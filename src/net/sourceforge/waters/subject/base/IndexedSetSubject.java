@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.subject.base
 //# CLASS:   IndexedSetSubject
 //###########################################################################
-//# $Id: IndexedSetSubject.java,v 1.3 2006-07-20 02:28:37 robi Exp $
+//# $Id: IndexedSetSubject.java,v 1.4 2007-07-03 11:20:53 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.subject.base;
@@ -22,9 +22,4 @@ import net.sourceforge.waters.model.base.IndexedSet;
 public interface IndexedSetSubject<P extends NamedSubject>
   extends IndexedSet<P>, SetSubject<P>
 {
-
-  //#########################################################################
-  //# Cloning
-  public IndexedSetSubject<P> clone();
-
 }

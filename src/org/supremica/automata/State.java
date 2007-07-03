@@ -1,3 +1,4 @@
+//# -*- indent-tabs-mode: nil  c-basic-offset: 4 -*-
 
 /*
  * Supremica Software License Agreement
@@ -56,6 +57,7 @@ import java.awt.Point;
 import org.supremica.util.Args;
 
 import net.sourceforge.waters.model.base.Proxy;
+import net.sourceforge.waters.model.base.ProxyTools;
 import net.sourceforge.waters.model.base.ProxyVisitor;
 import net.sourceforge.waters.model.base.NamedProxy;
 import net.sourceforge.waters.model.base.VisitorException;
@@ -1062,17 +1064,25 @@ public class State
 //        labels = set;
 //    }
 
-    public Object acceptVisitor(final ProxyVisitor visitor)
-    throws VisitorException
+    //#######################################################################
+    //# Interface net.sourceforge.waters.model.base.Proxy
+    public Class<StateProxy> getProxyInterface()
     {
-        final ProductDESProxyVisitor desvisitor = (ProductDESProxyVisitor) visitor;
-        return desvisitor.visitStateProxy(this);
+        return StateProxy.class;
     }
 
     public boolean equalsByContents(final Proxy partner)
     {
-        State partnerState = (State)partner;
-        return getName().equals(partnerState.getName()) && isInitial() == partnerState.isInitial() && isAccepting() == partnerState.isAccepting() && isForbidden() == partnerState.isForbidden();
+        if (getProxyInterface() == partner.getProxyInterface()) {
+            final StateProxy partnerState = (StateProxy) partner;
+            return
+                getName().equals(partnerState.getName()) &&
+                isInitial() == partnerState.isInitial() &&
+                ProxyTools.isEqualCollectionByContents
+                    (getPropositions(), partnerState.getPropositions());
+        } else {
+            return false;
+        }
     }
 
     public boolean equalsWithGeometry(final Proxy partner)
@@ -1107,6 +1117,14 @@ public class State
         return hashCodeByContents();
     }
 
+    public Object acceptVisitor(final ProxyVisitor visitor)
+        throws VisitorException
+    {
+        final ProductDESProxyVisitor desvisitor =
+            (ProductDESProxyVisitor) visitor;
+        return desvisitor.visitStateProxy(this);
+    }
+
     public boolean refequals(final NamedProxy partner)
     {
         return getName().equals(partner.getName());
@@ -1117,6 +1135,9 @@ public class State
         return getName().hashCode();
     }
 
+
+    //#######################################################################
+    //# Interface net.sourceforge.waters.model.module.AutomatonProxy
     public Collection<EventProxy> getPropositions()
     {
         LinkedList<EventProxy> currPropositions = new LinkedList<EventProxy>();
@@ -1129,6 +1150,6 @@ public class State
 			currPropositions.add(forbiddenProposition);
 		}
         return currPropositions;
-
     }
+
 }

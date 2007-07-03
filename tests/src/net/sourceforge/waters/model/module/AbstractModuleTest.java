@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.module
 //# CLASS:   AbstractModuleTest
 //###########################################################################
-//# $Id: AbstractModuleTest.java,v 1.12 2007-06-23 09:18:31 robi Exp $
+//# $Id: AbstractModuleTest.java,v 1.13 2007-07-03 11:20:53 robi Exp $
 //###########################################################################
 
 
@@ -14,7 +14,9 @@ import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
+import java.io.File;
 import java.io.PrintWriter;
+import java.net.URI;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
@@ -233,6 +235,57 @@ public abstract class AbstractModuleTest extends AbstractJAXBTest<ModuleProxy>
 
 
   //#########################################################################
+  //# Cross-Cloning Test Cases (subject->plain and vice versa)
+  public void testCrossClone_buffer_sf1()
+    throws Exception
+  {
+    testCrossClone("handwritten", "buffer_sf1");
+  }
+
+  public void testCrossClone_colours()
+    throws Exception
+  {
+    testCrossClone("handwritten", "colours");
+  }
+
+  public void testCrossClone_machine()
+    throws Exception
+  {
+    testCrossClone("handwritten", "machine");
+  }
+
+  public void testCrossClone_nodegroup1()
+    throws Exception
+  {
+    testCrossClone("handwritten", "nodegroup1");
+  }
+
+  public void testCrossClone_nodegroup2()
+    throws Exception
+  {
+    testCrossClone("handwritten", "nodegroup2");
+  }
+
+  public void testCrossClone_small_factory_2()
+    throws Exception
+  {
+    testCrossClone("handwritten", "small_factory_2");
+  }
+
+  public void testCrossClone_small_factory_n()
+    throws Exception
+  {
+    testCrossClone("handwritten", "small_factory_n");
+  }
+
+  public void testCrossClone_tictactoe()
+    throws Exception
+  {
+    testCrossClone("handwritten", "tictactoe");
+  }
+
+
+  //#########################################################################
   //# Handcrafting Test Cases
   public void testHandcraft_emptyedge()
     throws Exception
@@ -364,6 +417,69 @@ public abstract class AbstractModuleTest extends AbstractJAXBTest<ModuleProxy>
 
 
   //#########################################################################
+  //# Cross Cloning (only for modules so far)
+  protected ModuleProxy testCrossClone(final String name)
+    throws Exception
+  {
+    return testCrossClone(getInputDirectory(), name);
+  }
+
+  protected ModuleProxy testCrossClone(final String dirname, final String name)
+    throws Exception
+  {
+    final File dir = new File(getInputDirectory(), dirname);
+    return testCrossClone(dir, name);
+  }
+
+  protected ModuleProxy testCrossClone(final String dirname1,
+                                       final String dirname2,
+                                       final String name)
+    throws Exception
+  {
+    final File dir1 = new File(getInputDirectory(), dirname1);
+    final File dir2 = new File(dir1, dirname2);
+    return testCrossClone(dir2, name);
+  }
+
+  protected ModuleProxy testCrossClone(final File dir, final String name)
+    throws Exception
+  {
+    final ProxyUnmarshaller<ModuleProxy> unmarshaller = getProxyUnmarshaller();
+    final String extname = name + unmarshaller.getDefaultExtension();
+    final File filename = new File(dir, extname);
+    return testCrossClone(filename);
+  }
+
+  protected ModuleProxy testCrossClone(final File filename)
+    throws Exception
+  {
+    final ProxyUnmarshaller<ModuleProxy> unmarshaller =
+      getAlternateProxyUnmarshaller();
+    final ModuleProxyCloner cloner = getModuleProxyCloner();
+    final URI uri = filename.toURI();
+    final ModuleProxy module = unmarshaller.unmarshal(uri);
+    final ModuleProxy cloned = (ModuleProxy) cloner.getClone(module);
+    checkIntegrity(cloned);
+    assertTrue("Clone differs from original!",
+               cloned.equalsWithGeometry(module));
+    return cloned;
+  }
+
+
+  //#########################################################################
+  //# Simple Access
+  protected ModuleProxyCloner getModuleProxyCloner()
+  {
+    return mCloner;
+  }
+
+  protected ProxyUnmarshaller<ModuleProxy> getAlternateProxyUnmarshaller()
+  {
+    return mAltMarshaller;
+  }
+
+
+  //#########################################################################
   //# Overrides for Abstract Base Class JAXBTestCase
   protected ProxyMarshaller<ModuleProxy> getProxyMarshaller()
   {
@@ -393,8 +509,11 @@ public abstract class AbstractModuleTest extends AbstractJAXBTest<ModuleProxy>
   { 
     super.setUp();
     final ModuleProxyFactory factory = getModuleProxyFactory();
+    final ModuleProxyFactory altfactory = getAlternateModuleProxyFactory();
     final OperatorTable optable = CompilerOperatorTable.getInstance();
+    mCloner = new ModuleProxyCloner(factory);
     mMarshaller = new JAXBModuleMarshaller(factory, optable);
+    mAltMarshaller = new JAXBModuleMarshaller(altfactory, optable);
     final PrintWriter writer = new PrintWriter(System.out);
     mPrinter = new ModuleProxyPrinter(writer);
   }
@@ -403,6 +522,7 @@ public abstract class AbstractModuleTest extends AbstractJAXBTest<ModuleProxy>
     throws Exception
   {
     mMarshaller = null;
+    mAltMarshaller = null;
     mPrinter = null;
     super.tearDown();
   }
@@ -411,11 +531,14 @@ public abstract class AbstractModuleTest extends AbstractJAXBTest<ModuleProxy>
   //#########################################################################
   //# Provided by Subclasses
   protected abstract ModuleProxyFactory getModuleProxyFactory();
+  protected abstract ModuleProxyFactory getAlternateModuleProxyFactory();
 
 
   //#########################################################################
   //# Data Members
+  private ModuleProxyCloner mCloner;
   private JAXBModuleMarshaller mMarshaller;
+  private JAXBModuleMarshaller mAltMarshaller;
   private ProxyPrinter mPrinter;
 
 }

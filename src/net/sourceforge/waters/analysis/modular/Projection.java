@@ -2,30 +2,33 @@ package net.sourceforge.waters.analysis.modular;
 
 import net.sourceforge.waters.xsd.base.ComponentKind;
 
-import net.sourceforge.waters.model.des.ProductDESProxy;
-import java.util.Set;
-import net.sourceforge.waters.model.des.EventProxy;
-import net.sourceforge.waters.model.des.ProductDESProxyFactory;
-import net.sourceforge.waters.model.des.StateProxy;
 import java.util.AbstractMap;
-import java.util.Map;
-import java.util.Arrays;
-import net.sourceforge.waters.model.des.AutomatonProxy;
-import java.util.Collection;
-import net.sourceforge.waters.model.base.VisitorException;
-import net.sourceforge.waters.model.base.ProxyVisitor;
-import net.sourceforge.waters.model.des.ProductDESProxyVisitor;
-import java.util.HashSet;
-import java.util.TreeSet;
-import java.util.Comparator;
-import net.sourceforge.waters.model.des.TransitionProxy;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.SortedSet;
-import net.sourceforge.waters.model.base.NamedProxy;
-import java.util.List;
-import net.sourceforge.waters.model.base.Proxy;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.SortedSet;
+import java.util.TreeSet;
+
+import net.sourceforge.waters.model.base.NamedProxy;
+import net.sourceforge.waters.model.base.Proxy;
+import net.sourceforge.waters.model.base.ProxyTools;
+import net.sourceforge.waters.model.base.ProxyVisitor;
+import net.sourceforge.waters.model.base.VisitorException;
+import net.sourceforge.waters.model.des.AutomatonProxy;
+import net.sourceforge.waters.model.des.EventProxy;
+import net.sourceforge.waters.model.des.ProductDESProxy;
+import net.sourceforge.waters.model.des.ProductDESProxyFactory;
+import net.sourceforge.waters.model.des.ProductDESProxyVisitor;
+import net.sourceforge.waters.model.des.StateProxy;
+import net.sourceforge.waters.model.des.TransitionProxy;
+
 
 public class Projection
 {
@@ -343,10 +346,11 @@ public class Projection
     public boolean refequals(NamedProxy o)
     {
       if (o instanceof MemStateProxy) {
+	final MemStateProxy s = (MemStateProxy) o;
+	return s.mName == mName;
+      } else {
         return false;
       }
-      MemStateProxy s = (MemStateProxy)o;
-      return s.mName == mName;
     }
     
     public int refHashCode()
@@ -360,15 +364,29 @@ public class Projection
       final ProductDESProxyVisitor desvisitor = (ProductDESProxyVisitor) visitor;
       return desvisitor.visitStateProxy(this);
     }
-    
-    public boolean equalsByContents(Proxy o)
+
+    public Class<StateProxy> getProxyInterface()
     {
-      return refequals(o);
+      return StateProxy.class;
+    }
+
+    public boolean equalsByContents(final Proxy partner)
+    {
+      if (partner != null &&
+	  partner.getProxyInterface() == getProxyInterface()) {
+	final StateProxy state = (StateProxy) partner;
+	return
+	  (getName().equals(state.getName())) &&
+	  (isInitial() == state.isInitial()) &&
+	  state.getPropositions().isEmpty();
+      } else {
+	return false;
+      }
     }
     
     public boolean equalsWithGeometry(Proxy o)
     {
-      return refequals(o);
+      return equalsByContents(o);
     }
     
     public int hashCodeByContents()

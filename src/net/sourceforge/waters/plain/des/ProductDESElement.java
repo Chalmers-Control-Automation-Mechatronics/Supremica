@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.plain.des
 //# CLASS:   ProductDESElement
 //###########################################################################
-//# $Id: ProductDESElement.java,v 1.11 2007-02-26 21:41:18 robi Exp $
+//# $Id: ProductDESElement.java,v 1.12 2007-07-03 11:20:53 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.plain.des;
@@ -175,6 +175,11 @@ public class ProductDESElement
 
   //#########################################################################
   //# Equals and Hashcode
+  public Class<ProductDESProxy> getProxyInterface()
+  {
+    return ProductDESProxy.class;
+  }
+
   public boolean equalsByContents(final Proxy partner)
   {
     if (super.equalsByContents(partner)) {

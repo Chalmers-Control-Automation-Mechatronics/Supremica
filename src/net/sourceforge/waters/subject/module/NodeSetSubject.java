@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.subject.module
 //# CLASS:   NodeSetSubject
 //###########################################################################
-//# $Id: NodeSetSubject.java,v 1.6 2007-02-26 21:41:18 robi Exp $
+//# $Id: NodeSetSubject.java,v 1.7 2007-07-03 11:20:53 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.subject.module;
@@ -49,7 +49,7 @@ import net.sourceforge.waters.subject.base.Subject;
 
 class NodeSetSubject
   extends AbstractSet<NodeSubject>
-  implements IndexedSetSubject<NodeSubject>, Cloneable
+  implements IndexedSetSubject<NodeSubject>
 {
 
   //#########################################################################
@@ -71,34 +71,6 @@ class NodeSetSubject
     this(input.size());
     final Collection<NodeSubject> downcast = Casting.toCollection(input);
     insertAllUnique(downcast);
-  }
-
-
-  //#########################################################################
-  //# Cloning
-  public NodeSetSubject clone()
-  {
-    try {
-      final NodeSetSubject cloned = (NodeSetSubject) super.clone();
-      cloned.mParent = null;
-      cloned.mObservers = null;
-      cloned.mSimpleNodes = new LinkedList<SimpleNodeSubject>();
-      cloned.mGroupNodes = new LinkedList<GroupNodeSubject>();
-      cloned.mNameMap = new HashMap<String,NodeSubject>(size());
-      for (final SimpleNodeSubject node : mSimpleNodes) {
-	final SimpleNodeSubject clonednode = node.clone();
-	cloned.insertPreOrderedNode(clonednode);
-      }
-      for (final GroupNodeSubject groupnode : mGroupNodes) {
-	final GroupNodeSubject clonednode = groupnode.clone(cloned);
-	cloned.insertPreOrderedNode(clonednode);
-      }
-      return cloned;
-    } catch (final CloneNotSupportedException exception) {
-      throw new WatersRuntimeException(exception);
-    } catch (final DuplicateNameException exception) {
-      throw new WatersRuntimeException(exception);
-    }
   }
 
 

@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.plain.base
 //# CLASS:   AbstractNamedElement
 //###########################################################################
-//# $Id: AbstractNamedElement.java,v 1.3 2006-07-20 02:28:37 robi Exp $
+//# $Id: AbstractNamedElement.java,v 1.4 2007-07-03 11:20:53 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.plain.base;
@@ -81,7 +81,7 @@ public abstract class AbstractNamedElement
   public boolean equalsByContents(final Proxy partner)
   {
     if (super.equalsByContents(partner)) {
-      final AbstractNamedElement named = (AbstractNamedElement) partner;
+      final NamedProxy named = (NamedProxy) partner;
       return getName().equals(named.getName());
     } else {
       return false;

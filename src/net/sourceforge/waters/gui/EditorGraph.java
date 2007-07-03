@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   EditorGraph
 //###########################################################################
-//# $Id: EditorGraph.java,v 1.18 2007-05-23 16:28:16 robi Exp $
+//# $Id: EditorGraph.java,v 1.19 2007-07-03 11:20:53 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.gui;
@@ -121,11 +121,20 @@ public class EditorGraph
     addModelObserver(listener);
   }
 
-	public Object acceptVisitor(ProxyVisitor p)
+
+  //#########################################################################
+  //# Interface net.sourceforge.waters.model.module.GraphProxy
+  public Class<GraphProxy> getProxyInterface()
+  {
+    return GraphProxy.class;
+  }
+
+  public Object acceptVisitor(ProxyVisitor p)
     throws VisitorException
-	{
-		return ((ModuleProxyVisitor)p).visitGraphProxy(this);
-	}
+  {
+    return ((ModuleProxyVisitor)p).visitGraphProxy(this);
+  }
+
 
 	public Subject getCopy(Subject o)
 	{

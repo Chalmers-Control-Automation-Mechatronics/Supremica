@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.subject.base
 //# CLASS:   ProxySubject
 //###########################################################################
-//# $Id: ProxySubject.java,v 1.3 2007-06-11 05:59:18 robi Exp $
+//# $Id: ProxySubject.java,v 1.4 2007-07-03 11:20:53 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.subject.base;
@@ -44,7 +44,7 @@ public interface ProxySubject
    * are reused if possible, and may be changed in position as
    * needed. Items not contained are cloned from the given subject. The
    * method tries to produce as few model change notifications as possible.
-   * @param  subject  The subject to be copied from.
+   * @param  partner  The subject to be copied from.
    */
   public boolean assignFrom(ProxySubject partner);
 

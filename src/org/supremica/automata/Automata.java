@@ -1,3 +1,4 @@
+//# -*- indent-tabs-mode: nil  c-basic-offset: 4 -*-
 
 /*
  * Supremica Software License Agreement
@@ -1493,46 +1494,63 @@ public class Automata
     }
     
     
-    public Object acceptVisitor(final ProxyVisitor visitor)
-    throws VisitorException
+    //#######################################################################
+    //# Interface net.sourceforge.waters.model.base.Proxy
+    public Class<ProductDESProxy> getProxyInterface()
     {
-        final ProductDESProxyVisitor desvisitor = (ProductDESProxyVisitor) visitor;
-        return desvisitor.visitProductDESProxy(this);
+        return ProductDESProxy.class;
     }
-    
+
     public boolean equalsByContents(final Proxy partner)
     {
-        final Automata des = (Automata) partner;
-        
-        return	ProxyTools.isEqualSetByContents(getEvents(), des.getEvents()) &&
-            ProxyTools.isEqualSetByContents(getAutomata(), des.getAutomata());
+        if (getProxyInterface() == partner.getProxyInterface()) {
+            final ProductDESProxy des = (ProductDESProxy) partner;
+            return
+                // getName().equals(des.getName()) && ???
+                ProxyTools.isEqualSetByContents
+                    (getEvents(), des.getEvents()) &&
+                ProxyTools.isEqualSetByContents
+                    (getAutomata(), des.getAutomata());
+        } else {
+            return false;
+        }
     }
-    
+
     public boolean equalsWithGeometry(final Proxy partner)
     {
         return equalsByContents(partner);
     }
-    
+
     public int hashCodeByContents()
     {
+        // getName().hashCode() ???
         int result = ProxyTools.getSetHashCodeByContents(getEvents());
         result *= 5;
         result += ProxyTools.getSetHashCodeByContents(getAutomata());
         return result;
     }
-    
+
     public int hashCodeWithGeometry()
     {
         return hashCodeByContents();
     }
-    
+
     public boolean refequals(final NamedProxy partner)
     {
         return getName().equals(partner.getName());
     }
-    
+
     public int refHashCode()
     {
         return getName().hashCode();
     }
+
+    public Object acceptVisitor(final ProxyVisitor visitor)
+        throws VisitorException
+    {
+        final ProductDESProxyVisitor desvisitor =
+            (ProductDESProxyVisitor) visitor;
+        return desvisitor.visitProductDESProxy(this);
+    }
+
 }

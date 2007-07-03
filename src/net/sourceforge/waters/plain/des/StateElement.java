@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.plain.des
 //# CLASS:   StateElement
 //###########################################################################
-//# $Id: StateElement.java,v 1.9 2007-02-26 21:41:18 robi Exp $
+//# $Id: StateElement.java,v 1.10 2007-07-03 11:20:53 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.plain.des;
@@ -111,14 +111,19 @@ public final class StateElement
 
   //#########################################################################
   //# Equals and Hashcode
+  public Class<StateProxy> getProxyInterface()
+  {
+    return StateProxy.class;
+  }
+
   public boolean equalsByContents(final Proxy partner)
   {
     if (super.equalsByContents(partner)) {
-      final StateElement state = (StateElement) partner;
+      final StateProxy state = (StateProxy) partner;
       return
         (isInitial() == state.isInitial()) &&
         ProxyTools.isEqualCollectionByContents
-          (mPropositions, state.mPropositions);
+          (mPropositions, state.getPropositions());
     } else {
       return false;
     }

@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.plain.des
 //# CLASS:   ProxyToolsTest
 //###########################################################################
-//# $Id: ProxyToolsTest.java,v 1.2 2007-03-08 00:57:12 robi Exp $
+//# $Id: ProxyToolsTest.java,v 1.3 2007-07-03 11:20:53 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.base;
@@ -250,9 +250,17 @@ public class ProxyToolsTest extends TestCase
       }
     }
 
+    //#######################################################################
+    //# Equals and Hashcode
+    public Class<StringProxy> getProxyInterface()
+    {
+      return StringProxy.class;
+    }
+ 
     public boolean equalsByContents(final Proxy partner)
     {
-      if (partner instanceof StringProxy) {
+      if (partner != null &&
+          partner.getProxyInterface() == getProxyInterface()) {
         final StringProxy string = (StringProxy) partner;
         return mString.equals(string.mString);
       } else {
@@ -275,6 +283,8 @@ public class ProxyToolsTest extends TestCase
       return hashCodeByContents();
     }
 
+    //#######################################################################
+    //# Interface net.sourceforge.waters.model.base.Proxy
     public Object acceptVisitor(ProxyVisitor visitor)
       throws VisitorException
     {

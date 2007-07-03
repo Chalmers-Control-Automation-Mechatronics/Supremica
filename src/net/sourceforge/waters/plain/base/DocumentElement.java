@@ -3,7 +3,7 @@
 //# PACKAGE: net.sourceforge.waters.plain.base
 //# CLASS:   DocumentElement
 //###########################################################################
-//# $Id: DocumentElement.java,v 1.6 2007-06-23 09:18:31 robi Exp $
+//# $Id: DocumentElement.java,v 1.7 2007-07-03 11:20:53 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.plain.base;
@@ -125,11 +125,11 @@ public abstract class DocumentElement
   public boolean equalsByContents(final Proxy partner)
   {
     if (super.equalsByContents(partner)) {
-      final DocumentElement doc = (DocumentElement) partner;
+      final DocumentProxy doc = (DocumentProxy) partner;
       return
 	mComment == null ?
-	doc.mComment == null :
-	mComment.equals(doc.mComment);
+	doc.getComment() == null :
+	mComment.equals(doc.getComment());
     } else {
       return false;
     }

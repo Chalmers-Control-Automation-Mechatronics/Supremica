@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.subject.base
 //# CLASS:   AbstractSubject
 //###########################################################################
-//# $Id: AbstractSubject.java,v 1.6 2007-02-02 02:55:13 robi Exp $
+//# $Id: AbstractSubject.java,v 1.7 2007-07-03 11:20:53 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.subject.base;
@@ -71,11 +71,12 @@ public abstract class AbstractSubject
    * content-based equality, i.e., two subjects will be equal if their
    * contents are the same. Since subjects have no contents by themselves,
    * this default implementation considers two subjects as equal if they
-   * have the same class.
+   * have the same proxy interface.
    */
   public boolean equalsByContents(final Proxy partner)
   {
-    return partner != null && getClass() == partner.getClass();
+    return
+      partner != null && getProxyInterface() == partner.getProxyInterface();
   }
 
   /**
@@ -95,11 +96,11 @@ public abstract class AbstractSubject
    * used to compute a hash code to match the equality defined by the
    * {@link #equalsByContents(Proxy) equalsByContents()} method. The
    * default implementation for subjects computes the hash code based only
-   * on the object's class.
+   * on the object's proxy interface.
    */
   public int hashCodeByContents()
   {
-    return getClass().hashCode();
+    return getProxyInterface().hashCode();
   }
 
   /**

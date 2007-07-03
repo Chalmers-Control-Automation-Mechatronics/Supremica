@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.base
 //# CLASS:   Proxy
 //###########################################################################
-//# $Id: Proxy.java,v 1.3 2006-07-20 02:28:37 robi Exp $
+//# $Id: Proxy.java,v 1.4 2007-07-03 11:20:53 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.base;
@@ -30,6 +30,16 @@ public interface Proxy {
 
   //#########################################################################
   //# Comparing
+  /**
+   * Returns the most specific proxy interface implemented by this object.
+   * This method must return one of the leaf interfaces of the proxy
+   * hierarchy, e.g. {@link net.sourceforge.waters.model.des.EventProxy
+   * EventProxy}, not any specific implementation class. This is used by
+   * the different equality methods to ensure that objects from different
+   * implementations can be considered equal.
+   */
+  public Class<? extends Proxy> getProxyInterface();
+
   /**
    * Checks whether two elements are equal. This method implements
    * content-based equality, i.e., two elements will be equal if their

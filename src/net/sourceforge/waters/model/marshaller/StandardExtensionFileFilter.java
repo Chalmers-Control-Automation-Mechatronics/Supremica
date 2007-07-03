@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.marshaller
 //# CLASS:   StandardExtensionFileFilter
 //###########################################################################
-//# $Id: StandardExtensionFileFilter.java,v 1.3 2007-06-26 12:59:14 robi Exp $
+//# $Id: StandardExtensionFileFilter.java,v 1.4 2007-07-03 11:20:53 robi Exp $
 //###########################################################################
 
 
@@ -103,9 +103,9 @@ public class StandardExtensionFileFilter
    * @param  file        The file name to be checked.
    * @return A file with extension appended if necessary.
    */
-  public File ensureDefaultExtension(final File filename)
+  public File ensureDefaultExtension(final File file)
   {
-    return ensureDefaultExtension(filename, mExtension);
+    return ensureDefaultExtension(file, mExtension);
   }
 
 
@@ -123,7 +123,7 @@ public class StandardExtensionFileFilter
 
   /**
    * Checks whether a file name string has the given extension.
-   * @param  file        The file name to be checked.
+   * @param  filename    The file name to be checked.
    * @param  ext         The extension looked for, with preceding dot.
    */ 
   public static boolean hasExtension(final String filename, final String ext)

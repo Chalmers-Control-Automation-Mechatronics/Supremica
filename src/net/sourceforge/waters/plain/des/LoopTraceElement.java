@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.plain.des
 //# CLASS:   LoopTraceElement
 //###########################################################################
-//# $Id: LoopTraceElement.java,v 1.3 2006-09-19 15:53:20 robi Exp $
+//# $Id: LoopTraceElement.java,v 1.4 2007-07-03 11:20:53 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.plain.des;
@@ -33,7 +33,7 @@ import net.sourceforge.waters.model.des.TraceStepProxy;
  * @author Robi Malik
  */
 
-public class LoopTraceElement
+public final class LoopTraceElement
   extends TraceElement
   implements LoopTraceProxy
 {
@@ -128,11 +128,16 @@ public class LoopTraceElement
 
   //#########################################################################
   //# Equals and Hashcode
+  public Class<LoopTraceProxy> getProxyInterface()
+  {
+    return LoopTraceProxy.class;
+  }
+
   public boolean equalsByContents(final Proxy partner)
   {
     if (super.equalsByContents(partner)) {
-      final LoopTraceElement trace = (LoopTraceElement) partner;
-      return mLoopIndex == trace.mLoopIndex;
+      final LoopTraceProxy trace = (LoopTraceProxy) partner;
+      return mLoopIndex == trace.getLoopIndex();
     } else {
       return false;
     }    

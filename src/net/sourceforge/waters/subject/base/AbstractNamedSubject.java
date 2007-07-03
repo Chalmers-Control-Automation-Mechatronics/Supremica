@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.subject.base
 //# CLASS:   AbstractNamedSubject
 //###########################################################################
-//# $Id: AbstractNamedSubject.java,v 1.3 2006-07-20 02:28:37 robi Exp $
+//# $Id: AbstractNamedSubject.java,v 1.4 2007-07-03 11:20:53 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.subject.base;
@@ -80,7 +80,7 @@ public abstract class AbstractNamedSubject
   public boolean equalsByContents(final Proxy partner)
   {
     if (super.equalsByContents(partner)) {
-      final AbstractNamedSubject named = (AbstractNamedSubject) partner;
+      final NamedProxy named = (NamedProxy) partner;
       return getName().equals(named.getName());
     } else {
       return false;

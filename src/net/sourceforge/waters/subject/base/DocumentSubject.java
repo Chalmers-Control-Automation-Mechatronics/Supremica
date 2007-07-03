@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.subject.base
 //# CLASS:   DocumentSubject
 //###########################################################################
-//# $Id: DocumentSubject.java,v 1.7 2007-06-23 10:16:00 robi Exp $
+//# $Id: DocumentSubject.java,v 1.8 2007-07-03 11:20:53 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.subject.base;
@@ -134,11 +134,11 @@ public abstract class DocumentSubject
   public boolean equalsByContents(final Proxy partner)
   {
     if (super.equalsByContents(partner)) {
-      final DocumentSubject doc = (DocumentSubject) partner;
+      final DocumentProxy doc = (DocumentProxy) partner;
       return
 	mComment == null ?
-	doc.mComment == null :
-	mComment.equals(doc.mComment);
+	doc.getComment() == null :
+	mComment.equals(doc.getComment());
     } else {
       return false;
     }

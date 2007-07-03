@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.plain.des
 //# CLASS:   EventElement
 //###########################################################################
-//# $Id: EventElement.java,v 1.4 2006-07-20 02:28:37 robi Exp $
+//# $Id: EventElement.java,v 1.5 2007-07-03 11:20:53 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.plain.des;
@@ -28,7 +28,7 @@ import net.sourceforge.waters.xsd.base.EventKind;
  * @author Robi Malik
  */
 
-public class EventElement
+public final class EventElement
   extends NamedElement
   implements EventProxy
 {
@@ -95,13 +95,18 @@ public class EventElement
 
   //#########################################################################
   //# Equals and Hashcode
+  public Class<EventProxy> getProxyInterface()
+  {
+    return EventProxy.class;
+  }
+
   public boolean equalsByContents(final Proxy partner)
   {
     if (super.equalsByContents(partner)) {
-      final EventElement event = (EventElement) partner;
+      final EventProxy event = (EventProxy) partner;
       return
-	mKind.equals(event.mKind) &&
-	(mIsObservable == event.mIsObservable);
+	mKind.equals(event.getKind()) &&
+	(mIsObservable == event.isObservable());
     } else {
       return false;
     }    

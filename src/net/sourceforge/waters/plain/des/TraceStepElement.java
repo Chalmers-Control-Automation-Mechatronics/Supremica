@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.plain.des
 //# CLASS:   TraceStepElement
 //###########################################################################
-//# $Id: TraceStepElement.java,v 1.2 2006-07-20 02:28:37 robi Exp $
+//# $Id: TraceStepElement.java,v 1.3 2007-07-03 11:20:53 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.plain.des;
@@ -109,13 +109,18 @@ public final class TraceStepElement
 
   //#########################################################################
   //# Equals and Hashcode
+  public Class<TraceStepProxy> getProxyInterface()
+  {
+    return TraceStepProxy.class;
+  }
+
   public boolean equalsByContents(final Proxy partner)
   {
     if (super.equalsByContents(partner)) {
-      final TraceStepElement step = (TraceStepElement) partner;
+      final TraceStepProxy step = (TraceStepProxy) partner;
       return
-        (mEvent == step.mEvent) &&
-        mStateMap.equals(step.mStateMap);
+        (mEvent == step.getEvent()) &&
+        mStateMap.equals(step.getStateMap());
     } else {
       return false;
     }    

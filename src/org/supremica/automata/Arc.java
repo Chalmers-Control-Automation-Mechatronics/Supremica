@@ -1,3 +1,4 @@
+//# -*- indent-tabs-mode: nil  c-basic-offset: 4 -*-
 
 /*
  * Supremica Software License Agreement
@@ -228,35 +229,56 @@ public class Arc
         }
     }
     
-    public Object acceptVisitor(final ProxyVisitor visitor)
-    throws VisitorException
+
+    //#######################################################################
+    //# Interface net.sourceforge.waters.model.base.Proxy
+    public Class<TransitionProxy> getProxyInterface()
     {
-        final ProductDESProxyVisitor desvisitor = (ProductDESProxyVisitor) visitor;
-        return desvisitor.visitTransitionProxy(this);
+        return TransitionProxy.class;
     }
-    
+
     public boolean equalsByContents(final Proxy partner)
     {
-        Arc partnerArc = (Arc)partner;
-        return getSource().refequals(partnerArc.getSource()) && getTarget().refequals(partnerArc.getTarget()) && getEvent().refequals(partnerArc.getEvent());
+        if (partner.getProxyInterface() == getProxyInterface()) {
+            final TransitionProxy partnerArc = (TransitionProxy) partner;
+            return
+                getSource().refequals(partnerArc.getSource()) &&
+                getTarget().refequals(partnerArc.getTarget()) &&
+                getEvent().refequals(partnerArc.getEvent());
+        } else {
+            return false;
+        }
     }
-    
+
     public boolean equalsWithGeometry(final Proxy partner)
     {
         return equalsByContents(partner);
     }
-    
+
     public int hashCodeByContents()
     {
-        return getSource().refHashCode() + 5 * getEvent().refHashCode() + 25 * getTarget().refHashCode();
+        return
+            getSource().refHashCode() +
+            5 * getEvent().refHashCode() +
+            25 * getTarget().refHashCode();
     }
-    
+
     public int hashCodeWithGeometry()
     {
         return hashCodeByContents();
     }
-    
-    // TEMP-solution (use EFA instead)
+
+    public Object acceptVisitor(final ProxyVisitor visitor)
+        throws VisitorException
+    {
+        final ProductDESProxyVisitor desvisitor =
+            (ProductDESProxyVisitor) visitor;
+        return desvisitor.visitTransitionProxy(this);
+    }
+
+
+    //#######################################################################
+    //# TEMP-solution (use EFA instead)
     public Arc(State from, State to, LabeledEvent event, double probability)
         throws IllegalArgumentException
     {
@@ -264,15 +286,14 @@ public class Arc
         setProbability(probability);
     }
 
-    // TEMP-solution (use EFA instead)
     public void setProbability(double probability)
     {
 	this.probability = probability;
     }
 
-    // TEMP-solution (use EFA instead)
     public double getProbability()
     {
 	return probability;
     }
+
 }

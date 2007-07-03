@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.subject.module
 //# CLASS:   SubjectModuleTest
 //###########################################################################
-//# $Id: SubjectModuleTest.java,v 1.6 2007-06-23 09:18:31 robi Exp $
+//# $Id: SubjectModuleTest.java,v 1.7 2007-07-03 11:20:54 robi Exp $
 //###########################################################################
 
 
@@ -16,6 +16,7 @@ import junit.framework.TestSuite;
 import net.sourceforge.waters.model.module.AbstractModuleTest;
 import net.sourceforge.waters.model.module.ModuleProxy;
 import net.sourceforge.waters.model.module.ModuleProxyFactory;
+import net.sourceforge.waters.plain.module.ModuleElementFactory;
 
 
 public class SubjectModuleTest extends AbstractModuleTest
@@ -38,6 +39,11 @@ public class SubjectModuleTest extends AbstractModuleTest
   protected ModuleProxyFactory getModuleProxyFactory()
   {
     return ModuleSubjectFactory.getInstance();
+  }
+
+  protected ModuleProxyFactory getAlternateModuleProxyFactory()
+  {
+    return ModuleElementFactory.getInstance();
   }
 
 

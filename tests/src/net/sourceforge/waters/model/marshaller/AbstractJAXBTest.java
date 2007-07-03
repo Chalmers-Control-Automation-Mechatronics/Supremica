@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.marshaller
 //# CLASS:   AbstractJAXBTest
 //###########################################################################
-//# $Id: AbstractJAXBTest.java,v 1.4 2007-06-23 09:18:31 robi Exp $
+//# $Id: AbstractJAXBTest.java,v 1.5 2007-07-03 11:20:53 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.marshaller;
@@ -250,6 +250,8 @@ public abstract class AbstractJAXBTest<D extends DocumentProxy>
     final Class<D> clazz = unmarshaller.getDocumentClass();
     final D cloned = clazz.cast(cloneddoc);
     checkIntegrity(cloned);
+    assertTrue("Clone differs from original!",
+               proxy.equalsWithGeometry(cloned));
     return cloned;
   }
 

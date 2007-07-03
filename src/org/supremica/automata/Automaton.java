@@ -1,3 +1,4 @@
+//# -*- indent-tabs-mode: nil  c-basic-offset: 4 -*-
 
 /*
  * Supremica Software License Agreement
@@ -2412,70 +2413,35 @@ public class Automaton
         return sbuf.toString();
     }
 
-    ////////////////////////////////////
-    ///// AutomatonProxy interface /////
-    ////////////////////////////////////
-
     private AutomatonProxy correspondingAutomatonProxy = null;
 
-    public ComponentKind getKind()
-    {
-        return AutomatonType.toKind(type);
-    }
-
-    public AutomatonProxy clone()
+    public Automaton clone()
     {
         return new Automaton(this);
     }
 
-    public Set<StateProxy> getStates()
+
+    //#######################################################################
+    //# Interface net.sourceforge.waters.model.base.Proxy
+    public Class<AutomatonProxy> getProxyInterface()
     {
-        return getStateSet().getWatersStates();
-    }
-
-    public Collection<TransitionProxy> getTransitions()
-    {
-        LinkedList<TransitionProxy> transitions = new LinkedList<TransitionProxy>();
-
-        for (Iterator<Arc> arcIt = arcIterator(); arcIt.hasNext(); )
-        {
-            Arc currArc = arcIt.next();
-            transitions.add(currArc);
-        }
-
-        return transitions;
-    }
-
-    public Set<EventProxy> getEvents()
-    {
-        Set <EventProxy> currSet = getAlphabet().getWatersEvents();
-        if (true || hasAcceptingState()) // Always add? If "accepting" is not in the alphabet, all states should be marked!
-            currSet.add(State.acceptingProposition);
-        if (nbrOfForbiddenStates() > 0)
-            currSet.add(State.forbiddenProposition);
-        return currSet;
-    }
-
-    public Object acceptVisitor(final ProxyVisitor visitor)
-    throws VisitorException
-    {
-        final ProductDESProxyVisitor desvisitor = (ProductDESProxyVisitor) visitor;
-        return desvisitor.visitAutomatonProxy(this);
+        return AutomatonProxy.class;
     }
 
     public boolean equalsByContents(final Proxy partner)
     {
-        Automaton partnerAutomaton = (Automaton)partner;
-        if (getName().equals(partnerAutomaton.getName()))
-        {
+        if (getProxyInterface() == partner.getProxyInterface()) {
+            final AutomatonProxy partnerAutomaton = (AutomatonProxy) partner;
             return
-                getKind().equals(partnerAutomaton.getKind()) &&
-                ProxyTools.isEqualSetByContents(getEvents(), partnerAutomaton.getEvents()) &&
-                ProxyTools.isEqualSetByContents(getStates(), partnerAutomaton.getStates()) &&
-                ProxyTools.isEqualSetByContents(getTransitions(), partnerAutomaton.getTransitions());
-        }
-        else
-        {
+                getName().equals(partnerAutomaton.getName()) &&
+                getKind() == partnerAutomaton.getKind() &&
+                ProxyTools.isEqualSetByContents
+                    (getEvents(), partnerAutomaton.getEvents()) &&
+                ProxyTools.isEqualSetByContents
+                    (getStates(), partnerAutomaton.getStates()) &&
+                ProxyTools.isEqualSetByContents
+                    (getTransitions(), partnerAutomaton.getTransitions());
+        } else {
             return false;
         }
     }
@@ -2518,6 +2484,51 @@ public class Automaton
     {
         return getName().compareTo(((Automaton) partner).getName());
     }
+
+    public Object acceptVisitor(final ProxyVisitor visitor)
+    throws VisitorException
+    {
+        final ProductDESProxyVisitor desvisitor =
+            (ProductDESProxyVisitor) visitor;
+        return desvisitor.visitAutomatonProxy(this);
+    }
+
+
+    //#######################################################################
+    //# Interface net.sourceforge.waters.model.module.AutomatonProxy
+    public ComponentKind getKind()
+    {
+        return AutomatonType.toKind(type);
+    }
+
+    public Set<StateProxy> getStates()
+    {
+        return getStateSet().getWatersStates();
+    }
+
+    public Collection<TransitionProxy> getTransitions()
+    {
+        LinkedList<TransitionProxy> transitions = new LinkedList<TransitionProxy>();
+
+        for (Iterator<Arc> arcIt = arcIterator(); arcIt.hasNext(); )
+        {
+            Arc currArc = arcIt.next();
+            transitions.add(currArc);
+        }
+
+        return transitions;
+    }
+
+    public Set<EventProxy> getEvents()
+    {
+        Set <EventProxy> currSet = getAlphabet().getWatersEvents();
+        if (true || hasAcceptingState()) // Always add? If "accepting" is not in the alphabet, all states should be marked!
+            currSet.add(State.acceptingProposition);
+        if (nbrOfForbiddenStates() > 0)
+            currSet.add(State.forbiddenProposition);
+        return currSet;
+    }
+
 
     // Events are (supposed to be) immutable, you cannot change the label once constructed
     // Most of the effects of this can be overcome by this method

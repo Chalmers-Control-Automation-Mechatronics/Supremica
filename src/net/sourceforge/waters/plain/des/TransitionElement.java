@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.plain.des
 //# CLASS:   TransitionElement
 //###########################################################################
-//# $Id: TransitionElement.java,v 1.3 2006-07-20 02:28:37 robi Exp $
+//# $Id: TransitionElement.java,v 1.4 2007-07-03 11:20:53 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.plain.des;
@@ -27,7 +27,7 @@ import net.sourceforge.waters.plain.base.Element;
  * @author Robi Malik
  */
 
-public class TransitionElement
+public final class TransitionElement
   extends Element
   implements TransitionProxy
 {
@@ -92,6 +92,11 @@ public class TransitionElement
 
   //#########################################################################
   //# Equals and Hashcode
+  public Class<TransitionProxy> getProxyInterface()
+  {
+    return TransitionProxy.class;
+  }
+
   /**
    * Checks whether this transition is equal to another.
    * Two transitions are considered as equal if their source and target
@@ -100,7 +105,7 @@ public class TransitionElement
   public boolean equalsByContents(final Proxy partner)
   {
     if (super.equalsByContents(partner)) {
-      final TransitionElement trans = (TransitionElement) partner;
+      final TransitionProxy trans = (TransitionProxy) partner;
       return
         getSource().refequals(trans.getSource()) &&
         getTarget().refequals(trans.getTarget()) &&

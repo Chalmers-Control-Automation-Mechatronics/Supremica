@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.plain.des
 //# CLASS:   AutomatonElement
 //###########################################################################
-//# $Id: AutomatonElement.java,v 1.10 2007-02-26 21:41:18 robi Exp $
+//# $Id: AutomatonElement.java,v 1.11 2007-07-03 11:20:53 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.plain.des;
@@ -176,15 +176,20 @@ public final class AutomatonElement
 
   //#########################################################################
   //# Equals and Hashcode
+  public Class<AutomatonProxy> getProxyInterface()
+  {
+    return AutomatonProxy.class;
+  }
+
   public boolean equalsByContents(final Proxy partner)
   {
     if (super.equalsByContents(partner)) {
-      final AutomatonElement aut = (AutomatonElement) partner;
+      final AutomatonProxy aut = (AutomatonProxy) partner;
       return
-        mKind.equals(aut.mKind) &&
-        ProxyTools.isEqualSetByContents(mEvents, aut.mEvents) &&
-        ProxyTools.isEqualSetByContents(mStates, aut.mStates) &&
-        ProxyTools.isEqualSetByContents(mTransitions, aut.mTransitions);
+        mKind.equals(aut.getKind()) &&
+        ProxyTools.isEqualSetByContents(mEvents, aut.getEvents()) &&
+        ProxyTools.isEqualSetByContents(mStates, aut.getStates()) &&
+        ProxyTools.isEqualSetByContents(mTransitions, aut.getTransitions());
     } else {
       return false;
     }

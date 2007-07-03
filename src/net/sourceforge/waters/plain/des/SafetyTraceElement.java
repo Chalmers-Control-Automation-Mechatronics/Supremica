@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.plain.des
 //# CLASS:   SafetyTraceElement
 //###########################################################################
-//# $Id: SafetyTraceElement.java,v 1.4 2006-09-19 15:53:20 robi Exp $
+//# $Id: SafetyTraceElement.java,v 1.5 2007-07-03 11:20:53 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.plain.des;
@@ -32,7 +32,7 @@ import net.sourceforge.waters.model.des.TraceStepProxy;
  * @author Robi Malik
  */
 
-public class SafetyTraceElement
+public final class SafetyTraceElement
   extends TraceElement
   implements SafetyTraceProxy
 {
@@ -129,6 +129,14 @@ public class SafetyTraceElement
   {
     final ProductDESProxyVisitor desvisitor = (ProductDESProxyVisitor) visitor;
     return desvisitor.visitSafetyTraceProxy(this);
+  }
+
+
+  //#########################################################################
+  //# Equals and Hashcode
+  public Class<SafetyTraceProxy> getProxyInterface()
+  {
+    return SafetyTraceProxy.class;
   }
 
 }

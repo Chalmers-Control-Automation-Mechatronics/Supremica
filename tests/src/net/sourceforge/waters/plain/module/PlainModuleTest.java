@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.plain.module
 //# CLASS:   PlainModuleTest
 //###########################################################################
-//# $Id: PlainModuleTest.java,v 1.3 2006-07-20 02:28:38 robi Exp $
+//# $Id: PlainModuleTest.java,v 1.4 2007-07-03 11:20:54 robi Exp $
 //###########################################################################
 
 
@@ -15,6 +15,7 @@ import junit.framework.TestSuite;
 
 import net.sourceforge.waters.model.module.AbstractModuleTest;
 import net.sourceforge.waters.model.module.ModuleProxyFactory;
+import net.sourceforge.waters.subject.module.ModuleSubjectFactory;
 
 
 public class PlainModuleTest extends AbstractModuleTest
@@ -37,6 +38,11 @@ public class PlainModuleTest extends AbstractModuleTest
   protected ModuleProxyFactory getModuleProxyFactory()
   {
     return ModuleElementFactory.getInstance();
+  }
+
+  protected ModuleProxyFactory getAlternateModuleProxyFactory()
+  {
+    return ModuleSubjectFactory.getInstance();
   }
 
 }

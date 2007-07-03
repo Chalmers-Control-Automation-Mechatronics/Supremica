@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.plain.base
 //# CLASS:   Element
 //###########################################################################
-//# $Id: Element.java,v 1.4 2006-07-20 02:28:37 robi Exp $
+//# $Id: Element.java,v 1.5 2007-07-03 11:20:53 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.plain.base;
@@ -72,11 +72,12 @@ public abstract class Element
    * content-based equality, i.e., two elements will be equal if their
    * contents are the same. Since elements have no contents by themselves,
    * this default implementation considers two elements as equal if they
-   * have the same class.
+   * have the same proxy interface.
    */
   public boolean equalsByContents(final Proxy partner)
   {
-    return partner != null && getClass() == partner.getClass();
+    return
+      partner != null && getProxyInterface() == partner.getProxyInterface();
   }
 
   /**
@@ -96,11 +97,11 @@ public abstract class Element
    * used to compute a hash code to match the equality defined by the
    * {@link #equalsByContents(Proxy) equalsByContents()} method. The
    * default implementation for elements computes the hash code based only
-   * on the object's class.
+   * on the object's proxy interface.
    */
   public int hashCodeByContents()
   {
-    return getClass().hashCode();
+    return getProxyInterface().hashCode();
   }
 
   /**

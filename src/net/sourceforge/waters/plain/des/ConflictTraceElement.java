@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.plain.des
 //# CLASS:   ConflictTraceElement
 //###########################################################################
-//# $Id: ConflictTraceElement.java,v 1.3 2006-09-19 15:53:20 robi Exp $
+//# $Id: ConflictTraceElement.java,v 1.4 2007-07-03 11:20:53 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.plain.des;
@@ -136,6 +136,11 @@ public class ConflictTraceElement
 
   //#########################################################################
   //# Equals and Hashcode
+  public Class<ConflictTraceProxy> getProxyInterface()
+  {
+    return ConflictTraceProxy.class;
+  }
+
   public boolean equalsByContents(final Proxy partner)
   {
     if (super.equalsByContents(partner)) {

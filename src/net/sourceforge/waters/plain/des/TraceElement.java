@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.plain.des
 //# CLASS:   TraceElement
 //###########################################################################
-//# $Id: TraceElement.java,v 1.5 2007-02-26 21:41:18 robi Exp $
+//# $Id: TraceElement.java,v 1.6 2007-07-03 11:20:53 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.plain.des;
@@ -171,11 +171,11 @@ public abstract class TraceElement
   public boolean equalsByContents(final Proxy partner)
   {
     if (super.equalsByContents(partner)) {
-      final TraceElement trace = (TraceElement) partner;
+      final TraceProxy trace = (TraceProxy) partner;
       return
-        mProductDES == trace.mProductDES &&
-        mAutomata.equals(trace.mAutomata) &&
-        ProxyTools.isEqualListByContents(mTraceSteps, trace.mTraceSteps);
+        mProductDES == trace.getProductDES() &&
+        mAutomata.equals(trace.getAutomata()) &&
+        ProxyTools.isEqualListByContents(mTraceSteps, trace.getTraceSteps());
     } else {
       return false;
     }    

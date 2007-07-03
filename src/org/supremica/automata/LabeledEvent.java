@@ -1,3 +1,4 @@
+//# -*- indent-tabs-mode: nil  c-basic-offset: 4 -*-
 
 /*
  *  Supremica Software License Agreement
@@ -287,40 +288,25 @@ public class LabeledEvent
         return false;
     }
     
+
     //#########################################################################
-    //# Methods that implements the EventProxy interface
-    //# Some methods is defined above
-    
-    
-    public String getName()
+    //# Interface net.sourceforge.waters.model.base.Proxy
+    public Class<EventProxy> getProxyInterface()
     {
-        return getLabel();
-    }
-    
-    public EventKind getKind()
-    {
-        if (proposition)
-        {
-            return EventKind.PROPOSITION;
-        }
-        if (controllable)
-        {
-            return EventKind.CONTROLLABLE;
-        }
-        return EventKind.UNCONTROLLABLE;
-    }
-    
-    public Object acceptVisitor(final ProxyVisitor visitor)
-    throws VisitorException
-    {
-        final ProductDESProxyVisitor desvisitor = (ProductDESProxyVisitor) visitor;
-        return desvisitor.visitEventProxy(this);
+        return EventProxy.class;
     }
     
     public boolean equalsByContents(final Proxy partner)
     {
-        LabeledEvent partnerEvent = (LabeledEvent)partner;
-        return getName().equals(partnerEvent.getName()) && getKind().equals(partnerEvent.getKind()) && isObservable() == partnerEvent.isObservable();
+        if (getProxyInterface() == partner.getProxyInterface()) {
+            final EventProxy partnerEvent = (LabeledEvent) partner;
+            return
+                getName().equals(partnerEvent.getName()) &&
+                getKind() == partnerEvent.getKind() &&
+                isObservable() == partnerEvent.isObservable();
+        } else {
+            return false;
+        }
     }
     
     public boolean equalsWithGeometry(final Proxy partner)
@@ -354,6 +340,39 @@ public class LabeledEvent
     public int refHashCode()
     {
         return getName().hashCode();
+    }
+
+    public Object acceptVisitor(final ProxyVisitor visitor)
+        throws VisitorException
+    {
+        final ProductDESProxyVisitor desvisitor =
+            (ProductDESProxyVisitor) visitor;
+        return desvisitor.visitEventProxy(this);
+    }
+
+
+    //#########################################################################
+    //# Interface net.sourceforge.waters.model.base.NamedProxy
+    public String getName()
+    {
+        return getLabel();
+    }
+
+    
+    //#########################################################################
+    //# Interface net.sourceforge.waters.model.des.EventProxy
+    //# (Some EventProxy methods are defined above.)
+    public EventKind getKind()
+    {
+        if (proposition)
+        {
+            return EventKind.PROPOSITION;
+        }
+        if (controllable)
+        {
+            return EventKind.CONTROLLABLE;
+        }
+        return EventKind.UNCONTROLLABLE;
     }
     
 }
