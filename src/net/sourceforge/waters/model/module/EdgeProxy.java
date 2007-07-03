@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.module
 //# CLASS:   EdgeProxy
 //###########################################################################
-//# $Id: EdgeProxy.java,v 1.4 2006-09-20 16:24:12 robi Exp $
+//# $Id: EdgeProxy.java,v 1.5 2007-07-03 12:19:32 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.module;
@@ -39,12 +39,14 @@ public interface EdgeProxy extends Proxy {
    * Gets the source node of this edge.
    */
   // @ref
+  // @optional
   public NodeProxy getSource();
 
   /**
    * Gets the target node of this edge.
    */
   // @ref
+  // @optional
   public NodeProxy getTarget();
   
   /**

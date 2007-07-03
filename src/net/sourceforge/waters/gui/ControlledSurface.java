@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   ControlledSurface
 //###########################################################################
-//# $Id: ControlledSurface.java,v 1.135 2007-06-26 21:42:26 flordal Exp $
+//# $Id: ControlledSurface.java,v 1.136 2007-07-03 12:19:32 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.gui;
@@ -3062,7 +3062,8 @@ public class ControlledSurface
     {
       if (mCopiedEdge == null) {
         if (mSource != null) {
-          mOrigEdge = new EdgeSubject(mSource, null);
+          mOrigEdge =
+            new EdgeSubject(mSource, null, null, null, null, null, null);
           mCopiedEdge = mSecondaryGraph.addEdge(mOrigEdge);
           mSelectedObjects =
             Collections.singletonList((ProxySubject) mOrigEdge);
