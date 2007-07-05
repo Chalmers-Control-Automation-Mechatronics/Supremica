@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui.command
 //# CLASS:   MoveEdgeCommand
 //###########################################################################
-//# $Id: MoveEdgeCommand.java,v 1.9 2007-02-12 21:38:49 robi Exp $
+//# $Id: MoveEdgeCommand.java,v 1.10 2007-07-05 00:17:20 siw4 Exp $
 //###########################################################################
 
 

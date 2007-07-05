@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.analysis.modular
 //# CLASS:   ModularControllabilityChecker
 //###########################################################################
-//# $Id: ModularControllabilityChecker.java,v 1.9 2007-06-05 13:45:21 robi Exp $
+//# $Id: ModularControllabilityChecker.java,v 1.10 2007-07-05 00:17:20 siw4 Exp $
 //###########################################################################
 
 
@@ -139,10 +139,8 @@ public class ModularControllabilityChecker
                                    : ComponentKind.PLANT;
         }
       });
-      mChecker.setStateLimit(getStateLimit() - mStates);
       while (!mChecker.run()) {
-        mStates += mChecker.getAnalysisResult().getTotalNumberOfStates();
-        mChecker.setStateLimit(getStateLimit() - mStates);
+	mStates += mChecker.getAnalysisResult().getTotalNumberOfStates();
         Collection<AutomatonProxy> newComp =
           mHeuristic.heur(comp,
                           uncomposedplants,

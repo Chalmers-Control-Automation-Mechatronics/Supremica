@@ -1,5 +1,6 @@
 package net.sourceforge.waters.gui.command;
 
+import net.sourceforge.waters.gui.EditorGraph;
 import net.sourceforge.waters.subject.module.GroupNodeSubject;
 import net.sourceforge.waters.subject.module.GraphSubject;
 
@@ -50,7 +51,8 @@ public class DeleteNodeGroupCommand
     public void execute()
     {
       //mCommands.execute();
-		mGraph.getNodesModifiable().remove(mDeleted);
+      mGraph.getNodesModifiable().remove(mDeleted);
+      EditorGraph.updateChildNodes(mGraph);
     }
 
     /** 
@@ -64,8 +66,9 @@ public class DeleteNodeGroupCommand
 	 
     public void undo()
     {
-		mGraph.getNodesModifiable().add(mDeleted);
-		//mCommands.undo();
+      mGraph.getNodesModifiable().add(mDeleted);
+      EditorGraph.updateChildNodes(mGraph);
+      //mCommands.undo();
     }
 
     public String getName()

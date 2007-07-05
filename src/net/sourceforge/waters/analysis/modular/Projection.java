@@ -39,9 +39,6 @@ public class Projection
     mFactory = factory;
     mHide = hide;
     mForbidden = new HashSet<EventProxy>(forbidden);
-    mForbidden.retainAll(mHide);
-    System.out.println("forbidden + hidden:" + mForbidden);
-    mForbidden.addAll(forbidden);
     mForbidden.retainAll(mModel.getEvents());
     mStateLimit = 1000;
     mDisabled = new HashSet<EventProxy>(mModel.getEvents());
@@ -56,9 +53,7 @@ public class Projection
   public AutomatonProxy project()
     throws Exception
   {
-    System.out.println(mForbidden);
-    System.out.println("Hidden: " + mHide);
-    states = new IntMap(mStateLimit/2);
+    states = new IntMap(mStateLimit);
     trans = new ArrayList<TransitionProxy>();
     events = mModel.getEvents().toArray(new EventProxy[mModel.getEvents().size()]);
     int numAutomata = mModel.getAutomata().size();
@@ -170,7 +165,6 @@ public class Projection
     AutomatonProxy result = mFactory.createAutomatonProxy(name.toString(),
                                                           ComponentKind.PLANT,
                                                           ev, states.values(), trans);
-    System.out.println(states.values().size());
     states = null;
     trans = null;
     return result;

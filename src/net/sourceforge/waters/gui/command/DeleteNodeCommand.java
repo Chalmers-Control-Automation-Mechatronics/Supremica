@@ -1,5 +1,6 @@
 package net.sourceforge.waters.gui.command;
 
+import net.sourceforge.waters.gui.EditorGraph;
 import net.sourceforge.waters.subject.module.SimpleNodeSubject;
 import net.sourceforge.waters.subject.module.GraphSubject;
 
@@ -11,7 +12,7 @@ import net.sourceforge.waters.subject.module.EdgeSubject;
  * @author Simon Ware
  */
 
-public class DeleteNodeCommand 
+public class DeleteNodeCommand
     implements Command
 {
   /** The ControlledSurface Edited with this Command */
@@ -52,6 +53,7 @@ public class DeleteNodeCommand
   {
     //mCommands.execute();
     mGraph.getNodesModifiable().remove(mDeleted);
+    EditorGraph.updateChildNodes(mGraph);
   }
 
   /** 
@@ -62,6 +64,7 @@ public class DeleteNodeCommand
   {
     mGraph.getNodesModifiable().add(mDeleted);
     //mCommands.undo();
+    EditorGraph.updateChildNodes(mGraph);
   }
 
 	public boolean isSignificant()

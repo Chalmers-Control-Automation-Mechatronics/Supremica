@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui.command
 //# CLASS:   CreateNodeCommand
 //###########################################################################
-//# $Id: CreateNodeCommand.java,v 1.18 2007-02-14 02:01:06 robi Exp $
+//# $Id: CreateNodeCommand.java,v 1.19 2007-07-05 00:17:20 siw4 Exp $
 //###########################################################################
 
 package net.sourceforge.waters.gui.command;
@@ -62,11 +62,13 @@ public class CreateNodeCommand
   public void execute()
   {
     mGraph.getNodesModifiable().add(mCreated);
+    EditorGraph.updateChildNodes(mGraph);
   }
 
   public void undo()
   {
     mGraph.getNodesModifiable().remove(mCreated);
+    EditorGraph.updateChildNodes(mGraph);
   }
 
   public String getName()
