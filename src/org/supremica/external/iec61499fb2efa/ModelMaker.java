@@ -1387,6 +1387,7 @@ class ModelMaker
 		
 		String typeName = (String) basicFunctionBlocks.get(fbName);
 		JaxbFBType theType = (JaxbFBType) fbTypes.get(typeName);
+		ECC theECC = theType.getBasicFB().getECC();
 		
 		ExtendedAutomaton ecc = new ExtendedAutomaton("Execution Control Chart " + fbName, automata);
 
@@ -1429,10 +1430,10 @@ class ModelMaker
 				}
 			}
 		}
-
 		
 		
-
+		
+		
 
 
 		automata.addAutomaton(ecc);	
