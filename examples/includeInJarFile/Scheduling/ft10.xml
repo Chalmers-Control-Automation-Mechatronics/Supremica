@@ -1,0 +1,1283 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<Automata name="Untitled" major="0" minor="9" comment="Fisher &amp; Thompson, 10x10; optimal makespan = 930">
+<Automaton name="p1" type="Plant">
+	<Events>
+		<Event id="0" label="p1_s0"/>
+		<Event id="1" label="p1_s1"/>
+		<Event id="2" label="p1_s2"/>
+		<Event id="3" label="p1_s3"/>
+		<Event id="4" label="p1_s4"/>
+		<Event id="5" label="p1_s5"/>
+		<Event id="6" label="p1_s6"/>
+		<Event id="7" label="p1_s7"/>
+		<Event id="8" label="p1_s8"/>
+		<Event id="9" label="p1_s9"/>
+		<Event id="10" label="p1_f0"/>
+		<Event id="11" label="p1_f1"/>
+		<Event id="12" label="p1_f2"/>
+		<Event id="13" label="p1_f3"/>
+		<Event id="14" label="p1_f4"/>
+		<Event id="15" label="p1_f5"/>
+		<Event id="16" label="p1_f6"/>
+		<Event id="17" label="p1_f7"/>
+		<Event id="18" label="p1_f8"/>
+		<Event id="19" label="p1_f9"/>
+	</Events>
+	<States>
+		<State id="0" name="q0" initial="true" cost="0"/>
+		<State id="1" name="q1" cost="29"/>
+		<State id="2" name="q2" cost="0"/>
+		<State id="3" name="q3" cost="78"/>
+		<State id="4" name="q4" cost="0"/>
+		<State id="5" name="q5" cost="9"/>
+		<State id="6" name="q6" cost="0"/>
+		<State id="7" name="q7" cost="36"/>
+		<State id="8" name="q8" cost="0"/>
+		<State id="9" name="q9" cost="49"/>
+		<State id="10" name="q10" cost="0"/>
+		<State id="11" name="q11" cost="11"/>
+		<State id="12" name="q12" cost="0"/>
+		<State id="13" name="q13" cost="62"/>
+		<State id="14" name="q14" cost="0"/>
+		<State id="15" name="q15" cost="56"/>
+		<State id="16" name="q16" cost="0"/>
+		<State id="17" name="q17" cost="44"/>
+		<State id="18" name="q18" cost="0"/>
+		<State id="19" name="q19" cost="21"/>
+		<State id="20" name="q20" accepting="true" cost="0"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="0"/>
+		<Transition source="1" dest="2" event="10"/>
+		<Transition source="2" dest="3" event="1"/>
+		<Transition source="3" dest="4" event="11"/>
+		<Transition source="4" dest="5" event="2"/>
+		<Transition source="5" dest="6" event="12"/>
+		<Transition source="6" dest="7" event="3"/>
+		<Transition source="7" dest="8" event="13"/>
+		<Transition source="8" dest="9" event="4"/>
+		<Transition source="9" dest="10" event="14"/>
+		<Transition source="10" dest="11" event="5"/>
+		<Transition source="11" dest="12" event="15"/>
+		<Transition source="12" dest="13" event="6"/>
+		<Transition source="13" dest="14" event="16"/>
+		<Transition source="14" dest="15" event="7"/>
+		<Transition source="15" dest="16" event="17"/>
+		<Transition source="16" dest="17" event="8"/>
+		<Transition source="17" dest="18" event="18"/>
+		<Transition source="18" dest="19" event="9"/>
+		<Transition source="19" dest="20" event="19"/>
+	</Transitions>
+</Automaton>
+<Automaton name="p2" type="Plant">
+	<Events>
+		<Event id="0" label="p2_s0"/>
+		<Event id="1" label="p2_s1"/>
+		<Event id="2" label="p2_s2"/>
+		<Event id="3" label="p2_s3"/>
+		<Event id="4" label="p2_s4"/>
+		<Event id="5" label="p2_s5"/>
+		<Event id="6" label="p2_s6"/>
+		<Event id="7" label="p2_s7"/>
+		<Event id="8" label="p2_s8"/>
+		<Event id="9" label="p2_s9"/>
+		<Event id="10" label="p2_f0"/>
+		<Event id="11" label="p2_f1"/>
+		<Event id="12" label="p2_f2"/>
+		<Event id="13" label="p2_f3"/>
+		<Event id="14" label="p2_f4"/>
+		<Event id="15" label="p2_f5"/>
+		<Event id="16" label="p2_f6"/>
+		<Event id="17" label="p2_f7"/>
+		<Event id="18" label="p2_f8"/>
+		<Event id="19" label="p2_f9"/>
+	</Events>
+	<States>
+		<State id="0" name="q0" initial="true" cost="0"/>
+		<State id="1" name="q1" cost="43"/>
+		<State id="2" name="q2" cost="0"/>
+		<State id="3" name="q3" cost="90"/>
+		<State id="4" name="q4" cost="0"/>
+		<State id="5" name="q5" cost="75"/>
+		<State id="6" name="q6" cost="0"/>
+		<State id="7" name="q7" cost="11"/>
+		<State id="8" name="q8" cost="0"/>
+		<State id="9" name="q9" cost="69"/>
+		<State id="10" name="q10" cost="0"/>
+		<State id="11" name="q11" cost="28"/>
+		<State id="12" name="q12" cost="0"/>
+		<State id="13" name="q13" cost="46"/>
+		<State id="14" name="q14" cost="0"/>
+		<State id="15" name="q15" cost="46"/>
+		<State id="16" name="q16" cost="0"/>
+		<State id="17" name="q17" cost="72"/>
+		<State id="18" name="q18" cost="0"/>
+		<State id="19" name="q19" cost="30"/>
+		<State id="20" name="q20" accepting="true" cost="0"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="0"/>
+		<Transition source="1" dest="2" event="10"/>
+		<Transition source="2" dest="3" event="2"/>
+		<Transition source="3" dest="4" event="12"/>
+		<Transition source="4" dest="5" event="4"/>
+		<Transition source="5" dest="6" event="14"/>
+		<Transition source="6" dest="7" event="9"/>
+		<Transition source="7" dest="8" event="19"/>
+		<Transition source="8" dest="9" event="3"/>
+		<Transition source="9" dest="10" event="13"/>
+		<Transition source="10" dest="11" event="1"/>
+		<Transition source="11" dest="12" event="11"/>
+		<Transition source="12" dest="13" event="6"/>
+		<Transition source="13" dest="14" event="16"/>
+		<Transition source="14" dest="15" event="5"/>
+		<Transition source="15" dest="16" event="15"/>
+		<Transition source="16" dest="17" event="7"/>
+		<Transition source="17" dest="18" event="17"/>
+		<Transition source="18" dest="19" event="8"/>
+		<Transition source="19" dest="20" event="18"/>
+	</Transitions>
+</Automaton>
+<Automaton name="p3" type="Plant">
+	<Events>
+		<Event id="0" label="p3_s0"/>
+		<Event id="1" label="p3_s1"/>
+		<Event id="2" label="p3_s2"/>
+		<Event id="3" label="p3_s3"/>
+		<Event id="4" label="p3_s4"/>
+		<Event id="5" label="p3_s5"/>
+		<Event id="6" label="p3_s6"/>
+		<Event id="7" label="p3_s7"/>
+		<Event id="8" label="p3_s8"/>
+		<Event id="9" label="p3_s9"/>
+		<Event id="10" label="p3_f0"/>
+		<Event id="11" label="p3_f1"/>
+		<Event id="12" label="p3_f2"/>
+		<Event id="13" label="p3_f3"/>
+		<Event id="14" label="p3_f4"/>
+		<Event id="15" label="p3_f5"/>
+		<Event id="16" label="p3_f6"/>
+		<Event id="17" label="p3_f7"/>
+		<Event id="18" label="p3_f8"/>
+		<Event id="19" label="p3_f9"/>
+	</Events>
+	<States>
+		<State id="0" name="q0" initial="true" cost="0"/>
+		<State id="1" name="q1" cost="91"/>
+		<State id="2" name="q2" cost="0"/>
+		<State id="3" name="q3" cost="85"/>
+		<State id="4" name="q4" cost="0"/>
+		<State id="5" name="q5" cost="39"/>
+		<State id="6" name="q6" cost="0"/>
+		<State id="7" name="q7" cost="74"/>
+		<State id="8" name="q8" cost="0"/>
+		<State id="9" name="q9" cost="90"/>
+		<State id="10" name="q10" cost="0"/>
+		<State id="11" name="q11" cost="10"/>
+		<State id="12" name="q12" cost="0"/>
+		<State id="13" name="q13" cost="12"/>
+		<State id="14" name="q14" cost="0"/>
+		<State id="15" name="q15" cost="89"/>
+		<State id="16" name="q16" cost="0"/>
+		<State id="17" name="q17" cost="45"/>
+		<State id="18" name="q18" cost="0"/>
+		<State id="19" name="q19" cost="33"/>
+		<State id="20" name="q20" accepting="true" cost="0"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="1"/>
+		<Transition source="1" dest="2" event="11"/>
+		<Transition source="2" dest="3" event="0"/>
+		<Transition source="3" dest="4" event="10"/>
+		<Transition source="4" dest="5" event="3"/>
+		<Transition source="5" dest="6" event="13"/>
+		<Transition source="6" dest="7" event="2"/>
+		<Transition source="7" dest="8" event="12"/>
+		<Transition source="8" dest="9" event="8"/>
+		<Transition source="9" dest="10" event="18"/>
+		<Transition source="10" dest="11" event="5"/>
+		<Transition source="11" dest="12" event="15"/>
+		<Transition source="12" dest="13" event="7"/>
+		<Transition source="13" dest="14" event="17"/>
+		<Transition source="14" dest="15" event="6"/>
+		<Transition source="15" dest="16" event="16"/>
+		<Transition source="16" dest="17" event="9"/>
+		<Transition source="17" dest="18" event="19"/>
+		<Transition source="18" dest="19" event="4"/>
+		<Transition source="19" dest="20" event="14"/>
+	</Transitions>
+</Automaton>
+<Automaton name="p4" type="Plant">
+	<Events>
+		<Event id="0" label="p4_s0"/>
+		<Event id="1" label="p4_s1"/>
+		<Event id="2" label="p4_s2"/>
+		<Event id="3" label="p4_s3"/>
+		<Event id="4" label="p4_s4"/>
+		<Event id="5" label="p4_s5"/>
+		<Event id="6" label="p4_s6"/>
+		<Event id="7" label="p4_s7"/>
+		<Event id="8" label="p4_s8"/>
+		<Event id="9" label="p4_s9"/>
+		<Event id="10" label="p4_f0"/>
+		<Event id="11" label="p4_f1"/>
+		<Event id="12" label="p4_f2"/>
+		<Event id="13" label="p4_f3"/>
+		<Event id="14" label="p4_f4"/>
+		<Event id="15" label="p4_f5"/>
+		<Event id="16" label="p4_f6"/>
+		<Event id="17" label="p4_f7"/>
+		<Event id="18" label="p4_f8"/>
+		<Event id="19" label="p4_f9"/>
+	</Events>
+	<States>
+		<State id="0" name="q0" initial="true" cost="0"/>
+		<State id="1" name="q1" cost="81"/>
+		<State id="2" name="q2" cost="0"/>
+		<State id="3" name="q3" cost="95"/>
+		<State id="4" name="q4" cost="0"/>
+		<State id="5" name="q5" cost="71"/>
+		<State id="6" name="q6" cost="0"/>
+		<State id="7" name="q7" cost="99"/>
+		<State id="8" name="q8" cost="0"/>
+		<State id="9" name="q9" cost="9"/>
+		<State id="10" name="q10" cost="0"/>
+		<State id="11" name="q11" cost="52"/>
+		<State id="12" name="q12" cost="0"/>
+		<State id="13" name="q13" cost="85"/>
+		<State id="14" name="q14" cost="0"/>
+		<State id="15" name="q15" cost="98"/>
+		<State id="16" name="q16" cost="0"/>
+		<State id="17" name="q17" cost="22"/>
+		<State id="18" name="q18" cost="0"/>
+		<State id="19" name="q19" cost="43"/>
+		<State id="20" name="q20" accepting="true" cost="0"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="1"/>
+		<Transition source="1" dest="2" event="11"/>
+		<Transition source="2" dest="3" event="2"/>
+		<Transition source="3" dest="4" event="12"/>
+		<Transition source="4" dest="5" event="0"/>
+		<Transition source="5" dest="6" event="10"/>
+		<Transition source="6" dest="7" event="4"/>
+		<Transition source="7" dest="8" event="14"/>
+		<Transition source="8" dest="9" event="6"/>
+		<Transition source="9" dest="10" event="16"/>
+		<Transition source="10" dest="11" event="8"/>
+		<Transition source="11" dest="12" event="18"/>
+		<Transition source="12" dest="13" event="7"/>
+		<Transition source="13" dest="14" event="17"/>
+		<Transition source="14" dest="15" event="3"/>
+		<Transition source="15" dest="16" event="13"/>
+		<Transition source="16" dest="17" event="9"/>
+		<Transition source="17" dest="18" event="19"/>
+		<Transition source="18" dest="19" event="5"/>
+		<Transition source="19" dest="20" event="15"/>
+	</Transitions>
+</Automaton>
+<Automaton name="p5" type="Plant">
+	<Events>
+		<Event id="0" label="p5_s0"/>
+		<Event id="1" label="p5_s1"/>
+		<Event id="2" label="p5_s2"/>
+		<Event id="3" label="p5_s3"/>
+		<Event id="4" label="p5_s4"/>
+		<Event id="5" label="p5_s5"/>
+		<Event id="6" label="p5_s6"/>
+		<Event id="7" label="p5_s7"/>
+		<Event id="8" label="p5_s8"/>
+		<Event id="9" label="p5_s9"/>
+		<Event id="10" label="p5_f0"/>
+		<Event id="11" label="p5_f1"/>
+		<Event id="12" label="p5_f2"/>
+		<Event id="13" label="p5_f3"/>
+		<Event id="14" label="p5_f4"/>
+		<Event id="15" label="p5_f5"/>
+		<Event id="16" label="p5_f6"/>
+		<Event id="17" label="p5_f7"/>
+		<Event id="18" label="p5_f8"/>
+		<Event id="19" label="p5_f9"/>
+	</Events>
+	<States>
+		<State id="0" name="q0" initial="true" cost="0"/>
+		<State id="1" name="q1" cost="14"/>
+		<State id="2" name="q2" cost="0"/>
+		<State id="3" name="q3" cost="6"/>
+		<State id="4" name="q4" cost="0"/>
+		<State id="5" name="q5" cost="22"/>
+		<State id="6" name="q6" cost="0"/>
+		<State id="7" name="q7" cost="61"/>
+		<State id="8" name="q8" cost="0"/>
+		<State id="9" name="q9" cost="26"/>
+		<State id="10" name="q10" cost="0"/>
+		<State id="11" name="q11" cost="69"/>
+		<State id="12" name="q12" cost="0"/>
+		<State id="13" name="q13" cost="21"/>
+		<State id="14" name="q14" cost="0"/>
+		<State id="15" name="q15" cost="49"/>
+		<State id="16" name="q16" cost="0"/>
+		<State id="17" name="q17" cost="72"/>
+		<State id="18" name="q18" cost="0"/>
+		<State id="19" name="q19" cost="53"/>
+		<State id="20" name="q20" accepting="true" cost="0"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="2"/>
+		<Transition source="1" dest="2" event="12"/>
+		<Transition source="2" dest="3" event="0"/>
+		<Transition source="3" dest="4" event="10"/>
+		<Transition source="4" dest="5" event="1"/>
+		<Transition source="5" dest="6" event="11"/>
+		<Transition source="6" dest="7" event="5"/>
+		<Transition source="7" dest="8" event="15"/>
+		<Transition source="8" dest="9" event="3"/>
+		<Transition source="9" dest="10" event="13"/>
+		<Transition source="10" dest="11" event="4"/>
+		<Transition source="11" dest="12" event="14"/>
+		<Transition source="12" dest="13" event="8"/>
+		<Transition source="13" dest="14" event="18"/>
+		<Transition source="14" dest="15" event="7"/>
+		<Transition source="15" dest="16" event="17"/>
+		<Transition source="16" dest="17" event="9"/>
+		<Transition source="17" dest="18" event="19"/>
+		<Transition source="18" dest="19" event="6"/>
+		<Transition source="19" dest="20" event="16"/>
+	</Transitions>
+</Automaton>
+<Automaton name="p6" type="Plant">
+	<Events>
+		<Event id="0" label="p6_s0"/>
+		<Event id="1" label="p6_s1"/>
+		<Event id="2" label="p6_s2"/>
+		<Event id="3" label="p6_s3"/>
+		<Event id="4" label="p6_s4"/>
+		<Event id="5" label="p6_s5"/>
+		<Event id="6" label="p6_s6"/>
+		<Event id="7" label="p6_s7"/>
+		<Event id="8" label="p6_s8"/>
+		<Event id="9" label="p6_s9"/>
+		<Event id="10" label="p6_f0"/>
+		<Event id="11" label="p6_f1"/>
+		<Event id="12" label="p6_f2"/>
+		<Event id="13" label="p6_f3"/>
+		<Event id="14" label="p6_f4"/>
+		<Event id="15" label="p6_f5"/>
+		<Event id="16" label="p6_f6"/>
+		<Event id="17" label="p6_f7"/>
+		<Event id="18" label="p6_f8"/>
+		<Event id="19" label="p6_f9"/>
+	</Events>
+	<States>
+		<State id="0" name="q0" initial="true" cost="0"/>
+		<State id="1" name="q1" cost="84"/>
+		<State id="2" name="q2" cost="0"/>
+		<State id="3" name="q3" cost="2"/>
+		<State id="4" name="q4" cost="0"/>
+		<State id="5" name="q5" cost="52"/>
+		<State id="6" name="q6" cost="0"/>
+		<State id="7" name="q7" cost="95"/>
+		<State id="8" name="q8" cost="0"/>
+		<State id="9" name="q9" cost="48"/>
+		<State id="10" name="q10" cost="0"/>
+		<State id="11" name="q11" cost="72"/>
+		<State id="12" name="q12" cost="0"/>
+		<State id="13" name="q13" cost="47"/>
+		<State id="14" name="q14" cost="0"/>
+		<State id="15" name="q15" cost="65"/>
+		<State id="16" name="q16" cost="0"/>
+		<State id="17" name="q17" cost="6"/>
+		<State id="18" name="q18" cost="0"/>
+		<State id="19" name="q19" cost="25"/>
+		<State id="20" name="q20" accepting="true" cost="0"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="2"/>
+		<Transition source="1" dest="2" event="12"/>
+		<Transition source="2" dest="3" event="1"/>
+		<Transition source="3" dest="4" event="11"/>
+		<Transition source="4" dest="5" event="5"/>
+		<Transition source="5" dest="6" event="15"/>
+		<Transition source="6" dest="7" event="3"/>
+		<Transition source="7" dest="8" event="13"/>
+		<Transition source="8" dest="9" event="8"/>
+		<Transition source="9" dest="10" event="18"/>
+		<Transition source="10" dest="11" event="9"/>
+		<Transition source="11" dest="12" event="19"/>
+		<Transition source="12" dest="13" event="0"/>
+		<Transition source="13" dest="14" event="10"/>
+		<Transition source="14" dest="15" event="6"/>
+		<Transition source="15" dest="16" event="16"/>
+		<Transition source="16" dest="17" event="4"/>
+		<Transition source="17" dest="18" event="14"/>
+		<Transition source="18" dest="19" event="7"/>
+		<Transition source="19" dest="20" event="17"/>
+	</Transitions>
+</Automaton>
+<Automaton name="p7" type="Plant">
+	<Events>
+		<Event id="0" label="p7_s0"/>
+		<Event id="1" label="p7_s1"/>
+		<Event id="2" label="p7_s2"/>
+		<Event id="3" label="p7_s3"/>
+		<Event id="4" label="p7_s4"/>
+		<Event id="5" label="p7_s5"/>
+		<Event id="6" label="p7_s6"/>
+		<Event id="7" label="p7_s7"/>
+		<Event id="8" label="p7_s8"/>
+		<Event id="9" label="p7_s9"/>
+		<Event id="10" label="p7_f0"/>
+		<Event id="11" label="p7_f1"/>
+		<Event id="12" label="p7_f2"/>
+		<Event id="13" label="p7_f3"/>
+		<Event id="14" label="p7_f4"/>
+		<Event id="15" label="p7_f5"/>
+		<Event id="16" label="p7_f6"/>
+		<Event id="17" label="p7_f7"/>
+		<Event id="18" label="p7_f8"/>
+		<Event id="19" label="p7_f9"/>
+	</Events>
+	<States>
+		<State id="0" name="q0" initial="true" cost="0"/>
+		<State id="1" name="q1" cost="46"/>
+		<State id="2" name="q2" cost="0"/>
+		<State id="3" name="q3" cost="37"/>
+		<State id="4" name="q4" cost="0"/>
+		<State id="5" name="q5" cost="61"/>
+		<State id="6" name="q6" cost="0"/>
+		<State id="7" name="q7" cost="13"/>
+		<State id="8" name="q8" cost="0"/>
+		<State id="9" name="q9" cost="32"/>
+		<State id="10" name="q10" cost="0"/>
+		<State id="11" name="q11" cost="21"/>
+		<State id="12" name="q12" cost="0"/>
+		<State id="13" name="q13" cost="32"/>
+		<State id="14" name="q14" cost="0"/>
+		<State id="15" name="q15" cost="89"/>
+		<State id="16" name="q16" cost="0"/>
+		<State id="17" name="q17" cost="30"/>
+		<State id="18" name="q18" cost="0"/>
+		<State id="19" name="q19" cost="55"/>
+		<State id="20" name="q20" accepting="true" cost="0"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="1"/>
+		<Transition source="1" dest="2" event="11"/>
+		<Transition source="2" dest="3" event="0"/>
+		<Transition source="3" dest="4" event="10"/>
+		<Transition source="4" dest="5" event="3"/>
+		<Transition source="5" dest="6" event="13"/>
+		<Transition source="6" dest="7" event="2"/>
+		<Transition source="7" dest="8" event="12"/>
+		<Transition source="8" dest="9" event="6"/>
+		<Transition source="9" dest="10" event="16"/>
+		<Transition source="10" dest="11" event="5"/>
+		<Transition source="11" dest="12" event="15"/>
+		<Transition source="12" dest="13" event="9"/>
+		<Transition source="13" dest="14" event="19"/>
+		<Transition source="14" dest="15" event="8"/>
+		<Transition source="15" dest="16" event="18"/>
+		<Transition source="16" dest="17" event="7"/>
+		<Transition source="17" dest="18" event="17"/>
+		<Transition source="18" dest="19" event="4"/>
+		<Transition source="19" dest="20" event="14"/>
+	</Transitions>
+</Automaton>
+<Automaton name="p8" type="Plant">
+	<Events>
+		<Event id="0" label="p8_s0"/>
+		<Event id="1" label="p8_s1"/>
+		<Event id="2" label="p8_s2"/>
+		<Event id="3" label="p8_s3"/>
+		<Event id="4" label="p8_s4"/>
+		<Event id="5" label="p8_s5"/>
+		<Event id="6" label="p8_s6"/>
+		<Event id="7" label="p8_s7"/>
+		<Event id="8" label="p8_s8"/>
+		<Event id="9" label="p8_s9"/>
+		<Event id="10" label="p8_f0"/>
+		<Event id="11" label="p8_f1"/>
+		<Event id="12" label="p8_f2"/>
+		<Event id="13" label="p8_f3"/>
+		<Event id="14" label="p8_f4"/>
+		<Event id="15" label="p8_f5"/>
+		<Event id="16" label="p8_f6"/>
+		<Event id="17" label="p8_f7"/>
+		<Event id="18" label="p8_f8"/>
+		<Event id="19" label="p8_f9"/>
+	</Events>
+	<States>
+		<State id="0" name="q0" initial="true" cost="0"/>
+		<State id="1" name="q1" cost="31"/>
+		<State id="2" name="q2" cost="0"/>
+		<State id="3" name="q3" cost="86"/>
+		<State id="4" name="q4" cost="0"/>
+		<State id="5" name="q5" cost="46"/>
+		<State id="6" name="q6" cost="0"/>
+		<State id="7" name="q7" cost="74"/>
+		<State id="8" name="q8" cost="0"/>
+		<State id="9" name="q9" cost="32"/>
+		<State id="10" name="q10" cost="0"/>
+		<State id="11" name="q11" cost="88"/>
+		<State id="12" name="q12" cost="0"/>
+		<State id="13" name="q13" cost="19"/>
+		<State id="14" name="q14" cost="0"/>
+		<State id="15" name="q15" cost="48"/>
+		<State id="16" name="q16" cost="0"/>
+		<State id="17" name="q17" cost="36"/>
+		<State id="18" name="q18" cost="0"/>
+		<State id="19" name="q19" cost="79"/>
+		<State id="20" name="q20" accepting="true" cost="0"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="2"/>
+		<Transition source="1" dest="2" event="12"/>
+		<Transition source="2" dest="3" event="0"/>
+		<Transition source="3" dest="4" event="10"/>
+		<Transition source="4" dest="5" event="1"/>
+		<Transition source="5" dest="6" event="11"/>
+		<Transition source="6" dest="7" event="5"/>
+		<Transition source="7" dest="8" event="15"/>
+		<Transition source="8" dest="9" event="4"/>
+		<Transition source="9" dest="10" event="14"/>
+		<Transition source="10" dest="11" event="6"/>
+		<Transition source="11" dest="12" event="16"/>
+		<Transition source="12" dest="13" event="8"/>
+		<Transition source="13" dest="14" event="18"/>
+		<Transition source="14" dest="15" event="9"/>
+		<Transition source="15" dest="16" event="19"/>
+		<Transition source="16" dest="17" event="7"/>
+		<Transition source="17" dest="18" event="17"/>
+		<Transition source="18" dest="19" event="3"/>
+		<Transition source="19" dest="20" event="13"/>
+	</Transitions>
+</Automaton>
+<Automaton name="p9" type="Plant">
+	<Events>
+		<Event id="0" label="p9_s0"/>
+		<Event id="1" label="p9_s1"/>
+		<Event id="2" label="p9_s2"/>
+		<Event id="3" label="p9_s3"/>
+		<Event id="4" label="p9_s4"/>
+		<Event id="5" label="p9_s5"/>
+		<Event id="6" label="p9_s6"/>
+		<Event id="7" label="p9_s7"/>
+		<Event id="8" label="p9_s8"/>
+		<Event id="9" label="p9_s9"/>
+		<Event id="10" label="p9_f0"/>
+		<Event id="11" label="p9_f1"/>
+		<Event id="12" label="p9_f2"/>
+		<Event id="13" label="p9_f3"/>
+		<Event id="14" label="p9_f4"/>
+		<Event id="15" label="p9_f5"/>
+		<Event id="16" label="p9_f6"/>
+		<Event id="17" label="p9_f7"/>
+		<Event id="18" label="p9_f8"/>
+		<Event id="19" label="p9_f9"/>
+	</Events>
+	<States>
+		<State id="0" name="q0" initial="true" cost="0"/>
+		<State id="1" name="q1" cost="76"/>
+		<State id="2" name="q2" cost="0"/>
+		<State id="3" name="q3" cost="69"/>
+		<State id="4" name="q4" cost="0"/>
+		<State id="5" name="q5" cost="76"/>
+		<State id="6" name="q6" cost="0"/>
+		<State id="7" name="q7" cost="51"/>
+		<State id="8" name="q8" cost="0"/>
+		<State id="9" name="q9" cost="85"/>
+		<State id="10" name="q10" cost="0"/>
+		<State id="11" name="q11" cost="11"/>
+		<State id="12" name="q12" cost="0"/>
+		<State id="13" name="q13" cost="40"/>
+		<State id="14" name="q14" cost="0"/>
+		<State id="15" name="q15" cost="89"/>
+		<State id="16" name="q16" cost="0"/>
+		<State id="17" name="q17" cost="26"/>
+		<State id="18" name="q18" cost="0"/>
+		<State id="19" name="q19" cost="74"/>
+		<State id="20" name="q20" accepting="true" cost="0"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="0"/>
+		<Transition source="1" dest="2" event="10"/>
+		<Transition source="2" dest="3" event="1"/>
+		<Transition source="3" dest="4" event="11"/>
+		<Transition source="4" dest="5" event="3"/>
+		<Transition source="5" dest="6" event="13"/>
+		<Transition source="6" dest="7" event="5"/>
+		<Transition source="7" dest="8" event="15"/>
+		<Transition source="8" dest="9" event="2"/>
+		<Transition source="9" dest="10" event="12"/>
+		<Transition source="10" dest="11" event="9"/>
+		<Transition source="11" dest="12" event="19"/>
+		<Transition source="12" dest="13" event="6"/>
+		<Transition source="13" dest="14" event="16"/>
+		<Transition source="14" dest="15" event="7"/>
+		<Transition source="15" dest="16" event="17"/>
+		<Transition source="16" dest="17" event="4"/>
+		<Transition source="17" dest="18" event="14"/>
+		<Transition source="18" dest="19" event="8"/>
+		<Transition source="19" dest="20" event="18"/>
+	</Transitions>
+</Automaton>
+<Automaton name="p10" type="Plant">
+	<Events>
+		<Event id="0" label="p10_s0"/>
+		<Event id="1" label="p10_s1"/>
+		<Event id="2" label="p10_s2"/>
+		<Event id="3" label="p10_s3"/>
+		<Event id="4" label="p10_s4"/>
+		<Event id="5" label="p10_s5"/>
+		<Event id="6" label="p10_s6"/>
+		<Event id="7" label="p10_s7"/>
+		<Event id="8" label="p10_s8"/>
+		<Event id="9" label="p10_s9"/>
+		<Event id="10" label="p10_f0"/>
+		<Event id="11" label="p10_f1"/>
+		<Event id="12" label="p10_f2"/>
+		<Event id="13" label="p10_f3"/>
+		<Event id="14" label="p10_f4"/>
+		<Event id="15" label="p10_f5"/>
+		<Event id="16" label="p10_f6"/>
+		<Event id="17" label="p10_f7"/>
+		<Event id="18" label="p10_f8"/>
+		<Event id="19" label="p10_f9"/>
+	</Events>
+	<States>
+		<State id="0" name="q0" initial="true" cost="0"/>
+		<State id="1" name="q1" cost="85"/>
+		<State id="2" name="q2" cost="0"/>
+		<State id="3" name="q3" cost="13"/>
+		<State id="4" name="q4" cost="0"/>
+		<State id="5" name="q5" cost="61"/>
+		<State id="6" name="q6" cost="0"/>
+		<State id="7" name="q7" cost="7"/>
+		<State id="8" name="q8" cost="0"/>
+		<State id="9" name="q9" cost="64"/>
+		<State id="10" name="q10" cost="0"/>
+		<State id="11" name="q11" cost="76"/>
+		<State id="12" name="q12" cost="0"/>
+		<State id="13" name="q13" cost="47"/>
+		<State id="14" name="q14" cost="0"/>
+		<State id="15" name="q15" cost="52"/>
+		<State id="16" name="q16" cost="0"/>
+		<State id="17" name="q17" cost="90"/>
+		<State id="18" name="q18" cost="0"/>
+		<State id="19" name="q19" cost="45"/>
+		<State id="20" name="q20" accepting="true" cost="0"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="1"/>
+		<Transition source="1" dest="2" event="11"/>
+		<Transition source="2" dest="3" event="0"/>
+		<Transition source="3" dest="4" event="10"/>
+		<Transition source="4" dest="5" event="2"/>
+		<Transition source="5" dest="6" event="12"/>
+		<Transition source="6" dest="7" event="6"/>
+		<Transition source="7" dest="8" event="16"/>
+		<Transition source="8" dest="9" event="8"/>
+		<Transition source="9" dest="10" event="18"/>
+		<Transition source="10" dest="11" event="9"/>
+		<Transition source="11" dest="12" event="19"/>
+		<Transition source="12" dest="13" event="5"/>
+		<Transition source="13" dest="14" event="15"/>
+		<Transition source="14" dest="15" event="3"/>
+		<Transition source="15" dest="16" event="13"/>
+		<Transition source="16" dest="17" event="4"/>
+		<Transition source="17" dest="18" event="14"/>
+		<Transition source="18" dest="19" event="7"/>
+		<Transition source="19" dest="20" event="17"/>
+	</Transitions>
+</Automaton>
+<Automaton name="z0" type="Specification">
+	<Events>
+		<Event id="0" label="p1_s0"/>
+		<Event id="1" label="p2_s0"/>
+		<Event id="2" label="p3_s0"/>
+		<Event id="3" label="p4_s0"/>
+		<Event id="4" label="p5_s0"/>
+		<Event id="5" label="p6_s0"/>
+		<Event id="6" label="p7_s0"/>
+		<Event id="7" label="p8_s0"/>
+		<Event id="8" label="p9_s0"/>
+		<Event id="9" label="p10_s0"/>
+		<Event id="10" label="p1_f0"/>
+		<Event id="11" label="p2_f0"/>
+		<Event id="12" label="p3_f0"/>
+		<Event id="13" label="p4_f0"/>
+		<Event id="14" label="p5_f0"/>
+		<Event id="15" label="p6_f0"/>
+		<Event id="16" label="p7_f0"/>
+		<Event id="17" label="p8_f0"/>
+		<Event id="18" label="p9_f0"/>
+		<Event id="19" label="p10_f0"/>
+	</Events>
+	<States>
+		<State id="0" name="q0" initial="true" accepting="true"/>
+		<State id="1" name="q1"/>
+		<State id="2" name="q2"/>
+		<State id="3" name="q3"/>
+		<State id="4" name="q4"/>
+		<State id="5" name="q5"/>
+		<State id="6" name="q6"/>
+		<State id="7" name="q7"/>
+		<State id="8" name="q8"/>
+		<State id="9" name="q9"/>
+		<State id="10" name="q10"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="0"/>
+		<Transition source="0" dest="2" event="1"/>
+		<Transition source="0" dest="3" event="2"/>
+		<Transition source="0" dest="4" event="3"/>
+		<Transition source="0" dest="5" event="4"/>
+		<Transition source="0" dest="6" event="5"/>
+		<Transition source="0" dest="7" event="6"/>
+		<Transition source="0" dest="8" event="7"/>
+		<Transition source="0" dest="9" event="8"/>
+		<Transition source="0" dest="10" event="9"/>
+		<Transition source="1" dest="0" event="10"/>
+		<Transition source="2" dest="0" event="11"/>
+		<Transition source="3" dest="0" event="12"/>
+		<Transition source="4" dest="0" event="13"/>
+		<Transition source="5" dest="0" event="14"/>
+		<Transition source="6" dest="0" event="15"/>
+		<Transition source="7" dest="0" event="16"/>
+		<Transition source="8" dest="0" event="17"/>
+		<Transition source="9" dest="0" event="18"/>
+		<Transition source="10" dest="0" event="19"/>
+	</Transitions>
+</Automaton>
+<Automaton name="z1" type="Specification">
+	<Events>
+		<Event id="0" label="p1_s1"/>
+		<Event id="1" label="p2_s1"/>
+		<Event id="2" label="p3_s1"/>
+		<Event id="3" label="p4_s1"/>
+		<Event id="4" label="p5_s1"/>
+		<Event id="5" label="p6_s1"/>
+		<Event id="6" label="p7_s1"/>
+		<Event id="7" label="p8_s1"/>
+		<Event id="8" label="p9_s1"/>
+		<Event id="9" label="p10_s1"/>
+		<Event id="10" label="p1_f1"/>
+		<Event id="11" label="p2_f1"/>
+		<Event id="12" label="p3_f1"/>
+		<Event id="13" label="p4_f1"/>
+		<Event id="14" label="p5_f1"/>
+		<Event id="15" label="p6_f1"/>
+		<Event id="16" label="p7_f1"/>
+		<Event id="17" label="p8_f1"/>
+		<Event id="18" label="p9_f1"/>
+		<Event id="19" label="p10_f1"/>
+	</Events>
+	<States>
+		<State id="0" name="q0" initial="true" accepting="true"/>
+		<State id="1" name="q1"/>
+		<State id="2" name="q2"/>
+		<State id="3" name="q3"/>
+		<State id="4" name="q4"/>
+		<State id="5" name="q5"/>
+		<State id="6" name="q6"/>
+		<State id="7" name="q7"/>
+		<State id="8" name="q8"/>
+		<State id="9" name="q9"/>
+		<State id="10" name="q10"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="0"/>
+		<Transition source="0" dest="2" event="1"/>
+		<Transition source="0" dest="3" event="2"/>
+		<Transition source="0" dest="4" event="3"/>
+		<Transition source="0" dest="5" event="4"/>
+		<Transition source="0" dest="6" event="5"/>
+		<Transition source="0" dest="7" event="6"/>
+		<Transition source="0" dest="8" event="7"/>
+		<Transition source="0" dest="9" event="8"/>
+		<Transition source="0" dest="10" event="9"/>
+		<Transition source="1" dest="0" event="10"/>
+		<Transition source="2" dest="0" event="11"/>
+		<Transition source="3" dest="0" event="12"/>
+		<Transition source="4" dest="0" event="13"/>
+		<Transition source="5" dest="0" event="14"/>
+		<Transition source="6" dest="0" event="15"/>
+		<Transition source="7" dest="0" event="16"/>
+		<Transition source="8" dest="0" event="17"/>
+		<Transition source="9" dest="0" event="18"/>
+		<Transition source="10" dest="0" event="19"/>
+	</Transitions>
+</Automaton>
+<Automaton name="z2" type="Specification">
+	<Events>
+		<Event id="0" label="p1_s2"/>
+		<Event id="1" label="p2_s2"/>
+		<Event id="2" label="p3_s2"/>
+		<Event id="3" label="p4_s2"/>
+		<Event id="4" label="p5_s2"/>
+		<Event id="5" label="p6_s2"/>
+		<Event id="6" label="p7_s2"/>
+		<Event id="7" label="p8_s2"/>
+		<Event id="8" label="p9_s2"/>
+		<Event id="9" label="p10_s2"/>
+		<Event id="10" label="p1_f2"/>
+		<Event id="11" label="p2_f2"/>
+		<Event id="12" label="p3_f2"/>
+		<Event id="13" label="p4_f2"/>
+		<Event id="14" label="p5_f2"/>
+		<Event id="15" label="p6_f2"/>
+		<Event id="16" label="p7_f2"/>
+		<Event id="17" label="p8_f2"/>
+		<Event id="18" label="p9_f2"/>
+		<Event id="19" label="p10_f2"/>
+	</Events>
+	<States>
+		<State id="0" name="q0" initial="true" accepting="true"/>
+		<State id="1" name="q1"/>
+		<State id="2" name="q2"/>
+		<State id="3" name="q3"/>
+		<State id="4" name="q4"/>
+		<State id="5" name="q5"/>
+		<State id="6" name="q6"/>
+		<State id="7" name="q7"/>
+		<State id="8" name="q8"/>
+		<State id="9" name="q9"/>
+		<State id="10" name="q10"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="0"/>
+		<Transition source="0" dest="2" event="1"/>
+		<Transition source="0" dest="3" event="2"/>
+		<Transition source="0" dest="4" event="3"/>
+		<Transition source="0" dest="5" event="4"/>
+		<Transition source="0" dest="6" event="5"/>
+		<Transition source="0" dest="7" event="6"/>
+		<Transition source="0" dest="8" event="7"/>
+		<Transition source="0" dest="9" event="8"/>
+		<Transition source="0" dest="10" event="9"/>
+		<Transition source="1" dest="0" event="10"/>
+		<Transition source="2" dest="0" event="11"/>
+		<Transition source="3" dest="0" event="12"/>
+		<Transition source="4" dest="0" event="13"/>
+		<Transition source="5" dest="0" event="14"/>
+		<Transition source="6" dest="0" event="15"/>
+		<Transition source="7" dest="0" event="16"/>
+		<Transition source="8" dest="0" event="17"/>
+		<Transition source="9" dest="0" event="18"/>
+		<Transition source="10" dest="0" event="19"/>
+	</Transitions>
+</Automaton>
+<Automaton name="z3" type="Specification">
+	<Events>
+		<Event id="0" label="p1_s3"/>
+		<Event id="1" label="p2_s3"/>
+		<Event id="2" label="p3_s3"/>
+		<Event id="3" label="p4_s3"/>
+		<Event id="4" label="p5_s3"/>
+		<Event id="5" label="p6_s3"/>
+		<Event id="6" label="p7_s3"/>
+		<Event id="7" label="p8_s3"/>
+		<Event id="8" label="p9_s3"/>
+		<Event id="9" label="p10_s3"/>
+		<Event id="10" label="p1_f3"/>
+		<Event id="11" label="p2_f3"/>
+		<Event id="12" label="p3_f3"/>
+		<Event id="13" label="p4_f3"/>
+		<Event id="14" label="p5_f3"/>
+		<Event id="15" label="p6_f3"/>
+		<Event id="16" label="p7_f3"/>
+		<Event id="17" label="p8_f3"/>
+		<Event id="18" label="p9_f3"/>
+		<Event id="19" label="p10_f3"/>
+	</Events>
+	<States>
+		<State id="0" name="q0" initial="true" accepting="true"/>
+		<State id="1" name="q1"/>
+		<State id="2" name="q2"/>
+		<State id="3" name="q3"/>
+		<State id="4" name="q4"/>
+		<State id="5" name="q5"/>
+		<State id="6" name="q6"/>
+		<State id="7" name="q7"/>
+		<State id="8" name="q8"/>
+		<State id="9" name="q9"/>
+		<State id="10" name="q10"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="0"/>
+		<Transition source="0" dest="2" event="1"/>
+		<Transition source="0" dest="3" event="2"/>
+		<Transition source="0" dest="4" event="3"/>
+		<Transition source="0" dest="5" event="4"/>
+		<Transition source="0" dest="6" event="5"/>
+		<Transition source="0" dest="7" event="6"/>
+		<Transition source="0" dest="8" event="7"/>
+		<Transition source="0" dest="9" event="8"/>
+		<Transition source="0" dest="10" event="9"/>
+		<Transition source="1" dest="0" event="10"/>
+		<Transition source="2" dest="0" event="11"/>
+		<Transition source="3" dest="0" event="12"/>
+		<Transition source="4" dest="0" event="13"/>
+		<Transition source="5" dest="0" event="14"/>
+		<Transition source="6" dest="0" event="15"/>
+		<Transition source="7" dest="0" event="16"/>
+		<Transition source="8" dest="0" event="17"/>
+		<Transition source="9" dest="0" event="18"/>
+		<Transition source="10" dest="0" event="19"/>
+	</Transitions>
+</Automaton>
+<Automaton name="z4" type="Specification">
+	<Events>
+		<Event id="0" label="p1_s4"/>
+		<Event id="1" label="p2_s4"/>
+		<Event id="2" label="p3_s4"/>
+		<Event id="3" label="p4_s4"/>
+		<Event id="4" label="p5_s4"/>
+		<Event id="5" label="p6_s4"/>
+		<Event id="6" label="p7_s4"/>
+		<Event id="7" label="p8_s4"/>
+		<Event id="8" label="p9_s4"/>
+		<Event id="9" label="p10_s4"/>
+		<Event id="10" label="p1_f4"/>
+		<Event id="11" label="p2_f4"/>
+		<Event id="12" label="p3_f4"/>
+		<Event id="13" label="p4_f4"/>
+		<Event id="14" label="p5_f4"/>
+		<Event id="15" label="p6_f4"/>
+		<Event id="16" label="p7_f4"/>
+		<Event id="17" label="p8_f4"/>
+		<Event id="18" label="p9_f4"/>
+		<Event id="19" label="p10_f4"/>
+	</Events>
+	<States>
+		<State id="0" name="q0" initial="true" accepting="true"/>
+		<State id="1" name="q1"/>
+		<State id="2" name="q2"/>
+		<State id="3" name="q3"/>
+		<State id="4" name="q4"/>
+		<State id="5" name="q5"/>
+		<State id="6" name="q6"/>
+		<State id="7" name="q7"/>
+		<State id="8" name="q8"/>
+		<State id="9" name="q9"/>
+		<State id="10" name="q10"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="0"/>
+		<Transition source="0" dest="2" event="1"/>
+		<Transition source="0" dest="3" event="2"/>
+		<Transition source="0" dest="4" event="3"/>
+		<Transition source="0" dest="5" event="4"/>
+		<Transition source="0" dest="6" event="5"/>
+		<Transition source="0" dest="7" event="6"/>
+		<Transition source="0" dest="8" event="7"/>
+		<Transition source="0" dest="9" event="8"/>
+		<Transition source="0" dest="10" event="9"/>
+		<Transition source="1" dest="0" event="10"/>
+		<Transition source="2" dest="0" event="11"/>
+		<Transition source="3" dest="0" event="12"/>
+		<Transition source="4" dest="0" event="13"/>
+		<Transition source="5" dest="0" event="14"/>
+		<Transition source="6" dest="0" event="15"/>
+		<Transition source="7" dest="0" event="16"/>
+		<Transition source="8" dest="0" event="17"/>
+		<Transition source="9" dest="0" event="18"/>
+		<Transition source="10" dest="0" event="19"/>
+	</Transitions>
+</Automaton>
+<Automaton name="z5" type="Specification">
+	<Events>
+		<Event id="0" label="p1_s5"/>
+		<Event id="1" label="p2_s5"/>
+		<Event id="2" label="p3_s5"/>
+		<Event id="3" label="p4_s5"/>
+		<Event id="4" label="p5_s5"/>
+		<Event id="5" label="p6_s5"/>
+		<Event id="6" label="p7_s5"/>
+		<Event id="7" label="p8_s5"/>
+		<Event id="8" label="p9_s5"/>
+		<Event id="9" label="p10_s5"/>
+		<Event id="10" label="p1_f5"/>
+		<Event id="11" label="p2_f5"/>
+		<Event id="12" label="p3_f5"/>
+		<Event id="13" label="p4_f5"/>
+		<Event id="14" label="p5_f5"/>
+		<Event id="15" label="p6_f5"/>
+		<Event id="16" label="p7_f5"/>
+		<Event id="17" label="p8_f5"/>
+		<Event id="18" label="p9_f5"/>
+		<Event id="19" label="p10_f5"/>
+	</Events>
+	<States>
+		<State id="0" name="q0" initial="true" accepting="true"/>
+		<State id="1" name="q1"/>
+		<State id="2" name="q2"/>
+		<State id="3" name="q3"/>
+		<State id="4" name="q4"/>
+		<State id="5" name="q5"/>
+		<State id="6" name="q6"/>
+		<State id="7" name="q7"/>
+		<State id="8" name="q8"/>
+		<State id="9" name="q9"/>
+		<State id="10" name="q10"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="0"/>
+		<Transition source="0" dest="2" event="1"/>
+		<Transition source="0" dest="3" event="2"/>
+		<Transition source="0" dest="4" event="3"/>
+		<Transition source="0" dest="5" event="4"/>
+		<Transition source="0" dest="6" event="5"/>
+		<Transition source="0" dest="7" event="6"/>
+		<Transition source="0" dest="8" event="7"/>
+		<Transition source="0" dest="9" event="8"/>
+		<Transition source="0" dest="10" event="9"/>
+		<Transition source="1" dest="0" event="10"/>
+		<Transition source="2" dest="0" event="11"/>
+		<Transition source="3" dest="0" event="12"/>
+		<Transition source="4" dest="0" event="13"/>
+		<Transition source="5" dest="0" event="14"/>
+		<Transition source="6" dest="0" event="15"/>
+		<Transition source="7" dest="0" event="16"/>
+		<Transition source="8" dest="0" event="17"/>
+		<Transition source="9" dest="0" event="18"/>
+		<Transition source="10" dest="0" event="19"/>
+	</Transitions>
+</Automaton>
+<Automaton name="z6" type="Specification">
+	<Events>
+		<Event id="0" label="p1_s6"/>
+		<Event id="1" label="p2_s6"/>
+		<Event id="2" label="p3_s6"/>
+		<Event id="3" label="p4_s6"/>
+		<Event id="4" label="p5_s6"/>
+		<Event id="5" label="p6_s6"/>
+		<Event id="6" label="p7_s6"/>
+		<Event id="7" label="p8_s6"/>
+		<Event id="8" label="p9_s6"/>
+		<Event id="9" label="p10_s6"/>
+		<Event id="10" label="p1_f6"/>
+		<Event id="11" label="p2_f6"/>
+		<Event id="12" label="p3_f6"/>
+		<Event id="13" label="p4_f6"/>
+		<Event id="14" label="p5_f6"/>
+		<Event id="15" label="p6_f6"/>
+		<Event id="16" label="p7_f6"/>
+		<Event id="17" label="p8_f6"/>
+		<Event id="18" label="p9_f6"/>
+		<Event id="19" label="p10_f6"/>
+	</Events>
+	<States>
+		<State id="0" name="q0" initial="true" accepting="true"/>
+		<State id="1" name="q1"/>
+		<State id="2" name="q2"/>
+		<State id="3" name="q3"/>
+		<State id="4" name="q4"/>
+		<State id="5" name="q5"/>
+		<State id="6" name="q6"/>
+		<State id="7" name="q7"/>
+		<State id="8" name="q8"/>
+		<State id="9" name="q9"/>
+		<State id="10" name="q10"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="0"/>
+		<Transition source="0" dest="2" event="1"/>
+		<Transition source="0" dest="3" event="2"/>
+		<Transition source="0" dest="4" event="3"/>
+		<Transition source="0" dest="5" event="4"/>
+		<Transition source="0" dest="6" event="5"/>
+		<Transition source="0" dest="7" event="6"/>
+		<Transition source="0" dest="8" event="7"/>
+		<Transition source="0" dest="9" event="8"/>
+		<Transition source="0" dest="10" event="9"/>
+		<Transition source="1" dest="0" event="10"/>
+		<Transition source="2" dest="0" event="11"/>
+		<Transition source="3" dest="0" event="12"/>
+		<Transition source="4" dest="0" event="13"/>
+		<Transition source="5" dest="0" event="14"/>
+		<Transition source="6" dest="0" event="15"/>
+		<Transition source="7" dest="0" event="16"/>
+		<Transition source="8" dest="0" event="17"/>
+		<Transition source="9" dest="0" event="18"/>
+		<Transition source="10" dest="0" event="19"/>
+	</Transitions>
+</Automaton>
+<Automaton name="z7" type="Specification">
+	<Events>
+		<Event id="0" label="p1_s7"/>
+		<Event id="1" label="p2_s7"/>
+		<Event id="2" label="p3_s7"/>
+		<Event id="3" label="p4_s7"/>
+		<Event id="4" label="p5_s7"/>
+		<Event id="5" label="p6_s7"/>
+		<Event id="6" label="p7_s7"/>
+		<Event id="7" label="p8_s7"/>
+		<Event id="8" label="p9_s7"/>
+		<Event id="9" label="p10_s7"/>
+		<Event id="10" label="p1_f7"/>
+		<Event id="11" label="p2_f7"/>
+		<Event id="12" label="p3_f7"/>
+		<Event id="13" label="p4_f7"/>
+		<Event id="14" label="p5_f7"/>
+		<Event id="15" label="p6_f7"/>
+		<Event id="16" label="p7_f7"/>
+		<Event id="17" label="p8_f7"/>
+		<Event id="18" label="p9_f7"/>
+		<Event id="19" label="p10_f7"/>
+	</Events>
+	<States>
+		<State id="0" name="q0" initial="true" accepting="true"/>
+		<State id="1" name="q1"/>
+		<State id="2" name="q2"/>
+		<State id="3" name="q3"/>
+		<State id="4" name="q4"/>
+		<State id="5" name="q5"/>
+		<State id="6" name="q6"/>
+		<State id="7" name="q7"/>
+		<State id="8" name="q8"/>
+		<State id="9" name="q9"/>
+		<State id="10" name="q10"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="0"/>
+		<Transition source="0" dest="2" event="1"/>
+		<Transition source="0" dest="3" event="2"/>
+		<Transition source="0" dest="4" event="3"/>
+		<Transition source="0" dest="5" event="4"/>
+		<Transition source="0" dest="6" event="5"/>
+		<Transition source="0" dest="7" event="6"/>
+		<Transition source="0" dest="8" event="7"/>
+		<Transition source="0" dest="9" event="8"/>
+		<Transition source="0" dest="10" event="9"/>
+		<Transition source="1" dest="0" event="10"/>
+		<Transition source="2" dest="0" event="11"/>
+		<Transition source="3" dest="0" event="12"/>
+		<Transition source="4" dest="0" event="13"/>
+		<Transition source="5" dest="0" event="14"/>
+		<Transition source="6" dest="0" event="15"/>
+		<Transition source="7" dest="0" event="16"/>
+		<Transition source="8" dest="0" event="17"/>
+		<Transition source="9" dest="0" event="18"/>
+		<Transition source="10" dest="0" event="19"/>
+	</Transitions>
+</Automaton>
+<Automaton name="z8" type="Specification">
+	<Events>
+		<Event id="0" label="p1_s8"/>
+		<Event id="1" label="p2_s8"/>
+		<Event id="2" label="p3_s8"/>
+		<Event id="3" label="p4_s8"/>
+		<Event id="4" label="p5_s8"/>
+		<Event id="5" label="p6_s8"/>
+		<Event id="6" label="p7_s8"/>
+		<Event id="7" label="p8_s8"/>
+		<Event id="8" label="p9_s8"/>
+		<Event id="9" label="p10_s8"/>
+		<Event id="10" label="p1_f8"/>
+		<Event id="11" label="p2_f8"/>
+		<Event id="12" label="p3_f8"/>
+		<Event id="13" label="p4_f8"/>
+		<Event id="14" label="p5_f8"/>
+		<Event id="15" label="p6_f8"/>
+		<Event id="16" label="p7_f8"/>
+		<Event id="17" label="p8_f8"/>
+		<Event id="18" label="p9_f8"/>
+		<Event id="19" label="p10_f8"/>
+	</Events>
+	<States>
+		<State id="0" name="q0" initial="true" accepting="true"/>
+		<State id="1" name="q1"/>
+		<State id="2" name="q2"/>
+		<State id="3" name="q3"/>
+		<State id="4" name="q4"/>
+		<State id="5" name="q5"/>
+		<State id="6" name="q6"/>
+		<State id="7" name="q7"/>
+		<State id="8" name="q8"/>
+		<State id="9" name="q9"/>
+		<State id="10" name="q10"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="0"/>
+		<Transition source="0" dest="2" event="1"/>
+		<Transition source="0" dest="3" event="2"/>
+		<Transition source="0" dest="4" event="3"/>
+		<Transition source="0" dest="5" event="4"/>
+		<Transition source="0" dest="6" event="5"/>
+		<Transition source="0" dest="7" event="6"/>
+		<Transition source="0" dest="8" event="7"/>
+		<Transition source="0" dest="9" event="8"/>
+		<Transition source="0" dest="10" event="9"/>
+		<Transition source="1" dest="0" event="10"/>
+		<Transition source="2" dest="0" event="11"/>
+		<Transition source="3" dest="0" event="12"/>
+		<Transition source="4" dest="0" event="13"/>
+		<Transition source="5" dest="0" event="14"/>
+		<Transition source="6" dest="0" event="15"/>
+		<Transition source="7" dest="0" event="16"/>
+		<Transition source="8" dest="0" event="17"/>
+		<Transition source="9" dest="0" event="18"/>
+		<Transition source="10" dest="0" event="19"/>
+	</Transitions>
+</Automaton>
+<Automaton name="z9" type="Specification">
+	<Events>
+		<Event id="0" label="p1_s9"/>
+		<Event id="1" label="p2_s9"/>
+		<Event id="2" label="p3_s9"/>
+		<Event id="3" label="p4_s9"/>
+		<Event id="4" label="p5_s9"/>
+		<Event id="5" label="p6_s9"/>
+		<Event id="6" label="p7_s9"/>
+		<Event id="7" label="p8_s9"/>
+		<Event id="8" label="p9_s9"/>
+		<Event id="9" label="p10_s9"/>
+		<Event id="10" label="p1_f9"/>
+		<Event id="11" label="p2_f9"/>
+		<Event id="12" label="p3_f9"/>
+		<Event id="13" label="p4_f9"/>
+		<Event id="14" label="p5_f9"/>
+		<Event id="15" label="p6_f9"/>
+		<Event id="16" label="p7_f9"/>
+		<Event id="17" label="p8_f9"/>
+		<Event id="18" label="p9_f9"/>
+		<Event id="19" label="p10_f9"/>
+	</Events>
+	<States>
+		<State id="0" name="q0" initial="true" accepting="true"/>
+		<State id="1" name="q1"/>
+		<State id="2" name="q2"/>
+		<State id="3" name="q3"/>
+		<State id="4" name="q4"/>
+		<State id="5" name="q5"/>
+		<State id="6" name="q6"/>
+		<State id="7" name="q7"/>
+		<State id="8" name="q8"/>
+		<State id="9" name="q9"/>
+		<State id="10" name="q10"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="0"/>
+		<Transition source="0" dest="2" event="1"/>
+		<Transition source="0" dest="3" event="2"/>
+		<Transition source="0" dest="4" event="3"/>
+		<Transition source="0" dest="5" event="4"/>
+		<Transition source="0" dest="6" event="5"/>
+		<Transition source="0" dest="7" event="6"/>
+		<Transition source="0" dest="8" event="7"/>
+		<Transition source="0" dest="9" event="8"/>
+		<Transition source="0" dest="10" event="9"/>
+		<Transition source="1" dest="0" event="10"/>
+		<Transition source="2" dest="0" event="11"/>
+		<Transition source="3" dest="0" event="12"/>
+		<Transition source="4" dest="0" event="13"/>
+		<Transition source="5" dest="0" event="14"/>
+		<Transition source="6" dest="0" event="15"/>
+		<Transition source="7" dest="0" event="16"/>
+		<Transition source="8" dest="0" event="17"/>
+		<Transition source="9" dest="0" event="18"/>
+		<Transition source="10" dest="0" event="19"/>
+	</Transitions>
+</Automaton>
+</Automata>

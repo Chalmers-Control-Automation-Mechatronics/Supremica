@@ -27,10 +27,13 @@ public class ScheduleDialog
     public static final String VIS_GRAPH_TIME_RELAXATION = "visibility graph (time)";
     public static final String VIS_GRAPH_NODE_RELAXATION = "visibility graph (node)";
     public static final String BRUTE_FORCE_RELAXATION = "brute force";
+    private static final String OPTIMAL = "optimal";
+    private static final String SUBOPTIMAL = "random path";
     
     private static final long serialVersionUID = 1L;
-    private static final String[] optiMethodNames = new String[]{MODIFIED_A_STAR, MILP, VIS_GRAPH, MULTITHREADED_A_STAR}; //, "Modified IDA*", "Modified SMA*"};
-    private static final String[] heuristicsNames = new String[]{ONE_PRODUCT_RELAXATION, TWO_PRODUCT_RELAXATION, VIS_GRAPH_TIME_RELAXATION, VIS_GRAPH_NODE_RELAXATION, BRUTE_FORCE_RELAXATION};
+    private static final String[] optimizationMehtods = new String[]{MODIFIED_A_STAR, MILP, VIS_GRAPH, MULTITHREADED_A_STAR}; //, "Modified IDA*", "Modified SMA*"};
+    private static final String[] astarHeuristics = new String[]{ONE_PRODUCT_RELAXATION, TWO_PRODUCT_RELAXATION, VIS_GRAPH_TIME_RELAXATION, VIS_GRAPH_NODE_RELAXATION, BRUTE_FORCE_RELAXATION};
+    private static final String[] milpHeuristics = new String[]{OPTIMAL, SUBOPTIMAL};
     private static Logger logger = LoggerFactory.createLogger(ScheduleDialog.class);
     private JComboBox optiMethodsBox, heuristicsBox;
     private JCheckBox nodeExpander, buildAutomaton, vgDrawer;
@@ -63,10 +66,10 @@ public class ScheduleDialog
         cancelButton = new JButton("Cancel");
         
         JLabel optiMethodsLabel = new JLabel("Optimization methods: \t \t");
-        optiMethodsBox = new JComboBox(optiMethodNames);
+        optiMethodsBox = new JComboBox(optimizationMehtods);
         
         JLabel heuristicsLabel = new JLabel("Heuristics: \t \t");
-        heuristicsBox = new JComboBox(heuristicsNames);
+        heuristicsBox = new JComboBox(astarHeuristics);
         
         nodeExpander = new JCheckBox("use AK's node expander", false);
         buildAutomaton = new JCheckBox("build schedule", true);
@@ -159,13 +162,23 @@ public class ScheduleDialog
                 {
                     heuristicsBox.setEnabled(true);
                     
-// 						heuristicsBox.removeAllItems();
-// 						for (String heuristic : heuristicsNames)
-// 						{
-// 							heuristicsBox.addItem(heuristic);
-// 						}
+                    heuristicsBox.removeAllItems();
+                    for (String heuristic : astarHeuristics)
+                    {
+                            heuristicsBox.addItem(heuristic);
+                    }
                 }
-                else
+                else if (((String)optiMethodsBox.getSelectedItem()).equals("MILP"))
+                {
+                    heuristicsBox.setEnabled(true);
+                    
+                    heuristicsBox.removeAllItems();
+                    for (String heuristic : milpHeuristics)
+                    {
+                        heuristicsBox.addItem(heuristic);
+                    }
+                }
+                else 
                 {
                     heuristicsBox.setEnabled(false);
                 }
@@ -226,9 +239,9 @@ public class ScheduleDialog
             
             readMemoryCapacity();
             
+            String selectedHeuristic = (String) heuristicsBox.getSelectedItem();
             if (optiMethodsBox.getSelectedItem().equals(MODIFIED_A_STAR))
             {
-                String selectedHeuristic = (String) heuristicsBox.getSelectedItem();
                 if ((selectedAutomata.getPlantAutomata().size() == 2) && (selectedHeuristic.equals(VIS_GRAPH_TIME_RELAXATION) || selectedHeuristic.equals(VIS_GRAPH_NODE_RELAXATION)))
                 {
                     sched = new VisGraphScheduler(selectedAutomata, vgDrawer.isSelected(), this);
@@ -240,7 +253,14 @@ public class ScheduleDialog
             }
             else if (optiMethodsBox.getSelectedItem().equals(MILP))
             {
-                sched = new Milp(selectedAutomata, buildAutomaton.isSelected(), this);
+                if (selectedHeuristic.equals(OPTIMAL))
+                {
+                    sched = new Milp(selectedAutomata, buildAutomaton.isSelected(), this);
+                }
+                else if (selectedHeuristic.equals(SUBOPTIMAL))
+                {
+                    sched = new RandomPathUsingMilp(selectedAutomata, buildAutomaton.isSelected(), this);
+                }
             }
             else if (optiMethodsBox.getSelectedItem().equals(VIS_GRAPH))
             {

@@ -42,7 +42,7 @@ public class Milp
     private double makespan;
     
     /** The *.mod file that serves as an input to the Glpk-solver */
-    private File modelFile;
+    protected File modelFile;
     
     /** The *.sol file that stores the solution, i.e. the output of the Glpk-solver */
     private File solutionFile;
@@ -74,13 +74,13 @@ public class Milp
     private ActionTimer timer = new ActionTimer();
     
     /** This boolean is true if the scheduler-thread should be (is) running */
-    private volatile boolean isRunning = false;
+    protected volatile boolean isRunning = false;
     
     /** The dialog box that launched this scheduler */
-    private ScheduleDialog scheduleDialog;
+    protected ScheduleDialog scheduleDialog;
     
     /** Decides if the schedule should be built */
-    private boolean buildSchedule;
+    protected boolean buildSchedule;
     
     /** The output string */
     private String outputStr = "";
@@ -237,7 +237,8 @@ public class Milp
      */
     public void buildScheduleAutomaton()
         throws Exception
-    {                
+    {           
+/*
         //TODO: temp (fulhack) - fixa bättre schemabygge.
         SynthesizerOptions synthesizerOptions = new SynthesizerOptions();
         synthesizerOptions.setSynthesisType(SynthesisType.NONBLOCKINGCONTROLLABLE);
@@ -252,7 +253,7 @@ public class Milp
         synthAll.setName("SYNTH_OVER_ALL");
         synthAll.setType(AutomatonType.PLANT);
         State synthState = synthAll.getInitialState();
-            
+*/            
         // Create the automaton with a chosen name
         String scheduleName = "";
         while (scheduleName != null && scheduleName.trim() == "")
@@ -338,9 +339,9 @@ public class Milp
                             LabeledEvent currEvent = currArc.getEvent();
                             
                             // ... that correspoinds to an enabled transition
-//                             if (stepper.isEnabled(currEvent))
+                            if (stepper.isEnabled(currEvent))
                             // temp (fulhack)
-                            if (synthState.nextState(currEvent) != null)
+//                            if (synthState.nextState(currEvent) != null)
                             {
                                 int currStateIndex = indexMap.getStateIndex(currPlant, currState);
                                 int nextStateIndex = indexMap.getStateIndex(currPlant, currArc.getToState());
@@ -421,7 +422,7 @@ public class Milp
             schedule.addArc(new Arc(currScheduledState, nextScheduledState, currOptimalEvent));
             
             //temp (fulhack)
-            synthState = synthState.nextState(currOptimalEvent);
+//            synthState = synthState.nextState(currOptimalEvent);
 
             currScheduledState = nextScheduledState;
             
@@ -485,7 +486,7 @@ public class Milp
      * with the MILP-solver (GLPK). The automata are preprocessed (syntes and purge)
      * while the information about the location of booking/unbooking events is collected.
      */
-    private void initialize()
+    protected void initialize()
         throws Exception
     {
         modelFile = File.createTempFile("milp", ".mod");
@@ -1551,7 +1552,7 @@ public class Milp
      * Precedence, Mutual Exclusion, Cycle Time and Alternative Path constraints are
      * constructed.
      */
-    private void convertAutomataToMilp()
+    protected void convertAutomataToMilp()
     throws Exception
     {
         timer.restart();
@@ -1995,7 +1996,7 @@ public class Milp
         outputStr += "\t" + str + "\n";
     }
     
-    private void processSolutionFile()
+    protected void processSolutionFile()
         throws Exception
     {
         // tillf...
@@ -2096,7 +2097,13 @@ public class Milp
         outputStr += "\t" + str + "\n";
     }
     
-    private void callMilpSolver()
+    protected void callMilpSolver()
+    throws Exception
+    {
+        callMilpSolver(modelFile);
+    }
+                
+    protected void callMilpSolver(File currModelFile)
     throws Exception
     {
         logger.info("The MILP-solver started....");
@@ -2106,7 +2113,7 @@ public class Milp
         //cmds[0] = "C:\\Program Files\\glpk\\bin\\glpsol.exe";
         cmds[0] = "glpsol";
         cmds[1] = "-m";
-        cmds[2] = modelFile.getAbsolutePath();
+        cmds[2] = currModelFile.getAbsolutePath();
         cmds[3] = "-o";
         cmds[4] = solutionFile.getAbsolutePath();
         
