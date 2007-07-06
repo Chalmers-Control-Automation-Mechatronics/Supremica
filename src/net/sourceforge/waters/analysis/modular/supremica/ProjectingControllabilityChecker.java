@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.analysis.modular
 //# CLASS:   ProjectingControllabilityChecker
 //###########################################################################
-//# $Id: ProjectingControllabilityChecker.java,v 1.12 2007-07-05 00:17:20 siw4 Exp $
+//# $Id: ProjectingControllabilityChecker.java,v 1.13 2007-07-06 00:25:12 siw4 Exp $
 //###########################################################################
 
 
@@ -46,7 +46,6 @@ import net.sourceforge.waters.xsd.base.ComponentKind;
 import net.sourceforge.waters.xsd.base.EventKind;
 
 import java.util.Arrays;
-
 
 public class ProjectingControllabilityChecker
   extends AbstractModelVerifier
@@ -588,8 +587,7 @@ public class ProjectingControllabilityChecker
       mHidden = hidden;
     }
   }
-
-
+  
   //#########################################################################
   //# Data Members
   private final ControllabilityChecker mChecker;
@@ -602,7 +600,7 @@ public class ProjectingControllabilityChecker
 
   //#########################################################################
   //# Class Constants
-//  private static final Logger LOGGER =
+  //  private static final Logger LOGGER =
   //  LoggerFactory.createLogger(ProjectingControllabilityChecker.class);
 
 }

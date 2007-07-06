@@ -4,11 +4,12 @@
 //# PACKAGE: net.sourceforge.waters.cpp.analysis
 //# CLASS:   ProjectingModelVerifierFactory
 //###########################################################################
-//# $Id: ProjectingModelVerifierFactory.java,v 1.3 2007-07-05 00:17:20 siw4 Exp $
+//# $Id: ProjectingModelVerifierFactory.java,v 1.4 2007-07-06 00:25:12 siw4 Exp $
 //###########################################################################
 
 package net.sourceforge.waters.analysis.modular.supremica;
 
+import net.sourceforge.waters.analysis.modular.ModularLanguageInclusionChecker;
 import java.util.List;
 
 import net.sourceforge.waters.analysis.modular.HeuristicType;
@@ -45,8 +46,11 @@ public class ProjectingModelVerifierFactory implements ModelVerifierFactory
   public LanguageInclusionChecker createLanguageInclusionChecker
     (final ProductDESProxyFactory factory)
   {
-    throw new UnsupportedOperationException
-      ("Language inclusion check not yet supported!");
+    return new ModularLanguageInclusionChecker(
+       null, factory,
+       createControllabilityChecker(factory),
+       new MaxCommonEventsHeuristic(HeuristicType.PREFERREALPLANT)
+       );
   }
 
 
