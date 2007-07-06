@@ -771,7 +771,8 @@ Class-Path: ${manifest.pathlist}</echo>
             <formatter type="xml"/>
             <batchtest todir="${logs.results}">
                 <fileset dir="${testssrc}">
-                    <include name="**/ProjectingControllabilityCheckerTest.java"/>
+                    <include name="**/ModularLanguageInclusionCheckerTest.java"/>
+                    <include name="**/ProjectingLanguageInclusionCheckerTest.java"/>
                 </fileset>
             </batchtest>
             <classpath>
