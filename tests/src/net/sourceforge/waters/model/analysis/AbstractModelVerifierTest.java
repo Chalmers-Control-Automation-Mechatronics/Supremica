@@ -4,14 +4,17 @@
 //# PACKAGE: net.sourceforge.waters.model.analysis
 //# CLASS:   AbstractModelVerifierTest
 //###########################################################################
-//# $Id: AbstractModelVerifierTest.java,v 1.12 2007-05-26 11:29:22 robi Exp $
+//# $Id: AbstractModelVerifierTest.java,v 1.13 2007-07-06 02:09:50 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.analysis;
 
 import java.io.File;
+import java.util.Collection;
 import java.util.List;
 
+import net.sourceforge.waters.model.des.AutomatonProxy;
+import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 import net.sourceforge.waters.model.des.TraceProxy;
@@ -183,13 +186,34 @@ public abstract class AbstractModelVerifierTest extends AbstractAnalysisTest
 
 
   //#########################################################################
+  //# To be Overridden by Subclasses
+  protected void checkCounterExample(final ProductDESProxy des,
+                                     final TraceProxy trace)
+  {
+    assertNotNull(trace);
+    assertSame("Product DES in trace is not the original model!",
+               des, trace.getProductDES());
+    final Collection<AutomatonProxy> automata = des.getAutomata();
+    for (final AutomatonProxy aut : trace.getAutomata()) {
+      if (!automata.contains(aut)) {
+        fail("Trace automaton '" + aut.getName() +
+             "' does not match any in product DES!");
+      }
+    }
+    final Collection<EventProxy> events = des.getEvents();
+    for (final EventProxy event : trace.getEvents()) {
+      if (!events.contains(event)) {
+        fail("Trace event '" + event.getName() +
+             "' does not match any in product DES!");
+      }
+    }
+  }
+
+
+  //#########################################################################
   //# To be Provided by Subclasses
   protected abstract ModelVerifier
     createModelVerifier(ProductDESProxyFactory factory);
-
-  protected abstract void
-    checkCounterExample(ProductDESProxy des,
-                        TraceProxy counterexample);
 
 
   //#########################################################################

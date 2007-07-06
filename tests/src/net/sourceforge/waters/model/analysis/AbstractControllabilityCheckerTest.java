@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.analysis
 //# CLASS:   AbstractControllabilityCheckerTest
 //###########################################################################
-//# $Id: AbstractControllabilityCheckerTest.java,v 1.11 2007-06-08 10:45:20 robi Exp $
+//# $Id: AbstractControllabilityCheckerTest.java,v 1.12 2007-07-06 02:09:50 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.analysis;
@@ -761,7 +761,7 @@ public abstract class AbstractControllabilityCheckerTest
   protected void checkCounterExample(final ProductDESProxy des,
                                      final TraceProxy trace)
   {
-    assertNotNull(trace);
+    super.checkCounterExample(des, trace);
     final SafetyTraceProxy counterexample = (SafetyTraceProxy) trace;
   	
     final List<EventProxy> eventlist = counterexample.getEvents();

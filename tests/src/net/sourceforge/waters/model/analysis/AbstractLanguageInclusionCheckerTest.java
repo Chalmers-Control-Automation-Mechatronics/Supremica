@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.analysis
 //# CLASS:   AbstractLanguageInclusionCheckerTest
 //###########################################################################
-//# $Id: AbstractLanguageInclusionCheckerTest.java,v 1.5 2007-05-26 11:29:22 robi Exp $
+//# $Id: AbstractLanguageInclusionCheckerTest.java,v 1.6 2007-07-06 02:09:50 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.analysis;
@@ -218,7 +218,7 @@ public abstract class AbstractLanguageInclusionCheckerTest
   protected void checkCounterExample(final ProductDESProxy des,
                                      final TraceProxy trace)
   {
-    assertNotNull(trace);
+    super.checkCounterExample(des, trace);
     final SafetyTraceProxy counterexample = (SafetyTraceProxy) trace;
   	
     final List<EventProxy> eventlist = counterexample.getEvents();
