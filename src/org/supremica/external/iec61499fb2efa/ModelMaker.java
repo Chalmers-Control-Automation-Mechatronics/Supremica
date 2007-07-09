@@ -27,6 +27,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.HashMap;
+import java.util.Set;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.net.URI;
 import java.lang.Exception;
@@ -274,6 +276,7 @@ class ModelMaker
 			String fbName = (String) fbIter.next();
 			String typeName = (String) basicFunctionBlocks.get(fbName);
 			
+			// TODO
 // 			if (typeName.startsWith("E_SPLIT"))
 // 			{
 // 				makeSplit((new Integer(((String) functionBlocks.get(fbName)).substring(7))).intValue());
@@ -376,6 +379,7 @@ class ModelMaker
 			restartInstance = instanceName;
 			functionBlocks.put(instanceName,typeName);
 		}
+		// TODO
 // 		else if (typeName.startsWith("E_MERGE"))
 // 		{
 // 			System.out.println("\t Skipping built-in E_MERGE type.");			
@@ -1388,10 +1392,13 @@ class ModelMaker
 		String typeName = (String) basicFunctionBlocks.get(fbName);
 		JaxbFBType theType = (JaxbFBType) fbTypes.get(typeName);
 		ECC theECC = theType.getBasicFB().getECC();
-		
+		List ecStates = theECC.getECState();
+		List ecTransitions = theECC.getECTransition();
+		Set visitedECStates = new HashSet();
+
 		ExtendedAutomaton ecc = new ExtendedAutomaton("Execution Control Chart " + fbName, automata);
 
-		// local variables
+		// internal variables
 		if (theType.getBasicFB().isSetInternalVars())
 		{
 			final List internalVars = theType.getBasicFB().getInternalVars().getVarDeclaration();
@@ -1430,15 +1437,97 @@ class ModelMaker
 				}
 			}
 		}
-		
-		
-		
-		
 
+		int stateNameCounter = 1;
+		boolean initialState = true;
+		for (Iterator ecStatesIter = ecStates.iterator(); ecStatesIter.hasNext();)
+		{
+			JaxbECState curECState = (JaxbECState) ecStatesIter.next();
+			makeECStateBranch(ecc, fbName, curECState.getName(), null, null, ecStates, ecTransitions, visitedECStates, stateNameCounter, initialState);
+			initialState = false;
+		}
 
 		automata.addAutomaton(ecc);	
 	}
 
+	private void makeECStateBranch(ExtendedAutomaton ecc, String fbName, String ecStateName, String prevState, JaxbECTransition takenTransition, List ecStates, List ecTransitions, Set visitedECStates, int nameCounter, boolean initial)
+	{
+
+		JaxbECState ecState = null;
+		for (Iterator iter = ecStates.iterator();iter.hasNext();)
+		{
+			JaxbECState curECState = (JaxbECState) iter.next();
+			if (ecStateName.contains(curECState.getName()))
+			{
+				ecState = curECState;
+			}
+		}
+
+		List stateActions = ecState.getECAction();
+
+		
+		if (initial)
+		{
+			// don't make actions model
+				ecc.addState(ecStateName,true);
+				String to = "s" + nameCounter; 
+				nameCounter++;
+				ecc.addState(to);
+				ecc.addTransition(ecStateName, to, "update_ECC_" + fbName + ";", null, null);
+				prevState = to;
+		}
+		else
+		{
+			// make actions model
+			
+		}
+		visitedECStates.add(ecStateName);
+
+		// find all transitions from this ECState
+		Set ecStateTransitions = new HashSet();
+		for (Iterator ecTransitionsIter = ecTransitions.iterator(); ecTransitionsIter.hasNext();)
+		{
+			JaxbECTransition curECTransition = (JaxbECTransition) ecTransitionsIter.next();
+			if (curECTransition.getSource().equals(ecStateName))
+			{
+				ecStateTransitions.add(curECTransition);
+			}
+		}
+		
+		// make branches for each transition
+		for (Iterator ecStateTransitionsIter = ecStateTransitions.iterator(); ecStateTransitionsIter.hasNext();)
+		{
+			JaxbECTransition curECTransition = (JaxbECTransition) ecStateTransitionsIter.next();
+			String curDest = curECTransition.getDestination();
+			
+			// make branch model	
+			String from = prevState;
+			String to =  curDest + "_actions";
+			String event = "event_input_" + fbName + ";";
+			
+			// TODO: replace variable names with model variables
+			String guard = curECTransition.getCondition();
+
+			String action = null;		
+			// get first action of the next EC state, if any
+			if (stateActions.size()>0)
+			{
+				JaxbECAction firstAction = (JaxbECAction) stateActions.get(0);
+				//Integer actionAlgorithm = (Integer) ((Map) algorithms.get(fbName)).get(().getAlgorithm());
+				//action = "queueing_job_" + fbName + "=" + actionAlgorithm + ";";
+			}
+			
+			if (!visitedECStates.contains(curDest))
+			{
+				makeECStateBranch(ecc, fbName, to, from, curECTransition, ecStates, ecTransitions, visitedECStates, nameCounter, false);
+			}
+			else
+			{
+				// connect to existing model
+			}
+		}
+	}
+	
 	private void makeBasicFBAlgorithms(String fbName)
 	{
 		System.out.println("\t Algorithms");
