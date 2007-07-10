@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.analysis.modular
 //# CLASS:   ModularLanguageInclusionChecker
 //###########################################################################
-//# $Id: ModularLanguageInclusionChecker.java,v 1.7 2007-06-05 13:45:21 robi Exp $
+//# $Id: ModularLanguageInclusionChecker.java,v 1.8 2007-07-10 01:52:06 siw4 Exp $
 //###########################################################################
 
 
@@ -73,7 +73,7 @@ public class ModularLanguageInclusionChecker
     throws AnalysisException
   {
     mStates = 0;
-    List<AutomatonProxy> properties = new ArrayList<AutomatonProxy>();
+    final List<AutomatonProxy> properties = new ArrayList<AutomatonProxy>();
     Set<AutomatonProxy> automata = 
       new HashSet<AutomatonProxy>(getModel().getAutomata().size());
     for (AutomatonProxy automaton : getModel().getAutomata()) {
@@ -86,10 +86,7 @@ public class ModularLanguageInclusionChecker
       }
     }
     Collections.sort(properties, new AutomatonComparator());
-    ModularControllabilityChecker checker =
-      new ModularControllabilityChecker(null, getFactory(), mChecker,
-                                        mHeuristic, false);
-    for (final AutomatonProxy automaton : properties) {
+    /*for (final AutomatonProxy automaton : properties) {
       automata.add(automaton);
       ProductDESProxy model = 
         getFactory().createProductDESProxy("prop", getModel().getEvents(),
@@ -115,7 +112,31 @@ public class ModularLanguageInclusionChecker
         return false;
       }
       mStates += checker.getAnalysisResult().getTotalNumberOfStates();
+    }*/
+    automata.addAll(properties);
+    ProductDESProxy model = 
+      getFactory().createProductDESProxy("prop", getModel().getEvents(),
+                                         automata);
+    mChecker.setModel(model);
+    mChecker.setKindTranslator(new KindTranslator()
+    {
+      public EventKind getEventKind(EventProxy e)
+      {
+        return EventKind.UNCONTROLLABLE;
+      }
+      
+      public ComponentKind getComponentKind(AutomatonProxy a)
+      {
+        return properties.contains(a) ? ComponentKind.SPEC : ComponentKind.PLANT;
+      }
+    });
+    mChecker.setStateLimit(getStateLimit() - mStates);
+    if (!mChecker.run()) {
+      mStates += mChecker.getAnalysisResult().getTotalNumberOfStates();
+      setFailedResult(mChecker.getCounterExample());
+      return false;
     }
+    mStates += mChecker.getAnalysisResult().getTotalNumberOfStates();
     setSatisfiedResult();
     return true;
   }

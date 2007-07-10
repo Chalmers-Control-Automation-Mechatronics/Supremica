@@ -167,6 +167,7 @@ public class Projection
                                                           ev, states.values(), trans);
     states = null;
     trans = null;
+    System.out.println(result.getStates().size());
     return result;
   }
   
