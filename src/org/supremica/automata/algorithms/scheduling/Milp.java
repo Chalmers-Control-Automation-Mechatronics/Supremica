@@ -239,7 +239,7 @@ public class Milp
         throws Exception
     {           
 /*
-        //TODO: temp (fulhack) - fixa bättre schemabygge.
+        //TODO: temp (fulhack) - fixa bï¿½ttre schemabygge.
         SynthesizerOptions synthesizerOptions = new SynthesizerOptions();
         synthesizerOptions.setSynthesisType(SynthesisType.NONBLOCKINGCONTROLLABLE);
         synthesizerOptions.setSynthesisAlgorithm(SynthesisAlgorithm.MONOLITHIC);
@@ -1478,9 +1478,9 @@ public class Milp
      *  Calls @findNearestPathSplits(auto, state, altPathsVariables, null), thus
      *  initiating search for the path splits on all transitions leading to state.
      *
-     *  @param - auto, the automaton in which path splits may appear.
-     *  @parem - state, the state above which path splits are searched for.
-     *  @param - altPathVariables, the  @ArrayList containing the indices of 
+     *  @param auto the automaton in which path splits may appear.
+     *  @param state the state above which path splits are searched for.
+     *  @param altPathVariables the  @ArrayList containing the indices of 
      *           path split state pairs. The search is always ended by adding 
      *           NO_PATH_SPLIT_INDEX to the list.
      */
@@ -1497,12 +1497,12 @@ public class Milp
      *  states are found. Their inidices, as provided by @AutomataIndexMap, are
      *  stored in the supplied ArrayList.
      *
-     *  @param - auto, the automaton in which path splits may appear.
-     *  @parem - state, the state above which path splits are searched for.
-     *  @param - altPathVariables, the  @ArrayList containing the indices of 
+     *  @param auto, the automaton in which path splits may appear.
+     *  @parem state, the state above which path splits are searched for.
+     *  @param altPathVariables, the  @ArrayList containing the indices of 
      *           path split state pairs. The search is always ended by adding 
      *           NO_PATH_SPLIT_INDEX to the list.
-     *  @param - event, the event above (and including) which the search for 
+     *  @param event, the event above (and including) which the search for 
      *           path splits is started. If null, all transition leading to the 
      *           state are considered. 
      */
@@ -2225,7 +2225,7 @@ public class Milp
      *  in the initial state (which should only occur after one run of the
      *  optimization algorithm), it is removed (otherwise MILP cannot function).
      *
-     *  @param - The plant to be prepared for MILP-optimization.
+     *  @param currPlant The plant to be prepared for MILP-optimization.
      */
     private void prepareAutomatonForMilp(Automaton currPlant)
         throws Exception
@@ -2449,8 +2449,8 @@ public class Milp
      *  value that is smaller than time and cannot be affected by the sum of 
      *  epsilons.
      *
-     *  @param - time 
-     *  @return - the time without epsilons
+     *  @param time 
+     *  @return the time without epsilons
      */
     private double removeEpsilons(double time)
     {

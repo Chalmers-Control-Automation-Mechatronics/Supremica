@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   EventDeclListView
 //###########################################################################
-//# $Id: EventDeclListView.java,v 1.5 2007-06-11 15:07:51 robi Exp $
+//# $Id: EventDeclListView.java,v 1.6 2007-07-10 14:27:42 flordal Exp $
 //###########################################################################
 
 
@@ -57,7 +57,7 @@ import net.sourceforge.waters.xsd.base.EventKind;
  * transitions in graphs.
  *
  * @todo Selection handling (must be undoable) not yet implemented!
- *
+ * 
  * @author Simon Ware, Robi Malik
  */
 

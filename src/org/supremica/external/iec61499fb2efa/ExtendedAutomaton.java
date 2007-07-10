@@ -126,8 +126,8 @@ public class ExtendedAutomaton
 	 * @param from  name of the source state
 	 * @param to name of the destination state
 	 * @param label semi-colon separated list of event names for the transition
-	 * @param guard guard expression for the transition
-	 * @param action action expression for the transition
+	 * @param guardIn guard expression for the transition
+	 * @param actionIn action expression for the transition
 	 */
 	public void addTransition(String from, String to, String label, String guardIn, String actionIn)
 	{

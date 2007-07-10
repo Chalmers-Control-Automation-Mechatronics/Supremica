@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="iso-8859-1"?>
 
-<project name="Supremica" default="rebuild" basedir=".">
+<project name="Supremica" default="build" basedir=".">
     
     <property file="build.properties"/>    
     
@@ -102,8 +102,9 @@
 *	You should also run it every time one of the jar files below
 *	has been updated.
     -->
-    <target name="initialize" depends="clean,initialize_jars,version,build,-jar_supremica_lib,cpp_waters"/>
-    
+    <target name="initialize" depends="clean,initialize_jars,build,-jar_supremica_lib,cpp_waters"
+            description="Rebuilds the project from scratch."/>
+
     <!--
 <target name="eclipse_initialize">
 	<delete dir="${eclipselib}"/>
@@ -169,10 +170,6 @@
         <unjar src="${groovy-all.jar}" dest="${lib}/${unjared}"/> <!-- support for groovy -->
     </target>
     
-    <target name="init">
-        <tstamp/>
-    </target>
-    
     <target name="clean_build">
         <delete dir="${build}"/>
         <mkdir dir="${build}"/>
@@ -184,23 +181,17 @@
     
     <target name="clean" depends="clean_build">
         <delete dir="${dist}"/>
-        <mkdir dir="${dist}"/>	
-        
+        <mkdir dir="${dist}"/>	        
         <delete dir="${src}/org/w3"/>
-        <mkdir dir="${src}/org/w3"/>
-        
+        <mkdir dir="${src}/org/w3"/>        
         <delete dir="${doc}/api"/>
-        <mkdir dir="${doc}/api"/>	
-        
+        <mkdir dir="${doc}/api"/>	        
         <delete dir="${lib}/${unjared}"/>
-        <mkdir dir="${lib}/${unjared}"/>
-        
+        <mkdir dir="${lib}/${unjared}"/>        
         <delete dir="${resources}"/>
-        <mkdir dir="${resources}"/>
-        
+        <mkdir dir="${resources}"/>        
         <delete dir="${lib}/${unjared}/META-INF"/>
-        <mkdir dir="${lib}/${unjared}/META-INF"/>
-        
+        <mkdir dir="${lib}/${unjared}/META-INF"/>        
         <ant dir="${waters.dir}" target="clean" inheritAll="false"/>
     </target>
     
@@ -209,8 +200,12 @@
             <arg value="-jni -o ${src}/${supremica_basedir}/sattline/openmms/JOpenMMS.h ${my_packagedir}.sattline.openmms.JOpenMMS"/>
         </exec>
     </target>
-    
-    <target name="backup" depends="init,clean">
+
+    <target name="-init">
+        <tstamp/>
+    </target>
+            
+    <target name="backup" depends="-init,clean">
         <tar tarfile="${backup.dir}/${project.name}_${DSTAMP}_${TSTAMP}.tar" 
              basedir="../${project.name}"
              excludes="rsync/**,put,get,lib/unjared/**"/>
@@ -219,7 +214,7 @@
         <delete file="${backup.dir}/${project.name}_${DSTAMP}_${TSTAMP}.tar"/>
     </target>
     
-    <target name="backup_src" depends="init,clean">
+    <target name="backup_src" depends="-init,clean">
         <tar tarfile="${backup.dir}/${project.name}_onlysrc_${DSTAMP}_${TSTAMP}.tar" 
              basedir="../${project.name}/src"
              excludes="rsync/**,put,get"/>
@@ -228,7 +223,7 @@
         <delete file="${backup.dir}/${project.name}_onlysrc_${DSTAMP}_${TSTAMP}.tar"/>
     </target>
     
-    <target name="version" depends="init">
+    <target name="version" depends="-init">
         <delete quiet="true" file="${src}/${supremica_basedir}/Version.java"/>
         <copy file="${templates}/Version.tmpl" tofile="${src}/${supremica_basedir}/Version.java"/>	
         <replace file="${src}/${supremica_basedir}/Version.java" token="@BUILDDATE" value="${DSTAMP}${TSTAMP}"/>
@@ -286,7 +281,7 @@
         </javac>
     </target>
     
-    <target name="compile_supremica_groovy" depends="compile_supremica" description="--> compiles groovy src files that depend on Supremica">
+    <target name="compile_supremica_groovy" depends="compile_supremica" description="Compiles groovy src files that depend on Supremica">
         <groovyc srcdir="${src}" destdir="${build}">
             <classpath>    
                 <pathelement location="${build}"/>
@@ -429,7 +424,8 @@
 *	A standard compilation followed by packaging
 *	all files into a jar file. 
     -->
-    <target name="build" depends="version,compile,-jar_supremica,-startfiles_supremica">
+    <target name="build" depends="version,compile,-jar_supremica,-startfiles_supremica"
+            description="Recompiles only the files that have changed.">
     </target>
     
     <!-- Rebuild:
@@ -437,23 +433,8 @@
 *	and packages all files into a jar file that can
 *	be executed without any other dependencies. 
     -->
-    <target name="rebuild" depends="clean_build,version,compile,-jar_supremica,-startfiles_supremica" description=
+    <target name="rebuild" depends="clean_build,build" description=
             "Deletes all existing class files, recompiles all files, and packages all files into a jar file that can be executed without any other dependencies.">
-    </target>
-    
-    <!-- Build:
-*	A standard compilation followed by packaging
-*	all files into a jar file. 
-    -->
-    <target name="build_supremica" depends="compile_supremica,compile_supremica_tests,-jar_supremica,-startfiles_supremica">
-    </target>
-    
-    <!-- Rebuild:
-*	Deletes all existing class files, recompiles all files,
-*	and packages all files into a jar file that can
-*	be executed without any other dependencies. 
-    -->
-    <target name="rebuild_supremica" depends="clean,version,build_supremica,-jar_supremica_lib">
     </target>
     
     <!-- Build:
@@ -657,10 +638,6 @@ Class-Path: ${manifest.pathlist}</echo>
         <chmod file="${dist}/BisimulationEquivalence.dll" perm="644"/> 
         <copy file="${platform}/win.x86/lib/izmjnicom.dll" todir="${dist}"/>
         <chmod file="${dist}/izmjnicom.dll" perm="644"/>
-        <!-- JacoZoom license removed.
-	<copy file="${platform}/win.x86/lib/21100280.LIC" todir="${dist}"/>
-	<chmod file="${dist}/21100280.LIC" perm="644"/>
--->
         <copy file="${platform}/win.x86/lib/JavaClipboard.dll" todir="${dist}"/>
         <chmod file="${dist}/JavaClipboard.dll" perm="644"/>
         <copy file="${platform}/win.x86/lib/glpk_bridge.dll" todir="${dist}"/>
@@ -683,8 +660,6 @@ Class-Path: ${manifest.pathlist}</echo>
 	<chmod file="${dist}/JGrafChart.cmd" perm="644"/>
 </target>
 -->
-    
-    <target name="doc" depends="doc_supremica"/>
     
     <!-- Should probably be divided into several separate benchmarks as new ones appear. -->
     <target name="run_benchmarks" depends="compile_supremica,compile_benchmarks_supremica">
@@ -809,18 +784,19 @@ Class-Path: ${manifest.pathlist}</echo>
             </fileset>
             <report format="frames" todir="${logs.reports}"/>
         </junitreport>
+        <echo>Test report can be found in ${logs.reports}.</echo>
     </target>
     
-    <target name="test" depends="-run_tests,test_report"/>
+    <target name="test" depends="-run_tests,test_report"
+     description="Runs unit tests and produces a test report. This is a comprehensive test that takes several minutes."/>
+
     <target name="test_controllability" depends="-run_test_controllability,test_report"/>
-    <target name="test_short" depends="-run_tests_short,test_report"/>
-    <target name="test_bdd" depends="compile_supremica,-startfiles_supremica">
-        <!-- 
-	ok, the description should go 
-	"Run BDD specific tests, requires the BDD library for your architecture to be accessible"
-	but if i add this, only bdd_tests will show up with a "ant -projecthelp", since no one else
-	has cared to create a description
-	-->
+    
+    <target name="test_short" depends="-run_tests_short,test_report"
+     description="Runs unit tests and produces a test report. This is a shorter test that should take less than a minute."/>
+     
+    <target name="test_bdd" depends="compile_supremica,-startfiles_supremica" 
+            description="Run BDD specific tests, requires the BDD library for your architecture to be accessible">
         <java dir="${dist}" fork="yes" classname="org.supremica.util.BDD.test.TestAlgo" taskname="bdd_tests" failonerror="true">		
             <!-- ok, this is funny. if fork is "yes", we do start in ${dist}, otherwise in the Supremica-root -->
             <classpath>	
@@ -834,6 +810,8 @@ Class-Path: ${manifest.pathlist}</echo>
     <!--
 		packagenames="${supremica_basepackage}.automata.*,${supremica_basepackage}.gui.*,${supremica_basepackage}.util.*,${supremica_basepackage}.apps.*"
 -->
+    
+    <target name="doc" depends="doc_supremica" description="Generate Javadoc documentation."/>
     
     <target name="doc_supremica">
         <javadoc
@@ -869,8 +847,7 @@ Class-Path: ${manifest.pathlist}</echo>
     <!--	THIS ONE WAS PREVIOUSLY INCLUDED ABOVE...  -->
     <!--	overview="${templates}/Overview.html"      -->
     
-    <target name="doc_waters"
-            description="Generate Javadoc documentation.">
+    <target name="doc_waters">
         <mkdir dir="${javadoc}"/>
         <javadoc destdir="${javadoc}">
             <packageset dir="${src}">
@@ -890,7 +867,7 @@ Class-Path: ${manifest.pathlist}</echo>
                   offline="true" packagelistLoc="${docsrc}/offline/junit"/>
             <classpath>
                 <path refid="external-classpath"/>
-                pathelement location="${junit.jar}"/>
+                <pathelement location="${junit.jar}"/>
             </classpath>
         </javadoc>
     </target>

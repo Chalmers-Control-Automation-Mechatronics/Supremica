@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   ControlledSurface
 //###########################################################################
-//# $Id: ControlledSurface.java,v 1.136 2007-07-03 12:19:32 robi Exp $
+//# $Id: ControlledSurface.java,v 1.137 2007-07-10 14:27:42 flordal Exp $
 //###########################################################################
 
 package net.sourceforge.waters.gui;
@@ -354,8 +354,7 @@ public class ControlledSurface
    * Creates a simple node and selects it.
    * This method creates and executes a compound command consisting of
    * an simple node creation and a selection command.
-   * @param  x        the x coordinate of the new node.
-   * @param  y        the y coordinate of the new node.
+   * @param  pos        the coordinate of the new node.
    */
   void doCreateSimpleNode(final Point2D pos)
   {
@@ -1858,8 +1857,6 @@ public class ControlledSurface
      * to create and executes the appropriate command to reflect all the
      * changed made during the frag operation. Subclasses must call the
      * superclass method also.
-     * @param  event   The current mouse event.
-     * @return <CODE>true</CODE> if changes have been applied.
      */
     void commitDrag(final Point point)
     {
@@ -1872,8 +1869,6 @@ public class ControlledSurface
      * only clicked rather than dragged the mouse. Sometimes the selection
      * needs to be updated in such a case. Subclasses must call the
      * superclass method also.
-     * @param  event   The current mouse event.
-     * @return <CODE>true</CODE> if changes have been applied.
      */
     void cancelDrag(final Point point)
     {
