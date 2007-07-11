@@ -249,14 +249,14 @@ class ModelMaker
 		
 		makeDataConnectionMap(systemFBNetwork, null, 0);
 
-// 		printFunctionBlocksMap();
-// 		printBasicFunctionBlocksMap();
-//		printEventsMap();
-// 		printAlgorithmsMap();
-// 		printAlgorithmTextsMap();
-// 		printFBTypesMap();
-// 		printEventConnectionsMap();
-// 		printDataConnectionsMap();
+		// 		printFunctionBlocksMap();
+		// 		printBasicFunctionBlocksMap();
+		//		printEventsMap();
+		// 		printAlgorithmsMap();
+		// 		printAlgorithmTextsMap();
+		// 		printFBTypesMap();
+		// 		printEventConnectionsMap();
+		// 		printDataConnectionsMap();
 
 		System.out.println("ModelMaker.makeModel(): Generating Model -----------------------------------------");
 
@@ -277,34 +277,34 @@ class ModelMaker
 			String typeName = (String) basicFunctionBlocks.get(fbName);
 			
 			// TODO
-// 			if (typeName.startsWith("E_SPLIT"))
-// 			{
-// 				makeSplit((new Integer(((String) functionBlocks.get(fbName)).substring(7))).intValue());
-// 			}
-// 			else if (typeName.startsWith("E_MERGE"))
-// 			{
-// 				makeMerge((new Integer(((String) functionBlocks.get(fbName)).substring(7))).intValue());
-// 			}
-// 			else
-// 			{
-				makeBasicFB(fbName);
-//			}
+			// 			if (typeName.startsWith("E_SPLIT"))
+			// 			{
+			// 				makeSplit((new Integer(((String) functionBlocks.get(fbName)).substring(7))).intValue());
+			// 			}
+			// 			else if (typeName.startsWith("E_MERGE"))
+			// 			{
+			// 				makeMerge((new Integer(((String) functionBlocks.get(fbName)).substring(7))).intValue());
+			// 			}
+			// 			else
+			// 			{
+			makeBasicFB(fbName);
+			//			}
 		}
 		
-// 		// test automata classes
-// 		ExtendedAutomaton test = new ExtendedAutomaton("test", automata);
-// 		test.addState("s0", true);
-// 		test.addState("s1");
-// 		test.addIntegerVariable("var1", 0, 5, 0, null);
-// 		automata.addEvent("e1", "controllable");
-// 		test.addTransition("s0","s1","e1;e2;","var1 == 1","var1 = 4;");
-// 		automata.addAutomaton(test);
-// 		ExtendedAutomaton test2 = new ExtendedAutomaton("test2", automata);
-// 		test2.addState("s0", true);
-// 		test2.addState("s1");
-// 		test2.addIntegerVariable("var1", 0, 5, 0, null);
-// 		test2.addTransition("s0","s1","e1;e2;","var1 == 1","var1  = 4;");
-// 		automata.addAutomaton(test2);
+		// 		// test automata classes
+		// 		ExtendedAutomaton test = new ExtendedAutomaton("test", automata);
+		// 		test.addState("s0", true);
+		// 		test.addState("s1");
+		// 		test.addIntegerVariable("var1", 0, 5, 0, null);
+		// 		automata.addEvent("e1", "controllable");
+		// 		test.addTransition("s0","s1","e1;e2;","var1 == 1","var1 = 4;");
+		// 		automata.addAutomaton(test);
+		// 		ExtendedAutomaton test2 = new ExtendedAutomaton("test2", automata);
+		// 		test2.addState("s0", true);
+		// 		test2.addState("s1");
+		// 		test2.addIntegerVariable("var1", 0, 5, 0, null);
+		// 		test2.addTransition("s0","s1","e1;e2;","var1 == 1","var1  = 4;");
+		// 		automata.addAutomaton(test2);
 
 		automata.writeToFile(new File(outputFileName));
 	}
@@ -380,23 +380,23 @@ class ModelMaker
 			functionBlocks.put(instanceName,typeName);
 		}
 		// TODO
-// 		else if (typeName.startsWith("E_MERGE"))
-// 		{
-// 			System.out.println("\t Skipping built-in E_MERGE type.");			
-// 			System.out.println("\t Adding FB " + instanceName);
-// 			functionBlocks.put(instanceName,typeName);
-// 			System.out.println("\t Adding Basic FB " + instanceName);			
-// 			basicFunctionBlocks.put(instanceName, typeName);
+		// 		else if (typeName.startsWith("E_MERGE"))
+		// 		{
+		// 			System.out.println("\t Skipping built-in E_MERGE type.");			
+		// 			System.out.println("\t Adding FB " + instanceName);
+		// 			functionBlocks.put(instanceName,typeName);
+		// 			System.out.println("\t Adding Basic FB " + instanceName);			
+		// 			basicFunctionBlocks.put(instanceName, typeName);
 					
-// 		}
-// 		else if (typeName.startsWith("E_SPLIT"))
-// 		{
-// 			System.out.println("\t Skipping built-in E_SPLIT type.");			
-// 			System.out.println("\t Adding FB " + instanceName);
-// 			functionBlocks.put(instanceName,typeName);
-// 			System.out.println("\t Adding Basic FB " + instanceName);			
-// 			basicFunctionBlocks.put(instanceName, typeName);
-// 		}
+		// 		}
+		// 		else if (typeName.startsWith("E_SPLIT"))
+		// 		{
+		// 			System.out.println("\t Skipping built-in E_SPLIT type.");			
+		// 			System.out.println("\t Adding FB " + instanceName);
+		// 			functionBlocks.put(instanceName,typeName);
+		// 			System.out.println("\t Adding Basic FB " + instanceName);			
+		// 			basicFunctionBlocks.put(instanceName, typeName);
+		// 		}
 		else
 		{
 			
@@ -584,14 +584,14 @@ class ModelMaker
 			String sourceInstance = getInstanceName(source);
 			String sourceSignal   = getSignalName(source);
 				
-// 			for (int i = 0; i<level; i++)
-// 			{
-// 				System.out.print("\t");
-// 			}
-// 			System.out.println("Analyzing connection: " 
-// 							   + source
-// 							   + "-->" 
-// 							   + dest);
+			// 			for (int i = 0; i<level; i++)
+			// 			{
+			// 				System.out.print("\t");
+			// 			}
+			// 			System.out.println("Analyzing connection: " 
+			// 							   + source
+			// 							   + "-->" 
+			// 							   + dest);
 			
 			JaxbFBType sourceType = (JaxbFBType) fbTypes.get((String) functionBlocks.get(sourceInstance));
 
@@ -616,14 +616,14 @@ class ModelMaker
 			sourceInstance = getInstanceName(source);
 			sourceSignal   = getSignalName(source);
 		
-// 			for (int i = 0; i<level; i++)
-// 			{
-// 				System.out.print("\t");
-// 			}
-// 			System.out.println("Adding connection: " 
-// 							   + source
-// 							   + "-->" 
-// 							   + dest);
+			// 			for (int i = 0; i<level; i++)
+			// 			{
+			// 				System.out.print("\t");
+			// 			}
+			// 			System.out.println("Adding connection: " 
+			// 							   + source
+			// 							   + "-->" 
+			// 							   + dest);
 			
 			Map eventMap;
 			if (!eventConnections.keySet().contains(sourceInstance))
@@ -739,10 +739,10 @@ class ModelMaker
 			String destInstance = getInstanceName(dest);
 			String destSignal   = getSignalName(dest);
 			
-// 			System.out.println("Analyzing connection: " 
-// 							   + source
-// 							   + "-->" 
-// 							   + dest);
+			// 			System.out.println("Analyzing connection: " 
+			// 							   + source
+			// 							   + "-->" 
+			// 							   + dest);
 			
 			JaxbFBType destType = (JaxbFBType) fbTypes.get((String) functionBlocks.get(destInstance));
 
@@ -767,14 +767,14 @@ class ModelMaker
 			destInstance = getInstanceName(dest);
 			destSignal   = getSignalName(dest);
 		
-// 			for (int i = 0; i<level; i++)
-// 			{
-// 				System.out.print("\t");
-// 			}
-// 			System.out.println("Adding connection: " 
-// 							   + source
-// 							   + "-->" 
-// 							   + dest);
+			// 			for (int i = 0; i<level; i++)
+			// 			{
+			// 				System.out.print("\t");
+			// 			}
+			// 			System.out.println("Adding connection: " 
+			// 							   + source
+			// 							   + "-->" 
+			// 							   + dest);
 			
 			Map dataMap;
 			if (!dataConnections.keySet().contains(destInstance))
@@ -1374,8 +1374,8 @@ class ModelMaker
 					for (Iterator withIter = withData.iterator(); withIter.hasNext();)
 					{
 						String curWith = ((With) withIter.next()).getVar();
-							action = action + 
-								"data_" + curWith + "_" + fbName + "_place_" + i + " = 0;";
+						action = action + 
+							"data_" + curWith + "_" + fbName + "_place_" + i + " = 0;";
 					}
 				}
 
@@ -1413,46 +1413,53 @@ class ModelMaker
 				}
 				else if (curType.toLowerCase().equals("bool"))
 				{
-					System.err.println("\t Error: Unsupported input data variable type: BOOL");
-					System.err.println("\t Variable name: " + fbName + "_" + curName);
+					System.err.println("\t\t Error: Unsupported input data variable type: BOOL");
+					System.err.println("\t\t Variable name: " + fbName + "_" + curName);
 					System.exit(1);
 				}
 				else if (curType.toLowerCase().equals("real"))
 				{
-					System.err.println("\t Error: Unsupported input data variable type: REAL");
-					System.err.println("\t Variable name: " + fbName + "_" + curName);
+					System.err.println("\t\t Error: Unsupported input data variable type: REAL");
+					System.err.println("\t\t Variable name: " + fbName + "_" + curName);
 					System.exit(1);
 				}
 				else if (curType.toLowerCase().equals("string"))
 				{
-					System.err.println("\t Error: Unsupported input data variable type: STRING");
-					System.err.println("\t Variable name: " + fbName + "_" + curName);
+					System.err.println("\t\t Error: Unsupported input data variable type: STRING");
+					System.err.println("\t\t Variable name: " + fbName + "_" + curName);
 					System.exit(1);
 				}
 				else if (curType.toLowerCase().equals("object"))
 				{
-					System.err.println("\t Error: Unsupported input data variable type: OBJECT");
-					System.err.println("\t Variable name: " + fbName + "_" + curName);
+					System.err.println("\t\t Error: Unsupported input data variable type: OBJECT");
+					System.err.println("\t\t Variable name: " + fbName + "_" + curName);
 					System.exit(1);
 				}
 			}
 		}
 
 		int stateNameCounter = 1;
-		boolean initialState = true;
-		for (Iterator ecStatesIter = ecStates.iterator(); ecStatesIter.hasNext();)
-		{
-			JaxbECState curECState = (JaxbECState) ecStatesIter.next();
-			makeECStateBranch(ecc, fbName, curECState.getName(), null, null, ecStates, ecTransitions, visitedECStates, stateNameCounter, initialState);
-			initialState = false;
-		}
+		JaxbECState firstECState = (JaxbECState) ecStates.get(0);
+		System.out.println("\t\t Calling makeECStateBranch() from makeBasicFBExecutionControlChart()");
+		makeECStateBranch(ecc, fbName, firstECState.getName(), null, null, ecStates, ecTransitions, visitedECStates, stateNameCounter, true);
+
+		// TODO: check for unreachable states
 
 		automata.addAutomaton(ecc);	
 	}
 
 	private void makeECStateBranch(ExtendedAutomaton ecc, String fbName, String ecStateName, String prevState, JaxbECTransition takenTransition, List ecStates, List ecTransitions, Set visitedECStates, int nameCounter, boolean initial)
 	{
+		System.out.println("\t\t Entering makeECStateBranch(): ecStateName = " + ecStateName + ": prevState = " + prevState);
+		
+		// temporary variables
+		String from = null;
+		String to = null;
+		String event = null;
+		String guard = null;
+		String action = null;
 
+		// get the EC state and its EC actions
 		JaxbECState ecState = null;
 		for (Iterator iter = ecStates.iterator();iter.hasNext();)
 		{
@@ -1462,28 +1469,116 @@ class ModelMaker
 				ecState = curECState;
 			}
 		}
-
 		List stateActions = ecState.getECAction();
 
-		
+		// make actions of the EC state
 		if (initial)
 		{
-			// don't make actions model
-				ecc.addState(ecStateName,true);
-				String to = "s" + nameCounter; 
-				nameCounter++;
-				ecc.addState(to);
-				ecc.addTransition(ecStateName, to, "update_ECC_" + fbName + ";", null, null);
-				prevState = to;
+			// if initial state don't make actions model
+			ecc.addState(ecStateName,true);
+			to = "s" + nameCounter; 
+			nameCounter++;
+			ecc.addState(to);
+			ecc.addTransition(ecStateName, to, "update_ECC_" + fbName + ";", null, null);
+			prevState = to;
 		}
 		else
 		{
 			// make actions model
+			System.out.println("\t\t Adding state: " + ecStateName + "_actions");
+			ecc.addState(ecStateName + "_actions");
+			if (stateActions.size()>0)
+			{
+				for (Iterator actionsIter = stateActions.iterator(); actionsIter.hasNext();)
+				{
+					JaxbECAction curAction = (JaxbECAction) actionsIter.next();
+					if (curAction.isSetAlgorithm())
+					{
+						Integer actionAlgorithm = (Integer) ((Map) algorithms.get(fbName)).get(curAction.getAlgorithm());
+						from = prevState;
+						to = "s" + nameCounter; 
+						nameCounter++;
+						ecc.addState(to);
+						action = "queueing_job_" + fbName + "=" + actionAlgorithm + ";";
+						ecc.addTransition(from, to, "ecc_activity_" + fbName + ";", null, action);
+						prevState = to;						
+
+						from = prevState;
+						to = "s" + nameCounter; 
+						nameCounter++;
+						ecc.addState(to);
+						ecc.addTransition(from, to, "queue_job_" + fbName + ";", null, null);
+						prevState = to;						
+
+						if (curAction.isSetOutput())
+						{
+							from = prevState;
+							to = "s" + nameCounter; 
+							nameCounter++;
+							ecc.addState(to);
+							String cntName = (String) ((Map) eventConnections.get(fbName)).get(curAction.getOutput());
+							String cntFB = getInstanceName(cntName);
+							String cntSignal = getSignalName(cntName);
+							Integer cntSignalID = (Integer) ((Map) events.get(cntFB)).get(cntSignal);
+							action = "receiveing_event_" + cntFB + "=" + cntSignalID + ";";
+							ecc.addTransition(from, to, "finished_job_" + fbName + ";", null, action);
+							prevState = to;						
+							
+							from = prevState;
+							to = "s" + nameCounter; 
+							nameCounter++;
+							ecc.addState(to);
+							ecc.addTransition(from, to, "receive_event_" + cntFB + ";", null, null);
+							prevState = to;						
+						}
+						else
+						{
+							from = prevState;
+							to = "s" + nameCounter; 
+							nameCounter++;
+							ecc.addState(to);
+							ecc.addTransition(from, to, "finished_job_" + fbName + ";", null, null);
+							prevState = to;						
+						}
+					}
+					else if (curAction.isSetOutput())
+					{
+						from = prevState;
+						to = "s" + nameCounter; 
+						nameCounter++;
+						ecc.addState(to);
+						String cntName = (String) ((Map) eventConnections.get(fbName)).get(curAction.getOutput());
+						String cntFB = getInstanceName(cntName);
+						String cntSignal = getSignalName(cntName);
+						Integer cntSignalID = (Integer) ((Map) events.get(cntFB)).get(cntSignal);
+						action = "receiveing_event_" + cntFB + "=" + cntSignalID + ";";
+						ecc.addTransition(from, to, "ecc_activity_" + fbName + ";", null, action);
+						prevState = to;						
+						
+						from = prevState;
+						to = "s" + nameCounter; 
+						nameCounter++;
+						ecc.addState(to);
+						ecc.addTransition(from, to, "receive_event_" + cntFB + ";", null, null);
+						prevState = to;						
+					}
+				}
+			}
 			
+			// no more actions
+			from = prevState;
+			to = "s" + nameCounter;
+			ecc.addState(to);
+			nameCounter++;
+			ecc.addTransition(from, to, "no_action_" + fbName + ";", null, null);
+			prevState = to;
 		}
+
+		// mark the EC state as visited
+		System.out.println("\t\t Adding EC state to visited states: " + ecStateName);
 		visitedECStates.add(ecStateName);
 
-		// find all transitions from this ECState
+		// find all transitions from this EC state
 		Set ecStateTransitions = new HashSet();
 		for (Iterator ecTransitionsIter = ecTransitions.iterator(); ecTransitionsIter.hasNext();)
 		{
@@ -1494,38 +1589,82 @@ class ModelMaker
 			}
 		}
 		
-		// make branches for each transition
+		// temporary variable to accumulate all guards for
+		// the transitions from the EC states
+		String noTransitionGuard = "";
+
+		// make branch for each transition
 		for (Iterator ecStateTransitionsIter = ecStateTransitions.iterator(); ecStateTransitionsIter.hasNext();)
 		{
 			JaxbECTransition curECTransition = (JaxbECTransition) ecStateTransitionsIter.next();
-			String curDest = curECTransition.getDestination();
+			System.out.println("\t\t Analyzing EC transition: From: " + curECTransition.getSource() +
+							   "; To: " + curECTransition.getDestination() + 
+							   "; Cond: " + curECTransition.getCondition());
+			String curECDest = curECTransition.getDestination();
 			
-			// make branch model	
-			String from = prevState;
-			String to =  curDest + "_actions";
-			String event = "event_input_" + fbName + ";";
-			
-			// TODO: replace variable names with model variables
-			String guard = curECTransition.getCondition();
-
-			String action = null;		
-			// get first action of the next EC state, if any
-			if (stateActions.size()>0)
+			if (curECTransition.getCondition().equals("1"))
 			{
-				JaxbECAction firstAction = (JaxbECAction) stateActions.get(0);
-				//Integer actionAlgorithm = (Integer) ((Map) algorithms.get(fbName)).get(().getAlgorithm());
-				//action = "queueing_job_" + fbName + "=" + actionAlgorithm + ";";
-			}
-			
-			if (!visitedECStates.contains(curDest))
-			{
-				makeECStateBranch(ecc, fbName, to, from, curECTransition, ecStates, ecTransitions, visitedECStates, nameCounter, false);
+				
 			}
 			else
 			{
-				// connect to existing model
+				if (!initial)
+				{
+					// make handling event done transition
+					from = prevState;
+					to = "s" + nameCounter;
+					nameCounter++;
+					ecc.addState(to);
+					event = "handling_event_done_" + fbName + ";";
+					ecc.addTransition(from, to, event, null, null);
+					prevState = to;					
+					
+					// make update ECC transition					
+					from = prevState;
+					to = "s" + nameCounter;
+					nameCounter++;
+					ecc.addState(to);
+					event = "update_ECC_" + fbName + ";";
+					ecc.addTransition(from, to, event, null, null);
+					prevState = to;
+				}
+				
+				// make branch model	
+				from = prevState;
+				to =  curECDest + "_actions";
+				event = "event_input_" + fbName + ";";				
+				// TODO: replace variables and operators
+				guard = "Transition Condition;";
+				// TODO: add to gurad for no_transition event
+				noTransitionGuard = noTransitionGuard + "not(Transition Condition);";
+				
+				if (!visitedECStates.contains(curECDest))
+				{
+					System.out.println("\t\t Calling makeECStateBranch() from makeECStateBranch()");
+					makeECStateBranch(ecc, fbName, curECDest, to, curECTransition, ecStates, ecTransitions, visitedECStates, nameCounter, false);
+					//ecc.addTransition(from, to, "event_input_" + fbName + ";", guard, null);
+					ecc.addTransition(from, to, "event_input_" + fbName + ";", null, null);
+				}
+				else
+				{
+					System.out.println("\t\t NOT calling makeECStateBranch() from makeECStateBranch()");
+					// connect to existing state
+					if (curECDest.equals(((JaxbECState) ecStates.get(0)).getName()))
+					{
+						ecc.addTransition(from, curECDest, "event_input_" + fbName + ";", null, null);
+					}
+					else
+					{
+						ecc.addTransition(from, curECDest + "_actions", "event_input_" + fbName + ";", null, null);
+					}
+				}
 			}
 		}
+		
+		// TODO: correct the destination of "no transition" transition
+		// make no_transition event and guard
+		//ecc.addTransition(prevState, prevState, "no_transition_" + fbName + ";", noTransitionGuard, null);
+		ecc.addTransition(prevState, prevState, "no_transition_" + fbName + ";", null, null);
 	}
 	
 	private void makeBasicFBAlgorithms(String fbName)
