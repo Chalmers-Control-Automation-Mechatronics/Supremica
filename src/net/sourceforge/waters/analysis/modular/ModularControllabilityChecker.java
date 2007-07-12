@@ -4,12 +4,14 @@
 //# PACKAGE: net.sourceforge.waters.analysis.modular
 //# CLASS:   ModularControllabilityChecker
 //###########################################################################
-//# $Id: ModularControllabilityChecker.java,v 1.11 2007-07-10 01:52:06 siw4 Exp $
+//# $Id: ModularControllabilityChecker.java,v 1.12 2007-07-12 05:18:30 siw4 Exp $
 //###########################################################################
 
 
 package net.sourceforge.waters.analysis.modular;
 
+import org.supremica.log.LoggerFactory;
+import org.supremica.log.Logger;
 import net.sourceforge.waters.model.analysis.VerificationResult;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -196,4 +198,7 @@ public class ModularControllabilityChecker
       return a1.getName().compareTo(a2.getName());
     }
   }
+  
+  private static final Logger LOGGER =
+    LoggerFactory.createLogger(ModularControllabilityChecker.class);
 }

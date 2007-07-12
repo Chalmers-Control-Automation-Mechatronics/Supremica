@@ -4,12 +4,14 @@
 //# PACKAGE: net.sourceforge.waters.analysis.modular
 //# CLASS:   ProjectingControllabilityChecker
 //###########################################################################
-//# $Id: ProjectingControllabilityChecker.java,v 1.14 2007-07-10 01:52:06 siw4 Exp $
+//# $Id: ProjectingControllabilityChecker.java,v 1.15 2007-07-12 05:18:30 siw4 Exp $
 //###########################################################################
 
 
 package net.sourceforge.waters.analysis.modular.supremica;
 
+import org.supremica.log.Logger;
+import org.supremica.log.LoggerFactory;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -211,7 +213,7 @@ public class ProjectingControllabilityChecker
   public boolean run()
     throws AnalysisException
   {
-    return run2();
+    return run1();
   }
   
   public boolean run1()
@@ -770,14 +772,13 @@ public class ProjectingControllabilityChecker
   private ModularHeuristic mHeuristic;
   private KindTranslator mTranslator;
   private int mStates;
-  private int mMaxProjStates = 10000;
+  private int mMaxProjStates = 1000;
   private final boolean mLeast;
   private Map<AutomataHidden, AutomatonProxy> mMinAutMap = new HashMap<AutomataHidden, AutomatonProxy>();
-
+  
 
   //#########################################################################
   //# Class Constants
-  //  private static final Logger LOGGER =
-  //  LoggerFactory.createLogger(ProjectingControllabilityChecker.class);
-
+    private static final Logger LOGGER =
+    LoggerFactory.createLogger(ProjectingControllabilityChecker.class);
 }

@@ -4,12 +4,14 @@
 //# PACKAGE: net.sourceforge.waters.analysis.modular
 //# CLASS:   ModularLanguageInclusionChecker
 //###########################################################################
-//# $Id: ModularLanguageInclusionChecker.java,v 1.8 2007-07-10 01:52:06 siw4 Exp $
+//# $Id: ModularLanguageInclusionChecker.java,v 1.9 2007-07-12 05:18:30 siw4 Exp $
 //###########################################################################
 
 
 package net.sourceforge.waters.analysis.modular;
 
+import org.supremica.log.Logger;
+import org.supremica.log.LoggerFactory;
 import net.sourceforge.waters.model.analysis.VerificationResult;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import java.util.Comparator;
@@ -153,4 +155,7 @@ public class ModularLanguageInclusionChecker
       return a1.getName().compareTo(a2.getName());
     }
   }
+  
+  private static final Logger LOGGER =
+  LoggerFactory.createLogger(ModularLanguageInclusionChecker.class);
 }

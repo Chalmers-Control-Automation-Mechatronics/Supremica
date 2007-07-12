@@ -4,11 +4,15 @@
 //# PACKAGE: net.sourceforge.waters.analysis.modular.supremica
 //# CLASS:   ProjectingLanguageInclusionCheckerTest
 //###########################################################################
-//# $Id: ProjectingLanguageInclusionCheckerTest.java,v 1.1 2007-07-06 01:28:39 robi Exp $
+//# $Id: ProjectingLanguageInclusionCheckerTest.java,v 1.2 2007-07-12 05:18:30 siw4 Exp $
 //###########################################################################
 
 package net.sourceforge.waters.analysis.modular.supremica;
 
+import net.sourceforge.waters.analysis.modular.ModularLanguageInclusionChecker;
+import net.sourceforge.waters.analysis.modular.HeuristicType;
+import net.sourceforge.waters.analysis.modular.MaxCommonEventsHeuristic;
+import net.sourceforge.waters.cpp.analysis.NativeControllabilityChecker;
 import junit.framework.Test;
 import junit.framework.TestSuite;
 
@@ -48,7 +52,27 @@ public class ProjectingLanguageInclusionCheckerTest
   {
     final ModelVerifierFactory checkerfactory =
       ProjectingModelVerifierFactory.getInstance();
-    return checkerfactory.createLanguageInclusionChecker(desfactory);
+    return createLanguageInclusionChecker(desfactory);
   }
 
+  public ProjectingControllabilityChecker createControllabilityChecker
+    (final ProductDESProxyFactory factory)
+  {
+    return new ProjectingControllabilityChecker
+      (null,
+       factory,
+       new NativeControllabilityChecker(factory),
+       new MaxCommonEventsHeuristic(HeuristicType.PREFERREALPLANT),
+       false);
+  }
+
+  public LanguageInclusionChecker createLanguageInclusionChecker
+    (final ProductDESProxyFactory factory)
+  {
+    return new ModularLanguageInclusionChecker(
+       null, factory,
+       createControllabilityChecker(factory),
+       new MaxCommonEventsHeuristic(HeuristicType.PREFERREALPLANT)
+       );
+  }
 }
