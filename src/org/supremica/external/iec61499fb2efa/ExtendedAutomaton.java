@@ -107,12 +107,20 @@ public class ExtendedAutomaton
 
 	public void addState(String name)
 	{
-		graph.getNodesModifiable().add(factory.createSimpleNodeProxy(name));
+		SimpleNodeSubject node = (SimpleNodeSubject) graph.getNodesModifiable().get(name);
+		if (node == null)
+		{
+			graph.getNodesModifiable().add(factory.createSimpleNodeProxy(name));
+		}
 	}
 
 	public void addState(String name, boolean initial)
 	{
-		graph.getNodesModifiable().add(factory.createSimpleNodeProxy(name,null, initial,null,null,null));
+		SimpleNodeSubject node = (SimpleNodeSubject) graph.getNodesModifiable().get(name);
+		if (node == null)
+		{
+			graph.getNodesModifiable().add(factory.createSimpleNodeProxy(name,null, initial,null,null,null));
+		}
 	}
 
 	public void addIntegerVariable(String name, int lowerBound, int upperBound, int initialValue, Integer markedValue)
@@ -132,7 +140,15 @@ public class ExtendedAutomaton
 	public void addTransition(String from, String to, String label, String guardIn, String actionIn)
 	{
 		SimpleNodeSubject fromNode = (SimpleNodeSubject) graph.getNodesModifiable().get(from);
+		if (fromNode == null)
+		{
+			System.out.println("ExtendedAutomaton.addTransition(): From node " + from + " does not exist!");
+		}
 		SimpleNodeSubject toNode = (SimpleNodeSubject) graph.getNodesModifiable().get(to);
+		if (toNode == null)
+		{
+			System.out.println("ExtendedAutomaton.addTransition(): To node " + to + " does not exist!");
+		}
 		
 		// parse label into event name list and make LabelBlockSubject 
 		List events = new LinkedList();

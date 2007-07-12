@@ -25,11 +25,13 @@
     </InternalVars>
     <ECC>
         <ECState Name="INIT" />
-        <ECState Name="STATE">
+        <ECState Name="STATE" >
 		    <ECAction Algorithm="TestAlg" Output="EO"/>
-	    </ECState>    
+	    </ECState>    	
+        <ECState Name="STATE2" />
 		<ECTransition Source="INIT" Destination="STATE" Condition="EI" />
-		<ECTransition Source="STATE" Destination="INIT" Condition="1" />
+		<ECTransition Source="STATE" Destination="STATE2" Condition="EI" />
+		<ECTransition Source="STATE2" Destination="STATE" Condition="EI" />
     </ECC>
     <Algorithm Name="TestAlg">
     <Other Language="Java" Text=
@@ -37,11 +39,11 @@
 	DO = DI + 1;"
 	/>	
     </Algorithm>
-    <!--Algorithm Name="PrintAlg">
+    <Algorithm Name="PrintAlg">
     <Other Language="Java" Text=
 	"System.out.println(&#34;TestAlg:invoked: &#34; + invoked + &#34; times.&#34;);
 	System.out.println(&#34;TestAlg: DO: &#34; + DO + &#34;.&#34;);"
 	/>	
-    </Algorithm-->
+    </Algorithm>
   </BasicFB>
 </FBType>
