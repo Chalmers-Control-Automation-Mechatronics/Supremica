@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.gui.ide.actions
 //# CLASS:   AnalyzerSendToEditorAction
 //###########################################################################
-//# $Id: AnalyzerSendToEditorAction.java,v 1.9 2007-06-21 11:16:23 robi Exp $
+//# $Id: AnalyzerSendToEditorAction.java,v 1.10 2007-07-12 14:41:35 flordal Exp $
 //###########################################################################
 
 
@@ -35,15 +35,14 @@ import org.supremica.gui.ide.IDE;
 /**
  * The action used to send an automaton from the analyser to the editor.
  */
-
 public class AnalyzerSendToEditorAction
     extends IDEAction
 {
     private static final long serialVersionUID = 1L;
     
-
-	//#######################################################################
-	//# Constructor
+    
+    //#######################################################################
+    //# Constructor
     public AnalyzerSendToEditorAction(List<IDEAction> actionList)
     {
         super(actionList);
@@ -57,15 +56,15 @@ public class AnalyzerSendToEditorAction
         //putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_A, ActionEvent.CTRL_MASK));
         putValue(Action.SMALL_ICON, new ImageIcon(IDE.class.getResource("/icons/waters/toEditor16.gif")));
     }
-
     
-	//#######################################################################
-	//# Invocation
+    
+    //#######################################################################
+    //# Invocation
     public void actionPerformed(ActionEvent e)
     {
         doAction();
     }
-
+    
     /**
      * The code that is run when the action is invoked.
      */
@@ -90,6 +89,28 @@ public class AnalyzerSendToEditorAction
                         // Add all (new) events to the module
                         ModuleSubject module = ide.getActiveDocumentContainer().getEditorPanel().getEditorPanelInterface().getModuleSubject();
                         boolean problem = false;
+                        for (EventProxy event: aut.getEvents())
+                        {
+                            if (event.getName().contains("["))
+                            {
+                                problem = true;
+                            }
+                            else
+                            {
+                                if (!module.getEventDeclListModifiable().containsName(event.getName()))
+                                {
+                                    final EventProxy proxy = (EventProxy) event;
+                                    final EventDeclSubject decl =
+                                        new EventDeclSubject(proxy.getName(),
+                                        proxy.getKind(),
+                                        proxy.isObservable(),
+                                        ScopeKind.LOCAL,
+                                        null, null);
+                                    module.getEventDeclListModifiable().add(decl);
+                                }
+                            }                        
+                        }
+                        /*
                         for (LabeledEvent event: aut.getAlphabet())
                         {
                             if (!event.getName().contains("["))
@@ -111,6 +132,7 @@ public class AnalyzerSendToEditorAction
                                 problem = true;
                             }
                         }
+                         */
                         if (problem)
                             JOptionPane.showMessageDialog(ide.getFrame(), "There is a problem in the back-translation of parametrised events.", "Alert", JOptionPane.WARNING_MESSAGE);
                     }
@@ -126,5 +148,5 @@ public class AnalyzerSendToEditorAction
             }
         }
     }
-
+    
 }

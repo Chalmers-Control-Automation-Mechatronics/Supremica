@@ -2529,7 +2529,6 @@ public class Automaton
         return currSet;
     }
 
-
     // Events are (supposed to be) immutable, you cannot change the label once constructed
     // Most of the effects of this can be overcome by this method
     // We do not test if the old_event actually exists in the alphabet, we merely (try to) remove it
