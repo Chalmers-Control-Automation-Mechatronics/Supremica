@@ -1440,17 +1440,23 @@ class ModelMaker
 
 		int stateNameCounter = 1;
 		JaxbECState firstECState = (JaxbECState) ecStates.get(0);
+		String firstECStateName = firstECState.getName();
+		ecc.addState(firstECStateName,true);
 		System.out.println("\t\t Calling makeECStateBranch() from makeBasicFBExecutionControlChart()");
-		makeECStateBranch(ecc, fbName, firstECState.getName(), null, null, ecStates, ecTransitions, visitedECStates, stateNameCounter, true);
+		makeECStateBranch(ecc, fbName, firstECStateName, firstECStateName, ecStates, ecTransitions, visitedECStates, stateNameCounter, false, 2);
 
 		// TODO: check for unreachable states
 
 		automata.addAutomaton(ecc);	
 	}
 
-	private void makeECStateBranch(ExtendedAutomaton ecc, String fbName, String ecStateName, String prevState, JaxbECTransition takenTransition, List ecStates, List ecTransitions, Set visitedECStates, int nameCounter, boolean initial)
+	private void makeECStateBranch(ExtendedAutomaton ecc, String fbName, String ecStateName, String prevState, List ecStates, List ecTransitions, Set visitedECStates, int nameCounter, boolean branchOnOne, int level)
 	{
-		System.out.println("\t\t Entering makeECStateBranch(): ecStateName = " + ecStateName + ": prevState = " + prevState);
+		for (int i = 1; i<=level; i++)
+		{
+			System.out.print("\t");
+		}
+		System.out.println(" Entering makeECStateBranch(): ecStateName = " + ecStateName + ": prevState = " + prevState);
 		
 		// temporary variables
 		String from = null;
@@ -1458,6 +1464,31 @@ class ModelMaker
 		String event = null;
 		String guard = null;
 		String action = null;
+		
+		String noTransitionTo = null;
+		
+		// mark the EC state as visited
+		if (!visitedECStates.contains(ecStateName))
+		{
+			for (int i = 1; i<=level; i++)
+			{
+				System.out.print("\t");
+			}
+			System.out.println(" Visited EC state: " + ecStateName);
+			visitedECStates.add(ecStateName);
+		}
+		if (!visitedECStates.contains(prevState))
+		{
+			for (int i = 1; i<=level; i++)
+			{
+				System.out.print("\t");
+			}
+			System.out.println(" Visited EC state: " + prevState);
+			visitedECStates.add(prevState);
+		}
+		
+		// get the first EC state
+		String firstECStateName =  ((JaxbECState) ecStates.get(0)).getName();
 
 		// get the EC state and its EC actions
 		JaxbECState ecState = null;
@@ -1471,22 +1502,11 @@ class ModelMaker
 		}
 		List stateActions = ecState.getECAction();
 
-		// make actions of the EC state
-		if (initial)
+		
+
+		// make actions model of the EC state
+		if (!ecStateName.equals(firstECStateName))
 		{
-			// if initial state don't make actions model
-			ecc.addState(ecStateName,true);
-			to = "s" + nameCounter; 
-			nameCounter++;
-			ecc.addState(to);
-			ecc.addTransition(ecStateName, to, "update_ECC_" + fbName + ";", null, null);
-			prevState = to;
-		}
-		else
-		{
-			// make actions model
-			System.out.println("\t\t Adding state: " + ecStateName + "_actions");
-			ecc.addState(ecStateName + "_actions");
 			if (stateActions.size()>0)
 			{
 				for (Iterator actionsIter = stateActions.iterator(); actionsIter.hasNext();)
@@ -1498,16 +1518,38 @@ class ModelMaker
 						from = prevState;
 						to = "s" + nameCounter; 
 						nameCounter++;
+						for (int i = 1; i<=level; i++)
+						{
+							System.out.print("\t");
+						}
+						System.out.println(" Adding state: " + to);
 						ecc.addState(to);
+						event = "prepare_job_" + fbName + ";";
 						action = "queueing_job_" + fbName + "=" + actionAlgorithm + ";";
-						ecc.addTransition(from, to, "ecc_activity_" + fbName + ";", null, action);
+						for (int i = 1; i<=level; i++)
+						{
+							System.out.print("\t");
+						}
+						System.out.println(" Adding transition: from " + from + ": to " + to + ": event " + event);
+						ecc.addTransition(from, to, event, null, action);
 						prevState = to;						
 
 						from = prevState;
 						to = "s" + nameCounter; 
 						nameCounter++;
+						for (int i = 1; i<=level; i++)
+						{
+							System.out.print("\t");
+						}
+						System.out.println(" Adding state: " + to);
 						ecc.addState(to);
-						ecc.addTransition(from, to, "queue_job_" + fbName + ";", null, null);
+						event = "queue_job_" + fbName + ";";
+						for (int i = 1; i<=level; i++)
+						{
+							System.out.print("\t");
+						}
+						System.out.println(" Adding transition: from " + from + ": to " + to + ": event " + event);
+						ecc.addTransition(from, to, event, null, null);
 						prevState = to;						
 
 						if (curAction.isSetOutput())
@@ -1515,20 +1557,42 @@ class ModelMaker
 							from = prevState;
 							to = "s" + nameCounter; 
 							nameCounter++;
+							for (int i = 1; i<=level; i++)
+							{
+								System.out.print("\t");
+							}
+							System.out.println(" Adding state: " + to);
 							ecc.addState(to);
+							event = "finished_job_" + fbName + ";";
 							String cntName = (String) ((Map) eventConnections.get(fbName)).get(curAction.getOutput());
 							String cntFB = getInstanceName(cntName);
 							String cntSignal = getSignalName(cntName);
 							Integer cntSignalID = (Integer) ((Map) events.get(cntFB)).get(cntSignal);
-							action = "receiveing_event_" + cntFB + "=" + cntSignalID + ";";
-							ecc.addTransition(from, to, "finished_job_" + fbName + ";", null, action);
+							action = "receiveing_event_" + cntFB + "=" + cntSignalID + ";";						
+							for (int i = 1; i<=level; i++)
+							{
+								System.out.print("\t");
+							}
+							System.out.println(" Adding transition: from " + from + ": to " + to + ": event " + event);
+							ecc.addTransition(from, to, event, null, action);
 							prevState = to;						
 							
 							from = prevState;
 							to = "s" + nameCounter; 
 							nameCounter++;
+							for (int i = 1; i<=level; i++)
+							{
+								System.out.print("\t");
+							}
+							System.out.println(" Adding state: " + to);
 							ecc.addState(to);
-							ecc.addTransition(from, to, "receive_event_" + cntFB + ";", null, null);
+							event = "receive_event_" + cntFB + ";";
+							for (int i = 1; i<=level; i++)
+							{
+								System.out.print("\t");
+							}
+							System.out.println(" Adding transition: from " + from + ": to " + to + ": event " + event);
+							ecc.addTransition(from, to, event, null, null);
 							prevState = to;						
 						}
 						else
@@ -1536,8 +1600,19 @@ class ModelMaker
 							from = prevState;
 							to = "s" + nameCounter; 
 							nameCounter++;
+							for (int i = 1; i<=level; i++)
+							{
+								System.out.print("\t");
+							}
+							System.out.println(" Adding state: " + to);
 							ecc.addState(to);
-							ecc.addTransition(from, to, "finished_job_" + fbName + ";", null, null);
+							event = "finished_job_" + fbName + ";";
+							for (int i = 1; i<=level; i++)
+							{
+								System.out.print("\t");
+							}
+							System.out.println(" Adding transition: from " + from + ": to " + to + ": event " + event);
+							ecc.addTransition(from, to, event, null, null);
 							prevState = to;						
 						}
 					}
@@ -1546,38 +1621,92 @@ class ModelMaker
 						from = prevState;
 						to = "s" + nameCounter; 
 						nameCounter++;
+						for (int i = 1; i<=level; i++)
+						{
+							System.out.print("\t");
+						}
+						System.out.println(" Adding state: " + to);
 						ecc.addState(to);
+						event = "ecc_activity_" + fbName + ";";
 						String cntName = (String) ((Map) eventConnections.get(fbName)).get(curAction.getOutput());
 						String cntFB = getInstanceName(cntName);
 						String cntSignal = getSignalName(cntName);
 						Integer cntSignalID = (Integer) ((Map) events.get(cntFB)).get(cntSignal);
-						action = "receiveing_event_" + cntFB + "=" + cntSignalID + ";";
-						ecc.addTransition(from, to, "ecc_activity_" + fbName + ";", null, action);
+						action = "receiveing_event_" + cntFB + "=" + cntSignalID + ";";						
+						for (int i = 1; i<=level; i++)
+						{
+							System.out.print("\t");
+						}
+						System.out.println(" Adding transition: from " + from + ": to " + to + ": event " + event);
+						ecc.addTransition(from, to, event, null, action);
 						prevState = to;						
 						
 						from = prevState;
 						to = "s" + nameCounter; 
 						nameCounter++;
+						for (int i = 1; i<=level; i++)
+						{
+							System.out.print("\t");
+						}
+						System.out.println(" Adding state: " + to);
 						ecc.addState(to);
-						ecc.addTransition(from, to, "receive_event_" + cntFB + ";", null, null);
+						event = "receive_event_" + cntFB + ";";
+						for (int i = 1; i<=level; i++)
+						{
+							System.out.print("\t");
+						}
+						System.out.println(" Adding transition: from " + from + ": to " + to + ": event " + event);
+						ecc.addTransition(from, to, event, null, null);
 						prevState = to;						
 					}
 				}
 			}
-			
-			// no more actions
-			from = prevState;
-			to = "s" + nameCounter;
-			ecc.addState(to);
-			nameCounter++;
-			ecc.addTransition(from, to, "no_action_" + fbName + ";", null, null);
-			prevState = to;
+			else
+			{
+				if (!branchOnOne)
+				{
+					// no actions
+					from = prevState;
+					to = "s" + nameCounter;
+					nameCounter++;
+					for (int i = 1; i<=level; i++)
+					{
+						System.out.print("\t");
+					}
+					System.out.println(" Adding state: " + to);
+					ecc.addState(to);
+					event = "no_action_" + fbName + ";";
+					for (int i = 1; i<=level; i++)
+					{
+						System.out.print("\t");
+					}
+					System.out.println(" Adding transition: from " + from + ": to " + to + ": event " + event);
+					ecc.addTransition(from, to, event, null, null);
+					prevState = to;
+					
+					// make update ECC transition					
+					from = prevState;
+					to = "s" + nameCounter;
+					nameCounter++;
+					for (int i = 1; i<=level; i++)
+					{
+						System.out.print("\t");
+					}
+					System.out.println(" Adding state: " + to);
+					ecc.addState(to);
+					event = "update_ECC_" + fbName + ";";
+					for (int i = 1; i<=level; i++)
+					{
+						System.out.print("\t");
+					}
+					System.out.println(" Adding transition: from " + from + ": to " + to + ": event " + event);
+					ecc.addTransition(from, to, event, null, null);
+					noTransitionTo = from;
+					prevState = to;
+				}
+			}
 		}
-
-		// mark the EC state as visited
-		System.out.println("\t\t Adding EC state to visited states: " + ecStateName);
-		visitedECStates.add(ecStateName);
-
+		
 		// find all transitions from this EC state
 		Set ecStateTransitions = new HashSet();
 		for (Iterator ecTransitionsIter = ecTransitions.iterator(); ecTransitionsIter.hasNext();)
@@ -1597,41 +1726,151 @@ class ModelMaker
 		for (Iterator ecStateTransitionsIter = ecStateTransitions.iterator(); ecStateTransitionsIter.hasNext();)
 		{
 			JaxbECTransition curECTransition = (JaxbECTransition) ecStateTransitionsIter.next();
-			System.out.println("\t\t Analyzing EC transition: From: " + curECTransition.getSource() +
+			for (int i = 1; i<=level; i++)
+			{
+				System.out.print("\t");
+			}
+			System.out.println(" Analyzing EC transition: From: " + curECTransition.getSource() +
 							   "; To: " + curECTransition.getDestination() + 
 							   "; Cond: " + curECTransition.getCondition());
 			String curECDest = curECTransition.getDestination();
 			
 			if (curECTransition.getCondition().equals("1"))
-			{
+			{			
+				// make branch model	
+				from = prevState;
+				if (curECDest.equals(firstECStateName))
+				{
+					to =  curECDest + "_1";
+				}
+				else
+				{
+					to =  curECDest + "_actions_1";
+				}
+								
+				event = "one_transition_" + fbName + ";";				
 				
+				// making recursive call
+				if (!visitedECStates.contains(to))
+				{
+					for (int i = 1; i<=level; i++)
+					{
+						System.out.print("\t");
+					}
+					System.out.println(" Adding state: " + to);
+					ecc.addState(to);
+					
+					for (int i = 1; i<=level; i++)
+					{
+						System.out.print("\t");
+					}
+					System.out.println(" Calling makeECStateBranch() from makeECStateBranch()");
+					makeECStateBranch(ecc, fbName, curECDest, to, ecStates, ecTransitions, visitedECStates, nameCounter, true, level + 1);
+				}
+				else
+				{
+					for (int i = 1; i<=level; i++)
+					{
+						System.out.print("\t");
+					}
+					System.out.println("\t Error: ECC loop with \"1\" transitions detected!");
+					for (int i = 1; i<=level; i++)
+					{
+						System.out.print("\t");
+					}
+					System.out.println("\t Check EC transition: From: " + curECTransition.getSource() +
+									   "; To: " + curECTransition.getDestination() + 
+									   "; Cond: " + curECTransition.getCondition());
+					System.exit(1);
+				}
+				
+				// connect to existing state
+				for (int i = 1; i<=level; i++)
+				{
+					System.out.print("\t");
+				}
+				System.out.println(" Adding transition: from " + from + ": to " + to + ": event " + event);
+				ecc.addTransition(from, to, event, null, null);				
 			}
 			else
 			{
-				if (!initial)
+				// make handling event done transition
+				if (!prevState.equals(firstECStateName))
 				{
-					// make handling event done transition
+					if(branchOnOne)
+					{
+						// make handling event done transition
+						from = prevState;
+						to =  ecStateName;
+						event = "handling_event_done_" + fbName + ";";
+						for (int i = 1; i<=level; i++)
+						{
+							System.out.print("\t");
+						}
+						System.out.println(" Adding transition: from " + from + ": to " + to + ": event " + event);
+						ecc.addTransition(from, to, event, null, null);
+						prevState = to;											
+					}
+					else
+					{
+						from = prevState;
+						to = ecStateName;
+						for (int i = 1; i<=level; i++)
+						{
+							System.out.print("\t");
+						}
+						System.out.println(" Adding state: " + to);
+						ecc.addState(to);
+						event = "handling_event_done_" + fbName + ";";
+						for (int i = 1; i<=level; i++)
+						{
+							System.out.print("\t");
+						}
+						System.out.println(" Adding transition: from " + from + ": to " + to + ": event " + event);
+						ecc.addTransition(from, to, event, null, null);
+						prevState = to;					
+					}
+				}	
+				
+				// make update ECC transition					
+				if(!branchOnOne)
+				{
 					from = prevState;
 					to = "s" + nameCounter;
 					nameCounter++;
-					ecc.addState(to);
-					event = "handling_event_done_" + fbName + ";";
-					ecc.addTransition(from, to, event, null, null);
-					prevState = to;					
-					
-					// make update ECC transition					
-					from = prevState;
-					to = "s" + nameCounter;
-					nameCounter++;
+					for (int i = 1; i<=level; i++)
+					{
+						System.out.print("\t");
+					}
+					System.out.println(" Adding state: " + to);
 					ecc.addState(to);
 					event = "update_ECC_" + fbName + ";";
+					for (int i = 1; i<=level; i++)
+					{
+						System.out.print("\t");
+					}
+					System.out.println(" Adding transition: from " + from + ": to " + to + ": event " + event);
 					ecc.addTransition(from, to, event, null, null);
+					noTransitionTo = from;
 					prevState = to;
 				}
 				
-				// make branch model	
+				// make branch model
 				from = prevState;
-				to =  curECDest + "_actions";
+				if (branchOnOne)
+				{
+				}
+				else
+				{
+					if (curECDest.equals(firstECStateName))
+					{
+						to =  curECDest;
+					}
+					else
+					{
+						to =  curECDest + "_actions";
+					}
+				}
 				event = "event_input_" + fbName + ";";				
 				// TODO: replace variables and operators
 				guard = "Transition Condition;";
@@ -1640,31 +1879,47 @@ class ModelMaker
 				
 				if (!visitedECStates.contains(curECDest))
 				{
-					System.out.println("\t\t Calling makeECStateBranch() from makeECStateBranch()");
-					makeECStateBranch(ecc, fbName, curECDest, to, curECTransition, ecStates, ecTransitions, visitedECStates, nameCounter, false);
-					//ecc.addTransition(from, to, "event_input_" + fbName + ";", guard, null);
-					ecc.addTransition(from, to, "event_input_" + fbName + ";", null, null);
+					for (int i = 1; i<=level; i++)
+					{
+						System.out.print("\t");
+					}
+					System.out.println(" Adding state: " + to);
+					ecc.addState(to);
+					
+					// making recursive call
+					for (int i = 1; i<=level; i++)
+					{
+						System.out.print("\t");
+					}
+					System.out.println(" Calling makeECStateBranch() from makeECStateBranch()");
+					makeECStateBranch(ecc, fbName, curECDest, to, ecStates, ecTransitions, visitedECStates, nameCounter, false, level + 1);
 				}
-				else
+			
+				if (!branchOnOne)
 				{
-					System.out.println("\t\t NOT calling makeECStateBranch() from makeECStateBranch()");
 					// connect to existing state
-					if (curECDest.equals(((JaxbECState) ecStates.get(0)).getName()))
+					// TODO: add guard
+					for (int i = 1; i<=level; i++)
 					{
-						ecc.addTransition(from, curECDest, "event_input_" + fbName + ";", null, null);
+						System.out.print("\t");
 					}
-					else
-					{
-						ecc.addTransition(from, curECDest + "_actions", "event_input_" + fbName + ";", null, null);
-					}
+					System.out.println(" Adding transition: from " + from + ": to " + to + ": event " + event);
+					ecc.addTransition(from, to, event, null, null);
 				}
 			}
 		}
-		
-		// TODO: correct the destination of "no transition" transition
+
 		// make no_transition event and guard
-		//ecc.addTransition(prevState, prevState, "no_transition_" + fbName + ";", noTransitionGuard, null);
-		ecc.addTransition(prevState, prevState, "no_transition_" + fbName + ";", null, null);
+		// TODO: add guard
+// 		from = prevState;
+// 		to = noTransitionTo;
+// 		event = "no_transition_" + fbName + ";";
+// 		for (int i = 1; i<=level; i++)
+// 		{
+// 			System.out.print("\t");
+// 		}
+// 		System.out.println(" Adding transition: from " + from + ": to " + to + ": event " + event);
+// 		ecc.addTransition(from, to, event, null, null);
 	}
 	
 	private void makeBasicFBAlgorithms(String fbName)
