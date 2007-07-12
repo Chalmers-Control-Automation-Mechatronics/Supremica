@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.gui.ide
 //# CLASS:   ModuleContainer
 //###########################################################################
-//# $Id: ModuleContainer.java,v 1.63 2007-06-26 20:45:14 robi Exp $
+//# $Id: ModuleContainer.java,v 1.64 2007-07-12 19:30:33 avenir Exp $
 //###########################################################################
 
 
@@ -56,6 +56,7 @@ import net.sourceforge.waters.subject.module.ModuleSubject;
 import net.sourceforge.waters.subject.module.ModuleSubjectFactory;
 import net.sourceforge.waters.subject.module.SimpleComponentSubject;
 import net.sourceforge.waters.xsd.base.EventKind;
+import org.codehaus.groovy.antlr.java.Java2GroovyConverter;
 
 public class ModuleContainer 
     extends DocumentContainer
@@ -80,6 +81,17 @@ public class ModuleContainer
         mTabPanel.add(mAnalyzerPanel);
         mTabPanel.addChangeListener(this);
         mEditorPanel.showComment();
+        
+        mTabPanel.addMouseListener(new java.awt.event.MouseAdapter()
+        {
+            public void mouseClicked(java.awt.event.MouseEvent e)
+            {
+                if (mTabPanel.getSelectedComponent().getName().equals(mAnalyzerPanel.getName()))
+                {
+                    mAnalyzerPanel.sortAutomataByName();
+                }
+            }
+        });
     }
     
 

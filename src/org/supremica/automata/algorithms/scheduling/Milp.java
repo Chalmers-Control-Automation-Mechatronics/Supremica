@@ -2,6 +2,7 @@ package org.supremica.automata.algorithms.scheduling;
 
 import java.util.*;
 import java.io.*;
+import org.jacorb.orb.domain.TEST_POLICY_ID;
 
 import org.supremica.automata.*;
 import org.supremica.automata.algorithms.*;
@@ -35,8 +36,24 @@ public class Milp
     // NOT USED YET...
     // private Project theProject;
     
-    /** int[zone_nr][plant_nr][state_nr] - stores the states that fire booking/unbooking events */
-    private int[][][] bookingTics, unbookingTics;
+    /** 
+     * int[zone_nr][plant_nr][event/state-switch][state_nr] - stores the indices 
+     * of the booking/unbooking events and the states that fire them. 
+     */
+    private int[][][][] bookingTics, unbookingTics;
+   
+    /** The indices of the event- and state-arrays in bookingTics/unbookingTics */
+    private final static int STATE_SWITCH = 0;
+    private final static int EVENT_SWITCH = 1;
+    
+    /** 
+     * Mapping between plant_ + zone_ + bookingTics_indices and a mutex-variable-counter.
+     * The keys consist of int[]'s of the form {zoneIndex, firstPlantIndex, secondPlantIndex, 
+     * bookingTics[zoneIndex][firstPlantIndex], bookingTics[zoneIndex][secondPlantIndex]}. 
+     * The stored value is the corresponding variable counter. 
+     */
+    private TreeMap<int[], Integer> mutexVarCounterMap = 
+            new TreeMap<int[], Integer>(new IntArrayComparator());
     
     /** The optimal cycle time (makespan) */
     private double makespan;
@@ -175,11 +192,16 @@ public class Milp
     public void schedule()
         throws Exception
     {
-        ActionTimer totalTimer = new ActionTimer();
+//        ActionTimer totalTimer = new ActionTimer();
+//        ActionTimer partTimer = new ActionTimer();
+        
+        long totalTime = 0;
         
         if (isRunning)
         {
-            totalTimer.restart();
+//            totalTimer.restart();
+//            partTimer.restart();
+            timer.restart();
             initialize();
         }
         
@@ -190,27 +212,41 @@ public class Milp
 //            int anr = scheduleDialog.getIde().getIDE().getActiveProject().getAutomata().size();
             
             convertAutomataToMilp();
+            
+            long procTime = timer.elapsedTime();
+            logger.info("Pre-processing time = " + procTime + "ms");
+            totalTime += procTime;
         }
         
         // Calls the MILP-solver
         if (isRunning)
         {
+            timer.restart();
+            
             callMilpSolver();
+            
+            long procTime = timer.elapsedTime();
+            logger.info("Optimization time = " + procTime + "ms");
+            totalTime += procTime;
         }
         
         // Processes the output from the MILP-solver (*.sol file) and stores the optimal times for each state
         if (isRunning)
         {
-            processSolutionFile();
+            timer.restart();
             
-            String totalTimeStr = "Total optimization time = " + totalTimer.elapsedTime() + "ms";
-            logger.info(totalTimeStr);
+            processSolutionFile();
         }
         
         // Builds the optimal schedule (if solicited)
         if (isRunning && buildSchedule)
         {
             buildScheduleAutomaton();
+            
+            long procTime = timer.elapsedTime();
+            logger.info("Post-processing time (incl. schedule construction) = " + procTime + "ms");
+            totalTime += procTime;
+            logger.info("Total time = " + totalTime + "ms");
         }
         
         if (isRunning)
@@ -255,6 +291,7 @@ public class Milp
         State synthState = synthAll.getInitialState();
 */            
         // Create the automaton with a chosen name
+        timer.stop(); // Stop the timer while waiting for the user to enter the name of the new schedule
         String scheduleName = "";
         while (scheduleName != null && scheduleName.trim() == "")
         {
@@ -265,9 +302,7 @@ public class Milp
             return;
         }
         schedule = new Automaton(scheduleName);
-        
-        // Start the clock
-        timer.restart();
+        timer.start(); // Restart the timer
         
         SynchronizationStepper stepper = new SynchronizationStepper(theAutomata);
         
@@ -468,11 +503,7 @@ public class Milp
             plantAuto.getAlphabet().addEvent(resetEvent);
             plantAuto.addArc(new Arc(plantAuto.getInitialState(), plantAuto.getInitialState(), resetEvent));
         }
-        
-        String str = "Time to build the schedule: " + timer.elapsedTime() + "ms ";
-        logger.info(str);
-        outputStr += "\t" + str;
-        
+         
         addAutomatonToGui(schedule);
     }
     
@@ -503,6 +534,9 @@ public class Milp
         
         initAutomata();
         initMutexStates();
+        
+        //test
+        createNonCrossbookingConstraintsNew();
     }
     
     
@@ -651,8 +685,8 @@ public class Milp
     private void initMutexStates()
         throws Exception
     {
-        bookingTics = new int[zones.size()][plants.size()][1];
-        unbookingTics = new int[zones.size()][plants.size()][1];
+        bookingTics = new int[zones.size()][plants.size()][2][1];
+        unbookingTics = new int[zones.size()][plants.size()][2][1];
         
         // Initializing all book/unbook-state indices to -1.
         // The ones that remain -1 at the output of this method correspond
@@ -661,8 +695,10 @@ public class Milp
         {
             for (int j=0; j<plants.size(); j++)
             {
-                bookingTics[i][j][0] = -1;
-                unbookingTics[i][j][0] = -1;
+                bookingTics[i][j][STATE_SWITCH][0] = -1;
+                unbookingTics[i][j][STATE_SWITCH][0] = -1;
+                bookingTics[i][j][EVENT_SWITCH][0] = -1;
+                unbookingTics[i][j][EVENT_SWITCH][0] = -1;
             }
         }
         
@@ -686,6 +722,8 @@ public class Milp
                     
                     ArrayList<State> bookingStates = new ArrayList<State>();
                     ArrayList<State> unbookingStates = new ArrayList<State>();
+                    ArrayList<LabeledEvent> bookingEvents = new ArrayList<LabeledEvent>();
+                    ArrayList<LabeledEvent> unbookingEvents = new ArrayList<LabeledEvent>();
                     
                     for (Iterator<State> stateIter = currPlant.stateIterator(); stateIter.hasNext(); )
                     {
@@ -695,8 +733,9 @@ public class Milp
                         for (Iterator<LabeledEvent> currBookingEventsIter = currStatesBookingAlphabet.iterator(); currBookingEventsIter.hasNext(); )
                         {
                             ArrayList<State> possibleUnbookingStates = new ArrayList<State>();
+                            LabeledEvent currBookingEvent = currBookingEventsIter.next();
                             
-                            possibleUnbookingStates.add(currState.nextState(currBookingEventsIter.next()));
+                            possibleUnbookingStates.add(currState.nextState(currBookingEvent));
                             
                             while (possibleUnbookingStates.size() > 0)
                             {
@@ -710,6 +749,8 @@ public class Milp
                                     {
                                         bookingStates.add(currState);
                                         unbookingStates.add(currPossibleUnbookingState);
+                                        bookingEvents.add(currBookingEvent);
+                                        unbookingEvents.add(currArc.getEvent());
                                     }
                                     else
                                     {
@@ -729,12 +770,16 @@ public class Milp
                         throw new Exception(exceptionStr);
                     }
                     
-                    bookingTics[i][j] = new int[bookingStates.size()];
-                    unbookingTics[i][j] = new int[unbookingStates.size()];
+                    bookingTics[i][j][STATE_SWITCH] = new int[bookingStates.size()];
+                    unbookingTics[i][j][STATE_SWITCH] = new int[unbookingStates.size()];
+                    bookingTics[i][j][EVENT_SWITCH] = new int[bookingStates.size()];
+                    unbookingTics[i][j][EVENT_SWITCH] = new int[unbookingStates.size()];
                     for (int k=0; k<bookingStates.size(); k++)
                     {
-                        bookingTics[i][j][k] = indexMap.getStateIndex(currPlant, bookingStates.get(k));
-                        unbookingTics[i][j][k] = indexMap.getStateIndex(currPlant, unbookingStates.get(k));
+                        bookingTics[i][j][STATE_SWITCH][k] = indexMap.getStateIndex(currPlant, bookingStates.get(k));
+                        unbookingTics[i][j][STATE_SWITCH][k] = indexMap.getStateIndex(currPlant, unbookingStates.get(k));
+                        bookingTics[i][j][EVENT_SWITCH][k] = indexMap.getEventIndex(bookingEvents.get(k));
+                        unbookingTics[i][j][EVENT_SWITCH][k] = indexMap.getEventIndex(unbookingEvents.get(k));
                     }
                 }
             }
@@ -1543,6 +1588,374 @@ public class Milp
         }
     }    
     
+    private void createNonCrossbookingConstraintsNew()
+        throws Exception
+    {       
+        TreeMap<int[], ArrayList<int[]>> consecutiveBookingTicsIndices = 
+                new TreeMap<int[], ArrayList<int[]>>(new IntArrayComparator()); 
+        
+        for (int p = 0; p < plants.size(); p++)
+        {
+            for (int z1 = 0; z1 < bookingTics.length; z1++)
+            {
+                for (int z2 = 0; z2 < bookingTics.length; z2++)
+                {
+                    if (z1 != z2)
+                    {
+                        if ((bookingTics[z1][p][STATE_SWITCH][0] != -1) && (bookingTics[z2][p][STATE_SWITCH][0] != -1))
+                        {
+                            ArrayList<int[]> currConsecutiveBookingTicsIndices = findBookingStatesSequences(p, z1, z2);
+                            if (currConsecutiveBookingTicsIndices.size() > 0)
+                            {
+                                consecutiveBookingTicsIndices.put(new int[]{p, z1, z2}, currConsecutiveBookingTicsIndices);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        
+        for (int z1 = 0; z1 < zones.size(); z1++)
+        {
+            for (int z2 = 0; z2 < zones.size(); z2++)
+            {
+                if (z1 != z2)
+                {
+                    for (int p1 = 0; p1 < plants.size() - 1; p1++)
+                    {
+                        ArrayList<int[]> consecutiveTicsP1 = consecutiveBookingTicsIndices.get(new int[]{p1, z1, z2});
+                        if (consecutiveTicsP1 != null)
+                        {
+                            for (int p2 = p1 + 1; p2 < plants.size(); p2++)
+                            {
+                                ArrayList<int[]> consecutiveTicsP2 = consecutiveBookingTicsIndices.get(new int[]{p2, z2, z1});
+                                if (consecutiveTicsP2 != null)
+                                {
+                                    logger.warn("Cross-booking between P" + p1 + " and P" + p2 + " in zones Z" + z1 + " and Z" + z2);
+                                    
+                                    for (int[] tic1 : consecutiveTicsP1)
+                                    {
+                                        for (int[] tic2 : consecutiveTicsP2)
+                                        {
+                                            int[] zoneIndices = new int[]{z1, z2};
+                                            String str = "";
+                                            
+                                            for (int i = 0; i < zoneIndices.length; i++)
+                                            {
+                                                str = "r" + p1 + "_books_z" + zoneIndices[i] + "_before_r" + p2;
+                                                
+                                                Integer varCounter = mutexVarCounterMap.get(new int[]{zoneIndices[i], p1, p2, 
+                                                        bookingTics[zoneIndices[i]][p1][STATE_SWITCH][tic1[i]], 
+                                                        bookingTics[zoneIndices[i]][p2][STATE_SWITCH][tic2[i]]});
+                                                if (varCounter != null)
+                                                {
+                                                    str += "_var" + varCounter;
+                                                }
+                                                
+                                                logger.error("str = " + str);
+                                            }
+                                        }
+                                    }
+                                }
+                            }   
+                        }
+                    }           
+                }
+            }
+        }
+    }
+    
+    /**
+     * This method creates additional constraints that (may) speed up the optimization. 
+     * The constraints prevent two plants moving towards eachother from cross-booking two zones.
+     * More specifically, suppose that R1 passes first through Z1 and then Z2, while R2 moves 
+     * from the other direction, Z2 and then Z1. Then if R1 book Z2 before R2, then it must also
+     * book Z1 before R2, and vice versa. This poses additional constraint on the boolean variables: 
+     * R1_books_Z1_before_R2 >= R1_books_Z2_before_R2 - M*(4 - Z1_reached_by_R1 - Z2_reached_by_R1 - 
+     * Z1_reached_by_R2 - Z2_reached_by_R2).
+     */
+    private void createNonCrossbookingConstraints()
+        throws Exception
+    {       
+        for (int z1 = 0; z1 < bookingTics.length; z1++)
+        {
+            for (int z2 = 0; z2 < bookingTics.length; z2++)
+            {
+                if (z1 != z2)
+                {
+                    ArrayList<int[]>[] bookingTicsIndices = new ArrayList[plants.size()];
+                    for (int p = 0; p < plants.size(); p++)
+                    {
+                        if ((bookingTics[z1][p][STATE_SWITCH][0] != -1) && (bookingTics[z2][p][STATE_SWITCH][0] != -1))
+                        {
+                            bookingTicsIndices[p] = findBookingStatesSequences(p, z1, z2);
+                        }
+                    }
+                    
+                    for (int p1 = 0; p1 < bookingTicsIndices.length - 1; p1++)
+                    {
+                        for (int p2 = p1+1; p2 < bookingTicsIndices.length; p2++)
+                        {
+                            if ((bookingTicsIndices[p1].size() > 0) && (bookingTicsIndices[p2].size() > 0))
+                            {
+                                Automaton plant = plants.getAutomatonAt(p2);
+                                
+                                ArrayList<int[]>[] pathSplitInfosP2 = new ArrayList[bookingTicsIndices[p2].size()];
+                                for (int ticPair = 0; ticPair < bookingTicsIndices[p2].size(); ticPair++)
+                                {
+                                    pathSplitInfosP2[ticPair] = new ArrayList<int[]>();
+                                    for (int tic = 0; tic < bookingTicsIndices[p2].get(ticPair).length; tic++)
+                                    {
+                                        int stateIndex = bookingTics[z2][p2][STATE_SWITCH][bookingTicsIndices[p2].get(ticPair)[tic]];
+                                        int eventIndex = bookingTics[z2][p2][EVENT_SWITCH][bookingTicsIndices[p2].get(ticPair)[tic]];
+                                        State bState = indexMap.getStateAt(plant, stateIndex);
+                                        LabeledEvent bEvent = indexMap.getEventAt(eventIndex);
+
+                                        findNearestPathSplits(plant, bState.nextState(bEvent), pathSplitInfosP2[ticPair], bEvent);
+                                    }
+                                }
+
+                                plant = plants.getAutomatonAt(p1);
+                                
+//                                ArrayList<String> boolVariableRoots = new ArrayList<String>();
+//                                boolVariableRoots.add("r" + p1 + "_books_z" + z1 + "_before_r" + p2);
+//                                boolVariableRoots.add("r" + p1 + "_books_z" + z2 + "_before_r" + p2);
+                                for (int ticPair = 0; ticPair < bookingTicsIndices[p1].size(); ticPair++)
+                                {        
+//                                    ArrayList<String> timeVariableRoots = new ArrayList<String>();
+                                    ArrayList<int[]> pathSplitInfosP1 = new ArrayList<int[]>();
+                                    for (int tic = 0; tic < bookingTicsIndices[p1].get(ticPair).length; tic++)
+                                    {
+//                                        ArrayList<int[]> currPathSplitInfo = new ArrayList<int[]>();
+                                        int stateIndex = bookingTics[z1][p1][STATE_SWITCH][bookingTicsIndices[p1].get(ticPair)[tic]];
+                                        int eventIndex = bookingTics[z1][p1][EVENT_SWITCH][bookingTicsIndices[p1].get(ticPair)[tic]];
+                                        State bState = indexMap.getStateAt(plant, stateIndex);
+                                        LabeledEvent bEvent = indexMap.getEventAt(eventIndex);
+
+                                        findNearestPathSplits(plant, bState.nextState(bEvent), pathSplitInfosP1, bEvent);
+                                        
+//                                        timeVariableRoots.add("time[" + p1 + ", " + stateIndex + "]");
+                                    }
+
+                                    
+                                    
+//                                    BufferedReader r = new BufferedReader(new FileReader(modelFile));
+//                                    String str;
+//                                    while ((str = r.readLine()) != null)
+//                                    {
+//                                        String foundBoolVariableRoot = null;
+//                                        boolVarSearch: for (String boolVariableRoot : boolVariableRoots)
+//                                        {
+//                                            if (str.contains(boolVariableRoot))
+//                                            {
+//                                                foundBoolVariableRoot = boolVariableRoot;
+//                                                break boolVarSearch;
+//                                            }
+//                                        }
+//                                        
+//                                        if (foundBoolVariableRoot != null)
+//                                        {
+//                                            for (String timeVariableRoot : timeVariableRoots)
+//                                            {
+//                                                if (str.contains(timeVariableRoot))
+//                                                {
+//                                                    str = str.substring(str.indexOf(foundBoolVariableRoot));
+//                                                    str = str.substring(0, str.indexOf(" ")).trim();
+//                                                }   
+//                                            }
+//                                        }
+//                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+                
+//                ArrayList<Integer> plantsUsingZones = new ArrayList<Integer>(); //TODO...
+                
+//        for (int i = 0; i < bookingTics.length - 1; i++)
+//        {
+//            for (int j = i+1; j < bookingTics.length; j++)
+//            {
+//                ArrayList[][] bookingTicsIndices = new ArrayList[plants.size()][];
+////                ArrayList<Integer> plantsUsingZones = new ArrayList<Integer>(); //TODO...
+//                for (int k = 0; k < plants.size(); k++)
+//                {
+//                    if ((bookingTics[i][k][0] != -1) && (bookingTics[j][k][0] != -1))
+//                    {
+////                        plantsUsingZones.add(new Integer(k));
+//                        int plantIndex = indexMap.getAutomatonIndex(plants.getAutomatonAt(k));
+//                        
+//                        bookingTicsIndices[plantIndex] = new ArrayList[2];
+//                        bookingTicsIndices[plantIndex][0] = findBookingStatesSequences(bookingTics[j][plantIndex], bookingTics[i][plantIndex], plantIndex);
+//                        bookingTicsIndices[plantIndex][1] = findBookingStatesSequences(bookingTics[i][plantIndex], bookingTics[j][plantIndex], plantIndex);
+//                    }
+//                }
+//                
+//                outerfor: for (int k1 = 0; k1 < plants.size() - 1; k1++)
+//                {
+//                    for (int k2 = k1 + 1; k2 < plants.size(); k2++)
+//                    {
+//                        logger.info("i = " + i + "; j = " + j + "; k1 = " + k1 + "; k2 = " + k2);
+//                        if (bookingTicsIndices[k1] != null && bookingTicsIndices[k2] != null)
+//                        {
+//                            int[] activePlantIndices = new int[]{k1, k2};
+//                            int[] activeZoneIndices = new int[]{i, j};
+//                                                
+//                            String pathSplitStr = "";
+//                            int nrOfPathSplits = 0;
+//                            for (int pInd1 = 0; pInd1 < activePlantIndices.length; pInd1++)
+//                            {
+//                                int pInd2 = 1 - pInd1;
+//                                if ((bookingTicsIndices[activePlantIndices[pInd1]][0].size() > 0) 
+//                                && (bookingTicsIndices[activePlantIndices[pInd2]][1].size() > 0))
+//                                {                                            
+////                                    Automaton activePlant = plants.getAutomatonAt(activePlantIndices[pInd1]);
+////
+////                                    for (int zInd1 = 0; zInd1 < activeZoneIndices.length; zInd1++)
+////                                    {
+////                                        Automaton activeZone = zones.getAutomatonAt(activeZoneIndices[zInd1]);
+////
+////                                        //temp
+////                                        logger.error("pind1 = " + pInd1 + "; pind2 = " + pInd2 + "; zind = " + zInd1);
+////                                        logger.error("Checking " + activePlant.getName() + "_" + activeZone.getName()); 
+//                                                
+//                                        for (Iterator bookingPairsIt = bookingTicsIndices[activePlantIndices[pInd1]][0].iterator(); bookingPairsIt.hasNext();)
+//                                        {
+//                                            int[] currBookingPair = (int[]) bookingPairsIt.next();
+//
+//                                            for (int stInd = 0; stInd < currBookingPair.length; stInd++)
+//                                            {
+//                                                State currState = indexMap.getStateAt(plants.getAutomatonAt(activePlantIndices[ind1]), currBookingPair[stInd]);
+//                                                ArrayList<int[]> nearestPathSplits = new ArrayList<int[]>();
+//                                                Alphabet activeEvents = AlphabetHelpers.intersect(currState.activeEvents(false), zones.getAutomatonAt(activeZoneIndices[stInd]).getAlphabet());
+//                                                for (Iterator<LabeledEvent> activeEventIt = activeEvents.iterator(); activeEventIt.hasNext();)
+//                                                {
+//                                                    LabeledEvent activeEvent = activeEventIt.next();
+//                                                    findNearestPathSplits(plants.getAutomatonAt(activePlantIndices[ind1]), currState.nextState(activeEvent), nearestPathSplits, activeEvent);
+//                                                }
+//                                                for (Iterator<int[]> it = nearestPathSplits.iterator(); it.hasNext();)
+//                                                {
+//                                                    int[] pathSplitInfo = it.next();
+//                                                    if (pathSplitInfo[0] != NO_PATH_SPLIT_INDEX)
+//                                                    {
+//                                                        pathSplitStr += " - " + makeAltPathsVariable(k1, pathSplitInfo[0], pathSplitInfo[1]);
+//                                                        nrOfPathSplits++;
+//                                                    }
+//                                                }                                        
+//                                            }
+//                                        }
+//                                        for (Iterator bookingPairsIt = bookingTicsIndices[activePlantIndices[pInd2]][1].iterator(); bookingPairsIt.hasNext();)
+//                                        {
+//                                            int[] currBookingPair = (int[]) bookingPairsIt.next();
+//
+//                                            for (int stInd = 0; stInd < currBookingPair.length; stInd++)
+//                                            {
+//                                                State currState = indexMap.getStateAt(plants.getAutomatonAt(activePlantIndices[ind2]), currBookingPair[stInd]);
+//                                                ArrayList<int[]> nearestPathSplits = new ArrayList<int[]>();
+//                                                Alphabet activeEvents = AlphabetHelpers.intersect(currState.activeEvents(false), zones.getAutomatonAt(activeZoneIndices[1 - stInd]).getAlphabet());
+//                                                for (Iterator<LabeledEvent> activeEventIt = activeEvents.iterator(); activeEventIt.hasNext();)
+//                                                {
+//                                                    LabeledEvent activeEvent = activeEventIt.next();
+//                                                    findNearestPathSplits(plants.getAutomatonAt(activePlantIndices[ind2]), currState.nextState(activeEvent), nearestPathSplits, activeEvent);
+//                                                }
+//                                                for (Iterator<int[]> it = nearestPathSplits.iterator(); it.hasNext();)
+//                                                {
+//                                                    int[] pathSplitInfo = it.next();
+//                                                    if (pathSplitInfo[0] != NO_PATH_SPLIT_INDEX)
+//                                                    {
+//                                                        pathSplitStr += " - " + makeAltPathsVariable(k1, pathSplitInfo[0], pathSplitInfo[1]);
+//                                                        nrOfPathSplits++;
+//                                                    }
+//                                                }                                        
+//                                            }
+//                                        }
+//                                        
+//                                        int zInd2 = (int) Math.IEEEremainder(zInd1 + 1, 2);
+//                                        String wStr = "R" + activePlantIndices[pInd1] + "_books_Z" + activeZoneIndices[zInd1] + 
+//                                                "_before_R" + activePlantIndices[pInd2] + " >= " + "R" + activePlantIndices[pInd1] + 
+//                                                "_books_Z" + activeZoneIndices[zInd2] + "_before_R" + activePlantIndices[pInd2];
+//                                        if (nrOfPathSplits > 0)
+//                                        {
+//                                            wStr += " - bigM*(" + nrOfPathSplits + pathSplitStr + ")";
+//
+//                                        }
+//                                        else //TEMP
+//                                            wStr += " - nada";
+//                                        wStr += ";\n";
+//                                        logger.warn(wStr);
+//                                    }
+//                                }
+//                            }
+//                        }
+//                        
+//                        //temp
+//                        break outerfor;
+//                    }
+//                }
+//            }
+//        }
+//    }
+    
+    /**
+     * Finds all pairs of booking tics, such that the plant with index plantIndex books the mutex zone 
+     * with index pZoneIndex is first and the zone corresponding to fZoneIndex second.
+     *
+     * @param   pZoneIndex  the internal index of the firstly booked zone
+     * @param   fZoneIndex  the internal index of the secondly booked zone
+     * @param   plantIndex  the internal index of the plant, booking the mutex zones
+     * @return  array of int[], containg pairs of booking tics indices
+     */
+    private ArrayList<int[]> findBookingStatesSequences(int plantIndex, int pZoneIndex, int fZoneIndex)
+    {
+        ArrayList<int[]> bookingStateSequences = new ArrayList<int[]>();
+
+        Automaton plant = plants.getAutomatonAt(plantIndex);
+        
+        // For faster processing
+        Hashtable<Integer, Integer> pStateIndicesTable = new Hashtable<Integer, Integer>();
+        for (int i = 0; i < bookingTics[pZoneIndex][plantIndex][STATE_SWITCH].length; i++)
+        {
+            pStateIndicesTable.put(new Integer(bookingTics[pZoneIndex][plantIndex][STATE_SWITCH][i]), new Integer(i));
+        }
+
+        for (int i = 0; i < bookingTics[fZoneIndex][plantIndex][STATE_SWITCH].length; i++)
+        {
+            State fState = indexMap.getStateAt(plant, bookingTics[fZoneIndex][plantIndex][STATE_SWITCH][i]);
+            
+            //debug
+            String fStateName = fState.getName();
+            
+            ArrayList<State> upstreamsStates = new ArrayList<State>();
+            upstreamsStates.add(fState);
+            
+            while (!upstreamsStates.isEmpty())
+            {
+                State currUpstreamsState = upstreamsStates.remove(0);
+                int currUpsteamsStateIndex = indexMap.getStateIndex(plant, currUpstreamsState);                
+                Integer pStateIndex = pStateIndicesTable.get(new Integer(currUpsteamsStateIndex));
+                
+                if (pStateIndex != null)
+                {
+                    bookingStateSequences.add(new int[]{pStateIndex.intValue(), i});
+                }
+                else if (!currUpstreamsState.isInitial())
+                {
+                    for (Iterator<Arc> incomingArcsIt = currUpstreamsState.incomingArcsIterator(); incomingArcsIt.hasNext();)
+                    {
+                        Arc incomingArc = incomingArcsIt.next();
+                        upstreamsStates.add(incomingArc.getFromState());
+                    }
+                }
+            }
+        }
+
+        return bookingStateSequences;
+    }
+    
     /****************************************************************************************/
     /*                                 THE AUTOMATA-MILP-BRIDGE-METHODS                     */
     /****************************************************************************************/
@@ -1554,9 +1967,7 @@ public class Milp
      */
     protected void convertAutomataToMilp()
     throws Exception
-    {
-        timer.restart();
-        
+    {        
         int nrOfPlants = plants.size();
         int nrOfZones = zones.size();
         
@@ -1777,13 +2188,16 @@ public class Milp
                     int repeatedBooking = 0;
                     
                     // for every path combination that contains the event that books the current zone
-                    for (int k1=0; k1<bookingTics[i][j1].length; k1++)
+                    for (int k1=0; k1<bookingTics[i][j1][STATE_SWITCH].length; k1++)
                     {
-                        for (int k2=0; k2<bookingTics[i][j2].length; k2++)
+                        for (int k2=0; k2<bookingTics[i][j2][STATE_SWITCH].length; k2++)
                         {
-                            if (bookingTics[i][j1][0] != -1 && bookingTics[i][j2][0] != -1)
+                            if (bookingTics[i][j1][STATE_SWITCH][0] != -1 && bookingTics[i][j2][STATE_SWITCH][0] != -1)
                             {
                                 repeatedBooking++;
+                                
+                                // Fills the map, that is used in restiction of cross-booking
+                                mutexVarCounterMap.put(new int[]{i, j1, j2, k1, k2}, new Integer(repeatedBooking));
                                 
                                 String currMutexVariable = "r" + j1 + "_books_z" + i + "_before_r" + j2 + "_var" + repeatedBooking;
                                 
@@ -1792,12 +2206,23 @@ public class Milp
                                 //test
                                 ArrayList<int[]> bList = new ArrayList<int[]>();
                                 Automaton bPlant = indexMap.getAutomatonAt(j1);
-                                State bState = indexMap.getStateAt(bPlant, bookingTics[i][j1][k1]);
-                                findNearestPathSplits(bPlant, bState, bList);
+                                State bState = indexMap.getStateAt(bPlant, bookingTics[i][j1][STATE_SWITCH][k1]);
+                                LabeledEvent bEvent = indexMap.getEventAt(bookingTics[i][j1][EVENT_SWITCH][k1]);
+                                findNearestPathSplits(bPlant, bState.nextState(bEvent), bList, bEvent);
+                                
+                                //temp
+                                String bName = bEvent.getName();
+                                int sIndex = bookingTics[i][j1][STATE_SWITCH][k1];
+                                int pIndex = j1;
+                                int zIndex = i;
+                                int blistlength = bList.size();
+                                
                                 ArrayList<int[]> uList = new ArrayList<int[]>();
                                 Automaton uPlant = indexMap.getAutomatonAt(j2);
-                                State uState = indexMap.getStateAt(uPlant, unbookingTics[i][j2][k2]);
-                                findNearestPathSplits(uPlant, uState, uList);
+                                State uState = indexMap.getStateAt(uPlant, unbookingTics[i][j2][STATE_SWITCH][k2]);
+                                LabeledEvent uEvent = indexMap.getEventAt(unbookingTics[i][j2][EVENT_SWITCH][k2]);
+                                findNearestPathSplits(uPlant, uState.nextState(uEvent), uList, uEvent);
+                                
                                 int totalNrOfPathSplits = 0;
                                 String altPathsCoupling = "";
                                 for (int[] bSplitState : bList)
@@ -1816,7 +2241,7 @@ public class Milp
                                         altPathsCoupling += " - " + makeAltPathsVariable(j2, uSplitState[0], uSplitState[1]);
                                     }                       
                                 }
-                                mutexConstraints += "mutex_z" + i + "_r" + j1 + "_r" + j2 + "_var" + repeatedBooking + " : time[" + j1 + ", " + bookingTics[i][j1][k1] + "] >= " + "time[" + j2 + ", " + unbookingTics[i][j2][k2] + "] - bigM*";
+                                mutexConstraints += "mutex_z" + i + "_r" + j1 + "_r" + j2 + "_var" + repeatedBooking + " : time[" + j1 + ", " + bookingTics[i][j1][STATE_SWITCH][k1] + "] >= " + "time[" + j2 + ", " + unbookingTics[i][j2][STATE_SWITCH][k2] + "] - bigM*";
                                 if (totalNrOfPathSplits > 0)
                                 {
                                     mutexConstraints += "(" + totalNrOfPathSplits + " + " + currMutexVariable + altPathsCoupling + ")";
@@ -1829,12 +2254,16 @@ public class Milp
                                 //test (forts...)
                                 bList = new ArrayList<int[]>();
                                 bPlant = uPlant;
-                                bState = indexMap.getStateAt(bPlant, bookingTics[i][j2][k2]);
-                                findNearestPathSplits(bPlant, bState, bList);
+                                bState = indexMap.getStateAt(bPlant, bookingTics[i][j2][STATE_SWITCH][k2]);
+                                bEvent = indexMap.getEventAt(bookingTics[i][j2][EVENT_SWITCH][k2]);
+                                
+                                findNearestPathSplits(bPlant, bState.nextState(bEvent), bList, bEvent);
                                 uList = new ArrayList<int[]>();
                                 uPlant = indexMap.getAutomatonAt(j1);
-                                uState = indexMap.getStateAt(uPlant, unbookingTics[i][j1][k1]);
-                                findNearestPathSplits(uPlant, uState, uList);
+                                uState = indexMap.getStateAt(uPlant, unbookingTics[i][j1][STATE_SWITCH][k1]);
+                                uEvent = indexMap.getEventAt(unbookingTics[i][j1][EVENT_SWITCH][k1]);
+                                
+                                findNearestPathSplits(uPlant, uState.nextState(uEvent), uList, uEvent);
                                 totalNrOfPathSplits = 0;
                                 altPathsCoupling = "";
                                 for (int[] bSplitState : bList)
@@ -1853,7 +2282,7 @@ public class Milp
                                         altPathsCoupling += " - " + makeAltPathsVariable(j1, uSplitState[0], uSplitState[1]);
                                     }                       
                                 }
-                                mutexConstraints += "dual_mutex_z" + i + "_r" + j1 + "_r" + j2  + "_var" + repeatedBooking + " : time[" + j2 + ", " + bookingTics[i][j2][k2] + "] >= " + "time[" + j1 + ", " + unbookingTics[i][j1][k1] + "] - bigM*(";
+                                mutexConstraints += "dual_mutex_z" + i + "_r" + j1 + "_r" + j2  + "_var" + repeatedBooking + " : time[" + j2 + ", " + bookingTics[i][j2][STATE_SWITCH][k2] + "] >= " + "time[" + j1 + ", " + unbookingTics[i][j1][STATE_SWITCH][k1] + "] - bigM*(";
                                 if (totalNrOfPathSplits > 0)
                                 {
                                     mutexConstraints += (totalNrOfPathSplits+1) + " - " + currMutexVariable + altPathsCoupling + ")";
@@ -1871,7 +2300,7 @@ public class Milp
 //                                    mutexConstraints += " - bigM*" + pathCutEnsurance;
 //                                }
 //                                mutexConstraints += ";\n";
-//                                mutexConstraints += "dual_mutex_z" + i + "_r" + j1 + "_r" + j2  + "_var" + repeatedBooking + " : time[" + j2 + ", " + bookingTics[i][j2][k2] + "] >= " + "time[" + j1 + ", " + unbookingTics[i][j1][k1] + "] - bigM*(1 - " + currMutexVariable + ")" + " + " + epsilon;
+//                                mutexConstraints += "dual_mutex_z" + i + "_r" + j1 + "_r" + j2  + "_var" + repeatedBooking + " : time[" + j2 + ", " + bookingTics[i][j2][STATE_SWITCH][k2] + "] >= " + "time[" + j1 + ", " + unbookingTics[i][j1][STATE_SWITCH][k1] + "] - bigM*(1 - " + currMutexVariable + ")" + " + " + epsilon;
 //                                pathCutEnsurance = pathCutTable.get(indexMap.getStateAt(plants.getAutomatonAt(j2), k2));
 //                                if (pathCutEnsurance != null)
 //                                {
@@ -1990,10 +2419,6 @@ public class Milp
         w.newLine();
         w.write("end;");
         w.flush();
-        
-        String str = "Time to set up the optimization problem: " + timer.elapsedTime() + "ms";
-        logger.info(str);
-        outputStr += "\t" + str + "\n";
     }
     
     protected void processSolutionFile()

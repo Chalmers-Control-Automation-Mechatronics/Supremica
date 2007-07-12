@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.gui.ide
 //# CLASS:   AnalyzerPanel
 //###########################################################################
-//# $Id: AnalyzerPanel.java,v 1.33 2007-06-25 20:18:48 robi Exp $
+//# $Id: AnalyzerPanel.java,v 1.34 2007-07-12 19:30:33 avenir Exp $
 //###########################################################################
 
 package org.supremica.gui.ide;
@@ -220,6 +220,11 @@ public class AnalyzerPanel
         mVisualProject.addAutomata(project);
         mVisualProject.addAttributes(project);
         return project.size();
+    }
+    
+    public void sortAutomataByName()
+    {
+        automataPanel.sortAutomataByName();
     }
 
     private VisualProject mVisualProject = new VisualProject();

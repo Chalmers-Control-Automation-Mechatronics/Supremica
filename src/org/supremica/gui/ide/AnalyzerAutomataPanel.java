@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.gui.ide
 //# CLASS:   AnalyzerAutomataPanel
 //###########################################################################
-//# $Id: AnalyzerAutomataPanel.java,v 1.28 2007-06-21 11:16:23 robi Exp $
+//# $Id: AnalyzerAutomataPanel.java,v 1.29 2007-07-12 19:30:33 avenir Exp $
 //###########################################################################
 
 package org.supremica.gui.ide;
@@ -107,11 +107,11 @@ public class AnalyzerAutomataPanel
                 }
             }
         });
-        
+                
         theAutomatonTable.getTableHeader().setReorderingAllowed(false);
         
         getViewport().add(theAutomatonTable);
-        
+                
         theTableSorter.addMouseListenerToHeaderInTable(theAutomatonTable);
         
         analyzerTableModel.addTableModelListener(this);
@@ -295,7 +295,6 @@ public class AnalyzerAutomataPanel
         });
         
         // --------------------------------------//
-        
     }
     
     private VisualProject getActiveProject()
@@ -427,5 +426,10 @@ public class AnalyzerAutomataPanel
     public void selectAllAutomata()
     {
         theAutomatonTable.selectAll();
+    }
+    
+    public void sortAutomataByName()
+    {
+        theTableSorter.sortByColumn(TABLE_NAME_COLUMN);
     }
 }

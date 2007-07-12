@@ -163,6 +163,16 @@ public final class AutomataIndexMap
         return automatonStateEntryToIndexMap.get(new AutomatonAndStateEntry(automaton, state));
     }
     
+    public int getStateIndex(final int automatonIndex, final State state)
+    {
+        if (automatonIndex < 0)
+        {
+            throw new IndexOutOfBoundsException("automatonIndex has to >= 0");
+        }
+        Automaton currAutomaton = getAutomatonAt(automatonIndex);
+        return getStateIndex(currAutomaton, state);
+    }
+    
     public State getStateAt(final Automaton automaton, final int stateIndex)
     {
         Args.checkForNull(automaton);
