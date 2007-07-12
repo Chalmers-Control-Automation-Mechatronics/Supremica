@@ -1746,8 +1746,7 @@ class ModelMaker
 				else
 				{
 					to =  curECDest + "_actions_1";
-				}
-								
+				}				
 				event = "one_transition_" + fbName + ";";				
 				
 				// making recursive call
@@ -1857,10 +1856,7 @@ class ModelMaker
 				
 				// make branch model
 				from = prevState;
-				if (branchOnOne)
-				{
-				}
-				else
+				if (!branchOnOne)
 				{
 					if (curECDest.equals(firstECStateName))
 					{
@@ -1922,6 +1918,10 @@ class ModelMaker
 // 		ecc.addTransition(from, to, event, null, null);
 	}
 	
+	private void makeECStateBranchOnOne(ExtendedAutomaton ecc, String fbName, String ecStateName, String prevState, List ecStates, List ecTransitions, Set visitedECStates, int nameCounter, int level)
+	{
+	}
+
 	private void makeBasicFBAlgorithms(String fbName)
 	{
 		System.out.println("\t Algorithms");
