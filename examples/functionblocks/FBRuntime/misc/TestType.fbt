@@ -24,14 +24,14 @@
         <VarDeclaration Name="invoked" Type="INT" />
     </InternalVars>
     <ECC>
-        <ECState Name="INIT" />
+        <ECState Name="INIT" >
+		    <ECAction Algorithm="PrintAlg" />
+	    </ECState>    	
         <ECState Name="STATE" >
 		    <ECAction Algorithm="TestAlg" Output="EO"/>
 	    </ECState>    	
-        <ECState Name="STATE2" />
 		<ECTransition Source="INIT" Destination="STATE" Condition="EI" />
-		<ECTransition Source="STATE" Destination="STATE2" Condition="EI" />
-		<ECTransition Source="STATE2" Destination="STATE" Condition="EI" />
+		<ECTransition Source="STATE" Destination="INIT" Condition="1" />
     </ECC>
     <Algorithm Name="TestAlg">
     <Other Language="Java" Text=

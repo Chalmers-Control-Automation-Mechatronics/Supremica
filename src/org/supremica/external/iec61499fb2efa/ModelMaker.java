@@ -1121,7 +1121,7 @@ class ModelMaker
 
 		from = "s3";
 		to = "s2";
-		event = "no_action_" + fbName + ";";
+		event = "no_more_actions_" + fbName + ";";
 		eventHandling.addTransition(from, to, event, null, null);
 
 		from = "s3";
@@ -1432,17 +1432,17 @@ class ModelMaker
 		String firstECStateName = firstECState.getName();
 		ecc.addState(firstECStateName,true);
 		System.out.println("\t\t Calling makeECStateBranch() from makeBasicFBExecutionControlChart()");
-		makeECStateBranch(ecc, fbName, firstECStateName, firstECStateName, ecStates, ecTransitions, visitedECStates, stateNameCounter, 2);
+		makeECStateBranch(ecc, fbName, firstECStateName, firstECStateName, ecStates, ecTransitions, visitedECStates, false, stateNameCounter, 2);
 
 		// TODO: check for unreached states
 
 		automata.addAutomaton(ecc);	
 	}
 
-	private void makeECStateBranch(ExtendedAutomaton ecc, String fbName, String ecStateName, String prevStateName, List ecStates, List ecTransitions, Set visitedECStates, int nameCounter, int level)
+	private void makeECStateBranch(ExtendedAutomaton ecc, String fbName, String ecStateName, String prevStateName, List ecStates, List ecTransitions, Set visitedECStates, boolean madeInitActions, int nameCounter, int level)
 	{
-		output("Entering makeECStateBranch(): ecStateName = " + ecStateName + ": prevStateName = " + prevStateName, level);
-		
+		output("Entering makeECStateBranch(): ecStateName = " + ecStateName + ": prevStateName = " + prevStateName, level);		
+
 		// temporary variables
 		String from = null;
 		String to = null;
@@ -1453,11 +1453,17 @@ class ModelMaker
 		String noTransitionTo = null;
 		String noTransitionGuard = "";
 		boolean makeNoTransition = true;
-		
+		boolean doneInitActions = madeInitActions;
+		boolean doneInitFinish = madeInitActions;
+
+		// get the first EC state (ie initial)
+		JaxbECState firstECState = (JaxbECState) ecStates.get(0);
+		String firstECStateName = firstECState.getName();
+
 		// mark the EC state as visited
 		output("Visited EC state: " + ecStateName, level);
 		visitedECStates.add(ecStateName);
-		
+
 		// get the EC state
 		JaxbECState ecState = null;
 		for (Iterator iter = ecStates.iterator();iter.hasNext();)
@@ -1497,11 +1503,17 @@ class ModelMaker
 		for (Iterator ecStateTransitionsIter = ecStateTransitions.iterator(); ecStateTransitionsIter.hasNext();)
 		{
 			JaxbECTransition curECTransition = (JaxbECTransition) ecStateTransitionsIter.next();
-			output("Analyzing EC transition: from: " + curECTransition.getSource() +
-				   ", to: " + curECTransition.getDestination() + 
-				   ", cond: " + curECTransition.getCondition(), level);
-
+			String curECSourceName = curECTransition.getSource();			
 			String curECDestName = curECTransition.getDestination();			
+			String curECCondition = curECTransition.getCondition();			
+
+			output("Analyzing EC transition: from: " + curECSourceName +
+				   ", to: " + curECDestName + ", cond: " + curECCondition, level);
+
+			boolean oneTransitionFromECSource = false;
+			boolean oneTransitionFromECDest = false;
+			String next = "";
+
 			// get the current destination EC state
 			JaxbECState curECDestState = null;
 			for (Iterator iter = ecStates.iterator();iter.hasNext();)
@@ -1518,7 +1530,8 @@ class ModelMaker
 			output("Adding state: " + to, level);
 			ecc.addState(to);
 			if (curECTransition.getCondition().equals("1"))
-			{			
+			{
+				oneTransitionFromECSource = true;
 				makeNoTransition = false;
 				event = "one_transition_" + fbName + ";";
 				guard = null;
@@ -1527,18 +1540,23 @@ class ModelMaker
 			{
 				event = "event_input_" + fbName + ";";				
 				// TODO: replace variables and operators
-				guard = "Transition Condition;";
+				guard = curECCondition + " == 1";
 				// TODO: add to gurad for no_transition event
 				noTransitionGuard = noTransitionGuard + "not(Transition Condition);";
 			}				
 			output("Adding transition: from: " + from + ", to: " + to + ", event: " + event, level);
 			// TODO: add guard
-			ecc.addTransition(from, to, event, null, null);
-			prevStateName = to;
+			ecc.addTransition(from, to, event, guard, null);
+			next = to;
 			
 			// make actions model of the destination EC state
-			if (!visitedECStates.contains(curECDestName))
+			if (!visitedECStates.contains(curECDestName) || (curECDestName.equals(firstECStateName) && !doneInitActions))
 			{
+				if (curECDestName.equals(firstECStateName))
+				{
+					doneInitActions = true;
+				}
+				output("Making actions for EC state: " + curECDestName, level);
 				List destECActions = curECDestState.getECAction(); 
 				if (destECActions.size()>0)
 				{
@@ -1550,7 +1568,7 @@ class ModelMaker
 							// get action algorithm ID
 							Integer actionAlgorithm = (Integer) ((Map) algorithms.get(fbName)).get(curAction.getAlgorithm());
 							
-							from = prevStateName;
+							from = next;
 							to = "s" + nameCounter; 
 							nameCounter++;
 							output("Adding state: " + to, level);
@@ -1559,9 +1577,9 @@ class ModelMaker
 							action = "queueing_job_" + fbName + "=" + actionAlgorithm + ";";
 							output("Adding transition: from: " + from + ", to: " + to + ", event: " + event, level);
 							ecc.addTransition(from, to, event, null, action);
-							prevStateName = to;						
+							next = to;						
 							
-							from = prevStateName;
+							from = next;
 							to = "s" + nameCounter; 
 							nameCounter++;
 							output("Adding state: " + to, level);
@@ -1569,39 +1587,39 @@ class ModelMaker
 							event = "queue_job_" + fbName + ";";
 							output("Adding transition: from " + from + ": to " + to + ": event " + event, level);
 							ecc.addTransition(from, to, event, null, null);
-							prevStateName = to;						
+							next = to;						
 							
 							if (curAction.isSetOutput())
 							{
-								from = prevStateName;
+								from = next;
 								to = "s" + nameCounter; 
-							nameCounter++;
-							output("Adding state: " + to, level);
-							ecc.addState(to);
-							event = "finished_job_" + fbName + ";";							
-							// get connection data for the action
-							String cntName = (String) ((Map) eventConnections.get(fbName)).get(curAction.getOutput());
-							String cntFB = getInstanceName(cntName);
-							String cntSignal = getSignalName(cntName);
-							Integer cntSignalID = (Integer) ((Map) events.get(cntFB)).get(cntSignal);
-							action = "receiveing_event_" + cntFB + "=" + cntSignalID + ";";						
-							output("Adding transition: from: " + from + ", to: " + to + ", event: " + event, level);
-							ecc.addTransition(from, to, event, null, action);
-							prevStateName = to;						
-							
-							from = prevStateName;
-							to = "s" + nameCounter; 
-							nameCounter++;
-							output("Adding state: " + to, level);
-							ecc.addState(to);
-							event = "receive_event_" + cntFB + ";";
-							output("Adding transition: from: " + from + ", to: " + to + ", event: " + event, level);
-							ecc.addTransition(from, to, event, null, null);
-							prevStateName = to;						
+								nameCounter++;
+								output("Adding state: " + to, level);
+								ecc.addState(to);
+								event = "finished_job_" + fbName + ";";							
+								// get connection data for the action
+								String cntName = (String) ((Map) eventConnections.get(fbName)).get(curAction.getOutput());
+								String cntFB = getInstanceName(cntName);
+								String cntSignal = getSignalName(cntName);
+								Integer cntSignalID = (Integer) ((Map) events.get(cntFB)).get(cntSignal);
+								action = "receiveing_event_" + cntFB + "=" + cntSignalID + ";";						
+								output("Adding transition: from: " + from + ", to: " + to + ", event: " + event, level);
+								ecc.addTransition(from, to, event, null, action);
+								next = to;						
+								
+								from = next;
+								to = "s" + nameCounter; 
+								nameCounter++;
+								output("Adding state: " + to, level);
+								ecc.addState(to);
+								event = "receive_event_" + cntFB + ";";
+								output("Adding transition: from: " + from + ", to: " + to + ", event: " + event, level);
+								ecc.addTransition(from, to, event, null, null);
+								next = to;						
 							}
 							else
 							{
-								from = prevStateName;
+								from = next;
 								to = "s" + nameCounter; 
 								nameCounter++;
 								output("Adding state: " + to, level);
@@ -1609,12 +1627,12 @@ class ModelMaker
 								event = "finished_job_" + fbName + ";";
 								output("Adding transition: from: " + from + ", to: " + to + ", event: " + event, level);
 								ecc.addTransition(from, to, event, null, null);
-								prevStateName = to;						
+								next = to;						
 							}
 						}
 						else if (curAction.isSetOutput())
 						{
-							from = prevStateName;
+							from = next;
 							to = "s" + nameCounter; 
 							nameCounter++;
 							output("Adding state: " + to, level);
@@ -1628,9 +1646,9 @@ class ModelMaker
 							action = "receiveing_event_" + cntFB + "=" + cntSignalID + ";";						
 							output("Adding transition: from: " + from + ", to: " + to + ", event: " + event, level);
 							ecc.addTransition(from, to, event, null, action);
-							prevStateName = to;						
+							next = to;						
 							
-							from = prevStateName;
+							from = next;
 							to = "s" + nameCounter; 
 							nameCounter++;
 							output("Adding state: " + to, level);
@@ -1638,14 +1656,13 @@ class ModelMaker
 							event = "receive_event_" + cntFB + ";";
 							output("Adding transition: from: " + from + ", to: " + to + ", event: " + event, level);
 							ecc.addTransition(from, to, event, null, null);
-							prevStateName = to;						
+							next = to;						
 						}
 					}
 				}
 			}
 			
 			// find if there is any transition on "1" from curECDestState
-			boolean oneTransitionFromECDest = false;
 			for (Iterator ecTransitionsIter = ecTransitions.iterator(); ecTransitionsIter.hasNext();)
 			{
 				JaxbECTransition tempECTransition = (JaxbECTransition) ecTransitionsIter.next();
@@ -1658,32 +1675,42 @@ class ModelMaker
 				}
 			}
 
+			// one transition loop warning
+			if (oneTransitionFromECSource && oneTransitionFromECDest)
+			{
+				output("Warning!: Loop with \"1\" transitions found. This gives a live lock in the application!!", level);
+				output("\t Check EC states: " + curECSourceName + " and " + curECDestName, level);
+			}
+
 			if (oneTransitionFromECDest)
 			{
 				if (!visitedECStates.contains(curECDestName))
-				{
+				{	
 					// no_action model transition
-					from = prevStateName;
+					from = next;
 					to = curECDestName; 
 					output("Adding state: " + to, level);
 					ecc.addState(to);
-					event = "no_action_" + fbName + ";";
+					event = "no_more_actions_" + fbName + ";";
 					output("Adding transition: from: " + from + ", to: " + to + ", event: " + event, level);
 					ecc.addTransition(from, to, event, null, null);
-					prevStateName = to;				
+					next = to;				
 					
 					output("Calling makeECStateBranch() from makeECStateBranch()", level);
-					makeECStateBranch(ecc, fbName, curECDestName, to, ecStates, ecTransitions, visitedECStates, nameCounter, level + 1);
+					makeECStateBranch(ecc, fbName, curECDestName, to, ecStates, ecTransitions, visitedECStates, doneInitActions, nameCounter, level + 1);
 				}
-				else
-				{					
-					// no_action model transition to existing model state					
-					from = prevStateName;
+				else if (curECDestName.equals(firstECStateName)  && !doneInitFinish)
+				{
+					doneInitFinish = true;
+					// no_action model transition
+					from = next;
 					to = curECDestName; 
-					event = "no_action_" + fbName + ";";
+					output("Adding state: " + to, level);
+					ecc.addState(to);
+					event = "no_more_actions_" + fbName + ";";
 					output("Adding transition: from: " + from + ", to: " + to + ", event: " + event, level);
 					ecc.addTransition(from, to, event, null, null);
-					prevStateName = to;				
+					next = to;				
 				}
 			}
 			else
@@ -1691,18 +1718,18 @@ class ModelMaker
 				if (!visitedECStates.contains(curECDestName))
 				{
 					// no_action model transition
-					from = prevStateName;
+					from = next;
 					to = "s" + nameCounter;
 					nameCounter++;
 					output("Adding state: " + to, level);
 					ecc.addState(to);
-					event = "no_action_" + fbName + ";";
+					event = "no_more_actions_" + fbName + ";";
 					output("Adding transition: from: " + from + ", to: " + to + ", event: " + event, level);
 					ecc.addTransition(from, to, event, null, null);
-					prevStateName = to;				
+					next = to;				
 					
 					// make update_ECC model transition					
-					from = prevStateName;
+					from = next;
 					to = "s" + nameCounter;
 					nameCounter++;
 					output("Adding state: " + to, level);
@@ -1710,20 +1737,55 @@ class ModelMaker
 					event = "update_ECC_" + fbName + ";";
 					output("Adding transition: from: " + from + ", to: " + to + ", event: " + event, level);
 					ecc.addTransition(from, to, event, null, null);
-					prevStateName = to;
+					next = to;
 					
 					// handling_event_done model transition
-					from = prevStateName;
+					from = next;
 					to = curECDestName;
 					output("Adding state: " + to, level);
 					ecc.addState(to);
 					event = "handling_event_done_" + fbName + ";";
 					output("Adding transition: from: " + from + ", to: " + to + ", event: " + event, level);
 					ecc.addTransition(from, to, event, null, null);
-					prevStateName = to;				
+					next = to;				
 					
 					output("Calling makeECStateBranch() from makeECStateBranch()", level);
-					makeECStateBranch(ecc, fbName, curECDestName, prevStateName, ecStates, ecTransitions, visitedECStates, nameCounter, level + 1);
+					makeECStateBranch(ecc, fbName, curECDestName, next, ecStates, ecTransitions, visitedECStates, doneInitActions, nameCounter, level + 1);
+				}
+				else if (curECDestName.equals(firstECStateName) && !doneInitFinish)
+				{
+					doneInitFinish = true;
+					// no_action model transition
+					from = next;
+					to = "s" + nameCounter;
+					nameCounter++;
+					output("Adding state: " + to, level);
+					ecc.addState(to);
+					event = "no_more_actions_" + fbName + ";";
+					output("Adding transition: from: " + from + ", to: " + to + ", event: " + event, level);
+					ecc.addTransition(from, to, event, null, null);
+					next = to;				
+					
+					// make update_ECC model transition					
+					from = next;
+					to = "s" + nameCounter;
+					nameCounter++;
+					output("Adding state: " + to, level);
+					ecc.addState(to);
+					event = "update_ECC_" + fbName + ";";
+					output("Adding transition: from: " + from + ", to: " + to + ", event: " + event, level);
+					ecc.addTransition(from, to, event, null, null);
+					next = to;
+					
+					// handling_event_done model transition
+					from = next;
+					to = curECDestName;
+					output("Adding state: " + to, level);
+					ecc.addState(to);
+					event = "handling_event_done_" + fbName + ";";
+					output("Adding transition: from: " + from + ", to: " + to + ", event: " + event, level);
+					ecc.addTransition(from, to, event, null, null);
+					next = to;				
 				}
 			}
 		}
