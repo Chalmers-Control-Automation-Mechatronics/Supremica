@@ -25,7 +25,7 @@
     </InternalVars>
     <ECC>
         <ECState Name="INIT" >
-		    <ECAction Algorithm="PrintAlg" />
+		    <ECAction Algorithm="TestAlg" />
 	    </ECState>    	
         <ECState Name="STATE" >
 		    <ECAction Algorithm="TestAlg" Output="EO"/>

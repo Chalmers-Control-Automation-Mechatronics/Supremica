@@ -1545,7 +1545,6 @@ class ModelMaker
 				noTransitionGuard = noTransitionGuard + "not(Transition Condition);";
 			}				
 			output("Adding transition: from: " + from + ", to: " + to + ", event: " + event, level);
-			// TODO: add guard
 			ecc.addTransition(from, to, event, guard, null);
 			next = to;
 			
