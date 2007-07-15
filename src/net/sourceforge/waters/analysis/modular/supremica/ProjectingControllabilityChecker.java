@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.analysis.modular
 //# CLASS:   ProjectingControllabilityChecker
 //###########################################################################
-//# $Id: ProjectingControllabilityChecker.java,v 1.15 2007-07-12 05:18:30 siw4 Exp $
+//# $Id: ProjectingControllabilityChecker.java,v 1.16 2007-07-15 22:08:15 siw4 Exp $
 //###########################################################################
 
 
@@ -213,7 +213,7 @@ public class ProjectingControllabilityChecker
   public boolean run()
     throws AnalysisException
   {
-    return run1();
+    return run2();
   }
   
   public boolean run1()
@@ -772,7 +772,7 @@ public class ProjectingControllabilityChecker
   private ModularHeuristic mHeuristic;
   private KindTranslator mTranslator;
   private int mStates;
-  private int mMaxProjStates = 1000;
+  private int mMaxProjStates = 100000;
   private final boolean mLeast;
   private Map<AutomataHidden, AutomatonProxy> mMinAutMap = new HashMap<AutomataHidden, AutomatonProxy>();
   

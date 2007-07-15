@@ -167,7 +167,15 @@ public class Projection
                                                           ev, states.values(), trans);
     states = null;
     trans = null;
-    System.out.println(result.getStates().size());
+    System.out.println("Project:" + result.getStates().size());
+    //System.out.println("orig:\n" + result);
+    try {
+      Minimizer min = new Minimizer(result, mFactory);
+      result = min.run();
+    } catch (Throwable t) {
+      t.printStackTrace();
+    }
+    //System.out.println("new:\n" + result);
     return result;
   }
   
@@ -341,8 +349,8 @@ public class Projection
     public boolean refequals(NamedProxy o)
     {
       if (o instanceof MemStateProxy) {
-	final MemStateProxy s = (MemStateProxy) o;
-	return s.mName == mName;
+        final MemStateProxy s = (MemStateProxy) o;
+        return s.mName == mName;
       } else {
         return false;
       }
@@ -368,14 +376,13 @@ public class Projection
     public boolean equalsByContents(final Proxy partner)
     {
       if (partner != null &&
-	  partner.getProxyInterface() == getProxyInterface()) {
-	final StateProxy state = (StateProxy) partner;
-	return
-	  (getName().equals(state.getName())) &&
-	  (isInitial() == state.isInitial()) &&
-	  state.getPropositions().isEmpty();
+          partner.getProxyInterface() == getProxyInterface()) {
+        final StateProxy state = (StateProxy) partner;
+        return (getName().equals(state.getName())) &&
+               (isInitial() == state.isInitial()) &&
+               state.getPropositions().isEmpty();
       } else {
-	return false;
+        return false;
       }
     }
     
