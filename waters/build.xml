@@ -65,7 +65,7 @@
     <pathelement location="${waters.jar}"/>
     <pathelement location="${test.jar}"/>
     <pathelement location="${junit.jar}"/>
-    <pathelement location="${supremica.lib}/log4j.jar/>
+    <pathelement location="${supremica.lib}/log4j.jar"/>
   </path>
 
   <pathconvert property="waters.library.path" targetos="unix">
