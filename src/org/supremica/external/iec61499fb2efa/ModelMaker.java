@@ -1018,11 +1018,11 @@ class ModelMaker
 				{
 					String algName = (String) algIter.next();
 					Integer algID = (Integer) algorithmMap.get(algName);
-					String event = "execute_" + instanceName + "_" + algName + ";";
+					String event = "execute_" + algName + "_" + instanceName + ";";
 					String guard = "current_job_fb == " + instanceID;
 					guard = guard + " & current_job_alg == " + algID;
 					algorithmExecution.addTransition("s1", "s2", event, guard, null);
-					event = "finished_execution_" + instanceName + "_" + algName + ";";
+					event = "finished_execution_" + algName + "_" + instanceName + ";";
 					algorithmExecution.addTransition("s2", "s0", event, null, null);
 				}
 			}
@@ -1434,8 +1434,6 @@ class ModelMaker
 		ecc.addState(firstECStateName,true);
 		System.out.println("\t\t Calling makeECStateBranch() from makeBasicFBExecutionControlChart()");
 		makeECStateBranch(ecc, fbName, firstECStateName, firstECStateName, ecStates, ecTransitions, visitedECStates, false, stateNameCounter, 2);
-
-		// TODO: check for unreached states
 
 		automata.addAutomaton(ecc);	
 	}
@@ -1877,7 +1875,6 @@ class ModelMaker
 		}
 
 		// make no_transition event and guard
-		// TODO: add guard
 		if (makeNoTransition)
 		{
 			from = noTransitionFrom;
@@ -1892,8 +1889,113 @@ class ModelMaker
 	{
 		System.out.println("\t Algorithms");
 		
+		String typeName = (String) basicFunctionBlocks.get(fbName);
+		JaxbFBType theType = (JaxbFBType) fbTypes.get(typeName);
+		List algorithms = theType.getBasicFB().getAlgorithm();
+		// get the variables
+		List inputVars = null;
+		List outputVars = null;
+		List internalVars = null;
+		if (theType.getInterfaceList().isSetInputVars())
+		{
+			inputVars = theType.getInterfaceList().getInputVars().getVarDeclaration();
+		}		
+		if (theType.getInterfaceList().isSetOutputVars())
+		{
+			outputVars = theType.getInterfaceList().getOutputVars().getVarDeclaration();
+		}
+		if (theType.getBasicFB().isSetInternalVars())
+		{
+			internalVars = theType.getBasicFB().getInternalVars().getVarDeclaration();
+		}
 
+		// temporary variables
+		String from = null;
+		String to = null;
+		String event = null;
+		String action = null;
+
+		// for all algorithms
+		for (Iterator algIter = algorithms.iterator(); algIter.hasNext();)
+		{
+			JaxbAlgorithm curAlg = (JaxbAlgorithm) algIter.next();
+			String algName = curAlg.getName();
+			String algLang = curAlg.getOther().getLanguage();
+			String algText = curAlg.getOther().getText();
+			String[] algTextLines = algText.split(";");
+			ExtendedAutomaton curAlgModel = new ExtendedAutomaton("Algorithm " + algName + " " + fbName, automata);
+			int nameCounter = 0;
+
+			from = "s" + nameCounter;
+			curAlgModel.addState(from, true);
+			nameCounter++;	
+			to = "s" + nameCounter;
+			curAlgModel.addState(to);
+			nameCounter++;
+			event = "execute_" + algName + "_" + fbName + ";";
+			curAlgModel.addTransition(from, to, event, null, null);
+			from = to;
+
+			// for all lines in the algorithm text
+			for (int i = 0; i < algTextLines.length; i++)
+			{
+				String statement = algTextLines[i];
+				output("Making statement: " + statement, 2);
+
+				to = "s" + nameCounter;
+				curAlgModel.addState(to);
+				nameCounter++;
+				event = "statement_" + (i+1) + "_" + fbName + "_" + algName + ";";
+				action = statement;
+				// replace input vars variables 
+				if (inputVars != null)
+				{
+					for (Iterator iter = inputVars.iterator();iter.hasNext();)
+					{
+						VarDeclaration curVar = (VarDeclaration) iter.next();
+						String curVarName = curVar.getName();
+						action = action.replaceAll(curVarName, "data_" + curVarName + "_" + fbName);
+					}
+				}
+				// replace output vars variables 
+				if (outputVars != null)
+				{
+					for (Iterator iter = outputVars.iterator();iter.hasNext();)
+					{
+						VarDeclaration curVar = (VarDeclaration) iter.next();
+						String curVarName = curVar.getName();
+						action = action.replaceAll(curVarName, "data_" + curVarName + "_" + fbName);
+					}
+				}
+				// replace internal vares
+				if (internalVars != null)
+				{
+					for (Iterator iter = internalVars.iterator();iter.hasNext();)
+					{
+						VarDeclaration curVar = (VarDeclaration) iter.next();
+						String curVarName = curVar.getName();
+						action = action.replaceAll(curVarName, "internal_" + curVarName + "_" + fbName);
+					}
+				}
+				// replace operators
+				action = action.replaceAll("AND", "&");
+				action = action.replaceAll("OR", "|");
+				action = action.replaceAll("NOT", "!");
+				action = action.replaceAll("MOD", "%");		
+				action = action + ";";
+
+				output("Made model action: " + action, 2);
+				// make model transition
+				curAlgModel.addTransition(from, to, event, null, action);
+				from = to;
+			}
 			
+			to = "s0";
+			event = "finished_execution_" + algName + "_" + fbName + ";";
+			curAlgModel.addTransition(from, to, event, null, null);
+
+			automata.addAutomaton(curAlgModel);	
+		}
 	}
 
 
