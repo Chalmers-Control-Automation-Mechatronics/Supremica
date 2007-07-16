@@ -20,6 +20,7 @@
 /*
  * @author Goran Cengic (cengic@chalmers.se)
  */
+
 package org.supremica.external.iec61499fb2efa;
 
 import java.io.File;
@@ -958,8 +959,8 @@ class ModelMaker
 		{
 			jobQueue.addIntegerVariable("job_fb_place_" + i, 0, fbMaxID, 0, null);
 			jobQueue.addIntegerVariable("job_alg_place_" + i, 0, algMaxID, 0, null);
-
-			jobQueue.addState("s" + i);
+	
+		jobQueue.addState("s" + i);
 			//Transiton when queuing job
 			String from = "s" + (i-1);
 			String to = "s" + i;
@@ -1451,10 +1452,30 @@ class ModelMaker
 		String action = null;		
 		String noTransitionFrom = null;
 		String noTransitionTo = null;
-		String noTransitionGuard = "";
+		String noTransitionGuard = null;
 		boolean makeNoTransition = true;
 		boolean doneInitActions = madeInitActions;
 		boolean doneInitFinish = madeInitActions;
+
+		// get the FB type and all the variables
+		JaxbFBType fbType = (JaxbFBType) fbTypes.get((String) basicFunctionBlocks.get(fbName));
+		List eventInputs = fbType.getInterfaceList().getEventInputs().getEvent();
+		List eventOutputs = fbType.getInterfaceList().getEventOutputs().getEvent();
+		List inputVars = null;
+		List outputVars = null;
+		List internalVars = null;
+		if (fbType.getInterfaceList().isSetInputVars())
+		{
+			inputVars = fbType.getInterfaceList().getInputVars().getVarDeclaration();
+		}		
+		if (fbType.getInterfaceList().isSetOutputVars())
+		{
+			outputVars = fbType.getInterfaceList().getOutputVars().getVarDeclaration();
+		}
+		if (fbType.getBasicFB().isSetInternalVars())
+		{
+			internalVars = fbType.getBasicFB().getInternalVars().getVarDeclaration();
+		}
 
 		// get the first EC state (ie initial)
 		JaxbECState firstECState = (JaxbECState) ecStates.get(0);
@@ -1510,6 +1531,7 @@ class ModelMaker
 			output("Analyzing EC transition: from: " + curECSourceName +
 				   ", to: " + curECDestName + ", cond: " + curECCondition, level);
 
+			// loop temporary vars
 			boolean oneTransitionFromECSource = false;
 			boolean oneTransitionFromECDest = false;
 			String next = "";
@@ -1525,6 +1547,7 @@ class ModelMaker
 				}
 			}
 
+			// make model transition for the current EC transition
 			from = prevStateName;
 			to =  curECDestName + "_actions";
 			output("Adding state: " + to, level);
@@ -1535,17 +1558,81 @@ class ModelMaker
 				makeNoTransition = false;
 				event = "one_transition_" + fbName + ";";
 				guard = null;
+				action = null;
 			}
 			else
-			{
+			{				
 				event = "event_input_" + fbName + ";";				
-				// TODO: replace variables and operators
-				guard = curECCondition + " == 1";
-				// TODO: add to gurad for no_transition event
-				noTransitionGuard = noTransitionGuard + "not(Transition Condition);";
-			}				
+				guard = curECCondition;
+				action = null;
+				// replace input events
+				for (Iterator iter = eventInputs.iterator();iter.hasNext();)
+				{
+					JaxbEvent curEventInput = (JaxbEvent) iter.next();
+					String curEventInputName = curEventInput.getName();
+					if (curECCondition.contains(curEventInputName))
+					{
+						guard = guard.replaceAll(curEventInputName, "event_" + curEventInputName + "_" + fbName + " = 1");
+						if (action == null)
+						{
+							action = "event_" + curEventInputName + "_" + fbName + " = 0;";					
+						}
+						else
+						{
+							action = action + "event_" + curEventInputName + "_" + fbName + " = 0;";					
+						}
+					}
+				}
+				// replace input vars variables 
+				if (inputVars != null)
+				{
+					for (Iterator iter = inputVars.iterator();iter.hasNext();)
+					{
+						VarDeclaration curVar = (VarDeclaration) iter.next();
+						String curVarName = curVar.getName();
+						guard = guard.replaceAll(curVarName, "data_" + curVarName + "_" + fbName);
+					}
+				}
+				// replace output vars variables 
+				if (outputVars != null)
+				{
+					for (Iterator iter = outputVars.iterator();iter.hasNext();)
+					{
+						VarDeclaration curVar = (VarDeclaration) iter.next();
+						String curVarName = curVar.getName();
+						guard = guard.replaceAll(curVarName, "data_" + curVarName + "_" + fbName);
+					}
+				}
+				// replace internal vares
+				if (internalVars != null)
+				{
+					for (Iterator iter = internalVars.iterator();iter.hasNext();)
+					{
+						VarDeclaration curVar = (VarDeclaration) iter.next();
+						String curVarName = curVar.getName();
+						guard = guard.replaceAll(curVarName, "internal_" + curVarName + "_" + fbName);
+					}
+				}
+				// replace operators
+				guard = guard.replaceAll("AND", "&");
+				guard = guard.replaceAll("OR", "|");
+				guard = guard.replaceAll("NOT", "!");
+				guard = guard.replaceAll("=", "==");
+				guard = guard.replaceAll("<>", "!=");
+				guard = guard.replaceAll("MOD", "%");				
+
+				// add to gurad for no_transition event
+				if (noTransitionGuard == null)
+				{
+					noTransitionGuard = "!(" + guard + ")";
+				}
+				else
+				{
+					noTransitionGuard = noTransitionGuard + " | !(" + guard + ")";
+				}
+			}	
 			output("Adding transition: from: " + from + ", to: " + to + ", event: " + event, level);
-			ecc.addTransition(from, to, event, guard, null);
+			ecc.addTransition(from, to, event, guard, action);
 			next = to;
 			
 			// make actions model of the destination EC state
@@ -1797,7 +1884,7 @@ class ModelMaker
 			to = noTransitionTo;
 			event = "no_transition_" + fbName + ";";
 			output("Adding transition: from: " + from + ", to: " + to + ", event: " + event, level);
-			ecc.addTransition(from, to, event, null, null);
+			ecc.addTransition(from, to, event, noTransitionGuard, null);
 		}
 	}
 	
