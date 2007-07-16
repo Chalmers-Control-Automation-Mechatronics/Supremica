@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.gui.ide
 //# CLASS:   AnalyzerPanel
 //###########################################################################
-//# $Id: AnalyzerPanel.java,v 1.34 2007-07-12 19:30:33 avenir Exp $
+//# $Id: AnalyzerPanel.java,v 1.35 2007-07-16 11:34:32 flordal Exp $
 //###########################################################################
 
 package org.supremica.gui.ide;
@@ -137,8 +137,7 @@ public class AnalyzerPanel
                 ex.printStackTrace();
                 return false;
             }
-            mVisualProject.clear();
-            mVisualProject.addAutomata(supremicaProject);
+            addProject(supremicaProject);
             mVisualProject.updated();
             
             /*

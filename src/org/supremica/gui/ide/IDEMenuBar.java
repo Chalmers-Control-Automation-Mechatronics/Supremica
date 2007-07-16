@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.gui.ide
 //# CLASS:   IDEMenuBar
 //###########################################################################
-//# $Id: IDEMenuBar.java,v 1.48 2007-06-29 18:03:25 robi Exp $
+//# $Id: IDEMenuBar.java,v 1.49 2007-07-16 11:34:33 flordal Exp $
 //###########################################################################
 
 package org.supremica.gui.ide;
@@ -78,8 +78,7 @@ public class IDEMenuBar
             }
         }
     }
-    
-    
+        
     //#######################################################################
     //# Constructor
     public IDEMenuBar(IDE ide)

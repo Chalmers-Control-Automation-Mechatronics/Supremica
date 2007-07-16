@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.gui.ide
 //# CLASS:   EditorPanel
 //###########################################################################
-//# $Id: EditorPanel.java,v 1.60 2007-06-26 05:46:55 robi Exp $
+//# $Id: EditorPanel.java,v 1.61 2007-07-16 11:34:32 flordal Exp $
 //###########################################################################
 
 
@@ -133,7 +133,6 @@ public class EditorPanel
         final EditorPanel editorPanel = mModuleContainer.getEditorPanel();
         editorPanel.setRightComponent(commentPanel);
     }
-
 
     //######################################################################
     //#

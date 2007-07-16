@@ -54,67 +54,75 @@ import java.awt.*;
 import javax.swing.*;
 import org.supremica.automata.Automata;
 import org.supremica.automata.AutomataIndexFormHelper;
+import org.supremica.properties.Config;
 
 public class AutomataStateDisplayer
-	extends JPanel
+        extends JPanel
 {
-	private AutomataStateViewer stateViewer;
-	private Automata theAutomata;
-	private JCheckBox isInitialBox = new JCheckBox("initial");
-	private JCheckBox isAcceptingBox = new JCheckBox("accepting");
-	private JCheckBox isForbiddenBox = new JCheckBox("forbidden");
-	private JLabel stateCost = new JLabel();
-	private JLabel stateId = new JLabel();
-	private JLabel stateName = new JLabel();
-	private AutomataSynchronizerHelper helper;
-
-	public AutomataStateDisplayer(AutomataStateViewer stateViewer, AutomataSynchronizerHelper helper)
-	{
-		setLayout(new BorderLayout());
-
-		this.stateViewer = stateViewer;
-		this.theAutomata = helper.getAutomata();
-		this.helper = helper;
-
-		JLabel header = new JLabel("Current composite state");
-
-		add(header, BorderLayout.NORTH);
-
-		Box statusBox = new Box(BoxLayout.Y_AXIS);
-
-		isInitialBox.setEnabled(false);
-		isInitialBox.setBackground(Color.white);
-		statusBox.add(isInitialBox);
-		isAcceptingBox.setEnabled(false);
-		isAcceptingBox.setBackground(Color.white);
-		statusBox.add(isAcceptingBox);
-		isForbiddenBox.setEnabled(false);
-		isForbiddenBox.setBackground(Color.white);
-		statusBox.add(isForbiddenBox);
-		statusBox.add(stateCost);
-		statusBox.add(stateId);
-		statusBox.add(stateName);
-
-		JScrollPane boxScroller = new JScrollPane(statusBox);
-
-		add(boxScroller, BorderLayout.CENTER);
-
-		JViewport vp = boxScroller.getViewport();
-
-		vp.setBackground(Color.white);
-	}
-
-	public void setCurrState(int[] currState)
-	{
-		helper.addStatus(currState);
-
-		if (!helper.getCoExecuter().isControllable())
-		{
-			helper.setForbidden(currState, true);
-		}
-
-		isInitialBox.setSelected(AutomataIndexFormHelper.isInitial(currState));
-		isAcceptingBox.setSelected(AutomataIndexFormHelper.isAccepting(currState));
-		isForbiddenBox.setSelected(AutomataIndexFormHelper.isForbidden(currState));
-	}
+    private AutomataStateViewer stateViewer;
+    private Automata theAutomata;
+    private JCheckBox isInitialBox = new JCheckBox("initial");
+    private JCheckBox isAcceptingBox = new JCheckBox("accepting");
+    private JCheckBox isForbiddenBox = new JCheckBox("forbidden");
+    private JLabel stateCost = new JLabel();
+    private JLabel stateId = new JLabel();
+    private JLabel stateName = new JLabel();
+    private AutomataSynchronizerHelper helper;
+    
+    public AutomataStateDisplayer(AutomataStateViewer stateViewer, AutomataSynchronizerHelper helper)
+    {
+        setLayout(new BorderLayout());
+        
+        this.stateViewer = stateViewer;
+        this.theAutomata = helper.getAutomata();
+        this.helper = helper;
+        
+        JLabel header = new JLabel("Current composite state");
+        
+        add(header, BorderLayout.NORTH);
+        
+        Box statusBox = new Box(BoxLayout.Y_AXIS);
+        
+        isInitialBox.setEnabled(false);
+        isInitialBox.setBackground(Color.white);
+        statusBox.add(isInitialBox);
+        isAcceptingBox.setEnabled(false);
+        isAcceptingBox.setBackground(Color.white);
+        statusBox.add(isAcceptingBox);
+        isForbiddenBox.setEnabled(false);
+        isForbiddenBox.setBackground(Color.white);
+        statusBox.add(isForbiddenBox);
+        statusBox.add(stateCost);
+        statusBox.add(stateId);
+        statusBox.add(stateName);
+        
+        JScrollPane boxScroller = new JScrollPane(statusBox);
+        
+        add(boxScroller, BorderLayout.CENTER);
+        
+        JViewport vp = boxScroller.getViewport();
+        
+        vp.setBackground(Color.white);
+    }
+    
+    public void setCurrState(int[] currState)
+    {
+        helper.addStatus(currState);
+        
+        if (!helper.getCoExecuter().isControllable())
+            helper.setForbidden(currState, true);
+        
+        isInitialBox.setSelected(AutomataIndexFormHelper.isInitial(currState));
+        isAcceptingBox.setSelected(AutomataIndexFormHelper.isAccepting(currState));
+        isForbiddenBox.setSelected(AutomataIndexFormHelper.isForbidden(currState));
+        
+        StringBuffer stateNameBuffer = new StringBuffer();
+        stateNameBuffer.append(helper.getIndexMap().getStateAt(0,currState[0]).getName());
+        for (int i=1; i<helper.getAutomata().size(); i++)
+        {
+            stateNameBuffer.append(Config.GENERAL_STATE_SEPARATOR.get());
+            stateNameBuffer.append(helper.getIndexMap().getStateAt(i,currState[i]).getName());
+        }
+        stateName.setText(stateNameBuffer.toString());
+    }
 }

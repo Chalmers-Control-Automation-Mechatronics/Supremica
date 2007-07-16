@@ -56,117 +56,117 @@ import java.util.*;
 import org.supremica.automata.Automata;
 
 public class AutomataStateViewer
-	extends JPanel
+        extends JPanel
 {
-	private Automata theAutomata;
-	private AutomataSynchronizerHelper helper;
-	private int[] currState;
-	private AutomataEventList forwardEvents;
-	private AutomataEventList backwardEvents;
-	private AutomataExplorerController controller;
-	private AutomataStateDisplayer stateDisplayer;
-	private JSplitPane eventSplitter;
-	private JSplitPane stateEventSplitter;
-	private LinkedList prevStates = new LinkedList();
-	private LinkedList nextStates = new LinkedList();
-
-	public AutomataStateViewer(AutomataSynchronizerHelper helper)
-	{
-		setLayout(new BorderLayout());
-
-		theAutomata = helper.getAutomata();
-		this.helper = helper;
-		forwardEvents = new AutomataEventList(this, helper, true);
-		backwardEvents = new AutomataEventList(this, helper, false);
-		eventSplitter = new JSplitPane(JSplitPane.VERTICAL_SPLIT, forwardEvents, backwardEvents);
-		stateDisplayer = new AutomataStateDisplayer(this, helper);
-		stateEventSplitter = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, stateDisplayer, eventSplitter);
-
-		add(stateEventSplitter, BorderLayout.CENTER);
-	}
-
-	public void initialize()
-	{
-		eventSplitter.setDividerLocation(0.5);
-		stateEventSplitter.setDividerLocation(0.6);
-	}
-
-	public void setCurrState(int[] newState)
-	{
-		setCurrState(newState, false);
-	}
-
-	private void setCurrState(int[] newState, boolean isUndo)
-	{
-		if (!isUndo)
-		{
-			if (currState != null)
-			{
-				prevStates.addLast(currState);
-			}
-
-			nextStates.clear();
-		}
-
-		currState = newState;
-
-		update();
-	}
-
-	public void goToInitialState()
-	{
-		prevStates.clear();
-
-		currState = null;
-
-		helper.getCoExecuter().setCurrState(AutomataExplorerHelper.getInitialState());
-		setCurrState(AutomataExplorerHelper.getInitialState(), false);
-	}
-
-	public void undoState()
-	{
-		if (prevStates.size() > 0)
-		{
-			int[] newState = (int[]) prevStates.removeLast();
-
-			nextStates.addFirst(currState);
-			setCurrState(newState, true);
-		}
-	}
-
-	public boolean undoEnabled()
-	{
-		return prevStates.size() > 0;
-	}
-
-	public void redoState()
-	{
-		if (nextStates.size() > 0)
-		{
-			int[] newState = (int[]) nextStates.removeFirst();
-
-			prevStates.addLast(currState);
-			setCurrState(newState, true);
-		}
-	}
-
-	public boolean redoEnabled()
-	{
-		return nextStates.size() > 0;
-	}
-
-	public void update()
-	{
-		// The order of theese are changed, for states to be properly
-		// forbidden...
-		forwardEvents.setCurrState(currState);
-		backwardEvents.setCurrState(currState);
-		stateDisplayer.setCurrState(currState);
-		controller.update();
-	}
-
-	public void setController(AutomataExplorerController controller)
-	{
-		this.controller = controller;
-	}
+    private Automata theAutomata;
+    private AutomataSynchronizerHelper helper;
+    private int[] currState;
+    private AutomataEventList forwardEvents;
+    private AutomataEventList backwardEvents;
+    private AutomataExplorerController controller;
+    private AutomataStateDisplayer stateDisplayer;
+    private JSplitPane eventSplitter;
+    private JSplitPane stateEventSplitter;
+    private LinkedList prevStates = new LinkedList();
+    private LinkedList nextStates = new LinkedList();
+    
+    public AutomataStateViewer(AutomataSynchronizerHelper helper)
+    {
+        setLayout(new BorderLayout());
+        
+        theAutomata = helper.getAutomata();
+        this.helper = helper;
+        forwardEvents = new AutomataEventList(this, helper, true);
+        //backwardEvents = new AutomataEventList(this, helper, false);
+        eventSplitter = new JSplitPane(JSplitPane.VERTICAL_SPLIT, forwardEvents, backwardEvents);
+        stateDisplayer = new AutomataStateDisplayer(this, helper);
+        stateEventSplitter = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, stateDisplayer, eventSplitter);
+        
+        add(stateEventSplitter, BorderLayout.CENTER);
+    }
+    
+    public void initialize()
+    {
+        eventSplitter.setDividerLocation(0.5);
+        stateEventSplitter.setDividerLocation(0.6);
+    }
+    
+    public void setCurrState(int[] newState)
+    {
+        setCurrState(newState, false);
+    }
+    
+    private void setCurrState(int[] newState, boolean isUndo)
+    {
+        if (!isUndo)
+        {
+            if (currState != null)
+            {
+                prevStates.addLast(currState);
+            }
+            
+            nextStates.clear();
+        }
+        
+        currState = newState;
+        
+        update();
+    }
+    
+    public void goToInitialState()
+    {
+        prevStates.clear();
+        
+        currState = null;
+        
+        helper.getCoExecuter().setCurrState(AutomataExplorerHelper.getInitialState());
+        setCurrState(AutomataExplorerHelper.getInitialState(), false);
+    }
+    
+    public void undoState()
+    {
+        if (prevStates.size() > 0)
+        {
+            int[] newState = (int[]) prevStates.removeLast();
+            
+            nextStates.addFirst(currState);
+            setCurrState(newState, true);
+        }
+    }
+    
+    public boolean undoEnabled()
+    {
+        return prevStates.size() > 0;
+    }
+    
+    public void redoState()
+    {
+        if (nextStates.size() > 0)
+        {
+            int[] newState = (int[]) nextStates.removeFirst();
+            
+            prevStates.addLast(currState);
+            setCurrState(newState, true);
+        }
+    }
+    
+    public boolean redoEnabled()
+    {
+        return nextStates.size() > 0;
+    }
+    
+    public void update()
+    {
+        // The order of theese is important(?), for states to be properly
+        // forbidden...
+        forwardEvents.setCurrState(currState);
+        //backwardEvents.setCurrState(currState);
+        stateDisplayer.setCurrState(currState);
+        controller.update();
+    }
+    
+    public void setController(AutomataExplorerController controller)
+    {
+        this.controller = controller;
+    }
 }

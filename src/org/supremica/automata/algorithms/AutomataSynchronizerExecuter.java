@@ -173,7 +173,7 @@ public final class AutomataSynchronizerExecuter
         // Helper parameters
         helper = synchronizerHelper;
         nbrOfAutomata = helper.getAutomata().size();
-        nbrOfEvents = helper.getAutomaton().getAlphabet().size();
+        nbrOfEvents = helper.getUnionAlphabet().size();
         potentiallyUncontrollableStates = helper.getStateMemorizer();
         exhaustiveSearch = helper.getExhaustiveSearch();
         rememberUncontrollable = helper.getRememberUncontrollable();
@@ -395,24 +395,16 @@ public final class AutomataSynchronizerExecuter
             }
             
             int automatonTableIndex = 0;
-// KA: Commented out
-//			while (automatonTable[automatonTableIndex] < Integer.MAX_VALUE)
-//			{
-//				currAutIndex = automatonTable[automatonTableIndex];
-            
             for (int i = 0; i < nbrOfSelectedAutomata; i++)
             {
                 currAutIndex = automataIndices[i];
-                
-// End of replaced code
                 
                 automatonTableIndex++;
                 
                 // This is the index of the "next" event in the current automaton
                 currAutEventIndex = currOutgoingEvents[currAutIndex][currOutgoingEventsIndex[currAutIndex]];
                 
-                // logger.debug("checking event " + currAutEventIndex + " in aut " + currAutIndex);
-                
+                // logger.debug("checking event " + currAutEventIndex + " in aut " + currAutIndex);                
                 if (syncType == SynchronizationType.PRIORITIZED)
                 {
                     // If the event is prioritized in this automaton (and hence is in the alphabet)
@@ -503,8 +495,7 @@ public final class AutomataSynchronizerExecuter
                 }
                 // logger.debug("thisEventOk " + thisEventOk);
             }
-            
-            
+                        
             // If everything is ok, or the event is epsilon, it is enabled!
             // (If the event is epsilon, a lot of the above could have been ignored...)
             if (thisEventOk || epsilonEventsTable[currEventIndex])
@@ -535,7 +526,7 @@ public final class AutomataSynchronizerExecuter
                 }
             }
             
-            if (!thisEventOk && canExecuteInPlant && thisPlantEventOk &&!controllableEventsTable[currEventIndex])
+            if (!thisEventOk && canExecuteInPlant && thisPlantEventOk && !controllableEventsTable[currEventIndex])
             {
                 // Uncontrollable state found
                 controllableState = false;

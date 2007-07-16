@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.module
 //# CLASS:   ModuleCompiler
 //###########################################################################
-//# $Id: ModuleCompiler.java,v 1.78 2007-06-08 10:45:20 robi Exp $
+//# $Id: ModuleCompiler.java,v 1.79 2007-07-16 11:34:32 flordal Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.compiler;
@@ -82,8 +82,8 @@ import net.sourceforge.waters.xsd.base.EventKind;
 import net.sourceforge.waters.xsd.module.ScopeKind;
 
 
-public class ModuleCompiler extends AbstractModuleProxyVisitor {
-
+public class ModuleCompiler extends AbstractModuleProxyVisitor
+{
  
 //##########################################################################
   //# Constructors

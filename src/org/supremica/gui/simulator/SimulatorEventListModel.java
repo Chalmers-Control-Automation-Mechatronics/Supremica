@@ -88,7 +88,7 @@ public class SimulatorEventListModel
         this.theAutomata = helper.getAutomata();
         this.theProject = theProject;
         this.theControls = theProject.getControls();
-        this.theAlphabet = helper.getAutomaton().getAlphabet();
+        this.theAlphabet = helper.getUnionAlphabet();
         
 //              this.showDisabledEvents = showDisabledEvents;
 //              this.theSignals = theSignals;

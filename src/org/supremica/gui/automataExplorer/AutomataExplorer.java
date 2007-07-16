@@ -91,7 +91,8 @@ public class AutomataExplorer
         
         // Get helper
         helper = new AutomataSynchronizerHelper(theAutomata, syncOptions);
-        indexMap = helper.getIndexMap();
+        
+        indexMap = new AutomataIndexMap(theAutomata);
         
         // Build the initial state
         Automaton currAutomaton;
@@ -105,7 +106,7 @@ public class AutomataExplorer
         {
             currAutomaton = (Automaton) autIt.next();
             currInitialState = currAutomaton.getInitialState();
-            //	initialState[currAutomaton.getIndex()] = currInitialState.getIndex();
+//			initialState[currAutomaton.getIndex()] = currInitialState.getIndex();
             initialState[indexMap.getAutomatonIndex(currAutomaton)] = indexMap.getStateIndex(currAutomaton, currInitialState);
         }
         
@@ -113,40 +114,17 @@ public class AutomataExplorer
         
         //onlineSynchronizer = new AutomataOnlineSynchronizer(helper);
         onlineSynchronizer = new AutomataSynchronizerExecuter(helper);
-        
         onlineSynchronizer.initialize();
         onlineSynchronizer.setCurrState(initialState);
         helper.setCoExecuter(onlineSynchronizer);
         theAutomata.getListeners().addListener(this);
         setBackground(Color.white);
         
-        contentPane = (JPanel) getContentPane();
-        
+        contentPane = (JPanel) getContentPane();        
         contentPane.setLayout(layout);
         
         // contentPane.add(toolBar, BorderLayout.NORTH);
-        // / setTitle(theAutomaton.getName());
         setTitle("AutomataExplorer");
-        
-                /*
-                setSize(400, 500);
-                 
-                // Center the window
-                Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-                Dimension frameSize = getSize();
-                 
-                if (frameSize.height > screenSize.height)
-                {
-                                frameSize.height = screenSize.height;
-                }
-                 
-                if (frameSize.width > screenSize.width)
-                {
-                                frameSize.width = screenSize.width;
-                }
-                 
-                setLocation((screenSize.width - frameSize.width) / 2, (screenSize.height - frameSize.height) / 2);
-                 */
         Utility.setupFrame(this, 400, 500);
         addWindowListener(new WindowAdapter()
         {
@@ -160,8 +138,7 @@ public class AutomataExplorer
         initMenubar();
         
         // / stateViewer = new StateViewer(theAutomaton);
-        stateViewer = new AutomataStateViewer(helper);
-        
+        stateViewer = new AutomataStateViewer(helper);        
         contentPane.add(stateViewer, BorderLayout.CENTER);
         
         // / controller = new ExplorerController(stateViewer, theAutomaton);
@@ -207,14 +184,6 @@ public class AutomataExplorer
     
     public void updated(Object o)
     {
-        
-                /*
-                 *  Trams. FIXA!
-                 *  if (o == theAutomata)
-                 *  {
-                 *  stateViewer.goToInitialState();
-                 *  }
-                 */
     }
     
     public void stateAdded(Automaton aut, State q)

@@ -98,8 +98,7 @@ public class Project
         theTimers = new Timers(otherProject.theTimers);
         
         setName(otherProject.getName());
-    }
-    
+    }    
     
     public Project(Project otherProject, boolean shallowCopy)
     {
@@ -179,8 +178,7 @@ public class Project
     public void setAnimationURL(URL url)
     {
         animationURL = url;
-    }
-    
+    }    
     
     public boolean hasUserInterface()
     {
@@ -221,6 +219,9 @@ public class Project
         addTimers(otherProject.getTimers());
         setAnimationURL(otherProject.getAnimationURL());
         setUserInterfaceURL(otherProject.getUserInterfaceURL());
+
+        setName(otherProject.getName());
+        setComment(otherProject.getComment());
     }
     
     private void addInputSignals(Signals otherSignals)

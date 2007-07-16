@@ -56,89 +56,87 @@ import javax.swing.*;
 import org.supremica.automata.Automata;
 
 public class AutomataExplorerController
-	extends JPanel
+        extends JPanel
 {
-	private AutomataStateViewer stateViewer;
-	private Automata theAutomata;
-	private JButton undoButton;
-	private JButton redoButton;
-
-	public AutomataExplorerController(AutomataStateViewer stateViewer, AutomataSynchronizerHelper synchHelper)
-	{
-		setLayout(new BorderLayout());
-
-		this.stateViewer = stateViewer;
-		this.theAutomata = synchHelper.getAutomata();
-
-		Box redoBox = new Box(BoxLayout.X_AXIS);
-		ImageIcon forwardImg = new ImageIcon(AutomataExplorerController.class.getResource("/toolbarButtonGraphics/navigation/Forward24.gif"));
-		ImageIcon backwardImg = new ImageIcon(AutomataExplorerController.class.getResource("/toolbarButtonGraphics/navigation/Back24.gif"));
-		ImageIcon homeImg = new ImageIcon(AutomataExplorerController.class.getResource("/toolbarButtonGraphics/navigation/Home24.gif"));
-
-		undoButton = new JButton(backwardImg);
-
-		undoButton.setToolTipText("Back");
-
-		redoButton = new JButton(forwardImg);
-
-		redoButton.setToolTipText("Forward");
-
-		JButton resetButton = new JButton(homeImg);
-
-		resetButton.setToolTipText("Go to the initial state");
-		redoBox.add(Box.createHorizontalGlue());
-		redoBox.add(Box.createHorizontalGlue());
-		redoBox.add(undoButton);
-		redoBox.add(Box.createHorizontalGlue());
-		redoBox.add(redoButton);
-		redoBox.add(Box.createHorizontalGlue());
-		redoBox.add(resetButton);
-		redoBox.add(Box.createHorizontalGlue());
-		redoBox.add(Box.createHorizontalGlue());
-		add(redoBox, BorderLayout.NORTH);
-		undoButton.addActionListener(new ActionListener()
-		{
-			public void actionPerformed(ActionEvent e)
-			{
-				undo_actionPerformed(e);
-			}
-		});
-		redoButton.addActionListener(new ActionListener()
-		{
-			public void actionPerformed(ActionEvent e)
-			{
-				redo_actionPerformed(e);
-			}
-		});
-		resetButton.addActionListener(new ActionListener()
-		{
-			public void actionPerformed(ActionEvent e)
-			{
-				reset_actionPerformed(e);
-			}
-		});
-	}
-
-	public void reset_actionPerformed(ActionEvent e)
-	{
-		stateViewer.goToInitialState();
-
-		// stateViewer.initialize();
-	}
-
-	public void undo_actionPerformed(ActionEvent e)
-	{
-		stateViewer.undoState();
-	}
-
-	public void redo_actionPerformed(ActionEvent e)
-	{
-		stateViewer.redoState();
-	}
-
-	public void update()
-	{
-		undoButton.setEnabled(stateViewer.undoEnabled());
-		redoButton.setEnabled(stateViewer.redoEnabled());
-	}
+    private AutomataStateViewer stateViewer;
+    private Automata theAutomata;
+    private JButton undoButton;
+    private JButton redoButton;
+    
+    public AutomataExplorerController(AutomataStateViewer stateViewer, AutomataSynchronizerHelper synchHelper)
+    {
+        setLayout(new BorderLayout());
+        
+        this.stateViewer = stateViewer;
+        this.theAutomata = synchHelper.getAutomata();
+        
+        Box redoBox = new Box(BoxLayout.X_AXIS);
+        ImageIcon forwardImg = new ImageIcon(AutomataExplorerController.class.getResource("/toolbarButtonGraphics/navigation/Forward24.gif"));
+        ImageIcon backwardImg = new ImageIcon(AutomataExplorerController.class.getResource("/toolbarButtonGraphics/navigation/Back24.gif"));
+        ImageIcon homeImg = new ImageIcon(AutomataExplorerController.class.getResource("/toolbarButtonGraphics/navigation/Home24.gif"));
+        
+        undoButton = new JButton(backwardImg);        
+        undoButton.setToolTipText("Back");
+        
+        redoButton = new JButton(forwardImg);
+        redoButton.setToolTipText("Forward");
+        
+        JButton resetButton = new JButton(homeImg);
+        resetButton.setToolTipText("Go to the initial state");
+        
+        redoBox.add(Box.createHorizontalGlue());
+        redoBox.add(Box.createHorizontalGlue());
+        redoBox.add(undoButton);
+        redoBox.add(Box.createHorizontalGlue());
+        redoBox.add(redoButton);
+        redoBox.add(Box.createHorizontalGlue());
+        redoBox.add(resetButton);
+        redoBox.add(Box.createHorizontalGlue());
+        redoBox.add(Box.createHorizontalGlue());
+        add(redoBox, BorderLayout.NORTH);
+        undoButton.addActionListener(new ActionListener()
+        {
+            public void actionPerformed(ActionEvent e)
+            {
+                undo_actionPerformed(e);
+            }
+        });
+        redoButton.addActionListener(new ActionListener()
+        {
+            public void actionPerformed(ActionEvent e)
+            {
+                redo_actionPerformed(e);
+            }
+        });
+        resetButton.addActionListener(new ActionListener()
+        {
+            public void actionPerformed(ActionEvent e)
+            {
+                reset_actionPerformed(e);
+            }
+        });
+    }
+    
+    public void reset_actionPerformed(ActionEvent e)
+    {
+        stateViewer.goToInitialState();
+        
+        // stateViewer.initialize();
+    }
+    
+    public void undo_actionPerformed(ActionEvent e)
+    {
+        stateViewer.undoState();
+    }
+    
+    public void redo_actionPerformed(ActionEvent e)
+    {
+        stateViewer.redoState();
+    }
+    
+    public void update()
+    {
+        undoButton.setEnabled(stateViewer.undoEnabled());
+        redoButton.setEnabled(stateViewer.redoEnabled());
+    }
 }

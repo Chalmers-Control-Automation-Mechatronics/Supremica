@@ -97,10 +97,9 @@ public class AutomataToXML
         //AutomataIndexMap indexMap = new AutomataIndexMap(automata);
         
         pw.print(" major=\"" + majorFileVersion + "\"");
-        pw.print(" minor=\"" + minorFileVersion + "\"");
+        pw.print(" minor=\"" + minorFileVersion + "\"");        
         
-        
-        if ((automata.getComment() != null) &&!automata.getComment().equals(""))
+        if ((automata.getComment() != null) && !automata.getComment().equals(""))
         {
             pw.print(" comment=\"" + EncodingHelper.normalize(automata.getComment()) + "\"");
         }

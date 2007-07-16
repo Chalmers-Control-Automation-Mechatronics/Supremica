@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.base
 //# CLASS:   DocumentProxy
 //###########################################################################
-//# $Id: DocumentProxy.java,v 1.4 2006-09-19 15:53:20 robi Exp $
+//# $Id: DocumentProxy.java,v 1.5 2007-07-16 11:34:32 flordal Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.base;
@@ -12,7 +12,6 @@ package net.sourceforge.waters.model.base;
 import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URI;
-
 
 /**
  * <P>The interface characterising top-level objects in Waters.</P>
@@ -24,15 +23,12 @@ import java.net.URI;
  *
  * @author Robi Malik
  */
-
 public interface DocumentProxy
   extends NamedProxy
 {
-
   //#########################################################################
   //# Cloning
   public DocumentProxy clone();
-
 
   //#########################################################################
   //# Getters and Setters
@@ -60,5 +56,4 @@ public interface DocumentProxy
    * Sets the file name associated with this document to a new value.
    */
   public void setLocation(URI location);
-
 }

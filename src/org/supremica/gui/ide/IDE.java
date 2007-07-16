@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.gui.ide
 //# CLASS:   IDE
 //###########################################################################
-//# $Id: IDE.java,v 1.95 2007-06-29 18:03:25 robi Exp $
+//# $Id: IDE.java,v 1.96 2007-07-16 11:34:33 flordal Exp $
 //###########################################################################
 
 package org.supremica.gui.ide;
@@ -42,7 +42,6 @@ import org.supremica.util.ProcessCommandLineArguments;
 import org.supremica.Version;
 import org.xml.sax.SAXException;
 
-
 /**
  * The IDE's main window.
  *
@@ -52,12 +51,10 @@ import org.xml.sax.SAXException;
  *
  * @author Knut &Aring;kesson
  */
-
 public class IDE
     extends JFrame
     implements IDEActionInterface, Observer, Subject
-{
-    
+{    
     //#######################################################################
     //# Constructor
     public IDE()
@@ -98,7 +95,6 @@ public class IDE
         
         info("Supremica version: " + (new Version()).toString());
     }
-    
     
     //#######################################################################
     //# Simple Access

@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.valid
 //# CLASS:   SupremicaMarshaller
 //###########################################################################
-//# $Id: SupremicaMarshaller.java,v 1.1 2007-06-23 10:16:00 robi Exp $
+//# $Id: SupremicaMarshaller.java,v 1.2 2007-07-16 11:34:32 flordal Exp $
 //###########################################################################
 
 package org.supremica.automata.IO;
@@ -19,17 +19,14 @@ import net.sourceforge.waters.model.marshaller.ProxyMarshaller;
 import net.sourceforge.waters.model.marshaller.StandardExtensionFileFilter;
 import org.supremica.automata.Project;
 
-
 public class SupremicaMarshaller
     implements ProxyMarshaller<Project>
 {
-
     //#########################################################################
     //# Constructor
     public SupremicaMarshaller()
     {
     }
-
 
     //#########################################################################
     //# Interface net.sourceforge.waters.model.marshaller.ProxyMarshaller
@@ -61,5 +58,4 @@ public class SupremicaMarshaller
         final String description = getDescription();
         return StandardExtensionFileFilter.getFilter(ext, description);
     }
-
 }

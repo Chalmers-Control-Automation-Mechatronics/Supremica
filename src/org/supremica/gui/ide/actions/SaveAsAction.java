@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.gui.ide.actions
 //# CLASS:   SaveAsAction
 //###########################################################################
-//# $Id: SaveAsAction.java,v 1.10 2007-06-26 20:45:14 robi Exp $
+//# $Id: SaveAsAction.java,v 1.11 2007-07-16 11:34:33 flordal Exp $
 //###########################################################################
 
 package org.supremica.gui.ide.actions;
@@ -38,10 +38,8 @@ import org.supremica.gui.ide.DocumentContainerManager;
 import org.supremica.gui.ide.IDE;
 import org.supremica.gui.ide.ModuleContainer;
 
-
 public class SaveAsAction extends AbstractSaveAction
 {
-
   //#########################################################################
   //# Constructor
   public SaveAsAction(final IDE ide)
@@ -54,7 +52,6 @@ public class SaveAsAction extends AbstractSaveAction
               ("/toolbarButtonGraphics/general/Save16.gif")));
   }
 
-
   //#########################################################################
   //# Interface java.awt.event.ActionListener
   public void actionPerformed(final ActionEvent event)
@@ -64,12 +61,10 @@ public class SaveAsAction extends AbstractSaveAction
     manager.saveActiveContainerAs();
   }
 
-
   //#########################################################################
   //# Enabling and Disabling
   String getShortDescription(final String type)
   {
     return "Save the " + type + "using a new name";
   }
-
 }

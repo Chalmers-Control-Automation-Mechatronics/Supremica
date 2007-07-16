@@ -4,9 +4,8 @@
 //# PACKAGE: org.supremica.gui.ide
 //# CLASS:   DocumentContainerManager
 //###########################################################################
-//# $Id: DocumentContainerManager.java,v 1.5 2007-06-26 20:45:14 robi Exp $
+//# $Id: DocumentContainerManager.java,v 1.6 2007-07-16 11:34:32 flordal Exp $
 //###########################################################################
-
 
 package org.supremica.gui.ide;
 
@@ -60,10 +59,8 @@ import org.supremica.automata.IO.SupremicaMarshaller;
 import org.supremica.automata.IO.UMDESUnmarshaller;
 import org.xml.sax.SAXException;
 
-
 public class DocumentContainerManager
 {
-
     //#######################################################################
     //# Constructor
     DocumentContainerManager(final IDE ide)
@@ -109,9 +106,8 @@ public class DocumentContainerManager
         mWasCancelled = false;
     }
 
-
-	//#######################################################################
-	//# Interface net.sourceforge.waters.gui.observer.Subject
+    //#######################################################################
+    //# Interface net.sourceforge.waters.gui.observer.Subject
     public void attach(final Observer observer)
     {
         mObservers.add(observer);
@@ -131,8 +127,7 @@ public class DocumentContainerManager
             observer.update(event);
         }
         mIDE.fireEditorChangedEvent(event);
-    }
-    
+    }    
 
     //#######################################################################
     //# Simple Access
@@ -154,7 +149,6 @@ public class DocumentContainerManager
             return mRecentList.iterator().next();
         }
     }
-
 
     //#######################################################################
     //# Opening and Closing Documents
@@ -245,7 +239,6 @@ public class DocumentContainerManager
         return !mWasCancelled;
     }
 
-
     //#######################################################################
     //# Static Class Methods
     public static String getTypeString(final DocumentProxy doc)
@@ -259,7 +252,6 @@ public class DocumentContainerManager
                 ("Unknown document type: " + doc.getClass().getName() + "!");
         }
     }
-
 
     //#######################################################################
     //# Auxiliary Methods --- Opening
@@ -351,7 +343,6 @@ public class DocumentContainerManager
         fireContainerSwitch();
     }
 
-
     //#######################################################################
     //# Auxiliary Methods --- Saving
     private void saveActiveContainer(final boolean maycancel)
@@ -435,50 +426,67 @@ public class DocumentContainerManager
         final ProxyMarshaller<? extends DocumentProxy> marshaller =
             mDocumentManager.findProxyMarshaller(clazz);
         final FileFilter docfilter = marshaller.getDefaultFileFilter();
+        
         if (docfilter == filter) {
             final String ext = marshaller.getDefaultExtension();
             final File extfile =
                 StandardExtensionFileFilter.ensureDefaultExtension(file, ext);
             saveContainer(container, extfile, maycancel);
-        } else if (doc instanceof Project) {
+        }
+        else if (doc instanceof Project)
+        {
             // Converting Supremica >> Waters ...
             // If analyzer active, check if there are unsupported features
             // in the project ...
             if (container.isAnalyzerActive() &&
-                !SupremicaUnmarshaller.validate
-                (container.getAnalyzerPanel().getVisualProject())) {
+                    !SupremicaUnmarshaller.validate(container.getAnalyzerPanel().getVisualProject()))
+            {
                 final int choice = JOptionPane.showConfirmDialog
-                    (mIDE.getFrame(), "This project contains attributes not supported by the WMOD-format.\nDo you want to save (and lose the unsupported features)?", "Warning", JOptionPane.YES_NO_OPTION);
-                if (choice != JOptionPane.YES_OPTION) {
+                        (mIDE.getFrame(), "This project contains attributes not supported by the WMOD-format." + 
+                        "\nDo you want to save (and lose the unsupported features)?", "Warning", JOptionPane.YES_NO_OPTION);
+                if (choice != JOptionPane.YES_OPTION)
+                {
                     return;
                 }
             }
-            if (container instanceof ModuleContainer) {
+            
+            if (container instanceof ModuleContainer)
+            {
                 final ModuleProxy module =
-                    container.getEditorPanel().getModuleSubject();
+                        container.getEditorPanel().getModuleSubject();
                 marshalDocument(file, module, maycancel);
-            } else if (container instanceof AutomataContainer) {
+            }
+            else if (container instanceof AutomataContainer)
+            {
                 final ModuleProxyFactory factory =
-                    ModuleElementFactory.getInstance();
+                        ModuleElementFactory.getInstance();
                 final ProductDESImporter importer =
-                    new ProductDESImporter(factory);
+                        new ProductDESImporter(factory);
                 final Project project = (Project) doc;
                 final ModuleProxy module = importer.importModule(project);
                 marshalDocument(file, module, maycancel);
-            } else {
-                throw new ClassCastException
-                    ("Unknown document container type: " +
-                     container.getClass().getName() + "!");
             }
-        } else if (doc instanceof ModuleProxy) {
+            else
+            {
+                throw new ClassCastException
+                        ("Unknown document container type: " +
+                        container.getClass().getName() + "!");
+            }
+        }
+        else if (doc instanceof ModuleProxy)
+        {
             // Converting Waters >> Supremica ...
-            if (container.isEditorActive()) {
+            if (container.isEditorActive())
+            {
                 container.getAnalyzerPanel().updateAutomata();
             }
-            final Project project =
-                container.getAnalyzerPanel().getVisualProject();
+
+            // Here, the comment and the name disappears
+            final Project project = container.getAnalyzerPanel().getVisualProject();
             marshalDocument(file, project, maycancel);
-        } else {
+        }
+        else
+        {
             throw new ClassCastException
                 ("Unknown document type: " + clazz.getName() + "!");
         }
@@ -504,7 +512,6 @@ public class DocumentContainerManager
             showIOError(exception, maycancel);
         }
     }
-
 
     //#######################################################################
     //# Auxiliary Methods --- Dialogs
@@ -623,7 +630,6 @@ public class DocumentContainerManager
         return msg.replaceAll(": +", ":\n");
     }
 
-
     //#######################################################################
     //# Auxiliary Methods --- Notifications
     private void fireContainerSwitch()
@@ -633,7 +639,6 @@ public class DocumentContainerManager
             new ContainerSwitchEvent(this, container);
         fireEditorChangedEvent(event);
     }
-
 
     //#######################################################################
     //# Data Members
@@ -646,7 +651,6 @@ public class DocumentContainerManager
     private final List<Observer> mObservers;
 
     private boolean mWasCancelled;
-
 
     //#######################################################################
     //# Static Class Constants
@@ -663,5 +667,4 @@ public class DocumentContainerManager
 
     private static final String WARN_UNSAVED_CHANGES =
         "has unsaved changes.\nWould you like to save it before closing?";
-
 }

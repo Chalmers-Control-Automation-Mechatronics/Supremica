@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.automata.IO
 //# CLASS:   ProjectBuildFromWaters
 //###########################################################################
-//# $Id: ProjectBuildFromWaters.java,v 1.26 2007-06-20 12:47:36 avenir Exp $
+//# $Id: ProjectBuildFromWaters.java,v 1.27 2007-07-16 11:34:32 flordal Exp $
 //###########################################################################
 
 /*
@@ -162,6 +162,7 @@ public class ProjectBuildFromWaters
     {
         final Project currProject = mProjectFactory.getProject();
         currProject.setName(des.getName());
+        currProject.setComment(des.getComment());
         
         for (final AutomatonProxy aut : des.getAutomata())
         {

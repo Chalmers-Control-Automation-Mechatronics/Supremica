@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.des
 //# CLASS:   ProductDESProxy
 //###########################################################################
-//# $Id: ProductDESProxy.java,v 1.5 2006-09-19 15:53:20 robi Exp $
+//# $Id: ProductDESProxy.java,v 1.6 2007-07-16 11:34:32 flordal Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.des;
@@ -12,7 +12,6 @@ package net.sourceforge.waters.model.des;
 import java.util.Set;
 
 import net.sourceforge.waters.model.base.DocumentProxy;
-
 
 /**
  * <P>A collection of finite-state machines.</P>
@@ -34,15 +33,12 @@ import net.sourceforge.waters.model.base.DocumentProxy;
  *
  * @author Robi Malik
  */
-
 public interface ProductDESProxy
   extends DocumentProxy
 {
-
   //#########################################################################
   //# Cloning
   public ProductDESProxy clone();
-
 
   //#########################################################################
   //# Getters and Setters
@@ -57,5 +53,4 @@ public interface ProductDESProxy
    * @return  An unmodifiable list of objects of type {@link AutomatonProxy}.
    */
   public Set<AutomatonProxy> getAutomata();
-
 }

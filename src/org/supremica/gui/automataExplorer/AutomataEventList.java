@@ -56,86 +56,86 @@ import javax.swing.*;
 import org.supremica.automata.Automata;
 
 public class AutomataEventList
-	extends JPanel
+        extends JPanel
 {
-	private boolean forward;
-	private boolean showStateId = false;
-	private Automata theAutomata;
-	private int[] currState;
-	private AutomataStateViewer stateViewer;
-	private AutomataEventListModel eventsList;
-	private JList theList;
-
-	public AutomataEventList(AutomataStateViewer stateViewer, AutomataSynchronizerHelper helper, boolean forward)
-	{
-		setLayout(new BorderLayout());
-
-		this.stateViewer = stateViewer;
-		this.theAutomata = helper.getAutomata();
-		this.forward = forward;
-		eventsList = new AutomataEventListModel(helper, forward);
-		theList = new JList(eventsList);
-
-		JScrollPane scrollPanel = new JScrollPane(theList);
-
-		theList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-
-		String label;
-
-		if (forward)
-		{
-			label = "Outgoing events";
-		}
-		else
-		{
-			label = "Incoming events";
-		}
-
-		JLabel jLabel = new JLabel(label);
-
-		// jLabel.setOpaque(true);
-		// jLabel.setBackground(Color.yellow);
-		add(jLabel, BorderLayout.NORTH);
-		add(scrollPanel, BorderLayout.CENTER);
-		theList.addMouseListener(new MouseAdapter()
-		{
-			public void mouseClicked(MouseEvent e)
-			{
-				if (e.getClickCount() == 2)
-				{
-					int index = theList.locationToIndex(e.getPoint());
-
-					if (index >= 0)
-					{
-						int[] newState = eventsList.getStateAt(currState, index);
-
-						updateStateViewer(newState);
-					}
-				}
-			}
-		});
-	}
-
-	public void setShowStateId(boolean showStateId)
-	{
-		eventsList.setShowStateId(showStateId);
-	}
-
-	public void setCurrState(int[] currState)
-	{
-		this.currState = currState;
-
-		theList.clearSelection();
-		update();
-	}
-
-	public void update()
-	{
-		eventsList.setCurrState(currState);
-	}
-
-	private void updateStateViewer(int[] newState)
-	{
-		stateViewer.setCurrState(newState);
-	}
+    private boolean forward;
+    private boolean showStateId = false;
+    private Automata theAutomata;
+    private int[] currState;
+    private AutomataStateViewer stateViewer;
+    private AutomataEventListModel eventsList;
+    private JList theList;
+    
+    public AutomataEventList(AutomataStateViewer stateViewer, AutomataSynchronizerHelper helper, boolean forward)
+    {
+        setLayout(new BorderLayout());
+        
+        this.stateViewer = stateViewer;
+        this.theAutomata = helper.getAutomata();
+        this.forward = forward;
+        eventsList = new AutomataEventListModel(helper, forward);
+        theList = new JList(eventsList);
+        
+        JScrollPane scrollPanel = new JScrollPane(theList);
+        
+        theList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        
+        String label;
+        
+        if (forward)
+        {
+            label = "Outgoing events";
+        }
+        else
+        {
+            label = "Incoming events";
+        }
+        
+        JLabel jLabel = new JLabel(label);
+        
+        // jLabel.setOpaque(true);
+        // jLabel.setBackground(Color.yellow);
+        add(jLabel, BorderLayout.NORTH);
+        add(scrollPanel, BorderLayout.CENTER);
+        theList.addMouseListener(new MouseAdapter()
+        {
+            public void mouseClicked(MouseEvent e)
+            {
+                if (e.getClickCount() == 2)
+                {
+                    int index = theList.locationToIndex(e.getPoint());
+                    
+                    if (index >= 0)
+                    {
+                        int[] newState = eventsList.getStateAt(currState, index);
+                        
+                        updateStateViewer(newState);
+                    }
+                }
+            }
+        });
+    }
+    
+    public void setShowStateId(boolean showStateId)
+    {
+        eventsList.setShowStateId(showStateId);
+    }
+    
+    public void setCurrState(int[] currState)
+    {
+        this.currState = currState;
+        
+        theList.clearSelection();
+        update();
+    }
+    
+    public void update()
+    {
+        eventsList.setCurrState(currState);
+    }
+    
+    private void updateStateViewer(int[] newState)
+    {
+        stateViewer.setCurrState(newState);
+    }
 }
