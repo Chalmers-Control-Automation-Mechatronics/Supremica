@@ -716,70 +716,72 @@ class ModelMaker
 		{
 			output("ModelMaker.makeDataConnectionMap(" + parentInstance + "):", level);
 		}
-		for (Iterator connIter = fbNetwork.getDataConnections().getConnection().iterator();
-			 connIter.hasNext();)
+		if (fbNetwork.isSetDataConnections())
 		{
-			JaxbConnection connection = (JaxbConnection) connIter.next();
-			String source = connection.getSource().replace(".","_");
-			String dest = connection.getDestination().replace(".","_");			
-
-			if (parentInstance != null)
+			for (Iterator connIter = fbNetwork.getDataConnections().getConnection().iterator(); connIter.hasNext();)
 			{
-				// don't process internal event input connections in composite blocks...
-				if (!getInstanceName(dest).equals(""))
+				JaxbConnection connection = (JaxbConnection) connIter.next();
+				String source = connection.getSource().replace(".","_");
+				String dest = connection.getDestination().replace(".","_");			
+				
+				if (parentInstance != null)
+				{
+					// don't process internal event input connections in composite blocks...
+					if (!getInstanceName(dest).equals(""))
+					{
+						source = parentInstance + "_" + source;
+						dest   = parentInstance + "_" + dest;			
+					}
+				}
+				
+				String destInstance = getInstanceName(dest);
+				String destSignal   = getSignalName(dest);
+				
+				// 			System.out.println("Analyzing connection: " 
+				// 							   + source
+				// 							   + "-->" 
+				// 							   + dest);
+				
+				JaxbFBType destType = (JaxbFBType) fbTypes.get((String) functionBlocks.get(destInstance));
+				
+				if (destType != null)
+				{
+					if (destType.isSetFBNetwork())
+					{
+						makeDataConnectionMap(destType.getFBNetwork(), destInstance, level + 1);
+					}
+				}
+				
+				// ...process them here
+				if (destInstance.equals(""))
 				{
 					source = parentInstance + "_" + source;
 					dest   = parentInstance + "_" + dest;			
 				}
-			}
-
-			String destInstance = getInstanceName(dest);
-			String destSignal   = getSignalName(dest);
-			
-			// 			System.out.println("Analyzing connection: " 
-			// 							   + source
-			// 							   + "-->" 
-			// 							   + dest);
-			
-			JaxbFBType destType = (JaxbFBType) fbTypes.get((String) functionBlocks.get(destInstance));
-
-			if (destType != null)
-			{
-				if (destType.isSetFBNetwork())
+				
+				// flattening
+				source = getInternalDataOutputConnection(source);
+				dest = getInternalDataInputConnection(dest);
+				destInstance = getInstanceName(dest);
+				destSignal   = getSignalName(dest);
+				
+				// 			output("Adding connection: " + source + "-->" + dest, level);
+				
+				Map dataMap;
+				if (!dataConnections.keySet().contains(destInstance))
 				{
-					makeDataConnectionMap(destType.getFBNetwork(), destInstance, level + 1);
+					dataMap = new HashMap();
+					dataConnections.put(destInstance, dataMap);
 				}
-			}
-		
-			// ...process them here
-			if (destInstance.equals(""))
-			{
-				source = parentInstance + "_" + source;
-				dest   = parentInstance + "_" + dest;			
-			}
-			
-			// flattening
-			source = getInternalDataOutputConnection(source);
-			dest = getInternalDataInputConnection(dest);
-			destInstance = getInstanceName(dest);
-			destSignal   = getSignalName(dest);
-		
-			// 			output("Adding connection: " + source + "-->" + dest, level);
-			
-			Map dataMap;
-			if (!dataConnections.keySet().contains(destInstance))
-			{
-				dataMap = new HashMap();
-				dataConnections.put(destInstance, dataMap);
-			}
-			else
-			{
-				dataMap = (Map) dataConnections.get(destInstance);
-			}
-			dataMap.put(destSignal, source);
-		}	
+				else
+				{
+					dataMap = (Map) dataConnections.get(destInstance);
+				}
+				dataMap.put(destSignal, source);
+			}	
+		}
 	}
-
+	
 	private String getInternalDataInputConnection(String externalConnection)
 	{
 		String instanceName = getInstanceName(externalConnection);
