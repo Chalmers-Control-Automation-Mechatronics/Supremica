@@ -1682,7 +1682,17 @@ class ModelMaker
 								nameCounter++;
 								output("Adding state: " + to, level);
 								ecc.addState(to);
-								event = "finished_job_" + fbName + ";";							
+								event = "finished_job_" + fbName + ";";
+								output("Adding transition: from: " + from + ", to: " + to + ", event: " + event, level);
+								ecc.addTransition(from, to, event, null, null);
+								next = to;						
+								
+								from = next;
+								to = "s" + nameCounter; 
+								nameCounter++;
+								output("Adding state: " + to, level);
+								ecc.addState(to);
+								event = "send_output_" + curAction.getOutput() + "_" + fbName + ";";
 								// get connection data for the action
 								String cntName = (String) ((Map) eventConnections.get(fbName)).get(curAction.getOutput());
 								String cntFB = getInstanceName(cntName);
@@ -1723,7 +1733,7 @@ class ModelMaker
 							nameCounter++;
 							output("Adding state: " + to, level);
 							ecc.addState(to);
-							event = "prepare_output_" + fbName + ";";
+							event = "send_output_" + curAction.getOutput() + "_" + fbName + ";";
 							// get connection data for the action
 							String cntName = (String) ((Map) eventConnections.get(fbName)).get(curAction.getOutput());
 							String cntFB = getInstanceName(cntName);
