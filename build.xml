@@ -102,7 +102,7 @@
 *	You should also run it every time one of the jar files below
 *	has been updated.
     -->
-    <target name="initialize" depends="clean,initialize_jars,build,-jar_supremica_lib,cpp_waters"
+    <target name="initialize" depends="clean,initialize_jars,build,jar_supremica_lib,cpp_waters"
             description="Rebuilds the project from scratch."/>
 
     <!--
@@ -452,7 +452,7 @@
 *	be executed without any other dependencies. 
     -->
     <!--
-<target name="rebuild_jgrafchart" depends="clean,version,build_jgrafchart,-jar_supremica_lib">
+<target name="rebuild_jgrafchart" depends="clean,version,build_jgrafchart,jar_supremica_lib">
 </target>
 -->
     
@@ -464,7 +464,7 @@
 </target>
 -->
     
-    <target name="-jar_supremica_lib">
+    <target name="jar_supremica_lib" depends="initialize_jars">
         <delete dir="${javalibs.dir}/META-INF"/>
         <jar jarfile="${dist}/SupremicaLib.jar"> 
             <fileset dir="${javalibs.dir}"/>		

@@ -27,9 +27,12 @@
         <ECState Name="INIT" />
         <ECState Name="STATE" >
 		    <ECAction Algorithm="TestAlg" Output="EO"/>
+		    <ECAction Output="EO"/>
 	    </ECState>    	
+        <ECState Name="STATE2" />
 		<ECTransition Source="INIT" Destination="STATE" Condition="EI" />
-		<ECTransition Source="STATE" Destination="INIT" Condition="1" />
+		<ECTransition Source="STATE" Destination="STATE2" Condition="invoked = 3" />
+		<ECTransition Source="STATE2" Destination="INIT" Condition="1" />
     </ECC>
     <Algorithm Name="TestAlg">
     <Other Language="Java" Text=

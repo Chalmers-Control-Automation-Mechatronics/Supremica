@@ -24,6 +24,8 @@
 package org.supremica.external.iec61499fb2efa;
 
 import java.io.File;
+import java.io.Reader;
+import java.io.StringReader;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -36,6 +38,13 @@ import java.lang.Exception;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.JAXBException;
+
+import net.sourceforge.fuber.model.interpreters.st.Lexer;
+import net.sourceforge.fuber.model.interpreters.st.Parser;
+import java_cup.runtime.Scanner;
+import net.sourceforge.fuber.model.interpreters.st.Finder;
+import net.sourceforge.fuber.model.interpreters.st.Translator;
+import net.sourceforge.fuber.model.interpreters.st.abstractsyntax.Expression;
 
 import net.sourceforge.fuber.xsd.libraryelement.*;
 
@@ -82,6 +91,8 @@ class ModelMaker
 	private Map eventConnections = new HashMap();
 	// String fb name, Map data conn map do->di
 	private Map dataConnections = new HashMap();
+
+	private Map operatorMap = null;
 
 	private String restartInstance = null;
 
@@ -158,7 +169,6 @@ class ModelMaker
 
 	private ModelMaker(String outputFileName, String systemFileName, String libraryPathBase, String libraryPath) 
 	{
-
 		try
 		{
 			iecContext = JAXBContext.newInstance("net.sourceforge.fuber.xsd.libraryelement");
@@ -237,6 +247,15 @@ class ModelMaker
 				libraryPath = libraryPath.substring(libraryPath.indexOf(File.pathSeparatorChar)+1);
 			}
 		}
+
+		// make operator map
+		operatorMap = new HashMap();
+		operatorMap.put("AND", "&");
+		operatorMap.put("OR", "|");
+		operatorMap.put("NOT", "!");
+		operatorMap.put("=", "==");
+		operatorMap.put("<>", "!=");
+		operatorMap.put("MOD", "%");				
 	}
 	
 	public void makeModel()
@@ -1430,17 +1449,82 @@ class ModelMaker
 			}
 		}
 
+		// make identifier map
+		Map identifierMap = new HashMap();
+		// get the FB type and all the variables
+		List eventInputs = null;
+		List inputVars = null;
+		List outputVars = null;
+		List internalVars = null;
+		if (theType.getInterfaceList().isSetEventInputs())
+		{
+			eventInputs = theType.getInterfaceList().getEventInputs().getEvent();
+		}		
+		if (theType.getInterfaceList().isSetInputVars())
+		{
+			inputVars = theType.getInterfaceList().getInputVars().getVarDeclaration();
+		}		
+		if (theType.getInterfaceList().isSetOutputVars())
+		{
+			outputVars = theType.getInterfaceList().getOutputVars().getVarDeclaration();
+		}
+		if (theType.getBasicFB().isSetInternalVars())
+		{
+			internalVars = theType.getBasicFB().getInternalVars().getVarDeclaration();
+		}
+		// input events
+		if (eventInputs != null)
+		{
+			for (Iterator iter = eventInputs.iterator();iter.hasNext();)
+			{
+				JaxbEvent curEventInput = (JaxbEvent) iter.next();
+				String curEventInputName = curEventInput.getName();
+				identifierMap.put(curEventInputName, "event_" + curEventInputName + "_" + fbName + " == 1");
+			}
+		}
+		// input vars
+		if (inputVars != null)
+		{
+			for (Iterator iter = inputVars.iterator();iter.hasNext();)
+			{
+				VarDeclaration curVar = (VarDeclaration) iter.next();
+				String curVarName = curVar.getName();
+				identifierMap.put(curVarName, "data_" + curVarName + "_" + fbName);
+			}
+		}
+		// output vars
+		if (outputVars != null)
+		{
+			for (Iterator iter = outputVars.iterator();iter.hasNext();)
+			{
+				VarDeclaration curVar = (VarDeclaration) iter.next();
+				String curVarName = curVar.getName();
+				identifierMap.put(curVarName, "data_" + curVarName + "_" + fbName);
+			}
+		}
+		// internal vars
+		if (internalVars != null)
+		{
+			for (Iterator iter = internalVars.iterator();iter.hasNext();)
+			{
+				VarDeclaration curVar = (VarDeclaration) iter.next();
+				String curVarName = curVar.getName();
+				identifierMap.put(curVarName, "internal_" + curVarName + "_" + fbName);
+			}
+		}
+		
+		
 		int stateNameCounter = 1;
 		JaxbECState firstECState = (JaxbECState) ecStates.get(0);
 		String firstECStateName = firstECState.getName();
 		ecc.addState(firstECStateName,true);
-		System.out.println("\t\t Calling makeECStateBranch() from makeBasicFBExecutionControlChart()");
-		makeECStateBranch(ecc, fbName, firstECStateName, firstECStateName, ecStates, ecTransitions, visitedECStates, false, stateNameCounter, 2);
+		output("Calling makeECStateBranch() from makeBasicFBExecutionControlChart()", 2);
+		makeECStateBranch(ecc, fbName, firstECStateName, firstECStateName, ecStates, ecTransitions, visitedECStates, false, stateNameCounter, 2, identifierMap);
 
 		automata.addAutomaton(ecc);	
 	}
 
-	private void makeECStateBranch(ExtendedAutomaton ecc, String fbName, String ecStateName, String prevStateName, List ecStates, List ecTransitions, Set visitedECStates, boolean madeInitActions, int nameCounter, int level)
+	private void makeECStateBranch(ExtendedAutomaton ecc, String fbName, String ecStateName, String prevStateName, List ecStates, List ecTransitions, Set visitedECStates, boolean madeInitActions, int nameCounter, int level, Map identifierMap)
 	{
 		output("Entering makeECStateBranch(): ecStateName = " + ecStateName + ": prevStateName = " + prevStateName, level);		
 
@@ -1457,25 +1541,14 @@ class ModelMaker
 		boolean doneInitActions = madeInitActions;
 		boolean doneInitFinish = madeInitActions;
 
-		// get the FB type and all the variables
-		JaxbFBType fbType = (JaxbFBType) fbTypes.get((String) basicFunctionBlocks.get(fbName));
-		List eventInputs = fbType.getInterfaceList().getEventInputs().getEvent();
-		List eventOutputs = fbType.getInterfaceList().getEventOutputs().getEvent();
-		List inputVars = null;
-		List outputVars = null;
-		List internalVars = null;
-		if (fbType.getInterfaceList().isSetInputVars())
+		// get event inputs for the block
+		String typeName = (String) basicFunctionBlocks.get(fbName);
+		JaxbFBType theType = (JaxbFBType) fbTypes.get(typeName);
+		List eventInputs = null;
+		if (theType.getInterfaceList().isSetEventInputs())
 		{
-			inputVars = fbType.getInterfaceList().getInputVars().getVarDeclaration();
+			eventInputs = theType.getInterfaceList().getEventInputs().getEvent();
 		}		
-		if (fbType.getInterfaceList().isSetOutputVars())
-		{
-			outputVars = fbType.getInterfaceList().getOutputVars().getVarDeclaration();
-		}
-		if (fbType.getBasicFB().isSetInternalVars())
-		{
-			internalVars = fbType.getBasicFB().getInternalVars().getVarDeclaration();
-		}
 
 		// get the first EC state (ie initial)
 		JaxbECState firstECState = (JaxbECState) ecStates.get(0);
@@ -1546,7 +1619,7 @@ class ModelMaker
 					curECDestState = curECState;
 				}
 			}
-
+		
 			// make model transition for the current EC transition
 			from = prevStateName;
 			to =  curECDestName + "_actions";
@@ -1559,68 +1632,52 @@ class ModelMaker
 				event = "one_transition_" + fbName + ";";
 				guard = null;
 				action = null;
+				output("Adding transition: from: " + from + ", to: " + to + ", event: " + event, level);
+				ecc.addTransition(from, to, event, guard, action);
+				next = to;					
 			}
 			else
 			{				
-				event = "event_input_" + fbName + ";";				
-				guard = curECCondition;
-				action = null;
-				// replace input events
-				for (Iterator iter = eventInputs.iterator();iter.hasNext();)
+				// parse the current EC condition and translate to guard
+				StringReader conditionReader = new StringReader(curECCondition);
+				Lexer lexer = new Lexer((Reader) conditionReader);
+				Parser parser = new Parser((Scanner) lexer);
+				Expression parsedCondition = null;
+				try
 				{
-					JaxbEvent curEventInput = (JaxbEvent) iter.next();
-					String curEventInputName = curEventInput.getName();
-					if (curECCondition.contains(curEventInputName))
-					{
-						guard = guard.replaceAll(curEventInputName, "event_" + curEventInputName + "_" + fbName + " = 1");
-						if (action == null)
-						{
-							action = "event_" + curEventInputName + "_" + fbName + " = 0;";					
-						}
-						else
-						{
-							action = action + "event_" + curEventInputName + "_" + fbName + " = 0;";					
-						}
-					}
+					parsedCondition = (Expression) parser.parse().value;
 				}
-				// replace input vars variables 
-				if (inputVars != null)
+				catch(Exception e)
 				{
-					for (Iterator iter = inputVars.iterator();iter.hasNext();)
-					{
-						VarDeclaration curVar = (VarDeclaration) iter.next();
-						String curVarName = curVar.getName();
-						guard = guard.replaceAll(curVarName, "data_" + curVarName + "_" + fbName);
-					}
+					output("Error!: Parsing of the EC condition failed:", level);
+					output("\t Condition: " + curECCondition, level);
+					System.exit(1);
 				}
-				// replace output vars variables 
-				if (outputVars != null)
-				{
-					for (Iterator iter = outputVars.iterator();iter.hasNext();)
-					{
-						VarDeclaration curVar = (VarDeclaration) iter.next();
-						String curVarName = curVar.getName();
-						guard = guard.replaceAll(curVarName, "data_" + curVarName + "_" + fbName);
-					}
-				}
-				// replace internal vares
-				if (internalVars != null)
-				{
-					for (Iterator iter = internalVars.iterator();iter.hasNext();)
-					{
-						VarDeclaration curVar = (VarDeclaration) iter.next();
-						String curVarName = curVar.getName();
-						guard = guard.replaceAll(curVarName, "internal_" + curVarName + "_" + fbName);
-					}
-				}
-				// replace operators
-				guard = guard.replaceAll("AND", "&");
-				guard = guard.replaceAll("OR", "|");
-				guard = guard.replaceAll("NOT", "!");
-				guard = guard.replaceAll("=", "==");
-				guard = guard.replaceAll("<>", "!=");
-				guard = guard.replaceAll("MOD", "%");				
+				Finder finder = new Finder(parsedCondition);
+				Translator translator = new Translator(parsedCondition, identifierMap, operatorMap);
 
+				guard = translator.translate();
+
+				// make transition for every input event in EC condition
+				String newGuard = null;
+				if (eventInputs != null)
+				{
+					for (Iterator iter = eventInputs.iterator(); iter.hasNext();)
+					{
+						JaxbEvent curEventInput = (JaxbEvent) iter.next();
+						String curEventInputName = curEventInput.getName();
+						if (finder.existsIdentifier(curEventInputName))
+						{
+							event = "event_input_" + curEventInputName + "_" + fbName + ";";
+							newGuard = "event_" + curEventInputName + "_" + fbName + " == 1 & (" + guard + ")";
+							action = "event_" + curEventInputName + "_" + fbName + " = 0;";					
+							output("Adding transition: from: " + from + ", to: " + to + ", event: " + event, level);
+							ecc.addTransition(from, to, event, newGuard, action);
+						}
+					}
+				}
+				next = to;
+				
 				// add to gurad for no_transition event
 				if (noTransitionGuard == null)
 				{
@@ -1629,11 +1686,8 @@ class ModelMaker
 				else
 				{
 					noTransitionGuard = noTransitionGuard + " | !(" + guard + ")";
-				}
-			}	
-			output("Adding transition: from: " + from + ", to: " + to + ", event: " + event, level);
-			ecc.addTransition(from, to, event, guard, action);
-			next = to;
+				}				
+			}
 			
 			// make actions model of the destination EC state
 			if (!visitedECStates.contains(curECDestName) || (curECDestName.equals(firstECStateName) && !doneInitActions))
@@ -1653,14 +1707,16 @@ class ModelMaker
 						{
 							// get action algorithm ID
 							Integer actionAlgorithm = (Integer) ((Map) algorithms.get(fbName)).get(curAction.getAlgorithm());
-							
+							Integer blockID = (Integer) basicFunctionBlocksID.get(fbName);
+
 							from = next;
 							to = "s" + nameCounter; 
 							nameCounter++;
 							output("Adding state: " + to, level);
 							ecc.addState(to);
 							event = "prepare_job_" + fbName + ";";
-							action = "queueing_job_" + fbName + "=" + actionAlgorithm + ";";
+							action = "queueing_job_fb = " + blockID + ";";
+							action = action + "queueing_job_alg = " + actionAlgorithm + ";";
 							output("Adding transition: from: " + from + ", to: " + to + ", event: " + event, level);
 							ecc.addTransition(from, to, event, null, action);
 							next = to;						
@@ -1793,7 +1849,7 @@ class ModelMaker
 					next = to;				
 					
 					output("Calling makeECStateBranch() from makeECStateBranch()", level);
-					makeECStateBranch(ecc, fbName, curECDestName, to, ecStates, ecTransitions, visitedECStates, doneInitActions, nameCounter, level + 1);
+					makeECStateBranch(ecc, fbName, curECDestName, to, ecStates, ecTransitions, visitedECStates, doneInitActions, nameCounter, level + 1, identifierMap);
 				}
 				else if (curECDestName.equals(firstECStateName)  && !doneInitFinish)
 				{
@@ -1846,7 +1902,7 @@ class ModelMaker
 					next = to;				
 					
 					output("Calling makeECStateBranch() from makeECStateBranch()", level);
-					makeECStateBranch(ecc, fbName, curECDestName, next, ecStates, ecTransitions, visitedECStates, doneInitActions, nameCounter, level + 1);
+					makeECStateBranch(ecc, fbName, curECDestName, next, ecStates, ecTransitions, visitedECStates, doneInitActions, nameCounter, level + 1, identifierMap);
 				}
 				else if (curECDestName.equals(firstECStateName) && !doneInitFinish)
 				{
@@ -2150,6 +2206,6 @@ class ModelMaker
 		{
 			System.out.print("\t");
 		}
-		System.out.println(" " + text);
+		System.out.println(text);
 	}
 }
