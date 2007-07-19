@@ -101,6 +101,10 @@ class ModelMaker
 	// maximum value of an integer variable
 	private final int intVarMaxValue = 20;
 
+	private int nameCounter = 0;
+	private boolean doneInitActions = false;
+	private boolean doneInitFinish = false;
+	
 
 	public static void main(String args[])
     {
@@ -1514,17 +1518,19 @@ class ModelMaker
 		}
 		
 		
-		int stateNameCounter = 1;
+		nameCounter = 0;
+		doneInitActions = false;
+		doneInitFinish = false;
 		JaxbECState firstECState = (JaxbECState) ecStates.get(0);
 		String firstECStateName = firstECState.getName();
 		ecc.addState(firstECStateName,true);
 		output("Calling makeECStateBranch() from makeBasicFBExecutionControlChart()", 2);
-		makeECStateBranch(ecc, fbName, firstECStateName, firstECStateName, ecStates, ecTransitions, visitedECStates, false, stateNameCounter, 2, identifierMap);
+		makeECStateBranch(ecc, fbName, firstECStateName, firstECStateName, ecStates, ecTransitions, visitedECStates, 2, identifierMap);
 
 		automata.addAutomaton(ecc);	
 	}
 
-	private void makeECStateBranch(ExtendedAutomaton ecc, String fbName, String ecStateName, String prevStateName, List ecStates, List ecTransitions, Set visitedECStates, boolean madeInitActions, int nameCounter, int level, Map identifierMap)
+	private void makeECStateBranch(ExtendedAutomaton ecc, String fbName, String ecStateName, String prevStateName, List ecStates, List ecTransitions, Set visitedECStates, int level, Map identifierMap)
 	{
 		output("Entering makeECStateBranch(): ecStateName = " + ecStateName + ": prevStateName = " + prevStateName, level);		
 
@@ -1538,8 +1544,6 @@ class ModelMaker
 		String noTransitionTo = null;
 		String noTransitionGuard = null;
 		boolean makeNoTransition = true;
-		boolean doneInitActions = madeInitActions;
-		boolean doneInitFinish = madeInitActions;
 
 		// get event inputs for the block
 		String typeName = (String) basicFunctionBlocks.get(fbName);
@@ -1834,6 +1838,7 @@ class ModelMaker
 				output("\t Check EC states: " + curECSourceName + " and " + curECDestName, level);
 			}
 
+			// finish this state
 			if (oneTransitionFromECDest)
 			{
 				if (!visitedECStates.contains(curECDestName))
@@ -1849,7 +1854,7 @@ class ModelMaker
 					next = to;				
 					
 					output("Calling makeECStateBranch() from makeECStateBranch()", level);
-					makeECStateBranch(ecc, fbName, curECDestName, to, ecStates, ecTransitions, visitedECStates, doneInitActions, nameCounter, level + 1, identifierMap);
+					makeECStateBranch(ecc, fbName, curECDestName, to, ecStates, ecTransitions, visitedECStates, level + 1, identifierMap);
 				}
 				else if (curECDestName.equals(firstECStateName)  && !doneInitFinish)
 				{
@@ -1902,7 +1907,7 @@ class ModelMaker
 					next = to;				
 					
 					output("Calling makeECStateBranch() from makeECStateBranch()", level);
-					makeECStateBranch(ecc, fbName, curECDestName, next, ecStates, ecTransitions, visitedECStates, doneInitActions, nameCounter, level + 1, identifierMap);
+					makeECStateBranch(ecc, fbName, curECDestName, next, ecStates, ecTransitions, visitedECStates, level + 1, identifierMap);
 				}
 				else if (curECDestName.equals(firstECStateName) && !doneInitFinish)
 				{
