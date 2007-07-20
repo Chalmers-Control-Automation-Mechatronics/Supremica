@@ -3,10 +3,9 @@
   <VersionInfo Author="Goran Cengic" Organization="Chalmers" Version="1.0" Date="2005-04-08" />
   <InterfaceList>
     <EventInputs>
-      <Event Name="EI1" >
+      <Event Name="EI" >
         <With Var="DI" />
       </Event>
-      <Event Name="EI2" />
     </EventInputs>
     <EventOutputs>
       <Event Name="EO" >
@@ -26,16 +25,11 @@
     </InternalVars>
     <ECC>
         <ECState Name="INIT" />
-        <ECState Name="STATE1" >
+        <ECState Name="STATE" >
 		    <ECAction Algorithm="TestAlg" Output="EO"/>
 	    </ECState>    	
-        <ECState Name="STATE2" >
-		    <ECAction Algorithm="TestAlg" Output="EO"/>
-	    </ECState>    	
-		<ECTransition Source="INIT" Destination="STATE1" Condition="EI1" />
-		<ECTransition Source="STATE1" Destination="INIT" Condition="1" />
-		<ECTransition Source="INIT" Destination="STATE2" Condition="EI2" />
-		<ECTransition Source="STATE2" Destination="INIT" Condition="1" />
+		<ECTransition Source="INIT" Destination="STATE" Condition="EI" />
+		<ECTransition Source="STATE" Destination="INIT" Condition="1" />
     </ECC>
     <Algorithm Name="TestAlg">
     <Other Language="Java" Text=
