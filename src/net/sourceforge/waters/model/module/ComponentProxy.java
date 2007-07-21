@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.module
 //# CLASS:   ComponentProxy
 //###########################################################################
-//# $Id: ComponentProxy.java,v 1.2 2005-11-03 01:24:16 robi Exp $
+//# $Id: ComponentProxy.java,v 1.3 2007-07-21 08:46:39 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.module;
@@ -15,9 +15,11 @@ package net.sourceforge.waters.model.module;
  *
  * This interface represents the proper items that may occur in a module's
  * component list. Presently, these are <I>simple components</I> ({@link
- * SimpleComponentProxy}) and <I>instances</I> ({@link InstanceProxy}).
+ * SimpleComponentProxy}), <I>variables</I> ({@link VariableProxy}), and
+ * <I>instances</I> ({@link InstanceProxy}).
  *
  * @see SimpleComponentProxy
+ * @see VariableComponentProxy
  * @see InstanceProxy
  *
  * @author Robi Malik

@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.marshaller
 //# CLASS:   JAXBModuleImporter
 //###########################################################################
-//# $Id: JAXBModuleImporter.java,v 1.23 2007-06-08 10:45:20 robi Exp $
+//# $Id: JAXBModuleImporter.java,v 1.24 2007-07-21 08:46:39 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.marshaller;
@@ -65,6 +65,8 @@ import net.sourceforge.waters.model.module.SimpleIdentifierProxy;
 import net.sourceforge.waters.model.module.SimpleNodeProxy;
 import net.sourceforge.waters.model.module.SplineGeometryProxy;
 import net.sourceforge.waters.model.module.UnaryExpressionProxy;
+import net.sourceforge.waters.model.module.VariableComponentProxy;
+import net.sourceforge.waters.model.module.VariableMarkingProxy;
 
 import net.sourceforge.waters.xsd.base.ComponentKind;
 import net.sourceforge.waters.xsd.base.ElementType;
@@ -106,6 +108,8 @@ import net.sourceforge.waters.xsd.module.SimpleNode;
 import net.sourceforge.waters.xsd.module.SplineGeometry;
 import net.sourceforge.waters.xsd.module.SplineKind;
 import net.sourceforge.waters.xsd.module.UnaryExpression;
+import net.sourceforge.waters.xsd.module.VariableComponent;
+import net.sourceforge.waters.xsd.module.VariableMarking;
 //EFA----------------
 import net.sourceforge.waters.xsd.module.Actions;
 import net.sourceforge.waters.xsd.module.BooleanConstant;
@@ -434,6 +438,24 @@ public class JAXBModuleImporter
     };
     mHandlerMap.put
       (net.sourceforge.waters.xsd.module.UnaryExpression.class, handler);
+    handler = new ImportHandler() {
+      public VariableComponentProxy importElement(final ElementType element)
+      {
+        final VariableComponent downcast = (VariableComponent) element;
+        return importVariableComponent(downcast);
+      }
+    };
+    mHandlerMap.put
+      (net.sourceforge.waters.xsd.module.VariableComponent.class, handler);
+    handler = new ImportHandler() {
+      public VariableMarkingProxy importElement(final ElementType element)
+      {
+        final VariableMarking downcast = (VariableMarking) element;
+        return importVariableMarking(downcast);
+      }
+    };
+    mHandlerMap.put
+      (net.sourceforge.waters.xsd.module.VariableMarking.class, handler);
   }
 
 
@@ -1021,6 +1043,45 @@ public class JAXBModuleImporter
     final SimpleExpressionProxy subTerm =
       (SimpleExpressionProxy) importElement(subTermElement);
     return mFactory.createUnaryExpressionProxy(text, operator, subTerm);
+  }
+
+  private VariableComponentProxy importVariableComponent
+    (final VariableComponent element)
+  {
+    final IdentifierType identifierElement = element.getIdentifier();
+    final IdentifierProxy identifier =
+      (IdentifierProxy) importElement(identifierElement);
+    final SimpleExpressionType typeElement = element.getType();
+    final SimpleExpressionProxy type =
+      (SimpleExpressionProxy) importElement(typeElement);
+    final boolean deterministic = element.isDeterministic();
+    final SimpleExpressionType initialStatePredicateElement =
+      element.getInitialStatePredicate();
+    final SimpleExpressionProxy initialStatePredicate =
+      (SimpleExpressionProxy) importElement(initialStatePredicateElement);
+    final List<VariableMarkingProxy> markingList =
+      new LinkedList<VariableMarkingProxy>();
+    final List<VariableMarking> markingListElement =
+      Casting.toList(element.getVariableMarkings());
+    for (final VariableMarking markingElement : markingListElement) {
+      final VariableMarkingProxy markingProxy =
+        importVariableMarking(markingElement);
+      markingList.add(markingProxy);
+    }
+    return mFactory.createVariableComponentProxy
+      (identifier, type, deterministic, initialStatePredicate, markingList);
+  }
+
+  private VariableMarkingProxy importVariableMarking
+    (final VariableMarking element)
+  {
+    final IdentifierType propositionElement = element.getProposition();
+    final IdentifierProxy proposition =
+      (IdentifierProxy) importElement(propositionElement);
+    final SimpleExpressionType predicateElement = element.getPredicate();
+    final SimpleExpressionProxy predicate =
+      (SimpleExpressionProxy) importElement(predicateElement);
+    return mFactory.createVariableMarkingProxy(proposition, predicate);
   }
 
 

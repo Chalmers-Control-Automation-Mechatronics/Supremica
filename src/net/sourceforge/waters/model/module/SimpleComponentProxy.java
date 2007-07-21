@@ -1,10 +1,10 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
 //# PROJECT: Waters
-//# PACKAGE: net.sourceforge.waters.model.decl
+//# PACKAGE: net.sourceforge.waters.model.module
 //# CLASS:   SimpleComponentProxy
 //###########################################################################
-//# $Id: SimpleComponentProxy.java,v 1.3 2006-03-02 12:12:49 martin Exp $
+//# $Id: SimpleComponentProxy.java,v 1.4 2007-07-21 08:46:39 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.module;
@@ -44,7 +44,7 @@ public interface SimpleComponentProxy extends ComponentProxy {
   public ComponentKind getKind();
 
   public GraphProxy getGraph();
-  
+
   public List<VariableProxy> getVariables();
 
 }

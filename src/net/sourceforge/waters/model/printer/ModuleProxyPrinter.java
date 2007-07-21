@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.printer
 //# CLASS:   ModuleProxyPrinter
 //###########################################################################
-//# $Id: ModuleProxyPrinter.java,v 1.12 2007-06-08 10:45:20 robi Exp $
+//# $Id: ModuleProxyPrinter.java,v 1.13 2007-07-21 08:46:39 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.printer;
@@ -59,6 +59,8 @@ import net.sourceforge.waters.model.module.SimpleIdentifierProxy;
 import net.sourceforge.waters.model.module.SimpleNodeProxy;
 import net.sourceforge.waters.model.module.SplineGeometryProxy;
 import net.sourceforge.waters.model.module.UnaryExpressionProxy;
+import net.sourceforge.waters.model.module.VariableComponentProxy;
+import net.sourceforge.waters.model.module.VariableMarkingProxy;
 
 import net.sourceforge.waters.model.module.VariableProxy;
 import net.sourceforge.waters.model.module.GuardActionBlockProxy;
@@ -628,6 +630,44 @@ public class ModuleProxyPrinter
         mAssocBraces = savedAssocBraces;
       }
     }
+    return null;
+  }
+
+  public Object visitVariableComponentProxy
+      (final VariableComponentProxy proxy)
+    throws VisitorException
+  {
+    print("variable ");
+    final IdentifierProxy identifier = proxy.getIdentifier();
+    identifier.acceptVisitor(this);
+    print(" : ");
+    final SimpleExpressionProxy type = proxy.getType();
+    type.acceptVisitor(this);
+    println(" {");
+    indentIn();
+    print("initial WHEN ");
+    final SimpleExpressionProxy initial = proxy.getInitialStatePredicate();
+    initial.acceptVisitor(this);
+    println();
+    for (final VariableMarkingProxy marking : proxy.getVariableMarkings()) {
+      visitVariableMarkingProxy(marking);
+      println();
+    }
+    indentOut();
+    print('}');
+    return null;
+  }
+
+  public Object visitVariableMarkingProxy
+      (final VariableMarkingProxy proxy)
+    throws VisitorException
+  {
+    print("marking ");
+    final IdentifierProxy proposition = proxy.getProposition();
+    proposition.acceptVisitor(this);
+    print(" WHEN ");
+    final SimpleExpressionProxy predicate = proxy.getPredicate();
+    predicate.acceptVisitor(this);
     return null;
   }
 

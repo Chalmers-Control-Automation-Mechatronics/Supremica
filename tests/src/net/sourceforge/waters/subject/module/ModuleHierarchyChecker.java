@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.subject.module
 //# CLASS:   ModuleHierarchyChecker
 //###########################################################################
-//# $Id: ModuleHierarchyChecker.java,v 1.7 2007-06-23 09:18:31 robi Exp $
+//# $Id: ModuleHierarchyChecker.java,v 1.8 2007-07-21 08:46:39 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.subject.module;
@@ -41,6 +41,8 @@ import net.sourceforge.waters.model.module.SimpleExpressionProxy;
 import net.sourceforge.waters.model.module.SimpleNodeProxy;
 import net.sourceforge.waters.model.module.SplineGeometryProxy;
 import net.sourceforge.waters.model.module.UnaryExpressionProxy;
+import net.sourceforge.waters.model.module.VariableComponentProxy;
+import net.sourceforge.waters.model.module.VariableMarkingProxy;
 import net.sourceforge.waters.subject.base.AbstractSubject;
 import net.sourceforge.waters.subject.base.Subject;
 
@@ -340,6 +342,34 @@ class ModuleHierarchyChecker
     visitSimpleExpressionProxy(proxy);
     final SimpleExpressionProxy subTerm = proxy.getSubTerm();
     visitProxyChild(subTerm, proxy);
+    return null;
+  }
+
+  public Object visitVariableComponentProxy
+      (final VariableComponentProxy proxy)
+    throws VisitorException
+  {
+    final VariableComponentSubject subject = (VariableComponentSubject) proxy;
+    visitIdentifiedProxy(proxy);
+    final SimpleExpressionProxy type = proxy.getType();
+    visitProxyChild(type, proxy);
+    final SimpleExpressionProxy predicate = proxy.getInitialStatePredicate();
+    visitProxyChild(predicate, proxy);
+    final Collection<VariableMarkingSubject> markings =
+      subject.getVariableMarkingsModifiable();
+    visitProxyCollectionChild(markings, proxy);
+    return null;
+  }
+
+  public Object visitVariableMarkingProxy
+      (final VariableMarkingProxy proxy)
+    throws VisitorException
+  {
+    visitProxy(proxy);
+    final IdentifierProxy proposition = proxy.getProposition();
+    visitProxyChild(proposition, proxy);
+    final SimpleExpressionProxy predicate = proxy.getPredicate();
+    visitProxyChild(predicate, proxy);
     return null;
   }
 

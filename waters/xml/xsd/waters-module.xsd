@@ -270,6 +270,7 @@
 <xs:group name="ComponentListEntry">
   <xs:choice>
     <xs:element ref="M:SimpleComponent"/>
+    <xs:element ref="M:VariableComponent"/>
     <xs:element ref="M:Instance"/>
     <xs:element ref="M:ForeachComponent"/>
   </xs:choice>
@@ -284,6 +285,55 @@
           <xs:element ref="M:VariableList" minOccurs="0"/>
         </xs:sequence>
         <xs:attribute name="Kind" type="B:ComponentKind" use="required"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+</xs:element>
+
+<xs:element name="VariableComponent">
+  <xs:complexType>
+    <xs:complexContent>
+      <xs:extension base="M:IdentifiedType">
+        <xs:sequence>
+          <xs:group ref="M:RangeExpression">
+             <xs:annotation><xs:appinfo>
+               <jaxb:property name="Type"/>
+             </xs:appinfo></xs:annotation>
+          </xs:group>
+          <xs:group ref="M:ArithmeticExpression">
+            <xs:annotation><xs:appinfo>
+              <jaxb:property name="InitialStatePredicate"/>
+            </xs:appinfo></xs:annotation>
+          </xs:group>
+          <xs:element ref="M:VariableMarking"
+		      minOccurs="0" maxOccurs="unbounded">
+            <xs:annotation><xs:appinfo>
+              <jaxb:property name="VariableMarkings"/>
+            </xs:appinfo></xs:annotation>
+	  </xs:element>
+        </xs:sequence>
+        <xs:attribute name="Deterministic" type="xs:boolean" default="true"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+</xs:element>
+
+<xs:element name="VariableMarking">
+  <xs:complexType>
+    <xs:complexContent>
+      <xs:extension base="B:ElementType">
+        <xs:sequence>
+          <xs:group ref="M:Identifier">
+            <xs:annotation><xs:appinfo>
+              <jaxb:property name="Proposition"/>
+            </xs:appinfo></xs:annotation>
+          </xs:group>
+          <xs:group ref="M:ArithmeticExpression">
+            <xs:annotation><xs:appinfo>
+              <jaxb:property name="Predicate"/>
+            </xs:appinfo></xs:annotation>
+          </xs:group>
+        </xs:sequence>
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>

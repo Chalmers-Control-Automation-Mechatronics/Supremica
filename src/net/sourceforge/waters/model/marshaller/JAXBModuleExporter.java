@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.marshaller
 //# CLASS:   JAXBModuleExporter
 //###########################################################################
-//# $Id: JAXBModuleExporter.java,v 1.20 2007-06-08 10:45:20 robi Exp $
+//# $Id: JAXBModuleExporter.java,v 1.21 2007-07-21 08:46:39 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.marshaller;
@@ -64,6 +64,8 @@ import net.sourceforge.waters.model.module.SimpleIdentifierProxy;
 import net.sourceforge.waters.model.module.SimpleNodeProxy;
 import net.sourceforge.waters.model.module.SplineGeometryProxy;
 import net.sourceforge.waters.model.module.UnaryExpressionProxy;
+import net.sourceforge.waters.model.module.VariableComponentProxy;
+import net.sourceforge.waters.model.module.VariableMarkingProxy;
 import net.sourceforge.waters.model.unchecked.Casting;
 
 import net.sourceforge.waters.xsd.base.ElementType;
@@ -110,6 +112,8 @@ import net.sourceforge.waters.xsd.module.SimpleNode;
 import net.sourceforge.waters.xsd.module.SplineGeometry;
 import net.sourceforge.waters.xsd.module.SplineKind;
 import net.sourceforge.waters.xsd.module.UnaryExpression;
+import net.sourceforge.waters.xsd.module.VariableComponent;
+import net.sourceforge.waters.xsd.module.VariableMarking;
 //EFA-----------------
 import net.sourceforge.waters.xsd.module.Actions;
 import net.sourceforge.waters.xsd.module.BooleanConstant;
@@ -490,6 +494,24 @@ public class JAXBModuleExporter
   {
     final UnaryExpression element = mFactory.createUnaryExpression();
     copyUnaryExpressionProxy(proxy, element);
+    return element;
+  }
+
+  public VariableComponent visitVariableComponentProxy
+      (final VariableComponentProxy proxy)
+    throws VisitorException
+  {
+    final VariableComponent element = mFactory.createVariableComponent();
+    copyVariableComponentProxy(proxy, element);
+    return element;
+  }
+
+  public VariableMarking visitVariableMarkingProxy
+      (final VariableMarkingProxy proxy)
+    throws VisitorException
+  {
+    final VariableMarking element = mFactory.createVariableMarking();
+    copyVariableMarkingProxy(proxy, element);
     return element;
   }
 
@@ -1094,6 +1116,46 @@ public class JAXBModuleExporter
     element.setSubTerm(subTermElement);
   }
 
+  private void copyVariableComponentProxy
+      (final VariableComponentProxy proxy,
+       final VariableComponent element)
+    throws VisitorException
+  {
+    copyComponentProxy(proxy, element);
+    final SimpleExpressionProxy typeProxy = proxy.getType();
+    final SimpleExpressionType typeElement =
+      (SimpleExpressionType) typeProxy.acceptVisitor(this);
+    element.setType(typeElement);
+    final boolean deterministic = proxy.isDeterministic();
+    element.setDeterministic(deterministic);
+    final SimpleExpressionProxy predicateProxy =
+      proxy.getInitialStatePredicate();
+    final SimpleExpressionType predicateElement =
+      (SimpleExpressionType) predicateProxy.acceptVisitor(this);
+    element.setInitialStatePredicate(predicateElement);
+    final List<VariableMarkingProxy> listProxy =
+      proxy.getVariableMarkings();
+    final List<ElementType> listElement =
+      Casting.toList(element.getVariableMarkings());
+    copyCollection(listProxy, listElement);
+  }
+
+  private void copyVariableMarkingProxy
+      (final VariableMarkingProxy proxy,
+       final VariableMarking element)
+    throws VisitorException
+  {
+    copyProxy(proxy, element);
+    final IdentifierProxy identifierProxy = proxy.getProposition();
+    final IdentifierType identifierElement =
+      (IdentifierType) identifierProxy.acceptVisitor(this);
+    element.setProposition(identifierElement);
+    final SimpleExpressionProxy predicateProxy = proxy.getPredicate();
+    final SimpleExpressionType predicateElement =
+      (SimpleExpressionType) predicateProxy.acceptVisitor(this);
+    element.setPredicate(predicateElement);
+  }
+
 
   //#########################################################################
   //# Creating Geometry Elements
@@ -1175,12 +1237,13 @@ public class JAXBModuleExporter
   private static final GraphEdgeListHandler
     mGraphEdgeListHandler =
     new GraphEdgeListHandler(mFactory);
+
   //EFA
   private static final SimpleComponentVariableListHandler
   mSimpleComponentVariableListHandler =
   new SimpleComponentVariableListHandler(mFactory);
-  
   //--------------------------
+
   private static final GraphNodeListHandler
     mGraphNodeListHandler =
     new GraphNodeListHandler(mFactory);
