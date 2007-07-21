@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.module
 //# CLASS:   ModuleCompiler
 //###########################################################################
-//# $Id: ModuleCompiler.java,v 1.79 2007-07-16 11:34:32 flordal Exp $
+//# $Id: ModuleCompiler.java,v 1.80 2007-07-21 22:13:24 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.compiler;
@@ -50,7 +50,6 @@ import net.sourceforge.waters.model.marshaller.ProxyMarshaller;
 import net.sourceforge.waters.model.marshaller.WatersUnmarshalException;
 import net.sourceforge.waters.model.module.AbstractModuleProxyVisitor;
 import net.sourceforge.waters.model.module.BinaryExpressionProxy;
-import net.sourceforge.waters.model.module.BooleanConstantProxy;
 import net.sourceforge.waters.model.module.ConstantAliasProxy;
 import net.sourceforge.waters.model.module.EdgeProxy;
 import net.sourceforge.waters.model.module.EnumSetExpressionProxy;
@@ -196,12 +195,6 @@ public class ModuleCompiler extends AbstractModuleProxyVisitor
       exception.provideLocation(proxy);
       throw wrap(exception);
     }
-  }
-
-  public BooleanValue visitBooleanConstantProxy
-    (final BooleanConstantProxy proxy)
-  {
-    return new CompiledBooleanValue(proxy.isValue());
   }
 
   public SimpleValue visitConstantAliasProxy(final ConstantAliasProxy proxy)

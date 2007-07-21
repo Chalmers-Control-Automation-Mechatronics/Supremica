@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.printer
 //# CLASS:   ModuleProxyPrinter
 //###########################################################################
-//# $Id: ModuleProxyPrinter.java,v 1.13 2007-07-21 08:46:39 robi Exp $
+//# $Id: ModuleProxyPrinter.java,v 1.14 2007-07-21 22:13:24 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.printer;
@@ -64,7 +64,6 @@ import net.sourceforge.waters.model.module.VariableMarkingProxy;
 
 import net.sourceforge.waters.model.module.VariableProxy;
 import net.sourceforge.waters.model.module.GuardActionBlockProxy;
-import net.sourceforge.waters.model.module.BooleanConstantProxy;
 
 import net.sourceforge.waters.xsd.base.ComponentKind;
 import net.sourceforge.waters.xsd.base.EventKind;
@@ -118,15 +117,6 @@ public class ModuleProxyPrinter
 	    print(")");
 	    return null;
   }
-  
-  public Object visitBooleanConstantProxy 
-  (final BooleanConstantProxy proxy)
-  throws VisitorException
-	  {
-	    print(Boolean.toString(proxy.isValue()));
-	    return null;
-   }
-  
   //------------------
   
   public Object visitAliasProxy

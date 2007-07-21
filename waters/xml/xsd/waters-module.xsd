@@ -627,7 +627,6 @@
   <xs:choice>
     <xs:element ref="M:SimpleIdentifier"/>
     <xs:element ref="M:IntConstant"/>
-    <xs:element ref="M:BooleanConstant"/> 
   </xs:choice>
 </xs:group>
 
@@ -787,7 +786,6 @@
     <xs:element ref="M:SimpleIdentifier"/>
     <xs:element ref="M:IndexedIdentifier"/>
     <xs:element ref="M:IntConstant"/>
-    <xs:element ref="M:BooleanConstant"/>
     <xs:element ref="M:UnaryExpression"/>
     <xs:element ref="M:BinaryExpression"/>
     <xs:element ref="M:EnumSetExpression"/>
@@ -812,7 +810,6 @@
 <xs:group name="ArithmeticExpression">
   <xs:choice>
     <xs:element ref="M:BinaryExpression"/>
-    <xs:element ref="M:BooleanConstant"/>
     <xs:element ref="M:IntConstant"/>
     <xs:element ref="M:SimpleIdentifier"/>
     <xs:element ref="M:UnaryExpression"/>
@@ -823,7 +820,6 @@
   <xs:choice>
     <xs:element ref="M:SimpleIdentifier"/>
     <xs:element ref="M:IntConstant"/>
-    <xs:element ref="M:BooleanConstant"/>
     <xs:element ref="M:UnaryExpression"/>
     <xs:element ref="M:BinaryExpression"/>
     <xs:element ref="M:EnumSetExpression"/>
@@ -868,16 +864,6 @@
     <xs:complexContent>
       <xs:extension base="M:SimpleExpressionType">
         <xs:attribute name="Value" type="xs:int" use="required"/>
-      </xs:extension>
-    </xs:complexContent>
-  </xs:complexType>
-</xs:element>
-
-<xs:element name="BooleanConstant">
-  <xs:complexType>
-    <xs:complexContent>
-      <xs:extension base="M:SimpleExpressionType">
-        <xs:attribute name="Value" type="xs:boolean" use="required"/>
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>

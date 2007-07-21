@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.marshaller
 //# CLASS:   JAXBModuleImporter
 //###########################################################################
-//# $Id: JAXBModuleImporter.java,v 1.24 2007-07-21 08:46:39 robi Exp $
+//# $Id: JAXBModuleImporter.java,v 1.25 2007-07-21 22:13:24 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.marshaller;
@@ -30,7 +30,6 @@ import net.sourceforge.waters.model.expr.UnaryOperator;
 //EFA-----------
 import net.sourceforge.waters.model.module.GuardActionBlockProxy;
 import net.sourceforge.waters.model.module.VariableProxy;
-import net.sourceforge.waters.model.module.BooleanConstantProxy;
 //-------------
 import net.sourceforge.waters.model.module.BinaryExpressionProxy;
 import net.sourceforge.waters.model.module.BoxGeometryProxy;
@@ -112,7 +111,6 @@ import net.sourceforge.waters.xsd.module.VariableComponent;
 import net.sourceforge.waters.xsd.module.VariableMarking;
 //EFA----------------
 import net.sourceforge.waters.xsd.module.Actions;
-import net.sourceforge.waters.xsd.module.BooleanConstant;
 import net.sourceforge.waters.xsd.module.GuardActionBlock;
 import net.sourceforge.waters.xsd.module.Guards;
 import net.sourceforge.waters.xsd.module.Variable;
@@ -204,30 +202,18 @@ public class JAXBModuleImporter
           return importGuardActionBlock(downcast);
         }
       };
-      mHandlerMap.put
-        (net.sourceforge.waters.xsd.module.GuardActionBlock.class, handler);
-      
-      handler = new ImportHandler() {
-      public BooleanConstantProxy importElement(final ElementType element)
-      {
-        final BooleanConstant downcast = (BooleanConstant) element;
-        return importBooleanConstant(downcast);
-      }
-    };
     mHandlerMap.put
-      (net.sourceforge.waters.xsd.module.BooleanConstant.class, handler);
-    
-      handler = new ImportHandler() {
- 			public VariableProxy importElement(final ElementType element) {
- 				final Variable downcast = (Variable) element;
- 				return importVariable(downcast);
- 			}
- 		};
- 		mHandlerMap.put(net.sourceforge.waters.xsd.module.Variable.class,
- 				handler);
-     
-     // ---------------------------
-
+      (net.sourceforge.waters.xsd.module.GuardActionBlock.class, handler);
+      
+    handler = new ImportHandler() {
+        public VariableProxy importElement(final ElementType element) {
+          final Variable downcast = (Variable) element;
+          return importVariable(downcast);
+        }
+      };
+    mHandlerMap.put
+      (net.sourceforge.waters.xsd.module.Variable.class, handler);
+    // ---------------------------
     
     handler = new ImportHandler() {
       public EnumSetExpressionProxy importElement(final ElementType element)
@@ -555,14 +541,6 @@ public class JAXBModuleImporter
   
   
 //EFA----------------------
-  private BooleanConstantProxy importBooleanConstant
-    (final BooleanConstant element)
-  {
-    final String text = element.getText();
-    final boolean value = element.isValue();
-    return mFactory.createBooleanConstantProxy(text, value);
-  }
-
   private VariableProxy importVariable(final Variable element)
   {
     final String name = element.getName();

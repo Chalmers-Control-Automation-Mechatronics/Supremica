@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.waters.model.expr
 //# CLASS:   Operator
 //###########################################################################
-//# $Id: Operator.java,v 1.4 2006-09-06 11:52:21 robi Exp $
+//# $Id: Operator.java,v 1.5 2007-07-21 22:13:24 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.expr;
@@ -41,6 +41,8 @@ public interface Operator {
 
   public static final int TYPE_INDEX = 
     TYPE_BOOLEAN | TYPE_INT | TYPE_ATOM;
+  public static final int TYPE_ARITHMETIC = 
+    TYPE_BOOLEAN | TYPE_INT | TYPE_ATOM | TYPE_NAME;
   public static final int TYPE_ANY =
     TYPE_BOOLEAN | TYPE_INT | TYPE_ATOM | TYPE_RANGE | TYPE_NAME;
 

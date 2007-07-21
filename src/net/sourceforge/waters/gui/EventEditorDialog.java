@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   EventEditorDialog
 //###########################################################################
-//# $Id: EventEditorDialog.java,v 1.17 2007-06-11 05:59:18 robi Exp $
+//# $Id: EventEditorDialog.java,v 1.18 2007-07-21 22:13:24 robi Exp $
 //###########################################################################
 
 
@@ -369,7 +369,7 @@ public class EventEditorDialog
   /**
    * Fill the panels and layout all buttons and components.
    * This method uses the {@link #mDisplayingMoreOptions} member to
-   * determine whether the full dialog ore only the reduced version is to
+   * determine whether the full dialog or only the reduced version is to
    * be shown. It is assumed that all needed components have been
    * created by a call to {@link #createComponents()} before.
    */
@@ -1100,7 +1100,7 @@ public class EventEditorDialog
    * <P>The Waters event declaration subject edited by this dialog.</P>
    *
    * <P>This is a reference to the actual object that is being edited.  If
-   * a new event declaorration is being created, it is <CODE>null</CODE>
+   * a new event declaration is being created, it is <CODE>null</CODE>
    * until the dialog is commited and the actually created subject is
    * assigned.</P>
    *

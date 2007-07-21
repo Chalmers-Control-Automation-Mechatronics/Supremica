@@ -2,7 +2,6 @@ package net.sourceforge.waters.subject.module;
 
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
 import net.sourceforge.waters.model.module.BinaryExpressionProxy;
-import net.sourceforge.waters.model.module.BooleanConstantProxy;
 import net.sourceforge.waters.model.module.IntConstantProxy;
 import net.sourceforge.waters.model.module.SimpleIdentifierProxy;
 import net.sourceforge.waters.model.module.VariableProxy;
@@ -100,47 +99,56 @@ public class VariableHelper {
 	public static VariableSubject createBooleanVariable(final String name,
 			final boolean initialValue, final Boolean markedValue) {
 		ModuleSubjectFactory factory = ModuleSubjectFactory.getInstance();
-		return factory.createVariableProxy(name, factory
-				.createSimpleIdentifierProxy(NAME_OF_BOOLEAN_TYPE), factory
-				.createBooleanConstantProxy(initialValue),
-				markedValue == null ? null : factory
-						.createBooleanConstantProxy(markedValue));
+		return factory.createVariableProxy
+		  (name,
+		   factory.createSimpleIdentifierProxy(NAME_OF_BOOLEAN_TYPE),
+		   factory.createIntConstantProxy(initialValue ? 1 : 0),
+		   markedValue == null ? null :
+		   factory.createIntConstantProxy(markedValue ? 1 : 0));
 	}
 
-	public static void setAsBoolean(VariableSubject variable,
-			final boolean initialValue, final Boolean markedValue) {
-
-		ModuleSubjectFactory factory = ModuleSubjectFactory.getInstance();
-		variable.setType(factory
-				.createSimpleIdentifierProxy(NAME_OF_BOOLEAN_TYPE));
-
-		variable.setInitialValue(factory
-				.createBooleanConstantProxy(initialValue));
-
-		variable.setMarkedValue(markedValue == null ? null : factory
-				.createBooleanConstantProxy(markedValue));
-	}
+  public static void setAsBoolean(VariableSubject variable,
+				  final boolean initialValue,
+				  final Boolean markedValue)
+  {
+    ModuleSubjectFactory factory = ModuleSubjectFactory.getInstance();
+    variable.setType
+      (factory.createSimpleIdentifierProxy(NAME_OF_BOOLEAN_TYPE));
+    variable.setInitialValue
+      (factory.createIntConstantProxy(initialValue ? 1 : 0));
+    variable.setMarkedValue
+      (markedValue == null ? null :
+       factory.createIntConstantProxy(markedValue ? 1 : 0));
+  }
 
 	public static boolean isBoolean(VariableProxy variable) {
 		return variable.getType() instanceof SimpleIdentifierProxy;
 	}
 
-	public static Boolean getInitialBooleanValue(VariableProxy variable) {
-		if (!isBoolean(variable)) {
-			return null;
-		}
-		return ((BooleanConstantProxy) variable.getInitialValue()).isValue();
-	}
+  public static Boolean getInitialBooleanValue(VariableProxy variable)
+  {
+    if (!isBoolean(variable)) {
+      return null;
+    } else {
+      final IntConstantProxy intconst =
+	(IntConstantProxy) variable.getInitialValue();
+      return intconst.getValue() != 0;
+    }
+  }
 
-	public static Boolean getMarkedBooleanValue(VariableProxy variable) {
-		if (!isBoolean(variable)) {
-			return null;
-		}
-		if (variable.getMarkedValue() == null) {
-			return null;
-		}
-		return ((BooleanConstantProxy) variable.getMarkedValue()).isValue();
-	}
+  public static Boolean getMarkedBooleanValue(VariableProxy variable)
+  {
+    if (!isBoolean(variable)) {
+      return null;
+    } else if (variable.getMarkedValue() == null) {
+      return null;
+    } else {
+      final IntConstantProxy intconst =
+	(IntConstantProxy) variable.getMarkedValue();
+      return intconst.getValue() != 0;
+    }
+  }
+   
+ public static final String NAME_OF_BOOLEAN_TYPE = "boolean";
 
-	public final static String NAME_OF_BOOLEAN_TYPE = "boolean";
 }

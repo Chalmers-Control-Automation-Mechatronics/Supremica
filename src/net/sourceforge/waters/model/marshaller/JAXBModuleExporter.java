@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.marshaller
 //# CLASS:   JAXBModuleExporter
 //###########################################################################
-//# $Id: JAXBModuleExporter.java,v 1.21 2007-07-21 08:46:39 robi Exp $
+//# $Id: JAXBModuleExporter.java,v 1.22 2007-07-21 22:13:24 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.marshaller;
@@ -25,7 +25,6 @@ import net.sourceforge.waters.model.expr.UnaryOperator;
 //EFA----------
 import net.sourceforge.waters.model.module.GuardActionBlockProxy;
 import net.sourceforge.waters.model.module.VariableProxy;
-import net.sourceforge.waters.model.module.BooleanConstantProxy;
 //-------------
 import net.sourceforge.waters.model.module.AliasProxy;
 import net.sourceforge.waters.model.module.BinaryExpressionProxy;
@@ -116,7 +115,6 @@ import net.sourceforge.waters.xsd.module.VariableComponent;
 import net.sourceforge.waters.xsd.module.VariableMarking;
 //EFA-----------------
 import net.sourceforge.waters.xsd.module.Actions;
-import net.sourceforge.waters.xsd.module.BooleanConstant;
 import net.sourceforge.waters.xsd.module.GuardActionBlock;
 import net.sourceforge.waters.xsd.module.Guards;
 import net.sourceforge.waters.xsd.module.Variable;
@@ -153,15 +151,6 @@ public class JAXBModuleExporter
   {
     final Variable element = mFactory.createVariable();
     copyVariableProxy(proxy, element);
-    return element;
-  }
-
-  public BooleanConstant visitBooleanConstantProxy
-    (final BooleanConstantProxy proxy)
-    throws VisitorException
-  {
-    final BooleanConstant element = mFactory.createBooleanConstant();
-    copyBooleanConstantProxy(proxy, element);
     return element;
   }
   //--------------------------------
@@ -570,15 +559,6 @@ public class JAXBModuleExporter
         (SimpleExpressionType) markedValueProxy.acceptVisitor(this);
       values.add(markedValueElement);
     }
-  }
-
-  private void copyBooleanConstantProxy
-    (final BooleanConstantProxy proxy,
-     final BooleanConstant element)
-    throws VisitorException
-  {
-    copySimpleExpressionProxy(proxy, element);
-    element.setValue(proxy.isValue());
   }
   // ------------------
 
