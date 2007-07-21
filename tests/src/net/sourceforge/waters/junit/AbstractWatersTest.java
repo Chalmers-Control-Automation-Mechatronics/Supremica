@@ -4,14 +4,22 @@
 //# PACKAGE: net.sourceforge.waters.junit
 //# CLASS:   AbstractWatersTest
 //###########################################################################
-//# $Id: AbstractWatersTest.java,v 1.6 2007-05-28 07:07:08 robi Exp $
+//# $Id: AbstractWatersTest.java,v 1.7 2007-07-21 06:28:07 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.junit;
 
 import java.io.File;
-import java.lang.reflect.Method;
+import java.io.FileOutputStream;
+import java.io.OutputStream;
+import java.io.PrintWriter;
 import junit.framework.TestCase;
+
+import org.apache.log4j.Appender;
+import org.apache.log4j.Logger;
+import org.apache.log4j.PatternLayout;
+import org.apache.log4j.WriterAppender;
+
 
 public abstract class AbstractWatersTest
   extends TestCase
@@ -39,26 +47,27 @@ public abstract class AbstractWatersTest
   protected void setUp() throws Exception
   {
     super.setUp();
-    final ClassLoader loader = AbstractWatersTest.class.getClassLoader();
-    try {
-      final Class<?> lclazz = loader.loadClass(LOGGERFACTORY);
-      final Method method = lclazz.getMethod("logToFile", File.class);
-      final File dir = getOutputDirectory();
-      final String name = "log4j.log";
-      mLogFile = new File(dir, name);
-      method.invoke(null, mLogFile);
-    } catch (final ClassNotFoundException exception) {
-      // No loggers---no trouble ...
-    }
+    final File dir = getOutputDirectory();
+    final String name = "log4j.log";
+    mLogFile = new File(dir, name);
+    final OutputStream stream = new FileOutputStream(mLogFile, true);
+    final PrintWriter writer = new PrintWriter(stream);
+    final PatternLayout layout = new PatternLayout("%-5p %m%n");
+    final Appender appender = new WriterAppender(layout, writer);
+    final String fullname = mLogFile.toString();
+    appender.setName(fullname);
+    final Logger root = Logger.getRootLogger();
+    root.addAppender(appender);
   }
 
   protected void tearDown() throws Exception
   {
     if (mLogFile != null) {
-      final ClassLoader loader = AbstractWatersTest.class.getClassLoader();
-      final Class<?> lclazz = loader.loadClass(LOGGERFACTORY);
-      final Method method = lclazz.getMethod("cancelLogToFile", File.class);
-      method.invoke(null, mLogFile);
+      final Logger root = Logger.getRootLogger();
+      final String fullname = mLogFile.toString();
+      final Appender appender = root.getAppender(fullname);
+      root.removeAppender(appender);
+      appender.close();
     }
     super.tearDown();
   }

@@ -1,10 +1,10 @@
-//# -*- tab-width: 4  indent-tabs-mode: t  c-basic-offset: 4 -*-
+//# -*- tab-width: 4  indent-tabs-mode: nil  c-basic-offset: 4 -*-
 //###########################################################################
 //# PROJECT: Supremica
 //# PACKAGE: org.supremica.log
 //# CLASS:   SupremicaLogger
 //###########################################################################
-//# $Id: SupremicaLogger.java,v 1.2 2007-06-21 15:47:42 flordal Exp $
+//# $Id: SupremicaLogger.java,v 1.3 2007-07-21 06:28:07 robi Exp $
 //###########################################################################
 
 /*

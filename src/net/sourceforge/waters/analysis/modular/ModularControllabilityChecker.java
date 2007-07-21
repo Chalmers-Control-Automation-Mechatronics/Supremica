@@ -1,18 +1,15 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
-//# PROJECT: Waters
+//# PROJECT: Waters Analysis Algorithms
 //# PACKAGE: net.sourceforge.waters.analysis.modular
 //# CLASS:   ModularControllabilityChecker
 //###########################################################################
-//# $Id: ModularControllabilityChecker.java,v 1.12 2007-07-12 05:18:30 siw4 Exp $
+//# $Id: ModularControllabilityChecker.java,v 1.13 2007-07-21 06:28:07 robi Exp $
 //###########################################################################
 
 
 package net.sourceforge.waters.analysis.modular;
 
-import org.supremica.log.LoggerFactory;
-import org.supremica.log.Logger;
-import net.sourceforge.waters.model.analysis.VerificationResult;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
@@ -26,6 +23,7 @@ import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.ControllabilityChecker;
 import net.sourceforge.waters.model.analysis.ControllabilityKindTranslator;
 import net.sourceforge.waters.model.analysis.KindTranslator;
+import net.sourceforge.waters.model.analysis.VerificationResult;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
@@ -34,16 +32,13 @@ import net.sourceforge.waters.model.des.SafetyTraceProxy;
 import net.sourceforge.waters.xsd.base.ComponentKind;
 import net.sourceforge.waters.xsd.base.EventKind;
 
+import org.apache.log4j.Logger;
+
 
 public class ModularControllabilityChecker
   extends AbstractModelVerifier
   implements ControllabilityChecker
 {
-  private final ControllabilityChecker mChecker;
-  private ModularHeuristic mHeuristic;
-  private KindTranslator mTranslator;
-  private int mStates;
-  private final boolean mLeast;
  
   public ModularControllabilityChecker(ProductDESProxy model,
                                        ProductDESProxyFactory factory,
@@ -198,7 +193,19 @@ public class ModularControllabilityChecker
       return a1.getName().compareTo(a2.getName());
     }
   }
+
   
+  //#########################################################################
+  //# Data Members
+  private final ControllabilityChecker mChecker;
+  private ModularHeuristic mHeuristic;
+  private KindTranslator mTranslator;
+  private int mStates;
+  private final boolean mLeast;
+
+
+  //#########################################################################
+  //# Static Class Variables
   private static final Logger LOGGER =
-    LoggerFactory.createLogger(ModularControllabilityChecker.class);
+    Logger.getLogger(ModularControllabilityChecker.class);
 }

@@ -1,47 +1,44 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
-//# PROJECT: Waters
+//# PROJECT: Waters Analysis Algorithms
 //# PACKAGE: net.sourceforge.waters.analysis.modular
 //# CLASS:   ModularLanguageInclusionChecker
 //###########################################################################
-//# $Id: ModularLanguageInclusionChecker.java,v 1.9 2007-07-12 05:18:30 siw4 Exp $
+//# $Id: ModularLanguageInclusionChecker.java,v 1.10 2007-07-21 06:28:07 robi Exp $
 //###########################################################################
 
 
 package net.sourceforge.waters.analysis.modular;
 
-import org.supremica.log.Logger;
-import org.supremica.log.LoggerFactory;
-import net.sourceforge.waters.model.analysis.VerificationResult;
-import net.sourceforge.waters.model.analysis.AnalysisException;
-import java.util.Comparator;
-import java.util.Set;
-import net.sourceforge.waters.model.analysis.ControllabilityKindTranslator;
-import net.sourceforge.waters.model.des.EventProxy;
-import net.sourceforge.waters.xsd.base.EventKind;
+import java.util.ArrayList;
 import java.util.Collections;
-import net.sourceforge.waters.xsd.base.ComponentKind;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
-import java.util.ArrayList;
-import net.sourceforge.waters.model.des.AutomatonProxy;
-import net.sourceforge.waters.model.analysis.ControllabilityChecker;
+import java.util.Set;
+
 import net.sourceforge.waters.model.analysis.AbstractModelVerifier;
-import net.sourceforge.waters.model.analysis.LanguageInclusionChecker;
+import net.sourceforge.waters.model.analysis.AnalysisException;
+import net.sourceforge.waters.model.analysis.ControllabilityChecker;
+import net.sourceforge.waters.model.analysis.ControllabilityKindTranslator;
 import net.sourceforge.waters.model.analysis.KindTranslator;
-import net.sourceforge.waters.model.des.SafetyTraceProxy;
-import net.sourceforge.waters.model.des.ProductDESProxyFactory;
+import net.sourceforge.waters.model.analysis.LanguageInclusionChecker;
+import net.sourceforge.waters.model.analysis.VerificationResult;
+import net.sourceforge.waters.model.des.AutomatonProxy;
+import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
+import net.sourceforge.waters.model.des.ProductDESProxyFactory;
+import net.sourceforge.waters.model.des.SafetyTraceProxy;
+import net.sourceforge.waters.xsd.base.ComponentKind;
+import net.sourceforge.waters.xsd.base.EventKind;
+
+import org.apache.log4j.Logger;
 
 
 public class ModularLanguageInclusionChecker
   extends AbstractModelVerifier
   implements LanguageInclusionChecker
 {
-  private final ControllabilityChecker mChecker;
-  private ModularHeuristic mHeuristic;
-  private KindTranslator mTranslator;
-  private int mStates;
   
   public ModularLanguageInclusionChecker(ProductDESProxy model,
                                          ProductDESProxyFactory factory,
@@ -155,7 +152,19 @@ public class ModularLanguageInclusionChecker
       return a1.getName().compareTo(a2.getName());
     }
   }
-  
+
+
+  //#########################################################################
+  //# Data Members
+  private final ControllabilityChecker mChecker;
+  private ModularHeuristic mHeuristic;
+  private KindTranslator mTranslator;
+  private int mStates;
+
+
+  //#########################################################################
+  //# Static Class Variables
   private static final Logger LOGGER =
-  LoggerFactory.createLogger(ModularLanguageInclusionChecker.class);
+    Logger.getLogger(ModularLanguageInclusionChecker.class);
+
 }

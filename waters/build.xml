@@ -15,7 +15,9 @@
   <property name="jaxb-api.jar" location="${supremica.lib}/jaxb-api.jar"/>
   <property name="jaxb-impl.jar" location="${supremica.lib}/jaxb-impl.jar"/>
   <property name="jaxb-xjc.jar" location="${supremica.lib}/jaxb-xjc.jar"/>
-  <property name="jsr173_api.jar" location="${supremica.lib}/jsr173_1.0_api.jar"/>
+  <property name="jsr173_api.jar"
+    location="${supremica.lib}/jsr173_1.0_api.jar"/>
+  <property name="log4j.jar" location="${supremica.lib}/log4j.jar"/>
   <property name="junit.jar" location="${supremica.lib}/junit.jar"/>
   <property name="trove.jar" location="${supremica.lib}/trove.jar"/>
 
@@ -56,6 +58,7 @@
   <path id="waters.compile.classpath">
     <path refid="jaxb.classpath"/>
     <pathelement location="${jaxb.jar}"/>
+    <pathelement location="${log4j.jar}"/>
     <pathelement location="${trove.jar}"/>
     <pathelement location="${supremica.lib}/log4j.jar"/>
   </path>
@@ -123,17 +126,17 @@
 
   <target name="waters-compile" depends="jaxb-jar">
     <mkdir dir="${waters.classes}"/>
-    <javac srcdir="${supremica.src}" destdir="${waters.classes}" 
-           includes="net/sourceforge/waters/**/*.java"
-           excludes="net/sourceforge/waters/gui/**/*.java
-                     net/sourceforge/waters/mbt/**/*.java
-                     net/sourceforge/waters/analysis/modular/supremica/*.java
-                     net/sourceforge/waters/model/unchecked/**/*.java
-                     org/supremica/**/*.java"
+    <javac sourcepath="" srcdir="${supremica.src}" destdir="${waters.classes}" 
            debug="${debug}" debuglevel="${debuglevel}" optimize="${optimize}">
       <classpath refid="waters.compile.classpath"/>
       <compilerarg value="-Xlint:unchecked"/>
       <compilerarg value="-Xlint:deprecation"/>
+      <include name="net/sourceforge/waters/**/*.java"/>
+      <exclude name="net/sourceforge/waters/gui/**/*.java"/>
+      <exclude name="net/sourceforge/waters/mbt/**/*.java"/>
+      <exclude
+          name="net/sourceforge/waters/analysis/modular/supremica/*.java"/>
+      <exclude name="net/sourceforge/waters/model/unchecked/**/*.java"/>
     </javac>
   </target>
 

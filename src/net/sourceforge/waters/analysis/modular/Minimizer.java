@@ -1,43 +1,50 @@
+//# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
+//###########################################################################
+//# PROJECT: Waters Analysis Algorithms
+//# PACKAGE: net.sourceforge.waters.analysis.modular
+//# CLASS:   Minimizer
+//###########################################################################
+//# $Id: Minimizer.java,v 1.2 2007-07-21 06:28:07 robi Exp $
+//###########################################################################
+
 package net.sourceforge.waters.analysis.modular;
+
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.List;
+import java.util.ListIterator;
+import java.util.Map.Entry;
+import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
-import net.sourceforge.waters.model.des.StateProxy;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import net.sourceforge.waters.model.des.EventProxy;
-import net.sourceforge.waters.model.des.TransitionProxy;
-import java.util.ArrayList;
-import net.sourceforge.waters.model.des.AutomatonProxy;
-import java.util.Iterator;
-import java.util.ListIterator;
-import net.sourceforge.waters.model.des.ProductDESProxyFactory;
-import java.util.Collection;
-import net.sourceforge.waters.model.base.NamedProxy;
-import net.sourceforge.waters.model.base.VisitorException;
-import net.sourceforge.waters.model.base.ProxyVisitor;
-import net.sourceforge.waters.model.des.ProductDESProxyVisitor;
-import net.sourceforge.waters.model.base.Proxy;
-import java.util.HashSet;
-import java.util.Collections;
 import java.util.TreeSet;
+
+import net.sourceforge.waters.model.base.NamedProxy;
+import net.sourceforge.waters.model.base.Proxy;
+import net.sourceforge.waters.model.base.ProxyVisitor;
+import net.sourceforge.waters.model.base.VisitorException;
+import net.sourceforge.waters.model.des.AutomatonProxy;
+import net.sourceforge.waters.model.des.EventProxy;
+import net.sourceforge.waters.model.des.ProductDESProxyFactory;
+import net.sourceforge.waters.model.des.ProductDESProxyVisitor;
+import net.sourceforge.waters.model.des.StateProxy;
+import net.sourceforge.waters.model.des.TransitionProxy;
+
 
 public class Minimizer
 {
-  private ProductDESProxyFactory mFactory;
-  private AutomatonProxy mAutomaton;
-  private StateProxy[] mStates;
-  private int[] mStateToPart;
-  private List<Set<Integer>> mPartitions;
-  private int[][] mTransitionsSucc;
-  private Set<Integer>[][] mTransitionsPred;
-  private EventProxy[] mEvents;
-  private Map<EventProxy, Integer> mEventMap;
   
-  public Minimizer(AutomatonProxy automaton, ProductDESProxyFactory factory)
+  //#########################################################################
+  //# Constructor
+  @SuppressWarnings("unchecked")
+  public Minimizer(final AutomatonProxy automaton,
+                   final ProductDESProxyFactory factory)
   {
     mAutomaton = automaton;
     mFactory = factory;
@@ -45,13 +52,14 @@ public class Minimizer
     mStateToPart = new int[mStates.length];
     mEvents = new EventProxy[automaton.getEvents().size()];
     mEventMap = new HashMap<EventProxy, Integer>(mEvents.length);
-    Map<StateProxy, Integer> stateMap = new HashMap<StateProxy, Integer>(mStates.length);
+    Map<StateProxy, Integer> stateMap =
+      new HashMap<StateProxy, Integer>(mStates.length);
     mTransitionsSucc = new int[mStates.length][mEvents.length];
     mTransitionsPred = new HashSet[mStates.length][mEvents.length];
     automaton.getStates().toArray(mStates);
     automaton.getEvents().toArray(mEvents);
-    for(int i = 0; i < mTransitionsPred.length; i++) {
-      for(int j = 0; j < mTransitionsPred[i].length; j++) {
+    for (int i = 0; i < mTransitionsPred.length; i++) {
+      for (int j = 0; j < mTransitionsPred[i].length; j++) {
         mTransitionsPred[i][j] = new HashSet<Integer>(0);
         mTransitionsSucc[i][j] = -1;
       }
@@ -362,7 +370,8 @@ public class Minimizer
     public Object acceptVisitor(final ProxyVisitor visitor)
       throws VisitorException
     {
-      final ProductDESProxyVisitor desvisitor = (ProductDESProxyVisitor) visitor;
+      final ProductDESProxyVisitor desvisitor =
+        (ProductDESProxyVisitor) visitor;
       return desvisitor.visitStateProxy(this);
     }
 
@@ -404,4 +413,18 @@ public class Minimizer
       return getName().compareTo(n.getName());
     }
   }
+
+
+  //#########################################################################
+  //# Data Members
+  private ProductDESProxyFactory mFactory;
+  private AutomatonProxy mAutomaton;
+  private StateProxy[] mStates;
+  private int[] mStateToPart;
+  private List<Set<Integer>> mPartitions;
+  private int[][] mTransitionsSucc;
+  private Set<Integer>[][] mTransitionsPred;
+  private EventProxy[] mEvents;
+  private Map<EventProxy,Integer> mEventMap;
+
 }

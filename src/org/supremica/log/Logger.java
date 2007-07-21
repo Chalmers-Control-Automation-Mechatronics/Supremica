@@ -1,3 +1,11 @@
+//# -*- tab-width: 4  indent-tabs-mode: nil  c-basic-offset: 4 -*-
+//###########################################################################
+//# PROJECT: Supremica
+//# PACKAGE: org.supremica.log
+//# CLASS:   LoggerFactory
+//###########################################################################
+//# $Id: Logger.java,v 1.13 2007-07-21 06:28:07 robi Exp $
+//###########################################################################
 
 /*
  * Supremica Software License Agreement
@@ -47,10 +55,28 @@
  *
  * Supremica is owned and represented by KA.
  */
+
 package org.supremica.log;
+
+/**
+ * A wrapper interface for the {@link org.apache.log4j.Logger} class.
+ * In addition to providing access to logging functionality through an
+ * interface instead of a class, this interface also provides some more
+ * convenient formatting methods for logging of exceptions, and a verbose
+ * mode.
+ *
+ * (Robi thinks that this interface should be removed because it forces all
+ * users of logging to link to package org.supremica.log, which depends on
+ * all of Supremica. Logging functionality should be accessible through
+ * LOG4J directly, and all reformatting issues should be handled by the
+ * appenders.)
+ *
+ * @author Knut &Aring;kesson
+ */
 
 public interface Logger
 {
+
     void debug(Object message);
     
     void debug(StackTraceElement[] stackTrace);
