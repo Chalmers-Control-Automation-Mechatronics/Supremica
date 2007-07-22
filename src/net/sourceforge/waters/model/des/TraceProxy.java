@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.des
 //# CLASS:   TraceProxy
 //###########################################################################
-//# $Id: TraceProxy.java,v 1.2 2006-07-20 02:28:37 robi Exp $
+//# $Id: TraceProxy.java,v 1.3 2007-07-22 00:02:07 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.des;
@@ -50,7 +50,7 @@ public interface TraceProxy
    * Gets the sequence of states and events constituting this trace.
    * This method returns a list of {@link TraceStepProxy} objects,
    * each consisting of a pair of incoming event and target state.
-   * The first entry has a <CODE>null</CODE> and the initial state as
+   * The first entry has a <CODE>null</CODE> event and the initial state as
    * its target state, while every other entry has a non-null event
    * and the state reached after that event.
    * @return  An unmodifiable list of objects of type {@link TraceStepProxy}.

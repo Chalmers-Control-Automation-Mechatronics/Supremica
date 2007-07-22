@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.analysis
 //# CLASS:   SafetyVerifier
 //###########################################################################
-//# $Id: SafetyVerifier.java,v 1.1 2006-11-03 01:00:07 robi Exp $
+//# $Id: SafetyVerifier.java,v 1.2 2007-07-22 00:02:07 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.analysis;
@@ -13,7 +13,7 @@ import net.sourceforge.waters.model.des.SafetyTraceProxy;
 
 
 /**
- * <P>A model verifier that checks to check safety properties.  This
+ * <P>A model verifier that checks safety properties.  This
  * interface is a generalisation of the controllability and language
  * inclusion tests. Event and component kind translation can be used to
  * implement these very similar checks using the same code.</P>

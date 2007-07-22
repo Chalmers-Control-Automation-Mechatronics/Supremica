@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.analysis
 //# CLASS:   ControlLoopChecker
 //###########################################################################
-//# $Id: ControlLoopChecker.java,v 1.1 2007-07-06 02:09:50 robi Exp $
+//# $Id: ControlLoopChecker.java,v 1.2 2007-07-22 00:02:07 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.analysis;
@@ -14,7 +14,7 @@ import net.sourceforge.waters.model.des.LoopTraceProxy;
 
 /**
  * <P>A model verifier that checks for control loops. This model verifier
- * checks whether the synchronosu composition of all automata in the input
+ * checks whether the synchronous composition of all automata in the input
  * model contains any non-empty loop consisting of controllable events
  * only. The set of loops events can be parameterised using a kind
  * translator.</P>
