@@ -286,6 +286,8 @@ class ModelMaker
 
  		automata = new ExtendedAutomata(theSystem.getName());
 
+		// TODO: make startup model
+
 		makeInstanceQueue();
 
 		makeEventExecution();
