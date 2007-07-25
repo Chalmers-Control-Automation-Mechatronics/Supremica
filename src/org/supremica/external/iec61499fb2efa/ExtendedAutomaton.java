@@ -71,7 +71,7 @@ public class ExtendedAutomaton
 
 	private boolean expandActions = false;
 
-	public ExtendedAutomaton(String name, ExtendedAutomata automata) 
+	public ExtendedAutomaton(String name, ExtendedAutomata automata)
 	{
 		this.name = name;
 
@@ -128,11 +128,7 @@ public class ExtendedAutomaton
 
 	public void addState(String name)
 	{
-		SimpleNodeSubject node = (SimpleNodeSubject) graph.getNodesModifiable().get(name);
-		if (node == null)
-		{
-			graph.getNodesModifiable().add(factory.createSimpleNodeProxy(name));
-		}
+		addState(name, false);
 	}
 
 	public void addState(String name, boolean initial)

@@ -287,6 +287,7 @@ class ModelMaker
  		automata = new ExtendedAutomata(theSystem.getName());
 
 		// TODO: make startup model
+		makeStartup();
 
 		makeInstanceQueue();
 
@@ -890,6 +891,43 @@ class ModelMaker
 		}
 		return cntSpec.substring(cntSpec.lastIndexOf("_")+1,cntSpec.length());
 	}
+
+
+	private void makeStartup()
+	{
+		System.out.println("ModelMaker.makeStartup():");
+
+		String fbName = restartInstance;
+
+		ExtendedAutomaton startup = new ExtendedAutomaton("Startup", automata);
+		
+		startup.addIntegerVariable("startup_done", 0, 1, 0, null);
+
+		startup.addState("s0", true);
+		
+		String from = "s0";
+		String to = "s1"; 
+		startup.addState(to);
+		String event = "send_output_COLD_" + fbName + ";";
+		String guard = "startup_done == 0";
+		// get connection data for the action
+		String cntName = (String) ((Map) eventConnections.get(fbName)).get("COLD");
+		String cntFB = getInstanceName(cntName);
+		String cntSignal = getSignalName(cntName);
+		Integer cntSignalID = (Integer) ((Map) events.get(cntFB)).get(cntSignal);
+		String action = "receiveing_event_" + cntFB + "=" + cntSignalID + ";";	
+		startup.addTransition(from, to, event, guard, action);
+		
+		from = to;
+		to = "s0";
+		startup.addState(to);
+		event = "receive_event_" + cntFB + ";";
+		action = "startup_done = 1;";
+		startup.addTransition(from, to, event, null, action);
+
+		automata.addAutomaton(startup);
+	}
+
 
 	private void makeInstanceQueue()
 	{
