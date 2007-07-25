@@ -156,125 +156,178 @@ public class ExtendedAutomaton
 	 */
 	public void addTransition(String from, String to, String label, String guardIn, String actionIn)
 	{
-		if (!expandActions)
+		if (expandActions)
 		{
-			SimpleNodeSubject fromNode = (SimpleNodeSubject) graph.getNodesModifiable().get(from);
-			if (fromNode == null)
-			{
-				System.out.println("ExtendedAutomaton.addTransition(): From node " + from + " does not exist!");
-			}
-			SimpleNodeSubject toNode = (SimpleNodeSubject) graph.getNodesModifiable().get(to);
-			if (toNode == null)
-			{
-				System.out.println("ExtendedAutomaton.addTransition(): To node " + to + " does not exist!");
-			}
-			
-			// parse label into event name list and make LabelBlockSubject 
-			List events = new LinkedList();
-			String remainingEvents = label;
-			String curEvent;
-			while(remainingEvents.contains(";"))
-			{
-				curEvent = remainingEvents.substring(0,remainingEvents.indexOf(";"));
-				remainingEvents = remainingEvents.substring(remainingEvents.indexOf(";") + 1);
-				// Add event declaration to the module if needed
-				for(Iterator iter = module.getEventDeclList().iterator();iter.hasNext();)
-				{
-					if(((EventDeclProxy) iter.next()).getName().equals(curEvent))
-					{	
-						automata.addEvent(curEvent);
-					}
-				}
-				events.add(factory.createSimpleIdentifierProxy(curEvent));
-			}
-			LabelBlockSubject labelBlock = factory.createLabelBlockProxy(events, null);
-			
-			// make GuardActionSubject
-			// Get guard ...
-			SimpleExpressionSubject guard = null;
-			try
-			{
-				String guardText = guardIn;
-				if (guardText != null && !guardText.trim().equals(""))
-				{
-					guard = (SimpleExpressionSubject) parser.parse(guardText, Operator.TYPE_BOOLEAN);
-				}
-			}
-			catch (ParseException exception)
-			{
-				System.out.println("ExtendedAutomaton.addTransition(): Syntax error in guard!");
-				System.out.println("\t automaton: " + name);
-				System.out.print("\t from: " + from);
-				System.out.println(" to: " + to);
-				System.out.println("\t label: " + label);
-				System.out.println("\t guard: " + guardIn);
-				System.out.println("\t action: " + actionIn);
-				return;
-			}
-			// Get actions ...
-			List<BinaryExpressionSubject> actions = null;
-			String actionText = actionIn;
-			if (actionText != null && !actionText.trim().equals(""))
-			{
-				String[] texts = actionIn.split(";");
-				actions = new ArrayList<BinaryExpressionSubject>(texts.length);
-				for (String text : texts)
-				{
-					if (text.length() > 0)
-					{
-						try
-						{
-							SimpleExpressionSubject action = (SimpleExpressionSubject) parser.parse(text);
-							if (!(action instanceof BinaryExpressionSubject))
-							{
-								throw new TypeMismatchException(action, "ACTION");
-							}
-							BinaryExpressionSubject binaction = (BinaryExpressionSubject) action;
-							actions.add(binaction);
-						}
-						catch (ParseException exception)
-						{
-							System.out.println("ExtendedAutomaton.addTransition(): Syntax error in action!");
-							System.out.println("\t automaton: " + name);
-							System.out.print("\t from: " + from);
-							System.out.println(" to: " + to);
-							System.out.println("\t label: " + label);
-							System.out.println("\t guard: " + guardIn);
-							System.out.println("\t action: " + actionIn);
-							return;
-						}
-						catch (TypeMismatchException exception)
-						{
-							System.out.println("ExtendedAutomaton.addTransition(): Type mismatch error in action!");
-							System.out.println("\t automaton: " + name);
-							System.out.print("\t from: " + from);
-							System.out.println(" to: " + to);
-							System.out.println("\t label: " + label);
-							System.out.println("\t guard: " + guardIn);
-							System.out.println("\t action: " + actionIn);
-							return;
-						}
-					}
-				}
-			}
-			
-			// Store parsed results ...
-			GuardActionBlockSubject guardActionBlock = factory.createGuardActionBlockProxy();
-			List<SimpleExpressionSubject> blockGuards = guardActionBlock.getGuardsModifiable();
-			blockGuards.clear();
-			if (guard != null)
-			{
-				blockGuards.add(guard);
-			}
-			List<BinaryExpressionSubject> blockActions = guardActionBlock.getActionsModifiable();
-			blockActions.clear();
-			if (actions != null)
-			{
-				blockActions.addAll(actions);
-			}
-			
-			EdgeSubject newEdge = factory.createEdgeProxy(fromNode, toNode, labelBlock, guardActionBlock, null, null, null);
-			graph.getEdgesModifiable().add(newEdge);	
+			addExtendedTransition(from, to, label, guardIn, actionIn);
 		}
+		else
+		{
+			addNormalTransition(from, to, label, guardIn, actionIn);
+		}
+	}
+
+	private void addNormalTransition(String from, String to, String label, String guardIn, String actionIn)
+	{
+		SimpleNodeSubject fromNode = (SimpleNodeSubject) graph.getNodesModifiable().get(from);
+		if (fromNode == null)
+		{
+			System.out.println("ExtendedAutomaton.addNormalTransition(): From node " + from + " does not exist!");
+		}
+		SimpleNodeSubject toNode = (SimpleNodeSubject) graph.getNodesModifiable().get(to);
+		if (toNode == null)
+		{
+			System.out.println("ExtendedAutomaton.addNormalTransition(): To node " + to + " does not exist!");
+		}
+			
+		// parse label into event name list and make LabelBlockSubject 
+		List events = new LinkedList();
+		String remainingEvents = label;
+		String curEvent;
+		while(remainingEvents.contains(";"))
+		{
+			curEvent = remainingEvents.substring(0,remainingEvents.indexOf(";"));
+			remainingEvents = remainingEvents.substring(remainingEvents.indexOf(";") + 1);
+			// Add event declaration to the module if needed
+			for(Iterator iter = module.getEventDeclList().iterator();iter.hasNext();)
+			{
+				if(((EventDeclProxy) iter.next()).getName().equals(curEvent))
+				{	
+					automata.addEvent(curEvent);
+				}
+			}
+			events.add(factory.createSimpleIdentifierProxy(curEvent));
+		}
+		LabelBlockSubject labelBlock = factory.createLabelBlockProxy(events, null);
+			
+		// make GuardActionSubject
+		// Get guard ...
+		SimpleExpressionSubject guard = null;
+		try
+		{
+			String guardText = guardIn;
+			if (guardText != null && !guardText.trim().equals(""))
+			{
+				guard = (SimpleExpressionSubject) parser.parse(guardText, Operator.TYPE_BOOLEAN);
+			}
+		}
+		catch (ParseException exception)
+		{
+			System.out.println("ExtendedAutomaton.addNormalTransition(): Syntax error in guard!");
+			System.out.println("\t automaton: " + name);
+			System.out.print("\t from: " + from);
+			System.out.println(" to: " + to);
+			System.out.println("\t label: " + label);
+			System.out.println("\t guard: " + guardIn);
+			System.out.println("\t action: " + actionIn);
+			return;
+		}
+		// Get actions ...
+		List<BinaryExpressionSubject> actions = null;
+		String actionText = actionIn;
+		if (actionText != null && !actionText.trim().equals(""))
+		{
+			String[] texts = actionIn.split(";");
+			actions = new ArrayList<BinaryExpressionSubject>(texts.length);
+			for (String text : texts)
+			{
+				if (text.length() > 0)
+				{
+					try
+					{
+						SimpleExpressionSubject action = (SimpleExpressionSubject) parser.parse(text);
+						if (!(action instanceof BinaryExpressionSubject))
+						{
+							throw new TypeMismatchException(action, "ACTION");
+						}
+						BinaryExpressionSubject binaction = (BinaryExpressionSubject) action;
+						actions.add(binaction);
+					}
+					catch (ParseException exception)
+					{
+						System.out.println("ExtendedAutomaton.addNormalTransition(): Syntax error in action!");
+						System.out.println("\t automaton: " + name);
+						System.out.print("\t from: " + from);
+						System.out.println(" to: " + to);
+						System.out.println("\t label: " + label);
+						System.out.println("\t guard: " + guardIn);
+						System.out.println("\t action: " + actionIn);
+						return;
+					}
+					catch (TypeMismatchException exception)
+					{
+						System.out.println("ExtendedAutomaton.addNormalTransition(): Type mismatch error in action!");
+						System.out.println("\t automaton: " + name);
+						System.out.print("\t from: " + from);
+						System.out.println(" to: " + to);
+						System.out.println("\t label: " + label);
+						System.out.println("\t guard: " + guardIn);
+						System.out.println("\t action: " + actionIn);
+						return;
+					}
+				}
+			}
+		}
+			
+		// Store parsed results ...
+		GuardActionBlockSubject guardActionBlock = factory.createGuardActionBlockProxy();
+		List<SimpleExpressionSubject> blockGuards = guardActionBlock.getGuardsModifiable();
+		blockGuards.clear();
+		if (guard != null)
+		{
+			blockGuards.add(guard);
+		}
+		List<BinaryExpressionSubject> blockActions = guardActionBlock.getActionsModifiable();
+		blockActions.clear();
+		if (actions != null)
+		{
+			blockActions.addAll(actions);
+		}
+			
+		EdgeSubject newEdge = factory.createEdgeProxy(fromNode, toNode, labelBlock, guardActionBlock, null, null, null);
+		graph.getEdgesModifiable().add(newEdge);	
+	}
+
+	private void addExtendedTransition(String from, String to, String label, String guardIn, String actionIn)
+	{
+
+		// expand actions
+		StringReader stringReader = new StringReader(actionIn);
+		Lexer lexer = new Lexer((Reader) stringReader);
+		Parser parser = new Parser((Scanner) lexer);
+		Goal syntaxTree = null;
+		try
+		{
+			syntaxTree = (Goal) parser.parse().value;
+		}
+		catch(Exception e)
+		{
+			System.out.println("ExtendedAutomaton.addExtendedTransition(): Type mismatch error in action!");
+			System.out.println("\t automaton: " + name);
+			System.out.print("\t from: " + from);
+			System.out.println(" to: " + to);
+			System.out.println("\t label: " + label);
+			System.out.println("\t guard: " + guardIn);
+			System.out.println("\t action: " + actionIn);
+			return;
+		}
+
+		if (syntaxTree instanceof StatementList)
+		{
+
+		}
+		else if (syntaxTree instanceof Expression)
+		{
+			System.out.println("ExtendedAutomaton.addExtendedTransition(): Type mismatch error in action!");
+			System.out.println("\t automaton: " + name);
+			System.out.print("\t from: " + from);
+			System.out.println(" to: " + to);
+			System.out.println("\t label: " + label);
+			System.out.println("\t guard: " + guardIn);
+			System.out.println("\t action: " + actionIn);
+			return;
+		}
+
+
+		addNormalTransition(from, to, label, guardIn, actionIn);
 	}
 }
