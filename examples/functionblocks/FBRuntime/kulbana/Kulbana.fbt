@@ -101,17 +101,11 @@
 		<ECTransition Source="START" Destination="STATE3" Condition="UppMatlyft" />
 		<ECTransition Source="STATE3" Destination="START" Condition="1" />
 
-		<ECTransition Source="START" Destination="STATE4" Condition="Mat" />
-		<ECTransition Source="STATE4" Destination="START" Condition="1" />
-
-		<ECTransition Source="START" Destination="STATE5" Condition="Mat" />
-		<ECTransition Source="STATE5" Destination="START" Condition="1" />
-
-		<!--ECTransition Source="START" Destination="STATE4" Condition="Mat AND (liten_kula MOD 3 = 0)" />
+		<ECTransition Source="START" Destination="STATE4" Condition="Mat AND (liten_kula MOD 3 = 0)" />
 		<ECTransition Source="STATE4" Destination="START" Condition="1" />
 
 		<ECTransition Source="START" Destination="STATE5" Condition="Mat AND (liten_kula MOD 3 &gt; 0)" />
-		<ECTransition Source="STATE5" Destination="START" Condition="1" /-->
+		<ECTransition Source="STATE5" Destination="START" Condition="1" />
 
 		<ECTransition Source="START" Destination="STATE6" Condition="UrMatning" />
 		<ECTransition Source="STATE6" Destination="START" Condition="1" />
@@ -181,7 +175,7 @@
         <Other Language="Java" Text="" />	
     </Algorithm>
 
-<!--
+
     <Algorithm Name="PrintKulaPortvakt">
         <Other Language="Java" Text=
 		"System.out.println(&#34;KulaPortvakt&#34;);" />	
@@ -236,6 +230,6 @@
         <Other Language="Java" Text=
 		"System.out.println(&#34;ArmHemma&#34;);" />	
     </Algorithm>
-	-->
+
   </BasicFB>
 </FBType>
