@@ -291,43 +291,43 @@ public class ExtendedAutomaton
 	{
 
 		// expand actions
-		StringReader stringReader = new StringReader(actionIn);
-		Lexer lexer = new Lexer((Reader) stringReader);
-		Parser parser = new Parser((Scanner) lexer);
-		Goal syntaxTree = null;
-		try
-		{
-			syntaxTree = (Goal) parser.parse().value;
-		}
-		catch(Exception e)
-		{
-			System.out.println("ExtendedAutomaton.addExtendedTransition(): Type mismatch error in action!");
-			System.out.println("\t automaton: " + name);
-			System.out.print("\t from: " + from);
-			System.out.println(" to: " + to);
-			System.out.println("\t label: " + label);
-			System.out.println("\t guard: " + guardIn);
-			System.out.println("\t action: " + actionIn);
-			return;
-		}
-
-		if (syntaxTree instanceof StatementList)
-		{
-
-		}
-		else if (syntaxTree instanceof Expression)
-		{
-			System.out.println("ExtendedAutomaton.addExtendedTransition(): Type mismatch error in action!");
-			System.out.println("\t automaton: " + name);
-			System.out.print("\t from: " + from);
-			System.out.println(" to: " + to);
-			System.out.println("\t label: " + label);
-			System.out.println("\t guard: " + guardIn);
-			System.out.println("\t action: " + actionIn);
-			return;
-		}
-
-
-		addNormalTransition(from, to, label, guardIn, actionIn);
+//		StringReader stringReader = new StringReader(actionIn);
+//		Lexer lexer = new Lexer((Reader) stringReader);
+//		Parser parser = new Parser((Scanner) lexer);
+//		Goal syntaxTree = null;
+//		try
+//		{
+//			syntaxTree = (Goal) parser.parse().value;
+//		}
+//		catch(Exception e)
+//		{
+//			System.out.println("ExtendedAutomaton.addExtendedTransition(): Type mismatch error in action!");
+//			System.out.println("\t automaton: " + name);
+//			System.out.print("\t from: " + from);
+//			System.out.println(" to: " + to);
+//			System.out.println("\t label: " + label);
+//			System.out.println("\t guard: " + guardIn);
+//			System.out.println("\t action: " + actionIn);
+//			return;
+//		}
+//
+//		if (syntaxTree instanceof StatementList)
+//		{
+//
+//		}
+//		else if (syntaxTree instanceof Expression)
+//		{
+//			System.out.println("ExtendedAutomaton.addExtendedTransition(): Type mismatch error in action!");
+//			System.out.println("\t automaton: " + name);
+//			System.out.print("\t from: " + from);
+//			System.out.println(" to: " + to);
+//			System.out.println("\t label: " + label);
+//			System.out.println("\t guard: " + guardIn);
+//			System.out.println("\t action: " + actionIn);
+//			return;
+//		}
+//
+//
+//		addNormalTransition(from, to, label, guardIn, actionIn);
 	}
 }
