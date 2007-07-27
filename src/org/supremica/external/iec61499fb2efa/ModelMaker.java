@@ -322,14 +322,14 @@ class ModelMaker
 		// 		ExtendedAutomaton test = new ExtendedAutomaton("test", automata);
 		// 		test.addInitialState("s0");
 		// 		test.addState("s1");
-		// 		test.addIntegerVariable("var1", 0, 5, 0, null);
+		// 		test.addIntegerVariable("var1", 0, 5, 0, 0);
 		// 		automata.addEvent("e1", "controllable");
 		// 		test.addTransition("s0","s1","e1;e2;","var1 == 1","var1 = 4;");
 		// 		automata.addAutomaton(test);
 		// 		ExtendedAutomaton test2 = new ExtendedAutomaton("test2", automata);
 		// 		test2.addInitialState("s0");
 		// 		test2.addState("s1");
-		// 		test2.addIntegerVariable("var1", 0, 5, 0, null);
+		// 		test2.addIntegerVariable("var1", 0, 5, 0, 0);
 		// 		test2.addTransition("s0","s1","e1;e2;","var1 == 1","var1  = 4;");
 		// 		automata.addAutomaton(test2);
 
@@ -900,7 +900,7 @@ class ModelMaker
 
 		ExtendedAutomaton startup = new ExtendedAutomaton("Startup", automata);
 		
-		startup.addIntegerVariable("startup_done", 0, 1, 0, null);
+		startup.addIntegerVariable("startup_done", 0, 1, 0, 1);
 
 		startup.addInitialState("s0");
 		
@@ -937,13 +937,13 @@ class ModelMaker
 		// the maximum number of FB instances in the queue at the same time
 		final int places = basicFunctionBlocks.keySet().size();
 
-		instanceQueue.addIntegerVariable("queuing_fb", 0, fbMaxID, 0, null);
-		instanceQueue.addIntegerVariable("current_fb", 0, fbMaxID, 0, null);
+		instanceQueue.addIntegerVariable("queuing_fb", 0, fbMaxID, 0, 0);
+		instanceQueue.addIntegerVariable("current_fb", 0, fbMaxID, 0, 0);
 		
 		instanceQueue.addInitialState("s0");
 		for (int i = 1; i <= places; i++)
 		{
-			instanceQueue.addIntegerVariable("fb_place_" + i, 0, fbMaxID, 0, null);
+			instanceQueue.addIntegerVariable("fb_place_" + i, 0, fbMaxID, 0, 0);
 
 			instanceQueue.addState("s" + i);
 			//Transiton when queuing instance
@@ -1013,16 +1013,16 @@ class ModelMaker
 		// the maximum number of jobs in the queue at the same time
 		final int places = basicFunctionBlocks.keySet().size();	
 		
-		jobQueue.addIntegerVariable("queuing_job_fb", 0, fbMaxID, 0, null);
-		jobQueue.addIntegerVariable("queuing_job_alg", 0, algMaxID, 0, null);
-		jobQueue.addIntegerVariable("current_job_fb", 0, fbMaxID, 0, null);
-		jobQueue.addIntegerVariable("current_job_alg", 0, algMaxID, 0, null);
+		jobQueue.addIntegerVariable("queuing_job_fb", 0, fbMaxID, 0, 0);
+		jobQueue.addIntegerVariable("queuing_job_alg", 0, algMaxID, 0, 0);
+		jobQueue.addIntegerVariable("current_job_fb", 0, fbMaxID, 0, 0);
+		jobQueue.addIntegerVariable("current_job_alg", 0, algMaxID, 0, 0);
 
 		jobQueue.addInitialState("s0");
 		for (int i = 1; i <= places; i++)
 		{
-			jobQueue.addIntegerVariable("job_fb_place_" + i, 0, fbMaxID, 0, null);
-			jobQueue.addIntegerVariable("job_alg_place_" + i, 0, algMaxID, 0, null);
+			jobQueue.addIntegerVariable("job_fb_place_" + i, 0, fbMaxID, 0, 0);
+			jobQueue.addIntegerVariable("job_alg_place_" + i, 0, algMaxID, 0, 0);
 	
 		jobQueue.addState("s" + i);
 			//Transiton when queuing job
@@ -1114,7 +1114,7 @@ class ModelMaker
 
 		ExtendedAutomaton eventReceiving = new ExtendedAutomaton("Event Receiving " + fbName , automata);
 
-		eventReceiving.addIntegerVariable("receiving_event_" + fbName, 0, eventMaxID, 0, null);
+		eventReceiving.addIntegerVariable("receiving_event_" + fbName, 0, eventMaxID, 0, 0);
 				
 		eventReceiving.addInitialState("s0");
 		eventReceiving.addState("s1");
@@ -1216,7 +1216,7 @@ class ModelMaker
 		final int places = basicFunctionBlocks.keySet().size();	
 		
 		final int evMaxID = ((Integer) eventsMaxID.get(fbName)).intValue();
-		eventQueue.addIntegerVariable("queuing_event_" + fbName, 0, evMaxID, 0, null);
+		eventQueue.addIntegerVariable("queuing_event_" + fbName, 0, evMaxID, 0, 0);
 
 
 		// event input variables
@@ -1227,7 +1227,7 @@ class ModelMaker
 			{
 				JaxbEvent curEventInput = (JaxbEvent) eventInputsIter.next();
 				String curEventInputName = curEventInput.getName();
-				eventQueue.addIntegerVariable("event_" + curEventInputName + "_" + fbName, 0, 1, 0, null);
+				eventQueue.addIntegerVariable("event_" + curEventInputName + "_" + fbName, 0, 1, 0, 0);
 			}
 		}
 
@@ -1242,7 +1242,7 @@ class ModelMaker
 				String curDataType =  curDeclaration.getType();
 				if (curDataType.toLowerCase().equals("int"))
 				{
-					eventQueue.addIntegerVariable("data_" + curDataInputName + "_" + fbName, 0, intVarMaxValue, 0, null);
+					eventQueue.addIntegerVariable("data_" + curDataInputName + "_" + fbName, 0, intVarMaxValue, 0, 0);
 				}
 				else if (curDataType.toLowerCase().equals("bool"))
 				{
@@ -1282,7 +1282,7 @@ class ModelMaker
 				String curDataType =  curDeclaration.getType();
 				if (curDataType.toLowerCase().equals("int"))
 				{
-					eventQueue.addIntegerVariable("data_" + curDataOutputName + "_" + fbName, 0, intVarMaxValue, 0, null);
+					eventQueue.addIntegerVariable("data_" + curDataOutputName + "_" + fbName, 0, intVarMaxValue, 0, 0);
 				}
 				else if (curDataType.toLowerCase().equals("bool"))
 				{
@@ -1316,7 +1316,7 @@ class ModelMaker
 		for (int i = 1; i <= places; i++)
 		{
 		
-			eventQueue.addIntegerVariable("event_" + fbName + "_place_" + i, 0, fbMaxID, 0, null);
+			eventQueue.addIntegerVariable("event_" + fbName + "_place_" + i, 0, fbMaxID, 0, 0);
 			
 			// data input variables for each queue place
 			if (theType.getInterfaceList().isSetInputVars())
@@ -1329,7 +1329,7 @@ class ModelMaker
 					String curDataType =  curDeclaration.getType();
 					if (curDataType.toLowerCase().equals("int"))
 					{
-						eventQueue.addIntegerVariable("data_" + curDataInputName + "_" + fbName + "_place_" + i, 0, intVarMaxValue, 0, null);
+						eventQueue.addIntegerVariable("data_" + curDataInputName + "_" + fbName + "_place_" + i, 0, intVarMaxValue, 0, 0);
 					}
 					else if (curDataType.toLowerCase().equals("bool"))
 					{
@@ -1463,7 +1463,7 @@ class ModelMaker
 				String curType =  curDeclaration.getType();
 				if (curType.toLowerCase().equals("int"))
 				{
-					ecc.addIntegerVariable("internal_" + curName + "_" + fbName, 0, intVarMaxValue, 0, null);
+					ecc.addIntegerVariable("internal_" + curName + "_" + fbName, 0, intVarMaxValue, 0, 0);
 				}
 				else if (curType.toLowerCase().equals("bool"))
 				{
