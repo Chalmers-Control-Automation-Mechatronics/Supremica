@@ -42,9 +42,9 @@ import javax.xml.bind.JAXBException;
 import net.sourceforge.fuber.model.interpreters.st.Lexer;
 import net.sourceforge.fuber.model.interpreters.st.Parser;
 import java_cup.runtime.Scanner;
-import net.sourceforge.fuber.model.interpreters.st.Finder;
+import net.sourceforge.fuber.model.interpreters.Finder;
 import net.sourceforge.fuber.model.interpreters.st.Translator;
-import net.sourceforge.fuber.model.interpreters.st.abstractsyntax.Expression;
+import net.sourceforge.fuber.model.interpreters.abstractsyntax.Expression;
 
 import net.sourceforge.fuber.xsd.libraryelement.*;
 
