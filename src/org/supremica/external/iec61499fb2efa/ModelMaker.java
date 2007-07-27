@@ -320,14 +320,14 @@ class ModelMaker
 		
 		// 		// test automata classes
 		// 		ExtendedAutomaton test = new ExtendedAutomaton("test", automata);
-		// 		test.addState("s0", true);
+		// 		test.addInitialState("s0");
 		// 		test.addState("s1");
 		// 		test.addIntegerVariable("var1", 0, 5, 0, null);
 		// 		automata.addEvent("e1", "controllable");
 		// 		test.addTransition("s0","s1","e1;e2;","var1 == 1","var1 = 4;");
 		// 		automata.addAutomaton(test);
 		// 		ExtendedAutomaton test2 = new ExtendedAutomaton("test2", automata);
-		// 		test2.addState("s0", true);
+		// 		test2.addInitialState("s0");
 		// 		test2.addState("s1");
 		// 		test2.addIntegerVariable("var1", 0, 5, 0, null);
 		// 		test2.addTransition("s0","s1","e1;e2;","var1 == 1","var1  = 4;");
@@ -892,7 +892,6 @@ class ModelMaker
 		return cntSpec.substring(cntSpec.lastIndexOf("_")+1,cntSpec.length());
 	}
 
-
 	private void makeStartup()
 	{
 		System.out.println("ModelMaker.makeStartup():");
@@ -903,7 +902,7 @@ class ModelMaker
 		
 		startup.addIntegerVariable("startup_done", 0, 1, 0, null);
 
-		startup.addState("s0", true);
+		startup.addInitialState("s0");
 		
 		String from = "s0";
 		String to = "s1"; 
@@ -941,7 +940,7 @@ class ModelMaker
 		instanceQueue.addIntegerVariable("queuing_fb", 0, fbMaxID, 0, null);
 		instanceQueue.addIntegerVariable("current_fb", 0, fbMaxID, 0, null);
 		
-		instanceQueue.addState("s0", true);
+		instanceQueue.addInitialState("s0");
 		for (int i = 1; i <= places; i++)
 		{
 			instanceQueue.addIntegerVariable("fb_place_" + i, 0, fbMaxID, 0, null);
@@ -987,7 +986,7 @@ class ModelMaker
 
 		ExtendedAutomaton eventExecution = new ExtendedAutomaton("Event Execution", automata);
 
-		eventExecution.addState("s0", true);
+		eventExecution.addInitialState("s0");
 		eventExecution.addState("s1");
 		eventExecution.addState("s2");
 		
@@ -1019,7 +1018,7 @@ class ModelMaker
 		jobQueue.addIntegerVariable("current_job_fb", 0, fbMaxID, 0, null);
 		jobQueue.addIntegerVariable("current_job_alg", 0, algMaxID, 0, null);
 
-		jobQueue.addState("s0", true);
+		jobQueue.addInitialState("s0");
 		for (int i = 1; i <= places; i++)
 		{
 			jobQueue.addIntegerVariable("job_fb_place_" + i, 0, fbMaxID, 0, null);
@@ -1066,7 +1065,7 @@ class ModelMaker
 
 		ExtendedAutomaton algorithmExecution = new ExtendedAutomaton("Algorithm Execution", automata);
 				
-		algorithmExecution.addState("s0", true);
+		algorithmExecution.addInitialState("s0");
 		algorithmExecution.addState("s1");
 		algorithmExecution.addState("s2");
 		
@@ -1117,7 +1116,7 @@ class ModelMaker
 
 		eventReceiving.addIntegerVariable("receiving_event_" + fbName, 0, eventMaxID, 0, null);
 				
-		eventReceiving.addState("s0", true);
+		eventReceiving.addInitialState("s0");
 		eventReceiving.addState("s1");
 		eventReceiving.addState("s2");
 		eventReceiving.addState("s3");
@@ -1165,7 +1164,7 @@ class ModelMaker
 		
 		ExtendedAutomaton eventHandling = new ExtendedAutomaton("Event Handling " + fbName , automata);
 
-		eventHandling.addState("s0", true);
+		eventHandling.addInitialState("s0");
 		eventHandling.addState("s1");
 		eventHandling.addState("s2");
 		eventHandling.addState("s3");
@@ -1312,7 +1311,7 @@ class ModelMaker
 			}
 		}
 		
-		eventQueue.addState("s0", true);
+		eventQueue.addInitialState("s0");
 
 		for (int i = 1; i <= places; i++)
 		{
@@ -1563,7 +1562,7 @@ class ModelMaker
 		doneInitFinish = false;
 		JaxbECState firstECState = (JaxbECState) ecStates.get(0);
 		String firstECStateName = firstECState.getName();
-		ecc.addState(firstECStateName,true);
+		ecc.addInitialState(firstECStateName);
 		output("Calling makeECStateBranch() from makeBasicFBExecutionControlChart()", 2);
 		makeECStateBranch(ecc, fbName, firstECStateName, firstECStateName, ecStates, ecTransitions, visitedECStates, 2, identifierMap);
 
@@ -2040,7 +2039,7 @@ class ModelMaker
 			int nameCounter = 0;
 
 			from = "s" + nameCounter;
-			curAlgModel.addState(from, true);
+			curAlgModel.addInitialState(from);
 			nameCounter++;	
 			to = "s" + nameCounter;
 			curAlgModel.addState(to);

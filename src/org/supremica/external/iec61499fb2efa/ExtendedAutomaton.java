@@ -41,7 +41,8 @@ import net.sourceforge.waters.subject.module.GuardActionBlockSubject;
 import net.sourceforge.waters.subject.module.BinaryExpressionSubject;
 import net.sourceforge.waters.subject.module.SimpleExpressionSubject;
 import net.sourceforge.waters.subject.module.VariableHelper;
-
+import net.sourceforge.waters.subject.module.PlainEventListSubject;
+import net.sourceforge.waters.subject.module.EventDeclSubject;
 import net.sourceforge.waters.model.module.EventDeclProxy;
 
 import net.sourceforge.waters.xsd.base.ComponentKind;
@@ -67,6 +68,8 @@ public class ExtendedAutomaton
 	private SimpleComponentSubject component;
 	private GraphSubject graph;
 
+	private PlainEventListSubject acceptingProposition;
+
 	private ExpressionParser parser;
 
 	private boolean expandActions = false;
@@ -86,6 +89,12 @@ public class ExtendedAutomaton
 		component = factory.createSimpleComponentProxy(identifier, ComponentKind.PLANT, graph);
 
 		parser = new ExpressionParser(factory, CompilerOperatorTable.getInstance());
+
+		List propList = new LinkedList();
+
+		propList.add(factory.createSimpleIdentifierProxy(EventDeclProxy.DEFAULT_MARKING_NAME));
+
+		acceptingProposition = factory.createPlainEventListProxy(propList);
 	}
 
 	public ExtendedAutomaton(String name, ExtendedAutomata automata, boolean expand) 
@@ -126,17 +135,34 @@ public class ExtendedAutomaton
 		return component;
 	}
 
-	public void addState(String name)
+	public void addInitialState(String name)
 	{
-		addState(name, false);
+		addState(name, true, true);
 	}
 
-	public void addState(String name, boolean initial)
+	public void addAcceptingState(String name)
+	{
+		addState(name, true, false);
+	}
+
+	public void addState(String name)
+	{
+		addState(name, false, false);
+	}
+
+	public void addState(String name, boolean accepting, boolean initial)
 	{
 		SimpleNodeSubject node = (SimpleNodeSubject) graph.getNodesModifiable().get(name);
 		if (node == null)
 		{
-			graph.getNodesModifiable().add(factory.createSimpleNodeProxy(name,null, initial,null,null,null));
+			if (accepting)
+			{
+				graph.getNodesModifiable().add(factory.createSimpleNodeProxy(name, acceptingProposition, initial, null, null, null));
+			}
+			else
+			{
+				graph.getNodesModifiable().add(factory.createSimpleNodeProxy(name, null, initial, null, null, null));
+			}
 		}
 	}
 
@@ -187,15 +213,13 @@ public class ExtendedAutomaton
 		{
 			curEvent = remainingEvents.substring(0,remainingEvents.indexOf(";"));
 			remainingEvents = remainingEvents.substring(remainingEvents.indexOf(";") + 1);
-			// Add event declaration to the module if needed
-			for(Iterator iter = module.getEventDeclList().iterator();iter.hasNext();)
-			{
-				if(((EventDeclProxy) iter.next()).getName().equals(curEvent))
-				{	
-					automata.addEvent(curEvent);
-				}
-			}
 			events.add(factory.createSimpleIdentifierProxy(curEvent));
+
+			// Add event declaration to the module if needed
+			if (!module.getEventDeclListModifiable().containsName(curEvent))
+			{
+				automata.addEvent(curEvent);
+			}
 		}
 		LabelBlockSubject labelBlock = factory.createLabelBlockProxy(events, null);
 			

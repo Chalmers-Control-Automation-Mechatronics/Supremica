@@ -32,6 +32,7 @@ import net.sourceforge.waters.xsd.base.EventKind;
 import net.sourceforge.waters.subject.module.ModuleSubjectFactory;
 import net.sourceforge.waters.subject.module.IdentifierSubject;
 import net.sourceforge.waters.subject.module.ModuleSubject;
+import net.sourceforge.waters.model.module.EventDeclProxy;
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
 import net.sourceforge.waters.model.marshaller.JAXBModuleMarshaller;
 
@@ -45,12 +46,13 @@ public class ExtendedAutomata
 
 	public ExtendedAutomata(String name) 
 	{
-
 		factory = ModuleSubjectFactory.getInstance();
 
 		identifier = factory.createSimpleIdentifierProxy(name);
+
 		module = new ModuleSubject(identifier.getName(), null);
 
+		module.getEventDeclListModifiable().add(factory.createEventDeclProxy(EventDeclProxy.DEFAULT_MARKING_NAME, EventKind.PROPOSITION));
 	}
 
 	protected ModuleSubject getModule()
@@ -58,10 +60,9 @@ public class ExtendedAutomata
 		return module;
 	}
 
-
 	public void addEvent(String name)
 	{
-		module.getEventDeclListModifiable().add(factory.createEventDeclProxy(name, EventKind.UNCONTROLLABLE));
+		addEvent(name,"uncontrollable");
 	}
 	
 	public void addEvent(String name, String kind)
