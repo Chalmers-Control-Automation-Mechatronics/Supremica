@@ -99,7 +99,7 @@ class ModelMaker
 	private ExtendedAutomata automata;
 
 	// maximum value of an integer variable
-	private final int intVarMaxValue = 20;
+	private final int intVarMaxValue = 2;
 
 	private int nameCounter = 0;
 	private boolean doneInitActions = false;
@@ -319,14 +319,14 @@ class ModelMaker
 		}
 		
 		// 		// test automata classes
-		// 		ExtendedAutomaton test = new ExtendedAutomaton("test", automata);
+		// 		ExtendedAutomaton test = getNewAutomaton("test");
 		// 		test.addInitialState("s0");
 		// 		test.addState("s1");
 		// 		test.addIntegerVariable("var1", 0, 5, 0, 0);
 		// 		automata.addEvent("e1", "controllable");
 		// 		test.addTransition("s0","s1","e1;e2;","var1 == 1","var1 = 4;");
 		// 		automata.addAutomaton(test);
-		// 		ExtendedAutomaton test2 = new ExtendedAutomaton("test2", automata);
+		// 		ExtendedAutomaton test2 = getNewAutomaton("test2");
 		// 		test2.addInitialState("s0");
 		// 		test2.addState("s1");
 		// 		test2.addIntegerVariable("var1", 0, 5, 0, 0);
@@ -898,7 +898,7 @@ class ModelMaker
 
 		String fbName = restartInstance;
 
-		ExtendedAutomaton startup = new ExtendedAutomaton("Startup", automata);
+		ExtendedAutomaton startup = getNewAutomaton("Startup");
 		
 		startup.addIntegerVariable("startup_done", 0, 1, 0, 1);
 
@@ -908,21 +908,21 @@ class ModelMaker
 		String to = "s1"; 
 		startup.addState(to);
 		String event = "send_output_COLD_" + fbName + ";";
-		String guard = "startup_done == 0";
+		//String guard = "startup_done == 0";
 		// get connection data for the action
 		String cntName = (String) ((Map) eventConnections.get(fbName)).get("COLD");
 		String cntFB = getInstanceName(cntName);
 		String cntSignal = getSignalName(cntName);
 		Integer cntSignalID = (Integer) ((Map) events.get(cntFB)).get(cntSignal);
 		String action = "receiveing_event_" + cntFB + "=" + cntSignalID + ";";	
-		startup.addTransition(from, to, event, guard, action);
+		startup.addTransition(from, to, event, null, action);
 		
 		from = to;
-		to = "s0";
-		startup.addState(to);
+		to = "s2";
+		startup.addAcceptingState(to);
 		event = "receive_event_" + cntFB + ";";
-		action = "startup_done = 1;";
-		startup.addTransition(from, to, event, null, action);
+		//action = "startup_done = 1;";
+		startup.addTransition(from, to, event, null, null);
 
 		automata.addAutomaton(startup);
 	}
@@ -932,7 +932,7 @@ class ModelMaker
 	{
 		System.out.println("ModelMaker.makeInstanceQueue():");
 
-		ExtendedAutomaton instanceQueue = new ExtendedAutomaton("Instance Queue", automata);
+		ExtendedAutomaton instanceQueue = getNewAutomaton("Instance Queue");
 		
 		// the maximum number of FB instances in the queue at the same time
 		final int places = basicFunctionBlocks.keySet().size();
@@ -984,7 +984,7 @@ class ModelMaker
 	{
 		System.out.println("ModelMaker.makeEventExecution():");
 
-		ExtendedAutomaton eventExecution = new ExtendedAutomaton("Event Execution", automata);
+		ExtendedAutomaton eventExecution = getNewAutomaton("Event Execution");
 
 		eventExecution.addInitialState("s0");
 		eventExecution.addState("s1");
@@ -1008,7 +1008,7 @@ class ModelMaker
 	{
 		System.out.println("ModelMaker.makeJobQueue():");
 
-		ExtendedAutomaton jobQueue = new ExtendedAutomaton("Job Queue", automata);
+		ExtendedAutomaton jobQueue = getNewAutomaton("Job Queue");
 		
 		// the maximum number of jobs in the queue at the same time
 		final int places = basicFunctionBlocks.keySet().size();	
@@ -1063,7 +1063,7 @@ class ModelMaker
 	{
 		System.out.println("ModelMaker.makeAlgorithmExecution():");
 
-		ExtendedAutomaton algorithmExecution = new ExtendedAutomaton("Algorithm Execution", automata);
+		ExtendedAutomaton algorithmExecution = getNewAutomaton("Algorithm Execution");
 				
 		algorithmExecution.addInitialState("s0");
 		algorithmExecution.addState("s1");
@@ -1112,7 +1112,7 @@ class ModelMaker
 		Integer fbID = (Integer) basicFunctionBlocksID.get(fbName);
 		Integer eventMaxID = (Integer) eventsMaxID.get(fbName); 
 
-		ExtendedAutomaton eventReceiving = new ExtendedAutomaton("Event Receiving " + fbName , automata);
+		ExtendedAutomaton eventReceiving = getNewAutomaton("Event Receiving " + fbName);
 
 		eventReceiving.addIntegerVariable("receiving_event_" + fbName, 0, eventMaxID, 0, 0);
 				
@@ -1162,7 +1162,7 @@ class ModelMaker
 	{
 		System.out.println("\t Event Handling");
 		
-		ExtendedAutomaton eventHandling = new ExtendedAutomaton("Event Handling " + fbName , automata);
+		ExtendedAutomaton eventHandling = getNewAutomaton("Event Handling " + fbName );
 
 		eventHandling.addInitialState("s0");
 		eventHandling.addState("s1");
@@ -1210,7 +1210,7 @@ class ModelMaker
 		JaxbFBType theType = (JaxbFBType) fbTypes.get(typeName);
 		List eventInputList = (List) ((EventInputs) ((InterfaceList) theType.getInterfaceList()).getEventInputs()).getEvent();
 		
-		ExtendedAutomaton eventQueue = new ExtendedAutomaton("Event Queue " + fbName, automata);
+		ExtendedAutomaton eventQueue = getNewAutomaton("Event Queue " + fbName);
 		
 		// the maximum number of events in the queue at the same time
 		final int places = basicFunctionBlocks.keySet().size();	
@@ -1450,7 +1450,7 @@ class ModelMaker
 		List ecTransitions = theECC.getECTransition();
 		Set visitedECStates = new HashSet();
 
-		ExtendedAutomaton ecc = new ExtendedAutomaton("Execution Control Chart " + fbName, automata);
+		ExtendedAutomaton ecc = getNewAutomaton("Execution Control Chart " + fbName);
 
 		// internal variables
 		if (theType.getBasicFB().isSetInternalVars())
@@ -2035,7 +2035,7 @@ class ModelMaker
 			String algLang = curAlg.getOther().getLanguage();
 			String algText = curAlg.getOther().getText();
 			String[] algTextLines = algText.split(";");
-			ExtendedAutomaton curAlgModel = new ExtendedAutomaton("Algorithm " + algName + " " + fbName, automata);
+			ExtendedAutomaton curAlgModel = getNewAutomaton("Algorithm " + algName + " " + fbName);
 			int nameCounter = 0;
 
 			from = "s" + nameCounter;
@@ -2251,5 +2251,10 @@ class ModelMaker
 			System.out.print("\t");
 		}
 		System.out.println(text);
+	}
+
+	private ExtendedAutomaton getNewAutomaton(String name)
+	{
+		return new ExtendedAutomaton(name, automata);
 	}
 }

@@ -28,6 +28,15 @@ import java.util.LinkedList;
 import java.util.ArrayList;
 import java.util.Iterator;
 
+import java.io.Reader;
+import java.io.StringReader;
+import java_cup.runtime.Scanner;
+import net.sourceforge.fuber.model.interpreters.efa.Lexer;
+import net.sourceforge.fuber.model.interpreters.efa.Parser;
+import net.sourceforge.fuber.model.interpreters.abstractsyntax.Goal;
+import net.sourceforge.fuber.model.interpreters.abstractsyntax.StatementList;
+import net.sourceforge.fuber.model.interpreters.abstractsyntax.Expression;
+
 import net.sourceforge.waters.subject.module.ModuleSubjectFactory;
 import net.sourceforge.waters.subject.module.IdentifierSubject;
 import net.sourceforge.waters.subject.module.ModuleSubject;
@@ -68,8 +77,6 @@ public class ExtendedAutomaton
 	private SimpleComponentSubject component;
 	private GraphSubject graph;
 
-	private PlainEventListSubject acceptingProposition;
-
 	private ExpressionParser parser;
 
 	private boolean expandActions = false;
@@ -89,12 +96,6 @@ public class ExtendedAutomaton
 		component = factory.createSimpleComponentProxy(identifier, ComponentKind.PLANT, graph);
 
 		parser = new ExpressionParser(factory, CompilerOperatorTable.getInstance());
-
-		List propList = new LinkedList();
-
-		propList.add(factory.createSimpleIdentifierProxy(EventDeclProxy.DEFAULT_MARKING_NAME));
-
-		acceptingProposition = factory.createPlainEventListProxy(propList);
 	}
 
 	public ExtendedAutomaton(String name, ExtendedAutomata automata, boolean expand) 
@@ -157,6 +158,9 @@ public class ExtendedAutomaton
 		{
 			if (accepting)
 			{
+				List propList = new LinkedList();
+				propList.add(factory.createSimpleIdentifierProxy(EventDeclProxy.DEFAULT_MARKING_NAME));
+				PlainEventListSubject acceptingProposition = factory.createPlainEventListProxy(propList);
 				graph.getNodesModifiable().add(factory.createSimpleNodeProxy(name, acceptingProposition, initial, null, null, null));
 			}
 			else
@@ -311,47 +315,45 @@ public class ExtendedAutomaton
 		graph.getEdgesModifiable().add(newEdge);	
 	}
 
-	private void addExtendedTransition(String from, String to, String label, String guardIn, String actionIn)
+	private void addExtendedTransition(final String from, final String to, final String label, final String guardIn, final String actionIn)
 	{
 
-		// expand actions
-//		StringReader stringReader = new StringReader(actionIn);
-//		Lexer lexer = new Lexer((Reader) stringReader);
-//		Parser parser = new Parser((Scanner) lexer);
-//		Goal syntaxTree = null;
-//		try
-//		{
-//			syntaxTree = (Goal) parser.parse().value;
-//		}
-//		catch(Exception e)
-//		{
-//			System.out.println("ExtendedAutomaton.addExtendedTransition(): Type mismatch error in action!");
-//			System.out.println("\t automaton: " + name);
-//			System.out.print("\t from: " + from);
-//			System.out.println(" to: " + to);
-//			System.out.println("\t label: " + label);
-//			System.out.println("\t guard: " + guardIn);
-//			System.out.println("\t action: " + actionIn);
-//			return;
-//		}
-//
-//		if (syntaxTree instanceof StatementList)
-//		{
-//
-//		}
-//		else if (syntaxTree instanceof Expression)
-//		{
-//			System.out.println("ExtendedAutomaton.addExtendedTransition(): Type mismatch error in action!");
-//			System.out.println("\t automaton: " + name);
-//			System.out.print("\t from: " + from);
-//			System.out.println(" to: " + to);
-//			System.out.println("\t label: " + label);
-//			System.out.println("\t guard: " + guardIn);
-//			System.out.println("\t action: " + actionIn);
-//			return;
-//		}
-//
-//
-//		addNormalTransition(from, to, label, guardIn, actionIn);
+		StringReader stringReader = new StringReader(actionIn);
+		Lexer lexer = new Lexer((Reader) stringReader);
+		Parser parser = new Parser((Scanner) lexer);
+		Goal syntaxTree = null;
+		try
+		{
+			syntaxTree = (Goal) parser.parse().value;
+		}
+		catch(Exception e)
+		{
+			System.out.println("ExtendedAutomaton.addExtendedTransition(): Type mismatch error in action!");
+			System.out.println("\t automaton: " + name);
+			System.out.print("\t from: " + from);
+			System.out.println(" to: " + to);
+			System.out.println("\t label: " + label);
+			System.out.println("\t guard: " + guardIn);
+			System.out.println("\t action: " + actionIn);
+			return;
+		}
+
+		if (syntaxTree instanceof StatementList)
+		{
+
+		}
+		else if (syntaxTree instanceof Expression)
+		{
+			System.out.println("ExtendedAutomaton.addExtendedTransition(): Type mismatch error in action!");
+			System.out.println("\t automaton: " + name);
+			System.out.print("\t from: " + from);
+			System.out.println(" to: " + to);
+			System.out.println("\t label: " + label);
+			System.out.println("\t guard: " + guardIn);
+			System.out.println("\t action: " + actionIn);
+			return;
+		}
+
+		addNormalTransition(from, to, label, guardIn, actionIn);
 	}
 }

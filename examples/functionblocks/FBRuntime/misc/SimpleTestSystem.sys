@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<System xmlns="http://www.holobloc.com/xml/LibraryElement" Name="Simple Test System" >
+  <VersionInfo  Author="Goran Cengic" Organization="Chalmers" Version="1.0" Date="2007-08-07" />
+  <Device  Name="Test Device" Type="DeviceType_not_used">
+    <Resource Name="Test Resource" Type="ResourceType_not_used">
+      <FBNetwork>
+        <FB Name="restart" Type="E_RESTART" />
+        <FB Name="merge" Type="E_MERGE2" />
+        <FB Name="test1" Type="TestType" />
+        <EventConnections>
+          <Connection Source="restart.COLD" Destination="merge.EI2" />
+          <Connection Source="merge.EO" Destination="test1.EI" />
+          <Connection Source="test1.EO" Destination="merge.EI1" />
+        </EventConnections>
+        <DataConnections>
+          <Connection Source="test1.DO" Destination="test1.DI" />
+        </DataConnections>
+      </FBNetwork>
+    </Resource>
+  </Device>
+</System>
