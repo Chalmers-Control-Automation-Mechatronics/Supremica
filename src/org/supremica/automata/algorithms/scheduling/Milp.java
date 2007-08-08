@@ -305,7 +305,7 @@ public class Milp
         timer.start(); // Restart the timer
         
         SynchronizationStepper stepper = new SynchronizationStepper(theAutomata);
-        
+
         // The current synchronized state indices, consisting of as well plant
         // as specification indices and used to step through the final graph following the
         // time schedule (which is needed to build the schedule automaton)
@@ -2531,7 +2531,7 @@ public class Milp
     protected void callMilpSolver(File currModelFile)
     throws Exception
     {
-        logger.info("The MILP-solver started....");
+        logger.info("Callingt the MILP-solver....");
         
         // Defines the name of the .exe-file as well the arguments (.mod and .sol file names)
         String[] cmds = new String[5];
@@ -2541,6 +2541,13 @@ public class Milp
         cmds[2] = currModelFile.getAbsolutePath();
         cmds[3] = "-o";
         cmds[4] = solutionFile.getAbsolutePath();
+        
+        String str = "";
+        for (int i = 0; i < cmds.length; i++)
+        {
+            str += " " + cmds[i];
+        }
+        logger.info("cmds =" + str);
         
         try
         {

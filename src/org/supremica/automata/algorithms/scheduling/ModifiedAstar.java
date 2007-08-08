@@ -989,9 +989,10 @@ public class ModifiedAstar
         
         // Start the clock
         timer.restart();  
-      
+        
         State nextState = makeStateFromNode(acceptingNode, scheduleAuto, -1);
         nextState.setAccepting(true);
+        nextState.setCost(0); // The cost of the accepting state is 0
         scheduleAuto.addState(nextState);
 
         Node currNode = acceptingNode;
@@ -1001,13 +1002,19 @@ public class ModifiedAstar
             try
             {
                 if (isRunning)
-                {
+                {                    
                     Node parent = getParent(currNode);
-                    State currState = makeStateFromNode(parent, scheduleAuto, currNode.getValueAt(ACCUMULATED_COST_INDEX));
+                    
+                    State currState = makeStateFromNode(parent, scheduleAuto, 
+                            currNode.getValueAt(ACCUMULATED_COST_INDEX));
+                    
+                    currState.setCost(currNode.getValueAt(ACCUMULATED_COST_INDEX) - 
+                            parent.getValueAt(ACCUMULATED_COST_INDEX));
+                    
                     LabeledEvent event = findConnectingEvent(parent, currNode);
                     
                     if (!hasParent(parent))
-					{
+                    {
                         currState.setInitial(true);
                     }
 
@@ -1035,33 +1042,36 @@ public class ModifiedAstar
         // If a dummy event has been added to all robot alphabets,
         // it is also added to the schedule, thus making it return from its
         // accepting to its initial state.
-		boolean resetSchedule = true;
-		for (Iterator<Automaton> plantAutIt = plantAutomata.iterator(); plantAutIt.hasNext(); )
-		{
-			Automaton plant = plantAutIt.next();
-			if (!plant.getAlphabet().contains(dummyEventName))
-			{
-				resetSchedule = false;
-				break;
-			}
-		}
+        boolean resetSchedule = true;
+        for (Iterator<Automaton> plantAutIt = plantAutomata.iterator(); plantAutIt.hasNext(); )
+        {
+            Automaton plant = plantAutIt.next();
+            if (!plant.getAlphabet().contains(dummyEventName))
+            {
+                resetSchedule = false;
+                break;
+            }
+        }
         if (resetSchedule)
         {
             LabeledEvent resetEvent =  new LabeledEvent(dummyEventName);
             scheduleAuto.getAlphabet().addEvent(resetEvent);
 
-			for (Iterator<State> stateIt = scheduleAuto.stateIterator(); stateIt.hasNext(); )
-			{
-				State state = stateIt.next();
-				if (state.isAccepting())
-				{
-					scheduleAuto.addArc(new Arc(state, scheduleAuto.getInitialState(), resetEvent));					
-				}
-			}
+            for (Iterator<State> stateIt = scheduleAuto.stateIterator(); stateIt.hasNext(); )
+            {
+                State state = stateIt.next();
+                if (state.isAccepting())
+                {
+                    scheduleAuto.addArc(new Arc(state, scheduleAuto.getInitialState(), resetEvent));					
+                }
+            }
         }
         
         logger.info("Schedule was built in " + timer.elapsedTime() + "ms");
         scheduleDialog.getIde().getActiveDocumentContainer().getAnalyzerPanel().addAutomaton(scheduleAuto);
+        
+        //TODO: TEMP-TEST
+        new VelocityBalancer(scheduleAuto, theAutomata.getPlantAutomata());
     }
 
 	/**
