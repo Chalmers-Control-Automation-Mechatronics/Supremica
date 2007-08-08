@@ -44,7 +44,7 @@ import net.sourceforge.fuber.model.interpreters.st.Parser;
 import java_cup.runtime.Scanner;
 import net.sourceforge.fuber.model.interpreters.Finder;
 import net.sourceforge.fuber.model.interpreters.st.Translator;
-import net.sourceforge.fuber.model.interpreters.abstractsyntax.Expression;
+import net.sourceforge.fuber.model.interpreters.abstractsyntax.Goal;
 
 import net.sourceforge.fuber.xsd.libraryelement.*;
 
@@ -1685,10 +1685,10 @@ class ModelMaker
 				StringReader conditionReader = new StringReader(curECCondition);
 				Lexer lexer = new Lexer((Reader) conditionReader);
 				Parser parser = new Parser((Scanner) lexer);
-				Expression parsedCondition = null;
+				Goal parsedCondition = null;
 				try
 				{
-					parsedCondition = (Expression) parser.parse().value;
+					parsedCondition = (Goal) parser.parse().value;
 				}
 				catch(Exception e)
 				{
@@ -2255,6 +2255,6 @@ class ModelMaker
 
 	private ExtendedAutomaton getNewAutomaton(String name)
 	{
-		return new ExtendedAutomaton(name, automata, false);
+		return new ExtendedAutomaton(name, automata, true);
 	}
 }
