@@ -31,6 +31,7 @@ import java.util.Iterator;
 import java.io.Reader;
 import java.io.StringReader;
 import java_cup.runtime.Scanner;
+import net.sourceforge.fuber.model.interpreters.Finder;
 import net.sourceforge.fuber.model.interpreters.efa.Lexer;
 import net.sourceforge.fuber.model.interpreters.efa.Parser;
 import net.sourceforge.fuber.model.interpreters.abstractsyntax.Goal;
@@ -315,8 +316,10 @@ public class ExtendedAutomaton
 		graph.getEdgesModifiable().add(newEdge);	
 	}
 
-	private void addExtendedTransition(final String from, final String to, final String label, final String guardIn, final String actionIn)
+	private void addExtendedTransition(String from, String to, String label, String guardIn, String actionIn)
 	{
+		// this is done here for now
+		addNormalTransition(from, to, label, guardIn, actionIn);
 
 		StringReader stringReader = new StringReader(actionIn);
 		Lexer lexer = new Lexer((Reader) stringReader);
@@ -328,32 +331,34 @@ public class ExtendedAutomaton
 		}
 		catch(Exception e)
 		{
-			System.out.println("ExtendedAutomaton.addExtendedTransition(): Type mismatch error in action!");
+			System.out.println("ExtendedAutomaton.addExtendedTransition(): Couldn't parse the action!");
 			System.out.println("\t automaton: " + name);
 			System.out.print("\t from: " + from);
 			System.out.println(" to: " + to);
 			System.out.println("\t label: " + label);
 			System.out.println("\t guard: " + guardIn);
 			System.out.println("\t action: " + actionIn);
-			return;
+			System.exit(1);
 		}
 
 		if (syntaxTree instanceof StatementList)
 		{
+			StatementList actionStatements = (StatementList) syntaxTree;
 
+			
+			
 		}
 		else if (syntaxTree instanceof Expression)
 		{
-			System.out.println("ExtendedAutomaton.addExtendedTransition(): Type mismatch error in action!");
+			System.out.println("ExtendedAutomaton.addExtendedTransition(): Couln't parse the action!");
 			System.out.println("\t automaton: " + name);
 			System.out.print("\t from: " + from);
 			System.out.println(" to: " + to);
 			System.out.println("\t label: " + label);
 			System.out.println("\t guard: " + guardIn);
 			System.out.println("\t action: " + actionIn);
-			return;
+			System.exit(1);
 		}
 
-		addNormalTransition(from, to, label, guardIn, actionIn);
 	}
 }

@@ -265,7 +265,7 @@ class ModelMaker
 	public void makeModel()
 	{
 
-		System.out.println("ModelMaker.makeModel(): Loading and Analyzing System -----------------------------");
+		System.out.println("ModelMaker.makeModel(): Loading and Analyzing the System -----------------------------");
 		
 		loadSystem(systemFileName);
 		
@@ -2255,6 +2255,6 @@ class ModelMaker
 
 	private ExtendedAutomaton getNewAutomaton(String name)
 	{
-		return new ExtendedAutomaton(name, automata);
+		return new ExtendedAutomaton(name, automata, false);
 	}
 }
