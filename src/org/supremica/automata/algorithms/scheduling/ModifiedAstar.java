@@ -188,30 +188,61 @@ public class ModifiedAstar
      * to its initial state. Needed to describe repetitive working cycles.
      */
     String dummyEventName = "reset";
+    
+    /** 
+     * Used to guide the A* towards suboptimal solution. Contains x-weight and
+     * y-weight. The formula for adjusting the estimation value (f(n)) is:
+     * f(node) * ( 1 + x-weight / y-weight + node-depth)).
+     */
+    private double[] approximationWeights = null;
+    
+    /** The inidices of the aproximation weights. */
+    private final static int X_WEIGHT_INDEX = 0;
+    private final static int Y_WEIGHT_INDEX = 1;
 
     
     /****************************************************************************************/
     /*                                 CONSTUCTORS                                          */
     /****************************************************************************************/
     
-	public ModifiedAstar() {}
+    public ModifiedAstar() {}
 
-    public ModifiedAstar(Automata theAutomata, String heuristic, boolean manualExpansion, boolean buildSchedule, boolean isRelaxationProvider, ScheduleDialog scheduleDialog)
+    public ModifiedAstar(Automata theAutomata, String heuristic, boolean manualExpansion, boolean buildSchedule, 
+            boolean isRelaxationProvider, ScheduleDialog scheduleDialog)
 		throws Exception
     {
         this.theAutomata = theAutomata;
-		this.heuristic = heuristic;
-		this.manualExpansion = manualExpansion;
-		this.buildSchedule = buildSchedule;
+        this.heuristic = heuristic;
+        this.manualExpansion = manualExpansion;
+        this.buildSchedule = buildSchedule;
         this.isRelaxationProvider = isRelaxationProvider;
         this.scheduleDialog = scheduleDialog;
     }    
 	
-	public ModifiedAstar(Automata theAutomata, String heuristic, boolean manualExpansion, boolean buildSchedule, ScheduleDialog scheduleDialog)
-		throws Exception
-	{
-		this(theAutomata, heuristic, manualExpansion, buildSchedule, false, scheduleDialog);
-	}
+    public ModifiedAstar(Automata theAutomata, String heuristic, boolean manualExpansion, boolean buildSchedule, 
+            ScheduleDialog scheduleDialog)
+            throws Exception
+    {
+        this(theAutomata, heuristic, manualExpansion, buildSchedule, false, scheduleDialog);
+    }
+    
+    public ModifiedAstar(Automata theAutomata, String heuristic, boolean manualExpansion, boolean buildSchedule, 
+            ScheduleDialog scheduleDialog, double[] approximationWeights)
+            throws Exception
+    {
+        this(theAutomata, heuristic, manualExpansion, buildSchedule, false, scheduleDialog);
+        
+        if (approximationWeights.length == 2)
+        {
+            throw new Exception("Exactly 2 weights should be used to guide the A* towards a suboptimal solution!");
+        }
+        
+        this.approximationWeights = new double[approximationWeights.length];
+        for (int i = 0; i < approximationWeights.length; i++)
+        {
+            this.approximationWeights[i] = approximationWeights[i];
+        }
+    }
 
 
     /****************************************************************************************/
@@ -923,7 +954,21 @@ public class ModifiedAstar
         
         // 		logger.info("node = " + printArray(node) + "; estimation = " + fNode);
         
-        return fNode;
+        if (approximationWeights == null)
+        {
+            return fNode;
+        }
+        else
+        {
+            double depth = 0;
+            for (int i=0; i < getActiveLength(); i++)
+            {
+                depth += Math.pow(node.getBasis()[getActiveAutomataIndex()[i]], 2);
+            }
+            depth = Math.sqrt(depth);
+            
+            return fNode * ( 1 + approximationWeights[X_WEIGHT_INDEX] / (approximationWeights[Y_WEIGHT_INDEX] + depth));
+        }
     }
     
 	/*
@@ -1322,14 +1367,14 @@ public class ModifiedAstar
      */
     protected double getRelaxation(Node node)
 		throws Exception
-	{
-		return relaxer.getRelaxation(node);
-	}
+    {
+        return relaxer.getRelaxation(node);
+    }
 
-	public Relaxer getRelaxer()
-	{
-		return relaxer;
-	}
+    public Relaxer getRelaxer()
+    {
+        return relaxer;
+    }
     
     public String printArray(int[] node)
     {
