@@ -228,7 +228,7 @@ public class Milp
         if (isRunning)
         {
             //temp-bortkommat
-//            createNonCrossbookingConstraintsNew();
+            createNonCrossbookingConstraintsNew();
         }
         
         // Calls the MILP-solver
@@ -1648,6 +1648,14 @@ public class Milp
     private void createNonCrossbookingConstraintsNew()
         throws Exception
     {       
+        //temp
+        logger.warn("CREATE_NON_CROSSBOOKING_CONSTRAINTS NOW...");
+        
+        // Each entry of this map contains an ArrayList of pairs of consecutive 
+        // booking states, e.g. [Z1_b_index Z2_b_index]. These states are local to some plant, 
+        // e.g. Pi, and mean that Pi can book Z1 in the state corresponding to Z1_b_index 
+        // whereafter Z2 is booked in Z2_index without Z1 beeing unbooked in between. 
+        // The keys are int[]-objects of type [plant_index, first_zone_index, second_zone_index].
         TreeMap<int[], ArrayList<int[]>> consecutiveBookingTicsIndices = 
                 new TreeMap<int[], ArrayList<int[]>>(new IntArrayComparator()); 
         
@@ -1673,39 +1681,89 @@ public class Milp
             }
         }
         
-        // Find the consecutive bookings that are made reversely
-        int counter = 1;
-        for (int z1 = 0; z1 < zones.size(); z1++)
+        //temp-test
+        for (Iterator<int[]> keysIt = consecutiveBookingTicsIndices.keySet().iterator(); keysIt.hasNext();)
         {
-            for (int z2 = 0; z2 < zones.size(); z2++)
+            int[] key = keysIt.next();
+            String stre = "key: ";
+            for (int i = 0; i < key.length; i++)
             {
-                if (z1 != z2)
+                stre += key[i] + " ";
+            }
+            stre += ": ";
+            
+            for (int[] tic : consecutiveBookingTicsIndices.get(key))
+            {
+                for (int i = 0; i < tic.length; i++)
+                {    
+                    stre += bookingTics[key[i+1]][key[0]][STATE_SWITCH][tic[i]] + " ";
+                }
+                stre += ", ";
+            }
+            logger.error("consecutiveBookings = " + stre);
+        }
+        //...temp-test
+        
+        // Find the consecutive bookings that are made reversely by different plants
+        // Check for all combinations of z1 < z2 (if there is a match, 
+        // then some plant must book z1 -> z2)
+        int counter = 1;
+        for (int z1 = 0; z1 < zones.size() - 1; z1++)
+        {
+            for (int z2 = z1 + 1; z2 < zones.size(); z2++)
+            {
+                // Used in for-loops to decrease code-repetition
+                int[] zoneIndices = new int[]{z1, z2};
+
+                for (int p1 = 0; p1 < plants.size(); p1++)
                 {
-                    int[] zoneIndices = new int[]{z1, z2};
-                    
-                    for (int p1 = 0; p1 < plants.size() - 1; p1++)
-                    {
-                        ArrayList<int[]> consecutiveTicsP1 = consecutiveBookingTicsIndices.get(new int[]{p1, z1, z2});
-                        if (consecutiveTicsP1 != null)
+                    // If p1 books z1 and then z2 consecutively
+                    ArrayList<int[]> consecutiveTicsP1 = consecutiveBookingTicsIndices.get(new int[]{p1, z1, z2});
+                    if (consecutiveTicsP1 != null)
+                    {                       
+                        for (int p2 = 0; p2 < plants.size(); p2++)
                         {
-                            for (int p2 = p1 + 1; p2 < plants.size(); p2++)
+                            // Check for (almost) all combinations of p1&p2
+                            if (p1 != p2)
                             {
+                                // If also p2 books the zones reversely, i.e. first z2 and then z1, then 
+                                // constraint construction begins...
                                 ArrayList<int[]> consecutiveTicsP2 = consecutiveBookingTicsIndices.get(new int[]{p2, z2, z1});
-                                if (consecutiveTicsP2 != null)
-                                {                                    
+                                if (consecutiveTicsP2 != null) 
+                                {    
+                                    //temp-test
+                                    String str = "Found match... ";
+                                    for (int[] inP1 : consecutiveTicsP1)
+                                    {
+                                        str += bookingTics[z1][p1][STATE_SWITCH][inP1[0]] + " ";
+                                        str += bookingTics[z2][p1][STATE_SWITCH][inP1[1]] + " ";
+                                        str += ", ";
+                                    }
+                                    str += "; ";
+                                    for (int[] inP2 : consecutiveTicsP2)
+                                    {
+                                        str += bookingTics[z2][p2][STATE_SWITCH][inP2[0]] + " ";
+                                        str += bookingTics[z1][p2][STATE_SWITCH][inP2[0]] + " ";
+                                        str += ", ";
+                                    }
+                                    logger.warn(str);                                        
+                                    //...temp-test
+
                                     for (int[] tic1 : consecutiveTicsP1)
                                     {
+                                        // Find nearest upwards path splits for each consecutive booking
                                         ArrayList<int[]> pathSplitInfosP1 = new ArrayList<int[]>();
                                         for (int zInd = 0; zInd < zoneIndices.length; zInd++)
                                         {
-                                            int stateIndex = bookingTics[zInd][p1][STATE_SWITCH][tic1[zInd]];
-                                            int eventIndex = bookingTics[zInd][p1][EVENT_SWITCH][tic1[zInd]];
+                                            int stateIndex = bookingTics[zoneIndices[zInd]][p1][STATE_SWITCH][tic1[zInd]];
+                                            int eventIndex = bookingTics[zoneIndices[zInd]][p1][EVENT_SWITCH][tic1[zInd]];
                                             State bState = indexMap.getStateAt(plants.getAutomatonAt(p1), stateIndex);
                                             LabeledEvent bEvent = indexMap.getEventAt(eventIndex);
 
-                                            findNearestPathSplits(plants.getAutomatonAt(p1), bState.nextState(bEvent), pathSplitInfosP1, bEvent);    
+                                            findNearestPathSplits(plants.getAutomatonAt(p1), bState.nextState(bEvent), 
+                                                    pathSplitInfosP1, bEvent);    
                                         }
-                                        
+
                                         String pathSplitStrP1 = "";
                                         int pathSplitCounterP1 = 0;
                                         for (Iterator<int[]> it = pathSplitInfosP1.iterator(); it.hasNext();)
@@ -1717,31 +1775,43 @@ public class Milp
                                                 pathSplitStrP1 += " - " + makeAltPathsVariable(p1, pathSplitInfo[0], pathSplitInfo[1]);
                                             }
                                         }
-                                        
+                            
                                         String noncrossConstrStr = "";
+                                        String dualNoncrossConstrStr = "";
                                         ArrayList<int[]> pathSplitInfosP2 = new ArrayList<int[]>();
                                         for (int[] tic2 : consecutiveTicsP2)
                                         {                                           
-                                            for (int zInd = 0; zInd< zoneIndices.length; zInd++)
+                                            for (int zInd = 0; zInd < zoneIndices.length; zInd++)
                                             {      
                                                 // dualZInd is used to reverse tic2, that needs to be reversed 
                                                 // (so that the indices are right) since tic1 describes booking 
                                                 // z1 -> z2, while tic1 represents z2 -> z1
                                                 int dualZInd = tic2.length - 1 - zInd;
-                                                noncrossConstrStr += "r" + p1 + "_books_z" + zoneIndices[zInd] + "_before_r" + p2;
                                                 
+                                                noncrossConstrStr += "r" + p1 + "_books_z" + zoneIndices[zInd] + "_before_r" + p2;
+                                                dualNoncrossConstrStr += "r" + p1 + "_books_z" + zoneIndices[dualZInd] + "_before_r" + p2;
+                                                
+                                                // If there is a "var_x"-appendix corresponding to the current variable, it should be appended 
                                                 Integer varCounter = mutexVarCounterMap.get(new int[]{zoneIndices[zInd], p1, p2, 
                                                         tic1[zInd], tic2[dualZInd]});
                                                 if (varCounter != null)
                                                 {
                                                     noncrossConstrStr += "_var" + varCounter;
                                                 }
-                                                
+                                                // If there is a "var_x"-appendix corresponding to the dual variable, it should be appended 
+                                                varCounter = mutexVarCounterMap.get(new int[]{zoneIndices[dualZInd], p1, p2, 
+                                                        tic1[dualZInd], tic2[zInd]});
+                                                if (varCounter != null)
+                                                {
+                                                    dualNoncrossConstrStr += "_var" + varCounter;
+                                                }
+
                                                 if (! noncrossConstrStr.contains(">="))
                                                 {
-                                                    noncrossConstrStr = "non_crossbooking_" + counter++ + " : " + noncrossConstrStr + " >= ";
+                                                    noncrossConstrStr = "non_crossbooking_" + counter + " : " + noncrossConstrStr + " >= ";
+                                                    dualNoncrossConstrStr = "non_crossbooking_" + counter++ + "_dual : " + dualNoncrossConstrStr + " >= ";
                                                 }
-                                                
+
                                                 int stateIndex = bookingTics[zInd][p2][STATE_SWITCH][tic1[zInd]];
                                                 int eventIndex = bookingTics[zInd][p2][EVENT_SWITCH][tic1[zInd]];
                                                 State bState = indexMap.getStateAt(plants.getAutomatonAt(p2), stateIndex);
@@ -1749,7 +1819,7 @@ public class Milp
 
                                                 findNearestPathSplits(plants.getAutomatonAt(p2), bState.nextState(bEvent), pathSplitInfosP2, bEvent);    
                                             }
-                                            
+
                                             int pathSplitCounterP2 = 0;
                                             String pathSplitStrP2 = "";
                                             for (Iterator<int[]> it = pathSplitInfosP2.iterator(); it.hasNext();)
@@ -1761,24 +1831,34 @@ public class Milp
                                                     pathSplitStrP2 += " - " + makeAltPathsVariable(p2, pathSplitInfo[0], pathSplitInfo[1]);
                                                 }
                                             }
-                                            
+
                                             if ((pathSplitCounterP1 + pathSplitCounterP2) > 0)  
                                             {
                                                 noncrossConstrStr += " - bigM*(" + (pathSplitCounterP1 + pathSplitCounterP2) + 
                                                         pathSplitStrP1 + pathSplitStrP2 + ")";
                                             }
-                                            
+
                                             noncrossConstrStr += ";\n";
+                                            dualNoncrossConstrStr += ";\n";
                                         }
-                                        
+
                                         //temp
                                         logger.warn("str = " + noncrossConstrStr);
+                                        logger.warn("dual_str = " + dualNoncrossConstrStr);
+                                        
+                                        //TODO: kolla om det blir rätt med path-split-variabler (ny test-xml)
+                                        //TODO: kolla om det blir rätt om r2 bokar före r1 (möjligen får man 
+                                        //      ändra i mutex-kodningen (måste man kanske ändå det för att det 
+                                        //      skall stämma med splits?))
+                                        //TODO: dokumentera i /tankar/milp.tex
+                                        //TODO: VelocityBalansering
+                                        //TODO: Vad lämnade Hugo för smaskens?
                                     }
                                 }
-                            }   
-                        }
-                    }           
-                }
+                            }
+                        }   
+                    }
+                }           
             }
         }
     }
@@ -2019,8 +2099,9 @@ public class Milp
 //    }
     
     /**
-     * Finds all pairs of booking tics, such that the plant with index plantIndex books the mutex zone 
-     * with index pZoneIndex is first and the zone corresponding to fZoneIndex second.
+     * Finds all pairs of booking tics, such that the plant with index plantIndex 
+     * books the mutex zone with index pZoneIndex first and the zone corresponding 
+     * to fZoneIndex second without(!) unbooking pZoneIndex in between.
      *
      * @param   pZoneIndex  the internal index of the firstly booked zone
      * @param   fZoneIndex  the internal index of the secondly booked zone
@@ -2033,34 +2114,48 @@ public class Milp
 
         Automaton plant = plants.getAutomatonAt(plantIndex);
         
-        // For faster processing
-        Hashtable<Integer, Integer> pStateIndicesTable = new Hashtable<Integer, Integer>();
+        // For faster processing, the booking tics of the preceding zone are put into a hashtable 
+        Hashtable<Integer, Integer> pZoneBIndicesTable = new Hashtable<Integer, Integer>();
         for (int i = 0; i < bookingTics[pZoneIndex][plantIndex][STATE_SWITCH].length; i++)
         {
-            pStateIndicesTable.put(new Integer(bookingTics[pZoneIndex][plantIndex][STATE_SWITCH][i]), new Integer(i));
+            pZoneBIndicesTable.put(new Integer(bookingTics[pZoneIndex][plantIndex][STATE_SWITCH][i]), new Integer(i));
         }
-
+        
+        // For faster processing, the unbooking tics of the following zone are put into a hashtable 
+        Hashtable<Integer, Integer> pZoneUIndicesTable = new Hashtable<Integer, Integer>();
+        for (int i = 0; i < unbookingTics[pZoneIndex][plantIndex][STATE_SWITCH].length; i++)
+        {
+            pZoneUIndicesTable.put(new Integer(unbookingTics[pZoneIndex][plantIndex][STATE_SWITCH][i]), new Integer(i));
+        }
+        
+        // The loop searching for preceding bookings to each booking of fZone that 
+        // fulfil the requirements of "consecutive booking"
         for (int i = 0; i < bookingTics[fZoneIndex][plantIndex][STATE_SWITCH].length; i++)
         {
             State fState = indexMap.getStateAt(plant, bookingTics[fZoneIndex][plantIndex][STATE_SWITCH][i]);
-            
-            //debug
-            String fStateName = fState.getName();
-            
+                       
             ArrayList<State> upstreamsStates = new ArrayList<State>();
             upstreamsStates.add(fState);
             
+            // Starting with the booking of fZone, we search upwards
             while (!upstreamsStates.isEmpty())
             {
                 State currUpstreamsState = upstreamsStates.remove(0);
-                int currUpsteamsStateIndex = indexMap.getStateIndex(plant, currUpstreamsState);                
-                Integer pStateIndex = pStateIndicesTable.get(new Integer(currUpsteamsStateIndex));
+                int currUpsteamsStateIndex = indexMap.getStateIndex(plant, currUpstreamsState); 
                 
-                if (pStateIndex != null)
+                Integer pZoneBIndex = pZoneBIndicesTable.get(new Integer(currUpsteamsStateIndex));
+
+                // If we find a booking of pZone, a consecutive booking sequence is added
+                if (pZoneBIndex != null)
                 {
-                    bookingStateSequences.add(new int[]{pStateIndex.intValue(), i});
+                    bookingStateSequences.add(new int[]{pZoneBIndex.intValue(), i});
                 }
-                else if (!currUpstreamsState.isInitial())
+                // Otherwise if we neither find an unbooking of pZone or the initial state of current plant,
+                // the search is continued by adding all states that lead to the current state. 
+                // By checking for the unbooking of pZone, we avoid sequences like "Ri_bj -> Ri_uj -> Ri_bk",
+                // that do not comply with the definition of "consecutive booking".
+                else if (pZoneUIndicesTable.get(new Integer(currUpsteamsStateIndex)) == null && 
+                        !currUpstreamsState.isInitial())
                 {
                     for (Iterator<Arc> incomingArcsIt = currUpstreamsState.incomingArcsIterator(); incomingArcsIt.hasNext();)
                     {
