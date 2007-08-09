@@ -1,19 +1,18 @@
 /*
- *   Copyright (C) 2006 Goran Cengic
+ * Copyright (C) 2007 Goran Cengic
  *
- *   This file is free software; you can redistribute it and/or
- *   modify it under the terms of the GNU Lesser General Public
- *   License as published by the Free Software Foundation; either
- *   version 2.1 of the License, or (at your option) any later version.
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
  *
- *   This library is distributed in the hope that it will be useful,
- *   but WITHOUT ANY WARRANTY; without even the implied warranty of
- *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- *   Lesser General Public License for more details.
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
  *
- *   You should have received a copy of the GNU Lesser General Public
- *   License along with this library; if not, write to the Free Software
- *   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
 
@@ -50,6 +49,13 @@ import net.sourceforge.fuber.xsd.libraryelement.*;
 
 class ModelMaker
 {
+
+	private static final int ERROR = -2;
+	private static final int WARN = -1;
+	private static final int QUIET = 0;
+	private static final int INFO = 1;
+	private static final int DEBUG = 2;
+	private static int verboseLevel = INFO;
 
     private JAXBContext iecContext;
     private Unmarshaller iecUnmarshaller;
@@ -115,12 +121,20 @@ class ModelMaker
 
 		if (args.length == 0)
 		{
-			System.err.println("Usage: ModelMaker [-o outputFileName] [-lb libraryPathBase] [-lp libraryDirectory]... file.sys");
+			output(ERROR, "Usage: ModelMaker [-o outputFileName] [-lb libraryPathBase] [-lp libraryDirectory]... file.sys");
 			return;
 		}
 
 		for (int i = 0; i < args.length; i++)
 		{
+			if (args[i].equals("-d"))
+			{
+				verboseLevel = DEBUG;
+			}
+			if (args[i].equals("-q"))
+			{
+				verboseLevel = QUIET;
+			}
 			if (args[i].equals("-o"))
 			{
 				if (i + 1 < args.length)
@@ -158,9 +172,15 @@ class ModelMaker
 				}
 			}
 			
-		}			
-		
-		System.out.println("Input arguments: \n" 
+		}
+
+		output("ModelMaker  Copyright (C) 2007  Goran Cengic");
+		output("This program comes with ABSOLUTELY NO WARRANTY!");
+		output("This is free software, and you are welcome to redistribute it");
+		output("under the terms of GPL version 3 or later.");
+		output("For terms see http://www.gnu.org/licenses");
+		output("");
+		output("Input arguments: \n" 
 						   + "\t output file: " + outputFileName + "\n"
 						   + "\t system file: " + systemFileName + "\n"
 						   + "\t library path base: " + libraryPathBase + "\n"
@@ -180,7 +200,7 @@ class ModelMaker
 		}
 		catch (Exception e)
 		{
-			System.err.println(e);
+			output(ERROR, e.toString());
 			System.exit(1);
 		}
 
@@ -201,11 +221,11 @@ class ModelMaker
 
 				if (!libraryPathBaseFile.isDirectory())
 				{
-					System.err.println("ModelMaker(): Specified library base is not a directory!: " + libraryPathBaseFile.getName());
+					output(ERROR, "ModelMaker(): Specified library base is not a directory!: " + libraryPathBaseFile.getName());
 				}
 				else if (!libraryPathBaseFile.exists())
 				{
-					System.err.println("ModelMaker(): Specified library base does not exist!: " + libraryPathBaseFile.getName());
+					output(ERROR, "ModelMaker(): Specified library base does not exist!: " + libraryPathBaseFile.getName());
 				}
 				else
 				{
@@ -232,11 +252,11 @@ class ModelMaker
 
 				if (!curLibraryDir.isDirectory())
 				{
-					System.err.println("ModelMaker(): Specified library path element " + curLibraryDir.getAbsolutePath() + " is not a directory!");
+					output(ERROR, "ModelMaker(): Specified library path element " + curLibraryDir.getAbsolutePath() + " is not a directory!");
 				}
 				else if (!curLibraryDir.exists())
 				{
-					System.err.println("ModelMaker(): Specified library path element " + curLibraryDir.getAbsolutePath() + " does not exist!");
+					output(ERROR, "ModelMaker(): Specified library path element " + curLibraryDir.getAbsolutePath() + " does not exist!");
 				}
 				else
 				{
@@ -265,7 +285,7 @@ class ModelMaker
 	public void makeModel()
 	{
 
-		System.out.println("ModelMaker.makeModel(): Loading and Analyzing the System -----------------------------");
+		output("ModelMaker.makeModel(): Loading and Analyzing the System -----------------------");
 		
 		loadSystem(systemFileName);
 		
@@ -273,20 +293,19 @@ class ModelMaker
 		
 		makeDataConnectionMap(systemFBNetwork, null, 0);
 
-		// 		printFunctionBlocksMap();
-		// 		printBasicFunctionBlocksMap();
-		//		printEventsMap();
-		// 		printAlgorithmsMap();
-		// 		printAlgorithmTextsMap();
-		// 		printFBTypesMap();
-		// 		printEventConnectionsMap();
-		// 		printDataConnectionsMap();
-
-		System.out.println("ModelMaker.makeModel(): Generating Model -----------------------------------------");
+// 		printFunctionBlocksMap();
+// 		printBasicFunctionBlocksMap();
+// 		printEventsMap();
+// 		printAlgorithmsMap();
+// 		printAlgorithmTextsMap();
+// 		printFBTypesMap();
+// 		printEventConnectionsMap();
+// 		printDataConnectionsMap();
+		
+		output("ModelMaker.makeModel(): Generating Model ---------------------------------------");
 
  		automata = new ExtendedAutomata(theSystem.getName());
 
-		// TODO: make startup model
 		makeStartup();
 
 		makeInstanceQueue();
@@ -297,41 +316,27 @@ class ModelMaker
 
 		makeAlgorithmExecution();
 
-		//for each basic FB instance make models
 		for (Iterator fbIter = basicFunctionBlocks.keySet().iterator(); fbIter.hasNext();)
 		{
 			String fbName = (String) fbIter.next();
 			String typeName = (String) basicFunctionBlocks.get(fbName);
-			
-			// TODO
-			// 			if (typeName.startsWith("E_SPLIT"))
-			// 			{
-			// 				makeSplit((new Integer(((String) functionBlocks.get(fbName)).substring(7))).intValue());
-			// 			}
-			// 			else if (typeName.startsWith("E_MERGE"))
-			// 			{
-			// 				makeMerge((new Integer(((String) functionBlocks.get(fbName)).substring(7))).intValue());
-			// 			}
-			// 			else
-			// 			{
 			makeBasicFB(fbName);
-			//			}
 		}
 		
-		// 		// test automata classes
-		// 		ExtendedAutomaton test = getNewAutomaton("test");
-		// 		test.addInitialState("s0");
-		// 		test.addState("s1");
-		// 		test.addIntegerVariable("var1", 0, 5, 0, 0);
-		// 		automata.addEvent("e1", "controllable");
-		// 		test.addTransition("s0","s1","e1;e2;","var1 == 1","var1 = 4;");
-		// 		automata.addAutomaton(test);
-		// 		ExtendedAutomaton test2 = getNewAutomaton("test2");
-		// 		test2.addInitialState("s0");
-		// 		test2.addState("s1");
-		// 		test2.addIntegerVariable("var1", 0, 5, 0, 0);
-		// 		test2.addTransition("s0","s1","e1;e2;","var1 == 1","var1  = 4;");
-		// 		automata.addAutomaton(test2);
+// 		// test automata classes
+// 		ExtendedAutomaton test = getNewAutomaton("test");
+// 		test.addInitialState("s0");
+// 		test.addState("s1");
+// 		test.addIntegerVariable("var1", 0, 5, 0, 0);
+// 		automata.addEvent("e1", "controllable");
+// 		test.addTransition("s0","s1","e1;e2;","var1 == 1","var1 = 4;");
+// 		automata.addAutomaton(test);
+// 		ExtendedAutomaton test2 = getNewAutomaton("test2");
+// 		test2.addInitialState("s0");
+// 		test2.addState("s1");
+// 		test2.addIntegerVariable("var1", 0, 5, 0, 0);
+// 		test2.addTransition("s0","s1","e1;e2;","var1 == 1","var1  = 4;");
+// 		automata.addAutomaton(test2);
 
 		automata.writeToFile(new File(outputFileName));
 	}
@@ -339,8 +344,8 @@ class ModelMaker
     private void loadSystem(String fileName)
     {
 	
-		System.out.println("ModelMaker.loadSystem(" + fileName + "):");
-		System.out.println("\t Loading file " + fileName);
+		output("ModelMaker.loadSystem(" + fileName + "):");
+		output("Loading file " + fileName, 1);
 		
 		File file = getFile(fileName);
 		
@@ -375,7 +380,7 @@ class ModelMaker
 		}
 		catch (Exception e)
 		{
-			e.printStackTrace(System.err);
+			output(ERROR, e.toString());
 			System.exit(1);
 		}
 	}
@@ -397,33 +402,15 @@ class ModelMaker
 		String typeName = fb.getType();
 		String fileName = typeName + ".fbt";
 	
-		System.out.println("ModelMaker.loadFB(" + instanceName + ", " + fileName + "):");
+		output("ModelMaker.loadFB(" + instanceName + ", " + fileName + "):");
 				
 		if (typeName.equals("E_RESTART"))
 		{
-			System.out.println("\t Skipping built-in E_RESTART type.");
-			System.out.println("\t Adding FB " + instanceName);
+			output("Skipping built-in E_RESTART type.", 1);
+			output("Adding FB " + instanceName, 1);
 			restartInstance = instanceName;
 			functionBlocks.put(instanceName,typeName);
 		}
-		// TODO
-		// 		else if (typeName.startsWith("E_MERGE"))
-		// 		{
-		// 			System.out.println("\t Skipping built-in E_MERGE type.");			
-		// 			System.out.println("\t Adding FB " + instanceName);
-		// 			functionBlocks.put(instanceName,typeName);
-		// 			System.out.println("\t Adding Basic FB " + instanceName);			
-		// 			basicFunctionBlocks.put(instanceName, typeName);
-					
-		// 		}
-		// 		else if (typeName.startsWith("E_SPLIT"))
-		// 		{
-		// 			System.out.println("\t Skipping built-in E_SPLIT type.");			
-		// 			System.out.println("\t Adding FB " + instanceName);
-		// 			functionBlocks.put(instanceName,typeName);
-		// 			System.out.println("\t Adding Basic FB " + instanceName);			
-		// 			basicFunctionBlocks.put(instanceName, typeName);
-		// 		}
 		else
 		{
 			
@@ -437,7 +424,7 @@ class ModelMaker
 			}
 			catch (Exception e)
 			{
-				e.printStackTrace(System.err);
+				output(ERROR, e.toString());
 				System.exit(1);
 			}
 			
@@ -447,16 +434,16 @@ class ModelMaker
 
 				if (!fbTypes.keySet().contains(typeName))
 				{
-					System.out.println("\t Adding FB type " + typeName);
+					output("Adding FB type " + typeName, 1);
 					fbTypes.put(typeName, theType);					
 				}
 
-				System.out.println("\t Adding FB " + instanceName);
+				output("Adding FB " + instanceName, 1);
 				functionBlocks.put(instanceName,theType.getName());
 				
 				if (theType.isSetBasicFB() && !theType.isSetFBNetwork())
 				{
-					System.out.println("\t Adding Basic FB " + instanceName);			
+					output("Adding Basic FB " + instanceName, 1);
 
 					basicFunctionBlocks.put(instanceName, typeName);
 					basicFunctionBlocksID.put(instanceName, new Integer(fbIDCounter));
@@ -506,7 +493,8 @@ class ModelMaker
 							}
 							else
 							{
-								System.out.println("\t Error: The algorithm does not have a name!");
+								output(ERROR, "Error: The algorithm does not have a name!");
+								output(ERROR, "FB name: " + instanceName, 1);
 								System.exit(1);
 							}
 						}
@@ -529,9 +517,8 @@ class ModelMaker
 				}
 				else
 				{
-					System.out.println("ModelMaker.loadFB(" + instanceName + ", " + fileName
-									   + "): Unsupported FB type: " + typeName);
-					System.out.println("\t Neither a Basic FB nor Composite FB.");
+					output(ERROR, "Error!: ModelMaker.loadFB(" + instanceName + ", " + fileName + "): Unsupported FB type: " + typeName);
+					output(ERROR, "Neither a Basic FB nor a Composite FB.", 1);
 					System.exit(1);
 				}
 			}
@@ -548,7 +535,7 @@ class ModelMaker
 			{
 				File curLibraryDir = (File) iter.next();
 				theFile = new File(curLibraryDir, fileName);
-				//System.out.println("ModelMaker.getFile(" + fileName + "): Looking for file in " + theFile.toString());
+				output(DEBUG, "ModelMaker.getFile(): Looking for file " + theFile.toString());
 				if (theFile.exists())
 				{
 					break;
@@ -558,21 +545,20 @@ class ModelMaker
 
 		if (!theFile.exists())
 		{
-			System.err.println("ModelMaker.getFile(" + fileName + "): The file " + fileName 
-							   + " does not exist in the specified libraries...");
+			output(ERROR, "ModelMaker.getFile(" + fileName + "): The file " + fileName + " does not exist in the specified libraries...");
 			if (libraryPathList != null)
 			{
 				for (Iterator iter = libraryPathList.iterator();iter.hasNext();)
 				{
-					System.err.println("\t" + ((File) iter.next()).getAbsolutePath() + File.separator);
+					output(ERROR, ((File) iter.next()).getAbsolutePath() + File.separator, 1);
 				}
 			}
 			else
 			{
-				System.err.println("\t. (current directory)");
+				output(ERROR, ". (current directory)", 1);
 			}
-			System.err.println();
-			System.err.println("Usage: ModelMaker [-o outputFile] [-lb libraryPathBase] [-lp libraryDirectory]... file.sys");
+			output(ERROR, "");
+			output(ERROR, "Usage: ModelMaker [-o outputFile] [-lb libraryPathBase] [-lp libraryDirectory]... file.sys");
 			System.exit(1);
 		}
 		return theFile;
@@ -580,18 +566,15 @@ class ModelMaker
 	
 	private void makeEventConnectionMap(JaxbFBNetwork fbNetwork, String parentInstance, int level)
 	{
-		for (int i = 0; i<level; i++)
-		{
-			System.out.print("\t");
-		}
 		if (parentInstance == null)
 		{
-			System.out.println("ModelMaker.makeEventConnectionMap(System):");
+			output("ModelMaker.makeEventConnectionMap(System):");
 		}
 		else
 		{
-			System.out.println("ModelMaker.makeEventConnectionMap(" + parentInstance + "):");
+			output("ModelMaker.makeEventConnectionMap(" + parentInstance + "):");
 		}
+		
 		for (Iterator connIter = fbNetwork.getEventConnections().getConnection().iterator();
 			 connIter.hasNext();)
 		{
@@ -611,14 +594,7 @@ class ModelMaker
 			String sourceInstance = getInstanceName(source);
 			String sourceSignal   = getSignalName(source);
 				
-			// 			for (int i = 0; i<level; i++)
-			// 			{
-			// 				System.out.print("\t");
-			// 			}
-			// 			System.out.println("Analyzing connection: " 
-			// 							   + source
-			// 							   + "-->" 
-			// 							   + dest);
+			output(DEBUG, "Analyzing connection: " + source + "-->" + dest, level);
 			
 			JaxbFBType sourceType = (JaxbFBType) fbTypes.get((String) functionBlocks.get(sourceInstance));
 
@@ -643,14 +619,7 @@ class ModelMaker
 			sourceInstance = getInstanceName(source);
 			sourceSignal   = getSignalName(source);
 		
-			// 			for (int i = 0; i<level; i++)
-			// 			{
-			// 				System.out.print("\t");
-			// 			}
-			// 			System.out.println("Adding connection: " 
-			// 							   + source
-			// 							   + "-->" 
-			// 							   + dest);
+			output(DEBUG, "Adding connection: " + source + "-->" + dest, level);
 			
 			Map eventMap;
 			if (!eventConnections.keySet().contains(sourceInstance))
@@ -736,11 +705,11 @@ class ModelMaker
 	{
 		if (parentInstance == null)
 		{
-			output("ModelMaker.makeDataConnectionMap(System):", level);
+			output("ModelMaker.makeDataConnectionMap(System):");
 		}
 		else
 		{
-			output("ModelMaker.makeDataConnectionMap(" + parentInstance + "):", level);
+			output("ModelMaker.makeDataConnectionMap(" + parentInstance + "):");
 		}
 		if (fbNetwork.isSetDataConnections())
 		{
@@ -763,10 +732,7 @@ class ModelMaker
 				String destInstance = getInstanceName(dest);
 				String destSignal   = getSignalName(dest);
 				
-				// 			System.out.println("Analyzing connection: " 
-				// 							   + source
-				// 							   + "-->" 
-				// 							   + dest);
+				output(DEBUG, "Analyzing connection: " + source + "-->" + dest, level);
 				
 				JaxbFBType destType = (JaxbFBType) fbTypes.get((String) functionBlocks.get(destInstance));
 				
@@ -791,7 +757,7 @@ class ModelMaker
 				destInstance = getInstanceName(dest);
 				destSignal   = getSignalName(dest);
 				
-				// 			output("Adding connection: " + source + "-->" + dest, level);
+				output(DEBUG, "Adding connection: " + source + "-->" + dest, level);
 				
 				Map dataMap;
 				if (!dataConnections.keySet().contains(destInstance))
@@ -894,7 +860,7 @@ class ModelMaker
 
 	private void makeStartup()
 	{
-		System.out.println("ModelMaker.makeStartup():");
+		output("ModelMaker.makeStartup():");
 
 		String fbName = restartInstance;
 
@@ -930,7 +896,7 @@ class ModelMaker
 
 	private void makeInstanceQueue()
 	{
-		System.out.println("ModelMaker.makeInstanceQueue():");
+		output("ModelMaker.makeInstanceQueue():");
 
 		ExtendedAutomaton instanceQueue = getNewAutomaton("Instance Queue");
 		
@@ -982,7 +948,7 @@ class ModelMaker
 
 	private void makeEventExecution()
 	{
-		System.out.println("ModelMaker.makeEventExecution():");
+		output("ModelMaker.makeEventExecution():");
 
 		ExtendedAutomaton eventExecution = getNewAutomaton("Event Execution");
 
@@ -1006,7 +972,7 @@ class ModelMaker
 
 	private void makeJobQueue()
 	{
-		System.out.println("ModelMaker.makeJobQueue():");
+		output("ModelMaker.makeJobQueue():");
 
 		ExtendedAutomaton jobQueue = getNewAutomaton("Job Queue");
 		
@@ -1061,7 +1027,7 @@ class ModelMaker
 
 	private void makeAlgorithmExecution()
 	{
-		System.out.println("ModelMaker.makeAlgorithmExecution():");
+		output("ModelMaker.makeAlgorithmExecution():");
 
 		ExtendedAutomaton algorithmExecution = getNewAutomaton("Algorithm Execution");
 				
@@ -1096,7 +1062,7 @@ class ModelMaker
 
 	private void makeBasicFB(String fbName)
 	{	
-		System.out.println("ModelMaker.makeBasicFB(" + fbName + "):");
+		output("ModelMaker.makeBasicFB(" + fbName + "):");
 	
 		makeBasicFBEventReceiving(fbName);
 		makeBasicFBEventHandling(fbName);
@@ -1107,7 +1073,7 @@ class ModelMaker
 
 	private void makeBasicFBEventReceiving(String fbName)
 	{
-		System.out.println("\t Event Receiving");
+		output("Event Receiving", 1);
 
 		Integer fbID = (Integer) basicFunctionBlocksID.get(fbName);
 		Integer eventMaxID = (Integer) eventsMaxID.get(fbName); 
@@ -1160,7 +1126,7 @@ class ModelMaker
 	
 	private void makeBasicFBEventHandling(String fbName)
 	{
-		System.out.println("\t Event Handling");
+		output("Event Handling", 1);
 		
 		ExtendedAutomaton eventHandling = getNewAutomaton("Event Handling " + fbName );
 
@@ -1204,7 +1170,7 @@ class ModelMaker
 
 	private void makeBasicFBEventQueue(String fbName)
 	{
-		System.out.println("\t Event Queue");
+		output("Event Queue", 1);
 
 		String typeName = (String) basicFunctionBlocks.get(fbName);
 		JaxbFBType theType = (JaxbFBType) fbTypes.get(typeName);
@@ -1246,26 +1212,26 @@ class ModelMaker
 				}
 				else if (curDataType.toLowerCase().equals("bool"))
 				{
-					System.err.println("\t Error: Unsupported input data variable type: BOOL");
-					System.err.println("\t Variable name: " + fbName + "_" + curDataInputName);
+					output(ERROR, "Error: Unsupported input data variable type: BOOL", 1);
+					output(ERROR, "Variable name: " + fbName + "_" + curDataInputName, 2);
 					System.exit(1);
 				}
 				else if (curDataType.toLowerCase().equals("real"))
 				{
-					System.err.println("\t Error: Unsupported input data variable type: REAL");
-					System.err.println("\t Variable name: " + fbName + "_" + curDataInputName);
+					output(ERROR, "Error: Unsupported input data variable type: REAL", 1);
+					output(ERROR, "Variable name: " + fbName + "_" + curDataInputName, 2);
 					System.exit(1);
 				}
 				else if (curDataType.toLowerCase().equals("string"))
 				{
-					System.err.println("\t Error: Unsupported input data variable type: STRING");
-					System.err.println("\t Variable name: " + fbName + "_" + curDataInputName);
+					output(ERROR, "Error: Unsupported input data variable type: STRING", 1);
+					output(ERROR, "Variable name: " + fbName + "_" + curDataInputName, 2);
 					System.exit(1);
 				}
 				else if (curDataType.toLowerCase().equals("object"))
 				{
-					System.err.println("\t Error: Unsupported input data variable type: OBJECT");
-					System.err.println("\t Variable name: " + fbName + "_" + curDataInputName);
+					output(ERROR, "Error: Unsupported input data variable type: OBJECT", 1);
+					output(ERROR, "Variable name: " + fbName + "_" + curDataInputName, 2);
 					System.exit(1);
 				}
 			}
@@ -1286,26 +1252,26 @@ class ModelMaker
 				}
 				else if (curDataType.toLowerCase().equals("bool"))
 				{
-					System.err.println("\t Error: Unsupported input data variable type: BOOL");
-					System.err.println("\t Variable name: " + fbName + "_" + curDataOutputName);
+					output(ERROR, "Error: Unsupported input data variable type: BOOL", 1);
+					output(ERROR, "Variable name: " + fbName + "_" + curDataOutputName, 2);
 					System.exit(1);
 				}
 				else if (curDataType.toLowerCase().equals("real"))
 				{
-					System.err.println("\t Error: Unsupported input data variable type: REAL");
-					System.err.println("\t Variable name: " + fbName + "_" + curDataOutputName);
+					output(ERROR, "Error: Unsupported input data variable type: REAL", 1);
+					output(ERROR, "Variable name: " + fbName + "_" + curDataOutputName, 2);
 					System.exit(1);
 				}
 				else if (curDataType.toLowerCase().equals("string"))
 				{
-					System.err.println("\t Error: Unsupported input data variable type: STRING");
-					System.err.println("\t Variable name: " + fbName + "_" + curDataOutputName);
+					output(ERROR, "Error: Unsupported input data variable type: STRING", 1);
+					output(ERROR, "Variable name: " + fbName + "_" + curDataOutputName, 2);
 					System.exit(1);
 				}
 				else if (curDataType.toLowerCase().equals("object"))
 				{
-					System.err.println("\t Error: Unsupported input data variable type: OBJECT");
-					System.err.println("\t Variable name: " + fbName + "_" + curDataOutputName);
+					output(ERROR, "Error: Unsupported input data variable type: OBJECT", 1);
+					output(ERROR, "Variable name: " + fbName + "_" + curDataOutputName, 2);
 					System.exit(1);
 				}
 			}
@@ -1333,26 +1299,26 @@ class ModelMaker
 					}
 					else if (curDataType.toLowerCase().equals("bool"))
 					{
-						System.err.println("\t Error: Unsupported input data variable type: BOOL");
-						System.err.println("\t Variable name: " + fbName + "_" + curDataInputName);
+						output(ERROR, "Error: Unsupported input data variable type: BOOL", 1);
+						output(ERROR, "Variable name: " + fbName + "_" + curDataInputName, 2);
 						System.exit(1);
 					}
 					else if (curDataType.toLowerCase().equals("real"))
 					{
-						System.err.println("\t Error: Unsupported input data variable type: REAL");
-						System.err.println("\t Variable name: " + fbName + "_" + curDataInputName);
+						output(ERROR, "Error: Unsupported input data variable type: REAL", 1);
+						output(ERROR, "Variable name: " + fbName + "_" + curDataInputName, 2);
 						System.exit(1);
 					}
 					else if (curDataType.toLowerCase().equals("string"))
 					{
-						System.err.println("\t Error: Unsupported input data variable type: STRING");
-						System.err.println("\t Variable name: " + fbName + "_" + curDataInputName);
+						output(ERROR, "Error: Unsupported input data variable type: STRING", 1);
+						output(ERROR, "Variable name: " + fbName + "_" + curDataInputName, 2);
 						System.exit(1);
 					}
 					else if (curDataType.toLowerCase().equals("object"))
 					{
-						System.err.println("\t Error: Unsupported input data variable type: OBJECT");
-						System.err.println("\t Variable name: " + fbName + "_" + curDataInputName);
+						output(ERROR, "Error: Unsupported input data variable type: OBJECT", 1);
+						output(ERROR, "Variable name: " + fbName + "_" + curDataInputName, 2);
 						System.exit(1);
 					}
 				}
@@ -1441,7 +1407,7 @@ class ModelMaker
 	
 	private void makeBasicFBExecutionControlChart(String fbName)
 	{
-		System.out.println("\t Execution Control Chart");
+		output("Execution Control Chart", 1);
 		
 		String typeName = (String) basicFunctionBlocks.get(fbName);
 		JaxbFBType theType = (JaxbFBType) fbTypes.get(typeName);
@@ -1467,26 +1433,26 @@ class ModelMaker
 				}
 				else if (curType.toLowerCase().equals("bool"))
 				{
-					System.err.println("\t\t Error: Unsupported input data variable type: BOOL");
-					System.err.println("\t\t Variable name: " + fbName + "_" + curName);
+					output(ERROR, "Error: Unsupported input data variable type: BOOL", 2);
+					output(ERROR, "Variable name: " + fbName + "_" + curName, 3);
 					System.exit(1);
 				}
 				else if (curType.toLowerCase().equals("real"))
 				{
-					System.err.println("\t\t Error: Unsupported input data variable type: REAL");
-					System.err.println("\t\t Variable name: " + fbName + "_" + curName);
+					output(ERROR, "Error: Unsupported input data variable type: REAL", 2);
+					output(ERROR, "Variable name: " + fbName + "_" + curName, 3);
 					System.exit(1);
 				}
 				else if (curType.toLowerCase().equals("string"))
 				{
-					System.err.println("\t\t Error: Unsupported input data variable type: STRING");
-					System.err.println("\t\t Variable name: " + fbName + "_" + curName);
+					output(ERROR, "Error: Unsupported input data variable type: STRING", 2);
+					output(ERROR, "Variable name: " + fbName + "_" + curName, 3);
 					System.exit(1);
 				}
 				else if (curType.toLowerCase().equals("object"))
 				{
-					System.err.println("\t\t Error: Unsupported input data variable type: OBJECT");
-					System.err.println("\t\t Variable name: " + fbName + "_" + curName);
+					output(ERROR, "Error: Unsupported input data variable type: OBJECT", 2);
+					output(ERROR, "Variable name: " + fbName + "_" + curName, 3);
 					System.exit(1);
 				}
 			}
@@ -1555,15 +1521,14 @@ class ModelMaker
 				identifierMap.put(curVarName, "internal_" + curVarName + "_" + fbName);
 			}
 		}
-		
-		
+				
 		nameCounter = 0;
 		doneInitActions = false;
 		doneInitFinish = false;
 		JaxbECState firstECState = (JaxbECState) ecStates.get(0);
 		String firstECStateName = firstECState.getName();
 		ecc.addInitialState(firstECStateName);
-		output("Calling makeECStateBranch() from makeBasicFBExecutionControlChart()", 2);
+		output(DEBUG, "Calling makeECStateBranch() from makeBasicFBExecutionControlChart()", 2);
 		makeECStateBranch(ecc, fbName, firstECStateName, firstECStateName, ecStates, ecTransitions, visitedECStates, 2, identifierMap);
 
 		automata.addAutomaton(ecc);	
@@ -1571,7 +1536,7 @@ class ModelMaker
 
 	private void makeECStateBranch(ExtendedAutomaton ecc, String fbName, String ecStateName, String prevStateName, List ecStates, List ecTransitions, Set visitedECStates, int level, Map identifierMap)
 	{
-		output("Entering makeECStateBranch(): ecStateName = " + ecStateName + ": prevStateName = " + prevStateName, level);		
+		output(DEBUG, "Entering makeECStateBranch(): ecStateName = " + ecStateName + ": prevStateName = " + prevStateName, level);
 
 		// temporary variables
 		String from = null;
@@ -1598,7 +1563,7 @@ class ModelMaker
 		String firstECStateName = firstECState.getName();
 
 		// mark the EC state as visited
-		output("Visited EC state: " + ecStateName, level);
+		output(DEBUG, "Visited EC state: " + ecStateName, level);
 		visitedECStates.add(ecStateName);
 
 		// get the EC state
@@ -1627,10 +1592,10 @@ class ModelMaker
 		from = prevStateName;
 		to = "s" + nameCounter;
 		nameCounter++;
-		output("Adding state: " + to, level);
+		output(DEBUG, "Adding state: " + to, level);
 		ecc.addState(to);
 		event = "update_ECC_" + fbName + ";";
-		output("Adding transition: from: " + from + ", to: " + to + ", event: " + event, level);
+		output(DEBUG, "Adding transition: from: " + from + ", to: " + to + ", event: " + event, level);
 		ecc.addTransition(from, to, event, null, null);
 		noTransitionFrom = to;
 		noTransitionTo = from;
@@ -1644,7 +1609,7 @@ class ModelMaker
 			String curECDestName = curECTransition.getDestination();			
 			String curECCondition = curECTransition.getCondition();			
 
-			output("Analyzing EC transition: from: " + curECSourceName +
+			output(DEBUG, "Analyzing EC transition: from: " + curECSourceName +
 				   ", to: " + curECDestName + ", cond: " + curECCondition, level);
 
 			// loop temporary vars
@@ -1666,7 +1631,7 @@ class ModelMaker
 			// make model transition for the current EC transition
 			from = prevStateName;
 			to =  curECDestName + "_actions";
-			output("Adding state: " + to, level);
+			output(DEBUG, "Adding state: " + to, level);
 			ecc.addState(to);
 			if (curECTransition.getCondition().equals("1"))
 			{
@@ -1675,7 +1640,7 @@ class ModelMaker
 				event = "one_transition_" + fbName + ";";
 				guard = null;
 				action = null;
-				output("Adding transition: from: " + from + ", to: " + to + ", event: " + event, level);
+				output(DEBUG, "Adding transition: from: " + from + ", to: " + to + ", event: " + event, level);
 				ecc.addTransition(from, to, event, guard, action);
 				next = to;					
 			}
@@ -1692,8 +1657,8 @@ class ModelMaker
 				}
 				catch(Exception e)
 				{
-					output("Error!: Parsing of the EC condition failed:", level);
-					output("\t Condition: " + curECCondition, level);
+					output(ERROR, "Error!: Parsing of the EC condition failed:", level);
+					output(ERROR, "Condition: " + curECCondition, level + 1);
 					System.exit(1);
 				}
 				Finder finder = new Finder(parsedCondition);
@@ -1714,7 +1679,7 @@ class ModelMaker
 							event = "event_input_" + curEventInputName + "_" + fbName + ";";
 							newGuard = "event_" + curEventInputName + "_" + fbName + " == 1 & (" + guard + ")";
 							action = "event_" + curEventInputName + "_" + fbName + " = 0;";					
-							output("Adding transition: from: " + from + ", to: " + to + ", event: " + event, level);
+							output(DEBUG, "Adding transition: from: " + from + ", to: " + to + ", event: " + event, level);
 							ecc.addTransition(from, to, event, newGuard, action);
 						}
 					}
@@ -1739,7 +1704,7 @@ class ModelMaker
 				{
 					doneInitActions = true;
 				}
-				output("Making actions for EC state: " + curECDestName, level);
+				output(DEBUG, "Making actions for EC state: " + curECDestName, level);
 				List destECActions = curECDestState.getECAction(); 
 				if (destECActions.size()>0)
 				{
@@ -1755,22 +1720,22 @@ class ModelMaker
 							from = next;
 							to = "s" + nameCounter; 
 							nameCounter++;
-							output("Adding state: " + to, level);
+							output(DEBUG, "Adding state: " + to, level);
 							ecc.addState(to);
 							event = "prepare_job_" + fbName + ";";
 							action = "queueing_job_fb = " + blockID + ";";
 							action = action + "queueing_job_alg = " + actionAlgorithm + ";";
-							output("Adding transition: from: " + from + ", to: " + to + ", event: " + event, level);
+							output(DEBUG, "Adding transition: from: " + from + ", to: " + to + ", event: " + event, level);
 							ecc.addTransition(from, to, event, null, action);
 							next = to;						
 							
 							from = next;
 							to = "s" + nameCounter; 
 							nameCounter++;
-							output("Adding state: " + to, level);
+							output(DEBUG, "Adding state: " + to, level);
 							ecc.addState(to);
 							event = "queue_job_" + fbName + ";";
-							output("Adding transition: from " + from + ": to " + to + ": event " + event, level);
+							output(DEBUG, "Adding transition: from " + from + ": to " + to + ": event " + event, level);
 							ecc.addTransition(from, to, event, null, null);
 							next = to;						
 							
@@ -1779,17 +1744,17 @@ class ModelMaker
 								from = next;
 								to = "s" + nameCounter; 
 								nameCounter++;
-								output("Adding state: " + to, level);
+								output(DEBUG, "Adding state: " + to, level);
 								ecc.addState(to);
 								event = "finished_job_" + fbName + ";";
-								output("Adding transition: from: " + from + ", to: " + to + ", event: " + event, level);
+								output(DEBUG, "Adding transition: from: " + from + ", to: " + to + ", event: " + event, level);
 								ecc.addTransition(from, to, event, null, null);
 								next = to;						
 								
 								from = next;
 								to = "s" + nameCounter; 
 								nameCounter++;
-								output("Adding state: " + to, level);
+								output(DEBUG, "Adding state: " + to, level);
 								ecc.addState(to);
 								event = "send_output_" + curAction.getOutput() + "_" + fbName + ";";
 								// get connection data for the action
@@ -1798,17 +1763,17 @@ class ModelMaker
 								String cntSignal = getSignalName(cntName);
 								Integer cntSignalID = (Integer) ((Map) events.get(cntFB)).get(cntSignal);
 								action = "receiveing_event_" + cntFB + "=" + cntSignalID + ";";						
-								output("Adding transition: from: " + from + ", to: " + to + ", event: " + event, level);
+								output(DEBUG, "Adding transition: from: " + from + ", to: " + to + ", event: " + event, level);
 								ecc.addTransition(from, to, event, null, action);
 								next = to;						
 								
 								from = next;
 								to = "s" + nameCounter; 
 								nameCounter++;
-								output("Adding state: " + to, level);
+								output(DEBUG, "Adding state: " + to, level);
 								ecc.addState(to);
 								event = "receive_event_" + cntFB + ";";
-								output("Adding transition: from: " + from + ", to: " + to + ", event: " + event, level);
+								output(DEBUG, "Adding transition: from: " + from + ", to: " + to + ", event: " + event, level);
 								ecc.addTransition(from, to, event, null, null);
 								next = to;						
 							}
@@ -1817,10 +1782,10 @@ class ModelMaker
 								from = next;
 								to = "s" + nameCounter; 
 								nameCounter++;
-								output("Adding state: " + to, level);
+								output(DEBUG, "Adding state: " + to, level);
 								ecc.addState(to);
 								event = "finished_job_" + fbName + ";";
-								output("Adding transition: from: " + from + ", to: " + to + ", event: " + event, level);
+								output(DEBUG, "Adding transition: from: " + from + ", to: " + to + ", event: " + event, level);
 								ecc.addTransition(from, to, event, null, null);
 								next = to;						
 							}
@@ -1830,7 +1795,7 @@ class ModelMaker
 							from = next;
 							to = "s" + nameCounter; 
 							nameCounter++;
-							output("Adding state: " + to, level);
+							output(DEBUG, "Adding state: " + to, level);
 							ecc.addState(to);
 							event = "send_output_" + curAction.getOutput() + "_" + fbName + ";";
 							// get connection data for the action
@@ -1839,17 +1804,17 @@ class ModelMaker
 							String cntSignal = getSignalName(cntName);
 							Integer cntSignalID = (Integer) ((Map) events.get(cntFB)).get(cntSignal);
 							action = "receiveing_event_" + cntFB + "=" + cntSignalID + ";";						
-							output("Adding transition: from: " + from + ", to: " + to + ", event: " + event, level);
+							output(DEBUG, "Adding transition: from: " + from + ", to: " + to + ", event: " + event, level);
 							ecc.addTransition(from, to, event, null, action);
 							next = to;						
 							
 							from = next;
 							to = "s" + nameCounter; 
 							nameCounter++;
-							output("Adding state: " + to, level);
+							output(DEBUG, "Adding state: " + to, level);
 							ecc.addState(to);
 							event = "receive_event_" + cntFB + ";";
-							output("Adding transition: from: " + from + ", to: " + to + ", event: " + event, level);
+							output(DEBUG, "Adding transition: from: " + from + ", to: " + to + ", event: " + event, level);
 							ecc.addTransition(from, to, event, null, null);
 							next = to;						
 						}
@@ -1873,8 +1838,8 @@ class ModelMaker
 			// one transition loop warning
 			if (oneTransitionFromECSource && oneTransitionFromECDest)
 			{
-				output("Warning!: Loop with \"1\" transitions found. This gives a live lock in the application!!", level);
-				output("\t Check EC states: " + curECSourceName + " and " + curECDestName, level);
+				output(WARN, "Warning!: Loop with \"1\" transitions found. This gives a live lock in the application!!", level);
+				output(WARN, "Check EC states: " + curECSourceName + " and " + curECDestName, level + 1);
 			}
 
 			// finish this state
@@ -1885,14 +1850,14 @@ class ModelMaker
 					// no_action model transition
 					from = next;
 					to = curECDestName; 
-					output("Adding state: " + to, level);
+					output(DEBUG, "Adding state: " + to, level);
 					ecc.addState(to);
 					event = "no_more_actions_" + fbName + ";";
-					output("Adding transition: from: " + from + ", to: " + to + ", event: " + event, level);
+					output(DEBUG, "Adding transition: from: " + from + ", to: " + to + ", event: " + event, level);
 					ecc.addTransition(from, to, event, null, null);
 					next = to;				
 					
-					output("Calling makeECStateBranch() from makeECStateBranch()", level);
+					output(DEBUG, "Calling makeECStateBranch() from makeECStateBranch()", level);
 					makeECStateBranch(ecc, fbName, curECDestName, to, ecStates, ecTransitions, visitedECStates, level + 1, identifierMap);
 				}
 				else if (curECDestName.equals(firstECStateName)  && !doneInitFinish)
@@ -1901,10 +1866,10 @@ class ModelMaker
 					// no_action model transition
 					from = next;
 					to = curECDestName; 
-					output("Adding state: " + to, level);
+					output(DEBUG, "Adding state: " + to, level);
 					ecc.addState(to);
 					event = "no_more_actions_" + fbName + ";";
-					output("Adding transition: from: " + from + ", to: " + to + ", event: " + event, level);
+					output(DEBUG, "Adding transition: from: " + from + ", to: " + to + ", event: " + event, level);
 					ecc.addTransition(from, to, event, null, null);
 					next = to;				
 				}
@@ -1917,10 +1882,10 @@ class ModelMaker
 					from = next;
 					to = "s" + nameCounter;
 					nameCounter++;
-					output("Adding state: " + to, level);
+					output(DEBUG, "Adding state: " + to, level);
 					ecc.addState(to);
 					event = "no_more_actions_" + fbName + ";";
-					output("Adding transition: from: " + from + ", to: " + to + ", event: " + event, level);
+					output(DEBUG, "Adding transition: from: " + from + ", to: " + to + ", event: " + event, level);
 					ecc.addTransition(from, to, event, null, null);
 					next = to;				
 					
@@ -1928,24 +1893,24 @@ class ModelMaker
 					from = next;
 					to = "s" + nameCounter;
 					nameCounter++;
-					output("Adding state: " + to, level);
+					output(DEBUG, "Adding state: " + to, level);
 					ecc.addState(to);
 					event = "update_ECC_" + fbName + ";";
-					output("Adding transition: from: " + from + ", to: " + to + ", event: " + event, level);
+					output(DEBUG, "Adding transition: from: " + from + ", to: " + to + ", event: " + event, level);
 					ecc.addTransition(from, to, event, null, null);
 					next = to;
 					
 					// handling_event_done model transition
 					from = next;
 					to = curECDestName;
-					output("Adding state: " + to, level);
+					output(DEBUG, "Adding state: " + to, level);
 					ecc.addState(to);
 					event = "handling_event_done_" + fbName + ";";
-					output("Adding transition: from: " + from + ", to: " + to + ", event: " + event, level);
+					output(DEBUG, "Adding transition: from: " + from + ", to: " + to + ", event: " + event, level);
 					ecc.addTransition(from, to, event, null, null);
 					next = to;				
 					
-					output("Calling makeECStateBranch() from makeECStateBranch()", level);
+					output(DEBUG, "Calling makeECStateBranch() from makeECStateBranch()", level);
 					makeECStateBranch(ecc, fbName, curECDestName, next, ecStates, ecTransitions, visitedECStates, level + 1, identifierMap);
 				}
 				else if (curECDestName.equals(firstECStateName) && !doneInitFinish)
@@ -1955,10 +1920,10 @@ class ModelMaker
 					from = next;
 					to = "s" + nameCounter;
 					nameCounter++;
-					output("Adding state: " + to, level);
+					output(DEBUG, "Adding state: " + to, level);
 					ecc.addState(to);
 					event = "no_more_actions_" + fbName + ";";
-					output("Adding transition: from: " + from + ", to: " + to + ", event: " + event, level);
+					output(DEBUG, "Adding transition: from: " + from + ", to: " + to + ", event: " + event, level);
 					ecc.addTransition(from, to, event, null, null);
 					next = to;				
 					
@@ -1966,20 +1931,20 @@ class ModelMaker
 					from = next;
 					to = "s" + nameCounter;
 					nameCounter++;
-					output("Adding state: " + to, level);
+					output(DEBUG, "Adding state: " + to, level);
 					ecc.addState(to);
 					event = "update_ECC_" + fbName + ";";
-					output("Adding transition: from: " + from + ", to: " + to + ", event: " + event, level);
+					output(DEBUG, "Adding transition: from: " + from + ", to: " + to + ", event: " + event, level);
 					ecc.addTransition(from, to, event, null, null);
 					next = to;
 					
 					// handling_event_done model transition
 					from = next;
 					to = curECDestName;
-					output("Adding state: " + to, level);
+					output(DEBUG, "Adding state: " + to, level);
 					ecc.addState(to);
 					event = "handling_event_done_" + fbName + ";";
-					output("Adding transition: from: " + from + ", to: " + to + ", event: " + event, level);
+					output(DEBUG, "Adding transition: from: " + from + ", to: " + to + ", event: " + event, level);
 					ecc.addTransition(from, to, event, null, null);
 					next = to;				
 				}
@@ -1992,18 +1957,22 @@ class ModelMaker
 			from = noTransitionFrom;
 			to = noTransitionTo;
 			event = "no_transition_" + fbName + ";";
-			output("Adding transition: from: " + from + ", to: " + to + ", event: " + event, level);
+			output(DEBUG, "Adding transition: from: " + from + ", to: " + to + ", event: " + event, level);
 			ecc.addTransition(from, to, event, noTransitionGuard, null);
 		}
 	}
 	
 	private void makeBasicFBAlgorithms(String fbName)
 	{
-		System.out.println("\t Algorithms");
-		
 		String typeName = (String) basicFunctionBlocks.get(fbName);
 		JaxbFBType theType = (JaxbFBType) fbTypes.get(typeName);
 		List algorithms = theType.getBasicFB().getAlgorithm();
+
+		if (algorithms.size() > 0)
+		{
+			output("Algorithms", 1);
+		}
+
 		// get the variables
 		List inputVars = null;
 		List outputVars = null;
@@ -2052,7 +2021,7 @@ class ModelMaker
 			for (int i = 0; i < algTextLines.length; i++)
 			{
 				String statement = algTextLines[i];
-				output("Making statement: " + statement, 2);
+				output(DEBUG, "Making statement: " + statement, 2);
 
 				to = "s" + nameCounter;
 				curAlgModel.addState(to);
@@ -2096,7 +2065,7 @@ class ModelMaker
 				action = action.replaceAll("MOD", "%");		
 				action = action + ";";
 
-				output("Made model action: " + action, 2);
+				output(DEBUG, "Made model action: " + action, 2);
 				// make model transition
 				curAlgModel.addTransition(from, to, event, null, action);
 				from = to;
@@ -2110,151 +2079,158 @@ class ModelMaker
 		}
 	}
 
-
-	private void makeMerge(int size)
+	private ExtendedAutomaton getNewAutomaton(String name)
 	{
-		System.out.println("Making Merge of size: " + size);
-	}
-	
-	private void makeSplit(int size)
-	{
-		System.out.println("Making Split of size: " + size);
+		return new ExtendedAutomaton(name, automata, true);
 	}
 
 	private void printFunctionBlocksMap()
 	{
-		System.out.println("ModelMaker.printFunctionBlocksMap():");
+		output("ModelMaker.printFunctionBlocksMap():");
 		for (Iterator iter = functionBlocks.keySet().iterator(); iter.hasNext();)
 		{
 			String curBlock = (String) iter.next();
 			String curType  = (String) functionBlocks.get(curBlock);
-			System.out.println("\t " + curBlock + "\t" + curType);
+			output(curBlock + "\t" + curType, 1);
 		}
 	}
 
 	private void printBasicFunctionBlocksMap()
 	{
-		System.out.println("ModelMaker.printBasicFunctionBlocksMap():");
+		output("ModelMaker.printBasicFunctionBlocksMap():");
 		for (Iterator iter = basicFunctionBlocks.keySet().iterator(); iter.hasNext();)
 		{
 			String curBlock = (String) iter.next();
 			String curType  = (String) basicFunctionBlocks.get(curBlock);
 			Integer curID = (Integer) basicFunctionBlocksID.get(curBlock);
-			System.out.println("\t " + curBlock + "\t" + curType + "\t" + curID);
+			output(curBlock + "\t" + curType + "\t" + curID, 1);
 		}
-		System.out.println("\t Maximal block ID: " + fbMaxID);			
+		output("Maximal block ID: " + fbMaxID, 1);			
 	}	
 
 	private void printEventsMap()
 	{
-		System.out.println("ModelMaker.printEventsMap():");
+		output("ModelMaker.printEventsMap():");
 		for (Iterator iter = events.keySet().iterator(); iter.hasNext();)
 		{
 			String curBlock = (String) iter.next();
 			Map curEventIDMap  = (Map) events.get(curBlock);
-			System.out.println("\t " + curBlock);
+			output(curBlock, 1);
 			for (Iterator evIter = curEventIDMap.keySet().iterator(); evIter.hasNext();)
 			{
 				String curEventName = (String) evIter.next();
 				Integer curEventID = (Integer) curEventIDMap.get(curEventName);
-				System.out.println("\t\t " + curEventName + "\t" + curEventID);
+				output(curEventName + "\t" + curEventID, 2);
 			}
 			Integer evMaxID = (Integer) eventsMaxID.get(curBlock);
-			System.out.println("\t Maximal event ID: " + evMaxID);
+			output("Maximal event ID: " + evMaxID, 1);
 		}
 	}	
 
 	private void printAlgorithmsMap()
 	{
-		System.out.println("ModelMaker.printAlgorithmsMap():");
+		output("ModelMaker.printAlgorithmsMap():");
 		for (Iterator iter = algorithms.keySet().iterator(); iter.hasNext();)
 		{
 			String curBlock = (String) iter.next();
 			Map curAlgMap  = (Map) algorithms.get(curBlock);
-			System.out.println("\t " + curBlock);
+			output(curBlock, 1);
 			for (Iterator algIter = curAlgMap.keySet().iterator(); algIter.hasNext();)
 			{
 				String curAlgName = (String) algIter.next();
 				Integer curAlgID = (Integer) curAlgMap.get(curAlgName);
-				System.out.println("\t\t " + curAlgName + "\t" + curAlgID);
+				output(curAlgName + "\t" + curAlgID, 2);
 			}
 		}
-		System.out.println("\t Maximal algorithm ID: " + algMaxID);					
+		output("Maximal algorithm ID: " + algMaxID, 1);
 	}	
 
 	private void printAlgorithmTextsMap()
 	{
-		System.out.println("ModelMaker.printAlgorithmTextsMap():");
+		output("ModelMaker.printAlgorithmTextsMap():");
 		for (Iterator iter = algorithmTexts.keySet().iterator(); iter.hasNext();)
 		{
 			String curBlock = (String) iter.next();
 			Map curAlgTextMap  = (Map) algorithmTexts.get(curBlock);
-			System.out.println("\t " + curBlock);
+			output(curBlock, 1);
 			for (Iterator algIter = curAlgTextMap.keySet().iterator(); algIter.hasNext();)
 			{
 				String curAlgName = (String) algIter.next();
 				String curAlgText = (String) curAlgTextMap.get(curAlgName);
-				System.out.println("\t\t " + curAlgName + "\t" + curAlgText);
+				output(curAlgName + "\t" + curAlgText, 2);
 			}
 		}
 	}	
 	
 	private void printFBTypesMap()
 	{
-		System.out.println("ModelMaker.printFBTypesMap():");
+		output("ModelMaker.printFBTypesMap():");
 		for (Iterator iter = fbTypes.keySet().iterator(); iter.hasNext();)
 		{
 			String curBlock = (String) iter.next();
 			JaxbFBType curType  = (JaxbFBType) fbTypes.get(curBlock);
-			System.out.println("\t " + curBlock + "\t" + curType.getName());
+			output(curBlock + "\t" + curType.getName(), 1);
 		}
 	}
 	
 	private void printEventConnectionsMap()
 	{
-		System.out.println("ModelMaker.printEventConnectionsMap():");
+		output("ModelMaker.printEventConnectionsMap():");
 		for (Iterator fbIter = eventConnections.keySet().iterator(); fbIter.hasNext();)
 		{
 			String curBlock = (String) fbIter.next();
 			Map curEvents = (Map) eventConnections.get(curBlock);
-			System.out.println("\t " + curBlock);
+			output(curBlock, 1);
 			for (Iterator evIter = curEvents.keySet().iterator(); evIter.hasNext();)
 			{
 				String curEvent = (String) evIter.next();
 				String curConnection  = (String) curEvents.get(curEvent);
-				System.out.println("\t\t " + curEvent + " --> " + curConnection);
+				output(curEvent + " --> " + curConnection, 2);
 			}
 		}
 	}
 	
 	private void printDataConnectionsMap()
 	{
-		System.out.println("ModelMaker.printDataConnectionsMap():");
+		output("ModelMaker.printDataConnectionsMap():");
 		for (Iterator fbIter = dataConnections.keySet().iterator(); fbIter.hasNext();)
 		{
 			String curBlock = (String) fbIter.next();
 			Map curDatas = (Map) dataConnections.get(curBlock);
-			System.out.println("\t " + curBlock);
+			output(curBlock, 1);
 			for (Iterator dataIter = curDatas.keySet().iterator(); dataIter.hasNext();)
 			{
 				String curData = (String) dataIter.next();
 				String curConnection  = (String) curDatas.get(curData);
-				System.out.println("\t\t " + curConnection + " --> " + curData);
+				output(curConnection + " --> " + curData, 2);
 			}
 		}
 	}
 	
-	private void output(String text, int indentLevel)
+	private static void output(String text)
 	{
-		for (int i = 1; i <= indentLevel; i++)
-		{
-			System.out.print("\t");
-		}
-		System.out.println(text);
+		output(INFO, text, 0);
 	}
 
-	private ExtendedAutomaton getNewAutomaton(String name)
+	private static void output(int verboseLevel, String text)
 	{
-		return new ExtendedAutomaton(name, automata, true);
+		output(verboseLevel, text, 0);
+	}
+
+	private static void output(String text, int indentLevel)
+	{
+		output(INFO, text, indentLevel);
+	}
+
+	private static void output(int verboseLevel, String text, int indentLevel)
+	{
+		if (verboseLevel <= ModelMaker.verboseLevel)
+		{
+			for (int i = 1; i <= indentLevel; i++)
+			{
+				System.out.print("\t");
+			}
+			System.out.println(text);
+		}
 	}
 }

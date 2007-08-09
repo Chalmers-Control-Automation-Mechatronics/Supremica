@@ -346,17 +346,11 @@ public class ExtendedAutomaton
 			
 			if (syntaxTree instanceof StatementList)
 			{
+				//Printer printer = new Printer(System.out, " ");
+				//printer.print(syntaxTree,0);
+				Finder finder = new Finder(syntaxTree);
 
-
-
-
-				Printer printer = new Printer(System.out, " ");
-				printer.print(syntaxTree,0);
-				Finder finder = new Finder(syntaxTree);		
-				System.out.println("ExtendedAutomaton.addExtendedTransition(): Found all identifiers!");
-
-
-
+				
 			}
 			else if (syntaxTree instanceof Expression)
 			{
