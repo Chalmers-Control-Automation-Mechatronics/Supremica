@@ -23,6 +23,7 @@
 
 package org.supremica.external.iec61499fb2efa;
 
+import java.util.Set;
 import java.util.List;
 import java.util.LinkedList;
 import java.util.ArrayList;
@@ -350,7 +351,9 @@ public class ExtendedAutomaton
 				//printer.print(syntaxTree,0);
 				Finder finder = new Finder(syntaxTree);
 
-				
+
+				Set assignmentIdents = finder.getAssignmentIdentifiers();
+				Set expressionIdents = finder.getExpressionIdentifiers();
 			}
 			else if (syntaxTree instanceof Expression)
 			{
