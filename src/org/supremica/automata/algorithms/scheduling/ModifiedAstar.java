@@ -1116,9 +1116,7 @@ public class ModifiedAstar
         scheduleDialog.getIde().getActiveDocumentContainer().getAnalyzerPanel().addAutomaton(scheduleAuto);
         
         //TODO: TEMP-TEST
-		// ajabaja, kompilerar inte
-		// kommenterade bort GC
-        //new VelocityBalancer(scheduleAuto, theAutomata.getPlantAutomata());
+        new VelocityBalancer(scheduleAuto, theAutomata.getPlantAutomata());
     }
 
 	/**

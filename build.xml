@@ -315,7 +315,7 @@
     <target name="compile_scheduling">
         <javac
             debug="on"
-            debuglevel="source"
+            debuglevel="lines,source,vars"
             srcdir="${src}"
             destdir="${build}"
             classpath="${lib}/${unjared}"
