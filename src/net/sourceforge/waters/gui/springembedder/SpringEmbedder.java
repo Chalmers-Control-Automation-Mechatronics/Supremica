@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui.springembedder
 //# CLASS:   SpringEmbedder
 //###########################################################################
-//# $Id: SpringEmbedder.java,v 1.42 2007-06-29 18:03:25 robi Exp $
+//# $Id: SpringEmbedder.java,v 1.43 2007-08-10 22:07:29 robi Exp $
 //###########################################################################
 
 
@@ -386,7 +386,7 @@ public class SpringEmbedder
     double maxdelta = 0.0;
     double movex = 0.0;
     double movey = 0.0;
-    if (mPass > 0) {
+    if (mPass > 0 && !wrappers.isEmpty()) {
       double minx = Double.MAX_VALUE;
       double miny = Double.MAX_VALUE;
       for (final GeometryWrapper wrapper : wrappers) {
