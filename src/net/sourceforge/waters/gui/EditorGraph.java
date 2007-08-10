@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   EditorGraph
 //###########################################################################
-//# $Id: EditorGraph.java,v 1.19 2007-07-03 11:20:53 robi Exp $
+//# $Id: EditorGraph.java,v 1.20 2007-08-10 04:34:31 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.gui;
@@ -24,6 +24,8 @@ import java.util.Map;
 import java.util.Random;
 import java.util.Set;
 
+import net.sourceforge.waters.gui.command.Command;
+import net.sourceforge.waters.gui.command.MoveObjects;
 import net.sourceforge.waters.gui.renderer.GeometryTools;
 
 import net.sourceforge.waters.model.base.ProxyVisitor;
@@ -67,55 +69,47 @@ public class EditorGraph
 {
   public EditorGraph(final GraphSubject graph)
   {
-		mGraph = graph;
-		mChanged = new HashSet<Subject>();
-		mObserverMap = new IdentityHashMap<NodeSubject, EditorNode>(graph.getNodes().size());
-		mFakeMap = new IdentityHashMap<Subject, Subject>(graph.getNodes().size() + graph.getEdges().size()+1);
-		mOriginalMap = new IdentityHashMap<Subject, Subject>(graph.getNodes().size() + graph.getEdges().size()+1);
-		mEdges = new ArrayListSubject<EdgeSubject>(graph.getEdges().size());
-		mNodes = new IndexedHashSetSubject<NodeSubject>(graph.getNodes().size());
-		mEdges.setParent(this);
-		mNodes.setParent(this);
-		if (graph.getBlockedEvents() != null)	{
-			mBlockedEvents = graph.getBlockedEvents().clone();
-			mFakeMap.put(mBlockedEvents, graph.getBlockedEvents());
-			mOriginalMap.put(graph.getBlockedEvents(), mBlockedEvents);
+    mGraph = graph;
+    mChanged = new HashSet<Subject>();
+    mObserverMap = new IdentityHashMap<NodeSubject,EditorNode>
+      (graph.getNodes().size());
+    mFakeMap = new IdentityHashMap<Subject,Subject>
+      (graph.getNodes().size() + graph.getEdges().size()+1);
+    mOriginalMap = new IdentityHashMap<Subject, Subject>
+      (graph.getNodes().size() + graph.getEdges().size()+1);
+    mEdges = new ArrayListSubject<EdgeSubject>(graph.getEdges().size());
+    mNodes = new IndexedHashSetSubject<NodeSubject>(graph.getNodes().size());
+    mEdges.setParent(this);
+    mNodes.setParent(this);
+    if (graph.getBlockedEvents() != null)	{
+      mBlockedEvents = graph.getBlockedEvents().clone();
+      mFakeMap.put(mBlockedEvents, graph.getBlockedEvents());
+      mOriginalMap.put(graph.getBlockedEvents(), mBlockedEvents);
       mBlockedEvents.setParent(this);
-		}	else {
-			mBlockedEvents = null;
-		}
+    } else {
+      mBlockedEvents = null;
+    }
 
-		final Collection<NodeSubject> nodes = graph.getNodesModifiable();
-		final Iterator<NodeSubject> iter = nodes.iterator();
-
-		while (iter.hasNext())
-		{
-			NodeSubject temp = (NodeSubject) iter.next();
-
-			if (temp instanceof SimpleNodeSubject)
-			{
-				SimpleNodeSubject np = (SimpleNodeSubject) temp;
-				addNode(np);
-			}
-			else if (temp instanceof GroupNodeSubject)
-			{
-				GroupNodeSubject gn = (GroupNodeSubject) temp;
-				addGroupNode(gn);
-			}
-		}
-
-		for (EdgeSubject e : graph.getEdgesModifiable())
-		{
-			if ((e.getSource() != null) && (e.getTarget() != null))
-			{
-				addEdge(e);
-			}
-			else
-			{
-				//TODO: Do something here!
-				System.err.println("SOURCE OR TARGET IS NULL!");
-			}
-		}
+    final Collection<NodeSubject> nodes = graph.getNodesModifiable();
+    final Iterator<NodeSubject> iter = nodes.iterator();
+    while (iter.hasNext()) {
+      NodeSubject temp = (NodeSubject) iter.next();
+      if (temp instanceof SimpleNodeSubject) {
+        SimpleNodeSubject np = (SimpleNodeSubject) temp;
+        addNode(np);
+      }	else if (temp instanceof GroupNodeSubject) {
+        GroupNodeSubject gn = (GroupNodeSubject) temp;
+        addGroupNode(gn);
+      }
+    }
+    for (final EdgeSubject edge : graph.getEdgesModifiable()) {
+      if (edge.getSource() != null && edge.getTarget() != null) {
+        addEdge(edge);
+      }	else {
+        throw new NullPointerException
+          ("Can't import edge without source or target into secondary graph!");
+      }
+    }
 
     final CopiedModelListener listener = new CopiedModelListener();
     addModelObserver(listener);
@@ -135,169 +129,181 @@ public class EditorGraph
     return ((ModuleProxyVisitor)p).visitGraphProxy(this);
   }
 
+  public LabelBlockProxy getBlockedEvents()
+  {
+    return mBlockedEvents;
+  }
 
-	public Subject getCopy(Subject o)
-	{
-		Subject s = mOriginalMap.get(o);
-		if (s == null)
-		{
-			if (o instanceof LabelBlockSubject)
-			{
-				s = getCopy((LabelBlockSubject)o);
-			}
-			if (o instanceof GuardActionBlockSubject)
-			{
-				s = getCopy((GuardActionBlockSubject)o);
-			}
-			if (o instanceof LabelGeometrySubject)
-			{
-				s = getCopy((LabelGeometrySubject)o);
-			}
-		}
-		return s;
-	}
+  public Set<NodeProxy> getNodes()
+  {
+    final Set<NodeProxy> downcast = Casting.toSet(mNodes);
+    return Collections.unmodifiableSet(downcast);
+  }
 
-	public Subject getCopy(LabelBlockSubject o)
-	{
+  public List<EdgeProxy> getEdges()
+  {
+    final List<EdgeProxy> downcast = Casting.toList(mEdges);
+    return Collections.unmodifiableList(downcast);
+  }
+
+  public Set<NodeSubject> getNodeSubjects()
+  {
+    return Collections.unmodifiableSet(mNodes);
+  }
+
+  public List<EdgeSubject> getEdgeSubjects()
+  {
+    return Collections.unmodifiableList(mEdges);
+  }
+
+  public boolean isDeterministic()
+  {
+    return mGraph.isDeterministic();
+  }
+
+
+  //#########################################################################
+  //# Accessing the Fake Maps
+  public Subject getCopy(Subject o)
+  {
+    Subject s = mOriginalMap.get(o);
+    if (s == null) {
+      if (o instanceof LabelBlockSubject) {
+        s = getCopy((LabelBlockSubject)o);
+      } else if (o instanceof GuardActionBlockSubject) {
+        s = getCopy((GuardActionBlockSubject)o);
+      } else if (o instanceof LabelGeometrySubject) {
+        s = getCopy((LabelGeometrySubject)o);
+      }
+    }
+    return s;
+  }
+	
+  public Subject getCopy(LabelBlockSubject o)
+  {
     if (o.getParent() instanceof EdgeSubject) {
       EdgeSubject s = (EdgeSubject)mOriginalMap.get(o.getParent());
       return s.getLabelBlock();
     } else {
       return mOriginalMap.get(o);
     }
-	}
+  }
 
-	public Subject getCopy(GuardActionBlockSubject o)
-	{
-		EdgeSubject s = (EdgeSubject)mOriginalMap.get(o.getParent());
-		return s.getGuardActionBlock();
-	}
+  public Subject getCopy(GuardActionBlockSubject o)
+  {
+    EdgeSubject s = (EdgeSubject)mOriginalMap.get(o.getParent());
+    return s.getGuardActionBlock();
+  }
 
-	public Subject getCopy(LabelGeometrySubject o)
-	{
-		SimpleNodeSubject s = (SimpleNodeSubject)mOriginalMap.get(o.getParent());
-		return s.getLabelGeometry();
-	}
-  
+  public Subject getCopy(LabelGeometrySubject o)
+  {
+    SimpleNodeSubject s = (SimpleNodeSubject)mOriginalMap.get(o.getParent());
+    return s.getLabelGeometry();
+  }
+
   public Subject getOriginal(Subject o)
-	{
-		Subject s = mFakeMap.get(o);
-		if (s == null)
-		{
-			if (o instanceof LabelBlockSubject)
-			{
-				s = getOriginal((LabelBlockSubject)o);
-			}
-			if (o instanceof GuardActionBlockSubject)
-			{
-				s = getOriginal((GuardActionBlockSubject)o);
-			}
-			if (o instanceof LabelGeometrySubject)
-			{
-				s = getOriginal((LabelGeometrySubject)o);
-			}
-		}
-		return s;
-	}
+  {
+    Subject s = mFakeMap.get(o);
+    if (s == null) {
+      if (o instanceof LabelBlockSubject) {
+        s = getOriginal((LabelBlockSubject)o);
+      } else if (o instanceof GuardActionBlockSubject) {
+        s = getOriginal((GuardActionBlockSubject)o);
+      } else if (o instanceof LabelGeometrySubject) {
+        s = getOriginal((LabelGeometrySubject)o);
+      }
+    }
+    return s;
+  }
 
-	public Subject getOriginal(LabelBlockSubject o)
-	{
+  public Subject getOriginal(LabelBlockSubject o)
+  {
     if (o.getParent() instanceof EdgeSubject) {
       EdgeSubject s = (EdgeSubject)mFakeMap.get(o.getParent());
       return s.getLabelBlock();
     } else {
       return mFakeMap.get(o);
     }
-	}
+  }
 
-	public Subject getOriginal(GuardActionBlockSubject o)
-	{
-		EdgeSubject s = (EdgeSubject)mFakeMap.get(o.getParent());
-		return s.getGuardActionBlock();
-	}
+  public Subject getOriginal(GuardActionBlockSubject o)
+  {
+    EdgeSubject s = (EdgeSubject)mFakeMap.get(o.getParent());
+    return s.getGuardActionBlock();
+  }
 
-	public Subject getOriginal(LabelGeometrySubject o)
-	{
-		SimpleNodeSubject s = (SimpleNodeSubject)mFakeMap.get(o.getParent());
-		return s.getLabelGeometry();
-	}
+  public Subject getOriginal(LabelGeometrySubject o)
+  {
+    SimpleNodeSubject s = (SimpleNodeSubject)mFakeMap.get(o.getParent());
+    return s.getLabelGeometry();
+  }
 
-	public Collection<EdgeSubject> getNodeEdges(NodeSubject n)
-	{
-		return Collections.unmodifiableCollection(mObserverMap.get(n).getEdges());
-	}
+  public Collection<EdgeSubject> getNodeEdges(NodeSubject n)
+  {
+    return Collections.unmodifiableCollection(mObserverMap.get(n).getEdges());
+  }
 
-	public LabelBlockProxy getBlockedEvents()
-	{
-		return mBlockedEvents;
-	}
 
-	public Set<NodeProxy> getNodes()
-	{
-		final Set<NodeProxy> downcast = Casting.toSet(mNodes);
-		return Collections.unmodifiableSet(downcast);
-	}
+  //#########################################################################
+  //# Updating
+  /**
+   * Creates a command to transform the original graph into the same
+   * state as this editor graph.
+   * @param  name    The name to be given to the new command.
+   */
+  Command createUpdateCommand(final String description)
+  {
+    final Map<ProxySubject, ProxySubject> changed =
+      new IdentityHashMap<ProxySubject, ProxySubject>(mChanged.size());
+    for (Subject s : mChanged) {
+      ProxySubject orig = (ProxySubject) getOriginal(s);
+      if (orig != null) {
+        changed.put(orig, (ProxySubject)s);
+      }
+    }
+    return new MoveObjects(changed, mGraph, description);
+  }
 
-	public List<EdgeProxy> getEdges()
-	{
-		final List<EdgeProxy> downcast = Casting.toList(mEdges);
-		return Collections.unmodifiableList(downcast);
-	}
 
-	public Set<NodeSubject> getNodeSubjects()
-	{
-		return Collections.unmodifiableSet(mNodes);
-	}
+  //#########################################################################
+  //# Auxiliary Methods
+  private Point2D defaultPosition(NodeSubject node, Point2D turningpoint)
+  {
+    if (node instanceof SimpleNodeSubject) {
+      return defaultPosition((SimpleNodeSubject)node);
+    }
+    return defaultPosition((GroupNodeSubject)node, turningpoint);
+  }
 
-	public List<EdgeSubject> getEdgeSubjects()
-	{
-		return Collections.unmodifiableList(mEdges);
-	}
+  private Point2D defaultPosition(SimpleNodeSubject node)
+  {
+    return node.getPointGeometry().getPoint();
+  }
 
-	public boolean isDeterministic()
-	{
-		return mGraph.isDeterministic();
-	}
+  private Point2D defaultPosition(GroupNodeSubject node, Point2D point)
+  {
+    Rectangle2D r = node.getGeometry().getRectangle();
+    return GeometryTools.findIntersection(r, point);
+  }
 
-	private Point2D defaultPosition(NodeSubject node, Point2D turningpoint)
-	{
-		if (node instanceof SimpleNodeSubject)
-		{
-			return defaultPosition((SimpleNodeSubject)node);
-		}
-		return defaultPosition((GroupNodeSubject)node, turningpoint);
-	}
+  private Point2D getPosition(NodeSubject node)
+  {
+    if (node instanceof SimpleNodeSubject) {
+      return getPosition((SimpleNodeSubject)node);
+    }
+    return getPosition((GroupNodeSubject)node);
+  }
 
-	private Point2D defaultPosition(SimpleNodeSubject node)
-	{
-		return node.getPointGeometry().getPoint();
-	}
+  private Point2D getPosition(SimpleNodeSubject node)
+  {
+    return node.getPointGeometry().getPoint();
+  }
 
-	private Point2D defaultPosition(GroupNodeSubject node, Point2D point)
-	{
-		Rectangle2D r = node.getGeometry().getRectangle();
-		return GeometryTools.findIntersection(r, point);
-	}
-
-	private Point2D getPosition(NodeSubject node)
-	{
-		if (node instanceof SimpleNodeSubject)
-		{  
-			return getPosition((SimpleNodeSubject)node);
-		}
-		return getPosition((GroupNodeSubject)node);
-	}
-
-	private Point2D getPosition(SimpleNodeSubject node)
-	{
-		return node.getPointGeometry().getPoint();
-	}
-
-	private Point2D getPosition(GroupNodeSubject node)
-	{
-		Rectangle2D r = node.getGeometry().getRectangle();
-		return new Point2D.Double(r.getCenterX(), r.getCenterY());
-	}
+  private Point2D getPosition(GroupNodeSubject node)
+  {
+    Rectangle2D r = node.getGeometry().getRectangle();
+    return new Point2D.Double(r.getCenterX(), r.getCenterY());
+  }
 
   /**
    * Creates a copy of the given edge and adds it to this graph.
@@ -326,7 +332,7 @@ public class EditorGraph
     mOriginalMap.put(edge0, edge1);
     return edge1;
   }
-  
+
   private void removeEdge(EdgeSubject e)
   {
     EdgeSubject remove = (EdgeSubject)mOriginalMap.get(e);
@@ -334,7 +340,7 @@ public class EditorGraph
     mFakeMap.remove(remove);
     mOriginalMap.remove(e);
   }
-  
+
   private void removeNode(NodeSubject n)
   {
     NodeSubject remove = (NodeSubject)mOriginalMap.get(n);
@@ -343,22 +349,19 @@ public class EditorGraph
     mOriginalMap.remove(n);
   }
 
-	private void addGroupNode(GroupNodeSubject gn)
-	{
-		if (gn.getGeometry() == null)
-		{
-			throw new IllegalArgumentException("GroupNode " + gn + 
-										   " has no Geometry Data");
-		}
-		else
-		{
-			GroupNodeSubject group = gn.clone();
-			mNodes.add(group);
-			mObserverMap.put(group, new EditorGroupNode(group));
-			mFakeMap.put(group, gn);
-			mOriginalMap.put(gn, group);
-		}
-	}
+  private void addGroupNode(GroupNodeSubject gn)
+  {
+    if (gn.getGeometry() == null) {
+      throw new IllegalArgumentException("GroupNode " + gn +
+                                         " has no Geometry Data");
+    } else {
+      GroupNodeSubject group = gn.clone();
+      mNodes.add(group);
+      mObserverMap.put(group, new EditorGroupNode(group));
+      mFakeMap.put(group, gn);
+      mOriginalMap.put(gn, group);
+    }
+  }
 
   private void addNode(SimpleNodeSubject n)
   {
@@ -367,19 +370,6 @@ public class EditorGraph
     mObserverMap.put(node, new EditorSimpleNode(node));
     mFakeMap.put(node, n);
     mOriginalMap.put(n, node);
-  }
-  
-  public Map<ProxySubject, ProxySubject> getChanged()
-  {
-    IdentityHashMap<ProxySubject, ProxySubject> changed = 
-      new IdentityHashMap<ProxySubject, ProxySubject>(mChanged.size());
-    for (Subject s : mChanged) {
-      ProxySubject orig = (ProxySubject)getOriginal(s);
-      if (orig != null) {
-        changed.put(orig, (ProxySubject)s);
-      }
-    }
-    return changed;
   }
 
 
@@ -639,7 +629,7 @@ public class EditorGraph
     rect.setRect(x + dx, y + dy, width, height);
     geo1.setRectangle(rect);
   }
-  
+
   private void moveLabelGeometry(final LabelGeometrySubject geo0,
                                  final LabelGeometrySubject geo1,
                                  final double dx,
@@ -649,7 +639,7 @@ public class EditorGraph
     point.setLocation(point.getX() + dx, point.getY() + dy);
     geo1.setOffset(point);
   }
-  
+
   private void movePointGeometry(final PointGeometrySubject geo0,
                                  final PointGeometrySubject geo1,
                                  final double dx,
@@ -659,41 +649,40 @@ public class EditorGraph
     point.setLocation(point.getX() + dx, point.getY() + dy);
     geo1.setPoint(point);
   }
-  
+
 
   //#########################################################################
   //# Static Class Methods
-	public static LabelGeometrySubject defaultLabelBlockOffset()
-	{
-		Point2D p = new Point2D.Double(10, 10);
-		return new LabelGeometrySubject(p);
-	}
+  public static LabelGeometrySubject defaultLabelBlockOffset()
+  {
+    Point2D p = new Point2D.Double(10, 10);
+    return new LabelGeometrySubject(p);
+  }
 
-	public static LabelGeometrySubject defaultGuardActionBlockOffset()
-	{
-		Point2D p = new Point2D.Double(10, 10);
-		return new LabelGeometrySubject(p);
-	}
+  public static LabelGeometrySubject defaultGuardActionBlockOffset()
+  {
+    Point2D p = new Point2D.Double(10, 10);
+    return new LabelGeometrySubject(p);
+  }
 
-	public static LabelGeometrySubject defaultLabelOffset()
-	{
-		Point2D p = new Point2D.Double(-10, 10);
-		return new LabelGeometrySubject(p);
-	}
+  public static LabelGeometrySubject defaultLabelOffset()
+  {
+    Point2D p = new Point2D.Double(-10, 10);
+    return new LabelGeometrySubject(p);
+  }
 
-	public static PointGeometrySubject defaultNodePosition()
-	{
-		Random rand = new Random();
-		Point2D p = new Point2D.Double(rand.nextInt(1000), rand.nextInt(1000));
-		return new PointGeometrySubject(p);
-	}
+  public static PointGeometrySubject defaultNodePosition()
+  {
+    Random rand = new Random();
+    Point2D p = new Point2D.Double(rand.nextInt(1000), rand.nextInt(1000));
+    return new PointGeometrySubject(p);
+  }
 
-	public static PointGeometrySubject defaultInitialStateArrow()
-	{
-		Point2D p = new Point2D.Double(0, -10);
-		return new PointGeometrySubject(p);
-	}
-  
+  public static PointGeometrySubject defaultInitialStateArrow()
+  {
+    Point2D p = new Point2D.Double(0, -10);
+    return new PointGeometrySubject(p);
+  }
 
   public static void updateChildNodes(GraphSubject graph) {
     List<GroupNodeSubject> groups = new ArrayList<GroupNodeSubject>();
@@ -728,7 +717,8 @@ public class EditorGraph
         if (n != group) {
           if (group.getGeometry().getRectangle().contains(r1)) {
             for (GroupNodeSubject parent : parents) {
-              if (group.getGeometry().getRectangle().contains(parent.getGeometry().getRectangle())) {
+              if (group.getGeometry().getRectangle().contains
+                    (parent.getGeometry().getRectangle())) {
                 continue mainloop;
               }
             }
@@ -787,60 +777,57 @@ public class EditorGraph
     }
 
   }
-  
+
 
   //#########################################################################
   //# Inner Class EditorNode
   private abstract class EditorNode
     implements ModelObserver
   {
-		protected EditorNode(NodeSubject node)
-		{
-			mNode = node;
-			mEdges = new IdentityHashMap<EdgeSubject, Boolean>();
-		}
+    protected EditorNode(NodeSubject node)
+    {
+      mNode = node;
+      mEdges = new IdentityHashMap<EdgeSubject, Boolean>();
+    }
 
-		public void removeEdge(EdgeSubject edge)
-		{
-			if (mEdges.remove(edge) != null)
-			{
-				edge.removeModelObserver(this);
-			}
-		}
+    public void removeEdge(EdgeSubject edge)
+    {
+      if (mEdges.remove(edge) != null) {
+        edge.removeModelObserver(this);
+      }
+    }
 
-		public void addEdge(EdgeSubject edge)
-		{
-			if (mEdges.put(edge, new Boolean(true)) != null)
-			{
-				edge.addModelObserver(this);
-			}
-		}
+    public void addEdge(EdgeSubject edge)
+    {
+      if (mEdges.put(edge, new Boolean(true)) != null) {
+        edge.addModelObserver(this);
+      }
+    }
 
-		public Set<EdgeSubject> getEdges()
-		{
-			return Collections.unmodifiableSet(mEdges.keySet());
-		}
+    public Set<EdgeSubject> getEdges()
+    {
+      return Collections.unmodifiableSet(mEdges.keySet());
+    }
 
-		public void modelChanged(ModelChangeEvent event)
-		{
-			if (event.getSource() instanceof EdgeSubject)
-			{
-				EdgeSubject e = (EdgeSubject) event.getSource();
-				if (e.getSource() != getNodeSubject() && e.getTarget() != getNodeSubject())
-				{
-					removeEdge(e);
-				}
-			}
-		}
+    public void modelChanged(ModelChangeEvent event)
+    {
+      if (event.getSource() instanceof EdgeSubject) {
+        EdgeSubject e = (EdgeSubject) event.getSource();
+        if (e.getSource() != getNodeSubject() &&
+            e.getTarget() != getNodeSubject()) {
+          removeEdge(e);
+        }
+      }
+    }
 
-		public abstract void update();
+    public abstract void update();
 
     /**
      * Updates edge geometry when dragging node.
      * @param  edge   The edge to be modified.
      * @param  old    The old position of the start or end point.
      * @param  neo    The new position of the start or end point.
-     */ 
+     */
     protected final void transformEdge(final EdgeSubject edge,
 				       final Point2D old,
 				       final Point2D neo)
@@ -901,14 +888,14 @@ public class EditorGraph
       }
     }
 
-		public NodeSubject getNodeSubject()
-		{
-			return mNode;
-		}
+    public NodeSubject getNodeSubject()
+    {
+      return mNode;
+    }
 
-		private final NodeSubject mNode;
-		private final IdentityHashMap<EdgeSubject, Boolean> mEdges;
-	}
+    private final NodeSubject mNode;
+    private final IdentityHashMap<EdgeSubject, Boolean> mEdges;
+  }
 
 
   //#########################################################################
@@ -946,7 +933,7 @@ public class EditorGraph
       }
       mUpdate = false;
     }		
-    
+
     //#######################################################################
     //# Data Members
     private Point2D mPoint;
@@ -1009,13 +996,13 @@ public class EditorGraph
   //#########################################################################
   //# Data Members
   private boolean mUpdate = false;
-	private final GraphSubject mGraph;
-	private final ListSubject<EdgeSubject> mEdges;
-	private final IndexedSetSubject<NodeSubject> mNodes;
-	private final IdentityHashMap<NodeSubject, EditorNode> mObserverMap;
-	private final IdentityHashMap<Subject, Subject> mFakeMap;
-	private final IdentityHashMap<Subject, Subject> mOriginalMap;
-	private final LabelBlockSubject mBlockedEvents;
+  private final GraphSubject mGraph;
+  private final ListSubject<EdgeSubject> mEdges;
+  private final IndexedSetSubject<NodeSubject> mNodes;
+  private final IdentityHashMap<NodeSubject, EditorNode> mObserverMap;
+  private final IdentityHashMap<Subject, Subject> mFakeMap;
+  private final IdentityHashMap<Subject, Subject> mOriginalMap;
+  private final LabelBlockSubject mBlockedEvents;
   private final Set<Subject> mChanged;
 
 }

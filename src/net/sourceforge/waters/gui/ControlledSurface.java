@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   ControlledSurface
 //###########################################################################
-//# $Id: ControlledSurface.java,v 1.137 2007-07-10 14:27:42 flordal Exp $
+//# $Id: ControlledSurface.java,v 1.138 2007-08-10 04:34:31 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.gui;
@@ -109,7 +109,7 @@ public class ControlledSurface
     graph.addModelObserver(this);
     updateTool();
     if (runEmbedder) {
-      runEmbedder();
+      runEmbedder(false);
     }
     mSizeMayHaveChanged = true;
   }
@@ -198,7 +198,7 @@ public class ControlledSurface
     case EMBEDDER_STOP:
       mEmbedder.removeObserver(this);
       mEmbedder = null;
-      commitSecondaryGraph();
+      commitSecondaryGraph("Automatic Layout", mIsEmbedderUndoable);
       clearSecondaryGraph();
       updateTool();
       break;
@@ -543,8 +543,9 @@ public class ControlledSurface
     mRoot.getUndoInterface().executeCommand(compound);
   }
 
-  public void runEmbedder()
+  public void runEmbedder(final boolean undoable)
   {
+    mIsEmbedderUndoable = undoable;
     createSecondaryGraph();
     final SimpleComponentSubject comp =
       (SimpleComponentSubject) getGraph().getParent();
@@ -1092,10 +1093,19 @@ public class ControlledSurface
 
   private void commitSecondaryGraph()
   {
+    commitSecondaryGraph(null, true);
+  }
+
+  private void commitSecondaryGraph(final String description,
+                                    final boolean undoable)
+  {
     if (mSecondaryGraph != null) {
-      final Command move =
-        new MoveObjects(mSecondaryGraph.getChanged(), getGraph());
-      mRoot.getUndoInterface().executeCommand(move);
+      final Command cmd = mSecondaryGraph.createUpdateCommand(description);
+      if (undoable) {
+        mRoot.getUndoInterface().executeCommand(cmd);
+      } else {
+        cmd.execute();
+      }
     }
   }
 
@@ -1892,6 +1902,17 @@ public class ControlledSurface
       return Collections.emptyList();
     }
 
+    /**
+     * Gets the descriptive text used when creating a command when the
+     * drag is committed.
+     * @return  The command name, or <CODE>null</CODE> to let the
+     *          command choose its own name.
+     */
+    String getCommandDescription()
+    {
+      return null;
+    }
+
     //#######################################################################
     //# Data Members
     /**
@@ -1967,7 +1988,8 @@ public class ControlledSurface
 
     void commitSecondaryGraph()
     {
-      ControlledSurface.this.commitSecondaryGraph();
+      final String description = getCommandDescription();
+      ControlledSurface.this.commitSecondaryGraph(description, true);
     }
 
     //#######################################################################
@@ -2203,10 +2225,12 @@ public class ControlledSurface
           if (item instanceof SimpleNodeSubject) {
             final SimpleNodeSubject simple = (SimpleNodeSubject) item;
             snap = simple.getPointGeometry().getPoint();
+            break;
           } else if (item instanceof GroupNodeSubject) {
             final GroupNodeSubject group = (GroupNodeSubject) item;
             final Rectangle2D rect = group.getGeometry().getRectangle();
             snap = new Point2D.Double(rect.getX(), rect.getY());
+            break;
           }
         }
       }
@@ -2268,8 +2292,9 @@ public class ControlledSurface
         } else {
           doReplaceSelection(mMovedObject);
         }
-      } 
+      }
       super.commitSecondaryGraph();
+      mMoveVisitor = null;
     }
 
     void cancelDrag(final Point point)
@@ -2282,6 +2307,14 @@ public class ControlledSurface
       } else {
         doReplaceLabelSelection(mClickedObject);
       }
+      mMoveVisitor = null;
+    }
+
+    //#######################################################################
+    //# Rendering
+    String getCommandDescription()
+    {
+      return mMoveVisitor.getCommandDescription();
     }
 
     //#######################################################################
@@ -2620,6 +2653,13 @@ public class ControlledSurface
     }
 
     //#######################################################################
+    //# Rendering
+    String getCommandDescription()
+    {
+      return "Initial Arrow Movement";
+    }
+
+    //#######################################################################
     //# Auxiliary Methods
     private SimpleNodeSubject getNodeCopy()
     {
@@ -2682,6 +2722,13 @@ public class ControlledSurface
       final MiscShape shape =
         new GeneralShape(rect, EditorColor.SELECTCOLOR, null);
       return Collections.singletonList(shape);
+    }
+
+    //#######################################################################
+    //# Rendering
+    String getCommandDescription()
+    {
+      return "Group Node Creation";
     }
 
   }
@@ -2826,6 +2873,13 @@ public class ControlledSurface
       } else {
         return false;
       }
+    }
+
+    //#######################################################################
+    //# Rendering
+    String getCommandDescription()
+    {
+      return "Group Node Reshaping";
     }
 
     //#######################################################################
@@ -3118,15 +3172,14 @@ public class ControlledSurface
     //# Constructors
     private MoveVisitor()
     {
-      boolean moveNodes = false;
+      mMovedTypes = new HashSet<Class<? extends Proxy>>(8);
       for (final ProxySubject item : mSelectedObjects) {
-        if (item instanceof NodeSubject) {
-          moveNodes = true;
-          break;
-        }
+        final Class<? extends Proxy> iface = item.getProxyInterface();
+        mMovedTypes.add(iface);
       }
       final Collection<ProxySubject> moved;
-      if (moveNodes) {
+      if (mMovedTypes.contains(SimpleNodeProxy.class) ||
+          mMovedTypes.contains(GroupNodeProxy.class)) {
         final Collection<EdgeSubject> edges = getGraph().getEdgesModifiable();
         mEdgeMap = new HashMap<EdgeProxy,MovingEdge>(edges.size());
         moved = new LinkedList<ProxySubject>(mSelectedObjects);
@@ -3174,6 +3227,43 @@ public class ControlledSurface
         item.acceptVisitor(this);
       } catch (final VisitorException exception) {
         throw new WatersRuntimeException(exception);
+      }
+    }
+
+    private String getCommandDescription()
+    {
+      boolean first = true;
+      Class<? extends Proxy> guess = null;
+      for (final Class<? extends Proxy> iface : mMovedTypes) {
+        if (first) {
+          guess = iface;
+          first = false;
+        } else if (guess == iface) {
+          continue;
+        } else if (NodeProxy.class.isAssignableFrom(iface) &&
+                   NodeProxy.class.isAssignableFrom(guess)) {
+          guess = NodeProxy.class;
+        } else {
+          guess = null;
+          break;
+        }
+      }
+      if (guess == null) {
+        return "Movement";
+      } else if (guess == EdgeProxy.class) {
+        return "Edge Reshaping";
+      } else if (guess == GroupNodeProxy.class) {
+        return "Group Node Movement";
+      } else if (NodeProxy.class.isAssignableFrom(guess)) {
+        return "Node Movement";
+      } else if (guess == LabelGeometryProxy.class) {
+        return "Node Label Movement";
+      } else if (guess == LabelBlockProxy.class) {
+        return "Event Label Movement";
+      } else if (guess == GuardActionBlockProxy.class) {
+        return "Guard/Action Block Movement";
+      } else {
+        return "Movement";
       }
     }
 
@@ -3264,6 +3354,7 @@ public class ControlledSurface
 
     //#######################################################################
     //# Data Members
+    private final Set<Class<? extends Proxy>> mMovedTypes;
     private final Collection<ProxySubject> mMovedObjects;
     private final Map<EdgeProxy,MovingEdge> mEdgeMap;
     private int mDeltaX;
@@ -3703,6 +3794,11 @@ public class ControlledSurface
    * The current spring embedder, if any is running.
    */
   private SpringEmbedder mEmbedder;
+  /**
+   * Whether the current spring embedding is undoable.
+   * This is false for the initial layout of a graph without geometry.
+   */
+  private boolean mIsEmbedderUndoable;
 
   private ToolController mController;
   private ToolController mSelectController;

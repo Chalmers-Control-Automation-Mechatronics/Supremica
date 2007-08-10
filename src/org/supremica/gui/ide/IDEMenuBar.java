@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.gui.ide
 //# CLASS:   IDEMenuBar
 //###########################################################################
-//# $Id: IDEMenuBar.java,v 1.49 2007-07-16 11:34:33 flordal Exp $
+//# $Id: IDEMenuBar.java,v 1.50 2007-08-10 04:34:31 robi Exp $
 //###########################################################################
 
 package org.supremica.gui.ide;
@@ -25,6 +25,7 @@ import javax.swing.JMenuItem;
 import javax.swing.event.MenuEvent;
 import javax.swing.event.MenuListener;
 
+import net.sourceforge.waters.gui.actions.GraphLayoutAction;
 import net.sourceforge.waters.gui.actions.WatersUndoAction;
 import net.sourceforge.waters.gui.actions.WatersRedoAction;
 import net.sourceforge.waters.gui.observer.EditorChangedEvent;
@@ -129,7 +130,8 @@ public class IDEMenuBar
         menu.add(ide.getActions().editorPasteAction.getMenuItem());
         menu.addSeparator();
         // Embedder should probably go to 'Tools' menu?
-        menu.add(ide.getActions().editorRunEmbedderAction.getMenuItem());
+        final Action layout = actions.getAction(GraphLayoutAction.class);
+        menu.add(new JMenuItem(layout));
         add(menu);
         
         // Insert

@@ -1,8 +1,18 @@
+//# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
+//###########################################################################
+//# PROJECT: Waters GUI
+//# PACKAGE: net.sourceforge.waters.gui.command
+//# CLASS:   MoveObjects
+//###########################################################################
+//# $Id: MoveObjects.java,v 1.19 2007-08-10 04:34:31 robi Exp $
+//###########################################################################
+
 package net.sourceforge.waters.gui.command;
 
 import net.sourceforge.waters.subject.module.GraphSubject;
 import net.sourceforge.waters.gui.EditorGraph;
 import java.awt.geom.Point2D;
+import java.awt.geom.Rectangle2D;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Map;
@@ -20,8 +30,12 @@ import net.sourceforge.waters.subject.module.PointGeometrySubject;
 import net.sourceforge.waters.subject.module.BoxGeometrySubject;
 import net.sourceforge.waters.subject.module.SplineGeometrySubject;
 
+
 /**
- * the Command for Creation of nodes
+ * A general command to move a group of graphical objects in a graph.
+ * This command supports various types of movements of the selection,
+ * including reshaping of group nodes and edges in respsonse to the
+ * the dragging of handles.
  *
  * @author Simon Ware
  */
@@ -30,60 +44,86 @@ public class MoveObjects
   implements Command
 {
 
-  /**  the commands to be executed */
-  private final CompoundCommand mCommands;
-  private final String mDescription;
-  private final GraphSubject mGraph;
+  //#########################################################################
+  //# Constructors
+  /**
+   * Constructs a new move objects command.
+   * @param objects  A map which contains the old and new state of all
+   *                 graphical objects to be moved. The keys in the map
+   *                 are the original subjects, the values are 'dummy'
+   *                 copies the geometry of which is to be assigned to
+   *                 the original subjects.
+   * @param graph    The graph edited by this command.
+   */
+  public MoveObjects(final Map<ProxySubject, ProxySubject> objects,
+                     final GraphSubject graph)
+  {
+    this(objects, graph, null);
+  }
 
   /**
-   * Constructs a new CreateNodeCommand with the specified surface and
-   * creates the node in the x,y position specified
-   *
-   * @param graph the surface edited by this command
+   * Constructs a new move objects command with a given description.
+   * @param objects     A map which contains the old and new state of all
+   *                    graphical objects to be moved. The keys in the map
+   *                    are the original subjects, the values are 'dummy'
+   *                    copies the geometry of which is to be assigned to
+   *                    the original subjects.
+   * @param graph       The graph edited by this command.
+   * @param description The description to be used for the command, or
+   *                    <CODE>null</CODE> to compute one automatically
+   *                    from the type of objects used.
    */
-  public MoveObjects(Map<ProxySubject, ProxySubject> objects,
-                     GraphSubject graph)
+  public MoveObjects(final Map<ProxySubject,ProxySubject> objects,
+                     final GraphSubject graph,
+                     final String description)
   {
     mGraph = graph;
     mCommands = new CompoundCommand();
-    for (Map.Entry<ProxySubject, ProxySubject> entry : objects.entrySet()) {
-      Command c = null;
-      if (entry.getKey() instanceof SimpleNodeSubject) {
-        c = new MoveSimpleNode((SimpleNodeSubject) entry.getKey(),
-                               (SimpleNodeSubject) entry.getValue());
-      } else if (entry.getKey() instanceof GroupNodeSubject) {
-        c = new MoveGroupNode((GroupNodeSubject) entry.getKey(),
-                              (GroupNodeSubject) entry.getValue());
-      } else if (entry.getKey() instanceof EdgeSubject) {
-        c = new MoveEdge((EdgeSubject) entry.getKey(),
-                         (EdgeSubject) entry.getValue());
-      } else if (entry.getKey() instanceof LabelBlockSubject) {
-        c = new MoveLabelBlock((LabelBlockSubject) entry.getKey(),
-                               (LabelBlockSubject) entry.getValue());
-      } else if (entry.getKey() instanceof GuardActionBlockSubject) {
-          c = new MoveGuardActionBlock((GuardActionBlockSubject) entry.getKey(),
-                  (GuardActionBlockSubject) entry.getValue());
-      } else if (entry.getKey() instanceof LabelGeometrySubject) {
-        c = new MoveLabelGeometry((LabelGeometrySubject) entry.getKey(),
-                                  (LabelGeometrySubject) entry.getValue());
+    for (Map.Entry<ProxySubject,ProxySubject> entry : objects.entrySet()) {
+      final ProxySubject orig = entry.getKey();
+      final ProxySubject dummy = entry.getValue();
+      final ElementaryMoveCommand cmd;
+      if (orig instanceof SimpleNodeSubject) {
+        cmd = new MoveSimpleNode((SimpleNodeSubject) orig,
+                                 (SimpleNodeSubject) dummy);
+      } else if (orig instanceof GroupNodeSubject) {
+        cmd = new MoveGroupNode((GroupNodeSubject) orig,
+                                (GroupNodeSubject) dummy);
+      } else if (orig instanceof EdgeSubject) {
+        cmd = new MoveEdge((EdgeSubject) orig,
+                           (EdgeSubject) dummy);
+      } else if (orig instanceof LabelBlockSubject) {
+        cmd = new MoveLabelBlock((LabelBlockSubject) orig,
+                                 (LabelBlockSubject) dummy);
+      } else if (orig instanceof GuardActionBlockSubject) {
+        cmd = new MoveGuardActionBlock((GuardActionBlockSubject) orig,
+                                       (GuardActionBlockSubject) dummy);
+      } else if (orig instanceof LabelGeometrySubject) {
+        cmd = new MoveLabelGeometry((LabelGeometrySubject) orig,
+                                    (LabelGeometrySubject) dummy);
       } else {
-        assert(false);
+        throw new ClassCastException
+          ("Unknown subject type for MoveObjects command: " +
+           orig.getClass().getName());
       }
-      mCommands.addCommand(c);
+      mCommands.addCommand(cmd);
     }
     mCommands.end();
-    mDescription = "movement";
+    if (description != null) {
+      mDescription = description;
+    } else {
+      mDescription = "Movement";
+    }
   }
 
+
+  //#########################################################################
+  //# Interface net.sourceforge.waters.gui.command.Command
   public void execute()
   {
     mCommands.execute();
     EditorGraph.updateChildNodes(mGraph);
   }
-
-  /**
-   * Undoes the Command
-   */
 
   public void undo()
   {
@@ -91,18 +131,45 @@ public class MoveObjects
     EditorGraph.updateChildNodes(mGraph);
   }
 
-	public boolean isSignificant()
-	{
-		return mCommands.isSignificant();
-	}
+  public boolean isSignificant()
+  {
+    return mCommands.isSignificant();
+  }
 
   public String getName()
   {
     return mDescription;
   }
 
-  private class MoveSimpleNode
+
+  //#########################################################################
+  //# Inner Class ElementaryMoveCommand
+  private abstract static class ElementaryMoveCommand
     implements Command
+  {
+    //#######################################################################
+    //# Interface net.sourceforge.waters.gui.command.Command
+    public boolean isSignificant()
+    {
+      return true;
+    }
+
+    public String getName()
+    {
+      return getTypeName() + " Movement";
+    }
+
+    //#######################################################################
+    //# Naming
+    abstract String getTypeName();
+
+  }
+
+
+  //#########################################################################
+  //# Inner Class MoveSimpleNode
+  private static class MoveSimpleNode
+    extends ElementaryMoveCommand
   {
     private final SimpleNodeSubject mNode;
     private final PointGeometrySubject mOrig;
@@ -129,7 +196,6 @@ public class MoveObjects
 
     public void execute()
     {
-      //System.out.println("new pos:" + mNew.getPoint());
       mNode.setPointGeometry(mNew);
       mNode.setInitialArrowGeometry(mNArrow);
       mLabel.execute();
@@ -142,19 +208,32 @@ public class MoveObjects
       mLabel.undo();
     }
 
-    public boolean isSignificant()
+    //#######################################################################
+    //# Naming
+    String getTypeName()
     {
-      return true;
+      final Point2D oldpos = mOrig.getPoint();
+      final Point2D newpos = mNew.getPoint();
+      if (!oldpos.equals(newpos)) {
+	return "Node";
+      }
+      if (mOArrow != null) {
+	final Point2D oldinit = mOArrow.getPoint();
+	final Point2D newinit = mNArrow.getPoint();
+	if (!oldinit.equals(newinit)) {
+	  return "Initial State Arrow";
+	}
+      }
+      return mLabel.getTypeName();
     }
 
-    public String getName()
-    {
-      return "Move Node";
-    }
   }
 
-  private class MoveGroupNode
-    implements Command
+
+  //#########################################################################
+  //# Inner Class MoveGroupNode
+  private static class MoveGroupNode
+    extends ElementaryMoveCommand
   {
     private final GroupNodeSubject mNode;
     private final BoxGeometrySubject mOrig;
@@ -178,19 +257,32 @@ public class MoveObjects
       mNode.setGeometry(mOrig);
     }
 
-    public boolean isSignificant()
-    {
-      return true;
-    }
-
     public String getName()
     {
-      return "Move Node";
+      final Rectangle2D oldrect = mOrig.getRectangle();
+      final Rectangle2D newrect = mNew.getRectangle();
+      if (oldrect.getWidth() != newrect.getWidth() ||
+          oldrect.getHeight() != newrect.getHeight()) {
+        return getTypeName() + " Reshaping";
+      } else {
+        return super.getName();
+      }
     }
+
+    //#######################################################################
+    //# Naming
+    String getTypeName()
+    {
+      return "Group Node";
+    }
+
   }
 
-  private class MoveEdge
-    implements Command
+
+  //#########################################################################
+  //# Inner Class MoveEdge
+  private static class MoveEdge
+    extends ElementaryMoveCommand
   {
     //#######################################################################
     //# Constructor
@@ -225,14 +317,16 @@ public class MoveObjects
       mEdge.setEndPoint(mOEnd);
     }
 
-    public boolean isSignificant()
-    {
-      return true;
-    }
-
     public String getName()
     {
-      return "Move Edge";
+      return getTypeName() + " Reshaping";
+    }
+
+    //#######################################################################
+    //# Naming
+    String getTypeName()
+    {
+      return "Edge";
     }
 
     //#######################################################################
@@ -247,8 +341,11 @@ public class MoveObjects
 
   }
 
-  private class MoveLabelBlock
-    implements Command
+
+  //#########################################################################
+  //# Inner Class MoveLabelBlock
+  private static class MoveLabelBlock
+    extends ElementaryMoveCommand
   {
     private final LabelBlockSubject mLabel;
     private final LabelGeometrySubject mOGeo;
@@ -271,60 +368,67 @@ public class MoveObjects
       mLabel.setGeometry(mOGeo);
     }
 
-    public boolean isSignificant()
+    //#######################################################################
+    //# Naming
+    String getTypeName()
     {
-      return true;
+      return "Label Block";
     }
 
-    public String getName()
+  }
+
+
+  //#########################################################################
+  //# Inner Class MoveGuardActionBlock
+  private static class MoveGuardActionBlock
+    extends ElementaryMoveCommand
+  {
+
+    public MoveGuardActionBlock(final GuardActionBlockSubject orig,
+                                final GuardActionBlockSubject dummy)
     {
-      return "Move LabelBlock";
+      mGA = orig;
+      mOGeo = mGA.getGeometry().clone();
+      mNGeo = dummy.getGeometry().clone();
     }
-  }
- 
-  private class MoveGuardActionBlock
-  implements Command
-{
-  private final GuardActionBlockSubject mGA;
-  private final LabelGeometrySubject mOGeo;
-  private final LabelGeometrySubject mNGeo;
 
-  public MoveGuardActionBlock(GuardActionBlockSubject orig, GuardActionBlockSubject dummy)
-  {
-    mGA = orig;
-    mOGeo = mGA.getGeometry().clone();
-    mNGeo = dummy.getGeometry().clone();
-  }
+    public void execute()
+    {
+      mGA.setGeometry(mNGeo);
+    }
 
-  public void execute()
-  {
-    mGA.setGeometry(mNGeo);
-  }
+    public void undo()
+    {
+      mGA.setGeometry(mOGeo);
+    }
 
-  public void undo()
-  {
-    mGA.setGeometry(mOGeo);
-  }
+    //#######################################################################
+    //# Naming
+    String getTypeName()
+    {
+      return "Guard/Action Block";
+    }
 
-  public boolean isSignificant()
-  {
-    return true;
+    //#######################################################################
+    //# Data Members
+    private final GuardActionBlockSubject mGA;
+    private final LabelGeometrySubject mOGeo;
+    private final LabelGeometrySubject mNGeo;
+
   }
 
-  public String getName()
-  {
-    return "Move GuardActionBlock";
-  }
-}
 
-  private class MoveLabelGeometry
-    implements Command
+  //#########################################################################
+  //# Inner Class MoveLabelGeometry
+  private static class MoveLabelGeometry
+    extends ElementaryMoveCommand
   {
     private final LabelGeometrySubject mLabel;
     private final Point2D mOrig;
     private final Point2D mNew;
 
-    public MoveLabelGeometry(LabelGeometrySubject orig, LabelGeometrySubject dummy)
+    public MoveLabelGeometry(final LabelGeometrySubject orig,
+                             final LabelGeometrySubject dummy)
     {
       mLabel = orig;
       mOrig = mLabel.getOffset();
@@ -341,14 +445,35 @@ public class MoveObjects
       mLabel.setOffset(mOrig);
     }
 
-    public boolean isSignificant()
+    //#######################################################################
+    //# Naming
+    String getTypeName()
     {
-      return true;
+      return "Node Label";
     }
 
-    public String getName()
-    {
-      return "Move Label";
-    }
   }
+
+
+  //#########################################################################
+  //# Data Members
+  /**
+   * The elementary move commands to be executed.
+   * The move objects command basically is a compound command,
+   * consisting of elementary commands moving each object individually.
+   */
+  private final CompoundCommand mCommands;
+
+  /**
+   * A textual description of the command.
+   * The description can be calculated from the objects moved,
+   * or be given by the constructor.
+   */
+  private final String mDescription;
+
+  /**
+   * The graph edited by this command.
+   */
+  private final GraphSubject mGraph;
+
 }

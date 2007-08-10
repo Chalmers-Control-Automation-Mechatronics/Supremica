@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.gui.ide.actions
 //# CLASS:   Actions
 //###########################################################################
-//# $Id: Actions.java,v 1.53 2007-06-26 21:42:27 flordal Exp $
+//# $Id: Actions.java,v 1.54 2007-08-10 04:34:31 robi Exp $
 //###########################################################################
 
 package org.supremica.gui.ide.actions;
@@ -106,7 +106,6 @@ public class Actions extends WatersActionManager
     public IDEAction editorAddForeachComponentAction = new EditorAddForeachComponentAction(mIDEActions);
     public IDEAction editorAddInstanceAction = new EditorAddInstanceAction(mIDEActions);
     public IDEAction editorAddBindingAction = new EditorAddBindingAction(mIDEActions);
-    public IDEAction editorRunEmbedderAction = new EditorRunEmbedderAction(mIDEActions);
     public IDEAction editorStopEmbedderAction = new EditorStopEmbedderAction(mIDEActions);
 
     // Analyzer Options
