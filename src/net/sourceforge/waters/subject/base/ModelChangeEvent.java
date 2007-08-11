@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.subject.base
 //# CLASS:   ModelChangeEvent
 //###########################################################################
-//# $Id: ModelChangeEvent.java,v 1.6 2007-03-02 05:21:14 robi Exp $
+//# $Id: ModelChangeEvent.java,v 1.7 2007-08-11 10:44:03 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.subject.base;
@@ -185,6 +185,12 @@ public class ModelChangeEvent extends EventObject
   //# Class Constants
   public static final long serialVersionUID = 1;
 
+  /**
+   * A constant representing that no change occured.
+   * This can be used as a dummy or default value for the type of
+   * a change event.
+   */
+  public static final int NO_CHANGE = 0x00;
   /**
    * The constant identifying an item-addition notification.  This
    * notification is sent after an item has been added to some collection

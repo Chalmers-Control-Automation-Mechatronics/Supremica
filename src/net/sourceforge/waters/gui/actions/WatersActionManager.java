@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui.actions
 //# CLASS:   WatersActionManager
 //###########################################################################
-//# $Id: WatersActionManager.java,v 1.4 2007-08-10 04:34:31 robi Exp $
+//# $Id: WatersActionManager.java,v 1.5 2007-08-11 10:44:03 robi Exp $
 //###########################################################################
 
 
@@ -28,6 +28,7 @@ public abstract class WatersActionManager
   public WatersActionManager(final IDE ide)
   {
     mActionMap = new HashMap<Class<? extends IDEAction>, IDEAction>();
+    addAction(new InsertVariableAction(ide));
     addAction(new WatersUndoAction(ide));
     addAction(new WatersRedoAction(ide));
     addAction(new GraphLayoutAction(ide));

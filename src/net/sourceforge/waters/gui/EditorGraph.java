@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   EditorGraph
 //###########################################################################
-//# $Id: EditorGraph.java,v 1.20 2007-08-10 04:34:31 robi Exp $
+//# $Id: EditorGraph.java,v 1.21 2007-08-11 10:44:03 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.gui;
@@ -16,8 +16,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.HashSet;
-import java.util.IdentityHashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -28,11 +28,16 @@ import net.sourceforge.waters.gui.command.Command;
 import net.sourceforge.waters.gui.command.MoveObjects;
 import net.sourceforge.waters.gui.renderer.GeometryTools;
 
+import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.base.ProxyVisitor;
 import net.sourceforge.waters.model.base.VisitorException;
+import net.sourceforge.waters.model.base.WatersRuntimeException;
+import net.sourceforge.waters.model.module.AbstractModuleProxyVisitor;
 import net.sourceforge.waters.model.module.EdgeProxy;
 import net.sourceforge.waters.model.module.GraphProxy;
+import net.sourceforge.waters.model.module.GuardActionBlockProxy;
 import net.sourceforge.waters.model.module.LabelBlockProxy;
+import net.sourceforge.waters.model.module.LabelGeometryProxy;
 import net.sourceforge.waters.model.module.ModuleProxyVisitor;
 import net.sourceforge.waters.model.module.NodeProxy;
 import net.sourceforge.waters.model.unchecked.Casting;
@@ -70,22 +75,24 @@ public class EditorGraph
   public EditorGraph(final GraphSubject graph)
   {
     mGraph = graph;
-    mChanged = new HashSet<Subject>();
-    mObserverMap = new IdentityHashMap<NodeSubject,EditorNode>
+    mNumChanges = 0;
+    mObserverMap = new HashMap<NodeSubject,EditorNode>
       (graph.getNodes().size());
-    mFakeMap = new IdentityHashMap<Subject,Subject>
+    mFakeMap = new HashMap<ProxySubject,ChangeRecord>
       (graph.getNodes().size() + graph.getEdges().size()+1);
-    mOriginalMap = new IdentityHashMap<Subject, Subject>
+    mOriginalMap = new HashMap<ProxySubject,ChangeRecord>
       (graph.getNodes().size() + graph.getEdges().size()+1);
+    mFakeGetter = new FakeGetterVisitor();
+    mOriginalGetter = new OriginalGetterVisitor();
     mEdges = new ArrayListSubject<EdgeSubject>(graph.getEdges().size());
     mNodes = new IndexedHashSetSubject<NodeSubject>(graph.getNodes().size());
     mEdges.setParent(this);
     mNodes.setParent(this);
-    if (graph.getBlockedEvents() != null)	{
-      mBlockedEvents = graph.getBlockedEvents().clone();
-      mFakeMap.put(mBlockedEvents, graph.getBlockedEvents());
-      mOriginalMap.put(graph.getBlockedEvents(), mBlockedEvents);
+    if (graph.getBlockedEvents() != null) {
+      final LabelBlockSubject blocked = graph.getBlockedEvents();
+      mBlockedEvents = blocked.clone();
       mBlockedEvents.setParent(this);
+      addChangeRecord(blocked, mBlockedEvents);
     } else {
       mBlockedEvents = null;
     }
@@ -123,10 +130,11 @@ public class EditorGraph
     return GraphProxy.class;
   }
 
-  public Object acceptVisitor(ProxyVisitor p)
+  public Object acceptVisitor(final ProxyVisitor visitor)
     throws VisitorException
   {
-    return ((ModuleProxyVisitor)p).visitGraphProxy(this);
+    final ModuleProxyVisitor mvisitor = (ModuleProxyVisitor) visitor;
+    return mvisitor.visitGraphProxy(this);
   }
 
   public LabelBlockProxy getBlockedEvents()
@@ -164,78 +172,14 @@ public class EditorGraph
 
   //#########################################################################
   //# Accessing the Fake Maps
-  public Subject getCopy(Subject o)
+  public ProxySubject getCopy(final ProxySubject original)
   {
-    Subject s = mOriginalMap.get(o);
-    if (s == null) {
-      if (o instanceof LabelBlockSubject) {
-        s = getCopy((LabelBlockSubject)o);
-      } else if (o instanceof GuardActionBlockSubject) {
-        s = getCopy((GuardActionBlockSubject)o);
-      } else if (o instanceof LabelGeometrySubject) {
-        s = getCopy((LabelGeometrySubject)o);
-      }
-    }
-    return s;
-  }
-	
-  public Subject getCopy(LabelBlockSubject o)
-  {
-    if (o.getParent() instanceof EdgeSubject) {
-      EdgeSubject s = (EdgeSubject)mOriginalMap.get(o.getParent());
-      return s.getLabelBlock();
-    } else {
-      return mOriginalMap.get(o);
-    }
+    return mFakeGetter.getFake(original);
   }
 
-  public Subject getCopy(GuardActionBlockSubject o)
+  public ProxySubject getOriginal(final ProxySubject fake)
   {
-    EdgeSubject s = (EdgeSubject)mOriginalMap.get(o.getParent());
-    return s.getGuardActionBlock();
-  }
-
-  public Subject getCopy(LabelGeometrySubject o)
-  {
-    SimpleNodeSubject s = (SimpleNodeSubject)mOriginalMap.get(o.getParent());
-    return s.getLabelGeometry();
-  }
-
-  public Subject getOriginal(Subject o)
-  {
-    Subject s = mFakeMap.get(o);
-    if (s == null) {
-      if (o instanceof LabelBlockSubject) {
-        s = getOriginal((LabelBlockSubject)o);
-      } else if (o instanceof GuardActionBlockSubject) {
-        s = getOriginal((GuardActionBlockSubject)o);
-      } else if (o instanceof LabelGeometrySubject) {
-        s = getOriginal((LabelGeometrySubject)o);
-      }
-    }
-    return s;
-  }
-
-  public Subject getOriginal(LabelBlockSubject o)
-  {
-    if (o.getParent() instanceof EdgeSubject) {
-      EdgeSubject s = (EdgeSubject)mFakeMap.get(o.getParent());
-      return s.getLabelBlock();
-    } else {
-      return mFakeMap.get(o);
-    }
-  }
-
-  public Subject getOriginal(GuardActionBlockSubject o)
-  {
-    EdgeSubject s = (EdgeSubject)mFakeMap.get(o.getParent());
-    return s.getGuardActionBlock();
-  }
-
-  public Subject getOriginal(LabelGeometrySubject o)
-  {
-    SimpleNodeSubject s = (SimpleNodeSubject)mFakeMap.get(o.getParent());
-    return s.getLabelGeometry();
+    return mOriginalGetter.getOriginal(fake);
   }
 
   public Collection<EdgeSubject> getNodeEdges(NodeSubject n)
@@ -249,16 +193,31 @@ public class EditorGraph
   /**
    * Creates a command to transform the original graph into the same
    * state as this editor graph.
-   * @param  name    The name to be given to the new command.
+   * Presently, the following modifications are recognised and included
+   * in the command.
+   * <UL>
+   * <LI>Changes of geometry of all graphical objects.</LI>
+   * <LI>Addition and removal of nodes and group nodes.</LI>
+   * <LI>Addition and removal of edges.</LI>
+   * </UL>
+   * @param  description  The name to be given to the new command.
+   * @return The command that will transform the graph. It is not yet
+   *         executed, and needs to be enqueued by the caller.
    */
   Command createUpdateCommand(final String description)
   {
-    final Map<ProxySubject, ProxySubject> changed =
-      new IdentityHashMap<ProxySubject, ProxySubject>(mChanged.size());
-    for (Subject s : mChanged) {
-      ProxySubject orig = (ProxySubject) getOriginal(s);
-      if (orig != null) {
-        changed.put(orig, (ProxySubject)s);
+    final Map<ProxySubject,ProxySubject> changed =
+      new HashMap<ProxySubject,ProxySubject>(mNumChanges);
+    for (final ChangeRecord record : mOriginalMap.values()) {
+      final ProxySubject original = record.getOriginal();
+      final ProxySubject fake = record.getFake();
+      switch (record.getChangeKind()) {
+      case ModelChangeEvent.GEOMETRY_CHANGED:
+      case ModelChangeEvent.STATE_CHANGED:
+        changed.put(original, fake);
+        break;
+      default:
+        break;
       }
     }
     return new MoveObjects(changed, mGraph, description);
@@ -316,26 +275,26 @@ public class EditorGraph
     final NodeSubject source0 = edge0.getSource();
     final NodeSubject target0 = edge0.getTarget();
     if (source0 != null) {
-      final NodeSubject source1 = (NodeSubject) mOriginalMap.get(source0);
+      final NodeSubject source1 = (NodeSubject) getCopy(source0);
       edge1.setSource(source1);
       final EditorNode node = mObserverMap.get(source1);
       node.addEdge(edge1);
     }
     if (target0 != null) {
-      final NodeSubject target1 = (NodeSubject) mOriginalMap.get(target0);
+      final NodeSubject target1 = (NodeSubject) getCopy(target0);
       edge1.setTarget(target1);
       final EditorNode node = mObserverMap.get(target1);
       node.addEdge(edge1);
     }
     mEdges.add(edge1);
-    mFakeMap.put(edge1, edge0);
-    mOriginalMap.put(edge0, edge1);
+    addChangeRecord(edge0, edge1);
     return edge1;
   }
 
+  /*
   private void removeEdge(EdgeSubject e)
   {
-    EdgeSubject remove = (EdgeSubject)mOriginalMap.get(e);
+    EdgeSubject remove = (EdgeSubject) mOriginalMap.get(e);
     mEdges.remove(remove);
     mFakeMap.remove(remove);
     mOriginalMap.remove(e);
@@ -348,18 +307,18 @@ public class EditorGraph
     mFakeMap.remove(remove);
     mOriginalMap.remove(n);
   }
+  */
 
   private void addGroupNode(GroupNodeSubject gn)
   {
     if (gn.getGeometry() == null) {
       throw new IllegalArgumentException("GroupNode " + gn +
-                                         " has no Geometry Data");
+                                         " has no geometry!");
     } else {
       GroupNodeSubject group = gn.clone();
       mNodes.add(group);
       mObserverMap.put(group, new EditorGroupNode(group));
-      mFakeMap.put(group, gn);
-      mOriginalMap.put(gn, group);
+      addChangeRecord(gn, group);
     }
   }
 
@@ -368,8 +327,16 @@ public class EditorGraph
     final SimpleNodeSubject node = n.clone();
     mNodes.add(node);
     mObserverMap.put(node, new EditorSimpleNode(node));
-    mFakeMap.put(node, n);
-    mOriginalMap.put(n, node);
+    addChangeRecord(n, node);
+  }
+
+  private ChangeRecord addChangeRecord(final ProxySubject original,
+                                       final ProxySubject fake)
+  {
+    final ChangeRecord record = new ChangeRecord(original, fake);
+    mOriginalMap.put(original, record);
+    mFakeMap.put(fake, record);
+    return record;
   }
 
 
@@ -752,14 +719,15 @@ public class EditorGraph
 	{
 	  final Subject parent = esource.getParent();
 	  if (parent != null && parent instanceof GroupNodeSubject) {
-	    mChanged.add(parent);
+            final GroupNodeSubject group = (GroupNodeSubject) parent;
+	    recordChange(group, ModelChangeEvent.GEOMETRY_CHANGED);
 	  }
 	}
 	break;
       case ModelChangeEvent.STATE_CHANGED:
 	if (esource instanceof EdgeSubject) {
-          mChanged.add(esource);
 	  final EdgeSubject edge = (EdgeSubject) esource;
+          recordChange(edge, ModelChangeEvent.STATE_CHANGED);
 	  final NodeSubject source = edge.getSource();
           if (source != null) {
             mObserverMap.get(source).addEdge(edge);
@@ -771,11 +739,26 @@ public class EditorGraph
 	}
 	break;
       case ModelChangeEvent.GEOMETRY_CHANGED:
-	mChanged.add(esource);
+        final ProxySubject psource = (ProxySubject) esource;
+        recordChange(psource, ModelChangeEvent.GEOMETRY_CHANGED);
 	break;
       }
     }
 
+    //#######################################################################
+    //# Auxiliary Methods
+    private void recordChange(final ProxySubject fake, final int kind)
+    {
+      ChangeRecord record = mFakeMap.get(fake);
+      if (record == null) {
+        final ProxySubject original = getOriginal(fake);
+        record = addChangeRecord(original, fake);
+      }
+      final boolean add = record.setChangeKind(kind);
+      if (add) {
+        mNumChanges++;
+      }
+    }
   }
 
 
@@ -787,7 +770,7 @@ public class EditorGraph
     protected EditorNode(NodeSubject node)
     {
       mNode = node;
-      mEdges = new IdentityHashMap<EdgeSubject, Boolean>();
+      mEdges = new HashMap<EdgeSubject, Boolean>();
     }
 
     public void removeEdge(EdgeSubject edge)
@@ -894,7 +877,7 @@ public class EditorGraph
     }
 
     private final NodeSubject mNode;
-    private final IdentityHashMap<EdgeSubject, Boolean> mEdges;
+    private final Map<EdgeSubject,Boolean> mEdges;
   }
 
 
@@ -994,15 +977,198 @@ public class EditorGraph
 
 
   //#########################################################################
+  //# Inner Class FakeGetterVisitor
+  private class FakeGetterVisitor
+    extends AbstractModuleProxyVisitor
+  {
+    //#######################################################################
+    //# Invocation
+    private ProxySubject getFake(final ProxySubject original)
+    {
+      final ChangeRecord record = mOriginalMap.get(original);
+      if (record == null) {
+        try {
+          return (ProxySubject) original.acceptVisitor(this);
+        } catch (final VisitorException exception) {
+          throw new WatersRuntimeException(exception);
+        }
+      } else {
+        return record.getFake();
+      }
+    }
+
+    //#######################################################################
+    //# Interface net.sourceforge.waters.model.module.ModuleProxyVisitor
+    public Object visitProxy(final Proxy proxy)
+    {
+      return null;
+    }
+
+    public ProxySubject visitLabelBlockProxy(final LabelBlockProxy original)
+    {
+      final LabelBlockSubject osubject = (LabelBlockSubject) original;
+      final EdgeSubject oedge = (EdgeSubject) osubject.getParent();
+      final EdgeSubject fedge = (EdgeSubject) getFake(oedge);
+      return fedge.getLabelBlock();
+    }
+
+    public GuardActionBlockSubject visitGuardActionBlockProxy
+      (final GuardActionBlockProxy original)
+    {
+      final GuardActionBlockSubject osubject =
+        (GuardActionBlockSubject) original;
+      final EdgeSubject oedge = (EdgeSubject) osubject.getParent();
+      final EdgeSubject fedge = (EdgeSubject) getFake(oedge);
+      return fedge.getGuardActionBlock();
+    }
+
+    public LabelGeometrySubject visitLabelGeometryProxy
+      (final LabelGeometryProxy original)
+    {
+      final LabelGeometrySubject osubject = (LabelGeometrySubject) original;
+      final SimpleNodeSubject onode = (SimpleNodeSubject) osubject.getParent();
+      final SimpleNodeSubject fnode = (SimpleNodeSubject) getFake(onode);
+      return fnode.getLabelGeometry();
+    }
+  }
+
+
+  //#########################################################################
+  //# Inner Class OriginalGetterVisitor
+  private class OriginalGetterVisitor
+    extends AbstractModuleProxyVisitor
+  {
+    //#######################################################################
+    //# Invocation
+    private ProxySubject getOriginal(final ProxySubject fake)
+    {
+      final ChangeRecord record = mFakeMap.get(fake);
+      if (record == null) {
+        try{
+          return (ProxySubject) fake.acceptVisitor(this);
+        } catch (final VisitorException exception) {
+          throw new WatersRuntimeException(exception);
+        }
+      } else {
+        return record.getOriginal();
+      }
+    }
+
+    //#######################################################################
+    //# Interface net.sourceforge.waters.model.module.ModuleProxyVisitor
+    public Object visitProxy(final Proxy proxy)
+    {
+      return null;
+    }
+
+    public ProxySubject visitLabelBlockProxy(final LabelBlockProxy fake)
+    {
+      final LabelBlockSubject fsubject = (LabelBlockSubject) fake;
+      final EdgeSubject fedge = (EdgeSubject) fsubject.getParent();
+      final EdgeSubject oedge = (EdgeSubject) getOriginal(fedge);
+      return oedge.getLabelBlock();
+    }
+
+    public GuardActionBlockSubject visitGuardActionBlockProxy
+      (final GuardActionBlockProxy fake)
+    {
+      final GuardActionBlockSubject fsubject =
+        (GuardActionBlockSubject) fake;
+      final EdgeSubject fedge = (EdgeSubject) fsubject.getParent();
+      final EdgeSubject oedge = (EdgeSubject) getOriginal(fedge);
+      return oedge.getGuardActionBlock();
+    }
+
+    public LabelGeometrySubject visitLabelGeometryProxy
+      (final LabelGeometryProxy fake)
+    {
+      final LabelGeometrySubject fsubject = (LabelGeometrySubject) fake;
+      final SimpleNodeSubject fnode = (SimpleNodeSubject) fsubject.getParent();
+      final SimpleNodeSubject onode = (SimpleNodeSubject) getOriginal(fnode);
+      return onode.getLabelGeometry();
+    }
+  }
+
+
+  //#########################################################################
+  //# Inner Class ChangeRecord
+  private static class ChangeRecord
+  {
+    //#######################################################################
+    //# Constructors
+    private ChangeRecord(final ProxySubject original, final ProxySubject fake)
+    {
+      mOriginal = original;
+      mFake = fake;
+      mChangeKind = ModelChangeEvent.NO_CHANGE;
+    }
+
+    //#######################################################################
+    //# Simple Access
+    private ProxySubject getOriginal()
+    {
+      return mOriginal;
+    }
+
+    private ProxySubject getFake()
+    {
+      return mFake;
+    }
+
+    private int getChangeKind()
+    {
+      return mChangeKind;
+    }
+
+    private boolean setChangeKind(final int kind)
+    {
+      if (kind != ModelChangeEvent.NO_CHANGE &&
+          getChangeValue(kind) >= getChangeValue(mChangeKind)) {
+        final boolean result = (mChangeKind == ModelChangeEvent.NO_CHANGE);
+        mChangeKind = kind;
+        return result;
+      } else {
+        return false;
+      }
+    }
+
+    private int getChangeValue(final int kind)
+    {
+      switch (kind) {
+      case ModelChangeEvent.ITEM_ADDED:
+      case ModelChangeEvent.ITEM_REMOVED:
+        return 5;
+      case ModelChangeEvent.NAME_CHANGED:
+        return 4;
+      case ModelChangeEvent.STATE_CHANGED:
+        return 3;
+      case ModelChangeEvent.GEOMETRY_CHANGED:
+        return 2;
+      default:
+        return 0;
+      }
+    }
+
+    //#######################################################################
+    //# Data Members
+    private final ProxySubject mOriginal;
+    private final ProxySubject mFake;
+    private int mChangeKind;
+  }
+
+
+  //#########################################################################
   //# Data Members
   private boolean mUpdate = false;
+  private int mNumChanges;
   private final GraphSubject mGraph;
+  private final LabelBlockSubject mBlockedEvents;
   private final ListSubject<EdgeSubject> mEdges;
   private final IndexedSetSubject<NodeSubject> mNodes;
-  private final IdentityHashMap<NodeSubject, EditorNode> mObserverMap;
-  private final IdentityHashMap<Subject, Subject> mFakeMap;
-  private final IdentityHashMap<Subject, Subject> mOriginalMap;
-  private final LabelBlockSubject mBlockedEvents;
-  private final Set<Subject> mChanged;
+  private final Map<NodeSubject,EditorNode> mObserverMap;
+  private final Map<ProxySubject,ChangeRecord> mFakeMap;
+  private final Map<ProxySubject,ChangeRecord> mOriginalMap;
+  private final FakeGetterVisitor mFakeGetter;
+  private final OriginalGetterVisitor mOriginalGetter;
 
 }

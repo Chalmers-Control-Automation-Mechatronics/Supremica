@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   IconLoader
 //###########################################################################
-//# $Id: IconLoader.java,v 1.8 2007-03-01 02:20:03 robi Exp $
+//# $Id: IconLoader.java,v 1.9 2007-08-11 10:44:03 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.gui;
@@ -13,7 +13,7 @@ import java.net.URL;
 import javax.swing.ImageIcon;
 
 
-class IconLoader
+public class IconLoader
 {
 
     //#########################################################################
@@ -41,22 +41,26 @@ class IconLoader
     private static final String NAME_SPEC = "waters/spec";
     private static final String NAME_SUPERVISOR = "waters/supervisor";
     private static final String NAME_UNCONTROLLABLE = "waters/uncontrollable";
+    private static final String NAME_VARIABLE = "waters/variable";
     
     
     //#########################################################################
     //# Class Constants
-    static final ImageIcon ICON_BINDING = null;
-    static final ImageIcon ICON_CONTROLLABLE = getIcon(NAME_CONTROLLABLE);
-    static final ImageIcon ICON_EVENT = getIcon(NAME_EVENT);
-    static final ImageIcon ICON_FORBIDDEN = getIcon(NAME_FORBIDDEN);
-    static final ImageIcon ICON_FOREACH = null;
-    static final ImageIcon ICON_INSTANCE = getIcon(NAME_INSTANCE);
-    static final ImageIcon ICON_PLANT = getIcon(NAME_PLANT);
-    static final ImageIcon ICON_PROPERTY = getIcon(NAME_PROPERTY);
-    static final ImageIcon ICON_PROPOSITION = getIcon(NAME_PROPOSITION);
-    static final ImageIcon ICON_SIMPLEPARAM = getIcon(NAME_SIMPLEPARAM);
-    static final ImageIcon ICON_SPEC = getIcon(NAME_SPEC);
-    static final ImageIcon ICON_SUPERVISOR = getIcon(NAME_SUPERVISOR);
-    static final ImageIcon ICON_UNCONTROLLABLE = getIcon(NAME_UNCONTROLLABLE);
+    public static final ImageIcon ICON_BINDING = null;
+    public static final ImageIcon ICON_CONTROLLABLE =
+		getIcon(NAME_CONTROLLABLE);
+    public static final ImageIcon ICON_EVENT = getIcon(NAME_EVENT);
+    public static final ImageIcon ICON_FORBIDDEN = getIcon(NAME_FORBIDDEN);
+    public static final ImageIcon ICON_FOREACH = null;
+    public static final ImageIcon ICON_INSTANCE = getIcon(NAME_INSTANCE);
+    public static final ImageIcon ICON_PLANT = getIcon(NAME_PLANT);
+    public static final ImageIcon ICON_PROPERTY = getIcon(NAME_PROPERTY);
+    public static final ImageIcon ICON_PROPOSITION = getIcon(NAME_PROPOSITION);
+    public static final ImageIcon ICON_SIMPLEPARAM = getIcon(NAME_SIMPLEPARAM);
+    public static final ImageIcon ICON_SPEC = getIcon(NAME_SPEC);
+    public static final ImageIcon ICON_SUPERVISOR = getIcon(NAME_SUPERVISOR);
+    public static final ImageIcon ICON_UNCONTROLLABLE =
+		getIcon(NAME_UNCONTROLLABLE);
+    public static final ImageIcon ICON_VARIABLE = getIcon(NAME_VARIABLE);
     
 }

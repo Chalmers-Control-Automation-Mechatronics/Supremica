@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.gui.ide
 //# CLASS:   IDEMenuBar
 //###########################################################################
-//# $Id: IDEMenuBar.java,v 1.50 2007-08-10 04:34:31 robi Exp $
+//# $Id: IDEMenuBar.java,v 1.51 2007-08-11 10:44:03 robi Exp $
 //###########################################################################
 
 package org.supremica.gui.ide;
@@ -25,6 +25,7 @@ import javax.swing.JMenuItem;
 import javax.swing.event.MenuEvent;
 import javax.swing.event.MenuListener;
 
+import net.sourceforge.waters.gui.actions.InsertVariableAction;
 import net.sourceforge.waters.gui.actions.GraphLayoutAction;
 import net.sourceforge.waters.gui.actions.WatersUndoAction;
 import net.sourceforge.waters.gui.actions.WatersRedoAction;
@@ -138,6 +139,10 @@ public class IDEMenuBar
         menu = new JMenu("Insert");
         menu.setMnemonic(KeyEvent.VK_I);
         menu.add(ide.getActions().editorAddSimpleComponentAction.getMenuItem());
+		/*
+        final Action insvar = actions.getAction(InsertVariableAction.class);
+        menu.add(new JMenuItem(insvar));
+		*/
         menu.add(ide.getActions().editorAddComponentEventAction.getMenuItem());
         menu.add(ide.getActions().editorAddModuleEventAction.getMenuItem());
         //menu.add(ide.getActions().editorAddForeachComponentAction.getMenuItem());
