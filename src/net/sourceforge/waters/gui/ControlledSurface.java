@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   ControlledSurface
 //###########################################################################
-//# $Id: ControlledSurface.java,v 1.139 2007-08-12 07:55:18 robi Exp $
+//# $Id: ControlledSurface.java,v 1.140 2007-08-12 10:47:08 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.gui;
@@ -198,7 +198,7 @@ public class ControlledSurface
     case EMBEDDER_STOP:
       mEmbedder.removeObserver(this);
       mEmbedder = null;
-      commitSecondaryGraph("Automatic Layout", mIsEmbedderUndoable, false);
+      commitSecondaryGraph("Automatic Layout", false, mIsEmbedderUndoable);
       clearSecondaryGraph();
       updateTool();
       break;
