@@ -1,105 +1,67 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
-//# PROJECT: Waters
+//# PROJECT: Waters GUI
 //# PACKAGE: net.sourceforge.waters.gui.command
 //# CLASS:   MoveEdgeCommand
 //###########################################################################
-//# $Id: MoveEdgeCommand.java,v 1.10 2007-07-05 00:17:20 siw4 Exp $
+//# $Id: MoveEdgeCommand.java,v 1.11 2007-08-12 07:55:18 robi Exp $
 //###########################################################################
-
 
 package net.sourceforge.waters.gui.command;
 
 import java.awt.geom.Point2D;
 
-import java.util.Collections;
-import java.util.List;
-
-import net.sourceforge.waters.gui.ControlledSurface;
-import net.sourceforge.waters.gui.renderer.GeometryTools;
-
 import net.sourceforge.waters.subject.module.EdgeSubject;
-import net.sourceforge.waters.subject.module.GroupNodeSubject;
-import net.sourceforge.waters.subject.module.NodeSubject;
 import net.sourceforge.waters.subject.module.PointGeometrySubject;
 import net.sourceforge.waters.subject.module.SplineGeometrySubject;
 
 
 /**
- * The command for changing the source or target of an edge.
+ * A command to change the geometry of an edge in a graph.
  *
- * @author Simon Ware
+ * @author Simon Ware, Robi Malik
  */
 
 public class MoveEdgeCommand
-    implements Command
+  implements Command
 {
 
   //#########################################################################
-  //# Constructor
-  /**
-   * Creates a new edge move command.
-   * @param  surface  The panel affected.
-   * @param  edge     The edge to be modified.
-   * @param  neo      The new source or target node.
-   * @param  isSource True if the source node is changed,
-   *                  false if the target node is changed.
-   * @param  point    The changed position, or <CODE>null</CODE>.
-   */
-  public MoveEdgeCommand(final ControlledSurface surface,
-                         final EdgeSubject edge,
-                         final NodeSubject neo,
-                         final boolean isSource,
-                         final Point2D point)
+  //# Constructors
+  public MoveEdgeCommand(final EdgeSubject orig, final EdgeSubject dummy)
   {
-    mSurface = surface;
-    mEdge = edge;
-    mNew = neo;
-    if (neo instanceof GroupNodeSubject && point != null) {
-      mNPos = new PointGeometrySubject(point);
-    } else {
-      mNPos = null;
-    }
-    mIsSource = isSource;
-    if (isSource) {
-      mOld = edge.getSource();
-      mOPos = edge.getStartPoint();
-      mDescription = "Change Edge Source";
-    } else {
-      mOld = edge.getTarget();
-      mOPos = edge.getEndPoint();
-      mDescription = "Change Edge Target";
-    }
-    final SplineGeometrySubject geo = edge.getGeometry();
-    mOldGeo = geo == null ? geo : geo.clone();
+    mEdge = orig;
+    final SplineGeometrySubject oGeo = mEdge.getGeometry();
+    mOldGeometry = oGeo != null ? oGeo.clone() : null;
+    final SplineGeometrySubject nGeo = dummy.getGeometry();
+    mNewGeometry = nGeo != null ? nGeo.clone() : null;
+    final PointGeometrySubject oStart = mEdge.getStartPoint();
+    mOldStart = oStart != null ? oStart.clone() : null;
+    final PointGeometrySubject oEnd = mEdge.getEndPoint();
+    mOldEnd = oEnd != null ? oEnd.clone() : null;
+    final PointGeometrySubject nStart = dummy.getStartPoint();
+    mNewStart = nStart != null ? nStart.clone() : null;
+    final PointGeometrySubject nEnd = dummy.getEndPoint();
+    mNewEnd = nEnd != null ? nEnd.clone() : null;
   }
 
+
+  //#########################################################################
+  //# Interface net.sourceforge.waters.gui.command.Command
   public void execute()
   {
-    if (mIsSource) {
-      mEdge.setSource(mNew);
-      mEdge.setStartPoint(mNPos);
-    } else {
-      mEdge.setTarget(mNew);
-      mEdge.setEndPoint(mNPos);
-    }
-    GeometryTools.createDefaultGeometry(mEdge);
-    mSurface.getEditorInterface().setDisplayed();
+    mEdge.setGeometry(mNewGeometry);
+    mEdge.setStartPoint(mNewStart);
+    mEdge.setEndPoint(mNewEnd);
   }
 
   public void undo()
   {
-    if (mIsSource) {
-      mEdge.setSource(mOld);
-      mEdge.setStartPoint(mOPos);
-    } else {
-      mEdge.setTarget(mOld);
-      mEdge.setEndPoint(mOPos);
-    }
-    mEdge.setGeometry(mOldGeo);
-    mSurface.getEditorInterface().setDisplayed();
+    mEdge.setGeometry(mOldGeometry);
+    mEdge.setStartPoint(mOldStart);
+    mEdge.setEndPoint(mOldEnd);
   }
-	
+
   public boolean isSignificant()
   {
     return true;
@@ -107,20 +69,18 @@ public class MoveEdgeCommand
 
   public String getName()
   {
-    return mDescription;
+    return "Edge Reshaping";
   }
 
 
   //#########################################################################
   //# Data Members
-  private final ControlledSurface mSurface;
   private final EdgeSubject mEdge;
-  private final NodeSubject mOld;
-  private final NodeSubject mNew;
-  private final boolean mIsSource;
-  private final PointGeometrySubject mNPos;
-  private final PointGeometrySubject mOPos;
-  private final SplineGeometrySubject mOldGeo;
-  private final String mDescription;	
+  private final SplineGeometrySubject mOldGeometry;
+  private final SplineGeometrySubject mNewGeometry;
+  private final PointGeometrySubject mOldStart;
+  private final PointGeometrySubject mNewStart;
+  private final PointGeometrySubject mOldEnd;
+  private final PointGeometrySubject mNewEnd;
 
 }

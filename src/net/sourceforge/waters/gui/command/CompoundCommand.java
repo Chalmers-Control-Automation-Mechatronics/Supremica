@@ -4,13 +4,13 @@
 //# PACKAGE: net.sourceforge.waters.gui.command
 //# CLASS:   CompoundCommand
 //###########################################################################
-//# $Id: CompoundCommand.java,v 1.6 2007-06-11 15:07:51 robi Exp $
+//# $Id: CompoundCommand.java,v 1.7 2007-08-12 07:55:18 robi Exp $
 //###########################################################################
 
 
 package net.sourceforge.waters.gui.command;
 
-import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
 
@@ -28,16 +28,24 @@ public class CompoundCommand
 
   //#########################################################################
   //# Constructors
+  /**
+   * Creates a new compound command with a default name.
+   */
   public CompoundCommand()
   {
-    this("Compound Command");
+    this(null);
   }
 
+  /**
+   * Creates a new compound command with the given name.
+   * @param  name    The description to be used for the new command,
+   *                 or <CODE>null</CODE> to use a default name.
+   */
   public CompoundCommand(final String name)
   {
     mInProgress = true;
-    mCommands = new ArrayList();
-    mDescription = name;
+    mCommands = new LinkedList<Command>();
+    mDescription = name == null ? "Compound Command" : name;
   }
 
 
@@ -66,10 +74,20 @@ public class CompoundCommand
 
   //#########################################################################
   //# Command Construction
-  public boolean addCommand(Command c)
+  public boolean addCommand(final Command cmd)
   {
-    if (mInProgress && c != null) {
-      mCommands.add(c);
+    if (mInProgress && cmd != null) {
+      mCommands.add(cmd);
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  public boolean addCommands(final List<? extends Command> commands)
+  {
+    if (mInProgress) {
+      mCommands.addAll(commands);
       return true;
     } else {
       return false;
@@ -86,8 +104,8 @@ public class CompoundCommand
   //# Command Execution
   public void execute()
   {
-    for (final Command c : mCommands) {
-      c.execute();
+    for (final Command cmd : mCommands) {
+      cmd.execute();
     }
   }
 

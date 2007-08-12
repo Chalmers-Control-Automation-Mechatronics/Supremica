@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   ControlledSurface
 //###########################################################################
-//# $Id: ControlledSurface.java,v 1.138 2007-08-10 04:34:31 robi Exp $
+//# $Id: ControlledSurface.java,v 1.139 2007-08-12 07:55:18 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.gui;
@@ -198,7 +198,7 @@ public class ControlledSurface
     case EMBEDDER_STOP:
       mEmbedder.removeObserver(this);
       mEmbedder = null;
-      commitSecondaryGraph("Automatic Layout", mIsEmbedderUndoable);
+      commitSecondaryGraph("Automatic Layout", mIsEmbedderUndoable, false);
       clearSecondaryGraph();
       updateTool();
       break;
@@ -329,7 +329,8 @@ public class ControlledSurface
       compound.addCommand(unselect);
     }
     final CreateEdgeCommand create =
-      new CreateEdgeCommand(getGraph(), source, target, start, end);
+      new CreateEdgeCommand(getGraph(), source, target,
+                            start, end, null, null);
     final Command select = new SelectCommand(this, create.getCreatedEdge());
     compound.addCommand(create);
     compound.addCommand(select);
@@ -338,17 +339,16 @@ public class ControlledSurface
   }
 
   /**
-   * Changes the start or end of an edge using a move edge command.
-   */
-  void doMoveEdge(final EdgeSubject edge,
-                  final NodeSubject node,
-                  final boolean isSource,
-                  final Point2D anchor)
+   * Changes the start or end of an edge using a redirect edge command.
+  void doRedirectEdge(final EdgeSubject edge,
+                      final NodeSubject node,
+                      final boolean isSource,
+                      final Point2D anchor)
   {
-    final Command move =
-      new MoveEdgeCommand(this, edge, node, isSource, anchor);
+    final Command move = new RedirectEdgeCommand(edge, node, isSource, anchor);
     mRoot.getUndoInterface().executeCommand(move);
   }
+   */
 
   /**
    * Creates a simple node and selects it.
@@ -551,8 +551,8 @@ public class ControlledSurface
       (SimpleComponentSubject) getGraph().getParent();
     final String name = comp == null ? "graph" : comp.getName();
     final long timeout = Config.GUI_EDITOR_SPRING_EMBEDDER_TIMEOUT.get();
-    mEmbedder = new SpringEmbedder(mSecondaryGraph.getNodeSubjects(),
-                                   mSecondaryGraph.getEdgeSubjects());
+    mEmbedder = new SpringEmbedder(mSecondaryGraph.getNodesModifiable(),
+                                   mSecondaryGraph.getEdgesModifiable());
     mEmbedder.addObserver(this);
     final Thread thread = new Thread(mEmbedder);
     final JDialog dialog =
@@ -1091,17 +1091,16 @@ public class ControlledSurface
     }
   }
 
-  private void commitSecondaryGraph()
-  {
-    commitSecondaryGraph(null, true);
-  }
-
   private void commitSecondaryGraph(final String description,
+                                    final boolean selecting,
                                     final boolean undoable)
   {
     if (mSecondaryGraph != null) {
-      final Command cmd = mSecondaryGraph.createUpdateCommand(description);
-      if (undoable) {
+      final Command cmd =
+        mSecondaryGraph.createUpdateCommand(this, description, selecting);
+      if (cmd == null) {
+        // ignore
+      } else if (undoable) {
         mRoot.getUndoInterface().executeCommand(cmd);
       } else {
         cmd.execute();
@@ -1989,7 +1988,7 @@ public class ControlledSurface
     void commitSecondaryGraph()
     {
       final String description = getCommandDescription();
-      ControlledSurface.this.commitSecondaryGraph(description, true);
+      ControlledSurface.this.commitSecondaryGraph(description, true, true);
     }
 
     //#######################################################################
@@ -3043,45 +3042,8 @@ public class ControlledSurface
         if (mSource != null) {
           doReplaceSelection(mSource);
         }
-      } else if (mSource != null) {
-        // Creating edge ...
-        final Point2D end = findNodeAnchorPoint(node, getDragCurrent());
-        doCreateEdge(mSource, node, mAnchor, end);
       } else {
-        // Moving edge, maybe ...
-        if (node instanceof SimpleNodeSubject) {
-          if (mIsSource) {
-            if (node == mOrigEdge.getSource()) {
-              return;
-            }
-          } else {
-            if (node == mOrigEdge.getTarget()) {
-              return;
-            }
-          }
-          anchor = null;
-        } else if (node instanceof GroupNodeSubject) {
-          final Point current = getDragCurrent();
-          anchor = findNodeAnchorPoint(node, current);
-          if (mIsSource) {
-            if (node == mOrigEdge.getSource() &&
-                mOrigEdge.getStartPoint() != null &&
-                anchor.equals(mOrigEdge.getStartPoint().getPoint())) {
-              return;
-            }
-          } else {
-            if (getGraph().isDeterministic() ||
-                node == mOrigEdge.getTarget() && 
-                mOrigEdge.getEndPoint() != null &&
-                anchor.equals(mOrigEdge.getEndPoint().getPoint())) {
-              return;
-            }
-          }
-        } else {
-          throw new IllegalStateException
-            ("Unknown node type: " + node.getClass().getName() + "!");
-        }
-        doMoveEdge(mOrigEdge, node, mIsSource, anchor);
+        super.commitSecondaryGraph();
       }
     }
 
@@ -3106,14 +3068,30 @@ public class ControlledSurface
     }
 
     //#######################################################################
+    //# Rendering
+    String getCommandDescription()
+    {
+      if (mSource != null) {
+        return "Edge Creation";
+      } else if (mIsSource) {
+        return "Edge Source Change";
+      } else {
+        return "Edge Target Change";
+      }
+    }
+
+    //#######################################################################
     //# Auxiliary Methods
-    void createCopiedEdge()
+    private void createCopiedEdge()
     {
       if (mCopiedEdge == null) {
         if (mSource != null) {
-          mOrigEdge =
-            new EdgeSubject(mSource, null, null, null, null, null, null);
-          mCopiedEdge = mSecondaryGraph.addEdge(mOrigEdge);
+          final NodeSubject source =
+            (NodeSubject) mSecondaryGraph.getCopy(mSource);
+          mCopiedEdge =
+            new EdgeSubject(source, null, null, null, null, null, null);
+          mSecondaryGraph.getEdgesModifiable().add(mCopiedEdge);
+          mOrigEdge = (EdgeSubject) mSecondaryGraph.getOriginal(mCopiedEdge);
           mSelectedObjects =
             Collections.singletonList((ProxySubject) mOrigEdge);
         } else { 

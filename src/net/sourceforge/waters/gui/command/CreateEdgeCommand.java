@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui.command
 //# CLASS:   CreateEdgeCommand
 //###########################################################################
-//# $Id: CreateEdgeCommand.java,v 1.18 2007-05-23 07:23:00 avenir Exp $
+//# $Id: CreateEdgeCommand.java,v 1.19 2007-08-12 07:55:18 robi Exp $
 //###########################################################################
 
 
@@ -16,14 +16,18 @@ import java.awt.geom.Point2D;
 import net.sourceforge.waters.gui.renderer.GeometryTools;
 import net.sourceforge.waters.gui.renderer.LabelBlockProxyShape;
 import net.sourceforge.waters.model.base.Proxy;
+import net.sourceforge.waters.model.module.GuardActionBlockProxy;
+import net.sourceforge.waters.model.module.LabelBlockProxy;
+import net.sourceforge.waters.model.module.ModuleProxyCloner;
 import net.sourceforge.waters.model.module.SimpleNodeProxy;
-import net.sourceforge.waters.subject.module.GuardActionBlockSubject;
-import net.sourceforge.waters.subject.module.PointGeometrySubject;
 import net.sourceforge.waters.subject.module.EdgeSubject;
-import net.sourceforge.waters.subject.module.LabelGeometrySubject;
-import net.sourceforge.waters.subject.module.LabelBlockSubject;
-import net.sourceforge.waters.subject.module.NodeSubject;
 import net.sourceforge.waters.subject.module.GraphSubject;
+import net.sourceforge.waters.subject.module.GuardActionBlockSubject;
+import net.sourceforge.waters.subject.module.LabelBlockSubject;
+import net.sourceforge.waters.subject.module.LabelGeometrySubject;
+import net.sourceforge.waters.subject.module.ModuleSubjectFactory;
+import net.sourceforge.waters.subject.module.NodeSubject;
+import net.sourceforge.waters.subject.module.PointGeometrySubject;
 
 
 /**
@@ -53,12 +57,18 @@ public class CreateEdgeCommand
    *                   This parameter is ignored and should be
    *                   <CODE>null</CODE> unless the edge's target is a group
    *                   node.
+   * @param labelBlock The label block for the new edge, or <CODE>null</CODE>
+   *                   to create an empty one. To be cloned.     
+   * @param gaBlock    The guard/action block for the new edge,
+   *                   or <CODE>null</CODE>. To be cloned.     
    */
   public CreateEdgeCommand(final GraphSubject graph,
                            final NodeSubject source,
                            final NodeSubject target,
                            final Point2D startPoint,
-                           final Point2D endPoint)
+                           final Point2D endPoint,
+                           final LabelBlockProxy labelBlock,
+                           final GuardActionBlockProxy gaBlock)
   {
     mGraph = graph;
     final PointGeometrySubject startGeo;
@@ -73,11 +83,20 @@ public class CreateEdgeCommand
     } else {
       endGeo = new PointGeometrySubject(endPoint);
     }
-    final LabelGeometrySubject offset =
-      new LabelGeometrySubject(new Point(LabelBlockProxyShape.DEFAULTOFFSETX,
-                                         LabelBlockProxyShape.DEFAULTOFFSETY));
-    final LabelBlockSubject labelBlock = new LabelBlockSubject(null, offset);
-    mCreated = new EdgeSubject(source, target, labelBlock, null,
+    final ModuleProxyCloner cloner = ModuleSubjectFactory.getCloningInstance();
+    final LabelBlockSubject labelClone;
+    if (labelBlock == null) {
+      final LabelGeometrySubject offset =
+        new LabelGeometrySubject
+        (new Point(LabelBlockProxyShape.DEFAULTOFFSETX,
+                   LabelBlockProxyShape.DEFAULTOFFSETY));
+      labelClone = new LabelBlockSubject(null, offset);
+    } else {
+      labelClone = (LabelBlockSubject) cloner.getClone(labelBlock);
+    }
+    final GuardActionBlockSubject gaClone =
+      (GuardActionBlockSubject) cloner.getClone(gaBlock);
+    mCreated = new EdgeSubject(source, target, labelClone, gaClone,
                                null, startGeo, endGeo);
     GeometryTools.createDefaultGeometry(mCreated);
   }
