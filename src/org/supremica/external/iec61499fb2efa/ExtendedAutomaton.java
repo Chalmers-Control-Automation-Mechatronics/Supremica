@@ -29,17 +29,6 @@ import java.util.LinkedList;
 import java.util.ArrayList;
 import java.util.Iterator;
 
-import java.io.Reader;
-import java.io.StringReader;
-import java_cup.runtime.Scanner;
-import net.sourceforge.fuber.model.interpreters.Finder;
-import net.sourceforge.fuber.model.interpreters.Printer;
-import net.sourceforge.fuber.model.interpreters.efa.Lexer;
-import net.sourceforge.fuber.model.interpreters.efa.Parser;
-import net.sourceforge.fuber.model.interpreters.abstractsyntax.Goal;
-import net.sourceforge.fuber.model.interpreters.abstractsyntax.StatementList;
-import net.sourceforge.fuber.model.interpreters.abstractsyntax.Expression;
-
 import net.sourceforge.waters.subject.module.ModuleSubjectFactory;
 import net.sourceforge.waters.subject.module.IdentifierSubject;
 import net.sourceforge.waters.subject.module.ModuleSubject;
@@ -82,8 +71,6 @@ public class ExtendedAutomaton
 
 	private ExpressionParser parser;
 
-	private boolean expandActions = false;
-
 	public ExtendedAutomaton(String name, ExtendedAutomata automata)
 	{
 		this.name = name;
@@ -101,38 +88,22 @@ public class ExtendedAutomaton
 		parser = new ExpressionParser(factory, CompilerOperatorTable.getInstance());
 	}
 
-	public ExtendedAutomaton(String name, ExtendedAutomata automata, boolean expand) 
-	{
-		this.name = name;
+// 	public ExtendedAutomaton(String name, ComponentKind kind, ExtendedAutomata automata) 
+// 	{
+// 		this.name = name;
 
-		factory = ModuleSubjectFactory.getInstance();
+// 		factory = ModuleSubjectFactory.getInstance();
 		
-		this.automata = automata;
+// 		this.automata = automata;
 		
-		module = automata.getModule();
+// 		module = automata.getModule();
 
-		identifier = factory.createSimpleIdentifierProxy(name);
-		graph = factory.createGraphProxy();
-		component = factory.createSimpleComponentProxy(identifier, ComponentKind.PLANT, graph);
+// 		identifier = factory.createSimpleIdentifierProxy(name);
+// 		graph = factory.createGraphProxy();
+// 		component = factory.createSimpleComponentProxy(identifier, kind, graph);
 
-		parser = new ExpressionParser(factory, CompilerOperatorTable.getInstance());
-
-		expandActions = expand;
-	}
-
-	public ExtendedAutomaton(String name, ComponentKind kind, ExtendedAutomata automata) 
-	{
-		factory = ModuleSubjectFactory.getInstance();
-		
-		this.automata = automata;
-		
-		module = automata.getModule();
-
-		identifier = factory.createSimpleIdentifierProxy(name);
-		graph = factory.createGraphProxy();
-		component = factory.createSimpleComponentProxy(identifier, kind, graph);
-	}
-
+// 		parser = new ExpressionParser(factory, CompilerOperatorTable.getInstance());
+// 	}
 
 	protected SimpleComponentSubject getComponent()
 	{
@@ -188,18 +159,6 @@ public class ExtendedAutomaton
 	 * @param actionIn action expression for the transition
 	 */
 	public void addTransition(String from, String to, String label, String guardIn, String actionIn)
-	{
-		if (expandActions)
-		{
-			addExtendedTransition(from, to, label, guardIn, actionIn);
-		}
-		else
-		{
-			addNormalTransition(from, to, label, guardIn, actionIn);
-		}
-	}
-
-	private void addNormalTransition(String from, String to, String label, String guardIn, String actionIn)
 	{
 		SimpleNodeSubject fromNode = (SimpleNodeSubject) graph.getNodesModifiable().get(from);
 		if (fromNode == null)
@@ -316,56 +275,5 @@ public class ExtendedAutomaton
 			
 		EdgeSubject newEdge = factory.createEdgeProxy(fromNode, toNode, labelBlock, guardActionBlock, null, null, null);
 		graph.getEdgesModifiable().add(newEdge);	
-	}
-
-	private void addExtendedTransition(String from, String to, String label, String guardIn, String actionIn)
-	{
-		// this is done here for now
-		addNormalTransition(from, to, label, guardIn, actionIn);
-		
-		if (actionIn != null)
-		{
-			StringReader stringReader = new StringReader(actionIn);
-			Lexer lexer = new Lexer((Reader) stringReader);
-			Parser parser = new Parser((Scanner) lexer);
-			Goal syntaxTree = null;
-			try
-			{
-				syntaxTree = (Goal) parser.parse().value;
-			}
-			catch(Exception e)
-			{
-				System.out.println("ExtendedAutomaton.addExtendedTransition(): Couldn't parse the action!");
-				System.out.println("\t automaton: " + name);
-				System.out.print("\t from: " + from);
-				System.out.println(" to: " + to);
-				System.out.println("\t label: " + label);
-				System.out.println("\t guard: " + guardIn);
-				System.out.println("\t action: " + actionIn);
-				System.exit(1);
-			}
-			
-			if (syntaxTree instanceof StatementList)
-			{
-				//Printer printer = new Printer(System.out, " ");
-				//printer.print(syntaxTree,0);
-				Finder finder = new Finder(syntaxTree);
-
-
-				Set assignmentIdents = finder.getAssignmentIdentifiers();
-				Set expressionIdents = finder.getExpressionIdentifiers();
-			}
-			else if (syntaxTree instanceof Expression)
-			{
-				System.out.println("ExtendedAutomaton.addExtendedTransition(): Couln't parse the action!");
-				System.out.println("\t automaton: " + name);
-				System.out.print("\t from: " + from);
-				System.out.println(" to: " + to);
-				System.out.println("\t label: " + label);
-				System.out.println("\t guard: " + guardIn);
-				System.out.println("\t action: " + actionIn);
-				System.exit(1);
-			}
-		}
 	}
 }

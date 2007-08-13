@@ -50,12 +50,13 @@ import net.sourceforge.fuber.xsd.libraryelement.*;
 class ModelMaker
 {
 
-	private static final int ERROR = -2;
-	private static final int WARN = -1;
-	private static final int QUIET = 0;
-	private static final int INFO = 1;
-	private static final int DEBUG = 2;
+	static final int ERROR = -2;
+	static final int WARN = -1;
+	static final int QUIET = 0;
+	static final int INFO = 1;
+	static final int DEBUG = 2;
 	private static int verboseLevel = INFO;
+	private static boolean expandTransitions = false;
 
     private JAXBContext iecContext;
     private Unmarshaller iecUnmarshaller;
@@ -127,6 +128,10 @@ class ModelMaker
 
 		for (int i = 0; i < args.length; i++)
 		{
+			if (args[i].equals("-e"))
+			{
+				expandTransitions = true;
+			}
 			if (args[i].equals("-d"))
 			{
 				verboseLevel = DEBUG;
@@ -304,7 +309,7 @@ class ModelMaker
 		
 		output("ModelMaker.makeModel(): Generating Model ---------------------------------------");
 
- 		automata = new ExtendedAutomata(theSystem.getName());
+ 		automata = new ExtendedAutomata(theSystem.getName(), expandTransitions);
 
 		makeStartup();
 
@@ -338,6 +343,7 @@ class ModelMaker
 // 		test2.addTransition("s0","s1","e1;e2;","var1 == 1","var1  = 4;");
 // 		automata.addAutomaton(test2);
 
+		output("ModelMaker.makeModel(): Writing Model ------------------------------------------");
 		automata.writeToFile(new File(outputFileName));
 	}
 
@@ -880,7 +886,7 @@ class ModelMaker
 		String cntFB = getInstanceName(cntName);
 		String cntSignal = getSignalName(cntName);
 		Integer cntSignalID = (Integer) ((Map) events.get(cntFB)).get(cntSignal);
-		String action = "receiveing_event_" + cntFB + "=" + cntSignalID + ";";	
+		String action = "receiveing_event_" + cntFB + " = " + cntSignalID + ";";	
 		startup.addTransition(from, to, event, null, action);
 		
 		from = to;
@@ -1762,7 +1768,7 @@ class ModelMaker
 								String cntFB = getInstanceName(cntName);
 								String cntSignal = getSignalName(cntName);
 								Integer cntSignalID = (Integer) ((Map) events.get(cntFB)).get(cntSignal);
-								action = "receiveing_event_" + cntFB + "=" + cntSignalID + ";";						
+								action = "receiveing_event_" + cntFB + " = " + cntSignalID + ";";						
 								output(DEBUG, "Adding transition: from: " + from + ", to: " + to + ", event: " + event, level);
 								ecc.addTransition(from, to, event, null, action);
 								next = to;						
@@ -1803,7 +1809,7 @@ class ModelMaker
 							String cntFB = getInstanceName(cntName);
 							String cntSignal = getSignalName(cntName);
 							Integer cntSignalID = (Integer) ((Map) events.get(cntFB)).get(cntSignal);
-							action = "receiveing_event_" + cntFB + "=" + cntSignalID + ";";						
+							action = "receiveing_event_" + cntFB + " = " + cntSignalID + ";";						
 							output(DEBUG, "Adding transition: from: " + from + ", to: " + to + ", event: " + event, level);
 							ecc.addTransition(from, to, event, null, action);
 							next = to;						
@@ -2081,7 +2087,7 @@ class ModelMaker
 
 	private ExtendedAutomaton getNewAutomaton(String name)
 	{
-		return new ExtendedAutomaton(name, automata, true);
+		return new ExtendedAutomaton(name, automata);
 	}
 
 	private void printFunctionBlocksMap()
@@ -2207,22 +2213,22 @@ class ModelMaker
 		}
 	}
 	
-	private static void output(String text)
+	static void output(String text)
 	{
 		output(INFO, text, 0);
 	}
 
-	private static void output(int verboseLevel, String text)
+	static void output(int verboseLevel, String text)
 	{
 		output(verboseLevel, text, 0);
 	}
 
-	private static void output(String text, int indentLevel)
+	static void output(String text, int indentLevel)
 	{
 		output(INFO, text, indentLevel);
 	}
 
-	private static void output(int verboseLevel, String text, int indentLevel)
+	static void output(int verboseLevel, String text, int indentLevel)
 	{
 		if (verboseLevel <= ModelMaker.verboseLevel)
 		{
