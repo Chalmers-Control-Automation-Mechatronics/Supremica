@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui.command
 //# CLASS:   CreateEdgeCommand
 //###########################################################################
-//# $Id: CreateEdgeCommand.java,v 1.19 2007-08-12 07:55:18 robi Exp $
+//# $Id: CreateEdgeCommand.java,v 1.20 2007-08-13 23:49:19 robi Exp $
 //###########################################################################
 
 
@@ -72,13 +72,13 @@ public class CreateEdgeCommand
   {
     mGraph = graph;
     final PointGeometrySubject startGeo;
-    if (source instanceof SimpleNodeProxy) {
+    if (source instanceof SimpleNodeProxy || startPoint == null) {
       startGeo = null;
     } else {
       startGeo = new PointGeometrySubject(startPoint);
     }
     final PointGeometrySubject endGeo;
-    if (target instanceof SimpleNodeProxy) {
+    if (target instanceof SimpleNodeProxy || endPoint == null) {
       endGeo = null;
     } else {
       endGeo = new PointGeometrySubject(endPoint);

@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   EditorGraph
 //###########################################################################
-//# $Id: EditorGraph.java,v 1.22 2007-08-12 07:55:18 robi Exp $
+//# $Id: EditorGraph.java,v 1.23 2007-08-13 23:49:19 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.gui;
@@ -346,7 +346,8 @@ public class EditorGraph
       GroupNodeSubject group1 = group0.clone();
       mNodes.add(group1);
       mObserverMap.put(group1, new EditorGroupNode(group1));
-      final ChangeRecord record = new GroupNodeChangeRecord(group0, group1);
+      final ChangeRecord record =
+        new GroupNodeChangeRecord(group0, group1);
       addChangeRecord(record);
     }
   }
@@ -356,7 +357,8 @@ public class EditorGraph
     final SimpleNodeSubject node1 = node0.clone();
     mNodes.add(node1);
     mObserverMap.put(node1, new EditorSimpleNode(node1));
-    final ChangeRecord record = new SimpleNodeChangeRecord(node0, node1);
+    final ChangeRecord record =
+      new SimpleNodeChangeRecord(node0, node1);
     addChangeRecord(record);
   }
 
@@ -721,9 +723,23 @@ public class EditorGraph
           final ChangeRecord record = mFakeMap.get(group);
           record.setChangeKind(ModelChangeEvent.GEOMETRY_CHANGED);
         } else if (esource == mNodes) {
-          final NodeSubject node = (NodeSubject) event.getValue();
-          mChangeRecordCreator.createChangeRecord
-            (node, ModelChangeEvent.ITEM_ADDED);
+          final Object node = event.getValue();
+          if (node instanceof SimpleNodeSubject) {
+            final SimpleNodeSubject simple = (SimpleNodeSubject) node;
+            mObserverMap.put(simple, new EditorSimpleNode(simple));
+            final ChangeRecord record = new SimpleNodeChangeRecord
+              (null, simple, ModelChangeEvent.ITEM_ADDED);
+            addChangeRecord(record);
+          } else if (node instanceof GroupNodeSubject) {
+            final GroupNodeSubject group = (GroupNodeSubject) node;
+            mObserverMap.put(group, new EditorGroupNode(group));
+            final ChangeRecord record = new GroupNodeChangeRecord
+              (null, group, ModelChangeEvent.ITEM_ADDED);
+            addChangeRecord(record);
+          } else {
+            throw new ClassCastException("Adding unknown node type: " +
+                                         node.getClass().getName());
+          }
         } else if (esource == mEdges) {
           final EdgeSubject edge = (EdgeSubject) event.getValue();
           final ChangeRecord record =

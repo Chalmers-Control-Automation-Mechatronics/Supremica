@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   ControlledSurface
 //###########################################################################
-//# $Id: ControlledSurface.java,v 1.140 2007-08-12 10:47:08 robi Exp $
+//# $Id: ControlledSurface.java,v 1.141 2007-08-13 23:49:19 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.gui;
@@ -921,22 +921,6 @@ public class ControlledSurface
       point = mCurrentPoint;
     }
     return findGrid(point);
-  }
-
-  private Point2D findNodeAnchorPoint(final NodeSubject node,
-                                      final Point2D click)
-  {
-    if (node instanceof SimpleNodeSubject) {
-      final SimpleNodeSubject simple = (SimpleNodeSubject) node;
-      return simple.getPointGeometry().getPoint();
-    } else if (node instanceof GroupNodeSubject) {
-      final GroupNodeSubject group = (GroupNodeSubject) node;
-      final Rectangle2D rect = group.getGeometry().getRectangle();
-      return GeometryTools.findIntersection(rect, click);
-    } else {
-      throw new ClassCastException
-        ("Unknown node type: " + node.getClass().getName() + "!");
-    }
   }
 
   private boolean overlap(Shape s1, Shape s2)
@@ -2952,7 +2936,7 @@ public class ControlledSurface
     {
       super(event);
       mSource = (NodeSubject) mFocusedObject;
-      mAnchor = findNodeAnchorPoint(mSource, getDragStart());
+      mAnchor = GeometryTools.getDefaultPosition(mSource, getDragStart());
       mIsSource = false;
       mOrigEdge = null;
       mCanCreateSelfloop = false;
@@ -3088,8 +3072,12 @@ public class ControlledSurface
         if (mSource != null) {
           final NodeSubject source =
             (NodeSubject) mSecondaryGraph.getCopy(mSource);
+          final PointGeometrySubject geo =
+            source instanceof GroupNodeSubject ?
+            new PointGeometrySubject(mAnchor) :
+            null;
           mCopiedEdge =
-            new EdgeSubject(source, null, null, null, null, null, null);
+            new EdgeSubject(source, null, null, null, null, geo, null);
           mSecondaryGraph.getEdgesModifiable().add(mCopiedEdge);
           mOrigEdge = (EdgeSubject) mSecondaryGraph.getOriginal(mCopiedEdge);
           mSelectedObjects =
