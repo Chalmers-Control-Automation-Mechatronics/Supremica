@@ -87,53 +87,68 @@ public class RandomPathUsingMilp
             if (nrOfRandomTrials > 0) 
             {
                 nrOfRandomTrials--;
+                
+                // Initialize the variable array if not already done
                 if (currBoolCombination == null)
                 {
                     currBoolCombination = new int[boolVarList.size()];
                 }
-
+                
+                // At each new attempt, initialize all variable values to -1
                 for (int i = 0; i < currBoolCombination.length; i++)
                 {
-                    currBoolCombination[i] = (int) Math.round(Math.random());
-                }
-            }
-            // Else start systematic looping through all combinations of boolean variables 
-            // (the first combination is that all variables are zero).
-            else if (nrOfRandomTrials == 0) // Set all boolean variables to 0
-            {
-                nrOfRandomTrials--;
-                if (currBoolCombination == null)
-                {
-                    currBoolCombination = new int[boolVarList.size()];
+                    currBoolCombination[i] = -1;
                 }
 
+                // Assign variable values randomly, if not already done (i.e. if there are equal to -1) 
                 for (int i = 0; i < currBoolCombination.length; i++)
                 {
-                    currBoolCombination[i] = 0;
-                }
-            }
-            // Continue the systematic looping through the variable combinations. 
-            else // Update boolean variables 
-            {
-                for (int i = 0; i < currBoolCombination.length; i++)
-                {
-                    if (currBoolCombination[i] == 0)
+                    if (currBoolCombination[i] == -1)
                     {
-                        currBoolCombination[i] = 1;
-                        break;
-                    }
-                    else
-                    {
-                        currBoolCombination[i] = 0;
-                    }
-
-                    // If all boolean combinations have been tested, an exception is thrown, terminating the loop.
-                    if ((i == currBoolCombination.length - 1) && (currBoolCombination[i] == 0))
-                    {
-                        throw new Exception("All combinations of boolean variables were tested, no path found.");
+                        currBoolCombination[i] = (int) Math.round(Math.random());
+                        
+                        // Cross-couple
                     }
                 }
             }
+// TEMP: temporarily outcommented, only random trials for the moment.
+//            // Else start systematic looping through all combinations of boolean variables 
+//            // (the first combination is that all variables are zero).
+//            else if (nrOfRandomTrials == 0) // Set all boolean variables to 0
+//            {
+//                nrOfRandomTrials--;
+//                if (currBoolCombination == null)
+//                {
+//                    currBoolCombination = new int[boolVarList.size()];
+//                }
+//
+//                for (int i = 0; i < currBoolCombination.length; i++)
+//                {
+//                    currBoolCombination[i] = 0;
+//                }
+//            }
+//            // Continue the systematic looping through the variable combinations. 
+//            else // Update boolean variables 
+//            {
+//                for (int i = 0; i < currBoolCombination.length; i++)
+//                {
+//                    if (currBoolCombination[i] == 0)
+//                    {
+//                        currBoolCombination[i] = 1;
+//                        break;
+//                    }
+//                    else
+//                    {
+//                        currBoolCombination[i] = 0;
+//                    }
+//
+//                    // If all boolean combinations have been tested, an exception is thrown, terminating the loop.
+//                    if ((i == currBoolCombination.length - 1) && (currBoolCombination[i] == 0))
+//                    {
+//                        throw new Exception("All combinations of boolean variables were tested, no path found.");
+//                    }
+//                }
+//            }
 
             // Write current values of the boolean variables to the "model"-file
             for (int i = 0; i < currBoolCombination.length; i++)

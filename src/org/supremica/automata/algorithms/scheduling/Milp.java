@@ -102,13 +102,51 @@ public class Milp
     /** The output string */
     private String outputStr = "";
     
-    /** The constrainst represented by external specifications, in string form. */
+    /** The string containing precedence constraints */
+    private String precConstraints = "";
+
+    /** The string containing initial (precedence) constraints */
+    private String initPrecConstraints = "";
+
+    /** The string containing mutex constraints */
+    private String mutexConstraints = "";
+
+    /** The string containing mutex variables */
+    private String mutexVariables = "";
+
+    /** The string containg alternative paths constraints */
+    private String altPathsConstraints = "";
+
+    /** The string containing alternative paths variables */
+    private String altPathsVarDecl = "";
+
+    /** The string containing the cycle time constraints */
+    private String cycleTimeConstraints = "";
+
+    /** The string containing times for each state (delta-times) */
+    private String deltaTimeStr = "param deltaTime default 0\n:";
+    
+    /** The constraints represented by external specifications, in string form. */
     private String externalConstraints = "";
+    
+    /** 
+     * The constraints preventing cross-booking of zone pairs. When R_i first
+     * books Z_k and then Z_l (without unbooking Z_k), while R_j does the reverse 
+     * (Z_l -> Z_k), the robot robot ordering should then be the same for Z_k and 
+     * Z_l to avoid deadlock. This is taken care of during the optimization, but 
+     * with the help of these constraints, the search field is narrowed, which 
+     * should decrease the running time. Also, approximative solutions are easier 
+     * to obtains using these constraints. 
+     */
+    private String nonCrossbookingConstraints = "";
     
     /**
      *  The declaration of variables, used in internal ordering of precedence constraints.
      **/
     private String internalPrecVarDecl = "";
+    
+    /** The maximum number of time variables in any plant */ 
+    private int nrOfTics = 0;
     
     /*
      * The thread that performs the search for the optimal solution
@@ -197,16 +235,11 @@ public class Milp
      */
     public void schedule()
         throws Exception
-    {
-//        ActionTimer totalTimer = new ActionTimer();
-//        ActionTimer partTimer = new ActionTimer();
-        
+    {       
         long totalTime = 0;
         
         if (isRunning)
         {
-//            totalTimer.restart();
-//            partTimer.restart();
             timer.restart();
             initialize();
         }
@@ -214,21 +247,18 @@ public class Milp
         // Converts automata to constraints that the MILP-solver takes as input (*.mod file)
         if (isRunning)
         {
-            //TODO:temp
-//            int anr = scheduleDialog.getIde().getIDE().getActiveProject().getAutomata().size();
+            createExternalConstraints();           
+            createBasicConstraints();
             
-            convertAutomataToMilp();
+            //new... test... (should be called when mutex constraints already are created)
+            //TODO: better name...
+            createNonCrossbookingConstraintsNew();
+            
+            writeToMilpFile();
             
             long procTime = timer.elapsedTime();
             logger.info("Pre-processing time = " + procTime + "ms");
             totalTime += procTime;
-        }
-        
-        //new... test...
-        if (isRunning)
-        {
-            //temp-bortkommat
-            createNonCrossbookingConstraintsNew();
         }
         
         // Calls the MILP-solver
@@ -488,7 +518,6 @@ public class Milp
             {
                 if (smallestTime != makespan)
                 {
-                    logger.info("curroptimalevent = " + currOptimalEvent.getName());
                     throw new Exception("Makespan value does NOT correspond to the cost of the final state of the schedule (sched_time = " + smallestTime + "; makespan = " + makespan + "). Something went wrong...");
                 }
                 
@@ -1648,9 +1677,6 @@ public class Milp
     private void createNonCrossbookingConstraintsNew()
         throws Exception
     {       
-        //temp
-        logger.warn("CREATE_NON_CROSSBOOKING_CONSTRAINTS NOW...");
-        
         // Each entry of this map contains an ArrayList of pairs of consecutive 
         // booking states, e.g. [Z1_b_index Z2_b_index]. These states are local to some plant, 
         // e.g. Pi, and mean that Pi can book Z1 in the state corresponding to Z1_b_index 
@@ -1680,30 +1706,7 @@ public class Milp
                 }
             }
         }
-        
-        //temp-test
-        for (Iterator<int[]> keysIt = consecutiveBookingTicsIndices.keySet().iterator(); keysIt.hasNext();)
-        {
-            int[] key = keysIt.next();
-            String stre = "key: ";
-            for (int i = 0; i < key.length; i++)
-            {
-                stre += key[i] + " ";
-            }
-            stre += ": ";
-            
-            for (int[] tic : consecutiveBookingTicsIndices.get(key))
-            {
-                for (int i = 0; i < tic.length; i++)
-                {    
-                    stre += bookingTics[key[i+1]][key[0]][STATE_SWITCH][tic[i]] + " ";
-                }
-                stre += ", ";
-            }
-            logger.error("consecutiveBookings = " + stre);
-        }
-        //...temp-test
-        
+                
         // Find the consecutive bookings that are made reversely by different plants
         // Check for (almost) all combinations of z1&z2 
         int counter = 1;
@@ -1731,24 +1734,6 @@ public class Milp
                                 ArrayList<int[]> consecutiveTicsP2 = consecutiveBookingTicsIndices.get(new int[]{p2, z2, z1});
                                 if (consecutiveTicsP2 != null) 
                                 {    
-                                    //temp-test
-                                    String str = "Found match... ";
-                                    for (int[] inP1 : consecutiveTicsP1)
-                                    {
-                                        str += bookingTics[z1][p1][STATE_SWITCH][inP1[0]] + " ";
-                                        str += bookingTics[z2][p1][STATE_SWITCH][inP1[1]] + " ";
-                                        str += ", ";
-                                    }
-                                    str += "; ";
-                                    for (int[] inP2 : consecutiveTicsP2)
-                                    {
-                                        str += bookingTics[z2][p2][STATE_SWITCH][inP2[0]] + " ";
-                                        str += bookingTics[z1][p2][STATE_SWITCH][inP2[1]] + " ";
-                                        str += ", ";
-                                    }
-                                    logger.warn(str);                                        
-                                    //...temp-test
-
                                     for (int[] tic1 : consecutiveTicsP1)
                                     {
                                         // Find nearest upwards path splits for each consecutive booking
@@ -1776,8 +1761,8 @@ public class Milp
                                             }
                                         }
 
-                                        String noncrossConstrStr = "";
-                                        String dualNoncrossConstrStr = "";
+                                        String nonCrossConstrStr = "";
+                                        String dualNonCrossConstrStr = "";
                                         ArrayList<int[]> pathSplitInfosP2 = new ArrayList<int[]>();
                                         for (int[] tic2 : consecutiveTicsP2)
                                         {          
@@ -1788,28 +1773,28 @@ public class Milp
                                                 // z1 -> z2, while tic1 represents z2 -> z1
                                                 int dualZInd = tic2.length - 1 - zInd;
 
-                                                noncrossConstrStr += "r" + p1 + "_books_z" + zoneIndices[zInd] + "_before_r" + p2;
-                                                dualNoncrossConstrStr += "r" + p1 + "_books_z" + zoneIndices[dualZInd] + "_before_r" + p2;
+                                                nonCrossConstrStr += "r" + p1 + "_books_z" + zoneIndices[zInd] + "_before_r" + p2;
+                                                dualNonCrossConstrStr += "r" + p1 + "_books_z" + zoneIndices[dualZInd] + "_before_r" + p2;
 
                                                 // If there is a "var_x"-appendix corresponding to the current variable, it should be appended 
                                                 Integer varCounter = mutexVarCounterMap.get(new int[]{zoneIndices[zInd], p1, p2, 
                                                         tic1[zInd], tic2[dualZInd]});
                                                 if (varCounter != null)
                                                 {
-                                                    noncrossConstrStr += "_var" + varCounter;
+                                                    nonCrossConstrStr += "_var" + varCounter;
                                                 }
                                                 // If there is a "var_x"-appendix corresponding to the dual variable, it should be appended 
                                                 varCounter = mutexVarCounterMap.get(new int[]{zoneIndices[dualZInd], p1, p2, 
                                                         tic1[dualZInd], tic2[zInd]});
                                                 if (varCounter != null)
                                                 {
-                                                    dualNoncrossConstrStr += "_var" + varCounter;
+                                                    dualNonCrossConstrStr += "_var" + varCounter;
                                                 }
 
-                                                if (! noncrossConstrStr.contains(">="))
+                                                if (! nonCrossConstrStr.contains(">="))
                                                 {
-                                                    noncrossConstrStr = "non_crossbooking_" + counter + " : " + noncrossConstrStr + " >= ";
-                                                    dualNoncrossConstrStr = "non_crossbooking_" + counter++ + "_dual : " + dualNoncrossConstrStr + " >= ";
+                                                    nonCrossConstrStr = "non_crossbooking_" + counter + " : " + nonCrossConstrStr + " >= ";
+                                                    dualNonCrossConstrStr = "non_crossbooking_" + counter++ + "_dual : " + dualNonCrossConstrStr + " >= ";
                                                 }
 
                                                 int stateIndex = bookingTics[zInd][p2][STATE_SWITCH][tic1[zInd]];
@@ -1834,23 +1819,17 @@ public class Milp
 
                                             if ((pathSplitCounterP1 + pathSplitCounterP2) > 0)  
                                             {
-                                                noncrossConstrStr += " - bigM*(" + (pathSplitCounterP1 + pathSplitCounterP2) + 
+                                                nonCrossConstrStr += " - bigM*(" + (pathSplitCounterP1 + pathSplitCounterP2) + 
                                                         pathSplitStrP1 + pathSplitStrP2 + ")";
-                                                dualNoncrossConstrStr += " - bigM*(" + (pathSplitCounterP1 + pathSplitCounterP2) + 
+                                                dualNonCrossConstrStr += " - bigM*(" + (pathSplitCounterP1 + pathSplitCounterP2) + 
                                                         pathSplitStrP1 + pathSplitStrP2 + ")";
                                             }
 
-                                            noncrossConstrStr += ";\n";
-                                            dualNoncrossConstrStr += ";\n";
+                                            nonCrossbookingConstraints += nonCrossConstrStr + ";\n";
+                                            nonCrossbookingConstraints += dualNonCrossConstrStr + ";\n";
                                         }
 
-                                        //temp
-                                        logger.warn("str = " + noncrossConstrStr);
-                                        logger.warn("dual_str = " + dualNoncrossConstrStr);
-
-                                        //TODO: lägg in constr-stängen i MILP-en och testa optimera
-                                        //TODO: gör så att dessa begr. aldrig bryts vid random-MILP
-                                        //TODO: testa om "var" funkar bra (orka?)
+                                        //TODO: gör så att dessa begr. alltid följs vid random-MILP
                                         //TODO: dokumentera i /tankar/milp.tex
                                         //TODO: VelocityBalansering
                                         //TODO: Vad lämnade Hugo för smaskens?
@@ -2172,12 +2151,6 @@ public class Milp
                 }
             }
         }
-        
-        //temp
-        if (bookingStateSequences.size() > 0)
-        {
-            logger.error("found " + bookingStateSequences.size() + " sequences");
-        }
 
         return bookingStateSequences;
     }
@@ -2191,57 +2164,27 @@ public class Milp
      * Precedence, Mutual Exclusion, Cycle Time and Alternative Path constraints are
      * constructed.
      */
-    protected void convertAutomataToMilp()
+    protected void createBasicConstraints()
     throws Exception
     {        
         int nrOfPlants = plants.size();
-        int nrOfZones = zones.size();
-        
-        // The string containing precedence constraints
-        String precConstraints = "";
-        
-        // The string containing initial (precedence) constraints
-        String initPrecConstraints = "";
-        
-        // The string containing mutex constraints
-        String mutexConstraints = "";
-        
-        // The string containing mutex variables
-        String mutexVariables = "";
-        
-        // The string containg alternative paths constraints
-        String altPathsConstraints = "";
-        
-        // The string containing alternative paths variables
-        String altPathsVarDecl = "";
-        
-        // The string containing the cycle time constraints
-        String cycleTimeConstraints = "";
-        
-        // The string containing times for each state (delta-times)
-        String deltaTimeStr = "param deltaTime default 0\n:";
-        
-        
-        ////////////////////////////////////////////////////////////////////////////////////
-        //	                          The constructing part                               //
-        ////////////////////////////////////////////////////////////////////////////////////
-        
-        // prec_temp
-        createExternalConstraints();
-        
-        // Finding maximum number of time variables per plant (i.e. max nr of states)
-        int nrOfTics = 0;
+        int nrOfZones = zones.size();        
+              
+        // Finding the maximum number of time variables in any plant (i.e. max nr of states)
         for (int i=0; i<nrOfPlants; i++)
         {
             int nbrOfStates = plants.getAutomatonAt(i).nbrOfStates();
             if (nbrOfStates > nrOfTics)
+            {
                 nrOfTics = nbrOfStates;
+            }
         }
         
         // Making deltaTime-header
         for (int i=0; i<nrOfTics; i++)
+        {
             deltaTimeStr += "\t\t" + i;
-        
+        }
         deltaTimeStr += " :=\n";
         
         // Extracting deltaTimes for each plant
@@ -2539,11 +2482,11 @@ public class Milp
                 }
             }
         }
+    }
         
-        ////////////////////////////////////////////////////////////////////////////////////
-        //	                          The writing part                                    //
-        ////////////////////////////////////////////////////////////////////////////////////
-        
+    private void writeToMilpFile()
+        throws Exception
+    {   
         BufferedWriter w = new BufferedWriter(new FileWriter(modelFile));
         
         // Definitions of parameters
@@ -2596,10 +2539,7 @@ public class Milp
         // The cycle time constraints
         w.newLine();
         w.write(cycleTimeConstraints);
-        
-        // 		w.write("cycle_time{r in Plants}: c >= time[r, maxTic];");
-        // 		w.newLine();
-        
+               
         // The initial (precedence) constraints
         w.newLine();
         w.write(initPrecConstraints);
@@ -2620,6 +2560,10 @@ public class Milp
         w.write(externalConstraints);
         w.newLine();
         
+        // The constraints preventing cross-booking of zone pairs 
+        w.write(nonCrossbookingConstraints);
+        w.newLine();
+        
         // The end of the model-section and the beginning of the data-section
         w.newLine();
         w.write("data;");
@@ -2627,13 +2571,12 @@ public class Milp
         
         // The numbers of plants resp. zones are given
         w.newLine();
-        w.write("param nrOfPlants := " + (nrOfPlants - 1) + ";");
+        w.write("param nrOfPlants := " + (plants.size() - 1) + ";");
         w.newLine();
-        w.write("param nrOfZones := " + (nrOfZones - 1) + ";");
+        w.write("param nrOfZones := " + (zones.size() - 1) + ";");
         w.newLine();
         w.write("param bigM := " + BIG_M_VALUE + ";");
         w.newLine();
-        // Behovs maxTic verkligen???
         w.write("param maxTic := " + (nrOfTics - 1) + ";");
         w.newLine();
         w.write("param epsilon := " + EPSILON + ";");
@@ -2767,13 +2710,6 @@ public class Milp
         cmds[2] = currModelFile.getAbsolutePath();
         cmds[3] = "-o";
         cmds[4] = solutionFile.getAbsolutePath();
-        
-        String str = "";
-        for (int i = 0; i < cmds.length; i++)
-        {
-            str += " " + cmds[i];
-        }
-        logger.info("cmds =" + str);
         
         try
         {
