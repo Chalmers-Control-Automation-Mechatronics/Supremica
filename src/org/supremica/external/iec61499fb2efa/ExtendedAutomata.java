@@ -159,6 +159,7 @@ public class ExtendedAutomata
 
 			ListSubject edges = ((GraphSubject) curComponent.getGraph()).getEdgesModifiable();
 			List removeEdges = new LinkedList();
+			List addEdges = new LinkedList();
 
 			for (Iterator edgeIter = edges.iterator(); edgeIter.hasNext();)
 			{
@@ -286,6 +287,8 @@ public class ExtendedAutomata
 							boolean keepCounting = true;
 							while (keepCounting)
 							{
+								ModelMaker.output(ModelMaker.DEBUG, identCounters.toString(), 4);
+
 								// set expression symbols to counters and make new guard
 								String newGuard = "";
 								for (Iterator iter = expressionIdents.iterator(); iter.hasNext();)
@@ -320,13 +323,13 @@ public class ExtendedAutomata
 								for (Iterator iter = assignmentIdents.iterator(); iter.hasNext();)
 								{
 									String curIdent = ((Identifier) iter.next()).a;
-									int value = ((IntegerVariable) symbols.getVariable(curIdent)).getValue().intValue();
+									int value = ((IntegerVariable) updatedSymbols.getVariable(curIdent)).getValue().intValue();
 								
 									actions = actions + curIdent + " = " + value + ";";
 								}
 							
-								// add new edge
-								addTransition((GraphSubject) curComponent.getGraph(), (NodeProxy) source.clone(), (NodeProxy) target.clone(), (LabelBlockProxy) curLabel.clone(), guard, actions);
+								// mark new edge for adding
+								addEdges.add(makeTransition((NodeProxy) source.clone(), (NodeProxy) target.clone(), (LabelBlockProxy) curLabel.clone(), guard, actions));
 						
 								// increase ident counters
 								List atUpperBound = new LinkedList();
@@ -358,7 +361,6 @@ public class ExtendedAutomata
 									}
 								}
 
-								ModelMaker.output(ModelMaker.DEBUG, identCounters.toString(), 4);
 
 								// calculate keepCouting condition
 								keepCounting = (atUpperBound.size() != identCounters.keySet().size()); 
@@ -381,15 +383,21 @@ public class ExtendedAutomata
 				}				
 			}
 
-			// remove expanded edges
+			// remove old edges
 			for (Iterator iter = removeEdges.iterator(); iter.hasNext();)
 			{
 				edges.remove(iter.next());
 			}
+			
+			// add edges
+			for (Iterator iter = addEdges.iterator(); iter.hasNext();)
+			{
+				edges.add(iter.next());
+			}
 		}
 	}
 
-	private static void addTransition(GraphSubject graph, NodeProxy from, NodeProxy to, LabelBlockProxy labelBlock, String guardIn, String actionIn)
+	private static EdgeSubject makeTransition(NodeProxy from, NodeProxy to, LabelBlockProxy labelBlock, String guardIn, String actionIn)
 	{
 		// make GuardActionSubject
 		// Get guard ...
@@ -407,7 +415,7 @@ public class ExtendedAutomata
 			System.out.println("ExtendedAutomaton.addNormalTransition(): Syntax error in guard!");
 			System.out.println("\t guard: " + guardIn);
 			System.out.println("\t action: " + actionIn);
-			return;
+			return null;
 		}
 		// Get actions ...
 		List<BinaryExpressionSubject> actions = null;
@@ -435,14 +443,14 @@ public class ExtendedAutomata
 						System.out.println("ExtendedAutomaton.addNormalTransition(): Syntax error in action!");
 						System.out.println("\t guard: " + guardIn);
 						System.out.println("\t action: " + actionIn);
-						return;
+						return null;
 					}
 					catch (TypeMismatchException exception)
 					{
 						System.out.println("ExtendedAutomaton.addNormalTransition(): Type mismatch error in action!");
 						System.out.println("\t guard: " + guardIn);
 						System.out.println("\t action: " + actionIn);
-						return;
+						return null;
 					}
 				}
 			}
@@ -464,7 +472,8 @@ public class ExtendedAutomata
 		}
 			
 		EdgeSubject newEdge = factory.createEdgeProxy(from, to, labelBlock, guardActionBlock, null, null, null);
-		graph.getEdgesModifiable().add(newEdge);	
+
+		return newEdge;
 	}
 
 	
