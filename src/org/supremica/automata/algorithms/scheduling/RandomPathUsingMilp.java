@@ -15,6 +15,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.util.ArrayList;
+import java.util.Hashtable;
 import java.util.Iterator;
 import org.supremica.automata.Automata;
 import org.supremica.gui.ScheduleDialog;
@@ -44,7 +45,15 @@ public class RandomPathUsingMilp
         File suboptimalModelFile = File.createTempFile("milp", ".mod");
         logger.info("Creating suboptimal model file... " + suboptimalModelFile.getName());
         
-        ArrayList<String> boolVarList = null;
+        // The hashtable containing internal indices of the mutex variables (with the variable names as keys)
+        Hashtable<String, Integer> mutexVarTable = null;
+        
+        // Each value of this hashtable contains all internal indices of the variables that are 
+        // cross-booking-coupled (they must have the same value to avoid deadlocks) with the 
+        // variable having the internal index stored in the key
+        Hashtable<Integer, ArrayList<Integer>> crossBookingCouplingTable = null;
+        
+        // The current values of the boolean combinations, ordered by internal indices
         int[] currBoolCombination = null;
         
         // The number of times to try random variable values. If a solution is not found randomly,
@@ -63,21 +72,63 @@ public class RandomPathUsingMilp
             BufferedReader r = new BufferedReader(new FileReader(modelFile));
             BufferedWriter w = new BufferedWriter(new FileWriter(suboptimalModelFile));
             
-            boolean boolVarsAlreadyFound = (boolVarList == null) ? false : true;
+            boolean boolVarsAlreadyFound = (mutexVarTable == null) ? false : true;
             if (!boolVarsAlreadyFound)
             {
-                boolVarList = new ArrayList<String>();
+                mutexVarTable = new Hashtable<String, Integer>();
+                crossBookingCouplingTable = new Hashtable<Integer, ArrayList<Integer>>();
             }
 
-            String str;
-            int counter = 1;
+            //The internal index of the boolean variables 
+            int internalVarIndex = 0;
+            
             // Copy the MILP-file until the end of "model"-section, i.e. until the beginning of "data"-section.
             // Store the boolean variables that this file contains if not already done. 
+            String str;
             while (!(str = r.readLine()).contains(("data;")))
             {
-                if (!boolVarsAlreadyFound && str.contains("binary"))
+                if (!boolVarsAlreadyFound)
                 {
-                    boolVarList.add(str.substring(4, str.indexOf(",")));
+                    // Add the names of the mutex variables to mutexVarTable
+                    if (str.contains("binary") && str.contains("books"))
+                    {
+                        mutexVarTable.put(str.substring(4, str.indexOf(",")), internalVarIndex++);
+                        //temp
+                        logger.info("adding " + str.substring(4, str.indexOf(",")) + " to the var-table (index = " + (internalVarIndex-1) + ")");
+                    }
+                    // Add the variable indices for all cross-bookings of the zones to crossBookingCouplingTable
+                    else if (str.contains("non_crossbooking"))
+                    {
+                        // Extract the names of the boolean variables that represent non-cross-booked zones
+                        String varLeft = str.substring(str.indexOf(":") + 1, str.indexOf(">=")).trim();
+                        String varRight = str.substring(str.indexOf(">=") + 2).trim();
+                        if (varRight.contains(" - "))
+                        {
+                            varRight = varRight.substring(0, varRight.indexOf(" - ")).trim();
+                        }
+                        
+                        // Retrieve the internal indices for the current variables
+                        Integer varLeftIndex = mutexVarTable.get(varLeft);
+                        Integer varRightIndex = mutexVarTable.get(varRight);
+                        
+                        // If no cross-coupling for the current key is found, 
+                        // create new list of corresponing cross-booking-indices
+                        ArrayList<Integer> crossBookingCouplingEntry = crossBookingCouplingTable.get(varLeftIndex);
+                        if (crossBookingCouplingEntry == null)
+                        {
+                            crossBookingCouplingEntry = new ArrayList<Integer>();
+                        }
+                        
+                        // If no cross-coupling between the current key-value-pair is found,
+                        // add the value-index to the current cross-booking-list
+                        if (!crossBookingCouplingEntry.contains(varRightIndex))
+                        {
+                            crossBookingCouplingEntry.add(varRightIndex);
+                        }
+
+                        // Update the table of cross-booking-indices
+                        crossBookingCouplingTable.put(varLeftIndex, crossBookingCouplingEntry);
+                    }
                 }
                 
                 w.write(str + "\n");
@@ -91,7 +142,7 @@ public class RandomPathUsingMilp
                 // Initialize the variable array if not already done
                 if (currBoolCombination == null)
                 {
-                    currBoolCombination = new int[boolVarList.size()];
+                    currBoolCombination = new int[mutexVarTable.size()];
                 }
                 
                 // At each new attempt, initialize all variable values to -1
@@ -100,14 +151,44 @@ public class RandomPathUsingMilp
                     currBoolCombination[i] = -1;
                 }
 
-                // Assign variable values randomly, if not already done (i.e. if there are equal to -1) 
+                // Assign variable values randomly if not already done (i.e. if the values are equal to -1) 
                 for (int i = 0; i < currBoolCombination.length; i++)
                 {
                     if (currBoolCombination[i] == -1)
                     {
                         currBoolCombination[i] = (int) Math.round(Math.random());
                         
-                        // Cross-couple
+                        // Update all cross-coupled variables to have the same value as currBoolCombination[i].
+                        // Note that the whole coupling-chain should be updated, i.e. if alpha_1 is connected
+                        // with alpha_2, while alpha_2 -> alpha_3, also alpha_3 should be updated in this step.
+                        // (If this is done in several for-steps, conflicting cross-coupling-updates can occur.)
+                        ArrayList<Integer> keyVarList = new ArrayList<Integer>();
+                        keyVarList.add(new Integer(i));                       
+                        while (!keyVarList.isEmpty())
+                        {
+                            Integer keyVarIndex = keyVarList.remove(0);
+                            
+                            ArrayList<Integer> valueVarList = crossBookingCouplingTable.get(new Integer(keyVarIndex));                        
+                            if (valueVarList != null)
+                            {
+                                for (Iterator<Integer> valueIndicesIt = valueVarList.iterator(); valueIndicesIt.hasNext(); )
+                                {
+                                    Integer valueVarIndex = valueIndicesIt.next();
+
+                                    // If the currently examined cross-variable have not been updated previously,
+                                    // set the correct value for it and continue to unroll the cross-coupling chain
+                                    // by examining the currently updated variables couplings to the other variables
+                                    if (currBoolCombination[valueVarIndex] == -1)
+                                    {
+                                        currBoolCombination[valueVarIndex] = currBoolCombination[keyVarIndex];
+                                        keyVarList.add(valueVarIndex);
+
+                                        //temp
+                                        logger.warn(valueVarIndex + " follows " + keyVarIndex);
+                                    }
+                                }
+                            }
+                        }
                     }
                 }
             }
@@ -119,7 +200,7 @@ public class RandomPathUsingMilp
 //                nrOfRandomTrials--;
 //                if (currBoolCombination == null)
 //                {
-//                    currBoolCombination = new int[boolVarList.size()];
+//                    currBoolCombination = new int[mutexVarTable.size()];
 //                }
 //
 //                for (int i = 0; i < currBoolCombination.length; i++)
@@ -151,9 +232,11 @@ public class RandomPathUsingMilp
 //            }
 
             // Write current values of the boolean variables to the "model"-file
-            for (int i = 0; i < currBoolCombination.length; i++)
+            for (String varName : mutexVarTable.keySet())
             {
-                w.write("random_path_" + counter++ + " : " + boolVarList.get(i) + " = " + currBoolCombination[i] + ";\n");
+                int currIndex = mutexVarTable.get(varName);
+                w.write("random_path_" + currIndex + " : " + varName + " = " + 
+                        currBoolCombination[currIndex] + ";\n");
             }
 
             // Finish the MILP-file by copying the "data"-section

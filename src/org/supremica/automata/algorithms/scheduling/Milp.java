@@ -1685,7 +1685,8 @@ public class Milp
         TreeMap<int[], ArrayList<int[]>> consecutiveBookingTicsIndices = 
                 new TreeMap<int[], ArrayList<int[]>>(new IntArrayComparator()); 
         
-        // Find all consecutive bookingTics, i.e. when a plant first books Z_i and then Z_j
+        // Find all consecutive bookingTics, i.e. when a plant first books Z_i 
+        // and then Z_j without unbooking Z_i
         for (int p = 0; p < plants.size(); p++)
         {
             for (int z1 = 0; z1 < bookingTics.length; z1++)
