@@ -252,7 +252,7 @@ public class Milp
             
             //new... test... (should be called when mutex constraints already are created)
             //TODO: better name...
-            createNonCrossbookingConstraintsNew();
+            createConsecutiveBookingConstraints();
             
             writeToMilpFile();
             
@@ -1674,7 +1674,20 @@ public class Milp
         }
     }    
     
-    private void createNonCrossbookingConstraintsNew()
+    /**
+     * This method creates additional constraints that (should) speed up the optimization. 
+     * These constraints prevent two plants from booking two zones in different order if 
+     * there is no possibility to unbook the zones between their bookings. For example, 
+     * suppose that R1 first enters Z1 and then directly books Z2 (without unbooking Z1), 
+     * while R2 moves in the same manner from the other direction (Z2 -> Z1). Then if 
+     * R1 book Z2 before R2, then it must also book Z1 before R2, and vice versa. 
+     * This poses additional constraint on the boolean variables: 
+     * R1_books_Z1_before_R2 >= R1_books_Z2_before_R2 - M*(4 - Z1_reached_by_R1 - Z2_reached_by_R1 - 
+     * Z1_reached_by_R2 - Z2_reached_by_R2).
+     * Of course, the situation is identical if the robots book the zones in the same order,
+     * the important thing here is that there is no unbooking between the zones. 
+     */
+    private void createConsecutiveBookingConstraints()
         throws Exception
     {       
         // Each entry of this map contains an ArrayList of pairs of consecutive 
@@ -1685,8 +1698,8 @@ public class Milp
         TreeMap<int[], ArrayList<int[]>> consecutiveBookingTicsIndices = 
                 new TreeMap<int[], ArrayList<int[]>>(new IntArrayComparator()); 
         
-        // Find all consecutive bookingTics, i.e. when a plant first books Z_i 
-        // and then Z_j without unbooking Z_i
+        // Find and store all consecutive bookingTics, i.e. when a plant first 
+        // books Z_i and then Z_j without unbooking Z_i
         for (int p = 0; p < plants.size(); p++)
         {
             for (int z1 = 0; z1 < bookingTics.length; z1++)
@@ -1708,8 +1721,8 @@ public class Milp
             }
         }
                 
-        // Find the consecutive bookings that are made reversely by different plants
-        // Check for (almost) all combinations of z1&z2 
+        // Find the consecutive bookings of the same zone-pairs that are made by different 
+        // plants. Check for (almost) all combinations of z1&z2 
         int counter = 1;
         for (int z1 = 0; z1 < zones.size(); z1++)
         {
@@ -1718,119 +1731,138 @@ public class Milp
                 if (z1 != z2)
                 {
                     // Used in for-loops to decrease code-repetition
-                    int[] zoneIndices = new int[]{z1, z2};
+                    int[] currZoneIndices = new int[]{z1, z2};
 
-                    // Check for all combinations of p1 < p2 (the mutex variables 
-                    // are always of the form pi_books_zx_before_pj, where i < j)
+                    // Check for all combinations of p1 < p2 (this suffices since the mutex 
+                    // variables are always of the form "pi_books_zx_before_pj", where i < j)
                     for (int p1 = 0; p1 < plants.size() - 1; p1++)
-                    {
-                        // If p1 books z1 and then z2 consecutively
+                    {                       
                         ArrayList<int[]> consecutiveTicsP1 = consecutiveBookingTicsIndices.get(new int[]{p1, z1, z2});
                         if (consecutiveTicsP1 != null)
-                        {                       
+                        {                   
+                            // If p1 books z1 and then z2 consecutively (consecutiveTicsP1 = non_null), then 
+                            // there should be a consecutive booking secuense in som plant with higher index than p1...
                             for (int p2 = p1 + 1; p2 < plants.size(); p2++)
-                            {
-                                // If also p2 books the zones reversely, i.e. first z2 and then z1, then 
-                                // constraint construction begins...
-                                ArrayList<int[]> consecutiveTicsP2 = consecutiveBookingTicsIndices.get(new int[]{p2, z2, z1});
-                                if (consecutiveTicsP2 != null) 
-                                {    
-                                    for (int[] tic1 : consecutiveTicsP1)
-                                    {
-                                        // Find nearest upwards path splits for each consecutive booking
-                                        ArrayList<int[]> pathSplitInfosP1 = new ArrayList<int[]>();
-                                        for (int zInd = 0; zInd < zoneIndices.length; zInd++)
+                            {                   
+                                // To check both for the booking z1 -> z2 and z2 -> z1, a new index variable (zInd)
+                                // is needed
+                                for (int zInd = 0; zInd < currZoneIndices.length; zInd++)
+                                {                                    
+                                    // If also p2 books the same zones consecutively, i.e. no unbooking between
+                                    // z1 and z2, then constraint construction begins...
+                                    ArrayList<int[]> consecutiveTicsP2 = consecutiveBookingTicsIndices.get(
+                                            new int[]{p2, currZoneIndices[zInd], currZoneIndices[1 - zInd]});
+                                    if (consecutiveTicsP2 != null) 
+                                    {    
+                                        for (int[] tic1 : consecutiveTicsP1)
                                         {
-                                            int stateIndex = bookingTics[zoneIndices[zInd]][p1][STATE_SWITCH][tic1[zInd]];
-                                            int eventIndex = bookingTics[zoneIndices[zInd]][p1][EVENT_SWITCH][tic1[zInd]];
-                                            State bState = indexMap.getStateAt(plants.getAutomatonAt(p1), stateIndex);
-                                            LabeledEvent bEvent = indexMap.getEventAt(eventIndex);
-
-                                            findNearestPathSplits(plants.getAutomatonAt(p1), bState.nextState(bEvent), 
-                                                    pathSplitInfosP1, bEvent);    
-                                        }
-
-                                        String pathSplitStrP1 = "";
-                                        int pathSplitCounterP1 = 0;
-                                        for (Iterator<int[]> it = pathSplitInfosP1.iterator(); it.hasNext();)
-                                        {
-                                            int[] pathSplitInfo = it.next();     
-                                            if (pathSplitInfo[0] != NO_PATH_SPLIT_INDEX)
+                                            // Find nearest upwards path splits for each consecutive booking of p1
+                                            ArrayList<int[]> pathSplitInfosP1 = new ArrayList<int[]>();
+                                            for (int localZInd = 0; localZInd < currZoneIndices.length; localZInd++)
                                             {
-                                                pathSplitCounterP1++;
-                                                pathSplitStrP1 += " - " + makeAltPathsVariable(p1, pathSplitInfo[0], pathSplitInfo[1]);
-                                            }
-                                        }
-
-                                        String nonCrossConstrStr = "";
-                                        String dualNonCrossConstrStr = "";
-                                        ArrayList<int[]> pathSplitInfosP2 = new ArrayList<int[]>();
-                                        for (int[] tic2 : consecutiveTicsP2)
-                                        {          
-                                            for (int zInd = 0; zInd < zoneIndices.length; zInd++)
-                                            {      
-                                                // dualZInd is used to reverse tic2, that needs to be reversed 
-                                                // (so that the indices are right) since tic1 describes booking 
-                                                // z1 -> z2, while tic1 represents z2 -> z1
-                                                int dualZInd = tic2.length - 1 - zInd;
-
-                                                nonCrossConstrStr += "r" + p1 + "_books_z" + zoneIndices[zInd] + "_before_r" + p2;
-                                                dualNonCrossConstrStr += "r" + p1 + "_books_z" + zoneIndices[dualZInd] + "_before_r" + p2;
-
-                                                // If there is a "var_x"-appendix corresponding to the current variable, it should be appended 
-                                                Integer varCounter = mutexVarCounterMap.get(new int[]{zoneIndices[zInd], p1, p2, 
-                                                        tic1[zInd], tic2[dualZInd]});
-                                                if (varCounter != null)
-                                                {
-                                                    nonCrossConstrStr += "_var" + varCounter;
-                                                }
-                                                // If there is a "var_x"-appendix corresponding to the dual variable, it should be appended 
-                                                varCounter = mutexVarCounterMap.get(new int[]{zoneIndices[dualZInd], p1, p2, 
-                                                        tic1[dualZInd], tic2[zInd]});
-                                                if (varCounter != null)
-                                                {
-                                                    dualNonCrossConstrStr += "_var" + varCounter;
-                                                }
-
-                                                if (! nonCrossConstrStr.contains(">="))
-                                                {
-                                                    nonCrossConstrStr = "non_crossbooking_" + counter + " : " + nonCrossConstrStr + " >= ";
-                                                    dualNonCrossConstrStr = "non_crossbooking_" + counter++ + "_dual : " + dualNonCrossConstrStr + " >= ";
-                                                }
-
-                                                int stateIndex = bookingTics[zInd][p2][STATE_SWITCH][tic1[zInd]];
-                                                int eventIndex = bookingTics[zInd][p2][EVENT_SWITCH][tic1[zInd]];
-                                                State bState = indexMap.getStateAt(plants.getAutomatonAt(p2), stateIndex);
+                                                int stateIndex = bookingTics[currZoneIndices[localZInd]][p1][STATE_SWITCH][tic1[localZInd]];
+                                                int eventIndex = bookingTics[currZoneIndices[localZInd]][p1][EVENT_SWITCH][tic1[localZInd]];
+                                                State bState = indexMap.getStateAt(plants.getAutomatonAt(p1), stateIndex);
                                                 LabeledEvent bEvent = indexMap.getEventAt(eventIndex);
 
-                                                findNearestPathSplits(plants.getAutomatonAt(p2), bState.nextState(bEvent), pathSplitInfosP2, bEvent);    
+                                                findNearestPathSplits(plants.getAutomatonAt(p1), bState.nextState(bEvent), 
+                                                        pathSplitInfosP1, bEvent);    
                                             }
 
-                                            int pathSplitCounterP2 = 0;
-                                            String pathSplitStrP2 = "";
-                                            for (Iterator<int[]> it = pathSplitInfosP2.iterator(); it.hasNext();)
+                                            // Create path split variables from the path split indices (for p1)
+                                            String pathSplitStrP1 = "";
+                                            int pathSplitCounterP1 = 0;
+                                            for (Iterator<int[]> it = pathSplitInfosP1.iterator(); it.hasNext();)
                                             {
                                                 int[] pathSplitInfo = it.next();     
                                                 if (pathSplitInfo[0] != NO_PATH_SPLIT_INDEX)
                                                 {
-                                                    pathSplitCounterP2++;
-                                                    pathSplitStrP2 += " - " + makeAltPathsVariable(p2, pathSplitInfo[0], pathSplitInfo[1]);
+                                                    pathSplitCounterP1++;
+                                                    pathSplitStrP1 += " - " + makeAltPathsVariable(p1, pathSplitInfo[0], pathSplitInfo[1]);
                                                 }
                                             }
 
-                                            if ((pathSplitCounterP1 + pathSplitCounterP2) > 0)  
-                                            {
-                                                nonCrossConstrStr += " - bigM*(" + (pathSplitCounterP1 + pathSplitCounterP2) + 
-                                                        pathSplitStrP1 + pathSplitStrP2 + ")";
-                                                dualNonCrossConstrStr += " - bigM*(" + (pathSplitCounterP1 + pathSplitCounterP2) + 
-                                                        pathSplitStrP1 + pathSplitStrP2 + ")";
+                                            // Create path split variables for p2 and write the consecutive 
+                                            // booking constraints (primal and dual) to the MILP-file
+                                            String nonCrossConstrStr = "";
+                                            String dualNonCrossConstrStr = "";
+                                            ArrayList<int[]> pathSplitInfosP2 = new ArrayList<int[]>();
+                                            for (int[] tic2 : consecutiveTicsP2)
+                                            {          
+                                                for (int localZInd = 0; localZInd < currZoneIndices.length; localZInd++)
+                                                {      
+                                                    // This index is the combination of localZInd and zInd, ensuring that the tic2-elements  
+                                                    // used below correspond to the tic1[localZInd] (that is tic2[correspondingZInd] represents 
+                                                    // the same zone as tic1[localZInd]).
+                                                    int correspondingZInd = (int)Math.IEEEremainder(zInd + localZInd, 2); 
+
+                                                    nonCrossConstrStr += "r" + p1 + "_books_z" + currZoneIndices[localZInd] + "_before_r" + p2;
+                                                    dualNonCrossConstrStr += "r" + p1 + "_books_z" + currZoneIndices[1 - localZInd] + "_before_r" + p2;
+
+                                                    // If there is a "var_x"-appendix corresponding to the current variable, it should be appended 
+                                                    Integer varCounter = mutexVarCounterMap.get(new int[]{currZoneIndices[localZInd], p1, p2, 
+                                                            tic1[localZInd], tic2[correspondingZInd]});
+                                                    if (varCounter != null)
+                                                    {
+                                                        nonCrossConstrStr += "_var" + varCounter;
+                                                    }
+                                                    // If there is a "var_x"-appendix corresponding to the dual variable, it should be appended 
+                                                    varCounter = mutexVarCounterMap.get(new int[]{currZoneIndices[1 - localZInd], p1, p2, 
+                                                            tic1[1 - localZInd], tic2[1 - correspondingZInd]});
+                                                    if (varCounter != null)
+                                                    {
+                                                        dualNonCrossConstrStr += "_var" + varCounter;
+                                                    }
+
+                                                    if (! nonCrossConstrStr.contains(">="))
+                                                    {
+                                                        nonCrossConstrStr = "consecutive_booking_" + counter + " : " + nonCrossConstrStr + " >= ";
+                                                        dualNonCrossConstrStr = "consecutive_booking_" + counter++ + "_dual : " + dualNonCrossConstrStr + " >= ";
+                                                    }
+
+                                                    // Find nearest upwards path splits for each consecutive booking of p2
+                                                    int stateIndex = bookingTics[localZInd][p2][STATE_SWITCH][tic2[correspondingZInd]];
+                                                    int eventIndex = bookingTics[localZInd][p2][EVENT_SWITCH][tic2[correspondingZInd]];
+                                                    State bState = indexMap.getStateAt(plants.getAutomatonAt(p2), stateIndex);
+                                                    LabeledEvent bEvent = indexMap.getEventAt(eventIndex);
+
+                                                    findNearestPathSplits(plants.getAutomatonAt(p2), bState.nextState(bEvent), pathSplitInfosP2, bEvent);    
+                                                }
+
+                                                // Create path split variables from the path split indices (for p2)
+                                                int pathSplitCounterP2 = 0;
+                                                String pathSplitStrP2 = "";
+                                                for (Iterator<int[]> it = pathSplitInfosP2.iterator(); it.hasNext();)
+                                                {
+                                                    int[] pathSplitInfo = it.next();     
+                                                    if (pathSplitInfo[0] != NO_PATH_SPLIT_INDEX)
+                                                    {
+                                                        pathSplitCounterP2++;
+                                                        pathSplitStrP2 += " - " + makeAltPathsVariable(p2, pathSplitInfo[0], pathSplitInfo[1]);
+                                                    }
+                                                }
+
+                                                // Add the path split variables to the newly created constraints 
+                                                if ((pathSplitCounterP1 + pathSplitCounterP2) > 0)  
+                                                {
+                                                    nonCrossConstrStr += " - bigM*(" + (pathSplitCounterP1 + pathSplitCounterP2) + 
+                                                            pathSplitStrP1 + pathSplitStrP2 + ")";
+                                                    dualNonCrossConstrStr += " - bigM*(" + (pathSplitCounterP1 + pathSplitCounterP2) + 
+                                                            pathSplitStrP1 + pathSplitStrP2 + ")";
+                                                }
+
+                                                // Add the constraints to the constraint collection
+                                                nonCrossbookingConstraints += nonCrossConstrStr + ";\n";
+                                                nonCrossbookingConstraints += dualNonCrossConstrStr + ";\n";    
                                             }
-
-                                            nonCrossbookingConstraints += nonCrossConstrStr + ";\n";
-                                            nonCrossbookingConstraints += dualNonCrossConstrStr + ";\n";
                                         }
-
-                                        //TODO: gör så att dessa begr. alltid följs vid random-MILP
+                                        
+                                        //TODO: Installera RobotStudio
+                                        //TODO: Varför blir g*_suboptimal = 0 för FT6x6???
+                                        //TODO: hyfsa till RandomPathUsingMilp.java; 
+                                        //      man behöver kanske inte det systematiska variabelvalet.
+                                        //      Det är nog så om alla robotar börjar utanför zoner.
+                                        //      Annars fundera...  
                                         //TODO: dokumentera i /tankar/milp.tex
                                         //TODO: VelocityBalansering
                                         //TODO: Vad lämnade Hugo för smaskens?
@@ -1843,241 +1875,6 @@ public class Milp
             }
         }
     }
-    
-    /**
-     * This method creates additional constraints that (may) speed up the optimization. 
-     * The constraints prevent two plants moving towards eachother from cross-booking two zones.
-     * More specifically, suppose that R1 passes first through Z1 and then Z2, while R2 moves 
-     * from the other direction, Z2 and then Z1. Then if R1 book Z2 before R2, then it must also
-     * book Z1 before R2, and vice versa. This poses additional constraint on the boolean variables: 
-     * R1_books_Z1_before_R2 >= R1_books_Z2_before_R2 - M*(4 - Z1_reached_by_R1 - Z2_reached_by_R1 - 
-     * Z1_reached_by_R2 - Z2_reached_by_R2).
-     */
-    private void createNonCrossbookingConstraints()
-        throws Exception
-    {       
-        for (int z1 = 0; z1 < bookingTics.length; z1++)
-        {
-            for (int z2 = 0; z2 < bookingTics.length; z2++)
-            {
-                if (z1 != z2)
-                {
-                    ArrayList<int[]>[] bookingTicsIndices = new ArrayList[plants.size()];
-                    for (int p = 0; p < plants.size(); p++)
-                    {
-                        if ((bookingTics[z1][p][STATE_SWITCH][0] != -1) && (bookingTics[z2][p][STATE_SWITCH][0] != -1))
-                        {
-                            bookingTicsIndices[p] = findBookingStatesSequences(p, z1, z2);
-                        }
-                    }
-                    
-                    for (int p1 = 0; p1 < bookingTicsIndices.length - 1; p1++)
-                    {
-                        for (int p2 = p1+1; p2 < bookingTicsIndices.length; p2++)
-                        {
-                            if ((bookingTicsIndices[p1].size() > 0) && (bookingTicsIndices[p2].size() > 0))
-                            {
-                                Automaton plant = plants.getAutomatonAt(p2);
-                                
-                                ArrayList<int[]>[] pathSplitInfosP2 = new ArrayList[bookingTicsIndices[p2].size()];
-                                for (int ticPair = 0; ticPair < bookingTicsIndices[p2].size(); ticPair++)
-                                {
-                                    pathSplitInfosP2[ticPair] = new ArrayList<int[]>();
-                                    for (int tic = 0; tic < bookingTicsIndices[p2].get(ticPair).length; tic++)
-                                    {
-                                        int stateIndex = bookingTics[z2][p2][STATE_SWITCH][bookingTicsIndices[p2].get(ticPair)[tic]];
-                                        int eventIndex = bookingTics[z2][p2][EVENT_SWITCH][bookingTicsIndices[p2].get(ticPair)[tic]];
-                                        State bState = indexMap.getStateAt(plant, stateIndex);
-                                        LabeledEvent bEvent = indexMap.getEventAt(eventIndex);
-
-                                        findNearestPathSplits(plant, bState.nextState(bEvent), pathSplitInfosP2[ticPair], bEvent);
-                                    }
-                                }
-
-                                plant = plants.getAutomatonAt(p1);
-                                
-//                                ArrayList<String> boolVariableRoots = new ArrayList<String>();
-//                                boolVariableRoots.add("r" + p1 + "_books_z" + z1 + "_before_r" + p2);
-//                                boolVariableRoots.add("r" + p1 + "_books_z" + z2 + "_before_r" + p2);
-                                for (int ticPair = 0; ticPair < bookingTicsIndices[p1].size(); ticPair++)
-                                {        
-//                                    ArrayList<String> timeVariableRoots = new ArrayList<String>();
-                                    ArrayList<int[]> pathSplitInfosP1 = new ArrayList<int[]>();
-                                    for (int tic = 0; tic < bookingTicsIndices[p1].get(ticPair).length; tic++)
-                                    {
-//                                        ArrayList<int[]> currPathSplitInfo = new ArrayList<int[]>();
-                                        int stateIndex = bookingTics[z1][p1][STATE_SWITCH][bookingTicsIndices[p1].get(ticPair)[tic]];
-                                        int eventIndex = bookingTics[z1][p1][EVENT_SWITCH][bookingTicsIndices[p1].get(ticPair)[tic]];
-                                        State bState = indexMap.getStateAt(plant, stateIndex);
-                                        LabeledEvent bEvent = indexMap.getEventAt(eventIndex);
-
-                                        findNearestPathSplits(plant, bState.nextState(bEvent), pathSplitInfosP1, bEvent);
-                                        
-//                                        timeVariableRoots.add("time[" + p1 + ", " + stateIndex + "]");
-                                    }
-
-                                    
-                                    
-//                                    BufferedReader r = new BufferedReader(new FileReader(modelFile));
-//                                    String str;
-//                                    while ((str = r.readLine()) != null)
-//                                    {
-//                                        String foundBoolVariableRoot = null;
-//                                        boolVarSearch: for (String boolVariableRoot : boolVariableRoots)
-//                                        {
-//                                            if (str.contains(boolVariableRoot))
-//                                            {
-//                                                foundBoolVariableRoot = boolVariableRoot;
-//                                                break boolVarSearch;
-//                                            }
-//                                        }
-//                                        
-//                                        if (foundBoolVariableRoot != null)
-//                                        {
-//                                            for (String timeVariableRoot : timeVariableRoots)
-//                                            {
-//                                                if (str.contains(timeVariableRoot))
-//                                                {
-//                                                    str = str.substring(str.indexOf(foundBoolVariableRoot));
-//                                                    str = str.substring(0, str.indexOf(" ")).trim();
-//                                                }   
-//                                            }
-//                                        }
-//                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
-                
-//                ArrayList<Integer> plantsUsingZones = new ArrayList<Integer>(); //TODO...
-                
-//        for (int i = 0; i < bookingTics.length - 1; i++)
-//        {
-//            for (int j = i+1; j < bookingTics.length; j++)
-//            {
-//                ArrayList[][] bookingTicsIndices = new ArrayList[plants.size()][];
-////                ArrayList<Integer> plantsUsingZones = new ArrayList<Integer>(); //TODO...
-//                for (int k = 0; k < plants.size(); k++)
-//                {
-//                    if ((bookingTics[i][k][0] != -1) && (bookingTics[j][k][0] != -1))
-//                    {
-////                        plantsUsingZones.add(new Integer(k));
-//                        int plantIndex = indexMap.getAutomatonIndex(plants.getAutomatonAt(k));
-//                        
-//                        bookingTicsIndices[plantIndex] = new ArrayList[2];
-//                        bookingTicsIndices[plantIndex][0] = findBookingStatesSequences(bookingTics[j][plantIndex], bookingTics[i][plantIndex], plantIndex);
-//                        bookingTicsIndices[plantIndex][1] = findBookingStatesSequences(bookingTics[i][plantIndex], bookingTics[j][plantIndex], plantIndex);
-//                    }
-//                }
-//                
-//                outerfor: for (int k1 = 0; k1 < plants.size() - 1; k1++)
-//                {
-//                    for (int k2 = k1 + 1; k2 < plants.size(); k2++)
-//                    {
-//                        logger.info("i = " + i + "; j = " + j + "; k1 = " + k1 + "; k2 = " + k2);
-//                        if (bookingTicsIndices[k1] != null && bookingTicsIndices[k2] != null)
-//                        {
-//                            int[] activePlantIndices = new int[]{k1, k2};
-//                            int[] activeZoneIndices = new int[]{i, j};
-//                                                
-//                            String pathSplitStr = "";
-//                            int nrOfPathSplits = 0;
-//                            for (int pInd1 = 0; pInd1 < activePlantIndices.length; pInd1++)
-//                            {
-//                                int pInd2 = 1 - pInd1;
-//                                if ((bookingTicsIndices[activePlantIndices[pInd1]][0].size() > 0) 
-//                                && (bookingTicsIndices[activePlantIndices[pInd2]][1].size() > 0))
-//                                {                                            
-////                                    Automaton activePlant = plants.getAutomatonAt(activePlantIndices[pInd1]);
-////
-////                                    for (int zInd1 = 0; zInd1 < activeZoneIndices.length; zInd1++)
-////                                    {
-////                                        Automaton activeZone = zones.getAutomatonAt(activeZoneIndices[zInd1]);
-////
-////                                        //temp
-////                                        logger.error("pind1 = " + pInd1 + "; pind2 = " + pInd2 + "; zind = " + zInd1);
-////                                        logger.error("Checking " + activePlant.getName() + "_" + activeZone.getName()); 
-//                                                
-//                                        for (Iterator bookingPairsIt = bookingTicsIndices[activePlantIndices[pInd1]][0].iterator(); bookingPairsIt.hasNext();)
-//                                        {
-//                                            int[] currBookingPair = (int[]) bookingPairsIt.next();
-//
-//                                            for (int stInd = 0; stInd < currBookingPair.length; stInd++)
-//                                            {
-//                                                State currState = indexMap.getStateAt(plants.getAutomatonAt(activePlantIndices[ind1]), currBookingPair[stInd]);
-//                                                ArrayList<int[]> nearestPathSplits = new ArrayList<int[]>();
-//                                                Alphabet activeEvents = AlphabetHelpers.intersect(currState.activeEvents(false), zones.getAutomatonAt(activeZoneIndices[stInd]).getAlphabet());
-//                                                for (Iterator<LabeledEvent> activeEventIt = activeEvents.iterator(); activeEventIt.hasNext();)
-//                                                {
-//                                                    LabeledEvent activeEvent = activeEventIt.next();
-//                                                    findNearestPathSplits(plants.getAutomatonAt(activePlantIndices[ind1]), currState.nextState(activeEvent), nearestPathSplits, activeEvent);
-//                                                }
-//                                                for (Iterator<int[]> it = nearestPathSplits.iterator(); it.hasNext();)
-//                                                {
-//                                                    int[] pathSplitInfo = it.next();
-//                                                    if (pathSplitInfo[0] != NO_PATH_SPLIT_INDEX)
-//                                                    {
-//                                                        pathSplitStr += " - " + makeAltPathsVariable(k1, pathSplitInfo[0], pathSplitInfo[1]);
-//                                                        nrOfPathSplits++;
-//                                                    }
-//                                                }                                        
-//                                            }
-//                                        }
-//                                        for (Iterator bookingPairsIt = bookingTicsIndices[activePlantIndices[pInd2]][1].iterator(); bookingPairsIt.hasNext();)
-//                                        {
-//                                            int[] currBookingPair = (int[]) bookingPairsIt.next();
-//
-//                                            for (int stInd = 0; stInd < currBookingPair.length; stInd++)
-//                                            {
-//                                                State currState = indexMap.getStateAt(plants.getAutomatonAt(activePlantIndices[ind2]), currBookingPair[stInd]);
-//                                                ArrayList<int[]> nearestPathSplits = new ArrayList<int[]>();
-//                                                Alphabet activeEvents = AlphabetHelpers.intersect(currState.activeEvents(false), zones.getAutomatonAt(activeZoneIndices[1 - stInd]).getAlphabet());
-//                                                for (Iterator<LabeledEvent> activeEventIt = activeEvents.iterator(); activeEventIt.hasNext();)
-//                                                {
-//                                                    LabeledEvent activeEvent = activeEventIt.next();
-//                                                    findNearestPathSplits(plants.getAutomatonAt(activePlantIndices[ind2]), currState.nextState(activeEvent), nearestPathSplits, activeEvent);
-//                                                }
-//                                                for (Iterator<int[]> it = nearestPathSplits.iterator(); it.hasNext();)
-//                                                {
-//                                                    int[] pathSplitInfo = it.next();
-//                                                    if (pathSplitInfo[0] != NO_PATH_SPLIT_INDEX)
-//                                                    {
-//                                                        pathSplitStr += " - " + makeAltPathsVariable(k1, pathSplitInfo[0], pathSplitInfo[1]);
-//                                                        nrOfPathSplits++;
-//                                                    }
-//                                                }                                        
-//                                            }
-//                                        }
-//                                        
-//                                        int zInd2 = (int) Math.IEEEremainder(zInd1 + 1, 2);
-//                                        String wStr = "R" + activePlantIndices[pInd1] + "_books_Z" + activeZoneIndices[zInd1] + 
-//                                                "_before_R" + activePlantIndices[pInd2] + " >= " + "R" + activePlantIndices[pInd1] + 
-//                                                "_books_Z" + activeZoneIndices[zInd2] + "_before_R" + activePlantIndices[pInd2];
-//                                        if (nrOfPathSplits > 0)
-//                                        {
-//                                            wStr += " - bigM*(" + nrOfPathSplits + pathSplitStr + ")";
-//
-//                                        }
-//                                        else //TEMP
-//                                            wStr += " - nada";
-//                                        wStr += ";\n";
-//                                        logger.warn(wStr);
-//                                    }
-//                                }
-//                            }
-//                        }
-//                        
-//                        //temp
-//                        break outerfor;
-//                    }
-//                }
-//            }
-//        }
-//    }
     
     /**
      * Finds all pairs of booking tics, such that the plant with index plantIndex 
