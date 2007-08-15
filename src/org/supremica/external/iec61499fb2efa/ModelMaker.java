@@ -872,7 +872,7 @@ class ModelMaker
 
 		ExtendedAutomaton startup = getNewAutomaton("Startup");
 		
-		startup.addIntegerVariable("startup_done", 0, 1, 0, 1);
+		//startup.addIntegerVariable("startup_done", 0, 1, 0, 1);
 
 		startup.addInitialState("s0");
 		
@@ -886,7 +886,7 @@ class ModelMaker
 		String cntFB = getInstanceName(cntName);
 		String cntSignal = getSignalName(cntName);
 		Integer cntSignalID = (Integer) ((Map) events.get(cntFB)).get(cntSignal);
-		String action = "receiveing_event_" + cntFB + " = " + cntSignalID + ";";	
+		String action = "receiving_event_" + cntFB + " = " + cntSignalID + ";";	
 		startup.addTransition(from, to, event, null, action);
 		
 		from = to;
@@ -1098,6 +1098,7 @@ class ModelMaker
 		String to = "s1";
 		String event = "receive_event_" + fbName + ";";
 		String action = "queuing_event_" + fbName + " = receiving_event_" + fbName + ";";
+		//action = action + "receiving_event_" + fbName + " = 0;";
 		eventReceiving.addTransition(from, to, event, null, action);
 
 		from = "s1";
@@ -1192,7 +1193,7 @@ class ModelMaker
 
 
 		// event input variables
-		if (theType.getInterfaceList().isSetInputVars())
+		if (theType.getInterfaceList().isSetEventInputs())
 		{
 			final List eventInputs = theType.getInterfaceList().getEventInputs().getEvent();
 			for (Iterator eventInputsIter = eventInputs.iterator(); eventInputsIter.hasNext();)
@@ -1359,7 +1360,7 @@ class ModelMaker
 							" = data_" + fromSignal + "_" + fromInstance + ";";
 					}
 				}
- 				action = action + "queueing_event_" + fbName + " = 0;";
+ 				action = action + "queuing_event_" + fbName + " = 0;";
  				eventQueue.addTransition(from, to, event, guard, action);
 
 				// Transiton when dequeuing event
@@ -1729,8 +1730,8 @@ class ModelMaker
 							output(DEBUG, "Adding state: " + to, level);
 							ecc.addState(to);
 							event = "prepare_job_" + fbName + ";";
-							action = "queueing_job_fb = " + blockID + ";";
-							action = action + "queueing_job_alg = " + actionAlgorithm + ";";
+							action = "queuing_job_fb = " + blockID + ";";
+							action = action + "queuing_job_alg = " + actionAlgorithm + ";";
 							output(DEBUG, "Adding transition: from: " + from + ", to: " + to + ", event: " + event, level);
 							ecc.addTransition(from, to, event, null, action);
 							next = to;						
@@ -1768,7 +1769,7 @@ class ModelMaker
 								String cntFB = getInstanceName(cntName);
 								String cntSignal = getSignalName(cntName);
 								Integer cntSignalID = (Integer) ((Map) events.get(cntFB)).get(cntSignal);
-								action = "receiveing_event_" + cntFB + " = " + cntSignalID + ";";						
+								action = "receiving_event_" + cntFB + " = " + cntSignalID + ";";						
 								output(DEBUG, "Adding transition: from: " + from + ", to: " + to + ", event: " + event, level);
 								ecc.addTransition(from, to, event, null, action);
 								next = to;						
@@ -1809,7 +1810,7 @@ class ModelMaker
 							String cntFB = getInstanceName(cntName);
 							String cntSignal = getSignalName(cntName);
 							Integer cntSignalID = (Integer) ((Map) events.get(cntFB)).get(cntSignal);
-							action = "receiveing_event_" + cntFB + " = " + cntSignalID + ";";						
+							action = "receiving_event_" + cntFB + " = " + cntSignalID + ";";						
 							output(DEBUG, "Adding transition: from: " + from + ", to: " + to + ", event: " + event, level);
 							ecc.addTransition(from, to, event, null, action);
 							next = to;						

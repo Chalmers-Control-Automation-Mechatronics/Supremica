@@ -30,10 +30,11 @@ import javax.xml.bind.JAXBException;
 
 import java.util.Iterator;
 import java.util.Set;
-import java.util.Map;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.LinkedList;
 import java.util.ArrayList;
+import java.util.Map;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 
@@ -126,13 +127,13 @@ public class ExtendedAutomata
 
 	public static void expandTransitions(ModuleSubject module)
 	{
-
+		
 		ModelMaker.output("ExtendedAutomata.expandTransitions(): Expanding transitions.");
-
+		
 		// get all component variables
 		// and put them in a map
 		ModelMaker.output(ModelMaker.DEBUG, "ExtendedAutomata.expandTransitions(): Making module variables map.");
-		Map componentVariables = new HashMap();
+		Map moduleVariables = new HashMap();
 		for (Iterator compIter = module.getComponentList().iterator(); compIter.hasNext();)
 		{
 			SimpleComponentProxy curComponent = (SimpleComponentProxy) compIter.next();
@@ -140,21 +141,22 @@ public class ExtendedAutomata
 			{
 				VariableProxy curVar = (VariableProxy) varIter.next();
 				String curVarName = curVar.getName();
-				if (componentVariables.keySet().contains(curVarName))
+				if (moduleVariables.keySet().contains(curVarName))
 				{
 					ModelMaker.output(ModelMaker.WARN, "ExtendedAutomata.expandTransitions(): Warning!: The module contains duplicate variable definitions.");
 					ModelMaker.output(ModelMaker.WARN, "Variable name: " + curVarName, 1);
 				}
-				componentVariables.put(curVar.getName(), curVar);
+				ModelMaker.output(ModelMaker.DEBUG, curVar.getName(), 1);
+				moduleVariables.put(curVar.getName(), curVar);
 			}
 		}
-
-		// expand transitions with actions for all components in the module
+		
+		// expand transitions for all components in the module
 		for (Iterator compIter = module.getComponentList().iterator(); compIter.hasNext();)
 		{
 			SimpleComponentProxy curComponent = (SimpleComponentProxy) compIter.next();
 			String curComponentName = curComponent.getName();
-			ModelMaker.output(ModelMaker.DEBUG, "ExtendedAutomata.expandTransitions(): Component --------------------", 1);
+			ModelMaker.output(ModelMaker.DEBUG, "ExtendedAutomata.expandTransitions(): Component", 1);
 			ModelMaker.output(ModelMaker.DEBUG, curComponentName, 2);
 
 			ListSubject edges = ((GraphSubject) curComponent.getGraph()).getEdgesModifiable();
@@ -163,8 +165,6 @@ public class ExtendedAutomata
 
 			for (Iterator edgeIter = edges.iterator(); edgeIter.hasNext();)
 			{
-				ModelMaker.output(ModelMaker.DEBUG, "ExtendedAutomata.expandTransitions(): Edge --------------------", 2);
-
 				EdgeSubject curEdge = (EdgeSubject) edgeIter.next();
 
 				NodeProxy source = curEdge.getSource();
@@ -174,213 +174,302 @@ public class ExtendedAutomata
 
 				GuardActionBlockProxy curBlock = curEdge.getGuardActionBlock();
 
-				List curGuards = curBlock.getGuards();
-				String guardsText = "(";
-				if (curGuards.size() > 0 )
+				// do expansion only if guard and actions block is present
+				if (curBlock != null)
 				{
-					ModelMaker.output(ModelMaker.DEBUG, "ExtendedAutomata.expandTransitions(): Guards --------------------", 3);
-					for (Iterator iter = curGuards.iterator(); iter.hasNext();)
-					{
-						guardsText = guardsText + ((SimpleExpressionProxy) iter.next()).getPlainText();
-						if (iter.hasNext())
-						{
-							guardsText = guardsText + ") & (";
-						}
-						else
-						{
-							guardsText = guardsText + ")";
-						}
-					}
-					ModelMaker.output(ModelMaker.DEBUG, guardsText, 4);
-				}
+					ModelMaker.output(ModelMaker.DEBUG, "ExtendedAutomata.expandTransitions(): Expanding edge", 2);
 
-				List curActions = curBlock.getActions();
-				String actionsText = "";
-				if (curActions.size() > 0 )
-				{
-					ModelMaker.output(ModelMaker.DEBUG, "ExtendedAutomata.expandTransitions(): Actions --------------------", 3);
-					for (Iterator iter = curActions.iterator(); iter.hasNext();)
+					// get guards
+					List curGuards = curBlock.getGuards();
+					String guardText = "(";
+					if (curGuards.size() > 0 )
 					{
-						actionsText = actionsText + ((BinaryExpressionProxy) iter.next()).getPlainText() + "; ";
-					}
-					ModelMaker.output(ModelMaker.DEBUG, actionsText, 4);
-				}
-
-				// expand actions
-				if (!actionsText.equals(""))
-				{
-					StringReader stringReader = new StringReader(actionsText);
-					Lexer lexer = new Lexer((Reader) stringReader);
-					Parser parser = new Parser((Scanner) lexer);
-					Goal syntaxTree = null;
-					try
-					{
-						syntaxTree = (Goal) parser.parse().value;
-					}
-					catch(Exception e)
-					{
-						ModelMaker.output(ModelMaker.ERROR, "ExtendedAutomaton.addExtendedTransition(): Couldn't parse the action!");
-						ModelMaker.output(ModelMaker.ERROR, "\t automaton: " + curComponentName);
-						ModelMaker.output(ModelMaker.ERROR, "\t from: " + source.getName());
-						ModelMaker.output(ModelMaker.ERROR, " to: " + target.getName());
-						ModelMaker.output(ModelMaker.ERROR, "\t guard: " + guardsText);
-						ModelMaker.output(ModelMaker.ERROR, "\t action: " + actionsText);
-						System.exit(1);
+						ModelMaker.output(ModelMaker.DEBUG, "ExtendedAutomata.expandTransitions(): Guard", 3);
+						for (Iterator iter = curGuards.iterator(); iter.hasNext();)
+						{
+							guardText = guardText + ((SimpleExpressionProxy) iter.next()).getPlainText();
+							if (iter.hasNext())
+							{
+								guardText = guardText + ") & (";
+							}
+							else
+							{
+								guardText = guardText + ")";
+							}
+						}
+						ModelMaker.output(ModelMaker.DEBUG, guardText, 4);
 					}
 					
-					if (syntaxTree instanceof StatementList)
+					// get actions
+					List curActions = curBlock.getActions();
+					String actionsText = "";
+					if (curActions.size() > 0 )
 					{
-						ModelMaker.output(ModelMaker.DEBUG, "ExtendedAutomata.expandTransitions(): Succesfully parsed actions.", 3);
-						//Printer printer = new Printer(System.out, " ");
-						//printer.print(syntaxTree,0);
-						Finder finder = new Finder(syntaxTree);
-						
-						Set assignmentIdents = finder.getAssignmentIdentifiers();
-						Set expressionIdents = finder.getExpressionIdentifiers();
-						
-						if (expressionIdents.size() > 0)
+						ModelMaker.output(ModelMaker.DEBUG, "ExtendedAutomata.expandTransitions(): Actions", 3);
+						for (Iterator iter = curActions.iterator(); iter.hasNext();)
 						{
-							// make symbols
-							// currently only integer variables
-							Variables symbols = new Variables();
-							for (Iterator iter = assignmentIdents.iterator(); iter.hasNext();)
+							actionsText = actionsText + ((BinaryExpressionProxy) iter.next()).getPlainText() + "; ";
+						}
+						ModelMaker.output(ModelMaker.DEBUG, actionsText, 4);
+					}
+					
+					// parse transition guard
+					Goal guardSyntaxTree = null;
+					if (!guardText.equals("("))
+					{
+						StringReader stringReader = new StringReader(guardText);
+						Lexer lexer = new Lexer((Reader) stringReader);
+						Parser parser = new Parser((Scanner) lexer);
+						try
+						{
+							guardSyntaxTree = (Goal) parser.parse().value;
+						}
+						catch(Exception e)
+						{
+							ModelMaker.output(ModelMaker.ERROR, "ExtendedAutomaton.addExtendedTransition(): Couldn't parse the action!");
+							ModelMaker.output(ModelMaker.ERROR, "\t automaton: " + curComponentName);
+							ModelMaker.output(ModelMaker.ERROR, "\t from: " + source.getName());
+							ModelMaker.output(ModelMaker.ERROR, " to: " + target.getName());
+							ModelMaker.output(ModelMaker.ERROR, "\t guard: " + guardText);
+							ModelMaker.output(ModelMaker.ERROR, "\t action: " + actionsText);
+							System.exit(1);
+						}
+						
+						ModelMaker.output(ModelMaker.DEBUG, "ExtendedAutomata.expandTransitions(): Succesfully parsed guard.", 3);
+					}
+					
+					// parse transition actions
+					Goal actionsSyntaxTree = null;
+					if (!actionsText.equals(""))
+					{
+						StringReader stringReader = new StringReader(actionsText);
+						Lexer lexer = new Lexer((Reader) stringReader);
+						Parser parser = new Parser((Scanner) lexer);
+						try
+						{
+							actionsSyntaxTree = (Goal) parser.parse().value;
+						}
+						catch(Exception e)
+						{
+							ModelMaker.output(ModelMaker.ERROR, "ExtendedAutomaton.addExtendedTransition(): Couldn't parse the action!");
+							ModelMaker.output(ModelMaker.ERROR, "\t automaton: " + curComponentName);
+							ModelMaker.output(ModelMaker.ERROR, "\t from: " + source.getName());
+							ModelMaker.output(ModelMaker.ERROR, " to: " + target.getName());
+							ModelMaker.output(ModelMaker.ERROR, "\t guard: " + guardText);
+							ModelMaker.output(ModelMaker.ERROR, "\t action: " + actionsText);
+							System.exit(1);
+						}
+						
+						ModelMaker.output(ModelMaker.DEBUG, "ExtendedAutomata.expandTransitions(): Succesfully parsed actions.", 3);
+					}
+					
+					// put all identifiers in one set
+					Set assignmentIdents = new LinkedHashSet();
+					Set expressionIdents = new LinkedHashSet();
+					if (guardSyntaxTree != null)
+					{
+						// get guard identifiers
+						Finder finder = new Finder(guardSyntaxTree);
+						Set guardExpressionIdents = finder.getExpressionIdentifiers();
+						for (Iterator iter = guardExpressionIdents.iterator(); iter.hasNext();)
+						{
+							String curIdent = ((Identifier) iter.next()).a;
+							if (!expressionIdents.contains(curIdent))
 							{
-								String curIdent = ((Identifier) iter.next()).a;
+								expressionIdents.add(curIdent);
+							}
+						}						
+					}
+					if (actionsSyntaxTree != null)
+					{
+						// get actions identifiers
+						Finder finder = new Finder(actionsSyntaxTree);
+						Set actionsAssignmentIdents = finder.getAssignmentIdentifiers();
+						for (Iterator iter = actionsAssignmentIdents.iterator(); iter.hasNext();)
+						{
+							String curIdent = ((Identifier) iter.next()).a;
+							if (!assignmentIdents.contains(curIdent))
+							{
+								assignmentIdents.add(curIdent);
+							}
+						}
+						Set actionsExpressionIdents = finder.getExpressionIdentifiers();
+						for (Iterator iter = actionsExpressionIdents.iterator(); iter.hasNext();)
+						{
+							String curIdent = ((Identifier) iter.next()).a;
+							if (!expressionIdents.contains(curIdent))
+							{
+								expressionIdents.add(curIdent);
+							}
+						}
+					}
+					
+					if (expressionIdents.size() > 0)
+					{
+						// make symbols
+						// currently only integer variables
+						Variables symbols = new Variables();
+						for (Iterator iter = expressionIdents.iterator(); iter.hasNext();)
+						{
+							String curIdent = (String) iter.next();
+							if (!symbols.contains(curIdent))
+							{
 								symbols.addVariable(curIdent, new IntegerVariable());
 							}
-							for (Iterator iter = expressionIdents.iterator(); iter.hasNext();)
+						}
+						if (assignmentIdents.size() > 0)
+						{
+							for (Iterator iter = assignmentIdents.iterator(); iter.hasNext();)
 							{
-								String curIdent = ((Identifier) iter.next()).a;
+								String curIdent = (String) iter.next();
 								if (!symbols.contains(curIdent))
 								{
 									symbols.addVariable(curIdent, new IntegerVariable());
 								}
 							}
-						
+						}
+			
+						// count through all expression identifers and evaluate guard and actions
+						// initialize couters and upper bounds maps
+						Map identCounters = new LinkedHashMap();
+						Map identUpperBounds = new HashMap();
+						Map identLowerBounds = new HashMap();
+						ModelMaker.output(ModelMaker.DEBUG,"ExtendedAutomata.expandTransitions(): Initializing counters", 3);
+						for (Iterator iter = expressionIdents.iterator(); iter.hasNext();)
+						{
+							String curIdent = (String) iter.next();
+							VariableProxy curModuleVariable = (VariableProxy) moduleVariables.get(curIdent);
 
-							// count through all expression identifers and evaluate actions
-							// initialize couters and upper bounds maps
-							Map identCounters = new LinkedHashMap();
-							Map identUpperBounds = new HashMap();
-							Map identLowerBounds = new HashMap();
+							ModelMaker.output(ModelMaker.DEBUG, curIdent, 4);
+
+							Integer lowerBound = VariableHelper.getLowerBound(curModuleVariable);
+							Integer upperBound = VariableHelper.getUpperBound(curModuleVariable);	
+							if (!identCounters.keySet().contains(curIdent))
+							{
+								identCounters.put(curIdent, lowerBound);
+							}
+							if (!identUpperBounds.keySet().contains(curIdent))
+							{
+								identUpperBounds.put(curIdent, upperBound);
+							}
+							if (!identLowerBounds.keySet().contains(curIdent))
+							{
+								identLowerBounds.put(curIdent, lowerBound);
+							}
+						}
+					
+						// count up all identifiers ant evaluate guard and actions
+						Evaluator evaluator = null;
+						Variables updatedSymbols = null;
+						boolean keepCounting = true;
+						ModelMaker.output(ModelMaker.DEBUG, "ExtendedAutomata.expandTransitions(): Counting", 3);
+						while (keepCounting)
+						{
+							ModelMaker.output(ModelMaker.DEBUG, identCounters.toString(), 4);
+						
+							// set expression symbols to counters and make gaurd addition
+							String addToGuard = "";
 							for (Iterator iter = expressionIdents.iterator(); iter.hasNext();)
 							{
-								String curIdent = ((Identifier) iter.next()).a;
-								Integer lowerBound = VariableHelper.getLowerBound((VariableProxy) componentVariables.get(curIdent));
-								Integer upperBound = VariableHelper.getUpperBound((VariableProxy) componentVariables.get(curIdent));	
-								if (!identCounters.keySet().contains(curIdent))
+								String curIdent = (String) iter.next();
+								int value = ((Integer) identCounters.get(curIdent)).intValue();
+								((IntegerVariable) symbols.getVariable(curIdent)).setValue(value);
+								addToGuard = addToGuard + curIdent + " == " + value;
+								if (iter.hasNext())
 								{
-									identCounters.put(curIdent, lowerBound);
-								}
-								if (!identUpperBounds.keySet().contains(curIdent))
-								{
-									identUpperBounds.put(curIdent, upperBound);
-								}
-								if (!identLowerBounds.keySet().contains(curIdent))
-								{
-									identLowerBounds.put(curIdent, lowerBound);
+									addToGuard = addToGuard + " & ";
 								}
 							}
+						
+							evaluator = new Evaluator(symbols);
 
-							Evaluator evaluator = null;
-							Variables updatedSymbols = null;
-							boolean keepCounting = true;
-							while (keepCounting)
+							if (guardSyntaxTree != null)
 							{
-								ModelMaker.output(ModelMaker.DEBUG, identCounters.toString(), 4);
-
-								// set expression symbols to counters and make new guard
-								String newGuard = "";
-								for (Iterator iter = expressionIdents.iterator(); iter.hasNext();)
+								Boolean oldGuardValue = (Boolean) evaluator.evaluate(guardSyntaxTree);
+								
+								// only if old guard is evaluated to true add the transition
+								if (oldGuardValue)
 								{
-									String curIdent = ((Identifier) iter.next()).a;
-									int value = ((Integer) identCounters.get(curIdent)).intValue();
-									((IntegerVariable) symbols.getVariable(curIdent)).setValue(value);
-									newGuard = newGuard + curIdent + " == " + value;
-									if (iter.hasNext())
+									// make new guard
+									String guard =  addToGuard;
+									
+									// make new actions
+									String actions = null;
+									if (actionsSyntaxTree != null)
 									{
-										newGuard = newGuard + " & ";
+										// evaluate the actions
+										updatedSymbols = (Variables) evaluator.evaluateNonSequentially(actionsSyntaxTree);
+
+										actions = "";
+										for (Iterator iter = assignmentIdents.iterator(); iter.hasNext();)
+										{
+											String curIdent = (String) iter.next();
+											int value = ((IntegerVariable) updatedSymbols.getVariable(curIdent)).getValue().intValue();
+											
+											actions = actions + curIdent + " = " + value + ";";
+										}
 									}
+									// mark new edge for adding
+									addEdges.add(makeTransition((NodeProxy) source.clone(), (NodeProxy) target.clone(), (LabelBlockProxy) curLabel.clone(), guard, actions));
 								}
+							}
+							else if (actionsSyntaxTree != null)
+							{
+								// evaluate the actions
+								updatedSymbols = (Variables) evaluator.evaluateNonSequentially(actionsSyntaxTree);
 
 								// make new guard
-								String guard = null;
-								if (guardsText.equals("("))
-								{
-									guard = newGuard;
-								}
-								else
-								{
-									guard = newGuard + " & " + guardsText;								
-								}
+								String guard =  addToGuard;
 
-								// evaluate the actions
-								evaluator = new Evaluator(symbols);
-								updatedSymbols = (Variables) evaluator.evaluateNonSequentially(syntaxTree);
-							
-								// make new actions
 								String actions = "";
 								for (Iterator iter = assignmentIdents.iterator(); iter.hasNext();)
 								{
-									String curIdent = ((Identifier) iter.next()).a;
+									String curIdent = (String) iter.next();
 									int value = ((IntegerVariable) updatedSymbols.getVariable(curIdent)).getValue().intValue();
-								
+									
 									actions = actions + curIdent + " = " + value + ";";
 								}
-							
+
 								// mark new edge for adding
 								addEdges.add(makeTransition((NodeProxy) source.clone(), (NodeProxy) target.clone(), (LabelBlockProxy) curLabel.clone(), guard, actions));
-						
-								// increase ident counters
-								List atUpperBound = new LinkedList();
-								for (Iterator countIter = identCounters.keySet().iterator(); countIter.hasNext();)
-								{
+							}
+							
+							// increase ident counters
+							List atUpperBound = new LinkedList();
+							for (Iterator countIter = identCounters.keySet().iterator(); countIter.hasNext();)
+							{
 									String curIdent = (String) countIter.next();
 									int value = ((Integer) identCounters.get(curIdent)).intValue();
 									int upperBound = ((Integer) identUpperBounds.get(curIdent)).intValue();
-
+									
 									if (value < upperBound)
 									{
-										identCounters.put(curIdent, new Integer(value + 1));
-										if (atUpperBound.size() > 0)
-										{
-											for (Iterator iter = atUpperBound.iterator(); iter.hasNext();)
-											{
-												String curAtBound = (String) iter.next();
-												int lowerBound = ((Integer) identLowerBounds.get(curAtBound)).intValue();
-
-												identCounters.put(curAtBound, new Integer(lowerBound));
-											}
-											atUpperBound.clear();
-										}
-										break;
-									}
-									else
+									identCounters.put(curIdent, new Integer(value + 1));
+									if (atUpperBound.size() > 0)
 									{
-										atUpperBound.add(curIdent);
+										for (Iterator iter = atUpperBound.iterator(); iter.hasNext();)
+										{
+											String curAtBound = (String) iter.next();
+											int lowerBound = ((Integer) identLowerBounds.get(curAtBound)).intValue();
+										
+											identCounters.put(curAtBound, new Integer(lowerBound));
+										}
+										atUpperBound.clear();
 									}
+									break;
 								}
-
-
-								// calculate keepCouting condition
-								keepCounting = (atUpperBound.size() != identCounters.keySet().size()); 
+								else
+								{
+									atUpperBound.add(curIdent);
+								}
 							}
-						
-							// mark current edge for removal
-							removeEdges.add(curEdge);
+							// calculate keepCouting condition
+							keepCounting = (atUpperBound.size() != identCounters.keySet().size()); 
 						}
+						// mark current edge for removal
+						removeEdges.add(curEdge);
 					}
-					else if (syntaxTree instanceof Expression)
-					{
-						ModelMaker.output(ModelMaker.ERROR, "ExtendedAutomaton.addExtendedTransition(): Couln't parse the action!");
-						ModelMaker.output(ModelMaker.ERROR, "\t automaton: " + curComponentName);
-						ModelMaker.output(ModelMaker.ERROR, "\t from: " + source.getName());
-						ModelMaker.output(ModelMaker.ERROR, " to: " + target.getName());
-						ModelMaker.output(ModelMaker.ERROR, "\t guard: " + guardsText);
-						ModelMaker.output(ModelMaker.ERROR, "\t action: " + actionsText);
-						System.exit(1);
-					}
-				}				
+				}
 			}
 
 			// remove old edges
@@ -389,14 +478,14 @@ public class ExtendedAutomata
 				edges.remove(iter.next());
 			}
 			
-			// add edges
+			// add new edges
 			for (Iterator iter = addEdges.iterator(); iter.hasNext();)
 			{
 				edges.add(iter.next());
 			}
 		}
 	}
-
+	
 	private static EdgeSubject makeTransition(NodeProxy from, NodeProxy to, LabelBlockProxy labelBlock, String guardIn, String actionIn)
 	{
 		// make GuardActionSubject
