@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui.springembedder
 //# CLASS:   SpringEmbedder
 //###########################################################################
-//# $Id: SpringEmbedder.java,v 1.43 2007-08-10 22:07:29 robi Exp $
+//# $Id: SpringEmbedder.java,v 1.44 2007-08-15 12:23:17 robi Exp $
 //###########################################################################
 
 
@@ -195,8 +195,15 @@ public class SpringEmbedder
     }
 
     for (final EdgeSubject edge : mEdges) {
-      edge.setStartPoint(null);
-      edge.setEndPoint(null);
+      // Fixing some broken models---these adjustments should not
+      // be needed, but without them many old files would not be
+      // displayed correctly :-(
+      if (edge.getSource() instanceof SimpleNodeSubject) {
+        edge.setStartPoint(null);
+      }
+      if (edge.getTarget() instanceof SimpleNodeSubject) {
+        edge.setEndPoint(null);
+      }
       if (edge.getLabelBlock().getGeometry() == null) {
         final LabelGeometrySubject offset =
           new LabelGeometrySubject

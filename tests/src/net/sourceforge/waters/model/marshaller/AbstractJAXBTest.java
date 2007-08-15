@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.marshaller
 //# CLASS:   AbstractJAXBTest
 //###########################################################################
-//# $Id: AbstractJAXBTest.java,v 1.5 2007-07-03 11:20:53 robi Exp $
+//# $Id: AbstractJAXBTest.java,v 1.6 2007-08-15 12:23:17 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.marshaller;
@@ -174,7 +174,25 @@ public abstract class AbstractJAXBTest<D extends DocumentProxy>
     return clazz.cast(proxy1);
   }
 
-  protected void testHandcraft(final String subdirname, final D handcrafted)
+  protected void testHandcraft(final String dirname, final D handcrafted)
+    throws Exception
+  {
+    final File subdir = new File(getInputDirectory(), dirname);
+    testHandcraft(subdir, handcrafted);
+  }
+
+
+  protected void testHandcraft(final String dirname1,
+                               final String dirname2,
+                               final D handcrafted)
+    throws Exception
+  {
+    final File dir1 = new File(getInputDirectory(), dirname1);
+    final File dir2 = new File(dir1, dirname2);
+    testHandcraft(dir2, handcrafted);
+  }
+
+  protected void testHandcraft(final File fullindir, final D handcrafted)
     throws Exception
   {
     checkIntegrity(handcrafted);
@@ -182,7 +200,6 @@ public abstract class AbstractJAXBTest<D extends DocumentProxy>
     final ProxyUnmarshaller<D> unmarshaller = getProxyUnmarshaller();
     final String name = handcrafted.getName();
     final String extname = name + unmarshaller.getDefaultExtension();
-    final File fullindir = new File(getInputDirectory(), subdirname);
     final File infilename = new File(fullindir, extname);
     final File outfilename = new File(getOutputDirectory(), extname);
     final URI inuri = infilename.toURI();

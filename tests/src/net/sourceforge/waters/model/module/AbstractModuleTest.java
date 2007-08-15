@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.module
 //# CLASS:   AbstractModuleTest
 //###########################################################################
-//# $Id: AbstractModuleTest.java,v 1.13 2007-07-03 11:20:53 robi Exp $
+//# $Id: AbstractModuleTest.java,v 1.14 2007-08-15 12:23:17 robi Exp $
 //###########################################################################
 
 
@@ -84,6 +84,12 @@ public abstract class AbstractModuleTest extends AbstractJAXBTest<ModuleProxy>
     throws Exception
   {
     testMarshal("handwritten", "small_factory_n");
+  }
+
+  public void testMarshal_startgeo()
+    throws Exception
+  {
+    testMarshal("tests", "nasty", "startgeo");
   }
 
   public void testMarshal_tictactoe()
@@ -227,6 +233,12 @@ public abstract class AbstractModuleTest extends AbstractJAXBTest<ModuleProxy>
     testClone("handwritten", "small_factory_n");
   }
 
+  public void testClone_startgeo()
+    throws Exception
+  {
+    testClone("tests", "nasty", "startgeo");
+  }
+
   public void testClone_tictactoe()
     throws Exception
   {
@@ -276,6 +288,12 @@ public abstract class AbstractModuleTest extends AbstractJAXBTest<ModuleProxy>
     throws Exception
   {
     testCrossClone("handwritten", "small_factory_n");
+  }
+
+  public void testCrossClone_startgeo()
+    throws Exception
+  {
+    testCrossClone("tests", "nasty", "startgeo");
   }
 
   public void testCrossClone_tictactoe()
@@ -413,6 +431,54 @@ public abstract class AbstractModuleTest extends AbstractJAXBTest<ModuleProxy>
       (modname, null, null, null, eventList, null, compList);
 
     testHandcraft("handwritten", module);
+  }
+
+
+  public void testHandcraft_startgeo()
+    throws Exception
+  {
+    final ModuleProxyFactory factory = getModuleProxyFactory();
+
+    final String compname = "startgeo";
+    final String modname = compname;
+
+    final Point2D point0 = new Point(128, 80);
+    final PointGeometryProxy pointgeo0 =
+      factory.createPointGeometryProxy(point0);
+    final SimpleNodeProxy node0 =
+      factory.createSimpleNodeProxy("S0", null, true, pointgeo0, null, null);
+    final Point2D point1 = new Point(160, 208);
+    final PointGeometryProxy pointgeo1 =
+      factory.createPointGeometryProxy(point1);
+    final SimpleNodeProxy node1 =
+      factory.createSimpleNodeProxy("S1", null, false, pointgeo1, null, null);
+    final Rectangle2D rect = new Rectangle(80, 144, 144, 112);
+    final BoxGeometryProxy boxgeo = factory.createBoxGeometryProxy(rect);
+    final List<SimpleNodeProxy> children = Collections.singletonList(node1);
+    final GroupNodeProxy group =
+      factory.createGroupNodeProxy("G0", null, children, boxgeo);
+    final Point2D start = new Point(80, 207);
+    final PointGeometryProxy startgeo =
+      factory.createPointGeometryProxy(start);
+    final EdgeProxy edge = factory.createEdgeProxy
+      (group, node0, null, null, null, startgeo, null);
+    final List<NodeProxy> nodes = new LinkedList<NodeProxy>();
+    nodes.add(node0);
+    nodes.add(node1);
+    nodes.add(group);
+    final List<EdgeProxy> edges = Collections.singletonList(edge);
+    final GraphProxy graph =
+      factory.createGraphProxy(true, null, nodes, edges);
+    final IdentifierProxy compident =
+      factory.createSimpleIdentifierProxy(compname);
+    final SimpleComponentProxy comp =
+      factory.createSimpleComponentProxy(compident, ComponentKind.SPEC, graph);
+    final List<SimpleComponentProxy> compList =
+      Collections.singletonList(comp);
+    final ModuleProxy module = factory.createModuleProxy
+      (modname, null, null, null, null, null, compList);
+
+    testHandcraft("tests", "nasty", module);
   }
 
 

@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Module Name="startgeo" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
+<ComponentList>
+<SimpleComponent Kind="SPEC">
+<SimpleIdentifier Name="startgeo"/>
+<Graph>
+<NodeList>
+<SimpleNode Initial="true" Name="S0">
+<PointGeometry>
+<Point Y="80" X="128"/>
+</PointGeometry>
+</SimpleNode>
+<SimpleNode Name="S1">
+<PointGeometry>
+<Point Y="208" X="160"/>
+</PointGeometry>
+</SimpleNode>
+<GroupNode Name="G0">
+<NodeRef Name="S1"/>
+<BoxGeometry>
+<Box Y="144" X="80" Width="144" Height="112"/>
+</BoxGeometry>
+</GroupNode>
+</NodeList>
+<EdgeList>
+<Edge Target="S0" Source="G0">
+<StartPointGeometry>
+<Point Y="207" X="80"/>
+</StartPointGeometry>
+</Edge>
+</EdgeList>
+</Graph>
+</SimpleComponent>
+</ComponentList>
+</Module>
