@@ -192,7 +192,7 @@ class ModelMaker
 						   + "\t library path: " + libraryPath + "\n");
 		
 		(new ModelMaker(outputFileName,systemFileName,libraryPathBase,libraryPath)).makeModel();
-		System.exit(0);
+		exit(0);
 
 	}
 
@@ -206,7 +206,7 @@ class ModelMaker
 		catch (Exception e)
 		{
 			output(ERROR, e.toString());
-			System.exit(1);
+			exit(1);
 		}
 
 		this.outputFileName = outputFileName;
@@ -298,15 +298,18 @@ class ModelMaker
 		
 		makeDataConnectionMap(systemFBNetwork, null, 0);
 
-// 		printFunctionBlocksMap();
-// 		printBasicFunctionBlocksMap();
-// 		printEventsMap();
-// 		printAlgorithmsMap();
-// 		printAlgorithmTextsMap();
-// 		printFBTypesMap();
-// 		printEventConnectionsMap();
-// 		printDataConnectionsMap();
-		
+		if (verboseLevel <= DEBUG)
+		{
+			printFunctionBlocksMap();
+			printBasicFunctionBlocksMap();
+			printEventsMap();
+			printAlgorithmsMap();
+			printAlgorithmTextsMap();
+			printFBTypesMap();
+			printEventConnectionsMap();
+			printDataConnectionsMap();
+		}
+
 		output("ModelMaker.makeModel(): Generating Model ---------------------------------------");
 
  		automata = new ExtendedAutomata(theSystem.getName(), expandTransitions);
@@ -387,7 +390,7 @@ class ModelMaker
 		catch (Exception e)
 		{
 			output(ERROR, e.toString());
-			System.exit(1);
+			exit(1);
 		}
 	}
 
@@ -431,7 +434,7 @@ class ModelMaker
 			catch (Exception e)
 			{
 				output(ERROR, e.toString());
-				System.exit(1);
+				exit(1);
 			}
 			
 			if (unmarshalledObject instanceof JaxbFBType)
@@ -501,7 +504,7 @@ class ModelMaker
 							{
 								output(ERROR, "Error: The algorithm does not have a name!");
 								output(ERROR, "FB name: " + instanceName, 1);
-								System.exit(1);
+								exit(1);
 							}
 						}
 						algIDCounter = 1;
@@ -525,7 +528,7 @@ class ModelMaker
 				{
 					output(ERROR, "Error!: ModelMaker.loadFB(" + instanceName + ", " + fileName + "): Unsupported FB type: " + typeName);
 					output(ERROR, "Neither a Basic FB nor a Composite FB.", 1);
-					System.exit(1);
+					exit(1);
 				}
 			}
 		}
@@ -565,7 +568,7 @@ class ModelMaker
 			}
 			output(ERROR, "");
 			output(ERROR, "Usage: ModelMaker [-o outputFile] [-lb libraryPathBase] [-lp libraryDirectory]... file.sys");
-			System.exit(1);
+			exit(1);
 		}
 		return theFile;
     }
@@ -624,6 +627,8 @@ class ModelMaker
 			dest = getInternalEventInputConnection(dest);
 			sourceInstance = getInstanceName(source);
 			sourceSignal   = getSignalName(source);
+			String destInstance = getInstanceName(dest);
+			String destSignal   = getSignalName(dest);
 		
 			output(DEBUG, "Adding connection: " + source + "-->" + dest, level);
 			
@@ -638,6 +643,17 @@ class ModelMaker
 				eventMap = (Map) eventConnections.get(sourceInstance);
 			}
 			eventMap.put(sourceSignal, dest);
+
+			if (!eventConnections.keySet().contains(destInstance))
+			{
+				eventMap = new HashMap();
+				eventConnections.put(destInstance, eventMap);
+			}
+			else
+			{
+				eventMap = (Map) eventConnections.get(destInstance);
+			}
+			eventMap.put(destSignal, source);
 		}
 	}		
 
@@ -762,6 +778,8 @@ class ModelMaker
 				dest = getInternalDataInputConnection(dest);
 				destInstance = getInstanceName(dest);
 				destSignal   = getSignalName(dest);
+				String sourceInstance = getInstanceName(source);
+				String sourceSignal   = getSignalName(source);
 				
 				output(DEBUG, "Adding connection: " + source + "-->" + dest, level);
 				
@@ -776,6 +794,17 @@ class ModelMaker
 					dataMap = (Map) dataConnections.get(destInstance);
 				}
 				dataMap.put(destSignal, source);
+
+				if (!dataConnections.keySet().contains(sourceInstance))
+				{
+					dataMap = new HashMap();
+					dataConnections.put(sourceInstance, dataMap);
+				}
+				else
+				{
+					dataMap = (Map) dataConnections.get(sourceInstance);
+				}
+				dataMap.put(sourceSignal, dest);
 			}	
 		}
 	}
@@ -879,21 +908,29 @@ class ModelMaker
 		startup.addState(to);
 		String event = "send_output_COLD_" + fbName + ";";
 		startup.addTransition(from, to, event, null, null);
-		
-		from = to;
-		to = "s2";
-		startup.addAcceptingState(to);
-		// get connection data for the action
-		String cntName = (String) ((Map) eventConnections.get(fbName)).get("COLD");
-		String cntFB = getInstanceName(cntName);
-		String cntSignal = getSignalName(cntName);
-		event = "receive_event_" + cntSignal + "_" +cntFB + ";";
-		startup.addTransition(from, to, event, null, null);
 
+		if (isEventConnected(fbName,"COLD"))
+		{			
+			from = to;
+			to = "s2";
+			startup.addAcceptingState(to);
+			// get connection data for the action
+			String cntName = getEventConnection(fbName, "COLD");
+			String cntFB = getInstanceName(cntName);
+			String cntSignal = getSignalName(cntName);
+			event = "receive_event_" + cntSignal + "_" +cntFB + ";";
+			startup.addTransition(from, to, event, null, null);
+		}
+		else
+		{
+			output(ERROR, "The E_RESTART.COLD is not connected!");
+			output(ERROR, "The application can not start.", 1);
+			exit(1);
+		}
 		automata.addAutomaton(startup);
 	}
-
-
+	
+	
 	private void makeInstanceQueue()
 	{
 		output("ModelMaker.makeInstanceQueue():");
@@ -971,7 +1008,7 @@ class ModelMaker
 		ExtendedAutomaton jobQueue = getNewAutomaton("Job Queue");
 		
 		// the maximum number of jobs in the queue at the same time
-		final int places = basicFunctionBlocks.keySet().size();	
+		final int places = algMaxID;	
 		
 		jobQueue.addIntegerVariable("current_job_fb", 0, fbMaxID, 0, 0);
 		jobQueue.addIntegerVariable("current_job_alg", 0, algMaxID, 0, 0);
@@ -1092,18 +1129,22 @@ class ModelMaker
 		for (Iterator evIter = fbEvents.keySet().iterator(); evIter.hasNext();)
 		{
 			String curEvent = (String) evIter.next();
-			
-			from = "s0";
-			to = "s" + nameCounter;
-			eventReceiving.addState(to);
-			nameCounter++;
-			event = "receive_event_" + curEvent + "_" + fbName + ";";
-			eventReceiving.addTransition(from, to, event, null, null);
 
-			from = to;
-			to = "s1";
-			event = "queue_event_" + curEvent + "_" + fbName + ";";
-			eventReceiving.addTransition(from, to, event, null, null);			
+			// an event can be received only if it is connected
+			if (isEventConnected(fbName, curEvent))
+			{
+				from = "s0";
+				to = "s" + nameCounter;
+				eventReceiving.addState(to);
+				nameCounter++;
+				event = "receive_event_" + curEvent + "_" + fbName + ";";
+				eventReceiving.addTransition(from, to, event, null, null);
+				
+				from = to;
+				to = "s1";
+				event = "queue_event_" + curEvent + "_" + fbName + ";";
+				eventReceiving.addTransition(from, to, event, null, null);			
+			}
 		}
 
 		from = "s1";	
@@ -1119,19 +1160,23 @@ class ModelMaker
 		{
 			String curEvent = (String) evIter.next();
 			
-			from = handleFrom;
-			to = "s" + nameCounter;
-			eventReceiving.addState(to);
-			nameCounter++;
-			event = "receive_event_" + curEvent + "_" + fbName + ";";
-			eventReceiving.addTransition(from, to, event, null, null);
-
-			from = to;
-			to = handleFrom;
-			event = "queue_event_" + curEvent + "_" + fbName + ";";
-			eventReceiving.addTransition(from, to, event, null, null);			
+			// an event can be received only if it is connected
+			if (isEventConnected(fbName, curEvent))
+			{
+				from = handleFrom;
+				to = "s" + nameCounter;
+				eventReceiving.addState(to);
+				nameCounter++;
+				event = "receive_event_" + curEvent + "_" + fbName + ";";
+				eventReceiving.addTransition(from, to, event, null, null);
+				
+				from = to;
+				to = handleFrom;
+				event = "queue_event_" + curEvent + "_" + fbName + ";";
+				eventReceiving.addTransition(from, to, event, null, null);			
+			}			
 		}
-
+		
 		from = handleFrom;
 		to = "s0";
 		event = "handle_event_" + fbName + ";";
@@ -1217,39 +1262,43 @@ class ModelMaker
 			{
 				VarDeclaration curDeclaration = (VarDeclaration) dataInputsIter.next();
 				String curDataInputName = curDeclaration.getName();
-				String curDataType =  curDeclaration.getType();
-				if (curDataType.toLowerCase().equals("int"))
+				if (isDataConnected(fbName, curDataInputName))
 				{
-					eventQueue.addIntegerVariable("data_" + curDataInputName + "_" + fbName, 0, intVarMaxValue, 0, 0);
-				}
-				else if (curDataType.toLowerCase().equals("bool"))
-				{
-					output(ERROR, "Error: Unsupported input data variable type: BOOL", 1);
-					output(ERROR, "Variable name: " + fbName + "_" + curDataInputName, 2);
-					System.exit(1);
-				}
-				else if (curDataType.toLowerCase().equals("real"))
-				{
-					output(ERROR, "Error: Unsupported input data variable type: REAL", 1);
-					output(ERROR, "Variable name: " + fbName + "_" + curDataInputName, 2);
-					System.exit(1);
-				}
-				else if (curDataType.toLowerCase().equals("string"))
-				{
-					output(ERROR, "Error: Unsupported input data variable type: STRING", 1);
-					output(ERROR, "Variable name: " + fbName + "_" + curDataInputName, 2);
-					System.exit(1);
-				}
-				else if (curDataType.toLowerCase().equals("object"))
-				{
-					output(ERROR, "Error: Unsupported input data variable type: OBJECT", 1);
-					output(ERROR, "Variable name: " + fbName + "_" + curDataInputName, 2);
-					System.exit(1);
+					String curDataType =  curDeclaration.getType();
+					if (curDataType.toLowerCase().equals("int"))
+					{
+						eventQueue.addIntegerVariable("data_" + curDataInputName + "_" + fbName, 0, intVarMaxValue, 0, 0);
+					}
+					else if (curDataType.toLowerCase().equals("bool"))
+					{
+						output(ERROR, "Error: Unsupported input data variable type: BOOL", 1);
+						output(ERROR, "Variable name: " + fbName + "_" + curDataInputName, 2);
+						exit(1);
+					}
+					else if (curDataType.toLowerCase().equals("real"))
+					{
+						output(ERROR, "Error: Unsupported input data variable type: REAL", 1);
+						output(ERROR, "Variable name: " + fbName + "_" + curDataInputName, 2);
+						exit(1);
+					}
+					else if (curDataType.toLowerCase().equals("string"))
+					{
+						output(ERROR, "Error: Unsupported input data variable type: STRING", 1);
+						output(ERROR, "Variable name: " + fbName + "_" + curDataInputName, 2);
+						exit(1);
+					}
+					else if (curDataType.toLowerCase().equals("object"))
+					{
+						output(ERROR, "Error: Unsupported input data variable type: OBJECT", 1);
+						output(ERROR, "Variable name: " + fbName + "_" + curDataInputName, 2);
+						exit(1);
+					}
 				}
 			}
 		}
 		
 		// data output variables
+		// written only by algorithms
 		if (theType.getInterfaceList().isSetOutputVars())
 		{
 			final List dataOutputs = theType.getInterfaceList().getOutputVars().getVarDeclaration();
@@ -1266,25 +1315,25 @@ class ModelMaker
 				{
 					output(ERROR, "Error: Unsupported input data variable type: BOOL", 1);
 					output(ERROR, "Variable name: " + fbName + "_" + curDataOutputName, 2);
-					System.exit(1);
+					exit(1);
 				}
 				else if (curDataType.toLowerCase().equals("real"))
 				{
 					output(ERROR, "Error: Unsupported input data variable type: REAL", 1);
 					output(ERROR, "Variable name: " + fbName + "_" + curDataOutputName, 2);
-					System.exit(1);
+					exit(1);
 				}
 				else if (curDataType.toLowerCase().equals("string"))
 				{
 					output(ERROR, "Error: Unsupported input data variable type: STRING", 1);
 					output(ERROR, "Variable name: " + fbName + "_" + curDataOutputName, 2);
-					System.exit(1);
+					exit(1);
 				}
 				else if (curDataType.toLowerCase().equals("object"))
 				{
 					output(ERROR, "Error: Unsupported input data variable type: OBJECT", 1);
 					output(ERROR, "Variable name: " + fbName + "_" + curDataOutputName, 2);
-					System.exit(1);
+					exit(1);
 				}
 			}
 		}
@@ -1303,34 +1352,37 @@ class ModelMaker
 				{
 					VarDeclaration curDeclaration = (VarDeclaration) dataInputsIter.next();
 					String curDataInputName = curDeclaration.getName();
-					String curDataType =  curDeclaration.getType();
-					if (curDataType.toLowerCase().equals("int"))
+					if (isDataConnected(fbName, curDataInputName))
 					{
-						eventQueue.addIntegerVariable("data_place_" + i + "_" + curDataInputName + "_" + fbName, 0, intVarMaxValue, 0, 0);
-					}
-					else if (curDataType.toLowerCase().equals("bool"))
-					{
-						output(ERROR, "Error: Unsupported input data variable type: BOOL", 1);
-						output(ERROR, "Variable name: " + fbName + "_" + curDataInputName, 2);
-						System.exit(1);
-					}
-					else if (curDataType.toLowerCase().equals("real"))
-					{
-						output(ERROR, "Error: Unsupported input data variable type: REAL", 1);
-						output(ERROR, "Variable name: " + fbName + "_" + curDataInputName, 2);
-						System.exit(1);
-					}
-					else if (curDataType.toLowerCase().equals("string"))
-					{
-						output(ERROR, "Error: Unsupported input data variable type: STRING", 1);
-						output(ERROR, "Variable name: " + fbName + "_" + curDataInputName, 2);
-						System.exit(1);
-					}
-					else if (curDataType.toLowerCase().equals("object"))
-					{
-						output(ERROR, "Error: Unsupported input data variable type: OBJECT", 1);
-						output(ERROR, "Variable name: " + fbName + "_" + curDataInputName, 2);
-						System.exit(1);
+						String curDataType =  curDeclaration.getType();
+						if (curDataType.toLowerCase().equals("int"))
+						{
+							eventQueue.addIntegerVariable("data_place_" + i + "_" + curDataInputName + "_" + fbName, 0, intVarMaxValue, 0, 0);
+						}
+						else if (curDataType.toLowerCase().equals("bool"))
+						{
+							output(ERROR, "Error: Unsupported input data variable type: BOOL", 1);
+							output(ERROR, "Variable name: " + fbName + "_" + curDataInputName, 2);
+							exit(1);
+						}
+						else if (curDataType.toLowerCase().equals("real"))
+						{
+							output(ERROR, "Error: Unsupported input data variable type: REAL", 1);
+							output(ERROR, "Variable name: " + fbName + "_" + curDataInputName, 2);
+							exit(1);
+						}
+						else if (curDataType.toLowerCase().equals("string"))
+						{
+							output(ERROR, "Error: Unsupported input data variable type: STRING", 1);
+							output(ERROR, "Variable name: " + fbName + "_" + curDataInputName, 2);
+							exit(1);
+						}
+						else if (curDataType.toLowerCase().equals("object"))
+						{
+							output(ERROR, "Error: Unsupported input data variable type: OBJECT", 1);
+							output(ERROR, "Variable name: " + fbName + "_" + curDataInputName, 2);
+							exit(1);
+						}
 					}
 				}
 			}
@@ -1344,77 +1396,105 @@ class ModelMaker
 				String eventName = curEvent.getName();
 				int eventID = ((Integer) ((Map) events.get(fbName)).get(eventName)).intValue();
 
+				String from = "";
+				String to = "";
+				String event = "";
+				String guard = "";
+				String action = "";
+				
 				// Transiton when queuing event
- 				String from = "s" + (i-1);
- 				String to = "s" + i;
- 				String event = "queue_event_" + eventName + "_" + fbName + ";";
- 				String guard = null;
- 				String action = "event_place_" + i + "_" + fbName + " = " + eventID + ";";
-				if (curEvent.isSetWith())
-				{
-					List withData = curEvent.getWith();
-					for (Iterator withIter = withData.iterator(); withIter.hasNext();)
+				if (isEventConnected(fbName, eventName))
+				{					
+					from = "s" + (i-1);
+					to = "s" + i;
+					event = "queue_event_" + eventName + "_" + fbName + ";";
+					guard = null;
+					action = "event_place_" + i + "_" + fbName + " = " + eventID + ";";
+					if (curEvent.isSetWith())
 					{
-						String curWith = ((With) withIter.next()).getVar();
-						String cntFrom = (String) ((Map) dataConnections.get(fbName)).get(curWith);
-						String fromInstance = getInstanceName(cntFrom);
-						String fromSignal = getSignalName(cntFrom);				
-						action = action + 
-							"data_place_" + i + "_" + curWith + "_" + fbName + 
-							" = data_" + fromSignal + "_" + fromInstance + ";";
-					}
-				}
- 				eventQueue.addTransition(from, to, event, guard, action);
-
-				// Transiton when dequeuing event
- 				from = "s" + i;
- 				to = "s" + (i-1);
- 				event = "remove_event_" + fbName + ";";
- 				guard = "event_place_" + i + "_" + fbName + " == " + eventID;
- 				action = "event_" + eventName + "_" + fbName + " = 1;";
-				// move events in the queue
-				for (int j = 1; j <= i-1; j++)
-				{
-					action = action + "event_place_" + j + "_" + fbName +  " = event_place_" + (j+1) + "_" + fbName + ";";
-				}
- 				action = action + "event_place_" + i + "_" + fbName + " = 0;";
-				if (curEvent.isSetWith())
-				{
-					List withData = curEvent.getWith();
-					// get first data in the queue
-					for (Iterator withIter = withData.iterator(); withIter.hasNext();)
-					{
-						String curWith = ((With) withIter.next()).getVar();
-						action = action + 
-							"data_" + curWith + "_" + fbName + " = data_place_" + i + "_" + curWith + "_" + fbName + ";";
-					}
-					// move the queue
-					for (Iterator withIter = withData.iterator(); withIter.hasNext();)
-					{
-						String curWith = ((With) withIter.next()).getVar();
-						for (int j = 1; j <= i-1; j++)
+						List withData = curEvent.getWith();
+						for (Iterator withIter = withData.iterator(); withIter.hasNext();)
 						{
-							action = action + 
-								"data_place_" + j + "_" + curWith + "_" + fbName + " = data_place_" + (j+1) + "_" + curWith + "_" + fbName + ";";						
+							String curWith = ((With) withIter.next()).getVar();
+							if (isDataConnected(fbName, curWith))
+							{														
+								String cntFrom = (String) ((Map) dataConnections.get(fbName)).get(curWith);
+								String fromInstance = getInstanceName(cntFrom);
+								String fromSignal = getSignalName(cntFrom);				
+								action = action + 
+									"data_place_" + i + "_" + curWith + "_" + fbName + 
+									" = data_" + fromSignal + "_" + fromInstance + ";";
+							}
 						}
 					}
-					// reset current queue place
-					for (Iterator withIter = withData.iterator(); withIter.hasNext();)
-					{
-						String curWith = ((With) withIter.next()).getVar();
-						action = action + 
-							"data_place_" + i + "_" + curWith + "_" + fbName + " = 0;";
-					}
+					eventQueue.addTransition(from, to, event, guard, action);
 				}
- 				eventQueue.addTransition(from, to, event, guard, action);
 
+				// Transiton when dequeuing event
+				if (isEventConnected(fbName, eventName))
+				{					
+					from = "s" + i;
+					to = "s" + (i-1);
+					event = "remove_event_" + fbName + ";";
+					guard = "event_place_" + i + "_" + fbName + " == " + eventID;
+					action = "event_" + eventName + "_" + fbName + " = 1;";
+					// move events in the queue
+					for (int j = 1; j <= i-1; j++)
+					{
+						action = action + "event_place_" + j + "_" + fbName +  " = event_place_" + (j+1) + "_" + fbName + ";";
+					}
+					action = action + "event_place_" + i + "_" + fbName + " = 0;";
+					if (curEvent.isSetWith())
+					{
+						List withData = curEvent.getWith();
+
+						// get first data in the queue
+						for (Iterator withIter = withData.iterator(); withIter.hasNext();)
+						{
+							String curWith = ((With) withIter.next()).getVar();
+							if (isDataConnected(fbName, curWith))
+							{														
+								action = action + 
+									"data_" + curWith + "_" + fbName + " = data_place_" + i + "_" + curWith + "_" + fbName + ";";
+							}
+						}
+						// move the queue
+						for (Iterator withIter = withData.iterator(); withIter.hasNext();)
+						{
+							String curWith = ((With) withIter.next()).getVar();
+							if (isDataConnected(fbName, curWith))
+							{														
+								for (int j = 1; j <= i-1; j++)
+								{
+									action = action + 
+										"data_place_" + j + "_" + curWith + "_" + fbName + " = data_place_" + (j+1) + "_" + curWith + "_" + fbName + ";";						
+								}
+							}
+						}
+						// reset current queue place
+						for (Iterator withIter = withData.iterator(); withIter.hasNext();)
+						{
+							String curWith = ((With) withIter.next()).getVar();
+							if (isDataConnected(fbName, curWith))
+							{														
+								action = action + 
+									"data_place_" + i + "_" + curWith + "_" + fbName + " = 0;";
+							}
+						}
+					}
+					eventQueue.addTransition(from, to, event, guard, action);
+				}
+				
 				// Transiton to reset the event input variable
- 				from = "s" + (i-1);
- 				to = "s" + (i-1);
- 				event = "reset_event_" + eventName + "_" + fbName + ";";
- 				guard = null;
- 				action = "event_" + eventName + "_" + fbName + " = 0;";
- 				eventQueue.addTransition(from, to, event, guard, action);
+				if (isEventConnected(fbName, eventName))
+				{					
+					from = "s" + (i-1);
+					to = "s" + (i-1);
+					event = "reset_event_" + eventName + "_" + fbName + ";";
+					guard = null;
+					action = "event_" + eventName + "_" + fbName + " = 0;";
+					eventQueue.addTransition(from, to, event, guard, action);
+				}
 			}
 		}
 		automata.addAutomaton(eventQueue);	
@@ -1450,25 +1530,25 @@ class ModelMaker
 				{
 					output(ERROR, "Error: Unsupported input data variable type: BOOL", 2);
 					output(ERROR, "Variable name: " + fbName + "_" + curName, 3);
-					System.exit(1);
+					exit(1);
 				}
 				else if (curType.toLowerCase().equals("real"))
 				{
 					output(ERROR, "Error: Unsupported input data variable type: REAL", 2);
 					output(ERROR, "Variable name: " + fbName + "_" + curName, 3);
-					System.exit(1);
+					exit(1);
 				}
 				else if (curType.toLowerCase().equals("string"))
 				{
 					output(ERROR, "Error: Unsupported input data variable type: STRING", 2);
 					output(ERROR, "Variable name: " + fbName + "_" + curName, 3);
-					System.exit(1);
+					exit(1);
 				}
 				else if (curType.toLowerCase().equals("object"))
 				{
 					output(ERROR, "Error: Unsupported input data variable type: OBJECT", 2);
 					output(ERROR, "Variable name: " + fbName + "_" + curName, 3);
-					System.exit(1);
+					exit(1);
 				}
 			}
 		}
@@ -1674,7 +1754,7 @@ class ModelMaker
 				{
 					output(ERROR, "Error!: Parsing of the EC condition failed:", level);
 					output(ERROR, "Condition: " + curECCondition, level + 1);
-					System.exit(1);
+					exit(1);
 				}
 				Finder finder = new Finder(parsedCondition);
 				Translator translator = new Translator(parsedCondition, identifierMap, operatorMap);
@@ -1689,23 +1769,26 @@ class ModelMaker
 					{
 						JaxbEvent curEventInput = (JaxbEvent) iter.next();
 						String curEventInputName = curEventInput.getName();
-						if (finder.existsIdentifier(curEventInputName))
+						if (isEventConnected(fbName, curEventInputName))
 						{
-							from = prevStateName;
-							to = "s" + nameCounter;
-							nameCounter++;
-							output(DEBUG, "Adding state: " + to, level);
-							ecc.addState(to);
-							event = "event_input_" + curEventInputName + "_" + fbName + ";";
-							newGuard = "event_" + curEventInputName + "_" + fbName + " == 1 & (" + guard + ")";
-							output(DEBUG, "Adding transition: from: " + from + ", to: " + to + ", event: " + event, level);
-							ecc.addTransition(from, to, event, newGuard, null);
-
-							from = to;
-							to = curECDestName + "_actions";
-							event = "reset_event_" + curEventInputName + "_" + fbName + ";";
-							output(DEBUG, "Adding transition: from: " + from + ", to: " + to + ", event: " + event, level);
-							ecc.addTransition(from, to, event, null, null);
+							if (finder.existsIdentifier(curEventInputName))
+							{
+								from = prevStateName;
+								to = "s" + nameCounter;
+								nameCounter++;
+								output(DEBUG, "Adding state: " + to, level);
+								ecc.addState(to);
+								event = "event_input_" + curEventInputName + "_" + fbName + ";";
+								newGuard = "event_" + curEventInputName + "_" + fbName + " == 1 & (" + guard + ")";
+								output(DEBUG, "Adding transition: from: " + from + ", to: " + to + ", event: " + event, level);
+								ecc.addTransition(from, to, event, newGuard, null);
+								
+								from = to;
+								to = curECDestName + "_actions";
+								event = "reset_event_" + curEventInputName + "_" + fbName + ";";
+								output(DEBUG, "Adding transition: from: " + from + ", to: " + to + ", event: " + event, level);
+								ecc.addTransition(from, to, event, null, null);
+							}
 						}
 					}
 				}
@@ -1759,7 +1842,7 @@ class ModelMaker
 								nameCounter++;
 								output(DEBUG, "Adding state: " + to, level);
 								ecc.addState(to);
-								event = "finished_job_" + fbName + ";";
+								event = "finished_execution_" + actionAlgorithm + "_" + fbName + ";";
 								output(DEBUG, "Adding transition: from: " + from + ", to: " + to + ", event: " + event, level);
 								ecc.addTransition(from, to, event, null, null);
 								next = to;						
@@ -1770,23 +1853,26 @@ class ModelMaker
 								output(DEBUG, "Adding state: " + to, level);
 								ecc.addState(to);
 								event = "send_output_" + curAction.getOutput() + "_" + fbName + ";";
-								// get connection data for the action
-								String cntName = (String) ((Map) eventConnections.get(fbName)).get(curAction.getOutput());
-								String cntFB = getInstanceName(cntName);
-								String cntSignal = getSignalName(cntName);
 								output(DEBUG, "Adding transition: from: " + from + ", to: " + to + ", event: " + event, level);
 								ecc.addTransition(from, to, event, null, null);
 								next = to;						
 								
-								from = next;
-								to = "s" + nameCounter; 
-								nameCounter++;
-								output(DEBUG, "Adding state: " + to, level);
-								ecc.addState(to);
-								event = "receive_event_" + cntSignal + "_" + cntFB + ";";
-								output(DEBUG, "Adding transition: from: " + from + ", to: " + to + ", event: " + event, level);
-								ecc.addTransition(from, to, event, null, null);
-								next = to;						
+								if (isEventConnected(fbName, curAction.getOutput()))
+								{
+									from = next;
+									to = "s" + nameCounter; 
+									nameCounter++;
+									output(DEBUG, "Adding state: " + to, level);
+									ecc.addState(to);
+									// get connection data for the action
+									String cntName = getEventConnection(fbName, curAction.getOutput());
+									String cntFB = getInstanceName(cntName);
+									String cntSignal = getSignalName(cntName);
+									event = "receive_event_" + cntSignal + "_" + cntFB + ";";
+									output(DEBUG, "Adding transition: from: " + from + ", to: " + to + ", event: " + event, level);
+									ecc.addTransition(from, to, event, null, null);
+									next = to;						
+								}
 							}
 							else
 							{
@@ -1795,7 +1881,7 @@ class ModelMaker
 								nameCounter++;
 								output(DEBUG, "Adding state: " + to, level);
 								ecc.addState(to);
-								event = "finished_job_" + fbName + ";";
+								event = "finished_execution_" + actionAlgorithm + "_" + fbName + ";";
 								output(DEBUG, "Adding transition: from: " + from + ", to: " + to + ", event: " + event, level);
 								ecc.addTransition(from, to, event, null, null);
 								next = to;						
@@ -1809,23 +1895,26 @@ class ModelMaker
 							output(DEBUG, "Adding state: " + to, level);
 							ecc.addState(to);
 							event = "send_output_" + curAction.getOutput() + "_" + fbName + ";";
-							// get connection data for the action
-							String cntName = (String) ((Map) eventConnections.get(fbName)).get(curAction.getOutput());
-							String cntFB = getInstanceName(cntName);
-							String cntSignal = getSignalName(cntName);
 							output(DEBUG, "Adding transition: from: " + from + ", to: " + to + ", event: " + event, level);
 							ecc.addTransition(from, to, event, null, null);
 							next = to;						
 							
-							from = next;
-							to = "s" + nameCounter; 
-							nameCounter++;
-							output(DEBUG, "Adding state: " + to, level);
-							ecc.addState(to);
-							event = "receive_event_" + cntSignal + "_" + cntFB + ";";
-							output(DEBUG, "Adding transition: from: " + from + ", to: " + to + ", event: " + event, level);
-							ecc.addTransition(from, to, event, null, null);
-							next = to;						
+							if (isEventConnected(fbName, curAction.getOutput()))
+							{
+								from = next;
+								to = "s" + nameCounter; 
+								nameCounter++;
+								output(DEBUG, "Adding state: " + to, level);
+								ecc.addState(to);
+								// get connection data for the action
+								String cntName = getEventConnection(fbName, curAction.getOutput());
+								String cntFB = getInstanceName(cntName);
+								String cntSignal = getSignalName(cntName);
+								event = "receive_event_" + cntSignal + "_" + cntFB + ";";
+								output(DEBUG, "Adding transition: from: " + from + ", to: " + to + ", event: " + event, level);
+								ecc.addTransition(from, to, event, null, null);
+								next = to;						
+							}
 						}
 					}
 				}
@@ -2088,6 +2177,62 @@ class ModelMaker
 		}
 	}
 
+	private boolean isEventConnected(String fbName, String signal)
+	{
+		Map fbEventCons = (Map) eventConnections.get(fbName);
+		if (fbEventCons != null)
+		{
+			String cntName = (String) fbEventCons.get(signal);
+			if (cntName != null)
+			{
+				return true;
+			}
+		}
+		return false;
+	}
+
+	private boolean isDataConnected(String fbName, String signal)
+	{
+		Map fbDataCons = (Map) dataConnections.get(fbName);
+		if (fbDataCons != null)
+		{
+			String cntName = (String) fbDataCons.get(signal);
+			if (cntName != null)
+			{
+				return true;
+			}
+		}
+		return false;
+	}
+
+	private String getEventConnection(String fbName, String signal)
+	{
+		Map fbEventCons = (Map) eventConnections.get(fbName);
+		if (fbEventCons != null)
+		{
+			String cntName = (String) fbEventCons.get(signal);
+			if (cntName != null)
+			{
+				return cntName;
+			}
+		}
+		return null;
+	}
+
+	private String getDataConnection(String fbName, String signal)
+	{
+		Map fbDataCons = (Map) dataConnections.get(fbName);
+		if (fbDataCons != null)
+		{
+			String cntName = (String) fbDataCons.get(signal);
+			if (cntName != null)
+			{
+				return cntName;
+			}
+		}
+		return null;
+	}
+
 	private ExtendedAutomaton getNewAutomaton(String name)
 	{
 		return new ExtendedAutomaton(name, automata);
@@ -2095,123 +2240,123 @@ class ModelMaker
 
 	private void printFunctionBlocksMap()
 	{
-		output("ModelMaker.printFunctionBlocksMap():");
+		output(DEBUG, "ModelMaker.printFunctionBlocksMap():");
 		for (Iterator iter = functionBlocks.keySet().iterator(); iter.hasNext();)
 		{
 			String curBlock = (String) iter.next();
 			String curType  = (String) functionBlocks.get(curBlock);
-			output(curBlock + "\t" + curType, 1);
+			output(DEBUG, curBlock + "\t" + curType, 1);
 		}
 	}
 
 	private void printBasicFunctionBlocksMap()
 	{
-		output("ModelMaker.printBasicFunctionBlocksMap():");
+		output(DEBUG, "ModelMaker.printBasicFunctionBlocksMap():");
 		for (Iterator iter = basicFunctionBlocks.keySet().iterator(); iter.hasNext();)
 		{
 			String curBlock = (String) iter.next();
 			String curType  = (String) basicFunctionBlocks.get(curBlock);
 			Integer curID = (Integer) basicFunctionBlocksID.get(curBlock);
-			output(curBlock + "\t" + curType + "\t" + curID, 1);
+			output(DEBUG, curBlock + "\t" + curType + "\t" + curID, 1);
 		}
-		output("Maximal block ID: " + fbMaxID, 1);			
+		output(DEBUG, "Maximal block ID: " + fbMaxID, 1);			
 	}	
 
 	private void printEventsMap()
 	{
-		output("ModelMaker.printEventsMap():");
+		output(DEBUG, "ModelMaker.printEventsMap():");
 		for (Iterator iter = events.keySet().iterator(); iter.hasNext();)
 		{
 			String curBlock = (String) iter.next();
 			Map curEventIDMap  = (Map) events.get(curBlock);
-			output(curBlock, 1);
+			output(DEBUG, curBlock, 1);
 			for (Iterator evIter = curEventIDMap.keySet().iterator(); evIter.hasNext();)
 			{
 				String curEventName = (String) evIter.next();
 				Integer curEventID = (Integer) curEventIDMap.get(curEventName);
-				output(curEventName + "\t" + curEventID, 2);
+				output(DEBUG, curEventName + "\t" + curEventID, 2);
 			}
 			Integer evMaxID = (Integer) eventsMaxID.get(curBlock);
-			output("Maximal event ID: " + evMaxID, 1);
+			output(DEBUG, "Maximal event ID: " + evMaxID, 1);
 		}
 	}	
 
 	private void printAlgorithmsMap()
 	{
-		output("ModelMaker.printAlgorithmsMap():");
+		output(DEBUG, "ModelMaker.printAlgorithmsMap():");
 		for (Iterator iter = algorithms.keySet().iterator(); iter.hasNext();)
 		{
 			String curBlock = (String) iter.next();
 			Map curAlgMap  = (Map) algorithms.get(curBlock);
-			output(curBlock, 1);
+			output(DEBUG, curBlock, 1);
 			for (Iterator algIter = curAlgMap.keySet().iterator(); algIter.hasNext();)
 			{
 				String curAlgName = (String) algIter.next();
 				Integer curAlgID = (Integer) curAlgMap.get(curAlgName);
-				output(curAlgName + "\t" + curAlgID, 2);
+				output(DEBUG, curAlgName + "\t" + curAlgID, 2);
 			}
 		}
-		output("Maximal algorithm ID: " + algMaxID, 1);
+		output(DEBUG, "Maximal algorithm ID: " + algMaxID, 1);
 	}	
 
 	private void printAlgorithmTextsMap()
 	{
-		output("ModelMaker.printAlgorithmTextsMap():");
+		output(DEBUG, "ModelMaker.printAlgorithmTextsMap():");
 		for (Iterator iter = algorithmTexts.keySet().iterator(); iter.hasNext();)
 		{
 			String curBlock = (String) iter.next();
 			Map curAlgTextMap  = (Map) algorithmTexts.get(curBlock);
-			output(curBlock, 1);
+			output(DEBUG, curBlock, 1);
 			for (Iterator algIter = curAlgTextMap.keySet().iterator(); algIter.hasNext();)
 			{
 				String curAlgName = (String) algIter.next();
 				String curAlgText = (String) curAlgTextMap.get(curAlgName);
-				output(curAlgName + "\t" + curAlgText, 2);
+				output(DEBUG, curAlgName + "\t" + curAlgText, 2);
 			}
 		}
 	}	
 	
 	private void printFBTypesMap()
 	{
-		output("ModelMaker.printFBTypesMap():");
+		output(DEBUG, "ModelMaker.printFBTypesMap():");
 		for (Iterator iter = fbTypes.keySet().iterator(); iter.hasNext();)
 		{
 			String curBlock = (String) iter.next();
 			JaxbFBType curType  = (JaxbFBType) fbTypes.get(curBlock);
-			output(curBlock + "\t" + curType.getName(), 1);
+			output(DEBUG, curBlock + "\t" + curType.getName(), 1);
 		}
 	}
 	
 	private void printEventConnectionsMap()
 	{
-		output("ModelMaker.printEventConnectionsMap():");
+		output(DEBUG, "ModelMaker.printEventConnectionsMap():");
 		for (Iterator fbIter = eventConnections.keySet().iterator(); fbIter.hasNext();)
 		{
 			String curBlock = (String) fbIter.next();
 			Map curEvents = (Map) eventConnections.get(curBlock);
-			output(curBlock, 1);
+			output(DEBUG, curBlock, 1);
 			for (Iterator evIter = curEvents.keySet().iterator(); evIter.hasNext();)
 			{
 				String curEvent = (String) evIter.next();
 				String curConnection  = (String) curEvents.get(curEvent);
-				output(curEvent + " --> " + curConnection, 2);
+				output(DEBUG, curEvent + " --> " + curConnection, 2);
 			}
 		}
 	}
 	
 	private void printDataConnectionsMap()
 	{
-		output("ModelMaker.printDataConnectionsMap():");
+		output(DEBUG, "ModelMaker.printDataConnectionsMap():");
 		for (Iterator fbIter = dataConnections.keySet().iterator(); fbIter.hasNext();)
 		{
 			String curBlock = (String) fbIter.next();
 			Map curDatas = (Map) dataConnections.get(curBlock);
-			output(curBlock, 1);
+			output(DEBUG, curBlock, 1);
 			for (Iterator dataIter = curDatas.keySet().iterator(); dataIter.hasNext();)
 			{
 				String curData = (String) dataIter.next();
 				String curConnection  = (String) curDatas.get(curData);
-				output(curConnection + " --> " + curData, 2);
+				output(DEBUG, curData + " --> " + curConnection, 2);
 			}
 		}
 	}
@@ -2242,4 +2387,10 @@ class ModelMaker
 			System.out.println(text);
 		}
 	}
+
+	private static void exit(int status)
+	{
+		System.exit(status);
+	}
+
 }
