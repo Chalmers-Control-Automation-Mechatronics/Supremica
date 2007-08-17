@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui.renderer
 //# CLASS:   HornerPolynomial
 //###########################################################################
-//# $Id: HornerPolynomial.java,v 1.4 2007-05-27 16:30:06 robi Exp $
+//# $Id: HornerPolynomial.java,v 1.5 2007-08-17 00:38:47 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.gui.renderer;
@@ -329,7 +329,7 @@ public class HornerPolynomial
     } else {
       // There really are two distinct global minima.
       if (x1 <= extremal0) {
-        if (yy0 > 0.0 && yy1 < 0.0) {
+        if (yy0 < 0.0 && yy1 > 0.0) {
           return derivative1.newtonIteration(x0);
         } else {
           return yy1 < 0.0 ? x1 : x0;

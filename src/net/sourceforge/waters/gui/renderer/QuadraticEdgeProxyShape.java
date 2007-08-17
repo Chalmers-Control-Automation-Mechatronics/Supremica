@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui.renderer
 //# CLASS:   QuadraticEdgeProxyShape
 //###########################################################################
-//# $Id: QuadraticEdgeProxyShape.java,v 1.3 2007-05-18 15:42:02 robi Exp $
+//# $Id: QuadraticEdgeProxyShape.java,v 1.4 2007-08-17 00:38:47 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.gui.renderer;
@@ -108,7 +108,7 @@ class QuadraticEdgeProxyShape
     final double x = turn.getX() + dist * dir.getX();
     final double y = turn.getY() + dist * dir.getY();
     final Point2D rawtip = new Point2D.Double(x, y);
-    if (mStart.distance(mEnd) < EdgeProxyShape.ARROW_HEIGHT) {
+    if (mStart.distanceSq(mEnd) < EdgeProxyShape.ARROW_HEIGHT_SQ) {
       return rawtip;
     } else {
       return GeometryTools.findClosestPointOnQuadratic
