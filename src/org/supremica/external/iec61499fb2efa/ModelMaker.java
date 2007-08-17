@@ -1064,6 +1064,10 @@ class ModelMaker
 
 	private void makeAlgorithmExecution()
 	{
+		// TODO: fix the limitiation that any data output
+		// or internal var may be written by one algorithm
+		// only
+
 		output("ModelMaker.makeAlgorithmExecution():");
 
 		ExtendedAutomaton algorithmExecution = getNewAutomaton("Algorithm Execution");
