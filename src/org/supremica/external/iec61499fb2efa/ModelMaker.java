@@ -872,28 +872,22 @@ class ModelMaker
 
 		ExtendedAutomaton startup = getNewAutomaton("Startup");
 		
-		//startup.addIntegerVariable("startup_done", 0, 1, 0, 1);
-
 		startup.addInitialState("s0");
 		
 		String from = "s0";
 		String to = "s1"; 
 		startup.addState(to);
 		String event = "send_output_COLD_" + fbName + ";";
-		//String guard = "startup_done == 0";
-		// get connection data for the action
-		String cntName = (String) ((Map) eventConnections.get(fbName)).get("COLD");
-		String cntFB = getInstanceName(cntName);
-		String cntSignal = getSignalName(cntName);
-		Integer cntSignalID = (Integer) ((Map) events.get(cntFB)).get(cntSignal);
-		String action = "receiving_event_" + cntFB + " = " + cntSignalID + ";";	
-		startup.addTransition(from, to, event, null, action);
+		startup.addTransition(from, to, event, null, null);
 		
 		from = to;
 		to = "s2";
 		startup.addAcceptingState(to);
-		event = "receive_event_" + cntFB + ";";
-		//action = "startup_done = 1;";
+		// get connection data for the action
+		String cntName = (String) ((Map) eventConnections.get(fbName)).get("COLD");
+		String cntFB = getInstanceName(cntName);
+		String cntSignal = getSignalName(cntName);
+		event = "receive_event_" + cntSignal + "_" +cntFB + ";";
 		startup.addTransition(from, to, event, null, null);
 
 		automata.addAutomaton(startup);
@@ -909,7 +903,6 @@ class ModelMaker
 		// the maximum number of FB instances in the queue at the same time
 		final int places = basicFunctionBlocks.keySet().size();
 
-		instanceQueue.addIntegerVariable("queuing_fb", 0, fbMaxID, 0, 0);
 		instanceQueue.addIntegerVariable("current_fb", 0, fbMaxID, 0, 0);
 		
 		instanceQueue.addInitialState("s0");
@@ -922,32 +915,27 @@ class ModelMaker
 			String from = "s" + (i-1);
 			String to = "s" + i;
 			String event = "";
+			String action = "";
 			for (Iterator fbIter = basicFunctionBlocks.keySet().iterator(); fbIter.hasNext();)
 			{
-				String instanceName = (String) fbIter.next();
-				event = event + "queue_fb_" + instanceName + ";";
+				String fbName = (String) fbIter.next();		
+				Integer fbID = (Integer) basicFunctionBlocksID.get(fbName);
+
+				event = "queue_fb_" + fbName + ";";
+				action = "fb_place_" + i + " = " + fbID + ";";
+				instanceQueue.addTransition(from, to, event, null, action);
 			}
 
-			String guard = "queuing_fb > 0";
-			for (int j = 1; j <= (i-1); j++)
-			{
-				guard = guard + " & queuing_fb != fb_place_" + j;
-			}
-			String action = "fb_place_" + i + " = queuing_fb;";
-			action = action + "queuing_fb = 0;";
-			instanceQueue.addTransition(from, to, event, guard, action);
 			// Transiton when dequeuing instance
 			from = "s" + i;
 			to = "s" + (i-1);
 			event = "remove_fb;";      
-			guard = "";      
 			action = "current_fb = fb_place_1;";
 			for (int j = 1; j <= i-1; j++)
 			{
 				action = action + "fb_place_" + j + " = fb_place_" + (j+1) + ";";
 			}
-			action = action + "fb_place_" + i + " = 0;";
-			instanceQueue.addTransition(from, to, event, guard, action);      
+			instanceQueue.addTransition(from, to, event, null, action);      
 		}
 		automata.addAutomaton(instanceQueue);
 	}
@@ -985,8 +973,6 @@ class ModelMaker
 		// the maximum number of jobs in the queue at the same time
 		final int places = basicFunctionBlocks.keySet().size();	
 		
-		jobQueue.addIntegerVariable("queuing_job_fb", 0, fbMaxID, 0, 0);
-		jobQueue.addIntegerVariable("queuing_job_alg", 0, algMaxID, 0, 0);
 		jobQueue.addIntegerVariable("current_job_fb", 0, fbMaxID, 0, 0);
 		jobQueue.addIntegerVariable("current_job_alg", 0, algMaxID, 0, 0);
 
@@ -996,27 +982,37 @@ class ModelMaker
 			jobQueue.addIntegerVariable("job_fb_place_" + i, 0, fbMaxID, 0, 0);
 			jobQueue.addIntegerVariable("job_alg_place_" + i, 0, algMaxID, 0, 0);
 	
-		jobQueue.addState("s" + i);
+			jobQueue.addState("s" + i);
 			//Transiton when queuing job
 			String from = "s" + (i-1);
 			String to = "s" + i;
 			String event = "";
+			String guard = "";
+			String action = "";
 			for (Iterator fbIter = basicFunctionBlocks.keySet().iterator(); fbIter.hasNext();)
 			{
-				String instanceName = (String) fbIter.next();
-				event = event + "queue_job_" + instanceName + ";";
+				String fbName = (String) fbIter.next();
+				Integer fbID = (Integer) basicFunctionBlocksID.get(fbName);
+				Map fbAlgorithms = (Map) algorithms.get(fbName);
+				if (fbAlgorithms != null)
+				{
+					for (Iterator algIter = fbAlgorithms.keySet().iterator(); algIter.hasNext();)
+					{
+						String curAlg = (String) algIter.next();
+						Integer algID = (Integer) fbAlgorithms.get(curAlg);
+					
+						event = "queue_job_" + curAlg + "_" + fbName +";";
+						action = "job_fb_place_" + i + " = " + fbID + ";";
+						action = action + "job_alg_place_" + i + " = " + algID + ";";
+						jobQueue.addTransition(from, to, event, null, action);
+					}
+				}
 			}
-			String guard = "queuing_job_fb > 0 & queuing_job_alg > 0";
-			String action = "job_fb_place_" + i + " = queuing_job_fb;";
-			action = action + "job_alg_place_" + i + " = queuing_job_alg;";
-			action = action + "queuing_job_fb = 0;";
-			action = action + "queuing_job_alg = 0;";
-			jobQueue.addTransition(from, to, event, guard, action);
+
 			// Transiton when dequeuing job
 			from = "s" + i;
 			to = "s" + (i-1);
 			event = "remove_job;";      
-			guard = "";      
 			action = "current_job_fb = job_fb_place_1;";
 			action = action + "current_job_alg = job_alg_place_1;";
 			for (int j = 1; j <= i-1; j++)
@@ -1024,9 +1020,7 @@ class ModelMaker
 				action = action + "job_fb_place_" + j + " = job_fb_place_" + (j+1) + ";";
 				action = action + "job_alg_place_" + j + " = job_alg_place_" + (j+1) + ";";
 			}
-			action = action + "job_fb_place_" + i + " = 0;";
-			action = action + "job_alg_place_" + i + " = 0;";
-			jobQueue.addTransition(from, to, event, guard, action);      
+			jobQueue.addTransition(from, to, event, null, action);      
 		}
 		automata.addAutomaton(jobQueue);	
 	}
@@ -1081,51 +1075,66 @@ class ModelMaker
 	{
 		output("Event Receiving", 1);
 
-		Integer fbID = (Integer) basicFunctionBlocksID.get(fbName);
-		Integer eventMaxID = (Integer) eventsMaxID.get(fbName); 
+		Map fbEvents = (Map) events.get(fbName);
 
 		ExtendedAutomaton eventReceiving = getNewAutomaton("Event Receiving " + fbName);
 
-		eventReceiving.addIntegerVariable("receiving_event_" + fbName, 0, eventMaxID, 0, 0);
-				
+		int nameCounter = 2;
+
 		eventReceiving.addInitialState("s0");
 		eventReceiving.addState("s1");
-		eventReceiving.addState("s2");
-		eventReceiving.addState("s3");
-		eventReceiving.addState("s4");
-
-		String from = "s0";
-		String to = "s1";
-		String event = "receive_event_" + fbName + ";";
-		String action = "queuing_event_" + fbName + " = receiving_event_" + fbName + ";";
-		//action = action + "receiving_event_" + fbName + " = 0;";
-		eventReceiving.addTransition(from, to, event, null, action);
-
-		from = "s1";
-		to = "s2";
-		event = "queue_event_" + fbName + ";";
-		action = "queuing_fb = " + fbID + ";";
-		eventReceiving.addTransition(from, to, event, null, action);
 		
-		from = "s2";
-		to = "s3";
+		String from = "";
+		String to = "";
+		String event = "";
+		String action = "";
+
+		for (Iterator evIter = fbEvents.keySet().iterator(); evIter.hasNext();)
+		{
+			String curEvent = (String) evIter.next();
+			
+			from = "s0";
+			to = "s" + nameCounter;
+			eventReceiving.addState(to);
+			nameCounter++;
+			event = "receive_event_" + curEvent + "_" + fbName + ";";
+			eventReceiving.addTransition(from, to, event, null, null);
+
+			from = to;
+			to = "s1";
+			event = "queue_event_" + curEvent + "_" + fbName + ";";
+			eventReceiving.addTransition(from, to, event, null, null);			
+		}
+
+		from = "s1";	
+		to = "s" + nameCounter;
+		eventReceiving.addState(to);
+		nameCounter++;					
 		event = "queue_fb_" + fbName + ";";
 		eventReceiving.addTransition(from, to, event, null, null);
 
-		from = "s3";
+		String handleFrom = to;
+
+		for (Iterator evIter = fbEvents.keySet().iterator(); evIter.hasNext();)
+		{
+			String curEvent = (String) evIter.next();
+			
+			from = handleFrom;
+			to = "s" + nameCounter;
+			eventReceiving.addState(to);
+			nameCounter++;
+			event = "receive_event_" + curEvent + "_" + fbName + ";";
+			eventReceiving.addTransition(from, to, event, null, null);
+
+			from = to;
+			to = handleFrom;
+			event = "queue_event_" + curEvent + "_" + fbName + ";";
+			eventReceiving.addTransition(from, to, event, null, null);			
+		}
+
+		from = handleFrom;
 		to = "s0";
 		event = "handle_event_" + fbName + ";";
-		eventReceiving.addTransition(from, to, event, null, null);
-
-		from = "s3";
-		to = "s4";
-		event = "receive_event_" + fbName + ";";
-		action = "queuing_event_" + fbName + " = receiving_event_" + fbName + ";";
-		eventReceiving.addTransition(from, to, event, null, action);
-
-		from = "s4";
-		to = "s3";
-		event = "queue_event_" + fbName + ";";
 		eventReceiving.addTransition(from, to, event, null, null);
 
 		automata.addAutomaton(eventReceiving);
@@ -1186,12 +1195,8 @@ class ModelMaker
 		ExtendedAutomaton eventQueue = getNewAutomaton("Event Queue " + fbName);
 		
 		// the maximum number of events in the queue at the same time
-		final int places = basicFunctionBlocks.keySet().size();	
+		final int places = eventInputList.size();	
 		
-		final int evMaxID = ((Integer) eventsMaxID.get(fbName)).intValue();
-		eventQueue.addIntegerVariable("queuing_event_" + fbName, 0, evMaxID, 0, 0);
-
-
 		// event input variables
 		if (theType.getInterfaceList().isSetEventInputs())
 		{
@@ -1288,8 +1293,7 @@ class ModelMaker
 
 		for (int i = 1; i <= places; i++)
 		{
-		
-			eventQueue.addIntegerVariable("event_" + fbName + "_place_" + i, 0, fbMaxID, 0, 0);
+			eventQueue.addIntegerVariable("event_place_" + i + "_" + fbName, 0, fbMaxID, 0, 0);
 			
 			// data input variables for each queue place
 			if (theType.getInterfaceList().isSetInputVars())
@@ -1302,7 +1306,7 @@ class ModelMaker
 					String curDataType =  curDeclaration.getType();
 					if (curDataType.toLowerCase().equals("int"))
 					{
-						eventQueue.addIntegerVariable("data_" + curDataInputName + "_" + fbName + "_place_" + i, 0, intVarMaxValue, 0, 0);
+						eventQueue.addIntegerVariable("data_place_" + i + "_" + curDataInputName + "_" + fbName, 0, intVarMaxValue, 0, 0);
 					}
 					else if (curDataType.toLowerCase().equals("bool"))
 					{
@@ -1339,13 +1343,13 @@ class ModelMaker
 				JaxbEvent curEvent = (JaxbEvent) evIter.next();
 				String eventName = curEvent.getName();
 				int eventID = ((Integer) ((Map) events.get(fbName)).get(eventName)).intValue();
-				
-				//Transiton when queuing event
+
+				// Transiton when queuing event
  				String from = "s" + (i-1);
  				String to = "s" + i;
- 				String event = "queue_event_" + fbName + ";";
- 				String guard = "queuing_event_" + fbName + " == " + eventID;
- 				String action = "event_" + fbName + "_place_" + i + " = queuing_event_" + fbName + ";";
+ 				String event = "queue_event_" + eventName + "_" + fbName + ";";
+ 				String guard = null;
+ 				String action = "event_place_" + i + "_" + fbName + " = " + eventID + ";";
 				if (curEvent.isSetWith())
 				{
 					List withData = curEvent.getWith();
@@ -1356,26 +1360,24 @@ class ModelMaker
 						String fromInstance = getInstanceName(cntFrom);
 						String fromSignal = getSignalName(cntFrom);				
 						action = action + 
-							"data_" + curWith + "_" + fbName + "_place_" + i + 
+							"data_place_" + i + "_" + curWith + "_" + fbName + 
 							" = data_" + fromSignal + "_" + fromInstance + ";";
 					}
 				}
- 				action = action + "queuing_event_" + fbName + " = 0;";
  				eventQueue.addTransition(from, to, event, guard, action);
 
 				// Transiton when dequeuing event
  				from = "s" + i;
  				to = "s" + (i-1);
  				event = "remove_event_" + fbName + ";";
- 				guard = "event_" + fbName + "_place_" + i + " == " + eventID;
+ 				guard = "event_place_" + i + "_" + fbName + " == " + eventID;
  				action = "event_" + eventName + "_" + fbName + " = 1;";
 				// move events in the queue
 				for (int j = 1; j <= i-1; j++)
 				{
-					action = action + "event_" + fbName + "_place_" + j + " = event_" + fbName + "_place_" + (j+1) + ";";
+					action = action + "event_place_" + j + "_" + fbName +  " = event_place_" + (j+1) + "_" + fbName + ";";
 				}
- 				action = action + "event_" + fbName + "_place_" + i + " = 0;";
-
+ 				action = action + "event_place_" + i + "_" + fbName + " = 0;";
 				if (curEvent.isSetWith())
 				{
 					List withData = curEvent.getWith();
@@ -1384,7 +1386,7 @@ class ModelMaker
 					{
 						String curWith = ((With) withIter.next()).getVar();
 						action = action + 
-							"data_" + curWith + "_" + fbName + " = data_" + curWith + "_" + fbName + "_place_" + i + ";";
+							"data_" + curWith + "_" + fbName + " = data_place_" + i + "_" + curWith + "_" + fbName + ";";
 					}
 					// move the queue
 					for (Iterator withIter = withData.iterator(); withIter.hasNext();)
@@ -1393,8 +1395,7 @@ class ModelMaker
 						for (int j = 1; j <= i-1; j++)
 						{
 							action = action + 
-								"data_" + curWith + "_" + fbName + "_place_" + j + " = data_" + curWith + "_" + fbName + "_place_" + (j+1) + ";";
-							
+								"data_place_" + j + "_" + curWith + "_" + fbName + " = data_place_" + (j+1) + "_" + curWith + "_" + fbName + ";";						
 						}
 					}
 					// reset current queue place
@@ -1402,10 +1403,17 @@ class ModelMaker
 					{
 						String curWith = ((With) withIter.next()).getVar();
 						action = action + 
-							"data_" + curWith + "_" + fbName + "_place_" + i + " = 0;";
+							"data_place_" + i + "_" + curWith + "_" + fbName + " = 0;";
 					}
 				}
+ 				eventQueue.addTransition(from, to, event, guard, action);
 
+				// Transiton to reset the event input variable
+ 				from = "s" + (i-1);
+ 				to = "s" + (i-1);
+ 				event = "reset_event_" + eventName + "_" + fbName + ";";
+ 				guard = null;
+ 				action = "event_" + eventName + "_" + fbName + " = 0;";
  				eventQueue.addTransition(from, to, event, guard, action);
 			}
 		}
@@ -1683,11 +1691,21 @@ class ModelMaker
 						String curEventInputName = curEventInput.getName();
 						if (finder.existsIdentifier(curEventInputName))
 						{
+							from = prevStateName;
+							to = "s" + nameCounter;
+							nameCounter++;
+							output(DEBUG, "Adding state: " + to, level);
+							ecc.addState(to);
 							event = "event_input_" + curEventInputName + "_" + fbName + ";";
 							newGuard = "event_" + curEventInputName + "_" + fbName + " == 1 & (" + guard + ")";
-							action = "event_" + curEventInputName + "_" + fbName + " = 0;";					
 							output(DEBUG, "Adding transition: from: " + from + ", to: " + to + ", event: " + event, level);
-							ecc.addTransition(from, to, event, newGuard, action);
+							ecc.addTransition(from, to, event, newGuard, null);
+
+							from = to;
+							to = curECDestName + "_actions";
+							event = "reset_event_" + curEventInputName + "_" + fbName + ";";
+							output(DEBUG, "Adding transition: from: " + from + ", to: " + to + ", event: " + event, level);
+							ecc.addTransition(from, to, event, null, null);
 						}
 					}
 				}
@@ -1720,28 +1738,16 @@ class ModelMaker
 						JaxbECAction curAction = (JaxbECAction) actionsIter.next();
 						if (curAction.isSetAlgorithm())
 						{
-							// get action algorithm ID
-							Integer actionAlgorithm = (Integer) ((Map) algorithms.get(fbName)).get(curAction.getAlgorithm());
+							// get action algorithm
+							String actionAlgorithm = curAction.getAlgorithm();
 							Integer blockID = (Integer) basicFunctionBlocksID.get(fbName);
-
-							from = next;
-							to = "s" + nameCounter; 
-							nameCounter++;
-							output(DEBUG, "Adding state: " + to, level);
-							ecc.addState(to);
-							event = "prepare_job_" + fbName + ";";
-							action = "queuing_job_fb = " + blockID + ";";
-							action = action + "queuing_job_alg = " + actionAlgorithm + ";";
-							output(DEBUG, "Adding transition: from: " + from + ", to: " + to + ", event: " + event, level);
-							ecc.addTransition(from, to, event, null, action);
-							next = to;						
 							
 							from = next;
 							to = "s" + nameCounter; 
 							nameCounter++;
 							output(DEBUG, "Adding state: " + to, level);
 							ecc.addState(to);
-							event = "queue_job_" + fbName + ";";
+							event = "queue_job_" + actionAlgorithm + "_" + fbName + ";";
 							output(DEBUG, "Adding transition: from " + from + ": to " + to + ": event " + event, level);
 							ecc.addTransition(from, to, event, null, null);
 							next = to;						
@@ -1768,10 +1774,8 @@ class ModelMaker
 								String cntName = (String) ((Map) eventConnections.get(fbName)).get(curAction.getOutput());
 								String cntFB = getInstanceName(cntName);
 								String cntSignal = getSignalName(cntName);
-								Integer cntSignalID = (Integer) ((Map) events.get(cntFB)).get(cntSignal);
-								action = "receiving_event_" + cntFB + " = " + cntSignalID + ";";						
 								output(DEBUG, "Adding transition: from: " + from + ", to: " + to + ", event: " + event, level);
-								ecc.addTransition(from, to, event, null, action);
+								ecc.addTransition(from, to, event, null, null);
 								next = to;						
 								
 								from = next;
@@ -1779,7 +1783,7 @@ class ModelMaker
 								nameCounter++;
 								output(DEBUG, "Adding state: " + to, level);
 								ecc.addState(to);
-								event = "receive_event_" + cntFB + ";";
+								event = "receive_event_" + cntSignal + "_" + cntFB + ";";
 								output(DEBUG, "Adding transition: from: " + from + ", to: " + to + ", event: " + event, level);
 								ecc.addTransition(from, to, event, null, null);
 								next = to;						
@@ -1809,10 +1813,8 @@ class ModelMaker
 							String cntName = (String) ((Map) eventConnections.get(fbName)).get(curAction.getOutput());
 							String cntFB = getInstanceName(cntName);
 							String cntSignal = getSignalName(cntName);
-							Integer cntSignalID = (Integer) ((Map) events.get(cntFB)).get(cntSignal);
-							action = "receiving_event_" + cntFB + " = " + cntSignalID + ";";						
 							output(DEBUG, "Adding transition: from: " + from + ", to: " + to + ", event: " + event, level);
-							ecc.addTransition(from, to, event, null, action);
+							ecc.addTransition(from, to, event, null, null);
 							next = to;						
 							
 							from = next;
@@ -1820,7 +1822,7 @@ class ModelMaker
 							nameCounter++;
 							output(DEBUG, "Adding state: " + to, level);
 							ecc.addState(to);
-							event = "receive_event_" + cntFB + ";";
+							event = "receive_event_" + cntSignal + "_" + cntFB + ";";
 							output(DEBUG, "Adding transition: from: " + from + ", to: " + to + ", event: " + event, level);
 							ecc.addTransition(from, to, event, null, null);
 							next = to;						
@@ -1828,7 +1830,7 @@ class ModelMaker
 					}
 				}
 			}
-			
+
 			// find if there is any transition on "1" from curECDestState
 			for (Iterator ecTransitionsIter = ecTransitions.iterator(); ecTransitionsIter.hasNext();)
 			{
