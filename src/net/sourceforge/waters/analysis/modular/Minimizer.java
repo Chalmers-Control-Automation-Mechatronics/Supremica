@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.analysis.modular
 //# CLASS:   Minimizer
 //###########################################################################
-//# $Id: Minimizer.java,v 1.2 2007-07-21 06:28:07 robi Exp $
+//# $Id: Minimizer.java,v 1.3 2007-08-19 03:23:47 siw4 Exp $
 //###########################################################################
 
 package net.sourceforge.waters.analysis.modular;
@@ -75,22 +75,24 @@ public class Minimizer
     }
     mPartitions.add(firstpartition);
     for (TransitionProxy t : automaton.getTransitions()) {
+      assert(mTransitionsSucc[stateMap.get(t.getSource())][mEventMap.get(t.getEvent())] == -1);
       mTransitionsSucc[stateMap.get(t.getSource())][mEventMap.get(t.getEvent())]
         = stateMap.get(t.getTarget());
       mTransitionsPred[stateMap.get(t.getTarget())][mEventMap.get(t.getEvent())]
         .add(stateMap.get(t.getSource()));
+      assert(mTransitionsSucc[stateMap.get(t.getSource())][mEventMap.get(t.getEvent())] < 60000);
     }
   }
   
   public AutomatonProxy run()
   {
-    int size = (int)(mPartitions.size() * 1.5);
+    int size = (int)(mPartitions.size() * 2);
     while (true) {
       partition();
       if (mPartitions.size() <= size) {
         break;
       }
-      size = (int)(mPartitions.size() * 1.5);
+      size = (int)(mPartitions.size() * 2);
     }
     LinkedList<int[]> L = new LinkedList<int[]>();
     for (int i = 0; i < mPartitions.size(); i++) {
@@ -161,9 +163,9 @@ public class Minimizer
         }
       }
     }
-    /*for (Set<Integer> p : mPartitions) {
+    for (Set<Integer> p : mPartitions) {
       check(p);
-    }*/
+    }
     AutomatonProxy minAut;
     if (mStates.length > mPartitions.size()) { 
       List<StateProxy> states = new ArrayList<StateProxy>(mPartitions.size());
@@ -253,7 +255,7 @@ public class Minimizer
       int successor = mTransitionsSucc[state][i];
       int successorPartition = successor == -1 ? -1 : mStateToPart[successor];
       successorPartition++;
-      hashCode = 31 * hashCode + successorPartition * i;
+      hashCode = 3179 * hashCode + successorPartition * i;
     }
     return hashCode;
   }

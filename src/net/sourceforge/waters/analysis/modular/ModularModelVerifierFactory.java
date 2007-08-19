@@ -4,24 +4,19 @@
 //# PACKAGE: net.sourceforge.waters.cpp.analysis
 //# CLASS:   ProjectingModelVerifierFactory
 //###########################################################################
-//# $Id: ProjectingModelVerifierFactory.java,v 1.5 2007-08-19 03:23:47 siw4 Exp $
+//# $Id: ModularModelVerifierFactory.java,v 1.1 2007-08-19 03:23:47 siw4 Exp $
 //###########################################################################
 
-package net.sourceforge.waters.analysis.modular.supremica;
+package net.sourceforge.waters.analysis.modular;
 
 import net.sourceforge.waters.analysis.modular.ModularLanguageInclusionChecker;
 import java.util.List;
 
-import net.sourceforge.waters.analysis.modular.HeuristicType;
-import net.sourceforge.waters.analysis.modular.MaxCommonEventsHeuristic;
 import net.sourceforge.waters.cpp.analysis.NativeControllabilityChecker;
 import net.sourceforge.waters.model.analysis.ModelVerifierFactory;
 import net.sourceforge.waters.model.analysis.LanguageInclusionChecker;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 import net.sourceforge.waters.analysis.monolithic.MonolithicControllabilityChecker;
-import net.sourceforge.waters.analysis.modular.MinNewEventsHeuristic;
-import net.sourceforge.waters.analysis.modular.OneUncontrollableChecker;
-
 
 /**
  * A factory that produces projecting model verifiers.
@@ -29,15 +24,15 @@ import net.sourceforge.waters.analysis.modular.OneUncontrollableChecker;
  * @author Robi Malik
  */
 
-public class ProjectingModelVerifierFactory implements ModelVerifierFactory
+public class ModularModelVerifierFactory implements ModelVerifierFactory
 {
 
   //#########################################################################
   //# Interface net.sourceforge.waters.model.analysis.ModelVerifierFactory
-  public ProjectingControllabilityChecker createControllabilityChecker
+  public ModularControllabilityChecker createControllabilityChecker
     (final ProductDESProxyFactory factory)
   {
-    return new ProjectingControllabilityChecker
+    return new ModularControllabilityChecker
       (null,
        factory,
        new NativeControllabilityChecker(factory),
@@ -60,15 +55,15 @@ public class ProjectingModelVerifierFactory implements ModelVerifierFactory
 
   //#########################################################################
   //# Factory Instantiation
-  public static ProjectingModelVerifierFactory getInstance()
+  public static ModularModelVerifierFactory getInstance()
   {
     if (theInstance == null) {
-      theInstance = new ProjectingModelVerifierFactory();
+      theInstance = new ModularModelVerifierFactory();
     }
     return theInstance;
   }
 
-  public static ProjectingModelVerifierFactory
+  public static ModularModelVerifierFactory
     getInstance(final List<String> cmdline)
   {
     return getInstance();
@@ -77,6 +72,6 @@ public class ProjectingModelVerifierFactory implements ModelVerifierFactory
 
   //#########################################################################
   //# Class Variables
-  private static ProjectingModelVerifierFactory theInstance = null;
+  private static ModularModelVerifierFactory theInstance = null;
 
 }

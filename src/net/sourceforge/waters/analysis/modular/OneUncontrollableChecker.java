@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.analysis.modular
 //# CLASS:   ModularLanguageInclusionChecker
 //###########################################################################
-//# $Id: OneUncontrollableChecker.java,v 1.4 2007-06-05 13:45:21 robi Exp $
+//# $Id: OneUncontrollableChecker.java,v 1.5 2007-08-19 03:23:47 siw4 Exp $
 //###########################################################################
 
 
@@ -76,9 +76,9 @@ public class OneUncontrollableChecker
     }
     Collections.sort(uncontrollables, new EventComparator());
     for (final EventProxy event : uncontrollables) {
-      if (!event.getName().equals("PalletRmvd")) {
+      /*if (!event.getName().equals("HOST__read__app_FV_active[0]")) {
         continue;
-      }
+      }*/
       mChecker.setModel(getModel());
       mChecker.setKindTranslator(new KindTranslator()
       {
@@ -93,7 +93,7 @@ public class OneUncontrollableChecker
           if (getKindTranslator().getComponentKind(a)
               == ComponentKind.SPEC)
           {
-            if (!a.getEvents().contains(event) || a.getName().equals("h_GlobOfProt")) {
+            if (!a.getEvents().contains(event)/* && !a.getName().equals("HOST__read__app_FV_active[0]")*/) {
               return ComponentKind.PLANT;
             }
           }
@@ -103,15 +103,16 @@ public class OneUncontrollableChecker
       mChecker.setStateLimit(getStateLimit()/* - mStates*/);
       try {
         if (!mChecker.run()) {
-        System.out.println(event.getName() + " uncontrollable");
-        mStates += mChecker.getAnalysisResult().getTotalNumberOfStates();
-        setFailedResult(mChecker.getCounterExample());
-        return false;
+          System.out.println(event.getName() + " uncontrollable");
+          mStates += mChecker.getAnalysisResult().getTotalNumberOfStates();
+          setFailedResult(mChecker.getCounterExample());
+          return false;
         }
         System.out.println(event.getName() + " succeeded in " + mChecker.getAnalysisResult().getTotalNumberOfStates());
         mStates += mChecker.getAnalysisResult().getTotalNumberOfStates();
       } catch (AnalysisException a) {
         System.out.println(event.getName() + " failed");
+        throw a;
       }
     }
     setSatisfiedResult();

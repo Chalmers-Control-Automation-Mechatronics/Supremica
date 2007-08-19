@@ -151,9 +151,8 @@ public class Projection
     while (!unvisited.isEmpty()) {
       currentState = unvisited.take();
       //System.out.println(Arrays.toString(currentState));
-      if (!explore(currentState, true)) {
-        explore(currentState, false);
-      }
+      explore(currentState, true);
+      explore(currentState, false);
     }
     Collection<EventProxy> ev = new ArrayList<EventProxy>(mModel.getEvents());
     ev.removeAll(mHide);
@@ -174,6 +173,10 @@ public class Projection
       result = min.run();
     } catch (Throwable t) {
       t.printStackTrace();
+      for (AutomatonProxy auto : mModel.getAutomata()) {
+        System.out.println(auto.getName());
+      }
+      System.exit(1);
     }
     //System.out.println("new:\n" + result);
     return result;
@@ -220,9 +223,9 @@ public class Projection
       if (!successor.isEmpty()) {
         result = true;
         mDisabled.remove(events[i]);
-        if (forbidden) {
+        /*if (forbidden) {
           trans.add(mFactory.createTransitionProxy(source, events[i], source));
-        } else {
+        } else {*/
           int[][] successorarray = successor.toArray(new int[successor.size()][]);
           int[] truestate = encode(actualState(successorarray));
           StateProxy target = states.get(truestate);
@@ -236,7 +239,7 @@ public class Projection
             unvisited.offer(truestate);
           }
           trans.add(mFactory.createTransitionProxy(source, events[i], target));
-        }
+        //}
       }
     }
     return result;
@@ -294,7 +297,7 @@ public class Projection
         }
       }
     }
-    //note the states in these states must be sorted into the correct order
+    //note the states in these sets of states must be sorted into the correct order
     //by the end
     int[] result = new int[numAutomata * setofstates.size()];
     int l = 0;

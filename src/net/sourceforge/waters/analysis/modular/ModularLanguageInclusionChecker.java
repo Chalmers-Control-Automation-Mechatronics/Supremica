@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.analysis.modular
 //# CLASS:   ModularLanguageInclusionChecker
 //###########################################################################
-//# $Id: ModularLanguageInclusionChecker.java,v 1.10 2007-07-21 06:28:07 robi Exp $
+//# $Id: ModularLanguageInclusionChecker.java,v 1.11 2007-08-19 03:23:47 siw4 Exp $
 //###########################################################################
 
 
@@ -112,30 +112,33 @@ public class ModularLanguageInclusionChecker
       }
       mStates += checker.getAnalysisResult().getTotalNumberOfStates();
     }*/
-    automata.addAll(properties);
-    ProductDESProxy model = 
-      getFactory().createProductDESProxy("prop", getModel().getEvents(),
-                                         automata);
-    mChecker.setModel(model);
-    mChecker.setKindTranslator(new KindTranslator()
-    {
-      public EventKind getEventKind(EventProxy e)
+    for (AutomatonProxy p : properties) {
+      automata.add(p);
+      ProductDESProxy model = 
+        getFactory().createProductDESProxy("prop", getModel().getEvents(),
+                                           automata);
+      mChecker.setModel(model);
+      mChecker.setKindTranslator(new KindTranslator()
       {
-        return EventKind.UNCONTROLLABLE;
+        public EventKind getEventKind(EventProxy e)
+        {
+          return EventKind.UNCONTROLLABLE;
+        }
+        
+        public ComponentKind getComponentKind(AutomatonProxy a)
+        {
+          return properties.contains(a) ? ComponentKind.SPEC : ComponentKind.PLANT;
+        }
+      });
+      mChecker.setStateLimit(getStateLimit() - mStates);
+      if (!mChecker.run()) {
+        mStates += mChecker.getAnalysisResult().getTotalNumberOfStates();
+        setFailedResult(mChecker.getCounterExample());
+        return false;
       }
-      
-      public ComponentKind getComponentKind(AutomatonProxy a)
-      {
-        return properties.contains(a) ? ComponentKind.SPEC : ComponentKind.PLANT;
-      }
-    });
-    mChecker.setStateLimit(getStateLimit() - mStates);
-    if (!mChecker.run()) {
       mStates += mChecker.getAnalysisResult().getTotalNumberOfStates();
-      setFailedResult(mChecker.getCounterExample());
-      return false;
+      automata.remove(p);
     }
-    mStates += mChecker.getAnalysisResult().getTotalNumberOfStates();
     setSatisfiedResult();
     return true;
   }
