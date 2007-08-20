@@ -417,54 +417,16 @@
         </javac>
         
     </target>
-    
-    
-    
-    <!-- Build:
-*	A standard compilation followed by packaging
-*	all files into a jar file. 
-    -->
-    <target name="build" depends="version,compile,-jar_supremica,-startfiles_supremica"
-            description="Recompiles only the files that have changed.">
+        
+    <target name="build" depends="version,compile,-jar_supremica,-startfiles_supremica" description=
+            "Recompiles only the files that have changed, then packages all files into a jar file.">
     </target>
     
-    <!-- Rebuild:
-*	Deletes all existing class files, recompiles all files,
-*	and packages all files into a jar file that can
-*	be executed without any other dependencies. 
-    -->
     <target name="rebuild" depends="clean_build,build" description=
             "Deletes all existing class files, recompiles all files, and packages all files into a jar file that can be executed without any other dependencies.">
     </target>
     
-    <!-- Build:
-*	A standard compilation followed by packaging
-*	all files into a jar file. 
-    -->
-    <!--
-<target name="build_jgrafchart" depends="compile_jgrafchart,-jar_jgrafchart,-startfiles_jgrafchart">
-</target>
--->
-    
-    <!-- Rebuild:
-*	Deletes all existing class files, recompiles all files,
-*	and packages all files into a jar file that can
-*	be executed without any other dependencies. 
-    -->
-    <!--
-<target name="rebuild_jgrafchart" depends="clean,version,build_jgrafchart,jar_supremica_lib">
-</target>
--->
-    
-    <!--
-<target name="-jar_jgrafchart">
-	<jar jarfile="${dist}/Supremica.jar" manifest="${templates}/JGRAFCHART_MANIFEST.MF"> 
-		<fileset dir="${build}"/>
-	</jar>
-</target>
--->
-    
-    <target name="jar_supremica_lib">
+    <target name="jar_supremica_lib" depends="initialize_jars">
         <delete dir="${javalibs.dir}/META-INF"/>
         <jar jarfile="${dist}/SupremicaLib.jar"> 
             <fileset dir="${javalibs.dir}"/>		
@@ -871,8 +833,7 @@ Class-Path: ${manifest.pathlist}</echo>
             </classpath>
         </javadoc>
     </target>
-    
-    
+        
     <target name="run">
         <java classname="${supremica_basepackage}.gui.ide.IDE" fork="yes">
             <arg value="-p"/>
@@ -945,8 +906,7 @@ Class-Path: ${manifest.pathlist}</echo>
             <arg value="${examples}/functionblocks/FBRuntime"/>
         </java>
     </target>
-    
-    
+        
     <target name="deploy" depends="deployWeb">
     </target>
     

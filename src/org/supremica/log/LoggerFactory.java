@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.log
 //# CLASS:   LoggerFactory
 //###########################################################################
-//# $Id: LoggerFactory.java,v 1.17 2007-05-28 07:07:08 robi Exp $
+//# $Id: LoggerFactory.java,v 1.18 2007-08-20 11:36:57 flordal Exp $
 //###########################################################################
 
 /*
@@ -72,17 +72,14 @@ import org.apache.log4j.varia.NullAppender;
 
 import org.supremica.properties.Config;
 
-
 public class LoggerFactory
-{
-    
+{    
     //#######################################################################
     //# Constructors
     private LoggerFactory()
     {
     }
-    
-    
+        
     //#######################################################################
     //# Factory Methods
     public static LoggerFilter getLoggerFilter()

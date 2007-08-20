@@ -4,9 +4,8 @@
 //# PACKAGE: org.supremica.gui.ide.actions
 //# CLASS:   AnalyzerSendToEditorAction
 //###########################################################################
-//# $Id: AnalyzerSendToEditorAction.java,v 1.10 2007-07-12 14:41:35 flordal Exp $
+//# $Id: AnalyzerSendToEditorAction.java,v 1.11 2007-08-20 11:36:57 flordal Exp $
 //###########################################################################
-
 
 package org.supremica.gui.ide.actions;
 
@@ -31,7 +30,6 @@ import org.supremica.automata.Automaton;
 import org.supremica.automata.LabeledEvent;
 import org.supremica.gui.ide.IDE;
 
-
 /**
  * The action used to send an automaton from the analyser to the editor.
  */
@@ -39,8 +37,7 @@ public class AnalyzerSendToEditorAction
     extends IDEAction
 {
     private static final long serialVersionUID = 1L;
-    
-    
+        
     //#######################################################################
     //# Constructor
     public AnalyzerSendToEditorAction(List<IDEAction> actionList)
@@ -56,7 +53,6 @@ public class AnalyzerSendToEditorAction
         //putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_A, ActionEvent.CTRL_MASK));
         putValue(Action.SMALL_ICON, new ImageIcon(IDE.class.getResource("/icons/waters/toEditor16.gif")));
     }
-    
     
     //#######################################################################
     //# Invocation
