@@ -10,7 +10,7 @@
         <EventConnections>
           <Connection Source="restart.COLD" Destination="merge.EI2" />
           <Connection Source="merge.EO" Destination="test1.EI" />
-          <!--Connection Source="test1.EO" Destination="merge.EI1" /-->
+          <Connection Source="test1.EO" Destination="merge.EI1" />
         </EventConnections>
         <DataConnections>
           <Connection Source="test1.DO" Destination="test1.DI" />

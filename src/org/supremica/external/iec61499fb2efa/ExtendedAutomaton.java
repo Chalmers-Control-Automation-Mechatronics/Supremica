@@ -61,6 +61,8 @@ import net.sourceforge.waters.model.expr.ParseException;
 public class ExtendedAutomaton
 {
 
+	private boolean allAcceptingStates = false;
+
 	private String name;
 	private ExtendedAutomata automata;
 	private ModuleSubjectFactory factory;
@@ -71,7 +73,7 @@ public class ExtendedAutomaton
 
 	private ExpressionParser parser;
 
-	public ExtendedAutomaton(String name, ExtendedAutomata automata)
+	public ExtendedAutomaton(String name, ExtendedAutomata automata, boolean acceptingStates)
 	{
 		this.name = name;
 
@@ -86,6 +88,8 @@ public class ExtendedAutomaton
 		component = factory.createSimpleComponentProxy(identifier, ComponentKind.PLANT, graph);
 
 		parser = new ExpressionParser(factory, CompilerOperatorTable.getInstance());
+
+		allAcceptingStates = acceptingStates;
 	}
 
 // 	public ExtendedAutomaton(String name, ComponentKind kind, ExtendedAutomata automata) 
@@ -122,7 +126,14 @@ public class ExtendedAutomaton
 
 	public void addState(String name)
 	{
-		addState(name, false, false);
+		if (allAcceptingStates)
+		{
+			addState(name, true, false);
+		}
+		else
+		{
+			addState(name, false, false);			
+		}
 	}
 
 	public void addState(String name, boolean accepting, boolean initial)

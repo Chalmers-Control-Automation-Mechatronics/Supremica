@@ -59,6 +59,8 @@ class ModelMaker
 	static final int DEBUG = 2;
 	private static int verboseLevel = INFO;
 	private static boolean expandTransitions = false;
+	private static boolean addNoTransition = false;
+	private static boolean generatePlantModels = true;
 
     private JAXBContext iecContext;
     private Unmarshaller iecUnmarshaller;
@@ -133,6 +135,14 @@ class ModelMaker
 			if (args[i].equals("-e"))
 			{
 				expandTransitions = true;
+			}
+			if (args[i].equals("-n"))
+			{
+				addNoTransition = true;
+			}
+			if (args[i].equals("-p"))
+			{
+				generatePlantModels = false;
 			}
 			if (args[i].equals("-d"))
 			{
@@ -952,7 +962,8 @@ class ModelMaker
 		ExtendedAutomaton instanceQueue = getNewAutomaton("Instance Queue");
 		
 		// the maximum number of FB instances in the queue at the same time
-		final int places = basicFunctionBlocks.keySet().size();
+		//final int places = basicFunctionBlocks.keySet().size();
+		final int places = 1;
 
 		instanceQueue.addIntegerVariable("current_fb", 0, fbMaxID, 0, 0);
 		
@@ -1375,10 +1386,13 @@ class ModelMaker
 		event = "no_more_actions_" + fbName + ";";
 		eventHandling.addTransition(from, to, event, null, null);
 
-		from = "s3";
-		to = "s1";
-		event = "no_transition_" + fbName + ";";
-		eventHandling.addTransition(from, to, event, null, null);
+		if (addNoTransition)
+		{
+			from = "s3";
+			to = "s1";
+			event = "no_transition_" + fbName + ";";
+			eventHandling.addTransition(from, to, event, null, null);
+		}
 
 		from = "s3";
 		to = "s0";
@@ -1399,7 +1413,7 @@ class ModelMaker
 		ExtendedAutomaton eventQueue = getNewAutomaton("Event Queue " + fbName);
 		
 		// the maximum number of events in the queue at the same time
-		final int places = eventInputList.size();	
+		final int places = ((Integer) eventsMaxID.get(fbName)).intValue();	
 		
 		// event input variables
 		if (theType.getInterfaceList().isSetEventInputs())
@@ -1501,7 +1515,8 @@ class ModelMaker
 
 		for (int i = 1; i <= places; i++)
 		{
-			eventQueue.addIntegerVariable("event_place_" + i + "_" + fbName, 0, fbMaxID, 0, 0);
+			Integer numEvents = (Integer) eventsMaxID.get(fbName);
+			eventQueue.addIntegerVariable("event_place_" + i + "_" + fbName, 0, numEvents, 0, 0);
 			
 			// data input variables for each queue place
 			if (theType.getInterfaceList().isSetInputVars())
@@ -1801,7 +1816,7 @@ class ModelMaker
 		String noTransitionFrom = null;
 		String noTransitionTo = null;
 		String noTransitionGuard = null;
-		boolean makeNoTransition = true;
+		boolean makeNoTransition = addNoTransition;
 
 		// get event inputs for the block
 		String typeName = (String) basicFunctionBlocks.get(fbName);
@@ -1954,13 +1969,16 @@ class ModelMaker
 				next = to;
 				
 				// add to gurad for no_transition event
-				if (noTransitionGuard == null)
+				if (makeNoTransition)
 				{
-					noTransitionGuard = "!(" + guard + ")";
-				}
-				else
-				{
-					noTransitionGuard = noTransitionGuard + " | !(" + guard + ")";
+					if (noTransitionGuard == null)
+					{
+						noTransitionGuard = "!(" + guard + ")";
+					}
+					else
+					{
+						noTransitionGuard = noTransitionGuard + " | !(" + guard + ")";
+					}
 				}				
 			}
 			
@@ -2497,7 +2515,14 @@ class ModelMaker
 
 	private ExtendedAutomaton getNewAutomaton(String name)
 	{
-		return new ExtendedAutomaton(name, automata);
+		if (generatePlantModels)
+		{
+			return new ExtendedAutomaton(name, automata, true);
+		}
+		else
+		{
+			return new ExtendedAutomaton(name, automata, false);
+		}
 	}
 
 	private void printFunctionBlocksMap()

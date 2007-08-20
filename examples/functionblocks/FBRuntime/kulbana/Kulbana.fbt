@@ -133,48 +133,6 @@
 
 
     </ECC>
-    <Algorithm Name="PrintKulaPortvakt">
-        <Other Language="Java" Text="" />	
-    </Algorithm>
-    <Algorithm Name="PrintKulaMatlyft">
-        <Other Language="Java" Text="" />	
-    </Algorithm>
-    <Algorithm Name="PrintKulaMatstation">
-        <Other Language="Java" Text="" />	
-    </Algorithm>
-    <Algorithm Name="PrintStorKula">
-        <Other Language="Java" Text=
-		"liten_kula = liten_kula + 1;" />	
-    </Algorithm>
-    <Algorithm Name="PrintLitenKula">
-        <Other Language="Java" Text=
-		"liten_kula = liten_kula + 1;" />	
-    </Algorithm>
-    <Algorithm Name="PrintKulaHiss">
-        <Other Language="Java" Text="" />	
-    </Algorithm>
-    <Algorithm Name="PrintKulaVan1">
-        <Other Language="Java" Text="" />	
-    </Algorithm>
-    <Algorithm Name="PrintKulaVan2">
-        <Other Language="Java" Text="" />	
-    </Algorithm>
-    <Algorithm Name="PrintPlockaVan1">
-        <Other Language="Java" Text="" />	
-    </Algorithm>
-    <Algorithm Name="PrintPlockaVan2">
-        <Other Language="Java" Text="" />	
-    </Algorithm>
-    <Algorithm Name="PrintArmVan1">
-        <Other Language="Java" Text="" />	
-    </Algorithm>
-    <Algorithm Name="PrintArmVan2">
-        <Other Language="Java" Text="" />	
-    </Algorithm>
-    <Algorithm Name="PrintArmHemma">
-        <Other Language="Java" Text="" />	
-    </Algorithm>
-
 
     <Algorithm Name="PrintKulaPortvakt">
         <Other Language="Java" Text=
@@ -230,6 +188,5 @@
         <Other Language="Java" Text=
 		"System.out.println(&#34;ArmHemma&#34;);" />	
     </Algorithm>
-
   </BasicFB>
 </FBType>
