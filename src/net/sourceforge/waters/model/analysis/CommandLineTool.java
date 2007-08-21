@@ -1,10 +1,10 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //##########################################################################
 //# PROJECT: Waters
-//# PACKAGE: net.sourceforge.waters.analysis
+//# PACKAGE: net.sourceforge.waters.model.analysis
 //# CLASS:   ControlLoopChecker
 //##########################################################################
-//# $Id: CommandLineTool.java,v 1.3 2007-05-25 07:53:02 robi Exp $
+//# $Id: CommandLineTool.java,v 1.4 2007-08-21 00:03:16 robi Exp $
 //##########################################################################
 
 package net.sourceforge.waters.model.analysis;

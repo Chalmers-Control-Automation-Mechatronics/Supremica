@@ -1,3 +1,12 @@
+//# -*- tab-width: 4  indent-tabs-mode: nil  c-basic-offset: 4 -*-
+//###########################################################################
+//# PROJECT: Supremica
+//# PACKAGE: org.supremica.properties
+//# CLASS:   SupremicaProperties
+//###########################################################################
+//# $Id: SupremicaProperties.java,v 1.110 2007-08-21 00:03:16 robi Exp $
+//###########################################################################
+
 /*
  * Supremica Software License Agreement
  *
@@ -46,48 +55,49 @@
  *
  * Supremica is owned and represented by KA.
  */
+
 package org.supremica.properties;
 
-import java.util.*;
 import java.io.*;
+import java.util.Date;
+import java.util.Enumeration;
+import java.util.Properties;
 import javax.swing.text.html.Option;
+
 import org.supremica.util.BDD.Options;
+
 
 /**
  * Properties for Supremica.
  * All properties are added in the Config class.
+ *
+ * @author Knut &Aring;kesson
  */
+
 public final class SupremicaProperties
 {
     private SupremicaProperties()
     {
     }
-    
-    public static Iterator<Property> iterator()
-    {
-        return Property.iterator();
-    }
-    
+
     public static String getProperties()
     {
         StringBuffer sb = new StringBuffer();
-        for (Iterator<Property> it = iterator(); it.hasNext(); )
-        {
-            Property currProperty = it.next();
-            sb.append("# " + currProperty.getComment() + "\n");
-            sb.append(currProperty.toString() + "\n\n");
+        for (final Property property : Property.getAllProperties()) {
+            sb.append("# " + property.getComment() + "\n");
+            sb.append(property.toString() + "\n\n");
         }
         return sb.toString();
-        
+
     }
-    
+
     public static void loadProperties(File theFile)
-    throws FileNotFoundException, IOException
+        throws FileNotFoundException, IOException
     {
         propertyFile = theFile;
         updateProperties(propertyFile);
     }
-    
+
     /**
      * Load properties from file.
      */
@@ -99,7 +109,7 @@ public final class SupremicaProperties
         {
             String newKey = (String)e.nextElement();
             String newValue = propertiesFromFile.getProperty(newKey);
-            
+
             Property orgProperty = Property.getProperty(newKey);
             if (orgProperty == null)
             {
@@ -107,7 +117,7 @@ public final class SupremicaProperties
             }
             else if (orgProperty.isImmutable())
             {
-                System.err.println("Property \"" + newKey + "\" is immutable");                
+                System.err.println("Property \"" + newKey + "\" is immutable");
             }
             else
             {
@@ -121,18 +131,18 @@ public final class SupremicaProperties
                 }
             }
         }
-        
+
         // Update values in BDD.Options based on the current Config.
-        updateBDDOptions(false);        
+        updateBDDOptions(false);
     }
-    
+
     public static void saveProperties()
     throws FileNotFoundException, IOException
     {
         supremicaProperties.saveProperties(false);
     }
-    
-    
+
+
     public static void saveProperties(boolean saveAll)
     throws FileNotFoundException, IOException
     {
@@ -145,7 +155,7 @@ public final class SupremicaProperties
             System.err.println("Could not write to configuration file, unknown file name.");
         }
     }
-    
+
     /**
      * Save the property list to the configuration file.
      *
@@ -156,38 +166,37 @@ public final class SupremicaProperties
     private static void saveProperties(File propertyFile, boolean saveAll)
     throws FileNotFoundException, IOException
     {
-        // Update config from the current values in BDD.Options 
+        // Update config from the current values in BDD.Options
         // (WHY!!? IT SHOULD BE THE OTHER WAY AROUND OR THEY ARE LOST?! /hguo)
         //updateBDDOptions(true);    // first sync from BDD options
         updateBDDOptions(false);    // Send the new Config values to BDD.Options
-        
+
         OutputStream os = new FileOutputStream(propertyFile);
         BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(os, "8859_1"));
-        
+
         writer.write("# Supremica configuration file\n");
         writer.write("# Created: " + new Date().toString() + "\n\n");
-        
-        for (Iterator<Property> currIt = SupremicaProperties.iterator(); currIt.hasNext(); )
-        {
-            Property currProperty = currIt.next();
-            if ((saveAll && !currProperty.isImmutable()) || currProperty.currentValueDifferentFromDefaultValue())
-            {
-                writer.append("# " + currProperty.getComment() + "\n");
-                writer.append(currProperty.getPropertyType() + "." + currProperty.getKey() + " " + currProperty.valueToEscapedString()  + "\n\n");
+        for (final Property property : Property.getAllProperties()) {
+            if (saveAll && !property.isImmutable() ||
+                property.currentValueDifferentFromDefaultValue()) {
+                writer.append("# " + property.getComment() + "\n");
+                writer.append(property.getPropertyType() + "." +
+                              property.getKey() + " " +
+                              property.valueToEscapedString() + "\n\n");
             }
         }
-        
+
         writer.flush();
         os.close();
     }
-    
+
     private static Properties buildProperties(File theFile)
     throws FileNotFoundException, IOException
     {
         FileInputStream theStream = new FileInputStream(theFile);
         return buildProperties(new BufferedInputStream(theStream));
     }
-    
+
     private static Properties buildProperties(InputStream inStream)
     throws IOException
     {
@@ -195,7 +204,7 @@ public final class SupremicaProperties
         newProperties.load(inStream);
         return newProperties;
     }
-    
+
     /*
      * The problem is that we got two copies of BDD Options.
      * This will make sure they are both updated
@@ -268,7 +277,7 @@ public final class SupremicaProperties
             Options.show_level_graph = Config.BDD_LEVEL_GRAPHS.get();
         }
     }
-    
+
     /**
      * Returns the index of object in objects. For the BDD options.
      */
@@ -281,18 +290,18 @@ public final class SupremicaProperties
         }
         return -1;
     }
-    
+
     private static SupremicaProperties supremicaProperties;
     private static Config config = Config.getInstance();
     private static File propertyFile = null;
-    
+
     static
     {
         supremicaProperties = new SupremicaProperties();
         // Update values in BDD.Options based on Config.
         updateBDDOptions(false);
     }
-    
+
     public static void main(String[] args)
     {
         System.out.println(supremicaProperties.toString());

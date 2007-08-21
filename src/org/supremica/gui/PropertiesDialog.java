@@ -1,3 +1,11 @@
+//# -*- tab-width: 4  indent-tabs-mode: nil  c-basic-offset: 4 -*-
+//###########################################################################
+//# PROJECT: Supremica
+//# PACKAGE: org.supremica.gui
+//# CLASS:   PropertiesDialog
+//###########################################################################
+//# $Id: PropertiesDialog.java,v 1.16 2007-08-21 00:03:16 robi Exp $
+//###########################################################################
 
 /*
  * Supremica Software License Agreement
@@ -47,6 +55,7 @@
  *
  * Supremica is owned and represented by KA.
  */
+
 package org.supremica.gui;
 
 import java.awt.*;
@@ -55,19 +64,22 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.*;
 import java.text.NumberFormat;
+import java.util.LinkedList;
+import java.util.List;
 import javax.swing.*;
-import java.util.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+import javax.swing.text.NumberFormatter;
+
 import org.supremica.properties.BooleanProperty;
-import org.supremica.properties.IntegerProperty;
+import org.supremica.properties.Config;
 import org.supremica.properties.DoubleProperty;
-import org.supremica.properties.PropertyType;
+import org.supremica.properties.IntegerProperty;
 import org.supremica.properties.Property;
+import org.supremica.properties.PropertyType;
 import org.supremica.properties.StringProperty;
 import org.supremica.properties.SupremicaProperties;
-import javax.swing.text.NumberFormatter;
-import org.supremica.properties.Config;
+
 
 public class PropertiesDialog
     extends JDialog
@@ -81,7 +93,7 @@ public class PropertiesDialog
     /** The place for controlbuttons for this dialog. */
     private PropertiesControllerPanel controlPanel = null;
     
-    private LinkedList<Chooser> chooserList = new LinkedList<Chooser>();
+    private final List<Chooser> chooserList = new LinkedList<Chooser>();
     
     public PropertiesDialog(Frame owner)
     {
@@ -100,7 +112,7 @@ public class PropertiesDialog
         // The panel for controlling the dialog
         controlPanel = new PropertiesControllerPanel(this);
         dialogPanel.add(controlPanel, BorderLayout.SOUTH);
-        
+
         // For all types of properties
         for (PropertyType type: PropertyType.values())
         {
@@ -114,9 +126,7 @@ public class PropertiesDialog
             */
 
             // Find all properties of this type and add to the panel
-            Iterator<Property> it = Property.iterator();
-            for (Property property = it.next(); it.hasNext(); property = it.next())
-            {
+            for (final Property property : Property.getAllProperties()) {
                 // I only want properties of the current type
                 if (property.getPropertyType() == type)
                 {

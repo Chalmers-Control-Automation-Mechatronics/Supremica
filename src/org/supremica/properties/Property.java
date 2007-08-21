@@ -1,3 +1,12 @@
+//# -*- tab-width: 4  indent-tabs-mode: nil  c-basic-offset: 4 -*-
+//###########################################################################
+//# PROJECT: Supremica
+//# PACKAGE: org.supremica.properties
+//# CLASS:   Property
+//###########################################################################
+//# $Id: Property.java,v 1.4 2007-08-21 00:03:16 robi Exp $
+//###########################################################################
+
 /*
  * Supremica Software License Agreement
  *
@@ -46,76 +55,80 @@
  *
  * Supremica is owned and represented by KA.
  */
+
+
 package org.supremica.properties;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+
 
 public abstract class Property
 {
-    private static List<Property> collection = new LinkedList<Property>();
-    private static HashMap<String, Property> fullkeyToPropertyMap = new HashMap<String, Property>();
-    
-    private PropertyType type;
-    private final boolean immutable;
-    private final String key;
-    private final String comment;
-    
-    public Property(PropertyType type, String key, String comment, boolean immutable)
+
+    //#######################################################################
+    //# Constructors
+    public Property(final PropertyType type,
+                    final String key,
+                    final String comment,
+                    final boolean immutable)
     {
         assert(type != null);
         this.type = type;
         this.key = key;
         this.comment = comment;
         this.immutable = immutable;
-        collection.add(this);
-        fullkeyToPropertyMap.put(getFullKey(), this);
+        COLLECTION.add(this);
+        FULLKEY_TO_PROPERTY.put(getFullKey(), this);
     }
-    
+
+
+    //#######################################################################
+    //# Simple Access
     public final PropertyType getPropertyType()
     {
         return type;
     }
-    
+
     public final String getKey()
     {
         return key;
     }
-    
+
     public final String getFullKey()
     {
         return type.toString() + "." + key;
-    }    
-    
+    }
+
     public String getComment()
     {
         return comment;
     }
-    
+
     public boolean isImmutable()
     {
         return immutable;
     }
-    
-    public static Iterator<Property> iterator()
-    {
-        return collection.iterator();
-    }
-    
-    public static Property getProperty(String fullKey)
-    {
-        return fullkeyToPropertyMap.get(fullKey);
-    }
-    
-    public final String toString()
-    {
-        return getFullKey() + " " + valueToString();
-    }
-    
+
     public String valueToEscapedString()
     {
         return valueToString();
     }
-    
+
+
+    //#######################################################################
+    //# General Object Handling
+    public final String toString()
+    {
+        return getFullKey() + " " + valueToString();
+    }
+
+    /*
+     * Can there be two objects representing the same property?
+     * I hope not! ~~~Robi
     public boolean equals(Object other)
     {
         if (other == null || (!(other instanceof Property)))
@@ -124,10 +137,50 @@ public abstract class Property
         }
         return getFullKey().equals(((Property)other).getFullKey());
     }
-    
+     */
+
+
+    //#######################################################################
+    //# Provided by Subclasses
     public abstract void set(String value);
-    
+
     public abstract String valueToString();
-    
-    public abstract boolean currentValueDifferentFromDefaultValue();    
+
+    public abstract boolean currentValueDifferentFromDefaultValue();
+
+
+    //#######################################################################
+    //# Accessing the Properties List
+    /**
+     * Gets the list of all registered properties.
+     * @return An unmodifiable list of properties.
+     */
+    public static List<Property> getAllProperties()
+    {
+        return UNMOD_COLLECTION;
+    }
+
+    public static Property getProperty(final String fullKey)
+    {
+        return FULLKEY_TO_PROPERTY.get(fullKey);
+    }
+
+
+    //#######################################################################
+    //# Data Members
+    private final PropertyType type;
+    private final boolean immutable;
+    private final String key;
+    private final String comment;
+
+
+    //#######################################################################
+    //# Static Class Variables
+    private static final List<Property> COLLECTION =
+        new LinkedList<Property>();
+    private static final List<Property> UNMOD_COLLECTION =
+        Collections.unmodifiableList(COLLECTION);
+    private static final HashMap<String,Property> FULLKEY_TO_PROPERTY =
+        new HashMap<String, Property>();
+
 }
