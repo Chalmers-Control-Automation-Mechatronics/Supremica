@@ -57,10 +57,16 @@ class ModelMaker
 	static final int QUIET = 0;
 	static final int INFO = 1;
 	static final int DEBUG = 2;
+
 	private static int verboseLevel = INFO;
 	private static boolean expandTransitions = false;
 	private static boolean addNoTransition = false;
 	private static boolean generatePlantModels = true;
+
+	private static Integer eventQueuePlaces = 0;
+	private static Integer instanceQueuePlaces = 0;
+	private static Integer jobQueuePlaces = 0;
+
 
     private JAXBContext iecContext;
     private Unmarshaller iecUnmarshaller;
@@ -151,6 +157,27 @@ class ModelMaker
 			if (args[i].equals("-q"))
 			{
 				verboseLevel = QUIET;
+			}
+			if (args[i].equals("-ip"))
+			{
+				if (i + 1 < args.length)
+				{
+					instanceQueuePlaces = new Integer(args[i + 1]);
+				}
+			}
+			if (args[i].equals("-jp"))
+			{
+				if (i + 1 < args.length)
+				{
+					jobQueuePlaces = new Integer(args[i + 1]);
+				}
+			}
+			if (args[i].equals("-ep"))
+			{
+				if (i + 1 < args.length)
+				{
+					eventQueuePlaces = new Integer(args[i + 1]);
+				}
 			}
 			if (args[i].equals("-o"))
 			{
@@ -962,8 +989,11 @@ class ModelMaker
 		ExtendedAutomaton instanceQueue = getNewAutomaton("Instance Queue");
 		
 		// the maximum number of FB instances in the queue at the same time
-		//final int places = basicFunctionBlocks.keySet().size();
-		final int places = 1;
+		int places = basicFunctionBlocks.keySet().size();
+		if (instanceQueuePlaces != 0)
+		{
+			places = instanceQueuePlaces.intValue();
+		}
 
 		instanceQueue.addIntegerVariable("current_fb", 0, fbMaxID, 0, 0);
 		
@@ -1041,7 +1071,11 @@ class ModelMaker
 		ExtendedAutomaton jobQueue = getNewAutomaton("Job Queue");
 		
 		// the maximum number of jobs in the queue at the same time
-		final int places = algMaxID;	
+		int places = algMaxID;	
+		if (jobQueuePlaces != 0)
+		{
+			places = jobQueuePlaces.intValue();
+		}
 		
 		jobQueue.addIntegerVariable("current_job_fb", 0, fbMaxID, 0, 0);
 		jobQueue.addIntegerVariable("current_job_alg", 0, algMaxID, 0, 0);
@@ -1413,7 +1447,11 @@ class ModelMaker
 		ExtendedAutomaton eventQueue = getNewAutomaton("Event Queue " + fbName);
 		
 		// the maximum number of events in the queue at the same time
-		final int places = ((Integer) eventsMaxID.get(fbName)).intValue();	
+		int places = ((Integer) eventsMaxID.get(fbName)).intValue();	
+		if (eventQueuePlaces != 0)
+		{
+			places = eventQueuePlaces.intValue();
+		}
 		
 		// event input variables
 		if (theType.getInterfaceList().isSetEventInputs())
