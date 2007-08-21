@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.properties
 //# CLASS:   Config
 //###########################################################################
-//# $Id: Config.java,v 1.36 2007-08-21 00:03:16 robi Exp $
+//# $Id: Config.java,v 1.37 2007-08-21 03:43:42 robi Exp $
 //###########################################################################
 
 /*
@@ -69,8 +69,6 @@ import org.supremica.automata.algorithms.minimization.MinimizationHeuristic;
 import org.supremica.automata.algorithms.minimization.MinimizationStrategy;
 import org.supremica.automata.BDD.BDDPartitioningType;
 import org.supremica.automata.BDD.BDDLibraryType;
-import org.supremica.log.AppenderProperty;
-import org.supremica.log.RedirectProperty;
 import org.supremica.util.BDD.Options;
 
 /**
@@ -140,17 +138,17 @@ public final class Config
     public static final BooleanProperty INCLUDE_EXPERIMENTAL_ALGORITHMS = new BooleanProperty(PropertyType.GENERAL, "includeExperimentalAlgorithms", false, "Include experimental algorithms (requires restart)");
 
     // GENERAL_LOG
-    public static final AppenderProperty LOG_TO_CONSOLE =
-      new AppenderProperty(PropertyType.GENERAL_LOG, "logToConsole",
+    public static final BooleanProperty LOG_TO_CONSOLE =
+      new BooleanProperty(PropertyType.GENERAL_LOG, "logToConsole",
 			   true, "Log to Console");
-    public static final AppenderProperty LOG_TO_GUI =
-      new AppenderProperty(PropertyType.GENERAL_LOG, "logToGUI",
+    public static final BooleanProperty LOG_TO_GUI =
+      new BooleanProperty(PropertyType.GENERAL_LOG, "logToGUI",
 			   false, "Log to Graphical User Interface");
-    public static final RedirectProperty GENERAL_REDIRECT_STDOUT =
-      new RedirectProperty(PropertyType.GENERAL_LOG, "generalRedirectStdout",
+    public static final BooleanProperty GENERAL_REDIRECT_STDOUT =
+      new BooleanProperty(PropertyType.GENERAL_LOG, "generalRedirectStdout",
 			   true, "Redirect stdout");
-    public static final RedirectProperty GENERAL_REDIRECT_STDERR =
-      new RedirectProperty(PropertyType.GENERAL_LOG, "generalRedirectStderr",
+    public static final BooleanProperty GENERAL_REDIRECT_STDERR =
+      new BooleanProperty(PropertyType.GENERAL_LOG, "generalRedirectStderr",
 			   false, "Redirect stderr");
     public static final BooleanProperty VERBOSE_MODE =
       new BooleanProperty(PropertyType.GENERAL_LOG, "verboseMode",

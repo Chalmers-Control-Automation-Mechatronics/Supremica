@@ -346,11 +346,12 @@ proc Java_ProcessClassHierarchy {impl subpack inMapName outMapName} {
            \   (final Collection<? extends NodeSubject> children)" \
 	  "" \
 	  "final SetSubject<NodeSubject> oldchildren = mImmediateChildNodes;" \
-	  "final NodeSetSubject parent = (NodeSetSubject) getParent();" \
 	  "try \{" \
 	  "  mImmediateChildNodes = new ChildNodeSetSubject(children);" \
-	  "  if (parent != null) \{" \
-	  "    parent.rearrangeGroupNodes();" \
+	  "  final Subject parent = getParent();" \
+	  "  if (parent != null && parent instanceof NodeSetSubject) \{" \
+          "    final NodeSetSubject nodeset = (NodeSetSubject) parent;" \
+	  "    nodeset.rearrangeGroupNodes();" \
 	  "  \}" \
 	  "\} catch (final CyclicGroupNodeException exception) \{" \
 	  "  mImmediateChildNodes = oldchildren;" \

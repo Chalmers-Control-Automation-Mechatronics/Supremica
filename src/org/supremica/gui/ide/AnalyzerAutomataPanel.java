@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.gui.ide
 //# CLASS:   AnalyzerAutomataPanel
 //###########################################################################
-//# $Id: AnalyzerAutomataPanel.java,v 1.29 2007-07-12 19:30:33 avenir Exp $
+//# $Id: AnalyzerAutomataPanel.java,v 1.30 2007-08-21 03:43:42 robi Exp $
 //###########################################################################
 
 package org.supremica.gui.ide;
@@ -197,7 +197,7 @@ public class AnalyzerAutomataPanel
                         }
                         else if (selectedAutomata.size() == 1)
                         {
-                            if (Config.GUI_ANALYZER_AUTOMATONVIEWER_USE_CONTROLLED_SURFACE.isFalse())
+                            if (!Config.GUI_ANALYZER_AUTOMATONVIEWER_USE_CONTROLLED_SURFACE.isTrue())
                             {
                                 Automaton selectedAutomaton = selectedAutomata.getFirstAutomaton();
                                 AnalyzerAutomatonViewerPanel automatonPanel = new AnalyzerAutomatonViewerPanel("Dot View", selectedAutomaton);

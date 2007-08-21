@@ -1,3 +1,12 @@
+//# -*- tab-width: 4  indent-tabs-mode: nil  c-basic-offset: 4 -*-
+//###########################################################################
+//# PROJECT: Supremica
+//# PACKAGE: org.supremica.properties
+//# CLASS:   DoubleProperty
+//###########################################################################
+//# $Id: DoubleProperty.java,v 1.2 2007-08-21 03:43:42 robi Exp $
+//###########################################################################
+
 /*
  * Supremica Software License Agreement
  *
@@ -46,102 +55,128 @@
  *
  * Supremica is owned and represented by KA.
  */
+
 package org.supremica.properties;
+
 
 public class DoubleProperty
     extends Property
 {
-    private double defaultValue;
-    private double value;
-    private final double min;
-    private final double max;
-    
-    public DoubleProperty(PropertyType type, String key, double value, String comment)
+
+    //#######################################################################
+    //# Constructors
+    public DoubleProperty(final PropertyType type,
+                          final String key,
+                          final double value,
+                          final String comment)
     {
         this(type, key, value, comment, false);
     }
-    
-    public DoubleProperty(PropertyType type, String key, double value, String comment, boolean immutable)
+
+    public DoubleProperty(final PropertyType type,
+                          final String key,
+                          final double value,
+                          final String comment,
+                          final boolean immutable)
     {
-        this(type, key, value, comment, immutable, Double.MIN_VALUE, Double.MAX_VALUE);
+        this(type, key, value, comment, immutable,
+             Double.MIN_VALUE, Double.MAX_VALUE);
     }
-    
-    public DoubleProperty(PropertyType type, String key, double value, String comment, boolean immutable, double min)
+
+    public DoubleProperty(final PropertyType type,
+                          final String key,
+                          final double value,
+                          final String comment,
+                          final boolean immutable,
+                          final double min)
     {
         this(type, key, value, comment, immutable, min, Double.MAX_VALUE);
     }
-    
-    public DoubleProperty(PropertyType type, String key, double value, String comment, boolean immutable, double min, double max)
+
+    public DoubleProperty(final PropertyType type,
+                          final String key,
+                          final double value,
+                          final String comment,
+                          final boolean immutable,
+                          final double min,
+                          final double max)
     {
         super(type, key, comment, immutable);
-        this.defaultValue = value;
-        this.value = value;
-        this.min = min;
-        this.max = max;
-        if (!isValid(value))
-        {
-            throw new IllegalArgumentException("Illegal value");
-        }
+        mDefaultValue = value;
+        mValue = value;
+        mMin = min;
+        mMax = max;
+        checkValid(value);
     }
 
+
+    //#######################################################################
+    //# Overrides for Abstract Base Class Property
+    public void set(final String value)
+    {
+        set(Double.parseDouble(value));
+    }
+
+    public String valueToString()
+    {
+        return Double.toString(mValue);
+    }
+
+    public boolean currentValueDifferentFromDefaultValue()
+    {
+        return mDefaultValue != mValue;
+    }
+
+
+    //#######################################################################
+    //# Specific Access
     public double get()
     {
-        return value;
+        return mValue;
     }
-    
+
     public double getMinValue()
     {
-        return min;
-    }    
+        return mMin;
+    }
 
     public double getMaxValue()
     {
-        return max;
-    }    
+        return mMax;
+    }
 
-    public void set(String newValue)
+    public void set(final double value)
     {
-        set(Double.parseDouble(newValue));
+        checkMutable();
+        checkValid(value);
+        final String oldvalue = valueToString();
+        mValue = value;
+        firePropertyChanged(oldvalue);
     }
-    
-    public void set(double newValue)
-    {
-        if (isImmutable())
-        {
-            throw new IllegalStateException("This object is immutable, calling the set method is illegal");
-        }
-        if (isValid(newValue))
-        {
-            this.value = newValue;
-        }
-        else
-        {
-            throw new IllegalArgumentException("Illegal value");
-        }
-    }
-    
+
     public boolean isValid(double value)
     {
-        if (value < min)
-        {
-            return false;
-        }
-        if (value > max)
-        {
-            return false;
-        }
-        return true;
+        return value >= mMin && value <= mMax;
     }
-    
-    public String valueToString()
+
+    public void checkValid(final double value)
     {
-        return Double.toString(value);
+        if (!isValid(value)) {
+            throw new IllegalArgumentException
+                ("Assigning illegal value to property " + getFullKey() +
+                 ": " + value + "!");
+        }
     }
-    
-    public boolean currentValueDifferentFromDefaultValue()
-    {
-        return defaultValue != value;
-    }
+
+
+    //#######################################################################
+    //# Data Members
+    private final double mDefaultValue;
+    private final double mMin;
+    private final double mMax;
+
+    private double mValue;
+
 }
 
 

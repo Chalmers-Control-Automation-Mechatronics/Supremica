@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.log
 //# CLASS:   LogDisplay
 //###########################################################################
-//# $Id: LogDisplay.java,v 1.31 2007-05-02 00:25:29 robi Exp $
+//# $Id: LogDisplay.java,v 1.32 2007-08-21 03:43:42 robi Exp $
 //###########################################################################
 
 /*
@@ -82,7 +82,10 @@ import org.apache.log4j.helpers.OptionConverter;
 
 import org.supremica.util.VPopupMenu;
 import org.supremica.gui.*;
+import org.supremica.properties.BooleanProperty;
 import org.supremica.properties.Config;
+import org.supremica.properties.SupremicaPropertyChangeEvent;
+import org.supremica.properties.SupremicaPropertyChangeListener;
 
 
 public class LogDisplay
@@ -93,10 +96,12 @@ public class LogDisplay
 	//# Constructors
     public static LogDisplay getInstance()
     {
-        InterfaceManager interfaceManager = InterfaceManager.getInstance();
+        final InterfaceManager interfaceManager =
+			InterfaceManager.getInstance();
+		final LoggerFactory factory = LoggerFactory.getInstance();
         if (theLogDisplay == null) {
             theLogDisplay = new LogDisplay();            
-            theLogDisplay.addFilter(LoggerFactory.getLoggerFilter());
+            theLogDisplay.addFilter(factory.getLoggerFilter());
 			theLogDisplay.connectStreams();
         }
         return theLogDisplay;
@@ -302,20 +307,6 @@ public class LogDisplay
         FONT_NAME_OPTION, FONT_SIZE_OPTION };
     }
     
-	/**
-	 * Updates the system stream readers after a change to Supremica
-	 * properties. This method dynamically changes the behaviour whether
-	 * STDOUT or STDERR printing appears in the log display.
-	 * @param  property  The property that was changed,
-	 *                   either {@link Config#GENERAL_REDIRECT_STDOUT} or
-	 *                   {@link Config#GENERAL_REDIRECT_STDERR}.
-	 */
-	public void updateProperty(final RedirectProperty property)
-	{
-		mStdOutReader.updateRedirect(property);
-		mStdErrReader.updateRedirect(property);
-	}
-
     private Color parseColor(String v)
     {
         StringTokenizer st = new StringTokenizer(v, ",");
@@ -650,7 +641,9 @@ public class LogDisplay
 	 * or {@link System#out} and redirects anything printed to it to the
 	 * log display.
 	 */
-	private abstract class SystemStreamReader extends Thread
+	private abstract class SystemStreamReader
+		extends Thread
+		implements SupremicaPropertyChangeListener
 	{
 
 		//###################################################################
@@ -660,10 +653,12 @@ public class LogDisplay
 		 * {@link #setup()} must be called before the new thread
 		 * can do anything useful.
 		 */
-		private SystemStreamReader()
+		private SystemStreamReader(final BooleanProperty property)
 		{
 			setDaemon(true);
 			mSystemStream = getSystemOut();
+			mProperty = property;
+			mProperty.addPropertyChangeListener(this);
 		}
 
 		//###################################################################
@@ -690,25 +685,6 @@ public class LogDisplay
 		}
 
 		/**
-		 * Updates this reader after a change of Supremica properties.
-		 * This method reconnects the reader to its system stream if the given
-		 * property matches the Supremica property represented by this reader.
-		 * @see #reconnect()
-		 */
-		private void updateRedirect(final RedirectProperty property)
-		{
-			if (property == getProperty()) {
-				try {
-					reconnect();
-				} catch (final IOException exception) {
-					System.err.println
-						("Failed to redirect " + getStreamName() + "!");
-					exception.printStackTrace(System.err);
-				}
-			}
-		}
-
-		/**
 		 * Reconnects this reader to its system stream depending on
 		 * Supremica property settings. This methods connects the
 		 * reader to the system stream, if the correspoding property
@@ -718,8 +694,7 @@ public class LogDisplay
 		private void reconnect()
 			throws IOException
 		{
-			final RedirectProperty property = getProperty();
-			if (property.isTrue()) {
+			if (mProperty.isTrue()) {
 				connect();
 			} else {
 				disconnect();
@@ -755,6 +730,25 @@ public class LogDisplay
 		}
 
 		//###################################################################
+		//# Interface org.supremica.properties.SupremicaPropertyChangeListener
+		/**
+		 * Updates this reader after a change of Supremica properties.
+		 * This method reconnects the reader to its system stream if the given
+		 * property matches the Supremica property represented by this reader.
+		 * @see #reconnect()
+		 */
+		public void propertyChanged(final SupremicaPropertyChangeEvent event)
+		{
+			try {
+				reconnect();
+			} catch (final IOException exception) {
+				System.err.println
+					("Failed to redirect " + getStreamName() + "!");
+				exception.printStackTrace(System.err);
+			}
+		}
+
+		//###################################################################
 		//# Reading
 		private String readLine()
 			throws IOException
@@ -776,7 +770,6 @@ public class LogDisplay
 
 		//###################################################################
 		//# Abstract Methods
-		abstract RedirectProperty getProperty();
 		abstract PrintStream getSystemOut();
 		abstract void setSystemOut(PrintStream stream);
 		abstract String getStreamName();
@@ -785,6 +778,8 @@ public class LogDisplay
 		//###################################################################
 		//# Data Members
 		private final PrintStream mSystemStream;
+		private final BooleanProperty mProperty;
+
 		private InputStream mPipeIn;
 		private PrintStream mPrintStream;
 
@@ -800,16 +795,12 @@ public class LogDisplay
 		//# Constructor
 		private StdOutReader()
 		{
+			super(Config.GENERAL_REDIRECT_STDOUT);
 			mLogger = LoggerFactory.createLogger(getClass());
 		}
 
 		//###################################################################
 		//# Overrides for Abstract Baseclass SystemStreamReader
-		RedirectProperty getProperty()
-		{
-			return Config.GENERAL_REDIRECT_STDOUT;
-		}
-
 		PrintStream getSystemOut()
 		{
 			return System.out;
@@ -846,16 +837,12 @@ public class LogDisplay
 		//# Constructor
 		private StdErrReader()
 		{
+			super(Config.GENERAL_REDIRECT_STDERR);
 			mLogger = LoggerFactory.createLogger(getClass());
 		}
 
 		//###################################################################
 		//# Overrides for Abstract Baseclass SystemStreamReader
-		RedirectProperty getProperty()
-		{
-			return Config.GENERAL_REDIRECT_STDERR;
-		}
-
 		PrintStream getSystemOut()
 		{
 			return System.err;
@@ -889,7 +876,7 @@ public class LogDisplay
     private JTextPane mTextPane;
     private StyledDocument mDocument;
     private LoggerPopupMenu popup =
-		new LoggerPopupMenu(LoggerFactory.getLoggerFilter());
+		new LoggerPopupMenu(LoggerFactory.getInstance().getLoggerFilter());
 	private Layout mLayout;
     private Map<Level,MutableAttributeSet> mAttributeMap;
     private Map<Level,ImageIcon> mIconMap;

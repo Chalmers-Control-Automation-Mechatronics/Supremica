@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.properties
 //# CLASS:   Property
 //###########################################################################
-//# $Id: Property.java,v 1.4 2007-08-21 00:03:16 robi Exp $
+//# $Id: Property.java,v 1.5 2007-08-21 03:43:42 robi Exp $
 //###########################################################################
 
 /*
@@ -59,6 +59,7 @@
 
 package org.supremica.properties;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -141,6 +142,55 @@ public abstract class Property
 
 
     //#######################################################################
+    //# Assignment
+    protected void checkMutable()
+    {
+        if (isImmutable()) {
+            throw new IllegalStateException
+                ("Property " + getFullKey() +
+                 " is immutable, calling the set() method is illegal!");
+		}			
+    }
+
+
+    //#######################################################################
+    //# Observer Pattern
+    public void addPropertyChangeListener
+        (final SupremicaPropertyChangeListener listener)
+    {
+        if (mListeners == null) {
+            mListeners = new LinkedList<SupremicaPropertyChangeListener>();
+        }
+        mListeners.add(listener);
+    }
+
+    public void removePropertyChangeListener
+        (final SupremicaPropertyChangeListener listener)
+    {
+        if (mListeners != null) {
+            mListeners.remove(listener);
+            if (mListeners.isEmpty()) {
+                mListeners = null;
+            }
+        }
+    }
+
+    protected void firePropertyChanged(final String oldvalue)
+    {
+        if (mListeners != null) {
+            final String newvalue = valueToString();
+            final SupremicaPropertyChangeEvent event =
+                new SupremicaPropertyChangeEvent(this, oldvalue, newvalue);
+            final List<SupremicaPropertyChangeListener> copy =
+                new ArrayList<SupremicaPropertyChangeListener>(mListeners);
+            for (final SupremicaPropertyChangeListener listener : copy) {
+                listener.propertyChanged(event);
+            }
+        }
+    }
+            
+
+    //#######################################################################
     //# Provided by Subclasses
     public abstract void set(String value);
 
@@ -172,6 +222,8 @@ public abstract class Property
     private final boolean immutable;
     private final String key;
     private final String comment;
+
+    private List<SupremicaPropertyChangeListener> mListeners = null;
 
 
     //#######################################################################

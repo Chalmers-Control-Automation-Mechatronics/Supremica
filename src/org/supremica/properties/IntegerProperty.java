@@ -1,3 +1,12 @@
+//# -*- tab-width: 4  indent-tabs-mode: nil  c-basic-offset: 4 -*-
+//###########################################################################
+//# PROJECT: Supremica
+//# PACKAGE: org.supremica.properties
+//# CLASS:   IntegerProperty
+//###########################################################################
+//# $Id: IntegerProperty.java,v 1.5 2007-08-21 03:43:42 robi Exp $
+//###########################################################################
+
 /*
  * Supremica Software License Agreement
  *
@@ -51,125 +60,139 @@ package org.supremica.properties;
 public class IntegerProperty
     extends Property
 {
-    private int defaultValue;
-    private int value;
-    private final int min;
-    private final int max;
-    private final int tick;
     
-    public IntegerProperty(PropertyType type, String key, int value, String comment)
+    //#######################################################################
+    //# Constructors
+    public IntegerProperty(final PropertyType type,
+                           final String key,
+                           final int value,
+                           final String comment)
     {
         this(type, key, value, comment, false);
     }
     
-    public IntegerProperty(PropertyType type, String key, int value, String comment, boolean immutable)
+    public IntegerProperty(final PropertyType type,
+                           final String key,
+                           final int value,
+                           final String comment,
+                           final boolean immutable)
     {
-        this(type, key, value, comment, immutable, Integer.MIN_VALUE, Integer.MAX_VALUE);
+        this(type, key, value, comment, immutable,
+             Integer.MIN_VALUE, Integer.MAX_VALUE);
     }
     
-    public IntegerProperty(PropertyType type, String key, int value, String comment, boolean immutable, int min)
+    public IntegerProperty(final PropertyType type,
+                           final String key,
+                           final int value,
+                           final String comment,
+                           final boolean immutable,
+                           final int min)
     {
         this(type, key, value, comment, immutable, min, Integer.MAX_VALUE);
     }
     
-    public IntegerProperty(PropertyType type, String key, int value, String comment, boolean immutable, int min, int max)
+    public IntegerProperty(final PropertyType type,
+                           final String key,
+                           final int value,
+                           final String comment,
+                           final boolean immutable,
+                           final int min,
+                           final int max)
     {
-        this(type, key, value, comment, immutable, Integer.MIN_VALUE, Integer.MAX_VALUE, 1);
+        this(type, key, value, comment, immutable,
+             Integer.MIN_VALUE, Integer.MAX_VALUE, 1);
     }
 
-    public IntegerProperty(PropertyType type, String key, int value, String comment, boolean immutable, int min, int max, int tick)
+    public IntegerProperty(final PropertyType type,
+                           final String key,
+                           final int value,
+                           final String comment,
+                           final boolean immutable,
+                           final int min,
+                           final int max,
+                           final int tick)
     {
         super(type, key, comment, immutable);
-        this.defaultValue = value;
-        this.value = value;
-        this.min = min;
-        this.max = max;
-        this.tick = tick;
-        if (!isValid(value))
-        {
-            throw new IllegalArgumentException("Illegal value");
-        }
+        mDefaultValue = value;
+        mValue = value;
+        mMin = min;
+        mMax = max;
+        mTick = tick;
+        checkValid(value);
     }
 
-    public int get()
-    {
-        return value;
-    }
-    
-    public int getMinValue()
-    {
-        return min;
-    }    
 
-    public int getMaxValue()
+    //#######################################################################
+    //# Overrides for Abstract Base Class Property
+    public void set(final String value)
     {
-        return max;
-    }    
-
-    public int getTick()
-    {
-        return tick;
-    }    
-
-    public void set(String newValue)
-    {
-        set(Integer.parseInt(newValue));
-    }
-    
-    public void set(int newValue)
-    {
-        if (isImmutable())
-        {
-            throw new IllegalStateException("This object is immutable, calling the set method is illegal");
-        }
-        if (isValid(newValue))
-        {
-            this.value = newValue;
-        }
-        else
-        {
-            throw new IllegalArgumentException("Illegal value");
-        }
-    }
-    
-    public boolean isValid(int value)
-    {
-        if (value < min)
-        {
-            return false;
-        }
-        if (value > max)
-        {
-            return false;
-        }
-        return true;
+        set(Integer.parseInt(value));
     }
     
     public String valueToString()
     {
-        return Integer.toString(value);
+        return Integer.toString(mValue);
     }
     
     public boolean currentValueDifferentFromDefaultValue()
     {
-        return defaultValue != value;
+        return mDefaultValue != mValue;
+    }
+
+
+    //#######################################################################
+    //# Specific Access
+    public int get()
+    {
+        return mValue;
     }
     
-    /*
-    ////////////////////// OVERRIDES ////
-    public String getComment()
+    public int getMinValue()
     {
-        String minComment = "";
-        if (min > Integer.MIN_VALUE)
-            minComment = "(" + min;
-        else
-            minComment = "(-\u221E";
-        String maxComment = "";
-        if (max < Integer.MAX_VALUE)
-            maxComment = max + ")";
-        else
-            maxComment = "\u221E)";
-        return super.getComment() + " " + minComment + ", " + maxComment;
+        return mMin;
+    }    
+
+    public int getMaxValue()
+    {
+        return mMax;
+    }    
+
+    public int getTick()
+    {
+        return mTick;
+    }    
+    
+    public void set(final int value)
+    {
+        checkMutable();
+        checkValid(value);
+        final String oldvalue = valueToString();        
+        mValue = value;
+        firePropertyChanged(oldvalue);
     }
-    */
+    
+    public boolean isValid(final int value)
+    {
+        return value >= mMin && value <= mMax;
+    }
+
+    public void checkValid(final int value)
+    {
+        if (!isValid(value)) {
+            throw new IllegalArgumentException
+                ("Assigning illegal value to property " + getFullKey() +
+                 ": " + value + "!");
+        }
+    }
+
+
+    //#######################################################################
+    //# Data Members
+    private final int mDefaultValue;
+    private final int mMin;
+    private final int mMax;
+    private final int mTick;
+
+    private int mValue;
+    
 }

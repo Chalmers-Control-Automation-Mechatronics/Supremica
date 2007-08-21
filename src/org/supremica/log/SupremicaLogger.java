@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.log
 //# CLASS:   SupremicaLogger
 //###########################################################################
-//# $Id: SupremicaLogger.java,v 1.3 2007-07-21 06:28:07 robi Exp $
+//# $Id: SupremicaLogger.java,v 1.4 2007-08-21 03:43:42 robi Exp $
 //###########################################################################
 
 /*
@@ -70,12 +70,13 @@ class SupremicaLogger
     implements Logger
 {    
     //#######################################################################
-    //# Constructors
+    //# Constructor
     SupremicaLogger(final org.apache.log4j.Logger logger)
     {
         mLogger = logger;
     }  
     
+
     //#######################################################################
     //# Interface org.apache.log4j.Logger
     public void debug(final Object message)
@@ -210,13 +211,11 @@ class SupremicaLogger
     
     public void setLogToConsole(final boolean log)
     {
-        final Appender appender = LoggerFactory.getConsoleAppender();
-        if (log)
-        {
+        final LoggerFactory factory = LoggerFactory.getInstance();
+        final Appender appender = factory.getConsoleAppender();
+        if (log) {
             mLogger.addAppender(appender);
-        }
-        else
-        {
+        } else {
             mLogger.removeAppender(appender);
         }
     }
@@ -229,6 +228,7 @@ class SupremicaLogger
         StringBuffer error = stringWriter.getBuffer();
         return error.toString();
     }
+
     
     //#######################################################################
     //# Data Members

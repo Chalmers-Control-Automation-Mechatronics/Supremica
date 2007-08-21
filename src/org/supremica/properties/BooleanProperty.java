@@ -1,10 +1,10 @@
-//# -*- tab-width: 4  indent-tabs-mode: t  c-basic-offset: 4 -*-
+//# -*- tab-width: 4  indent-tabs-mode: nil  c-basic-offset: 4 -*-
 //###########################################################################
 //# PROJECT: Supremica
 //# PACKAGE: org.supremica.properties
 //# CLASS:   BooleanProperty
 //###########################################################################
-//# $Id: BooleanProperty.java,v 1.4 2007-05-02 00:25:29 robi Exp $
+//# $Id: BooleanProperty.java,v 1.5 2007-08-21 03:43:42 robi Exp $
 //###########################################################################
 
 /*
@@ -62,34 +62,60 @@ package org.supremica.properties;
 public class BooleanProperty
     extends Property
 {
-    private boolean defaultValue;
-    private boolean value;
     
-    public BooleanProperty(PropertyType type, String key, boolean value, String comment)
+    //#######################################################################
+    //# Constructors
+    public BooleanProperty(final PropertyType type,
+						   final String key,
+						   final boolean value,
+						   final String comment)
     {
         this(type, key, value, comment, false);
     }
     
-    public BooleanProperty(PropertyType type, String key, boolean value, String comment, boolean immutable)
+    public BooleanProperty(final PropertyType type,
+						   final String key,
+						   final boolean value,
+						   final String comment,
+						   final boolean immutable)
     {
         super(type, key, comment, immutable);
-        this.defaultValue = value;
-        this.value = value;
+        mDefaultValue = value;
+        mValue = value;
+    }
+
+    
+    //#######################################################################
+    //# Overrides for Abstract Base Class Property
+    public void set(final boolean value)
+    {
+        checkMutable();
+        final String oldvalue = valueToString();        
+		mValue = value;
+		firePropertyChanged(oldvalue);
+    }
+    
+    public String valueToString()
+    {
+        return Boolean.toString(mValue);
+    }
+    
+    public boolean currentValueDifferentFromDefaultValue()
+    {
+        return mDefaultValue != mValue;
+    }
+
+
+    //#######################################################################
+    //# Specific Access
+    public boolean isTrue()
+    {
+        return mValue;
     }
     
     public boolean get()
     {
         return isTrue();
-    }
-    
-    public boolean isTrue()
-    {
-        return value;
-    }
-    
-    public boolean isFalse()
-    {
-        return !isTrue();
     }
     
     public void set(final String value)
@@ -98,24 +124,11 @@ public class BooleanProperty
 		set(boolval);
     }
     
-    public void set(boolean value)
-    {
-        if (isImmutable())
-        {
-            throw new IllegalStateException("This object is immutable, calling the set method is illegal");
-        }
-        
-        this.value = value;
-    }
-    
-    public String valueToString()
-    {
-        return Boolean.toString(value);
-    }
-    
-    public boolean currentValueDifferentFromDefaultValue()
-    {
-        return defaultValue != value;
-    }
+
+    //#######################################################################
+    //# Data Members
+    private final boolean mDefaultValue;
+
+    private boolean mValue;
     
 }

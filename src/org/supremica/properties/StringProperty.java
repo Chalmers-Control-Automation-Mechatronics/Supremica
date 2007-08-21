@@ -1,3 +1,12 @@
+//# -*- tab-width: 4  indent-tabs-mode: nil  c-basic-offset: 4 -*-
+//###########################################################################
+//# PROJECT: Supremica
+//# PACKAGE: org.supremica.properties
+//# CLASS:   StringProperty
+//###########################################################################
+//# $Id: StringProperty.java,v 1.5 2007-08-21 03:43:42 robi Exp $
+//###########################################################################
+
 /*
  * Supremica Software License Agreement
  *
@@ -52,7 +61,7 @@ public class StringProperty
     extends Property
 {
     private String defaultValue;
-    private String value;
+    private String mValue;
     private Object[] legalValues;
     boolean ignoreCase = false;
     
@@ -75,28 +84,23 @@ public class StringProperty
     {
         super(type, key, comment, immutable);
         this.defaultValue = value.toString();
-        this.value = value.toString();
+        mValue = value.toString();
         this.legalValues = legalValues;
         this.ignoreCase = ignoreCase;
-        if (!isValid(this.value))
-        {
-            throw new IllegalArgumentException("Illegal value");
-        }
     }
     
     public String get()
     {
-        return value;
+        return mValue;
     }
     
-    public void set(String value)
+    public void set(final String value)
     {
-        if (isImmutable())
-        {
-            throw new IllegalStateException("This object is immutable, calling the set method is illegal.");
-        }
-        
-        this.value = value;
+        checkMutable();
+        checkValid(value);
+        final String oldvalue = mValue;
+        mValue = value;
+        firePropertyChanged(oldvalue);
     }
     
     public boolean isValid(String value)
@@ -128,6 +132,15 @@ public class StringProperty
         }
         return false;
     }
+
+    public void checkValid(final String value)
+    {
+        if (!isValid(value)) {
+            throw new IllegalArgumentException
+                ("Assigning illegal value to property " + getFullKey() +
+                 ": " + value + "!");
+        }
+    }
     
     public Object[] legalValues()
     {
@@ -158,11 +171,11 @@ public class StringProperty
     {
         if (!ignoreCase)
         {
-            return !defaultValue.equals(value);
+            return !defaultValue.equals(mValue);
         }
         else
         {
-            return !defaultValue.equalsIgnoreCase(value);
+            return !defaultValue.equalsIgnoreCase(mValue);
         }
     }
     
