@@ -6,8 +6,6 @@ import javax.swing.*;
 import java.awt.GridLayout;
 import java.awt.event.*;
 import java.io.*;
-
-import org.supremica.gui.ide.IDEReportInterface;
 import org.supremica.log.Logger;
 import org.supremica.log.LoggerFactory;
 import org.supremica.automata.Automata;
@@ -32,7 +30,7 @@ public class ScheduleDialog
     
     private static final long serialVersionUID = 1L;
     private static final String[] optimizationMehtods = new String[]{MODIFIED_A_STAR, MILP, VIS_GRAPH, MULTITHREADED_A_STAR}; //, "Modified IDA*", "Modified SMA*"};
-    private static final String[] astarHeuristics = new String[]{ONE_PRODUCT_RELAXATION, TWO_PRODUCT_RELAXATION, VIS_GRAPH_TIME_RELAXATION, VIS_GRAPH_NODE_RELAXATION, BRUTE_FORCE_RELAXATION};
+    private static final String[] astarHeuristics = new String[]{ONE_PRODUCT_RELAXATION, SUBOPTIMAL, TWO_PRODUCT_RELAXATION, VIS_GRAPH_TIME_RELAXATION, VIS_GRAPH_NODE_RELAXATION, BRUTE_FORCE_RELAXATION};
     private static final String[] milpHeuristics = new String[]{OPTIMAL, SUBOPTIMAL};
     private static Logger logger = LoggerFactory.createLogger(ScheduleDialog.class);
     private JComboBox optiMethodsBox, heuristicsBox;
@@ -246,6 +244,42 @@ public class ScheduleDialog
                 {
                     sched = new VisGraphScheduler(selectedAutomata, vgDrawer.isSelected(), this);
                 }
+                else if (heuristicsBox.getSelectedItem().equals(SUBOPTIMAL))
+                {
+                    //temp
+                    sched = new ModifiedAstar(selectedAutomata, ONE_PRODUCT_RELAXATION, 
+                            nodeExpander.isSelected(), buildAutomaton.isSelected(), this, 
+                            new double[]{100, 200});
+                    
+                    
+                    
+                    
+//                    Thread mainThread = Thread.currentThread();
+                    
+//                    logger.info("0");
+//                    ApproxWeightsDialog approxWeightsDlg = new ApproxWeightsDialog(this);
+//                    return;
+//                    Thread approxDlgThread = new Thread(approxWeightsDlg);
+//                    approxDlgThread.start();
+//                    mainThread.join();
+//                    
+////                    while (! approxWeightsDlg.isDone())
+////                    {
+////                        mainThread.sleep(1000);
+////                    }
+////                    synchronized (approxWeightsDlg)
+////                    {
+////                        mainThread.wait();
+////                    
+//                    logger.info("1");
+////                    Thread.currentThread().wait();
+//                    logger.info("2");
+//                    sched = new ModifiedAstar(selectedAutomata, (String) heuristicsBox.getSelectedItem(), 
+//                            nodeExpander.isSelected(), buildAutomaton.isSelected(), this, 
+//                            approxWeightsDlg.getWeights());
+//                    logger.info("3");
+////                    }
+                }
                 else
                 {
                     sched = new ModifiedAstar(selectedAutomata, (String) heuristicsBox.getSelectedItem(), nodeExpander.isSelected(), buildAutomaton.isSelected(), this);
@@ -392,4 +426,170 @@ public class ScheduleDialog
 //    }
 }
 
+    
+class ApproxWeightsDialog
+        extends JDialog implements Runnable, ActionListener, KeyListener
+{
+    private Scheduler sched = null;
+    private ScheduleDialog parentDlg = null;
+    private JPanel ioPanel = new JPanel();
+    private JPanel btnPanel = new JPanel();
+    private JTextField xField = new JTextField(5);
+    private JTextField yField = new JTextField(5);
+    private JButton okBtn = new JButton("OK");
+    private JButton cancelBtn = new JButton("Cancel");
+    private double xWeight = -1;
+    private double yWeight = -1;
+    private boolean threadDone = false;
+    private final static Logger logger = LoggerFactory.createLogger(ApproxWeightsDialog.class);
+        
+    public ApproxWeightsDialog(ScheduleDialog scheduleDlg)
+        throws Exception
+    {
+        super(scheduleDlg);
+        parentDlg = scheduleDlg;
+        
+        openApproxWeightsDialog();
+    }
+    
+    public void run()
+    {
+        logger.info("in run");
+               
+//        try 
+//        {
+//            while (xWeight < 0 || yWeight < 0)
+//            {
+//                repaint();
+//            }
+       
+        for (int i = 0; i < 5; i++)
+        {
+            repaint();
+            logger.warn("in_run_nr_" + i);
+        } 
 
+            
+            logger.info("thread done");
+            threadDone = true;
+            notifyAll();
+//        }
+//        catch (InterruptedException ex)
+//        {
+//            ex.printStackTrace();
+//        }
+    }
+    
+    private void openApproxWeightsDialog()
+            throws Exception
+    {
+        // Set the main layout of the dialog box
+        java.awt.BorderLayout headLayout = new java.awt.BorderLayout();
+        headLayout.setHgap(5);
+        headLayout.setVgap(5);
+        setLayout(headLayout);
+
+        // Set the layout of the x-y-input-panel and populate it
+        ioPanel.setLayout(new java.awt.GridLayout(1, 8));
+        ioPanel.setSize(this.getWidth() + 10, 100);
+        ioPanel.add(new JLabel(""));
+        ioPanel.add(new JLabel("x-weight: "));
+        ioPanel.add(xField);
+        ioPanel.add(new JLabel(""));
+        ioPanel.add(new JLabel(""));
+        ioPanel.add(new JLabel("y-weight: "));
+        ioPanel.add(yField);
+        ioPanel.add(new JLabel(""));
+
+        // Set the layout of the button-panel and populate it
+        btnPanel.setLayout(new java.awt.GridLayout(1, 2));
+        btnPanel.setSize(this.getWidth() + 10, okBtn.getHeight() + 10);
+        btnPanel.add(okBtn);
+        btnPanel.add(cancelBtn);
+
+        // Add the action listener to the ok-button, calling ModifiedA* if the weights are set
+        okBtn.addActionListener(this);
+
+        // Close the dialog box if cancel is called
+        cancelBtn.addActionListener(new ActionListener()
+        {
+            public void actionPerformed(ActionEvent ev)
+            {
+                parentDlg.done();
+            }
+        });
+
+        // Listen for the "enter"-key and click the ok-button if it happens
+        xField.addKeyListener(this);
+        yField.addKeyListener(this);
+
+        // Populate the dialog box: add title, header text, x-y-input-panel and button-panel
+        setTitle("Approximation weights for the A*");
+        add(new JLabel(" Set the x- and y-weights used by the A*" + 
+                "to find an approximative solution...  "), java.awt.BorderLayout.NORTH);
+        add(ioPanel, java.awt.BorderLayout.CENTER);
+        add(btnPanel, java.awt.BorderLayout.SOUTH);
+
+        // Pack and show the dialog box
+        pack();
+        setVisible(true);  
+    }
+    
+    /**
+     * Returns the weight-values if they are non-negative, i.e if they have 
+     * been set by the user.
+     */
+    public double[] getWeights()
+        throws Exception
+    {
+        return new double[]{xWeight, yWeight};
+    }
+    
+    public boolean isDone()
+    {
+        return threadDone;
+    }
+    
+    /**
+     * Called at the click of the ok-button. If the x- and y-fields are non-empty and
+     * non-negative, the weight-values are stored.
+     */
+    public void actionPerformed(ActionEvent ev)
+    {
+        try
+        {
+            xWeight = new Double(xField.getText()).doubleValue();
+            yWeight = new Double(yField.getText()).doubleValue();
+
+            if (xWeight < 0 || yWeight < 0)
+            {
+                throw new NumberFormatException("At least one of the approximation weights is negative.");
+            }
+
+        }
+        catch (NumberFormatException ex)
+        {
+            logger.error("The weights have incorrect format (must be positive floating numbers).");
+        }
+        catch (Exception excp)
+        {
+            logger.error("ScheduleDialog::doit " + excp);
+            logger.debug(excp.getStackTrace());
+        }
+    }
+    
+    /**
+     * If return is pressed in the x- or y-field, click the ok-button
+     */
+    public void keyPressed(KeyEvent ev)
+    {
+        if (ev.getKeyCode() == ev.VK_ENTER)
+        {
+            okBtn.doClick();
+        }
+    }
+    
+    // Necessary methods to implement the KeyListener-interface
+    public void keyReleased(KeyEvent ev){}
+    public void keyTyped(KeyEvent ev){}
+}

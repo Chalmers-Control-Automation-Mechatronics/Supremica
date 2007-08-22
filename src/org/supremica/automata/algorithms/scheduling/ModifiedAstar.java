@@ -232,7 +232,7 @@ public class ModifiedAstar
     {
         this(theAutomata, heuristic, manualExpansion, buildSchedule, false, scheduleDialog);
         
-        if (approximationWeights.length == 2)
+        if (approximationWeights.length != 2)
         {
             throw new Exception("Exactly 2 weights should be used to guide the A* towards a suboptimal solution!");
         }
@@ -340,16 +340,18 @@ public class ModifiedAstar
 //         {
 //             addDummyAcceptingState(autIt.next());
 //         }
+        
+        SchedulingHelper.preparePlantsForScheduling(theAutomata.getPlantAutomata());
  
-		// Creates an instance of a class that is resposible for the expansion of 
-		// the synchronized states. 
+        // Creates an instance of a class that is resposible for the expansion of 
+        // the synchronized states. 
         expander = new NodeExpander(manualExpansion, theAutomata, this);
 
-	    // Fetches the AutomataIndexMap from the NodeExpander
-		indexMap = expander.getIndexMap();
+        // Fetches the AutomataIndexMap from the NodeExpander
+        indexMap = expander.getIndexMap();
 
-		// Creates an instance of the relaxation class (search guidance), as 
-		// specified by the user through the GUI.
+        // Creates an instance of the relaxation class (search guidance), as 
+        // specified by the user through the GUI.
         initRelaxer(); 
 
         //Borde r�cka med plantAutomata.size(), fast d� kanske man m�ste �ndra lite p� andra st�llen ocks�
@@ -365,12 +367,12 @@ public class ModifiedAstar
 		// Initiates the important node indices that are used throughout the search
         initAuxIndices();
 
-		// Initiates the open and the closed trees.
-		initTrees();
+        // Initiates the open and the closed trees.
+        initTrees();
 
-		String initTimeStr = "Initialization time = " + timer.elapsedTime() + "ms";
+        String initTimeStr = "Initialization time = " + timer.elapsedTime() + "ms";
 // 		logger.info(initTimeStr);
-		outputStr += "\t" + initTimeStr + "\n";
+        outputStr += "\t" + initTimeStr + "\n";
     }
     
     protected void initAuxIndices()
@@ -390,56 +392,56 @@ public class ModifiedAstar
         ESTIMATE_INDEX = ACCUMULATED_COST_INDEX + 1;
     }
 
-	/**
-	 * Creates an instance of Relaxer corresponding to the chosen heuristic.
-	 */
-	protected void initRelaxer()
-		throws Exception
-	{
-		if (heuristic.equals(ScheduleDialog.ONE_PRODUCT_RELAXATION))
+    /**
+     * Creates an instance of Relaxer corresponding to the chosen heuristic.
+     */
+    protected void initRelaxer()
+        throws Exception
+    {
+        if (heuristic.equals(ScheduleDialog.ONE_PRODUCT_RELAXATION))
         {
             relaxer = new OneProductRelaxer(expander, this);
         }
         else if (heuristic.equals(ScheduleDialog.TWO_PRODUCT_RELAXATION))
         {
             // if (theAutomata.getPlantAutomata().size() < 3)
-			//             {
-			//                 throw new Exception("2-product relax cannot be used for two or less products");
-			//             }
-            
-			//             useOneProdRelax = false;
-			throw new Exception("'2-product relax' is currently too buggishly implemented.");
-        }
-		else if (heuristic.equals(ScheduleDialog.VIS_GRAPH_TIME_RELAXATION))
-		{
-			relaxer = new VisibilityGraphRelaxer(expander, this, false);
-		}
-		else if (heuristic.equals(ScheduleDialog.VIS_GRAPH_NODE_RELAXATION))
-		{
-			relaxer = new VisibilityGraphRelaxer(expander, this, true);
-		}
-		else if (heuristic.equals(ScheduleDialog.BRUTE_FORCE_RELAXATION))
-		{
-			relaxer = new BruteForceRelaxer();
-		}
-	}
+            //             {
+            //                 throw new Exception("2-product relax cannot be used for two or less products");
+            //             }
 
-	/** 
-	 * Resets or initializes the OPEN and the CLOSED trees.
-	 */
-	protected void initTrees()
-	{
-		if (openTree == null)
-		{
-			openTree = new TreeSet<Node>(new OpenTreeComparator(ESTIMATE_INDEX));
-			closedTree = new TreeMap<Integer, Node>();
-		}
-		else 
-		{
-			openTree.clear();
-			closedTree.clear();
-		}
-	}
+            //             useOneProdRelax = false;
+            throw new Exception("'2-product relax' is currently too buggishly implemented.");
+        }
+        else if (heuristic.equals(ScheduleDialog.VIS_GRAPH_TIME_RELAXATION))
+        {
+            relaxer = new VisibilityGraphRelaxer(expander, this, false);
+        }
+        else if (heuristic.equals(ScheduleDialog.VIS_GRAPH_NODE_RELAXATION))
+        {
+            relaxer = new VisibilityGraphRelaxer(expander, this, true);
+        }
+        else if (heuristic.equals(ScheduleDialog.BRUTE_FORCE_RELAXATION))
+        {
+            relaxer = new BruteForceRelaxer();
+        }
+    }
+
+    /** 
+     * Resets or initializes the OPEN and the CLOSED trees.
+     */
+    protected void initTrees()
+    {
+        if (openTree == null)
+        {
+            openTree = new TreeSet<Node>(new OpenTreeComparator(ESTIMATE_INDEX));
+            closedTree = new TreeMap<Integer, Node>();
+        }
+        else 
+        {
+            openTree.clear();
+            closedTree.clear();
+        }
+    }
     
     public void requestStop()
     {

@@ -264,7 +264,7 @@ public class RandomPathUsingMilp
             {
                 if (ex.getMessage().contains("NO") && ex.getMessage().contains("FEASIBLE SOLUTION"))
                 {
-                    logger.info("No path with current variable values");
+                    logger.warn("No path with current variable values");
 //                    logger.error(ex.getMessage());
 //                    throw ex;
                 }

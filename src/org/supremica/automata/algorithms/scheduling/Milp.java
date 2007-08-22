@@ -696,11 +696,9 @@ public class Milp
         
         // Rescale the times in plants if necessary
 //        rescalePlantTimes();
-                
-        for (Iterator<Automaton> plantIt = plants.iterator(); plantIt.hasNext(); )
-        {
-            prepareAutomatonForMilp(plantIt.next());
-        }
+        
+        // Prepare the plants before scheduling (add dummy initial state if needed, remove selfloops if needed)
+        SchedulingHelper.preparePlantsForScheduling(plants);
         
         for (Iterator<Automaton> specsIt = allSpecs.iterator(); specsIt.hasNext(); )
         {
@@ -1690,6 +1688,9 @@ public class Milp
     private void createConsecutiveBookingConstraints()
         throws Exception
     {       
+        // Connectivity-test
+        ArrayList<LabeledEvent[]> bEventPairs = new ArrayList<LabeledEvent[]>();
+        
         // Each entry of this map contains an ArrayList of pairs of consecutive 
         // booking states, e.g. [Z1_b_index Z2_b_index]. These states are local to some plant, 
         // e.g. Pi, and mean that Pi can book Z1 in the state corresponding to Z1_b_index 
@@ -1720,6 +1721,61 @@ public class Milp
                 }
             }
         }
+        
+        
+        
+        
+        
+        
+        
+        // TODO: sigue leendo... (UNDER CONSTRUCTION...)
+        // Denna for-slinga är nästan en upprepning av det som görs längre ner
+        // (måste komma här för att få med ALLA bEventPar och inte bara de överlappande).
+        // Detta är dock endast tillfälligt (hoppas jag, annars strukturera om)
+        // då den nedanstående endast funkar för 2 plantor och bör på sikt försvinna 
+        // (tror jag) /AK
+        // Skall infon om tillstånd vara med i bEventPairs??? /AK
+//TODO: De följande tre raderna skall inte vara bortkommenterade (ÄN) utan är det för att slippa lägga
+//      till BookingPairsGraphExplorer.java i CVS-en. Vad skall göras här???
+//        BookingPairsGraphExplorer graphExplorer = new BookingPairsGraphExplorer(
+//            consecutiveBookingTicsIndices.keySet().toArray(new int[][]{}));
+//        graphExplorer.findConnectedCycles();
+        
+// @Deprecated: tänkte om...
+//                    for (int p = 0; p < plants.size(); p++)
+//                    {
+//                        ArrayList<int[]> consecutiveTics = consecutiveBookingTicsIndices.get(new int[]{p, z1, z2});
+//                        if (consecutiveTics != null)
+//                        {
+//                            for (int[] tic : consecutiveTics)
+//                            {
+//                                // The current booking-events-pair of p
+//                                LabeledEvent[] currBEventPair = new LabeledEvent[currZoneIndices.length];
+//
+//                                for (int localZInd = 0; localZInd < currZoneIndices.length; localZInd++)
+//                                {
+//                                    int eventIndex = bookingTics[currZoneIndices[localZInd]][p][EVENT_SWITCH][tic[localZInd]];
+//                                    LabeledEvent bEvent = indexMap.getEventAt(eventIndex);   
+//
+//                                    currBEventPair[localZInd] = bEvent;
+//                                }   
+//
+//                                bEventPairs.add(currBEventPair);
+//                            }     
+//                        }  
+//                    }
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
                 
         // Find the consecutive bookings of the same zone-pairs that are made by different 
         // plants. Check for (almost) all combinations of z1&z2 
@@ -1732,14 +1788,14 @@ public class Milp
                 {
                     // Used in for-loops to decrease code-repetition
                     int[] currZoneIndices = new int[]{z1, z2};
-
+                    
                     // Check for all combinations of p1 < p2 (this suffices since the mutex 
                     // variables are always of the form "pi_books_zx_before_pj", where i < j)
                     for (int p1 = 0; p1 < plants.size() - 1; p1++)
                     {                       
                         ArrayList<int[]> consecutiveTicsP1 = consecutiveBookingTicsIndices.get(new int[]{p1, z1, z2});
                         if (consecutiveTicsP1 != null)
-                        {                   
+                        {   
                             // If p1 books z1 and then z2 consecutively (consecutiveTicsP1 = non_null), then 
                             // there should be a consecutive booking secuense in som plant with higher index than p1...
                             for (int p2 = p1 + 1; p2 < plants.size(); p2++)
@@ -1755,7 +1811,7 @@ public class Milp
                                     if (consecutiveTicsP2 != null) 
                                     {    
                                         for (int[] tic1 : consecutiveTicsP1)
-                                        {
+                                        {                                            
                                             // Find nearest upwards path splits for each consecutive booking of p1
                                             ArrayList<int[]> pathSplitInfosP1 = new ArrayList<int[]>();
                                             for (int localZInd = 0; localZInd < currZoneIndices.length; localZInd++)
@@ -1764,11 +1820,11 @@ public class Milp
                                                 int eventIndex = bookingTics[currZoneIndices[localZInd]][p1][EVENT_SWITCH][tic1[localZInd]];
                                                 State bState = indexMap.getStateAt(plants.getAutomatonAt(p1), stateIndex);
                                                 LabeledEvent bEvent = indexMap.getEventAt(eventIndex);
-
+                                                
                                                 findNearestPathSplits(plants.getAutomatonAt(p1), bState.nextState(bEvent), 
                                                         pathSplitInfosP1, bEvent);    
                                             }
-
+                                            
                                             // Create path split variables from the path split indices (for p1)
                                             String pathSplitStrP1 = "";
                                             int pathSplitCounterP1 = 0;
@@ -1788,7 +1844,8 @@ public class Milp
                                             String dualNonCrossConstrStr = "";
                                             ArrayList<int[]> pathSplitInfosP2 = new ArrayList<int[]>();
                                             for (int[] tic2 : consecutiveTicsP2)
-                                            {          
+                                                {         
+                     
                                                 for (int localZInd = 0; localZInd < currZoneIndices.length; localZInd++)
                                                 {      
                                                     // This index is the combination of localZInd and zInd, ensuring that the tic2-elements  
@@ -1825,8 +1882,9 @@ public class Milp
                                                     int eventIndex = bookingTics[localZInd][p2][EVENT_SWITCH][tic2[correspondingZInd]];
                                                     State bState = indexMap.getStateAt(plants.getAutomatonAt(p2), stateIndex);
                                                     LabeledEvent bEvent = indexMap.getEventAt(eventIndex);
-
-                                                    findNearestPathSplits(plants.getAutomatonAt(p2), bState.nextState(bEvent), pathSplitInfosP2, bEvent);    
+              
+                                                    findNearestPathSplits(plants.getAutomatonAt(p2), bState.nextState(bEvent), 
+                                                            pathSplitInfosP2, bEvent);                                                        
                                                 }
 
                                                 // Create path split variables from the path split indices (for p2)
@@ -1857,15 +1915,17 @@ public class Milp
                                             }
                                         }
                                         
-                                        //TODO: Installera RobotStudio
+                                        //TODO: Installera och lek med RobotStudio
                                         //TODO: Varför blir g*_suboptimal = 0 för FT6x6???
+                                        //      ... jo, för att den inte hittar ngn lösning.
+                                        //      1) connected components behöver fixas;
+                                        //      2) path-variablerna är ju också connectade... fixa. 
                                         //TODO: hyfsa till RandomPathUsingMilp.java; 
                                         //      man behöver kanske inte det systematiska variabelvalet.
                                         //      Det är nog så om alla robotar börjar utanför zoner.
                                         //      Annars fundera...  
                                         //TODO: dokumentera i /tankar/milp.tex
                                         //TODO: VelocityBalansering
-                                        //TODO: Vad lämnade Hugo för smaskens?
                                     }
                                 }
                             }
@@ -1874,6 +1934,9 @@ public class Milp
                 }           
             }
         }
+        
+//        BookingPairsGraphExplorer graphExplorer = new BookingPairsGraphExplorer(bEventPairs);
+//        graphExplorer.findConnectedCycles();
     }
     
     /**
@@ -2603,87 +2666,6 @@ public class Milp
     public String getOutputString()
     {
         return outputStr;
-    }
-    
-    /**
-     *  This method prepares a plant for the MILP optimization algorithm.
-     *  It checks whether the plant has an initial state (
-     *  prior to the call to this method, the plant is composed with
-     *  its specifications, i.e. specifications that only consist of events in
-     *  this plant. If the specifications are too restrictive, an initial
-     *  state may not exist). Next, if the initial state of the plant is also
-     *  accepting, a dummy accepting state is added to the plant in order to
-     *  allow the optimization algorithm to start. If there is a self-loop
-     *  in the initial state (which should only occur after one run of the
-     *  optimization algorithm), it is removed (otherwise MILP cannot function).
-     *
-     *  @param currPlant The plant to be prepared for MILP-optimization.
-     */
-    private void prepareAutomatonForMilp(Automaton currPlant)
-        throws Exception
-    {
-        State currInitialState = currPlant.getInitialState();
-        
-        // If there is no initial state, throw exception
-        if (currInitialState == null)
-        {
-            int plantNameRoopIndex = currPlant.getName().indexOf("_constr");
-            String plantName;
-            if (plantNameRoopIndex < 0)
-            {
-                plantName = currPlant.getName();
-            }
-            else
-            {
-                plantName = currPlant.getName().substring(0, plantNameRoopIndex);
-            }
-            throw new Exception(plantName + " has no initial state, possibly due to the restrictions imposed by its specifications. The system has thus no (optimal) path.");
-        }
-        
-        // Remove the self-loops in the initial state. Such self-loops are sometimes created during
-        // schedule construction to run a schedule repeatedly.
-        ArrayList<Arc> arcsToBeRemoved = new ArrayList<Arc>();
-        boolean selfLoopDetected = false;
-        for (Iterator<Arc> arcIt = currInitialState.outgoingArcsIterator(); arcIt.hasNext();)
-        {
-            Arc arc = arcIt.next();
-            if (arc.isSelfLoop())
-            {
-                arcsToBeRemoved.add(arc);
-                selfLoopDetected = true;
-            }
-        }
-        for (Arc arc : arcsToBeRemoved)
-        {
-            currPlant.removeArc(arc);
-        }
-        if (selfLoopDetected)
-        {
-            currPlant.remapStateIndices();
-        }
-             
-        // Add a dummy accepting state if the initial state is accepting
-        if (currInitialState.isAccepting())
-        {
-            currInitialState.setAccepting(false);
-            
-            State dummyState = new State("dummy_" + currInitialState.getName());
-            currPlant.addState(dummyState);
-            
-            for (Iterator<Arc> incomingArcIt = currInitialState.incomingArcsIterator(); incomingArcIt.hasNext(); )
-            {
-                Arc currArc = incomingArcIt.next();
-                
-                currPlant.addArc(new Arc(currArc.getFromState(), dummyState, currArc.getEvent()));
-            }
-            
-            currInitialState.removeIncomingArcs();
-            
-            dummyState.setAccepting(true);
-            dummyState.setCost(0);
-            
-            currPlant.remapStateIndices();
-        }
     }
     
     private synchronized void addAutomatonToGui(Automaton auto)
