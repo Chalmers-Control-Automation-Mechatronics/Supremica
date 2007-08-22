@@ -27,14 +27,12 @@
   		  <Connection Source="kulbana.MatlyftNere" Destination="matlyft.MatlyftNere" />
 		  <Connection Source="matlyft.UppMatlyft" Destination="kulbana.UppMatlyft" />
 
+  		  <Connection Source="kulbana.KulaMatstation" Destination="matstation.KulaMatstation" />
+  		  <Connection Source="matstation.Mat" Destination="kulbana.Mat" />
   		  <Connection Source="kulbana.StorKula" Destination="splitStor.EI" />
   		  <Connection Source="kulbana.LitenKula" Destination="splitLiten.EI" />
-
-
-  		  <Connection Source="kulbana.KulaMatstation" Destination="matstation.KulaMatstation" />
   		  <Connection Source="splitStor.EO1" Destination="matstation.Storkula" />
   		  <Connection Source="splitLiten.EO1" Destination="matstation.Litenkula" />
-  		  <Connection Source="matstation.Mat" Destination="kulbana.Mat" />
   		  <Connection Source="matstation.Urmatning" Destination="kulbana.UrMatning" />
 
   		  <Connection Source="splitStor.EO2" Destination="hiss.StorKula" />
