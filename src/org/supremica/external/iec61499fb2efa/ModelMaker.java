@@ -112,6 +112,7 @@ class ModelMaker
 	private Map operatorMap = null;
 
 	private String restartInstance = null;
+	private String stopInstance = null;
 
 	private ExtendedAutomata automata;
 
@@ -370,21 +371,6 @@ class ModelMaker
 			makeBasicFB(fbName);
 		}
 		
-		// 		// test automata classes
-		// 		ExtendedAutomaton test = getNewAutomaton("test");
-		// 		test.addInitialState("s0");
-		// 		test.addState("s1");
-		// 		test.addIntegerVariable("var1", 0, 5, 0, 0);
-		// 		automata.addEvent("e1", "controllable");
-		// 		test.addTransition("s0","s1","e1;e2;","var1 == 1","var1 = 4;");
-		// 		automata.addAutomaton(test);
-		// 		ExtendedAutomaton test2 = getNewAutomaton("test2");
-		// 		test2.addInitialState("s0");
-		// 		test2.addState("s1");
-		// 		test2.addIntegerVariable("var1", 0, 5, 0, 0);
-		// 		test2.addTransition("s0","s1","e1;e2;","var1 == 1","var1  = 4;");
-		// 		automata.addAutomaton(test2);
-
 		output("ModelMaker.makeModel(): Writing Model ------------------------------------------");
 		automata.writeToFile(new File(outputFileName));
 	}
@@ -457,6 +443,13 @@ class ModelMaker
 			output("Skipping built-in E_RESTART type.", 1);
 			output("Adding FB " + instanceName, 1);
 			restartInstance = instanceName;
+			functionBlocks.put(instanceName,typeName);
+		}
+		else if (typeName.equals("E_STOP"))
+		{
+			output("Skipping built-in E_STOP type.", 1);
+			output("Adding FB " + instanceName, 1);
+			stopInstance = instanceName;
 			functionBlocks.put(instanceName,typeName);
 		}
 		else
@@ -937,9 +930,17 @@ class ModelMaker
 		output("ModelMaker.makeStartup():");
 
 		String fbName = restartInstance;
-
-		ExtendedAutomaton startup = getNewAutomaton("Startup");
 		
+		ExtendedAutomaton startup;
+		if (stopInstance != null)
+		{
+			startup = getNewAutomaton("Startup and Finish");
+		}
+		else
+		{
+			startup = getNewAutomaton("Startup");
+		}
+
 		startup.addInitialState("s0");
 		
 		String from = "s0";
@@ -958,19 +959,34 @@ class ModelMaker
 			from = to;
 			to = "s2";
 			startup.addState(to);
-			event = "receive_event_" + cntSignal + "_" +cntFB + ";";
+			event = "receive_event_" + cntSignal + "_" + cntFB + ";";
 			startup.addTransition(from, to, event, null, null);
 
 			from = to;
 			to = "s3";
 			startup.addAcceptingState(to);
-			event = "received_event_" + cntSignal + "_" +cntFB + ";";
+			event = "received_event_" + cntSignal + "_" + cntFB + ";";
 			startup.addTransition(from, to, event, null, null);
 
 			from = to;
 			to = to;
 			event = "remove_fb;";
 			startup.addTransition(from, to, event, null, null);
+
+			if (stopInstance != null)
+			{
+				from = to;
+				to = "s4" ;
+				startup.addState(to);
+				event = "receive_event_STOP_" + stopInstance + ";";
+				startup.addTransition(from, to, event, null, null);
+				
+				from = to;
+				to = "s5";
+				startup.addAcceptingState(to);
+				event = "received_event_STOP_" + stopInstance + ";";
+				startup.addTransition(from, to, event, null, null);
+			}
 		}
 		else
 		{
@@ -980,8 +996,7 @@ class ModelMaker
 		}
 		automata.addAutomaton(startup);
 	}
-	
-	
+
 	private void makeInstanceQueue()
 	{
 		output("ModelMaker.makeInstanceQueue():");
@@ -1152,7 +1167,7 @@ class ModelMaker
 				String typeName = (String) basicFunctionBlocks.get(instanceName);
 				JaxbFBType theType = (JaxbFBType) fbTypes.get(typeName);
 				Map algorithmMap = (Map) algorithms.get(instanceName);
-				// re-defining class attribute
+				// localy re-defining class attribute
 				List algorithms = theType.getBasicFB().getAlgorithm();
 
 				String from = "";
