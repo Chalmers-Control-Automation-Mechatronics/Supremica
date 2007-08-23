@@ -1314,102 +1314,12 @@ class ModelMaker
 	{	
 		output("ModelMaker.makeBasicFB(" + fbName + "):");
 	
-		makeBasicFBEventReceiving(fbName);
 		makeBasicFBEventHandling(fbName);
 		makeBasicFBEventQueue(fbName);
 		makeBasicFBExecutionControlChart(fbName);
 		makeBasicFBAlgorithms(fbName);
 	}
 
-	private void makeBasicFBEventReceiving(String fbName)
-	{
-		output("Event Receiving", 1);
-
-		Map fbEvents = (Map) events.get(fbName);
-
-		ExtendedAutomaton eventReceiving = getNewAutomaton("Event Receiving " + fbName);
-
-		int nameCounter = 2;
-
-		eventReceiving.addInitialState("s0");
-		eventReceiving.addState("s1");
-		
-		String from = "";
-		String to = "";
-		String event = "";
-		String action = "";
-
-		for (Iterator evIter = fbEvents.keySet().iterator(); evIter.hasNext();)
-		{
-			String curEvent = (String) evIter.next();
-
-			// an event can be received only if it is connected
-			if (isEventConnected(fbName, curEvent))
-			{
-				from = "s0";
-				to = "s" + nameCounter;
-				eventReceiving.addState(to);
-				nameCounter++;
-				event = "receive_event_" + curEvent + "_" + fbName + ";";
-				eventReceiving.addTransition(from, to, event, null, null);
-				
-				from = to;
-				to = "s" + nameCounter;
-				eventReceiving.addState(to);
-				nameCounter++;
-				event = "queue_event_" + curEvent + "_" + fbName + ";";
-				eventReceiving.addTransition(from, to, event, null, null);			
-
-				from = to;	
-				to = "s" + nameCounter;
-				eventReceiving.addState(to);
-				nameCounter++;					
-				event = "queue_fb_" + fbName + ";";
-				eventReceiving.addTransition(from, to, event, null, null);
-
-				from = to;
-				to = "s1";
-				event = "received_event_" + curEvent + "_" + fbName + ";";
-				eventReceiving.addTransition(from, to, event, null, null);			
-			}
-		}
-
-		for (Iterator evIter = fbEvents.keySet().iterator(); evIter.hasNext();)
-		{
-			String curEvent = (String) evIter.next();
-			
-			// an event can be received only if it is connected
-			if (isEventConnected(fbName, curEvent))
-			{
-				from = "s1";
-				to = "s" + nameCounter;
-				eventReceiving.addState(to);
-				nameCounter++;
-				event = "receive_event_" + curEvent + "_" + fbName + ";";
-				eventReceiving.addTransition(from, to, event, null, null);
-				
-				from = to;
-				to = "s" + nameCounter;
-				eventReceiving.addState(to);
-				nameCounter++;
-				event = "queue_event_" + curEvent + "_" + fbName + ";";
-				eventReceiving.addTransition(from, to, event, null, null);			
-
-				from = to;
-				to = "s1";
-				event = "received_event_" + curEvent + "_" + fbName + ";";
-				eventReceiving.addTransition(from, to, event, null, null);			
-			}			
-		}
-		
-		from = "s1";
-		to = "s0";
-		event = "handle_event_" + fbName + ";";
-		eventReceiving.addTransition(from, to, event, null, null);
-
-		automata.addAutomaton(eventReceiving);
-	}
-	
 	private void makeBasicFBEventHandling(String fbName)
 	{
 		output("Event Handling", 1);
@@ -1570,6 +1480,13 @@ class ModelMaker
 			}
 		}
 		
+		String from = "";
+		String to = "";
+		String event = "";
+		String guard = "";
+		String action = "";
+		int nameCounter = 1;
+		
 		eventQueue.addInitialState("s0");
 
 		for (int i = 1; i <= places; i++)
@@ -1621,25 +1538,28 @@ class ModelMaker
 			}
 			
 			eventQueue.addState("s" + i);
-			
+
 			for (Iterator evIter = eventInputList.iterator(); evIter.hasNext();)
 			{
 
 				JaxbEvent curEvent = (JaxbEvent) evIter.next();
 				String eventName = curEvent.getName();
 				int eventID = ((Integer) ((Map) events.get(fbName)).get(eventName)).intValue();
-
-				String from = "";
-				String to = "";
-				String event = "";
-				String guard = "";
-				String action = "";
 				
-				// Transiton when queuing event
+				// Transitons when queuing event
 				if (isEventConnected(fbName, eventName))
 				{					
 					from = "s" + (i-1);
-					to = "s" + i;
+					to = "s" + (places + nameCounter);
+					nameCounter++;
+					eventQueue.addState(to);
+					event = "receive_event_" + eventName + "_" + fbName + ";";
+					eventQueue.addTransition(from, to, event, null, null);
+					
+					from = to;
+					to = "s" + (places + nameCounter);
+					nameCounter++;
+					eventQueue.addState(to);
 					event = "queue_event_" + eventName + "_" + fbName + ";";
 					guard = null;
 					action = "event_place_" + i + "_" + fbName + " = " + eventID + ";";
@@ -1661,26 +1581,51 @@ class ModelMaker
 						}
 					}
 					eventQueue.addTransition(from, to, event, guard, action);
+					
+					//if (i == 1)
+					//{
+						from = to;
+						to = "s" + (places + nameCounter);
+						nameCounter++;
+						eventQueue.addState(to);
+						event = "queue_fb_" + fbName + ";";
+						eventQueue.addTransition(from, to, event, null, null);
+						//}
+					
+					from = to;
+					to = "s" + i;
+					event = "received_event_" + eventName + "_" + fbName + ";";
+					eventQueue.addTransition(from, to, event, null, null);
 				}
+				
+			}
 
-				// Transiton when dequeuing event
+
+			// Transitions when dequeuing event
+			for (Iterator evIter = eventInputList.iterator(); evIter.hasNext();)
+			{
+				JaxbEvent curEvent = (JaxbEvent) evIter.next();
+				String eventName = curEvent.getName();
+				int eventID = ((Integer) ((Map) events.get(fbName)).get(eventName)).intValue();
+
 				if (isEventConnected(fbName, eventName))
 				{					
 					from = "s" + i;
-					to = "s" + (i-1);
+					to = "s" + (places + nameCounter);
+					nameCounter++;
+					eventQueue.addState(to);
 					event = "remove_event_" + fbName + ";";
-					guard = "event_place_" + i + "_" + fbName + " == " + eventID;
+					guard = "event_place_1_" + fbName + " == " + eventID;
 					action = "event_" + eventName + "_" + fbName + " = 1;";
 					// move events in the queue
 					for (int j = 1; j <= i-1; j++)
 					{
 						action = action + "event_place_" + j + "_" + fbName +  " = event_place_" + (j+1) + "_" + fbName + ";";
 					}
-					action = action + "event_place_" + i + "_" + fbName + " = 0;";
 					if (curEvent.isSetWith())
 					{
 						List withData = curEvent.getWith();
-
+						
 						// get first data in the queue
 						for (Iterator withIter = withData.iterator(); withIter.hasNext();)
 						{
@@ -1704,32 +1649,25 @@ class ModelMaker
 								}
 							}
 						}
-						// reset current queue place
-						for (Iterator withIter = withData.iterator(); withIter.hasNext();)
-						{
-							String curWith = ((With) withIter.next()).getVar();
-							if (isDataConnected(fbName, curWith))
-							{														
-								action = action + 
-									"data_place_" + i + "_" + curWith + "_" + fbName + " = 0;";
-							}
-						}
 					}
 					eventQueue.addTransition(from, to, event, guard, action);
-				}
-				
-				// Transiton to reset the event input variable
-				if (isEventConnected(fbName, eventName))
-				{					
-					from = "s" + (i-1);
+					
+					from = to;
 					to = "s" + (i-1);
 					event = "reset_event_" + eventName + "_" + fbName + ";";
-					guard = null;
 					action = "event_" + eventName + "_" + fbName + " = 0;";
-					eventQueue.addTransition(from, to, event, guard, action);
+					eventQueue.addTransition(from, to, event, null, action);
 				}
 			}
-		}
+
+			//if (i > 1)
+			//{
+			//	from = "s" + (i-1);
+			//	to = "s" + (i-1);
+			//	event = "queue_fb_" + fbName + ";";
+			//	eventQueue.addTransition(from, to, event, null, null);
+			//}
+		}		
 		automata.addAutomaton(eventQueue);	
 	}
 	
