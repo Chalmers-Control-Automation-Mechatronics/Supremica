@@ -219,12 +219,12 @@ class ModelMaker
 			
 		}
 
-		output("ModelMaker  Copyright (C) 2007  Goran Cengic");
-		output("This program comes with ABSOLUTELY NO WARRANTY!");
-		output("This is free software, and you are welcome to redistribute it");
-		output("under the terms of GPL version 3 or later.");
-		output("For terms see http://www.gnu.org/licenses");
-		output("");
+		//output("ModelMaker  Copyright (C) 2007  Goran Cengic");
+		//output("This program comes with ABSOLUTELY NO WARRANTY!");
+		//output("This is free software, and you are welcome to redistribute it");
+		//output("under the terms of GPL version 3 or later.");
+		//output("For terms see http://www.gnu.org/licenses");
+		//output("");
 		output("Input arguments: \n" 
 			   + "\t output file: " + outputFileName + "\n"
 			   + "\t system file: " + systemFileName + "\n"
@@ -1042,6 +1042,7 @@ class ModelMaker
 			{
 				action = action + "fb_place_" + j + " = fb_place_" + (j+1) + ";";
 			}
+			action = action + "fb_place_" + i + " = 0;";
 			instanceQueue.addTransition(from, to, event, null, action);      
 		}
 		automata.addAutomaton(instanceQueue);
@@ -1141,6 +1142,8 @@ class ModelMaker
 					action = action + "job_fb_place_" + j + " = job_fb_place_" + (j+1) + ";";
 					action = action + "job_alg_place_" + j + " = job_alg_place_" + (j+1) + ";";
 				}
+				action = action + "job_fb_place_" + i + " = 0;";
+				action = action + "job_alg_place_" + i + " = 0;";
 				jobQueue.addTransition(from, to, event, null, action);      
 			}
 			automata.addAutomaton(jobQueue);	
@@ -1622,6 +1625,7 @@ class ModelMaker
 					{
 						action = action + "event_place_" + j + "_" + fbName +  " = event_place_" + (j+1) + "_" + fbName + ";";
 					}
+					action = action + "event_place_" + i + "_" + fbName +  " = 0;";
 					if (curEvent.isSetWith())
 					{
 						List withData = curEvent.getWith();
@@ -1647,6 +1651,8 @@ class ModelMaker
 									action = action + 
 										"data_place_" + j + "_" + curWith + "_" + fbName + " = data_place_" + (j+1) + "_" + curWith + "_" + fbName + ";";						
 								}
+								action = action + 
+									"data_place_" + i + "_" + curWith + "_" + fbName + " = 0;";
 							}
 						}
 					}
@@ -1659,14 +1665,6 @@ class ModelMaker
 					eventQueue.addTransition(from, to, event, null, action);
 				}
 			}
-
-			//if (i > 1)
-			//{
-			//	from = "s" + (i-1);
-			//	to = "s" + (i-1);
-			//	event = "queue_fb_" + fbName + ";";
-			//	eventQueue.addTransition(from, to, event, null, null);
-			//}
 		}		
 		automata.addAutomaton(eventQueue);	
 	}
