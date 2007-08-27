@@ -1577,23 +1577,31 @@ class ModelMaker
 								String cntFrom = (String) ((Map) dataConnections.get(fbName)).get(curWith);
 								String fromInstance = getInstanceName(cntFrom);
 								String fromSignal = getSignalName(cntFrom);				
-								action = action + 
-									"data_place_" + i + "_" + curWith + "_" + fbName + 
-									" = data_" + fromSignal + "_" + fromInstance + ";";
+								if (fromInstance.equals(""))
+								{
+									// constant data connection
+									action = action + 
+										"data_place_" + i + "_" + curWith + "_" + fbName + 
+										" = " + new Integer(fromSignal) + ";";
+								}
+								else
+								{
+									// instance data connection
+									action = action + 
+										"data_place_" + i + "_" + curWith + "_" + fbName + 
+										" = data_" + fromSignal + "_" + fromInstance + ";";
+								}
 							}
 						}
 					}
 					eventQueue.addTransition(from, to, event, guard, action);
 					
-					//if (i == 1)
-					//{
-						from = to;
-						to = "s" + (places + nameCounter);
-						nameCounter++;
-						eventQueue.addState(to);
-						event = "queue_fb_" + fbName + ";";
-						eventQueue.addTransition(from, to, event, null, null);
-						//}
+					from = to;
+					to = "s" + (places + nameCounter);
+					nameCounter++;
+					eventQueue.addState(to);
+					event = "queue_fb_" + fbName + ";";
+					eventQueue.addTransition(from, to, event, null, null);
 					
 					from = to;
 					to = "s" + i;

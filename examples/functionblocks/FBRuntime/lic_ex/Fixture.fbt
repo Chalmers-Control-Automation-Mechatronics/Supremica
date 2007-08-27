@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<FBType xmlns="http://www.holobloc.com/xml/LibraryElement" Name="Fixture" >
+
+  <VersionInfo Author="Goran Cengic" Organization="Chalmers" Version="1.0" Date="2007-08-23" />
+
+  <InterfaceList>
+
+    <EventInputs>
+      <Event Name="EI1" />
+      <Event Name="EI2" />
+    </EventInputs>
+
+    <EventOutputs>
+      <Event Name="EO" />
+    </EventOutputs>
+
+  </InterfaceList>
+
+  <BasicFB>
+
+    <ECC>
+        <ECState Name="INIT" />
+        <ECState Name="STATE1" >
+		    <!--ECAction Algorithm="OpenClamp" /-->
+	    </ECState>    	
+        <ECState Name="STATE2" >
+		    <!--ECAction Algorithm="PushOut" Output="EO"/-->
+		    <ECAction Output="EO"/>
+	    </ECState>    	
+
+		<ECTransition Source="INIT" Destination="STATE1" Condition="EI1" />
+		<ECTransition Source="STATE1" Destination="INIT" Condition="1" />
+
+		<ECTransition Source="INIT" Destination="STATE2" Condition="EI2" />
+		<ECTransition Source="STATE2" Destination="INIT" Condition="1" />
+    </ECC>
+
+    <!--Algorithm Name="OpenClamp">
+        <Other Language="Java" Text="System.out.println(&#34;Opening Clamp!&#34;);" />	
+    </Algorithm>
+
+    <Algorithm Name="PushOut">
+        <Other Language="Java" Text="System.out.println(&#34;Pushing Out!&#34;);" />	
+    </Algorithm-->
+
+  </BasicFB>
+</FBType>

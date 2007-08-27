@@ -20,6 +20,7 @@
         </EventConnections>
         <DataConnections>
           <!--Connection Source="300" Destination="delay.DT" /-->
+          <!--Connection Source="2" Destination="comptest2.DI" /-->
           <Connection Source="comptest1.DO" Destination="comptest2.DI" />
           <Connection Source="comptest2.DO" Destination="comptest1.DI" />
         </DataConnections>
