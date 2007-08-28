@@ -1,0 +1,253 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<FBType xmlns="http://www.holobloc.com/xml/LibraryElement" Name="Resource" >
+
+  <VersionInfo Author="Goran Cengic" Organization="Chalmers" Version="1.0" Date="2007-08-20" />
+
+  <InterfaceList>
+
+    <EventInputs>
+      <Event Name="take" >
+        <With Var="product" />
+      </Event>
+      <Event Name="process" >
+        <With Var="product" />
+      </Event>
+      <Event Name="release" >
+        <With Var="product" />
+      </Event>
+    </EventInputs>
+
+    <EventOutputs>
+      <Event Name="taken" >
+        <With Var="forProduct" />
+      </Event>
+      <Event Name="processed" >
+        <With Var="forProduct" />
+      </Event>
+    </EventOutputs>
+
+	<InputVars>
+      <VarDeclaration Name="product" Type="INT" />
+      <VarDeclaration Name="capacity" Type="INT" />
+    </InputVars>
+
+    <OutputVars>
+      <VarDeclaration Name="forProduct" Type="INT" />
+    </OutputVars>
+
+  </InterfaceList>
+
+  <BasicFB>
+
+    <InternalVars>
+        <VarDeclaration Name="place1" Type="INT" />
+        <VarDeclaration Name="place2" Type="INT" />
+        <VarDeclaration Name="next" Type="INT" />
+    </InternalVars>
+
+    <ECC>
+        <ECState Name="INIT" />
+        <ECState Name="S1" >
+		    <ECAction Algorithm="Alg1"/>
+	    </ECState>    	
+        <ECState Name="S2" >
+		    <ECAction Algorithm="Alg2" Output="processed"/>
+	    </ECState>    	
+        <ECState Name="S3" >
+		    <ECAction Algorithm="Alg3" Output="taken"/>
+	    </ECState>    	
+        <ECState Name="S4" >
+		    <ECAction Algorithm="Alg4" Output="taken"/>
+	    </ECState>    	
+        <ECState Name="S5" >
+		    <ECAction Algorithm="Alg5" Output="processed"/>
+	    </ECState>    	
+        <ECState Name="S6" >
+		    <ECAction Algorithm="Alg6" Output="taken"/>
+	    </ECState>    	
+        <ECState Name="S7" >
+		    <ECAction Algorithm="Alg7" Output="processed"/>
+	    </ECState>    	
+        <ECState Name="S8" >
+		    <ECAction Algorithm="Alg8" Output="processed"/>
+	    </ECState>    	
+        <ECState Name="S9" />
+        <ECState Name="S10" />
+        <ECState Name="S11" >
+		    <ECAction Algorithm="Alg11" Output="processed"/>
+	    </ECState>    	
+        <ECState Name="S12" >
+		    <ECAction Algorithm="Alg12" Output="processed"/>
+	    </ECState>    	
+        <ECState Name="S13" />
+        <ECState Name="S14" />
+
+		<ECTransition Source="INIT" Destination="S4" Condition="take" />
+		<ECTransition Source="S4" Destination="S1" Condition="take AND capacity=1" />
+		<ECTransition Source="S4" Destination="S6" Condition="take AND capacity=2" />
+
+		<ECTransition Source="S1" Destination="S2" Condition="process AND product=place1" />
+		<ECTransition Source="S2" Destination="S3" Condition="release AND product=place1" />
+		<ECTransition Source="S3" Destination="S5" Condition="process AND product=place1" />
+
+		<ECTransition Source="S4" Destination="S5" Condition="process AND product=place1" />
+		<ECTransition Source="S5" Destination="INIT" Condition="release AND product=place1" />
+
+		<ECTransition Source="S6" Destination="S7" Condition="process AND product=place2" />
+		<ECTransition Source="S7" Destination="S8" Condition="process AND product=place1" />
+		<ECTransition Source="S8" Destination="S9" Condition="release AND product=place1" />
+		<ECTransition Source="S8" Destination="S10" Condition="release AND product=place2" />
+		<ECTransition Source="S9" Destination="INIT" Condition="release AND product=place2" />
+		<ECTransition Source="S10" Destination="INIT" Condition="release AND product=place1" />
+
+		<ECTransition Source="S6" Destination="S11" Condition="process AND product=place1" />
+		<ECTransition Source="S11" Destination="S12" Condition="process AND product=place2" />
+		<ECTransition Source="S12" Destination="S13" Condition="release AND product=place1" />
+		<ECTransition Source="S12" Destination="S14" Condition="release AND product=place2" />
+		<ECTransition Source="S13" Destination="INIT" Condition="release AND product=place2" />
+		<ECTransition Source="S14" Destination="INIT" Condition="release AND product=place1" />
+
+    </ECC>
+
+<!--
+    <ECC>
+        <ECState Name="INIT" />
+        <ECState Name="S1" >
+		    <ECAction Algorithm="PrintAlg1"/>
+		    <ECAction Algorithm="Alg1"/>
+	    </ECState>    	
+        <ECState Name="S2" >
+		    <ECAction Algorithm="PrintAlg2"/>
+		    <ECAction Algorithm="Alg2" Output="processed"/>
+	    </ECState>    	
+        <ECState Name="S3" >
+		    <ECAction Algorithm="PrintAlg3"/>
+		    <ECAction Algorithm="Alg3" Output="taken"/>
+	    </ECState>    	
+        <ECState Name="S4" >
+		    <ECAction Algorithm="PrintAlg4"/>
+		    <ECAction Algorithm="Alg4" Output="taken"/>
+	    </ECState>    	
+        <ECState Name="S5" >
+		    <ECAction Algorithm="PrintAlg5"/>
+		    <ECAction Algorithm="Alg5" Output="processed"/>
+	    </ECState>    	
+        <ECState Name="S6" >
+		    <ECAction Algorithm="PrintAlg6"/>
+		    <ECAction Algorithm="Alg6" Output="taken"/>
+	    </ECState>    	
+        <ECState Name="S7" >
+		    <ECAction Algorithm="PrintAlg7"/>
+		    <ECAction Algorithm="Alg7" Output="processed"/>
+	    </ECState>    	
+        <ECState Name="S8" >
+		    <ECAction Algorithm="PrintAlg8"/>
+		    <ECAction Algorithm="Alg8" Output="processed"/>
+	    </ECState>    	
+        <ECState Name="S9" />
+        <ECState Name="S10" />
+        <ECState Name="S11" >
+		    <ECAction Algorithm="PrintAlg11"/>
+		    <ECAction Algorithm="Alg11" Output="processed"/>
+	    </ECState>    	
+        <ECState Name="S12" >
+		    <ECAction Algorithm="PrintAlg12"/>
+		    <ECAction Algorithm="Alg12" Output="processed"/>
+	    </ECState>    	
+        <ECState Name="S13" />
+        <ECState Name="S14" />
+
+		<ECTransition Source="INIT" Destination="S4" Condition="take" />
+		<ECTransition Source="S4" Destination="S1" Condition="take AND capacity=1" />
+		<ECTransition Source="S4" Destination="S6" Condition="take AND capacity=2" />
+
+		<ECTransition Source="S1" Destination="S2" Condition="process AND product=place1" />
+		<ECTransition Source="S2" Destination="S3" Condition="release AND product=place1" />
+		<ECTransition Source="S3" Destination="S5" Condition="process AND product=place1" />
+
+		<ECTransition Source="S4" Destination="S5" Condition="process AND product=place1" />
+		<ECTransition Source="S5" Destination="INIT" Condition="release AND product=place1" />
+
+		<ECTransition Source="S6" Destination="S7" Condition="process AND product=place2" />
+		<ECTransition Source="S7" Destination="S8" Condition="process AND product=place1" />
+		<ECTransition Source="S8" Destination="S9" Condition="release AND product=place1" />
+		<ECTransition Source="S8" Destination="S10" Condition="release AND product=place2" />
+		<ECTransition Source="S9" Destination="INIT" Condition="release AND product=place2" />
+		<ECTransition Source="S10" Destination="INIT" Condition="release AND product=place1" />
+
+		<ECTransition Source="S6" Destination="S11" Condition="process AND product=place1" />
+		<ECTransition Source="S11" Destination="S12" Condition="process AND product=place2" />
+		<ECTransition Source="S12" Destination="S13" Condition="release AND product=place1" />
+		<ECTransition Source="S12" Destination="S14" Condition="release AND product=place2" />
+		<ECTransition Source="S13" Destination="INIT" Condition="release AND product=place2" />
+		<ECTransition Source="S14" Destination="INIT" Condition="release AND product=place1" />
+
+    </ECC>
+
+
+    <Algorithm Name="PrintAlg1">
+	    <Other Language="Java" Text="System.out.println(&#34;Alg1&#34;);" />
+    </Algorithm>
+    <Algorithm Name="PrintAlg2">
+	    <Other Language="Java" Text="System.out.println(&#34;Alg2&#34;);" />
+    </Algorithm>
+    <Algorithm Name="PrintAlg3">
+	    <Other Language="Java" Text="System.out.println(&#34;Alg3&#34;);" />
+    </Algorithm>
+    <Algorithm Name="PrintAlg4">
+	    <Other Language="Java" Text="System.out.println(&#34;Alg4&#34;);" />
+    </Algorithm>
+    <Algorithm Name="PrintAlg5">
+	    <Other Language="Java" Text="System.out.println(&#34;Alg5&#34;);" />
+    </Algorithm>
+    <Algorithm Name="PrintAlg6">
+	    <Other Language="Java" Text="System.out.println(&#34;Alg6&#34;);" />
+    </Algorithm>
+    <Algorithm Name="PrintAlg7">
+	    <Other Language="Java" Text="System.out.println(&#34;Alg7&#34;);" />
+    </Algorithm>
+    <Algorithm Name="PrintAlg8">
+	    <Other Language="Java" Text="System.out.println(&#34;Alg8&#34;);" />
+    </Algorithm>
+    <Algorithm Name="PrintAlg11">
+	    <Other Language="Java" Text="System.out.println(&#34;Alg11&#34;);" />
+    </Algorithm>
+    <Algorithm Name="PrintAlg12">
+	    <Other Language="Java" Text="System.out.println(&#34;Alg12&#34;);" />
+    </Algorithm>
+-->
+
+    <Algorithm Name="Alg1">
+	    <Other Language="Java" Text="next = product;" />
+    </Algorithm>
+    <Algorithm Name="Alg2">
+	    <Other Language="Java" Text="forProduct = place1;" />	
+    </Algorithm>
+    <Algorithm Name="Alg3">
+	    <Other Language="Java" Text="place1 = next; forProduct = place1;" />	
+    </Algorithm>
+    <Algorithm Name="Alg4">
+	    <Other Language="Java" Text="place1 = product; forProduct = place1;" />	
+    </Algorithm>
+    <Algorithm Name="Alg5">
+	    <Other Language="Java" Text="forProduct = place1;" />	
+    </Algorithm>
+    <Algorithm Name="Alg6">
+	    <Other Language="Java" Text="place2 = product; forProduct = place2;" />	
+    </Algorithm>
+    <Algorithm Name="Alg7">
+	    <Other Language="Java" Text="forProduct = place2;" />	
+    </Algorithm>
+    <Algorithm Name="Alg8">
+	    <Other Language="Java" Text="forProduct = place1;" />	
+    </Algorithm>
+    <Algorithm Name="Alg11">
+	    <Other Language="Java" Text="forProduct = place1;" />	
+    </Algorithm>
+    <Algorithm Name="Alg12">
+	    <Other Language="Java" Text="forProduct = place2;" />	
+    </Algorithm>
+
+
+  </BasicFB>
+</FBType>

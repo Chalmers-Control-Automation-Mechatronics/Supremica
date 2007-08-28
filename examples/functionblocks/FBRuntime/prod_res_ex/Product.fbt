@@ -1,0 +1,189 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<FBType xmlns="http://www.holobloc.com/xml/LibraryElement" Name="Product" >
+
+  <VersionInfo Author="Goran Cengic" Organization="Chalmers" Version="1.0" Date="2007-08-28" />
+
+  <InterfaceList>
+
+    <EventInputs>
+      <Event Name="make" >
+	  	  <With Var="product"/>
+	  </Event>
+      <Event Name="gotR1" />
+      <Event Name="gotR2" />
+      <Event Name="gotR3" />
+      <Event Name="processedR1" />
+      <Event Name="processedR2" />
+      <Event Name="processedR3" />
+    </EventInputs>
+
+    <EventOutputs>
+      <Event Name="takeR1" />
+      <Event Name="takeR2" />
+      <Event Name="takeR3" />
+      <Event Name="processR1" />
+      <Event Name="processR2" />
+      <Event Name="processR3" />
+      <Event Name="releaseR1" />
+      <Event Name="releaseR2" />
+      <Event Name="releaseR3" />
+      <Event Name="done" />
+    </EventOutputs>
+
+	<InputVars>
+      <VarDeclaration Name="product" Type="INT" />
+    </InputVars>
+
+  </InterfaceList>
+
+  <BasicFB>
+
+    <ECC>
+        <ECState Name="INIT" />
+        <ECState Name="S11" >
+		    <ECAction Algorithm="PrintAlg11"/>
+		    <ECAction Output="takeR3"/>
+	    </ECState>    	
+        <ECState Name="S12" >
+		    <ECAction Algorithm="PrintAlg12"/>
+		    <ECAction Output="takeR1"/>
+	    </ECState>    	
+        <ECState Name="S13" >
+		    <ECAction Algorithm="PrintAlg13"/>
+		    <ECAction Output="processR3"/>
+		    <ECAction Output="processR1"/>
+	    </ECState>    	
+        <ECState Name="S14" >
+		    <ECAction Algorithm="PrintAlg14"/>
+	    </ECState>    	
+        <ECState Name="S15" >
+		    <ECAction Algorithm="PrintAlg15"/>
+	    </ECState>    	
+        <ECState Name="S16" >
+		    <ECAction Algorithm="PrintAlg16"/>
+		    <ECAction Output="releaseR3"/>
+		    <ECAction Output="takeR2"/>
+	    </ECState>    	
+        <ECState Name="S17" >
+		    <ECAction Algorithm="PrintAlg17"/>
+		    <ECAction Output="releaseR1"/>
+		    <ECAction Output="processR2"/>
+	    </ECState>    	
+        <ECState Name="S18" >
+		    <ECAction Algorithm="PrintAlg18"/>
+		    <ECAction Output="releaseR2"/>
+		    <ECAction Output="done"/>
+	    </ECState>    	
+
+        <ECState Name="S21" >
+		    <ECAction Algorithm="PrintAlg21"/>
+		    <ECAction Output="takeR3"/>
+	    </ECState>    	
+        <ECState Name="S22" >
+		    <ECAction Algorithm="PrintAlg22"/>
+		    <ECAction Output="takeR2"/>
+	    </ECState>    	
+        <ECState Name="S23" >
+		    <ECAction Algorithm="PrintAlg23"/>
+		    <ECAction Output="processR3"/>
+		    <ECAction Output="processR2"/>
+	    </ECState>    	
+        <ECState Name="S24" >
+		    <ECAction Algorithm="PrintAlg24"/>
+	    </ECState>    	
+        <ECState Name="S25" >
+		    <ECAction Algorithm="PrintAlg25"/>
+	    </ECState>    	
+        <ECState Name="S26" >
+		    <ECAction Algorithm="PrintAlg26"/>
+		    <ECAction Output="releaseR3"/>
+		    <ECAction Output="takeR1"/>
+	    </ECState>    	
+        <ECState Name="S27" >
+		    <ECAction Algorithm="PrintAlg27"/>
+		    <ECAction Output="releaseR2"/>
+		    <ECAction Output="processR1"/>
+	    </ECState>    	
+        <ECState Name="S28" >
+		    <ECAction Algorithm="PrintAlg28"/>
+		    <ECAction Output="releaseR1"/>
+		    <ECAction Output="done"/>
+	    </ECState>    	
+
+
+		<ECTransition Source="INIT" Destination="S11" Condition="make AND product=1" />
+		<ECTransition Source="S11" Destination="S12" Condition="gotR3" />
+		<ECTransition Source="S12" Destination="S13" Condition="gotR1" />
+		<ECTransition Source="S13" Destination="S14" Condition="processedR1" />
+		<ECTransition Source="S14" Destination="S16" Condition="processedR3" />
+		<ECTransition Source="S13" Destination="S15" Condition="processedR3" />
+		<ECTransition Source="S15" Destination="S16" Condition="processedR1" />
+		<ECTransition Source="S16" Destination="S17" Condition="gotR2" />
+		<ECTransition Source="S17" Destination="S18" Condition="processedR2" />
+		<ECTransition Source="S18" Destination="INIT" Condition="1" />
+
+		<ECTransition Source="INIT" Destination="S21" Condition="make AND product=2" />
+		<ECTransition Source="S21" Destination="S22" Condition="gotR3" />
+		<ECTransition Source="S22" Destination="S23" Condition="gotR2" />
+		<ECTransition Source="S23" Destination="S24" Condition="processedR2" />
+		<ECTransition Source="S24" Destination="S26" Condition="processedR3" />
+		<ECTransition Source="S23" Destination="S25" Condition="processedR3" />
+		<ECTransition Source="S25" Destination="S26" Condition="processedR2" />
+		<ECTransition Source="S26" Destination="S27" Condition="gotR1" />
+		<ECTransition Source="S27" Destination="S28" Condition="processedR1" />
+		<ECTransition Source="S28" Destination="INIT" Condition="1" />
+
+    </ECC>
+
+    <Algorithm Name="PrintAlg11">
+	    <Other Language="Java" Text="System.out.println(&#34;Prod 1; S11&#34;);" />
+    </Algorithm>
+    <Algorithm Name="PrintAlg12">
+	    <Other Language="Java" Text="System.out.println(&#34;Prod 1; S12&#34;);" />
+    </Algorithm>
+    <Algorithm Name="PrintAlg13">
+	    <Other Language="Java" Text="System.out.println(&#34;Prod 1; S13&#34;);" />
+    </Algorithm>
+    <Algorithm Name="PrintAlg14">
+	    <Other Language="Java" Text="System.out.println(&#34;Prod 1; S14&#34;);" />
+    </Algorithm>
+    <Algorithm Name="PrintAlg15">
+	    <Other Language="Java" Text="System.out.println(&#34;Prod 1; S15&#34;);" />
+    </Algorithm>
+    <Algorithm Name="PrintAlg16">
+	    <Other Language="Java" Text="System.out.println(&#34;Prod 1; S16&#34;);" />
+    </Algorithm>
+    <Algorithm Name="PrintAlg17">
+	    <Other Language="Java" Text="System.out.println(&#34;Prod 1; S17&#34;);" />
+    </Algorithm>
+    <Algorithm Name="PrintAlg18">
+	    <Other Language="Java" Text="System.out.println(&#34;Prod 1; S18&#34;);" />
+    </Algorithm>
+
+    <Algorithm Name="PrintAlg21">
+	    <Other Language="Java" Text="System.out.println(&#34;Prod 2; S21&#34;);" />
+    </Algorithm>
+    <Algorithm Name="PrintAlg22">
+	    <Other Language="Java" Text="System.out.println(&#34;Prod 2; S22&#34;);" />
+    </Algorithm>
+    <Algorithm Name="PrintAlg23">
+	    <Other Language="Java" Text="System.out.println(&#34;Prod 2; S23&#34;);" />
+    </Algorithm>
+    <Algorithm Name="PrintAlg24">
+	    <Other Language="Java" Text="System.out.println(&#34;Prod 2; S24&#34;);" />
+    </Algorithm>
+    <Algorithm Name="PrintAlg25">
+	    <Other Language="Java" Text="System.out.println(&#34;Prod 2; S25&#34;);" />
+    </Algorithm>
+    <Algorithm Name="PrintAlg26">
+	    <Other Language="Java" Text="System.out.println(&#34;Prod 2; S26&#34;);" />
+    </Algorithm>
+    <Algorithm Name="PrintAlg27">
+	    <Other Language="Java" Text="System.out.println(&#34;Prod 2; S27&#34;);" />
+    </Algorithm>
+    <Algorithm Name="PrintAlg28">
+	    <Other Language="Java" Text="System.out.println(&#34;Prod 2; S28&#34;);" />
+    </Algorithm>
+
+  </BasicFB>
+</FBType>
