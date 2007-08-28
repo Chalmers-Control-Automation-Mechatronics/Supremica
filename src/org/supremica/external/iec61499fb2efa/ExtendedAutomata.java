@@ -104,7 +104,7 @@ public class ExtendedAutomata
 
 	public void addEvent(String name)
 	{
-		addEvent(name,"uncontrollable");
+		addEvent(name,"controllable");
 	}
 	
 	public void addEvent(String name, String kind)
