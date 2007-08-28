@@ -117,7 +117,7 @@ class ModelMaker
 	private ExtendedAutomata automata;
 
 	// maximum value of an integer variable
-	private final int intVarMaxValue = 2;
+	private static int intVarMaxValue = 2;
 
 	private int nameCounter = 0;
 	private boolean doneInitActions = false;
@@ -158,6 +158,13 @@ class ModelMaker
 			if (args[i].equals("-q"))
 			{
 				verboseLevel = QUIET;
+			}
+			if (args[i].equals("-i"))
+			{
+				if (i + 1 < args.length)
+				{
+					intVarMaxValue = (new Integer(args[i + 1])).intValue();
+				}
 			}
 			if (args[i].equals("-ip"))
 			{
@@ -1327,7 +1334,7 @@ class ModelMaker
 	{
 		output("Event Handling", 1);
 		
-		ExtendedAutomaton eventHandling = getNewAutomaton("Event Handling " + fbName );
+		ExtendedAutomaton eventHandling = getNewAutomaton(fbName + ": Event Handling");
 
 		eventHandling.addInitialState("s0");
 		eventHandling.addState("s1");
@@ -1378,7 +1385,7 @@ class ModelMaker
 		JaxbFBType theType = (JaxbFBType) fbTypes.get(typeName);
 		List eventInputList = (List) ((EventInputs) ((InterfaceList) theType.getInterfaceList()).getEventInputs()).getEvent();
 		
-		ExtendedAutomaton eventQueue = getNewAutomaton("Event Queue " + fbName);
+		ExtendedAutomaton eventQueue = getNewAutomaton(fbName + ": Event Queue");
 		
 		// the maximum number of events in the queue at the same time
 		int places = ((Integer) eventsMaxID.get(fbName)).intValue();	
@@ -1688,7 +1695,7 @@ class ModelMaker
 		List ecTransitions = theECC.getECTransition();
 		Set visitedECStates = new HashSet();
 
-		ExtendedAutomaton ecc = getNewAutomaton("Execution Control Chart " + fbName);
+		ExtendedAutomaton ecc = getNewAutomaton(fbName + ": Execution Control Chart");
 
 		// internal variables
 		if (theType.getBasicFB().isSetInternalVars())
@@ -2286,7 +2293,7 @@ class ModelMaker
 			String algName = curAlg.getName();
 			String algLang = curAlg.getOther().getLanguage();
 			String algText = curAlg.getOther().getText();
-			ExtendedAutomaton curAlgModel = getNewAutomaton("Algorithm " + algName + " " + fbName);
+			ExtendedAutomaton curAlgModel = getNewAutomaton(fbName + " " + algName + ": Algorithm");
 			int nameCounter = 0;
 
 			if (algLang.toLowerCase().equals("java"))

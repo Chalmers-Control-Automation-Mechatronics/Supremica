@@ -37,7 +37,83 @@
   </InterfaceList>
 
   <BasicFB>
+    <ECC>
+        <ECState Name="INIT" />
+        <ECState Name="S11" >
+		    <ECAction Output="takeR3"/>
+	    </ECState>    	
+        <ECState Name="S12" >
+		    <ECAction Output="takeR1"/>
+	    </ECState>    	
+        <ECState Name="S13" >
+		    <ECAction Output="processR3"/>
+		    <ECAction Output="processR1"/>
+	    </ECState>    	
+        <ECState Name="S14" />
+        <ECState Name="S15" />
+        <ECState Name="S16" >
+		    <ECAction Output="releaseR3"/>
+		    <ECAction Output="takeR2"/>
+	    </ECState>    	
+        <ECState Name="S17" >
+		    <ECAction Output="releaseR1"/>
+		    <ECAction Output="processR2"/>
+	    </ECState>    	
+        <ECState Name="S18" >
+		    <ECAction Output="releaseR2"/>
+		    <ECAction Output="done"/>
+	    </ECState>    	
 
+        <ECState Name="S21" >
+		    <ECAction Output="takeR3"/>
+	    </ECState>    	
+        <ECState Name="S22" >
+		    <ECAction Output="takeR2"/>
+	    </ECState>    	
+        <ECState Name="S23" >
+		    <ECAction Output="processR3"/>
+		    <ECAction Output="processR2"/>
+	    </ECState>    	
+        <ECState Name="S24" />
+        <ECState Name="S25" />
+        <ECState Name="S26" >
+		    <ECAction Output="releaseR3"/>
+		    <ECAction Output="takeR1"/>
+	    </ECState>    	
+        <ECState Name="S27" >
+		    <ECAction Output="releaseR2"/>
+		    <ECAction Output="processR1"/>
+	    </ECState>    	
+        <ECState Name="S28" >
+		    <ECAction Output="releaseR1"/>
+		    <ECAction Output="done"/>
+	    </ECState>    	
+
+
+		<ECTransition Source="INIT" Destination="S11" Condition="make AND product=1" />
+		<ECTransition Source="S11" Destination="S12" Condition="gotR3" />
+		<ECTransition Source="S12" Destination="S13" Condition="gotR1" />
+		<ECTransition Source="S13" Destination="S14" Condition="processedR1" />
+		<ECTransition Source="S14" Destination="S16" Condition="processedR3" />
+		<ECTransition Source="S13" Destination="S15" Condition="processedR3" />
+		<ECTransition Source="S15" Destination="S16" Condition="processedR1" />
+		<ECTransition Source="S16" Destination="S17" Condition="gotR2" />
+		<ECTransition Source="S17" Destination="S18" Condition="processedR2" />
+		<ECTransition Source="S18" Destination="INIT" Condition="1" />
+
+		<ECTransition Source="INIT" Destination="S21" Condition="make AND product=2" />
+		<ECTransition Source="S21" Destination="S22" Condition="gotR3" />
+		<ECTransition Source="S22" Destination="S23" Condition="gotR2" />
+		<ECTransition Source="S23" Destination="S24" Condition="processedR2" />
+		<ECTransition Source="S24" Destination="S26" Condition="processedR3" />
+		<ECTransition Source="S23" Destination="S25" Condition="processedR3" />
+		<ECTransition Source="S25" Destination="S26" Condition="processedR2" />
+		<ECTransition Source="S26" Destination="S27" Condition="gotR1" />
+		<ECTransition Source="S27" Destination="S28" Condition="processedR1" />
+		<ECTransition Source="S28" Destination="INIT" Condition="1" />
+
+    </ECC>
+<!--
     <ECC>
         <ECState Name="INIT" />
         <ECState Name="S11" >
@@ -184,6 +260,6 @@
     <Algorithm Name="PrintAlg28">
 	    <Other Language="Java" Text="System.out.println(&#34;Prod 2; S28&#34;);" />
     </Algorithm>
-
+-->
   </BasicFB>
 </FBType>
