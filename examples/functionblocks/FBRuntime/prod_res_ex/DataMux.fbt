@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<FBType xmlns="http://www.holobloc.com/xml/LibraryElement" Name="DataMux" >
+
+  <VersionInfo Author="Goran Cengic" Organization="Chalmers" Version="1.0" Date="2007-08-28" />
+
+  <InterfaceList>
+    <EventInputs>
+      <Event Name="EI1" >
+	  	  <With Var="DI1" />
+      </Event>
+      <Event Name="EI2" >
+	  	  <With Var="DI2" />
+      </Event>
+      <Event Name="EI3" >
+	  	  <With Var="DI3" />
+      </Event>
+    </EventInputs>
+
+    <EventOutputs>
+      <Event Name="EO1">
+	  	  <With Var="DO" />
+	  </Event>
+      <Event Name="EO2">
+	  	  <With Var="DO" />
+	  </Event>
+      <Event Name="EO3">
+	  	  <With Var="DO" />
+	  </Event>
+    </EventOutputs>
+
+    <InputVars>
+      <VarDeclaration Name="DI1" Type="INT" />
+      <VarDeclaration Name="DI2" Type="INT" />
+      <VarDeclaration Name="DI3" Type="INT" />
+    </InputVars>
+
+    <OutputVars>
+      <VarDeclaration Name="DO" Type="INT" />
+    </OutputVars>
+  </InterfaceList>
+
+  <BasicFB>
+    <ECC>
+        <ECState Name="START" />
+        <ECState Name="S1">
+		    <ECAction Algorithm="Alg1" Output="EO1"/>
+	    </ECState>    
+        <ECState Name="S2">
+		    <ECAction Algorithm="Alg2" Output="EO2"/>
+	    </ECState>    
+        <ECState Name="S3">
+		    <ECAction Algorithm="Alg3" Output="EO3"/>
+	    </ECState>    
+
+		<ECTransition Source="START" Destination="S1" Condition="EI1" />
+		<ECTransition Source="S1" Destination="START" Condition="1" />
+		<ECTransition Source="START" Destination="S2" Condition="EI2" />
+		<ECTransition Source="S2" Destination="START" Condition="1" />
+		<ECTransition Source="START" Destination="S3" Condition="EI3" />
+		<ECTransition Source="S3" Destination="START" Condition="1" />
+    </ECC>
+
+    <Algorithm Name="Alg1">
+	    <Other Language="Java" Text="DO = DI1;" />	
+    </Algorithm>
+    <Algorithm Name="Alg2">
+	    <Other Language="Java" Text="DO = DI2;" />	
+    </Algorithm>
+    <Algorithm Name="Alg3">
+	    <Other Language="Java" Text="DO = DI3;" />	
+    </Algorithm>
+
+  </BasicFB>
+</FBType>

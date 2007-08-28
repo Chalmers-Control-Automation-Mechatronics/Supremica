@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<FBType xmlns="http://www.holobloc.com/xml/LibraryElement" Name="E_REND" >
+  <VersionInfo Author="Goran Cengic" Organization="Chalmers" Version="1.0" Date="2005-11-20" />
+  <InterfaceList>
+    <EventInputs>
+      <Event Name="EI1" />
+      <Event Name="EI2" />
+      <Event Name="R" />
+    </EventInputs>
+    <EventOutputs>
+      <Event Name="EO" />
+    </EventOutputs>
+  </InterfaceList>
+  <BasicFB>
+    <ECC>
+        <ECState Name="START" />
+        <ECState Name="R"/>
+        <ECState Name="EI1"/>
+        <ECState Name="R1"/>
+        <ECState Name="EI2"/>
+        <ECState Name="R2"/>
+        <ECState Name="EO">
+			<ECAction Output="EO" />
+		</ECState>
+
+		<ECTransition Source="START" Destination="R" Condition="R" />
+		<ECTransition Source="R" Destination="START" Condition="1" />
+
+		<ECTransition Source="START" Destination="EI1" Condition="EI1" />
+		<ECTransition Source="EI1" Destination="START" Condition="R" />
+		
+		<ECTransition Source="START" Destination="EI2" Condition="EI2" />
+		<ECTransition Source="EI2" Destination="START" Condition="R" />
+
+		<ECTransition Source="EI1" Destination="R1" Condition="EI1" />
+		<ECTransition Source="R1" Destination="EI1" Condition="1" />
+
+		<ECTransition Source="EI1" Destination="EO" Condition="EI2" />
+
+		<ECTransition Source="EI2" Destination="R2" Condition="EI2" />
+		<ECTransition Source="R2" Destination="EI2" Condition="1" />
+
+		<ECTransition Source="EI2" Destination="EO" Condition="EI1" />
+
+		<ECTransition Source="EO" Destination="START" Condition="1" />
+    </ECC>
+  </BasicFB>
+</FBType>

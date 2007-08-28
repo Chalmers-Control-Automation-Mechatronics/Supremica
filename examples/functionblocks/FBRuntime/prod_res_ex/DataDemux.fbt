@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<FBType xmlns="http://www.holobloc.com/xml/LibraryElement" Name="DataDemux" >
+
+  <VersionInfo Author="Goran Cengic" Organization="Chalmers" Version="1.0" Date="2007-08-28" />
+
+  <InterfaceList>
+    <EventInputs>
+      <Event Name="EI1">
+	  	  <With Var="DI" />
+	  </Event>
+      <Event Name="EI2">
+	  	  <With Var="DI" />
+	  </Event>
+    </EventInputs>
+
+    <EventOutputs>
+      <Event Name="EO1" >
+	  	  <With Var="DO1" />
+	  </Event>
+      <Event Name="EO2" >
+	  	  <With Var="DO2" />
+	  </Event>
+    </EventOutputs>
+
+    <InputVars>
+      <VarDeclaration Name="DI" Type="INT" />
+    </InputVars>
+
+    <OutputVars>
+      <VarDeclaration Name="DO1" Type="INT" />
+      <VarDeclaration Name="DO2" Type="INT" />
+    </OutputVars>
+  </InterfaceList>
+
+  <BasicFB>
+    <ECC>
+        <ECState Name="START" />
+        <ECState Name="S1">
+		    <ECAction Algorithm="Alg1" Output="EO1"/>
+	    </ECState>    
+        <ECState Name="S2">
+		    <ECAction Algorithm="Alg2" Output="EO2"/>
+	    </ECState>    
+
+		<ECTransition Source="START" Destination="S1" Condition="EI1" />
+		<ECTransition Source="S1" Destination="START" Condition="1" />
+		<ECTransition Source="START" Destination="S2" Condition="EI2" />
+		<ECTransition Source="S2" Destination="START" Condition="1" />
+    </ECC>
+
+    <Algorithm Name="Alg1">
+	    <Other Language="Java" Text="DO1 = DI;" />	
+    </Algorithm>
+    <Algorithm Name="Alg2">
+	    <Other Language="Java" Text="DO2 = DI;" />	
+    </Algorithm>
+
+  </BasicFB>
+</FBType>
