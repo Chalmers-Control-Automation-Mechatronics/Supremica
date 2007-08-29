@@ -37,6 +37,7 @@
   </InterfaceList>
 
   <BasicFB>
+
     <ECC>
         <ECState Name="INIT" />
         <ECState Name="S11" >
@@ -113,6 +114,7 @@
 		<ECTransition Source="S28" Destination="INIT" Condition="1" />
 
     </ECC>
+
 <!--
     <ECC>
         <ECState Name="INIT" />

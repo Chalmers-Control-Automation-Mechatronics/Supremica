@@ -535,7 +535,10 @@ class ModelMaker
 								}
 								if (!iter.hasNext())
 								{
-									algMaxID = algIDCounter;
+									if (algIDCounter > algMaxID)
+									{
+										algMaxID = algIDCounter;
+									}
 								}
 								algIDCounter++;
 							}
