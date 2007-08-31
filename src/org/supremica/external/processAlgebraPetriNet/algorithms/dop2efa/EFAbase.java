@@ -43,11 +43,11 @@ class EFAbase
         states = new LinkedList<String>();
         events = new LinkedList<String>();
         
-        automata = new ExtendedAutomata(comment);
-        automaton = new ExtendedAutomaton(machine,automata);
+        automata = new ExtendedAutomata(comment, true);
+        automaton = new ExtendedAutomaton(machine,automata, true);
         
         //add first initialstate
-        automaton.addState("s0",true);
+        automaton.addState("s0",true,true);
         states.add("s0");
         automata.addAutomaton(automaton);
     }
