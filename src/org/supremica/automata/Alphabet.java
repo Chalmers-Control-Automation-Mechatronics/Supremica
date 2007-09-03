@@ -129,7 +129,7 @@ public class Alphabet
     {
         Set<EventProxy> currSet = getWatersEvents();
         currSet.add(State.acceptingProposition);
-        currSet.add(State.acceptingProposition);
+        currSet.add(State.forbiddenProposition);
         return currSet;
     }
     

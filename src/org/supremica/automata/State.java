@@ -50,9 +50,7 @@
  */
 package org.supremica.automata;
 
-import java.io.Serializable;
 import java.util.*;
-import java.awt.Point;
 
 import org.supremica.util.Args;
 
@@ -65,7 +63,6 @@ import net.sourceforge.waters.model.des.StateProxy;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyVisitor;
 import net.sourceforge.waters.model.module.EventDeclProxy;
-
 
 public class State
     implements StateProxy
@@ -1135,7 +1132,6 @@ public class State
         return getName().hashCode();
     }
 
-
     //#######################################################################
     //# Interface net.sourceforge.waters.model.module.AutomatonProxy
     public Collection<EventProxy> getPropositions()
@@ -1147,8 +1143,8 @@ public class State
         }
         if (isForbidden())
         {
-			currPropositions.add(forbiddenProposition);
-		}
+            currPropositions.add(forbiddenProposition);
+        }
         return currPropositions;
     }
 

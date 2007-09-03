@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.gui.ide
 //# CLASS:   ComponentEditorPanel
 //###########################################################################
-//# $Id: ComponentEditorPanel.java,v 1.48 2007-09-03 08:22:41 flordal Exp $
+//# $Id: ComponentEditorPanel.java,v 1.49 2007-09-03 11:37:27 flordal Exp $
 //###########################################################################
 
 
@@ -310,6 +310,15 @@ public class ComponentEditorPanel
             mModuleContainer.getIDE().info("No Postscript printer service installed.");
         }
     }
+
+    /*
+    public void exportEPS()
+    {
+        EPS2D eps2d = new EPS2D("filename.eps");
+        
+        surface.print(eps2d);
+    }
+     */
     
     public void exportEncapsulatedPostscript()
     {
@@ -567,14 +576,15 @@ public class ComponentEditorPanel
                     w.write(centerPoint.getX() + " " + centerPoint.getY() + " " + command + "\n");
                     if (forbiddenState)
                     {
+                        w.write("gsave\n");
                         w.write("newpath\n");
                         w.write((centerPoint.getX()-8) + " " + (centerPoint.getY()-8) + " moveto\n");
                         w.write((centerPoint.getX()+8) + " " + (centerPoint.getY()+8) + " lineto\n");
                         w.write((centerPoint.getX()+8) + " " + (centerPoint.getY()-8) + " moveto\n");
                         w.write((centerPoint.getX()-8) + " " + (centerPoint.getY()+8) + " lineto\n");
                         w.write("\t1.0 0.0 0.0 setrgbcolor\n");
-                        w.write("stroke");
-                        w.write("\t0.0 0.0 0.0 setrgbcolor\n");
+                        w.write("stroke\n");
+                        w.write("grestore\n");
                     }
                     
                     // Create bounds for the state, at a small distance (PADDING)

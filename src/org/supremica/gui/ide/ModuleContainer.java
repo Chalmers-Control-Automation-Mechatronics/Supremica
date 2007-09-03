@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.gui.ide
 //# CLASS:   ModuleContainer
 //###########################################################################
-//# $Id: ModuleContainer.java,v 1.64 2007-07-12 19:30:33 avenir Exp $
+//# $Id: ModuleContainer.java,v 1.65 2007-09-03 11:37:27 flordal Exp $
 //###########################################################################
 
 
@@ -186,14 +186,12 @@ public class ModuleContainer
     
     public void addStandardPropositions()
     {
-        EventDeclSubject accepting = new EventDeclSubject(EventDeclProxy.DEFAULT_MARKING_NAME,
-            EventKind.PROPOSITION);
+        EventDeclSubject accepting = new EventDeclSubject(EventDeclProxy.DEFAULT_MARKING_NAME, EventKind.PROPOSITION);
         if (!getModule().getEventDeclListModifiable().containsName(EventDeclProxy.DEFAULT_MARKING_NAME))
         {
             getModule().getEventDeclListModifiable().add(accepting);
         }
-        EventDeclSubject forbidden = new EventDeclSubject(EventDeclProxy.DEFAULT_FORBIDDEN_NAME,
-            EventKind.PROPOSITION);
+        EventDeclSubject forbidden = new EventDeclSubject(EventDeclProxy.DEFAULT_FORBIDDEN_NAME, EventKind.PROPOSITION);
         if (!getModule().getEventDeclListModifiable().containsName(EventDeclProxy.DEFAULT_FORBIDDEN_NAME))
         {
             getModule().getEventDeclListModifiable().add(forbidden);
