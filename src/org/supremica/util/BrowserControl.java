@@ -2,6 +2,8 @@ package org.supremica.util;
 
 import java.io.IOException;
 import org.supremica.log.*;
+import java.lang.reflect.Method;
+import javax.swing.JOptionPane;
 
 /**
 * A simple, static class to display a URL in the system browser.
@@ -25,7 +27,7 @@ import org.supremica.log.*;
 public class BrowserControl
 {
 	private static Logger logger = LoggerFactory.createLogger(BrowserControl.class);
-
+  	private static final String errMsg = "Error attempting to launch web browser";
 	/**
 	 * Display a file in the system browser.  If you want to display a
 	 * file, you must include the absolute path name.
@@ -33,61 +35,45 @@ public class BrowserControl
 	 * @param url the file's url (the url must start with either "http://" or
 	 * "file://").
 	 */
-	public static void displayURL(String url)
+	public static void displayURL(String url) 
 	{
-		boolean windows = isWindowsPlatform();
-		String cmd = null;
-
+		String osName = System.getProperty("os.name");
 		try
 		{
-			if (windows)
+			if (osName.startsWith("Mac OS")) 
 			{
-
-				// cmd = 'rundll32 url.dll,FileProtocolHandler http://...'
-				cmd = WIN_PATH + " " + WIN_FLAG + " " + url;
-
-				Process p = Runtime.getRuntime().exec(cmd);
+				Class fileMgr = Class.forName("com.apple.eio.FileManager");
+				Method openURL = fileMgr.getDeclaredMethod("openURL", new Class[] {String.class});
+				openURL.invoke(null, new Object[] {url});
 			}
-			else
+			else if (osName.startsWith("Windows"))
 			{
-
-				// Under Unix, Netscape has to be running for the "-remote"
-				// command to work.  So, we try sending the command and
-				// check for an exit value.  If the exit command is 0,
-				// it worked, otherwise we need to start the browser.
-				// cmd = 'netscape -remote openURL(http://www.javaworld.com)'
-				cmd = UNIX_PATH + " " + url;
-
-				Process p = Runtime.getRuntime().exec(cmd);
-
-				/* // This doesnot work on Hugo's Netscape 4.77, RH Linux
-cmd = UNIX_PATH + " " + UNIX_FLAG + "(" + url + ")";
-Process p = Runtime.getRuntime().exec(cmd);
-try
-{
-	// wait for exit code -- if it's 0, command worked,
-	// otherwise we need to start the browser up.
-	int exitCode = p.waitFor();
-	logger.info("displayURL exitCode: " + exitCode);
-	if (exitCode != 0)
-	{
-		// Command failed, start up the browser
-		// cmd = 'netscape http://www.javaworld.com'
-		cmd = UNIX_PATH + " "  + url;
-		p = Runtime.getRuntime().exec(cmd);
-	}
-} */
+				Runtime.getRuntime().exec("rundll32 url.dll,FileProtocolHandler " + url);
+			}
+			else 
+			{ //assume Unix or Linux
+				String[] browsers = {
+					"firefox", "opera", "konqueror", "epiphany", "mozilla", "netscape" };
+				String browser = null;
+				for (int count = 0; count < browsers.length && browser == null; count++)
+					if (Runtime.getRuntime().exec(new String[] {"which", browsers[count]}).waitFor() == 0)
+						browser = browsers[count];
+				if (browser == null)
+				{
+					throw new Exception("Could not find web browser");	
+				}
+				else
+				{
+					Runtime.getRuntime().exec(new String[] {browser, url});
+				}
 			}
 		}
-		catch (IOException ex)
+		catch (Exception e) 
 		{
-
-			// couldn't exec browser
-			logger.error("Could not invoke browser, command=" + cmd);
-			logger.error("Caught: " + ex);
-			logger.debug(ex.getStackTrace());
+			JOptionPane.showMessageDialog(null, errMsg + ":\n" + e.getLocalizedMessage());
 		}
 	}
+
 
 	/**
 	 * Try to determine whether this application is running under Windows
@@ -95,6 +81,7 @@ try
 	 *
 	 * @return true if this application is running under a Windows OS
 	 */
+/*
 	public static boolean isWindowsPlatform()
 	{
 		String os = System.getProperty("os.name");
@@ -108,27 +95,13 @@ try
 			return false;
 		}
 	}
-
+*/
 	/**
 	 * Simple example.
 	 */
 	public static void main(String[] args)
 	{
-		displayURL("http://www.javaworld.com");
+		displayURL("http://www.supremica.org");
 	}
 
-	// Used to identify the windows platform.
-	private static final String WIN_ID = "Windows";
-
-	// The default system browser under windows.
-	private static final String WIN_PATH = "rundll32";
-
-	// The flag to display a url.
-	private static final String WIN_FLAG = "url.dll,FileProtocolHandler";
-
-	// The default browser under unix.
-	private static final String UNIX_PATH = "netscape";
-
-	// The flag to display a url.
-	private static final String UNIX_FLAG = "-remote openURL";
 }

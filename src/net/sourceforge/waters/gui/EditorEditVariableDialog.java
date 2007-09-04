@@ -84,7 +84,8 @@ implements ActionListener{
 		layout.setConstraints(lType, con);
 		add(lType);
 
-		String[] types = {"boolean", "integer"};
+		//String[] types = {"boolean", "integer"};
+		String[] types = {"integer"};
 		typeSelector = new JComboBox(types);
 		con.gridx = 2;
 		con.weightx = 1;
