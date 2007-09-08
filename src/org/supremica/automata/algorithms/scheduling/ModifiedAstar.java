@@ -188,7 +188,9 @@ public class ModifiedAstar
      * to its initial state. Needed to describe repetitive working cycles.
      */
     String dummyEventName = "reset";
-    
+
+	private Automaton scheduleAuto = null;
+
     /** 
      * Used to guide the A* towards suboptimal solution. Contains x-weight and
      * y-weight. The formula for adjusting the estimation value (f(n)) is:
@@ -1032,7 +1034,7 @@ public class ModifiedAstar
         {
             return;
         }
-        Automaton scheduleAuto = new Automaton(scheduleName);
+        scheduleAuto = new Automaton(scheduleName);
         
         // Start the clock
         timer.restart();  
@@ -1115,10 +1117,14 @@ public class ModifiedAstar
         }
         
         logger.info("Schedule was built in " + timer.elapsedTime() + "ms");
-        scheduleDialog.getIde().getActiveDocumentContainer().getAnalyzerPanel().addAutomaton(scheduleAuto);
-        
+		
+		if (scheduleDialog != null)
+		{
+			scheduleDialog.getIde().getActiveDocumentContainer().getAnalyzerPanel().addAutomaton(scheduleAuto);
+		}
+
         //TODO: TEMP-TEST
-        new VelocityBalancer(scheduleAuto, theAutomata.getPlantAutomata());
+        //new VelocityBalancer(scheduleAuto, theAutomata.getPlantAutomata());
     }
 
 	/**
@@ -1638,5 +1644,10 @@ public class ModifiedAstar
 	public void addToOutputString(String str)
 	{
 		outputStr += str;
+	}
+
+	public Automaton getSchedule()
+	{
+		return scheduleAuto;
 	}
 }

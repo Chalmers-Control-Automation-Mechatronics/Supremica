@@ -1,6 +1,7 @@
 package org.supremica.automata.algorithms.scheduling;
 
 import org.supremica.automata.algorithms.Stoppable;
+import org.supremica.automata.Automaton;
 
 public interface Scheduler
     extends Stoppable, Runnable
@@ -18,4 +19,7 @@ public interface Scheduler
     
     /** Returns a string containing information about the optimization process. */
     public String getOutputString();
+
+	/** Returns the schedule automaton. */
+	public Automaton getSchedule();
 }
