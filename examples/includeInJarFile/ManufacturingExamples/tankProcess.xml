@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
-<Automata name="Tank process" major="0" minor="9" comment="Unknown origin (Balemi?). A tank with two vents, input (Vent1) and output (Vent2), a heating element, a temperature sensor. When the tank becomes empty, half full, and full, events are fired. When being filled, the event 'in' is fired (at half full and full) and when being emptied the event 'out' is fired (at half full and empty). 
+<Automata name="Tank process" major="0" minor="9" comment="Unknown origin (Balemi?). A tank with two valves, input (Valve1) and output (Valve2), a heating element, a temperature sensor. When the tank becomes empty, half full, and full, events are fired. When being filled, the event 'in' is fired (at half full and full) and when being emptied the event 'out' is fired (at half full and empty). 
   The specifications and thair respective objectives are...
   * FillDrain, saying that the tank should be completely filled and then completely emptied, alternatingly.
   * Heat, saying that after turning on the heater the tank must become hot before the element can be turned on and the tank emptied.
   * NeverHeatEmpty, saying that the element must not be turned on before the tank is at least half full.
 
-  The vents for opening and closing the vents and for turning the element on and off are controllable. All other events are uncontrollable.">
+  The valves for opening and closing the valves and for turning the element on and off are controllable. All other events are uncontrollable.">
 <Automaton name="Tank" type="Plant">
 	<Events>
 		<Event id="0" label="in" controllable="false"/>
@@ -60,7 +60,7 @@
 		<Transition source="1" dest="0" event="0"/>
 	</Transitions>
 </Automaton>
-<Automaton name="Vent2" type="Plant">
+<Automaton name="Valve2" type="Plant">
 	<Events>
 		<Event id="0" label="out" controllable="false"/>
 		<Event id="1" label="v20"/>
@@ -76,7 +76,7 @@
 		<Transition source="1" dest="0" event="1"/>
 	</Transitions>
 </Automaton>
-<Automaton name="Vent1" type="Plant">
+<Automaton name="Valve1" type="Plant">
 	<Events>
 		<Event id="0" label="in" controllable="false"/>
 		<Event id="1" label="v10"/>

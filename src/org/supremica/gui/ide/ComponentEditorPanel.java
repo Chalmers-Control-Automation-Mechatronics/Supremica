@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.gui.ide
 //# CLASS:   ComponentEditorPanel
 //###########################################################################
-//# $Id: ComponentEditorPanel.java,v 1.49 2007-09-03 11:37:27 flordal Exp $
+//# $Id: ComponentEditorPanel.java,v 1.50 2007-09-09 11:05:48 flordal Exp $
 //###########################################################################
 
 
@@ -312,7 +312,7 @@ public class ComponentEditorPanel
     }
 
     /*
-    public void exportEPS()
+    public void exportEncapsulatedPostscript()
     {
         EPS2D eps2d = new EPS2D("filename.eps");
         

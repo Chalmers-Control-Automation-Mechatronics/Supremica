@@ -353,6 +353,12 @@ public class VisGraphScheduler
     throws Exception
     {
     }
+
+    //TODO: make it useful
+    public Automaton getSchedule()
+    {
+	return null;
+    }
     
     private void branch(double[] currNode)
     {
