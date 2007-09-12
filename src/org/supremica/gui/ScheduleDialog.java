@@ -289,7 +289,7 @@ public class ScheduleDialog
             {
                 if (selectedHeuristic.equals(OPTIMAL))
                 {
-                    sched = new Milp(selectedAutomata, buildAutomaton.isSelected(), this);
+                    sched = new Milp(selectedAutomata, buildAutomaton.isSelected()); //temp_uc, this);
                 }
                 else if (selectedHeuristic.equals(SUBOPTIMAL))
                 {

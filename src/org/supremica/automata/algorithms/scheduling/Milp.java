@@ -6,11 +6,12 @@ import org.jacorb.orb.domain.TEST_POLICY_ID;
 
 import org.supremica.automata.*;
 import org.supremica.automata.algorithms.*;
-import org.supremica.gui.ScheduleDialog;
-import org.supremica.gui.ide.IDEReportInterface;
-import org.supremica.gui.ide.actions.IDEAction;
-import org.supremica.gui.ide.actions.IDEActionInterface;
-import org.supremica.log.*;
+//temp_uc
+//import org.supremica.gui.ScheduleDialog;
+//import org.supremica.gui.ide.IDEReportInterface;
+//import org.supremica.gui.ide.actions.IDEAction;
+//import org.supremica.gui.ide.actions.IDEActionInterface;
+//temp_uc//import org.supremica.log.*;
 import org.supremica.util.ActionTimer;
 
 //TODO: Strukturera upp koden. Kommentera. 
@@ -22,7 +23,8 @@ public class Milp
     /****************************************************************************************/
     
     /** The logger */
-    private static Logger logger = LoggerFactory.createLogger(Milp.class);
+    //temp_uc
+//    private static Logger logger = LoggerFactory.createLogger(Milp.class);
     
     private static final int NO_PATH_SPLIT_INDEX = -1;
     
@@ -94,7 +96,8 @@ public class Milp
     protected volatile boolean isRunning = false;
     
     /** The dialog box that launched this scheduler */
-    protected ScheduleDialog scheduleDialog;
+    //temp_uc
+//    protected ScheduleDialog scheduleDialog;
     
     /** Decides if the schedule should be built */
     protected boolean buildSchedule;
@@ -158,7 +161,7 @@ public class Milp
      *  automatic deduction of epsilon from the optmal time values in  
      *  @see{buildScheduleAutomaton}, it should be a power of 10. For correct 
      *  functioning, this variable should be strictly smaller than 10^(-x), where
-     *  x is the total number of (individual) plant states. 
+     *  x is the total number of (individual) plalnt states. 
      */
     private final double EPSILON = 0.001;
     
@@ -177,14 +180,23 @@ public class Milp
     /****************************************************************************************/
     /*                                 CONSTUCTORS                                          */
     /****************************************************************************************/
+  
+    //temp_uc
+//    public Milp(Automata theAutomata, boolean buildSchedule, ScheduleDialog scheduleDialog)
+//    throws Exception
+//    {
+//        this.theAutomata = theAutomata;
+//        //  this.theProject = theProject;
+//        this.buildSchedule = buildSchedule;
+//        this.scheduleDialog = scheduleDialog;
+//    }
     
-    public Milp(Automata theAutomata, boolean buildSchedule, ScheduleDialog scheduleDialog)
-    throws Exception
+    //temp and ugly
+    public Milp(Automata theAutomata, boolean buildSchedule) //, Object scheduleDialog)
+        throws Exception
     {
         this.theAutomata = theAutomata;
-        //  this.theProject = theProject;
         this.buildSchedule = buildSchedule;
-        this.scheduleDialog = scheduleDialog;
     }
     
     public void startSearchThread()
@@ -215,13 +227,15 @@ public class Milp
             {
                 solutionFile.delete();
             }
-            if (scheduleDialog != null)
-            {
-                scheduleDialog.close();
-            }
+            //temp_uc
+//            if (scheduleDialog != null)
+//            {
+//                scheduleDialog.close();
+//            }
             
-            logger.error("Milp::schedule() -> " + ex);
-            logger.debug(ex.getStackTrace());
+            //temp_uc
+//            logger.error("Milp::schedule() -> " + ex);
+//            logger.debug(ex.getStackTrace());
         }
     }
     
@@ -257,7 +271,8 @@ public class Milp
             writeToMilpFile();
             
             long procTime = timer.elapsedTime();
-            logger.info("Pre-processing time = " + procTime + "ms");
+            //temp_uc
+//            logger.info("Pre-processing time = " + procTime + "ms");
             totalTime += procTime;
         }
         
@@ -269,7 +284,8 @@ public class Milp
             callMilpSolver();
             
             long procTime = timer.elapsedTime();
-            logger.info("Optimization time = " + procTime + "ms");
+            //temp_uc
+//            logger.info("Optimization time = " + procTime + "ms");
             totalTime += procTime;
         }
         
@@ -279,17 +295,22 @@ public class Milp
             timer.restart();
             
             processSolutionFile();
+            
+            //Temp
+            java.awt.Toolkit.getDefaultToolkit().beep();
         }
         
         // Builds the optimal schedule (if solicited)
-        if (isRunning && buildSchedule)
+        if (isRunning)
         {
             buildScheduleAutomaton();
             
             long procTime = timer.elapsedTime();
-            logger.info("Post-processing time (incl. schedule construction) = " + procTime + "ms");
+            //temp_uc
+//            logger.info("Post-processing time (incl. schedule construction) = " + procTime + "ms");
             totalTime += procTime;
-            logger.info("Total time = " + totalTime + "ms");
+            //temp_uc
+//            logger.info("Total time = " + totalTime + "ms");
         }
         
         if (isRunning)
@@ -298,11 +319,18 @@ public class Milp
         }
         else
         {
-            logger.warn("Scheduling interrupted");
-            
-            {
-                scheduleDialog.reset();
-            }
+            //temp_uc
+//            logger.warn("Scheduling interrupted");
+  
+            //temp_uc
+//            {
+//                scheduleDialog.reset();
+//            }
+        }
+        
+        if (isStopped())
+        {
+            java.awt.Toolkit.getDefaultToolkit().beep();
         }
     }
     
@@ -338,7 +366,10 @@ public class Milp
         String scheduleName = "";
         while (scheduleName != null && scheduleName.trim() == "")
         {
-            scheduleName = scheduleDialog.getIde().getActiveDocumentContainer().getAnalyzerPanel().getNewAutomatonName("Enter a name for the schedule", "Schedule");
+            //temp_uc
+            //scheduleName = scheduleDialog.getIde().getActiveDocumentContainer().getAnalyzerPanel().getNewAutomatonName("Enter a name for the schedule", "Schedule");
+            //temp
+            scheduleName = "Schedule";
         }       
         if (scheduleName == null)
         {
@@ -554,7 +585,10 @@ public class Milp
 //            plantAuto.addArc(new Arc(plantAuto.getInitialState(), plantAuto.getInitialState(), resetEvent));
 //        }
          
-        addAutomatonToGui(schedule);
+        if (buildSchedule)
+        {
+            addAutomatonToGui(schedule);
+        }
     }
     
     
@@ -576,9 +610,10 @@ public class Milp
         solutionFile = File.createTempFile("milp", ".sol");
         solutionFile.deleteOnExit();
         
-        logger.info("model: " + modelFile.getPath());
-        logger.info("solution: " + solutionFile.getPath());        
-        
+        //temp_uc
+//        logger.info("model: " + modelFile.getPath());
+//        logger.info("solution: " + solutionFile.getPath());        
+//        
         indexMap = new AutomataIndexMap(theAutomata);
         pathCutTable = new Hashtable<State,String>();
         
@@ -623,7 +658,8 @@ public class Milp
             
             if (counter == 0)
             {
-                logger.warn("Specification " + spec.getName() + " has no common events with any of the plants");
+                //temp_uc
+//                logger.warn("Specification " + spec.getName() + " has no common events with any of the plants");
             }
             else if (counter == 1)
             {
@@ -698,7 +734,8 @@ public class Milp
                 restrictedPlant.setName(plantName + "_constrained");
                 plants.addAutomaton(restrictedPlant);
                 
-                logger.info(str.substring(0, str.lastIndexOf("||")) + " synthesized into " + restrictedPlant.getName());
+                //temp_uc
+//                logger.info(str.substring(0, str.lastIndexOf("||")) + " synthesized into " + restrictedPlant.getName());
             }
         }
         
@@ -2556,7 +2593,8 @@ public class Milp
         }
         
         str = "OPTIMAL MAKESPAN: " + makespan + ".............................";
-        logger.info(str);
+        //temp_uc
+//        logger.info(str);
         outputStr += "\t" + str + "\n";
     }
     
@@ -2569,7 +2607,8 @@ public class Milp
     protected void callMilpSolver(File currModelFile)
     throws Exception
     {
-        logger.info("Callingt the MILP-solver....");
+        //temp_uc
+//        logger.info("Callingt the MILP-solver....");
         
         // Defines the name of the .exe-file as well the arguments (.mod and .sol file names)
         String[] cmds = new String[5];
@@ -2587,7 +2626,8 @@ public class Milp
         }
         catch (IOException milpNotFoundException)
         {
-            logger.error("The GLPK-solver 'glpsol.exe' not found. Make sure that it is registered in your path.");
+            //temp_uc
+//            logger.error("The GLPK-solver 'glpsol.exe' not found. Make sure that it is registered in your path.");
             
             throw milpNotFoundException;
         }
@@ -2637,10 +2677,11 @@ public class Milp
             milpProcess.destroy();
         }
         
-        if (scheduleDialog != null && disposeScheduleDialog)
-        {
-            scheduleDialog.done();
-        }
+        //temp_uc
+//        if (scheduleDialog != null && disposeScheduleDialog)
+//        {
+//            scheduleDialog.done();
+//        }
     }
     
     public boolean isStopped()
@@ -2685,127 +2726,131 @@ public class Milp
     private synchronized void addAutomatonToGui(Automaton auto, boolean addToEditor)
     throws Exception
     {
-        if (scheduleDialog != null)
-        {
-            IDEActionInterface ide = null;
-            
-            try
-            {
-                ide = scheduleDialog.getIde();
-                ide.getIDE().getActiveDocumentContainer().getAnalyzerPanel().addAutomaton(auto);
-                
-                // The following part should be somewhere else, but unfortunately the communication between the editor
-                // and the analyzer are not automatic in the IDE, tuff luck...
-                if (addToEditor)
-                {
-                    if (ide.getActiveDocumentContainer().getEditorPanel() != null)
-                    {
-                        // Compile into Waters module
-                        net.sourceforge.waters.model.marshaller.ProductDESImporter importer = 
-                                new net.sourceforge.waters.model.marshaller.ProductDESImporter(net.sourceforge.waters.subject.module.ModuleSubjectFactory.getInstance());
-
-                        net.sourceforge.waters.model.module.SimpleComponentProxy component = importer.importComponent(schedule);
-                        if (ide.getActiveDocumentContainer().getEditorPanel().getEditorPanelInterface().componentNameAvailable(component.getName()))
-                        {
-                            // Add to current module
-                            try
-                            {
-                                ide.getActiveDocumentContainer().getEditorPanel().getEditorPanelInterface().addComponent((net.sourceforge.waters.subject.base.AbstractSubject) component);
-
-                                // Add all (new) events to the module
-                                net.sourceforge.waters.subject.module.ModuleSubject module = ide.getActiveDocumentContainer().getEditorPanel().getEditorPanelInterface().getModuleSubject();
-                                boolean problem = false;
-                                for (LabeledEvent event: schedule.getAlphabet())
-                                {
-                                    if (!event.getName().contains("["))
-                                    {
-                                        if (!module.getEventDeclListModifiable().containsName(event.getName()))
-                                        {
-                                            final net.sourceforge.waters.model.des.EventProxy proxy = 
-                                                    (net.sourceforge.waters.model.des.EventProxy) event;
-                                            final net.sourceforge.waters.subject.module.EventDeclSubject decl =
-                                                new net.sourceforge.waters.subject.module.EventDeclSubject(proxy.getName(),
-                                                proxy.getKind(),
-                                                proxy.isObservable(),
-                                                net.sourceforge.waters.xsd.module.ScopeKind.LOCAL,
-                                                null, null);
-                                            module.getEventDeclListModifiable().add(decl);
-                                        }
-                                    }
-                                    else
-                                    {
-                                        problem = true;
-                                    }
-                                }
-                                if (problem)
-                                {
-                                    javax.swing.JOptionPane.showMessageDialog(ide.getFrame(), "There is a problem in the back-translation of parametrised events.", "Alert", javax.swing.JOptionPane.WARNING_MESSAGE);
-                                }
-                            }
-                            catch (Exception ex)
-                            {
-                                ide.getIDE().error("Could not add " + schedule + " to editor." + ex);
-                            }
-                        }
-                        else
-                        {
-                            javax.swing.JOptionPane.showMessageDialog(ide.getFrame(), "Component: " + component.getName() + " already exists in editor", "Duplicate Name", javax.swing.JOptionPane.ERROR_MESSAGE);
-                        }
-                    }
-                    else
-                    {
-                        javax.swing.JOptionPane.showMessageDialog(ide.getFrame(), "The editor is unknown. The schedule was not added.", "Editor null", javax.swing.JOptionPane.ERROR_MESSAGE);
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                logger.warn("EXceptiON, ide = " + ide);            
-                throw ex;
-            }
-        }
+        //temp_uc
+//        if (scheduleDialog != null)
+//        {
+//            IDEActionInterface ide = null;
+//            
+//            try
+//            {
+//                ide = scheduleDialog.getIde();
+//                ide.getIDE().getActiveDocumentContainer().getAnalyzerPanel().addAutomaton(auto);
+//                
+//                // The following part should be somewhere else, but unfortunately the communication between the editor
+//                // and the analyzer are not automatic in the IDE, tuff luck...
+//                if (addToEditor)
+//                {
+//                    if (ide.getActiveDocumentContainer().getEditorPanel() != null)
+//                    {
+//                        // Compile into Waters module
+//                        net.sourceforge.waters.model.marshaller.ProductDESImporter importer = 
+//                                new net.sourceforge.waters.model.marshaller.ProductDESImporter(net.sourceforge.waters.subject.module.ModuleSubjectFactory.getInstance());
+//
+//                        net.sourceforge.waters.model.module.SimpleComponentProxy component = importer.importComponent(schedule);
+//                        if (ide.getActiveDocumentContainer().getEditorPanel().getEditorPanelInterface().componentNameAvailable(component.getName()))
+//                        {
+//                            // Add to current module
+//                            try
+//                            {
+//                                ide.getActiveDocumentContainer().getEditorPanel().getEditorPanelInterface().addComponent((net.sourceforge.waters.subject.base.AbstractSubject) component);
+//
+//                                // Add all (new) events to the module
+//                                net.sourceforge.waters.subject.module.ModuleSubject module = ide.getActiveDocumentContainer().getEditorPanel().getEditorPanelInterface().getModuleSubject();
+//                                boolean problem = false;
+//                                for (LabeledEvent event: schedule.getAlphabet())
+//                                {
+//                                    if (!event.getName().contains("["))
+//                                    {
+//                                        if (!module.getEventDeclListModifiable().containsName(event.getName()))
+//                                        {
+//                                            final net.sourceforge.waters.model.des.EventProxy proxy = 
+//                                                    (net.sourceforge.waters.model.des.EventProxy) event;
+//                                            final net.sourceforge.waters.subject.module.EventDeclSubject decl =
+//                                                new net.sourceforge.waters.subject.module.EventDeclSubject(proxy.getName(),
+//                                                proxy.getKind(),
+//                                                proxy.isObservable(),
+//                                                net.sourceforge.waters.xsd.module.ScopeKind.LOCAL,
+//                                                null, null);
+//                                            module.getEventDeclListModifiable().add(decl);
+//                                        }
+//                                    }
+//                                    else
+//                                    {
+//                                        problem = true;
+//                                    }
+//                                }
+//                                if (problem)
+//                                {
+//                                    javax.swing.JOptionPane.showMessageDialog(ide.getFrame(), "There is a problem in the back-translation of parametrised events.", "Alert", javax.swing.JOptionPane.WARNING_MESSAGE);
+//                                }
+//                            }
+//                            catch (Exception ex)
+//                            {
+//                                ide.getIDE().error("Could not add " + schedule + " to editor." + ex);
+//                            }
+//                        }
+//                        else
+//                        {
+//                            javax.swing.JOptionPane.showMessageDialog(ide.getFrame(), "Component: " + component.getName() + " already exists in editor", "Duplicate Name", javax.swing.JOptionPane.ERROR_MESSAGE);
+//                        }
+//                    }
+//                    else
+//                    {
+//                        javax.swing.JOptionPane.showMessageDialog(ide.getFrame(), "The editor is unknown. The schedule was not added.", "Editor null", javax.swing.JOptionPane.ERROR_MESSAGE);
+//                    }
+//                }
+//            }
+//            catch (Exception ex)
+//            {
+//                //temp_uc
+////                logger.warn("EXceptiON, ide = " + ide);            
+//                throw ex;
+//            }
+//        }
     }
     
     private synchronized void updateGui(Automata autos)
     throws Exception
     {
-        if (scheduleDialog != null)
-        {
-            IDEActionInterface ide = null;
-            
-            try
-            {
-                ide = scheduleDialog.getIde();
-                
-                // Remove old automata
-                Automata selectedAutos = ide.getIDE().getActiveDocumentContainer().getAnalyzerPanel().getSelectedAutomata();
-                for (Iterator<Automaton> autIt = selectedAutos.iterator(); autIt.hasNext(); )
-                {
-                    Automaton selectedAuto = autIt.next();
-                    if (!autos.containsAutomaton(selectedAuto.getName()))
-                    {
-//                        ide.getVisualProjectContainer().getActiveProject().removeAutomaton(selectedAuto);
-                        ide.getIDE().getActiveDocumentContainer().getAnalyzerPanel().getVisualProject().removeAutomaton(selectedAuto);
-                    }
-                }
-                
-                // Add missing automata
-                for (Iterator<Automaton> autIt = autos.iterator(); autIt.hasNext(); )
-                {
-                    Automaton auto = autIt.next();
-                    if (!selectedAutos.containsAutomaton(auto.getName()))
-                    {
-                        ide.getIDE().getActiveDocumentContainer().getAnalyzerPanel().addAutomaton(auto);
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                logger.warn("EXceptiON, ide = " + ide);
-                
-                throw ex;
-            }
-        }
+        //temp_uc
+//        if (scheduleDialog != null)
+//        {
+//            IDEActionInterface ide = null;
+//            
+//            try
+//            {
+//                ide = scheduleDialog.getIde();
+//                
+//                // Remove old automata
+//                Automata selectedAutos = ide.getIDE().getActiveDocumentContainer().getAnalyzerPanel().getSelectedAutomata();
+//                for (Iterator<Automaton> autIt = selectedAutos.iterator(); autIt.hasNext(); )
+//                {
+//                    Automaton selectedAuto = autIt.next();
+//                    if (!autos.containsAutomaton(selectedAuto.getName()))
+//                    {
+////                        ide.getVisualProjectContainer().getActiveProject().removeAutomaton(selectedAuto);
+//                        ide.getIDE().getActiveDocumentContainer().getAnalyzerPanel().getVisualProject().removeAutomaton(selectedAuto);
+//                    }
+//                }
+//                
+//                // Add missing automata
+//                for (Iterator<Automaton> autIt = autos.iterator(); autIt.hasNext(); )
+//                {
+//                    Automaton auto = autIt.next();
+//                    if (!selectedAutos.containsAutomaton(auto.getName()))
+//                    {
+//                        ide.getIDE().getActiveDocumentContainer().getAnalyzerPanel().addAutomaton(auto);
+//                    }
+//                }
+//            }
+//            catch (Exception ex)
+//            {
+//                //temp_uc
+////                logger.warn("EXceptiON, ide = " + ide);
+//                
+//                throw ex;
+//            }
+//        }
     }
     
     /**
