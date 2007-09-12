@@ -15,13 +15,13 @@ public class NodeExpander
     /** Decides if the expansion of the nodes should be done using the methods of this class or using Supremicas methods */
     protected boolean manualExpansion;
 
-	/** 
-	 * If this variable is true, the expander is forced to choose one of the 
-	 * uncontrollable events if present, which means that controllable transitions
-	 * are disregarded at expansion if there is at least one outgoing uncontrollable
-	 * transition. 
-	 */
-	protected boolean immediateChoiceAtUncontrollability;
+    /** 
+     * If this variable is true, the expander is forced to choose one of the 
+     * uncontrollable events if present, which means that controllable transitions
+     * are disregarded at expansion if there is at least one outgoing uncontrollable
+     * transition. 
+     */
+    protected boolean immediateChoiceAtUncontrollability;
 
     /** Needed to be able to use Supremicas expansion/synchronization methods */
     protected AutomataSynchronizerExecuter onlineSynchronizer;
@@ -29,8 +29,8 @@ public class NodeExpander
     /** Contains maps between states and corresponding indices, in order to compress the used memory and speed up operations */
 	protected AutomataIndexForm indexForm;
 
-	/** Responsible for correct indexing of automata, states and events. */
-	protected AutomataIndexMap indexMap;
+    /** Responsible for correct indexing of automata, states and events. */
+    protected AutomataIndexMap indexMap;
     
     /** The selected automata to be scheduled */
     protected Automata theAutomata, plantAutomata;
@@ -41,20 +41,20 @@ public class NodeExpander
     /** Maps every event that is specified to the corresponing specification automaton, in order to speed up the expansion */
     protected Hashtable<LabeledEvent, Integer> specEventTable;
 
-	/** 
-	 * This variable becomes true if at least one uncontrollable event 
-	 * is found during the current expansion.
-	 */
-	private boolean uncontrollableEventFound = false;
+    /** 
+     * This variable becomes true if at least one uncontrollable event 
+     * is found during the current expansion.
+     */
+    private boolean uncontrollableEventFound = false;
 
-	//Tillf (test)
-	private Alphabet unbookingAlphabet = null;
+    //Tillf (test)
+    private Alphabet unbookingAlphabet = null;
 
-	//     /** Needed for manual expansion */
-	//     protected int[][][] outgoingEventsTable;
+    //     /** Needed for manual expansion */
+    //     protected int[][][] outgoingEventsTable;
 
-	//     /** Needed for manual expansion */
-	//     protected int[][][] nextStateTable;
+    //     /** Needed for manual expansion */
+    //     protected int[][][] nextStateTable;
 
     /***********************************************************************
      *                Start-up methods                                     *
@@ -84,20 +84,21 @@ public class NodeExpander
 		}
     }
 
-	public NodeExpander(boolean manualExpansion, Automata theAutomata, ModifiedAstar sched)
-	{
-		this(manualExpansion, true, theAutomata, sched);
-	}
+    public NodeExpander(boolean manualExpansion, Automata theAutomata, ModifiedAstar sched)
+    {
+            this(manualExpansion, true, theAutomata, sched);
+    }
 
-    public Collection expandNode(Node node, int[] activeAutomataIndex) {
-		if (!manualExpansion) 
-		{
-			return expandNodeWithSupremica(node, activeAutomataIndex);
-		}
-		else
-		{
-			return expandNodeManually(node, activeAutomataIndex);
-		}
+    public Collection expandNode(Node node, int[] activeAutomataIndex) 
+    {
+        if (!manualExpansion) 
+        {
+            return expandNodeWithSupremica(node, activeAutomataIndex);
+        }
+        else
+        {
+            return expandNodeManually(node, activeAutomataIndex);
+        }
     }
 
 
@@ -404,106 +405,107 @@ public class NodeExpander
     }
 
     public Collection expandNodeWithSupremica(Node node, int[] activeAutomataIndex) 
-	{
-		uncontrollableEventFound = false;
+    {       
+        uncontrollableEventFound = false;
         Hashtable childNodes = new Hashtable();
 
-		int[] currStateIndex = AutomataIndexFormHelper.createState(theAutomata.size());
-		for (int i=0; i<currStateIndex.length; i++)
-		{
- 			currStateIndex[i] = (int)node.getValueAt(i);
-		}
+        int[] currStateIndex = AutomataIndexFormHelper.createState(theAutomata.size());
+        for (int i=0; i<currStateIndex.length; i++)
+        {
+            currStateIndex[i] = (int)node.getValueAt(i);
+        }
 
-		int[] currOutgoingEvents = onlineSynchronizer.getOutgoingEvents(currStateIndex);
-	
-		for (int i=0; i<currOutgoingEvents.length; i++) 
-		{
-			if (onlineSynchronizer.isEnabled(currOutgoingEvents[i])) 
-			{
-				// If uncontrollable events should be immediately chosen when possible,
-				// special treatment is needed when finding the successors of the current state...
-				if (immediateChoiceAtUncontrollability)
-				{
-					if (uncontrollableEventFound && indexForm.getControllableEventsTable()[currOutgoingEvents[i]])
-					{
-						// If there was an uncontrollable event detected earlier, while the current event
-						// is controllable, do nothing
-					}
-					else
-					{
-						if (!uncontrollableEventFound && !indexForm.getControllableEventsTable()[currOutgoingEvents[i]])
-						{
-							// If the current event is the first uncontrollanble event that is found 
-							// during this expansion, then previously collected "controllable" 
-							// successors are no longer legitimate successors. Thus the 'children'-list
-							// is cleared. 
-							uncontrollableEventFound = true;
-							childNodes.clear();
-						}
+        int[] currOutgoingEvents = onlineSynchronizer.getOutgoingEvents(currStateIndex);
 
-						// The following code makes one expansion and add the child to the hashtable childNodes
-						int[] nextStateIndex = onlineSynchronizer.doTransition(currStateIndex, currOutgoingEvents[i]);
-		
-						int changedIndex = -1;
-						for (int k=0; k<activeAutomataIndex.length; k++)
-						{
-							if (nextStateIndex[activeAutomataIndex[k]] != currStateIndex[activeAutomataIndex[k]]) 
-							{
-								changedIndex = k;
-								break;
-							}
-						}
-						
-						if (changedIndex > -1) // || activeAutomataIndex.length == plantAutomata.size()) 
-						{
-							Integer currKey = sched.getKey(nextStateIndex);
-							
-							if (!childNodes.contains(currKey)) 
-							{
-								double newCost = indexMap.getStateAt(plantAutomata.getAutomatonAt(changedIndex), nextStateIndex[activeAutomataIndex[changedIndex]]).getCost();
-								double[] newCosts = sched.updateCosts(getCosts(node), changedIndex, newCost);
-								
-								Node newNode = node.emptyClone();
-								newNode.setBasis(makeNodeBasis(nextStateIndex, sched.getKey(node), newCosts));
-								childNodes.put(currKey, newNode);
-							}
-						}
-					}	
-				}
-				else
-				{
-					// The following code makes one expansion and add the child to the hashtable childNodes
-					int[] nextStateIndex = onlineSynchronizer.doTransition(currStateIndex, currOutgoingEvents[i]);
-					
-					int changedIndex = -1;
-					for (int k=0; k<activeAutomataIndex.length; k++)
-					{
-						if (nextStateIndex[activeAutomataIndex[k]] != currStateIndex[activeAutomataIndex[k]]) 
-						{
-							changedIndex = k;
-							break;
-						}
-					}
-					
-					if (changedIndex > -1) // || activeAutomataIndex.length == plantAutomata.size()) 
-					{
-						Integer currKey = sched.getKey(nextStateIndex);
-						
-						if (!childNodes.contains(currKey)) 
-						{
-							double newCost = indexMap.getStateAt(plantAutomata.getAutomatonAt(changedIndex), nextStateIndex[activeAutomataIndex[changedIndex]]).getCost();
-							double[] newCosts = sched.updateCosts(getCosts(node), changedIndex, newCost);
-							
-							Node newNode = node.emptyClone();
-							newNode.setBasis(makeNodeBasis(nextStateIndex, sched.getKey(node), newCosts));
-							childNodes.put(currKey, newNode);
-						}
-					}
-				}
-			}
-		}
+        for (int i=0; i<currOutgoingEvents.length; i++) 
+        {           
+            if (onlineSynchronizer.isEnabled(currOutgoingEvents[i])) 
+            {
+                // If uncontrollable events should be immediately chosen when possible,
+                // special treatment is needed when finding the successors of the current state...
+                if (immediateChoiceAtUncontrollability)
+                {            
+                    if (uncontrollableEventFound && indexForm.getControllableEventsTable()[currOutgoingEvents[i]])
+                    {
+                        // If there was an uncontrollable event detected earlier, while the current event
+                        // is controllable, do nothing
+                        //TODO.... make this nothing-doingness only occur when uc-event can occur right now (before c-sigma in other words)
+                    }
+                    else
+                    {
+                        if (!uncontrollableEventFound && !indexForm.getControllableEventsTable()[currOutgoingEvents[i]])
+                        {
+                            // If the current event is the first uncontrollanble event that is found 
+                            // during this expansion, then previously collected "controllable" 
+                            // successors are no longer legitimate successors. Thus the 'children'-list
+                            // is cleared. 
+                            uncontrollableEventFound = true;
+                            childNodes.clear();
+                        }
 
-		return childNodes.values();
+                        // The following code makes one expansion and add the child to the hashtable childNodes
+                        int[] nextStateIndex = onlineSynchronizer.doTransition(currStateIndex, currOutgoingEvents[i]);
+
+                        int changedIndex = -1;
+                        for (int k=0; k<activeAutomataIndex.length; k++)
+                        {
+                            if (nextStateIndex[activeAutomataIndex[k]] != currStateIndex[activeAutomataIndex[k]]) 
+                            {
+                                changedIndex = k;
+                                break;
+                            }
+                        }
+
+                        if (changedIndex > -1) // || activeAutomataIndex.length == plantAutomata.size()) 
+                        {
+                            Integer currKey = sched.getKey(nextStateIndex);
+
+                            if (!childNodes.contains(currKey)) 
+                            {
+                                double newCost = indexMap.getStateAt(plantAutomata.getAutomatonAt(changedIndex), nextStateIndex[activeAutomataIndex[changedIndex]]).getCost();
+                                double[] newCosts = sched.updateCosts(getCosts(node), changedIndex, newCost);
+
+                                Node newNode = node.emptyClone();
+                                newNode.setBasis(makeNodeBasis(nextStateIndex, sched.getKey(node), newCosts));
+                                childNodes.put(currKey, newNode);
+                            }
+                        }
+                    }	
+                }
+                else
+                {                    
+                    // The following code makes one expansion and add the child to the hashtable childNodes
+                    int[] nextStateIndex = onlineSynchronizer.doTransition(currStateIndex, currOutgoingEvents[i]);
+
+                    int changedIndex = -1;
+                    for (int k=0; k<activeAutomataIndex.length; k++)
+                    {
+                        if (nextStateIndex[activeAutomataIndex[k]] != currStateIndex[activeAutomataIndex[k]]) 
+                        {
+                            changedIndex = k;
+                            break;
+                        }
+                    }
+
+                    if (changedIndex > -1) // || activeAutomataIndex.length == plantAutomata.size()) 
+                    {                       
+                        Integer currKey = sched.getKey(nextStateIndex);
+
+                        if (!childNodes.contains(currKey)) 
+                        {                            
+                            double newCost = indexMap.getStateAt(plantAutomata.getAutomatonAt(changedIndex), nextStateIndex[activeAutomataIndex[changedIndex]]).getCost();
+                            double[] newCosts = sched.updateCosts(getCosts(node), changedIndex, newCost);
+
+                            Node newNode = node.emptyClone();
+                            newNode.setBasis(makeNodeBasis(nextStateIndex, sched.getKey(node), newCosts));
+                            childNodes.put(currKey, newNode);
+                        }
+                    }
+                }
+            }
+        }
+        
+        return childNodes.values();
     }
 
 
@@ -527,13 +529,13 @@ public class NodeExpander
 // 		return new long[]{key, nodeArrayIndex};
 //     }
 
-	/**
+    /**
 	 * Combines the state indices of the current state and its parent, together
 	 * with the costs (currentCosts, accumulatedCost and estimatedCost) into an
 	 * int-array that represent the current node.
 	 */
     public double[] makeNodeBasis(int[] stateIndices, int parentNodeKey, double[] costs) 
-	{
+    {
 // 		if (parentNodeKey == null) 
 // 		{
 // 			// Ändra detta
@@ -545,28 +547,28 @@ public class NodeExpander
 // 		}
 
 // 		double[] newNodeBasis = new double[stateIndices.length + parentNodeKeys.length + costs.length];
-		double[] newNodeBasis = new double[stateIndices.length + 2 + costs.length];
-	
-		for (int i=0; i<stateIndices.length; i++)
-		{
-			newNodeBasis[i] = stateIndices[i];
-		}
+        double[] newNodeBasis = new double[stateIndices.length + 2 + costs.length];
+
+        for (int i=0; i<stateIndices.length; i++)
+        {
+            newNodeBasis[i] = stateIndices[i];
+        }
 
 // 		for (int i=0; i<parentNodeKeys.length; i++)
 // 		{
 // 			newNodeBasis[i + stateIndices.length] = parentNodeKeys[i];
 // 		}
 
-		newNodeBasis[stateIndices.length] = parentNodeKey;
-		newNodeBasis[stateIndices.length + 1] = -1;
+        newNodeBasis[ModifiedAstar.PARENT_INDEX] = parentNodeKey;
+        newNodeBasis[stateIndices.length + 1] = -1;
 
-		for (int i=0; i<costs.length; i++)
-		{
+        for (int i=0; i<costs.length; i++)
+        {
 // 			newNodeBasis[i + stateIndices.length + parentNodeKeys.length] = costs[i];
-			newNodeBasis[i + stateIndices.length + 2] = costs[i];
-		}
+            newNodeBasis[i + stateIndices.length + 2] = costs[i];
+        }
 
-		return newNodeBasis;
+        return newNodeBasis;
     }
 
 	public double[] getCosts(Node node)
@@ -600,14 +602,14 @@ public class NodeExpander
      */
     public double[] makeInitialNodeBasis()
     {
-		int nrOfPlants = plantAutomata.size();
+        int nrOfPlants = plantAutomata.size();
         int[] initialStates = AutomataIndexFormHelper.createState(theAutomata.size());
         double[] initialCosts = new double[nrOfPlants + 2];
         
         // Initial state indices are stored
         for (int i=0; i<theAutomata.size(); i++)
         {
-			Automaton currAuto = indexMap.getAutomatonAt(i);
+            Automaton currAuto = indexMap.getAutomatonAt(i);
             initialStates[indexMap.getAutomatonIndex(currAuto)] = indexMap.getStateIndex(currAuto, currAuto.getInitialState());
         }
         
@@ -625,13 +627,13 @@ public class NodeExpander
         
         // The NodeExpander combines the information, together with the parent-information,
         // which is null for the initial state.
-		// 		return expander.makeNode(initialStates, null, initialCosts);
+        // 		return expander.makeNode(initialStates, null, initialCosts);
         return makeNodeBasis(initialStates, -1, initialCosts);
     }
 
-	public AutomataIndexMap getIndexMap()
-	{
-		return indexMap;
-	}
+    public AutomataIndexMap getIndexMap()
+    {
+            return indexMap;
+    }
 }
    

@@ -108,7 +108,7 @@ public final class Args
         }
     }    
 
-        /**
+    /**
      * Throw an <code>IndexOutOfBoundsException</code> if not 0 <= aNumber <= Integer.MAX_VALUE
      * returns <code>false</code>.
      */

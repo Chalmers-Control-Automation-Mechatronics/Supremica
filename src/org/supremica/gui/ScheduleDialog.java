@@ -26,7 +26,7 @@ public class ScheduleDialog
     public static final String VIS_GRAPH_NODE_RELAXATION = "visibility graph (node)";
     public static final String BRUTE_FORCE_RELAXATION = "brute force";
     private static final String OPTIMAL = "optimal";
-    private static final String SUBOPTIMAL = "random path";
+    private static final String SUBOPTIMAL = "suboptimal";
     
     private static final long serialVersionUID = 1L;
     private static final String[] optimizationMehtods = new String[]{MODIFIED_A_STAR, MILP, VIS_GRAPH, MULTITHREADED_A_STAR}; //, "Modified IDA*", "Modified SMA*"};
@@ -249,7 +249,7 @@ public class ScheduleDialog
                     //temp
                     sched = new ModifiedAstar(selectedAutomata, ONE_PRODUCT_RELAXATION, 
                             nodeExpander.isSelected(), buildAutomaton.isSelected(), this, 
-                            new double[]{100, 200});
+                            new double[]{30, 40});
                     
                     
                     
