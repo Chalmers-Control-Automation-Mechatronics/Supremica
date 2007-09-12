@@ -478,31 +478,16 @@ public class Milp
                     }
                 }
             }
-            
+                       
             // Remove the added epsilons from the smallest time, thus obtaining the true smallest time
             smallestTime = removeEpsilons(smallestTime);
-            
-            // Add the transition time to the name of the state-to-be-in-the-schedule
-            currScheduledState.setName(currScheduledState.getName() + ";  firing_time = " + smallestTime);
-            //			currScheduledState.setCost(smallestTime);
             
             // Make a transition (in the synchronizer) to the state that is reachable in one step at cheapest cost
             // This state will be the next parting point in our walk
             currComposedStateIndices = stepper.step(currComposedStateIndices, currOptimalEvent);
-
+            
             // Update the schedule automaton
-            State nextScheduledState = makeScheduleState(currComposedStateIndices);
-            
-            if (! schedule.getAlphabet().contains(currOptimalEvent))
-            {
-                schedule.getAlphabet().addEvent(currOptimalEvent);
-            }
-            schedule.addArc(new Arc(currScheduledState, nextScheduledState, currOptimalEvent));
-            
-            //temp (fulhack)
-//            synthState = synthState.nextState(currOptimalEvent);
-
-            currScheduledState = nextScheduledState;
+            State nextScheduledState;
             
             // If all the states that build up the current state are accepting, make the composed state accepting too
             boolean isAccepting = true;
@@ -514,37 +499,60 @@ public class Milp
                 }
             }
             
+            // Connect the last transition of the schedule to the initial state (that is also made marked)
             if (isAccepting)
             {
                 if (smallestTime != makespan)
                 {
                     throw new Exception("Makespan value does NOT correspond to the cost of the final state of the schedule (sched_time = " + smallestTime + "; makespan = " + makespan + "). Something went wrong...");
-                }
+                }     
                 
-                currScheduledState.setAccepting(true);
-                currScheduledState.setName(currScheduledState.getName() + ";  makespan = " + makespan);
+                nextScheduledState = schedule.getInitialState();
+                nextScheduledState.setAccepting(true);
+                nextScheduledState.setName(nextScheduledState.getName() + ";  makespan = " + makespan);
             }
+            else
+            {
+                // Add the next state to the schedule
+                nextScheduledState = makeScheduleState(currComposedStateIndices);
+            }
+            
+            // Add the transition time to the name of the state-to-be-in-the-schedule
+            currScheduledState.setName(currScheduledState.getName() + ";  firing_time = " + smallestTime);
+
+            if (! schedule.getAlphabet().contains(currOptimalEvent))
+            {
+                schedule.getAlphabet().addEvent(currOptimalEvent);
+            }
+            schedule.addArc(new Arc(currScheduledState, nextScheduledState, currOptimalEvent));
+            
+            //temp (fulhack)
+//            synthState = synthState.nextState(currOptimalEvent);
+
+            currScheduledState = nextScheduledState;
         }
+
         
-        // A dummy reset-event that returns the schedule automaton from its accepting
-        // to its initial state. Needed to describe repetitive working cycles...
-        String resetEventName = "reset";
-        while (theAutomata.getPlantAutomata().getUnionAlphabet().contains(resetEventName))
-        {
-            resetEventName += "1";
-        }
-        LabeledEvent resetEvent = new LabeledEvent(resetEventName);
         
-        // The reset event brings the schedule to its initial state...
-        schedule.getAlphabet().addEvent(resetEvent);
-        schedule.addArc(new Arc(currScheduledState, schedule.getInitialState(), resetEvent));
-        
-        // ...But then also the participating plants should have this event in their initial states
-        for (Automaton plantAuto : theAutomata.getPlantAutomata())
-        {
-            plantAuto.getAlphabet().addEvent(resetEvent);
-            plantAuto.addArc(new Arc(plantAuto.getInitialState(), plantAuto.getInitialState(), resetEvent));
-        }
+//        // A dummy reset-event that returns the schedule automaton from its accepting
+//        // to its initial state. Needed to describe repetitive working cycles...
+//        String resetEventName = "reset";
+//        while (theAutomata.getPlantAutomata().getUnionAlphabet().contains(resetEventName))
+//        {
+//            resetEventName += "1";
+//        }
+//        LabeledEvent resetEvent = new LabeledEvent(resetEventName);
+//        
+//        // The reset event brings the schedule to its initial state...
+//        schedule.getAlphabet().addEvent(resetEvent);
+//        schedule.addArc(new Arc(currScheduledState, schedule.getInitialState(), resetEvent));
+//        
+//        // ...But then also the participating plants should have this event in their initial states
+//        for (Automaton plantAuto : theAutomata.getPlantAutomata())
+//        {
+//            plantAuto.getAlphabet().addEvent(resetEvent);
+//            plantAuto.addArc(new Arc(plantAuto.getInitialState(), plantAuto.getInitialState(), resetEvent));
+//        }
          
         addAutomatonToGui(schedule);
     }

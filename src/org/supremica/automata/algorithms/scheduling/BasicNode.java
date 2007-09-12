@@ -1,5 +1,13 @@
 package org.supremica.automata.algorithms.scheduling;
 
+/* 
+ * This class implements the basic node, wrapping some useful information stored in:
+ *      double[] nodeBasis = [state_0_index, ..., state_m_index, -1, 0,
+ *                            parent_node_key, index_of_curr_parent_within_parent_node 
+ *                            (-1 if only one instance of the parent have been opened),
+ *                            current_costs_0, ..., current_costs_k,
+ *                            accumulated_cost, estimate_value].
+ */
 public class BasicNode
 	implements Node
 {

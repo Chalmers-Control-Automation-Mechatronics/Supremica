@@ -7,9 +7,11 @@ import org.supremica.automata.*;
 public class OneProductRelaxer
 	implements Relaxer
 {
-	private NodeExpander expander; 
-	private ModifiedAstar scheduler;
-	private Automata plantAutomata;
+    private NodeExpander expander; 
+    private ModifiedAstar scheduler;
+    private Automata plantAutomata;
+    
+    private org.supremica.log.Logger logger = org.supremica.log.LoggerFactory.createLogger(this.getClass());
 
     /**
      * The remaining cost for each state of each robot (if run independently of other robots).
@@ -17,15 +19,15 @@ public class OneProductRelaxer
      */
     private double[][] remainingCosts;
 	
-	public OneProductRelaxer(NodeExpander expander, ModifiedAstar scheduler)
-		throws Exception
-	{
-		this.expander = expander;
-		this.scheduler = scheduler;
-		plantAutomata = scheduler.getPlantAutomata();
-				
-		initRemainingCosts();
-	}
+    public OneProductRelaxer(NodeExpander expander, ModifiedAstar scheduler)
+            throws Exception
+    {
+            this.expander = expander;
+            this.scheduler = scheduler;
+            plantAutomata = scheduler.getPlantAutomata();
+
+            initRemainingCosts();
+    }
 
     /**
      * Calculates the remaining (independent) cycle times for each robot (i.e. as if there
@@ -35,9 +37,9 @@ public class OneProductRelaxer
      * and visibility graph).
      */
     private void initRemainingCosts()
-		throws Exception
+        throws Exception
     {
-		remainingCosts = new double[plantAutomata.size()][];
+        remainingCosts = new double[plantAutomata.size()][];
 
         for (int i=0; i<plantAutomata.size(); i++)
         {
@@ -54,9 +56,9 @@ public class OneProductRelaxer
                 markedState = stateIt.next();
                 
                 if (markedState.isAccepting())
-				{
+                {
                     break;
-				}
+                }
             }
             
             if (! markedState.isAccepting())
@@ -68,14 +70,14 @@ public class OneProductRelaxer
             
             remainingCosts[i] = new double[theAuto.nbrOfStates()];
             for (int j=0; j<remainingCosts[i].length; j++)
-			{
+            {
                 remainingCosts[i][j] = -1;
             }
 
             if (markedState == null)
-			{
+            {
                 return;
-			}
+            }
             else
             {
                 remainingCosts[i][expander.getIndexMap().getStateIndex(theAuto, markedState)] = markedState.getCost();
@@ -91,9 +93,9 @@ public class OneProductRelaxer
                         Arc currArc = incomingArcIterator.next();
                         State currState = currArc.getFromState();
                         State nextState = currArc.getToState();
-						int currStateIndex = expander.getIndexMap().getStateIndex(theAuto, currState);
-						int nextStateIndex = expander.getIndexMap().getStateIndex(theAuto, nextState);
-                        
+                        int currStateIndex = expander.getIndexMap().getStateIndex(theAuto, currState);
+                        int nextStateIndex = expander.getIndexMap().getStateIndex(theAuto, nextState);
+
                         if (remainingCosts[i][currStateIndex] == -1)
                         {
                             remainingCosts[i][currStateIndex] = remainingCosts[i][nextStateIndex] + nextState.getCost();
@@ -115,7 +117,7 @@ public class OneProductRelaxer
         }
     }
 
-   	/**
+    /**
 	 * This returns the one-product relaxation value for the supplied node. 
 	 * This is done by calculating the remaining cost for each robot/plant. 
 	 * The maximum remaining cost is returned to be used as an estimate of 
@@ -126,23 +128,23 @@ public class OneProductRelaxer
 	 * in this case it is the "1-product relaxation"
 	 */
     public double getRelaxation(Node node) 
-		throws Exception
-	{
-		double estimate = 0;
-		double[] currCosts = expander.getCosts(node);
-		int[] activeAutomataIndex = scheduler.getActiveAutomataIndex();
-	
-		for (int i=0; i<scheduler.getActiveLength(); i++) 
-		{
-			double altEstimate = currCosts[i] + remainingCosts[i][(int)node.getValueAt(scheduler.getActiveAutomataIndex()[i])]; 
-	    
-			if (altEstimate > estimate)
-			{
-				estimate = altEstimate;
-			}
-		}
-	
-		return estimate;
+        throws Exception
+    {
+        double estimate = 0;
+        double[] currCosts = expander.getCosts(node);
+        int[] activeAutomataIndex = scheduler.getActiveAutomataIndex();
+
+        for (int i=0; i<scheduler.getActiveLength(); i++) 
+        {
+            double altEstimate = currCosts[i] + remainingCosts[i][(int)node.getValueAt(scheduler.getActiveAutomataIndex()[i])]; 
+
+            if (altEstimate > estimate)
+            {
+                estimate = altEstimate;
+            }
+        }
+        
+        return estimate;
     }
 
 	public double[][] getRemainingCosts()
