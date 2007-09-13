@@ -238,7 +238,7 @@
     -->
     <target name="compileAndRun" depends="compile,runLocal"/>
     
-    <target name="compile" depends="compile_supremica,compile_supremica_groovy,compile_supremica_tests,compile_supremica_tests_groovy"/>
+    <target name="compile" depends="compile_supremica,compile_supremica_groovy,compile_supremica_tests,compile_supremica_tests_groovy,compile_manufacturingTables_jaxb"/>
     
     <target name="compile_supremica" depends="-startfiles_local_supremica">
         <javac debug="on"
@@ -294,7 +294,7 @@
 *	Reuses existing class files, but recompiles those
 *	source files that have changed.
     -->
-    <target name="compile_manufacturingTables_jaxb" depends="build_rop_ppn_jaxb">
+    <target name="compile_manufacturingTables_jaxb" depends="build_rop_copvision">
         <javac
             srcdir="${src}"
             destdir="${build}"
@@ -486,8 +486,8 @@ Class-Path: ${manifest.pathlist}</echo>
         <ant dir="${waters.dir}" target="jaxb-jar" inheritAll="false"/>
     </target>
     
-    <target name="build_rop_ppn_jaxb" description="builds rop_ppn">
-        <ant dir="schema/" target="gen_manufacturingtables_rop_ppn" inheritAll="false"/>
+    <target name="build_rop_copvision" description="builds rop copvision">
+        <ant dir="schema/" target="gen_manufacturingtables_rop_copvision" inheritAll="false"/>
     </target>
     
     <target name="cpp_waters">
