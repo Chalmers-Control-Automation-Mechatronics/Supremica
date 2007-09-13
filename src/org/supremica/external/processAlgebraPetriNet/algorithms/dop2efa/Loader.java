@@ -1,8 +1,6 @@
 package org.supremica.external.processAlgebraPetriNet.algorithms.dop2efa;
 
 import java.lang.Object;
-import java.util.Iterator;
-import java.util.List;
 import java.io.*;
 
 import javax.xml.bind.*;
@@ -11,7 +9,7 @@ import javax.xml.bind.*;
 //OBS
 //class to save and open files in XML format
 //use org.supremica.manufacturingTables.management.Loader;
-//then it is done
+//then it is ready
 //OBS
 
 public class Loader {

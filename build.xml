@@ -238,7 +238,7 @@
     -->
     <target name="compileAndRun" depends="compile,runLocal"/>
     
-    <target name="compile" depends="compile_supremica,compile_supremica_groovy,compile_supremica_tests,compile_supremica_tests_groovy,compile_manufacturingTables_jaxb"/>
+    <target name="compile" depends="compile_manufacturingTables_jaxb,compile_supremica,compile_supremica_groovy,compile_supremica_tests,compile_supremica_tests_groovy"/>
     
     <target name="compile_supremica" depends="-startfiles_local_supremica">
         <javac debug="on"
