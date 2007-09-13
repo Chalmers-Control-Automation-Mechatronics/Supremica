@@ -36,7 +36,10 @@ public class RandomPathUsingMilp
     public RandomPathUsingMilp(Automata theAutomata, boolean buildSchedule, ScheduleDialog scheduleDialog)
         throws Exception
     {
-        super(theAutomata, buildSchedule, scheduleDialog);
+        //temp_uc
+//        super(theAutomata, buildSchedule, scheduleDialog);
+        //temp
+        super(theAutomata, buildSchedule);
     }
         
     protected void callMilpSolver()
