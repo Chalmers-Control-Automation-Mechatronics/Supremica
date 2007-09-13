@@ -131,6 +131,10 @@ public class Milp
     
     /** The constraints represented by external specifications, in string form. */
     private String externalConstraints = "";
+
+	//temp_debug
+	private java.io.File debugFile;
+	private java.io.BufferedWriter debugWr;
     
     /** 
      * The constraints preventing cross-booking of zone pairs. When R_i first
@@ -208,35 +212,52 @@ public class Milp
     
     public void run()
     {
-        try
-        {
-            schedule();
-        }
-        catch (Exception ex)
-        {
-            if (milpProcess != null)
-            {
-                milpProcess.destroy();
-                milpProcess = null;
-            }
-            if (modelFile != null)
-            {
-                //modelFile.delete();
-            }
-            if (solutionFile != null)
-            {
-                solutionFile.delete();
-            }
-            //temp_uc
-//            if (scheduleDialog != null)
-//            {
-//                scheduleDialog.close();
-//            }
-            
-            //temp_uc
-//            logger.error("Milp::schedule() -> " + ex);
-//            logger.debug(ex.getStackTrace());
-        }
+		try
+		{
+			//temp
+			debugFile = new java.io.File("C:\\Temp\\debug.txt");
+			debugWr = new java.io.BufferedWriter(new FileWriter(debugFile));
+
+			schedule();
+		}
+		catch (Exception ex)
+		{
+			if (milpProcess != null)
+			{
+				milpProcess.destroy();
+				milpProcess = null;
+			}
+			if (modelFile != null)
+			{
+				//modelFile.delete();
+			}
+			if (solutionFile != null)
+			{
+				solutionFile.delete();
+			}
+
+			isRunning = false;
+
+			//temp_uc
+			//            if (scheduleDialog != null)
+			//            {
+			//                scheduleDialog.close();
+			//            }
+
+			//temp_uc
+			//            logger.error("Milp::schedule() -> " + ex);
+			//            logger.debug(ex.getStackTrace());
+		}
+		finally //temp
+		{
+			try
+			{
+				//temp
+				debugWr.flush();
+				debugWr.close();
+			}
+			catch (Exception e) {}
+		}
     }
     
     /****************************************************************************************/
@@ -249,61 +270,98 @@ public class Milp
      */
     public void schedule()
         throws Exception
-    {       
+    {
+		//temp
+		debugWr.write("Starting schedule()\n");
+
         long totalTime = 0;
         
         if (isRunning)
         {
+			debugWr.write("Restarting time (1)\n");
             timer.restart();
+			//temp
+			debugWr.write("Starting initialize()\n");
             initialize();
+			//temp
+			debugWr.write("Finished initialize()\n");
+
         }
         
         // Converts automata to constraints that the MILP-solver takes as input (*.mod file)
         if (isRunning)
         {
-            createExternalConstraints();           
+			//temp
+			debugWr.write("Starting createExternalConstraints()\n");
+            createExternalConstraints();
+			//temp
+			debugWr.write("Finished createExternalConstraints(), starting createBasicConstraints()\n");
             createBasicConstraints();
             
             //new... test... (should be called when mutex constraints already are created)
             //TODO: better name...
+			//temp
+			debugWr.write("Starting createConsecutiveBookingConstraints()\n");
             createConsecutiveBookingConstraints();
-            
+			debugWr.write("Finished createConsecutiveBookingConstraints()\n");
+
+			//temp
+			debugWr.write("Starting writeToMilpFile()\n");
             writeToMilpFile();
+			//temp
+			debugWr.write("Finished writeToMilpFile()\n");
             
             long procTime = timer.elapsedTime();
             //temp_uc
 //            logger.info("Pre-processing time = " + procTime + "ms");
             totalTime += procTime;
+			//temp
+			debugWr.write("Time recorded (1)\n");
         }
         
         // Calls the MILP-solver
         if (isRunning)
         {
+			//temp
+			debugWr.write("Restarting time (2)\n");
             timer.restart();
-            
+
+			//temp
+			debugWr.write("Starting callMilpSolver()\n");
             callMilpSolver();
+			//temp
+			debugWr.write("Finished callMilpSolver()\n");
             
             long procTime = timer.elapsedTime();
             //temp_uc
 //            logger.info("Optimization time = " + procTime + "ms");
             totalTime += procTime;
+			//temp
+			debugWr.write("Time recorded (2)\n");
         }
         
         // Processes the output from the MILP-solver (*.sol file) and stores the optimal times for each state
         if (isRunning)
         {
+			//temp
+			debugWr.write("Time restarted (3)\n");
             timer.restart();
-            
+
+			//temp
+			debugWr.write("Starting processSolutionFile()\n");
             processSolutionFile();
-            
-            //Temp
-            java.awt.Toolkit.getDefaultToolkit().beep();
+			//temp
+			debugWr.write("Finished processSolutionFile()\n");
         }
         
         // Builds the optimal schedule (if solicited)
         if (isRunning)
         {
+			//temp
+			debugWr.write("Starting buildScheduleAutomaton()\n");
             buildScheduleAutomaton();
+			//temp
+			debugWr.write("Finished buildScheduleAutomaton()\n");
             
             long procTime = timer.elapsedTime();
             //temp_uc
@@ -311,11 +369,19 @@ public class Milp
             totalTime += procTime;
             //temp_uc
 //            logger.info("Total time = " + totalTime + "ms");
+			//temp
+			debugWr.write("Time recorded (4)\n");
         }
         
         if (isRunning)
         {
+			//temp
+			debugWr.write("Starting requestStop()\n");
             requestStop(true);
+			//temp
+			debugWr.write("Finished requestStop()\n");
+			//temp
+			debugWr.write("Done!\n");
         }
         else
         {
@@ -326,11 +392,6 @@ public class Milp
 //            {
 //                scheduleDialog.reset();
 //            }
-        }
-        
-        if (isStopped())
-        {
-            java.awt.Toolkit.getDefaultToolkit().beep();
         }
     }
     
@@ -604,21 +665,31 @@ public class Milp
     protected void initialize()
         throws Exception
     {
+		debugWr.write("Creating model file\n");
         modelFile = File.createTempFile("milp", ".mod");
         modelFile.deleteOnExit();
+		debugWr.write("Model file exists\n");
 
+		debugWr.write("Creating solution file\n");
         solutionFile = File.createTempFile("milp", ".sol");
         solutionFile.deleteOnExit();
+		debugWr.write("Solution file exists\n");
         
         //temp_uc
 //        logger.info("model: " + modelFile.getPath());
-//        logger.info("solution: " + solutionFile.getPath());        
+//        logger.info("solution: " + solutionFile.getPath());     
 //        
-        indexMap = new AutomataIndexMap(theAutomata);
+
+		debugWr.write("Creating pathCut-hashtable\n");
         pathCutTable = new Hashtable<State,String>();
-        
+		debugWr.write("PathCut-hashtable exists\n");
+
+		debugWr.write("Calling initAutomata()\n");
         initAutomata();
+		debugWr.write("Returned from initAutomata()\n");
+		debugWr.write("Calling initMutexStates\n");
         initMutexStates();
+		debugWr.write("Returned from initMutexStates\n");
     }
     
     
@@ -632,11 +703,28 @@ public class Milp
     private void initAutomata()
         throws Exception
     {
+		// Making all state names coherent to avoid bugs due to inappropriate state names
+		for (Iterator<Automaton> autIt = theAutomata.iterator(); autIt.hasNext(); )
+		{
+			Automaton auto = autIt.next();
+			int counter = 0;
+			for (Iterator<State> stateIt = auto.stateIterator(); stateIt.hasNext(); )
+			{
+				State currState = stateIt.next();
+				currState.setName("q" + counter++);
+			}
+		}
+
+		// The index map is initialized
+		indexMap = new AutomataIndexMap(theAutomata);
+
+		debugWr.write("Automata pre-initialization\n");
         plants = theAutomata.getPlantAutomata();
         zones = new Automata();
         externalSpecs = new Automata();
         Automata allSpecs = theAutomata.getSpecificationAutomata();
-        
+		debugWr.write("Automata pre-initialized!\n");
+
         Hashtable<Automaton, Automata> toBeSynthesizedSet = new Hashtable<Automaton, Automata>(plants.size());
         for (Iterator<Automaton> specIt = allSpecs.iterator(); specIt.hasNext(); )
         {
@@ -672,14 +760,21 @@ public class Milp
                 toBeSynthesizedSet.put(latestPlant, toBeSynthesized);
             }
         }
+
+		debugWr.write("First for-loop in initAutomata() done\n");
         
         for (Enumeration<Automaton> keysEnum = toBeSynthesizedSet.keys(); keysEnum.hasMoreElements(); )
         {
+			debugWr.write("In the second for-loop in initAutomata()\n");
+
             Automaton plant = keysEnum.nextElement();
             Automata toBeSynthesized = toBeSynthesizedSet.get(plant);
-            
+
+			debugWr.write("before the if (toBeSynthesided)-part\n");
             if (toBeSynthesized != null)
             {
+				debugWr.write("in the ''if''\n");
+
                 // Store the costs of each of the plants states
                 double[] costs = new double[plant.nbrOfStates()];
                 for (Iterator<State> stateIter = plant.stateIterator(); stateIter.hasNext(); )
@@ -688,6 +783,8 @@ public class Milp
                     int stateIndex = indexMap.getStateIndex(plant, currState);
                     costs[stateIndex] = currState.getCost();
                 }
+
+				debugWr.write("Will set synthesizer options\n");
                 
                 // If there are several automata with similar names (one is a plant the other are
                 // restricting specification), then perform a synthesis
@@ -697,23 +794,39 @@ public class Milp
                 synthesizerOptions.setPurge(true);
                 synthesizerOptions.setMaximallyPermissive(true);
                 synthesizerOptions.setMaximallyPermissiveIncremental(true);
+
+				debugWr.write("Synthesizer-options set\n");
                 
                 AutomataSynthesizer synthesizer = new AutomataSynthesizer(toBeSynthesized, SynchronizationOptions.getDefaultSynthesisOptions(), synthesizerOptions);
-                
+
+				debugWr.write("Synthesizer initialized\n");
+
                 Automaton restrictedPlant = synthesizer.execute().getFirstAutomaton();
+				debugWr.write("Synthetization executed\n");
                 restrictedPlant.setName(plant.getName());
                 restrictedPlant.setType(AutomatonType.PLANT);
+				debugWr.write("The name for the synch.composition is set\n");
+				debugWr.write("restrictedPlant = " + restrictedPlant + "\n");
                 
                 // Set the state costs for the resulting synthesized automaton in an appropriate way
                 for (Iterator<State> stateIter = restrictedPlant.stateIterator(); stateIter.hasNext(); )
                 {
+					debugWr.write("In the critical for-loop\n");
                     State currState = stateIter.next();
+					debugWr.write("state = " + currState + "\n");
+
                     String stateName = currState.getName().substring(0, currState.getName().indexOf("."));
+					debugWr.write("State name set\n");
                     int stateIndex = indexMap.getStateIndex(restrictedPlant, new State(stateName));
+					debugWr.write("State index retrieved\n");
                     
                     currState.setIndex(stateIndex);
+					debugWr.write("State index set\n");
                     currState.setCost(costs[stateIndex]);
+					debugWr.write("State cost set\n");
                 }
+
+				debugWr.write("State costs are updated (inner for-loop done)\n");
                 
                 // Remove the specifications that have been synthesized
                 String str = "";
@@ -728,16 +841,22 @@ public class Milp
                         allSpecs.removeAutomaton(isSynthesized);
                     }
                 }
+
+				debugWr.write("Synthesized specifications removed (2-nd inner for-loop)\n");
                 
                 String plantName = restrictedPlant.getName();
                 plants.removeAutomaton(plantName);
                 restrictedPlant.setName(plantName + "_constrained");
                 plants.addAutomaton(restrictedPlant);
+
+				debugWr.write("Constrained plant added\n");
                 
                 //temp_uc
 //                logger.info(str.substring(0, str.lastIndexOf("||")) + " synthesized into " + restrictedPlant.getName());
             }
         }
+
+		debugWr.write("Second for-loop in initAutomata() done\n");
         
         // Rescale the times in plants if necessary
 //        rescalePlantTimes();
@@ -758,6 +877,8 @@ public class Milp
                 externalSpecs.addAutomaton(spec);
             }
         }
+
+		debugWr.write("Third for-loop in initAutomata() done\n");
         
         // Filling theAutomata with SHALLOW copies of plants and zones
         theAutomata = new Automata(plants, true);
@@ -765,6 +886,8 @@ public class Milp
         theAutomata.addAutomata(externalSpecs);
         indexMap = new AutomataIndexMap(theAutomata);
         updateGui(theAutomata);
+
+		debugWr.write("Getting out of initAutomata()\n");
     }
     
     /** 
@@ -814,6 +937,8 @@ public class Milp
     private void initMutexStates()
         throws Exception
     {
+		debugWr.write("In initMutexStates()\n");
+
         bookingTics = new int[zones.size()][plants.size()][2][1];
         unbookingTics = new int[zones.size()][plants.size()][2][1];
         
@@ -830,6 +955,8 @@ public class Milp
                 unbookingTics[i][j][EVENT_SWITCH][0] = -1;
             }
         }
+
+		debugWr.write("First for-loop in initMutexStates() done\n");
         
         for (int i=0; i<zones.size(); i++)
         {
@@ -888,6 +1015,8 @@ public class Milp
                                 }
                             }
                         }
+
+						debugWr.write("First inner for-loop in initMutexStates() done\n");
                     }
                     
                     if (bookingStates.size() != unbookingStates.size())
@@ -910,9 +1039,13 @@ public class Milp
                         bookingTics[i][j][EVENT_SWITCH][k] = indexMap.getEventIndex(bookingEvents.get(k));
                         unbookingTics[i][j][EVENT_SWITCH][k] = indexMap.getEventIndex(unbookingEvents.get(k));
                     }
+
+					debugWr.write("Second inner for-loop in initMutexStates() done\n");
                 }
             }
         }
+
+		debugWr.write("initMutexStates() done\n");
     }
     
     private boolean isMutexZone(Automaton spec)
