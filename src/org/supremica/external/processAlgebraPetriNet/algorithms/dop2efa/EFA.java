@@ -39,7 +39,7 @@ public class EFA extends ExtendedAutomaton{
 	   //OBS 
 	   //problem whit guard and action
 	   guard = "";
-	   //action ="";
+	   action ="";
 	   //remove then solved
 	   //OBS
 	   
