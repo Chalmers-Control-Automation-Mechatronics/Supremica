@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.analysis
 //# CLASS:   ControlLoopChecker
 //##########################################################################
-//# $Id: CommandLineTool.java,v 1.4 2007-08-21 00:03:16 robi Exp $
+//# $Id: CommandLineTool.java,v 1.5 2007-09-13 23:19:13 robi Exp $
 //##########################################################################
 
 package net.sourceforge.waters.model.analysis;
@@ -90,13 +90,15 @@ public class CommandLineTool
       final ClassLoader loader = CommandLineTool.class.getClassLoader();
       try {
         final Class<?> lclazz = loader.loadClass(LOGGERFACTORY);
+        final Method method0 = lclazz.getMethod("getInstance");
+        final Object loggerfactory = method0.invoke(null);
         if (verbose) {
           final Method method =
             lclazz.getMethod("logToStream", PrintStream.class);
-          method.invoke(null, System.err);
+          method.invoke(loggerfactory, System.err);
         } else {
           final Method method = lclazz.getMethod("logToNull");
-          method.invoke(null);
+          method.invoke(loggerfactory);
         }
       } catch (final ClassNotFoundException exception) {
         // No loggers---no trouble ...
