@@ -7,7 +7,6 @@ import java.io.*;
 
 import javax.xml.bind.*;
 
-import org.supremica.manufacturingTables.xsd.rop_copvision.*;
 
 //OBS
 //class to save and open files in XML format
