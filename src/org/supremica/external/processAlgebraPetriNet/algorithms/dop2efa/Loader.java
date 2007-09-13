@@ -1,7 +1,8 @@
 package org.supremica.external.processAlgebraPetriNet.algorithms.dop2efa;
 
 import java.lang.Object;
-import java.io.*;
+import java.io.File;
+import java.io.FileOutputStream;
 
 import javax.xml.bind.*;
 

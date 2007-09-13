@@ -1,23 +1,22 @@
-/**
- * Help class for convert dop to efa PGA stands for Process Guard and
- * Action.
- */
 package org.supremica.external.processAlgebraPetriNet.algorithms.dop2efa;
 
 /**
+ *	Help class for building transitions. PGA stands for Process Guard and
+ *	Action.
  *
- * @author David Millares
+ *	@author David Millares
  *
  */
 public class PGA {
 	
-	//String
+	//keywords
 	static final public String ONLY_START = "_START_";
 	static final public String ONLY_STOP = "_STOP_";
 	
 	static final public String GUARD = "_GUARD_";
 	static final public String ACTION = "_ACTION_";
 	
+	//
 	static final private String AND = "&";
 	
 	//
@@ -25,6 +24,7 @@ public class PGA {
 	private String startGuard, stopGuard;
 	private String startAction, stopAction;
 	
+	//
 	private boolean only_start;
 	private boolean only_stop;
 	
@@ -62,6 +62,14 @@ public class PGA {
 		this.process = process;
 	}
 	
+	/**
+	 * Take the process name and parse it.
+	 * 
+	 * Parse on order start/stop guard action.
+	 * 
+	 * @param process process name whit keywords 
+	 * @return process name without keywords.
+	 */
 	private String parseProcess(String process){
 		String tmp = "";
 		
