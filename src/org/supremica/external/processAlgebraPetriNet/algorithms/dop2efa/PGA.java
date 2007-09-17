@@ -84,7 +84,7 @@ public class PGA {
 		}
 		
 		//take guard
-		
+		tmp = "";
 		if(process.startsWith(GUARD)){
 			//remove first GUARD
 			process = process.substring(GUARD.length());
@@ -117,7 +117,7 @@ public class PGA {
 		}
 		
 		//take action
-		
+		tmp = "";
 		if(process.startsWith(ACTION)){
 			//remove first ACTION
 			process = process.substring(ACTION.length());

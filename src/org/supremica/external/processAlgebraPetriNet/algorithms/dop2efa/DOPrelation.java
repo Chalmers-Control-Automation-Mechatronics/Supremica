@@ -151,8 +151,12 @@ public class DOPrelation{
 					//build Alternative path
 					start_stop_parallel.setProcess(var_name);
 					
-					start_stop_parallel.setStartGuard(var_name + ">0");
-					start_stop_parallel.setStopAction(var_name + "+=1;");
+					/* Start parallel node by seting it's variable to 1 */
+					start_stop_parallel.setStartAction(var_name + "=1;");
+					
+					/* Continue then parallel node is done, and reset variabel */
+					start_stop_parallel.setStopGuard(var_name + "==" + (ant_parallel_track + 1));
+					start_stop_parallel.setStopAction(var_name + "=0;");
 					
 					pgaList.add(start_stop_parallel);
 					
@@ -266,8 +270,10 @@ public class DOPrelation{
 					
 					//build Alternative path
 					start_stop_parallel.setProcess(var_name);
-					start_stop_parallel.setStartGuard(var_name + ">0");
-					start_stop_parallel.setStopAction(var_name + "+=1;");
+					start_stop_parallel.setStartAction(var_name + "=1;");
+					
+					start_stop_parallel.setStopGuard(var_name + "==" + (ant_parallel_track + 1));
+					start_stop_parallel.setStopAction(var_name + "=0;");
 					
 					pgaList.add(start_stop_parallel);
 					
@@ -303,8 +309,8 @@ public class DOPrelation{
 		final String firstState = "waiting";
 		final String lastState = "finished";
 		
-		String startGuard = "";
-		String stopAction = "";
+		String startGuard = ""; 
+		String stopGuard = "", stopAction = "";
 		
 		String parallel_track = "";
 		
@@ -322,6 +328,8 @@ public class DOPrelation{
 		
 		if(parallel_var.length() > 0){
 			startGuard = parallel_var + ">0";
+			
+			stopGuard = parallel_var + "<" + (activityRelations.length + 1);
 			stopAction = parallel_var + "+=1;";
 		}else{
 			parallel_var = "pa";
@@ -331,7 +339,7 @@ public class DOPrelation{
 		
 		for(int i = 0; i < activityRelations.length; i++){
 			
-			parallel_track = parallel_var +"_"+ i; 
+			parallel_track = parallel_var +"_"+ i;
 			
 			tmp = new EFA(parallel_track,m);
 			m.addAutomaton(tmp);
@@ -348,18 +356,16 @@ public class DOPrelation{
 				seq.setType(RelationType.SEQUENCE);
 				
 				Activity start_par = factory.createActivity();
-				start = PGA.ONLY_START + 
-						PGA.GUARD
-						+startGuard+ 
-						PGA.GUARD + parallel_track;
+				start = PGA.ONLY_START + PGA.GUARD+startGuard+PGA.GUARD
+									   +parallel_track;
 				
 				start_par.setOperation(start);
 				
 				Activity stop_par = factory.createActivity();
-				stop = PGA.ONLY_STOP + 
-						PGA.ACTION
-						+stopAction+ 
-						PGA.ACTION + parallel_track;
+				stop = PGA.ONLY_STOP +PGA.GUARD+stopGuard+PGA.GUARD
+									 +PGA.ACTION+stopAction+PGA.ACTION
+									 +parallel_track;
+				
 				stop_par.setOperation(stop);
 				
 				// lock the relation in a sequence
@@ -374,6 +380,8 @@ public class DOPrelation{
 				/* Activity code */
 				PGA pga = new PGA(((Activity)activityRelations[i]).getOperation());
 				pga.setStartGuard(startGuard);
+				
+				pga.setStopGuard(stopGuard);
 				pga.setStopAction(stopAction);
 				
 				nativeProcess(pga,firstState,lastState,tmp);

@@ -36,13 +36,6 @@ public class EFA extends ExtendedAutomaton{
 	   
 	   this.addEvent(event);
 	   
-	   //OBS 
-	   //problem whit guard and action
-	   guard = "";
-	   action ="";
-	   //remove then solved
-	   //OBS
-	   
 	   //event, guard and action must ends whit ;
 	   if(event.length() > 0 && !event.endsWith(";")){
 		   event = event.concat(";");

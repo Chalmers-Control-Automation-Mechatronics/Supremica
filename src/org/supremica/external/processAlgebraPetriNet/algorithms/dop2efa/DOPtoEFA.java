@@ -36,7 +36,7 @@ public class DOPtoEFA extends DOPrelation{
 			machine = "no_machine";
 		}
 		
-		Module m = new Module(machine,true);
+		Module m = new Module(machine,false);
 		
 		ObjectFactory factory = new ObjectFactory();
 		
@@ -147,6 +147,12 @@ public class DOPtoEFA extends DOPrelation{
 		Relation seq = factory.createRelation();
 		seq.setType(RelationType.SEQUENCE);
 		
+		Relation alt = factory.createRelation();
+		alt.setType(RelationType.ALTERNATIVE);
+		
+		Relation par = factory.createRelation();
+		par.setType(RelationType.PARALLEL);
+		
 		Activity a = factory.createActivity();
 		a.setOperation("a");
 		
@@ -156,23 +162,39 @@ public class DOPtoEFA extends DOPrelation{
 		Activity c = factory.createActivity();
 		c.setOperation("c");
 		
+		Activity d = factory.createActivity();
+		d.setOperation("d");
+		
+		Activity e = factory.createActivity();
+		e.setOperation("e");
+		
+		Activity f = factory.createActivity();
+		f.setOperation("f");
+		
+		Activity g = factory.createActivity();
+		g.setOperation("g");
+		
+		Activity h = factory.createActivity();
+		h.setOperation("h");
+		
+		Activity i = factory.createActivity();
+		i.setOperation("i");
+		
+		
+		par.getActivityRelationGroup().add(g);
+		par.getActivityRelationGroup().add(h);
+		par.getActivityRelationGroup().add(i);
+		
 		seq.getActivityRelationGroup().add(a);
 		seq.getActivityRelationGroup().add(b);
+		seq.getActivityRelationGroup().add(par);
 		seq.getActivityRelationGroup().add(c);
 		
-		Relation alt = factory.createRelation();
-		alt.setType(RelationType.ALTERNATIVE);
+		alt.getActivityRelationGroup().add(d);
+		alt.getActivityRelationGroup().add(e);
+		alt.getActivityRelationGroup().add(f);
 		
-		alt.getActivityRelationGroup().add(a);
-		alt.getActivityRelationGroup().add(b);
-		alt.getActivityRelationGroup().add(c);
 		
-		Relation par = factory.createRelation();
-		par.setType(RelationType.PARALLEL);
-		
-		par.getActivityRelationGroup().add(a);
-		par.getActivityRelationGroup().add(b);
-		par.getActivityRelationGroup().add(c);
 		
 		/*
 		//Test native
@@ -214,9 +236,9 @@ public class DOPtoEFA extends DOPrelation{
 		Relation r = new Relation();
 		r.setType(RelationType.PARALLEL);
 		
-		r.getActivityRelationGroup().add(0, a);
-		r.getActivityRelationGroup().add(1, par);
-		r.getActivityRelationGroup().add(2, par);
+		r.getActivityRelationGroup().add(0, seq);
+		r.getActivityRelationGroup().add(1, alt);
+		//r.getActivityRelationGroup().add(2, c);
 		
 		rop.setRelation(r);
 		

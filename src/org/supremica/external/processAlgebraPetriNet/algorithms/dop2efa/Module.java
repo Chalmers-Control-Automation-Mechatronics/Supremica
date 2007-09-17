@@ -61,16 +61,21 @@ public class Module extends ExtendedAutomata{
 	 * @return name of new parallel variable created
 	 */
 	public String newParrallelInteger(int upperBound){
+		
+		final int lowerBound = 0;
+		final int initialValue = 0;
+		//final int markedValue = 0;
+		
 		if(global_variables_dummy_efa == null){
 			init_global_variables();
 		}
 		
-		String tmp = PARALLEL_PREFIX + parallels;
+		String name = PARALLEL_PREFIX + parallels;
 		parallels = parallels + 1;
 		
 		global_variables_dummy_efa.addIntegerVariable(
-				tmp, 0, upperBound, 0, null);
+				name, lowerBound, upperBound, initialValue, null);
 		
-		return tmp;
+		return name;
 	}
 }
