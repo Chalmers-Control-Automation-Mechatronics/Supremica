@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.module
 //# CLASS:   ModuleCompiler
 //###########################################################################
-//# $Id: ModuleCompiler.java,v 1.80 2007-07-21 22:13:24 robi Exp $
+//# $Id: ModuleCompiler.java,v 1.81 2007-09-17 06:52:18 markus Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.compiler;
@@ -916,11 +916,21 @@ public class ModuleCompiler extends AbstractModuleProxyVisitor
       */
       createForbiddenSelfLoopsInAutomata();
       mGlobalAlphabet.clear();
+      //Test
+      EventProxy prop = mDESFactory.createEventProxy(":accepting",
+              EventKind.PROPOSITION); 
+      addAcceptingPropositionToAutomata(newEvents, prop);
+      //
       mGlobalAlphabet.addAll(newEvents);
     } catch (final EvalException exception) {
       throw wrap(exception);
     }
   }
+
+
+private void addAcceptingPropositionToAutomata(Set<EventProxy> newEvents, EventProxy prop) {
+	// TODO Add prop to global alphabet and to regular automata with marked states.
+}
 
 
 private void addSingleStateSpec() {
@@ -931,7 +941,8 @@ private void addSingleStateSpec() {
 		final Collection<EventProxy> alphabet = new HashSet<EventProxy>();
         alphabet.add(event);
     
-        EventProxy marked = mDESFactory.createEventProxy("marked", EventKind.PROPOSITION);
+        EventProxy marked = mDESFactory.createEventProxy(":accepting", EventKind.PROPOSITION);
+        alphabet.add(marked);
         Collection<EventProxy> props = Collections.singletonList(marked);
         final StateProxy state = mDESFactory.createStateProxy(name, true, props);
         Collection<StateProxy> states = new HashSet<StateProxy>();
@@ -1267,7 +1278,6 @@ private void updateTransitionsInAutomtata()
           }
         }
       }
-      
       newAutomata.put(aut.getName(),
                       mDESFactory.createAutomatonProxy(aut.getName(),
                                                        aut.getKind(),
@@ -1328,7 +1338,7 @@ private void updateTransitionsInAutomtata()
     return variableAutomaton;
   }
 
-  private void createVariableStates(final VariableProxy variable,
+private void createVariableStates(final VariableProxy variable,
                                     final RangeValue range,
                                     final Map<IndexValue,StateProxy> states)
     throws VisitorException
@@ -1342,7 +1352,7 @@ private void updateTransitionsInAutomtata()
     if (markedexpr != null) {
       markedvalue = evalIndex(markedexpr, range);
       // BUG!!! Must use shared event for this!!!
-      prop = mDESFactory.createEventProxy("variableMarking",
+      prop = mDESFactory.createEventProxy(":accepting",
                                           EventKind.PROPOSITION);
     }
     for (final IndexValue item : range.getValues()) {
