@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.module
 //# CLASS:   ModuleCompiler
 //###########################################################################
-//# $Id: ModuleCompiler.java,v 1.81 2007-09-17 06:52:18 markus Exp $
+//# $Id: ModuleCompiler.java,v 1.82 2007-09-17 15:32:44 markus Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.compiler;
@@ -915,12 +915,10 @@ public class ModuleCompiler extends AbstractModuleProxyVisitor
       *  (i.e. not to the variableAutomata. ).
       */
       createForbiddenSelfLoopsInAutomata();
-      mGlobalAlphabet.clear();
       //Test
-      EventProxy prop = mDESFactory.createEventProxy(":accepting",
-              EventKind.PROPOSITION); 
-      addAcceptingPropositionToAutomata(newEvents, prop);
+      //addAcceptingPropositionToAutomata(newEvents);
       //
+      mGlobalAlphabet.clear();
       mGlobalAlphabet.addAll(newEvents);
     } catch (final EvalException exception) {
       throw wrap(exception);
@@ -928,8 +926,55 @@ public class ModuleCompiler extends AbstractModuleProxyVisitor
   }
 
 
-private void addAcceptingPropositionToAutomata(Set<EventProxy> newEvents, EventProxy prop) {
-	// TODO Add prop to global alphabet and to regular automata with marked states.
+private void addAcceptingPropositionToAutomata(Set<EventProxy> newEvents) {
+	final Map<String,AutomatonProxy> newAutomata =
+	      new TreeMap<String,AutomatonProxy>();
+	newAutomata.putAll(mAutomata);
+	
+	boolean containsAccepting = containsAcceptingProp(newEvents);
+	
+	    for (final AutomatonProxy aut: mAutomata.values()) {
+	    	for(final StateProxy state: aut.getStates()){
+	    		if(!state.getPropositions().isEmpty()){
+	    			if(containsAcceptingProp(aut.getEvents())){
+	    				break;
+	    			}
+	    			else{
+	    			final Set<EventProxy> alphabet = new TreeSet<EventProxy>();
+	    			EventProxy prop = mDESFactory.createEventProxy(":accepting",
+	    		            EventKind.PROPOSITION);
+	    			alphabet.add(prop);
+	    			alphabet.addAll(aut.getEvents());
+	    			if(!containsAccepting){
+	    				newEvents.add(prop);
+	    				containsAccepting=true;
+	    			}
+	    			newAutomata.remove(aut.getName());
+	    			newAutomata.put(aut.getName(),
+		                      mDESFactory.createAutomatonProxy(aut.getName(),
+		                                                       aut.getKind(),
+		                                                       alphabet,
+		                                                       aut.getStates(),
+		                                                       aut.getTransitions()));
+	    		break;
+	    		}
+	    		}
+	    	}
+	    }
+	   mAutomata.clear();
+	   mAutomata.putAll(newAutomata);
+}
+
+
+private boolean containsAcceptingProp(Set<EventProxy> newEvents) {
+	EventProxy prop = mDESFactory.createEventProxy(":accepting",
+            EventKind.PROPOSITION);
+	for(EventProxy event: newEvents){
+		if(event.equalsByContents(prop)){
+			return true;
+		}
+	}
+	return false;
 }
 
 
@@ -2165,7 +2210,6 @@ private void createVariableStates(final VariableProxy variable,
     private final String mSoughtName;
 
   }
-
 
   //#########################################################################
   //# Data Members
