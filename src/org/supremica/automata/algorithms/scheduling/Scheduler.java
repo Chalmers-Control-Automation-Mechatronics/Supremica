@@ -17,9 +17,22 @@ public interface Scheduler
     public void buildScheduleAutomaton()
 		throws Exception;
     
-    /** Returns a string containing information about the optimization process. */
-    public String getOutputString();
+	//@Deprecated
+    ///** Returns a string containing information about the optimization process. */
+    //public String getOutputString();
 
 	/** Returns the schedule automaton. */
 	public Automaton getSchedule();
+
+	/** Returns all info messages that have been generated during a run. */
+	public String getInfoMessages();
+
+	/** Returns all warning messages that have been generated during a run. */
+	public String getWarningMessages();
+
+	/** Returns all error messages that have been generated during a run. */
+	public String getErrorMessages();
+
+	/** Returns all debug messages that have been generated during a run. */
+	public Object[] getDebugMessages();
 }

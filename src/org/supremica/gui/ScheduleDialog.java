@@ -9,29 +9,31 @@ import java.io.*;
 import org.supremica.log.Logger;
 import org.supremica.log.LoggerFactory;
 import org.supremica.automata.Automata;
+import org.supremica.automata.Automaton;
 import org.supremica.automata.algorithms.scheduling.*;
 import org.supremica.gui.ide.actions.IDEActionInterface;
 
 public class ScheduleDialog
     extends JDialog
 {
-    public static final String MODIFIED_A_STAR = "Modified A*";
-    public static final String MILP = "MILP";
-    public static final String VIS_GRAPH = "Visibility Graph";
-    public static final String MULTITHREADED_A_STAR = "Multithreaded A*";
-    
-    public static final String ONE_PRODUCT_RELAXATION = "1-product relax";
-    public static final String TWO_PRODUCT_RELAXATION = "2-product relax";
-    public static final String VIS_GRAPH_TIME_RELAXATION = "visibility graph (time)";
-    public static final String VIS_GRAPH_NODE_RELAXATION = "visibility graph (node)";
-    public static final String BRUTE_FORCE_RELAXATION = "brute force";
-    private static final String OPTIMAL = "optimal";
-    private static final String SUBOPTIMAL = "suboptimal";
-    
+/*
+	public static final String MODIFIED_A_STAR = "Modified A*";
+	public static final String MILP = "MILP";
+	public static final String VIS_GRAPH = "Visibility Graph";
+	public static final String MULTITHREADED_A_STAR = "Multithreaded A*";
+
+	public static final String ONE_PRODUCT_RELAXATION = "1-product relax";
+	public static final String TWO_PRODUCT_RELAXATION = "2-product relax";
+	public static final String VIS_GRAPH_TIME_RELAXATION = "visibility graph (time)";
+	public static final String VIS_GRAPH_NODE_RELAXATION = "visibility graph (node)";
+	public static final String BRUTE_FORCE_RELAXATION = "brute force";
+	private static final String OPTIMAL = "optimal";
+	private static final String SUBOPTIMAL = "suboptimal";
+*/    
     private static final long serialVersionUID = 1L;
-    private static final String[] optimizationMehtods = new String[]{MODIFIED_A_STAR, MILP, VIS_GRAPH, MULTITHREADED_A_STAR}; //, "Modified IDA*", "Modified SMA*"};
-    private static final String[] astarHeuristics = new String[]{ONE_PRODUCT_RELAXATION, SUBOPTIMAL, TWO_PRODUCT_RELAXATION, VIS_GRAPH_TIME_RELAXATION, VIS_GRAPH_NODE_RELAXATION, BRUTE_FORCE_RELAXATION};
-    private static final String[] milpHeuristics = new String[]{OPTIMAL, SUBOPTIMAL};
+	private static final String[] optimizationMethods = new String[] {SchedulingConstants.MODIFIED_A_STAR, SchedulingConstants.MILP, SchedulingConstants.VIS_GRAPH, SchedulingConstants.MULTITHREADED_A_STAR}; //, "Modified IDA*", "Modified SMA*"};
+	private static final String[] astarHeuristics = new String[] {SchedulingConstants.ONE_PRODUCT_RELAXATION, SchedulingConstants.SUBOPTIMAL, SchedulingConstants.TWO_PRODUCT_RELAXATION, SchedulingConstants.VIS_GRAPH_TIME_RELAXATION, SchedulingConstants.VIS_GRAPH_NODE_RELAXATION, SchedulingConstants.BRUTE_FORCE_RELAXATION};
+	private static final String[] milpHeuristics = new String[] {SchedulingConstants.OPTIMAL, SchedulingConstants.SUBOPTIMAL };
     private static Logger logger = LoggerFactory.createLogger(ScheduleDialog.class);
     private JComboBox optiMethodsBox, heuristicsBox;
     private JCheckBox nodeExpander, buildAutomaton, vgDrawer;
@@ -64,7 +66,7 @@ public class ScheduleDialog
         cancelButton = new JButton("Cancel");
         
         JLabel optiMethodsLabel = new JLabel("Optimization methods: \t \t");
-        optiMethodsBox = new JComboBox(optimizationMehtods);
+        optiMethodsBox = new JComboBox(optimizationMethods);
         
         JLabel heuristicsLabel = new JLabel("Heuristics: \t \t");
         heuristicsBox = new JComboBox(astarHeuristics);
@@ -143,6 +145,7 @@ public class ScheduleDialog
                 if (sched != null)
                 {
                     sched.requestStop();
+					reset();
                 }
                 else
                 {
@@ -196,7 +199,7 @@ public class ScheduleDialog
                 try
                 {
                     File resultFile = null;
-                    if (((String)optiMethodsBox.getSelectedItem()).equals(MODIFIED_A_STAR))
+					if (((String)optiMethodsBox.getSelectedItem()).equals(SchedulingConstants.MODIFIED_A_STAR))
                     {
                         resultFile = new File(rootDir + File.separator + "_" + heuristicsBox.getSelectedItem() + ".txt");
                     }
@@ -238,18 +241,18 @@ public class ScheduleDialog
             readMemoryCapacity();
             
             String selectedHeuristic = (String) heuristicsBox.getSelectedItem();
-            if (optiMethodsBox.getSelectedItem().equals(MODIFIED_A_STAR))
+			if (optiMethodsBox.getSelectedItem().equals(SchedulingConstants.MODIFIED_A_STAR))
             {
-                if ((selectedAutomata.getPlantAutomata().size() == 2) && (selectedHeuristic.equals(VIS_GRAPH_TIME_RELAXATION) || selectedHeuristic.equals(VIS_GRAPH_NODE_RELAXATION)))
+				if ((selectedAutomata.getPlantAutomata().size() == 2) && (selectedHeuristic.equals(SchedulingConstants.VIS_GRAPH_TIME_RELAXATION) || selectedHeuristic.equals(SchedulingConstants.VIS_GRAPH_NODE_RELAXATION)))
                 {
                     sched = new VisGraphScheduler(selectedAutomata, vgDrawer.isSelected(), this);
                 }
-                else if (heuristicsBox.getSelectedItem().equals(SUBOPTIMAL))
+				else if (heuristicsBox.getSelectedItem().equals(SchedulingConstants.SUBOPTIMAL))
                 {
                     //temp
-                    sched = new ModifiedAstar(selectedAutomata, ONE_PRODUCT_RELAXATION, 
-                            nodeExpander.isSelected(), buildAutomaton.isSelected(), this, 
-                            new double[]{30, 40});
+					sched = new ModifiedAstar(selectedAutomata, SchedulingConstants.ONE_PRODUCT_RELAXATION, 
+                            nodeExpander.isSelected(), buildAutomaton.isSelected(), new double[]{30, 40});
+                            //temp_uc, this, new double[]{30, 40});
                     
                     
                     
@@ -282,25 +285,25 @@ public class ScheduleDialog
                 }
                 else
                 {
-                    sched = new ModifiedAstar(selectedAutomata, (String) heuristicsBox.getSelectedItem(), nodeExpander.isSelected(), buildAutomaton.isSelected(), this);
+                    sched = new ModifiedAstar(selectedAutomata, (String) heuristicsBox.getSelectedItem(), nodeExpander.isSelected(), buildAutomaton.isSelected()); //, this);
                 }
             }
-            else if (optiMethodsBox.getSelectedItem().equals(MILP))
+			else if (optiMethodsBox.getSelectedItem().equals(SchedulingConstants.MILP))
             {
-                if (selectedHeuristic.equals(OPTIMAL))
+				if (selectedHeuristic.equals(SchedulingConstants.OPTIMAL))
                 {
                     sched = new Milp(selectedAutomata, buildAutomaton.isSelected()); //temp_uc, this);
                 }
-                else if (selectedHeuristic.equals(SUBOPTIMAL))
+				else if (selectedHeuristic.equals(SchedulingConstants.SUBOPTIMAL))
                 {
                     sched = new RandomPathUsingMilp(selectedAutomata, buildAutomaton.isSelected(), this);
                 }
             }
-            else if (optiMethodsBox.getSelectedItem().equals(VIS_GRAPH))
+			else if (optiMethodsBox.getSelectedItem().equals(SchedulingConstants.VIS_GRAPH))
             {
                 sched = new VisGraphScheduler(selectedAutomata, vgDrawer.isSelected(), this);
             }
-            else if (optiMethodsBox.getSelectedItem().equals(MULTITHREADED_A_STAR))
+			else if (optiMethodsBox.getSelectedItem().equals(SchedulingConstants.MULTITHREADED_A_STAR))
             {
                 sched = new MultithreadedAstar(selectedAutomata, (String) heuristicsBox.getSelectedItem(), nodeExpander.isSelected(), buildAutomaton.isSelected(), false, this);
             }
@@ -313,8 +316,43 @@ public class ScheduleDialog
             {
                 throw new Exception("Unknown optimization method");
             }
-            
+
+			logger.info("Scheduling started...");
             sched.startSearchThread();
+
+			// Wait for the Scheduler to become stopped...
+			while (!sched.isStopped())
+			{
+				Thread.sleep(10);
+			}
+			
+			// ... add the schedule automaton to the GUI...
+			addAutomatonToGUI(sched.getSchedule());
+		
+			// ... Print the messages (if there are any) to the screen...
+			if (sched.getInfoMessages() != "")
+			{
+				logger.info(sched.getInfoMessages());
+			}
+			if (sched.getWarningMessages() != "")
+			{
+				logger.warn(sched.getWarningMessages());
+			}
+			if (sched.getErrorMessages() != "")
+			{
+				logger.error(sched.getErrorMessages());
+			}
+			logger.debug(sched.getDebugMessages());
+
+			// ... and dispose of the schedule dialog if there were no errors
+			if (sched.getDebugMessages().length == 0)
+			{
+				done();
+			}
+			else
+			{
+				reset();
+			}
         }
         catch (Exception excp)
         {
@@ -341,7 +379,7 @@ public class ScheduleDialog
                 // Write the results of previous scheduling operation
                 if (sched != null)
                 {
-                    writer.write(sched.getOutputString());
+                    writer.write(sched.getInfoMessages());
                     writer.newLine();
                     writer.newLine();
                 }
@@ -424,6 +462,93 @@ public class ScheduleDialog
 //            return ((IDEActionInterface) ide).getIDE().getActiveDocumentContainer().getAnalyzerPanel().getSelectedAutomata();
 //        }
 //    }
+
+	private void addAutomatonToGUI(Automaton scheduleAuto)
+		throws Exception
+	{
+		if (scheduleAuto != null)
+		{
+			// Choose a name for the schedule automaton
+			String scheduleName = "";
+			while (scheduleName != null && scheduleName.trim() == "")
+			{
+				scheduleName = getIde().getActiveDocumentContainer().getAnalyzerPanel().getNewAutomatonName(
+					"Enter a name for the schedule", "Schedule");
+			}
+
+			// If the name is non-null, add the schedule automaton to the GUI
+			if (scheduleName != null)
+			{
+				scheduleAuto.setName(scheduleName);
+				ide.getActiveDocumentContainer().getAnalyzerPanel().addAutomaton(scheduleAuto);
+   
+				// The following part should be somewhere else, but unfortunately the communication between the editor
+				// and the analyzer are not automatic in the IDE, tuff luck...
+				if (ide.getActiveDocumentContainer().getEditorPanel() != null)
+                {
+                    // Compile into Waters module
+                    net.sourceforge.waters.model.marshaller.ProductDESImporter importer = 
+                            new net.sourceforge.waters.model.marshaller.ProductDESImporter(net.sourceforge.waters.subject.module.ModuleSubjectFactory.getInstance());
+
+                    net.sourceforge.waters.model.module.SimpleComponentProxy component = importer.importComponent(scheduleAuto);
+                    if (ide.getActiveDocumentContainer().getEditorPanel().getEditorPanelInterface().componentNameAvailable(component.getName()))
+					{
+                        // Add to current module
+                        try
+                        {
+                            ide.getActiveDocumentContainer().getEditorPanel().getEditorPanelInterface().addComponent((net.sourceforge.waters.subject.base.AbstractSubject) component);
+
+                            // Add all (new) events to the module
+                            net.sourceforge.waters.subject.module.ModuleSubject module = ide.getActiveDocumentContainer().getEditorPanel().getEditorPanelInterface().getModuleSubject();
+                            boolean problem = false;
+                            for (org.supremica.automata.LabeledEvent event : scheduleAuto.getAlphabet())
+                            {
+                                if (!event.getName().contains("["))
+                                {
+                                    if (!module.getEventDeclListModifiable().containsName(event.getName()))
+                                    {
+                                        final net.sourceforge.waters.model.des.EventProxy proxy = 
+                                                (net.sourceforge.waters.model.des.EventProxy) event;
+                                        final net.sourceforge.waters.subject.module.EventDeclSubject decl =
+                                            new net.sourceforge.waters.subject.module.EventDeclSubject(proxy.getName(),
+                                            proxy.getKind(),
+                                            proxy.isObservable(),
+                                            net.sourceforge.waters.xsd.module.ScopeKind.LOCAL,
+                                            null, null);
+                                        module.getEventDeclListModifiable().add(decl);
+                                    }
+                                }
+                                else
+                                {
+                                    problem = true;
+                                }
+                            }
+                            if (problem)
+                            {
+                                javax.swing.JOptionPane.showMessageDialog(ide.getFrame(), "There is a problem in the back-translation of parametrised events.", "Alert", javax.swing.JOptionPane.WARNING_MESSAGE);
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            ide.getIDE().error("Could not add " + scheduleAuto + " to editor." + ex);
+                        }
+                    }
+                    else
+                    {
+                        javax.swing.JOptionPane.showMessageDialog(ide.getFrame(), "Component: " + component.getName() + " already exists in editor", "Duplicate Name", javax.swing.JOptionPane.ERROR_MESSAGE);
+                    }
+                }
+                else
+                {
+                    javax.swing.JOptionPane.showMessageDialog(ide.getFrame(), "The editor is unknown. The schedule was not added.", "Editor null", javax.swing.JOptionPane.ERROR_MESSAGE);
+                }
+            }
+			else
+			{
+				logger.error("The schedule automaton was not added (schedule.name = null)");
+			}
+		}
+	}
 }
 
     

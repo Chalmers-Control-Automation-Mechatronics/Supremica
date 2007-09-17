@@ -19,8 +19,6 @@ import java.util.*;
 
 import org.supremica.automata.*;
 import org.supremica.gui.ActionMan;
-import org.supremica.gui.ScheduleDialog;
-import org.supremica.log.*;
 import org.supremica.util.ActionTimer;
 
 public class ModifiedAstar
@@ -107,8 +105,9 @@ public class ModifiedAstar
      */
 //     protected boolean useOneProdRelax;
     
-    /** This string contains info about the scheduling, such as time, nr of iterations etc. */
-    protected String outputStr =  "";
+	//@Deprecated (use infoMsgs instead)
+    ///** This string contains info about the scheduling, such as time, nr of iterations etc. */
+    //protected String outputStr =  "";
     
     /**
      * Which heuristic should be chosen. The value is normally supplied by the
@@ -132,20 +131,12 @@ public class ModifiedAstar
      * at the cost of some extra operations.
      */
     protected boolean consistentHeuristic = false;
-    
-    /**
-     * The output stream
-     */
-    private static Logger logger = LoggerFactory.createLogger(ModifiedAstar.class);
-    
+      
     /** Stores the accepting node of the resulting schedule (with a reference to the ancestor node. */
     protected Node acceptingNode = null;
     
     /** This boolean is true if the scheduler-thread should be (is) running */
     protected volatile boolean isRunning = false;
-    
-    /** The dialog box that launched this scheduler */
-    protected ScheduleDialog scheduleDialog;
     
     /** Decides if the schedule should be built */
     protected boolean buildSchedule;
@@ -204,6 +195,11 @@ public class ModifiedAstar
     private final static int X_WEIGHT_INDEX = 0;
     private final static int Y_WEIGHT_INDEX = 1;
 
+	protected String infoMsgs = "";
+	protected String warnMsgs = "";
+	protected String errorMsgs = "";
+	protected ArrayList<StackTraceElement[]> debugMsgs = new ArrayList<StackTraceElement[]>();
+
     
     /****************************************************************************************/
     /*                                 CONSTUCTORS                                          */
@@ -212,7 +208,7 @@ public class ModifiedAstar
     public ModifiedAstar() {}
 
     public ModifiedAstar(Automata theAutomata, String heuristic, boolean manualExpansion, boolean buildSchedule, 
-            boolean isRelaxationProvider, ScheduleDialog scheduleDialog)
+            boolean isRelaxationProvider) 
 		throws Exception
     {
         this.theAutomata = theAutomata;
@@ -220,21 +216,19 @@ public class ModifiedAstar
         this.manualExpansion = manualExpansion;
         this.buildSchedule = buildSchedule;
         this.isRelaxationProvider = isRelaxationProvider;
-        this.scheduleDialog = scheduleDialog;
     }    
 	
-    public ModifiedAstar(Automata theAutomata, String heuristic, boolean manualExpansion, boolean buildSchedule, 
-            ScheduleDialog scheduleDialog)
+    public ModifiedAstar(Automata theAutomata, String heuristic, boolean manualExpansion, boolean buildSchedule) 
             throws Exception
     {
-        this(theAutomata, heuristic, manualExpansion, buildSchedule, false, scheduleDialog);
+        this(theAutomata, heuristic, manualExpansion, buildSchedule, false); 
     }
     
-    public ModifiedAstar(Automata theAutomata, String heuristic, boolean manualExpansion, boolean buildSchedule, 
-            ScheduleDialog scheduleDialog, double[] approximationWeights)
+    public ModifiedAstar(Automata theAutomata, String heuristic, boolean manualExpansion, boolean buildSchedule, double[] approximationWeights) 
+            //ScheduleDialog scheduleDialog, double[] approximationWeights)
             throws Exception
     {
-        this(theAutomata, heuristic, manualExpansion, buildSchedule, false, scheduleDialog);
+        this(theAutomata, heuristic, manualExpansion, buildSchedule, false); 
         
         if (approximationWeights.length != 2)
         {
@@ -262,52 +256,50 @@ public class ModifiedAstar
 
     public void run()
     {
-        try
-        {
-            ActionTimer totalTimer = new ActionTimer();
-            
-            if (isRunning)
-            {
-                totalTimer.restart();
+		try
+		{
+			ActionTimer totalTimer = new ActionTimer();
+
+			if (isRunning)
+			{
+				totalTimer.restart();
 
 				init();
 
 				// Is needed for synchronization purposes
 				isInitialized = true;
-            }
-            
-            if (!isRelaxationProvider)
-            {
-                if (isRunning)
-                {
-                    schedule();
+			}
 
-                    String totalTimeStr = "Total optimization time = " + totalTimer.elapsedTime() + "ms";
-                    logger.info(totalTimeStr);
-                    outputStr += "\t" + totalTimeStr + "\n";
-                }
-                
-                if (isRunning && buildSchedule)
-                {
-                    buildScheduleAutomaton();
-                }
-                
-                if (isRunning)
-                {
-                    requestStop(true);
-                }
-                else
-                {
-                    logger.warn("Scheduling interrupted, openTree.size = " + openTree.size() + "; closedTree.size = " + closedTree.size());
-                    scheduleDialog.reset();
-                }
-            }
-        }
-        catch (Exception ex)
-        {
-            logger.error("A_star::schedule() -> " + ex);
-            logger.debug(ex.getStackTrace());
-        }
+			if (!isRelaxationProvider)
+			{
+				if (isRunning)
+				{
+					schedule();
+				
+					String totalTimeStr = "Total optimization time = " + totalTimer.elapsedTime() + "ms";
+					infoMsgs += "\t" + totalTimeStr + "\n";
+				}
+
+				if (isRunning && buildSchedule)
+				{
+					buildScheduleAutomaton();
+				}
+
+				if (isRunning)
+				{
+					requestStop(true);
+				}
+				else
+				{
+					errorMsgs += "Scheduling interrupted, openTree.size = " + openTree.size() + "; closedTree.size = " + closedTree.size();
+				}
+			}
+		}
+		catch (Exception ex)
+		{
+			errorMsgs += "A_star::schedule() -> " + ex;
+			debugMsgs.add(ex.getStackTrace());
+		}
     }
     
     protected void init()
@@ -338,9 +330,9 @@ public class ModifiedAstar
         // Adds a dummy state in all automata that start on an accepting
         // state. By this, the search can be performed and all the plants that return
         // to their initial states are returned simultaneously with help of a dummy
-        // "reset"-event, whereafter their working cycles can restart synchronized.       
+        // "reset"-event, whereafter their working cycles can restart synchronized.     
         SchedulingHelper.preparePlantsForScheduling(theAutomata.getPlantAutomata());
- 
+
         // Creates an instance of a class that is resposible for the expansion of 
         // the synchronized states. 
         expander = new NodeExpander(manualExpansion, false, theAutomata, this);
@@ -350,7 +342,7 @@ public class ModifiedAstar
 
         // Creates an instance of the relaxation class (search guidance), as 
         // specified by the user through the GUI.
-        initRelaxer(); 
+		initRelaxer();
 
         //Borde r�cka med plantAutomata.size(), fast d� kanske man m�ste �ndra lite p� andra st�llen ocks�
         keyMapping = new int[theAutomata.size()];
@@ -360,7 +352,7 @@ public class ModifiedAstar
             keyMapping[i] = keyMapping[i-1] * (indexMap.getAutomatonAt(i-1).nbrOfStates() + 1);
         }
         
-        outputStr = "Processing times:\n";
+        infoMsgs += "Processing times:\n";
 
         // Initiates the important node indices that are used throughout the search
         initAuxIndices();
@@ -369,8 +361,7 @@ public class ModifiedAstar
         initTrees();
 
         String initTimeStr = "Initialization time = " + timer.elapsedTime() + "ms";
-// 		logger.info(initTimeStr);
-        outputStr += "\t" + initTimeStr + "\n";
+		infoMsgs += "\t" + initTimeStr + "\n";
     }
     
     protected void initAuxIndices()
@@ -396,11 +387,11 @@ public class ModifiedAstar
     protected void initRelaxer()
         throws Exception
     {
-        if (heuristic.equals(ScheduleDialog.ONE_PRODUCT_RELAXATION))
+		if (heuristic.equals(SchedulingConstants.ONE_PRODUCT_RELAXATION))
         {
             relaxer = new OneProductRelaxer(expander, this);
         }
-        else if (heuristic.equals(ScheduleDialog.TWO_PRODUCT_RELAXATION))
+		else if (heuristic.equals(SchedulingConstants.TWO_PRODUCT_RELAXATION))
         {
             // if (theAutomata.getPlantAutomata().size() < 3)
             //             {
@@ -410,15 +401,15 @@ public class ModifiedAstar
             //             useOneProdRelax = false;
             throw new Exception("'2-product relax' is currently too buggishly implemented.");
         }
-        else if (heuristic.equals(ScheduleDialog.VIS_GRAPH_TIME_RELAXATION))
+		else if (heuristic.equals(SchedulingConstants.VIS_GRAPH_TIME_RELAXATION))
         {
             relaxer = new VisibilityGraphRelaxer(expander, this, false);
         }
-        else if (heuristic.equals(ScheduleDialog.VIS_GRAPH_NODE_RELAXATION))
+		else if (heuristic.equals(SchedulingConstants.VIS_GRAPH_NODE_RELAXATION))
         {
             relaxer = new VisibilityGraphRelaxer(expander, this, true);
         }
-        else if (heuristic.equals(ScheduleDialog.BRUTE_FORCE_RELAXATION))
+		else if (heuristic.equals(SchedulingConstants.BRUTE_FORCE_RELAXATION))
         {
             relaxer = new BruteForceRelaxer();
         }
@@ -455,11 +446,12 @@ public class ModifiedAstar
     {
         isRunning = false;
         astarThread = null;
-        
+/*        
         if (disposescheduleDialog)
         {
             scheduleDialog.done();
         }
+ */
     }
     
     /**
@@ -624,21 +616,16 @@ public class ModifiedAstar
         }
 
         if (currNode == null || ! isAcceptingNode(currNode))
-        {            
-            logger.warn("open_count = " + openTree.size() + "; max_open_size = " + maxOpenSize);
+        {     
+            errorMsgs += "open_count = " + openTree.size() + "; max_open_size = " + maxOpenSize;
             throw new RuntimeException("An accepting state could not be found, nr of iterations = " + iterationCounter);
         }
 
-        outputStr += "\tA*-iterations (nr of search calls through the closed tree): " + iterationCounter + "\n";
-        outputStr += "\tIn time: " + timer.elapsedTime() + " ms\n";
-        outputStr += "\tThe CLOSED tree contains (at the end) " + closedTree.size() + " elements\n";
-        outputStr += "\tMax{OPEN.size} = " + maxOpenSize + "\n";
-        outputStr += "\t\t" + "g = " + acceptingNode.getValueAt(ACCUMULATED_COST_INDEX);
-
-        if (!isRelaxationProvider)
-        {
-            logger.info(outputStr);
-        }
+		infoMsgs += "\tA*-iterations (nr of search calls through the closed tree): " + iterationCounter + "\n";
+		infoMsgs += "\tIn time: " + timer.elapsedTime() + " ms\n";
+		infoMsgs += "\tThe CLOSED tree contains (at the end) " + closedTree.size() + " elements\n";
+		infoMsgs += "\tMax{OPEN.size} = " + maxOpenSize + "\n";
+		infoMsgs += "\t\t" + "g = " + acceptingNode.getValueAt(ACCUMULATED_COST_INDEX);
         
         schedulingDone = true;
 
@@ -698,10 +685,9 @@ public class ModifiedAstar
                 }
             }
         }
-        catch (Exception e)
+        catch (Exception ex)
         {
-            logger.error(e.toString());
-            e.printStackTrace();
+			debugMsgs.add(ex.getStackTrace());
         }
     }
     
@@ -1022,17 +1008,8 @@ public class ModifiedAstar
     public void buildScheduleAutomaton()
 		throws Exception
     {
-        // Create the automaton with a chosen name
-        String scheduleName = "";
-        while (scheduleName != null && scheduleName.trim() == "")
-        {
-            scheduleName = scheduleDialog.getIde().getActiveDocumentContainer().getAnalyzerPanel().getNewAutomatonName("Enter a name for the schedule", "Schedule");
-        }       
-        if (scheduleName == null)
-        {
-            return;
-        }
-        scheduleAuto = new Automaton(scheduleName);
+        // Create the automaton with a working name "Schedule"
+        scheduleAuto = new Automaton("Schedule");
         
         // Start the clock
         timer.restart();  
@@ -1083,8 +1060,9 @@ public class ModifiedAstar
             }
             catch (Exception ex)
             {
-                logger.error("ModifiedAstar::buildScheduleAutomaton() --> Could not find the arc between " + printArray(currNode.getBasis()) + " and its parent" + printNodeName(getParent(currNode)));
-                logger.debug(ex.getStackTrace());
+                errorMsgs += "ModifiedAstar::buildScheduleAutomaton() --> Could not find the arc between " + 
+					printArray(currNode.getBasis()) + " and its parent" + printNodeName(getParent(currNode));
+                debugMsgs.add(ex.getStackTrace());
                 
                 throw ex;
             }
@@ -1129,12 +1107,7 @@ public class ModifiedAstar
                 "; makespan = " + acceptingNode.getValueAt(ACCUMULATED_COST_INDEX));
         scheduleAuto.removeState(acceptingState);
         
-        logger.info("Schedule was built in " + timer.elapsedTime() + "ms");
-		
-		if (scheduleDialog != null)
-		{
-			scheduleDialog.getIde().getActiveDocumentContainer().getAnalyzerPanel().addAutomaton(scheduleAuto);
-		}
+        infoMsgs += "Schedule was built in " + timer.elapsedTime() + "ms";
 
         //TODO: TEMP-TEST
 //        new VelocityBalancer(scheduleAuto, theAutomata.getPlantAutomata());
@@ -1601,11 +1574,13 @@ public class ModifiedAstar
     {
         return makespan;
     }
-    
-    public String getOutputString()
-    {
-        return outputStr;
-    }
+
+//@Deprecated
+//    public String getOutputString()
+//    {
+//        return outputStr;
+//    }
+//
 
 // 	public int getMaxOpenSize()
 // 	{
@@ -1647,24 +1622,32 @@ public class ModifiedAstar
 		return indexMap;
 	}
 
-	public ScheduleDialog getScheduleDialog()
-	{
-		return scheduleDialog;
-	}
-
 	public void sleep (long ms)
 		throws InterruptedException
 	{
 		astarThread.sleep(ms);
 	}
 
-	public void addToOutputString(String str)
-	{
-		outputStr += str;
-	}
-
 	public Automaton getSchedule()
 	{
 		return scheduleAuto;
 	}
+
+	public String getInfoMessages()
+	{
+		return infoMsgs;
+	}
+	public String getWarningMessages()
+	{
+		return warnMsgs;
+	}
+	public String getErrorMessages()
+	{
+		return errorMsgs;
+	}
+	public Object[] getDebugMessages()
+	{
+		return debugMsgs.toArray();
+	}
 }
+
