@@ -146,7 +146,7 @@ public class DOPrelation{
 					String var_name;
 					
 					/* Parallel node code */
-					var_name = m.newParrallelInteger(ant_parallel_track + 1);
+					var_name = m.newParrallelNodeInteger(ant_parallel_track + 1);
 					
 					//build Alternative path
 					start_stop_parallel.setProcess(var_name);
@@ -162,6 +162,31 @@ public class DOPrelation{
 					
 					//build Parallel
 					parallel(parallel,var_name,m);
+				}else if(RelationType.ARBITRARY.equals(((Relation)o).getType())){
+					
+					Module m = efa.getModule();
+					Relation arbitrary = (Relation)o;
+					int ant_arbitrary_track = arbitrary.getActivityRelationGroup().size();
+					PGA start_stop_arbitrary = new PGA();
+					String var_name;
+					
+					/* ArbitraryOrder node code */
+					var_name = m.newArbitraryNodeInteger(ant_arbitrary_track + 1);
+					
+					//build Alternative path
+					start_stop_arbitrary.setProcess(var_name);
+					
+					/* Start arbitrary node by set it's variable to 1 */
+					start_stop_arbitrary.setStartAction(var_name + "=1;");
+					
+					/* Continue then arbitrary node is done, and reset variable */
+					start_stop_arbitrary.setStopGuard(var_name + "==" + (ant_arbitrary_track + 1));
+					start_stop_arbitrary.setStopAction(var_name + "=0;");
+					
+					pgaList.add(start_stop_arbitrary);
+					
+					//build Parallel
+					arbitrary(arbitrary,var_name,m);
 				}else{
 					/* Unknown node type */
 					System.err.println("Unknown RelationType " + ((Relation)o).getType());
@@ -266,7 +291,7 @@ public class DOPrelation{
 					String var_name;
 					
 					/* Parallel node code */
-					var_name = m.newParrallelInteger(ant_parallel_track + 1);
+					var_name = m.newParrallelNodeInteger(ant_parallel_track + 1);
 					
 					//build Alternative path
 					start_stop_parallel.setProcess(var_name);
@@ -281,6 +306,31 @@ public class DOPrelation{
 					System.out.println("Build parallel from alternative");
 					
 					parallel(parallel,var_name,m);
+				}else if(RelationType.ARBITRARY.equals(((Relation)o).getType())){
+					
+					Module m = efa.getModule();
+					Relation arbitrary = (Relation)o;
+					int ant_arbitrary_track = arbitrary.getActivityRelationGroup().size();
+					PGA start_stop_arbitrary = new PGA();
+					String var_name;
+					
+					/* ArbitraryOrder node code */
+					var_name = m.newArbitraryNodeInteger(ant_arbitrary_track + 1);
+					
+					//build Alternative path
+					start_stop_arbitrary.setProcess(var_name);
+					
+					/* Start arbitrary node by set it's variable to 1 */
+					start_stop_arbitrary.setStartAction(var_name + "=1;");
+					
+					/* Continue then arbitrary node is done, and reset variable */
+					start_stop_arbitrary.setStopGuard(var_name + "==" + (ant_arbitrary_track + 1));
+					start_stop_arbitrary.setStopAction(var_name + "=0;");
+					
+					pgaList.add(start_stop_arbitrary);
+					
+					//build Parallel
+					arbitrary(arbitrary,var_name,m);
 				}else{
 					/* Unknown node type */
 					System.err.println("Unknown RelationType " + ((Relation)o).getType());
@@ -304,12 +354,19 @@ public class DOPrelation{
 		}
 	}
 	
+	/**
+	 * parallel relation.
+	 * 
+	 * @param r relation tree of type parallel on top.
+	 * @param parallel_var variable name for this parallel node from 0 to ant parallel track + 1
+	 * @param m module to build parallel in.
+	 */
 	protected static void parallel(Relation r, String parallel_var, Module m){
 		
 		final String firstState = "waiting";
 		final String lastState = "finished";
 		
-		String startGuard = ""; 
+		String startGuard = "";
 		String stopGuard = "", stopAction = "";
 		
 		String parallel_track = "";
@@ -327,8 +384,10 @@ public class DOPrelation{
 		activityRelations = (r.getActivityRelationGroup()).toArray();
 		
 		if(parallel_var.length() > 0){
+			//start conditions
 			startGuard = parallel_var + ">0";
 			
+			//stop conditions
 			stopGuard = parallel_var + "<" + (activityRelations.length + 1);
 			stopAction = parallel_var + "+=1;";
 		}else{
@@ -336,6 +395,12 @@ public class DOPrelation{
 			System.out.println("WARNING! a parallel node have no" +
 					" variable asigned");
 		}
+		
+		/* 
+		 * for a parallel node only two options exist either we have
+		 * a relation or a activity.
+		 *  
+		 */
 		
 		for(int i = 0; i < activityRelations.length; i++){
 			
@@ -352,15 +417,18 @@ public class DOPrelation{
 				String stop;
 				
 				/* Relation code */
+				
 				Relation seq = factory.createRelation();
 				seq.setType(RelationType.SEQUENCE);
 				
+				/* set start conditions */
 				Activity start_par = factory.createActivity();
 				start = PGA.ONLY_START + PGA.GUARD+startGuard+PGA.GUARD
 									   +parallel_track;
 				
 				start_par.setOperation(start);
 				
+				/* set stop conditions */
 				Activity stop_par = factory.createActivity();
 				stop = PGA.ONLY_STOP +PGA.GUARD+stopGuard+PGA.GUARD
 									 +PGA.ACTION+stopAction+PGA.ACTION
@@ -368,7 +436,10 @@ public class DOPrelation{
 				
 				stop_par.setOperation(stop);
 				
-				// lock the relation in a sequence
+				/* 
+				 * bind the relation in a sequence
+				 * whit start and stop guards 
+				 */
 				seq.getActivityRelationGroup().add(start_par);
 				seq.getActivityRelationGroup().add(activityRelations[i]);
 				seq.getActivityRelationGroup().add(stop_par);
@@ -377,9 +448,131 @@ public class DOPrelation{
 				sequence(seq,firstState,lastState,tmp);
 				
 			}else if(activityRelations[i] instanceof Activity){
+				
 				/* Activity code */
+				
 				PGA pga = new PGA(((Activity)activityRelations[i]).getOperation());
 				pga.setStartGuard(startGuard);
+				
+				pga.setStopGuard(stopGuard);
+				pga.setStopAction(stopAction);
+				
+				nativeProcess(pga,firstState,lastState,tmp);
+			}else{
+				System.err.println("Unknown objekt " + activityRelations[i]);
+			}
+		}
+		
+	}
+	
+	/**
+	 * arbitrary relation.
+	 * 
+	 * @param r relation tree of type arbitrary on top.
+	 * @param arbitrary_var variable name for this arbitrary node from 0 to ant arbitrary track + 1
+	 * @param m module to build arbitrary in.
+	 */
+	protected static void arbitrary(Relation r, String arbitraryNode_var, Module m){
+		
+		final String firstState = "waiting";
+		final String lastState = "finished";
+		
+		String startGuard = "", startAction = ""; 
+		String stopGuard = "", stopAction = "";
+		
+		String parallel_track = "";
+		
+		String arbitrary_var = "";
+		
+		Object[] activityRelations;
+		EFA tmp; 
+		
+		ObjectFactory factory = new ObjectFactory();  
+		
+		//check in data
+		if(r == null || m == null){
+			return;
+		}
+		
+		activityRelations = (r.getActivityRelationGroup()).toArray();
+		
+		arbitrary_var = m.newArbitraryInteger();
+		
+		if(arbitraryNode_var.length() > 0){
+			//start conditions
+			startGuard = arbitraryNode_var + ">0"+ PGA.AND +arbitrary_var+ "==1";
+			startAction = arbitrary_var + "=0;";
+			
+			//stop conditions
+			stopGuard = arbitraryNode_var + "<" + (activityRelations.length + 1);
+			stopAction = arbitraryNode_var + "+=1;" + arbitrary_var + "=1;";
+		}else{
+			arbitraryNode_var = "ao";
+			System.out.println("WARNING! a arbitraryorder node have no" +
+					" variable asigned");
+		}
+		
+		
+		
+		/* 
+		 * for a arbitraryorder node only two options exist either we have
+		 * a relation or a activity.
+		 *  
+		 */
+		
+		for(int i = 0; i < activityRelations.length; i++){
+			
+			parallel_track = arbitrary_var +"_"+ i;
+			
+			tmp = new EFA(parallel_track,m);
+			m.addAutomaton(tmp);
+			
+			tmp.addState(firstState);
+			tmp.addState(lastState);
+			
+			if(activityRelations[i] instanceof Relation){
+				String start;
+				String stop;
+				
+				/* Relation code */
+				
+				Relation seq = factory.createRelation();
+				seq.setType(RelationType.SEQUENCE);
+				
+				/* set start conditions */
+				Activity start_par = factory.createActivity();
+				start = PGA.ONLY_START + PGA.GUARD+startGuard+PGA.GUARD
+									   +PGA.ACTION+startAction+PGA.ACTION
+									   +parallel_track;
+				
+				start_par.setOperation(start);
+				
+				/* set stop conditions */
+				Activity stop_par = factory.createActivity();
+				stop = PGA.ONLY_STOP +PGA.GUARD+stopGuard+PGA.GUARD
+									 +PGA.ACTION+stopAction+PGA.ACTION
+									 +parallel_track;
+				
+				stop_par.setOperation(stop);
+				
+				/* 
+				 * bind the relation in a sequence
+				 * whit start and stop guards 
+				 */
+				seq.getActivityRelationGroup().add(start_par);
+				seq.getActivityRelationGroup().add(activityRelations[i]);
+				seq.getActivityRelationGroup().add(stop_par);
+				
+				//build sequence
+				sequence(seq,firstState,lastState,tmp);
+				
+			}else if(activityRelations[i] instanceof Activity){
+				
+				/* Activity code */
+				
+				PGA pga = new PGA(((Activity)activityRelations[i]).getOperation());
+				pga.setStartGuard(startGuard);
+				pga.setStartAction(startAction);
 				
 				pga.setStopGuard(stopGuard);
 				pga.setStopAction(stopAction);

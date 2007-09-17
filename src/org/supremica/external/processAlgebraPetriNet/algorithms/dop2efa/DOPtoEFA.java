@@ -231,136 +231,18 @@ public class DOPtoEFA extends DOPrelation{
 		
 		ROP rop = factory.createROP();
 		rop.setMachine("machine");
-		rop.setComment("Test Parallel");
+		rop.setComment("Test Arbitrary");
 		
 		Relation r = new Relation();
-		r.setType(RelationType.PARALLEL);
+		r.setType(RelationType.ARBITRARY);
 		
-		r.getActivityRelationGroup().add(0, seq);
-		r.getActivityRelationGroup().add(1, alt);
+		r.getActivityRelationGroup().add(0, a);
+		r.getActivityRelationGroup().add(1, b);
 		//r.getActivityRelationGroup().add(2, c);
 		
 		rop.setRelation(r);
 		
 		createEFA(rop);
 		System.out.println("Done test ROP");
-		
-		
-		/*
-		System.out.println("Try to create EFA");
-		DOPtoEFA.createEFA();
-		System.out.println("Done create EFA");
-		
-		
-		
-		ObjectFactory factory  = new ObjectFactory();
-		
-		
-		//test activities
-		Activity a = factory.createActivity();
-		a.setOperation("a");
-		
-		Activity b = factory.createActivity();
-		b.setOperation("b");
-		
-		Activity c = factory.createActivity();
-		c.setOperation("c");
-		
-		Activity d = factory.createActivity();
-		d.setOperation("d");
-		
-		Activity e = factory.createActivity();
-		e.setOperation("e");
-		
-		Activity f = factory.createActivity();
-		f.setOperation("f");
-		
-		Activity g = factory.createActivity();
-		g.setOperation("g");
-		
-		Activity h = factory.createActivity();
-		h.setOperation("h");
-		
-		Activity i = factory.createActivity();
-		i.setOperation("i");
-		
-		Activity j = factory.createActivity();
-		j.setOperation("j");
-		
-		
-		
-		//test relations
-		Relation seq1 = factory.createRelation();
-		seq1.setType(RelationType.SEQUENCE);
-		
-		Relation seq2 = factory.createRelation();
-		seq2.setType(RelationType.SEQUENCE);
-		
-		Relation seq3 = factory.createRelation();
-		seq3.setType(RelationType.SEQUENCE);
-		
-		
-		Relation alt1 = factory.createRelation();
-		alt1.setType(RelationType.ALTERNATIVE);
-		
-		Relation alt2 = factory.createRelation();
-		alt2.setType(RelationType.ALTERNATIVE);
-		
-		Relation alt3 = factory.createRelation();
-		alt3.setType(RelationType.ALTERNATIVE);
-		
-		//relation alt1..3 seq1..3
-		//activity a b c d e f g h i j
-		
-		
-		ROP rop = (new ObjectFactory()).createROP();
-		rop.setMachine("machine");
-		rop.setComment("Test sequence alternative");
-		
-		//create test relation
-		
-		//seq1
-		seq1.getActivityRelationGroup().add(a);
-		alt1.getActivityRelationGroup().add(b);
-		alt1.getActivityRelationGroup().add(c);
-		
-		seq1.getActivityRelationGroup().add(alt1);
-		
-		seq1.getActivityRelationGroup().add(d);
-		//end seq1
-		
-		//seq2
-		seq2.getActivityRelationGroup().add(e);
-		
-		alt2.getActivityRelationGroup().add(f);
-		alt2.getActivityRelationGroup().add(g);
-		
-		seq2.getActivityRelationGroup().add(alt2);
-		
-		seq2.getActivityRelationGroup().add(h);
-		//end seq2
-		
-		//alt3
-		alt3.getActivityRelationGroup().add(seq1);
-		alt3.getActivityRelationGroup().add(i);
-		alt3.getActivityRelationGroup().add(seq2);
-		//end alt3
-		
-		seq3.getActivityRelationGroup().add(seq1);
-		seq3.getActivityRelationGroup().add(seq2);
-		
-		seq3 = flattenSequence(seq3);
-		
-		//seq3.getActivityRelationGroup().add(c);
-		//seq3.getActivityRelationGroup().add(d);
-		
-		rop.setRelation(seq3);
-
-		//System.out.println("Try to createEFA(rop)");
-		//createEFA(rop);
-		//System.out.println("Done createEFA(rop)");
-	
-		 */
-		
 	}
 }

@@ -17,7 +17,7 @@ public class PGA {
 	static final public String ACTION = "_ACTION_";
 	
 	//
-	static final private String AND = "&";
+	static final public String AND = "&";
 	
 	//
 	private String process;

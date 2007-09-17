@@ -13,8 +13,11 @@ public class Module extends ExtendedAutomata{
 	private LinkedList<String> events;
 	
 	private int parallels;
+	private int arbitraryNode;
+	private int arbitrary;
 	
-	private final String PARALLEL_PREFIX = "pa_";
+	private final String PARALLEL_PREFIX = "pa";
+	private final String ARBITRARY_ORDER_PREFIX = "ao";
 	
 	private EFA global_variables_dummy_efa;
 	   
@@ -22,6 +25,8 @@ public class Module extends ExtendedAutomata{
 		super(name, expand);
 		events = new LinkedList<String>();
 		parallels = 0;
+		arbitraryNode = 0;
+		arbitrary = 0;
 		global_variables_dummy_efa = null;
 		
 	}
@@ -60,7 +65,7 @@ public class Module extends ExtendedAutomata{
 	 * @param upperBound
 	 * @return name of new parallel variable created
 	 */
-	public String newParrallelInteger(int upperBound){
+	public String newParrallelNodeInteger(int upperBound){
 		
 		final int lowerBound = 0;
 		final int initialValue = 0;
@@ -70,8 +75,62 @@ public class Module extends ExtendedAutomata{
 			init_global_variables();
 		}
 		
-		String name = PARALLEL_PREFIX + parallels;
+		String name = PARALLEL_PREFIX + "_" + parallels;
 		parallels = parallels + 1;
+		
+		global_variables_dummy_efa.addIntegerVariable(
+				name, lowerBound, upperBound, initialValue, null);
+		
+		return name;
+	}
+	
+	/**
+	 * Add new arbitrary node variable
+	 * 
+	 * @param efa
+	 * @param upperBound
+	 * @return name of new parallel variable created
+	 */
+	public String newArbitraryNodeInteger(int upperBound){
+		
+		final int lowerBound = 0;
+		final int initialValue = 0;
+		//final int markedValue = 0;
+		
+		if(global_variables_dummy_efa == null){
+			init_global_variables();
+		}
+		
+		String name = ARBITRARY_ORDER_PREFIX +"n_"+ arbitraryNode;
+		arbitraryNode = arbitraryNode + 1;
+		
+		global_variables_dummy_efa.addIntegerVariable(
+				name, lowerBound, upperBound, initialValue, null);
+		
+		return name;
+	}
+	
+	/**
+	 * Add new integer variables for arbitrary node
+	 * 
+	 * @param efa
+	 * @param upperBound
+	 * @return name of new parallel variable created
+	 */
+	public String newArbitraryInteger(){
+		
+		final int lowerBound = 0;
+		final int upperBound = 1;
+		
+		final int initialValue = 1;
+		//final int markedValue = 0;
+		
+		if(global_variables_dummy_efa == null){
+			init_global_variables();
+		}
+		
+		String name = ARBITRARY_ORDER_PREFIX + "_" +arbitrary;
+		arbitrary = arbitrary + 1;
 		
 		global_variables_dummy_efa.addIntegerVariable(
 				name, lowerBound, upperBound, initialValue, null);
