@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.module
 //# CLASS:   ModuleCompiler
 //###########################################################################
-//# $Id: ModuleCompiler.java,v 1.83 2007-09-18 09:06:22 markus Exp $
+//# $Id: ModuleCompiler.java,v 1.84 2007-09-18 14:04:43 markus Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.compiler;
@@ -899,7 +899,7 @@ public class ModuleCompiler extends AbstractModuleProxyVisitor
       updateTransitionsInAutomtata();
       
       /* In order to avoid fictional uncontrollable 
-       * states caussed by the relabelling of events 
+       * states caused by the relabelling of events 
        * specifications are transformed into plants. 
        * However, if one relabelled uncontrollable 
        * event is allowed  by the spec i.e. no extra 
