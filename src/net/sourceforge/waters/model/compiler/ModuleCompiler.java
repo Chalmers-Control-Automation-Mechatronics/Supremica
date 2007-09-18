@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.module
 //# CLASS:   ModuleCompiler
 //###########################################################################
-//# $Id: ModuleCompiler.java,v 1.82 2007-09-17 15:32:44 markus Exp $
+//# $Id: ModuleCompiler.java,v 1.83 2007-09-18 09:06:22 markus Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.compiler;
@@ -820,8 +820,10 @@ public class ModuleCompiler extends AbstractModuleProxyVisitor
      */
     final Set<EventProxy> newEvents = new HashSet<EventProxy>();
     newEvents.addAll(mOriginalAlphabet);
-
-    
+    /*
+     * Get or create an accepting prop
+     */
+    mAcceptingProp=getAcceptingProp(mOriginalAlphabet);
     try {
       for (final EventProxy event : mOriginalAlphabet) {
         EventProxy orgEvent=findOriginalEvent(event);
@@ -915,9 +917,12 @@ public class ModuleCompiler extends AbstractModuleProxyVisitor
       *  (i.e. not to the variableAutomata. ).
       */
       createForbiddenSelfLoopsInAutomata();
-      //Test
-      //addAcceptingPropositionToAutomata(newEvents);
-      //
+      /*
+       * If the variable automata have marked states the :accepting proposition is added to their 
+       * alphabet. 
+       */
+      addAcceptingPropositionToAutomata(newEvents);
+    
       mGlobalAlphabet.clear();
       mGlobalAlphabet.addAll(newEvents);
     } catch (final EvalException exception) {
@@ -930,25 +935,21 @@ private void addAcceptingPropositionToAutomata(Set<EventProxy> newEvents) {
 	final Map<String,AutomatonProxy> newAutomata =
 	      new TreeMap<String,AutomatonProxy>();
 	newAutomata.putAll(mAutomata);
-	
 	boolean containsAccepting = containsAcceptingProp(newEvents);
-	
 	    for (final AutomatonProxy aut: mAutomata.values()) {
 	    	for(final StateProxy state: aut.getStates()){
-	    		if(!state.getPropositions().isEmpty()){
+	    		if(state.getPropositions().contains(mAcceptingProp)){
+	    			if(!containsAccepting){
+	    				newEvents.add(mAcceptingProp);
+	    				containsAccepting=true;
+	    			}
 	    			if(containsAcceptingProp(aut.getEvents())){
 	    				break;
 	    			}
 	    			else{
 	    			final Set<EventProxy> alphabet = new TreeSet<EventProxy>();
-	    			EventProxy prop = mDESFactory.createEventProxy(":accepting",
-	    		            EventKind.PROPOSITION);
-	    			alphabet.add(prop);
+	    			alphabet.add(mAcceptingProp);
 	    			alphabet.addAll(aut.getEvents());
-	    			if(!containsAccepting){
-	    				newEvents.add(prop);
-	    				containsAccepting=true;
-	    			}
 	    			newAutomata.remove(aut.getName());
 	    			newAutomata.put(aut.getName(),
 		                      mDESFactory.createAutomatonProxy(aut.getName(),
@@ -967,34 +968,36 @@ private void addAcceptingPropositionToAutomata(Set<EventProxy> newEvents) {
 
 
 private boolean containsAcceptingProp(Set<EventProxy> newEvents) {
-	EventProxy prop = mDESFactory.createEventProxy(":accepting",
-            EventKind.PROPOSITION);
-	for(EventProxy event: newEvents){
-		if(event.equalsByContents(prop)){
+		for(EventProxy event: newEvents){
+		if(event.equals(mAcceptingProp)){
 			return true;
 		}
 	}
 	return false;
 }
-
+private EventProxy getAcceptingProp(Set<EventProxy> newEvents) {
+	EventProxy prop = mDESFactory.createEventProxy(":accepting",
+            EventKind.PROPOSITION);
+	for(EventProxy event: newEvents){
+		if(event.equalsByContents(prop)){
+			return event;
+		}
+	}
+	return prop;
+}
 
 private void addSingleStateSpec() {
-	//for(EventProxy event: mEventForbiddenStatesMap.keyset()){
 	for(EventProxy event: mForbiddenEvents){
 		String name= event.getName(); 
 		
 		final Collection<EventProxy> alphabet = new HashSet<EventProxy>();
         alphabet.add(event);
-    
-        EventProxy marked = mDESFactory.createEventProxy(":accepting", EventKind.PROPOSITION);
-        alphabet.add(marked);
-        Collection<EventProxy> props = Collections.singletonList(marked);
+        alphabet.add(mAcceptingProp);
+        Collection<EventProxy> props = Collections.singletonList(mAcceptingProp);
         final StateProxy state = mDESFactory.createStateProxy(name, true, props);
         Collection<StateProxy> states = new HashSet<StateProxy>();
         states.add(state);
-    
         Collection<TransitionProxy> transitions = new HashSet<TransitionProxy>();
-    
         final AutomatonProxy automaton =
         mDESFactory.createAutomatonProxy(name,
                                        ComponentKind.SPEC,
@@ -1005,9 +1008,7 @@ private void addSingleStateSpec() {
          }
 }
 
-private void createForbiddenSelfLoopsInAutomata() {
-	//for (EventProxy event: mEventForbiddenStatesMap.keySet()){
-		
+private void createForbiddenSelfLoopsInAutomata() {		
 		for (EventProxy event: mForbiddenEvents){
 		Set<String> namesOfAutomata= new TreeSet<String>();
 		namesOfAutomata.addAll(mAutomata.keySet());
@@ -1038,41 +1039,6 @@ private void createForbiddenSelfLoopsInAutomata() {
             		
                 }}}}}}}
 
-/*
-private void plantifyUncontrollableSpec() {
-	
-	final Map<String,AutomatonProxy> newPlantAutomata =
-	      new TreeMap<String,AutomatonProxy>();
-	    
-	for(AutomatonProxy aut: mAutomata.values()){
-		for(String uncontrollableEFASpec: mUncontrollableEFASpecifications){
-		if(uncontrollableEFASpec.equals(aut.getName())){
-		Collection<TransitionProxy> transitions= new TreeSet<TransitionProxy>();
-	    transitions.addAll(aut.getTransitions());
-		for(EventProxy event: aut.getEvents()){
-			if(event.getKind()==EventKind.UNCONTROLLABLE){
-				for(StateProxy state: aut.getStates()){
-					if(eventDisabledAtState(aut, state, event)){
-						final TransitionProxy selfloop =
-	                        mDESFactory.createTransitionProxy(state,
-	                        		event,
-	                                                          state);
-						transitions.add(selfloop);
-					}
-									}
-			}}
-	    String name="Plant("+aut.getName()+")";
-	    final AutomatonProxy plantifiedAut =
-	      mDESFactory.createAutomatonProxy(name,
-	                                       ComponentKind.PLANT,
-	                                       aut.getEvents(),
-	                                       aut.getStates(),
-	                                       transitions);
-	    newPlantAutomata.put(name,plantifiedAut);
-	}}}
-	mAutomata.putAll(newPlantAutomata);
-}
-*/
 private void plantifySpec() {
 	
 	final Map<String,AutomatonProxy> newPlantAutomata =
@@ -1393,19 +1359,15 @@ private void createVariableStates(final VariableProxy variable,
     final IndexValue initvalue = evalIndex(initexpr, range);
     final SimpleExpressionProxy markedexpr = variable.getMarkedValue();
     IndexValue markedvalue = null;
-    EventProxy prop = null;
     if (markedexpr != null) {
       markedvalue = evalIndex(markedexpr, range);
-      // BUG!!! Must use shared event for this!!!
-      prop = mDESFactory.createEventProxy(":accepting",
-                                          EventKind.PROPOSITION);
     }
     for (final IndexValue item : range.getValues()) {
       final String name = prefix + item.toString();
       final boolean initial = item.equals(initvalue);
       Collection<EventProxy> props;
       if (item.equals(markedvalue)) {
-        props = Collections.singletonList(prop);
+        props = Collections.singletonList(mAcceptingProp);
       } else {
         props = Collections.emptyList();
       }
@@ -2256,10 +2218,13 @@ private void createVariableStates(final VariableProxy variable,
    * be used later for optimization. The specifications that
    * needs to be transformed into plants are those in mUncontrollableEFASpecifications
    * and specifications that contains events that have been relabelled into more 
-   * that two one name.    
+   * than one name.    
    */
   //private Set<String> mUncontrollableEFASpecifications; 
   private Map<EventProxy,LocationsAndExpression> mEventForbiddenStatesMap;
   private Set<EventProxy> mForbiddenEvents;
-  //
+  /*
+   * This event is used to mark states. 
+   */
+  private EventProxy mAcceptingProp;
 }
