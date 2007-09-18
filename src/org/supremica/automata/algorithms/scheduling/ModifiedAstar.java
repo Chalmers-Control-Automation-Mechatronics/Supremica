@@ -1649,5 +1649,24 @@ public class ModifiedAstar
 	{
 		return debugMsgs.toArray();
 	}
+        
+    public void addToMessages(String additionStr, int messageType)
+    {
+        switch (messageType)
+        {
+            case SchedulingConstants.MESSAGE_TYPE_INFO:
+                infoMsgs += additionStr;
+                break;
+            case SchedulingConstants.MESSAGE_TYPE_WARN:
+                warnMsgs += additionStr;
+                break;   
+            case SchedulingConstants.MESSAGE_TYPE_ERROR:
+                errorMsgs += additionStr;
+                break;   
+            default:
+                warnMsgs += "Message type incorrect when adding \"" + additionStr + "\" to the messages";
+                break;
+        }
+    }
 }
 

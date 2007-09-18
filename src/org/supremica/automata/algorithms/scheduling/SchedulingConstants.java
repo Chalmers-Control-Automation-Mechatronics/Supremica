@@ -14,4 +14,8 @@ public class SchedulingConstants
 	public static final String BRUTE_FORCE_RELAXATION = "brute force";
 	public static final String OPTIMAL = "optimal";
 	public static final String SUBOPTIMAL = "suboptimal";
+        
+        public static final int MESSAGE_TYPE_INFO = 0;
+        public static final int MESSAGE_TYPE_WARN = 1;
+        public static final int MESSAGE_TYPE_ERROR = 2;
 }

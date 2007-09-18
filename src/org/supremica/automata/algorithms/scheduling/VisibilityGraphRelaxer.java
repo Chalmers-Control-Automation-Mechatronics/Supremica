@@ -3,18 +3,11 @@ package org.supremica.automata.algorithms.scheduling;
 import java.util.*;
 
 import org.supremica.automata.*;
-import org.supremica.gui.ScheduleDialog;
-import org.supremica.log.*;
 import org.supremica.util.ActionTimer;
 
 public class VisibilityGraphRelaxer
 	implements Relaxer
 {
-	/**
-	 * The output stream
-	 */
-	private static Logger logger = LoggerFactory.createLogger(VisibilityGraphRelaxer.class);
-
 	/*
 	 * The total cycle times of each robot (when run independently)
 	 */
@@ -24,7 +17,7 @@ public class VisibilityGraphRelaxer
      * Hashtable containing the estimated cost for a given time configuration
      * (as returned by the visibility graph)
      */
-	protected Hashtable<String, Double> visGraphRelax = null;
+    protected Hashtable<String, Double> visGraphRelax = null;
        
     /** The Visibility Graphs, used for relaxation. Can handle two robots at a time */
     protected Hashtable<String, VisGraphScheduler> visibilityGraphs = null;
@@ -64,7 +57,8 @@ public class VisibilityGraphRelaxer
 
 		timer.restart();
 		preprocessVisibilityGraphs();
-		scheduler.addToOutputString("\tvisibility graphs calculated in " + timer.elapsedTime() + "ms\n"); 
+		scheduler.addToMessages("\tvisibility graphs calculated in " + timer.elapsedTime() + "ms\n", 
+                        SchedulingConstants.MESSAGE_TYPE_INFO); 
 	}
 
 	public double getRelaxation(double[] node)
@@ -113,7 +107,8 @@ public class VisibilityGraphRelaxer
 					}
 					catch (InterruptedException ex)
 					{
-						logger.error("INTERRUPTED_EXCEPTION in ModifiedAstar.calcEstimatedCost()...");
+						scheduler.addToMessages("INTERRUPTED_EXCEPTION in ModifiedAstar.calcEstimatedCost()...", 
+                                                        SchedulingConstants.MESSAGE_TYPE_INFO); 
 						throw(ex);
 					}				
 
@@ -211,7 +206,7 @@ public class VisibilityGraphRelaxer
 				automataPair.addAutomaton(currAuto);
 				key += currAuto.getName();				
 
-				VisGraphScheduler vgSched = new VisGraphScheduler(automataPair, scheduler.getAllAutomata().getSpecificationAutomata(), false, true, scheduler.getScheduleDialog());
+				VisGraphScheduler vgSched = new VisGraphScheduler(automataPair, scheduler.getAllAutomata().getSpecificationAutomata(), false, true);
 				try 
 				{
 					while (!vgSched.isInitialized())
@@ -221,7 +216,8 @@ public class VisibilityGraphRelaxer
 				}
 				catch (InterruptedException ex)
 				{
-					logger.error("EXCEPTION in ModifiedAstar.preprocessVisibilityGraphs()...");
+					scheduler.addToMessages("EXCEPTION in ModifiedAstar.preprocessVisibilityGraphs()...",
+                                                SchedulingConstants.MESSAGE_TYPE_INFO); 
 					throw(ex);
 				}
 

@@ -18,9 +18,6 @@ import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.Iterator;
 import org.supremica.automata.Automata;
-import org.supremica.gui.ScheduleDialog;
-import org.supremica.log.Logger;
-import org.supremica.log.LoggerFactory;
 import org.supremica.util.ActionTimer;
 
 /**
@@ -29,16 +26,11 @@ import org.supremica.util.ActionTimer;
  */
 public class RandomPathUsingMilp
         extends Milp
-{
-    private static Logger logger = LoggerFactory.createLogger(RandomPathUsingMilp.class);
-    
+{    
     /** Creates a new instance of RandomPathUsingMilp */
-    public RandomPathUsingMilp(Automata theAutomata, boolean buildSchedule, ScheduleDialog scheduleDialog)
+    public RandomPathUsingMilp(Automata theAutomata, boolean buildSchedule)
         throws Exception
     {
-        //temp_uc
-//        super(theAutomata, buildSchedule, scheduleDialog);
-        //temp
         super(theAutomata, buildSchedule);
     }
         
@@ -46,7 +38,7 @@ public class RandomPathUsingMilp
             throws Exception
     {
         File suboptimalModelFile = File.createTempFile("milp", ".mod");
-        logger.info("Creating suboptimal model file... " + suboptimalModelFile.getName());
+        infoMsgs += "Creating suboptimal model file... " + suboptimalModelFile.getName();
         
         // The hashtable containing internal indices of the mutex variables (with the variable names as keys)
         Hashtable<String, Integer> boolVarTable = null;
@@ -97,7 +89,7 @@ public class RandomPathUsingMilp
                     {
                         boolVarTable.put(str.substring(4, str.indexOf(",")), internalVarIndex++);
                         //temp
-                        logger.info("adding " + str.substring(4, str.indexOf(",")) + " to the var-table (index = " + (internalVarIndex-1) + ")");
+                        infoMsgs += "adding " + str.substring(4, str.indexOf(",")) + " to the var-table (index = " + (internalVarIndex-1) + ")";
                     }
                     // Add the variable indices for all consecutive-bookings of the zones to consecutiveBookingCouplingTable
                     else if (str.contains("consecutive_booking"))
@@ -187,7 +179,7 @@ public class RandomPathUsingMilp
                                         keyVarList.add(valueVarIndex);
 
                                         //temp
-                                        logger.warn(valueVarIndex + " follows " + keyVarIndex);
+                                        warnMsgs += valueVarIndex + " follows " + keyVarIndex;
                                     }
                                 }
                             }
@@ -258,7 +250,7 @@ public class RandomPathUsingMilp
             try
             {
                 super.callMilpSolver(suboptimalModelFile);
-                logger.info("A path was found!!!");
+                infoMsgs += "A path was found!!!";
                 return;
             }
             // If there is no solution with current variable values, an exception is thrown. Here it is caught 
@@ -267,8 +259,8 @@ public class RandomPathUsingMilp
             {
                 if (ex.getMessage().contains("NO") && ex.getMessage().contains("FEASIBLE SOLUTION"))
                 {
-                    logger.warn("No path with current variable values");
-//                    logger.error(ex.getMessage());
+                    warnMsgs += "No path with current variable values";
+//                    errorMsgs += (ex.getMessage();
 //                    throw ex;
                 }
             }

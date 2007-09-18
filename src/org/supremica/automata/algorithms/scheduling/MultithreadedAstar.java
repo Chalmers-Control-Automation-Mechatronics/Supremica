@@ -11,17 +11,11 @@ package org.supremica.automata.algorithms.scheduling;
 import java.util.*;
 
 import org.supremica.automata.*;
-import org.supremica.gui.ScheduleDialog;
-import org.supremica.gui.ActionMan;
-import org.supremica.log.*;
 import org.supremica.util.ActionTimer;
 
 public class MultithreadedAstar
     extends ModifiedAstar
-{
-    
-    private static Logger logger = LoggerFactory.createLogger(MultithreadedAstar.class);
-    
+{    
     /**
      * Contains promising search tree nodes, i.e. nodes that might lie on the optimal path.
      * They are "opened" but not yet examined (i.e. not "closed").
@@ -67,22 +61,22 @@ public class MultithreadedAstar
 // 	private int nrOfSubthreads = 0;
 // 	private int maxClosedSize = 0;
     
-    public MultithreadedAstar(Automata theAutomata, String heuristic, boolean manualExpansion, boolean buildSchedule, boolean isRelaxationProvider, ScheduleDialog scheduleDialog)
+    public MultithreadedAstar(Automata theAutomata, String heuristic, boolean manualExpansion, boolean buildSchedule, boolean isRelaxationProvider)
     throws Exception
     {
-        this(theAutomata, heuristic, manualExpansion, buildSchedule, isRelaxationProvider, scheduleDialog, null);
+        this(theAutomata, heuristic, manualExpansion, buildSchedule, isRelaxationProvider, null);
     }
     
-    public MultithreadedAstar(Automata theAutomata, String heuristic, boolean manualExpansion, boolean buildSchedule, boolean isRelaxationProvider, ScheduleDialog scheduleDialog, MultithreadedNode rootNode)
+    public MultithreadedAstar(Automata theAutomata, String heuristic, boolean manualExpansion, boolean buildSchedule, boolean isRelaxationProvider, MultithreadedNode rootNode)
     throws Exception
     {
-        this(theAutomata, heuristic, manualExpansion, buildSchedule, isRelaxationProvider, scheduleDialog, rootNode, DEFAULT_PROBABILITY);
+        this(theAutomata, heuristic, manualExpansion, buildSchedule, isRelaxationProvider, rootNode, DEFAULT_PROBABILITY);
     }
     
-    public MultithreadedAstar(Automata theAutomata, String heuristic, boolean manualExpansion, boolean buildSchedule, boolean isRelaxationProvider, ScheduleDialog scheduleDialog, MultithreadedNode rootNode, double branchingProbality)
+    public MultithreadedAstar(Automata theAutomata, String heuristic, boolean manualExpansion, boolean buildSchedule, boolean isRelaxationProvider, MultithreadedNode rootNode, double branchingProbality)
     throws Exception
     {
-        super(theAutomata, heuristic, manualExpansion, buildSchedule, isRelaxationProvider, scheduleDialog);
+        super(theAutomata, heuristic, manualExpansion, buildSchedule, isRelaxationProvider);
         
         this.rootNode = rootNode;
         this.branchingProbality = branchingProbality;
@@ -102,7 +96,6 @@ public class MultithreadedAstar
         manualExpansion = parentThread.isManualExpansion();
         buildSchedule = parentThread.getBuildSchedule();
         isRelaxationProvider = true; // If there is a parent thread, then this thread is a subthread, i.e. a relaxationProvider
-        scheduleDialog = parentThread.getScheduleDialog();
         expander = parentThread.getNodeExpander();
         relaxer = parentThread.getRelaxer();
         keyMapping = parentThread.getKeyMapping();
@@ -167,29 +160,24 @@ public class MultithreadedAstar
                 }
             }
             
-            outputStr += "\tA*-iterations (nr of search calls through the closed trees): " + iterationCounter + "\n";
-            outputStr += "\tIn time: " + localTimer.elapsedTime() + " ms\n";
-// 			outputStr += "\tThe CLOSED tree contains (at the end) " + closedTree.size() + " elements\n";
-// 			outputStr += "\tMax{OPEN.size} = " + maxOpenSize + "\n";
+            infoMsgs += "\tA*-iterations (nr of search calls through the closed trees): " + iterationCounter + "\n";
+            infoMsgs += "\tIn time: " + localTimer.elapsedTime() + " ms\n";
+// 			infoMsgs += "\tThe CLOSED tree contains (at the end) " + closedTree.size() + " elements\n";
+// 			infoMsgs += "\tMax{OPEN.size} = " + maxOpenSize + "\n";
             if (acceptingNode != null)
             {
-                outputStr += "\t\t" + "g = " + acceptingNode.getBasis()[ESTIMATE_INDEX];
+                infoMsgs += "\t\t" + "g = " + acceptingNode.getBasis()[ESTIMATE_INDEX];
             }
             else
             {
-                logger.error("An accepting state could not be found");
+                errorMsgs += "An accepting state could not be found";
             }
-            
-            if (!isRelaxationProvider)
-            {
-                logger.info(outputStr);
-            }
-            
+                        
             schedulingDone = true;
         }
         else // I.e. if this is a subthread...
         {
-// 			logger.warn("Adding " + printNodeName(rootNode) + " to a new open list");
+// 			warnMsgs += "Adding " + printNodeName(rootNode) + " to a new open list";
 // 			openTree.add(rootNode);
         }
     }
@@ -433,8 +421,7 @@ public class MultithreadedAstar
         {
             timer.restart();
             
-            scheduleAuto = new Automaton();
-            scheduleAuto.setComment("Schedule");
+            scheduleAuto = new Automaton("Schedule");
             
             buildScheduleFromArray(scheduleInfo);
             
@@ -456,8 +443,7 @@ public class MultithreadedAstar
                 }
             }
             
-            logger.info("Schedule was built in " + timer.elapsedTime() + "ms");
-            scheduleDialog.getIde().getActiveDocumentContainer().getAnalyzerPanel().addAutomaton(scheduleAuto);
+            infoMsgs += "Schedule was built in " + timer.elapsedTime() + "ms";
         }
     }
     

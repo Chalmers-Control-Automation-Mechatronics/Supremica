@@ -245,14 +245,14 @@ public class ScheduleDialog
             {
 				if ((selectedAutomata.getPlantAutomata().size() == 2) && (selectedHeuristic.equals(SchedulingConstants.VIS_GRAPH_TIME_RELAXATION) || selectedHeuristic.equals(SchedulingConstants.VIS_GRAPH_NODE_RELAXATION)))
                 {
-                    sched = new VisGraphScheduler(selectedAutomata, vgDrawer.isSelected(), this);
+                    sched = new VisGraphScheduler(selectedAutomata, vgDrawer.isSelected());
                 }
 				else if (heuristicsBox.getSelectedItem().equals(SchedulingConstants.SUBOPTIMAL))
                 {
                     //temp
 					sched = new ModifiedAstar(selectedAutomata, SchedulingConstants.ONE_PRODUCT_RELAXATION, 
                             nodeExpander.isSelected(), buildAutomaton.isSelected(), new double[]{30, 40});
-                            //temp_uc, this, new double[]{30, 40});
+                           
                     
                     
                     
@@ -285,27 +285,27 @@ public class ScheduleDialog
                 }
                 else
                 {
-                    sched = new ModifiedAstar(selectedAutomata, (String) heuristicsBox.getSelectedItem(), nodeExpander.isSelected(), buildAutomaton.isSelected()); //, this);
+                    sched = new ModifiedAstar(selectedAutomata, (String) heuristicsBox.getSelectedItem(), nodeExpander.isSelected(), buildAutomaton.isSelected()); 
                 }
             }
 			else if (optiMethodsBox.getSelectedItem().equals(SchedulingConstants.MILP))
             {
 				if (selectedHeuristic.equals(SchedulingConstants.OPTIMAL))
                 {
-                    sched = new Milp(selectedAutomata, buildAutomaton.isSelected()); //temp_uc, this);
+                    sched = new Milp(selectedAutomata, buildAutomaton.isSelected()); 
                 }
 				else if (selectedHeuristic.equals(SchedulingConstants.SUBOPTIMAL))
                 {
-                    sched = new RandomPathUsingMilp(selectedAutomata, buildAutomaton.isSelected(), this);
+                    sched = new RandomPathUsingMilp(selectedAutomata, buildAutomaton.isSelected());
                 }
             }
 			else if (optiMethodsBox.getSelectedItem().equals(SchedulingConstants.VIS_GRAPH))
             {
-                sched = new VisGraphScheduler(selectedAutomata, vgDrawer.isSelected(), this);
+                sched = new VisGraphScheduler(selectedAutomata, vgDrawer.isSelected());
             }
 			else if (optiMethodsBox.getSelectedItem().equals(SchedulingConstants.MULTITHREADED_A_STAR))
             {
-                sched = new MultithreadedAstar(selectedAutomata, (String) heuristicsBox.getSelectedItem(), nodeExpander.isSelected(), buildAutomaton.isSelected(), false, this);
+                sched = new MultithreadedAstar(selectedAutomata, (String) heuristicsBox.getSelectedItem(), nodeExpander.isSelected(), buildAutomaton.isSelected(), false);
             }
 // 			else if (optiMethodsBox.getSelectedItem().equals("Modified IDA*"))
 // 				throw new Exception("IMA* not implemented yet...");

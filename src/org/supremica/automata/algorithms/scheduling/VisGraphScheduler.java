@@ -3,17 +3,12 @@ package org.supremica.automata.algorithms.scheduling;
 import java.util.*;
 
 import org.supremica.automata.*;
-import org.supremica.gui.ScheduleDialog;
 import org.supremica.gui.VisGraphDrawer;
-import org.supremica.log.*;
 import org.supremica.util.ActionTimer;
 
 public class VisGraphScheduler
     implements Scheduler
 {
-    /** The logger */
-    private static Logger logger = LoggerFactory.createLogger(VisGraphScheduler.class);
-    
     static final int SELF_INDEX = 0;
     private static final int PARENT_INDEX = SELF_INDEX + 1;
     private static final int G_INDEX = PARENT_INDEX + 1;
@@ -52,10 +47,7 @@ public class VisGraphScheduler
     
     /** This boolean is true if the scheduler-thread should be (is) running */
     private volatile boolean isRunning = false;
-    
-    /** The dialog box that launched this scheduler */
-    private ScheduleDialog gui;
-    
+        
     /**
      * Assures that the mutex zones of the graph have been initialized
      * (is needed for correct functionning when this thread is started from
@@ -79,32 +71,36 @@ public class VisGraphScheduler
     
     /** The number of zones that each robot occupies during its cycle */
     private double[] additionalTimes;
+    
+    protected String infoMsgs = "";
+    protected String warnMsgs = "";
+    protected String errorMsgs = "";
+    protected ArrayList<StackTraceElement[]> debugMsgs = new ArrayList<StackTraceElement[]>();
 
 	/*
 	 * The thread that performs the search for the optimal solution
 	 */
 	private Thread vgThread;
     
-    public VisGraphScheduler(Automata theAutomata, boolean toDrawVisibilityGraph, ScheduleDialog gui)
+    public VisGraphScheduler(Automata theAutomata, boolean toDrawVisibilityGraph)
     throws Exception
     {
-        this(theAutomata.getPlantAutomata(), theAutomata.getSpecificationAutomata(), toDrawVisibilityGraph, gui);
+        this(theAutomata.getPlantAutomata(), theAutomata.getSpecificationAutomata(), toDrawVisibilityGraph);
     }
     
-    public VisGraphScheduler(Automata robots, Automata zones, boolean toDrawVisibilityGraph, ScheduleDialog gui)
+    public VisGraphScheduler(Automata robots, Automata zones, boolean toDrawVisibilityGraph)
     throws Exception
     {
-        this(robots, zones, toDrawVisibilityGraph, false, gui);
+        this(robots, zones, toDrawVisibilityGraph, false);
     }
     
-    public VisGraphScheduler(Automata robots, Automata zones, boolean toDrawVisibilityGraph, boolean isRelaxationProvider, ScheduleDialog gui)
+    public VisGraphScheduler(Automata robots, Automata zones, boolean toDrawVisibilityGraph, boolean isRelaxationProvider)
     throws Exception
     {
         this.toDrawVisibilityGraph = toDrawVisibilityGraph;
         
         this.robots = robots;
         this.zones = zones;
-        this.gui = gui;
         this.isRelaxationProvider = isRelaxationProvider;
     }
 
@@ -136,31 +132,14 @@ public class VisGraphScheduler
                     timer.restart();
                     drawVisibilityGraph(500, 500);
                     
-                    logger.info("The visibility graph painted in " + timer.elapsedTime() + "ms");
-                }
-                
-                if (gui != null)
-                {
-                    if (isRunning)
-                    {
-                        requestStop(true);
-                    }
-                    else
-                    {
-                        logger.warn("Scheduling interrupted");
-                        gui.reset();
-                    }
-                }
-                else
-                {
-                    throw new Exception("Gui is NULL as far as VisGraphScheduler is concerned. The scheduling thread was not interrupted properly");
+                    infoMsgs += "The visibility graph painted in " + timer.elapsedTime() + "ms";
                 }
             }
         }
         catch (Exception ex)
         {
-            logger.error("Visibility Graph::schedule() -> " + ex);
-            logger.debug(ex.getStackTrace());
+            errorMsgs += "Visibility Graph::schedule() -> " + ex;
+            debugMsgs.add(ex.getStackTrace());
         }
     }
     
@@ -189,9 +168,8 @@ public class VisGraphScheduler
                     // If the algorithm was called from the GUI, print the optimal time value there
                     if (!isRelaxationProvider)
                     {
-                        String str = "OPTIMAL SOLUTION.......... " + currNode[G_INDEX] + " in time " + timer.elapsedTime() + "ms";
-                        logger.info(str);
-                        outputStr += "\t" + str + "\n";
+                        infoMsgs += "\tOPTIMAL SOLUTION.......... " + currNode[G_INDEX] + 
+                                " in time " + timer.elapsedTime() + "ms\n";
                     }
                     
                     closedTree.put(new Double(currNode[SELF_INDEX]), currNode);
@@ -536,9 +514,7 @@ public class VisGraphScheduler
         // If the call came from GUI, print the preprocessing time
         if (!isRelaxationProvider)
         {
-            String str = "Preprocessing in " + timer.elapsedTime() + "ms";
-            logger.info(str);
-            outputStr += "\t" + str + "\n";
+            infoMsgs += "\tPreprocessing in " + timer.elapsedTime() + "ms\n";
         }
         
         indexMap = new AutomataIndexMap(robots);
@@ -621,11 +597,6 @@ public class VisGraphScheduler
     public void requestStop(boolean disposeGui)
     {
         isRunning = false;
-        
-        if (disposeGui)
-        {
-            gui.done();
-        }
     }
     
     private synchronized double calcDistance(double[] start, double[] goal)
@@ -719,5 +690,44 @@ public class VisGraphScheduler
         s += array[array.length-1] + "]";
         
         return s;
+    }
+    
+    public String getInfoMessages()
+    {
+        return infoMsgs;
+    }
+    
+    public String getWarningMessages()
+    {
+        return infoMsgs;
+    }
+    
+    public String getErrorMessages()
+    {
+        return infoMsgs;
+    }
+    
+    public Object[] getDebugMessages()
+    {
+        return debugMsgs.toArray();
+    }
+    
+    public void addToMessages(String additionStr, int messageType)
+    {
+        switch (messageType)
+        {
+            case SchedulingConstants.MESSAGE_TYPE_INFO:
+                infoMsgs += additionStr;
+                break;
+            case SchedulingConstants.MESSAGE_TYPE_WARN:
+                warnMsgs += additionStr;
+                break;   
+            case SchedulingConstants.MESSAGE_TYPE_ERROR:
+                errorMsgs += additionStr;
+                break;   
+            default:
+                warnMsgs += "Message type incorrect when adding \"" + additionStr + "\" to the messages";
+                break;
+        }
     }
 }
