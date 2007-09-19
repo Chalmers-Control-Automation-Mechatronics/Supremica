@@ -247,8 +247,8 @@ public class EditorEditEdgeDialog
           // Not a very good position!
           // ***
           final LabelGeometrySubject geo = new LabelGeometrySubject
-            (new Point(LabelBlockProxyShape.DEFAULTOFFSETX,
-                       LabelBlockProxyShape.DEFAULTOFFSETY + 10));
+            (new Point(LabelBlockProxyShape.DEFAULT_OFFSET_X,
+                       LabelBlockProxyShape.DEFAULT_OFFSET_Y + 10));
           final GuardActionBlockSubject newblock =
             new GuardActionBlockSubject(guards, actions, geo);
           mEdge.setGuardActionBlock(newblock);

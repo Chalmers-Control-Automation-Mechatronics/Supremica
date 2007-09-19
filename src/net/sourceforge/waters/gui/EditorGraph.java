@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   EditorGraph
 //###########################################################################
-//# $Id: EditorGraph.java,v 1.23 2007-08-13 23:49:19 robi Exp $
+//# $Id: EditorGraph.java,v 1.24 2007-09-19 00:33:02 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.gui;
@@ -41,6 +41,7 @@ import net.sourceforge.waters.gui.command.MoveSimpleNodeCommand;
 import net.sourceforge.waters.gui.command.RedirectEdgeCommand;
 import net.sourceforge.waters.gui.command.SelectCommand;
 import net.sourceforge.waters.gui.command.UnSelectCommand;
+import net.sourceforge.waters.gui.renderer.LabelBlockProxyShape;
 import net.sourceforge.waters.gui.renderer.GeometryTools;
 
 import net.sourceforge.waters.model.base.Proxy;
@@ -588,8 +589,15 @@ public class EditorGraph
                       final double dy)
   {
     final LabelBlockSubject block1 = (LabelBlockSubject) getCopy(block0);
-    final LabelGeometrySubject geo0 = block0.getGeometry();
-    final LabelGeometrySubject geo1 = block1.getGeometry();
+    LabelGeometrySubject geo0 = block0.getGeometry();
+    LabelGeometrySubject geo1 = block1.getGeometry();
+    if (geo0 == null) {
+      geo0 = DEFAULT_LABELBLOCK_GEO;
+    }
+    if (geo1 == null) {
+      geo1 = DEFAULT_LABELBLOCK_GEO.clone();
+      block1.setGeometry(geo1);
+    }
     moveLabelGeometry(geo0, geo1, dx, dy);
   }
 
@@ -1791,5 +1799,8 @@ public class EditorGraph
 
   private static final int FIRST_PASS = PASS0_UNLINK;
   private static final int LAST_PASS = PASS3_RELINK;
+
+  private static final LabelGeometrySubject DEFAULT_LABELBLOCK_GEO =
+    new LabelGeometrySubject(LabelBlockProxyShape.DEFAULT_OFFSET);
 
 }

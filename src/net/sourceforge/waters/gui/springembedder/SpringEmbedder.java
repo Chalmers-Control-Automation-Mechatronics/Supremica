@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui.springembedder
 //# CLASS:   SpringEmbedder
 //###########################################################################
-//# $Id: SpringEmbedder.java,v 1.44 2007-08-15 12:23:17 robi Exp $
+//# $Id: SpringEmbedder.java,v 1.45 2007-09-19 00:33:02 robi Exp $
 //###########################################################################
 
 
@@ -206,9 +206,7 @@ public class SpringEmbedder
       }
       if (edge.getLabelBlock().getGeometry() == null) {
         final LabelGeometrySubject offset =
-          new LabelGeometrySubject
-               (new Point(LabelBlockProxyShape.DEFAULTOFFSETX,
-                          LabelBlockProxyShape.DEFAULTOFFSETY));
+          new LabelGeometrySubject(LabelBlockProxyShape.DEFAULT_OFFSET);
         edge.getLabelBlock().setGeometry(offset);
       }
       if (edge.getGuardActionBlock() != null &&
@@ -218,8 +216,8 @@ public class SpringEmbedder
         // ***
         final LabelGeometrySubject offset =
           new LabelGeometrySubject
-               (new Point(LabelBlockProxyShape.DEFAULTOFFSETX,
-                          LabelBlockProxyShape.DEFAULTOFFSETY + 10));
+               (new Point(LabelBlockProxyShape.DEFAULT_OFFSET_X,
+                          LabelBlockProxyShape.DEFAULT_OFFSET_Y + 10));
         edge.getGuardActionBlock().setGeometry(offset);
       }
     }

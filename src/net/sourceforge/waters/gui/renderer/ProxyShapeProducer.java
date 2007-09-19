@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui.renderer
 //# CLASS:   ProxyShapeProducer
 //###########################################################################
-//# $Id: ProxyShapeProducer.java,v 1.24 2007-05-23 07:23:00 avenir Exp $
+//# $Id: ProxyShapeProducer.java,v 1.25 2007-09-19 00:33:02 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.gui.renderer;
@@ -208,8 +208,8 @@ public class ProxyShapeProducer
       double y;
       final LabelGeometryProxy geo = block.getGeometry();
       if (geo == null) {
-        x = LabelBlockProxyShape.DEFAULTOFFSETX;
-        y = LabelBlockProxyShape.DEFAULTOFFSETY;
+        x = LabelBlockProxyShape.DEFAULT_OFFSET_X;
+        y = LabelBlockProxyShape.DEFAULT_OFFSET_Y;
       } else {
         final Point2D offset = geo.getOffset();
         x = offset.getX();

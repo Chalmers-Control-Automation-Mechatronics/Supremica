@@ -4,13 +4,15 @@
 //# PACKAGE: net.sourceforge.waters.gui.command
 //# CLASS:   MoveLabelBlockCommand
 //###########################################################################
-//# $Id: MoveLabelBlockCommand.java,v 1.1 2007-08-12 07:55:18 robi Exp $
+//# $Id: MoveLabelBlockCommand.java,v 1.2 2007-09-19 00:33:02 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.gui.command;
 
+import net.sourceforge.waters.model.module.ModuleProxyCloner;
 import net.sourceforge.waters.subject.module.LabelGeometrySubject;
 import net.sourceforge.waters.subject.module.LabelBlockSubject;
+import net.sourceforge.waters.subject.module.ModuleSubjectFactory;
 
 
 /**
@@ -29,8 +31,9 @@ public class MoveLabelBlockCommand
 			       final LabelBlockSubject dummy)
   {
     mLabelBlock = orig;
-    mOldGeometry = mLabelBlock.getGeometry().clone();
-    mNewGeometry = dummy.getGeometry().clone();
+    final ModuleProxyCloner cloner = ModuleSubjectFactory.getCloningInstance();
+    mOldGeometry = (LabelGeometrySubject) cloner.getClone(orig.getGeometry());
+    mNewGeometry = (LabelGeometrySubject) cloner.getClone(dummy.getGeometry());
   }
 
 

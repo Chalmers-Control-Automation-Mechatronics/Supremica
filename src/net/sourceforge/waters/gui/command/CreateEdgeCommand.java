@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui.command
 //# CLASS:   CreateEdgeCommand
 //###########################################################################
-//# $Id: CreateEdgeCommand.java,v 1.20 2007-08-13 23:49:19 robi Exp $
+//# $Id: CreateEdgeCommand.java,v 1.21 2007-09-19 00:33:02 robi Exp $
 //###########################################################################
 
 
@@ -87,9 +87,7 @@ public class CreateEdgeCommand
     final LabelBlockSubject labelClone;
     if (labelBlock == null) {
       final LabelGeometrySubject offset =
-        new LabelGeometrySubject
-        (new Point(LabelBlockProxyShape.DEFAULTOFFSETX,
-                   LabelBlockProxyShape.DEFAULTOFFSETY));
+        new LabelGeometrySubject(LabelBlockProxyShape.DEFAULT_OFFSET);
       labelClone = new LabelBlockSubject(null, offset);
     } else {
       labelClone = (LabelBlockSubject) cloner.getClone(labelBlock);

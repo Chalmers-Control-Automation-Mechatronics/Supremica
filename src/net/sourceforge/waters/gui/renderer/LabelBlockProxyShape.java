@@ -4,15 +4,17 @@
 //# PACKAGE: net.sourceforge.waters.gui.renderer
 //# CLASS:   LabelBlockProxyShape
 //###########################################################################
-//# $Id: LabelBlockProxyShape.java,v 1.7 2007-02-16 03:00:42 robi Exp $
+//# $Id: LabelBlockProxyShape.java,v 1.8 2007-09-19 00:33:02 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.gui.renderer;
 
 import java.awt.Graphics2D;
+import java.awt.Point;
 import java.awt.RenderingHints;
 import java.awt.Shape;
 import java.awt.geom.GeneralPath;
+import java.awt.geom.Point2D;
 import java.awt.geom.RoundRectangle2D;
 
 import net.sourceforge.waters.model.module.LabelBlockProxy;
@@ -92,7 +94,9 @@ public class LabelBlockProxyShape
   //# Class Constants
   public static final int DEFAULTARCW = 8;
   public static final int DEFAULTARCH = 8;
-  public static final int DEFAULTOFFSETX = 0;
-  public static final int DEFAULTOFFSETY = 10;
+  public static final int DEFAULT_OFFSET_X = 0;
+  public static final int DEFAULT_OFFSET_Y = 10;
+  public static final Point2D DEFAULT_OFFSET =
+    new Point(DEFAULT_OFFSET_X, DEFAULT_OFFSET_Y);
 
 }
