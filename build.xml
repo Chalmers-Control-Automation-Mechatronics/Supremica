@@ -150,11 +150,12 @@
         <unjar src="${waters.jaxbjar}" dest="${lib}/${unjared}"/>
         <unjar src="${lib}/manufacturingTables_jaxb.jar" dest="${lib}/${unjared}"/>
         <unjar src="${lib}/itext.jar" dest="${lib}/${unjared}"/>
+        <unjar src="${lib}/sat4j.jar" dest="${lib}/${unjared}"/>       
         <!-- unjar src="${lib}/java_cup.jar" dest="${lib}/${unjared}"/-->	
         <!-- unjar src="${lib}/bsh.jar" dest="${lib}/${unjared}"/-->	
         <unjar src="${lib}/jgrafchartresources.jar" dest="${resources}"/>
         <unjar src="${lib}/swing-worker.jar" dest="${resources}"/>
-        <unjar src="${lib}/sat4j.jar" dest="${resources}"/>       
+
         
         <!-- Ant 1.6.0 is not able to unjar empty jar files -->
         <!--
