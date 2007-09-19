@@ -167,6 +167,7 @@
         <unjar src="${jaxb-impl.jar}" dest="${lib}/${unjared}"/>
         <unjar src="${jaxb1-impl.jar}" dest="${lib}/${unjared}"/>
         <unjar src="${jsr173_api.jar}" dest="${lib}/${unjared}"/>
+        <unjar src="${sat4j.jar}" dest="${lib}/${unjared}"/>        
         <unjar src="${groovy-all.jar}" dest="${lib}/${unjared}"/> <!-- support for groovy -->
     </target>
     
