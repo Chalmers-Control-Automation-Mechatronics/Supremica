@@ -114,7 +114,11 @@
     
     <target name="initialize_jars" depends="-jar_waters_jaxb">	
         <!-- PLEASE ADD COMMENTS DESCRIBING THE DIFFERENT LIBRARIES. -->
-        <unjar src="${lib}/JGo.jar" dest="${lib}/${unjared}"/>	
+        
+    	<unjar src="${lib}/jniwrap-3.1.jar" dest="${lib}/${unjared}"/>
+    	<unjar src="${lib}/jexcel-1.0.jar" dest="${lib}/${unjared}"/>
+    	
+    	<unjar src="${lib}/JGo.jar" dest="${lib}/${unjared}"/>	
         <unjar src="${lib}/JGoLayout.jar" dest="${lib}/${unjared}"/>
         <unjar src="${lib}/antlr.jar" dest="${lib}/${unjared}"/>
         <unjar src="${lib}/grappa.jar" dest="${lib}/${unjared}"/>
