@@ -157,7 +157,19 @@ public class ExtendedAutomaton
 
 	public void addIntegerVariable(String name, int lowerBound, int upperBound, int initialValue, Integer markedValue)
 	{
+		// TODO: mark all variable values
+// 		BinaryExpressionProxy type = 
+// 			factory.createBinaryExpressionProxy(CompilerOperatorTable.getInstance().getBinaryOperator(".."),
+// 												factory.createIntConstantProxy(lowerBound), factory
+// 												.createIntConstantProxy(upperBound));
+		
+// 		factory.createVariableProxy(name, type, 
+// 									factory.createIntConstantProxy(initialValue),
+// 									markedValue == null ? null : factory.createIntConstantProxy(markedValue));
+
 		component.getVariablesModifiable().add(VariableHelper.createIntegerVariable(name, lowerBound, upperBound, initialValue, markedValue));
+
+
 	}
 
 	/**
