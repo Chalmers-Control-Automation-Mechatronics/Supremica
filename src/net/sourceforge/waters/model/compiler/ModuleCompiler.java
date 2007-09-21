@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.module
 //# CLASS:   ModuleCompiler
 //###########################################################################
-//# $Id: ModuleCompiler.java,v 1.84 2007-09-18 14:04:43 markus Exp $
+//# $Id: ModuleCompiler.java,v 1.85 2007-09-21 12:58:28 markus Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.compiler;
@@ -57,6 +57,7 @@ import net.sourceforge.waters.model.module.EventAliasProxy;
 import net.sourceforge.waters.model.module.EventDeclProxy;
 import net.sourceforge.waters.model.module.EventListExpressionProxy;
 import net.sourceforge.waters.model.module.ExpressionProxy;
+import net.sourceforge.waters.model.module.ForeachComponentProxy;
 import net.sourceforge.waters.model.module.ForeachProxy;
 import net.sourceforge.waters.model.module.GraphProxy;
 import net.sourceforge.waters.model.module.GroupNodeProxy;
@@ -139,28 +140,12 @@ public class ModuleCompiler extends AbstractModuleProxyVisitor
         mParameterMap = new TreeMap<String,CompiledParameterBinding>();
         visitCollection(bindings);
       }
-      // begin EFA
-      
       /*
-      // declare boolean constants
-      mContext.add("true", new CompiledIntValue(true));
-      mContext.add("false", new CompiledIntValue(false));
-      // reserve "boolean" for the type boolean
-      mContext.add("boolean", new CompiledIntRangeValue(0,1));
-      */
-
+       * mIsEFA is set to true if a component in mModule has a non-empty GuardActionBlock. 
+       */
       mIsEFA = false;
-      for (final Proxy proxy : mModule.getComponentList()) {
-        if (proxy instanceof SimpleComponentProxy) {
-          final SimpleComponentProxy comp = (SimpleComponentProxy) proxy;
-          final Collection<EdgeProxy> edges = comp.getGraph().getEdges();
-          mIsEFA = mIsEFA || componentHasNonEmptyGuardActionBlock(edges);
-        } else {
-          mIsEFA = false;
-          break;
-        }
-      }
-      // end EFA
+      isEFA(mModule.getComponentList());
+      
       visitModuleProxy(mModule);
       return mDESFactory.createProductDESProxy
         (name, comment, desLocation, mGlobalAlphabet, mAutomata.values());
@@ -178,6 +163,26 @@ public class ModuleCompiler extends AbstractModuleProxyVisitor
     }
   }
 
+
+private void isEFA(List<Proxy> componentList) {
+	if(componentList.isEmpty()){
+		return;
+	}
+	else{
+	for (final Proxy proxy : componentList) {
+        if (proxy instanceof SimpleComponentProxy) {
+          final SimpleComponentProxy comp = (SimpleComponentProxy) proxy;
+          final Collection<EdgeProxy> edges = comp.getGraph().getEdges();
+          mIsEFA = mIsEFA || componentHasNonEmptyGuardActionBlock(edges);
+        }
+        if (proxy instanceof ForeachComponentProxy) {
+            final ForeachComponentProxy comp = (ForeachComponentProxy) proxy;
+            final List<Proxy> proxyList = comp.getBody();
+            isEFA(proxyList);
+          }
+      }
+   }
+}
 
   //##########################################################################
   //# Interface net.sourceforge.waters.model.module.ModuleProxyVisitor
