@@ -81,10 +81,10 @@
     </xjc>
   </target>
 
-  <target name="gen_manufacturingtables_rop_copvision" description="Generate Manufacturing Tables ROP COPVision JAXB classes.">
-    <xjc target="${src}" extension="true" removeOldOutput="yes" package="org.supremica.manufacturingTables.xsd.rop_copvision">
-      <schema dir="${xsd_manufacturingTables}" includes="ROP_COPVision.xsd"/>
-      <produces dir="${src}/org/supremica/manufacturingTables/xsd/rop_copvision"/>
+  <target name="gen_manufacturingtables_rop_processeditor" description="Generate Manufacturing Tables ROP processeditor JAXB classes.">
+    <xjc target="${src}" extension="true" removeOldOutput="yes" package="org.supremica.manufacturingTables.xsd.processeditor">
+      <schema dir="${xsd_manufacturingTables}" includes="ROP_processeditor.xsd"/>
+      <produces dir="${src}/org/supremica/manufacturingTables/xsd/processeditor"/>
     </xjc>
   </target>
 
