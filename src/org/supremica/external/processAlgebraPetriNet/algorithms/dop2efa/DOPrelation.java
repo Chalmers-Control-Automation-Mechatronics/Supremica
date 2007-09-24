@@ -10,7 +10,7 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.supremica.manufacturingTables.xsd.rop_copvision.*;
+import org.supremica.manufacturingTables.xsd.processeditor.*;
 
 public class DOPrelation{
 	
@@ -151,7 +151,7 @@ public class DOPrelation{
 					//build Alternative path
 					start_stop_parallel.setProcess(var_name);
 					
-					/* Start parallel node by seting it's variable to 1 */
+					/* Start parallel node by set it's variable to 1 */
 					start_stop_parallel.setStartAction(var_name + "=1;");
 					
 					/* Continue then parallel node is done, and reset variabel */
@@ -399,6 +399,8 @@ public class DOPrelation{
 		/* 
 		 * for a parallel node only two options exist either we have
 		 * a relation or a activity.
+		 * 
+		 * Different relation type handle equals.
 		 *  
 		 */
 		
@@ -409,7 +411,7 @@ public class DOPrelation{
 			tmp = new EFA(parallel_track,m);
 			m.addAutomaton(tmp);
 			
-			tmp.addState(firstState);
+			tmp.addInitialState(firstState);
 			tmp.addState(lastState);
 			
 			if(activityRelations[i] instanceof Relation){
@@ -437,8 +439,8 @@ public class DOPrelation{
 				stop_par.setOperation(stop);
 				
 				/* 
-				 * bind the relation in a sequence
-				 * whit start and stop guards 
+				 * lock the relation in a sequence
+				 * whit start and stop guards.
 				 */
 				seq.getActivityRelationGroup().add(start_par);
 				seq.getActivityRelationGroup().add(activityRelations[i]);
@@ -527,7 +529,7 @@ public class DOPrelation{
 			tmp = new EFA(parallel_track,m);
 			m.addAutomaton(tmp);
 			
-			tmp.addState(firstState);
+			tmp.addInitialState(firstState);
 			tmp.addState(lastState);
 			
 			if(activityRelations[i] instanceof Relation){

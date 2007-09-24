@@ -48,38 +48,38 @@ public class EFA extends ExtendedAutomaton{
 	   //super
 	   super.addTransition(from,to,event,guard,action);
    }
+   
+   public void addState(String name){
+	   this.addState(name, false, false);
+   }
+   
+   public void addInitialState(String name){
+	   this.addState(name, false, true);
+   }
+   
+   public void addAcceptingState(String name){
+	   this.addState(name, true, false);
+   }
+   
    /**
-    * Add new state String s to automaton.
-    * if state s already present or null do
-    * nothing.
     * 
-    * First added state will be initial state
-    * @param s
     */
-   public void addState(String s){
-       
-       //check in data
-       if(s == null){
+   public void addState(String name, boolean accepting, boolean initial){
+	 //check in data
+       if(name == null){
            return;
-       }else if(s.length() == 0){
+       }else if(name.length() == 0){
     	   return;
        }
        
        //check if we already added this state
-       if(states.contains(s)){
+       if(states.contains(name)){
     	   return;
        }
  
        //add new state
-       if(states.isEmpty()){
-    	   //first state is always
-    	   //initial state
-    	   super.addInitialState(s);
-       }else{
-    	   super.addState(s);
-       }
-       
-       states.add(s);
+       super.addState(name, accepting, initial);
+       states.add(name);
    }
    
    /**

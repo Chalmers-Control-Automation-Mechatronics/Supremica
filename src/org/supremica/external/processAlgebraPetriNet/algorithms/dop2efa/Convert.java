@@ -8,6 +8,8 @@ import java.awt.event.*;
 import javax.swing.*;
 import javax.swing.filechooser.*;
 
+import org.supremica.apps.*;
+
 public class Convert extends JPanel implements ActionListener {
 
 	private JPanel inputPane;
@@ -127,9 +129,30 @@ public class Convert extends JPanel implements ActionListener {
     	File inFile = new File(in);
     	
     	if(inFile.exists()){
-    		//open in supremica here???
-    		System.out.println("Not implemented");
+    		String fileName = "tmpfile";
+    		String ext = ".wmod";
+    		File outFile = new File(fileName.concat(ext));
     		
+    		//unique file name
+    		int i = 0;
+    		while(outFile.exists()){
+    			fileName = "tmpfile" + Integer.toString(i) + ext;
+    			outFile = new File(fileName);
+    			i = i + 1;
+    		}
+    		
+    		try{
+				outFile.createNewFile();
+			}
+			catch (Exception e){
+				e.printStackTrace();
+			}
+			//help
+    		DOPtoEFA.createEFA(inFile, outFile);
+    		
+    		SupremicaWithGui.startSupremica(new String[]{"test"});
+    		
+    		outFile.delete();
     	}else{
     		System.err.println("File " + inFile + " dosen't exist.");
     	}

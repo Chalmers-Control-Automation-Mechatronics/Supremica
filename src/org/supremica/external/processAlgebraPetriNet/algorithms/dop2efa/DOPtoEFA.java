@@ -8,7 +8,7 @@ import java.io.File;
 import java.util.List;
 import java.util.LinkedList;
 
-import org.supremica.manufacturingTables.xsd.rop_copvision.*;
+import org.supremica.manufacturingTables.xsd.processeditor.*;
 
 /**
  * @author David Millares
@@ -60,7 +60,13 @@ public class DOPtoEFA extends DOPrelation{
 		EFA main_efa = new EFA("main_" + machine,m);
 		m.addAutomaton(main_efa);
 		
-		sequence(main_sequence,machine +  "_idle",machine + "_finish", main_efa);
+		String startState = machine +  "_idle";
+		String endState = machine + "_finish";
+		
+		main_efa.addInitialState(startState);
+		main_efa.addState(endState);
+		
+		sequence(main_sequence,startState,endState,main_efa);
 		
 		m.writeToFile(f);
 	}
@@ -237,7 +243,7 @@ public class DOPtoEFA extends DOPrelation{
 		r.setType(RelationType.ARBITRARY);
 		
 		r.getActivityRelationGroup().add(0, a);
-		r.getActivityRelationGroup().add(1, b);
+		//r.getActivityRelationGroup().add(1, b);
 		//r.getActivityRelationGroup().add(2, c);
 		
 		rop.setRelation(r);

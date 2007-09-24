@@ -15,7 +15,7 @@ import javax.xml.bind.*;
 
 public class Loader {
     
-    private final String PKGS = "org.supremica.manufacturingTables.xsd.rop_copvision";
+    private final String PKGS = "org.supremica.manufacturingTables.xsd.processeditor";
     
     private JAXBContext jaxbContext;
     private Unmarshaller u;

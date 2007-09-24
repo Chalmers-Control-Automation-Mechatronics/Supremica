@@ -95,7 +95,7 @@ public class Module extends ExtendedAutomata{
 		
 		final int lowerBound = 0;
 		final int initialValue = 0;
-		//final int markedValue = 0;
+		final int markedValue = 0;
 		
 		if(global_variables_dummy_efa == null){
 			init_global_variables();
@@ -105,7 +105,7 @@ public class Module extends ExtendedAutomata{
 		arbitraryNode = arbitraryNode + 1;
 		
 		global_variables_dummy_efa.addIntegerVariable(
-				name, lowerBound, upperBound, initialValue, null);
+				name, lowerBound, upperBound, initialValue, markedValue);
 		
 		return name;
 	}
@@ -123,7 +123,7 @@ public class Module extends ExtendedAutomata{
 		final int upperBound = 1;
 		
 		final int initialValue = 1;
-		//final int markedValue = 0;
+		final int markedValue = 1;
 		
 		if(global_variables_dummy_efa == null){
 			init_global_variables();
@@ -133,7 +133,7 @@ public class Module extends ExtendedAutomata{
 		arbitrary = arbitrary + 1;
 		
 		global_variables_dummy_efa.addIntegerVariable(
-				name, lowerBound, upperBound, initialValue, null);
+				name, lowerBound, upperBound, initialValue, markedValue);
 		
 		return name;
 	}
