@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.gui.ide
 //# CLASS:   IDE
 //###########################################################################
-//# $Id: IDE.java,v 1.97 2007-09-21 14:02:32 knut Exp $
+//# $Id: IDE.java,v 1.98 2007-09-24 18:24:43 knut Exp $
 //###########################################################################
 
 package org.supremica.gui.ide;
@@ -21,6 +21,7 @@ import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JSplitPane;
+import java.util.Locale;
 import javax.xml.bind.JAXBException;
 
 import net.sourceforge.waters.gui.EditorWindowInterface;
@@ -353,6 +354,7 @@ public class IDE
 
     static
     {
+		Locale.setDefault(Locale.ENGLISH);
         Config.XML_RPC_ACTIVE.set(false);
         Config.DOT_USE.set(true);
         Config.LOG_TO_CONSOLE.set(false);
