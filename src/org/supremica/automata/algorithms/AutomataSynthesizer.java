@@ -80,19 +80,19 @@ public class AutomataSynthesizer
     private ArrayList synchronizationExecuters;
     private SynchronizationOptions synchronizationOptions;
     private SynthesizerOptions synthesizerOptions;
-    
+
     private ExecutionDialog executionDialog = null;
-    
+
     // For the stopping
     private boolean stopRequested = false;
     private Stoppable threadToStop = null;
-    
+
     // For the optimization...
     private boolean maximallyPermissive;
-    
+
     // Statistics
     AutomataSynchronizerHelperStatistics helperStatistics = new AutomataSynchronizerHelperStatistics();
-    
+
     public AutomataSynthesizer(Automata theAutomata, SynchronizationOptions synchronizationOptions,
         SynthesizerOptions synthesizerOptions)
         throws Exception, IllegalArgumentException
@@ -103,17 +103,17 @@ public class AutomataSynthesizer
         this.synthesizerOptions = synthesizerOptions;
         this.nbrOfExecuters = this.synchronizationOptions.getNbrOfExecuters();
         this.maximallyPermissive = synthesizerOptions.getMaximallyPermissive();
-        
+
         // Some sanity tests (should already have been tested from ActionMan?)
         if ((synthesizerOptions.getSynthesisAlgorithm() == SynthesisAlgorithm.MODULAR) &&
             !theAutomata.isAllEventsPrioritized())
         {
             throw new IllegalArgumentException("All events are not prioritized!");
         }
-        
+
         // Fix this later
         synthesizerOptions.setRememberDisabledUncontrollableEvents(true);
-        
+
         try
         {
             ucEventToPlantMap = AlphabetHelpers.buildUncontrollableEventToAutomataMap(theAutomata.getPlantAutomata());
@@ -122,11 +122,11 @@ public class AutomataSynthesizer
         {
             logger.error("Error while initializing synchronization helper. " + e);
             logger.debug(e.getStackTrace());
-            
+
             throw e;
         }
     }
-    
+
     /**
      * Synthesizes supervisors
      */
@@ -134,17 +134,17 @@ public class AutomataSynthesizer
     throws Exception
     {
         Automata result = new Automata();
-        
+
         /*
                   if (synthesizerOptions.getSynthesisAlgorithm() == SynthesisAlgorithm.MonolithicSingleFixpoint)
                   {
                   MonolithicReturnValue retval = doMonolithic(theAutomata, true);
-         
+
                   if (stopRequested)
                   {
                   return new Automata();
                   }
-         
+
                   result.addAutomaton(retval.automaton);
                   }
                   else
@@ -153,32 +153,32 @@ public class AutomataSynthesizer
         {
             // MONOLITHIC synthesis, just whack the entire stuff into the monolithic algo
             MonolithicReturnValue retval = doMonolithic(theAutomata, false);
-            
+
             if (stopRequested)
             {
                 return new Automata();
             }
-            
+
             result.addAutomaton(retval.automaton);
         }
         else if (synthesizerOptions.getSynthesisAlgorithm() == SynthesisAlgorithm.MODULAR)
         {
             // MODULAR (controllability) synthesis
             Automata newSupervisors = doModular(theAutomata);
-            
+
             if (stopRequested || newSupervisors == null)
             {
                 return new Automata();
             }
-            
+
             logger.info(helperStatistics);
-            
+
             result.addAutomata(newSupervisors);
         }
         else if (synthesizerOptions.getSynthesisAlgorithm() == SynthesisAlgorithm.COMPOSITIONAL)
         {
             // Use supervision equivalence minimization!
-            
+
             // Prepare for synthesis
             // Make a copy
             theAutomata = new Automata(theAutomata);
@@ -211,7 +211,7 @@ public class AutomataSynthesizer
                 // NONBLOCKING and controllable. Plantify the specifications and supervisors!
                 MinimizationHelper.plantify(theAutomata);
             }
-            
+
             // Do the stuff!
             AutomataMinimizer minimizer = new AutomataMinimizer(theAutomata);
             minimizer.setExecutionDialog(executionDialog);
@@ -222,7 +222,7 @@ public class AutomataSynthesizer
                 sup.setComment("sup(" + min.getName() + ")");
                 sup.setName(null);
             }
-            
+
             // Present result
             if (Config.VERBOSE_MODE.isTrue() && (min.size() == 1) && (min.getFirstAutomaton().nbrOfStates() < 100))
             {
@@ -238,29 +238,33 @@ public class AutomataSynthesizer
             SynthesisType type = synthesizerOptions.getSynthesisType();
             boolean do_c = (type == SynthesisType.NONBLOCKINGCONTROLLABLE) | (type == SynthesisType.CONTROLLABLE);
             boolean do_nb = (type == SynthesisType.NONBLOCKINGCONTROLLABLE) | (type == SynthesisType.NONBLOCKING);
-            
+
             Automata newAutomata = new Automata(theAutomata);
-            
+
             AutomataBDDSynthesizer bddSynthesizer = new AutomataBDDSynthesizer(newAutomata, do_nb, do_c);
-            
-            //Perform BDD synthesis
-            OnlineBDDSupervisor supervisor = bddSynthesizer.extractOnlineSupervisor();
-            
-            //result.addAutomaton(sup);
-            try
+
+
+            if (synthesizerOptions.doExtractSupervisor())
             {
-                result.addAutomaton(supervisor.createAutomaton());
-            }
-            catch(Exception ex)
-            {
-                ex.printStackTrace();
-            }
-            finally
-            {
-                //clean up (this is needed because of the buddy lib)
-                supervisor.cleanup();
-                bddSynthesizer.cleanup();
-            }
+				//Perform BDD synthesis
+				OnlineBDDSupervisor supervisor = bddSynthesizer.extractOnlineSupervisor();
+
+				//result.addAutomaton(sup);
+				try
+				{
+					result.addAutomaton(supervisor.createAutomaton());
+				}
+				catch(Exception ex)
+				{
+					ex.printStackTrace();
+				}
+				finally
+				{
+					//clean up (this is needed because of the buddy lib)
+					supervisor.cleanup();
+					bddSynthesizer.cleanup();
+				}
+			}
         }
         else if (synthesizerOptions.getSynthesisAlgorithm() == SynthesisAlgorithm.MONOLITHICBDD)
         {
@@ -274,10 +278,10 @@ public class AutomataSynthesizer
         {
             logger.error("Unknown synthesis algorithm");
         }
-        
+
         return result;
     }
-    
+
     /**
      * Removes from disabledUncontrollableEvents those events that are "insignificant"
      * Returns the result, which is an altered disabledUncontrollableEvents
@@ -290,31 +294,31 @@ public class AutomataSynthesizer
             {
                 // disregard the uc-events of this spec/supervisor
                 Automaton currAutomaton = (Automaton) autIt.next();
-                
+
                 if (currAutomaton.isSupervisor() || currAutomaton.isSpecification())
                 {
                     Alphabet currAlphabet = currAutomaton.getAlphabet();
-                    
+
                     disabledUncontrollableEvents.minus(currAlphabet);
                 }
             }
-            
+
             // Remove those disabled events that are not included in another plant
             LinkedList eventsToBeRemoved = new LinkedList();
-            
+
             for (Iterator evIt = disabledUncontrollableEvents.iterator(); evIt.hasNext(); )
             {
                 LabeledEvent currEvent = (LabeledEvent) evIt.next();
                 //Set currAutomata = (Set) ucEventToPlantMap.get(currEvent);
                 Automata currAutomata = ucEventToPlantMap.get(currEvent);
                 boolean removeEvent = true;
-                
+
                 // currAutomata contains those plant automata that contain this event.
                 for (Iterator autIt = currAutomata.iterator();
                 autIt.hasNext(); )
                 {
                     Automaton currAutomaton = (Automaton) autIt.next();
-                    
+
                     if (currAutomaton.isPlant())
                     {
                         // Check if there is a plant not included in this
@@ -326,24 +330,24 @@ public class AutomataSynthesizer
                         }
                     }
                 }
-                
+
                 if (removeEvent)
                 {
                     eventsToBeRemoved.add(currEvent);
                 }
             }
-            
+
             for (Iterator evIt = eventsToBeRemoved.iterator(); evIt.hasNext(); )
             {
                 LabeledEvent currEvent = (LabeledEvent) evIt.next();
-                
+
                 disabledUncontrollableEvents.removeEvent(currEvent);
             }
         }
-        
+
         return disabledUncontrollableEvents;
     }
-    
+
     /**
      * Does modular synthesis...
      */
@@ -352,10 +356,10 @@ public class AutomataSynthesizer
     {
         // Automata that collects the calculated supervisors
         Automata supervisors = new Automata();
-        
+
         // Selector - always start with non-max perm
         AutomataSelector selector = AutomataSelectorFactory.getAutomataSelector(aut, synthesizerOptions);
-        
+
         // Initialize execution dialog
         java.awt.EventQueue.invokeLater(new Runnable()
         {
@@ -368,7 +372,7 @@ public class AutomataSynthesizer
                 }
             }
         });
-        
+
         // Loop over specs/sups AND their corresponding plants (dealt with by the selector)
         for (Automata automata = selector.next(); automata.size() > 0; automata = selector.next())
         {
@@ -376,7 +380,7 @@ public class AutomataSynthesizer
             {
                 return new Automata();
             }
-            
+
             // In the non incremental approach, immediately add all plants that are related
             // by uncontrollable events. Otherwise this is done incrementally below
             if (synthesizerOptions.getMaximallyPermissive() &&
@@ -395,20 +399,20 @@ public class AutomataSynthesizer
                     uncontrollableEvents = automata.getUnionAlphabet().getUncontrollableAlphabet();
                 }
             }
-            
+
             // Do monolithic synthesis on this subsystem
             MonolithicReturnValue retval = doMonolithic(automata);
-            
+
             if (stopRequested)
             {
                 return new Automata();
             }
-            
+
             // Did anything happen?
             if (retval.didSomething)
             {
                 Alphabet disabledUncontrollableEvents = checkMaximallyPermissive(automata, retval.disabledUncontrollableEvents);
-                
+
                 // Do we care about max perm?
                 if (synthesizerOptions.getMaximallyPermissive())
                 {
@@ -425,15 +429,15 @@ public class AutomataSynthesizer
                         else
                             // Add all plants
                             automata = selector.addPlants(disabledUncontrollableEvents);
-                        
+
                         // Do monolithic synthesis on this subsystem
                         retval = doMonolithic(automata);
-                        
+
                         if (stopRequested)
                         {
                             return new Automata();
                         }
-                        
+
                         disabledUncontrollableEvents = checkMaximallyPermissive(automata, retval.disabledUncontrollableEvents);
                     }
                 }
@@ -455,38 +459,38 @@ public class AutomataSynthesizer
                             "' is maximally permissive.");
                     }
                 }
-                
+
                 supervisors.addAutomaton(retval.automaton);
             }
-            
+
             // Update execution dialog
             if (executionDialog != null)
             {
                 executionDialog.setProgress(selector.getProgress());
             }
         }
-        
+
         /*
         // If no spec/sup is in the selected automata, only nonblocking requires work
         // if we've not seen any spec, do monolithic synthesis on each plant individually
         if (!selector.hadSpec())
         {
                 logger.debug("No spec/sup seen, performing monolithic synthesis on the each plant.");
-         
+
                 MonolithicReturnValue retval = doMonolithic(aut);
-         
+
                 if (stopRequested)
                 {
                 return new Automata();
                 }
-         
+
                 if (retval.didSomething)
                 {
                 supervisors.addAutomaton(retval.automaton);
                 }
         }
          */
-        
+
         // Should we optimize the result (throw unnecessary supervisors away)
         if (synthesizerOptions.getOptimize())
         {
@@ -495,17 +499,17 @@ public class AutomataSynthesizer
                 executionDialog.setMode(ExecutionDialogMode.SYNTHESISOPTIMIZING);
                 executionDialog.initProgressBar(0, supervisors.size());
             }
-            
+
             optimize(aut, supervisors);
         }
-        
+
         // Did we do anything at all?
         if (supervisors.size() == 0)
         {
             logger.info("No problems found, the current specifications and supervisors " +
                 "can be used to supervise the system.");
         }
-        
+
         // NONBLOCKING synthesis is not implemented...
         if ((synthesizerOptions.getSynthesisType() == SynthesisType.NONBLOCKING) || (synthesizerOptions.getSynthesisType() == SynthesisType.NONBLOCKINGCONTROLLABLE))
         {
@@ -513,11 +517,11 @@ public class AutomataSynthesizer
                 "is that each supervisor is individually nonblocking with respect to the " +
                 "plants it controls");
         }
-        
+
         // Return the new supervisors
         return supervisors;
     }
-    
+
     /**
      * This method synchronizes the given automata, and calculates
      * the forbidden states. Uses the ordinary synthesis algorithm.
@@ -527,7 +531,7 @@ public class AutomataSynthesizer
     {
         return doMonolithic(automata, false);
     }
-    
+
     /**
      * This method synchronizes the given automata, and calculates
      * the forbidden states.
@@ -536,11 +540,11 @@ public class AutomataSynthesizer
     throws Exception
     {
         logger.verbose("Attempting monolithic synthesis for: " + automata);
-        
+
         MonolithicReturnValue retval = new MonolithicReturnValue();
-        
+
         retval.didSomething = false;
-        
+
         // If we synthesize a nonblocking, controllable and observable
         // supervisor a supremal supervisor is only guaranteed
         // to exist if all controllable events are observable.
@@ -555,71 +559,71 @@ public class AutomataSynthesizer
         {
             Alphabet unionAlphabet = AlphabetHelpers.getUnionAlphabet(automata);
             Alphabet problemEvents = new Alphabet();
-            
+
             for (Iterator<LabeledEvent> evIt = unionAlphabet.iterator();
             evIt.hasNext(); )
             {
                 LabeledEvent currEvent = evIt.next();
-                
+
                 if (currEvent.isControllable() &&!currEvent.isObservable())
                 {
                     problemEvents.addEvent(currEvent);
                 }
             }
-            
+
             if (problemEvents.size() > 0)
             {
                 // Make copy since we will change controllability
                 Automata newAutomata = new Automata(automata);
-                
+
                 // Iterate over all the automata and change
                 // controllability of the problem events
                 for (Iterator autIt = newAutomata.iterator(); autIt.hasNext(); )
                 {
                     Automaton currAutomaton = (Automaton) autIt.next();
                     Alphabet currAlphabet = currAutomaton.getAlphabet();
-                    
+
                     // Iterator over the problem events
                     for (Iterator<LabeledEvent> evIt = problemEvents.iterator();
                     evIt.hasNext(); )
                     {
                         LabeledEvent currEvent = evIt.next();
-                        
+
                         if (currAlphabet.contains(currEvent.getLabel()))
                         {
                             LabeledEvent currAutomatonEvent = currAlphabet.getEvent(currEvent.getLabel());
-                            
+
                             currAutomatonEvent.setControllable(false);
                         }
                     }
                 }
-                
+
                 StringBuffer sb = new StringBuffer();
                 for (Iterator<LabeledEvent> evIt = problemEvents.iterator(); evIt.hasNext(); )
                 {
                     LabeledEvent currEvent = evIt.next();
                     sb.append(currEvent + " ");
                 }
-                
+
                 logger.warn(sb.toString() + "are controllable but not observable. This implies that a supremal" +
                     "supervisor may not exist. To guarantee existence of such a supervisor the events " +
                     "will be treated us uncontrollable from the supervisors point of view. However the " +
                     "supervisor does not have to be maximally permissive.");
-                
+
                 automata = newAutomata;
             }
         }
-        
+
         // Remember old setting
         boolean orgRememberDisabledEvents = synchronizationOptions.rememberDisabledEvents();
-        
+
         // We must keep track of all events that we have disabled
         // This is used when checking for observability
         if (synthesizerOptions.getSynthesisType() == SynthesisType.NONBLOCKINGCONTROLLABLEOBSERVABLE)
         {
             synchronizationOptions.setRememberDisabledEvents(true);
         }
-        
+
         if (synthesizerOptions.getSynthesisType() == SynthesisType.NONBLOCKING)
         {
             automata = new Automata(automata);
@@ -632,34 +636,34 @@ public class AutomataSynthesizer
                 }
             }
         }
-        
+
         AutomataSynchronizer syncher = new AutomataSynchronizer(automata, synchronizationOptions);
         syncher.getHelper().setExecutionDialog(executionDialog);
         threadToStop = syncher;
         syncher.execute();
         threadToStop = null;
-        
+
         // Exctract statistics, add to global statistics set in helperData.
         AutomataSynchronizerHelper helper = syncher.getHelper();
         helperStatistics.setNumberOfCheckedStates(helperStatistics.getNumberOfCheckedStates() + helper.getHelperData().getNumberOfCheckedStates());
         helperStatistics.setNumberOfDeadlockedStates(helperStatistics.getNumberOfDeadlockedStates() + helper.getHelperData().getNumberOfDeadlockedStates());
         helperStatistics.setNumberOfForbiddenStates(helperStatistics.getNumberOfForbiddenStates() + helper.getHelperData().getNumberOfForbiddenStates());
         helperStatistics.setNumberOfReachableStates(helperStatistics.getNumberOfReachableStates() + helper.getHelperData().getNumberOfReachableStates());
-        
+
         if (stopRequested)
         {
             return null;
         }
-        
+
         retval.automaton = syncher.getAutomaton();
         retval.didSomething |= !syncher.getHelper().getAutomataIsControllable();
-        
+
         if (synthesizerOptions.getSynthesisType() == SynthesisType.NONBLOCKINGCONTROLLABLEOBSERVABLE)
         {
             // Reset the synchronization type
             synchronizationOptions.setRememberDisabledEvents(orgRememberDisabledEvents);
         }
-        
+
         // We need to synthesize even if the result above is controllable
         // NONBLOCKING may ruin controllability
         // ARASH: choose between triple and the single fixpoint algorithms:
@@ -669,15 +673,15 @@ public class AutomataSynthesizer
         threadToStop = synthesizer;
         retval.didSomething |= synthesizer.synthesize();
         threadToStop = null;
-        
+
         if (stopRequested)
         {
             return null;
         }
-        
+
         retval.disabledUncontrollableEvents = synthesizer.getDisabledUncontrollableEvents();
         retval.automaton = synthesizer.getAutomaton();
-        
+
         // Shall we reduce the supervisor?
         if (synthesizerOptions.getReduceSupervisors())
         {
@@ -685,25 +689,25 @@ public class AutomataSynthesizer
             {
                 executionDialog.setMode(ExecutionDialogMode.SYNTHESISREDUCING);
             }
-            
+
             // Supervisor reduction only works if the supervisor is purged
             assert(synthesizerOptions.doPurge());
-            
+
             // Add the reduced supervisor
             Automaton supervisor = retval.automaton;
-            Automaton reducedSupervisor = AutomatonSplit.reduceAutomaton(supervisor, automata);            
+            Automaton reducedSupervisor = AutomatonSplit.reduceAutomaton(supervisor, automata);
             retval.automaton = reducedSupervisor;
-            
+
             if (executionDialog != null)
             {
                 executionDialog.setMode(ExecutionDialogMode.SYNTHESIZING);
             }
         }
-        
+
         // Return the result
         return retval;
     }
-    
+
     /**
      * Removes unnecessary automata, i.e. synthesised supervisors that
      * don't affect the controllability.
@@ -721,10 +725,10 @@ public class AutomataSynthesizer
     throws Exception
     {
         logger.debug("AutomataSynthesizer.optimize");
-        
+
         // Deep copy the new automata, so we can purge without affecting the originals
         Automata newSupervisors = new Automata(candidateSupervisors);
-        
+
         // Make sure the automata are purged - they must be for the optimization to work...
         if (!synthesizerOptions.doPurge())
         {
@@ -736,15 +740,15 @@ public class AutomataSynthesizer
                 automatonPurge.execute();
             }
         }
-        
+
         Automata currAutomata = new Automata();
         currAutomata.addAutomata(theAutomata);
         currAutomata.addAutomata(newSupervisors);
-        
+
         // Remove one of the candidate supervisors in newSupervisors at a time and see
         // if the behaviour of the rest of the system is included in that supervisor
         // (i.e. the system already behaves like that without the supervisor).
-        
+
         // Remove the new automata one by one and examine if it had impact on the result.
         int progress = 0;
         for (int i = newSupervisors.size() - 1; i >= 0; i--)
@@ -752,7 +756,7 @@ public class AutomataSynthesizer
             Automaton currSupervisor = newSupervisors.getAutomatonAt(i);
             currAutomata.removeAutomaton(currSupervisor);
             progress++;
-            
+
             // Prepare a verifier for verifying the need for this supervisor
                         /*
                           SynchronizationOptions synchronizationOptions;
@@ -773,12 +777,12 @@ public class AutomataSynthesizer
             synchronizationOptions = SynchronizationOptions.getDefaultVerificationOptions();
             AutomataVerifier verifier = new AutomataVerifier(currAutomata, verificationOptions,
                 synchronizationOptions, null);
-            
+
             if (stopRequested)
             {
                 return;
             }
-            
+
             // Will the supervisor affect the system at all?
             logger.verbose("Examining whether the supervisor candidate " +
                 currSupervisor + " is needed.");
@@ -796,19 +800,19 @@ public class AutomataSynthesizer
                 currAutomata.addAutomaton(currSupervisor); // Not for LanguageInclusion
             }
             threadToStop = null;
-            
+
             if (executionDialog != null)
             {
                 executionDialog.setProgress(progress);
             }
         }
     }
-    
+
     public void setExecutionDialog(ExecutionDialog dialog)
     {
         executionDialog = dialog;
     }
-    
+
     /**
      * Method that stops the synthesizer as soon as possible.
      *
@@ -817,21 +821,21 @@ public class AutomataSynthesizer
     public void requestStop()
     {
         stopRequested = true;
-        
+
         logger.debug("AutomataSynthesizer requested to stop.");
-        
+
         // Stop currently executing thread!
         if (threadToStop != null)
         {
             threadToStop.requestStop();
         }
     }
-    
+
     public boolean isStopped()
     {
         return stopRequested;
     }
-    
+
     /**
      * Default method for SYNTHESIZING a controllable and nonblocking supervisor.
      */
@@ -842,7 +846,7 @@ public class AutomataSynthesizer
         SynthesizerOptions synthOptions = SynthesizerOptions.getDefaultMonolithicCNBSynthesizerOptions();
         AutomataSynthesizer synthesizer = new AutomataSynthesizer(model, synchOptions, synthOptions);
         Automata result = synthesizer.execute();
-        
+
         return new ModularSupervisor(result);
     }
 }

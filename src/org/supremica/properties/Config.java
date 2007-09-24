@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.properties
 //# CLASS:   Config
 //###########################################################################
-//# $Id: Config.java,v 1.38 2007-09-21 14:02:32 knut Exp $
+//# $Id: Config.java,v 1.39 2007-09-24 14:04:24 knut Exp $
 //###########################################################################
 
 /*
@@ -272,6 +272,8 @@ public final class Config
     public static final BooleanProperty BDD_INTERLEAVED_VARIABLES = new BooleanProperty(PropertyType.ALGORITHMS_BDD, "bddInterleavedVariables", Options.interleaved_variables, "Interleaved or seperated variable orders");
     public static final BooleanProperty BDD_LEVEL_GRAPHS = new BooleanProperty(PropertyType.ALGORITHMS_BDD, "bddLevelGraphs", Options.show_level_graph, "Shows the fillness of the workset sent to H1");
     public static final StringProperty BDD_LIB_PATH  = new StringProperty(PropertyType.ALGORITHMS_BDD, "bddLibPath", Options.extraLibPath, "Extra Library path");
+    public static final BooleanProperty BDD_SYNTHESIS_EXTRACT_AUTOMATON = new BooleanProperty(PropertyType.ALGORITHMS_BDD, "bddSynthesisExtractAutomaton", false, "Build automaton after BDD synthesis");
+
 
     // ALGORITHMS_HMI
     public static final BooleanProperty INCLUDE_USERINTERFACE = new BooleanProperty(PropertyType.ALGORITHMS_HMI, "includeUserInterface", false, "Include SwiXML analyzer tools");

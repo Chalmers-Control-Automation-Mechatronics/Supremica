@@ -55,7 +55,7 @@ import org.supremica.log.*;
 public final class SynthesizerOptions
 {
     private static Logger logger = LoggerFactory.createLogger(SynthesizerOptions.class);
-    
+
     private boolean dialogOK = false;
     private SynthesisType synthesisType;
     private SynthesisAlgorithm synthesisAlgorithm;
@@ -66,24 +66,26 @@ public final class SynthesizerOptions
     private boolean reduceSupervisors;
     private boolean rememberDisabledUncontrollableEvents;
 
+    private boolean bddExtractSupervisor;
+
     public boolean oneEventAtATime = false;
     public boolean addOnePlantAtATime = false;
-    
+
     /**
      * The current options, based on earlier user preferences.
      */
     public SynthesizerOptions()
     {
-        this(SynthesisType.fromDescription(Config.SYNTHESIS_SYNTHESIS_TYPE.get()), SynthesisAlgorithm.fromDescription(Config.SYNTHESIS_ALGORITHM_TYPE.get()), Config.SYNTHESIS_PURGE.get(), Config.SYNTHESIS_OPTIMIZE.get(), Config.SYNTHESIS_MAXIMALLY_PERMISSIVE.get(), Config.SYNTHESIS_MAXIMALLY_PERMISSIVE_INCREMENTAL.get(), Config.SYNTHESIS_REDUCE_SUPERVISORS.get());
+        this(SynthesisType.fromDescription(Config.SYNTHESIS_SYNTHESIS_TYPE.get()), SynthesisAlgorithm.fromDescription(Config.SYNTHESIS_ALGORITHM_TYPE.get()), Config.SYNTHESIS_PURGE.get(), Config.SYNTHESIS_OPTIMIZE.get(), Config.SYNTHESIS_MAXIMALLY_PERMISSIVE.get(), Config.SYNTHESIS_MAXIMALLY_PERMISSIVE_INCREMENTAL.get(), Config.SYNTHESIS_REDUCE_SUPERVISORS.get(), Config.BDD_SYNTHESIS_EXTRACT_AUTOMATON.get());
     }
-    
+
     /**
      * This is not a good constructor so it is private, it is impossible to read in the code.
      * Use the "getDefault..."-methods in this class instead or when they won't suit you,
      * modify the necessary options one by one, starting from default! Much more readable and
      * also more practical when adding new options.
      */
-    private SynthesizerOptions(SynthesisType synthesisType, SynthesisAlgorithm synthesisAlgorithm, boolean purge, boolean optimize, boolean maximallyPermissive, boolean maximallyPermissiveIncremental, boolean reduceSupervisors)
+    private SynthesizerOptions(SynthesisType synthesisType, SynthesisAlgorithm synthesisAlgorithm, boolean purge, boolean optimize, boolean maximallyPermissive, boolean maximallyPermissiveIncremental, boolean reduceSupervisors, boolean bddExtractSupervisor)
     {
         this.synthesisType = synthesisType;
         this.synthesisAlgorithm = synthesisAlgorithm;
@@ -92,8 +94,9 @@ public final class SynthesizerOptions
         this.maximallyPermissive = maximallyPermissive;
         this.maximallyPermissiveIncremental = maximallyPermissiveIncremental;
         this.reduceSupervisors = reduceSupervisors;
+        this.bddExtractSupervisor = bddExtractSupervisor;
     }
-    
+
     public boolean isValid()
     {
         String errorMessage = validOptions();
@@ -102,17 +105,17 @@ public final class SynthesizerOptions
             logger.error(errorMessage);
             return false;
         }
-        
+
         return true;
     }
-    
+
     public String validOptions()
     {
         if (synthesisType == null)
         {
             return "Unknown synthesis type.";
         }
-        
+
         if (synthesisAlgorithm == SynthesisAlgorithm.BDD)
         {
             if ((synthesisType != SynthesisType.NONBLOCKINGCONTROLLABLE) &&
@@ -122,107 +125,117 @@ public final class SynthesizerOptions
                 return("BDD algorithms currently only support supNB+C synthesis.");
             }
         }
- 
+
         if (synthesisAlgorithm == SynthesisAlgorithm.MONOLITHICBDD)
         {
             if (synthesisType != SynthesisType.NONBLOCKING)
             {
                 return("BDD2 algorithms currently only support supNB synthesis.");
             }
-        }       
+        }
         return null;
     }
-    
+
     public void setDialogOK(boolean bool)
     {
         dialogOK = bool;
     }
-    
+
     public boolean getDialogOK()
     {
         return dialogOK;
     }
-    
+
     public void setSynthesisType(SynthesisType type)
     {
         synthesisType = type;
     }
-    
+
     public SynthesisType getSynthesisType()
     {
         return synthesisType;
     }
-    
+
     public void setSynthesisAlgorithm(SynthesisAlgorithm algorithm)
     {
         synthesisAlgorithm = algorithm;
     }
-    
+
     public SynthesisAlgorithm getSynthesisAlgorithm()
     {
         return synthesisAlgorithm;
     }
-    
+
     public void setPurge(boolean bool)
     {
         purge = bool;
     }
-    
+
     public boolean doPurge()
     {
         return purge;
     }
-    
+
     public void setRememberDisabledUncontrollableEvents(boolean remember)
     {
         rememberDisabledUncontrollableEvents = remember;
     }
-    
+
     public boolean doRememberDisabledUncontrollableEvents()
     {
         return rememberDisabledUncontrollableEvents;
     }
-    
+
     public void setOptimize(boolean bool)
     {
         optimize = bool;
     }
-    
+
     public boolean getOptimize()
     {
         return optimize;
     }
-    
+
+    public void setExtractSupervisor(boolean extract)
+    {
+        bddExtractSupervisor = extract;
+    }
+
+    public boolean doExtractSupervisor()
+    {
+        return bddExtractSupervisor;
+    }
+
     public void setMaximallyPermissive(boolean bool)
     {
         maximallyPermissive = bool;
     }
-    
+
     public boolean getMaximallyPermissive()
     {
         return maximallyPermissive;
     }
-    
+
     public void setMaximallyPermissiveIncremental(boolean bool)
     {
         maximallyPermissiveIncremental = bool;
     }
-    
+
     public boolean getMaximallyPermissiveIncremental()
     {
         return maximallyPermissiveIncremental;
     }
-    
+
     public void setReduceSupervisors(boolean bool)
     {
         reduceSupervisors = bool;
     }
-    
+
     public boolean getReduceSupervisors()
     {
         return reduceSupervisors;
     }
-    
+
     /**
      * Stores the current set of options in SupremicaProperties.
      */
@@ -235,16 +248,18 @@ public final class SynthesizerOptions
         Config.SYNTHESIS_MAXIMALLY_PERMISSIVE.set(maximallyPermissive);
         Config.SYNTHESIS_MAXIMALLY_PERMISSIVE_INCREMENTAL.set(maximallyPermissiveIncremental);
         Config.SYNTHESIS_REDUCE_SUPERVISORS.set(reduceSupervisors);
+        Config.BDD_SYNTHESIS_EXTRACT_AUTOMATON.set(bddExtractSupervisor);
+
     }
-    
+
     /**
      * Returns the default options for synthesis---modular synthesis of controllability only.
      */
     public static SynthesizerOptions getDefaultSynthesizerOptions()
     {
-        return new SynthesizerOptions(SynthesisType.CONTROLLABLE, SynthesisAlgorithm.MODULAR, true, true, true, true, true);
+        return new SynthesizerOptions(SynthesisType.CONTROLLABLE, SynthesisAlgorithm.MODULAR, true, true, true, true, true, false);
     }
-    
+
     /**
      * Returns the default options for synthesis.
      */
@@ -255,7 +270,7 @@ public final class SynthesizerOptions
         options.synthesisAlgorithm = SynthesisAlgorithm.MONOLITHIC;
         options.optimize = false;
         options.reduceSupervisors = false;
-        
+
         return options;
     }
 }
