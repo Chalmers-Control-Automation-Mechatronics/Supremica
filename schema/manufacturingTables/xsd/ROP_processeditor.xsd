@@ -37,6 +37,7 @@
 <xs:element name="Comment" type="xs:string"/>
 <xs:element name="Machine" type="xs:string"/>
 <xs:element name="Operation" type="xs:string"/>
+<xs:element name="Description" type="xs:string"/>
 <xs:element name="AttributeValue" type="xs:string"/>
 <!--xs:element name="UpperIndicator" type="xs:boolean"/>
 <xs:element name="LowerIndicator" type="xs:boolean"/-->
@@ -86,7 +87,8 @@
 	<xs:complexType>
 		<xs:sequence>
 			<xs:element ref='Precondition' minOccurs='0' maxOccurs='1'/>
-			<xs:element ref='Operation' minOccurs='1' maxOccurs='1'/>   
+			<xs:element ref='Operation' minOccurs='1' maxOccurs='1'/>
+			<xs:element ref='Description' minOccurs='0' maxOccurs='1'/>   
 			<!--xs:element ref='Successors' minOccurs='0' maxOccurs='1'/-->
 			<xs:element ref='Properties' minOccurs='0' maxOccurs='1'/>
 			<!--xs:element ref='Position' minOccurs='0' maxOccurs='1'/-->
