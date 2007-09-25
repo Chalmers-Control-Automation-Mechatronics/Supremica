@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   EventDeclListView
 //###########################################################################
-//# $Id: EventDeclListView.java,v 1.7 2007-09-25 18:22:37 knut Exp $
+//# $Id: EventDeclListView.java,v 1.8 2007-09-25 21:38:57 knut Exp $
 //###########################################################################
 
 
@@ -223,11 +223,12 @@ public class EventDeclListView
         EventDeclListView.this.getSelectionModel();
       final Point point = event.getPoint();
       final int index = locationToIndex(point);
-      if (index < 0 ||
-          index >= mModel.getSize() ||
-          selection.isSelectedIndex(index)) {
-        decls = mModel.getSelectedSubjects(selection);
-      } else {
+      System.out.println("Index: " + index + " ModelSize: " + mModel.getSize() + " isSelected: " + selection.isSelectedIndex(index));
+      if (index < 0 || index >= mModel.getSize())
+      {
+        decls = new ArrayList<EventDeclSubject>();
+      } else
+      {
         final EventDeclSubject clicked = mModel.getElementAt(index);
         decls = Collections.singletonList(clicked);
       }

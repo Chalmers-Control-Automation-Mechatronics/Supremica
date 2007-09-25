@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.gui.ide
 //# CLASS:   EditorAddEventAction
 //###########################################################################
-//# $Id: EditorAddModuleEventAction.java,v 1.8 2007-06-20 19:43:38 flordal Exp $
+//# $Id: EditorAddModuleEventAction.java,v 1.9 2007-09-25 21:38:57 knut Exp $
 //###########################################################################
 
 
@@ -23,26 +23,26 @@ public class EditorAddModuleEventAction
     extends IDEAction
 {
     private static final long serialVersionUID = 1L;
-    
+
     public EditorAddModuleEventAction(List<IDEAction> actionList)
     {
         super(actionList);
-        
+
         setEditorActiveRequired(true);
-        
+
         putValue(Action.NAME, "New Module Event...");
         putValue(Action.SHORT_DESCRIPTION, "Add a new event to the module");
         putValue(Action.SMALL_ICON,
             new ImageIcon(IDE.class.getResource("/icons/waters/event16.gif")));
-        putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_E, ActionEvent.CTRL_MASK));
+        //putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_E, ActionEvent.CTRL_MASK));
         putValue(Action.ACTION_COMMAND_KEY, KEY);
     }
-    
+
     public void actionPerformed(ActionEvent e)
     {
         doAction();
     }
-    
+
     public void doAction()
     {
         ide.getActiveDocumentContainer().getEditorPanel().getEditorPanelInterface().addModuleEvent();
