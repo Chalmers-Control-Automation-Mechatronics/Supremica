@@ -24,6 +24,8 @@ import java.util.List;
 
 import javax.swing.*;
 
+import org.supremica.gui.Utility;
+
 import net.sourceforge.waters.gui.renderer.LabelBlockProxyShape;
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
 import net.sourceforge.waters.model.compiler.TypeMismatchException;
@@ -66,6 +68,7 @@ public class EditorEditEdgeDialog
   public EditorEditEdgeDialog(final EdgeSubject edge,
                               final ModuleWindowInterface root)
   {
+	super(root.getRootWindow());
     mEdge = edge;
     mRoot = root;
 
@@ -182,6 +185,7 @@ public class EditorEditEdgeDialog
     add(scrollPaneA);
 
     pack();
+    Utility.setupDialog(this, this.getWidth(), this.getHeight());
     setVisible(true);
   }
 

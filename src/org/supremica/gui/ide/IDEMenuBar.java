@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.gui.ide
 //# CLASS:   IDEMenuBar
 //###########################################################################
-//# $Id: IDEMenuBar.java,v 1.52 2007-09-25 22:56:11 knut Exp $
+//# $Id: IDEMenuBar.java,v 1.53 2007-09-25 23:38:58 knut Exp $
 //###########################################################################
 
 package org.supremica.gui.ide;
@@ -119,7 +119,7 @@ public class IDEMenuBar
 
         // Edit
         menu = new JMenu("Edit");
-        menu.setMnemonic(KeyEvent.VK_E);
+        //menu.setMnemonic(KeyEvent.VK_E);
         final Action undo = actions.getAction(WatersUndoAction.class);
         menu.add(new JMenuItem(undo));
         final Action redo = actions.getAction(WatersRedoAction.class);
@@ -137,7 +137,7 @@ public class IDEMenuBar
 
         // Insert
         menu = new JMenu("Create");
-        menu.setMnemonic(KeyEvent.VK_I);
+        //menu.setMnemonic(KeyEvent.VK_I);
         menu.add(ide.getActions().editorAddSimpleComponentAction.getMenuItem());
 		/*
         final Action insvar = actions.getAction(InsertVariableAction.class);
@@ -164,7 +164,7 @@ public class IDEMenuBar
 
         // Analyze
         menu = new JMenu("Analyze");
-        menu.setMnemonic(KeyEvent.VK_A);
+        //menu.setMnemonic(KeyEvent.VK_A);
         menu.add(viewMenu);
         menu.add(ide.getActions().analyzerSynchronizerAction.getMenuItem());
         menu.add(ide.getActions().analyzerSynthesizerAction.getMenuItem());
@@ -190,7 +190,7 @@ public class IDEMenuBar
 
         // Examples
         menu = new JMenu("Examples");
-        menu.setMnemonic(KeyEvent.VK_X);
+        //menu.setMnemonic(KeyEvent.VK_X);
         menu.add(ide.getActions().toolsTestCasesAction.getMenuItem());
         add(menu);
 

@@ -124,8 +124,8 @@ class ModuleTreePopupMenu
         }
         else if(mInvokingComponent instanceof ModuleSubject)
         {
-            item = new JMenuItem("New component");
-            item.setActionCommand("create simple component");
+            item = new JMenuItem("Create component");
+            item.setActionCommand("add simple component");
             item.addActionListener(listener);
             this.add(item);
             addComponentItem = item;

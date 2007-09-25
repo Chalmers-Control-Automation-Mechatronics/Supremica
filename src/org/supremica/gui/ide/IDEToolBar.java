@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.gui.ide
 //# CLASS:   IDEToolBar
 //###########################################################################
-//# $Id: IDEToolBar.java,v 1.18 2007-06-26 05:46:55 robi Exp $
+//# $Id: IDEToolBar.java,v 1.19 2007-09-25 23:38:58 knut Exp $
 //###########################################################################
 
 
@@ -76,8 +76,8 @@ public class IDEToolBar
 		addAction(actions.getAction(WatersUndoAction.class));
 		addAction(actions.getAction(WatersRedoAction.class));
         addSeparator();
-        addAction(actions.editorStopEmbedderAction);
-        addSeparator();
+        //addAction(actions.editorStopEmbedderAction);
+        //addSeparator();
         final ButtonGroup group = new ButtonGroup();
 		addAction(actions.getAction(ToolSelectAction.class), group);
 		addAction(actions.getAction(ToolNodeAction.class), group);
