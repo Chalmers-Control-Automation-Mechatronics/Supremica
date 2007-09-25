@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.properties
 //# CLASS:   Config
 //###########################################################################
-//# $Id: Config.java,v 1.39 2007-09-24 14:04:24 knut Exp $
+//# $Id: Config.java,v 1.40 2007-09-25 09:07:06 knut Exp $
 //###########################################################################
 
 /*
@@ -136,6 +136,8 @@ public final class Config
     public static final BooleanProperty GENERAL_USE_SECURITY = new BooleanProperty(PropertyType.GENERAL, "generalUseSecurity", false, "Use file security");
     public static final BooleanProperty GENERAL_STUDENT_VERSION = new BooleanProperty(PropertyType.GENERAL, "generalStudentVersion", false, "Student version (requires restart)");
     public static final BooleanProperty INCLUDE_EXPERIMENTAL_ALGORITHMS = new BooleanProperty(PropertyType.GENERAL, "includeExperimentalAlgorithms", false, "Include experimental algorithms (requires restart)");
+    public static final BooleanProperty GENERAL_INCLUDE_EDITOR = new BooleanProperty(PropertyType.GENERAL, "generalIncludeEditor", true, "Include editor");
+
 
     // GENERAL_LOG
     public static final BooleanProperty LOG_TO_CONSOLE =

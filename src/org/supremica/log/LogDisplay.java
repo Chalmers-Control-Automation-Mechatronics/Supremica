@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.log
 //# CLASS:   LogDisplay
 //###########################################################################
-//# $Id: LogDisplay.java,v 1.32 2007-08-21 03:43:42 robi Exp $
+//# $Id: LogDisplay.java,v 1.33 2007-09-25 09:07:06 knut Exp $
 //###########################################################################
 
 /*
@@ -100,13 +100,13 @@ public class LogDisplay
 			InterfaceManager.getInstance();
 		final LoggerFactory factory = LoggerFactory.getInstance();
         if (theLogDisplay == null) {
-            theLogDisplay = new LogDisplay();            
+            theLogDisplay = new LogDisplay();
             theLogDisplay.addFilter(factory.getLoggerFilter());
 			theLogDisplay.connectStreams();
         }
         return theLogDisplay;
     }
-    
+
     private LogDisplay()
     {
         mLayout = new PatternLayout("%-5p %m%n");
@@ -116,25 +116,25 @@ public class LogDisplay
         createIcons();
         mLabel = "";
         mIsFancy = true;
-        
+
         // This code used to be in the popup menu -------------
         mTextPane.addMouseListener(new MouseAdapter()
         {
             public void mousePressed(MouseEvent e)
             {
-                
+
                 // This is needed for the Linux platform
                 // where isPopupTrigger is true only on mousePressed.
                 maybeShowPopup(e);
             }
-            
+
             public void mouseReleased(MouseEvent e)
             {
-                
+
                 // This is for triggering the popup on Windows platforms
                 maybeShowPopup(e);
             }
-            
+
             private void maybeShowPopup(MouseEvent e)
             {
                 if (e.isPopupTrigger())
@@ -145,7 +145,7 @@ public class LogDisplay
         });
 	}
 
-    
+
 	//#######################################################################
 	//# Initialisation
     private void createAttributes()
@@ -204,33 +204,33 @@ public class LogDisplay
         mIconMap.put(Level.ALL, getIcon("/icons/BlackFlag.gif"));
         mIconMap.put(Level.OFF, getIcon("/icons/BlackFlag.gif"));
     }
-    
-    
+
+
     public void close()
     {
 	}
-    
+
     public void clear()
     {
         mTextPane.setText("");
     }
-    
+
     public void cut()
     {
         mTextPane.cut();
     }
-    
+
     public void copy()
     {
         mTextPane.copy();
     }
-    
+
     private ImageIcon getIcon(final String name)
     {
         final URL url = Supremica.class.getResource(name);
 		return url == null ? null : new ImageIcon(url);
     }
-    
+
 
 	//#######################################################################
 	//# Interface org.apache.log4j.Appender
@@ -284,17 +284,17 @@ public class LogDisplay
     {
         return theTextPaneScrollPane;
     }
-    
+
     public JComponent getComponentWithoutScrollPane()
     {
         return mTextPane;
     }
-    
+
     public String getLabel()
     {
         return mLabel;
     }
-    
+
 
 	//#######################################################################
 	//# Properties
@@ -306,33 +306,33 @@ public class LogDisplay
         COLOR_OPTION_BACKGROUND, FANCY_OPTION,
         FONT_NAME_OPTION, FONT_SIZE_OPTION };
     }
-    
+
     private Color parseColor(String v)
     {
         StringTokenizer st = new StringTokenizer(v, ",");
         int val[] = { 255, 255, 255, 255 };
         int i = 0;
-        
+
         while (st.hasMoreTokens())
         {
             val[i] = Integer.parseInt(st.nextToken());
-            
+
             i++;
         }
-        
+
         return new Color(val[0], val[1], val[2], val[3]);
     }
-    
+
     public void setLayout(Layout layout)
     {
         mLayout = layout;
     }
-    
+
     public void setName(String name)
     {
         this.name = name;
     }
-    
+
     private void setTextPane(JTextPane textpane)
     {
         mTextPane = textpane;
@@ -340,86 +340,86 @@ public class LogDisplay
         mTextPane.setBackground(Color.white);
         mDocument = mTextPane.getStyledDocument();
     }
-    
+
     private void setColor(Level p, String v)
     {
         StyleConstants.setForeground(mAttributeMap.get(p), parseColor(v));
     }
-    
+
     private void setFontSize(final int size)
     {
 		for (final MutableAttributeSet attribs : mAttributeMap.values()) {
 			StyleConstants.setFontSize(attribs, size);
 		}
     }
-    
+
     private void setFontName(final String name)
     {
 		for (final MutableAttributeSet attribs : mAttributeMap.values()) {
 			StyleConstants.setFontFamily(attribs, name);
         }
     }
-    
+
     public void setOption(String option, String value)
     {
         if (option.equalsIgnoreCase(LABEL_OPTION))
         {
             mLabel = value;
         }
-        
+
         if (option.equalsIgnoreCase(COLOR_OPTION_FATAL))
         {
             setColor(Level.FATAL, value);
         }
-        
+
         if (option.equalsIgnoreCase(COLOR_OPTION_ERROR))
         {
             setColor(Level.ERROR, value);
         }
-        
+
         if (option.equalsIgnoreCase(COLOR_OPTION_WARN))
         {
             setColor(Level.WARN, value);
         }
-        
+
         if (option.equalsIgnoreCase(COLOR_OPTION_INFO))
         {
             setColor(Level.INFO, value);
         }
-        
+
         if (option.equalsIgnoreCase(COLOR_OPTION_DEBUG))
         {
             setColor(Level.DEBUG, value);
         }
-        
+
         if (option.equalsIgnoreCase(COLOR_OPTION_BACKGROUND))
         {
             mTextPane.setBackground(parseColor(value));
         }
-        
+
         if (option.equalsIgnoreCase(FANCY_OPTION))
         {
             mIsFancy = OptionConverter.toBoolean(value, mIsFancy);
         }
-        
+
         if (option.equalsIgnoreCase(FONT_SIZE_OPTION))
         {
             setFontSize(Integer.parseInt(value));
         }
-        
+
         if (option.equalsIgnoreCase(FONT_NAME_OPTION))
         {
             setFontName(value);
         }
-        
+
         return;
     }
-    
+
     public boolean requiresLayout()
     {
         return true;
     }
-    
+
     class LoggerPopupMenu
         extends VPopupMenu
     {
@@ -430,12 +430,12 @@ public class LogDisplay
         private JCheckBoxMenuItem debugItem = null;
         private JCheckBoxMenuItem warnItem = null;
         private JCheckBoxMenuItem infoItem = null;
-        
+
         // except for access, these are copied straight from gui.Supremica
         private void initPopups()
         {
             JMenuItem cutItem = new JMenuItem("Cut");
-            
+
             cutItem.addActionListener(new ActionListener()
             {
                 public void actionPerformed(ActionEvent e)
@@ -444,9 +444,9 @@ public class LogDisplay
                 }
             });
             add(cutItem);
-            
+
             JMenuItem copyItem = new JMenuItem("Copy");
-            
+
             copyItem.addActionListener(new ActionListener()
             {
                 public void actionPerformed(ActionEvent e)
@@ -456,9 +456,9 @@ public class LogDisplay
             });
             add(copyItem);
             addSeparator();
-            
+
             JMenuItem clearItem = new JMenuItem("Clear");
-            
+
             clearItem.addActionListener(new ActionListener()
             {
                 public void actionPerformed(ActionEvent e)
@@ -468,14 +468,14 @@ public class LogDisplay
             });
             add(clearItem);
             addSeparator();
-            
+
             JMenu logProperties = new JMenu("Log Configuration");
-            
+
             add(logProperties);
-            
+
             // FATAL, ERROR, WARN, INFO and DEBUG.
             fatalItem = new JCheckBoxMenuItem("Log Fatal");
-            
+
             fatalItem.setSelected(filter.allowFatal());
             fatalItem.addItemListener(new ItemListener()
             {
@@ -487,9 +487,9 @@ public class LogDisplay
                 }
             });
             logProperties.add(fatalItem);
-            
+
             errorItem = new JCheckBoxMenuItem("Log Error");
-            
+
             errorItem.setSelected(filter.allowError());
             errorItem.addItemListener(new ItemListener()
             {
@@ -501,9 +501,9 @@ public class LogDisplay
                 }
             });
             logProperties.add(errorItem);
-            
+
             warnItem = new JCheckBoxMenuItem("Log Warning");
-            
+
             warnItem.setSelected(filter.allowWarn());
             warnItem.addItemListener(new ItemListener()
             {
@@ -515,9 +515,9 @@ public class LogDisplay
                 }
             });
             logProperties.add(warnItem);
-            
+
             infoItem = new JCheckBoxMenuItem("Log Info");
-            
+
             infoItem.setSelected(filter.allowInfo());
             infoItem.addItemListener(new ItemListener()
             {
@@ -529,9 +529,9 @@ public class LogDisplay
                 }
             });
             logProperties.add(infoItem);
-            
+
             debugItem = new JCheckBoxMenuItem("Log Debug");
-            
+
             debugItem.setSelected(filter.allowDebug());
             debugItem.addItemListener(new ItemListener()
             {
@@ -544,65 +544,65 @@ public class LogDisplay
             });
             logProperties.add(debugItem);
         }
-        
+
         public LoggerPopupMenu(LoggerFilter filter)
         {
             this.filter = filter;
-            
+
             initPopups();
         }
-        
+
         public boolean allowInfo()
         {
             return filter.allowInfo();
         }
-        
+
         public void setAllowInfo(boolean allow)
         {
             filter.setAllowInfo(allow);
         }
-        
+
         public boolean allowDebug()
         {
             return filter.allowDebug();
         }
-        
+
         public void setAllowDebug(boolean allow)
         {
             filter.setAllowDebug(allow);
         }
-        
+
         public boolean allowWarn()
         {
             return filter.allowWarn();
         }
-        
+
         public void setAllowWarn(boolean allow)
         {
             filter.setAllowWarn(allow);
         }
-        
+
         public boolean allowError()
         {
             return filter.allowError();
         }
-        
+
         public void setAllowError(boolean allow)
         {
             filter.setAllowError(allow);
         }
-        
+
         public boolean allowFatal()
         {
             return filter.allowFatal();
         }
-        
+
         public void setAllowFatal(boolean allow)
         {
             filter.setAllowFatal(allow);
         }
     }
-    
+
 
 	//#######################################################################
 	//# Inner Class EventQueueReader
@@ -627,7 +627,7 @@ public class LogDisplay
 				for (final LoggingEvent event : mEventQueue) {
 					appendImmediately(event);
 				}
-				mEventQueue.clear();					
+				mEventQueue.clear();
 			}
 		}
 
@@ -712,7 +712,7 @@ public class LogDisplay
 		{
 			setSystemOut(mSystemStream);
 		}
-			
+
 		//###################################################################
 		//# Interface java.lang.Runnable
 		public void run()

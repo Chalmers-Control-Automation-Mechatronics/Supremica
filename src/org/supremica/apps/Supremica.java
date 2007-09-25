@@ -59,7 +59,7 @@ public class Supremica
         Config.XML_RPC_ACTIVE.set(false);
         Config.DOT_USE.set(true);
     }
-    
+
     public static void main(String[] args)
     {
         org.supremica.util.ProcessCommandLineArguments.process(args);

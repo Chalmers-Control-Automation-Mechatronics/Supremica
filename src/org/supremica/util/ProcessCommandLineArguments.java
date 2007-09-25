@@ -49,6 +49,7 @@
  */
 package org.supremica.util;
 
+import org.supremica.properties.Config;
 import org.supremica.properties.SupremicaProperties;
 import org.supremica.Version;
 import java.io.*;
@@ -68,7 +69,7 @@ public class ProcessCommandLineArguments
     {
         boolean quit = false;
         List<File> filesToOpen = new LinkedList<File>();
-        
+
         for (int i = 0; i < args.length; i++)
         {
             if (args[i].equals("-h") || args[i].equals("-?") || args[i].equals("--help") || args[i].equals("--usage"))
@@ -83,7 +84,7 @@ public class ProcessCommandLineArguments
                     String fileName = args[i + 1];
                     i++;
                     File propFile = new File(fileName);
-                    
+
                     try
                     {
                         if (!propFile.exists())
@@ -91,7 +92,7 @@ public class ProcessCommandLineArguments
                             System.out.println("Creating property file: " + propFile.getAbsolutePath());
                             propFile.createNewFile();
                         }
-                        
+
                         SupremicaProperties.loadProperties(propFile);
                     }
                     catch (Exception e)
@@ -99,6 +100,10 @@ public class ProcessCommandLineArguments
                         System.err.println("Error reading properties file: " + propFile.getAbsolutePath());
                     }
                 }
+            }
+            else if (args[i].equals("-noEditor"))
+            {
+				Config.GENERAL_INCLUDE_EDITOR.set(false);
             }
             else if (args[i].equals("-l") || args[i].equals("--list"))
             {
@@ -133,15 +138,15 @@ public class ProcessCommandLineArguments
         System.out.println();
         System.err.println();
         */
-        
+
         if (quit)
         {
             System.exit(0);
         }
-        
+
         return filesToOpen;
     }
-    
+
     private static void printUsage()
     {
         System.out.println("Supremica: " + org.supremica.Version.version());
@@ -153,4 +158,5 @@ public class ProcessCommandLineArguments
         System.out.println("Version: \n  -v, --version \t\t show version");
         System.out.println("");
     }
+
 }

@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.gui.ide
 //# CLASS:   IDE
 //###########################################################################
-//# $Id: IDE.java,v 1.98 2007-09-24 18:24:43 knut Exp $
+//# $Id: IDE.java,v 1.99 2007-09-25 09:07:06 knut Exp $
 //###########################################################################
 
 package org.supremica.gui.ide;
@@ -31,6 +31,7 @@ import net.sourceforge.waters.gui.observer.Subject;
 import net.sourceforge.waters.model.base.DocumentProxy;
 import net.sourceforge.waters.model.marshaller.DocumentManager;
 
+import org.supremica.apps.SupremicaWithGui;
 import org.supremica.automata.Project;
 import org.supremica.gui.ide.actions.Actions;
 import org.supremica.gui.ide.actions.ExitAction;
@@ -315,17 +316,22 @@ public class IDE
     throws Exception
     {
         final List<File> files = ProcessCommandLineArguments.process(args);
-        final InterfaceManager manager = InterfaceManager.getInstance();
-        manager.initLookAndFeel();
-        final IDE ide = new IDE();
-        ide.setVisible(true);
-        if (files != null && files.size() > 0)
-        {
-        	ide.openFiles(files);
+     	if (Config.GENERAL_INCLUDE_EDITOR.isTrue())
+     	{
+			final IDE ide = new IDE();
+			ide.setVisible(true);
+			if (files != null && files.size() > 0)
+			{
+				ide.openFiles(files);
+			}
+			else if (Config.GUI_EDITOR_DEFAULT_EMPTY_MODULE.isTrue())
+			{
+				ide.openEmptyDocument();
+			}
 		}
-		else if (Config.GUI_EDITOR_DEFAULT_EMPTY_MODULE.isTrue())
+		else
 		{
-			ide.openEmptyDocument();
+        	SupremicaWithGui.startSupremica();
 		}
     }
 
@@ -351,13 +357,15 @@ public class IDE
     private static final long serialVersionUID = 1L;
     private static final String IDENAME = "Supremica";
     private static final Logger LOGGER = LoggerFactory.createLogger(IDE.class);
+	//private static final InterfaceManager manager;
 
     static
     {
-		Locale.setDefault(Locale.ENGLISH);
+        InterfaceManager.getInstance().initLookAndFeel();
         Config.XML_RPC_ACTIVE.set(false);
         Config.DOT_USE.set(true);
         Config.LOG_TO_CONSOLE.set(false);
         Config.LOG_TO_GUI.set(true);
+		Locale.setDefault(Locale.ENGLISH);
     }
 }
