@@ -58,14 +58,15 @@ public enum VerificationAlgorithm
     MONOLITHIC("Monolithic (Explicit)"),
     MONOLITHICBDD("Monolithic (Symbolic)"),
     MODULAR("Modular"),
+    SAT("Satisfiability"),
     COMPOSITIONAL("Compositional"),
     COMBINED("Compositional + BDD"),
     BDD("BDD");
     //IDD("IDD");
-    
+
     /** Textual description. */
     private final String description;
-    
+
     private VerificationAlgorithm(String description)
     {
         this.description = description;

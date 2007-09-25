@@ -55,7 +55,7 @@ import org.supremica.automata.Automata;
 public final class VerificationOptions
 {
     private boolean dialogOK = false;
-    
+
     // Options
     private VerificationType verificationType;
     private VerificationAlgorithm algorithmType;
@@ -65,17 +65,17 @@ public final class VerificationOptions
     private boolean skipUncontrollabilityCheck;
     private int nbrOfAttempts;
     private boolean showBadTrace;
-    
+
     private Automata inclusionAutomata = null;
-    
+
     /**
      * The current options, based on earlier user preferences.
      */
     public VerificationOptions()
     {
        this(VerificationType.fromDescription(Config.VERIFY_VERIFICATION_TYPE.get()), VerificationAlgorithm.fromDescription(Config.VERIFY_ALGORITHM_TYPE.get()), Config.VERIFY_EXCLUSION_STATE_LIMIT.get(), Config.VERIFY_REACHABILITY_STATE_LIMIT.get(), Config.VERIFY_ONE_EVENT_AT_A_TIME.get(), Config.VERIFY_SKIP_UNCONTROLLABILITY_CHECK.get(), Config.VERIFY_NBR_OF_ATTEMPTS.get(), Config.VERIFY_SHOW_BAD_TRACE.get());
-    }        
-    
+    }
+
     /**
      * This is not a good constructor so it is private, it is
      * impossible to read in the code.  Use the "getDefault..."-
@@ -95,107 +95,107 @@ public final class VerificationOptions
         this.nbrOfAttempts = nbrOfAttempts;
         this.showBadTrace = showBadTrace;
     }
-    
+
     public void setDialogOK(boolean bool)
     {
         dialogOK = bool;
     }
-    
+
     public boolean getDialogOK()
     {
         return dialogOK;
     }
-    
+
     public void setVerificationType(VerificationType type)
     {
         verificationType = type;
     }
-    
+
     public VerificationType getVerificationType()
     {
         return verificationType;
     }
-    
+
     public void setAlgorithmType(VerificationAlgorithm algorithm)
     {
         algorithmType = algorithm;
     }
-    
+
     public VerificationAlgorithm getAlgorithmType()
     {
         return algorithmType;
     }
-    
+
     public void setExclusionStateLimit(int limit)
     {
         exclusionStateLimit = limit;
     }
-    
+
     public int getExclusionStateLimit()
     {
         return exclusionStateLimit;
     }
-    
+
     public void setReachabilityStateLimit(int limit)
     {
         reachabilityStateLimit = limit;
     }
-    
+
     public int getReachabilityStateLimit()
     {
         return reachabilityStateLimit;
     }
-    
+
     public void setOneEventAtATime(boolean bool)
     {
         oneEventAtATime = bool;
     }
-    
+
     public boolean getOneEventAtATime()
     {
         return oneEventAtATime;
     }
-    
+
     public void setSkipUncontrollabilityCheck(boolean bool)
     {
         skipUncontrollabilityCheck = bool;
     }
-    
+
     public boolean getSkipUncontrollabilityCheck()
     {
         return skipUncontrollabilityCheck;
     }
-    
+
     public void setNbrOfAttempts(int nbr)
     {
         nbrOfAttempts = nbr;
     }
-    
+
     public int getNbrOfAttempts()
     {
         return nbrOfAttempts;
     }
-    
+
     public void setShowBadTrace(boolean bool)
     {
         showBadTrace = bool;
     }
-    
+
     public boolean showBadTrace()
     {
         return showBadTrace;
     }
-    
+
     public void setInclusionAutomata(Automata aut)
     {
         inclusionAutomata = aut;
     }
-    
+
     public Automata getInclusionAutomata()
     {
         return inclusionAutomata;
     }
-    
+
     /**
      * Stores the current set of options in Config.
      */
@@ -210,7 +210,7 @@ public final class VerificationOptions
         Config.VERIFY_NBR_OF_ATTEMPTS.set(nbrOfAttempts);
         Config.VERIFY_SHOW_BAD_TRACE.set(showBadTrace);
     }
-    
+
     /**
      * Returns the default options for controllability verification.
      */
@@ -223,7 +223,7 @@ public final class VerificationOptions
         options.setSkipUncontrollabilityCheck(false);
         return options;
     }
-    
+
     /**
      * Returns the default options for nonblocking verification.
      */
@@ -234,7 +234,7 @@ public final class VerificationOptions
         options.setAlgorithmType(VerificationAlgorithm.COMPOSITIONAL);
         return options;
     }
-    
+
     /**
      * Returns the default options for language inclusion verification.
      */
@@ -244,4 +244,5 @@ public final class VerificationOptions
         options.setVerificationType(VerificationType.LANGUAGEINCLUSION);
         return options;
     }
+
 }

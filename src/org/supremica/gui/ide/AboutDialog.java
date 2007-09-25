@@ -88,6 +88,7 @@ public class AboutDialog
 		textArea.setSelectionStart(0);
 		textArea.setSelectionEnd(0);
 		JScrollPane scrollPanel = new JScrollPane(textArea);
+		Utility.setupPane(scrollPanel);
 		thisPanel.add(scrollPanel, BorderLayout.CENTER);
 		scrollPanel.getVerticalScrollBar().setValue(0);
 		JPanel buttonPanel = new JPanel();

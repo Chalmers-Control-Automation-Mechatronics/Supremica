@@ -49,6 +49,7 @@
  */
 package org.supremica.gui;
 
+import org.supremica.properties.Config;
 import org.supremica.automata.algorithms.VerificationOptions;
 import org.supremica.automata.algorithms.VerificationType;
 import org.supremica.automata.algorithms.VerificationAlgorithm;
@@ -64,7 +65,7 @@ import java.lang.Integer;
 interface VerificationPanel
 {
     void update(VerificationOptions v);
-    
+
     void regain(VerificationOptions v);
 }
 
@@ -79,9 +80,9 @@ public class VerificationDialog
     private VerificationDialogAdvancedPanelModularNonblocking advancedPanelNonblocking;
     private MinimizationOptions minimizationOptions;
     private JDialog dialog;
-    
+
     private JTabbedPane tabbedPane;
-    
+
     /**
      * Creates modal dialog box for input of options for verification.
      */
@@ -91,40 +92,40 @@ public class VerificationDialog
         dialog = new JDialog(parentFrame, true);    // modal
         this.verificationOptions = verificationOptions;
         this.minimizationOptions = minimizationOptions;
-        
+
         dialog.setTitle("Verification options");
         dialog.setSize(new Dimension(400, 300));
-        
+
         // dialog.setResizable(false);
         Container contentPane = dialog.getContentPane();
-        
+
         standardPanel = new VerificationDialogStandardPanel();
         advancedPanelControllability = new VerificationDialogAdvancedPanelControllability();
         advancedPanelNonblocking = new VerificationDialogAdvancedPanelModularNonblocking();
-        
+
         tabbedPane = new JTabbedPane();
-        
+
         tabbedPane.addTab("Standard options", null, standardPanel, "Standard options");
         tabbedPane.addTab("Advanced options", null, advancedPanelControllability, "Advanced options");
-        
+
         // buttonPanel;
         JPanel buttonPanel = new JPanel();
-        
+
         okButton = addButton(buttonPanel, "OK");
         cancelButton = addButton(buttonPanel, "Cancel");
-        
+
         contentPane.add("Center", tabbedPane);
         contentPane.add("South", buttonPanel);
         Utility.setDefaultButton(dialog, okButton);
-        
+
         // ** MF ** Fix to get the frigging thing centered
         Dimension dim = dialog.getMinimumSize();
-        
+
         dialog.setLocation(Utility.getPosForCenter(dim));
         dialog.setResizable(false);
         update();
     }
-    
+
     /**
      * Updates the information in the dialog from what is recorded in VerificationOptions.
      * @see VerificationOptions
@@ -135,26 +136,26 @@ public class VerificationDialog
         advancedPanelControllability.update(verificationOptions);
         advancedPanelNonblocking.update(minimizationOptions);
     }
-    
+
     private JButton addButton(Container container, String name)
     {
         JButton button = new JButton(name);
-        
+
         button.addActionListener(this);
         container.add(button);
-        
+
         return button;
     }
-    
+
     public void show()
     {
         dialog.setVisible(true);
     }
-    
+
     public void actionPerformed(ActionEvent event)
     {
         Object source = event.getSource();
-        
+
         if (source == okButton)
         {
             // Remember the selections
@@ -173,58 +174,58 @@ public class VerificationDialog
             dialog.dispose();
         }
     }
-    
+
     private class VerificationDialogStandardPanel
         extends JPanel
         implements VerificationPanel, ActionListener
     {
         private static final long serialVersionUID = 1L;
-        
+
         private JComboBox verificationTypeBox;
         private JComboBox algorithmSelector;
         private JCheckBox showTrace;
         private JTextArea note;
-        
+
         //private JTextArea note;// = new JTextArea("Bananas...");
         //final String[] verificationData = { "Controllability",  // keep them in this order, for God's sake!
         //   "nonblocking",         // No! God has nothing to do with programming!!
         //   "Language inclusion"}; // Programming is fate-driven!
-        
+
         public VerificationDialogStandardPanel()
         {
             verificationTypeBox = new JComboBox(VerificationType.values());
             verificationTypeBox.addActionListener(this);
-            
+
             algorithmSelector = new JComboBox();
             algorithmSelector.addActionListener(this);
-            
+
             showTrace = new JCheckBox("Show trace to bad states");
             showTrace.addActionListener(this);
-            
+
             note = new JTextArea("Note:\n" + "Currently, modular nonblocking\n" + "verification is not supported.");
             note.setBackground(this.getBackground());
-            
+
             Box mainBox = Box.createVerticalBox();
-            
+
             JPanel panel = new JPanel();
             Box algoBox = Box.createVerticalBox();
             algoBox.add(verificationTypeBox);
             algoBox.add(algorithmSelector);
             panel.add(algoBox);
             mainBox.add(panel);
-            
+
             panel = new JPanel();
             panel.add(showTrace);
             mainBox.add(panel);
-            
+
             panel = new JPanel();
             panel.add(note);
             note.setVisible(false);
             mainBox.add(panel);
-            
+
             this.add(mainBox);
         }
-        
+
         public void update(VerificationOptions verificationOptions)
         {
             verificationTypeBox.setSelectedItem(verificationOptions.getVerificationType());
@@ -233,7 +234,7 @@ public class VerificationDialog
             updatePanel();
             updateNote();
         }
-        
+
         /**
          * Changes the available options on the panel based on the current choice.
          */
@@ -242,7 +243,7 @@ public class VerificationDialog
             // Some ugly stuff goes on here, the "advanced panel" is supposed to be the one
             // with index 1.
             int advancedTabIndex = 1;
-            
+
             // Change the advanced panel
             if ((verificationTypeBox.getSelectedItem() == VerificationType.CONTROLLABILITY ||
                 verificationTypeBox.getSelectedItem() == VerificationType.INVERSECONTROLLABILITY) &&
@@ -267,7 +268,7 @@ public class VerificationDialog
                 // Hide advanced panel
                 tabbedPane.setEnabledAt(advancedTabIndex, false);
             }
-            
+
             // Which algorithms should be enabled?
             // Remember current selection
             VerificationAlgorithm selected = (VerificationAlgorithm) algorithmSelector.getSelectedItem();
@@ -283,6 +284,10 @@ public class VerificationDialog
                 algorithmSelector.addItem(VerificationAlgorithm.COMPOSITIONAL);
                 algorithmSelector.addItem(VerificationAlgorithm.COMBINED);
                 algorithmSelector.addItem(VerificationAlgorithm.BDD);
+                if (Config.INCLUDE_EXPERIMENTAL_ALGORITHMS.isTrue() && verificationTypeBox.getSelectedItem() == VerificationType.CONTROLLABILITY)
+                {
+					algorithmSelector.addItem(VerificationAlgorithm.SAT);
+				}
             }
             /*
             else if (verificationTypeBox.getSelectedItem() == VerificationType.MUTUALLYNONBLOCKING)
@@ -307,7 +312,7 @@ public class VerificationDialog
             algorithmSelector.setSelectedIndex(0);
             // Reselect previously selected item if possible
             algorithmSelector.setSelectedItem(selected);
-            
+
             // Show trace?
             if (verificationTypeBox.getSelectedItem() == VerificationType.NONBLOCKING &&
                 algorithmSelector.getSelectedItem() == VerificationAlgorithm.MONOLITHIC ||
@@ -324,7 +329,7 @@ public class VerificationDialog
                 showTrace.setEnabled(false);
             }
         }
-        
+
         /**
          * Changes the displayed note depending on the current choice.
          */
@@ -377,34 +382,34 @@ public class VerificationDialog
                 note.setVisible(false);
             }
         }
-        
+
         public void regain(VerificationOptions verificationOptions)
         {
             verificationOptions.setVerificationType((VerificationType) verificationTypeBox.getSelectedItem());
             verificationOptions.setAlgorithmType((VerificationAlgorithm) algorithmSelector.getSelectedItem());
             verificationOptions.setShowBadTrace(showTrace.isSelected());
         }
-        
+
         public void actionPerformed(ActionEvent e)
         {
             updatePanel();
             updateNote();
         }
     }
-    
+
     class VerificationDialogAdvancedPanelModularNonblocking
         extends JPanel
         // implements MinimizationDialog.MinimizationPanel
     {
         private static final long serialVersionUID = 1L;
-        
+
         JComboBox minimizationStrategy;
         JComboBox minimizationHeuristic;
         JCheckBox ruleSC;
         JCheckBox ruleOSI;
         JCheckBox ruleAE;
         JCheckBox ruleOSO;
-        
+
         public VerificationDialogAdvancedPanelModularNonblocking()
         {
             minimizationStrategy = new JComboBox(MinimizationStrategy.values());
@@ -413,24 +418,24 @@ public class VerificationDialog
             ruleOSI = new JCheckBox("Rule OSI");
             ruleAE = new JCheckBox("Rule AE");
             ruleOSO = new JCheckBox("Rule OSO");
-            
+
             // Create layout!
             Box mainBox = Box.createVerticalBox();
-            
+
             JPanel panel = new JPanel();
             Box strategyBox = Box.createHorizontalBox();
             strategyBox.add(new JLabel("Minimization strategy: "));
             strategyBox.add(minimizationStrategy);
             panel.add(strategyBox);
             mainBox.add(panel);
-            
+
             panel = new JPanel();
             Box heuristicBox = Box.createHorizontalBox();
             heuristicBox.add(new JLabel("Minimization heuristic: "));
             heuristicBox.add(minimizationHeuristic);
             panel.add(heuristicBox);
             mainBox.add(panel);
-            
+
             panel = new JPanel();
             panel.add(new JLabel("Rules: "));
             panel.add(ruleSC);
@@ -438,11 +443,11 @@ public class VerificationDialog
             panel.add(ruleAE);
             panel.add(ruleOSO);
             mainBox.add(panel);
-            
+
             // Add components
             this.add(mainBox);
         }
-        
+
         public void update(MinimizationOptions options)
         {
             minimizationStrategy.setSelectedItem(options.getMinimizationStrategy());
@@ -452,11 +457,11 @@ public class VerificationDialog
             ruleAE.setSelected(options.getUseRuleAE());
             ruleOSO.setSelected(options.getUseRuleOSO());
         }
-        
+
         public void regain(MinimizationOptions options)
         {
             options.setMinimizationType(EquivalenceRelation.CONFLICTEQUIVALENCE);
-            
+
             options.setMinimizationStrategy((MinimizationStrategy) minimizationStrategy.getSelectedItem());
             options.setMinimizationHeuristic((MinimizationHeuristic) minimizationHeuristic.getSelectedItem());
             options.setUseRuleSC(ruleSC.isSelected());
@@ -465,36 +470,36 @@ public class VerificationDialog
             options.setUseRuleOSO(ruleOSO.isSelected());
         }
     }
-    
+
     class VerificationDialogAdvancedPanelControllability
         extends JPanel
         implements VerificationPanel
     {
         private static final long serialVersionUID = 1L;
-        
+
         private JTextField exclusionStateLimit;
         private JTextField reachabilityStateLimit;
         private JCheckBox oneEventAtATimeBox;
         private JCheckBox skipUncontrollabilityBox;
         private JTextField nbrOfAttempts;
-        
+
         public VerificationDialogAdvancedPanelControllability()
         {
             Box advancedBox = Box.createVerticalBox();
             JLabel exclusionStateLimitText = new JLabel("Initial state limit for state exclusion");
-            
+
             exclusionStateLimit = new JTextField();
-            
+
             JLabel reachabilityStateLimitText = new JLabel("Initial state limit for reachability verification");
-            
+
             reachabilityStateLimit = new JTextField();
             oneEventAtATimeBox = new JCheckBox("Verify one uncontrollable event at a time");
             skipUncontrollabilityBox = new JCheckBox("Skip uncontrollability check");
-            
+
             JLabel nbrOfAttemptsText = new JLabel("Number of verification attempts");
-            
+
             nbrOfAttempts = new JTextField();
-            
+
             advancedBox.add(exclusionStateLimitText);
             advancedBox.add(exclusionStateLimit);
             advancedBox.add(reachabilityStateLimitText);
@@ -505,7 +510,7 @@ public class VerificationDialog
             advancedBox.add(nbrOfAttempts);
             this.add(advancedBox, BorderLayout.CENTER);
         }
-        
+
         public void update(VerificationOptions verificationOptions)
         {
             exclusionStateLimit.setText(Integer.toString(verificationOptions.getExclusionStateLimit()));
@@ -514,7 +519,7 @@ public class VerificationDialog
             skipUncontrollabilityBox.setSelected(verificationOptions.getSkipUncontrollabilityCheck());
             nbrOfAttempts.setText(Integer.toString(verificationOptions.getNbrOfAttempts()));
         }
-        
+
         public void regain(VerificationOptions verificationOptions)
         {
             //verificationOptions.setExclusionStateLimit(PreferencesDialog.getInt("Exclusion state limit", exclusionStateLimit.getText(), 10));
