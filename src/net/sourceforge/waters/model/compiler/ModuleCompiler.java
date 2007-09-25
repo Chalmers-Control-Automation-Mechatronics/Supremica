@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.module
 //# CLASS:   ModuleCompiler
 //###########################################################################
-//# $Id: ModuleCompiler.java,v 1.85 2007-09-21 12:58:28 markus Exp $
+//# $Id: ModuleCompiler.java,v 1.86 2007-09-25 14:51:15 markus Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.compiler;
@@ -513,7 +513,7 @@ private void isEFA(List<Proxy> componentList) {
   {
     // EFA
     mEFATransitionAutomatonMap =
-      new HashMap<TransitionProxy, AutomatonProxy>();
+      new HashMap<TransitionProxy,AutomatonProxy>();
     mEFATransitionGuardActionBlockMap =
       new HashMap<TransitionProxy, GuardActionBlockProxy>();
     mSimpleComponents = new LinkedList<SimpleComponentProxy>();
@@ -803,9 +803,19 @@ private void isEFA(List<Proxy> componentList) {
   private void compileEFA()
     throws VisitorException
   {
-    /*
-     * Mappings used to create variable automata instantiated.
-     */
+	  /*
+	   * Create mutable automata.
+	   */
+	  mCompiledAutomata = new TreeMap<String, CompiledAutomaton>();
+		for (final AutomatonProxy aut : mAutomata.values()) {
+			mCompiledAutomata.put(aut.getName(), new CompiledAutomaton(aut
+					.getName(), aut.getKind(), aut.getEvents(),
+					aut.getStates(), aut.getTransitions()));
+		}
+		
+	/*
+	 * Mappings used to create variable automata instantiated.
+	 */
     mEFAEventGuardClauseMap = new HashMap<EventProxy,SimpleExpressionProxy>();
     mEFAEventActionListsMap = new HashMap<EventProxy, List<List<BinaryExpressionProxy>>>();
     /*
@@ -882,7 +892,7 @@ private void isEFA(List<Proxy> componentList) {
               mEFAEventEventMap.put(relabeledEvent, orgEvent);
               // New transitions with the new event names are added to
               // the automata.
-              addNewTransitionsToAutomtata(relabeledEvent, path);
+              addNewTransitionsToCompiledAutomtata(relabeledEvent, path);
              }
           }
         }
@@ -897,46 +907,66 @@ private void isEFA(List<Proxy> componentList) {
       /* 
        * Forbidden self loops are first added to the variableAutomata.
        */
-      buildVariableAutomata();
+      buildCompiledVariableAutomata();
       /*
-       * Transitions in automata without GuardActionBlocks are updated.
+       * All transitions with old event names are removed. 
        */
-      updateTransitionsInAutomtata();
-      
+      updateTransitionsInCompiledAutomata();
       /* In order to avoid fictional uncontrollable 
        * states caused by the relabelling of events 
        * specifications are transformed into plants. 
-       * However, if one relabelled uncontrollable 
-       * event is allowed  by the spec i.e. no extra 
-       * selfloops triggered by that relabelled events 
+       * This is done in such a way that if one or more 
+       * relabelled uncontrollable 
+       * events are allowed  by the spec i.e. no extra 
+       * selfloops triggered by relabellings of that particular event 
        * are added at that state. No optimizations are done yet.
        */
-      plantifySpec();
-      
+      plantifyCompiledSpec();
       /* 
        * Specifications that forbids events are added.
        */
-      addSingleStateSpec();
-      
+      addSingleStateCompiledSpec();
       /* Forbidden self loops are added to the rest of the plants
       *  (i.e. not to the variableAutomata. ).
       */
-      createForbiddenSelfLoopsInAutomata();
+      createForbiddenSelfLoopsInCompiledAutomata();
       /*
        * If the variable automata have marked states the :accepting proposition is added to their 
        * alphabet. 
        */
-      addAcceptingPropositionToAutomata(newEvents);
+      addAcceptingPropositionToCompiledAutomata(newEvents);
     
       mGlobalAlphabet.clear();
       mGlobalAlphabet.addAll(newEvents);
+      mAutomata.clear();
+      mAutomata.putAll(mCompiledAutomata);
     } catch (final EvalException exception) {
       throw wrap(exception);
     }
   }
 
+  private void addAcceptingPropositionToCompiledAutomata(Set<EventProxy> newEvents) {
+		boolean containsAccepting = containsAcceptingProp(newEvents);
+		    for (final CompiledAutomaton aut: mCompiledAutomata.values()) {
+		    	for(final StateProxy state: aut.getStates()){
+		    		if(state.getPropositions().contains(mAcceptingProp)){
+		    			if(!containsAccepting){
+		    				newEvents.add(mAcceptingProp);
+		    				containsAccepting=true;
+		    			}
+		    			if(containsAcceptingProp(aut.getEvents())){
+		    				break;
+		    			}
+		    			else{
+		    			aut.addEvent(mAcceptingProp);
+		    		    break;
+		    		}
+		    		}
+		    	}
+		    }
+	}
 
-private void addAcceptingPropositionToAutomata(Set<EventProxy> newEvents) {
+/*private void addAcceptingPropositionToAutomata(Set<EventProxy> newEvents) {
 	final Map<String,AutomatonProxy> newAutomata =
 	      new TreeMap<String,AutomatonProxy>();
 	newAutomata.putAll(mAutomata);
@@ -970,7 +1000,7 @@ private void addAcceptingPropositionToAutomata(Set<EventProxy> newEvents) {
 	   mAutomata.clear();
 	   mAutomata.putAll(newAutomata);
 }
-
+*/
 
 private boolean containsAcceptingProp(Set<EventProxy> newEvents) {
 		for(EventProxy event: newEvents){
@@ -991,6 +1021,28 @@ private EventProxy getAcceptingProp(Set<EventProxy> newEvents) {
 	return prop;
 }
 
+private void addSingleStateCompiledSpec() {
+	for(EventProxy event: mForbiddenEvents){
+		String name= event.getName(); 
+		
+		final Collection<EventProxy> alphabet = new HashSet<EventProxy>();
+        alphabet.add(event);
+        alphabet.add(mAcceptingProp);
+        Collection<EventProxy> props = Collections.singletonList(mAcceptingProp);
+        final StateProxy state = mDESFactory.createStateProxy(name, true, props);
+        Collection<StateProxy> states = new HashSet<StateProxy>();
+        states.add(state);
+        Collection<TransitionProxy> transitions = new HashSet<TransitionProxy>();
+        final CompiledAutomaton automaton =
+        new CompiledAutomaton(name,
+                                       ComponentKind.SPEC,
+                                       alphabet,
+                                       states,
+                                       transitions);
+        mCompiledAutomata.put(name, automaton);
+         }
+}
+/*
 private void addSingleStateSpec() {
 	for(EventProxy event: mForbiddenEvents){
 		String name= event.getName(); 
@@ -1012,7 +1064,23 @@ private void addSingleStateSpec() {
         mAutomata.put(name, automaton);
          }
 }
+*/
 
+private void createForbiddenSelfLoopsInCompiledAutomata() {		
+	for (EventProxy event: mForbiddenEvents){
+	for(String loc: mEventForbiddenStatesMap.get(event).getLocations()){
+	for(CompiledAutomaton aut: mCompiledAutomata.values()){
+	if(aut.getKind()== ComponentKind.PLANT){
+		for (StateProxy state: aut.getStates()){
+			if (state.getName().equals(loc)){
+				final TransitionProxy selfloop =
+                    mDESFactory.createTransitionProxy(state, event, state);
+				aut.addEvent(event);
+                aut.addTransition(selfloop);
+            }}}}}}}
+
+
+/*
 private void createForbiddenSelfLoopsInAutomata() {		
 		for (EventProxy event: mForbiddenEvents){
 		Set<String> namesOfAutomata= new TreeSet<String>();
@@ -1043,7 +1111,42 @@ private void createForbiddenSelfLoopsInAutomata() {
             	        mAutomata.put(name,updatedAutomaton);
             		
                 }}}}}}}
+*/
 
+private void plantifyCompiledSpec() {
+	
+	final Map<String,CompiledAutomaton> newPlantAutomata =
+	      new TreeMap<String,CompiledAutomaton>();
+	    
+	for(AutomatonProxy aut: mCompiledAutomata.values()){
+		if(aut.getKind()== ComponentKind.SPEC){
+		Collection<TransitionProxy> transitions= new TreeSet<TransitionProxy>();
+	    transitions.addAll(aut.getTransitions());
+		for(EventProxy relabelledEvent: aut.getEvents()){
+			if(relabelledEvent.getKind()== EventKind.UNCONTROLLABLE){
+				for(StateProxy state: aut.getStates()){
+					if(originalEventDisabledAtState(aut, state, relabelledEvent)){
+						final TransitionProxy selfloop =
+	                        mDESFactory.createTransitionProxy(state,
+	                        		relabelledEvent,
+	                                                          state);
+						transitions.add(selfloop);
+					}
+									}
+			}}
+	    String name="Plant("+aut.getName()+")";
+	    final CompiledAutomaton plantifiedAut =
+	      new CompiledAutomaton(name,
+	                                       ComponentKind.PLANT,
+	                                       aut.getEvents(),
+	                                       aut.getStates(),
+	                                       transitions);
+	    newPlantAutomata.put(name,plantifiedAut);
+	}}
+	mCompiledAutomata.putAll(newPlantAutomata);
+}
+
+/*
 private void plantifySpec() {
 	
 	final Map<String,AutomatonProxy> newPlantAutomata =
@@ -1076,6 +1179,7 @@ private void plantifySpec() {
 	}}
 	mAutomata.putAll(newPlantAutomata);
 }
+*/
 
 private boolean originalEventDisabledAtState(AutomatonProxy aut, StateProxy state, EventProxy relabelledEvent) {	
 	for(TransitionProxy trans: aut.getTransitions()){
@@ -1107,18 +1211,6 @@ private EventProxy findOriginalEvent(EventProxy event) {
 		return findOriginalEvent(mEFAEventEventMap.get(event));
 	}
 }
-
-/*
-private boolean eventDisabledAtState(AutomatonProxy aut, StateProxy state, EventProxy event) {
-	for(TransitionProxy trans: aut.getTransitions()){
-		if(trans.getSource()== state && trans.getEvent()== event){
-			return false;
-		}
-		
-	}
-	return true;
-}
-*/
 
 private void findForbiddenStates(final EventProxy event, Set<EventProxy> newEvents) throws EvalException {
 	/*
@@ -1257,26 +1349,27 @@ else{
 	}
 }
 
-/*
-private void collectUncontrollableEFASpec(String name) {
-	for(AutomatonProxy aut: mAutomata.values()){
-	if(aut.getKind()== ComponentKind.SPEC){
-	for(StateProxy state: aut.getStates()){
-		if(state.getName().equals(name)){
-		mUncontrollableEFASpecifications.add(aut.getName());	
-		}
-		}
-	}	
-	}
-}
-*/
+private void updateTransitionsInCompiledAutomata()
+  {
+    for (final CompiledAutomaton aut: mCompiledAutomata.values()) {
+    	Set<EventProxy> events = new TreeSet<EventProxy>();
+        events.addAll(mEFAEventEventMap.values());
+    	for (final EventProxy event: events) {
+    	  final Collection<TransitionProxy> transitions =
+    	        new TreeSet<TransitionProxy>();
+    	     transitions.addAll(aut.getTransitions());
+    	  for (final TransitionProxy trans: transitions){
+          aut.removeTransition(trans.getSource().getName(), trans.getTarget().getName(), event.getName());
+          }
+        aut.removeEvent(event.getName());
+        }
+      }
+  }
 
 /*
- * All transitions with old event names are removed. Forbidden events are added to the alphabet 
- * of the specifications. Transitions with forbidden events are added in plant automata that are 
- * not variable automata.
+ * All transitions with old event names are removed. 
  */
-private void updateTransitionsInAutomtata()
+/*private void updateTransitionsInAutomata()
   {
     final Map<String,AutomatonProxy> newAutomata =
       new TreeMap<String,AutomatonProxy>();
@@ -1304,8 +1397,26 @@ private void updateTransitionsInAutomtata()
     mAutomata.clear();
     mAutomata.putAll(newAutomata);
   }
+*/
+private void buildCompiledVariableAutomata()
+throws VisitorException
+{
+for (SimpleComponentProxy comp : mSimpleComponents) {
+  // Get the EFA variables.
+  final Collection<VariableProxy> variables = comp.getVariables();
+  // Create an automaton for each variable, the alphabet for each
+  // automaton is a subset of mEFAEvent.
+  for (VariableProxy variable : variables) {
+    CompiledAutomaton variableAutomaton =
+      createCompiledVariableAutomaton(ComponentKind.PLANT, variable);
+    // Add variable automaton to mAutomata.
+    mCompiledAutomata.put(variable.getName(), variableAutomaton);
+  }
+}
+}  
 
-  private void buildVariableAutomata()
+/*
+private void buildVariableAutomata()
     throws VisitorException
   {
     for (SimpleComponentProxy comp : mSimpleComponents) {
@@ -1321,8 +1432,41 @@ private void updateTransitionsInAutomtata()
       }
     }
   }
+*/
 
-  private AutomatonProxy createVariableAutomaton(ComponentKind kind,
+private CompiledAutomaton createCompiledVariableAutomaton(ComponentKind kind,
+        VariableProxy variable)
+throws VisitorException
+{
+// Evaluate the state range.
+final SimpleExpressionProxy rangeexpr = variable.getType();
+final RangeValue range = evalRange(rangeexpr);
+final int numstates = range.size();
+// Create states corresponding to the different states of the variable.
+final Map<IndexValue,StateProxy> variableStates =
+new HashMap<IndexValue,StateProxy>(numstates);
+createVariableStates(variable, range, variableStates);
+// Copy the relabeledAlphabet. Events that translates into
+// selfloops in all variable states will be removed.
+final Set<EventProxy> variableAlphabet = new HashSet<EventProxy>();
+variableAlphabet.addAll(mEFAEventGuardClauseMap.keySet());
+// Create transitions corresponding to all allowed updates of the variable.
+Set<TransitionProxy> variableTransitions =
+createVariableTransitions(variable,
+range,
+variableAlphabet,
+variableStates);
+//Create variable automaton.
+CompiledAutomaton variableAutomaton =
+new CompiledAutomaton(variable.getName(),kind,
+variableAlphabet,
+variableStates.values(),
+variableTransitions);
+return variableAutomaton;
+}
+  
+/*
+private AutomatonProxy createVariableAutomaton(ComponentKind kind,
                                                  VariableProxy variable)
     throws VisitorException
   {
@@ -1353,6 +1497,7 @@ private void updateTransitionsInAutomtata()
                                        variableTransitions);
     return variableAutomaton;
   }
+*/
 
 private void createVariableStates(final VariableProxy variable,
                                     final RangeValue range,
@@ -1542,13 +1687,6 @@ private void createVariableStates(final VariableProxy variable,
     	  transInAutomaton.add(transition);
         
       } 
-      /*else if (mEFAEventEventMap.get(transition.getEvent()) != null) {
-        if (mEFAEventEventMap.get(transition.getEvent()) == event) {
-        	
-        	transInAutomaton.add(transition);
-        }
-      }
-      */
     }
     if (transInAutomaton.isEmpty() &&
         automaton.getEvents().contains(event)&& 
@@ -1603,13 +1741,6 @@ private void createVariableStates(final VariableProxy variable,
         if (event==findOriginalEvent(transition.getEvent())) {
           transInAutomaton.add(transition);
         } 
-        /*
-        else if (mEFAEventEventMap.get(transition.getEvent()) != null) {
-          if (mEFAEventEventMap.get(transition.getEvent()) == event) {
-            transInAutomaton.add(transition);
-          }
-        }
-        */
       }
       if (transInAutomaton.isEmpty() &&
           automaton.getEvents().contains(event)) {
@@ -1620,11 +1751,6 @@ private void createVariableStates(final VariableProxy variable,
       }
     }
     List<List<TransitionProxy>> allPaths = allPossiblePaths(transitions);
-    /*
-     * For debugging
-    System.err.println("Event: " + event);
-    System.err.println("Paths: " + allPaths);
-     */
     return allPaths;
   }
 
@@ -1654,57 +1780,68 @@ private void createVariableStates(final VariableProxy variable,
     }
   }
 
-  private void addNewTransitionsToAutomtata(EventProxy relabeledEvent, List<TransitionProxy> path) {
-    for(TransitionProxy trans: path){
-      Set<EventProxy> relabeledEvents = new TreeSet<EventProxy>();
-      Collection<TransitionProxy> relabeledTransitions = new TreeSet<TransitionProxy>();
+  private void addNewTransitionsToCompiledAutomtata(EventProxy relabeledEvent, List<TransitionProxy> path) {
+	    for(TransitionProxy trans: path){
+	      /*
+	       * Find the corresponding mutable compiled automaton.
+	       */
+	      CompiledAutomaton aut= mCompiledAutomata.get(mEFATransitionAutomatonMap.get(trans).getName());
+          aut.addEvent(relabeledEvent);
+          TransitionProxy relabeledTransition =
+  	        mDESFactory.createTransitionProxy(trans.getSource(),
+  	                                       relabeledEvent,
+  	                                       trans.getTarget());
+          aut.addTransition(relabeledTransition);
+	    }
 
+	  }
 
-      /*
-       * Finding the original automata.
-       */
+ 
+ 
+ /* private void addNewTransitionsToAutomtata(EventProxy relabeledEvent,
+			List<TransitionProxy> path) {
+		for (TransitionProxy trans : path) {
+			Set<EventProxy> relabeledEvents = new TreeSet<EventProxy>();
+			Collection<TransitionProxy> relabeledTransitions = new TreeSet<TransitionProxy>();
 
-      AutomatonProxy aut= mEFATransitionAutomatonMap.get(trans);
+			/*
+			 * Finding the original automata.
+			 */
+/*
+			AutomatonProxy aut = mEFATransitionAutomatonMap.get(trans);
 
-      /*
-       * Add the relabeledEvent to relabeledEvents.
-       *
-       * It may still exist old transitions with the
-       * old event name. Therefore we cannot remove
-       * the old events here.
-       */
-      relabeledEvents.addAll(mAutomata.
-                             get(aut.getName()).getEvents());
-      relabeledEvents.add(relabeledEvent);
-      /*
-       * Add new transition to relabeledTransitions.
-       */
-      relabeledTransitions.addAll(mAutomata.
-                                  get(aut.getName()).getTransitions());
-      TransitionProxy relabeledTransition =
-        mDESFactory.createTransitionProxy(trans.getSource(),
-                                       relabeledEvent,
-                                       trans.getTarget());
-      relabeledTransitions.add(relabeledTransition);
+			/*
+			 * Add the relabeledEvent to relabeledEvents.
+			 * 
+			 * It may still exist old transitions with the old event name.
+			 * Therefore we cannot remove the old events here.
+			 */
+/*			relabeledEvents.addAll(mAutomata.get(aut.getName()).getEvents());
+			relabeledEvents.add(relabeledEvent);
+			/*
+			 * Add new transition to relabeledTransitions.
+			 */
+/*			relabeledTransitions.addAll(mAutomata.get(aut.getName())
+					.getTransitions());
+			TransitionProxy relabeledTransition = mDESFactory
+					.createTransitionProxy(trans.getSource(), relabeledEvent,
+							trans.getTarget());
+			relabeledTransitions.add(relabeledTransition);
 
-      /*
-       * Create updated automaton.
-       */
-      AutomatonProxy relabeledAutomaton =
-        mDESFactory.createAutomatonProxy(aut.getName(),
-                                      aut.getKind(),
-                                      relabeledEvents,
-                                      aut.getStates(),
-                                      relabeledTransitions);
-      /*
-       * Update mapping.
-       */
-      mAutomata.put(aut.getName(),relabeledAutomaton);
-    }
-
-  }
-
-  
+			/*
+			 * Create updated automaton.
+			 */
+/*			AutomatonProxy relabeledAutomaton = mDESFactory
+					.createAutomatonProxy(aut.getName(), aut.getKind(),
+							relabeledEvents, aut.getStates(),
+							relabeledTransitions);
+			/*
+			 * Update mapping.
+			 */
+/*			mAutomata.put(aut.getName(), relabeledAutomaton);
+		}
+	}
+*/  
   
   private SimpleExpressionProxy collectUncontrollableGuard
   (SimpleExpressionProxy plantGuard, SimpleExpressionProxy specGuard)
@@ -1770,18 +1907,6 @@ private void createVariableStates(final VariableProxy variable,
     return actionLists;
   }
 
-/*
-  private boolean componentHasNonEmptyGuardActionBlock
-    (Collection<EdgeProxy> edges)
-  {
-    for (final EdgeProxy edge: edges){
-      if (edge.getGuardActionBlock() != null){
-        return true;
-      }
-    }
-    return false;
-  }
-*/
 	private boolean componentHasNonEmptyGuardActionBlock(Collection<EdgeProxy> edges)
 	{
 		for (final EdgeProxy edge: edges)
@@ -1937,7 +2062,8 @@ private void createVariableStates(final VariableProxy variable,
     		if(guard.toString().equals("false")){
     			create=false; 
     			/*
-    			 * The in transition is removed but is in the alphabet.
+    			 * The in transition is removed but the event 
+    			 * is in the alphabet.
     			 */
     			mGlobalAlphabet.add(event);
                 mLocalAlphabet.add(event);
@@ -2225,11 +2351,11 @@ private void createVariableStates(final VariableProxy variable,
    * and specifications that contains events that have been relabelled into more 
    * than one name.    
    */
-  //private Set<String> mUncontrollableEFASpecifications; 
   private Map<EventProxy,LocationsAndExpression> mEventForbiddenStatesMap;
   private Set<EventProxy> mForbiddenEvents;
   /*
    * This event is used to mark states. 
    */
   private EventProxy mAcceptingProp;
+  private Map<String,CompiledAutomaton> mCompiledAutomata;
 }
