@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.gui.ide
 //# CLASS:   IDEMenuBar
 //###########################################################################
-//# $Id: IDEMenuBar.java,v 1.53 2007-09-25 23:38:58 knut Exp $
+//# $Id: IDEMenuBar.java,v 1.54 2007-09-25 23:42:21 knut Exp $
 //###########################################################################
 
 package org.supremica.gui.ide;
@@ -143,7 +143,7 @@ public class IDEMenuBar
         final Action insvar = actions.getAction(InsertVariableAction.class);
         menu.add(new JMenuItem(insvar));
 		*/
-        //menu.add(ide.getActions().editorAddComponentEventAction.getMenuItem());
+        menu.add(ide.getActions().editorAddComponentEventAction.getMenuItem());
         menu.add(ide.getActions().editorAddModuleEventAction.getMenuItem());
         //menu.add(ide.getActions().editorAddForeachComponentAction.getMenuItem());
         //menu.add(ide.getActions().editorAddInstanceAction.getMenuItem());

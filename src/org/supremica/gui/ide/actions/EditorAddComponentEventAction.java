@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.gui.ide
 //# CLASS:   EditorAddEventAction
 //###########################################################################
-//# $Id: EditorAddComponentEventAction.java,v 1.7 2007-09-25 21:38:57 knut Exp $
+//# $Id: EditorAddComponentEventAction.java,v 1.8 2007-09-25 23:42:21 knut Exp $
 //###########################################################################
 
 
@@ -33,11 +33,11 @@ public class EditorAddComponentEventAction
 
         setEditorActiveRequired(true);
 
-        putValue(Action.NAME, "New Component Event...");
+        putValue(Action.NAME, "Component Event...");
         putValue(Action.SHORT_DESCRIPTION, "Add a new event to the component");
         putValue(Action.SMALL_ICON,
             new ImageIcon(IDE.class.getResource("/icons/waters/event16.gif")));
-        putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_E, ActionEvent.CTRL_MASK));
+        putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_E, ActionEvent.ALT_MASK));
         putValue(Action.ACTION_COMMAND_KEY, KEY);
     }
 

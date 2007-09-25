@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.gui.ide
 //# CLASS:   EditorAddEventAction
 //###########################################################################
-//# $Id: EditorAddModuleEventAction.java,v 1.11 2007-09-25 23:38:58 knut Exp $
+//# $Id: EditorAddModuleEventAction.java,v 1.12 2007-09-25 23:42:21 knut Exp $
 //###########################################################################
 
 
@@ -30,11 +30,11 @@ public class EditorAddModuleEventAction
 
         setEditorActiveRequired(true);
 
-        putValue(Action.NAME, "Event...");
+        putValue(Action.NAME, "Module Event...");
         putValue(Action.SHORT_DESCRIPTION, "Add a new event to the module");
         putValue(Action.SMALL_ICON,
             new ImageIcon(IDE.class.getResource("/icons/waters/event16.gif")));
-        putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_E, ActionEvent.ALT_MASK));
+        putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_F, ActionEvent.ALT_MASK));
         putValue(Action.ACTION_COMMAND_KEY, KEY);
     }
 
