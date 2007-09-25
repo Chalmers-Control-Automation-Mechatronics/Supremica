@@ -77,7 +77,7 @@ public class AboutDialog
 		textArea.append("Version: " + Version.version() + "\n");
 		textArea.append("Copyright (c) 1999-2007\n");
 		textArea.append("Knut \u00c5kesson, Martin Fabian, Hugo Flordal, Robi Malik\n");
-		textArea.append("Arash Vahidi, Markus Skoldstam, Goran Cengic\n\n");
+		textArea.append("Arash Vahidi, Markus Sk\u00F6ldstam, Goran \u010Cengi\u0107\n\n");
 		textArea.append("Supremica is currently a joint project between Department\nof Signals and Systems, Chalmers University of Technology, Sweden\nand Department of Computer Science, University of Waikato, New Zealand\n\n");
 		textArea.append("Supremica includes technology from the Waters project developed at\n");
 		textArea.append("Department of Computer Science, University of Waikato, New Zealand\n\n");
