@@ -4,12 +4,13 @@
 //# PACKAGE: org.supremica.gui.ide
 //# CLASS:   EditorNewDialog
 //###########################################################################
-//# $Id: EditorNewComponentDialog.java,v 1.16 2007-05-24 06:21:18 robi Exp $
+//# $Id: EditorNewComponentDialog.java,v 1.17 2007-09-25 22:56:11 knut Exp $
 //###########################################################################
 
 
 package org.supremica.gui.ide;
 
+import java.awt.Frame;
 import java.awt.event.*;
 import javax.swing.*;
 
@@ -22,6 +23,8 @@ import net.sourceforge.waters.subject.module.SimpleComponentSubject;
 import net.sourceforge.waters.xsd.base.ComponentKind;
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
 import net.sourceforge.waters.subject.module.ModuleSubjectFactory;
+
+import org.supremica.gui.Utility;
 
 
 /** <p>A dialog to help users create new components in a module.</p>
@@ -48,13 +51,13 @@ public class EditorNewComponentDialog
 	EditorPanelInterface mRoot = null;
 //	private DefaultMutableTreeNode parentNode = null;
 
-	public EditorNewComponentDialog(EditorPanelInterface root)
+	public EditorNewComponentDialog(Frame parent, EditorPanelInterface root)
 	{
+		super(parent);
 		this.mRoot = root;
 //		parentNode = node;
 
 		this.setTitle("Create Component");
-
 		// Center this element on the screen
 		setModal(true);
 		setLocationRelativeTo(null);
@@ -114,6 +117,7 @@ public class EditorNewComponentDialog
 		mNameInput.requestFocusInWindow();
 		this.setContentPane(b);
 		this.pack();
+		Utility.setupDialog(this, getWidth(), getHeight());
 		this.setVisible(true);
 		mNameInput.requestFocusInWindow();
 	}

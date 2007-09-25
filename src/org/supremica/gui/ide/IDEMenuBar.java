@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.gui.ide
 //# CLASS:   IDEMenuBar
 //###########################################################################
-//# $Id: IDEMenuBar.java,v 1.51 2007-08-11 10:44:03 robi Exp $
+//# $Id: IDEMenuBar.java,v 1.52 2007-09-25 22:56:11 knut Exp $
 //###########################################################################
 
 package org.supremica.gui.ide;
@@ -50,19 +50,19 @@ public class IDEMenuBar
     extends JMenuBar
     implements Observer
 {
-    
+
     //#######################################################################
     //# Inner Class NewFromTemplateHandler
     class NewFromTemplateHandler
         implements ActionListener
     {
         private TemplateItem item = null;
-        
+
         public NewFromTemplateHandler(TemplateItem item)
         {
             this.item = item;
         }
-        
+
         public void actionPerformed(ActionEvent e)
         {
             try
@@ -80,7 +80,7 @@ public class IDEMenuBar
             }
         }
     }
-        
+
     //#######################################################################
     //# Constructor
     public IDEMenuBar(IDE ide)
@@ -89,11 +89,11 @@ public class IDEMenuBar
         initMenubar();
         ide.attach(this);
     }
-    
+
     private void initMenubar()
     {
         final Actions actions = ide.getActions();
-        
+
         // File
         JMenu menu = new JMenu("File");
         menu.setMnemonic(KeyEvent.VK_F);
@@ -116,7 +116,7 @@ public class IDEMenuBar
 		final Action exit = actions.getAction(ExitAction.class);
         menu.add(new JMenuItem(exit));
         add(menu);
-        
+
         // Edit
         menu = new JMenu("Edit");
         menu.setMnemonic(KeyEvent.VK_E);
@@ -134,16 +134,16 @@ public class IDEMenuBar
         final Action layout = actions.getAction(GraphLayoutAction.class);
         menu.add(new JMenuItem(layout));
         add(menu);
-        
+
         // Insert
-        menu = new JMenu("Insert");
+        menu = new JMenu("Create");
         menu.setMnemonic(KeyEvent.VK_I);
         menu.add(ide.getActions().editorAddSimpleComponentAction.getMenuItem());
 		/*
         final Action insvar = actions.getAction(InsertVariableAction.class);
         menu.add(new JMenuItem(insvar));
 		*/
-        menu.add(ide.getActions().editorAddComponentEventAction.getMenuItem());
+        //menu.add(ide.getActions().editorAddComponentEventAction.getMenuItem());
         menu.add(ide.getActions().editorAddModuleEventAction.getMenuItem());
         //menu.add(ide.getActions().editorAddForeachComponentAction.getMenuItem());
         //menu.add(ide.getActions().editorAddInstanceAction.getMenuItem());
@@ -151,7 +151,7 @@ public class IDEMenuBar
         editorMenu = menu;
         editorMenu.setEnabled(false);
         add(menu);
-        
+
         // View (submenu)
         final JMenu viewMenu = new JMenu("View");
         viewMenu.add
@@ -161,7 +161,7 @@ public class IDEMenuBar
         viewMenu.add(actions.analyzerViewStatesAction.getMenuItem());
         viewMenu.add
             (actions.analyzerViewModularStructureAction.getMenuItem());
-        
+
         // Analyze
         menu = new JMenu("Analyze");
         menu.setMnemonic(KeyEvent.VK_A);
@@ -187,49 +187,49 @@ public class IDEMenuBar
         analyzerMenu = menu;
         analyzerMenu.setEnabled(false);
         add(menu);
-        
+
         // Examples
         menu = new JMenu("Examples");
         menu.setMnemonic(KeyEvent.VK_X);
         menu.add(ide.getActions().toolsTestCasesAction.getMenuItem());
         add(menu);
-        
+
         // File.NewFromTemplate
         ExampleTemplates exTempl = ExampleTemplates.getInstance();
         for (Iterator groupIt = exTempl.iterator(); groupIt.hasNext(); )
         {
             TemplateGroup currGroup = (TemplateGroup) groupIt.next();
             JMenu menuFileNewFromTemplateGroup = new JMenu();
-            
+
             menuFileNewFromTemplateGroup.setText(currGroup.getName());
             menuFileNewFromTemplateGroup.setToolTipText(currGroup.getShortDescription());
             menu.add(menuFileNewFromTemplateGroup);
-            
+
             for (Iterator itemIt = currGroup.iterator(); itemIt.hasNext(); )
             {
                 TemplateItem currItem = (TemplateItem) itemIt.next();
                 JMenuItem menuItem = new JMenuItem();
                 menuItem.setText(currItem.getName());
                 menuItem.setToolTipText(currItem.getShortDescription());
-                
+
                 menuFileNewFromTemplateGroup.add(menuItem);
                 menuItem.addActionListener(new NewFromTemplateHandler(currItem));
             }
         }
-        
+
         // Configure
         menu = new JMenu("Configure");
-        menu.setMnemonic(KeyEvent.VK_C);
+        //menu.setMnemonic(KeyEvent.VK_C);
         add(menu);
         //menu.add(ide.getActions().editorOptionsAction.getMenuItem());
         menu.add(ide.getActions().analyzerOptionsAction.getMenuItem());
-        
+
         // Modules
         mModulesMenu = new JMenu("Modules");
         mModulesMenu.setMnemonic(KeyEvent.VK_M);
         mModulesMenu.setEnabled(false);
         add(mModulesMenu);
-        
+
         // Help
         menu = new JMenu();
         menu.setText("Help");
@@ -239,8 +239,8 @@ public class IDEMenuBar
         menu.addSeparator();
         menu.add(ide.getActions().helpAboutAction.getMenuItem());
     }
-    
-    
+
+
     //#######################################################################
     //# Interface net.sourceforge.waters.gui.observer.Observer
     public void update(final EditorChangedEvent event)
@@ -258,8 +258,8 @@ public class IDEMenuBar
                 break;
         }
     }
-    
-    
+
+
     //#######################################################################
     //# Auxiliary Methods
     private void updateEnabledStatus()
@@ -269,7 +269,7 @@ public class IDEMenuBar
         editorMenu.setEnabled(editor);
         analyzerMenu.setEnabled(analyzer);
     }
-    
+
     private void updateModulesMenu()
     {
         final DocumentContainerManager manager =
@@ -288,7 +288,7 @@ public class IDEMenuBar
         }
         mModulesMenu.setEnabled(count > 0);
     }
-    
+
     private JMenuItem createMenuItem(final DocumentContainer container)
     {
         final JMenuItem item = new JMenuItem();
@@ -326,18 +326,18 @@ public class IDEMenuBar
         item.addActionListener(listener);
         return item;
     }
-    
-    
+
+
     //#######################################################################
     //# Data Members
     private final IDE ide;
     private JMenu editorMenu;
     private JMenu analyzerMenu;
     private JMenu mModulesMenu;
-    
-    
+
+
     //#######################################################################
     //# Class Constants
     private static final int MAX_MODULES = 24;
-    
+
 }

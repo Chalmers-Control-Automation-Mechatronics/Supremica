@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.gui.ide.actions
 //# CLASS:   EditorCopyAction
 //###########################################################################
-//# $Id: EditorCopyAction.java,v 1.6 2007-05-23 15:47:29 flordal Exp $
+//# $Id: EditorCopyAction.java,v 1.7 2007-09-25 22:56:11 knut Exp $
 //###########################################################################
 
 package org.supremica.gui.ide.actions;
@@ -33,29 +33,33 @@ public class EditorCopyAction
     extends IDEAction
 {
     private static final long serialVersionUID = 1L;
-    
+
     public EditorCopyAction(List<IDEAction> actionList)
     {
         super(actionList);
-        
+
         setEditorActiveRequired(true);
-        
+
         putValue(Action.NAME, "Copy");
         putValue(Action.SHORT_DESCRIPTION, "Copy");
         putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_C, ActionEvent.CTRL_MASK));
         putValue(Action.MNEMONIC_KEY, new Integer(KeyEvent.VK_C));
         putValue(Action.SMALL_ICON, new ImageIcon(IDE.class.getResource("/toolbarButtonGraphics/general/Copy16.gif")));
     }
-    
+
     public void actionPerformed(ActionEvent e)
     {
         doAction();
     }
-    
+
     public void doAction()
     {
+		if (ide.getActiveEditorWindowInterface() == null)
+			return;
         final ControlledSurface surface =
             ide.getActiveEditorWindowInterface().getControlledSurface();
+        if (surface == null)
+        	return;
         final Collection<ProxySubject> selected = surface.getSelected();
         final Collection<NodeSubject> nodes = new LinkedList<NodeSubject>();
         final Collection<EdgeSubject> edges = new LinkedList<EdgeSubject>();
