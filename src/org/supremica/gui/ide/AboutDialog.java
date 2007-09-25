@@ -64,21 +64,32 @@ public class AboutDialog
 	public AboutDialog(Frame parent)
 	{
 		super(parent, true);
-		Utility.setupDialog(this, 400, 300);
+		Utility.setupDialog(this, 600, 500);
+		setTitle("About Supremica");
 
 		enableEvents(AWTEvent.WINDOW_EVENT_MASK);
 
 		Container thisPanel = getContentPane();
 
-		thisPanel.add(new JLabel(new ImageIcon(getClass().getResource("/icons/Supremica.gif"))), BorderLayout.WEST);
+		//thisPanel.add(new JLabel(new ImageIcon(getClass().getResource("/icons/Supremica.gif"))), BorderLayout.WEST);
 		JTextArea textArea = new JTextArea();
-		textArea.append("<b>Supremica</b>\n");
+		textArea.append("Supremica\n");
 		textArea.append("Version: " + Version.version() + "\n");
-		textArea.append("Copyright (c) 1999-2005\n");
-		textArea.append("Knut \u00c5kesson, Martin Fabian, Hugo Flordal,\n");
-		textArea.append("Anders Hellgren, Robi Malik, Arash Vahidi.\n");
+		textArea.append("Copyright (c) 1999-2007\n");
+		textArea.append("Knut \u00c5kesson, Martin Fabian, Hugo Flordal, Robi Malik\n");
+		textArea.append("Arash Vahidi, Markus Skoldstam, Goran Cengic\n\n");
+		textArea.append("Supremica is currently a joint project between Department\nof Signals and Systems, Chalmers University of Technology, Sweden\nand Department of Computer Science, University of Waikato, New Zealand\n\n");
+		textArea.append("Supremica includes technology from the Waters project developed at\n");
+		textArea.append("Department of Computer Science, University of Waikato, New Zealand\n\n");
+		textArea.append("Supremica is release using the Supremica Software License Agreement\n\n");
+		textArea.append(license);
+
 		textArea.setEditable(false);
-		thisPanel.add(textArea, BorderLayout.CENTER);
+		textArea.setSelectionStart(0);
+		textArea.setSelectionEnd(0);
+		JScrollPane scrollPanel = new JScrollPane(textArea);
+		thisPanel.add(scrollPanel, BorderLayout.CENTER);
+		scrollPanel.getVerticalScrollBar().setValue(0);
 		JPanel buttonPanel = new JPanel();
 		okButton = new JButton("Ok");
 		okButton.addActionListener(this);
@@ -111,4 +122,6 @@ public class AboutDialog
 			cancel();
 		}
 	}
+
+	private static final String license = "Supremica Software License Agreement\nThe Supremica software is not in the public domain\nHowever, it is freely available without fee for education,\nresearch, and non-profit purposes.  By obtaining copies of\nthis and other files that comprise the Supremica software,\nyou, the Licensee, agree to abide by the following\nconditions and understandings with respect to the\ncopyrighted software:\n\nThe software is copyrighted in the name of Supremica,\nand ownership of the software remains with Supremica.\n\nPermission to use, copy, and modify this software and its\ndocumentation for education, research, and non-profit\npurposes is hereby granted to Licensee, provided that the\ncopyright notice, the original author's names and unit\nidentification, and this permission notice appear on all\nsuch copies, and that no charge be made for such copies.\nAny entity desiring permission to incorporate this software\ninto commercial products or to use it for commercial\npurposes should contact:\n\nKnut Akesson (KA), knut@supremica.org\nSupremica,\nNorra Breviksvägen 10\nSE-421 67 Västra Frölunda\nSWEDEN\n\nto discuss license terms. No cost evaluation licenses are\navailable.\n\nLicensee may not use the name, logo, or any other symbol\nof Supremica nor the names of any of its employees nor\nany adaptation thereof in advertising or publicity\npertaining to the software without specific prior written\napproval of the Supremica.\n\nSUPREMICA AND KA MAKES NO REPRESENTATIONS ABOUT THE\nSUITABILITY OF THE SOFTWARE FOR ANY PURPOSE.\nIT IS PROVIDED \"AS IS\" WITHOUT EXPRESS OR IMPLIED WARRANTY.\n\nSupremica or KA shall not be liable for any damages\nsuffered by Licensee from the use of this software.\n\nSupremica is owned and represented by KA.\n";
 }

@@ -87,7 +87,7 @@ public class AboutBox
 	GridLayout gridLayout1 = new GridLayout();
 	String product = "Supremica";
 	String version = Version.version();
-	String copyright = "Copyright © 1999-2005";
+	String copyright = "Copyright © 1999-2007";
 	String authors1 = "Knut \u00c5kesson, Hugo Flordal, Martin Fabian";
 	String authors2 = "Anders Hellgren, Arash Vahidi";
 	String comments1 = "Northwoods Software - http://www.nwoods.com";
