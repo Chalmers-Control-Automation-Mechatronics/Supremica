@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   EditorEvents
 //###########################################################################
-//# $Id: EditorEvents.java,v 1.34 2007-06-26 14:43:25 robi Exp $
+//# $Id: EditorEvents.java,v 1.35 2007-09-25 18:22:37 knut Exp $
 //###########################################################################
 
 
@@ -52,6 +52,9 @@ import net.sourceforge.waters.subject.module.IdentifierSubject;
 import net.sourceforge.waters.subject.module.GraphSubject;
 import net.sourceforge.waters.subject.module.SimpleComponentSubject;
 import net.sourceforge.waters.xsd.base.EventKind;
+
+import org.supremica.log.Logger;
+import org.supremica.log.LoggerFactory;
 
 
 /**
@@ -414,8 +417,8 @@ public class EditorEvents
       {
         final IdentifierSubject ident = model.getEvent(rows[i]);
         final EventKind guess = mRoot.guessEventKind(ident);
-        System.out.println("EventType: " + e);
-        System.out.println("EventKind: " + guess);
+        logger.debug("EventType: " + e);
+        logger.debug("EventKind: " + guess);
         if (guess != null) {
           switch (e) {
             case UNKNOWN:
@@ -460,7 +463,7 @@ public class EditorEvents
         }
         idents.add(ident);
       }
-      System.out.println("EventType: " + e);
+      logger.debug("EventType: " + e);
       final Transferable trans = new IdentifierTransfer(idents, e);
 			try {
 				event.startDrag(DragSource.DefaultCopyDrop, trans);
@@ -489,6 +492,8 @@ public class EditorEvents
 
 	//#######################################################################
 	//# Class Constants
+    private static Logger logger = LoggerFactory.createLogger(EditorEvents.class);
+
 	private static final int COLUMNWIDTH0 = 24;
 	private static final int MINCOLUMNWIDTH0 = 20;
 	private static final int COLUMNWIDTH1 = 96;

@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.gui.ide
 //# CLASS:   ComponentEditorPanel
 //###########################################################################
-//# $Id: ComponentEditorPanel.java,v 1.50 2007-09-09 11:05:48 flordal Exp $
+//# $Id: ComponentEditorPanel.java,v 1.51 2007-09-25 18:22:37 knut Exp $
 //###########################################################################
 
 
@@ -57,8 +57,10 @@ import net.sourceforge.waters.subject.base.NamedSubject;
 import net.sourceforge.waters.subject.module.ModuleSubject;
 import net.sourceforge.waters.subject.module.SimpleComponentSubject;
 import net.sourceforge.waters.subject.module.SimpleIdentifierSubject;
-import org.supremica.gui.FileDialogs;
 
+import org.supremica.log.Logger;
+import org.supremica.log.LoggerFactory;
+import org.supremica.gui.FileDialogs;
 import org.supremica.gui.GraphicsToClipboard;
 
 /**
@@ -76,7 +78,9 @@ public class ComponentEditorPanel
     implements EditorWindowInterface
 {
     private static final long serialVersionUID = 1L;
-    
+
+    private static Logger logger = LoggerFactory.createLogger(ComponentEditorPanel.class);
+
     private ModuleContainer mModuleContainer;
     private ControlledSurface surface;
     private EditorEvents events;
@@ -84,7 +88,7 @@ public class ComponentEditorPanel
     private ModuleSubject mModule = null;
     private boolean isSaved = false;
     private GraphicsToClipboard toClipboard = null;
-    
+
     /**
      * Creates a new component editor panel.
      * @param  moduleContainer  the module container as a handle to the
@@ -106,13 +110,13 @@ public class ComponentEditorPanel
             (ControlledToolbar) mModuleContainer.getIDE().getToolBar());
         surface.setPreferredSize(IDEDimensions.rightEditorPreferredSize);
         surface.setMinimumSize(IDEDimensions.rightEditorMinimumSize);
-        
+
         final ModuleWindowInterface root = mModuleContainer.getEditorPanel();
         events = new EditorEvents(root, element, this);
-        
+
         final LayoutManager layout = new BorderLayout();
         setLayout(layout);
-        
+
         final JScrollPane scrollsurface = new JScrollPane(surface);
         final JScrollPane scrollevents = new JScrollPane(events);
         final JViewport viewevents = scrollevents.getViewport();
@@ -123,42 +127,42 @@ public class ComponentEditorPanel
         final int divide = Math.min(prefeventswidth, halfwidth);
         split.setDividerLocation(divide);
         add(split, BorderLayout.CENTER);
-        
+
         surface.createOptions(this);
     }
-    
+
     //########################################################################
     //# Interface net.sourceforge.waters.gui.EditorWindowInterface
     public ModuleWindowInterface getModuleWindowInterface()
     {
         return mModuleContainer.getEditorPanel();
     }
-    
+
     public boolean isSaved()
     {
         return isSaved;
     }
-    
+
     public void setSaved(boolean s)
     {
         isSaved = s;
     }
-    
+
     public JFrame getFrame()
     {
         return mModuleContainer.getFrame();
     }
-    
+
     public ControlledSurface getControlledSurface()
     {
         return surface;
     }
-    
+
     public EditorEvents getEventPane()
     {
         return events;
     }
-    
+
 /*
         public void repaint()
         {
@@ -167,25 +171,25 @@ public class ComponentEditorPanel
                 super.repaint();
         }
  */
-    
+
     public void setDisplayed()
     {
         EditorPanel editorPanel = mModuleContainer.getEditorPanel();
         editorPanel.setRightComponent(this);
     }
-    
+
     public UndoInterface getUndoInterface()
     {
         return mModuleContainer;
     }
-    
+
     public void copyAsWMFToClipboard()
     {
         if (toClipboard == null)
         {
             toClipboard = GraphicsToClipboard.getInstance();
         }
-        
+
         //Rectangle2D bb = surface.getBoundingBox();
         //double minX = bb.getMinX();
         //double maxX = bb.getMaxX();
@@ -200,12 +204,12 @@ public class ComponentEditorPanel
         //width += (int)0.1*width;
         //height += (int)0.1*height;
         Graphics theGraphics = toClipboard.getGraphics(surface.getWidth(), surface.getHeight());
-        
+
         surface.print(theGraphics);
         toClipboard.copyToClipboard();
     }
-    
-    
+
+
     public void exportPDF()
     {
         // Get file to export to
@@ -218,19 +222,19 @@ public class ComponentEditorPanel
         {
             return;
         }
-        
+
         // Create output
         int width = surface.getWidth();
         int height = surface.getHeight();
         Document document = new Document(new com.lowagie.text.Rectangle(width, height));
-        
+
         try
         {
             PdfWriter writer= PdfWriter.getInstance(document,  new FileOutputStream(file));
-            
+
             document.addAuthor("Supremica");
             document.open();
-            
+
             PdfContentByte cb = writer.getDirectContent();
             PdfTemplate tp = cb.createTemplate(width, height);
             Graphics2D g2 = tp.createGraphics(width, height, new DefaultFontMapper());
@@ -239,7 +243,7 @@ public class ComponentEditorPanel
             //chart.draw(g2, rectangle2D);
             g2.dispose();
             cb.addTemplate(tp, 0, 0);
-            
+
         }
         catch (DocumentException de)
         {
@@ -249,17 +253,17 @@ public class ComponentEditorPanel
         {
             System.err.println(ioe.getMessage());
         }
-        
+
         document.close();
     }
-    
+
     /**
      * Prints postscript output to file (specified by user).
      */
     public void exportPostscript()
     {
         String psMimeType = "application/postscript";
-        
+
         StreamPrintServiceFactory[] factories =
             PrinterJob.lookupStreamPrintServices(psMimeType);
         if (factories.length > 0)
@@ -278,7 +282,7 @@ public class ComponentEditorPanel
                 {
                     return;
                 }
-                
+
                 // Get printerservice and set up PrintJob
                 FileOutputStream outstream = new FileOutputStream(file);
                 StreamPrintService psPrinter = factories[0].getPrintService(outstream);
@@ -290,7 +294,7 @@ public class ComponentEditorPanel
                 PrintRequestAttributeSet attributes = new HashPrintRequestAttributeSet();
                 PrintRequestAttribute jobName = new JobName("Supremica Printing", Locale.ENGLISH);
                 attributes.add(jobName);
-                
+
                 // Show printing dialog
                 //if (printJob.printDialog(attributes))
                 // Print!
@@ -315,33 +319,33 @@ public class ComponentEditorPanel
     public void exportEncapsulatedPostscript()
     {
         EPS2D eps2d = new EPS2D("filename.eps");
-        
+
         surface.print(eps2d);
     }
      */
-    
+
     public void exportEncapsulatedPostscript()
     {
         // The output stream, used to write to an eps-file
         BufferedWriter w = null;
-        
+
         try
         {
             // An auxiliary object, finding the shapes of the logical objects of the graph, such as nodes, edges, etc.
             ProxyShapeProducer producer = surface.getShapeProducer();
-            
+
             // Some transform needed to convert java's pixel representation into postscript coordinate system
             AffineTransform transform = new AffineTransform(1, 0, 0, -1, 0, (new java.awt.print.Paper()).getHeight());
             AffineTransform offsetTransform = new AffineTransform(1, 0, 0, -1, 0, 0);
             AffineTransform labelTransform = new AffineTransform(1, 0, 0, -1, 1, (new java.awt.print.Paper()).getHeight() - 12);
-            
+
             // The delimiters of the eps-file BoundingBox, stored in the following order: minX, minY, maxX, maxY
             double[] boundingBoxLimits = new double[]{(new java.awt.print.Paper()).getWidth(), (new java.awt.print.Paper()).getHeight(), 0, 0};
-            
+
             // This is somewhat ugly
             final int NODE_RADIUS = 6; // The radius of the states
             final double MARKING_GREY_SCALE = 0.5; // The grayscale level of the marked states
-            
+
             // Open a file chooser in the location of the modelfile,
             // and create the eps-file to be filled with the graphical
             // information.
@@ -366,10 +370,10 @@ public class ComponentEditorPanel
             {
                 return;
             }
-            
+
             // Create the writer, responsible for writing the information to the eps-file
             w = new BufferedWriter(new FileWriter(epsFile));
-            
+
             // Create the head of the eps-file
             w.write("%!PS-Adobe EPSF-3.0");
             w.newLine();
@@ -392,7 +396,7 @@ public class ComponentEditorPanel
             w.newLine();
             w.write("%%Page: 1 1\n");
             w.newLine();
-            
+
             w.write("/actionLabel {\n");
             w.write("\tgsave\n");
             w.write("\t0.6 0.15 0.15 setrgbcolor\n");
@@ -400,14 +404,14 @@ public class ComponentEditorPanel
             w.write("\tgrestore\n");
             w.write("} def\n");
             w.newLine();
-            
+
             // Useful functions are defined and added to the eps-file
             w.write("/arrow {\n");
             w.write("\tarrowHead\n");
             w.write("\tedge\n");
             w.write("} def\n");
             w.newLine();
-            
+
             w.write("/arrowHead {\n");
             w.write("\tnewpath\n");
             w.write("\tmoveto\n");
@@ -417,12 +421,12 @@ public class ComponentEditorPanel
             w.write("\tfill\n");
             w.write("} def\n");
             w.newLine();
-            
+
             w.write("/controllableLabel {\n");
             w.write("\tControllableFont label\n");
             w.write("} def\n");
             w.newLine();
-            
+
             w.write("/edge {\n");
             w.write("\tnewpath\n");
             w.write("\t6 -2 roll moveto\n");
@@ -430,7 +434,7 @@ public class ComponentEditorPanel
             w.write("\tstroke\n");
             w.write("} def\n");
             w.newLine();
-            
+
             w.write("/guardLabel {\n");
             w.write("\tgsave\n");
             w.write("\t0.0 0.5 0.5 setrgbcolor\n");
@@ -438,7 +442,7 @@ public class ComponentEditorPanel
             w.write("\tgrestore\n");
             w.write("} def\n");
             w.newLine();
-            
+
             w.write("/label {\n");
             w.write("\tsetfont\n");
             w.write("\tnewpath\n");
@@ -447,7 +451,7 @@ public class ComponentEditorPanel
             w.write("\tstroke\n");
             w.write("} def\n");
             w.newLine();
-            
+
             w.write("/loop {\n");
             w.write("\tnewpath\n");
             w.write("\t28 -2 roll moveto\n");
@@ -461,14 +465,14 @@ public class ComponentEditorPanel
             w.write("\tstroke\n");
             w.write("} def\n");
             w.newLine();
-            
+
             // Useful functions are defined and added to the eps-file
             w.write("/loopArrow {\n");
             w.write("\tarrowHead\n");
             w.write("\tloop\n");
             w.write("} def\n");
             w.newLine();
-            
+
             w.write("/markedState {\n");
             w.write("\tnewpath\n");
             w.write("\t" + NODE_RADIUS + " 0 360 arc\n");
@@ -479,14 +483,14 @@ public class ComponentEditorPanel
             w.write("\tstroke\n");
             w.write("} def\n");
             w.newLine();
-            
+
             w.write("/state {\n");
             w.write("\tnewpath\n");
             w.write("\t" + NODE_RADIUS + " 0 360 arc\n");
             w.write("\tstroke\n");
             w.write("} def\n");
             w.newLine();
-            
+
             w.write("/stateLabel {\n");
             w.write("\tgsave\n");
             w.write("\t0.0 0.5 0.0 setrgbcolor\n");
@@ -494,13 +498,13 @@ public class ComponentEditorPanel
             w.write("\tgrestore\n");
             w.write("} def\n");
             w.newLine();
-            
+
             w.write("/straightArrow {\n");
             w.write("\tarrowHead\n");
             w.write("\tstraightEdge\n");
             w.write("} def\n");
             w.newLine();
-            
+
             w.write("/straightEdge {\n");
             w.write("\tnewpath\n");
             w.write("\tmoveto\n");
@@ -508,31 +512,31 @@ public class ComponentEditorPanel
             w.write("\tstroke\n");
             w.write("} def\n");
             w.newLine();
-            
-            
+
+
             w.write("/uncontrollableLabel {\n");
             w.write("\tUncontrollableFont label\n");
             w.write("} def\n");
             w.newLine();
-            
+
             w.write("/ControllableFont\n");
             w.write("\t/Times-Roman findfont\n");
             w.write("\t12 scalefont\n");
             w.write("def\n");
             w.newLine();
-            
+
             w.write("/StateFont\n");
             w.write("\t/Helvetica findfont\n");
             w.write("\t12 scalefont\n");
             w.write("def\n");
             w.newLine();
-            
+
             w.write("/UncontrollableFont\n");
             w.write("\t/Times-Italic findfont\n");
             w.write("\t12 scalefont\n");
             w.write("def\n");
             w.newLine();
-            
+
             // For every node...
             // *** BUG *** This must be done through renderer.
             for (NodeProxy node : surface.getDrawnGraph().getNodes())
@@ -543,12 +547,12 @@ public class ComponentEditorPanel
                     SimpleNodeProxy simpleNode = (SimpleNodeProxy) node;
                     boolean markedState = false;
                     boolean forbiddenState = false;
-                    
+
                     // Find the center point of the state in ps-coordinates
                     // and round it off to the nearest integer
                     Point2D centerPoint = transform.transform(simpleNode.getPointGeometry().getPoint(), null);
                     centerPoint.setLocation(Math.round(centerPoint.getX()), Math.round(centerPoint.getY()));
-                    
+
                     // Check if this node is marked, i.e. whether it is labeled with a marked event
                     for (Proxy event : simpleNode.getPropositions().getEventList())
                     {
@@ -564,14 +568,14 @@ public class ComponentEditorPanel
                             }
                         }
                     }
-                    
+
                     // Choose appropriate postscript-command for this state
                     String command = "state";
                     if (markedState)
                     {
                         command = "markedState";
                     }
-                    
+
                     // Add the state to the eps-file
                     w.write(centerPoint.getX() + " " + centerPoint.getY() + " " + command + "\n");
                     if (forbiddenState)
@@ -586,13 +590,13 @@ public class ComponentEditorPanel
                         w.write("stroke\n");
                         w.write("grestore\n");
                     }
-                    
+
                     // Create bounds for the state, at a small distance (PADDING)
                     // outside the state circle and update the bounding box
                     final int PADDING = 0;
                     Rectangle2D stateBounds = new Rectangle2D.Double(centerPoint.getX() - NODE_RADIUS - PADDING, centerPoint.getY() - NODE_RADIUS - PADDING, 2*(NODE_RADIUS + PADDING), 2*(NODE_RADIUS + PADDING));
                     boundingBoxLimits = updateBoundingBoxLimits(boundingBoxLimits, stateBounds, null);
-                    
+
                     // If current state is initial, add the initial (straight) arrow to the eps-file
                     if (simpleNode.isInitial())
                     {
@@ -601,42 +605,42 @@ public class ComponentEditorPanel
                             if (handle.getType() == Handle.HandleType.INITIAL)
                             {
                                 PathIterator paths = handle.getShape().getPathIterator(transform);
-                                
+
                                 String psStr = "";
                                 while (!paths.isDone())
                                 {
                                     double[] coords = new double[6];
                                     int res = paths.currentSegment(coords);
-                                    
+
                                     if (res != PathIterator.SEG_CLOSE)
                                     {
                                         psStr += Math.round(coords[0]) + " " + Math.round(coords[1]) + " \n";
                                     }
-                                    
+
                                     paths.next();
                                 }
                                 w.write(psStr.substring(0, psStr.length()-1) + "straightArrow\n");
-                                
+
                                 Rectangle2D bounds = handle.getShape().getBounds2D();
                                 double[] boundsCoords = new double[]{bounds.getMinX(), bounds.getMinY(), bounds.getMaxX(), bounds.getMaxY()};
                                 transform.transform(boundsCoords, 0, boundsCoords, 0, 2);
-                                
+
                                 // Update the bounding box
                                 boundingBoxLimits = updateBoundingBoxLimits(boundingBoxLimits, handle.getShape().getBounds2D(), transform);
-                                
+
                                 break;
                             }
                         }
                     }
-                    
+
                     // Add the label of the current state to the eps-file, using the
                     // left lower corner of the label shape as the ps-coordinates.
                     Shape stateLabelShape = producer.getShape(simpleNode.getLabelGeometry()).getShape();
                     Point2D leftLowerCorner = labelTransform.transform(new Point2D.Double(stateLabelShape.getBounds2D().getMinX(), stateLabelShape.getBounds2D().getMinY()), null);
                     leftLowerCorner.setLocation(Math.round(leftLowerCorner.getX()), Math.round(leftLowerCorner.getY()));
-                    
+
                     w.write("(" + simpleNode.getName() + ") " + leftLowerCorner.getX() + " " + leftLowerCorner.getY() + " stateLabel\n");
-                    
+
                     // Update the bounding box
                     boundingBoxLimits = updateBoundingBoxLimits(boundingBoxLimits, stateLabelShape.getBounds2D(), transform);
                 }
@@ -647,7 +651,7 @@ public class ComponentEditorPanel
                     w.write("gsave\n");
                     w.write("0.7 setgray\n");
                     w.write("1.5 setlinewidth\n");
-                    
+
                     GroupNodeProxy groupNode = (GroupNodeProxy) node;
                     BoxGeometryProxy groupGeometryProxy = groupNode.getGeometry();
                     PathIterator paths = groupGeometryProxy.getRectangle().getPathIterator(transform);
@@ -655,7 +659,7 @@ public class ComponentEditorPanel
                     {
                         double[] coords = new double[6];
                         int res = paths.currentSegment(coords);
-                        
+
                         if (res == PathIterator.SEG_MOVETO)
                         {
                             w.write(Math.round(coords[0]) + " " + Math.round(coords[1]) + " moveto\n");
@@ -666,7 +670,7 @@ public class ComponentEditorPanel
                         }
                         else if (res == PathIterator.SEG_QUADTO)
                         {
-                            System.out.println("Oops, could this happen? Not implemented...");
+                            logger.error("Oops, could this happen? Not implemented...");
                         }
                         else if (res == PathIterator.SEG_CUBICTO)
                         {
@@ -681,7 +685,7 @@ public class ComponentEditorPanel
                         {
                             w.write("stroke\n");
                             w.write("grestore\n");
-                            
+
                             // Update the bounding box
                             boundingBoxLimits = updateBoundingBoxLimits(boundingBoxLimits, groupGeometryProxy.getRectangle().getBounds2D(), transform);
                         }
@@ -690,33 +694,33 @@ public class ComponentEditorPanel
                 }
                 else
                 {
-                    System.out.println("node " + node.getName() + " UNTREATED... (unheard of)");
+                    logger.error("node " + node.getName() + " UNTREATED... (unheard of)");
                 }
-                
+
                 // Add an empty line after each state-info
                 w.newLine();
             }
-            
+
             // For every edge...
             for (EdgeProxy edge : surface.getDrawnGraph().getEdges())
             {
                 Shape edgeshape = producer.getShape(edge).getShape();
                 PathIterator paths = edgeshape.getPathIterator(transform);
-                
+
                 // Set correct ps-command for the edge
                 String command = "arrow";
                 if (edge.getGeometry() == null) // then this is a straight edge
                 {
                     command = "straightArrow";
                 }
-                
+
                 // Write the geometry information about the edge to the eps-file
                 String psStr = "";
                 while (!paths.isDone())
                 {
                     double[] coords = new double[6];
                     int res = paths.currentSegment(coords);
-                    
+
                     if (res != PathIterator.SEG_CLOSE)
                     {
                         // The ps-commands are either "moveto", using 2 arguments,
@@ -730,17 +734,17 @@ public class ComponentEditorPanel
                         else if (res == PathIterator.SEG_CUBICTO)
                         {
                             nrOfCoords = 6;
-                            
+
                             // SEG_CUBICTO, used to draw self-loops, requires special treatment
                             command = "loopArrow";
                         }
-                        
+
                         for (int i=0; i<nrOfCoords; i++)
                         {
                             //w.write(Math.round(coords[i]) + " ");
                             psStr += Math.round(coords[i]) + " ";
                         }
-                        
+
                         psStr += "\n";
                     }
                     else
@@ -749,13 +753,13 @@ public class ComponentEditorPanel
                         w.newLine();
                         break;
                     }
-                    
+
                     paths.next();
                 }
-                
+
                 // Update the bounding box
                 boundingBoxLimits = updateBoundingBoxLimits(boundingBoxLimits, edgeshape.getBounds2D(), transform);
-                
+
                 // For each event attached to this edge...
                 for (Proxy proxyid : edge.getLabelBlock().getEventList())
                 {
@@ -778,12 +782,12 @@ public class ComponentEditorPanel
                     Shape eventShape = producer.getShape(proxyid).getShape();
                     Point2D leftLowerCorner = labelTransform.transform(new Point2D.Double(eventShape.getBounds2D().getMinX(), eventShape.getBounds2D().getMinY()), null);
                     leftLowerCorner.setLocation(Math.round(leftLowerCorner.getX()), Math.round(leftLowerCorner.getY()));
-                    
+
                     // The strings that are used to construct the ps-command
                     String eventName = ((IdentifierProxy) proxyid).getName();
                     String coordStr = leftLowerCorner.getX() + " " + leftLowerCorner.getY();
                     String labelStr = "(" + eventName + ")";
-                    
+
                     // Choose correct ps-command, according to the type of this event
                     command = "controllableLabel";
                     List<EventDeclProxy> eventdecllist = surface.getModule().getEventDeclList();
@@ -797,14 +801,14 @@ public class ComponentEditorPanel
                             }
                         }
                     }
-                    
+
                     w.write(labelStr + " " + coordStr + " " + command);
                     w.newLine();
-                    
+
                     // Update the bounding box
                     boundingBoxLimits = updateBoundingBoxLimits(boundingBoxLimits, eventShape.getBounds2D(), labelTransform);
                 }
-                
+
                 // Add guards and actions to the eps-file
                 GuardActionBlockProxy guardActionBlock = edge.getGuardActionBlock();
                 if (guardActionBlock != null)
@@ -814,9 +818,9 @@ public class ComponentEditorPanel
                         Shape actionShape = producer.getShape(action).getShape();
                         Point2D actionAnchor = labelTransform.transform(new Point2D.Double(actionShape.getBounds2D().getMinX(), actionShape.getBounds2D().getMinY()), null);
                         actionAnchor.setLocation(Math.round(actionAnchor.getX()), Math.round(actionAnchor.getY()));
-                        
+
                         w.write("(" + action + ") " + actionAnchor.getX() + " " + actionAnchor.getY() + " actionLabel\n");
-                        
+
                         // Update the bounding box
                         boundingBoxLimits = updateBoundingBoxLimits(boundingBoxLimits, actionShape.getBounds2D(), labelTransform);
                     }
@@ -825,32 +829,32 @@ public class ComponentEditorPanel
                         Shape guardShape = producer.getShape(guard).getShape();
                         Point2D guardAnchor = labelTransform.transform(new Point2D.Double(guardShape.getBounds2D().getMinX(), guardShape.getBounds2D().getMinY()), null);
                         guardAnchor.setLocation(Math.round(guardAnchor.getX()), Math.round(guardAnchor.getY()));
-                        
+
                         w.write("(" + guard + ") " + guardAnchor.getX() + " " + guardAnchor.getY() + " guardLabel\n");
-                        
+
                         // Update the bounding box
                         boundingBoxLimits = updateBoundingBoxLimits(boundingBoxLimits, guardShape.getBounds2D(), labelTransform);
                     }
                 }
-                
+
                 // Add an empty line after each edge-info
                 w.newLine();
             }
-            
+
             // Add closing command to the eps-file
             w.write("%%EOF");
-            
+
             // Close the output stream
             w.flush();
             w.close();
-            
+
             // The recently created eps-file is reprinted, this time with the
             // information about the supremal bounding box added to its header.
             // A temporary file is used for the reprinting
             File newEpsFile = File.createTempFile("temp", ".eps", epsFile.getParentFile());
             BufferedReader r = new BufferedReader(new FileReader(epsFile));
             w = new BufferedWriter(new FileWriter(newEpsFile));
-            
+
             // Every line of command is copied and a "BoundingBox"-line is added
             String str = r.readLine();
             while (str != null)
@@ -860,18 +864,18 @@ public class ComponentEditorPanel
                     w.write("%%BoundingBox: " + Math.round(boundingBoxLimits[0]) + " " + Math.round(boundingBoxLimits[1]) + " " + Math.round(boundingBoxLimits[2]) + " " + Math.round(boundingBoxLimits[3]));
                     w.newLine();
                 }
-                
+
                 w.write(str);
                 w.newLine();
-                
+
                 str = r.readLine();
             }
-            
+
             // The in- and output streams are closed
             w.flush();
             w.close();
             r.close();
-            
+
             // The old file is deleted, while the new one takes its name
             epsFile.delete();
             boolean renameSucceeded = newEpsFile.renameTo(epsFile);
@@ -879,7 +883,7 @@ public class ComponentEditorPanel
             {
                 throw new Exception("Unable to rename the newly created file to " + epsFile.getName());
             }
-            
+
             mModuleContainer.getIDE().info(epsFile.getName() + " created.");
         }
         catch (Exception ex)
@@ -897,13 +901,13 @@ public class ComponentEditorPanel
                     mModuleContainer.getIDE().error("Error at flushing the output stream");
                 }
             }
-            
+
             ex.printStackTrace();
         }
     }
 //     {
 // 		String psMimeType = "application/postscript";
-    
+
 //         StreamPrintServiceFactory[] factories =
 //             PrinterJob.lookupStreamPrintServices(psMimeType);
 //         if (factories.length > 0)
@@ -920,11 +924,11 @@ public class ComponentEditorPanel
 //                 {
 //                     return;
 //                 }
-    
+
 // 				// Create output
 // 				File dir = epsFile.getParentFile();
 // 				File psFile = File.createTempFile("temp", ".ps", dir);
-    
+
 //                 // Get printerservice and set up PrintJob
 //                 FileOutputStream outstream = new FileOutputStream(psFile);
 //                 StreamPrintService psPrinter = factories[0].getPrintService(outstream);
@@ -936,19 +940,19 @@ public class ComponentEditorPanel
 //                 PrintRequestAttributeSet attributes = new HashPrintRequestAttributeSet();
 //                 PrintRequestAttribute jobName = new JobName("Supremica Printing", Locale.ENGLISH);
 //                 attributes.add(jobName);
-    
+
 //                 // Print!
 //                 printJob.print(attributes);
-    
-    
+
+
 // 				// Convert ps to eps using "ps2epsi"
 // 				try
 // 				{
 // 					String[] cmds = new String[]{"ps2epsi.bat", psFile.getName(), epsFile.getName()};
-    
+
 // 					Process ps2epsiProcess = Runtime.getRuntime().exec(cmds, null, dir);
 // 					ps2epsiProcess.waitFor();
-    
+
 // 					if (ps2epsiProcess.exitValue() != 0)
 // 					{
 // 						throw new Exception("Conversion from ps to eps exited unsuccessfully.");
@@ -959,13 +963,13 @@ public class ComponentEditorPanel
 // 					mModuleContainer.getIDE().error("The conversion from ps to eps failed. Make sure that \"ps2epsi.bat\" is globally accessible.");
 // 					throw ex;
 // 				}
-    
+
 // 				// Loop through the eps-file and correct it if necessary
 // 				File newEpsFile = File.createTempFile(epsFile.getName(), ".tmp", dir);
-    
+
 // 				BufferedReader r = new BufferedReader(new FileReader(epsFile));
 // 				BufferedWriter w = new BufferedWriter(new FileWriter(newEpsFile));
-    
+
 // 				boolean alert = false;
 // 				String str = r.readLine();
 // 				while (str != null)
@@ -974,36 +978,36 @@ public class ComponentEditorPanel
 // 					{
 // 						alert = false;
 // 					}
-    
+
 // 					if (alert == true)
 // 					{
 // 						w.write("save countdictstack mark newpath /showpage {} def /setpagedevice {pop} def\n");
-    
+
 // 						alert = false;
 // 					}
-    
+
 // 					w.write(str);
 // 					w.newLine();
-    
+
 // 					if (str.contains("%%EndPreview"))
 // 					{
 // 						alert = true;
 // 					}
-    
+
 // 					str = r.readLine();
 // 				}
-    
+
 // 				w.flush();
 // 				w.close();
 // 				r.close();
 // 				outstream.close();
-    
+
 // 				// Clean up
 // 				psFile.delete();
 // 				epsFile.delete();
-    
+
 // 				boolean renameSucceeded = newEpsFile.renameTo(epsFile);
-    
+
 // 				if (!renameSucceeded)
 // 				{
 // 					throw new Exception("Unable to rename the newly created file to " + epsFile.getName());
@@ -1027,7 +1031,7 @@ public class ComponentEditorPanel
 //             mModuleContainer.getIDE().info("No Postscript printer service installed.");
 //         }
 // 	}
-    
+
     /**
      * Open a print dialog and let the user choose how to print.
      */
@@ -1042,22 +1046,22 @@ public class ComponentEditorPanel
                 return;
             }
             printJob.setPrintable(surface);
-            
+
             // Printing attributes
             PrintRequestAttributeSet attributes = new HashPrintRequestAttributeSet();
             PrintRequestAttribute name = new JobName("Supremica Printing", Locale.ENGLISH);
             attributes.add(name);
-            
+
             // Show printing dialog
             if (printJob.printDialog(attributes))
             {
-                System.out.println("Printing...");
-                
+                logger.debug("Printing...");
+
                 // Print!
                 printJob.print();
                 //printJob.print(attributes);
-                
-                System.out.println("Printing done!");
+
+                logger.debug("Printing done!");
             }
         }
         catch (Exception ex)
@@ -1066,7 +1070,7 @@ public class ComponentEditorPanel
             System.err.println(ex.getStackTrace());
         }
     }
-    
+
     public void createEvent()
     {
         final ModuleWindowInterface root = mModuleContainer.getEditorPanel();
@@ -1078,17 +1082,20 @@ public class ComponentEditorPanel
             public void actionPerformed(final ActionEvent event)
             {
                 final NamedSubject decl = diag.getEditedItem();
-                final String name = decl.getName();
-                final SimpleIdentifierSubject ident =
-                    new SimpleIdentifierSubject(name);
-                final EditorEvents eventpane = gedit.getEventPane();
-                final EventTableModel model =
-                    (EventTableModel) eventpane.getModel();
-                model.addIdentifier(ident);
+                if (decl != null)
+                {
+					final String name = decl.getName();
+					final SimpleIdentifierSubject ident =
+						new SimpleIdentifierSubject(name);
+					final EditorEvents eventpane = gedit.getEventPane();
+					final EventTableModel model =
+						(EventTableModel) eventpane.getModel();
+					model.addIdentifier(ident);
+				}
             }
         });
     }
-    
+
     /**
      * This is an auxiliary method that is used when creating an Encapsulated
      * Postscript output. It is responsible for updating the limits of the
@@ -1101,7 +1108,7 @@ public class ComponentEditorPanel
     private double[] updateBoundingBoxLimits(double[] bbLimits, Rectangle2D bounds, AffineTransform transform)
     {
         double[] boundsCoords = new double[]{bounds.getMinX(), bounds.getMaxY(), bounds.getMaxX(), bounds.getMinY()};
-        
+
         if (transform != null)
         {
             transform.transform(boundsCoords, 0, boundsCoords, 0, 2);
@@ -1112,7 +1119,7 @@ public class ComponentEditorPanel
             boundsCoords[1] = boundsCoords[3];
             boundsCoords[3] = temp;
         }
-        
+
         // minX
         if (boundsCoords[0] < bbLimits[0])
         {
@@ -1133,7 +1140,7 @@ public class ComponentEditorPanel
         {
             bbLimits[3] = boundsCoords[3];
         }
-        
+
         return bbLimits;
     }
 }

@@ -1,9 +1,0 @@
-#!/bin/sh
-
-cd `dirname $0`
-DIR=`pwd`
-
-export LD_LIBRARY_PATH=$DIR
-
-java -cp "$DIR/Supremica.jar:$DIR/SupremicaLib.jar" -enableassertions \
-  org.supremica.apps.Supremica -p SupremicaProperties.cfg $*

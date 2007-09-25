@@ -562,15 +562,7 @@ Class-Path: ${manifest.pathlist}</echo>
         <copy file="${templates}/wcheck" todir="${dist}"/>	
         <chmod file="${dist}/wcheck" perm="755"/>	
         <copy file="${templates}/MBTTranslate" todir="${dist}"/>	
-        <chmod file="${dist}/MBTTranslate" perm="755"/>	
-        <copy file="${templates}/Waters.cmd" todir="${dist}"/>	
-        <chmod file="${dist}/Waters.cmd" perm="644"/>
-        <copy file="${templates}/Waters" todir="${dist}"/>	
-        <chmod file="${dist}/Waters" perm="755"/>	
-        <copy file="${templates}/Supremica" todir="${dist}"/>	
-        <chmod file="${dist}/Supremica" perm="755"/>	
-        <copy file="${templates}/Supremica.cmd" todir="${dist}"/>	
-        <chmod file="${dist}/Supremica.cmd" perm="644"/>
+        <chmod file="${dist}/MBTTranslate" perm="755"/>		
         <copy file="${templates}/demo" todir="${dist}"/>
         <chmod file="${dist}/demo" perm="755"/>
         <copy file="${templates}/demo.cmd" todir="${dist}"/>

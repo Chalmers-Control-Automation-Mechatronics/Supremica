@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   EventDeclListView
 //###########################################################################
-//# $Id: EventDeclListView.java,v 1.6 2007-07-10 14:27:42 flordal Exp $
+//# $Id: EventDeclListView.java,v 1.7 2007-09-25 18:22:37 knut Exp $
 //###########################################################################
 
 
@@ -13,6 +13,7 @@ package net.sourceforge.waters.gui;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.ArrayList;
+import java.util.List;
 import java.awt.Point;
 import java.awt.datatransfer.Transferable;
 import java.awt.event.ActionEvent;
@@ -28,9 +29,11 @@ import java.awt.dnd.DragGestureListener;
 import java.awt.dnd.DragSourceAdapter;
 import java.awt.dnd.DragSourceListener;
 import java.awt.dnd.InvalidDnDOperationException;
+import javax.swing.JDialog;
 import javax.swing.JList;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
 import javax.swing.JRadioButtonMenuItem;
 import javax.swing.ListModel;
@@ -41,10 +44,21 @@ import net.sourceforge.waters.gui.command.CompoundCommand;
 import net.sourceforge.waters.gui.command.DeleteEventDeclCommand;
 import net.sourceforge.waters.gui.command.EditEventDeclCommand;
 
+import net.sourceforge.waters.model.base.NamedProxy;
+import net.sourceforge.waters.model.base.Proxy;
+
+import net.sourceforge.waters.model.module.EdgeProxy;
+import net.sourceforge.waters.model.module.IdentifierProxy;
+import net.sourceforge.waters.model.module.LabelBlockProxy;
+
+import net.sourceforge.waters.subject.base.AbstractSubject;
+import net.sourceforge.waters.subject.base.ListSubject;
 import net.sourceforge.waters.subject.base.IndexedListSubject;
 import net.sourceforge.waters.subject.module.EventDeclSubject;
+import net.sourceforge.waters.subject.module.GraphSubject;
 import net.sourceforge.waters.subject.module.IdentifierSubject;
 import net.sourceforge.waters.subject.module.ModuleSubject;
+import net.sourceforge.waters.subject.module.SimpleComponentSubject;
 import net.sourceforge.waters.subject.module.SimpleIdentifierSubject;
 import net.sourceforge.waters.xsd.base.EventKind;
 
@@ -57,7 +71,7 @@ import net.sourceforge.waters.xsd.base.EventKind;
  * transitions in graphs.
  *
  * @todo Selection handling (must be undoable) not yet implemented!
- * 
+ *
  * @author Simon Ware, Robi Malik
  */
 
@@ -102,6 +116,43 @@ public class EventDeclListView
   {
     if (victims.iterator().hasNext()) {
       final ModuleSubject module = mRoot.getModuleSubject();
+
+      // Make sure that the event is not currently in use
+      for (EventDeclSubject event : victims)
+      {
+
+		  // First check that the event is not in use
+		  ListSubject<AbstractSubject> 	componentList = module.getComponentListModifiable();
+		  for (AbstractSubject subject : componentList)
+		  {
+			if (subject instanceof SimpleComponentSubject)
+			{
+			  System.err.println("Checking SimpleComponentSubject");
+			  GraphSubject graphSubject = ((SimpleComponentSubject)subject).getGraph();
+			  Collection<EdgeProxy> edges = graphSubject.getEdges();
+			  for (EdgeProxy edge : edges)
+			  {
+				LabelBlockProxy labelBlock = edge.getLabelBlock();
+				List<Proxy> eventList = labelBlock.getEventList();
+				for (Proxy proxy : eventList)
+				{
+					System.err.println("Checking proxy");
+					if (proxy instanceof IdentifierProxy)
+					{
+						if (event.getName().equals(((IdentifierProxy)proxy).getName()))
+						{
+						  JOptionPane.showMessageDialog(mRoot.getRootWindow(), "Event " + event.getName() + " is used in component " + ((SimpleComponentSubject)subject).getName(),
+														"Event in use!",
+														JDialog.DO_NOTHING_ON_CLOSE);
+						  return;
+						}
+					}
+				}
+			  }
+			}
+		  }
+		}
+
       final Command command = new DeleteEventDeclCommand(victims, module);
       mRoot.getUndoInterface().executeCommand(command);
     }
@@ -180,6 +231,7 @@ public class EventDeclListView
         final EventDeclSubject clicked = mModel.getElementAt(index);
         decls = Collections.singletonList(clicked);
       }
+
 
       int declcount = 0;
       int kindcount = 0;
@@ -280,7 +332,7 @@ public class EventDeclListView
         buffer.append(lower);
       }
       return buffer.toString();
-    }        
+    }
   }
 
 
@@ -424,10 +476,10 @@ public class EventDeclListView
 
 
   //#########################################################################
-  //# Data Members 
+  //# Data Members
   private final IndexedListModel<EventDeclSubject> mModel;
   private final ModuleWindowInterface mRoot;
-  
+
 
   //#########################################################################
   //# Class Constants

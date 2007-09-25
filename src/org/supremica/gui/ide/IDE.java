@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.gui.ide
 //# CLASS:   IDE
 //###########################################################################
-//# $Id: IDE.java,v 1.99 2007-09-25 09:07:06 knut Exp $
+//# $Id: IDE.java,v 1.100 2007-09-25 18:22:37 knut Exp $
 //###########################################################################
 
 package org.supremica.gui.ide;
@@ -361,11 +361,11 @@ public class IDE
 
     static
     {
+		Locale.setDefault(Locale.ENGLISH);
         InterfaceManager.getInstance().initLookAndFeel();
         Config.XML_RPC_ACTIVE.set(false);
         Config.DOT_USE.set(true);
         Config.LOG_TO_CONSOLE.set(false);
         Config.LOG_TO_GUI.set(true);
-		Locale.setDefault(Locale.ENGLISH);
     }
 }
