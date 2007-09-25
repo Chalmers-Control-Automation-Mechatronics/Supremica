@@ -7,6 +7,7 @@ package org.supremica.external.processAlgebraPetriNet.algorithms.dop2efa;
 import java.io.File;
 import java.util.List;
 import java.util.LinkedList;
+import java.util.Hashtable;
 
 import org.supremica.manufacturingTables.xsd.processeditor.*;
 
@@ -25,26 +26,46 @@ public class DOPtoEFA extends DOPrelation{
 	}
 	
 	public static void createEFA(ROP rop, File f){
+		buildModuleFromROP(rop).writeToFile(f);
+	}
+	
+	/**
+	 * Build the relation tree in rop to a Module.
+	 * 
+	 * @param rop
+	 * @return
+	 */
+	public static Module buildModuleFromROP(ROP rop){
 		
-		String comment = rop.getComment(); 
+		String comment, machine;
+		
+		Module module;
+		EFA main_efa;
+		
+		ObjectFactory factory;
+		
+		Relation main_sequence;
+		Activity start_machine, stop_machine;
+		
+		comment = rop.getComment(); 
 		if(comment == null || comment.length() == 0){
 			comment = "no comment";
 		}
 		
-		String machine = rop.getMachine(); 
+		machine = rop.getMachine(); 
 		if(machine == null || machine.length() == 0){
 			machine = "no_machine";
 		}
 		
-		Module m = new Module(machine,false);
+		module = new Module(machine,false);
 		
-		ObjectFactory factory = new ObjectFactory();
+		factory = new ObjectFactory();
 		
-		Relation main_sequence = factory.createRelation();
+		main_sequence = factory.createRelation();
 		main_sequence.setType(RelationType.SEQUENCE);
 		
-		Activity start_machine = factory.createActivity();
-		Activity stop_machine = factory.createActivity();
+		start_machine = factory.createActivity();
+		stop_machine = factory.createActivity();
 		
 		//special will be parsed in class EGA 
 		start_machine.setOperation(PGA.ONLY_START + machine);
@@ -55,20 +76,27 @@ public class DOPtoEFA extends DOPrelation{
 		main_sequence.getActivityRelationGroup().add(rop.getRelation());
 		main_sequence.getActivityRelationGroup().add(stop_machine);
 		
+		//fix relation tree
 		main_sequence = collapseRelationTree(main_sequence);
+		main_sequence = removeEmtyRelations(main_sequence);
+		main_sequence = renameEqualOperationName(main_sequence);
 		
-		EFA main_efa = new EFA("main_" + machine,m);
-		m.addAutomaton(main_efa);
+		main_efa = new EFA("main_" + machine,module);
+		module.addAutomaton(main_efa);
 		
 		String startState = machine +  "_idle";
 		String endState = machine + "_finish";
 		
-		main_efa.addInitialState(startState);
-		main_efa.addState(endState);
+		/* First state marked and initial */
+		main_efa.addState(startState, true, true);
 		
+		/* Last state marked */
+		main_efa.addState(endState,true,false);
+		
+		/* Build sequence in module */
 		sequence(main_sequence,startState,endState,main_efa);
 		
-		m.writeToFile(f);
+		return module;
 	}
 	
 	
@@ -99,6 +127,266 @@ public class DOPtoEFA extends DOPrelation{
 		return null;
 	}
 	
+	
+	//
+	//	Special
+	//
+	
+	/**
+	 *	Search through Relation r and return a new relation
+	 *	there same relation in relation are collapsed. 
+	 *
+	 *	Return a new relation whit no relation with same type as above.
+	 * 
+	 */
+	public static Relation collapseRelationTree(Relation r){
+		
+		Relation tmp;
+		List list;
+		int i;
+		
+		//get element in this relation
+		list = r.getActivityRelationGroup();
+		
+		//loop over all element
+		i = 0;
+		while(i < list.size()){
+			Object o = list.get(i);
+			
+			if(o instanceof Relation){
+				tmp = (Relation)o;
+				if(r.getType().equals(tmp.getType())){
+					/* same RelationType */
+					
+					list.remove(i);
+					list.addAll(i,tmp.getActivityRelationGroup());
+				}else{
+					/* go down in relation tree */
+					
+					//recursion
+					tmp = collapseRelationTree(tmp);
+					
+					list.remove(i);
+					list.add(i, tmp);
+					
+					i = i + 1; //next element
+				}
+			}else if(o instanceof Activity){
+				
+				/* Activities are OK go next*/
+				i = i + 1; //next element
+				
+			}else{
+				/* Unknown object in Relation */
+				System.err.println("Unknown object in Relation tree: " + o);
+				
+				i = i + 1; //next element
+			}
+		}
+		
+		return r;
+	}
+	
+	/**
+	 *	Search through Relation r and remove all Activities whit same
+	 *	operation name.
+	 */
+	public static Relation removeDoubleActivity(Relation r){
+		
+		List objList = null;
+		Object o = null;
+		Object o2 = null;
+		
+		String op1="", op2=""; 
+		
+		//check in data
+		if(r == null){
+			return r;
+		}
+		
+		//get element in this relation
+		objList = r.getActivityRelationGroup();
+		
+		//check list
+		if(objList == null || objList.isEmpty()){
+			return r;
+		}
+		
+		//search for doubles
+		for(int i=0; i <= objList.size()-1; i++){
+			o = objList.get(i);
+			
+			if(o instanceof Activity){
+				for(int ii = i+1; ii < objList.size(); ii++){
+					o2 = objList.get(ii);
+					if(o2 instanceof Activity){
+						
+						op1 = ((Activity)o).getOperation();
+						op2 = ((Activity)o2).getOperation();
+						
+						if(op1.equals(op2)){
+							//double found remove
+							objList.remove(o2);
+						}
+					}
+				}//end for
+			}//end if
+			
+		}//end for
+		
+		return r;
+	}
+	/**
+	 * Remove relation nodes who are empty.
+	 * 
+	 * @param relation
+	 * @return
+	 */
+	private static Relation removeEmtyRelations(Relation relation){
+		
+		List objList;
+		Object o;
+		
+		if(relation == null){
+			return relation;
+		}
+		
+		//get element in this relation
+		objList = relation.getActivityRelationGroup();
+		
+		//check list
+		if(objList == null || objList.isEmpty()){
+			return null;
+		}
+		
+		int i = 0;
+		while(i < objList.size()){
+			o = objList.get(i);
+			
+			if(o instanceof Relation){
+				/* if empty relation list remove */
+				if(((Relation)o).getActivityRelationGroup().isEmpty()){
+					objList.remove(i);
+				}else{
+					
+					/* recursion */
+					o = removeEmtyRelations((Relation)o);
+					
+					objList.remove(i);
+					objList.add(i,o);
+					
+					/* Next */
+					i = i + 1;
+				}
+			}else if(o instanceof Activity){
+				
+				/* Next */
+				i = i + 1;
+			}else{
+				System.err.println("Unknown object " + o.toString());
+			}
+		}
+		return relation;
+	}
+	
+	
+	
+	
+	
+	/**
+	 * Search through the relation tree and renames all
+	 * activities whit the same operation name.
+	 *  
+	 * @param r
+	 * @return
+	 */
+	private static Relation renameEqualOperationName(Relation r){
+		NumOfOperations op = (new DOPtoEFA()).new NumOfOperations();
+		Relation tmp = renameEqualOperationName(r,op);
+		
+		//debug
+		//System.out.println("Table");
+		//System.out.println(op.toString());
+		//debug
+		
+		return tmp;
+	}
+	
+	private static Relation renameEqualOperationName(Relation r, NumOfOperations operations){
+		
+		Object o = null;
+		List objList = null;
+		
+		String opName = "";
+		
+		if(r == null){
+			return r;
+		}
+		
+		//get element in this relation
+		objList = r.getActivityRelationGroup();
+		
+		//check list
+		if(objList == null || objList.isEmpty()){
+			return r;
+		}
+		
+		for(int i=0; i < objList.size(); i++){
+			o = objList.get(i);
+			
+			if(o instanceof Relation){
+				renameEqualOperationName((Relation)o,operations);
+			}else if(o instanceof Activity){
+				opName = ((Activity)o).getOperation();
+				
+				if(operations.exist(opName)){
+					((Activity)o).setOperation(opName + 
+							"_" + operations.getNumberOfOperationsWithName(opName));
+				}
+				
+				//add opName
+				operations.addOperation(opName);
+					
+			}else{
+				System.err.println("Unknown object: " + o.toString());
+			}
+		}
+		return r;
+	}
+	
+	/**
+	 * Internal class for 
+	 * @author David Millares
+	 */
+	private class NumOfOperations{
+		
+		Hashtable<String,Integer> operations = null;
+		
+		public NumOfOperations(){
+			operations = new Hashtable<String,Integer>();
+		}
+		
+		public boolean exist(String name){
+			return operations.containsKey(name);
+		}
+		
+		public int getNumberOfOperationsWithName(String name){
+			return operations.get(name);
+		}
+		
+		public void addOperation(String name){
+			if(exist(name)){
+				operations.put(name, new Integer(operations.get(name)+1));
+			}else{
+				operations.put(name, new Integer(1));
+			}
+		}
+		
+		
+		public String toString(){
+			return operations.toString();
+		}
+	}
 	
 	/**
 	 * Test main method to test this class

@@ -17,7 +17,8 @@ public class PGA {
 	static final public String ACTION = "_ACTION_";
 	
 	//
-	static final public String AND = "&";
+	static final public String AND = " & ";
+	static final public String OR = " | ";
 	
 	//
 	private String process;
@@ -179,29 +180,74 @@ public class PGA {
 		if(sg.equals("")){
 			return;
 		}
-		startGuard = startGuard + AND + sg;
+		
+		if(startGuard.length() == 0){
+			setStartGuard(sg);
+		}else{
+			startGuard = startGuard + AND + sg;
+		}
+		
 	}
 	
 	public void andStopGuard(String sg){
 		if(sg.equals("")){
 			return;
 		}
-		stopGuard = stopGuard + AND + sg;
+		
+		if(stopGuard.length() == 0){
+			setStopGuard(sg);
+		}else{
+			stopGuard = stopGuard + AND + sg;
+		}
 	}
 	
+	//add OR guard
+	public void orStartGuard(String sg){
+		if(sg.equals("")){
+			return;
+		}
+		
+		if(startGuard.length() == 0){
+			setStartGuard(sg);
+		}else{
+			startGuard = startGuard + OR + sg;
+		}
+		
+	}
+	
+	public void orStopGuard(String sg){
+		if(sg.equals("")){
+			return;
+		}
+		
+		if(stopGuard.length() == 0){
+			setStopGuard(sg);
+		}else{
+			stopGuard = stopGuard + OR + sg;
+		}
+	}
 	//add action
-	public void andStartAction(String sa){
+	public void addStartAction(String sa){
 		if(sa.equals("")){
 			return;
 		}
-		startAction = startAction + AND + sa;
+		
+		if(startAction.length() == 0){
+			setStartAction(sa);
+		}else{
+			startAction = startAction + ";" + sa;
+		}
 	}
-	
 	public void addStopAction(String sa){
-		if(!sa.equals("")){
+		if(sa.equals("")){
 			return;
 		}
-		stopAction = stopAction + AND + sa;
+		
+		if(stopAction.length() == 0){
+			setStopAction(sa);
+		}else{
+			stopAction = stopAction + ";" + sa;
+		}
 	}
 	
 	//get process

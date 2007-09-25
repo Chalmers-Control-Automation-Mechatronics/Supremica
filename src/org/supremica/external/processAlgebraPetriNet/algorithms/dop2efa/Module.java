@@ -1,5 +1,6 @@
 package org.supremica.external.processAlgebraPetriNet.algorithms.dop2efa;
 
+import java.util.Hashtable;
 import java.util.LinkedList;
 
 import org.supremica.automata.ExtendedAutomata;
@@ -11,6 +12,7 @@ public class Module extends ExtendedAutomata{
 	* in ExtendedAutomaton
 	*/
 	private LinkedList<String> events;
+	Hashtable<String,Integer> resources;
 	
 	private int parallels;
 	private int arbitraryNode;
@@ -19,24 +21,38 @@ public class Module extends ExtendedAutomata{
 	private final String PARALLEL_PREFIX = "pa";
 	private final String ARBITRARY_ORDER_PREFIX = "ao";
 	
-	private EFA global_variables_dummy_efa;
-	   
+	private EFA nodeVariablesEFA;
+	private EFA resourceVariablesEFA;
+	
 	public Module(String name, boolean expand){
 		super(name, expand);
+		
 		events = new LinkedList<String>();
+		resources = new Hashtable<String,Integer>();
+		
 		parallels = 0;
 		arbitraryNode = 0;
 		arbitrary = 0;
-		global_variables_dummy_efa = null;
+		
+		nodeVariablesEFA = null;
+		resourceVariablesEFA = null;
 		
 	}
 	
-	private void init_global_variables(){
-		global_variables_dummy_efa =
-			new EFA("global_variables",this);
-		this.addAutomaton(global_variables_dummy_efa);
-		global_variables_dummy_efa.addInitialState(
-				"dummy_state_for_global_variables");
+	private void initNodeVariables(){
+		nodeVariablesEFA =
+			new EFA("node_variables",this);
+		this.addAutomaton(nodeVariablesEFA);
+		nodeVariablesEFA.addInitialState(
+				"dummy_state_for_nod_variables");
+	}
+	
+	private void initResourceVariables(){
+		resourceVariablesEFA =
+			new EFA("resource_variables",this);
+		this.addAutomaton(resourceVariablesEFA);
+		resourceVariablesEFA.addInitialState(
+				"dummy_state_for_resource_variables");
 	}
 	
 	public void addEvent(String event){
@@ -69,17 +85,17 @@ public class Module extends ExtendedAutomata{
 		
 		final int lowerBound = 0;
 		final int initialValue = 0;
-		//final int markedValue = 0;
+		final int markedValue = 0;
 		
-		if(global_variables_dummy_efa == null){
-			init_global_variables();
+		if(nodeVariablesEFA == null){
+			initNodeVariables();
 		}
 		
 		String name = PARALLEL_PREFIX + "_" + parallels;
 		parallels = parallels + 1;
 		
-		global_variables_dummy_efa.addIntegerVariable(
-				name, lowerBound, upperBound, initialValue, null);
+		nodeVariablesEFA.addIntegerVariable(
+				name, lowerBound, upperBound, initialValue, markedValue);
 		
 		return name;
 	}
@@ -97,14 +113,14 @@ public class Module extends ExtendedAutomata{
 		final int initialValue = 0;
 		final int markedValue = 0;
 		
-		if(global_variables_dummy_efa == null){
-			init_global_variables();
+		if(nodeVariablesEFA == null){
+			initNodeVariables();
 		}
 		
 		String name = ARBITRARY_ORDER_PREFIX +"n_"+ arbitraryNode;
 		arbitraryNode = arbitraryNode + 1;
 		
-		global_variables_dummy_efa.addIntegerVariable(
+		nodeVariablesEFA.addIntegerVariable(
 				name, lowerBound, upperBound, initialValue, markedValue);
 		
 		return name;
@@ -125,16 +141,52 @@ public class Module extends ExtendedAutomata{
 		final int initialValue = 1;
 		final int markedValue = 1;
 		
-		if(global_variables_dummy_efa == null){
-			init_global_variables();
+		if(nodeVariablesEFA == null){
+			initNodeVariables();
 		}
 		
 		String name = ARBITRARY_ORDER_PREFIX + "_" +arbitrary;
 		arbitrary = arbitrary + 1;
 		
-		global_variables_dummy_efa.addIntegerVariable(
+		nodeVariablesEFA.addIntegerVariable(
 				name, lowerBound, upperBound, initialValue, markedValue);
 		
 		return name;
+	}
+	
+	public int getMaxValueResourceInteger(String resourceName){
+		return resources.get(resourceName);
+	}
+	/**
+	 * Create new resource variable in this module.
+	 * 
+	 * @param resourceName name for resource
+	 * @param upperBound max value for resource
+	 */
+	public void newResourceInteger(String resourceName, int upperBound){
+		
+		final int lowerBound = 0;
+		final int initialValue = upperBound;
+		//final int markedValue = upperBound; 
+		
+		//check in data
+		if(resourceName == null || resourceName.length() == 0){
+			return;
+		}
+		
+		/* Already added */
+		if(resources.containsKey(resourceName)){
+			return;
+		}
+		
+		resources.put(resourceName, upperBound);
+		
+		if(resourceVariablesEFA == null){
+			initResourceVariables();
+		}
+		
+		/* create resource variable */
+		resourceVariablesEFA.addIntegerVariable(
+				resourceName, lowerBound, upperBound, initialValue, null);
 	}
 }

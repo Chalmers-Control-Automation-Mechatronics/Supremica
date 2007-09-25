@@ -12,7 +12,7 @@ import java.util.List;
 
 import org.supremica.manufacturingTables.xsd.processeditor.*;
 
-public class DOPrelation{
+public class DOPrelation extends DOPnative{
 	
 	//
 	// Relation function code
@@ -43,6 +43,7 @@ public class DOPrelation{
 			return;
 		}
 		
+		//add state if missing
 		if(from.length() == 0){
 			from = efa.newUniqueState();
 		}
@@ -62,6 +63,12 @@ public class DOPrelation{
 		String tmp;
 			
 		List activityList = r.getActivityRelationGroup();
+		
+		if(activityList.isEmpty()){
+			System.err.println("WARNING empty " + r.getType().toString());
+			return;
+		}
+		
 		Iterator i = activityList.iterator();
 		
 		/* start build EFA
@@ -76,11 +83,7 @@ public class DOPrelation{
 			
 			/* ------------ activity code -------------- */
 			while(o instanceof Activity){
-				PGA pga = new PGA();
-				pga.setProcess(((Activity)o).getOperation());
-				pgaList.add(pga);
-				
-				
+				pgaList.add(pgaFromActivity((Activity)o,efa));
 				if(!i.hasNext()){
 					o = null;
 					break; //exit first while
@@ -154,7 +157,7 @@ public class DOPrelation{
 					/* Start parallel node by set it's variable to 1 */
 					start_stop_parallel.setStartAction(var_name + "=1;");
 					
-					/* Continue then parallel node is done, and reset variabel */
+					/* Continue then parallel node is done, and reset variable */
 					start_stop_parallel.setStopGuard(var_name + "==" + (ant_parallel_track + 1));
 					start_stop_parallel.setStopAction(var_name + "=0;");
 					
@@ -221,7 +224,7 @@ public class DOPrelation{
 	protected static void alternative(Relation r,
 			                          String from, String to,
 			                          EFA efa){
-		//check indata
+		//check in data
 		if(r == null){
 			return;
 		}
@@ -237,6 +240,12 @@ public class DOPrelation{
 		List<PGA> pgaList = new LinkedList<PGA>();
 			
 		List activityList = r.getActivityRelationGroup();
+		
+		if(activityList.isEmpty()){
+			System.err.println("WARNING empty " + r.getType().toString());
+			return;
+		}
+		
 		Iterator i = activityList.iterator();
 		
 		/* start build EFA
@@ -251,9 +260,8 @@ public class DOPrelation{
 			
 			/* ------------ activity code -------------- */
 			while(o instanceof Activity){
-				PGA pga = new PGA();
-				pga.setProcess(((Activity)o).getOperation());
-				pgaList.add(pga);
+				
+				pgaList.add(pgaFromActivity((Activity)o, efa));
 					
 				if(!i.hasNext()){
 					o = null;
@@ -381,6 +389,11 @@ public class DOPrelation{
 			return;
 		}
 		
+		if(r.getActivityRelationGroup().isEmpty()){
+			System.err.println("WARNING empty " + r.getType().toString());
+			return;
+		}
+		
 		activityRelations = (r.getActivityRelationGroup()).toArray();
 		
 		if(parallel_var.length() > 0){
@@ -496,6 +509,11 @@ public class DOPrelation{
 			return;
 		}
 		
+		if(r.getActivityRelationGroup().isEmpty()){
+			System.err.println("WARNING empty " + r.getType().toString());
+			return;
+		}
+		
 		activityRelations = (r.getActivityRelationGroup()).toArray();
 		
 		arbitrary_var = m.newArbitraryInteger();
@@ -587,280 +605,5 @@ public class DOPrelation{
 		
 	}
 	
-	//
-	//	Native function code. Help function for relation code
-	//
 	
-	
-	/**
-	 * Native model for process start and stop.
-	 * 
-	 * @param pga
-	 * @param from 
-	 * @param to
-	 * @param efa
-	 */
-	protected static void nativeProcess(PGA pga, String from, String to, EFA efa){
-		
-		final String START_EVENT = "sta_";
-		final String STOP_EVENT = "sto_";
-		
-		final String RUNNING_STATE = "_run";
-		
-		String event, guard, action;
-		String runningState;
-		
-		// check in data
-		if(pga == null || efa == null){
-			return;
-		}
-		
-		// check if state exist
-		if(!efa.stateExist(from) || !efa.stateExist(to)){
-			System.err.println("Unknown state From: " +from+ " To: " + to);
-			return;
-		}
-		
-		
-		//debug
-		System.out.println("Process: " + pga.getProcess());
-		
-		System.out.println("StartGuard: " + pga.getStartGuard());
-		System.out.println("StartAction: " + pga.getStartAction());
-		
-		System.out.println("StopGuard: " + pga.getStopGuard());
-		System.out.println("StopAction: " + pga.getStopAction());
-		
-		System.out.println("OnlyStart: " + pga.getOnlyStart());
-		System.out.println("OnlyStop: " + pga.getOnlyStop());
-		//debug
-		
-		/**************************/
-		//only start event ?
-		/**************************/
-		
-		if(pga.getOnlyStart()){
-			event = START_EVENT.concat(pga.getProcess());
-			guard = pga.getStartGuard();
-			action = pga.getStartAction();
-			efa.addTransition(from, to, event, guard, action);
-			return;
-		}
-		
-		/**************************/
-		//only stop event 
-		/**************************/
-		
-		if(pga.getOnlyStop()){
-			event = STOP_EVENT.concat(pga.getProcess());
-			guard = pga.getStopGuard();
-			action = pga.getStopAction();
-			efa.addTransition(from,to, event, guard, action);
-			return;
-		}
-		
-		/**************************/
-		//from start to running to stop event
-		/**************************/
-		
-		runningState = pga.getProcess().concat(RUNNING_STATE);
-		
-		//unique running state
-		if(efa.stateExist(runningState)){
-			int i = 0;
-			do{
-				i = i + 1;
-			}while(efa.stateExist(runningState.concat(Integer.toString(i))));
-			
-			runningState = runningState.concat(Integer.toString(i));
-		}
-		
-		//add running state
-		efa.addState(runningState);
-		
-		//create transition
-		event = START_EVENT.concat(pga.getProcess());
-		guard = pga.getStartGuard();
-		action = pga.getStartAction();
-		
-		efa.addTransition(from, runningState, event, guard, action);
-		
-		event = STOP_EVENT.concat(pga.getProcess());
-		guard = pga.getStopGuard();
-		action = pga.getStopAction();
-		
-		efa.addTransition(runningState,to, event, guard, action);
-	}
-	
-	/**
-	 * 
-	 * 
-	 * @param start is start state for sequence
-	 * @param end is end state for sequence
-	 * @param ega 
-	 */
-	protected static void nativeSequence(List<PGA> pgaList,
-			                             String from, String to,
-			                             EFA efa){
-		//check in data
-		if(pgaList.isEmpty()){
-			return;
-		}
-		
-		//add first state
-		if(from.length() == 0){
-			from = efa.nextState();
-		}
-		
-		if(!efa.stateExist(from)){
-			efa.addState(from);
-		}
-		
-		//special case
-		if(pgaList.size() == 1){
-			//add last state
-			if(to.length() == 0){
-				to = efa.nextState();
-			}
-			if(!efa.stateExist(to)){
-				efa.addState(to);	
-			}
-			
-			nativeProcess(pgaList.get(0),from,to,efa);
-			return;
-		}
-		
-		//everything ok continue
-		Iterator<PGA> i = pgaList.iterator();
-		PGA pga = i.next();
-		
-		String tmpFrom = from;
-		String tmpTo = efa.newUniqueState();
-
-		nativeProcess(pga,tmpFrom,tmpTo,efa);
-		
-		while(i.hasNext()){
-			pga = i.next();
-			if(i.hasNext()){
-				
-				tmpFrom = tmpTo;
-				tmpTo = efa.newUniqueState();
-				
-				nativeProcess(pga,tmpFrom,tmpTo,efa);
-			}else{
-				
-				//connect to last state to
-				tmpFrom = tmpTo;
-				
-				//add last state
-				if(to.length() == 0){
-					to = efa.nextState();
-				}
-				if(!efa.stateExist(to)){
-					efa.addState(to);	
-				}
-				nativeProcess(pga,tmpFrom,to,efa);
-			}
-		}
-	}
-	
-
-	protected static void nativeAlternative(List<PGA> pgaList,
-            								String from, String to,
-            								EFA efa){
-		//chech indata
-		if(pgaList.size() == 0){
-			return;
-		}
-		
-		//add first state
-		if(from.length() == 0){
-			from = efa.nextState();
-		}
-		
-		if(!efa.stateExist(from)){
-			efa.addState(from);
-		}
-		
-		//add last state
-		if(to.length() == 0){
-			to = efa.nextState();
-		}
-		
-		if(!efa.stateExist(to)){
-			efa.addState(to);	
-		}
-		
-		
-		//special for alternative
-		//egaList = removeDouble(egaList);
-		//egaList = concatEvents(egaList);
-		
-		
-		//everything ok continue
-		Iterator<PGA> i = pgaList.iterator();
-		
-		while(i.hasNext()){
-			nativeProcess(i.next(),from,to,efa);
-		}
-	}
-	
-	//
-	//	Special
-	//
-	
-	/**
-	 *	Search through Relation r and return a new relation
-	 *	there same relation in relation are collapsed. 
-	 *
-	 *	Return a new relation whit no relation with same type as above.
-	 * 
-	 */
-	public static Relation collapseRelationTree(Relation r){
-		
-		Relation tmp;
-		List list;
-		int i;
-		
-		//get element in this relation
-		list = r.getActivityRelationGroup();
-		
-		//loop over all element
-		i = 0;
-		while(i < list.size()){
-			Object o = list.get(i);
-			
-			if(o instanceof Relation){
-				tmp = (Relation)o;
-				if(r.getType().equals(tmp.getType())){
-					/* same RelationType */
-					
-					list.remove(i);
-					list.addAll(i,tmp.getActivityRelationGroup());
-				}else{
-					/* go down in relation tree */
-					
-					//recursion
-					tmp = collapseRelationTree(tmp);
-					
-					list.remove(i);
-					list.add(i, tmp);
-					
-					i = i + 1; //next element
-				}
-			}else if(o instanceof Activity){
-				
-				/* Activities are OK go next*/
-				i = i + 1; //next element
-				
-			}else{
-				/* Unknown object in Relation */
-				System.err.println("Unknown object in Relation tree: " + o);
-				
-				i = i + 1; //next element
-			}
-		}
-		
-		return r;
-	}
 }
