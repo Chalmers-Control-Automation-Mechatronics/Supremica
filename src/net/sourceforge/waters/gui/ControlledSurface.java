@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   ControlledSurface
 //###########################################################################
-//# $Id: ControlledSurface.java,v 1.141 2007-08-13 23:49:19 robi Exp $
+//# $Id: ControlledSurface.java,v 1.142 2007-09-25 22:20:44 knut Exp $
 //###########################################################################
 
 package net.sourceforge.waters.gui;
@@ -56,7 +56,7 @@ import net.sourceforge.waters.gui.renderer.ProxyShapeProducer;
 import net.sourceforge.waters.gui.renderer.RenderingInformation;
 import net.sourceforge.waters.gui.renderer.SimpleNodeProxyShape;
 import net.sourceforge.waters.gui.renderer.SubjectShapeProducer;
-import net.sourceforge.waters.gui.springembedder.EmbedderEvent; 
+import net.sourceforge.waters.gui.springembedder.EmbedderEvent;
 import net.sourceforge.waters.gui.springembedder.EmbedderObserver;
 import net.sourceforge.waters.gui.springembedder.SpringEmbedder;
 import net.sourceforge.waters.gui.transfer.GraphContainer;
@@ -123,7 +123,7 @@ public class ControlledSurface
   {
     this(graph, module, null, null);
   }
-  
+
   public void lostOwnership(Clipboard clipboard, Transferable contents)
   {
   }
@@ -419,7 +419,8 @@ public class ControlledSurface
       doReplaceSelection(node);
       mRoot.getUndoInterface().executeCommand(add);
     } else {
-      doReplaceSelection(elist);
+	  doClearSelection();
+      //doReplaceSelection(elist);
       final CompoundCommand compound = new CompoundCommand("Event Addition");
       final Collection<IdentifierSubject> added = add.getAddedIdentifiers();
       final Command select = new SelectCommand(this, added);
@@ -580,7 +581,7 @@ public class ControlledSurface
 
   /**
    * Adds an item to the selection.
-   * This method adds the given item to the selection using a select command. 
+   * This method adds the given item to the selection using a select command.
    */
   private void doAddToSelection(final ProxySubject item)
   {
@@ -593,7 +594,7 @@ public class ControlledSurface
   /**
    * Adds several items to the selection.
    * This method adds the items in the given collection to the selection
-   * using a select command. 
+   * using a select command.
    */
   private void doAddToSelection(final Collection<? extends ProxySubject> items)
   {
@@ -606,7 +607,7 @@ public class ControlledSurface
   /**
    * Removes an item from the selection.
    * This method removes the items in the given collection from the
-   * selection using an unselect command. 
+   * selection using an unselect command.
    */
   private void doRemoveFromSelection(final ProxySubject item)
   {
@@ -619,7 +620,7 @@ public class ControlledSurface
   /**
    * Removes several items from the selection.
    * This method removes the given item from the selection using an
-   * unselect command. 
+   * unselect command.
    */
   private void doRemoveFromSelection
     (final Collection<? extends ProxySubject> items)
@@ -634,7 +635,7 @@ public class ControlledSurface
    * Replaces the selection.
    * This method ensures that only the given item is selected,
    * by first clearing the selection and and then adding the item to
-   * the selection using unselect and select commands. 
+   * the selection using unselect and select commands.
    */
   private void doReplaceSelection(final ProxySubject item)
   {
@@ -658,7 +659,7 @@ public class ControlledSurface
    * Replaces the selection.
    * This method ensures that only the given items are selected,
    * by first clearing the selection and and then adding the items to
-   * the selection using unselect and select commands. 
+   * the selection using unselect and select commands.
    */
   private void doReplaceSelection
     (final Collection<? extends ProxySubject> items)
@@ -688,7 +689,7 @@ public class ControlledSurface
   /**
    * Toggles the selection of an item.
    * This method selects the given item if it is not yet selected,
-   * and unselects it if selected, using a select or unselect command. 
+   * and unselects it if selected, using a select or unselect command.
    */
   private void doToggleSelection(final ProxySubject item)
   {
@@ -796,7 +797,7 @@ public class ControlledSurface
       return false;
     }
   }
- 
+
   private DRAGOVERSTATUS getDragOver(ProxySubject s)
   {
     if (!isFocused(s)) {
@@ -1129,7 +1130,7 @@ public class ControlledSurface
       }
     }
   }
-  
+
   public Collection<ProxySubject> getSelected()
   {
     return Collections.unmodifiableCollection(mSelectedObjects);
@@ -1149,7 +1150,7 @@ public class ControlledSurface
     //#######################################################################
     //# Interface java.awt.dnd.DropTargetAdapter
     public void dragOver(final DropTargetDragEvent event)
-    { 
+    {
       final Point point = event.getLocation();
       final InternalDragActionDND action = getInternalDragAction(point);
       action.continueDrag(event);
@@ -1585,7 +1586,7 @@ public class ControlledSurface
           } else {
             mInternalDragAction =
               new InternalDragActionResizeGroupNode(event, handle);
-          } 
+          }
         } else {
           mInternalDragAction = new InternalDragActionMove(event);
         }
@@ -1621,7 +1622,7 @@ public class ControlledSurface
 
     boolean canBeSelected(final ProxySubject item)
     {
-      return 
+      return
         item instanceof EdgeSubject ||
         item instanceof LabelBlockSubject ||
         item instanceof GuardActionBlockSubject;
@@ -2892,9 +2893,9 @@ public class ControlledSurface
       final double oldy = oldrect.getY();
       final double oldwidth = oldrect.getWidth();
       final double oldheight = oldrect.getHeight();
-      final double relx = 
+      final double relx =
         oldwidth < GeometryTools.EPSILON ? 0.5 : (x0 - oldx) / oldwidth;
-      final double rely = 
+      final double rely =
         oldheight < GeometryTools.EPSILON ? 0.5 : (y0 - oldy) / oldheight;
       final Rectangle2D newrect = mGroupCopy.getGeometry().getRectangle();
       final double newx = newrect.getX();
@@ -2967,7 +2968,7 @@ public class ControlledSurface
       default:
         throw new IllegalStateException
           ("Unknown edge handle type: " + handle.getType() + "!");
-      }  
+      }
     }
 
     //#######################################################################
@@ -3082,7 +3083,7 @@ public class ControlledSurface
           mOrigEdge = (EdgeSubject) mSecondaryGraph.getOriginal(mCopiedEdge);
           mSelectedObjects =
             Collections.singletonList((ProxySubject) mOrigEdge);
-        } else { 
+        } else {
           mCopiedEdge = (EdgeSubject) mSecondaryGraph.getCopy(mOrigEdge);
           GeometryTools.createDefaultGeometry(mCopiedEdge);
         }
@@ -3333,7 +3334,7 @@ public class ControlledSurface
   //# Inner Class MovingEdge
   private class MovingEdge
   {
-    
+
     //#######################################################################
     //# Constructor
     private MovingEdge(final EdgeSubject edge)
@@ -3389,7 +3390,7 @@ public class ControlledSurface
     private final MovingEdgeType mType;
     private final boolean mMovingSource;
     private final boolean mMovingTarget;
-    
+
   }
 
 
@@ -3425,7 +3426,7 @@ public class ControlledSurface
         return prio1 - prio2;
       }
     }
-    
+
   }
 
 
