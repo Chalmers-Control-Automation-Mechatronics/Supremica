@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.module
 //# CLASS:   ModuleCompiler
 //###########################################################################
-//# $Id: ModuleCompiler.java,v 1.86 2007-09-25 14:51:15 markus Exp $
+//# $Id: ModuleCompiler.java,v 1.87 2007-09-26 15:04:46 markus Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.compiler;
@@ -856,6 +856,7 @@ private void isEFA(List<Proxy> componentList) {
 				findForbiddenStates(orgEvent, newEvents);
 			}	
     	  List<List<TransitionProxy>> allTrans = allPossibleTransitions(orgEvent);
+    	  
         /*
 		 * Collect guard and actions. Split the guards into andClauses. Update
 		 * the automata with the final events and transitions. Fill mappings,
@@ -865,7 +866,11 @@ private void isEFA(List<Proxy> componentList) {
         for (List<TransitionProxy> path : allTrans) {
           // The event is renamed in two steps: first for each path and
           // then for each andClause in the guard expression.
-          final SimpleExpressionProxy guard = collectGuard(path);
+          SimpleExpressionProxy guard = collectGuard(path);
+          if(orgEvent.getKind()== EventKind.UNCONTROLLABLE){
+        	  guard = collectPlantGuard(path);
+          }
+       
           final CompiledNormalForm dnf = mDNFConverter.convertToDNF(guard);
           //Collection<CompiledClause> andClauses = dnf.getClauses();
           List<SimpleExpressionProxy> sortedAndClauses =
@@ -945,7 +950,7 @@ private void isEFA(List<Proxy> componentList) {
     }
   }
 
-  private void addAcceptingPropositionToCompiledAutomata(Set<EventProxy> newEvents) {
+private void addAcceptingPropositionToCompiledAutomata(Set<EventProxy> newEvents) {
 		boolean containsAccepting = containsAcceptingProp(newEvents);
 		    for (final CompiledAutomaton aut: mCompiledAutomata.values()) {
 		    	for(final StateProxy state: aut.getStates()){
@@ -1891,7 +1896,52 @@ private void createVariableStates(final VariableProxy variable,
     }
   }
 
-  private List<List<BinaryExpressionProxy>>
+  private SimpleExpressionProxy collectPlantGuard
+  (final List<TransitionProxy> path)
+{
+  final BinaryOperator andop = mOperatorTable.getAndOperator();
+  SimpleExpressionProxy result = null;
+  for (final TransitionProxy trans : path) {
+	  boolean isPlant= plantTransition(trans);
+	  if(isPlant){
+	  final GuardActionBlockProxy block =
+      mEFATransitionGuardActionBlockMap.get(trans);
+    if (block != null) {
+      for (final SimpleExpressionProxy guard : block.getGuards()) {
+      	/*if(guard.toString().equals("false")){
+      		return mModuleFactory.createSimpleIdentifierProxy("false");
+      		  }*/
+      	if (result == null) {
+          result = guard;
+        } else {
+      	  result =
+            mModuleFactory.createBinaryExpressionProxy(andop, result, guard);
+        }
+      }
+    }
+  }
+}
+  
+  if (result == null) {
+    return mModuleFactory.createIntConstantProxy(1);
+  } else {
+    return result;
+  }
+}
+
+  
+  private boolean plantTransition(TransitionProxy trans) {
+     boolean isPlant=false;	
+	  for(AutomatonProxy aut: mAutomata.values()){
+		if(aut.getKind()== ComponentKind.PLANT){
+		  isPlant=isPlant || aut.getTransitions().contains(trans);
+	}
+	  }
+	return isPlant;
+}
+
+
+private List<List<BinaryExpressionProxy>>
     collectAction(final List<TransitionProxy> path)
   {
     final List<List<BinaryExpressionProxy>> actionLists =
