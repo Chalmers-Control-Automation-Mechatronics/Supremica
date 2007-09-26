@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.gui.ide
 //# CLASS:   IDEMenuBar
 //###########################################################################
-//# $Id: IDEMenuBar.java,v 1.55 2007-09-26 21:15:39 flordal Exp $
+//# $Id: IDEMenuBar.java,v 1.56 2007-09-26 21:19:39 flordal Exp $
 //###########################################################################
 
 package org.supremica.gui.ide;
@@ -184,7 +184,7 @@ public class IDEMenuBar
         // Simulator
         if (Config.INCLUDE_ANIMATOR.isTrue())
         {
-            menu = new JMenu("Simulator");
+            menu = new JMenu("Simulate");
             menu.add(ide.getActions().simulatorLaunchAnimatorAction);
             menu.add(ide.getActions().simulatorLaunchSimulatorAction);
             menu.add(ide.getActions().simulatorClearSimulationData);
