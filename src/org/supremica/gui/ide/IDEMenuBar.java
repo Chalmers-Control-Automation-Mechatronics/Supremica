@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.gui.ide
 //# CLASS:   IDEMenuBar
 //###########################################################################
-//# $Id: IDEMenuBar.java,v 1.54 2007-09-25 23:42:21 knut Exp $
+//# $Id: IDEMenuBar.java,v 1.55 2007-09-26 21:15:39 flordal Exp $
 //###########################################################################
 
 package org.supremica.gui.ide;
@@ -18,14 +18,9 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Iterator;
 import javax.swing.Action;
-import javax.swing.ImageIcon;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
-import javax.swing.event.MenuEvent;
-import javax.swing.event.MenuListener;
-
-import net.sourceforge.waters.gui.actions.InsertVariableAction;
 import net.sourceforge.waters.gui.actions.GraphLayoutAction;
 import net.sourceforge.waters.gui.actions.WatersUndoAction;
 import net.sourceforge.waters.gui.actions.WatersRedoAction;
@@ -44,13 +39,12 @@ import org.supremica.gui.ide.actions.NewAction;
 import org.supremica.gui.ide.actions.OpenAction;
 import org.supremica.gui.ide.actions.SaveAction;
 import org.supremica.gui.ide.actions.SaveAsAction;
-
+import org.supremica.properties.Config;
 
 public class IDEMenuBar
     extends JMenuBar
     implements Observer
 {
-
     //#######################################################################
     //# Inner Class NewFromTemplateHandler
     class NewFromTemplateHandler
@@ -113,7 +107,7 @@ public class IDEMenuBar
         menu.add(ide.getActions().editorSaveEncapsulatedPostscriptAction.getMenuItem());
         menu.add(ide.getActions().editorSavePDFAction.getMenuItem());
         menu.addSeparator();
-		final Action exit = actions.getAction(ExitAction.class);
+        final Action exit = actions.getAction(ExitAction.class);
         menu.add(new JMenuItem(exit));
         add(menu);
 
@@ -152,19 +146,18 @@ public class IDEMenuBar
         editorMenu.setEnabled(false);
         add(menu);
 
-        // View (submenu)
-        final JMenu viewMenu = new JMenu("View");
-        viewMenu.add
-            (actions.analyzerViewAutomatonAction.getMenuItem());
-        viewMenu.add
-            (actions.analyzerViewAlphabetAction.getMenuItem());
-        viewMenu.add(actions.analyzerViewStatesAction.getMenuItem());
-        viewMenu.add
-            (actions.analyzerViewModularStructureAction.getMenuItem());
 
         // Analyze
         menu = new JMenu("Analyze");
         //menu.setMnemonic(KeyEvent.VK_A);
+        // View (submenu)
+        final JMenu viewMenu = new JMenu("View");
+        {
+            viewMenu.add(actions.analyzerViewAutomatonAction.getMenuItem());
+            viewMenu.add(actions.analyzerViewAlphabetAction.getMenuItem());
+            viewMenu.add(actions.analyzerViewStatesAction.getMenuItem());
+            viewMenu.add(actions.analyzerViewModularStructureAction.getMenuItem());
+        }
         menu.add(viewMenu);
         menu.add(ide.getActions().analyzerSynchronizerAction.getMenuItem());
         menu.add(ide.getActions().analyzerSynthesizerAction.getMenuItem());
@@ -188,6 +181,16 @@ public class IDEMenuBar
         analyzerMenu.setEnabled(false);
         add(menu);
 
+        // Simulator
+        if (Config.INCLUDE_ANIMATOR.isTrue())
+        {
+            menu = new JMenu("Simulator");
+            menu.add(ide.getActions().simulatorLaunchAnimatorAction);
+            menu.add(ide.getActions().simulatorLaunchSimulatorAction);
+            menu.add(ide.getActions().simulatorClearSimulationData);
+            add(menu);
+        }
+        
         // Examples
         menu = new JMenu("Examples");
         //menu.setMnemonic(KeyEvent.VK_X);

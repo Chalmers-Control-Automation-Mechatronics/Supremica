@@ -55,62 +55,62 @@ import org.supremica.log.*;
 
 public class AnimationItem
 {
-	private static Logger logger = LoggerFactory.createLogger(AnimationItem.class);
-
-	private String description;
-	private URL url;
-
-	public AnimationItem(String description, URL url)
-	{
-		this.description = description;
-		this.url = url;
-	}
-
-	public String getDescription()
-	{
-		return description;
-	}
-
-	public URL getURL()
-	{
-		return url;
-	}
-
-	public Animator createInstance()
-		throws Exception
-	{
-		logger.debug("createInstance no url");
-		return AnimationItem.createInstance(url);
-	}
-
-	public static Animator createInstance(URL url)
-		throws Exception
-	{
-		logger.debug("createInstance url: " + url);
-		try
-		{
-			final Animator view = new Animator(" Path: " + url.toString());
-
-			/*
-			URL url = AnimationItem.class.getResource(path);
-
-			if (url == null)
-			{ // The class loader could not find the file
-
-			}
-			*/
-			XMLAnimationParser parser = new XMLAnimationParser(url, view._canvas);
-
-			view.setAnimation(parser.parseAnimation());
-
-			return view;
-		}
-		catch (Exception ex)
-		{
-			System.err.println(ex);
-			ex.printStackTrace();
-
-			throw ex;
-		}
-	}
+    private static Logger logger = LoggerFactory.createLogger(AnimationItem.class);
+    
+    private String description;
+    private URL url;
+    
+    public AnimationItem(String description, URL url)
+    {
+        this.description = description;
+        this.url = url;
+    }
+    
+    public String getDescription()
+    {
+        return description;
+    }
+    
+    public URL getURL()
+    {
+        return url;
+    }
+    
+    public Animator createInstance()
+    throws Exception
+    {
+        logger.debug("createInstance no url");
+        return AnimationItem.createInstance(url);
+    }
+    
+    public static Animator createInstance(URL url)
+    throws Exception
+    {
+        logger.debug("createInstance url: " + url);
+        try
+        {
+            final Animator view = new Animator(" Path: " + url.toString());
+            
+                        /*
+                        URL url = AnimationItem.class.getResource(path);
+                         
+                        if (url == null)
+                        { // The class loader could not find the file
+                         
+                        }
+                         */
+            XMLAnimationParser parser = new XMLAnimationParser(url, view._canvas);
+            
+            view.setAnimation(parser.parseAnimation());
+            
+            return view;
+        }
+        catch (Exception ex)
+        {
+            System.err.println(ex);
+            ex.printStackTrace();
+            
+            throw ex;
+        }
+    }
 }
