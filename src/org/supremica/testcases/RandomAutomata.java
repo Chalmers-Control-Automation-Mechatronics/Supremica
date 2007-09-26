@@ -22,7 +22,7 @@ public class RandomAutomata
         
         if (first)
         {
-            project.setComment("Composition of random automata tend to have very few states (often " + "only one). This is very favourable for traditional algorithms in " + "contrast to the symbolic ones (e.g. BDD-based). In this sense, the " + "'Random automata' testcase is the exact opposite to the 'Counters' " + "test case.");
+            project.setComment("Random automata...");
         }
         
         first = false;
@@ -39,7 +39,7 @@ public class RandomAutomata
         {
             events_vector[i] = new LabeledEvent("e" + (i + 1));
             
-            events_vector[i].setControllable(Math.random() > 0.4);    // 60% controllables ?
+            events_vector[i].setControllable(Math.random() > 0.3);    // 70% controllables ?
         }
         
         int tcount = (int) ((double) states * events * dens);
@@ -62,12 +62,18 @@ public class RandomAutomata
                 if (s == 0)
                 {
                     state_vector[s].setInitial(true);
-                    state_vector[s].setAccepting(true);
                 }
-                
+
                 random.addState(state_vector[s]);
             }
-            
+
+            // Mark some states (at least one)
+            int mark = (int) Math.floor(Math.random()*states);
+            for (int m=0; m<=mark; m++)
+            {
+                state_vector[(int) Math.floor(Math.random()*states)].setAccepting(true);
+            }
+
             computeRandomTransitions(transitions, states, events);
             
             for (int j = 0; j < events; j++)
@@ -95,7 +101,12 @@ public class RandomAutomata
                 random.addArc(new Arc(state_vector[transitions[s].s0], state_vector[transitions[s].s1], events_vector[transitions[s].event]));
             }
             
-            random.setType(AutomatonType.PLANT);
+            // Make the first a plant, the second a spec, and the rest 50/50 plant/spec.
+            if (i == 0 || (i != 1 && Math.random() > 0.5))
+                random.setType(AutomatonType.PLANT);
+            else
+                random.setType(AutomatonType.SPECIFICATION);
+
             project.addAutomaton(random);
         }
     }

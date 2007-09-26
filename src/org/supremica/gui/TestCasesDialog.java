@@ -391,9 +391,9 @@ class RandomPanel
 
         add(panel, BorderLayout.WEST);
         panel.add(new JLabel("Number of automata: "));
-        panel.add(int_num = new IntegerField("2", 6));
+        panel.add(int_num = new IntegerField("3", 6));
         panel.add(new JLabel("Number of states: "));
-        panel.add(int_size = new IntegerField("4", 6));
+        panel.add(int_size = new IntegerField("5", 6));
         panel.add(new JLabel("Number of events: "));
         panel.add(int_events = new IntegerField("3", 3));
         panel.add(new JLabel("Deterministic transition-density: "));
