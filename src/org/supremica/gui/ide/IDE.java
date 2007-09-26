@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.gui.ide
 //# CLASS:   IDE
 //###########################################################################
-//# $Id: IDE.java,v 1.100 2007-09-25 18:22:37 knut Exp $
+//# $Id: IDE.java,v 1.101 2007-09-26 13:57:43 flordal Exp $
 //###########################################################################
 
 package org.supremica.gui.ide;
@@ -43,6 +43,7 @@ import org.supremica.log.LoggerFactory;
 import org.supremica.properties.Config;
 import org.supremica.util.ProcessCommandLineArguments;
 import org.supremica.Version;
+import org.supremica.comm.xmlrpc.Server;
 import org.xml.sax.SAXException;
 
 /**
@@ -55,8 +56,8 @@ import org.xml.sax.SAXException;
  * @author Knut &Aring;kesson
  */
 public class IDE
-    extends JFrame
-    implements IDEActionInterface, Observer, Subject
+        extends JFrame
+        implements IDEActionInterface, Observer, Subject
 {
     //#######################################################################
     //# Constructor
@@ -65,11 +66,11 @@ public class IDE
     {
         Utility.setupFrame(this, IDEDimensions.mainWindowPreferredSize);
         setTitle(getName());
-
+        
         // Instantiate all actions
         mObservers = new LinkedList<Observer>();
         mActions = new Actions(this);
-
+        
         // Create GUI
         final BorderLayout layout = new BorderLayout();
         final JPanel contents = (JPanel) getContentPane();
@@ -82,55 +83,76 @@ public class IDE
         mBlankPanel.setPreferredSize(IDEDimensions.mainWindowPreferredSize);
         mLogPanel = new LogPanel(this, "Logger");
         mSplitPaneVertical =
-            new JSplitPane(JSplitPane.VERTICAL_SPLIT, mBlankPanel, mLogPanel);
+                new JSplitPane(JSplitPane.VERTICAL_SPLIT, mBlankPanel, mLogPanel);
         mSplitPaneVertical.setContinuousLayout(false);
         mSplitPaneVertical.setOneTouchExpandable(false);
         mSplitPaneVertical.setDividerLocation(0.8);
         mSplitPaneVertical.setResizeWeight(1.0);
         contents.add(mSplitPaneVertical, BorderLayout.CENTER);
-
+        
         final File startdir = new File(Config.FILE_OPEN_PATH.get());
         mFileChooser = new JFileChooser(startdir);
-
+        
         // Initialise Document Managers
         mDocumentContainerManager = new DocumentContainerManager(this);
         mDocumentContainerManager.attach(this);
-
+        
         info("Supremica version: " + (new Version()).toString());
+        
+        if (Config.XML_RPC_ACTIVE.isTrue())
+        {
+            boolean serverStarted = true;
+            
+            try
+            {
+                Server xmlRpcServer = new Server(this, Config.XML_RPC_PORT.get());
+            }
+            catch (Exception e)
+            {
+                serverStarted = false;
+                
+                warn("Another server already running on port " + Config.XML_RPC_PORT.get() + ". XML-RPC server not started!");
+            }
+            
+            if (serverStarted)
+            {
+                info("XML-RPC server running on port " + Config.XML_RPC_PORT.get());
+            }
+        }
     }
-
+    
     //#######################################################################
     //# Simple Access
     public String getName()
     {
         return IDENAME;
     }
-
+    
     public JFrame getFrame()
     {
         return this;
     }
-
+    
     public IDE getIDE()
     {
         return this;
     }
-
+    
     public IDEToolBar getToolBar()
     {
         return mToolBar;
     }
-
+    
     public Actions getActions()
     {
         return mActions;
     }
-
+    
     public DocumentContainerManager getDocumentContainerManager()
     {
         return mDocumentContainerManager;
     }
-
+    
     public DocumentManager getDocumentManager()
     {
         return mDocumentContainerManager.getDocumentManager();
@@ -139,8 +161,8 @@ public class IDE
     {
         return mFileChooser;
     }
-
-
+    
+    
     //#######################################################################
     //# Listeners
     /**
@@ -152,7 +174,7 @@ public class IDE
         {
             final Action action = mActions.getAction(ExitAction.class);
             final ActionEvent aevent =
-				new ActionEvent(this, ActionEvent.ACTION_PERFORMED, null);
+                    new ActionEvent(this, ActionEvent.ACTION_PERFORMED, null);
             action.actionPerformed(aevent);
         }
         else
@@ -160,8 +182,8 @@ public class IDE
             super.processWindowEvent(event);
         }
     }
-
-
+    
+    
     //#######################################################################
     //# Interface net.sourceforge.waters.gui.observer.Observer
     public void update(final EditorChangedEvent event)
@@ -170,7 +192,7 @@ public class IDE
         {
             case CONTAINER_SWITCH:
                 final DocumentContainer container =
-                    mDocumentContainerManager.getActiveContainer();
+                        mDocumentContainerManager.getActiveContainer();
                 if (container == null)
                 {
                     mSplitPaneVertical.setTopComponent(mBlankPanel);
@@ -186,20 +208,20 @@ public class IDE
                 break;
         }
     }
-
-
+    
+    
     //#######################################################################
     //# Interface net.sourceforge.waters.gui.observer.Subject
     public void attach(final Observer observer)
     {
         mObservers.add(observer);
     }
-
+    
     public void detach(final Observer observer)
     {
         mObservers.remove(observer);
     }
-
+    
     public void fireEditorChangedEvent(final EditorChangedEvent event)
     {
         // Just in case they try to register or deregister observers
@@ -210,8 +232,8 @@ public class IDE
             observer.update(event);
         }
     }
-
-
+    
+    
     //#######################################################################
     //# Public Shortcuts
     //# (use with caution --- these should be considered as deprecated)
@@ -219,123 +241,128 @@ public class IDE
     {
         return mDocumentContainerManager.getActiveContainer();
     }
-
+    
     public EditorWindowInterface getActiveEditorWindowInterface()
     {
         return getActiveDocumentContainer().getEditorPanel().getActiveEditorWindowInterface();
     }
-
+    
     public boolean editorActive()
     {
         final DocumentContainer active =
-            mDocumentContainerManager.getActiveContainer();
+                mDocumentContainerManager.getActiveContainer();
         return active != null && active.isEditorActive();
     }
-
+    
     public boolean analyzerActive()
     {
         final DocumentContainer active =
-            mDocumentContainerManager.getActiveContainer();
+                mDocumentContainerManager.getActiveContainer();
         return active != null && active.isAnalyzerActive();
     }
-
+    
     public Project getActiveProject()
     {
         final DocumentContainer active =
-            mDocumentContainerManager.getActiveContainer();
+                mDocumentContainerManager.getActiveContainer();
         return active.getAnalyzerPanel().getVisualProject();
     }
-
+    
     private boolean openFiles(final List<File> filesToOpen)
     {
         return mDocumentContainerManager.openContainers(filesToOpen);
     }
-
+    
     private void openEmptyDocument()
     {
-		mDocumentContainerManager.newModuleContainer();
-	}
-
-	public String getWindowTitle()
-	{
-		final DocumentContainer container =
-			mDocumentContainerManager.getActiveContainer();
-		if (container == null)
-		{
-			return IDENAME;
-		}
-		else
-		{
-			final DocumentProxy doc = container.getDocument();
-			final String name = doc.getName();
-			final File file = container.getFileLocation();
-			final StringBuffer buffer = new StringBuffer(IDENAME + " - Module");
-			if (name != null && !name.equals(""))
-			{
-				buffer.append(": ");
-				buffer.append(name);
-			}
-			if (file != null)
-			{
-				buffer.append(" [");
-				buffer.append(file);
-				buffer.append(']');
-			}
-			return buffer.toString();
-		}
-
-	}
-
-
+        mDocumentContainerManager.newModuleContainer();
+    }
+    
+    public String getWindowTitle()
+    {
+        final DocumentContainer container =
+                mDocumentContainerManager.getActiveContainer();
+        if (container == null)
+        {
+            return IDENAME;
+        }
+        else
+        {
+            final DocumentProxy doc = container.getDocument();
+            final String name = doc.getName();
+            final File file = container.getFileLocation();
+            final StringBuffer buffer = new StringBuffer(IDENAME + " - Module");
+            if (name != null && !name.equals(""))
+            {
+                buffer.append(": ");
+                buffer.append(name);
+            }
+            if (file != null)
+            {
+                buffer.append(" [");
+                buffer.append(file);
+                buffer.append(']');
+            }
+            return buffer.toString();
+        }
+        
+    }
+    
+    
     //#######################################################################
     //# Interface org.supremica.gui.ide.IDEReportInterface
     public void error(String msg)
     {
         LOGGER.error(msg);
     }
-
+    
     public void error(String msg, Throwable t)
     {
         LOGGER.error(msg, t);
     }
-
+    
     public void info(String msg)
     {
         LOGGER.info(msg);
     }
-
+    
+    public void warn(String msg)
+    {
+        LOGGER.warn(msg);
+    }
+    
     public void debug(String msg)
     {
         LOGGER.debug(msg);
     }
-
-
+    
+    
     //#######################################################################
     //# Main Program
     public static void main(String args[])
     throws Exception
     {
         final List<File> files = ProcessCommandLineArguments.process(args);
-     	if (Config.GENERAL_INCLUDE_EDITOR.isTrue())
-     	{
-			final IDE ide = new IDE();
-			ide.setVisible(true);
-			if (files != null && files.size() > 0)
-			{
-				ide.openFiles(files);
-			}
-			else if (Config.GUI_EDITOR_DEFAULT_EMPTY_MODULE.isTrue())
-			{
-				ide.openEmptyDocument();
-			}
-		}
-		else
-		{
-        	SupremicaWithGui.startSupremica();
-		}
+        if (Config.GENERAL_INCLUDE_EDITOR.isTrue())
+        {
+            final IDE ide = new IDE();
+            ide.setVisible(true);
+            if (files != null && files.size() > 0)
+            {
+                ide.openFiles(files);
+            }
+            else if (Config.GUI_EDITOR_DEFAULT_EMPTY_MODULE.isTrue())
+            {
+                ide.openEmptyDocument();
+            }
+        }
+        else
+        {
+            SupremicaWithGui.startSupremica();
+        }
     }
-
-
+    
+    
     //#######################################################################
     //# Data Members
     // GUI Components
@@ -346,22 +373,22 @@ public class IDE
     private final JSplitPane mSplitPaneVertical;
     private final LogPanel mLogPanel;
     private final JFileChooser mFileChooser;
-
+    
     // Actions
     private final Actions mActions;
     private final List<Observer> mObservers;
-
-
+    
+    
     //#######################################################################
     //# Static Class Constants
     private static final long serialVersionUID = 1L;
     private static final String IDENAME = "Supremica";
     private static final Logger LOGGER = LoggerFactory.createLogger(IDE.class);
-	//private static final InterfaceManager manager;
-
+    //private static final InterfaceManager manager;
+    
     static
     {
-		Locale.setDefault(Locale.ENGLISH);
+        Locale.setDefault(Locale.ENGLISH);
         InterfaceManager.getInstance().initLookAndFeel();
         Config.XML_RPC_ACTIVE.set(false);
         Config.DOT_USE.set(true);

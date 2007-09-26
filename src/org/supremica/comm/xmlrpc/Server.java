@@ -56,12 +56,11 @@ import org.supremica.automata.*;
 import org.supremica.automata.IO.*;
 import org.supremica.properties.*;
 
-// import helma.xmlrpc.*;
 import org.apache.xmlrpc.*;
+import org.supremica.gui.ide.IDE;
 
 public class Server
-{
-    
+{    
     // singleton stuff:
     private static Server instance_ = null;
     
@@ -120,16 +119,23 @@ public class Server
     }
     
     // -----------------------------------------------------
-    private VisualProjectContainer container;
+    private VisualProjectContainer container = null;
+    private IDE ide = null;
     private WebServer theServer;
     
     // -----------------------------------------------------
-    public Server(VisualProjectContainer container, int port)
+    public Server(Object projectContainer, int port)
     throws Exception
     {
-        this.container = container;
         instance_ = this;    // this statement would be illegal in C++  :)
-        
+
+        if (projectContainer instanceof VisualProjectContainer)
+            container = (VisualProjectContainer) projectContainer;
+        else if (projectContainer instanceof IDE)
+            ide = (IDE) projectContainer;
+        else
+            throw new Exception("Bad input to constructor.");
+
         String filter = Config.XML_RPC_FILTER.get();
         
         theServer = new WebServer(port);
@@ -145,11 +151,22 @@ public class Server
         theServer.start();
     }
     
+    /**
+     * Gets the active project from the GUI.
+     */
+    private Project getActiveProject()
+    {
+        if (container != null)
+            return container.getActiveProject();
+        else
+            return ide.getActiveProject();
+    }
+    
     // ---------------------------------------------------
     public Vector getAutomataIdentities()
     {
         Vector theIdentities = new Vector();
-        Iterator autIt = container.getActiveProject().iterator();
+        Iterator autIt = getActiveProject().iterator();
         
         while (autIt.hasNext())
         {
@@ -165,7 +182,7 @@ public class Server
     public int deleteAutomaton(String name)
     throws XmlRpcException
     {
-        Automata as = container.getActiveProject();
+        Automata as = getActiveProject();
         int oldsize = as.size();
         
         as.removeAutomaton(name);
@@ -181,7 +198,7 @@ public class Server
     public int renameAutomaton(String name, String newname)
     throws XmlRpcException
     {
-        Automata as = container.getActiveProject();
+        Automata as = getActiveProject();
         
         try
         {
@@ -205,7 +222,7 @@ public class Server
         
         try
         {
-            currAutomaton = container.getActiveProject().getAutomaton(name);
+            currAutomaton = getActiveProject().getAutomaton(name);
         }
         catch (Exception e)
         {
@@ -242,7 +259,7 @@ public class Server
             
             try
             {
-                currAutomaton = container.getActiveProject().getAutomaton(currName);
+                currAutomaton = getActiveProject().getAutomaton(currName);
             }
             catch (Exception e)
             {
@@ -291,7 +308,7 @@ public class Server
         Automaton currAutomaton = (Automaton) autIt.next();
         
         currAutomaton.setName(name);
-        container.getActiveProject().addAutomaton(currAutomaton);
+        getActiveProject().addAutomaton(currAutomaton);
         
         return 0;    // ignore this
     }
@@ -321,7 +338,7 @@ public class Server
             
             try
             {
-                container.getActiveProject().addAutomaton(currAutomaton);
+                getActiveProject().addAutomaton(currAutomaton);
             }
             catch (Exception e)
             {
@@ -340,10 +357,9 @@ public class Server
             String currName = (String) automataIdentities.get(i);
             
             try
-            {
-                
+            {                
                 // container.remove(currName);
-                container.getActiveProject().removeAutomaton(currName);
+                getActiveProject().removeAutomaton(currName);
             }
             catch (Exception e)
             {
