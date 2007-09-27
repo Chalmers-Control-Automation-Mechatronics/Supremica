@@ -256,7 +256,8 @@ public class AutomataSynthesizer
 				}
 				catch(Exception ex)
 				{
-					ex.printStackTrace();
+					logger.error(ex);
+					//ex.printStackTrace();
 				}
 				finally
 				{
@@ -264,7 +265,11 @@ public class AutomataSynthesizer
 					supervisor.cleanup();
 					bddSynthesizer.cleanup();
 				}
-			}
+		}
+		else
+		{
+			bddSynthesizer.clenup();
+		}
         }
         else if (synthesizerOptions.getSynthesisAlgorithm() == SynthesisAlgorithm.MONOLITHICBDD)
         {
