@@ -268,7 +268,7 @@ public class AutomataSynthesizer
 		}
 		else
 		{
-			bddSynthesizer.clenup();
+			bddSynthesizer.cleanup();
 		}
         }
         else if (synthesizerOptions.getSynthesisAlgorithm() == SynthesisAlgorithm.MONOLITHICBDD)
