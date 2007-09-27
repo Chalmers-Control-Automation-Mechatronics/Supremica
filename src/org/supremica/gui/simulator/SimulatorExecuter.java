@@ -87,23 +87,23 @@ public class SimulatorExecuter
     
     //private AutomataOnlineSynchronizer onlineSynchronizer;
     private AutomataSynchronizerExecuter onlineSynchronizer;
-    private Actions theActions;
-    private Controls theControls;
-    private VisualProject theProject;
-    private Animator theAnimator;
-    private Animation theAnimation;
-    private AnimationSignals theAnimationSignals;
+    private Actions actions;
+    private Controls controls;
+    private VisualProject project;
+    private Animator animator;
+    private Animation animation;
+    private AnimationSignals animationSignals;
     private int[] currState;
     
     public SimulatorExecuter(VisualProject project, boolean useExternalExecuter)
     throws Exception
     {
-        this.theProject = project;
-        this.theActions = project.getActions();
-        this.theControls = project.getControls();
-        theAnimator = project.getAnimator();
+        this.project = project;
+        this.actions = project.getActions();
+        this.controls = project.getControls();
+        animator = project.getAnimator();
         
-        if (theAnimator == null)
+        if (animator == null)
         {
             String msg = "Could not open animator: " + project.getAnimationURL();
             
@@ -112,26 +112,19 @@ public class SimulatorExecuter
             throw new SupremicaException("Could not open animator: " + project.getAnimationURL());
         }
         
-        theAnimation = theAnimator.getAnimation();
-        
-        theAnimation.addAnimationListener(this);
-        
-        theAnimationSignals = new AnimationSignals(theAnimation);
+        animation = animator.getAnimation();        
+        animation.addAnimationListener(this);        
+        animationSignals = new AnimationSignals(animation);
         
         SynchronizationOptions syncOptions = SynchronizationOptions.getDefaultVerificationOptions();
-        
-        //SynchronizationOptions syncOptions = new SynchronizationOptions(SupremicaProperties.syncNbrOfExecuters(), SynchronizationType.Prioritized, SupremicaProperties.syncInitialHashtableSize(), SupremicaProperties.syncExpandHashtable(), SupremicaProperties.syncForbidUncontrollableStates(), SupremicaProperties.syncExpandForbiddenStates(), false, false, false, Config.VERBOSE_MODE.isTrue(), false, true, false);
         helper = new AutomataSynchronizerHelper(project, syncOptions);
         AutomataIndexMap indexMap = helper.getIndexMap();
         
         // Build the initial state
         Automaton automaton;
         State state;
-        int[] initialState = AutomataIndexFormHelper.createState(this.theProject.size());
-        
-        // + 1 status field
-        Iterator autIt = this.theProject.iterator();
-        
+        int[] initialState = AutomataIndexFormHelper.createState(this.project.size());
+        Iterator autIt = this.project.iterator();
         while (autIt.hasNext())
         {
             automaton = (Automaton) autIt.next();
@@ -139,12 +132,11 @@ public class SimulatorExecuter
             //initialState[automaton.getIndex()] = state.getIndex();
             initialState[indexMap.getAutomatonIndex(automaton)] = indexMap.getStateIndex(automaton, state);
         }
-        
+        // Set initial state in helper
         SimulatorExecuterHelper.setInitialState(initialState);
         
         //onlineSynchronizer = new AutomataOnlineSynchronizer(helper);
-        onlineSynchronizer = new AutomataSynchronizerExecuter(helper);
-        
+        onlineSynchronizer = new AutomataSynchronizerExecuter(helper);        
         onlineSynchronizer.initialize();
         onlineSynchronizer.setCurrState(initialState);
         
@@ -152,11 +144,14 @@ public class SimulatorExecuter
         
         helper.setCoExecuter(onlineSynchronizer);
         
+        ////////////////
+        // SET UP GUI //
+        ////////////////
+                
         //theProject.getListeners().addListener(this);
         setBackground(Color.white);
         
-        contentPane = (JPanel) getContentPane();
-        
+        contentPane = (JPanel) getContentPane();        
         contentPane.setLayout(layout);
         
         // contentPane.add(toolBar, BorderLayout.NORTH);
@@ -189,7 +184,6 @@ public class SimulatorExecuter
         initMenubar();
         
         stateViewer = new SimulatorStateViewer(this, helper, useExternalExecuter);
-        
         contentPane.add(stateViewer, BorderLayout.CENTER);
         
         //controller = new ExplorerController(stateViewer, theAutomaton);
@@ -292,12 +286,12 @@ public class SimulatorExecuter
     
     public void registerSignalObserver(SignalObserver listener)
     {
-        theAnimationSignals.registerInterest(listener);
+        animationSignals.registerInterest(listener);
     }
     
     public boolean isTrue(Condition theCondition)
     {
-        return theAnimationSignals.isTrue(theCondition.getLabel());
+        return animationSignals.isTrue(theCondition.getLabel());
     }
     
 /*
@@ -310,14 +304,14 @@ public class SimulatorExecuter
     {
         String label = event.getLabel();
         
-        if (theControls != null)
+        if (controls != null)
         {}
         
-        if (theActions != null)
+        if (actions != null)
         {
-            if (theActions.hasAction(label))
+            if (actions.hasAction(label))
             {
-                org.supremica.automata.execution.Action currAction = theActions.getAction(label);
+                org.supremica.automata.execution.Action currAction = actions.getAction(label);
                 
                 for (Iterator cmdIt = currAction.commandIterator();
                 cmdIt.hasNext(); )
@@ -326,7 +320,7 @@ public class SimulatorExecuter
                     
                     try
                     {
-                        theAnimation.invokeCommand(currCommand.getLabel());
+                        animation.invokeCommand(currCommand.getLabel());
                     }
                     catch (CommandException ex)
                     {
@@ -364,7 +358,7 @@ public class SimulatorExecuter
     
     public Project getProject()
     {
-        return theProject;
+        return project;
     }
     
     public void update()

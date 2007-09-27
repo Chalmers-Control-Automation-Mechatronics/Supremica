@@ -1428,20 +1428,10 @@ public final class AutomataSynchronizerExecuter
         return true;
     }
     
-    /**
-     * Select uncontrollable event (for "one event at a time"-execution).
-     *
-     *@param  event the current uncontrollable event the synchronization should focus on.
-     */
-    public void setCurrUncontrollableEvent(LabeledEvent event)
-    {
-        currUncontrollableEvent = event.getIndex();
-    }
+    // ****************************************************** //
+    //  Methods for "online" running of the synchroniser      //
+    // ****************************************************** //
     
-    // ****************************************************** //
-    //  Methods from AutomataOnlineSynchronizer (which is to  //
-    //  become deprecated real soon, I hope).                 //
-    // ****************************************************** //
     public boolean isEnabled(LabeledEvent theEvent)
     {
         //return isEnabled(theEvent.getIndex());
