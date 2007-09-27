@@ -1444,7 +1444,8 @@ public final class AutomataSynchronizerExecuter
     // ****************************************************** //
     public boolean isEnabled(LabeledEvent theEvent)
     {
-        return isEnabled(theEvent.getIndex());
+        //return isEnabled(theEvent.getIndex());
+        return isEnabled(indexForm.getAutomataIndexMap().getEventIndex(theEvent));
     }
     
     public boolean isEnabled(int eventIndex)
@@ -1477,7 +1478,8 @@ public final class AutomataSynchronizerExecuter
      */
     public int[] doTransition(int[] currState, LabeledEvent theEvent)
     {
-        return doTransition(currState, theEvent.getIndex());
+        //return doTransition(currState, theEvent.getIndex());
+        return doTransition(currState, indexForm.getAutomataIndexMap().getEventIndex(theEvent));
     }
     
     /**
