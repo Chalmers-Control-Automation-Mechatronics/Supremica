@@ -73,13 +73,12 @@ public class DOPtoEFA extends DOPrelation{
 		
 		//build main sequence
 		main_sequence.getActivityRelationGroup().add(start_machine);
-		main_sequence.getActivityRelationGroup().add(rop.getRelation());
+		main_sequence.getActivityRelationGroup().add(renameEqualOperationName(rop.getRelation(),machine));
 		main_sequence.getActivityRelationGroup().add(stop_machine);
 		
 		//fix relation tree
 		main_sequence = collapseRelationTree(main_sequence);
 		main_sequence = removeEmtyRelations(main_sequence);
-		main_sequence = renameEqualOperationName(main_sequence);
 		
 		main_efa = new EFA("main_" + machine,module);
 		module.addAutomaton(main_efa);
@@ -300,19 +299,21 @@ public class DOPtoEFA extends DOPrelation{
 	 * @param r
 	 * @return
 	 */
-	private static Relation renameEqualOperationName(Relation r){
+	private static Relation renameEqualOperationName(Relation r, String machineName){
 		NumOfOperations op = (new DOPtoEFA()).new NumOfOperations();
-		Relation tmp = renameEqualOperationName(r,op);
+		Relation tmp = renameEqualOperationName(r,op,machineName);
 		
 		//debug
-		//System.out.println("Table");
-		//System.out.println(op.toString());
+		System.out.println("Table");
+		System.out.println(op.toString());
 		//debug
 		
 		return tmp;
 	}
 	
-	private static Relation renameEqualOperationName(Relation r, NumOfOperations operations){
+	private static Relation renameEqualOperationName(Relation r,
+													 NumOfOperations operations, 
+													 String machineName){
 		
 		Object o = null;
 		List objList = null;
@@ -335,17 +336,23 @@ public class DOPtoEFA extends DOPrelation{
 			o = objList.get(i);
 			
 			if(o instanceof Relation){
-				renameEqualOperationName((Relation)o,operations);
+				renameEqualOperationName((Relation)o,operations,machineName);
 			}else if(o instanceof Activity){
-				opName = ((Activity)o).getOperation();
 				
+				opName = ((Activity)o).getOperation();
 				if(operations.exist(opName)){
 					((Activity)o).setOperation(opName + 
 							"_" + operations.getNumberOfOperationsWithName(opName));
 				}
-				
 				//add opName
 				operations.addOperation(opName);
+				
+				//add machine name to operation
+				if(machineName != null && machineName.length() > 0){
+					opName = ((Activity)o).getOperation();
+					((Activity)o).setOperation(opName +"::"+machineName);
+				}
+				
 					
 			}else{
 				System.err.println("Unknown object: " + o.toString());

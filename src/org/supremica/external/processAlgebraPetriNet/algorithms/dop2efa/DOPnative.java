@@ -1,15 +1,116 @@
 package org.supremica.external.processAlgebraPetriNet.algorithms.dop2efa;
 
 import java.util.Iterator;
+import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
 
 import org.supremica.manufacturingTables.xsd.processeditor.Activity;
 import org.supremica.manufacturingTables.xsd.processeditor.Attribute;
+import org.supremica.manufacturingTables.xsd.processeditor.OperationReferenceType;
+import org.supremica.manufacturingTables.xsd.processeditor.Precondition;
 
 //
 //	Native function code. Help function for DOPrelation class
 //
 public class DOPnative {
+	
+	protected final static String EVENT_MACHINE_SEPARATOR = "::";
+	
+	protected final static String EVENT_STOP_PREFIX = "sto_";
+	protected final static String EVENT_START_PREFIX = "sta_";
+	
+	protected final static String RUNNING_STATE_SUFFIX = "_run";
+	
+	protected final static String PRECON_NOT_FULFILLED_STATE = "precon_not_fulfilled";
+	protected final static String PRECON_FULFILLED_STATE = "precon_fulfilled";
+	//
+	// Activity function code
+	//
+	protected static void nativeActivity(Activity activity,
+									String from,
+									String to,
+									EFA efa){
+		
+		
+		EFA preconEFA = null;
+		PGA pga = null;
+		Precondition precon = null;
+		List<OperationReferenceType> preconList = null;
+		List<String> eventList = null;
+		
+		/**************************/
+		//Check in data
+		/**************************/
+		if(activity == null || efa == null){
+			return;
+		}
+		
+		// check if state exist
+		if(!efa.stateExist(from) || !efa.stateExist(to)){
+			System.err.println("Unknown state From: " +from+
+							   " or To: " + to);
+			return;
+		}
+		
+		/**************************/
+		//Operation
+		/**************************/
+		//build operation
+		pga = pgaFromActivity(activity,efa);
+		nativeProcess(pga,from,to,efa);
+		
+		//get predecessors
+		precon =  activity.getPrecondition();
+		if(precon != null){
+			preconList = precon.getPredecessor();
+		}
+		
+		/**************************/
+		//no Predecessors
+		/**************************/
+		if(preconList == null || preconList.size() == 0){
+			return;
+		}
+		
+		/**************************/
+		//Predecessors
+		/**************************/
+		eventList = new LinkedList<String>();
+		for(OperationReferenceType pre : preconList){
+			eventList.add(EVENT_STOP_PREFIX
+						+ pre.getOperation()+
+						  EVENT_MACHINE_SEPARATOR
+						  +pre.getMachine());
+		}
+		
+		String event, preconEFAname;
+		for(int i = 0; i < eventList.size(); i++){
+			event = eventList.get(i);
+			preconEFAname = "precon"+Integer.toString(i+1)+"_"+pga.getProcess();
+			
+			preconEFA = new EFA(preconEFAname,efa.getModule());
+			
+			
+			preconEFA.addInitialState(PRECON_NOT_FULFILLED_STATE);
+			preconEFA.addState(PRECON_FULFILLED_STATE);
+			
+			//transition to precondition fulfilled
+			preconEFA.addTransition(PRECON_NOT_FULFILLED_STATE,
+									PRECON_FULFILLED_STATE, event,"","");
+			
+			//self loop for not block event 
+			preconEFA.addTransition(PRECON_FULFILLED_STATE,
+									PRECON_FULFILLED_STATE, event,"","");
+			
+			//back to not fulfilled
+			preconEFA.addTransition(PRECON_FULFILLED_STATE,
+									PRECON_NOT_FULFILLED_STATE,
+									EVENT_START_PREFIX+pga.getProcess(),"","");
+			
+			efa.getModule().addAutomaton(preconEFA);
+		}
+	}
 	
 	protected static PGA pgaFromActivity(Activity activity, EFA efa){
 		
@@ -105,11 +206,6 @@ public class DOPnative {
 	 */
 	protected static void nativeProcess(PGA pga, String from, String to, EFA efa){
 		
-		final String START_EVENT = "sta_";
-		final String STOP_EVENT = "sto_";
-		
-		final String RUNNING_STATE = "_run";
-		
 		String event, guard, action;
 		String runningState;
 		
@@ -147,7 +243,7 @@ public class DOPnative {
 		/**************************/
 		
 		if(pga.getOnlyStart()){
-			event = START_EVENT.concat(pga.getProcess());
+			event = EVENT_START_PREFIX.concat(pga.getProcess());
 			guard = pga.getStartGuard();
 			action = pga.getStartAction();
 			efa.addTransition(from, to, event, guard, action);
@@ -159,7 +255,7 @@ public class DOPnative {
 		/**************************/
 		
 		if(pga.getOnlyStop()){
-			event = STOP_EVENT.concat(pga.getProcess());
+			event = EVENT_STOP_PREFIX.concat(pga.getProcess());
 			guard = pga.getStopGuard();
 			action = pga.getStopAction();
 			efa.addTransition(from,to, event, guard, action);
@@ -170,7 +266,7 @@ public class DOPnative {
 		//from start to running to stop event
 		/**************************/
 		
-		runningState = pga.getProcess().concat(RUNNING_STATE);
+		runningState = pga.getProcess().concat(RUNNING_STATE_SUFFIX);
 		
 		//unique running state
 		if(efa.stateExist(runningState)){
@@ -186,13 +282,13 @@ public class DOPnative {
 		efa.addState(runningState);
 		
 		//create transition
-		event = START_EVENT.concat(pga.getProcess());
+		event = EVENT_START_PREFIX.concat(pga.getProcess());
 		guard = pga.getStartGuard();
 		action = pga.getStartAction();
 		
 		efa.addTransition(from, runningState, event, guard, action);
 		
-		event = STOP_EVENT.concat(pga.getProcess());
+		event = EVENT_STOP_PREFIX.concat(pga.getProcess());
 		guard = pga.getStopGuard();
 		action = pga.getStopAction();
 		
@@ -206,11 +302,11 @@ public class DOPnative {
 	 * @param end is end state for sequence
 	 * @param ega 
 	 */
-	protected static void nativeSequence(List<PGA> pgaList,
+	protected static void nativeSequence(List<Activity> activityList,
 			                             String from, String to,
 			                             EFA efa){
 		//check in data
-		if(pgaList.isEmpty()){
+		if(activityList.isEmpty()){
 			return;
 		}
 		
@@ -224,7 +320,7 @@ public class DOPnative {
 		}
 		
 		//special case
-		if(pgaList.size() == 1){
+		if(activityList.size() == 1){
 			//add last state
 			if(to.length() == 0){
 				to = efa.nextState();
@@ -233,27 +329,27 @@ public class DOPnative {
 				efa.addState(to);	
 			}
 			
-			nativeProcess(pgaList.get(0),from,to,efa);
+			nativeActivity(activityList.get(0),from,to,efa);
 			return;
 		}
 		
 		//everything ok continue
-		Iterator<PGA> i = pgaList.iterator();
-		PGA pga = i.next();
+		Iterator<Activity> i = activityList.iterator();
+		Activity activity = i.next();
 		
 		String tmpFrom = from;
 		String tmpTo = efa.newUniqueState();
 
-		nativeProcess(pga,tmpFrom,tmpTo,efa);
+		nativeActivity(activity,tmpFrom,tmpTo,efa);
 		
 		while(i.hasNext()){
-			pga = i.next();
+			activity = i.next();
 			if(i.hasNext()){
 				
 				tmpFrom = tmpTo;
 				tmpTo = efa.newUniqueState();
 				
-				nativeProcess(pga,tmpFrom,tmpTo,efa);
+				nativeActivity(activity,tmpFrom,tmpTo,efa);
 			}else{
 				
 				//connect to last state to
@@ -266,7 +362,7 @@ public class DOPnative {
 				if(!efa.stateExist(to)){
 					efa.addState(to);	
 				}
-				nativeProcess(pga,tmpFrom,to,efa);
+				nativeActivity(activity,tmpFrom,to,efa);
 			}
 		}
 	}
@@ -278,11 +374,11 @@ public class DOPnative {
 	 * @param to
 	 * @param efa
 	 */
-	protected static void nativeAlternative(List<PGA> pgaList,
+	protected static void nativeAlternative(List<Activity> activityList,
             								String from, String to,
             								EFA efa){
 		//chech indata
-		if(pgaList.size() == 0){
+		if(activityList.size() == 0){
 			return;
 		}
 		
@@ -304,17 +400,58 @@ public class DOPnative {
 			efa.addState(to);	
 		}
 		
-		
-		//special for alternative
-		//egaList = removeDouble(egaList);
-		//egaList = concatEvents(egaList);
-		
-		
 		//everything ok continue
-		Iterator<PGA> i = pgaList.iterator();
+		Iterator<Activity> i = activityList.iterator();
 		
 		while(i.hasNext()){
-			nativeProcess(i.next(),from,to,efa);
+			nativeActivity(i.next(),from,to,efa);
+		}
+	}
+	
+	protected static void diamond(String from, String to, List<String> events, EFA efa){
+		String tmpTo = "";
+		List<String> tmpEvents = new LinkedList<String>();
+		
+		//check indata
+		if(events == null || events.size() == 0){
+			System.err.println("WARNING DIAMOND");
+			return;
+		}
+		
+		System.out.println("Diamond");
+		System.out.println("From: " + from);
+		System.out.println("To: " + to);
+		System.out.println(events.toString());
+		
+		//base case
+		if(events.size() == 1){
+			efa.addTransition(from, to, events.get(0),"","");
+			return;
+		}
+		
+		//copy events to tmpEvents
+		for(String event : events){
+			tmpEvents.add(event);
+		}
+		
+		
+		for(String event : events){
+			
+			//
+			tmpTo = efa.newUniqueState();
+			efa.addTransition(from, tmpTo, event,"","");
+			
+			System.out.println(tmpEvents.toString());
+			System.out.println(events.toString());
+			
+			//copy events to tmpEvents
+			Collections.copy(events,tmpEvents);
+			
+			//remove current event
+			tmpEvents.remove(event);
+			
+			//recursion
+			diamond(tmpTo,to,tmpEvents,efa);
 		}
 	}
 }

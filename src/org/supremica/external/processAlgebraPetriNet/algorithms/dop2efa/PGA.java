@@ -92,6 +92,11 @@ public class PGA {
 			
 			//search second GUARD
 			while(process.length() > 0){
+				
+				//check if we have a GUARD
+                if(process.startsWith(GUARD)){
+        			break; //exit while
+                }
                 
                 //add first char to tmp
                 tmp = tmp.concat(process.substring(0,1));
@@ -99,10 +104,7 @@ public class PGA {
                 //remove first char from process
                 process = process.substring(1);
                 
-                //check if we have a GUARD
-                if(process.startsWith(GUARD)){
-        			break; //exit while
-                }
+                
             }
 			//remove last GUARD
 			process = process.substring(GUARD.length());
@@ -125,6 +127,10 @@ public class PGA {
 			
 			//search second GUARD
 			while(process.length() > 0){
+				//check if we have a ACTION
+                if(process.startsWith(ACTION)){
+        			break; //exit while
+                }
                 
                 //add first char to tmp
                 tmp = tmp.concat(process.substring(0,1));
@@ -132,10 +138,7 @@ public class PGA {
                 //remove first char from process
                 process = process.substring(1);
                 
-                //check if we have a GUARD
-                if(process.startsWith(ACTION)){
-        			break; //exit while
-                }
+                
             }
 			//remove last ACTION
 			process = process.substring(ACTION.length());
