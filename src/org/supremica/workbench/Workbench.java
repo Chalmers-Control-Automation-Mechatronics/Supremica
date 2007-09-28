@@ -61,7 +61,7 @@ public class Workbench
         updateButtons();
         pack();
     }
-    
+
     void close()
     {
         hideGraph();
@@ -72,7 +72,7 @@ public class Workbench
                 }
                  */
     }
-    
+
     void showGraph()
     throws Exception
     {
@@ -100,11 +100,12 @@ public class Workbench
             }
             catch(Exception excp)
             {
-                System.out.println("Something bad occurred");
+				logger.error(excp);
+                //System.out.println("Something bad occurred");
             }
         }
     }
-    
+
     void hideGraph()
     {
         try
@@ -123,13 +124,13 @@ public class Workbench
             logger.error("Error in hiding viewer", excp);
         }
     }
-    
+
     void showMessage(String mess)
     {
         info.setText(mess);
         //if (toListUC()) {}
     }
-    
+
     /**
      * What is this one supposed to do?
      */
@@ -137,7 +138,7 @@ public class Workbench
     {
         return params.toShowGraph();
     }
-    
+
     /**
      * What is this one supposed to do?
      */
@@ -145,7 +146,7 @@ public class Workbench
     {
         return params.toListUC();
     }
-    
+
     /**
      * What is this one supposed to do?
      */
@@ -153,7 +154,7 @@ public class Workbench
     {
         return params.toListNB();
     }
-    
+
     /**
      * Returns true if "Add final result to the project" is selected.
      */
@@ -161,7 +162,7 @@ public class Workbench
     {
         return params.toAddIt();
     }
-    
+
     /**
      * Add current automaton to the project
      */
@@ -169,7 +170,7 @@ public class Workbench
     {
         project.addAutomaton(automaton);
     }
-    
+
     /**
      * Updates the enabled status of the buttons.
      */
@@ -200,7 +201,7 @@ public class Workbench
             }
         }
     }
-    
+
     // For debugging only
     public static void main(String args[])
     throws Exception
@@ -224,7 +225,7 @@ class MyAutomatonToDot
         // logger.info("MyAutomatonToDot::constructed");
         super(automaton);
     }
-    
+
     protected String getStateColor(State state)
     {
                 /*
@@ -257,7 +258,7 @@ class MyAutomatonViewer
         // logger.info("MyAutomatonViewer::constructed");
         super(theAutomaton);
     }
-    
+
     public AutomataSerializer getSerializer()
     {
         MyAutomatonToDot serializer = new MyAutomatonToDot(getAutomaton());
@@ -288,7 +289,7 @@ class ButtonImpl
 {
     private static final long serialVersionUID = 1L;
     Workbench wb = null;
-    
+
     ButtonImpl(String text, Workbench wb, String tooltip)
     {
         super(text);
@@ -317,7 +318,7 @@ class SynchButton
             }
         });
     }
-    
+
     /**
      * Synchronize all. Note that we do not mark new forbidden states
      * Probably this will change the look of the graph after
@@ -383,7 +384,7 @@ class CompareButton
             }
         });
     }
-    
+
     /**
      * Compare the synched result with the plant If the automaton
      * exists, calc new states (only) and manually set the
@@ -475,7 +476,7 @@ class CompareButton
             logger.debug(excp.getStackTrace());
             return;
         }
-        
+
         // In any case we do this and let wb handle how...
         try
         {
@@ -513,7 +514,7 @@ class ContButton
             }
         });
     }
-    
+
     // let's calc the new uc-states
     void action(ActionEvent e)
     {
@@ -579,7 +580,7 @@ class NonblockButton
             }
         });
     }
-    
+
     // Here we are to forbid *non*coreachable states
     // So we have to calc the coreachable (and nonforbidden ones) and forbid the rest
     public void action(ActionEvent e)
@@ -758,7 +759,7 @@ class DoneButton
                         }
                          */
         }
-        
+
         // Exit
         wb.close();
         wb.dispose();
@@ -889,7 +890,7 @@ class InfoPanel
     //JTextField text = new JTextField("", 18);
     //JTextArea text = new JTextArea(2,22);
     JTextPane text = new JTextPane();
-    
+
     InfoPanel(Workbench wb)
     {
         //text.setFont(new JTextField().getFont()); // Didn't know how to find the right font...
@@ -899,7 +900,7 @@ class InfoPanel
         text.setBackground(super.getBackground());
         add(text);
     }
-    
+
     void setText(String string)
     {
         text.setText(string);
