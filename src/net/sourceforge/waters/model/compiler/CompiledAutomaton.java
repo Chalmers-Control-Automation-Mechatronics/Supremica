@@ -2,9 +2,9 @@
 //###########################################################################
 //# PROJECT: Waters
 //# PACKAGE: net.sourceforge.waters.plain.des
-//# CLASS:   AutomatonElement
+//# CLASS:   CompiledAutomaton
 //###########################################################################
-//# $Id: CompiledAutomaton.java,v 1.1 2007-09-25 14:50:40 markus Exp $
+//# $Id: CompiledAutomaton.java,v 1.2 2007-10-04 20:45:23 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.compiler;
@@ -37,7 +37,7 @@ import net.sourceforge.waters.xsd.base.ComponentKind;
  * This is a simple MUTABLE implementation of the {@link AutomatonProxy}
  * interface.
  *
- * @author Markus Sköldstam
+ * @author Markus Sk&ouml;ldstam
  */
 
 public final class CompiledAutomaton
@@ -81,6 +81,7 @@ public final class CompiledAutomaton
     mEvents = Collections.synchronizedSet(eventscopy);
     mStates = Collections.synchronizedSet(statescopy);
     if (transitions == null || transitions.isEmpty()) {
+      // *** BUG ***
       mTransitions = Collections.emptyList();
     } else {
       List<TransitionProxy> transitionscopy =
@@ -118,6 +119,7 @@ public final class CompiledAutomaton
   //# Interface java.lang.Cloneable
   public CompiledAutomaton clone()
   {
+    // *** BUG ***
     return (CompiledAutomaton) super.clone();
   }
 
@@ -152,6 +154,7 @@ public final class CompiledAutomaton
    */
   public Set<EventProxy> getEvents()
   {
+    // *** NOT unmodifiable ***
     return mEvents;
   }
 
@@ -161,6 +164,7 @@ public final class CompiledAutomaton
    */
   public Set<StateProxy> getStates()
   {
+    // *** NOT unmodifiable ***
     return mStates;
   }
 
@@ -170,6 +174,7 @@ public final class CompiledAutomaton
    */
   public Collection<TransitionProxy> getTransitions()
   {
+    // *** NOT unmodifiable ***
     return mTransitions;
   }
 
@@ -311,9 +316,8 @@ public final class CompiledAutomaton
 
   }
 
-//#########################################################################
-  //# Setters
- 
+  //#########################################################################
+  //# Setters 
   public void setKind(ComponentKind kind)
   {
     if (mKind== kind) {
@@ -362,6 +366,7 @@ public final class CompiledAutomaton
 	   */
     mStates.add(state);
   }
+
   public void removeState(String name) {
 		for (StateProxy state : mStates) {
 			if (state.getName().equals(name)) {
@@ -392,6 +397,7 @@ public final class CompiledAutomaton
     mTransitions.add(transition);
   }
   
+
   //#########################################################################
   //# Data Members
   private ComponentKind mKind;
