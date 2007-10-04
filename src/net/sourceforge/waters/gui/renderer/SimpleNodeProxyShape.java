@@ -51,7 +51,8 @@ public class SimpleNodeProxyShape
             {
                 // CHALMERS IDES MODE---SINGLE TYPE OF MARKING, DOUBLE CIRCLES
                 g.setColor(EditorColor.DEFAULTCOLOR);
-                arc = new Arc2D.Double(rect.getX()+2, rect.getY()+2, rect.getWidth()-4.1, rect.getHeight()-4.1, 0, 360, Arc2D.OPEN);
+                g.setStroke(SINGLESTROKE);
+                arc = new Arc2D.Double(rect.getX()+2, rect.getY()+2, rect.getWidth()-4, rect.getHeight()-4, 0, 360, Arc2D.OPEN);
                 g.draw(arc);
                 //g.drawOval((int) rect.getX()+2, (int) rect.getY()+2, (int) (rect.getWidth()-4), (int) (rect.getHeight()-4));
             }

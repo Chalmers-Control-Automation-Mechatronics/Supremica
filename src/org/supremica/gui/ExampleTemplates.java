@@ -116,8 +116,8 @@ public class ExampleTemplates
         thisGroup.addItem(new TemplateItem("Chapter 2 - Reachability Tree and Graph", prefix + "Ch2_Reachability_Tree_and_Graph.xml"));
         thisGroup.addItem(new TemplateItem("Chapter 3 - Specification", prefix + "Ch3_Specification.xml"));
         thisGroup.addItem(new TemplateItem("Chapter 3 - Partial and Total Specifications", prefix + "Ch3_Partial_and_Total_Specifications.xml"));
-        thisGroup.addItem(new TemplateItem("Chapter 3 - Static and Dynamic Specifications", prefix + "Ch3_Static_and_Dynamic_Specification.xml"));
-        thisGroup.addItem(new TemplateItem("Chapter 4 - Static and Dynamic Controller", prefix + "Ch4_Static_and_Dynamic_Specification.xml"));
+        thisGroup.addItem(new TemplateItem("Chapter 3 - Static and Dynamic Specifications", prefix + "Ch3_Static_and_Dynamic_Specifications.xml"));
+        thisGroup.addItem(new TemplateItem("Chapter 4 - Static and Dynamic Controller", prefix + "Ch4_Static_and_Dynamic_Controller.xml"));
         thisGroup.addItem(new TemplateItem("Chapter 4 - Controllability", prefix + "Ch4_Controllability.xml"));
         thisGroup.addItem(new TemplateItem("Chapter 4 - Uncontrollable States", prefix + "Ch4_Uncontrollable_States.xml"));
         thisGroup.addItem(new TemplateItem("Chapter 4 - Trimming", prefix + "Ch4_Trimming.xml"));

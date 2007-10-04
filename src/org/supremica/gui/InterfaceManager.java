@@ -83,8 +83,6 @@ public class InterfaceManager
             else
                 UIManager.setLookAndFeel(lookAndFeel);
             
-            System.err.println("Apa: " + lookAndFeel + " eller "+ UIManager.getLookAndFeel().toString());
-            
             /*
             // Debugging
             System.err.println("Chosen look and feel: " + lookAndFeel);
