@@ -2,6 +2,7 @@ package org.supremica.external.processAlgebraPetriNet.algorithms.dop2efa;
 
 import java.util.Hashtable;
 import java.util.LinkedList;
+import java.util.List;
 
 import org.supremica.automata.ExtendedAutomata;
 
@@ -21,8 +22,11 @@ public class Module extends ExtendedAutomata{
 	private final String PARALLEL_PREFIX = "pa";
 	private final String ARBITRARY_ORDER_PREFIX = "ao";
 	
+	private final String BLOCKED_STATE = "not_rechable_state";
+	
 	private EFA nodeVariablesEFA;
 	private EFA resourceVariablesEFA;
+	private EFA blockedEventsEFA;
 	
 	public Module(String name, boolean expand){
 		super(name, expand);
@@ -39,9 +43,13 @@ public class Module extends ExtendedAutomata{
 		
 	}
 	
+	public List<String> getEvents(){
+		return events;
+	}
+	
 	private void initNodeVariables(){
 		nodeVariablesEFA =
-			new EFA("node_variables",this);
+			new EFA("Node_variables",this);
 		this.addAutomaton(nodeVariablesEFA);
 		nodeVariablesEFA.addInitialState(
 				"dummy_state_for_nod_variables");
@@ -49,10 +57,46 @@ public class Module extends ExtendedAutomata{
 	
 	private void initResourceVariables(){
 		resourceVariablesEFA =
-			new EFA("resource_variables",this);
+			new EFA("Resource_variables",this);
 		this.addAutomaton(resourceVariablesEFA);
 		resourceVariablesEFA.addInitialState(
 				"dummy_state_for_resource_variables");
+	}
+	
+	private void initBlockedEvents(){
+		blockedEventsEFA =
+			new EFA("Blocked_event",this);
+		this.addAutomaton(blockedEventsEFA);
+		blockedEventsEFA.addInitialState(
+				"dummy_inital_state_for_blocked");
+		
+		blockedEventsEFA.addState(BLOCKED_STATE);
+
+	}
+	
+	public void blockEvents(List<String> events){
+		
+		String event = "";
+		
+		//check in data
+		if(events == null || events.size() == 0){
+			return;
+		}
+		
+		if(blockedEventsEFA == null){
+			initBlockedEvents();
+		}
+		
+		for(String e : events){
+			if(e.endsWith(";")){
+				event = event + e;
+			}else{
+				event = event + e + ";";
+			}
+		}
+		
+		blockedEventsEFA.addTransition(BLOCKED_STATE,
+									   BLOCKED_STATE, event,"","");
 	}
 	
 	public void addEvent(String event){

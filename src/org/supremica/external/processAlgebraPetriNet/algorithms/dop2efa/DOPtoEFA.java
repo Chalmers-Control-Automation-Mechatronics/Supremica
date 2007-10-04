@@ -26,7 +26,44 @@ public class DOPtoEFA extends DOPrelation{
 	}
 	
 	public static void createEFA(ROP rop, File f){
-		buildModuleFromROP(rop).writeToFile(f);
+		
+		Module module = buildModuleFromROP(rop);
+		
+		/* Last fix */
+		/* Block */
+		blockStopEventWhitNoStartEvent(module);
+		
+		module.writeToFile(f);
+	}
+	
+	public static Module buildModuleFromROP(ROP rop){
+		String machine = rop.getMachine();
+		if(machine == null || machine.length() == 0){
+			machine = "no_machine";
+		}
+		return buildModuleFromROP(rop,new Module(machine, false));
+	}
+	
+	public static Module buildModuleFromROP(List<ROP> ropList, String name){
+		
+		Module module = null;
+		
+		//check in data
+		if(name == null || name.length()== 0){
+			name = "new_module";
+		}
+		
+		if(ropList == null || ropList.size() == 0){
+			return new Module(name,false);
+		}
+		
+		module = new Module(name,false);
+		
+		for(ROP rop : ropList){
+			module = buildModuleFromROP(rop, module);
+		}
+		
+		return module;
 	}
 	
 	/**
@@ -35,11 +72,10 @@ public class DOPtoEFA extends DOPrelation{
 	 * @param rop
 	 * @return
 	 */
-	public static Module buildModuleFromROP(ROP rop){
+	public static Module buildModuleFromROP(ROP rop, Module module){
 		
 		String comment, machine;
 		
-		Module module;
 		EFA main_efa;
 		
 		ObjectFactory factory;
@@ -57,7 +93,9 @@ public class DOPtoEFA extends DOPrelation{
 			machine = "no_machine";
 		}
 		
-		module = new Module(machine,false);
+		if(module == null){
+			module = new Module(machine,false);
+		}
 		
 		factory = new ObjectFactory();
 		
@@ -186,6 +224,34 @@ public class DOPtoEFA extends DOPrelation{
 		return r;
 	}
 	
+	public static void blockStopEventWhitNoStartEvent(Module m){
+		
+		List<String> block = new LinkedList<String>();
+		List<String> events = m.getEvents();
+		String tmp = "";
+		
+		for(String event : events){
+			
+			/* search for stop events */
+			if(event.startsWith(EVENT_STOP_PREFIX)){
+				
+				/* tmp is corresponding start event */
+				tmp = event.replace(EVENT_STOP_PREFIX,
+									EVENT_START_PREFIX);
+				
+				/* if we not have a start event block
+				 * end event
+				 */
+				if(!events.contains(tmp)){
+					block.add(event);
+				}
+			}
+		}
+		
+		m.blockEvents(block);
+		
+	}
+	
 	/**
 	 *	Search through Relation r and remove all Activities whit same
 	 *	operation name.
@@ -235,6 +301,7 @@ public class DOPtoEFA extends DOPrelation{
 		
 		return r;
 	}
+	
 	/**
 	 * Remove relation nodes who are empty.
 	 * 
@@ -304,8 +371,8 @@ public class DOPtoEFA extends DOPrelation{
 		Relation tmp = renameEqualOperationName(r,op,machineName);
 		
 		//debug
-		System.out.println("Table");
-		System.out.println(op.toString());
+		//System.out.println("Table");
+		//System.out.println(op.toString());
 		//debug
 		
 		return tmp;

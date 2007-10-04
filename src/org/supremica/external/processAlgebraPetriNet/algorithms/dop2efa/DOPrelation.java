@@ -13,20 +13,20 @@ import java.util.List;
 import org.supremica.manufacturingTables.xsd.processeditor.*;
 
 public class DOPrelation extends DOPnative{
-	
-	
-	
-	
-	//
-	// Relation function code
-	//
-	protected static void relation(Relation r,EFA efa){
-		if(RelationType.SEQUENCE.equals(r.getType())){
-			sequence(r, "start_", "end_", efa);
-		}else if(RelationType.ALTERNATIVE.equals(r.getType())){
-			alternative(r, "start_", "end_", efa);
-		}else if(RelationType.PARALLEL.equals(r.getType())){
-			parallel(r,"", efa.getModule());
+	/**
+	 * 
+	 * @param relation
+	 * @param efa
+	 */
+	protected static void relation(Relation relation,EFA efa){
+		if(RelationType.SEQUENCE.equals(relation.getType())){
+			sequence(relation, "start_", "end_", efa);
+		}else if(RelationType.ALTERNATIVE.equals(relation.getType())){
+			alternative(relation, "start_", "end_", efa);
+		}else if(RelationType.PARALLEL.equals(relation.getType())){
+			parallel(relation,"", efa.getModule());
+		}else if(RelationType.ARBITRARY.equals(relation.getType())){
+			arbitrary(relation,"", efa.getModule());
 		}
 	}
 	
@@ -104,7 +104,9 @@ public class DOPrelation extends DOPnative{
 				//take care of different nodes here
 				if(RelationType.SEQUENCE.equals(((Relation)o).getType())){
 					
+					/*--------------------*/
 					/* Sequence node code */
+					/*--------------------*/
 					
 					if(myActivityList.size() > 0){
 						tmp = efa.newUniqueState();
@@ -126,7 +128,10 @@ public class DOPrelation extends DOPnative{
 					
 				}else if(RelationType.ALTERNATIVE.equals(((Relation)o).getType())){
 					
+					/*-----------------------*/
 					/* Alternative node code */
+					/*-----------------------*/
+					
 					if(myActivityList.size() > 0){
 						tmp = efa.newUniqueState();
 						nativeSequence(myActivityList,myLastState,tmp,efa);
@@ -145,7 +150,10 @@ public class DOPrelation extends DOPnative{
 					
 				}else if(RelationType.PARALLEL.equals(((Relation)o).getType())){
 					
+					/*--------------------*/
 					/* Parallel node code */
+					/*--------------------*/
+					
 					Module m = efa.getModule();
 					String var_name;
 					
@@ -155,6 +163,10 @@ public class DOPrelation extends DOPnative{
 					parallel((Relation)o,var_name,m);
 				}else if(RelationType.ARBITRARY.equals(((Relation)o).getType())){
 					
+					/*--------------------*/
+					/* Arbitrary node code*/
+					/*--------------------*/
+					
 					Module m = efa.getModule();
 					String var_name;
 					
@@ -162,6 +174,7 @@ public class DOPrelation extends DOPnative{
 					
 					//build arbitrary
 					arbitrary((Relation)o,var_name,m);
+					
 				}else{
 					/* Unknown node type */
 					System.err.println("Unknown RelationType " + ((Relation)o).getType());
@@ -252,19 +265,29 @@ public class DOPrelation extends DOPnative{
 				//take care of different nodes here
 				if(RelationType.SEQUENCE.equals(((Relation)o).getType())){
 					
+					/*--------------------*/
 					/* Sequence node code */
+					/*--------------------*/
+					
 					nativeAlternative(myActivityList,from,to,efa);
 					myActivityList.clear();
 
 					sequence((Relation)o, from, to, efa);
 					
 				}else if(RelationType.ALTERNATIVE.equals(((Relation)o).getType())){
+					
+					/*-----------------------*/
 					/* Alternative node code */
+					/*-----------------------*/
 					//recursion
 					alternative((Relation)o, from, to, efa);
+					
 				}else if(RelationType.PARALLEL.equals(((Relation)o).getType())){
 					
+					/*--------------------*/
 					/* Parallel node code */
+					/*--------------------*/
+					
 					Module m = efa.getModule();
 					String var_name;
 					ObjectFactory factory = new ObjectFactory();
@@ -286,7 +309,10 @@ public class DOPrelation extends DOPnative{
 					parallel((Relation)o,var_name,m);
 				}else if(RelationType.ARBITRARY.equals(((Relation)o).getType())){
 					
+					/*---------------------------*/
 					/* Arbitrary order node code */
+					/*---------------------------*/
+					
 					Module m = efa.getModule();
 					String var_name;
 					ObjectFactory factory = new ObjectFactory();
@@ -329,7 +355,13 @@ public class DOPrelation extends DOPnative{
 		}
 	}
 	
-	
+	/**
+	 * 
+	 * @param activityList
+	 * @param relation
+	 * @param efa
+	 * @return
+	 */
 	private static String addWaitForNodeToFinish(List<Activity> activityList,
 												 Relation relation, EFA efa){
 		
@@ -373,6 +405,7 @@ public class DOPrelation extends DOPnative{
 		/* add Activity who wait for node to finish*/
 		activityList.add(stop_par);
 		
+		//return the variable name assigned to this node
 		return var_name;
 	}
 	
@@ -386,8 +419,8 @@ public class DOPrelation extends DOPnative{
 	 */
 	protected static void parallel(Relation r, String parallel_var, Module m){
 		
-		final String firstState = "waiting";
-		final String lastState = "finished";
+		final String FIRST_STATE = "waiting";
+		final String LAST_STATE = "finished";
 		
 		String startGuard = "";
 		String stopGuard = "", stopAction = "";
@@ -439,8 +472,8 @@ public class DOPrelation extends DOPnative{
 			tmp = new EFA(parallel_track,m);
 			m.addAutomaton(tmp);
 			
-			tmp.addInitialState(firstState);
-			tmp.addState(lastState);
+			tmp.addInitialState(FIRST_STATE);
+			tmp.addState(LAST_STATE);
 			
 			if(activityRelations[i] instanceof Relation){
 				String start;
@@ -475,7 +508,7 @@ public class DOPrelation extends DOPnative{
 				seq.getActivityRelationGroup().add(stop_par);
 				
 				//build sequence
-				sequence(seq,firstState,lastState,tmp);
+				sequence(seq,FIRST_STATE,LAST_STATE,tmp);
 				
 			}else if(activityRelations[i] instanceof Activity){
 				
@@ -487,7 +520,7 @@ public class DOPrelation extends DOPnative{
 				pga.setStopGuard(stopGuard);
 				pga.setStopAction(stopAction);
 				
-				nativeProcess(pga,firstState,lastState,tmp);
+				nativeProcess(pga,FIRST_STATE,LAST_STATE,tmp);
 			}else{
 				System.err.println("Unknown objekt " + activityRelations[i]);
 			}
@@ -504,8 +537,8 @@ public class DOPrelation extends DOPnative{
 	 */
 	protected static void arbitrary(Relation r, String arbitraryNode_var, Module m){
 		
-		final String firstState = "waiting";
-		final String lastState = "finished";
+		final String FIRST_STATE = "waiting";
+		final String LAST_STATE = "finished";
 		
 		String startGuard = "", startAction = ""; 
 		String stopGuard = "", stopAction = "";
@@ -562,8 +595,8 @@ public class DOPrelation extends DOPnative{
 			tmp = new EFA(parallel_track,m);
 			m.addAutomaton(tmp);
 			
-			tmp.addInitialState(firstState);
-			tmp.addState(lastState);
+			tmp.addInitialState(FIRST_STATE);
+			tmp.addState(LAST_STATE);
 			
 			if(activityRelations[i] instanceof Relation){
 				String start;
@@ -599,7 +632,7 @@ public class DOPrelation extends DOPnative{
 				seq.getActivityRelationGroup().add(stop_par);
 				
 				//build sequence
-				sequence(seq,firstState,lastState,tmp);
+				sequence(seq,FIRST_STATE,LAST_STATE,tmp);
 				
 			}else if(activityRelations[i] instanceof Activity){
 				
@@ -612,7 +645,7 @@ public class DOPrelation extends DOPnative{
 				pga.setStopGuard(stopGuard);
 				pga.setStopAction(stopAction);
 				
-				nativeProcess(pga,firstState,lastState,tmp);
+				nativeProcess(pga,FIRST_STATE,LAST_STATE,tmp);
 			}else{
 				System.err.println("Unknown objekt " + activityRelations[i]);
 			}
