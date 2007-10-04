@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.log
 //# CLASS:   LoggerFactory
 //###########################################################################
-//# $Id: LoggerFactory.java,v 1.19 2007-08-21 03:43:42 robi Exp $
+//# $Id: LoggerFactory.java,v 1.20 2007-10-04 20:44:40 robi Exp $
 //###########################################################################
 
 /*
@@ -115,7 +115,7 @@ public class LoggerFactory
     
     public Logger createLoggerFor(final Class clazz)
     {
-        return createLogger(clazz.getName());
+        return createLoggerFor(clazz.getName());
     }
     
     public Logger createLoggerFor(final String name)
