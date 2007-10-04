@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.gui
 //# CLASS:   PropertiesDialog
 //###########################################################################
-//# $Id: PropertiesDialog.java,v 1.16 2007-08-21 00:03:16 robi Exp $
+//# $Id: PropertiesDialog.java,v 1.17 2007-10-04 15:14:56 flordal Exp $
 //###########################################################################
 
 /*
@@ -77,7 +77,7 @@ import org.supremica.properties.DoubleProperty;
 import org.supremica.properties.IntegerProperty;
 import org.supremica.properties.Property;
 import org.supremica.properties.PropertyType;
-import org.supremica.properties.StringProperty;
+import org.supremica.properties.ObjectProperty;
 import org.supremica.properties.SupremicaProperties;
 
 
@@ -126,7 +126,8 @@ public class PropertiesDialog
             */
 
             // Find all properties of this type and add to the panel
-            for (final Property property : Property.getAllProperties()) {
+            for (final Property property : Property.getAllProperties())
+            {
                 // I only want properties of the current type
                 if (property.getPropertyType() == type)
                 {
@@ -152,9 +153,9 @@ public class PropertiesDialog
                         chooserList.add(chooser);
                         panel.add(chooser);
                     }
-                     else if (property instanceof StringProperty)
+                    else if (property instanceof ObjectProperty)
                     {
-                        StringChooser chooser = new StringChooser((StringProperty) property);
+                        StringChooser chooser = new StringChooser((ObjectProperty) property);
                         chooser.setEnabled(!property.isImmutable());
                         chooserList.add(chooser);
                         panel.add(chooser);
@@ -264,8 +265,7 @@ public class PropertiesDialog
         
         // The old BDD options (Arash's) are treated specially. They method still use integer variables
         // in BDD.Options instead of the Config-values. The BDD.Options values are updated by the 
-        // SupremicaProperties.saveProperties()-method (which is run after successfully running this method).
-        
+        // SupremicaProperties.saveProperties()-method (which is run after successfully running this method).        
         return true;
     }
     
@@ -479,6 +479,7 @@ public class PropertiesDialog
             text.setText(""+property.get());
         }
     }
+    
     /**
      * Chooser for StringProperty:s. If the StringProperty has a set of legal values, 
      * this becomes a JComboBox with those as choices, otherwise this becomes an 
@@ -488,12 +489,12 @@ public class PropertiesDialog
         extends JPanel
         implements Chooser
     {
-        private final StringProperty property;
+        private final ObjectProperty property;
         
         private JTextField text = null;
         private JComboBox selector = null;
                 
-        StringChooser(StringProperty property)
+        StringChooser(ObjectProperty property)
         {
             super();
             this.property = property;
@@ -503,12 +504,12 @@ public class PropertiesDialog
             if (property.legalValues() == null)
             {
                 text = new JTextField();
-                text.setColumns(Math.max(property.get().length()+1,5));
+                text.setColumns(Math.max(property.get().toString().length()+1,5));
                 this.add(text);
             }
             else
             {
-                selector = new JComboBox(property.legalValuesAsStrings());
+                selector = new JComboBox(property.legalValues());
                 if (property.get() != null)
                 {
                     selector.setSelectedItem(property.get());
@@ -538,7 +539,7 @@ public class PropertiesDialog
         public void getFromConfig()
         {
             if (text != null)
-                text.setText(property.get());
+                text.setText(property.getAsString());
             else
                 selector.setSelectedItem(property.get());
         }

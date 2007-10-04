@@ -23,7 +23,7 @@
  * into commercial products or to use it for commercial
  * purposes should contact:
  *
- * Knut Akesson (KA), knut@supremica.org
+ * Knut Akesson (KA), knut@supremica.orgex
  * Supremica,
  * Knarrhogsgatan 10
  * SE-431 60 MOLNDAL

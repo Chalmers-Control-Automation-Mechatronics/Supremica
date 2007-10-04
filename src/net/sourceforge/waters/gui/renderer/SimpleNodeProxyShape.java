@@ -2,7 +2,6 @@ package net.sourceforge.waters.gui.renderer;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
-import java.awt.Point;
 
 import java.awt.geom.Arc2D;
 import java.awt.geom.GeneralPath;
@@ -23,6 +22,7 @@ import net.sourceforge.waters.model.module.EventDeclProxy;
 import net.sourceforge.waters.model.module.IdentifierProxy;
 import net.sourceforge.waters.model.module.ModuleProxy;
 import net.sourceforge.waters.model.module.SimpleNodeProxy;
+import org.supremica.properties.Config;
 
 public class SimpleNodeProxyShape
     extends AbstractProxyShape
@@ -46,12 +46,25 @@ public class SimpleNodeProxyShape
         }
         else
         {
-            for (Color c : mColors)
+            // Draw marking
+            if (layoutMode.equals(Config.LAYOUT_MODE_LEGALVALUES.ChalmersIDES))
             {
-                arc = new Arc2D.Double(rect, i, degrees, Arc2D.PIE);
-                g.setColor(c);
-                g.fill(arc);
-                i += degrees;
+                // CHALMERS IDES MODE---SINGLE TYPE OF MARKING, DOUBLE CIRCLES
+                g.setColor(EditorColor.DEFAULTCOLOR);
+                arc = new Arc2D.Double(rect.getX()+2, rect.getY()+2, rect.getWidth()-4.1, rect.getHeight()-4.1, 0, 360, Arc2D.OPEN);
+                g.draw(arc);
+                //g.drawOval((int) rect.getX()+2, (int) rect.getY()+2, (int) (rect.getWidth()-4), (int) (rect.getHeight()-4));
+            }
+            else
+            {
+                // DEFAULT MODE
+                for (Color c : mColors)
+                {
+                    arc = new Arc2D.Double(rect, i, degrees, Arc2D.PIE);
+                    g.setColor(c);
+                    g.fill(arc);
+                    i += degrees;
+                }
             }
         }
         
@@ -69,7 +82,6 @@ public class SimpleNodeProxyShape
         
         // Cross out if forbidden
         if (isForbidden)
-        //if (false)
         {
             g.setColor(EditorColor.ERRORCOLOR);
             g.setStroke(DOUBLESTROKE);
@@ -79,7 +91,7 @@ public class SimpleNodeProxyShape
     }
     
     /**
-     * Updates the color set of marked nodes (I think).
+     * I think this method updates the set of colors used (if this is a marked node).
      */
     private void updateColors()
     {
@@ -130,7 +142,7 @@ public class SimpleNodeProxyShape
         mModule = module;
         Point2D p = getProxy().getPointGeometry().getPoint();
         Rectangle2D rect = new Rectangle2D.Double(p.getX() - RADIUS, p.getY() - RADIUS,
-            WIDTH, WIDTH);
+            DIAMETER, DIAMETER);
         
         //mShape = new Arc2D.Double(rect, 0, 360, Arc2D.OPEN);
         nodeCircleShape = new Arc2D.Double(rect, 0, 360, Arc2D.OPEN);
@@ -175,7 +187,17 @@ public class SimpleNodeProxyShape
     private final Arc2D nodeCircleShape;
     private final GeneralPath mShape; // To incorporate the initial state arrow    
     
-    public static int RADIUS = 6;
-    public static int WIDTH = RADIUS * 2;
-    private static Color FILLCOLOR = Color.WHITE;
+    /** Node radius. */
+    public static final int RADIUS;// 6
+    static
+    {
+        if (Config.GUI_EDITOR_LAYOUT_MODE.get().equals(Config.LAYOUT_MODE_LEGALVALUES.ChalmersIDES))
+            RADIUS = 10;
+        else
+            RADIUS = 6;
+    };
+    public static final int DIAMETER = RADIUS * 2;
+    private static final Color FILLCOLOR = Color.WHITE;
+    
+    private static final Object layoutMode = Config.GUI_EDITOR_LAYOUT_MODE.get();
 }

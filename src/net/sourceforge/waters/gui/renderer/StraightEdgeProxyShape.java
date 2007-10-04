@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui.renderer
 //# CLASS:   StraightEdgeProxyShape
 //###########################################################################
-//# $Id: StraightEdgeProxyShape.java,v 1.2 2007-05-18 15:42:02 robi Exp $
+//# $Id: StraightEdgeProxyShape.java,v 1.3 2007-10-04 15:14:56 flordal Exp $
 //###########################################################################
 
 package net.sourceforge.waters.gui.renderer;
@@ -55,7 +55,7 @@ class StraightEdgeProxyShape
     } else if (!isInClickBounds(x, y)) {
       return false;
     } else {
-      return mLine.ptLineDistSq(x, y) <= EdgeProxyShape.CLICK_TOLERANCE2;
+      return mLine.ptLineDistSq(x, y) <= EdgeProxyShape.CLICK_TOLERANCE_SQ;
     }
   }
 

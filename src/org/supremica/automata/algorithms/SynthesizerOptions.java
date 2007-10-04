@@ -76,7 +76,14 @@ public final class SynthesizerOptions
      */
     public SynthesizerOptions()
     {
-        this(SynthesisType.fromDescription(Config.SYNTHESIS_SYNTHESIS_TYPE.get()), SynthesisAlgorithm.fromDescription(Config.SYNTHESIS_ALGORITHM_TYPE.get()), Config.SYNTHESIS_PURGE.get(), Config.SYNTHESIS_OPTIMIZE.get(), Config.SYNTHESIS_MAXIMALLY_PERMISSIVE.get(), Config.SYNTHESIS_MAXIMALLY_PERMISSIVE_INCREMENTAL.get(), Config.SYNTHESIS_REDUCE_SUPERVISORS.get(), Config.BDD_SYNTHESIS_EXTRACT_AUTOMATON.get());
+        this((SynthesisType) Config.SYNTHESIS_SYNTHESIS_TYPE.get(),
+            (SynthesisAlgorithm) Config.SYNTHESIS_ALGORITHM_TYPE.get(),
+            Config.SYNTHESIS_PURGE.get(),
+            Config.SYNTHESIS_OPTIMIZE.get(),
+            Config.SYNTHESIS_MAXIMALLY_PERMISSIVE.get(),
+            Config.SYNTHESIS_MAXIMALLY_PERMISSIVE_INCREMENTAL.get(),
+            Config.SYNTHESIS_REDUCE_SUPERVISORS.get(),
+            Config.BDD_SYNTHESIS_EXTRACT_AUTOMATON.get());
     }
 
     /**

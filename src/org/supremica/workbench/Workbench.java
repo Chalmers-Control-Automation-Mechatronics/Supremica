@@ -460,7 +460,7 @@ class CompareButton
                     // coincides with the normalized name (omg that would be stupid)) since we've
                     // normalized the names above!))
                     String name = state.getName();
-                    name = name.substring(0, name.lastIndexOf(Config.GENERAL_STATE_SEPARATOR.get()));
+                    name = name.substring(0, name.lastIndexOf(Config.GENERAL_STATE_SEPARATOR.getAsString()));
                     // Find this state in automaton
                     State s = wb.automaton.getStateWithName(name);
                     s.setForbidden(true);

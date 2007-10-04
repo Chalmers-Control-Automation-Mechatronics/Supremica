@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui.renderer
 //# CLASS:   GeometryTools
 //###########################################################################
-//# $Id: GeometryTools.java,v 1.18 2007-05-27 16:30:06 robi Exp $
+//# $Id: GeometryTools.java,v 1.19 2007-10-04 15:14:56 flordal Exp $
 //###########################################################################
 
 package net.sourceforge.waters.gui.renderer;
@@ -614,8 +614,8 @@ public final class GeometryTools
     final Point2D center = getPosition(node);
     final double dx = normdir.getX();
     final double dy = normdir.getY();
-    final double x = center.getX() + SimpleNodeProxyShape.RADIUS * dx;
-    final double y = center.getY() + SimpleNodeProxyShape.RADIUS * dy;
+    final double x = center.getX() + (SimpleNodeProxyShape.RADIUS) * dx;
+    final double y = center.getY() + (SimpleNodeProxyShape.RADIUS) * dy;
     return new Point2D.Double(x, y);
   }
 

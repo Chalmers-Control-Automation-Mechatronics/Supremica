@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.properties
 //# CLASS:   SupremicaProperties
 //###########################################################################
-//# $Id: SupremicaProperties.java,v 1.110 2007-08-21 00:03:16 robi Exp $
+//# $Id: SupremicaProperties.java,v 1.111 2007-10-04 15:14:56 flordal Exp $
 //###########################################################################
 
 /*
@@ -271,7 +271,7 @@ public final class SupremicaProperties
             Options.dssi_heuristics = indexOf(Config.BDD_DSSI_HEURISTIC.get(), Options.DSSI_HEURISTIC_NAMES);
             Options.max_partition_size = Config.BDD_PARTITION_MAX.get();
             Options.encoding_algorithm = indexOf(Config.BDD_ENCODING_ALGO.get(), Options.ENCODING_NAMES);
-            Options.extraLibPath = Config.BDD_LIB_PATH.get();
+            Options.extraLibPath = Config.BDD_LIB_PATH.getAsString();
             Options.sup_reachability_type = indexOf(Config.BDD_SUP_REACHABILITY.get(), Options.SUP_REACHABILITY_NAMES);
             Options.interleaved_variables = Config.BDD_INTERLEAVED_VARIABLES.get();
             Options.show_level_graph = Config.BDD_LEVEL_GRAPHS.get();
@@ -281,7 +281,7 @@ public final class SupremicaProperties
     /**
      * Returns the index of object in objects. For the BDD options.
      */
-    private static int indexOf(String object, String[] objects)
+    private static int indexOf(Object object, Object[] objects)
     {
         for (int i=0; i< objects.length; i++)
         {

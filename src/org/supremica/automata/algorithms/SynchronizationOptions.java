@@ -110,8 +110,8 @@ public final class SynchronizationOptions
 		this.requireConsistentControllability = true;
 		this.requireConsistentImmediate = true;
 		this.rememberDisabledEvents = false;
-		this.automatonNameSeparator = Config.SYNC_AUTOMATON_NAME_SEPARATOR.get();
-		this.stateNameSeparator = Config.GENERAL_STATE_SEPARATOR.get();
+		this.automatonNameSeparator = Config.SYNC_AUTOMATON_NAME_SEPARATOR.getAsString();
+		this.stateNameSeparator = Config.GENERAL_STATE_SEPARATOR.getAsString();
 	}
 
 	public void setDialogOK(boolean bool)

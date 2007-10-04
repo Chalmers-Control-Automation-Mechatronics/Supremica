@@ -60,8 +60,8 @@ public class AutomatonSplit
     private static Logger logger = LoggerFactory.createLogger(AutomatonSplit.class);
     
     /**
-     * Splits automaton in two (experimental).
-     * @return an automata containing parts of the split or null if the operation failed.
+     * Decomposes automaton into two automata (experimental).
+     * @return an automata containing parts that when composed give the original or null if the operation failed.
      */
     public static Automata split(Automaton original)
     {
@@ -78,6 +78,7 @@ public class AutomatonSplit
         
         try
         {
+            int bestResult = Integer.MAX_VALUE;
             for (Iterator<LabeledEvent> evIt = original.eventIterator(); evIt.hasNext(); )
             {
                 // Remove one event from A's alphabet
@@ -102,17 +103,19 @@ public class AutomatonSplit
                                                 bestValue = value;
                                 }
                                  */
-                if ((splitA.nbrOfEvents() == 0) || (splitB.nbrOfEvents() == 0))
+                if (!(splitA.nbrOfEvents() == 0) || (splitB.nbrOfEvents() == 0))
                 {
-                    continue;
+                    int states = splitA.nbrOfStates() + splitB.nbrOfStates();
+                    if (states < bestResult)
+                    {
+                        bestResult = states;
+                        split.clear();
+                        splitA.setComment(original.getName() + "_A");
+                        splitB.setComment(original.getName() + "_B");
+                        split.addAutomaton(splitA);
+                        split.addAutomaton(splitB);
+                    }
                 }
-                
-                splitA.setComment(original.getName() + "_A");
-                splitB.setComment(original.getName() + "_B");
-                split.addAutomaton(splitA);
-                split.addAutomaton(splitB);
-                
-                break;
             }
         }
         catch (Exception ex)
@@ -204,7 +207,7 @@ public class AutomatonSplit
              
                                         // Merge states in transition, make selfloop
                                         Automaton reduction = removeTransition(result, arc);
-                         
+             
                                         // Have we removed something vital? (If not, that's good!)
                                         Automata automataA = new Automata();
                                         automataA.addAutomaton(reduction);
@@ -215,7 +218,7 @@ public class AutomatonSplit
                                                 result = reduction;
                                         }
                         }
-                         */
+             */
         }
         catch (Exception ex)
         {

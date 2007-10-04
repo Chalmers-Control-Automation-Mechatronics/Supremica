@@ -69,7 +69,7 @@ public class BDDTransitionFactory
     
     public BDDTransitions createTransitions()
     {
-        BDDPartitioningType partitioningType = BDDPartitioningType.fromDescription(Config.BDD2_PARTITIONING.get());
+        BDDPartitioningType partitioningType = BDDPartitioningType.fromDescription(Config.BDD2_PARTITIONING.getAsString());
         
         if (partitioningType == BDDPartitioningType.MONOLITHIC)
         {

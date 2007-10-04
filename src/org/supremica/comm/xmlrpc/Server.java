@@ -136,7 +136,7 @@ public class Server
         else
             throw new Exception("Bad input to constructor.");
 
-        String filter = Config.XML_RPC_FILTER.get();
+        String filter = Config.XML_RPC_FILTER.getAsString();
         
         theServer = new WebServer(port);
         

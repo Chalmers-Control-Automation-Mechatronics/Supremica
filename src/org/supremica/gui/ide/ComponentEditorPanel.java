@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.gui.ide
 //# CLASS:   ComponentEditorPanel
 //###########################################################################
-//# $Id: ComponentEditorPanel.java,v 1.51 2007-09-25 18:22:37 knut Exp $
+//# $Id: ComponentEditorPanel.java,v 1.52 2007-10-04 15:14:56 flordal Exp $
 //###########################################################################
 
 
@@ -41,6 +41,7 @@ import net.sourceforge.waters.gui.command.UndoInterface;
 import net.sourceforge.waters.gui.renderer.GeometryAbsentException;
 import net.sourceforge.waters.gui.renderer.Handle;
 import net.sourceforge.waters.gui.renderer.ProxyShapeProducer;
+import net.sourceforge.waters.gui.renderer.SimpleNodeProxyShape;
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.module.BinaryExpressionProxy;
 import net.sourceforge.waters.model.module.BoxGeometryProxy;
@@ -49,7 +50,6 @@ import net.sourceforge.waters.model.module.EventDeclProxy;
 import net.sourceforge.waters.model.module.GroupNodeProxy;
 import net.sourceforge.waters.model.module.GuardActionBlockProxy;
 import net.sourceforge.waters.model.module.IdentifierProxy;
-import net.sourceforge.waters.model.module.IndexedIdentifierProxy;
 import net.sourceforge.waters.model.module.NodeProxy;
 import net.sourceforge.waters.model.module.SimpleExpressionProxy;
 import net.sourceforge.waters.model.module.SimpleNodeProxy;
@@ -60,8 +60,8 @@ import net.sourceforge.waters.subject.module.SimpleIdentifierSubject;
 
 import org.supremica.log.Logger;
 import org.supremica.log.LoggerFactory;
-import org.supremica.gui.FileDialogs;
 import org.supremica.gui.GraphicsToClipboard;
+import org.supremica.properties.Config;
 
 /**
  * A Swing component for editing a Waters graph.
@@ -343,7 +343,6 @@ public class ComponentEditorPanel
             double[] boundingBoxLimits = new double[]{(new java.awt.print.Paper()).getWidth(), (new java.awt.print.Paper()).getHeight(), 0, 0};
 
             // This is somewhat ugly
-            final int NODE_RADIUS = 6; // The radius of the states
             final double MARKING_GREY_SCALE = 0.5; // The grayscale level of the marked states
 
             // Open a file chooser in the location of the modelfile,
@@ -419,6 +418,7 @@ public class ComponentEditorPanel
             w.write("\tlineto\n");
             w.write("\tclosepath\n");
             w.write("\tfill\n");
+            w.write("\tstroke\n");
             w.write("} def\n");
             w.newLine();
 
@@ -428,6 +428,7 @@ public class ComponentEditorPanel
             w.newLine();
 
             w.write("/edge {\n");
+            w.write("0.25 setlinewidth\n");
             w.write("\tnewpath\n");
             w.write("\t6 -2 roll moveto\n");
             w.write("\tcurrentpoint 6 2 roll curveto\n");
@@ -468,25 +469,45 @@ public class ComponentEditorPanel
 
             // Useful functions are defined and added to the eps-file
             w.write("/loopArrow {\n");
-            w.write("\tarrowHead\n");
+            w.write("\td\n");
             w.write("\tloop\n");
             w.write("} def\n");
             w.newLine();
 
-            w.write("/markedState {\n");
-            w.write("\tnewpath\n");
-            w.write("\t" + NODE_RADIUS + " 0 360 arc\n");
-            w.write("\tgsave\n");
-            w.write("\t" + MARKING_GREY_SCALE + " setgray\n");
-            w.write("\tfill\n");
-            w.write("\tgrestore\n");
-            w.write("\tstroke\n");
-            w.write("} def\n");
-            w.newLine();
+            if (Config.GUI_EDITOR_LAYOUT_MODE.get().equals(Config.LAYOUT_MODE_LEGALVALUES.ChalmersIDES))
+            {
+                // DOUBLE CIRCLES FOR MARKING
+                w.write("/markedState {\n");
+                w.write("0.75 setlinewidth\n");
+                w.write("\t2 copy\n");
+                w.write("\tnewpath\n");
+                w.write("\t" + SimpleNodeProxyShape.RADIUS + " 0 360 arc\n");
+                w.write("\tstroke\n");
+                w.write("\tnewpath\n");
+                w.write("\t" + (SimpleNodeProxyShape.RADIUS-2) + " 0 360 arc\n");
+                w.write("\tstroke\n");
+                w.write("} def\n");
+                w.newLine();
+            }
+            else
+            {
+                // DEFAULT
+                w.write("/markedState {\n");
+                w.write("\tnewpath\n");
+                w.write("\t" + SimpleNodeProxyShape.RADIUS + " 0 360 arc\n");
+                w.write("\tgsave\n");
+                w.write("\t" + MARKING_GREY_SCALE + " setgray\n");
+                w.write("\tfill\n");
+                w.write("\tgrestore\n");
+                w.write("\tstroke\n");
+                w.write("} def\n");
+                w.newLine();
+            }
 
             w.write("/state {\n");
+            w.write("0.75 setlinewidth\n");
             w.write("\tnewpath\n");
-            w.write("\t" + NODE_RADIUS + " 0 360 arc\n");
+            w.write("\t" + SimpleNodeProxyShape.RADIUS + " 0 360 arc\n");
             w.write("\tstroke\n");
             w.write("} def\n");
             w.newLine();
@@ -506,6 +527,7 @@ public class ComponentEditorPanel
             w.newLine();
 
             w.write("/straightEdge {\n");
+            w.write("0.25 setlinewidth\n");
             w.write("\tnewpath\n");
             w.write("\tmoveto\n");
             w.write("\tlineto\n");
@@ -594,7 +616,7 @@ public class ComponentEditorPanel
                     // Create bounds for the state, at a small distance (PADDING)
                     // outside the state circle and update the bounding box
                     final int PADDING = 0;
-                    Rectangle2D stateBounds = new Rectangle2D.Double(centerPoint.getX() - NODE_RADIUS - PADDING, centerPoint.getY() - NODE_RADIUS - PADDING, 2*(NODE_RADIUS + PADDING), 2*(NODE_RADIUS + PADDING));
+                    Rectangle2D stateBounds = new Rectangle2D.Double(centerPoint.getX() - SimpleNodeProxyShape.RADIUS - PADDING, centerPoint.getY() - SimpleNodeProxyShape.RADIUS - PADDING, 2*(SimpleNodeProxyShape.RADIUS + PADDING), 2*(SimpleNodeProxyShape.RADIUS + PADDING));
                     boundingBoxLimits = updateBoundingBoxLimits(boundingBoxLimits, stateBounds, null);
 
                     // If current state is initial, add the initial (straight) arrow to the eps-file

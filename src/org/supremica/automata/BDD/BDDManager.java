@@ -66,7 +66,7 @@ public class BDDManager
     
     public BDDManager()
     {
-        this(BDDLibraryType.fromDescription(Config.BDD2_BDDLIBRARY.get()));
+        this(BDDLibraryType.fromDescription(Config.BDD2_BDDLIBRARY.getAsString()));
     }
     
     public BDDManager(BDDLibraryType bddpackage)

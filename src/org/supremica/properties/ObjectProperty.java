@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.properties
 //# CLASS:   StringProperty
 //###########################################################################
-//# $Id: StringProperty.java,v 1.5 2007-08-21 03:43:42 robi Exp $
+//# $Id: ObjectProperty.java,v 1.1 2007-10-04 15:14:56 flordal Exp $
 //###########################################################################
 
 /*
@@ -57,53 +57,73 @@
  */
 package org.supremica.properties;
 
-public class StringProperty
+public class ObjectProperty
     extends Property
 {
     private String defaultValue;
-    private String mValue;
+    private Object mValue;
     private Object[] legalValues;
-    boolean ignoreCase = false;
     
-    public StringProperty(PropertyType type, String key, Object value, String comment)
+    public ObjectProperty(PropertyType type, String key, Object value, String comment)
     {
         this(type, key, value, comment, null);
     }
     
-    public StringProperty(PropertyType type, String key, Object value, String comment, Object[] legalValues)
+    public ObjectProperty(PropertyType type, String key, Object value, String comment, Object[] legalValues)
     {
         this(type, key, value, comment, legalValues, false);
     }
     
-    public StringProperty(PropertyType type, String key, Object value, String comment, Object[] legalValues, boolean immutable)
-    {
-        this(type, key, value, comment, legalValues, immutable, false);
-    }
-    
-    public StringProperty(PropertyType type, String key, Object value, String comment, Object[] legalValues, boolean immutable, boolean ignoreCase)
+    public ObjectProperty(PropertyType type, String key, Object value, String comment, Object[] legalValues, boolean immutable)
     {
         super(type, key, comment, immutable);
         this.defaultValue = value.toString();
         mValue = value.toString();
         this.legalValues = legalValues;
-        this.ignoreCase = ignoreCase;
     }
     
-    public String get()
+    public Object get()
     {
         return mValue;
     }
     
     public void set(final String value)
     {
-        checkMutable();
+        final Object oldvalue = mValue;
+        set(parseObject(value));
+        firePropertyChanged(oldvalue.toString());
+    }
+   
+    public void set(final Object value)
+    {
         checkValid(value);
-        final String oldvalue = mValue;
+        checkMutable();
         mValue = value;
-        firePropertyChanged(oldvalue);
+    }
+        
+    /**
+     * Parses a String.
+     */
+    private Object parseObject(String value)
+    {
+        if (legalValues != null)
+        {
+            for (Object object: legalValues)
+            {
+                if (object.toString().equals(value))
+                {
+                    return object;
+                }
+            }
+            return null;
+        }
+        else
+        {
+            return value;
+        }
     }
     
-    public boolean isValid(String value)
+    public boolean isValid(Object value)
     {
         if (value == null)
         {
@@ -115,25 +135,15 @@ public class StringProperty
         }
         for (int i = 0; i < legalValues.length; i++)
         {
-            if (!ignoreCase)
+            if (value.equals(legalValues[i]))
             {
-                if (value.equals(legalValues[i].toString()))
-                {
-                    return true;
-                }
-            }
-            else
-            {
-                if (value.equalsIgnoreCase(legalValues[i].toString()))
-                {
-                    return true;
-                }
+                return true;
             }
         }
         return false;
     }
 
-    public void checkValid(final String value)
+    public void checkValid(final Object value)
     {
         if (!isValid(value)) {
             throw new IllegalArgumentException
@@ -157,26 +167,19 @@ public class StringProperty
         return legalValuesAsStrings;        
     }
     
-    public String valueToString()
+    public String getAsString()
     {
-        return get();
+        return get().toString();
     }
     
     public String valueToEscapedString()
     {
-        return StringProperty.convert(get(), false);
+        return ObjectProperty.convert(get().toString(), false);
     }
     
     public boolean currentValueDifferentFromDefaultValue()
     {
-        if (!ignoreCase)
-        {
-            return !defaultValue.equals(mValue);
-        }
-        else
-        {
-            return !defaultValue.equalsIgnoreCase(mValue);
-        }
+        return !defaultValue.equals(mValue);
     }
     
     // --------------------------------------------------------------

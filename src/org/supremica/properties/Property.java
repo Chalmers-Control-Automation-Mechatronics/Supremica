@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.properties
 //# CLASS:   Property
 //###########################################################################
-//# $Id: Property.java,v 1.5 2007-08-21 03:43:42 robi Exp $
+//# $Id: Property.java,v 1.6 2007-10-04 15:14:56 flordal Exp $
 //###########################################################################
 
 /*
@@ -116,7 +116,7 @@ public abstract class Property
 
     public String valueToEscapedString()
     {
-        return valueToString();
+        return getAsString();
     }
 
 
@@ -124,7 +124,7 @@ public abstract class Property
     //# General Object Handling
     public final String toString()
     {
-        return getFullKey() + " " + valueToString();
+        return getFullKey() + " " + getAsString();
     }
 
     /*
@@ -145,11 +145,12 @@ public abstract class Property
     //# Assignment
     protected void checkMutable()
     {
-        if (isImmutable()) {
+        if (isImmutable())
+        {
             throw new IllegalStateException
                 ("Property " + getFullKey() +
-                 " is immutable, calling the set() method is illegal!");
-		}			
+                " is immutable, calling the set() method is illegal!");
+        }
     }
 
 
@@ -175,12 +176,12 @@ public abstract class Property
         }
     }
 
-    protected void firePropertyChanged(final String oldvalue)
+    protected void firePropertyChanged(final Object oldvalue)
     {
         if (mListeners != null) {
-            final String newvalue = valueToString();
+            final String newvalue = getAsString();
             final SupremicaPropertyChangeEvent event =
-                new SupremicaPropertyChangeEvent(this, oldvalue, newvalue);
+                new SupremicaPropertyChangeEvent(this, oldvalue.toString(), newvalue);
             final List<SupremicaPropertyChangeListener> copy =
                 new ArrayList<SupremicaPropertyChangeListener>(mListeners);
             for (final SupremicaPropertyChangeListener listener : copy) {
@@ -194,7 +195,7 @@ public abstract class Property
     //# Provided by Subclasses
     public abstract void set(String value);
 
-    public abstract String valueToString();
+    public abstract String getAsString();
 
     public abstract boolean currentValueDifferentFromDefaultValue();
 

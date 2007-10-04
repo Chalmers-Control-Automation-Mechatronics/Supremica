@@ -1627,7 +1627,7 @@ public class Automaton
         if (!preserveControllability)
         {
             // Get/create silent event tau
-            String silentName = Config.MINIMIZATION_SILENT_EVENT_NAME.get();
+            String silentName = Config.MINIMIZATION_SILENT_EVENT_NAME.getAsString();
             LabeledEvent tau = getAlphabet().getEvent(silentName);
             if (tau == null)
             {
@@ -1672,7 +1672,7 @@ public class Automaton
         {
             // Get/create silent events tau_c and tau_u
             // tau_c
-            String silentCName = Config.MINIMIZATION_SILENT_CONTROLLABLE_EVENT_NAME.get();
+            String silentCName = Config.MINIMIZATION_SILENT_CONTROLLABLE_EVENT_NAME.getAsString();
             LabeledEvent tau_c = getAlphabet().getEvent(silentCName);
             if(hideThese.getControllableAlphabet().size() > 0)
             {
@@ -1695,7 +1695,7 @@ public class Automaton
             }
             
             // tau_u
-            String silentUName = Config.MINIMIZATION_SILENT_UNCONTROLLABLE_EVENT_NAME.get();
+            String silentUName = Config.MINIMIZATION_SILENT_UNCONTROLLABLE_EVENT_NAME.getAsString();
             LabeledEvent tau_u = getAlphabet().getEvent(silentUName);
             if (hideThese.getUncontrollableAlphabet().size() > 0)
             {

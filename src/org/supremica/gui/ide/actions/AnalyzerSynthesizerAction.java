@@ -26,9 +26,9 @@ public class AnalyzerSynthesizerAction
         
         putValue(Action.NAME, "Synthesize...");
         putValue(Action.MNEMONIC_KEY, new Integer(KeyEvent.VK_Y));
-        //putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_A, ActionEvent.CTRL_MASK));        
+        //putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_A, ActionEvent.CTRL_MASK));
         putValue(Action.SHORT_DESCRIPTION, "Synthesize a supervisor for the selected automata");
-        putValue(Action.SMALL_ICON, new ImageIcon(IDE.class.getResource("/icons/synthesize16.gif")));        
+        putValue(Action.SMALL_ICON, new ImageIcon(IDE.class.getResource("/icons/synthesize16.gif")));
     }
     
     public void actionPerformed(ActionEvent e)
@@ -38,7 +38,7 @@ public class AnalyzerSynthesizerAction
     
     
     public void doAction()
-    {        
+    {
         // Retrieve the selected automata and make a sanity check
         Automata selectedAutomata = ide.getActiveDocumentContainer().getAnalyzerPanel().getSelectedAutomata();
         if (!selectedAutomata.sanityCheck(ide.getIDE(), 1, true, true, true, true))
@@ -55,6 +55,6 @@ public class AnalyzerSynthesizerAction
             return;
         }
         
-        AutomataSynthesisWorker worker = new AutomataSynthesisWorker(ide.getIDE(), selectedAutomata, options);       
+        AutomataSynthesisWorker worker = new AutomataSynthesisWorker(ide.getIDE(), selectedAutomata, options);
     }
 }

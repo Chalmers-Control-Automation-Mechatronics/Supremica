@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.properties
 //# CLASS:   DoubleProperty
 //###########################################################################
-//# $Id: DoubleProperty.java,v 1.2 2007-08-21 03:43:42 robi Exp $
+//# $Id: DoubleProperty.java,v 1.3 2007-10-04 15:14:56 flordal Exp $
 //###########################################################################
 
 /*
@@ -62,44 +62,44 @@ package org.supremica.properties;
 public class DoubleProperty
     extends Property
 {
-
+    
     //#######################################################################
     //# Constructors
     public DoubleProperty(final PropertyType type,
-                          final String key,
-                          final double value,
-                          final String comment)
+        final String key,
+        final double value,
+        final String comment)
     {
         this(type, key, value, comment, false);
     }
-
+    
     public DoubleProperty(final PropertyType type,
-                          final String key,
-                          final double value,
-                          final String comment,
-                          final boolean immutable)
+        final String key,
+        final double value,
+        final String comment,
+        final boolean immutable)
     {
         this(type, key, value, comment, immutable,
-             Double.MIN_VALUE, Double.MAX_VALUE);
+            Double.MIN_VALUE, Double.MAX_VALUE);
     }
-
+    
     public DoubleProperty(final PropertyType type,
-                          final String key,
-                          final double value,
-                          final String comment,
-                          final boolean immutable,
-                          final double min)
+        final String key,
+        final double value,
+        final String comment,
+        final boolean immutable,
+        final double min)
     {
         this(type, key, value, comment, immutable, min, Double.MAX_VALUE);
     }
-
+    
     public DoubleProperty(final PropertyType type,
-                          final String key,
-                          final double value,
-                          final String comment,
-                          final boolean immutable,
-                          final double min,
-                          final double max)
+        final String key,
+        final double value,
+        final String comment,
+        final boolean immutable,
+        final double min,
+        final double max)
     {
         super(type, key, comment, immutable);
         mDefaultValue = value;
@@ -108,75 +108,76 @@ public class DoubleProperty
         mMax = max;
         checkValid(value);
     }
-
-
+    
+    
     //#######################################################################
     //# Overrides for Abstract Base Class Property
     public void set(final String value)
     {
         set(Double.parseDouble(value));
     }
-
-    public String valueToString()
+    
+    public String getAsString()
     {
         return Double.toString(mValue);
     }
-
+    
     public boolean currentValueDifferentFromDefaultValue()
     {
         return mDefaultValue != mValue;
     }
-
-
+    
+    
     //#######################################################################
     //# Specific Access
     public double get()
     {
         return mValue;
     }
-
+    
     public double getMinValue()
     {
         return mMin;
     }
-
+    
     public double getMaxValue()
     {
         return mMax;
     }
-
+    
     public void set(final double value)
     {
         checkMutable();
         checkValid(value);
-        final String oldvalue = valueToString();
+        final String oldvalue = getAsString();
         mValue = value;
         firePropertyChanged(oldvalue);
     }
-
+    
     public boolean isValid(double value)
     {
         return value >= mMin && value <= mMax;
     }
-
+    
     public void checkValid(final double value)
     {
-        if (!isValid(value)) {
+        if (!isValid(value))
+        {
             throw new IllegalArgumentException
                 ("Assigning illegal value to property " + getFullKey() +
-                 ": " + value + "!");
+                ": " + value + "!");
         }
     }
-
-
+    
+    
     //#######################################################################
     //# Data Members
     private final double mDefaultValue;
     private final double mMin;
     private final double mMax;
-
+    
     private double mValue;
-
+    
 }
 
 

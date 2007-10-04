@@ -73,7 +73,14 @@ public final class VerificationOptions
      */
     public VerificationOptions()
     {
-       this(VerificationType.fromDescription(Config.VERIFY_VERIFICATION_TYPE.get()), VerificationAlgorithm.fromDescription(Config.VERIFY_ALGORITHM_TYPE.get()), Config.VERIFY_EXCLUSION_STATE_LIMIT.get(), Config.VERIFY_REACHABILITY_STATE_LIMIT.get(), Config.VERIFY_ONE_EVENT_AT_A_TIME.get(), Config.VERIFY_SKIP_UNCONTROLLABILITY_CHECK.get(), Config.VERIFY_NBR_OF_ATTEMPTS.get(), Config.VERIFY_SHOW_BAD_TRACE.get());
+       this((VerificationType) Config.VERIFY_VERIFICATION_TYPE.get(), 
+           (VerificationAlgorithm) Config.VERIFY_ALGORITHM_TYPE.get(),
+           Config.VERIFY_EXCLUSION_STATE_LIMIT.get(), 
+           Config.VERIFY_REACHABILITY_STATE_LIMIT.get(),
+           Config.VERIFY_ONE_EVENT_AT_A_TIME.get(), 
+           Config.VERIFY_SKIP_UNCONTROLLABILITY_CHECK.get(), 
+           Config.VERIFY_NBR_OF_ATTEMPTS.get(),
+           Config.VERIFY_SHOW_BAD_TRACE.get());
     }
 
     /**

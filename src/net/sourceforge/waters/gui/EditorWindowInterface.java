@@ -4,7 +4,7 @@
 //# PACKAGE: waters.gui
 //# CLASS:   EditorWindow
 //###########################################################################
-//# $Id: EditorWindowInterface.java,v 1.15 2007-09-03 11:37:27 flordal Exp $
+//# $Id: EditorWindowInterface.java,v 1.16 2007-10-04 15:14:56 flordal Exp $
 //###########################################################################
 
 
@@ -14,7 +14,9 @@ import javax.swing.JFrame;
 
 import net.sourceforge.waters.gui.command.UndoInterface;
 
-
+/**
+ * Implemented by ComponentEditorPanel and ComponentViewPanel...
+ */
 public interface EditorWindowInterface
 {
     public ModuleWindowInterface getModuleWindowInterface();

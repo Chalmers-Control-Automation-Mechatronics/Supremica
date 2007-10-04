@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui.renderer
 //# CLASS:   EdgeProxyShape
 //###########################################################################
-//# $Id: EdgeProxyShape.java,v 1.17 2007-08-17 00:38:47 robi Exp $
+//# $Id: EdgeProxyShape.java,v 1.18 2007-10-04 15:14:56 flordal Exp $
 //###########################################################################
 
 package net.sourceforge.waters.gui.renderer;
@@ -224,13 +224,22 @@ abstract class EdgeProxyShape
   /**
    * The width of the point of the arrow, in radians.
    */
-  static final double ARROW_ANGLE = 0.3 * Math.PI;
+  static final double ARROW_ANGLE;// = 0.3 * Math.PI;
+  static
+  {
+      if (Config.GUI_EDITOR_LAYOUT_MODE.get().equals(Config.LAYOUT_MODE_LEGALVALUES.ChalmersIDES))
+          ARROW_ANGLE = 0.2 * Math.PI;
+      else
+          ARROW_ANGLE = 0.3 * Math.PI;
+  };  
   static final double ARROW_SIN = Math.sin(0.5 * ARROW_ANGLE);
   static final double ARROW_COS = Math.cos(0.5 * ARROW_ANGLE);
+  
   /**
    * The height of the arrow, i.e., the distance it covers on the line.
    */
-  static final double ARROW_HEIGHT = 7.0;
+  //static final double ARROW_HEIGHT = 7.0;
+  static final double ARROW_HEIGHT = 6.0;
   /**
    * The square of the arrow height.
    */
@@ -241,6 +250,5 @@ abstract class EdgeProxyShape
   static final double ARROW_SIDE = ARROW_HEIGHT / ARROW_COS;
 
   static final int CLICK_TOLERANCE = 2;
-  static final int CLICK_TOLERANCE2 = CLICK_TOLERANCE * CLICK_TOLERANCE;
-
+  static final int CLICK_TOLERANCE_SQ = CLICK_TOLERANCE * CLICK_TOLERANCE;
 }

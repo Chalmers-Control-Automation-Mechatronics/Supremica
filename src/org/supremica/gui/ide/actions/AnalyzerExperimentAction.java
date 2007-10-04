@@ -3,16 +3,9 @@ package org.supremica.gui.ide.actions;
 import java.util.List;
 import javax.swing.Action;
 import java.awt.event.ActionEvent;
-import java.util.Collection;
-import java.util.Iterator;
-import net.sourceforge.waters.model.des.AutomatonProxy;
-import net.sourceforge.waters.model.des.EventProxy;
-import net.sourceforge.waters.model.des.ProductDESProxy;
-import org.supremica.automata.Alphabet;
 import org.supremica.automata.Automata;
 import org.supremica.automata.Automaton;
-import org.supremica.automata.algorithms.minimization.AutomataMinimizer;
-import org.supremica.automata.algorithms.minimization.MinimizationOptions;
+import org.supremica.automata.algorithms.AutomatonSplit;
 import org.supremica.log.Logger;
 import org.supremica.log.LoggerFactory;
 
@@ -59,7 +52,21 @@ public class AnalyzerExperimentAction
         
         // EXPERIMENT!
         {
-            logger.info("Test: " + automata);
+            // "DECOMPOSE" INDIVUDUAL AUTOMATA
+            for (Automaton automaton: automata)
+            {
+                Automata result = AutomatonSplit.split(automaton);
+
+                try
+                {
+                    ide.getIDE().getActiveDocumentContainer().getAnalyzerPanel().addAutomata(result);
+                }
+                catch (Exception ex)
+                {
+                    logger.debug("SplitAction::actionPerformed() -- ", ex);
+                    logger.debug(ex.getStackTrace());
+                }
+            }
         }
         
         logger.info("Experiment finished.");

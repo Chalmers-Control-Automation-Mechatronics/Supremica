@@ -4,8 +4,8 @@
 //# PACKAGE: wnet.sourceforge.aters.gui
 //# CLASS:   EditorObject
 //###########################################################################
-//# $Id: EditorObject.java,v 1.26 2006-08-20 13:40:44 flordal Exp $
-//# $Id: EditorObject.java,v 1.26 2006-08-20 13:40:44 flordal Exp $
+//# $Id: EditorObject.java,v 1.27 2007-10-04 15:14:56 flordal Exp $
+//# $Id: EditorObject.java,v 1.27 2007-10-04 15:14:56 flordal Exp $
 //###########################################################################
 
 
@@ -22,6 +22,7 @@ import net.sourceforge.waters.subject.base.Subject;
  *
  * @author Gian Perrone
  */
+
 public abstract class EditorObject
 {
     protected boolean visible;

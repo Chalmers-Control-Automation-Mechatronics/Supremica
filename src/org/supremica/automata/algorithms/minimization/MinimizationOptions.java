@@ -123,12 +123,12 @@ public final class MinimizationOptions
      */
     public MinimizationOptions()
     {
-        this.equivalenceRelation = EquivalenceRelation.fromDescription(Config.MINIMIZATION_EQUIVALENCE_RELATION.get());
+        equivalenceRelation = (EquivalenceRelation) Config.MINIMIZATION_EQUIVALENCE_RELATION.get();
         alsoTransitions = Config.MINIMIZATION_ALSO_MINIMIZE_TRANSITIONS.get();
         keepOriginal = Config.MINIMIZATION_KEEP_ORIGINAL.get();
         ignoreMarking = Config.MINIMIZATION_IGNORE_MARKING.get();
-        minimizationStrategy = MinimizationStrategy.toStrategy(Config.MINIMIZATION_STRATEGY.get());
-        minimizationHeuristic = MinimizationHeuristic.toHeuristic(Config.MINIMIZATION_HEURISTIC.get());
+        minimizationStrategy = (MinimizationStrategy) Config.MINIMIZATION_STRATEGY.get();
+        minimizationHeuristic = (MinimizationHeuristic) Config.MINIMIZATION_HEURISTIC.get();
         componentSizeLimit = Integer.MAX_VALUE;
     }
     

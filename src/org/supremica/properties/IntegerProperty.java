@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.properties
 //# CLASS:   IntegerProperty
 //###########################################################################
-//# $Id: IntegerProperty.java,v 1.5 2007-08-21 03:43:42 robi Exp $
+//# $Id: IntegerProperty.java,v 1.6 2007-10-04 15:14:56 flordal Exp $
 //###########################################################################
 
 /*
@@ -64,53 +64,53 @@ public class IntegerProperty
     //#######################################################################
     //# Constructors
     public IntegerProperty(final PropertyType type,
-                           final String key,
-                           final int value,
-                           final String comment)
+        final String key,
+        final int value,
+        final String comment)
     {
         this(type, key, value, comment, false);
     }
     
     public IntegerProperty(final PropertyType type,
-                           final String key,
-                           final int value,
-                           final String comment,
-                           final boolean immutable)
+        final String key,
+        final int value,
+        final String comment,
+        final boolean immutable)
     {
         this(type, key, value, comment, immutable,
-             Integer.MIN_VALUE, Integer.MAX_VALUE);
+            Integer.MIN_VALUE, Integer.MAX_VALUE);
     }
     
     public IntegerProperty(final PropertyType type,
-                           final String key,
-                           final int value,
-                           final String comment,
-                           final boolean immutable,
-                           final int min)
+        final String key,
+        final int value,
+        final String comment,
+        final boolean immutable,
+        final int min)
     {
         this(type, key, value, comment, immutable, min, Integer.MAX_VALUE);
     }
     
     public IntegerProperty(final PropertyType type,
-                           final String key,
-                           final int value,
-                           final String comment,
-                           final boolean immutable,
-                           final int min,
-                           final int max)
+        final String key,
+        final int value,
+        final String comment,
+        final boolean immutable,
+        final int min,
+        final int max)
     {
         this(type, key, value, comment, immutable,
-             Integer.MIN_VALUE, Integer.MAX_VALUE, 1);
+            Integer.MIN_VALUE, Integer.MAX_VALUE, 1);
     }
-
+    
     public IntegerProperty(final PropertyType type,
-                           final String key,
-                           final int value,
-                           final String comment,
-                           final boolean immutable,
-                           final int min,
-                           final int max,
-                           final int tick)
+        final String key,
+        final int value,
+        final String comment,
+        final boolean immutable,
+        final int min,
+        final int max,
+        final int tick)
     {
         super(type, key, comment, immutable);
         mDefaultValue = value;
@@ -120,8 +120,8 @@ public class IntegerProperty
         mTick = tick;
         checkValid(value);
     }
-
-
+    
+    
     //#######################################################################
     //# Overrides for Abstract Base Class Property
     public void set(final String value)
@@ -129,7 +129,7 @@ public class IntegerProperty
         set(Integer.parseInt(value));
     }
     
-    public String valueToString()
+    public String getAsString()
     {
         return Integer.toString(mValue);
     }
@@ -138,8 +138,8 @@ public class IntegerProperty
     {
         return mDefaultValue != mValue;
     }
-
-
+    
+    
     //#######################################################################
     //# Specific Access
     public int get()
@@ -150,23 +150,23 @@ public class IntegerProperty
     public int getMinValue()
     {
         return mMin;
-    }    
-
+    }
+    
     public int getMaxValue()
     {
         return mMax;
-    }    
-
+    }
+    
     public int getTick()
     {
         return mTick;
-    }    
+    }
     
     public void set(final int value)
     {
         checkMutable();
         checkValid(value);
-        final String oldvalue = valueToString();        
+        final String oldvalue = getAsString();
         mValue = value;
         firePropertyChanged(oldvalue);
     }
@@ -175,24 +175,25 @@ public class IntegerProperty
     {
         return value >= mMin && value <= mMax;
     }
-
+    
     public void checkValid(final int value)
     {
-        if (!isValid(value)) {
+        if (!isValid(value))
+        {
             throw new IllegalArgumentException
                 ("Assigning illegal value to property " + getFullKey() +
-                 ": " + value + "!");
+                ": " + value + "!");
         }
     }
-
-
+    
+    
     //#######################################################################
     //# Data Members
     private final int mDefaultValue;
     private final int mMin;
     private final int mMax;
     private final int mTick;
-
+    
     private int mValue;
     
 }

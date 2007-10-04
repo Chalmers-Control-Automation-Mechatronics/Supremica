@@ -66,8 +66,8 @@ public class InterfaceManager
     {
         try
         {
-            String lookAndFeel = Config.GENERAL_LOOKANDFEEL.get();
-            
+            String lookAndFeel = Config.GENERAL_LOOKANDFEEL.getAsString();
+
             if ((lookAndFeel == null) || "System".equalsIgnoreCase(lookAndFeel))
                 UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
             else if ("Metal".equalsIgnoreCase(lookAndFeel))
@@ -82,6 +82,8 @@ public class InterfaceManager
                 UIManager.setLookAndFeel("com.sun.java.swing.plaf.gtk.GTKLookAndFeel");
             else
                 UIManager.setLookAndFeel(lookAndFeel);
+            
+            System.err.println("Apa: " + lookAndFeel + " eller "+ UIManager.getLookAndFeel().toString());
             
             /*
             // Debugging

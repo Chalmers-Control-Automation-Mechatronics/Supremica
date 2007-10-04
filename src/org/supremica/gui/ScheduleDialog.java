@@ -193,7 +193,7 @@ public class ScheduleDialog
         {
             public void actionPerformed(ActionEvent e)
             {
-                File rootDir = new File(org.supremica.properties.Config.FILE_OPEN_PATH.get());
+                File rootDir = new File(org.supremica.properties.Config.FILE_OPEN_PATH.getAsString());
                 File[] files = rootDir.listFiles();
                 
                 try

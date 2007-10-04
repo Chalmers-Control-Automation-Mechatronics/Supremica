@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.gui.ide
 //# CLASS:   IDE
 //###########################################################################
-//# $Id: IDE.java,v 1.101 2007-09-26 13:57:43 flordal Exp $
+//# $Id: IDE.java,v 1.102 2007-10-04 15:14:56 flordal Exp $
 //###########################################################################
 
 package org.supremica.gui.ide;
@@ -56,8 +56,8 @@ import org.xml.sax.SAXException;
  * @author Knut &Aring;kesson
  */
 public class IDE
-        extends JFrame
-        implements IDEActionInterface, Observer, Subject
+    extends JFrame
+    implements IDEActionInterface, Observer, Subject
 {
     //#######################################################################
     //# Constructor
@@ -83,14 +83,14 @@ public class IDE
         mBlankPanel.setPreferredSize(IDEDimensions.mainWindowPreferredSize);
         mLogPanel = new LogPanel(this, "Logger");
         mSplitPaneVertical =
-                new JSplitPane(JSplitPane.VERTICAL_SPLIT, mBlankPanel, mLogPanel);
+            new JSplitPane(JSplitPane.VERTICAL_SPLIT, mBlankPanel, mLogPanel);
         mSplitPaneVertical.setContinuousLayout(false);
         mSplitPaneVertical.setOneTouchExpandable(false);
         mSplitPaneVertical.setDividerLocation(0.8);
         mSplitPaneVertical.setResizeWeight(1.0);
         contents.add(mSplitPaneVertical, BorderLayout.CENTER);
         
-        final File startdir = new File(Config.FILE_OPEN_PATH.get());
+        final File startdir = new File(Config.FILE_OPEN_PATH.getAsString());
         mFileChooser = new JFileChooser(startdir);
         
         // Initialise Document Managers
@@ -174,7 +174,7 @@ public class IDE
         {
             final Action action = mActions.getAction(ExitAction.class);
             final ActionEvent aevent =
-                    new ActionEvent(this, ActionEvent.ACTION_PERFORMED, null);
+                new ActionEvent(this, ActionEvent.ACTION_PERFORMED, null);
             action.actionPerformed(aevent);
         }
         else
@@ -192,7 +192,7 @@ public class IDE
         {
             case CONTAINER_SWITCH:
                 final DocumentContainer container =
-                        mDocumentContainerManager.getActiveContainer();
+                    mDocumentContainerManager.getActiveContainer();
                 if (container == null)
                 {
                     mSplitPaneVertical.setTopComponent(mBlankPanel);
@@ -250,21 +250,21 @@ public class IDE
     public boolean editorActive()
     {
         final DocumentContainer active =
-                mDocumentContainerManager.getActiveContainer();
+            mDocumentContainerManager.getActiveContainer();
         return active != null && active.isEditorActive();
     }
     
     public boolean analyzerActive()
     {
         final DocumentContainer active =
-                mDocumentContainerManager.getActiveContainer();
+            mDocumentContainerManager.getActiveContainer();
         return active != null && active.isAnalyzerActive();
     }
     
     public Project getActiveProject()
     {
         final DocumentContainer active =
-                mDocumentContainerManager.getActiveContainer();
+            mDocumentContainerManager.getActiveContainer();
         return active.getAnalyzerPanel().getVisualProject();
     }
     
@@ -281,7 +281,7 @@ public class IDE
     public String getWindowTitle()
     {
         final DocumentContainer container =
-                mDocumentContainerManager.getActiveContainer();
+            mDocumentContainerManager.getActiveContainer();
         if (container == null)
         {
             return IDENAME;
@@ -343,10 +343,10 @@ public class IDE
     throws Exception
     {
         final List<File> files = ProcessCommandLineArguments.process(args);
+        InterfaceManager.getInstance().initLookAndFeel();
         if (Config.GENERAL_INCLUDE_EDITOR.isTrue())
         {
             final IDE ide = new IDE();
-            ide.setVisible(true);
             if (files != null && files.size() > 0)
             {
                 ide.openFiles(files);
@@ -355,6 +355,7 @@ public class IDE
             {
                 ide.openEmptyDocument();
             }
+            ide.setVisible(true);
         }
         else
         {
@@ -389,7 +390,6 @@ public class IDE
     static
     {
         Locale.setDefault(Locale.ENGLISH);
-        InterfaceManager.getInstance().initLookAndFeel();
         Config.XML_RPC_ACTIVE.set(false);
         Config.DOT_USE.set(true);
         Config.LOG_TO_CONSOLE.set(false);

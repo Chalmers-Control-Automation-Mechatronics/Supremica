@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.properties
 //# CLASS:   BooleanProperty
 //###########################################################################
-//# $Id: BooleanProperty.java,v 1.5 2007-08-21 03:43:42 robi Exp $
+//# $Id: BooleanProperty.java,v 1.6 2007-10-04 15:14:56 flordal Exp $
 //###########################################################################
 
 /*
@@ -66,36 +66,36 @@ public class BooleanProperty
     //#######################################################################
     //# Constructors
     public BooleanProperty(final PropertyType type,
-						   final String key,
-						   final boolean value,
-						   final String comment)
+        final String key,
+        final boolean value,
+        final String comment)
     {
         this(type, key, value, comment, false);
     }
     
     public BooleanProperty(final PropertyType type,
-						   final String key,
-						   final boolean value,
-						   final String comment,
-						   final boolean immutable)
+        final String key,
+        final boolean value,
+        final String comment,
+        final boolean immutable)
     {
         super(type, key, comment, immutable);
         mDefaultValue = value;
         mValue = value;
     }
-
+    
     
     //#######################################################################
     //# Overrides for Abstract Base Class Property
     public void set(final boolean value)
     {
         checkMutable();
-        final String oldvalue = valueToString();        
-		mValue = value;
-		firePropertyChanged(oldvalue);
+        final String oldvalue = getAsString();
+        mValue = value;
+        firePropertyChanged(oldvalue);
     }
     
-    public String valueToString()
+    public String getAsString()
     {
         return Boolean.toString(mValue);
     }
@@ -104,8 +104,8 @@ public class BooleanProperty
     {
         return mDefaultValue != mValue;
     }
-
-
+    
+    
     //#######################################################################
     //# Specific Access
     public boolean isTrue()
@@ -120,15 +120,15 @@ public class BooleanProperty
     
     public void set(final String value)
     {
-		final boolean boolval = Boolean.parseBoolean(value);
-		set(boolval);
+        final boolean boolval = Boolean.parseBoolean(value);
+        set(boolval);
     }
     
-
+    
     //#######################################################################
     //# Data Members
     private final boolean mDefaultValue;
-
+    
     private boolean mValue;
     
 }
