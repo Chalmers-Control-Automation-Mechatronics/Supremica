@@ -24,6 +24,8 @@ public class DOPnative {
 	protected final static String PRECON_NOT_FULFILLED_STATE = "precon_not_fulfilled";
 	protected final static String PRECON_FULFILLED_STATE = "precon_fulfilled";
 	
+	protected static List<Activity> activityPreconList = new LinkedList<Activity>();
+	
 	/**
 	 * Activity function code
 	 */
@@ -33,11 +35,8 @@ public class DOPnative {
 									EFA efa){
 		
 		
-		EFA preconEFA = null;
+		
 		PGA pga = null;
-		Precondition precon = null;
-		List<OperationReferenceType> preconList = null;
-		List<String> eventList = null;
 		
 		/**************************/
 		//Check in data
@@ -63,62 +62,148 @@ public class DOPnative {
 		/**************************/
 		//Predecessors
 		/**************************/
-		
-		//get predecessors
-		precon =  activity.getPrecondition();
-		if(precon != null){
-			preconList = precon.getPredecessor();
-		}
-		
-		//no Predecessors
-		if(preconList == null || preconList.size() == 0){
-			return;
-		}
-		
-		//predecessors exist 
-		eventList = new LinkedList<String>();
-		for(OperationReferenceType pre : preconList){
-			eventList.add(EVENT_STOP_PREFIX
-						+ pre.getOperation()+
-						  EVENT_MACHINE_SEPARATOR
-						  +pre.getMachine());
-		}
-		
-		String event, preconEFAname;
-		for(int i = 0; i < eventList.size(); i++){
-			event = eventList.get(i);
-			preconEFAname = "precon"+Integer.toString(i+1)+"_"+pga.getProcess();
-			
-			preconEFA = new EFA(preconEFAname,efa.getModule());
-			
-			
-			preconEFA.addInitialState(PRECON_NOT_FULFILLED_STATE);
-			preconEFA.addState(PRECON_FULFILLED_STATE);
-			
-			//transition to precondition fulfilled
-			preconEFA.addTransition(PRECON_NOT_FULFILLED_STATE,
-									PRECON_FULFILLED_STATE, event,"","");
-			
-			//self loop for not block event 
-			preconEFA.addTransition(PRECON_FULFILLED_STATE,
-									PRECON_FULFILLED_STATE, event,"","");
-			
-			/*
-			//back to not fulfilled
-			preconEFA.addTransition(PRECON_FULFILLED_STATE,
-									PRECON_NOT_FULFILLED_STATE,
-									EVENT_START_PREFIX+pga.getProcess(),"","");
-			*/
-			
-			
-			//self loop to precon fulfilled
-			preconEFA.addTransition(PRECON_FULFILLED_STATE,
-					PRECON_FULFILLED_STATE,
-					EVENT_START_PREFIX+pga.getProcess(),"","");
-			
-			efa.getModule().addAutomaton(preconEFA);
+		if(activity.getPrecondition() != null){
+			if(!activityPreconList.contains(activity)){
+				activityPreconList.add(activity);
+			}
 		}
 	}
+	
+	/**
+	 * 
+	 * @param module
+	 */
+	protected static void addPrecondition(Module module){
+		
+		EFA preconEFA = null;
+		Precondition precon = null;
+		
+		List<OperationReferenceType> preconList = null;
+		List<String> eventList = null;
+		List<String> moduleEventList = null;
+		
+		for(Activity activity : activityPreconList){
+			
+			//get predecessors
+			precon =  activity.getPrecondition();
+			if(precon != null){
+				preconList = precon.getPredecessor();
+			}
+			
+			//no Predecessors
+			if(preconList == null || preconList.size() == 0){
+				return;
+			}
+			
+			//predecessors exist 
+			eventList = new LinkedList<String>();
+			OperationReferenceType pre = null;
+			
+			for(int i = 0; i < preconList.size(); i++){
+				
+				Object o =  preconList.get(i);
+				
+				if(o instanceof OperationReferenceType){
+					pre = (OperationReferenceType)o;
+				
+					eventList.add(EVENT_STOP_PREFIX
+							+ pre.getOperation()+
+							  EVENT_MACHINE_SEPARATOR
+							  +pre.getMachine());
+				}
+			}
+			
+			/*
+			 * search for same event but relabeled
+			 */
+			moduleEventList = module.getEvents();
+			for(int i = 0; i < eventList.size(); i++){
+				int ii = 1;
+				
+				String event = eventList.get(i);
+				String tmpEvent = event.replace(EVENT_MACHINE_SEPARATOR, "_"+ii+EVENT_MACHINE_SEPARATOR);
+				
+				/* add relabeled event from module*/
+				while(moduleEventList.contains(tmpEvent)){
+					event = event.concat(";" + tmpEvent);
+					ii = ii + 1;
+					tmpEvent = event.replace(EVENT_MACHINE_SEPARATOR, "_"+ii+EVENT_MACHINE_SEPARATOR);
+				}
+				
+				/* replace */
+				eventList.remove(i);
+				eventList.add(i,event);
+			}
+			
+			/*
+			 * build one efa for every precondition
+			 */
+			String event, preconEFAname;
+			for(int i = 0; i < eventList.size(); i++){
+				event = eventList.get(i);
+				preconEFAname = "precon"+Integer.toString(i+1)+"_"+activity.getOperation();
+				
+				preconEFA = new EFA(preconEFAname,module);
+				
+				
+				preconEFA.addInitialState(PRECON_NOT_FULFILLED_STATE);
+				preconEFA.addState(PRECON_FULFILLED_STATE);
+				
+				//transition to precondition fulfilled
+				preconEFA.addTransition(PRECON_NOT_FULFILLED_STATE,
+										PRECON_FULFILLED_STATE, event,"","");
+				
+				//self loop for not block event 
+				preconEFA.addTransition(PRECON_FULFILLED_STATE,
+										PRECON_FULFILLED_STATE, event,"","");
+				
+				/*
+				//back to not fulfilled
+				preconEFA.addTransition(PRECON_FULFILLED_STATE,
+										PRECON_NOT_FULFILLED_STATE,
+										EVENT_START_PREFIX+pga.getProcess(),"","");
+				*/
+				
+				
+				//self loop to precon fulfilled
+				preconEFA.addTransition(PRECON_FULFILLED_STATE,
+						PRECON_FULFILLED_STATE,
+						EVENT_START_PREFIX+activity.getOperation(),"","");
+				
+				module.addAutomaton(preconEFA);
+			}
+			
+		}
+	}
+	
+	protected static String getEvent(String event){
+		if(event.contains(EVENT_MACHINE_SEPARATOR)){
+			return event.substring(0,event.indexOf(EVENT_MACHINE_SEPARATOR));
+		}
+		return event;
+	}
+	
+	protected static String getMachine(String event){
+		
+		if(event.endsWith(EVENT_MACHINE_SEPARATOR)){
+			return event.replace(EVENT_MACHINE_SEPARATOR,"");
+		}
+		
+		if(event.contains(EVENT_MACHINE_SEPARATOR)){
+			for(int i = 0; i < event.length(); i++){
+				if(event.substring(i).startsWith(EVENT_MACHINE_SEPARATOR)){
+					return event.substring(i+EVENT_MACHINE_SEPARATOR.length());
+				}
+				
+			}
+		}
+		return event;
+	}
+	
+	protected static void resetPreconList(){
+		activityPreconList = new LinkedList<Activity>();
+	}
+	
 	
 	/**
 	 * 

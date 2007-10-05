@@ -47,31 +47,37 @@ public class Module extends ExtendedAutomata{
 		return events;
 	}
 	
-	private void initNodeVariables(){
-		nodeVariablesEFA =
-			new EFA("Node_variables",this);
-		this.addAutomaton(nodeVariablesEFA);
-		nodeVariablesEFA.addInitialState(
-				"dummy_state_for_nod_variables");
-	}
-	
-	private void initResourceVariables(){
-		resourceVariablesEFA =
-			new EFA("Resource_variables",this);
-		this.addAutomaton(resourceVariablesEFA);
-		resourceVariablesEFA.addInitialState(
-				"dummy_state_for_resource_variables");
-	}
-	
-	private void initBlockedEvents(){
-		blockedEventsEFA =
-			new EFA("Blocked_event",this);
-		this.addAutomaton(blockedEventsEFA);
-		blockedEventsEFA.addInitialState(
-				"dummy_inital_state_for_blocked");
+	public void initNodeVariables(){
+		if(nodeVariablesEFA != null){
+			return;
+		}
 		
+		nodeVariablesEFA = new EFA("Node_variables",this);
+		this.addAutomaton(nodeVariablesEFA);
+		nodeVariablesEFA.addInitialState("dummy_state_for_nod_variables");
+		
+	}
+	
+	public void initResourceVariables(){
+		if(resourceVariablesEFA != null){
+			return;
+		}
+		
+		resourceVariablesEFA = new EFA("Resource_variables",this);
+		this.addAutomaton(resourceVariablesEFA);
+		resourceVariablesEFA.addInitialState("dummy_state_for_resource_variables");
+	}
+	
+	public void initBlockedEvents(){
+		
+		if(blockedEventsEFA != null){
+			return;
+		}
+		
+		blockedEventsEFA = new EFA("Blocked_event",this);
+		this.addAutomaton(blockedEventsEFA);
+		blockedEventsEFA.addInitialState("dummy_inital_state_for_blocked");
 		blockedEventsEFA.addState(BLOCKED_STATE);
-
 	}
 	
 	public void blockEvents(List<String> events){
@@ -96,7 +102,8 @@ public class Module extends ExtendedAutomata{
 		}
 		
 		blockedEventsEFA.addTransition(BLOCKED_STATE,
-									   BLOCKED_STATE, event,"","");
+									   BLOCKED_STATE,
+									   event,"","");
 	}
 	
 	public void addEvent(String event){
@@ -116,6 +123,10 @@ public class Module extends ExtendedAutomata{
 	    	//add new event to module
 		    super.addEvent(event);
 	    }
+	}
+	
+	public void addPrecondition(String eventName, List<String> preconList){
+		;
 	}
 	
 	/**
@@ -201,6 +212,7 @@ public class Module extends ExtendedAutomata{
 	public int getMaxValueResourceInteger(String resourceName){
 		return resources.get(resourceName);
 	}
+	
 	/**
 	 * Create new resource variable in this module.
 	 * 

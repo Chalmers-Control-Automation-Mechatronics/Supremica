@@ -44,11 +44,26 @@ public class DOPtoEFA extends DOPrelation{
 		return buildModuleFromROP(rop,new Module(machine, false));
 	}
 	
+	public static Module buildModule(List<String> filePathList, String name){		
+		ROP rop = null;
+		
+		List<ROP> ropList = new LinkedList<ROP>();
+		for(String filePath : filePathList){
+			rop = getROPfromFile(new File(filePath));
+			if(rop != null){
+				ropList.add(rop);
+			}
+		}
+		
+		return buildModuleFromROP(ropList, name);
+	}
+	
 	public static Module buildModuleFromROP(List<ROP> ropList, String name){
 		
 		Module module = null;
+		resetPreconList();
 		
-		//check in data
+		//check input
 		if(name == null || name.length()== 0){
 			name = "new_module";
 		}
@@ -59,9 +74,27 @@ public class DOPtoEFA extends DOPrelation{
 		
 		module = new Module(name,false);
 		
+		/*
+		 * does this first so they will be easy to find
+		 * in Supremica then many ROP:s are being converted.
+		 */
+		if(ropList.size() > 1){
+			module.initNodeVariables();
+			module.initResourceVariables();
+		}
+		
+		/*
+		 * convert all rop in list in to module
+		 */
 		for(ROP rop : ropList){
 			module = buildModuleFromROP(rop, module);
 		}
+		
+		/*
+		 * must be done last because
+		 * relabeling of events.
+		 */
+		addPrecondition(module);
 		
 		return module;
 	}
@@ -109,15 +142,26 @@ public class DOPtoEFA extends DOPrelation{
 		start_machine.setOperation(PGA.ONLY_START + machine);
 		stop_machine.setOperation(PGA.ONLY_STOP + machine);
 		
+		/*
+		 * Relabeling of events, for uniqueness and traceable
+		 * to machine. 
+		 */
+		rop.setRelation(renameEqualOperationName(rop.getRelation(),machine));
+		
 		//build main sequence
 		main_sequence.getActivityRelationGroup().add(start_machine);
-		main_sequence.getActivityRelationGroup().add(renameEqualOperationName(rop.getRelation(),machine));
+		main_sequence.getActivityRelationGroup().add(rop.getRelation());
 		main_sequence.getActivityRelationGroup().add(stop_machine);
 		
-		//fix relation tree
+		/*
+		 * preprocessing of the relation tree
+		 */
 		main_sequence = collapseRelationTree(main_sequence);
 		main_sequence = removeEmtyRelations(main_sequence);
 		
+		/*
+		 * create main efa
+		 */
 		main_efa = new EFA("main_" + machine,module);
 		module.addAutomaton(main_efa);
 		

@@ -26,7 +26,7 @@ public class Loader {
     //open a file
     public Object open(File file) {	
 		//DEBUG
-		System.out.println("Loader.open()");
+		//System.out.println("Loader.open()");
 		//END DEBUG
 		try {			
 	    	jaxbContext = JAXBContext.newInstance(PKGS);
@@ -44,7 +44,7 @@ public class Loader {
 		try {		
 	    	if(file!=null) {			
 				Object o = u.unmarshal(file);
-				java.lang.System.err.println("The file is unmarshalled");
+				//java.lang.System.err.println("The file is unmarshalled");
 				return o;
 	    	}else {
 				java.lang.System.err.println("Problems reading the file!");
