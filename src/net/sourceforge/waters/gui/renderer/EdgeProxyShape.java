@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui.renderer
 //# CLASS:   EdgeProxyShape
 //###########################################################################
-//# $Id: EdgeProxyShape.java,v 1.18 2007-10-04 15:14:56 flordal Exp $
+//# $Id: EdgeProxyShape.java,v 1.19 2007-10-05 10:58:42 flordal Exp $
 //###########################################################################
 
 package net.sourceforge.waters.gui.renderer;
@@ -238,8 +238,8 @@ abstract class EdgeProxyShape
   /**
    * The height of the arrow, i.e., the distance it covers on the line.
    */
-  //static final double ARROW_HEIGHT = 7.0;
-  static final double ARROW_HEIGHT = 6.0;
+  static final double ARROW_HEIGHT = 7.0;
+  //static final double ARROW_HEIGHT = 6.0;
   /**
    * The square of the arrow height.
    */

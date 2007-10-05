@@ -33,8 +33,12 @@ public class SimpleNodeProxyShape
     {
         // Draw the filling (depends on marking)
         updateColors();
-        //Rectangle2D rect = getShape().getBounds();
-        Rectangle2D rect = nodeCircleShape.getBounds();
+        // This rectangle is not the same as the one used to create the nodeCircleShape! It gives rounding errors!
+        //Rectangle2D rect = nodeCircleShape.getBounds();
+        // This one is correct!
+        Rectangle2D rect = new Rectangle2D.Double(nodeCircleShape.getX(), nodeCircleShape.getY(),
+            DIAMETER, DIAMETER);
+
         Arc2D arc;
         double i = 0;
         double degrees = ((double)360 / (double)mColors.size());
@@ -53,6 +57,8 @@ public class SimpleNodeProxyShape
                 g.setColor(EditorColor.DEFAULTCOLOR);
                 g.setStroke(SINGLESTROKE);
                 arc = new Arc2D.Double(rect.getX()+2, rect.getY()+2, rect.getWidth()-4, rect.getHeight()-4, 0, 360, Arc2D.OPEN);
+                //arc = new Arc2D.Double();
+                //arc.setArcByCenter(rect.getX()+rect.getWidth(), rect.getY()+rect.getHeight(), RADIUS-2, 0, 360, Arc2D.OPEN);
                 g.draw(arc);
                 //g.drawOval((int) rect.getX()+2, (int) rect.getY()+2, (int) (rect.getWidth()-4), (int) (rect.getHeight()-4));
             }
@@ -145,8 +151,9 @@ public class SimpleNodeProxyShape
         Rectangle2D rect = new Rectangle2D.Double(p.getX() - RADIUS, p.getY() - RADIUS,
             DIAMETER, DIAMETER);
         
-        //mShape = new Arc2D.Double(rect, 0, 360, Arc2D.OPEN);
         nodeCircleShape = new Arc2D.Double(rect, 0, 360, Arc2D.OPEN);
+        //nodeCircleShape = new Arc2D.Double();
+        //nodeCircleShape.setArcByCenter(rect.getX()+rect.getWidth(), rect.getY()+rect.getHeight(), RADIUS, 0, 360, Arc2D.OPEN);
         mShape = new GeneralPath(nodeCircleShape);
 
         // Create handles
