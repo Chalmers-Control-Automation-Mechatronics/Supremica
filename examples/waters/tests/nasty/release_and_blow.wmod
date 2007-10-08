@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Module Name="release_and_blow" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
+<ns2:Comment></ns2:Comment>
+<EventDeclList>
+<EventDecl Kind="CONTROLLABLE" Name="release"/>
+<EventDecl Kind="UNCONTROLLABLE" Name="blow_up"/>
+</EventDeclList>
+<ComponentList>
+<SimpleComponent Kind="PLANT">
+<SimpleIdentifier Name="release_and_blow"/>
+<Graph>
+<NodeList>
+<SimpleNode Initial="true" Name="S0">
+<PointGeometry>
+<Point Y="128" X="96"/>
+</PointGeometry>
+<InitialArrowGeometry>
+<Point Y="-5" X="-5"/>
+</InitialArrowGeometry>
+<LabelGeometry Anchor="NW">
+<Point Y="10" X="0"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="S1">
+<PointGeometry>
+<Point Y="128" X="192"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point Y="10" X="0"/>
+</LabelGeometry>
+</SimpleNode>
+</NodeList>
+<EdgeList>
+<Edge Target="S1" Source="S0">
+<LabelBlock>
+<SimpleIdentifier Name="release"/>
+<LabelGeometry Anchor="NW">
+<Point Y="-17" X="-24"/>
+</LabelGeometry>
+</LabelBlock>
+</Edge>
+<Edge Target="S1" Source="S1">
+<LabelBlock>
+<SimpleIdentifier Name="blow_up"/>
+<LabelGeometry Anchor="NW">
+<Point Y="8" X="-30"/>
+</LabelGeometry>
+</LabelBlock>
+</Edge>
+</EdgeList>
+</Graph>
+</SimpleComponent>
+<SimpleComponent Kind="SPEC">
+<SimpleIdentifier Name="never_blow_up"/>
+<Graph>
+<LabelBlock>
+<SimpleIdentifier Name="blow_up"/>
+<LabelGeometry Anchor="NW">
+<Point Y="24" X="24"/>
+</LabelGeometry>
+</LabelBlock>
+<NodeList>
+<SimpleNode Initial="true" Name="S0">
+<PointGeometry>
+<Point Y="112" X="96"/>
+</PointGeometry>
+<InitialArrowGeometry>
+<Point Y="-5" X="-5"/>
+</InitialArrowGeometry>
+<LabelGeometry Anchor="NW">
+<Point Y="10" X="0"/>
+</LabelGeometry>
+</SimpleNode>
+</NodeList>
+</Graph>
+</SimpleComponent>
+<SimpleComponent Kind="SPEC">
+<SimpleIdentifier Name="never_release"/>
+<Graph>
+<LabelBlock>
+<SimpleIdentifier Name="release"/>
+<LabelGeometry Anchor="NW">
+<Point Y="24" X="24"/>
+</LabelGeometry>
+</LabelBlock>
+<NodeList>
+<SimpleNode Initial="true" Name="S0">
+<PointGeometry>
+<Point Y="96" X="96"/>
+</PointGeometry>
+<InitialArrowGeometry>
+<Point Y="-5" X="-5"/>
+</InitialArrowGeometry>
+<LabelGeometry Anchor="NW">
+<Point Y="10" X="0"/>
+</LabelGeometry>
+</SimpleNode>
+</NodeList>
+</Graph>
+</SimpleComponent>
+</ComponentList>
+</Module>
