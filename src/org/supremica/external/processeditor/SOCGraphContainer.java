@@ -60,11 +60,14 @@ public class SOCGraphContainer
     public SOCToolBar toolbar = new SOCToolBar();
     public SOCMenuBar menubar = new SOCMenuBar(this);
     
+    private SOCDOPtoEFAFrame dopToEfaFrame = null; 
+    
     private Object memory;
     private Object numOfCopies = 0;
 
     private File cDir = null;
-    private SOCFileFilter xmlFilter = new SOCFileFilter(".xml");	
+    private SOCFileFilter xmlFilter = new SOCFileFilter(".xml");
+    private SOCFileFilter wmodFilter = new SOCFileFilter(".wmod");
     private SOCFileFilter xlsFilter = new SOCFileFilter(".xls");
     private SOCFileFilter bmpFilter = new SOCFileFilter(".bmp");
     private SOCFileFilter jpgFilter = new SOCFileFilter(".jpg");
@@ -713,6 +716,45 @@ public class SOCGraphContainer
 	}else if(result == JFileChooser.ERROR_OPTION) {		    
 	}		
     }
+    
+    public void viewDOPtoEFAFrame() {
+    	
+    	if(dopToEfaFrame == null){
+    		dopToEfaFrame = new SOCDOPtoEFAFrame();
+    	}
+    	dopToEfaFrame.setVisible(true);
+    	
+    	
+    	
+    	JFileChooser fcInput;
+    	
+    	if(cDir != null) {
+    	    fcInput = new JFileChooser(cDir);
+    	}else {
+    	    fcInput = new JFileChooser();
+    	}
+    	
+    	fcInput.addChoosableFileFilter(xmlFilter);
+    	fcInput.setFileFilter(xmlFilter);
+    	fcInput.setAcceptAllFileFilterUsed(false);
+    	
+    	dopToEfaFrame.setInputFileChooser(fcInput);
+    	
+    	JFileChooser fcOutput;
+    	
+    	if(cDir != null) {
+    	    fcOutput = new JFileChooser(cDir);
+    	}else {
+    	    fcOutput = new JFileChooser();
+    	}
+    	
+    	fcOutput.setAcceptAllFileFilterUsed(true);
+    	fcOutput.addChoosableFileFilter(wmodFilter);
+    	fcOutput.setFileFilter(wmodFilter);
+    	
+    	dopToEfaFrame.setOutputFileChooser(fcOutput);
+    }
+    
     /**
      * Page and print setup
      */

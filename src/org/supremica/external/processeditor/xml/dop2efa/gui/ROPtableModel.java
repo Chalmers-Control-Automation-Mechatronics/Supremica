@@ -1,4 +1,4 @@
-package org.supremica.external.processAlgebraPetriNet.algorithms.dop2efa.gui;
+package org.supremica.external.processeditor.xml.dop2efa.gui;
 
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.DefaultTableModel;

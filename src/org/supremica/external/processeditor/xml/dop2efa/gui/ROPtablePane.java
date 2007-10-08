@@ -1,4 +1,4 @@
-package org.supremica.external.processAlgebraPetriNet.algorithms.dop2efa.gui;
+package org.supremica.external.processeditor.xml.dop2efa.gui;
 
 import java.util.*;
 import java.util.List;
@@ -13,8 +13,7 @@ import java.io.*;
 
 public class ROPtablePane extends JPanel implements ActionListener{
 	
-	private JButton jbAddFile;	
-	private JButton jbAddDirectory;
+	private JButton jbAddFile;
 	private JButton jbRemove;
 	
 	private int xSize = 100;
@@ -29,17 +28,13 @@ public class ROPtablePane extends JPanel implements ActionListener{
 		JPanel buttonPanel = new JPanel();
 		buttonPanel.setLayout(new BoxLayout(buttonPanel,BoxLayout.Y_AXIS));
     
-		jbAddFile = new JButton("Add File");	
-		jbAddDirectory = new JButton("Add Directory");
+		jbAddFile = new JButton("Add");	
 		jbRemove = new JButton("Remove");
 		
 		jbAddFile.addActionListener(this);
-		jbAddDirectory.addActionListener(this);	
 		jbRemove.addActionListener(this); 
     
 		buttonPanel.add(jbAddFile);
-		buttonPanel.add(Box.createRigidArea(new Dimension(1,10)));
-		buttonPanel.add(jbAddDirectory);
 		buttonPanel.add(Box.createRigidArea(new Dimension(1,10)));
 		buttonPanel.add(jbRemove);	    	    	   
     
@@ -59,22 +54,35 @@ public class ROPtablePane extends JPanel implements ActionListener{
 		setSize(xSize, ySize);	   
 	}
 	
+	public void setFileChooser(JFileChooser fc){
+		if(this.fc == null){
+    		this.fc = fc;
+    	}
+	}
+	
+	/**
+	 * 
+	 * @return List<String> whit all file paths in table 
+	 */
 	public List<String> getFilePathList(){
     	return ropTable.getFilePathList();
     }
 	
+	/**
+	 * 
+	 * @return List<String> whit all file paths to marked files
+	 */
 	public List<String> getMarkedFilePathList(){
     	return ropTable.getMarkedFilePathList();
     }
 	
+	//take care of actions
 	public void actionPerformed(ActionEvent evt) {
     	
         Object o = evt.getSource();
         
         if(o == jbAddFile){
-        	addFile();
-        }else if(o == jbAddDirectory){
-        	addDirectory();
+        	addFiles();
         }else if(o == jbRemove){
         	remove();
         }else{
@@ -82,32 +90,28 @@ public class ROPtablePane extends JPanel implements ActionListener{
         }
     }
 	
-	private void addFile(){
-    	//Create a file chooser
-        fc = new JFileChooser();
+	private void addFiles(){
+		
+		if(fc == null){
+			//Create a file chooser
+			fc = new JFileChooser();
+		}
+		
+        //store selection mode
+        int tmp = fc.getFileSelectionMode();
+        
+        //set selection mode
+        fc.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
         
     	int returnVal = fc.showOpenDialog(this);
 
         if (returnVal == JFileChooser.APPROVE_OPTION) {
-            File file = fc.getSelectedFile();
-            ropTable.addROPfile(file);
-        } else {
-            ;
-        }
-    }
-    
-    private void addDirectory(){
-    	
-    	fc = new JFileChooser();
-        fc.setDialogTitle("Add directory");
-        fc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-    	
-    	int returnVal = fc.showOpenDialog(this);
-    	
-        if (returnVal == JFileChooser.APPROVE_OPTION) {
-            File file = fc.getSelectedFile();
             
-            if(file.isDirectory()){
+        	File file = fc.getSelectedFile();
+            
+        	if(file.isFile()){
+            	ropTable.addROPfile(file);
+            }else if(file.isDirectory()){
             	File[] files = file.listFiles();
             	
             	for(int i = 0; i < files.length; i++){
@@ -119,8 +123,11 @@ public class ROPtablePane extends JPanel implements ActionListener{
         } else {
             ;
         }
+        
+        //restore selection mode
+        fc.setFileSelectionMode(tmp);
     }
-    
+   
     private void remove(){
     	ropTable.removeSelectedRows();
     	repaint();

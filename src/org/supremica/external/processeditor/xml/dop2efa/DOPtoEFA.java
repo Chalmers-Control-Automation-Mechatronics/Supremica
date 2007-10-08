@@ -1,7 +1,7 @@
 /**
  * class to convert from DOP to EFA 
  */
-package org.supremica.external.processAlgebraPetriNet.algorithms.dop2efa;
+package org.supremica.external.processeditor.xml.dop2efa;
 
 
 import java.io.File;
@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.LinkedList;
 import java.util.Hashtable;
 
+import org.supremica.external.processeditor.xml.Loader;
 import org.supremica.manufacturingTables.xsd.processeditor.*;
 
 /**
@@ -44,7 +45,7 @@ public class DOPtoEFA extends DOPrelation{
 		return buildModuleFromROP(rop,new Module(machine, false));
 	}
 	
-	public static Module buildModule(List<String> filePathList, String name){		
+	public static Module buildModule(List<String> filePathList, String name, boolean block){		
 		ROP rop = null;
 		
 		List<ROP> ropList = new LinkedList<ROP>();
@@ -55,24 +56,37 @@ public class DOPtoEFA extends DOPrelation{
 			}
 		}
 		
-		return buildModuleFromROP(ropList, name);
+		return buildModuleFromROP(ropList, name, block);
 	}
 	
-	public static Module buildModuleFromROP(List<ROP> ropList, String name){
+	/**
+	 * Build a waters module from a list of ROP
+	 * @param ropList list of ROP to be build in to module
+	 * @param moduleName name of module
+	 * @return a Module whit all ROP
+	 */
+	public static Module buildModuleFromROP(List<ROP> ropList, String moduleName, boolean block){
 		
 		Module module = null;
+		
+		/*
+		 * remove previus stored precondition
+		 */
 		resetPreconList();
 		
-		//check input
-		if(name == null || name.length()== 0){
-			name = "new_module";
+		/*
+		 * check input
+		 */
+		if(moduleName == null || moduleName.length()== 0){
+			moduleName = "new_module";
 		}
 		
 		if(ropList == null || ropList.size() == 0){
-			return new Module(name,false);
+			return new Module(moduleName,false);
 		}
 		
-		module = new Module(name,false);
+		/* create module */
+		module = new Module(moduleName,false);
 		
 		/*
 		 * does this first so they will be easy to find
@@ -90,20 +104,32 @@ public class DOPtoEFA extends DOPrelation{
 			module = buildModuleFromROP(rop, module);
 		}
 		
+		
+		/* Last fix */
+		
 		/*
 		 * must be done last because
-		 * relabeling of events.
+		 * now we know the event names
 		 */
 		addPrecondition(module);
 		
+		/* Block */
+		if(block){
+			blockStopEventWhitNoStartEvent(module);
+		}
+		
+		/*
+		 * all rop in one module
+		 */
 		return module;
 	}
 	
+	
 	/**
-	 * Build the relation tree in rop to a Module.
+	 * Add one ROP to a waters Module
 	 * 
-	 * @param rop
-	 * @return
+	 * @param rop the ROP to add to module
+	 * @return a Module whit one ROP added
 	 */
 	public static Module buildModuleFromROP(ROP rop, Module module){
 		
@@ -116,6 +142,18 @@ public class DOPtoEFA extends DOPrelation{
 		Relation main_sequence;
 		Activity start_machine, stop_machine;
 		
+		/*
+		 * check input
+		 */
+		if(rop == null){
+			return module;
+		}
+		
+		if(module == null){
+			module = new Module("module",false);
+		}
+		
+		
 		comment = rop.getComment(); 
 		if(comment == null || comment.length() == 0){
 			comment = "no comment";
@@ -124,10 +162,6 @@ public class DOPtoEFA extends DOPrelation{
 		machine = rop.getMachine(); 
 		if(machine == null || machine.length() == 0){
 			machine = "no_machine";
-		}
-		
-		if(module == null){
-			module = new Module(machine,false);
 		}
 		
 		factory = new ObjectFactory();
@@ -156,8 +190,13 @@ public class DOPtoEFA extends DOPrelation{
 		/*
 		 * preprocessing of the relation tree
 		 */
+		
+		//remove same relation in same relation
 		main_sequence = collapseRelationTree(main_sequence);
+		
+		//remove empty relations
 		main_sequence = removeEmtyRelations(main_sequence);
+		
 		
 		/*
 		 * create main efa
@@ -177,6 +216,7 @@ public class DOPtoEFA extends DOPrelation{
 		/* Build sequence in module */
 		sequence(main_sequence,startState,endState,main_efa);
 		
+		//return module
 		return module;
 	}
 	

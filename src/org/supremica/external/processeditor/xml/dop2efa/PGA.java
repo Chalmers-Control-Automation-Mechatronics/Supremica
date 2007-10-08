@@ -1,4 +1,4 @@
-package org.supremica.external.processAlgebraPetriNet.algorithms.dop2efa;
+package org.supremica.external.processeditor.xml.dop2efa;
 
 /**
  *	Help class for building transitions. PGA stands for Process Guard and

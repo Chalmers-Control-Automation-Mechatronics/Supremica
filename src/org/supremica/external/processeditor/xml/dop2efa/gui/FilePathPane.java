@@ -1,4 +1,4 @@
-package org.supremica.external.processAlgebraPetriNet.algorithms.dop2efa.gui;
+package org.supremica.external.processeditor.xml.dop2efa.gui;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -27,24 +27,36 @@ public class FilePathPane extends JPanel implements ActionListener{
         add(jbSetFilePath);
     }
     
+    public void setFileChooser(JFileChooser fc){
+    	if(this.fc == null){
+    		this.fc = fc;
+    	}
+    }
+    
     public String getFilePath(){
     	return tfFilePath.getText();
     }
     
     public void actionPerformed(ActionEvent evt) {
-    	
-        Object o = evt.getSource();
+    	int returnVal;
+    	File file;
+        Object o;
         
+        o = evt.getSource();
         if(o == jbSetFilePath){
-        	fc = new JFileChooser();
-        	int returnVal = fc.showOpenDialog(this);
+        	
+        	if(fc == null){
+        		fc = new JFileChooser();
+        	}
+        	
+        	returnVal = fc.showOpenDialog(this);
 
             if(returnVal == JFileChooser.APPROVE_OPTION){
-                File file = fc.getSelectedFile();
+                file = fc.getSelectedFile();
                 tfFilePath.setText(file.getAbsolutePath());
             }
         }else{
-        	System.err.println("unknown source " + o);
+        	System.err.println("Unknown source " + o);
         }
     }
 }

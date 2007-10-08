@@ -29,6 +29,6 @@ public class SOC {
     	try {
     		UIManager.setLookAndFeel("com.sun.java.swing.plaf.windows.WindowsLookAndFeel");
     	}catch(Exception ex) {}
-    	SOCFrame soc = new SOCFrame();	
+    	SOCFrame soc = new SOCFrame();
     }
 }

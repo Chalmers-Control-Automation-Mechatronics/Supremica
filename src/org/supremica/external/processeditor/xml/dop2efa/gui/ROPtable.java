@@ -1,8 +1,4 @@
-package org.supremica.external.processAlgebraPetriNet.algorithms.dop2efa.gui;
-
-/* 
- * TableToolTipsDemo.java requires no other files.
- */
+package org.supremica.external.processeditor.xml.dop2efa.gui;
  
 import javax.swing.JComponent;
 import javax.swing.JFrame;
@@ -12,7 +8,6 @@ import javax.swing.JTable;
 
 import javax.swing.table.JTableHeader;
 import javax.swing.table.TableModel;
-import javax.xml.bind.UnmarshalException;
 
 import java.awt.Dimension;
 import java.awt.GridLayout;
@@ -22,7 +17,7 @@ import java.util.List;
 import java.util.LinkedList;
 import java.io.File;
 
-import org.supremica.external.processAlgebraPetriNet.algorithms.dop2efa.Loader;
+import org.supremica.external.processeditor.xml.Loader;
 import org.supremica.manufacturingTables.xsd.processeditor.ROP;
 
 /** 
@@ -30,7 +25,6 @@ import org.supremica.manufacturingTables.xsd.processeditor.ROP;
  * sets up tool tips for both cells and column headers.
  */
 public class ROPtable extends JTable {
-    private boolean DEBUG = false;
     
     ROPtableModel model;
     
@@ -41,7 +35,7 @@ public class ROPtable extends JTable {
 
     public ROPtable() {
         super(new ROPtableModel());
-        setPreferredScrollableViewportSize(new Dimension(250, 500));
+        setPreferredScrollableViewportSize(new Dimension(50, 100));
         setFillsViewportHeight(true);
     }
     

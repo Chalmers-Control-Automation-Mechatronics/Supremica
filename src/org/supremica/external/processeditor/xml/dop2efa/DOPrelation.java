@@ -1,4 +1,4 @@
-package org.supremica.external.processAlgebraPetriNet.algorithms.dop2efa;
+package org.supremica.external.processeditor.xml.dop2efa;
 
 /**
  * this class holds function to build single relations

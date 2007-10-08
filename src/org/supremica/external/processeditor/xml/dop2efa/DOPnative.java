@@ -1,4 +1,4 @@
-package org.supremica.external.processAlgebraPetriNet.algorithms.dop2efa;
+package org.supremica.external.processeditor.xml.dop2efa;
 
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -116,23 +116,29 @@ public class DOPnative {
 			/*
 			 * search for same event but relabeled
 			 */
+			String totalEvents = "";
+			
 			moduleEventList = module.getEvents();
 			for(int i = 0; i < eventList.size(); i++){
 				int ii = 1;
 				
 				String event = eventList.get(i);
-				String tmpEvent = event.replace(EVENT_MACHINE_SEPARATOR, "_"+ii+EVENT_MACHINE_SEPARATOR);
+				String tmpEvent = event.replace(EVENT_MACHINE_SEPARATOR,
+						                        "_"+ii+EVENT_MACHINE_SEPARATOR);
+				
+				totalEvents = event;
 				
 				/* add relabeled event from module*/
 				while(moduleEventList.contains(tmpEvent)){
-					event = event.concat(";" + tmpEvent);
+					totalEvents = totalEvents.concat(";" + tmpEvent);
 					ii = ii + 1;
-					tmpEvent = event.replace(EVENT_MACHINE_SEPARATOR, "_"+ii+EVENT_MACHINE_SEPARATOR);
+					tmpEvent = event.replace(EVENT_MACHINE_SEPARATOR,
+											 "_"+ii+EVENT_MACHINE_SEPARATOR);
 				}
 				
 				/* replace */
 				eventList.remove(i);
-				eventList.add(i,event);
+				eventList.add(i,totalEvents);
 			}
 			
 			/*

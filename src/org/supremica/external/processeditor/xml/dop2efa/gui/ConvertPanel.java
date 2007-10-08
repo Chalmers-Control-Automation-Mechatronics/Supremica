@@ -1,4 +1,4 @@
-package org.supremica.external.processAlgebraPetriNet.algorithms.dop2efa.gui;
+package org.supremica.external.processeditor.xml.dop2efa.gui;
 
 import java.io.*;
 import java.util.List;
@@ -8,18 +8,19 @@ import java.awt.event.*;
 
 import javax.swing.*;
 
-import org.supremica.external.processAlgebraPetriNet.algorithms.dop2efa.DOPtoEFA;
+import org.supremica.external.processeditor.xml.dop2efa.Module;
+import org.supremica.external.processeditor.xml.dop2efa.DOPtoEFA;
 
 public class ConvertPanel extends JPanel implements ActionListener {
 	
-	private JPanel leftPane;
+	private ROPtablePane leftPane;
 	private JPanel rigthPane;
 	private JPanel bottomRigthPane;
 	
-	private JPanel outputPane;
+	private FilePathPane outputPane;
 	private JPanel moduleNamePane;
 	
-	private JPanel configPane;
+	private ParameterPane configPane;
 	private JPanel buttonPane;
 	
     private JButton jbToFile;
@@ -28,6 +29,10 @@ public class ConvertPanel extends JPanel implements ActionListener {
     private JTextField tfModuleName;
     
     private JFrame dialogReferenceFrame;
+    
+    private ActionListener l;
+    
+    public static final String EXIT = "exit"; 
     
     //constructor
     public ConvertPanel() {
@@ -40,7 +45,7 @@ public class ConvertPanel extends JPanel implements ActionListener {
     	
     	outputPane = new FilePathPane();
     	
-    	configPane = new JPanel();
+    	configPane = new ParameterPane();
     	buttonPane = new JPanel();
     	
     	moduleNamePane  = new JPanel();
@@ -63,14 +68,15 @@ public class ConvertPanel extends JPanel implements ActionListener {
                 BorderFactory.createTitledBorder("Module name"),
                 BorderFactory.createEmptyBorder(5,5,5,5)));
         
-        jbToFile = new JButton("To file");
+        jbToFile = new JButton("Write file");
         jbToFile.addActionListener(this);
         
         jbExit = new JButton("Exit");
         jbExit.addActionListener(this);
         
         //add components to moduleNamePane
-        tfModuleName.setToolTipText("Name of module in Supremica");
+        tfModuleName.setToolTipText("Name of waters module");
+        moduleNamePane.setLayout(new BoxLayout(moduleNamePane,BoxLayout.X_AXIS));
         moduleNamePane.add(tfModuleName);
         
         //add components to buttonPane
@@ -84,6 +90,8 @@ public class ConvertPanel extends JPanel implements ActionListener {
         bottomRigthPane.add(buttonPane);
         bottomRigthPane.add(Box.createVerticalGlue());
         
+        configPane.addOption("Block stop events whit no start event", "block", false, 0);
+        
         rigthPane.add(configPane);
         rigthPane.add(bottomRigthPane);
         
@@ -95,7 +103,19 @@ public class ConvertPanel extends JPanel implements ActionListener {
     public void setFrame(JFrame frame) {
     	dialogReferenceFrame = frame;
     }
-
+    
+    public void setInputFileChooser(JFileChooser fc) {
+    	leftPane.setFileChooser(fc);
+    }
+    
+    public void setOutputFileChooser(JFileChooser fc) {
+    	outputPane.setFileChooser(fc);
+    }
+    
+    public void addActionListener(ActionListener l) {
+    	this.l = l;
+    }
+    
     /**
      *	Take care of action
      */
@@ -106,7 +126,9 @@ public class ConvertPanel extends JPanel implements ActionListener {
         if(o == jbToFile){
         	convert();
         }else if(o == jbExit){
-        	System.exit(0);
+        	if(l != null){
+        		l.actionPerformed(new ActionEvent(o,0,EXIT));
+        	}
         }else{
         	System.err.println("unknown source " + o);
         }
@@ -125,7 +147,18 @@ public class ConvertPanel extends JPanel implements ActionListener {
     		moduleName = tfModuleName.getText();
     		
     		//convert
-    		DOPtoEFA.buildModule(filePathList,moduleName).writeToFile(new File(outFile));
+    		Module mod = DOPtoEFA.buildModule(filePathList,
+    							 moduleName,
+    							 configPane.getValueOption("block"));
+    		if(mod != null){
+    			mod.writeToFile(new File(outFile));
+    		}else{
+    			JOptionPane.
+				showMessageDialog(dialogReferenceFrame,
+								  "Couldn't create module",
+								  "Problem",
+								  JOptionPane.ERROR_MESSAGE);
+    		}
     	}
     }
     
