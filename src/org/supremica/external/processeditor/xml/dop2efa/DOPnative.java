@@ -56,7 +56,7 @@ public class DOPnative {
 		//Operation
 		/**************************/
 		//build operation
-		pga = pgaFromActivity(activity,efa);
+		pga = pgaFromActivity(activity, efa.getModule());
 		nativeProcess(pga,from,to,efa);
 		
 		/**************************/
@@ -217,12 +217,11 @@ public class DOPnative {
 	 * @param efa
 	 * @return
 	 */
-	protected static PGA pgaFromActivity(Activity activity, EFA efa){
+	protected static PGA pgaFromActivity(Activity activity, Module module){
 		
 		final int MAX_RESOURCE_VALUE = 1;
 		
 		PGA pga;
-		Module m;
 		List attList;
 		Attribute att;
 		
@@ -237,14 +236,10 @@ public class DOPnative {
 		pga = new PGA();
 		pga.setProcess(activity.getOperation());
 		
-		if(efa == null){
+		if(module == null){
 			return pga;
 		}
 		
-		m = efa.getModule();
-		if(m == null){
-			return pga;
-		}
 		
 		if(activity.getProperties() == null){
 			return pga;
@@ -262,7 +257,7 @@ public class DOPnative {
 				att = (Attribute)o;
 				
 				resourceName = att.getAttributeValue();
-				m.newResourceInteger(resourceName,MAX_RESOURCE_VALUE);
+				module.newResourceInteger(resourceName,MAX_RESOURCE_VALUE);
 				
 				if(att.getUpperIndicator() == null){
 					requireResource = false;
@@ -286,7 +281,7 @@ public class DOPnative {
 				
 				if(releaseResource){
 					guard = resourceName + "<" +
-							m.getMaxValueResourceInteger(resourceName);
+							module.getMaxValueResourceInteger(resourceName);
 					
 					action = resourceName + "+=1";
 					

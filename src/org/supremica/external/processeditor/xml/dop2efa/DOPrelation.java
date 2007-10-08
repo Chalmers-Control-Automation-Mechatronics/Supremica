@@ -514,11 +514,11 @@ public class DOPrelation extends DOPnative{
 				
 				/* Activity code */
 				
-				PGA pga = new PGA(((Activity)activityRelations[i]).getOperation());
-				pga.setStartGuard(startGuard);
+				PGA pga = pgaFromActivity((Activity)activityRelations[i],m);
+				pga.andStartGuard(startGuard);
 				
-				pga.setStopGuard(stopGuard);
-				pga.setStopAction(stopAction);
+				pga.andStopGuard(stopGuard);
+				pga.addStopAction(stopAction);
 				
 				nativeProcess(pga,FIRST_STATE,LAST_STATE,tmp);
 			}else{
@@ -638,12 +638,12 @@ public class DOPrelation extends DOPnative{
 				
 				/* Activity code */
 				
-				PGA pga = new PGA(((Activity)activityRelations[i]).getOperation());
-				pga.setStartGuard(startGuard);
-				pga.setStartAction(startAction);
+				PGA pga = pgaFromActivity((Activity)activityRelations[i],m);
+				pga.andStartGuard(startGuard);
+				pga.addStartAction(startAction);
 				
-				pga.setStopGuard(stopGuard);
-				pga.setStopAction(stopAction);
+				pga.andStopGuard(stopGuard);
+				pga.addStopAction(stopAction);
 				
 				nativeProcess(pga,FIRST_STATE,LAST_STATE,tmp);
 			}else{
