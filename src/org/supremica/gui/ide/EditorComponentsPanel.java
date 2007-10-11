@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.gui.ide
 //# CLASS:   EditorComponentsPanel
 //###########################################################################
-//# $Id: EditorComponentsPanel.java,v 1.40 2007-09-25 23:38:58 knut Exp $
+//# $Id: EditorComponentsPanel.java,v 1.41 2007-10-11 17:29:46 flordal Exp $
 //###########################################################################
 
 
@@ -183,7 +183,7 @@ class EditorComponentsPanel
     //# Interface java.awt.event.ActionListener
     public void actionPerformed(ActionEvent e)
     {
-		//System.out.println(e.getActionCommand());
+        //System.out.println(e.getActionCommand());
         if("add variable".equals(e.getActionCommand()))
         {
             //add new variable

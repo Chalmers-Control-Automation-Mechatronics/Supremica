@@ -1,0 +1,261 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<Automata name="Exponential determinisation" major="0" minor="9" comment="When any of these automata are made deterministic, the state space is increased exponentially, to the worst case size, 2^n-1, where n is the number of states in the nondeterministic automaton.
+  To perform determinisation in Supremica, go to the &quot;Analyzer&quot; tab, right-click on an automaton, choose &quot;Minimize&quot; using &quot;Language Equivalence&quot;.">
+<Automaton name="4 states small" type="Plant">
+	<Events>
+		<Event id="0" label="del"/>
+		<Event id="1" label="plus"/>
+		<Event id="2" label="shift"/>
+	</Events>
+	<States>
+		<State id="0" name="a" initial="true" accepting="true"/>
+		<State id="1" name="b"/>
+		<State id="2" name="c"/>
+		<State id="3" name="d"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="0" event="1"/>
+		<Transition source="0" dest="1" event="1"/>
+		<Transition source="0" dest="1" event="2"/>
+		<Transition source="1" dest="1" event="0"/>
+		<Transition source="1" dest="2" event="2"/>
+		<Transition source="2" dest="2" event="0"/>
+		<Transition source="2" dest="2" event="1"/>
+		<Transition source="2" dest="3" event="2"/>
+		<Transition source="3" dest="3" event="0"/>
+		<Transition source="3" dest="3" event="1"/>
+		<Transition source="3" dest="0" event="2"/>
+	</Transitions>
+</Automaton>
+<Automaton name="5 states small" type="Plant">
+	<Events>
+		<Event id="0" label="del"/>
+		<Event id="1" label="plus"/>
+		<Event id="2" label="shift"/>
+	</Events>
+	<States>
+		<State id="0" name="a" initial="true" accepting="true"/>
+		<State id="1" name="b"/>
+		<State id="2" name="c"/>
+		<State id="3" name="d"/>
+		<State id="4" name="e"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="0" event="1"/>
+		<Transition source="0" dest="1" event="1"/>
+		<Transition source="0" dest="1" event="2"/>
+		<Transition source="1" dest="1" event="0"/>
+		<Transition source="1" dest="2" event="2"/>
+		<Transition source="2" dest="2" event="0"/>
+		<Transition source="2" dest="2" event="1"/>
+		<Transition source="2" dest="3" event="2"/>
+		<Transition source="3" dest="3" event="0"/>
+		<Transition source="3" dest="3" event="1"/>
+		<Transition source="3" dest="4" event="2"/>
+		<Transition source="4" dest="4" event="0"/>
+		<Transition source="4" dest="4" event="1"/>
+		<Transition source="4" dest="0" event="2"/>
+	</Transitions>
+</Automaton>
+<Automaton name="3 states small" type="Plant">
+	<Events>
+		<Event id="0" label="plus"/>
+		<Event id="1" label="shift"/>
+	</Events>
+	<States>
+		<State id="0" name="a" initial="true" accepting="true"/>
+		<State id="1" name="b"/>
+		<State id="2" name="c"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="0" event="0"/>
+		<Transition source="0" dest="1" event="0"/>
+		<Transition source="0" dest="1" event="1"/>
+		<Transition source="1" dest="2" event="1"/>
+		<Transition source="2" dest="2" event="0"/>
+		<Transition source="2" dest="0" event="1"/>
+	</Transitions>
+</Automaton>
+<Automaton name="4 states" type="Plant">
+	<Events>
+		<Event id="0" label="a"/>
+		<Event id="1" label="ab"/>
+		<Event id="2" label="abc"/>
+		<Event id="3" label="abcd"/>
+		<Event id="4" label="ac"/>
+		<Event id="5" label="b"/>
+		<Event id="6" label="bc"/>
+		<Event id="7" label="bcd"/>
+		<Event id="8" label="bd"/>
+		<Event id="9" label="c"/>
+		<Event id="10" label="cd"/>
+		<Event id="11" label="cda"/>
+		<Event id="12" label="d"/>
+		<Event id="13" label="da"/>
+		<Event id="14" label="dab"/>
+	</Events>
+	<States>
+		<State id="0" name="a" initial="true" accepting="true"/>
+		<State id="1" name="b"/>
+		<State id="2" name="c"/>
+		<State id="3" name="d"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="0" event="1"/>
+		<Transition source="0" dest="1" event="1"/>
+		<Transition source="0" dest="0" event="2"/>
+		<Transition source="0" dest="1" event="2"/>
+		<Transition source="0" dest="2" event="2"/>
+		<Transition source="0" dest="0" event="3"/>
+		<Transition source="0" dest="1" event="3"/>
+		<Transition source="0" dest="2" event="3"/>
+		<Transition source="0" dest="3" event="3"/>
+		<Transition source="0" dest="0" event="4"/>
+		<Transition source="0" dest="2" event="4"/>
+		<Transition source="0" dest="1" event="5"/>
+		<Transition source="1" dest="1" event="6"/>
+		<Transition source="1" dest="2" event="6"/>
+		<Transition source="1" dest="1" event="7"/>
+		<Transition source="1" dest="2" event="7"/>
+		<Transition source="1" dest="3" event="7"/>
+		<Transition source="1" dest="1" event="8"/>
+		<Transition source="1" dest="3" event="8"/>
+		<Transition source="1" dest="2" event="9"/>
+		<Transition source="2" dest="2" event="10"/>
+		<Transition source="2" dest="3" event="10"/>
+		<Transition source="2" dest="0" event="11"/>
+		<Transition source="2" dest="2" event="11"/>
+		<Transition source="2" dest="3" event="11"/>
+		<Transition source="2" dest="3" event="12"/>
+		<Transition source="3" dest="0" event="0"/>
+		<Transition source="3" dest="0" event="13"/>
+		<Transition source="3" dest="3" event="13"/>
+		<Transition source="3" dest="0" event="14"/>
+		<Transition source="3" dest="1" event="14"/>
+		<Transition source="3" dest="3" event="14"/>
+	</Transitions>
+</Automaton>
+<Automaton name="6 states smaller" type="Plant">
+	<Events>
+		<Event id="0" label="add"/>
+		<Event id="1" label="sub"/>
+	</Events>
+	<States>
+		<State id="0" name="a" initial="true" accepting="true"/>
+		<State id="1" name="b"/>
+		<State id="2" name="c"/>
+		<State id="3" name="d"/>
+		<State id="4" name="e"/>
+		<State id="5" name="f"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="0" event="0"/>
+		<Transition source="0" dest="1" event="0"/>
+		<Transition source="1" dest="2" event="0"/>
+		<Transition source="1" dest="1" event="1"/>
+		<Transition source="2" dest="3" event="0"/>
+		<Transition source="2" dest="2" event="1"/>
+		<Transition source="3" dest="4" event="0"/>
+		<Transition source="3" dest="3" event="1"/>
+		<Transition source="4" dest="5" event="0"/>
+		<Transition source="4" dest="4" event="1"/>
+		<Transition source="5" dest="0" event="0"/>
+		<Transition source="5" dest="5" event="1"/>
+	</Transitions>
+</Automaton>
+<Automaton name="3 states" type="Plant">
+	<Events>
+		<Event id="0" label="a"/>
+		<Event id="1" label="ab"/>
+		<Event id="2" label="abc"/>
+		<Event id="3" label="b"/>
+		<Event id="4" label="bc"/>
+		<Event id="5" label="c"/>
+		<Event id="6" label="ca"/>
+	</Events>
+	<States>
+		<State id="0" name="a" initial="true" accepting="true"/>
+		<State id="1" name="b"/>
+		<State id="2" name="c"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="0" event="1"/>
+		<Transition source="0" dest="1" event="1"/>
+		<Transition source="0" dest="0" event="2"/>
+		<Transition source="0" dest="1" event="2"/>
+		<Transition source="0" dest="2" event="2"/>
+		<Transition source="0" dest="1" event="3"/>
+		<Transition source="1" dest="1" event="4"/>
+		<Transition source="1" dest="2" event="4"/>
+		<Transition source="1" dest="2" event="5"/>
+		<Transition source="2" dest="0" event="0"/>
+		<Transition source="2" dest="0" event="6"/>
+		<Transition source="2" dest="2" event="6"/>
+	</Transitions>
+</Automaton>
+<Automaton name="7 states smaller" type="Plant">
+	<Events>
+		<Event id="0" label="add"/>
+		<Event id="1" label="sub"/>
+	</Events>
+	<States>
+		<State id="0" name="a" initial="true" accepting="true"/>
+		<State id="1" name="b"/>
+		<State id="2" name="c"/>
+		<State id="3" name="d"/>
+		<State id="4" name="e"/>
+		<State id="5" name="f"/>
+		<State id="6" name="g"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="0" event="0"/>
+		<Transition source="0" dest="1" event="0"/>
+		<Transition source="1" dest="2" event="0"/>
+		<Transition source="1" dest="1" event="1"/>
+		<Transition source="2" dest="3" event="0"/>
+		<Transition source="2" dest="2" event="1"/>
+		<Transition source="3" dest="4" event="0"/>
+		<Transition source="3" dest="3" event="1"/>
+		<Transition source="4" dest="5" event="0"/>
+		<Transition source="4" dest="4" event="1"/>
+		<Transition source="5" dest="6" event="0"/>
+		<Transition source="5" dest="5" event="1"/>
+		<Transition source="6" dest="0" event="0"/>
+		<Transition source="6" dest="6" event="1"/>
+	</Transitions>
+</Automaton>
+<Automaton name="6 states small" type="Plant">
+	<Events>
+		<Event id="0" label="del"/>
+		<Event id="1" label="plus"/>
+		<Event id="2" label="shift"/>
+	</Events>
+	<States>
+		<State id="0" name="a" initial="true" accepting="true"/>
+		<State id="1" name="b"/>
+		<State id="2" name="c"/>
+		<State id="3" name="d"/>
+		<State id="4" name="e"/>
+		<State id="5" name="f"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="0" event="1"/>
+		<Transition source="0" dest="1" event="1"/>
+		<Transition source="0" dest="1" event="2"/>
+		<Transition source="1" dest="1" event="0"/>
+		<Transition source="1" dest="2" event="2"/>
+		<Transition source="2" dest="2" event="0"/>
+		<Transition source="2" dest="2" event="1"/>
+		<Transition source="2" dest="3" event="2"/>
+		<Transition source="3" dest="3" event="0"/>
+		<Transition source="3" dest="3" event="1"/>
+		<Transition source="3" dest="4" event="2"/>
+		<Transition source="4" dest="4" event="0"/>
+		<Transition source="4" dest="4" event="1"/>
+		<Transition source="4" dest="5" event="2"/>
+		<Transition source="5" dest="5" event="0"/>
+		<Transition source="5" dest="5" event="1"/>
+		<Transition source="5" dest="0" event="2"/>
+	</Transitions>
+</Automaton>
+</Automata>

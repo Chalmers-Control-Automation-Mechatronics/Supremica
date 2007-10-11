@@ -187,6 +187,7 @@ public class ExampleTemplates
         thisGroup.addItem(new TemplateItem("Car Window Control System", prefix + "big_bmw.xml"));
         thisGroup.addItem(new TemplateItem("Car fh", prefix + "/ModuleExamples/car_fh/car_fh.wmod"));
         thisGroup.addItem(new TemplateItem("Coffee Machine", prefix + "CoffeeMachine.wmod"));
+        thisGroup.addItem(new TemplateItem("Exponential determinisation", prefix + "ExponentialDeterminisation.xml"));
         thisGroup.addItem(new TemplateItem("Mars Pathfinder", prefix + "MarsPathfinder.wmod"));
         thisGroup.addItem(new TemplateItem("Observation Equivalence Execise", prefix + "ObservationEquivalenceExercise.xml"));
         //thisGroup.addItem(new TemplateItem("Passenger Land-Transportation System", prefix + "PLanTS.xml"));
