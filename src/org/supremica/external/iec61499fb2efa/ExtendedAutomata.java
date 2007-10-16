@@ -361,7 +361,7 @@ public class ExtendedAutomata
 						{
 							ModelMaker.output(ModelMaker.DEBUG, identCounters.toString(), 4);
 						
-							// set expression symbols to counters and make gaurd addition
+							// set expression symbols to counters and make guard addition
 							String addToGuard = "";
 							for (Iterator iter = guardExpressionIdents.iterator(); iter.hasNext();)
 							{
@@ -451,13 +451,24 @@ public class ExtendedAutomata
 										ModelMaker.output(ModelMaker.DEBUG, actionsIdentCounters.toString(), 4);
 										
 										// set action expression symbols to counters
+										addToGuard = "";
 										for (Iterator iter = actionsExpressionIdents.iterator(); iter.hasNext();)
 										{
 											String curIdent = (String) iter.next();
 											int value = ((Integer) actionsIdentCounters.get(curIdent)).intValue();
 											((IntegerVariable) symbols.getVariable(curIdent)).setValue(value);
+											addToGuard = addToGuard + curIdent + " == " + value;
+											if (iter.hasNext())
+											{
+												addToGuard = addToGuard + " & ";
+											}
 										}
-															
+										
+										if (!addToGuard.equals(""))
+										{
+											guard = guard + " & " + addToGuard;
+										}
+
 										// evaluate the actions
 										if (evaluator == null)
 										{
@@ -516,8 +527,13 @@ public class ExtendedAutomata
 										keepCountingActions = (atUpperBound.size() != actionsIdentCounters.keySet().size()); 
 									}
 								}
+								else
+								{
+									// mark new edge for adding
+									addEdges.add(makeTransition((NodeProxy) source.clone(), (NodeProxy) target.clone(), (LabelBlockProxy) curLabel.clone(), guard, ""));
+								}
 							}
-							
+												
 							// increase guard ident counters
 							List atUpperBound = new LinkedList();
 							for (Iterator countIter = identCounters.keySet().iterator(); countIter.hasNext();)
@@ -620,13 +636,21 @@ public class ExtendedAutomata
 							ModelMaker.output(ModelMaker.DEBUG, actionsIdentCounters.toString(), 4);
 							
 							// set action expression symbols to counters
+							String addToGuard = "";
 							for (Iterator iter = actionsExpressionIdents.iterator(); iter.hasNext();)
 							{
 								String curIdent = (String) iter.next();
 								int value = ((Integer) actionsIdentCounters.get(curIdent)).intValue();
 								((IntegerVariable) symbols.getVariable(curIdent)).setValue(value);
+								addToGuard = addToGuard + curIdent + " == " + value;
+								if (iter.hasNext())
+								{
+									addToGuard = addToGuard + " & ";
+								}
 							}
 							
+							String guard =  addToGuard;
+
 							// evaluate the actions
 							if (evaluator == null)
 							{
@@ -649,7 +673,7 @@ public class ExtendedAutomata
 							}
 							
 							// mark new edge for adding
-							addEdges.add(makeTransition((NodeProxy) source.clone(), (NodeProxy) target.clone(), (LabelBlockProxy) curLabel.clone(), "", actions));
+							addEdges.add(makeTransition((NodeProxy) source.clone(), (NodeProxy) target.clone(), (LabelBlockProxy) curLabel.clone(), guard, actions));
 							
 							// increase actions ident counters
 							List atUpperBound = new LinkedList();
@@ -684,6 +708,8 @@ public class ExtendedAutomata
 							// calculate keepCoutingActions condition
 							keepCountingActions = (atUpperBound.size() != actionsIdentCounters.keySet().size()); 
 						}
+						// mark current edge for removal
+						removeEdges.add(curEdge);
 					}
 
 					
@@ -751,7 +777,7 @@ public class ExtendedAutomata
 // 						{
 // 							ModelMaker.output(ModelMaker.DEBUG, identCounters.toString(), 4);
 						
-// 							// set expression symbols to counters and make gaurd addition
+// 							// set expression symbols to counters and make guard addition
 // 							String addToGuard = "";
 // 							for (Iterator iter = expressionIdents.iterator(); iter.hasNext();)
 // 							{
@@ -856,17 +882,17 @@ public class ExtendedAutomata
  				}
  			}
 
-// 			// remove old edges
-// 			for (Iterator iter = removeEdges.iterator(); iter.hasNext();)
-// 			{
-// 				edges.remove(iter.next());
-// 			}
+ 			// remove old edges
+ 			for (Iterator iter = removeEdges.iterator(); iter.hasNext();)
+ 			{
+ 				edges.remove(iter.next());
+ 			}
 			
-// 			// add new edges
-// 			for (Iterator iter = addEdges.iterator(); iter.hasNext();)
-// 			{
-// 				edges.add(iter.next());
-// 			}
+ 			// add new edges
+ 			for (Iterator iter = addEdges.iterator(); iter.hasNext();)
+ 			{
+ 				edges.add(iter.next());
+ 			}
 		}
 	}
 
