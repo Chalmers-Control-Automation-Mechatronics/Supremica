@@ -367,12 +367,20 @@ public class DOPrelation extends DOPnative{
 		
 		Module m = efa.getModule();
 		int numberOfTracks = relation.getActivityRelationGroup().size();
-		String var_name;
+		String var_name = "";
 		
 		ObjectFactory factory = new ObjectFactory();
 		
-		/* Parallel node code */
-		var_name = m.newParrallelNodeInteger(numberOfTracks + 1);
+		/* node code */
+		if(RelationType.PARALLEL.equals(relation.getType())){
+			var_name = m.newParrallelNodeInteger(numberOfTracks + 1);
+		}else if(RelationType.ARBITRARY.equals(relation.getType())){
+			var_name = m.newArbitraryOrderNodeInteger(numberOfTracks + 1);
+		}else{
+			System.err.println("Unknown node type " +
+								relation.getType().toString() +
+								" in addWaitForNodeToFinish");
+		}
 		
 		String startGuard = "";
 		String startAction = var_name + "=1;";

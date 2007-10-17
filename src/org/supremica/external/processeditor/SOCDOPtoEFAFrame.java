@@ -66,4 +66,10 @@ public class SOCDOPtoEFAFrame extends JFrame implements ActionListener{
         }
     }
     
+    public void setVisible(boolean b){
+    	if(b){
+    		cPanel.refreshTable();
+    	}
+    	super.setVisible(b);
+    }
 }

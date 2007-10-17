@@ -718,14 +718,20 @@ public class SOCGraphContainer
     }
     
     public void viewDOPtoEFAFrame() {
-    	
+    
+    	/*
+    	 * Create frame
+    	 */
     	if(dopToEfaFrame == null){
     		dopToEfaFrame = new SOCDOPtoEFAFrame();
     	}
+    	
+    	//show frame
     	dopToEfaFrame.setVisible(true);
     	
-    	
-    	
+    	/*
+    	 * Set input file chooser
+    	 */
     	JFileChooser fcInput;
     	
     	if(cDir != null) {
@@ -740,6 +746,9 @@ public class SOCGraphContainer
     	
     	dopToEfaFrame.setInputFileChooser(fcInput);
     	
+    	/*
+    	 * Set output file chooser
+    	 */
     	JFileChooser fcOutput;
     	
     	if(cDir != null) {

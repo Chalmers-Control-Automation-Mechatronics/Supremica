@@ -162,7 +162,7 @@ public class Module extends ExtendedAutomata{
 	 * @param upperBound
 	 * @return name of new parallel variable created
 	 */
-	public String newArbitraryNodeInteger(int upperBound){
+	public String newArbitraryOrderNodeInteger(int upperBound){
 		
 		final int lowerBound = 0;
 		final int initialValue = 0;

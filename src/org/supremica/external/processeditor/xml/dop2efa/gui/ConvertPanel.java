@@ -11,7 +11,9 @@ import javax.swing.*;
 import org.supremica.external.processeditor.xml.dop2efa.Module;
 import org.supremica.external.processeditor.xml.dop2efa.DOPtoEFA;
 
-public class ConvertPanel extends JPanel implements ActionListener {
+public class ConvertPanel 
+					extends JPanel 
+							implements ActionListener {
 	
 	private ROPtablePane leftPane;
 	private JPanel rigthPane;
@@ -114,6 +116,10 @@ public class ConvertPanel extends JPanel implements ActionListener {
     
     public void addActionListener(ActionListener l) {
     	this.l = l;
+    }
+    
+    public void refreshTable(){
+    	leftPane.refresh();
     }
     
     /**

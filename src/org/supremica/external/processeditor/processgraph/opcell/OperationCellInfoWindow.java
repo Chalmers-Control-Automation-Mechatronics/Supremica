@@ -291,7 +291,7 @@ public class OperationCellInfoWindow extends JDialog implements ActionListener {
 	return option;
     }
     private Activity getActivity() {
-	return operand;
+    	return operand;
     }
     /**
      * Is invoked when an action has occured.
@@ -356,150 +356,160 @@ public class OperationCellInfoWindow extends JDialog implements ActionListener {
 	//***************************END NEW CODE *********************************
     public class PredecessorWindow extends JPanel implements ActionListener
     {
-	private JButton add = new JButton("Add");
-	private JButton modify = new JButton("Modify");
-	private JButton remove = new JButton("Remove");
-	private int xSize = 100;
-	private int ySize = 100;
-	private DefaultTableModel model;
-	private JTable table ;
+    	private JButton add = new JButton("Add");
+    	private JButton modify = new JButton("Modify");
+    	private JButton remove = new JButton("Remove");
+    	private int xSize = 100;
+    	private int ySize = 100;
+    	private DefaultTableModel model;
+    	private JTable table ;
 	
-	public PredecessorWindow()
-	{	   
-	    setLayout(new BorderLayout());	    	    
-	    JPanel buttonPanel = new JPanel();
-	    buttonPanel.setLayout(new BoxLayout(buttonPanel,BoxLayout.Y_AXIS));
-	    add.addActionListener(this);
-	    modify.addActionListener(this);	
-	    remove.addActionListener(this); 
+    	public PredecessorWindow()
+    	{	   
+    		setLayout(new BorderLayout());	    	    
+    		JPanel buttonPanel = new JPanel();
+    		buttonPanel.setLayout(new BoxLayout(buttonPanel,BoxLayout.Y_AXIS));
+    		
+    		add.addActionListener(this);
+    		modify.addActionListener(this);	
+    		remove.addActionListener(this); 
 	    
-	    buttonPanel.add(add);
-	    buttonPanel.add(Box.createRigidArea(new Dimension(1,10)));
-	    buttonPanel.add(modify);
-	    buttonPanel.add(Box.createRigidArea(new Dimension(1,10)));
-	    buttonPanel.add(remove);	    	    	   
+    		buttonPanel.add(add);
+    		buttonPanel.add(Box.createRigidArea(new Dimension(1,10)));
+    		buttonPanel.add(modify);
+    		buttonPanel.add(Box.createRigidArea(new Dimension(1,10)));
+    		buttonPanel.add(remove);	    	    	   
 	    
-	    model = new DefaultTableModel(predecessorInfo, predecessorHeaders);	   
-	    table = new JTable(model);	    
-	    table.setShowHorizontalLines(true);  
-	    table.setShowVerticalLines(true); 
-	    table.setGridColor(Color.lightGray);
-	    table.setSize(((xSize*4)/5),ySize);
-	    table.setRowHeight(20);
+    		model = new DefaultTableModel(predecessorInfo, predecessorHeaders);	   
+    		table = new JTable(model);	    
+    		table.setShowHorizontalLines(true);  
+    		table.setShowVerticalLines(true); 
+    		table.setGridColor(Color.lightGray);
+    		table.setSize(((xSize*4)/5),ySize);
+    		table.setRowHeight(20);
 	    
-	    Object colModel = table.getColumnModel();
+    		Object colModel = table.getColumnModel();
 	    
-	    //Setting column widths
-	    for(int i = 0;i<((DefaultTableColumnModel)colModel).getColumnCount()-1;i++)	{
-		((DefaultTableColumnModel)colModel).getColumn(i).
-		    setPreferredWidth(preColumnPreferWidths[i]);
-		((DefaultTableColumnModel)colModel).getColumn(i).
-		    setMinWidth(preColumnMinWidths[i]);
-	    }	  
+    		//Setting column widths
+    		for(int i = 0;i<((DefaultTableColumnModel)colModel).getColumnCount()-1;i++)
+    		{
+    			((DefaultTableColumnModel)colModel).getColumn(i).
+    						setPreferredWidth(preColumnPreferWidths[i]);
+    			((DefaultTableColumnModel)colModel).getColumn(i).
+    						setMinWidth(preColumnMinWidths[i]);
+    		}	  
 	    	    
-	    JScrollPane scrollPane = new JScrollPane(table);	    	    	    
+    		JScrollPane scrollPane = new JScrollPane(table);	    	    	    
 	    
-	    add(scrollPane, BorderLayout.CENTER);
-	    add(buttonPanel, BorderLayout.EAST);	    
-	    setSize(xSize, ySize);	   
-	}
+    		add(scrollPane, BorderLayout.CENTER);
+    		add(buttonPanel, BorderLayout.EAST);	    
+    		setSize(xSize, ySize);	   
+    	}
 	
-	public Precondition getPrecondition() {	    
-	    try{
-		Precondition newPrecondition = null;
-		for(int i = 0; i < model.getRowCount(); i++) {
-		    if(i == 0) {
-			//newPrecondition = new PreconditionImpl();
-			newPrecondition = objectFactory.createPrecondition();
-		    }
-		    try{
-			//OperationReferenceType newOpRef = new OperationReferenceTypeImpl();		    
-			OperationReferenceType newOpRef = objectFactory.createOperationReferenceType();
-			newOpRef.setOperation((String)model.getValueAt(i,0));
-			newOpRef.setMachine((String)model.getValueAt(i,1));
-			newPrecondition.getPredecessor().add(newOpRef);
-		    }catch(Exception ex) {}
-		}
-		return newPrecondition;
-	    }catch(Exception ex) {
-		return null;
-	    }	    
-	}
-	public void actionPerformed(ActionEvent e)
-	{
-	    if( e.getSource() == add)
-		{
-		    String newData = JOptionPane.showInputDialog(this, 
+    	public Precondition getPrecondition()
+    	{	    
+    		try
+    		{
+    			Precondition newPrecondition = null;
+    			for(int i = 0; i < model.getRowCount(); i++)
+    			{
+    				if(i == 0)
+    				{
+    					//newPrecondition = new PreconditionImpl();
+    					newPrecondition = objectFactory.createPrecondition();
+    				}
+    				try
+    				{
+    					//OperationReferenceType newOpRef = new OperationReferenceTypeImpl();		    
+    					OperationReferenceType newOpRef = objectFactory.createOperationReferenceType();
+    					newOpRef.setOperation((String)model.getValueAt(i,0));
+    					newOpRef.setMachine((String)model.getValueAt(i,1));
+    					newPrecondition.getPredecessor().add(newOpRef);
+    				}catch(Exception ex) {}
+    			}
+    			return newPrecondition;
+    		}
+    		catch(Exception ex)
+    		{
+    			return null;
+    		}	    
+    	}
+    	
+    	public void actionPerformed(ActionEvent e)
+    	{
+    		if( e.getSource() == add)
+    		{
+    			String newData = JOptionPane.showInputDialog(this, 
 						      	 "Enter Name @ Resource");
-		    if(newData != null)
-			{
-			    String tmpName = "";
-			    String tmpResource = "";
-			    try {
-				tmpName = newData.substring(0,newData.indexOf("@"));
-				tmpResource = newData.substring(newData.indexOf("@")+1,
-								       newData.length());
-			    }catch(Exception ex){
-				tmpName = newData;
-			    }
-			    Object[] newRowData = {tmpName,tmpResource,""};
-			    model.addRow(newRowData);
-			}
-		    else{table.clearSelection();}
-		}
-	    else if( e.getSource() == modify)
-		{		    
-		    if(table.getSelectedRow() != -1)
-			{
-			    Object t = model.getValueAt(table.getSelectedRow(),0)+"@"+
-				model.getValueAt(table.getSelectedRow(),1);		     
-			    String inData = JOptionPane.showInputDialog(
-									this, 
-									"Enter Name",(Object)t );
-			    if(inData != null)
-				{
-				    String tmpName = "";
-				    String tmpResource = "";
-				    try {
-					tmpName = inData.substring(0, inData.indexOf("@"));
-					tmpResource = inData.substring(inData.indexOf("@")+1, 
-								       inData.length());
-				    }catch(Exception ex) {
-					tmpName = inData;
-				    }
-				    model.setValueAt(tmpName,
-						     table.getSelectedRow(),0);
-				    model.setValueAt(tmpResource,
-						     table.getSelectedRow(),1);
-				}
-			    else{
-				table.clearSelection();}
-			}
-		    else
-			{
-			    JOptionPane.showMessageDialog(this,
-							  "You must select a row",
-							  "Modify",
-							  JOptionPane.ERROR_MESSAGE);
-			}
-		    
-		}
-	    else if( e.getSource() == remove)
-		{		    
-		    if(table.getSelectedRow() != -1)
-			{		       
-			    model.removeRow(table.getSelectedRow())	;
-			}
-		    else
-			{
-			    JOptionPane.showMessageDialog(this,
+    			if(newData != null)
+    			{
+    				String tmpName = "";
+    				String tmpResource = "";
+			    
+    				try {
+    					tmpName = newData.substring(0,newData.indexOf("@"));
+    					tmpResource = newData.substring(newData.indexOf("@")+1,
+    													newData.length());
+    				}catch(Exception ex){
+    					tmpName = newData;
+    				}
+			    
+    				Object[] newRowData = {tmpName,tmpResource,""};
+    				model.addRow(newRowData);
+    			}
+    			else{table.clearSelection();}
+    		}
+    		else if( e.getSource() == modify)
+    		{		    
+    			if(table.getSelectedRow() != -1)
+    			{
+    				Object t = model.getValueAt(table.getSelectedRow(),0)+"@"+
+    				model.getValueAt(table.getSelectedRow(),1);		     
+    				String inData = JOptionPane.showInputDialog(this, 
+														"Enter Name",(Object)t );
+    				if(inData != null)
+    				{
+    					String tmpName = "";
+    					String tmpResource = "";
+    					try {
+    						tmpName = inData.substring(0, inData.indexOf("@"));
+    						tmpResource = inData.substring(inData.indexOf("@")+1, 
+    								inData.length());
+    					}catch(Exception ex) {
+    						tmpName = inData;
+    					}
+    					model.setValueAt(tmpName,
+    							table.getSelectedRow(),0);
+    					model.setValueAt(tmpResource,
+    							table.getSelectedRow(),1);
+    				}
+    				else{table.clearSelection();}
+    			}
+    			else
+    			{
+    				JOptionPane.showMessageDialog(this,
+    							"You must select a row",
+    							"Modify",
+    							JOptionPane.ERROR_MESSAGE);
+    			} 
+    		}
+    		else if( e.getSource() == remove)
+    		{		    
+    			if(table.getSelectedRow() != -1)
+    			{		       
+    				model.removeRow(table.getSelectedRow())	;
+    			}
+    			else
+    			{
+    				JOptionPane.showMessageDialog(this,
 							  "You must select a row",
 							  "Remove",
 							  JOptionPane.ERROR_MESSAGE);
-			}
-		}
-	}
+    			}
+    		}
+    	}
     }
+    
     public class AttributeWindow extends JPanel implements ActionListener
     {
 	private JButton add=new JButton("Add"),

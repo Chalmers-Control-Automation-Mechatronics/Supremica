@@ -76,6 +76,10 @@ public class ROPtablePane extends JPanel implements ActionListener{
     	return ropTable.getMarkedFilePathList();
     }
 	
+	public void refresh(){
+		ropTable.refresh();
+	}
+	
 	//take care of actions
 	public void actionPerformed(ActionEvent evt) {
     	

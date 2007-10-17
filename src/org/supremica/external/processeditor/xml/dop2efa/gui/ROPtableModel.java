@@ -15,7 +15,6 @@ public class ROPtableModel extends AbstractTableModel {
 	public final int BOOLEAN_COL = 3;
 	public final int FILE_PATH_COL = 4;
 	
-	private boolean DEBUG = false;
 	private final int COLUMS = 5;
 	
     private String[] columnNames = {"Name",
@@ -94,22 +93,9 @@ public class ROPtableModel extends AbstractTableModel {
      * data can change.
      */
     public void setValueAt(Object value, int row, int col) {
-        if (DEBUG) {
-            System.out.println("Setting value at " + row + "," + col
-                               + " to " + value
-                               + " (an instance of "
-                               + value.getClass() + ")");
-        }
-        
         Object[] o = dataList.get(row);
         o[col] = value;
-        
         fireTableCellUpdated(row, col);
-
-        if (DEBUG) {
-            System.out.println("New value of data:");
-            printDebugData();
-        }
     }
     
     public void insertRow(Object[] row) {
@@ -118,14 +104,17 @@ public class ROPtableModel extends AbstractTableModel {
         	return;
         }
     	dataList.add(row);
+    	fireTableRowsInserted(0,getRowCount());
     }
     
-    public void deleteRow(Object[] row) {
-    	
-    	if(row == null || row.length != COLUMS){
+    public void deleteRow(Object[] o) {
+    	int row = -1;
+    	if(o == null || o.length != COLUMS){
         	return;
         }
-    	dataList.remove(row);
+    	
+    	row  = dataList.indexOf(o);
+    	deleteRow(row);
     }
     
     public void deleteRow(int row) {
@@ -135,6 +124,7 @@ public class ROPtableModel extends AbstractTableModel {
         }
     	
     	dataList.remove(row);
+    	fireTableRowsDeleted(row, row);
     }
     
     public boolean rowExist(Object[] o) {
@@ -158,19 +148,5 @@ public class ROPtableModel extends AbstractTableModel {
     	
     	//no match
     	return false;
-    }
-    
-    private void printDebugData() {
-        int numRows = getRowCount();
-        int numCols = getColumnCount();
-
-        for (int i=0; i < numRows; i++) {
-            System.out.print("    row " + i + ":");
-            for (int j=0; j < numCols; j++) {
-                System.out.print("  ");
-            }
-            System.out.println();
-        }
-        System.out.println("--------------------------");
     }
 }

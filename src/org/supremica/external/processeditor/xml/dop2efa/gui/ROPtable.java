@@ -68,6 +68,54 @@ public class ROPtable extends JTable {
     	
     }
     
+    public void refresh(){
+    	
+    	String name = "";
+    	String type = "";
+    	String comment = "";
+    	
+    	File ropFile = null;
+    	ROP rop = null;
+    	
+    	int row = 0;
+    	while(row < getModel().getRowCount()){
+    		
+    		//create file
+    		ropFile = new File((String)getModel().getValueAt(row,getModel().FILE_PATH_COL));
+    		
+    		//create rop
+    		rop = getROPfromFile(ropFile);
+    		
+    		if(rop == null){
+    			getModel().deleteRow(row);
+    		}else{
+    			//test if property have changed
+    			name = (String)getModel().getValueAt(row, getModel().NAME_COL);
+    			type = (String)getModel().getValueAt(row, getModel().TYPE_COL);
+    			comment = (String)getModel().getValueAt(row, getModel().COMMENT_COL);
+    			
+    			if(!name.equals(rop.getMachine())){
+    				//name changed
+    				getModel().setValueAt(rop.getMachine(),
+    									  row, getModel().NAME_COL);
+    			}
+    			if(!type.equals(rop.getType().toString())){
+    				//type changed
+    				getModel().setValueAt(rop.getType().toString(),
+    									  row, getModel().TYPE_COL);
+    			}
+    			if(!comment.equals(rop.getComment())){
+    				//comment changed
+    				getModel().setValueAt(rop.getComment(),
+    						  			  row, getModel().COMMENT_COL);
+    			}
+    			
+    			//next row
+    			row = row + 1;
+    		}
+    	}
+    }
+    
     public List<String> getFilePathList(){
     	List<String> filePathList = new LinkedList<String>();
     	
@@ -95,7 +143,7 @@ public class ROPtable extends JTable {
     public void removeSelectedRows(){
     	int rows[] = getSelectedRows();
     	for(int i = 0; i < rows.length; i++){
-    		getModel().deleteRow(rows[i]);
+    		getModel().deleteRow(rows[i]-i);
     	}
     }
     
@@ -104,6 +152,7 @@ public class ROPtable extends JTable {
     	String tip = null;
     	
     	String fileName = null;
+    	String type = null;
 		String machineName = null;
 		String comment = null;
 		
@@ -127,14 +176,17 @@ public class ROPtable extends JTable {
     			}
     			break;
     		
-    		case 1: //Comment column
+    		case 1: //RopType column
+    			type = (String)getValueAt(rowIndex, colIndex);
+    			if(type != null && type.length() > 0){
+    				tip = type;
+    			}
+        		break;
+    		case 2: //comment 
     			comment = (String)getValueAt(rowIndex, colIndex);
     			if(comment != null && comment.length() > 0){
     				tip = comment;
     			}
-        		break;
-    		case 2: //Type column
-    			//tip = "";
         		break;
     		case 3: // Checked column
     			
