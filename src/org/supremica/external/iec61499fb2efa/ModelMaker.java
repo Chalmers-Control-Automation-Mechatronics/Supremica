@@ -379,7 +379,10 @@ class ModelMaker
 		}
 		
 		output("ModelMaker.makeModel(): Writing Model ------------------------------------------");
+
 		automata.writeToFile(new File(outputFileName));
+
+		output("ModelMaker.makeModel(): Done ------------------------------------------");
 	}
 
     private void loadSystem(String fileName)
