@@ -244,7 +244,7 @@ public class Milp
             //TODO: better name...
             createConsecutiveBookingConstraints();
 
-			writeToMilpFile();
+            writeToMilpFile();
 			
             long procTime = timer.elapsedTime();
             infoMsgs += "\tPre-processing time = " + procTime + "ms\n";
@@ -1690,9 +1690,12 @@ public class Milp
         ArrayList<LabeledEvent[]> bEventPairs = new ArrayList<LabeledEvent[]>();
         
         // Each entry of this map contains an ArrayList of pairs of consecutive 
-        // booking states, e.g. [Z1_b_index Z2_b_index]. These states are local to some plant, 
-        // e.g. Pi, and mean that Pi can book Z1 in the state corresponding to Z1_b_index 
-        // whereafter Z2 is booked in Z2_index without Z1 beeing unbooked in between. 
+        // booking states together with the information about whether there is 
+        // a buffer between the bookings or not, e.g. [Z1_b_index Z2_b_index isBuffer]. 
+        // These states are local to some plant, e.g. Pi, and mean that Pi 
+        // can book Z1 in the state corresponding to Z1_b_index whereafter Z2 is booked 
+        // in Z2_index at some point. If the second booking is done without Z1 beeing unbooked,
+        // isBuffer is equal to 1. 
         // The keys are int[]-objects of type [plant_index, first_zone_index, second_zone_index].
         TreeMap<int[], ArrayList<int[]>> consecutiveBookingTicsIndices = 
                 new TreeMap<int[], ArrayList<int[]>>(new IntArrayComparator()); 
@@ -1734,11 +1737,43 @@ public class Milp
         // (tror jag) /AK
         // Skall infon om tillstånd vara med i bEventPairs??? /AK
 //TODO: De följande tre raderna skall inte vara bortkommenterade (ÄN) utan är det för att slippa lägga
-//      till BookingPairsGraphExplorer.java i CVS-en. Vad skall göras här???
+//      till BookingPairsGraphExplorer.java i CVS-en. Vad skall göras här???        
 //        BookingPairsGraphExplorer graphExplorer = new BookingPairsGraphExplorer(
 //            consecutiveBookingTicsIndices.keySet().toArray(new int[][]{}));
 //        graphExplorer.findConnectedCycles();
-        
+        // Sanity-check...
+        for (int p = 0; p < plants.size(); p++)
+        {
+            for (int z1 = 0; z1 < bookingTics.length; z1++)
+            {
+                for (int z2 = 0; z2 < bookingTics.length; z2++)
+                {
+                    if (z1 != z2)
+                    {
+                        ArrayList<int[]> testList = consecutiveBookingTicsIndices.get(new int[]{p, z1, z2});
+                        if (testList != null)
+                        {
+                            for (int[] inList : testList)
+                            {
+                                String str = "P" + p + "_Z" + z1 + "_Z" + z2;
+                                if (inList[2] == 0)
+                                {
+                                    str += " (overlapping): ";
+                                }
+                                else 
+                                    str += " (buffered): ";
+                         
+                                str += bookingTics[z1][p][STATE_SWITCH][inList[0]] + " ";
+                                str += bookingTics[z2][p][STATE_SWITCH][inList[1]] + " ";
+                                str += inList[2];
+
+                                warnMsgs += str + "\n";
+                            }
+                        }
+                    }
+                }             
+            }
+        }
 // @Deprecated: tänkte om...
 //                    for (int p = 0; p < plants.size(); p++)
 //                    {
@@ -1953,6 +1988,10 @@ public class Milp
 
         Automaton plant = plants.getAutomatonAt(plantIndex);
         
+        // This array holds true values (i.e. =1) for each examined state that has a
+        // pZone-unbooking event in the trace to the fZone-booking. 
+        int[] uEventFoundDownstreams = new int[plant.nbrOfStates()];
+        
         // For faster processing, the booking tics of the preceding zone are put into a hashtable 
         Hashtable<Integer, Integer> pBStateIndicesTable = new Hashtable<Integer, Integer>();
         for (int i = 0; i < bookingTics[pZoneIndex][plantIndex][STATE_SWITCH].length; i++)
@@ -1960,7 +1999,7 @@ public class Milp
             pBStateIndicesTable.put(new Integer(bookingTics[pZoneIndex][plantIndex][STATE_SWITCH][i]), new Integer(i));
         }
         
-        // Find the events that are common to the current plant pZone 
+        // Find the events that are common to the current plant and pZone 
         Alphabet pCommonAlphabet = AlphabetHelpers.intersect(
                 plants.getAutomatonAt(plantIndex).getAlphabet(),
                 zones.getAutomatonAt(pZoneIndex).getAlphabet());
@@ -1983,7 +2022,10 @@ public class Milp
             // Starting with the booking of fZone, we search upwards
             while (!upstreamsStates.isEmpty())
             {
-                State currUpstreamsState = upstreamsStates.remove(0);
+                // Remove the last state in the list (important to search deepwards to avoid
+                // confusion in the values of "uEventFoundDownstreams"
+                State currUpstreamsState = upstreamsStates.remove(upstreamsStates.size() - 1);
+                
                 for (Iterator<Arc> incomingArcsIt = currUpstreamsState.incomingArcsIterator(); incomingArcsIt.hasNext();)
                 {
                     Arc incomingArc = incomingArcsIt.next();
@@ -1991,12 +2033,19 @@ public class Milp
                     // If the incoming event does not unbook pZone...
                     if (!pUnbookingAlphabet.contains(incomingArc.getEvent()))
                     {
+                        int currStateIndex = indexMap.getStateIndex(plant, incomingArc.getFromState());
+                        
+                        // Propagate the information about the pZone-unbooking event
+                        uEventFoundDownstreams[currStateIndex] = 
+                                uEventFoundDownstreams[indexMap.getStateIndex(plant, incomingArc.getToState())];
+                        
                         // If that event actually books pZone, then a consecutive sequence is added to the list
                         if (pBookingAlphabet.contains(incomingArc.getEvent()))
                         {
-                            int bookingStateIndex = indexMap.getStateIndex(plant, incomingArc.getFromState());                                 
+                            // Adding a pair of consecutive booking states (with or without a buffer in between)
                             bookingStateSequences.add(new int[]{
-                                pBStateIndicesTable.get(new Integer(bookingStateIndex)).intValue(), i});
+                                pBStateIndicesTable.get(new Integer(currStateIndex)).intValue(), i, 
+                                uEventFoundDownstreams[currStateIndex]});
                         }
                         // Otherwise, if we neither find booking nor unbooking of pZone,
                         // the search is continued by adding all states that lead to the current state. 
@@ -2006,6 +2055,13 @@ public class Milp
                         {
                             upstreamsStates.add(incomingArc.getFromState());
                         }
+                    }
+                    else
+                    {
+                        // An unbooking event was found which must be recorded
+                        uEventFoundDownstreams[indexMap.getStateIndex(plant, incomingArc.getFromState())] = 1;
+                        
+                        upstreamsStates.add(incomingArc.getFromState());
                     }
                 }
             }

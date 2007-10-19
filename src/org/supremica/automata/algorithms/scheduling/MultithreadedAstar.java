@@ -57,7 +57,6 @@ public class MultithreadedAstar
     private static final double DEFAULT_PROBABILITY = 1;
     private static final double UNSUCCESSFUL_SEARCH_VALUE = Double.NEGATIVE_INFINITY;
     private ArrayList<Node> scheduleInfo;
-    private Automaton scheduleAuto;
 // 	private int nrOfSubthreads = 0;
 // 	private int maxClosedSize = 0;
     
@@ -415,8 +414,8 @@ public class MultithreadedAstar
      * is done until an initial node is found, which completes the construction.
      */
     public void buildScheduleAutomaton()
-    throws Exception
-    {
+        throws Exception
+    {   
         if (acceptingNode != null)
         {
             timer.restart();

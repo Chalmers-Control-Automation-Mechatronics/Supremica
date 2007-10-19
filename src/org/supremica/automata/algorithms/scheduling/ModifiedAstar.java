@@ -182,7 +182,7 @@ public class ModifiedAstar
      */
     String dummyEventName = "reset";
 
-	private Automaton scheduleAuto = null;
+    protected Automaton scheduleAuto = null;
 
     /** 
      * Used to guide the A* towards suboptimal solution. Contains x-weight and
@@ -282,12 +282,12 @@ public class ModifiedAstar
 
 				if (isRunning && buildSchedule)
 				{
-					buildScheduleAutomaton();
+                                    buildScheduleAutomaton();
 				}
 
 				if (isRunning)
 				{
-					requestStop(true);
+                                    requestStop(true);
 				}
 				else
 				{
@@ -1630,7 +1630,7 @@ public class ModifiedAstar
 
 	public Automaton getSchedule()
 	{
-		return scheduleAuto;
+            return scheduleAuto;
 	}
 
 	public String getInfoMessages()
