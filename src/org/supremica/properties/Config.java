@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.properties
 //# CLASS:   Config
 //###########################################################################
-//# $Id: Config.java,v 1.41 2007-10-04 15:14:56 flordal Exp $
+//# $Id: Config.java,v 1.42 2007-10-19 12:38:28 flordal Exp $
 //###########################################################################
 
 /*
@@ -225,25 +225,25 @@ public final class Config
     public static final BooleanProperty SYNTHESIS_REDUCE_SUPERVISORS = new BooleanProperty(PropertyType.ALGORITHMS_SYNTHESIS, "synthesisReduceSupervisors", false, "Try to minimize supervisors");
 
     // ALGORITHMS_MINIMIZATION
-    public static final ObjectProperty MINIMIZATION_EQUIVALENCE_RELATION = new ObjectProperty(PropertyType.ALGORITHMS_MINIMIZATION, "minimizationEquivalenceRelation", EquivalenceRelation.LANGUAGEEQUIVALENCE.toString(), "Default equivalence relation", EquivalenceRelation.values());
+    public static final ObjectProperty MINIMIZATION_EQUIVALENCE_RELATION = new ObjectProperty(PropertyType.ALGORITHMS_MINIMIZATION, "minimizationEquivalenceRelation", EquivalenceRelation.LANGUAGEEQUIVALENCE, "Default equivalence relation", EquivalenceRelation.values());
     public static final BooleanProperty MINIMIZATION_ALSO_MINIMIZE_TRANSITIONS = new BooleanProperty(PropertyType.ALGORITHMS_MINIMIZATION, "minimizationAlsoMinimizeTransitions", true, "Minimize the number of transitions");
     public static final BooleanProperty MINIMIZATION_KEEP_ORIGINAL = new BooleanProperty(PropertyType.ALGORITHMS_MINIMIZATION, "minimizationKeepOriginal", true, "Keep original");
     public static final BooleanProperty MINIMIZATION_IGNORE_MARKING = new BooleanProperty(PropertyType.ALGORITHMS_MINIMIZATION, "minimizationIgnoreMarking", false, "Ignore marking");
-    public static final ObjectProperty MINIMIZATION_STRATEGY = new ObjectProperty(PropertyType.ALGORITHMS_MINIMIZATION, "minimizationStrategy", MinimizationStrategy.FewestTransitionsFirst.toString(), "Minimization strategy", MinimizationStrategy.values());
-    public static final ObjectProperty MINIMIZATION_HEURISTIC = new ObjectProperty(PropertyType.ALGORITHMS_MINIMIZATION, "minimizationHeuristic", MinimizationHeuristic.MostLocal.toString(), "Minimization heuristics", MinimizationHeuristic.values());
+    public static final ObjectProperty MINIMIZATION_STRATEGY = new ObjectProperty(PropertyType.ALGORITHMS_MINIMIZATION, "minimizationStrategy", MinimizationStrategy.FewestTransitionsFirst, "Minimization strategy", MinimizationStrategy.values());
+    public static final ObjectProperty MINIMIZATION_HEURISTIC = new ObjectProperty(PropertyType.ALGORITHMS_MINIMIZATION, "minimizationHeuristic", MinimizationHeuristic.MostLocal, "Minimization heuristics", MinimizationHeuristic.values());
     public static final ObjectProperty MINIMIZATION_SILENT_EVENT_NAME = new ObjectProperty(PropertyType.ALGORITHMS_MINIMIZATION, "generalSilentEventName", "tau", "Silent event name");
     public static final ObjectProperty MINIMIZATION_SILENT_CONTROLLABLE_EVENT_NAME = new ObjectProperty(PropertyType.ALGORITHMS_MINIMIZATION, "generalSilentControllableEventName", "tau_c", "Silent controllable event name");
     public static final ObjectProperty MINIMIZATION_SILENT_UNCONTROLLABLE_EVENT_NAME = new ObjectProperty(PropertyType.ALGORITHMS_MINIMIZATION, "generalSilentUnontrollableEventName", "tau_u", "Silent uncontrollable event name");
 
     // ALGORITHMS_BDD2
     // New BDD implementation using JavaBDD library
-    public static final ObjectProperty BDD2_BDDLIBRARY = new ObjectProperty(PropertyType.ALGORITHMS_BDD2, "libraryName", BDDLibraryType.JAVA.toString(), "Binary Decision Diagram Library", BDDLibraryType.values());
+    public static final ObjectProperty BDD2_BDDLIBRARY = new ObjectProperty(PropertyType.ALGORITHMS_BDD2, "libraryName", BDDLibraryType.JAVA, "Binary Decision Diagram Library", BDDLibraryType.values());
     public static final IntegerProperty BDD2_INITIALNODETABLESIZE = new IntegerProperty(PropertyType.ALGORITHMS_BDD2, "initialNodeTableSize", 1000000, "Initial node table size");
     public static final IntegerProperty BDD2_CACHESIZE = new IntegerProperty(PropertyType.ALGORITHMS_BDD2, "cacheSize", 100000, "Operation cache size");
     public static final IntegerProperty BDD2_MAXINCREASENODES = new IntegerProperty(PropertyType.ALGORITHMS_BDD2, "maxIncreaseNodes", 2500000, "Set maximum number of nodes by which to increase node table after a garbage collection.");
     public static final DoubleProperty BDD2_INCREASEFACTOR = new DoubleProperty(PropertyType.ALGORITHMS_BDD2, "increaseFactor", 2.0, "Set factor by which to increase node table after a garbage collection.", false, 0.0);
     public static final DoubleProperty BDD2_CACHERATIO = new DoubleProperty(PropertyType.ALGORITHMS_BDD2, "cacheRatio", 10.0, "Sets the cache ratio for the operator caches (#tablenodes/#cachenodes)", false, 0.0);
-    public static final ObjectProperty BDD2_PARTITIONING = new ObjectProperty(PropertyType.ALGORITHMS_BDD2, "partitioning", BDDPartitioningType.MONOLITHIC.toString(), "BDD transition partitioning", BDDPartitioningType.values());
+    public static final ObjectProperty BDD2_PARTITIONING = new ObjectProperty(PropertyType.ALGORITHMS_BDD2, "partitioning", BDDPartitioningType.MONOLITHIC, "BDD transition partitioning", BDDPartitioningType.values());
 
     // ALGORITHMS_BDD
     // Most of these are ugly integers in BDD.Options... but they have String representations here.

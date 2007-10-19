@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.properties
 //# CLASS:   StringProperty
 //###########################################################################
-//# $Id: ObjectProperty.java,v 1.1 2007-10-04 15:14:56 flordal Exp $
+//# $Id: ObjectProperty.java,v 1.2 2007-10-19 12:38:28 flordal Exp $
 //###########################################################################
 
 /*
@@ -84,9 +84,35 @@ public class ObjectProperty
     
     public Object get()
     {
-        return mValue;
+        if (legalValues != null)
+        {
+            for (Object value: legalValues)
+            {
+                if (mValue.equals(value))
+                {
+                    return mValue;
+                }
+            }
+            for (Object value: legalValues)
+            {
+                if (mValue.toString().equals(value.toString()))
+                {
+                    return value;
+                }
+            }
+            throw new IllegalArgumentException("Illegal value: " + mValue);
+        }
+        else
+        {
+            return mValue;
+        }
     }
     
+    public String getAsString()
+    {
+        return get().toString();
+    }
+
     public void set(final String value)
     {
         final Object oldvalue = mValue;
@@ -157,6 +183,7 @@ public class ObjectProperty
         return legalValues;        
     }
  
+    /*
     public String[] legalValuesAsStrings()
     {
         String[] legalValuesAsStrings = new String[legalValues.length];
@@ -166,15 +193,11 @@ public class ObjectProperty
         }
         return legalValuesAsStrings;        
     }
-    
-    public String getAsString()
-    {
-        return get().toString();
-    }
+     */
     
     public String valueToEscapedString()
     {
-        return ObjectProperty.convert(get().toString(), false);
+        return ObjectProperty.convert(getAsString(), false);
     }
     
     public boolean currentValueDifferentFromDefaultValue()

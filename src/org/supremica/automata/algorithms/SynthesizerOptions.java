@@ -248,8 +248,8 @@ public final class SynthesizerOptions
      */
     public void saveOptions()
     {
-        Config.SYNTHESIS_SYNTHESIS_TYPE.set(synthesisType.toString());
-        Config.SYNTHESIS_ALGORITHM_TYPE.set(synthesisAlgorithm.toString());
+        Config.SYNTHESIS_SYNTHESIS_TYPE.set(synthesisType);
+        Config.SYNTHESIS_ALGORITHM_TYPE.set(synthesisAlgorithm);
         Config.SYNTHESIS_PURGE.set(purge);
         Config.SYNTHESIS_OPTIMIZE.set(optimize);
         Config.SYNTHESIS_MAXIMALLY_PERMISSIVE.set(maximallyPermissive);

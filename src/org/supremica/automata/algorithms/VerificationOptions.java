@@ -208,8 +208,8 @@ public final class VerificationOptions
      */
     public void saveOptions()
     {
-        Config.VERIFY_VERIFICATION_TYPE.set(verificationType.toString());
-        Config.VERIFY_ALGORITHM_TYPE.set(algorithmType.toString());
+        Config.VERIFY_VERIFICATION_TYPE.set(verificationType);
+        Config.VERIFY_ALGORITHM_TYPE.set(algorithmType);
         Config.VERIFY_EXCLUSION_STATE_LIMIT.set(exclusionStateLimit);
         Config.VERIFY_REACHABILITY_STATE_LIMIT.set(reachabilityStateLimit);
         Config.VERIFY_ONE_EVENT_AT_A_TIME.set(oneEventAtATime);

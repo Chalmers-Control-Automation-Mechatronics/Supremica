@@ -329,12 +329,12 @@ public final class MinimizationOptions
      */
     public void saveOptions()
     {
-        Config.MINIMIZATION_EQUIVALENCE_RELATION.set(equivalenceRelation.toString());
+        Config.MINIMIZATION_EQUIVALENCE_RELATION.set(equivalenceRelation);
         Config.MINIMIZATION_ALSO_MINIMIZE_TRANSITIONS.set(alsoTransitions);
         Config.MINIMIZATION_KEEP_ORIGINAL.set(keepOriginal);
         Config.MINIMIZATION_IGNORE_MARKING.set(ignoreMarking);
-        Config.MINIMIZATION_STRATEGY.set(minimizationStrategy.toString());
-        Config.MINIMIZATION_HEURISTIC.set(minimizationHeuristic.toString());
+        Config.MINIMIZATION_STRATEGY.set(minimizationStrategy);
+        Config.MINIMIZATION_HEURISTIC.set(minimizationHeuristic);
     }
     
     /**

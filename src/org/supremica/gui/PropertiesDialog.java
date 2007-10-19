@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.gui
 //# CLASS:   PropertiesDialog
 //###########################################################################
-//# $Id: PropertiesDialog.java,v 1.17 2007-10-04 15:14:56 flordal Exp $
+//# $Id: PropertiesDialog.java,v 1.18 2007-10-19 12:38:28 flordal Exp $
 //###########################################################################
 
 /*
@@ -526,7 +526,7 @@ public class PropertiesDialog
                 {
                     if (selector.getSelectedItem() != null)
                     {
-                        property.set(selector.getSelectedItem().toString());
+                        property.set(selector.getSelectedItem());
                     }
                 }
                 else if (text != null)
