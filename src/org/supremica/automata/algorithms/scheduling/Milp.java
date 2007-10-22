@@ -162,6 +162,9 @@ public class Milp
      * In that case, each statetime-value is divised by timeThroughBigMApprox. 
      */
     private double timeThroughBigMApprox = 1;
+    
+    //TODO: totally ugly (snabb fix): needs to be redone! (se nedan)
+    private ArrayList<int[]>[] consecutiveBookingEdges;
 
 	protected String infoMsgs = "";
 	protected String warnMsgs = "";
@@ -1702,6 +1705,15 @@ public class Milp
         
         // Find and store all consecutive bookingTics, i.e. when a plant first 
         // books Z_i and then Z_j without unbooking Z_i
+        
+        //TODO: totally ugly (snabb fix): needs to be redone! (se nedan)
+        consecutiveBookingEdges = new ArrayList[zones.size()];
+        for (int z = 0; z < zones.size(); z++)
+        {
+            consecutiveBookingEdges[z] = new ArrayList<int[]>();
+        }
+        
+        
         for (int p = 0; p < plants.size(); p++)
         {
             for (int z1 = 0; z1 < bookingTics.length; z1++)
@@ -1716,6 +1728,15 @@ public class Milp
                             if (currConsecutiveBookingTicsIndices.size() > 0)
                             {
                                 consecutiveBookingTicsIndices.put(new int[]{p, z1, z2}, currConsecutiveBookingTicsIndices);
+                                
+                                //TODO: totally ugly (snabb fix): needs to be redone!
+                                for (int i = 0; i < currConsecutiveBookingTicsIndices.size(); i++)
+                                {
+                                    consecutiveBookingEdges[z1].add(new int[]{z2, p, 
+                                            currConsecutiveBookingTicsIndices.get(i)[0],
+                                            currConsecutiveBookingTicsIndices.get(i)[1],
+                                            currConsecutiveBookingTicsIndices.get(i)[2]});
+                                }
                             }
                         }
                     }
@@ -1742,6 +1763,8 @@ public class Milp
 //            consecutiveBookingTicsIndices.keySet().toArray(new int[][]{}));
 //        graphExplorer.findConnectedCycles();
         // Sanity-check...
+        new BookingPairsGraphExplorer(consecutiveBookingEdges);
+        
         for (int p = 0; p < plants.size(); p++)
         {
             for (int z1 = 0; z1 < bookingTics.length; z1++)
@@ -2008,6 +2031,21 @@ public class Milp
                 zones.getAutomatonAt(pZoneIndex).getInitialState().activeEvents(false));
         // The remaining common events book pZone
         Alphabet pBookingAlphabet = AlphabetHelpers.minus(pCommonAlphabet, pUnbookingAlphabet);
+        // All booking events except for the ones that book pZone or fZone (move outside the method)
+        // TODO: Move the method to an egen class
+        // TODO: Make this method more efficient (do we have to call it 1.000.000 times with (p1,z1,z2)?
+        //       Or could it be enough to call with (p)?
+        Alphabet remainingBookingAlphabet = new Alphabet();
+        for (int i = 0; i < zones.size(); i++)
+        {
+            if (i != pZoneIndex && i != fZoneIndex)
+            {
+                remainingBookingAlphabet = AlphabetHelpers.union(remainingBookingAlphabet, 
+                        zones.getAutomatonAt(i).getInitialState().activeEvents(true));
+            }
+        }
+        remainingBookingAlphabet = AlphabetHelpers.intersect(
+                plants.getAutomatonAt(plantIndex).getAlphabet(), remainingBookingAlphabet);
         
         // The loop searching for preceding bookings to each booking of fZone that 
         // fulfil the requirements of "consecutive booking"
@@ -2047,11 +2085,11 @@ public class Milp
                                 pBStateIndicesTable.get(new Integer(currStateIndex)).intValue(), i, 
                                 uEventFoundDownstreams[currStateIndex]});
                         }
-                        // Otherwise, if we neither find booking nor unbooking of pZone,
+                        // Otherwise, if we neither find unbooking of pZone nor booking of any other zone,
                         // the search is continued by adding all states that lead to the current state. 
                         // By checking for the unbooking of pZone, we avoid sequences like "Ri_bj -> Ri_uj -> Ri_bk",
                         // that do not comply with the definition of "consecutive booking".
-                        else
+                        else if (!remainingBookingAlphabet.contains(incomingArc.getEvent()))
                         {
                             upstreamsStates.add(incomingArc.getFromState());
                         }
@@ -2642,9 +2680,16 @@ public class Milp
         // ...and prints it to stdout
         String milpEchoStr = "";
         String totalMilpEchoStr = "";
+        String simplexIterationNr = "";
         while ((milpEchoStr = milpEcho.readLine()) != null)
         {
             totalMilpEchoStr += milpEchoStr + "\n";
+            
+            if (milpEchoStr.contains("+") && milpEchoStr.contains(":") && 
+                    milpEchoStr.contains("mip") && milpEchoStr.contains(">="))
+            {
+                simplexIterationNr = milpEchoStr.substring(milpEchoStr.indexOf("+") + 1, milpEchoStr.indexOf(":")).trim();
+            }
             
 //             if (milpEchoStr.contains("INTEGER OPTIMAL SOLUTION FOUND") || milpEchoStr.contains("Time") || milpEchoStr.contains("Memory"))
 //             {
@@ -2665,6 +2710,8 @@ public class Milp
                 throw new Exception(totalMilpEchoStr);
             }
         }
+         
+        infoMsgs += "\tNr of simplex iterations = " + simplexIterationNr + "\n";
     }
     
     public void requestStop()
