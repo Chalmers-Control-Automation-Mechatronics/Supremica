@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.properties
 //# CLASS:   StringProperty
 //###########################################################################
-//# $Id: ObjectProperty.java,v 1.2 2007-10-19 12:38:28 flordal Exp $
+//# $Id: ObjectProperty.java,v 1.3 2007-10-22 13:49:41 flordal Exp $
 //###########################################################################
 
 /*
@@ -84,28 +84,10 @@ public class ObjectProperty
     
     public Object get()
     {
-        if (legalValues != null)
-        {
-            for (Object value: legalValues)
-            {
-                if (mValue.equals(value))
-                {
-                    return mValue;
-                }
-            }
-            for (Object value: legalValues)
-            {
-                if (mValue.toString().equals(value.toString()))
-                {
-                    return value;
-                }
-            }
-            throw new IllegalArgumentException("Illegal value: " + mValue);
-        }
+        if (mValue instanceof String)
+            return parseObject((String) mValue);
         else
-        {
             return mValue;
-        }
     }
     
     public String getAsString()
