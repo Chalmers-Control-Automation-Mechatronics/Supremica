@@ -7,7 +7,8 @@ import javax.swing.table.TableModel;
 import java.util.List;
 import java.util.LinkedList;
 
-public class ROPtableModel extends AbstractTableModel {
+public class ROPtableModel
+					extends AbstractTableModel {
 	
 	public final int NAME_COL = 0;
 	public final int TYPE_COL = 1;
@@ -74,10 +75,6 @@ public class ROPtableModel extends AbstractTableModel {
     	}
     }
 
-    /*
-     * Don't need to implement this method unless your table's
-     * editable.
-     */
     public boolean isCellEditable(int row, int col) {
         //Note that the data/cell address is constant,
         //no matter where the cell appears onscreen.
@@ -88,10 +85,6 @@ public class ROPtableModel extends AbstractTableModel {
         }
     }
 
-    /*
-     * Don't need to implement this method unless your table's
-     * data can change.
-     */
     public void setValueAt(Object value, int row, int col) {
         Object[] o = dataList.get(row);
         o[col] = value;

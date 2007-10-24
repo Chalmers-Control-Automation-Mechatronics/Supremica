@@ -629,12 +629,12 @@ public class SOCMenuBar extends JMenuBar implements ActionListener,
      * @param title the title of the frame that is to be added
      */
     public void addFrame(String title) {
-	JRadioButtonMenuItem jrbmi = new JRadioButtonMenuItem(title);
-	jrbmi.addActionListener(this);
-	JMenu jmWindow = (JMenu)getMenuItem("Windows");
-	jmWindow.add(jrbmi);
-	bgWindow.add(jrbmi);
-	jrbmi.setSelected(true);	
+    	JRadioButtonMenuItem jrbmi = new JRadioButtonMenuItem(title);
+    	jrbmi.addActionListener(this);
+    	JMenu jmWindow = (JMenu)getMenuItem("Windows");
+    	jmWindow.add(jrbmi);
+    	bgWindow.add(jrbmi);
+    	jrbmi.setSelected(true);	
     }
     /**
      * Is invoked when an action has occurred.
@@ -644,151 +644,154 @@ public class SOCMenuBar extends JMenuBar implements ActionListener,
      * @param e the action event
      */
     public void actionPerformed(ActionEvent e) {
-	//DEBUG
-	//System.out.println("SOCGraphContainer.actionPerformed()");
-	//END DEBUG
-	if(e.getSource() instanceof JMenuItem) {
-	    if("New".equals(e.getActionCommand())) {
-		graphContainer.newSheet();	  	    	
-	    }else if("Open...".equals(e.getActionCommand())) {
-		graphContainer.open();
-	    }else if("eRWD".equals(e.getActionCommand())) {
-		graphContainer.importFromFile(SOCGraphContainer.ERWD);
-	    }else if("SDP Station".equals(e.getActionCommand())) {
-		graphContainer.importFromFile(SOCGraphContainer.SDP_STATION);
-	    }else if("SDP Database".equals(e.getActionCommand())) {
-		graphContainer.importFromFile(SOCGraphContainer.SDP_DATABASE);
-	    }else if("Close".equals(e.getActionCommand())) {
-		graphContainer.close();
-	    }else if("Save".equals(e.getActionCommand())) {
-		graphContainer.save();
-	    }else if("Save As...".equals(e.getActionCommand())) {	 
-		if(((JMenu)getMenuItem("Custom Save")).
-		   isMenuComponent((JMenuItem)e.getSource())) {
-		    graphContainer.saveWithoutSubelements();
-		}else {		   
-		    graphContainer.saveAs();
-		}	       		
-	    }else if("Export As Image...".equals(e.getActionCommand())) {
-		graphContainer.exportAsImage();
-	    }else if("Export...".equals(e.getActionCommand())) {
-		graphContainer.export();	  	   	       
-	    //}else if("Solution Extraction...".equals(e.getActionCommand())) {
-		//solutionExtraction(COMPLETE);		
-	    }else if("Printer Settings...".equals(e.getActionCommand())) {
-		JMenuItem tmp = getMenuItem("Custom Save.Save As...");
-	    }else if("Print".equals(e.getActionCommand())) {
-		graphContainer.print();
-	    }else if("Exit".equals(e.getActionCommand())) {
-		System.exit(0);
-	    }else if("New Resource".equals(e.getActionCommand())) {
-		graphContainer.newResource();
-	    }else if("New Operation".equals(e.getActionCommand())) { 
-		graphContainer.newOperation();
-	    }else if("New Sequence".equals(e.getActionCommand())) {
-		graphContainer.newRelation(RelationType.SEQUENCE);
-	    }else if("New Alternative".equals(e.getActionCommand())) {	       
-		graphContainer.newRelation(RelationType.ALTERNATIVE);
-	    }else if("New Parallel".equals(e.getActionCommand())) {
-		graphContainer.newRelation(RelationType.PARALLEL);
-	    }else if("New Arbitrary".equals(e.getActionCommand())) {
-		graphContainer.newRelation(RelationType.ARBITRARY);
-	    }else if("New Algebraic...".equals(e.getActionCommand())) {
-		graphContainer.newAlgebraic();
-	    }else if("Insert Resource...".equals(e.getActionCommand())) {
-		graphContainer.insertResource();
-	    }else if("Create Outer Relation".equals(e.getActionCommand())) {
-		graphContainer.createOuterRelation();
-	    }else if("Remove Outer Relation".equals(e.getActionCommand())) {
-		graphContainer.removeOuterRelation();
-	    }else if("Cut".equals(e.getActionCommand())) {
-		graphContainer.cut();
-	    }else if("Copy".equals(e.getActionCommand())) {
-		graphContainer.copy();
-		setEnabled("Paste", true);
-	    }else if("Paste".equals(e.getActionCommand())) {
-		graphContainer.paste();
-	    }else if("Delete".equals(e.getActionCommand())) {
-		graphContainer.delete();
-	    }else if("Sequence".equals(e.getActionCommand())) {
-	    	graphContainer.changeRelationType(RelationType.SEQUENCE);
-	    }else if("Alternative".equals(e.getActionCommand())) {
-	    	graphContainer.changeRelationType(RelationType.ALTERNATIVE);
-	    }else if("Parallel".equals(e.getActionCommand())) {	    
-	    	graphContainer.changeRelationType(RelationType.PARALLEL);
-	    }else if("Arbitrary".equals(e.getActionCommand())) {
-	    	graphContainer.changeRelationType(RelationType.ARBITRARY);
-	    }else if("Auto Positioning".equals(e.getActionCommand())) {	  
-	    	graphContainer.rebuildAll();
-	    }else if("Algebraic".equals(e.getActionCommand())) {
-		graphContainer.
-		    setAlgebraic(((JCheckBoxMenuItem)e.getSource()).
-				 isSelected());
-	    }else if(e.getSource() instanceof JMenuItem && 
-		     ((JMenuItem)e.getSource()).getName() != null &&	    
-		     ((JMenuItem)e.getSource()).getName().
-		     startsWith("SumAttribute")) {
-		graphContainer.sumAttribute(((JMenuItem)e.getSource()).
-					    getName().
-					    substring(12, 
-						      ((JMenuItem)e.
-						       getSource()).
-						      getName().length()));
-	    }else if("Resource Info...".equals(e.getActionCommand())) {
-		graphContainer.resourceInfo();
-	    }else if("Operation Info...".equals(e.getActionCommand())) {
-		graphContainer.operationInfo();
-	    }else if("Multi Mode".equals(e.getActionCommand())) {
-		graphContainer.setMultiModeView(((JCheckBoxMenuItem)e.
-						 getSource()).getState());  
-	    }else if("Smallest".equals(e.getActionCommand())) {
-		AttributePanel.sizeX = 20;	    		
-		graphContainer.rebuildAll();		
-	    }else if("Smaller".equals(e.getActionCommand())) {
-		AttributePanel.sizeX = 30;	    	       
-		graphContainer.rebuildAll();		
-	    }else if("Small".equals(e.getActionCommand())) {
-		AttributePanel.sizeX = 40;	    		
-		graphContainer.rebuildAll();		
-	    }else if("Medium".equals(e.getActionCommand())) {
-		AttributePanel.sizeX = 50;		
-		graphContainer.rebuildAll();		
-	    }else if("Large".equals(e.getActionCommand())) {
-		AttributePanel.sizeX = 60;		
-		graphContainer.rebuildAll();		
-	    }else if("Larger".equals(e.getActionCommand())) {
-		AttributePanel.sizeX = 70;	     
-		graphContainer.rebuildAll();	       
-	    }else if("Largest".equals(e.getActionCommand())) {
-		AttributePanel.sizeX = 80;	    		
-		graphContainer.rebuildAll();	
-	    }else if("Synthesis...".equals(e.getActionCommand())) {
-		graphContainer.synthesis();
-	    }else if("Automata...".equals(e.getActionCommand())) {
-		graphContainer.viewAutomata();
-	    }else if("Complete Model...".equals(e.getActionCommand())) {
-		graphContainer.createAutomatas(SOCGraphContainer.COMPLETE);
-	    }else if("Basic Model...".equals(e.getActionCommand())) {
-		graphContainer.createAutomatas(SOCGraphContainer.BASIC);
-	    }else if("Simplified Model...".equals(e.getActionCommand())) {
-		graphContainer.createAutomatas(SOCGraphContainer.SIMPLIFIED);
-	    }else if("Complete State Names...".equals(e.getActionCommand())) {
-		graphContainer.generateSupervisor(SOCGraphContainer.COMPLETE);
-	    }else if("Short State Names...".equals(e.getActionCommand())) {
-		graphContainer.generateSupervisor(SOCGraphContainer.SIMPLIFIED);
-	    }else if("DOP to EFA".equals(e.getActionCommand())) {
-	    	graphContainer.viewDOPtoEFAFrame();
-	    }else if("Cascade".equals(e.getActionCommand())) {
-		graphContainer.cascade();
-	    }else {
-		JInternalFrame[] frames = graphContainer.getAllFrames();
-		for(int i = 0; i < frames.length; i++) {	
-		    if(frames[i].getTitle().equals(e.getActionCommand())) {    
-			((SOCGraphFrame)frames[i]).setSelected(true);  	    
-			((SOCGraphFrame)frames[i]).setMaximum(true);
-			break;
-		    }
-		}
+    	//DEBUG
+    	//System.out.println("SOCGraphContainer.actionPerformed()");
+    	//END DEBUG
+    	if(e.getSource() instanceof JMenuItem) {
+    		if("New".equals(e.getActionCommand())) {
+    			graphContainer.newSheet();	  	    	
+    		}else if("Open...".equals(e.getActionCommand())) {
+    			graphContainer.open();
+    		}else if("eRWD".equals(e.getActionCommand())) {
+    			graphContainer.importFromFile(SOCGraphContainer.ERWD);
+    		}else if("SDP Station".equals(e.getActionCommand())) {
+    			graphContainer.importFromFile(SOCGraphContainer.SDP_STATION);
+    		}else if("SDP Database".equals(e.getActionCommand())) {
+    			graphContainer.importFromFile(SOCGraphContainer.SDP_DATABASE);
+    		}else if("Close".equals(e.getActionCommand())) {
+    			graphContainer.close();
+    		}else if("Save".equals(e.getActionCommand())) {
+    			graphContainer.save();
+    		}else if("Save As...".equals(e.getActionCommand())) {
+    			
+    			if(((JMenu)getMenuItem("Custom Save")).
+    						isMenuComponent((JMenuItem)e.getSource())) {
+    				graphContainer.saveWithoutSubelements();
+    			}else {		   
+    				graphContainer.saveAs();
+    			}
+    			
+    		}else if("Export As Image...".equals(e.getActionCommand())) {
+    			graphContainer.exportAsImage();
+    		}else if("Export...".equals(e.getActionCommand())) {
+    			graphContainer.export();	  	   	       
+    		//}else if("Solution Extraction...".equals(e.getActionCommand())) {
+    			//solutionExtraction(COMPLETE);		
+    		}else if("Printer Settings...".equals(e.getActionCommand())) {
+    			JMenuItem tmp = getMenuItem("Custom Save.Save As...");
+    		}else if("Print".equals(e.getActionCommand())) {
+    			graphContainer.print();
+    		}else if("Exit".equals(e.getActionCommand())) {
+    			System.exit(0);
+    		}else if("New Resource".equals(e.getActionCommand())) {
+    			graphContainer.newResource();
+    		}else if("New Operation".equals(e.getActionCommand())) { 
+    			graphContainer.newOperation();
+    		}else if("New Sequence".equals(e.getActionCommand())) {
+    			graphContainer.newRelation(RelationType.SEQUENCE);
+    		}else if("New Alternative".equals(e.getActionCommand())) {	       
+    			graphContainer.newRelation(RelationType.ALTERNATIVE);
+    		}else if("New Parallel".equals(e.getActionCommand())) {
+    			graphContainer.newRelation(RelationType.PARALLEL);
+    		}else if("New Arbitrary".equals(e.getActionCommand())) {
+    			graphContainer.newRelation(RelationType.ARBITRARY);
+    		}else if("New Algebraic...".equals(e.getActionCommand())) {
+    			graphContainer.newAlgebraic();
+    		}else if("Insert Resource...".equals(e.getActionCommand())) {
+    			graphContainer.insertResource();
+    		}else if("Create Outer Relation".equals(e.getActionCommand())) {
+    			graphContainer.createOuterRelation();
+    		}else if("Remove Outer Relation".equals(e.getActionCommand())) {
+    			graphContainer.removeOuterRelation();
+    		}else if("Cut".equals(e.getActionCommand())) {
+    			graphContainer.cut();
+    		}else if("Copy".equals(e.getActionCommand())) {
+    			graphContainer.copy();
+    			setEnabled("Paste", true);
+    		}else if("Paste".equals(e.getActionCommand())) {
+    			graphContainer.paste();
+    		}else if("Delete".equals(e.getActionCommand())) {
+    			graphContainer.delete();
+    		}else if("Sequence".equals(e.getActionCommand())) {
+    			graphContainer.changeRelationType(RelationType.SEQUENCE);
+    		}else if("Alternative".equals(e.getActionCommand())) {
+    			graphContainer.changeRelationType(RelationType.ALTERNATIVE);
+    		}else if("Parallel".equals(e.getActionCommand())) {	    
+    			graphContainer.changeRelationType(RelationType.PARALLEL);
+    		}else if("Arbitrary".equals(e.getActionCommand())) {
+    			graphContainer.changeRelationType(RelationType.ARBITRARY);
+    		}else if("Auto Positioning".equals(e.getActionCommand())) {	  
+    			graphContainer.rebuildAll();
+    		}else if("Algebraic".equals(e.getActionCommand())) {
+    			graphContainer.
+    				setAlgebraic(((JCheckBoxMenuItem)e.getSource()).
+    												isSelected());
+    		}else if(e.getSource() instanceof JMenuItem && 
+    				((JMenuItem)e.getSource()).getName() != null &&	    
+    				((JMenuItem)e.getSource()).getName().
+    				startsWith("SumAttribute")) {
+    				graphContainer.sumAttribute(((JMenuItem)e.getSource()).
+    						getName().
+    							substring(12, 
+    									((JMenuItem)e.
+    											getSource()).
+    											getName().length()));
+    		}else if("Resource Info...".equals(e.getActionCommand())) {
+    			graphContainer.resourceInfo();
+    		}else if("Operation Info...".equals(e.getActionCommand())) {
+    			graphContainer.operationInfo();
+    		}else if("Multi Mode".equals(e.getActionCommand())) {
+    			graphContainer.setMultiModeView(((JCheckBoxMenuItem)e.
+						 		getSource()).getState());  
+    		}else if("Smallest".equals(e.getActionCommand())) {
+    			AttributePanel.sizeX = 20;	    		
+    			graphContainer.rebuildAll();		
+    		}else if("Smaller".equals(e.getActionCommand())) {
+    			AttributePanel.sizeX = 30;	    	       
+    			graphContainer.rebuildAll();		
+    		}else if("Small".equals(e.getActionCommand())) {
+    			AttributePanel.sizeX = 40;	    		
+    			graphContainer.rebuildAll();		
+    		}else if("Medium".equals(e.getActionCommand())) {
+    			AttributePanel.sizeX = 50;		
+    			graphContainer.rebuildAll();		
+    		}else if("Large".equals(e.getActionCommand())) {
+    			AttributePanel.sizeX = 60;		
+    			graphContainer.rebuildAll();		
+    		}else if("Larger".equals(e.getActionCommand())) {
+    			AttributePanel.sizeX = 70;	     
+    			graphContainer.rebuildAll();	       
+    		}else if("Largest".equals(e.getActionCommand())) {
+    			AttributePanel.sizeX = 80;	    		
+    			graphContainer.rebuildAll();	
+    		}else if("Synthesis...".equals(e.getActionCommand())) {
+    			graphContainer.synthesis();
+    		}else if("Automata...".equals(e.getActionCommand())) {
+    			graphContainer.viewAutomata();
+    		}else if("Complete Model...".equals(e.getActionCommand())) {
+    			graphContainer.createAutomatas(SOCGraphContainer.COMPLETE);
+    		}else if("Basic Model...".equals(e.getActionCommand())) {
+    			graphContainer.createAutomatas(SOCGraphContainer.BASIC);
+    		}else if("Simplified Model...".equals(e.getActionCommand())) {
+    			graphContainer.createAutomatas(SOCGraphContainer.SIMPLIFIED);
+    		}else if("Complete State Names...".equals(e.getActionCommand())) {
+    			graphContainer.generateSupervisor(SOCGraphContainer.COMPLETE);
+    		}else if("Short State Names...".equals(e.getActionCommand())) {
+    			graphContainer.generateSupervisor(SOCGraphContainer.SIMPLIFIED);
+    		}else if("DOP to EFA".equals(e.getActionCommand())) {
+    			graphContainer.viewDOPtoEFAFrame();
+    		}else if("Cascade".equals(e.getActionCommand())) {
+    			graphContainer.cascade();
+    		}else {
+		
+    			JInternalFrame[] frames = graphContainer.getAllFrames();
+    			for(int i = 0; i < frames.length; i++) {	
+    				if(frames[i].getTitle().equals(e.getActionCommand())) {    
+    					((SOCGraphFrame)frames[i]).setSelected(true);  	    
+    					((SOCGraphFrame)frames[i]).setMaximum(true);
+    					break;
+    				}
+    			}
 	    }
 	}
     }      
@@ -906,19 +909,19 @@ public class SOCMenuBar extends JMenuBar implements ActionListener,
      * @param e the internal frame event
      */
     public void internalFrameActivated(InternalFrameEvent e) {
-	SOCGraphFrame frame = (SOCGraphFrame)e.getInternalFrame();
-	JMenu jmWindows = (JMenu)getMenuItem("Windows");
-	JCheckBoxMenuItem jmiMultiMode = 
-	    (JCheckBoxMenuItem)getMenuItem("Multi Mode");
-	for(int i = 2; i < jmWindows.getItemCount(); i++) {
-	    if(jmWindows.getItem(i).getText().
-	       equals(e.getInternalFrame().getTitle())) {
-		jmWindows.getItem(i).setSelected(true);
-		jmiMultiMode.setState(frame.isMultiModeView());
-		break;
-	    }
-	}
-	selectionChanged();
+    	SOCGraphFrame frame = (SOCGraphFrame)e.getInternalFrame();
+    	JMenu jmWindows = (JMenu)getMenuItem("Windows");
+    	JCheckBoxMenuItem jmiMultiMode = 
+    				(JCheckBoxMenuItem)getMenuItem("Multi Mode");
+    	for(int i = 2; i < jmWindows.getItemCount(); i++) {
+    		if(jmWindows.getItem(i).getText().
+    				equals(e.getInternalFrame().getTitle())) {
+    			jmWindows.getItem(i).setSelected(true);
+    			jmiMultiMode.setState(frame.isMultiModeView());
+    			break;
+    		}
+    	}
+    	selectionChanged();
     }
     /**
      * Is invoked when a internal frame is closed.
@@ -928,9 +931,9 @@ public class SOCMenuBar extends JMenuBar implements ActionListener,
      * @param e the internal frame event
      */
     public void internalFrameClosed(InternalFrameEvent e) {
-	if(graphContainer.getFrameCount() == 0) {
-	    setEnabled("Multi Mode", false);
-	}
+    	if(graphContainer.getFrameCount() == 0) {
+    		setEnabled("Multi Mode", false);
+    	}
     }
     /**
      * Is invoked when a internal frame is closing.
@@ -940,13 +943,13 @@ public class SOCMenuBar extends JMenuBar implements ActionListener,
      * @param e the internal frame event
      */
     public void internalFrameClosing(InternalFrameEvent e) {
-	JMenu jmWindows = (JMenu)getMenuItem("Windows");
-	for(int i = 2; i < jmWindows.getItemCount(); i++) {  
-	    if(jmWindows.getItem(i).getText().
-	       equals(e.getInternalFrame().getTitle())) {
-		jmWindows.remove(i);
-	    }
-	}		
+    	JMenu jmWindows = (JMenu)getMenuItem("Windows");
+    	for(int i = 2; i < jmWindows.getItemCount(); i++) {  
+    		if(jmWindows.getItem(i).getText().
+    				equals(e.getInternalFrame().getTitle())) {
+    			jmWindows.remove(i);
+    		}
+    	}		
     }
     /**
      * Is invoked when a internal frame is deactivated.

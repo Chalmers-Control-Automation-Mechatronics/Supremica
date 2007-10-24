@@ -9,9 +9,10 @@ import org.supremica.manufacturingTables.xsd.processeditor.Attribute;
 import org.supremica.manufacturingTables.xsd.processeditor.OperationReferenceType;
 import org.supremica.manufacturingTables.xsd.processeditor.Precondition;
 
-//
-//	Native function code. Help function for DOPrelation class
-//
+
+/*
+ * Native function code. Base functions for DOPrelation class
+ */
 public class DOPnative {
 	
 	protected final static String EVENT_MACHINE_SEPARATOR = "::";
@@ -28,11 +29,13 @@ public class DOPnative {
 	
 	/**
 	 * Activity function code
+	 * 
+	 * Create an activity from state "from" to "to" in efa.
 	 */
 	protected static void nativeActivity(Activity activity,
-									String from,
-									String to,
-									EFA efa){
+										 String from,
+										 String to,
+										 EFA efa){
 		
 		
 		
@@ -70,7 +73,7 @@ public class DOPnative {
 	}
 	
 	/**
-	 * 
+	 * Create precondition
 	 * @param module
 	 */
 	protected static void addPrecondition(Module module){
@@ -128,7 +131,7 @@ public class DOPnative {
 				
 				totalEvents = event;
 				
-				/* add relabeled event from module*/
+				/* add relabeled event from module */
 				while(moduleEventList.contains(tmpEvent)){
 					totalEvents = totalEvents.concat(";" + tmpEvent);
 					ii = ii + 1;
@@ -182,6 +185,11 @@ public class DOPnative {
 		}
 	}
 	
+	/**
+	 * 
+	 * @param event with event name and machine name separated by ::
+	 * @return name of event without machine name
+	 */
 	protected static String getEvent(String event){
 		if(event.contains(EVENT_MACHINE_SEPARATOR)){
 			return event.substring(0,event.indexOf(EVENT_MACHINE_SEPARATOR));
@@ -189,6 +197,11 @@ public class DOPnative {
 		return event;
 	}
 	
+	/**
+	 * 
+	 * @param event with event name and machine name separated by :: 
+	 * @return machine name from event
+	 */
 	protected static String getMachine(String event){
 		
 		if(event.endsWith(EVENT_MACHINE_SEPARATOR)){
@@ -206,6 +219,9 @@ public class DOPnative {
 		return event;
 	}
 	
+	/**
+	 *  Resets the precondition list. 
+	 */
 	protected static void resetPreconList(){
 		activityPreconList = new LinkedList<Activity>();
 	}
@@ -296,6 +312,7 @@ public class DOPnative {
 		
 		return pga;
 	}
+	
 	/**
 	 * Native model for process start and stop.
 	 * 
@@ -319,24 +336,6 @@ public class DOPnative {
 			System.err.println("Unknown state From: " +from+ " To: " + to);
 			return;
 		}
-		
-		
-		//debug
-		/*
-		System.out.println("Process: " + pga.getProcess());
-		
-		System.out.println("StartGuard: " + pga.getStartGuard());
-		System.out.println("StartAction: " + pga.getStartAction());
-		
-		System.out.println("StopGuard: " + pga.getStopGuard());
-		System.out.println("StopAction: " + pga.getStopAction());
-		
-		System.out.println("OnlyStart: " + pga.getOnlyStart());
-		System.out.println("OnlyStop: " + pga.getOnlyStop());
-		*/
-		//debug
-		
-		
 		
 		/**************************/
 		//only start event ?

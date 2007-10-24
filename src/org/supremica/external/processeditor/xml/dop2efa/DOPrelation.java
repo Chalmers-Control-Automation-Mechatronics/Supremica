@@ -3,7 +3,6 @@ package org.supremica.external.processeditor.xml.dop2efa;
 /**
  * this class holds function to build single relations
  * to EFA.
- * 
  */
 
 import java.util.Iterator;
@@ -12,7 +11,8 @@ import java.util.List;
 
 import org.supremica.manufacturingTables.xsd.processeditor.*;
 
-public class DOPrelation extends DOPnative{
+public class DOPrelation
+					extends DOPnative{
 	/**
 	 * 
 	 * @param relation
@@ -31,7 +31,7 @@ public class DOPrelation extends DOPnative{
 	}
 	
 	/**
-	 * 
+	 * Builds a sequence relation from from event "from" to "to".
 	 * 
 	 * @param start is start state for sequence
 	 * @param end is end state for sequence
@@ -41,6 +41,11 @@ public class DOPrelation extends DOPnative{
 	protected static void sequence(Relation r,
 			                       String from, String to,
 			                       EFA efa){
+		String myLastState;
+		String tmp;
+		
+		Iterator i;
+		
 		//check indata
 		if(r == null){
 			return;
@@ -62,8 +67,7 @@ public class DOPrelation extends DOPnative{
 		Object o = null;
 		List<Activity> myActivityList = new LinkedList<Activity>();
 		
-		String myLastState = from;
-		String tmp;
+		myLastState = from;
 			
 		List activityList = r.getActivityRelationGroup();
 		
@@ -72,7 +76,7 @@ public class DOPrelation extends DOPnative{
 			return;
 		}
 		
-		Iterator i = activityList.iterator();
+		i = activityList.iterator();
 		
 		/* start build EFA
 		 * go down in tre structure
@@ -199,21 +203,28 @@ public class DOPrelation extends DOPnative{
 	}
 	
 	/**
+	 * Builds a alternative relation from from event "from" to "to".
 	 * 
-	 * 
-	 * @param start is start state for sequence
-	 * @param end is end state for sequence
-	 * @param r is relation whit type sequence 
+	 * @param start is start state for alternative
+	 * @param end is end state for alternative
+	 * @param r is relation whit type alternative 
 	 * 
 	 */
 	protected static void alternative(Relation r,
-			                          String from, String to,
+			                          String from,
+			                          String to,
 			                          EFA efa){
+		Object o = null;
+		List<Activity> myActivityList = null;
+		List activityList = null;
+		Iterator i = null;
+		
 		//check in data
 		if(r == null){
 			return;
 		}
 		
+		//make sure from and to state exist
 		if(from.length() == 0){
 			from = efa.newUniqueState();
 		}
@@ -221,17 +232,15 @@ public class DOPrelation extends DOPnative{
 			to = efa.newUniqueState();
 		}
 		
-		Object o = null;
-		List<Activity> myActivityList = new LinkedList<Activity>();
-			
-		List activityList = r.getActivityRelationGroup();
+		myActivityList = new LinkedList<Activity>();
+		activityList = r.getActivityRelationGroup();
 		
 		if(activityList.isEmpty()){
 			System.err.println("WARNING empty " + r.getType().toString());
 			return;
 		}
 		
-		Iterator i = activityList.iterator();
+		i = activityList.iterator();
 		
 		/* start build EFA
 		 * go down in tre structure
@@ -356,11 +365,13 @@ public class DOPrelation extends DOPnative{
 	}
 	
 	/**
-	 * 
-	 * @param activityList
-	 * @param relation
-	 * @param efa
-	 * @return
+	 * Manipulate the activityList to contain two new activities one who starts
+	 * the node relation and one who wait for it to finish.
+	 *  
+	 * @param activityList list of activities to manipulate.
+	 * @param relation node type.
+	 * @param efa, needed to get module.
+	 * @return variable name for node.
 	 */
 	private static String addWaitForNodeToFinish(List<Activity> activityList,
 												 Relation relation, EFA efa){
@@ -370,6 +381,12 @@ public class DOPrelation extends DOPnative{
 		String var_name = "";
 		
 		ObjectFactory factory = new ObjectFactory();
+		
+		String startGuard = "";
+		String startAction = "";
+		
+		String stopGuard = "";
+		String stopAction = "";
 		
 		/* node code */
 		if(RelationType.PARALLEL.equals(relation.getType())){
@@ -382,13 +399,15 @@ public class DOPrelation extends DOPnative{
 								" in addWaitForNodeToFinish");
 		}
 		
-		String startGuard = "";
-		String startAction = var_name + "=1;";
+		startGuard = "";
+		startAction = var_name + "=1;";
 		
-		String stopGuard = var_name + "==" + (numberOfTracks + 1);
-		String stopAction = var_name + "=0;";
+		stopGuard = var_name + "==" + (numberOfTracks + 1);
+		stopAction = var_name + "=0;";
 		
-		/* set start conditions */
+		/* 
+		 * set start conditions
+		 */
 		Activity start_par = factory.createActivity();
 		String start = PGA.ONLY_START +
 						PGA.GUARD+startGuard+PGA.GUARD +
@@ -397,8 +416,9 @@ public class DOPrelation extends DOPnative{
 		
 		start_par.setOperation(start);
 		
-		
-		/* set stop conditions */
+		/* 
+		 * set stop conditions
+		 */
 		Activity stop_par = factory.createActivity();
 		String stop = PGA.ONLY_STOP+
 					  PGA.GUARD+stopGuard+PGA.GUARD+
@@ -407,10 +427,14 @@ public class DOPrelation extends DOPnative{
 		
 		stop_par.setOperation(stop);
 		
-		/* add Activity who starts node */
+		/* 
+		 * add Activity who starts node
+		 */
 		activityList.add(start_par);
 		
-		/* add Activity who wait for node to finish*/
+		/* 
+		 * add Activity who wait for node to finish
+		 */
 		activityList.add(stop_par);
 		
 		//return the variable name assigned to this node
@@ -487,7 +511,9 @@ public class DOPrelation extends DOPnative{
 				String start;
 				String stop;
 				
-				/* Relation code */
+				/*---------------------------*/
+				/* Relation code             */
+				/*---------------------------*/
 				
 				Relation seq = factory.createRelation();
 				seq.setType(RelationType.SEQUENCE);
@@ -520,7 +546,9 @@ public class DOPrelation extends DOPnative{
 				
 			}else if(activityRelations[i] instanceof Activity){
 				
-				/* Activity code */
+				/*---------------------------*/
+				/* Activity code             */
+				/*---------------------------*/
 				
 				PGA pga = pgaFromActivity((Activity)activityRelations[i],m);
 				pga.andStartGuard(startGuard);
@@ -545,9 +573,11 @@ public class DOPrelation extends DOPnative{
 	 */
 	protected static void arbitrary(Relation r, String arbitraryNode_var, Module m){
 		
+		//final
 		final String FIRST_STATE = "waiting";
 		final String LAST_STATE = "finished";
 		
+		//lokal
 		String startGuard = "", startAction = ""; 
 		String stopGuard = "", stopAction = "";
 		
@@ -560,7 +590,7 @@ public class DOPrelation extends DOPnative{
 		
 		ObjectFactory factory = new ObjectFactory();  
 		
-		//check in data
+		//test in data
 		if(r == null || m == null){
 			return;
 		}
@@ -591,7 +621,7 @@ public class DOPrelation extends DOPnative{
 		
 		
 		/* 
-		 * for a arbitraryorder node only two options exist either we have
+		 * for a arbitrary order node only two options exist either we have
 		 * a relation or a activity.
 		 *  
 		 */
@@ -610,7 +640,9 @@ public class DOPrelation extends DOPnative{
 				String start;
 				String stop;
 				
-				/* Relation code */
+				/*---------------------------*/
+				/* Relation code             */
+				/*---------------------------*/
 				
 				Relation seq = factory.createRelation();
 				seq.setType(RelationType.SEQUENCE);
@@ -644,7 +676,9 @@ public class DOPrelation extends DOPnative{
 				
 			}else if(activityRelations[i] instanceof Activity){
 				
-				/* Activity code */
+				/*---------------------------*/
+				/* Activity code             */
+				/*---------------------------*/
 				
 				PGA pga = pgaFromActivity((Activity)activityRelations[i],m);
 				pga.andStartGuard(startGuard);

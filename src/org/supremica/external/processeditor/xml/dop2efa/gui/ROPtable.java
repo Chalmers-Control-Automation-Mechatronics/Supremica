@@ -20,10 +20,6 @@ import java.io.File;
 import org.supremica.external.processeditor.xml.Loader;
 import org.supremica.manufacturingTables.xsd.processeditor.ROP;
 
-/** 
- * TableToolTipsDemo is just like TableDemo except that it
- * sets up tool tips for both cells and column headers.
- */
 public class ROPtable extends JTable {
     
     ROPtableModel model;

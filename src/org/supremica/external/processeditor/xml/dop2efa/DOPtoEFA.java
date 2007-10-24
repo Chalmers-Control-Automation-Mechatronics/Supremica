@@ -16,38 +16,52 @@ import org.supremica.manufacturingTables.xsd.processeditor.*;
  * @author David Millares
  *
  */
-public class DOPtoEFA extends DOPrelation{
-	
-	private static String outputFileName = "testModule.wmod";
+public class DOPtoEFA
+				extends DOPrelation{
 	
 	public DOPtoEFA(){}
 	
-	public static void createEFA(ROP rop){
-		createEFA(rop,new File(outputFileName));
-	}
-	
-	public static void createEFA(ROP rop, File f){
+	public static void createEFA(ROP rop, File f, boolean block){
 		
+		//build module
 		Module module = buildModuleFromROP(rop);
 		
-		/* Last fix */
-		/* Block */
-		blockStopEventWhitNoStartEvent(module);
+		if(block){
+			blockStopEventWithNoStartEvent(module);
+		}
 		
 		module.writeToFile(f);
 	}
 	
+	/**
+	 * Builds one ROP file to a Module
+	 * @param rop ROP to be converted
+	 * @return Module whit rop as EFAs
+	 */
 	public static Module buildModuleFromROP(ROP rop){
+		
 		String machine = rop.getMachine();
+		
 		if(machine == null || machine.length() == 0){
 			machine = "no_machine";
 		}
+		
 		return buildModuleFromROP(rop,new Module(machine, false));
 	}
-	
+	/**
+	 * Builds a number of ROP files to a Module
+	 * 
+	 * @param filePathList, list of paths to ROP files
+	 * @param name, module name
+	 * @param block, should stop events whit no start events be blocket. 
+	 * @return a module containing all ROP files as EFAs
+	 */
 	public static Module buildModule(List<String> filePathList, String name, boolean block){		
 		ROP rop = null;
 		
+		/*
+		 * create the file list to a ROP list
+		 */
 		List<ROP> ropList = new LinkedList<ROP>();
 		for(String filePath : filePathList){
 			rop = getROPfromFile(new File(filePath));
@@ -56,11 +70,15 @@ public class DOPtoEFA extends DOPrelation{
 			}
 		}
 		
+		/*
+		 * build ROP to Module 
+		 */
 		return buildModuleFromROP(ropList, name, block);
 	}
 	
 	/**
 	 * Build a waters module from a list of ROP
+	 * 
 	 * @param ropList list of ROP to be build in to module
 	 * @param moduleName name of module
 	 * @return a Module whit all ROP
@@ -70,7 +88,8 @@ public class DOPtoEFA extends DOPrelation{
 		Module module = null;
 		
 		/*
-		 * remove previus stored precondition
+		 * remove previous stored precondition
+		 * from earlier builds.
 		 */
 		resetPreconList();
 		
@@ -115,11 +134,11 @@ public class DOPtoEFA extends DOPrelation{
 		
 		/* Block */
 		if(block){
-			blockStopEventWhitNoStartEvent(module);
+			blockStopEventWithNoStartEvent(module);
 		}
 		
 		/*
-		 * all rop in one module
+		 * return a module whit all rops
 		 */
 		return module;
 	}
@@ -134,6 +153,7 @@ public class DOPtoEFA extends DOPrelation{
 	public static Module buildModuleFromROP(ROP rop, Module module){
 		
 		String comment, machine;
+		String startState, endState;
 		
 		EFA main_efa;
 		
@@ -172,7 +192,9 @@ public class DOPtoEFA extends DOPrelation{
 		start_machine = factory.createActivity();
 		stop_machine = factory.createActivity();
 		
-		//special will be parsed in class EGA 
+		/*
+		 * special will be parsed in class EGA
+		 */ 
 		start_machine.setOperation(PGA.ONLY_START + machine);
 		stop_machine.setOperation(PGA.ONLY_STOP + machine);
 		
@@ -187,14 +209,11 @@ public class DOPtoEFA extends DOPrelation{
 		main_sequence.getActivityRelationGroup().add(rop.getRelation());
 		main_sequence.getActivityRelationGroup().add(stop_machine);
 		
-		/*
-		 * preprocessing of the relation tree
-		 */
+		/*------------------------------------*/
+		/* preprocessing of the relation tree */
+		/*------------------------------------*/
 		
-		//remove same relation in same relation
 		main_sequence = collapseRelationTree(main_sequence);
-		
-		//remove empty relations
 		main_sequence = removeEmtyRelations(main_sequence);
 		
 		
@@ -204,8 +223,8 @@ public class DOPtoEFA extends DOPrelation{
 		main_efa = new EFA("main_" + machine,module);
 		module.addAutomaton(main_efa);
 		
-		String startState = machine +  "_idle";
-		String endState = machine + "_finish";
+		startState = machine +  "_idle";
+		endState = machine + "_finish";
 		
 		/* First state marked and initial */
 		main_efa.addState(startState, true, true);
@@ -220,31 +239,30 @@ public class DOPtoEFA extends DOPrelation{
 		return module;
 	}
 	
-	
-	
-	public static void createEFA(File ropFile, File f){
+	/**
+	 * Open a ROP file and return the ROP
+	 * @param ropFile 
+	 * @return ROP from ropFile
+	 */
+	public static ROP getROPfromFile(File ropFile){
 		
-		//check indata
-		if(ropFile == null || f == null){
-			return;
-		}
-		
-		createEFA(getROPfromFile(ropFile),f);
-	}
-	
-	
-	
-	public static ROP getROPfromFile(File f){
-		
-		if(f != null && f.exists()){
-			Loader loader = new Loader();
-			Object o = loader.open(f);
+		if(ropFile != null && ropFile.exists()){
 			
+			/*
+			 * get xml object
+			 */
+			Loader loader = new Loader();
+			Object o = loader.open(ropFile);
+			
+			/*
+			 * test for ROP
+			 */
 			if(o instanceof ROP){
 				return (ROP)o;
 			}
 		}
-		System.err.println("File " + f + " contains no ROP.");
+		
+		System.err.println("File " + ropFile + " contains no ROP.");
 		return null;
 	}
 	
@@ -308,7 +326,11 @@ public class DOPtoEFA extends DOPrelation{
 		return r;
 	}
 	
-	public static void blockStopEventWhitNoStartEvent(Module m){
+	/**
+	 *  
+	 * @param m
+	 */
+	public static void blockStopEventWithNoStartEvent(Module m){
 		
 		List<String> block = new LinkedList<String>();
 		List<String> events = m.getEvents();
@@ -323,7 +345,8 @@ public class DOPtoEFA extends DOPrelation{
 				tmp = event.replace(EVENT_STOP_PREFIX,
 									EVENT_START_PREFIX);
 				
-				/* if we not have a start event block
+				/* 
+				 * if we not have a start event block
 				 * end event
 				 */
 				if(!events.contains(tmp)){
@@ -332,13 +355,15 @@ public class DOPtoEFA extends DOPrelation{
 			}
 		}
 		
+		/*
+		 * block events in module 
+		 */
 		m.blockEvents(block);
-		
 	}
 	
 	/**
 	 *	Search through Relation r and remove all Activities whit same
-	 *	operation name.
+	 *	operation name. (Currently newer used)
 	 */
 	public static Relation removeDoubleActivity(Relation r){
 		
@@ -451,13 +476,12 @@ public class DOPtoEFA extends DOPrelation{
 	 * @return
 	 */
 	private static Relation renameEqualOperationName(Relation r, String machineName){
-		NumOfOperations op = (new DOPtoEFA()).new NumOfOperations();
-		Relation tmp = renameEqualOperationName(r,op,machineName);
 		
-		//debug
-		//System.out.println("Table");
-		//System.out.println(op.toString());
-		//debug
+		NumOfOperations op;
+		Relation tmp;
+		
+		op = (new DOPtoEFA()).new NumOfOperations();
+		tmp = renameEqualOperationName(r,op,machineName);
 		
 		return tmp;
 	}
@@ -465,7 +489,6 @@ public class DOPtoEFA extends DOPrelation{
 	private static Relation renameEqualOperationName(Relation r,
 													 NumOfOperations operations, 
 													 String machineName){
-		
 		Object o = null;
 		List objList = null;
 		
@@ -513,7 +536,7 @@ public class DOPtoEFA extends DOPrelation{
 	}
 	
 	/**
-	 * Internal class for 
+	 * Internal class
 	 * @author David Millares
 	 */
 	private class NumOfOperations{
@@ -540,161 +563,8 @@ public class DOPtoEFA extends DOPrelation{
 			}
 		}
 		
-		
 		public String toString(){
 			return operations.toString();
 		}
-	}
-	
-	/**
-	 * Test main method to test this class
-	 * @param args
-	 */
-	public static void main(String[] args) {
-		
-		Module m = new Module("Test",true);
-		
-		EFA efa = new EFA("seq",m);
-		EFA efa1 = new EFA("alt",m);
-		
-		m.addAutomaton(efa);
-		m.addAutomaton(efa1);
-		
-		//build pgaList
-		
-		PGA pga = new PGA();
-		PGA pga1 = new PGA();
-		PGA pga2 = new PGA();
-		
-		pga.setProcess("Op0");
-		pga1.setProcess("Op1");
-		pga2.setProcess("Op2");
-		
-		//efa.addIntegerVariable("i", 0, 5, 0, null);
-		//efa.addIntegerVariable("j", 1, 5, 2, null);
-		
-		//pga.setStartGuard("i==1");
-		//pga.setStartAction("i+=1");
-		
-		
-		//pga.andStartGuard("j==2;");
-		
-		List<PGA> pgaList = new LinkedList<PGA>();
-		pgaList.add(pga);
-		pgaList.add(pga1);
-		pgaList.add(pga2);
-		
-		//build egaList
-		List<String> egaList = new LinkedList<String>();
-		
-		egaList.add("a");
-		egaList.add("b");
-		egaList.add("c");
-		egaList.add("d");
-		
-		
-		//build relation
-		ObjectFactory factory  = new ObjectFactory();
-		
-		Relation seq = factory.createRelation();
-		seq.setType(RelationType.SEQUENCE);
-		
-		Relation alt = factory.createRelation();
-		alt.setType(RelationType.ALTERNATIVE);
-		
-		Relation par = factory.createRelation();
-		par.setType(RelationType.PARALLEL);
-		
-		Activity a = factory.createActivity();
-		a.setOperation("a");
-		
-		Activity b = factory.createActivity();
-		b.setOperation("b");
-		
-		Activity c = factory.createActivity();
-		c.setOperation("c");
-		
-		Activity d = factory.createActivity();
-		d.setOperation("d");
-		
-		Activity e = factory.createActivity();
-		e.setOperation("e");
-		
-		Activity f = factory.createActivity();
-		f.setOperation("f");
-		
-		Activity g = factory.createActivity();
-		g.setOperation("g");
-		
-		Activity h = factory.createActivity();
-		h.setOperation("h");
-		
-		Activity i = factory.createActivity();
-		i.setOperation("i");
-		
-		
-		par.getActivityRelationGroup().add(g);
-		par.getActivityRelationGroup().add(h);
-		par.getActivityRelationGroup().add(i);
-		
-		seq.getActivityRelationGroup().add(a);
-		seq.getActivityRelationGroup().add(b);
-		seq.getActivityRelationGroup().add(par);
-		seq.getActivityRelationGroup().add(c);
-		
-		alt.getActivityRelationGroup().add(d);
-		alt.getActivityRelationGroup().add(e);
-		alt.getActivityRelationGroup().add(f);
-		
-		
-		
-		/*
-		//Test native
-		//efa.addState("s0");
-		//efa.addState("s1");
-
-		//nativeProcess(pga,"s0","s1",efa);
-		
-		
-		
-		nativeSequence(pgaList,"start","end",efa);
-		nativeAlternative(pgaList,"start","end",efa1);
-		
-		
-		//nativeAlternative(egaList,"start","end",efa1);
-		
-		
-		m.writeToFile(new File(outputFileName));
-		System.out.println("Done test native");
-		*/
-		
-		
-		/*
-		//Test Relation
-		
-		sequence(seq,"start","end",efa);
-		alternative(alt, "from","to", efa1);
-		
-		m.writeToFile(new File(outputFileName));
-		System.out.println("Done test Relation");
-		*/
-		
-		//Test ROP
-		
-		ROP rop = factory.createROP();
-		rop.setMachine("machine");
-		rop.setComment("Test Arbitrary");
-		
-		Relation r = new Relation();
-		r.setType(RelationType.ARBITRARY);
-		
-		r.getActivityRelationGroup().add(0, a);
-		//r.getActivityRelationGroup().add(1, b);
-		//r.getActivityRelationGroup().add(2, c);
-		
-		rop.setRelation(r);
-		
-		createEFA(rop);
-		System.out.println("Done test ROP");
-	}
+	}	
 }

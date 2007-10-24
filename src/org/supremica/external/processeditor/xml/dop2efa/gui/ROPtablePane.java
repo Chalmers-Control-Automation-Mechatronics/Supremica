@@ -11,7 +11,9 @@ import java.awt.event.*;
 import java.awt.Font.*;
 import java.io.*;
 
-public class ROPtablePane extends JPanel implements ActionListener{
+public class ROPtablePane
+					extends JPanel 
+							implements ActionListener{
 	
 	private JButton jbAddFile;
 	private JButton jbRemove;
@@ -80,7 +82,10 @@ public class ROPtablePane extends JPanel implements ActionListener{
 		ropTable.refresh();
 	}
 	
-	//take care of actions
+	/**
+	 * (non-Javadoc)
+	 * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
+	 */
 	public void actionPerformed(ActionEvent evt) {
     	
         Object o = evt.getSource();
@@ -94,6 +99,9 @@ public class ROPtablePane extends JPanel implements ActionListener{
         }
     }
 	
+	/**
+	 * 	Open file chooser to add ROP files. 
+	 */
 	private void addFiles(){
 		
 		if(fc == null){
@@ -131,7 +139,10 @@ public class ROPtablePane extends JPanel implements ActionListener{
         //restore selection mode
         fc.setFileSelectionMode(tmp);
     }
-   
+	
+	/**
+	 *	Removes selected ROP files from table
+	 */
     private void remove(){
     	ropTable.removeSelectedRows();
     	repaint();
