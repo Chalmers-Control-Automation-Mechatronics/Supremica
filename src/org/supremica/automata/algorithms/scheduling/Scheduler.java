@@ -24,14 +24,11 @@ public interface Scheduler
 	/** Returns the schedule automaton. */
 	public Automaton getSchedule();
 
-	/** Returns all info messages that have been generated during a run. */
-	public String getInfoMessages();
-
-	/** Returns all warning messages that have been generated during a run. */
-	public String getWarningMessages();
-
-	/** Returns all error messages that have been generated during a run. */
-	public String getErrorMessages();
+	/** 
+         * Returns all messages of the supplied type that have been generated 
+         * during a run. Message types are defined in {@link SchedulingConstants}.
+         */
+	public String getMessages(int msgType);
 
 	/** Returns all debug messages that have been generated during a run. */
 	public Object[] getDebugMessages();

@@ -692,19 +692,20 @@ public class VisGraphScheduler
         return s;
     }
     
-    public String getInfoMessages()
+    public String getMessages(int msgType)
     {
-        return infoMsgs;
-    }
-    
-    public String getWarningMessages()
-    {
-        return infoMsgs;
-    }
-    
-    public String getErrorMessages()
-    {
-        return infoMsgs;
+        switch (msgType)
+        {
+            case(SchedulingConstants.MESSAGE_TYPE_INFO):
+                return infoMsgs;
+            case(SchedulingConstants.MESSAGE_TYPE_WARN):
+                return warnMsgs;
+            case(SchedulingConstants.MESSAGE_TYPE_ERROR):
+                return errorMsgs;
+            default:
+                errorMsgs += "Wrong message type supplied to Milp.getMessages()";
+                return null;
+        }
     }
     
     public Object[] getDebugMessages()

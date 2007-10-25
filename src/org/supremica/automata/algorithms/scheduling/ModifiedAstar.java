@@ -1633,18 +1633,22 @@ public class ModifiedAstar
             return scheduleAuto;
 	}
 
-	public String getInfoMessages()
-	{
-		return infoMsgs;
-	}
-	public String getWarningMessages()
-	{
-		return warnMsgs;
-	}
-	public String getErrorMessages()
-	{
-		return errorMsgs;
-	}
+    public String getMessages(int msgType)
+    {
+        switch (msgType)
+        {
+            case(SchedulingConstants.MESSAGE_TYPE_INFO):
+                return infoMsgs;
+            case(SchedulingConstants.MESSAGE_TYPE_WARN):
+                return warnMsgs;
+            case(SchedulingConstants.MESSAGE_TYPE_ERROR):
+                return errorMsgs;
+            default:
+                errorMsgs += "Wrong message type supplied to Milp.getMessages()";
+                return null;
+        }
+    }
+
 	public Object[] getDebugMessages()
 	{
 		return debugMsgs.toArray();

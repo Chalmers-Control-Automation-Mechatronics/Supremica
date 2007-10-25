@@ -11,25 +11,12 @@ import org.supremica.log.LoggerFactory;
 import org.supremica.automata.Automata;
 import org.supremica.automata.Automaton;
 import org.supremica.automata.algorithms.scheduling.*;
+import org.supremica.automata.algorithms.scheduling.milp.Milp;
 import org.supremica.gui.ide.actions.IDEActionInterface;
 
 public class ScheduleDialog
     extends JDialog
 {
-/*
-	public static final String MODIFIED_A_STAR = "Modified A*";
-	public static final String MILP = "MILP";
-	public static final String VIS_GRAPH = "Visibility Graph";
-	public static final String MULTITHREADED_A_STAR = "Multithreaded A*";
-
-	public static final String ONE_PRODUCT_RELAXATION = "1-product relax";
-	public static final String TWO_PRODUCT_RELAXATION = "2-product relax";
-	public static final String VIS_GRAPH_TIME_RELAXATION = "visibility graph (time)";
-	public static final String VIS_GRAPH_NODE_RELAXATION = "visibility graph (node)";
-	public static final String BRUTE_FORCE_RELAXATION = "brute force";
-	private static final String OPTIMAL = "optimal";
-	private static final String SUBOPTIMAL = "suboptimal";
-*/    
     private static final long serialVersionUID = 1L;
     private static final String[] optimizationMethods = new String[] {SchedulingConstants.MODIFIED_A_STAR, SchedulingConstants.MILP, SchedulingConstants.VIS_GRAPH, SchedulingConstants.MULTITHREADED_A_STAR}; //, "Modified IDA*", "Modified SMA*"};
     private static final String[] astarHeuristics = new String[] {SchedulingConstants.ONE_PRODUCT_RELAXATION, SchedulingConstants.SUBOPTIMAL, SchedulingConstants.TWO_PRODUCT_RELAXATION, SchedulingConstants.VIS_GRAPH_TIME_RELAXATION, SchedulingConstants.VIS_GRAPH_NODE_RELAXATION, SchedulingConstants.BRUTE_FORCE_RELAXATION};
@@ -145,7 +132,7 @@ public class ScheduleDialog
                 if (sched != null)
                 {
                     sched.requestStop();
-					reset();
+                    reset();
                 }
                 else
                 {
@@ -329,17 +316,17 @@ public class ScheduleDialog
             addAutomatonToGUI(sched.getSchedule());
 
             // ... Print the messages (if there are any) to the screen...
-            if (sched.getInfoMessages() != "")
+            if (sched.getMessages(SchedulingConstants.MESSAGE_TYPE_INFO) != "")
             {
-                    logger.info(sched.getInfoMessages());
+                    logger.info(sched.getMessages(SchedulingConstants.MESSAGE_TYPE_INFO));
             }
-            if (sched.getWarningMessages() != "")
+            if (sched.getMessages(SchedulingConstants.MESSAGE_TYPE_WARN) != "")
             {
-                    logger.warn(sched.getWarningMessages());
+                    logger.warn(sched.getMessages(SchedulingConstants.MESSAGE_TYPE_WARN));
             }
-            if (sched.getErrorMessages() != "")
+            if (sched.getMessages(SchedulingConstants.MESSAGE_TYPE_ERROR) != "")
             {
-                    logger.error(sched.getErrorMessages());
+                    logger.error(sched.getMessages(SchedulingConstants.MESSAGE_TYPE_ERROR));
             }
             logger.debug(sched.getDebugMessages());
 
@@ -378,7 +365,7 @@ public class ScheduleDialog
                 // Write the results of previous scheduling operation
                 if (sched != null)
                 {
-                    writer.write(sched.getInfoMessages());
+                    writer.write(sched.getMessages(SchedulingConstants.MESSAGE_TYPE_INFO));
                     writer.newLine();
                     writer.newLine();
                 }
