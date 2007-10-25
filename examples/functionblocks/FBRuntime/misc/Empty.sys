@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<System xmlns="http://www.holobloc.com/xml/LibraryElement" Name="Empty" >
+  <VersionInfo  Author="Goran Cengic" Organization="Chalmers" Version="1.0" Date="2007-10-25" />
+  <Device  Name="Test Device" Type="DeviceType_not_used">
+    <Resource Name="Test Resource" Type="ResourceType_not_used">
+      <FBNetwork>
+        <FB Name="start" Type="E_RESTART" />
+		<FB Name="stop" Type="E_STOP" />
+        <FB Name="empty" Type="Empty" />
+        <EventConnections>
+          <Connection Source="start.COLD" Destination="empty.EI" />
+          <Connection Source="empty.EO" Destination="stop.STOP" />
+        </EventConnections>
+      </FBNetwork>
+    </Resource>
+  </Device>
+</System>

@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<FBType xmlns="http://www.holobloc.com/xml/LibraryElement" Name="Empty" >
+  <VersionInfo Author="Goran Cengic" Organization="Chalmers" Version="1.0" Date="2007-10-25" />
+  <InterfaceList>
+    <EventInputs>
+      <Event Name="EI" />
+    </EventInputs>
+	<Event Name="EO" >
+        <With Var="DO" />
+    </Event>
+	<OutputVars>
+      <VarDeclaration Name="DO" Type="INT" />
+    </OutputVars>
+  </InterfaceList>
+  <BasicFB>
+    <ECC>
+        <ECState Name="INIT" />
+        <ECState Name="STATE">
+		  <ECAction Algorithm="Alg" Output="EO" />
+		</ECState>
+		<ECTransition Source="INIT" Destination="STATE" Condition="EI" />
+		<ECTransition Source="STATE" Destination="INIT" Condition="1" />
+    </ECC>
+    <Algorithm Name="Alg">
+	    <Other Language="Java" Text=
+		"
+		DO = 1;
+		" />	
+    </Algorithm>
+  </BasicFB>
+</FBType>
