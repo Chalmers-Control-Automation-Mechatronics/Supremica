@@ -350,6 +350,7 @@ public class ExampleTemplates
         thisGroup.addItem(new TemplateItem("2 robots (from HBS)", prefix + "hbs_example.xml"));
         thisGroup.addItem(new TemplateItem("2 robots with alternatives (from PV35)", prefix + "pv35_example.xml"));
         thisGroup.addItem(new TemplateItem("3 robots", prefix + "3_2.xml"));
+        thisGroup.addItem(new TemplateItem("Velocity balancing example", prefix + "velocity_balancing_example.xml"));
         thisGroup.addItem(new TemplateItem("2 robots, uncontrollable alternatives", prefix + "uc_alternatives.xml"));
         thisGroup.addItem(new TemplateItem("Fisher & Thompson, 6x6 (6 robots, 6 zones)", prefix + "ft06.xml"));
         thisGroup.addItem(new TemplateItem("Fisher & Thompson, 10x10 (10 robots, 10 zones)", prefix + "ft10.xml"));

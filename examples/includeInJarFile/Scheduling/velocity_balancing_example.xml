@@ -1,0 +1,165 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<Automata name="Untitled" major="0" minor="9">
+<Automaton name="R1" type="Plant">
+	<Events>
+		<Event id="0" label="R1_book_Z1"/>
+		<Event id="1" label="R1_book_Z2"/>
+		<Event id="2" label="R1_book_Z3"/>
+		<Event id="3" label="R1_home"/>
+		<Event id="4" label="R1_unbook_Z1" controllable="false"/>
+		<Event id="5" label="R1_unbook_Z2" controllable="false"/>
+		<Event id="6" label="R1_unbook_Z3" controllable="false"/>
+	</Events>
+	<States>
+		<State id="0" name="S0" initial="true" cost="2.0"/>
+		<State id="1" name="S1" cost="2.0"/>
+		<State id="2" name="S2" cost="3.0"/>
+		<State id="3" name="S3" cost="2.0"/>
+		<State id="4" name="S4" cost="1.0"/>
+		<State id="5" name="S5" cost="2.0"/>
+		<State id="6" name="S6" cost="1.0"/>
+		<State id="7" name="S7" accepting="true" cost="0.0"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="0"/>
+		<Transition source="1" dest="2" event="1"/>
+		<Transition source="2" dest="3" event="5"/>
+		<Transition source="3" dest="4" event="4"/>
+		<Transition source="4" dest="5" event="2"/>
+		<Transition source="5" dest="6" event="6"/>
+		<Transition source="6" dest="7" event="3"/>
+	</Transitions>
+</Automaton>
+<Automaton name="R2" type="Plant">
+	<Events>
+		<Event id="0" label="R2_book_Z1"/>
+		<Event id="1" label="R2_book_Z2"/>
+		<Event id="2" label="R2_book_Z3"/>
+		<Event id="3" label="R2_home"/>
+		<Event id="4" label="R2_unbook_Z1" controllable="false"/>
+		<Event id="5" label="R2_unbook_Z2" controllable="false"/>
+		<Event id="6" label="R2_unbook_Z3" controllable="false"/>
+	</Events>
+	<States>
+		<State id="0" name="S0" initial="true" cost="2.0"/>
+		<State id="1" name="S1" cost="2.0"/>
+		<State id="2" name="S2" cost="2.0"/>
+		<State id="3" name="S3" cost="2.0"/>
+		<State id="4" name="S4" cost="1.0"/>
+		<State id="5" name="S5" cost="1.0"/>
+		<State id="6" name="S6" cost="1.0"/>
+		<State id="7" name="S7" accepting="true" cost="0.0"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="1"/>
+		<Transition source="1" dest="2" event="2"/>
+		<Transition source="2" dest="3" event="6"/>
+		<Transition source="3" dest="4" event="5"/>
+		<Transition source="4" dest="5" event="0"/>
+		<Transition source="5" dest="6" event="4"/>
+		<Transition source="6" dest="7" event="3"/>
+	</Transitions>
+</Automaton>
+<Automaton name="R3" type="Plant">
+	<Events>
+		<Event id="0" label="R3_book_Z1"/>
+		<Event id="1" label="R3_book_Z2"/>
+		<Event id="2" label="R3_book_Z3"/>
+		<Event id="3" label="R3_home"/>
+		<Event id="4" label="R3_unbook_Z1" controllable="false"/>
+		<Event id="5" label="R3_unbook_Z2" controllable="false"/>
+		<Event id="6" label="R3_unbook_Z3" controllable="false"/>
+	</Events>
+	<States>
+		<State id="0" name="S0" initial="true" cost="2.0"/>
+		<State id="1" name="S1" cost="3.0"/>
+		<State id="2" name="S2" cost="2.0"/>
+		<State id="3" name="S3" cost="1.0"/>
+		<State id="4" name="S4" cost="1.0"/>
+		<State id="5" name="S5" cost="1.0"/>
+		<State id="6" name="S6" cost="1.0"/>
+		<State id="7" name="S7" accepting="true" cost="1.0"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="2"/>
+		<Transition source="1" dest="2" event="0"/>
+		<Transition source="2" dest="3" event="4"/>
+		<Transition source="3" dest="4" event="6"/>
+		<Transition source="4" dest="5" event="1"/>
+		<Transition source="5" dest="6" event="5"/>
+		<Transition source="6" dest="7" event="3"/>
+	</Transitions>
+</Automaton>
+<Automaton name="Z1" type="Specification">
+	<Events>
+		<Event id="0" label="R1_book_Z1"/>
+		<Event id="1" label="R1_unbook_Z1" controllable="false"/>
+		<Event id="2" label="R2_book_Z1"/>
+		<Event id="3" label="R2_unbook_Z1" controllable="false"/>
+		<Event id="4" label="R3_book_Z1"/>
+		<Event id="5" label="R3_unbook_Z1" controllable="false"/>
+	</Events>
+	<States>
+		<State id="0" name="S0" initial="true" accepting="true"/>
+		<State id="1" name="S1"/>
+		<State id="2" name="S2"/>
+		<State id="3" name="S3"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="0"/>
+		<Transition source="0" dest="2" event="2"/>
+		<Transition source="0" dest="3" event="4"/>
+		<Transition source="1" dest="0" event="1"/>
+		<Transition source="2" dest="0" event="3"/>
+		<Transition source="3" dest="0" event="5"/>
+	</Transitions>
+</Automaton>
+<Automaton name="Z2" type="Specification">
+	<Events>
+		<Event id="0" label="R1_book_Z2"/>
+		<Event id="1" label="R1_unbook_Z2" controllable="false"/>
+		<Event id="2" label="R2_book_Z2"/>
+		<Event id="3" label="R2_unbook_Z2" controllable="false"/>
+		<Event id="4" label="R3_book_Z2"/>
+		<Event id="5" label="R3_unbook_Z2" controllable="false"/>
+	</Events>
+	<States>
+		<State id="0" name="S0" initial="true" accepting="true"/>
+		<State id="1" name="S1"/>
+		<State id="2" name="S2"/>
+		<State id="3" name="S3"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="0"/>
+		<Transition source="0" dest="2" event="2"/>
+		<Transition source="0" dest="3" event="4"/>
+		<Transition source="1" dest="0" event="1"/>
+		<Transition source="2" dest="0" event="3"/>
+		<Transition source="3" dest="0" event="5"/>
+	</Transitions>
+</Automaton>
+<Automaton name="Z3" type="Specification">
+	<Events>
+		<Event id="0" label="R1_book_Z3"/>
+		<Event id="1" label="R1_unbook_Z3" controllable="false"/>
+		<Event id="2" label="R2_book_Z3"/>
+		<Event id="3" label="R2_unbook_Z3" controllable="false"/>
+		<Event id="4" label="R3_book_Z3"/>
+		<Event id="5" label="R3_unbook_Z3" controllable="false"/>
+	</Events>
+	<States>
+		<State id="0" name="S0" initial="true" accepting="true"/>
+		<State id="1" name="S1"/>
+		<State id="2" name="S2"/>
+		<State id="3" name="S3"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="0"/>
+		<Transition source="0" dest="2" event="2"/>
+		<Transition source="0" dest="3" event="4"/>
+		<Transition source="1" dest="0" event="1"/>
+		<Transition source="2" dest="0" event="3"/>
+		<Transition source="3" dest="0" event="5"/>
+	</Transitions>
+</Automaton>
+</Automata>

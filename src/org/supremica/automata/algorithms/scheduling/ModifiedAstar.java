@@ -256,50 +256,50 @@ public class ModifiedAstar
 
     public void run()
     {
-		try
-		{
-			ActionTimer totalTimer = new ActionTimer();
+        try
+        {
+            ActionTimer totalTimer = new ActionTimer();
 
-			if (isRunning)
-			{
-				totalTimer.restart();
+            if (isRunning)
+            {
+                totalTimer.restart();
 
-				init();
+                init();
 
-				// Is needed for synchronization purposes
-				isInitialized = true;
-			}
+                // Is needed for synchronization purposes
+                isInitialized = true;
+            }
 
-			if (!isRelaxationProvider)
-			{
-				if (isRunning)
-				{
-					schedule();
-				
-					String totalTimeStr = "Total optimization time = " + totalTimer.elapsedTime() + "ms";
-					infoMsgs += "\t" + totalTimeStr + "\n";
-				}
+            if (!isRelaxationProvider)
+            {
+                if (isRunning)
+                {
+                    schedule();
 
-				if (isRunning && buildSchedule)
-				{
-                                    buildScheduleAutomaton();
-				}
+                    String totalTimeStr = "Total optimization time = " + totalTimer.elapsedTime() + "ms";
+                    infoMsgs += "\t" + totalTimeStr + "\n";
+                }
 
-				if (isRunning)
-				{
-                                    requestStop(true);
-				}
-				else
-				{
-					errorMsgs += "Scheduling interrupted, openTree.size = " + openTree.size() + "; closedTree.size = " + closedTree.size();
-				}
-			}
-		}
-		catch (Exception ex)
-		{
-			errorMsgs += "A_star::schedule() -> " + ex;
-			debugMsgs.add(ex.getStackTrace());
-		}
+                if (isRunning && buildSchedule)
+                {
+                    buildScheduleAutomaton();
+                }
+
+                if (isRunning)
+                {
+                    requestStop(true);
+                }
+                else
+                {
+                    errorMsgs += "Scheduling interrupted, openTree.size = " + openTree.size() + "; closedTree.size = " + closedTree.size();
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+                errorMsgs += "A_star::schedule() -> " + ex;
+                debugMsgs.add(ex.getStackTrace());
+        }
     }
     
     protected void init()
