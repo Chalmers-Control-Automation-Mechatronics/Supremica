@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.gui.ide
 //# CLASS:   ComponentEditorPanel
 //###########################################################################
-//# $Id: ComponentEditorPanel.java,v 1.54 2007-10-29 11:34:30 flordal Exp $
+//# $Id: ComponentEditorPanel.java,v 1.55 2007-10-29 12:14:16 avenir Exp $
 //###########################################################################
 
 
@@ -468,7 +468,7 @@ public class ComponentEditorPanel
 
             // Useful functions are defined and added to the eps-file
             w.write("/loopArrow {\n");
-            w.write("\td\n");
+            w.write("\tarrowHead\n");
             w.write("\tloop\n");
             w.write("} def\n");
             w.newLine();
