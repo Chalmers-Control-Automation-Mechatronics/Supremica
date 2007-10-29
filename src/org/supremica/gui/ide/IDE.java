@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.gui.ide
 //# CLASS:   IDE
 //###########################################################################
-//# $Id: IDE.java,v 1.102 2007-10-04 15:14:56 flordal Exp $
+//# $Id: IDE.java,v 1.103 2007-10-29 18:31:21 flordal Exp $
 //###########################################################################
 
 package org.supremica.gui.ide;
@@ -344,23 +344,16 @@ public class IDE
     {
         final List<File> files = ProcessCommandLineArguments.process(args);
         InterfaceManager.getInstance().initLookAndFeel();
-        if (Config.GENERAL_INCLUDE_EDITOR.isTrue())
+        final IDE ide = new IDE();
+        if (files != null && files.size() > 0)
         {
-            final IDE ide = new IDE();
-            if (files != null && files.size() > 0)
-            {
-                ide.openFiles(files);
-            }
-            else if (Config.GUI_EDITOR_DEFAULT_EMPTY_MODULE.isTrue())
-            {
-                ide.openEmptyDocument();
-            }
-            ide.setVisible(true);
+            ide.openFiles(files);
         }
-        else
+        else if (Config.GUI_EDITOR_DEFAULT_EMPTY_MODULE.isTrue())
         {
-            SupremicaWithGui.startSupremica();
+            ide.openEmptyDocument();
         }
+        ide.setVisible(true);
     }
     
     

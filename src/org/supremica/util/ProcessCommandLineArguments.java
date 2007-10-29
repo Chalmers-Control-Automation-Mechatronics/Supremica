@@ -74,15 +74,16 @@ public class ProcessCommandLineArguments
         {
             if (args[i].equals("-h") || args[i].equals("-?") || args[i].equals("--help") || args[i].equals("--usage"))
             {
+                // Print usage
                 printUsage();
                 quit = true;
             }
             else if (args[i].equals("-p") || args[i].equals("--properties"))
             {
-                if (i + 1 < args.length)
+                // Load properties
+                if (++i < args.length)
                 {
-                    String fileName = args[i + 1];
-                    i++;
+                    String fileName = args[i];
                     File propFile = new File(fileName);
 
                     try
@@ -101,10 +102,20 @@ public class ProcessCommandLineArguments
                     }
                 }
             }
-            else if (args[i].equals("-noEditor"))
+            /*
+            else if (args[i].equals("-epsfigs"))
             {
-				Config.GENERAL_INCLUDE_EDITOR.set(false);
+                // Create eps figs for all components in the supplied file
+                if (++i < args.length)
+                {
+                    String fileName = args[i];
+
+                    // Load file
+
+                    // Loop throgh components and print eps-figures
+                }
             }
+             */
             else if (args[i].equals("-l") || args[i].equals("--list"))
             {
                 System.out.println(SupremicaProperties.getProperties());
