@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.gui.ide
 //# CLASS:   ComponentEditorPanel
 //###########################################################################
-//# $Id: ComponentEditorPanel.java,v 1.52 2007-10-04 15:14:56 flordal Exp $
+//# $Id: ComponentEditorPanel.java,v 1.53 2007-10-29 11:18:29 flordal Exp $
 //###########################################################################
 
 
@@ -428,7 +428,6 @@ public class ComponentEditorPanel
             w.newLine();
 
             w.write("/edge {\n");
-            w.write("0.25 setlinewidth\n");
             w.write("\tnewpath\n");
             w.write("\t6 -2 roll moveto\n");
             w.write("\tcurrentpoint 6 2 roll curveto\n");
@@ -486,7 +485,8 @@ public class ComponentEditorPanel
                 w.write("\tnewpath\n");
                 w.write("\t" + (SimpleNodeProxyShape.RADIUS-2) + " 0 360 arc\n");
                 w.write("\tstroke\n");
-                w.write("} def\n");
+                w.write("0.25 setlinewidth\n");
+                 w.write("} def\n");
                 w.newLine();
             }
             else
@@ -505,10 +505,17 @@ public class ComponentEditorPanel
             }
 
             w.write("/state {\n");
-            w.write("0.75 setlinewidth\n");
+            if (Config.GUI_EDITOR_LAYOUT_MODE.get().equals(Config.LAYOUT_MODE_LEGALVALUES.ChalmersIDES))
+            {
+                w.write("0.75 setlinewidth\n");
+            }
             w.write("\tnewpath\n");
             w.write("\t" + SimpleNodeProxyShape.RADIUS + " 0 360 arc\n");
             w.write("\tstroke\n");
+            if (Config.GUI_EDITOR_LAYOUT_MODE.get().equals(Config.LAYOUT_MODE_LEGALVALUES.ChalmersIDES))
+            {
+                w.write("0.25 setlinewidth\n");
+            }
             w.write("} def\n");
             w.newLine();
 
@@ -527,7 +534,6 @@ public class ComponentEditorPanel
             w.newLine();
 
             w.write("/straightEdge {\n");
-            w.write("0.25 setlinewidth\n");
             w.write("\tnewpath\n");
             w.write("\tmoveto\n");
             w.write("\tlineto\n");
@@ -559,6 +565,9 @@ public class ComponentEditorPanel
             w.write("def\n");
             w.newLine();
 
+            // Default line width
+            w.write("0.25 setlinewidth\n");
+            
             // For every node...
             // *** BUG *** This must be done through renderer.
             for (NodeProxy node : surface.getDrawnGraph().getNodes())
@@ -757,8 +766,12 @@ public class ComponentEditorPanel
                         {
                             nrOfCoords = 6;
 
-                            // SEG_CUBICTO, used to draw self-loops, requires special treatment
+                            // SEG_CUBICTO, used to draw selfloops, requires special treatment
                             command = "loopArrow";
+                        }
+                        else
+                        {
+                            //This happens quite often!! But what should we do?!
                         }
 
                         for (int i=0; i<nrOfCoords; i++)
