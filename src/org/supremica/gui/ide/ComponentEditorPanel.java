@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.gui.ide
 //# CLASS:   ComponentEditorPanel
 //###########################################################################
-//# $Id: ComponentEditorPanel.java,v 1.53 2007-10-29 11:18:29 flordal Exp $
+//# $Id: ComponentEditorPanel.java,v 1.54 2007-10-29 11:34:30 flordal Exp $
 //###########################################################################
 
 
@@ -818,13 +818,11 @@ public class ComponentEditorPanel
                     Point2D leftLowerCorner = labelTransform.transform(new Point2D.Double(eventShape.getBounds2D().getMinX(), eventShape.getBounds2D().getMinY()), null);
                     leftLowerCorner.setLocation(Math.round(leftLowerCorner.getX()), Math.round(leftLowerCorner.getY()));
 
-                    // The strings that are used to construct the ps-command
+                    // Event name
                     String eventName = ((IdentifierProxy) proxyid).getName();
-                    String coordStr = leftLowerCorner.getX() + " " + leftLowerCorner.getY();
-                    String labelStr = "(" + eventName + ")";
 
-                    // Choose correct ps-command, according to the type of this event
-                    command = "controllableLabel";
+                    // Determine controllability of event
+                    boolean controllable = true;
                     List<EventDeclProxy> eventdecllist = surface.getModule().getEventDeclList();
                     for (EventDeclProxy edp : eventdecllist)
                     {
@@ -832,11 +830,17 @@ public class ComponentEditorPanel
                         {
                             if (edp.getKind() == net.sourceforge.waters.xsd.base.EventKind.UNCONTROLLABLE)
                             {
-                                command = "uncontrollableLabel";
+                                controllable = false;
                             }
                         }
                     }
 
+                    // The strings that are used to construct the ps-command
+                    String coordStr = leftLowerCorner.getX() + " " + leftLowerCorner.getY();
+                    //String labelStr = "(" + (controllable? "" : "!") + eventName + ")";
+                    String labelStr = "(" + eventName + ")";
+                    command = (controllable? "" : "un") + "controllableLabel";
+                    
                     w.write(labelStr + " " + coordStr + " " + command);
                     w.newLine();
 
