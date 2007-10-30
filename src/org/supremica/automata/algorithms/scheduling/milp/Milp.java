@@ -383,6 +383,9 @@ public class Milp
             }
         }
         
+        // The time accumulated along the optimal path so far
+        double accumulatedTime = 0;
+        
         // Walk from the initial state until an accepting (synchronized) state is found
         // In every step, the cheapest allowed transition is chosen
         // This is done until an accepting state is found for our schedule
@@ -490,6 +493,11 @@ public class Milp
             
             // Remove the added epsilons from the smallest time, thus obtaining the true smallest time
             smallestTime = removeEpsilons(smallestTime);
+            
+            // Set the cost of the current state
+            currScheduledState.setCost(smallestTime - accumulatedTime);
+            // Update the accumulated time
+            accumulatedTime = smallestTime;
             
             // Make a transition (in the synchronizer) to the state that is reachable in one step at cheapest cost
             // This state will be the next parting point in our walk
