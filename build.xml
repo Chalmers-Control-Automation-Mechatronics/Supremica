@@ -114,7 +114,11 @@
     
     <target name="initialize_jars" depends="-jar_waters_jaxb">	
         <!-- PLEASE ADD COMMENTS DESCRIBING THE DIFFERENT LIBRARIES. -->
-        
+    	
+    	<!-- Library for handling db in SOC -->
+    	<unjar src="${lib}/sqljdbc.jar" dest="${lib}/${unjared}"/>
+    	
+    	<!-- Library used by SOC -->
     	<unjar src="${lib}/jniwrap-3.1.jar" dest="${lib}/${unjared}"/>
     	<unjar src="${lib}/jexcel-1.0.jar" dest="${lib}/${unjared}"/>
     	
