@@ -27,6 +27,7 @@ import org.supremica.external.processeditor.xgraph.Selection;
 
 import org.supremica.external.processeditor.processgraph.opcell.OperationCell;
 import org.supremica.external.processeditor.processgraph.resrccell.ResourceCell;
+import org.supremica.external.processeditor.tools.db.BaseWindow;
 
 import org.supremica.manufacturingTables.xsd.processeditor.ObjectFactory;
 import org.supremica.manufacturingTables.xsd.processeditor.ROP;
@@ -37,6 +38,8 @@ import org.supremica.external.processeditor.xml.Converter;
 import org.supremica.external.relationExtraction.Gui.*;
 
 import org.supremica.external.processeditor.xgraph.*;
+
+import org.supremica.external.processeditor.tools.db.BaseWindow;
 
 /**
  * The most central GUI class of the <code>org.soc</code> package. 
@@ -563,6 +566,11 @@ public class SOCGraphContainer
 	}
 
     }
+    
+    public void openDBConnection(){
+    	BaseWindow baseWindow = new BaseWindow();
+    }
+    
     /**
      * Creates a automata model and generates a supervisor to that model.
      * <p>

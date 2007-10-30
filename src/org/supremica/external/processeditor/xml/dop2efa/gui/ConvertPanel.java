@@ -92,7 +92,7 @@ public class ConvertPanel
         bottomRigthPane.add(buttonPane);
         bottomRigthPane.add(Box.createVerticalGlue());
         
-        configPane.addOption("Block stop events whit no start event", "block", false, 0);
+        configPane.addOption("Block stop events with no start event", "block", false, 0);
         
         rigthPane.add(configPane);
         rigthPane.add(bottomRigthPane);

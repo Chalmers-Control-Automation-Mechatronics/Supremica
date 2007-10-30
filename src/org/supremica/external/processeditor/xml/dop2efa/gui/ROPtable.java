@@ -90,17 +90,17 @@ public class ROPtable extends JTable {
     			type = (String)getModel().getValueAt(row, getModel().TYPE_COL);
     			comment = (String)getModel().getValueAt(row, getModel().COMMENT_COL);
     			
-    			if(!name.equals(rop.getMachine())){
+    			if(rop.getMachine() != null && !name.equals(rop.getMachine())){
     				//name changed
     				getModel().setValueAt(rop.getMachine(),
     									  row, getModel().NAME_COL);
     			}
-    			if(!type.equals(rop.getType().toString())){
+    			if(rop.getType() != null && !type.equals(rop.getType().toString())){
     				//type changed
     				getModel().setValueAt(rop.getType().toString(),
     									  row, getModel().TYPE_COL);
     			}
-    			if(!comment.equals(rop.getComment())){
+    			if(rop.getComment() != null && !comment.equals(rop.getComment())){
     				//comment changed
     				getModel().setValueAt(rop.getComment(),
     						  			  row, getModel().COMMENT_COL);

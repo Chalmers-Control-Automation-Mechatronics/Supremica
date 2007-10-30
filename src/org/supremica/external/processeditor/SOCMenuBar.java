@@ -56,7 +56,8 @@ public class SOCMenuBar extends JMenuBar implements ActionListener,
 			     "Save As...", 
 			     "Custom Save",
 			     "Export...", 
-			     "Export As Image...", 
+			     "Export As Image...",
+			     "Export to DB",
 			     "SEPARATOR",
 			     "Printer Settings...", 
 			     "Print", 
@@ -676,7 +677,9 @@ public class SOCMenuBar extends JMenuBar implements ActionListener,
     		}else if("Export...".equals(e.getActionCommand())) {
     			graphContainer.export();	  	   	       
     		//}else if("Solution Extraction...".equals(e.getActionCommand())) {
-    			//solutionExtraction(COMPLETE);		
+    			//solutionExtraction(COMPLETE);
+    		}else if("Export to DB".equals(e.getActionCommand())) {
+    			graphContainer.openDBConnection();
     		}else if("Printer Settings...".equals(e.getActionCommand())) {
     			JMenuItem tmp = getMenuItem("Custom Save.Save As...");
     		}else if("Print".equals(e.getActionCommand())) {
