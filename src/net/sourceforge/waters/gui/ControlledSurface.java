@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   ControlledSurface
 //###########################################################################
-//# $Id: ControlledSurface.java,v 1.142 2007-09-25 22:20:44 knut Exp $
+//# $Id: ControlledSurface.java,v 1.143 2007-10-30 11:21:41 flordal Exp $
 //###########################################################################
 
 package net.sourceforge.waters.gui;
@@ -76,12 +76,13 @@ import net.sourceforge.waters.gui.springembedder.SpringAbortDialog;
 import java.awt.datatransfer.ClipboardOwner;
 import java.awt.datatransfer.Clipboard;
 
-
+/**
+ *
+ */
 public class ControlledSurface
   extends EditorSurface
   implements Observer, ModelObserver, EmbedderObserver, ClipboardOwner
 {
-
   //#########################################################################
   //# Constructors
   public ControlledSurface(final GraphSubject graph,

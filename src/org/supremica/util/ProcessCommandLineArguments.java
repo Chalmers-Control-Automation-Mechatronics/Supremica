@@ -49,13 +49,29 @@
  */
 package org.supremica.util;
 
-import org.supremica.properties.Config;
+import javax.xml.bind.JAXBException;
+import net.sourceforge.waters.model.marshaller.WatersUnmarshalException;
 import org.supremica.properties.SupremicaProperties;
 import org.supremica.Version;
 import java.io.*;
 import java.util.LinkedList;
 import java.util.List;
-import org.supremica.gui.ide.actions.IDEActionInterface;
+import net.sourceforge.waters.model.base.ProxyMarshaller;
+import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
+import net.sourceforge.waters.model.expr.OperatorTable;
+import net.sourceforge.waters.model.marshaller.DocumentManager;
+import net.sourceforge.waters.model.marshaller.JAXBModuleMarshaller;
+import net.sourceforge.waters.model.marshaller.ProxyUnmarshaller;
+import net.sourceforge.waters.model.module.ModuleProxy;
+import net.sourceforge.waters.model.module.ModuleProxyFactory;
+import net.sourceforge.waters.subject.module.ModuleSubjectFactory;
+import net.sourceforge.waters.valid.ValidUnmarshaller;
+import org.supremica.automata.IO.ADSUnmarshaller;
+import org.supremica.automata.IO.HISCUnmarshaller;
+import org.supremica.automata.IO.SupremicaMarshaller;
+import org.supremica.automata.IO.SupremicaUnmarshaller;
+import org.supremica.automata.IO.UMDESUnmarshaller;
+import org.supremica.automata.Project;
 
 /**
  * Class responsible for interpreting command line arguments given to Supremica.
@@ -76,6 +92,8 @@ public class ProcessCommandLineArguments
             {
                 // Print usage
                 printUsage();
+                
+                // Quit after this
                 quit = true;
             }
             else if (args[i].equals("-p") || args[i].equals("--properties"))
@@ -102,20 +120,79 @@ public class ProcessCommandLineArguments
                     }
                 }
             }
-            /*
             else if (args[i].equals("-epsfigs"))
             {
                 // Create eps figs for all components in the supplied file
                 if (++i < args.length)
                 {
                     String fileName = args[i];
+                    File figFile = new File(fileName);
 
+                    // Set up document manager ...
+                    DocumentManager documentManager = new DocumentManager();
+                    try
+                    {
+                        final ModuleProxyFactory factory = ModuleSubjectFactory.getInstance();
+                        final OperatorTable opTable = CompilerOperatorTable.getInstance();
+                        final JAXBModuleMarshaller moduleMarshaller =
+                            new JAXBModuleMarshaller(factory, opTable);
+                        final ProxyUnmarshaller<Project> supremicaUnmarshaller =
+                            new SupremicaUnmarshaller(factory);
+                        final ProxyUnmarshaller<ModuleProxy> validUnmarshaller =
+                            new ValidUnmarshaller(factory, opTable);
+                        final ProxyUnmarshaller<ModuleProxy> hiscUnmarshaller =
+                            new HISCUnmarshaller(factory);
+                        final ProxyUnmarshaller<ModuleProxy> umdesUnmarshaller =
+                            new UMDESUnmarshaller(factory);
+                        final ProxyUnmarshaller<ModuleProxy> adsUnmarshaller =
+                            new ADSUnmarshaller(factory);
+                        // Add unmarshallers in order of importance ...
+                        // (shows up in the file-open dialog)
+                        documentManager.registerUnmarshaller(moduleMarshaller);
+                        documentManager.registerUnmarshaller(supremicaUnmarshaller);
+                        documentManager.registerUnmarshaller(validUnmarshaller);
+                        documentManager.registerUnmarshaller(hiscUnmarshaller);
+                        documentManager.registerUnmarshaller(umdesUnmarshaller);
+                        documentManager.registerUnmarshaller(adsUnmarshaller);
+                    }
+                    catch (Exception ex)
+                    {
+                        System.err.println("Error initialising document manager: " + ex);
+                    }
+                        
                     // Load file
+                    ModuleProxy module;
+                    try
+                    {                        
+                        module = (ModuleProxy) documentManager.load(figFile);
+                    }
+                    catch (IOException ex)
+                    {
+                        System.err.println("IO problem: " + ex);
+                    }                   
+                    catch (WatersUnmarshalException ex)
+                    {
+                        System.err.println("Problem unmarshalling: " + ex);
+                    }
+                    catch (ClassCastException ex)
+                    {
+                        System.err.println("Only import of modules is supported: " + ex);
+                    }                   
 
                     // Loop throgh components and print eps-figures
+                    /*
+                    for (Proxy proxy: module.getComponentList())
+                    {
+                        
+                    }
+                     */
+
+                    // Create ControlledSurface object and print using ordinary printing routine
+                    
+                    // Quit after this
+                    quit = true;
                 }
             }
-             */
             else if (args[i].equals("-l") || args[i].equals("--list"))
             {
                 System.out.println(SupremicaProperties.getProperties());
