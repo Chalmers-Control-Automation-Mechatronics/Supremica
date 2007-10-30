@@ -42,23 +42,4 @@ public class IntArrayTreeSet
             return tailSet(element).first();
         }
     }
-    
-    /**
-     * Returns the common elements w.r.t. the otherTreeSet.
-     *
-     * @param otherTree - the set to be compared with.
-     * @return common elements
-     */
-    public IntArrayTreeSet intersect(IntArrayTreeSet otherTree)
-    {
-        IntArrayTreeSet intersectionTreeSet = new IntArrayTreeSet();
-        
-        for (int[] inOtherTree : otherTree)
-        {
-            if (contains(inOtherTree))
-            {
-                intersectionTreeSet.add(inOtherTree);
-            }
-        }
-    }
 }
