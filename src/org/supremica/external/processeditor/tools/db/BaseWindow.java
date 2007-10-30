@@ -395,7 +395,7 @@ public class BaseWindow extends JFrame implements ActionListener {
 			connectWindow = new ConnectWindow();
 			connectWindow.setPreferredSize(new Dimension(300,220));
 			glassPanel.add(connectWindow);
-			setDefaultCloseOperation(EXIT_ON_CLOSE);
+			setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 		}
 		
 		// Disconnect button
