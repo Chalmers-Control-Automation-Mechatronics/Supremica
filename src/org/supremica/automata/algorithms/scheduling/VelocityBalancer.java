@@ -56,12 +56,16 @@ public class VelocityBalancer
      */
     double[][] firingTimes = null;
     
+    AutomataIndexMap indexMap = null;
+        
     /** The logger */
     private Logger logger = LoggerFactory.createLogger(this.getClass());
 
     public VelocityBalancer(Automaton schedule, Automata plantAutomata)
         throws Exception
     {
+        indexMap = new AutomataIndexMap(plantAutomata);
+       
         // Extracts plant times from the optimal schedule
         extractFiringTimes(schedule, plantAutomata);
         
@@ -154,14 +158,16 @@ public class VelocityBalancer
         }
 
         State[] currPlantStates = new State[plants.size()];
-        for (int i = 0; i < currPlantStates.length; i++)
+        for (int plantIndex = 0; plantIndex < currPlantStates.length; plantIndex++)
         {
-            currPlantStates[i] = plants.getAutomatonAt(i).getInitialState();
+            currPlantStates[plantIndex] = indexMap.getAutomatonAt(plantIndex).getInitialState();
         }
      
+        // Find a firing/simulation time for each schedule state, start from the initial state.
         State scheduleState = schedule.getInitialState();
-        while (scheduleState.nbrOfOutgoingMultiArcs() > 0)
-        {
+        int statesLeftToCheck = schedule.nbrOfStates(); 
+        while (statesLeftToCheck-- > 0)
+        {            
             if (scheduleState.nbrOfOutgoingMultiArcs() > 1)
             {
                 throw new Exception("Velocity balancing not implemented for a " +
@@ -173,18 +179,23 @@ public class VelocityBalancer
                 {
                     LabeledEvent currEvent = arcIt.next().getEvent();
                     
-                    for (int i = 0; i < currPlantStates.length; i++)
+                    for (int plantIndex = 0; plantIndex < currPlantStates.length; plantIndex++)
                     {
-                        Alphabet currPlantEvents = currPlantStates[i].activeEvents(false);
+                        Alphabet currPlantEvents = currPlantStates[plantIndex].activeEvents(false);
                         if (currPlantEvents.contains(currEvent))
                         {
                             currFiringTime += scheduleState.getCost();
                             
-                            simulationTimesArrays[i].add(new Double(currPlantStates[i].getCost()));
-                            firingTimesArrays[i].add(new Double(currFiringTime));
+                            firingTimes[plantIndex][indexMap.getStateIndex(plantIndex, currPlantStates[plantIndex])] = currFiringTime;
+                            simulationTimes[plantIndex][indexMap.getStateIndex(plantIndex, currPlantStates[plantIndex])] = currPlantStates[plantIndex].getCost();
+                            
+//                            logger.info("skriv mig" + firingTimes[i][j]);
+                            
+//                            simulationTimesArrays[plantIndex].add(new Double(currPlantStates[plantIndex].getCost()));
+//                            firingTimesArrays[plantIndex].add(new Double(currFiringTime));
                             
                             scheduleState = scheduleState.nextState(currEvent);
-                            currPlantStates[i] = currPlantStates[i].nextState(currEvent);
+                            currPlantStates[plantIndex] = currPlantStates[plantIndex].nextState(currEvent);
                             
                             break;
                         }                    

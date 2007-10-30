@@ -44,7 +44,7 @@
 		<State id="0" name="S0" initial="true" cost="2.0"/>
 		<State id="1" name="S1" cost="2.0"/>
 		<State id="2" name="S2" cost="2.0"/>
-		<State id="3" name="S3" cost="2.0"/>
+		<State id="3" name="S3" cost="3.0"/>
 		<State id="4" name="S4" cost="1.0"/>
 		<State id="5" name="S5" cost="1.0"/>
 		<State id="6" name="S6" cost="1.0"/>

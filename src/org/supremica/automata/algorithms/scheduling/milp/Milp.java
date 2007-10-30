@@ -12,6 +12,7 @@ import org.supremica.util.ActionTimer;
 import org.supremica.automata.algorithms.scheduling.Scheduler;
 import org.supremica.automata.algorithms.scheduling.SchedulingHelper;
 import org.supremica.automata.algorithms.scheduling.SynchronizationStepper;
+import org.supremica.util.BDD.IntArray;
 
 //TODO (always): Structure the code. Comment better.
 public class Milp
@@ -113,7 +114,18 @@ public class Milp
     /**
      * The declaration of variables, used in internal ordering of precedence constraints.
      **/
-    private ArrayList<String> internalPrecVariables = null;
+    private ArrayList<String> internalPrecVariables = null; //TO BE DEPRECATED
+    /**
+     * These variables describe the internal event ordering in the external 
+     * precedence specifications. For example, suppose that we have a specification 
+     * stating that first sigma_a or sigma_b should happen, followed by 
+     * sigma_c or sigma_d. Then two variables are needed, namely 
+     * 'sigma_a_before_sigma_b' and 'sigma_c_before_sigma_d'. These are stored 
+     * as ordered eventIndices, e.g. [sigma_a, sigma_b] where 
+     * indexMap.getEventIndex(sigma_a) < indexMap.getEventIndex(sigma_b).
+     * (IntArrayTreeSet is used to avoid variable repetition). 
+     **/
+    private IntArrayTreeSet externalPrecVariables = null;
     
     /**
      * The ArrayList containing the cycle time constraints.
@@ -570,7 +582,8 @@ public class Milp
         altPathVariablesStrArray = new ArrayList<String>(); //TO BE DEPRECATED
         altPathVariablesTree = new IntArrayTreeSet();
         mutexVariables = new ArrayList<String>();
-        internalPrecVariables = new ArrayList<String>();
+        internalPrecVariables = new ArrayList<String>(); //TO BE DEPRECATED
+        externalPrecVariables = new IntArrayTreeSet();
         
         cycleTimeConstraints = new ArrayList<int[]>();
         initPrecConstraints = new ArrayList<int[]>();
@@ -1093,10 +1106,10 @@ public class Milp
     //TO BE INAUGURATED
     private void createExternalPrecedenceConstraintsNew(Automaton currSpec)
     {
-        ArrayList<int[]>[] involvedEventInfo = new ArrayList[2];
-        for (int i = 0; i < involvedEventInfo.length; i++)
+        ArrayList<int[]>[] involvedEventInfoList = new ArrayList[2];
+        for (int i = 0; i < involvedEventInfoList.length; i++)
         {
-            involvedEventInfo[i] = new ArrayList<int[]>();
+            involvedEventInfoList[i] = new ArrayList<int[]>();
         }
         
         // Loops through the plant automata and finds the states in which the preceding/following
@@ -1114,12 +1127,12 @@ public class Milp
                 {
                     State specState = stateIt.next();
                     
-                    // Set the index of the involvedEventInfo-array (0 if the current events are of
+                    // Set the index of the involvedEventInfoList-array (0 if the current events are of
                     // preceding-type and 1 if they are of following-type
-                    int ieiIndex = 0;
+                    int ieiType = 0;
                     if (! specState.isInitial())
                     {
-                        ieiIndex = 1;
+                        ieiType = 1;
                     }
                     
                     for (Iterator<LabeledEvent> eventIt = specState.activeEvents(false).iterator(); eventIt.hasNext();)
@@ -1133,7 +1146,7 @@ public class Milp
                                 
                                 if (plantState.activeEvents(false).contains(currEvent))
                                 {
-                                    involvedEventInfo[ieiIndex].add(new int[]{
+                                    involvedEventInfoList[ieiType].add(new int[]{
                                         indexMap.getAutomatonIndex(plant),
                                         indexMap.getStateIndex(plant, plantState),
                                         indexMap.getEventIndex(currEvent)
@@ -1142,6 +1155,31 @@ public class Milp
                             }
                         }
                     }
+                }
+            }
+        }
+        
+        // Store new external precedence variables as [sigma_a, sigma_b], 
+        // where indexMap.getEventIndex(sigma_a) < indexMap.getEventIndex(sigma_b).
+        for (int i = 0; i < involvedEventInfoList.length; i++)
+        {
+            for (int j=0; j<involvedEventInfoList[i].size()-1; j++)
+            {
+                for (int k=j+1; k<involvedEventInfoList[i].size(); k++)
+                {
+                    int jEventIndex = involvedEventInfoList[i].get(j)[2];
+                    int kEventIndex = involvedEventInfoList[i].get(k)[2];
+                    
+                    if (j < k)
+                    {
+                        externalPrecVariables.add(new int[]{j, k});
+                    }
+                    else if (k < j)
+                    {
+                        externalPrecVariables.add(new int[]{k, j});
+                    }
+                    // else if (j == k), there should be no variable since we are then 
+                    // dealing with the same event fired from another state
                 }
             }
         }
@@ -1159,7 +1197,7 @@ public class Milp
                 str += " (F) : ";
             }
             
-            for (int[] ips : involvedEventInfo[i])
+            for (int[] ips : involvedEventInfoList[i])
             {
                 for (int j = 0; j < ips.length - 1; j++)
                 {
@@ -1180,13 +1218,13 @@ public class Milp
         // ...to here
         
         ArrayList<int[]>[] permutations = new ArrayList[2];
-        permutations[0] = getIndexPermutations(involvedEventInfo[0].size());
+        permutations[0] = getIndexPermutations(involvedEventInfoList[0].size());
         permutations[1] = permutations[0];
-        if (involvedEventInfo[0].size() != involvedEventInfo[1].size())
+        if (involvedEventInfoList[0].size() != involvedEventInfoList[1].size())
         {
-            permutations[1] = getIndexPermutations(involvedEventInfo[1].size());
+            permutations[1] = getIndexPermutations(involvedEventInfoList[1].size());
         }
-        int maxNrOfEventPairs = Math.min(involvedEventInfo[0].size(), involvedEventInfo[1].size());
+        int maxNrOfEventPairs = Math.min(involvedEventInfoList[0].size(), involvedEventInfoList[1].size());
         
         for (int[] pPerm : permutations[0])
         {
@@ -1195,14 +1233,14 @@ public class Milp
                 String str = "Perm: ";
                 for (int i = 0; i < maxNrOfEventPairs; i++)
                 {
-                    int[] currPEventInfo = involvedEventInfo[0].get(pPerm[i]);
+                    int[] currPEventInfo = involvedEventInfoList[0].get(pPerm[i]);
                     str += currPEventInfo[0] + " " + currPEventInfo[1];
                     for (int[] altpath : getActiveAltPathVars(currPEventInfo))
                     {
                         str += altpath[1] + " " + altpath[2] + " ";
                     }
                     str += " -> ";
-                    int[] currFEventInfo = involvedEventInfo[1].get(fPerm[i]);
+                    int[] currFEventInfo = involvedEventInfoList[1].get(fPerm[i]);
                     str += currFEventInfo[0] + " " + currFEventInfo[1];
                     for (int[] altpath : getActiveAltPathVars(currFEventInfo))
                     {

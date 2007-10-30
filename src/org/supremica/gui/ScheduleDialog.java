@@ -6,6 +6,7 @@ import javax.swing.*;
 import java.awt.GridLayout;
 import java.awt.event.*;
 import java.io.*;
+import org.supremica.automata.algorithms.scheduling.milp.RandomPathUsingMilp;
 import org.supremica.log.Logger;
 import org.supremica.log.LoggerFactory;
 import org.supremica.automata.Automata;
