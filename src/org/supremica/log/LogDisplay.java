@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.log
 //# CLASS:   LogDisplay
 //###########################################################################
-//# $Id: LogDisplay.java,v 1.34 2007-10-04 15:14:56 flordal Exp $
+//# $Id: LogDisplay.java,v 1.35 2007-10-31 13:39:49 flordal Exp $
 //###########################################################################
 
 /*
@@ -909,8 +909,7 @@ public class LogDisplay
     private JScrollPane theTextPaneScrollPane;
     private JTextPane mTextPane;
     private StyledDocument mDocument;
-    private LoggerPopupMenu popup =
-        new LoggerPopupMenu(LoggerFactory.getInstance().getLoggerFilter());
+    private LoggerPopupMenu popup = new LoggerPopupMenu(LoggerFactory.getInstance().getLoggerFilter());
     private Layout mLayout;
     private Map<Level,MutableAttributeSet> mAttributeMap;
     private Map<Level,ImageIcon> mIconMap;

@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.gui.ide
 //# CLASS:   IDE
 //###########################################################################
-//# $Id: IDE.java,v 1.104 2007-10-31 13:01:00 flordal Exp $
+//# $Id: IDE.java,v 1.105 2007-10-31 13:39:49 flordal Exp $
 //###########################################################################
 
 package org.supremica.gui.ide;
@@ -342,8 +342,9 @@ public class IDE
     public static void main(String args[])
     throws Exception
     {
+        //logger.setLogToConsole(true);
         final List<File> files = ProcessCommandLineArguments.process(args);
-        logger = LoggerFactory.createLogger(IDE.class);
+        //logger = LoggerFactory.createLogger(IDE.class);
         InterfaceManager.getInstance().initLookAndFeel();
         final IDE ide = new IDE();
         if (files != null && files.size() > 0)
@@ -374,7 +375,8 @@ public class IDE
     private final List<Observer> mObservers;
 
     // Logger. Must not be initialised until ProcessCommandLineArguments has finished (or messages will disappear).
-    private static Logger logger;
+    //private static Logger logger;
+    private static Logger logger = LoggerFactory.createLogger(IDE.class);
     
     //#######################################################################
     //# Static Class Constants
