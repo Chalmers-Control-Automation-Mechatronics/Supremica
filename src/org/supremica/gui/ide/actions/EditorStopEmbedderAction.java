@@ -8,7 +8,7 @@ import org.supremica.gui.ide.IDE;
 import net.sourceforge.waters.gui.springembedder.SpringEmbedder;
 
 /**
- * A new action
+ * Action that stops all running embedders.
  */
 public class EditorStopEmbedderAction
     extends IDEAction
@@ -42,6 +42,6 @@ public class EditorStopEmbedderAction
      */
     public void doAction()
     {
-		SpringEmbedder.stopAll();
+        SpringEmbedder.stopAll();
     }
 }

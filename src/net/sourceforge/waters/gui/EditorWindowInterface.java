@@ -4,7 +4,7 @@
 //# PACKAGE: waters.gui
 //# CLASS:   EditorWindow
 //###########################################################################
-//# $Id: EditorWindowInterface.java,v 1.16 2007-10-04 15:14:56 flordal Exp $
+//# $Id: EditorWindowInterface.java,v 1.17 2007-10-31 13:01:00 flordal Exp $
 //###########################################################################
 
 
@@ -27,6 +27,8 @@ public interface EditorWindowInterface
     
     public UndoInterface getUndoInterface();
     
+    public String getComponentName();
+    
     public void repaint();
     
     public void setDisplayed();
@@ -36,8 +38,6 @@ public interface EditorWindowInterface
     public void exportPDF();
     
     public void exportPostscript();
-    
-    public void exportEncapsulatedPostscript();
     
     public void printFigure();
     

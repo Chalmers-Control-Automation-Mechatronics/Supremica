@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.gui.ide
 //# CLASS:   ComponentViewPanel
 //###########################################################################
-//# $Id: ComponentViewPanel.java,v 1.7 2007-06-23 10:33:12 robi Exp $
+//# $Id: ComponentViewPanel.java,v 1.8 2007-10-31 13:01:00 flordal Exp $
 //###########################################################################
 
 package org.supremica.gui.ide;
@@ -99,6 +99,11 @@ public class ComponentViewPanel
         add(split, BorderLayout.CENTER);
         
         surface.createOptions(this);
+    }
+
+    public String getComponentName()
+    {
+        return element.getName();
     }
     
     public boolean isSaved()
@@ -228,9 +233,6 @@ public class ComponentViewPanel
     }
     
     public void exportPostscript()
-    {}
-    
-    public void exportEncapsulatedPostscript()
     {}
     
     public void printFigure()

@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.log
 //# CLASS:   LoggerFactory
 //###########################################################################
-//# $Id: Logger.java,v 1.13 2007-07-21 06:28:07 robi Exp $
+//# $Id: Logger.java,v 1.14 2007-10-31 13:01:00 flordal Exp $
 //###########################################################################
 
 /*
@@ -76,7 +76,6 @@ package org.supremica.log;
 
 public interface Logger
 {
-
     void debug(Object message);
     
     void debug(StackTraceElement[] stackTrace);

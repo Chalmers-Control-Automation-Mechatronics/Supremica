@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.gui.ide
 //# CLASS:   ModuleContainer
 //###########################################################################
-//# $Id: ModuleContainer.java,v 1.65 2007-09-03 11:37:27 flordal Exp $
+//# $Id: ModuleContainer.java,v 1.66 2007-10-31 13:01:00 flordal Exp $
 //###########################################################################
 
 
@@ -212,8 +212,7 @@ public class ModuleContainer
         return simulatorPanel;
     }
     
-    public ComponentEditorPanel getComponentEditorPanel
-        (final SimpleComponentSubject scp)
+    public ComponentEditorPanel getComponentEditorPanel(final SimpleComponentSubject scp)
     {
         ComponentEditorPanel panel = mComponentToPanelMap.get(scp);
         if (panel == null)

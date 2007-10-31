@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.gui.ide
 //# CLASS:   AutomataContainer
 //###########################################################################
-//# $Id: AutomataContainer.java,v 1.5 2007-06-25 07:42:27 robi Exp $
+//# $Id: AutomataContainer.java,v 1.6 2007-10-31 13:01:00 flordal Exp $
 //###########################################################################
 
 
@@ -15,53 +15,53 @@ import java.awt.Component;
 import org.supremica.automata.Project;
 
 
-public class AutomataContainer 
+public class AutomataContainer
     extends DocumentContainer
 {
-
+    
     //#######################################################################
     //# Constructor
     public AutomataContainer(final IDE ide, final Project project)
     {
         super(ide, project);
-		mAnalyzerPanel = new AnalyzerPanel(this, "Analyzer");
+        mAnalyzerPanel = new AnalyzerPanel(this, "Analyzer");
         mAnalyzerPanel.addProject(project);
     }
     
-
+    
     //#######################################################################
     //# Overrides for Abstract Base Class
-	//# org.supremica.gui.ide.DocumentContainer
+    //# org.supremica.gui.ide.DocumentContainer
     public Component getPanel()
-	{
-		return mAnalyzerPanel;
-	}
-
+    {
+        return mAnalyzerPanel;
+    }
+    
     public EditorPanel getEditorPanel()
-	{
-		return null;
-	}
-
+    {
+        return null;
+    }
+    
     public AnalyzerPanel getAnalyzerPanel()
-	{
-		return mAnalyzerPanel;
-	}
-	public boolean isEditorActive()
-	{
-		return false;
-	}
-
-	public boolean isAnalyzerActive()
-	{
-		return true;
-	}
-
-	public String getTypeString()
-	{
-		return TYPE_STRING;
-	}
-
-
+    {
+        return mAnalyzerPanel;
+    }
+    public boolean isEditorActive()
+    {
+        return false;
+    }
+    
+    public boolean isAnalyzerActive()
+    {
+        return true;
+    }
+    
+    public String getTypeString()
+    {
+        return TYPE_STRING;
+    }
+    
+    
     //#######################################################################
     //# Simple Access
     public Project getAutomata()
@@ -78,15 +78,15 @@ public class AutomataContainer
         return simulatorPanel;
     }
     
-
+    
     //#######################################################################
     //# Data Members
-	private final AnalyzerPanel mAnalyzerPanel;
+    private final AnalyzerPanel mAnalyzerPanel;
     private SimulatorPanel simulatorPanel = null;
-
-
+    
+    
     //#######################################################################
     //# Class Constants
-	static final String TYPE_STRING = "Supremica project";
-
+    static final String TYPE_STRING = "Supremica project";
+    
 }

@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.gui.ide
 //# CLASS:   IDE
 //###########################################################################
-//# $Id: IDE.java,v 1.103 2007-10-29 18:31:21 flordal Exp $
+//# $Id: IDE.java,v 1.104 2007-10-31 13:01:00 flordal Exp $
 //###########################################################################
 
 package org.supremica.gui.ide;
@@ -313,27 +313,27 @@ public class IDE
     //# Interface org.supremica.gui.ide.IDEReportInterface
     public void error(String msg)
     {
-        LOGGER.error(msg);
+        logger.error(msg);
     }
     
     public void error(String msg, Throwable t)
     {
-        LOGGER.error(msg, t);
+        logger.error(msg, t);
     }
     
     public void info(String msg)
     {
-        LOGGER.info(msg);
+        logger.info(msg);
     }
     
     public void warn(String msg)
     {
-        LOGGER.warn(msg);
+        logger.warn(msg);
     }
     
     public void debug(String msg)
     {
-        LOGGER.debug(msg);
+        logger.debug(msg);
     }
     
     
@@ -343,6 +343,7 @@ public class IDE
     throws Exception
     {
         final List<File> files = ProcessCommandLineArguments.process(args);
+        logger = LoggerFactory.createLogger(IDE.class);
         InterfaceManager.getInstance().initLookAndFeel();
         final IDE ide = new IDE();
         if (files != null && files.size() > 0)
@@ -371,13 +372,14 @@ public class IDE
     // Actions
     private final Actions mActions;
     private final List<Observer> mObservers;
-    
+
+    // Logger. Must not be initialised until ProcessCommandLineArguments has finished (or messages will disappear).
+    private static Logger logger;
     
     //#######################################################################
     //# Static Class Constants
     private static final long serialVersionUID = 1L;
     private static final String IDENAME = "Supremica";
-    private static final Logger LOGGER = LoggerFactory.createLogger(IDE.class);
     //private static final InterfaceManager manager;
     
     static

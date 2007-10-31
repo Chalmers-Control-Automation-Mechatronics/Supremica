@@ -1,4 +1,3 @@
-
 /*
  * Supremica Software License Agreement
  *
@@ -50,28 +49,36 @@
 package org.supremica.util;
 
 import javax.xml.bind.JAXBException;
+import net.sourceforge.waters.model.base.AbstractProxyVisitor;
 import net.sourceforge.waters.model.marshaller.WatersUnmarshalException;
+import net.sourceforge.waters.model.module.AbstractModuleProxyVisitor;
+import org.supremica.gui.ide.actions.EditorSaveEncapsulatedPostscriptAction;
 import org.supremica.properties.SupremicaProperties;
 import org.supremica.Version;
 import java.io.*;
 import java.util.LinkedList;
 import java.util.List;
-import net.sourceforge.waters.model.base.ProxyMarshaller;
+import net.sourceforge.waters.gui.springembedder.SpringEmbedder;
+import net.sourceforge.waters.model.base.DocumentProxy;
+import net.sourceforge.waters.model.base.Proxy;
+import net.sourceforge.waters.model.base.VisitorException;
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
 import net.sourceforge.waters.model.expr.OperatorTable;
 import net.sourceforge.waters.model.marshaller.DocumentManager;
 import net.sourceforge.waters.model.marshaller.JAXBModuleMarshaller;
+import net.sourceforge.waters.model.marshaller.ProductDESImporter;
 import net.sourceforge.waters.model.marshaller.ProxyUnmarshaller;
 import net.sourceforge.waters.model.module.ModuleProxy;
 import net.sourceforge.waters.model.module.ModuleProxyFactory;
+import net.sourceforge.waters.model.module.SimpleComponentProxy;
 import net.sourceforge.waters.subject.module.ModuleSubjectFactory;
 import net.sourceforge.waters.valid.ValidUnmarshaller;
 import org.supremica.automata.IO.ADSUnmarshaller;
 import org.supremica.automata.IO.HISCUnmarshaller;
-import org.supremica.automata.IO.SupremicaMarshaller;
 import org.supremica.automata.IO.SupremicaUnmarshaller;
 import org.supremica.automata.IO.UMDESUnmarshaller;
 import org.supremica.automata.Project;
+import org.xml.sax.SAXException;
 
 /**
  * Class responsible for interpreting command line arguments given to Supremica.
@@ -120,7 +127,7 @@ public class ProcessCommandLineArguments
                     }
                 }
             }
-            else if (args[i].equals("-epsfigs"))
+            else if (args[i].equals("-e") || args[i].equals("--epsfigs"))
             {
                 // Create eps figs for all components in the supplied file
                 if (++i < args.length)
@@ -130,6 +137,7 @@ public class ProcessCommandLineArguments
 
                     // Set up document manager ...
                     DocumentManager documentManager = new DocumentManager();
+                    ProductDESImporter importer; 
                     try
                     {
                         final ModuleProxyFactory factory = ModuleSubjectFactory.getInstance();
@@ -154,17 +162,34 @@ public class ProcessCommandLineArguments
                         documentManager.registerUnmarshaller(hiscUnmarshaller);
                         documentManager.registerUnmarshaller(umdesUnmarshaller);
                         documentManager.registerUnmarshaller(adsUnmarshaller);
-                    }
-                    catch (Exception ex)
-                    {
-                        System.err.println("Error initialising document manager: " + ex);
-                    }
                         
-                    // Load file
-                    ModuleProxy module;
+                        importer = new ProductDESImporter(factory);
+                    }
+                    catch (SAXException ex)
+                    {
+                        System.err.println("SAXException when initialising document manager: " + ex);
+                        return null;
+                    }
+                    catch (JAXBException ex)
+                    {
+                        System.err.println("JAXBException when initialising document manager: " + ex);
+                        return null;
+                    }
+                
+                    // Do the printing
                     try
                     {                        
-                        module = (ModuleProxy) documentManager.load(figFile);
+                        // Load file
+                        DocumentProxy doc = documentManager.load(figFile);
+
+                        // Build module
+                        ModuleProxy module = (ModuleProxy) doc;
+
+                        // Loop throgh components and print eps-figures
+                        //module.acceptVisitor(new EPSPrinterVisitor(module));
+                        final List<Proxy> components = module.getComponentList();
+                        AbstractProxyVisitor visitor = new EPSPrinterVisitor(module);
+                        visitor.visitCollection(components);
                     }
                     catch (IOException ex)
                     {
@@ -178,17 +203,11 @@ public class ProcessCommandLineArguments
                     {
                         System.err.println("Only import of modules is supported: " + ex);
                     }                   
-
-                    // Loop throgh components and print eps-figures
-                    /*
-                    for (Proxy proxy: module.getComponentList())
+                    catch (VisitorException ex)
                     {
-                        
-                    }
-                     */
+                        System.err.println("Problems when visiting module: " + ex);
+                    }                   
 
-                    // Create ControlledSurface object and print using ordinary printing routine
-                    
                     // Quit after this
                     quit = true;
                 }
@@ -235,16 +254,50 @@ public class ProcessCommandLineArguments
         return filesToOpen;
     }
 
+    /**
+     * --help
+     */
     private static void printUsage()
     {
         System.out.println("Supremica: " + org.supremica.Version.version());
         System.out.println("More information about Supremica is available at www.supremica.org\n");
         System.out.println("Usage: Supremica [OPTION] MODULE_FILES\n");
         System.out.println("Property options: \n  -p, --properties FILE\t\t Load properties from FILE");
+        System.out.println("EPS-figure generation: \n  -e, --epsfigs FILE\t\t Creates eps-figures from all components in FILE");
         System.out.println("List: \n  -l, --list [FILE]\t\t List properties with current values (or values in FILE)");
         System.out.println("Help options: \n  -?, -h, --help, --usage\t show this help message");
         System.out.println("Version: \n  -v, --version \t\t show version");
         System.out.println("");
     }
+}
 
+/**
+ * Visitor for visiting all simpleComponentProxys and output eps-files for the graphs.
+ */
+class EPSPrinterVisitor
+    extends AbstractModuleProxyVisitor
+{
+    ModuleProxy module;
+    
+    EPSPrinterVisitor(ModuleProxy module)
+    {
+        this.module = module;
+    }
+
+    /**
+     * Visit simpleComponent and output eps-file.
+     * The only reason that visitGraphProxy is not used instead is that we need the name...
+     */
+    public Object visitSimpleComponentProxy(final SimpleComponentProxy proxy) throws VisitorException
+    {
+        // Create file        
+        File file = new File(proxy.getName() + ".eps");
+
+        // Print!
+        EditorSaveEncapsulatedPostscriptAction.saveEPS(file, proxy.getGraph(), module);
+        
+        System.err.println("Created eps-file: " + file.getAbsolutePath());
+        
+        return null;
+    }
 }

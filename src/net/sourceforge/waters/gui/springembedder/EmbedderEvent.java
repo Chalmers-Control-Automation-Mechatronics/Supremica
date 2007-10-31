@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui.springembedder
 //# CLASS:   EmbedderEvent
 //###########################################################################
-//# $Id: EmbedderEvent.java,v 1.2 2007-02-22 03:08:31 robi Exp $
+//# $Id: EmbedderEvent.java,v 1.3 2007-10-31 13:01:00 flordal Exp $
 //###########################################################################
 
 
@@ -21,9 +21,7 @@ import java.util.EventObject;
  *
  * @author Simon Ware
  */
-
 public class EmbedderEvent extends EventObject
-
 {
   
   //#########################################################################
