@@ -130,7 +130,7 @@ public class ProcessCommandLineArguments
             else if (args[i].equals("-e") || args[i].equals("--epsfigs"))
             {
                 // Create eps figs for all components in the supplied file
-                if (++i < args.length)
+                while (++i < args.length)
                 {
                     String fileName = args[i];
                     File figFile = new File(fileName);
@@ -256,7 +256,7 @@ public class ProcessCommandLineArguments
         System.out.println("More information about Supremica is available at www.supremica.org\n");
         System.out.println("Usage: IDE [OPTION] MODULE_FILES\n");
         System.out.println("Property options: \n  -p, --properties FILE\t\t Load properties from FILE");
-        System.out.println("EPS-figure generation: \n  -e, --epsfigs FILE\t\t Creates eps-figures from all components in FILE");
+        System.out.println("EPS-figure generation: \n  -e, --epsfigs FILE... \t\t Creates eps-figures from all components in FILEs");
         System.out.println("List: \n  -l, --list [FILE]\t\t List properties with current values (or values in FILE)");
         System.out.println("Help options: \n  -?, -h, --help, --usage\t show this help message");
         System.out.println("Version: \n  -v, --version \t\t show version");
