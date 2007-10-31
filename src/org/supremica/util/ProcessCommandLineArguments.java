@@ -215,12 +215,12 @@ public class ProcessCommandLineArguments
             else if (args[i].equals("-l") || args[i].equals("--list"))
             {
                 System.out.println(SupremicaProperties.getProperties());
-                //quit = true;
+                quit = true;
             }
             else if (args[i].equals("-v") || args[i].equals("--version"))
             {
                 System.out.println("Supremica version: " + Version.version());
-                //quit = true;
+                quit = true;
             }
             else
             {
@@ -254,7 +254,7 @@ public class ProcessCommandLineArguments
     {
         System.out.println("Supremica: " + org.supremica.Version.version());
         System.out.println("More information about Supremica is available at www.supremica.org\n");
-        System.out.println("Usage: Supremica [OPTION] MODULE_FILES\n");
+        System.out.println("Usage: IDE [OPTION] MODULE_FILES\n");
         System.out.println("Property options: \n  -p, --properties FILE\t\t Load properties from FILE");
         System.out.println("EPS-figure generation: \n  -e, --epsfigs FILE\t\t Creates eps-figures from all components in FILE");
         System.out.println("List: \n  -l, --list [FILE]\t\t List properties with current values (or values in FILE)");

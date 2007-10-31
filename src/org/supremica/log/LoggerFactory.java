@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.log
 //# CLASS:   LoggerFactory
 //###########################################################################
-//# $Id: LoggerFactory.java,v 1.20 2007-10-04 20:44:40 robi Exp $
+//# $Id: LoggerFactory.java,v 1.21 2007-10-31 14:58:54 flordal Exp $
 //###########################################################################
 
 /*
@@ -77,9 +77,8 @@ import org.supremica.properties.SupremicaPropertyChangeListener;
 
 
 public class LoggerFactory
-	implements SupremicaPropertyChangeListener
-{    
-
+    implements SupremicaPropertyChangeListener
+{
     //#######################################################################
     //# Constructors
     private LoggerFactory()
@@ -87,25 +86,32 @@ public class LoggerFactory
         final PatternLayout layout = new PatternLayout("%-5p %m%n");
         final PrintWriter writer = new PrintWriter(System.out);
         final Appender cappender = new WriterAppender(layout, writer);
-        mConsoleAppender = cappender;
         final LoggerFilter filter = new LoggerFilter();
         cappender.addFilter(filter);
+        mConsoleAppender = cappender;
+        mLayout = layout;
+        mFilter = filter;
+
+        Config.LOG_TO_CONSOLE.addPropertyChangeListener(this);
+        Config.LOG_TO_GUI.addPropertyChangeListener(this);
+    }
+    
+    public void initialiseAppenders()
+    {
         final org.apache.log4j.Logger root =
             org.apache.log4j.Logger.getRootLogger();
-        if (Config.LOG_TO_CONSOLE.isTrue()) {
-            root.addAppender(cappender);
+        if (Config.LOG_TO_CONSOLE.isTrue())
+        {
+            root.addAppender(mConsoleAppender);
         }
-        if (Config.LOG_TO_GUI.isTrue()) {
+        
+        if (Config.LOG_TO_GUI.isTrue())
+        {
             final Appender dappender = LogDisplay.getInstance();
             root.addAppender(dappender);
         }
-		mLayout = layout;
-        mFilter = filter;        
-		Config.LOG_TO_CONSOLE.addPropertyChangeListener(this);
-		Config.LOG_TO_GUI.addPropertyChangeListener(this);
     }
-
-        
+    
     //#######################################################################
     //# Factory Methods
     public LoggerFilter getLoggerFilter()
@@ -130,57 +136,58 @@ public class LoggerFactory
         return mConsoleAppender;
     }
     
-
-	//#######################################################################
+    
+    //#######################################################################
     //# Redirection
     public void logToNull()
-	{
+    {
         final Appender appender = new NullAppender();
         final org.apache.log4j.Logger root =
             org.apache.log4j.Logger.getRootLogger();
-		root.addAppender(appender);
-	}
-
+        root.addAppender(appender);
+    }
+    
     public void logToFile(final File file)
-		throws FileNotFoundException
-	{
-		final String name = file.toString();
-		final OutputStream fstream = new FileOutputStream(file, true);
-		final PrintStream pstream = new PrintStream(fstream, true);
-		logToStream(pstream, name);
-	}
-
-	public void logToStream(final PrintStream stream)
-	{
-		logToStream(stream, null);
-	}
-
-	public void logToStream(final PrintStream stream, final String name)
-	{
+    throws FileNotFoundException
+    {
+        final String name = file.toString();
+        final OutputStream fstream = new FileOutputStream(file, true);
+        final PrintStream pstream = new PrintStream(fstream, true);
+        logToStream(pstream, name);
+    }
+    
+    public void logToStream(final PrintStream stream)
+    {
+        logToStream(stream, null);
+    }
+    
+    public void logToStream(final PrintStream stream, final String name)
+    {
         final PrintWriter writer = new PrintWriter(stream);
         final Appender appender = new WriterAppender(mLayout, writer);
-		if (name != null) {
-			appender.setName(name);
-		}
+        if (name != null)
+        {
+            appender.setName(name);
+        }
         final org.apache.log4j.Logger root =
             org.apache.log4j.Logger.getRootLogger();
-		root.addAppender(appender);
-	}
-
+        root.addAppender(appender);
+    }
+    
     public void cancelLogToFile(final File file)
-	{
-		final String name = file.toString();
+    {
+        final String name = file.toString();
         final org.apache.log4j.Logger root =
             org.apache.log4j.Logger.getRootLogger();
-		final Appender appender = root.getAppender(name);
-		root.removeAppender(appender);
-		appender.close();
-	}
-
-
-	//#######################################################################
+        final Appender appender = root.getAppender(name);
+        root.removeAppender(appender);
+        appender.close();
+    }
+    
+    
+    //#######################################################################
     //# Interface org.supremica.properties.SupremicaPropertyChangeListener
-	/**
+    /**
      * Updates the appenders of the root logger after a change to
      * Supremica properties. This method adds or removes appenders
      * to the root logger, thus changing the behaviour of all loggers
@@ -189,53 +196,64 @@ public class LoggerFactory
      */
     public void propertyChanged(final SupremicaPropertyChangeEvent event)
     {
-		final BooleanProperty property = (BooleanProperty) event.getSource();
+        final BooleanProperty property = (BooleanProperty) event.getSource();
         final Appender appender;
-        if (property == Config.LOG_TO_CONSOLE) {
+        if (property == Config.LOG_TO_CONSOLE)
+        {
             appender = mConsoleAppender;
-        } else if (property == Config.LOG_TO_GUI) {
+        }
+        else if (property == Config.LOG_TO_GUI)
+        {
             appender = LogDisplay.getInstance();
-        } else {
+        }
+        else
+        {
             throw new IllegalArgumentException
                 ("Unsupported property: " + property.getKey() + "!");
         }
         final org.apache.log4j.Logger root =
             org.apache.log4j.Logger.getRootLogger();
-        if (property.isTrue()) {
+        if (property.isTrue())
+        {
             root.addAppender(appender);
-        } else {
+        }
+        else
+        {
             root.removeAppender(appender);
         }
     }
     
-
+    
     //#######################################################################
     //# Static Access
-	public static LoggerFactory getInstance()
-	{
-		return theInstance;
-	}
-
+    public static LoggerFactory getInstance()
+    {
+        /*
+        if (theInstance == null)
+            theInstance = new LoggerFactory();
+         */
+        return theInstance;
+    }
+    
     public static Logger createLogger(final Class clazz)
     {
-        return theInstance.createLoggerFor(clazz);
+        return getInstance().createLoggerFor(clazz);
     }
     
     public static Logger createLogger(final String name)
     {
-        return theInstance.createLoggerFor(name);
+        return getInstance().createLoggerFor(name);
     }
-
+    
     
     //#######################################################################
     //# Data Members
     private final PatternLayout mLayout;
     private final LoggerFilter mFilter;
     private final Appender mConsoleAppender;
-
-
+    
+    
     //#######################################################################
     //# Singleton Pattern
-	private static final LoggerFactory theInstance = new LoggerFactory();
-    
+    private static final LoggerFactory theInstance = new LoggerFactory();
 }

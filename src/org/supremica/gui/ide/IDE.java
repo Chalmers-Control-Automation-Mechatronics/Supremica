@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.gui.ide
 //# CLASS:   IDE
 //###########################################################################
-//# $Id: IDE.java,v 1.105 2007-10-31 13:39:49 flordal Exp $
+//# $Id: IDE.java,v 1.106 2007-10-31 14:58:54 flordal Exp $
 //###########################################################################
 
 package org.supremica.gui.ide;
@@ -64,14 +64,17 @@ public class IDE
     public IDE()
     throws JAXBException, SAXException
     {
-        Utility.setupFrame(this, IDEDimensions.mainWindowPreferredSize);
-        setTitle(getName());
-        
+        // Initialise logging
+        LoggerFactory.getInstance().initialiseAppenders();        
+        info("Supremica version: " + (new Version()).toString()); // Hello world!
+                
         // Instantiate all actions
         mObservers = new LinkedList<Observer>();
         mActions = new Actions(this);
         
         // Create GUI
+        Utility.setupFrame(this, IDEDimensions.mainWindowPreferredSize);
+        setTitle(getName());
         final BorderLayout layout = new BorderLayout();
         final JPanel contents = (JPanel) getContentPane();
         contents.setLayout(layout);
@@ -96,9 +99,8 @@ public class IDE
         // Initialise Document Managers
         mDocumentContainerManager = new DocumentContainerManager(this);
         mDocumentContainerManager.attach(this);
-        
-        info("Supremica version: " + (new Version()).toString());
-        
+
+        // Initialise XML_RPC
         if (Config.XML_RPC_ACTIVE.isTrue())
         {
             boolean serverStarted = true;
@@ -342,11 +344,15 @@ public class IDE
     public static void main(String args[])
     throws Exception
     {
-        //logger.setLogToConsole(true);
+        // Process command line arguments
         final List<File> files = ProcessCommandLineArguments.process(args);
-        //logger = LoggerFactory.createLogger(IDE.class);
+        
+        // Now start the gui...
+        logger = LoggerFactory.createLogger(IDE.class);
         InterfaceManager.getInstance().initLookAndFeel();
         final IDE ide = new IDE();
+
+        // Open initial module(s)
         if (files != null && files.size() > 0)
         {
             ide.openFiles(files);
@@ -355,6 +361,8 @@ public class IDE
         {
             ide.openEmptyDocument();
         }
+        
+        // Show!
         ide.setVisible(true);
     }
     
@@ -374,9 +382,11 @@ public class IDE
     private final Actions mActions;
     private final List<Observer> mObservers;
 
-    // Logger. Must not be initialised until ProcessCommandLineArguments has finished (or messages will disappear).
-    //private static Logger logger;
-    private static Logger logger = LoggerFactory.createLogger(IDE.class);
+    // Logger. Must not be initialised until ProcessCommandLineArguments has finished (or messages WILL disappear).
+    // Try running "IDE -h" and "IDE", _both_ should give output, to console and logdisplay, respectively.
+    //private static Logger logger = LoggerFactory.createLogger(IDE.class);
+    private static Logger logger = null;
+    
     
     //#######################################################################
     //# Static Class Constants

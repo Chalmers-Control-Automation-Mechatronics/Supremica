@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.log
 //# CLASS:   LogDisplay
 //###########################################################################
-//# $Id: LogDisplay.java,v 1.35 2007-10-31 13:39:49 flordal Exp $
+//# $Id: LogDisplay.java,v 1.36 2007-10-31 14:58:54 flordal Exp $
 //###########################################################################
 
 /*
@@ -92,8 +92,6 @@ public class LogDisplay
     extends AppenderSkeleton
 {
     
-    //#######################################################################
-    //# Constructors
     public static LogDisplay getInstance()
     {
         final InterfaceManager interfaceManager =
@@ -107,7 +105,9 @@ public class LogDisplay
         }
         return theLogDisplay;
     }
-    
+
+    //#######################################################################
+    //# Constructors
     private LogDisplay()
     {
         mLayout = new PatternLayout("%-5p %m%n");
@@ -118,6 +118,8 @@ public class LogDisplay
         mLabel = "";
         mIsFancy = true;
         
+        popup = new LoggerPopupMenu(LoggerFactory.getInstance().getLoggerFilter());
+
         // This code used to be in the popup menu -------------
         mTextPane.addMouseListener(new MouseAdapter()
         {
@@ -909,7 +911,7 @@ public class LogDisplay
     private JScrollPane theTextPaneScrollPane;
     private JTextPane mTextPane;
     private StyledDocument mDocument;
-    private LoggerPopupMenu popup = new LoggerPopupMenu(LoggerFactory.getInstance().getLoggerFilter());
+    private LoggerPopupMenu popup;
     private Layout mLayout;
     private Map<Level,MutableAttributeSet> mAttributeMap;
     private Map<Level,ImageIcon> mIconMap;
