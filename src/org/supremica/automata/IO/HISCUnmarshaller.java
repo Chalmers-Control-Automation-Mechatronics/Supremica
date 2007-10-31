@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.valid
 //# CLASS:   SupremicaUnmarshaller
 //###########################################################################
-//# $Id: HISCUnmarshaller.java,v 1.2 2007-06-23 10:16:00 robi Exp $
+//# $Id: HISCUnmarshaller.java,v 1.3 2007-10-31 13:15:02 flordal Exp $
 //###########################################################################
 
 package org.supremica.automata.IO;
@@ -31,8 +31,7 @@ import org.xml.sax.SAXException;
 
 public class HISCUnmarshaller
     implements ProxyUnmarshaller<ModuleProxy>
-{
-    
+{    
     //#########################################################################
     //# Constructor
     public HISCUnmarshaller(final ModuleProxyFactory modfactory)

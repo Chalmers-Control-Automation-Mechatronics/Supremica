@@ -62,7 +62,6 @@ import org.supremica.log.*;
  */
 public class ProjectBuildFromHISC
 {
-    private static Logger logger = LoggerFactory.createLogger(ProjectBuildFromHISC.class);
     private ProjectFactory theProjectFactory = null;
     private Project project = null;
     private String fileName;
@@ -189,7 +188,7 @@ public class ProjectBuildFromHISC
         }
         
         // Return
-        logger.warn("There is a problem when converting HISC projects since the concepts of answer and request events do not automatically translate to ordinary supervisory control.");
+        System.out.println("There is a problem when converting HISC projects since the concepts of answer and request events do not automatically translate to ordinary supervisory control.");
         return project;
     }
     

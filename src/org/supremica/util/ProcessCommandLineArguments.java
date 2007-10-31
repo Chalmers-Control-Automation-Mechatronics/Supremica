@@ -239,13 +239,6 @@ public class ProcessCommandLineArguments
             }
         }
 
-        /*
-        // I'd like to flush the output to the console, but it's intercepted by the logger...
-        // So nothing gets output if we quit here!
-        System.out.println();
-        System.err.println();
-        */
-
         if (quit)
         {
             System.exit(0);

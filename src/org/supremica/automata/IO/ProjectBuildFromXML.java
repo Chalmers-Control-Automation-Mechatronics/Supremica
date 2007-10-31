@@ -65,7 +65,6 @@ import org.supremica.log.*;
 public class ProjectBuildFromXML
     extends DefaultHandler
 {
-    private static Logger logger = LoggerFactory.createLogger(ProjectBuildFromXML.class);
     private final static String automataStr = "Automata";
     private final static String automatonStr = "Automaton";
     private final static String eventsStr = "Events";
@@ -238,7 +237,7 @@ public class ProjectBuildFromXML
         }
         catch (SAXException ex)
         {
-            logger.error(ex.getMessage());
+            System.out.println(ex.getMessage());
             
             throw new SupremicaException(ex.getMessage());
         }
@@ -261,7 +260,7 @@ public class ProjectBuildFromXML
         }
         catch (SAXException ex)
         {
-            logger.error(ex.getMessage());
+            System.err.println(ex.getMessage());
             
             throw new SupremicaException(ex.getMessage());
         }
@@ -434,7 +433,7 @@ public class ProjectBuildFromXML
         if (currProject.containsAutomaton(currAutomaton.getName()))
         {
             // Already there!?!
-            logger.error("Name conflict, multiple automata with name " +
+            System.err.println("Name conflict, multiple automata with name " +
                 currAutomaton + ", discarding last one added.");
         }
         else
@@ -533,7 +532,7 @@ public class ProjectBuildFromXML
         catch (Exception ex)
         {
             
-            // logger.error("Exception adding event. " + ex);
+            // System.err.println("Exception adding event. " + ex);
             // logger.debug(ex.getStackTrace());
             throw new RuntimeException(ex);
         }
@@ -1092,7 +1091,7 @@ public class ProjectBuildFromXML
         catch (MalformedURLException ex)
         {    // This was not an url
             url = null;
-            //logger.error(ex);
+            //System.err.println(ex);
         }
         
         try
@@ -1126,7 +1125,7 @@ public class ProjectBuildFromXML
         catch (MalformedURLException ex)
         {    // This was not an url
             url = null;
-            //logger.error(ex);
+            //System.err.println(ex);
         }
         
         currProject.setAnimationURL(url);
@@ -1158,7 +1157,7 @@ public class ProjectBuildFromXML
         catch (MalformedURLException ex)
         {    // This was not an url
             url = null;
-            //logger.error(ex);
+            //System.err.println(ex);
         }
         
         try
@@ -1192,7 +1191,7 @@ public class ProjectBuildFromXML
         catch (MalformedURLException ex)
         {    // This was not an url
             url = null;
-            logger.error(ex);
+            System.err.println(ex);
         }
         
         currProject.setUserInterfaceURL(url);

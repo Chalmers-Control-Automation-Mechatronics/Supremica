@@ -126,7 +126,6 @@ import org.supremica.log.*;
  */
 public class ProjectBuildFromADS
 {
-    private static Logger logger = LoggerFactory.createLogger(ProjectBuildFromADS.class);
     private ProjectFactory theProjectFactory = null;
 //	private Project currProject = null;
 //	private Automaton currAutomaton = null;
@@ -250,7 +249,7 @@ public class ProjectBuildFromADS
                     
                     if (automatonName == null)
                     {
-                        logger.error("Expected an automaton name");
+                        System.err.println("Expected an automaton name");
                     }
                     
                     currAutomaton.setName(automatonName);
@@ -266,14 +265,14 @@ public class ProjectBuildFromADS
                     }
                     catch (NumberFormatException ex)
                     {
-                        logger.error("Expected the number of states. Read: " + currToken);
+                        System.err.println("Expected the number of states. Read: " + currToken);
                         
                         throw ex;
                     }
                     
                     if (numberOfStates < 1)
                     {
-                        logger.error("The automaton must have at least one state (the initial state)");
+                        System.err.println("The automaton must have at least one state (the initial state)");
                     }
                     
                     // Create all states
@@ -301,7 +300,7 @@ public class ProjectBuildFromADS
                     }
                     catch (NumberFormatException ex)
                     {
-                        logger.error("Expected a state number. Read: " + currToken);
+                        System.err.println("Expected a state number. Read: " + currToken);
                         throw ex;
                     }
                     
@@ -314,7 +313,7 @@ public class ProjectBuildFromADS
                 }
                 else if (currParserState == STATE_READ_VOCAL_STATES)
                 {
-                    logger.error("Vocal states not supported. Read: " + currToken);
+                    System.err.println("Vocal states not supported. Read: " + currToken);
                     throw new Exception("Vocal states not supported");
                 }
                 else if (currParserState == STATE_READ_TRANSITIONS)
@@ -329,17 +328,17 @@ public class ProjectBuildFromADS
                     
                     if (sourceStateName == null)
                     {
-                        logger.error("No source state name");
+                        System.err.println("No source state name");
                     }
                     
                     if (eventLabel == null)
                     {
-                        logger.error("No dest state name");
+                        System.err.println("No dest state name");
                     }
                     
                     if (destStateName == null)
                     {
-                        logger.error("No dest state name");
+                        System.err.println("No dest state name");
                     }
                     
                     int sourceStateNumber = -1;
@@ -353,7 +352,7 @@ public class ProjectBuildFromADS
                     }
                     catch (NumberFormatException ex)
                     {
-                        logger.error("Expected an integer. Read: " + currToken);
+                        System.err.println("Expected an integer. Read: " + currToken);
                         throw ex;
                     }
                     

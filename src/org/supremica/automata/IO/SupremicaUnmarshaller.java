@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.automata.IO
 //# CLASS:   SupremicaUnmarshaller
 //###########################################################################
-//# $Id: SupremicaUnmarshaller.java,v 1.18 2007-06-23 10:58:09 robi Exp $
+//# $Id: SupremicaUnmarshaller.java,v 1.19 2007-10-31 13:15:02 flordal Exp $
 //###########################################################################
 
 package org.supremica.automata.IO;
@@ -27,8 +27,6 @@ import org.supremica.automata.Automata;
 import org.supremica.automata.Automaton;
 import org.supremica.automata.Project;
 import org.supremica.automata.State;
-import org.supremica.log.Logger;
-import org.supremica.log.LoggerFactory;
 
 import org.xml.sax.SAXException;
 
@@ -130,7 +128,6 @@ public class SupremicaUnmarshaller
     {
         if (project.hasAnimation())
         {
-            logger.warn("Project contains an animation, this is not supported by the editor.");
             return false;
         }
         
@@ -142,7 +139,7 @@ public class SupremicaUnmarshaller
                 /*
                 if (state.getCost() != State.UNDEF_COST)
                 {
-                    logger.warn("State cost information in the automata model is not supported by the editor.");
+                    System.out.println("State cost information in the automata model is not supported by the editor.");
                     return false;
                 }
                 */
@@ -156,8 +153,4 @@ public class SupremicaUnmarshaller
     //# Data Members
     private final ProjectBuildFromXML builder;
     private DocumentManager mDocumentManager;
-
-    private static final Logger logger =
-        LoggerFactory.createLogger(SupremicaUnmarshaller.class);
-
 }
