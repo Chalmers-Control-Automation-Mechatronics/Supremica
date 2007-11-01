@@ -1,3 +1,13 @@
+//# -*- tab-width: 4  indent-tabs-mode: nil  c-basic-offset: 4 -*-
+//###########################################################################
+//# PROJECT: Waters/Supremica IDE
+//# PACKAGE: org.supremica.gui.ide.actions
+//# CLASS:   EditorSaveEncapsulatedPostscriptAction
+//###########################################################################
+//# $Id: EditorSaveEncapsulatedPostscriptAction.java,v 1.4 2007-11-01 00:56:49 robi Exp $
+//###########################################################################
+
+
 package org.supremica.gui.ide.actions;
 
 import java.awt.Shape;
@@ -123,17 +133,31 @@ public class EditorSaveEncapsulatedPostscriptAction
         saveEPS(file, graph, module);
     }
 
+
     /**
-     * Prints a graph as eps in the file file. The module is needed for alphabet (deciding controllability).
+     * <P>Prints a graph as EPS in the file outputfile.
+     * The module is needed for alphabet (deciding controllability).</P>
+     * 
+     * <P><STRONG>BUG.</STRONG> EPS Printing should be done through renderer.
+     * Otherwise, changes to rendering will not be reflected in EPS
+     * output.</P>
+     * <P><STRONG>BUG.</STRONG> This method should throw IOException, and
+     * be called by another 'GUI driver' method that catches the
+     * exception and presents it in a dialog box.</P>
      */
-    public static void saveEPS(File file, GraphProxy graph, ModuleProxy module)
+    public static void saveEPS(final File outputfile,
+                               final GraphProxy graph,
+                               final ModuleProxy module)
     {
-        // Create the writer, responsible for writing the information to the eps-file
+        // Create the writer, responsible for writing the information
+        // to the EPS-file
         BufferedWriter w = null;
         
-        try
-        {
-            w = new BufferedWriter(new FileWriter(file));
+        try {
+            // First we write everything to a temporary file,
+            // which is later copied to the final output.
+            final File tempfile = File.createTempFile("temp", ".eps");
+            w = new BufferedWriter(new FileWriter(tempfile));
             
             ///////////////////
             // START WRITING //
@@ -144,7 +168,7 @@ public class EditorSaveEncapsulatedPostscriptAction
             w.newLine();
             w.write("%%Creator: Supremica-IDE");
             w.newLine();
-            w.write("%%Title: " + file.getName());
+            w.write("%%Title: " + outputfile.getName());
             w.newLine();
             java.util.Calendar gregCalendar = new java.util.GregorianCalendar();
             String month = "" + (gregCalendar.get(java.util.Calendar.MONTH) + 1);
@@ -666,17 +690,17 @@ public class EditorSaveEncapsulatedPostscriptAction
             w.write("%%EOF");
             
             // Close the output stream
-            w.flush();
             w.close();
+            w = null;
             
             // The recently created eps-file is reprinted, this time with the
             // information about the supremal bounding box added to its header.
             // A temporary file is used for the reprinting
-            File newEpsFile = File.createTempFile("temp", ".eps", file.getParentFile());
-            BufferedReader r = new BufferedReader(new FileReader(file));
-            w = new BufferedWriter(new FileWriter(newEpsFile));
+            BufferedReader r = new BufferedReader(new FileReader(tempfile));
+            w = new BufferedWriter(new FileWriter(outputfile));
             
-            // Every line of command is copied and a "BoundingBox"-line is added
+            // Every line of command is copied
+            // and a "BoundingBox"-line is added
             String str = r.readLine();
             while (str != null)
             {
@@ -691,36 +715,21 @@ public class EditorSaveEncapsulatedPostscriptAction
                 
                 str = r.readLine();
             }
-            
-            // The in- and output streams are closed
-            w.flush();
-            w.close();
             r.close();
-            
-            // The old file is deleted, while the new one takes its name
-            file.delete();
-            boolean renameSucceeded = newEpsFile.renameTo(file);
-            if (!renameSucceeded)
-            {
-                throw new IOException("Unable to rename the newly created file to " + file.getName());
-            }
-        }
-        catch (IOException ex)
-        {
-            if (w != null)
-            {
-                try
-                {
-                    w.flush();
+            // The old file is deleted.
+            tempfile.delete();
+        } catch (final IOException exception) {
+            throw new RuntimeException(exception);
+        } finally {
+            // Close the output stream in a finally block,
+            // so it happens even in case of exceptions.
+            if (w != null) {
+                try {
                     w.close();
-                }
-                catch (IOException exo)
-                {
-                    exo.printStackTrace();
+                } catch (final IOException exception) {
+                    throw new RuntimeException(exception);
                 }
             }
-            
-            ex.printStackTrace();
         }
     }
     
