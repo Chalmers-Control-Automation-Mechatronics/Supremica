@@ -130,9 +130,9 @@ public class ProcessCommandLineArguments
             else if (args[i].equals("-e") || args[i].equals("--epsfigs"))
             {
                 // Create eps figs for all components in the supplied file
-                while (++i < args.length)
+                while ((i+1 < args.length) && !(args[i+1].startsWith("-")))
                 {
-                    String fileName = args[i];
+                    String fileName = args[++i];
                     File figFile = new File(fileName);
 
                     // Set up document manager ...
@@ -183,7 +183,19 @@ public class ProcessCommandLineArguments
                         DocumentProxy doc = documentManager.load(figFile);
 
                         // Build module
-                        ModuleProxy module = (ModuleProxy) doc;
+                        ModuleProxy module;
+                        if (doc instanceof ModuleProxy)
+                        {
+                            module = (ModuleProxy) doc;
+                        }
+                        else if (doc instanceof Project)
+                        {
+                            module = importer.importModule((Project) doc);
+                        }
+                        else
+                        {
+                            throw new ClassCastException("Unknown document type");
+                        }
 
                         // Loop throgh components and print eps-figures
                         //module.acceptVisitor(new EPSPrinterVisitor(module));
@@ -287,10 +299,17 @@ class EPSPrinterVisitor
         File file = new File(proxy.getName() + ".eps");
 
         // Print!
-        EditorSaveEncapsulatedPostscriptAction.saveEPS(file, proxy.getGraph(), module);
-        
-        System.err.println("Created eps-file: " + file.getAbsolutePath());
-        
+        try
+        {
+            EditorSaveEncapsulatedPostscriptAction.saveEPS(file, proxy.getGraph(), module);
+            System.err.println("Created eps-file: " + file.getAbsolutePath());
+        }
+        catch (NullPointerException ex)
+        {
+            System.err.println("Component '" + file.getName().substring(0,file.getName().length()-4) + "' appears to be missing geometry information.");
+        }
+
+        // Return null?
         return null;
     }
 }
