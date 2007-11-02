@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.analysis.modular
 //# CLASS:   ModularLanguageInclusionChecker
 //###########################################################################
-//# $Id: ModularLanguageInclusionChecker.java,v 1.11 2007-08-19 03:23:47 siw4 Exp $
+//# $Id: ModularLanguageInclusionChecker.java,v 1.12 2007-11-02 00:30:37 robi Exp $
 //###########################################################################
 
 
@@ -50,7 +50,7 @@ public class ModularLanguageInclusionChecker
     mHeuristic = heuristic;
     mTranslator = ControllabilityKindTranslator.getInstance();
     mStates = 0;
-    setStateLimit(10000000);
+    setNodeLimit(10000000);
   }
   
   public SafetyTraceProxy getCounterExample()
@@ -104,7 +104,7 @@ public class ModularLanguageInclusionChecker
         }
       });
       automata.remove(automaton);
-      checker.setStateLimit(getStateLimit() - mStates);
+      checker.setNodeLimit(getNodeLimit() - mStates);
       if (!checker.run()) {
         mStates += checker.getAnalysisResult().getTotalNumberOfStates();
         setFailedResult(mChecker.getCounterExample());
@@ -130,7 +130,7 @@ public class ModularLanguageInclusionChecker
           return properties.contains(a) ? ComponentKind.SPEC : ComponentKind.PLANT;
         }
       });
-      mChecker.setStateLimit(getStateLimit() - mStates);
+      mChecker.setNodeLimit(getNodeLimit() - mStates);
       if (!mChecker.run()) {
         mStates += mChecker.getAnalysisResult().getTotalNumberOfStates();
         setFailedResult(mChecker.getCounterExample());

@@ -154,7 +154,7 @@
         <unjar src="${lib}/swixml.jar" dest="${lib}/${unjared}"/>
         <unjar src="${lib}/trove.jar" dest="${lib}/${unjared}"/>
         <!-- Library for handling BDDs. -->
-        <unjar src="${lib}/javabdd.jar" dest="${lib}/${unjared}"/>	
+        <unjar src="${lib}/javabdd-2.0.jar" dest="${lib}/${unjared}"/>
         <unjar src="${waters.jaxbjar}" dest="${lib}/${unjared}"/>
         <unjar src="${lib}/manufacturingTables_jaxb.jar" dest="${lib}/${unjared}"/>
         <unjar src="${lib}/itext.jar" dest="${lib}/${unjared}"/>

@@ -11,6 +11,9 @@ ARGS=
 
 for F in $@; do
     case $F in
+	-bdd)
+	    FACTORY="$WPACK.analysis.bdd.BDDModelVerifierFactory"
+	    ;;
 	-native)
 	    FACTORY="$WPACK.cpp.analysis.NativeModelVerifierFactory"
 	    ;;

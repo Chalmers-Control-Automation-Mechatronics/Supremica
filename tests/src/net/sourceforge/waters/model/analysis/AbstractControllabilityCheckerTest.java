@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.analysis
 //# CLASS:   AbstractControllabilityCheckerTest
 //###########################################################################
-//# $Id: AbstractControllabilityCheckerTest.java,v 1.12 2007-07-06 02:09:50 robi Exp $
+//# $Id: AbstractControllabilityCheckerTest.java,v 1.13 2007-11-02 00:30:37 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.analysis;
@@ -71,7 +71,7 @@ public abstract class AbstractControllabilityCheckerTest
   {
     try {
       final ModelVerifier verifier = getModelVerifier();
-      verifier.setStateLimit(3);
+      verifier.setNodeLimit(3);
       testBigFactory();
       fail("Expected overflow not caught!");
     } catch (final OverflowException exception) {
@@ -385,6 +385,22 @@ public abstract class AbstractControllabilityCheckerTest
     runModelVerifier(group, dir, name, false);
   }
 
+  public void test_Nasty_OnlyInitBad() throws Exception
+  {
+    final String group = "tests";
+    final String dir  = "nasty";
+    final String name = "only_init_bad.wmod";
+    runModelVerifier(group, dir, name, false);
+  }
+
+  public void test_Nasty_ReleaseAndBlow() throws Exception
+  {
+    final String group = "tests";
+    final String dir  = "nasty";
+    final String name = "release_and_blow.wmod";
+    runModelVerifier(group, dir, name, true);
+  }
+
   public void testProfisafeI4Host() throws Exception
   {
     final String group = "tests";
@@ -644,20 +660,20 @@ public abstract class AbstractControllabilityCheckerTest
     runModelVerifier(group, dir, name, true);
   }
 
-  public void testFtuer() throws Exception
-  {
-    final String group = "valid";
-    final String dir  = "central_locking";
-    final String name = "ftuer.wdes";
-    runModelVerifier(group, dir, name, true);
-  }
-
   public void testFischertechnik() throws Exception
   {
     final String group = "tests";
     final String dir = "incremental_suite";
     final String name = "ftechnik.wmod";
     runModelVerifier(group, dir, name, false);
+  }
+
+  public void testFtuer() throws Exception
+  {
+    final String group = "valid";
+    final String dir = "central_locking";
+    final String name = "ftuer.wdes";
+    runModelVerifier(group, dir, name, true);
   }
 
   public void testKoordwsp() throws Exception
@@ -715,6 +731,7 @@ public abstract class AbstractControllabilityCheckerTest
     final String name = "weiche.wdes";
     runModelVerifier(group, dir, name, true);
   }
+
 
   //#########################################################################
   //# Test Cases -- Parameterised

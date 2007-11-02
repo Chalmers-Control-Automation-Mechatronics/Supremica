@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.analysis
 //# CLASS:   ModelChecker
 //###########################################################################
-//# $Id: ModelChecker.java,v 1.5 2006-11-03 15:01:57 torda Exp $
+//# $Id: ModelChecker.java,v 1.6 2007-11-02 00:30:37 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.analysis;
@@ -45,7 +45,7 @@ import net.sourceforge.waters.model.des.TraceProxy;
  * <CODE>&nbsp;&nbsp;//</CODE> <I>property satisfied ...</I><BR>
  * <CODE>} else {</CODE><BR>
  * <CODE>&nbsp;&nbsp;//</CODE> <I>property not satisfied ...</I><BR>
- * <CODE>&nbsp;&nbsp;{@link net.sourceforge.waters.model.des.SafetyTraceProxy}
+ * <CODE>&nbsp;&nbsp;{@link net.sourceforge.waters.model.des.TraceProxy}
  *   counterexample = checker.{@link #getCounterExample()};</CODE><BR>
  * <CODE>}</CODE></P>
  *

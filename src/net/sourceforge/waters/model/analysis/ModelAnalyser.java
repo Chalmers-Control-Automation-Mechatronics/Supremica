@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.analysis
 //# CLASS:   ModelAnalyser
 //###########################################################################
-//# $Id: ModelAnalyser.java,v 1.6 2006-11-15 01:26:40 robi Exp $
+//# $Id: ModelAnalyser.java,v 1.7 2007-11-02 00:30:37 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.analysis;
@@ -66,22 +66,24 @@ public interface ModelAnalyser
   //#########################################################################
   //# Parameters
   /**
-   * Sets the state limit for this model verifier.
-   * If set, the state limit is the maximum number of states the verifier
+   * Sets the node limit for this model verifier.
+   * If set, the node limit is the maximum number of nodes the verifier
    * is allowed to keep in memory at any one time. If this number is
    * exceeded, an {@link OverflowException} is thrown.
-   * @param  limit  The new state limit, or {@link Integer#MAX_VALUE} to
-   *                indicate that no state limit is to be used.
+   * A 'node' here represents a basic unit of memory such as a state
+   * in a synchronous product or a BDD node.
+   * @param  limit  The new node limit, or {@link Integer#MAX_VALUE} to
+   *                indicate that no node limit is to be used.
    */
-  public void setStateLimit(final int limit);
+  public void setNodeLimit(final int limit);
 
   /**
-   * Gets the state limit for this model verifier.
-   * @return The current state limit, or {@link Integer#MAX_VALUE} to indicate
-   *         that no state limit is used.
-   * @see    #setStateLimit(int)
+   * Gets the node limit for this model verifier.
+   * @return The current node limit, or {@link Integer#MAX_VALUE} to indicate
+   *         that no node limit is used.
+   * @see    #setNodeLimit(int)
    */
-  public int getStateLimit();
+  public int getNodeLimit();
 
 
   //#########################################################################

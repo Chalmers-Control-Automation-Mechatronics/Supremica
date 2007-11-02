@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.analysis
 //# CLASS:   AbstractModelVerifierTest
 //###########################################################################
-//# $Id: AbstractModelVerifierTest.java,v 1.13 2007-07-06 02:09:50 robi Exp $
+//# $Id: AbstractModelVerifierTest.java,v 1.14 2007-11-02 00:30:37 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.analysis;
@@ -44,7 +44,7 @@ public abstract class AbstractModelVerifierTest extends AbstractAnalysisTest
     final ProductDESProxyFactory factory = getProductDESProxyFactory();
     mTraceMarshaller = new JAXBTraceMarshaller(factory);
     mModelVerifier = createModelVerifier(factory);
-    setStateLimit();
+    setNodeLimit();
   }
 
 
@@ -173,7 +173,7 @@ public abstract class AbstractModelVerifierTest extends AbstractAnalysisTest
     }
     assertEquals("Wrong result from model checker: got " +
                  result + " but should have been " + expect + "!",
-                 result, expect);
+                 expect, result);
     if (!expect) {
       checkCounterExample(des, counterexample);
     }
@@ -190,7 +190,7 @@ public abstract class AbstractModelVerifierTest extends AbstractAnalysisTest
   protected void checkCounterExample(final ProductDESProxy des,
                                      final TraceProxy trace)
   {
-    assertNotNull(trace);
+    assertNotNull("Counterexample is NULL!", trace);
     assertSame("Product DES in trace is not the original model!",
                des, trace.getProductDES());
     final Collection<AutomatonProxy> automata = des.getAutomata();
@@ -218,12 +218,12 @@ public abstract class AbstractModelVerifierTest extends AbstractAnalysisTest
 
   //#########################################################################
   //# Auxiliary Methods
-  private void setStateLimit()
+  private void setNodeLimit()
   {
     final String prop = System.getProperty("waters.analysis.statelimit");
     if (prop != null) {
       final int limit = Integer.parseInt(prop);
-      mModelVerifier.setStateLimit(limit);
+      mModelVerifier.setNodeLimit(limit);
     }
   }
 

@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.analysis.modular
 //# CLASS:   ModularLanguageInclusionChecker
 //###########################################################################
-//# $Id: OneUncontrollableChecker.java,v 1.5 2007-08-19 03:23:47 siw4 Exp $
+//# $Id: OneUncontrollableChecker.java,v 1.6 2007-11-02 00:30:37 robi Exp $
 //###########################################################################
 
 
@@ -45,7 +45,7 @@ public class OneUncontrollableChecker
     mChecker = checker;
     mTranslator = ControllabilityKindTranslator.getInstance();
     mStates = 0;
-    setStateLimit(5000000);
+    setNodeLimit(5000000);
   }
   
   public SafetyTraceProxy getCounterExample()
@@ -100,7 +100,7 @@ public class OneUncontrollableChecker
           return getKindTranslator().getComponentKind(a);
         }
       });
-      mChecker.setStateLimit(getStateLimit()/* - mStates*/);
+      mChecker.setNodeLimit(getNodeLimit()/* - mStates*/);
       try {
         if (!mChecker.run()) {
           System.out.println(event.getName() + " uncontrollable");

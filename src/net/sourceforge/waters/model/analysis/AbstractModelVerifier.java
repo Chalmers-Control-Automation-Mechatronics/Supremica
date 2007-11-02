@@ -1,11 +1,10 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
-//# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
 //# PROJECT: Waters
 //# PACKAGE: net.sourceforge.waters.model.analysis
 //# CLASS:   AbstractModelVerifier
 //###########################################################################
-//# $Id: AbstractModelVerifier.java,v 1.6 2006-12-05 21:38:17 flordal Exp $
+//# $Id: AbstractModelVerifier.java,v 1.7 2007-11-02 00:30:37 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.analysis;
@@ -104,7 +103,9 @@ public abstract class AbstractModelVerifier
   }
 
   /**
-   * Gets the total number of states constructed by this verifier.
+   * Stores any available statistics on this verifier's last run in the
+   * given verification result. This default implementation does nothing,
+   * it needs to be overriden by subclasses.
    */
   protected void addStatistics(VerificationResult result)
   {

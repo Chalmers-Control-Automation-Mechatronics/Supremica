@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.analysis.monolithic
 //# CLASS:   MonolithicSafetyVerifier
 //###########################################################################
-//# $Id: MonolithicSafetyVerifier.java,v 1.10 2007-04-16 03:56:00 robi Exp $
+//# $Id: MonolithicSafetyVerifier.java,v 1.11 2007-11-02 00:30:37 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.analysis.monolithic;
@@ -245,6 +245,7 @@ public class MonolithicSafetyVerifier
     final int numstates = mStateSpace.size();
     result.setNumberOfAutomata(mNumAutomata);
     result.setNumberOfStates(numstates);
+    result.setPeakNumberOfNodes(numstates);
   }
 
 
@@ -348,8 +349,8 @@ public class MonolithicSafetyVerifier
           encode(mSuccessor, mStateTuple);
           if (systemSet.add(mStateTuple)) {
             mStateSpace.add(mStateTuple);
-            if (mStateSpace.size() > getStateLimit()) {
-              throw new OverflowException(getStateLimit());
+            if (mStateSpace.size() > getNodeLimit()) {
+              throw new OverflowException(getNodeLimit());
             }
           }
         }

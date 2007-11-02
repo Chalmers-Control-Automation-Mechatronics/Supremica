@@ -45,7 +45,7 @@ public class ParallelModularControllabilityChecker
     mHeuristic = heuristic;
     mTranslator = ControllabilityKindTranslator.getInstance();
     mStates = 0;
-    setStateLimit(2000000);
+    setNodeLimit(2000000);
   }
   
   public SafetyTraceProxy getCounterExample()
@@ -143,7 +143,7 @@ public class ParallelModularControllabilityChecker
                                      : ComponentKind.PLANT;
           }
         });
-        mChecker.setStateLimit(getStateLimit() - mStates);
+        mChecker.setNodeLimit(getNodeLimit() - mStates);
         if (!mChecker.run()) {
           Set<AutomatonProxy> cplants = 
             new HashSet<AutomatonProxy>(run.mPlants);
@@ -242,7 +242,7 @@ public class ParallelModularControllabilityChecker
           lookedat.addAll(tobeadded);
         }
         mStates += mChecker.getAnalysisResult().getTotalNumberOfStates();
-        mChecker.setStateLimit(getStateLimit() - mStates);
+        mChecker.setNodeLimit(getNodeLimit() - mStates);
       }
     }
     setSatisfiedResult();

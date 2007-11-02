@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.analysis.modular
 //# CLASS:   ModularControllabilityChecker
 //###########################################################################
-//# $Id: CullingControllabilityChecker.java,v 1.5 2007-06-05 13:45:21 robi Exp $
+//# $Id: CullingControllabilityChecker.java,v 1.6 2007-11-02 00:30:37 robi Exp $
 //###########################################################################
 
 
@@ -62,7 +62,7 @@ public class CullingControllabilityChecker
     mTranslator = ControllabilityKindTranslator.getInstance();
     mStates = 0;
     mLeast = least;
-    setStateLimit(2000000);
+    setNodeLimit(2000000);
     mOut = out;
   }
   
@@ -85,7 +85,7 @@ public class CullingControllabilityChecker
     throws AnalysisException
   {
     mStates = 0;
-    mChecker.setStateLimit(getStateLimit());
+    mChecker.setNodeLimit(getNodeLimit());
     final Set<AutomatonProxy> plants = new HashSet<AutomatonProxy>();
     final Set<AutomatonProxy> specplants = new HashSet<AutomatonProxy>();
     final SortedSet<AutomatonProxy> specs = 
@@ -148,14 +148,14 @@ public class CullingControllabilityChecker
                                    : ComponentKind.PLANT;
         }
       });
-      mChecker.setStateLimit(getStateLimit());
+      mChecker.setNodeLimit(getNodeLimit());
       mainloop:
       while (!mChecker.run()) {
         TraceProxy newcounter = mChecker.getCounterExample();
         mOut.println("Size:" + newcounter.getEvents().size());
         mOut.println(newcounter);
         mStates += mChecker.getAnalysisResult().getTotalNumberOfStates();
-        mChecker.setStateLimit(getStateLimit());
+        mChecker.setNodeLimit(getNodeLimit());
         while (newcounter != null) {
           TraceProxy counter = newcounter;
           newcounter = null;
@@ -179,7 +179,7 @@ public class CullingControllabilityChecker
           Set<AutomatonProxy> possible = new HashSet<AutomatonProxy>(op.others);
           possible.add(op.added);
           //CheckSuffix.checkSuffix(counter, possible, null);
-          int prevstates = mChecker.getAnalysisResult().getTotalNumberOfStates();
+          double prevstates = mChecker.getAnalysisResult().getTotalNumberOfStates();
           System.out.println(op.added.getName() + " added " + mStates + " " + composition.size() + " " + prevstates);
           uncomposedplants.remove(op.added);
           uncomposedspecplants.remove(op.added);
@@ -192,7 +192,7 @@ public class CullingControllabilityChecker
               composition.remove(oportunity.added);
               comp = getFactory().createProductDESProxy("comp", events, composition);
               mChecker.setModel(comp);
-              //mChecker.setStateLimit(getStateLimit() - mStates);
+              //mChecker.setNodeLimit(getNodeLimit() - mStates);
               if (mChecker.run()) {
                 break mainloop;
               };
@@ -227,7 +227,7 @@ public class CullingControllabilityChecker
         }
         comp = getFactory().createProductDESProxy("comp", events, composition);
         mChecker.setModel(comp);
-        mChecker.setStateLimit(getStateLimit());
+        mChecker.setNodeLimit(getNodeLimit());
       }
       mStates += mChecker.getAnalysisResult().getTotalNumberOfStates();
       /*specs.removeAll(composition);

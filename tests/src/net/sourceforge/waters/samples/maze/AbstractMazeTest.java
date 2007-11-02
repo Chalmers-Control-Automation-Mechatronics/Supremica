@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.samples.maze
 //# CLASS:   AbstractMazeTest
 //###########################################################################
-//# $Id: AbstractMazeTest.java,v 1.5 2006-11-15 01:26:40 robi Exp $
+//# $Id: AbstractMazeTest.java,v 1.6 2007-11-02 00:30:37 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.samples.maze;
@@ -497,6 +497,7 @@ public abstract class AbstractMazeTest extends AbstractWatersTest
     mTraceMarshaller = new JAXBTraceMarshaller(mProductDESFactory);
     mMazeCompiler = new MazeCompiler
       (mInputDirectory, mOutputDirectory, moduleFactory, mModuleMarshaller);
+    // mMazeCompiler.setUseLanguageInclusion(false);
     mDocumentManager = new DocumentManager();
     mDocumentManager.registerMarshaller(mModuleMarshaller);
     mDocumentManager.registerMarshaller(mProductDESMarshaller);

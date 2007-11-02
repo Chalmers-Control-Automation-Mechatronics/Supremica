@@ -4,7 +4,7 @@
 //# PACKAGE: waters.analysis
 //# CLASS:   SafetyVerifier
 //###########################################################################
-//# $Id: SafetyVerifier.cpp,v 1.12 2007-06-05 15:09:36 robi Exp $
+//# $Id: SafetyVerifier.cpp,v 1.13 2007-11-02 00:30:37 robi Exp $
 //###########################################################################
 
 #ifdef __GNUG__
@@ -125,6 +125,7 @@ addStatistics(const jni::VerificationResultGlue& vresult)
 {
   vresult.setNumberOfAutomata(mNumAutomata);
   vresult.setNumberOfStates(mNumStates);
+  vresult.setPeakNumberOfNodes(mNumStates);
 }
 
 
@@ -468,7 +469,7 @@ Java_net_sourceforge_waters_cpp_analysis_NativeSafetyVerifier_runNativeAlgorithm
       jni::KindTranslatorGlue translator =
         gchecker.getKindTranslatorGlue(&cache);
       waters::SafetyVerifier checker(des, translator, &cache);
-      const int limit = gchecker.getStateLimit();
+      const int limit = gchecker.getNodeLimit();
       if (limit != UNDEF_INT32) {
         checker.setStateLimit(limit);
       }

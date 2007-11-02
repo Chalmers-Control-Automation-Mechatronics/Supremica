@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.analysis
 //# CLASS:   VerificationResult
 //###########################################################################
-//# $Id: VerificationResult.java,v 1.4 2007-04-16 03:56:00 robi Exp $
+//# $Id: VerificationResult.java,v 1.5 2007-11-02 00:30:37 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.analysis;
@@ -56,8 +56,9 @@ public class VerificationResult extends AnalysisResult
   {
     super(satisfied);
     mCounterExample = counterexample;
-    mTotalNumberOfStates = -1;
     mTotalNumberOfAutomata = -1;
+    mTotalNumberOfStates = -1.0;
+    mPeakNumberOfNodes = -1;
   }
 
 
@@ -85,9 +86,20 @@ public class VerificationResult extends AnalysisResult
    * Gets the total number of states constructed by the analysis.
    * @return The number of states, or <CODE>-1</CODE> if unknown.
    */
-  public int getTotalNumberOfStates()
+  public double getTotalNumberOfStates()
   {
     return mTotalNumberOfStates;
+  }
+
+  /**
+   * Gets the maximum number of states nodes used during analysis.
+   * A 'node' here represents a basic unit of memory such as a state
+   * in a synchronous product or a BDD node.
+   * @return The peak number of nodes, or <CODE>-1</CODE> if unknown.
+   */
+  public int getPeakNumberOfNodes()
+  {
+    return mPeakNumberOfNodes;
   }
   
 
@@ -116,7 +128,7 @@ public class VerificationResult extends AnalysisResult
    * @throws IllegalStateException if the total number of states has been
    *         set by a previous call to this method.
    */
-  public void setNumberOfStates(final int numstates)
+  public void setNumberOfStates(final double numstates)
   {
     if (mTotalNumberOfStates < 0) {
       mTotalNumberOfStates = numstates;
@@ -127,12 +139,31 @@ public class VerificationResult extends AnalysisResult
     }
   }
 
+  /**
+   * Specifies the maximum number of states nodes used during analysis.
+   * A 'node' here represents a basic unit of memory such as a state
+   * in a synchronous product or a BDD node.
+   * @throws IllegalStateException if the peak number of nodes has been
+   *         set by a previous call to this method.
+   */
+  public void setPeakNumberOfNodes(final int numnodes)
+  {
+    if (mPeakNumberOfNodes < 0) {
+      mPeakNumberOfNodes = numnodes;
+    } else {
+      throw new IllegalStateException
+	("Trying to overwrite previously set peak number of nodes " +
+	 "in verification result!");
+    }
+  }
+
 
   //#########################################################################
   //# Data Members
   private final TraceProxy mCounterExample;
 
-  private int mTotalNumberOfStates;
   private int mTotalNumberOfAutomata;
+  private double mTotalNumberOfStates;
+  private int mPeakNumberOfNodes;
 
 }

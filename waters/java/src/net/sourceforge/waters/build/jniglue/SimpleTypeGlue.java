@@ -3,7 +3,7 @@
 //# PACKAGE: net.sourceforge.waters.build.jniglue
 //# CLASS:   SimpleTypeGlue
 //###########################################################################
-//# $Id: SimpleTypeGlue.java,v 1.3 2005-11-05 09:47:15 robi Exp $
+//# $Id: SimpleTypeGlue.java,v 1.4 2007-11-02 00:30:37 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.build.jniglue;
@@ -18,9 +18,10 @@ class SimpleTypeGlue extends TypeGlue {
   private static final int C_VOID = 0;
   private static final int C_BOOLEAN = 1;
   private static final int C_CHAR = 2;
-  private static final int C_INT = 3;
-  private static final int C_OBJECT = 4;
-  private static final int C_STRING = 5;
+  private static final int C_DOUBLE = 3;
+  private static final int C_INT = 4;
+  private static final int C_OBJECT = 5;
+  private static final int C_STRING = 6;
 
   static final SimpleTypeGlue TYPE_VOID =
     new SimpleTypeGlue(C_VOID, "void", "void", "void",
@@ -31,6 +32,9 @@ class SimpleTypeGlue extends TypeGlue {
   static final SimpleTypeGlue TYPE_CHAR =
     new SimpleTypeGlue(C_CHAR, "char", "char", "jchar",
 		       "C", "Char", char.class);
+  static final SimpleTypeGlue TYPE_DOUBLE =
+    new SimpleTypeGlue(C_DOUBLE, "double", "double", "jdouble",
+		       "D", "Double", double.class);
   static final SimpleTypeGlue TYPE_INT =
     new SimpleTypeGlue(C_INT, "int", "int", "jint",
 		       "I", "Int", int.class);

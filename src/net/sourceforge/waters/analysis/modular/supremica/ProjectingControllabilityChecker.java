@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.analysis.modular
 //# CLASS:   ProjectingControllabilityChecker
 //###########################################################################
-//# $Id: ProjectingControllabilityChecker.java,v 1.17 2007-08-19 03:23:47 siw4 Exp $
+//# $Id: ProjectingControllabilityChecker.java,v 1.18 2007-11-02 00:30:37 robi Exp $
 //###########################################################################
 
 
@@ -72,7 +72,7 @@ public class ProjectingControllabilityChecker
     mTranslator = ControllabilityKindTranslator.getInstance();
     mStates = 0;
     mLeast = least;
-    setStateLimit(10000000);
+    setNodeLimit(10000000);
   }
   
   public SafetyTraceProxy getCounterExample()
@@ -265,7 +265,7 @@ public class ProjectingControllabilityChecker
   public boolean run()
     throws AnalysisException
   {
-    System.out.println(getStateLimit());
+    System.out.println(getNodeLimit());
     return run1();
   }
   
@@ -275,7 +275,7 @@ public class ProjectingControllabilityChecker
     //LOGGER.debug("ProjectingControllabilityChecker: STARTING on " +
     //             getModel().getName());
     mStates = 0;
-    mChecker.setStateLimit(getStateLimit());
+    mChecker.setNodeLimit(getNodeLimit());
     final Map<AutomatonProxy, AutomatonProxy> getorig = new HashMap<AutomatonProxy, AutomatonProxy>();
     final Map<AutomatonProxy, AutomatonProxy> getplant = new HashMap<AutomatonProxy, AutomatonProxy>();
     final Set<AutomatonProxy> plants = new HashSet<AutomatonProxy>();
@@ -462,7 +462,7 @@ public class ProjectingControllabilityChecker
     ControllabilityChecker checker = new ModularControllabilityChecker(
                                            list.getModel(), getFactory(),
                                            mChecker, mHeuristic, mLeast);
-    checker.setStateLimit(getStateLimit());
+    checker.setNodeLimit(getNodeLimit());
     checker.setKindTranslator(new KindTranslator()
     {
       public EventKind getEventKind(EventProxy e)
@@ -556,7 +556,7 @@ public class ProjectingControllabilityChecker
         Projection2 proj = new Projection2(comp, getFactory(), mHidden, localforbiddenEvents);
         try {
           int size = (minSize * 10 < mMaxProjStates) ? minSize * 10 : mMaxProjStates;
-          proj.setStateLimit(size);
+          proj.setNodeLimit(size);
           minAutomaton = proj.project();
           mStates += minAutomaton.getStates().size();
           mMinAutMap.put(ah, minAutomaton);

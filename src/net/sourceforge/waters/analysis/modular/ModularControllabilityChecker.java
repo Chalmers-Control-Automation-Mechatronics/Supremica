@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.analysis.modular
 //# CLASS:   ModularControllabilityChecker
 //###########################################################################
-//# $Id: ModularControllabilityChecker.java,v 1.13 2007-07-21 06:28:07 robi Exp $
+//# $Id: ModularControllabilityChecker.java,v 1.14 2007-11-02 00:30:37 robi Exp $
 //###########################################################################
 
 
@@ -52,7 +52,7 @@ public class ModularControllabilityChecker
     mTranslator = ControllabilityKindTranslator.getInstance();
     mStates = 0;
     mLeast = least;
-    setStateLimit(2000000);
+    setNodeLimit(2000000);
   }
   
   public SafetyTraceProxy getCounterExample()
@@ -74,7 +74,7 @@ public class ModularControllabilityChecker
     throws AnalysisException
   {
     mStates = 0;
-    mChecker.setStateLimit(getStateLimit());
+    mChecker.setNodeLimit(getNodeLimit());
     final Set<AutomatonProxy> plants = new HashSet<AutomatonProxy>();
     final Set<AutomatonProxy> specplants = new HashSet<AutomatonProxy>();
     final SortedSet<AutomatonProxy> specs = 

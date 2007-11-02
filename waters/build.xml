@@ -12,6 +12,7 @@
   <property name="supremica.testsrc" location="${supremica.root}/tests/src"/>
 
   <property name="activation.jar" location="${supremica.lib}/activation.jar"/>
+  <property name="javabdd.jar" location="${supremica.lib}/javabdd-2.0.jar"/>
   <property name="jaxb-api.jar" location="${supremica.lib}/jaxb-api.jar"/>
   <property name="jaxb-impl.jar" location="${supremica.lib}/jaxb-impl.jar"/>
   <property name="jaxb-xjc.jar" location="${supremica.lib}/jaxb-xjc.jar"/>
@@ -53,11 +54,14 @@
   <property name="test.classes" location="${classes}/test"/>
   <property name="waters.jar" location="${jar}/waters.jar"/>
   <property name="waters.classes" location="${classes}/waters"/>
-  <property name="waters424.jar" location="${jar}/waters424.jar"/>
+
+  <property name="javadoc552" location="java/docs552"/>
+  <property name="waters552.jar" location="${jar}/waters552.jar"/>
 
   <path id="waters.compile.classpath">
     <path refid="jaxb.classpath"/>
     <pathelement location="${jaxb.jar}"/>
+    <pathelement location="${javabdd.jar}"/>
     <pathelement location="${log4j.jar}"/>
     <pathelement location="${trove.jar}"/>
     <pathelement location="${supremica.lib}/log4j.jar"/>
@@ -155,6 +159,33 @@
         <exclude name="net/sourceforge/waters/gui/**"/>
         <exclude name="net/sourceforge/waters/model/unchecked/**"/>
         <exclude name="net/sourceforge/waters/xsd/**"/>
+      </fileset>
+    </jar>
+  </target>
+
+  <target name="jar552" depends="waters-compile">
+    <copy file="${xsl}/vw.xsl"
+          todir="${waters.classes}/net/sourceforge/waters/valid"/>
+    <copy todir="${waters.classes}/net/sourceforge/waters/model/marshaller">
+      <fileset dir="${xsd}" includes="*.xsd"/>
+    </copy>
+    <jar jarfile="${waters552.jar}">
+      <fileset dir="${waters.classes}">
+        <include name="net/sourceforge/waters/**/*.class"/>
+        <include name="net/sourceforge/waters/**/*.xsd"/>
+        <include name="net/sourceforge/waters/**/*.xsl"/>
+        <exclude name="net/sourceforge/waters/analysis/**"/>
+        <exclude name="net/sourceforge/waters/build/**"/>
+        <exclude name="net/sourceforge/waters/cpp/**"/>
+        <exclude name="net/sourceforge/waters/gui/**"/>
+        <exclude name="net/sourceforge/waters/mbt/**"/>
+        <exclude name="net/sourceforge/waters/model/analysis/**"/>
+        <exclude name="net/sourceforge/waters/samples/**"/>
+      </fileset>
+    </jar>
+    <jar jarfile="${waters552.jar}" update="true">
+      <fileset dir="${waters.classes}">
+        <include name="net/sourceforge/waters/analysis/ModelChecker.class"/>
       </fileset>
     </jar>
   </target>
@@ -287,7 +318,8 @@
       <formatter type="xml"/>
       <batchtest todir="${logs.results}">
         <fileset dir="${supremica.testsrc}">
-          <include name="net/sourceforge/waters/analysis/ControlLoopCheckerTest.java"/>
+          <include name="net/sourceforge/waters/analysis/bdd/**/*.java"/>
+          <exclude name="**/Abstract*.java"/>
         </fileset>
       </batchtest>
       <classpath refid="waters.test.classpath"/>
@@ -302,7 +334,8 @@
       <formatter type="xml"/>
       <batchtest todir="${logs.results}">
         <fileset dir="${supremica.testsrc}">
-          <include name="net/sourceforge/waters/analysis/modular/MaxCommonEventsHeuristicTest.java"/>
+          <include name="net/sourceforge/waters/**/*Maze*Test.java"/>
+          <exclude name="**/Abstract*.java"/>
         </fileset>
       </batchtest>
       <classpath refid="waters.test.classpath"/>
@@ -416,9 +449,10 @@
     
   <target name="test8" depends="run_test8,test-report"
      description="Run some test cases."/>
-          
+
   <target name="doc" depends="jaxb-generate"
           description="Generate Javadoc documentation.">
+    <delete dir="${javadoc}"/>
     <mkdir dir="${javadoc}"/>
     <javadoc destdir="${javadoc}" windowtitle="Waters API">
       <packageset dir="${src}">
@@ -440,6 +474,39 @@
             offline="true" packagelistLoc="${docsrc}/offline/junit"/>
       <classpath refid="waters.test.classpath"/>
     </javadoc>
+  </target>
+
+  <target name="doc552" depends="jaxb-generate"
+          description="Generate Javadoc documentation.">
+    <delete dir="${javadoc552}"/>
+    <mkdir dir="${javadoc552}/src"/>
+    <copy todir="${javadoc552}/src">
+      <fileset dir="${supremica.src}">
+        <include name="net/sourceforge/waters/analysis/Controllability*"/>
+        <include name="net/sourceforge/waters/analysis/ModelChecker.java"/>
+        <include name="net/sourceforge/waters/model/**"/>
+        <exclude name="net/sourceforge/waters/model/analysis/**"/>
+        <include name="net/sourceforge/waters/plain/**"/>
+        <include name="net/sourceforge/waters/subject/**"/>
+        <include name="net/sourceforge/waters/valid/**"/>
+      </fileset>
+    </copy>
+    <javadoc destdir="${javadoc552}" windowtitle="Waters API">
+      <packageset dir="${src}">
+        <include name="net/sourceforge/waters/xsd/**/*"/>
+        <exclude name="net/sourceforge/waters/xsd/*/impl/**"/>
+      </packageset>
+      <packageset dir="${javadoc552}/src"/>
+      <doctitle><![CDATA[<h1>Waters API Documentation</h1>]]></doctitle>
+      <link href="${java.api.url}"
+            offline="true" packagelistLoc="${docsrc}/offline/j2sdk"/>
+      <link href="${jaxme.api.url}"
+            offline="true" packagelistLoc="${docsrc}/offline/jaxme"/>
+      <link href="${junit.api.url}"
+            offline="true" packagelistLoc="${docsrc}/offline/junit"/>
+      <classpath refid="waters.test.classpath"/>
+    </javadoc>
+    <delete dir="${javadoc552}/src"/>
   </target>
 
   <target name="www" depends="doc"

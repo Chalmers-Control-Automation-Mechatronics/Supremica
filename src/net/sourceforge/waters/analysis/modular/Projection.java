@@ -40,20 +40,20 @@ public class Projection
     mHide = hide;
     mForbidden = new HashSet<EventProxy>(forbidden);
     mForbidden.retainAll(mModel.getEvents());
-    mStateLimit = 1000;
+    mNodeLimit = 1000;
     mDisabled = new HashSet<EventProxy>(mModel.getEvents());
     numStates = 1;
   }
 
-  public void setStateLimit(int stateLimit)
+  public void setNodeLimit(int stateLimit)
   {
-    mStateLimit = stateLimit;
+    mNodeLimit = stateLimit;
   }
   
   public AutomatonProxy project()
     throws Exception
   {
-    states = new IntMap(mStateLimit);
+    states = new IntMap(mNodeLimit);
     trans = new ArrayList<TransitionProxy>();
     events = mModel.getEvents().toArray(new EventProxy[mModel.getEvents().size()]);
     int numAutomata = mModel.getAutomata().size();
@@ -233,7 +233,7 @@ public class Projection
             target = new MemStateProxy(numStates);
             states.put(truestate, target);
             numStates++;
-            if (numStates > mStateLimit) {
+            if (numStates > mNodeLimit) {
               throw new Exception("State Limit Exceeded");
             }
             unvisited.offer(truestate);
@@ -585,7 +585,7 @@ public class Projection
     }
   }
   
-  private int mStateLimit;
+  private int mNodeLimit;
   private ProductDESProxy mModel;
   private ProductDESProxyFactory mFactory;
   private Set<EventProxy> mHide;

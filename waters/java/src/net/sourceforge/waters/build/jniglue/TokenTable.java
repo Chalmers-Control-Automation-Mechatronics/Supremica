@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.build.jniglue
 //# CLASS:   TokenTable
 //###########################################################################
-//# $Id: TokenTable.java,v 1.4 2005-11-05 01:02:23 robi Exp $
+//# $Id: TokenTable.java,v 1.5 2007-11-02 00:30:37 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.build.jniglue;
@@ -63,6 +63,8 @@ class TokenTable {
     new SimpleTypeToken(SimpleTypeGlue.TYPE_BOOLEAN);
   static final Token T_TYPE_CHAR =
     new SimpleTypeToken(SimpleTypeGlue.TYPE_CHAR);
+  static final Token T_TYPE_DOUBLE =
+    new SimpleTypeToken(SimpleTypeGlue.TYPE_DOUBLE);
   static final Token T_TYPE_INT =
     new SimpleTypeToken(SimpleTypeGlue.TYPE_INT);
   static final Token T_TYPE_STRING =
@@ -102,6 +104,7 @@ class TokenTable {
     recordToken(T_TYPE_VOID);
     recordToken(T_TYPE_BOOLEAN);
     recordToken(T_TYPE_CHAR);
+    recordToken(T_TYPE_DOUBLE);
     recordToken(T_TYPE_INT);
     recordToken(T_TYPE_STRING);
   }

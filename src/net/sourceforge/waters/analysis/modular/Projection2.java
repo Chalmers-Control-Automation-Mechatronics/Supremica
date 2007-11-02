@@ -40,7 +40,7 @@ public class Projection2
     mHide = hide;
     mForbidden = new HashSet<EventProxy>(forbidden);
     mForbidden.retainAll(mModel.getEvents());
-    mStateLimit = 1000;
+    mNodeLimit = 1000;
     mDisabled = new HashSet<EventProxy>(mModel.getEvents());
     mDisabled.remove(mHide);
     numStates = 1;
@@ -48,15 +48,15 @@ public class Projection2
     //System.out.println("forbidden;" + forbidden);
   }
 
-  public void setStateLimit(int stateLimit)
+  public void setNodeLimit(int stateLimit)
   {
-    mStateLimit = stateLimit;
+    mNodeLimit = stateLimit;
   }
   
   public AutomatonProxy project()
     throws Exception
   {
-    states = new IntMap(mStateLimit);
+    states = new IntMap(mNodeLimit);
     trans = new ArrayList<TransitionProxy>();
     events = mModel.getEvents().toArray(new EventProxy[mModel.getEvents().size()]);
     int numAutomata = mModel.getAutomata().size();
@@ -174,7 +174,7 @@ public class Projection2
     }
     numStates = 1;
     currentState = actualState(currentState);
-    newStates = new StateMap(mStateLimit);
+    newStates = new StateMap(mNodeLimit);
     newStates.put(currentState, new MemStateProxy(0));
     unvisited.offer(currentState);
     while (!unvisited.isEmpty()) {
@@ -260,7 +260,7 @@ public class Projection2
         target = numStates;
         states.put(suc, target);
         numStates++;
-        if (numStates > mStateLimit * 10) {
+        if (numStates > mNodeLimit * 10) {
           throw new Exception("State Limit Exceeded");
         }
         unvisited.offer(suc);
@@ -308,7 +308,7 @@ public class Projection2
         target = new MemStateProxy(numStates);
         newStates.put(succ, target);
         numStates++;
-        if (numStates > mStateLimit) {
+        if (numStates > mNodeLimit) {
           throw new Exception("State Limit Exceeded");
         }
         unvisited.offer(succ);
@@ -717,7 +717,7 @@ public class Projection2
   }
   
   private int mCompositionSize = 0;
-  private int mStateLimit;
+  private int mNodeLimit;
   private ProductDESProxy mModel;
   private ProductDESProxyFactory mFactory;
   private Set<EventProxy> mHide;
