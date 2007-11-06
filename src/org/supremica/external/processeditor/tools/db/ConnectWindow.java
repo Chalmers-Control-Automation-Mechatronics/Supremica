@@ -1,11 +1,8 @@
 package org.supremica.external.processeditor.tools.db;
 
-import java.*;
-import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
-import java.sql.*;
-import javax.sql.*;
+import javax.swing.*;
 
 public class ConnectWindow extends JInternalFrame implements ActionListener {
 	
@@ -45,9 +42,8 @@ public class ConnectWindow extends JInternalFrame implements ActionListener {
 		m.setConstraints(portLabel,con);
 		add(portLabel);
 		
-		//hostNameField = new JTextField("127.0.0.1",15);		//Local Host name
 		hostNameField = new JTextField("129.16.80.73",15);		//Host name
-		
+		hostNameField.addActionListener(this);
 		con = new GridBagConstraints();
 		con.gridx = 0;
 		con.gridy = 1;
@@ -57,9 +53,8 @@ public class ConnectWindow extends JInternalFrame implements ActionListener {
 		m.setConstraints(hostNameField,con);
 		add(hostNameField);
 		
-		//portField = new JTextField("1434",7);		//Local Port
 		portField = new JTextField("1433",7);		//Port
-		
+		portField.addActionListener(this);
 		con = new GridBagConstraints();
 		con.gridx = 2;
 		con.gridy = 1;
@@ -90,6 +85,7 @@ public class ConnectWindow extends JInternalFrame implements ActionListener {
 		add(passwordLabel);
 		
 		userNameField = new JTextField("test123",12);		//User name
+		userNameField.addActionListener(this);
 		con = new GridBagConstraints();
 		con.gridx = 0;
 		con.gridy = 3;
@@ -100,6 +96,7 @@ public class ConnectWindow extends JInternalFrame implements ActionListener {
 		add(userNameField);
 		
 		passwordField = new JPasswordField("test123",10);		//Password
+		passwordField.addActionListener(this);
 		con = new GridBagConstraints();
 		con.gridx = 1;
 		con.gridy = 3;
@@ -136,13 +133,14 @@ public class ConnectWindow extends JInternalFrame implements ActionListener {
 	}
 
 	public void actionPerformed(ActionEvent e){
-		if (e.getSource() == connectButton) {
+		if (e.getSource() == connectButton || e.getSource() == hostNameField || e.getSource() == portField
+			|| e.getSource() == userNameField || e.getSource() == passwordField) {
 			String hostNameStr = hostNameField.getText();
 			String portNumberStr = portField.getText();
 			String userNameStr = userNameField.getText();
 			String passwordStr = passwordField.getText();
 			dbConnect = new Connect("jdbc:sqlserver://", hostNameStr, portNumberStr, "ProductionControlDB", 
-										userNameStr, passwordStr, "direct");
+				userNameStr, passwordStr, "direct");
 			dbConnect.displayDbProperties();
 			this.dispose();
 		}

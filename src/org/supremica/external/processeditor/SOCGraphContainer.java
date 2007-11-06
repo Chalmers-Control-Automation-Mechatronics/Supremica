@@ -287,6 +287,23 @@ public class SOCGraphContainer
 	}else if(result == JFileChooser.CANCEL_OPTION) {	    
 	}else if(result == JFileChooser.ERROR_OPTION) {}	    	
     }
+    
+    public void insertResource(Object o, File file) {
+    	String name = "New ROP";
+    	
+    	if(file == null){
+    		if(o instanceof ROP){
+    			name = ((ROP)o).getMachine();
+    		}
+    	}else{
+    		name = file.getName();
+    	}
+    	
+    	SOCGraphFrame newFrame = new SOCGraphFrame(name, o, file);
+    	add(newFrame);
+    	newFrame.setMaximum(true);
+    }
+    
     /**
      * Closes the active worksheet.
      */
@@ -569,6 +586,7 @@ public class SOCGraphContainer
     
     public void openDBConnection(){
     	BaseWindow baseWindow = new BaseWindow();
+    	baseWindow.setGraphContainer(this);
     }
     
     /**

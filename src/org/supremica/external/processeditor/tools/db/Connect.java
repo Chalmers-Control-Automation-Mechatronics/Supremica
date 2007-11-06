@@ -1,15 +1,15 @@
 package org.supremica.external.processeditor.tools.db;
 
-import java.lang.*;
-import javax.swing.*;
+import java.util.*;
 import java.io.*;
 import java.sql.*;
-import java.sql.Connection.*;
-import java.sql.DriverManager.*;
-import javax.sql.*;
-import javax.xml.stream.*; 
+import javax.xml.bind.*;
+import javax.xml.transform.stream.*;
+import org.supremica.external.processeditor.xml.*;
+
 
 public class Connect {
+	private final String PKGS = "org.supremica.manufacturingTables.xsd.processeditor";
 	private java.sql.Connection con = null;
 	private String url;
 	private String serverName;
@@ -32,7 +32,7 @@ public class Connect {
 		this.databaseName = "ProductionControlDB";
 		this.userName = "test123";
 		this.password = "test123";
-		this.selectMethod = "cursor";
+		this.selectMethod = "direct";
 	}
 	
 	public Connect(String url, String serverName, String portNumber, String databaseName,
@@ -62,9 +62,6 @@ public class Connect {
 		try{
 			Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver"); 
 			con = java.sql.DriverManager.getConnection(getConnectionUrl(),userName,password);
-			if(con != null) {
-				BaseWindow.getPrintArea().append("\nConnection Successful!");
-			}
 		}catch(Exception e){
 			e.printStackTrace();
 			BaseWindow.getPrintArea().append("\nError Trace in getConnection() : " + e.getMessage());
@@ -103,7 +100,8 @@ public class Connect {
 				rs = dm.getCatalogs();
 				while(rs.next()){
 					BaseWindow.getPrintArea().append("\n\tcatalog: " + rs.getString(1));
-				} 
+				}
+				BaseWindow.getPrintArea().append("\n");
 				rs.close();
 				rs = null;
 				closeConnection();
@@ -115,6 +113,38 @@ public class Connect {
 			closeConnection();
 		}
 		dm = null;
+	}
+	
+	//	Get all projects
+	public Vector getAllProjects() {
+		PreparedStatement ps = null;
+		ResultSet rs = null;
+		Vector projects = new Vector();
+		try {
+			con = this.getConnection();
+			if(con != null){	
+				ps = con.prepareStatement("SELECT Project_name FROM Projects");
+				try {
+					rs = ps.executeQuery();
+				}catch(SQLException sqle){
+					BaseWindow.getPrintArea().append("\nAn SQL Exception Occured! " + sqle.getMessage());
+				}
+				while (rs.next()) {
+					projects.addElement(rs.getString(1));
+				}
+				
+				ps.close();
+				rs.close();
+				rs = null;
+				closeConnection();
+			}
+			else 
+				BaseWindow.getPrintArea().append("\nError: No active Connection");
+		}catch(Exception e){
+			BaseWindow.getPrintArea().append("\nError: " + e.getMessage());
+			closeConnection();
+		}
+		return projects;
 	}
 	
 	//	Get project ID
@@ -133,8 +163,7 @@ public class Connect {
 				}catch(SQLException sqle){
 					BaseWindow.getPrintArea().append("\nAn SQL Exception Occured! " + sqle.getMessage());
 				}
-				if (rs != null) {
-					rs.next();
+				if (rs.next()) {
 					projectID = rs.getInt(1);	// The project ID
 				}
 				
@@ -147,31 +176,26 @@ public class Connect {
 			else 
 				BaseWindow.getPrintArea().append("\nError: No active Connection");
 		}catch(Exception e){
-			BaseWindow.getPrintArea().append("\nError: No active Connection: " + e.getMessage());
+			BaseWindow.getPrintArea().append("\nError: " + e.getMessage());
 			closeConnection();
 		}
 		return projectID;
 	}
 	
-	//	Check project ID
+	//	Delete project
 
-	public int checkProjectID(int projectID) {
+	public void deleteProject(int projectID) {
 		PreparedStatement ps = null;
 		ResultSet rs = null;
 		try {
 			con = this.getConnection();
 			if(con != null){	
-				ps = con.prepareStatement("select Project_ID from Projects WHERE Projects.Project_ID = ?");
+				ps = con.prepareStatement("DELETE FROM Projects WHERE Projects.Project_ID = ? SELECT 1");
 				ps.setInt(1, projectID);
 				try {
 					rs = ps.executeQuery();
 				}catch(SQLException sqle){
 					BaseWindow.getPrintArea().append("\nAn SQL Exception Occured! " + sqle.getMessage());
-				}
-				if (rs != null) {
-					rs.next();
-					if (rs.getString(1).isEmpty())
-						projectID = 0;
 				}
 				
 				ps.close();
@@ -183,15 +207,79 @@ public class Connect {
 			else 
 				BaseWindow.getPrintArea().append("\nError: No active Connection");
 		}catch(Exception e){
-			BaseWindow.getPrintArea().append("\nError: No active Connection: " + e.getMessage());
+			BaseWindow.getPrintArea().append("\nError: " + e.getMessage());
 			closeConnection();
 		}
-		return projectID;
 	}
+	
+	//	Get all ROPs
 
+	public Vector getAllROPs(int projectID) {
+		PreparedStatement ps = null;
+		ResultSet rs = null;
+		Vector ROPs = new Vector();
+		try {
+			con = this.getConnection();
+			if(con != null){	
+				ps = con.prepareStatement("SELECT ROP_name_ID, ROP_type, Comment FROM ROPs WHERE ROPs.Project_ID = ?");
+				ps.setInt(1,projectID);
+				try {
+					rs = ps.executeQuery();
+				}catch(SQLException sqle){
+					BaseWindow.getPrintArea().append("\nAn SQL Exception Occured! " + sqle.getMessage());
+				}
+				while (rs.next()) {
+					ROPs.addElement(rs.getString(1));
+				}
+				
+				ps.close();
+				rs.close();
+				rs = null;
+				closeConnection();
+			}
+			else 
+				BaseWindow.getPrintArea().append("\nError: No active Connection");
+		}catch(Exception e){
+			BaseWindow.getPrintArea().append("\nError: " + e.getMessage());
+			closeConnection();
+		}
+		return ROPs;
+	}
+	
+	//	Delete ROP
+
+	public void deleteROP(int projectID, String ROPNameID) {
+		PreparedStatement ps = null;
+		ResultSet rs = null;
+		try {
+			con = this.getConnection();
+			if(con != null){	
+				ps = con.prepareStatement("DELETE FROM ROPs WHERE ROPs.Project_ID = ? AND ROPs.ROP_name_ID = ? SELECT 1");
+				ps.setInt(1, projectID);
+				ps.setString(2, ROPNameID);
+				try {
+					rs = ps.executeQuery();
+				}catch(SQLException sqle){
+					BaseWindow.getPrintArea().append("\nAn SQL Exception Occured! " + sqle.getMessage());
+				}
+				
+				ps.close();
+				rs.close();
+				rs = null;
+				closeConnection();
+				
+			}
+			else 
+				BaseWindow.getPrintArea().append("\nError: No active Connection");
+		}catch(Exception e){
+			BaseWindow.getPrintArea().append("\nError: " + e.getMessage());
+			closeConnection();
+		}
+	}
+	
 	//	Get the ROP XML-file from DB and write to a specified directory (to file)
 
-	public void getROPXML(int projectID, String ROPNameID, String filePath) {
+	public Object getROPXML(int projectID, String ROPNameID, String filePath) {
 		PreparedStatement ps = null;
 		ResultSet rs = null;
 		String xmlStr = "";
@@ -209,12 +297,27 @@ public class Connect {
 				}
 				if (rs != null) {
 					rs.next();
-					xmlStr = rs.getString(1);	// Hela XML-filen som en sträng!!
+					xmlStr = rs.getString(1);	// Hela XML-filen som en sträng
 					try {
-						BufferedWriter out = new BufferedWriter(new FileWriter(filePath));
-						out.write(xmlStr);
-						out.close();
-						BaseWindow.getPrintArea().append("\nExtract complete");
+						//BufferedWriter out = new BufferedWriter(new FileWriter(filePath));
+						//out.write(xmlStr);
+						//out.close();
+						Loader ldr = new Loader();
+						Object o = ldr.open(xmlStr);
+
+						JAXBContext jc = JAXBContext.newInstance(PKGS);
+						Marshaller m = jc.createMarshaller();
+						
+						StringWriter stringWriter = new StringWriter();
+						StreamResult result = new StreamResult( stringWriter );
+						m.marshal( o, result );
+						String content = stringWriter.toString();
+						
+						System.out.println(content);
+						BaseWindow.getPrintArea().append("\nExtract complete (System.out.println())");
+						
+						return o;
+						
 					}catch (Exception e) {
 						if (e.getMessage() == null) {
 							BaseWindow.getPrintArea().append("\nError writing to file. The string is empty. Wrong projectID or ROPname?");
@@ -237,6 +340,8 @@ public class Connect {
 			BaseWindow.getPrintArea().append("\nError: No active Connection: " + e.getMessage());
 			closeConnection();
 		}
+		
+		return null;
 	}
 
 	//	Insert XML string into DB
@@ -244,7 +349,7 @@ public class Connect {
 	public void setROPXML(int projectID, String ROPXML) {
 		PreparedStatement ps = null;
 		ResultSet rs = null;
-		String resultStr = "";
+		String resultStr = "No ResultSet returned";
 		try {
 			con = this.getConnection();
 			if(con != null) {
@@ -257,11 +362,11 @@ public class Connect {
 					BaseWindow.getPrintArea().append("\nAn SQL Exception Occured! " + sqle.getMessage());
 					closeConnection();
 				}
-				if (rs != null) {
-					rs.next();
+				while(rs.next()) {
 					resultStr = rs.getString(1);
-					BaseWindow.getPrintArea().append("\nROP ID: " + resultStr);
 				}
+				BaseWindow.getPrintArea().append("\nROP ID: " + resultStr);
+
 				ps.close();
 				rs.close();
 				rs = null;

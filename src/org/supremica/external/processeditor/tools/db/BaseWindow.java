@@ -1,408 +1,607 @@
 package org.supremica.external.processeditor.tools.db;
 
-import java.*;
-import javax.swing.*;
-import java.awt.*;
-import java.awt.event.*;
 import java.util.*;
 import java.io.*;
+import java.awt.*;
+import java.awt.event.*;
+import javax.swing.*;
+import javax.swing.event.*;
+import javax.swing.text.*;
 
-public class BaseWindow extends JFrame implements ActionListener {
+import org.supremica.external.processeditor.*;
+
+public class BaseWindow extends JFrame implements ActionListener, ListSelectionListener {
 
 /*
 	--< Init >--
 */
-	public JDesktopPane desktop;
-	private JButton insertButton;
-	private JButton extractButton;
-	private JButton connectButton;
-	private JButton disconnectButton;
-
-	private JLabel insertLabel;
-	private JLabel projectIDLabel;
-	private JLabel projectNameLabel;
-	private JLabel descriptionLabel;
-	private JTextField projectIDField;
-	private JTextField projectNameField;
-	private JTextField descriptionField;
-	
-	private JLabel extractLabel;
-	private JLabel projectIDLabel2;
-	private JLabel ROPNameIDLabel;
-	private JLabel filePathLabel;
-	private JTextField projectIDField2;
-	private JTextField ROPNameIDField;
-	private JTextField filePathField;
-
-	private static JTextArea printArea;
-	private JScrollPane scrollPane;
-	
-	private JPanel fieldPanel;
-	private JPanel insertPanel;
+	private JDesktopPane desktop;
 	private JPanel glassPanel;
+	private JMenuBar menuBar;
+	private JMenu sessionMenu;
+	private JMenu encodingMenu;
+	private JMenuItem connectItem, disconnectItem, exitItem,
+							encUTF8Item, encUTF16Item;
+	private JLabel projectLabel;
+	private JLabel projectsLabel;
+	private JLabel ROPLabel;
+	private JLabel ROPsLabel;
+	private JLabel messagesLabel;
+	private JScrollPane pListScrollPane;
+	private JScrollPane rListScrollPane;
+	private JScrollPane scrollMPane;
+	private JTextField projectField;
+	private JList pList;
+	private JList rList;
+   private DefaultListModel pListModel;
+   private DefaultListModel rListModel;
+	private JButton useProjectButton;
+	private JButton refreshPButton;
+	private JButton refreshRButton;
+	private JButton deletePButton;
+	private JButton importButton;
+	private JButton exportButton;
+	private JButton deleteRButton;
+	private static JTextArea printArea;
 	
 	private ConnectWindow connectWindow = null;
-	private Connect dbConnect = null;
+	private SOCGraphContainer graphContainer = null;
 	
+	private String encodingName = "UTF-8";
+	private int index = -1;
+	private int projectID = 0;
+	private String projectName = "";
+	private String ROPNameID = "";
+
+		
 /*
 	--< Constructor >--
 */
 	public BaseWindow() {
+		setDefaultLookAndFeelDecorated(true);
 		setTitle("Database Connection Interface");
+		setResizable(false);
 		desktop = new JDesktopPane();
 		setContentPane(desktop);
-		setSize(540,630);
+		setSize(580,640);
 		setLocationRelativeTo(null);
-		
+
+		// Constrains
 		GridBagLayout m = new GridBagLayout();
 		setLayout(m);
 		GridBagConstraints con;
+
+		// Menu
+		menuBar = new JMenuBar();
+		setJMenuBar(menuBar);
 		
-		insertButton = new JButton("INSERT XML");		//INSERT Button
-		insertButton.setPreferredSize(new Dimension(110,26));		
+		sessionMenu = new JMenu("Session");
+      sessionMenu.setMnemonic(KeyEvent.VK_S);
+		connectItem = new JMenuItem("Connect to DB...");
+		disconnectItem = new JMenuItem("Disconnect");
+		exitItem = new JMenuItem("Exit");
+		connectItem.addActionListener(this);
+		disconnectItem.addActionListener(this);
+		exitItem.addActionListener(this);
+		sessionMenu.add(connectItem);
+		sessionMenu.add(disconnectItem);		
+		sessionMenu.addSeparator();
+		sessionMenu.add(exitItem);
+
+		encodingMenu = new JMenu("Encoding");
+		encodingMenu.setMnemonic(KeyEvent.VK_E);
+		ButtonGroup group = new ButtonGroup();
+		encUTF8Item = new JRadioButtonMenuItem("Unicode UTF-8", true);
+		encUTF16Item = new JRadioButtonMenuItem("Unicode UTF-16");
+		group.add(encUTF8Item);
+		group.add(encUTF16Item);
+		encUTF8Item.addActionListener(this);
+		encUTF16Item.addActionListener(this);
+		encodingMenu.add(encUTF8Item);
+		encodingMenu.add(encUTF16Item);
+	
+      menuBar.add(sessionMenu);
+		menuBar.add(encodingMenu);
+
+		// ****** Project ******
+
+		// Project label
+		projectLabel = new JLabel("Project");
 		con = new GridBagConstraints();
 		con.gridx = 1;
 		con.gridy = 1;
 		con.gridwidth = 1;
-		con.insets = new Insets(2,0,10,10);
-		con.anchor = GridBagConstraints.NORTHWEST;
-		m.setConstraints(insertButton,con);
-		add(insertButton);
-		insertButton.addActionListener(this);
+		con.insets = new Insets(0,0,10,0);
+		con.anchor = GridBagConstraints.WEST;		
+		m.setConstraints(projectLabel,con);
+		add(projectLabel);
 		
-		extractButton = new JButton("EXTRACT XML");		//EXTRACT Button
+		// Project field
+		projectField = new JTextField(15);
+		projectField.addActionListener(this);
+		con = new GridBagConstraints();
+		con.gridx = 1;
+		con.gridy = 2;
+		con.gridwidth = 1;
+		con.insets = new Insets(0,0,5,30);
+		con.anchor = GridBagConstraints.WEST;		
+		m.setConstraints(projectField,con);
+		add(projectField);
+		
+		// Delete project Button
+		deletePButton = new JButton("Delete in DB");
+		deletePButton.addActionListener(this);
+		con = new GridBagConstraints();
+		con.gridx = 1;
+		con.gridy = 4;
+		con.gridwidth = 1;
+		con.insets = new Insets(0,0,0,0);
+		con.anchor = GridBagConstraints.WEST;
+		m.setConstraints(deletePButton,con);
+		add(deletePButton);
+		
+		// Create / Use project button
+		useProjectButton = new JButton("Use/ Create");
+		useProjectButton.setPreferredSize(deletePButton.getPreferredSize());
+		useProjectButton.addActionListener(this);
+		con = new GridBagConstraints();
+		con.gridx = 1;
+		con.gridy = 3;
+		con.gridwidth = 1;
+		con.insets = new Insets(0,0,5,0);
+		con.anchor = GridBagConstraints.WEST;
+		m.setConstraints(useProjectButton,con);
+		add(useProjectButton);
+
+		// Projects label
+		projectsLabel = new JLabel("Projects");
 		con = new GridBagConstraints();
 		con.gridx = 2;
 		con.gridy = 1;
 		con.gridwidth = 1;
-		con.insets = new Insets(2,0,10,10);
-		con.anchor = GridBagConstraints.NORTH;
-		m.setConstraints(extractButton,con);
-		add(extractButton);
-		extractButton.addActionListener(this);
-
-		connectButton = new JButton("CONNECT");		//CONNECT Button
-		connectButton.setPreferredSize(new Dimension(110,26));
-		con = new GridBagConstraints();
-		con.gridx = 3;
-		con.gridy = 1;
-		con.gridwidth = 1;
-		con.insets = new Insets(2,0,10,10);
-		con.anchor = GridBagConstraints.NORTH;
-		m.setConstraints(connectButton,con);
-		add(connectButton);
-		connectButton.addActionListener(this);
+		con.insets = new Insets(0,0,10,0);
+		con.anchor = GridBagConstraints.WEST;		
+		m.setConstraints(projectsLabel,con);
+		add(projectsLabel);
 		
-		disconnectButton = new JButton("DISCONNECT");		//DISCONNECT Button
-		disconnectButton.setPreferredSize(new Dimension(110,26));
+		// Project list
+		pListModel = new DefaultListModel();
+		pListModel.addElement("Hit refresh");
+      pList = new JList(pListModel);
+		pList.setPreferredSize(new Dimension(300,200));
+      pList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+      pList.setSelectedIndex(0);
+      pList.addListSelectionListener(this);
+      pList.setVisibleRowCount(5);
+      pListScrollPane = new JScrollPane(pList);
 		con = new GridBagConstraints();
-		con.gridx = 4;
-		con.gridy = 1;
-		con.gridwidth = 1;
-		con.insets = new Insets(2,0,10,0);
-		con.anchor = GridBagConstraints.NORTH;
-		m.setConstraints(disconnectButton,con);
-		add(disconnectButton);
-		disconnectButton.addActionListener(this);
+		con.gridx = 2;
+		con.gridy = 2;
+		con.gridwidth = 2;
+		con.gridheight = 3;
+		con.insets = new Insets(0,0,5,0);
+		con.anchor = GridBagConstraints.WEST;
+		m.setConstraints(pListScrollPane,con);		
+		add(pListScrollPane);
 		
-		fieldPanel = new JPanel();		//Field Panel
+		// Refresh projects button
+		refreshPButton = new JButton("Refresh");
+		refreshPButton.addActionListener(this);
+		con = new GridBagConstraints();
+		con.gridx = 2;
+		con.gridy = 5;
+		con.gridwidth = 1;
+		con.insets = new Insets(0,0,40,0);
+		con.anchor = GridBagConstraints.WEST;
+		m.setConstraints(refreshPButton,con);
+		add(refreshPButton);	
+		
+		// ****** ROP Components ******
+		
+		// ROP label
+		ROPLabel = new JLabel("ROP");
 		con = new GridBagConstraints();
 		con.gridx = 1;
-		con.gridy = 2;
-		con.gridwidth = 4;
+		con.gridy = 7;
+		con.gridwidth = 1;
+		con.insets = new Insets(0,0,10,0);
+		con.anchor = GridBagConstraints.WEST;		
+		m.setConstraints(ROPLabel,con);
+		add(ROPLabel);
+		
+		// Import button
+		importButton = new JButton("Import selected");
+		importButton.addActionListener(this);
+		con = new GridBagConstraints();
+		con.gridx = 1;
+		con.gridy = 8;
+		con.gridwidth = 1;
+		con.insets = new Insets(0,0,10,0);
+		con.anchor = GridBagConstraints.WEST;
+		m.setConstraints(importButton,con);
+		add(importButton);
+		
+		// Export button
+		exportButton = new JButton("Export new ...");
+		exportButton.setPreferredSize(importButton.getPreferredSize());
+		exportButton.addActionListener(this);
+		con = new GridBagConstraints();
+		con.gridx = 1;
+		con.gridy = 9;
+		con.gridwidth = 1;
+		con.insets = new Insets(0,0,10,0);
+		con.anchor = GridBagConstraints.WEST;
+		m.setConstraints(exportButton,con);
+		add(exportButton);
+		
+		// Delete ROP button
+		deleteRButton = new JButton("Delete in DB");
+		deleteRButton.setPreferredSize(importButton.getPreferredSize());
+		deleteRButton.addActionListener(this);
+		con = new GridBagConstraints();
+		con.gridx = 1;
+		con.gridy = 10;
+		con.gridwidth = 1;
 		con.insets = new Insets(0,0,0,0);
 		con.anchor = GridBagConstraints.WEST;
-		m.setConstraints(fieldPanel,con);
-		add(fieldPanel);
-		fieldPanel.setPreferredSize(new Dimension(480, 500));
-		fieldPanel.setBorder(BorderFactory.createLineBorder(Color.lightGray, 2));
-		
-		// Field panel
+		m.setConstraints(deleteRButton,con);
+		add(deleteRButton);
 
-		GridBagLayout m2 = new GridBagLayout();
-		fieldPanel.setLayout(m2);
-		GridBagConstraints con2;
+		// ROPs label
+		ROPsLabel = new JLabel("ROPs");
+		con = new GridBagConstraints();
+		con.gridx = 2;
+		con.gridy = 7;
+		con.gridwidth = 1;
+		con.insets = new Insets(0,0,10,0);
+		con.anchor = GridBagConstraints.WEST;		
+		m.setConstraints(ROPsLabel,con);
+		add(ROPsLabel);
 		
-		insertLabel = new JLabel("< INSERT ROP >");
-		con2 = new GridBagConstraints();
-		con2.gridx = 1;
-		con2.gridy = 1;
-		con2.gridwidth = 3;
-		con2.insets = new Insets(10,10,5,10);
-		con2.anchor = GridBagConstraints.WEST;
-		m2.setConstraints(insertLabel,con2);
-		fieldPanel.add(insertLabel);
-		insertLabel.setForeground(Color.gray); 
-
-		projectIDLabel = new JLabel("Project ID");
-		con2 = new GridBagConstraints();
-		con2.gridx = 1;
-		con2.gridy = 2;
-		con2.gridwidth = 1;
-		con2.insets = new Insets(10,10,5,10);
-		con2.anchor = GridBagConstraints.WEST;
-		m2.setConstraints(projectIDLabel,con2);
-		fieldPanel.add(projectIDLabel);
-
-		projectNameLabel = new JLabel("Project name");
-		con2 = new GridBagConstraints();
-		con2.gridx = 2;
-		con2.gridy = 2;
-		con2.gridwidth = 2;
-		con2.insets = new Insets(10,10,5,0);
-		con2.anchor = GridBagConstraints.WEST;
-		m2.setConstraints(projectNameLabel,con2);
-		fieldPanel.add(projectNameLabel);
-
-		projectIDField = new JTextField(10);		// Project ID Field
-		con2 = new GridBagConstraints();
-		con2.gridx = 1;
-		con2.gridy = 3;
-		con2.gridwidth = 1;
-		con2.insets = new Insets(5,10,10,10);
-		m2.setConstraints(projectIDField,con2);
-		fieldPanel.add(projectIDField);
+		// ROP list
+		rListModel = new DefaultListModel();
+		rListModel.addElement("Hit refresh");
+   	rList = new JList(rListModel);
+		rList.setPreferredSize(new Dimension(300,200));
+      rList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+      rList.setSelectedIndex(0);
+      rList.addListSelectionListener(this);
+      rList.setVisibleRowCount(5);
+      rListScrollPane = new JScrollPane(rList);
+		con = new GridBagConstraints();
+		con.gridx = 2;
+		con.gridy = 8;
+		con.gridwidth = 2;
+		con.gridheight = 3;
+		con.insets = new Insets(0,0,5,0);
+		con.anchor = GridBagConstraints.WEST;
+		m.setConstraints(rListScrollPane,con);		
+		add(rListScrollPane);
 		
-		projectNameField = new JTextField(20);		// Project name Field
-		con2 = new GridBagConstraints();
-		con2.gridx = 2;
-		con2.gridy = 3;
-		con2.gridwidth = 2;
-		con2.insets = new Insets(5,10,10,0);
-		con2.anchor = GridBagConstraints.WEST;
-		m2.setConstraints(projectNameField,con2);
-		fieldPanel.add(projectNameField);
-
-		extractLabel = new JLabel("< EXTRACT ROP >");
-		con2 = new GridBagConstraints();
-		con2.gridx = 1;
-		con2.gridy = 5;
-		con2.gridwidth = 3;
-		con2.insets = new Insets(30,10,5,10);
-		con2.anchor = GridBagConstraints.WEST;
-		m2.setConstraints(extractLabel,con2);
-		fieldPanel.add(extractLabel);
-		extractLabel.setForeground(Color.gray); 
-						
-		projectIDLabel2 = new JLabel("Project ID");
-		con2 = new GridBagConstraints();
-		con2.gridx = 1;
-		con2.gridy = 6;
-		con2.gridwidth = 1;
-		con2.insets = new Insets(10,10,5,10);
-		con2.anchor = GridBagConstraints.WEST;
-		m2.setConstraints(projectIDLabel2,con2);
-		fieldPanel.add(projectIDLabel2);
+		// Refres ROPs button
+		refreshRButton = new JButton("Refresh");
+		refreshRButton.addActionListener(this);
+		con = new GridBagConstraints();
+		con.gridx = 2;
+		con.gridy = 11;
+		con.gridwidth = 1;
+		con.insets = new Insets(0,0,0,0);
+		con.anchor = GridBagConstraints.WEST;
+		m.setConstraints(refreshRButton,con);
+		add(refreshRButton);
 		
-		ROPNameIDLabel = new JLabel("ROP ID");
-		con2 = new GridBagConstraints();
-		con2.gridx = 2;
-		con2.gridy = 6;
-		con2.gridwidth = 2;
-		con2.insets = new Insets(10,10,5,0);		
-		con2.anchor = GridBagConstraints.WEST;
-		m2.setConstraints(ROPNameIDLabel,con2);
-		fieldPanel.add(ROPNameIDLabel);
-
-		projectIDField2 = new JTextField(10);		// Project ID Field
-		con2 = new GridBagConstraints();
-		con2.gridx = 1;
-		con2.gridy = 7;
-		con2.gridwidth = 1;
-		con2.insets = new Insets(5,10,10,10);
-		m2.setConstraints(projectIDField2,con2);
-		fieldPanel.add(projectIDField2);
+		// ****** Messages ******
 		
-		ROPNameIDField = new JTextField(20);		// ROP name ID Field
-		con2 = new GridBagConstraints();
-		con2.gridx = 2;
-		con2.gridy = 7;
-		con2.gridwidth = 2;
-		con2.insets = new Insets(5,10,10,0);
-		con2.anchor = GridBagConstraints.WEST;
-		m2.setConstraints(ROPNameIDField,con2);
-		fieldPanel.add(ROPNameIDField);
-
-		filePathLabel = new JLabel("Output file path");
-		con2 = new GridBagConstraints();
-		con2.gridx = 1;
-		con2.gridy = 8;
-		con2.gridwidth = 1;
-		con2.insets = new Insets(10,10,5,10);
-		con2.anchor = GridBagConstraints.WEST;
-		m2.setConstraints(filePathLabel,con2);
-		fieldPanel.add(filePathLabel);
+		// Messages label
+		messagesLabel = new JLabel("Messages");
+		con = new GridBagConstraints();
+		con.gridx = 1;
+		con.gridy = 13;
+		con.gridwidth = 1;
+		con.insets = new Insets(0,0,10,0);
+		con.anchor = GridBagConstraints.WEST;		
+		m.setConstraints(messagesLabel,con);
+		add(messagesLabel);
 		
-		filePathField = new JTextField("c:\\\\xml_output\\\\ROPtest1.xml",32);		// Output file path Field
-		con2 = new GridBagConstraints();
-		con2.gridx = 1;
-		con2.gridy = 9;
-		con2.gridwidth = 3;
-		con2.insets = new Insets(10,10,5,10);
-		con2.anchor = GridBagConstraints.WEST;
-		m2.setConstraints(filePathField,con2);
-		fieldPanel.add(filePathField);
-		
-		printArea = new JTextArea("No connection..", 10, 38);
+		// Print area		
+		printArea = new JTextArea("No connection..", 10, 45);
 		printArea.setLineWrap(true);
 		printArea.setWrapStyleWord(true);
-		scrollPane = new JScrollPane(printArea);
-		scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
+		scrollMPane = new JScrollPane(printArea);
+		scrollMPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
 		printArea.setCaretPosition(printArea.getDocument().getLength());
-		con2 = new GridBagConstraints();
-		con2.gridx = 1;
-		con2.gridy = 10;
-		con2.gridwidth = 3;
-		con2.insets = new Insets(20,10,5,10);
-		con2.anchor = GridBagConstraints.WEST;
-		m2.setConstraints(scrollPane,con2);
-		fieldPanel.add(scrollPane);
+		con = new GridBagConstraints();
+		con.gridx = 1;
+		con.gridy = 14;
+		con.gridwidth = 3;
+		con.insets = new Insets(0,0,0,0);
+		con.anchor = GridBagConstraints.WEST;
+		m.setConstraints(scrollMPane,con);
+		add(scrollMPane);
 		printArea.setBackground(Color.WHITE);
 		printArea.setBorder(BorderFactory.createEtchedBorder());
-
+		
+		// Set visible
+		setDefaultCloseOperation(EXIT_ON_CLOSE);
 		setVisible(true);
-		setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 	}
+
 /*
 	--< Methods >--
 */
+
+	// Get print area
 	public static JTextArea getPrintArea() {
 		return printArea;
 	}
 	
+	public void setGraphContainer(SOCGraphContainer graphContainer) {
+		this.graphContainer = graphContainer;
+	}
+	
+	// Is Connected
+	private boolean isConnected() {
+		if (connectWindow != null)
+			if (connectWindow.getDBConnection() != null)
+				return true;
+			else
+				return false;
+		else
+			return false;
+	}
+	
+	// Not connected
+	private void notConnected() {
+		printArea.append("\nNot connected!");
+		pListModel.removeAllElements();
+		rListModel.removeAllElements();
+		pListModel.addElement("Hit refresh");
+		rListModel.addElement("Hit refresh");
+	}
+	
+	// Init values
+	private void initValues() {
+		if (rList.isSelectionEmpty()) {
+			ROPNameID = "";
+		}
+		else
+			ROPNameID = rListModel.getElementAt(rList.getSelectedIndex()).toString();
+			if (ROPNameID.equals("Hit refresh"))
+				ROPNameID = "";
+
+		if (projectField.getText().isEmpty()) {
+			projectName = "";
+		}
+		else
+			projectName = projectField.getText();
+		
+		index = -1;
+	}
+
 /*
 	--< Action performed >--
 */
 
 	public void actionPerformed(ActionEvent e) {
-		int projectID = 0;
-		String projectName = "";
-		String ROPNameID = "";
-		String ROPXML = "";
-		String filePath = "";
-		File xmlFile;
+
+		// Connect Item
+		if (e.getSource() == connectItem) {
+			glassPanel = (JPanel) getGlassPane();
+			glassPanel.setLayout(new FlowLayout());
+			connectWindow = new ConnectWindow();
+			connectWindow.setPreferredSize(new Dimension(300,220));
+			glassPanel.add(connectWindow);
+			glassPanel.setVisible(true);
+		}
 		
-		// Insert button
+		// Disconnect Item
+		else if (e.getSource() == disconnectItem) {
+			connectWindow = null;
+			printArea.append("\nDisconnected");
+			projectID = 0;
+		}
 		
-		if (e.getSource() == insertButton) {
-			printArea.append("\n\nINSERT");
-			if (connectWindow == null) {
-				printArea.append("\nNot connected!");
-			}
-			else if (connectWindow.getDBConnection() == null) {
-				printArea.append("\nNot connected!");
-			}
-			
-			// If connected
-			
-			else {
-				projectName = projectNameField.getText().trim();
-				
-				// Project ID
-				
+		// Exit Item
+		else if (e.getSource() == exitItem) {
+			System.exit(0);
+		}
+		
+		// UTF-8 Item
+		else if (e.getActionCommand() == "Unicode UTF-8") {
+			encodingName = "UTF8";
+		}
+		
+		// UTF-16 Item
+		else if (e.getActionCommand() == "Unicode UTF-16") {
+			encodingName = "UTF16";
+		}
+		
+		// ------------------------------
+		
+		// Use/ Create project button
+		else if (e.getSource() == useProjectButton || e.getSource() == projectField) {
+			if (isConnected()) {
+				initValues();
 				if (projectName.isEmpty()) {
-					try { 
-						projectID = Integer.parseInt(projectIDField.getText().trim());
-					}catch (NumberFormatException nfe){
-						printArea.append("\nNumberFormatException: " + nfe.getMessage()); 
-					}
-					try {
-						projectID = connectWindow.getDBConnection().checkProjectID(projectID);
-					}catch (Exception eDBF) {
-						printArea.append("\nUnsuccessful function call: " + eDBF.getMessage());
-					}
+					printArea.append("\nType or select a project name!");
 				}
-				
-				// Project name
-				
 				else {
-					try {
-						projectID = connectWindow.getDBConnection().getProjectID(projectName);
-					}catch (Exception eDBF) {
-						printArea.append("\nUnsuccessful function call: " + eDBF.getMessage());
+					projectID = connectWindow.getDBConnection().getProjectID(projectName);
+					printArea.append("\nProject ID: " + projectID);
+					
+					Vector ROPs = new Vector();
+					rListModel.removeAllElements();
+					ROPs = connectWindow.getDBConnection().getAllROPs(projectID);
+					for (int i=0; i<ROPs.size(); i++) {
+						rListModel.addElement(ROPs.elementAt(i));
 					}
 				}
-				printArea.append("\n--> Project name: " + projectName);
-				printArea.append("\n--> Project ID: " + projectID);
-				
+			}
+			else
+				notConnected();	
+		}
+		
+		// Delete project Button
+		else if (e.getSource() == deletePButton) {
+			if (isConnected()) {
+				initValues();
+				if (projectName.isEmpty() || projectID == 0) {
+					printArea.append("\nChoose a project!");
+				}
+				else {
+					int okFlag = JOptionPane.showConfirmDialog(null,"Permanently delete project: " + projectName + "?", "Confirm delete", JOptionPane.YES_NO_OPTION);
+					if (okFlag == JOptionPane.YES_OPTION) {
+						connectWindow.getDBConnection().deleteProject(projectID);
+						printArea.append("\nProject deleted..");
+						projectID = 0;
+					}						
+				}
+			}
+			else
+				notConnected();
+		}
+		
+		// Refresh projects Button
+		else if (e.getSource() == refreshPButton) {
+			if (isConnected()) {
+				Vector projects = new Vector();
+				pListModel.removeAllElements();
+				projects = connectWindow.getDBConnection().getAllProjects();
+				for (int i=0; i<projects.size(); i++) {
+					pListModel.addElement(projects.elementAt(i));
+				}
+				projectID = 0;
+			}
+			else
+				notConnected();
+		}
+		
+		// Import selected Button
+		else if (e.getSource() == importButton) {
+			String filePath = "noFilePath";	// TO BE REMOVED !!!!!!!!!!!!!!!!!!
+			if (isConnected()) {
+				initValues();
+				if (projectID == 0 && !ROPNameID.isEmpty()) {
+					printArea.append("\nChoose a project!");
+				}
+				else if (projectID == 0 && ROPNameID.isEmpty()) {
+					printArea.append("\nChoose a project!");
+					printArea.append("\nChoose a ROP!");
+				}
+				else{
+					Object o = null;
+					o = connectWindow.
+							getDBConnection().
+									getROPXML(projectID, ROPNameID, filePath);
+					
+					if(graphContainer != null){
+						graphContainer.insertResource(o, null);
+					}
+				}
+			}
+			else
+				notConnected();
+		}
+
+		// Export new Button
+		else if (e.getSource() == exportButton) {
+			File xmlFile = null;
+			String ROPXML = "";	// TO BE REMOVED !!!!!!!!!!!!!!!!!!
+			if (isConnected()) {
+				initValues();
 				// File chooser & scanner
-				
-				if (projectID != 0) {
+				if (projectID == 0) {
+					printArea.append("\nChoose a project!");
+				}
+				else {
 					final JFileChooser fc = new JFileChooser(); 
 					int returnVal = fc.showOpenDialog(glassPanel); 
-					if (returnVal == JFileChooser.APPROVE_OPTION){
+					if (returnVal == JFileChooser.APPROVE_OPTION) {
 						xmlFile = fc.getSelectedFile();
 						try {
-							Scanner scanner = new Scanner(xmlFile);
+							Reader r = new InputStreamReader(new FileInputStream(xmlFile), encodingName);
+							Scanner scanner = new Scanner(r);
 							while (scanner.hasNextLine()){
-								ROPXML = ROPXML + scanner.nextLine();
+								String tempStr = scanner.nextLine();
+								ROPXML = ROPXML + tempStr;
 								ROPXML.trim();
-							} 
+							}
 							scanner.close();
+							System.out.println(ROPXML);
 						}catch (IOException ex){
 							printArea.append("\nIOException from Scanner: " + ex.getMessage());
 						}					
 						try {
 							connectWindow.getDBConnection().setROPXML(projectID, ROPXML);
-						}catch (Exception eDBF) {
-							printArea.append("\nUnsuccessful function call: " + eDBF.getMessage());
+						}catch (Exception eENF) {
+							printArea.append("\nUnsuccessful function call: " + eENF.getMessage());
 						}
 					}
-					else {
+					else
 						printArea.append("\nOpen command cancelled by user");
-					}
+				}
+			}
+			else
+				notConnected();
+		}
+		
+		// Delete ROP Button
+		else if (e.getSource() == deleteRButton) {
+			if (isConnected()) {
+				initValues();
+				if (projectID == 0) {
+					printArea.append("\nChoose a project!");
+				}
+				else if (ROPNameID.isEmpty()) {
+					printArea.append("\nChoose a ROP!");
 				}
 				else {
-					printArea.append("\nNot a valid projectID!");
-				}	
-			}				
-		}
-		// Extract button
-		
-		else if (e.getSource() == extractButton) {
-			printArea.append("\n\nEXTRACT");
-			if (connectWindow == null) {
-				printArea.append("\nNot connected!");
-			}
-			else if (connectWindow.getDBConnection() == null) {
-				printArea.append("\nNot connected!");
-			}
-			else {
-				try { 
-					projectID = Integer.parseInt(projectIDField2.getText().trim());
-				}catch (NumberFormatException nfe){
-					printArea.append("\nNumberFormatException: " + nfe.getMessage()); 
-				}
-				ROPNameID = ROPNameIDField.getText();
-				filePath = filePathField.getText();
-				try {
-					connectWindow.getDBConnection().getROPXML(projectID, ROPNameID, filePath);
-				}catch (Exception eDBF) {
-					printArea.append("\nUnsuccessful function call: " + eDBF.getMessage());
+					int okFlag = JOptionPane.showConfirmDialog(null,"Permanently delete ROP: " + ROPNameID + "?", "Confirm delete", JOptionPane.YES_NO_OPTION);
+					if (okFlag == JOptionPane.YES_OPTION) {
+						connectWindow.getDBConnection().deleteROP(projectID, ROPNameID);
+						printArea.append("\nROP deleted..");
+					}
 				}
 			}
+			else
+				notConnected();
 		}
-		// Connect button
-		
-		else if (e.getSource() == connectButton) {
-		
-			// Glass Pane	
-			glassPanel = (JPanel) getGlassPane();
-			glassPanel.setLayout(new FlowLayout());
-			glassPanel.setVisible(true);
+
+		// Refresh ROPs Button
+		else if (e.getSource() == refreshRButton) {
+			if (isConnected()) {
+				if (projectID == 0) {
+					printArea.append("\nNo project selected!");
+				}
+				else {
+					Vector ROPs = new Vector();
+					rListModel.removeAllElements();
+					ROPs = connectWindow.getDBConnection().getAllROPs(projectID);
+					for (int i=0; i<ROPs.size(); i++) {
+						rListModel.addElement(ROPs.elementAt(i));
+					}
+				}
+			}
+			else
+				notConnected();
+		}
+	}
 	
-			//	Connect window			
-			connectWindow = new ConnectWindow();
-			connectWindow.setPreferredSize(new Dimension(300,220));
-			glassPanel.add(connectWindow);
-			setDefaultCloseOperation(DISPOSE_ON_CLOSE);
-		}
-		
-		// Disconnect button
-		
-		else if (e.getSource() == disconnectButton) {
-			connectWindow = null;
-			printArea.append("\n\nConnection is closed!");
+/*
+	--< Value changed >--
+*/
+
+	public void valueChanged(ListSelectionEvent e) {
+		JList lst = (JList) e.getSource();
+		ListModel dlm = lst.getModel();
+		if (lst.getValueIsAdjusting() == true) {
+			if (e.getSource() == pList) {
+				pList.setSelectedIndex(lst.getSelectedIndex());
+				projectField.setText(dlm.getElementAt(lst.getSelectedIndex()).toString());
+			}
+			else if (e.getSource() == rList) {
+				rList.setSelectedIndex(lst.getSelectedIndex());
+			}
 		}
 	}
 	
@@ -413,8 +612,7 @@ public class BaseWindow extends JFrame implements ActionListener {
 	public static void main(String[] args) {
         javax.swing.SwingUtilities.invokeLater(new Runnable() {
             public void run(){
-					JFrame.setDefaultLookAndFeelDecorated(true);
-					BaseWindow baseWindow = new BaseWindow();
+					new BaseWindow();
             }
         });
     }
