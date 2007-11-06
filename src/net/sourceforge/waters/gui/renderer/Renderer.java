@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui.renderer
 //# CLASS:   Renderer
 //###########################################################################
-//# $Id: Renderer.java,v 1.11 2007-02-22 03:08:31 robi Exp $
+//# $Id: Renderer.java,v 1.12 2007-11-06 03:22:26 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.gui.renderer;
@@ -89,9 +89,10 @@ public class Renderer
         {
             queue.poll().draw(graphics);
         }
-        for (MiscShape shape : shapes)
-        {
+        if (shapes != null) {
+          for (final MiscShape shape : shapes) {
             shape.draw(graphics);
+          }
         }
     }
     

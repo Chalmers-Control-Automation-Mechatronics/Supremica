@@ -1,3 +1,12 @@
+//# -*- tab-width: 4  indent-tabs-mode: nil  c-basic-offset: 4 -*-
+//###########################################################################
+//# PROJECT: Supremica/Waters IDE
+//# PACKAGE: org.supremica.util
+//# CLASS:   ProcessCommandLineArguments
+//###########################################################################
+//# $Id: ProcessCommandLineArguments.java,v 1.16 2007-11-06 03:22:26 robi Exp $
+//###########################################################################
+
 /*
  * Supremica Software License Agreement
  *
@@ -48,17 +57,18 @@
  */
 package org.supremica.util;
 
-import javax.xml.bind.JAXBException;
-import net.sourceforge.waters.model.base.AbstractProxyVisitor;
-import net.sourceforge.waters.model.marshaller.WatersUnmarshalException;
-import net.sourceforge.waters.model.module.AbstractModuleProxyVisitor;
-import org.supremica.gui.ide.actions.EditorSaveEncapsulatedPostscriptAction;
-import org.supremica.properties.SupremicaProperties;
-import org.supremica.Version;
+import java.awt.geom.Rectangle2D;
 import java.io.*;
+import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
-import net.sourceforge.waters.gui.springembedder.SpringEmbedder;
+import javax.xml.bind.JAXBException;
+
+import net.sourceforge.waters.gui.renderer.DefaultRenderable;
+import net.sourceforge.waters.gui.renderer.ProxyShapeProducer;
+import net.sourceforge.waters.gui.renderer.Renderable;
+import net.sourceforge.waters.gui.renderer.Renderer;
+import net.sourceforge.waters.model.base.AbstractProxyVisitor;
 import net.sourceforge.waters.model.base.DocumentProxy;
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.base.VisitorException;
@@ -68,16 +78,27 @@ import net.sourceforge.waters.model.marshaller.DocumentManager;
 import net.sourceforge.waters.model.marshaller.JAXBModuleMarshaller;
 import net.sourceforge.waters.model.marshaller.ProductDESImporter;
 import net.sourceforge.waters.model.marshaller.ProxyUnmarshaller;
+import net.sourceforge.waters.model.marshaller.WatersUnmarshalException;
+import net.sourceforge.waters.model.module.AbstractModuleProxyVisitor;
+import net.sourceforge.waters.model.module.ForeachComponentProxy;
+import net.sourceforge.waters.model.module.GraphProxy;
 import net.sourceforge.waters.model.module.ModuleProxy;
 import net.sourceforge.waters.model.module.ModuleProxyFactory;
 import net.sourceforge.waters.model.module.SimpleComponentProxy;
 import net.sourceforge.waters.subject.module.ModuleSubjectFactory;
 import net.sourceforge.waters.valid.ValidUnmarshaller;
+
+import org.apache.xmlgraphics.java2d.GraphicContext;
+import org.apache.xmlgraphics.java2d.ps.EPSDocumentGraphics2D;
+
+import org.supremica.Version;
 import org.supremica.automata.IO.ADSUnmarshaller;
 import org.supremica.automata.IO.HISCUnmarshaller;
 import org.supremica.automata.IO.SupremicaUnmarshaller;
 import org.supremica.automata.IO.UMDESUnmarshaller;
 import org.supremica.automata.Project;
+import org.supremica.properties.SupremicaProperties;
+
 import org.xml.sax.SAXException;
 
 /**
@@ -282,34 +303,81 @@ public class ProcessCommandLineArguments
 class EPSPrinterVisitor
     extends AbstractModuleProxyVisitor
 {
-    ModuleProxy module;
-    
-    EPSPrinterVisitor(ModuleProxy module)
+
+    //#######################################################################
+    //# Constructor
+    EPSPrinterVisitor(final ModuleProxy module)
     {
-        this.module = module;
+        mRenderable = new DefaultRenderable();
+        mModule = module;
+    }
+
+
+    //#######################################################################
+    //# Interface net.sourceforge.waters.model.module.ModuleProxyVisitor
+    /**
+     * Visit the children of foreach constructs in the component list.
+     */
+    public Object visitForeachComponentProxy
+        (final ForeachComponentProxy foreach)
+        throws VisitorException
+    {
+        final Collection<Proxy> body = foreach.getBody();
+        return visitCollection(body);
     }
 
     /**
      * Visit simpleComponent and output eps-file.
-     * The only reason that visitGraphProxy is not used instead is that we need the name...
+     * The only reason that visitGraphProxy is not used instead is that we
+     * need the name ...
      */
-    public Object visitSimpleComponentProxy(final SimpleComponentProxy proxy) throws VisitorException
+    public Object visitSimpleComponentProxy(final SimpleComponentProxy comp)
+        throws VisitorException
     {
-        // Create file        
-        File file = new File(proxy.getName() + ".eps");
-
-        // Print!
-        try
-        {
-            EditorSaveEncapsulatedPostscriptAction.saveEPS(file, proxy.getGraph(), module);
-            System.err.println("Created eps-file: " + file.getAbsolutePath());
+        final String name = comp.getName();
+        final GraphProxy graph = comp.getGraph();
+        final ProxyShapeProducer shaper =
+            new ProxyShapeProducer(graph, mModule);
+        try {
+            final File file = new File(name + ".eps");
+            OutputStream stream = null;
+            try {
+                stream = new FileOutputStream(file);
+                stream = new BufferedOutputStream(stream);
+                final EPSDocumentGraphics2D g2d =
+                    new EPSDocumentGraphics2D(false);
+                g2d.setGraphicContext(new GraphicContext());
+                final Rectangle2D bounds =
+                    shaper.getMinimumBoundingRectangle();
+                g2d.translate(-bounds.getX(), -bounds.getY());
+                final int width = (int) Math.ceil(bounds.getWidth());
+                final int height = (int) Math.ceil(bounds.getHeight());
+                g2d.setupDocument(stream, width, height);
+                final Renderer renderer = new Renderer();
+                renderer.renderGraph(graph, null, mRenderable, shaper, g2d);
+                g2d.finish();
+            /*
+            } catch (final NullPointerException exception) {
+                System.err.println
+                    ("Component '" + name +
+                     "' appears to be missing geometry information!");
+            */        
+            } finally {
+                if (stream != null) {
+                    stream.close();
+                }
+            }
+        } catch (final IOException exception) {
+            throw wrap(exception);
         }
-        catch (NullPointerException ex)
-        {
-            System.err.println("Component '" + file.getName().substring(0,file.getName().length()-4) + "' appears to be missing geometry information.");
-        }
-
-        // Return null?
+        // Return any value ...
         return null;
     }
+
+
+    //#######################################################################
+    //# Constructor
+    final Renderable mRenderable;
+    final ModuleProxy mModule;
+
 }

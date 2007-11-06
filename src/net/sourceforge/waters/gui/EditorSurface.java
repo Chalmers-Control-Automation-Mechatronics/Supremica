@@ -4,19 +4,19 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   EditorSurface
 //###########################################################################
-//# $Id: EditorSurface.java,v 1.81 2007-06-26 11:28:14 robi Exp $
+//# $Id: EditorSurface.java,v 1.82 2007-11-06 03:22:26 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.gui;
 
 import java.awt.Color;
 import java.awt.Dimension;
-import java.awt.Graphics2D;
 import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.print.PageFormat;
 import java.awt.print.Printable;
-import java.awt.Rectangle;
 import java.awt.geom.Line2D;
+import java.awt.geom.Rectangle2D;
 import java.util.Collections;
 import java.util.List;
 import javax.swing.JComponent;
@@ -214,8 +214,11 @@ public class EditorSurface
      */
     Dimension calculatePreferredSize()
     {
-        final Rectangle area = getShapeProducer().getMinimumBoundingRectangle();
-        return new Dimension(area.width, area.height);
+        final Rectangle2D area =
+          getShapeProducer().getMinimumBoundingRectangle();
+        final int width = (int) Math.ceil(area.getWidth());
+        final int height = (int) Math.ceil(area.getHeight());
+        return new Dimension(width, height);
     }
     
     public ProxyShapeProducer getShapeProducer()
@@ -263,7 +266,8 @@ public class EditorSurface
             
             // Get the bounds of the actual drawing
             getShapeProducer().createAllShapes();
-            Rectangle area = getShapeProducer().getMinimumBoundingRectangle();
+            final Rectangle2D area =
+              getShapeProducer().getMinimumBoundingRectangle();
             
             // This is the place to do rescaling if the figure won't fit on the page!
             double scaleX = pageFormat.getImageableWidth() / (area.getWidth());

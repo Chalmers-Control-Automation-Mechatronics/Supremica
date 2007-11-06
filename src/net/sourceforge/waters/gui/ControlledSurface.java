@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   ControlledSurface
 //###########################################################################
-//# $Id: ControlledSurface.java,v 1.143 2007-10-30 11:21:41 flordal Exp $
+//# $Id: ControlledSurface.java,v 1.144 2007-11-06 03:22:26 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.gui;
@@ -244,10 +244,12 @@ public class ControlledSurface
 
   Dimension calculatePreferredSize()
   {
-    final Rectangle area = getShapeProducer().getMinimumBoundingRectangle();
+    final Rectangle2D area = getShapeProducer().getMinimumBoundingRectangle();
+    final int width = (int) Math.ceil(area.getWidth());
+    final int height = (int) Math.ceil(area.getHeight());
     final int extra = Config.GUI_EDITOR_GRID_SIZE.get() * 10;
-    final int x = area.width + extra;
-    final int y = area.height + extra;
+    final int x = width + extra;
+    final int y = height + extra;
     return new Dimension(x, y);
   }
 

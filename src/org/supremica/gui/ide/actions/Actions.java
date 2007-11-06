@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.gui.ide.actions
 //# CLASS:   Actions
 //###########################################################################
-//# $Id: Actions.java,v 1.55 2007-09-26 21:15:39 flordal Exp $
+//# $Id: Actions.java,v 1.56 2007-11-06 03:22:26 robi Exp $
 //###########################################################################
 
 package org.supremica.gui.ide.actions;
@@ -98,7 +98,6 @@ public class Actions extends WatersActionManager
     public IDEAction editorPrintAction = new EditorPrintAction(mIDEActions);
     public IDEAction editorSavePDFAction = new EditorSavePDFAction(mIDEActions);
     public IDEAction editorSavePostscriptAction = new EditorSavePostscriptAction(mIDEActions);
-    public IDEAction editorSaveEncapsulatedPostscriptAction = new EditorSaveEncapsulatedPostscriptAction(mIDEActions);
     
     // Editor Actions
     public IDEAction editorCopyAction = new EditorCopyAction(mIDEActions);

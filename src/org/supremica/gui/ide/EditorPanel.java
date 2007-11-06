@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.gui.ide
 //# CLASS:   EditorPanel
 //###########################################################################
-//# $Id: EditorPanel.java,v 1.62 2007-08-10 04:34:31 robi Exp $
+//# $Id: EditorPanel.java,v 1.63 2007-11-06 03:22:26 robi Exp $
 //###########################################################################
 
 
@@ -180,14 +180,12 @@ public class EditorPanel
         // (component editor panel) --- to be deprecated ...
         if (newComponent instanceof ComponentEditorPanel) {
             getActions().editorSavePostscriptAction.setEnabled(true);
-            getActions().editorSaveEncapsulatedPostscriptAction.setEnabled(true);
             getActions().editorSavePDFAction.setEnabled(true);
             getActions().editorPrintAction.setEnabled(true);
         }
         else
         {
             getActions().editorSavePostscriptAction.setEnabled(false);
-            getActions().editorSaveEncapsulatedPostscriptAction.setEnabled(false);
             getActions().editorSavePDFAction.setEnabled(false);
             getActions().editorPrintAction.setEnabled(false);
         }

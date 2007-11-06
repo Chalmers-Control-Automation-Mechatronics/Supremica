@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.gui.ide
 //# CLASS:   DocumentContainerManager
 //###########################################################################
-//# $Id: DocumentContainerManager.java,v 1.6 2007-07-16 11:34:32 flordal Exp $
+//# $Id: DocumentContainerManager.java,v 1.7 2007-11-06 03:22:26 robi Exp $
 //###########################################################################
 
 package org.supremica.gui.ide;
@@ -61,6 +61,7 @@ import org.xml.sax.SAXException;
 
 public class DocumentContainerManager
 {
+
     //#######################################################################
     //# Constructor
     DocumentContainerManager(final IDE ide)
@@ -106,6 +107,7 @@ public class DocumentContainerManager
         mWasCancelled = false;
     }
 
+
     //#######################################################################
     //# Interface net.sourceforge.waters.gui.observer.Subject
     public void attach(final Observer observer)
@@ -129,6 +131,7 @@ public class DocumentContainerManager
         mIDE.fireEditorChangedEvent(event);
     }    
 
+
     //#######################################################################
     //# Simple Access
     public DocumentManager getDocumentManager()
@@ -149,6 +152,7 @@ public class DocumentContainerManager
             return mRecentList.iterator().next();
         }
     }
+
 
     //#######################################################################
     //# Opening and Closing Documents
@@ -239,6 +243,12 @@ public class DocumentContainerManager
         return !mWasCancelled;
     }
 
+    public void showIOError(final IOException exception)
+    {
+        showIOError(exception, false);
+    }
+
+
     //#######################################################################
     //# Static Class Methods
     public static String getTypeString(final DocumentProxy doc)
@@ -252,6 +262,7 @@ public class DocumentContainerManager
                 ("Unknown document type: " + doc.getClass().getName() + "!");
         }
     }
+
 
     //#######################################################################
     //# Auxiliary Methods --- Opening
@@ -342,6 +353,7 @@ public class DocumentContainerManager
         mDocumentManager.remove(uri);
         fireContainerSwitch();
     }
+
 
     //#######################################################################
     //# Auxiliary Methods --- Saving
@@ -513,6 +525,7 @@ public class DocumentContainerManager
         }
     }
 
+
     //#######################################################################
     //# Auxiliary Methods --- Dialogs
     private String getNewModuleName()
@@ -630,6 +643,7 @@ public class DocumentContainerManager
         return msg.replaceAll(": +", ":\n");
     }
 
+
     //#######################################################################
     //# Auxiliary Methods --- Notifications
     private void fireContainerSwitch()
@@ -639,6 +653,7 @@ public class DocumentContainerManager
             new ContainerSwitchEvent(this, container);
         fireEditorChangedEvent(event);
     }
+
 
     //#######################################################################
     //# Data Members
@@ -651,6 +666,7 @@ public class DocumentContainerManager
     private final List<Observer> mObservers;
 
     private boolean mWasCancelled;
+
 
     //#######################################################################
     //# Static Class Constants

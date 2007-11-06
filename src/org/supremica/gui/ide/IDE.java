@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.gui.ide
 //# CLASS:   IDE
 //###########################################################################
-//# $Id: IDE.java,v 1.106 2007-10-31 14:58:54 flordal Exp $
+//# $Id: IDE.java,v 1.107 2007-11-06 03:22:26 robi Exp $
 //###########################################################################
 
 package org.supremica.gui.ide;
@@ -159,6 +159,7 @@ public class IDE
     {
         return mDocumentContainerManager.getDocumentManager();
     }
+
     public JFileChooser getFileChooser()
     {
         return mFileChooser;

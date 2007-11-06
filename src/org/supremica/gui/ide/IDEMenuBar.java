@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.gui.ide
 //# CLASS:   IDEMenuBar
 //###########################################################################
-//# $Id: IDEMenuBar.java,v 1.56 2007-09-26 21:19:39 flordal Exp $
+//# $Id: IDEMenuBar.java,v 1.57 2007-11-06 03:22:26 robi Exp $
 //###########################################################################
 
 package org.supremica.gui.ide;
@@ -22,6 +22,7 @@ import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import net.sourceforge.waters.gui.actions.GraphLayoutAction;
+import net.sourceforge.waters.gui.actions.GraphSaveEPSAction;
 import net.sourceforge.waters.gui.actions.WatersUndoAction;
 import net.sourceforge.waters.gui.actions.WatersRedoAction;
 import net.sourceforge.waters.gui.observer.EditorChangedEvent;
@@ -104,7 +105,8 @@ public class IDEMenuBar
         menu.addSeparator();
         menu.add(ide.getActions().editorPrintAction.getMenuItem());
         menu.add(ide.getActions().editorSavePostscriptAction.getMenuItem());
-        menu.add(ide.getActions().editorSaveEncapsulatedPostscriptAction.getMenuItem());
+		final Action epsprint = actions.getAction(GraphSaveEPSAction.class);
+        menu.add(new JMenuItem(epsprint));
         menu.add(ide.getActions().editorSavePDFAction.getMenuItem());
         menu.addSeparator();
         final Action exit = actions.getAction(ExitAction.class);
