@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.marshaller
 //# CLASS:   ProductDESImporter
 //###########################################################################
-//# $Id: ProductDESImporter.java,v 1.8 2007-06-08 10:45:20 robi Exp $
+//# $Id: ProductDESImporter.java,v 1.9 2007-11-06 17:08:15 avenir Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.marshaller;
@@ -260,6 +260,7 @@ public class ProductDESImporter
 
   private SimpleNodeProxy importNode(final StateProxy state)
   {
+      
     final String name = state.getName();
     final boolean initial = state.isInitial();
     final Collection<EventProxy> props = state.getPropositions();

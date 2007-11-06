@@ -19,7 +19,7 @@ public class ScheduleDialog
     extends JDialog
 {
     private static final long serialVersionUID = 1L;
-    private static final String[] optimizationMethods = new String[] {SchedulingConstants.MODIFIED_A_STAR, SchedulingConstants.MILP, SchedulingConstants.VIS_GRAPH, SchedulingConstants.MULTITHREADED_A_STAR}; //, "Modified IDA*", "Modified SMA*"};
+    private static final String[] optimizationMethods = new String[] {SchedulingConstants.MODIFIED_A_STAR, SchedulingConstants.MILP, SchedulingConstants.VIS_GRAPH, SchedulingConstants.MULTITHREADED_A_STAR, "Velocity Balancing"}; //, "Modified IDA*", "Modified SMA*"};
     private static final String[] astarHeuristics = new String[] {SchedulingConstants.ONE_PRODUCT_RELAXATION, SchedulingConstants.SUBOPTIMAL, SchedulingConstants.TWO_PRODUCT_RELAXATION, SchedulingConstants.VIS_GRAPH_TIME_RELAXATION, SchedulingConstants.VIS_GRAPH_NODE_RELAXATION, SchedulingConstants.BRUTE_FORCE_RELAXATION};
     private static final String[] milpHeuristics = new String[] {SchedulingConstants.OPTIMAL, SchedulingConstants.SUBOPTIMAL };
     private static Logger logger = LoggerFactory.createLogger(ScheduleDialog.class);
@@ -187,7 +187,7 @@ public class ScheduleDialog
                 try
                 {
                     File resultFile = null;
-					if (((String)optiMethodsBox.getSelectedItem()).equals(SchedulingConstants.MODIFIED_A_STAR))
+                    if (((String)optiMethodsBox.getSelectedItem()).equals(SchedulingConstants.MODIFIED_A_STAR))
                     {
                         resultFile = new File(rootDir + File.separator + "_" + heuristicsBox.getSelectedItem() + ".txt");
                     }
@@ -227,6 +227,13 @@ public class ScheduleDialog
             okButton.setEnabled(false);
             
             readMemoryCapacity();
+            
+            //temp - only here to be able to test the velocity balancer rapidly
+            if (optiMethodsBox.getSelectedItem().equals("Velocity Balancing"))
+            {
+                new VelocityBalancer(selectedAutomata.getPlantAutomata(), selectedAutomata.getSupervisorAutomata());
+                return;
+            }
             
             String selectedHeuristic = (String) heuristicsBox.getSelectedItem();
             if (optiMethodsBox.getSelectedItem().equals(SchedulingConstants.MODIFIED_A_STAR))
@@ -475,9 +482,19 @@ public class ScheduleDialog
                 {
                     // Compile into Waters module
                     net.sourceforge.waters.model.marshaller.ProductDESImporter importer = 
-                            new net.sourceforge.waters.model.marshaller.ProductDESImporter(net.sourceforge.waters.subject.module.ModuleSubjectFactory.getInstance());
+                            new net.sourceforge.waters.model.marshaller.ProductDESImporter(
+                            net.sourceforge.waters.subject.module.ModuleSubjectFactory.getInstance());
+                    
+                    // Adds the cost in the state to the name of the state for correct display in the editor
+                    Automaton scheduleAutoForEditor = scheduleAuto.clone();
+                    for (java.util.Iterator<org.supremica.automata.State> states = scheduleAutoForEditor.stateIterator(); states.hasNext(); )
+                    {
+                        org.supremica.automata.State state = states.next();
+                        state.setName(state.getName() + ", cost=" + state.getCost());
+                    }
 
-                    net.sourceforge.waters.model.module.SimpleComponentProxy component = importer.importComponent(scheduleAuto);
+                    net.sourceforge.waters.model.module.SimpleComponentProxy component = 
+                            importer.importComponent(scheduleAutoForEditor);
                     if (ide.getActiveDocumentContainer().getEditorPanel().getEditorPanelInterface().componentNameAvailable(component.getName()))
                     {
                         // Add to current module

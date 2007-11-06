@@ -13,6 +13,7 @@ import java.util.*;
 import org.supremica.automata.*;
 import org.supremica.log.Logger;
 import org.supremica.log.LoggerFactory;
+import org.supremica.petrinet.Place;
 
 /**
  * Creates a new instance of VelocityBalancer
@@ -60,78 +61,133 @@ public class VelocityBalancer
         
     /** The logger */
     private Logger logger = LoggerFactory.createLogger(this.getClass());
-
-    public VelocityBalancer(Automaton schedule, Automata plantAutomata)
+    
+    // This ugly construction is needed (temporarily) to call VelocityBalancer.java 
+    // directly from the GUI, without pre-optimization. 
+    public VelocityBalancer(Automata plantAutomata, Automaton schedule)
         throws Exception
     {
+        this(plantAutomata, new Automata(schedule));
+    }
+    
+    public VelocityBalancer(Automata plantAutomata, Automata supervisors)
+        throws Exception
+    {
+        Automaton schedule = null;
+        
+        // Extract the schedule automaton from the supplied supervisor automata
+        if (supervisors.size() == 1)
+        {
+            schedule = supervisors.getAutomatonAt(0);
+        }
+        else 
+        {
+            for (Automaton supAuto : supervisors)
+            {
+                State initState = supAuto.getInitialState();
+                if (initState.getName().contains(("firing time")))
+                {
+                    schedule = supAuto;
+                }
+            }
+        }
+        // If the search for schedule was unsuccessful, no balancing can be done...
+        if (schedule == null)
+        {
+            throw new Exception("No schedule found in the supplied automata -> Velocity balancing is impossible.");
+        }
+        
         indexMap = new AutomataIndexMap(plantAutomata);
        
         // Extracts plant times from the optimal schedule
         extractFiringTimes(schedule, plantAutomata);
         
-        // Creates a test problem. This is a temporary construction
-        makeTestPath();
-
-        // Checks for each pair of points (except for consecutive points) 
-        // whether they can see eachother.
-        // This is needed only during the development phase (to see what happens with our small example)
-        for (int i=0; i<pathPoints.size()-2; i++)
+        // Feasibility check
+        String tempStr = "";
+        for (int i = 0; i < firingTimes.length; i++)
         {
-            for (int j=i+2; j<pathPoints.size(); j++)
+            tempStr += "(firing) i = " + i + " --> ";
+            for (int j = 0; j < firingTimes[i].length; j++)
             {
-                String str = "";
-
-                for (int k=0; k<pathPoints.get(i).length; k++)
-                {
-                        str += pathPoints.get(i)[k] + " ";
-                }
-                str += "---> ";
-
-                for (int k=0; k<pathPoints.get(j).length; k++)
-                {
-                        str += pathPoints.get(j)[k] + " ";
-                }
-
-                if (areVisible(pathPoints.get(i), pathPoints.get(j)))
-                {
-                        str += "see eachother!!!!!!";
-                        System.out.println(str);
-                }
+                tempStr += firingTimes[i][j] + " ";
             }
+            tempStr += "\n";
         }
-
-        // Finds the key points, i.e. points allowing to decrease the number of robot stops 
-        findKeyPoints();
-
-        System.out.println("");
-        System.out.println("Initial key points:");
-        String str = "";
-        for (int i=0; i<keyPoints.size(); i++)
+        for (int i = 0; i < simulationTimes.length; i++)
         {
-            for (int j=0; j<keyPoints.get(i).length; j++)
+            tempStr += "(simulation) i = " + i + " --> ";
+            for (int j = 0; j < simulationTimes[i].length; j++)
             {
-                str += keyPoints.get(i)[j] + " ";
+                tempStr += simulationTimes[i][j] + " ";
             }
-            str += "---> ";
+            tempStr += "\n";
         }
-        str += "KLART!!!";
-        System.out.println(str);
-
-        // Loops through the key points and smooth out the robot velocities even more when possible
-        improveKeyPointsUsingVisibilitySmoothing();
-
-        // Gathers some statistics about the velocity changes (smooth schedule)
-        System.out.println("");
-        System.out.println("SMOOTH SCHEDULE......");
-        calcVelocityStatisticsForVisibilitySmoothing(keyPoints);
-
-        System.out.println("");
-        System.out.println("UNPROCESSED SCHEDULE.....");
-        calcVelocityStatisticsForUnprocessedSchedule();
-
-        System.out.println("");
-        System.out.println("EVENT SMOOTHING:");
-        calcVelocityStatisticsForEventSmoothing();
+        logger.info(tempStr);
+//        
+//        
+//        // Creates a test problem. This is a temporary construction
+//        makeTestPath();
+//
+//        // Checks for each pair of points (except for consecutive points) 
+//        // whether they can see eachother.
+//        // This is needed only during the development phase (to see what happens with our small example)
+//        for (int i=0; i<pathPoints.size()-2; i++)
+//        {
+//            for (int j=i+2; j<pathPoints.size(); j++)
+//            {
+//                String str = "";
+//
+//                for (int k=0; k<pathPoints.get(i).length; k++)
+//                {
+//                        str += pathPoints.get(i)[k] + " ";
+//                }
+//                str += "---> ";
+//
+//                for (int k=0; k<pathPoints.get(j).length; k++)
+//                {
+//                        str += pathPoints.get(j)[k] + " ";
+//                }
+//
+//                if (areVisible(pathPoints.get(i), pathPoints.get(j)))
+//                {
+//                        str += "see eachother!!!!!!";
+//                        System.out.println(str);
+//                }
+//            }
+//        }
+//
+//        // Finds the key points, i.e. points allowing to decrease the number of robot stops 
+//        findKeyPoints();
+//
+//        System.out.println("");
+//        System.out.println("Initial key points:");
+//        String str = "";
+//        for (int i=0; i<keyPoints.size(); i++)
+//        {
+//            for (int j=0; j<keyPoints.get(i).length; j++)
+//            {
+//                str += keyPoints.get(i)[j] + " ";
+//            }
+//            str += "---> ";
+//        }
+//        str += "KLART!!!";
+//        System.out.println(str);
+//
+//        // Loops through the key points and smooth out the robot velocities even more when possible
+//        improveKeyPointsUsingVisibilitySmoothing();
+//
+//        // Gathers some statistics about the velocity changes (smooth schedule)
+//        System.out.println("");
+//        System.out.println("SMOOTH SCHEDULE......");
+//        calcVelocityStatisticsForVisibilitySmoothing(keyPoints);
+//
+//        System.out.println("");
+//        System.out.println("UNPROCESSED SCHEDULE.....");
+//        calcVelocityStatisticsForUnprocessedSchedule();
+//
+//        System.out.println("");
+//        System.out.println("EVENT SMOOTHING:");
+//        calcVelocityStatisticsForEventSmoothing();
 
         System.out.println("Smoooth gliding.......");	
     }
@@ -185,9 +241,9 @@ public class VelocityBalancer
                         if (currPlantEvents.contains(currEvent))
                         {
                             currFiringTime += scheduleState.getCost();
-                            
-                            firingTimes[plantIndex][indexMap.getStateIndex(plantIndex, currPlantStates[plantIndex])] = currFiringTime;
-                            simulationTimes[plantIndex][indexMap.getStateIndex(plantIndex, currPlantStates[plantIndex])] = currPlantStates[plantIndex].getCost();
+                                    
+                            firingTimesArrays[plantIndex].add(currFiringTime);
+                            simulationTimesArrays[plantIndex].add(currPlantStates[plantIndex].getCost());
                             
 //                            logger.info("skriv mig" + firingTimes[i][j]);
                             
@@ -218,24 +274,6 @@ public class VelocityBalancer
                 simulationTimes[i][j] = simulationTimesArrays[i].get(j).doubleValue();
             }
         }
-        
-        
-        //TEMP-test
-        String strF = "Firing: \n";
-        String strS = "Simulation: \n";
-        for (int i = 0; i < firingTimes.length; i++)
-        {
-            for (int j = 0; j < firingTimes[i].length; j++)
-            {
-                strF += firingTimes[i][j] + " ";
-                strS += simulationTimes[i][j] + " ";
-            }
-            
-            strF += "\n";
-            strS += "\n";
-        }
-        logger.info(strF);
-        logger.info(strS);
     }
 
     /**

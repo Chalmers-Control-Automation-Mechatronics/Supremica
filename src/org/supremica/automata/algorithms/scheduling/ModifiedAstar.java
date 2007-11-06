@@ -1010,6 +1010,7 @@ public class ModifiedAstar
     {
         // Create the automaton with a working name "Schedule"
         scheduleAuto = new Automaton("Schedule");
+        scheduleAuto.setType(AutomatonType.SUPERVISOR);
         
         // Start the clock
         timer.restart();  
@@ -1110,7 +1111,7 @@ public class ModifiedAstar
         infoMsgs += "Schedule was built in " + timer.elapsedTime() + "ms";
 
         //TODO: TEMP-TEST
-//        new VelocityBalancer(scheduleAuto, theAutomata.getPlantAutomata());
+        new VelocityBalancer(theAutomata.getPlantAutomata(), scheduleAuto);
     }
 
 	/**
@@ -1337,7 +1338,7 @@ public class ModifiedAstar
 //                 currPlant.addArc(new Arc(currArc.getFromState(), dummyState, currArc.getEvent()));
 //             }
             
-//             currInitialState.removeIncomingArcs();
+//             currInitialStat  e.removeIncomingArcs();
             
 //             LabeledEvent dummyEvent = new LabeledEvent(dummyEventName);
 //             currPlant.getAlphabet().addEvent(dummyEvent);
@@ -1348,7 +1349,7 @@ public class ModifiedAstar
             
 //             currPlant.remapStateIndices();
 //         }
-//     }
+//     }  
     
     /****************************************************************************************/
     /*                                 AUXILIARY METHODS                                    */

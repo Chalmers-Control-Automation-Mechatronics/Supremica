@@ -421,6 +421,7 @@ public class MultithreadedAstar
             timer.restart();
             
             scheduleAuto = new Automaton("Schedule");
+            scheduleAuto.setType(AutomatonType.SUPERVISOR);
             
             buildScheduleFromArray(scheduleInfo);
             

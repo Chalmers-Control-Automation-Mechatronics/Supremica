@@ -354,6 +354,7 @@ public class Milp
         // Create the automaton with a chosen name
         //timer.stop(); // Stop the timer while waiting for the user to enter the name of the new schedule
         schedule = new Automaton("Schedule");
+        schedule.setType(AutomatonType.SUPERVISOR);
         //timer.start(); // Restart the timer
         
         SynchronizationStepper stepper = new SynchronizationStepper(theAutomata);
