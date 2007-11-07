@@ -39,6 +39,7 @@ public class VelocityBalancer
      * never happens). 
      */
     ArrayList[] mutexLimits = null;
+    ArrayList<double[]>[][] mutexLimitsNew =  null;
 
     /**
      * Possible deadlocks give rise to forbidden time-zones.
@@ -58,52 +59,24 @@ public class VelocityBalancer
     double[][] firingTimes = null;
     
     AutomataIndexMap indexMap = null;
+    Automata plants = null;
+    Automata specs = null;
+    Automaton schedule = null;
         
     /** The logger */
     private Logger logger = LoggerFactory.createLogger(this.getClass());
-    
-    // This ugly construction is needed (temporarily) to call VelocityBalancer.java 
-    // directly from the GUI, without pre-optimization. 
-    public VelocityBalancer(Automata plantAutomata, Automaton schedule)
-        throws Exception
-    {
-        this(plantAutomata, new Automata(schedule));
-    }
-    
-    public VelocityBalancer(Automata plantAutomata, Automata supervisors)
-        throws Exception
-    {
-        Automaton schedule = null;
-        
-        // Extract the schedule automaton from the supplied supervisor automata
-        if (supervisors.size() == 1)
-        {
-            schedule = supervisors.getAutomatonAt(0);
-        }
-        else 
-        {
-            for (Automaton supAuto : supervisors)
-            {
-                State initState = supAuto.getInitialState();
-                if (initState.getName().contains(("firing time")))
-                {
-                    schedule = supAuto;
-                }
-            }
-        }
-        // If the search for schedule was unsuccessful, no balancing can be done...
-        if (schedule == null)
-        {
-            throw new Exception("No schedule found in the supplied automata -> Velocity balancing is impossible.");
-        }
-        
-        indexMap = new AutomataIndexMap(plantAutomata);
        
+    public VelocityBalancer(Automata theAutomata) 
+        throws Exception
+    {             
+        // Initializes pointers to automata, time variables, indexMap, etc
+        init(theAutomata);
+        
         // Extracts plant times from the optimal schedule
-        extractFiringTimes(schedule, plantAutomata);
+        extractFiringTimes();
         
         // Feasibility check
-        String tempStr = "";
+        String tempStr = "\n";
         for (int i = 0; i < firingTimes.length; i++)
         {
             tempStr += "(firing) i = " + i + " --> ";
@@ -123,6 +96,35 @@ public class VelocityBalancer
             tempStr += "\n";
         }
         logger.info(tempStr);
+        tempStr = "(path points): ";
+        for (double[] teff : pathPoints)
+        {
+            tempStr += "[";
+            for (int i = 0; i < teff.length; i++)
+            {
+                tempStr += teff[i] + " ";
+            }
+            tempStr = tempStr.trim() + "] ";           
+        }
+        logger.warn(tempStr + "\n");
+        tempStr = "(mutex limits): \n";
+        for (int i = 0; i < mutexLimitsNew.length; i++)
+        {
+            for (int j = 0; j < mutexLimitsNew[i].length; j++)
+            {
+                tempStr += "i = " + i + ", j = " + j + ": ";
+                for (double[] mutlim : mutexLimitsNew[i][j])
+                {
+                    tempStr += "[";
+                    for (int k = 0; k < mutlim.length; k++)
+                    {
+                        tempStr += mutlim[k] + " ";
+                    }
+                    tempStr = tempStr.trim() + "] ";           
+                }
+            }
+        }   
+        logger.error(tempStr + "\n");
 //        
 //        
 //        // Creates a test problem. This is a temporary construction
@@ -191,20 +193,81 @@ public class VelocityBalancer
 
         System.out.println("Smoooth gliding.......");	
     }
+    
+    private void init(Automata theAutomata)
+        throws Exception
+    {
+        // Extract the schedule automaton from the supplied supervisor automata
+        if (theAutomata.getSupervisorAutomata().size() == 1)
+        {
+            schedule = theAutomata.getSupervisorAutomata().getAutomatonAt(0);
+        }
+        else 
+        {
+            for (Automaton supAuto : theAutomata.getSupervisorAutomata())
+            {
+                State initState = supAuto.getInitialState();
+                if (initState.getName().contains(("firing time")))
+                {
+                    schedule = supAuto;
+                }
+            }
+        }
+        // If the search for schedule was unsuccessful, no balancing can be done...
+        if (schedule == null)
+        {
+            throw new Exception("No schedule found in the supplied automata -> Velocity balancing is impossible.");
+        }
+        
+        plants = theAutomata.getPlantAutomata();
+        specs = theAutomata.getSpecificationAutomata(); 
+        for (Automaton spec : specs)
+        {
+            if (spec.nbrOfStates() < 3)
+            {
+                throw new Exception("The velocity balancing is not implemented for specifications of other type that zones. " +
+                        "(Note that zones should have at least three states).");
+            }
+        }
+        
+        indexMap = new AutomataIndexMap(plants);
+        
+        firingTimes = new double[plants.size()][];
+        simulationTimes = new double[plants.size()][];
+        pathPoints = new ArrayList<double[]>();
+        
+        mutexLimitsNew = new ArrayList[specs.size()][plants.size()];
+        for (int i = 0; i < mutexLimitsNew.length; i++)
+        {
+            for (int j = 0; j < mutexLimitsNew[i].length; j++)
+            {
+                mutexLimitsNew[i][j] = new ArrayList<double[]>();
+            }
+        }
+    }
 
     /**
      * This method searches through the optimal schedule and extracts the optimal
      * firing times of the scheduled events. Also minimal residence times for 
      * these events are collected.
-     *
-     * @param   the optimal schedule
      */
-    private void extractFiringTimes(Automaton schedule, Automata plants)
+    private void extractFiringTimes()
         throws Exception
     {
         // The sum of schedule costs from the initial state to the current state
         double currFiringTime = 0;
         
+        // The array containing current path-point-values for each plant (these
+        // values are denoted by T_{eff} in the velocity balancing paper).
+        double[] currPathPoint = new double[plants.size()];
+        for (int i = 0; i < currPathPoint.length; i++)
+        {
+            currPathPoint[i] = 0;
+        }
+        pathPoints.add(currPathPoint);
+        
+        // Temporary arrays of firing and simulations times (we need arrays since we don't know 
+        // exactly how many events correspond to each robot are in the optimal schedule). 
         ArrayList<Double>[] firingTimesArrays = new ArrayList[plants.size()];
         ArrayList<Double>[] simulationTimesArrays = new ArrayList[plants.size()];
         for (int i = 0; i < firingTimesArrays.length; i++)
@@ -213,6 +276,8 @@ public class VelocityBalancer
             simulationTimesArrays[i] = new ArrayList<Double>();            
         }
 
+        // The plant states that build up the currently examimed schedule state, 
+        // starting with the initial of course. 
         State[] currPlantStates = new State[plants.size()];
         for (int plantIndex = 0; plantIndex < currPlantStates.length; plantIndex++)
         {
@@ -234,36 +299,105 @@ public class VelocityBalancer
                 for (Iterator<Arc> arcIt = scheduleState.outgoingArcsIterator(); arcIt.hasNext();)
                 {
                     LabeledEvent currEvent = arcIt.next().getEvent();
+                    double currCost = -1;
+                    int activeAutomatonIndex = -1;
                     
                     for (int plantIndex = 0; plantIndex < currPlantStates.length; plantIndex++)
                     {
                         Alphabet currPlantEvents = currPlantStates[plantIndex].activeEvents(false);
                         if (currPlantEvents.contains(currEvent))
                         {
-                            currFiringTime += scheduleState.getCost();
+                            // Record the index of the automaton that contains the currently scheduled event
+                            activeAutomatonIndex = plantIndex;
+                            
+                            // Update the current and the accumulated cost of the schedule state.
+                            currCost = scheduleState.getCost();
+                            currFiringTime += currCost;
                                     
                             firingTimesArrays[plantIndex].add(currFiringTime);
                             simulationTimesArrays[plantIndex].add(currPlantStates[plantIndex].getCost());
-                            
-//                            logger.info("skriv mig" + firingTimes[i][j]);
-                            
-//                            simulationTimesArrays[plantIndex].add(new Double(currPlantStates[plantIndex].getCost()));
-//                            firingTimesArrays[plantIndex].add(new Double(currFiringTime));
-                            
+                                                        
                             scheduleState = scheduleState.nextState(currEvent);
                             currPlantStates[plantIndex] = currPlantStates[plantIndex].nextState(currEvent);
                             
                             break;
-                        }                    
+                        }       
+                    }
+                    
+                    if (currCost == -1)
+                    {
+                        throw new Exception("The scheduled event (" + currEvent.getLabel() + ") not found in any plant.");
+                    }
+                    
+                    // Create a new path point and adjust its values by letting each plant 
+                    // run as long as possible, i.e. as long as either the cost of the 
+                    // current scheduled event or the Tv-value (currRemainingTimeInState)
+                    // "prevents" the plant from moving further through its cycle. 
+                    // Of course, when treating the plant that fired the schedule event, 
+                    // we know that the time update is equal to current cost of the schedule state. 
+                    double[] newPathPoint = new double[plants.size()];
+                    for (int i = 0; i < currPathPoint.length; i++)
+                    {
+                        if (i == activeAutomatonIndex) // Update the active automaton
+                        {
+                            newPathPoint[i] = currPathPoint[i] + currCost;
+                        }
+                        else // Update inactive automata using the minimal of 
+                            // the current schedule state cost and the remaining time in plant state
+                        {
+                            double prevPlantFiringTime = 0;
+                            if (firingTimesArrays[i].size() > 0)
+                            {
+                                prevPlantFiringTime = firingTimesArrays[i].get(firingTimesArrays[i].size() - 1);
+                            }
+                            double remainingTimeInState = Math.max(0, 
+                                    currPlantStates[i].getCost() - (currFiringTime - currCost - prevPlantFiringTime));
+                            newPathPoint[i] = currPathPoint[i] + Math.min(currCost, remainingTimeInState);
+                        }
+                    }
+                    
+                    // Add the newly created path point to the list, avoiding repetitions of identical points
+                    for (int i = 0; i < currPathPoint.length; i++)
+                    {
+                        if (currPathPoint[i] != newPathPoint[i])
+                        {
+                            currPathPoint = newPathPoint;
+                            pathPoints.add(currPathPoint); 
+                            break;
+                        }
+                    }
+                    
+                    // Find mutexLimits. This is done by finding the specification/zone that contains the 
+                    // current schedule event and record the event execution time relative to the individual 
+                    // robot cycle, i.e. sum(T(q_{i}^{P_active})), where q_{i}^{P_active} range from 
+                    // q_{initial}^{P_active} up to and including q_{current}^{P_active}.
+                    // If there is already an unfinished mutexLimit for current spec-plant-pair (last value of 
+                    // mutexLimit-double[] is equal to -1), the current event represents unbooking. 
+                    // Thus, the unfinished mutexLimit-double[] is completed. Otherwise a new mutexLimit-double[], 
+                    // with the last value set to -1, is created.
+                     for (int i = 0; i < specs.size(); i++)
+                    {
+                        if (specs.getAutomatonAt(i).getAlphabet().contains(currEvent))
+                        {
+                            int nrOfAddedMutexLimits = mutexLimitsNew[i][activeAutomatonIndex].size();
+                            if ((nrOfAddedMutexLimits > 0) && (mutexLimitsNew[i][activeAutomatonIndex].get(nrOfAddedMutexLimits - 1)[1] == -1))
+                            {
+                                mutexLimitsNew[i][activeAutomatonIndex].get(nrOfAddedMutexLimits - 1)[1] = currPathPoint[activeAutomatonIndex];
+                            }
+                            else 
+                            {
+                                mutexLimitsNew[i][activeAutomatonIndex].add(new double[]{currPathPoint[activeAutomatonIndex], -1});
+                            } 
+                            
+                            break;
+                        }
                     }
                 }
             }
         }
         
-        // Put the info about firing and simulation times from temporary containers
+        // Transfer the info about firing and simulation times from temporary containers
         // into more lasting ones. 
-        firingTimes = new double[plants.size()][];
-        simulationTimes = new double[plants.size()][];
         for (int i = 0; i < firingTimes.length; i++)
         {
             firingTimes[i] = new double[firingTimesArrays[i].size()];
@@ -273,7 +407,7 @@ public class VelocityBalancer
                 firingTimes[i][j] = firingTimesArrays[i].get(j).doubleValue();
                 simulationTimes[i][j] = simulationTimesArrays[i].get(j).doubleValue();
             }
-        }
+        }   
     }
 
     /**
@@ -951,7 +1085,7 @@ public class VelocityBalancer
         // Zone 1
         mutexLimits[0] = new ArrayList<double[]>();
         mutexLimits[0].add(new double[]{2, 9});
-        mutexLimits[0].add(new double[]{10, 12});
+        mutexLimits[0].add(new double[]{10, 11});
         mutexLimits[0].add(new double[]{5, 7});
 
         // Zone 2

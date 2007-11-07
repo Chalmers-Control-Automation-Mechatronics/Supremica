@@ -36,6 +36,7 @@ public class Gui extends JFrame implements ActionListener{
     	p.setLayout(new GridLayout(1,1));
     	p.add(openSup);
     	p.add(openROPs);
+        setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 	}
 
 	public void init() {

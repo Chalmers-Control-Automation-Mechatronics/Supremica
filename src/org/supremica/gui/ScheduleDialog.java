@@ -231,7 +231,7 @@ public class ScheduleDialog
             //temp - only here to be able to test the velocity balancer rapidly
             if (optiMethodsBox.getSelectedItem().equals("Velocity Balancing"))
             {
-                new VelocityBalancer(selectedAutomata.getPlantAutomata(), selectedAutomata.getSupervisorAutomata());
+                new VelocityBalancer(selectedAutomata);
                 return;
             }
             

@@ -1111,7 +1111,9 @@ public class ModifiedAstar
         infoMsgs += "Schedule was built in " + timer.elapsedTime() + "ms";
 
         //TODO: TEMP-TEST
-        new VelocityBalancer(theAutomata.getPlantAutomata(), scheduleAuto);
+        Automata autosToBeBalanced = theAutomata.clone();
+        autosToBeBalanced.addAutomaton(scheduleAuto);
+        new VelocityBalancer(autosToBeBalanced);
     }
 
 	/**
