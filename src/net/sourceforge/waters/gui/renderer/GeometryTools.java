@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui.renderer
 //# CLASS:   GeometryTools
 //###########################################################################
-//# $Id: GeometryTools.java,v 1.19 2007-10-04 15:14:56 flordal Exp $
+//# $Id: GeometryTools.java,v 1.20 2007-11-07 06:16:04 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.gui.renderer;
@@ -414,6 +414,69 @@ public final class GeometryTools
     final double d1 = 2.0 * (a1x * a0x + a1y * a0y);
     final double d0 = a0x * a0x + a0y * a0y;
     return new HornerPolynomial(d4, d3, d2, d1, d0);
+  }
+
+  /**
+   * Calculates a bounding box for a biquadratic curve.
+   * This method calculates a tight and exact bounding box by taking
+   * into account all three control points and calculating extremals.
+   * @param pt1              One end of the curve.
+   * @param c                The Bezier control point of the curve.
+   * @param pt2              The other end of the curve.
+   * @return A tight bounding box of the curve.
+   */
+  public static Rectangle2D getQuadraticBoundingBox(final Point2D pt1,
+                                                    final Point2D c,
+                                                    final Point2D pt2)
+  {
+    double xmin, xmax, ymin, ymax;
+    final double x1 = pt1.getX();
+    final double x2 = pt2.getX();
+    if (x1 < x2) {
+      xmin = x1;
+      xmax = x2;
+    } else {
+      xmin = x2;
+      xmax = x1;
+    }
+    final double xc = c.getX();
+    final double xdet = x1 + x2 - 2.0 * xc;
+    if (Math.abs(xdet) > EPSILON) {
+      final double t = (x1 - xc) / xdet;
+      if (t >= 0.0 && t <= 1.0) {
+        final double t1 = 1.0 - t;
+        final double xe = t1 * t1 * x1 + 2.0 * t * t1 * xc + t * t * x2;
+        if (xe < xmin) {
+          xmin = xe;
+        } else if (xe > xmax) {
+          xmax = xe;
+        }
+      }
+    }
+    final double y1 = pt1.getY();
+    final double y2 = pt2.getY();
+    if (y1 < y2) {
+      ymin = y1;
+      ymax = y2;
+    } else {
+      ymin = y2;
+      ymax = y1;
+    }
+    final double yc = c.getY();
+    final double ydet = y1 + y2 - 2.0 * yc;
+    if (Math.abs(ydet) > EPSILON) {
+      final double t = (y1 - yc) / ydet;
+      if (t >= 0.0 && t <= 1.0) {
+        final double t1 = 1.0 - t;
+        final double ye = t1 * t1 * y1 + 2.0 * t * t1 * yc + t * t * y2;
+        if (ye < ymin) {
+          ymin = ye;
+        } else if (ye > ymax) {
+          ymax = ye;
+        }
+      }
+    }
+    return new Rectangle2D.Double(xmin, ymin, xmax - xmin, ymax - ymin);
   }
 
   /**

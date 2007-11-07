@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui.renderer
 //# CLASS:   Renderer
 //###########################################################################
-//# $Id: Renderer.java,v 1.12 2007-11-06 03:22:26 robi Exp $
+//# $Id: Renderer.java,v 1.13 2007-11-07 06:16:04 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.gui.renderer;
@@ -85,9 +85,9 @@ public class Renderer
                             new RenderingInformation(false, false, EditorColor.GUARDCOLOR, EditorColor.GUARDCOLOR, 0)));
                     }}
             }
-        while (!queue.isEmpty())
-        {
-            queue.poll().draw(graphics);
+        while (!queue.isEmpty()) {
+          final ShapeToRender shape = queue.poll();
+          shape.draw(graphics);
         }
         if (shapes != null) {
           for (final MiscShape shape : shapes) {
@@ -129,5 +129,6 @@ public class Renderer
         {
             return mStatus.getPriority() - o.mStatus.getPriority();
         }
+
     }
 }

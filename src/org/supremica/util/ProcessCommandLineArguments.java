@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.util
 //# CLASS:   ProcessCommandLineArguments
 //###########################################################################
-//# $Id: ProcessCommandLineArguments.java,v 1.17 2007-11-06 11:09:03 flordal Exp $
+//# $Id: ProcessCommandLineArguments.java,v 1.18 2007-11-07 06:16:04 robi Exp $
 //###########################################################################
 
 /*
@@ -57,18 +57,13 @@
  */
 package org.supremica.util;
 
-import java.awt.geom.Rectangle2D;
 import java.io.*;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 import javax.xml.bind.JAXBException;
-import net.sourceforge.waters.gui.actions.GraphSaveEPSAction;
 
-import net.sourceforge.waters.gui.renderer.DefaultRenderable;
-import net.sourceforge.waters.gui.renderer.ProxyShapeProducer;
-import net.sourceforge.waters.gui.renderer.Renderable;
-import net.sourceforge.waters.gui.renderer.Renderer;
+import net.sourceforge.waters.gui.renderer.EPSGraphPrinter;
 import net.sourceforge.waters.model.base.AbstractProxyVisitor;
 import net.sourceforge.waters.model.base.DocumentProxy;
 import net.sourceforge.waters.model.base.Proxy;
@@ -88,9 +83,6 @@ import net.sourceforge.waters.model.module.ModuleProxyFactory;
 import net.sourceforge.waters.model.module.SimpleComponentProxy;
 import net.sourceforge.waters.subject.module.ModuleSubjectFactory;
 import net.sourceforge.waters.valid.ValidUnmarshaller;
-
-import org.apache.xmlgraphics.java2d.GraphicContext;
-import org.apache.xmlgraphics.java2d.ps.EPSDocumentGraphics2D;
 
 import org.supremica.Version;
 import org.supremica.automata.IO.ADSUnmarshaller;
@@ -114,7 +106,7 @@ public class ProcessCommandLineArguments
     {
         boolean quit = false;
         List<File> filesToOpen = new LinkedList<File>();
-        
+
         for (int i = 0; i < args.length; i++)
         {
             if (args[i].equals("-h") || args[i].equals("-?") || args[i].equals("--help") || args[i].equals("--usage"))
@@ -132,7 +124,7 @@ public class ProcessCommandLineArguments
                 {
                     String fileName = args[i];
                     File propFile = new File(fileName);
-                    
+
                     try
                     {
                         if (!propFile.exists())
@@ -140,7 +132,7 @@ public class ProcessCommandLineArguments
                             System.out.println("Creating property file: " + propFile.getAbsolutePath());
                             propFile.createNewFile();
                         }
-                        
+
                         SupremicaProperties.loadProperties(propFile);
                     }
                     catch (Exception e)
@@ -156,10 +148,10 @@ public class ProcessCommandLineArguments
                 {
                     String fileName = args[++i];
                     File figFile = new File(fileName);
-                    
+
                     // Set up document manager ...
                     DocumentManager documentManager = new DocumentManager();
-                    ProductDESImporter importer;
+                    ProductDESImporter importer; 
                     try
                     {
                         final ModuleProxyFactory factory = ModuleSubjectFactory.getInstance();
@@ -197,13 +189,13 @@ public class ProcessCommandLineArguments
                         System.err.println("JAXBException when initialising document manager: " + ex);
                         return null;
                     }
-                    
+                
                     // Do the printing
                     try
-                    {
+                    {                        
                         // Load file
                         DocumentProxy doc = documentManager.load(figFile);
-                        
+
                         // Build module
                         ModuleProxy module;
                         if (doc instanceof ModuleProxy)
@@ -218,7 +210,7 @@ public class ProcessCommandLineArguments
                         {
                             throw new ClassCastException("Unknown document type");
                         }
-                        
+
                         // Loop throgh components and print eps-figures
                         //module.acceptVisitor(new EPSPrinterVisitor(module));
                         final List<Proxy> components = module.getComponentList();
@@ -228,7 +220,7 @@ public class ProcessCommandLineArguments
                     catch (IOException ex)
                     {
                         System.err.println("IO problem: " + ex);
-                    }
+                    }                   
                     catch (WatersUnmarshalException ex)
                     {
                         System.err.println("Problem unmarshalling: " + ex);
@@ -236,13 +228,13 @@ public class ProcessCommandLineArguments
                     catch (ClassCastException ex)
                     {
                         System.err.println("Only import of modules is supported: " + ex);
-                    }
+                    }                   
                     catch (VisitorException ex)
                     {
                         System.err.println("Problems when visiting module: " + ex);
-                    }
+                    }                   
                 }
-                
+
                 // Quit after this (even if there were no files)
                 quit = true;
             }
@@ -272,15 +264,15 @@ public class ProcessCommandLineArguments
                 }
             }
         }
-        
+
         if (quit)
         {
             System.exit(0);
         }
-        
+
         return filesToOpen;
     }
-    
+
     /**
      * --help
      */
@@ -299,21 +291,21 @@ public class ProcessCommandLineArguments
 }
 
 /**
- * Visitor for visiting all simpleComponentProxys and output eps-files for the graphs.
+ * Visitor for visiting all simple components and output eps-files
+ * for the graphs. 
  */
 class EPSPrinterVisitor
     extends AbstractModuleProxyVisitor
 {
-    
+
     //#######################################################################
     //# Constructor
     EPSPrinterVisitor(final ModuleProxy module)
     {
-        mRenderable = new DefaultRenderable();
         mModule = module;
     }
-    
-    
+
+
     //#######################################################################
     //# Interface net.sourceforge.waters.model.module.ModuleProxyVisitor
     /**
@@ -326,43 +318,31 @@ class EPSPrinterVisitor
         final Collection<Proxy> body = foreach.getBody();
         return visitCollection(body);
     }
-    
+
     /**
      * Visit simpleComponent and output eps-file.
-     * The only reason that visitGraphProxy is not used instead is that we need the name of the component...
+     * The only reason that visitGraphProxy is not used instead is that we
+     * need the name ...
      */
     public Object visitSimpleComponentProxy(final SimpleComponentProxy comp)
-    throws VisitorException
+        throws VisitorException
     {
-        final String name = comp.getName();
-        final GraphProxy graph = comp.getGraph();
-        final ProxyShapeProducer shaper = new ProxyShapeProducer(graph, mModule);
-        try
-        {
+        try {
+            final String name = comp.getName();
             final File file = new File(name + ".eps");
-            GraphSaveEPSAction.saveEPS(file, graph, shaper);
-            System.out.println("Wrote " + file.getAbsolutePath());
-        }
-        catch (final NullPointerException exception)
-        {
-            // Null pointers appear when there is no geometry information (and maybe at other times too?)
-            System.err.println
-                ("Component '" + name +
-                "' appears to be missing geometry information!?");
-        }
-        catch (final IOException exception)
-        {
+            final GraphProxy graph = comp.getGraph();
+            final EPSGraphPrinter printer =
+                new EPSGraphPrinter(graph, mModule, file);
+            printer.print();
+            // Return any value ...
+            return null;
+        } catch (final IOException exception) {
             throw wrap(exception);
         }
-        
-        // Return any value ...
-        return null;
     }
-    
-    
+
     //#######################################################################
-    //# Constructor
-    final Renderable mRenderable;
+    //# Data Members
     final ModuleProxy mModule;
-    
+
 }

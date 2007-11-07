@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   EditorSurface
 //###########################################################################
-//# $Id: EditorSurface.java,v 1.82 2007-11-06 03:22:26 robi Exp $
+//# $Id: EditorSurface.java,v 1.83 2007-11-07 06:16:04 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.gui;
@@ -265,7 +265,6 @@ public class EditorSurface
             */
             
             // Get the bounds of the actual drawing
-            getShapeProducer().createAllShapes();
             final Rectangle2D area =
               getShapeProducer().getMinimumBoundingRectangle();
             

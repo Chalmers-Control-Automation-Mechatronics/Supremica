@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui.renderer
 //# CLASS:   QuadraticEdgeProxyShape
 //###########################################################################
-//# $Id: QuadraticEdgeProxyShape.java,v 1.4 2007-08-17 00:38:47 robi Exp $
+//# $Id: QuadraticEdgeProxyShape.java,v 1.5 2007-11-07 06:16:04 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.gui.renderer;
@@ -14,6 +14,7 @@ import java.awt.Shape;
 import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
 import java.awt.geom.QuadCurve2D;
+import java.awt.geom.Rectangle2D;
 
 import net.sourceforge.waters.model.module.EdgeProxy;
 
@@ -42,6 +43,11 @@ class QuadraticEdgeProxyShape
 
   //#########################################################################
   //# Overrides for net.sourceforge.waters.gui.renderer.RendererShape
+  public Rectangle2D getBounds2D()
+  {
+    return GeometryTools.getQuadraticBoundingBox(mStart, mControl, mEnd);
+  }
+
   public boolean isClicked(final int x, final int y)
   {
     if (getClickedHandle(x, y) != null) {

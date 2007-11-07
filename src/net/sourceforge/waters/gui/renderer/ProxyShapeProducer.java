@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui.renderer
 //# CLASS:   ProxyShapeProducer
 //###########################################################################
-//# $Id: ProxyShapeProducer.java,v 1.26 2007-11-06 03:22:26 robi Exp $
+//# $Id: ProxyShapeProducer.java,v 1.27 2007-11-07 06:16:04 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.gui.renderer;
@@ -103,15 +103,17 @@ public class ProxyShapeProducer
    */
   public Rectangle2D getMinimumBoundingRectangle()
   {
+    createAllShapes();
     synchronized (mMap) {
       if (mMap.isEmpty()) {
         return new Rectangle(0, 0, 0, 0);
       } else {
         final Iterator<ProxyShape> iter = mMap.values().iterator();
-        final Rectangle2D rect = iter.next().getShape().getBounds2D();
+        final ProxyShape shape0 = iter.next();
+        final Rectangle2D rect = shape0.getBounds2D();
         while (iter.hasNext()) {
           final ProxyShape shape = iter.next();
-          rect.add(shape.getShape().getBounds2D());
+          rect.add(shape.getBounds2D());
         }
         return rect;
       }
