@@ -12,6 +12,7 @@ package org.supremica.automata.algorithms.scheduling;
 import java.util.*;
 import org.supremica.automata.*;
 import org.supremica.automata.algorithms.*;
+import org.supremica.automata.algorithms.scheduling.milp.IntArrayTreeSet;
 import org.supremica.log.Logger;
 import org.supremica.log.LoggerFactory;
 import org.supremica.petrinet.Place;
@@ -431,7 +432,15 @@ public class VelocityBalancer
         Automaton synthAuto = synthesizer.execute().getFirstAutomaton();
         synthAuto.setName("Plants||Specs");
         synthAuto.setType(AutomatonType.PLANT);
-        State synthState = synthAuto.getInitialState();
+                
+        AutomataIndexMap synthIndexMap = new AutomataIndexMap(new Automata(synthAuto));
+        
+        // Contains the indices of allowed states that lead to a forbidden state in one transition,
+        // together with the indices of the events leading to a forbidden state, i.e. one entry is 
+        // [border_allowed_state_index, event_leading_to_forbidden_state_index].
+        IntArrayTreeSet borderAllowedStates = new IntArrayTreeSet();
+        
+        ArrayList<State> listOfForbiddenRegionRoots = new ArrayList<State>();
         
         for (Iterator<State> stateIt = synthAuto.stateIterator(); stateIt.hasNext();)
         {
@@ -441,24 +450,153 @@ public class VelocityBalancer
                 boolean isRootOfForbiddenRegion = true;
                 for (Iterator<Arc> incomingArcIt = state.incomingArcsIterator(); incomingArcIt.hasNext();)
                 {
-                    if (incomingArcIt.next().getFromState().isForbidden())
+                    Arc incomingArc = incomingArcIt.next();
+                
+                    if (incomingArc.getFromState().isForbidden())
                     {
                         isRootOfForbiddenRegion = false;
-                        break;
+                    }
+                    else
+                    {
+                        borderAllowedStates.add(new int[]{synthIndexMap.getStateIndex(synthAuto, incomingArc.getFromState()), 
+                            synthIndexMap.getEventIndex(incomingArc.getEvent())});
                     }
                 }
                 
                 if (isRootOfForbiddenRegion)
-                {
-                    logger.error("State " + state.getName() + " is the root of forbidden");
-                    
-                    
-                } 
-                else //temp
-                    logger.error("State " + state.getName() + " is just forbidden");
-                
+                {   
+                    listOfForbiddenRegionRoots.add(state);
+                }
             }
         }
+        
+        for (Iterator<State> stateIt = listOfForbiddenRegionRoots.iterator(); stateIt.hasNext();)
+        {
+            State state = stateIt.next();
+                
+//                    // This array contains true values for each plant that is involved in a deadlock in current forbidden state
+//                    boolean[] isLockedPlant = new boolean[plants.size()];
+//                    for (int i = 0; i < isLockedPlant.length; i++)
+//                    {
+//                        isLockedPlant[i] = false;
+//                    }
+//                    // Set isLockedPlant[i] to true if there is an event belonging to plants[i] leading to the root of 
+//                    // the current forbidden region
+//                    for (Iterator<Arc> incomingArcIt = state.incomingArcsIterator(); incomingArcIt.hasNext();)
+//                    {
+//                        LabeledEvent incomingEvent = incomingArcIt.next().getEvent();
+//                        for (int i = 0; i < plants.size(); i++)
+//                        {
+//                            if (!isLockedPlant[i]) // No need to check plants that are already detected to be involved in deadlock
+//                            {
+//                                if (plants.getAutomatonAt(i).getAlphabet().contains(incomingEvent))
+//                                {
+//                                    isLockedPlant[i] = true;
+//                                }
+//                            }
+//                        }
+//                    }
+            double[] minDLLimit = new double[plants.size()];
+            double[] maxDLLimit = new double[plants.size()];
+            for (int i = 0; i < minDLLimit.length; i++)
+            {
+                minDLLimit[i] = Double.MAX_VALUE;
+                maxDLLimit[i] = 0;
+            }
+
+            for (Iterator<Arc> incomingArcIt = state.incomingArcsIterator(); incomingArcIt.hasNext();)
+            {
+                Arc incomingArc = incomingArcIt.next();
+                LabeledEvent incomingEvent = incomingArc.getEvent();
+
+                for (int i = 0; i < plants.size(); i++)
+                {
+                    Automaton auto = plants.getAutomatonAt(i);
+                    if (auto.getAlphabet().contains(incomingArc.getEvent()))
+                    {
+                        for (Iterator<State> stIt = auto.stateIterator(); stIt.hasNext();)
+                        {
+                            State stateInAuto = stIt.next();
+                            if (stateInAuto.activeEvents(false).contains(incomingEvent))
+                            {
+                                double currMinDLLimit = 0;
+
+                                //Assumes that the number of incoming transitions is one in this state
+                                while (!stateInAuto.isInitial())
+                                {
+                                    currMinDLLimit += stateInAuto.getCost();
+                                    stateInAuto = stateInAuto.incomingArcsIterator().next().getFromState();
+                                }   
+                                currMinDLLimit += stateInAuto.getCost();
+
+                                if (minDLLimit[i] > currMinDLLimit)
+                                {
+                                    minDLLimit[i] = currMinDLLimit;
+                                }
+                            }
+                        }
+                    }
+                }                        
+
+                ArrayList<State> stackOfAllowedStates = new ArrayList<State>();
+                stackOfAllowedStates.add(incomingArc.getFromState());
+                while (!stackOfAllowedStates.isEmpty())
+                {
+                    State allowedState = stackOfAllowedStates.remove(0);
+                    for (Iterator<Arc> arcIt = allowedState.outgoingArcsIterator(); arcIt.hasNext();)
+                    {
+                        Arc arc = arcIt.next();
+                        if (!arc.getEvent().equals(incomingEvent))
+                        {
+                            State nextState = arc.getToState();
+                            if (borderAllowedStates.get(new int[]{synthIndexMap.getStateIndex(synthAuto, nextState),
+                                                                    synthIndexMap.getEventIndex(incomingArc.getEvent())}) != null)
+                            {
+                                stackOfAllowedStates.add(nextState);
+                            }
+                            else
+                            {
+                                for (int i = 0; i < plants.size(); i++)
+                                {
+                                    Automaton auto = plants.getAutomatonAt(i);
+                                    if (auto.getAlphabet().contains(arc.getEvent()))
+                                    {
+                                        for (Iterator<State> stIt = auto.stateIterator(); stIt.hasNext();)
+                                        {
+                                            State stateInAuto = stIt.next();
+                                            if (stateInAuto.activeEvents(false).contains(arc.getEvent()))
+                                            {
+                                                double currMaxDLLimit = 0;
+
+                                                // Assumes that the number of incoming transitions is one in this state
+                                                while (!stateInAuto.isInitial())
+                                                {
+                                                    currMaxDLLimit += stateInAuto.getCost();
+                                                    stateInAuto = stateInAuto.incomingArcsIterator().next().getFromState();
+                                                }   
+                                                currMaxDLLimit += stateInAuto.getCost();
+
+                                                if (maxDLLimit[i] < currMaxDLLimit)
+                                                {
+                                                    maxDLLimit[i] = currMaxDLLimit;
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }  
+            }
+
+            String dlStr = "State " + state.getName() + " is the root of forbidden region...\n";
+            for (int i = 0; i < maxDLLimit.length; i++)
+            {
+                dlStr += "\t[" + minDLLimit[i] + " " + maxDLLimit[i] + "]";
+            }
+            logger.info(dlStr);
+        } 
     }
 
     /**
