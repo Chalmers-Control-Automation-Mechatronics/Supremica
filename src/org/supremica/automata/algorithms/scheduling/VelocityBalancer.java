@@ -11,6 +11,7 @@ package org.supremica.automata.algorithms.scheduling;
 
 import java.util.*;
 import org.supremica.automata.*;
+import org.supremica.automata.algorithms.*;
 import org.supremica.log.Logger;
 import org.supremica.log.LoggerFactory;
 import org.supremica.petrinet.Place;
@@ -74,6 +75,8 @@ public class VelocityBalancer
         
         // Extracts plant times from the optimal schedule
         extractFiringTimes();
+        
+        findDeadlockLimits();
         
         // Feasibility check
         String tempStr = "\n";
@@ -207,7 +210,7 @@ public class VelocityBalancer
             for (Automaton supAuto : theAutomata.getSupervisorAutomata())
             {
                 State initState = supAuto.getInitialState();
-                if (initState.getName().contains(("firing time")))
+                if (initState.getName().contains(("firing_time")))
                 {
                     schedule = supAuto;
                 }
@@ -408,6 +411,54 @@ public class VelocityBalancer
                 simulationTimes[i][j] = simulationTimesArrays[i].get(j).doubleValue();
             }
         }   
+    }
+    
+    private void findDeadlockLimits()
+        throws Exception
+    {
+        Automata plantsAndSpecs = new Automata(plants);
+        plantsAndSpecs.addAutomata(specs);
+        SynthesizerOptions synthesizerOptions = new SynthesizerOptions();
+        synthesizerOptions.setSynthesisType(SynthesisType.NONBLOCKING);
+        synthesizerOptions.setSynthesisAlgorithm(SynthesisAlgorithm.MONOLITHIC);
+        synthesizerOptions.setPurge(false);
+        synthesizerOptions.setMaximallyPermissive(true);
+        synthesizerOptions.setMaximallyPermissiveIncremental(true);
+ 
+        AutomataSynthesizer synthesizer = new AutomataSynthesizer(plantsAndSpecs, 
+                SynchronizationOptions.getDefaultSynthesisOptions(), synthesizerOptions);
+ 
+        Automaton synthAuto = synthesizer.execute().getFirstAutomaton();
+        synthAuto.setName("Plants||Specs");
+        synthAuto.setType(AutomatonType.PLANT);
+        State synthState = synthAuto.getInitialState();
+        
+        for (Iterator<State> stateIt = synthAuto.stateIterator(); stateIt.hasNext();)
+        {
+            State state = stateIt.next();
+            if (state.isForbidden())
+            {
+                boolean isRootOfForbiddenRegion = true;
+                for (Iterator<Arc> incomingArcIt = state.incomingArcsIterator(); incomingArcIt.hasNext();)
+                {
+                    if (incomingArcIt.next().getFromState().isForbidden())
+                    {
+                        isRootOfForbiddenRegion = false;
+                        break;
+                    }
+                }
+                
+                if (isRootOfForbiddenRegion)
+                {
+                    logger.error("State " + state.getName() + " is the root of forbidden");
+                    
+                    
+                } 
+                else //temp
+                    logger.error("State " + state.getName() + " is just forbidden");
+                
+            }
+        }
     }
 
     /**
