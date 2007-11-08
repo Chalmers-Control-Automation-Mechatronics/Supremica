@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.util
 //# CLASS:   ProcessCommandLineArguments
 //###########################################################################
-//# $Id: ProcessCommandLineArguments.java,v 1.18 2007-11-07 06:16:04 robi Exp $
+//# $Id: ProcessCommandLineArguments.java,v 1.19 2007-11-08 07:57:07 flordal Exp $
 //###########################################################################
 
 /*
@@ -90,6 +90,7 @@ import org.supremica.automata.IO.HISCUnmarshaller;
 import org.supremica.automata.IO.SupremicaUnmarshaller;
 import org.supremica.automata.IO.UMDESUnmarshaller;
 import org.supremica.automata.Project;
+import org.supremica.properties.Config;
 import org.supremica.properties.SupremicaProperties;
 
 import org.xml.sax.SAXException;
@@ -105,6 +106,7 @@ public class ProcessCommandLineArguments
     public static List<File> process(String[] args)
     {
         boolean quit = false;
+        boolean verbose = false;
         List<File> filesToOpen = new LinkedList<File>();
 
         for (int i = 0; i < args.length; i++)
@@ -116,6 +118,14 @@ public class ProcessCommandLineArguments
                 
                 // Quit after this
                 quit = true;
+            }
+            if (args[i].equals("--verbose"))
+            {
+                System.out.println("Verbose mode");
+                Config.VERBOSE_MODE.set(true);
+                
+                // Print usage
+                verbose = true;
             }
             else if (args[i].equals("-p") || args[i].equals("--properties"))
             {
@@ -134,6 +144,10 @@ public class ProcessCommandLineArguments
                         }
 
                         SupremicaProperties.loadProperties(propFile);
+                        if (verbose)
+                        {
+                            Config.VERBOSE_MODE.set(true);
+                        }
                     }
                     catch (Exception e)
                     {
@@ -214,7 +228,7 @@ public class ProcessCommandLineArguments
                         // Loop throgh components and print eps-figures
                         //module.acceptVisitor(new EPSPrinterVisitor(module));
                         final List<Proxy> components = module.getComponentList();
-                        AbstractProxyVisitor visitor = new EPSPrinterVisitor(module);
+                        AbstractProxyVisitor visitor = new EPSPrinterVisitor(module, verbose);
                         visitor.visitCollection(components);
                     }
                     catch (IOException ex)
@@ -285,6 +299,7 @@ public class ProcessCommandLineArguments
         System.out.println("EPS-figure generation: \n  -e, --epsfigs FILE... \t Creates eps-figures from all components in FILEs");
         System.out.println("List: \n  -l, --list [FILE]\t\t List properties with current values (or values in FILE)");
         System.out.println("Help options: \n  -?, -h, --help, --usage\t show this help message");
+        System.out.println("Verbose mode: \n  --verbose\t\t be extra verbose");
         System.out.println("Version: \n  -v, --version \t\t show version");
         System.out.println("");
     }
@@ -297,12 +312,14 @@ public class ProcessCommandLineArguments
 class EPSPrinterVisitor
     extends AbstractModuleProxyVisitor
 {
-
+    final boolean verbose;
+    
     //#######################################################################
     //# Constructor
-    EPSPrinterVisitor(final ModuleProxy module)
+    EPSPrinterVisitor(final ModuleProxy module, boolean verbose)
     {
         mModule = module;
+        this.verbose = verbose;
     }
 
 
@@ -334,6 +351,13 @@ class EPSPrinterVisitor
             final EPSGraphPrinter printer =
                 new EPSGraphPrinter(graph, mModule, file);
             printer.print();
+
+            // Log
+            if (verbose)
+            {
+                System.out.println("Wrote " + file.getAbsolutePath());
+            }
+            
             // Return any value ...
             return null;
         } catch (final IOException exception) {
