@@ -47,6 +47,7 @@ public class VelocityBalancer
      * Possible deadlocks give rise to forbidden time-zones.
      */
     ArrayList[] deadlockLimits = null;
+    ArrayList<double[]>[][] deadlockLimitsNew =  null;
 
     /**
      * The times that are recorded for the plants during simulation.
@@ -64,20 +65,20 @@ public class VelocityBalancer
     Automata plants = null;
     Automata specs = null;
     Automaton schedule = null;
-        
+     
     /** The logger */
     private Logger logger = LoggerFactory.createLogger(this.getClass());
-       
-    public VelocityBalancer(Automata theAutomata) 
+              
+    public VelocityBalancer(Automata theAutomata)
         throws Exception
-    {             
+    {                     
         // Initializes pointers to automata, time variables, indexMap, etc
         init(theAutomata);
         
-        // Extracts plant times from the optimal schedule
+        // Extracts plant times from the optimal schedule - TODO: RENAME
         extractFiringTimes();
         
-        findDeadlockLimits();
+//        findDeadlockLimits();
         
         // Feasibility check
         String tempStr = "\n";
@@ -129,73 +130,73 @@ public class VelocityBalancer
             }
         }   
         logger.error(tempStr + "\n");
-//        
-//        
-//        // Creates a test problem. This is a temporary construction
-//        makeTestPath();
-//
-//        // Checks for each pair of points (except for consecutive points) 
-//        // whether they can see eachother.
-//        // This is needed only during the development phase (to see what happens with our small example)
-//        for (int i=0; i<pathPoints.size()-2; i++)
-//        {
-//            for (int j=i+2; j<pathPoints.size(); j++)
-//            {
-//                String str = "";
-//
-//                for (int k=0; k<pathPoints.get(i).length; k++)
-//                {
-//                        str += pathPoints.get(i)[k] + " ";
-//                }
-//                str += "---> ";
-//
-//                for (int k=0; k<pathPoints.get(j).length; k++)
-//                {
-//                        str += pathPoints.get(j)[k] + " ";
-//                }
-//
-//                if (areVisible(pathPoints.get(i), pathPoints.get(j)))
-//                {
-//                        str += "see eachother!!!!!!";
-//                        System.out.println(str);
-//                }
-//            }
-//        }
-//
-//        // Finds the key points, i.e. points allowing to decrease the number of robot stops 
-//        findKeyPoints();
-//
-//        System.out.println("");
-//        System.out.println("Initial key points:");
-//        String str = "";
-//        for (int i=0; i<keyPoints.size(); i++)
-//        {
-//            for (int j=0; j<keyPoints.get(i).length; j++)
-//            {
-//                str += keyPoints.get(i)[j] + " ";
-//            }
-//            str += "---> ";
-//        }
-//        str += "KLART!!!";
-//        System.out.println(str);
-//
-//        // Loops through the key points and smooth out the robot velocities even more when possible
-//        improveKeyPointsUsingVisibilitySmoothing();
-//
-//        // Gathers some statistics about the velocity changes (smooth schedule)
-//        System.out.println("");
-//        System.out.println("SMOOTH SCHEDULE......");
-//        calcVelocityStatisticsForVisibilitySmoothing(keyPoints);
-//
-//        System.out.println("");
-//        System.out.println("UNPROCESSED SCHEDULE.....");
-//        calcVelocityStatisticsForUnprocessedSchedule();
-//
-//        System.out.println("");
-//        System.out.println("EVENT SMOOTHING:");
-//        calcVelocityStatisticsForEventSmoothing();
+        
+        
+        // Creates a test problem. This is a temporary construction
+        makeTestPath();
 
-        System.out.println("Smoooth gliding.......");	
+        // Checks for each pair of points (except for consecutive points) 
+        // whether they can see eachother.
+        // This is needed only during the development phase (to see what happens with our small example)
+        for (int i=0; i<pathPoints.size()-2; i++)
+        {
+            for (int j=i+2; j<pathPoints.size(); j++)
+            {
+                String str = "";
+
+                for (int k=0; k<pathPoints.get(i).length; k++)
+                {
+                        str += pathPoints.get(i)[k] + " ";
+                }
+                str += "---> ";
+
+                for (int k=0; k<pathPoints.get(j).length; k++)
+                {
+                        str += pathPoints.get(j)[k] + " ";
+                }
+
+                if (areVisible(pathPoints.get(i), pathPoints.get(j)))
+                {
+                        str += "see eachother!!!!!!";
+                        logger.warn(str);
+                }
+            }
+        }
+
+        // Finds the key points, i.e. points allowing to decrease the number of robot stops 
+        findKeyPoints();
+
+        logger.warn("");
+        logger.warn("Initial key points:");
+        String str = "";
+        for (int i=0; i<keyPoints.size(); i++)
+        {
+            for (int j=0; j<keyPoints.get(i).length; j++)
+            {
+                str += keyPoints.get(i)[j] + " ";
+            }
+            str += "---> ";
+        }
+        str += "KLART!!!";
+        logger.warn(str);
+
+        // Loops through the key points and smooth out the robot velocities even more when possible
+        improveKeyPointsUsingVisibilitySmoothing();
+
+        // Gathers some statistics about the velocity changes (smooth schedule)
+        logger.warn("");
+        logger.warn("SMOOTH SCHEDULE......");
+        calcVelocityStatisticsForVisibilitySmoothing(keyPoints);
+
+        logger.warn("");
+        logger.warn("UNPROCESSED SCHEDULE.....");
+        calcVelocityStatisticsForUnprocessedSchedule();
+
+        logger.warn("");
+        logger.warn("EVENT SMOOTHING:");
+        calcVelocityStatisticsForEventSmoothing();
+
+        logger.warn("Smoooth gliding.......");	
     }
     
     private void init(Automata theAutomata)
@@ -258,6 +259,21 @@ public class VelocityBalancer
     private void extractFiringTimes()
         throws Exception
     {
+        // Retrieve the parts of the original plants that are involved in the 
+        // optimal schedule by partitioning the schedule into individual plants 
+        // during the walk through the states of the optimal schedule. 
+        Automata optimalPlantParts = new Automata();
+        for (int i = 0; i < plants.size(); i++)
+        {
+            Automaton currOptimalPlantPart = new Automaton(plants.getAutomatonAt(i).getName() + "_optimal");
+            currOptimalPlantPart.setType(AutomatonType.PLANT);
+            State initialState = new State("q0");
+            initialState.setInitial(true);
+            initialState.setAccepting(true);
+            currOptimalPlantPart.addState(initialState);
+            optimalPlantParts.addAutomaton(currOptimalPlantPart);
+        }
+        
         // The sum of schedule costs from the initial state to the current state
         double currFiringTime = 0;
         
@@ -374,7 +390,7 @@ public class VelocityBalancer
                     // Find mutexLimits. This is done by finding the specification/zone that contains the 
                     // current schedule event and record the event execution time relative to the individual 
                     // robot cycle, i.e. sum(T(q_{i}^{P_active})), where q_{i}^{P_active} range from 
-                    // q_{initial}^{P_active} up to and including q_{current}^{P_active}.
+                    // q_{initial}^{P_active} up to and including q_{current}^{P_active} (this sum is stored in currPathPoint).
                     // If there is already an unfinished mutexLimit for current spec-plant-pair (last value of 
                     // mutexLimit-double[] is equal to -1), the current event represents unbooking. 
                     // Thus, the unfinished mutexLimit-double[] is completed. Otherwise a new mutexLimit-double[], 
@@ -396,9 +412,35 @@ public class VelocityBalancer
                             break;
                         }
                     }
+                    
+                    // Add the current event to corresponding optimal plant part
+                    Automaton currOptimalPlantPart = optimalPlantParts.getAutomatonAt(activeAutomatonIndex);
+                    State fromState = currOptimalPlantPart.getStateWithName("q" + (currOptimalPlantPart.nbrOfStates() - 1));
+                    fromState.setCost(simulationTimesArrays[activeAutomatonIndex].get(
+                            simulationTimesArrays[activeAutomatonIndex].size() - 1));
+                    State toState = new State("q" + currOptimalPlantPart.nbrOfStates());
+                    currOptimalPlantPart.addState(toState);
+                    currOptimalPlantPart.getAlphabet().addEvent(currEvent);
+                    currOptimalPlantPart.addArc(new Arc(fromState, toState, currEvent));
                 }
             }
         }
+        
+        // Connect the currOptimalPlantPart as a loop by redirecting the last 
+        // transition to the initial state
+        for (int i = 0; i < optimalPlantParts.size(); i++)
+        {
+            Automaton currOptimalPlantPart = optimalPlantParts.getAutomatonAt(i);
+            State fromState = currOptimalPlantPart.getStateWithName("q" + (currOptimalPlantPart.nbrOfStates() - 2));
+            State prevToState = currOptimalPlantPart.getStateWithName("q" + (currOptimalPlantPart.nbrOfStates() - 1));
+            currOptimalPlantPart.addArc(new Arc(fromState, currOptimalPlantPart.getInitialState(), 
+                    fromState.outgoingArcsIterator().next().getEvent()));
+            currOptimalPlantPart.removeState(prevToState);
+        }
+        
+        Automata plantsAndSpecs = new Automata(optimalPlantParts);
+        plantsAndSpecs.addAutomata(specs);
+        findDeadlockLimits(plantsAndSpecs);
         
         // Transfer the info about firing and simulation times from temporary containers
         // into more lasting ones. 
@@ -414,11 +456,9 @@ public class VelocityBalancer
         }   
     }
     
-    private void findDeadlockLimits()
+    private void findDeadlockLimits(Automata plantsAndSpecs)
         throws Exception
     {
-        Automata plantsAndSpecs = new Automata(plants);
-        plantsAndSpecs.addAutomata(specs);
         SynthesizerOptions synthesizerOptions = new SynthesizerOptions();
         synthesizerOptions.setSynthesisType(SynthesisType.NONBLOCKING);
         synthesizerOptions.setSynthesisAlgorithm(SynthesisAlgorithm.MONOLITHIC);
@@ -470,9 +510,17 @@ public class VelocityBalancer
             }
         }
         
-        for (Iterator<State> stateIt = listOfForbiddenRegionRoots.iterator(); stateIt.hasNext();)
+        // Create the deadlock limit array
+        deadlockLimitsNew = new ArrayList[listOfForbiddenRegionRoots.size()][plants.size()];
+        
+        for (int j = 0; j < listOfForbiddenRegionRoots.size(); j++)
         {
-            State state = stateIt.next();
+            for (int k = 0; k < deadlockLimitsNew[j].length; k++)
+            {
+                deadlockLimitsNew[j][k] = new ArrayList<double[]>();
+            }
+            
+            State state = listOfForbiddenRegionRoots.get(j);
                 
 //                    // This array contains true values for each plant that is involved in a deadlock in current forbidden state
 //                    boolean[] isLockedPlant = new boolean[plants.size()];
@@ -496,13 +544,15 @@ public class VelocityBalancer
 //                            }
 //                        }
 //                    }
-            double[] minDLLimit = new double[plants.size()];
-            double[] maxDLLimit = new double[plants.size()];
-            for (int i = 0; i < minDLLimit.length; i++)
-            {
-                minDLLimit[i] = Double.MAX_VALUE;
-                maxDLLimit[i] = 0;
-            }
+
+
+//            double[] minDLLimit = new double[plants.size()];
+//            double[] maxDLLimit = new double[plants.size()];
+//            for (int i = 0; i < minDLLimit.length; i++)
+//            {
+//                minDLLimit[i] = Double.MAX_VALUE;
+//                maxDLLimit[i] = 0;
+//            }
 
             for (Iterator<Arc> incomingArcIt = state.incomingArcsIterator(); incomingArcIt.hasNext();)
             {
@@ -511,7 +561,7 @@ public class VelocityBalancer
 
                 for (int i = 0; i < plants.size(); i++)
                 {
-                    Automaton auto = plants.getAutomatonAt(i);
+                    Automaton auto = plantsAndSpecs.getPlantAutomata().getAutomatonAt(i);
                     if (auto.getAlphabet().contains(incomingArc.getEvent()))
                     {
                         for (Iterator<State> stIt = auto.stateIterator(); stIt.hasNext();)
@@ -529,10 +579,12 @@ public class VelocityBalancer
                                 }   
                                 currMinDLLimit += stateInAuto.getCost();
 
-                                if (minDLLimit[i] > currMinDLLimit)
-                                {
-                                    minDLLimit[i] = currMinDLLimit;
-                                }
+                                deadlockLimitsNew[j][i].add(new double[]{currMinDLLimit, -1});
+                                
+//                                if (minDLLimit[i] > currMinDLLimit)
+//                                {
+//                                    minDLLimit[i] = currMinDLLimit;
+//                                }
                             }
                         }
                     }
@@ -558,7 +610,7 @@ public class VelocityBalancer
                             {
                                 for (int i = 0; i < plants.size(); i++)
                                 {
-                                    Automaton auto = plants.getAutomatonAt(i);
+                                    Automaton auto = plantsAndSpecs.getPlantAutomata().getAutomatonAt(i);
                                     if (auto.getAlphabet().contains(arc.getEvent()))
                                     {
                                         for (Iterator<State> stIt = auto.stateIterator(); stIt.hasNext();)
@@ -576,10 +628,11 @@ public class VelocityBalancer
                                                 }   
                                                 currMaxDLLimit += stateInAuto.getCost();
 
-                                                if (maxDLLimit[i] < currMaxDLLimit)
-                                                {
-                                                    maxDLLimit[i] = currMaxDLLimit;
-                                                }
+                                                deadlockLimitsNew[j][i].get(deadlockLimitsNew[j][i].size() - 1)[1] = currMaxDLLimit;
+//                                                if (maxDLLimit[i] < currMaxDLLimit)
+//                                                {
+//                                                    maxDLLimit[i] = currMaxDLLimit;
+//                                                }
                                             }
                                         }
                                     }
@@ -589,13 +642,13 @@ public class VelocityBalancer
                     }
                 }  
             }
-
-            String dlStr = "State " + state.getName() + " is the root of forbidden region...\n";
-            for (int i = 0; i < maxDLLimit.length; i++)
-            {
-                dlStr += "\t[" + minDLLimit[i] + " " + maxDLLimit[i] + "]";
-            }
-            logger.info(dlStr);
+            
+//            String dlStr = "State " + state.getName() + " is the root of forbidden region...\n";
+//            for (int i = 0; i < maxDLLimit.length; i++)
+//            {
+//                dlStr += "\t[" + minDLLimit[i] + " " + maxDLLimit[i] + "]";
+//            }
+//            logger.info(dlStr);
         } 
     }
 
@@ -604,7 +657,7 @@ public class VelocityBalancer
      */
     private void tryNewKeyPoint(double[] newKeyPoint, double[] pointBefore, double[] pointAfter)
     {
-        System.out.println("");
+        logger.warn("");
 
         // Looking backward
         String str = "";
@@ -622,7 +675,7 @@ public class VelocityBalancer
         if (areVisible(pointBefore, newKeyPoint))
         {
             str += "see eachother!!!!!!";
-            System.out.println(str);
+            logger.warn(str);
         }
 
         // Looking forward
@@ -642,7 +695,7 @@ public class VelocityBalancer
         if (areVisible(newKeyPoint, pointAfter))
         {
             str += "see eachother!!!!!!";
-            System.out.println(str);
+            logger.warn(str);
         }
         // ...done (testing to add a better key point)
     }
@@ -672,7 +725,7 @@ public class VelocityBalancer
                 str += roundOff(relativeVelocities[i][j+1], 2) + " ";
             }
 
-            System.out.println(str);
+            logger.warn(str);
         }
 
         // COPY-PASTE
@@ -682,8 +735,8 @@ public class VelocityBalancer
         double[] totalVelocityChange = new double[relativeVelocities.length];
         double[] meanVelocityChange = new double[relativeVelocities.length];
 
-        System.out.println("");
-        System.out.println("Smooth-per-event-velocity statistics: ");
+        logger.warn("");
+        logger.warn("Smooth-per-event-velocity statistics: ");
         for (int i=0; i<relativeVelocities.length; i++)
         {
             for (int j=0; j<relativeVelocities[i].length; j++)
@@ -728,9 +781,9 @@ public class VelocityBalancer
             totalVelocityChange[i] = roundOff(totalVelocityChange[i], 2); 			
             meanVelocityChange[i] = roundOff(meanVelocityChange[i], 2);
 
-            System.out.println("Rob_" + i + "... total change: " + totalVelocityChange[i] + "; nr of changes: " + nrOfVelocityChanges[i] + "; mean change: " + meanVelocityChange[i] + "; nr of stops: " + nrOfMinVelocityPassages[i] + "; nr of full-speed-runs: " + nrOfMaxVelocityPassages[i]);
+            logger.warn("Rob_" + i + "... total change: " + totalVelocityChange[i] + "; nr of changes: " + nrOfVelocityChanges[i] + "; mean change: " + meanVelocityChange[i] + "; nr of stops: " + nrOfMinVelocityPassages[i] + "; nr of full-speed-runs: " + nrOfMaxVelocityPassages[i]);
         }
-        System.out.println("");
+        logger.warn("");
         // COPY-PASTE-DONE
     }
 
@@ -747,8 +800,8 @@ public class VelocityBalancer
         double[] totalVelocityChange = new double[pathPoints.get(0).length];
         double[] meanVelocityChange = new double[pathPoints.get(0).length];
 
-        System.out.println("");
-        System.out.println("Unprocessed schedule statistics:");
+        logger.warn("");
+        logger.warn("Unprocessed schedule statistics:");
         for (int j=0; j<pathPoints.get(0).length; j++)
         {
             boolean lastVelocityWasZero = true;
@@ -799,7 +852,7 @@ public class VelocityBalancer
 
             meanVelocityChange[j] = totalVelocityChange[j] / nrOfVelocityChanges[j];
 
-            System.out.println("Rob_" + j + "... total change: " + totalVelocityChange[j] + "; nr of changes: " + nrOfVelocityChanges[j] + "; mean change: " + meanVelocityChange[j] + "; nr of stops: " + nrOfMinVelocityPassages[j] + "; nr of full-speed-runs: " + nrOfMaxVelocityPassages[j]);
+            logger.warn("Rob_" + j + "... total change: " + totalVelocityChange[j] + "; nr of changes: " + nrOfVelocityChanges[j] + "; mean change: " + meanVelocityChange[j] + "; nr of stops: " + nrOfMinVelocityPassages[j] + "; nr of full-speed-runs: " + nrOfMaxVelocityPassages[j]);
         }
     }
 
@@ -819,8 +872,8 @@ public class VelocityBalancer
         double[] totalVelocityChange = new double[points.get(0).length];
         double[] meanVelocityChange = new double[points.get(0).length];
 
-        System.out.println("");
-        System.out.println("Velocity statistics: ");
+        logger.warn("");
+        logger.warn("Velocity statistics: ");
         for (int j=0; j<relativeVelocities[0].length; j++)
         {
             for (int i=0; i<relativeVelocities.length; i++)
@@ -862,9 +915,9 @@ public class VelocityBalancer
             totalVelocityChange[j] = roundOff(totalVelocityChange[j], 2); 			
             meanVelocityChange[j] = roundOff(meanVelocityChange[j], 2);
 
-            System.out.println("Rob_" + j + "... total change: " + totalVelocityChange[j] + "; nr of changes: " + nrOfVelocityChanges[j] + "; mean change: " + meanVelocityChange[j] + "; nr of stops: " + nrOfMinVelocityPassages[j] + "; nr of full-speed-runs: " + nrOfMaxVelocityPassages[j]);
+            logger.warn("Rob_" + j + "... total change: " + totalVelocityChange[j] + "; nr of changes: " + nrOfVelocityChanges[j] + "; mean change: " + meanVelocityChange[j] + "; nr of stops: " + nrOfMinVelocityPassages[j] + "; nr of full-speed-runs: " + nrOfMaxVelocityPassages[j]);
         }
-        System.out.println("");
+        logger.warn("");
     }
 
     /**
@@ -941,8 +994,8 @@ public class VelocityBalancer
         // for every key point. The robot with the largest velocity change is adjusted,
         // such that the velocity to the current and to the next point is set equal. 
         // The key points are then adjusted consequently.
-        System.out.println("");
-        System.out.println("diff velocities:  ");
+        logger.warn("");
+        logger.warn("diff velocities:  ");
         for (int i=1; i<keyPoints.size()-1; i++)
         {
             // The index of the robot that currently changes its velocity most.
@@ -1022,8 +1075,8 @@ public class VelocityBalancer
         }
 
         //TEMP
-        System.out.println("");
-        System.out.println("Relative velocities (after):");
+        logger.warn("");
+        logger.warn("Relative velocities (after):");
         for (int i=0; i<keyPoints.size(); i++)
         {
             String str = "";
@@ -1031,12 +1084,12 @@ public class VelocityBalancer
             {
                 str += roundOff(relativeVelocities[i][j], 2) + " ";
             }
-            System.out.println(str);
+            logger.warn(str);
         }
-        System.out.println("");
+        logger.warn("");
 
-        System.out.println("");
-        System.out.println("Key points (after): ");
+        logger.warn("");
+        logger.warn("Key points (after): ");
         for (int i=0; i<keyPoints.size(); i++)
         {
             String str = "";
@@ -1044,9 +1097,9 @@ public class VelocityBalancer
             {
                 str += roundOff(keyPoints.get(i)[j], 2) + " ";
             }
-            System.out.println(str);
+            logger.warn(str);
         }
-        System.out.println("");
+        logger.warn("");
     }
 
     /**
@@ -1105,7 +1158,82 @@ public class VelocityBalancer
         }
     }
 
-    /**
+    //@Deprecated
+//    /**
+//     * Checks if there is a straight line between two points, 
+//     * that does not cross any zone.
+//     *
+//     * @param startPoint
+//     * @param endPoint
+//     * @return true if there is no obstacle on the straight line between the points.
+//     */
+//    private boolean areVisibleOld(double[] startPoint, double[] endPoint)
+//    {
+//        // For each mutex zone...
+//        for (int i=0; i<mutexLimits.length; i++)
+//        {
+//            // Start and end times of collisions between the startPoint-endPoint-line and current mutex zone
+//            ArrayList<double[]> collisionTimes = getCollisionTimesForZone(startPoint, endPoint, mutexLimits[i]);
+//
+//            // A collision occurs if (at least) two robots enter the mutex zone at the same time.
+//            // The following is a check for common enter/exit time intervals.
+//            if (collisionTimes.size() > 1)
+//            {
+//                // Find common collision time values, by checking
+//                // pairwise intersections of all collision times for the current zone
+//                for (int k=0; k<collisionTimes.size()-1; k++)
+//                {
+//                    for (int l=k+1; l<collisionTimes.size(); l++)
+//                    {
+//                        // if true, the current time intersection is positive, that is there is an obstacle along the road
+//                        if ((collisionTimes.get(k)[0] < collisionTimes.get(l)[1]) && (collisionTimes.get(l)[0] < collisionTimes.get(k)[1]))
+//                        {
+//                            return false;
+//                        }
+//                    }
+//                }
+//            }
+//        }
+//
+//        // For each deadlock-zone...
+//        for (int i=0; i<deadlockLimits.length; i++)
+//        {
+//            // Start and end times of collisions between the startPoint-endPoint-line and current deadlock zone
+//            ArrayList<double[]> collisionTimes = getCollisionTimesForZone(startPoint, endPoint, deadlockLimits[i]);
+//
+//            // There can be a circular wait situation only if all robots are inside the deadlock zone at some time...
+//            if (collisionTimes.size() == deadlockLimits[i].size())
+//            {
+//                // The collision times are first initialized to their extreme values
+//                double[] commonCollisionTimes = new double[]{0, 1};
+//
+//                // Next, intersection of all collision times is calculated
+//                for (int k=0; k<collisionTimes.size(); k++)
+//                {
+//                    if (collisionTimes.get(k)[0] > commonCollisionTimes[0])
+//                    {
+//                        commonCollisionTimes[0] = collisionTimes.get(k)[0];
+//                    }
+//
+//                    if (collisionTimes.get(k)[1] < commonCollisionTimes[1])
+//                    {
+//                        commonCollisionTimes[1] = collisionTimes.get(k)[1];
+//                    }
+//                }
+//
+//                // Finally, if the intersection of collision times is positive, we have a (deadlock) obstacle along the path
+//                if (commonCollisionTimes[0] < commonCollisionTimes[1])
+//                {
+//                    return false;
+//                }
+//            }
+//        }
+//
+//        // If no common collision time was found for any zone, startPoint and endPoint see eachother
+//        return true;
+//    }
+    
+       /**
      * Checks if there is a straight line between two points, 
      * that does not cross any zone.
      *
@@ -1116,25 +1244,32 @@ public class VelocityBalancer
     private boolean areVisible(double[] startPoint, double[] endPoint)
     {
         // For each mutex zone...
-        for (int i=0; i<mutexLimits.length; i++)
+        for (int i=0; i<mutexLimitsNew.length; i++)
         {
             // Start and end times of collisions between the startPoint-endPoint-line and current mutex zone
-            ArrayList<double[]> collisionTimes = getCollisionTimesForZone(startPoint, endPoint, mutexLimits[i]);
+            ArrayList<double[]>[] collisionTimes = getCollisionTimesForZone(startPoint, endPoint, mutexLimitsNew[i]);
 
-            // A collision occurs if (at least) two robots enter the mutex zone at the same time.
-            // The following is a check for common enter/exit time intervals.
-            if (collisionTimes.size() > 1)
+            for (int j1 = 0; j1 < collisionTimes.length - 1; j1++)
             {
-                // Find common collision time values, by checking
-                // pairwise intersections of all collision times for the current zone
-                for (int k=0; k<collisionTimes.size()-1; k++)
+                for (int j2 = j1 + 1; j2 < collisionTimes.length; j2++)
                 {
-                    for (int l=k+1; l<collisionTimes.size(); l++)
+                    // A collision occurs if (at least) two robots enter the mutex zone at the same time.
+                    // The following is a check for common enter/exit time intervals.
+                    if ((collisionTimes[j1].size() > 1) && (collisionTimes[j2].size() > 1))
                     {
-                        // if true, the current time intersection is positive, that is there is an obstacle along the road
-                        if ((collisionTimes.get(k)[0] < collisionTimes.get(l)[1]) && (collisionTimes.get(l)[0] < collisionTimes.get(k)[1]))
+                        // Find common collision time values, by checking pairwise 
+                        // intersections (w.r.t. the plants) of all collision times for the current zone
+                        for (int k1=0; k1<collisionTimes[j1].size(); k1++)
                         {
-                            return false;
+                            for (int k2=0; k2<collisionTimes[j2].size(); k2++)
+                            {
+                                // if true, the current time intersection is positive, that is there is an obstacle along the road
+                                if ((collisionTimes[j1].get(k1)[0] < collisionTimes[j2].get(k2)[1]) && 
+                                        (collisionTimes[j2].get(k2)[0] < collisionTimes[j1].get(k1)[1]))
+                                {
+                                    return false;
+                                }
+                            }
                         }
                     }
                 }
@@ -1145,38 +1280,101 @@ public class VelocityBalancer
         for (int i=0; i<deadlockLimits.length; i++)
         {
             // Start and end times of collisions between the startPoint-endPoint-line and current deadlock zone
-            ArrayList<double[]> collisionTimes = getCollisionTimesForZone(startPoint, endPoint, deadlockLimits[i]);
+            ArrayList<double[]>[] collisionTimes = getCollisionTimesForZone(startPoint, endPoint, deadlockLimitsNew[i]);
 
-            // There can be a circular wait situation only if all robots are inside the deadlock zone at some time...
-            if (collisionTimes.size() == deadlockLimits[i].size())
+            // If any robot that is involved in current circular wait does not pass through the 
+            // corresponding DL-obstacle between startPoint and endPoint, this deadlock cannot occor.
+            boolean deadlockPossible = true;
+            for (int j = 0; j < deadlockLimitsNew[i].length; j++)
             {
-                // The collision times are first initialized to their extreme values
-                double[] commonCollisionTimes = new double[]{0, 1};
-
-                // Next, intersection of all collision times is calculated
-                for (int k=0; k<collisionTimes.size(); k++)
+                if ((deadlockLimitsNew[i][j].size() > 0) && (collisionTimes[j].size() == 0))
                 {
-                    if (collisionTimes.get(k)[0] > commonCollisionTimes[0])
-                    {
-                        commonCollisionTimes[0] = collisionTimes.get(k)[0];
-                    }
-
-                    if (collisionTimes.get(k)[1] < commonCollisionTimes[1])
-                    {
-                        commonCollisionTimes[1] = collisionTimes.get(k)[1];
-                    }
+                   deadlockPossible = false;
                 }
-
-                // Finally, if the intersection of collision times is positive, we have a (deadlock) obstacle along the path
-                if (commonCollisionTimes[0] < commonCollisionTimes[1])
+            }
+            
+            if (deadlockPossible)
+            {
+                // If there is a legal intersection, then the path from startPoint to endPoint 
+                // passes through a deadlock obstacle
+                if (intersectRecursively(collisionTimes, 0).size() > 0)
                 {
                     return false;
                 }
+                
+//                // The collision times are first initialized to their extreme values
+//                double[] commonCollisionTimes = new double[]{0, 1};
+
+//                // Next, intersection of all collision times is calculated
+//                for (int k=0; k<collisionTimes.size(); k++)
+//                {
+//                    if (collisionTimes.get(k)[0] > commonCollisionTimes[0])
+//                    {
+//                        commonCollisionTimes[0] = collisionTimes.get(k)[0];
+//                    }
+//
+//                    if (collisionTimes.get(k)[1] < commonCollisionTimes[1])
+//                    {
+//                        commonCollisionTimes[1] = collisionTimes.get(k)[1];
+//                    }
+//                }
+
+//                // Finally, if the intersection of collision times is positive, we have a (deadlock) obstacle along the path
+//                if (commonCollisionTimes[0] < commonCollisionTimes[1])
+//                {
+//                    return false;
+//                }
             }
         }
 
         // If no common collision time was found for any zone, startPoint and endPoint see eachother
         return true;
+    }
+    
+    private ArrayList<double[]> intersectRecursively(ArrayList<double[]>[] collisionTimes, int fromIndex)
+    {
+        ArrayList<double[]> currCollisionIntersections = new ArrayList<double[]>();
+        
+        // Next, intersection of all collision times is calculated
+        for (int i=0; i<collisionTimes[fromIndex].size(); i++)
+        {
+            // The collision times are first initialized to their extreme values
+            double[] commonCollisionTimes = new double[]{0, 1};
+
+            if (collisionTimes[fromIndex].get(i)[0] > commonCollisionTimes[0])
+            {
+                commonCollisionTimes[0] = collisionTimes[fromIndex].get(i)[0];
+            }
+
+            if (collisionTimes[fromIndex].get(i)[1] < commonCollisionTimes[1])
+            {
+                commonCollisionTimes[1] = collisionTimes[fromIndex].get(i)[1];
+            }
+            
+            if (commonCollisionTimes[0] < commonCollisionTimes[1])
+            {
+                if (fromIndex == collisionTimes.length - 1)
+                {
+                    currCollisionIntersections.add(new double[]{commonCollisionTimes[0], commonCollisionTimes[0]});
+                }
+                else
+                {
+                    ArrayList<double[]> nextCollisionIntersections = intersectRecursively(collisionTimes, fromIndex+1);
+                    for (int j = 0; j < nextCollisionIntersections.size(); j++)
+                    {
+                        double intersectionStart = Math.max(commonCollisionTimes[0], nextCollisionIntersections.get(j)[0]);
+                        double intersectionEnd = Math.min(commonCollisionTimes[1], nextCollisionIntersections.get(j)[1]);
+
+                        if (intersectionStart < intersectionEnd)
+                        {
+                            currCollisionIntersections.add(new double[]{intersectionStart, intersectionEnd});
+                        }
+                    }
+                }
+            }
+        }
+        
+        return currCollisionIntersections;
     }
 
     /**
@@ -1184,22 +1382,26 @@ public class VelocityBalancer
      * the zone described by zoneLimits along the line starting in startPoint 
      * and ending in endPoint.
      */
-    private ArrayList<double[]> getCollisionTimesForZone(double[] startPoint, double[] endPoint, ArrayList zoneLimits)
+    private ArrayList<double[]>[] getCollisionTimesForZone(double[] startPoint, double[] endPoint, ArrayList<double[]>[] zoneLimits)
     {
         // This list is filled with start and end times of collisions between the startPoint-endPoint-line and the zones
-        ArrayList<double[]> collisionTimes = new ArrayList<double[]>();
+        ArrayList<double[]>[] collisionTimes = new ArrayList[plants.size()];
+        for (int i = 0; i < collisionTimes.length; i++)
+        {
+            collisionTimes[i] = new ArrayList<double[]>();
+        }
 
         // For each robot...
-        for (int j=0; j<zoneLimits.size(); j++)
+        for (int i=0; i<zoneLimits.length; i++)
         {
-            // The enter/exit times for the current robot-zone-pair (is null if the robot never enters the zone)
-            double[] currZoneLimits = (double[]) zoneLimits.get(j);
-
-            // If the current robot does enter the zone...
-            if (currZoneLimits != null)
+            // For each time the current robot crosses the current zone...
+            for (int j = 0; j < zoneLimits[i].size(); j++)
             {
+                // The enter/exit times for the current robot-zone-pair (is null if the robot never enters the zone)
+                double[] currZoneLimits = zoneLimits[i].get(j);
+
                 // If the end points of the line are within the zone limits, we have a collision...
-                if ((startPoint[j] < currZoneLimits[1]) && (endPoint[j] > currZoneLimits[0]))
+                if ((startPoint[i] < currZoneLimits[1]) && (endPoint[i] > currZoneLimits[0]))
                 {
                     // The collisionStart/collisionEnd time values. These times correspond to 
                     // the parametrization of the line between startPoint and endPoint.
@@ -1208,65 +1410,124 @@ public class VelocityBalancer
 
                     // If the line starts within the line, the parametrization time value of 
                     // collisionStart is equal to zero. Else it corresponds to the first zone limit.
-                    if (startPoint[j] >= currZoneLimits[0])
+                    if (startPoint[i] >= currZoneLimits[0])
                     {
                         currCollisionTimes[0] = 0;
                     }
                     else
                     {
-                        currCollisionTimes[0] = (currZoneLimits[0] - startPoint[j]) / (endPoint[j] - startPoint[j]);
+                        currCollisionTimes[0] = (currZoneLimits[0] - startPoint[i]) / (endPoint[i] - startPoint[i]);
                     }
 
                     // If the line ends within the line, the parametrization time value of 
                     // collisionEnd is equal to one. Else it corresponds to the second zone limit.
-                    if (endPoint[j] <= currZoneLimits[1])
+                    if (endPoint[i] <= currZoneLimits[1])
                     {
                         currCollisionTimes[1] = 1;
                     }
                     else
                     {
-                        currCollisionTimes[1] = (currZoneLimits[1] - startPoint[j]) / (endPoint[j] - startPoint[j]);
+                        currCollisionTimes[1] = (currZoneLimits[1] - startPoint[i]) / (endPoint[i] - startPoint[i]);
                     }
 
                     // Update the list of collision times
-                    collisionTimes.add(currCollisionTimes);
+                    collisionTimes[i].add(currCollisionTimes);
                 }
             }
         }
 
         return collisionTimes;
     }
+    
+    //@Deprecated
+//    /**
+//     * This method finds all times when collision occur between any robot and 
+//     * the zone described by zoneLimits along the line starting in startPoint 
+//     * and ending in endPoint.
+//     */
+//    private ArrayList<double[]> getCollisionTimesForZoneOld(double[] startPoint, double[] endPoint, ArrayList zoneLimits)
+//    {
+//        // This list is filled with start and end times of collisions between the startPoint-endPoint-line and the zones
+//        ArrayList<double[]> collisionTimes = new ArrayList<double[]>();
+//
+//        // For each robot...
+//        for (int j=0; j<zoneLimits.size(); j++)
+//        {
+//            // The enter/exit times for the current robot-zone-pair (is null if the robot never enters the zone)
+//            double[] currZoneLimits = (double[]) zoneLimits.get(j);
+//
+//            // If the current robot does enter the zone...
+//            if (currZoneLimits != null)
+//            {
+//                // If the end points of the line are within the zone limits, we have a collision...
+//                if ((startPoint[j] < currZoneLimits[1]) && (endPoint[j] > currZoneLimits[0]))
+//                {
+//                    // The collisionStart/collisionEnd time values. These times correspond to 
+//                    // the parametrization of the line between startPoint and endPoint.
+//                    // Thus they belong to [0, 1].
+//                    double[] currCollisionTimes = new double[2];
+//
+//                    // If the line starts within the line, the parametrization time value of 
+//                    // collisionStart is equal to zero. Else it corresponds to the first zone limit.
+//                    if (startPoint[j] >= currZoneLimits[0])
+//                    {
+//                        currCollisionTimes[0] = 0;
+//                    }
+//                    else
+//                    {
+//                        currCollisionTimes[0] = (currZoneLimits[0] - startPoint[j]) / (endPoint[j] - startPoint[j]);
+//                    }
+//
+//                    // If the line ends within the line, the parametrization time value of 
+//                    // collisionEnd is equal to one. Else it corresponds to the second zone limit.
+//                    if (endPoint[j] <= currZoneLimits[1])
+//                    {
+//                        currCollisionTimes[1] = 1;
+//                    }
+//                    else
+//                    {
+//                        currCollisionTimes[1] = (currZoneLimits[1] - startPoint[j]) / (endPoint[j] - startPoint[j]);
+//                    }
+//
+//                    // Update the list of collision times
+//                    collisionTimes.add(currCollisionTimes);
+//                }
+//            }
+//        }
+//
+//        return collisionTimes;
+//    }
 
     /**
      * A temporary method that makes a path to test the smoothing
      */
     private void makeTestPath()
     {
-        // Adds the state times of each robot (run independently)
-        simulationTimes = new double[3][];
-        simulationTimes[0] = new double[]{2, 2, 3, 2, 1, 2, 1};
-        simulationTimes[1] = new double[]{2, 2, 2, 3, 1, 1, 1};
-        simulationTimes[2] = new double[]{2, 3, 2, 1, 1, 1, 1};
-
-        // Adds the state firing times of each robot (run together)
-        firingTimes = new double[3][];
-        firingTimes[0] = new double[]{2, 4, 7, 9, 14, 18, 19};
-        firingTimes[1] = new double[]{7, 12, 14, 17, 18, 19, 20};
-        firingTimes[2] = new double[]{2, 9, 11, 12, 17, 19, 20};
-
-        // Adds the points of the optimal path (schedule)
-        pathPoints.add(new double[]{0, 0, 0});
-        pathPoints.add(new double[]{2, 2, 2});
-        pathPoints.add(new double[]{4, 2, 4});
-        pathPoints.add(new double[]{7, 2, 5});
-        pathPoints.add(new double[]{9, 4, 5});
-        pathPoints.add(new double[]{10, 4, 7});
-        pathPoints.add(new double[]{10, 4, 8});
-        pathPoints.add(new double[]{10, 6, 9});
-        pathPoints.add(new double[]{12, 9, 9});
-        pathPoints.add(new double[]{12, 10, 10});
-        pathPoints.add(new double[]{13, 11, 10});
-        pathPoints.add(new double[]{13, 12, 11});
+//        // Adds the state times of each robot (run independently)
+//        simulationTimes = new double[3][];
+//        simulationTimes[0] = new double[]{2, 2, 3, 2, 1, 2, 1};
+//        simulationTimes[1] = new double[]{2, 2, 2, 3, 1, 1, 1};
+//        simulationTimes[2] = new double[]{2, 3, 2, 1, 1, 1, 1};
+//
+//        // Adds the state firing times of each robot (run together)
+//        firingTimes = new double[3][];
+//        firingTimes[0] = new double[]{2, 4, 7, 9, 14, 18, 19};
+//        firingTimes[1] = new double[]{7, 12, 14, 17, 18, 19, 20};
+//        firingTimes[2] = new double[]{2, 9, 11, 12, 17, 19, 20};
+//
+//        // Adds the points of the optimal path (schedule)
+//        pathPoints.add(new double[]{0, 0, 0});
+//        pathPoints.add(new double[]{2, 2, 2});
+//        pathPoints.add(new double[]{4, 2, 4});
+//        pathPoints.add(new double[]{7, 2, 5});
+//        pathPoints.add(new double[]{9, 4, 5});
+//        pathPoints.add(new double[]{10, 4, 7});
+//        pathPoints.add(new double[]{10, 4, 8});
+//        pathPoints.add(new double[]{10, 6, 9});
+//        pathPoints.add(new double[]{12, 9, 9});
+//        pathPoints.add(new double[]{12, 10, 10});
+//        pathPoints.add(new double[]{13, 11, 10});
+//        pathPoints.add(new double[]{13, 12, 11});
 
         // Three zones in this example...
         mutexLimits = new ArrayList[3];
