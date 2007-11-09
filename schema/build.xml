@@ -81,17 +81,20 @@
     </xjc>
   </target>
 
-  <target name="gen_manufacturingtables_rop_processeditor" description="Generate Manufacturing Tables ROP processeditor JAXB classes.">
+  <!--target name="gen_manufacturingtables_rop_processeditor" description="Generate Manufacturing Tables ROP processeditor JAXB classes.">
     <xjc target="${src}" extension="true" removeOldOutput="yes" package="org.supremica.manufacturingTables.xsd.processeditor">
       <schema dir="${xsd_manufacturingTables}" includes="ROP_processeditor.xsd"/>
       <produces dir="${src}/org/supremica/manufacturingTables/xsd/processeditor"/>
     </xjc>
-  </target>
+  </target-->
 
-  <target name="gen_manufacturingtables_rop_ppn" description="Generate Manufacturing Tables ROP PPNedit JAXB classes.">
-  	<xjc target="${src}" extension="true" removeOldOutput="yes" package="org.supremica.manufacturingTables.xsd.rop_ppn">
-  		<schema dir="${xsd_manufacturingTables}" includes="ROP_PPN.xsd"/>
-  		<produces dir="${src}/org/supremica/manufacturingTables/xsd/rop_ppn"/>
+  <target name="gen_manufacturingtables_rop_processeditor" depends="gen_manufacturingtables_rop_ppnedit" />
+  
+  <!-- This generatete both ROP and worksheet -->
+  <target name="gen_manufacturingtables_rop_ppnedit" description="Generate Manufacturing Tables ROP PPNedit JAXB classes.">
+  	<xjc target="${src}" extension="true" removeOldOutput="yes" package="org.supremica.manufacturingTables.xsd.processeditor">
+  		<schema dir="${xsd_manufacturingTables}" includes="PPNEditWorksheet.xsd"/>
+  		<produces dir="${src}/org/supremica/manufacturingTables/xsd/processeditor"/>
   	</xjc>
   </target>
 </project>
