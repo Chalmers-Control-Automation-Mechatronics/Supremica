@@ -86,6 +86,22 @@ public class GraphCell extends JPanel implements MouseListener,
 	locX = p.x; locY = p.y;
 	setBounds(locX, locY, sizeX, sizeY);	
     }
+    
+    
+    /**
+     * Sets a border on the cell to mark the cell as selected.
+     * 
+     * @param selsected boolean variable
+     */
+    public void setSelected(boolean selected){
+    	//This function was added by David Millares
+		if(selected){
+			setBorder(BorderFactory.createLineBorder(Color.black));
+		}else{
+			setBorder(BorderFactory.createEmptyBorder());
+		}
+	}
+    
     /**
      * Translates this cell position
      * <p>

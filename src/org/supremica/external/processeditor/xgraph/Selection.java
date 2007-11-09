@@ -19,7 +19,7 @@ public class Selection {
     /**
      * Creates a new instance of the class.
      */
-    Selection() {}
+    public Selection() {}
 
     /**
      * Creates a new instance of the class and sets its graph. 

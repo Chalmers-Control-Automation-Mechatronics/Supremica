@@ -232,33 +232,35 @@ public class Graph extends JPanel implements MouseListener,
      * @param g the graphic context
      */
     public void paintComponent(Graphics g) {
-	//DEBUG
-	//System.out.println("Graph.paintComponent");
-	//END DEBUG              
+    	//DEBUG
+    	//System.out.println("Graph.paintComponent");
+    	//END DEBUG              
 
-	super.paintComponent(g);			
-	//----- DRAW EDGE -----
-	for(int i = 0; i < edges.length; i++) {	
-	    edges[i].draw(g);
-	}	   	   
-	//----- DRAW SELECTION AREA -----
-	g.setColor(Color.gray);
-	int x; int y; int width; int height;
-	if(selectionAreaStart.x < selectionAreaStop.x) {
-	    x = selectionAreaStart.x;
-	    width = selectionAreaStop.x-selectionAreaStart.x;
-	}else {
-	    x = selectionAreaStop.x;
-	    width = selectionAreaStart.x-selectionAreaStop.x;
-	}
-	if(selectionAreaStart.y < selectionAreaStop.y) {
-	    y = selectionAreaStart.y;
-	    height = selectionAreaStop.y-selectionAreaStart.y;
-	}else {
-	    y = selectionAreaStop.y;
-	    height = selectionAreaStart.y-selectionAreaStop.y;
-	}	
-	g.drawRect(x, y, width, height);	
+    	super.paintComponent(g);
+    	
+    	//----- DRAW EDGE -----
+    	for(int i = 0; i < edges.length; i++) {	
+    		edges[i].draw(g);
+    	}	   	   
+    	
+    	//----- DRAW SELECTION AREA -----
+    	g.setColor(Color.gray);
+    	int x; int y; int width; int height;
+    	if(selectionAreaStart.x < selectionAreaStop.x) {
+    		x = selectionAreaStart.x;
+    		width = selectionAreaStop.x-selectionAreaStart.x;
+    	}else {
+    		x = selectionAreaStop.x;
+    		width = selectionAreaStart.x-selectionAreaStop.x;
+    	}
+    	if(selectionAreaStart.y < selectionAreaStop.y) {
+    		y = selectionAreaStart.y;
+    		height = selectionAreaStop.y-selectionAreaStart.y;
+    	}else {
+    		y = selectionAreaStop.y;
+    		height = selectionAreaStart.y-selectionAreaStop.y;
+    	}	
+    	g.drawRect(x, y, width, height);	
     }
     /**
      * Repaints this graph.

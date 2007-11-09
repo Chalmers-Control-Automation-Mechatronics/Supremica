@@ -5,8 +5,8 @@ import java.io.*;
 import java.sql.*;
 import javax.xml.bind.*;
 import javax.xml.transform.stream.*;
-import org.supremica.external.processeditor.xml.*;
 
+import org.supremica.external.processeditor.xml.*;
 
 public class Connect {
 	private final String PKGS = "org.supremica.manufacturingTables.xsd.processeditor";
@@ -64,7 +64,7 @@ public class Connect {
 			con = java.sql.DriverManager.getConnection(getConnectionUrl(),userName,password);
 		}catch(Exception e){
 			e.printStackTrace();
-			BaseWindow.getPrintArea().append("\nError Trace in getConnection() : " + e.getMessage());
+			DBInterface.getPrintArea().append("\nError Trace in getConnection() : " + e.getMessage());
 		}
 		return con;
 	}
@@ -90,26 +90,26 @@ public class Connect {
 			con = this.getConnection();
 			if(con != null){
 				dm = con.getMetaData();
-				BaseWindow.getPrintArea().append("\nDriver Information");
-				BaseWindow.getPrintArea().append("\n\tDriver Name: "+ dm.getDriverName());
-				BaseWindow.getPrintArea().append("\n\tDriver Version: "+ dm.getDriverVersion ());
-				BaseWindow.getPrintArea().append("\n\nDatabase Information ");
-				BaseWindow.getPrintArea().append("\n\tDatabase Name: "+ dm.getDatabaseProductName());
-				BaseWindow.getPrintArea().append("\n\tDatabase Version: "+ dm.getDatabaseProductVersion());
-				BaseWindow.getPrintArea().append("\nAvalilable Catalogs ");
+				DBInterface.getPrintArea().append("\nDriver Information");
+				DBInterface.getPrintArea().append("\n\tDriver Name: "+ dm.getDriverName());
+				DBInterface.getPrintArea().append("\n\tDriver Version: "+ dm.getDriverVersion ());
+				DBInterface.getPrintArea().append("\n\nDatabase Information ");
+				DBInterface.getPrintArea().append("\n\tDatabase Name: "+ dm.getDatabaseProductName());
+				DBInterface.getPrintArea().append("\n\tDatabase Version: "+ dm.getDatabaseProductVersion());
+				DBInterface.getPrintArea().append("\nAvalilable Catalogs ");
 				rs = dm.getCatalogs();
 				while(rs.next()){
-					BaseWindow.getPrintArea().append("\n\tcatalog: " + rs.getString(1));
+					DBInterface.getPrintArea().append("\n\tcatalog: " + rs.getString(1));
 				}
-				BaseWindow.getPrintArea().append("\n");
+				DBInterface.getPrintArea().append("\n");
 				rs.close();
 				rs = null;
 				closeConnection();
 			}
 			else 
-				BaseWindow.getPrintArea().append("\nError: No active Connection");
+				DBInterface.getPrintArea().append("\nError: No active Connection");
 		}catch(Exception e){
-			BaseWindow.getPrintArea().append("\nError: No active Connection" + e.getMessage());
+			DBInterface.getPrintArea().append("\nError: No active Connection" + e.getMessage());
 			closeConnection();
 		}
 		dm = null;
@@ -119,7 +119,7 @@ public class Connect {
 	public Vector getAllProjects() {
 		PreparedStatement ps = null;
 		ResultSet rs = null;
-		Vector projects = new Vector();
+		Vector<String> projects = new Vector<String>();
 		try {
 			con = this.getConnection();
 			if(con != null){	
@@ -127,7 +127,7 @@ public class Connect {
 				try {
 					rs = ps.executeQuery();
 				}catch(SQLException sqle){
-					BaseWindow.getPrintArea().append("\nAn SQL Exception Occured! " + sqle.getMessage());
+					DBInterface.getPrintArea().append("\nAn SQL Exception Occured! " + sqle.getMessage());
 				}
 				while (rs.next()) {
 					projects.addElement(rs.getString(1));
@@ -139,9 +139,9 @@ public class Connect {
 				closeConnection();
 			}
 			else 
-				BaseWindow.getPrintArea().append("\nError: No active Connection");
+				DBInterface.getPrintArea().append("\nError: No active Connection");
 		}catch(Exception e){
-			BaseWindow.getPrintArea().append("\nError: " + e.getMessage());
+			DBInterface.getPrintArea().append("\nError: " + e.getMessage());
 			closeConnection();
 		}
 		return projects;
@@ -161,7 +161,7 @@ public class Connect {
 				try {
 					rs = ps.executeQuery();
 				}catch(SQLException sqle){
-					BaseWindow.getPrintArea().append("\nAn SQL Exception Occured! " + sqle.getMessage());
+					DBInterface.getPrintArea().append("\nAn SQL Exception Occured! " + sqle.getMessage());
 				}
 				if (rs.next()) {
 					projectID = rs.getInt(1);	// The project ID
@@ -174,9 +174,9 @@ public class Connect {
 				
 			}
 			else 
-				BaseWindow.getPrintArea().append("\nError: No active Connection");
+				DBInterface.getPrintArea().append("\nError: No active Connection");
 		}catch(Exception e){
-			BaseWindow.getPrintArea().append("\nError: " + e.getMessage());
+			DBInterface.getPrintArea().append("\nError: " + e.getMessage());
 			closeConnection();
 		}
 		return projectID;
@@ -195,7 +195,7 @@ public class Connect {
 				try {
 					rs = ps.executeQuery();
 				}catch(SQLException sqle){
-					BaseWindow.getPrintArea().append("\nAn SQL Exception Occured! " + sqle.getMessage());
+					DBInterface.getPrintArea().append("\nAn SQL Exception Occured! " + sqle.getMessage());
 				}
 				
 				ps.close();
@@ -205,9 +205,9 @@ public class Connect {
 				
 			}
 			else 
-				BaseWindow.getPrintArea().append("\nError: No active Connection");
+				DBInterface.getPrintArea().append("\nError: No active Connection");
 		}catch(Exception e){
-			BaseWindow.getPrintArea().append("\nError: " + e.getMessage());
+			DBInterface.getPrintArea().append("\nError: " + e.getMessage());
 			closeConnection();
 		}
 	}
@@ -217,7 +217,7 @@ public class Connect {
 	public Vector getAllROPs(int projectID) {
 		PreparedStatement ps = null;
 		ResultSet rs = null;
-		Vector ROPs = new Vector();
+		Vector<String> ROPs = new Vector<String>();
 		try {
 			con = this.getConnection();
 			if(con != null){	
@@ -226,7 +226,7 @@ public class Connect {
 				try {
 					rs = ps.executeQuery();
 				}catch(SQLException sqle){
-					BaseWindow.getPrintArea().append("\nAn SQL Exception Occured! " + sqle.getMessage());
+					DBInterface.getPrintArea().append("\nAn SQL Exception Occured! " + sqle.getMessage());
 				}
 				while (rs.next()) {
 					ROPs.addElement(rs.getString(1));
@@ -238,9 +238,9 @@ public class Connect {
 				closeConnection();
 			}
 			else 
-				BaseWindow.getPrintArea().append("\nError: No active Connection");
+				DBInterface.getPrintArea().append("\nError: No active Connection");
 		}catch(Exception e){
-			BaseWindow.getPrintArea().append("\nError: " + e.getMessage());
+			DBInterface.getPrintArea().append("\nError: " + e.getMessage());
 			closeConnection();
 		}
 		return ROPs;
@@ -260,7 +260,7 @@ public class Connect {
 				try {
 					rs = ps.executeQuery();
 				}catch(SQLException sqle){
-					BaseWindow.getPrintArea().append("\nAn SQL Exception Occured! " + sqle.getMessage());
+					DBInterface.getPrintArea().append("\nAn SQL Exception Occured! " + sqle.getMessage());
 				}
 				
 				ps.close();
@@ -270,16 +270,16 @@ public class Connect {
 				
 			}
 			else 
-				BaseWindow.getPrintArea().append("\nError: No active Connection");
+				DBInterface.getPrintArea().append("\nError: No active Connection");
 		}catch(Exception e){
-			BaseWindow.getPrintArea().append("\nError: " + e.getMessage());
+			DBInterface.getPrintArea().append("\nError: " + e.getMessage());
 			closeConnection();
 		}
 	}
 	
-	//	Get the ROP XML-file from DB and write to a specified directory (to file)
+	//	Import ROP XML from DB
 
-	public Object getROPXML(int projectID, String ROPNameID, String filePath) {
+	public Object getROPXML(int projectID, String ROPNameID) {
 		PreparedStatement ps = null;
 		ResultSet rs = null;
 		String xmlStr = "";
@@ -293,37 +293,38 @@ public class Connect {
 				try {
 					rs = ps.executeQuery();
 				}catch(SQLException sqle){
-					BaseWindow.getPrintArea().append("\nAn SQL Exception Occured! " + sqle.getMessage());
+					DBInterface.getPrintArea().append("\nAn SQL Exception Occured! " + sqle.getMessage());
 				}
 				if (rs != null) {
 					rs.next();
-					xmlStr = rs.getString(1);	// Hela XML-filen som en sträng
+					xmlStr = rs.getString(1);	// The complete XML file as a String object
 					try {
-						//BufferedWriter out = new BufferedWriter(new FileWriter(filePath));
-						//out.write(xmlStr);
-						//out.close();
 						Loader ldr = new Loader();
 						Object o = ldr.open(xmlStr);
-
+						
+						//debug
+						/*
 						JAXBContext jc = JAXBContext.newInstance(PKGS);
 						Marshaller m = jc.createMarshaller();
-						
+
 						StringWriter stringWriter = new StringWriter();
-						StreamResult result = new StreamResult( stringWriter );
-						m.marshal( o, result );
+						StreamResult result = new StreamResult(stringWriter);
+						m.marshal(o, result);
 						String content = stringWriter.toString();
-						
+
 						System.out.println(content);
-						BaseWindow.getPrintArea().append("\nExtract complete (System.out.println())");
+					
+						DBInterface.getPrintArea().append("\nExtract complete (System.out.println())");
+						*/
 						
 						return o;
 						
 					}catch (Exception e) {
 						if (e.getMessage() == null) {
-							BaseWindow.getPrintArea().append("\nError writing to file. The string is empty. Wrong projectID or ROPname?");
+							DBInterface.getPrintArea().append("\nError writing to file. The string is empty. Wrong projectID or ROPname?");
 						}
 						else {
-							BaseWindow.getPrintArea().append("\nError writing to file: " + e.getMessage());
+							DBInterface.getPrintArea().append("\nError writing to file: " + e.getMessage());
 						}
 						closeConnection();	
 					}
@@ -335,16 +336,16 @@ public class Connect {
 				closeConnection();
 			}
 			else 
-				BaseWindow.getPrintArea().append("\nError: No active Connection ");
+				DBInterface.getPrintArea().append("\nError: No active Connection ");
 		}catch(Exception e){
-			BaseWindow.getPrintArea().append("\nError: No active Connection: " + e.getMessage());
+			DBInterface.getPrintArea().append("\nError: No active Connection: " + e.getMessage());
 			closeConnection();
 		}
 		
 		return null;
 	}
 
-	//	Insert XML string into DB
+	//	Export ROP XML to DB
 
 	public void setROPXML(int projectID, String ROPXML) {
 		PreparedStatement ps = null;
@@ -359,13 +360,13 @@ public class Connect {
 				try {
 					rs = ps.executeQuery();
 				}catch(SQLException sqle) {
-					BaseWindow.getPrintArea().append("\nAn SQL Exception Occured! " + sqle.getMessage());
+					DBInterface.getPrintArea().append("\nAn SQL Exception Occured! " + sqle.getMessage());
 					closeConnection();
 				}
 				while(rs.next()) {
 					resultStr = rs.getString(1);
 				}
-				BaseWindow.getPrintArea().append("\nROP ID: " + resultStr);
+				DBInterface.getPrintArea().append("\nROP ID: " + resultStr);
 
 				ps.close();
 				rs.close();
@@ -373,9 +374,9 @@ public class Connect {
 				closeConnection();
 			}
 			else 
-				BaseWindow.getPrintArea().append("\nError: No active Connection ");
+				DBInterface.getPrintArea().append("\nError: No active Connection ");
 		}catch(Exception e) {
-			BaseWindow.getPrintArea().append("\nError: " + e.getMessage());
+			DBInterface.getPrintArea().append("\nError: " + e.getMessage());
 		}
 	}
 }

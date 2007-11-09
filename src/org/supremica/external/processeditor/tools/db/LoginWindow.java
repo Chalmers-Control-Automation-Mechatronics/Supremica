@@ -4,7 +4,7 @@ import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
 
-public class ConnectWindow extends JInternalFrame implements ActionListener {
+public class LoginWindow extends JInternalFrame implements ActionListener {
 	
 	private JButton connectButton;
 	private JButton exitButton;
@@ -16,7 +16,7 @@ public class ConnectWindow extends JInternalFrame implements ActionListener {
 	private Connect dbConnect = null;		// Connection setup object
 	private java.sql.Connection con;		// Connection object
 	
-	public ConnectWindow() {
+	public LoginWindow() {
 		super("Connect to host",false,false);
 		GridBagLayout m = new GridBagLayout();
 		setLayout(m);
@@ -138,10 +138,12 @@ public class ConnectWindow extends JInternalFrame implements ActionListener {
 			String hostNameStr = hostNameField.getText();
 			String portNumberStr = portField.getText();
 			String userNameStr = userNameField.getText();
-			String passwordStr = passwordField.getText();
+			char[] passwordChars = passwordField.getPassword();
+			String passwordStr = new String(passwordChars);
 			dbConnect = new Connect("jdbc:sqlserver://", hostNameStr, portNumberStr, "ProductionControlDB", 
 				userNameStr, passwordStr, "direct");
 			dbConnect.displayDbProperties();
+			DBInterface.setDBConnection(dbConnect);
 			this.dispose();
 		}
 		else if (e.getSource() == exitButton){
@@ -149,7 +151,7 @@ public class ConnectWindow extends JInternalFrame implements ActionListener {
 		}
 	}
 	
-	public Connect getDBConnection(){
-		return this.dbConnect;
-	}
+//	public Connect getDBConnection() {
+//		return this.dbConnect;
+//	}
 }

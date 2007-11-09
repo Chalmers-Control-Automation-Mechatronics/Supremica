@@ -10,7 +10,7 @@ import javax.swing.text.*;
 
 import org.supremica.external.processeditor.*;
 
-public class BaseWindow extends JFrame implements ActionListener, ListSelectionListener {
+public class DBInterface extends JFrame implements ActionListener, ListSelectionListener {
 
 /*
 	--< Init >--
@@ -44,7 +44,8 @@ public class BaseWindow extends JFrame implements ActionListener, ListSelectionL
 	private JButton deleteRButton;
 	private static JTextArea printArea;
 	
-	private ConnectWindow connectWindow = null;
+	private LoginWindow connectWindow = null;
+	private static Connect dbConnect = null;		// Connection setup object
 	private SOCGraphContainer graphContainer = null;
 	
 	private String encodingName = "UTF-8";
@@ -57,12 +58,13 @@ public class BaseWindow extends JFrame implements ActionListener, ListSelectionL
 /*
 	--< Constructor >--
 */
-	public BaseWindow() {
+	public DBInterface() {
 		setDefaultLookAndFeelDecorated(true);
 		setTitle("Database Connection Interface");
 		setResizable(false);
 		desktop = new JDesktopPane();
 		setContentPane(desktop);
+		desktop.setBackground(Color.WHITE);
 		setSize(580,640);
 		setLocationRelativeTo(null);
 
@@ -304,16 +306,17 @@ public class BaseWindow extends JFrame implements ActionListener, ListSelectionL
 		add(messagesLabel);
 		
 		// Print area		
-		printArea = new JTextArea("No connection..", 10, 45);
+		printArea = new JTextArea("No connection..");
 		printArea.setLineWrap(true);
 		printArea.setWrapStyleWord(true);
 		scrollMPane = new JScrollPane(printArea);
+		scrollMPane.setPreferredSize(new Dimension(520,180));
 		scrollMPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
 		printArea.setCaretPosition(printArea.getDocument().getLength());
 		con = new GridBagConstraints();
 		con.gridx = 1;
 		con.gridy = 14;
-		con.gridwidth = 3;
+		con.gridwidth = GridBagConstraints.REMAINDER;
 		con.insets = new Insets(0,0,0,0);
 		con.anchor = GridBagConstraints.WEST;
 		m.setConstraints(scrollMPane,con);
@@ -322,7 +325,7 @@ public class BaseWindow extends JFrame implements ActionListener, ListSelectionL
 		printArea.setBorder(BorderFactory.createEtchedBorder());
 		
 		// Set visible
-		setDefaultCloseOperation(EXIT_ON_CLOSE);
+		setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 		setVisible(true);
 	}
 
@@ -335,17 +338,18 @@ public class BaseWindow extends JFrame implements ActionListener, ListSelectionL
 		return printArea;
 	}
 	
+	public static void setDBConnection(Connect dbCon) {
+		dbConnect = dbCon;
+	}
+	
 	public void setGraphContainer(SOCGraphContainer graphContainer) {
 		this.graphContainer = graphContainer;
 	}
 	
 	// Is Connected
 	private boolean isConnected() {
-		if (connectWindow != null)
-			if (connectWindow.getDBConnection() != null)
-				return true;
-			else
-				return false;
+		if (dbConnect != null)
+			return true;
 		else
 			return false;
 	}
@@ -388,7 +392,7 @@ public class BaseWindow extends JFrame implements ActionListener, ListSelectionL
 		if (e.getSource() == connectItem) {
 			glassPanel = (JPanel) getGlassPane();
 			glassPanel.setLayout(new FlowLayout());
-			connectWindow = new ConnectWindow();
+			connectWindow = new LoginWindow();
 			connectWindow.setPreferredSize(new Dimension(300,220));
 			glassPanel.add(connectWindow);
 			glassPanel.setVisible(true);
@@ -396,14 +400,14 @@ public class BaseWindow extends JFrame implements ActionListener, ListSelectionL
 		
 		// Disconnect Item
 		else if (e.getSource() == disconnectItem) {
-			connectWindow = null;
+			dbConnect = null;
 			printArea.append("\nDisconnected");
 			projectID = 0;
 		}
 		
 		// Exit Item
 		else if (e.getSource() == exitItem) {
-			System.exit(0);
+			this.dispose();
 		}
 		
 		// UTF-8 Item
@@ -426,12 +430,12 @@ public class BaseWindow extends JFrame implements ActionListener, ListSelectionL
 					printArea.append("\nType or select a project name!");
 				}
 				else {
-					projectID = connectWindow.getDBConnection().getProjectID(projectName);
+					projectID = dbConnect.getProjectID(projectName);
 					printArea.append("\nProject ID: " + projectID);
 					
 					Vector ROPs = new Vector();
 					rListModel.removeAllElements();
-					ROPs = connectWindow.getDBConnection().getAllROPs(projectID);
+					ROPs = dbConnect.getAllROPs(projectID);
 					for (int i=0; i<ROPs.size(); i++) {
 						rListModel.addElement(ROPs.elementAt(i));
 					}
@@ -451,7 +455,7 @@ public class BaseWindow extends JFrame implements ActionListener, ListSelectionL
 				else {
 					int okFlag = JOptionPane.showConfirmDialog(null,"Permanently delete project: " + projectName + "?", "Confirm delete", JOptionPane.YES_NO_OPTION);
 					if (okFlag == JOptionPane.YES_OPTION) {
-						connectWindow.getDBConnection().deleteProject(projectID);
+						dbConnect.deleteProject(projectID);
 						printArea.append("\nProject deleted..");
 						projectID = 0;
 					}						
@@ -466,7 +470,7 @@ public class BaseWindow extends JFrame implements ActionListener, ListSelectionL
 			if (isConnected()) {
 				Vector projects = new Vector();
 				pListModel.removeAllElements();
-				projects = connectWindow.getDBConnection().getAllProjects();
+				projects = dbConnect.getAllProjects();
 				for (int i=0; i<projects.size(); i++) {
 					pListModel.addElement(projects.elementAt(i));
 				}
@@ -478,25 +482,21 @@ public class BaseWindow extends JFrame implements ActionListener, ListSelectionL
 		
 		// Import selected Button
 		else if (e.getSource() == importButton) {
-			String filePath = "noFilePath";	// TO BE REMOVED !!!!!!!!!!!!!!!!!!
 			if (isConnected()) {
 				initValues();
-				if (projectID == 0 && !ROPNameID.isEmpty()) {
-					printArea.append("\nChoose a project!");
-				}
-				else if (projectID == 0 && ROPNameID.isEmpty()) {
-					printArea.append("\nChoose a project!");
-					printArea.append("\nChoose a ROP!");
-				}
-				else{
+				if (projectID > 0 && !ROPNameID.isEmpty()) {
 					Object o = null;
-					o = connectWindow.
-							getDBConnection().
-									getROPXML(projectID, ROPNameID, filePath);
+					o = dbConnect.getROPXML(projectID, ROPNameID);
 					
 					if(graphContainer != null){
-						graphContainer.insertResource(o, null);
+						graphContainer.insertResource(o, null); 
 					}
+				}
+				else {
+					if (projectID == 0)
+						printArea.append("\nChoose a project!");
+					if (ROPNameID.isEmpty())						
+						printArea.append("\nChoose a ROP!");
 				}
 			}
 			else
@@ -532,7 +532,7 @@ public class BaseWindow extends JFrame implements ActionListener, ListSelectionL
 							printArea.append("\nIOException from Scanner: " + ex.getMessage());
 						}					
 						try {
-							connectWindow.getDBConnection().setROPXML(projectID, ROPXML);
+							dbConnect.setROPXML(projectID, ROPXML);
 						}catch (Exception eENF) {
 							printArea.append("\nUnsuccessful function call: " + eENF.getMessage());
 						}
@@ -549,18 +549,18 @@ public class BaseWindow extends JFrame implements ActionListener, ListSelectionL
 		else if (e.getSource() == deleteRButton) {
 			if (isConnected()) {
 				initValues();
-				if (projectID == 0) {
-					printArea.append("\nChoose a project!");
-				}
-				else if (ROPNameID.isEmpty()) {
-					printArea.append("\nChoose a ROP!");
-				}
-				else {
+				if (projectID > 0 && !ROPNameID.isEmpty()) {
 					int okFlag = JOptionPane.showConfirmDialog(null,"Permanently delete ROP: " + ROPNameID + "?", "Confirm delete", JOptionPane.YES_NO_OPTION);
 					if (okFlag == JOptionPane.YES_OPTION) {
-						connectWindow.getDBConnection().deleteROP(projectID, ROPNameID);
+						dbConnect.deleteROP(projectID, ROPNameID);
 						printArea.append("\nROP deleted..");
 					}
+				}
+				else {
+					if (projectID == 0)
+						printArea.append("\nChoose a project!");
+					if (ROPNameID.isEmpty())
+						printArea.append("\nChoose a ROP!");
 				}
 			}
 			else
@@ -576,7 +576,7 @@ public class BaseWindow extends JFrame implements ActionListener, ListSelectionL
 				else {
 					Vector ROPs = new Vector();
 					rListModel.removeAllElements();
-					ROPs = connectWindow.getDBConnection().getAllROPs(projectID);
+					ROPs = dbConnect.getAllROPs(projectID);
 					for (int i=0; i<ROPs.size(); i++) {
 						rListModel.addElement(ROPs.elementAt(i));
 					}
@@ -612,7 +612,7 @@ public class BaseWindow extends JFrame implements ActionListener, ListSelectionL
 	public static void main(String[] args) {
         javax.swing.SwingUtilities.invokeLater(new Runnable() {
             public void run(){
-					new BaseWindow();
+					new DBInterface();
             }
         });
     }
