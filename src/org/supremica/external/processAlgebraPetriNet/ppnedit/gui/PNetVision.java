@@ -14,9 +14,6 @@ public class PNetVision
 					extends JFrame 
 								implements ToolBarListener{
 
-    private final int SIZE_X = 800;
-    private final int SIZE_Y = 700;
-    
     private int maxX, maxY;
  
     private JMenuBar jmb = new JMenuBar();
@@ -34,8 +31,9 @@ public class PNetVision
         maxX = screenSize.width - 100;
         maxY = screenSize.height - 100;
 	
-        setSize(maxX, maxY);
-        setLocation(50,50);
+        setSize((int)(maxX/1.6), (int)(maxY/1.6));
+        setLocation((screenSize.width - getSize().width)/2 ,
+        			(screenSize.height - getSize().height)/2);
         
 		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		
@@ -66,7 +64,7 @@ public class PNetVision
 		//LAYOUT
 		getContentPane().setLayout(new BorderLayout());
 		getContentPane().add(toolbar,BorderLayout.NORTH);
-		getContentPane().add(petritoolbar,BorderLayout.WEST);
+		//getContentPane().add(petritoolbar,BorderLayout.WEST);
 		getContentPane().add(table, BorderLayout.CENTER);
        
 		this.setVisible(true);	

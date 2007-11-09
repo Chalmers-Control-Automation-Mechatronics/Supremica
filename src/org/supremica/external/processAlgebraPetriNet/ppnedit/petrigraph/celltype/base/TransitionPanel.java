@@ -10,8 +10,8 @@ import java.awt.*;
 class TransitionPanel extends JPanel {
     
     private final int ARROW_HEIGTH = 15;
-    private final int HEIGTH = 3;
-    private final int WIDTH = 30;
+    private final int HEIGTH = 1;
+    private final int WIDTH = 20;
     private final int MARGIN = 1;
 	
 	private boolean drawArrow = false;

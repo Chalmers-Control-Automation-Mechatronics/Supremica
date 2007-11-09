@@ -45,8 +45,8 @@
 <xs:element name="Invisible" type="xs:boolean"/>
 <xs:element name="Unextended" type="xs:boolean"/>
 <xs:element name="Compressed" type="xs:boolean"/>
-<xs:element name='XCoordinate' type="xs:integer"/>
-<xs:element name='YCoordinate' type="xs:integer"/>
+<xs:element name="XCoordinate" type="xs:int"/>
+ <xs:element name="YCoordinate" type="xs:int"/>
 <!-- Definition of attributes _____________________________________-->
 
 <xs:attribute name="id" type="xs:string"/>
@@ -68,9 +68,9 @@
 <xs:element name='Relation'>
 	<xs:complexType>
 		<xs:sequence>
+			<xs:element ref='Position' minOccurs='0' maxOccurs='1'/>
 			<xs:group ref='ActivityRelationGroup' minOccurs='0' maxOccurs='unbounded' />
 			<xs:element ref='Algebraic' minOccurs='0' maxOccurs='1'/>
-			<!--xs:element ref='Position' minOccurs='0' maxOccurs='1'/-->
 		</xs:sequence>
 		<xs:attribute name="type" type="RelationType" use="required"/>		
 	</xs:complexType>
@@ -86,12 +86,12 @@
 <xs:element name='Activity'>
 	<xs:complexType>
 		<xs:sequence>
+			<xs:element ref='Position' minOccurs='0' maxOccurs='1'/>
 			<xs:element ref='Precondition' minOccurs='0' maxOccurs='1'/>
 			<xs:element ref='Operation' minOccurs='1' maxOccurs='1'/>
 			<xs:element ref='Description' minOccurs='0' maxOccurs='1'/>   
 			<!--xs:element ref='Successors' minOccurs='0' maxOccurs='1'/-->
 			<xs:element ref='Properties' minOccurs='0' maxOccurs='1'/>
-			<!--xs:element ref='Position' minOccurs='0' maxOccurs='1'/-->
 		</xs:sequence>
 	</xs:complexType>
 </xs:element>
@@ -165,12 +165,12 @@
 	</xs:complexType>
 </xs:element>
 
-<!--xs:element name='Position'>
+<xs:element name='Position'>
 	<xs:complexType>
 		<xs:sequence>
 			<xs:element ref='XCoordinate' minOccurs='1' maxOccurs='1'/>
 			<xs:element ref='YCoordinate' minOccurs='1' maxOccurs='1'/>
 		</xs:sequence>
 	</xs:complexType>
-</xs:element-->
+</xs:element>
 </xs:schema>

@@ -102,7 +102,11 @@ class EventAction extends
 	}
 	
 	private BaseGraph getSelectedGraph(){
-		return (BaseGraph)getSelectedFrame().getGraph();
+		if( getSelectedFrame() != null){
+			return (BaseGraph)getSelectedFrame().getGraph();
+		}
+		
+		return null;
 	}
     
 	public void selectionChanged(Selection s) {

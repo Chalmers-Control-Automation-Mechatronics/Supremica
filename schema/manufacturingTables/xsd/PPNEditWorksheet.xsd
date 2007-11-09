@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema 
+	xmlns:xs="http://www.w3.org/2001/XMLSchema"
+	xmlns:jaxb="http://java.sun.com/xml/ns/jaxb" jaxb:version="2.0"
+	elementFormDefault="qualified"
+	attributeFormDefault="unqualified"
+	version="1.0">
+
+<!-- Include -->
+<xs:include schemaLocation="ROP_processeditor.xsd"/>
+ 
+ <!-- Definition of simple types ___________________________________-->
+ 
+ <xs:element name="Date" type="xs:date"/>
+ <xs:element name="Number" type="xs:int"/>
+ 
+ <xs:element name="Token" type="xs:boolean"/>
+ 
+  <!-- definition of attributes -->
+ 
+ <!-- definition of complex elements -->
+ 
+ <xs:element name='Worksheet'>
+  <xs:complexType>
+   <xs:sequence>
+    <xs:element ref='Date' minOccurs='0' maxOccurs='1'/>
+    <xs:element ref='Comment' minOccurs='0' maxOccurs='1'/>
+    <xs:element ref='PetriCells' minOccurs='0' maxOccurs='1'/>
+   </xs:sequence>
+  </xs:complexType>
+ </xs:element>
+  
+  <xs:element name='PetriCells'>
+  <xs:complexType>
+   <xs:sequence>
+    <xs:element ref='DEScells' minOccurs='0' maxOccurs='1'/>
+    <xs:element ref='PlaceCells' minOccurs='0' maxOccurs='1'/>
+   </xs:sequence>
+   </xs:complexType>
+  </xs:element>
+ 
+ <xs:element name='DEScells'>
+  <xs:complexType>
+   <xs:sequence>
+    <xs:element ref='DEScell' minOccurs='0' maxOccurs='unbounded'/>
+   </xs:sequence>
+   </xs:complexType>
+  </xs:element>
+  
+ <xs:element name='DEScell'>
+  <xs:complexType>
+   <xs:sequence>
+     <xs:group ref='PetriCellGroup' minOccurs='0' maxOccurs='1'/>
+	</xs:sequence>
+  </xs:complexType>
+ </xs:element>
+ 
+ <xs:element name='PlaceCells'>
+  <xs:complexType>
+   <xs:sequence>
+    <xs:element ref='PlaceCell' minOccurs='0' maxOccurs='unbounded'/>
+   </xs:sequence>
+   </xs:complexType>
+  </xs:element>
+ 
+ <xs:element name='PlaceCell'>
+  <xs:complexType>
+   <xs:sequence>
+	 <xs:element ref='Position' minOccurs='1' maxOccurs='1'/>
+	 <xs:element ref='Token' minOccurs='1' maxOccurs='1'/>
+	 <xs:element ref='SourceNr' minOccurs='0' maxOccurs='1'/>
+	 <xs:element ref='TargetNr' minOccurs='0' maxOccurs='1'/>
+	</xs:sequence>
+  </xs:complexType>
+ </xs:element>
+ 
+ <xs:element name='SourceNr'>
+  <xs:complexType>
+   <xs:sequence>
+    <xs:element ref='Number' minOccurs='0' maxOccurs='unbounded'/>
+   </xs:sequence>
+   </xs:complexType>
+  </xs:element>
+ 
+ <xs:element name='TargetNr'>
+  <xs:complexType>
+   <xs:sequence>
+    <xs:element ref='Number' minOccurs='0' maxOccurs='unbounded'/>
+   </xs:sequence>
+   </xs:complexType>
+  </xs:element>
+  
+ <xs:group name='PetriCellGroup'>
+   <xs:choice>
+	  <xs:element ref='ROP' minOccurs='0' maxOccurs='1'/>
+	  <xs:element ref='Relation' minOccurs='0' maxOccurs='1'/>
+	  <xs:element ref='Activity' minOccurs='0' maxOccurs='1'/>
+    </xs:choice>
+  </xs:group>
+
+</xs:schema>

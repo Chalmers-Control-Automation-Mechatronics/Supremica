@@ -19,8 +19,6 @@ public class PPNtoRelation
 			return null;
 		}
 
-		// System.out.println("To Relation " + exp);
-
 		/* make relation */
 		if (PPN.validExp(exp)) {
 			exp = PPN.toInternalExp(exp);
@@ -31,11 +29,10 @@ public class PPNtoRelation
 				System.out.println("createRelation exp: " + exp
 						+ " contains no operations");
 			} else {
-				System.out.println("To Relation " + exp);
 				return makeRelation(exp);
 			}
 		} else {
-			System.out.println("Not a valid exp: " + exp);
+			System.err.println("Not a valid exp: " + exp);
 		}
 
 		/* something wrong */
@@ -120,7 +117,7 @@ public class PPNtoRelation
 					return relation;
 				}
 
-				System.out.println("expToParse is now " + expToParse);
+				//System.out.println("expToParse is now " + expToParse);
 
 				expToParse = PPN.trimParenthesis(expToParse);
 

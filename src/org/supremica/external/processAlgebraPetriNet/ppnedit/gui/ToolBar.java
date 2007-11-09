@@ -3,6 +3,8 @@ package org.supremica.external.processAlgebraPetriNet.ppnedit.gui;
 import javax.swing.*;
 import javax.swing.border.*;
 
+import org.supremica.gui.Supremica;
+
 
 import java.awt.*;
 import java.awt.Font.*;
@@ -38,24 +40,20 @@ public class ToolBar extends JToolBar implements ActionListener{
     public ToolBar(){  
 		super();
 		
-		String FILE_SEPARATOR = System.getProperty("file.separator");
-		
-		searchIconsIn = "icons" + FILE_SEPARATOR;
-		
-		fileNew = Toolkit.getDefaultToolkit().
-	    		getImage(searchIconsIn + "FileNew.gif");
+		fileNew = Toolkit.getDefaultToolkit().	     
+	    	getImage(Supremica.class.getResource("/icons/processeditor/FileNew.gif"));	       
 		fileOpen = Toolkit.getDefaultToolkit().
-	    		getImage(searchIconsIn + "FileOpen.gif");
+	    	getImage(Supremica.class.getResource("/icons/processeditor/FileOpen.gif"));
 		fileSave = Toolkit.getDefaultToolkit().
-	    		getImage(searchIconsIn + "FileSave.gif");
+	    	getImage(Supremica.class.getResource("/icons/processeditor/FileSave.gif"));
 		editCut = Toolkit.getDefaultToolkit().
-	    		getImage(searchIconsIn + "EditCut.gif");
+	    	getImage(Supremica.class.getResource("/icons/processeditor/EditCut.gif"));
 		editCopy = Toolkit.getDefaultToolkit().
-	    		getImage(searchIconsIn + "EditCopy.gif");
+	    	getImage(Supremica.class.getResource("/icons/processeditor/EditCopy.gif"));
 		editPaste = Toolkit.getDefaultToolkit().
-	    		getImage(searchIconsIn + "EditPaste.gif");
+	    	getImage(Supremica.class.getResource("/icons/processeditor/EditPaste.gif"));
 		editDelete = Toolkit.getDefaultToolkit().
-	    		getImage(searchIconsIn + "EditDelete.gif");
+	    	getImage(Supremica.class.getResource("/icons/processeditor/EditDelete.gif"));
 			
 		//setLayout(new BoxLayout(BoxLayout.X_AXIS));
 		this.add(jbFileNew = new JButton(" New ",new ImageIcon(fileNew)));  	
@@ -69,7 +67,7 @@ public class ToolBar extends JToolBar implements ActionListener{
 		this.addSeparator();
 		this.add(jbEditDelete = new JButton(" Delete ", new ImageIcon(editDelete)));
 		this.addSeparator();
-        this.add(jbShowPPframe = new JButton("PetriProEdit"));
+        //this.add(jbShowPPframe = new JButton("PetriProEdit"));
 
 		jbFileNew.addActionListener(this);
 		jbFileOpen.addActionListener(this);
@@ -78,7 +76,7 @@ public class ToolBar extends JToolBar implements ActionListener{
 		jbEditCopy.addActionListener(this);
 		jbEditPaste.addActionListener(this);
 		jbEditDelete.addActionListener(this);
-        jbShowPPframe.addActionListener(this);            	
+        //jbShowPPframe.addActionListener(this);            	
     }
 	
     public void addToolBarListener(ToolBarListener tbl) {
