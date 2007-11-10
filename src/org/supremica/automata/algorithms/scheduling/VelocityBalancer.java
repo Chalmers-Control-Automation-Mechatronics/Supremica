@@ -579,7 +579,15 @@ public class VelocityBalancer
                                 }   
                                 currMinDLLimit += stateInAuto.getCost();
 
-                                deadlockLimitsNew[j][i].add(new double[]{currMinDLLimit, -1});
+                                int nrOfAddedDLLimits = deadlockLimitsNew[j][i].size();
+                                if ((nrOfAddedDLLimits > 0) && (deadlockLimitsNew[j][i].get(nrOfAddedDLLimits - 1)[0] == -1))
+                                {
+                                    deadlockLimitsNew[j][i].get(nrOfAddedDLLimits - 1)[0] = currMinDLLimit;
+                                }
+                                else 
+                                {
+                                    deadlockLimitsNew[j][i].add(new double[]{currMinDLLimit, -1});
+                                } 
                                 
 //                                if (minDLLimit[i] > currMinDLLimit)
 //                                {
@@ -628,7 +636,16 @@ public class VelocityBalancer
                                                 }   
                                                 currMaxDLLimit += stateInAuto.getCost();
 
-                                                deadlockLimitsNew[j][i].get(deadlockLimitsNew[j][i].size() - 1)[1] = currMaxDLLimit;
+                                                int nrOfAddedDLLimits = deadlockLimitsNew[j][i].size();
+                                                if ((nrOfAddedDLLimits > 0) && (deadlockLimitsNew[j][i].get(nrOfAddedDLLimits - 1)[1] == -1))
+                                                {
+                                                    deadlockLimitsNew[j][i].get(nrOfAddedDLLimits - 1)[1] = currMaxDLLimit;
+                                                }
+                                                else 
+                                                {
+                                                    deadlockLimitsNew[j][i].add(new double[]{-1, currMaxDLLimit});
+                                                } 
+                                                
 //                                                if (maxDLLimit[i] < currMaxDLLimit)
 //                                                {
 //                                                    maxDLLimit[i] = currMaxDLLimit;
@@ -1233,7 +1250,7 @@ public class VelocityBalancer
 //        return true;
 //    }
     
-       /**
+   /**
      * Checks if there is a straight line between two points, 
      * that does not cross any zone.
      *
@@ -1248,6 +1265,17 @@ public class VelocityBalancer
         {
             // Start and end times of collisions between the startPoint-endPoint-line and current mutex zone
             ArrayList<double[]>[] collisionTimes = getCollisionTimesForZone(startPoint, endPoint, mutexLimitsNew[i]);
+            
+//            //temp
+//            logger.error("Checking zone_" + i + ", " + startPoint[0] + " " + startPoint[1] + " " + startPoint[2] + " --> " + 
+//                    endPoint[0] + " " + endPoint[1] + " " + endPoint[2] + ": coll_times = ");
+//            for (int j = 0; j < collisionTimes.length; j++)
+//            {
+//                for (double[] ct : collisionTimes[j])
+//                {
+//                    logger.error("(plant_index = " + j + ") = " + ct[0] + " " + ct[1]);
+//                }
+//            }
 
             for (int j1 = 0; j1 < collisionTimes.length - 1; j1++)
             {
@@ -1255,7 +1283,7 @@ public class VelocityBalancer
                 {
                     // A collision occurs if (at least) two robots enter the mutex zone at the same time.
                     // The following is a check for common enter/exit time intervals.
-                    if ((collisionTimes[j1].size() > 1) && (collisionTimes[j2].size() > 1))
+                    if ((collisionTimes[j1].size() > 0) && (collisionTimes[j2].size() > 0))
                     {
                         // Find common collision time values, by checking pairwise 
                         // intersections (w.r.t. the plants) of all collision times for the current zone
@@ -1277,7 +1305,7 @@ public class VelocityBalancer
         }
 
         // For each deadlock-zone...
-        for (int i=0; i<deadlockLimits.length; i++)
+        for (int i=0; i<deadlockLimitsNew.length; i++)
         {
             // Start and end times of collisions between the startPoint-endPoint-line and current deadlock zone
             ArrayList<double[]>[] collisionTimes = getCollisionTimesForZone(startPoint, endPoint, deadlockLimitsNew[i]);
@@ -1331,44 +1359,38 @@ public class VelocityBalancer
         return true;
     }
     
+    /**
+     * This method is called recursively, looping through all indices of the 
+     * supplied collisionTimes-array (i.e. fromIndex should start at 0). When 
+     * fromIndex == collisionTimes.lastIndex, a list is created, containing collision times
+     * between plants[fromIndex] and the current deadlock zone. For other fromIndices, 
+     * the list of collision times is intersected with current collision times. In the
+     * end, the intersections of all combinations of collision times (each combination 
+     * intersected between all plant involved in the deadlock) are contained in the 
+     * collision times list.
+     */
     private ArrayList<double[]> intersectRecursively(ArrayList<double[]>[] collisionTimes, int fromIndex)
     {
         ArrayList<double[]> currCollisionIntersections = new ArrayList<double[]>();
         
         // Next, intersection of all collision times is calculated
         for (int i=0; i<collisionTimes[fromIndex].size(); i++)
-        {
-            // The collision times are first initialized to their extreme values
-            double[] commonCollisionTimes = new double[]{0, 1};
-
-            if (collisionTimes[fromIndex].get(i)[0] > commonCollisionTimes[0])
+        {           
+            if (fromIndex == collisionTimes.length - 1)
             {
-                commonCollisionTimes[0] = collisionTimes[fromIndex].get(i)[0];
+                currCollisionIntersections.add(new double[]{collisionTimes[fromIndex].get(i)[0], collisionTimes[fromIndex].get(i)[0]});
             }
+            else
+            {
+                ArrayList<double[]> nextCollisionIntersections = intersectRecursively(collisionTimes, fromIndex+1);
+                for (int j = 0; j < nextCollisionIntersections.size(); j++)
+                {
+                    double intersectionStart = Math.max(collisionTimes[fromIndex].get(i)[0], nextCollisionIntersections.get(j)[0]);
+                    double intersectionEnd = Math.min(collisionTimes[fromIndex].get(i)[1], nextCollisionIntersections.get(j)[1]);
 
-            if (collisionTimes[fromIndex].get(i)[1] < commonCollisionTimes[1])
-            {
-                commonCollisionTimes[1] = collisionTimes[fromIndex].get(i)[1];
-            }
-            
-            if (commonCollisionTimes[0] < commonCollisionTimes[1])
-            {
-                if (fromIndex == collisionTimes.length - 1)
-                {
-                    currCollisionIntersections.add(new double[]{commonCollisionTimes[0], commonCollisionTimes[0]});
-                }
-                else
-                {
-                    ArrayList<double[]> nextCollisionIntersections = intersectRecursively(collisionTimes, fromIndex+1);
-                    for (int j = 0; j < nextCollisionIntersections.size(); j++)
+                    if (intersectionStart < intersectionEnd)
                     {
-                        double intersectionStart = Math.max(commonCollisionTimes[0], nextCollisionIntersections.get(j)[0]);
-                        double intersectionEnd = Math.min(commonCollisionTimes[1], nextCollisionIntersections.get(j)[1]);
-
-                        if (intersectionStart < intersectionEnd)
-                        {
-                            currCollisionIntersections.add(new double[]{intersectionStart, intersectionEnd});
-                        }
+                        currCollisionIntersections.add(new double[]{intersectionStart, intersectionEnd});
                     }
                 }
             }
