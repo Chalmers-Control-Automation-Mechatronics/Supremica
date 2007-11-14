@@ -29,8 +29,7 @@ public class ToolsSOCEditorAction
         putValue(Action.SHORT_DESCRIPTION, "SOC Editor");
 //        putValue(Action.MNEMONIC_KEY, new Integer(KeyEvent.VK_A));
 //        putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_A, ActionEvent.CTRL_MASK));
-//        putValue(Action.SMALL_ICON, new ImageIcon(IDE.class.getResource("/toolbarButtonGraphics/general/Icon.gif")));
-//        putValue(Action.SMALL_ICON, new ImageIcon(IDE.class.getResource("/icons/waters/minimise16.gif")));
+        putValue(Action.SMALL_ICON, new ImageIcon(IDE.class.getResource("/icons/processeditor/icon.ico")));
     }
 
     public void actionPerformed(ActionEvent e)
