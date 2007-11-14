@@ -33,7 +33,7 @@ public class SOCFrame extends JFrame  {
     	
     	setSize(700,500);
     	this.setExtendedState(Frame.MAXIMIZED_BOTH); 
-    	this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+    	this.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
     	this.setTitle("Sequence of Operation Chart");
 	
     	

@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.gui.ide
 //# CLASS:   IDEMenuBar
 //###########################################################################
-//# $Id: IDEMenuBar.java,v 1.57 2007-11-06 03:22:26 robi Exp $
+//# $Id: IDEMenuBar.java,v 1.58 2007-11-14 15:16:34 millares Exp $
 //###########################################################################
 
 package org.supremica.gui.ide;
@@ -235,6 +235,19 @@ public class IDEMenuBar
         mModulesMenu.setEnabled(false);
         add(mModulesMenu);
 
+        // Tools
+        if (Config.INCLUDE_EXTERNALTOOLS.isTrue())
+        {
+        	menu = new JMenu();
+        	menu.setText("Tools");
+        	add(menu);
+        	if (Config.INCLUDE_SOCEDITOR.isTrue())
+        	{
+        		menu.add(ide.getActions().toolsSOCEditorAction.getMenuItem());
+        	}
+
+        }
+        
         // Help
         menu = new JMenu();
         menu.setText("Help");

@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.properties
 //# CLASS:   Config
 //###########################################################################
-//# $Id: Config.java,v 1.43 2007-10-29 18:31:21 flordal Exp $
+//# $Id: Config.java,v 1.44 2007-11-14 15:16:34 millares Exp $
 //###########################################################################
 
 /*
@@ -169,7 +169,9 @@ public final class Config
     public static final ObjectProperty SOFTPLC_INTERFACES = new ObjectProperty(PropertyType.GENERAL_SOFTPLC, "softplcInterfaces", "org.supremica.softplc.Simulator.BTSim", "Default interface");
 
     // GUI
+    public static final BooleanProperty INCLUDE_EXTERNALTOOLS = new BooleanProperty(PropertyType.GUI, "includeExternalTools", true, "Include external tools");
     public static final BooleanProperty INCLUDE_JGRAFCHART = new BooleanProperty(PropertyType.GUI, "includeJGrafchart", false, "Include JGrafchart");
+    public static final BooleanProperty INCLUDE_SOCEDITOR = new BooleanProperty(PropertyType.GUI, "includeSOCEditor", true, "Include SOC editor");
     public static final BooleanProperty INCLUDE_SHOE_FACTORY = new BooleanProperty(PropertyType.GUI, "includeShoeFactory", false, "Include Shoe factory simulation");
     public static final BooleanProperty INCLUDE_INSTANTION =
       new BooleanProperty(PropertyType.GUI, "includeInstantiation", true,

@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.gui.ide.actions
 //# CLASS:   Actions
 //###########################################################################
-//# $Id: Actions.java,v 1.56 2007-11-06 03:22:26 robi Exp $
+//# $Id: Actions.java,v 1.57 2007-11-14 15:16:34 millares Exp $
 //###########################################################################
 
 package org.supremica.gui.ide.actions;
@@ -155,6 +155,9 @@ public class Actions extends WatersActionManager
     
     // Examples Actions
     public IDEAction toolsTestCasesAction = new ToolsTestCasesAction(mIDEActions);
+ 
+    // Tools Actions
+    public IDEAction toolsSOCEditorAction = new ToolsSOCEditorAction(mIDEActions);
     
     // Help Actions
     public IDEAction helpWebAction = new HelpWebAction(mIDEActions);
