@@ -3,19 +3,15 @@ package org.supremica.external.processAlgebraPetriNet.ppnedit.gui;
 import javax.swing.*;
 import javax.swing.border.*;
 
-import org.supremica.gui.Supremica;
-
-
 import java.awt.*;
 import java.awt.Font.*;
 import java.awt.event.*;
 import java.io.*;
 
 
-public class ToolBar extends JToolBar implements ActionListener{    
-
-    //GETTING ICONS AT DIRECTORY searchIconsIn
-    private String searchIconsIn;
+public class ToolBar 
+				extends JToolBar 
+							implements ActionListener{    
 
     private Image fileNew;
     private Image fileOpen;
@@ -41,19 +37,19 @@ public class ToolBar extends JToolBar implements ActionListener{
 		super();
 		
 		fileNew = Toolkit.getDefaultToolkit().	     
-	    	getImage(Supremica.class.getResource("/icons/processeditor/FileNew.gif"));	       
+	    	getImage(ToolBar.class.getResource("/icons/processeditor/FileNew.gif"));	       
 		fileOpen = Toolkit.getDefaultToolkit().
-	    	getImage(Supremica.class.getResource("/icons/processeditor/FileOpen.gif"));
+	    	getImage(ToolBar.class.getResource("/icons/processeditor/FileOpen.gif"));
 		fileSave = Toolkit.getDefaultToolkit().
-	    	getImage(Supremica.class.getResource("/icons/processeditor/FileSave.gif"));
+	    	getImage(ToolBar.class.getResource("/icons/processeditor/FileSave.gif"));
 		editCut = Toolkit.getDefaultToolkit().
-	    	getImage(Supremica.class.getResource("/icons/processeditor/EditCut.gif"));
+	    	getImage(ToolBar.class.getResource("/icons/processeditor/EditCut.gif"));
 		editCopy = Toolkit.getDefaultToolkit().
-	    	getImage(Supremica.class.getResource("/icons/processeditor/EditCopy.gif"));
+	    	getImage(ToolBar.class.getResource("/icons/processeditor/EditCopy.gif"));
 		editPaste = Toolkit.getDefaultToolkit().
-	    	getImage(Supremica.class.getResource("/icons/processeditor/EditPaste.gif"));
+	    	getImage(ToolBar.class.getResource("/icons/processeditor/EditPaste.gif"));
 		editDelete = Toolkit.getDefaultToolkit().
-	    	getImage(Supremica.class.getResource("/icons/processeditor/EditDelete.gif"));
+	    	getImage(ToolBar.class.getResource("/icons/processeditor/EditDelete.gif"));
 			
 		//setLayout(new BoxLayout(BoxLayout.X_AXIS));
 		this.add(jbFileNew = new JButton(" New ",new ImageIcon(fileNew)));  	
