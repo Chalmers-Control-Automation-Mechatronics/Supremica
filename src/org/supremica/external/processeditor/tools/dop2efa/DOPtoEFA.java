@@ -274,12 +274,14 @@ public class DOPtoEFA
 	
 	/**
 	 *	Search through Relation r and return a new relation
-	 *	there same relation in relation are collapsed. 
+	 *	there same relation in relation are collapsed.
+	 *
+	 *	Arbitrary and Parallel nodes are not collapsed.
 	 *
 	 *	Return a new relation whit no relation with same type as above.
 	 * 
 	 */
-	public static Relation collapseRelationTree(Relation r){
+	public static Relation collapseRelationTree( Relation r ){
 		
 		Relation tmp;
 		List list;
@@ -290,13 +292,13 @@ public class DOPtoEFA
 		
 		//loop over all element
 		i = 0;
-		while(i < list.size()){
+		while( i < list.size() ){
 			Object o = list.get(i);
 			
-			if(o instanceof Relation){
+			if( o instanceof Relation ){
 				tmp = (Relation)o;
-				if(r.getType().equals(tmp.getType())){
-					/* same RelationType */
+				if( r.getType().equals( tmp.getType() ) && !( r.getType() == RelationType.ARBITRARY )){
+					/* same RelationType and not a arbitrary order node */
 					
 					list.remove(i);
 					list.addAll(i,tmp.getActivityRelationGroup());
@@ -311,7 +313,7 @@ public class DOPtoEFA
 					
 					i = i + 1; //next element
 				}
-			}else if(o instanceof Activity){
+			}else if( o instanceof Activity ){
 				
 				/* Activities are OK go next*/
 				i = i + 1; //next element

@@ -630,6 +630,7 @@ public class DOPrelation
 			
 			parallel_track = arbitrary_var +"_"+ i;
 			
+			//create new automata
 			tmp = new EFA(parallel_track,m);
 			m.addAutomaton(tmp);
 			
