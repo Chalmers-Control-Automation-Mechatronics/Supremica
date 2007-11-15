@@ -1,7 +1,7 @@
 /**
  * class to convert from DOP to EFA 
  */
-package org.supremica.external.processeditor.xml.dop2efa;
+package org.supremica.external.processeditor.tools.dop2efa;
 
 
 import java.io.File;
@@ -150,7 +150,8 @@ public class DOPtoEFA
 	 * @param rop the ROP to add to module
 	 * @return a Module whit one ROP added
 	 */
-	public static Module buildModuleFromROP(ROP rop, Module module){
+	public static Module buildModuleFromROP(ROP rop,
+											Module module){
 		
 		String comment, machine;
 		String startState, endState;
@@ -226,8 +227,8 @@ public class DOPtoEFA
 		startState = machine +  "_idle";
 		endState = machine + "_finish";
 		
-		/* First state marked and initial */
-		main_efa.addState(startState, true, true);
+		/* First state not marked and initial */
+		main_efa.addState(startState, false, true);
 		
 		/* Last state marked */
 		main_efa.addState(endState,true,false);

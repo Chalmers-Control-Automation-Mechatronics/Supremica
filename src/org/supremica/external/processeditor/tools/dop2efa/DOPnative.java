@@ -1,4 +1,4 @@
-package org.supremica.external.processeditor.xml.dop2efa;
+package org.supremica.external.processeditor.tools.dop2efa;
 
 import java.util.Iterator;
 import java.util.LinkedList;

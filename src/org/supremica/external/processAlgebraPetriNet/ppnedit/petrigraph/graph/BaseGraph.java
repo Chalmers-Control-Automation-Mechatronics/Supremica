@@ -372,13 +372,16 @@ public class BaseGraph extends Graph
 		
 		lastClick = e.getPoint();
 		
-		if(e.isPopupTrigger()){
-			showPopupMenu(e.getPoint());
-			return;
+		if( MouseEvent.BUTTON2 == e.getButton()){
+			selection.removeAll();
+			selectionAreaStart = new Point(e.getX(), e.getY());
+			selectionAreaStop = new Point(e.getX(), e.getY());
 		}
-				
-		selectionAreaStart = new Point(e.getX(), e.getY());
-		selectionAreaStop = new Point(e.getX(), e.getY());
+		
+		if( MouseEvent.BUTTON1 == e.getButton()){
+			selectionAreaStart = new Point(e.getX(), e.getY());
+			selectionAreaStop = new Point(e.getX(), e.getY());
+		}
 		
 		repaint();
 	}

@@ -1,4 +1,4 @@
-package org.supremica.external.processeditor.xml.dop2efa.gui;
+package org.supremica.external.processeditor.tools.dop2efa.gui;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;

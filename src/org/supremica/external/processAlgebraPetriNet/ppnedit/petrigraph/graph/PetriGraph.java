@@ -325,16 +325,73 @@ public class PetriGraph
 	}
 	
 	private void connect(){
-	
+		
+		int x, y;
+		int dx, dy;
+		
+		Point pos;
+		
 		GraphCell[] cells = ((BaseSelection)selection).getSelected(); 
 		if( cells == null || cells.length != 2){
 			return;
 		}
 		
-		if(cells[0] instanceof Place && !(cells[1] instanceof Place)){
+		if(cells[0] instanceof Place &&
+		   !(cells[1] instanceof Place)){
 			((Place)cells[0]).addTargetCell((BaseCell)cells[1]);
-		}else if(cells[1] instanceof Place && !(cells[0] instanceof Place)){
+		}else if(cells[1] instanceof Place && 
+				 !(cells[0] instanceof Place)){
 			((Place)cells[1]).addSourceCell((BaseCell)cells[0]);
+		}else{
+			/* Same kind of cell*/
+			if( cells[0] instanceof Place ){
+				
+				//New transition
+				Transition t = new Transition();
+				
+				//Calculate position
+				x = Math.min(cells[0].getX(), cells[1].getX());
+				y = Math.min(cells[0].getY(), cells[1].getY());
+				
+				dx = Math.abs(cells[0].getX() - cells[1].getX())/2;
+				dy = Math.abs(cells[0].getY() - cells[1].getY())/2;
+				
+				pos = new Point(x,y);
+				pos.translate(dx, dy);
+				
+				t.setPos(pos);
+				
+				//Insert transition
+				insert(t);
+				
+				//Connect new transition
+				((Place)cells[0]).addTargetCell(t);
+				((Place)cells[1]).addSourceCell(t);
+				
+			}else if( cells[0] instanceof Transition ){
+				//New place
+				Place p = new Place();
+				
+				//Calculate position
+				x = Math.min(cells[0].getX(), cells[1].getX());
+				y = Math.min(cells[0].getY(), cells[1].getY());
+				
+				dx = Math.abs(cells[0].getX() - cells[1].getX())/2;
+				dy = Math.abs(cells[0].getY() - cells[1].getY())/2;
+				
+				pos = new Point(x,y);
+				pos.translate(dx, dy);
+				
+				p.setPos(pos);
+				
+				//Insert transition
+				insert(p);
+				
+				//Connect new place
+				p.addSourceCell((BaseCell)cells[0]);
+				p.addTargetCell((BaseCell)cells[1]);
+			}
+			
 		}
 	}
 	

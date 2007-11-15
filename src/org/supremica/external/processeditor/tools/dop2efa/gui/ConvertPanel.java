@@ -1,4 +1,4 @@
-package org.supremica.external.processeditor.xml.dop2efa.gui;
+package org.supremica.external.processeditor.tools.dop2efa.gui;
 
 import java.io.*;
 import java.util.List;
@@ -8,8 +8,8 @@ import java.awt.event.*;
 
 import javax.swing.*;
 
-import org.supremica.external.processeditor.xml.dop2efa.Module;
-import org.supremica.external.processeditor.xml.dop2efa.DOPtoEFA;
+import org.supremica.external.processeditor.tools.dop2efa.DOPtoEFA;
+import org.supremica.external.processeditor.tools.dop2efa.Module;
 
 public class ConvertPanel 
 					extends JPanel 

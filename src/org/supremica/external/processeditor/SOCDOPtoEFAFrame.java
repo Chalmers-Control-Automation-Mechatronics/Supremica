@@ -9,10 +9,17 @@ import java.awt.event.*;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 
-import org.supremica.external.processeditor.xml.dop2efa.gui.ConvertPanel;
+import org.supremica.external.processeditor.tools.dop2efa.gui.ConvertPanel;
 import org.supremica.gui.Supremica;
 
-public class SOCDOPtoEFAFrame extends JFrame implements ActionListener{
+
+/**
+ * @author millares
+ *
+ */
+public class SOCDOPtoEFAFrame
+						extends JFrame 
+									implements ActionListener{
 	
 	ConvertPanel cPanel;
 	
