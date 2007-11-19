@@ -443,7 +443,7 @@ public class ScheduleDialog
     {
         return ide;
     }
-    
+
 //    // Ugly implementation 
 //    public Automata getSelectedAutomata()
 //    {

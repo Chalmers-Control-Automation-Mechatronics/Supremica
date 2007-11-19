@@ -40,13 +40,13 @@ public class VelocityBalancer
      * of when each plant enters and exits a zone (and null if that 
      * never happens). 
      */
-    ArrayList[] mutexLimits = null;
+//    ArrayList[] mutexLimits = null;
     ArrayList<double[]>[][] mutexLimitsNew =  null;
 
     /**
      * Possible deadlocks give rise to forbidden time-zones.
      */
-    ArrayList[] deadlockLimits = null;
+//       ArrayList[] deadlockLimits = null;
     ArrayList<double[]>[][] deadlockLimitsNew =  null;
 
     /**
@@ -133,7 +133,7 @@ public class VelocityBalancer
         
         
         // Creates a test problem. This is a temporary construction
-        makeTestPath();
+//        makeTestPath();
 
         // Checks for each pair of points (except for consecutive points) 
         // whether they can see eachother.
@@ -1551,35 +1551,35 @@ public class VelocityBalancer
 //        pathPoints.add(new double[]{13, 11, 10});
 //        pathPoints.add(new double[]{13, 12, 11});
 
-        // Three zones in this example...
-        mutexLimits = new ArrayList[3];
-
-        // Zone 1
-        mutexLimits[0] = new ArrayList<double[]>();
-        mutexLimits[0].add(new double[]{2, 9});
-        mutexLimits[0].add(new double[]{10, 11});
-        mutexLimits[0].add(new double[]{5, 7});
-
-        // Zone 2
-        mutexLimits[1] = new ArrayList<double[]>();
-        mutexLimits[1].add(new double[]{4, 7});
-        mutexLimits[1].add(new double[]{2, 9});
-        mutexLimits[1].add(new double[]{9, 10});
-
-        // Zone 3
-        mutexLimits[2] = new ArrayList<double[]>();
-        mutexLimits[2].add(new double[]{10, 12});
-        mutexLimits[2].add(new double[]{4, 6});
-        mutexLimits[2].add(new double[]{2, 8});
-
-        // ... and one deadlock
-        deadlockLimits = new ArrayList[1];
-
-        // Deadlock 1
-        deadlockLimits[0] = new ArrayList<double[]>();
-        deadlockLimits[0].add(new double[]{2, 4});
-        deadlockLimits[0].add(new double[]{2, 4});
-        deadlockLimits[0].add(new double[]{2, 5});
+//        // Three zones in this example...
+//        mutexLimits = new ArrayList[3];
+//
+//        // Zone 1
+//        mutexLimits[0] = new ArrayList<double[]>();
+//        mutexLimits[0].add(new double[]{2, 9});
+//        mutexLimits[0].add(new double[]{10, 11});
+//        mutexLimits[0].add(new double[]{5, 7});
+//
+//        // Zone 2
+//        mutexLimits[1] = new ArrayList<double[]>();
+//        mutexLimits[1].add(new double[]{4, 7});
+//        mutexLimits[1].add(new double[]{2, 9});
+//        mutexLimits[1].add(new double[]{9, 10});
+//
+//        // Zone 3
+//        mutexLimits[2] = new ArrayList<double[]>();
+//        mutexLimits[2].add(new double[]{10, 12});
+//        mutexLimits[2].add(new double[]{4, 6});
+//        mutexLimits[2].add(new double[]{2, 8});
+//
+//        // ... and one deadlock
+//        deadlockLimits = new ArrayList[1];
+//
+//        // Deadlock 1
+//        deadlockLimits[0] = new ArrayList<double[]>();
+//        deadlockLimits[0].add(new double[]{2, 4});
+//        deadlockLimits[0].add(new double[]{2, 4});
+//        deadlockLimits[0].add(new double[]{2, 5});
     }
 
     /**
