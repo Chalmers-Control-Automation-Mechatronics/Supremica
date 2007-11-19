@@ -48,6 +48,9 @@ public class VelocityBalancer
      */
 //       ArrayList[] deadlockLimits = null;
     ArrayList<double[]>[][] deadlockLimitsNew =  null;
+    
+    /** The indices of path points where velocities should be changed, i.e. the indices of key points. */
+    ArrayList<Integer> keyPointIndices = null;
 
     /**
      * The times that are recorded for the plants during simulation.
@@ -65,6 +68,7 @@ public class VelocityBalancer
     Automata plants = null;
     Automata specs = null;
     Automaton schedule = null;
+    Automata optimalSubPlants = null;
      
     /** The logger */
     private Logger logger = LoggerFactory.createLogger(this.getClass());
@@ -181,7 +185,39 @@ public class VelocityBalancer
         logger.warn(str);
 
         // Loops through the key points and smooth out the robot velocities even more when possible
-        improveKeyPointsUsingVisibilitySmoothing();
+        double[][] relativeVelocities = improveKeyPointsUsingVisibilitySmoothing();
+        int stateCounter = 0;
+        State[] currStates = new State[optimalSubPlants.size()];
+        for (int i=0; i<optimalSubPlants.size(); i++)
+        {
+            currStates[i] = optimalSubPlants.getAutomatonAt(i).getInitialState();
+        }
+        for (int i = 1; i < keyPointIndices.size(); i++)
+        {
+            while (stateCounter++ < keyPointIndices.get(i))
+            {
+                for (int j = 0; j < optimalSubPlants.size(); j++)
+                {
+                    if (currStates[j].isAccepting())
+                    {
+                        currStates[j].setName(currStates[j].getName() + "; velocity=0");
+                    }
+                    else
+                    {
+                        currStates[j].setName(currStates[j].getName() + "; velocity=" + relativeVelocities[i][j]);
+                    }
+                }
+            }
+        }
+        
+        //temp
+        for (Automaton auto : optimalSubPlants)
+        {
+            for (State state : auto)
+            {
+                logger.info("State = " + state.getName());
+            }
+        }
 
         // Gathers some statistics about the velocity changes (smooth schedule)
         logger.warn("");
@@ -240,6 +276,7 @@ public class VelocityBalancer
         firingTimes = new double[plants.size()][];
         simulationTimes = new double[plants.size()][];
         pathPoints = new ArrayList<double[]>();
+        keyPointIndices = new ArrayList<Integer>();
         
         mutexLimitsNew = new ArrayList[specs.size()][plants.size()];
         for (int i = 0; i < mutexLimitsNew.length; i++)
@@ -248,6 +285,21 @@ public class VelocityBalancer
             {
                 mutexLimitsNew[i][j] = new ArrayList<double[]>();
             }
+        }
+        
+        // Retrieve the parts of the original plants that are involved in the 
+        // optimal schedule by partitioning the schedule into individual plants 
+        // during the walk through the states of the optimal schedule. 
+        optimalSubPlants = new Automata();
+        for (int i = 0; i < plants.size(); i++)
+        {
+            Automaton currOptimalSubPlant = new Automaton(plants.getAutomatonAt(i).getName() + "_optimal");
+            currOptimalSubPlant.setType(AutomatonType.PLANT);
+            State initialState = new State("q0");
+            initialState.setInitial(true);
+            initialState.setAccepting(true);
+            currOptimalSubPlant.addState(initialState);
+            optimalSubPlants.addAutomaton(currOptimalSubPlant);
         }
     }
 
@@ -259,21 +311,6 @@ public class VelocityBalancer
     private void extractFiringTimes()
         throws Exception
     {
-        // Retrieve the parts of the original plants that are involved in the 
-        // optimal schedule by partitioning the schedule into individual plants 
-        // during the walk through the states of the optimal schedule. 
-        Automata optimalPlantParts = new Automata();
-        for (int i = 0; i < plants.size(); i++)
-        {
-            Automaton currOptimalPlantPart = new Automaton(plants.getAutomatonAt(i).getName() + "_optimal");
-            currOptimalPlantPart.setType(AutomatonType.PLANT);
-            State initialState = new State("q0");
-            initialState.setInitial(true);
-            initialState.setAccepting(true);
-            currOptimalPlantPart.addState(initialState);
-            optimalPlantParts.addAutomaton(currOptimalPlantPart);
-        }
-        
         // The sum of schedule costs from the initial state to the current state
         double currFiringTime = 0;
         
@@ -414,31 +451,31 @@ public class VelocityBalancer
                     }
                     
                     // Add the current event to corresponding optimal plant part
-                    Automaton currOptimalPlantPart = optimalPlantParts.getAutomatonAt(activeAutomatonIndex);
-                    State fromState = currOptimalPlantPart.getStateWithName("q" + (currOptimalPlantPart.nbrOfStates() - 1));
+                    Automaton currOptimalSubPlant = optimalSubPlants.getAutomatonAt(activeAutomatonIndex);
+                    State fromState = currOptimalSubPlant.getStateWithName("q" + (currOptimalSubPlant.nbrOfStates() - 1));
                     fromState.setCost(simulationTimesArrays[activeAutomatonIndex].get(
                             simulationTimesArrays[activeAutomatonIndex].size() - 1));
-                    State toState = new State("q" + currOptimalPlantPart.nbrOfStates());
-                    currOptimalPlantPart.addState(toState);
-                    currOptimalPlantPart.getAlphabet().addEvent(currEvent);
-                    currOptimalPlantPart.addArc(new Arc(fromState, toState, currEvent));
+                    State toState = new State("q" + currOptimalSubPlant.nbrOfStates());
+                    currOptimalSubPlant.addState(toState);
+                    currOptimalSubPlant.getAlphabet().addEvent(currEvent);
+                    currOptimalSubPlant.addArc(new Arc(fromState, toState, currEvent));
                 }
             }
         }
         
-        // Connect the currOptimalPlantPart as a loop by redirecting the last 
+        // Connect the currOptimalSubPlant as a loop by redirecting the last 
         // transition to the initial state
-        for (int i = 0; i < optimalPlantParts.size(); i++)
+        for (int i = 0; i < optimalSubPlants.size(); i++)
         {
-            Automaton currOptimalPlantPart = optimalPlantParts.getAutomatonAt(i);
-            State fromState = currOptimalPlantPart.getStateWithName("q" + (currOptimalPlantPart.nbrOfStates() - 2));
-            State prevToState = currOptimalPlantPart.getStateWithName("q" + (currOptimalPlantPart.nbrOfStates() - 1));
-            currOptimalPlantPart.addArc(new Arc(fromState, currOptimalPlantPart.getInitialState(), 
+            Automaton currOptimalSubPlant = optimalSubPlants.getAutomatonAt(i);
+            State fromState = currOptimalSubPlant.getStateWithName("q" + (currOptimalSubPlant.nbrOfStates() - 2));
+            State prevToState = currOptimalSubPlant.getStateWithName("q" + (currOptimalSubPlant.nbrOfStates() - 1));
+            currOptimalSubPlant.addArc(new Arc(fromState, currOptimalSubPlant.getInitialState(), 
                     fromState.outgoingArcsIterator().next().getEvent()));
-            currOptimalPlantPart.removeState(prevToState);
+            currOptimalSubPlant.removeState(prevToState);
         }
         
-        Automata plantsAndSpecs = new Automata(optimalPlantParts);
+        Automata plantsAndSpecs = new Automata(optimalSubPlants);
         plantsAndSpecs.addAutomata(specs);
         findDeadlockLimits(plantsAndSpecs);
         
@@ -999,7 +1036,7 @@ public class VelocityBalancer
      * Goes through the key points and replaces them if possible, 
      * removing unnecessary robot stops. 
      */
-    private void improveKeyPointsUsingVisibilitySmoothing()
+    private double[][] improveKeyPointsUsingVisibilitySmoothing()
     {
         // Stores the maximal difference between the elements of this and the previous key point.
         double[] timeToPrevKeyPoint = calcTimeToPreviousPoint(keyPoints);
@@ -1117,6 +1154,8 @@ public class VelocityBalancer
             logger.warn(str);
         }
         logger.warn("");
+        
+        return relativeVelocities;
     }
 
     /**
@@ -1162,6 +1201,8 @@ public class VelocityBalancer
         int currKeyPointIndex = 0;
         while (currKeyPointIndex > -1)
         {
+            keyPointIndices.add(new Integer(currKeyPointIndex));
+            
             // This (ugly) procedure is done to avoid mixing with path- and key points by accident
             double[] currPathPoint = pathPoints.get(currKeyPointIndex);
             double[] currKeyPoint = new double[currPathPoint.length];
