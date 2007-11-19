@@ -6,6 +6,7 @@ import javax.swing.*;
 
 public class LoginWindow extends JInternalFrame implements ActionListener {
 	
+	private static final long serialVersionUID = 1L;
 	private JButton connectButton;
 	private JButton exitButton;
 	private JTextField hostNameField;
@@ -14,7 +15,6 @@ public class LoginWindow extends JInternalFrame implements ActionListener {
 	private JPasswordField passwordField;
 	
 	private Connect dbConnect = null;		// Connection setup object
-	private java.sql.Connection con;		// Connection object
 	
 	public LoginWindow() {
 		super("Connect to host",false,false);

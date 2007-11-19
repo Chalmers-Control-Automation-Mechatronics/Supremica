@@ -43,7 +43,7 @@ public class Converter {
 	/* convert to relation */
 	public static Relation createRelation(final String exp) {
 		final Relation r = PPNtoRelation.createRelation(exp);
-		printRelation(r);
+		//printRelation(r);
 		return r;
 	}
 

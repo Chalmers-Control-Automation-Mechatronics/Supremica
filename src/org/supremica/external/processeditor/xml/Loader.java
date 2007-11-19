@@ -3,7 +3,6 @@ package org.supremica.external.processeditor.xml;
 import java.lang.Object;
 import java.io.*;
 import javax.xml.bind.*;
-
 import javax.xml.transform.stream.StreamSource;
 
 public class Loader {
@@ -26,7 +25,7 @@ public class Loader {
     		je.printStackTrace();
     		return null;
     	}
-    }    
+    }
     
     private Object load(File file) {	
     	try {		
@@ -69,7 +68,7 @@ public class Loader {
 
     			return o;
     		}else {
-    			java.lang.System.err.println("Problem reading the file!");
+    			java.lang.System.err.println("Problem reading the XML string!");
     		}
     	}catch(UnmarshalException ue) {
     		java.lang.System.err.println("Invalid XML code (UnmarshalException)" );

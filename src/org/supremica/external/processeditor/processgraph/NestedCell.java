@@ -1135,7 +1135,7 @@ public class NestedCell extends GraphCell implements MouseListener,
      * @return the complex function
      */
     public Object getFunction() {
-	return complexFunction;
+    	return complexFunction;
     }
     /**
      * Sets the complex function of this nested cell.

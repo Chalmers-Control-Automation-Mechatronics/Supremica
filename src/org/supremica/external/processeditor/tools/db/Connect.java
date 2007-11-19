@@ -5,8 +5,8 @@ import java.io.*;
 import java.sql.*;
 import javax.xml.bind.*;
 import javax.xml.transform.stream.*;
-
-import org.supremica.external.processeditor.xml.*;
+import org.supremica.external.processeditor.*;
+import org.supremica.external.processeditor.xml.Loader;
 
 public class Connect {
 	private final String PKGS = "org.supremica.manufacturingTables.xsd.processeditor";
@@ -116,7 +116,7 @@ public class Connect {
 	}
 	
 	//	Get all projects
-	public Vector getAllProjects() {
+	public Vector<String> getAllProjects() {
 		PreparedStatement ps = null;
 		ResultSet rs = null;
 		Vector<String> projects = new Vector<String>();
@@ -214,7 +214,7 @@ public class Connect {
 	
 	//	Get all ROPs
 
-	public Vector getAllROPs(int projectID) {
+	public Vector<String> getAllROPs(int projectID) {
 		PreparedStatement ps = null;
 		ResultSet rs = null;
 		Vector<String> ROPs = new Vector<String>();
@@ -286,7 +286,7 @@ public class Connect {
 		try{
 			con = this.getConnection();
 			if(con != null){
-				ps = con.prepareStatement("declare @xml xml exec @xml = ExtractROPXML @projectID = ?, @ropNameID = ? select @xml");
+				ps = con.prepareStatement("declare @xml XML exec @xml = ExtractROPXML @projectID = ?, @ropNameID = ? select @xml");
 				ps.setInt(1, projectID);
 				ps.setString(2, ROPNameID);
 				
@@ -301,11 +301,11 @@ public class Connect {
 					try {
 						Loader ldr = new Loader();
 						Object o = ldr.open(xmlStr);
-						
-						//debug
-						/*
+
 						JAXBContext jc = JAXBContext.newInstance(PKGS);
 						Marshaller m = jc.createMarshaller();
+						m.setProperty(Marshaller.JAXB_ENCODING, "UTF-8");
+						m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
 
 						StringWriter stringWriter = new StringWriter();
 						StreamResult result = new StreamResult(stringWriter);
@@ -313,10 +313,9 @@ public class Connect {
 						String content = stringWriter.toString();
 
 						System.out.println(content);
-					
+			
 						DBInterface.getPrintArea().append("\nExtract complete (System.out.println())");
-						*/
-						
+					
 						return o;
 						
 					}catch (Exception e) {
@@ -347,13 +346,25 @@ public class Connect {
 
 	//	Export ROP XML to DB
 
-	public void setROPXML(int projectID, String ROPXML) {
+	public void setROPXML(int projectID, Object o) {
 		PreparedStatement ps = null;
 		ResultSet rs = null;
+		String ROPXML = "";
 		String resultStr = "No ResultSet returned";
 		try {
 			con = this.getConnection();
 			if(con != null) {
+			
+				JAXBContext jc = JAXBContext.newInstance(PKGS);
+				Marshaller m = jc.createMarshaller();
+				m.setProperty(Marshaller.JAXB_ENCODING, "UTF-16");
+				m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
+
+				StringWriter stringWriter = new StringWriter();
+				StreamResult result = new StreamResult(stringWriter);
+				m.marshal(o, result);
+				ROPXML = stringWriter.toString();
+			
 				ps = con.prepareStatement("exec InsertROPXML @projectID = ?, @xml = ?");
 				ps.setInt(1, projectID);
 				ps.setString(2, ROPXML);

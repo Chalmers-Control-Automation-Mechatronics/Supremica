@@ -6,15 +6,16 @@ import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
 import javax.swing.event.*;
-import javax.swing.text.*;
 
-import org.supremica.external.processeditor.*;
+import org.supremica.external.processeditor.SOCGraphContainer;
+import org.supremica.external.processeditor.processgraph.resrccell.ResourceCell;
 
 public class DBInterface extends JFrame implements ActionListener, ListSelectionListener {
 
 /*
-	--< Init >--
+	--< Initialize >--
 */
+	private static final long serialVersionUID = 1L;
 	private JDesktopPane desktop;
 	private JPanel glassPanel;
 	private JMenuBar menuBar;
@@ -33,8 +34,8 @@ public class DBInterface extends JFrame implements ActionListener, ListSelection
 	private JTextField projectField;
 	private JList pList;
 	private JList rList;
-   private DefaultListModel pListModel;
-   private DefaultListModel rListModel;
+	private DefaultListModel pListModel;
+	private DefaultListModel rListModel;
 	private JButton useProjectButton;
 	private JButton refreshPButton;
 	private JButton refreshRButton;
@@ -49,7 +50,6 @@ public class DBInterface extends JFrame implements ActionListener, ListSelection
 	private SOCGraphContainer graphContainer = null;
 	
 	private String encodingName = "UTF-8";
-	private int index = -1;
 	private int projectID = 0;
 	private String projectName = "";
 	private String ROPNameID = "";
@@ -78,7 +78,7 @@ public class DBInterface extends JFrame implements ActionListener, ListSelection
 		setJMenuBar(menuBar);
 		
 		sessionMenu = new JMenu("Session");
-      sessionMenu.setMnemonic(KeyEvent.VK_S);
+		sessionMenu.setMnemonic(KeyEvent.VK_S);
 		connectItem = new JMenuItem("Connect to DB...");
 		disconnectItem = new JMenuItem("Disconnect");
 		exitItem = new JMenuItem("Exit");
@@ -101,8 +101,8 @@ public class DBInterface extends JFrame implements ActionListener, ListSelection
 		encUTF16Item.addActionListener(this);
 		encodingMenu.add(encUTF8Item);
 		encodingMenu.add(encUTF16Item);
-	
-      menuBar.add(sessionMenu);
+		
+		menuBar.add(sessionMenu);
 		menuBar.add(encodingMenu);
 
 		// ****** Project ******
@@ -169,13 +169,14 @@ public class DBInterface extends JFrame implements ActionListener, ListSelection
 		// Project list
 		pListModel = new DefaultListModel();
 		pListModel.addElement("Hit refresh");
-      pList = new JList(pListModel);
+		pList = new JList(pListModel);
 		pList.setPreferredSize(new Dimension(300,200));
-      pList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-      pList.setSelectedIndex(0);
-      pList.addListSelectionListener(this);
-      pList.setVisibleRowCount(5);
-      pListScrollPane = new JScrollPane(pList);
+		pList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+		pList.setSelectedIndex(0);
+		pList.addMouseListener(new ActionJList(pList, this));
+		pList.addListSelectionListener(this);
+		pList.setVisibleRowCount(5);
+		pListScrollPane = new JScrollPane(pList);
 		con = new GridBagConstraints();
 		con.gridx = 2;
 		con.gridy = 2;
@@ -263,13 +264,13 @@ public class DBInterface extends JFrame implements ActionListener, ListSelection
 		// ROP list
 		rListModel = new DefaultListModel();
 		rListModel.addElement("Hit refresh");
-   	rList = new JList(rListModel);
+		rList = new JList(rListModel);
 		rList.setPreferredSize(new Dimension(300,200));
-      rList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-      rList.setSelectedIndex(0);
-      rList.addListSelectionListener(this);
-      rList.setVisibleRowCount(5);
-      rListScrollPane = new JScrollPane(rList);
+		rList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+		rList.setSelectedIndex(0);
+		rList.addListSelectionListener(this);
+		rList.setVisibleRowCount(5);
+		rListScrollPane = new JScrollPane(rList);
 		con = new GridBagConstraints();
 		con.gridx = 2;
 		con.gridy = 8;
@@ -310,7 +311,7 @@ public class DBInterface extends JFrame implements ActionListener, ListSelection
 		printArea.setLineWrap(true);
 		printArea.setWrapStyleWord(true);
 		scrollMPane = new JScrollPane(printArea);
-		scrollMPane.setPreferredSize(new Dimension(520,180));
+		scrollMPane.setPreferredSize(new Dimension(515,180));
 		scrollMPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
 		printArea.setCaretPosition(printArea.getDocument().getLength());
 		con = new GridBagConstraints();
@@ -325,7 +326,7 @@ public class DBInterface extends JFrame implements ActionListener, ListSelection
 		printArea.setBorder(BorderFactory.createEtchedBorder());
 		
 		// Set visible
-		setDefaultCloseOperation(DISPOSE_ON_CLOSE);
+		setDefaultCloseOperation(EXIT_ON_CLOSE);
 		setVisible(true);
 	}
 
@@ -342,7 +343,7 @@ public class DBInterface extends JFrame implements ActionListener, ListSelection
 		dbConnect = dbCon;
 	}
 	
-	public void setGraphContainer(SOCGraphContainer graphContainer) {
+    public void setGraphContainer(SOCGraphContainer graphContainer) {
 		this.graphContainer = graphContainer;
 	}
 	
@@ -363,7 +364,7 @@ public class DBInterface extends JFrame implements ActionListener, ListSelection
 		rListModel.addElement("Hit refresh");
 	}
 	
-	// Init values
+	// Initialize values
 	private void initValues() {
 		if (rList.isSelectionEmpty()) {
 			ROPNameID = "";
@@ -378,9 +379,29 @@ public class DBInterface extends JFrame implements ActionListener, ListSelection
 		}
 		else
 			projectName = projectField.getText();
-		
-		index = -1;
 	}
+	
+	public void setProject() {
+		if (isConnected()) {
+			initValues();
+			if (projectName.isEmpty()) {
+				printArea.append("\nType or select a project name!");
+			}
+			else {
+				projectID = dbConnect.getProjectID(projectName);
+				printArea.append("\nProject ID: " + projectID);
+				
+				Vector<String> ROPs = new Vector<String>();
+				rListModel.removeAllElements();
+				ROPs = dbConnect.getAllROPs(projectID);
+				for (int i=0; i<ROPs.size(); i++) {
+					rListModel.addElement(ROPs.elementAt(i));
+				}
+			}
+		}
+		else
+			notConnected();	
+	}	
 
 /*
 	--< Action performed >--
@@ -424,25 +445,7 @@ public class DBInterface extends JFrame implements ActionListener, ListSelection
 		
 		// Use/ Create project button
 		else if (e.getSource() == useProjectButton || e.getSource() == projectField) {
-			if (isConnected()) {
-				initValues();
-				if (projectName.isEmpty()) {
-					printArea.append("\nType or select a project name!");
-				}
-				else {
-					projectID = dbConnect.getProjectID(projectName);
-					printArea.append("\nProject ID: " + projectID);
-					
-					Vector ROPs = new Vector();
-					rListModel.removeAllElements();
-					ROPs = dbConnect.getAllROPs(projectID);
-					for (int i=0; i<ROPs.size(); i++) {
-						rListModel.addElement(ROPs.elementAt(i));
-					}
-				}
-			}
-			else
-				notConnected();	
+			setProject();
 		}
 		
 		// Delete project Button
@@ -468,7 +471,7 @@ public class DBInterface extends JFrame implements ActionListener, ListSelection
 		// Refresh projects Button
 		else if (e.getSource() == refreshPButton) {
 			if (isConnected()) {
-				Vector projects = new Vector();
+				Vector<String> projects = new Vector<String>();
 				pListModel.removeAllElements();
 				projects = dbConnect.getAllProjects();
 				for (int i=0; i<projects.size(); i++) {
@@ -485,11 +488,12 @@ public class DBInterface extends JFrame implements ActionListener, ListSelection
 			if (isConnected()) {
 				initValues();
 				if (projectID > 0 && !ROPNameID.isEmpty()) {
+					@SuppressWarnings("unused")
 					Object o = null;
 					o = dbConnect.getROPXML(projectID, ROPNameID);
 					
 					if(graphContainer != null){
-						graphContainer.insertResource(o, null); 
+						graphContainer.insertResource(o, null);
 					}
 				}
 				else {
@@ -506,39 +510,26 @@ public class DBInterface extends JFrame implements ActionListener, ListSelection
 		// Export new Button
 		else if (e.getSource() == exportButton) {
 			File xmlFile = null;
-			String ROPXML = "";	// TO BE REMOVED !!!!!!!!!!!!!!!!!!
+			String ROPXML = "";
 			if (isConnected()) {
 				initValues();
-				// File chooser & scanner
 				if (projectID == 0) {
 					printArea.append("\nChoose a project!");
 				}
 				else {
-					final JFileChooser fc = new JFileChooser(); 
-					int returnVal = fc.showOpenDialog(glassPanel); 
-					if (returnVal == JFileChooser.APPROVE_OPTION) {
-						xmlFile = fc.getSelectedFile();
-						try {
-							Reader r = new InputStreamReader(new FileInputStream(xmlFile), encodingName);
-							Scanner scanner = new Scanner(r);
-							while (scanner.hasNextLine()){
-								String tempStr = scanner.nextLine();
-								ROPXML = ROPXML + tempStr;
-								ROPXML.trim();
-							}
-							scanner.close();
-							System.out.println(ROPXML);
-						}catch (IOException ex){
-							printArea.append("\nIOException from Scanner: " + ex.getMessage());
-						}					
-						try {
-							dbConnect.setROPXML(projectID, ROPXML);
-						}catch (Exception eENF) {
-							printArea.append("\nUnsuccessful function call: " + eENF.getMessage());
+					Object o = new Object();//!!! change
+					if(1 == graphContainer.getSelectedCount()){
+						o = graphContainer.getSelectedResourceCell();
+						if(o != null){
+							o = ((ResourceCell)o).getFunction();
 						}
 					}
-					else
-						printArea.append("\nOpen command cancelled by user");
+					
+					try {
+						dbConnect.setROPXML(projectID, o);
+					}catch (Exception eENF) {
+						printArea.append("\nUnsuccessful function call: " + eENF.getMessage());
+					}
 				}
 			}
 			else
@@ -574,7 +565,7 @@ public class DBInterface extends JFrame implements ActionListener, ListSelection
 					printArea.append("\nNo project selected!");
 				}
 				else {
-					Vector ROPs = new Vector();
+					Vector<String> ROPs = new Vector<String>();
 					rListModel.removeAllElements();
 					ROPs = dbConnect.getAllROPs(projectID);
 					for (int i=0; i<ROPs.size(); i++) {
@@ -616,4 +607,23 @@ public class DBInterface extends JFrame implements ActionListener, ListSelection
             }
         });
     }
+}
+/*
+	--< ActionJList >--
+*/
+
+class ActionJList extends MouseAdapter{
+	protected JList list;
+	protected DBInterface dbi;
+    
+	public ActionJList(JList l, DBInterface dbi){
+	  list = l;
+	  this.dbi = dbi;
+	}
+    
+	public void mouseClicked(MouseEvent e){
+		if(e.getClickCount() == 2){
+			dbi.setProject();
+		}
+	}
 }
