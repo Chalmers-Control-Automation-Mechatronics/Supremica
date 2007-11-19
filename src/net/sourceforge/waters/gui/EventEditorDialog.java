@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   EventEditorDialog
 //###########################################################################
-//# $Id: EventEditorDialog.java,v 1.18 2007-07-21 22:13:24 robi Exp $
+//# $Id: EventEditorDialog.java,v 1.19 2007-11-19 02:16:52 robi Exp $
 //###########################################################################
 
 
@@ -286,18 +286,12 @@ public class EventEditorDialog
         new ArrayList<SimpleExpressionSubject>(ranges);
       mIndexModel = new ListTableModel<SimpleExpressionSubject>
         (copy, SimpleExpressionSubject.class);
-      mIndexTable = new JTable(mIndexModel) {
-          public boolean getScrollableTracksViewportHeight()
-          {
-            final Container viewport = getParent();
-            return getPreferredSize().height < viewport.getHeight();
-          }
-        };
+      mIndexTable = new JTable(mIndexModel);
       mIndexTable.setTableHeader(null);
       mIndexTable.setShowGrid(false);
       mIndexTable.setSurrendersFocusOnKeystroke(true);
       mIndexTable.setAutoResizeMode(JTable.AUTO_RESIZE_LAST_COLUMN);
-      //mIndexTable.setFillsViewportHeight(true); // works in Java 6
+      mIndexTable.setFillsViewportHeight(true);
       final Dimension minsize = new Dimension(0, 0);
       mIndexTable.setPreferredScrollableViewportSize(minsize);
       mIndexTable.setMinimumSize(minsize);

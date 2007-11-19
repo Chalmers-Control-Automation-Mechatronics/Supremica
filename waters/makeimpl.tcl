@@ -188,7 +188,9 @@ proc Java_ExtractFileInfo {srcname importMapName} {
             set comment ""
           } elseif {[regexp \
                     {^public +static +final +[A-Za-z0-9_]+ +[A-Za-z0-9_]+ *=} \
-                    $header all]} {
+                    $header all] ||
+                    [regexp \
+                    {^public +[A-Za-z0-9_]+ +clone *\(\)} $header all]} {
             # ignore ...
 	  } else {
 	    puts stderr "WARNING: Failed to parse method header:"

@@ -2,9 +2,9 @@
 //###########################################################################
 //# PROJECT: Waters
 //# PACKAGE: net.sourceforge.waters.model.expr
-//# CLASS:   ExpressionTest
+//# CLASS:   AbstractExpressionTest
 //###########################################################################
-//# $Id: ExpressionTest.java,v 1.8 2006-11-03 15:01:58 torda Exp $
+//# $Id: AbstractExpressionTest.java,v 1.1 2007-11-19 02:16:52 robi Exp $
 //###########################################################################
 
 
@@ -18,11 +18,27 @@ import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
 import net.sourceforge.waters.model.module.ModuleProxyFactory;
 import net.sourceforge.waters.model.module.SimpleExpressionProxy;
 import net.sourceforge.waters.model.module.SimpleIdentifierProxy;
-import net.sourceforge.waters.plain.module.ModuleElementFactory;
 
 
-public class ExpressionTest extends TestCase
+public abstract class AbstractExpressionTest extends TestCase
 {
+
+  //#########################################################################
+  //# Constructors
+  public AbstractExpressionTest()
+  {
+  }
+
+  public AbstractExpressionTest(final String name)
+  {
+    super(name);
+  }
+
+
+  //#########################################################################
+  //# Provided by Subclasses
+  protected abstract ModuleProxyFactory getFactory();
+
 
   //#########################################################################
   //# Successful Parse Tests
@@ -68,7 +84,13 @@ public class ExpressionTest extends TestCase
     testExpression("1---100", mExpr_1minusmm100, Operator.TYPE_INT);
   }
 
-  public void testExpression_1plus1()
+  public void testExpression_1plus1_nospace()
+    throws ParseException
+  {
+    testExpression("1+1", mExpr_1plus1, Operator.TYPE_INT);
+  }
+
+  public void testExpression_1plus1_space()
     throws ParseException
   {
     testExpression("1 + 1", mExpr_1plus1, Operator.TYPE_INT);
@@ -188,7 +210,13 @@ public class ExpressionTest extends TestCase
     testExpression("-a", mExpr_m_a, Operator.TYPE_INT);
   }
 
-  public void testExpression_a_b_c()
+  public void testExpression_a_b_c_nospace()
+    throws ParseException
+  {
+    testExpression("{a,b,c}", mExpr_a_b_c, Operator.TYPE_RANGE);
+  }
+
+  public void testExpression_a_b_c_space()
     throws ParseException
   {
     testExpression("{a, b, c}", mExpr_a_b_c, Operator.TYPE_RANGE);
@@ -246,7 +274,7 @@ public class ExpressionTest extends TestCase
 
 
   //#########################################################################
-  //# Utilities
+  //# Auxiliary Methods
   private void testExpression(final String text,
                               final SimpleExpressionProxy expr,
                               final int mask)
@@ -296,83 +324,85 @@ public class ExpressionTest extends TestCase
   //# Overrides for junit.framework.TestCase
   protected void setUp()
   {
-    mFactory = ModuleElementFactory.getInstance();
-    mOperatorTable = CompilerOperatorTable.getInstance();
-    mParser = new ExpressionParser(mFactory, mOperatorTable);
+    final ModuleProxyFactory factory = getFactory();
+    final OperatorTable optable = CompilerOperatorTable.getInstance();
+    mParser = new ExpressionParser(factory, optable);
 
-    final BinaryOperator plus = mOperatorTable.getBinaryOperator("+");
-    final BinaryOperator minus = mOperatorTable.getBinaryOperator("-");
-    final BinaryOperator equals = mOperatorTable.getBinaryOperator("==");
-    final BinaryOperator range = mOperatorTable.getBinaryOperator("..");
-    final UnaryOperator uminus = mOperatorTable.getUnaryOperator("-");
+    final BinaryOperator plus = optable.getBinaryOperator("+");
+    final BinaryOperator minus = optable.getBinaryOperator("-");
+    final BinaryOperator equals = optable.getBinaryOperator("==");
+    final BinaryOperator range = optable.getBinaryOperator("..");
+    final UnaryOperator uminus = optable.getUnaryOperator("-");
 
     final List<SimpleIdentifierProxy> idlist =
       new LinkedList<SimpleIdentifierProxy>();
     final List<SimpleExpressionProxy> exlist =
       new LinkedList<SimpleExpressionProxy>();
-    mExpr_1 = mFactory.createIntConstantProxy(1);
-    mExpr_2 = mFactory.createIntConstantProxy(2);
-    mExpr_m2 = mFactory.createIntConstantProxy(-2);
-    mExpr_m100 = mFactory.createIntConstantProxy(-100);
-    mExpr_mm100 = mFactory.createUnaryExpressionProxy(uminus, mExpr_m100);
-    mExpr_a = mFactory.createSimpleIdentifierProxy("a");
-    mExpr_b = mFactory.createSimpleIdentifierProxy("b");
-    mExpr_c = mFactory.createSimpleIdentifierProxy("c");
-    mExpr_1eqm100 = mFactory.createBinaryExpressionProxy
-      (equals, mExpr_1, mExpr_m100);
-    mExpr_1minusm100 =
-      mFactory.createBinaryExpressionProxy(minus, mExpr_1, mExpr_m100);
-    mExpr_1minusmm100 =
-      mFactory.createBinaryExpressionProxy(minus, mExpr_1, mExpr_mm100);
-    mExpr_1plus1 =
-      mFactory.createBinaryExpressionProxy(plus, mExpr_1, mExpr_1);
-    mExpr_1plus1eq2 =
-      mFactory.createBinaryExpressionProxy(equals, mExpr_1plus1, mExpr_2);
-    mExpr_1plus1plus2 =
-      mFactory.createBinaryExpressionProxy(plus, mExpr_1plus1, mExpr_2);
-    mExpr_1plusm2 =
-      mFactory.createBinaryExpressionProxy(plus, mExpr_1, mExpr_m2);
-    mExpr_1to2 =
-      mFactory.createBinaryExpressionProxy(range, mExpr_1, mExpr_2);
-    mExpr_2eq1plus1 =
-      mFactory.createBinaryExpressionProxy(equals, mExpr_2, mExpr_1plus1);
-    mExpr_2minus1 =
-      mFactory.createBinaryExpressionProxy(minus, mExpr_2, mExpr_1);
-    mExpr_2minus1minus1 =
-      mFactory.createBinaryExpressionProxy(minus, mExpr_2minus1, mExpr_1);
-    mExpr_2minus1minusa =
-      mFactory.createBinaryExpressionProxy(minus, mExpr_2minus1, mExpr_a);
-    mExpr_2minus1plusa =
-      mFactory.createBinaryExpressionProxy(plus, mExpr_2minus1, mExpr_a);
-    mExpr_2plus1 =
-      mFactory.createBinaryExpressionProxy(plus, mExpr_2, mExpr_1);
-    mExpr_2plus1minusa =
-      mFactory.createBinaryExpressionProxy(minus, mExpr_2plus1, mExpr_a);
-    mExpr_2plus1plus1 =
-      mFactory.createBinaryExpressionProxy(plus, mExpr_2, mExpr_1plus1);
-    mExpr_m100tom2 =
-      mFactory.createBinaryExpressionProxy(range, mExpr_m100, mExpr_m2);
-    mExpr_m_a = mFactory.createUnaryExpressionProxy(uminus, mExpr_a);
-    mExpr_aminus1 =
-      mFactory.createBinaryExpressionProxy(minus, mExpr_a, mExpr_1);
-    idlist.add(mExpr_a);
-    idlist.add(mExpr_b);
-    idlist.add(mExpr_c);
-    mExpr_a_b_c = mFactory.createEnumSetExpressionProxy(idlist);
-    exlist.add(mExpr_1);
-    mExpr_event_1 = mFactory.createIndexedIdentifierProxy("event", exlist);
-    exlist.add(mExpr_1plus1);
-    mExpr_event_1_1plus1 =
-      mFactory.createIndexedIdentifierProxy("event", exlist);
+
+    mExpr_1 = factory.createIntConstantProxy(1);
+    mExpr_2 = factory.createIntConstantProxy(2);
+    mExpr_m2 = factory.createIntConstantProxy(-2);
+    mExpr_m100 = factory.createIntConstantProxy(-100);
+    mExpr_mm100 = factory.createUnaryExpressionProxy(uminus, mExpr_m100);
+    mExpr_a = factory.createSimpleIdentifierProxy("a");
+    mExpr_b = factory.createSimpleIdentifierProxy("b");
+    mExpr_c = factory.createSimpleIdentifierProxy("c");
+
+    mExpr_1eqm100 = factory.createBinaryExpressionProxy
+      (equals, mExpr_1.clone(), mExpr_m100.clone());
+    mExpr_1minusm100 = factory.createBinaryExpressionProxy
+      (minus, mExpr_1.clone(), mExpr_m100.clone());
+    mExpr_1minusmm100 = factory.createBinaryExpressionProxy
+      (minus, mExpr_1.clone(), mExpr_mm100.clone());
+    mExpr_1plus1 = factory.createBinaryExpressionProxy
+      (plus, mExpr_1.clone(), mExpr_1.clone());
+    mExpr_1plus1eq2 = factory.createBinaryExpressionProxy
+      (equals, mExpr_1plus1.clone(), mExpr_2.clone());
+    mExpr_1plus1plus2 = factory.createBinaryExpressionProxy
+      (plus, mExpr_1plus1.clone(), mExpr_2.clone());
+    mExpr_1plusm2 = factory.createBinaryExpressionProxy
+      (plus, mExpr_1.clone(), mExpr_m2.clone());
+    mExpr_1to2 = factory.createBinaryExpressionProxy
+      (range, mExpr_1.clone(), mExpr_2.clone());
+    mExpr_2eq1plus1 = factory.createBinaryExpressionProxy
+      (equals, mExpr_2.clone(), mExpr_1plus1.clone());
+    mExpr_2minus1 = factory.createBinaryExpressionProxy
+      (minus, mExpr_2.clone(), mExpr_1.clone());
+    mExpr_2minus1minus1 = factory.createBinaryExpressionProxy
+      (minus, mExpr_2minus1.clone(), mExpr_1.clone());
+    mExpr_2minus1minusa = factory.createBinaryExpressionProxy
+      (minus, mExpr_2minus1.clone(), mExpr_a.clone());
+    mExpr_2minus1plusa = factory.createBinaryExpressionProxy
+      (plus, mExpr_2minus1.clone(), mExpr_a.clone());
+    mExpr_2plus1 = factory.createBinaryExpressionProxy
+      (plus, mExpr_2.clone(), mExpr_1.clone());
+    mExpr_2plus1minusa = factory.createBinaryExpressionProxy
+      (minus, mExpr_2plus1.clone(), mExpr_a.clone());
+    mExpr_2plus1plus1 = factory.createBinaryExpressionProxy
+      (plus, mExpr_2.clone(), mExpr_1plus1.clone());
+    mExpr_m100tom2 = factory.createBinaryExpressionProxy
+      (range, mExpr_m100.clone(), mExpr_m2.clone());
+    mExpr_m_a = factory.createUnaryExpressionProxy(uminus, mExpr_a.clone());
+    mExpr_aminus1 = factory.createBinaryExpressionProxy
+      (minus, mExpr_a.clone(), mExpr_1.clone());
+    idlist.add(mExpr_a.clone());
+    idlist.add(mExpr_b.clone());
+    idlist.add(mExpr_c.clone());
+    mExpr_a_b_c = factory.createEnumSetExpressionProxy(idlist);
+    exlist.add(mExpr_1.clone());
+    mExpr_event_1 = factory.createIndexedIdentifierProxy("event", exlist);
     exlist.clear();
-    exlist.add(mExpr_m2);
-    mExpr_event_m2 = mFactory.createIndexedIdentifierProxy("event", exlist);
+    exlist.add(mExpr_1.clone());
+    exlist.add(mExpr_1plus1.clone());
+    mExpr_event_1_1plus1 =
+      factory.createIndexedIdentifierProxy("event", exlist);
+    exlist.clear();
+    exlist.add(mExpr_m2.clone());
+    mExpr_event_m2 = factory.createIndexedIdentifierProxy("event", exlist);
   }
 
   protected void tearDown()
   {
-    mFactory = null;
-    mOperatorTable = null;
     mParser = null;
     mExpr_1 = null;
     mExpr_2 = null;
@@ -410,8 +440,6 @@ public class ExpressionTest extends TestCase
 
   //#########################################################################
   //# Data Members
-  private ModuleProxyFactory mFactory;
-  private OperatorTable mOperatorTable;
   private ExpressionParser mParser;
 
   private SimpleExpressionProxy mExpr_1;

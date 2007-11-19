@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.module
 //# CLASS:   SimpleExpressionProxy
 //###########################################################################
-//# $Id: SimpleExpressionProxy.java,v 1.3 2006-09-06 11:52:21 robi Exp $
+//# $Id: SimpleExpressionProxy.java,v 1.4 2007-11-19 02:16:52 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.module;
@@ -24,6 +24,8 @@ package net.sourceforge.waters.model.module;
 public interface SimpleExpressionProxy
   extends ExpressionProxy
 {
+
+  public SimpleExpressionProxy clone();
 
   /**
    * Gets the original text of this expression.

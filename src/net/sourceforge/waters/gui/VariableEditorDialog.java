@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   VariableEditorDialog
 //###########################################################################
-//# $Id: VariableEditorDialog.java,v 1.1 2007-08-11 10:44:03 robi Exp $
+//# $Id: VariableEditorDialog.java,v 1.2 2007-11-19 02:16:53 robi Exp $
 //###########################################################################
 
 
@@ -111,10 +111,7 @@ public class VariableEditorDialog
   //#########################################################################
   //# Initialisation and Layout of Components
   /**
-   * Initialise buttons and components that have not yet been initialised.
-   * If {@link #mDisplayingMoreOptions} is <CODE>true</CODE> all components
-   * of the full dialog are initialised, otherwise only those needed by the
-   * reduced version.
+   * Initialise buttons and components.
    */
   private void createComponents()
   {
@@ -140,10 +137,12 @@ public class VariableEditorDialog
     mNameInput = new SimpleExpressionCell(Operator.TYPE_NAME, parser);
     mNameInput.addActionListener(commithandler);
     mNameInput.addKeyListener(keyhandler);
+    mNameInput.setToolTipText("Enter variable name, e.g., x or v[i]");
     mTypeLabel = new JLabel("Type:");
     mTypeInput = new SimpleExpressionCell(Operator.TYPE_RANGE, parser);
     mTypeInput.addActionListener(commithandler);
     mTypeInput.addKeyListener(keyhandler);
+    mTypeInput.setToolTipText("Enter type expression, e.g., 0..8 or {on,off}");
     mDeterministicLabel = new JLabel("Deterministic:");
     mDeterministicButton = new JCheckBox();
     mDeterministicButton.setRequestFocusEnabled(false);
@@ -151,12 +150,15 @@ public class VariableEditorDialog
     mInitialInput = new SimpleExpressionCell(Operator.TYPE_ARITHMETIC, parser);
     mInitialInput.addActionListener(commithandler);
     mInitialInput.addKeyListener(keyhandler);
+    mInitialInput.setToolTipText("Enter initial state predicate, e.g., x==0");
 
     // Error panel ...
     mErrorPanel = new RaisedDialogPanel();
     mErrorLabel = new ErrorLabel();
     mErrorPanel.add(mErrorLabel);
     mNameInput.setErrorDisplay(mErrorLabel);
+    mTypeInput.setErrorDisplay(mErrorLabel);
+    mInitialInput.setErrorDisplay(mErrorLabel);
 
     // Markings panel ...
     mMarkingsPanel = new RaisedDialogPanel();
@@ -346,9 +348,17 @@ public class VariableEditorDialog
     constraints.gridx = 0;
     constraints.gridy = 0;
     constraints.gridwidth = 1;
-    constraints.gridheight = 4;
-    constraints.weightx = 1.0;
     constraints.weighty = 1.0;
+    // Label
+    final JLabel label = new JLabel("Markings:");
+    constraints.weightx = 0.0;
+    constraints.gridheight = 4;
+    constraints.anchor = GridBagConstraints.NORTHWEST;
+    markingslayout.setConstraints(label, constraints);
+    mMarkingsPanel.add(label);
+    // List
+    constraints.gridx++;
+    constraints.weightx = 1.0;
     constraints.fill = GridBagConstraints.BOTH;
     final JScrollPane scrolled = new JScrollPane(mMarkingsTable);
     final Border border = BorderFactory.createLoweredBevelBorder();

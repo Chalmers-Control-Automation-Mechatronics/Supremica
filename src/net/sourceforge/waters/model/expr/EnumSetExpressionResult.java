@@ -4,11 +4,12 @@
 //# PACKAGE: net.sourceforge.waters.model.expr
 //# CLASS:   EnumSetExpressionResult
 //###########################################################################
-//# $Id: EnumSetExpressionResult.java,v 1.1 2006-09-06 11:52:21 robi Exp $
+//# $Id: EnumSetExpressionResult.java,v 1.2 2007-11-19 02:16:52 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.expr;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import net.sourceforge.waters.model.module.EnumSetExpressionProxy;
@@ -44,7 +45,13 @@ class EnumSetExpressionResult extends ParseResult {
   EnumSetExpressionProxy createProxy(final ModuleProxyFactory factory,
                                      final String text)
   {
-    return factory.createEnumSetExpressionProxy(text, mItems);
+    final int size = mItems.size();
+    final List<SimpleIdentifierProxy> clones =
+      new ArrayList<SimpleIdentifierProxy>(size);
+    for (final SimpleIdentifierProxy item : mItems) {
+      clones.add(item.clone());
+    }
+    return factory.createEnumSetExpressionProxy(text, clones);
   }
 
 
