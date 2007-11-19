@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.expr
 //# CLASS:   ExpressionParser
 //###########################################################################
-//# $Id: ExpressionParser.java,v 1.10 2007-11-19 02:16:52 robi Exp $
+//# $Id: ExpressionParser.java,v 1.11 2007-11-19 03:05:23 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.expr;
@@ -375,7 +375,7 @@ public class ExpressionParser {
     final Token token = mScanner.peek();
     switch (token.getType()) {
     case Token.END:
-      throw createParseException("Unexpected end of input!", token);
+      throw createUnexpectedTokenException(token);
     case Token.OPENBR:
       mScanner.next();
       final ParseResult lhs = parseResult(Token.CLOSEBR, token);
@@ -539,8 +539,12 @@ public class ExpressionParser {
 
   private ParseException createUnexpectedTokenException(final Token token)
   {
-    return createParseException
-      ("Unexpected token '" + token.getText() + "'!", token);
+    if (token.getType() == Token.END) {
+      return createParseException("Unexpected end of input!", token);
+    } else {
+      return createParseException
+        ("Unexpected token '" + token.getText() + "'!", token);
+    }
   }
 
   private ParseException createParseException(final String msg,

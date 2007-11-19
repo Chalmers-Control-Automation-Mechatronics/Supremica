@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.expr
 //# CLASS:   AbstractExpressionTest
 //###########################################################################
-//# $Id: AbstractExpressionTest.java,v 1.1 2007-11-19 02:16:52 robi Exp $
+//# $Id: AbstractExpressionTest.java,v 1.2 2007-11-19 03:05:23 robi Exp $
 //###########################################################################
 
 
@@ -263,6 +263,18 @@ public abstract class AbstractExpressionTest extends TestCase
     testExpression("event[1] + event[2]", "event[1]");
   }
 
+  public void testError_a_b()
+  {
+    final String text = "{a, b";
+    testExpression(text, text.length());
+  }
+
+  public void testError_a_b_comma()
+  {
+    final String text = "{a, b,";
+    testExpression(text, text.length());
+  }
+
   public void testError_eq_s_multi()
   {
     testExpression("=s", "=");
@@ -311,11 +323,22 @@ public abstract class AbstractExpressionTest extends TestCase
       final int pos = exception.getErrorOffset();
       final int len = culprit.length();
       final String substring = text.substring(pos, pos + len);
-      System.out.println(msg);
       assertEquals("Indicated error position " + pos +
                    " in parsed string '" + text +
                    "' does not contain expected culprit '" + culprit + "'!",
                    culprit, substring);
+    }
+  }
+
+  private void testExpression(final String text, final int errpos)
+  {
+    try {
+      mParser.parse(text);
+      fail("Expected ParseException not caught!");
+    } catch (final ParseException exception) {
+      final int pos = exception.getErrorOffset();
+      assertEquals("Error in parsed string '" + text +
+                   "' reported at wrong position!", pos, errpos);
     }
   }
 
