@@ -32,4 +32,6 @@ public interface Scheduler
 
 	/** Returns all debug messages that have been generated during a run. */
 	public Object[] getDebugMessages();
+        
+        public void addToMessages(String additionStr, int messageType);
 }

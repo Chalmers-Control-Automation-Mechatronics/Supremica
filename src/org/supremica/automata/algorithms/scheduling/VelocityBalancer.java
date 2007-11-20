@@ -72,10 +72,19 @@ public class VelocityBalancer
      
     /** The logger */
     private Logger logger = LoggerFactory.createLogger(this.getClass());
+    
+    Scheduler callingScheduler = null;
               
     public VelocityBalancer(Automata theAutomata)
         throws Exception
-    {                     
+    {                   
+        this(theAutomata, null);
+    }
+    public VelocityBalancer(Automata theAutomata, Scheduler callingScheduler)
+        throws Exception
+    {
+        this.callingScheduler = callingScheduler;
+        
         // Initializes pointers to automata, time variables, indexMap, etc
         init(theAutomata);
         
@@ -104,7 +113,7 @@ public class VelocityBalancer
             }
             tempStr += "\n";
         }
-        logger.info(tempStr);
+        addToMessages(tempStr, SchedulingConstants.MESSAGE_TYPE_INFO);
         tempStr = "(path points): ";
         for (double[] teff : pathPoints)
         {
@@ -115,7 +124,7 @@ public class VelocityBalancer
             }
             tempStr = tempStr.trim() + "] ";           
         }
-        logger.warn(tempStr + "\n");
+        addToMessages(tempStr, SchedulingConstants.MESSAGE_TYPE_INFO);
         tempStr = "(mutex limits): \n";
         for (int i = 0; i < mutexLimitsNew.length; i++)
         {
@@ -133,7 +142,7 @@ public class VelocityBalancer
                 }
             }
         }   
-        logger.error(tempStr + "\n");
+        addToMessages(tempStr, SchedulingConstants.MESSAGE_TYPE_ERROR); 
         
         
         // Creates a test problem. This is a temporary construction
@@ -162,7 +171,7 @@ public class VelocityBalancer
                 if (areVisible(pathPoints.get(i), pathPoints.get(j)))
                 {
                         str += "see eachother!!!!!!";
-                        logger.warn(str);
+                        addToMessages(str, SchedulingConstants.MESSAGE_TYPE_WARN);
                 }
             }
         }
@@ -170,8 +179,8 @@ public class VelocityBalancer
         // Finds the key points, i.e. points allowing to decrease the number of robot stops 
         findKeyPoints();
 
-        logger.warn("");
-        logger.warn("Initial key points:");
+        addToMessages("", SchedulingConstants.MESSAGE_TYPE_WARN);
+        addToMessages("Initial key points:", SchedulingConstants.MESSAGE_TYPE_WARN);
         String str = "";
         for (int i=0; i<keyPoints.size(); i++)
         {
@@ -182,57 +191,51 @@ public class VelocityBalancer
             str += "---> ";
         }
         str += "KLART!!!";
-        logger.warn(str);
-
-        // Loops through the key points and smooth out the robot velocities even more when possible
-        double[][] relativeVelocities = improveKeyPointsUsingVisibilitySmoothing();
-        int stateCounter = 0;
-        State[] currStates = new State[optimalSubPlants.size()];
-        for (int i=0; i<optimalSubPlants.size(); i++)
-        {
-            currStates[i] = optimalSubPlants.getAutomatonAt(i).getInitialState();
-        }
-        for (int i = 1; i < keyPointIndices.size(); i++)
-        {
-            while (stateCounter++ < keyPointIndices.get(i))
-            {
-                for (int j = 0; j < optimalSubPlants.size(); j++)
-                {
-                    if (currStates[j].isAccepting())
-                    {
-                        currStates[j].setName(currStates[j].getName() + "; velocity=0");
-                    }
-                    else
-                    {
-                        currStates[j].setName(currStates[j].getName() + "; velocity=" + relativeVelocities[i][j]);
-                    }
-                }
-            }
-        }
+        addToMessages(str, SchedulingConstants.MESSAGE_TYPE_WARN);
         
-        //temp
-        for (Automaton auto : optimalSubPlants)
-        {
-            for (State state : auto)
-            {
-                logger.info("State = " + state.getName());
-            }
-        }
+        // Loops through the key points and smooth out the robot velocities even more when possible
+//        double[][] relativeVelocities = improveKeyPointsUsingVisibilitySmoothing();
+//        int stateCounter = 0;
+//        State[] currStates = new State[optimalSubPlants.size()];
+//        for (int i=0; i<optimalSubPlants.size(); i++)
+//        {
+//            currStates[i] = optimalSubPlants.getAutomatonAt(i).getInitialState();
+//        }
+//        for (int i = 1; i < keyPointIndices.size(); i++)
+//        {
+//            while (stateCounter++ < keyPointIndices.get(i))
+//            {
+//                for (int j = 0; j < optimalSubPlants.size(); j++)
+//                {
+//                    if (!currStates[j].isAccepting() || stateCounter <= 1)
+//                    {
+//                        currStates[j].setName(currStates[j].getName() + "; velocity=" + relativeVelocities[i][j]);
+//                        currStates[j] = currStates[j].outgoingArcsIterator().next().getToState();
+//                    }
+//                }
+//            }
+//        }
+        
+        // Prepare optimalSubPlants for the addition of the velocity profiles.
+        // This is done by looping through keyPoints and recording which states
+        // have the same velocities.
+        double[][] relativeVelocities = improveKeyPointsUsingVisibilitySmoothing();
+        setRelativeVelocitiesInPlants(relativeVelocities);
 
         // Gathers some statistics about the velocity changes (smooth schedule)
-        logger.warn("");
-        logger.warn("SMOOTH SCHEDULE......");
+        addToMessages("", SchedulingConstants.MESSAGE_TYPE_WARN);
+        addToMessages("SMOOTH SCHEDULE......", SchedulingConstants.MESSAGE_TYPE_WARN);
         calcVelocityStatisticsForVisibilitySmoothing(keyPoints);
 
-        logger.warn("");
-        logger.warn("UNPROCESSED SCHEDULE.....");
+        addToMessages("", SchedulingConstants.MESSAGE_TYPE_WARN);
+        addToMessages("UNPROCESSED SCHEDULE.....", SchedulingConstants.MESSAGE_TYPE_WARN);
         calcVelocityStatisticsForUnprocessedSchedule();
 
-        logger.warn("");
-        logger.warn("EVENT SMOOTHING:");
+        addToMessages("", SchedulingConstants.MESSAGE_TYPE_WARN);
+        addToMessages("EVENT SMOOTHING:", SchedulingConstants.MESSAGE_TYPE_WARN);
         calcVelocityStatisticsForEventSmoothing();
 
-        logger.warn("Smoooth gliding.......");	
+        addToMessages("Smoooth gliding.......", SchedulingConstants.MESSAGE_TYPE_WARN);	
     }
     
     private void init(Automata theAutomata)
@@ -711,7 +714,7 @@ public class VelocityBalancer
      */
     private void tryNewKeyPoint(double[] newKeyPoint, double[] pointBefore, double[] pointAfter)
     {
-        logger.warn("");
+        addToMessages("", SchedulingConstants.MESSAGE_TYPE_WARN);
 
         // Looking backward
         String str = "";
@@ -729,7 +732,7 @@ public class VelocityBalancer
         if (areVisible(pointBefore, newKeyPoint))
         {
             str += "see eachother!!!!!!";
-            logger.warn(str);
+            addToMessages(str, SchedulingConstants.MESSAGE_TYPE_WARN);
         }
 
         // Looking forward
@@ -749,7 +752,7 @@ public class VelocityBalancer
         if (areVisible(newKeyPoint, pointAfter))
         {
             str += "see eachother!!!!!!";
-            logger.warn(str);
+            addToMessages(str, SchedulingConstants.MESSAGE_TYPE_WARN);
         }
         // ...done (testing to add a better key point)
     }
@@ -779,7 +782,7 @@ public class VelocityBalancer
                 str += roundOff(relativeVelocities[i][j+1], 2) + " ";
             }
 
-            logger.warn(str);
+            addToMessages(str, SchedulingConstants.MESSAGE_TYPE_WARN);
         }
 
         // COPY-PASTE
@@ -789,8 +792,8 @@ public class VelocityBalancer
         double[] totalVelocityChange = new double[relativeVelocities.length];
         double[] meanVelocityChange = new double[relativeVelocities.length];
 
-        logger.warn("");
-        logger.warn("Smooth-per-event-velocity statistics: ");
+        addToMessages("", SchedulingConstants.MESSAGE_TYPE_WARN);
+        addToMessages("Smooth-per-event-velocity statistics: ", SchedulingConstants.MESSAGE_TYPE_WARN);
         for (int i=0; i<relativeVelocities.length; i++)
         {
             for (int j=0; j<relativeVelocities[i].length; j++)
@@ -835,9 +838,13 @@ public class VelocityBalancer
             totalVelocityChange[i] = roundOff(totalVelocityChange[i], 2); 			
             meanVelocityChange[i] = roundOff(meanVelocityChange[i], 2);
 
-            logger.warn("Rob_" + i + "... total change: " + totalVelocityChange[i] + "; nr of changes: " + nrOfVelocityChanges[i] + "; mean change: " + meanVelocityChange[i] + "; nr of stops: " + nrOfMinVelocityPassages[i] + "; nr of full-speed-runs: " + nrOfMaxVelocityPassages[i]);
+            addToMessages("Rob_" + i + "... total change: " + totalVelocityChange[i] + 
+                    "; nr of changes: " + nrOfVelocityChanges[i] + "; mean change: " + 
+                    meanVelocityChange[i] + "; nr of stops: " + nrOfMinVelocityPassages[i] + 
+                    "; nr of full-speed-runs: " + nrOfMaxVelocityPassages[i], 
+                    SchedulingConstants.MESSAGE_TYPE_WARN);
         }
-        logger.warn("");
+        addToMessages("", SchedulingConstants.MESSAGE_TYPE_WARN);
         // COPY-PASTE-DONE
     }
 
@@ -854,8 +861,8 @@ public class VelocityBalancer
         double[] totalVelocityChange = new double[pathPoints.get(0).length];
         double[] meanVelocityChange = new double[pathPoints.get(0).length];
 
-        logger.warn("");
-        logger.warn("Unprocessed schedule statistics:");
+        addToMessages("", SchedulingConstants.MESSAGE_TYPE_WARN);
+        addToMessages("Unprocessed schedule statistics:", SchedulingConstants.MESSAGE_TYPE_WARN);
         for (int j=0; j<pathPoints.get(0).length; j++)
         {
             boolean lastVelocityWasZero = true;
@@ -906,7 +913,11 @@ public class VelocityBalancer
 
             meanVelocityChange[j] = totalVelocityChange[j] / nrOfVelocityChanges[j];
 
-            logger.warn("Rob_" + j + "... total change: " + totalVelocityChange[j] + "; nr of changes: " + nrOfVelocityChanges[j] + "; mean change: " + meanVelocityChange[j] + "; nr of stops: " + nrOfMinVelocityPassages[j] + "; nr of full-speed-runs: " + nrOfMaxVelocityPassages[j]);
+            addToMessages("Rob_" + j + "... total change: " + totalVelocityChange[j] + 
+                    "; nr of changes: " + nrOfVelocityChanges[j] + "; mean change: " + 
+                    meanVelocityChange[j] + "; nr of stops: " + nrOfMinVelocityPassages[j] + 
+                    "; nr of full-speed-runs: " + nrOfMaxVelocityPassages[j], 
+                    SchedulingConstants.MESSAGE_TYPE_WARN);
         }
     }
 
@@ -926,8 +937,8 @@ public class VelocityBalancer
         double[] totalVelocityChange = new double[points.get(0).length];
         double[] meanVelocityChange = new double[points.get(0).length];
 
-        logger.warn("");
-        logger.warn("Velocity statistics: ");
+        addToMessages("", SchedulingConstants.MESSAGE_TYPE_WARN);
+        addToMessages("Velocity statistics: ", SchedulingConstants.MESSAGE_TYPE_WARN);
         for (int j=0; j<relativeVelocities[0].length; j++)
         {
             for (int i=0; i<relativeVelocities.length; i++)
@@ -969,9 +980,13 @@ public class VelocityBalancer
             totalVelocityChange[j] = roundOff(totalVelocityChange[j], 2); 			
             meanVelocityChange[j] = roundOff(meanVelocityChange[j], 2);
 
-            logger.warn("Rob_" + j + "... total change: " + totalVelocityChange[j] + "; nr of changes: " + nrOfVelocityChanges[j] + "; mean change: " + meanVelocityChange[j] + "; nr of stops: " + nrOfMinVelocityPassages[j] + "; nr of full-speed-runs: " + nrOfMaxVelocityPassages[j]);
+            addToMessages("Rob_" + j + "... total change: " + totalVelocityChange[j] + 
+                    "; nr of changes: " + nrOfVelocityChanges[j] + "; mean change: " + 
+                    meanVelocityChange[j] + "; nr of stops: " + nrOfMinVelocityPassages[j] + 
+                    "; nr of full-speed-runs: " + nrOfMaxVelocityPassages[j], 
+                    SchedulingConstants.MESSAGE_TYPE_WARN);
         }
-        logger.warn("");
+        addToMessages("", SchedulingConstants.MESSAGE_TYPE_WARN);
     }
 
     /**
@@ -1048,8 +1063,8 @@ public class VelocityBalancer
         // for every key point. The robot with the largest velocity change is adjusted,
         // such that the velocity to the current and to the next point is set equal. 
         // The key points are then adjusted consequently.
-        logger.warn("");
-        logger.warn("diff velocities:  ");
+        addToMessages("", SchedulingConstants.MESSAGE_TYPE_WARN);
+        addToMessages("diff velocities:  ", SchedulingConstants.MESSAGE_TYPE_WARN);
         for (int i=1; i<keyPoints.size()-1; i++)
         {
             // The index of the robot that currently changes its velocity most.
@@ -1129,8 +1144,8 @@ public class VelocityBalancer
         }
 
         //TEMP
-        logger.warn("");
-        logger.warn("Relative velocities (after):");
+        addToMessages("", SchedulingConstants.MESSAGE_TYPE_WARN);
+        addToMessages("Relative velocities (after):", SchedulingConstants.MESSAGE_TYPE_WARN);
         for (int i=0; i<keyPoints.size(); i++)
         {
             String str = "";
@@ -1138,12 +1153,12 @@ public class VelocityBalancer
             {
                 str += roundOff(relativeVelocities[i][j], 2) + " ";
             }
-            logger.warn(str);
+            addToMessages(str, SchedulingConstants.MESSAGE_TYPE_WARN);
         }
-        logger.warn("");
+        addToMessages("", SchedulingConstants.MESSAGE_TYPE_WARN);
 
-        logger.warn("");
-        logger.warn("Key points (after): ");
+        addToMessages("", SchedulingConstants.MESSAGE_TYPE_WARN);
+        addToMessages("Key points (after): ", SchedulingConstants.MESSAGE_TYPE_WARN);
         for (int i=0; i<keyPoints.size(); i++)
         {
             String str = "";
@@ -1151,9 +1166,9 @@ public class VelocityBalancer
             {
                 str += roundOff(keyPoints.get(i)[j], 2) + " ";
             }
-            logger.warn(str);
+            addToMessages(str, SchedulingConstants.MESSAGE_TYPE_WARN);
         }
-        logger.warn("");
+        addToMessages("", SchedulingConstants.MESSAGE_TYPE_WARN);
         
         return relativeVelocities;
     }
@@ -1622,6 +1637,44 @@ public class VelocityBalancer
 //        deadlockLimits[0].add(new double[]{2, 4});
 //        deadlockLimits[0].add(new double[]{2, 5});
     }
+    
+    /**
+     * Loops through the plant parts that are used in the optimal schedule and
+     * sets relative velocities in each state, as given by supplied relativeVelocities.
+     * Currently the velocities are added to the name of the state as 
+     * state.name += "; velocity=x", where x is the relative velocity w.r.t. max velocity.
+     */
+    private void setRelativeVelocitiesInPlants(double[][] relativeVelocities)
+    {
+        for (int plantIndex = 0; plantIndex < optimalSubPlants.size(); plantIndex++)
+        {
+            State currState = optimalSubPlants.getAutomatonAt(plantIndex).getInitialState();
+            double accCost = 0;
+            int relVelIndex = 0;
+            innerForLoop: for (double[] keyPoint : keyPoints)
+            {
+                // If we have looped through the optimalSubPlant and arrived at the initial state 
+                // for the second time, then stop and continue with the next plant.
+                if (currState.isInitial() && accCost > 0)
+                {
+                    break innerForLoop;
+                }
+                
+                // Add "_velocity=counter" to the names of states that should be passed
+                // before some keyPoint is reached. Counter will later be replaced by 
+                // relativeVelocities. This is done now, since the values of keyPoints 
+                // will change, while we want the event velocities to be set in right places. 
+                while (accCost < keyPoint[plantIndex])
+                {
+                    currState.setName(currState.getName() + "; velocity=" + relativeVelocities[relVelIndex][plantIndex]);
+                    accCost += currState.getCost();
+                    currState = currState.outgoingArcsIterator().next().getToState();
+                }
+                
+                relVelIndex++;
+            }
+        }
+    }
 
     /**
      * A method for rounding off floating numbers.
@@ -1629,5 +1682,30 @@ public class VelocityBalancer
     private double roundOff(double number, double nrOfDecimals)
     {
         return Math.round(number * Math.pow(10, nrOfDecimals)) / (Math.pow(10, nrOfDecimals) + 0.0);
+    }
+    
+    private void addToMessages(String str, int msgType)
+    {
+        if (callingScheduler != null)
+        {
+            callingScheduler.addToMessages(str + "\n", msgType);
+        }
+        else
+        {
+            switch(msgType)
+            {
+                case SchedulingConstants.MESSAGE_TYPE_INFO:
+                    logger.info(str);
+                    break;
+                case SchedulingConstants.MESSAGE_TYPE_WARN:
+                    logger.warn(str);
+                    break;
+                case SchedulingConstants.MESSAGE_TYPE_ERROR:
+                    logger.error(str);
+                    break;
+                default:
+                    logger.error("Wrong message type at addToMessages()");
+            }
+        }
     }
 }
