@@ -12,6 +12,7 @@ import org.supremica.util.ActionTimer;
 import org.supremica.automata.algorithms.scheduling.Scheduler;
 import org.supremica.automata.algorithms.scheduling.SchedulingHelper;
 import org.supremica.automata.algorithms.scheduling.SynchronizationStepper;
+import org.supremica.automata.algorithms.scheduling.VelocityBalancer;
 import org.supremica.util.BDD.IntArray;
 
 //TODO (always): Structure the code. Comment better.
@@ -212,6 +213,8 @@ public class Milp
     protected String errorMsgs = "";
     protected ArrayList<StackTraceElement[]> debugMsgs = new ArrayList<StackTraceElement[]>();
     
+    protected boolean balanceVelocities = false;
+    
     /****************************************************************************************/
     /*                                 CONSTUCTORS                                          */
     /****************************************************************************************/
@@ -219,8 +222,15 @@ public class Milp
     public Milp(Automata theAutomata, boolean buildSchedule)
     throws Exception
     {
+        this(theAutomata, buildSchedule, false);
+    }
+    
+    public Milp(Automata theAutomata, boolean buildSchedule, boolean balanceVelocities)
+    throws Exception
+    {
         this.theAutomata = theAutomata;
         this.buildSchedule = buildSchedule;
+        this.balanceVelocities = balanceVelocities;
     }
     
     public void startSearchThread()
@@ -273,8 +283,8 @@ public class Milp
             createBasicConstraints();
             
             //new... test... (should be called when mutex constraints already are created)
-            //TODO: better name...
-            createConsecutiveBookingConstraints();
+            //TODO: better name... better implementation...
+//            createConsecutiveBookingConstraints();
             
             milpSolver.createModelFile();
             
@@ -312,6 +322,13 @@ public class Milp
             infoMsgs += "\tPost-processing time (incl. schedule construction) = " + procTime + "ms\n";
             totalTime += procTime;
             infoMsgs += "\tTotal time = " + totalTime + "ms\n";
+        }
+        
+        if (isRunning && balanceVelocities)
+        {
+            Automata autosToBeBalanced = theAutomata.clone();
+            autosToBeBalanced.addAutomaton(getSchedule());
+            new VelocityBalancer(autosToBeBalanced, this);
         }
         
         if (isRunning)

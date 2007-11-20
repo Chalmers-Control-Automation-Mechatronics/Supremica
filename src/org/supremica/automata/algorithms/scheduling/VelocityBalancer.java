@@ -460,7 +460,10 @@ public class VelocityBalancer
                             simulationTimesArrays[activeAutomatonIndex].size() - 1));
                     State toState = new State("q" + currOptimalSubPlant.nbrOfStates());
                     currOptimalSubPlant.addState(toState);
-                    currOptimalSubPlant.getAlphabet().addEvent(currEvent);
+                    if (!currOptimalSubPlant.getAlphabet().contains(currEvent))
+                    {
+                        currOptimalSubPlant.getAlphabet().addEvent(currEvent);
+                    }
                     currOptimalSubPlant.addArc(new Arc(fromState, toState, currEvent));
                 }
             }
@@ -1707,5 +1710,10 @@ public class VelocityBalancer
                     logger.error("Wrong message type at addToMessages()");
             }
         }
+    }
+    
+    public Automata getOptimalSubPlants()
+    {
+        return optimalSubPlants;
     }
 }
