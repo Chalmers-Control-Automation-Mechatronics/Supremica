@@ -225,7 +225,7 @@ public class DBInterface extends JFrame implements ActionListener, ListSelection
 		add(importButton);
 		
 		// Export button
-		exportButton = new JButton("Export new ...");
+		exportButton = new JButton("Export to DB");
 		exportButton.setPreferredSize(importButton.getPreferredSize());
 		exportButton.addActionListener(this);
 		con = new GridBagConstraints();
@@ -326,7 +326,7 @@ public class DBInterface extends JFrame implements ActionListener, ListSelection
 		printArea.setBorder(BorderFactory.createEtchedBorder());
 		
 		// Set visible
-		setDefaultCloseOperation(EXIT_ON_CLOSE);
+		setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 		setVisible(true);
 	}
 
@@ -339,6 +339,7 @@ public class DBInterface extends JFrame implements ActionListener, ListSelection
 		return printArea;
 	}
 	
+	// Set DB connection
 	public static void setDBConnection(Connect dbCon) {
 		dbConnect = dbCon;
 	}
@@ -364,7 +365,7 @@ public class DBInterface extends JFrame implements ActionListener, ListSelection
 		rListModel.addElement("Hit refresh");
 	}
 	
-	// Initialize values
+	// Init values
 	private void initValues() {
 		if (rList.isSelectionEmpty()) {
 			ROPNameID = "";
@@ -381,7 +382,47 @@ public class DBInterface extends JFrame implements ActionListener, ListSelection
 			projectName = projectField.getText();
 	}
 	
+	// Refresh projects
+	public void refreshProjects() {
+		if (isConnected()) {
+			initValues();
+			Vector<String> projects = new Vector<String>();
+			pListModel.removeAllElements();
+			projects = dbConnect.getAllProjects();
+			for (int i=0; i<projects.size(); i++) {
+				pListModel.addElement(projects.elementAt(i));
+			}
+			projectID = 0;
+		}
+		else
+			notConnected();	
+	}
+	
+	// Set project
 	public void setProject() {
+		if (isConnected()) {
+			initValues();
+			if (projectName.isEmpty()) {
+				printArea.append("\nType or select a project name!");
+			}
+			else {
+				projectID = dbConnect.getProjectID(projectName);
+				printArea.append("\nProject ID: " + projectID);
+				
+				Vector<String> ROPs = new Vector<String>();
+				rListModel.removeAllElements();
+				ROPs = dbConnect.getAllROPs(projectID);
+				for (int i=0; i<ROPs.size(); i++) {
+					rListModel.addElement(ROPs.elementAt(i));
+				}
+			}
+		}
+		else
+			notConnected();	
+	}
+	
+	// Refresh ROPs
+	public void refreshROPs() {
 		if (isConnected()) {
 			initValues();
 			if (projectName.isEmpty()) {
@@ -413,7 +454,7 @@ public class DBInterface extends JFrame implements ActionListener, ListSelection
 		if (e.getSource() == connectItem) {
 			glassPanel = (JPanel) getGlassPane();
 			glassPanel.setLayout(new FlowLayout());
-			connectWindow = new LoginWindow();
+			connectWindow = new LoginWindow(this);
 			connectWindow.setPreferredSize(new Dimension(300,220));
 			glassPanel.add(connectWindow);
 			glassPanel.setVisible(true);
@@ -446,12 +487,16 @@ public class DBInterface extends JFrame implements ActionListener, ListSelection
 		// Use/ Create project button
 		else if (e.getSource() == useProjectButton || e.getSource() == projectField) {
 			setProject();
+			refreshProjects();
+			pList.setSelectedIndex(pListModel.indexOf(pListModel.lastElement()));
 		}
 		
 		// Delete project Button
 		else if (e.getSource() == deletePButton) {
 			if (isConnected()) {
 				initValues();
+				projectID = dbConnect.getProjectID(projectName);
+				System.out.println(projectID);
 				if (projectName.isEmpty() || projectID == 0) {
 					printArea.append("\nChoose a project!");
 				}
@@ -461,6 +506,7 @@ public class DBInterface extends JFrame implements ActionListener, ListSelection
 						dbConnect.deleteProject(projectID);
 						printArea.append("\nProject deleted..");
 						projectID = 0;
+						refreshProjects();
 					}						
 				}
 			}
@@ -470,17 +516,7 @@ public class DBInterface extends JFrame implements ActionListener, ListSelection
 		
 		// Refresh projects Button
 		else if (e.getSource() == refreshPButton) {
-			if (isConnected()) {
-				Vector<String> projects = new Vector<String>();
-				pListModel.removeAllElements();
-				projects = dbConnect.getAllProjects();
-				for (int i=0; i<projects.size(); i++) {
-					pListModel.addElement(projects.elementAt(i));
-				}
-				projectID = 0;
-			}
-			else
-				notConnected();
+			refreshProjects();
 		}
 		
 		// Import selected Button
@@ -507,7 +543,7 @@ public class DBInterface extends JFrame implements ActionListener, ListSelection
 				notConnected();
 		}
 
-		// Export new Button
+		// Export to DB Button
 		else if (e.getSource() == exportButton) {
 			File xmlFile = null;
 			String ROPXML = "";
@@ -517,7 +553,7 @@ public class DBInterface extends JFrame implements ActionListener, ListSelection
 					printArea.append("\nChoose a project!");
 				}
 				else {
-					Object o = new Object();//!!! change
+					Object o = new Object();
 					if(1 == graphContainer.getSelectedCount()){
 						o = graphContainer.getSelectedResourceCell();
 						if(o != null){
@@ -527,6 +563,7 @@ public class DBInterface extends JFrame implements ActionListener, ListSelection
 					
 					try {
 						dbConnect.setROPXML(projectID, o);
+						refreshROPs();
 					}catch (Exception eENF) {
 						printArea.append("\nUnsuccessful function call: " + eENF.getMessage());
 					}
@@ -545,6 +582,7 @@ public class DBInterface extends JFrame implements ActionListener, ListSelection
 					if (okFlag == JOptionPane.YES_OPTION) {
 						dbConnect.deleteROP(projectID, ROPNameID);
 						printArea.append("\nROP deleted..");
+						refreshROPs();
 					}
 				}
 				else {

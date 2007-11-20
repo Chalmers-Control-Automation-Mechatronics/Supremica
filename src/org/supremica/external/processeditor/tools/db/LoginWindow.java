@@ -7,17 +7,20 @@ import javax.swing.*;
 public class LoginWindow extends JInternalFrame implements ActionListener {
 	
 	private static final long serialVersionUID = 1L;
+	
 	private JButton connectButton;
 	private JButton exitButton;
 	private JTextField hostNameField;
 	private JTextField portField;
 	private JTextField userNameField;
 	private JPasswordField passwordField;
+	protected DBInterface dbi;
 	
 	private Connect dbConnect = null;		// Connection setup object
 	
-	public LoginWindow() {
+	public LoginWindow(DBInterface dbi) {
 		super("Connect to host",false,false);
+		this.dbi = dbi;
 		GridBagLayout m = new GridBagLayout();
 		setLayout(m);
 		GridBagConstraints con;
@@ -144,14 +147,11 @@ public class LoginWindow extends JInternalFrame implements ActionListener {
 				userNameStr, passwordStr, "direct");
 			dbConnect.displayDbProperties();
 			DBInterface.setDBConnection(dbConnect);
+			dbi.refreshProjects();
 			this.dispose();
 		}
 		else if (e.getSource() == exitButton){
 			this.dispose();
 		}
 	}
-	
-//	public Connect getDBConnection() {
-//		return this.dbConnect;
-//	}
 }

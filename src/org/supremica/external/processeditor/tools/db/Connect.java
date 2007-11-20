@@ -312,7 +312,7 @@ public class Connect {
 						m.marshal(o, result);
 						String content = stringWriter.toString();
 
-						System.out.println(content);
+						//System.out.println(content);
 			
 						DBInterface.getPrintArea().append("\nExtract complete (System.out.println())");
 					
@@ -387,7 +387,7 @@ public class Connect {
 			else 
 				DBInterface.getPrintArea().append("\nError: No active Connection ");
 		}catch(Exception e) {
-			DBInterface.getPrintArea().append("\nError: " + e.getMessage());
+			DBInterface.getPrintArea().append("\nError: A ROP resource must be selected. " + e.getMessage());
 		}
 	}
 }
