@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   SimpleExpressionCell
 //###########################################################################
-//# $Id: SimpleExpressionCell.java,v 1.9 2006-11-03 15:01:56 torda Exp $
+//# $Id: SimpleExpressionCell.java,v 1.10 2007-11-20 03:37:35 robi Exp $
 //###########################################################################
 
 
@@ -64,7 +64,6 @@ public class SimpleExpressionCell
   public SimpleExpressionCell(final Object value,
                               final FormattedInputParser parser)
   {
-    mAllowNull = (value == null);
     mParser = parser;
     mVerifier = new SimpleExpressionVerifier();
     final JFormattedTextField.AbstractFormatter formatter =
@@ -73,9 +72,16 @@ public class SimpleExpressionCell
       new DefaultFormatterFactory(formatter);
     setFormatterFactory(factory);
     setInputVerifier(mVerifier);
-    if (value != null) {
-      setValue(value);
-    }
+    setValue(value);
+  }
+
+
+  //#########################################################################
+  //# Overrides for Base Class JFormattedTextField
+  public void setValue(final Object value)
+  {
+    super.setValue(value);
+    mAllowNull = (value == null);
   }
 
 
@@ -244,7 +250,7 @@ public class SimpleExpressionCell
       } else if (mAllowNull) {
         return null;
       } else {
-        final String msg = "Empty name!";
+        final String msg = "Empty input!";
         setErrorMessage(msg);
         throw new java.text.ParseException(msg, 0);
       }
@@ -307,9 +313,10 @@ public class SimpleExpressionCell
 
   //#########################################################################
   //# Data Members
-  private final boolean mAllowNull;
   private final FormattedInputParser mParser;
   private final SimpleExpressionVerifier mVerifier;
+
+  private boolean mAllowNull;
   private ErrorDisplay mErrorDisplay;
 
 }

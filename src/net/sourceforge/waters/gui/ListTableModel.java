@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   ListTableModel
 //###########################################################################
-//# $Id: ListTableModel.java,v 1.2 2006-11-03 15:01:56 torda Exp $
+//# $Id: ListTableModel.java,v 1.3 2007-11-20 03:37:35 robi Exp $
 //###########################################################################
 
 
@@ -49,7 +49,7 @@ public class ListTableModel<E>
     return 1;
   }
 
-  public E getValueAt(final int row, final int column)
+  public Object getValueAt(final int row, final int column)
   {
     if (column == 0) {
       return mList.get(row);
@@ -102,6 +102,12 @@ public class ListTableModel<E>
   List<E> getList()
   {
     return mList;
+  }
+
+  void setList(final List<E> list)
+  {
+    mList = list;
+    fireTableChanged(new TableModelEvent(this));
   }
 
 
@@ -211,7 +217,7 @@ public class ListTableModel<E>
 
   //#######################################################################
   //# Data Members
-  private final List<E> mList;
+  private List<E> mList;
   private final Class<E> mClass;
 
 }

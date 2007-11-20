@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.waters.gui
 //# CLASS:   SimpleExpressionEditor
 //###########################################################################
-//# $Id: SimpleExpressionEditor.java,v 1.2 2006-11-03 15:01:56 torda Exp $
+//# $Id: SimpleExpressionEditor.java,v 1.3 2007-11-20 03:37:35 robi Exp $
 //###########################################################################
 
 

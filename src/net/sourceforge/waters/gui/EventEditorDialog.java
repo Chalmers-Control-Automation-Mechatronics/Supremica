@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   EventEditorDialog
 //###########################################################################
-//# $Id: EventEditorDialog.java,v 1.19 2007-11-19 02:16:52 robi Exp $
+//# $Id: EventEditorDialog.java,v 1.20 2007-11-20 03:37:35 robi Exp $
 //###########################################################################
 
 
@@ -96,7 +96,6 @@ public class EventEditorDialog
                            final EventDeclSubject decl)
   {
     super(root.getRootWindow());
-    final EventDeclSubject template;
     if (decl == null) {
       setTitle("Creating new event declation");
     } else {
@@ -774,6 +773,7 @@ public class EventEditorDialog
         }
       }
     }
+    mErrorLabel.clearDisplay();
   }
 
 

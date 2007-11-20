@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   VariableEditorDialog
 //###########################################################################
-//# $Id: VariableEditorDialog.java,v 1.2 2007-11-19 02:16:53 robi Exp $
+//# $Id: VariableEditorDialog.java,v 1.3 2007-11-20 03:37:35 robi Exp $
 //###########################################################################
 
 
@@ -47,6 +47,7 @@ import javax.swing.border.Border;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.TableCellEditor;
+import javax.swing.table.TableColumnModel;
 
 import net.sourceforge.waters.gui.command.Command;
 //import net.sourceforge.waters.gui.command.CreateVariableCommand;
@@ -56,6 +57,7 @@ import net.sourceforge.waters.model.expr.Operator;
 import net.sourceforge.waters.subject.module.IdentifierSubject;
 import net.sourceforge.waters.subject.module.ModuleSubject;
 import net.sourceforge.waters.subject.module.SimpleExpressionSubject;
+import net.sourceforge.waters.subject.module.SimpleIdentifierSubject;
 import net.sourceforge.waters.subject.module.VariableComponentSubject;
 import net.sourceforge.waters.subject.module.VariableMarkingSubject;
 
@@ -77,7 +79,6 @@ public class VariableEditorDialog
                               final VariableComponentSubject var)
   {
     super(root.getRootWindow());
-    final VariableComponentSubject template;
     if (var == null) {
       setTitle("Creating new variable");
     } else {
@@ -87,9 +88,9 @@ public class VariableEditorDialog
     mRoot = root;
     mVariable = var;
     createComponents();
-    initializeComponents();
     layoutComponents();
     setLocationRelativeTo(mRoot.getRootWindow());
+    updateListControlEnabled();
     mNameInput.requestFocusInWindow();
     setVisible(true);
   }
@@ -115,6 +116,8 @@ public class VariableEditorDialog
    */
   private void createComponents()
   {
+    final VariableComponentSubject template =
+      mVariable == null ? TEMPLATE : mVariable;
     final ExpressionParser parser = getExpressionParser();
     final ActionListener commithandler = new ActionListener() {
         public void actionPerformed(final ActionEvent event)
@@ -134,23 +137,27 @@ public class VariableEditorDialog
     // Main panel ...
     mMainPanel = new RaisedDialogPanel();
     mNameLabel = new JLabel("Name:");
-    mNameInput = new SimpleExpressionCell(Operator.TYPE_NAME, parser);
+    mNameInput = new SimpleExpressionCell
+      (template.getIdentifier(), Operator.TYPE_NAME, parser);
     mNameInput.addActionListener(commithandler);
     mNameInput.addKeyListener(keyhandler);
     mNameInput.setToolTipText("Enter variable name, e.g., x or v[i]");
     mTypeLabel = new JLabel("Type:");
-    mTypeInput = new SimpleExpressionCell(Operator.TYPE_RANGE, parser);
+    mTypeInput = new SimpleExpressionCell
+      (template.getType(), Operator.TYPE_RANGE, parser);
     mTypeInput.addActionListener(commithandler);
     mTypeInput.addKeyListener(keyhandler);
     mTypeInput.setToolTipText("Enter type expression, e.g., 0..8 or {on,off}");
     mDeterministicLabel = new JLabel("Deterministic:");
-    mDeterministicButton = new JCheckBox();
+    mDeterministicButton =
+      new JCheckBox((String) null, template.isDeterministic());
     mDeterministicButton.setRequestFocusEnabled(false);
     mInitialLabel = new JLabel("Initial:");
-    mInitialInput = new SimpleExpressionCell(Operator.TYPE_ARITHMETIC, parser);
+    mInitialInput = new SimpleExpressionCell
+      (template.getInitialStatePredicate(), Operator.TYPE_ARITHMETIC, parser);
     mInitialInput.addActionListener(commithandler);
     mInitialInput.addKeyListener(keyhandler);
-    mInitialInput.setToolTipText("Enter initial state predicate, e.g., x==0");
+    mInitialInput.setToolTipText("Enter initial state, e.g., 0 or on");
 
     // Error panel ...
     mErrorPanel = new RaisedDialogPanel();
@@ -162,9 +169,12 @@ public class VariableEditorDialog
 
     // Markings panel ...
     mMarkingsPanel = new RaisedDialogPanel();
-    // mMarkingsModel = new ListTableModel<SimpleExpressionSubject>
-    //   (copy, SimpleExpressionSubject.class);
-    mMarkingsTable = new JTable();
+    final List<VariableMarkingSubject> markings =
+      template.getVariableMarkingsModifiable();
+    final List<VariableMarkingSubject> copy =
+      new ArrayList<VariableMarkingSubject>(markings);
+    mMarkingsModel = new VariableMarkingTableModel(copy);
+    mMarkingsTable = new JTable(mMarkingsModel);
     mMarkingsTable.setTableHeader(null);
     mMarkingsTable.setShowGrid(false);
     mMarkingsTable.setSurrendersFocusOnKeystroke(true);
@@ -174,6 +184,11 @@ public class VariableEditorDialog
     mMarkingsTable.setPreferredScrollableViewportSize(minsize);
     mMarkingsTable.setMinimumSize(minsize);
     mMarkingsTable.setRowSelectionAllowed(true);
+    final TableColumnModel model = mMarkingsTable.getColumnModel();
+    model.getColumn(0).setPreferredWidth(32);
+    model.getColumn(0).setMaxWidth(32);
+    model.getColumn(1).setPreferredWidth(160);
+    model.getColumn(2).setPreferredWidth(160);
     final Set<AWTKeyStroke> forward = mNameInput.getFocusTraversalKeys
       (KeyboardFocusManager.FORWARD_TRAVERSAL_KEYS);
     mMarkingsTable.setFocusTraversalKeys
@@ -182,10 +197,14 @@ public class VariableEditorDialog
       (KeyboardFocusManager.BACKWARD_TRAVERSAL_KEYS);
     mMarkingsTable.setFocusTraversalKeys
       (KeyboardFocusManager.BACKWARD_TRAVERSAL_KEYS, backward);
-    final TableCellEditor editor =
-      new SimpleExpressionEditor(Operator.TYPE_RANGE, parser, mErrorLabel);
-    mMarkingsTable.setDefaultEditor(Object.class, editor);
-    editor.addCellEditorListener(mMarkingsModel);
+    final TableCellEditor propeditor =
+      new SimpleExpressionEditor(Operator.TYPE_NAME, parser, mErrorLabel);
+    mMarkingsTable.setDefaultEditor(IdentifierSubject.class, propeditor);
+    propeditor.addCellEditorListener(mMarkingsModel);
+    final TableCellEditor prededitor =
+      new SimpleExpressionEditor(Operator.TYPE_BOOLEAN, parser, mErrorLabel);
+    mMarkingsTable.setDefaultEditor(SimpleExpressionSubject.class, prededitor);
+    prededitor.addCellEditorListener(mMarkingsModel);
     final ListSelectionModel selmodel = mMarkingsTable.getSelectionModel();
     selmodel.addListSelectionListener(new ListSelectionListener() {
         public void valueChanged(final ListSelectionEvent event)
@@ -248,28 +267,6 @@ public class VariableEditorDialog
         }
       });
     mButtonsPanel.add(cancelButton);
-  }
-
-  /**
-   * Initialise the dialog components with their default values.
-   * When editing an existing variable, the current values from
-   * that variable are read and placed into the input fields.
-   */
-  private void initializeComponents()
-  {
-    if (mVariable == null) {
-      mDeterministicButton.setSelected(true);
-    } else {
-      final IdentifierSubject ident = mVariable.getIdentifier();
-      mNameInput.setValue(ident);
-      final SimpleExpressionSubject type = mVariable.getType();
-      mTypeInput.setValue(type);
-      final boolean deterministic = mVariable.isDeterministic();
-      mDeterministicButton.setSelected(deterministic);
-      final SimpleExpressionSubject initial =
-        mVariable.getInitialStatePredicate();
-      mInitialInput.setValue(initial);
-    }
   }
 
   /**
@@ -469,13 +466,13 @@ public class VariableEditorDialog
 
 
   /**
-   * Creates a new index range.
+   * Creates a marking entry.
    * This method is attached to action listener of the 'add' button
    * of the markings list control.
    */
   private void addMarking()
   {
-    if (mNameInput.isFocusOwner() && !mNameInput.shouldYieldFocus()) {
+    if (isInputLocked()) {
       // nothing
     } else if (mMarkingsTable.isEditing()) {
       final TableCellEditor editor = mMarkingsTable.getCellEditor();
@@ -490,7 +487,7 @@ public class VariableEditorDialog
       }
     } else {
       final int row = mMarkingsModel.createEditedItemAtEnd();
-      if (mMarkingsTable.editCellAt(row, 0)) {
+      if (mMarkingsTable.editCellAt(row, 1)) {
         final ListSelectionModel selmodel = mMarkingsTable.getSelectionModel();
         selmodel.setSelectionInterval(row, row);
         final Component comp = mMarkingsTable.getEditorComponent();
@@ -527,6 +524,7 @@ public class VariableEditorDialog
         }
       }
     }
+    mErrorLabel.clearDisplay();
   }
 
 
@@ -595,9 +593,9 @@ public class VariableEditorDialog
    */
   public void commitDialog()
   {
-    if (mNameInput.isFocusOwner() && !mNameInput.shouldYieldFocus()) {
+    if (isInputLocked()) {
       // nothing
-    } else if (mMarkingsTable != null && mMarkingsTable.isEditing()) {
+    } else if (mMarkingsTable.isEditing()) {
       final TableCellEditor editor = mMarkingsTable.getCellEditor();
       if (editor.stopCellEditing()) {
         // Must wait for focus change events to be processed ...
@@ -615,6 +613,26 @@ public class VariableEditorDialog
       // *** TBD ***
       dispose();
     }
+  }
+
+
+  //#########################################################################
+  //# Auxiliary Methods
+  /**
+   * Checks whether it is unsafe the current input to commit the currently
+   * edited text field. If this method returns <CODE>true</CODE>, it is
+   * unsafe to commit the current dialog contents, and shifting the focus
+   * is to be avoided.
+   * @return <CODE>true</CODE> if the component currently owning the focus
+   *         is to be parsed and has been found to contain invalid information,
+   *         <CODE>false</CODE> otherwise.
+   */
+  private boolean isInputLocked()
+  {
+    return
+      mNameInput.isFocusOwner() && !mNameInput.shouldYieldFocus() ||
+      mTypeInput.isFocusOwner() && !mTypeInput.shouldYieldFocus() ||
+      mInitialInput.isFocusOwner() && !mInitialInput.shouldYieldFocus();
   }
 
 
@@ -648,7 +666,7 @@ public class VariableEditorDialog
   private SimpleExpressionCell mInitialInput;
 
   private JPanel mMarkingsPanel;
-  private ListTableModel<VariableMarkingSubject> mMarkingsModel;
+  private VariableMarkingTableModel mMarkingsModel;
   private JTable mMarkingsTable;
   private JButton mAddButton;
   private JButton mRemoveButton;
@@ -677,5 +695,10 @@ public class VariableEditorDialog
   //#########################################################################
   //# Class Constants
   private static final Insets INSETS = new Insets(2, 4, 2, 4);
+  private static final VariableComponentSubject TEMPLATE =
+    new VariableComponentSubject(new SimpleIdentifierSubject(""),
+                                 new SimpleIdentifierSubject(""),
+                                 true,
+                                 new SimpleIdentifierSubject(""));
 
 }
