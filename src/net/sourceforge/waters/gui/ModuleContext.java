@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   ModuleContext
 //###########################################################################
-//# $Id: ModuleContext.java,v 1.1 2007-11-21 01:33:38 robi Exp $
+//# $Id: ModuleContext.java,v 1.2 2007-11-21 04:14:46 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.gui;
@@ -30,10 +30,10 @@ import net.sourceforge.waters.xsd.base.EventKind;
 
 
 /**
- * <P>An axiliary class to retrieve context information from a module.</P>
+ * <P>An auxiliary class to retrieve context information from a module.</P>
  *
  * <P>A module context is linked to a module ({@link ModuleSubject}).
- * It provides some lookup functionality for events by their names,
+ * It provides some look-up functionality for events by their names,
  * and acts as a central access point to determine icons from object
  * types. It is faster, but less accurate, than the compiler ({@link
  * net.sourceforge.waters.model.compiler.ModuleCompiler}).</P>

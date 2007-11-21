@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.subject.base
 //# CLASS:   IndexedArrayListSubject
 //###########################################################################
-//# $Id: IndexedArrayListSubject.java,v 1.6 2007-02-26 21:41:18 robi Exp $
+//# $Id: IndexedArrayListSubject.java,v 1.7 2007-11-21 04:14:46 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.subject.base;
@@ -173,7 +173,7 @@ public class IndexedArrayListSubject<P extends NamedSubject>
     final P victim = mProxyList.remove(index);
     final String name = victim.getName();
     mProxyMap.remove(name);
-    afterRemove(victim);
+    afterRemove(victim, index);
     return victim;
   }
 
@@ -191,8 +191,8 @@ public class IndexedArrayListSubject<P extends NamedSubject>
       mProxyMap.remove(oldname);
       mProxyMap.put(newname, proxy);
       mProxyList.set(index, proxy);
-      afterRemove(old);
-      afterAdd(proxy);
+      afterRemove(old, index);
+      afterAdd(proxy, index);
     }
     return old;
   }
@@ -276,10 +276,11 @@ public class IndexedArrayListSubject<P extends NamedSubject>
     if (mProxyMap.containsKey(name)) {
       throw createDuplicateName(name);
     } else {
+      final int index = mProxyList.size();
       beforeAdd(proxy);
       mProxyList.add(proxy);
       mProxyMap.put(name, proxy);
-      afterAdd(proxy);
+      afterAdd(proxy, index);
     }
   }
 
@@ -302,7 +303,7 @@ public class IndexedArrayListSubject<P extends NamedSubject>
     final P victim = mProxyMap.remove(name);
     if (victim != null) {
       mProxyList.remove(victim);
-      afterRemove(victim);
+      afterRemove(victim, -1);
     }
     return victim;
   }
@@ -447,13 +448,13 @@ public class IndexedArrayListSubject<P extends NamedSubject>
     }
     mProxyList = newlist;
     for (final P oldproxy : removed) {
-      afterRemove(oldproxy);
+      afterRemove(oldproxy, -1);
     }
     for (final P oldproxy : moved) {
       afterMove(oldproxy);
     }
     for (final P newproxy : added) {
-      afterAdd(newproxy);
+      afterAdd(newproxy, -1);
     }
   }
 
@@ -469,7 +470,7 @@ public class IndexedArrayListSubject<P extends NamedSubject>
       beforeAdd(proxy);
       mProxyList.add(index, proxy);
       mProxyMap.put(name, proxy);
-      afterAdd(proxy);
+      afterAdd(proxy, index);
       return proxy;
     } else if (found.equals(proxy)) {
       return found;
@@ -544,18 +545,18 @@ public class IndexedArrayListSubject<P extends NamedSubject>
     proxy.setParent(this);
   }
 
-  private void afterAdd(final P proxy)
+  private void afterAdd(final P proxy, final int index)
   {
     final ModelChangeEvent event =
-      ModelChangeEvent.createItemAdded(this, proxy);
+      ModelChangeEvent.createItemAdded(this, proxy, index);
     fireModelChanged(event);
   }
 
-  private void afterRemove(final P proxy)
+  private void afterRemove(final P proxy, final int index)
   {
     proxy.setParent(null);
     final ModelChangeEvent event =
-      ModelChangeEvent.createItemRemoved(this, proxy);
+      ModelChangeEvent.createItemRemoved(this, proxy, index);
     fireModelChanged(event);
   }
 

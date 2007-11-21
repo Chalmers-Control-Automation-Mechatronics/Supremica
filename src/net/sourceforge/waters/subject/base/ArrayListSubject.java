@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.subject.base
 //# CLASS:   ArrayListSubject
 //###########################################################################
-//# $Id: ArrayListSubject.java,v 1.6 2007-06-11 05:59:18 robi Exp $
+//# $Id: ArrayListSubject.java,v 1.7 2007-11-21 04:14:46 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.subject.base;
@@ -181,7 +181,7 @@ public class ArrayListSubject<P extends ProxySubject>
   {
     beforeAdd(proxy);
     mProxyList.add(index, proxy);
-    afterAdd(proxy);
+    afterAdd(proxy, index);
   }
 
   public P get(final int index)
@@ -192,7 +192,7 @@ public class ArrayListSubject<P extends ProxySubject>
   public P remove(final int index)
   {
     final P proxy = mProxyList.remove(index);
-    afterRemove(proxy);
+    afterRemove(proxy, index);
     return proxy;
   }
 
@@ -202,8 +202,8 @@ public class ArrayListSubject<P extends ProxySubject>
     if (old != proxy) {
       beforeAdd(proxy);
       mProxyList.set(index, proxy);
-      afterRemove(old);
-      afterAdd(proxy);
+      afterRemove(old, index);
+      afterAdd(proxy, index);
     }
     return old;
   }
@@ -277,13 +277,13 @@ public class ArrayListSubject<P extends ProxySubject>
     }
     mProxyList = newlist;
     for (final P oldproxy : removed) {
-      afterRemove(oldproxy);
+      afterRemove(oldproxy, -1);
     }
     for (final P oldproxy : moved) {
       afterMove(oldproxy);
     }
     for (final P newproxy : added) {
-      afterAdd(newproxy);
+      afterAdd(newproxy, -1);
     }
   }
 
@@ -369,18 +369,18 @@ public class ArrayListSubject<P extends ProxySubject>
     proxy.setParent(this);
   }
 
-  private void afterAdd(final P proxy)
+  private void afterAdd(final P proxy, final int index)
   {
     final ModelChangeEvent event =
-      ModelChangeEvent.createItemAdded(this, proxy);
+      ModelChangeEvent.createItemAdded(this, proxy, index);
     fireModelChanged(event);
   }
 
-  private void afterRemove(final P proxy)
+  private void afterRemove(final P proxy, final int index)
   {
     proxy.setParent(null);
     final ModelChangeEvent event =
-      ModelChangeEvent.createItemRemoved(this, proxy);
+      ModelChangeEvent.createItemRemoved(this, proxy, index);
     fireModelChanged(event);
   }
 

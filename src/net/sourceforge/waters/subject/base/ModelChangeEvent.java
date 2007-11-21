@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.subject.base
 //# CLASS:   ModelChangeEvent
 //###########################################################################
-//# $Id: ModelChangeEvent.java,v 1.7 2007-08-11 10:44:03 robi Exp $
+//# $Id: ModelChangeEvent.java,v 1.8 2007-11-21 04:14:46 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.subject.base;
@@ -36,8 +36,9 @@ import java.util.EventObject;
  * </UL>
  * <P>In addition, each event has its <EMPH>source</EMPH> that identifies
  * the item that was affected by the change, and may have an additional
- * <EMPH>value</EMPH>. The precise meaning of these fields depends on the
- * event kind.</P>
+ * <EMPH>value</EMPH> and an index representing the position of a change in
+ * a list. The precise meaning of these fields depends on the event
+ * kind.</P>
  *
  * @see Subject
  * @see ModelObserver
@@ -60,7 +61,23 @@ public class ModelChangeEvent extends EventObject
   public static ModelChangeEvent createItemAdded(final Subject container,
                                                  final Object element)
   {
-    return new ModelChangeEvent(container, ITEM_ADDED, element);
+    return createItemAdded(container, element, -1);
+  }
+
+  /**
+   * Creates an <CODE>ITEM_ADDED</CODE> notification.
+   * @param  container    The list or collection that has received a new item.
+   * @param  element      The item added to the container.
+   * @param  index        When adding to a list, the position of the item
+   *                      after the insertion, otherwise -1.
+   * @return A model change event that has the container as source
+   *         and the element as value.
+   */
+  public static ModelChangeEvent createItemAdded(final Subject container,
+                                                 final Object element,
+                                                 final int index)
+  {
+    return new ModelChangeEvent(container, ITEM_ADDED, element, index);
   }
 
   /**
@@ -74,7 +91,24 @@ public class ModelChangeEvent extends EventObject
   public static ModelChangeEvent createItemRemoved(final Subject container,
                                                    final Object element)
   {
-    return new ModelChangeEvent(container, ITEM_REMOVED, element);
+    return createItemRemoved(container, element, -1);
+  }
+
+  /**
+   * Creates an <CODE>ITEM_REMOVED</CODE> notification.
+   * @param  container    The list or collection from which an item has
+   *                      been removed.
+   * @param  element      The item removed from the container.
+   * @param  index        When removing from a list, the position of the item
+   *                      before its removal, otherwise -1.
+   * @return A model change event that has the container as source
+   *         and the element as value.
+   */
+  public static ModelChangeEvent createItemRemoved(final Subject container,
+                                                   final Object element,
+                                                   final int index)
+  {
+    return new ModelChangeEvent(container, ITEM_REMOVED, element, index);
   }
 
   /**
@@ -137,9 +171,27 @@ public class ModelChangeEvent extends EventObject
                           final int kind,
                           final Object value)
   {
+    this(source, kind, value, -1);
+  }
+
+
+  /**
+   * Creates a new model change event with a specified value.
+   * @param  source       The source of the event.
+   * @param  kind         The kind of notification.
+   * @param  value        The value to be passed with the event.
+   * @param  index        The index specifying where the value was inserted
+   *                      or deleted in its parent.
+   */
+  public ModelChangeEvent(final Subject source,
+                          final int kind,
+                          final Object value,
+                          final int index)
+  {
     super(source);
     mKind = kind;
     mValue = value;
+    mIndex = index;
   }
 
 
@@ -180,6 +232,19 @@ public class ModelChangeEvent extends EventObject
     return mValue;
   }
 
+  /**
+   * Gets the index associated with this event.
+   * For an item-addition notification in a list, the index specifies the
+   * position of the inserted item after the insertion.
+   * For an item-removal notification in a list, the index specifies the
+   * position of the removed item before the deletion.
+   * In all other cases, the index is -1.
+   */
+  public int getIndex()
+  {
+    return mIndex;
+  }
+
 
   //#########################################################################
   //# Class Constants
@@ -195,10 +260,11 @@ public class ModelChangeEvent extends EventObject
    * The constant identifying an item-addition notification.  This
    * notification is sent after an item has been added to some collection
    * or list. The event source is the container that has received the new
-   * item, and the value is the item that was added. This event is only
-   * received by the container that was modified, not by the item that was
-   * added. When the message is received, the addition of the item is
-   * already completed, so its parent points to the container.
+   * item, and the value is the item that was added. If the item is added
+   * to a list, an index may be specified. This event is only received by
+   * the container that was modified, not by the item that was added. When
+   * the message is received, the addition of the item is already
+   * completed, so its parent points to the container.
    */
   public static final int ITEM_ADDED = 0x01;
   /**
@@ -206,9 +272,10 @@ public class ModelChangeEvent extends EventObject
    * notification is sent after an item has been removed from some
    * collection or list. The event source is the container from which the
    * the item has been removed, and the value is the item that was removed.
-   * This event is only received by the container that was modified, not by
-   * the removed item. When the message is received, the removal of the
-   * item is already completed, so its parent is <CODE>null</CODE>.
+   * If the item is removed from a list, an index may be specified. This
+   * event is only received by the container that was modified, not by the
+   * removed item. When the message is received, the removal of the item is
+   * already completed, so its parent is <CODE>null</CODE>.
    */
   public static final int ITEM_REMOVED = 0x02;
   /**
@@ -245,5 +312,6 @@ public class ModelChangeEvent extends EventObject
   //# Data Members
   private final int mKind;
   private final Object mValue;
+  private final int mIndex;
 
 }
