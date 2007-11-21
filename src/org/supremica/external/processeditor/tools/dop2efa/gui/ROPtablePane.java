@@ -141,6 +141,15 @@ public class ROPtablePane
     }
 	
 	/**
+	 * 	Add one file to table
+	 * 	if the file contains no ROP
+	 * 	nothing happens.
+	 */
+	public void addFile(File file){
+		ropTable.addROPfile(file);
+	}
+	
+	/**
 	 *	Removes selected ROP files from table
 	 */
     private void remove(){

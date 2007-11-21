@@ -73,7 +73,7 @@ public class ConvertPanel
         jbToFile = new JButton("Write file");
         jbToFile.addActionListener(this);
         
-        jbExit = new JButton("Exit");
+        jbExit = new JButton("Close");
         jbExit.addActionListener(this);
         
         //add components to moduleNamePane
@@ -120,6 +120,10 @@ public class ConvertPanel
     
     public void refreshTable(){
     	leftPane.refresh();
+    }
+    
+    public void addFile(File file){
+    	leftPane.addFile(file);
     }
     
     /**

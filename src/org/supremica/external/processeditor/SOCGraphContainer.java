@@ -40,6 +40,7 @@ import org.supremica.external.relationExtraction.Gui.*;
 import org.supremica.external.processeditor.xgraph.*;
 
 import org.supremica.external.processeditor.tools.db.DBInterface;
+import org.supremica.external.processeditor.tools.dop2efa.gui.DOPtoEFAInterface;
 
 /**
  * The most central GUI class of the <code>org.soc</code> package. 
@@ -63,7 +64,7 @@ public class SOCGraphContainer
     public SOCToolBar toolbar = new SOCToolBar();
     public SOCMenuBar menubar = new SOCMenuBar(this);
     
-    private SOCDOPtoEFAFrame dopToEfaFrame = null; 
+    private DOPtoEFAInterface dopToEfaFrame = null; 
     
     private Object memory;
     private Object numOfCopies = 0;
@@ -749,7 +750,8 @@ public class SOCGraphContainer
     	 * Create frame
     	 */
     	if(dopToEfaFrame == null){
-    		dopToEfaFrame = new SOCDOPtoEFAFrame();
+    		dopToEfaFrame = new DOPtoEFAInterface();
+    		dopToEfaFrame.setGraphContainer(this);
     	}
     	
     	//show frame

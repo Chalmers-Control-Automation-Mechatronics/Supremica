@@ -1,5 +1,5 @@
 /**
- * class to convert from DOP to EFA 
+ *	class to convert from DOP to EFA 
  */
 package org.supremica.external.processeditor.tools.dop2efa;
 

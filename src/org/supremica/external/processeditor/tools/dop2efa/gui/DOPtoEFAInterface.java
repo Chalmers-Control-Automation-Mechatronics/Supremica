@@ -1,4 +1,4 @@
-package org.supremica.external.processeditor;
+package org.supremica.external.processeditor.tools.dop2efa.gui;
 
 import java.awt.Dimension;
 import java.awt.Frame;
@@ -9,28 +9,29 @@ import java.awt.event.*;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 
-import org.supremica.external.processeditor.tools.dop2efa.gui.ConvertPanel;
-import org.supremica.gui.Supremica;
+import org.supremica.external.processeditor.SOCGraphContainer;
+import org.supremica.external.processeditor.processgraph.resrccell.ResourceCell;
 
 
 /**
  * @author millares
  *
  */
-public class SOCDOPtoEFAFrame
+public class DOPtoEFAInterface
 						extends JFrame 
 									implements ActionListener{
 	
 	ConvertPanel cPanel;
+	SOCGraphContainer graphContainer;
 	
-	public SOCDOPtoEFAFrame(){
+	public DOPtoEFAInterface(){
 		
 		this.setExtendedState(Frame.MAXIMIZED_BOTH); 
 		this.setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
 		
 		this.setTitle("DOP to EFA");
 		this.setIconImage(Toolkit.getDefaultToolkit().
-				getImage(Supremica.class.getClass().
+				getImage(DOPtoEFAInterface.class.getClass().
 						getResource("/icons/processeditor/icon.gif")));
 		
         //Add contents to the window.
@@ -52,6 +53,10 @@ public class SOCDOPtoEFAFrame
         this.setLocation(c);
         
         this.setVisible(false);
+	}
+	
+	public void setGraphContainer(SOCGraphContainer graphContainer) {
+		this.graphContainer = graphContainer;
 	}
 	
 	public void setInputFileChooser(JFileChooser fc) {
@@ -76,7 +81,30 @@ public class SOCDOPtoEFAFrame
     public void setVisible(boolean b){
     	if(b){
     		cPanel.refreshTable();
+    		addSelected();
     	}
     	super.setVisible(b);
+    }
+    
+    private void addSelected(){
+    	Object o = null;
+    	int selectedcells = 0;
+    	
+    	//check indata
+    	if(graphContainer == null){
+    		return;
+    	}
+    	
+    	//loop over all selected cells
+    	selectedcells = graphContainer.getSelectedCount();
+    	for(int i=0; i < selectedcells; i++){
+    		o = graphContainer.getSelectedAt(i);
+    		
+    		//ResourceCell have ROP file
+    		if(o instanceof ResourceCell){
+    			cPanel.addFile(((ResourceCell)o).getFile());
+    		}
+    	}
+    	
     }
 }

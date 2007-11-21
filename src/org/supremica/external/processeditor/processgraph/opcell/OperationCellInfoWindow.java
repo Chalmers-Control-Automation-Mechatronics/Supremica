@@ -11,8 +11,6 @@ import java.awt.event.*;
 import java.awt.Font.*;
 import java.io.*;
 
-import org.supremica.gui.Supremica;
-
 import org.supremica.manufacturingTables.xsd.processeditor.Properties;
 import org.supremica.manufacturingTables.xsd.processeditor.Activity;
 import org.supremica.manufacturingTables.xsd.processeditor.Attribute;
@@ -80,13 +78,13 @@ public class OperationCellInfoWindow extends JDialog implements ActionListener {
 	operand = a;
 	       	
 	noUpperIndIcon = Toolkit.getDefaultToolkit().
-	    getImage(Supremica.class.getClass().getResource("/icons/processeditor/NoUI.gif"));
+	    getImage(OperationCellInfoWindow.class.getClass().getResource("/icons/processeditor/NoUI.gif"));
 	upperIndIcon = Toolkit.getDefaultToolkit().
-	    getImage(Supremica.class.getClass().getResource("/icons/processeditor/UI.gif"));
+	    getImage(OperationCellInfoWindow.class.getClass().getResource("/icons/processeditor/UI.gif"));
 	noLowerIndIcon = Toolkit.getDefaultToolkit().
-	    getImage(Supremica.class.getClass().getResource("/icons/processeditor/NoLI.gif"));
+	    getImage(OperationCellInfoWindow.class.getClass().getResource("/icons/processeditor/NoLI.gif"));
 	lowerIndIcon = Toolkit.getDefaultToolkit().
-	    getImage(Supremica.class.getClass().getResource("/icons/processeditor/LI.gif"));
+	    getImage(OperationCellInfoWindow.class.getClass().getResource("/icons/processeditor/LI.gif"));
 	
 	Object[] tmpAttributeHeaders = {"Value", 
 					"At Attribute Type", 

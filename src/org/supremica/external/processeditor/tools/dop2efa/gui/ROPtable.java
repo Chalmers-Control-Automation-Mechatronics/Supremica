@@ -194,7 +194,7 @@ public class ROPtable extends JTable {
                 	if((Boolean)checked){
                 		tip = machineName + " will be converted";
                 	}else{
-                		tip = machineName + " will not be converted";
+                		tip = machineName + " will NOT be converted";
                 	}
                 }
         		break;
@@ -220,6 +220,13 @@ public class ROPtable extends JTable {
         	};
     }
     
+    /**
+     *	Open file and return a ROP if the file is a valid
+     *	ROP file. Otherwise null
+     * 
+     * @param file
+     * @return a ROP from file
+     */
     private ROP getROPfromFile(File file){
 		
 		if(file != null && file.exists()){
@@ -236,10 +243,12 @@ public class ROPtable extends JTable {
 				return (ROP)o;
 			}
 		}
+		
 		System.err.println("File " + file + " contains no ROP.");
 		return null;
 	}
 
+    
     /**
      * Create the GUI and show it.  For thread safety,
      * this method should be invoked from the
