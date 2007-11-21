@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.gui.ide
 //# CLASS:   ModuleContainer
 //###########################################################################
-//# $Id: ModuleContainer.java,v 1.66 2007-10-31 13:01:00 flordal Exp $
+//# $Id: ModuleContainer.java,v 1.67 2007-11-21 01:33:38 robi Exp $
 //###########################################################################
 
 
@@ -32,6 +32,7 @@ import javax.swing.undo.UndoableEdit;
 
 import net.sourceforge.waters.gui.EditorWindowInterface;
 import net.sourceforge.waters.gui.HTMLPrinter;
+import net.sourceforge.waters.gui.ModuleContext;
 import net.sourceforge.waters.gui.command.Command;
 import net.sourceforge.waters.gui.command.UndoableCommand;
 import net.sourceforge.waters.gui.command.UndoInterface;
@@ -42,13 +43,11 @@ import net.sourceforge.waters.gui.observer.Subject;
 import net.sourceforge.waters.gui.observer.UndoRedoEvent;
 import net.sourceforge.waters.gui.renderer.GeometryAbsentException;
 import net.sourceforge.waters.model.base.Proxy;
-import net.sourceforge.waters.model.base.IndexedList;
 import net.sourceforge.waters.model.base.NamedProxy;
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
 import net.sourceforge.waters.model.expr.ExpressionParser;
 import net.sourceforge.waters.model.expr.OperatorTable;
 import net.sourceforge.waters.model.module.EventDeclProxy;
-import net.sourceforge.waters.model.module.IdentifierProxy;
 import net.sourceforge.waters.model.module.ModuleProxyFactory;
 import net.sourceforge.waters.model.printer.ProxyPrinter;
 import net.sourceforge.waters.subject.module.EventDeclSubject;
@@ -56,7 +55,7 @@ import net.sourceforge.waters.subject.module.ModuleSubject;
 import net.sourceforge.waters.subject.module.ModuleSubjectFactory;
 import net.sourceforge.waters.subject.module.SimpleComponentSubject;
 import net.sourceforge.waters.xsd.base.EventKind;
-import org.codehaus.groovy.antlr.java.Java2GroovyConverter;
+
 
 public class ModuleContainer 
     extends DocumentContainer
@@ -69,6 +68,7 @@ public class ModuleContainer
     {
         super(ide, module);
 
+        mModuleContext = new ModuleContext(module);
         final ModuleProxyFactory factory = ModuleSubjectFactory.getInstance();
         final OperatorTable optable = CompilerOperatorTable.getInstance();
         mExpressionParser = new ExpressionParser(factory, optable);
@@ -170,18 +170,14 @@ public class ModuleContainer
         return (ModuleSubject) getDocument();
     }
     
+    public ModuleContext getModuleContext()
+    {
+        return mModuleContext;
+    }
+    
     public ExpressionParser getExpressionParser()
     {
         return mExpressionParser;
-    }
-    
-    public EventKind guessEventKind(final IdentifierProxy ident)
-    {
-        final String name = ident.getName();
-        final IndexedList<EventDeclSubject> decls =
-            getModule().getEventDeclListModifiable();
-        final EventDeclSubject decl = decls.get(name);
-        return decl == null ? null : decl.getKind();
     }
     
     public void addStandardPropositions()
@@ -401,6 +397,7 @@ public class ModuleContainer
         mComponentToViewPanelMap =
         new HashMap<SimpleComponentSubject,ComponentViewPanel>();
 
+    private final ModuleContext mModuleContext;
     private final ExpressionParser mExpressionParser;
     private final ProxyPrinter mPrinter;
 

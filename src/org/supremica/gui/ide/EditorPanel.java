@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.gui.ide
 //# CLASS:   EditorPanel
 //###########################################################################
-//# $Id: EditorPanel.java,v 1.63 2007-11-06 03:22:26 robi Exp $
+//# $Id: EditorPanel.java,v 1.64 2007-11-21 01:33:38 robi Exp $
 //###########################################################################
 
 
@@ -18,6 +18,7 @@ import java.util.LinkedList;
 import javax.swing.*;
 
 import net.sourceforge.waters.gui.EditorWindowInterface;
+import net.sourceforge.waters.gui.ModuleContext;
 import net.sourceforge.waters.gui.ModuleWindowInterface;
 import net.sourceforge.waters.gui.command.UndoInterface;
 import net.sourceforge.waters.gui.observer.EditorChangedEvent;
@@ -25,11 +26,9 @@ import net.sourceforge.waters.gui.observer.SubPanelSwitchEvent;
 import net.sourceforge.waters.gui.observer.Observer;
 import net.sourceforge.waters.gui.observer.Subject;
 import net.sourceforge.waters.model.expr.ExpressionParser;
-import net.sourceforge.waters.model.module.IdentifierProxy;
 import net.sourceforge.waters.subject.base.AbstractSubject;
 import net.sourceforge.waters.subject.module.ModuleSubject;
 import net.sourceforge.waters.subject.module.SimpleComponentSubject;
-import net.sourceforge.waters.xsd.base.EventKind;
 
 import org.supremica.gui.ide.actions.Actions;
 
@@ -92,14 +91,14 @@ public class EditorPanel
         return mModuleContainer.getModule();
     }
 
+    public ModuleContext getModuleContext()
+    {
+        return mModuleContainer.getModuleContext();
+    }
+
     public ExpressionParser getExpressionParser()
     {
         return mModuleContainer.getExpressionParser();
-    }
-
-    public EventKind guessEventKind(final IdentifierProxy ident)
-    {
-        return mModuleContainer.guessEventKind(ident);
     }
 
     public Frame getRootWindow()

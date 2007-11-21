@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   EventEditorDialog
 //###########################################################################
-//# $Id: EventEditorDialog.java,v 1.20 2007-11-20 03:37:35 robi Exp $
+//# $Id: EventEditorDialog.java,v 1.21 2007-11-21 01:33:38 robi Exp $
 //###########################################################################
 
 
@@ -58,7 +58,6 @@ import net.sourceforge.waters.gui.command.EditEventDeclCommand;
 import net.sourceforge.waters.model.expr.ExpressionParser;
 import net.sourceforge.waters.model.expr.Operator;
 import net.sourceforge.waters.model.expr.ParseException;
-import net.sourceforge.waters.subject.base.IndexedListSubject;
 import net.sourceforge.waters.subject.module.EventDeclSubject;
 import net.sourceforge.waters.subject.module.ModuleSubject;
 import net.sourceforge.waters.subject.module.SimpleExpressionSubject;
@@ -961,13 +960,7 @@ public class EventEditorDialog
       parser.parseSimpleIdentifier(text);
       final String oldname = mEventDecl == null ? "" : mEventDecl.getName();
       if (!text.equals(oldname)) {
-        final ModuleSubject module = getModule();
-        final IndexedListSubject<EventDeclSubject> eventlist =
-          module.getEventDeclListModifiable();
-        if (eventlist.containsName(text)) {
-          throw new ParseException
-            ("Name '" + text + "' is already taken by an event!", 0);
-        }
+        mModuleContext.checkNewEventName(text);
       }
       return text;
     }
@@ -1051,6 +1044,10 @@ public class EventEditorDialog
         }
       }
     }
+
+    //#######################################################################
+    //# Data Members
+    private final ModuleContext mModuleContext = mRoot.getModuleContext();
 
   }
 

@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   ModuleWindowInterface
 //###########################################################################
-//# $Id: ModuleWindowInterface.java,v 1.10 2007-06-23 10:58:09 robi Exp $
+//# $Id: ModuleWindowInterface.java,v 1.11 2007-11-21 01:33:38 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.gui;
@@ -17,8 +17,6 @@ import net.sourceforge.waters.gui.renderer.GeometryAbsentException;
 import net.sourceforge.waters.subject.module.ModuleSubject;
 import net.sourceforge.waters.subject.module.SimpleComponentSubject;
 import net.sourceforge.waters.model.expr.ExpressionParser;
-import net.sourceforge.waters.model.module.IdentifierProxy;
-import net.sourceforge.waters.xsd.base.EventKind;
 
 
 /**
@@ -46,23 +44,15 @@ public interface ModuleWindowInterface
     public ModuleSubject getModuleSubject();
     
     /**
+     * Gets the module context to be used for name-based lookups in the
+     * module.
+     */
+    public ModuleContext getModuleContext();
+    
+    /**
      * Gets the shared expression parser used by this GUI.
      */
     public ExpressionParser getExpressionParser();
-    
-    /**
-     * Tries to determine an event kind for the given identifier.
-     * Given an event name, this method inspects the module associated with
-     * this window to determine whether the name represents a controllable
-     * event, and uncontrollable event, or a proposition. Depending on the
-     * implementation, it may or may not return accurate type information.
-     * @param  ident   The identifier representing the event name to be
-     *                 checked.
-     * @return The event kind that will be associated with the given
-     *         identifier after compilation of the module, or <CODE>null</CODE>
-     *         that the event kind cannot be determined.
-     */
-    public EventKind guessEventKind(IdentifierProxy ident);
     
     /**
      * Gets the root window of this GUI.

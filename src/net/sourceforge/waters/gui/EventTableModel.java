@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   EventTableModel
 //###########################################################################
-//# $Id: EventTableModel.java,v 1.29 2007-05-29 11:49:02 robi Exp $
+//# $Id: EventTableModel.java,v 1.30 2007-11-21 01:33:38 robi Exp $
 //###########################################################################
 
 
@@ -25,6 +25,7 @@ import javax.swing.ImageIcon;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
+
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.base.ProxyAccessorHashMapByContents;
 import net.sourceforge.waters.model.base.ProxyAccessorMap;
@@ -43,7 +44,6 @@ import net.sourceforge.waters.subject.module.EventListExpressionSubject;
 import net.sourceforge.waters.subject.module.ForeachEventSubject;
 import net.sourceforge.waters.subject.module.GraphSubject;
 import net.sourceforge.waters.subject.module.IdentifierSubject;
-import net.sourceforge.waters.xsd.base.EventKind;
 
 
 
@@ -68,6 +68,7 @@ public class EventTableModel
     mTable = table;
     mGraph = graph;
     mRoot = root;
+    mModuleContext = root.getModuleContext();
     mEvents = collectEvents();
     graph.addModelObserver(this);
     fireTableChanged(new TableModelEvent(this));
@@ -121,11 +122,7 @@ public class EventTableModel
     {
         case 0:
             final IdentifierSubject ident = entry.getName();
-            final EventKind kind = mRoot.guessEventKind(ident);
-            if (kind!=null && kind.equals(EventKind.PROPOSITION) && ident.getName().equals(EventDeclProxy.DEFAULT_FORBIDDEN_NAME))
-                return IconLoader.ICON_FORBIDDEN;
-            else
-                return getIcon(kind);
+            return mModuleContext.guessEventIcon(ident);
         case 1:
             return entry.getName();
         default:
@@ -229,24 +226,7 @@ public class EventTableModel
   String getToolTipText(final int row)
   {
     final IdentifierSubject event = getEvent(row);
-    final String name = event.toString();
-    final int len = name.length();
-    final StringBuffer buffer = new StringBuffer(len + 22);
-    final EventKind kind = mRoot.guessEventKind(event);
-    if (kind == null) {
-      buffer.append("Event");
-    } else if (kind.equals(EventKind.CONTROLLABLE)) {
-      buffer.append("Controllable event");
-    } else if (kind.equals(EventKind.PROPOSITION)) {
-      buffer.append("Proposition");
-    } else if (kind.equals(EventKind.UNCONTROLLABLE)) {
-      buffer.append("Uncontrollable event");
-    } else {
-      buffer.append("Event");
-    }
-    buffer.append(' ');
-    buffer.append(name);
-    return buffer.toString();
+    return mModuleContext.guessEventToolTipText(event);
   }
 
 
@@ -308,30 +288,6 @@ public class EventTableModel
     final EventEntry entry = new EventEntry(ident);
     final int index = Collections.binarySearch(mEvents, entry);
     return index >= 0;
-  }
-
-  private ImageIcon getIcon(final EventKind kind)
-  {
-    if (kind == null) 
-    {
-      return IconLoader.ICON_EVENT;
-    } 
-    else if (kind.equals(EventKind.CONTROLLABLE)) 
-    {
-      return IconLoader.ICON_CONTROLLABLE;
-    } 
-    else if (kind.equals(EventKind.PROPOSITION)) 
-    {
-      return IconLoader.ICON_PROPOSITION;
-    } 
-    else if (kind.equals(EventKind.UNCONTROLLABLE)) 
-    {
-      return IconLoader.ICON_UNCONTROLLABLE;
-    }
-    else 
-    {
-      return IconLoader.ICON_EVENT;
-    }
   }
 
   /*public IdentifierTransfer createIdentifierTransfer
@@ -610,6 +566,7 @@ public class EventTableModel
   //# Data Members
   private final GraphSubject mGraph;
   private final ModuleWindowInterface mRoot;
+  private final ModuleContext mModuleContext;
   private final List<EventEntry> mEvents;
   private final EditorEvents mTable;
 }
