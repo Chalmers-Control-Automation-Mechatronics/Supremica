@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   ListTableModel
 //###########################################################################
-//# $Id: ListTableModel.java,v 1.3 2007-11-20 03:37:35 robi Exp $
+//# $Id: ListTableModel.java,v 1.4 2007-11-21 23:42:26 robi Exp $
 //###########################################################################
 
 
@@ -115,11 +115,16 @@ public class ListTableModel<E>
   //# List Modifications
   int createEditedItemAtEnd()
   {
+    return createEditedItemAtEnd(null);
+  }
+
+  int createEditedItemAtEnd(final E item)
+  {
     final int row = mList.size();
-    if (row > 0 && mList.get(row - 1) == null) {
+    if (row > 0 && mList.get(row - 1) == item) {
       return row - 1;
     } else {
-      mList.add(null);
+      mList.add(item);
       fireTableRowsInserted(row, row);
       return row;
     }

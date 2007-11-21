@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   VariableEditorDialog
 //###########################################################################
-//# $Id: VariableEditorDialog.java,v 1.3 2007-11-20 03:37:35 robi Exp $
+//# $Id: VariableEditorDialog.java,v 1.4 2007-11-21 23:42:26 robi Exp $
 //###########################################################################
 
 
@@ -50,11 +50,13 @@ import javax.swing.table.TableCellEditor;
 import javax.swing.table.TableColumnModel;
 
 import net.sourceforge.waters.gui.command.Command;
-//import net.sourceforge.waters.gui.command.CreateVariableCommand;
-//import net.sourceforge.waters.gui.command.EditVariableCommand;
+import net.sourceforge.waters.gui.command.CreateVariableComponentCommand;
+import net.sourceforge.waters.gui.command.EditVariableComponentCommand;
 import net.sourceforge.waters.model.expr.ExpressionParser;
 import net.sourceforge.waters.model.expr.Operator;
+import net.sourceforge.waters.model.module.EventDeclProxy;
 import net.sourceforge.waters.subject.module.IdentifierSubject;
+import net.sourceforge.waters.subject.module.IntConstantSubject;
 import net.sourceforge.waters.subject.module.ModuleSubject;
 import net.sourceforge.waters.subject.module.SimpleExpressionSubject;
 import net.sourceforge.waters.subject.module.SimpleIdentifierSubject;
@@ -100,8 +102,7 @@ public class VariableEditorDialog
   //# Access to Created Item
   /**
    * Gets the Waters subject edited by this dialog.
-   * @return A reference to the event declaration being edited by this
-   *         dialog.
+   * @return A reference to the variable being edited by this dialog.
    */
   public VariableComponentSubject getEditedItem()
   {
@@ -117,7 +118,7 @@ public class VariableEditorDialog
   private void createComponents()
   {
     final VariableComponentSubject template =
-      mVariable == null ? TEMPLATE : mVariable;
+      mVariable == null ? VARIABLE_TEMPLATE : mVariable;
     final ExpressionParser parser = getExpressionParser();
     final ActionListener commithandler = new ActionListener() {
         public void actionPerformed(final ActionEvent event)
@@ -486,8 +487,17 @@ public class VariableEditorDialog
           });
       }
     } else {
-      final int row = mMarkingsModel.createEditedItemAtEnd();
-      if (mMarkingsTable.editCellAt(row, 1)) {
+      final int row;
+      final int column;
+      final List<VariableMarkingSubject> markings = mMarkingsModel.getList();
+      if (markings.isEmpty()) {
+        row = mMarkingsModel.createEditedItemAtEnd(MARKING_TEMPLATE);
+        column = 2;
+      } else {
+        row = mMarkingsModel.createEditedItemAtEnd();
+        column = 1;
+      }
+      if (mMarkingsTable.editCellAt(row, column)) {
         final ListSelectionModel selmodel = mMarkingsTable.getSelectionModel();
         selmodel.setSelectionInterval(row, row);
         final Component comp = mMarkingsTable.getEditorComponent();
@@ -606,11 +616,43 @@ public class VariableEditorDialog
             }
           });
       }
+    } else if (!mTypeInput.shouldYieldFocus()) {
+      mTypeInput.requestFocusInWindow();
+    } else if (!mInitialInput.shouldYieldFocus()) {
+      mInitialInput.requestFocusInWindow();
     } else {
       final IdentifierSubject ident =
         (IdentifierSubject) mNameInput.getValue();
+      final SimpleExpressionSubject type =
+        (SimpleExpressionSubject) mTypeInput.getValue();
       final boolean deterministic = mDeterministicButton.isSelected();
-      // *** TBD ***
+      final SimpleExpressionSubject initial = 
+        (SimpleExpressionSubject) mInitialInput.getValue();
+      final List<VariableMarkingSubject> origmarkings =
+        mMarkingsModel.getList();
+      final List<VariableMarkingSubject> markings =
+        new ArrayList<VariableMarkingSubject>(origmarkings.size());
+      for (final VariableMarkingSubject marking : origmarkings) {
+        if (marking.getParent() == null) {
+          markings.add(marking);
+        } else {
+          markings.add(marking.clone());
+        }
+      }
+      final VariableComponentSubject template =
+        new VariableComponentSubject(ident, type, deterministic,
+                                     initial, markings);
+      if (mVariable == null) {
+        final ModuleSubject module = getModule();
+        final Command command =
+          new CreateVariableComponentCommand(template, module);
+        mVariable = template;
+        mRoot.getUndoInterface().executeCommand(command);
+      } else if (!mVariable.equalsWithGeometry(template)) {
+        final Command command =
+          new EditVariableComponentCommand(mVariable, template);
+        mRoot.getUndoInterface().executeCommand(command);
+      }
       dispose();
     }
   }
@@ -695,10 +737,14 @@ public class VariableEditorDialog
   //#########################################################################
   //# Class Constants
   private static final Insets INSETS = new Insets(2, 4, 2, 4);
-  private static final VariableComponentSubject TEMPLATE =
+  private static final VariableComponentSubject VARIABLE_TEMPLATE =
     new VariableComponentSubject(new SimpleIdentifierSubject(""),
                                  new SimpleIdentifierSubject(""),
                                  true,
                                  new SimpleIdentifierSubject(""));
+  private static final VariableMarkingSubject MARKING_TEMPLATE =
+    new VariableMarkingSubject
+      (new SimpleIdentifierSubject(EventDeclProxy.DEFAULT_MARKING_NAME),
+       new IntConstantSubject(1));
 
 }
