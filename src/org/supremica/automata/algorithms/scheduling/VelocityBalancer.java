@@ -343,6 +343,12 @@ public class VelocityBalancer
         {
             currPlantStates[plantIndex] = indexMap.getAutomatonAt(plantIndex).getInitialState();
         }
+        
+        double[] remainingTimesInState = new double[plants.size()];
+        for (int i = 0; i < remainingTimesInState.length; i++)
+        {
+            remainingTimesInState[i] = plants.getAutomatonAt(i).getInitialState().getCost();
+        }
      
         // Find a firing/simulation time for each schedule state, start from the initial state.
         State scheduleState = schedule.getInitialState();
@@ -394,26 +400,36 @@ public class VelocityBalancer
                     // current scheduled event or the Tv-value (currRemainingTimeInState)
                     // "prevents" the plant from moving further through its cycle. 
                     // Of course, when treating the plant that fired the schedule event, 
-                    // we know that the time update is equal to current cost of the schedule state. 
+                    // we know that the time update is equal to current cost of the schedule state.                    
                     double[] newPathPoint = new double[plants.size()];
                     for (int i = 0; i < currPathPoint.length; i++)
-                    {
-                        if (i == activeAutomatonIndex) // Update the active automaton
+                    {                        
+                        newPathPoint[i] = currPathPoint[i] + Math.min(currCost, remainingTimesInState[i]);
+                        
+                        if (i != activeAutomatonIndex)
                         {
-                            newPathPoint[i] = currPathPoint[i] + currCost;
+                            remainingTimesInState[i] = Math.max(0, remainingTimesInState[i] - currCost);
                         }
-                        else // Update inactive automata using the minimal of 
+                        else
+                        {
+                            remainingTimesInState[activeAutomatonIndex] = currPlantStates[activeAutomatonIndex].getCost();
+                        }
+//                        if (i == activeAutomatonIndex) // Update the active automaton
+//                        {
+//                            newPathPoint[i] = currPathPoint[i] + currCost;
+//                        }
+//                        else // Update inactive automata using the minimal of 
                             // the current schedule state cost and the remaining time in plant state
-                        {
-                            double prevPlantFiringTime = 0;
-                            if (firingTimesArrays[i].size() > 0)
-                            {
-                                prevPlantFiringTime = firingTimesArrays[i].get(firingTimesArrays[i].size() - 1);
-                            }
-                            double remainingTimeInState = Math.max(0, 
-                                    currPlantStates[i].getCost() - (currFiringTime - currCost - prevPlantFiringTime));
-                            newPathPoint[i] = currPathPoint[i] + Math.min(currCost, remainingTimeInState);
-                        }
+//                        {
+//                            double prevPlantFiringTime = 0;
+//                            if (firingTimesArrays[i].size() > 0)
+//                            {
+//                                prevPlantFiringTime = firingTimesArrays[i].get(firingTimesArrays[i].size() - 1);
+//                            }
+//                            double remainingTimeInState = Math.max(0, 
+//                                    currPlantStates[i].getCost() - (currFiringTime - currCost - prevPlantFiringTime));
+//                            newPathPoint[i] = currPathPoint[i] + Math.min(currCost, remainingTimeInState);
+//                        }
                     }
                     
                     // Add the newly created path point to the list, avoiding repetitions of identical points
@@ -1669,6 +1685,12 @@ public class VelocityBalancer
                 // will change, while we want the event velocities to be set in right places. 
                 while (accCost < keyPoint[plantIndex])
                 {
+                    // If we get back to a treated state during the while loop, break out
+                    if (currState.getName().contains("velocity="))
+                    {
+                        break innerForLoop;
+                    }
+                    
                     currState.setName(currState.getName() + "; velocity=" + relativeVelocities[relVelIndex][plantIndex]);
                     accCost += currState.getCost();
                     currState = currState.outgoingArcsIterator().next().getToState();

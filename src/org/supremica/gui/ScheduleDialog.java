@@ -231,7 +231,12 @@ public class ScheduleDialog
             //temp - only here to be able to test the velocity balancer rapidly
             if (optiMethodsBox.getSelectedItem().equals("Velocity Balancing"))
             {
-                new VelocityBalancer(selectedAutomata);
+                VelocityBalancer vb = new VelocityBalancer(selectedAutomata);
+                for (int i = 0; i < vb.getOptimalSubPlants().size(); i++)
+                {
+                    ide.getActiveDocumentContainer().getAnalyzerPanel().addAutomaton(vb.getOptimalSubPlants().getAutomatonAt(i));
+                }
+                
                 return;
             }
             
