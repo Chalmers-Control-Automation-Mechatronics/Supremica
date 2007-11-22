@@ -5,6 +5,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.supremica.automata.ExtendedAutomata;
+import net.sourceforge.waters.subject.module.ModuleSubject;
 
 public class Module extends ExtendedAutomata{
 	
@@ -13,7 +14,7 @@ public class Module extends ExtendedAutomata{
 	* in ExtendedAutomaton
 	*/
 	private LinkedList<String> events;
-	Hashtable<String,Integer> resources;
+	private Hashtable<String,Integer> integerVariables;
 	
 	private int parallels;
 	private int arbitraryNode;
@@ -32,7 +33,7 @@ public class Module extends ExtendedAutomata{
 		super(name, expand);
 		
 		events = new LinkedList<String>();
-		resources = new Hashtable<String,Integer>();
+		integerVariables = new Hashtable<String,Integer>();
 		
 		parallels = 0;
 		arbitraryNode = 0;
@@ -78,6 +79,7 @@ public class Module extends ExtendedAutomata{
 		this.addAutomaton(blockedEventsEFA);
 		blockedEventsEFA.addInitialState("dummy_inital_state_for_blocked");
 		blockedEventsEFA.addState(BLOCKED_STATE);
+		
 	}
 	
 	public void blockEvents(List<String> events){
@@ -125,10 +127,6 @@ public class Module extends ExtendedAutomata{
 	    }
 	}
 	
-	public void addPrecondition(String eventName, List<String> preconList){
-		;
-	}
-	
 	/**
 	 * Add new integer variables for parallel node
 	 * 
@@ -148,6 +146,8 @@ public class Module extends ExtendedAutomata{
 		
 		String name = PARALLEL_PREFIX + "_" + parallels;
 		parallels = parallels + 1;
+		
+		integerVariables.put(name, upperBound);
 		
 		nodeVariablesEFA.addIntegerVariable(
 				name, lowerBound, upperBound, initialValue, markedValue);
@@ -174,6 +174,8 @@ public class Module extends ExtendedAutomata{
 		
 		String name = ARBITRARY_ORDER_PREFIX +"n_"+ arbitraryNode;
 		arbitraryNode = arbitraryNode + 1;
+		
+		integerVariables.put(name, upperBound);
 		
 		nodeVariablesEFA.addIntegerVariable(
 				name, lowerBound, upperBound, initialValue, markedValue);
@@ -203,6 +205,8 @@ public class Module extends ExtendedAutomata{
 		String name = ARBITRARY_ORDER_PREFIX + "_" +arbitrary;
 		arbitrary = arbitrary + 1;
 		
+		integerVariables.put(name, upperBound);
+		
 		nodeVariablesEFA.addIntegerVariable(
 				name, lowerBound, upperBound, initialValue, markedValue);
 		
@@ -210,7 +214,7 @@ public class Module extends ExtendedAutomata{
 	}
 	
 	public int getMaxValueResourceInteger(String resourceName){
-		return resources.get(resourceName);
+		return integerVariables.get(resourceName);
 	}
 	
 	/**
@@ -231,11 +235,11 @@ public class Module extends ExtendedAutomata{
 		}
 		
 		/* Already added */
-		if(resources.containsKey(resourceName)){
+		if(integerVariables.containsKey(resourceName)){
 			return;
 		}
 		
-		resources.put(resourceName, upperBound);
+		integerVariables.put(resourceName, upperBound);
 		
 		if(resourceVariablesEFA == null){
 			initResourceVariables();
