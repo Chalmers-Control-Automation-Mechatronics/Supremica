@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   ComponentsTree
 //###########################################################################
-//# $Id: ComponentsTree.java,v 1.1 2007-11-22 03:40:12 robi Exp $
+//# $Id: ComponentsTree.java,v 1.2 2007-11-22 04:30:52 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.gui;
@@ -38,7 +38,7 @@ import net.sourceforge.waters.subject.module.VariableComponentSubject;
  * @author Robi Malik
  */
 
-class ComponentsTree
+public class ComponentsTree
   extends JTree
   implements MouseListener		     
 {
@@ -56,6 +56,19 @@ class ComponentsTree
     mPopupActionListener = popuplistener;
     addMouseListener(this);
     setCellRenderer(new ComponentsTreeCellRenderer());
+  }
+
+
+  //#########################################################################
+  //# Simple Access
+  public Proxy getSelectedItem()
+  {
+    final TreePath path = getSelectionPath();
+    if (path == null) {
+      return null;
+    } else {
+      return (Proxy) path.getLastPathComponent();
+    }
   }
 
 

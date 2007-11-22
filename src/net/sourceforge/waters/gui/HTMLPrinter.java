@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   HTMLPrinter
 //###########################################################################
-//# $Id: HTMLPrinter.java,v 1.4 2007-06-08 10:45:20 robi Exp $
+//# $Id: HTMLPrinter.java,v 1.5 2007-11-22 04:30:52 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.gui;
@@ -22,9 +22,11 @@ import net.sourceforge.waters.model.module.ExpressionProxy;
 import net.sourceforge.waters.model.module.ForeachProxy;
 import net.sourceforge.waters.model.module.IdentifierProxy;
 import net.sourceforge.waters.model.module.InstanceProxy;
+import net.sourceforge.waters.model.module.ModuleProxy;
 import net.sourceforge.waters.model.module.ParameterBindingProxy;
 import net.sourceforge.waters.model.module.SimpleComponentProxy;
 import net.sourceforge.waters.model.module.SimpleExpressionProxy;
+import net.sourceforge.waters.model.module.VariableComponentProxy;
 import net.sourceforge.waters.model.printer.ModuleProxyPrinter;
 
 
@@ -124,6 +126,14 @@ public class HTMLPrinter
     return null;
   }
 
+  public Object visitModuleProxy(final ModuleProxy module)
+    throws VisitorException
+  {
+    print("<B>MODULE</B> ");
+    print(module.getName());
+    return null;
+  }
+
   public Object visitParameterBindingProxy
       (final ParameterBindingProxy proxy)
     throws VisitorException
@@ -136,12 +146,22 @@ public class HTMLPrinter
     return null;
   }
 
-  public Object visitSimpleComponentProxy
-      (final SimpleComponentProxy proxy)
+  public Object visitSimpleComponentProxy(final SimpleComponentProxy comp)
     throws VisitorException
   {
-    final IdentifierProxy identifier = proxy.getIdentifier();
+    final IdentifierProxy identifier = comp.getIdentifier();
     identifier.acceptVisitor(this);
+    return null;
+  }
+
+  public Object visitVariableComponentProxy(final VariableComponentProxy var)
+    throws VisitorException
+  {
+    final IdentifierProxy identifier = var.getIdentifier();
+    identifier.acceptVisitor(this);
+    print(" : ");
+    final SimpleExpressionProxy type = var.getType();
+    type.acceptVisitor(this);
     return null;
   }
 
