@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   ModuleTree
 //###########################################################################
-//# $Id: ModuleTree.java,v 1.15 2007-11-21 01:33:38 robi Exp $
+//# $Id: ModuleTree.java,v 1.16 2007-11-22 03:40:12 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.gui;
@@ -168,9 +168,7 @@ public class ModuleTree extends JTree
               (((ComponentInfo) nodeInfo).getComponent());
 
             ModuleTreePopupMenu popup =
-              new ModuleTreePopupMenu(mSelfRef,
-                                      mPopupActionListener,
-                                      component);
+              new ModuleTreePopupMenu(mPopupActionListener, component);
             popup.show(mSelfRef, e.getX(), e.getY());
           }
         }

@@ -13,7 +13,7 @@ package net.sourceforge.waters.gui;
 import java.awt.event.*;
 import javax.swing.*;
 
-import net.sourceforge.waters.subject.base.AbstractSubject;
+import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.subject.module.ModuleSubject;
 import net.sourceforge.waters.subject.module.SimpleComponentSubject;
 import net.sourceforge.waters.subject.module.VariableSubject;
@@ -38,15 +38,11 @@ class ModuleTreePopupMenu
     private JMenuItem toPlantTypeItem;
     private JMenuItem toSpecificationTypeItem;
     private JMenuItem toSupervisorTypeItem;
-    private AbstractSubject mInvokingComponent;
-    private ModuleTree mTree;
+    private Proxy mInvokingComponent;
 
-    public ModuleTreePopupMenu(final ModuleTree tree,
-			       final ActionListener listener,
-			       final AbstractSubject c)
+    public ModuleTreePopupMenu(final ActionListener listener, final Proxy c)
     {
         mInvokingComponent = c;
-        mTree = tree;
         init(listener);
     }
 

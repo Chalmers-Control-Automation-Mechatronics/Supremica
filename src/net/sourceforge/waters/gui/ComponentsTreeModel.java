@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   ComponentsTreeModel
 //###########################################################################
-//# $Id: ComponentsTreeModel.java,v 1.1 2007-11-21 04:14:46 robi Exp $
+//# $Id: ComponentsTreeModel.java,v 1.2 2007-11-22 03:40:12 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.gui;
@@ -42,13 +42,13 @@ import net.sourceforge.waters.subject.module.ModuleSubject;
  * @author Robi Malik
  */
 
-public class ComponentsTreeModel
+class ComponentsTreeModel
   implements TreeModel, ModelObserver
 {
 
   //#########################################################################
   //# Constructor
-  public ComponentsTreeModel(final ModuleSubject module)
+  ComponentsTreeModel(final ModuleSubject module)
   {
     mModule = module;
     mChildrenGetterVisitor = new ChildrenGetterVisitor();
@@ -60,7 +60,7 @@ public class ComponentsTreeModel
 
   //#########################################################################
   //# Clean Up
-  public void close()
+  void close()
   {
     mModule.removeModelObserver(this);
     mModule = null;

@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui.actions
 //# CLASS:   InsertVariableAction
 //###########################################################################
-//# $Id: InsertVariableAction.java,v 1.1 2007-08-11 10:44:03 robi Exp $
+//# $Id: InsertVariableAction.java,v 1.2 2007-11-22 03:40:12 robi Exp $
 //###########################################################################
 
 
@@ -39,7 +39,7 @@ public class InsertVariableAction
   InsertVariableAction(final IDE ide)
   {
     super(ide);
-    putValue(Action.NAME, "New Variable ...");
+    putValue(Action.NAME, "Variable ...");
     putValue(Action.SHORT_DESCRIPTION,
              "Add a variable component to the module");
     putValue(Action.MNEMONIC_KEY, KeyEvent.VK_V);
