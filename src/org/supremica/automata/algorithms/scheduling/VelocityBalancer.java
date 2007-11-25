@@ -74,7 +74,7 @@ public class VelocityBalancer
     private Logger logger = LoggerFactory.createLogger(this.getClass());
     
     Scheduler callingScheduler = null;
-              
+       
     public VelocityBalancer(Automata theAutomata)
         throws Exception
     {                   
@@ -82,7 +82,7 @@ public class VelocityBalancer
     }
     public VelocityBalancer(Automata theAutomata, Scheduler callingScheduler)
         throws Exception
-    {
+    {        
         this.callingScheduler = callingScheduler;
         
         // Initializes pointers to automata, time variables, indexMap, etc
@@ -495,7 +495,7 @@ public class VelocityBalancer
             currOptimalSubPlant.addArc(new Arc(fromState, currOptimalSubPlant.getInitialState(), 
                     fromState.outgoingArcsIterator().next().getEvent()));
             currOptimalSubPlant.removeState(prevToState);
-        }
+        }        
         
         Automata plantsAndSpecs = new Automata(optimalSubPlants);
         plantsAndSpecs.addAutomata(specs);
@@ -517,18 +517,10 @@ public class VelocityBalancer
     
     private void findDeadlockLimits(Automata plantsAndSpecs)
         throws Exception
-    {
-        SynthesizerOptions synthesizerOptions = new SynthesizerOptions();
-        synthesizerOptions.setSynthesisType(SynthesisType.NONBLOCKING);
-        synthesizerOptions.setSynthesisAlgorithm(SynthesisAlgorithm.MONOLITHIC);
-        synthesizerOptions.setPurge(false);
-        synthesizerOptions.setMaximallyPermissive(true);
-        synthesizerOptions.setMaximallyPermissiveIncremental(true);
- 
-        AutomataSynthesizer synthesizer = new AutomataSynthesizer(plantsAndSpecs, 
-                SynchronizationOptions.getDefaultSynthesisOptions(), synthesizerOptions);
- 
-        Automaton synthAuto = synthesizer.execute().getFirstAutomaton();
+    {        
+        AutomataSynchronizer synchronizer = new AutomataSynchronizer(plantsAndSpecs, SynchronizationOptions.getDefaultSynchronizationOptions());
+        synchronizer.execute();
+        Automaton synthAuto = synchronizer.getAutomaton();
         synthAuto.setName("Plants||Specs");
         synthAuto.setType(AutomatonType.PLANT);
                 
@@ -540,12 +532,11 @@ public class VelocityBalancer
         IntArrayTreeSet borderAllowedStates = new IntArrayTreeSet();
         
         ArrayList<State> listOfForbiddenRegionRoots = new ArrayList<State>();
-        
         for (Iterator<State> stateIt = synthAuto.stateIterator(); stateIt.hasNext();)
         {
             State state = stateIt.next();
             if (state.isForbidden())
-            {
+            { 
                 boolean isRootOfForbiddenRegion = true;
                 for (Iterator<Arc> incomingArcIt = state.incomingArcsIterator(); incomingArcIt.hasNext();)
                 {

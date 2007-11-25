@@ -237,6 +237,7 @@ public class ScheduleDialog
                     ide.getActiveDocumentContainer().getAnalyzerPanel().addAutomaton(vb.getOptimalSubPlants().getAutomatonAt(i));
                 }
                 
+                close();
                 return;
             }
             
