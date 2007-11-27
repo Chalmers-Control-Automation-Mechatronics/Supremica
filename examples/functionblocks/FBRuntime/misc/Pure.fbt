@@ -12,7 +12,9 @@
   <BasicFB>
     <ECC>
         <ECState Name="INIT" />
-        <ECState Name="STATE" />
+        <ECState Name="STATE">
+		   <ECAction Output="EO"/>
+		</ECState>
 		<ECTransition Source="INIT" Destination="STATE" Condition="EI" />
 		<ECTransition Source="STATE" Destination="INIT" Condition="1" />
     </ECC>

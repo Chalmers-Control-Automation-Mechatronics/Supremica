@@ -1684,6 +1684,11 @@ class ModelMaker
 					event = "reset_event_" + eventName + "_" + fbName + ";";
 					action = "event_" + eventName + "_" + fbName + " = 0;";
 					eventQueue.addTransition(from, to, event, null, action);
+
+					from = to;
+					to = "s" + (i-1);
+					event = "update_ECC_" + fbName + ";";
+					eventQueue.addTransition(from, to, event, null, null);
 				}
 			}
 		}		
