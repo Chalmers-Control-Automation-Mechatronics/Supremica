@@ -69,6 +69,8 @@ public class VelocityBalancer
     Automata specs = null;
     Automaton schedule = null;
     Automata optimalSubPlants = null;
+    
+    int[] plantIndexMapping;
      
     /** The logger */
     private Logger logger = LoggerFactory.createLogger(this.getClass());
@@ -276,6 +278,12 @@ public class VelocityBalancer
         
         indexMap = new AutomataIndexMap(plants);
         
+        plantIndexMapping = new int[plants.size()];
+        for (int i = 0; i < plants.size(); i++)
+        {
+            plantIndexMapping[i] = indexMap.getAutomatonIndex(plants.getAutomatonAt(i));
+        }
+        
         firingTimes = new double[plants.size()][];
         simulationTimes = new double[plants.size()][];
         pathPoints = new ArrayList<double[]>();
@@ -296,7 +304,7 @@ public class VelocityBalancer
         optimalSubPlants = new Automata();
         for (int i = 0; i < plants.size(); i++)
         {
-            Automaton currOptimalSubPlant = new Automaton(plants.getAutomatonAt(i).getName() + "_optimal");
+            Automaton currOptimalSubPlant = new Automaton(indexMap.getAutomatonAt(plantIndexMapping[i]).getName() + "_optimal");
             currOptimalSubPlant.setType(AutomatonType.PLANT);
             State initialState = new State("q0");
             initialState.setInitial(true);
@@ -341,13 +349,13 @@ public class VelocityBalancer
         State[] currPlantStates = new State[plants.size()];
         for (int plantIndex = 0; plantIndex < currPlantStates.length; plantIndex++)
         {
-            currPlantStates[plantIndex] = indexMap.getAutomatonAt(plantIndex).getInitialState();
+            currPlantStates[plantIndex] = indexMap.getAutomatonAt(plantIndexMapping[plantIndex]).getInitialState();
         }
         
         double[] remainingTimesInState = new double[plants.size()];
         for (int i = 0; i < remainingTimesInState.length; i++)
         {
-            remainingTimesInState[i] = plants.getAutomatonAt(i).getInitialState().getCost();
+            remainingTimesInState[i] = plants.getAutomatonAt(plantIndexMapping[i]).getInitialState().getCost();
         }
      
         // Find a firing/simulation time for each schedule state, start from the initial state.
@@ -464,13 +472,11 @@ public class VelocityBalancer
                             {
                                 mutexLimitsNew[i][activeAutomatonIndex].add(new double[]{currPathPoint[activeAutomatonIndex], -1});
                             } 
-                            
-                            break;
                         }
                     }
                     
                     // Add the current event to corresponding optimal plant part
-                    Automaton currOptimalSubPlant = optimalSubPlants.getAutomatonAt(activeAutomatonIndex);
+                    Automaton currOptimalSubPlant = optimalSubPlants.getAutomatonAt(plantIndexMapping[activeAutomatonIndex]);
                     State fromState = currOptimalSubPlant.getStateWithName("q" + (currOptimalSubPlant.nbrOfStates() - 1));
                     fromState.setCost(simulationTimesArrays[activeAutomatonIndex].get(
                             simulationTimesArrays[activeAutomatonIndex].size() - 1));
@@ -489,7 +495,7 @@ public class VelocityBalancer
         // transition to the initial state
         for (int i = 0; i < optimalSubPlants.size(); i++)
         {
-            Automaton currOptimalSubPlant = optimalSubPlants.getAutomatonAt(i);
+            Automaton currOptimalSubPlant = optimalSubPlants.getAutomatonAt(plantIndexMapping[i]);
             State fromState = currOptimalSubPlant.getStateWithName("q" + (currOptimalSubPlant.nbrOfStates() - 2));
             State prevToState = currOptimalSubPlant.getStateWithName("q" + (currOptimalSubPlant.nbrOfStates() - 1));
             currOptimalSubPlant.addArc(new Arc(fromState, currOptimalSubPlant.getInitialState(), 
@@ -611,7 +617,7 @@ public class VelocityBalancer
 
                 for (int i = 0; i < plants.size(); i++)
                 {
-                    Automaton auto = plantsAndSpecs.getPlantAutomata().getAutomatonAt(i);
+                    Automaton auto = plantsAndSpecs.getPlantAutomata().getAutomatonAt(plantIndexMapping[i]);
                     if (auto.getAlphabet().contains(incomingArc.getEvent()))
                     {
                         for (Iterator<State> stIt = auto.stateIterator(); stIt.hasNext();)
@@ -668,7 +674,7 @@ public class VelocityBalancer
                             {
                                 for (int i = 0; i < plants.size(); i++)
                                 {
-                                    Automaton auto = plantsAndSpecs.getPlantAutomata().getAutomatonAt(i);
+                                    Automaton auto = plantsAndSpecs.getPlantAutomata().getAutomatonAt(plantIndexMapping[i]);
                                     if (auto.getAlphabet().contains(arc.getEvent()))
                                     {
                                         for (Iterator<State> stIt = auto.stateIterator(); stIt.hasNext();)
@@ -1658,7 +1664,7 @@ public class VelocityBalancer
     {
         for (int plantIndex = 0; plantIndex < optimalSubPlants.size(); plantIndex++)
         {
-            State currState = optimalSubPlants.getAutomatonAt(plantIndex).getInitialState();
+            State currState = optimalSubPlants.getAutomatonAt(plantIndexMapping[plantIndex]).getInitialState();
             double accCost = 0;
             int relVelIndex = 0;
             innerForLoop: for (double[] keyPoint : keyPoints)
