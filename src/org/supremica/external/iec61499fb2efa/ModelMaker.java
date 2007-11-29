@@ -116,7 +116,8 @@ class ModelMaker
 
 	private ExtendedAutomata automata;
 
-	// maximum value of an integer variable
+	// default range of an integer variable
+	private static int intVarMinValue = 0;
 	private static int intVarMaxValue = 2;
 
 	private int nameCounter = 0;
@@ -159,11 +160,18 @@ class ModelMaker
 			{
 				verboseLevel = QUIET;
 			}
-			if (args[i].equals("-i"))
+			if (args[i].equals("-ix"))
 			{
 				if (i + 1 < args.length)
 				{
 					intVarMaxValue = (new Integer(args[i + 1])).intValue();
+				}
+			}
+			if (args[i].equals("-im"))
+			{
+				if (i + 1 < args.length)
+				{
+					intVarMinValue = (new Integer(args[i + 1])).intValue();
 				}
 			}
 			if (args[i].equals("-ip"))
@@ -1425,7 +1433,7 @@ class ModelMaker
 					String curDataType =  curDeclaration.getType();
 					if (curDataType.toLowerCase().equals("int"))
 					{
-						eventQueue.addIntegerVariable("data_" + curDataInputName + "_" + fbName, 0, intVarMaxValue, 0, 0);
+						eventQueue.addIntegerVariable("data_" + curDataInputName + "_" + fbName, intVarMinValue, intVarMaxValue, 0, 0);
 					}
 					else if (curDataType.toLowerCase().equals("bool"))
 					{
@@ -1467,7 +1475,7 @@ class ModelMaker
 				String curDataType =  curDeclaration.getType();
 				if (curDataType.toLowerCase().equals("int"))
 				{
-					eventQueue.addIntegerVariable("data_" + curDataOutputName + "_" + fbName, 0, intVarMaxValue, 0, 0);
+					eventQueue.addIntegerVariable("data_" + curDataOutputName + "_" + fbName, intVarMinValue, intVarMaxValue, 0, 0);
 				}
 				else if (curDataType.toLowerCase().equals("bool"))
 				{
@@ -1523,7 +1531,7 @@ class ModelMaker
 						String curDataType =  curDeclaration.getType();
 						if (curDataType.toLowerCase().equals("int"))
 						{
-							eventQueue.addIntegerVariable("data_place_" + i + "_" + curDataInputName + "_" + fbName, 0, intVarMaxValue, 0, 0);
+							eventQueue.addIntegerVariable("data_place_" + i + "_" + curDataInputName + "_" + fbName, intVarMinValue, intVarMaxValue, 0, 0);
 						}
 						else if (curDataType.toLowerCase().equals("bool"))
 						{
@@ -1719,7 +1727,7 @@ class ModelMaker
 				String curType =  curDeclaration.getType();
 				if (curType.toLowerCase().equals("int"))
 				{
-					ecc.addIntegerVariable("internal_" + curName + "_" + fbName, 0, intVarMaxValue, 0, 0);
+					ecc.addIntegerVariable("internal_" + curName + "_" + fbName, intVarMinValue, intVarMaxValue, 0, 0);
 				}
 				else if (curType.toLowerCase().equals("bool"))
 				{
@@ -2411,7 +2419,7 @@ class ModelMaker
 				for (Iterator iter = algorithmIdents.iterator(); iter.hasNext();)
 				{
 					String curIdent = (String) iter.next();
-					curAlgModel.addIntegerVariable(curIdent, 0, intVarMaxValue, 0, 0);
+					curAlgModel.addIntegerVariable(curIdent, intVarMinValue, intVarMaxValue, 0, 0);
 				}
 				
 				String[] efaAlgTextLines = efaAlgText.split(";");

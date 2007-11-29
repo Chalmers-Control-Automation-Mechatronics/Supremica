@@ -5,6 +5,9 @@ DIR=`dirname $THIS`
 
 export LD_LIBRARY_PATH=$DIR
 
-java -cp "$DIR/Supremica.jar" -enableassertions \
+#  -agentlib:jdwp=transport=dt_socket,address=8000,server=y,suspend=n \
+java -Xms512m \
+	-Xmx1280m \
+  -cp "$DIR/Supremica.jar" -enableassertions \
   org.supremica.gui.ide.IDE -p SupremicaProperties.cfg $*
 

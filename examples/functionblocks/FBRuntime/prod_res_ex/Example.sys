@@ -19,135 +19,56 @@
 		  <FB Name="res2" Type="Resource" />
 		  <FB Name="res3" Type="Resource" />
 
-		  <FB Name="mux1take" Type="Mux" />
-		  <FB Name="mux1process" Type="Mux" />
-		  <FB Name="mux1release" Type="Mux" />
-
-		  <FB Name="mux2take" Type="Mux" />
-		  <FB Name="mux2process" Type="Mux" />
-		  <FB Name="mux2release" Type="Mux" />
-
-		  <FB Name="mux3take" Type="Mux" />
-		  <FB Name="mux3process" Type="Mux" />
-		  <FB Name="mux3release" Type="Mux" />
-
-		  <FB Name="datamux1" Type="DataMux" />
-		  <FB Name="datamux2" Type="DataMux" />
-		  <FB Name="datamux3" Type="DataMux" />
-
-
-		  <FB Name="datademux1" Type="DataDemux" />
-		  <FB Name="datademux2" Type="DataDemux" />
-		  <FB Name="datademux3" Type="DataDemux" />
-
-		  <FB Name="demux1taken" Type="Demux" />
-		  <FB Name="demux1processed" Type="Demux" />
-
-		  <FB Name="demux2taken" Type="Demux" />
-		  <FB Name="demux2processed" Type="Demux" />
-
-		  <FB Name="demux3taken" Type="Demux" />
-		  <FB Name="demux3processed" Type="Demux" />
-
-
-	
 		  <EventConnections>
 			  <Connection Source="restart.COLD" Destination="split.EI" />
 			  <Connection Source="split.EO1" Destination="prod1.make" />
 			  <Connection Source="split.EO2" Destination="prod2.make" />
 
+			  <!-- Product 1 -->
+			  <Connection Source="prod1.takeR1" Destination="res1.take1" />
+			  <Connection Source="prod1.takeR2" Destination="res2.take1" />
+			  <Connection Source="prod1.takeR3" Destination="res3.take1" />
+
+			  <Connection Source="prod1.processR1" Destination="res1.process1" />
+			  <Connection Source="prod1.processR2" Destination="res2.process1" />
+			  <Connection Source="prod1.processR3" Destination="res3.process1" />
+
+			  <Connection Source="prod1.releaseR1" Destination="res1.release1" />
+			  <Connection Source="prod1.releaseR2" Destination="res2.release1" />
+			  <Connection Source="prod1.releaseR3" Destination="res3.release1" />
+
+			  <Connection Source="res1.taken1" Destination="prod1.gotR1" />
+			  <Connection Source="res2.taken1" Destination="prod1.gotR2" />
+			  <Connection Source="res3.taken1" Destination="prod1.gotR3" />
+
+			  <Connection Source="res1.processed1" Destination="prod1.processedR1" />
+			  <Connection Source="res2.processed1" Destination="prod1.processedR2" />
+			  <Connection Source="res3.processed1" Destination="prod1.processedR3" />
 
 
 
-			  <Connection Source="prod1.takeR1" Destination="mux1take.EI1" />
-			  <Connection Source="prod1.processR1" Destination="mux1process.EI1" />
-			  <Connection Source="prod1.releaseR1" Destination="mux1release.EI1" />
+			  <!-- Product 2 -->
+			  <Connection Source="prod2.takeR1" Destination="res1.take2" />
+			  <Connection Source="prod2.takeR2" Destination="res2.take2" />
+			  <Connection Source="prod2.takeR3" Destination="res3.take2" />
 
-			  <Connection Source="prod2.takeR1" Destination="mux1take.EI2" />
-			  <Connection Source="prod2.processR1" Destination="mux1process.EI2" />
-			  <Connection Source="prod2.releaseR1" Destination="mux1release.EI2" />
+			  <Connection Source="prod2.processR1" Destination="res1.process2" />
+			  <Connection Source="prod2.processR2" Destination="res2.process2" />
+			  <Connection Source="prod2.processR3" Destination="res3.process2" />
 
-			  <Connection Source="mux1take.EO" Destination="datamux1.EI1" />
-			  <Connection Source="mux1process.EO" Destination="datamux1.EI2" />
-			  <Connection Source="mux1release.EO" Destination="datamux1.EI3" />
+			  <Connection Source="prod2.releaseR1" Destination="res1.release2" />
+			  <Connection Source="prod2.releaseR2" Destination="res2.release2" />
+			  <Connection Source="prod2.releaseR3" Destination="res3.release2" />
 
-			  <Connection Source="datamux1.EO1" Destination="res1.take" />
-			  <Connection Source="datamux1.EO2" Destination="res1.process" />
-			  <Connection Source="datamux1.EO3" Destination="res1.release" />
+			  <Connection Source="res1.taken2" Destination="prod2.gotR1" />
+			  <Connection Source="res2.taken2" Destination="prod2.gotR2" />
+			  <Connection Source="res3.taken2" Destination="prod2.gotR3" />
 
-			  <Connection Source="res1.taken" Destination="datademux1.EI1" />
-			  <Connection Source="res1.processed" Destination="datademux1.EI2" />
-
-			  <Connection Source="datademux1.EO1" Destination="demux1taken.EI" />
-			  <Connection Source="datademux1.EO2" Destination="demux1processed.EI" />
-
-			  <Connection Source="demux1taken.EO1" Destination="prod1.gotR1" />
-			  <Connection Source="demux1taken.EO2" Destination="prod2.gotR1" />
-
-			  <Connection Source="demux1processed.EO1" Destination="prod1.processedR1" />
-			  <Connection Source="demux1processed.EO2" Destination="prod2.processedR1" />
-
-
-
-
-			  <Connection Source="prod1.takeR2" Destination="mux2take.EI1" />
-			  <Connection Source="prod1.processR2" Destination="mux2process.EI1" />
-			  <Connection Source="prod1.releaseR2" Destination="mux2release.EI1" />
-
-			  <Connection Source="prod2.takeR2" Destination="mux2take.EI2" />
-			  <Connection Source="prod2.processR2" Destination="mux2process.EI2" />
-			  <Connection Source="prod2.releaseR2" Destination="mux2release.EI2" />
-
-			  <Connection Source="mux2take.EO" Destination="datamux2.EI1" />
-			  <Connection Source="mux2process.EO" Destination="datamux2.EI2" />
-			  <Connection Source="mux2release.EO" Destination="datamux2.EI3" />
-
-			  <Connection Source="datamux2.EO1" Destination="res2.take" />
-			  <Connection Source="datamux2.EO2" Destination="res2.process" />
-			  <Connection Source="datamux2.EO3" Destination="res2.release" />
-
-			  <Connection Source="res2.taken" Destination="datademux2.EI1" />
-			  <Connection Source="res2.processed" Destination="datademux2.EI2" />
-
-			  <Connection Source="datademux2.EO1" Destination="demux2taken.EI" />
-			  <Connection Source="datademux2.EO2" Destination="demux2processed.EI" />
-
-			  <Connection Source="demux2taken.EO1" Destination="prod1.gotR2" />
-			  <Connection Source="demux2taken.EO2" Destination="prod2.gotR2" />
-
-			  <Connection Source="demux2processed.EO1" Destination="prod1.processedR2" />
-			  <Connection Source="demux2processed.EO2" Destination="prod2.processedR2" />
-
-
-
-
-			  <Connection Source="prod1.takeR3" Destination="mux3take.EI1" />
-			  <Connection Source="prod1.processR3" Destination="mux3process.EI1" />
-			  <Connection Source="prod1.releaseR3" Destination="mux3release.EI1" />
-
-			  <Connection Source="prod2.takeR3" Destination="mux3take.EI2" />
-			  <Connection Source="prod2.processR3" Destination="mux3process.EI2" />
-			  <Connection Source="prod2.releaseR3" Destination="mux3release.EI2" />
-
-			  <Connection Source="mux3take.EO" Destination="datamux3.EI1" />
-			  <Connection Source="mux3process.EO" Destination="datamux3.EI2" />
-			  <Connection Source="mux3release.EO" Destination="datamux3.EI3" />
-
-			  <Connection Source="datamux3.EO1" Destination="res3.take" />
-			  <Connection Source="datamux3.EO2" Destination="res3.process" />
-			  <Connection Source="datamux3.EO3" Destination="res3.release" />
-
-			  <Connection Source="res3.taken" Destination="datademux3.EI1" />
-			  <Connection Source="res3.processed" Destination="datademux3.EI2" />
-
-			  <Connection Source="datademux3.EO1" Destination="demux3taken.EI" />
-			  <Connection Source="datademux3.EO2" Destination="demux3processed.EI" />
-
-			  <Connection Source="demux3taken.EO1" Destination="prod1.gotR3" />
-			  <Connection Source="demux3taken.EO2" Destination="prod2.gotR3" />
-
-			  <Connection Source="demux3processed.EO1" Destination="prod1.processedR3" />
-			  <Connection Source="demux3processed.EO2" Destination="prod2.processedR3" />
+			  <Connection Source="res1.processed2" Destination="prod2.processedR1" />
+			  <Connection Source="res2.processed2" Destination="prod2.processedR2" />
+			  <Connection Source="res3.processed2" Destination="prod2.processedR3" />
+			  
+			  
 			  
 			  <Connection Source="prod1.done" Destination="rend.EI1" />
 			  <Connection Source="prod2.done" Destination="rend.EI2" />
@@ -159,51 +80,9 @@
 			  <Connection Source="1" Destination="prod1.product" />
 			  <Connection Source="2" Destination="prod2.product" />
 
-		  	  <Connection Source="1" Destination="res1.capacity" />
-		  	  <Connection Source="1" Destination="res2.capacity" />
-		  	  <Connection Source="1" Destination="res3.capacity" />
-
-
-
-
-			  <Connection Source="mux1take.DO" Destination="datamux1.DI1" />
-			  <Connection Source="mux1process.DO" Destination="datamux1.DI2" />
-			  <Connection Source="mux1release.DO" Destination="datamux1.DI3" />
-
-			  <Connection Source="datamux1.DO" Destination="res1.product" />
-
-			  <Connection Source="res1.forProduct" Destination="datademux1.DI" />
-
-			  <Connection Source="datademux1.DO1" Destination="demux1taken.DI" />
-			  <Connection Source="datademux1.DO2" Destination="demux1processed.DI" />
-
-
-
-
-			  <Connection Source="mux2take.DO" Destination="datamux2.DI1" />
-			  <Connection Source="mux2process.DO" Destination="datamux2.DI2" />
-			  <Connection Source="mux2release.DO" Destination="datamux2.DI3" />
-
-			  <Connection Source="datamux2.DO" Destination="res2.product" />
-
-			  <Connection Source="res2.forProduct" Destination="datademux2.DI" />
-
-			  <Connection Source="datademux2.DO1" Destination="demux2taken.DI" />
-			  <Connection Source="datademux2.DO2" Destination="demux2processed.DI" />
-
-
-
-
-			  <Connection Source="mux3take.DO" Destination="datamux3.DI1" />
-			  <Connection Source="mux3process.DO" Destination="datamux3.DI2" />
-			  <Connection Source="mux3release.DO" Destination="datamux3.DI3" />
-
-			  <Connection Source="datamux3.DO" Destination="res3.product" />
-
-			  <Connection Source="res3.forProduct" Destination="datademux3.DI" />
-
-			  <Connection Source="datademux3.DO1" Destination="demux3taken.DI" />
-			  <Connection Source="datademux3.DO2" Destination="demux3processed.DI" />
+			  <Connection Source="1" Destination="res1.capacity" />
+			  <Connection Source="1" Destination="res2.capacity" />
+			  <Connection Source="1" Destination="res3.capacity" />
           </DataConnections>
 
       </FBNetwork>
