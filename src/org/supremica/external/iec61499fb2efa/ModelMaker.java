@@ -33,6 +33,7 @@ import java.util.Set;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
+import java.util.ArrayList;
 import java.net.URI;
 import java.lang.Exception;
 import javax.xml.bind.JAXBContext;
@@ -86,7 +87,9 @@ class ModelMaker
 	private Map basicFunctionBlocks = new HashMap();
 	// String name, Integer ID
 	private Map basicFunctionBlocksID = new HashMap();
-	private int fbIDCounter = 1;
+	// list to order the blocks with algorithms first
+	// used to assign lowest block ids to blocks with algorithms
+	private List basicFunctionBlocksList = new ArrayList();
 	private int fbMaxID = 1;
 
 	// String fb name, Map event input name -> event ID
@@ -98,6 +101,8 @@ class ModelMaker
 	private Map algorithms = new HashMap();
 	private int algIDCounter = 1;
 	private int algMaxID = 0;
+	// number of blocks containing the algorithms
+	private int algFB = 0;
 	// String fb name, Map alg name -> JaxbAlgorithm
 	private Map algorithmTexts = new HashMap();
 
@@ -422,7 +427,6 @@ class ModelMaker
 								{
 									FB curFB = (FB) fbIter.next();
 									loadFB(curFB, null, null);
-									fbMaxID = fbIDCounter - 1;
 								}
 							}
 						}
@@ -435,6 +439,16 @@ class ModelMaker
 			output(ERROR, e.toString());
 			exit(1);
 		}
+		
+		// Assign block IDs
+		int counter = 1;
+		for (Iterator iter = basicFunctionBlocksList.iterator(); iter.hasNext();)
+		{
+			String instanceName = (String) iter.next();
+			basicFunctionBlocksID.put(instanceName, new Integer(counter));
+			counter++;
+		}
+		fbMaxID = counter-1;
 	}
 
     private void loadFB(FB fb, FB parent, String parentName)
@@ -505,8 +519,6 @@ class ModelMaker
 					output("Adding Basic FB " + instanceName, 1);
 
 					basicFunctionBlocks.put(instanceName, typeName);
-					basicFunctionBlocksID.put(instanceName, new Integer(fbIDCounter));
-					fbIDCounter++;
 
 					// make events map entry
 					List eventInputList = (List) ((EventInputs) ((InterfaceList) theType.getInterfaceList()).getEventInputs()).getEvent();
@@ -530,6 +542,11 @@ class ModelMaker
 					BasicFB basicFB = theType.getBasicFB();
 					if (basicFB.isSetAlgorithm())
 					{
+
+						// blocks with algorithms go first in the list
+						basicFunctionBlocksList.add(0,instanceName);
+						algFB++;
+
 						List fbAlgs = (List) basicFB.getAlgorithm();
 						Map algMap = new HashMap();
 						Map algTextMap = new HashMap();
@@ -563,6 +580,10 @@ class ModelMaker
 						algIDCounter = 1;
 						algorithms.put(instanceName, algMap);
 						algorithmTexts.put(instanceName, algTextMap);
+					}
+					else
+					{
+						basicFunctionBlocksList.add(instanceName);
 					}
 				}
 				else if (!theType.isSetBasicFB() && theType.isSetFBNetwork())
@@ -625,6 +646,7 @@ class ModelMaker
 		}
 		return theFile;
     }
+
 	
 	private void makeEventConnectionMap(JaxbFBNetwork fbNetwork, String parentInstance, int level)
 	{
@@ -1116,13 +1138,13 @@ class ModelMaker
 				places = jobQueuePlaces.intValue();
 			}
 		
-			jobQueue.addIntegerVariable("current_job_fb", 0, fbMaxID, 0, 0);
+			jobQueue.addIntegerVariable("current_job_fb", 0, algFB, 0, 0);
 			jobQueue.addIntegerVariable("current_job_alg", 0, algMaxID, 0, 0);
 
 			jobQueue.addInitialState("s0");
 			for (int i = 1; i <= places; i++)
 			{
-				jobQueue.addIntegerVariable("job_fb_place_" + i, 0, fbMaxID, 0, 0);
+				jobQueue.addIntegerVariable("job_fb_place_" + i, 0, algFB, 0, 0);
 				jobQueue.addIntegerVariable("job_alg_place_" + i, 0, algMaxID, 0, 0);
 	
 				jobQueue.addState("s" + i);
