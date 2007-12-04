@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.compiler
 //# CLASS:   CompilerTest
 //###########################################################################
-//# $Id: CompilerTest.java,v 1.14 2007-06-08 10:45:20 robi Exp $
+//# $Id: CompilerTest.java,v 1.15 2007-12-04 03:22:58 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.compiler;
@@ -208,6 +208,12 @@ public class CompilerTest
 
   //#########################################################################
   //# Successful Test Cases using EFA
+  public void testCompile_dosingtankEFA()
+    throws IOException, WatersException
+  {
+    compile("dosingtankEFA");
+  }
+
   public void testCompile_EFA0()
     throws IOException, WatersException
   {

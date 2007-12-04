@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.subject.base
 //# CLASS:   IndexedArrayListSubject
 //###########################################################################
-//# $Id: IndexedArrayListSubject.java,v 1.7 2007-11-21 04:14:46 robi Exp $
+//# $Id: IndexedArrayListSubject.java,v 1.8 2007-12-04 03:22:58 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.subject.base;
@@ -363,7 +363,11 @@ public class IndexedArrayListSubject<P extends NamedSubject>
   public void fireModelChanged(final ModelChangeEvent event)
   {
     if (mObservers != null) {
-      for (final ModelObserver observer : mObservers) {
+      // Just in case they try to register or deregister observers
+      // in response to the update ...
+      final List<ModelObserver> copy =
+        new ArrayList<ModelObserver>(mObservers);
+      for (final ModelObserver observer : copy) {
         observer.modelChanged(event);
       }
     }

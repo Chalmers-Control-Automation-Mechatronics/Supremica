@@ -4,13 +4,13 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   IdentifierTransfer
 //###########################################################################
-//# $Id: IdentifierTransfer.java,v 1.4 2007-01-29 16:04:25 flordal Exp $
+//# $Id: IdentifierTransfer.java,v 1.5 2007-12-04 03:22:54 robi Exp $
 //###########################################################################
 
 
 package net.sourceforge.waters.gui;
 
-import java.util.Collection;
+import java.util.List;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.UnsupportedFlavorException;
 import java.awt.datatransfer.Transferable;
@@ -29,7 +29,7 @@ public class IdentifierTransfer implements Transferable
    * @param idents  The identifier being transferred.
    * @param kind   The associated event kind.
    */
-  public IdentifierTransfer(final Collection<IdentifierSubject> idents,
+  public IdentifierTransfer(final List<IdentifierSubject> idents,
                             final EventType kind)
   {
     mData = new IdentifierWithKind(idents, kind);

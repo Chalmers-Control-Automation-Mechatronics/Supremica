@@ -1,5 +1,12 @@
+//# -*- tab-width: 4  indent-tabs-mode: t  c-basic-offset: 4 -*-
+//###########################################################################
+//# PROJECT: Supremica GUI
+//# PACKAGE: org.supremica.gui.ide.actions
+//# CLASS:   ScheduleDialog
+//###########################################################################
+//# $Id: ScheduleDialog.java,v 1.56 2007-12-04 03:22:58 robi Exp $
+//###########################################################################
 
-/********************** ScheduleDialog.java *****************/
 package org.supremica.gui;
 
 import javax.swing.*;
@@ -501,53 +508,39 @@ public class ScheduleDialog
 
                     net.sourceforge.waters.model.module.SimpleComponentProxy component = 
                             importer.importComponent(scheduleAutoForEditor);
-                    if (ide.getActiveDocumentContainer().getEditorPanel().getEditorPanelInterface().componentNameAvailable(component.getName()))
-                    {
+					try {
                         // Add to current module
-                        try
-                        {
-                            ide.getActiveDocumentContainer().getEditorPanel().getEditorPanelInterface().addComponent((net.sourceforge.waters.subject.base.AbstractSubject) component);
-
-                            // Add all (new) events to the module
-                            net.sourceforge.waters.subject.module.ModuleSubject module = ide.getActiveDocumentContainer().getEditorPanel().getEditorPanelInterface().getModuleSubject();
-                            boolean problem = false;
-                            for (org.supremica.automata.LabeledEvent event : scheduleAuto.getAlphabet())
-                            {
-                                if (!event.getName().contains("["))
-                                {
-                                    if (!module.getEventDeclListModifiable().containsName(event.getName()))
-                                    {
-                                        final net.sourceforge.waters.model.des.EventProxy proxy = 
-                                                (net.sourceforge.waters.model.des.EventProxy) event;
-                                        final net.sourceforge.waters.subject.module.EventDeclSubject decl =
-                                            new net.sourceforge.waters.subject.module.EventDeclSubject(proxy.getName(),
-                                            proxy.getKind(),
-                                            proxy.isObservable(),
-                                            net.sourceforge.waters.xsd.module.ScopeKind.LOCAL,
-                                            null, null);
-                                        module.getEventDeclListModifiable().add(decl);
-                                    }
-                                }
-                                else
-                                {
-                                    problem = true;
-                                }
-                            }
-                            if (problem)
-                            {
-                                javax.swing.JOptionPane.showMessageDialog(ide.getFrame(), "There is a problem in the back-translation of parametrised events.", "Alert", javax.swing.JOptionPane.WARNING_MESSAGE);
-                            }
-                        }
-                        catch (Exception ex)
-                        {
-                            ide.getIDE().error("Could not add " + scheduleAuto + " to editor." + ex);
-                        }
-                    }
-                    else
-                    {
-                        javax.swing.JOptionPane.showMessageDialog(ide.getFrame(), "Component: " + component.getName() + " already exists in editor", "Duplicate Name", javax.swing.JOptionPane.ERROR_MESSAGE);
-                    }
-                }
+						final net.sourceforge.waters.model.module.IdentifierProxy ident = component.getIdentifier();
+						final net.sourceforge.waters.gui.ModuleContext context = ide.getActiveDocumentContainer().getEditorPanel().getModuleContext();
+						context.checkNewComponentName(ident);
+						ide.getActiveDocumentContainer().getEditorPanel().addComponent((net.sourceforge.waters.subject.base.AbstractSubject) component);
+						// Add all (new) events to the module
+						net.sourceforge.waters.subject.module.ModuleSubject module = ide.getActiveDocumentContainer().getEditorPanel().getModuleSubject();
+						boolean problem = false;
+						for (org.supremica.automata.LabeledEvent event : scheduleAuto.getAlphabet()) {
+							if (!event.getName().contains("[")) {
+								if (!module.getEventDeclListModifiable().containsName(event.getName())) {
+									final net.sourceforge.waters.model.des.EventProxy proxy = 
+										(net.sourceforge.waters.model.des.EventProxy) event;
+									final net.sourceforge.waters.subject.module.EventDeclSubject decl =
+										new net.sourceforge.waters.subject.module.EventDeclSubject(proxy.getName(),
+																								   proxy.getKind(),
+																								   proxy.isObservable(),
+																								   net.sourceforge.waters.xsd.module.ScopeKind.LOCAL,
+																								   null, null);
+									module.getEventDeclListModifiable().add(decl);
+								}
+							} else {
+								problem = true;
+							}
+						}
+						if (problem) {
+							javax.swing.JOptionPane.showMessageDialog(ide.getFrame(), "There is a problem in the back-translation of parametrised events.", "Alert", javax.swing.JOptionPane.WARNING_MESSAGE);
+						}
+					} catch (Exception ex) {
+						ide.getIDE().error("Could not add " + scheduleAuto + " to editor." + ex);
+					}
+				}
                 else
                 {
                     javax.swing.JOptionPane.showMessageDialog(ide.getFrame(), "The editor is unknown. The schedule was not added.", "Editor null", javax.swing.JOptionPane.ERROR_MESSAGE);

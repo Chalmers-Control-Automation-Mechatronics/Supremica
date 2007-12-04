@@ -250,14 +250,14 @@
     <xs:complexContent>
       <xs:extension base="B:ElementType">
         <xs:sequence>
-          <xs:element ref="D:TraceStateTuple" minOccurs="0">
+          <xs:element ref="D:FirstTraceStateTuple" minOccurs="0">
             <xs:annotation><xs:appinfo>
               <jaxb:property name="InitialState"/>
             </xs:appinfo></xs:annotation>
           </xs:element>
           <xs:sequence maxOccurs="unbounded">
             <xs:element ref="D:EventRef"/>
-            <xs:element ref="D:TraceStateTuple" minOccurs="0"/>
+            <xs:element ref="D:NextTraceStateTuple" minOccurs="0"/>
           </xs:sequence>
         </xs:sequence>
       </xs:extension>
@@ -274,18 +274,32 @@
   </xs:complexType>
 </xs:element>
 
-<xs:element name="TraceStateTuple">
+<xs:complexType name="TraceStateTupleType">
+  <xs:complexContent>
+    <xs:extension base="B:ElementType">
+      <xs:sequence>
+        <xs:element ref="D:TraceState" minOccurs="0" maxOccurs="unbounded">
+          <xs:annotation><xs:appinfo>
+            <jaxb:property name="List"/>
+          </xs:appinfo></xs:annotation>
+        </xs:element>
+      </xs:sequence>
+    </xs:extension>
+  </xs:complexContent>
+</xs:complexType>
+
+<xs:element name="FirstTraceStateTuple">
   <xs:complexType>
     <xs:complexContent>
-      <xs:extension base="B:ElementType">
-        <xs:sequence>
-          <xs:element ref="D:TraceState" minOccurs="0" maxOccurs="unbounded">
-            <xs:annotation><xs:appinfo>
-              <jaxb:property name="List"/>
-            </xs:appinfo></xs:annotation>
-          </xs:element>
-        </xs:sequence>
-      </xs:extension>
+      <xs:extension base="D:TraceStateTupleType"/>
+    </xs:complexContent>
+  </xs:complexType>
+</xs:element>
+
+<xs:element name="NextTraceStateTuple">
+  <xs:complexType>
+    <xs:complexContent>
+      <xs:extension base="D:TraceStateTupleType"/>
     </xs:complexContent>
   </xs:complexType>
 </xs:element>

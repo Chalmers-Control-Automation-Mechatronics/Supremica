@@ -1,6 +1,6 @@
 ##############################################################################
 # Sample build.properties file for Waters
-# $Id: build.properties.sample,v 1.7 2006-07-20 02:28:38 robi Exp $
+# $Id: build.properties.sample,v 1.8 2007-12-04 03:23:02 robi Exp $
 ##############################################################################
 # Copy this file to build.properties and edit the names below
 # to match your system.
@@ -9,7 +9,7 @@
 ##############################################################################
 # JAVADOC LINKS
 
-java.api.url = http://www.scms.waikato.ac.nz/help/reference/j2sdk1.5/api/
+java.api.url = http://java.sun.com/javase/6/docs/api/
 jaxme.api.url = http://ws.apache.org/jaxme/apidocs/
 junit.api.url = http://junit.sourceforge.net/javadoc/
 

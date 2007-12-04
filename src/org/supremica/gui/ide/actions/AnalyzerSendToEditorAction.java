@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.gui.ide.actions
 //# CLASS:   AnalyzerSendToEditorAction
 //###########################################################################
-//# $Id: AnalyzerSendToEditorAction.java,v 1.11 2007-08-20 11:36:57 flordal Exp $
+//# $Id: AnalyzerSendToEditorAction.java,v 1.12 2007-12-04 03:22:58 robi Exp $
 //###########################################################################
 
 package org.supremica.gui.ide.actions;
@@ -16,8 +16,10 @@ import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import javax.swing.ImageIcon;
 
+import net.sourceforge.waters.gui.ModuleContext;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.marshaller.ProductDESImporter;
+import net.sourceforge.waters.model.module.IdentifierProxy;
 import net.sourceforge.waters.model.module.SimpleComponentProxy;
 import net.sourceforge.waters.xsd.module.ScopeKind;
 import net.sourceforge.waters.subject.base.AbstractSubject;
@@ -72,76 +74,42 @@ public class AnalyzerSendToEditorAction
             
             // Compile into Waters module
             ProductDESImporter importer = new ProductDESImporter(ModuleSubjectFactory.getInstance());
-            for (Automaton aut : selectedAutomata)
-            {
-                SimpleComponentProxy component = importer.importComponent(aut);
-                if (ide.getActiveDocumentContainer().getEditorPanel().getEditorPanelInterface().componentNameAvailable(component.getName()))
-                {
+            for (Automaton aut : selectedAutomata) {
+				try {
+					final SimpleComponentProxy comp =
+						importer.importComponent(aut);
+					final IdentifierProxy ident = comp.getIdentifier();
+					final ModuleContext context =
+						ide.getActiveDocumentContainer().getEditorPanel().
+						getModuleContext();
+					context.checkNewComponentName(ident);
                     // Add to current module
-                    try
-                    {
-                        ide.getActiveDocumentContainer().getEditorPanel().getEditorPanelInterface().addComponent((AbstractSubject) component);
-                        
-                        // Add all (new) events to the module
-                        ModuleSubject module = ide.getActiveDocumentContainer().getEditorPanel().getEditorPanelInterface().getModuleSubject();
-                        boolean problem = false;
-                        for (EventProxy event: aut.getEvents())
-                        {
-                            if (event.getName().contains("["))
-                            {
-                                problem = true;
-                            }
-                            else
-                            {
-                                if (!module.getEventDeclListModifiable().containsName(event.getName()))
-                                {
-                                    final EventProxy proxy = (EventProxy) event;
-                                    final EventDeclSubject decl =
-                                        new EventDeclSubject(proxy.getName(),
-                                        proxy.getKind(),
-                                        proxy.isObservable(),
-                                        ScopeKind.LOCAL,
-                                        null, null);
-                                    module.getEventDeclListModifiable().add(decl);
-                                }
-                            }                        
-                        }
-                        /*
-                        for (LabeledEvent event: aut.getAlphabet())
-                        {
-                            if (!event.getName().contains("["))
-                            {
-                                if (!module.getEventDeclListModifiable().containsName(event.getName()))
-                                {
-                                    final EventProxy proxy = (EventProxy) event;
-                                    final EventDeclSubject decl =
-                                        new EventDeclSubject(proxy.getName(),
-                                        proxy.getKind(),
-                                        proxy.isObservable(),
-                                        ScopeKind.LOCAL,
-                                        null, null);
-                                    module.getEventDeclListModifiable().add(decl);
-                                }
-                            }
-                            else
-                            {
-                                problem = true;
-                            }
-                        }
-                         */
-                        if (problem)
-                            JOptionPane.showMessageDialog(ide.getFrame(), "There is a problem in the back-translation of parametrised events.", "Alert", JOptionPane.WARNING_MESSAGE);
+					ide.getActiveDocumentContainer().getEditorPanel().
+						addComponent((AbstractSubject) comp);
+					// Add all (new) events to the module
+					ModuleSubject module = ide.getActiveDocumentContainer().getEditorPanel().getModuleSubject();
+					boolean problem = false;
+					for (EventProxy event: aut.getEvents()) {
+						if (event.getName().contains("[")) {
+							problem = true;
+						} else if (!module.getEventDeclListModifiable().containsName(event.getName())) {
+								final EventProxy proxy = (EventProxy) event;
+								final EventDeclSubject decl =
+									new EventDeclSubject(proxy.getName(),
+														 proxy.getKind(),
+														 proxy.isObservable(),
+														 ScopeKind.LOCAL,
+														 null, null);
+								module.getEventDeclListModifiable().add(decl);
+						}
+					}
+					if (problem) {
+						JOptionPane.showMessageDialog(ide.getFrame(), "There is a problem in the back-translation of parametrised events.", "Alert", JOptionPane.WARNING_MESSAGE);
                     }
-                    catch (Exception ex)
-                    {
-                        ide.getIDE().error("Could not add " + aut + " to editor." + ex);
-                    }
-                }
-                else
-                {
-                    JOptionPane.showMessageDialog(ide.getFrame(), "Component: " + component.getName() + " already exists in editor", "Duplicate Name", JOptionPane.ERROR_MESSAGE);
-                }
-            }
+				} catch (Exception ex) {
+					ide.getIDE().error("Could not add " + aut + " to editor." + ex);
+				}
+			}
         }
     }
     

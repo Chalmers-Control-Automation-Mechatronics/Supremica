@@ -41,7 +41,6 @@ import net.sourceforge.waters.subject.module.SimpleExpressionSubject;
 import net.sourceforge.waters.subject.module.GuardActionBlockSubject;
 import net.sourceforge.waters.subject.module.BinaryExpressionSubject;
 import net.sourceforge.waters.subject.module.SimpleExpressionSubject;
-import net.sourceforge.waters.subject.module.VariableHelper;
 import net.sourceforge.waters.subject.module.PlainEventListSubject;
 import net.sourceforge.waters.subject.module.EventDeclSubject;
 import net.sourceforge.waters.model.module.EventDeclProxy;
@@ -55,6 +54,8 @@ import net.sourceforge.waters.model.compiler.TypeMismatchException;
 import net.sourceforge.waters.model.expr.ExpressionParser;
 import net.sourceforge.waters.model.expr.Operator;
 import net.sourceforge.waters.model.expr.ParseException;
+
+import org.supremica.automata.VariableHelper;
 
 
 
@@ -157,7 +158,7 @@ public class ExtendedAutomaton
 
 	public void addIntegerVariable(String name, int lowerBound, int upperBound, int initialValue, Integer markedValue)
 	{
-		component.getVariablesModifiable().add(VariableHelper.createIntegerVariable(name, lowerBound, upperBound, initialValue, null));
+		module.getComponentListModifiable().add(VariableHelper.createIntegerVariable(name, lowerBound, upperBound, initialValue, null));
 	}
 
 	/**

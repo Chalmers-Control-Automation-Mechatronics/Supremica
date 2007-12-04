@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   IconLoader
 //###########################################################################
-//# $Id: IconLoader.java,v 1.9 2007-08-11 10:44:03 robi Exp $
+//# $Id: IconLoader.java,v 1.10 2007-12-04 03:22:54 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.gui;
@@ -30,6 +30,7 @@ public class IconLoader
     
     //#########################################################################
     //# Class Constants
+    private static final String NAME_AUTOMATON = "waters/automaton16";
     private static final String NAME_CONTROLLABLE = "waters/controllable";
     private static final String NAME_EVENT = "waters/event";
     private static final String NAME_FORBIDDEN = "ForbiddenState16";
@@ -46,6 +47,7 @@ public class IconLoader
     
     //#########################################################################
     //# Class Constants
+    public static final ImageIcon ICON_AUTOMATON = getIcon(NAME_AUTOMATON);
     public static final ImageIcon ICON_BINDING = null;
     public static final ImageIcon ICON_CONTROLLABLE =
 		getIcon(NAME_CONTROLLABLE);

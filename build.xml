@@ -264,7 +264,8 @@
                verbose="false"
                nowarn="true"
                excludes="${jgrafchart_basedir}/**,
-               ${supremica_basedir}/external/robotCoordination/**"
+                  ${supremica_basedir}/external/robotCoordination/**,
+                  net/sourceforge/waters/mbt/**"
                source="1.5"
                fork="true"
                memoryMaximumSize="128M">
@@ -613,6 +614,10 @@ Class-Path: ${manifest.pathlist}</echo>
         <chmod file="${dist}/glpk_bridge.dll" perm="644"/> 
         <copy file="${platform}/linux.x86/lib/libbuddy.so" todir="${dist}"/>
         <chmod file="${dist}/libbuddy.so" perm="644"/>
+        <copy file="${platform}/linux.x86/lib/libcal.so" todir="${dist}"/>
+        <chmod file="${dist}/libcal.so" perm="644"/>
+        <copy file="${platform}/linux.x86/lib/libcudd.so" todir="${dist}"/>
+        <chmod file="${dist}/libcudd.so" perm="644"/>
         <copy file="${platform}/linux.x86/lib/libBisimulationEquivalence.so" todir="${dist}"/>
         <chmod file="${dist}/libBisimulationEquivalence.so" perm="644"/>
         <copy file="${platform}/macosx.powerpc/libBisimulationEquivalence.dylib" todir="${dist}"/>

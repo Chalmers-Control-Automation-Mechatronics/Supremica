@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   EventEditorDialog
 //###########################################################################
-//# $Id: EventEditorDialog.java,v 1.21 2007-11-21 01:33:38 robi Exp $
+//# $Id: EventEditorDialog.java,v 1.22 2007-12-04 03:22:54 robi Exp $
 //###########################################################################
 
 
@@ -53,8 +53,9 @@ import javax.swing.text.BadLocationException;
 import javax.swing.text.DocumentFilter;
 
 import net.sourceforge.waters.gui.command.Command;
-import net.sourceforge.waters.gui.command.CreateEventDeclCommand;
-import net.sourceforge.waters.gui.command.EditEventDeclCommand;
+import net.sourceforge.waters.gui.command.InsertCommand;
+import net.sourceforge.waters.gui.command.EditCommand;
+import net.sourceforge.waters.gui.transfer.SelectionOwner;
 import net.sourceforge.waters.model.expr.ExpressionParser;
 import net.sourceforge.waters.model.expr.Operator;
 import net.sourceforge.waters.model.expr.ParseException;
@@ -896,16 +897,15 @@ public class EventEditorDialog
         }
         // ***
       }
+      final SelectionOwner panel = mRoot.getEventsPanel();
       final EventDeclSubject template =
         new EventDeclSubject(name, kind, observable, scope, ranges, null);
       if (mEventDecl == null) {
-        // Creating new event declaration.
-        final ModuleSubject module = getModule();
-        final Command command = new CreateEventDeclCommand(template, module);
+        final Command command = new InsertCommand(template, panel);
         mEventDecl = template;
         mRoot.getUndoInterface().executeCommand(command);
       } else if (!mEventDecl.equalsWithGeometry(template)) {
-        final Command command = new EditEventDeclCommand(mEventDecl, template);
+        final Command command = new EditCommand(mEventDecl, template, panel);
         mRoot.getUndoInterface().executeCommand(command);
       }
       dispose();

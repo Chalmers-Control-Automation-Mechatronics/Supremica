@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.gui.ide
 //# CLASS:   IDEToolBar
 //###########################################################################
-//# $Id: IDEToolBar.java,v 1.19 2007-09-25 23:38:58 knut Exp $
+//# $Id: IDEToolBar.java,v 1.20 2007-12-04 03:22:58 robi Exp $
 //###########################################################################
 
 
@@ -21,6 +21,13 @@ import javax.swing.JButton;
 import javax.swing.JToggleButton;
 
 import net.sourceforge.waters.gui.ControlledToolbar;
+import net.sourceforge.waters.gui.actions.IDECopyAction;
+import net.sourceforge.waters.gui.actions.IDECutAction;
+import net.sourceforge.waters.gui.actions.IDEDeleteAction;
+import net.sourceforge.waters.gui.actions.IDEPasteAction;
+import net.sourceforge.waters.gui.actions.InsertEventDeclAction;
+import net.sourceforge.waters.gui.actions.InsertSimpleComponentAction;
+import net.sourceforge.waters.gui.actions.InsertVariableAction;
 import net.sourceforge.waters.gui.actions.ToolEdgeAction;
 import net.sourceforge.waters.gui.actions.ToolGroupNodeAction;
 import net.sourceforge.waters.gui.actions.ToolNodeAction;
@@ -73,16 +80,26 @@ public class IDEToolBar
         addAction(actions.getAction(SaveAction.class));
         addAction(actions.editorPrintAction);
         addSeparator();
+        addAction(actions.getAction(IDEDeleteAction.class));
+        addAction(actions.getAction(IDECutAction.class));
+        addAction(actions.getAction(IDECopyAction.class));
+        addAction(actions.getAction(IDEPasteAction.class));
+        addSeparator();
 		addAction(actions.getAction(WatersUndoAction.class));
 		addAction(actions.getAction(WatersRedoAction.class));
+        addSeparator();
+		addAction(actions.getAction(InsertSimpleComponentAction.class));
+        //Need better icons first for these two :-(
+		//addAction(actions.getAction(InsertVariableAction.class));
+		//addAction(actions.getAction(InsertEventDeclAction.class));
         addSeparator();
         //addAction(actions.editorStopEmbedderAction);
         //addSeparator();
         final ButtonGroup group = new ButtonGroup();
-		addAction(actions.getAction(ToolSelectAction.class), group);
-		addAction(actions.getAction(ToolNodeAction.class), group);
-		addAction(actions.getAction(ToolGroupNodeAction.class), group);
-		addAction(actions.getAction(ToolEdgeAction.class), group);
+		addAction(actions.getAction(ToolSelectAction.class), group, true);
+		addAction(actions.getAction(ToolNodeAction.class), group, false);
+		addAction(actions.getAction(ToolGroupNodeAction.class), group, false);
+		addAction(actions.getAction(ToolEdgeAction.class), group, false);
     }
 
 
@@ -141,14 +158,19 @@ public class IDEToolBar
 	private void addAction(final Action action)
 	{
 		final JButton button = add(action);
+        button.setFocusable(false);
 		button.setMargin(INSETS);
 	}
 
-	private void addAction(final Action action, final ButtonGroup group)
+	private void addAction(final Action action,
+                           final ButtonGroup group,
+                           final boolean selected)
 	{
 		final JToggleButton button = new JToggleButton(action);
 		button.setText("");
 		button.setMargin(INSETS);
+        button.setSelected(selected);
+        button.setFocusable(false);
 		group.add(button);
 		add(button);
 	}

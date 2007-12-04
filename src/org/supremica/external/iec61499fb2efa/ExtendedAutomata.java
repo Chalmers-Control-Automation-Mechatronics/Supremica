@@ -1,3 +1,12 @@
+//# -*- tab-width: 4  indent-tabs-mode: nil  c-basic-offset: 4 -*-
+//###########################################################################
+//# PROJECT: Supremica
+//# PACKAGE: org.supremica.external.iec61499fb2efa
+//# CLASS:   ExtendedAutomata
+//###########################################################################
+//# $Id: ExtendedAutomata.java,v 1.19 2007-12-04 03:22:58 robi Exp $
+//###########################################################################
+
 /*
  *   Copyright (C) 2006 Goran Cengic
  *
@@ -55,21 +64,20 @@ import net.sourceforge.fuber.model.interpreters.abstractsyntax.StatementList;
 import net.sourceforge.fuber.model.interpreters.abstractsyntax.Expression;
 import net.sourceforge.fuber.model.interpreters.abstractsyntax.Identifier;
 
-import net.sourceforge.waters.xsd.base.EventKind;
-import net.sourceforge.waters.subject.base.ListSubject;
-
-import net.sourceforge.waters.subject.module.*;
-import net.sourceforge.waters.model.module.*;
-
+import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
-import net.sourceforge.waters.model.marshaller.JAXBModuleMarshaller;
-
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
 import net.sourceforge.waters.model.compiler.TypeMismatchException;
-
 import net.sourceforge.waters.model.expr.ExpressionParser;
 import net.sourceforge.waters.model.expr.Operator;
 import net.sourceforge.waters.model.expr.ParseException;
+import net.sourceforge.waters.model.marshaller.JAXBModuleMarshaller;
+import net.sourceforge.waters.model.module.*;
+import net.sourceforge.waters.subject.base.ListSubject;
+import net.sourceforge.waters.subject.module.*;
+import net.sourceforge.waters.xsd.base.EventKind;
+
+import org.supremica.automata.VariableHelper;
 
 
 public class ExtendedAutomata
@@ -134,27 +142,28 @@ public class ExtendedAutomata
 		// and put them in a map
 		ModelMaker.output(ModelMaker.DEBUG, "ExtendedAutomata.expandTransitions(): Making module variables map.");
 		Map moduleVariables = new HashMap();
-		for (Iterator compIter = module.getComponentList().iterator(); compIter.hasNext();)
-		{
-			SimpleComponentProxy curComponent = (SimpleComponentProxy) compIter.next();
-			for (Iterator varIter = curComponent.getVariables().iterator(); varIter.hasNext();)
-			{
-				VariableProxy curVar = (VariableProxy) varIter.next();
-				String curVarName = curVar.getName();
+        for (final Proxy proxy : module.getComponentList()) {
+            if (proxy instanceof VariableComponentProxy) {
+                final VariableComponentProxy curVar =
+                    (VariableComponentProxy) proxy;
+				final String curVarName = curVar.getName();
 				if (moduleVariables.keySet().contains(curVarName))
 				{
-					ModelMaker.output(ModelMaker.WARN, "ExtendedAutomata.expandTransitions(): Warning!: The module contains duplicate variable definitions.");
-					ModelMaker.output(ModelMaker.WARN, "Variable name: " + curVarName, 1);
+					System.out.println("ExtendedAutomata.expandTransitions(): Warning!: The module contains duplicate variable definitions.");
+					System.out.println("Variable name: " + curVarName);
 				}
-				ModelMaker.output(ModelMaker.DEBUG, curVar.getName(), 1);
+				System.out.println(curVar.getName());
 				moduleVariables.put(curVar.getName(), curVar);
 			}
 		}
 		
 		// expand transitions for all components in the module
-		for (Iterator compIter = module.getComponentList().iterator(); compIter.hasNext();)
-		{
-			SimpleComponentProxy curComponent = (SimpleComponentProxy) compIter.next();
+        for (final Proxy proxy : module.getComponentList()) {
+            if (!(proxy instanceof SimpleComponentProxy)) {
+                continue;
+            }
+            final SimpleComponentProxy curComponent =
+                (SimpleComponentProxy) proxy;
 			String curComponentName = curComponent.getName();
 			ModelMaker.output(ModelMaker.DEBUG, "ExtendedAutomata.expandTransitions(): Component", 1);
 			ModelMaker.output(ModelMaker.DEBUG, curComponentName, 2);
@@ -331,7 +340,7 @@ public class ExtendedAutomata
 						for (Iterator iter = guardExpressionIdents.iterator(); iter.hasNext();)
 						{
 							String curIdent = (String) iter.next();
-							VariableProxy curModuleVariable = (VariableProxy) moduleVariables.get(curIdent);
+							VariableComponentProxy curModuleVariable = (VariableComponentProxy) moduleVariables.get(curIdent);
 
 							ModelMaker.output(ModelMaker.DEBUG, curIdent, 4);
 
@@ -420,7 +429,7 @@ public class ExtendedAutomata
 									for (Iterator iter = actionsExpressionIdents.iterator(); iter.hasNext();)
 									{
 										String curIdent = (String) iter.next();
-										VariableProxy curModuleVariable = (VariableProxy) moduleVariables.get(curIdent);
+										VariableComponentProxy curModuleVariable = (VariableComponentProxy) moduleVariables.get(curIdent);
 
 										ModelMaker.output(ModelMaker.DEBUG, curIdent, 4);
 										
@@ -606,7 +615,7 @@ public class ExtendedAutomata
 						for (Iterator iter = actionsExpressionIdents.iterator(); iter.hasNext();)
 						{
 							String curIdent = (String) iter.next();
-							VariableProxy curModuleVariable = (VariableProxy) moduleVariables.get(curIdent);
+							VariableComponentProxy curModuleVariable = (VariableComponentProxy) moduleVariables.get(curIdent);
 							
 							ModelMaker.output(ModelMaker.DEBUG, curIdent, 4);
 							

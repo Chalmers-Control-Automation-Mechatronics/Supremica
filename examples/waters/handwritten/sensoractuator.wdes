@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<ProductDES Name="sensoractuator" xmlns="http://waters.sourceforge.net/xsd/des">
+<ProductDES Name="sensoractuator"
+            xmlns:ns2="http://waters.sourceforge.net/xsd/base"
+            xmlns="http://waters.sourceforge.net/xsd/des">
+<ns2:Comment></ns2:Comment>
 <EventList>
 <Event Kind="PROPOSITION" Name=":accepting"/>
 <Event Kind="CONTROLLABLE" Name="change_direction_11"/>

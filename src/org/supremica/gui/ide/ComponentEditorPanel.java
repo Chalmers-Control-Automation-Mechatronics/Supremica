@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.gui.ide
 //# CLASS:   ComponentEditorPanel
 //###########################################################################
-//# $Id: ComponentEditorPanel.java,v 1.57 2007-10-31 13:01:00 flordal Exp $
+//# $Id: ComponentEditorPanel.java,v 1.58 2007-12-04 03:22:58 robi Exp $
 //###########################################################################
 
 
@@ -42,6 +42,7 @@ import org.supremica.log.Logger;
 import org.supremica.log.LoggerFactory;
 import org.supremica.gui.GraphicsToClipboard;
 
+
 /**
  * A Swing component for editing a Waters graph.
  * A component editor panel allows the user to edit an object of type
@@ -51,22 +52,14 @@ import org.supremica.gui.GraphicsToClipboard;
  *
  * @author Knut &Aring;kesson
  */
+
 public class ComponentEditorPanel
     extends JPanel
     implements EditorWindowInterface
 {
-    private static final long serialVersionUID = 1L;
     
-    private static Logger logger = LoggerFactory.createLogger(ComponentEditorPanel.class);
-    
-    private ModuleContainer mModuleContainer;
-    private ControlledSurface surface;
-    private EditorEvents events;
-    private SimpleComponentSubject component = null;
-    private ModuleSubject mModule = null;
-    private boolean isSaved = false;
-    private GraphicsToClipboard toClipboard = null;
-    
+    //########################################################################
+    //# Constructor
     /**
      * Creates a new component editor panel.
      * @param  moduleContainer  the module container as a handle to the
@@ -76,62 +69,50 @@ public class ComponentEditorPanel
      * @param  size             the expected total size of the panel.
      */
     public ComponentEditorPanel(final ModuleContainer moduleContainer,
-        final SimpleComponentSubject component,
-        final Dimension size)
+								final SimpleComponentSubject component,
+								final Dimension size)
         throws GeometryAbsentException
     {
-        this.component = component;
+        mComponent = component;
         mModuleContainer = moduleContainer;
         mModule = moduleContainer.getModule();
-        surface = new ControlledSurface
+		final IDE ide = moduleContainer.getIDE();
+        mSurface = new ControlledSurface
             (component.getGraph(), mModule, this,
-            (ControlledToolbar) mModuleContainer.getIDE().getToolBar());
-        surface.setPreferredSize(IDEDimensions.rightEditorPreferredSize);
-        surface.setMinimumSize(IDEDimensions.rightEditorMinimumSize);
+			 (ControlledToolbar) ide.getToolBar(),
+			 ide.getPopupActionManager());
+        mSurface.setPreferredSize(IDEDimensions.rightEditorPreferredSize);
+        mSurface.setMinimumSize(IDEDimensions.rightEditorMinimumSize);
         
         final ModuleWindowInterface root = mModuleContainer.getEditorPanel();
-        events = new EditorEvents(root, component, this);
+        mEventsPane = new EditorEvents(root, component, this);
         
         final LayoutManager layout = new BorderLayout();
         setLayout(layout);
         
-        final JScrollPane scrollsurface = new JScrollPane(surface);
-        final JScrollPane scrollevents = new JScrollPane(events);
+        final JScrollPane scrollsurface = new JScrollPane(mSurface);
+        final JScrollPane scrollevents = new JScrollPane(mEventsPane);
         final JViewport viewevents = scrollevents.getViewport();
         final JSplitPane split = new JSplitPane
             (JSplitPane.HORIZONTAL_SPLIT, scrollevents, scrollsurface);
         final int halfwidth = size.width >> 1;
-        final int prefeventswidth = events.getPreferredSize().width;
+        final int prefeventswidth = mEventsPane.getPreferredSize().width;
         final int divide = Math.min(prefeventswidth, halfwidth);
         split.setDividerLocation(divide);
         add(split, BorderLayout.CENTER);
-        
-        surface.createOptions(this);
     }
-    
-    /**
-     * Returns the name of the current component.
-     */
-    public String getComponentName()
-    {
-        return component.getName();
-    }
-    
+
+
     //########################################################################
     //# Interface net.sourceforge.waters.gui.EditorWindowInterface
+    public SimpleComponentSubject getComponent()
+    {
+        return mComponent;
+    }
+
     public ModuleWindowInterface getModuleWindowInterface()
     {
         return mModuleContainer.getEditorPanel();
-    }
-    
-    public boolean isSaved()
-    {
-        return isSaved;
-    }
-    
-    public void setSaved(boolean s)
-    {
-        isSaved = s;
     }
     
     public JFrame getFrame()
@@ -141,27 +122,12 @@ public class ComponentEditorPanel
     
     public ControlledSurface getControlledSurface()
     {
-        return surface;
+        return mSurface;
     }
     
     public EditorEvents getEventPane()
     {
-        return events;
-    }
-    
-/*
-        public void repaint()
-        {
-                System.err.println("ComponentEditorPanel.repaint");
-                //scrollsurface.invalidate();
-                super.repaint();
-        }
- */
-    
-    public void setDisplayed()
-    {
-        EditorPanel editorPanel = mModuleContainer.getEditorPanel();
-        editorPanel.setRightComponent(this);
+        return mEventsPane;
     }
     
     public UndoInterface getUndoInterface()
@@ -176,12 +142,12 @@ public class ComponentEditorPanel
             toClipboard = GraphicsToClipboard.getInstance();
         }
         
-        //Rectangle2D bb = surface.getBoundingBox();
+        //Rectangle2D bb = mSurface.getBoundingBox();
         //double minX = bb.getMinX();
         //double maxX = bb.getMaxX();
         //double minY = bb.getMinY();
         //double maxY = bb.getMaxY();
-        //logger.debug("minX: " + minX + " maxX: " + maxX + " minY: " + minY + " maxY: " + maxY);
+        //LOGGER.debug("minX: " + minX + " maxX: " + maxX + " minY: " + minY + " maxY: " + maxY);
         //create a WMF object
         //int width = (int)(maxX - minX) + 1;
         //int height = (int)(maxY - minY) + 1;
@@ -189,9 +155,9 @@ public class ComponentEditorPanel
         // a problem with the size of wmf-data
         //width += (int)0.1*width;
         //height += (int)0.1*height;
-        Graphics theGraphics = toClipboard.getGraphics(surface.getWidth(), surface.getHeight());
+        Graphics theGraphics = toClipboard.getGraphics(mSurface.getWidth(), mSurface.getHeight());
         
-        surface.print(theGraphics);
+        mSurface.print(theGraphics);
         toClipboard.copyToClipboard();
     }
     
@@ -201,7 +167,7 @@ public class ComponentEditorPanel
         // Get file to export to
         JFileChooser chooser = new JFileChooser();
         chooser.setSelectedFile(new File(getName() + ".pdf"));
-        int returnVal = chooser.showSaveDialog(surface);
+        int returnVal = chooser.showSaveDialog(mSurface);
         File file = chooser.getSelectedFile();
         // Not OK?
         if (returnVal != JFileChooser.APPROVE_OPTION)
@@ -210,8 +176,8 @@ public class ComponentEditorPanel
         }
         
         // Create output
-        int width = surface.getWidth();
-        int height = surface.getHeight();
+        int width = mSurface.getWidth();
+        int height = mSurface.getHeight();
         Document document = new Document(new com.lowagie.text.Rectangle(width, height));
         
         try
@@ -224,7 +190,7 @@ public class ComponentEditorPanel
             PdfContentByte cb = writer.getDirectContent();
             PdfTemplate tp = cb.createTemplate(width, height);
             Graphics2D g2 = tp.createGraphics(width, height, new DefaultFontMapper());
-            surface.print(g2);
+            mSurface.print(g2);
             //Rectangle2D rectangle2D = new Rectangle2D.Double(0, 0, width, height);
             //chart.draw(g2, rectangle2D);
             g2.dispose();
@@ -261,7 +227,7 @@ public class ComponentEditorPanel
                 String name;
                 name = getName();
                 chooser.setSelectedFile(new File(name + ".ps"));
-                int returnVal = chooser.showSaveDialog(surface);
+                int returnVal = chooser.showSaveDialog(mSurface);
                 File file = chooser.getSelectedFile();
                 // Not OK?
                 if (returnVal != JFileChooser.APPROVE_OPTION)
@@ -275,7 +241,7 @@ public class ComponentEditorPanel
                 // psPrinter is our Postscript print service
                 PrinterJob printJob = PrinterJob.getPrinterJob();
                 printJob.setPrintService(psPrinter);
-                printJob.setPrintable(surface);
+                printJob.setPrintable(mSurface);
                 // Printing attributes
                 PrintRequestAttributeSet attributes = new HashPrintRequestAttributeSet();
                 PrintRequestAttribute jobName = new JobName("Supremica Printing", Locale.ENGLISH);
@@ -314,7 +280,7 @@ public class ComponentEditorPanel
                 mModuleContainer.getIDE().error("No default printer set.");
                 return;
             }
-            printJob.setPrintable(surface);
+            printJob.setPrintable(mSurface);
             
             // Printing attributes
             PrintRequestAttributeSet attributes = new HashPrintRequestAttributeSet();
@@ -324,13 +290,13 @@ public class ComponentEditorPanel
             // Show printing dialog
             if (printJob.printDialog(attributes))
             {
-                logger.debug("Printing...");
+                LOGGER.debug("Printing...");
                 
                 // Print!
                 printJob.print();
                 //printJob.print(attributes);
                 
-                logger.debug("Printing done!");
+                LOGGER.debug("Printing done!");
             }
         }
         catch (Exception ex)
@@ -339,29 +305,23 @@ public class ComponentEditorPanel
             System.err.println(ex.getStackTrace());
         }
     }
-    
-    public void createEvent()
-    {
-        final ModuleWindowInterface root = mModuleContainer.getEditorPanel();
-        final EditorWindowInterface gedit =
-            mModuleContainer.getActiveEditorWindowInterface();
-        final EventEditorDialog diag = new EventEditorDialog(root);
-        diag.addActionListener(new ActionListener()
-        {
-            public void actionPerformed(final ActionEvent event)
-            {
-                final NamedSubject decl = diag.getEditedItem();
-                if (decl != null)
-                {
-                    final String name = decl.getName();
-                    final SimpleIdentifierSubject ident =
-                        new SimpleIdentifierSubject(name);
-                    final EditorEvents eventpane = gedit.getEventPane();
-                    final EventTableModel model =
-                        (EventTableModel) eventpane.getModel();
-                    model.addIdentifier(ident);
-                }
-            }
-        });
-    }
+
+
+    //########################################################################
+    //# Data Members
+    private final ModuleContainer mModuleContainer;
+    private final ControlledSurface mSurface;
+    private final EditorEvents mEventsPane;
+    private final SimpleComponentSubject mComponent;
+    private final ModuleSubject mModule;
+
+    private GraphicsToClipboard toClipboard;
+
+
+    //########################################################################
+    //# Static Class Constants
+    private static final long serialVersionUID = 1L;
+    private static final Logger LOGGER =
+		LoggerFactory.createLogger(ComponentEditorPanel.class);
+
 }

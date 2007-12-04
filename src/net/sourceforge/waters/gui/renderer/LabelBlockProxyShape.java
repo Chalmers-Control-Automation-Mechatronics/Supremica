@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui.renderer
 //# CLASS:   LabelBlockProxyShape
 //###########################################################################
-//# $Id: LabelBlockProxyShape.java,v 1.8 2007-09-19 00:33:02 robi Exp $
+//# $Id: LabelBlockProxyShape.java,v 1.9 2007-12-04 03:22:55 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.gui.renderer;
@@ -30,13 +30,8 @@ public class LabelBlockProxyShape
                               final RoundRectangle2D bounds)
   {
     super(block);
-    if (block.getEventList().isEmpty()) {
-      mShape = new GeneralPath();
-      mHeight = 0;
-    } else {
-      mShape = bounds;
-      mHeight = bounds.getHeight();
-    }
+    mShape = bounds;
+    mHeight = bounds.getHeight();
   }
 
 
@@ -45,6 +40,11 @@ public class LabelBlockProxyShape
   double getHeight()
   {
     return mHeight;
+  }
+
+  boolean getShowsHandlesWhenEmpty()
+  {
+    return false;
   }
 
 
@@ -77,9 +77,11 @@ public class LabelBlockProxyShape
       g2d.fill(shape);
     }
     if (status.showHandles()) {
-      g2d.setColor(status.getColor());
-      g2d.setStroke(BASICSTROKE);
-      g2d.draw(shape);
+      if (getShowsHandlesWhenEmpty() || !getProxy().getEventList().isEmpty()) {
+        g2d.setColor(status.getColor());
+        g2d.setStroke(BASICSTROKE);
+        g2d.draw(shape);
+      }
     }
   }
 

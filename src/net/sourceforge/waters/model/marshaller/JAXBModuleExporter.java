@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.marshaller
 //# CLASS:   JAXBModuleExporter
 //###########################################################################
-//# $Id: JAXBModuleExporter.java,v 1.22 2007-07-21 22:13:24 robi Exp $
+//# $Id: JAXBModuleExporter.java,v 1.23 2007-12-04 03:22:55 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.marshaller;
@@ -22,10 +22,6 @@ import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.base.VisitorException;
 import net.sourceforge.waters.model.expr.BinaryOperator;
 import net.sourceforge.waters.model.expr.UnaryOperator;
-//EFA----------
-import net.sourceforge.waters.model.module.GuardActionBlockProxy;
-import net.sourceforge.waters.model.module.VariableProxy;
-//-------------
 import net.sourceforge.waters.model.module.AliasProxy;
 import net.sourceforge.waters.model.module.BinaryExpressionProxy;
 import net.sourceforge.waters.model.module.BoxGeometryProxy;
@@ -42,6 +38,7 @@ import net.sourceforge.waters.model.module.ForeachComponentProxy;
 import net.sourceforge.waters.model.module.ForeachEventAliasProxy;
 import net.sourceforge.waters.model.module.ForeachEventProxy;
 import net.sourceforge.waters.model.module.ForeachProxy;
+import net.sourceforge.waters.model.module.GuardActionBlockProxy;
 import net.sourceforge.waters.model.module.GraphProxy;
 import net.sourceforge.waters.model.module.GroupNodeProxy;
 import net.sourceforge.waters.model.module.IdentifiedProxy;
@@ -69,12 +66,13 @@ import net.sourceforge.waters.model.unchecked.Casting;
 
 import net.sourceforge.waters.xsd.base.ElementType;
 import net.sourceforge.waters.xsd.base.NamedType;
+import net.sourceforge.waters.xsd.module.Actions;
 import net.sourceforge.waters.xsd.module.AnchorPosition;
 import net.sourceforge.waters.xsd.module.BinaryExpression;
-import net.sourceforge.waters.xsd.module.BoxGeometry;
 import net.sourceforge.waters.xsd.module.Box;
-import net.sourceforge.waters.xsd.module.ColorGeometry;
+import net.sourceforge.waters.xsd.module.BoxGeometry;
 import net.sourceforge.waters.xsd.module.Color;
+import net.sourceforge.waters.xsd.module.ColorGeometry;
 import net.sourceforge.waters.xsd.module.ConstantAlias;
 import net.sourceforge.waters.xsd.module.Edge;
 import net.sourceforge.waters.xsd.module.EnumSetExpression;
@@ -84,11 +82,13 @@ import net.sourceforge.waters.xsd.module.EventListExpression;
 import net.sourceforge.waters.xsd.module.EventListType;
 import net.sourceforge.waters.xsd.module.ExpressionType;
 import net.sourceforge.waters.xsd.module.ForeachComponent;
-import net.sourceforge.waters.xsd.module.ForeachEventAlias;
 import net.sourceforge.waters.xsd.module.ForeachEvent;
+import net.sourceforge.waters.xsd.module.ForeachEventAlias;
 import net.sourceforge.waters.xsd.module.ForeachType;
 import net.sourceforge.waters.xsd.module.Graph;
 import net.sourceforge.waters.xsd.module.GroupNode;
+import net.sourceforge.waters.xsd.module.GuardActionBlock;
+import net.sourceforge.waters.xsd.module.Guards;
 import net.sourceforge.waters.xsd.module.IdentifiedType;
 import net.sourceforge.waters.xsd.module.IdentifierType;
 import net.sourceforge.waters.xsd.module.IndexedIdentifier;
@@ -97,12 +97,12 @@ import net.sourceforge.waters.xsd.module.IntConstant;
 import net.sourceforge.waters.xsd.module.LabelBlock;
 import net.sourceforge.waters.xsd.module.LabelGeometry;
 import net.sourceforge.waters.xsd.module.Module;
-import net.sourceforge.waters.xsd.module.NodeType;
 import net.sourceforge.waters.xsd.module.NodeRef;
+import net.sourceforge.waters.xsd.module.NodeType;
 import net.sourceforge.waters.xsd.module.ObjectFactory;
 import net.sourceforge.waters.xsd.module.ParameterBinding;
-import net.sourceforge.waters.xsd.module.PointGeometryType;
 import net.sourceforge.waters.xsd.module.Point;
+import net.sourceforge.waters.xsd.module.PointGeometryType;
 import net.sourceforge.waters.xsd.module.ScopeKind;
 import net.sourceforge.waters.xsd.module.SimpleComponent;
 import net.sourceforge.waters.xsd.module.SimpleExpressionType;
@@ -112,13 +112,10 @@ import net.sourceforge.waters.xsd.module.SplineGeometry;
 import net.sourceforge.waters.xsd.module.SplineKind;
 import net.sourceforge.waters.xsd.module.UnaryExpression;
 import net.sourceforge.waters.xsd.module.VariableComponent;
+import net.sourceforge.waters.xsd.module.VariableInitial;
 import net.sourceforge.waters.xsd.module.VariableMarking;
-//EFA-----------------
-import net.sourceforge.waters.xsd.module.Actions;
-import net.sourceforge.waters.xsd.module.GuardActionBlock;
-import net.sourceforge.waters.xsd.module.Guards;
-import net.sourceforge.waters.xsd.module.Variable;
-//-----------------------
+import net.sourceforge.waters.xsd.module.VariableRange;
+
 
 public class JAXBModuleExporter
   extends JAXBDocumentExporter<ModuleProxy,Module>
@@ -145,15 +142,7 @@ public class JAXBModuleExporter
     copyGuardActionBlockProxy(proxy, element);
     return element;
   }
-  
-  public Variable visitVariableProxy(final VariableProxy proxy)
-    throws VisitorException
-  {
-    final Variable element = mFactory.createVariable();
-    copyVariableProxy(proxy, element);
-    return element;
-  }
-  //--------------------------------
+//--------------------------------
 
   public Object visitAliasProxy(final AliasProxy proxy)
     throws VisitorException
@@ -534,30 +523,6 @@ public class JAXBModuleExporter
       final LabelGeometry geometryElement =
         visitLabelGeometryProxy(geometryProxy);
       element.setLabelGeometry(geometryElement);
-    }
-  }
-  
-  private void copyVariableProxy
-    (final VariableProxy proxy,
-     final Variable element)
-    throws VisitorException
-  {
-    copyProxy(proxy, element);
-    element.setName(proxy.getName());
-    final SimpleExpressionProxy typeProxy = proxy.getType();
-    final SimpleExpressionType typeElement = 
-      (SimpleExpressionType) typeProxy.acceptVisitor(this);
-    element.setType(typeElement);
-    final List<SimpleExpressionType> values = element.getValues();
-    final SimpleExpressionProxy initialValueProxy = proxy.getInitialValue();
-    final SimpleExpressionType initialValueElement = 
-      (SimpleExpressionType) initialValueProxy.acceptVisitor(this);
-    values.add(initialValueElement);
-    final SimpleExpressionProxy markedValueProxy = proxy.getMarkedValue();
-    if (markedValueProxy != null) {
-      final SimpleExpressionType markedValueElement = 
-        (SimpleExpressionType) markedValueProxy.acceptVisitor(this);
-      values.add(markedValueElement);
     }
   }
   // ------------------
@@ -1007,8 +972,6 @@ public class JAXBModuleExporter
      final SimpleComponent element)
     throws VisitorException
   {
-    final List<VariableProxy> variablesProxy = proxy.getVariables();
-    mSimpleComponentVariableListHandler.toJAXB(this, variablesProxy, element);
     copyComponentProxy(proxy, element);
     element.setKind(proxy.getKind());
     final GraphProxy graphProxy = proxy.getGraph();
@@ -1102,19 +1065,22 @@ public class JAXBModuleExporter
     throws VisitorException
   {
     copyComponentProxy(proxy, element);
+    final boolean deterministic = proxy.isDeterministic();
+    element.setDeterministic(deterministic);
     final SimpleExpressionProxy typeProxy = proxy.getType();
     final SimpleExpressionType typeElement =
       (SimpleExpressionType) typeProxy.acceptVisitor(this);
-    element.setType(typeElement);
-    final boolean deterministic = proxy.isDeterministic();
-    element.setDeterministic(deterministic);
+    final VariableRange vrange = mFactory.createVariableRange();
+    vrange.setRange(typeElement);
+    element.setVariableRange(vrange);
     final SimpleExpressionProxy predicateProxy =
       proxy.getInitialStatePredicate();
     final SimpleExpressionType predicateElement =
       (SimpleExpressionType) predicateProxy.acceptVisitor(this);
-    element.setInitialStatePredicate(predicateElement);
-    final List<VariableMarkingProxy> listProxy =
-      proxy.getVariableMarkings();
+    final VariableInitial vinit = mFactory.createVariableInitial();
+    vinit.setPredicate(predicateElement);
+    element.setVariableInitial(vinit);
+    final List<VariableMarkingProxy> listProxy = proxy.getVariableMarkings();
     final List<ElementType> listElement =
       Casting.toList(element.getVariableMarkings());
     copyCollection(listProxy, listElement);
@@ -1126,14 +1092,16 @@ public class JAXBModuleExporter
     throws VisitorException
   {
     copyProxy(proxy, element);
+    final List<SimpleExpressionType> pair =
+      element.getPropositionAndPredicate();
     final IdentifierProxy identifierProxy = proxy.getProposition();
     final IdentifierType identifierElement =
       (IdentifierType) identifierProxy.acceptVisitor(this);
-    element.setProposition(identifierElement);
+    pair.add(identifierElement);
     final SimpleExpressionProxy predicateProxy = proxy.getPredicate();
     final SimpleExpressionType predicateElement =
       (SimpleExpressionType) predicateProxy.acceptVisitor(this);
-    element.setPredicate(predicateElement);
+    pair.add(predicateElement);
   }
 
 
@@ -1217,13 +1185,6 @@ public class JAXBModuleExporter
   private static final GraphEdgeListHandler
     mGraphEdgeListHandler =
     new GraphEdgeListHandler(mFactory);
-
-  //EFA
-  private static final SimpleComponentVariableListHandler
-  mSimpleComponentVariableListHandler =
-  new SimpleComponentVariableListHandler(mFactory);
-  //--------------------------
-
   private static final GraphNodeListHandler
     mGraphNodeListHandler =
     new GraphNodeListHandler(mFactory);

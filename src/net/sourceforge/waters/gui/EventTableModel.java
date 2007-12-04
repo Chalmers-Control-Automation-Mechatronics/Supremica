@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   EventTableModel
 //###########################################################################
-//# $Id: EventTableModel.java,v 1.30 2007-11-21 01:33:38 robi Exp $
+//# $Id: EventTableModel.java,v 1.31 2007-12-04 03:22:54 robi Exp $
 //###########################################################################
 
 
@@ -24,7 +24,6 @@ import java.util.List;
 import javax.swing.ImageIcon;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.event.TableModelEvent;
-import javax.swing.event.TableModelListener;
 
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.base.ProxyAccessorHashMapByContents;
@@ -40,11 +39,13 @@ import net.sourceforge.waters.subject.base.ModelObserver;
 import net.sourceforge.waters.subject.base.ModelChangeEvent;
 import net.sourceforge.waters.subject.base.Subject;
 import net.sourceforge.waters.subject.module.EdgeSubject;
+import net.sourceforge.waters.subject.module.EventDeclSubject;
 import net.sourceforge.waters.subject.module.EventListExpressionSubject;
 import net.sourceforge.waters.subject.module.ForeachEventSubject;
 import net.sourceforge.waters.subject.module.GraphSubject;
 import net.sourceforge.waters.subject.module.IdentifierSubject;
-
+import net.sourceforge.waters.subject.module.ModuleSubject;
+import net.sourceforge.waters.subject.module.SimpleIdentifierSubject;
 
 
 /**
@@ -64,14 +65,15 @@ public class EventTableModel
                   final ModuleWindowInterface root,
                   final EditorEvents table)
   {
-    addTableModelListener(new TableHandler());
     mTable = table;
     mGraph = graph;
     mRoot = root;
-    mModuleContext = root.getModuleContext();
     mEvents = collectEvents();
+    final ModuleSubject module = mRoot.getModuleSubject();
+    final ListSubject<EventDeclSubject> events =
+      module.getEventDeclListModifiable();
+    events.addModelObserver(this);
     graph.addModelObserver(this);
-    fireTableChanged(new TableModelEvent(this));
   }
 
 
@@ -80,12 +82,35 @@ public class EventTableModel
   public void modelChanged(final ModelChangeEvent event)
   {
     final Subject source = event.getSource();
-    if (source instanceof ListSubject &&
-        source.getParent() instanceof EventListExpressionSubject) {
-      final EventListExpressionSubject parent =
-        (EventListExpressionSubject) source.getParent();
-      final List<AbstractSubject> list = parent.getEventListModifiable();
-      addIdentifiers(list);
+    final Object value = event.getValue();
+    switch (event.getKind()) {
+    case ModelChangeEvent.ITEM_ADDED:
+      if (source.getParent() instanceof EventListExpressionSubject) {
+        if (value instanceof IdentifierSubject) {
+          final IdentifierSubject ident = (IdentifierSubject) value;
+          addIdentifier(ident);
+        } else if (value instanceof ForeachEventSubject) {
+          final ForeachEventSubject foreach = (ForeachEventSubject) value;
+          final List<AbstractSubject> body = foreach.getBodyModifiable();
+          addIdentifiers(body);
+        }
+      } else if (value instanceof EventDeclSubject &&
+                 mTable.isDisplayedEditor()) {
+        final EventDeclSubject decl = (EventDeclSubject) value;
+        final String name = decl.getName();
+        final IdentifierSubject ident = new SimpleIdentifierSubject(name);
+        addIdentifier(ident);
+      }
+      break;
+    case ModelChangeEvent.ITEM_REMOVED:
+      if (value instanceof EventDeclSubject) {
+        final EventDeclSubject decl = (EventDeclSubject) value;
+        final String name = decl.getName();
+        removeIdentifiers(name);
+      }
+      break;
+    default:
+      break;
     }
   }
 
@@ -118,16 +143,16 @@ public class EventTableModel
   public Object getValueAt(final int row, final int column)
   {
     final EventEntry entry = (EventEntry) mEvents.get(row);
-    switch (column)
-    {
-        case 0:
-            final IdentifierSubject ident = entry.getName();
-            return mModuleContext.guessEventIcon(ident);
-        case 1:
-            return entry.getName();
-        default:
-            throw new ArrayIndexOutOfBoundsException
-                ("Bad column number for event table model!");
+    switch (column) {
+    case 0:
+      final ModuleContext context = mRoot.getModuleContext();
+      final IdentifierSubject ident = entry.getName();
+      return context.guessEventIcon(ident);
+    case 1:
+      return entry.getName();
+    default:
+      throw new ArrayIndexOutOfBoundsException
+        ("Bad column number for event table model!");
     }
   }
 
@@ -162,6 +187,29 @@ public class EventTableModel
     }
   }
 
+  public void removeIdentifiers(final String name)
+  {
+    final IdentifierSubject tester = new SimpleIdentifierSubject(name);
+    final EventEntry entry = new EventEntry(tester);
+    final int first = Collections.binarySearch(mEvents, entry);
+    if (first >= 0) {
+      final int size = mEvents.size();
+      int last = first;
+      for (int index = first + 1; index < size; index++) {
+        final IdentifierSubject ident = getEvent(index);
+        if (ident.getName().equals(name)) {
+          last++;
+        } else {
+          break;
+        }
+      }
+      for (int index = last; index >= first; index--) {
+        mEvents.remove(index);
+      }
+      fireTableRowsDeleted(first, last);
+    }
+  }
+
   public void removeIdentifier(final IdentifierSubject ident)
   {
     final EventEntry entry = new EventEntry(ident);
@@ -180,23 +228,18 @@ public class EventTableModel
       case 0:
         return;
       case 1:
-        if (value == null)
-        {
-			return;
-		}
-        final IdentifierSubject ident = ((IdentifierSubject) value).clone();
+        final IdentifierSubject ident =
+          value == null ? null : ((IdentifierSubject) value).clone();
         final IdentifierSubject old = getEvent(row);
         if (ident == null) {
           Command c = new RemoveFromTableCommand(this, old);
           mTable.getEditorInterface().getUndoInterface().executeCommand(c);
-        } else if (old == null || !old.equalsByContents(ident)) {
-          if (old != null) {
-            Command c = new ChangeEventNameCommand(mGraph, this, old, ident);
-            mTable.getEditorInterface().getUndoInterface().executeCommand(c);
-          } else {
-            Command c = new AddToTableCommand(this, ident);
-            mTable.getEditorInterface().getUndoInterface().executeCommand(c);
-          }
+        } else if (old == null) {
+          Command c = new AddToTableCommand(this, ident);
+          mTable.getEditorInterface().getUndoInterface().executeCommand(c);
+        } else if (!old.equalsByContents(ident)) {
+          Command c = new ChangeEventNameCommand(mGraph, this, old, ident);
+          mTable.getEditorInterface().getUndoInterface().executeCommand(c);
         }
         return;
       default:
@@ -225,8 +268,9 @@ public class EventTableModel
 
   String getToolTipText(final int row)
   {
+    final ModuleContext context = mRoot.getModuleContext();
     final IdentifierSubject event = getEvent(row);
-    return mModuleContext.guessEventToolTipText(event);
+    return context.guessEventToolTipText(event);
   }
 
 
@@ -289,13 +333,6 @@ public class EventTableModel
     final int index = Collections.binarySearch(mEvents, entry);
     return index >= 0;
   }
-
-  /*public IdentifierTransfer createIdentifierTransfer
-    (final IdentifierSubject ident)
-  {
-    final EventKind kind = mRoot.guessEventKind(ident);
-    return new IdentifierTransfer(ident, kind);
-  }*/
 
 
   //#########################################################################
@@ -369,18 +406,6 @@ public class EventTableModel
     //# Data Members
     private final IdentifierSubject mName;
 
-  }
-
-
-  //#########################################################################
-  //# Local Class TableHandler
-  private class TableHandler implements TableModelListener
-  {
-    public void tableChanged(final TableModelEvent event)
-    {
-      Collections.sort(mEvents);
-      mTable.repaint();
-    }
   }
 
 
@@ -504,9 +529,7 @@ public class EventTableModel
      */
     public void undo()
     {
-      System.out.println("Undo addition" + mModel.getRowCount());
       mModel.removeIdentifier(mIdentifier);
-      System.out.println("Undo addition" + mModel.getRowCount());
     }
 
     public boolean isSignificant()
@@ -566,7 +589,6 @@ public class EventTableModel
   //# Data Members
   private final GraphSubject mGraph;
   private final ModuleWindowInterface mRoot;
-  private final ModuleContext mModuleContext;
   private final List<EventEntry> mEvents;
   private final EditorEvents mTable;
 }

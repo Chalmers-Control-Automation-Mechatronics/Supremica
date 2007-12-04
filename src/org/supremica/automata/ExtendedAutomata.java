@@ -1,3 +1,12 @@
+//# -*- tab-width: 4  indent-tabs-mode: nil  c-basic-offset: 4 -*-
+//###########################################################################
+//# PROJECT: Supremica
+//# PACKAGE: org.supremica.automata
+//# CLASS:   ExtendedAutomata
+//###########################################################################
+//# $Id: ExtendedAutomata.java,v 1.3 2007-12-04 03:22:58 robi Exp $
+//###########################################################################
+
 /*
  * Supremica Software License Agreement
  *
@@ -85,21 +94,17 @@ import net.sourceforge.fuber.model.interpreters.abstractsyntax.StatementList;
 import net.sourceforge.fuber.model.interpreters.abstractsyntax.Expression;
 import net.sourceforge.fuber.model.interpreters.abstractsyntax.Identifier;
 
-import net.sourceforge.waters.xsd.base.EventKind;
-import net.sourceforge.waters.subject.base.ListSubject;
-
-import net.sourceforge.waters.subject.module.*;
-import net.sourceforge.waters.model.module.*;
-
-import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
-import net.sourceforge.waters.model.marshaller.JAXBModuleMarshaller;
-
+import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
 import net.sourceforge.waters.model.compiler.TypeMismatchException;
-
 import net.sourceforge.waters.model.expr.ExpressionParser;
 import net.sourceforge.waters.model.expr.Operator;
 import net.sourceforge.waters.model.expr.ParseException;
+import net.sourceforge.waters.model.marshaller.JAXBModuleMarshaller;
+import net.sourceforge.waters.model.module.*;
+import net.sourceforge.waters.subject.base.ListSubject;
+import net.sourceforge.waters.subject.module.*;
+import net.sourceforge.waters.xsd.base.EventKind;
 
 
 public class ExtendedAutomata
@@ -160,13 +165,11 @@ public class ExtendedAutomata
 		// get all component variables
 		// and put them in a map
 		Map moduleVariables = new HashMap();
-		for (Iterator compIter = module.getComponentList().iterator(); compIter.hasNext();)
-		{
-			SimpleComponentProxy curComponent = (SimpleComponentProxy) compIter.next();
-			for (Iterator varIter = curComponent.getVariables().iterator(); varIter.hasNext();)
-			{
-				VariableProxy curVar = (VariableProxy) varIter.next();
-				String curVarName = curVar.getName();
+        for (final Proxy proxy : module.getComponentList()) {
+            if (proxy instanceof VariableComponentProxy) {
+                final VariableComponentProxy curVar =
+                    (VariableComponentProxy) proxy;
+				final String curVarName = curVar.getName();
 				if (moduleVariables.keySet().contains(curVarName))
 				{
 					System.out.println("ExtendedAutomata.expandTransitions(): Warning!: The module contains duplicate variable definitions.");
@@ -178,9 +181,12 @@ public class ExtendedAutomata
 		}
 		
 		// expand transitions for all components in the module
-		for (Iterator compIter = module.getComponentList().iterator(); compIter.hasNext();)
-		{
-			SimpleComponentProxy curComponent = (SimpleComponentProxy) compIter.next();
+        for (final Proxy proxy : module.getComponentList()) {
+            if (!(proxy instanceof SimpleComponentProxy)) {
+                continue;
+            }
+            final SimpleComponentProxy curComponent =
+                (SimpleComponentProxy) proxy;
 			String curComponentName = curComponent.getName();
 			System.out.println("ExtendedAutomata.expandTransitions(): Component");
 			System.out.println(curComponentName);
@@ -364,7 +370,7 @@ public class ExtendedAutomata
 						for (Iterator iter = expressionIdents.iterator(); iter.hasNext();)
 						{
 							String curIdent = (String) iter.next();
-							VariableProxy curModuleVariable = (VariableProxy) moduleVariables.get(curIdent);
+							VariableComponentProxy curModuleVariable = (VariableComponentProxy) moduleVariables.get(curIdent);
 
 							System.out.println(curIdent);
 

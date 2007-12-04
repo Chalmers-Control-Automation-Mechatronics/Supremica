@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.gui.ide
 //# CLASS:   MainPanel
 //###########################################################################
-//# $Id: MainPanel.java,v 1.33 2007-06-25 20:18:48 robi Exp $
+//# $Id: MainPanel.java,v 1.34 2007-12-04 03:22:58 robi Exp $
 //###########################################################################
 
 package org.supremica.gui.ide;
@@ -46,14 +46,22 @@ abstract class MainPanel
         setPreferredSize(IDEDimensions.mainPanelPreferredSize);
         setMinimumSize(IDEDimensions.mainPanelMinimumSize);
 
-        GridBagLayout gridbag = new GridBagLayout();
+        final GridBagLayout gridbag = new GridBagLayout();
         setLayout(gridbag);
-
+        final GridBagConstraints constraints = new GridBagConstraints();
         constraints.gridy = 0;
         constraints.weighty = 1.0;
         constraints.anchor = GridBagConstraints.NORTH;
         constraints.weightx = 1.0;
         constraints.fill = GridBagConstraints.BOTH;
+
+        mSplitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, false);
+        mSplitPane.setOneTouchExpandable(false);
+        mSplitPane.setOneTouchExpandable(false);
+        mSplitPane.setDividerLocation(0.2);
+        mSplitPane.setResizeWeight(0.0);
+        gridbag.setConstraints(mSplitPane, constraints);
+        add(mSplitPane);
     }
 
 
@@ -64,44 +72,44 @@ abstract class MainPanel
         return name;
     }
 
-    protected GridBagConstraints getGridBagConstraints()
+    void setLeftComponent(final JComponent newComponent)
     {
-        return constraints;
+        mSplitPane.setLeftComponent(newComponent);
     }
 
-    public void setRightComponent(JComponent newComponent)
+    void setRightComponent(JComponent newComponent)
     {
         JComponent oldComponent = getRightComponent();
         if (oldComponent != newComponent)
         {
             JScrollPane emptyRightPanel = getEmptyRightPanel();
-            int dividerLocation = splitPanelHorizontal.getDividerLocation();
+            int dividerLocation = mSplitPane.getDividerLocation();
             Dimension oldSize = emptyRightPanel.getSize();
 
             if (oldComponent != null)
             {
-                splitPanelHorizontal.remove(oldComponent);
+                mSplitPane.remove(oldComponent);
                 oldSize = oldComponent.getSize();
             }
 
             if (newComponent == null || newComponent == getEmptyRightPanel())
             {
                 emptyRightPanel.setPreferredSize(oldSize);
-                splitPanelHorizontal.setRightComponent(emptyRightPanel);
+                mSplitPane.setRightComponent(emptyRightPanel);
             }
             else
             {
                 newComponent.setPreferredSize(oldSize);
-                splitPanelHorizontal.setRightComponent(newComponent);
+                mSplitPane.setRightComponent(newComponent);
             }
-            splitPanelHorizontal.setDividerLocation(dividerLocation);
+            mSplitPane.setDividerLocation(dividerLocation);
         }
         validate();
     }
 
     public JComponent getRightComponent()
     {
-        return (JComponent)splitPanelHorizontal.getRightComponent();
+        return (JComponent) mSplitPane.getRightComponent();
     }
 
     public JScrollPane getEmptyRightPanel()
@@ -124,9 +132,9 @@ abstract class MainPanel
 
     //######################################################################
     //# Data Members
-    private GridBagConstraints constraints = new GridBagConstraints();
+    private final JSplitPane mSplitPane;
+
     private EmptyRightPanel emptyRightPanel = new EmptyRightPanel();
     private String name;
-    protected JSplitPane splitPanelHorizontal;
 
 }

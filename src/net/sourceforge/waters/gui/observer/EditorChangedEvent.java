@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui.observer
 //# CLASS:   EditorChangedEvent
 //###########################################################################
-//# $Id: EditorChangedEvent.java,v 1.5 2007-06-24 18:40:06 robi Exp $
+//# $Id: EditorChangedEvent.java,v 1.6 2007-12-04 03:22:55 robi Exp $
 //###########################################################################
 
 
@@ -37,6 +37,8 @@ import java.util.EventObject;
  * <TD>A new drawing tool has been selected.</TD></TR>
  * <TR><TD>SELECTION_CHANGED</TD> <TD>{@link SelectionChangedEvent}</TD>
  * <TD>Some selection has changed.</TD></TR>
+ * <TR><TD>CLIPBOARD_CHANGED</TD> <TD>{@link ClipboardChangedEvent}</TD>
+ * <TD>The system clipboard contents have changed.</TD></TR>
  * <TR><TD>UNDOREDO</TD> <TD>{@link UndoRedoEvent}</TD>
  * <TD>The state of the undo manager has changed.</TD></TR>
  * </TABLE>
@@ -68,6 +70,7 @@ public abstract class EditorChangedEvent extends EventObject
     SUBPANEL_SWITCH,
     TOOL_SWITCH,
     SELECTION_CHANGED,
+    CLIPBOARD_CHANGED,
     UNDOREDO;
   }
 

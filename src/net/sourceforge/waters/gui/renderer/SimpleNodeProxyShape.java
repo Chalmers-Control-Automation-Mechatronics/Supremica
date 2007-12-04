@@ -1,13 +1,22 @@
+//# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
+//###########################################################################
+//# PROJECT: Waters
+//# PACKAGE: net.sourceforge.waters.gui.renderer
+//# CLASS:   SimpleNodeProxyShape
+//###########################################################################
+//# $Id: SimpleNodeProxyShape.java,v 1.19 2007-12-04 03:22:55 robi Exp $
+//###########################################################################
+
+
 package net.sourceforge.waters.gui.renderer;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
-
+import java.awt.Point;
 import java.awt.geom.Arc2D;
 import java.awt.geom.GeneralPath;
 import java.awt.geom.Rectangle2D;
 import java.awt.geom.Point2D;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -22,7 +31,9 @@ import net.sourceforge.waters.model.module.EventDeclProxy;
 import net.sourceforge.waters.model.module.IdentifierProxy;
 import net.sourceforge.waters.model.module.ModuleProxy;
 import net.sourceforge.waters.model.module.SimpleNodeProxy;
+
 import org.supremica.properties.Config;
+
 
 public class SimpleNodeProxyShape
     extends AbstractProxyShape
@@ -206,6 +217,16 @@ public class SimpleNodeProxyShape
     };
     public static final int DIAMETER = RADIUS * 2;
     private static final Color FILLCOLOR = Color.WHITE;
+
+  public static final int DEFAULT_OFFSET_X = 5;
+  public static final int DEFAULT_OFFSET_Y = 5;
+  public static final Point2D DEFAULT_OFFSET =
+    new Point(DEFAULT_OFFSET_X, DEFAULT_OFFSET_Y);
+
+  public static final int DEFAULT_INITARROW_X = -5;
+  public static final int DEFAULT_INITARROW_Y = -5;
+  public static final Point2D DEFAULT_INITARROW =
+    new Point(DEFAULT_INITARROW_X, DEFAULT_INITARROW_Y);
     
     private static final Object layoutMode = Config.GUI_EDITOR_LAYOUT_MODE.get();
 }

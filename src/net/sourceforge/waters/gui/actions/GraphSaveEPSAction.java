@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui.actions
 //# CLASS:   GraphSaveEPSAction
 //###########################################################################
-//# $Id: GraphSaveEPSAction.java,v 1.3 2007-11-07 06:16:04 robi Exp $
+//# $Id: GraphSaveEPSAction.java,v 1.4 2007-12-04 03:22:54 robi Exp $
 //###########################################################################
 
 
@@ -22,6 +22,7 @@ import javax.swing.filechooser.FileFilter;
 import net.sourceforge.waters.gui.ControlledSurface;
 import net.sourceforge.waters.gui.EditorColor;
 import net.sourceforge.waters.gui.EditorSurface;
+import net.sourceforge.waters.gui.EditorWindowInterface;
 import net.sourceforge.waters.gui.renderer.EPSGraphPrinter;
 import net.sourceforge.waters.gui.renderer.ProxyShapeProducer;
 import net.sourceforge.waters.model.marshaller.StandardExtensionFileFilter;
@@ -60,7 +61,8 @@ public class GraphSaveEPSAction
       final IDE ide = getIDE();
       final ModuleProxy module = surface.getModule();
       // The name of the graph ...
-      final String name = getActiveEditorWindowInterface().getComponentName();
+      final EditorWindowInterface iface = getActiveEditorWindowInterface();
+      final String name = iface.getComponent().getName();
       final JFileChooser chooser = getFileChooser(module, name);
       if (chooser.showSaveDialog(ide) != JFileChooser.APPROVE_OPTION) {
         return;

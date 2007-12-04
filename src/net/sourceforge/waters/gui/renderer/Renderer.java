@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui.renderer
 //# CLASS:   Renderer
 //###########################################################################
-//# $Id: Renderer.java,v 1.13 2007-11-07 06:16:04 robi Exp $
+//# $Id: Renderer.java,v 1.14 2007-12-04 03:22:55 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.gui.renderer;
@@ -36,8 +36,10 @@ public class Renderer
     // Blocked events
     final LabelBlockProxy blocked = graph.getBlockedEvents();
     if (blocked != null) {
-      queue.offer(new ShapeToRender(producer.getShape(blocked),
-                                    render.getRenderingInformation(blocked)));
+      final ProxyShape shape = producer.getShape(blocked);
+      final RenderingInformation info =
+        render.getRenderingInformation(blocked);
+      queue.offer(new ShapeToRender(shape, info));
       for (final Proxy proxy : blocked.getEventList()) {
         queue.offer(new ShapeToRender(producer.getShape(proxy),
                                       render.getRenderingInformation(proxy)));

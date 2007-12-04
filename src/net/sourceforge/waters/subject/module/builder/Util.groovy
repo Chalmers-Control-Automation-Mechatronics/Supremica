@@ -2,7 +2,7 @@ package net.sourceforge.waters.subject.module.builder;
 
 import groovy.util.BuilderSupport
 import net.sourceforge.waters.model.base.ProxyTools
-import net.sourceforge.waters.subject.module.VariableSubject
+import net.sourceforge.waters.subject.module.VariableComponentSubject
 import net.sourceforge.waters.model.module.*
 import net.sourceforge.waters.subject.module.*
 import net.sourceforge.waters.gui.*

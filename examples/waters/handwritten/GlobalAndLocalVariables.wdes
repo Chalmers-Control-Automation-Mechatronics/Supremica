@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<ProductDES Name="GlobalAndLocalVariables" xmlns="http://waters.sourceforge.net/xsd/des">
+<ProductDES Name="GlobalAndLocalVariables"
+  xmlns:ns2="http://waters.sourceforge.net/xsd/base"
+  xmlns="http://waters.sourceforge.net/xsd/des">
+<ns2:Comment></ns2:Comment>
 <EventList>
 <Event Kind="CONTROLLABLE" Name="a_2"/>
 <Event Kind="CONTROLLABLE" Name="a_1"/>

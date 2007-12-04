@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.gui.ide
 //# CLASS:   IDEMenuBar
 //###########################################################################
-//# $Id: IDEMenuBar.java,v 1.58 2007-11-14 15:16:34 millares Exp $
+//# $Id: IDEMenuBar.java,v 1.59 2007-12-04 03:22:58 robi Exp $
 //###########################################################################
 
 package org.supremica.gui.ide;
@@ -23,8 +23,20 @@ import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import net.sourceforge.waters.gui.actions.GraphLayoutAction;
 import net.sourceforge.waters.gui.actions.GraphSaveEPSAction;
-import net.sourceforge.waters.gui.actions.WatersUndoAction;
+import net.sourceforge.waters.gui.actions.IDECopyAction;
+import net.sourceforge.waters.gui.actions.IDECutAction;
+import net.sourceforge.waters.gui.actions.IDEDeleteAction;
+import net.sourceforge.waters.gui.actions.IDEDeselectAllAction;
+import net.sourceforge.waters.gui.actions.IDEPasteAction;
+import net.sourceforge.waters.gui.actions.IDEPropertiesAction;
+import net.sourceforge.waters.gui.actions.IDESelectAllAction;
+import net.sourceforge.waters.gui.actions.InsertEventDeclAction;
+import net.sourceforge.waters.gui.actions.InsertSimpleComponentAction;
+import net.sourceforge.waters.gui.actions.InsertVariableAction;
+import net.sourceforge.waters.gui.actions.ShowGraphAction;
+import net.sourceforge.waters.gui.actions.ShowModuleCommentAction;
 import net.sourceforge.waters.gui.actions.WatersRedoAction;
+import net.sourceforge.waters.gui.actions.WatersUndoAction;
 import net.sourceforge.waters.gui.observer.EditorChangedEvent;
 import net.sourceforge.waters.gui.observer.Observer;
 import net.sourceforge.waters.model.base.DocumentProxy;
@@ -91,56 +103,73 @@ public class IDEMenuBar
 
         // File
         JMenu menu = new JMenu("File");
-        menu.setMnemonic(KeyEvent.VK_F);
+        menu.setMnemonic(KeyEvent.VK_F); // ALT-F - Create module event?
         final Action newmod = actions.getAction(NewAction.class);
-        menu.add(new JMenuItem(newmod));
+        menu.add(newmod);
         final Action open = actions.getAction(OpenAction.class);
-        menu.add(new JMenuItem(open));
+        menu.add(open);
         final Action save = actions.getAction(SaveAction.class);
-        menu.add(new JMenuItem(save));
+        menu.add(save);
         final Action saveas = actions.getAction(SaveAsAction.class);
-        menu.add(new JMenuItem(saveas));
+        menu.add(saveas);
         final Action close = actions.getAction(CloseAction.class);
-        menu.add(new JMenuItem(close));
+        menu.add(close);
         menu.addSeparator();
         menu.add(ide.getActions().editorPrintAction.getMenuItem());
         menu.add(ide.getActions().editorSavePostscriptAction.getMenuItem());
 		final Action epsprint = actions.getAction(GraphSaveEPSAction.class);
-        menu.add(new JMenuItem(epsprint));
+        menu.add(epsprint);
         menu.add(ide.getActions().editorSavePDFAction.getMenuItem());
         menu.addSeparator();
         final Action exit = actions.getAction(ExitAction.class);
-        menu.add(new JMenuItem(exit));
+        menu.add(exit);
         add(menu);
 
         // Edit
         menu = new JMenu("Edit");
-        //menu.setMnemonic(KeyEvent.VK_E);
+        // menu.setMnemonic(KeyEvent.VK_E); // ALT-E - Create component event?
         final Action undo = actions.getAction(WatersUndoAction.class);
-        menu.add(new JMenuItem(undo));
+        menu.add(undo);
         final Action redo = actions.getAction(WatersRedoAction.class);
-        menu.add(new JMenuItem(redo));
+        menu.add(redo);
         menu.addSeparator();
-        menu.add(ide.getActions().editorCutAction.getMenuItem());
-        //menu.add(ide.getActions().editorCopyAsWMFAction.getMenuItem());
-        menu.add(ide.getActions().editorCopyAction.getMenuItem());
-        menu.add(ide.getActions().editorPasteAction.getMenuItem());
+        final Action delete = actions.getAction(IDEDeleteAction.class);
+        menu.add(delete);
+		final Action cut = actions.getAction(IDECutAction.class);
+        menu.add(cut);
+		final Action copy = actions.getAction(IDECopyAction.class);
+        menu.add(copy);
+		final Action paste = actions.getAction(IDEPasteAction.class);
+        menu.add(paste);
         menu.addSeparator();
+        final Action select = actions.getAction(IDESelectAllAction.class);
+        menu.add(select);
+        final Action deselect = actions.getAction(IDEDeselectAllAction.class);
+        menu.add(deselect);
+        menu.addSeparator();
+        final Action properties = actions.getAction(IDEPropertiesAction.class);
+        menu.add(properties);
+        final Action showgraph = actions.getAction(ShowGraphAction.class);
+        menu.add(showgraph);
+        final Action showcomment =
+			actions.getAction(ShowModuleCommentAction.class);
+        menu.add(showcomment);
         // Embedder should probably go to 'Tools' menu?
         final Action layout = actions.getAction(GraphLayoutAction.class);
-        menu.add(new JMenuItem(layout));
+        menu.add(layout);
         add(menu);
 
         // Insert
         menu = new JMenu("Create");
+		// Why not "Insert"? All MS programs use insert. ~~~Robi
         //menu.setMnemonic(KeyEvent.VK_I);
-        menu.add(ide.getActions().editorAddSimpleComponentAction.getMenuItem());
-		/*
+        final Action inscomp =
+			actions.getAction(InsertSimpleComponentAction.class);
+        menu.add(inscomp);
         final Action insvar = actions.getAction(InsertVariableAction.class);
-        menu.add(new JMenuItem(insvar));
-		*/
-        menu.add(ide.getActions().editorAddComponentEventAction.getMenuItem());
-        menu.add(ide.getActions().editorAddModuleEventAction.getMenuItem());
+        menu.add(insvar);
+        final Action insevent = actions.getAction(InsertEventDeclAction.class);
+        menu.add(insevent);
         //menu.add(ide.getActions().editorAddForeachComponentAction.getMenuItem());
         //menu.add(ide.getActions().editorAddInstanceAction.getMenuItem());
         //menu.add(ide.getActions().editorAddBindingAction.getMenuItem());
@@ -151,7 +180,7 @@ public class IDEMenuBar
 
         // Analyze
         menu = new JMenu("Analyze");
-        //menu.setMnemonic(KeyEvent.VK_A);
+        // menu.setMnemonic(KeyEvent.VK_A); // ALT-A - Save as?
         // View (submenu)
         final JMenu viewMenu = new JMenu("View");
         {
@@ -224,7 +253,7 @@ public class IDEMenuBar
 
         // Configure
         menu = new JMenu("Configure");
-        //menu.setMnemonic(KeyEvent.VK_C);
+        // menu.setMnemonic(KeyEvent.VK_C); // ALT-C - Create component?
         add(menu);
         //menu.add(ide.getActions().editorOptionsAction.getMenuItem());
         menu.add(ide.getActions().analyzerOptionsAction.getMenuItem());

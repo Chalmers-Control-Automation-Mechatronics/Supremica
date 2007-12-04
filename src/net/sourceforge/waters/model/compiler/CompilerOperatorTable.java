@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.compiler
 //# CLASS:   CompilerOperatorTable
 //###########################################################################
-//# $Id: CompilerOperatorTable.java,v 1.8 2007-02-16 00:11:38 martin Exp $
+//# $Id: CompilerOperatorTable.java,v 1.9 2007-12-04 03:22:55 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.compiler;
@@ -57,17 +57,11 @@ public class CompilerOperatorTable extends AbstractOperatorTable {
     mGreaterEqualsOperator = new BinaryGreaterEqualsOperator();
     mLessThanOperator = new BinaryLessThanOperator();
     mLessEqualsOperator = new BinaryLessEqualsOperator();
-    
     mNotOperator = new UnaryNotOperator();
     mAssignmentOperator = new BinaryAssignmentOperator();
     mIncrementOperator = new BinaryIncrementOperator();
     mDecrementOperator = new BinaryDecrementOperator();
-    final BinaryOperator eqop = new BinaryEqualsOperator();
-    final BinaryOperator neqop = new BinaryNotEqualsOperator();
-    final BinaryOperator gtop = new BinaryGreaterThanOperator();
-    final BinaryOperator geqop = new BinaryGreaterEqualsOperator();
-    final BinaryOperator ltop = new BinaryLessThanOperator();
-    final BinaryOperator leqop = new BinaryLessEqualsOperator();
+    mRangeOperator = new BinaryRangeOperator();
 
     store(mAndOperator);
     store(mOrOperator);
@@ -87,10 +81,10 @@ public class CompilerOperatorTable extends AbstractOperatorTable {
     store(new BinaryDivideOperator());
     store(new BinaryModuloOperator());
     store(new UnaryMinusOperator());
-    store(new BinaryRangeOperator());
-    storeComplements(eqop, neqop);
-    storeComplements(ltop, geqop);
-    storeComplements(gtop, leqop);
+    store(mRangeOperator);
+    storeComplements(mEqualsOperator, mNotEqualsOperator);
+    storeComplements(mLessThanOperator, mGreaterEqualsOperator);
+    storeComplements(mGreaterThanOperator, mLessEqualsOperator);
   }
 
   private void storeComplements(final BinaryOperator op1,
@@ -105,61 +99,65 @@ public class CompilerOperatorTable extends AbstractOperatorTable {
 
   //#########################################################################
   //# Acess by Logic Semantics
-  BinaryOperator getAndOperator()
+  public BinaryOperator getAndOperator()
   {
     return mAndOperator;
   }
 
-  BinaryOperator getOrOperator()
+  public BinaryOperator getOrOperator()
   {
     return mOrOperator;
   }
 
-  UnaryOperator getNotOperator()
+  public UnaryOperator getNotOperator()
   {
     return mNotOperator;
   }
   
-  BinaryOperator getEqualsOperator() {
-	  return mEqualsOperator;
+  public BinaryOperator getEqualsOperator() {
+    return mEqualsOperator;
   }
   
-  BinaryOperator getNotEqualsOperator() {
-	  return mNotEqualsOperator;
+  public BinaryOperator getNotEqualsOperator() {
+    return mNotEqualsOperator;
   }
   
-  BinaryOperator getGreaterThanOperator() {
-	  return mGreaterThanOperator;
+  public BinaryOperator getGreaterThanOperator() {
+    return mGreaterThanOperator;
   }
   
-  BinaryOperator getGreaterEqualsOperator() {
-	  return mGreaterEqualsOperator;
+  public BinaryOperator getGreaterEqualsOperator() {
+    return mGreaterEqualsOperator;
   }
   
-  BinaryOperator getLessThanOperator() {
-	  return mLessThanOperator;
+  public BinaryOperator getLessThanOperator() {
+    return mLessThanOperator;
   }
   
-  BinaryOperator getLessEqualsOperator() {
-	  return mLessEqualsOperator;
+  public BinaryOperator getLessEqualsOperator() {
+    return mLessEqualsOperator;
   }
 
-  BinaryOperator getAssignmentOperator()
+  public BinaryOperator getAssignmentOperator()
   {
     return mAssignmentOperator;
   }
 
-  BinaryOperator getIncrementOperator()
+  public BinaryOperator getIncrementOperator()
   {
     return mIncrementOperator;
   }
 
-  BinaryOperator getDecrementOperator()
+  public BinaryOperator getDecrementOperator()
   {
     return mDecrementOperator;
   }
 
-  BinaryOperator getComplementaryOperator(final BinaryOperator op)
+  public BinaryOperator getRangeOperator() {
+    return mRangeOperator;
+  }
+  
+  public BinaryOperator getComplementaryOperator(final BinaryOperator op)
   {
     return mComplementMap.get(op);
   }
@@ -1142,6 +1140,7 @@ public class CompilerOperatorTable extends AbstractOperatorTable {
   private final BinaryOperator mAndOperator;
   private final BinaryOperator mOrOperator;
   private final UnaryOperator mNotOperator;
+  private final BinaryOperator mRangeOperator;
   private final BinaryOperator mEqualsOperator;
   private final BinaryOperator mNotEqualsOperator;
   private final BinaryOperator mGreaterThanOperator;

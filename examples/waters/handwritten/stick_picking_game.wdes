@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <ProductDES Name="stick_picking_game"
+            xmlns:ns2="http://waters.sourceforge.net/xsd/base"
             xmlns="http://waters.sourceforge.net/xsd/des">
+<ns2:Comment>A model of a simple nim game. Five sticks are on the table, and two players take it in turn to pick up one or two sticks.</ns2:Comment>
 <EventList>
 <Event Kind="PROPOSITION" Name=":accepting"/>
 <Event Kind="CONTROLLABLE" Name="player1_remove_one_1"/>

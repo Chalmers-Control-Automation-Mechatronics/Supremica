@@ -4,31 +4,40 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   EventDeclListView
 //###########################################################################
-//# $Id: EventDeclListView.java,v 1.9 2007-09-25 22:56:11 knut Exp $
+//# $Id: EventDeclListView.java,v 1.10 2007-12-04 03:22:54 robi Exp $
 //###########################################################################
 
 
 package net.sourceforge.waters.gui;
 
-import java.util.Collection;
-import java.util.Collections;
-import java.util.ArrayList;
-import java.util.List;
+import java.awt.Color;
 import java.awt.Point;
+import java.awt.Rectangle;
 import java.awt.datatransfer.Transferable;
+import java.awt.datatransfer.UnsupportedFlavorException;
+import java.awt.dnd.DnDConstants;
+import java.awt.dnd.DragGestureEvent;
+import java.awt.dnd.DragGestureListener;
+import java.awt.dnd.DragSource;
+import java.awt.dnd.DragSourceAdapter;
+import java.awt.dnd.DragSourceDragEvent;
+import java.awt.dnd.DragSourceListener;
+import java.awt.dnd.InvalidDnDOperationException;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.FocusEvent;
+import java.awt.event.FocusListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
-import java.awt.dnd.DnDConstants;
-import java.awt.dnd.DragSource;
-import java.awt.dnd.DragSourceDragEvent;
-import java.awt.dnd.DragGestureEvent;
-import java.awt.dnd.DragGestureListener;
-import java.awt.dnd.DragSourceAdapter;
-import java.awt.dnd.DragSourceListener;
-import java.awt.dnd.InvalidDnDOperationException;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Set;
 import javax.swing.JDialog;
 import javax.swing.JList;
 import javax.swing.JMenu;
@@ -38,26 +47,37 @@ import javax.swing.JPopupMenu;
 import javax.swing.JRadioButtonMenuItem;
 import javax.swing.ListModel;
 import javax.swing.ListSelectionModel;
+import javax.swing.SwingUtilities;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 
+import net.sourceforge.waters.gui.actions.WatersPopupActionManager;
 import net.sourceforge.waters.gui.command.Command;
 import net.sourceforge.waters.gui.command.CompoundCommand;
-import net.sourceforge.waters.gui.command.DeleteEventDeclCommand;
-import net.sourceforge.waters.gui.command.EditEventDeclCommand;
-
+import net.sourceforge.waters.gui.command.EditCommand;
+import net.sourceforge.waters.gui.command.UndoInterface;
+import net.sourceforge.waters.gui.observer.EditorChangedEvent;
+import net.sourceforge.waters.gui.observer.Observer;
+import net.sourceforge.waters.gui.observer.SelectionChangedEvent;
+import net.sourceforge.waters.gui.transfer.InsertInfo;
+import net.sourceforge.waters.gui.transfer.ProxyTransferable;
+import net.sourceforge.waters.gui.transfer.SelectionOwner;
+import net.sourceforge.waters.gui.transfer.WatersDataFlavor;
 import net.sourceforge.waters.model.base.NamedProxy;
 import net.sourceforge.waters.model.base.Proxy;
-
 import net.sourceforge.waters.model.module.EdgeProxy;
 import net.sourceforge.waters.model.module.IdentifierProxy;
 import net.sourceforge.waters.model.module.LabelBlockProxy;
-
+import net.sourceforge.waters.model.module.ModuleProxyCloner;
+import net.sourceforge.waters.model.unchecked.Casting;
 import net.sourceforge.waters.subject.base.AbstractSubject;
-import net.sourceforge.waters.subject.base.ListSubject;
 import net.sourceforge.waters.subject.base.IndexedListSubject;
+import net.sourceforge.waters.subject.base.ListSubject;
 import net.sourceforge.waters.subject.module.EventDeclSubject;
 import net.sourceforge.waters.subject.module.GraphSubject;
 import net.sourceforge.waters.subject.module.IdentifierSubject;
 import net.sourceforge.waters.subject.module.ModuleSubject;
+import net.sourceforge.waters.subject.module.ModuleSubjectFactory;
 import net.sourceforge.waters.subject.module.SimpleComponentSubject;
 import net.sourceforge.waters.subject.module.SimpleIdentifierSubject;
 import net.sourceforge.waters.xsd.base.EventKind;
@@ -70,21 +90,23 @@ import net.sourceforge.waters.xsd.base.EventKind;
  * event declarations by means of double click, and drag&amp;drop to label
  * transitions in graphs.
  *
- * @todo Selection handling (must be undoable) not yet implemented!
- *
  * @author Simon Ware, Robi Malik
  */
 
 public class EventDeclListView
   extends JList
+  implements SelectionOwner, FocusListener, ListSelectionListener
 {
 
   //#########################################################################
   //# Constructors
-  public EventDeclListView(final ModuleWindowInterface root)
+  public EventDeclListView(final ModuleWindowInterface root,
+                           final WatersPopupActionManager manager)
   {
     mRoot = root;
-    setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
+    mPopupFactory = new EventDeclListPopupFactory(manager);
+    mDeleteVisitor = new EventDeclDeleteVisitor(root);
+    mObservers = null;
 
     final ModuleSubject module = root.getModuleSubject();
     final IndexedListSubject<EventDeclSubject> events =
@@ -93,8 +115,13 @@ public class EventDeclListView
     setModel(mModel);
     setCellRenderer(new EventListCell());
 
+    setSelectionBackground(EditorColor.BACKGROUND_NOTFOCUSSED);
+    addFocusListener(this);
+    setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
     final MouseListener handler = new EventDeclMouseListener();
     addMouseListener(handler);
+    addListSelectionListener(this);
+    manager.installCutCopyPasteActions(this);
 
     final DragSource dragsource = DragSource.getDefaultDragSource();
     final DragGestureListener glistener = new EventDeclDragGestureListener();
@@ -106,56 +133,315 @@ public class EventDeclListView
 
 
   //#########################################################################
-  //# Commands
-  private void doCreateEvent()
+  //# Interface net.sourceforge.waters.gui.transfer.SelectionOwner
+  public UndoInterface getUndoInterface()
   {
-    new EventEditorDialog(mRoot, false);
+    return mRoot.getUndoInterface();
   }
 
-  private void doDeleteEvents(final Iterable<EventDeclSubject> victims)
+  public boolean hasNonEmptySelection()
   {
-    if (victims.iterator().hasNext()) {
-      final ModuleSubject module = mRoot.getModuleSubject();
+    return !isSelectionEmpty();
+  }
 
-      // Make sure that the event is not currently in use
-      for (EventDeclSubject event : victims)
-      {
-
-		  // First check that the event is not in use
-		  ListSubject<AbstractSubject> 	componentList = module.getComponentListModifiable();
-		  for (AbstractSubject subject : componentList)
-		  {
-			if (subject instanceof SimpleComponentSubject)
-			{
-			  GraphSubject graphSubject = ((SimpleComponentSubject)subject).getGraph();
-			  Collection<EdgeProxy> edges = graphSubject.getEdges();
-			  for (EdgeProxy edge : edges)
-			  {
-				LabelBlockProxy labelBlock = edge.getLabelBlock();
-				List<Proxy> eventList = labelBlock.getEventList();
-				for (Proxy proxy : eventList)
-				{
-					if (proxy instanceof IdentifierProxy)
-					{
-						if (event.getName().equals(((IdentifierProxy)proxy).getName()))
-						{
-						  JOptionPane.showMessageDialog(mRoot.getRootWindow(), "Event " + event.getName() + " is used in component " + ((SimpleComponentSubject)subject).getName(),
-														"Event in use!",
-														JDialog.DO_NOTHING_ON_CLOSE);
-						  return;
-						}
-					}
-				}
-			  }
-			}
-		  }
-		}
-
-      final Command command = new DeleteEventDeclCommand(victims, module);
-      mRoot.getUndoInterface().executeCommand(command);
+  public boolean canSelectMore()
+  {
+    final int size = mModel.getSize();
+    if (isSelectionEmpty()) {
+      return size > 0;
+    } else if (getMinSelectionIndex() > 0 ||
+               getMaxSelectionIndex() + 1 < size) {
+      return true;
+    } else {
+      for (int index = 0; index < size; index++) {
+        if (!isSelectedIndex(index)) {
+          return true;
+        }
+      }
+      return false;
     }
   }
 
+  public boolean isSelected(final Proxy proxy)
+  {
+    final int index = mModel.indexOf(proxy);
+    return isSelectedIndex(index);
+  }
+
+  public List<EventDeclSubject> getCurrentSelection()
+  {
+    final List<EventDeclSubject> result = new LinkedList<EventDeclSubject>();
+    final ListSelectionModel selection = getSelectionModel();
+    for (final EventDeclSubject decl : mModel.getSelectedSubjects(selection)) {
+      result.add(decl);
+    }
+    return result;
+  }
+
+  public List<EventDeclSubject> getAllSelectableItems()
+  {
+    final int size = mModel.getSize();
+    final List<EventDeclSubject> result =
+      new ArrayList<EventDeclSubject>(size);
+    for (int index = 0; index < size; index++) {
+      final EventDeclSubject decl = mModel.getElementAt(index);
+      result.add(decl);
+    }
+    return result;
+  }
+
+  public EventDeclSubject getSelectionAnchor()
+  {
+    final int size = mModel.getSize();
+    final int index = getAnchorSelectionIndex();
+    if (index >= 0 && index < size) {
+      return mModel.getElementAt(index);
+    } else {
+      return null;
+    }
+  }
+
+  public void addToSelection(final List<? extends Proxy> items)
+  {
+    int remaining = items.size();
+    switch (remaining) {
+    case 0:
+      break;
+    case 1:
+      final Proxy proxy = items.iterator().next();
+      final int index1 = mModel.indexOf(proxy);
+      if (index1 >= 0) {
+        addSelectionInterval(index1, index1);
+      }
+      break;
+    default:
+      final int size = mModel.getSize();
+      final Set<Proxy> added = new HashSet<Proxy>(items);
+      int start = -1;
+      for (int index = 0; index < size; index++) {
+        final EventDeclSubject decl = mModel.getElementAt(index);
+        if (added.contains(decl)) {
+          if (start < 0) {
+            start = index;
+          }
+          if (--remaining == 0) {
+            addSelectionInterval(start, index);
+            return;
+          }
+        } else if (start >= 0 && !isSelectedIndex(index)) {
+          addSelectionInterval(start, index - 1);
+          start = -1;
+        }
+      }
+      if (start >= 0) {
+        addSelectionInterval(start, size - 1);
+      }
+      break;
+    }
+  }
+
+  public void removeFromSelection(final List<? extends Proxy> items)
+  {
+    int remaining = items.size();
+    switch (remaining) {
+    case 0:
+      break;
+    case 1:
+      final Proxy proxy = items.iterator().next();
+      final int index1 = mModel.indexOf(proxy);
+      if (index1 >= 0) {
+        removeSelectionInterval(index1, index1);
+      }
+      break;
+    default:
+      final int size = mModel.getSize();
+      final Set<Proxy> removed = new HashSet<Proxy>(items);
+      int start = -1;
+      for (int index = 0; index < size; index++) {
+        final EventDeclSubject decl = mModel.getElementAt(index);
+        if (removed.contains(decl)) {
+          if (start < 0) {
+            start = index;
+          }
+          if (--remaining == 0) {
+            removeSelectionInterval(start, index);
+            return;
+          }
+        } else if (start >= 0 && isSelectedIndex(index)) {
+          removeSelectionInterval(start, index - 1);
+          start = -1;
+        }
+      }
+      if (start >= 0) {
+        removeSelectionInterval(start, size - 1);
+      }
+      break;
+    }
+  }
+
+  public Proxy getInsertPosition(final Proxy proxy)
+  {
+    return proxy;
+  }
+
+  public void insertCreatedItem(final Proxy proxy, final Object insobj)
+  {
+    final ModuleSubject module = mRoot.getModuleSubject();
+    final List<EventDeclSubject> events = module.getEventDeclListModifiable();
+    final EventDeclSubject decl = (EventDeclSubject) proxy;
+    events.add(decl);
+  }
+
+  public boolean canCopy(final List<? extends Proxy> items)
+  {
+    return !items.isEmpty();
+  }
+
+  public Transferable createTransferable(final List<? extends Proxy> items)
+  {
+    return new ProxyTransferable(WatersDataFlavor.EVENTDECL_LIST, items);
+  }
+
+  public boolean canPaste(final Transferable transferable)
+  {
+    return transferable.isDataFlavorSupported(WatersDataFlavor.EVENTDECL_LIST);
+  }
+
+  public List<InsertInfo> getInsertInfo(Transferable transferable)
+    throws IOException, UnsupportedFlavorException
+  {
+    final ModuleContext context = mRoot.getModuleContext();
+    final ModuleProxyCloner cloner = ModuleSubjectFactory.getCloningInstance();
+    final List<Proxy> data = (List<Proxy>) transferable.getTransferData
+      (WatersDataFlavor.EVENTDECL_LIST);
+    final int size = data.size();
+    final Set<String> names = new HashSet<String>(size);
+    final List<InsertInfo> result = new ArrayList<InsertInfo>(size);
+    for (final Proxy proxy : data) {
+      final EventDeclSubject decl = (EventDeclSubject) cloner.getClone(proxy);
+      final String name = decl.getName();
+      final String unique = context.getPastedEventName(name, names);
+      decl.setName(unique);
+      final InsertInfo info = new InsertInfo(decl);
+      result.add(info);
+      names.add(unique);
+    }
+    return result;
+  }
+
+  public boolean canDelete(final List<? extends Proxy> items)
+  {
+    return !items.isEmpty();
+  }
+
+  public List<InsertInfo> getDeletionVictims(final List<? extends Proxy> items)
+  {
+    final List<EventDeclSubject> decls = Casting.toList(items);
+    return mDeleteVisitor.getDeletionVictims(decls);
+  }
+
+  public void insertItems(List<InsertInfo> inserts)
+  {
+    mDeleteVisitor.insertItems(inserts);
+  }
+
+  public void deleteItems(List<InsertInfo> deletes)
+  {
+    mDeleteVisitor.deleteItems(deletes);
+  }
+
+  public void scrollToVisible(final List<? extends Proxy> list)
+  {
+    if (!list.isEmpty()) {
+      int min = mModel.getSize() - 1;
+      int max = 0;
+      for (final Proxy proxy : list) {
+        final int index = mModel.indexOf(proxy);
+        if (index >= 0) {
+          if (index < min) {
+            min = index;
+          }
+          if (index > max) {
+            max = index;
+          }
+        }
+      }
+      final Rectangle rect = getCellBounds(min, max);
+      scrollRectToVisible(rect);
+    }
+  }
+
+  public void activate()
+  {
+    mRoot.showPanel(this);
+    requestFocusInWindow();
+  }
+
+  public void close()
+  {
+    mModel.dispose();
+  }
+
+
+  //#######################################################################
+  //# Interface net.sourceforge.waters.gui.observer.Subject
+  public void attach(final Observer observer)
+  {
+    if (mObservers == null) {
+      mObservers = new LinkedList<Observer>();
+    }
+    mObservers.add(observer);
+  }
+
+  public void detach(final Observer observer)
+  {
+    mObservers.remove(observer);
+    if (mObservers.isEmpty()) {
+      mObservers = null;
+    }
+  }
+  
+  public void fireEditorChangedEvent(final EditorChangedEvent event)
+  {
+    if (mObservers != null) {
+      // Just in case they try to register or deregister observers
+      // in response to the update ...
+      final List<Observer> copy = new ArrayList<Observer>(mObservers);
+      for (final Observer observer : copy) {
+        observer.update(event);
+      }
+    }
+  }
+
+
+  //#########################################################################
+  //# Interface java.awt.event.FocusListener
+  public void focusGained(final FocusEvent event)
+  {
+    setSelectionBackground(EditorColor.BACKGROUND_FOCUSSED);
+  }
+
+  public void focusLost(final FocusEvent event)
+  {
+    setSelectionBackground(EditorColor.BACKGROUND_NOTFOCUSSED);
+  }
+
+
+  //#########################################################################
+  //# Interface javax.swing.event.ListSelectionListener
+  public void valueChanged(final ListSelectionEvent event)
+  {
+    // Why can't the new selection be read immediately ???
+    SwingUtilities.invokeLater(new Runnable() {
+        public void run() {
+          fireSelectionChanged();
+        }
+      });
+  }
+
+
+  //#########################################################################
+  //# Commands
   private void doSetEventsKind(final Iterable<EventDeclSubject> decls,
                                final EventKind kind)
   {
@@ -164,7 +450,7 @@ public class EventDeclListView
       if (decl.getKind() != kind) {
         final EventDeclSubject template = decl.clone();
         template.setKind(kind);
-        final Command command = new EditEventDeclCommand(decl, template);
+        final Command command = new EditCommand(decl, template);
         compound.addCommand(command);
       }
     }
@@ -183,7 +469,7 @@ public class EventDeclListView
       if (decl.isObservable() != observable) {
         final EventDeclSubject template = decl.clone();
         template.setObservable(observable);
-        final Command command = new EditEventDeclCommand(decl, template);
+        final Command command = new EditCommand(decl, template);
         compound.addCommand(command);
       }
     }
@@ -205,6 +491,12 @@ public class EventDeclListView
     } else {
       return null;
     }
+  }
+
+  private void fireSelectionChanged()
+  {
+    final EditorChangedEvent event = new SelectionChangedEvent(this);
+    fireEditorChangedEvent(event);
   }
 
 
@@ -267,22 +559,6 @@ public class EventDeclListView
         }
       }
 
-      final JMenuItem newItem = new JMenuItem("Create Event ...");
-      newItem.addActionListener(new ActionListener() {
-          public void actionPerformed(final ActionEvent event) {
-            doCreateEvent();
-          }
-        });
-      add(newItem);
-      final String deltext = declcount == 1 ? "Delete Event" : "Delete Events";
-      final JMenuItem deleteItem = new JMenuItem(deltext);
-      deleteItem.setEnabled(declcount > 0);
-      deleteItem.addActionListener(new ActionListener() {
-          public void actionPerformed(final ActionEvent event) {
-            doDeleteEvents(decls);
-          }
-        });
-      add(deleteItem);
       final JMenu kindMenu = new JMenu("Set kind");
       add(kindMenu);
       for (final EventKind itemkind : EventKind.values()) {
@@ -372,12 +648,15 @@ public class EventDeclListView
     //# Auxiliary Methods
     private void maybeShowPopup(final MouseEvent event)
     {
-      if (event.isPopupTrigger()) {
-        final JPopupMenu popup = new EventDeclPopup(event);
-        final int x = event.getX();
-        final int y = event.getY();
-        popup.show(EventDeclListView.this, x, y);
+      final Point point = event.getPoint();
+      final int index = locationToIndex(point);
+      final EventDeclSubject clicked;
+      if (index >= 0 && index < mModel.getSize()) {
+        clicked = mModel.getElementAt(index);
+      } else {
+        clicked = null;
       }
+      mPopupFactory.maybeShowPopup(EventDeclListView.this, event, clicked);
     }
 
   }
@@ -391,15 +670,15 @@ public class EventDeclListView
     //# Interface java.awt.dnd.DragGestureListener
     public void dragGestureRecognized(final DragGestureEvent event)
     {
-      final int row = locationToIndex(event.getDragOrigin());
-      if (row < 0) {
+      final int index = locationToIndex(event.getDragOrigin());
+      if (index < 0) {
         return;
       }
       final Object[] values = getSelectedValues();
       if (values.length == 0) {
         return;
       }
-      final Collection<IdentifierSubject> idents =
+      final List<IdentifierSubject> idents =
         new ArrayList<IdentifierSubject>(values.length);
       EventType e = EventType.UNKNOWN;
       for(int i = 0; i < values.length; i++)
@@ -477,6 +756,10 @@ public class EventDeclListView
   //# Data Members
   private final IndexedListModel<EventDeclSubject> mModel;
   private final ModuleWindowInterface mRoot;
+  private final PopupFactory mPopupFactory;
+  private final EventDeclDeleteVisitor mDeleteVisitor;
+
+  private List<Observer> mObservers;
 
 
   //#########################################################################

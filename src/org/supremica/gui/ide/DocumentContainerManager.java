@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.gui.ide
 //# CLASS:   DocumentContainerManager
 //###########################################################################
-//# $Id: DocumentContainerManager.java,v 1.7 2007-11-06 03:22:26 robi Exp $
+//# $Id: DocumentContainerManager.java,v 1.8 2007-12-04 03:22:58 robi Exp $
 //###########################################################################
 
 package org.supremica.gui.ide;
@@ -351,6 +351,7 @@ public class DocumentContainerManager
         mURIContainerMap.remove(uri);
         mRecentList.remove(container);
         mDocumentManager.remove(uri);
+        container.close();
         fireContainerSwitch();
     }
 

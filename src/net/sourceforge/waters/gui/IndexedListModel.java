@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   IndexedListModel
 //###########################################################################
-//# $Id: IndexedListModel.java,v 1.5 2007-06-11 15:07:51 robi Exp $
+//# $Id: IndexedListModel.java,v 1.6 2007-12-04 03:22:54 robi Exp $
 //###########################################################################
 
 
@@ -59,7 +59,23 @@ public class IndexedListModel<E extends NamedSubject>
 
 
   //#########################################################################
-  //# Accessing the Selection
+  //# Additional Access
+  public int indexOf(final Object item)
+  {
+    if (item instanceof NamedSubject) {
+      final NamedSubject named = (NamedSubject) item;
+      final int index = Collections.binarySearch(mSortedMirror, named);
+      if (index >= 0) {
+        final E member = mSortedMirror.get(index);
+        return item.equals(member) ? index : -1;
+      } else {
+        return -1;
+      }
+    } else {
+      return -1;
+    }
+  }
+
   public Iterable<E> getSelectedSubjects(final ListSelectionModel selection)
   {
     return new SelectionIterable(selection);
@@ -217,7 +233,8 @@ public class IndexedListModel<E extends NamedSubject>
     SelectionIterator(final ListSelectionModel selection)
     {
       mSelection = selection;
-      mIndex = selection.getMinSelectionIndex();
+      mIndex =
+        selection.isSelectionEmpty() ? -1 : selection.getMinSelectionIndex();
     }
 
     //#######################################################################
@@ -234,10 +251,12 @@ public class IndexedListModel<E extends NamedSubject>
         final int stop = mSelection.getMaxSelectionIndex();
         while (++mIndex <= stop) {
           if (mSelection.isSelectedIndex(mIndex)) {
-            return result;
+            break;
           }
         }
-        mIndex = -1;
+        if (mIndex > stop) {
+          mIndex = -1;
+        }
         return result;
       } else {
         throw new NoSuchElementException

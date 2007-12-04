@@ -282,7 +282,6 @@
       <xs:extension base="M:IdentifiedType">
         <xs:sequence>
           <xs:element ref="M:Graph"/>
-          <xs:element ref="M:VariableList" minOccurs="0"/>
         </xs:sequence>
         <xs:attribute name="Kind" type="B:ComponentKind" use="required"/>
       </xs:extension>
@@ -295,16 +294,8 @@
     <xs:complexContent>
       <xs:extension base="M:IdentifiedType">
         <xs:sequence>
-          <xs:group ref="M:RangeExpression">
-             <xs:annotation><xs:appinfo>
-               <jaxb:property name="Type"/>
-             </xs:appinfo></xs:annotation>
-          </xs:group>
-          <xs:group ref="M:ArithmeticExpression">
-            <xs:annotation><xs:appinfo>
-              <jaxb:property name="InitialStatePredicate"/>
-            </xs:appinfo></xs:annotation>
-          </xs:group>
+          <xs:element ref="M:VariableRange"/>
+          <xs:element ref="M:VariableInitial"/>
           <xs:element ref="M:VariableMarking"
 		      minOccurs="0" maxOccurs="unbounded">
             <xs:annotation><xs:appinfo>
@@ -318,19 +309,46 @@
   </xs:complexType>
 </xs:element>
 
+<xs:element name="VariableRange">
+  <xs:complexType>
+    <xs:complexContent>
+      <xs:extension base="B:ElementType">
+        <xs:sequence>
+          <xs:group ref="M:RangeExpression">
+            <xs:annotation><xs:appinfo>
+              <jaxb:property name="Range"/>
+            </xs:appinfo></xs:annotation>
+          </xs:group>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+</xs:element>
+
+<xs:element name="VariableInitial">
+  <xs:complexType>
+    <xs:complexContent>
+      <xs:extension base="B:ElementType">
+        <xs:sequence>
+          <xs:group ref="M:ArithmeticExpression">
+            <xs:annotation><xs:appinfo>
+              <jaxb:property name="Predicate"/>
+            </xs:appinfo></xs:annotation>
+          </xs:group>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+</xs:element>
+ 
 <xs:element name="VariableMarking">
   <xs:complexType>
     <xs:complexContent>
       <xs:extension base="B:ElementType">
         <xs:sequence>
-          <xs:group ref="M:Identifier">
+          <xs:group ref="M:ArithmeticExpression" minOccurs="2" maxOccurs="2">
             <xs:annotation><xs:appinfo>
-              <jaxb:property name="Proposition"/>
-            </xs:appinfo></xs:annotation>
-          </xs:group>
-          <xs:group ref="M:ArithmeticExpression">
-            <xs:annotation><xs:appinfo>
-              <jaxb:property name="Predicate"/>
+              <jaxb:property name="PropositionAndPredicate"/>
             </xs:appinfo></xs:annotation>
           </xs:group>
         </xs:sequence>
@@ -577,58 +595,6 @@
     </xs:complexContent>
   </xs:complexType>
 </xs:element>
-
-
-<!-- ==================================================================== -->
-<!-- Variables                                                            -->
-<!-- ==================================================================== -->
-
-<xs:element name="VariableList">
-  <xs:complexType>
-    <xs:complexContent>
-      <xs:extension base="B:ElementType">
-        <xs:sequence>
-          <xs:element ref="M:Variable" maxOccurs="unbounded">
-            <xs:annotation><xs:appinfo>
-              <jaxb:property name="List"/>
-            </xs:appinfo></xs:annotation>
-          </xs:element>
-        </xs:sequence>
-      </xs:extension>
-    </xs:complexContent>
-  </xs:complexType>
-</xs:element>
-
-<xs:element name="Variable">
-  <xs:complexType>
-    <xs:complexContent>
-      <xs:extension base="B:NamedType">
-       <xs:sequence>
-         <xs:group ref="M:RangeExpression">
-           <xs:annotation>
-            <xs:appinfo>
-               <jaxb:property name="Type"/>
-            </xs:appinfo>
-           </xs:annotation>
-         </xs:group>
-         <xs:group ref="M:ValueType" minOccurs="1" maxOccurs="2">
-           <xs:annotation><xs:appinfo>
-             <jaxb:property name="Values"/>
-           </xs:appinfo></xs:annotation>
-         </xs:group>
-         <!--Remember to check that InitialValue has the right type.-->
-       </xs:sequence>
-      </xs:extension>
-    </xs:complexContent>
-  </xs:complexType>
-</xs:element>
-
-<xs:group name="ValueType">
-  <xs:choice>
-    <xs:element ref="M:SimpleIdentifier"/>
-    <xs:element ref="M:IntConstant"/>
-  </xs:choice>
-</xs:group>
 
 
 <!-- ==================================================================== -->

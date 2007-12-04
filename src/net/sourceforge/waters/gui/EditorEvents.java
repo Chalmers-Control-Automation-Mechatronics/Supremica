@@ -1,10 +1,10 @@
-//# indent-tabs-mode: nil  c-basic-offset: 2 -*-
+//# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
 //# PROJECT: Waters
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   EditorEvents
 //###########################################################################
-//# $Id: EditorEvents.java,v 1.36 2007-11-21 01:33:38 robi Exp $
+//# $Id: EditorEvents.java,v 1.37 2007-12-04 03:22:54 robi Exp $
 //###########################################################################
 
 
@@ -16,6 +16,8 @@ import java.awt.Dimension;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
+import java.awt.event.FocusEvent;
+import java.awt.event.FocusListener;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
@@ -29,7 +31,7 @@ import java.awt.dnd.DragSourceDragEvent;
 import java.awt.dnd.DragSourceListener;
 import java.awt.dnd.InvalidDnDOperationException;
 import java.util.ArrayList;
-import java.util.Collection;
+import java.util.List;
 import javax.swing.AbstractAction;
 import javax.swing.ActionMap;
 import javax.swing.ImageIcon;
@@ -69,6 +71,7 @@ import org.supremica.log.LoggerFactory;
 
 public class EditorEvents
   extends JTable
+  implements FocusListener
 {
 
   //#########################################################################
@@ -115,6 +118,8 @@ public class EditorEvents
 
     setPreferredSizes();
 
+    setSelectionBackground(EditorColor.BACKGROUND_NOTFOCUSSED);
+    addFocusListener(this);
     final ListSelectionModel selmodel = getSelectionModel();
     final ListSelectionListener listener = new SelectionListener();
     selmodel.addListSelectionListener(listener);
@@ -178,9 +183,31 @@ public class EditorEvents
     return getPreferredSize().height < viewport.getHeight();
   }
 
-  public EditorWindowInterface getEditorInterface()
+
+  //#########################################################################
+  //# Interface java.awt.event.FocusListener
+  public void focusGained(final FocusEvent event)
+  {
+    setSelectionBackground(EditorColor.BACKGROUND_FOCUSSED);
+  }
+
+  public void focusLost(final FocusEvent event)
+  {
+    setSelectionBackground(EditorColor.BACKGROUND_NOTFOCUSSED);
+  }
+
+
+  //#########################################################################
+  //# Accessing the Parents
+  EditorWindowInterface getEditorInterface()
   {
     return mWindow;
+  }
+
+  boolean isDisplayedEditor()
+  {
+    final ModuleWindowInterface iface = mWindow.getModuleWindowInterface();
+    return iface.getActiveEditorWindowInterface() == mWindow;
   }
 
 
@@ -326,7 +353,7 @@ public class EditorEvents
 	    (row != selmodel.getMinSelectionIndex() ||
 	     row != selmodel.getMaxSelectionIndex())) {
 	  setRowSelectionInterval(row, row);
-	  getEditorComponent().requestFocus();
+	  getEditorComponent().requestFocusInWindow();
 	}
       } else if (event.getValueIsAdjusting()) {
 	// Ignore extra messages ...
@@ -405,7 +432,7 @@ public class EditorEvents
       if (rows.length == 0) {
 	return;
       }
-      final Collection<IdentifierSubject> idents =
+      final List<IdentifierSubject> idents =
 	new ArrayList<IdentifierSubject>(rows.length);
       EventType e = EventType.UNKNOWN;
       for(int i = 0; i < rows.length; i++) {

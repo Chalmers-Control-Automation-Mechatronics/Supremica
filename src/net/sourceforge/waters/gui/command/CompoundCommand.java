@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui.command
 //# CLASS:   CompoundCommand
 //###########################################################################
-//# $Id: CompoundCommand.java,v 1.7 2007-08-12 07:55:18 robi Exp $
+//# $Id: CompoundCommand.java,v 1.8 2007-12-04 03:22:54 robi Exp $
 //###########################################################################
 
 
@@ -66,6 +66,11 @@ public class CompoundCommand
     return mDescription;
   }
 
+  public void setName(final String description)
+  {
+    mDescription = description;
+  }
+
   public boolean isEmpty()
   {
     return mCommands.isEmpty();
@@ -121,7 +126,7 @@ public class CompoundCommand
   //#########################################################################
   //# Data Members
   private final List<Command> mCommands;
-  private final String mDescription;
+  private String mDescription;
   private boolean mInProgress;
 
 }

@@ -1,267 +1,243 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <Module Name="stick_picking_game" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
-    <EventDeclList>
-        <EventDecl Kind="CONTROLLABLE" Name="player1_remove_one"/>
-        <EventDecl Kind="CONTROLLABLE" Name="player1_remove_two"/>
-        <EventDecl Kind="UNCONTROLLABLE" Name="player2_remove_one"/>
-        <EventDecl Kind="UNCONTROLLABLE" Name="player2_remove_two"/>
-        <EventDecl Kind="PROPOSITION" Name=":accepting"/>
-        <EventDecl Kind="PROPOSITION" Name=":forbidden"/>
-    </EventDeclList>
-    <ComponentList>
-        <SimpleComponent Kind="PLANT">
-            <SimpleIdentifier Name="Two_players"/>
-            <Graph>
-                <NodeList>
-                    <SimpleNode Initial="true" Name="player1">
-                        <PointGeometry>
-                            <Point Y="112" X="224"/>
-                        </PointGeometry>
-                        <InitialArrowGeometry>
-                            <Point Y="-5" X="-5"/>
-                        </InitialArrowGeometry>
-                        <LabelGeometry Anchor="NW">
-                            <Point Y="-23" X="3"/>
-                        </LabelGeometry>
-                    </SimpleNode>
-                    <SimpleNode Name="player2">
-                        <EventList>
-                            <SimpleIdentifier Name=":accepting"/>
-                        </EventList>
-                        <PointGeometry>
-                            <Point Y="256" X="224"/>
-                        </PointGeometry>
-                        <LabelGeometry Anchor="NW">
-                            <Point Y="6" X="3"/>
-                        </LabelGeometry>
-                    </SimpleNode>
-                </NodeList>
-                <EdgeList>
-                    <Edge Target="player2" Source="player1">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="player1_remove_one"/>
-                            <LabelGeometry Anchor="NW">
-                                <Point Y="-12" X="12"/>
-                            </LabelGeometry>
-                        </LabelBlock>
-                        <StartPointGeometry>
-                            <Point Y="112" X="224"/>
-                        </StartPointGeometry>
-                        <SplineGeometry>
-                            <Point Y="225" X="292"/>
-                        </SplineGeometry>
-                        <EndPointGeometry>
-                            <Point Y="256" X="224"/>
-                        </EndPointGeometry>
-                        <GuardActionBlock>
-                            <Guards>
-                                <BinaryExpression Operator="&gt;">
-                                    <SimpleIdentifier Name="sticks"/>
-                                    <IntConstant Value="0"/>
-                                </BinaryExpression>
-                            </Guards>
-                            <Actions>
-                                <BinaryExpression Operator="-=">
-                                    <SimpleIdentifier Name="sticks"/>
-                                    <IntConstant Value="1"/>
-                                </BinaryExpression>
-                            </Actions>
-                            <LabelGeometry Anchor="NW">
-                                <Point Y="7" X="0"/>
-                            </LabelGeometry>
-                        </GuardActionBlock>
-                    </Edge>
-                    <Edge Target="player2" Source="player1">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="player1_remove_two"/>
-                            <LabelGeometry Anchor="NW">
-                                <Point Y="-12" X="-127"/>
-                            </LabelGeometry>
-                        </LabelBlock>
-                        <StartPointGeometry>
-                            <Point Y="112" X="224"/>
-                        </StartPointGeometry>
-                        <SplineGeometry>
-                            <Point Y="225" X="151"/>
-                        </SplineGeometry>
-                        <EndPointGeometry>
-                            <Point Y="256" X="224"/>
-                        </EndPointGeometry>
-                        <GuardActionBlock>
-                            <Guards>
-                                <BinaryExpression Operator="&gt;">
-                                    <SimpleIdentifier Name="sticks"/>
-                                    <IntConstant Value="1"/>
-                                </BinaryExpression>
-                            </Guards>
-                            <Actions>
-                                <BinaryExpression Operator="-=">
-                                    <SimpleIdentifier Name="sticks"/>
-                                    <IntConstant Value="2"/>
-                                </BinaryExpression>
-                            </Actions>
-                            <LabelGeometry Anchor="NW">
-                                <Point Y="7" X="0"/>
-                            </LabelGeometry>
-                        </GuardActionBlock>
-                    </Edge>
-                    <Edge Target="player1" Source="player2">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="player2_remove_one"/>
-                            <LabelGeometry Anchor="NW">
-                                <Point Y="-39" X="10"/>
-                            </LabelGeometry>
-                        </LabelBlock>
-                        <StartPointGeometry>
-                            <Point Y="256" X="224"/>
-                        </StartPointGeometry>
-                        <SplineGeometry>
-                            <Point Y="140" X="294"/>
-                        </SplineGeometry>
-                        <EndPointGeometry>
-                            <Point Y="112" X="224"/>
-                        </EndPointGeometry>
-                        <GuardActionBlock>
-                            <Guards>
-                                <BinaryExpression Operator="&gt;">
-                                    <SimpleIdentifier Name="sticks"/>
-                                    <IntConstant Value="0"/>
-                                </BinaryExpression>
-                            </Guards>
-                            <Actions>
-                                <BinaryExpression Operator="-=">
-                                    <SimpleIdentifier Name="sticks"/>
-                                    <IntConstant Value="1"/>
-                                </BinaryExpression>
-                            </Actions>
-                            <LabelGeometry Anchor="NW">
-                                <Point Y="-20" X="0"/>
-                            </LabelGeometry>
-                        </GuardActionBlock>
-                    </Edge>
-                    <Edge Target="player1" Source="player2">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="player2_remove_two"/>
-                            <LabelGeometry Anchor="NW">
-                                <Point Y="-39" X="-126"/>
-                            </LabelGeometry>
-                        </LabelBlock>
-                        <StartPointGeometry>
-                            <Point Y="256" X="224"/>
-                        </StartPointGeometry>
-                        <SplineGeometry>
-                            <Point Y="140" X="152"/>
-                        </SplineGeometry>
-                        <EndPointGeometry>
-                            <Point Y="112" X="224"/>
-                        </EndPointGeometry>
-                        <GuardActionBlock>
-                            <Guards>
-                                <BinaryExpression Operator="&gt;">
-                                    <SimpleIdentifier Name="sticks"/>
-                                    <IntConstant Value="1"/>
-                                </BinaryExpression>
-                            </Guards>
-                            <Actions>
-                                <BinaryExpression Operator="-=">
-                                    <SimpleIdentifier Name="sticks"/>
-                                    <IntConstant Value="2"/>
-                                </BinaryExpression>
-                            </Actions>
-                            <LabelGeometry Anchor="NW">
-                                <Point Y="-20" X="0"/>
-                            </LabelGeometry>
-                        </GuardActionBlock>
-                    </Edge>
-                </EdgeList>
-            </Graph>
-            <VariableList>
-                <Variable Name="sticks">
-                    <BinaryExpression Operator="..">
-                        <IntConstant Value="0"/>
-                        <IntConstant Value="5"/>
-                    </BinaryExpression>
-                    <IntConstant Value="5"/>
-                    <IntConstant Value="0"/>
-                </Variable>
-            </VariableList>
-        </SimpleComponent>
-        <SimpleComponent Kind="SPEC">
-            <SimpleIdentifier Name="Spec"/>
-            <Graph>
-                <NodeList>
-                    <SimpleNode Initial="true" Name="S0">
-                        <PointGeometry>
-                            <Point Y="112" X="192"/>
-                        </PointGeometry>
-                        <InitialArrowGeometry>
-                            <Point Y="-5" X="-5"/>
-                        </InitialArrowGeometry>
-                        <LabelGeometry Anchor="NW">
-                            <Point Y="10" X="0"/>
-                        </LabelGeometry>
-                    </SimpleNode>
-                </NodeList>
-                <EdgeList>
-                    <Edge Target="S0" Source="S0">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="player2_remove_two"/>
-                            <LabelGeometry Anchor="NW">
-                                <Point Y="10" X="0"/>
-                            </LabelGeometry>
-                        </LabelBlock>
-                        <StartPointGeometry>
-                            <Point Y="112" X="192"/>
-                        </StartPointGeometry>
-                        <SplineGeometry>
-                            <Point Y="52" X="256"/>
-                        </SplineGeometry>
-                        <EndPointGeometry>
-                            <Point Y="112" X="192"/>
-                        </EndPointGeometry>
-                        <GuardActionBlock>
-                            <Guards>
-                                <BinaryExpression Operator="!=">
-                                    <SimpleIdentifier Name="sticks"/>
-                                    <IntConstant Value="2"/>
-                                </BinaryExpression>
-                            </Guards>
-                            <LabelGeometry Anchor="NW">
-                                <Point Y="29" X="0"/>
-                            </LabelGeometry>
-                        </GuardActionBlock>
-                    </Edge>
-                    <Edge Target="S0" Source="S0">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="player2_remove_one"/>
-                            <LabelGeometry Anchor="NW">
-                                <Point Y="10" X="0"/>
-                            </LabelGeometry>
-                        </LabelBlock>
-                        <StartPointGeometry>
-                            <Point Y="112" X="192"/>
-                        </StartPointGeometry>
-                        <SplineGeometry>
-                            <Point Y="173" X="110"/>
-                        </SplineGeometry>
-                        <EndPointGeometry>
-                            <Point Y="112" X="192"/>
-                        </EndPointGeometry>
-                        <GuardActionBlock>
-                            <Guards>
-                                <BinaryExpression Operator="!=">
-                                    <SimpleIdentifier Name="sticks"/>
-                                    <IntConstant Value="1"/>
-                                </BinaryExpression>
-                            </Guards>
-                            <LabelGeometry Anchor="NW">
-                                <Point Y="29" X="0"/>
-                            </LabelGeometry>
-                        </GuardActionBlock>
-                    </Edge>
-                </EdgeList>
-            </Graph>
-        </SimpleComponent>
-    </ComponentList>
+<ns2:Comment></ns2:Comment>
+<EventDeclList>
+<EventDecl Kind="CONTROLLABLE" Name="player1_remove_one"/>
+<EventDecl Kind="CONTROLLABLE" Name="player1_remove_two"/>
+<EventDecl Kind="UNCONTROLLABLE" Name="player2_remove_one"/>
+<EventDecl Kind="UNCONTROLLABLE" Name="player2_remove_two"/>
+<EventDecl Kind="PROPOSITION" Name=":accepting"/>
+<EventDecl Kind="PROPOSITION" Name=":forbidden"/>
+</EventDeclList>
+<ComponentList>
+<VariableComponent Deterministic="true">
+<SimpleIdentifier Name="sticks"/>
+<VariableRange>
+<BinaryExpression Operator="..">
+<IntConstant Value="0"/>
+<IntConstant Value="5"/>
+</BinaryExpression>
+</VariableRange>
+<VariableInitial>
+<BinaryExpression Operator="==">
+<SimpleIdentifier Name="sticks"/>
+<IntConstant Value="5"/>
+</BinaryExpression>
+</VariableInitial>
+<VariableMarking>
+<SimpleIdentifier Name=":accepting"/>
+<BinaryExpression Operator="==">
+<SimpleIdentifier Name="sticks"/>
+<IntConstant Value="0"/>
+</BinaryExpression>
+</VariableMarking>
+</VariableComponent>
+<SimpleComponent Kind="PLANT">
+<SimpleIdentifier Name="Two_players"/>
+<Graph>
+<NodeList>
+<SimpleNode Initial="true" Name="player1">
+<PointGeometry>
+<Point Y="112" X="224"/>
+</PointGeometry>
+<InitialArrowGeometry>
+<Point Y="-5" X="-5"/>
+</InitialArrowGeometry>
+<LabelGeometry Anchor="NW">
+<Point Y="-23" X="3"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="player2">
+<EventList>
+<SimpleIdentifier Name=":accepting"/>
+</EventList>
+<PointGeometry>
+<Point Y="256" X="224"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point Y="6" X="3"/>
+</LabelGeometry>
+</SimpleNode>
+</NodeList>
+<EdgeList>
+<Edge Target="player2" Source="player1">
+<LabelBlock>
+<SimpleIdentifier Name="player1_remove_one"/>
+<LabelGeometry Anchor="NW">
+<Point Y="-12" X="12"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point Y="225" X="292"/>
+</SplineGeometry>
+<GuardActionBlock>
+<Guards>
+<BinaryExpression Operator="&gt;">
+<SimpleIdentifier Name="sticks"/>
+<IntConstant Value="0"/>
+</BinaryExpression>
+</Guards>
+<Actions>
+<BinaryExpression Operator="-=">
+<SimpleIdentifier Name="sticks"/>
+<IntConstant Value="1"/>
+</BinaryExpression>
+</Actions>
+<LabelGeometry Anchor="NW">
+<Point Y="7" X="0"/>
+</LabelGeometry>
+</GuardActionBlock>
+</Edge>
+<Edge Target="player2" Source="player1">
+<LabelBlock>
+<SimpleIdentifier Name="player1_remove_two"/>
+<LabelGeometry Anchor="NW">
+<Point Y="-12" X="-127"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point Y="225" X="151"/>
+</SplineGeometry>
+<GuardActionBlock>
+<Guards>
+<BinaryExpression Operator="&gt;">
+<SimpleIdentifier Name="sticks"/>
+<IntConstant Value="1"/>
+</BinaryExpression>
+</Guards>
+<Actions>
+<BinaryExpression Operator="-=">
+<SimpleIdentifier Name="sticks"/>
+<IntConstant Value="2"/>
+</BinaryExpression>
+</Actions>
+<LabelGeometry Anchor="NW">
+<Point Y="7" X="0"/>
+</LabelGeometry>
+</GuardActionBlock>
+</Edge>
+<Edge Target="player1" Source="player2">
+<LabelBlock>
+<SimpleIdentifier Name="player2_remove_one"/>
+<LabelGeometry Anchor="NW">
+<Point Y="-39" X="10"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point Y="140" X="294"/>
+</SplineGeometry>
+<GuardActionBlock>
+<Guards>
+<BinaryExpression Operator="&gt;">
+<SimpleIdentifier Name="sticks"/>
+<IntConstant Value="0"/>
+</BinaryExpression>
+</Guards>
+<Actions>
+<BinaryExpression Operator="-=">
+<SimpleIdentifier Name="sticks"/>
+<IntConstant Value="1"/>
+</BinaryExpression>
+</Actions>
+<LabelGeometry Anchor="NW">
+<Point Y="-20" X="0"/>
+</LabelGeometry>
+</GuardActionBlock>
+</Edge>
+<Edge Target="player1" Source="player2">
+<LabelBlock>
+<SimpleIdentifier Name="player2_remove_two"/>
+<LabelGeometry Anchor="NW">
+<Point Y="-39" X="-126"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point Y="140" X="152"/>
+</SplineGeometry>
+<GuardActionBlock>
+<Guards>
+<BinaryExpression Operator="&gt;">
+<SimpleIdentifier Name="sticks"/>
+<IntConstant Value="1"/>
+</BinaryExpression>
+</Guards>
+<Actions>
+<BinaryExpression Operator="-=">
+<SimpleIdentifier Name="sticks"/>
+<IntConstant Value="2"/>
+</BinaryExpression>
+</Actions>
+<LabelGeometry Anchor="NW">
+<Point Y="-20" X="0"/>
+</LabelGeometry>
+</GuardActionBlock>
+</Edge>
+</EdgeList>
+</Graph>
+</SimpleComponent>
+<SimpleComponent Kind="SPEC">
+<SimpleIdentifier Name="Spec"/>
+<Graph>
+<NodeList>
+<SimpleNode Initial="true" Name="S0">
+<PointGeometry>
+<Point Y="112" X="192"/>
+</PointGeometry>
+<InitialArrowGeometry>
+<Point Y="-5" X="-5"/>
+</InitialArrowGeometry>
+<LabelGeometry Anchor="NW">
+<Point Y="10" X="0"/>
+</LabelGeometry>
+</SimpleNode>
+</NodeList>
+<EdgeList>
+<Edge Target="S0" Source="S0">
+<LabelBlock>
+<SimpleIdentifier Name="player2_remove_two"/>
+<LabelGeometry Anchor="NW">
+<Point Y="10" X="0"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point Y="52" X="256"/>
+</SplineGeometry>
+<GuardActionBlock>
+<Guards>
+<BinaryExpression Operator="!=">
+<SimpleIdentifier Name="sticks"/>
+<IntConstant Value="2"/>
+</BinaryExpression>
+</Guards>
+<LabelGeometry Anchor="NW">
+<Point Y="29" X="0"/>
+</LabelGeometry>
+</GuardActionBlock>
+</Edge>
+<Edge Target="S0" Source="S0">
+<LabelBlock>
+<SimpleIdentifier Name="player2_remove_one"/>
+<LabelGeometry Anchor="NW">
+<Point Y="10" X="0"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point Y="173" X="110"/>
+</SplineGeometry>
+<GuardActionBlock>
+<Guards>
+<BinaryExpression Operator="!=">
+<SimpleIdentifier Name="sticks"/>
+<IntConstant Value="1"/>
+</BinaryExpression>
+</Guards>
+<LabelGeometry Anchor="NW">
+<Point Y="29" X="0"/>
+</LabelGeometry>
+</GuardActionBlock>
+</Edge>
+</EdgeList>
+</Graph>
+</SimpleComponent>
+</ComponentList>
 </Module>
-

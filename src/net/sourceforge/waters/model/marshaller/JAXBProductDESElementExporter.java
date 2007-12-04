@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.marshaller
 //# CLASS:   JAXBProductDESExporter
 //###########################################################################
-//# $Id: JAXBProductDESElementExporter.java,v 1.4 2006-11-03 15:01:57 torda Exp $
+//# $Id: JAXBProductDESElementExporter.java,v 1.5 2007-12-04 03:22:55 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.marshaller;
@@ -42,13 +42,15 @@ import net.sourceforge.waters.xsd.des.AutomatonRef;
 import net.sourceforge.waters.xsd.des.ConflictTrace;
 import net.sourceforge.waters.xsd.des.Event;
 import net.sourceforge.waters.xsd.des.EventRef;
+import net.sourceforge.waters.xsd.des.FirstTraceStateTuple;
 import net.sourceforge.waters.xsd.des.LoopTrace;
+import net.sourceforge.waters.xsd.des.NextTraceStateTuple;
 import net.sourceforge.waters.xsd.des.ObjectFactory;
 import net.sourceforge.waters.xsd.des.ProductDES;
 import net.sourceforge.waters.xsd.des.SafetyTrace;
 import net.sourceforge.waters.xsd.des.State;
 import net.sourceforge.waters.xsd.des.TraceState;
-import net.sourceforge.waters.xsd.des.TraceStateTuple;
+import net.sourceforge.waters.xsd.des.TraceStateTupleType;
 import net.sourceforge.waters.xsd.des.TraceStepList;
 import net.sourceforge.waters.xsd.des.TraceType;
 import net.sourceforge.waters.xsd.des.Transition;
@@ -124,14 +126,17 @@ abstract class JAXBProductDESElementExporter
     return visitDocumentProxy(proxy);
   }
 
-  public TraceStateTuple visitTraceStepProxy(final TraceStepProxy proxy)
+  public TraceStateTupleType visitTraceStepProxy(final TraceStepProxy proxy)
     throws VisitorException
   {
     final Map<AutomatonProxy,StateProxy> statemap = proxy.getStateMap();
     if (statemap.isEmpty()) {
       return null;
     } else {
-      final TraceStateTuple element = mFactory.createTraceStateTuple();
+      final TraceStateTupleType element =
+        mIsFirstTraceStep ?
+        mFactory.createFirstTraceStateTuple() :
+        mFactory.createNextTraceStateTuple();
       copyTraceStepProxy(proxy, element);
       return element;
     }
@@ -262,21 +267,25 @@ abstract class JAXBProductDESElementExporter
       final List<TraceStepProxy> steps = proxy.getTraceSteps();
       final Iterator<TraceStepProxy> iter = steps.iterator();
       final TraceStepProxy step0 = iter.next();
-      final TraceStateTuple tracestate0 = visitTraceStepProxy(step0);
+      mIsFirstTraceStep = true;
+      final FirstTraceStateTuple tracestate0 =
+        (FirstTraceStateTuple) visitTraceStepProxy(step0);
       if (tracestate0 != null || iter.hasNext()) {
         final TraceStepList listelem = mFactory.createTraceStepList();
         element.setTraceStepList(listelem);
         if (tracestate0 != null) {
           listelem.setInitialState(tracestate0);
         }
+        mIsFirstTraceStep = false;
         final List<ElementType> outlist =
-          listelem.getEventRefAndTraceStateTuple();
+          listelem.getEventRefAndNextTraceStateTuple();
         while (iter.hasNext()) {
           final TraceStepProxy step = iter.next();
           final EventProxy event = step.getEvent();
           final EventRef eventref = eventexporter.visitEventProxy(event);
           outlist.add(eventref);
-          final TraceStateTuple tracestate = visitTraceStepProxy(step);
+          final NextTraceStateTuple tracestate =
+            (NextTraceStateTuple) visitTraceStepProxy(step);
           if (tracestate != null) {
             outlist.add(tracestate);
           }
@@ -288,7 +297,7 @@ abstract class JAXBProductDESElementExporter
   }
 
   private void copyTraceStepProxy(final TraceStepProxy proxy,
-                                  final TraceStateTuple element)
+                                  final TraceStateTupleType element)
     throws VisitorException
   {
     final List<TraceState> outlist = element.getList();
@@ -372,6 +381,7 @@ abstract class JAXBProductDESElementExporter
   private IndexedSet<AutomatonProxy> mTraceAutomata;
   private RefExporter<EventProxy> mProductDESEventRefExporter;
   private RefExporter<EventProxy> mAutomatonEventRefExporter;
+  private boolean mIsFirstTraceStep;
 
   private final ProductDESEventListHandler
     mProductDESEventListHandler = new ProductDESEventListHandler(mFactory);

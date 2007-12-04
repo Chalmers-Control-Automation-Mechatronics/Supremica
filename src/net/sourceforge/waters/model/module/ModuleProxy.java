@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.module
 //# CLASS:   ModuleProxy
 //###########################################################################
-//# $Id: ModuleProxy.java,v 1.5 2007-06-08 10:45:20 robi Exp $
+//# $Id: ModuleProxy.java,v 1.6 2007-12-04 03:22:55 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.module;
@@ -49,7 +49,7 @@ import net.sourceforge.waters.model.base.Proxy;
  * Similar automata can be reused by replacing their events in various
  * ways.</P>
  *
- * <P>An more advanced version of the <I>small factory</I> example above
+ * <P>A more advanced version of the <I>small factory</I> example above
  * would use only one automaton for the two almost identical machines
  * <CODE>mach1</CODE> and <CODE>mach2</CODE>. This is achieved by creating
  * a machine module containing the one machine automaton. The advanced
@@ -81,6 +81,9 @@ import net.sourceforge.waters.model.base.Proxy;
  *   spec buffer;
  * </PRE>
  *
+ * <P>Further instantiation and abstraction is possible using EFA variables
+ * ({@link VariableComponentProxy}) or aliases ({@link AliasProxy}).
+ *
  * @author Robi Malik
  */
 
@@ -111,6 +114,11 @@ public interface ModuleProxy
 
   /**
    * Gets the component list of this module.
+   * This list does not only contain the automata ({@link
+   * SimpleComponentProxy}) of the module, but also all EFA variables
+   * ({@link VariableComponentProxy}) and module instances ({@link
+   * InstanceProxy}). All these items can be nested in forach blocks
+   * ({@link ForeachComponentProxy}).
    * @return The component list.
    *         Each element is of type {@link ComponentProxy}
    *         or {@link ForeachComponentProxy}.

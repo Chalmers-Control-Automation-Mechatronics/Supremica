@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui.springembedder
 //# CLASS:   SpringEmbedder
 //###########################################################################
-//# $Id: SpringEmbedder.java,v 1.45 2007-09-19 00:33:02 robi Exp $
+//# $Id: SpringEmbedder.java,v 1.46 2007-12-04 03:22:55 robi Exp $
 //###########################################################################
 
 
@@ -149,16 +149,14 @@ public class SpringEmbedder
       }
     }
 
-    // *** BUG ***
-    // This should used named constants throughout!
-    // ***
     for (final NodeSubject node : mNodes) {
       if (node instanceof SimpleNodeSubject) {
         final SimpleNodeSubject simple = (SimpleNodeSubject) node;
         if (simple.isInitial()) {
           if (simple.getInitialArrowGeometry() == null) {
-            simple.setInitialArrowGeometry
-              (new PointGeometrySubject(new Point(-5, -5)));
+            final PointGeometrySubject geo =
+              new PointGeometrySubject(SimpleNodeProxyShape.DEFAULT_INITARROW);
+            simple.setInitialArrowGeometry(geo);
           }
         }
         if (simple.getPointGeometry() == null) {
@@ -178,8 +176,9 @@ public class SpringEmbedder
                                base + mRandom.nextInt(spread))));
         }
         if (simple.getLabelGeometry() == null) {
-          simple.setLabelGeometry
-            (new LabelGeometrySubject(new Point(5, 5)));
+          final LabelGeometrySubject geo =
+            new LabelGeometrySubject(SimpleNodeProxyShape.DEFAULT_OFFSET);
+          simple.setLabelGeometry(geo);
         }
       } else if (node instanceof GroupNodeSubject) {
         final GroupNodeSubject group = (GroupNodeSubject) node;

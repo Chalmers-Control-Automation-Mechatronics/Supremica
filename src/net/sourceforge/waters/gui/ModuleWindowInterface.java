@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   ModuleWindowInterface
 //###########################################################################
-//# $Id: ModuleWindowInterface.java,v 1.11 2007-11-21 01:33:38 robi Exp $
+//# $Id: ModuleWindowInterface.java,v 1.12 2007-12-04 03:22:54 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.gui;
@@ -14,6 +14,7 @@ import java.awt.event.ActionListener;
 
 import net.sourceforge.waters.gui.command.UndoInterface;
 import net.sourceforge.waters.gui.renderer.GeometryAbsentException;
+import net.sourceforge.waters.gui.transfer.SelectionOwner;
 import net.sourceforge.waters.subject.module.ModuleSubject;
 import net.sourceforge.waters.subject.module.SimpleComponentSubject;
 import net.sourceforge.waters.model.expr.ExpressionParser;
@@ -33,41 +34,85 @@ import net.sourceforge.waters.model.expr.ExpressionParser;
 public interface ModuleWindowInterface
 {
     
-    /**
-     * Gets the undo manager used to pass commands to this GUI.
-     */
-    public UndoInterface getUndoInterface();
+  /**
+   * Gets the undo manager used to pass commands to this GUI.
+   */
+  public UndoInterface getUndoInterface();
     
-    /**
-     * Gets the module edited by the GUI represented by this inteface.
-     */
-    public ModuleSubject getModuleSubject();
+  /**
+   * Gets the module edited by the GUI represented by this inteface.
+   */
+  public ModuleSubject getModuleSubject();
     
-    /**
-     * Gets the module context to be used for name-based lookups in the
-     * module.
-     */
-    public ModuleContext getModuleContext();
+  /**
+   * Gets the module context to be used for name-based lookups in the
+   * module.
+   */
+  public ModuleContext getModuleContext();
+
+  /**
+   * Gets the shared expression parser used by this GUI.
+   */
+  public ExpressionParser getExpressionParser();
     
-    /**
-     * Gets the shared expression parser used by this GUI.
-     */
-    public ExpressionParser getExpressionParser();
-    
-    /**
-     * Gets the root window of this GUI.
-     * Dialogs will use this as their owner.
-     */
-    public Frame getRootWindow();
-    
-    /**
-     * Opens a graph editor for the given component.
-     */
-    public EditorWindowInterface showEditor(SimpleComponentSubject comp)
+  /**
+   * Gets the root window of this GUI.
+   * Dialogs will use this as their owner.
+   */
+  public Frame getRootWindow();
+
+  /**
+   * Gets the components panel for the module edited by this GUI.
+   */
+  public SelectionOwner getComponentsPanel();
+
+  /**
+   * Gets the events panel for the module edited by this GUI.
+   */
+  public SelectionOwner getEventsPanel();
+
+  /**
+   * Shows the list of components of the module so the user can edit it.
+   */
+  public void showComponents();
+
+  /**
+   * Shows the list of events of the module so the user can edit it.
+   */
+  public void showEvents();
+
+  /**
+   * Opens a graph editor for the given component.
+   */
+  public EditorWindowInterface showEditor(SimpleComponentSubject comp)
     throws GeometryAbsentException;
+ 
+  /**
+   * Gets the graph editor for the given component.
+   * @return The editor window interface to edit the given component,
+   *         or <CODE>null</CODE> if the component has not yet been
+   *         edited.
+   */
+  public EditorWindowInterface getEditorWindowInterface
+    (SimpleComponentSubject comp);
     
-    /**
-     * Shows the comment editor panel for the current module.
-     */
-    public void showComment();
+  /**
+   * Gets the currently active graph editor, or <CODE>null</CODE> if
+   * none is active.
+   */
+  public EditorWindowInterface getActiveEditorWindowInterface();
+    
+  /**
+   * Shows the comment editor panel for the current module.
+   */
+  public void showComment();
+
+  /**
+   * Shows the given panel in the module window, so the user can edit
+   * its contents.
+   * @param  panel   The panel to be activated. Should be a panel this
+   *                 GUI has control over.
+   */
+  public void showPanel(SelectionOwner panel);
+
 }

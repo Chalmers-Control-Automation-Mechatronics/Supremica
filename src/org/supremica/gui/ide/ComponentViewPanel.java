@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.gui.ide
 //# CLASS:   ComponentViewPanel
 //###########################################################################
-//# $Id: ComponentViewPanel.java,v 1.8 2007-10-31 13:01:00 flordal Exp $
+//# $Id: ComponentViewPanel.java,v 1.9 2007-12-04 03:22:58 robi Exp $
 //###########################################################################
 
 package org.supremica.gui.ide;
@@ -54,7 +54,6 @@ public class ComponentViewPanel
     private EditorEvents events;
     private SimpleComponentSubject element = null;
     private ModuleSubject mModule = null;
-    private boolean isSaved = false;
     private GraphicsToClipboard toClipboard = null;
     
     
@@ -75,9 +74,11 @@ public class ComponentViewPanel
         this.element = element;
         mModuleContainer = moduleContainer;
         mModule = moduleContainer.getModule();
+		final IDE ide = moduleContainer.getIDE();
         surface = new ControlledSurface
             (element.getGraph(), mModule, this,
-            (ControlledToolbar) mModuleContainer.getIDE().getToolBar());
+			 (ControlledToolbar) ide.getToolBar(),
+			 ide.getPopupActionManager());
         surface.setPreferredSize(IDEDimensions.rightAnalyzerPreferredSize);
         surface.setMinimumSize(IDEDimensions.rightAnalyzerMinimumSize);
         
@@ -97,23 +98,11 @@ public class ComponentViewPanel
         final int divide = Math.min(prefeventswidth, halfwidth);
         split.setDividerLocation(divide);
         add(split, BorderLayout.CENTER);
-        
-        surface.createOptions(this);
     }
 
-    public String getComponentName()
+    public SimpleComponentSubject getComponent()
     {
-        return element.getName();
-    }
-    
-    public boolean isSaved()
-    {
-        return isSaved;
-    }
-    
-    public void setSaved(boolean s)
-    {
-        isSaved = s;
+        return element;
     }
     
     public JFrame getFrame()
@@ -131,20 +120,6 @@ public class ComponentViewPanel
         return events;
     }
     
-/*
-        public void repaint()
-        {
-                System.err.println("ComponentEditorPanel.repaint");
-                //scrollsurface.invalidate();
-                super.repaint();
-        }
- */
-    
-    public void setDisplayed()
-    {
-        AnalyzerPanel analyzerPanel = mModuleContainer.getAnalyzerPanel();
-        analyzerPanel.setRightComponent(this);
-    }
 
 	//########################################################################
     //# Interface net.sourceforge.waters.gui.EditorWindowInterface

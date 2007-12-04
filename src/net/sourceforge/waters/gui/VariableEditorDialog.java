@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   VariableEditorDialog
 //###########################################################################
-//# $Id: VariableEditorDialog.java,v 1.4 2007-11-21 23:42:26 robi Exp $
+//# $Id: VariableEditorDialog.java,v 1.5 2007-12-04 03:22:54 robi Exp $
 //###########################################################################
 
 
@@ -47,14 +47,23 @@ import javax.swing.border.Border;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.TableCellEditor;
+import javax.swing.table.TableColumn;
 import javax.swing.table.TableColumnModel;
+import javax.swing.text.DocumentFilter;
 
 import net.sourceforge.waters.gui.command.Command;
-import net.sourceforge.waters.gui.command.CreateVariableComponentCommand;
-import net.sourceforge.waters.gui.command.EditVariableComponentCommand;
+import net.sourceforge.waters.gui.command.EditCommand;
+import net.sourceforge.waters.gui.command.InsertCommand;
+import net.sourceforge.waters.gui.transfer.SelectionOwner;
+import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
+import net.sourceforge.waters.model.expr.BinaryOperator;
 import net.sourceforge.waters.model.expr.ExpressionParser;
 import net.sourceforge.waters.model.expr.Operator;
+import net.sourceforge.waters.model.expr.ParseException;
 import net.sourceforge.waters.model.module.EventDeclProxy;
+import net.sourceforge.waters.model.module.IdentifierProxy;
+import net.sourceforge.waters.model.module.SimpleExpressionProxy;
+import net.sourceforge.waters.subject.module.BinaryExpressionSubject;
 import net.sourceforge.waters.subject.module.IdentifierSubject;
 import net.sourceforge.waters.subject.module.IntConstantSubject;
 import net.sourceforge.waters.subject.module.ModuleSubject;
@@ -62,8 +71,6 @@ import net.sourceforge.waters.subject.module.SimpleExpressionSubject;
 import net.sourceforge.waters.subject.module.SimpleIdentifierSubject;
 import net.sourceforge.waters.subject.module.VariableComponentSubject;
 import net.sourceforge.waters.subject.module.VariableMarkingSubject;
-
-import org.supremica.properties.Config;
 
 
 public class VariableEditorDialog
@@ -119,7 +126,8 @@ public class VariableEditorDialog
   {
     final VariableComponentSubject template =
       mVariable == null ? VARIABLE_TEMPLATE : mVariable;
-    final ExpressionParser parser = getExpressionParser();
+    final ModuleContext context = mRoot.getModuleContext();
+    final ExpressionParser parser = mRoot.getExpressionParser();
     final ActionListener commithandler = new ActionListener() {
         public void actionPerformed(final ActionEvent event)
         {
@@ -138,27 +146,38 @@ public class VariableEditorDialog
     // Main panel ...
     mMainPanel = new RaisedDialogPanel();
     mNameLabel = new JLabel("Name:");
-    mNameInput = new SimpleExpressionCell
-      (template.getIdentifier(), Operator.TYPE_NAME, parser);
+    final IdentifierProxy oldname = template.getIdentifier();
+    final FormattedInputParser nameparser =
+      new ComponentNameInputParser(oldname, context, parser);
+    mNameInput = new SimpleExpressionCell(oldname, nameparser);
     mNameInput.addActionListener(commithandler);
     mNameInput.addKeyListener(keyhandler);
     mNameInput.setToolTipText("Enter variable name, e.g., x or v[i]");
+    mNameInput.setAllowNull(false);
     mTypeLabel = new JLabel("Type:");
     mTypeInput = new SimpleExpressionCell
       (template.getType(), Operator.TYPE_RANGE, parser);
     mTypeInput.addActionListener(commithandler);
     mTypeInput.addKeyListener(keyhandler);
     mTypeInput.setToolTipText("Enter type expression, e.g., 0..8 or {on,off}");
+    mTypeInput.setAllowNull(false);
     mDeterministicLabel = new JLabel("Deterministic:");
     mDeterministicButton =
       new JCheckBox((String) null, template.isDeterministic());
     mDeterministicButton.setRequestFocusEnabled(false);
     mInitialLabel = new JLabel("Initial:");
-    mInitialInput = new SimpleExpressionCell
-      (template.getInitialStatePredicate(), Operator.TYPE_ARITHMETIC, parser);
+    mInitialInput = new InitialStatePredicateCell(template);
     mInitialInput.addActionListener(commithandler);
     mInitialInput.addKeyListener(keyhandler);
-    mInitialInput.setToolTipText("Enter initial state, e.g., 0 or on");
+    mInitialInput.setAllowNull(false);
+ 
+    final ActionListener dethandler = new ActionListener() {
+        public void actionPerformed(final ActionEvent event)
+        {
+          mInitialInput.updateShownExpression();
+        }
+      };
+    mDeterministicButton.addActionListener(dethandler);
 
     // Error panel ...
     mErrorPanel = new RaisedDialogPanel();
@@ -175,21 +194,25 @@ public class VariableEditorDialog
     final List<VariableMarkingSubject> copy =
       new ArrayList<VariableMarkingSubject>(markings);
     mMarkingsModel = new VariableMarkingTableModel(copy);
-    mMarkingsTable = new JTable(mMarkingsModel);
+    mMarkingsTable = new VariableMarkingTable(mMarkingsModel);
     mMarkingsTable.setTableHeader(null);
     mMarkingsTable.setShowGrid(false);
     mMarkingsTable.setSurrendersFocusOnKeystroke(true);
     mMarkingsTable.setAutoResizeMode(JTable.AUTO_RESIZE_LAST_COLUMN);
     mMarkingsTable.setFillsViewportHeight(true);
     final Dimension minsize = new Dimension(0, 0);
-    mMarkingsTable.setPreferredScrollableViewportSize(minsize);
     mMarkingsTable.setMinimumSize(minsize);
+    final Dimension prefsize = new Dimension(300, 0);
+    mMarkingsTable.setPreferredScrollableViewportSize(prefsize);
     mMarkingsTable.setRowSelectionAllowed(true);
-    final TableColumnModel model = mMarkingsTable.getColumnModel();
-    model.getColumn(0).setPreferredWidth(32);
-    model.getColumn(0).setMaxWidth(32);
-    model.getColumn(1).setPreferredWidth(160);
-    model.getColumn(2).setPreferredWidth(160);
+    final TableColumnModel colmodel = mMarkingsTable.getColumnModel();
+    final TableColumn column0 = colmodel.getColumn(0);
+    column0.setPreferredWidth(32);
+    column0.setMaxWidth(32);
+    final TableColumn column1 = colmodel.getColumn(1);
+    column1.setPreferredWidth(100);
+    final TableColumn column2 = colmodel.getColumn(2);
+    column2.setPreferredWidth(160);
     final Set<AWTKeyStroke> forward = mNameInput.getFocusTraversalKeys
       (KeyboardFocusManager.FORWARD_TRAVERSAL_KEYS);
     mMarkingsTable.setFocusTraversalKeys
@@ -198,12 +221,12 @@ public class VariableEditorDialog
       (KeyboardFocusManager.BACKWARD_TRAVERSAL_KEYS);
     mMarkingsTable.setFocusTraversalKeys
       (KeyboardFocusManager.BACKWARD_TRAVERSAL_KEYS, backward);
-    final TableCellEditor propeditor =
+    final SimpleExpressionEditor propeditor =
       new SimpleExpressionEditor(Operator.TYPE_NAME, parser, mErrorLabel);
     mMarkingsTable.setDefaultEditor(IdentifierSubject.class, propeditor);
+    propeditor.setToolTipText("Enter the name of a proposition event");
     propeditor.addCellEditorListener(mMarkingsModel);
-    final TableCellEditor prededitor =
-      new SimpleExpressionEditor(Operator.TYPE_BOOLEAN, parser, mErrorLabel);
+    final TableCellEditor prededitor = new PredicateExpressionEditor(parser);
     mMarkingsTable.setDefaultEditor(SimpleExpressionSubject.class, prededitor);
     prededitor.addCellEditorListener(mMarkingsModel);
     final ListSelectionModel selmodel = mMarkingsTable.getSelectionModel();
@@ -626,8 +649,8 @@ public class VariableEditorDialog
       final SimpleExpressionSubject type =
         (SimpleExpressionSubject) mTypeInput.getValue();
       final boolean deterministic = mDeterministicButton.isSelected();
-      final SimpleExpressionSubject initial = 
-        (SimpleExpressionSubject) mInitialInput.getValue();
+      final SimpleExpressionSubject initial =
+        mInitialInput.getInitialStatePredicate();
       final List<VariableMarkingSubject> origmarkings =
         mMarkingsModel.getList();
       final List<VariableMarkingSubject> markings =
@@ -639,18 +662,19 @@ public class VariableEditorDialog
           markings.add(marking.clone());
         }
       }
+      final IdentifierSubject iclone =
+        ident.getParent() == null ? ident : ident.clone();
       final VariableComponentSubject template =
-        new VariableComponentSubject(ident, type, deterministic,
+        new VariableComponentSubject(iclone, type, deterministic,
                                      initial, markings);
       if (mVariable == null) {
-        final ModuleSubject module = getModule();
-        final Command command =
-          new CreateVariableComponentCommand(template, module);
+        final SelectionOwner panel = mRoot.getComponentsPanel();
+        final Command command = new InsertCommand(template, panel);
         mVariable = template;
         mRoot.getUndoInterface().executeCommand(command);
       } else if (!mVariable.equalsWithGeometry(template)) {
-        final Command command =
-          new EditVariableComponentCommand(mVariable, template);
+        final SelectionOwner panel = mRoot.getComponentsPanel();
+        final Command command = new EditCommand(mVariable, template, panel);
         mRoot.getUndoInterface().executeCommand(command);
       }
       dispose();
@@ -677,17 +701,288 @@ public class VariableEditorDialog
       mInitialInput.isFocusOwner() && !mInitialInput.shouldYieldFocus();
   }
 
-
-  //#########################################################################
-  //# Auxiliary Access
-  private ModuleSubject getModule()
+  private SimpleExpressionSubject getShownExpression
+    (final VariableComponentSubject var)
   {
-    return mRoot.getModuleSubject();
+    final SimpleExpressionSubject pred = var.getInitialStatePredicate();
+    if (var.isDeterministic()) {
+      if (!(pred instanceof BinaryExpressionSubject)) {
+        return null;
+      }
+      final BinaryExpressionSubject binpred = (BinaryExpressionSubject) pred;
+      final CompilerOperatorTable optable =
+        CompilerOperatorTable.getInstance();
+      if (binpred.getOperator() != optable.getEqualsOperator()) {
+        return null;
+      }
+      final IdentifierSubject ident = var.getIdentifier();
+      final SimpleExpressionSubject lhs = binpred.getLeft();
+      final SimpleExpressionSubject rhs = binpred.getRight();
+      if (lhs.equalsByContents(ident)) {
+        return rhs;
+      } else if (rhs.equalsByContents(ident)) {
+        return lhs;
+      } else if (lhs instanceof SimpleIdentifierSubject) {
+        return rhs;
+      } else if (rhs instanceof SimpleIdentifierSubject) {
+        return lhs;
+      } else {
+        return null;
+      }
+    } else {
+      return pred;
+    }
   }
 
-  private ExpressionParser getExpressionParser()
+
+  //#########################################################################
+  //# Inner Class InitialStatePredicateCell
+  /**
+   * <P>The initial state editor.</P>
+   *
+   * <P>This cell supports smart editing of the initial state predicate for
+   * deterministic variables. For a deterministic variable <CODE>x</CODE>,
+   * the user can enter an initial <I>value</I> such
+   * as&nbsp;<CODE>0</CODE>, and the GUI automatically generates the
+   * predicate <CODE>x==0</CODE>. For nondeterministic variables, the
+   * values is entered directly.</P>
+   *
+   * <P>The behaviour and text fields contents change, when the checkbox
+   * for the <I>deterministic</I> attribute changes. The changes are
+   * reflected in a smart tooltip.</P>
+   */
+  private class InitialStatePredicateCell
+    extends SimpleExpressionCell
   {
-    return mRoot.getExpressionParser();
+
+    //#######################################################################
+    //# Constructor
+    private InitialStatePredicateCell(final VariableComponentSubject template)
+    {
+      super(getShownExpression(template), new InitialStateInputParser());
+      setToolTipText("");
+    }
+
+    //#######################################################################
+    //# Overrides for Base Class javax.swing.JComponent
+    public String getToolTipText(final MouseEvent event)
+    {
+       if (mDeterministicButton.isSelected()) {
+        return "Enter the initial value of this variable.";
+      } else {      
+        final String text = mNameInput.getText();
+        final String name = text.length() == 0 ? "x" : text;
+        final StringBuffer buffer = new StringBuffer(160);
+        buffer.append("Enter initial state predicate, e.g., ");
+        buffer.append(name);
+        buffer.append(" == 0 | ");
+        buffer.append(name);
+        buffer.append(" >= 4.");
+        return buffer.toString();
+      }
+    }
+
+    //#######################################################################
+    //# Converting Deterministic and Nondeterministic Representations
+    private void updateShownExpression()
+    {
+      if (shouldYieldFocus()) {
+        final CompilerOperatorTable optable =
+          CompilerOperatorTable.getInstance();
+        final BinaryOperator eqop = optable.getEqualsOperator();
+        final SimpleExpressionSubject value =
+          (SimpleExpressionSubject) getValue();
+        if (value == null) {
+          return;
+        } else if (mDeterministicButton.isSelected()) {
+          if (!(value instanceof BinaryExpressionSubject)) {
+            return;
+          }
+          final BinaryExpressionSubject binpred =
+            (BinaryExpressionSubject) value;
+          if (binpred.getOperator() != eqop) {
+            return;
+          }
+          final IdentifierSubject ident =
+            (IdentifierSubject) mNameInput.getValue();
+          final SimpleExpressionSubject lhs = binpred.getLeft();
+          final SimpleExpressionSubject rhs = binpred.getRight();
+          if (lhs.equalsByContents(ident)) {
+            setValue(rhs);
+          } else if (rhs.equalsByContents(ident)) {
+            setValue(lhs);
+          } else if (lhs instanceof SimpleIdentifierSubject) {
+            setValue(rhs);
+          } else if (rhs instanceof SimpleIdentifierSubject) {
+            setValue(lhs);
+          }
+        } else {
+          final IdentifierSubject ident =
+            (IdentifierSubject) mNameInput.getValue();
+          final IdentifierSubject iclone =
+            ident.getParent() == null ? ident : ident.clone();
+          final SimpleExpressionSubject vclone =
+            value.getParent() == null ? value : value.clone();
+          final BinaryExpressionSubject pred =
+            new BinaryExpressionSubject(eqop, iclone, vclone);
+          setValue(pred);
+        }
+      }
+      final InitialStateInputParser parser =
+        (InitialStateInputParser) getFormattedInputParser();
+      parser.updateTypeMask();
+    }
+
+    private SimpleExpressionSubject getInitialStatePredicate()
+    {
+      final SimpleExpressionSubject value =
+        (SimpleExpressionSubject) getValue();
+      if (value == null) {
+        return null;
+      } else if (mDeterministicButton.isSelected()) {
+        final IdentifierSubject ident =
+          (IdentifierSubject) mNameInput.getValue();
+        final IdentifierSubject iclone =
+          ident.getParent() == null ? ident : ident.clone();
+        final CompilerOperatorTable optable =
+          CompilerOperatorTable.getInstance();
+        final BinaryOperator eqop = optable.getEqualsOperator();
+        return new BinaryExpressionSubject(eqop, iclone, value);
+      } else {
+        return value;
+      }
+    }
+
+  }
+
+
+  //#########################################################################
+  //# Local Class InitialStateInputParser
+  /**
+   * This parser is needed to support the weird initial state predicate
+   * cell. It changes its behaviour depending on the state of the
+   * deterministic check box.
+   */
+  private class InitialStateInputParser
+    extends DocumentFilter
+    implements FormattedInputParser
+  {
+
+    //#######################################################################
+    //# Constructors
+    private InitialStateInputParser()
+    {
+      final ExpressionParser parser = mRoot.getExpressionParser();
+      mDocumentFilter = new SimpleExpressionDocumentFilter(parser);
+      updateTypeMask();
+    }
+
+    //#######################################################################
+    //# Interface net.sourceforge.waters.gui.FormattedInputParser
+    public SimpleExpressionProxy parse(final String text)
+      throws ParseException
+    {
+      final ExpressionParser parser = mRoot.getExpressionParser();
+      return parser.parse(text, mTypeMask);
+    }
+
+    public DocumentFilter getDocumentFilter()
+    {
+      return mDocumentFilter;
+    }
+
+    //#######################################################################
+    //# Auxiliary Methods
+    private void updateTypeMask()
+    {
+      if (mDeterministicButton.isSelected()) {
+        mTypeMask = Operator.TYPE_INDEX;
+      } else {
+        mTypeMask = Operator.TYPE_BOOLEAN;
+      }
+    }
+
+    //#######################################################################
+    //# Data Members
+    private final DocumentFilter mDocumentFilter;
+    private int mTypeMask;
+
+  }
+
+
+  //#########################################################################
+  //# Inner Class PredicateExpressionEditor
+  /**
+   * This extension of {@link SimpleExpressionEditor} is only done to
+   * add a smart tooltip.
+   */
+  private class PredicateExpressionEditor
+    extends SimpleExpressionEditor
+  {
+
+    //#######################################################################
+    //# Constructor
+    private PredicateExpressionEditor(final ExpressionParser parser)
+    {
+      super(Operator.TYPE_BOOLEAN, parser, mErrorLabel);
+    }
+
+    //#######################################################################
+    //# Overrides for Base Class
+    //# net.sourceforge.waters.gui.SimpleExpressionEditor
+    public SimpleExpressionCell getTableCellEditorComponent
+      (final JTable table, final Object value, final boolean isSelected,
+       final int row, final int column)
+    {
+      final SimpleExpressionCell cell = super.getTableCellEditorComponent
+        (table, value, isSelected, row, column);
+      final String text = mNameInput.getText();
+      final String name = text.length() == 0 ? "x" : text;
+      final StringBuffer buffer = new StringBuffer(160);
+      buffer.append("Enter marking condition, e.g., ");
+      buffer.append(name);
+      buffer.append(" == 0 | ");
+      buffer.append(name);
+      buffer.append(" >= 4. ");
+      buffer.append("0 stands for false, and 1 stands for true.");
+      final String tooltip = buffer.toString();
+      cell.setToolTipText(tooltip);
+      return cell;
+    }
+
+  }
+
+
+  //#########################################################################
+  //# Inner Class VariableMarkingTable
+  /**
+   * This extension of {@link JTable} is only done to add tooltips to the
+   * columns.
+   */
+  private static class VariableMarkingTable
+    extends JTable
+  {
+
+    //#######################################################################
+    //# Constructor
+    private VariableMarkingTable(final VariableMarkingTableModel model)
+    {
+      super(model);
+    }
+
+    //#######################################################################
+    //# Overrides for javax.swing.JTable
+    public String getToolTipText(final MouseEvent event)
+    {
+      final Point point = event.getPoint();
+      final int column = columnAtPoint(point);
+      if (column <= 1) {
+        return "Propositions";
+      } else {
+        return "Marking Predicates";
+      }
+    }
+
   }
 
 
@@ -705,7 +1000,7 @@ public class VariableEditorDialog
   private JLabel mDeterministicLabel;
   private JCheckBox mDeterministicButton;
   private JLabel mInitialLabel;
-  private SimpleExpressionCell mInitialInput;
+  private InitialStatePredicateCell mInitialInput;
 
   private JPanel mMarkingsPanel;
   private VariableMarkingTableModel mMarkingsModel;

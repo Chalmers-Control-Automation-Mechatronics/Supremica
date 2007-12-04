@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.base
 //# CLASS:   VisitorException
 //###########################################################################
-//# $Id: VisitorException.java,v 1.4 2007-11-21 01:33:38 robi Exp $
+//# $Id: VisitorException.java,v 1.5 2007-12-04 03:22:55 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.base;
@@ -12,10 +12,28 @@ package net.sourceforge.waters.model.base;
 import net.sourceforge.waters.model.base.WatersRuntimeException;
 
 
+/**
+ * The class of exceptions throw by WATERS visitors.
+ * These exceptions typically are wrapped around another exception
+ * that are unpacked by the visitor's entrance method.
+ * The visitor and visitor exception interfaces provides support for the
+ * wrapping and rethrowing of visitor exceptions.
+ *
+ * @see ProxyVisitor
+ * @author Robi Malik
+ */
+
 public class VisitorException extends WatersException {
 
   //#########################################################################
   //# Constructors
+  /**
+   * Constructs a visitor exception without cause or message.
+   */
+  public VisitorException()
+  {
+  }
+
   /**
    * Constructs a new exception with the specified cause. The detail
    * message will be <CODE>(cause==null ? null : cause.toString())</CODE>

@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.marshaller
 //# CLASS:   JAXBTraceImporter
 //###########################################################################
-//# $Id: JAXBTraceImporter.java,v 1.4 2006-11-03 15:01:57 torda Exp $
+//# $Id: JAXBTraceImporter.java,v 1.5 2007-12-04 03:22:55 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.marshaller;
@@ -39,7 +39,7 @@ import net.sourceforge.waters.xsd.des.EventRef;
 import net.sourceforge.waters.xsd.des.LoopTrace;
 import net.sourceforge.waters.xsd.des.SafetyTrace;
 import net.sourceforge.waters.xsd.des.TraceState;
-import net.sourceforge.waters.xsd.des.TraceStateTuple;
+import net.sourceforge.waters.xsd.des.TraceStateTupleType;
 import net.sourceforge.waters.xsd.des.TraceStepList;
 import net.sourceforge.waters.xsd.des.TraceType;
 
@@ -178,19 +178,20 @@ class JAXBTraceImporter
         final IndexedSet<EventProxy> events =
           new CheckedExportSet<EventProxy>(des.getEvents(), des, "event");
         final EventRefImporter importer = new EventRefImporter(events);
-        final TraceStateTuple tuple0 = element.getInitialState();
+        final TraceStateTupleType tuple0 = element.getInitialState();
         final TraceStepProxy step0 = getTraceStep(null, tuple0, automata);
         steps.add(step0);
-        final List<ElementType> list = element.getEventRefAndTraceStateTuple();
+        final List<ElementType> list =
+          element.getEventRefAndNextTraceStateTuple();
         final ListIterator<ElementType> iter = list.listIterator();
         while (iter.hasNext()) {
           final ElementType eventref = iter.next();
           final EventProxy event = importer.importElement(eventref);
-          TraceStateTuple tuple = null;
+          TraceStateTupleType tuple = null;
           if (iter.hasNext()) {
             final ElementType next = iter.next();
-            if (next instanceof TraceStateTuple) {
-              tuple = (TraceStateTuple) next;
+            if (next instanceof TraceStateTupleType) {
+              tuple = (TraceStateTupleType) next;
             } else {
               iter.previous();
             }
@@ -207,7 +208,7 @@ class JAXBTraceImporter
 
   private TraceStepProxy getTraceStep
     (final EventProxy event,
-     final TraceStateTuple element,
+     final TraceStateTupleType element,
      final IndexedSet<AutomatonProxy> automata)
   {
     Map<AutomatonProxy,StateProxy> statemap = null;

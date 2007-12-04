@@ -788,38 +788,68 @@ proc Java_GenerateClass {impl subpack prefix destname classinfo
             Java_WriteLn $stream $umap "        change = true;"
           }
           Java_WriteLn $stream $umap "      \}"
-        } elseif {[string compare $eqstatus "required"] == 0} {
-          Java_WriteLn $stream $umap \
-              "      $membername.assignFrom($paramname);"
         } else {
-          Java_WriteLn $stream $umap \
-              "      if ($membername != null && $paramname != null) \{"
-          Java_WriteLn $stream $umap \
-              "        $membername.assignFrom($paramname);"
-          Java_WriteLn $stream $umap \
-              "      \} else if ($membername == null && $paramname != null) \{"
-          Java_WriteLn $stream $umap \
-              "        $membername = $paramname.clone();"
-          Java_WriteLn $stream $umap \
-              "        $membername.setParent(this);"
-          if {[string compare $eqstatus "geometry"] == 0} {
+          if {[string compare $eqstatus "required"] == 0} {
+            set closer ""
+          } else {
             Java_WriteLn $stream $umap \
-                "        fireGeometryChanged($membername);";
-          } else {
-            Java_WriteLn $stream $umap "        change = true;"
+                "      if ($membername == $paramname) \{"
+            Java_WriteLn $stream $umap \
+                "        // nothing"
+            Java_WriteLn $stream $umap \
+                "      \} else if ($membername == null) \{"
+            Java_WriteLn $stream $umap \
+                "        $membername = $paramname.clone();"
+            Java_WriteLn $stream $umap \
+                "        $membername.setParent(this);"
+            if {[string compare $eqstatus "geometry"] == 0} {
+              Java_WriteLn $stream $umap \
+                  "        fireGeometryChanged($membername);";
+            } else {
+              Java_WriteLn $stream $umap "        change = true;"
+            }
+            Java_WriteLn $stream $umap \
+                "      \} else if ($paramname == null) \{"
+            Java_WriteLn $stream $umap \
+                "        $membername.setParent(null);"
+            Java_WriteLn $stream $umap \
+                "        $membername = null;"
+            if {[string compare $eqstatus "geometry"] == 0} {
+              Java_WriteLn $stream $umap "        fireGeometryChanged(null);";
+            } else {
+              Java_WriteLn $stream $umap "        change = true;"
+            }
+            set closer "\} else "
           }
-          Java_WriteLn $stream $umap \
-              "      \} else if ($membername != null && $paramname == null) \{"
-          Java_WriteLn $stream $umap \
-              "        $membername.setParent(null);"
-          Java_WriteLn $stream $umap \
-              "        $membername = null;"
-          if {[string compare $eqstatus "geometry"] == 0} {
-            Java_WriteLn $stream $umap "        fireGeometryChanged(null);";
-          } else {
-            Java_WriteLn $stream $umap "        change = true;"
+          if {[Java_ClassIsAbstract $classMap($decltype)]} {
+            set test "$membername.getClass() != $paramname.getClass()"
+            Java_WriteLn $stream $umap \
+                "      ${closer}if ($test) \{"
+            Java_WriteLn $stream $umap \
+                "        $membername.setParent(null);"
+            Java_WriteLn $stream $umap \
+                "        $membername = $paramname.clone();"
+            Java_WriteLn $stream $umap \
+                "        $membername.setParent(this);"
+            if {[string compare $eqstatus "geometry"] == 0} {
+              Java_WriteLn $stream $umap \
+                  "        fireGeometryChanged($membername);";
+            } else {
+              Java_WriteLn $stream $umap "        change = true;"
+            }
+            set closer "\} else "
           }
-          Java_WriteLn $stream $umap "      \}"
+          if {[string compare $closer ""] == 0} {
+            Java_WriteLn $stream $umap \
+                "      $membername.assignFrom($paramname);"
+          } else {
+            Java_WriteLn $stream $umap \
+                "      \} else \{"
+            Java_WriteLn $stream $umap \
+                "        $membername.assignFrom($paramname);"
+            Java_WriteLn $stream $umap \
+                "      \}"
+          }
         }
       }
       if {$abstract} {
@@ -1613,6 +1643,7 @@ proc Java_GenerateCloningVisitor {subpack prefix destname classnames
     Java_WriteLn $stream $umap ""
     Java_WriteLn $stream $umap "public $keyword $visitorname"
     Java_WriteLn $stream $umap "  extends Abstract${prefix}ProxyVisitor"
+    Java_WriteLn $stream $umap "  implements ProxyCloner"
     Java_WriteLn $stream $umap "\{"
 
   ############################################################################
@@ -1639,7 +1670,7 @@ proc Java_GenerateCloningVisitor {subpack prefix destname classnames
     Java_WriteLn $stream $umap \
         "      \} catch (final VisitorException exception) \{"
     Java_WriteLn $stream $umap \
-        "        throw new WatersRuntimeException(exception);"
+        "        throw exception.getRuntimeException();"
     Java_WriteLn $stream $umap "      \} finally \{"
     Java_WriteLn $stream $umap "        mNodeMap.clear();"
     Java_WriteLn $stream $umap "      \}"

@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.module
 //# CLASS:   ModuleIntegrityChecker
 //###########################################################################
-//# $Id: ModuleIntegrityChecker.java,v 1.2 2007-06-23 09:18:31 robi Exp $
+//# $Id: ModuleIntegrityChecker.java,v 1.3 2007-12-04 03:23:02 robi Exp $
 //###########################################################################
 
 
@@ -71,6 +71,8 @@ public class ModuleIntegrityChecker
       if (proxy instanceof SimpleComponentProxy) {
         final SimpleComponentProxy comp = (SimpleComponentProxy) proxy;
         checkGraphIntegrity(comp);
+      } else if (proxy instanceof VariableComponentProxy) {
+        // O.K.
       } else if (proxy instanceof InstanceProxy) {
         // O.K.
       } else if (proxy instanceof ForeachComponentProxy) {

@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui.renderer
 //# CLASS:   GeometryTools
 //###########################################################################
-//# $Id: GeometryTools.java,v 1.20 2007-11-07 06:16:04 robi Exp $
+//# $Id: GeometryTools.java,v 1.21 2007-12-04 03:22:55 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.gui.renderer;
@@ -13,6 +13,7 @@ import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
 import java.awt.geom.QuadCurve2D;
 import java.awt.geom.Rectangle2D;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
@@ -60,6 +61,21 @@ public final class GeometryTools
       mNodePositionVisitor = new NodePositionVisitor();
     }
     return mNodePositionVisitor.getPosition(node);
+  }
+
+  public static Point2D getTopLeftPosition
+    (final Collection<? extends NodeProxy> nodes)
+  {
+    double minx = Double.POSITIVE_INFINITY;
+    double miny = Double.POSITIVE_INFINITY;
+    for (final NodeProxy node : nodes) {
+      final Point2D point = getTopLeftPosition(node);
+      final double x = point.getX();
+      final double y = point.getY();
+      minx = Math.min(minx, x);
+      miny = Math.min(miny, y);
+    }
+    return new Point2D.Double(minx, miny);
   }
 
   public static Point2D getTopLeftPosition(final NodeProxy node)

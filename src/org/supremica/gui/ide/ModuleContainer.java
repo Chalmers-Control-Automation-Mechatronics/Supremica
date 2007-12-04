@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.gui.ide
 //# CLASS:   ModuleContainer
 //###########################################################################
-//# $Id: ModuleContainer.java,v 1.67 2007-11-21 01:33:38 robi Exp $
+//# $Id: ModuleContainer.java,v 1.68 2007-12-04 03:22:58 robi Exp $
 //###########################################################################
 
 
@@ -50,6 +50,10 @@ import net.sourceforge.waters.model.expr.OperatorTable;
 import net.sourceforge.waters.model.module.EventDeclProxy;
 import net.sourceforge.waters.model.module.ModuleProxyFactory;
 import net.sourceforge.waters.model.printer.ProxyPrinter;
+import net.sourceforge.waters.subject.base.AbstractSubject;
+import net.sourceforge.waters.subject.base.ListSubject;
+import net.sourceforge.waters.subject.base.ModelChangeEvent;
+import net.sourceforge.waters.subject.base.ModelObserver;
 import net.sourceforge.waters.subject.module.EventDeclSubject;
 import net.sourceforge.waters.subject.module.ModuleSubject;
 import net.sourceforge.waters.subject.module.ModuleSubjectFactory;
@@ -59,7 +63,7 @@ import net.sourceforge.waters.xsd.base.EventKind;
 
 public class ModuleContainer 
     extends DocumentContainer
-    implements UndoInterface, Subject, ChangeListener
+    implements UndoInterface, Subject, ChangeListener, ModelObserver
 {
 
     //#######################################################################
@@ -81,6 +85,10 @@ public class ModuleContainer
         mTabPanel.add(mAnalyzerPanel);
         mTabPanel.addChangeListener(this);
         mEditorPanel.showComment();
+
+        final ListSubject<AbstractSubject> comps =
+            module.getComponentListModifiable();
+        comps.addModelObserver(this);
         
         mTabPanel.addMouseListener(new java.awt.event.MouseAdapter()
         {
@@ -107,6 +115,11 @@ public class ModuleContainer
 	{
 		mUndoCheckPoint = mUndoIndex;
 	}
+
+    public void close()
+    {
+        mEditorPanel.close();
+    }
 
     public Component getPanel()
     {
@@ -161,7 +174,31 @@ public class ModuleContainer
         }
         getIDE().fireEditorChangedEvent(event);
     }
+
     
+    //#######################################################################
+    //# Interface net.sourceforge.waters.subject.base.ModelObserver
+    /**
+     * Implementation of {@link ModelObserver} interface.
+     * If a component is removed from the module, and its automaton
+     * is currently displayed, show the comment editor instead.
+     */
+    public void modelChanged(final ModelChangeEvent event)
+    {
+        if (event.getKind() == ModelChangeEvent.ITEM_REMOVED) {
+            final Object value = event.getValue();
+            if (value instanceof SimpleComponentSubject) {
+                final ComponentEditorPanel panel =
+                    mEditorPanel.getActiveEditorWindowInterface();
+                if (panel != null && panel.getComponent() == value) {
+                    mEditorPanel.showComment();
+                    // Do not event try to close or dispose the graph panel:
+                    // deletions can be undone!
+                }
+            }
+        }   
+    }
+
 
     //#######################################################################
     //# Simple Access
@@ -208,9 +245,10 @@ public class ModuleContainer
         return simulatorPanel;
     }
     
-    public ComponentEditorPanel getComponentEditorPanel(final SimpleComponentSubject scp)
+    ComponentEditorPanel createComponentEditorPanel
+        (final SimpleComponentSubject comp)
     {
-        ComponentEditorPanel panel = mComponentToPanelMap.get(scp);
+        ComponentEditorPanel panel = getComponentEditorPanel(comp);
         if (panel == null)
         {
             final EditorPanel editorPanel = getEditorPanel();
@@ -218,8 +256,8 @@ public class ModuleContainer
             final Dimension oldsize = right.getSize();
             try
             {
-                panel = new ComponentEditorPanel(this, scp, oldsize);
-                mComponentToPanelMap.put(scp, panel);
+                panel = new ComponentEditorPanel(this, comp, oldsize);
+                mComponentToPanelMap.put(comp, panel);
             }
             catch (GeometryAbsentException g)
             {
@@ -228,11 +266,17 @@ public class ModuleContainer
         }
         return panel;
     }
+
+    ComponentEditorPanel getComponentEditorPanel
+        (final SimpleComponentSubject comp)
+    {
+        return mComponentToPanelMap.get(comp);
+    }
     
     public ComponentViewPanel getComponentViewPanel
-        (final SimpleComponentSubject scp)
+        (final SimpleComponentSubject comp)
     {
-        ComponentViewPanel panel = mComponentToViewPanelMap.get(scp);
+        ComponentViewPanel panel = mComponentToViewPanelMap.get(comp);
         if (panel == null)
         {
             final AnalyzerPanel analyzerPanel = getAnalyzerPanel();
@@ -240,8 +284,8 @@ public class ModuleContainer
             final Dimension oldsize = right.getSize();
             try
             {
-                panel = new ComponentViewPanel(this, scp, oldsize);
-                mComponentToViewPanelMap.put(scp, panel);
+                panel = new ComponentViewPanel(this, comp, oldsize);
+                mComponentToViewPanelMap.put(comp, panel);
             }
             catch (GeometryAbsentException g)
             {

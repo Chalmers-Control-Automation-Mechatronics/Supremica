@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.gui.ide
 //# CLASS:   ModuleContainer
 //###########################################################################
-//# $Id: DocumentContainer.java,v 1.5 2007-09-26 13:57:43 flordal Exp $
+//# $Id: DocumentContainer.java,v 1.6 2007-12-04 03:22:58 robi Exp $
 //###########################################################################
 
 
@@ -47,16 +47,28 @@ public abstract class DocumentContainer
         return mDocument;
     }
     
+
     //#######################################################################
     //# To be Overriden by Subclasses
     public boolean hasUnsavedChanges()
     {
         return false;
     }
-    
+
     public void setCheckPoint()
     {
     }
+
+	/**
+	 * Cleans up. This method is called by the GUI to notify that the
+	 * document of this container has been closed by the user. It should
+	 * unregister all listeners on external components and perform any
+	 * other cleanup that may be necessary. The component does not have to
+	 * support any other methods once <CODE>close()</CODE> has been called.
+	 */
+	public void close()
+	{
+	}
     
     public abstract Component getPanel();
     
@@ -69,6 +81,7 @@ public abstract class DocumentContainer
     public abstract boolean isAnalyzerActive();
     
     public abstract String getTypeString();    
+
     
     //#######################################################################
     //# Titling

@@ -4,29 +4,25 @@
 //# PACKAGE: net.sourceforge.waters.gui.command
 //# CLASS:   AbstractEditCommand
 //###########################################################################
-//# $Id: AbstractEditCommand.java,v 1.1 2007-06-08 16:09:52 robi Exp $
+//# $Id: AbstractEditCommand.java,v 1.2 2007-12-04 03:22:54 robi Exp $
 //###########################################################################
+
 
 package net.sourceforge.waters.gui.command;
 
-import net.sourceforge.waters.subject.base.ProxySubject;
+import net.sourceforge.waters.gui.transfer.SelectionOwner;
 
 
 /**
- * <P>A command for modifying an object.</P>
+ * <P>The general superclass for the generic commands that operate
+ * on a selection owner.</P>
  *
- * <P>This command is typically used after the user has edited some settings
- * using a dialog. It is passed a subject to be modified, and a dummy
- * object containing the new values. When executed, all changes are
- * applied at the same time, in an attempt to reduce the number of
- * change notifications fired.</P>
- *
- * <P>The internal mechanism for the assignment is the {@link
- * ProxySubject#assignFrom(ProxySubject) assignFrom()} method, which
- * supports uniform assignments between subjects.</P>
- *
- * <P>Different subclasses of this class exist, for the different types
- * of objects that can be edited.</P>
+ * <P>In addition to the panel (implementing the {@link SelectionOwner}
+ * interface), this class stores a changeable descriptive name and a flag
+ * to indicate whether the command should update the panel's selection. The
+ * latter is useful, because in some cases a command is placed in a
+ * compound that does its own selection handling, so the selection handling
+ * features built into the individual commands needs to be disabled.</P>
  *
  * @author Robi Malik
  */
@@ -38,63 +34,88 @@ public abstract class AbstractEditCommand
   //#########################################################################
   //# Constructors
   /**
-   * Creates a new edit command.
-   * @param  subject   The subject affected by this command.
-   * @param  newstate  A template subject to specify the desired state of the
-   *                   subject after execution of the command. It should be
-   *                   of a type assignable to the subject, but <I>not</I>
-   *                   be the same object.
+   * Creates a new edit command that updates the selection.
+   * @param  panel             The panel that controls the operation of this
+   *                           command.
    */
-  public AbstractEditCommand(final ProxySubject subject,
-                             final ProxySubject newstate)
+  public AbstractEditCommand(final SelectionOwner panel)
   {
-    mSubject = subject;
-    mOldState = subject.clone();
-    mNewState = newstate;
+    this(panel, null, true);
+  }
+
+  /**
+   * Creates a new edit command that updates the selection.
+   * @param  panel             The panel that controls the operation of this
+   *                           command.
+   * @param  name              The description of the command.
+   */
+  public AbstractEditCommand(final SelectionOwner panel,
+                             final String name)
+  {
+    this(panel, name, true);
+  }
+
+  /**
+   * Creates a new edit command.
+   * @param  panel             The panel that controls the operation of this
+   *                           command.
+   * @param  updatesSelection  A flag, indicating whether this command should
+   *                           update the selection of the panel when
+   *                           executed.
+   */
+  public AbstractEditCommand(final SelectionOwner panel,
+                             final boolean updatesSelection)
+  {
+    this(panel, null, updatesSelection);
+  }
+
+  /**
+   * Creates a new edit command.
+   * @param  panel             The panel that controls the operation of this
+   *                           command.
+   * @param  name              The description of the command.
+   * @param  updatesSelection  A flag, indicating whether this command should
+   *                           update the selection of the panel when
+   *                           executed.
+   */
+  public AbstractEditCommand(final SelectionOwner panel,
+                             final String name,
+                             final boolean updatesSelection)
+  {
+    mPanel = panel;
+    mName = name;
+    mUpdatesSelection = updatesSelection;
   }
         
 
   //#########################################################################
   //# Simple Access
-  /**
-   * Gets the subject affected by this command, in its current state.
-   */
-  public ProxySubject getSubject()
+  public SelectionOwner getPanel()
   {
-    return mSubject;
+    return mPanel;
   }
 
-  /**
-   * Gets the state of the affected subject before execution of the command.
-   * The object returned is a clone of the original subject in the state
-   * before the command was first executed.
-   */
-  public ProxySubject getOldState()
+  public void setName(final String name)
   {
-    return mOldState;
+    mName = name;
   }
 
-  /**
-   * Gets the state of the affected subject after execution of the command.
-   * The object returned is the dummy object given by the user to specify
-   * the desired value of the subject after this command.
-   */
-  public ProxySubject getNewState()
+  public boolean getUpdatesSelection()
   {
-    return mNewState;
+    return mUpdatesSelection;
+  }
+
+  public void setUpdatesSelection(final boolean updatesSelection)
+  {
+    mUpdatesSelection = updatesSelection;
   }
 
 
   //#########################################################################
   //# Interface net.sourceforge.waters.gui.command.Command
-  public void execute()
+  public String getName()
   {
-    mSubject.assignFrom(mNewState);
-  }
-
-  public void undo()
-  {
-    mSubject.assignFrom(mOldState);
+    return mName != null ? mName : getClass().getName();
   }
 
   public boolean isSignificant()
@@ -105,8 +126,8 @@ public abstract class AbstractEditCommand
 
   //#########################################################################
   //# Data Members
-  private final ProxySubject mSubject;
-  private final ProxySubject mNewState;
-  private final ProxySubject mOldState;
+  private final SelectionOwner mPanel;
+  private String mName;
+  private boolean mUpdatesSelection;
 
 }

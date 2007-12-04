@@ -1,21 +1,21 @@
 package net.sourceforge.waters.gui;
 
-import java.util.Collection;
+import java.util.List;
 import net.sourceforge.waters.subject.module.IdentifierSubject;
 import net.sourceforge.waters.xsd.base.EventKind;
 
 public class IdentifierWithKind
 {
-    private Collection<IdentifierSubject> ip_;
+    private List<IdentifierSubject> ip_;
     private EventType e_;
     
-    public IdentifierWithKind(Collection<IdentifierSubject> ip, EventType e)
+    public IdentifierWithKind(List<IdentifierSubject> ip, EventType e)
     {
       ip_ = ip;
       e_ = e;
     }
     
-    public Collection<IdentifierSubject> getIdentifiers()
+    public List<IdentifierSubject> getIdentifiers()
     {
       return ip_;
     }

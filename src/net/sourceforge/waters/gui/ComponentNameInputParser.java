@@ -1,0 +1,66 @@
+//# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
+//###########################################################################
+//# PROJECT: Waters
+//# PACKAGE: net.sourceforge.waters.gui
+//# CLASS:   ComponentNameInputParser
+//###########################################################################
+//# $Id: ComponentNameInputParser.java,v 1.2 2007-12-04 03:22:54 robi Exp $
+//###########################################################################
+
+
+package net.sourceforge.waters.gui;
+
+import javax.swing.text.DocumentFilter;
+
+import net.sourceforge.waters.model.expr.ExpressionParser;
+import net.sourceforge.waters.model.expr.ParseException;
+import net.sourceforge.waters.model.module.IdentifierProxy;
+
+
+class ComponentNameInputParser
+  implements FormattedInputParser
+{
+
+  //#########################################################################
+  //# Constructor
+  ComponentNameInputParser(final IdentifierProxy oldname,
+			   final ModuleContext context,
+			   final ExpressionParser parser)
+  {
+    mOldIdentifier = oldname;
+    mOldName = oldname.toString();
+    mModuleContext = context;
+    mExpressionParser = parser;
+    mDocumentFilter = new SimpleExpressionDocumentFilter(parser);
+  }
+
+
+  //#########################################################################
+  //# Interface net.sourceforge.waters.gui.FormattedInputParser
+  public IdentifierProxy parse(final String text)
+    throws ParseException
+  {
+    if (!text.equals(mOldName)) {
+      final IdentifierProxy ident = mExpressionParser.parseIdentifier(text);
+      mModuleContext.checkNewComponentName(ident);
+      return ident;
+    } else {
+      return mOldIdentifier;
+    }
+  }
+
+  public DocumentFilter getDocumentFilter()
+  {
+    return mDocumentFilter;
+  }
+
+
+  //#######################################################################
+  //# Data Members
+  private final IdentifierProxy mOldIdentifier;
+  private final String mOldName;
+  private final ModuleContext mModuleContext;
+  private final ExpressionParser mExpressionParser;
+  private final DocumentFilter mDocumentFilter;
+
+}

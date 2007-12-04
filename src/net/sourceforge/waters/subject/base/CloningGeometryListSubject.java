@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.subject.base
 //# CLASS:   CloningGeometryListSubject
 //###########################################################################
-//# $Id: CloningGeometryListSubject.java,v 1.5 2007-03-02 05:21:14 robi Exp $
+//# $Id: CloningGeometryListSubject.java,v 1.6 2007-12-04 03:22:58 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.subject.base;
@@ -186,7 +186,11 @@ public class CloningGeometryListSubject<E extends Cloneable>
   public void fireModelChanged(final ModelChangeEvent event)
   {
     if (mObservers != null) {
-      for (final ModelObserver observer : mObservers) {
+      // Just in case they try to register or deregister observers
+      // in response to the update ...
+      final List<ModelObserver> copy =
+        new ArrayList<ModelObserver>(mObservers);
+      for (final ModelObserver observer : copy) {
         observer.modelChanged(event);
       }
     }

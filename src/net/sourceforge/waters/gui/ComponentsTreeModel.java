@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   ComponentsTreeModel
 //###########################################################################
-//# $Id: ComponentsTreeModel.java,v 1.2 2007-11-22 03:40:12 robi Exp $
+//# $Id: ComponentsTreeModel.java,v 1.3 2007-12-04 03:22:54 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.gui;
@@ -63,7 +63,6 @@ class ComponentsTreeModel
   void close()
   {
     mModule.removeModelObserver(this);
-    mModule = null;
     mListeners = null;
   }
 
@@ -155,10 +154,10 @@ class ComponentsTreeModel
       switch (event.getKind()) {
       case ModelChangeEvent.ITEM_ADDED:
         {
-          final ProxySubject parent = (ProxySubject) source.getParent();
-          if (isInTree(parent)) {
+          final ProxySubject value = (ProxySubject) event.getValue();
+          if (isInTree(value)) {
+            final ProxySubject parent = (ProxySubject) source.getParent();
             final int index = event.getIndex();
-            final Object value = event.getValue();
             final TreeModelEvent newevent =
               createTreeModelEvent(parent, index, value);
             if (index >= 0) {
@@ -172,8 +171,8 @@ class ComponentsTreeModel
       case ModelChangeEvent.ITEM_REMOVED:
         {
           final ProxySubject parent = (ProxySubject) source.getParent();
-          if (isInTree(parent)) {
-            final Object value = event.getValue();
+          final Proxy value = (Proxy) event.getValue();
+           if (canBeInTree(value) && isInTree(parent)) {
             final int index = event.getIndex();
             final TreeModelEvent newevent =
               createTreeModelEvent(parent, index, value);
@@ -191,11 +190,12 @@ class ComponentsTreeModel
           final ProxySubject psource = (ProxySubject) source;
           if (isInTree(psource)) {
             final ProxySubject parent = getParentInTree(psource);
-            final TreePath path = createPath(parent);
             final TreeModelEvent newevent;
             if (parent == null) {
+              final TreePath path = createPath(psource);
               newevent = new TreeModelEvent(this, path, null, null);
             } else {
+              final TreePath path = createPath(parent);
               final int index = getIndexOfChild(parent, source);
               newevent = createTreeModelEvent(parent, index, source);
             }
@@ -206,6 +206,57 @@ class ComponentsTreeModel
       default:
         break;
       }
+    }
+  }
+
+
+  //#########################################################################
+  //# Computing Paths
+  TreePath createPath(ProxySubject node)
+  {
+    final List<Subject> list = new LinkedList<Subject>();
+    while (node != null) {
+      list.add(node);
+      node = getParentInTree(node);
+    }
+    final int len = list.size();
+    final Object[] path = new Object[len];
+    int i = len;
+    for (final Subject nodei : list) {
+      path[--i] = nodei;
+    }
+    return new TreePath(path);
+  }
+
+  boolean isInTree(final ProxySubject node)
+  {
+    return canBeInTree(node) && getRootInTree(node) == mModule;
+  }
+
+  boolean canBeInTree(final Proxy node)
+  {
+    return mTypeCheckerVisitor.canBeInTree(node);
+  }
+
+  ProxySubject getRootInTree(ProxySubject node)
+  {
+    ProxySubject root = node;
+    do {
+      node = getParentInTree(node);
+      if (node == null) {
+        return root;
+      }
+      root = node;
+    } while (true);
+  }
+
+  ProxySubject getParentInTree(final ProxySubject node)
+  {
+    final Subject parent1 = node.getParent();
+    if (parent1 == null) {
+      return null;
+    } else {
+      return (ProxySubject) parent1.getParent();
     }
   }
 
@@ -222,50 +273,6 @@ class ComponentsTreeModel
       return new TreeModelEvent(this, path, indexes, children);
     } else {
       return new TreeModelEvent(this, path);
-    }
-  }
-
-  private TreePath createPath(ProxySubject node)
-  {
-    final List<Subject> list = new LinkedList<Subject>();
-    while (node != null) {
-      list.add(node);
-      node = getParentInTree(node);
-    }
-    final int len = list.size();
-    final Object[] path = new Object[len];
-    int i = len;
-    for (final Subject nodei : list) {
-      path[--i] = nodei;
-    }
-    return new TreePath(path);
-  }
-
-  private boolean isInTree(final ProxySubject node)
-  {
-    return
-      mTypeCheckerVisitor.canBeInTree(node) && getRootInTree(node) == mModule;
-  }
-
-  private ProxySubject getRootInTree(ProxySubject node)
-  {
-    ProxySubject root = node;
-    do {
-      node = getParentInTree(node);
-      if (node == null) {
-        return root;
-      }
-      root = node;
-    } while (true);
-  }
-
-  private ProxySubject getParentInTree(final ProxySubject node)
-  {
-    final Subject parent1 = node.getParent();
-    if (parent1 == null) {
-      return null;
-    } else {
-      return (ProxySubject) parent1.getParent();
     }
   }
 

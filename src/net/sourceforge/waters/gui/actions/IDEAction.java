@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui.actions
 //# CLASS:   IDEAction
 //###########################################################################
-//# $Id: IDEAction.java,v 1.3 2007-06-24 18:40:06 robi Exp $
+//# $Id: IDEAction.java,v 1.4 2007-12-04 03:22:54 robi Exp $
 //###########################################################################
 
 
@@ -15,6 +15,9 @@ import javax.swing.AbstractAction;
 import net.sourceforge.waters.gui.command.UndoInterface;
 import net.sourceforge.waters.gui.observer.Observer;
 import net.sourceforge.waters.gui.observer.EditorChangedEvent;
+import net.sourceforge.waters.gui.transfer.FocusTracker;
+import net.sourceforge.waters.gui.transfer.SelectionOwner;
+import net.sourceforge.waters.model.base.Proxy;
 import org.supremica.gui.ide.IDE;
 
 
@@ -81,6 +84,43 @@ public abstract class IDEAction
   public IDE getIDE()
   {
     return mIDE;
+  }
+
+  /**
+   * Gets the focus tracker of the IDE.
+   */
+  public FocusTracker getFocusTracker()
+  {
+    return mIDE.getFocusTracker();
+  }
+
+  /**
+   * Gets the current selection owner.  
+   * This method returns the panel of the IDE that currently owns the
+   * keyboard focus, if that panel implements the {@link SelectionOwner}
+   * interface; <CODE>null</CODE> otherwise.
+   */
+  public SelectionOwner getCurrentSelectionOwner()
+  {
+    return getFocusTracker().getWatersSelectionOwner();
+  }
+
+  /**
+   * Gets the currently focussed object.
+   * This method retrieves the selection owner from the IDE, and identifies
+   * the item that was last clicked or selected in that component. It is
+   * this item that should be the target of 'properties' or similar actions.
+   * @return The currently focussed object, or <CODE>null</CODE> if no
+   *         focussed object can be identified.
+   */
+  public Proxy getSelectionAnchor()
+  {
+    final SelectionOwner panel = getCurrentSelectionOwner();
+    if (panel == null) {
+      return null;
+    } else {
+      return panel.getSelectionAnchor();
+    }
   }
 
 

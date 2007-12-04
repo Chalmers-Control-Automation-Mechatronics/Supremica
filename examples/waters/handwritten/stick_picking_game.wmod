@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<Module Name="stick_picking_game" xmlns="http://waters.sourceforge.net/xsd/module">
+<Module Name="stick_picking_game" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
+<ns2:Comment>A model of a simple nim game. Five sticks are on the table, and two players take it in turn to pick up one or two sticks.</ns2:Comment>
 <EventDeclList>
 <EventDecl Kind="CONTROLLABLE" Name="player1_remove_one"/>
 <EventDecl Kind="CONTROLLABLE" Name="player1_remove_two"/>
@@ -8,16 +9,31 @@
 <EventDecl Kind="PROPOSITION" Name=":accepting"/>
 </EventDeclList>
 <ComponentList>
+<VariableComponent Deterministic="true">
+<SimpleIdentifier Name="sticks"/>
+<VariableRange>
+<BinaryExpression Operator="..">
+<IntConstant Value="0"/>
+<IntConstant Value="5"/>
+</BinaryExpression>
+</VariableRange>
+<VariableInitial>
+<BinaryExpression Operator="==" Text="sticks == 5">
+<SimpleIdentifier Name="sticks"/>
+<IntConstant Value="5"/>
+</BinaryExpression>
+</VariableInitial>
+</VariableComponent>
 <SimpleComponent Kind="PLANT">
 <SimpleIdentifier Name="Two_players"/>
-<Graph Deterministic="true">
+<Graph>
 <NodeList>
 <SimpleNode Initial="true" Name="player1">
 <PointGeometry>
-<Point X="224" Y="112"/>
+<Point Y="112" X="224"/>
 </PointGeometry>
 <LabelGeometry Anchor="NW">
-<Point X="3" Y="-23"/>
+<Point Y="-23" X="3"/>
 </LabelGeometry>
 </SimpleNode>
 <SimpleNode Name="player2">
@@ -25,29 +41,29 @@
 <SimpleIdentifier Name=":accepting"/>
 </EventList>
 <PointGeometry>
-<Point X="224" Y="256"/>
+<Point Y="256" X="224"/>
 </PointGeometry>
 <LabelGeometry Anchor="NW">
-<Point X="3" Y="6"/>
+<Point Y="6" X="3"/>
 </LabelGeometry>
 </SimpleNode>
 </NodeList>
 <EdgeList>
-<Edge Source="player1" Target="player2">
+<Edge Target="player2" Source="player1">
 <LabelBlock>
 <SimpleIdentifier Name="player1_remove_one"/>
 <LabelGeometry Anchor="NW">
-<Point X="12" Y="-12"/>
+<Point Y="-12" X="12"/>
 </LabelGeometry>
 </LabelBlock>
 <StartPointGeometry>
-<Point X="224" Y="112"/>
+<Point Y="112" X="224"/>
 </StartPointGeometry>
-<SplineGeometry Kind="INTERPOLATING">
-<Point X="292" Y="225"/>
+<SplineGeometry>
+<Point Y="225" X="292"/>
 </SplineGeometry>
 <EndPointGeometry>
-<Point X="224" Y="256"/>
+<Point Y="256" X="224"/>
 </EndPointGeometry>
 <GuardActionBlock>
 <Guards>
@@ -64,21 +80,21 @@
 </Actions>
 </GuardActionBlock>
 </Edge>
-<Edge Source="player1" Target="player2">
+<Edge Target="player2" Source="player1">
 <LabelBlock>
 <SimpleIdentifier Name="player1_remove_two"/>
 <LabelGeometry Anchor="NW">
-<Point X="-127" Y="-12"/>
+<Point Y="-12" X="-127"/>
 </LabelGeometry>
 </LabelBlock>
 <StartPointGeometry>
-<Point X="224" Y="112"/>
+<Point Y="112" X="224"/>
 </StartPointGeometry>
-<SplineGeometry Kind="INTERPOLATING">
-<Point X="151" Y="225"/>
+<SplineGeometry>
+<Point Y="225" X="151"/>
 </SplineGeometry>
 <EndPointGeometry>
-<Point X="224" Y="256"/>
+<Point Y="256" X="224"/>
 </EndPointGeometry>
 <GuardActionBlock>
 <Guards>
@@ -95,21 +111,21 @@
 </Actions>
 </GuardActionBlock>
 </Edge>
-<Edge Source="player2" Target="player1">
+<Edge Target="player1" Source="player2">
 <LabelBlock>
 <SimpleIdentifier Name="player2_remove_one"/>
 <LabelGeometry Anchor="NW">
-<Point X="10" Y="-39"/>
+<Point Y="-39" X="10"/>
 </LabelGeometry>
 </LabelBlock>
 <StartPointGeometry>
-<Point X="224" Y="256"/>
+<Point Y="256" X="224"/>
 </StartPointGeometry>
-<SplineGeometry Kind="INTERPOLATING">
-<Point X="294" Y="140"/>
+<SplineGeometry>
+<Point Y="140" X="294"/>
 </SplineGeometry>
 <EndPointGeometry>
-<Point X="224" Y="112"/>
+<Point Y="112" X="224"/>
 </EndPointGeometry>
 <GuardActionBlock>
 <Guards>
@@ -126,21 +142,21 @@
 </Actions>
 </GuardActionBlock>
 </Edge>
-<Edge Source="player2" Target="player1">
+<Edge Target="player1" Source="player2">
 <LabelBlock>
 <SimpleIdentifier Name="player2_remove_two"/>
 <LabelGeometry Anchor="NW">
-<Point X="-126" Y="-39"/>
+<Point Y="-39" X="-126"/>
 </LabelGeometry>
 </LabelBlock>
 <StartPointGeometry>
-<Point X="224" Y="256"/>
+<Point Y="256" X="224"/>
 </StartPointGeometry>
-<SplineGeometry Kind="INTERPOLATING">
-<Point X="152" Y="140"/>
+<SplineGeometry>
+<Point Y="140" X="152"/>
 </SplineGeometry>
 <EndPointGeometry>
-<Point X="224" Y="112"/>
+<Point Y="112" X="224"/>
 </EndPointGeometry>
 <GuardActionBlock>
 <Guards>
@@ -159,16 +175,6 @@
 </Edge>
 </EdgeList>
 </Graph>
-<VariableList>
-<Variable Name="sticks">
-<BinaryExpression Operator="..">
-<IntConstant Value="0"/>
-<IntConstant Value="5"/>
-</BinaryExpression>
-<IntConstant Value="5"/>
-</Variable>
-</VariableList>
 </SimpleComponent>
 </ComponentList>
 </Module>
-

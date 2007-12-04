@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.plain.des
 //# CLASS:   CompiledAutomaton
 //###########################################################################
-//# $Id: CompiledAutomaton.java,v 1.2 2007-10-04 20:45:23 robi Exp $
+//# $Id: CompiledAutomaton.java,v 1.3 2007-12-04 03:22:55 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.compiler;
@@ -36,6 +36,11 @@ import net.sourceforge.waters.xsd.base.ComponentKind;
  * A finite-state machine.
  * This is a simple MUTABLE implementation of the {@link AutomatonProxy}
  * interface.
+ *
+ * <STRONG>BUG.</STRONG> Not a proper an implementation of {@link
+ * AutomatonProxy}, also the compiler must create everything through its
+ * factory. Create your own data structure as needed, but do not pretend to
+ * be {@link AutomatonProxy} ...
  *
  * @author Markus Sk&ouml;ldstam
  */

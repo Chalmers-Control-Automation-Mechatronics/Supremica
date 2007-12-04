@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui.renderer
 //# CLASS:   SubjectShapeProducer
 //###########################################################################
-//# $Id: SubjectShapeProducer.java,v 1.29 2007-05-23 16:28:16 robi Exp $
+//# $Id: SubjectShapeProducer.java,v 1.30 2007-12-04 03:22:55 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.gui.renderer;
@@ -57,7 +57,17 @@ public class SubjectShapeProducer
                               final ModuleProxy module)
   {
     super(graph, module);
+    mSubject = subject;
     subject.addModelObserver(this);
+  }
+
+
+  //##########################################################################
+  //# Clean up
+  public void close()
+  {
+    mSubject.removeModelObserver(this);
+    super.close();
   }
 
 
@@ -170,5 +180,51 @@ public class SubjectShapeProducer
       removeMapping(esource);
     }
   }
+
+
+  //##########################################################################
+  //# Smarter Lookup Using Parents
+  public EdgeProxyShape visitEdgeProxy(final EdgeProxy edge)
+  {
+    return createEdgeProxyShape(edge);
+  }
+
+  public GuardActionBlockProxyShape visitGuardActionBlockProxy
+    (final GuardActionBlockProxy block)
+  {
+    final GuardActionBlockProxyShape shape =
+      (GuardActionBlockProxyShape) lookup(block);
+    if (shape != null) {
+      return shape;
+    } else {
+      final GuardActionBlockSubject subject = (GuardActionBlockSubject) block;
+      final EdgeSubject edge = (EdgeSubject) subject.getParent();
+      final EdgeProxyShape eshape = visitEdgeProxy(edge);
+      return createGuardActionBlockShape(block, eshape);
+    }
+  }
+
+  public LabelBlockProxyShape visitLabelBlockProxy(final LabelBlockProxy block)
+  {
+    final LabelBlockProxyShape shape = (LabelBlockProxyShape) lookup(block);
+    if (shape != null) {
+      return shape;
+    } else {
+      final LabelBlockSubject subject = (LabelBlockSubject) block;
+      final Subject parent = subject.getParent();
+      if (parent instanceof EdgeProxy) {
+        final EdgeProxy edge = (EdgeProxy) parent;
+        final EdgeProxyShape eshape = visitEdgeProxy(edge);
+        return createLabelBlockShape(block, eshape);
+      } else {
+        return createLabelBlockShape(block, null);
+      }
+    }
+  }
+
+
+  //##########################################################################
+  //# Data Members
+  private final Subject mSubject;
 
 }

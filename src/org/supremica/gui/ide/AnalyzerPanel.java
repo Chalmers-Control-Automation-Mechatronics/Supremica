@@ -4,12 +4,11 @@
 //# PACKAGE: org.supremica.gui.ide
 //# CLASS:   AnalyzerPanel
 //###########################################################################
-//# $Id: AnalyzerPanel.java,v 1.35 2007-07-16 11:34:32 flordal Exp $
+//# $Id: AnalyzerPanel.java,v 1.36 2007-12-04 03:22:58 robi Exp $
 //###########################################################################
 
 package org.supremica.gui.ide;
 
-import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import javax.swing.AbstractAction;
@@ -59,16 +58,8 @@ public class AnalyzerPanel
         tabPanel.setSelectedComponent(automataPanel);
         
         automatonViewerPanel = getEmptyRightPanel();
-        
-        splitPanelHorizontal = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, tabPanel, automatonViewerPanel);
-        splitPanelHorizontal.setContinuousLayout(false);
-        splitPanelHorizontal.setOneTouchExpandable(false);
-        splitPanelHorizontal.setDividerLocation(0.2);
-        splitPanelHorizontal.setResizeWeight(0.0);
-        
-        ((GridBagLayout)getLayout()).setConstraints(splitPanelHorizontal, getGridBagConstraints());
-        
-        add(splitPanelHorizontal);
+		setLeftComponent(tabPanel);
+		setRightComponent(automatonViewerPanel);
         
         // Add CTRL-A as a "Select All" action
         this.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(KeyEvent.VK_A, ActionEvent.CTRL_MASK), "SelectAll");

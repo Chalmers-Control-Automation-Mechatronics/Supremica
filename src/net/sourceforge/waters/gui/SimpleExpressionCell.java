@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   SimpleExpressionCell
 //###########################################################################
-//# $Id: SimpleExpressionCell.java,v 1.10 2007-11-20 03:37:35 robi Exp $
+//# $Id: SimpleExpressionCell.java,v 1.11 2007-12-04 03:22:54 robi Exp $
 //###########################################################################
 
 
@@ -13,8 +13,6 @@ package net.sourceforge.waters.gui;
 import javax.swing.InputVerifier;
 import javax.swing.JComponent;
 import javax.swing.JFormattedTextField;
-import javax.swing.text.AttributeSet;
-import javax.swing.text.BadLocationException;
 import javax.swing.text.DefaultFormatter;
 import javax.swing.text.DefaultFormatterFactory;
 import javax.swing.text.DocumentFilter;
@@ -73,6 +71,19 @@ public class SimpleExpressionCell
     setFormatterFactory(factory);
     setInputVerifier(mVerifier);
     setValue(value);
+  }
+
+
+  //#########################################################################
+  //# Simple Access
+  public FormattedInputParser getFormattedInputParser()
+  {
+    return mParser;
+  }
+
+  public void setAllowNull(final boolean allow)
+  {
+    mAllowNull = allow;
   }
 
 
@@ -142,8 +153,8 @@ public class SimpleExpressionCell
     {
       mParser = parser;
       mTypeMask = mask;
+      mDocumentFilter = new SimpleExpressionDocumentFilter(parser);
     }
-
 
     //#######################################################################
     //# Interface net.sourceforge.waters.gui.FormattedInputParser
@@ -155,66 +166,14 @@ public class SimpleExpressionCell
 
     public DocumentFilter getDocumentFilter()
     {
-      return this;
+      return mDocumentFilter;
     }
-
-
-    //#######################################################################
-    //# Overrides for class javax.swing.DocumentFilter
-    public void insertString(final DocumentFilter.FilterBypass bypass,
-                             final int offset,
-                             final String text,
-                             final AttributeSet attribs)
-      throws BadLocationException
-    {
-      final String filtered = filter(text);
-      if (filtered != null) {
-        super.insertString(bypass, offset, filtered, attribs);
-      }
-    }
-
-    public void replace(final DocumentFilter.FilterBypass bypass,
-                        final int offset,
-                        final int length,
-                        final String text,
-                        final AttributeSet attribs)
-      throws BadLocationException
-    {
-      final String filtered = filter(text);
-      if (filtered != null) {
-        super.replace(bypass, offset, length, filtered, attribs);
-      }
-    }
-
-
-    //#######################################################################
-    //# Auxiliary Methods
-    private String filter(final String text)
-    {
-      if (text == null) {
-        return null;
-      } else {
-        final int len = text.length();
-        final StringBuffer buffer = new StringBuffer(len);
-        for (int i = 0; i < len; i++) {
-          final char ch = text.charAt(i);
-          if (mParser.isExpressionCharacter(ch)) {
-            buffer.append(ch);
-          }
-        }
-        if (buffer.length() == 0) {
-          return null;
-        } else {
-          return buffer.toString();
-        }
-      }
-    }
-
 
     //#######################################################################
     //# Data Members
     private final ExpressionParser mParser;
     private final int mTypeMask;
+    private final DocumentFilter mDocumentFilter;
 
   }
 

@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.subject.module
 //# CLASS:   NodeSetSubject
 //###########################################################################
-//# $Id: NodeSetSubject.java,v 1.7 2007-07-03 11:20:53 robi Exp $
+//# $Id: NodeSetSubject.java,v 1.8 2007-12-04 03:22:58 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.subject.module;
@@ -25,6 +25,7 @@ import net.sourceforge.waters.model.base.DuplicateNameException;
 import net.sourceforge.waters.model.base.ItemNotFoundException;
 import net.sourceforge.waters.model.base.NamedProxy;
 import net.sourceforge.waters.model.base.NameNotFoundException;
+import net.sourceforge.waters.model.base.ProxyTools;
 import net.sourceforge.waters.model.base.WatersRuntimeException;
 import net.sourceforge.waters.model.module.ComponentProxy;
 import net.sourceforge.waters.model.module.NodeProxy;
@@ -304,8 +305,10 @@ class NodeSetSubject
   //# Interface net.sourceforge.waters.subject.base.SetSubject
   public void assignFrom(final Set<? extends NodeSubject> set)
   {
-    throw new UnsupportedOperationException
-      ("Node set assignment not yet implemented!");
+    if (!ProxyTools.isEqualSetWithGeometry(this, set)) {
+      throw new UnsupportedOperationException
+        ("Node set assignment not yet implemented!");
+    }
   }
 
   

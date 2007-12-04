@@ -301,7 +301,7 @@
       <formatter type="xml"/>
       <batchtest todir="${logs.results}">
         <fileset dir="${supremica.testsrc}">
-          <include name="net/sourceforge/waters/**/*ModuleTest.java"/>
+          <include name="net/sourceforge/waters/**/*CompilerTest.java"/>
           <exclude name="**/Abstract*.java"/>
         </fileset>
       </batchtest>
@@ -464,6 +464,7 @@
         <exclude name="net/sourceforge/waters/analysis/modular/supremica/**"/>
         <exclude name="net/sourceforge/waters/build/**"/>
         <exclude name="net/sourceforge/waters/gui/**"/>
+        <exclude name="net/sourceforge/waters/mbt/**"/>
       </packageset>
       <doctitle><![CDATA[<h1>Waters API Documentation</h1>]]></doctitle>
       <link href="${java.api.url}"

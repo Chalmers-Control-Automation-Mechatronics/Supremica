@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui.renderer
 //# CLASS:   ProxyShapeProducer
 //###########################################################################
-//# $Id: ProxyShapeProducer.java,v 1.27 2007-11-07 06:16:04 robi Exp $
+//# $Id: ProxyShapeProducer.java,v 1.28 2007-12-04 03:22:55 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.gui.renderer;
@@ -17,6 +17,7 @@ import java.awt.geom.GeneralPath;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.awt.geom.RoundRectangle2D;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -25,7 +26,6 @@ import java.util.Map;
 
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.base.VisitorException;
-import net.sourceforge.waters.model.base.WatersRuntimeException;
 import net.sourceforge.waters.model.module.AbstractModuleProxyVisitor;
 import net.sourceforge.waters.model.module.BinaryExpressionProxy;
 import net.sourceforge.waters.model.module.EdgeProxy;
@@ -61,6 +61,13 @@ public class ProxyShapeProducer
   }
 
     
+  //##########################################################################
+  //# Clean up
+  public void close()
+  {
+  }
+
+
   //#########################################################################
   //# Simple Access
   public GraphProxy getGraph()
@@ -77,7 +84,7 @@ public class ProxyShapeProducer
       try {
         return (ProxyShape) proxy.acceptVisitor(this);
       } catch (final VisitorException exception) {
-        throw new WatersRuntimeException(exception);
+        throw exception.getRuntimeException();
       }
     } else {
       return null;
@@ -92,14 +99,12 @@ public class ProxyShapeProducer
     }
     for (final EdgeProxy edge : mGraph.getEdges()) {
       getShape(edge);
+      getShape(edge.getLabelBlock());
     }
   }
 
   /**
    * Calculates a minimum bounding rectangle of all shapes displayed.
-   * This method is only accurate if all shapes are cached. If this
-   * cannot be guaranteed, {@link #createAllShapes()} should be called
-   * first to ensure it.
    */
   public Rectangle2D getMinimumBoundingRectangle()
   {
@@ -120,22 +125,34 @@ public class ProxyShapeProducer
     }
   }
 
+  /**
+   * Calculates a minimum bounding rectangle for the given items.
+   */
+  public Rectangle2D getMinimumBoundingRectangle
+    (final Collection<? extends Proxy> proxies)
+  {
+    if (proxies.isEmpty()) {
+      return new Rectangle(0, 0, 0, 0);
+    } else {
+      final Iterator<? extends Proxy> iter = proxies.iterator();
+      final Proxy proxy0 = iter.next();
+      final ProxyShape shape0 = getShape(proxy0);
+      final Rectangle2D rect = shape0.getBounds2D();
+      while (iter.hasNext()) {
+        final Proxy proxy = iter.next();
+        final ProxyShape shape = getShape(proxy);
+        rect.add(shape.getBounds2D());
+      }
+      return rect;
+    }
+  }
+
 
   //#########################################################################
   //# Interface net.sourceforge.waters.model.module.ModuleProxyVisitor
   public EdgeProxyShape visitEdgeProxy(final EdgeProxy edge)
   {
-    EdgeProxyShape shape = (EdgeProxyShape) lookup(edge);
-    if (shape == null) {
-      if (GeometryTools.isSelfloop(edge)) {
-        shape = new TieEdgeProxyShape(edge);
-      } else if (edge.getGeometry() == null) {
-        shape = new StraightEdgeProxyShape(edge);
-      } else {
-        shape = new QuadraticEdgeProxyShape(edge);
-      }
-      mMap.put(edge, shape);
-    }
+    final EdgeProxyShape shape = createEdgeProxyShape(edge);
     createLabelBlockShape(edge.getLabelBlock(), shape);
     final GuardActionBlockProxy block = edge.getGuardActionBlock();
     if (block != null) {
@@ -153,7 +170,7 @@ public class ProxyShapeProducer
       return createLabelBlockShape(block, null);
     }
   }
-    
+
   public GroupNodeProxyShape visitGroupNodeProxy(final GroupNodeProxy group)
   {
     GroupNodeProxyShape shape = (GroupNodeProxyShape) lookup(group);
@@ -206,7 +223,23 @@ public class ProxyShapeProducer
 
   //#########################################################################
   //# Auxiliary Methods
-  private LabelBlockProxyShape createLabelBlockShape
+  EdgeProxyShape createEdgeProxyShape(final EdgeProxy edge)
+  {
+    EdgeProxyShape shape = (EdgeProxyShape) lookup(edge);
+    if (shape == null) {
+      if (GeometryTools.isSelfloop(edge)) {
+        shape = new TieEdgeProxyShape(edge);
+      } else if (edge.getGeometry() == null) {
+        shape = new StraightEdgeProxyShape(edge);
+      } else {
+        shape = new QuadraticEdgeProxyShape(edge);
+      }
+      mMap.put(edge, shape);
+    }
+    return shape;
+  }
+
+  LabelBlockProxyShape createLabelBlockShape
     (final LabelBlockProxy block,
      final EdgeProxyShape eshape)
   {
@@ -278,7 +311,7 @@ public class ProxyShapeProducer
     return shape;
   }
     
-  private GuardActionBlockProxyShape createGuardActionBlockShape
+  GuardActionBlockProxyShape createGuardActionBlockShape
     (final GuardActionBlockProxy block,
      final EdgeProxyShape eshape)
   {

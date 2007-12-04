@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.printer
 //# CLASS:   ModuleProxyPrinter
 //###########################################################################
-//# $Id: ModuleProxyPrinter.java,v 1.14 2007-07-21 22:13:24 robi Exp $
+//# $Id: ModuleProxyPrinter.java,v 1.15 2007-12-04 03:22:58 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.printer;
@@ -40,6 +40,7 @@ import net.sourceforge.waters.model.module.ForeachEventProxy;
 import net.sourceforge.waters.model.module.ForeachProxy;
 import net.sourceforge.waters.model.module.GraphProxy;
 import net.sourceforge.waters.model.module.GroupNodeProxy;
+import net.sourceforge.waters.model.module.GuardActionBlockProxy;
 import net.sourceforge.waters.model.module.IdentifiedProxy;
 import net.sourceforge.waters.model.module.IdentifierProxy;
 import net.sourceforge.waters.model.module.IndexedIdentifierProxy;
@@ -61,9 +62,6 @@ import net.sourceforge.waters.model.module.SplineGeometryProxy;
 import net.sourceforge.waters.model.module.UnaryExpressionProxy;
 import net.sourceforge.waters.model.module.VariableComponentProxy;
 import net.sourceforge.waters.model.module.VariableMarkingProxy;
-
-import net.sourceforge.waters.model.module.VariableProxy;
-import net.sourceforge.waters.model.module.GuardActionBlockProxy;
 
 import net.sourceforge.waters.xsd.base.ComponentKind;
 import net.sourceforge.waters.xsd.base.EventKind;
@@ -96,29 +94,6 @@ public class ModuleProxyPrinter
 
   //#########################################################################
   //# Interface net.sourceforge.waters.model.module.ModuleProxyVisitor
-  
-//EFA-------------------
-  public Object visitGuardActionBlockProxy
-  (final GuardActionBlockProxy proxy)
- throws VisitorException
-  {
-	  //Temporary changes
-	     return null;
-  }
-  
-  public Object visitVariableProxy
-  (final VariableProxy proxy)
- throws VisitorException
-  {
-	    print(proxy.getName());
-	    print(" (" + proxy.getType().toString());
-	    print(" initial:" + proxy.getInitialValue().toString());
-	    print(" marked:" + (proxy.getMarkedValue() != null ? proxy.getMarkedValue().toString() : "null"));
-	    print(")");
-	    return null;
-  }
-  //------------------
-  
   public Object visitAliasProxy
       (final AliasProxy proxy)
     throws VisitorException
@@ -225,6 +200,10 @@ public class ModuleProxyPrinter
     print(' ');
     final LabelBlockProxy labelBlock = proxy.getLabelBlock();
     visitLabelBlockProxy(labelBlock);
+    final GuardActionBlockProxy guardActionBlock = proxy.getGuardActionBlock();
+    if (guardActionBlock != null) {
+      visitGuardActionBlockProxy(guardActionBlock);
+    }
     return null;
   }
 
@@ -359,6 +338,19 @@ public class ModuleProxyPrinter
     print(" = ");
     printSortedEmptyCollection(proxy.getImmediateChildNodes());
     visitNodeProxy(proxy);
+    return null;
+  }
+
+  public Object visitGuardActionBlockProxy
+    (final GuardActionBlockProxy proxy)
+    throws VisitorException
+  {
+    println('[');
+    printCollection(proxy.getGuards());
+    println(']');
+    println('{');
+    printCollection(proxy.getActions());
+    println('}');
     return null;
   }
 

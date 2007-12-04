@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.gui.ide
 //# CLASS:   IDE
 //###########################################################################
-//# $Id: IDE.java,v 1.107 2007-11-06 03:22:26 robi Exp $
+//# $Id: IDE.java,v 1.108 2007-12-04 03:22:58 robi Exp $
 //###########################################################################
 
 package org.supremica.gui.ide;
@@ -14,20 +14,24 @@ import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.WindowEvent;
 import java.io.File;
-import java.util.List;
+import java.util.ArrayList;
 import java.util.LinkedList;
+import java.util.List;
+import java.util.Locale;
 import javax.swing.Action;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
+import javax.swing.JMenuBar;
 import javax.swing.JPanel;
 import javax.swing.JSplitPane;
-import java.util.Locale;
 import javax.xml.bind.JAXBException;
 
 import net.sourceforge.waters.gui.EditorWindowInterface;
+import net.sourceforge.waters.gui.actions.WatersPopupActionManager;
 import net.sourceforge.waters.gui.observer.EditorChangedEvent;
 import net.sourceforge.waters.gui.observer.Observer;
 import net.sourceforge.waters.gui.observer.Subject;
+import net.sourceforge.waters.gui.transfer.FocusTracker;
 import net.sourceforge.waters.model.base.DocumentProxy;
 import net.sourceforge.waters.model.marshaller.DocumentManager;
 
@@ -53,7 +57,7 @@ import org.xml.sax.SAXException;
  * access point to all components of the graphical user interface. It
  * also is the main entry point to the program.
  *
- * @author Knut &Aring;kesson
+ * @author Knut &Aring;kesson, Robi Malik
  */
 public class IDE
     extends JFrame
@@ -66,12 +70,15 @@ public class IDE
     {
         // Initialise logging
         LoggerFactory.getInstance().initialiseAppenders();        
-        info("Supremica version: " + (new Version()).toString()); // Hello world!
+        info("Supremica version: " + (new Version()));
                 
         // Instantiate all actions
         mObservers = new LinkedList<Observer>();
+        mFocusTracker = new FocusTracker(this);
         mActions = new Actions(this);
-        
+        mPopupActionManager = new WatersPopupActionManager(this);
+        mFocusTracker.attach(this);
+
         // Create GUI
         Utility.setupFrame(this, IDEDimensions.mainWindowPreferredSize);
         setTitle(getName());
@@ -96,32 +103,28 @@ public class IDE
         final File startdir = new File(Config.FILE_OPEN_PATH.getAsString());
         mFileChooser = new JFileChooser(startdir);
         
-        // Initialise Document Managers
+        // Initialise document managers
         mDocumentContainerManager = new DocumentContainerManager(this);
         mDocumentContainerManager.attach(this);
 
         // Initialise XML_RPC
         if (Config.XML_RPC_ACTIVE.isTrue())
         {
-            boolean serverStarted = true;
-            
             try
             {
-                Server xmlRpcServer = new Server(this, Config.XML_RPC_PORT.get());
+                new Server(this, Config.XML_RPC_PORT.get());
+                info("XML-RPC server running on port " +
+                     Config.XML_RPC_PORT.get());
             }
-            catch (Exception e)
+            catch (final Exception exception)
             {
-                serverStarted = false;
-                
-                warn("Another server already running on port " + Config.XML_RPC_PORT.get() + ". XML-RPC server not started!");
-            }
-            
-            if (serverStarted)
-            {
-                info("XML-RPC server running on port " + Config.XML_RPC_PORT.get());
+                warn("Another server already running on port " +
+                     Config.XML_RPC_PORT.get() +
+                     ". XML-RPC server not started!");
             }
         }
     }
+
     
     //#######################################################################
     //# Simple Access
@@ -149,12 +152,22 @@ public class IDE
     {
         return mActions;
     }
-    
+
+    public FocusTracker getFocusTracker()
+    {
+        return mFocusTracker;
+    }
+
+    public WatersPopupActionManager getPopupActionManager()
+    {
+        return mPopupActionManager;
+    }
+
     public DocumentContainerManager getDocumentContainerManager()
     {
         return mDocumentContainerManager;
     }
-    
+
     public DocumentManager getDocumentManager()
     {
         return mDocumentContainerManager.getDocumentManager();
@@ -210,9 +223,10 @@ public class IDE
             default:
                 break;
         }
+        fireEditorChangedEvent(event);
     }
     
-    
+
     //#######################################################################
     //# Interface net.sourceforge.waters.gui.observer.Subject
     public void attach(final Observer observer)
@@ -378,14 +392,17 @@ public class IDE
     private final JSplitPane mSplitPaneVertical;
     private final LogPanel mLogPanel;
     private final JFileChooser mFileChooser;
-    
+
     // Actions
+    private final FocusTracker mFocusTracker;
     private final Actions mActions;
+    private final WatersPopupActionManager mPopupActionManager;
     private final List<Observer> mObservers;
 
-    // Logger. Must not be initialised until ProcessCommandLineArguments has finished (or messages WILL disappear).
-    // Try running "IDE -h" and "IDE", _both_ should give output, to console and logdisplay, respectively.
-    //private static Logger logger = LoggerFactory.createLogger(IDE.class);
+    // Logger. Must not be initialised until ProcessCommandLineArguments
+    // has finished (or messages WILL disappear).  Try running "IDE -h" and
+    // "IDE", _both_ should give output, to console and logdisplay,
+    // respectively.
     private static Logger logger = null;
     
     

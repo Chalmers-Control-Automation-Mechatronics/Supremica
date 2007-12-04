@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   EditorGraph
 //###########################################################################
-//# $Id: EditorGraph.java,v 1.24 2007-09-19 00:33:02 robi Exp $
+//# $Id: EditorGraph.java,v 1.25 2007-12-04 03:22:54 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.gui;
@@ -25,13 +25,8 @@ import java.util.Set;
 
 import net.sourceforge.waters.gui.command.Command;
 import net.sourceforge.waters.gui.command.CompoundCommand;
-import net.sourceforge.waters.gui.command.CreateEdgeCommand;
-import net.sourceforge.waters.gui.command.CreateNodeCommand;
-import net.sourceforge.waters.gui.command.CreateNodeGroupCommand;
-import net.sourceforge.waters.gui.command.DeleteEdgeCommand;
-import net.sourceforge.waters.gui.command.DeleteNodeCommand;
-import net.sourceforge.waters.gui.command.DeleteNodeGroupCommand;
-import net.sourceforge.waters.gui.command.GraphCompoundCommand;
+import net.sourceforge.waters.gui.command.DeleteCommand;
+import net.sourceforge.waters.gui.command.InsertCommand;
 import net.sourceforge.waters.gui.command.MoveEdgeCommand;
 import net.sourceforge.waters.gui.command.MoveGroupNodeCommand;
 import net.sourceforge.waters.gui.command.MoveGuardActionBlockCommand;
@@ -39,10 +34,10 @@ import net.sourceforge.waters.gui.command.MoveLabelBlockCommand;
 import net.sourceforge.waters.gui.command.MoveLabelGeometryCommand;
 import net.sourceforge.waters.gui.command.MoveSimpleNodeCommand;
 import net.sourceforge.waters.gui.command.RedirectEdgeCommand;
-import net.sourceforge.waters.gui.command.SelectCommand;
-import net.sourceforge.waters.gui.command.UnSelectCommand;
-import net.sourceforge.waters.gui.renderer.LabelBlockProxyShape;
+import net.sourceforge.waters.gui.command.UpdateCommand;
 import net.sourceforge.waters.gui.renderer.GeometryTools;
+import net.sourceforge.waters.gui.renderer.LabelBlockProxyShape;
+import net.sourceforge.waters.gui.transfer.InsertInfo;
 
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.base.ProxyTools;
@@ -86,11 +81,31 @@ import net.sourceforge.waters.subject.module.SplineGeometrySubject;
 import net.sourceforge.waters.xsd.module.SplineKind;
 
 
-public class EditorGraph
+/**
+ * <P>A double-up graph used by the controlled surface during drag
+ * operations.</P>
+ *
+ * <P>When a drag action is initiated in the controlled surface, it creates
+ * a so-called secondary graph of type <CODE>EditorGraph</CODE>. This is a
+ * full implementation of the {@link GraphProxy} interface, which is passed
+ * to the renderers for display. It is updated continuously during the
+ * course of the drag operation, but these changes are not written through
+ * to the model immediately.</P>
+ *
+ * <P>When the drag operation is completed, the <CODE>EditorGraph</CODE>
+ * computes a single command object that represents all changes applied to
+ * the double-up graph, and this command is registered with the undo
+ * manager for execution on the main model.</P>
+ *
+ * @see ControlledSurface, Command
+ * @author Simon Ware, Robi Malik
+ */
+
+class EditorGraph
   extends MutableSubject
   implements GraphProxy
 {
-  public EditorGraph(final GraphSubject graph)
+  EditorGraph(final GraphSubject graph)
   {
     mGraph = graph;
     mObserverMap = new HashMap<NodeSubject,EditorNode>
@@ -189,17 +204,17 @@ public class EditorGraph
 
   //#########################################################################
   //# Accessing the Fake Maps
-  public ProxySubject getCopy(final ProxySubject original)
+  ProxySubject getCopy(final ProxySubject original)
   {
     return mFakeGetter.getFake(original);
   }
 
-  public ProxySubject getOriginal(final ProxySubject fake)
+  ProxySubject getOriginal(final ProxySubject fake)
   {
     return mOriginalGetter.getOriginal(fake);
   }
 
-  public Collection<EdgeSubject> getNodeEdges(NodeSubject n)
+  Collection<EdgeSubject> getNodeEdges(NodeSubject n)
   {
     return Collections.unmodifiableCollection(mObserverMap.get(n).getEdges());
   }
@@ -230,24 +245,28 @@ public class EditorGraph
                               final String description,
                               final boolean selecting)
   {
-    final List<ChangeRecord> additions =
-      selecting ? new LinkedList<ChangeRecord>() : null;
-    final List<ProxySubject> deselected = new LinkedList<ProxySubject>();
+    final List<ProxySubject> modified = new LinkedList<ProxySubject>();
+    final List<ProxySubject> added = new LinkedList<ProxySubject>();
+    final List<ProxySubject> removed = new LinkedList<ProxySubject>();
     int minpass = Integer.MAX_VALUE;
     int maxpass = Integer.MIN_VALUE;
-    GraphSubject hgraph = null;
     for (final ChangeRecord record : mOriginalMap.values()) {
+      final ProxySubject original = record.getOriginal();
       switch (record.getChangeKind()) {
       case ModelChangeEvent.ITEM_ADDED:
-        if (selecting) {
-          additions.add(record);
-        }
+        added.add(original);
         break;
       case ModelChangeEvent.ITEM_REMOVED:
-        final ProxySubject victim = record.getOriginal();
-        deselected.add(victim);
+        removed.add(original);
+        break;
+      case ModelChangeEvent.STATE_CHANGED:
+      case ModelChangeEvent.GEOMETRY_CHANGED:
+        modified.add(original);
         break;
       default:
+        if (record.hasImplicitChanges()) {
+          modified.add(original);
+        }
         break;
       }
       final int minpass1 = record.getMinPass();
@@ -258,49 +277,20 @@ public class EditorGraph
       if (maxpass1 > maxpass) {
         maxpass = maxpass1;
       }
-      if (record.requiresGroupHierarchyUpdate()) {
-        hgraph = mGraph;
-      }
     }
-
-    final GraphCompoundCommand compound =
-      new GraphCompoundCommand(hgraph, description);
-    Command cmd = null;
-    int count = 0;
-    if (selecting && !additions.isEmpty()) {
-      final Collection<ProxySubject> selected = surface.getSelected();
-      cmd = new UnSelectCommand(surface, selected);
-      compound.addCommand(cmd);
-      count++;
-    } else if (!deselected.isEmpty()) {
-      cmd = new UnSelectCommand(surface, deselected);
-      compound.addCommand(cmd);
-      count++;
-    }
+    final CompoundCommand compound =
+      new UpdateCommand(modified, added, removed,
+                        surface, description, selecting);
     for (int pass = minpass; pass <= maxpass; pass++) {
       for (final ChangeRecord record : mFakeMap.values()) {
-        cmd = record.getUpdateCommand(pass);
+        final Command cmd = record.getUpdateCommand(surface, pass);
         if (cmd != null && cmd.isSignificant()) {
           compound.addCommand(cmd);
-          count++;
         }
       }
     }
-    if (selecting && !additions.isEmpty()) {
-      final int size = additions.size();
-      final List<ProxySubject> selected = new ArrayList<ProxySubject>(size);
-      for (final ChangeRecord record : additions) {
-        final ProxySubject original = record.getOriginal();
-        selected.add(original);
-      }
-      cmd = new SelectCommand(surface, selected);
-      compound.addCommand(cmd);
-      count++;
-    }
-    if (count == 0 || !compound.isSignificant()) {
+    if (!compound.isSignificant()) {
       return null;
-    } else if (count == 1 && hgraph == null) {
-      return cmd.isSignificant() ? cmd : null;
     } else {
       compound.end();
       return compound;
@@ -654,55 +644,6 @@ public class EditorGraph
     final Point2D point = geo0.getPoint();
     point.setLocation(point.getX() + dx, point.getY() + dy);
     geo1.setPoint(point);
-  }
-
-
-  //#########################################################################
-  //# Static Class Methods
-  public static void updateChildNodes(GraphSubject graph) {
-    List<GroupNodeSubject> groups = new ArrayList<GroupNodeSubject>();
-    for (NodeSubject n : graph.getNodesModifiable()) {
-      if (n instanceof GroupNodeSubject) {
-        ((GroupNodeSubject) n).getImmediateChildNodesModifiable().clear();
-        groups.add((GroupNodeSubject) n);
-      }
-    }
-    // sort all the node groups from smallest to largest
-    Collections.sort(groups, new Comparator<GroupNodeSubject>() {
-      public int compare(GroupNodeSubject g1, GroupNodeSubject g2)
-      {
-        Rectangle2D r1 = g1.getGeometry().getRectangle();
-        Rectangle2D r2 = g2.getGeometry().getRectangle();
-        return (int) ((r1.getHeight() * r1.getWidth())
-                      - (r2.getHeight() * r2.getWidth()));
-      }
-    });
-    // go through all the nodes
-    for (NodeSubject n : graph.getNodesModifiable()) {
-      Rectangle2D r1;
-      if (n instanceof GroupNodeSubject) {
-        r1 = ((GroupNodeSubject) n).getGeometry().getRectangle();
-      } else {
-        Point2D p = ((SimpleNodeSubject) n).getPointGeometry().getPoint();
-        r1 = new Rectangle((int) p.getX(), (int) p.getY(), 1, 1);
-      }
-      Collection<GroupNodeSubject> parents = new ArrayList<GroupNodeSubject>();
-      mainloop:
-      for (GroupNodeSubject group : groups) {
-        if (n != group) {
-          if (group.getGeometry().getRectangle().contains(r1)) {
-            for (GroupNodeSubject parent : parents) {
-              if (group.getGeometry().getRectangle().contains
-                    (parent.getGeometry().getRectangle())) {
-                continue mainloop;
-              }
-            }
-            group.getImmediateChildNodesModifiable().add(n);
-            parents.add(group);
-          }
-        }
-      }
-    }
   }
 
 
@@ -1099,6 +1040,11 @@ public class EditorGraph
       }
     }
 
+    boolean hasImplicitChanges()
+    {
+      return getChangeKind() != ModelChangeEvent.NO_CHANGE;
+    }
+
     //#######################################################################
     //# Updating
     int getPass()
@@ -1127,14 +1073,16 @@ public class EditorGraph
       return getPass();
     }
 
-    Command getUpdateCommand(final int pass)
+    Command getUpdateCommand(final ControlledSurface surface, final int pass)
     {
       return null;
     }
 
-    boolean requiresGroupHierarchyUpdate()
+    Command createDeleteCommand(final ControlledSurface surface)
     {
-      return false;
+      final List<ProxySubject> origs = Collections.singletonList(mOriginal);
+      final List<InsertInfo> deletes = surface.getDeletionVictims(origs);
+      return new DeleteCommand(deletes, surface, false);
     }
 
 
@@ -1180,17 +1128,18 @@ public class EditorGraph
 
     //#######################################################################
     //# Updating
-    Command getUpdateCommand(final int pass)
+    Command getUpdateCommand(final ControlledSurface surface, final int pass)
     {
       if (pass == getPass()) {
         switch (getChangeKind()) {
         case ModelChangeEvent.ITEM_ADDED:
           final Point2D pos = getFake().getPointGeometry().getPoint();
-          final CreateNodeCommand cmd = new CreateNodeCommand(mGraph, pos); 
-          setOriginal(cmd.getCreatedNode());
-          return cmd;
+          final SimpleNodeSubject node =
+            GraphTools.getCreatedSimpleNode(mGraph, pos);
+          setOriginal(node);
+          return new InsertCommand(node, surface, false);
         case ModelChangeEvent.ITEM_REMOVED:
-          return new DeleteNodeCommand(mGraph, getOriginal()); 
+          return createDeleteCommand(surface);
         case ModelChangeEvent.GEOMETRY_CHANGED:
           return new MoveSimpleNodeCommand(getOriginal(), getFake());
         default:
@@ -1199,11 +1148,6 @@ public class EditorGraph
       } else {
         return null;
       }
-    }
-
-    boolean requiresGroupHierarchyUpdate()
-    {
-      return true;
     }
   }
 
@@ -1242,18 +1186,18 @@ public class EditorGraph
 
     //#######################################################################
     //# Updating
-    Command getUpdateCommand(final int pass)
+    Command getUpdateCommand(final ControlledSurface surface, final int pass)
     {
       if (pass == getPass()) {
         switch (getChangeKind()) {
         case ModelChangeEvent.ITEM_ADDED:
           final Rectangle2D rect = getFake().getGeometry().getRectangle();
-          final CreateNodeGroupCommand cmd =
-            new CreateNodeGroupCommand(mGraph, rect); 
-          setOriginal(cmd.getCreatedGroupNode());
-          return cmd;
+          final GroupNodeSubject group =
+            GraphTools.getCreatedGroupNode(mGraph, rect);
+          setOriginal(group);
+          return new InsertCommand(group, surface, false);
         case ModelChangeEvent.ITEM_REMOVED:
-          return new DeleteNodeGroupCommand(mGraph, getOriginal()); 
+          return createDeleteCommand(surface);
         case ModelChangeEvent.GEOMETRY_CHANGED:
           return new MoveGroupNodeCommand(getOriginal(), getFake());
         default:
@@ -1262,11 +1206,6 @@ public class EditorGraph
       } else {
         return null;
       }
-    }
-
-    boolean requiresGroupHierarchyUpdate()
-    {
-      return true;
     }
   }
 
@@ -1303,6 +1242,25 @@ public class EditorGraph
       return (EdgeSubject) super.getFake();
     }
 
+    boolean hasImplicitChanges()
+    {
+      if (getChangeKind() == ModelChangeEvent.NO_CHANGE) {
+        final EdgeSubject original = getOriginal();
+        final NodeSubject source = original.getSource();
+        final ChangeRecord srecord = mOriginalMap.get(source);
+        final int schange = srecord.getChangeKind();
+        if (schange == ModelChangeEvent.GEOMETRY_CHANGED) {
+          return true;
+        }
+        final NodeSubject target = original.getTarget();
+        final ChangeRecord trecord = mOriginalMap.get(target);
+        final int tchange = trecord.getChangeKind();
+        return tchange == ModelChangeEvent.GEOMETRY_CHANGED;
+      } else {
+        return true;
+      }
+    }
+
     //#######################################################################
     //# Updating
     int getPass()
@@ -1334,7 +1292,7 @@ public class EditorGraph
       }
     }
 
-    Command getUpdateCommand(final int pass)
+    Command getUpdateCommand(final ControlledSurface surface, final int pass)
     {
       final EdgeSubject fake = getFake();
       final EdgeSubject original = getOriginal();
@@ -1351,13 +1309,12 @@ public class EditorGraph
           final Point2D end = endgeo == null ? null : endgeo.getPoint();
           final LabelBlockSubject lblock = fake.getLabelBlock();
           final GuardActionBlockSubject gablock = fake.getGuardActionBlock();
-          final CreateEdgeCommand cmd =
-            new CreateEdgeCommand(mGraph, asource, atarget,
-                                  start, end, lblock, gablock);
-          setOriginal(cmd.getCreatedEdge());
-          return cmd;
+          final EdgeSubject edge = GraphTools.getCreatedEdge
+            (mGraph, asource, atarget, start, end, lblock, gablock);
+          setOriginal(edge);
+          return new InsertCommand(edge, surface, false);
         case ModelChangeEvent.ITEM_REMOVED:
-          return new DeleteEdgeCommand(mGraph, original); 
+          return createDeleteCommand(surface);
         case ModelChangeEvent.STATE_CHANGED:
           final NodeSubject source =
             (NodeSubject) EditorGraph.this.getOriginal(fake.getSource());
@@ -1460,7 +1417,7 @@ public class EditorGraph
 
     //#######################################################################
     //# Updating
-    Command getUpdateCommand(final int pass)
+    Command getUpdateCommand(final ControlledSurface surface, final int pass)
     {
       if (pass == getPass()) {
         switch (getChangeKind()) {
@@ -1510,7 +1467,7 @@ public class EditorGraph
 
     //#######################################################################
     //# Updating
-    Command getUpdateCommand(final int pass)
+    Command getUpdateCommand(final ControlledSurface surface, final int pass)
     {
       if (pass == getPass()) {
         switch (getChangeKind()) {
@@ -1560,7 +1517,7 @@ public class EditorGraph
 
     //#######################################################################
     //# Updating
-    Command getUpdateCommand(final int pass)
+    Command getUpdateCommand(final ControlledSurface surface, final int pass)
     {
       if (pass == getPass()) {
         switch (getChangeKind()) {

@@ -4,12 +4,13 @@
 //# PACKAGE: net.sourceforge.waters.gui.actions
 //# CLASS:   WatersAction
 //###########################################################################
-//# $Id: WatersAction.java,v 1.4 2007-06-24 18:40:06 robi Exp $
+//# $Id: WatersAction.java,v 1.5 2007-12-04 03:22:54 robi Exp $
 //###########################################################################
 
 
 package net.sourceforge.waters.gui.actions;
 
+import net.sourceforge.waters.gui.ModuleContext;
 import net.sourceforge.waters.gui.ModuleWindowInterface;
 import net.sourceforge.waters.gui.command.UndoInterface;
 import net.sourceforge.waters.gui.observer.EditorChangedEvent;
@@ -83,6 +84,22 @@ public abstract class WatersAction
     }
     final ModuleContainer mcontainer = (ModuleContainer) container;
     return mcontainer.getEditorPanel();    
+  }
+
+  /**
+   * Retrieves a references to the current module context.
+   * @return  A module context object providing access to the module
+   *          being edited, or <CODE>null</CODE> if no module is currently
+   *          available.
+   */
+  ModuleContext getModuleContext()
+  {
+    final ModuleWindowInterface iface = getActiveModuleWindowInterface();
+    if (iface == null) {
+      return null;
+    } else {
+      return iface.getModuleContext();
+    }
   }
 
   /**

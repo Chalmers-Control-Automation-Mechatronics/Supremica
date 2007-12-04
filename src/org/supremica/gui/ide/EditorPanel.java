@@ -4,27 +4,38 @@
 //# PACKAGE: org.supremica.gui.ide
 //# CLASS:   EditorPanel
 //###########################################################################
-//# $Id: EditorPanel.java,v 1.64 2007-11-21 01:33:38 robi Exp $
+//# $Id: EditorPanel.java,v 1.65 2007-12-04 03:22:58 robi Exp $
 //###########################################################################
 
 
 package org.supremica.gui.ide;
 
+import java.awt.Component;
 import java.awt.Frame;
-import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.LinkedList;
-import javax.swing.*;
+import java.util.Map;
+import javax.swing.JComponent;
+import javax.swing.JScrollPane;
+import javax.swing.JTabbedPane;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 
+import net.sourceforge.waters.gui.ComponentsTree;
 import net.sourceforge.waters.gui.EditorWindowInterface;
+import net.sourceforge.waters.gui.EventDeclListView;
 import net.sourceforge.waters.gui.ModuleContext;
 import net.sourceforge.waters.gui.ModuleWindowInterface;
+import net.sourceforge.waters.gui.actions.WatersPopupActionManager;
 import net.sourceforge.waters.gui.command.UndoInterface;
 import net.sourceforge.waters.gui.observer.EditorChangedEvent;
-import net.sourceforge.waters.gui.observer.SubPanelSwitchEvent;
 import net.sourceforge.waters.gui.observer.Observer;
+import net.sourceforge.waters.gui.observer.SubPanelSwitchEvent;
 import net.sourceforge.waters.gui.observer.Subject;
+import net.sourceforge.waters.gui.transfer.SelectionOwner;
+import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.expr.ExpressionParser;
 import net.sourceforge.waters.subject.base.AbstractSubject;
 import net.sourceforge.waters.subject.module.ModuleSubject;
@@ -33,49 +44,57 @@ import net.sourceforge.waters.subject.module.SimpleComponentSubject;
 import org.supremica.gui.ide.actions.Actions;
 
 
+/**
+ * The panel to edit modules.
+ * It consists of a split pane, with events or components lists in
+ * tabs on the left side, and the graph editor panel on the right side.
+ *
+ * @author Knut &Aring;kesson
+ */
+
 public class EditorPanel
     extends MainPanel
-    implements ModuleWindowInterface, Subject
+    implements ModuleWindowInterface, ChangeListener, Subject
 {
 
     //#######################################################################
     //# Constructor
-    public EditorPanel(ModuleContainer moduleContainer, String name)
+    public EditorPanel(final ModuleContainer moduleContainer,
+                       final String name)
     {
         super(name);
         mModuleContainer = moduleContainer;
-        tabPanel = new JTabbedPane(JTabbedPane.BOTTOM);
-        tabPanel.setPreferredSize(IDEDimensions.leftEditorPreferredSize);
-        tabPanel.setMinimumSize(IDEDimensions.leftEditorMinimumSize);
+        mTabMap = new HashMap<SelectionOwner,Tab>();
 
-        /*
-                aliasesPanel = new EditorAliasesPanel(moduleContainer, "Aliases");
-                aliasesPanel.setPreferredSize(IDEDimensions.leftEditorPreferredSize);
-                aliasesPanel.setMinimumSize(IDEDimensions.leftEditorMinimumSize);
-                tabPanel.add(aliasesPanel);
-         */
+        mTabbedPane = new JTabbedPane(JTabbedPane.BOTTOM);
+        mTabbedPane.setPreferredSize(IDEDimensions.leftEditorPreferredSize);
+        mTabbedPane.setMinimumSize(IDEDimensions.leftEditorMinimumSize);
+        mTabbedPane.addChangeListener(this);
+        setLeftComponent(mTabbedPane);
 
-        componentsPanel = new EditorComponentsPanel(moduleContainer, this, "Components");
-        componentsPanel.setPreferredSize(IDEDimensions.leftEditorPreferredSize);
-        componentsPanel.setMinimumSize(IDEDimensions.leftEditorMinimumSize);
-        tabPanel.add(componentsPanel);
+		final IDE ide = mModuleContainer.getIDE();
+ 		final WatersPopupActionManager manager = ide.getPopupActionManager();
+        final ComponentsTree comptree = new ComponentsTree(this, manager);
+        mComponentsTab = new Tab("Components", comptree);
+        final EventDeclListView eventlist =
+            new EventDeclListView(this, manager);
+        mEventsTab = new Tab("Events", eventlist);
+        // aliasesPanel = new EditorAliasesPanel(moduleContainer, "Aliases");
+        mComponentsTab.activate();
 
-        eventsPanel = new EditorEventsPanel(this, "Events");
-        eventsPanel.setPreferredSize(IDEDimensions.leftEditorPreferredSize);
-        eventsPanel.setMinimumSize(IDEDimensions.leftEditorMinimumSize);
-        tabPanel.add(eventsPanel);
-        tabPanel.setSelectedComponent(componentsPanel);
+        final ModuleSubject module = getModuleSubject();
+        mCommentPanel = new CommentPanel(module);
+        setRightComponent(mCommentPanel);
+    }
 
-        componentEditorPanel = getEmptyRightPanel();
 
-        splitPanelHorizontal = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, tabPanel, componentEditorPanel);
-        splitPanelHorizontal.setContinuousLayout(false);
-        splitPanelHorizontal.setOneTouchExpandable(false);
-        splitPanelHorizontal.setDividerLocation(0.2);
-        splitPanelHorizontal.setResizeWeight(0.0);
-
-        ((GridBagLayout)getLayout()).setConstraints(splitPanelHorizontal, getGridBagConstraints());
-        add(splitPanelHorizontal);
+    //######################################################################
+    //# Clean Up
+    public void close()
+    {
+        for (final SelectionOwner panel : mTabMap.keySet()) {
+            panel.close();
+        }
     }
 
 
@@ -106,30 +125,72 @@ public class EditorPanel
         return (Frame) getTopLevelAncestor();
     }
 
-    public EditorWindowInterface showEditor(SimpleComponentSubject component)
+    public SelectionOwner getComponentsPanel()
     {
-        final EditorPanel editorPanel = mModuleContainer.getEditorPanel();
-        if (component != null)
-        {
-            editorPanel.setRightComponent(mModuleContainer.getComponentEditorPanel(component));
-        }
-        return editorPanel.getActiveEditorWindowInterface();
+        return mComponentsTab.getPanel();
     }
 
-    private CommentPanel commentPanel = null;
+    public SelectionOwner getEventsPanel()
+    {
+        return mEventsTab.getPanel();
+    }
 
-    /**
-     * Displays a comment about the module.
-     */
+    public void showComponents()
+    {
+        mComponentsTab.activate();
+    }
+
+    public void showEvents()
+    {
+        mEventsTab.activate();
+    }
+
+    public EditorWindowInterface showEditor(final SimpleComponentSubject comp)
+    {
+        final ComponentEditorPanel panel =
+            mModuleContainer.createComponentEditorPanel(comp);
+        setRightComponent(panel);
+        return panel;
+    }
+
+    public EditorWindowInterface getEditorWindowInterface
+        (final SimpleComponentSubject comp)
+    {
+        return mModuleContainer.getComponentEditorPanel(comp);
+    }
+
+    public ComponentEditorPanel getActiveEditorWindowInterface()
+    {
+        if (getRightComponent() instanceof EditorWindowInterface) {
+            return (ComponentEditorPanel) getRightComponent();
+        } else {
+            return null;
+        }
+    }
+
     public void showComment()
     {
-        if (commentPanel == null)
-        {
-            commentPanel = new CommentPanel(getModuleSubject());
-        }
+        setRightComponent(mCommentPanel);
+    }
 
-        final EditorPanel editorPanel = mModuleContainer.getEditorPanel();
-        editorPanel.setRightComponent(commentPanel);
+    public void showPanel(final SelectionOwner panel)
+    {
+        final Tab tab = mTabMap.get(panel);
+        if (tab != null) {
+            tab.activate();
+        }
+    }
+
+
+    //#######################################################################
+    //# Interface javax.swing.event.ChangeListener
+    public void stateChanged(final ChangeEvent event)
+    {
+        // Why is the focus not transfered automatically when clicking tabs?
+        final JScrollPane scroll =
+            (JScrollPane) mTabbedPane.getSelectedComponent();
+        final Component panel = scroll.getViewport().getView();
+        panel.requestFocusInWindow();
     }
 
 
@@ -159,17 +220,7 @@ public class EditorPanel
 
     //######################################################################
     //#
-    public EditorWindowInterface getActiveEditorWindowInterface()
-    {
-        if (getRightComponent() instanceof EditorWindowInterface)
-        {
-            return (EditorWindowInterface)getRightComponent();
-        }
-        return null;
-        //      return getEditorWindowInterface();
-    }
-
-    public void setRightComponent(JComponent newComponent)
+    void setRightComponent(JComponent newComponent)
     {
         super.setRightComponent(newComponent);
         final EditorChangedEvent event = new SubPanelSwitchEvent(this);
@@ -190,63 +241,75 @@ public class EditorPanel
         }
     }
 
-    public EditorPanelInterface getEditorPanelInterface()
+    // Deprecated!!!
+    public void addComponent(final Proxy proxy)
     {
-        return new EditorPanelInterfaceImpl();
+        final SelectionOwner component = mComponentsTab.getPanel();
+        final Object inspos = component.getInsertPosition(proxy);
+        component.insertCreatedItem(proxy, inspos);
     }
 
-    class EditorPanelInterfaceImpl
-        implements EditorPanelInterface
-    {
-        public void addComponent()
-        {
-            componentsPanel.addComponent();
-        }
 
-        public void addComponent(AbstractSubject component)
-        {
-            componentsPanel.addComponent(component);
-        }
-
-        public void addModuleEvent()
-        {
-            eventsPanel.addModuleEvent();
-        }
-
-        public void addComponentEvent()
-        {
-            eventsPanel.addComponentEvent();
-        }
-
-        public ModuleSubject getModuleSubject()
-        {
-            return componentsPanel.getModuleSubject();
-        }
-
-        public boolean componentNameAvailable(String name)
-        {
-            return componentsPanel.componentNameAvailable(name);
-        }
-    }
-
-    public Actions getActions()
+    //#######################################################################
+    //# Auxiliary Methods
+    private Actions getActions()
     {
         return mModuleContainer.getIDE().getActions();
     }
 
 
     //#######################################################################
+    //# Inner Class Tab
+    private class Tab
+    {
+
+        //###################################################################
+        //# Constructor
+        private Tab(final String name, final JComponent panel)
+        {
+            mPanel = panel;
+            mSelectionOwner = (SelectionOwner) panel;
+            mScrollPane = new JScrollPane(panel);
+            mScrollPane.setName(name);
+            mScrollPane.setPreferredSize
+                (IDEDimensions.leftEditorPreferredSize);
+            mScrollPane.setMinimumSize(IDEDimensions.leftEditorMinimumSize);
+            mTabbedPane.add(mScrollPane);
+            mTabMap.put(mSelectionOwner, this);
+        }
+
+        //###################################################################
+        //# Simple Access
+        private SelectionOwner getPanel()
+        {
+            return mSelectionOwner;
+        }
+
+        private void activate()
+        {
+            mTabbedPane.setSelectedComponent(mScrollPane);
+            mPanel.requestFocusInWindow();
+        }
+
+        //###################################################################
+        //# Data Members
+        private final JComponent mPanel;
+        private final SelectionOwner mSelectionOwner;
+        private final JScrollPane mScrollPane;
+
+    }
+
+
+    //#######################################################################
     //# Data Members
-    private static final long serialVersionUID = 1L;
-
-    private JTabbedPane tabPanel;
-    private JComponent componentEditorPanel;
-
-    private EditorEventsPanel eventsPanel;
-    private EditorAliasesPanel aliasesPanel;
-    private EditorComponentsPanel componentsPanel;
-
     private final ModuleContainer mModuleContainer;
+    private final Map<SelectionOwner,Tab> mTabMap;
+
+    private final JTabbedPane mTabbedPane;
+    private final Tab mComponentsTab;
+    private final Tab mEventsTab;
+    private final CommentPanel mCommentPanel;
+
     private final Collection<Observer> mObservers = new LinkedList<Observer>();
 
 }

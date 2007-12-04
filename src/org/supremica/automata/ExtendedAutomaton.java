@@ -1,3 +1,12 @@
+//# -*- tab-width: 4  indent-tabs-mode: nil  c-basic-offset: 4 -*-
+//###########################################################################
+//# PROJECT: Supremica
+//# PACKAGE: org.supremica.automata
+//# CLASS:   ExtendedAutomaton
+//###########################################################################
+//# $Id: ExtendedAutomaton.java,v 1.4 2007-12-04 03:22:58 robi Exp $
+//###########################################################################
+
 /*
  * Supremica Software License Agreement
  *
@@ -59,22 +68,21 @@ import java.util.LinkedList;
 import java.util.ArrayList;
 import java.util.Iterator;
 
-import net.sourceforge.waters.subject.module.ModuleSubjectFactory;
-import net.sourceforge.waters.subject.module.IdentifierSubject;
-import net.sourceforge.waters.subject.module.ModuleSubject;
-import net.sourceforge.waters.subject.module.SimpleComponentSubject;
-import net.sourceforge.waters.subject.module.GraphSubject;
-import net.sourceforge.waters.subject.module.SimpleNodeSubject;
-import net.sourceforge.waters.subject.module.EdgeSubject;
-import net.sourceforge.waters.subject.module.LabelBlockSubject;
-import net.sourceforge.waters.subject.module.SimpleExpressionSubject;
-import net.sourceforge.waters.subject.module.GuardActionBlockSubject;
-import net.sourceforge.waters.subject.module.BinaryExpressionSubject;
-import net.sourceforge.waters.subject.module.SimpleExpressionSubject;
-import net.sourceforge.waters.subject.module.VariableHelper;
-import net.sourceforge.waters.subject.module.PlainEventListSubject;
-import net.sourceforge.waters.subject.module.EventDeclSubject;
 import net.sourceforge.waters.model.module.EventDeclProxy;
+import net.sourceforge.waters.subject.module.BinaryExpressionSubject;
+import net.sourceforge.waters.subject.module.EdgeSubject;
+import net.sourceforge.waters.subject.module.EventDeclSubject;
+import net.sourceforge.waters.subject.module.GraphSubject;
+import net.sourceforge.waters.subject.module.GuardActionBlockSubject;
+import net.sourceforge.waters.subject.module.IdentifierSubject;
+import net.sourceforge.waters.subject.module.LabelBlockSubject;
+import net.sourceforge.waters.subject.module.ModuleSubject;
+import net.sourceforge.waters.subject.module.ModuleSubjectFactory;
+import net.sourceforge.waters.subject.module.PlainEventListSubject;
+import net.sourceforge.waters.subject.module.SimpleComponentSubject;
+import net.sourceforge.waters.subject.module.SimpleExpressionSubject;
+import net.sourceforge.waters.subject.module.SimpleExpressionSubject;
+import net.sourceforge.waters.subject.module.SimpleNodeSubject;
 
 import net.sourceforge.waters.xsd.base.ComponentKind;
 import net.sourceforge.waters.xsd.base.EventKind;
@@ -187,7 +195,7 @@ public class ExtendedAutomaton
 
 	public void addIntegerVariable(String name, int lowerBound, int upperBound, int initialValue, Integer markedValue)
 	{
-		component.getVariablesModifiable().add(VariableHelper.createIntegerVariable(name, lowerBound, upperBound, initialValue, markedValue));
+		module.getComponentListModifiable().add(VariableHelper.createIntegerVariable(name, lowerBound, upperBound, initialValue, markedValue));
 	}
 
 	/**
