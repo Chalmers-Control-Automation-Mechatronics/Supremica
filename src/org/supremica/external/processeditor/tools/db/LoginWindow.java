@@ -5,19 +5,36 @@ import java.awt.event.*;
 import javax.swing.*;
 
 public class LoginWindow extends JInternalFrame implements ActionListener {
-	
+
+/*
+	------------------
+	--< Initialize >--
+	------------------
+*/
 	private static final long serialVersionUID = 1L;
-	
 	private JButton connectButton;
 	private JButton exitButton;
 	private JTextField hostNameField;
 	private JTextField portField;
 	private JTextField userNameField;
 	private JPasswordField passwordField;
-	protected DBInterface dbi;
+
+	// User default settings
+	private String hostNameStr = "129.16.80.73";
+	//private String hostNameStr = "193.11.200.48";
+	private String portStr = "1433";
+	private String userNameStr = "test123";
+	private String passwordStr = "test123";
 	
-	private Connect dbConnect = null;		// Connection setup object
+	// Connection setup objects
+	private DBInterface dbi;
+	private Connect dbConnect = null;
 	
+/*
+	-------------------
+	--< Constructor >--
+	-------------------
+*/
 	public LoginWindow(DBInterface dbi) {
 		super("Connect to host",false,false);
 		this.dbi = dbi;
@@ -45,7 +62,7 @@ public class LoginWindow extends JInternalFrame implements ActionListener {
 		m.setConstraints(portLabel,con);
 		add(portLabel);
 		
-		hostNameField = new JTextField("129.16.80.73",15);		//Host name
+		hostNameField = new JTextField(hostNameStr,15);		//Host name
 		hostNameField.addActionListener(this);
 		con = new GridBagConstraints();
 		con.gridx = 0;
@@ -56,7 +73,7 @@ public class LoginWindow extends JInternalFrame implements ActionListener {
 		m.setConstraints(hostNameField,con);
 		add(hostNameField);
 		
-		portField = new JTextField("1433",7);		//Port
+		portField = new JTextField(portStr,7);		//Port
 		portField.addActionListener(this);
 		con = new GridBagConstraints();
 		con.gridx = 2;
@@ -87,7 +104,7 @@ public class LoginWindow extends JInternalFrame implements ActionListener {
 		m.setConstraints(passwordLabel,con);
 		add(passwordLabel);
 		
-		userNameField = new JTextField("test123",12);		//User name
+		userNameField = new JTextField(userNameStr,12);		//User name
 		userNameField.addActionListener(this);
 		con = new GridBagConstraints();
 		con.gridx = 0;
@@ -98,7 +115,7 @@ public class LoginWindow extends JInternalFrame implements ActionListener {
 		m.setConstraints(userNameField,con);
 		add(userNameField);
 		
-		passwordField = new JPasswordField("test123",10);		//Password
+		passwordField = new JPasswordField(passwordStr,10);		//Password
 		passwordField.addActionListener(this);
 		con = new GridBagConstraints();
 		con.gridx = 1;
@@ -134,7 +151,12 @@ public class LoginWindow extends JInternalFrame implements ActionListener {
 		setVisible(true);
 		setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 	}
-
+	
+/*
+	------------------------
+	--< Action performed >--
+	------------------------
+*/
 	public void actionPerformed(ActionEvent e){
 		if (e.getSource() == connectButton || e.getSource() == hostNameField || e.getSource() == portField
 			|| e.getSource() == userNameField || e.getSource() == passwordField) {
@@ -145,9 +167,12 @@ public class LoginWindow extends JInternalFrame implements ActionListener {
 			String passwordStr = new String(passwordChars);
 			dbConnect = new Connect("jdbc:sqlserver://", hostNameStr, portNumberStr, "ProductionControlDB", 
 				userNameStr, passwordStr, "direct");
-			dbConnect.displayDbProperties();
-			DBInterface.setDBConnection(dbConnect);
-			dbi.refreshProjects();
+			if (dbConnect.isConnected()) {
+				DBInterface.clearPrintArea();
+				dbConnect.displayDbProperties();
+				DBInterface.setDBConnection(dbConnect);
+				dbi.refreshProjects();
+			}
 			this.dispose();
 		}
 		else if (e.getSource() == exitButton){

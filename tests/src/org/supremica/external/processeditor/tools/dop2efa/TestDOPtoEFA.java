@@ -112,7 +112,7 @@ public class TestDOPtoEFA extends TestCase{
     	}
     }
     
-public void testBuildModuleWithROPsContainingResources(){
+    public void testBuildModuleWithROPsContainingResources(){
     	
     	Module module = null;
     	List<ROP> ropList = new LinkedList<ROP>();
@@ -200,7 +200,78 @@ public void testBuildModuleWithROPsContainingResources(){
     	assertEquals(nodes, relation.getActivityRelationGroup().size());
     }
     
-    
+    public void testAddAttributeToActivities(){
+    	
+    	final int NUMBER_OF_ACTIVITIES = 4*10;
+    	List<Object> objList;
+    	
+    	Attribute att;
+    	
+    	Relation seq;
+    	Relation alt;
+    	Relation par;
+    	Relation arb;
+    	
+    	// ------- Build Test ROP ------- //
+    	Activity as[] = new Activity[NUMBER_OF_ACTIVITIES];
+    	for(int i = 0; i < as.length; i++){
+    		as[i] = factory.createActivity();
+    	}
+    	
+    	//
+    	att = factory.createAttribute();
+    	att.setAttributeValue("test_attribute");
+    	att.setType("test_type");
+    	//
+    	
+    	seq = factory.createRelation();
+    	seq.setType(RelationType.SEQUENCE);
+    	
+    	alt = factory.createRelation();
+    	alt.setType(RelationType.SEQUENCE);
+    	
+    	par= factory.createRelation();
+    	par.setType(RelationType.SEQUENCE);
+    	
+    	arb = factory.createRelation();
+    	arb.setType(RelationType.SEQUENCE);
+    	
+    	int i = 0;
+    	while(i < as.length){
+    		seq.getActivityRelationGroup().add(as[i]);
+    		if(i < as.length)i++;
+    		
+    		alt.getActivityRelationGroup().add(as[i]);
+    		if(i < as.length)i++;
+    		
+    		par.getActivityRelationGroup().add(as[i]);
+    		if(i < as.length)i++;
+    		
+    		arb.getActivityRelationGroup().add(as[i]);
+    		if(i < as.length)i++;
+    	}
+    	
+    	seq.getActivityRelationGroup().add(seq.getActivityRelationGroup().size()/2, alt);
+    	arb.getActivityRelationGroup().add(arb.getActivityRelationGroup().size()/2, par);
+    	
+    	seq.getActivityRelationGroup().add(arb);
+    	// ------- End Build Test ROP ------- //
+    	
+    	
+    	DOPtoEFA.addAttributeToActivities(seq, att);
+    	
+    	
+    	objList = seq.getActivityRelationGroup();
+    	for(Object o : objList){
+    		if(o instanceof Activity){
+    			if(!((Activity)o).getProperties().getAttribute().contains(att)){
+    				assertTrue(false);
+    			}
+    		}
+    	}
+    	
+    	assertTrue(true);
+    }
     
     /**
      *	Help function 

@@ -27,6 +27,19 @@ public class Loader {
     	}
     }
     
+    public Object open(String xmlStr, String PKGS) {	
+    	
+    	try {			
+    		jaxbContext = JAXBContext.newInstance(PKGS);
+    		u = jaxbContext.createUnmarshaller();
+    		return load(xmlStr, PKGS);
+    	}
+    	catch(JAXBException je) {
+    		je.printStackTrace();
+    		return null;
+    	}
+    } 
+    
     private Object load(File file) {	
     	try {		
     		if(file!=null) {			
@@ -45,27 +58,13 @@ public class Loader {
     	return null;
     }
     
-    public Object open(String xmlStr) {	
-    	
-    	try {			
-    		jaxbContext = JAXBContext.newInstance(PKGS);
-    		u = jaxbContext.createUnmarshaller();	    	    
-    		return load(xmlStr);
-    	}
-    	catch(JAXBException je) {
-    		je.printStackTrace();
-    		return null;
-    	}
-    }    
-    
-    private Object load(String xmlStr) {	
+    private Object load(String xmlStr, String PKGS) {	
     	try {		
     		if(xmlStr!=null) {			
     			JAXBContext jc = JAXBContext.newInstance(PKGS);
 				Unmarshaller u = jc.createUnmarshaller();
 				StringBuffer xmlStrB = new StringBuffer(xmlStr);
-				Object o = u.unmarshal( new StreamSource( new StringReader( xmlStrB.toString() ) ) ); 
-
+				Object o = u.unmarshal(new StreamSource(new StringReader(xmlStrB.toString()))); 
     			return o;
     		}else {
     			java.lang.System.err.println("Problem reading the XML string!");

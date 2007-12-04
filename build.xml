@@ -504,6 +504,10 @@ Class-Path: ${manifest.pathlist}</echo>
     
     <target name="build_rop_processeditor" description="builds rop processeditor">
         <ant dir="schema/" target="gen_manufacturingtables_rop_processeditor" inheritAll="false"/>
+    	<ant dir="schema/" target="gen_manufacturingtables_il" inheritAll="false"/>
+    	<ant dir="schema/" target="gen_manufacturingtables_pr" inheritAll="false"/>
+    	<ant dir="schema/" target="gen_manufacturingtables_vr" inheritAll="false"/>
+    	<ant dir="schema/" target="gen_manufacturingtables_eop" inheritAll="false"/>
     </target>
     
     <target name="cpp_waters">

@@ -102,7 +102,10 @@ public class DOPtoEFAInterface
     		
     		//ResourceCell have ROP file
     		if(o instanceof ResourceCell){
-    			cPanel.addFile(((ResourceCell)o).getFile());
+    			if(((ResourceCell)o).getFile() != null &&
+    			   ((ResourceCell)o).getFile().exists()){
+    				cPanel.addFile(((ResourceCell)o).getFile());
+    			}
     		}
     	}
     	

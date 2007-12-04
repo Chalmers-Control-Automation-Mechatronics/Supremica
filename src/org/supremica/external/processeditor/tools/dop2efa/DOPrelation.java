@@ -44,7 +44,7 @@ public class DOPrelation
 		String myLastState;
 		String tmp;
 		
-		Iterator i;
+		Iterator<Object> i;
 		
 		//check indata
 		if(r == null){
@@ -69,7 +69,7 @@ public class DOPrelation
 		
 		myLastState = from;
 			
-		List activityList = r.getActivityRelationGroup();
+		List<Object> activityList = r.getActivityRelationGroup();
 		
 		if(activityList.isEmpty()){
 			System.err.println("WARNING empty " + r.getType().toString());
@@ -154,13 +154,14 @@ public class DOPrelation
 					
 				}else if(RelationType.PARALLEL.equals(((Relation)o).getType())){
 					
+					Module m;
+					String var_name;
+					
 					/*--------------------*/
 					/* Parallel node code */
 					/*--------------------*/
 					
-					Module m = efa.getModule();
-					String var_name;
-					
+					m = efa.getModule();
 					var_name = addWaitForNodeToFinish(myActivityList,(Relation)o,efa);
 					
 					//build Parallel
@@ -216,8 +217,8 @@ public class DOPrelation
 			                          EFA efa){
 		Object o = null;
 		List<Activity> myActivityList = null;
-		List activityList = null;
-		Iterator i = null;
+		List<Object> activityList = null;
+		Iterator<Object> i = null;
 		
 		//check in data
 		if(r == null){
@@ -243,8 +244,8 @@ public class DOPrelation
 		i = activityList.iterator();
 		
 		/* start build EFA
-		 * go down in tre structure
-		 * and handel activities and relations
+		 * go down in tree structure
+		 * and handle activities and relations
 		 */
 		while(i.hasNext() || o != null){
 			
@@ -325,13 +326,12 @@ public class DOPrelation
 					Module m = efa.getModule();
 					String var_name;
 					ObjectFactory factory = new ObjectFactory();
+					
 					Relation seq = factory.createRelation();
+					seq.setType(RelationType.SEQUENCE);
 					
 					List<Activity> tmp = new LinkedList<Activity>();
-					
 					var_name = addWaitForNodeToFinish(tmp,(Relation)o,efa);
-					
-					seq.setType(RelationType.SEQUENCE);
 					for(Activity a : tmp){
 						seq.getActivityRelationGroup().add(a);
 					}
@@ -376,6 +376,16 @@ public class DOPrelation
 	private static String addWaitForNodeToFinish(List<Activity> activityList,
 												 Relation relation, EFA efa){
 		
+		Activity start;
+		Attribute onlystart;
+		Attribute startguard;
+		Attribute startaction;
+		
+		Activity stop;
+		Attribute onlystop;
+		Attribute stopguard;
+		Attribute stopaction;
+		
 		Module m = efa.getModule();
 		int numberOfTracks = relation.getActivityRelationGroup().size();
 		String var_name = "";
@@ -397,6 +407,7 @@ public class DOPrelation
 			System.err.println("Unknown node type " +
 								relation.getType().toString() +
 								" in addWaitForNodeToFinish");
+			return var_name;
 		}
 		
 		startGuard = "";
@@ -405,37 +416,60 @@ public class DOPrelation
 		stopGuard = var_name + "==" + (numberOfTracks + 1);
 		stopAction = var_name + "=0;";
 		
-		/* 
-		 * set start conditions
-		 */
-		Activity start_par = factory.createActivity();
-		String start = PGA.ONLY_START +
-						PGA.GUARD+startGuard+PGA.GUARD +
-						PGA.ACTION+startAction+PGA.ACTION
-						+var_name;
+		/* set start conditions */
+		onlystart = factory.createAttribute();
+		onlystart.setType( ONLY_STA );
 		
-		start_par.setOperation(start);
+		startguard = factory.createAttribute();
+		startguard.setType( AND_STA_GUARD );
+		startguard.setAttributeValue(startGuard);
 		
-		/* 
-		 * set stop conditions
-		 */
-		Activity stop_par = factory.createActivity();
-		String stop = PGA.ONLY_STOP+
-					  PGA.GUARD+stopGuard+PGA.GUARD+
-					  PGA.ACTION+stopAction+PGA.ACTION
-					  +var_name;
+		startaction = factory.createAttribute();
+		startaction.setType( ADD_STA_ACTION );
+		startaction.setAttributeValue(startAction);
 		
-		stop_par.setOperation(stop);
+		start = factory.createActivity();
+		start.setProperties(factory.createProperties());
+		
+		start.getProperties().getAttribute().add(onlystart);
+		start.getProperties().getAttribute().add(startguard);
+		start.getProperties().getAttribute().add(startaction);
+		
+		start.setOperation(var_name);
+		/* end set start conditions */
+		
+		
+		/* Set stop conditions */
+		onlystop = factory.createAttribute();
+		onlystop.setType( ONLY_STO );
+		
+		stopguard = factory.createAttribute();
+		stopguard.setType( AND_STO_GUARD );
+		stopguard.setAttributeValue(stopGuard);
+		
+		stopaction = factory.createAttribute();
+		stopaction.setType( ADD_STO_ACTION );
+		stopaction.setAttributeValue(stopAction);
+		
+		stop = factory.createActivity();
+		stop.setProperties(factory.createProperties());
+		
+		stop.getProperties().getAttribute().add(onlystop);
+		stop.getProperties().getAttribute().add(stopguard);
+		stop.getProperties().getAttribute().add(stopaction);
+		
+		stop.setOperation(var_name);
+		/* End stop conditions */
 		
 		/* 
 		 * add Activity who starts node
 		 */
-		activityList.add(start_par);
+		activityList.add(start);
 		
 		/* 
 		 * add Activity who wait for node to finish
 		 */
-		activityList.add(stop_par);
+		activityList.add(stop);
 		
 		//return the variable name assigned to this node
 		return var_name;
@@ -454,7 +488,7 @@ public class DOPrelation
 		final String FIRST_STATE = "waiting";
 		final String LAST_STATE = "finished";
 		
-		String startGuard = "";
+		String startGuard = "", startAction = "";
 		String stopGuard = "", stopAction = "";
 		
 		String parallel_track = "";
@@ -489,13 +523,9 @@ public class DOPrelation
 					" variable asigned");
 		}
 		
-		/* 
-		 * for a parallel node only two options exist either we have
-		 * a relation or a activity.
-		 * 
-		 * Different relation type handle equals.
-		 *  
-		 */
+		//for a parallel node only two options exist either we have
+		//a relation or a activity.
+		//Different relation type handle equals.
 		
 		for(int i = 0; i < activityRelations.length; i++){
 			
@@ -511,32 +541,63 @@ public class DOPrelation
 				String start;
 				String stop;
 				
-				/*---------------------------*/
-				/* Relation code             */
-				/*---------------------------*/
+				//---------------------------//
+				// Relation code             //
+				//---------------------------//
 				
 				Relation seq = factory.createRelation();
 				seq.setType(RelationType.SEQUENCE);
 				
-				/* set start conditions */
+				//------- set start conditions --------//
 				Activity start_par = factory.createActivity();
-				start = PGA.ONLY_START + PGA.GUARD+startGuard+PGA.GUARD
-									   +parallel_track;
+				start_par.setProperties(factory.createProperties());
 				
-				start_par.setOperation(start);
+				Attribute onlystart = factory.createAttribute();
+				Attribute startguard = factory.createAttribute();
+				Attribute startaction = factory.createAttribute();
 				
-				/* set stop conditions */
+				onlystart.setType(ONLY_STA);
+				
+				startguard.setType( AND_STA_GUARD );
+				startaction.setType( ADD_STA_ACTION );
+				
+				startguard.setAttributeValue(startGuard);
+				startaction.setAttributeValue(startAction);
+				
+				start_par.getProperties().getAttribute().add(onlystart);
+				start_par.getProperties().getAttribute().add(startguard);
+				start_par.getProperties().getAttribute().add(startaction);
+				
+				start_par.setOperation(parallel_track);
+				//------- end set start conditions -------//
+				
+				// Set stop conditions //
 				Activity stop_par = factory.createActivity();
-				stop = PGA.ONLY_STOP +PGA.GUARD+stopGuard+PGA.GUARD
-									 +PGA.ACTION+stopAction+PGA.ACTION
-									 +parallel_track;
+				stop_par.setProperties(factory.createProperties());
 				
-				stop_par.setOperation(stop);
+				Attribute onlystop = factory.createAttribute();
+				Attribute stopguard = factory.createAttribute();
+				Attribute stopaction = factory.createAttribute();
 				
-				/* 
-				 * lock the relation in a sequence
-				 * whit start and stop guards.
-				 */
+				onlystop.setType(ONLY_STO);
+				
+				stopguard.setType( AND_STO_GUARD );
+				stopguard.setAttributeValue(stopGuard);
+				
+				stopaction.setType( ADD_STO_ACTION );
+				stopaction.setAttributeValue(stopAction);
+				
+				stop_par.getProperties().getAttribute().add(onlystop);
+				stop_par.getProperties().getAttribute().add(stopguard);
+				stop_par.getProperties().getAttribute().add(stopaction);
+				
+				stop_par.setOperation(parallel_track);			
+				//End stop conditions //
+				
+				
+				//lock the relation in a sequence
+				//whit start and stop guards.
+				
 				seq.getActivityRelationGroup().add(start_par);
 				seq.getActivityRelationGroup().add(activityRelations[i]);
 				seq.getActivityRelationGroup().add(stop_par);
@@ -546,17 +607,42 @@ public class DOPrelation
 				
 			}else if(activityRelations[i] instanceof Activity){
 				
-				/*---------------------------*/
-				/* Activity code             */
-				/*---------------------------*/
+				//---------------------------//
+				// Activity code             //
+				//---------------------------//
 				
-				PGA pga = pgaFromActivity((Activity)activityRelations[i],m);
-				pga.andStartGuard(startGuard);
+				//make sure it exist a property list
+				if(((Activity)activityRelations[i]).getProperties() == null){
+					((Activity)activityRelations[i]).setProperties(factory.createProperties());
+				}
 				
-				pga.andStopGuard(stopGuard);
-				pga.addStopAction(stopAction);
+				//create start/stop guard and action
+				Attribute startguard = factory.createAttribute();
+				Attribute startaction = factory.createAttribute();
 				
-				nativeProcess(pga,FIRST_STATE,LAST_STATE,tmp);
+				Attribute stopguard = factory.createAttribute();
+				Attribute stopaction = factory.createAttribute();
+				
+				startguard.setType( AND_STA_GUARD );
+				startguard.setAttributeValue( startGuard );
+				
+				stopguard.setType( AND_STO_GUARD );
+				stopguard.setAttributeValue( stopGuard );
+				
+				startaction.setType( ADD_STA_ACTION );
+				startaction.setAttributeValue( startAction );
+				
+				stopaction.setType( ADD_STO_ACTION );
+				stopaction.setAttributeValue( stopAction );
+				
+				//add to properties list
+				((Activity)activityRelations[i]).getProperties().getAttribute().add( startguard );
+				((Activity)activityRelations[i]).getProperties().getAttribute().add( stopguard );
+				
+				((Activity)activityRelations[i]).getProperties().getAttribute().add( startaction );
+				((Activity)activityRelations[i]).getProperties().getAttribute().add( stopaction );
+				
+				nativeActivity((Activity)activityRelations[i],FIRST_STATE,LAST_STATE,tmp);
 			}else{
 				System.err.println("Unknown objekt " + activityRelations[i]);
 			}
@@ -581,12 +667,23 @@ public class DOPrelation
 		String startGuard = "", startAction = ""; 
 		String stopGuard = "", stopAction = "";
 		
-		String parallel_track = "";
-		
+		String arbitrary_track = "";
 		String arbitrary_var = "";
 		
+		Relation seq;
+		
+		Activity start_ao;
+		Attribute onlystart;
+		Attribute startguard;
+		Attribute startaction;
+		
+		Activity stop_ao;
+		Attribute onlystop;
+		Attribute stopguard;
+		Attribute stopaction;
+		
 		Object[] activityRelations;
-		EFA tmp; 
+		EFA tmp;
 		
 		ObjectFactory factory = new ObjectFactory();  
 		
@@ -606,7 +703,7 @@ public class DOPrelation
 		
 		if(arbitraryNode_var.length() > 0){
 			//start conditions
-			startGuard = arbitraryNode_var + ">0"+ PGA.AND +arbitrary_var+ "==1";
+			startGuard = arbitraryNode_var + ">0"+ EGA.AND +arbitrary_var+ "==1";
 			startAction = arbitrary_var + "=0;";
 			
 			//stop conditions
@@ -618,83 +715,200 @@ public class DOPrelation
 					" variable asigned");
 		}
 		
-		
-		
-		/* 
-		 * for a arbitrary order node only two options exist either we have
-		 * a relation or a activity.
-		 *  
-		 */
+		//for a arbitrary order node only two
+		//options exist either we have
+		//a relation or a activity.
 		
 		for(int i = 0; i < activityRelations.length; i++){
 			
-			parallel_track = arbitrary_var +"_"+ i;
+			arbitrary_track = arbitrary_var +"_"+ i;
 			
 			//create new automata
-			tmp = new EFA(parallel_track,m);
+			tmp = new EFA(arbitrary_track,m);
 			m.addAutomaton(tmp);
 			
 			tmp.addInitialState(FIRST_STATE);
 			tmp.addState(LAST_STATE);
 			
 			if(activityRelations[i] instanceof Relation){
-				String start;
-				String stop;
 				
-				/*---------------------------*/
-				/* Relation code             */
-				/*---------------------------*/
+				//---------------------------//
+				// Relation code             //
+				//---------------------------//
 				
-				Relation seq = factory.createRelation();
+				//------- Create start conditions --------//
+				onlystart = factory.createAttribute();
+				onlystart.setType(ONLY_STA);
+				
+				startguard = factory.createAttribute();
+				startguard.setType( AND_STA_GUARD );
+				startguard.setAttributeValue(startGuard);
+				
+				startaction = factory.createAttribute();
+				startaction.setType( ADD_STA_ACTION );
+				startaction.setAttributeValue(startAction);
+				
+				start_ao = factory.createActivity();
+				start_ao.setProperties(factory.createProperties());
+				start_ao.setOperation(arbitrary_track);
+				
+				start_ao.getProperties().getAttribute().add(onlystart);
+				start_ao.getProperties().getAttribute().add(startguard);
+				start_ao.getProperties().getAttribute().add(startaction);
+				//------- End start conditions -------//
+				
+				// ------- Create stop conditions ------- //
+				onlystop = factory.createAttribute();
+				onlystop.setType( ONLY_STO );
+				
+				stopguard = factory.createAttribute();
+				stopguard.setType( AND_STO_GUARD );
+				stopguard.setAttributeValue(stopGuard);
+				
+				stopaction = factory.createAttribute();
+				stopaction.setType( ADD_STO_ACTION );
+				stopaction.setAttributeValue(stopAction);
+				
+				stop_ao = factory.createActivity();
+				stop_ao.setProperties(factory.createProperties());
+				stop_ao.setOperation(arbitrary_track);
+				
+				stop_ao.getProperties().getAttribute().add(onlystop);
+				stop_ao.getProperties().getAttribute().add(stopguard);
+				stop_ao.getProperties().getAttribute().add(stopaction);		
+				// ------- End stop conditions ------- //
+				
+				// bind the relation in a sequence
+				//whit start and stop guards
+				seq = factory.createRelation();
 				seq.setType(RelationType.SEQUENCE);
 				
-				/* set start conditions */
-				Activity start_par = factory.createActivity();
-				start = PGA.ONLY_START + PGA.GUARD+startGuard+PGA.GUARD
-									   +PGA.ACTION+startAction+PGA.ACTION
-									   +parallel_track;
-				
-				start_par.setOperation(start);
-				
-				/* set stop conditions */
-				Activity stop_par = factory.createActivity();
-				stop = PGA.ONLY_STOP +PGA.GUARD+stopGuard+PGA.GUARD
-									 +PGA.ACTION+stopAction+PGA.ACTION
-									 +parallel_track;
-				
-				stop_par.setOperation(stop);
-				
-				/* 
-				 * bind the relation in a sequence
-				 * whit start and stop guards 
-				 */
-				seq.getActivityRelationGroup().add(start_par);
-				seq.getActivityRelationGroup().add(activityRelations[i]);
-				seq.getActivityRelationGroup().add(stop_par);
+				seq.getActivityRelationGroup().add( start_ao );
+				seq.getActivityRelationGroup().add( activityRelations[i] );
+				seq.getActivityRelationGroup().add( stop_ao );
 				
 				//build sequence
-				sequence(seq,FIRST_STATE,LAST_STATE,tmp);
+				sequence( seq, FIRST_STATE, LAST_STATE, tmp );
 				
 			}else if(activityRelations[i] instanceof Activity){
 				
-				/*---------------------------*/
-				/* Activity code             */
-				/*---------------------------*/
+				//---------------------------//
+				// Activity code             //
+				//---------------------------//
 				
-				PGA pga = pgaFromActivity((Activity)activityRelations[i],m);
-				pga.andStartGuard(startGuard);
-				pga.addStartAction(startAction);
+				//make sure it exist a property list
+				if(((Activity)activityRelations[i]).getProperties() == null){
+					((Activity)activityRelations[i]).setProperties(factory.createProperties());
+				}
 				
-				pga.andStopGuard(stopGuard);
-				pga.addStopAction(stopAction);
+				//create start/stop guard and action
+				startguard = factory.createAttribute();
+				startguard.setType( AND_STA_GUARD );
+				startguard.setAttributeValue( startGuard );
 				
-				nativeProcess(pga,FIRST_STATE,LAST_STATE,tmp);
+				startaction = factory.createAttribute();
+				startaction.setType( ADD_STA_ACTION );
+				startaction.setAttributeValue( startAction );
+				
+				stopguard = factory.createAttribute();
+				stopguard.setType( AND_STO_GUARD );
+				stopguard.setAttributeValue( stopGuard );
+				
+				stopaction = factory.createAttribute();
+				stopaction.setType( ADD_STO_ACTION );
+				stopaction.setAttributeValue( stopAction );
+				
+				//add to properties list
+				((Activity)activityRelations[i]).getProperties().getAttribute().add( startguard );
+				((Activity)activityRelations[i]).getProperties().getAttribute().add( stopguard );
+				((Activity)activityRelations[i]).getProperties().getAttribute().add( startaction );
+				((Activity)activityRelations[i]).getProperties().getAttribute().add( stopaction );
+				
+				nativeActivity((Activity)activityRelations[i],FIRST_STATE,LAST_STATE,tmp);
 			}else{
-				System.err.println("Unknown objekt " + activityRelations[i]);
+				//No Relation and no Activity
+				System.err.println("WARNING! Unknown objekt " + activityRelations[i]);
 			}
 		}
-		
 	}
 	
 	
+	
+	//////////////////////////////////////////////////////////////////////////////
+	//				NOT FINISHED OR EPEREMENTAL FUNCTIONS						//
+	//////////////////////////////////////////////////////////////////////////////
+	
+	protected static Relation addStartStopAttributes(Relation relation,
+												 	 List<Attribute> attStartList,
+												 	 List<Attribute> attStopList){
+		
+		// check input
+		if(relation == null){
+			return null;
+		}
+		
+		if(attStartList == null || attStartList.size() == 0){
+			if(attStopList == null|| attStopList.size() == 0){
+				return relation;
+			}
+		}
+		
+		
+		if(RelationType.SEQUENCE.equals(relation.getType())){
+			Object o;
+			
+			// ------- sequence -------//
+			
+			//Add start Attributes
+			o = relation.getActivityRelationGroup().get(0);
+			
+			if(o instanceof Activity){
+				addAttributes((Activity)o, attStartList);
+			}else if(o instanceof Relation){
+				addStartStopAttributes(relation, attStartList, attStopList);
+			}
+			
+			//Add stop Attribute
+			o = relation.getActivityRelationGroup().
+					get(relation.getActivityRelationGroup().size()-1);
+			
+			if(o instanceof Activity){
+				addAttributes((Activity)o, attStopList);
+			}else if(o instanceof Relation){
+				addStartStopAttributes(relation, attStartList, attStopList);
+			}
+			// ------- end sequence -------//
+			
+		}else if(RelationType.ALTERNATIVE.equals(relation.getType()) ||
+				 RelationType.PARALLEL.equals(relation.getType()) ||
+				 RelationType.ARBITRARY.equals(relation.getType())){
+			
+			List<Object> activityRelationGroup;
+			
+			activityRelationGroup = relation.getActivityRelationGroup();
+			
+			//loop over all
+			for(Object o : activityRelationGroup){
+				if(o instanceof Activity){
+					addAttributes((Activity)o, attStartList);
+					addAttributes((Activity)o, attStopList);
+				}else if(o instanceof Relation){
+					addStartStopAttributes((Relation)o, attStartList, attStopList);
+				}
+			}
+		}
+		
+		return relation;
+	}
+	
+	/**
+	 * Help function to <CODE>addStartAttributes</CODE>.
+	 * @param activity
+	 * @param attList
+	 */
+	private static void addAttributes(Activity activity, List<Attribute> attList){
+		for(Attribute att : attList){
+			activity.getProperties().getAttribute().add(att);
+		}
+	}
 }

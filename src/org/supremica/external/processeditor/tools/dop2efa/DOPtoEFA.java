@@ -21,8 +21,14 @@ public class DOPtoEFA
 	
 	public DOPtoEFA(){}
 	
+	/**
+	 * Build a single <code>ROP</code> to a file.
+	 *  
+	 * @param rop
+	 * @param f
+	 * @param block
+	 */
 	public static void createEFA(ROP rop, File f, boolean block){
-		
 		//build module
 		Module module = buildModuleFromROP(rop);
 		
@@ -48,6 +54,7 @@ public class DOPtoEFA
 		
 		return buildModuleFromROP(rop,new Module(machine, false));
 	}
+	
 	/**
 	 * Builds a number of ROP files to a Module
 	 * 
@@ -87,15 +94,11 @@ public class DOPtoEFA
 		
 		Module module = null;
 		
-		/*
-		 * remove previous stored precondition
-		 * from earlier builds.
-		 */
+		//remove previous stored precondition
+		//from earlier builds.
 		resetPreconList();
 		
-		/*
-		 * check input
-		 */
+		//check input
 		if(moduleName == null || moduleName.length()== 0){
 			moduleName = "new_module";
 		}
@@ -104,42 +107,34 @@ public class DOPtoEFA
 			return new Module(moduleName,false);
 		}
 		
-		/* create module */
+		
 		module = new Module(moduleName,false);
 		
-		/*
-		 * does this first so they will be easy to find
-		 * in Supremica then many ROP:s are being converted.
-		 */
+		//does this first so they will be easy to find
+		//in Supremica then many ROP:s are being converted.
 		if(ropList.size() > 1){
 			module.initNodeVariables();
 			module.initResourceVariables();
 		}
 		
-		/*
-		 * convert all rop in list in to module
-		 */
+		//convert all rop in list in to module
 		for(ROP rop : ropList){
 			module = buildModuleFromROP(rop, module);
 		}
 		
 		
-		/* Last fix */
+		//-------- Last fixes ------------//
 		
-		/*
-		 * must be done last because
-		 * now we know the event names
-		 */
+		//must be done last because
+		//now we know the event names
 		addPrecondition(module);
 		
-		/* Block */
+		//Block
 		if(block){
 			blockStopEventWithNoStartEvent(module);
 		}
 		
-		/*
-		 * return a module whit all rops
-		 */
+		//return a module whit all rops
 		return module;
 	}
 	
@@ -193,16 +188,27 @@ public class DOPtoEFA
 		start_machine = factory.createActivity();
 		stop_machine = factory.createActivity();
 		
-		/*
-		 * special will be parsed in class EGA
-		 */ 
-		start_machine.setOperation(PGA.ONLY_START + machine);
-		stop_machine.setOperation(PGA.ONLY_STOP + machine);
+		Attribute onlyStartAttribute = factory.createAttribute();
+		Attribute onlyStopAttribute = factory.createAttribute();
 		
-		/*
-		 * Relabeling of events, for uniqueness and traceable
-		 * to machine. 
-		 */
+		Properties startProp = factory.createProperties();
+		Properties stopProp = factory.createProperties();
+		
+		onlyStartAttribute.setType(ONLY_STA);
+		onlyStopAttribute.setType(ONLY_STO);
+		
+		startProp.getAttribute().add(onlyStartAttribute);
+		stopProp.getAttribute().add(onlyStopAttribute);
+		
+		//special will be parsed in DOPnative 
+		start_machine.setOperation(machine);
+		start_machine.setProperties(startProp);
+		
+		stop_machine.setOperation(machine);
+		stop_machine.setProperties(stopProp);
+		
+		//Relabeling of events, for uniqueness and traceable
+		//to machine. 
 		rop.setRelation(renameEqualOperationName(rop.getRelation(),machine));
 		
 		//build main sequence
@@ -210,27 +216,23 @@ public class DOPtoEFA
 		main_sequence.getActivityRelationGroup().add(rop.getRelation());
 		main_sequence.getActivityRelationGroup().add(stop_machine);
 		
-		/*------------------------------------*/
-		/* preprocessing of the relation tree */
-		/*------------------------------------*/
-		
-		main_sequence = collapseRelationTree(main_sequence);
+		//------------------------------------//
+		// preprocessing of the relation tree //
+		//------------------------------------//
 		main_sequence = removeEmtyRelations(main_sequence);
+		main_sequence = collapseRelationTree(main_sequence);
 		
-		
-		/*
-		 * create main efa
-		 */
+		//create main efa
 		main_efa = new EFA("main_" + machine,module);
 		module.addAutomaton(main_efa);
 		
 		startState = machine +  "_idle";
 		endState = machine + "_finish";
 		
-		/* First state not marked and initial */
+		//First state not marked and initial
 		main_efa.addState(startState, false, true);
 		
-		/* Last state marked */
+		//Last state marked
 		main_efa.addState(endState,true,false);
 		
 		/* Build sequence in module */
@@ -248,16 +250,8 @@ public class DOPtoEFA
 	public static ROP getROPfromFile(File ropFile){
 		
 		if(ropFile != null && ropFile.exists()){
-			
-			/*
-			 * get xml object
-			 */
 			Loader loader = new Loader();
 			Object o = loader.open(ropFile);
-			
-			/*
-			 * test for ROP
-			 */
 			if(o instanceof ROP){
 				return (ROP)o;
 			}
@@ -284,7 +278,7 @@ public class DOPtoEFA
 	public static Relation collapseRelationTree( Relation r ){
 		
 		Relation tmp;
-		List list;
+		List<Object> list;
 		int i;
 		
 		//get element in this relation
@@ -298,12 +292,12 @@ public class DOPtoEFA
 			if( o instanceof Relation ){
 				tmp = (Relation)o;
 				if( r.getType().equals( tmp.getType() ) && !( r.getType() == RelationType.ARBITRARY )){
-					/* same RelationType and not a arbitrary order node */
+					//same RelationType and not a arbitrary order node
 					
 					list.remove(i);
 					list.addAll(i,tmp.getActivityRelationGroup());
 				}else{
-					/* go down in relation tree */
+					//go down in relation tree
 					
 					//recursion
 					tmp = collapseRelationTree(tmp);
@@ -315,11 +309,11 @@ public class DOPtoEFA
 				}
 			}else if( o instanceof Activity ){
 				
-				/* Activities are OK go next*/
+				//Activities are OK go next
 				i = i + 1; //next element
 				
 			}else{
-				/* Unknown object in Relation */
+				//Unknown object in Relation
 				System.err.println("Unknown object in Relation tree: " + o);
 				
 				i = i + 1; //next element
@@ -327,6 +321,34 @@ public class DOPtoEFA
 		}
 		
 		return r;
+	}
+	
+	/**
+	 * Add Attribute to all activities in relation.
+	 * 
+	 * @param relation
+	 * @param att
+	 * @return
+	 */
+	public static Relation addAttributeToActivities( Relation relation, Attribute att ){
+		List<Object> objList = relation.getActivityRelationGroup();
+		
+		for(Object o : objList){
+			if(o instanceof Activity){
+				
+				//make sure attribute list exist
+				if(((Activity)o).getProperties() == null){
+					((Activity)o).setProperties((new ObjectFactory()).createProperties());
+				}
+				
+				//add attribute
+				((Activity)o).getProperties().getAttribute().add(att);
+				
+			}else if(o instanceof Relation){
+				addAttributeToActivities((Relation)o, att);
+			}
+		}
+		return relation;
 	}
 	
 	/**
@@ -341,77 +363,24 @@ public class DOPtoEFA
 		
 		for(String event : events){
 			
-			/* search for stop events */
+			//search for stop events
 			if(event.startsWith(EVENT_STOP_PREFIX)){
 				
-				/* tmp is corresponding start event */
+				//tmp is corresponding start event
 				tmp = event.replace(EVENT_STOP_PREFIX,
 									EVENT_START_PREFIX);
 				
-				/* 
-				 * if we not have a start event block
-				 * end event
-				 */
+				
+				//if we not have a start event block
+				//end event
 				if(!events.contains(tmp)){
 					block.add(event);
 				}
 			}
 		}
 		
-		/*
-		 * block events in module 
-		 */
+		//block events in module 
 		m.blockEvents(block);
-	}
-	
-	/**
-	 *	Search through Relation r and remove all Activities whit same
-	 *	operation name. (Currently newer used)
-	 */
-	public static Relation removeDoubleActivity(Relation r){
-		
-		List objList = null;
-		Object o = null;
-		Object o2 = null;
-		
-		String op1="", op2=""; 
-		
-		//check in data
-		if(r == null){
-			return r;
-		}
-		
-		//get element in this relation
-		objList = r.getActivityRelationGroup();
-		
-		//check list
-		if(objList == null || objList.isEmpty()){
-			return r;
-		}
-		
-		//search for doubles
-		for(int i=0; i <= objList.size()-1; i++){
-			o = objList.get(i);
-			
-			if(o instanceof Activity){
-				for(int ii = i+1; ii < objList.size(); ii++){
-					o2 = objList.get(ii);
-					if(o2 instanceof Activity){
-						
-						op1 = ((Activity)o).getOperation();
-						op2 = ((Activity)o2).getOperation();
-						
-						if(op1.equals(op2)){
-							//double found remove
-							objList.remove(o2);
-						}
-					}
-				}//end for
-			}//end if
-			
-		}//end for
-		
-		return r;
 	}
 	
 	/**
@@ -422,7 +391,7 @@ public class DOPtoEFA
 	 */
 	private static Relation removeEmtyRelations(Relation relation){
 		
-		List objList;
+		List<Object> objList;
 		Object o;
 		
 		if(relation == null){
@@ -442,23 +411,25 @@ public class DOPtoEFA
 			o = objList.get(i);
 			
 			if(o instanceof Relation){
-				/* if empty relation list remove */
-				if(((Relation)o).getActivityRelationGroup().isEmpty()){
+				//if empty relation list remove
+				if( ((Relation)o).getType() == null ||
+					((Relation)o).getActivityRelationGroup() == null ||
+					((Relation)o).getActivityRelationGroup().isEmpty()){
 					objList.remove(i);
 				}else{
 					
-					/* recursion */
+					//recursion
 					o = removeEmtyRelations((Relation)o);
 					
 					objList.remove(i);
 					objList.add(i,o);
 					
-					/* Next */
+					//Next
 					i = i + 1;
 				}
 			}else if(o instanceof Activity){
 				
-				/* Next */
+				//Next
 				i = i + 1;
 			}else{
 				System.err.println("Unknown object " + o.toString());
@@ -466,9 +437,6 @@ public class DOPtoEFA
 		}
 		return relation;
 	}
-	
-	
-	
 	
 	
 	/**
@@ -493,7 +461,7 @@ public class DOPtoEFA
 													 NumOfOperations operations, 
 													 String machineName){
 		Object o = null;
-		List objList = null;
+		List<Object> objList = null;
 		
 		String opName = "";
 		
@@ -539,7 +507,7 @@ public class DOPtoEFA
 	}
 	
 	/**
-	 * Internal class
+	 * Internal class to count operation names
 	 * @author David Millares
 	 */
 	private class NumOfOperations{
