@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   ComponentsTreeModel
 //###########################################################################
-//# $Id: ComponentsTreeModel.java,v 1.3 2007-12-04 03:22:54 robi Exp $
+//# $Id: ComponentsTreeModel.java,v 1.4 2007-12-04 22:30:27 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.gui;
@@ -22,6 +22,7 @@ import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.base.VisitorException;
 import net.sourceforge.waters.model.module.AbstractModuleProxyVisitor;
 import net.sourceforge.waters.model.module.ForeachComponentProxy;
+import net.sourceforge.waters.model.module.GraphProxy;
 import net.sourceforge.waters.model.module.InstanceProxy;
 import net.sourceforge.waters.model.module.ModuleProxy;
 import net.sourceforge.waters.model.module.ParameterBindingProxy;
@@ -184,21 +185,13 @@ class ComponentsTreeModel
           }
           break;
         }
-      case ModelChangeEvent.NAME_CHANGED:
       case ModelChangeEvent.STATE_CHANGED:
         {
-          final ProxySubject psource = (ProxySubject) source;
-          if (isInTree(psource)) {
-            final ProxySubject parent = getParentInTree(psource);
-            final TreeModelEvent newevent;
-            if (parent == null) {
-              final TreePath path = createPath(psource);
-              newevent = new TreeModelEvent(this, path, null, null);
-            } else {
-              final TreePath path = createPath(parent);
-              final int index = getIndexOfChild(parent, source);
-              newevent = createTreeModelEvent(parent, index, source);
-            }
+          final ProxySubject psource = getVisibleAncestorInTree(source);
+          if (psource != null) {
+            final TreePath path = createPath(psource);
+            final TreeModelEvent newevent =
+              new TreeModelEvent(this, path, null, null);
             fireNodesChanged(newevent);
           }
           break;
@@ -258,6 +251,11 @@ class ComponentsTreeModel
     } else {
       return (ProxySubject) parent1.getParent();
     }
+  }
+
+  ProxySubject getVisibleAncestorInTree(final Subject subject)
+  {
+    return mTypeCheckerVisitor.getVisibleAncestorInTree(subject);
   }
 
 
@@ -375,6 +373,26 @@ class ComponentsTreeModel
 
     //#######################################################################
     //# Invocation
+    private ProxySubject getVisibleAncestorInTree(Subject subject)
+    {
+      for (; !canBeInTree(subject); subject = subject.getParent()) {
+        if (subject instanceof GraphProxy) {
+          return null;
+        }
+      }
+      return (ProxySubject) subject;
+    }
+           
+    private boolean canBeInTree(final Subject subject)
+    {
+      if (subject instanceof Proxy) {
+        final Proxy proxy = (Proxy) subject;
+        return canBeInTree(proxy);
+      } else {
+        return false;
+      }
+    }
+
     private boolean canBeInTree(final Proxy proxy)
     {
       try {
