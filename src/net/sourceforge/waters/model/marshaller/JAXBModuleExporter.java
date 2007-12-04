@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.marshaller
 //# CLASS:   JAXBModuleExporter
 //###########################################################################
-//# $Id: JAXBModuleExporter.java,v 1.23 2007-12-04 03:22:55 robi Exp $
+//# $Id: JAXBModuleExporter.java,v 1.24 2007-12-04 03:37:59 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.marshaller;
@@ -1065,8 +1065,9 @@ public class JAXBModuleExporter
     throws VisitorException
   {
     copyComponentProxy(proxy, element);
-    final boolean deterministic = proxy.isDeterministic();
-    element.setDeterministic(deterministic);
+    if (!proxy.isDeterministic()) {
+      element.setDeterministic(false);
+    }
     final SimpleExpressionProxy typeProxy = proxy.getType();
     final SimpleExpressionType typeElement =
       (SimpleExpressionType) typeProxy.acceptVisitor(this);
