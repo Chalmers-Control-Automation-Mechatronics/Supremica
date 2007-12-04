@@ -61,7 +61,6 @@ class ModelMaker
 
 	private static int verboseLevel = INFO;
 	private static boolean expandTransitions = false;
-	private static boolean addNoTransition = false;
 	private static boolean generatePlantModels = true;
 
 	private static Integer eventQueuePlaces = 0;
@@ -148,10 +147,6 @@ class ModelMaker
 			if (args[i].equals("-e"))
 			{
 				expandTransitions = true;
-			}
-			if (args[i].equals("-n"))
-			{
-				addNoTransition = true;
 			}
 			if (args[i].equals("-p"))
 			{
@@ -354,9 +349,9 @@ class ModelMaker
 		
 		loadSystem(systemFileName);
 		
-		makeEventConnectionMap(systemFBNetwork, null, 0);
+		makeEventConnectionsMap(systemFBNetwork, null, 0);
 		
-		makeDataConnectionMap(systemFBNetwork, null, 0);
+		makeDataConnectionsMap(systemFBNetwork, null, 0);
 
 		if (verboseLevel <= DEBUG)
 		{
@@ -648,7 +643,7 @@ class ModelMaker
     }
 
 	
-	private void makeEventConnectionMap(JaxbFBNetwork fbNetwork, String parentInstance, int level)
+	private void makeEventConnectionsMap(JaxbFBNetwork fbNetwork, String parentInstance, int level)
 	{
 		if (parentInstance == null)
 		{
@@ -678,7 +673,7 @@ class ModelMaker
 			String sourceInstance = getInstanceName(source);
 			String sourceSignal   = getSignalName(source);
 				
-			output(DEBUG, "Analyzing connection: " + source + "-->" + dest, level);
+			output(DEBUG, "Analyzing connection: " + source + "-->" + dest, level + 1);
 			
 			JaxbFBType sourceType = (JaxbFBType) fbTypes.get((String) functionBlocks.get(sourceInstance));
 
@@ -686,7 +681,7 @@ class ModelMaker
 			{
 				if (sourceType.isSetFBNetwork())
 				{
-					makeEventConnectionMap(sourceType.getFBNetwork(), sourceInstance, level + 1);
+					makeEventConnectionsMap(sourceType.getFBNetwork(), sourceInstance, level + 1);
 				}
 			}
 		
@@ -705,7 +700,7 @@ class ModelMaker
 			String destInstance = getInstanceName(dest);
 			String destSignal   = getSignalName(dest);
 		
-			output(DEBUG, "Adding connection: " + source + "-->" + dest, level);
+			output(DEBUG, "Adding connection: " + source + "-->" + dest, level + 1);
 			
 			Map eventMap;
 			if (!eventConnections.keySet().contains(sourceInstance))
@@ -798,7 +793,7 @@ class ModelMaker
 		return externalConnection;
 	}
 
-	private void makeDataConnectionMap(JaxbFBNetwork fbNetwork, String parentInstance, int level)
+	private void makeDataConnectionsMap(JaxbFBNetwork fbNetwork, String parentInstance, int level)
 	{
 		if (parentInstance == null)
 		{
@@ -829,7 +824,7 @@ class ModelMaker
 				String destInstance = getInstanceName(dest);
 				String destSignal   = getSignalName(dest);
 				
-				output(DEBUG, "Analyzing connection: " + source + "-->" + dest, level);
+				output(DEBUG, "Analyzing connection: " + source + "-->" + dest, level + 1);
 				
 				JaxbFBType destType = (JaxbFBType) fbTypes.get((String) functionBlocks.get(destInstance));
 				
@@ -837,7 +832,7 @@ class ModelMaker
 				{
 					if (destType.isSetFBNetwork())
 					{
-						makeDataConnectionMap(destType.getFBNetwork(), destInstance, level + 1);
+						makeDataConnectionsMap(destType.getFBNetwork(), destInstance, level + 1);
 					}
 				}
 				
@@ -856,7 +851,7 @@ class ModelMaker
 				String sourceInstance = getInstanceName(source);
 				String sourceSignal   = getSignalName(source);
 				
-				output(DEBUG, "Adding connection: " + source + "-->" + dest, level);
+				output(DEBUG, "Adding connection: " + source + "-->" + dest, level + 1);
 				
 				Map dataMap;
 				if (!dataConnections.keySet().contains(destInstance))
@@ -870,16 +865,19 @@ class ModelMaker
 				}
 				dataMap.put(destSignal, source);
 
-				if (!dataConnections.keySet().contains(sourceInstance))
+				if (sourceInstance != "")
 				{
-					dataMap = new HashMap();
-					dataConnections.put(sourceInstance, dataMap);
+					if (!dataConnections.keySet().contains(sourceInstance))
+					{
+						dataMap = new HashMap();
+						dataConnections.put(sourceInstance, dataMap);
+					}
+					else
+					{
+						dataMap = (Map) dataConnections.get(sourceInstance);
+					}
+					dataMap.put(sourceSignal, dest);
 				}
-				else
-				{
-					dataMap = (Map) dataConnections.get(sourceInstance);
-				}
-				dataMap.put(sourceSignal, dest);
 			}	
 		}
 	}
@@ -1396,14 +1394,11 @@ class ModelMaker
 		to = "s2";
 		event = "no_more_actions_" + fbName + ";";
 		eventHandling.addTransition(from, to, event, null, null);
-
-		if (addNoTransition)
-		{
-			from = "s3";
-			to = "s1";
-			event = "no_transition_" + fbName + ";";
-			eventHandling.addTransition(from, to, event, null, null);
-		}
+		
+		from = "s3";
+		to = "s3";
+		event = "no_transition_" + fbName + ";";
+		eventHandling.addTransition(from, to, event, null, null);
 
 		from = "s3";
 		to = "s0";
@@ -1455,7 +1450,19 @@ class ModelMaker
 					String curDataType =  curDeclaration.getType();
 					if (curDataType.toLowerCase().equals("int"))
 					{
-						eventQueue.addIntegerVariable("data_" + curDataInputName + "_" + fbName, intVarMinValue, intVarMaxValue, 0, 0);
+						// get possible constant data value
+						String dataCnt = (String) ((Map) dataConnections.get(fbName)).get(curDataInputName);
+						if (getInstanceName(dataCnt) != "")
+						{
+							output(DEBUG, "Making non constant data variable", 2);
+							eventQueue.addIntegerVariable("data_" + curDataInputName + "_" + fbName, intVarMinValue, intVarMaxValue, 0, 0);
+						}
+						else
+						{
+							Integer dataValue = new Integer(getSignalName(dataCnt));
+							output(DEBUG, "Making constant data variable data_" + curDataInputName + "_" + fbName + " with value " + dataValue, 2);
+							eventQueue.addIntegerVariable("data_" + curDataInputName + "_" + fbName, intVarMinValue, intVarMaxValue, dataValue.intValue(), 0);
+						}
 					}
 					else if (curDataType.toLowerCase().equals("bool"))
 					{
@@ -1715,10 +1722,10 @@ class ModelMaker
 					action = "event_" + eventName + "_" + fbName + " = 0;";
 					eventQueue.addTransition(from, to, event, null, action);
 
-					from = to;
-					to = "s" + (i-1);
-					event = "update_ECC_" + fbName + ";";
-					eventQueue.addTransition(from, to, event, null, null);
+					//from = to;
+					//to = "s" + (i-1);
+					//event = "update_ECC_" + fbName + ";";
+					//eventQueue.addTransition(from, to, event, null, null);
 				}
 			}
 		}		
@@ -1867,7 +1874,7 @@ class ModelMaker
 		String noTransitionFrom = null;
 		String noTransitionTo = null;
 		String noTransitionGuard = null;
-		boolean makeNoTransition = addNoTransition;
+		boolean makeNoTransition = true;
 
 		// get event inputs for the block
 		String typeName = (String) basicFunctionBlocks.get(fbName);
@@ -2303,10 +2310,18 @@ class ModelMaker
 		if (makeNoTransition)
 		{
 			from = noTransitionFrom;
-			to = noTransitionTo;
+			to = "s" + nameCounter;
+			nameCounter++;
+			ecc.addState(to);
 			event = "no_transition_" + fbName + ";";
 			output(DEBUG, "Adding transition: from: " + from + ", to: " + to + ", event: " + event, level);
 			ecc.addTransition(from, to, event, noTransitionGuard, null);
+
+			from = to;
+			to = noTransitionTo;
+			event = "handling_event_done_" + fbName + ";";
+			output(DEBUG, "Adding transition: from: " + from + ", to: " + to + ", event: " + event, level);
+			ecc.addTransition(from, to, event, null, null);
 		}
 	}
 	

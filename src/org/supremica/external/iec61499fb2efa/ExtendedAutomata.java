@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.external.iec61499fb2efa
 //# CLASS:   ExtendedAutomata
 //###########################################################################
-//# $Id: ExtendedAutomata.java,v 1.19 2007-12-04 03:22:58 robi Exp $
+//# $Id: ExtendedAutomata.java,v 1.20 2007-12-04 15:25:49 cengic Exp $
 //###########################################################################
 
 /*
@@ -149,13 +149,15 @@ public class ExtendedAutomata
 				final String curVarName = curVar.getName();
 				if (moduleVariables.keySet().contains(curVarName))
 				{
-					System.out.println("ExtendedAutomata.expandTransitions(): Warning!: The module contains duplicate variable definitions.");
-					System.out.println("Variable name: " + curVarName);
+					ModelMaker.output(ModelMaker.WARN, "ExtendedAutomata.expandTransitions(): Warning!: The module contains duplicate variable definitions.");
+					ModelMaker.output(ModelMaker.WARN, "Variable name: " + curVarName, 1);
 				}
-				System.out.println(curVar.getName());
-				moduleVariables.put(curVar.getName(), curVar);
-			}
-		}
+                else
+                {
+                    moduleVariables.put(curVar.getName(), curVar);    
+                }
+            }
+        }
 		
 		// expand transitions for all components in the module
         for (final Proxy proxy : module.getComponentList()) {
@@ -739,10 +741,6 @@ public class ExtendedAutomata
 
 		ModelMaker.output("ExtendedAutomata.expandTransitions(): Done expanding transitions.");
 
-	}
-
-	private static void makeExpandedActions()
-	{
 	}
 
 	private static EdgeSubject makeTransition(NodeProxy from, NodeProxy to, LabelBlockProxy labelBlock, String guardIn, String actionIn)

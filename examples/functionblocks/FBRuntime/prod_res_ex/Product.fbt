@@ -6,9 +6,7 @@
   <InterfaceList>
 
     <EventInputs>
-      <Event Name="make" >
-	  	  <With Var="product"/>
-	  </Event>
+      <Event Name="make" />
       <Event Name="gotR1" />
       <Event Name="gotR2" />
       <Event Name="gotR3" />

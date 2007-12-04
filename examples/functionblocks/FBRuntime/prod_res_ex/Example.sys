@@ -82,7 +82,7 @@
 
 			  <Connection Source="1" Destination="res1.capacity" />
 			  <Connection Source="1" Destination="res2.capacity" />
-			  <Connection Source="2" Destination="res3.capacity" />
+			  <Connection Source="1" Destination="res3.capacity" />
           </DataConnections>
 
       </FBNetwork>
