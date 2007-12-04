@@ -1,0 +1,178 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Created with Liquid XML Studio 1.0.5.0 (http://www.liquid-technologies.com) -->
+<xs:schema xmlns:jaxb="http://java.sun.com/xml/ns/jaxb" attributeFormDefault="unqualified" elementFormDefault="qualified" version="1.0" jaxb:version="1.0" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:simpleType name="ComponentType">
+    <xs:restriction base="xs:string" />
+  </xs:simpleType>
+  <xs:element name="Comment" type="xs:string" />
+  <xs:element name="Machine" type="xs:string" />
+  <xs:element name="Actuator" type="xs:string" />
+  <xs:element name="Sensor" type="xs:string" />
+  <xs:element name="Variable" type="xs:string" />
+  <xs:element name="Component" type="ComponentType" />
+  <xs:element name="Value" type="xs:string" />
+  <xs:element name="Zone" type="xs:string" />
+  <xs:element name="Operation" type="xs:string" />
+  <xs:element name="Product" type="xs:string" />
+  <xs:attribute name="id" type="xs:string" />
+  <xs:attribute name="row" type="xs:positiveInteger" />
+  <xs:attribute name="mode" type="xs:string" />
+  <xs:element name="IL">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" maxOccurs="1" ref="Comment" />
+        <xs:element minOccurs="1" maxOccurs="1" ref="Operation" />
+        <xs:element minOccurs="1" maxOccurs="1" ref="Actuator" />
+        <xs:element minOccurs="1" maxOccurs="1" ref="ILStructure" />
+      </xs:sequence>
+      <xs:attribute ref="id" use="required" />
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="ILStructure">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="1" maxOccurs="1" ref="InternalComponents" />
+        <xs:element minOccurs="0" maxOccurs="1" ref="ExternalComponents" />
+        <xs:element minOccurs="0" maxOccurs="1" ref="Zones" />
+        <xs:element minOccurs="0" maxOccurs="1" ref="Operations" />
+        <xs:element minOccurs="0" maxOccurs="unbounded" ref="Term" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="InternalComponents">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" maxOccurs="unbounded" ref="Actuator" />
+        <xs:element minOccurs="0" maxOccurs="unbounded" ref="Sensor" />
+        <xs:element minOccurs="0" maxOccurs="unbounded" ref="Variable" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="ExternalComponents">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="1" maxOccurs="unbounded" ref="ExternalComponent" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="Zones">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="1" maxOccurs="unbounded" ref="Zone" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="Operations">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="1" maxOccurs="unbounded" ref="Operation" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="Term">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" maxOccurs="unbounded" ref="ActuatorValue" />
+        <xs:element minOccurs="0" maxOccurs="unbounded" ref="SensorValue" />
+        <xs:element minOccurs="0" maxOccurs="unbounded" ref="VariableValue" />
+        <xs:element minOccurs="0" maxOccurs="unbounded" ref="ExternalComponentValue" />
+        <xs:element minOccurs="0" maxOccurs="unbounded" ref="ZoneCheck" />
+        <xs:element minOccurs="0" maxOccurs="unbounded" ref="OperationCheck" />
+        <xs:element minOccurs="0" maxOccurs="unbounded" ref="Products" />
+      </xs:sequence>
+      <xs:attribute ref="row" use="required" />
+      <xs:attribute ref="mode" use="required" />
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="ActuatorValue">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="1" maxOccurs="1" ref="Actuator" />
+        <xs:element minOccurs="1" maxOccurs="1" ref="Value" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="SensorValue">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="1" maxOccurs="1" ref="Sensor" />
+        <xs:element minOccurs="1" maxOccurs="1" ref="Value" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="VariableValue">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="1" maxOccurs="1" ref="Variable" />
+        <xs:element minOccurs="1" maxOccurs="1" ref="Value" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="ExternalComponentValue">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="1" maxOccurs="1" ref="ExternalComponent" />
+        <xs:element minOccurs="1" maxOccurs="1" ref="Value" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="ExternalComponent">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="1" maxOccurs="1" ref="Component" />
+        <xs:element minOccurs="1" maxOccurs="1" ref="Machine" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="ZoneCheck">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" maxOccurs="1" ref="BeforeZones" />
+        <xs:element minOccurs="0" maxOccurs="1" ref="AfterZones" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="BeforeZones">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" maxOccurs="unbounded" ref="Zone" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="AfterZones">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" maxOccurs="unbounded" ref="Zone" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="OperationCheck">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" maxOccurs="1" ref="NotStarted" />
+        <xs:element minOccurs="0" maxOccurs="1" ref="NotOngoing" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="NotStarted">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" maxOccurs="unbounded" ref="Operation" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="NotOngoing">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" maxOccurs="unbounded" ref="Operation" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="Products">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="1" maxOccurs="unbounded" ref="Product" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+</xs:schema>

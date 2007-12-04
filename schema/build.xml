@@ -80,6 +80,27 @@
       <produces dir="${src}/org/supremica/manufacturingTables/xsd/rop"/>
     </xjc>
   </target>
+	
+  <target name="gen_manufacturingtables_il" description="Generate Manufacturing Tables IL JAXB classes.">
+  	<xjc target="${src}" extension="true" removeOldOutput="yes" package="org.supremica.manufacturingTables.xsd.il">
+  		<schema dir="${xsd_manufacturingTables}" includes="IL.xsd"/>
+  		<produces dir="${src}/org/supremica/manufacturingTables/xsd/il"/>
+  	</xjc>
+  </target>
+
+  <target name="gen_manufacturingtables_pr" description="Generate Manufacturing Tables PhysicalResources JAXB classes.">
+  	<xjc target="${src}" extension="true" removeOldOutput="yes" package="org.supremica.manufacturingTables.xsd.pr">
+  		<schema dir="${xsd_manufacturingTables}" includes="PhysicalResources.xsd"/>
+  		<produces dir="${src}/org/supremica/manufacturingTables/xsd/pr"/>
+  	</xjc>
+  </target>
+  
+  <target name="gen_manufacturingtables_vr" description="Generate Manufacturing Tables VirtualResources JAXB classes.">
+  	<xjc target="${src}" extension="true" removeOldOutput="yes" package="org.supremica.manufacturingTables.xsd.vr">
+  		<schema dir="${xsd_manufacturingTables}" includes="VirtualResources.xsd"/>
+  		<produces dir="${src}/org/supremica/manufacturingTables/xsd/vr"/>
+  	</xjc>
+  </target>
 
   <!--target name="gen_manufacturingtables_rop_processeditor" description="Generate Manufacturing Tables ROP processeditor JAXB classes.">
     <xjc target="${src}" extension="true" removeOldOutput="yes" package="org.supremica.manufacturingTables.xsd.processeditor">
