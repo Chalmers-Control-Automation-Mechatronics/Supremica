@@ -2035,7 +2035,7 @@ class ModelMaker
 					}
 					else
 					{
-						noTransitionGuard = noTransitionGuard + " | !(" + guard + ")";
+						noTransitionGuard = noTransitionGuard + " & !(" + guard + ")";
 					}
 				}				
 			}
@@ -2316,7 +2316,22 @@ class ModelMaker
 			event = "no_transition_" + fbName + ";";
 			output(DEBUG, "Adding transition: from: " + from + ", to: " + to + ", event: " + event, level);
 			ecc.addTransition(from, to, event, noTransitionGuard, null);
-
+			
+			from = to;
+			to = "s" + nameCounter;
+			nameCounter++;
+			ecc.addState(to);
+			// reset all events
+			for (Iterator iter = eventInputs.iterator();iter.hasNext();)
+			{
+				JaxbEvent curEventInput = (JaxbEvent) iter.next();
+				String curEventInputName = curEventInput.getName();
+				event = "reset_event_" + curEventInputName + "_" + fbName + ";";
+				guard = "event_" + curEventInputName + "_" + fbName + " == 1";
+				output(DEBUG, "Adding transition: from: " + from + ", to: " + to + ", event: " + event, level);
+				ecc.addTransition(from, to, event, guard, null);
+			}
+			
 			from = to;
 			to = noTransitionTo;
 			event = "handling_event_done_" + fbName + ";";
