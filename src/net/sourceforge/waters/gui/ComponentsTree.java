@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   ComponentsTree
 //###########################################################################
-//# $Id: ComponentsTree.java,v 1.3 2007-12-04 03:22:54 robi Exp $
+//# $Id: ComponentsTree.java,v 1.4 2007-12-05 06:48:06 robi Exp $
 //###########################################################################
 
 
@@ -97,6 +97,7 @@ public class ComponentsTree
     mPopupFactory = new ComponentsTreePopupFactory(manager);
     mDataFlavorVisitor = new DataFlavorVisitor();
     mObservers = null;
+    mIsPermanentFocusOwner = false;
     addMouseListener(this);
     addFocusListener(this);
     addTreeSelectionListener(this);
@@ -483,12 +484,18 @@ public class ComponentsTree
   //# Interface java.awt.event.FocusListener
   public void focusGained(final FocusEvent event)
   {
-    repaint();
+    if (!event.isTemporary()) {
+      mIsPermanentFocusOwner = true;
+      repaint();
+    }
   }
 
   public void focusLost(final FocusEvent event)
   {
-    repaint();
+    if (!event.isTemporary()) {
+      mIsPermanentFocusOwner = false;
+      repaint();
+    }
   }
 
 
@@ -571,7 +578,7 @@ public class ComponentsTree
       setToolTipText(tooltip);
       setOpaque(sel);
       if (sel) {
-        if (ComponentsTree.this.isFocusOwner()) {
+        if (mIsPermanentFocusOwner) {
           setBackground(EditorColor.BACKGROUND_FOCUSSED);
         } else {
           setBackground(EditorColor.BACKGROUND_NOTFOCUSSED);
@@ -699,5 +706,6 @@ public class ComponentsTree
   private final DataFlavorVisitor mDataFlavorVisitor;
 
   private List<Observer> mObservers;
+  private boolean mIsPermanentFocusOwner;
 
 }

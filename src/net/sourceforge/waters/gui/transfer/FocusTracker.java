@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui.actions
 //# CLASS:   FocusTracker
 //###########################################################################
-//# $Id: FocusTracker.java,v 1.2 2007-12-04 03:22:55 robi Exp $
+//# $Id: FocusTracker.java,v 1.3 2007-12-05 06:48:06 robi Exp $
 //###########################################################################
 
 
@@ -91,16 +91,13 @@ public class FocusTracker
   public void propertyChange(final PropertyChangeEvent event)
   {
     final String prop = event.getPropertyName();
-    if ("focusOwner".equals(prop)) {
+    if ("permanentFocusOwner".equals(prop)) {
       final Object newvalue = event.getNewValue();
       /*
       System.err.println
         ("FocusTracker: " +
          (newvalue == null ? "null" : newvalue.getClass().getName()));
       */
-      if (newvalue == null || newvalue instanceof JRootPane) {
-	return;
-      }
       if (mSelectionOwner != newvalue) {
 	if (mWatersSelectionOwner != null) {
 	  mWatersSelectionOwner.detach(this);

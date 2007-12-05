@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   EventDeclListView
 //###########################################################################
-//# $Id: EventDeclListView.java,v 1.10 2007-12-04 03:22:54 robi Exp $
+//# $Id: EventDeclListView.java,v 1.11 2007-12-05 06:48:06 robi Exp $
 //###########################################################################
 
 
@@ -418,12 +418,16 @@ public class EventDeclListView
   //# Interface java.awt.event.FocusListener
   public void focusGained(final FocusEvent event)
   {
-    setSelectionBackground(EditorColor.BACKGROUND_FOCUSSED);
+    if (!event.isTemporary()) {
+      setSelectionBackground(EditorColor.BACKGROUND_FOCUSSED);
+    }
   }
 
   public void focusLost(final FocusEvent event)
   {
-    setSelectionBackground(EditorColor.BACKGROUND_NOTFOCUSSED);
+    if (!event.isTemporary()) {
+      setSelectionBackground(EditorColor.BACKGROUND_NOTFOCUSSED);
+    }
   }
 
 

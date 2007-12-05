@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   ModuleContext
 //###########################################################################
-//# $Id: ModuleContext.java,v 1.3 2007-12-04 03:22:54 robi Exp $
+//# $Id: ModuleContext.java,v 1.4 2007-12-05 06:48:06 robi Exp $
 //###########################################################################
 
 
@@ -375,16 +375,13 @@ public class ModuleContext
         final IdentifiedProxy comp = (IdentifiedProxy) value;
         final IdentifierProxy ident = comp.getIdentifier();
         if (ident instanceof SimpleIdentifierProxy) {
-          final String name = ident.getName();
-          if (mComponentMap.containsKey(name)) {
-            mComponentMap = null;
-            list.removeModelObserver(this);
-          }
+          mComponentMap = null;
+          list.removeModelObserver(this);
         }
       }
       break;
     case ModelChangeEvent.STATE_CHANGED:
-      // Identifier and IdentifiedProxie objects fire STATE_CHANGED,
+      // Identifier and IdentifiedProxy objects fire STATE_CHANGED,
       // not NAME_CHANGED ...
       final Subject parent = source.getParent();
       if (source instanceof IdentifiedProxy &&

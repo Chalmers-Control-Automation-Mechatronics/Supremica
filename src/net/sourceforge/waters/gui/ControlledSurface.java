@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   ControlledSurface
 //###########################################################################
-//# $Id: ControlledSurface.java,v 1.146 2007-12-05 03:23:02 robi Exp $
+//# $Id: ControlledSurface.java,v 1.147 2007-12-05 06:48:06 robi Exp $
 //###########################################################################
 
 
@@ -139,6 +139,7 @@ public class ControlledSurface
     mNeedsHierarchyUpdate = false;
     mSizeMayHaveChanged = true;
 
+    mIsPermanentFocusOwner = false;
     addFocusListener(this);
     graph.addModelObserver(this);
     if (root != null) {
@@ -837,12 +838,18 @@ public class ControlledSurface
   //# Interface java.awt.event.FocusListener
   public void focusGained(final FocusEvent event)
   {
-    repaint();
+    if (!event.isTemporary()) {
+      mIsPermanentFocusOwner = true;
+      repaint();
+    }
   }
 
   public void focusLost(final FocusEvent event)
   {
-    repaint();
+    if (!event.isTemporary()) {
+      mIsPermanentFocusOwner = false;
+      repaint();
+    }
   }
 
 
@@ -1259,11 +1266,12 @@ public class ControlledSurface
     if (isFocused) {
       dragOver = mExternalDragStatus;
     }
-    final boolean hasfocus = isFocusOwner();
     return new RenderingInformation
       (showHandles, isFocused,
-       EditorColor.getColor(item, dragOver, selected, error, hasfocus),
-       EditorColor.getShadowColor(item, dragOver, selected, error, hasfocus),
+       EditorColor.getColor(item, dragOver, selected,
+                            error, mIsPermanentFocusOwner),
+       EditorColor.getShadowColor(item, dragOver, selected,
+                                  error, mIsPermanentFocusOwner),
        priority);
   }
 
@@ -4543,6 +4551,7 @@ public class ControlledSurface
    */
   private boolean mHasGroupNodes;
   private boolean mSizeMayHaveChanged;
+  private boolean mIsPermanentFocusOwner;
 
   private ToolController mController;
   private ToolController mSelectController;

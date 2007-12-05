@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   EditorEvents
 //###########################################################################
-//# $Id: EditorEvents.java,v 1.37 2007-12-04 03:22:54 robi Exp $
+//# $Id: EditorEvents.java,v 1.38 2007-12-05 06:48:06 robi Exp $
 //###########################################################################
 
 
@@ -188,12 +188,16 @@ public class EditorEvents
   //# Interface java.awt.event.FocusListener
   public void focusGained(final FocusEvent event)
   {
-    setSelectionBackground(EditorColor.BACKGROUND_FOCUSSED);
+    if (!event.isTemporary()) {
+      setSelectionBackground(EditorColor.BACKGROUND_FOCUSSED);
+    }
   }
 
   public void focusLost(final FocusEvent event)
   {
-    setSelectionBackground(EditorColor.BACKGROUND_NOTFOCUSSED);
+    if (!event.isTemporary()) {
+      setSelectionBackground(EditorColor.BACKGROUND_NOTFOCUSSED);
+    }
   }
 
 
