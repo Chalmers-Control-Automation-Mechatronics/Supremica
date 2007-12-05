@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   ControlledSurface
 //###########################################################################
-//# $Id: ControlledSurface.java,v 1.145 2007-12-04 03:22:54 robi Exp $
+//# $Id: ControlledSurface.java,v 1.146 2007-12-05 03:23:02 robi Exp $
 //###########################################################################
 
 
@@ -104,7 +104,8 @@ import org.supremica.properties.Config;
 
 public class ControlledSurface
   extends EditorSurface
-  implements SelectionOwner, Observer, ModelObserver, EmbedderObserver
+  implements SelectionOwner,
+             Observer, ModelObserver, EmbedderObserver, FocusListener
 {
   //#########################################################################
   //# Constructors
@@ -138,6 +139,7 @@ public class ControlledSurface
     mNeedsHierarchyUpdate = false;
     mSizeMayHaveChanged = true;
 
+    addFocusListener(this);
     graph.addModelObserver(this);
     if (root != null) {
       if (toolbar != null) {
@@ -832,6 +834,19 @@ public class ControlledSurface
 
 
   //#########################################################################
+  //# Interface java.awt.event.FocusListener
+  public void focusGained(final FocusEvent event)
+  {
+    repaint();
+  }
+
+  public void focusLost(final FocusEvent event)
+  {
+    repaint();
+  }
+
+
+  //#########################################################################
   //# Repainting
   protected void paintComponent(final Graphics graphics)
   {
@@ -1244,10 +1259,11 @@ public class ControlledSurface
     if (isFocused) {
       dragOver = mExternalDragStatus;
     }
+    final boolean hasfocus = isFocusOwner();
     return new RenderingInformation
       (showHandles, isFocused,
-       EditorColor.getColor(item, dragOver, selected, error),
-       EditorColor.getShadowColor(item, dragOver, selected, error),
+       EditorColor.getColor(item, dragOver, selected, error, hasfocus),
+       EditorColor.getShadowColor(item, dragOver, selected, error, hasfocus),
        priority);
   }
 
@@ -2574,8 +2590,8 @@ public class ControlledSurface
       final Rectangle rect = getDragRectangle();
       final MiscShape shape =
         new GeneralShape(rect,
-                         EditorColor.SELECTCOLOR,
-                         EditorColor.shadow(EditorColor.SELECTCOLOR));
+                         EditorColor.GRAPH_SELECTED_FOCUSSED,
+                         EditorColor.shadow(EditorColor.GRAPH_SELECTED_FOCUSSED));
       return Collections.singletonList(shape);
     }
 
@@ -3048,7 +3064,7 @@ public class ControlledSurface
         return Collections.emptyList();
       } else {
         final MiscShape shape =
-          new GeneralShape(mLine, EditorColor.SELECTCOLOR, null);
+          new GeneralShape(mLine, EditorColor.GRAPH_SELECTED_FOCUSSED, null);
         return Collections.singletonList(shape);
       }
     }
@@ -3173,7 +3189,7 @@ public class ControlledSurface
     {
       final Rectangle rect = getDragRectangle();
       final MiscShape shape =
-        new GeneralShape(rect, EditorColor.SELECTCOLOR, null);
+        new GeneralShape(rect, EditorColor.GRAPH_SELECTED_FOCUSSED, null);
       return Collections.singletonList(shape);
     }
 

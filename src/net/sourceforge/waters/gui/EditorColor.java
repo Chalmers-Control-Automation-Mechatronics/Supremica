@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   EditorEvents
 //###########################################################################
-//# $Id: EditorColor.java,v 1.27 2007-12-04 03:22:54 robi Exp $
+//# $Id: EditorColor.java,v 1.28 2007-12-05 03:23:02 robi Exp $
 //###########################################################################
 
 
@@ -59,13 +59,22 @@ public class EditorColor
   public static final Color ERRORCOLOR = Color.RED;
   public static final Color ERRORCOLOR_NODE = ERRORCOLOR.darker();
     
-  /** The color of selected objects. */
-  public static final Color SELECTCOLOR = Color.BLUE;
+  /**
+   * The color of selected objects in a graph with keyboard focus.
+   */
+  public static final Color GRAPH_SELECTED_FOCUSSED = Color.BLUE;
+  /**
+   * The color of selected objects in a graph without keyboard focus.
+   */
+  public static final Color GRAPH_SELECTED_NOTFOCUSSED =
+    new Color(64, 112, 128);
     
-  /** The color of objects when showing whether stuff can be dropped on them. */
+  /**
+   * The color of objects when showing whether stuff can be dropped on them.
+   */
   public static final Color CANDROPCOLOR = Color.GREEN.darker().darker();
   public static final Color CANTDROPCOLOR = Color.RED;
-    
+
   /** Invisible color. */
   public static final Color INVISIBLE = new Color(0,0,0,0);
 
@@ -81,6 +90,7 @@ public class EditorColor
    */
   public static final Color BACKGROUND_NOTFOCUSSED = new Color(232, 232, 232);
  
+
   /**
    * Returns a transparent variant of the supplied color. The
    * alpha-value is changed to SHADOWALPHA.
@@ -89,65 +99,69 @@ public class EditorColor
    */
   public static Color shadow(Color color)
   {
-    return new Color(color.getRed(), color.getGreen(), color.getBlue(), SHADOWALPHA);
+    return new Color(color.getRed(), color.getGreen(), color.getBlue(),
+                     SHADOWALPHA);
   }
     
   /**
    * Returns the appropriate color for painting this object.
    */
-  public static Color getColor(Proxy o, EditorSurface.DRAGOVERSTATUS dragOver, boolean selected,
-			       boolean error)
+  public static Color getColor(final Proxy o,
+                               final EditorSurface.DRAGOVERSTATUS dragOver,
+                               final boolean selected,
+			       final boolean error,
+                               final boolean hasfocus)
   {
     // In order of importance
-    if(dragOver != EditorSurface.DRAGOVERSTATUS.NOTDRAG)
-      {
-	if (dragOver == EditorSurface.DRAGOVERSTATUS.CANDROP)
-	  return CANDROPCOLOR;
-	else if(dragOver == EditorSurface.DRAGOVERSTATUS.CANTDROP)
-	  return CANTDROPCOLOR;
+    if (dragOver != EditorSurface.DRAGOVERSTATUS.NOTDRAG) {
+      if (dragOver == EditorSurface.DRAGOVERSTATUS.CANDROP) {
+        return CANDROPCOLOR;
+      } else if(dragOver == EditorSurface.DRAGOVERSTATUS.CANTDROP) {
+        return CANTDROPCOLOR;
       }
-    else if(error)
-      {
-	if(o instanceof SimpleNodeProxy)
-	  {
-	    // Slightly different color, to distinguish nodes from
-	    // nodegroups more clearly. Overkill?
-	    return ERRORCOLOR_NODE;
-	  }
+    } else if (error) {
+      if (o instanceof SimpleNodeProxy) {
+        // Slightly different color, to distinguish nodes from
+        // nodegroups more clearly. Overkill?
+        return ERRORCOLOR_NODE;
+      } else {
 	return ERRORCOLOR;
       }
-    else if(selected)
-      {
-	return SELECTCOLOR;
+    } else if (selected) {
+      if (hasfocus) {
+        return GRAPH_SELECTED_FOCUSSED;
+      } else {
+        return GRAPH_SELECTED_NOTFOCUSSED;
       }
-        
+    }
     // Defaults
-    if(o instanceof GroupNodeProxy)
-      {
-	return DEFAULTCOLOR_NODEGROUP;
-      }
-    else if(o instanceof LabelGeometryProxy)
-      {
-	return DEFAULTCOLOR_LABEL;
-      }
-    return DEFAULTCOLOR;
+    if (o instanceof GroupNodeProxy) {
+      return DEFAULTCOLOR_NODEGROUP;
+    } else if (o instanceof LabelGeometryProxy) {
+      return DEFAULTCOLOR_LABEL;
+    } else {
+      return DEFAULTCOLOR;
+    }
   }
     
   /**
    * Returns a lighter shade of the color of the object for drawing a "shadow".
    */
-  public static Color getShadowColor(Proxy o,
-				     EditorSurface.DRAGOVERSTATUS dragOver, 
-				     boolean selected, boolean error)
+  public static Color getShadowColor
+    (final Proxy o,
+     final EditorSurface.DRAGOVERSTATUS dragOver, 
+     final boolean selected,
+     final boolean error,
+     final boolean hasfocus)
   {
-    // Overrides, if not selected and not error (then the color is normal...)
-    if(!selected && !error && o instanceof GroupNodeProxy) {
+    final Color color = getColor(o, dragOver, selected, error, hasfocus);
+    final Color shade = shadow(color);
+    if (!selected && !error && o instanceof GroupNodeProxy) {
+      // If not selected and not error (then the color is normal ...)
       // Unfortunately, the light gray color gives a too weak shadow!
-      return shadow(getColor(o, dragOver, selected, error).
-		    darker().darker().darker());
+      return shade.darker().darker().darker();
     } else {
-      // Return the shadowed variant of the ordinary color of this object
-      return shadow(getColor(o, dragOver, selected, error));
+      return shade;
     }
   }
 }

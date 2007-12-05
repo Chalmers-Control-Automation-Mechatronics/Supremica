@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui.renderer
 //# CLASS:   DefaultRenderable
 //###########################################################################
-//# $Id: DefaultRenderable.java,v 1.2 2007-11-07 06:16:04 robi Exp $
+//# $Id: DefaultRenderable.java,v 1.3 2007-12-05 03:23:02 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.gui.renderer;
@@ -52,9 +52,9 @@ public class DefaultRenderable
     return new RenderingInformation
       (false, false,
        EditorColor.getColor
-         (proxy, EditorSurface.DRAGOVERSTATUS.NOTDRAG, false, false),
+         (proxy, EditorSurface.DRAGOVERSTATUS.NOTDRAG, false, false, true),
        EditorColor.getShadowColor
-         (proxy, EditorSurface.DRAGOVERSTATUS.NOTDRAG, false, false),
+         (proxy, EditorSurface.DRAGOVERSTATUS.NOTDRAG, false, false, true),
        getPriority(proxy));
   }
 

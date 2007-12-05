@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui.language
 //# CLASS:   ProxyNamer
 //###########################################################################
-//# $Id: ProxyNamer.java,v 1.2 2007-12-04 03:22:55 robi Exp $
+//# $Id: ProxyNamer.java,v 1.3 2007-12-05 03:23:02 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.gui.language;
@@ -29,6 +29,7 @@ import net.sourceforge.waters.model.module.IdentifierProxy;
 import net.sourceforge.waters.model.module.IndexedIdentifierProxy;
 import net.sourceforge.waters.model.module.InstanceProxy;
 import net.sourceforge.waters.model.module.LabelBlockProxy;
+import net.sourceforge.waters.model.module.LabelGeometryProxy;
 import net.sourceforge.waters.model.module.NodeProxy;
 import net.sourceforge.waters.model.module.ParameterBindingProxy;
 import net.sourceforge.waters.model.module.SimpleComponentProxy;
@@ -138,6 +139,7 @@ public class ProxyNamer {
     createEntry(IdentifierProxy.class, "Label");
     createEntry(IndexedIdentifierProxy.class, "Label", IdentifierProxy.class);
     createEntry(InstanceProxy.class, "Instance", AutomatonProxy.class);
+    createEntry(LabelGeometryProxy.class, "Label", SimpleNodeProxy.class);
     createEntry(LabelBlockProxy.class, "Labels", "Labels");
     createEntry(NodeProxy.class, "Node", GraphProxy.class);
     createEntry(ParameterBindingProxy.class, "Binding");

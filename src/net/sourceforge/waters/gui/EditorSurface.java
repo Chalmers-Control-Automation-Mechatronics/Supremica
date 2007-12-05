@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   EditorSurface
 //###########################################################################
-//# $Id: EditorSurface.java,v 1.83 2007-11-07 06:16:04 robi Exp $
+//# $Id: EditorSurface.java,v 1.84 2007-12-05 03:23:02 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.gui;
@@ -72,15 +72,19 @@ public class EditorSurface
     }
     
     
-    //##########################################################################
-    //#
-    public RenderingInformation getRenderingInformation(Proxy o)
-    {
-        return new RenderingInformation(false, false,
-            EditorColor.getColor(o, DRAGOVERSTATUS.NOTDRAG, false, false),
-            EditorColor.getShadowColor(o, DRAGOVERSTATUS.NOTDRAG, false, false),
-            getPriority(o));
-    }
+  //##########################################################################
+  //# Interface net.sourceforge.waters.gui.Renderable
+  public RenderingInformation getRenderingInformation(Proxy o)
+  {
+    final boolean hasfocus = isFocusOwner();
+    return new RenderingInformation
+      (false, false,
+       EditorColor.getColor(o, DRAGOVERSTATUS.NOTDRAG,
+                            false, false, hasfocus),
+       EditorColor.getShadowColor(o, DRAGOVERSTATUS.NOTDRAG,
+                                  false, false, hasfocus),
+       getPriority(o));
+  }
     
     protected int getPriority(Proxy o)
     {
