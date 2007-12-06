@@ -27,17 +27,13 @@ import org.supremica.external.processeditor.xgraph.Selection;
 
 import org.supremica.external.processeditor.processgraph.opcell.OperationCell;
 import org.supremica.external.processeditor.processgraph.resrccell.ResourceCell;
-import org.supremica.external.processeditor.tools.db.DBInterface;
+
 
 import org.supremica.manufacturingTables.xsd.processeditor.ObjectFactory;
 import org.supremica.manufacturingTables.xsd.processeditor.ROP;
 import org.supremica.manufacturingTables.xsd.processeditor.RelationType;
 
 import org.supremica.external.processeditor.xml.Converter;
-//import org.supremica.external.relationExtraction.Algorithms.*;
-import org.supremica.external.relationExtraction.Gui.*;
-
-import org.supremica.external.processeditor.xgraph.*;
 
 import org.supremica.external.processeditor.tools.db.DBInterface;
 import org.supremica.external.processeditor.tools.dop2efa.gui.DOPtoEFAInterface;
@@ -588,7 +584,19 @@ public class SOCGraphContainer
     public void openDBConnection(){
     	DBInterface dbInterface = new DBInterface();
     	dbInterface.setGraphContainer(this);
+    	setIconToFrame(dbInterface);
     }
+    
+    /**
+     * Function to set SOC icons to external frames opend by SOC.
+     * @param frame
+     */
+    private void setIconToFrame(JFrame frame){
+    	frame.setIconImage(Toolkit.getDefaultToolkit().
+    			  getImage(SOCGraphContainer.class.getClass().
+    				   getResource("/icons/processeditor/icon.gif")));	
+    }
+    
     
     /**
      * Creates a automata model and generates a supervisor to that model.
@@ -752,6 +760,7 @@ public class SOCGraphContainer
     	if(dopToEfaFrame == null){
     		dopToEfaFrame = new DOPtoEFAInterface();
     		dopToEfaFrame.setGraphContainer(this);
+    		setIconToFrame(dopToEfaFrame);
     	}
     	
     	//show frame

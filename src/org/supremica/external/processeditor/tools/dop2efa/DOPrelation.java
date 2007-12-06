@@ -157,9 +157,9 @@ public class DOPrelation
 					Module m;
 					String var_name;
 					
-					/*--------------------*/
-					/* Parallel node code */
-					/*--------------------*/
+					//--------------------//
+					// Parallel node code //
+					//--------------------//
 					
 					m = efa.getModule();
 					var_name = addWaitForNodeToFinish(myActivityList,(Relation)o,efa);
@@ -168,9 +168,9 @@ public class DOPrelation
 					parallel((Relation)o,var_name,m);
 				}else if(RelationType.ARBITRARY.equals(((Relation)o).getType())){
 					
-					/*--------------------*/
-					/* Arbitrary node code*/
-					/*--------------------*/
+					//--------------------//
+					// Arbitrary node code//
+					//--------------------//
 					
 					Module m = efa.getModule();
 					String var_name;
@@ -178,11 +178,13 @@ public class DOPrelation
 					var_name = addWaitForNodeToFinish(myActivityList,(Relation)o,efa);
 					
 					//build arbitrary
-					arbitrary((Relation)o,var_name,m);
+					arbitrary( (Relation)o ,var_name ,m );
 					
 				}else{
-					/* Unknown node type */
-					System.err.println("Unknown RelationType " + ((Relation)o).getType());
+					//Unknown node type
+					System.err.println("Unknown RelationType "+
+										((Relation)o).getType()+
+										" in sequence");
 				}
 				
 				
@@ -243,17 +245,16 @@ public class DOPrelation
 		
 		i = activityList.iterator();
 		
-		/* start build EFA
-		 * go down in tree structure
-		 * and handle activities and relations
-		 */
+		// start build EFA
+		// go down in tree structure
+		// and handle activities and relations
 		while(i.hasNext() || o != null){
 			
 			if(o == null){
 				o = i.next();
 			}
 			
-			/* ------------ activity code -------------- */
+			// ------------ activity code -------------- //
 			while(o instanceof Activity){
 				
 				myActivityList.add((Activity)o);
@@ -265,19 +266,19 @@ public class DOPrelation
 					o = i.next();
 				}
 			}
-			/* ------------ end activity code ---------------- */
+			// ------------ end activity code ---------------- //
 			
 			
 			
-			/* --------------- relation code ----------------- */
+			// --------------- relation code ----------------- //
 			while(o instanceof Relation){
 				
 				//take care of different nodes here
 				if(RelationType.SEQUENCE.equals(((Relation)o).getType())){
 					
-					/*--------------------*/
-					/* Sequence node code */
-					/*--------------------*/
+					//--------------------//
+					// Sequence node code //
+					//--------------------//
 					
 					nativeAlternative(myActivityList,from,to,efa);
 					myActivityList.clear();
@@ -286,17 +287,17 @@ public class DOPrelation
 					
 				}else if(RelationType.ALTERNATIVE.equals(((Relation)o).getType())){
 					
-					/*-----------------------*/
-					/* Alternative node code */
-					/*-----------------------*/
+					//-----------------------//
+					// Alternative node code //
+					//-----------------------//
 					//recursion
 					alternative((Relation)o, from, to, efa);
 					
 				}else if(RelationType.PARALLEL.equals(((Relation)o).getType())){
 					
-					/*--------------------*/
-					/* Parallel node code */
-					/*--------------------*/
+					//--------------------//
+					// Parallel node code //
+					//--------------------//
 					
 					Module m = efa.getModule();
 					String var_name;
@@ -319,9 +320,9 @@ public class DOPrelation
 					parallel((Relation)o,var_name,m);
 				}else if(RelationType.ARBITRARY.equals(((Relation)o).getType())){
 					
-					/*---------------------------*/
-					/* Arbitrary order node code */
-					/*---------------------------*/
+					//---------------------------//
+					// Arbitrary order node code //
+					//---------------------------//
 					
 					Module m = efa.getModule();
 					String var_name;
@@ -342,7 +343,7 @@ public class DOPrelation
 					//build arbitrary
 					arbitrary((Relation)o,var_name,m);
 				}else{
-					/* Unknown node type */
+					// Unknown node type //
 					System.err.println("Unknown RelationType " + ((Relation)o).getType());
 				}
 				
@@ -354,11 +355,11 @@ public class DOPrelation
 					o = i.next();
 				}
 			}
-			/* --------------- end  relation code ------------ */
+			// --------------- end  relation code ------------ //
 			
 		}
 		
-		/* build alternative from list */
+		// build alternative from list //
 		if(!myActivityList.isEmpty()){
 			nativeAlternative(myActivityList,from,to,efa);
 		}
@@ -398,7 +399,7 @@ public class DOPrelation
 		String stopGuard = "";
 		String stopAction = "";
 		
-		/* node code */
+		// node code //
 		if(RelationType.PARALLEL.equals(relation.getType())){
 			var_name = m.newParrallelNodeInteger(numberOfTracks + 1);
 		}else if(RelationType.ARBITRARY.equals(relation.getType())){
@@ -416,7 +417,7 @@ public class DOPrelation
 		stopGuard = var_name + "==" + (numberOfTracks + 1);
 		stopAction = var_name + "=0;";
 		
-		/* set start conditions */
+		// set start conditions //
 		onlystart = factory.createAttribute();
 		onlystart.setType( ONLY_STA );
 		
@@ -436,10 +437,10 @@ public class DOPrelation
 		start.getProperties().getAttribute().add(startaction);
 		
 		start.setOperation(var_name);
-		/* end set start conditions */
+		// end set start conditions //
 		
 		
-		/* Set stop conditions */
+		// Set stop conditions //
 		onlystop = factory.createAttribute();
 		onlystop.setType( ONLY_STO );
 		
@@ -459,16 +460,12 @@ public class DOPrelation
 		stop.getProperties().getAttribute().add(stopaction);
 		
 		stop.setOperation(var_name);
-		/* End stop conditions */
+		// End stop conditions //
 		
-		/* 
-		 * add Activity who starts node
-		 */
+		//add Activity who starts node
 		activityList.add(start);
 		
-		/* 
-		 * add Activity who wait for node to finish
-		 */
+		//add Activity who wait for node to finish
 		activityList.add(stop);
 		
 		//return the variable name assigned to this node
@@ -538,9 +535,6 @@ public class DOPrelation
 			tmp.addState(LAST_STATE);
 			
 			if(activityRelations[i] instanceof Relation){
-				String start;
-				String stop;
-				
 				//---------------------------//
 				// Relation code             //
 				//---------------------------//

@@ -235,7 +235,7 @@ public class DOPtoEFA
 		//Last state marked
 		main_efa.addState(endState,true,false);
 		
-		/* Build sequence in module */
+		// Build sequence in module
 		sequence(main_sequence,startState,endState,main_efa);
 		
 		//return module

@@ -3,8 +3,6 @@ package org.supremica.external.processeditor;
 import java.awt.*;
 import javax.swing.*;
 
-import org.supremica.gui.Supremica;
-
 /**
  * SOCFrame is the SOC program main frame. 
  *
@@ -39,7 +37,7 @@ public class SOCFrame extends JFrame  {
     	
 	
     	this.setIconImage(Toolkit.getDefaultToolkit().
-			  getImage(Supremica.class.getClass().
+			  getImage(SOCFrame.class.getClass().
 				   getResource("/icons/processeditor/icon.gif")));	
 
     	this.setJMenuBar(table.getMenuBar());		

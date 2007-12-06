@@ -10,7 +10,7 @@ import org.supremica.manufacturingTables.xsd.processeditor.OperationReferenceTyp
 import org.supremica.manufacturingTables.xsd.processeditor.Precondition;
 import org.supremica.manufacturingTables.xsd.processeditor.Properties;
 
-/*
+/**
  * Native function code. Base functions for DOPrelation class
  */
 public class DOPnative {
@@ -83,8 +83,11 @@ public class DOPnative {
 		Properties properties = activity.getProperties();
 		if(properties != null){
 			List<Attribute> attributeList = properties.getAttribute();
-
+			
+			//--------------------------------------------------------
 			//	Attributes
+			//--------------------------------------------------------
+			
 			for(Attribute att : attributeList){
 				value = att.getAttributeValue();
 				if(att.getType() != null){
@@ -136,7 +139,20 @@ public class DOPnative {
 			}// end for
 		}
 
-
+		//------------------------------------------------------------
+		//		Predecessors
+		//------------------------------------------------------------
+		
+		if(activity.getPrecondition() != null){
+			if(!activityPreconList.contains(activity)){
+				activityPreconList.add(activity);
+			}
+		}
+		
+		//------------------------------------------------------------
+		//		Build in efa
+		//------------------------------------------------------------
+		
 		//only start event
 		if(onlystart){
 			efa.addTransition(from, to, 
@@ -182,14 +198,6 @@ public class DOPnative {
 					      stop.getEvent(),
 					      stop.getGuard(),
 					      stop.getAction());
-
-
-		//Predecessors
-		if(activity.getPrecondition() != null){
-			if(!activityPreconList.contains(activity)){
-				activityPreconList.add(activity);
-			}
-		}
 	}
 
 	/**

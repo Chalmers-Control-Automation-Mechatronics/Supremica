@@ -30,9 +30,6 @@ public class DOPtoEFAInterface
 		this.setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
 		
 		this.setTitle("DOP to EFA");
-		this.setIconImage(Toolkit.getDefaultToolkit().
-				getImage(DOPtoEFAInterface.class.getClass().
-						getResource("/icons/processeditor/icon.gif")));
 		
         //Add contents to the window.
         cPanel = new ConvertPanel();
