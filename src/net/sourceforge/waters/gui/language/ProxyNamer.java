@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui.language
 //# CLASS:   ProxyNamer
 //###########################################################################
-//# $Id: ProxyNamer.java,v 1.3 2007-12-05 03:23:02 robi Exp $
+//# $Id: ProxyNamer.java,v 1.4 2007-12-06 08:41:20 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.gui.language;
@@ -125,31 +125,42 @@ public class ProxyNamer {
     mMap = new HashMap<Class<? extends Proxy>,NameEntry>(32);
     createEntry(AutomatonProxy.class, "Component");
     createEntry(AliasProxy.class, "Alias", "Aliases");
-    createEntry(ConstantAliasProxy.class, "Named Constant", AliasProxy.class);
-    createEntry(EdgeProxy.class, "Edge", GraphProxy.class);
+    createEntry(ConstantAliasProxy.class, "Named Constant",
+                AliasProxy.class, false);
+    createEntry(EdgeProxy.class, "Edge",
+                NodeProxy.class, true);
     createEntry(EventAliasProxy.class, "Event Alias", "Event Aliases",
-                AliasProxy.class);
+                AliasProxy.class, false);
     createEntry(EventDeclProxy.class, "Event");
     createEntry(ForeachComponentProxy.class, "Foreach Block",
-                AutomatonProxy.class);
+                AutomatonProxy.class, false);
     createEntry(GraphProxy.class, "Graph", "Graph");
     createEntry(GuardActionBlockProxy.class, "Guard/Action Block",
-                LabelBlockProxy.class);
-    createEntry(GroupNodeProxy.class, "Group Node", NodeProxy.class);
-    createEntry(IdentifierProxy.class, "Label");
-    createEntry(IndexedIdentifierProxy.class, "Label", IdentifierProxy.class);
-    createEntry(InstanceProxy.class, "Instance", AutomatonProxy.class);
-    createEntry(LabelGeometryProxy.class, "Label", SimpleNodeProxy.class);
-    createEntry(LabelBlockProxy.class, "Labels", "Labels");
-    createEntry(NodeProxy.class, "Node", GraphProxy.class);
+                EdgeProxy.class, true);
+    createEntry(GroupNodeProxy.class, "Group Node",
+                NodeProxy.class, false);
+    createEntry(IdentifierProxy.class, "Label",
+                LabelBlockProxy.class, true);
+    createEntry(IndexedIdentifierProxy.class, "Label",
+                IdentifierProxy.class, false);
+    createEntry(InstanceProxy.class, "Instance",
+                AutomatonProxy.class, false);
+    createEntry(LabelGeometryProxy.class, "Label",
+                SimpleNodeProxy.class, true);
+    createEntry(LabelBlockProxy.class, "Labels", "Labels",
+                EdgeProxy.class, true);
+    createEntry(NodeProxy.class, "Node");
     createEntry(ParameterBindingProxy.class, "Binding");
     createEntry(SimpleComponentProxy.class, "Automaton", "Automata",
-                AutomatonProxy.class);
-    createEntry(SimpleIdentifierProxy.class, "Label", IdentifierProxy.class);
-    createEntry(SimpleNodeProxy.class, "Node", NodeProxy.class);
+                AutomatonProxy.class, false);
+    createEntry(SimpleIdentifierProxy.class, "Label",
+                IdentifierProxy.class, false);
+    createEntry(SimpleNodeProxy.class, "Node",
+                NodeProxy.class, false);
     createEntry(VariableComponentProxy.class, "Variable",
-                AutomatonProxy.class);
-    createEntry(VariableMarkingProxy.class, "Marking");
+                AutomatonProxy.class, false);
+    createEntry(VariableMarkingProxy.class, "Marking",
+                VariableComponentProxy.class, true);
   }
 
 
@@ -158,39 +169,43 @@ public class ProxyNamer {
   private void createEntry(final Class<? extends Proxy> iface,
                            final String singular)
   {
-    createEntry(iface, singular, (Class<? extends Proxy>) null);
+    createEntry(iface, singular, (Class<? extends Proxy>) null, false);
   }
 
   private void createEntry(final Class<? extends Proxy> iface,
                            final String singular,
                            final String plural)
   {
-    createEntry(iface, singular, plural, null);
+    createEntry(iface, singular, plural, null, false);
   }
 
   private void createEntry(final Class<? extends Proxy> iface,
                            final String singular,
-                           final Class<? extends Proxy> parent)
+                           final Class<? extends Proxy> parent,
+                           final boolean constituent)
   {
-    createEntry(iface, singular, singular + "s", parent);
-  }
-
-  private void createEntry(final Class<? extends Proxy> iface,
-                           final String singular,
-                           final String plural,
-                           final Class<? extends Proxy> parent)
-  {
-    final boolean vowel = hasInitialVowel(singular);
-    createEntry(iface, singular, plural, parent, vowel);
+    createEntry(iface, singular, singular + "s", parent, constituent);
   }
 
   private void createEntry(final Class<? extends Proxy> iface,
                            final String singular,
                            final String plural,
                            final Class<? extends Proxy> parent,
-                           final boolean vowel)
+                           final boolean constituent)
   {
-    final NameEntry entry = new NameEntry(singular, plural, parent, vowel);
+    final boolean vowel = hasInitialVowel(singular);
+    createEntry(iface, singular, plural, vowel, parent, constituent);
+  }
+
+  private void createEntry(final Class<? extends Proxy> iface,
+                           final String singular,
+                           final String plural,
+                           final boolean vowel,
+                           final Class<? extends Proxy> parent,
+                           final boolean constituent)
+  {
+    final NameEntry entry =
+      new NameEntry(singular, plural, vowel, parent, constituent);
     mMap.put(iface, entry);
   }
 
@@ -208,19 +223,44 @@ public class ProxyNamer {
     case 0:
       return null;
     case 1:
-      final Proxy proxy = collection.iterator().next();
-      return getNameSingular(proxy);
+      final Proxy first = collection.iterator().next();
+      return getNameSingular(first);
     default:
-      final Class<? extends Proxy> iface = getLeastCommonAncestor(collection);
-      final NameEntry entry = mMap.get(iface);
-      return entry == null ? null : entry.getPlural();
+      final int size = collection.size();
+      final Map<Class<? extends Proxy>,Integer> map =
+        new HashMap<Class<? extends Proxy>,Integer>(size);
+      for (final Proxy proxy : collection) {
+        final Class<? extends Proxy> iface = proxy.getProxyInterface();
+        final Integer count = map.get(iface);
+        if (count == null) {
+          map.put(iface, 1);
+        } else {
+          map.put(iface, count + 1);
+        }
+      }
+      int count = 0;
+      Class<? extends Proxy> iface = null;
+      for (final Map.Entry<Class<? extends Proxy>,Integer> entry :
+             map.entrySet()) {
+        final Class<? extends Proxy> key = entry.getKey();
+        iface = getLeastCommonAncestor(iface, key);
+        if (isConstituentOf(key, iface)) {
+          // leave count unchanged
+        } else if (isConstituentOf(iface, key)) {
+          count = entry.getValue();
+        } else {
+          count += entry.getValue();
+        }
+      }
+      final NameEntry entry = getEntry(iface);
+      return count == 1 ? entry.getSingular() : entry.getPlural();
     }      
   }
 
   private String getNameUnqualified(final Proxy proxy)
   {
     final Class<? extends Proxy> iface = proxy.getProxyInterface();
-    final NameEntry entry = mMap.get(iface);
+    final NameEntry entry = getEntry(iface);
     final String name = entry.getSingular().toLowerCase();
     final String article = entry.hasInitialVowel() ? "an " : "a ";
     return article + name;
@@ -229,14 +269,14 @@ public class ProxyNamer {
   private String getNameSingular(final Proxy proxy)
   {
     final Class<? extends Proxy> iface = proxy.getProxyInterface();
-    final NameEntry entry = mMap.get(iface);
+    final NameEntry entry = getEntry(iface);
     return entry.getSingular();
   }
 
   private String getNamePlural(final Proxy proxy)
   {
     final Class<? extends Proxy> iface = proxy.getProxyInterface();
-    final NameEntry entry = mMap.get(iface);
+    final NameEntry entry = getEntry(iface);
     return entry.getPlural();
   }
 
@@ -244,23 +284,13 @@ public class ProxyNamer {
   //#########################################################################
   //# Auxiliary Methods
   private Class<? extends Proxy> getLeastCommonAncestor
-    (final Collection<? extends Proxy> collection)
-  {
-    final Iterator<? extends Proxy> iter = collection.iterator();
-    final Proxy first = iter.next();
-    Class<? extends Proxy> result = first.getProxyInterface();
-    while (iter.hasNext() && result != null) {
-      final Proxy next = iter.next();
-      final Class<? extends Proxy> iface = next.getProxyInterface();
-      result = getLeastCommonAncestor(result, iface);
-    }
-    return result;
-  }
-
-  private Class<? extends Proxy> getLeastCommonAncestor
     (final Class<? extends Proxy> iface1, final Class<? extends Proxy> iface2)
   {
-    if (isAncestor(iface1, iface2)) {
+    if (iface1 == null) {
+      return iface2;
+    } else if (iface2 == null) {
+      return iface1;
+    } else if (isAncestor(iface1, iface2)) {
       return iface1;
     } else if (isAncestor(iface2, iface1)) {
       return iface2;
@@ -286,11 +316,30 @@ public class ProxyNamer {
     return false;
   }
 
+  private boolean isConstituentOf(Class<? extends Proxy> item,
+                                  final Class<? extends Proxy> ancestor)
+  {
+    while (item != ancestor) {
+      final NameEntry entry = getEntry(item);
+      if (!entry.isConstituent()) {
+        return false;
+      }
+      item = entry.getParent();
+    }
+    return true;
+  }
+
   private Class<? extends Proxy> getParent(final Class<? extends Proxy> iface)
+  {
+    final NameEntry entry = getEntry(iface);
+    return entry.getParent();
+  }
+
+  private NameEntry getEntry(final Class<? extends Proxy> iface)
   {
     final NameEntry entry = mMap.get(iface);
     if (entry != null) {
-      return entry.getParent();
+      return entry;
     } else {
       throw new IllegalArgumentException
         ("ProxyNamer does not support class " + iface.getName() + "!");
@@ -315,13 +364,15 @@ public class ProxyNamer {
     //# Constructor
     private NameEntry(final String singular,
                       final String plural,
+                      final boolean vowel,
                       final Class<? extends Proxy> parent,
-                      final boolean vowel)
+                      final boolean constituent)
     {
       mSingular = singular;
       mPlural = plural;
-      mParent = parent;
       mHasInitialVowel = vowel;
+      mParent = parent;
+      mIsConstituent = constituent;
     }
 
     //#######################################################################
@@ -336,22 +387,28 @@ public class ProxyNamer {
       return mPlural;
     }
 
+    private boolean hasInitialVowel()
+    {
+      return mHasInitialVowel;
+    }
+
     private Class<? extends Proxy> getParent()
     {
       return mParent;
     }
 
-    private boolean hasInitialVowel()
+    private boolean isConstituent()
     {
-      return mHasInitialVowel;
+      return mIsConstituent;
     }
 
     //#######################################################################
     //# Data Members
     private final String mSingular;
     private final String mPlural;
-    private final Class<? extends Proxy> mParent;
     private final boolean mHasInitialVowel;
+    private final Class<? extends Proxy> mParent;
+    private final boolean mIsConstituent;
   }
 
 

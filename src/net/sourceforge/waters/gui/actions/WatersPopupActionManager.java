@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.gui.ide.actions
 //# CLASS:   WatersPopupActionManager
 //###########################################################################
-//# $Id: WatersPopupActionManager.java,v 1.2 2007-12-04 03:22:54 robi Exp $
+//# $Id: WatersPopupActionManager.java,v 1.3 2007-12-06 08:41:20 robi Exp $
 //###########################################################################
 
 
@@ -89,6 +89,12 @@ public class WatersPopupActionManager
   public IDEAction getEdgeFlipAction(final Proxy arg)
   {
     return new EditEdgeFlipAction(mIDE, arg);
+  }
+
+  public IDEAction getGraphLayoutAction()
+  {
+    final WatersActionManager master = mIDE.getActions();
+    return master.getAction(GraphLayoutAction.class);
   }
 
   public IDEAction getInsertBlockedEventListAction(final Point point)

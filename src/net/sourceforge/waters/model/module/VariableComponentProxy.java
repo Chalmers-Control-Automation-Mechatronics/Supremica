@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.module
 //# CLASS:   VariableComponentProxy
 //###########################################################################
-//# $Id: VariableComponentProxy.java,v 1.2 2007-12-04 03:22:55 robi Exp $
+//# $Id: VariableComponentProxy.java,v 1.3 2007-12-06 08:41:20 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.module;
@@ -35,6 +35,7 @@ import java.util.List;
  *
  * @author Robi Malik
  */
+// @short variable
 
 public interface VariableComponentProxy extends ComponentProxy {
 

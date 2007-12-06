@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui.command
 //# CLASS:   UpdateCommand
 //###########################################################################
-//# $Id: UpdateCommand.java,v 1.2 2007-12-04 03:22:54 robi Exp $
+//# $Id: UpdateCommand.java,v 1.3 2007-12-06 08:41:20 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.gui.command;
@@ -93,10 +93,12 @@ public class UpdateCommand
       all.addAll(added);
       all.addAll(removed);
       final String named = ProxyNamer.getCollectionClassName(all);
+      final String suffix =
+        added.isEmpty() && removed.isEmpty() ? "Movement" : "Rearrangement";
       if (named != null) {
-        setName(named + " Rearrangement");
+        setName(named + ' ' + suffix);
       } else {
-        setName("Rearrangement");
+        setName(suffix);
       }
     }
   }

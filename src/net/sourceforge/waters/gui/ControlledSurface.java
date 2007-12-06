@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   ControlledSurface
 //###########################################################################
-//# $Id: ControlledSurface.java,v 1.147 2007-12-05 06:48:06 robi Exp $
+//# $Id: ControlledSurface.java,v 1.148 2007-12-06 08:41:20 robi Exp $
 //###########################################################################
 
 
@@ -1169,7 +1169,7 @@ public class ControlledSurface
     if (mSecondaryGraph == null) {
       return item;
     } else {
-      return (ProxySubject) mSecondaryGraph.getOriginal(item);
+      return mSecondaryGraph.getOriginal(item);
     }
   }
 
@@ -2378,17 +2378,6 @@ public class ControlledSurface
       return Collections.emptyList();
     }
 
-    /**
-     * Gets the descriptive text used when creating a command when the
-     * drag is committed.
-     * @return  The command name, or <CODE>null</CODE> to let the
-     *          command choose its own name.
-     */
-    String getCommandDescription()
-    {
-      return null;
-    }
-
     //#######################################################################
     //# Data Members
     /**
@@ -2464,8 +2453,7 @@ public class ControlledSurface
 
     void commitSecondaryGraph()
     {
-      final String description = getCommandDescription();
-      ControlledSurface.this.commitSecondaryGraph(description, true, true);
+      ControlledSurface.this.commitSecondaryGraph(null, true, true);
     }
 
     //#######################################################################
@@ -2786,13 +2774,6 @@ public class ControlledSurface
         doReplaceLabelSelection(mClickedObject);
       }
       mMoveVisitor = null;
-    }
-
-    //#######################################################################
-    //# Rendering
-    String getCommandDescription()
-    {
-      return mMoveVisitor.getCommandDescription();
     }
 
     //#######################################################################
@@ -3130,13 +3111,6 @@ public class ControlledSurface
     }
 
     //#######################################################################
-    //# Rendering
-    String getCommandDescription()
-    {
-      return "Initial Arrow Movement";
-    }
-
-    //#######################################################################
     //# Auxiliary Methods
     private SimpleNodeSubject getNodeCopy()
     {
@@ -3199,13 +3173,6 @@ public class ControlledSurface
       final MiscShape shape =
         new GeneralShape(rect, EditorColor.GRAPH_SELECTED_FOCUSSED, null);
       return Collections.singletonList(shape);
-    }
-
-    //#######################################################################
-    //# Rendering
-    String getCommandDescription()
-    {
-      return "Group Node Creation";
     }
 
   }
@@ -3352,13 +3319,6 @@ public class ControlledSurface
       } else {
         return false;
       }
-    }
-
-    //#######################################################################
-    //# Rendering
-    String getCommandDescription()
-    {
-      return "Group Node Reshaping";
     }
 
     //#######################################################################
@@ -3548,19 +3508,6 @@ public class ControlledSurface
     }
 
     //#######################################################################
-    //# Rendering
-    String getCommandDescription()
-    {
-      if (mSource != null) {
-        return "Edge Creation";
-      } else if (mIsSource) {
-        return "Edge Source Change";
-      } else {
-        return "Edge Target Change";
-      }
-    }
-
-    //#######################################################################
     //# Auxiliary Methods
     private void createCopiedEdge()
     {
@@ -3692,42 +3639,6 @@ public class ControlledSurface
       }
     }
 
-    private String getCommandDescription()
-    {
-      boolean first = true;
-      Class<? extends Proxy> guess = null;
-      for (final Class<? extends Proxy> iface : mMovedTypes) {
-        if (first) {
-          guess = iface;
-          first = false;
-        } else if (guess == iface) {
-          continue;
-        } else if (NodeProxy.class.isAssignableFrom(iface) &&
-                   NodeProxy.class.isAssignableFrom(guess)) {
-          guess = NodeProxy.class;
-        } else {
-          guess = null;
-          break;
-        }
-      }
-      if (guess == null) {
-        return "Movement";
-      } else if (guess == EdgeProxy.class) {
-        return "Edge Reshaping";
-      } else if (guess == GroupNodeProxy.class) {
-        return "Group Node Movement";
-      } else if (NodeProxy.class.isAssignableFrom(guess)) {
-        return "Node Movement";
-      } else if (guess == LabelGeometryProxy.class) {
-        return "Node Label Movement";
-      } else if (guess == LabelBlockProxy.class) {
-        return "Event Label Movement";
-      } else if (guess == GuardActionBlockProxy.class) {
-        return "Guard/Action Block Movement";
-      } else {
-        return "Movement";
-      }
-    }
 
     //#######################################################################
     //# Interface net.sourceforge.waters.model.module.ModuleProxyVisitor

@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   EditorGraph
 //###########################################################################
-//# $Id: EditorGraph.java,v 1.25 2007-12-04 03:22:54 robi Exp $
+//# $Id: EditorGraph.java,v 1.26 2007-12-06 08:41:20 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.gui;
@@ -23,17 +23,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import net.sourceforge.waters.gui.command.AbstractEditCommand;
 import net.sourceforge.waters.gui.command.Command;
 import net.sourceforge.waters.gui.command.CompoundCommand;
 import net.sourceforge.waters.gui.command.DeleteCommand;
+import net.sourceforge.waters.gui.command.EditCommand;
 import net.sourceforge.waters.gui.command.InsertCommand;
-import net.sourceforge.waters.gui.command.MoveEdgeCommand;
-import net.sourceforge.waters.gui.command.MoveGroupNodeCommand;
-import net.sourceforge.waters.gui.command.MoveGuardActionBlockCommand;
-import net.sourceforge.waters.gui.command.MoveLabelBlockCommand;
-import net.sourceforge.waters.gui.command.MoveLabelGeometryCommand;
-import net.sourceforge.waters.gui.command.MoveSimpleNodeCommand;
-import net.sourceforge.waters.gui.command.RedirectEdgeCommand;
+import net.sourceforge.waters.gui.command.MoveCommand;
 import net.sourceforge.waters.gui.command.UpdateCommand;
 import net.sourceforge.waters.gui.renderer.GeometryTools;
 import net.sourceforge.waters.gui.renderer.LabelBlockProxyShape;
@@ -43,7 +39,6 @@ import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.base.ProxyTools;
 import net.sourceforge.waters.model.base.ProxyVisitor;
 import net.sourceforge.waters.model.base.VisitorException;
-import net.sourceforge.waters.model.base.WatersRuntimeException;
 import net.sourceforge.waters.model.module.AbstractModuleProxyVisitor;
 import net.sourceforge.waters.model.module.EdgeProxy;
 import net.sourceforge.waters.model.module.GraphProxy;
@@ -74,6 +69,7 @@ import net.sourceforge.waters.subject.module.GuardActionBlockSubject;
 import net.sourceforge.waters.subject.module.LabelBlockSubject;
 import net.sourceforge.waters.subject.module.LabelGeometrySubject;
 import net.sourceforge.waters.subject.module.NodeSubject;
+import net.sourceforge.waters.subject.module.PointGeometrySubject;
 import net.sourceforge.waters.subject.module.PointGeometrySubject;
 import net.sourceforge.waters.subject.module.SimpleNodeSubject;
 import net.sourceforge.waters.subject.module.SplineGeometrySubject;
@@ -125,9 +121,7 @@ class EditorGraph
       final LabelBlockSubject blocked = graph.getBlockedEvents();
       mBlockedEvents = blocked.clone();
       mBlockedEvents.setParent(this);
-      final ChangeRecord record =
-        new LabelBlockChangeRecord(blocked, mBlockedEvents);
-      addChangeRecord(record);
+      new LabelBlockChangeRecord(blocked, mBlockedEvents);
     } else {
       mBlockedEvents = null;
     }
@@ -135,7 +129,7 @@ class EditorGraph
     for (final NodeSubject node : graph.getNodesModifiable()) {
       if (node instanceof SimpleNodeSubject) {
         SimpleNodeSubject simple = (SimpleNodeSubject) node;
-        addNode(simple);
+        addSimpleNode(simple);
       } else if (node instanceof GroupNodeSubject) {
         GroupNodeSubject group = (GroupNodeSubject) node;
         addGroupNode(group);
@@ -250,8 +244,8 @@ class EditorGraph
     final List<ProxySubject> removed = new LinkedList<ProxySubject>();
     int minpass = Integer.MAX_VALUE;
     int maxpass = Integer.MIN_VALUE;
-    for (final ChangeRecord record : mOriginalMap.values()) {
-      final ProxySubject original = record.getOriginal();
+    for (final ChangeRecord record : mFakeMap.values()) {
+      final ProxySubject original = record.createOriginal();
       switch (record.getChangeKind()) {
       case ModelChangeEvent.ITEM_ADDED:
         added.add(original);
@@ -278,20 +272,32 @@ class EditorGraph
         maxpass = maxpass1;
       }
     }
-    final CompoundCommand compound =
-      new UpdateCommand(modified, added, removed,
-                        surface, description, selecting);
+    final int size = modified.size() + added.size() + removed.size();
+    if (size == 0) {
+      return null;
+    }
+    final List<AbstractEditCommand> commands =
+      new ArrayList<AbstractEditCommand>(size);
     for (int pass = minpass; pass <= maxpass; pass++) {
       for (final ChangeRecord record : mFakeMap.values()) {
-        final Command cmd = record.getUpdateCommand(surface, pass);
-        if (cmd != null && cmd.isSignificant()) {
-          compound.addCommand(cmd);
+        final AbstractEditCommand cmd = record.getUpdateCommand(surface, pass);
+        if (cmd != null) {
+          commands.add(cmd);
         }
       }
     }
-    if (!compound.isSignificant()) {
+    switch (commands.size()) {
+    case 0:
       return null;
-    } else {
+    case 1:
+      final AbstractEditCommand cmd = commands.iterator().next();
+      cmd.setUpdatesSelection(selecting);
+      return cmd;
+    default:
+      final CompoundCommand compound =
+        new UpdateCommand(modified, added, removed,
+                          surface, description, selecting);
+      compound.addCommands(commands);
       compound.end();
       return compound;
     }
@@ -323,8 +329,7 @@ class EditorGraph
       node.addEdge(edge1);
     }
     mEdges.add(edge1);
-    final ChangeRecord record = new EdgeChangeRecord(edge0, edge1);
-    addChangeRecord(record);
+    new EdgeChangeRecord(edge0, edge1);
     return edge1;
   }
 
@@ -337,28 +342,16 @@ class EditorGraph
       GroupNodeSubject group1 = group0.clone();
       mNodes.add(group1);
       mObserverMap.put(group1, new EditorGroupNode(group1));
-      final ChangeRecord record =
-        new GroupNodeChangeRecord(group0, group1);
-      addChangeRecord(record);
+      new GroupNodeChangeRecord(group0, group1);
     }
   }
 
-  private void addNode(final SimpleNodeSubject node0)
+  private void addSimpleNode(final SimpleNodeSubject node0)
   {
     final SimpleNodeSubject node1 = node0.clone();
     mNodes.add(node1);
     mObserverMap.put(node1, new EditorSimpleNode(node1));
-    final ChangeRecord record =
-      new SimpleNodeChangeRecord(node0, node1);
-    addChangeRecord(record);
-  }
-
-  private void addChangeRecord(final ChangeRecord record)
-  {
-    final ProxySubject original = record.getOriginal();
-    mOriginalMap.put(original, record);
-    final ProxySubject fake = record.getFake();
-    mFakeMap.put(fake, record);
+    new SimpleNodeChangeRecord(node0, node1);
   }
 
 
@@ -676,24 +669,20 @@ class EditorGraph
           if (node instanceof SimpleNodeSubject) {
             final SimpleNodeSubject simple = (SimpleNodeSubject) node;
             mObserverMap.put(simple, new EditorSimpleNode(simple));
-            final ChangeRecord record = new SimpleNodeChangeRecord
+            new SimpleNodeChangeRecord
               (null, simple, ModelChangeEvent.ITEM_ADDED);
-            addChangeRecord(record);
           } else if (node instanceof GroupNodeSubject) {
             final GroupNodeSubject group = (GroupNodeSubject) node;
             mObserverMap.put(group, new EditorGroupNode(group));
-            final ChangeRecord record = new GroupNodeChangeRecord
+            new GroupNodeChangeRecord
               (null, group, ModelChangeEvent.ITEM_ADDED);
-            addChangeRecord(record);
           } else {
             throw new ClassCastException("Adding unknown node type: " +
                                          node.getClass().getName());
           }
         } else if (esource == mEdges) {
           final EdgeSubject edge = (EdgeSubject) event.getValue();
-          final ChangeRecord record =
-            new EdgeChangeRecord(null, edge, ModelChangeEvent.ITEM_ADDED);
-          addChangeRecord(record);
+          new EdgeChangeRecord(null, edge, ModelChangeEvent.ITEM_ADDED);
           final NodeSubject source = edge.getSource();
           if (source != null) {
             mObserverMap.get(source).addEdge(edge);
@@ -718,8 +707,6 @@ class EditorGraph
             // ignore
           } else if (record.getChangeKind() == ModelChangeEvent.ITEM_ADDED) {
             mFakeMap.remove(item);
-            final ProxySubject original = record.getOriginal();
-            mOriginalMap.remove(original);
           } else {
             record.setChangeKind(ModelChangeEvent.ITEM_REMOVED);
           }
@@ -741,7 +728,15 @@ class EditorGraph
         }
         break;
       case ModelChangeEvent.GEOMETRY_CHANGED:
-        final ProxySubject item = (ProxySubject) esource;
+        final Object value = event.getValue();
+        final ProxySubject item;
+        if (esource instanceof SimpleNodeSubject &&
+            value instanceof LabelGeometrySubject) {
+          item = (LabelGeometrySubject) value;
+          
+        } else {
+          item = (ProxySubject) esource;
+        }
         mChangeRecordCreator.createChangeRecord
           (item, ModelChangeEvent.GEOMETRY_CHANGED);
         break;
@@ -982,9 +977,13 @@ class EditorGraph
                  final ProxySubject fake,
                  final int kind)
     {
-      mOriginal = original == null ? fake : original;
+      mOriginal = original;
       mFake = fake;
       mChangeKind = kind;
+      mFakeMap.put(fake, this);
+      if (original != null) {
+        mOriginalMap.put(original, this);
+      }
     }
 
     //#######################################################################
@@ -996,9 +995,13 @@ class EditorGraph
 
     void setOriginal(final ProxySubject original)
     {
-      mOriginalMap.remove(mOriginal);
+      if (mOriginal != null) {
+        mOriginalMap.remove(mOriginal);
+      }
       mOriginal = original;
-      mOriginalMap.put(mOriginal, this);
+      if (mOriginal != null) {
+        mOriginalMap.put(mOriginal, this);
+      }
     }
 
     ProxySubject getFake()
@@ -1073,18 +1076,54 @@ class EditorGraph
       return getPass();
     }
 
-    Command getUpdateCommand(final ControlledSurface surface, final int pass)
+    ProxySubject createOriginal()
     {
-      return null;
+      if (mOriginal != null) {
+        return mOriginal;
+      } else {
+        throw new UnsupportedOperationException
+          ("EditorGraph does not support automatic creation for class " +
+           mFake.getClass().getName() + "!");
+      }
     }
 
-    Command createDeleteCommand(final ControlledSurface surface)
+    AbstractEditCommand createInsertCommand(final ControlledSurface surface)
+    {
+      return new InsertCommand(createOriginal(), surface, false);
+    }
+
+    AbstractEditCommand createDeleteCommand(final ControlledSurface surface)
     {
       final List<ProxySubject> origs = Collections.singletonList(mOriginal);
       final List<InsertInfo> deletes = surface.getDeletionVictims(origs);
       return new DeleteCommand(deletes, surface, false);
     }
 
+    AbstractEditCommand createMoveCommand(final ControlledSurface surface)
+    {
+      throw new UnsupportedOperationException
+        ("EditorGraph does not support automatic movement for class " +
+         mFake.getClass().getName() + "!");
+    }
+
+    AbstractEditCommand getUpdateCommand(final ControlledSurface surface,
+                                         final int pass)
+    {
+      if (pass == getPass()) {
+        switch (getChangeKind()) {
+        case ModelChangeEvent.ITEM_ADDED:
+          return createInsertCommand(surface);
+        case ModelChangeEvent.ITEM_REMOVED:
+          return createDeleteCommand(surface);
+        case ModelChangeEvent.GEOMETRY_CHANGED:
+          return createMoveCommand(surface);
+        default:
+          return null;
+        }
+      } else {
+        return null;
+      }
+    }
 
     //#######################################################################
     //# Data Members
@@ -1128,26 +1167,45 @@ class EditorGraph
 
     //#######################################################################
     //# Updating
-    Command getUpdateCommand(final ControlledSurface surface, final int pass)
+    SimpleNodeSubject createOriginal()
     {
-      if (pass == getPass()) {
-        switch (getChangeKind()) {
-        case ModelChangeEvent.ITEM_ADDED:
-          final Point2D pos = getFake().getPointGeometry().getPoint();
-          final SimpleNodeSubject node =
-            GraphTools.getCreatedSimpleNode(mGraph, pos);
-          setOriginal(node);
-          return new InsertCommand(node, surface, false);
-        case ModelChangeEvent.ITEM_REMOVED:
-          return createDeleteCommand(surface);
-        case ModelChangeEvent.GEOMETRY_CHANGED:
-          return new MoveSimpleNodeCommand(getOriginal(), getFake());
-        default:
+      final SimpleNodeSubject original = getOriginal();
+      if (original != null) {
+        return original;
+      } else {
+        final Point2D pos = getFake().getPointGeometry().getPoint();
+        final SimpleNodeSubject node = 
+          GraphTools.getCreatedSimpleNode(mGraph, pos);
+        setOriginal(node);
+        return node;
+      }
+    }
+
+    AbstractEditCommand createMoveCommand(final ControlledSurface surface)
+    {
+      final SimpleNodeSubject original = getOriginal();
+      final PointGeometrySubject oldgeo = original.getPointGeometry();
+      final PointGeometrySubject oldinit = original.getInitialArrowGeometry();
+      final SimpleNodeSubject fake = getFake();
+      final PointGeometrySubject newgeo = fake.getPointGeometry();
+      final PointGeometrySubject newinit = fake.getInitialArrowGeometry();
+      final boolean equalgeo = ProxyTools.equalsWithGeometry(oldgeo, newgeo);
+      final boolean equalinit =
+        ProxyTools.equalsWithGeometry(oldinit, newinit);
+      if (equalinit) {
+        if (equalgeo) {
           return null;
+        } else {
+          return new MoveCommand(oldgeo, newgeo, surface);
         }
       } else {
-        return null;
-      }
+        final String name = equalgeo ? "Initial Arrow Change" : null;
+        if (equalgeo && oldinit != null && newinit != null) {
+          return new MoveCommand(oldinit, newinit, surface, name);
+        } else {
+          return new EditCommand(original, fake, surface, name);
+        }
+      }          
     }
   }
 
@@ -1186,26 +1244,34 @@ class EditorGraph
 
     //#######################################################################
     //# Updating
-    Command getUpdateCommand(final ControlledSurface surface, final int pass)
+    GroupNodeSubject createOriginal()
     {
-      if (pass == getPass()) {
-        switch (getChangeKind()) {
-        case ModelChangeEvent.ITEM_ADDED:
-          final Rectangle2D rect = getFake().getGeometry().getRectangle();
-          final GroupNodeSubject group =
-            GraphTools.getCreatedGroupNode(mGraph, rect);
-          setOriginal(group);
-          return new InsertCommand(group, surface, false);
-        case ModelChangeEvent.ITEM_REMOVED:
-          return createDeleteCommand(surface);
-        case ModelChangeEvent.GEOMETRY_CHANGED:
-          return new MoveGroupNodeCommand(getOriginal(), getFake());
-        default:
-          return null;
-        }
+      final GroupNodeSubject original = getOriginal();
+      if (original != null) {
+        return original;
       } else {
-        return null;
+        final Rectangle2D rect = getFake().getGeometry().getRectangle();
+        final GroupNodeSubject group =
+          GraphTools.getCreatedGroupNode(mGraph, rect);
+        setOriginal(group);
+        return group;
       }
+    }
+
+    AbstractEditCommand createMoveCommand(final ControlledSurface surface)
+    {
+      final GroupNodeSubject original = getOriginal();
+      final BoxGeometrySubject oldgeo = original.getGeometry();
+      final Rectangle2D oldrect = oldgeo.getRectangle();
+      final GroupNodeSubject fake = getFake();
+      final BoxGeometrySubject newgeo = fake.getGeometry();
+      final Rectangle2D newrect = newgeo.getRectangle();
+      final String name =
+        oldrect.getWidth() == newrect.getWidth() &&
+        oldrect.getHeight() == newrect.getHeight() ?
+        "Group Node Movement" :
+        "Group Node Reshaping";
+      return new MoveCommand(oldgeo, newgeo, surface, name);
     }
   }
 
@@ -1292,54 +1358,83 @@ class EditorGraph
       }
     }
 
-    Command getUpdateCommand(final ControlledSurface surface, final int pass)
+    EdgeSubject createOriginal()
+    {
+      final EdgeSubject original = getOriginal();
+      if (original != null) {
+        return original;
+      } else {
+        // This will not work if the source or target is created as well ...
+        final EdgeSubject fake = getFake();
+        final NodeSubject asource =
+          (NodeSubject) EditorGraph.this.getOriginal(fake.getSource());
+        final NodeSubject atarget =
+          (NodeSubject) EditorGraph.this.getOriginal(fake.getTarget());
+        final PointGeometrySubject startgeo = fake.getStartPoint();
+        final Point2D start = startgeo == null ? null : startgeo.getPoint();
+        final PointGeometrySubject endgeo = fake.getEndPoint();
+        final Point2D end = endgeo == null ? null : endgeo.getPoint();
+        final LabelBlockSubject lblock = fake.getLabelBlock();
+        final GuardActionBlockSubject gablock = fake.getGuardActionBlock();
+        final EdgeSubject edge = GraphTools.getCreatedEdge
+          (mGraph, asource, atarget, start, end, lblock, gablock);
+        setOriginal(edge);
+        return edge;
+      }
+    }
+
+    AbstractEditCommand createMoveCommand(final ControlledSurface surface)
+    {
+      final EdgeSubject original = getOriginal();
+      final SplineGeometrySubject oldgeo = original.getGeometry();
+      final PointGeometrySubject oldstart = original.getStartPoint();
+      final PointGeometrySubject oldend = original.getEndPoint();
+      final EdgeSubject fake = getFake();
+      final SplineGeometrySubject newgeo = fake.getGeometry();
+      final PointGeometrySubject newstart = fake.getStartPoint();
+      final PointGeometrySubject newend = fake.getEndPoint();
+      final boolean hasnull =
+        (oldgeo == null ^ newgeo == null) ||
+        (oldstart == null ^ newstart == null) ||
+        (oldend == null ^ newend == null);
+      final String name = "Edge Reshaping";
+      if (hasnull) {
+        return createEditCommand(surface, name);
+      } else {
+        final boolean equalgeo =
+          ProxyTools.equalsWithGeometry(oldgeo, newgeo);
+        final boolean equalstart =
+          ProxyTools.equalsWithGeometry(oldstart, newstart);
+        final boolean equalend =
+          ProxyTools.equalsWithGeometry(oldend, newend);
+        if (!equalgeo && equalstart && equalend) {
+          return new MoveCommand(oldgeo, newgeo, surface, name);
+        } else if (equalgeo && !equalstart && equalend) {
+          return new MoveCommand(oldstart, newstart, surface, name);
+        } else if (equalgeo && equalstart && !equalend) {
+          return new MoveCommand(oldend, newend, surface, name);
+        } else if (equalgeo && equalstart && equalend) {
+          return null;
+        } else {
+          return createEditCommand(surface, name);
+        }
+      }
+    }
+    AbstractEditCommand getUpdateCommand(final ControlledSurface surface,
+                                         final int pass)
     {
       final EdgeSubject fake = getFake();
-      final EdgeSubject original = getOriginal();
+      final EdgeSubject original = createOriginal();
       if (pass == getPass()) {
         switch (getChangeKind()) {
         case ModelChangeEvent.ITEM_ADDED:
-          final NodeSubject asource =
-            (NodeSubject) EditorGraph.this.getOriginal(fake.getSource());
-          final NodeSubject atarget =
-            (NodeSubject) EditorGraph.this.getOriginal(fake.getTarget());
-          final PointGeometrySubject startgeo = fake.getStartPoint();
-          final Point2D start = startgeo == null ? null : startgeo.getPoint();
-          final PointGeometrySubject endgeo = fake.getEndPoint();
-          final Point2D end = endgeo == null ? null : endgeo.getPoint();
-          final LabelBlockSubject lblock = fake.getLabelBlock();
-          final GuardActionBlockSubject gablock = fake.getGuardActionBlock();
-          final EdgeSubject edge = GraphTools.getCreatedEdge
-            (mGraph, asource, atarget, start, end, lblock, gablock);
-          setOriginal(edge);
-          return new InsertCommand(edge, surface, false);
+          return createInsertCommand(surface);
         case ModelChangeEvent.ITEM_REMOVED:
           return createDeleteCommand(surface);
         case ModelChangeEvent.STATE_CHANGED:
-          final NodeSubject source =
-            (NodeSubject) EditorGraph.this.getOriginal(fake.getSource());
-          final PointGeometrySubject newstart = fake.getStartPoint();
-          final PointGeometrySubject oldstart = original.getStartPoint();
-          Command scmd = null;
-          if (source != original.getSource() ||
-              !ProxyTools.equalsWithGeometry(oldstart, newstart)) {
-            final Point2D point =
-              newstart == null ? null : newstart.getPoint();
-            scmd = new RedirectEdgeCommand(original, source, true, point);
-          }
-          final NodeSubject target =
-            (NodeSubject) EditorGraph.this.getOriginal(fake.getTarget());
-          final PointGeometrySubject newend = fake.getEndPoint();
-          final PointGeometrySubject oldend = original.getEndPoint();
-          Command tcmd = null;
-          if (target != original.getTarget() ||
-              !ProxyTools.equalsWithGeometry(oldend, newend)) {
-            final Point2D point = newend == null ? null : newend.getPoint();
-            tcmd = new RedirectEdgeCommand(original, target, false, point);
-          }
-          return createDoubleCommand(scmd, tcmd);
+          return createEditCommand(surface, "Edge Redirection");
         case ModelChangeEvent.GEOMETRY_CHANGED:
-          return new MoveEdgeCommand(original, fake);
+          return createMoveCommand(surface);
         default:
           return null;
         }
@@ -1347,17 +1442,27 @@ class EditorGraph
                  getChangeKind() == ModelChangeEvent.STATE_CHANGED) {
         final NodeSubject source = fake.getSource();
         final ChangeRecord srecord = mFakeMap.get(source);
-        final Command scmd =
-          srecord.getChangeKind() == ModelChangeEvent.ITEM_REMOVED ?
-          new RedirectEdgeCommand(original, null, true, null) :
-          null;
+        final boolean sdrop =
+          srecord.getChangeKind() == ModelChangeEvent.ITEM_REMOVED;
         final NodeSubject target = fake.getTarget();
         final ChangeRecord trecord = mFakeMap.get(target);
-        final Command tcmd =
-          trecord.getChangeKind() == ModelChangeEvent.ITEM_REMOVED ?
-          new RedirectEdgeCommand(original, null, false, null) :
-          null;
-        return createDoubleCommand(scmd, tcmd);
+        final boolean tdrop =
+          trecord.getChangeKind() == ModelChangeEvent.ITEM_REMOVED;
+        if (sdrop || tdrop) {
+          final EdgeSubject template = original.clone();
+          if (sdrop) {
+            template.setSource(null);
+            template.setStartPoint(null);
+          }
+          if (tdrop) {
+            template.setTarget(null);
+            template.setEndPoint(null);
+          }
+          return new EditCommand(original, template, surface,
+                                 "Edge Redirection");
+        } else {
+          return null;
+        }
       } else {
         return null;
       }
@@ -1365,20 +1470,21 @@ class EditorGraph
 
     //#######################################################################
     //# Auxiliary Methods
-    private Command createDoubleCommand(final Command source,
-                                        final Command target)
+    private AbstractEditCommand createEditCommand
+      (final ControlledSurface surface, final String name)
     {
-      if (source == null) {
-        return target;
-      } else if (target == null) {
-        return source;
-      } else {
-        final CompoundCommand cmd = new CompoundCommand("Edge Redirection");
-        cmd.addCommand(source);
-        cmd.addCommand(target);
-        cmd.end();
-        return cmd;
-      }
+      final EdgeSubject original = getOriginal();
+      final EdgeSubject fake = getFake();
+      final EdgeSubject template = fake.clone();
+      final NodeSubject fsource = fake.getSource();
+      final NodeSubject osource =
+        (NodeSubject) EditorGraph.this.getOriginal(fsource);
+      template.setSource(osource);
+      final NodeSubject ftarget = fake.getTarget();
+      final NodeSubject otarget =
+        (NodeSubject) EditorGraph.this.getOriginal(ftarget);
+      template.setTarget(otarget);
+      return new EditCommand(original, template, surface, name);
     }
   }
 
@@ -1417,18 +1523,10 @@ class EditorGraph
 
     //#######################################################################
     //# Updating
-    Command getUpdateCommand(final ControlledSurface surface, final int pass)
+    AbstractEditCommand createMoveCommand(final ControlledSurface surface)
     {
-      if (pass == getPass()) {
-        switch (getChangeKind()) {
-        case ModelChangeEvent.GEOMETRY_CHANGED:
-          return new MoveLabelGeometryCommand(getOriginal(), getFake());
-        default:
-          return null;
-        }
-      } else {
-        return null;
-      }
+      return
+        new MoveCommand(getOriginal(), getFake(), surface, "Label Movement");
     }
   }
 
@@ -1467,17 +1565,16 @@ class EditorGraph
 
     //#######################################################################
     //# Updating
-    Command getUpdateCommand(final ControlledSurface surface, final int pass)
+    AbstractEditCommand createMoveCommand(final ControlledSurface surface)
     {
-      if (pass == getPass()) {
-        switch (getChangeKind()) {
-        case ModelChangeEvent.GEOMETRY_CHANGED:
-          return new MoveLabelBlockCommand(getOriginal(), getFake());
-        default:
-          return null;
-        }
+      final LabelBlockSubject original = getOriginal();
+      final LabelGeometrySubject oldgeo = original.getGeometry();
+      final LabelBlockSubject fake = getFake();
+      final LabelGeometrySubject newgeo = fake.getGeometry();
+      if (oldgeo == null || newgeo == null) {
+        return new EditCommand(original, fake, surface, "Events Movement");
       } else {
-        return null;
+        return new MoveCommand(oldgeo, newgeo, surface);
       }
     }
   }
@@ -1517,17 +1614,17 @@ class EditorGraph
 
     //#######################################################################
     //# Updating
-    Command getUpdateCommand(final ControlledSurface surface, final int pass)
+    AbstractEditCommand createMoveCommand(final ControlledSurface surface)
     {
-      if (pass == getPass()) {
-        switch (getChangeKind()) {
-        case ModelChangeEvent.GEOMETRY_CHANGED:
-          return new MoveGuardActionBlockCommand(getOriginal(), getFake());
-        default:
-          return null;
-        }
+      final GuardActionBlockSubject original = getOriginal();
+      final LabelGeometrySubject oldgeo = original.getGeometry();
+      final GuardActionBlockSubject fake = getFake();
+      final LabelGeometrySubject newgeo = fake.getGeometry();
+      if (oldgeo == null || newgeo == null) {
+        return new EditCommand(original, fake, surface,
+                               "Guard/Action Block Movement");
       } else {
-        return null;
+        return new MoveCommand(oldgeo, newgeo, surface);
       }
     }
   }
@@ -1547,7 +1644,7 @@ class EditorGraph
         try {
           return (ProxySubject) original.acceptVisitor(this);
         } catch (final VisitorException exception) {
-          throw new WatersRuntimeException(exception);
+          throw exception.getRuntimeException();
         }
       } else {
         return record.getFake();
@@ -1604,10 +1701,11 @@ class EditorGraph
         try{
           return (ProxySubject) fake.acceptVisitor(this);
         } catch (final VisitorException exception) {
-          throw new WatersRuntimeException(exception);
+          throw exception.getRuntimeException();
         }
       } else {
-        return record.getOriginal();
+        final ProxySubject original = record.getOriginal();
+        return original != null ? original : fake;
       }
     }
 
@@ -1621,9 +1719,14 @@ class EditorGraph
     public ProxySubject visitLabelBlockProxy(final LabelBlockProxy fake)
     {
       final LabelBlockSubject fsubject = (LabelBlockSubject) fake;
-      final EdgeSubject fedge = (EdgeSubject) fsubject.getParent();
-      final EdgeSubject oedge = (EdgeSubject) getOriginal(fedge);
-      return oedge == null ? null : oedge.getLabelBlock();
+      final Subject parent = fsubject.getParent();
+      if (parent instanceof EdgeSubject) {
+        final EdgeSubject fedge = (EdgeSubject) parent;
+        final EdgeSubject oedge = (EdgeSubject) getOriginal(fedge);
+        return oedge == null ? null : oedge.getLabelBlock();
+      } else {
+        return mGraph.getBlockedEvents();
+      }
     }
 
     public GuardActionBlockSubject visitGuardActionBlockProxy
@@ -1657,23 +1760,20 @@ class EditorGraph
     private ChangeRecord createChangeRecord(final ProxySubject fake,
                                             final int kind)
     {
-      ChangeRecord record = mFakeMap.get(fake);
+      final ChangeRecord record = mFakeMap.get(fake);
       if (record == null) {
         try{
           mOriginal = mOriginalGetter.getOriginal(fake);
           mFake = fake;
           mKind = kind;
-          record = (ChangeRecord) fake.acceptVisitor(this);
-          mOriginal = record.getOriginal();
-          mOriginalMap.put(mOriginal, record);
-          mFakeMap.put(fake, record);
+          return (ChangeRecord) fake.acceptVisitor(this);
         } catch (final VisitorException exception) {
-          throw new WatersRuntimeException(exception);
+          throw exception.getRuntimeException();
         }
       } else {
         record.setChangeKind(kind);
+        return record;
       }
-      return record;
     }
 
     //#######################################################################

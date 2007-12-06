@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.gui.ide.actions
 //# CLASS:   SaveAsAction
 //###########################################################################
-//# $Id: SaveAsAction.java,v 1.11 2007-07-16 11:34:33 flordal Exp $
+//# $Id: SaveAsAction.java,v 1.12 2007-12-06 08:41:21 robi Exp $
 //###########################################################################
 
 package org.supremica.gui.ide.actions;
@@ -49,7 +49,7 @@ public class SaveAsAction extends AbstractSaveAction
     putValue(Action.SHORT_DESCRIPTION, "Save the module using a new name");
     putValue(Action.MNEMONIC_KEY, KeyEvent.VK_A);
     putValue(Action.SMALL_ICON, new ImageIcon(IDE.class.getResource
-              ("/toolbarButtonGraphics/general/Save16.gif")));
+              ("/toolbarButtonGraphics/general/SaveAs16.gif")));
   }
 
   //#########################################################################

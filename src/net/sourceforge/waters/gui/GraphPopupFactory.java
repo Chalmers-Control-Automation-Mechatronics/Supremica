@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   GraphPopupFactory
 //###########################################################################
-//# $Id: GraphPopupFactory.java,v 1.2 2007-12-04 03:22:54 robi Exp $
+//# $Id: GraphPopupFactory.java,v 1.3 2007-12-06 08:41:20 robi Exp $
 //###########################################################################
 
 
@@ -74,6 +74,8 @@ class GraphPopupFactory
     popup.addSeparator();
     final IDEAction newevent = master.getInsertEventDeclAction();
     popup.add(newevent);
+    final IDEAction layout = master.getGraphLayoutAction();
+    popup.add(layout);
   }
 
 

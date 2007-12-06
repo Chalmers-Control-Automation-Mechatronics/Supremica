@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.module
 //# CLASS:   VariableMarkingProxy
 //###########################################################################
-//# $Id: VariableMarkingProxy.java,v 1.2 2007-12-04 03:22:55 robi Exp $
+//# $Id: VariableMarkingProxy.java,v 1.3 2007-12-06 08:41:20 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.module;
@@ -24,7 +24,7 @@ public interface VariableMarkingProxy extends Proxy {
   //#########################################################################
   //# Simple Access
   /**
-   * Gets the proposition event considered by this marking.
+   * Gets the proposition event of this marking.
    * @return An identifier referring to a proposition event of the module.
    */
   public IdentifierProxy getProposition();

@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.subject.base
 //# CLASS:   GeometrySubject
 //###########################################################################
-//# $Id: GeometrySubject.java,v 1.5 2007-12-04 03:22:58 robi Exp $
+//# $Id: GeometrySubject.java,v 1.6 2007-12-06 08:41:20 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.subject.base;
@@ -44,6 +44,14 @@ public abstract class GeometrySubject
   protected GeometrySubject(final GeometryProxy partner)
   {
     super(partner);
+  }
+
+
+  //#########################################################################
+  //# Cloning and Assigning
+  public GeometrySubject clone()
+  {
+    return (GeometrySubject) super.clone();
   }
 
 

@@ -1653,8 +1653,7 @@ proc Java_GenerateCloningVisitor {subpack prefix destname classnames
         "  public ${visitorname}(final ${prefix}ProxyFactory factory)"
     Java_WriteLn $stream $umap "  \{"
     Java_WriteLn $stream $umap "    mFactory = factory;"
-    Java_WriteLn $stream $umap \
-        "    mNodeMap = new HashMap<String,NodeProxy>();"
+    Java_WriteLn $stream $umap "    mNodeMap = null;"
     Java_WriteLn $stream $umap "  \}"
     Java_WriteLn $stream $umap ""
 
@@ -1671,8 +1670,6 @@ proc Java_GenerateCloningVisitor {subpack prefix destname classnames
         "      \} catch (final VisitorException exception) \{"
     Java_WriteLn $stream $umap \
         "        throw exception.getRuntimeException();"
-    Java_WriteLn $stream $umap "      \} finally \{"
-    Java_WriteLn $stream $umap "        mNodeMap.clear();"
     Java_WriteLn $stream $umap "      \}"
     Java_WriteLn $stream $umap "    \}"
     Java_WriteLn $stream $umap "  \}"
@@ -1693,9 +1690,20 @@ proc Java_GenerateCloningVisitor {subpack prefix destname classnames
         Java_WriteLn $stream $umap \
             "    return ($classname) proxy.acceptVisitor(this);"
       } else {
+        set isroot [expr [string compare $classname "GraphProxy"] == 0]
+        if {$isroot} {
+          Java_WriteLn $stream $umap \
+              "    final int size = proxy.getNodes().size();"
+          Java_WriteLn $stream $umap \
+              "    mNodeMap = new HashMap<String,NodeProxy>(size);"
+          Java_WriteLn $stream $umap \
+              "    try \{"
+          set ind "  "
+        } else {
+          set ind ""
+        }
         set allattribs [Java_ClassGetAllAttributes $classinfo classMap]
         set args ""
-        set resets ""
 	foreach attrib $allattribs {
 	  set decltype [Java_AttribGetDeclaredType $attrib $impl]
           if {[string compare $decltype "URI"] == 0} {
@@ -1719,9 +1727,6 @@ proc Java_GenerateCloningVisitor {subpack prefix destname classnames
               set method "use"
             } elseif {[string compare $elemtype "NodeProxy"] == 0} {
               set method "lookup${elemtype}Collection"
-              if {[string compare $refstatus "owned"] == 0} {
-                lappend resets $elemtype
-              }
             } else {
               set method "cloneProxyCollection"
             }
@@ -1730,27 +1735,24 @@ proc Java_GenerateCloningVisitor {subpack prefix destname classnames
           }
           if {[string compare $method "use"] == 0} {
             Java_WriteLn $stream $umap \
-                "    final $decltype $paramname = proxy.${gettername}();"
+                "$ind    final $decltype $paramname = proxy.${gettername}();"
           } else {
             set eqstatus [Java_AttribGetEqualityStatus $attrib $impl]
             set paramname0 "${paramname}0"
             Java_WriteLn $stream $umap \
-                "    final $decltype $paramname0 = proxy.${gettername}();"
+                "$ind    final $decltype $paramname0 = proxy.${gettername}();"
             if {[string compare $eqstatus "required"] == 0} {
               Java_WriteLn $stream $umap \
-                  "    final $decltype $paramname = ${method}($paramname0);"
+                "$ind    final $decltype $paramname = ${method}($paramname0);"
             } else {
               set ite "$paramname0 == null ? null : ${method}($paramname0)"
               Java_WriteLn $stream $umap \
-                  "    final $decltype $paramname = $ite;"
+                "$ind    final $decltype $paramname = $ite;"
             }
           }
           lappend args $paramname
 	}
-        if {[llength $resets] > 0} {
-          Java_WriteLn $stream $umap "    mNodeMap.clear();"
-        }
-        set text "    return mFactory.create${classname}("
+        set text "$ind    return mFactory.create${classname}("
         set indent [string length $text]
         set indent [string range $gSpaces 1 $indent]
         Java_Write $stream $umap $text
@@ -1765,6 +1767,11 @@ proc Java_GenerateCloningVisitor {subpack prefix destname classnames
           Java_Write $stream $umap $arg
         }
         Java_WriteLn $stream $umap ");"
+        if {$isroot} {
+          Java_WriteLn $stream $umap "    \} finally \{"
+          Java_WriteLn $stream $umap "      mNodeMap = null;"
+          Java_WriteLn $stream $umap "    \}"
+        }
       }
       Java_WriteLn $stream $umap "  \}"
       Java_WriteLn $stream $umap ""
@@ -1777,13 +1784,17 @@ proc Java_GenerateCloningVisitor {subpack prefix destname classnames
         "  private NodeProxy lookupNodeProxy(final NodeProxy orig)"
     Java_WriteLn $stream $umap "    throws VisitorException"
     Java_WriteLn $stream $umap "  \{"
-    Java_WriteLn $stream $umap "    final String name = orig.getName();"
-    Java_WriteLn $stream $umap "    NodeProxy node = mNodeMap.get(name);"
-    Java_WriteLn $stream $umap "    if (node == null) \{"
-    Java_WriteLn $stream $umap "      node = visitNodeProxy(orig);"
-    Java_WriteLn $stream $umap "      mNodeMap.put(name, node);"
+    Java_WriteLn $stream $umap "    if (mNodeMap == null) \{"
+    Java_WriteLn $stream $umap "      return orig;"
+    Java_WriteLn $stream $umap "    \} else \{"
+    Java_WriteLn $stream $umap "      final String name = orig.getName();"
+    Java_WriteLn $stream $umap "      NodeProxy node = mNodeMap.get(name);"
+    Java_WriteLn $stream $umap "      if (node == null) \{"
+    Java_WriteLn $stream $umap "        node = visitNodeProxy(orig);"
+    Java_WriteLn $stream $umap "        mNodeMap.put(name, node);"
+    Java_WriteLn $stream $umap "      \}"
+    Java_WriteLn $stream $umap "      return node;"
     Java_WriteLn $stream $umap "    \}"
-    Java_WriteLn $stream $umap "    return node;"
     Java_WriteLn $stream $umap "  \}"
     Java_WriteLn $stream $umap ""
     Java_WriteLn $stream $umap \
@@ -1824,7 +1835,7 @@ proc Java_GenerateCloningVisitor {subpack prefix destname classnames
     Java_WriteLn $stream $umap \
         "  private final ${prefix}ProxyFactory mFactory;"
     Java_WriteLn $stream $umap \
-        "  private final Map<String,NodeProxy> mNodeMap;"
+        "  private Map<String,NodeProxy> mNodeMap;"
     Java_WriteLn $stream $umap ""
 
     if {$write} {

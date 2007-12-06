@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.subject.base
 //# CLASS:   CloningGeometryListSubject
 //###########################################################################
-//# $Id: CloningGeometryListSubject.java,v 1.6 2007-12-04 03:22:58 robi Exp $
+//# $Id: CloningGeometryListSubject.java,v 1.7 2007-12-06 08:41:20 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.subject.base;
@@ -208,8 +208,7 @@ public class CloningGeometryListSubject<E extends Cloneable>
     final int newsize = list.size();
     final boolean[] used = new boolean[oldsize];
     final List<E> newlist = new ArrayList<E>(newsize);
-    int usecount = 0;
-    boolean change = false;
+    boolean useall = true;
     int i;
     for (i = 0; i < newsize; i++) {
       newlist.add(null);
@@ -217,6 +216,9 @@ public class CloningGeometryListSubject<E extends Cloneable>
     for (i = 0; i < oldsize; i++) {
       used[i] = false;
     }
+    // First try to find list positions that change neither in contents
+    // nor in position. These are transferred directly into the new list
+    // and do not cause any change notification.
     i = 0;
     final Iterator<? extends E> iter = list.iterator();
     for (final E newitem : list) {
@@ -225,38 +227,46 @@ public class CloningGeometryListSubject<E extends Cloneable>
         if (newitem.equals(olditem)) {
           newlist.set(i, olditem);
           used[i] = true;
-          usecount++;
+          useall = false;
         }
         i++;
       } else {
         break;
       }
     }
-    i = 0;
-    for (final E newitem : list) {
-      if (newlist.get(i) == null) {
-        int j = 0;
-        for (final E olditem : this) {
-          if (!used[j] && newitem.equals(olditem)) {
-            newlist.set(i, olditem);
-            used[j] = true;
-            usecount++;
-            change = true;
-            break;
+    final boolean change;
+    if (useall) {
+      // We have filled all places. But there may still be a change if
+      // the list has shrunk.
+      change = newsize != oldsize;
+    } else {
+      // We could not yet fill all places. Visit again and try to move
+      // items found in different positions in the new list. If no identical
+      // item can be found, use a clone of the item in the new list.
+      change = true;
+      i = 0;
+      for (final E newitem : list) {
+        if (newlist.get(i) == null) {
+          int j = 0;
+          for (final E olditem : this) {
+            if (!used[j] && newitem.equals(olditem)) {
+              newlist.set(i, olditem);
+              used[j] = true;
+              break;
+            }
+            j++;
           }
-          j++;
-        }
-        if (j == oldsize) {
-          // not found --- must clone and add.
-          final E item = cloneElement(newitem);
-          newlist.set(i, item);
-          change = true;
-        }
+          if (j == oldsize) {
+            // Not found---must clone and add ...
+            final E item = cloneElement(newitem);
+            newlist.set(i, item);
+          }
+        } 
+        i++;
       }
-      i++;
     }
-    mList = newlist;
-    if (change || usecount < oldsize) {
+    if (change) {
+      mList = newlist;
       fireGeometryChange();
     }
   }
@@ -303,7 +313,7 @@ public class CloningGeometryListSubject<E extends Cloneable>
 
   private void fireGeometryChange()
   {
-    final Subject source = mParent != null ? mParent.getParent() : null;
+    final Subject source = mParent != null ? mParent.getParent() : this;
     final ModelChangeEvent event =
       ModelChangeEvent.createGeometryChanged(source,
                                              (GeometrySubject) mParent);
