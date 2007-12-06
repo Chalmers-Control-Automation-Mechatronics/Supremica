@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui.renderer
 //# CLASS:   SubjectShapeProducer
 //###########################################################################
-//# $Id: SubjectShapeProducer.java,v 1.30 2007-12-04 03:22:55 robi Exp $
+//# $Id: SubjectShapeProducer.java,v 1.31 2007-12-06 21:33:49 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.gui.renderer;
@@ -220,6 +220,23 @@ public class SubjectShapeProducer
         return createLabelBlockShape(block, null);
       }
     }
+  }
+
+  public LabelProxyShape visitLabelGeometryProxy(final LabelGeometryProxy geo)
+  {
+    final LabelProxyShape shape = (LabelProxyShape) lookup(geo);
+    if (shape != null) {
+      return shape;
+    } else {
+      final LabelGeometrySubject subject = (LabelGeometrySubject) geo;
+      final SimpleNodeSubject node = (SimpleNodeSubject) subject.getParent();
+      return createLabelProxyShape(geo, node);
+    }
+  }
+
+  public SimpleNodeProxyShape visitSimpleNodeProxy(SimpleNodeProxy simple)
+  {
+    return createSimpleNodeProxyShape(simple);
   }
 
 

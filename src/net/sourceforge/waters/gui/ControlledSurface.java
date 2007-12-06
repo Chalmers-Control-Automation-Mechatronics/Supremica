@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   ControlledSurface
 //###########################################################################
-//# $Id: ControlledSurface.java,v 1.148 2007-12-06 08:41:20 robi Exp $
+//# $Id: ControlledSurface.java,v 1.149 2007-12-06 21:33:49 robi Exp $
 //###########################################################################
 
 
@@ -300,9 +300,8 @@ public class ControlledSurface
     boolean change = false;
     for (final Proxy proxy : items) {
       final ProxySubject subject = (ProxySubject) proxy;
-      if (!isSelected(subject)) {
+      if (mSelectedSet.add(subject)) {
         mSelectedList.add(subject);
-        mSelectedSet.add(subject);
         change = true;
       }
     }
@@ -1155,8 +1154,10 @@ public class ControlledSurface
   //# Low-level Selection Handling
   private void fireSelectionChanged()
   {
-    final EditorChangedEvent event = new SelectionChangedEvent(this);
-    fireEditorChangedEvent(event);
+    if (mInternalDragAction == null) {
+      final EditorChangedEvent event = new SelectionChangedEvent(this);
+      fireEditorChangedEvent(event);
+    }
     repaint();
   }
 
@@ -1190,15 +1191,13 @@ public class ControlledSurface
     }
   }
 
-  private boolean hasSelected(EventListExpressionSubject e)
+  private boolean hasSelected(final EventListExpressionSubject expr)
   {
-    for (Subject s : mSelectedList)
-      {
-        if (e.getEventList().contains(s))
-          {
-            return true;
-          }
+    for (final Proxy proxy : expr.getEventList()) {
+      if (isSelected(proxy)) {
+        return true;
       }
+    }
     return false;
   }
 
@@ -1381,17 +1380,16 @@ public class ControlledSurface
   }
 
   /**
-   * Gets the item that should receives the data of a paste operation.
+   * Gets the item that should receive the data of a paste operation.
    * This is either the edited graph, if the selection is empty, or the
    * single selected item, if the selection contains only one element.
-   * Otherwise it is <CODE>null</CODE>, and paste operations are disabled.
    */
   private ProxySubject getPasteTarget()
   {
-    if (mSelectedList.isEmpty()) {
-      return getGraph();
-    } else {
+    if (hasNonEmptySelection()) {
       return getSelectionAnchor();
+    } else {
+      return getGraph();
     }
   }
 
@@ -1640,6 +1638,7 @@ public class ControlledSurface
       final InternalDragActionDND action = getInternalDragAction(point);
       action.commitDrag(event);
       mInternalDragAction = null;
+      fireSelectionChanged();
       mController.updateHighlighting(point);
     }
 
@@ -1748,6 +1747,7 @@ public class ControlledSurface
           mInternalDragAction.cancelDrag(point);
         }
         mInternalDragAction = null;
+        fireSelectionChanged();
         final Rectangle rect = getVisibleRect();
         if (rect.contains(point)) {
           updateHighlighting(point);
@@ -2201,7 +2201,7 @@ public class ControlledSurface
                                final boolean controlDown)
     {
       mWasControlDown = controlDown;
-      mPreviousSelection = mSelectedList;
+      mPreviousSelection = null;
       mDragStart = point;
       mDragStartOnGrid = snapped;
       mDragCurrent = point;
@@ -2294,6 +2294,13 @@ public class ControlledSurface
       return false;
     }
 
+    //#######################################################################
+    //# Temporrary Selection
+    void copyCurrentSelection()
+    {
+      mPreviousSelection = new ArrayList<ProxySubject>(mSelectedList);
+    }
+
     List<ProxySubject> getPreviousSelection()
     {
       return mPreviousSelection;
@@ -2340,12 +2347,6 @@ public class ControlledSurface
      */
     void commitDrag(final Point point)
     {
-      if (mSelectedList != mPreviousSelection) {
-        mSelectedList = mPreviousSelection;
-        mSelectedSet.clear();
-        mSelectedSet.addAll(mSelectedList);
-        repaint();
-      }
     }
 
     /**
@@ -2355,13 +2356,7 @@ public class ControlledSurface
      * superclass method also.
      */
     void cancelDrag(final Point point)
-    {
-      if (mSelectedList != mPreviousSelection) {
-        mSelectedList = mPreviousSelection;
-        mSelectedSet.clear();
-        mSelectedSet.addAll(mSelectedList);
-        repaint();
-      }
+    { 
     }
 
     //#######################################################################
@@ -2385,13 +2380,10 @@ public class ControlledSurface
      */
     private final boolean mWasControlDown;
     /**
-     * Backup of the selection when this action was started.
-     * The selection is automatically stored away at the beginning of every
-     * drag action and restored at the end. It is up to the subclasses to
-     * apply appropriate changes to the copy during the drag operation, and
-     * to the original selection in the end.
+     * Backup of the selection when this action was started,
+     * if requested by calling {@link #copyCurrentSelection()}.
      */
-    private final List<ProxySubject> mPreviousSelection;
+    private List<ProxySubject> mPreviousSelection;
     /**
      * Whether the mouse has been dragged during this operation.
      */
@@ -2504,19 +2496,7 @@ public class ControlledSurface
       } else {
         mLabelBlock = null;
       }
-      if (mFocusedObject == null) {
-        mCurrentDragSelection = Collections.emptyList();
-      } else {
-        mCurrentDragSelection = Collections.singletonList(mFocusedObject);
-      }
-      if (wasControlDown()) {
-        mSelectedList = new LinkedList<ProxySubject>(mSelectedList);
-        removeFromSelection(mCurrentDragSelection);
-      } else {
-        clearSelection();
-        mSelectedList = new LinkedList<ProxySubject>();
-        addToSelection(mCurrentDragSelection);
-      }
+      copyCurrentSelection();
     }
 
     //#######################################################################
@@ -2524,19 +2504,18 @@ public class ControlledSurface
     boolean continueDrag(final Point point)
     {
       if (super.continueDrag(point)) {
+        final List<ProxySubject> dragged = getDragSelection();
         if (wasControlDown()) {
           clearSelection();
           addToSelection(getPreviousSelection());
-          mCurrentDragSelection = getDragSelection();
-          if (mSelectedSet.containsAll(mCurrentDragSelection)) {
-            removeFromSelection(mCurrentDragSelection);
+          if (mSelectedSet.containsAll(dragged)) {
+            removeFromSelection(dragged);
           } else {
-            addToSelection(mCurrentDragSelection);
+            addToSelection(dragged);
           }
         } else {
           clearSelection();
-          mCurrentDragSelection = getDragSelection();
-          addToSelection(mCurrentDragSelection);
+          addToSelection(dragged);
         }
         return true;
       } else {
@@ -2547,14 +2526,6 @@ public class ControlledSurface
     void commitDrag(final Point point)
     {
       super.commitDrag(point);
-      if (!wasControlDown()) {
-        doReplaceSelection(mCurrentDragSelection);
-      } else if (mSelectedSet.containsAll(mCurrentDragSelection)) {
-        doRemoveFromSelection(mCurrentDragSelection);
-      } else {
-        doAddToSelection(mCurrentDragSelection);
-      }
-      repaint();
     }
 
     void cancelDrag(final Point point)
@@ -2563,11 +2534,15 @@ public class ControlledSurface
       final ProxySubject label = getLabelToBeSelected();
       if (label == null) {
         if (wasControlDown()) {
-          for (final ProxySubject item : mCurrentDragSelection) {
-            doToggleSelection(item);
+          if (mFocusedObject != null) {
+            doToggleSelection(mFocusedObject);
           }
         } else {
-          doReplaceSelection(mCurrentDragSelection);
+          if (mFocusedObject == null) {
+            clearSelection();
+          } else {
+            doReplaceSelection(mFocusedObject);
+          }
         }
       } else {
         if (wasControlDown()) {
@@ -2576,7 +2551,6 @@ public class ControlledSurface
           doReplaceLabelSelection(label);
         }
       }
-      repaint();
     }
 
     //#######################################################################
@@ -2648,7 +2622,6 @@ public class ControlledSurface
     //#######################################################################
     //# Data Members
     private final LabelBlockSubject mLabelBlock;
-    private List<ProxySubject> mCurrentDragSelection;
 
   }
 
@@ -2671,18 +2644,15 @@ public class ControlledSurface
     {
       super(event);
       mClickedObject = clicked;
+      mClickedObjectWasSelected = clicked != null && isSelected(clicked);
       mMovedObject = mFocusedObject;
-      if (mMovedObject == null || !isSelected(mMovedObject)) {
-        if (wasControlDown()) {
-          mSelectedList = new LinkedList<ProxySubject>(mSelectedList);
-        } else {
-          mSelectedList = new LinkedList<ProxySubject>();
+      if (mMovedObject == null || !mClickedObjectWasSelected) {
+        if (!wasControlDown()) {
+          clearSelection();
         }
         if (mMovedObject != null) {
-          mSelectedList.add(mMovedObject);
+          doAddToSelection(mMovedObject);
         }
-        mSelectedSet.clear();
-        mSelectedSet.addAll(mSelectedList);
       }
       Point2D snap = null;
       if (Config.GUI_EDITOR_NODES_SNAP_TO_GRID.get()) {
@@ -2751,14 +2721,7 @@ public class ControlledSurface
     }
 
     void commitSecondaryGraph()
-    {
-      if (mMovedObject != null && !isSelected(mMovedObject)) {
-        if (wasControlDown()) {
-          doAddToSelection(mMovedObject);
-        } else {
-          doReplaceSelection(mMovedObject);
-        }
-      }
+    { 
       super.commitSecondaryGraph();
       mMoveVisitor = null;
     }
@@ -2766,12 +2729,12 @@ public class ControlledSurface
     void cancelDrag(final Point point)
     {
       super.cancelDrag(point);
-      if (mMovedObject == null) {
-        doClearSelection();
-      } else if (wasControlDown()) {
-        doToggleSelection(mClickedObject);
-      } else {
-        doReplaceLabelSelection(mClickedObject);
+      if (mClickedObject != null) {
+        if (!wasControlDown()) {
+          doReplaceLabelSelection(mClickedObject);
+        } else if (mClickedObjectWasSelected) {
+          doRemoveFromSelection(mClickedObject);
+        }
       }
       mMoveVisitor = null;
     }
@@ -2780,6 +2743,7 @@ public class ControlledSurface
     //# Data Members
     private final Point2D mSnapPoint;
     private final ProxySubject mClickedObject;
+    private final boolean mClickedObjectWasSelected;
     private final ProxySubject mMovedObject;
     private MoveVisitor mMoveVisitor;
 
@@ -2950,7 +2914,7 @@ public class ControlledSurface
     }
 
     void cancelDrag(final Point point)
-    {
+    {     
       super.cancelDrag(point);
       if (mClickedLabel != null) {
         if (wasControlDown()) {
@@ -3079,7 +3043,7 @@ public class ControlledSurface
     {
       super(event);
       mNode = (SimpleNodeSubject) mFocusedObject;
-      mSelectedList = Collections.singletonList(mFocusedObject);
+      doReplaceSelection(mFocusedObject);
     }
 
     //#######################################################################
@@ -3102,12 +3066,6 @@ public class ControlledSurface
       } else {
         return false;
       }
-    }
-
-    void commitSecondaryGraph()
-    {
-      doReplaceLabelSelection(mNode);
-      super.commitSecondaryGraph();
     }
 
     //#######################################################################
@@ -3141,7 +3099,7 @@ public class ControlledSurface
       super(event,
             Config.GUI_EDITOR_NODES_SNAP_TO_GRID.get() ?
             findGrid(event.getPoint()) : event.getPoint());
-      mSelectedList = Collections.emptyList();
+      clearSelection();
     }
 
     //#######################################################################
@@ -3191,7 +3149,7 @@ public class ControlledSurface
     {
       super(event);
       mGroup = (GroupNodeSubject) mFocusedObject;
-      mSelectedList = Collections.singletonList(mFocusedObject);
+      doReplaceSelection(mFocusedObject);
       final Rectangle2D rect = mGroup.getGeometry().getRectangle();
       switch (handle.getType()) {
       case NW:
@@ -3276,7 +3234,6 @@ public class ControlledSurface
         final Command cmd = new DeleteCommand(deletes, ControlledSurface.this);
         getUndoInterface().executeCommand(cmd);
       } else {
-        doReplaceSelection(mGroup);
         super.commitSecondaryGraph();
       }
     }
@@ -3396,7 +3353,7 @@ public class ControlledSurface
       mIsSource = false;
       mOrigEdge = null;
       mCanCreateSelfloop = false;
-      mSelectedList = Collections.singletonList(mFocusedObject);
+      doReplaceSelection(mFocusedObject);
       mFocusedObject = null;
     }
 
@@ -3412,7 +3369,7 @@ public class ControlledSurface
       mAnchor = null;
       mOrigEdge = (EdgeSubject) mFocusedObject;
       mCanCreateSelfloop = true;
-      mSelectedList = Collections.singletonList(mFocusedObject);
+      doReplaceSelection(mFocusedObject);
       switch (handle.getType()) {
       case SOURCE:
         mIsSource = true;
@@ -3523,8 +3480,7 @@ public class ControlledSurface
             new EdgeSubject(source, null, null, null, null, geo, null);
           mSecondaryGraph.getEdgesModifiable().add(mCopiedEdge);
           mOrigEdge = (EdgeSubject) mSecondaryGraph.getOriginal(mCopiedEdge);
-          mSelectedList =
-            Collections.singletonList((ProxySubject) mOrigEdge);
+          doReplaceSelection(mOrigEdge);
         } else {
           mCopiedEdge = (EdgeSubject) mSecondaryGraph.getCopy(mOrigEdge);
           GeometryTools.createDefaultGeometry(mCopiedEdge);
@@ -3714,12 +3670,12 @@ public class ControlledSurface
       final ProxySubject parent = (ProxySubject) subject.getParent();
       if (parent instanceof EdgeProxy) {
         if (mEdgeMap == null) {
-          return mSelectedList.contains(parent);
+          return isSelected(parent);
         } else {
           return mEdgeMap.containsKey(parent);
         }
       } else if (parent instanceof NodeProxy) {
-        return mSelectedList.contains(parent);
+        return isSelected(parent);
       } else {
         return false;
       }

@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui.renderer
 //# CLASS:   ProxyShapeProducer
 //###########################################################################
-//# $Id: ProxyShapeProducer.java,v 1.28 2007-12-04 03:22:55 robi Exp $
+//# $Id: ProxyShapeProducer.java,v 1.29 2007-12-06 21:33:49 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.gui.renderer;
@@ -163,12 +163,7 @@ public class ProxyShapeProducer
 
   public LabelBlockProxyShape visitLabelBlockProxy(final LabelBlockProxy block)
   {
-    final LabelBlockProxyShape shape = (LabelBlockProxyShape) lookup(block);
-    if (shape != null) {
-      return shape;
-    } else {
-      return createLabelBlockShape(block, null);
-    }
+    return createLabelBlockShape(block, null);
   }
 
   public GroupNodeProxyShape visitGroupNodeProxy(final GroupNodeProxy group)
@@ -180,23 +175,15 @@ public class ProxyShapeProducer
     }
     return shape;
   }
-    
+
   public SimpleNodeProxyShape visitSimpleNodeProxy(SimpleNodeProxy simple)
   {
-    SimpleNodeProxyShape shape = (SimpleNodeProxyShape) lookup(simple);
-    if (shape == null) {
-        shape = new SimpleNodeProxyShape(simple, mModule);
-        mMap.put(simple, shape);
-    }
+    final SimpleNodeProxyShape shape = createSimpleNodeProxyShape(simple);
     final LabelGeometryProxy geo = simple.getLabelGeometry();
-    LabelProxyShape label = (LabelProxyShape) lookup(geo);
-    if (label == null) {
-      label = new LabelProxyShape(simple, DEFAULT);
-      mMap.put(geo, label);
-    }
+    createLabelProxyShape(geo, simple);
     return shape;
   }
-    
+
   public ProxyShape visitProxy(final Proxy proxy)
     throws VisitorException
   {
@@ -223,6 +210,27 @@ public class ProxyShapeProducer
 
   //#########################################################################
   //# Auxiliary Methods
+  SimpleNodeProxyShape createSimpleNodeProxyShape(final SimpleNodeProxy simple)
+  {
+    SimpleNodeProxyShape shape = (SimpleNodeProxyShape) lookup(simple);
+    if (shape == null) {
+      shape = new SimpleNodeProxyShape(simple, mModule);
+      mMap.put(simple, shape);
+    }
+    return shape;
+  }
+
+  LabelProxyShape createLabelProxyShape(final LabelGeometryProxy geo,
+                                        final SimpleNodeProxy simple)
+  {
+    LabelProxyShape shape = (LabelProxyShape) lookup(geo);
+    if (shape == null) {
+      shape = new LabelProxyShape(simple, DEFAULT);
+      mMap.put(geo, shape);
+    }
+    return shape;
+  }
+
   EdgeProxyShape createEdgeProxyShape(final EdgeProxy edge)
   {
     EdgeProxyShape shape = (EdgeProxyShape) lookup(edge);
