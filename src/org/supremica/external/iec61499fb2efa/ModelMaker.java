@@ -2321,7 +2321,7 @@ class ModelMaker
 			to = "s" + nameCounter;
 			nameCounter++;
 			ecc.addState(to);
-			// reset all events
+			// reset active event
 			for (Iterator iter = eventInputs.iterator();iter.hasNext();)
 			{
 				JaxbEvent curEventInput = (JaxbEvent) iter.next();
