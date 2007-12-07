@@ -407,14 +407,6 @@ public class DOPnative {
 					preconEFA.addTransition(PRECON_FULFILLED_STATE,
 										PRECON_FULFILLED_STATE, event,"","");
 				
-					/*
-					//back to not fulfilled
-					preconEFA.addTransition(PRECON_FULFILLED_STATE,
-											PRECON_NOT_FULFILLED_STATE,
-											EVENT_START_PREFIX+pga.getProcess(),"","");
-					 */
-				
-				
 					//self loop to precon fulfilled
 					preconEFA.addTransition(PRECON_FULFILLED_STATE,
 							PRECON_FULFILLED_STATE,

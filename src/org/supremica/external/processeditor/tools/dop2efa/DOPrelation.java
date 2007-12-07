@@ -243,6 +243,15 @@ public class DOPrelation
 			return;
 		}
 		
+		
+		//---------- uncontrollable alternative --------
+		if(false){
+			uncontrollabelAlternative(r, from, to, efa);
+			return;
+		}
+		//-------- end uncontrollable alternative ------
+		
+		
 		i = activityList.iterator();
 		
 		// start build EFA
@@ -362,6 +371,102 @@ public class DOPrelation
 		// build alternative from list //
 		if(!myActivityList.isEmpty()){
 			nativeAlternative(myActivityList,from,to,efa);
+		}
+	}
+	/**
+	 * Function to build an uncontrollable alternative node.
+	 * @param r
+	 * @param from
+	 * @param to
+	 * @param efa
+	 */
+	protected static void uncontrollabelAlternative(Relation r,
+            										String from,
+            										String to,
+            										EFA efa){
+		
+		String tmp = "";
+		String altEvent = "alt_";
+		String event = "";
+		
+		int number = 0;
+		
+		List<Object> objectList = null;
+		
+		//check in data
+		if(r == null){
+			return;
+		}
+		objectList = r.getActivityRelationGroup();
+		
+		if(objectList.isEmpty()){
+			System.err.println("WARNING empty " + r.getType().toString());
+			return;
+		}
+		
+		//make sure from and to state exist
+		if(from.length() == 0){
+			from = efa.newUniqueState();
+		}
+		if(to.length() == 0){
+			to = efa.newUniqueState();
+		}
+		
+		//build unique event
+		number = 0;
+		while(efa.eventExist(altEvent + Integer.toString(number) + "_0")){
+			number++;
+		}
+		
+		altEvent = altEvent.concat(Integer.toString(number));
+		altEvent = altEvent.concat("_");
+		
+		number = -1;
+		for(Object o : objectList){
+			number = number + 1;
+			
+			//--- Uncontrollable start
+			tmp = efa.newUniqueState();
+			event = altEvent.concat(Integer.toString(number));
+			efa.addEvent(event, "uncontrollable");
+			efa.addTransition(from, tmp, event, "", "");
+			
+			//--- Uncontrollable start
+			
+			if(o instanceof Activity){
+				nativeActivity( (Activity)o, tmp, to, efa );
+			}else if(o instanceof Relation){
+				if(RelationType.SEQUENCE.equals(((Relation)o).getType()))
+				{
+					sequence( (Relation)o, tmp, to, efa );
+				}
+				else if(RelationType.ALTERNATIVE.equals(((Relation)o).getType()))
+				{
+					alternative( (Relation)o, tmp, to, efa );
+				}
+				else if(RelationType.PARALLEL.equals(((Relation)o).getType()))
+				{
+					List<Activity> activityList = new LinkedList<Activity>();
+					String varName = addWaitForNodeToFinish(activityList, (Relation)o, efa);
+					
+					if(!activityList.isEmpty()){
+						nativeSequence(activityList,tmp,to,efa);
+					}
+					
+					parallel( (Relation)o, varName, efa.getModule());
+				}
+				else if(RelationType.ARBITRARY.equals(((Relation)o).getType()))
+				{
+					List<Activity> activityList = new LinkedList<Activity>();
+					String varName = addWaitForNodeToFinish(activityList, (Relation)o, efa);
+					
+					if(!activityList.isEmpty()){
+						nativeSequence(activityList,tmp,to,efa);
+					}
+					
+					arbitrary( (Relation)o, varName, efa.getModule());
+				}
+			}//end if
 		}
 	}
 	

@@ -5,7 +5,6 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.supremica.automata.ExtendedAutomata;
-import net.sourceforge.waters.subject.module.ModuleSubject;
 
 public class Module extends ExtendedAutomata{
 	

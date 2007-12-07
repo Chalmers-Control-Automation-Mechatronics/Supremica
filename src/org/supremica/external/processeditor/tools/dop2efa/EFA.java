@@ -103,9 +103,35 @@ public class EFA extends ExtendedAutomaton{
        
        //add new event to automata
        for(int i = 0; i < es.length; i++){
-    	   module.addEvent(es[i]);
+    	   if(!eventExist(es[i])){
+    		   module.addEvent(es[i]);
+    		   events.add(es[i]);
+    	   }
        }
    }
+   
+   protected void addEvent(String event, String kind){
+       
+       //check in data
+       if(event == null ){
+           return;
+       }else if(event.length() == 0){
+    	   return;
+       }
+       
+       //parse event
+       //events are separated whit ; tex event1;event2
+       String[] es = event.split(";");
+       
+       //add new event to automata
+       for(int i = 0; i < es.length; i++){
+    	   if(!eventExist(es[i])){
+    		   module.addEvent(es[i], kind);
+    		   events.add(es[i]);
+    	   }
+       }
+   }
+   
    
    /**
     * returns the name of next state
