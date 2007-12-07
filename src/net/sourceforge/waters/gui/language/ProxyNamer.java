@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui.language
 //# CLASS:   ProxyNamer
 //###########################################################################
-//# $Id: ProxyNamer.java,v 1.4 2007-12-06 08:41:20 robi Exp $
+//# $Id: ProxyNamer.java,v 1.5 2007-12-07 06:24:03 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.gui.language;
@@ -17,6 +17,7 @@ import java.util.Map;
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.module.AliasProxy;
+import net.sourceforge.waters.model.module.ComponentProxy;
 import net.sourceforge.waters.model.module.ConstantAliasProxy;
 import net.sourceforge.waters.model.module.EdgeProxy;
 import net.sourceforge.waters.model.module.EventAliasProxy;
@@ -123,17 +124,18 @@ public class ProxyNamer {
   private ProxyNamer()
   {
     mMap = new HashMap<Class<? extends Proxy>,NameEntry>(32);
-    createEntry(AutomatonProxy.class, "Component");
+    createEntry(AutomatonProxy.class, "Automaton", "Automata");
     createEntry(AliasProxy.class, "Alias", "Aliases");
     createEntry(ConstantAliasProxy.class, "Named Constant",
                 AliasProxy.class, false);
+    createEntry(ComponentProxy.class, "Component");
     createEntry(EdgeProxy.class, "Edge",
                 NodeProxy.class, true);
     createEntry(EventAliasProxy.class, "Event Alias", "Event Aliases",
                 AliasProxy.class, false);
     createEntry(EventDeclProxy.class, "Event");
     createEntry(ForeachComponentProxy.class, "Foreach Block",
-                AutomatonProxy.class, false);
+                ComponentProxy.class, false);
     createEntry(GraphProxy.class, "Graph", "Graph");
     createEntry(GuardActionBlockProxy.class, "Guard/Action Block",
                 EdgeProxy.class, true);
@@ -144,7 +146,7 @@ public class ProxyNamer {
     createEntry(IndexedIdentifierProxy.class, "Label",
                 IdentifierProxy.class, false);
     createEntry(InstanceProxy.class, "Instance",
-                AutomatonProxy.class, false);
+                ComponentProxy.class, false);
     createEntry(LabelGeometryProxy.class, "Label",
                 SimpleNodeProxy.class, true);
     createEntry(LabelBlockProxy.class, "Labels", "Labels",
@@ -152,13 +154,13 @@ public class ProxyNamer {
     createEntry(NodeProxy.class, "Node");
     createEntry(ParameterBindingProxy.class, "Binding");
     createEntry(SimpleComponentProxy.class, "Automaton", "Automata",
-                AutomatonProxy.class, false);
+                ComponentProxy.class, false);
     createEntry(SimpleIdentifierProxy.class, "Label",
                 IdentifierProxy.class, false);
     createEntry(SimpleNodeProxy.class, "Node",
                 NodeProxy.class, false);
     createEntry(VariableComponentProxy.class, "Variable",
-                AutomatonProxy.class, false);
+                ComponentProxy.class, false);
     createEntry(VariableMarkingProxy.class, "Marking",
                 VariableComponentProxy.class, true);
   }
@@ -214,7 +216,14 @@ public class ProxyNamer {
   //# Simple Access
   private String getName(final Proxy proxy, final boolean plural)
   {
-    return plural ? getNamePlural(proxy) : getNameSingular(proxy);
+    final Class<? extends Proxy> iface = proxy.getProxyInterface();
+    return getName(iface, plural);
+  }
+
+  private String getName(final Class<? extends Proxy> iface,
+                         final boolean plural)
+  {
+    return plural ? getNamePlural(iface) : getNameSingular(iface);
   }
 
   private String getName(final Collection<? extends Proxy> collection)
@@ -226,6 +235,7 @@ public class ProxyNamer {
       final Proxy first = collection.iterator().next();
       return getNameSingular(first);
     default:
+      // Collect how many items of each class are to be named ...
       final int size = collection.size();
       final Map<Class<? extends Proxy>,Integer> map =
         new HashMap<Class<? extends Proxy>,Integer>(size);
@@ -238,6 +248,12 @@ public class ProxyNamer {
           map.put(iface, count + 1);
         }
       }
+      // Top-level rules. If any top-level items found, ignore the rest ...
+      final Integer numdecls = map.get(EventDeclProxy.class);
+      if (numdecls != null) {
+        return getName(EventDeclProxy.class, numdecls != 1);
+      }
+      // Otherwise find most general supertype and use it name ...
       int count = 0;
       Class<? extends Proxy> iface = null;
       for (final Map.Entry<Class<? extends Proxy>,Integer> entry :
@@ -269,6 +285,11 @@ public class ProxyNamer {
   private String getNameSingular(final Proxy proxy)
   {
     final Class<? extends Proxy> iface = proxy.getProxyInterface();
+    return getNameSingular(iface);
+  }
+
+  private String getNameSingular(final Class<? extends Proxy> iface)
+  {
     final NameEntry entry = getEntry(iface);
     return entry.getSingular();
   }
@@ -276,6 +297,11 @@ public class ProxyNamer {
   private String getNamePlural(final Proxy proxy)
   {
     final Class<? extends Proxy> iface = proxy.getProxyInterface();
+    return getNamePlural(iface);
+  }
+
+  private String getNamePlural(final Class<? extends Proxy> iface)
+  {
     final NameEntry entry = getEntry(iface);
     return entry.getPlural();
   }
@@ -319,14 +345,13 @@ public class ProxyNamer {
   private boolean isConstituentOf(Class<? extends Proxy> item,
                                   final Class<? extends Proxy> ancestor)
   {
-    while (item != ancestor) {
+    boolean constituent = true;
+    while (item != null && item != ancestor) {
       final NameEntry entry = getEntry(item);
-      if (!entry.isConstituent()) {
-        return false;
-      }
+      constituent = entry.isConstituent();
       item = entry.getParent();
     }
-    return true;
+    return item != null && constituent;
   }
 
   private Class<? extends Proxy> getParent(final Class<? extends Proxy> iface)
