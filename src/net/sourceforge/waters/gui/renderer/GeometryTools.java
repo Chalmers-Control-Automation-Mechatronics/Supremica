@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui.renderer
 //# CLASS:   GeometryTools
 //###########################################################################
-//# $Id: GeometryTools.java,v 1.21 2007-12-04 03:22:55 robi Exp $
+//# $Id: GeometryTools.java,v 1.22 2007-12-08 22:22:31 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.gui.renderer;
@@ -17,12 +17,15 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
+import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.base.VisitorException;
 import net.sourceforge.waters.model.base.WatersRuntimeException;
 import net.sourceforge.waters.model.module.AbstractModuleProxyVisitor;
 import net.sourceforge.waters.model.module.BoxGeometryProxy;
 import net.sourceforge.waters.model.module.EdgeProxy;
 import net.sourceforge.waters.model.module.GroupNodeProxy;
+import net.sourceforge.waters.model.module.LabelBlockProxy;
+import net.sourceforge.waters.model.module.LabelGeometryProxy;
 import net.sourceforge.waters.model.module.NodeProxy;
 import net.sourceforge.waters.model.module.PointGeometryProxy;
 import net.sourceforge.waters.model.module.SimpleNodeProxy;
@@ -31,6 +34,7 @@ import net.sourceforge.waters.subject.base.ProxySubject;
 import net.sourceforge.waters.subject.module.BoxGeometrySubject;
 import net.sourceforge.waters.subject.module.EdgeSubject;
 import net.sourceforge.waters.subject.module.GroupNodeSubject;
+import net.sourceforge.waters.subject.module.LabelGeometrySubject;
 import net.sourceforge.waters.subject.module.NodeSubject;
 import net.sourceforge.waters.subject.module.PointGeometrySubject;
 import net.sourceforge.waters.subject.module.SimpleNodeSubject;
@@ -64,10 +68,16 @@ public final class GeometryTools
   }
 
   public static Point2D getTopLeftPosition
-    (final Collection<? extends NodeProxy> nodes)
+    (final LabelBlockProxy blocked,
+     final Collection<? extends NodeProxy> nodes)
   {
     double minx = Double.POSITIVE_INFINITY;
     double miny = Double.POSITIVE_INFINITY;
+    if (blocked != null) {
+      final Point2D point = getTopLeftPosition(blocked);
+      minx = point.getX();
+      miny = point.getY();
+    }
     for (final NodeProxy node : nodes) {
       final Point2D point = getTopLeftPosition(node);
       final double x = point.getX();
@@ -78,12 +88,12 @@ public final class GeometryTools
     return new Point2D.Double(minx, miny);
   }
 
-  public static Point2D getTopLeftPosition(final NodeProxy node)
+  public static Point2D getTopLeftPosition(final Proxy proxy)
   {
     if (mTopLeftPositionVisitor == null) {
       mTopLeftPositionVisitor = new TopLeftPositionVisitor();
     }
-    return mTopLeftPositionVisitor.getTopLeftPosition(node);
+    return mTopLeftPositionVisitor.getTopLeftPosition(proxy);
   }
 
   public static Point2D getDefaultPosition(final NodeProxy node,
@@ -818,18 +828,6 @@ public final class GeometryTools
 
     //#######################################################################
     //# Interface net.sourceforge.waters.model.module.ModuleProxyVisitor
-    public Object visitSimpleNodeProxy(final SimpleNodeProxy simple)
-      throws VisitorException
-    {
-      return visitPointGeometryProxy(simple.getPointGeometry());
-    }
-
-    public Object visitGroupNodeProxy(final GroupNodeProxy group)
-      throws VisitorException
-    {
-      return visitBoxGeometryProxy(group.getGeometry());
-    }
-
     public Object visitEdgeProxy(final EdgeProxy edge)
       throws VisitorException
     {
@@ -839,6 +837,24 @@ public final class GeometryTools
       } else {
         return null;
       }
+    }
+
+    public Object visitGroupNodeProxy(final GroupNodeProxy group)
+      throws VisitorException
+    {
+      return visitBoxGeometryProxy(group.getGeometry());
+    }
+
+    public Object visitLabelBlockProxy(final LabelBlockProxy block)
+      throws VisitorException
+    {
+      return visitLabelGeometryProxy(block.getGeometry());
+    }
+
+    public Object visitSimpleNodeProxy(final SimpleNodeProxy simple)
+      throws VisitorException
+    {
+      return visitPointGeometryProxy(simple.getPointGeometry());
     }
 
   }
@@ -874,6 +890,17 @@ public final class GeometryTools
       final double height = rect.getHeight();
       rect.setFrame(x, y, width, height);
       subject.setRectangle(rect);
+      return null;
+    }
+
+    public Object visitLabelGeometryProxy(final LabelGeometryProxy geo)
+    {
+      final LabelGeometrySubject subject = (LabelGeometrySubject) geo;
+      final Point2D offset = geo.getOffset();
+      final double x = offset.getX() + mDelta.getX();
+      final double y = offset.getY() + mDelta.getY();
+      offset.setLocation(x, y);
+      subject.setOffset(offset);
       return null;
     }
 
@@ -953,10 +980,10 @@ public final class GeometryTools
 
     //#######################################################################
     //# Invocation
-    private Point2D getTopLeftPosition(final NodeProxy node)
+    private Point2D getTopLeftPosition(final Proxy proxy)
     {
       try {
-        return (Point2D) node.acceptVisitor(this);
+        return (Point2D) proxy.acceptVisitor(this);
       } catch (final VisitorException exception) {
         throw new WatersRuntimeException(exception);
       }
@@ -970,6 +997,11 @@ public final class GeometryTools
       final double x = rect.getX();
       final double y = rect.getY();
       return new Point2D.Double(x, y);
+    }
+
+    public Object visitLabelGeometryProxy(final LabelGeometryProxy geo)
+    {
+      return geo.getOffset();
     }
 
     public Object visitPointGeometryProxy(final PointGeometryProxy geo)

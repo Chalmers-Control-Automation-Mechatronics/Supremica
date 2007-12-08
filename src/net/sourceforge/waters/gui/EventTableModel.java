@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   EventTableModel
 //###########################################################################
-//# $Id: EventTableModel.java,v 1.31 2007-12-04 03:22:54 robi Exp $
+//# $Id: EventTableModel.java,v 1.32 2007-12-08 22:22:31 robi Exp $
 //###########################################################################
 
 
@@ -44,6 +44,7 @@ import net.sourceforge.waters.subject.module.EventListExpressionSubject;
 import net.sourceforge.waters.subject.module.ForeachEventSubject;
 import net.sourceforge.waters.subject.module.GraphSubject;
 import net.sourceforge.waters.subject.module.IdentifierSubject;
+import net.sourceforge.waters.subject.module.LabelBlockSubject;
 import net.sourceforge.waters.subject.module.ModuleSubject;
 import net.sourceforge.waters.subject.module.SimpleIdentifierSubject;
 
@@ -100,6 +101,10 @@ public class EventTableModel
         final String name = decl.getName();
         final IdentifierSubject ident = new SimpleIdentifierSubject(name);
         addIdentifier(ident);
+      } else if (value instanceof EdgeSubject) {
+        final EdgeSubject edge = (EdgeSubject) value;
+        final LabelBlockSubject block = edge.getLabelBlock();
+        addIdentifiers(block);
       }
       break;
     case ModelChangeEvent.ITEM_REMOVED:
@@ -107,6 +112,12 @@ public class EventTableModel
         final EventDeclSubject decl = (EventDeclSubject) value;
         final String name = decl.getName();
         removeIdentifiers(name);
+      }
+      break;
+    case ModelChangeEvent.STATE_CHANGED:
+      if (source == mGraph) {
+        final LabelBlockSubject block = mGraph.getBlockedEvents();
+        addIdentifiers(block);
       }
       break;
     default:
@@ -187,7 +198,15 @@ public class EventTableModel
     }
   }
 
-  public void removeIdentifiers(final String name)
+  private void addIdentifiers(final EventListExpressionSubject expr)
+  {
+    if (expr != null) {
+      final List<AbstractSubject> events = expr.getEventListModifiable();
+      addIdentifiers(events);
+    }
+  }
+
+  private void removeIdentifiers(final String name)
   {
     final IdentifierSubject tester = new SimpleIdentifierSubject(name);
     final EventEntry entry = new EventEntry(tester);
@@ -210,7 +229,7 @@ public class EventTableModel
     }
   }
 
-  public void removeIdentifier(final IdentifierSubject ident)
+  private void removeIdentifier(final IdentifierSubject ident)
   {
     final EventEntry entry = new EventEntry(ident);
     final int index = Collections.binarySearch(mEvents, entry);

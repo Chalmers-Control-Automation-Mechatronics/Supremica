@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   ControlledSurface
 //###########################################################################
-//# $Id: ControlledSurface.java,v 1.150 2007-12-08 21:17:52 robi Exp $
+//# $Id: ControlledSurface.java,v 1.151 2007-12-08 22:22:31 robi Exp $
 //###########################################################################
 
 
@@ -425,14 +425,15 @@ public class ControlledSurface
         (List<Proxy>) transferable.getTransferData(WatersDataFlavor.GRAPH);
       final Proxy data = list.iterator().next();
       final GraphSubject newgraph = (GraphSubject) cloner.getClone(data);
+      final LabelBlockSubject newblocked = newgraph.getBlockedEvents();
       final Collection<NodeSubject> newnodes = newgraph.getNodesModifiable();
       final Collection<EdgeSubject> newedges = newgraph.getEdgesModifiable();
-      final Point2D newpos = GeometryTools.getTopLeftPosition(newnodes);
+      final Point2D newpos =
+        GeometryTools.getTopLeftPosition(newblocked, newnodes);
       final Point2D pastepos = getPastePosition();
       final double dx = pastepos.getX() - newpos.getX();
       final double dy = pastepos.getY() - newpos.getY();
       final Point2D delta = new Point2D.Double(dx, dy);
-      final LabelBlockSubject newblocked = newgraph.getBlockedEvents();
       if (newblocked != null) {
         newgraph.setBlockedEvents(null);
         final LabelBlockSubject blocked = graph.getBlockedEvents();

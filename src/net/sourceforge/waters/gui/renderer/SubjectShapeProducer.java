@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui.renderer
 //# CLASS:   SubjectShapeProducer
 //###########################################################################
-//# $Id: SubjectShapeProducer.java,v 1.31 2007-12-06 21:33:49 robi Exp $
+//# $Id: SubjectShapeProducer.java,v 1.32 2007-12-08 22:22:31 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.gui.renderer;
@@ -166,6 +166,14 @@ public class SubjectShapeProducer
         removeMapping(esource);
       }
       break;
+    case ModelChangeEvent.STATE_CHANGED:
+      if (esource == getGraph() &&
+          getGraph().getBlockedEvents() == null &&
+          mOldBlockedEventsList != null) {
+        removeMapping(mOldBlockedEventsList);
+        mOldBlockedEventsList = null;
+      }
+      break;
     case ModelChangeEvent.GEOMETRY_CHANGED:
       if (esource instanceof NodeProxy) {
         for (final EdgeProxy edge : getGraph().getEdges()) {
@@ -217,6 +225,7 @@ public class SubjectShapeProducer
         final EdgeProxyShape eshape = visitEdgeProxy(edge);
         return createLabelBlockShape(block, eshape);
       } else {
+        mOldBlockedEventsList = subject;
         return createLabelBlockShape(block, null);
       }
     }
@@ -243,5 +252,7 @@ public class SubjectShapeProducer
   //##########################################################################
   //# Data Members
   private final Subject mSubject;
+
+  private LabelBlockProxy mOldBlockedEventsList = null;
 
 }
