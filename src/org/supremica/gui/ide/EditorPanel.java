@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.gui.ide
 //# CLASS:   EditorPanel
 //###########################################################################
-//# $Id: EditorPanel.java,v 1.65 2007-12-04 03:22:58 robi Exp $
+//# $Id: EditorPanel.java,v 1.66 2007-12-08 21:17:53 robi Exp $
 //###########################################################################
 
 
@@ -220,24 +220,26 @@ public class EditorPanel
 
     //######################################################################
     //#
-    void setRightComponent(JComponent newComponent)
+    boolean setRightComponent(JComponent newComponent)
     {
-        super.setRightComponent(newComponent);
-        final EditorChangedEvent event = new SubPanelSwitchEvent(this);
-        fireEditorChangedEvent(event);
+        if (super.setRightComponent(newComponent)) {
+            final EditorChangedEvent event = new SubPanelSwitchEvent(this);
+            fireEditorChangedEvent(event);
 
-        // Update enablement of actions dependent on the right component
-        // (component editor panel) --- to be deprecated ...
-        if (newComponent instanceof ComponentEditorPanel) {
-            getActions().editorSavePostscriptAction.setEnabled(true);
-            getActions().editorSavePDFAction.setEnabled(true);
-            getActions().editorPrintAction.setEnabled(true);
-        }
-        else
-        {
-            getActions().editorSavePostscriptAction.setEnabled(false);
-            getActions().editorSavePDFAction.setEnabled(false);
-            getActions().editorPrintAction.setEnabled(false);
+            // Update enablement of actions dependent on the right component
+            // (component editor panel) --- to be deprecated ...
+            if (newComponent instanceof ComponentEditorPanel) {
+                getActions().editorSavePostscriptAction.setEnabled(true);
+                getActions().editorSavePDFAction.setEnabled(true);
+                getActions().editorPrintAction.setEnabled(true);
+            } else {
+                getActions().editorSavePostscriptAction.setEnabled(false);
+                getActions().editorSavePDFAction.setEnabled(false);
+                getActions().editorPrintAction.setEnabled(false);
+            }
+            return true;
+        } else {
+            return false;
         }
     }
 

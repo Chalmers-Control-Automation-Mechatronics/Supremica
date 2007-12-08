@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui.command
 //# CLASS:   EditCommand
 //###########################################################################
-//# $Id: EditCommand.java,v 1.2 2007-12-04 03:22:54 robi Exp $
+//# $Id: EditCommand.java,v 1.3 2007-12-08 21:17:53 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.gui.command;
@@ -161,8 +161,7 @@ public class EditCommand
     if (getUpdatesSelection()) {
       final SelectionOwner panel = getPanel();
       final List<ProxySubject> list = Collections.singletonList(mSubject);
-      panel.clearSelection();
-      panel.addToSelection(list);
+      panel.replaceSelection(list);
       panel.scrollToVisible(list);
       panel.activate();
     }

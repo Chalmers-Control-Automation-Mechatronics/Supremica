@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.gui.ide
 //# CLASS:   MainPanel
 //###########################################################################
-//# $Id: MainPanel.java,v 1.34 2007-12-04 03:22:58 robi Exp $
+//# $Id: MainPanel.java,v 1.35 2007-12-08 21:17:53 robi Exp $
 //###########################################################################
 
 package org.supremica.gui.ide;
@@ -77,7 +77,7 @@ abstract class MainPanel
         mSplitPane.setLeftComponent(newComponent);
     }
 
-    void setRightComponent(JComponent newComponent)
+    boolean setRightComponent(final JComponent newComponent)
     {
         JComponent oldComponent = getRightComponent();
         if (oldComponent != newComponent)
@@ -103,8 +103,11 @@ abstract class MainPanel
                 mSplitPane.setRightComponent(newComponent);
             }
             mSplitPane.setDividerLocation(dividerLocation);
+            validate();
+            return true;
+        } else {
+            return false;
         }
-        validate();
     }
 
     public JComponent getRightComponent()

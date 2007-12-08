@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   ComponentsTree
 //###########################################################################
-//# $Id: ComponentsTree.java,v 1.4 2007-12-05 06:48:06 robi Exp $
+//# $Id: ComponentsTree.java,v 1.5 2007-12-08 21:17:52 robi Exp $
 //###########################################################################
 
 
@@ -184,6 +184,12 @@ public class ComponentsTree
     } else {
       return (Proxy) path.getLastPathComponent();
     }
+  }
+
+  public void replaceSelection(final List<? extends Proxy> items)
+  {
+    clearSelection();
+    addToSelection(items);
   }
 
   public void addToSelection(final List<? extends Proxy> items)
@@ -398,8 +404,10 @@ public class ComponentsTree
 
   public void activate()
   {
-    mRoot.showPanel(this);
-    requestFocusInWindow();
+    if (!isFocusOwner()) {
+      mRoot.showPanel(this);
+      requestFocusInWindow();
+    }
   }
 
   public void close()

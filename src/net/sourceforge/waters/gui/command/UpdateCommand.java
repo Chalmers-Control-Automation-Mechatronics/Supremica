@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui.command
 //# CLASS:   UpdateCommand
 //###########################################################################
-//# $Id: UpdateCommand.java,v 1.3 2007-12-06 08:41:20 robi Exp $
+//# $Id: UpdateCommand.java,v 1.4 2007-12-08 21:17:53 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.gui.command;
@@ -121,39 +121,43 @@ public class UpdateCommand
   //# Interface net.sourceforge.waters.gui.command.Command
   public void execute()
   {
-    if (mUpdatesSelection && mHasBeenExecuted) {
-      mPanel.clearSelection();
-      super.execute();
-      mPanel.addToSelection(mModified);
-      mPanel.addToSelection(mAdded);
-    } else {
-      mPanel.removeFromSelection(mRemoved);
-      super.execute();
-      mHasBeenExecuted = true;
-    }
     final int size = mModified.size() + mAdded.size();
     final List<Proxy> visible = new ArrayList<Proxy>(size);
     visible.addAll(mModified);
     visible.addAll(mAdded);
+    if (!mUpdatesSelection || !mHasBeenExecuted) {
+      mPanel.removeFromSelection(mRemoved);
+      super.execute();
+      mHasBeenExecuted = true;
+    } else if (mRemoved.isEmpty()) {
+      super.execute();
+      mPanel.replaceSelection(visible);
+    } else {
+      mPanel.clearSelection();
+      super.execute();
+      mPanel.addToSelection(visible);
+    }
     mPanel.scrollToVisible(visible);
     mPanel.activate();
   }
 
   public void undo()
   {
-    if (mUpdatesSelection) {
-      mPanel.clearSelection();
-      super.undo();
-      mPanel.addToSelection(mModified);
-      mPanel.addToSelection(mRemoved);
-    } else {
-      mPanel.removeFromSelection(mAdded);
-      super.undo();
-    }
     final int size = mModified.size() + mRemoved.size();
     final List<Proxy> visible = new ArrayList<Proxy>(size);
     visible.addAll(mModified);
     visible.addAll(mRemoved);
+    if (!mUpdatesSelection) {
+      mPanel.removeFromSelection(mAdded);
+      super.undo();
+    } else if (mAdded.isEmpty()) {
+      super.undo();
+      mPanel.replaceSelection(visible);
+    } else {
+      mPanel.clearSelection();
+      super.undo();
+      mPanel.addToSelection(visible);
+    }
     mPanel.scrollToVisible(visible);
     mPanel.activate();
   }

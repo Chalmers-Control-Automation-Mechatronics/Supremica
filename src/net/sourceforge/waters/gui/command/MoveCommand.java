@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui.command
 //# CLASS:   MoveCommand
 //###########################################################################
-//# $Id: MoveCommand.java,v 1.2 2007-12-06 08:41:20 robi Exp $
+//# $Id: MoveCommand.java,v 1.3 2007-12-08 21:17:53 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.gui.command;
@@ -164,8 +164,7 @@ public class MoveCommand
       final SelectionOwner panel = getPanel();
       final ProxySubject parent = (ProxySubject) mSubject.getParent();
       final List<ProxySubject> list = Collections.singletonList(parent);
-      panel.clearSelection();
-      panel.addToSelection(list);
+      panel.replaceSelection(list);
       panel.scrollToVisible(list);
       panel.activate();
     }

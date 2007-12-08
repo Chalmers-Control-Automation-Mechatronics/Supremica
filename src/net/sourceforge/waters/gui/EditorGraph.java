@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   EditorGraph
 //###########################################################################
-//# $Id: EditorGraph.java,v 1.26 2007-12-06 08:41:20 robi Exp $
+//# $Id: EditorGraph.java,v 1.27 2007-12-08 21:17:53 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.gui;
@@ -282,6 +282,7 @@ class EditorGraph
       for (final ChangeRecord record : mFakeMap.values()) {
         final AbstractEditCommand cmd = record.getUpdateCommand(surface, pass);
         if (cmd != null) {
+          cmd.setUpdatesSelection(false);
           commands.add(cmd);
         }
       }

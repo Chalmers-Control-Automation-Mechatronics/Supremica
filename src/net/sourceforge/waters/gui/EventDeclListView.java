@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   EventDeclListView
 //###########################################################################
-//# $Id: EventDeclListView.java,v 1.11 2007-12-05 06:48:06 robi Exp $
+//# $Id: EventDeclListView.java,v 1.12 2007-12-08 21:17:53 robi Exp $
 //###########################################################################
 
 
@@ -201,6 +201,12 @@ public class EventDeclListView
     }
   }
 
+  public void replaceSelection(final List<? extends Proxy> items)
+  {
+    clearSelection();
+    addToSelection(items);
+  }
+
   public void addToSelection(final List<? extends Proxy> items)
   {
     int remaining = items.size();
@@ -373,8 +379,10 @@ public class EventDeclListView
 
   public void activate()
   {
-    mRoot.showPanel(this);
-    requestFocusInWindow();
+    if (!isFocusOwner()) {
+      mRoot.showPanel(this);
+      requestFocusInWindow();
+    }
   }
 
   public void close()

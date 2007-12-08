@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.gui.ide
 //# CLASS:   IDE
 //###########################################################################
-//# $Id: IDE.java,v 1.108 2007-12-04 03:22:58 robi Exp $
+//# $Id: IDE.java,v 1.109 2007-12-08 21:17:53 robi Exp $
 //###########################################################################
 
 package org.supremica.gui.ide;
@@ -241,6 +241,10 @@ public class IDE
     
     public void fireEditorChangedEvent(final EditorChangedEvent event)
     {
+        /*
+        System.err.println("fireEditorChangedEvent " + event.getKind() + " " +
+                           event.getSource().getClass().getName());
+        */
         // Just in case they try to register or deregister observers
         // in response to the update ...
         final List<Observer> copy = new LinkedList<Observer>(mObservers);

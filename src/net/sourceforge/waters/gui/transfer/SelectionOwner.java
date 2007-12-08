@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui.transfer
 //# CLASS:   SelectionOwner
 //###########################################################################
-//# $Id: SelectionOwner.java,v 1.2 2007-12-04 03:22:55 robi Exp $
+//# $Id: SelectionOwner.java,v 1.3 2007-12-08 21:17:53 robi Exp $
 //###########################################################################
 
 
@@ -88,6 +88,14 @@ public interface SelectionOwner
    * Resets the current selection to be empty.
    */
   public void clearSelection();
+
+  /**
+   * Replaces the component's current selection by the given list.
+   * The selection is performed directly, without using a command.
+   * @param  items   The list of items to be selected, as produced by the
+   *                 {@link #getCurrentSelection()} method.
+   */
+  public void replaceSelection(List<? extends Proxy> items);
 
   /**
    * Adds all items in the given list to the selection of this component.

@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   ControlledSurface
 //###########################################################################
-//# $Id: ControlledSurface.java,v 1.149 2007-12-06 21:33:49 robi Exp $
+//# $Id: ControlledSurface.java,v 1.150 2007-12-08 21:17:52 robi Exp $
 //###########################################################################
 
 
@@ -291,6 +291,18 @@ public class ControlledSurface
     if (!mSelectedList.isEmpty()) {
       mSelectedList.clear();
       mSelectedSet.clear();
+      fireSelectionChanged();
+    }
+  }
+
+  public void replaceSelection(final List<? extends Proxy> items)
+  {
+    if (!mSelectedList.equals(items)) {
+      final List<ProxySubject> subjects = Casting.toList(items);
+      mSelectedList.clear();
+      mSelectedSet.clear();
+      mSelectedList.addAll(subjects);
+      mSelectedSet.addAll(subjects);
       fireSelectionChanged();
     }
   }
@@ -717,14 +729,16 @@ public class ControlledSurface
 
   public void activate()
   {
-    try {
-      final GraphSubject graph = getGraph();
-      final SimpleComponentSubject comp =
-        (SimpleComponentSubject) graph.getParent();
-      mRoot.getModuleWindowInterface().showEditor(comp);
-      requestFocusInWindow();
-    } catch (final GeometryAbsentException exception) {
-      throw new WatersRuntimeException(exception);
+    if (!isFocusOwner()) {
+      try {
+        final GraphSubject graph = getGraph();
+        final SimpleComponentSubject comp =
+          (SimpleComponentSubject) graph.getParent();
+        mRoot.getModuleWindowInterface().showEditor(comp);
+        requestFocusInWindow();
+      } catch (final GeometryAbsentException exception) {
+        throw new WatersRuntimeException(exception);
+      }
     }
   }
 
@@ -1014,10 +1028,10 @@ public class ControlledSurface
     final Subject parent = elist.getParent();
     if (parent instanceof NodeSubject) {
       final NodeSubject node = (NodeSubject) parent;
-      doReplaceSelection(node);
+      replaceSelection(node);
       getUndoInterface().executeCommand(add);
     } else {
-      doClearSelection();
+      clearSelection();
       final CompoundCommand compound = new CompoundCommand("Event Addition");
       final List<IdentifierSubject> added = add.getAddedIdentifiers();
       final Command select = new SelectCommand(added, this);
@@ -1049,38 +1063,37 @@ public class ControlledSurface
 
 
   //#########################################################################
-  //# High-level Selection Handling
+  //# Auxiliary Methods for Selection Handling
   /**
-   * Clears the selection.
+   * Replaces the selection.
+   * This method ensures that only the given item is selected.
    */
-  private void doClearSelection()
+  private void replaceSelection(final ProxySubject item)
   {
-    clearSelection();
+    if (mSelectedList.size() != 1 || !isSelected(item)) {
+      mSelectedList.clear();
+      mSelectedSet.clear();
+      mSelectedList.add(item);
+      mSelectedSet.add(item);
+      fireSelectionChanged();
+    }
   }
 
   /**
    * Adds an item to the selection.
    */
-  private void doAddToSelection(final ProxySubject item)
+  private void addToSelection(final ProxySubject item)
   {
-    if (!isSelected(item)) {
-      final List<ProxySubject> list = Collections.singletonList(item);
-      addToSelection(list);
+    if (mSelectedSet.add(item)) {
+      mSelectedList.add(item);
+      fireSelectionChanged();
     }
-  }
-
-  /**
-   * Adds several items to the selection.
-   */
-  private void doAddToSelection(final List<? extends ProxySubject> items)
-  {
-    addToSelection(items);
   }
 
   /**
    * Removes an item from the selection.
    */
-  private void doRemoveFromSelection(final ProxySubject item)
+  private void removeFromSelection(final ProxySubject item)
   {
     if (isSelected(item)) {
       final List<ProxySubject> list = Collections.singletonList(item);
@@ -1088,36 +1101,7 @@ public class ControlledSurface
     }
   }
 
-  /**
-   * Removes several items from the selection.
-   */
-  private void doRemoveFromSelection
-    (final List<? extends ProxySubject> items)
-  {
-    removeFromSelection(items);
-  }
-
-  /**
-   * Replaces the selection.
-   * This method ensures that only the given item is selected.
-   */
-  private void doReplaceSelection(final ProxySubject item)
-  {
-    doClearSelection();
-    doAddToSelection(item);
-  }
-
-  /**
-   * Replaces the selection.
-   * This method ensures that only the given items are selected.
-   */
-  private void doReplaceSelection(final List<? extends ProxySubject> items)
-  {
-    doClearSelection();
-    doAddToSelection(items);
-  }
-
-  private void doReplaceLabelSelection(final ProxySubject item)
+  private void replaceLabelSelection(final ProxySubject item)
   {
     if (item.getParent().getParent() instanceof EventListExpressionSubject) {
       final LabelBlockSubject block =
@@ -1128,10 +1112,10 @@ public class ControlledSurface
           victims.add(label);
         }
       }
-      doRemoveFromSelection(victims);
-      doAddToSelection(item);
+      removeFromSelection(victims);
+      addToSelection(item);
     } else {
-      doReplaceSelection(item);
+      replaceSelection(item);
     }
   }
 
@@ -1140,12 +1124,12 @@ public class ControlledSurface
    * This method selects the given item if it is not yet selected,
    * and unselects it if selected.
    */
-  private void doToggleSelection(final ProxySubject item)
+  private void toggleSelection(final ProxySubject item)
   {
     if (isSelected(item)) {
-      doRemoveFromSelection(item);
+      removeFromSelection(item);
     } else {
-      doAddToSelection(item);
+      addToSelection(item);
     }
   }
 
@@ -2535,20 +2519,20 @@ public class ControlledSurface
       if (label == null) {
         if (wasControlDown()) {
           if (mFocusedObject != null) {
-            doToggleSelection(mFocusedObject);
+            toggleSelection(mFocusedObject);
           }
         } else {
           if (mFocusedObject == null) {
             clearSelection();
           } else {
-            doReplaceSelection(mFocusedObject);
+            replaceSelection(mFocusedObject);
           }
         }
       } else {
         if (wasControlDown()) {
-          doToggleSelection(label);
+          toggleSelection(label);
         } else {
-          doReplaceLabelSelection(label);
+          replaceLabelSelection(label);
         }
       }
     }
@@ -2651,7 +2635,7 @@ public class ControlledSurface
           clearSelection();
         }
         if (mMovedObject != null) {
-          doAddToSelection(mMovedObject);
+          addToSelection(mMovedObject);
         }
       }
       Point2D snap = null;
@@ -2731,9 +2715,9 @@ public class ControlledSurface
       super.cancelDrag(point);
       if (mClickedObject != null) {
         if (!wasControlDown()) {
-          doReplaceLabelSelection(mClickedObject);
+          replaceLabelSelection(mClickedObject);
         } else if (mClickedObjectWasSelected) {
-          doRemoveFromSelection(mClickedObject);
+          removeFromSelection(mClickedObject);
         }
       }
       mMoveVisitor = null;
@@ -2764,7 +2748,7 @@ public class ControlledSurface
       super(event);
       mLabelBlock = (LabelBlockSubject) mFocusedObject;
       mClickedLabel = label;
-      doAddToSelection(mClickedLabel);
+      addToSelection(mClickedLabel);
     }
 
     private InternalDragActionDND(final Point point)
@@ -2918,9 +2902,9 @@ public class ControlledSurface
       super.cancelDrag(point);
       if (mClickedLabel != null) {
         if (wasControlDown()) {
-          doToggleSelection(mClickedLabel);
+          toggleSelection(mClickedLabel);
         } else {
-          doReplaceLabelSelection(mClickedLabel);
+          replaceLabelSelection(mClickedLabel);
         }
       }
     }
@@ -3043,7 +3027,7 @@ public class ControlledSurface
     {
       super(event);
       mNode = (SimpleNodeSubject) mFocusedObject;
-      doReplaceSelection(mFocusedObject);
+      replaceSelection(mFocusedObject);
     }
 
     //#######################################################################
@@ -3149,7 +3133,7 @@ public class ControlledSurface
     {
       super(event);
       mGroup = (GroupNodeSubject) mFocusedObject;
-      doReplaceSelection(mFocusedObject);
+      replaceSelection(mFocusedObject);
       final Rectangle2D rect = mGroup.getGeometry().getRectangle();
       switch (handle.getType()) {
       case NW:
@@ -3353,7 +3337,7 @@ public class ControlledSurface
       mIsSource = false;
       mOrigEdge = null;
       mCanCreateSelfloop = false;
-      doReplaceSelection(mFocusedObject);
+      replaceSelection(mFocusedObject);
       mFocusedObject = null;
     }
 
@@ -3369,7 +3353,7 @@ public class ControlledSurface
       mAnchor = null;
       mOrigEdge = (EdgeSubject) mFocusedObject;
       mCanCreateSelfloop = true;
-      doReplaceSelection(mFocusedObject);
+      replaceSelection(mFocusedObject);
       switch (handle.getType()) {
       case SOURCE:
         mIsSource = true;
@@ -3437,7 +3421,7 @@ public class ControlledSurface
       final Point2D anchor;
       if (node == null) {
         if (mSource != null) {
-          doReplaceSelection(mSource);
+          replaceSelection(mSource);
         }
       } else {
         super.commitSecondaryGraph();
@@ -3480,7 +3464,7 @@ public class ControlledSurface
             new EdgeSubject(source, null, null, null, null, geo, null);
           mSecondaryGraph.getEdgesModifiable().add(mCopiedEdge);
           mOrigEdge = (EdgeSubject) mSecondaryGraph.getOriginal(mCopiedEdge);
-          doReplaceSelection(mOrigEdge);
+          replaceSelection(mOrigEdge);
         } else {
           mCopiedEdge = (EdgeSubject) mSecondaryGraph.getCopy(mOrigEdge);
           GeometryTools.createDefaultGeometry(mCopiedEdge);

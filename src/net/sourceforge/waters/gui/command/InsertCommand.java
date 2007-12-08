@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui.command
 //# CLASS:   InsertCommand
 //###########################################################################
-//# $Id: InsertCommand.java,v 1.2 2007-12-04 03:22:54 robi Exp $
+//# $Id: InsertCommand.java,v 1.3 2007-12-08 21:17:53 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.gui.command;
@@ -93,13 +93,10 @@ public class InsertCommand
   public void execute()
   {
     final SelectionOwner panel = getPanel();
-    if (getUpdatesSelection()) {
-      panel.clearSelection();
-    }
     panel.insertItems(mInserts);
     if (getUpdatesSelection()) {
       final List<Proxy> list = InsertInfo.getProxies(mInserts);
-      panel.addToSelection(list);
+      panel.replaceSelection(list);
       panel.scrollToVisible(list);
       panel.activate();
     }
