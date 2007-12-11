@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   EditorEvents
 //###########################################################################
-//# $Id: EditorColor.java,v 1.28 2007-12-05 03:23:02 robi Exp $
+//# $Id: EditorColor.java,v 1.29 2007-12-11 21:00:33 robi Exp $
 //###########################################################################
 
 
@@ -53,7 +53,7 @@ public class EditorColor
   /** The default color of objects. */
   public static final Color DEFAULTCOLOR = Color.BLACK;
   public static final Color DEFAULTCOLOR_LABEL = Color.GREEN.darker().darker();
-  public static final Color DEFAULTCOLOR_NODEGROUP = Color.lightGray;
+  public static final Color DEFAULTCOLOR_NODEGROUP = new Color(64,64,64);
     
   /** The color of erring objects. For example colliding nodes and nodegroups. */
   public static final Color ERRORCOLOR = Color.RED;
@@ -155,13 +155,7 @@ public class EditorColor
      final boolean hasfocus)
   {
     final Color color = getColor(o, dragOver, selected, error, hasfocus);
-    final Color shade = shadow(color);
-    if (!selected && !error && o instanceof GroupNodeProxy) {
-      // If not selected and not error (then the color is normal ...)
-      // Unfortunately, the light gray color gives a too weak shadow!
-      return shade.darker().darker().darker();
-    } else {
-      return shade;
-    }
+    return shadow(color);
   }
+
 }
