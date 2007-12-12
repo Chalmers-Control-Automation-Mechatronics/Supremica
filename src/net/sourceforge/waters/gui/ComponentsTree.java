@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   ComponentsTree
 //###########################################################################
-//# $Id: ComponentsTree.java,v 1.5 2007-12-08 21:17:52 robi Exp $
+//# $Id: ComponentsTree.java,v 1.6 2007-12-12 23:57:48 robi Exp $
 //###########################################################################
 
 
@@ -42,9 +42,9 @@ import net.sourceforge.waters.gui.command.UndoInterface;
 import net.sourceforge.waters.gui.observer.EditorChangedEvent;
 import net.sourceforge.waters.gui.observer.Observer;
 import net.sourceforge.waters.gui.observer.SelectionChangedEvent;
+import net.sourceforge.waters.gui.transfer.ComponentTransferable;
 import net.sourceforge.waters.gui.transfer.InsertInfo;
 import net.sourceforge.waters.gui.transfer.ListInsertPosition;
-import net.sourceforge.waters.gui.transfer.ProxyTransferable;
 import net.sourceforge.waters.gui.transfer.SelectionOwner;
 import net.sourceforge.waters.gui.transfer.WatersDataFlavor;
 import net.sourceforge.waters.model.base.Proxy;
@@ -270,8 +270,7 @@ public class ComponentsTree
       }
     }
     final Proxy first = transferred.iterator().next();
-    final DataFlavor flavor = mDataFlavorVisitor.getDataFlavor(first);
-    return new ProxyTransferable(flavor, transferred);
+    return new ComponentTransferable(transferred);
   }
 
   public boolean canPaste(final Transferable transferable)

@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui.transfer
 //# CLASS:   ProxyTransferable
 //###########################################################################
-//# $Id: ProxyTransferable.java,v 1.2 2007-12-04 03:22:55 robi Exp $
+//# $Id: ProxyTransferable.java,v 1.3 2007-12-12 23:57:49 robi Exp $
 //###########################################################################
 
 
@@ -22,11 +22,12 @@ import java.util.List;
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.base.ProxyCloner;
 import net.sourceforge.waters.model.printer.ProxyPrinter;
+import net.sourceforge.waters.model.unchecked.Casting;
 import net.sourceforge.waters.plain.module.ModuleElementFactory;
 
 
 /**
- * <P>A transferable that can copy and paster one or more WATERS
+ * <P>A transferable that can copy and paste one or more WATERS
  * objects.</P>
  *
  * <P>In addition to a type-specific data flavour as defined in class
@@ -41,7 +42,7 @@ import net.sourceforge.waters.plain.module.ModuleElementFactory;
  * @author Robi Malik
  */
 
-public class ProxyTransferable implements Transferable
+public class ProxyTransferable<P extends Proxy> implements Transferable
 {
 
   //#########################################################################
@@ -49,21 +50,35 @@ public class ProxyTransferable implements Transferable
   /**
    * Creates a transferable that holds a single item.
    */
-  public ProxyTransferable(final DataFlavor flavor, final Proxy data)
+  ProxyTransferable(final DataFlavor flavor, final P data)
   {
     this(flavor, Collections.singletonList(data));
   }
 
   /**
+   * Creates a transferable that holds a single item.
+   */
+  ProxyTransferable(final DataFlavor[] flavors, final P data)
+  {
+    this(flavors, Collections.singletonList(data));
+  }
+
+  /**
    * Creates a transferable that holds a whole list of items.
    */
-  public ProxyTransferable(final DataFlavor flavor,
-                           final List<? extends Proxy> data)
+  ProxyTransferable(final DataFlavor flavor, final List<? extends P> data)
   {
-    mFlavor = flavor;
-    mFlavors = new DataFlavor[] {flavor, DataFlavor.stringFlavor};
+    this(new DataFlavor[] {flavor, DataFlavor.stringFlavor}, data);
+  }
 
-    // This is not good enough for AutomatonProxy ...
+  /**
+   * Creates a transferable that holds a whole list of items.
+   */
+  ProxyTransferable(final DataFlavor[] flavors, final List<? extends P> data)
+  {
+    mFlavors = flavors;
+
+    // This is not good enough for ProductDESProxy ...
     final ProxyCloner cloner = ModuleElementFactory.getCloningInstance();
     final int size = data.size();
     mData = new ArrayList<Proxy>(size);
@@ -79,7 +94,7 @@ public class ProxyTransferable implements Transferable
   public Object getTransferData(final DataFlavor flavor)
     throws IOException, UnsupportedFlavorException
   {
-    if (mFlavor.equals(flavor)) {
+    if (mFlavors[0].equals(flavor)) {
       return mData;
     } else if (DataFlavor.stringFlavor.equals(flavor)) {
       final StringWriter writer = new StringWriter();
@@ -100,30 +115,25 @@ public class ProxyTransferable implements Transferable
 
   public boolean isDataFlavorSupported(final DataFlavor flavor)
   {
-    return
-      isSameFlavor(mFlavor, flavor) ||
-      DataFlavor.stringFlavor.equals(flavor);
+    for (int i = 0; i < mFlavors.length; i++) {
+      if (mFlavors[i].equals(flavor)) {
+        return true;
+      }
+    }
+    return false;
   }
 
 
   //#########################################################################
-  //# Auxiliary Methods
-  private boolean isSameFlavor(final DataFlavor flavor1,
-                               final DataFlavor flavor2)
+  //# Simple Access
+  List<P> getRawData()
   {
-    if (flavor1.equals(flavor2)) {
-      final String name1 = flavor1.getHumanPresentableName();
-      final String name2 = flavor2.getHumanPresentableName();
-      return name1.equals(name2);
-    } else {
-      return false;
-    }
+    return Casting.toList(mData);
   }
 
 
   //#########################################################################
   //# Data Members
-  private final DataFlavor mFlavor;
   private final DataFlavor[] mFlavors;
   private final List<Proxy> mData;
 

@@ -1,0 +1,52 @@
+//# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
+//###########################################################################
+//# PROJECT: Waters GUI
+//# PACKAGE: net.sourceforge.waters.gui.transfer
+//# CLASS:   ParameterBindingTransferable
+//###########################################################################
+//# $Id: ParameterBindingTransferable.java,v 1.1 2007-12-12 23:57:49 robi Exp $
+//###########################################################################
+
+
+package net.sourceforge.waters.gui.transfer;
+
+import java.util.List;
+
+import net.sourceforge.waters.model.module.ParameterBindingProxy;
+
+
+/**
+ * <P>A transferable that can hold a list of WATERS parameter binding
+ * ({@link ParameterBindingProxy}) objects.</P>
+ *
+ * <P>All the functionality of this transferable is included in the base
+ * class {@link ProxyTransferable}. The extension is only done to have
+ * a separate class for the data flavour.</P>
+ *
+ * @author Robi Malik
+ */
+
+public class ParameterBindingTransferable
+  extends ProxyTransferable<ParameterBindingProxy>
+{
+
+  //#########################################################################
+  //# Constructor
+  /**
+   * Creates a transferable that holds a single parameter binding.
+   */
+  public ParameterBindingTransferable(final ParameterBindingProxy data)
+  {
+    super(WatersDataFlavor.PARAMETER_BINDING_LIST, data);
+  }
+
+  /**
+   * Creates a transferable that holds a whole list of parameter bindings.
+   */
+  public ParameterBindingTransferable
+    (final List<? extends ParameterBindingProxy> data)
+  {
+    super(WatersDataFlavor.PARAMETER_BINDING_LIST, data);
+  }
+
+}

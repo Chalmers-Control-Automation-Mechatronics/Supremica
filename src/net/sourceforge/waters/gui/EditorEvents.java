@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   EditorEvents
 //###########################################################################
-//# $Id: EditorEvents.java,v 1.38 2007-12-05 06:48:06 robi Exp $
+//# $Id: EditorEvents.java,v 1.39 2007-12-12 23:57:49 robi Exp $
 //###########################################################################
 
 
@@ -48,12 +48,12 @@ import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableModel;
 
+import net.sourceforge.waters.gui.transfer.IdentifierTransferable;
 import net.sourceforge.waters.model.expr.ExpressionParser;
 import net.sourceforge.waters.model.expr.Operator;
-import net.sourceforge.waters.subject.module.IdentifierSubject;
 import net.sourceforge.waters.subject.module.GraphSubject;
+import net.sourceforge.waters.subject.module.IdentifierSubject;
 import net.sourceforge.waters.subject.module.SimpleComponentSubject;
-import net.sourceforge.waters.xsd.base.EventKind;
 
 import org.supremica.log.Logger;
 import org.supremica.log.LoggerFactory;
@@ -438,58 +438,11 @@ public class EditorEvents
       }
       final List<IdentifierSubject> idents =
 	new ArrayList<IdentifierSubject>(rows.length);
-      EventType e = EventType.UNKNOWN;
       for(int i = 0; i < rows.length; i++) {
 	final IdentifierSubject ident = model.getEvent(rows[i]);
-	final EventKind guess = mModuleContext.guessEventKind(ident);
-	LOGGER.debug("EventType: " + e);
-	LOGGER.debug("EventKind: " + guess);
-	if (guess != null) {
-	  switch (e) {
-	  case UNKNOWN:
-	    switch (guess) {
-	    case PROPOSITION:
-	      e = EventType.NODE_EVENTS;
-	      break;
-	    case CONTROLLABLE:
-	      e = EventType.EDGE_EVENTS;
-	      break;
-	    case UNCONTROLLABLE:
-	      e = EventType.EDGE_EVENTS;
-	      break;
-	    default:
-	      break;
-	    }
-	    break;
-	  case EDGE_EVENTS:
-	    switch (guess) {
-	    case PROPOSITION:
-	      e = EventType.BOTH;
-	      break;
-	    default:
-	      break;
-	    }
-	    break;
-	  case NODE_EVENTS:
-	    switch (guess) {
-	    case CONTROLLABLE:
-	      e = EventType.BOTH;
-	      break;
-	    case UNCONTROLLABLE:
-	      e = EventType.BOTH;
-	      break;
-	    default:
-	      break;
-	    }
-	    break;
-	  default:
-	    break;
-	  }
-	}
 	idents.add(ident);
       }
-      LOGGER.debug("EventType: " + e);
-      final Transferable trans = new IdentifierTransfer(idents, e);
+      final Transferable trans = new IdentifierTransferable(idents);
       try {
 	event.startDrag(DragSource.DefaultCopyDrop, trans);
       } catch (InvalidDnDOperationException exception) {

@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   EventDeclListView
 //###########################################################################
-//# $Id: EventDeclListView.java,v 1.12 2007-12-08 21:17:53 robi Exp $
+//# $Id: EventDeclListView.java,v 1.13 2007-12-12 23:57:49 robi Exp $
 //###########################################################################
 
 
@@ -59,8 +59,8 @@ import net.sourceforge.waters.gui.command.UndoInterface;
 import net.sourceforge.waters.gui.observer.EditorChangedEvent;
 import net.sourceforge.waters.gui.observer.Observer;
 import net.sourceforge.waters.gui.observer.SelectionChangedEvent;
+import net.sourceforge.waters.gui.transfer.EventDeclTransferable;
 import net.sourceforge.waters.gui.transfer.InsertInfo;
-import net.sourceforge.waters.gui.transfer.ProxyTransferable;
 import net.sourceforge.waters.gui.transfer.SelectionOwner;
 import net.sourceforge.waters.gui.transfer.WatersDataFlavor;
 import net.sourceforge.waters.model.base.NamedProxy;
@@ -305,7 +305,8 @@ public class EventDeclListView
 
   public Transferable createTransferable(final List<? extends Proxy> items)
   {
-    return new ProxyTransferable(WatersDataFlavor.EVENTDECL_LIST, items);
+    final List<EventDeclSubject> decls = Casting.toList(items);
+    return new EventDeclTransferable(decls);
   }
 
   public boolean canPaste(final Transferable transferable)
@@ -683,62 +684,16 @@ public class EventDeclListView
     public void dragGestureRecognized(final DragGestureEvent event)
     {
       final int index = locationToIndex(event.getDragOrigin());
-      if (index < 0) {
+      final List<EventDeclSubject> data;
+      if (isSelectedIndex(index)) {
+        data = getCurrentSelection();
+      } else if (index >= 0 && index < mModel.getSize()) {
+        final EventDeclSubject decl = mModel.getElementAt(index);
+        data = Collections.singletonList(decl);
+      } else {
         return;
       }
-      final Object[] values = getSelectedValues();
-      if (values.length == 0) {
-        return;
-      }
-      final List<IdentifierSubject> idents =
-        new ArrayList<IdentifierSubject>(values.length);
-      EventType e = EventType.UNKNOWN;
-      for(int i = 0; i < values.length; i++)
-      {
-        final EventDeclSubject decl = (EventDeclSubject) values[i];
-        switch (e) {
-          case UNKNOWN:
-            switch (decl.getKind()) {
-              case PROPOSITION:
-                e = EventType.NODE_EVENTS;
-                break;
-              case CONTROLLABLE:
-                e = EventType.EDGE_EVENTS;
-                break;
-              case UNCONTROLLABLE:
-                e = EventType.EDGE_EVENTS;
-                break;
-              default:
-                break;
-            }
-            break;
-          case EDGE_EVENTS:
-            switch (decl.getKind()) {
-              case PROPOSITION:
-                e = EventType.BOTH;
-                break;
-              default:
-                break;
-            }
-            break;
-          case NODE_EVENTS:
-            switch (decl.getKind()) {
-              case CONTROLLABLE:
-                e = EventType.BOTH;
-                break;
-              case UNCONTROLLABLE:
-                e = EventType.BOTH;
-                break;
-              default:
-                break;
-            }
-            break;
-          default:
-            break;
-        }
-        idents.add(new SimpleIdentifierSubject(decl.getName()));
-      }
-      final Transferable trans = new IdentifierTransfer(idents, e);
+      final Transferable trans = createTransferable(data);
       try {
         event.startDrag(DragSource.DefaultCopyDrop, trans);
       } catch (InvalidDnDOperationException exception) {

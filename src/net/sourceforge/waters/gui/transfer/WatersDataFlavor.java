@@ -4,14 +4,13 @@
 //# PACKAGE: net.sourceforge.waters.gui.transfer
 //# CLASS:   WatersDataFlavor
 //###########################################################################
-//# $Id: WatersDataFlavor.java,v 1.2 2007-12-04 03:22:55 robi Exp $
+//# $Id: WatersDataFlavor.java,v 1.3 2007-12-12 23:57:49 robi Exp $
 //###########################################################################
 
 
 package net.sourceforge.waters.gui.transfer;
 
 import java.awt.datatransfer.DataFlavor;
-import java.util.List;
 
 
 /**
@@ -25,7 +24,7 @@ public class WatersDataFlavor
 {
 
   public static final DataFlavor EVENTDECL_LIST =
-    new DataFlavor(List.class, "List<EventDeclProxy>");
+    new DataFlavor(EventDeclTransferable.class, "List<EventDeclProxy>");
 
   /**
    * The data flavour for a graph. It is implemented as a {@link
@@ -33,7 +32,7 @@ public class WatersDataFlavor
    * net.sourceforge.waters.model.GraphProxy}.
    */
   public static final DataFlavor GRAPH =
-    new DataFlavor(List.class, "GraphProxy");
+    new DataFlavor(GraphTransferable.class, "GraphProxy");
 
   /**
    * The data flavour for a guard/action block. It is implemented as a
@@ -41,7 +40,8 @@ public class WatersDataFlavor
    * {@link net.sourceforge.waters.model.GuardActionBlockProxy}.
    */
   public static final DataFlavor GUARD_ACTION_BLOCK =
-    new DataFlavor(List.class, "GuardActionBlockProxy");
+    new DataFlavor(GuardActionBlockTransferable.class,
+                   "GuardActionBlockProxy");
 
   /**
    * The data flavour for a list of event labels, as found on an edge of a
@@ -51,7 +51,7 @@ public class WatersDataFlavor
    * net.sourceforge.waters.model.ForeachEventProxy}
    */
   public static final DataFlavor IDENTIFIER_LIST =
-    new DataFlavor(List.class, "List<IdentifierProxy*>");
+    new DataFlavor(IdentifierTransferable.class, "List<IdentifierProxy*>");
 
   /**
    * The data flavour for a list of module components, as contained in the
@@ -63,7 +63,7 @@ public class WatersDataFlavor
    * net.sourceforge.waters.model.ForeachComponentProxy}.
    */
   public static final DataFlavor MODULE_COMPONENT_LIST =
-    new DataFlavor(List.class, "List<SimpleComponentProxy*>");
+    new DataFlavor(ComponentTransferable.class, "List<ComponentProxy*>");
 
   /**
    * The data flavour for a list of parameter bindings, as contained in the
@@ -72,9 +72,10 @@ public class WatersDataFlavor
    * net.sourceforge.waters.model.ParameterBindingProxy}.
    */
   public static final DataFlavor PARAMETER_BINDING_LIST =
-    new DataFlavor(List.class, "List<ParameterBindingProxy>");
+    new DataFlavor(ParameterBindingTransferable.class,
+                   "List<ParameterBindingProxy>");
 
   public static final DataFlavor PRODUCT_DES =
-    new DataFlavor(List.class, "ProductDESProxy");
+    new DataFlavor(ProductDESTransferable.class, "ProductDESProxy");
 
 }

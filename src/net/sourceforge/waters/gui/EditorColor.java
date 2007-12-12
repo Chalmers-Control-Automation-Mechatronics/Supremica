@@ -2,9 +2,9 @@
 //###########################################################################
 //# PROJECT: Waters
 //# PACKAGE: net.sourceforge.waters.gui
-//# CLASS:   EditorEvents
+//# CLASS:   EditorColor
 //###########################################################################
-//# $Id: EditorColor.java,v 1.30 2007-12-11 21:13:19 robi Exp $
+//# $Id: EditorColor.java,v 1.31 2007-12-12 23:57:49 robi Exp $
 //###########################################################################
 
 
@@ -44,13 +44,11 @@ public class EditorColor
     if (dragOver != EditorSurface.DRAGOVERSTATUS.NOTDRAG) {
       if (dragOver == EditorSurface.DRAGOVERSTATUS.CANDROP) {
         return CANDROPCOLOR;
-      } else if(dragOver == EditorSurface.DRAGOVERSTATUS.CANTDROP) {
+      } else if (dragOver == EditorSurface.DRAGOVERSTATUS.CANTDROP) {
         return CANTDROPCOLOR;
       }
     } else if (error) {
       if (o instanceof SimpleNodeProxy) {
-        // Slightly different color, to distinguish nodes from
-        // nodegroups more clearly. Overkill?
         return ERRORCOLOR_NODE;
       } else {
 	return ERRORCOLOR;
@@ -88,29 +86,17 @@ public class EditorColor
 
   /**
    * Returns a transparent variant of the supplied color. The
-   * alpha-value is changed to SHADOWALPHA.
-   *
-   * @see #SHADOWALPHA
+   * alpha-value is changed to {@link #SHADOWALPHA}.
    */
   public static Color shadow(final Color color)
   {
-    final Color cached = SHADOW_CACHE.get(color);
-    if (cached != null) {
-      return cached;
-    } else {
-      final Color shade = new Color(color.getRed(), color.getGreen(),
-                                    color.getBlue(), SHADOWALPHA);
-      SHADOW_CACHE.put(color, shade);
-      return shade;
-    }
+    return new Color(color.getRed(), color.getGreen(), color.getBlue(),
+                     SHADOWALPHA);
   }
 
 
   //#########################################################################
   //# Public Colour Constants
-  /** The alpha value of the shadow-colors. */
-  private static final int SHADOWALPHA = 48;
-    
   /** The default color of disabled text. */
   public static final Color DISABLEDCOLOR = Color.GRAY;
     
@@ -134,13 +120,21 @@ public class EditorColor
     
   /** The default color of objects. */
   public static final Color DEFAULTCOLOR = Color.BLACK;
+
+  /** The default color of node labels. */
   public static final Color DEFAULTCOLOR_LABEL = Color.GREEN.darker().darker();
+
+  /** The default color of goup nodes. */
   public static final Color DEFAULTCOLOR_NODEGROUP = new Color(64,64,64);
     
   /**
    * The color of erring objects. For example colliding nodes and nodegroups.
    */
   public static final Color ERRORCOLOR = Color.RED;
+  /**
+   * Slightly darker error color, to distinguish simple nodes from
+   * group nodes more clearly. Overkill?
+   */
   public static final Color ERRORCOLOR_NODE = ERRORCOLOR.darker();
     
   /**
@@ -154,9 +148,13 @@ public class EditorColor
     new Color(64, 112, 128);
     
   /**
-   * The color of objects when showing whether stuff can be dropped on them.
+   * The color of objects when showing that stuff can be dropped on them.
    */
   public static final Color CANDROPCOLOR = Color.GREEN.darker().darker();
+
+  /**
+   * The color of objects when showing that stuff cannot be dropped on them.
+   */
   public static final Color CANTDROPCOLOR = Color.RED;
 
   /** Invisible color. */
@@ -173,11 +171,11 @@ public class EditorColor
    * are not in focus.
    */
   public static final Color BACKGROUND_NOTFOCUSSED = new Color(232, 232, 232);
- 
+
 
   //#########################################################################
-  //# Private Constants
-  private static final Map<Color,Color> SHADOW_CACHE =
-    new HashMap<Color,Color>(32);
-
+  //# Private Class Constants
+  /** The alpha value of the shadow-colors. */
+  private static final int SHADOWALPHA = 48;
+    
 }

@@ -4,12 +4,13 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   ModuleContext
 //###########################################################################
-//# $Id: ModuleContext.java,v 1.4 2007-12-05 06:48:06 robi Exp $
+//# $Id: ModuleContext.java,v 1.5 2007-12-12 23:57:49 robi Exp $
 //###########################################################################
 
 
 package net.sourceforge.waters.gui;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -25,6 +26,7 @@ import net.sourceforge.waters.model.expr.ParseException;
 import net.sourceforge.waters.model.module.AbstractModuleProxyVisitor;
 import net.sourceforge.waters.model.module.EventDeclProxy;
 import net.sourceforge.waters.model.module.ForeachProxy;
+import net.sourceforge.waters.model.module.ForeachEventProxy;
 import net.sourceforge.waters.model.module.IdentifiedProxy;
 import net.sourceforge.waters.model.module.IdentifierProxy;
 import net.sourceforge.waters.model.module.InstanceProxy;
@@ -69,6 +71,7 @@ public class ModuleContext
   public ModuleContext(final ModuleSubject module)
   {
     mModule = module;
+    mCanDropVisitor = new CanDropVisitor();
     mIconGetterVisitor = new IconGetterVisitor();
     mToolTipGetterVisitor = new ToolTipGetterVisitor();
   }
@@ -157,6 +160,33 @@ public class ModuleContext
     final String name = ident.getName();
     final EventDeclProxy decl = getEventDecl(name);
     return decl == null ? "Event" : getToolTipText(decl);
+  }
+
+  /**
+   * Tries to determine whether the given list of identifiers can be
+   * dropped on a node. This method checks all the identifiers in the given
+   * list, recursively entering foreach-event blocks
+   * @return <CODE>false</CODE> if an identifier is found that can be
+   *         determined <I>not</I> to be of type proposition ({@link
+   *         EventKind#PROPOSITION}); <CODE>true</CODE> otherwise.
+   */
+  public boolean canDropOnNode(final Collection<? extends Proxy> idents)
+  {
+    return mCanDropVisitor.canDrop(idents, NODE_DROP_LIST);
+  }
+
+  /**
+   * Tries to determine whether the given list of identifiers can be
+   * dropped on a node. This method checks all the identifiers in the given
+   * list, recursively entering foreach-event blocks
+   * @return <CODE>false</CODE> if an identifier is found that can be
+   *         determined <I>not</I> to be controllable ({@link
+   *         EventKind#CONTROLLABLE}) or uncontrollable ({@link
+   *         EventKind#UNCONTROLLABLE}); <CODE>true</CODE> otherwise.
+   */
+  public boolean canDropOnEdge(final Collection<? extends Proxy> idents)
+  {
+    return mCanDropVisitor.canDrop(idents, EDGE_DROP_LIST);
   }
 
 
@@ -475,6 +505,67 @@ public class ModuleContext
 
 
   //#########################################################################
+  //# Inner Class CanDropVisitor
+  private class CanDropVisitor
+    extends AbstractModuleProxyVisitor
+  {
+
+    //#######################################################################
+    //# Invocation
+    private boolean canDrop(final Collection<? extends Proxy> idents,
+                            final EventKind[] allowed)
+    {
+      try {
+        mAllowed = allowed;
+        for (final Proxy proxy : idents) {
+          final boolean candrop = (Boolean) proxy.acceptVisitor(this);
+          if (!candrop) {
+            return false;
+          }
+        }
+        return true;
+      } catch (final VisitorException exception) {
+	throw exception.getRuntimeException();
+      }
+    }
+
+    //#######################################################################
+    //# Interface net.sourceforge.waters.model.printer.ModuleProxyVisitor
+    public Boolean visitForeachEventProxy(final ForeachEventProxy foreach)
+      throws VisitorException
+    {
+      for (final Proxy proxy : foreach.getBody()) {
+        final boolean candrop = (Boolean) proxy.acceptVisitor(this);
+        if (!candrop) {
+          return false;
+        }
+      }
+      return true;
+    }
+
+    public Boolean visitIdentifierProxy(final IdentifierProxy ident)
+    {
+      final EventKind kind = guessEventKind(ident);
+      if (kind == null) {
+        return true;
+      } else {
+        for (int i = 0; i < mAllowed.length; i++) {
+          if (kind == mAllowed[i]) {
+            return true;
+          }
+        }
+        return false;
+      }
+    }
+
+    //#######################################################################
+    //# Data Members
+    private EventKind[] mAllowed;
+
+  }
+
+
+  //#########################################################################
   //# Inner Class IconGetterVisitor
   private static class IconGetterVisitor
     extends AbstractModuleProxyVisitor
@@ -623,6 +714,7 @@ public class ModuleContext
   //#########################################################################
   //# Data Members
   private final ModuleSubject mModule;
+  private final CanDropVisitor mCanDropVisitor;
   private final IconGetterVisitor mIconGetterVisitor;
   private final ToolTipGetterVisitor mToolTipGetterVisitor;
 
@@ -632,5 +724,10 @@ public class ModuleContext
   //#########################################################################
   //# Static Class Variables
   private static Pattern PATTERN = null;
+
+  private static final EventKind[] NODE_DROP_LIST =
+    {EventKind.PROPOSITION};
+  private static final EventKind[] EDGE_DROP_LIST =
+    {EventKind.CONTROLLABLE, EventKind.UNCONTROLLABLE};
 
 }

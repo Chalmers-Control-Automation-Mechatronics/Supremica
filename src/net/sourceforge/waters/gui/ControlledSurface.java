@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   ControlledSurface
 //###########################################################################
-//# $Id: ControlledSurface.java,v 1.151 2007-12-08 22:22:31 robi Exp $
+//# $Id: ControlledSurface.java,v 1.152 2007-12-12 23:57:48 robi Exp $
 //###########################################################################
 
 
@@ -76,6 +76,9 @@ import net.sourceforge.waters.gui.springembedder.EmbedderEvent;
 import net.sourceforge.waters.gui.springembedder.EmbedderObserver;
 import net.sourceforge.waters.gui.springembedder.SpringAbortDialog;
 import net.sourceforge.waters.gui.springembedder.SpringEmbedder;
+import net.sourceforge.waters.gui.transfer.GraphTransferable;
+import net.sourceforge.waters.gui.transfer.GuardActionBlockTransferable;
+import net.sourceforge.waters.gui.transfer.IdentifierTransferable;
 import net.sourceforge.waters.gui.transfer.InsertInfo;
 import net.sourceforge.waters.gui.transfer.ListInsertPosition;
 import net.sourceforge.waters.gui.transfer.ProxyTransferable;
@@ -373,7 +376,7 @@ public class ControlledSurface
     } else if (WatersDataFlavor.GUARD_ACTION_BLOCK.equals(flavor)) {
       final GuardActionBlockProxy block =
         findFirst(items, GuardActionBlockProxy.class);
-      return new ProxyTransferable(flavor, block);
+      return new GuardActionBlockTransferable(block);
     } else if (DataFlavor.stringFlavor.equals(flavor)) {
       // *** BUG *** Parse it also !!!
       final LabelGeometrySubject geo =
@@ -2767,61 +2770,54 @@ public class ControlledSurface
       continueDrag(point);
       mController.updateHighlighting(point);
 
-      IdentifierWithKind ikind;
+      List<? extends Proxy> data;
       EventListExpressionSubject elist = null;
       Line2D line = null;
       try {
-        ikind = (IdentifierWithKind)
-          event.getTransferable().getTransferData(FLAVOUR);
+        data = (List<? extends Proxy>)
+          event.getTransferable().getTransferData
+            (WatersDataFlavor.IDENTIFIER_LIST);
       } catch (final UnsupportedFlavorException exception) {
         throw new IllegalArgumentException(exception);
       } catch (final IOException exception) {
         throw new IllegalArgumentException(exception);
       }
 
-      final EventType etype = ikind.getKind();
+      final ModuleContext context =
+        mRoot.getModuleWindowInterface().getModuleContext();
       if (mFocusedObject != null) {
         if (mFocusedObject instanceof SimpleNodeSubject) {
-          if (etype == EventType.UNKNOWN || etype == EventType.NODE_EVENTS) {
-            final SimpleNodeSubject node =
-              (SimpleNodeSubject) mFocusedObject;
+          final SimpleNodeSubject node = (SimpleNodeSubject) mFocusedObject;
+          if (context.canDropOnNode(data)) {
             elist = node.getPropositions();
           }
         } else if (mFocusedObject instanceof LabelGeometrySubject) {
-          if (etype == EventType.UNKNOWN || etype == EventType.NODE_EVENTS) {
-            final SimpleNodeSubject node =
-              (SimpleNodeSubject) mFocusedObject.getParent();
+          final SimpleNodeSubject node =
+            (SimpleNodeSubject) mFocusedObject.getParent();
+          if (context.canDropOnNode(data)) {
             elist = node.getPropositions();
           }
         } else if (mFocusedObject instanceof EdgeSubject) {
-          if (etype == EventType.UNKNOWN || etype == EventType.EDGE_EVENTS) {
-            final EdgeSubject edge = (EdgeSubject) mFocusedObject;
+          final EdgeSubject edge = (EdgeSubject) mFocusedObject;
+          if (context.canDropOnEdge(data)) {
             elist = edge.getLabelBlock();
           }
-        } else if (mFocusedObject instanceof LabelBlockSubject) {
-          if (etype == EventType.UNKNOWN || etype == EventType.EDGE_EVENTS) {
-            elist = (LabelBlockSubject) mFocusedObject;
-          }
+        } else if (mFocusedObject instanceof LabelBlockSubject &&
+                   context.canDropOnEdge(data)) {
+          elist = (LabelBlockSubject) mFocusedObject;
         }
       }
 
       if (elist != null) {
-        boolean allpresent = true;
-        Set<IdentifierSubject> contents =
-          new TreeSet<IdentifierSubject>(NamedComparator.getInstance());
+        Set<IdentifierProxy> contents =
+          new TreeSet<IdentifierProxy>(NamedComparator.getInstance());
         for (final AbstractSubject item : elist.getEventListModifiable()) {
-          if (item instanceof IdentifierSubject) {
-            final IdentifierSubject ident = (IdentifierSubject) item;
+          if (item instanceof IdentifierProxy) {
+            final IdentifierProxy ident = (IdentifierProxy) item;
             contents.add(ident);
           }
         }
-        for (final IdentifierSubject ident : ikind.getIdentifiers()) {
-          if (!contents.contains(ident)) {
-            allpresent = false;
-            break;
-          }
-        }
-        if (allpresent) {
+        if (contents.containsAll(data)) {
           elist = null;
         } else if (elist instanceof LabelBlockSubject) {
           final LabelBlockSubject block = (LabelBlockSubject) elist;
@@ -2872,18 +2868,33 @@ public class ControlledSurface
       commitDrag(point);
       try {
         if (mExternalDragStatus == EditorSurface.DRAGOVERSTATUS.CANDROP) {
-          final IdentifierWithKind ikind = (IdentifierWithKind)
-            event.getTransferable().getTransferData(FLAVOUR);
-          final List<IdentifierSubject> identifiers = ikind.getIdentifiers();
+          final List<? extends Proxy> data = (List<? extends Proxy>)
+            event.getTransferable().getTransferData
+              (WatersDataFlavor.IDENTIFIER_LIST);
+          final ModuleProxyCloner cloner =
+            ModuleSubjectFactory.getCloningInstance();
+          final int size = data.size();
+          // *** BUG ***
+          // What about non-identifiers?
+          // ***
+          final List<IdentifierSubject> clones =
+            new ArrayList<IdentifierSubject>(size);
+          for (final Proxy proxy : data) {
+            if (proxy instanceof IdentifierProxy) {
+              final IdentifierSubject ident =
+                (IdentifierSubject) cloner.getClone(proxy);
+              clones.add(ident);
+            }
+          }
           if (mFocusedObject instanceof SimpleNodeSubject) {
-            addToNode((SimpleNodeSubject) mFocusedObject, identifiers);
+            addToNode((SimpleNodeSubject) mFocusedObject, clones);
           } else if (mFocusedObject instanceof EdgeSubject) {
-            addToEdge((EdgeSubject) mFocusedObject, identifiers);
+            addToEdge((EdgeSubject) mFocusedObject, clones);
           } else if (mFocusedObject instanceof LabelBlockSubject) {
             addToLabelGroup((LabelBlockSubject) mFocusedObject,
-                            identifiers, event);
+                            clones, event);
           } else if (mFocusedObject instanceof LabelGeometrySubject) {
-            addToLabel((LabelGeometrySubject) mFocusedObject, identifiers);
+            addToLabel((LabelGeometrySubject) mFocusedObject, clones);
           }
           event.dropComplete(true);
           requestFocusInWindow();
@@ -4006,8 +4017,7 @@ public class ControlledSurface
           (InternalDragActionDND) mInternalDragAction;
         final List<IdentifierSubject> toBeDragged =
           action.getIdentifiersToBeDragged();
-        final Transferable trans =
-          new IdentifierTransfer(toBeDragged, EventType.EDGE_EVENTS);
+        final Transferable trans = new IdentifierTransferable(toBeDragged);
         try {
           event.startDrag(DragSource.DefaultCopyDrop, trans);
         } catch (final InvalidDnDOperationException exception) {
@@ -4181,8 +4191,7 @@ public class ControlledSurface
       }
       final GraphProxy graph = new GraphElement
         (false, mTransferredBlock, mTransferredNodes, mTransferredEdges);
-      final ProxyTransferable transferable = new ProxyTransferable
-        (WatersDataFlavor.GRAPH, graph);
+      final ProxyTransferable transferable = new GraphTransferable(graph);
       mTransferredBlock = null;
       mTransferredNodes = null;
       mTransferredEdges = null;
@@ -4249,8 +4258,8 @@ public class ControlledSurface
       }
       final List<Proxy> transferlist =
         new ArrayList<Proxy>(mTransferredItems.values());
-      final ProxyTransferable transferable = new ProxyTransferable
-        (WatersDataFlavor.IDENTIFIER_LIST, transferlist);
+      final ProxyTransferable transferable =
+        new IdentifierTransferable(transferlist);
       mTransferredItems = null;
       return transferable;
     }
@@ -4431,9 +4440,6 @@ public class ControlledSurface
 
   //#########################################################################
   //# Class Constants
-  private static final DataFlavor FLAVOUR =
-    new DataFlavor(IdentifierWithKind.class, "IdentifierWithKind");
-
   private static final int SELFLOOP_AUX_RADIUS =
     SimpleNodeProxyShape.RADIUS + 2;
   private static final double SELFLOOP_THRESHOLD =
