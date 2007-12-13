@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   ControlledSurface
 //###########################################################################
-//# $Id: ControlledSurface.java,v 1.152 2007-12-12 23:57:48 robi Exp $
+//# $Id: ControlledSurface.java,v 1.153 2007-12-13 23:49:37 robi Exp $
 //###########################################################################
 
 
@@ -48,7 +48,6 @@ import javax.swing.event.DocumentListener;
 import net.sourceforge.waters.gui.EditorSurface.DRAGOVERSTATUS;
 import net.sourceforge.waters.gui.actions.IDEAction;
 import net.sourceforge.waters.gui.actions.WatersPopupActionManager;
-import net.sourceforge.waters.gui.command.AddEventCommand;
 import net.sourceforge.waters.gui.command.ChangeNameCommand;
 import net.sourceforge.waters.gui.command.Command;
 import net.sourceforge.waters.gui.command.CompoundCommand;
@@ -300,12 +299,27 @@ public class ControlledSurface
 
   public void replaceSelection(final List<? extends Proxy> items)
   {
-    if (!mSelectedList.equals(items)) {
-      final List<ProxySubject> subjects = Casting.toList(items);
+    // *** KLUDGE ***
+    // After adding a proposition to a node via drop or paste,
+    // InsertCommand will try to select it. This code selects
+    // the node instead of the proposition label.
+    // But it does not work well when undoing---then the node should
+    // be selected, not deselected ...
+    // ***
+    final int size = items.size();
+    final List<ProxySubject> selectable = new ArrayList<ProxySubject>(size);
+    for (final Proxy proxy : items) {
+      final ProxySubject subject = (ProxySubject) proxy;
+      final ProxySubject parent = findSelectableAncestor(subject);
+      if (parent != null && !selectable.contains(parent)) {
+        selectable.add(parent);
+      }
+    }
+    if (!mSelectedList.equals(selectable)) {
       mSelectedList.clear();
       mSelectedSet.clear();
-      mSelectedList.addAll(subjects);
-      mSelectedSet.addAll(subjects);
+      mSelectedList.addAll(selectable);
+      mSelectedSet.addAll(selectable);
       fireSelectionChanged();
     }
   }
@@ -315,8 +329,9 @@ public class ControlledSurface
     boolean change = false;
     for (final Proxy proxy : items) {
       final ProxySubject subject = (ProxySubject) proxy;
-      if (mSelectedSet.add(subject)) {
-        mSelectedList.add(subject);
+      final ProxySubject parent = findSelectableAncestor(subject);
+      if (parent != null && mSelectedSet.add(parent)) {
+        mSelectedList.add(parent);
         change = true;
       }
     }
@@ -329,10 +344,12 @@ public class ControlledSurface
   {
     boolean change = false;
     for (final Proxy proxy : items) {
-      if (mSelectedSet.remove(proxy)) {
-        mSelectedList.remove(proxy);
-        if (proxy instanceof LabelBlockSubject) {
-          final LabelBlockSubject block = (LabelBlockSubject) proxy;
+      final ProxySubject subject = (ProxySubject) proxy;
+      final ProxySubject parent = findSelectableAncestor(subject);
+      if (mSelectedSet.remove(parent)) {
+        mSelectedList.remove(parent);
+        if (parent instanceof LabelBlockSubject) {
+          final LabelBlockSubject block = (LabelBlockSubject) parent;
           for (final Proxy child : block.getEventListModifiable()) {
             if (mSelectedSet.remove(child)) {
               mSelectedList.remove(child);
@@ -397,11 +414,7 @@ public class ControlledSurface
     } else if (transferable.isDataFlavorSupported
                  (WatersDataFlavor.IDENTIFIER_LIST)) {
       final Proxy target = getPasteTarget();
-      return
-        target != null &&
-        (target instanceof GraphProxy ||
-         target instanceof EdgeProxy ||
-         target instanceof LabelBlockProxy);
+      return mIdentifierPasteVisitor.canPaste(target, transferable);
     } else if (transferable.isDataFlavorSupported
                  (WatersDataFlavor.GUARD_ACTION_BLOCK)) {
       final Proxy target = getPasteTarget();
@@ -476,40 +489,8 @@ public class ControlledSurface
       newedges.clear();
     } else if (transferable.isDataFlavorSupported
                  (WatersDataFlavor.IDENTIFIER_LIST)) {
-      final List<Proxy> data = (List<Proxy>)
-        transferable.getTransferData(WatersDataFlavor.IDENTIFIER_LIST);
       final ProxySubject target = getPasteTarget();
-      final LabelBlockSubject block;
-      if (target instanceof LabelBlockSubject) {
-        block = (LabelBlockSubject) target;
-      } else if (target instanceof EdgeSubject) {
-        final EdgeSubject edge = (EdgeSubject) target;
-        block = edge.getLabelBlock();
-      } else if (target instanceof GraphSubject) {
-        final GraphSubject graph = (GraphSubject) target;
-        block = graph.getBlockedEvents();
-      } else {
-        block = null;
-      }
-      if (block != null) {
-        final ListSubject<? extends ProxySubject> eventlist =
-          block.getEventListModifiable();
-        int pos = eventlist.size();
-        for (final Proxy proxy : data) {
-          final ProxySubject newident = (ProxySubject) cloner.getClone(proxy);
-          addInsertInfo(inserts, newident, eventlist, pos++);
-        }
-      } else {
-        final LabelBlockSubject newblock = new LabelBlockSubject();
-        final List<AbstractSubject> newlist =
-          newblock.getEventListModifiable();
-        for (final Proxy proxy : data) {
-          final AbstractSubject newident =
-            (AbstractSubject) cloner.getClone(proxy);
-          newlist.add(newident);
-        }
-        addInsertInfo(inserts, newblock, target);
-      }
+      mIdentifierPasteVisitor.addInsertInfo(target, -1, transferable, inserts);
     } else if (transferable.isDataFlavorSupported
                  (WatersDataFlavor.GUARD_ACTION_BLOCK)) {
       final List<Proxy> list =
@@ -712,8 +693,8 @@ public class ControlledSurface
         if (proxy instanceof IdentifierSubject ||
             proxy instanceof ForeachEventSubject) {
           final Subject subject = (Subject) proxy;
-          final LabelBlockSubject block = findLabelBlock(subject);
-          scrollable.add(block);
+          final ProxySubject parent = findLabelBlockOrSimpleNode(subject);
+          scrollable.add(parent);
         } else {
           scrollable.add(proxy);
         }
@@ -1009,41 +990,6 @@ public class ControlledSurface
       GraphTools.getCreatedEdge(graph, source, target, start, end);
     final Command cmd = new InsertCommand(edge, this);
     getUndoInterface().executeCommand(cmd);
-  }
-
-  /**
-   * Adds a set of event labels to a label block and selects them.
-   * This method creates and executes a compound command consisting of
-   * an event addition and a selection command. Labels to be added as
-   * propositions to nodes are handled differently and correctly.
-   * @param  elist        the label block to be modified.
-   * @param  identifiers  the event labels to be added. They are cloned
-   *                      before insertion.
-   * @param  pos          the position in the list where the new labels
-   *                      are to be added. Insertion occurs before this
-   *                      position.
-   */
-  void doAddToEventList
-    (final EventListExpressionSubject elist,
-     final List<IdentifierSubject> identifiers,
-     final int pos)
-  {
-    final AddEventCommand add = new AddEventCommand(elist, identifiers, pos);
-    final Subject parent = elist.getParent();
-    if (parent instanceof NodeSubject) {
-      final NodeSubject node = (NodeSubject) parent;
-      replaceSelection(node);
-      getUndoInterface().executeCommand(add);
-    } else {
-      clearSelection();
-      final CompoundCommand compound = new CompoundCommand("Event Addition");
-      final List<IdentifierSubject> added = add.getAddedIdentifiers();
-      final Command select = new SelectCommand(added, this);
-      compound.addCommand(add);
-      compound.addCommand(select);
-      compound.end();
-      getUndoInterface().executeCommand(compound);
-    }
   }
 
   public void runEmbedder(final boolean undoable)
@@ -1507,12 +1453,33 @@ public class ControlledSurface
     return null;
   }
 
-  private LabelBlockSubject findLabelBlock(Subject subject)
+  private ProxySubject findLabelBlockOrSimpleNode(Subject subject)
   {
-    while (subject != null && !(subject instanceof LabelBlockSubject)) {
+    while (subject != null &&
+           !(subject instanceof LabelBlockSubject) &&
+           !(subject instanceof SimpleNodeSubject)) {
       subject = subject.getParent();
     }
-    return (LabelBlockSubject) subject;
+    return (ProxySubject) subject;
+  }
+
+  private ProxySubject findSelectableAncestor(final Subject subject)
+  {
+    if (subject instanceof IdentifierSubject ||
+        subject instanceof ForeachEventSubject) {
+      Subject parent = subject;
+      do {
+        parent = parent.getParent();
+        if (parent == null) {
+          return null;
+        }
+      } while (!(parent instanceof LabelBlockSubject) &&
+               !(parent instanceof SimpleNodeSubject));
+      return (ProxySubject)
+        (parent instanceof SimpleNodeSubject ? parent : subject);
+    } else {
+      return (ProxySubject) subject;
+    }
   }
 
 
@@ -2770,79 +2737,40 @@ public class ControlledSurface
       continueDrag(point);
       mController.updateHighlighting(point);
 
-      List<? extends Proxy> data;
-      EventListExpressionSubject elist = null;
-      Line2D line = null;
-      try {
-        data = (List<? extends Proxy>)
-          event.getTransferable().getTransferData
-            (WatersDataFlavor.IDENTIFIER_LIST);
-      } catch (final UnsupportedFlavorException exception) {
-        throw new IllegalArgumentException(exception);
-      } catch (final IOException exception) {
-        throw new IllegalArgumentException(exception);
-      }
-
-      final ModuleContext context =
-        mRoot.getModuleWindowInterface().getModuleContext();
-      if (mFocusedObject != null) {
-        if (mFocusedObject instanceof SimpleNodeSubject) {
-          final SimpleNodeSubject node = (SimpleNodeSubject) mFocusedObject;
-          if (context.canDropOnNode(data)) {
-            elist = node.getPropositions();
-          }
-        } else if (mFocusedObject instanceof LabelGeometrySubject) {
-          final SimpleNodeSubject node =
-            (SimpleNodeSubject) mFocusedObject.getParent();
-          if (context.canDropOnNode(data)) {
-            elist = node.getPropositions();
-          }
-        } else if (mFocusedObject instanceof EdgeSubject) {
-          final EdgeSubject edge = (EdgeSubject) mFocusedObject;
-          if (context.canDropOnEdge(data)) {
-            elist = edge.getLabelBlock();
-          }
-        } else if (mFocusedObject instanceof LabelBlockSubject &&
-                   context.canDropOnEdge(data)) {
-          elist = (LabelBlockSubject) mFocusedObject;
-        }
-      }
-
-      if (elist != null) {
-        Set<IdentifierProxy> contents =
-          new TreeSet<IdentifierProxy>(NamedComparator.getInstance());
-        for (final AbstractSubject item : elist.getEventListModifiable()) {
-          if (item instanceof IdentifierProxy) {
-            final IdentifierProxy ident = (IdentifierProxy) item;
-            contents.add(ident);
-          }
-        }
-        if (contents.containsAll(data)) {
-          elist = null;
-        } else if (elist instanceof LabelBlockSubject) {
-          final LabelBlockSubject block = (LabelBlockSubject) elist;
-          final Rectangle2D bounds =
-            getShapeProducer().getShape(block).getShape().getBounds();
-          final double x1 = bounds.getMinX();
-          final double x2 = bounds.getMaxX();
-          double y;
-          if (elist == mFocusedObject) {
-            y = bounds.getMinY();
-            for (final ProxySubject item : block.getEventListModifiable()) {
-              final ProxyShape shape = getShapeProducer().getShape(item);
-              final Rectangle2D rect = shape.getShape().getBounds();
-              if (point.getY() < rect.getCenterY()) {
-                y = rect.getMinY();
-                break;
-              } else {
-                y = rect.getMaxY();
-              }
+      final Transferable transferable = event.getTransferable();
+      final EventListExpressionSubject elist =
+        mIdentifierPasteVisitor.getIdentifierPasteTarget
+          (mFocusedObject, transferable);
+      final Line2D line;
+      if (elist != null && elist instanceof LabelBlockSubject) {
+        final LabelBlockSubject block = (LabelBlockSubject) elist;
+        final Rectangle2D bounds =
+          getShapeProducer().getShape(block).getShape().getBounds();
+        final double x1 = bounds.getMinX();
+        final double x2 = bounds.getMaxX();
+        double y;
+        if (elist == mFocusedObject) {
+          y = bounds.getMinY();
+          mDropIndex = 0;
+          for (final ProxySubject item : block.getEventListModifiable()) {
+            final ProxyShape shape = getShapeProducer().getShape(item);
+            final Rectangle2D rect = shape.getShape().getBounds();
+            if (point.getY() < rect.getCenterY()) {
+              y = rect.getMinY();
+              break;
+            } else {
+              y = rect.getMaxY();
+              mDropIndex++;
             }
-          } else {
-            y = bounds.getMaxY();
           }
-          line = new Line2D.Double(x1, y, x2, y);
+        } else {
+          y = bounds.getMaxY();
+          mDropIndex = -1;
         }
+        line = new Line2D.Double(x1, y, x2, y);
+      } else {
+        line = null;
+        mDropIndex = -1;
       }
 
       final int operation = DnDConstants.ACTION_COPY;
@@ -2868,36 +2796,14 @@ public class ControlledSurface
       commitDrag(point);
       try {
         if (mExternalDragStatus == EditorSurface.DRAGOVERSTATUS.CANDROP) {
-          final List<? extends Proxy> data = (List<? extends Proxy>)
-            event.getTransferable().getTransferData
-              (WatersDataFlavor.IDENTIFIER_LIST);
-          final ModuleProxyCloner cloner =
-            ModuleSubjectFactory.getCloningInstance();
-          final int size = data.size();
-          // *** BUG ***
-          // What about non-identifiers?
-          // ***
-          final List<IdentifierSubject> clones =
-            new ArrayList<IdentifierSubject>(size);
-          for (final Proxy proxy : data) {
-            if (proxy instanceof IdentifierProxy) {
-              final IdentifierSubject ident =
-                (IdentifierSubject) cloner.getClone(proxy);
-              clones.add(ident);
-            }
-          }
-          if (mFocusedObject instanceof SimpleNodeSubject) {
-            addToNode((SimpleNodeSubject) mFocusedObject, clones);
-          } else if (mFocusedObject instanceof EdgeSubject) {
-            addToEdge((EdgeSubject) mFocusedObject, clones);
-          } else if (mFocusedObject instanceof LabelBlockSubject) {
-            addToLabelGroup((LabelBlockSubject) mFocusedObject,
-                            clones, event);
-          } else if (mFocusedObject instanceof LabelGeometrySubject) {
-            addToLabel((LabelGeometrySubject) mFocusedObject, clones);
-          }
+          final Transferable transferable = event.getTransferable();
+          final List<InsertInfo> inserts = new LinkedList<InsertInfo>();
+          mIdentifierPasteVisitor.addInsertInfo
+            (mFocusedObject, mDropIndex, transferable, inserts);
+          final Command cmd =
+            new InsertCommand(inserts, ControlledSurface.this);
+          getUndoInterface().executeCommand(cmd);
           event.dropComplete(true);
-          requestFocusInWindow();
         } else {
           event.dropComplete(false);
         }
@@ -2963,48 +2869,6 @@ public class ControlledSurface
       return result;
     }
 
-    private void addToNode(final SimpleNodeSubject node,
-                           final List<IdentifierSubject> identifiers)
-    {
-      final EventListExpressionSubject elist = node.getPropositions();
-      doAddToEventList(elist, identifiers, elist.getEventList().size());
-    }
-
-    private void addToLabel(final LabelGeometrySubject label,
-                            final List<IdentifierSubject> identifiers)
-    {
-      final SimpleNodeSubject node = (SimpleNodeSubject) label.getParent();
-      addToNode(node, identifiers);
-    }
-
-    private void addToEdge(final EdgeSubject edge,
-                           final List<IdentifierSubject> identifiers)
-    {
-      final LabelBlockSubject block = edge.getLabelBlock();
-      doAddToEventList(block, identifiers, block.getEventList().size());
-    }
-
-    private void addToLabelGroup
-      (final LabelBlockSubject block,
-       final List<IdentifierSubject> identifiers,
-       final DropTargetDropEvent event)
-    {
-      final double y = event.getLocation().getY();
-      int pos = 0;
-      for (final AbstractSubject item : block.getEventListModifiable()) {
-        final ProxyShape shape = getShapeProducer().getShape(item);
-        final Rectangle2D rect = shape.getShape().getBounds();
-        if (y < rect.getCenterY()) {
-          break;
-        }
-        pos++;
-      }
-      if (pos == -1) {
-        pos = 0;
-      }
-      doAddToEventList(block, identifiers, pos);
-    }
-
     //#######################################################################
     //# Rendering
     List<MiscShape> getDrawnObjects()
@@ -3023,6 +2887,7 @@ public class ControlledSurface
     private final LabelBlockSubject mLabelBlock;
     private final ProxySubject mClickedLabel;
     private Line2D mLine;
+    private int mDropIndex;
 
   }
 
@@ -4303,6 +4168,152 @@ public class ControlledSurface
 
 
   //#########################################################################
+  //# Inner Class IdentifierPasteVisitor
+  private class IdentifierPasteVisitor
+    extends AbstractModuleProxyVisitor
+  {
+
+    //#######################################################################
+    //# Invocation
+    private boolean canPaste(final Proxy focussed,
+                             final Transferable transferable)
+    {
+      return getIdentifierPasteTarget(focussed, transferable) != null;
+    }
+
+    private EventListExpressionSubject getIdentifierPasteTarget
+      (final Proxy focussed, final Transferable transferable)
+    {
+      try {
+        final List<? extends Proxy> data = getTransferData(transferable);
+        return getIdentifierPasteTarget(focussed, data);
+      } catch (final IOException exception) {
+        return null;
+      } catch (final UnsupportedFlavorException exception) {
+        return null;
+      }
+    }
+
+    private EventListExpressionSubject getIdentifierPasteTarget
+      (final Proxy focussed, final List<? extends Proxy> data)
+    {
+      if (focussed == null) {
+        return null;
+      } else {
+        try {
+          mTransferData = data;
+          return (EventListExpressionSubject) focussed.acceptVisitor(this);
+        } catch (final VisitorException exception) {
+          throw exception.getRuntimeException();
+        }
+      }
+    }
+
+    private void addInsertInfo(final Proxy focussed,
+                               final int startpos,
+                               final Transferable transferable,
+                               final List<InsertInfo> inserts)
+      throws IOException, UnsupportedFlavorException
+    {
+      final ModuleProxyCloner cloner =
+        ModuleSubjectFactory.getCloningInstance();
+      final List<? extends Proxy> data = getTransferData(transferable);
+      final EventListExpressionSubject elist =
+        getIdentifierPasteTarget(focussed, data);
+      if (elist != null) {
+        final ListSubject<AbstractSubject> list =
+          elist.getEventListModifiable();
+        int pos = startpos < 0 ? list.size() : startpos;
+        for (final Proxy proxy : data) {
+          final ProxySubject newident = (ProxySubject) cloner.getClone(proxy);
+          ControlledSurface.this.addInsertInfo(inserts, newident, list, pos++);
+        }
+      }
+    }
+
+    //#######################################################################
+    //# Interface net.sourceforge.waters.model.base.ProxyVisitor
+    public EventListExpressionProxy visitProxy(final Proxy proxy)
+    {
+      return null;
+    }
+
+    //#######################################################################
+    //# Interface net.sourceforge.waters.model.module.ModuleProxyVisitor
+    public EventListExpressionProxy visitEdgeProxy(final EdgeProxy edge)
+    {
+      final LabelBlockProxy block = edge.getLabelBlock();
+      return visitLabelBlockProxy(block);
+    }
+
+    public EventListExpressionProxy visitGuardActionBlockProxy
+      (final GuardActionBlockProxy block)
+    {
+      final GuardActionBlockSubject subject = (GuardActionBlockSubject) block;
+      final EdgeSubject edge = (EdgeSubject) subject.getParent();
+      return visitEdgeProxy(edge);
+    }
+
+    public EventListExpressionProxy visitLabelBlockProxy
+      (final LabelBlockProxy block)
+    {
+      final ModuleContext context =
+        mRoot.getModuleWindowInterface().getModuleContext();
+      return
+        context.canDropOnEdge(mTransferData) && !isContainingAll(block) ?
+        block : null;
+    }
+
+    public EventListExpressionProxy visitLabelGeometryProxy
+      (final LabelGeometryProxy geo)
+    {
+      final LabelGeometrySubject subject = (LabelGeometrySubject) geo;
+      final SimpleNodeSubject node = (SimpleNodeSubject) subject.getParent();
+      return visitSimpleNodeProxy(node);
+    }
+
+    public EventListExpressionProxy visitPlainEventListProxy
+      (final PlainEventListProxy elist)
+    {
+      final ModuleContext context =
+        mRoot.getModuleWindowInterface().getModuleContext();
+      return
+        context.canDropOnNode(mTransferData) && !isContainingAll(elist) ?
+        elist : null;
+    }
+
+    public EventListExpressionProxy visitSimpleNodeProxy
+      (final SimpleNodeProxy node)
+    {
+      final PlainEventListProxy elist = node.getPropositions();
+      return visitPlainEventListProxy(elist);
+    }
+
+    //#######################################################################
+    //# Auxiliary Methods
+    private List<? extends Proxy> getTransferData
+      (final Transferable transferable)
+      throws IOException, UnsupportedFlavorException
+    {
+      return (List<Proxy>) transferable.getTransferData
+        (WatersDataFlavor.IDENTIFIER_LIST);
+    }
+
+    private boolean isContainingAll(final EventListExpressionProxy elist)
+    {
+      final List<? extends Proxy> list = elist.getEventList();
+      final ProxyAccessorMap<Proxy> map =
+        new ProxyAccessorHashMapByContents(list);
+      return map.containsAll(mTransferData);
+    }
+
+    //#######################################################################
+    //# Data Members
+    private List<? extends Proxy> mTransferData;
+  }
+
+
+  //#########################################################################
   //# Inner Class GraphInsertPosition
   private static class GraphInsertPosition
   {
@@ -4434,6 +4445,8 @@ public class ControlledSurface
   private final IdentifierListTransferableVisitor
     mIdentifierListTransferableVisitor =
     new IdentifierListTransferableVisitor();
+  private final IdentifierPasteVisitor mIdentifierPasteVisitor =
+    new IdentifierPasteVisitor();
   private final HighlightComparator mComparator = new HighlightComparator();
   private List<Observer> mObservers;
 

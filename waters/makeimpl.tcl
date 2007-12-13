@@ -1674,7 +1674,35 @@ proc Java_GenerateCloningVisitor {subpack prefix destname classnames
     Java_WriteLn $stream $umap "    \}"
     Java_WriteLn $stream $umap "  \}"
     Java_WriteLn $stream $umap ""
-
+    Java_WriteLn $stream $umap "  public <P extends Proxy>"
+    Java_WriteLn $stream $umap \
+        "  List<P> getClonedList(Collection<? extends P> collection)"
+    Java_WriteLn $stream $umap "  \{"
+    Java_WriteLn $stream $umap "    final int size = collection.size();"
+    Java_WriteLn $stream $umap \
+        "    final List<Proxy> result = new ArrayList<Proxy>(size);"
+    Java_WriteLn $stream $umap "    for (final P proxy : collection) \{"
+    Java_WriteLn $stream $umap "      final Proxy cloned = getClone(proxy);"
+    Java_WriteLn $stream $umap "      result.add(cloned);"
+    Java_WriteLn $stream $umap "    \}"
+    Java_WriteLn $stream $umap "    return Casting.toList(result);"
+    Java_WriteLn $stream $umap "  \}"
+    Java_WriteLn $stream $umap ""
+    Java_WriteLn $stream $umap "  public <P extends Proxy>"
+    Java_WriteLn $stream $umap \
+        "  Set<P> getClonedSet(Collection<? extends P> collection)"
+    Java_WriteLn $stream $umap "  \{"
+    Java_WriteLn $stream $umap "    final int size = collection.size();"
+    Java_WriteLn $stream $umap \
+        "    final Set<Proxy> result = new HashSet<Proxy>(size);"
+    Java_WriteLn $stream $umap "    for (final P proxy : collection) \{"
+    Java_WriteLn $stream $umap "      final Proxy cloned = getClone(proxy);"
+    Java_WriteLn $stream $umap "      result.add(cloned);"
+    Java_WriteLn $stream $umap "    \}"
+    Java_WriteLn $stream $umap "    return Casting.toSet(result);"
+    Java_WriteLn $stream $umap "  \}"
+    Java_WriteLn $stream $umap ""
+    
   ############################################################################
   # Write Visitor Methods
     Java_GenerateSeparatorComment $stream $umap \

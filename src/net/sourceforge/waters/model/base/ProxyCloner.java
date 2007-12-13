@@ -4,10 +4,14 @@
 //# PACKAGE: net.sourceforge.waters.model.base
 //# CLASS:   ProxyCloner
 //###########################################################################
-//# $Id: ProxyCloner.java,v 1.2 2007-12-04 03:22:55 robi Exp $
+//# $Id: ProxyCloner.java,v 1.3 2007-12-13 23:49:37 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.base;
+
+import java.util.Collection;
+import java.util.List;
+import java.util.Set;
 
 
 /**
@@ -25,8 +29,29 @@ public interface ProxyCloner {
    * Clones a proxy object. This method creates a deep copy of the given
    * object, using the underlying factory, and ensuring consistency of
    * internal references.
-   * @param  proxy   The object to be copied.
+   * @param  proxy       The object to be copied.
    */
   public Proxy getClone(Proxy proxy);
+
+  /**
+   * Clones a collection of proxy objects. This method creates a deep copy
+   * of all objects in the given collection, using the underlying factory,
+   * and ensuring consistency of internal references.
+   * @param  collection  The objects to be copied.
+   * @return The list of clones, in the same order as their originals
+   *         are encountered in the input collection.
+   */
+  public <P extends Proxy>
+  List<P> getClonedList(Collection<? extends P> collection);
+
+  /**
+   * Clones a collection of proxy objects. This method creates a deep copy
+   * of all objects in the given collection, using the underlying factory,
+   * and ensuring consistency of internal references.
+   * @param  collection  The objects to be copied.
+   * @return A set containing the clones.
+   */
+  public <P extends Proxy>
+  Set<P> getClonedSet(Collection<? extends P> collection);
 
 }

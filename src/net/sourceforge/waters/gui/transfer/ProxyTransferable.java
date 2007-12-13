@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui.transfer
 //# CLASS:   ProxyTransferable
 //###########################################################################
-//# $Id: ProxyTransferable.java,v 1.3 2007-12-12 23:57:49 robi Exp $
+//# $Id: ProxyTransferable.java,v 1.4 2007-12-13 23:49:37 robi Exp $
 //###########################################################################
 
 
@@ -15,7 +15,6 @@ import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
 import java.io.IOException;
 import java.io.StringWriter;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -77,15 +76,11 @@ public class ProxyTransferable<P extends Proxy> implements Transferable
   ProxyTransferable(final DataFlavor[] flavors, final List<? extends P> data)
   {
     mFlavors = flavors;
-
+    // *** BUG ***
     // This is not good enough for ProductDESProxy ...
+    // ***
     final ProxyCloner cloner = ModuleElementFactory.getCloningInstance();
-    final int size = data.size();
-    mData = new ArrayList<Proxy>(size);
-    for (final Proxy proxy : data) {
-      final Proxy cloned = cloner.getClone(proxy);
-      mData.add(cloned);
-    }
+    mData = cloner.getClonedList(data);
   }
 
 
@@ -128,13 +123,13 @@ public class ProxyTransferable<P extends Proxy> implements Transferable
   //# Simple Access
   List<P> getRawData()
   {
-    return Casting.toList(mData);
+    return mData;
   }
 
 
   //#########################################################################
   //# Data Members
   private final DataFlavor[] mFlavors;
-  private final List<Proxy> mData;
+  private final List<P> mData;
 
 }
