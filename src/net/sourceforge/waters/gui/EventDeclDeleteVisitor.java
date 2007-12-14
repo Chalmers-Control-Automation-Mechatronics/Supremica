@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   EventDeclDeleteVisitor
 //###########################################################################
-//# $Id: EventDeclDeleteVisitor.java,v 1.2 2007-12-04 03:22:54 robi Exp $
+//# $Id: EventDeclDeleteVisitor.java,v 1.3 2007-12-14 21:04:26 robi Exp $
 //###########################################################################
 
 
@@ -49,6 +49,8 @@ import net.sourceforge.waters.subject.base.ListSubject;
 import net.sourceforge.waters.subject.base.ProxySubject;
 import net.sourceforge.waters.subject.base.Subject;
 import net.sourceforge.waters.subject.module.EventDeclSubject;
+import net.sourceforge.waters.subject.module.GraphSubject;
+import net.sourceforge.waters.subject.module.IdentifierSubject;
 import net.sourceforge.waters.subject.module.ModuleSubject;
 import net.sourceforge.waters.subject.module.SimpleComponentSubject;
 
@@ -127,8 +129,9 @@ class EventDeclDeleteVisitor
         final List<Proxy> list = Casting.toList(inspos.getList());
         final int index = inspos.getPosition();
         list.add(index, proxy);
-        if (proxy instanceof IdentifierProxy) {
-          final GraphProxy graph = findGraph(proxy);
+        if (proxy instanceof IdentifierSubject) {
+          final IdentifierSubject subject = (IdentifierSubject) proxy;
+          final GraphSubject graph = subject.getAncestor(GraphSubject.class);
           if (graph == visiblegraph) {
             final ProxySubject selectable = findSelectable(proxy);
             if (selectable != last) {
@@ -158,8 +161,10 @@ class EventDeclDeleteVisitor
       if (proxy instanceof EventDeclProxy) {
         events.remove(proxy);
       } else {
-        if (proxy instanceof IdentifierProxy) {
-          final SimpleComponentSubject comp = findComponent(proxy);
+        if (proxy instanceof IdentifierSubject) {
+          final IdentifierSubject subject = (IdentifierSubject) proxy;
+          final SimpleComponentSubject comp =
+            subject.getAncestor(SimpleComponentSubject.class);
           final EditorWindowInterface iface =
             mRoot.getEditorWindowInterface(comp);
           if (iface != null) {
@@ -394,22 +399,6 @@ class EventDeclDeleteVisitor
       subject = subject.getParent();
     }
     return (ProxySubject) subject;
-  }
-
-  private GraphProxy findGraph(Subject subject)
-  {
-    while (subject != null && !(subject instanceof GraphProxy)) {
-      subject = subject.getParent();
-    }
-    return (GraphProxy) subject;
-  }
-
-  private SimpleComponentSubject findComponent(Subject subject)
-  {
-    while (subject != null && !(subject instanceof SimpleComponentSubject)) {
-      subject = subject.getParent();
-    }
-    return (SimpleComponentSubject) subject;
   }
 
 

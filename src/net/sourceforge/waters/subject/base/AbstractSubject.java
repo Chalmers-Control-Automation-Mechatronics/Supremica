@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.subject.base
 //# CLASS:   AbstractSubject
 //###########################################################################
-//# $Id: AbstractSubject.java,v 1.7 2007-07-03 11:20:53 robi Exp $
+//# $Id: AbstractSubject.java,v 1.8 2007-12-14 21:04:26 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.subject.base;
@@ -164,6 +164,22 @@ public abstract class AbstractSubject
 
 
   //#########################################################################
+  //# Advanced Hierarchy Navigation
+  public <S extends Subject> S getAncestor(final Class<? extends S> clazz)
+  {
+    Subject subject = this;
+    do {
+      final Class<? extends Subject> current = subject.getClass();
+      if (clazz.isAssignableFrom(current)) {
+        return clazz.cast(subject);
+      }
+      subject = subject.getParent();
+    } while (subject != null);
+    return null;
+  }
+
+
+  //#########################################################################
   //# Printing
   public String toString()
   {
@@ -172,7 +188,7 @@ public abstract class AbstractSubject
 
   public String getShortClassName()
   {
-    final Class clazz = getClass();
+    final Class<? extends AbstractSubject> clazz = getClass();
     final String fullclazzname = clazz.getName();
     final int dotpos = fullclazzname.lastIndexOf('.');
     return fullclazzname.substring(dotpos + 1);

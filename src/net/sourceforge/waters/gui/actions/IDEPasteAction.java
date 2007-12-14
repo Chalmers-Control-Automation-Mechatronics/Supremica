@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui.actions
 //# CLASS:   IDEPasteAction
 //###########################################################################
-//# $Id: IDEPasteAction.java,v 1.2 2007-12-04 03:22:54 robi Exp $
+//# $Id: IDEPasteAction.java,v 1.3 2007-12-14 21:04:26 robi Exp $
 //###########################################################################
 
 
@@ -88,14 +88,16 @@ public class IDEPasteAction
           Toolkit.getDefaultToolkit().getSystemClipboard();
         final Transferable transferable = clipboard.getContents(this);
         final List<InsertInfo> info = watersOwner.getInsertInfo(transferable);
-        final Command cmd = new InsertCommand(info, watersOwner);
-        final UndoInterface undoer = watersOwner.getUndoInterface();
-        if (undoer == null) {
-          // If there is no undo interface, just insert them ...
-          cmd.execute();
-        } else {
-          // Otherwise register the command ...
-          undoer.executeCommand(cmd);
+        if (info != null) {
+          final Command cmd = new InsertCommand(info, watersOwner);
+          final UndoInterface undoer = watersOwner.getUndoInterface();
+          if (undoer == null) {
+            // If there is no undo interface, just insert them ...
+            cmd.execute();
+          } else {
+            // Otherwise register the command ...
+            undoer.executeCommand(cmd);
+          }
         }
       } else if (swingOwner != null) {
         mDefaultAction.actionPerformed(event);

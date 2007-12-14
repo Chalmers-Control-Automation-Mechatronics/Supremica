@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui.transfer
 //# CLASS:   SelectionOwner
 //###########################################################################
-//# $Id: SelectionOwner.java,v 1.3 2007-12-08 21:17:53 robi Exp $
+//# $Id: SelectionOwner.java,v 1.4 2007-12-14 21:04:26 robi Exp $
 //###########################################################################
 
 
@@ -162,12 +162,21 @@ public interface SelectionOwner
   public boolean canPaste(Transferable transferable);
 
   /**
-   * Copies the contents of the given transferable to a list of items that
-   * can be inserted into this component. This method can be used by a
-   * paste operation to obtain insert position as required for the {@link
-   * #insertItems(List<InsertInfo>) insertItems()} method. A previous call
-   * to {@link #canPaste(Transferable) canPaste()} should have returned
-   * <CODE>true</CODE>, otherwise the result of this method is undefined.
+   * <P>Copies the contents of the given transferable to a list of items that
+   * can be inserted into this component.</P>
+   * <P>This method can be used by a paste operation to obtain insert
+   * position as required for the {@link #insertItems(List<InsertInfo>)
+   * insertItems()} method. A previous call to {@link
+   * #canPaste(Transferable) canPaste()} should have returned
+   * <CODE>true</CODE>, otherwise the result of this method is
+   * undefined.</P>
+   * <P>This method may perform user interaction, and the user may cancel
+   * the insertion of the transferable contents this point. In this case,
+   * <CODE>null</CODE> is returned.</P>
+   * @return A list of {@link InsertInfo} objects identifying the items
+   *         to be removed from the model, plus any information needed
+   *         to insert them appropriately; or <CODE>null</CODE> if the
+   *         user has cancelled the insertion.
    */
   public List<InsertInfo> getInsertInfo(Transferable transferable)
     throws IOException, UnsupportedFlavorException;
