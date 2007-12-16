@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   IndexedListModel
 //###########################################################################
-//# $Id: IndexedListModel.java,v 1.6 2007-12-04 03:22:54 robi Exp $
+//# $Id: IndexedListModel.java,v 1.7 2007-12-16 22:55:30 robi Exp $
 //###########################################################################
 
 
@@ -60,6 +60,11 @@ public class IndexedListModel<E extends NamedSubject>
 
   //#########################################################################
   //# Additional Access
+  public boolean contains(final Object item)
+  {
+    return indexOf(item) >= 0;
+  }
+
   public int indexOf(final Object item)
   {
     if (item instanceof NamedSubject) {

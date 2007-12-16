@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   EventDeclListView
 //###########################################################################
-//# $Id: EventDeclListView.java,v 1.14 2007-12-16 22:09:39 robi Exp $
+//# $Id: EventDeclListView.java,v 1.15 2007-12-16 22:55:30 robi Exp $
 //###########################################################################
 
 
@@ -203,7 +203,11 @@ public class EventDeclListView
 
   public Proxy getSelectableAncestor(final Proxy item)
   {
-    return item;
+    if (item instanceof EventDeclSubject && mModel.contains(item)) {
+      return item;
+    } else {
+      return null;
+    }
   }
 
   public void replaceSelection(final List<? extends Proxy> items)

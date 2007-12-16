@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   ComponentsTree
 //###########################################################################
-//# $Id: ComponentsTree.java,v 1.7 2007-12-16 22:09:39 robi Exp $
+//# $Id: ComponentsTree.java,v 1.8 2007-12-16 22:55:30 robi Exp $
 //###########################################################################
 
 
@@ -22,6 +22,7 @@ import java.awt.event.MouseListener;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.LinkedList;
@@ -188,7 +189,13 @@ public class ComponentsTree
 
   public Proxy getSelectableAncestor(final Proxy item)
   {
-    return item;
+    final ComponentsTreeModel model = getComponentsTreeModel();
+    final ProxySubject subject = (ProxySubject) item;
+    if (subject == model.getRoot()) {
+      return isRootVisible() ? subject : null;
+    } else {
+      return model.isInTree(subject) ? subject : null;
+    }
   }
 
   public void replaceSelection(final List<? extends Proxy> items)
@@ -388,22 +395,32 @@ public class ComponentsTree
 
   public void scrollToVisible(final List<? extends Proxy> list)
   {
-    if (!list.isEmpty()) {
-      final ComponentsTreeModel model = getComponentsTreeModel();
-      final ProxySubject first = (ProxySubject) list.iterator().next();
-      final TreePath firstpath = model.createPath(first);
-      final Rectangle rect = getPathBounds(firstpath);
-      final int size = list.size();
-      if (size > 1) {
-        final ProxySubject last =
-          (ProxySubject) list.listIterator(size).previous();
-        final TreePath lastpath = model.createPath(last);
-        final Rectangle lastrect = getPathBounds(lastpath);
-        final int y = lastrect.y + lastrect.height;
-        rect.height = y - rect.y;
-      }
-      scrollRectToVisible(rect);
+    if (list.isEmpty()) {
+      return;
     }
+    final ComponentsTreeModel model = getComponentsTreeModel();
+    final Iterator<? extends Proxy> iter = list.iterator();
+    final Proxy next = iter.next();
+    final ProxySubject first;
+    if (next != model.getRoot() || isRootVisible()) {
+      first = (ProxySubject) next;
+    } else if (iter.hasNext()) {
+      first = (ProxySubject) iter.next();
+    } else {
+      return;
+    }
+    final TreePath firstpath = model.createPath(first);
+    final Rectangle rect = getPathBounds(firstpath);
+    final int size = list.size();
+    if (size > 1) {
+      final ProxySubject last =
+        (ProxySubject) list.listIterator(size).previous();
+      final TreePath lastpath = model.createPath(last);
+      final Rectangle lastrect = getPathBounds(lastpath);
+      final int y = lastrect.y + lastrect.height;
+      rect.height = y - rect.y;
+    }
+    scrollRectToVisible(rect);
   }
 
   public void activate()
