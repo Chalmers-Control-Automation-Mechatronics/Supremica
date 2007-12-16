@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   ControlledSurface
 //###########################################################################
-//# $Id: ControlledSurface.java,v 1.153 2007-12-13 23:49:37 robi Exp $
+//# $Id: ControlledSurface.java,v 1.154 2007-12-16 22:09:39 robi Exp $
 //###########################################################################
 
 
@@ -297,45 +297,25 @@ public class ControlledSurface
     }
   }
 
+  public Proxy getSelectableAncestor(final Proxy item)
+  {
+    return mSelectableVisitor.getSelectableAncestor(item);
+  }
+
   public void replaceSelection(final List<? extends Proxy> items)
   {
-    // *** KLUDGE ***
-    // After adding a proposition to a node via drop or paste,
-    // InsertCommand will try to select it. This code selects
-    // the node instead of the proposition label.
-    // But it does not work well when undoing---then the node should
-    // be selected, not deselected ...
-    // ***
-    final int size = items.size();
-    final List<ProxySubject> selectable = new ArrayList<ProxySubject>(size);
-    for (final Proxy proxy : items) {
-      final ProxySubject subject = (ProxySubject) proxy;
-      final ProxySubject parent = findSelectableAncestor(subject);
-      if (parent != null && !selectable.contains(parent)) {
-        selectable.add(parent);
-      }
-    }
-    if (!mSelectedList.equals(selectable)) {
+
+    if (!mSelectedList.equals(items)) {
       mSelectedList.clear();
       mSelectedSet.clear();
-      mSelectedList.addAll(selectable);
-      mSelectedSet.addAll(selectable);
+      mSelectableVisitor.addToSelectionList(items);
       fireSelectionChanged();
     }
   }
 
   public void addToSelection(final List<? extends Proxy> items)
   {
-    boolean change = false;
-    for (final Proxy proxy : items) {
-      final ProxySubject subject = (ProxySubject) proxy;
-      final ProxySubject parent = findSelectableAncestor(subject);
-      if (parent != null && mSelectedSet.add(parent)) {
-        mSelectedList.add(parent);
-        change = true;
-      }
-    }
-    if (change) {
+    if (mSelectableVisitor.addToSelectionList(items)) {
       fireSelectionChanged();
     }
   }
@@ -345,18 +325,18 @@ public class ControlledSurface
     boolean change = false;
     for (final Proxy proxy : items) {
       final ProxySubject subject = (ProxySubject) proxy;
-      final ProxySubject parent = findSelectableAncestor(subject);
-      if (mSelectedSet.remove(parent)) {
-        mSelectedList.remove(parent);
-        if (parent instanceof LabelBlockSubject) {
-          final LabelBlockSubject block = (LabelBlockSubject) parent;
-          for (final Proxy child : block.getEventListModifiable()) {
-            if (mSelectedSet.remove(child)) {
-              mSelectedList.remove(child);
-            }
+      if (mSelectedSet.remove(subject)) {
+        mSelectedList.remove(subject);
+        change = true;
+      }
+      if (subject instanceof LabelBlockSubject) {
+        final LabelBlockSubject block = (LabelBlockSubject) subject;
+        for (final Proxy child : block.getEventListModifiable()) {
+          if (mSelectedSet.remove(child)) {
+            mSelectedList.remove(child);
+            change = true;
           }
         }
-        change = true;
       }
     }
     if (change) {
@@ -692,8 +672,10 @@ public class ControlledSurface
       for (final Proxy proxy : list) {
         if (proxy instanceof IdentifierSubject ||
             proxy instanceof ForeachEventSubject) {
-          final Subject subject = (Subject) proxy;
-          final ProxySubject parent = findLabelBlockOrSimpleNode(subject);
+          final AbstractSubject subject = (AbstractSubject) proxy;
+          final ProxySubject parent = 
+            (ProxySubject) subject.getAncestor(LabelBlockSubject.class,
+                                               SimpleNodeSubject.class);
           scrollable.add(parent);
         } else {
           scrollable.add(proxy);
@@ -1451,16 +1433,6 @@ public class ControlledSurface
       }
     }
     return null;
-  }
-
-  private ProxySubject findLabelBlockOrSimpleNode(Subject subject)
-  {
-    while (subject != null &&
-           !(subject instanceof LabelBlockSubject) &&
-           !(subject instanceof SimpleNodeSubject)) {
-      subject = subject.getParent();
-    }
-    return (ProxySubject) subject;
   }
 
   private ProxySubject findSelectableAncestor(final Subject subject)
@@ -4024,6 +3996,118 @@ public class ControlledSurface
 
 
   //#########################################################################
+  //# Inner Class SelectableVisitor
+  private class SelectableVisitor
+    extends AbstractModuleProxyVisitor
+  {
+
+    //#######################################################################
+    //# Invocation
+    private boolean addToSelectionList(final List<? extends Proxy> proxies)
+    {
+      boolean change = false;
+      for (final Proxy proxy : proxies) {
+        final ProxySubject subject = (ProxySubject) proxy;
+        if (subject instanceof IdentifierSubject) {
+          final IdentifierSubject ident = (IdentifierSubject) subject;
+          final LabelBlockSubject block =
+            ident.getAncestor(LabelBlockSubject.class);
+          if (block != null && mSelectedSet.add(block)) {
+            mSelectedList.add(block);
+            change = true;
+          }
+        }
+        final ProxySubject ancestor = getSelectableAncestor(subject);
+        if (ancestor != null && mSelectedSet.add(ancestor)) {
+          mSelectedList.add(ancestor);
+          change = true;
+        }
+      }
+      return change;
+    }
+
+    private ProxySubject getSelectableAncestor(final Proxy proxy)
+    {
+      try {
+        return (ProxySubject) proxy.acceptVisitor(this);
+      } catch (final VisitorException exception) {
+        throw exception.getRuntimeException();
+      }
+    }
+
+    //#######################################################################
+    //# Interface net.sourceforge.waters.model.base.ProxyVisitor
+    public Object visitProxy(final Proxy proxy)
+    {
+      return null;
+    }
+
+    //#######################################################################
+    //# Interface net.sourceforge.waters.model.module.ModuleProxyVisitor
+    public EdgeProxy visitEdgeProxy(final EdgeProxy edge)
+    {
+      return edge;
+    }
+
+    public Proxy visitForeachEventProxy(final ForeachEventProxy foreach)
+    {
+      return visitEventListMember(foreach);
+    }
+
+    public GuardActionBlockProxy visitGuardActionBlockProxy
+      (final GuardActionBlockProxy block)
+    {
+      return block;
+    }
+
+    public Proxy visitIdentifierProxy(final IdentifierProxy ident)
+    {
+      return visitEventListMember(ident);
+    }
+
+    public Proxy visitLabelBlockProxy(final LabelBlockProxy block)
+    {
+      if (block.getEventList().isEmpty()) {
+        final LabelBlockSubject subject = (LabelBlockSubject) block;
+        final Subject parent = subject.getParent();
+        if (parent instanceof GraphProxy) {
+          return block;
+        } else {
+          return (EdgeSubject) parent;
+        }
+      } else {
+        return block;
+      }
+    }
+
+    public LabelGeometryProxy visitLabelGeometryProxy
+      (final LabelGeometryProxy geo)
+    {
+      return geo;
+    }
+
+    public NodeProxy visitNodeProxy(final NodeProxy node)
+    {
+      return node;
+    }
+
+    //#######################################################################
+    //# Auxiliary Methods
+    private AbstractSubject visitEventListMember(final Proxy proxy)
+    {
+      final AbstractSubject subject = (AbstractSubject) proxy;
+      final Subject ancestor = subject.getAncestor(SimpleNodeSubject.class,
+                                                   LabelBlockSubject.class);
+      if (ancestor instanceof SimpleNodeSubject) {
+        return (SimpleNodeSubject) ancestor;
+      } else {
+        return subject;
+      }
+    }
+  }
+
+
+  //#########################################################################
   //# Inner Class GraphTransferableVisitor
   private class GraphTransferableVisitor
     extends AbstractModuleProxyVisitor
@@ -4439,6 +4523,7 @@ public class ControlledSurface
   private int mExternalDragAction = DnDConstants.ACTION_COPY;
   private DRAGOVERSTATUS mExternalDragStatus = DRAGOVERSTATUS.NOTDRAG;
 
+  private final SelectableVisitor mSelectableVisitor = new SelectableVisitor();
   private final DataFlavorVisitor mDataFlavorVisitor = new DataFlavorVisitor();
   private final GraphTransferableVisitor mGraphTransferableVisitor =
     new GraphTransferableVisitor();

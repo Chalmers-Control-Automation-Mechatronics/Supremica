@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.subject.base
 //# CLASS:   AbstractSubject
 //###########################################################################
-//# $Id: AbstractSubject.java,v 1.8 2007-12-14 21:04:26 robi Exp $
+//# $Id: AbstractSubject.java,v 1.9 2007-12-16 22:09:39 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.subject.base;
@@ -165,6 +165,31 @@ public abstract class AbstractSubject
 
   //#########################################################################
   //# Advanced Hierarchy Navigation
+  /**
+   * Gets the closest proper ancestor of this subject that implements the
+   * {@link Proxy} interface.
+   * @return The closest propert ancestor of type {@link Proxy}
+   *         or <CODE>null</CODE>.
+   */
+  public AbstractSubject getProxyParent()
+  {
+    Subject subject = getParent();
+    while (subject != null) {
+      if (subject instanceof Proxy) {
+        return (AbstractSubject) subject;
+      }
+      subject = subject.getParent();
+    }
+    return null;
+  }
+
+  /**
+   * Finds the closest ancestor, which is an instance of the given class.
+   * Possible ancestors include the object itself.
+   * @return The closest ancestor of this subject, which can be assigned to
+   *         a variable of the given class, or <CODE>null</CODE> if no such
+   *         ancestor can be found.
+   */
   public <S extends Subject> S getAncestor(final Class<? extends S> clazz)
   {
     Subject subject = this;
@@ -172,6 +197,28 @@ public abstract class AbstractSubject
       final Class<? extends Subject> current = subject.getClass();
       if (clazz.isAssignableFrom(current)) {
         return clazz.cast(subject);
+      }
+      subject = subject.getParent();
+    } while (subject != null);
+    return null;
+  }
+
+  /**
+   * Finds the closest ancestor, which is an instance of one of two givenn
+   * class.  Possible ancestors include the object itself.
+   * @return The closest ancestor of this subject, which can be assigned to
+   *         a variable one of the given classes, or <CODE>null</CODE> if
+   *         no such ancestor can be found.
+   */
+  public Subject getAncestor(final Class<? extends Subject> clazz1,
+                             final Class<? extends Subject> clazz2)
+  {
+    Subject subject = this;
+    do {
+      final Class<? extends Subject> current = subject.getClass();
+      if (clazz1.isAssignableFrom(current) ||
+          clazz2.isAssignableFrom(current)) {
+        return subject;
       }
       subject = subject.getParent();
     } while (subject != null);

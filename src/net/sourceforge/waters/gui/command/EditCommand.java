@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui.command
 //# CLASS:   EditCommand
 //###########################################################################
-//# $Id: EditCommand.java,v 1.3 2007-12-08 21:17:53 robi Exp $
+//# $Id: EditCommand.java,v 1.4 2007-12-16 22:09:39 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.gui.command;
@@ -14,6 +14,7 @@ import java.util.List;
 
 import net.sourceforge.waters.gui.language.ProxyNamer;
 import net.sourceforge.waters.gui.transfer.SelectionOwner;
+import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.subject.base.ProxySubject;
 
 
@@ -160,7 +161,8 @@ public class EditCommand
   {
     if (getUpdatesSelection()) {
       final SelectionOwner panel = getPanel();
-      final List<ProxySubject> list = Collections.singletonList(mSubject);
+      final Proxy ancestor = panel.getSelectableAncestor(mSubject);
+      final List<Proxy> list = Collections.singletonList(ancestor);
       panel.replaceSelection(list);
       panel.scrollToVisible(list);
       panel.activate();

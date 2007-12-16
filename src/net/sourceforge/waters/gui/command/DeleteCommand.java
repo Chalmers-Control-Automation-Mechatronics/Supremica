@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui.command
 //# CLASS:   DeleteCommand
 //###########################################################################
-//# $Id: DeleteCommand.java,v 1.3 2007-12-08 21:17:53 robi Exp $
+//# $Id: DeleteCommand.java,v 1.4 2007-12-16 22:09:39 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.gui.command;
@@ -114,15 +114,22 @@ public class DeleteCommand
   //# Interface net.sourceforge.waters.gui.command.Command
   public void execute()
   {
+    final List<Proxy> selection;
     final SelectionOwner panel = getPanel();
     if (getUpdatesSelection() && mHasBeenExecuted) {
       panel.clearSelection();
+      selection = getSelectionAfterDelete(mDeletes);
     } else {
-      final List<Proxy> proxies = InsertInfo.getProxies(mDeletes);
-      panel.removeFromSelection(proxies);
+      final List<Proxy> deselect = InsertInfo.getProxies(mDeletes);
+      panel.removeFromSelection(deselect);
       mHasBeenExecuted = true;
+      selection = null;
     }
     panel.deleteItems(mDeletes);
+    if (selection != null) {
+      panel.replaceSelection(selection);
+      panel.scrollToVisible(selection);
+    }
     if (getUpdatesSelection()) {
       panel.activate();
     }
@@ -133,9 +140,9 @@ public class DeleteCommand
     final SelectionOwner panel = getPanel();
     panel.insertItems(mDeletes);
     if (getUpdatesSelection()) {
-      final List<Proxy> proxies = InsertInfo.getProxies(mDeletes);
-      panel.replaceSelection(proxies);
-      panel.scrollToVisible(proxies);
+      final List<Proxy> selection = getSelectionAfterInsert(mDeletes);
+      panel.replaceSelection(selection);
+      panel.scrollToVisible(selection);
       panel.activate();
     }
   }

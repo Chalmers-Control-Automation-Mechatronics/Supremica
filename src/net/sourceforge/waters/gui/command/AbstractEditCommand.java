@@ -4,13 +4,22 @@
 //# PACKAGE: net.sourceforge.waters.gui.command
 //# CLASS:   AbstractEditCommand
 //###########################################################################
-//# $Id: AbstractEditCommand.java,v 1.2 2007-12-04 03:22:54 robi Exp $
+//# $Id: AbstractEditCommand.java,v 1.3 2007-12-16 22:09:39 robi Exp $
 //###########################################################################
 
 
 package net.sourceforge.waters.gui.command;
 
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Set;
+
+import net.sourceforge.waters.gui.transfer.InsertInfo;
 import net.sourceforge.waters.gui.transfer.SelectionOwner;
+import net.sourceforge.waters.model.base.Proxy;
+import net.sourceforge.waters.subject.base.AbstractSubject;
 
 
 /**
@@ -121,6 +130,41 @@ public abstract class AbstractEditCommand
   public boolean isSignificant()
   {
     return true;
+  }
+
+
+  //#########################################################################
+  //# Auxiliary Methods
+  List<Proxy> getSelectionAfterInsert(final List<InsertInfo> inserts)
+  {
+    final int size = inserts.size();
+    final Set<Proxy> set = new HashSet<Proxy>(size);
+    final List<Proxy> result = new ArrayList<Proxy>(size);
+    for (final InsertInfo insert : inserts) {
+      final Proxy proxy = insert.getProxy();
+      final Proxy ancestor = mPanel.getSelectableAncestor(proxy);
+      if (ancestor != null && set.add(ancestor)) {
+        result.add(ancestor);
+      }
+    }
+    return result;
+  }
+
+  List<Proxy> getSelectionAfterDelete(final List<InsertInfo> deletes)
+  {
+    final int size = deletes.size();
+    final Set<Proxy> set = new HashSet<Proxy>(size);
+    final List<Proxy> result = new LinkedList<Proxy>();
+    for (final InsertInfo delete : deletes) {
+      final Proxy proxy = delete.getProxy();
+      final AbstractSubject subject = (AbstractSubject) proxy;
+      final AbstractSubject parent = subject.getProxyParent();
+      final Proxy ancestor = mPanel.getSelectableAncestor(parent);
+      if (ancestor != null && ancestor != proxy && set.add(ancestor)) {
+        result.add(ancestor);
+      }
+    }
+    return result;
   }
 
 

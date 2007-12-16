@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui.transfer
 //# CLASS:   SelectionOwner
 //###########################################################################
-//# $Id: SelectionOwner.java,v 1.4 2007-12-14 21:04:26 robi Exp $
+//# $Id: SelectionOwner.java,v 1.5 2007-12-16 22:09:39 robi Exp $
 //###########################################################################
 
 
@@ -85,6 +85,21 @@ public interface SelectionOwner
   public Proxy getSelectionAnchor();
 
   /**
+   * Determines the closest ancestor of the given item that can be selected
+   * in this panel. Usually, this method simply returns the given item, but
+   * some panels may not be able to display the item directly, but only
+   * indirectly through one of its ancestors. In such cases, the selectable
+   * ancestor needs to be passed to the {@link replaceSelection(List<?
+   * extends Proxy>) replaceSelection()} or {@link addToSelection(List<?
+   * extends Proxy>) addToSelection()} methods, and no attempts should be
+   * made to select the item itself.
+   * @param  item    The item the user wants to select.
+   * @return The best ancestor that can be selected in this panel, or
+   *         <CODE>null</CODE> if the item cannot be selected at all.
+   */
+  public Proxy getSelectableAncestor(final Proxy item);
+
+  /**
    * Resets the current selection to be empty.
    */
   public void clearSelection();
@@ -92,35 +107,38 @@ public interface SelectionOwner
   /**
    * Replaces the component's current selection by the given list.
    * The selection is performed directly, without using a command.
-   * @param  items   The list of items to be selected, as produced by the
-   *                 {@link #getCurrentSelection()} method.
+   * @param  items   The list of items to be selected. Should only
+   *                 include selectable ancestors.
+   * @see    {@link #getSelectableAncestor(Proxy) getSelectableAncestor()}
    */
   public void replaceSelection(List<? extends Proxy> items);
 
   /**
    * Adds all items in the given list to the selection of this component.
    * The selection is performed directly, without using a command.
-   * @param  items   The list of items to be selected, as produced by the
-   *                 {@link #getCurrentSelection()} method.
+   * @param  items   The list of items to be selected. Should only
+   *                 include selectable ancestors.
+   * @see    {@link #getSelectableAncestor(Proxy) getSelectableAncestor()}
    */
   public void addToSelection(List<? extends Proxy> items);
 
   /**
    * Removes all items in the given list from the selection of this component.
    * The deselection is performed directly, without using a command.
-   * @param  items   The list of items to be deselected, as produced by the
-   *                 {@link #getCurrentSelection()} method.
+   * @param  items   The list of items to be deselected. Should only
+   *                 include selectable ancestors.
+   * @see    {@link #getSelectableAncestor(Proxy) getSelectableAncestor()}
    */
   public void removeFromSelection(List<? extends Proxy> items);
 
   /**
    * Gets the insert position for a given item.
-   * @param  proxy   The item to be inserted.
+   * @param  item    The item to be inserted.
    * @return An object that identifies to the panel where and how to insert
    *         the given item if a create or paste operation is completed at
    *         this time.
    */
-  public Object getInsertPosition(final Proxy proxy);
+  public Object getInsertPosition(final Proxy item);
 
   /**
    * Inserts a new item into the panel.
@@ -128,12 +146,12 @@ public interface SelectionOwner
    * completed. It inserts the created item into the data structure. The
    * insertion is performed directly, without cloning, and without using a
    * command. The item is not selected, this has to be done separately.
-   * @param  proxy  The item to be inserted.
+   * @param  item   The item to be inserted.
    * @param  inspos An object identifying where and how to insert the
    *                new item. The insert position is typically obtained
    *                using the {@link #getInsertPosition()} method.
    */
-  public void insertCreatedItem(final Proxy proxy, final Object inspos);
+  public void insertCreatedItem(final Proxy item, final Object inspos);
 
   /**
    * Determines whether the contents of the given selection can be
