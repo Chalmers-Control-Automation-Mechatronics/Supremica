@@ -1148,13 +1148,10 @@ public class DBInterface extends JFrame implements ActionListener, ListSelection
 		ListModel dlm = lst.getModel();
 		if (lst.getValueIsAdjusting() == true) {
 			if (e.getSource() == pList) {
-				pList.setSelectedIndex(lst.getSelectedIndex());
 				projectField.setText(dlm.getElementAt(lst.getSelectedIndex()).toString());
 				setStandardsInUse();
 			}
-			else if (e.getSource() == sList) {
-				sList.setSelectedIndices(lst.getSelectedIndices());
-			}
+
 		}
 	}
 
