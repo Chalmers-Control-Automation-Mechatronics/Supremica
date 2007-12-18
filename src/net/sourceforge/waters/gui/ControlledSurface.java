@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   ControlledSurface
 //###########################################################################
-//# $Id: ControlledSurface.java,v 1.154 2007-12-16 22:09:39 robi Exp $
+//# $Id: ControlledSurface.java,v 1.155 2007-12-18 02:38:10 robi Exp $
 //###########################################################################
 
 
@@ -344,9 +344,10 @@ public class ControlledSurface
     }
   }
 
-  public Proxy getInsertPosition(final Proxy proxy)
+  public GraphInsertPosition getInsertPosition(final Proxy item)
   {
-    return proxy;
+    final GraphSubject graph = getGraph();
+    return new GraphInsertPosition(graph, null);
   }
 
   public void insertCreatedItem(final Proxy proxy, final Object insobj)
@@ -567,12 +568,11 @@ public class ControlledSurface
             addInsertInfo(inserts, subject, graph);
           } else if (!lookup.contains(parent)) {
             final LabelBlockSubject block = (LabelBlockSubject) subject;
-            final ListSubject<AbstractSubject> eventlist =
-              block.getEventListModifiable();
-            int pos = 0;
-            for (final ProxySubject ident : eventlist) {
-              addInsertInfo(inserts, ident, eventlist, pos++);
-            }
+            final EdgeSubject edge = (EdgeSubject) parent;
+            final List<AbstractSubject> elist = block.getEventListModifiable();
+            final List<AbstractSubject> clonedlist =
+              new ArrayList<AbstractSubject>(elist);
+            addInsertInfo(inserts, block, edge, clonedlist);
           }
         } else if (subject instanceof GuardActionBlockSubject) {
           final Subject parent = subject.getParent();
@@ -588,15 +588,15 @@ public class ControlledSurface
   public void insertItems(List<InsertInfo> inserts)
   {
     final GraphSubject graph = getGraph();
-    final Collection<NodeSubject> nodes = graph.getNodesModifiable();
-    final Collection<EdgeSubject> edges = graph.getEdgesModifiable();
     for (final InsertInfo insert : inserts) {
       final Proxy proxy = insert.getProxy();
       if (proxy instanceof NodeSubject) {
         final NodeSubject node = (NodeSubject) proxy;
+        final Collection<NodeSubject> nodes = graph.getNodesModifiable();
         nodes.add(node);
       } else if (proxy instanceof EdgeSubject) {
         final EdgeSubject edge = (EdgeSubject) proxy;
+        final Collection<EdgeSubject> edges = graph.getEdgesModifiable();
         edges.add(edge);
       } else if (proxy instanceof IdentifierSubject ||
                  proxy instanceof ForeachEventSubject) {
@@ -613,7 +613,16 @@ public class ControlledSurface
         edge.setGuardActionBlock(block);
       } else if (proxy instanceof LabelBlockSubject) {
         final LabelBlockSubject block = (LabelBlockSubject) proxy;
-        graph.setBlockedEvents(block);
+        final GraphInsertPosition inspos =
+          (GraphInsertPosition) insert.getInsertPosition();
+        if (inspos.getParent() == graph) {
+          graph.setBlockedEvents(block);
+        } else {
+          final List<AbstractSubject> list = block.getEventListModifiable();
+          final List<AbstractSubject> clonedlist =
+            (List<AbstractSubject>) inspos.getOldValue();
+          list.addAll(clonedlist);
+        }
       } else if (proxy instanceof SimpleIdentifierElement) {
         final SimpleIdentifierProxy ident = (SimpleIdentifierProxy) proxy;
         final String name = ident.getName();
@@ -650,7 +659,15 @@ public class ControlledSurface
           (GuardActionBlockSubject) inspos.getOldValue();
         edge.setGuardActionBlock(oldvalue);
       } else if (proxy instanceof LabelBlockSubject) {
-        graph.setBlockedEvents(null);
+        final LabelBlockSubject block = (LabelBlockSubject) proxy;
+        final GraphInsertPosition inspos =
+          (GraphInsertPosition) insert.getInsertPosition();
+        if (inspos.getParent() == graph) {
+          graph.setBlockedEvents(null);
+        } else {
+          final List<AbstractSubject> list = block.getEventListModifiable();
+          list.clear();
+        }
       } else if (proxy instanceof SimpleIdentifierElement) {
         final GraphInsertPosition inspos =
           (GraphInsertPosition) insert.getInsertPosition();
@@ -1510,7 +1527,7 @@ public class ControlledSurface
   private void addInsertInfo(final List<InsertInfo> inserts,
                              final Proxy item,
                              final ProxySubject parent,
-                             final Proxy oldvalue)
+                             final Object oldvalue)
   {
     final GraphInsertPosition inspos =
       new GraphInsertPosition(parent, oldvalue);
@@ -4404,7 +4421,7 @@ public class ControlledSurface
     //#######################################################################
     //# Constructor
     private GraphInsertPosition(final ProxySubject parent,
-                                final Proxy oldvalue)
+                                final Object oldvalue)
     {
       mParent = parent;
       mOldValue = oldvalue;
@@ -4417,7 +4434,7 @@ public class ControlledSurface
       return mParent;
     }
 
-    public Proxy getOldValue()
+    public Object getOldValue()
     {
       return mOldValue;
     }
@@ -4425,7 +4442,7 @@ public class ControlledSurface
     //#######################################################################
     //# Data Members
     private final ProxySubject mParent;
-    private final Proxy mOldValue;
+    private final Object mOldValue;
   }
 
 
