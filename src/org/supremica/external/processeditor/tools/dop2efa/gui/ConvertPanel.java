@@ -15,6 +15,8 @@ public class ConvertPanel
 					extends JPanel 
 							implements ActionListener {
 	
+	private static final String WATER_MODULE_EXTENSION = ".wmod";
+	
 	private ROPtablePane leftPane;
 	private JPanel rigthPane;
 	private JPanel bottomRigthPane;
@@ -46,6 +48,7 @@ public class ConvertPanel
     	bottomRigthPane = new JPanel();
     	
     	outputPane = new FilePathPane();
+    	outputPane.setFileExtension(WATER_MODULE_EXTENSION);
     	
     	configPane = new ParameterPane();
     	buttonPane = new JPanel();

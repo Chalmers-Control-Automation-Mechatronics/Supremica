@@ -9,19 +9,25 @@ import javax.swing.JFileChooser;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
-public class FilePathPane extends JPanel implements ActionListener{
+public class FilePathPane 
+					extends JPanel 
+								implements ActionListener{
 	
-	private JTextField tfFilePath;
-    private JButton jbSetFilePath;
+	private final static String TOOL_TIP_TEXT = "File path";
+	
+	private JTextField tfFilePath = null;
+    private JButton jbSetFilePath = null;
     
-    private JFileChooser fc;
+    private JFileChooser fc = null;
+    
+    private String ext = "";
     
     public FilePathPane(){
     	jbSetFilePath = new JButton("Set");
         jbSetFilePath.addActionListener(this);
         
         tfFilePath = new JTextField(30);
-        tfFilePath.setToolTipText("File path");
+        tfFilePath.setToolTipText(TOOL_TIP_TEXT);
         
         add(tfFilePath);
         add(jbSetFilePath);
@@ -33,15 +39,30 @@ public class FilePathPane extends JPanel implements ActionListener{
     	}
     }
     
+    public void setFileExtension(String ext){
+    	this.ext = ext;
+    }
+    
     public String getFilePath(){
-    	return tfFilePath.getText();
+    	String absoluteFilePath = tfFilePath.getText();
+    	
+    	//no extension
+    	if(ext.equals("")){
+    		return absoluteFilePath;
+    	}
+    	
+    	//add extension
+    	if(!absoluteFilePath.endsWith(ext)){
+			absoluteFilePath = absoluteFilePath.concat(ext);
+		}
+    	return absoluteFilePath;
     }
     
     public void actionPerformed(ActionEvent evt) {
     	int returnVal;
     	File file;
         Object o;
-        
+
         o = evt.getSource();
         if(o == jbSetFilePath){
         	
