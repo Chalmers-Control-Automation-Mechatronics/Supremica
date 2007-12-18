@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.automata
 //# CLASS:   ExtendedAutomata
 //###########################################################################
-//# $Id: ExtendedAutomata.java,v 1.3 2007-12-04 03:22:58 robi Exp $
+//# $Id: ExtendedAutomata.java,v 1.4 2007-12-18 19:21:48 cengic Exp $
 //###########################################################################
 
 /*
@@ -81,8 +81,8 @@ import java.io.Reader;
 import java.io.StringReader;
 import java_cup.runtime.Scanner;
 
-import net.sourceforge.fuber.model.Variables;
-import net.sourceforge.fuber.model.IntegerVariable;
+import net.sourceforge.fuber.model.dual.Variables;
+import net.sourceforge.fuber.model.dual.IntegerVariable;
 
 import net.sourceforge.fuber.model.interpreters.Finder;
 import net.sourceforge.fuber.model.interpreters.Evaluator;

@@ -71,7 +71,7 @@ import java.util.Map.Entry;
 import org.supremica.manufacturingTables.controlsystemdata.*;
 import org.supremica.manufacturingTables.controlsystemimplementation.IEC61499.*;
 
-import net.sourceforge.fuber.model.Device;
+import net.sourceforge.fuber.model.dual.Device;
 
 public class IEC61499ControlSystemImplementationBuilder extends ControlSystemImplementationBuilder
 {
