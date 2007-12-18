@@ -14,8 +14,15 @@ import org.supremica.manufacturingTables.xsd.il.*;
 
 import org.supremica.external.processeditor.xml.Loader;
 
+
+/**
+ * This class is used to create connection setup objects to the
+ * MS SQL Server 2005. A number of methods sending predefined
+ * queries to the database are also defined
+ *
+ */
 public class Connect {
-	
+
 /*
 	------------------
 	--< Initialize >--
@@ -33,16 +40,19 @@ public class Connect {
 	private String databaseName;
 	private String userName;
 	private String password;
-	// Informs the driver if a server side cursor will be used, 
-	// which permits more than one active statement 
+	// Informs the driver if a server side cursor will be used,
+	// which permits more than one active statement
 	// on a connection.
 	private String selectMethod;
-    
+
 /*
 	--------------------
 	--< Constructors >--
 	--------------------
 */
+	/**
+	 * Creates a predefined connection setup object
+	 */
 	public Connect() {
 		this.url = "jdbc:sqlserver://";
 		this.serverName = "127.0.0.1";
@@ -52,7 +62,17 @@ public class Connect {
 		this.password = "test123";
 		this.selectMethod = "direct";
 	}
-	
+	/**
+	 * Creates a connection setup object with a number of parameters
+	 *
+	 * @param	url	the server URL
+	 * @param	serverName	the server name
+	 * @param	portNumber	the port number
+	 * @param	databaseName	the database name
+	 * @param	userName	the user name
+	 * @param	password	the user password
+	 * @param	selectMethod	the method used to retrieve result sets, can be set to either cursor or direct
+	 */
 	public Connect(String url, String serverName, String portNumber, String databaseName,
 						String userName, String password, String selectMethod){
 		this.url = url;
@@ -69,16 +89,23 @@ public class Connect {
 	--< Methods >--
 	---------------
 */
-	
 	// Make URL-string
+	/**
+	 * Returns the connection URL
+	 * @return		the connection URL
+	 */
 	private String getConnectionUrl(){
 		return url+serverName+":"+portNumber+";databaseName="+databaseName+";selectMethod="+selectMethod+";";
 	}
 
-	// Establish connection by using the DriverManager class	
+	// Get connection
+	/**
+	 * Establishes a connection by using the DriverManager class
+	 * @return		the connection object
+	 */
 	private java.sql.Connection getConnection(){
 		try{
-			Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver"); 
+			Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
 			con = java.sql.DriverManager.getConnection(getConnectionUrl(),userName,password);
 		}catch(Exception e){
 			//e.printStackTrace();
@@ -86,8 +113,13 @@ public class Connect {
 		}
 		return con;
 	}
-	
+
 	// Is connected
+	/**
+	 * Returns true if a connection object is defined, otherwise
+	 * false
+	 * @return		true if a connection object is defined
+	 */
 	public boolean isConnected(){
 		try{
 			con = this.getConnection();
@@ -99,8 +131,11 @@ public class Connect {
 		}
 		return false;
 	}
-	
+
 	// Close local connection
+	/**
+	 * Closes the current active connection.
+	 */
 	private void closeConnection(){
 		try{
 			if(con != null)
@@ -111,7 +146,10 @@ public class Connect {
 		}
 	}
 
-	//	Display the driver properties, database details 
+	// Display database properties
+	/**
+	 * 	Displays the driver properties, the database details
+	 */
 	public void displayDbProperties(){
 		java.sql.DatabaseMetaData dm = null;
 		java.sql.ResultSet rs = null;
@@ -134,7 +172,7 @@ public class Connect {
 				rs = null;
 				closeConnection();
 			}
-			else 
+			else
 				DBInterface.getPrintArea().append("\nError: No active Connection");
 		}catch(Exception e){
 			DBInterface.getPrintArea().append("\nError: No active Connection " + e.getMessage());
@@ -142,19 +180,23 @@ public class Connect {
 		}
 		dm = null;
 	}
-	
+
 	//	Get all projects
+	/**
+	 * Returns a vector with all the projects in the database
+	 * @return	a vector with all database projects
+	 */
 	public Vector<String> getAllProjects() {
 		PreparedStatement ps = null;
 		ResultSet rs = null;
 		Vector<String> projects = new Vector<String>();
 		try {
-			if(isConnected()){	
+			if(isConnected()){
 				ps = con.prepareStatement("SELECT Project_name FROM Projects");
 				try {
 					rs = ps.executeQuery();
 				}catch(SQLException sqle){
-					DBInterface.getPrintArea().append("\nAn SQL Exception Occured! " + sqle.getMessage());
+					DBInterface.getPrintArea().append("\nAn SQL Exception Occurred! " + sqle.getMessage());
 				}
 				while (rs.next()) {
 					projects.addElement(rs.getString(1));
@@ -164,7 +206,7 @@ public class Connect {
 				rs = null;
 				closeConnection();
 			}
-			else 
+			else
 				DBInterface.getPrintArea().append("\nError: No active Connection");
 		}catch(Exception e){
 			DBInterface.getPrintArea().append("\nError: " + e.getMessage());
@@ -172,20 +214,25 @@ public class Connect {
 		}
 		return projects;
 	}
-	
+
 	//	Get project ID
+	/**
+	 * Returns the database ID of a project by using the project name
+	 * @param	projectName	the project name
+	 * @return	the database ID of a project as INT
+	 */
 	public int getProjectID(String projectName) {
 		PreparedStatement ps = null;
 		ResultSet rs = null;
 		int projectID = 0;
 		try {
-			if(isConnected()){	
+			if(isConnected()){
 				ps = con.prepareStatement("exec GetProjectID @projectName = ?");
 				ps.setString(1, projectName);
 				try {
 					rs = ps.executeQuery();
 				}catch(SQLException sqle){
-					DBInterface.getPrintArea().append("\nAn SQL Exception Occured! " + sqle.getMessage());
+					DBInterface.getPrintArea().append("\nAn SQL Exception Occurred! " + sqle.getMessage());
 				}
 				if (rs.next()) {
 					projectID = rs.getInt(1);	// The project ID
@@ -195,7 +242,7 @@ public class Connect {
 				rs = null;
 				closeConnection();
 			}
-			else 
+			else
 				DBInterface.getPrintArea().append("\nError: No active Connection");
 		}catch(Exception e){
 			DBInterface.getPrintArea().append("\nError: " + e.getMessage());
@@ -203,20 +250,177 @@ public class Connect {
 		}
 		return projectID;
 	}
-	
+
+	//****** IMPORT XML ******
+
+	//	Import project XML as String
+	/**
+	 * Import a project from the database as an XML String
+	 * @param	projectName	the project name
+	 * @return	the project as a String object
+	 */
+	public String getProjectXMLAsString(String projectName) {
+		PreparedStatement ps = null;
+		ResultSet rs = null;
+		String xmlStr = "";
+		try {
+			if(isConnected()){
+				ps = con.prepareStatement("declare @xml XML exec @xml = ExtractProjectXML @projectName = ? select @xml");
+				ps.setString(1, projectName);
+				try {
+					rs = ps.executeQuery();
+				}catch(SQLException sqle){
+					DBInterface.getPrintArea().append("\nAn SQL Exception Occurred! " + sqle.getMessage());
+				}
+				if (rs != null) {
+					rs.next();
+					xmlStr = rs.getString(1);	// The complete XML as a String object
+				}
+				ps.close();
+				rs.close();
+				rs = null;
+				closeConnection();
+
+				return xmlStr;
+			}
+			else
+				DBInterface.getPrintArea().append("\nError: No active Connection");
+		}catch(Exception e){
+			DBInterface.getPrintArea().append("\nError: " + e.getMessage());
+			closeConnection();
+		}
+		return xmlStr;
+	}
+
+	//****** EXPORT XML ******
+
+	//	Export project XML as String
+	/**
+	 * Returns the database ID of a project by using the project name
+	 * @param	projectName	the project name
+	 * @return	the database ID of a project as INT
+	 */
+	public void setProjectXMLFromString(String xmlStr) {
+		PreparedStatement ps = null;
+		ResultSet rs = null;
+		String resultSet = "\nNo resultSet returned!";
+		try {
+			if(isConnected()){
+				ps = con.prepareStatement("exec InsertProjectXML @xml = ?");
+				ps.setString(1, xmlStr);
+				try {
+					rs = ps.executeQuery();
+				}catch(SQLException sqle){
+					DBInterface.getPrintArea().append("\nAn SQL Exception Occurred! " + sqle.getMessage());
+				}
+				if (rs != null) {
+					rs.next();
+					resultSet = rs.getString(1);	// The complete XML as a String object
+				}
+				DBInterface.getPrintArea().append("\nInserted as ID: " + resultSet);
+				ps.close();
+				rs.close();
+				rs = null;
+				closeConnection();
+
+			}
+			else
+				DBInterface.getPrintArea().append("\nError: No active Connection");
+		}catch(Exception e){
+			DBInterface.getPrintArea().append("\nError: " + e.getMessage());
+			closeConnection();
+		}
+	}
+
+	//	Send query
+	/**
+	 * Sends a predefined query to the database
+	 * @param	query	the predefined query as String
+	 */
+	public void sendQuery(String query) {
+		PreparedStatement ps = null;
+		ResultSet rs = null;
+		String result = "";
+		try {
+			if(isConnected()){
+				ps = con.prepareStatement(query);//"exec GetProjectID @projectName = ?");
+				//ps.setString(1, projectName);
+				try {
+					rs = ps.executeQuery();
+				}catch(SQLException sqle){
+					DBInterface.getPrintArea().append("\nAn SQL Exception Occurred! " + sqle.getMessage());
+				}
+				while (rs.next()) {
+					result = result + rs.getString(1) + "\t\t" + rs.getString(2) + "\n";
+				}
+				ps.close();
+				rs.close();
+				rs = null;
+				closeConnection();
+				DBInterface.getPrintArea().append("\n" + result);
+			}
+			else
+				DBInterface.getPrintArea().append("\nError: No active Connection");
+		}catch(Exception e){
+			DBInterface.getPrintArea().append("\nError: " + e.getMessage());
+			closeConnection();
+		}
+	}
+
+	// Link project
+	/**
+	 * Sends a predefined query to the database
+	 * @param	query	the predefined query as String
+	 */
+	public String linkProject(int projectID) {
+		PreparedStatement ps = null;
+		ResultSet rs = null;
+		String result = "";
+		try {
+			if(isConnected()){
+				ps = con.prepareStatement("exec CreateLinks @projectID = ?");
+				ps.setInt(1, projectID);
+				try {
+					rs = ps.executeQuery();
+				}catch(SQLException sqle){
+					DBInterface.getPrintArea().append("\nAn SQL Exception Occurred! " + sqle.getMessage());
+				}
+				while (rs.next()) {
+					result = result + rs.getString(2) + "\t" + rs.getString(3) + "\t" + rs.getString(4) + "\n";
+				}
+				ps.close();
+				rs.close();
+				rs = null;
+				closeConnection();
+				DBInterface.getPrintArea().append("\n" + result);
+			}
+			else
+				DBInterface.getPrintArea().append("\nError: No active Connection");
+		}catch(Exception e){
+			DBInterface.getPrintArea().append("\nError: " + e.getMessage());
+			closeConnection();
+		}
+		return result;
+	}
+
 	// Get standards in use
+	/**
+	 * Returns an ArrayList object defining what standards are present in a specific project
+	 * @param	projectID	the project database ID
+	 * @return	an ArrayList object
+	 */
 	public ArrayList<Integer> getStandardsInUse(int projectID){
 		ArrayList<Integer> standardsInUse = new ArrayList<Integer>();
 		PreparedStatement ps = null;
 		ResultSet rs = null;
 		try {
-			if(isConnected()){	
+			if(isConnected()){
 				ps = con.prepareStatement("exec GetStandardsInUse @projectID = ?");
 				ps.setInt(1, projectID);
 				try {
 					rs = ps.executeQuery();
 				}catch(SQLException sqle){
-					DBInterface.getPrintArea().append("\nAn SQL Exception Occured! " + sqle.getMessage());
+					DBInterface.getPrintArea().append("\nAn SQL Exception Occurred! " + sqle.getMessage());
 				}
 				if (rs != null) {
 					rs.next();
@@ -231,7 +435,7 @@ public class Connect {
 				rs = null;
 				closeConnection();
 			}
-			else 
+			else
 				DBInterface.getPrintArea().append("\nError: No active Connection");
 		}catch(Exception e){
 			DBInterface.getPrintArea().append("\nError: " + e.getMessage());
@@ -239,28 +443,32 @@ public class Connect {
 		}
 		return standardsInUse;
 	}
-	
+
 	//	Delete project
+	/**
+	 * Permanently deletes a project from the database
+	 * @param	projectID	the project database ID
+	 */
 	public void deleteProject(int projectID) {
 		PreparedStatement ps = null;
 		ResultSet rs = null;
 		try {
-			if(isConnected()){	
+			if(isConnected()){
 				ps = con.prepareStatement("DELETE FROM Projects WHERE Projects.Project_ID = ? SELECT 1");
 				ps.setInt(1, projectID);
 				try {
 					rs = ps.executeQuery();
 				}catch(SQLException sqle){
-					DBInterface.getPrintArea().append("\nAn SQL Exception Occured! " + sqle.getMessage());
+					DBInterface.getPrintArea().append("\nAn SQL Exception Occurred! " + sqle.getMessage());
 				}
-				
+
 				ps.close();
 				rs.close();
 				rs = null;
 				closeConnection();
-				
+
 			}
-			else 
+			else
 				DBInterface.getPrintArea().append("\nError: No active Connection");
 		}catch(Exception e){
 			DBInterface.getPrintArea().append("\nError: " + e.getMessage());
@@ -269,12 +477,19 @@ public class Connect {
 	}
 
 	//------------------------------
-	
+
 	//	Get all standards
-	public Vector<String> getAllStandards(int projectID, int standardIndex) {
+	/**
+	 * Returns a Vector object containing all instances of a specific standard in a specific
+	 * project
+	 * @param	projectID	the project database ID
+	 * @param	standardIndex	the selected standard type
+	 * @return	a Vector object with all the instances of the standard type
+	 */
+	public ArrayList<String> getAllStandards(int projectID, int standardIndex) {
 		PreparedStatement ps = null;
 		ResultSet rs = null;
-		Vector<String> vector = new Vector<String>();
+		ArrayList<String> list = new ArrayList<String>();
 		try {
 			if(isConnected()){
 				switch (standardIndex) {
@@ -288,26 +503,32 @@ public class Connect {
 				try {
 					rs = ps.executeQuery();
 				}catch(SQLException sqle){
-					DBInterface.getPrintArea().append("\nAn SQL Exception Occured! " + sqle.getMessage());
+					DBInterface.getPrintArea().append("\nAn SQL Exception Occurred! " + sqle.getMessage());
 				}
 				while (rs.next()) {
-					vector.addElement(rs.getString(1));
+					list.add(rs.getString(1));
 				}
 				ps.close();
 				rs.close();
 				rs = null;
 				closeConnection();
 			}
-			else 
+			else
 				DBInterface.getPrintArea().append("\nError: No active Connection");
 		}catch(Exception e){
 			DBInterface.getPrintArea().append("\nError: " + e.getMessage());
 			closeConnection();
 		}
-		return vector;
+		return list;
 	}
-	
+
 	//	Delete standard
+	/**
+	 * Deletes a specific standard in the database
+	 * @param	projectID	the project database ID
+	 * @param	standardIndex	the selected standard type
+	 * @param	standardNameID	the selected instance of the standard type
+	 */
 	public void deleteStandard(int projectID, int standardIndex, String standardNameID) {
 		PreparedStatement ps = null;
 		ResultSet rs = null;
@@ -327,7 +548,7 @@ public class Connect {
 				try {
 					rs = ps.executeQuery();
 				}catch(SQLException sqle){
-					DBInterface.getPrintArea().append("\nAn SQL Exception Occured! " + sqle.getMessage());
+					DBInterface.getPrintArea().append("\nAn SQL Exception Occurred! " + sqle.getMessage());
 				}
 				if (rs != null) {
 					rs.next();
@@ -340,17 +561,24 @@ public class Connect {
 				rs = null;
 				closeConnection();
 			}
-			else 
+			else
 				DBInterface.getPrintArea().append("\nError: No active Connection");
 		}catch(Exception e){
 			DBInterface.getPrintArea().append("\nError: " + e.getMessage());
 			closeConnection();
 		}
 	}
-	
+
 	//****** IMPORT XML ******
 
 	//	Import standard from DB as String
+	/**
+	 * Returns a specific standard from the database as a String object
+	 * @param	projectID	the project database ID
+	 * @param	standardIndex	the selected standard type
+	 * @param	standardNameID	the selected instance of the standard type
+	 * @return	the selected standard as an XML String
+	 */
 	public String getStandardXMLAsString(int projectID, int standardIndex, String standardNameID) {
 		PreparedStatement ps = null;
 		ResultSet rs = null;
@@ -360,18 +588,18 @@ public class Connect {
 				switch(standardIndex) {
 				case 0: ps = con.prepareStatement("declare @xml XML exec @xml = ExtractPRXML @projectID = ? select @xml"); break;
 				case 1: ps = con.prepareStatement("declare @xml XML exec @xml = ExtractVRXML @projectID = ? select @xml"); break;
-				case 2: ps = con.prepareStatement("declare @xml XML exec @xml = ExtractROPXML @projectID = ?, @ROPNameID = ? select @xml"); 
+				case 2: ps = con.prepareStatement("declare @xml XML exec @xml = ExtractROPXML @projectID = ?, @ROPNameID = ? select @xml");
 						ps.setString(2, standardNameID); break;
-				case 3: ps = con.prepareStatement("declare @xml XML exec @xml = ExtractEOPXML @projectID = ?, @OPNameID = ? select @xml"); 
+				case 3: ps = con.prepareStatement("declare @xml XML exec @xml = ExtractEOPXML @projectID = ?, @OPNameID = ? select @xml");
 						ps.setString(2, standardNameID); break;
-				case 4: ps = con.prepareStatement("declare @xml XML exec @xml = ExtractILXML @projectID = ?, @ILNameID = ? select @xml"); 
+				case 4: ps = con.prepareStatement("declare @xml XML exec @xml = ExtractILXML @projectID = ?, @ILNameID = ? select @xml");
 						ps.setString(2, standardNameID); break;
 				}
 				ps.setInt(1, projectID);
 				try {
 					rs = ps.executeQuery();
 				}catch(SQLException sqle){
-					DBInterface.getPrintArea().append("\nAn SQL Exception Occured! " + sqle.getMessage());
+					DBInterface.getPrintArea().append("\nAn SQL Exception Occurred! " + sqle.getMessage());
 				}
 				if (rs != null) {
 					rs.next();
@@ -381,10 +609,10 @@ public class Connect {
 				rs.close();
 				rs = null;
 				closeConnection();
-				
+
 				return xmlStr;
 			}
-			else 
+			else
 				DBInterface.getPrintArea().append("\nError: No active Connection ");
 		}catch(Exception e){
 			DBInterface.getPrintArea().append("\nError: No active Connection: " + e.getMessage());
@@ -392,8 +620,15 @@ public class Connect {
 		}
 		return null;
 	}
-	
+
 	//	Import standard from DB as JAXB Object
+	/**
+	 * Returns a specific standard from the database as a JAXB object
+	 * @param	projectID	the project database ID
+	 * @param	standardIndex	the selected standard type
+	 * @param	standardNameID	the selected instance of the standard type
+	 * @return	the selected standard as a JAXB object
+	 */
 	public Object getStandardXMLAsObject(int projectID, int standardIndex, String standardNameID) {
 		PreparedStatement ps = null;
 		ResultSet rs = null;
@@ -403,18 +638,18 @@ public class Connect {
 				switch(standardIndex) {
 				case 0: ps = con.prepareStatement("declare @xml XML exec @xml = ExtractPRXML @projectID = ? select @xml"); break;
 				case 1: ps = con.prepareStatement("declare @xml XML exec @xml = ExtractVRXML @projectID = ? select @xml"); break;
-				case 2: ps = con.prepareStatement("declare @xml XML exec @xml = ExtractROPXML @projectID = ?, @ROPNameID = ? select @xml"); 
+				case 2: ps = con.prepareStatement("declare @xml XML exec @xml = ExtractROPXML @projectID = ?, @ROPNameID = ? select @xml");
 						ps.setString(2, standardNameID); break;
-				case 3: ps = con.prepareStatement("declare @xml XML exec @xml = ExtractEOPXML @projectID = ?, @OPNameID = ? select @xml"); 
+				case 3: ps = con.prepareStatement("declare @xml XML exec @xml = ExtractEOPXML @projectID = ?, @OPNameID = ? select @xml");
 						ps.setString(2, standardNameID); break;
-				case 4: ps = con.prepareStatement("declare @xml XML exec @xml = ExtractILXML @projectID = ?, @ILNameID = ? select @xml"); 
+				case 4: ps = con.prepareStatement("declare @xml XML exec @xml = ExtractILXML @projectID = ?, @ILNameID = ? select @xml");
 						ps.setString(2, standardNameID); break;
 				}
 				ps.setInt(1, projectID);
 				try {
 					rs = ps.executeQuery();
 				}catch(SQLException sqle){
-					DBInterface.getPrintArea().append("\nAn SQL Exception Occured! " + sqle.getMessage());
+					DBInterface.getPrintArea().append("\nAn SQL Exception Occurred! " + sqle.getMessage());
 				}
 				if (rs != null) {
 					rs.next();
@@ -427,8 +662,22 @@ public class Connect {
 					String content = "";
 					try {
 						switch(standardIndex){
-						case 0: o = ldr.open(xmlStr, PKGS_PR); break;
-						case 1: o = ldr.open(xmlStr, PKGS_VR); break;
+						case 0: o = ldr.open(xmlStr, PKGS_PR);
+								jc = JAXBContext.newInstance(PKGS_PR);
+								m = jc.createMarshaller();
+								m.setProperty(Marshaller.JAXB_ENCODING, "UTF-8");
+								m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
+								m.marshal(o, result);
+								content = stringWriter.toString();
+								DBInterface.getPrintArea().append("\n\n" + content); break;
+						case 1: o = ldr.open(xmlStr, PKGS_VR);
+								jc = JAXBContext.newInstance(PKGS_VR);
+								m = jc.createMarshaller();
+								m.setProperty(Marshaller.JAXB_ENCODING, "UTF-8");
+								m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
+								m.marshal(o, result);
+								content = stringWriter.toString();
+								DBInterface.getPrintArea().append("\n\n" + content); break;
 						case 2: o = ldr.open(xmlStr, PKGS_ROP);
 								jc = JAXBContext.newInstance(PKGS_ROP);
 								m = jc.createMarshaller();
@@ -436,7 +685,7 @@ public class Connect {
 								m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
 								m.marshal(o, result);
 								content = stringWriter.toString();
-								DBInterface.getPrintArea().append("\n\n" + content); break;						
+								DBInterface.getPrintArea().append("\n\n" + content); break;
 						case 3: o = ldr.open(xmlStr, PKGS_EOP);
 								jc = JAXBContext.newInstance(PKGS_EOP);
 								m = jc.createMarshaller();
@@ -445,34 +694,27 @@ public class Connect {
 								m.marshal(o, result);
 								content = stringWriter.toString();
 								DBInterface.getPrintArea().append("\n\n" + content); break;
-						case 4: o = ldr.open(xmlStr, PKGS_IL); break;
+						case 4: o = ldr.open(xmlStr, PKGS_IL);
+								jc = JAXBContext.newInstance(PKGS_IL);
+								m = jc.createMarshaller();
+								m.setProperty(Marshaller.JAXB_ENCODING, "UTF-8");
+								m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
+								m.marshal(o, result);
+								content = stringWriter.toString();
+								DBInterface.getPrintArea().append("\n\n" + content); break;
 						}
 					}catch(Exception e) {
-						DBInterface.getPrintArea().append(e.getMessage());
+						DBInterface.getPrintArea().append("Exception: " + e.getMessage());
 					}
-					//*
-					DBInterface.getPrintArea().setCaretPosition(DBInterface.getPrintArea().getDocument().getLength());
-					//DBInterface.getPrintArea().append("\nNo client SOC application present\nYou may want to change the transfer type setting to \"file\" in the Options menu");
-					//* remove //******************					
-					//Marshaller m = jc.createMarshaller();
-					//m.setProperty(Marshaller.JAXB_ENCODING, "UTF-8");
-					//m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
-					//StringWriter stringWriter = new StringWriter();
-					//StreamResult result = new StreamResult(stringWriter);
-					//m.marshal(o, result);
-					//String content = stringWriter.toString();
-					//System.out.println(content);
-					//* remove //******************
-					
 				}
 				ps.close();
 				rs.close();
 				rs = null;
 				closeConnection();
-				
+
 				return o;
 			}
-			else 
+			else
 				DBInterface.getPrintArea().append("\nError: No active Connection ");
 		}catch(Exception e){
 			DBInterface.getPrintArea().append("\nError: No active Connection: " + e.getMessage());
@@ -484,12 +726,18 @@ public class Connect {
 	//****** EXPORT XML ******
 
 	//	Export standard to DB from String
+	/**
+	 * Exports a selected standard to the database from a String object
+	 * @param	projectID	the project database ID
+	 * @param	standardIndex	the selected standard type
+	 * @param	xmlStr	the XML data as a String object
+	 */
 	public void setStandardXMLFromString(int projectID, int standardIndex, String xmlStr) {
 		PreparedStatement ps = null;
 		ResultSet rs = null;
 		String resultStr = "No ResultSet returned";
 		String insertStr = "\nInserted as ID: ";
-		
+
 		try {
 			if(isConnected()) {
 				Loader ldr = new Loader();
@@ -570,7 +818,7 @@ public class Connect {
 					try {
 						rs = ps.executeQuery();
 					}catch(SQLException sqle) {
-						DBInterface.getPrintArea().append("\nAn SQL Exception Occured! " + sqle.getMessage());
+						DBInterface.getPrintArea().append("\nAn SQL Exception Occurred! " + sqle.getMessage());
 						closeConnection();
 						insertStr = "";
 					}
@@ -588,7 +836,7 @@ public class Connect {
 				rs = null;
 				closeConnection();
 			}
-			else 
+			else
 				DBInterface.getPrintArea().append("\nError: No active Connection ");
 		}catch(Exception e) {
 			DBInterface.getPrintArea().append("\nError: " + e.getMessage());
@@ -596,6 +844,12 @@ public class Connect {
 	}
 
 	//	Export standard to DB from JAXB Object
+	/**
+	 * Exports a selected standard to the database from a JAXB object
+	 * @param	projectID	the project database ID
+	 * @param	standardIndex	the selected standard type
+	 * @param	o	the XML data as a JAXB object
+	 */
 	public void setStandardXMLFromObject(int projectID, int standardIndex, Object o) {
 		PreparedStatement ps = null;
 		ResultSet rs = null;
@@ -620,7 +874,7 @@ public class Connect {
 				StreamResult result = new StreamResult(stringWriter);
 				m.marshal(o, result);
 				xmlStr = stringWriter.toString();
-				
+
 				switch(standardIndex){
 				case 0: ps = con.prepareStatement("exec InsertPRXML @projectID = ?, @xml = ?"); break;
 				case 1: ps = con.prepareStatement("exec InsertVRXML @projectID = ?, @xml = ?"); break;
@@ -633,7 +887,7 @@ public class Connect {
 				try {
 					rs = ps.executeQuery();
 				}catch(SQLException sqle) {
-					DBInterface.getPrintArea().append("\nAn SQL Exception Occured! " + sqle.getMessage());
+					DBInterface.getPrintArea().append("\nAn SQL Exception Occurred! " + sqle.getMessage());
 					closeConnection();
 					insertStr = "";
 				}
@@ -646,10 +900,10 @@ public class Connect {
 				rs = null;
 				closeConnection();
 			}
-			else 
+			else
 				DBInterface.getPrintArea().append("\nError: No active Connection ");
 		}catch(Exception e) {
-			DBInterface.getPrintArea().append("\nError: A resource must be selected. " + e.getMessage());
+			DBInterface.getPrintArea().append("\nError: A resource must be selected in SOC. " + e.getMessage());
 		}
 	}
 }
