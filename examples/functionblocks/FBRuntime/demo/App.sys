@@ -6,8 +6,6 @@
       <FBNetwork>
         <FB Name="restart" Type="E_RESTART" />
 
-        <FB Name="fcc" Type="FCC" />
-
         <FB Name="R3323merge" Type="E_MERGE2" />
         <FB Name="R3325merge" Type="E_MERGE2" />
         <FB Name="TT153merge" Type="E_MERGE2" />
@@ -49,6 +47,8 @@
         <FB Name="rend_split" Type="E_SPLIT3" />
 
         <FB Name="nomore_merge" Type="E_MERGE2" />
+
+        <FB Name="fcc" Type="FCC" />
 
 		
         <EventConnections>

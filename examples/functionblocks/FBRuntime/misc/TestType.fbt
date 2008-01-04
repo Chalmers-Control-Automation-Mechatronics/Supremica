@@ -26,11 +26,11 @@
     <ECC>
         <ECState Name="INIT" />
         <ECState Name="STATE" >
-		    <ECAction Algorithm="TestAlg" Output="EO"/>
-		    <!--ECAction Algorithm="PrintAlg"/-->
-	    </ECState>    	
-		<ECTransition Source="INIT" Destination="STATE" Condition="EI" />
-		<ECTransition Source="STATE" Destination="INIT" Condition="1" />
+        <ECAction Algorithm="TestAlg" Output="EO"/>
+            <!--ECAction Algorithm="PrintAlg"/-->
+        </ECState>    	
+        <ECTransition Source="INIT" Destination="STATE" Condition="EI" />
+        <ECTransition Source="STATE" Destination="INIT" Condition="1" />
     </ECC>
     <Algorithm Name="TestAlg">
     <Other Language="Java" Text=
