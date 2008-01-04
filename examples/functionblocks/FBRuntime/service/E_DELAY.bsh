@@ -1,0 +1,78 @@
+/*
+ *   This file is part of Fuber (Function Block Execution Runtime) library.
+ *   Copyright (C) 2005 Goran Cengic
+ *
+ *   This library is free software; you can redistribute it and/or
+ *   modify it under the terms of the GNU Lesser General Public
+ *   License as published by the Free Software Foundation; either
+ *   version 2.1 of the License, or (at your option) any later version.
+ *
+ *   This library is distributed in the hope that it will be useful,
+ *   but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ *   Lesser General Public License for more details.
+ *
+ *   You should have received a copy of the GNU Lesser General Public
+ *   License along with this library; if not, write to the Free Software
+ *   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+ *
+ *   To contact author please refer to contact information in the README file.
+ */
+/*
+ * @author Goran Cengic
+ */
+
+import net.sourceforge.fuber.model.dual.*;
+import net.sourceforge.fuber.model.*;
+
+import net.sourceforge.fuber.model.services.DelayThread;
+
+
+ServiceFBInstance serviceFB = (ServiceFBInstance) serviceFB;
+Map serviceState = (Map) serviceState;
+Event serviceEvent = (Event) serviceEvent;
+Variables serviceVariables = (Variables) serviceVariables;
+
+if (serviceInitialize)
+{
+
+	System.out.println("E_DELAY.bsh(" + serviceFB.getName() + "): Initialization");
+	serviceState = new HashMap();
+
+	// flag for discarding incoming events
+	serviceState.put("delaying", new Boolean(false));
+
+	// create service thread
+	DelayThread delayThread = new DelayThread(serviceFB);
+	serviceState.put("delayThread", delayThread);
+	delayThread.start();
+
+}
+else
+{
+
+	String eventName  = ((Event) serviceEvent).getName();
+
+	if (eventName.equals("START"))
+	{ 
+		if (((Boolean) serviceState.get("delaying")).booleanValue())
+		{
+			//System.out.println("E_DELAY.bsh(" + serviceFB.getName() + "): Discarding START event");
+			return;
+		}
+
+		serviceState.put("delaying", new Boolean(true));
+
+		//System.out.println("E_DELAY.bsh(" + serviceFB.getName() + "): START event received");
+		int delayTime = ((IntegerVariable) serviceVariables.getVariable("DT")).getValue().intValue();
+		serviceState.get("delayThread").startDelay(delayTime);
+
+		
+	}
+	else if (eventName.equals("STOP"))
+	{	
+		//System.out.println("E_DELAY.bsh(" + serviceFB.getName() + "): STOP event received");
+		serviceState.put("delaying", new Boolean(false));		
+		serviceState.get("delayThread").stopDelay();
+	}
+}
