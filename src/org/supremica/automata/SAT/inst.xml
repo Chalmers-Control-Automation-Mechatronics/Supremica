@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<instance>
+    <presentation name="x" format="XCSP 2.0"/>
+    <domains nbDomains="3">
+        <domain nbValues="3" name="statesA">0..2</domain>
+        <domain nbValues="2" name="statesB">0..1</domain>
+        <domain nbValues="3" name="events">0..2</domain>
+    </domains>
+    <variables nbVariables="17">
+        <variable name="state_A_step_0" domain="statesA"/>
+        <variable name="state_B_step_0" domain="statesB"/>
+        <variable name="state_A_step_1" domain="statesA"/>
+        <variable name="state_B_step_1" domain="statesB"/>
+        <variable name="state_A_step_2" domain="statesA"/>
+        <variable name="state_B_step_2" domain="statesB"/>
+        <variable name="state_A_step_3" domain="statesA"/>
+        <variable name="state_B_step_3" domain="statesB"/>
+        <variable name="state_A_step_4" domain="statesA"/>
+        <variable name="state_B_step_4" domain="statesB"/>
+        <variable name="state_A_step_5" domain="statesA"/>
+        <variable name="state_B_step_5" domain="statesB"/>
+        <variable name="event_step_0" domain="events"/>
+        <variable name="event_step_1" domain="events"/>
+        <variable name="event_step_2" domain="events"/>
+        <variable name="event_step_3" domain="events"/>
+        <variable name="event_step_4" domain="events"/>
+    </variables>
+    <predicates nbPredicates="8">
+        <predicate name="A_init">
+            <parameters>int X</parameters>
+            <expression>
+                <functional>eq(X,0)</functional>
+            </expression>
+        </predicate>
+        <predicate name="B_init">
+            <parameters>int X</parameters>
+            <expression>
+                <functional>eq(X,0)</functional>
+            </expression>
+        </predicate>
+        <predicate name="A_e1">
+            <parameters>int E int X int X1</parameters>
+            <expression>
+                <functional>or(not(eq(E, 0)), and(eq(X, 0),eq(X1, 1)))</functional>
+            </expression>
+        </predicate>
+        <predicate name="A_e2">
+            <parameters>int E int X int X1</parameters>
+            <expression>
+                <functional>or(not(eq(E, 1)), and(eq(X, 0),eq(X1, 1)))</functional>
+            </expression>
+        </predicate>
+        <predicate name="B_e1">
+            <parameters>int E int X int X1</parameters>
+            <expression>
+                <functional>or(not(eq(E, 0)), and(eq(X, 0),eq(X1, 1)))</functional>
+            </expression>
+        </predicate>
+        <predicate name="A_marking">
+            <parameters>int E int X int X1</parameters>
+            <expression>
+                <functional>or(not(eq(E,2)),or(eq(0,1), and(eq(X,1),eq(X1,1))))</functional>
+            </expression>
+        </predicate>
+        <predicate name="B_marking">
+            <parameters>int E int X int X1</parameters>
+            <expression>
+                <functional>or(not(eq(E,2)),or(eq(0,1), and(eq(X,1),eq(X1,1))))</functional>
+            </expression>
+        </predicate>
+        <predicate name="goal">
+            <parameters>int event_step_0 int event_step_1 int event_step_2 int event_step_3 int event_step_4</parameters>
+            <expression>
+                <functional>or(or(or(or(eq(event_step_0, 2),eq(event_step_1, 2)),eq(event_step_2, 2)),eq(event_step_3, 2)),eq(event_step_4, 2))</functional>
+            </expression>
+        </predicate>
+    </predicates>
+    <constraints nbConstraints="28">
+        <constraint scope="state_A_step_0" reference="A_init" name="c_A_init" arity="1">
+            <parameters>state_A_step_0</parameters>
+        </constraint>
+        <constraint scope="state_B_step_0" reference="B_init" name="c_B_init" arity="1">
+            <parameters>state_B_step_0</parameters>
+        </constraint>
+        <constraint scope="event_step_0 state_A_step_0 state_A_step_1" reference="A_e1" name="c_A_e10" arity="3">
+            <parameters>event_step_0 state_A_step_0 state_A_step_1</parameters>
+        </constraint>
+        <constraint scope="event_step_1 state_A_step_1 state_A_step_2" reference="A_e1" name="c_A_e11" arity="3">
+            <parameters>event_step_1 state_A_step_1 state_A_step_2</parameters>
+        </constraint>
+        <constraint scope="event_step_2 state_A_step_2 state_A_step_3" reference="A_e1" name="c_A_e12" arity="3">
+            <parameters>event_step_2 state_A_step_2 state_A_step_3</parameters>
+        </constraint>
+        <constraint scope="event_step_3 state_A_step_3 state_A_step_4" reference="A_e1" name="c_A_e13" arity="3">
+            <parameters>event_step_3 state_A_step_3 state_A_step_4</parameters>
+        </constraint>
+        <constraint scope="event_step_4 state_A_step_4 state_A_step_5" reference="A_e1" name="c_A_e14" arity="3">
+            <parameters>event_step_4 state_A_step_4 state_A_step_5</parameters>
+        </constraint>
+        <constraint scope="event_step_0 state_A_step_0 state_A_step_1" reference="A_e2" name="c_A_e20" arity="3">
+            <parameters>event_step_0 state_A_step_0 state_A_step_1</parameters>
+        </constraint>
+        <constraint scope="event_step_1 state_A_step_1 state_A_step_2" reference="A_e2" name="c_A_e21" arity="3">
+            <parameters>event_step_1 state_A_step_1 state_A_step_2</parameters>
+        </constraint>
+        <constraint scope="event_step_2 state_A_step_2 state_A_step_3" reference="A_e2" name="c_A_e22" arity="3">
+            <parameters>event_step_2 state_A_step_2 state_A_step_3</parameters>
+        </constraint>
+        <constraint scope="event_step_3 state_A_step_3 state_A_step_4" reference="A_e2" name="c_A_e23" arity="3">
+            <parameters>event_step_3 state_A_step_3 state_A_step_4</parameters>
+        </constraint>
+        <constraint scope="event_step_4 state_A_step_4 state_A_step_5" reference="A_e2" name="c_A_e24" arity="3">
+            <parameters>event_step_4 state_A_step_4 state_A_step_5</parameters>
+        </constraint>
+        <constraint scope="event_step_0 state_B_step_0 state_B_step_1" reference="B_e1" name="c_B_e10" arity="3">
+            <parameters>event_step_0 state_B_step_0 state_B_step_1</parameters>
+        </constraint>
+        <constraint scope="event_step_1 state_B_step_1 state_B_step_2" reference="B_e1" name="c_B_e11" arity="3">
+            <parameters>event_step_1 state_B_step_1 state_B_step_2</parameters>
+        </constraint>
+        <constraint scope="event_step_2 state_B_step_2 state_B_step_3" reference="B_e1" name="c_B_e12" arity="3">
+            <parameters>event_step_2 state_B_step_2 state_B_step_3</parameters>
+        </constraint>
+        <constraint scope="event_step_3 state_B_step_3 state_B_step_4" reference="B_e1" name="c_B_e13" arity="3">
+            <parameters>event_step_3 state_B_step_3 state_B_step_4</parameters>
+        </constraint>
+        <constraint scope="event_step_4 state_B_step_4 state_B_step_5" reference="B_e1" name="c_B_e14" arity="3">
+            <parameters>event_step_4 state_B_step_4 state_B_step_5</parameters>
+        </constraint>
+        <constraint scope="event_step_0 state_A_step_0 state_A_step_1" reference="A_marking" name="c_A_marking_step_0" arity="3">
+            <parameters>event_step_0 state_A_step_0 state_A_step_1</parameters>
+        </constraint>
+        <constraint scope="event_step_1 state_A_step_1 state_A_step_2" reference="A_marking" name="c_A_marking_step_1" arity="3">
+            <parameters>event_step_1 state_A_step_1 state_A_step_2</parameters>
+        </constraint>
+        <constraint scope="event_step_2 state_A_step_2 state_A_step_3" reference="A_marking" name="c_A_marking_step_2" arity="3">
+            <parameters>event_step_2 state_A_step_2 state_A_step_3</parameters>
+        </constraint>
+        <constraint scope="event_step_3 state_A_step_3 state_A_step_4" reference="A_marking" name="c_A_marking_step_3" arity="3">
+            <parameters>event_step_3 state_A_step_3 state_A_step_4</parameters>
+        </constraint>
+        <constraint scope="event_step_4 state_A_step_4 state_A_step_5" reference="A_marking" name="c_A_marking_step_4" arity="3">
+            <parameters>event_step_4 state_A_step_4 state_A_step_5</parameters>
+        </constraint>
+        <constraint scope="event_step_0 state_B_step_0 state_B_step_1" reference="B_marking" name="c_B_marking_step_0" arity="3">
+            <parameters>event_step_0 state_B_step_0 state_B_step_1</parameters>
+        </constraint>
+        <constraint scope="event_step_1 state_B_step_1 state_B_step_2" reference="B_marking" name="c_B_marking_step_1" arity="3">
+            <parameters>event_step_1 state_B_step_1 state_B_step_2</parameters>
+        </constraint>
+        <constraint scope="event_step_2 state_B_step_2 state_B_step_3" reference="B_marking" name="c_B_marking_step_2" arity="3">
+            <parameters>event_step_2 state_B_step_2 state_B_step_3</parameters>
+        </constraint>
+        <constraint scope="event_step_3 state_B_step_3 state_B_step_4" reference="B_marking" name="c_B_marking_step_3" arity="3">
+            <parameters>event_step_3 state_B_step_3 state_B_step_4</parameters>
+        </constraint>
+        <constraint scope="event_step_4 state_B_step_4 state_B_step_5" reference="B_marking" name="c_B_marking_step_4" arity="3">
+            <parameters>event_step_4 state_B_step_4 state_B_step_5</parameters>
+        </constraint>
+        <constraint scope=" event_step_0 event_step_1 event_step_2 event_step_3 event_step_4" reference="goal" name="c_goal" arity="5">
+            <parameters> event_step_0 event_step_1 event_step_2 event_step_3 event_step_4</parameters>
+        </constraint>
+    </constraints>
+</instance>
