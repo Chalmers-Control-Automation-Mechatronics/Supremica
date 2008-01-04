@@ -34,11 +34,9 @@ import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.ArrayList;
-import java.net.URI;
 import java.lang.Exception;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Unmarshaller;
-import javax.xml.bind.JAXBException;
 
 import java_cup.runtime.Scanner;
 import net.sourceforge.fuber.model.interpreters.st.Lexer;
@@ -865,7 +863,7 @@ class ModelMaker
 				}
 				dataMap.put(destSignal, source);
 
-				if (sourceInstance != "")
+				if (!sourceInstance.equals(""))
 				{
 					if (!dataConnections.keySet().contains(sourceInstance))
 					{
@@ -1452,7 +1450,7 @@ class ModelMaker
 					{
 						// get possible constant data value
 						String dataCnt = (String) ((Map) dataConnections.get(fbName)).get(curDataInputName);
-						if (getInstanceName(dataCnt) != "")
+						if (!getInstanceName(dataCnt).equals(""))
 						{
 							output(DEBUG, "Making non constant data variable", 2);
 							eventQueue.addIntegerVariable("data_" + curDataInputName + "_" + fbName, intVarMinValue, intVarMaxValue, 0, 0);
