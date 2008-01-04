@@ -22,9 +22,9 @@
  * @author Goran Cengic
  */
 
-import net.sourceforge.fuber.model.*;
+import net.sourceforge.fuber.fcc.model.*;
 
-import net.sourceforge.fuber.demo.FCCThread;
+import net.sourceforge.fuber.fcc.demo.FCCThread;
 
 ServiceFBInstance serviceFB = (ServiceFBInstance) serviceFB;
 Map serviceState = (Map) serviceState;

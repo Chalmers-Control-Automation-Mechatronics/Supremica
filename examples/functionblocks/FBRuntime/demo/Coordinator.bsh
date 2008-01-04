@@ -2,8 +2,8 @@
  * @author Goran Cengic
  */
 
-import net.sourceforge.fuber.model.*;
-import net.sourceforge.fuber.demo.CoordinatorThread;
+import net.sourceforge.fuber.fcc.model.*;
+import net.sourceforge.fuber.fcc.demo.CoordinatorThread;
 import org.supremica.manufacturingTables.controlsystemimplementation.IEC61499.*;
 
 
