@@ -150,7 +150,11 @@
         <unjar src="${lib}/jgrafchart.jar" dest="${lib}/${unjared}"/>	
         <unjar src="${lib}/WMFWriter2D.jar" dest="${lib}/${unjared}"/>	
         <unjar src="${lib}/sysutils.jar" dest="${lib}/${unjared}"/>	
+        <!-- Libraries for IEC61499 Fuber runtime support in Supremica. -->
+        <!--   Maintained by: cengic@chalmers.se -->
+        <unjar src="${lib}/fcc_demo.jar" dest="${lib}/${unjared}"/>
         <unjar src="${lib}/fuber.jar" dest="${lib}/${unjared}"/>
+        <!-- End IEC61499 runtime libraries -->
         <unjar src="${lib}/swixml.jar" dest="${lib}/${unjared}"/>
         <unjar src="${lib}/trove.jar" dest="${lib}/${unjared}"/>
         <!-- Library for handling BDDs. -->

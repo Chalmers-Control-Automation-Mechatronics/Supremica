@@ -1,12 +1,3 @@
-//# -*- tab-width: 4  indent-tabs-mode: nil  c-basic-offset: 4 -*-
-//###########################################################################
-//# PROJECT: Supremica
-//# PACKAGE: org.supremica.automata
-//# CLASS:   ExtendedAutomata
-//###########################################################################
-//# $Id: ExtendedAutomata.java,v 1.4 2007-12-18 19:21:48 cengic Exp $
-//###########################################################################
-
 /*
  * Supremica Software License Agreement
  *
@@ -81,8 +72,8 @@ import java.io.Reader;
 import java.io.StringReader;
 import java_cup.runtime.Scanner;
 
-import net.sourceforge.fuber.model.dual.Variables;
-import net.sourceforge.fuber.model.dual.IntegerVariable;
+import net.sourceforge.fuber.model.Variables;
+import net.sourceforge.fuber.model.IntegerVariable;
 
 import net.sourceforge.fuber.model.interpreters.Finder;
 import net.sourceforge.fuber.model.interpreters.Evaluator;

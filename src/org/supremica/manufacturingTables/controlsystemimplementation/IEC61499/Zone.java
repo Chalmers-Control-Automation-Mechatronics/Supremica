@@ -58,7 +58,7 @@
  */
 package org.supremica.manufacturingTables.controlsystemimplementation.IEC61499;
 
-import net.sourceforge.fuber.demo.ZoneThread;
+import net.sourceforge.fuber.fcc.demo.ZoneThread;
 
 public class Zone implements Listener
 {

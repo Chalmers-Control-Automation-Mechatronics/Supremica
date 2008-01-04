@@ -59,7 +59,7 @@
  */
 package org.supremica.manufacturingTables.controlsystemimplementation.IEC61499;
 
-import net.sourceforge.fuber.demo.MachineThread;
+import net.sourceforge.fuber.fcc.demo.MachineThread;
 
 public class Machine implements Listener
 {

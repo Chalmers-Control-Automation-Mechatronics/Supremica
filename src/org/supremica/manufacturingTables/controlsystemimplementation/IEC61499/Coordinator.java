@@ -58,7 +58,7 @@
  */
 package org.supremica.manufacturingTables.controlsystemimplementation.IEC61499;
 
-import net.sourceforge.fuber.demo.CoordinatorThread;
+import net.sourceforge.fuber.fcc.demo.CoordinatorThread;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Collections;
