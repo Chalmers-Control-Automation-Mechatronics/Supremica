@@ -112,11 +112,11 @@ public class ExtendedAutomata
 	public static void expandTransitions(ModuleSubject module)
 	{
 		
-		ModelMaker.output("ExtendedAutomata.expandTransitions(): Expanding transitions.");
+		Logger.output("ExtendedAutomata.expandTransitions(): Expanding transitions.");
 		
 		// get all component variables
 		// and put them in a map
-		ModelMaker.output(ModelMaker.DEBUG, "ExtendedAutomata.expandTransitions(): Making module variables map.");
+		Logger.output(Logger.DEBUG, "ExtendedAutomata.expandTransitions(): Making module variables map.");
 		Map moduleVariables = new HashMap();
         for (final Proxy proxy : module.getComponentList()) {
             if (proxy instanceof VariableComponentProxy) {
@@ -125,8 +125,8 @@ public class ExtendedAutomata
 				final String curVarName = curVar.getName();
 				if (moduleVariables.keySet().contains(curVarName))
 				{
-					ModelMaker.output(ModelMaker.WARN, "ExtendedAutomata.expandTransitions(): Warning!: The module contains duplicate variable definitions.");
-					ModelMaker.output(ModelMaker.WARN, "Variable name: " + curVarName, 1);
+					Logger.output(Logger.WARN, "ExtendedAutomata.expandTransitions(): Warning!: The module contains duplicate variable definitions.");
+					Logger.output(Logger.WARN, "Variable name: " + curVarName, 1);
 				}
                 else
                 {
@@ -143,8 +143,8 @@ public class ExtendedAutomata
             final SimpleComponentProxy curComponent =
                 (SimpleComponentProxy) proxy;
 			String curComponentName = curComponent.getName();
-			ModelMaker.output(ModelMaker.DEBUG, "ExtendedAutomata.expandTransitions(): Component", 1);
-			ModelMaker.output(ModelMaker.DEBUG, curComponentName, 2);
+			Logger.output(Logger.DEBUG, "ExtendedAutomata.expandTransitions(): Component", 1);
+			Logger.output(Logger.DEBUG, curComponentName, 2);
 
 			ListSubject edges = ((GraphSubject) curComponent.getGraph()).getEdgesModifiable();
 			List removeEdges = new LinkedList();
@@ -164,14 +164,14 @@ public class ExtendedAutomata
 				// do expansion only if guard and actions block is present
 				if (curBlock != null)
 				{
-					ModelMaker.output(ModelMaker.DEBUG, "ExtendedAutomata.expandTransitions(): Expanding edge", 2);
+					Logger.output(Logger.DEBUG, "ExtendedAutomata.expandTransitions(): Expanding edge", 2);
 
 					// get guards
 					List curGuards = curBlock.getGuards();
 					String guardText = "(";
 					if (curGuards.size() > 0 )
 					{
-						ModelMaker.output(ModelMaker.DEBUG, "ExtendedAutomata.expandTransitions(): Guard", 3);
+						Logger.output(Logger.DEBUG, "ExtendedAutomata.expandTransitions(): Guard", 3);
 						for (Iterator iter = curGuards.iterator(); iter.hasNext();)
 						{
 							guardText = guardText + ((SimpleExpressionProxy) iter.next()).getPlainText();
@@ -184,7 +184,7 @@ public class ExtendedAutomata
 								guardText = guardText + ")";
 							}
 						}
-						ModelMaker.output(ModelMaker.DEBUG, guardText, 4);
+						Logger.output(Logger.DEBUG, guardText, 4);
 					}
 
 					// get actions
@@ -192,12 +192,12 @@ public class ExtendedAutomata
 					String actionsText = "";
 					if (curActions.size() > 0 )
 					{
-						ModelMaker.output(ModelMaker.DEBUG, "ExtendedAutomata.expandTransitions(): Actions", 3);
+						Logger.output(Logger.DEBUG, "ExtendedAutomata.expandTransitions(): Actions", 3);
 						for (Iterator iter = curActions.iterator(); iter.hasNext();)
 						{
 							actionsText = actionsText + ((BinaryExpressionProxy) iter.next()).getPlainText() + "; ";
 						}
-						ModelMaker.output(ModelMaker.DEBUG, actionsText, 4);
+						Logger.output(Logger.DEBUG, actionsText, 4);
 					}
 
 					// parse transition guard
@@ -213,16 +213,16 @@ public class ExtendedAutomata
 						}
 						catch(Exception e)
 						{
-							ModelMaker.output(ModelMaker.ERROR, "ExtendedAutomaton.addExtendedTransition(): Couldn't parse the action!");
-							ModelMaker.output(ModelMaker.ERROR, "\t automaton: " + curComponentName);
-							ModelMaker.output(ModelMaker.ERROR, "\t from: " + source.getName());
-							ModelMaker.output(ModelMaker.ERROR, " to: " + target.getName());
-							ModelMaker.output(ModelMaker.ERROR, "\t guard: " + guardText);
-							ModelMaker.output(ModelMaker.ERROR, "\t action: " + actionsText);
+							Logger.output(Logger.ERROR, "ExtendedAutomaton.addExtendedTransition(): Couldn't parse the action!");
+							Logger.output(Logger.ERROR, "\t automaton: " + curComponentName);
+							Logger.output(Logger.ERROR, "\t from: " + source.getName());
+							Logger.output(Logger.ERROR, " to: " + target.getName());
+							Logger.output(Logger.ERROR, "\t guard: " + guardText);
+							Logger.output(Logger.ERROR, "\t action: " + actionsText);
 							System.exit(1);
 						}
 						
-						ModelMaker.output(ModelMaker.DEBUG, "ExtendedAutomata.expandTransitions(): Succesfully parsed guard.", 3);
+						Logger.output(Logger.DEBUG, "ExtendedAutomata.expandTransitions(): Succesfully parsed guard.", 3);
 					}
 					
 					// parse transition actions
@@ -238,16 +238,16 @@ public class ExtendedAutomata
 						}
 						catch(Exception e)
 						{
-							ModelMaker.output(ModelMaker.ERROR, "ExtendedAutomaton.addExtendedTransition(): Couldn't parse the action!");
-							ModelMaker.output(ModelMaker.ERROR, "\t automaton: " + curComponentName);
-							ModelMaker.output(ModelMaker.ERROR, "\t from: " + source.getName());
-							ModelMaker.output(ModelMaker.ERROR, " to: " + target.getName());
-							ModelMaker.output(ModelMaker.ERROR, "\t guard: " + guardText);
-							ModelMaker.output(ModelMaker.ERROR, "\t action: " + actionsText);
+							Logger.output(Logger.ERROR, "ExtendedAutomaton.addExtendedTransition(): Couldn't parse the action!");
+							Logger.output(Logger.ERROR, "\t automaton: " + curComponentName);
+							Logger.output(Logger.ERROR, "\t from: " + source.getName());
+							Logger.output(Logger.ERROR, " to: " + target.getName());
+							Logger.output(Logger.ERROR, "\t guard: " + guardText);
+							Logger.output(Logger.ERROR, "\t action: " + actionsText);
 							System.exit(1);
 						}
 						
-						ModelMaker.output(ModelMaker.DEBUG, "ExtendedAutomata.expandTransitions(): Succesfully parsed actions.", 3);
+						Logger.output(Logger.DEBUG, "ExtendedAutomata.expandTransitions(): Succesfully parsed actions.", 3);
 					}
 					
 					// get guard identifiers
@@ -314,13 +314,13 @@ public class ExtendedAutomata
 						Map identCounters = new LinkedHashMap();
 						Map identUpperBounds = new HashMap();
 						Map identLowerBounds = new HashMap();
-						ModelMaker.output(ModelMaker.DEBUG,"ExtendedAutomata.expandTransitions(): Initializing guard identifiers counters", 3);
+						Logger.output(Logger.DEBUG,"ExtendedAutomata.expandTransitions(): Initializing guard identifiers counters", 3);
 						for (Iterator iter = guardExpressionIdents.iterator(); iter.hasNext();)
 						{
 							String curIdent = (String) iter.next();
 							VariableComponentProxy curModuleVariable = (VariableComponentProxy) moduleVariables.get(curIdent);
 
-							ModelMaker.output(ModelMaker.DEBUG, curIdent, 4);
+							Logger.output(Logger.DEBUG, curIdent, 4);
 
 							Integer lowerBound = VariableHelper.getLowerBound(curModuleVariable);
 							Integer upperBound = VariableHelper.getUpperBound(curModuleVariable);	
@@ -343,10 +343,10 @@ public class ExtendedAutomata
 						Evaluator evaluator = null;
 						Boolean oldGuardValue = false;
 						boolean keepCountingGuard = true;
-						ModelMaker.output(ModelMaker.DEBUG, "ExtendedAutomata.expandTransitions(): Counting guard identifiers", 3);
+						Logger.output(Logger.DEBUG, "ExtendedAutomata.expandTransitions(): Counting guard identifiers", 3);
 						while (keepCountingGuard)
 						{
-							ModelMaker.output(ModelMaker.DEBUG, identCounters.toString(), 4);
+							Logger.output(Logger.DEBUG, identCounters.toString(), 4);
 						
 							// set expression symbols to counters and make guard addition
 							String addToGuard = "";
@@ -403,13 +403,13 @@ public class ExtendedAutomata
 									Map actionsIdentCounters = new LinkedHashMap();
 									Map actionsIdentUpperBounds = new HashMap();
 									Map actionsIdentLowerBounds = new HashMap();
-									ModelMaker.output(ModelMaker.DEBUG,"ExtendedAutomata.expandTransitions(): Initializing actions identifiers counters", 3);
+									Logger.output(Logger.DEBUG,"ExtendedAutomata.expandTransitions(): Initializing actions identifiers counters", 3);
 									for (Iterator iter = actionsExpressionIdents.iterator(); iter.hasNext();)
 									{
 										String curIdent = (String) iter.next();
 										VariableComponentProxy curModuleVariable = (VariableComponentProxy) moduleVariables.get(curIdent);
 
-										ModelMaker.output(ModelMaker.DEBUG, curIdent, 4);
+										Logger.output(Logger.DEBUG, curIdent, 4);
 										
 										Integer lowerBound = VariableHelper.getLowerBound(curModuleVariable);
 										Integer upperBound = VariableHelper.getUpperBound(curModuleVariable);	
@@ -433,10 +433,10 @@ public class ExtendedAutomata
 									Variables updatedSymbols = null;
 									boolean keepCountingActions = true;
 									String oldGuard = guard;
-									ModelMaker.output(ModelMaker.DEBUG, "ExtendedAutomata.expandTransitions(): Counting actions identifiers", 3);
+									Logger.output(Logger.DEBUG, "ExtendedAutomata.expandTransitions(): Counting actions identifiers", 3);
 									while (keepCountingActions)
 									{
-										ModelMaker.output(ModelMaker.DEBUG, actionsIdentCounters.toString(), 4);
+										Logger.output(Logger.DEBUG, actionsIdentCounters.toString(), 4);
 										
 										// set action expression symbols to counters
 										addToGuard = "";
@@ -589,13 +589,13 @@ public class ExtendedAutomata
 						Map actionsIdentCounters = new LinkedHashMap();
 						Map actionsIdentUpperBounds = new HashMap();
 						Map actionsIdentLowerBounds = new HashMap();
-						ModelMaker.output(ModelMaker.DEBUG,"ExtendedAutomata.expandTransitions(): Initializing actions identifiers counters", 3);
+						Logger.output(Logger.DEBUG,"ExtendedAutomata.expandTransitions(): Initializing actions identifiers counters", 3);
 						for (Iterator iter = actionsExpressionIdents.iterator(); iter.hasNext();)
 						{
 							String curIdent = (String) iter.next();
 							VariableComponentProxy curModuleVariable = (VariableComponentProxy) moduleVariables.get(curIdent);
 							
-							ModelMaker.output(ModelMaker.DEBUG, curIdent, 4);
+							Logger.output(Logger.DEBUG, curIdent, 4);
 							
 							Integer lowerBound = VariableHelper.getLowerBound(curModuleVariable);
 							Integer upperBound = VariableHelper.getUpperBound(curModuleVariable);	
@@ -618,10 +618,10 @@ public class ExtendedAutomata
 						Evaluator evaluator = null;
 						Variables updatedSymbols = null;
 						boolean keepCountingActions = true;
-						ModelMaker.output(ModelMaker.DEBUG, "ExtendedAutomata.expandTransitions(): Counting actions identifiers", 3);
+						Logger.output(Logger.DEBUG, "ExtendedAutomata.expandTransitions(): Counting actions identifiers", 3);
 						while (keepCountingActions)
 						{
-							ModelMaker.output(ModelMaker.DEBUG, actionsIdentCounters.toString(), 4);
+							Logger.output(Logger.DEBUG, actionsIdentCounters.toString(), 4);
 							
 							// set action expression symbols to counters
 							String addToGuard = "";
@@ -715,7 +715,7 @@ public class ExtendedAutomata
  			}
 		}
 
-		ModelMaker.output("ExtendedAutomata.expandTransitions(): Done expanding transitions.");
+		Logger.output("ExtendedAutomata.expandTransitions(): Done expanding transitions.");
 
 	}
 
@@ -807,7 +807,7 @@ public class ExtendedAutomata
 			expandTransitions(module);
 		}
 
-		ModelMaker.output("ExtendedAutomata.writeToFile(): Writing model file.");
+		Logger.output("ExtendedAutomata.writeToFile(): Writing model file.");
 
 		try
 		{
