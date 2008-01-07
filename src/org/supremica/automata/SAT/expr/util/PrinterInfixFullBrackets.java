@@ -4,13 +4,14 @@
  */
 
 package org.supremica.automata.SAT.expr.util;
+import java.io.PrintWriter;
 import  org.supremica.automata.SAT.expr.*;
 
 /**
  *
  * @author voronov
  */
-public class PrinterInfixFullBrackets {
+public class PrinterInfixFullBrackets implements IPrinter {
     public static String print(Expr n) {
         if(n==null)
             throw new IllegalArgumentException("Can't print null node");
@@ -36,6 +37,9 @@ public class PrinterInfixFullBrackets {
             throw new IllegalArgumentException(
                     "Unrecognized node type: "+n.type.toString());
         }
-    }   
+    }
 
+    public void print(Expr e, PrintWriter pwOut) {
+        pwOut.print(print(e));
+    }
 }

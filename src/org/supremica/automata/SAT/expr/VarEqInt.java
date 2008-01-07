@@ -12,17 +12,13 @@ import  org.supremica.automata.SAT.expr.util.*;
  */
 public class VarEqInt extends Expr
 {
-    public Variable variable;
-    public int value;
+    public final Variable variable;
+    public final int value;
 
     public VarEqInt(Variable var, int val){
-        init(var, val, false);
+        this(var, val, false);
     }
     public VarEqInt(Variable var, int val, boolean skipDomainCheck){
-        init(var, val, skipDomainCheck);
-    }
-    private void init(Variable var, int val, boolean skipDomainCheck)
-    {
         if(var == null)
             throw new IllegalArgumentException(
                     "variable can't be null!");
@@ -35,7 +31,7 @@ public class VarEqInt extends Expr
         value    = val;
         type     = ExprType.VAREQINT;            
     }
-    public Object accept(Visitor v) {
+    public Object accept(IVisitor v) {
         return v.visit(this);                    
     }
 

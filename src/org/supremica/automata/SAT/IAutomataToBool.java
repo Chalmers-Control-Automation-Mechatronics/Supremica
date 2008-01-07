@@ -12,8 +12,9 @@ import org.sat4j.specs.ISolver;
  *
  * @author voronov
  */
-public interface AutomataToBool {
+public interface IAutomataToBool {
     public void printDimacsCnfStr(PrintWriter pwOut);
+    public void printDimacsSatStr(PrintWriter pwOut);
     public void chargeSolver(ISolver solver);
     public void decode(int[] answer);
     public void decode(String answer);    

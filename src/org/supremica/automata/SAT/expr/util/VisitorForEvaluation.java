@@ -11,7 +11,7 @@ import org.supremica.automata.SAT.*;
  *
  * @author voronov
  */
-public class VisitorForEvaluation implements Visitor {
+public class VisitorForEvaluation implements IVisitor {
     
     Environment env;
     

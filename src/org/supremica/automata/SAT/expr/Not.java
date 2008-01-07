@@ -11,7 +11,7 @@ import  org.supremica.automata.SAT.expr.util.*;
  * @author voronov
  */
 public class Not extends Expr {
-    public Expr child;
+    public final Expr child;
 
     public Not(Expr n){
         if(n==null)
@@ -20,7 +20,7 @@ public class Not extends Expr {
         child = n;
         type = ExprType.NOT;
     }        
-    public Object accept(Visitor v) {
+    public Object accept(IVisitor v) {
         return v.visit(this);                    
     }
 

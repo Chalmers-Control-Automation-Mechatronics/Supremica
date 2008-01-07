@@ -25,7 +25,7 @@ import  java.util.*;
  *
  * @author voronov
  */
-public class AutomataToBoolForControlability implements AutomataToBool
+public class AutomataToBoolForControlability implements IAutomataToBool
 {
     /** total steps to analyze */
     int         totalSteps;
@@ -60,15 +60,20 @@ public class AutomataToBoolForControlability implements AutomataToBool
      *
      */
     
-    private Expr getBoolCnfFlatExpr(){
+    
+    private void initExpr(){
         System.err.print("Generating expression...");
         //addGoal();        
         //addBlockingDetermination();
         addForbidden();
         addInit();
         addTransitions();
-        System.err.println(" done");
+        System.err.println(" done");        
+    }
+    private Expr getBoolCnfFlatExpr(){
                         
+        initExpr();
+                
         System.err.print("Converting variables to boolean...");
         vareq = new ConverterVarEqToBool(env, envBool);        
         Expr nB = vareq.initConvert(completeExpression);
@@ -93,6 +98,34 @@ public class AutomataToBoolForControlability implements AutomataToBool
         PrinterDimacsCnf.print(nBCF, pwOut);
         pwOut.flush();
         System.err.println(" done");                                
+    }
+    private Expr getBoolFlatExpr()
+    {
+        initExpr();
+                        
+        System.err.print("Converting variables to boolean...");
+        vareq = new ConverterVarEqToBool(env, envBool);        
+        Expr nB = vareq.initConvert(completeExpression);
+        System.err.println(" done");
+                       
+        System.err.print("Converting to non-negated...");
+        Expr nBC = ConverterToNonNegated.convert(nB);
+        System.err.println(" done");        
+        
+        System.err.print("Flattening expression tree...");
+        Expr nBCF = ConverterToFlattened.convert(nBC);
+        System.err.println(" done");                        
+        
+        return nBCF;        
+    }
+    public void printDimacsSatStr(PrintWriter pwOut){
+        Expr nBCF = getBoolFlatExpr();
+        System.err.print("Producing DIMACS SAT...");
+        int numClauses = ((mAnd)nBCF).childs.size();
+        pwOut.println("p sat "+ envBool.vars.size());
+        pwOut.print(PrinterDimacsSat.Print2(nBCF));
+        pwOut.flush();
+        System.err.println(" done");                  
     }
     public void chargeSolver(ISolver solver)
     {

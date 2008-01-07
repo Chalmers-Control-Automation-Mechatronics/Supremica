@@ -28,7 +28,7 @@ public class mOr extends Expr  implements Iterable<Expr> {
     public Iterator<Expr> iterator(){
         return childs.iterator();            
     }
-    public Object accept(Visitor v){
+    public Object accept(IVisitor v){
         return v.visit(this);
     }        
 }

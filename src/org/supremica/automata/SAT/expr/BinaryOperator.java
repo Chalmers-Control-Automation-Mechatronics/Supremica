@@ -11,8 +11,8 @@ package org.supremica.automata.SAT.expr;
  */
 public abstract class BinaryOperator extends Expr
 {
-    public Expr left;
-    public Expr right;        
+    public final Expr left;
+    public final Expr right;        
     public BinaryOperator(Expr l, Expr r)
     {
         if(l==null)

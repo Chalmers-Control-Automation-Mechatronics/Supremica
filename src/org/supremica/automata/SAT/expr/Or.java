@@ -16,7 +16,7 @@ public class Or extends BinaryOperator
         super(l,r);
         type = ExprType.OR;
     }    
-    public Object accept(Visitor v) {
+    public Object accept(IVisitor v) {
         return v.visit(this);                    
     }
 }

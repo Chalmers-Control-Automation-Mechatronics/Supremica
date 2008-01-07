@@ -17,7 +17,7 @@ public abstract class Expr {
     }
 
     public ExprType type;
-    public abstract Object accept(Visitor v);
+    public abstract Object accept(IVisitor v);
     
         
 } 

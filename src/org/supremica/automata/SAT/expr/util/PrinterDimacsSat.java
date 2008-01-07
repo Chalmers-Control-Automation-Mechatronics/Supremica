@@ -4,13 +4,14 @@
  */
 
 package org.supremica.automata.SAT.expr.util;
+import java.io.PrintWriter;
 import  org.supremica.automata.SAT.expr.*;
-import org.supremica.automata.SAT.expr.Expr.ExprType;
+import  org.supremica.automata.SAT.expr.Expr.ExprType;
 /**
  *
  * @author voronov
  */
-public class PrinterDimacsSat {
+public class PrinterDimacsSat /*implements IPrinter*/ {
 
     public static String Print(Expr n) {
         switch(n.type){
@@ -133,5 +134,9 @@ public class PrinterDimacsSat {
             throw new IllegalArgumentException(
                     "Unrecognized (non-dimacs-sat?) node type");
         }
-    }       
+    }
+
+    public static void print(Expr e, PrintWriter pwOut) {
+        pwOut.print(Print2(e));
+    }
 }

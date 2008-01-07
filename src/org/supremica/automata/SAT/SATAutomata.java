@@ -62,7 +62,7 @@ public class SATAutomata {
         } catch (Exception ex) {            
             Logger.getLogger(SATAutomata.class.getName()).log(Level.SEVERE, null, ex);
         }
-        AutomataToBool atb;
+        IAutomataToBool atb;
         if(args[1].equalsIgnoreCase("MSR")){
             atb = new AutomataToBoolForReachability(ats, totalSteps);
         }
@@ -75,8 +75,12 @@ public class SATAutomata {
         else {
             throw new IllegalArgumentException("no task (MSR or CV expected)");
         }
-        PrintWriter cnfFile = new PrintWriter(System.out);        
-        atb.printDimacsCnfStr(cnfFile);                    
+        PrintWriter cnfFile = new PrintWriter(System.out);
+        if(args[2].equalsIgnoreCase("--DimacsSat")){
+            atb.printDimacsSatStr(cnfFile);
+        } else {
+            atb.printDimacsCnfStr(cnfFile);               
+        }
         
     }
 

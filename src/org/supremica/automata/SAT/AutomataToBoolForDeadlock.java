@@ -25,7 +25,7 @@ import  java.util.*;
  *
  * @author voronov
  */
-public class AutomataToBoolForDeadlock implements AutomataToBool
+public class AutomataToBoolForDeadlock implements IAutomataToBool
 {
     /** total steps to analyze */
     int         totalSteps;
@@ -68,23 +68,27 @@ public class AutomataToBoolForDeadlock implements AutomataToBool
         addInit();
         addTransitions();
         System.err.println(" done");
-        System.err.println("Expr:");        
-        System.err.println(PrinterInfix.print(completeExpression));
+        //System.err.println("Expr:");        
+        //System.err.println(PrinterInfix.print(completeExpression));
                         
         System.err.print("Converting variables to boolean...");
         vareq = new ConverterVarEqToBool(env, envBool);        
         Expr nB = vareq.initConvert(completeExpression);
         System.err.println(" done");
                        
-        System.err.print("Converting to CNF...");
-        Expr nBC = ConverterBoolToCnfSat.convertAll(nB);
-        System.err.println(" done");        
+        //System.err.print("Converting to CNF...");
+        //Expr nBC = ConverterBoolToCnfSat.convertAll(nB);
+        //System.err.println(" done");        
         
+        System.err.print("Removing negations...");
+        Expr nNB = ConverterToNonNegated.convert(nB);
+        System.err.println(" done");                        
+                
         System.err.print("Flattening expression tree...");
-        Expr nBCF = ConverterCnfToMAnd.convert(nBC);
+        Expr nNBF = ConverterToFlattened.convert(nNB);
         System.err.println(" done");                        
         
-        return nBCF;
+        return nNBF;
     }
     
     public void printDimacsCnfStr(PrintWriter pwOut){
@@ -511,6 +515,14 @@ public class AutomataToBoolForDeadlock implements AutomataToBool
             for(State s: a)
                 a.addArc(new Arc(s, s, stay));
         }
+    }
+    public  void  printDimacsSatStr(PrintWriter pwOut){
+        Expr nBCF = getBoolCnfFlatExpr();
+        System.err.print("Producing DIMACS SAT...");
+        pwOut.println("p sat "+ envBool.vars.size());
+        pwOut.print(PrinterDimacsSat.Print2(nBCF));
+        pwOut.flush();
+        System.err.println(" done");                  
     }
    
 }

@@ -4,6 +4,7 @@
  */
 
 package org.supremica.automata.SAT.expr.util;
+import java.io.PrintWriter;
 import  org.supremica.automata.SAT.expr.*;
 import org.supremica.automata.SAT.expr.Expr.ExprType;
 
@@ -11,7 +12,7 @@ import org.supremica.automata.SAT.expr.Expr.ExprType;
  *
  * @author voronov
  */
-public class PrinterInfix {
+public class PrinterInfix implements IPrinter {
 
     public static String print(Expr n) {
         if(n==null)
@@ -101,5 +102,8 @@ public class PrinterInfix {
         }
         return sb.toString();        
     }
-    
+
+    public void print(Expr e, PrintWriter pwOut) {
+        pwOut.print(print(e));
+    }    
 }

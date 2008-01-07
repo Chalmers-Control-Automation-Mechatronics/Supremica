@@ -5,10 +5,13 @@
 
 package org.supremica.automata.SAT.expr.util;
 
+import java.io.PrintWriter;
+import org.supremica.automata.SAT.expr.Expr;
+
 /**
  *
  * @author voronov
  */
-public class ConverterRemoveNegations {
-
+public interface IPrinter {
+    public void print(Expr e, PrintWriter pwOut);
 }

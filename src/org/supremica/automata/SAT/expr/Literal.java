@@ -23,7 +23,7 @@ public class Literal extends Expr
         isPositive = p;
         type = ExprType.LIT;
     }
-    public Object accept(Visitor v) {
+    public Object accept(IVisitor v) {
         return v.visit(this);                    
     }        
 }       

@@ -11,7 +11,7 @@ import  org.supremica.automata.SAT.*;
  *
  * @author voronov
  */
-public interface Visitor {
+public interface IVisitor {
     public Object visit(And      n);
     public Object visit(Or       n);
     public Object visit(Not      n);

@@ -12,8 +12,8 @@ import  org.supremica.automata.SAT.expr.util.*;
  */
 public class VarEqVar extends Expr
 {
-    public Variable var1;
-    public Variable var2;
+    public final Variable var1;
+    public final Variable var2;
 
     public VarEqVar(Variable var1i, Variable var2i)
     {
@@ -31,7 +31,7 @@ public class VarEqVar extends Expr
         var2 = var2i;
         type = ExprType.VAREQVAR;
     }   
-    public Object accept(Visitor v) {
+    public Object accept(IVisitor v) {
         return v.visit(this);                    
     }
 

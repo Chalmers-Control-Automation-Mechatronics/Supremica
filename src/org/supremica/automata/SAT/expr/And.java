@@ -17,7 +17,7 @@ public class And extends BinaryOperator
     }        
 
     @Override
-    public Object accept(Visitor v) {
+    public Object accept(IVisitor v) {
         return v.visit(this);                    
     }
 }

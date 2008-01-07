@@ -12,7 +12,7 @@ import  java.io.PrintWriter;
  *
  * @author voronov
  */
-public class PrinterDimacsCnf {
+public class PrinterDimacsCnf /*implements IPrinter*/ {
     public static String print(Expr n){
         if(!ConverterBoolToCnfSat.isInCNF(n))
             throw new IllegalArgumentException("expression is not in CNF");
@@ -77,6 +77,5 @@ public class PrinterDimacsCnf {
             throw new IllegalArgumentException(
                     "unrecognized (non-CNF?) Node Type: " + n.type.toString());
         }        
-    }
-    
+    }    
 }
