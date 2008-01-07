@@ -30,7 +30,7 @@ public class ModuleToIEC61499
 {
 
 	private static final String xmlnsLibraryElementString = "xmlns=\"http://www.holobloc.com/xml/LibraryElement\" ";
-	private static Logger logger = LoggerFactory.createLogger(ModuleToIEC61499.class);
+	private static org.supremica.log.Logger logger = LoggerFactory.createLogger(ModuleToIEC61499.class);
 	private Project theProject;
 	private Alphabet allEvents;
 	private boolean comments = false;

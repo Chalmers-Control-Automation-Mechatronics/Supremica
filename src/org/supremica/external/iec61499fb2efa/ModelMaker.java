@@ -139,10 +139,6 @@ class ModelMaker
 		}
 
 		Logger.output("ModelMaker  Copyright (C) 2008  Goran Cengic");
-		//Logger.output("This program comes with ABSOLUTELY NO WARRANTY!");
-		//Logger.output("This is free software, and you are welcome to redistribute it");
-		//Logger.output("under the terms of GPL version 3 or later.");
-		//Logger.output("For terms see http://www.gnu.org/licenses");
 		Logger.output("");
 		Logger.output("Input arguments: \n" 
 			   + "\t output file: " + outputFileName + "\n"
