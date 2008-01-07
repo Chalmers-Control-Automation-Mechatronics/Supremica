@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<FBType xmlns="http://www.holobloc.com/xml/LibraryElement" Name="E_MERGE2" >
+  <VersionInfo Author="Goran Cengic" Organization="Chalmers" Version="1.0" Date="2005-05-11" />
+  <InterfaceList>
+    <EventInputs>
+      <Event Name="EI1" />
+      <Event Name="EI2" />
+    </EventInputs>
+    <EventOutputs>
+      <Event Name="EO" />
+    </EventOutputs>
+  </InterfaceList>
+  <BasicFB>
+    <ECC>
+        <ECState Name="S0" />
+        <ECState Name="S1">
+			<ECAction Output="EO" />
+		</ECState>    
+	<ECTransition Source="S0" Destination="S1" Condition="EI1 OR EI2" />
+	<ECTransition Source="S1" Destination="S0" Condition="1" />
+    </ECC>
+  </BasicFB>
+</FBType>
