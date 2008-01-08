@@ -270,9 +270,9 @@ class SequentialExecModelBuilder extends ModelBuilder
 		
 		makeEventExecution();
 		
-		makeJobQueue();
+		//makeJobQueue();
 		
-		makeAlgorithmExecution();
+		//makeAlgorithmExecution();
 		
 		for (Iterator fbIter = basicFunctionBlocks.keySet().iterator(); fbIter.hasNext();)
 		{
