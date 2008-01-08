@@ -232,11 +232,15 @@ class DualExecModelBuilder extends ModelBuilder
 
 	void loadSystem()
 	{
+		Logger.output("DualExecModelBuilder.loadSystem()");
+
 		loadSystem(systemFileName);
 	}
 
 	void analyzeSystem()
 	{
+		Logger.output("DualExecModelBuilder.analyzeSystem()");
+
 		makeEventConnectionsMap(systemFBNetwork, null, 0);
 		
 		makeDataConnectionsMap(systemFBNetwork, null, 0);
@@ -256,6 +260,8 @@ class DualExecModelBuilder extends ModelBuilder
 	
 	void buildModels()
 	{
+		Logger.output("DualExecModelBuilder.buildModels()");
+
  		automata = new ExtendedAutomata(theSystem.getName(), expandTransitions);
 		
 		makeStartup();
@@ -279,6 +285,7 @@ class DualExecModelBuilder extends ModelBuilder
 	
 	void writeResult()
 	{
+		Logger.output("DualExecModelBuilder.writeResult()");
 		automata.writeToFile(new File(outputFileName));
 	}
 
