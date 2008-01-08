@@ -37,24 +37,24 @@ import net.sourceforge.fuber.xsd.libraryelement.*;
 class DualExecModelBuilder extends ModelBuilder
 {
 
-	private static boolean expandTransitions = false;
-	private static boolean generatePlantModels = true;
+	// input arguments
+	private boolean expandTransitions = false;
+	private boolean generatePlantModels = true;
 
-	private static Integer eventQueuePlaces = 0;
-	private static Integer instanceQueuePlaces = 0;
-	private static Integer jobQueuePlaces = 0;
+	private Integer eventQueuePlaces = 0;
+	private Integer instanceQueuePlaces = 0;
+	private Integer jobQueuePlaces = 0;
 
-
-    private JAXBContext iecContext;
-    private Unmarshaller iecUnmarshaller;
+	private int intVarMinValue = 0;
+	private int intVarMaxValue = 2;
 
 	private String systemFileName;
 	private String outputFileName;
-	// File
-    private List libraryPathList = new LinkedList();
+    private List<File> libraryPathList = new LinkedList();
+	// end input arguments
 
-	// Generate model for execution model: d=dual, s=sequential
-	private static String execModel = "d";
+    private JAXBContext iecContext;
+    private Unmarshaller iecUnmarshaller;
 
 	private JaxbSystem theSystem;
 	private JaxbFBNetwork systemFBNetwork;
@@ -93,169 +93,58 @@ class DualExecModelBuilder extends ModelBuilder
 	// String fb name, Map data conn map do->di
 	private Map dataConnections = new HashMap();
 
-	private Map operatorMap = null;
-
 	private String restartInstance = null;
 	private String stopInstance = null;
 
 	private ExtendedAutomata automata;
 
-	// default range of an integer variable
-	private static int intVarMinValue = 0;
-	private static int intVarMaxValue = 2;
-
+	// attributes used for ECC generation only
+	private Map operatorMap = null;
 	private int nameCounter = 0;
 	private boolean doneInitActions = false;
 	private boolean doneInitFinish = false;
 	
-
-	public static void main(String args[])
-    {
-		String outputFileName = null;
-		String systemFileName = null;
-		String libraryPathBase = null;
-		String libraryPath = null;
-
-		if (args.length == 0)
-		{
-			Logger.output(Logger.ERROR, "Usage: ModelMaker [-qdpe] [-m 's'|'d'] [-o outputFileName] [-lb libraryPathBase] [-lp libraryDirectory]... file.sys");
-			return;
-		}
-
-		for (int i = 0; i < args.length; i++)
-		{
-			if (args[i].equals("-e"))
-			{
-				expandTransitions = true;
-			}
-			if (args[i].equals("-p"))
-			{
-				generatePlantModels = false;
-			}
-			if (args[i].equals("-d"))
-			{
-				Logger.setVerboseLevel(Logger.DEBUG);
-			}
-			if (args[i].equals("-q"))
-			{
-				Logger.setVerboseLevel(Logger.QUIET);
-			}
-			if (args[i].equals("-m"))
-			{
-				if (i + 1 < args.length)
-				{
-					execModel = args[i + 1];
-				}
-			}
-			if (args[i].equals("-ix"))
-			{
-				if (i + 1 < args.length)
-				{
-					intVarMaxValue = (new Integer(args[i + 1])).intValue();
-				}
-			}
-			if (args[i].equals("-im"))
-			{
-				if (i + 1 < args.length)
-				{
-					intVarMinValue = (new Integer(args[i + 1])).intValue();
-				}
-			}
-			if (args[i].equals("-ip"))
-			{
-				if (i + 1 < args.length)
-				{
-					instanceQueuePlaces = new Integer(args[i + 1]);
-				}
-			}
-			if (args[i].equals("-jp"))
-			{
-				if (i + 1 < args.length)
-				{
-					jobQueuePlaces = new Integer(args[i + 1]);
-				}
-			}
-			if (args[i].equals("-ep"))
-			{
-				if (i + 1 < args.length)
-				{
-					eventQueuePlaces = new Integer(args[i + 1]);
-				}
-			}
-			if (args[i].equals("-o"))
-			{
-				if (i + 1 < args.length)
-				{
-					outputFileName = args[i + 1];
-				}
-			}
-			if (args[i].equals("-lb"))
-			{
-				if (i + 1 < args.length)
-				{
-					libraryPathBase = args[i + 1];
-				}
-			}
-			if (args[i].equals("-lp"))
-			{
-				if (i + 1 < args.length)
-				{
-					if (libraryPath == null)
-					{
-						libraryPath = args[i + 1];
-					}
-					else
-					{
-						libraryPath = libraryPath + File.pathSeparator + args[i + 1];
-					}
-				}
-			}
-			if (i == args.length-1)
-			{
-				systemFileName = args[i];
-				if (outputFileName == null)
-				{
-					outputFileName = systemFileName + ".wmod";
-				}
-			}
-			
-		}
-
-		Logger.output("ModelMaker  Copyright (C) 2008  Goran Cengic");
-		//Logger.output("This program comes with ABSOLUTELY NO WARRANTY!");
-		//Logger.output("This is free software, and you are welcome to redistribute it");
-		//Logger.output("under the terms of GPL version 3 or later.");
-		//Logger.output("For terms see http://www.gnu.org/licenses");
-		Logger.output("");
-		Logger.output("Input arguments: \n" 
-			   + "\t output file: " + outputFileName + "\n"
-			   + "\t system file: " + systemFileName + "\n"
-			   + "\t library path base: " + libraryPathBase + "\n"
-			   + "\t library path: " + libraryPath + "\n");
-		
-		(new DualExecModelBuilder(outputFileName,systemFileName,libraryPathBase,libraryPath)).makeModel();
-		exit(0);
-
-	}
-
-	private DualExecModelBuilder(String outputFileName, String systemFileName, String libraryPathBase, String libraryPath) 
+	DualExecModelBuilder(Map<String, String> arguments)
 	{
-		try
+		// get arguments
+		if (arguments.get("expandTransitions") != null)
 		{
-			iecContext = JAXBContext.newInstance("net.sourceforge.fuber.xsd.libraryelement");
-			iecUnmarshaller = iecContext.createUnmarshaller();
+			expandTransitions = (new Boolean(arguments.get("expandTransitions"))).booleanValue();
 		}
-		catch (Exception e)
+		if (arguments.get("generatePlantModels") != null)
 		{
-			Logger.output(Logger.ERROR, e.toString());
-			exit(1);
+			generatePlantModels = (new Boolean(arguments.get("generatePlantModels"))).booleanValue();
 		}
 
-		this.outputFileName = outputFileName;
-		this.systemFileName = systemFileName;
+		if (arguments.get("eventQueuePlaces") != null)
+		{
+			eventQueuePlaces = new Integer(arguments.get("eventQueuePlaces"));
+		}	
+		if (arguments.get("instanceQueuePlaces") != null)
+		{
+			instanceQueuePlaces = new Integer(arguments.get("instanceQueuePlaces"));
+		}	
+		if (arguments.get("jobQueuePlaces") != null)
+		{
+			jobQueuePlaces = new Integer(arguments.get("jobQueuePlaces"));
+		}	
 
+		if (arguments.get("intVarMinValue") != null)
+		{
+			intVarMinValue = (new Integer(arguments.get("intVarMinValue"))).intValue();
+		}
+		if (arguments.get("intVarMaxValue") != null)
+		{
+			intVarMaxValue = (new Integer(arguments.get("intVarMaxValue"))).intValue();
+		}
+		
+		this.systemFileName = arguments.get("systemFileName");
+		this.outputFileName = arguments.get("outputFileName");
 
-		// convert libraryPath string into list of Files
+		String libraryPathBase = arguments.get("libraryPathBase");
+		String libraryPath = arguments.get("libraryPath");
+
+		// convert libraryPath string into a list of Files
 		if (libraryPath == null) // libraryPath is not specified
 		{
 			if (libraryPathBase == null)
@@ -268,11 +157,11 @@ class DualExecModelBuilder extends ModelBuilder
 
 				if (!libraryPathBaseFile.isDirectory())
 				{
-					Logger.output(Logger.ERROR, "ModelMaker(): Specified library base is not a directory!: " + libraryPathBaseFile.getName());
+					Logger.output(Logger.ERROR, "DualExecModelBuilder(): Specified library base is not a directory!: " + libraryPathBaseFile.getName());
 				}
 				else if (!libraryPathBaseFile.exists())
 				{
-					Logger.output(Logger.ERROR, "ModelMaker(): Specified library base does not exist!: " + libraryPathBaseFile.getName());
+					Logger.output(Logger.ERROR, "DualExecModelBuilder(): Specified library base does not exist!: " + libraryPathBaseFile.getName());
 				}
 				else
 				{
@@ -299,11 +188,11 @@ class DualExecModelBuilder extends ModelBuilder
 
 				if (!curLibraryDir.isDirectory())
 				{
-					Logger.output(Logger.ERROR, "ModelMaker(): Specified library path element " + curLibraryDir.getAbsolutePath() + " is not a directory!");
+					Logger.output(Logger.ERROR, "DualExecModelBuilder(): Specified library path element " + curLibraryDir.getAbsolutePath() + " is not a directory!");
 				}
 				else if (!curLibraryDir.exists())
 				{
-					Logger.output(Logger.ERROR, "ModelMaker(): Specified library path element " + curLibraryDir.getAbsolutePath() + " does not exist!");
+					Logger.output(Logger.ERROR, "DualExecModelBuilder(): Specified library path element " + curLibraryDir.getAbsolutePath() + " does not exist!");
 				}
 				else
 				{
@@ -319,7 +208,7 @@ class DualExecModelBuilder extends ModelBuilder
 			}
 		}
 
-		// make operator map
+		// make operator map for ST to EFA translation
 		operatorMap = new HashMap();
 		operatorMap.put("AND", "&");
 		operatorMap.put("OR", "|");
@@ -327,19 +216,31 @@ class DualExecModelBuilder extends ModelBuilder
 		operatorMap.put("=", "==");
 		operatorMap.put("<>", "!=");
 		operatorMap.put("MOD", "%");				
-	}
-	
-	public void makeModel()
-	{
 
-		Logger.output("ModelMaker.makeModel(): Loading and Analyzing the System -----------------------");
-		
+		// get unmarshaller for XML reading
+		try
+		{
+			iecContext = JAXBContext.newInstance("net.sourceforge.fuber.xsd.libraryelement");
+			iecUnmarshaller = iecContext.createUnmarshaller();
+		}
+		catch (Exception e)
+		{
+			Logger.output(Logger.ERROR, e.toString());
+			exit(1);
+		}
+	}
+
+	void loadSystem()
+	{
 		loadSystem(systemFileName);
-		
+	}
+
+	void analyzeSystem()
+	{
 		makeEventConnectionsMap(systemFBNetwork, null, 0);
 		
 		makeDataConnectionsMap(systemFBNetwork, null, 0);
-
+		
 		if (Logger.getVerboseLevel() <= Logger.DEBUG)
 		{
 			printFunctionBlocksMap();
@@ -351,65 +252,40 @@ class DualExecModelBuilder extends ModelBuilder
 			printEventConnectionsMap();
 			printDataConnectionsMap();
 		}
-
-		Logger.output("ModelMaker.makeModel(): Generating Model ---------------------------------------");
-
-		if (execModel.equals("d"))
-		{
-			Logger.output("ModelMaker.makeModel(): Making dual execution model.", 1);
-		}
-		else if (execModel.equals("s"))
-		{
-			Logger.output("ModelMaker.makeModel(): Making sequential execution model.", 1);
-		}
-		else
-		{
-			Logger.output("ModelMaker.makeModel(): Unknown execution model. Exiting!", 1);
-			System.exit(0);
-		}
-
-
- 		automata = new ExtendedAutomata(theSystem.getName(), expandTransitions);
-
-		makeStartup();
-
-		makeInstanceQueue();
-
-		makeEventExecution();
+	}
 	
-		if (execModel.equals("d"))
-		{
-			makeJobQueue();
-			
-			makeAlgorithmExecution();
-		}
-
+	void buildModels()
+	{
+ 		automata = new ExtendedAutomata(theSystem.getName(), expandTransitions);
+		
+		makeStartup();
+		
+		makeInstanceQueue();
+		
+		makeEventExecution();
+		
+		makeJobQueue();
+		
+		makeAlgorithmExecution();
+		
 		for (Iterator fbIter = basicFunctionBlocks.keySet().iterator(); fbIter.hasNext();)
 		{
 			String fbName = (String) fbIter.next();
 			String typeName = (String) basicFunctionBlocks.get(fbName);
-			if (execModel.equals("d"))
-			{
-				makeBasicFB(fbName);
-			}
-			else
-			{
-				//makeSeqBasicFB(fbName);
-			}
-
+			
+			makeBasicFB(fbName);
 		}
-		
-		Logger.output("ModelMaker.makeModel(): Writing Model ------------------------------------------");
-
+	}
+	
+	void writeResult()
+	{
 		automata.writeToFile(new File(outputFileName));
-
-		Logger.output("ModelMaker.makeModel(): Done ------------------------------------------");
 	}
 
     private void loadSystem(String fileName)
     {
 	
-		Logger.output("ModelMaker.loadSystem(" + fileName + "):");
+		Logger.output("DualExecModelBuilder.loadSystem(" + fileName + "):");
 		Logger.output("Loading file " + fileName, 1);
 		
 		File file = getFile(fileName);
@@ -476,7 +352,7 @@ class DualExecModelBuilder extends ModelBuilder
 		String typeName = fb.getType();
 		String fileName = typeName + ".fbt";
 	
-		Logger.output("ModelMaker.loadFB(" + instanceName + ", " + fileName + "):");
+		Logger.output("DualExecModelBuilder.loadFB(" + instanceName + ", " + fileName + "):");
 				
 		if (typeName.equals("E_RESTART"))
 		{
@@ -608,7 +484,7 @@ class DualExecModelBuilder extends ModelBuilder
 				}
 				else
 				{
-					Logger.output(Logger.ERROR, "Error!: ModelMaker.loadFB(" + instanceName + ", " + fileName + "): Unsupported FB type: " + typeName);
+					Logger.output(Logger.ERROR, "Error!: DualExecModelBuilder.loadFB(" + instanceName + ", " + fileName + "): Unsupported FB type: " + typeName);
 					Logger.output(Logger.ERROR, "Neither a Basic FB nor a Composite FB.", 1);
 					exit(1);
 				}
@@ -626,7 +502,7 @@ class DualExecModelBuilder extends ModelBuilder
 			{
 				File curLibraryDir = (File) iter.next();
 				theFile = new File(curLibraryDir, fileName);
-				Logger.output(Logger.DEBUG, "ModelMaker.getFile(): Looking for file " + theFile.toString());
+				Logger.output(Logger.DEBUG, "DualExecModelBuilder.getFile(): Looking for file " + theFile.toString());
 				if (theFile.exists())
 				{
 					break;
@@ -636,7 +512,7 @@ class DualExecModelBuilder extends ModelBuilder
 
 		if (!theFile.exists())
 		{
-			Logger.output(Logger.ERROR, "ModelMaker.getFile(" + fileName + "): The file " + fileName + " does not exist in the specified libraries...");
+			Logger.output(Logger.ERROR, "DualExecModelBuilder.getFile(" + fileName + "): The file " + fileName + " does not exist in the specified libraries...");
 			if (libraryPathList != null)
 			{
 				for (Iterator iter = libraryPathList.iterator();iter.hasNext();)
@@ -649,7 +525,7 @@ class DualExecModelBuilder extends ModelBuilder
 				Logger.output(Logger.ERROR, ". (current directory)", 1);
 			}
 			Logger.output(Logger.ERROR, "");
-			Logger.output(Logger.ERROR, "Usage: ModelMaker [-o outputFile] [-lb libraryPathBase] [-lp libraryDirectory]... file.sys");
+			Logger.output(Logger.ERROR, "Usage: DualExecModelBuilder [-o outputFile] [-lb libraryPathBase] [-lp libraryDirectory]... file.sys");
 			exit(1);
 		}
 		return theFile;
@@ -660,11 +536,11 @@ class DualExecModelBuilder extends ModelBuilder
 	{
 		if (parentInstance == null)
 		{
-			Logger.output("ModelMaker.makeEventConnectionMap(System):");
+			Logger.output("DualExecModelBuilder.makeEventConnectionMap(System):");
 		}
 		else
 		{
-			Logger.output("ModelMaker.makeEventConnectionMap(" + parentInstance + "):");
+			Logger.output("DualExecModelBuilder.makeEventConnectionMap(" + parentInstance + "):");
 		}
 		
 		for (Iterator connIter = fbNetwork.getEventConnections().getConnection().iterator();
@@ -810,11 +686,11 @@ class DualExecModelBuilder extends ModelBuilder
 	{
 		if (parentInstance == null)
 		{
-			Logger.output("ModelMaker.makeDataConnectionMap(System):");
+			Logger.output("DualExecModelBuilder.makeDataConnectionMap(System):");
 		}
 		else
 		{
-			Logger.output("ModelMaker.makeDataConnectionMap(" + parentInstance + "):");
+			Logger.output("DualExecModelBuilder.makeDataConnectionMap(" + parentInstance + "):");
 		}
 		if (fbNetwork.isSetDataConnections())
 		{
@@ -981,7 +857,7 @@ class DualExecModelBuilder extends ModelBuilder
 
 	private void makeStartup()
 	{
-		Logger.output("ModelMaker.makeStartup():");
+		Logger.output("DualExecModelBuilder.makeStartup():");
 
 		String fbName = restartInstance;
 		
@@ -1053,7 +929,7 @@ class DualExecModelBuilder extends ModelBuilder
 
 	private void makeInstanceQueue()
 	{
-		Logger.output("ModelMaker.makeInstanceQueue():");
+		Logger.output("DualExecModelBuilder.makeInstanceQueue():");
 
 		ExtendedAutomaton instanceQueue = getNewAutomaton("Instance Queue");
 		
@@ -1104,7 +980,7 @@ class DualExecModelBuilder extends ModelBuilder
 
 	private void makeEventExecution()
 	{
-		Logger.output("ModelMaker.makeEventExecution():");
+		Logger.output("DualExecModelBuilder.makeEventExecution():");
 
 		ExtendedAutomaton eventExecution = getNewAutomaton("Event Execution");
 
@@ -1138,7 +1014,7 @@ class DualExecModelBuilder extends ModelBuilder
 	{
 		if (algMaxID > 0)
 		{
-			Logger.output("ModelMaker.makeJobQueue():");
+			Logger.output("DualExecModelBuilder.makeJobQueue():");
 
 			ExtendedAutomaton jobQueue = getNewAutomaton("Job Queue");
 		
@@ -1208,7 +1084,7 @@ class DualExecModelBuilder extends ModelBuilder
 	{
 		if (algMaxID > 0)
 		{
-			Logger.output("ModelMaker.makeAlgorithmExecution():");
+			Logger.output("DualExecModelBuilder.makeAlgorithmExecution():");
 			
 			ExtendedAutomaton algorithmExecution = getNewAutomaton("Algorithm Execution");
 				
@@ -1369,7 +1245,7 @@ class DualExecModelBuilder extends ModelBuilder
 
 	private void makeBasicFB(String fbName)
 	{	
-		Logger.output("ModelMaker.makeBasicFB(" + fbName + "):");
+		Logger.output("DualExecModelBuilder.makeBasicFB(" + fbName + "):");
 	
 		makeBasicFBEventHandling(fbName);
 		makeBasicFBEventQueue(fbName);
@@ -2621,7 +2497,7 @@ class DualExecModelBuilder extends ModelBuilder
 
 	private void printFunctionBlocksMap()
 	{
-		Logger.output(Logger.DEBUG, "ModelMaker.printFunctionBlocksMap():");
+		Logger.output(Logger.DEBUG, "DualExecModelBuilder.printFunctionBlocksMap():");
 		for (Iterator iter = functionBlocks.keySet().iterator(); iter.hasNext();)
 		{
 			String curBlock = (String) iter.next();
@@ -2632,7 +2508,7 @@ class DualExecModelBuilder extends ModelBuilder
 
 	private void printBasicFunctionBlocksMap()
 	{
-		Logger.output(Logger.DEBUG, "ModelMaker.printBasicFunctionBlocksMap():");
+		Logger.output(Logger.DEBUG, "DualExecModelBuilder.printBasicFunctionBlocksMap():");
 		for (Iterator iter = basicFunctionBlocks.keySet().iterator(); iter.hasNext();)
 		{
 			String curBlock = (String) iter.next();
@@ -2645,7 +2521,7 @@ class DualExecModelBuilder extends ModelBuilder
 
 	private void printEventsMap()
 	{
-		Logger.output(Logger.DEBUG, "ModelMaker.printEventsMap():");
+		Logger.output(Logger.DEBUG, "DualExecModelBuilder.printEventsMap():");
 		for (Iterator iter = events.keySet().iterator(); iter.hasNext();)
 		{
 			String curBlock = (String) iter.next();
@@ -2664,7 +2540,7 @@ class DualExecModelBuilder extends ModelBuilder
 
 	private void printAlgorithmsMap()
 	{
-		Logger.output(Logger.DEBUG, "ModelMaker.printAlgorithmsMap():");
+		Logger.output(Logger.DEBUG, "DualExecModelBuilder.printAlgorithmsMap():");
 		for (Iterator iter = algorithms.keySet().iterator(); iter.hasNext();)
 		{
 			String curBlock = (String) iter.next();
@@ -2682,7 +2558,7 @@ class DualExecModelBuilder extends ModelBuilder
 
 	private void printAlgorithmTextsMap()
 	{
-		Logger.output(Logger.DEBUG, "ModelMaker.printAlgorithmTextsMap():");
+		Logger.output(Logger.DEBUG, "DualExecModelBuilder.printAlgorithmTextsMap():");
 		for (Iterator iter = algorithmTexts.keySet().iterator(); iter.hasNext();)
 		{
 			String curBlock = (String) iter.next();
@@ -2699,7 +2575,7 @@ class DualExecModelBuilder extends ModelBuilder
 	
 	private void printFBTypesMap()
 	{
-		Logger.output(Logger.DEBUG, "ModelMaker.printFBTypesMap():");
+		Logger.output(Logger.DEBUG, "DualExecModelBuilder.printFBTypesMap():");
 		for (Iterator iter = fbTypes.keySet().iterator(); iter.hasNext();)
 		{
 			String curBlock = (String) iter.next();
@@ -2710,7 +2586,7 @@ class DualExecModelBuilder extends ModelBuilder
 	
 	private void printEventConnectionsMap()
 	{
-		Logger.output(Logger.DEBUG, "ModelMaker.printEventConnectionsMap():");
+		Logger.output(Logger.DEBUG, "DualExecModelBuilder.printEventConnectionsMap():");
 		for (Iterator fbIter = eventConnections.keySet().iterator(); fbIter.hasNext();)
 		{
 			String curBlock = (String) fbIter.next();
@@ -2727,7 +2603,7 @@ class DualExecModelBuilder extends ModelBuilder
 	
 	private void printDataConnectionsMap()
 	{
-		Logger.output(Logger.DEBUG, "ModelMaker.printDataConnectionsMap():");
+		Logger.output(Logger.DEBUG, "DualExecModelBuilder.printDataConnectionsMap():");
 		for (Iterator fbIter = dataConnections.keySet().iterator(); fbIter.hasNext();)
 		{
 			String curBlock = (String) fbIter.next();
@@ -2742,7 +2618,7 @@ class DualExecModelBuilder extends ModelBuilder
 		}
 	}
 	
-	private static void exit(int status)
+	private void exit(int status)
 	{
 		System.exit(status);
 	}

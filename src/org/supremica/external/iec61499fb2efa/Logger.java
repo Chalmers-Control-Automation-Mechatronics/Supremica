@@ -29,6 +29,11 @@ class Logger
 		return verboseLevel;
 	}
 
+	public static void output(int verboseLevel)
+	{
+		output(verboseLevel, "", 0);
+	}
+
 	public static void output(String text)
 	{
 		output(INFO, text, 0);
