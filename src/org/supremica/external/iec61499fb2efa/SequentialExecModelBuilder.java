@@ -2274,7 +2274,7 @@ class SequentialExecModelBuilder extends ModelBuilder
 					{
 						VarDeclaration curVar = (VarDeclaration) iter.next();
 						String curVarName = curVar.getName();
-						identifierMap.put(curVarName, "data_" + curVarName + "_" + algName + "_" + fbName);
+						identifierMap.put(curVarName, "data_" + curVarName + "_" + fbName);
 						//reverseIdentifierMap.put("alg_data_" + curVarName + "_" + algName + "_" + fbName, "data_" + curVarName + "_" + fbName);
 					}
 				}		
@@ -2285,7 +2285,7 @@ class SequentialExecModelBuilder extends ModelBuilder
 					{
 						VarDeclaration curVar = (VarDeclaration) iter.next();
 						String curVarName = curVar.getName();
-						identifierMap.put(curVarName, "data_" + curVarName + "_" + algName + "_" + fbName);
+						identifierMap.put(curVarName, "data_" + curVarName + "_" + fbName);
 						//reverseIdentifierMap.put("alg_data_" + curVarName + "_" + algName + "_" + fbName, "data_" + curVarName + "_" + fbName);
 					}
 				}
@@ -2296,7 +2296,7 @@ class SequentialExecModelBuilder extends ModelBuilder
 					{
 						VarDeclaration curVar = (VarDeclaration) iter.next();
 						String curVarName = curVar.getName();
-						identifierMap.put(curVarName, "internal_" + curVarName + "_" + algName + "_" + fbName);
+						identifierMap.put(curVarName, "internal_" + curVarName + "_" + fbName);
 						//reverseIdentifierMap.put("alg_internal_" + curVarName + "_" + algName + "_" + fbName, "internal_" + curVarName + "_" + fbName);
 					}
 				}
