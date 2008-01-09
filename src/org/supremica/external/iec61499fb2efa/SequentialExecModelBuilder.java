@@ -270,8 +270,6 @@ class SequentialExecModelBuilder extends ModelBuilder
 		
 		makeEventExecution();
 		
-		//makeJobQueue();
-		
 		makeAlgorithmExecution();
 		
 		for (Iterator fbIter = basicFunctionBlocks.keySet().iterator(); fbIter.hasNext();)
@@ -531,12 +529,11 @@ class SequentialExecModelBuilder extends ModelBuilder
 			{
 				Logger.output(Logger.ERROR, ". (current directory)", 1);
 			}
-			Logger.output(Logger.ERROR, "");
-			Logger.output(Logger.ERROR, "Usage: SequentialExecModelBuilder [-o outputFile] [-lb libraryPathBase] [-lp libraryDirectory]... file.sys");
 			exit(1);
 		}
 		return theFile;
     }
+
 
 	
 	private void makeEventConnectionsMap(JaxbFBNetwork fbNetwork, String parentInstance, int level)
@@ -1015,76 +1012,6 @@ class SequentialExecModelBuilder extends ModelBuilder
 			eventExecution.addTransition(from, to, event, null, null);
 		}
 		automata.addAutomaton(eventExecution);
-	}
-
-	private void makeJobQueue()
-	{
-		if (algMaxID > 0)
-		{
-			Logger.output("SequentialExecModelBuilder.makeJobQueue():");
-
-			ExtendedAutomaton jobQueue = getNewAutomaton("Job Queue");
-		
-			// the maximum number of jobs in the queue at the same time
-			int places = algMaxID;	
-			if (jobQueuePlaces != 0)
-			{
-				places = jobQueuePlaces.intValue();
-			}
-		
-			jobQueue.addIntegerVariable("current_job_fb", 0, algFB, 0, 0);
-			jobQueue.addIntegerVariable("current_job_alg", 0, algMaxID, 0, 0);
-
-			jobQueue.addInitialState("s0");
-			for (int i = 1; i <= places; i++)
-			{
-				jobQueue.addIntegerVariable("job_fb_place_" + i, 0, algFB, 0, 0);
-				jobQueue.addIntegerVariable("job_alg_place_" + i, 0, algMaxID, 0, 0);
-	
-				jobQueue.addState("s" + i);
-				//Transiton when queuing job
-				String from = "s" + (i-1);
-				String to = "s" + i;
-				String event = "";
-				String guard = "";
-				String action = "";
-				for (Iterator fbIter = basicFunctionBlocks.keySet().iterator(); fbIter.hasNext();)
-				{
-					String fbName = (String) fbIter.next();
-					Integer fbID = (Integer) basicFunctionBlocksID.get(fbName);
-					Map fbAlgorithms = (Map) algorithms.get(fbName);
-					if (fbAlgorithms != null)
-					{
-						for (Iterator algIter = fbAlgorithms.keySet().iterator(); algIter.hasNext();)
-						{
-							String curAlg = (String) algIter.next();
-							Integer algID = (Integer) fbAlgorithms.get(curAlg);
-					
-							event = "queue_job_" + curAlg + "_" + fbName +";";
-							action = "job_fb_place_" + i + " = " + fbID + ";";
-							action = action + "job_alg_place_" + i + " = " + algID + ";";
-							jobQueue.addTransition(from, to, event, null, action);
-						}
-					}
-				}
-
-				// Transiton when dequeuing job
-				from = "s" + i;
-				to = "s" + (i-1);
-				event = "remove_job;";      
-				action = "current_job_fb = job_fb_place_1;";
-				action = action + "current_job_alg = job_alg_place_1;";
-				for (int j = 1; j <= i-1; j++)
-				{
-					action = action + "job_fb_place_" + j + " = job_fb_place_" + (j+1) + ";";
-					action = action + "job_alg_place_" + j + " = job_alg_place_" + (j+1) + ";";
-				}
-				action = action + "job_fb_place_" + i + " = 0;";
-				action = action + "job_alg_place_" + i + " = 0;";
-				jobQueue.addTransition(from, to, event, null, action);      
-			}
-			automata.addAutomaton(jobQueue);	
-		}
 	}
 
 	private void makeAlgorithmExecution()
