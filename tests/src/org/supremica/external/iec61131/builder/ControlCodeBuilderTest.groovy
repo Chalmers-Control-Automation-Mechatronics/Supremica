@@ -6,59 +6,64 @@ import net.sourceforge.waters.subject.module.builder.Util
 
 class ControlCodeBuilderTest extends GroovyTestCase {
 	static void main(String[] args) {
-		Util.openInSupremica(ASSIGNMENT_APP.toAutomata(true))
-//		Util.openInSupremica(SFC_APP_MODULE)
+		Util.openInSupremica(getAssignmentApp().toAutomata(true))
+		Util.openInSupremica(getSfcApp().toAutomata(true))
 //		Util.openInSupremica(SFC_DEFERRED_APP_MODULE)
 //		Util.openInSupremica(STATELESS_CYCLE_APP_MODULE)
 //		Util.openInSupremica(FB_APP_MODULE)
+//		new ControlCodeBuilderTest().testSfcDeferred()
 	}
 	static final CCB = new ControlCodeBuilder()
-	static final ASSIGNMENT_APP = CCB.application('assignmentTest') {
-		input 'y1'
-		input 'y2'
-		input 'y3'
-		output 'u1 := true'
-		output 'u2 := false'
-		output 'u3'
-		output 'u5'
-		output 'u6'
-		output 'u7'
-		output 'u4'
-		variable 'x2'
-		variable 'SR1_S'
-		variable 'SR1_R'
-		variable 'SR1_Q'
-		variable 'RS1_Q'
-		variable 'RS1_S'
-		variable 'RS1_R'
-		variable 'Py2_in'
-		variable 'Py2_Q'
-		variable 'Py2_old'
-		logicProgram('program') {
-			'u2 := not y1'()
-			'u1 := y1 and u2'()
-			'SR1_S := y1'()
-			'SR1_R := y2 and u2'()
-			'SR1_Q := not SR1_R and SR1_Q or SR1_S'()
-			'u5 := SR1_Q'()
-			'RS1_Q := u6'()
-			'RS1_S := y1'()
-			'RS1_R := y2 and u2'()
-			'RS1_Q := not RS1_R and (RS1_Q or RS1_S)'()
-			'u6 := RS1_Q'()
-			'Py2_in := y2'()
-			'Py2_Q := Py2_in and not Py2_old '()
-			'Py2_old := Py2_in'()
-			'u4 := Py2_Q and y1'()
-			'x2 := True'()
-		}
-		process('someProcess') {
+	static getAssignmentApp() {
+		static final APPLICATION
+		if (APPLICATION) return APPLICATION
+		APPLICATION = CCB.application('assignmentTest') {
+			input 'y1'
+			input 'y2'
+			input 'y3'
+			output 'u1 := true'
+			output 'u2 := false'
+			output 'u3'
+			output 'u5'
+			output 'u6'
+			output 'u7'
+			output 'u4'
+			variable 'x2'
+			variable 'SR1_S'
+			variable 'SR1_R'
+			variable 'SR1_Q'
+			variable 'RS1_Q'
+			variable 'RS1_S'
+			variable 'RS1_R'
+			variable 'Py2_in'
+			variable 'Py2_Q'
+			variable 'Py2_old'
 			logicProgram('program') {
-				'SR1_Q := y1'()
-				'SR1_S := y2 and u3'()
-				'SR1_R := not u3'()
+				'u2 := not y1'()
+				'u1 := y1 and u2'()
+				'SR1_S := y1'()
+				'SR1_R := y2 and u2'()
 				'SR1_Q := not SR1_R and SR1_Q or SR1_S'()
-				'y1 := SR1_Q'()
+				'u5 := SR1_Q'()
+				'RS1_Q := u6'()
+				'RS1_S := y1'()
+				'RS1_R := y2 and u2'()
+				'RS1_Q := not RS1_R and (RS1_Q or RS1_S)'()
+				'u6 := RS1_Q'()
+				'Py2_in := y2'()
+				'Py2_Q := Py2_in and not Py2_old '()
+				'Py2_old := Py2_in'()
+				'u4 := Py2_Q and y1'()
+				'x2 := True'()
+			}
+			process('someProcess') {
+				logicProgram('program') {
+					'SR1_Q := y1'()
+					'SR1_S := y2 and u3'()
+					'SR1_R := not u3'()
+					'SR1_Q := not SR1_R and SR1_Q or SR1_S'()
+					'y1 := SR1_Q'()
+				}
 			}
 		}
 	}
@@ -114,39 +119,44 @@ class ControlCodeBuilderTest extends GroovyTestCase {
 			}
 		}
 		ModuleSubject generatedModuleFromStateless = appStateless.toAutomata(true)
-		Util.assertGeneratedModuleEqualsManual(ASSIGNMENT_APP.toAutomata(true), generatedModuleFromStateless)
+		Util.assertGeneratedModuleEqualsManual(assignmentApp.toAutomata(true), generatedModuleFromStateless)
 //		Util.openInSupremica(generatedModuleFromAssignmentOnly)
 	}
-	static final SFC_APP = CCB.application('sfcapp') {
-		input 'y1 := true'
-		input 'y2 := true'
-		output 'u1'
-		output 'u2'
-		output 'u3'
-		output 'u4'
-		output 'u5'
-		output 'u6'
-		sequentialProgram('program') {
-			sequence('mySequence') {
-				Step ('S1'){
-					N('u5')
-					P0_Action {
-						'u2 := y1'()
+	
+	static getSfcApp() {
+		static final APPLICATION
+		if (APPLICATION) return APPLICATION
+		APPLICATION = CCB.application('sfcapp') {
+			input 'y1 := true'
+			input 'y2 := true'
+			output 'u1'
+			output 'u2'
+			output 'u3'
+			output 'u4'
+			output 'u5'
+			output 'u6'
+			sequentialProgram('program') {
+				sequence('mySequence') {
+					Step ('S1'){
+						N('u5')
+						P0_Action {
+							'u2 := y1'()
+						}
 					}
-				}
-				'y1'();    'y2'(to:'S3')
-				Step('S2', marked:true){
-					S('u4')
-					N_action {
-						'u1 := y1 or y2'()
+					'y1'();    'y2'(to:'S3')
+					Step('S2', marked:true){
+						S('u4')
+						N_action {
+							'u1 := y1 or y2'()
+						}
 					}
+					'not y1'(to:'S1')
+								Step('S3'){
+									P1_action{'u3 := y2'()}
+									R('u4')
+								}
+								'true'()
 				}
-				'not y1'(to:'S1')
-							Step('S3'){
-								P1_action{'u3 := y2'()}
-								R('u4')
-							}
-							'true'()
 			}
 		}
 	}
@@ -202,21 +212,25 @@ class ControlCodeBuilderTest extends GroovyTestCase {
 		}
 		//ModuleSubject sfcModule = sfcApp.toAutomata()
 		ModuleSubject sfcLessModule = appSfcLess.toAutomata()
-		Util.assertGeneratedModuleEqualsManual(SFC_APP.toAutomata(), sfcLessModule)
+		Util.assertGeneratedModuleEqualsManual(sfcApp.toAutomata(), sfcLessModule)
 		//Util.openInSupremica(sfcModule)
 	}
-	static final SFC_PARALLEL_APP = CCB.application('sfcParallelApp') {
-		input 'y1'
-		input 'y2'
-		sequentialProgram('program') {
-			sequence('mySequence') {
-				Step 'S1'
-				'y1'(to:['L1', 'R1'])
-				Step('L1')
-				'not y1'()
-				Step 'L2'
-				Step 'R1'
-				'y2'(from:['L2', 'R1'])
+	static getSfcParallelApp() {
+		static final APPLICATION
+		if (APPLICATION) return APPLICATION
+		APPLICATION = CCB.application('sfcParallelApp') {
+			input 'y1'
+			input 'y2'
+			sequentialProgram('program') {
+				sequence('mySequence') {
+					Step 'S1'
+					'y1'(to:['L1', 'R1'])
+					Step('L1')
+					'not y1'()
+					Step 'L2'
+					Step 'R1'
+					'y2'(from:['L2', 'R1'])
+				}
 			}
 		}
 	}
@@ -262,22 +276,26 @@ class ControlCodeBuilderTest extends GroovyTestCase {
 		}
 		//ModuleSubject sfcModule = sfcApp.toAutomata()
 		ModuleSubject sfcLessModule = appSfcLess.toAutomata()
-		Util.assertGeneratedModuleEqualsManual(SFC_PARALLEL_APP.toAutomata(), sfcLessModule)
+		Util.assertGeneratedModuleEqualsManual(sfcParallelApp.toAutomata(), sfcLessModule)
 		//Util.openInSupremica(sfcModule)
 	}
-	static final SFC_DEFERRED_APP = CCB.application('testSfcDeferred') {
-		sequentialProgram('deferred', deferred:true) {
-			sequence('sfcA') {
-				Step ('A1')
-				'B1.X'()
-				Step('A2')
-				'true'()
-			}
-			sequence('sfcB') {
-				Step ('B1')
-				'A1.X'()
-				Step('B2')
-				'true'()
+	static getSfcDeferredApp() {
+		static final APPLICATION
+		if (APPLICATION) return APPLICATION
+		APPLICATION = CCB.application('testSfcDeferred') {
+			sequentialProgram('deferred', deferred:true) {
+				sequence('sfcA') {
+					Step ('A1')
+					'B1.X'()
+					Step('A2')
+					'true'()
+				}
+				sequence('sfcB') {
+					Step ('B1')
+					'A1.X'()
+					Step('B2')
+					'true'()
+				}
 			}
 		}
 	}
@@ -323,42 +341,46 @@ class ControlCodeBuilderTest extends GroovyTestCase {
 		}
 //		ModuleSubject sfcModule = appSfc.toAutomata()
 		ModuleSubject sfcLessModule = appSfcLess.toAutomata()
-		Util.assertGeneratedModuleEqualsManual(SFC_DEFERRED_APP.toAutomata(), sfcLessModule)
+		Util.assertGeneratedModuleEqualsManual(sfcDeferredApp.toAutomata(), sfcLessModule)
 //		Util.openInSupremica(sfcModule)
 	}
-	static final STATELESS_CYCLE_APP = CCB.application('testapp2') {
-		input 'y1'
-		input 'y2'
-		input 'y3'
-		input 'y4'
-		input 'y5'
-		output('u3', markedValue:true)
-		output 'u7'
-		variable 'FB1instance_x' 
-		logicProgram('program') {
-			'u7 := not y2 and u7 or (FB1instance_x and y3)'()
-			'FB1instance_x := not y3 and FB1instance_x or y2'()
-			'u3 := true'()
-		}
-		process('someProcess') {
+	static getParallelAssignmentApp() {
+		static final APPLICATION
+		if (APPLICATION) return APPLICATION
+		APPLICATION = CCB.application('parallelAssignment') {
+			input 'y1'
+			input 'y2'
+			input 'y3'
+			input 'y4'
+			input 'y5'
+			output('u3', markedValue:true)
+			output 'u7'
+			variable 'FB1instance_x' 
 			logicProgram('program') {
-				'y1 := not (not u3) and y1 or (y2 and u3)'()
+				'u7 := not y2 and u7 or (FB1instance_x and y3)'()
+				'FB1instance_x := not y3 and FB1instance_x or y2'()
+				'u3 := true'()
 			}
-		}
-		process('slowProcess1', speed:Speed.SLOW) {
-			logicProgram('program') {
-				'y4 := u7'()
+			process('someProcess') {
+				logicProgram('program') {
+					'y1 := not (not u3) and y1 or (y2 and u3)'()
+				}
 			}
-		}
-		process('slowProcess2', speed:Speed.SLOW) {
-			logicProgram('program') {
-				'y5 := u7'()
+			process('slowProcess1', speed:Speed.SLOW) {
+				logicProgram('program') {
+					'y4 := u7'()
+				}
+			}
+			process('slowProcess2', speed:Speed.SLOW) {
+				logicProgram('program') {
+					'y5 := u7'()
+				}
 			}
 		}
 	}
 	//static final STATELESS_CYCLE_APP_MODULE = STATELESS_CYCLE_APP.toAutomata()
 	void testAutomataGenerator() {
-		ModuleSubject correctModule = new ModuleBuilder().module('testapp2') {
+		ModuleSubject correctModule = new ModuleBuilder().module('parallelAssignment') {
 			event(Converter.SCAN_CYCLE_EVENT_NAME, controllable:false)
 			booleanVariable(['y1', 'y2', 'y3', 'y4', 'y5', 'FB1instance_x', 'u7'], initialValue:false, markedValue:false)
 			booleanVariable('u3', initialValue:false, markedValue:true)
@@ -476,25 +498,29 @@ class ControlCodeBuilderTest extends GroovyTestCase {
 			}
 		}
 		
-		Util.assertGeneratedModuleEqualsManual(STATELESS_CYCLE_APP.toAutomata(), correctModule)
+		Util.assertGeneratedModuleEqualsManual(parallelAssignmentApp.toAutomata(), correctModule)
 //		Util.openInSupremica(generatedModuleFromStateless)
 	}
-	static final SYNTHESIS_APP = CCB.application('synthesisapp') {
-		input 'y1'
-		input 'y2'
-		output('u3', markedValue:true)
-		output 'u7'
-		logicProgram('program') {
-			'u7 := u3 and y1 and not y2'()
-		}
-		process('someProcess') {
+	static getSynthesisApp() {
+		static final APPLICATION
+		if (APPLICATION) return APPLICATION
+		APPLICATION = CCB.application('synthesisapp') {
+			input 'y1'
+			input 'y2'
+			output('u3', markedValue:true)
+			output 'u7'
 			logicProgram('program') {
-				'y1 := u3 and y1 or (y2 and u3)'()
+				'u7 := u3 and y1 and not y2'()
 			}
-		}
-		process('slowProcess1', speed:Speed.SLOW) {
-			logicProgram('program') {
-				'y2 := u7'()
+			process('someProcess') {
+				logicProgram('program') {
+					'y1 := u3 and y1 or (y2 and u3)'()
+				}
+			}
+			process('slowProcess1', speed:Speed.SLOW) {
+				logicProgram('program') {
+					'y2 := u7'()
+				}
 			}
 		}
 	}
@@ -572,59 +598,63 @@ class ControlCodeBuilderTest extends GroovyTestCase {
 				}
 			}
 		}
-		Util.assertGeneratedModuleEqualsManual(SYNTHESIS_APP.toAutomata(true), correctModule)
+		Util.assertGeneratedModuleEqualsManual(synthesisApp.toAutomata(true), correctModule)
 //		Util.openInSupremica(generatedModuleFromStateless)
 	}
-	static final FB_APP = CCB.application('functionBlockTest') {
-		input 'y1'
-		input 'y2'
-		input 'y3'
-		output 'u1'
-		output 'u2'
-		output 'u3'
-		output 'u5'
-		output 'u6'
-		output 'u7'
-		output 'u4'
-		output 'u8'
-		RS 'RS1'
-		functionblock('FB1') {
+	static getFbApp() {
+		static final APPLICATION
+		if (APPLICATION) return APPLICATION
+		APPLICATION = CCB.application('functionBlockTest') {
 			input 'y1'
 			input 'y2'
+			input 'y3'
 			output 'u1'
-			variable 'x'
-			logicProgram('program') {
-				SR(Q:'u1', S:'x AND y2', R:'y1')
-				SR(Q:'x', S:'y1', R:'y2')
-			}
-		}
-		logicProgram('program') {
-			'u2 := not y1'()
-			SR('SR1', S:'y1', R:'y2 and u2')
-			'u5 := SR1.Q'()
-			RS1(S:'y1', R:'y2 and u2', Q:'u6')
-			R_TRIG('Py2', in:'y2')
-			'u4 := Py2.Q and y1'()
-			FB1('FB1instance', y1:'y2', y2:'y3', u1:'u7')
-			'u8 := y1 or y2'('y3')
-		}
-		process('someProcess') {
-			variable 'x'
-			logicProgram('program') {
-				SR(Q:'y1', S:'y2 and u3 or x', R:'not u3')
-				'x := not u2'()
-			}
-		}
-		process('process3') {
-			functionblock('ProcessFb') {
-				input 'in'
-				output 'q'
+			output 'u2'
+			output 'u3'
+			output 'u5'
+			output 'u6'
+			output 'u7'
+			output 'u4'
+			output 'u8'
+			RS 'RS1'
+			functionblock('FB1') {
+				input 'y1'
+				input 'y2'
+				output 'u1'
+				variable 'x'
 				logicProgram('program') {
-					'q := not in'()
+					SR(Q:'u1', S:'x AND y2', R:'y1')
+					SR(Q:'x', S:'y1', R:'y2')
 				}
 			}
 			logicProgram('program') {
-				ProcessFb(q:'y3', in:'u2')
+				'u2 := not y1'()
+				SR('SR1', S:'y1', R:'y2 and u2')
+				'u5 := SR1.Q'()
+				RS1(S:'y1', R:'y2 and u2', Q:'u6')
+				R_TRIG('Py2', in:'y2')
+				'u4 := Py2.Q and y1'()
+				FB1('FB1instance', y1:'y2', y2:'y3', u1:'u7')
+				'u8 := y1 or y2'('y3')
+			}
+			process('someProcess') {
+				variable 'x'
+				logicProgram('program') {
+					SR(Q:'y1', S:'y2 and u3 or x', R:'not u3')
+					'x := not u2'()
+				}
+			}
+			process('process3') {
+				functionblock('ProcessFb') {
+					input 'in'
+					output 'q'
+					logicProgram('program') {
+						'q := not in'()
+					}
+				}
+				logicProgram('program') {
+					ProcessFb(q:'y3', in:'u2')
+				}
 			}
 		}
 	}
@@ -713,7 +743,7 @@ class ControlCodeBuilderTest extends GroovyTestCase {
 			}
 		}
 		ModuleSubject generatedModuleFromAssignmentOnly = appAssignmentOnly.toAutomata(true)
-		Util.assertGeneratedModuleEqualsManual(FB_APP.toAutomata(true), generatedModuleFromAssignmentOnly)
+		Util.assertGeneratedModuleEqualsManual(fbApp.toAutomata(true), generatedModuleFromAssignmentOnly)
 //		Util.openInSupremica(generatedModule)
 	}
 }
