@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.gui.ide
 //# CLASS:   DocumentContainerManager
 //###########################################################################
-//# $Id: DocumentContainerManager.java,v 1.8 2007-12-04 03:22:58 robi Exp $
+//# $Id: DocumentContainerManager.java,v 1.9 2008-01-11 12:59:03 torda Exp $
 //###########################################################################
 
 package org.supremica.gui.ide;
@@ -333,7 +333,7 @@ public class DocumentContainerManager
         }
     }
 
-    private void addContainer(final DocumentContainer container)
+    public void addContainer(final DocumentContainer container)
     {
         final DocumentProxy doc = container.getDocument();
         final URI uri = doc.getLocation();
