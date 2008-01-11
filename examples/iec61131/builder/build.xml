@@ -8,7 +8,7 @@
 	<property name="lib" value="${supremicadir}/lib" />
 	<property name="src" value="." />
 	<property name="bin" value="bin" />
-	<property name="groovy-all.jar" location="${lib}/groovy-all-1.0.jar" />
+	<property name="groovy-all.jar" location="${lib}/groovy-all-1.5.1.jar" />
 
 	<path id="groovy.classpath" location="${groovy-all.jar}" />
 	<path id="supremica.classpath">
