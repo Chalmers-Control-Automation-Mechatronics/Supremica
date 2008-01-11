@@ -21,7 +21,7 @@ import net.sourceforge.waters.model.expr.Operator
 import org.supremica.gui.ide.IDE
 import org.supremica.gui.InterfaceManager
 import net.sourceforge.waters.xsd.module.ScopeKind
-
+import org.supremica.automata.*
 class ModuleBuilder extends BuilderSupport {
 
 	static void main(args) {
@@ -179,14 +179,8 @@ class ModuleBuilder extends BuilderSupport {
 			case ForeachComponentSubject:
 				parent.componentListModifiable << child
 				break
-			case VariableSubject:
-				def dummyComponent = parent.componentList.find{it.name == VARIABLE_COMPONENT_NAME}
-				if (!dummyComponent) {
-					dummyComponent = factory.createSimpleComponentProxy(parser.parseIdentifier(VARIABLE_COMPONENT_NAME), ComponentKind.PLANT, factory.createGraphProxy())
-					dummyComponent.graph.nodesModifiable << factory.createSimpleNodeProxy('dummy', factory.createPlainEventListProxy([parser.parse(EventDeclProxy.DEFAULT_MARKING_NAME)]), true, null, null, null)
-					parent.componentListModifiable << dummyComponent
-				}
-				dummyComponent.variablesModifiable << child
+			case VariableComponentSubject:
+				def dummyComponent = parent.componentListModifiable << child
 				break
 			case EventDeclSubject:
 				parent.eventDeclListModifiable << child
@@ -233,7 +227,7 @@ class ModuleBuilder extends BuilderSupport {
 				parent.graph.edgesModifiable << child
 				transitionAttributes = null
 				break
-			case VariableSubject:
+			case VariableComponentSubject:
 				parent.variablesModifiable << child
 				break
 			default:
@@ -324,6 +318,7 @@ class ModuleBuilder extends BuilderSupport {
 			event('e4', ranges:[0..2])
 			event(name:'e5', ranges:[0..2, 0..3], controllable:false)
 			eventAlias(name:'someEvents', events:['e1', 'e2'])
+			booleanVariable(name:'y1', initialValue:false)
 			plant(name:'testcomponent', initialState:'q0', defaultEvent:'e0') {
 				state(name:'q0')
 				state('q1', marked:true)
@@ -347,7 +342,6 @@ class ModuleBuilder extends BuilderSupport {
 						reset('y1')
 					}
 				}
-				booleanVariable(name:'y1', initialValue:false)
 				transition(from:'s0', to:'s1', event:'e2', guard:'!y0')
 			}
 			foreach('i', range:0..2) {
@@ -379,10 +373,10 @@ class ModuleBuilder extends BuilderSupport {
 		assert module.eventDeclList.findAll{it.kind == EventKind.UNCONTROLLABLE}.name == ['e1', 'e2', 'e5']
 		assert module.eventDeclList.findAll{it.kind == EventKind.PROPOSITION}.name == [EventDeclProxy.DEFAULT_MARKING_NAME, EventDeclProxy.DEFAULT_FORBIDDEN_NAME, 'e3']
 		assert module.eventAliasList.name == ['someEvents']
-		assert module.eventAliasList.expression.eventList.name == ['e1','e2'] 
-		assert module.componentList.find{it.name == VARIABLE_COMPONENT_NAME}.variables.type*.toString() == ['0..1', '1..4', '1..4']
-        assert module.componentList.find{it.name == VARIABLE_COMPONENT_NAME}.variables.initialValue.value == [0, 2, 2]
-		assert module.componentList.name == [VARIABLE_COMPONENT_NAME, 'testcomponent', 'testcomponent2', 'i']
+		assert module.eventAliasList.expression.eventList.name == [['e1','e2']] : module.eventAliasList.expression.eventList.name 
+		//assert module.componentList.find{it.name == VARIABLE_COMPONENT_NAME}.variables.type*.toString() == ['0..1', '1..4', '1..4']
+        //assert module.componentList.find{it.name == VARIABLE_COMPONENT_NAME}.variables.initialValue.value == [0, 2, 2]
+		assert module.componentList.name == ['y0', 'x0', 'x1', 'y1', 'testcomponent', 'testcomponent2', 'i'] : module.componentList.name
 		assert module.componentList.find{it.name == 'testcomponent'}.graph.deterministic
 		assert module.componentList.find{it.name == 'testcomponent'}.graph.nodes.name == ['q0', 'q1']
 		assert module.componentList.find{it.name == 'testcomponent'}.graph.nodes.find{it.name == 'q0'}.initial
@@ -394,9 +388,9 @@ class ModuleBuilder extends BuilderSupport {
 			 it.guardActionBlock?.actions?.plainText]
 		} == [['q0', 'q1', ['e0'], 'y0 & x0 < 4', ['x0 += 1', 'y0 = 1']],
 		      ['q1', 'q0', ['e1','e0'], null, null]]
-		assert module.componentList.find{it.name == 'testcomponent2'}.variables.collect {
-			[it.name, it.initialValue.value, it.type.toString()]
-		} == [['y1', 0, '0..1']]
+//		assert module.componentList.find{it.name == 'testcomponent2'}.variables.collect {
+//			[it.name, it.initialValue.value, it.type.toString()]
+//		} == [['y1', 0, '0..1']]
 		assert !module.componentList.find{it.name == 'testcomponent2'}.graph.deterministic
 		assert module.componentList.find{it.name == 'testcomponent2'}.graph.nodes.name == ['s0', 's1']
 		assert module.componentList.find{it.name == 'testcomponent2'}.graph.nodes.find{it.name == 's0'}.initial
