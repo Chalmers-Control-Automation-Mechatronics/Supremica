@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.gui.ide
 //# CLASS:   IDE
 //###########################################################################
-//# $Id: IDE.java,v 1.109 2007-12-08 21:17:53 robi Exp $
+//# $Id: IDE.java,v 1.110 2008-01-11 12:55:04 torda Exp $
 //###########################################################################
 
 package org.supremica.gui.ide;
@@ -69,7 +69,8 @@ public class IDE
     throws JAXBException, SAXException
     {
         // Initialise logging
-        LoggerFactory.getInstance().initialiseAppenders();        
+        if (logger == null) logger = LoggerFactory.createLogger(IDE.class);
+    	LoggerFactory.getInstance().initialiseAppenders();        
         info("Supremica version: " + (new Version()));
                 
         // Instantiate all actions
@@ -367,7 +368,6 @@ public class IDE
         final List<File> files = ProcessCommandLineArguments.process(args);
         
         // Now start the gui...
-        logger = LoggerFactory.createLogger(IDE.class);
         InterfaceManager.getInstance().initLookAndFeel();
         final IDE ide = new IDE();
 
