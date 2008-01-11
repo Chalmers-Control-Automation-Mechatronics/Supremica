@@ -33,7 +33,7 @@ class FunctionBlock {
 	
 	ModuleSubject addToModule(ModuleSubject module, boolean forSynthesis = false) {
 		ModuleBuilder mb = new ModuleBuilder()
-		Scope scope = [self:this, process:this]
+		Scope scope = new Scope(self:this, process:this)
 		mb.module(module) {
 			List assignments = getRuntimeAssignments(scope)
 			List freeVariables = allControllableVariables.findAll{var -> assignments.every{it.Q.fullyQualified(it.scope) != var}}

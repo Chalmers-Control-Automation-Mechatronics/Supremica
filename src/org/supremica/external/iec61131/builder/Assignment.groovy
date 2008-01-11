@@ -11,7 +11,7 @@ class Assignment {
 	static final parentAttr = 'statements'
 
 	List getRuntimeAssignments(Scope parent) {
-		if (!condition) return [[scope:parent, Q:Q, input:input] as RuntimeAssignment]
+		if (!condition) return [new RuntimeAssignment(scope:parent, Q:Q, input:input)]
 		else return [[scope:parent, Q:Q, input:new Expression("($condition) and ($input) or (not ($condition) and $Q)")] as RuntimeAssignment]
 	}
 	List getNamedElements() { [] }
@@ -24,10 +24,10 @@ class Assignment {
 }
 
 class RuntimeAssignment {
-	final Identifier Q
-	final Expression input
-	final Scope scope
-	final boolean stochastic // Means that it will not necessarily execute
+	Identifier Q
+	Expression input
+	Scope scope
+	boolean stochastic // Means that it will not necessarily execute
 	
 	String toString() {
 		"$scope { $Q := $input }"

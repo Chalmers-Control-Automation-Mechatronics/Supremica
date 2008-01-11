@@ -15,14 +15,14 @@ class SequentialProgram {
 		subScopeElements//[*variables, *sequences]
 	}
 	List getSubScopeElements() {
-		[*variables, *sequences, *sequences.steps]
+		[*variables, *sequences, *sequences.steps.flatten()]
 	}
 	List getRuntimeAssignments(Scope parent) {
 		Scope scope = [self:this, parent:parent]
 		List rtAssignments = []               
 		if (deferred) {
 			rtAssignments += sequences*.getRuntimeAssignments(scope).flatten()
-			rtAssignments += sequences.steps*.getRuntimeAssignments(scope).flatten()
+			rtAssignments += sequences.steps.flatten()*.getRuntimeAssignments(scope).flatten()
 		} else {
 			rtAssignments += sequences.collect{it.getRuntimeAssignments(scope) + it.steps*.getRuntimeAssignments(scope)}.flatten()
 		}

@@ -10,11 +10,11 @@ class LogicProgram {
 	List statements = []
 	List variables = []
 	List getRuntimeAssignments(Scope parent) {
-		Scope scope = [self:this, parent:parent]
+		Scope scope = [self:this, parent:parent] as Scope
 		statements*.getRuntimeAssignments(scope).flatten()
 	}
 	List getControllableVariables(Scope parent) {
-		Scope scope = [self:this, parent:parent]
+		Scope scope = [self:this, parent:parent] as Scope
 		subScopeElements*.getControllableVariables(scope).flatten()
 	}
 	List getNamedElements() {

@@ -1,8 +1,8 @@
 package org.supremica.external.iec61131.builder
 
 class Scope {
-	final Scope parent
-	final Object self
+	Scope parent
+	Object self
 	
 	boolean isGlobal() {!parent}
 	
@@ -61,7 +61,7 @@ class Scope {
 		else {fullNameCache = new Identifier("${parent.fullName}${Converter.SEPARATOR}${self.name}")}
 		fullNameCache
 	}
-	final def process
+    def process
 	def getProcess() {
 		if (!process) return parent.process
 		else return process
