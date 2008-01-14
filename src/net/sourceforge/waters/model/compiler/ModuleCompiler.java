@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.module
 //# CLASS:   ModuleCompiler
 //###########################################################################
-//# $Id: ModuleCompiler.java,v 1.88 2007-12-04 03:22:55 robi Exp $
+//# $Id: ModuleCompiler.java,v 1.89 2008-01-14 15:21:33 markus Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.compiler;
@@ -77,10 +77,12 @@ import net.sourceforge.waters.model.module.UnaryExpressionProxy;
 import net.sourceforge.waters.model.module.VariableComponentProxy;
 import net.sourceforge.waters.model.module.VariableMarkingProxy;
 import net.sourceforge.waters.plain.module.ModuleElementFactory;
+import net.sourceforge.waters.subject.module.ModuleSubject;
 import net.sourceforge.waters.xsd.base.ComponentKind;
 import net.sourceforge.waters.xsd.base.EventKind;
 import net.sourceforge.waters.xsd.module.ScopeKind;
 
+import org.supremica.external.iec61499fb2efa.ExtendedAutomata;
 
 public class ModuleCompiler extends AbstractModuleProxyVisitor
 {
@@ -119,7 +121,8 @@ public class ModuleCompiler extends AbstractModuleProxyVisitor
     throws EvalException
   {
     try {
-      final String name = mModule.getName();
+   //ExtendedAutomata.expandTransitions((ModuleSubject)mModule);
+     final String name = mModule.getName();
       final String comment = mModule.getComment();
       final URI moduleLocation = mModule.getLocation();
       URI desLocation = null;
