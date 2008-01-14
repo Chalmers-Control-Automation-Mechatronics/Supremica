@@ -190,15 +190,20 @@ public class ExtendedAutomata
 					}
 
 					// get actions
-					List curActions = curBlock.getActions();
+					List <BinaryExpressionProxy> curActions = curBlock.getActions();
 					String actionsText = "";
 					if (curActions.size() > 0 )
 					{
 						Logger.output(Logger.DEBUG, "ExtendedAutomata.expandTransitions(): Actions", 3);
+						for(BinaryExpressionProxy action: curActions){
+							actionsText = actionsText + action.toString() + "; ";	
+						}
+						/*
 						for (Iterator iter = curActions.iterator(); iter.hasNext();)
 						{
 							actionsText = actionsText + ((BinaryExpressionProxy) iter.next()).getPlainText() + "; ";
 						}
+						*/
 						Logger.output(Logger.DEBUG, actionsText, 4);
 					}
 
