@@ -64,7 +64,7 @@ public class ExtendedAutomata
 	private ModuleSubject module;
 	private boolean expand;
 
-	private static ExpressionParser parser;
+	private static ExpressionParser parser = new ExpressionParser(ModuleSubjectFactory.getInstance(), CompilerOperatorTable.getInstance());
 
 	public ExtendedAutomata(String name, boolean expand) 
 	{
@@ -78,7 +78,7 @@ public class ExtendedAutomata
 
 		this.expand = expand;
 		
-		parser = new ExpressionParser(factory, CompilerOperatorTable.getInstance());
+		//parser = new ExpressionParser(factory, CompilerOperatorTable.getInstance());
 	}
 
 	protected ModuleSubject getModule()
