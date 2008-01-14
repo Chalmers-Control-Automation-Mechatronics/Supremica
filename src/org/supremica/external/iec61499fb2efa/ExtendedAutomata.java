@@ -59,7 +59,7 @@ import org.supremica.automata.VariableHelper;
 public class ExtendedAutomata
 {
 
-	private static ModuleSubjectFactory factory;
+	private static ModuleSubjectFactory factory = ModuleSubjectFactory.getInstance();
 	private IdentifierSubject identifier;
 	private ModuleSubject module;
 	private boolean expand;
@@ -68,15 +68,17 @@ public class ExtendedAutomata
 
 	public ExtendedAutomata(String name, boolean expand) 
 	{
-		factory = ModuleSubjectFactory.getInstance();
-
 		identifier = factory.createSimpleIdentifierProxy(name);
 
 		module = new ModuleSubject(identifier.getName(), null);
 
+		// make marking proposition
 		module.getEventDeclListModifiable().add(factory.createEventDeclProxy(EventDeclProxy.DEFAULT_MARKING_NAME, EventKind.PROPOSITION));
 
 		this.expand = expand;
+
+		//factory = ModuleSubjectFactory.getInstance();
+
 		
 		//parser = new ExpressionParser(factory, CompilerOperatorTable.getInstance());
 	}
