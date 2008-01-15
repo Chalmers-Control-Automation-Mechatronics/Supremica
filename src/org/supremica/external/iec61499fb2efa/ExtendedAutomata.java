@@ -176,7 +176,8 @@ public class ExtendedAutomata
 						Logger.output(Logger.DEBUG, "ExtendedAutomata.expandTransitions(): Guard", 3);
 						for (Iterator iter = curGuards.iterator(); iter.hasNext();)
 						{
-							guardText = guardText + ((SimpleExpressionProxy) iter.next()).getPlainText();
+							//guardText = guardText + ((SimpleExpressionProxy) iter.next()).getPlainText();
+							guardText = guardText + ((SimpleExpressionProxy) iter.next()).toString();
 							if (iter.hasNext())
 							{
 								guardText = guardText + ") & (";
@@ -826,5 +827,21 @@ public class ExtendedAutomata
 			e.printStackTrace();
 		}
 	}
-	
+
+	public static void writeModuleToFile(ModuleSubject module, String fileName)
+	{
+
+		Logger.output("ExtendedAutomata.writeModuleToFile(): Writing module to file.");
+
+		try
+		{
+			JAXBModuleMarshaller marshaller = new JAXBModuleMarshaller(factory, CompilerOperatorTable.getInstance());	
+			marshaller.marshal(module, new File(fileName));
+		}
+		catch (Exception e)
+		{
+			e.printStackTrace();
+		}
+	}
+
 }
