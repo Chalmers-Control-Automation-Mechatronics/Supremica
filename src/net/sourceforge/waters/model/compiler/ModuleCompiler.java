@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.module
 //# CLASS:   ModuleCompiler
 //###########################################################################
-//# $Id: ModuleCompiler.java,v 1.90 2008-01-16 13:33:15 markus Exp $
+//# $Id: ModuleCompiler.java,v 1.91 2008-01-16 14:01:12 markus Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.compiler;
@@ -122,8 +122,7 @@ public class ModuleCompiler extends AbstractModuleProxyVisitor
     throws EvalException
   {
     try {
-   //ExtendedAutomata.expandTransitions((ModuleSubject)mModule);
-     final String name = mModule.getName();
+      final String name = mModule.getName();
       final String comment = mModule.getComment();
       final URI moduleLocation = mModule.getLocation();
       URI desLocation = null;
