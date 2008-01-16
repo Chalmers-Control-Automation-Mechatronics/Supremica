@@ -95,7 +95,7 @@ public class ConverterBoolToCnfStruct {
         Expr ne = ConverterToNonNegated.convert(new Not(e));
         
         return new Pair(v, 
-                And(Or(ne,v), Or(v,ne)));
+                And(Or(ne,v), Or(nv,e)));
     }    
     private mOr Or(Expr e1, Expr e2){
         mOr e = new mOr();
