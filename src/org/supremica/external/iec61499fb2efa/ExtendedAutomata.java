@@ -487,7 +487,8 @@ public class ExtendedAutomata
 										}
 										
 										// mark new edge for adding
-										addEdges.add(makeTransition((NodeProxy) source.clone(), (NodeProxy) target.clone(), (LabelBlockProxy) curLabel.clone(), guard, actions));
+										addEdges.add(makeTransition((NodeProxy) source/*.clone()*/, (NodeProxy) target/*.clone()*/, 
+												(LabelBlockProxy) curLabel.clone(), guard, actions));
 										
 										// increase actions ident counters
 										List atUpperBound = new LinkedList();
@@ -526,7 +527,8 @@ public class ExtendedAutomata
 								else
 								{
 									// mark new edge for adding
-									addEdges.add(makeTransition((NodeProxy) source.clone(), (NodeProxy) target.clone(), (LabelBlockProxy) curLabel.clone(), guard, ""));
+									addEdges.add(makeTransition((NodeProxy) source/*.clone()*/, (NodeProxy) target/*.clone()*/, 
+											(LabelBlockProxy) curLabel.clone(), guard, ""));
 								}
 							}
 												
@@ -669,7 +671,8 @@ public class ExtendedAutomata
 							}
 							
 							// mark new edge for adding
-							addEdges.add(makeTransition((NodeProxy) source.clone(), (NodeProxy) target.clone(), (LabelBlockProxy) curLabel.clone(), guard, actions));
+							addEdges.add(makeTransition((NodeProxy) source/*.clone()*/, (NodeProxy) target/*.clone()*/,
+									(LabelBlockProxy) curLabel.clone(), guard, actions));
 							
 							// increase actions ident counters
 							List atUpperBound = new LinkedList();
