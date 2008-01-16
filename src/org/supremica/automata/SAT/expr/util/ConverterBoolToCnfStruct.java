@@ -14,13 +14,13 @@ public class ConverterBoolToCnfStruct {
     
 
     public static class Pair {
+        private final Expr main;
+        private final mAnd top;
+
         public Pair(Expr m, mAnd t){
             main = m;
             top = t;
         }
-        private Expr main;
-        private mAnd top;
-
         public Expr getMain() {
             return main;
         }
@@ -87,12 +87,26 @@ public class ConverterBoolToCnfStruct {
         return true;
     }
     public Pair replacement(Expr e){
+        
         int vi = env.addBool();
-        Literal v = new Literal(env.vars.get(vi), true);
-        mAnd ma = new mAnd();
-        // TODO: Or -> mOr
-        ma.add(new Or(new Not(e), v));
-        ma.add(new Or(e, new Not(v)));
-        return new Pair(v, ma);
+        Literal v  = new Literal(env.vars.get(vi), true);
+        Literal nv = new Literal(env.vars.get(vi), false);
+        
+        Expr ne = ConverterToNonNegated.convert(new Not(e));
+        
+        return new Pair(v, 
+                And(Or(ne,v), Or(v,ne)));
     }    
+    private mOr Or(Expr e1, Expr e2){
+        mOr e = new mOr();
+        e.add(e1);
+        e.add(e2);
+        return e;
+    }
+    private mAnd And(Expr e1, Expr e2){
+        mAnd e = new mAnd();
+        e.add(e1);
+        e.add(e2);
+        return e;
+    }
 }
