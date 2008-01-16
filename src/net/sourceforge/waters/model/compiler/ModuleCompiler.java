@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.module
 //# CLASS:   ModuleCompiler
 //###########################################################################
-//# $Id: ModuleCompiler.java,v 1.89 2008-01-14 15:21:33 markus Exp $
+//# $Id: ModuleCompiler.java,v 1.90 2008-01-16 13:33:15 markus Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.compiler;
@@ -26,6 +26,7 @@ import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.Set;
 
+import net.sourceforge.waters.model.base.DocumentProxy;
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.base.VisitorException;
 import net.sourceforge.waters.model.base.WatersRuntimeException;
@@ -136,6 +137,21 @@ public class ModuleCompiler extends AbstractModuleProxyVisitor
           // No marshaller --- O.K.
         }
       }
+      ModuleProxy module= (ModuleProxy) mModule.clone();
+      mContext = new CompilerContext(module);
+      mGlobalAlphabet = new TreeSet<EventProxy>();
+      mAutomata = new TreeMap<String, AutomatonProxy>();
+      if (bindings != null) {
+        mParameterMap = new TreeMap<String,CompiledParameterBinding>();
+        visitCollection(bindings);
+      }
+      mIsEFA = false;
+      isEFA(module.getComponentList());
+      if(mIsEFA){
+    	  ExtendedAutomata.expandTransitions((ModuleSubject)module);
+      }
+      visitModuleProxy(module);
+      /*
       mContext = new CompilerContext(mModule);
       mGlobalAlphabet = new TreeSet<EventProxy>();
       mAutomata = new TreeMap<String, AutomatonProxy>();
@@ -143,13 +159,18 @@ public class ModuleCompiler extends AbstractModuleProxyVisitor
         mParameterMap = new TreeMap<String,CompiledParameterBinding>();
         visitCollection(bindings);
       }
+     */
       /*
        * mIsEFA is set to true if a component in mModule has a non-empty GuardActionBlock. 
        */
+      /*
       mIsEFA = false;
       isEFA(mModule.getComponentList());
-      
+      if(mIsEFA){
+    	  ExtendedAutomata.expandTransitions((ModuleSubject)mModule);
+      }
       visitModuleProxy(mModule);
+      */
       return mDESFactory.createProductDESProxy
         (name, comment, desLocation, mGlobalAlphabet, mAutomata.values());
     } catch (final VisitorException exception) {
