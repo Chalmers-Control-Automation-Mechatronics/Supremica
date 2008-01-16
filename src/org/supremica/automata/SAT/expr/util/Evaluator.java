@@ -15,9 +15,19 @@ public class Evaluator
 {
     public static boolean Evaluate(Expr n, Environment env) {
         switch(n.type){
+        case MAND:
+            for(Expr e: (mAnd)n)
+                if(!Evaluate(e,env))
+                    return false;
+            return true;
         case AND:
             return Evaluate(((And)n).left, env) && 
                     Evaluate(((And)n).right, env) ;
+        case MOR:
+            for(Expr e: (mOr)n)
+                if(Evaluate(e,env))
+                    return true;
+            return false;
         case OR:
             return Evaluate(((Or)n).left, env) ||
                     Evaluate(((Or)n).right, env) ;

@@ -21,7 +21,7 @@ public class ConverterBoolToCnfSatNew {
     /** Convert to CNF (conjunction of disjunctions)
      * All variables should be already represented as boolean literals
      */
-    private static Expr convert(Expr node)           
+    public static Expr convert(Expr node)           
     {
         switch(node.type)
         {
@@ -173,6 +173,10 @@ public class ConverterBoolToCnfSatNew {
         mOr ors = new mOr();
         for(Expr e: node){           
             switch(e.type){
+                case MOR:
+                    for(Expr e1: (mOr)e)
+                        ors.add(e1);
+                    break;
                 case AND:
                     mAnd a1 = new mAnd();
                     a1.add(((And)e).left);
@@ -181,60 +185,80 @@ public class ConverterBoolToCnfSatNew {
                     break;
                 case MAND:
                     ands.add(e);
-//                    for(Expr e1: (mAnd)e)
-//                        ands.add(e1);
                     break;
                 case OR:
                     ors.add(((Or)e).left);
                     ors.add(((Or)e).right);
                     break;
-                case MOR:
-                    for(Expr e1: (mOr)e)
-                        ors.add(e1);
-                    break;
                 case LIT:
                     ors.add(e);
                     break;
-                //case NOT:
-                //    or.add(pushNegationDown(((Not)e).child));
-                //    break;
+                case NOT:
+                    //ors.add(pushNegationDown(((Not)e).child));
+                    throw new IllegalArgumentException(
+                            "Unexpected NOT. removeNegations first");
                 default:
                     throw new IllegalArgumentException(
                             "Illegal node type: " 
-                            + node.type.toString());                        
+                            + e.type.toString());                        
             }
         }
-        ands.add(ors);
+        if(ors.childs.size()>0)
+            ands.add(ors);
+        ArrayList<ArrayList<Expr>> fullList = new ArrayList<ArrayList<Expr>>();
         for(Expr e: ands){
+            ArrayList<Expr> smallList = new ArrayList<Expr>();
             switch(e.type){
                 case MAND:
-                    
+                    for(Expr e1: (mAnd)e)
+                        smallList.add(e1);
                     break;
+                    
                 case MOR:
+                    smallList.add(e);
                     break;
                 default:
                     throw new IllegalArgumentException(
                             "Illegal node type: " 
                             + node.type.toString());                        
             }
+            fullList.add(smallList);
         }
-        return ;
+        ArrayList<ArrayList<Expr>> resList = permutes(fullList);
+        mAnd res = new mAnd();
+        for(ArrayList<Expr> smallList: resList){
+            mOr o = new mOr();
+            for(Expr e: smallList)
+                o.add(e);
+            if(o.childs.size()>0)
+                res.add(o);
+        }
+
+        return res;
     }
     
-    public ArrayList<ArrayList<Expr>> concats(ArrayList<ArrayList<Expr>> source){
+    public static ArrayList<ArrayList<Expr>> permutes(
+            ArrayList<ArrayList<Expr>> source){
+        
         ArrayList<ArrayList<Expr>> res = new ArrayList<ArrayList<Expr>>();
+        ArrayList<Expr> lead = new ArrayList<Expr>();
         if(source.size()>0){
             ArrayList<Expr> cur = source.remove(0);//source.get(0);
             for(Expr e: cur){
-                ArrayList<Expr> nl = new ArrayList<Expr>();
-                nl.add(e);
-                res.add(nl);
+                lead.add(e);
             }
             
-            ArrayList<ArrayList<Expr>> next = concats(source);
-            for(ArrayList<Expr> resElem: res){
-                for(ArrayList<Expr> nextElem: next){
+            ArrayList<ArrayList<Expr>> next = permutes(source);
+            for(Expr leadElem: lead){
+                if(next.size()<1){
+                    ArrayList<Expr> resElem = new ArrayList<Expr>();
+                    resElem.add(leadElem);
+                    res.add(resElem);                    
+                } else for(ArrayList<Expr> nextElem: next){
+                    ArrayList<Expr> resElem = new ArrayList<Expr>();
+                    resElem.add(leadElem);
                     resElem.addAll(nextElem);
+                    res.add(resElem);
                 }
             }            
         }

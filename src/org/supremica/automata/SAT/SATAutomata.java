@@ -265,7 +265,7 @@ public class SATAutomata {
     {
         ObjectFactory f = new ObjectFactory();
 
-        Instance inst = f.createInstance ();
+        org.supremica.automata.SAT.generated.CSPbinding.Instance inst = f.createInstance ();
 
         int TotalSteps = 5;
 
