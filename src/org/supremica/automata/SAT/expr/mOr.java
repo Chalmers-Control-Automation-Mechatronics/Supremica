@@ -23,7 +23,19 @@ public class mOr extends Expr  implements Iterable<Expr> {
             add(e);
     }
     public void add(Expr n){
-        childs.add(n);
+        switch(n.type){
+            case MOR:
+                for(Expr e: (mOr)n)
+                    childs.add(e);
+                break;
+            case MAND:
+                if( ((mAnd)n).childs.size()>0)
+                    childs.add(n);
+                break;
+            default:
+                childs.add(n);
+                break;
+        }
     }
     public Iterator<Expr> iterator(){
         return childs.iterator();            

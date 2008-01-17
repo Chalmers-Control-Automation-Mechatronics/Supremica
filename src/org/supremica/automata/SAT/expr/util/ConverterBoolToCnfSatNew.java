@@ -18,15 +18,13 @@ public class ConverterBoolToCnfSatNew {
     /** Convert to CNF (conjunction of disjunctions)
      * All variables should be already represented as boolean literals
      */
-    /** Convert to CNF (conjunction of disjunctions)
-     * All variables should be already represented as boolean literals
-     */
-    public static Expr convert(Expr node)           
+    public static Expr convert(Expr node)
     {
         switch(node.type)
         {
             case NOT:
-                return convert(pushNegationDown(((Not)node).child));
+                return convert(ConverterToNonNegated.pushNegationDown(
+                        ((Not)node).child));
             case AND:
                 Expr left  = ((And)node).left;
                 Expr right = ((And)node).right;
@@ -48,58 +46,9 @@ public class ConverterBoolToCnfSatNew {
                         + node.type.toString());
         }
     }
-    
-    
-    /**
-     * !(a&b) = !a | !b
-     * !(a|b) = !a & !b
-     */
-    static Expr pushNegationDown(Expr c)
-    {
-        //Expr c = node.child;
-        switch(c.type)
-        {
-            case AND:
-                And a = (And)c;
-                return (
-                        new Or( 
-                            pushNegationDown(a.left), 
-                            pushNegationDown(a.right) 
-                         
-                        ));                
-            case OR:                
-                Or o = (Or)c;
-                return (
-                        new And(
-                            pushNegationDown(o.left), 
-                            pushNegationDown(o.right)
-                        
-                        ));                
-            case MOR:
-                mAnd ma = new mAnd();
-                for(Expr n1: (mOr)c)
-                    ma.add(pushNegationDown(n1));
-                return ma;
-            case MAND:
-                mOr mo = new mOr();
-                for(Expr n1: (mAnd)c)
-                    mo.add(pushNegationDown(n1));                
-                return mo;            
-            case NOT:
-                return (((Not)c).child);
-            case LIT:
-                Literal l = (Literal)c;
-                return new Literal(l.variable, !l.isPositive);
-            default:
-                throw new IllegalArgumentException(
-                        "Illegal child node type: " 
-                        + c.type.toString());
-
-        }        
-    }
-    
+        
     /** (a&b)|c = (a|c)&(b|c) */
-    static Expr toCNFPushDisjunctionDown(Or node)
+    private static Expr toCNFPushDisjunctionDown(Or node)
     {
         Expr left  = node.left;
         Expr right = node.right;
@@ -131,43 +80,11 @@ public class ConverterBoolToCnfSatNew {
         }                            
     }
     
-    public static boolean isInCNF(Expr n){
-        return isInCNF(n, false);
-    }
-    private static boolean isInCNF(Expr n, boolean seenOr)
-    {
-        switch(n.type)
-        {
-        case LIT:
-            return true;
-        case AND:
-            And a = (And)n;
-            return !seenOr && 
-                    isInCNF(a.left, seenOr) && 
-                    isInCNF(a.right, seenOr);
-        case MAND:
-            if(seenOr)
-                return false;
-            for(Expr n1: (mAnd)n)
-                if(!isInCNF(n1, seenOr))
-                    return false;
-            return true;
-        case OR:
-            Or o = (Or)n;
-            return isInCNF(o.left, true) && 
-                    isInCNF(o.right, true);
-        case MOR:
-            for(Expr n1: (mOr)n)
-                if(!isInCNF(n1, true))
-                    return false;
-            return true;                
-        default:
-            return false;
-        }
-    }
-    /** (a&b)|c = (a|c)&(b|c) */
-    /* a|b|(d&e)|f = a|b|d|f & a|b|e|f  */
-    static Expr toCNFPushDisjunctionDown(mOr node)
+    /** (a&b)|c = (a|c)&(b|c) 
+     * a|b|(d&e)|f = a|b|d|f & a|b|e|f  
+     * (a&b)|(c&d)|e = ace ade bce bde      
+     */
+    private static Expr toCNFPushDisjunctionDown(mOr node)
     {
         ArrayList<Expr> ands = new ArrayList<Expr>();
         mOr ors = new mOr();
@@ -196,7 +113,7 @@ public class ConverterBoolToCnfSatNew {
                 case NOT:
                     //ors.add(pushNegationDown(((Not)e).child));
                     throw new IllegalArgumentException(
-                            "Unexpected NOT. removeNegations first");
+                            "Unexpected NOT in mOr. convertToNonNegated first");
                 default:
                     throw new IllegalArgumentException(
                             "Illegal node type: " 
@@ -236,8 +153,21 @@ public class ConverterBoolToCnfSatNew {
 
         return res;
     }
-    
-    public static ArrayList<ArrayList<Expr>> permutes(
+    /**
+     * ab cd ef -> 
+     * a c e
+     * a c f
+     * a d e
+     * a d f
+     * b c e
+     * b c f
+     * b d e
+     * b d f
+     * 
+     * @param source
+     * @return
+     */
+    private static ArrayList<ArrayList<Expr>> permutes(
             ArrayList<ArrayList<Expr>> source){
         
         ArrayList<ArrayList<Expr>> res = new ArrayList<ArrayList<Expr>>();

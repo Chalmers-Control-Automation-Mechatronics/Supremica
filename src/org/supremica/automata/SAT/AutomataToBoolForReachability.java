@@ -109,7 +109,7 @@ public class AutomataToBoolForReachability implements IAutomataToBool
         System.err.println(" done");
                        
         System.err.print("Converting to non-negated...");
-        Expr nBC = ConverterToNonNegated.convert(nB);
+        Expr nBC = ConverterToNonNegatedOld.convert(nB);
         System.err.println(" done");        
         
         System.err.print("Flattening expression tree...");

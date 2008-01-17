@@ -81,7 +81,7 @@ public class AutomataToBoolForDeadlock implements IAutomataToBool
         //System.err.println(" done");        
         
         System.err.print("Removing negations...");
-        Expr nNB = ConverterToNonNegated.convert(nB);
+        Expr nNB = ConverterToNonNegatedOld.convert(nB);
         System.err.println(" done");                        
                 
         System.err.print("Flattening expression tree...");
