@@ -939,7 +939,7 @@ class SequentialExecModelBuilder extends ModelBuilder
 		
 		// the maximum number of FB instances in the queue at the same time
 		int places = basicFunctionBlocks.keySet().size();
-		if (instanceQueuePlaces != 0)
+		if (instanceQueuePlaces > 0 && instanceQueuePlaces <= places)
 		{
 			places = instanceQueuePlaces.intValue();
 		}
@@ -1252,7 +1252,7 @@ class SequentialExecModelBuilder extends ModelBuilder
 		
 		// the maximum number of events in the queue at the same time
 		int places = ((Integer) eventsMaxID.get(fbName)).intValue();	
-		if (eventQueuePlaces != 0)
+		if (eventQueuePlaces > 0 && eventQueuePlaces <= places )
 		{
 			places = eventQueuePlaces.intValue();
 		}
@@ -1364,6 +1364,9 @@ class SequentialExecModelBuilder extends ModelBuilder
 				}
 			}
 		}
+
+		// first queue element pointer
+		eventQueue.addIntegerVariable("event_" + fbName + "_first", 1, places, 1, 0);
 		
 		String from = "";
 		String to = "";
@@ -1446,38 +1449,41 @@ class SequentialExecModelBuilder extends ModelBuilder
 					nameCounter++;
 					eventQueue.addState(to);
 					event = "queue_event_" + eventName + "_" + fbName + ";";
-					guard = null;
-					action = "event_place_" + i + "_" + fbName + " = " + eventID + ";";
-					if (curEvent.isSetWith())
+					for (int j = 1; j <= places; j++)
 					{
-						List withData = curEvent.getWith();
-						for (Iterator withIter = withData.iterator(); withIter.hasNext();)
+						guard = "event_" + fbName + "_first == " + j;
+						action = "event_place_" + ((((j-1)+(i-1)) % places) + 1) + "_" + fbName + " = " + eventID + ";";
+						if (curEvent.isSetWith())
 						{
-							String curWith = ((With) withIter.next()).getVar();
-							if (isDataConnected(fbName, curWith))
-							{														
-								String cntFrom = (String) ((Map) dataConnections.get(fbName)).get(curWith);
-								String fromInstance = getInstanceName(cntFrom);
-								String fromSignal = getSignalName(cntFrom);				
-								if (fromInstance.equals(""))
-								{
-									// constant data connection
-									action = action + 
-										"data_place_" + i + "_" + curWith + "_" + fbName + 
-										" = " + new Integer(fromSignal) + ";";
-								}
-								else
-								{
-									// instance data connection
-									action = action + 
-										"data_place_" + i + "_" + curWith + "_" + fbName + 
-										" = data_" + fromSignal + "_" + fromInstance + ";";
+							List withData = curEvent.getWith();
+							for (Iterator withIter = withData.iterator(); withIter.hasNext();)
+							{
+								String curWith = ((With) withIter.next()).getVar();
+								if (isDataConnected(fbName, curWith))
+								{														
+									String cntFrom = (String) ((Map) dataConnections.get(fbName)).get(curWith);
+									String fromInstance = getInstanceName(cntFrom);
+									String fromSignal = getSignalName(cntFrom);				
+									if (fromInstance.equals(""))
+									{
+										// constant data connection
+										action = action + 
+											"data_place_" + ((((j-1)+(i-1)) % places) + 1) + "_" + curWith + "_" + fbName + 
+											" = " + new Integer(fromSignal) + ";";
+									}
+									else
+									{
+										// instance data connection
+										action = action + 
+											"data_place_" + ((((j-1)+(i-1)) % places) + 1) + "_" + curWith + "_" + fbName + 
+											" = data_" + fromSignal + "_" + fromInstance + ";";
+									}
 								}
 							}
 						}
+						eventQueue.addTransition(from, to, event, guard, action);
 					}
-					eventQueue.addTransition(from, to, event, guard, action);
-					
+
 					from = to;
 					to = "s" + (places + nameCounter);
 					nameCounter++;
@@ -1508,46 +1514,33 @@ class SequentialExecModelBuilder extends ModelBuilder
 					nameCounter++;
 					eventQueue.addState(to);
 					event = "remove_event_" + fbName + ";";
-					guard = "event_place_1_" + fbName + " == " + eventID;
-					action = "event_" + eventName + "_" + fbName + " = 1;";
-					// move events in the queue
-					for (int j = 1; j <= i-1; j++)
+					for (int j = 1; j <= places; j++)
 					{
-						action = action + "event_place_" + j + "_" + fbName +  " = event_place_" + (j+1) + "_" + fbName + ";";
-					}
-					action = action + "event_place_" + i + "_" + fbName +  " = 0;";
-					if (curEvent.isSetWith())
-					{
-						List withData = curEvent.getWith();
+						guard = "(event_" + fbName + "_first == " + j + ") & ";
+						guard = guard + "(event_place_" + j + "_" + fbName + " == " + eventID + ")";
+						action = "event_" + eventName + "_" + fbName + " = 1;";
+						action = action + "event_" + fbName + "_first = " + ((j % places) + 1) + ";";				
+						action = action + "event_place_" + j + "_" + fbName +  " = 0;";
+						if (curEvent.isSetWith())
+						{
+							List withData = curEvent.getWith();
 						
-						// get first data in the queue
-						for (Iterator withIter = withData.iterator(); withIter.hasNext();)
-						{
-							String curWith = ((With) withIter.next()).getVar();
-							if (isDataConnected(fbName, curWith))
-							{														
-								action = action + 
-									"data_" + curWith + "_" + fbName + " = data_place_" + i + "_" + curWith + "_" + fbName + ";";
-							}
-						}
-						// move the queue
-						for (Iterator withIter = withData.iterator(); withIter.hasNext();)
-						{
-							String curWith = ((With) withIter.next()).getVar();
-							if (isDataConnected(fbName, curWith))
-							{														
-								for (int j = 1; j <= i-1; j++)
-								{
+							// get first data in the queue
+							for (Iterator withIter = withData.iterator(); withIter.hasNext();)
+							{
+								String curWith = ((With) withIter.next()).getVar();
+								if (isDataConnected(fbName, curWith))
+								{														
 									action = action + 
-										"data_place_" + j + "_" + curWith + "_" + fbName + " = data_place_" + (j+1) + "_" + curWith + "_" + fbName + ";";						
+										"data_" + curWith + "_" + fbName + " = data_place_" + j + "_" + curWith + "_" + fbName + ";";
+									action = action + 
+										"data_place_" + j + "_" + curWith + "_" + fbName + " = 0;";
 								}
-								action = action + 
-									"data_place_" + i + "_" + curWith + "_" + fbName + " = 0;";
 							}
 						}
-					}
-					eventQueue.addTransition(from, to, event, guard, action);
-					
+						eventQueue.addTransition(from, to, event, guard, action);
+					}					
+
 					from = to;
 					to = "s" + (i-1);
 					event = "reset_event_" + eventName + "_" + fbName + ";";

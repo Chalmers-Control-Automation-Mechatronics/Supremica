@@ -166,15 +166,15 @@ class ModelMaker
 	{
 		ModelBuilder theBuilder;
 
-		if(arguments.get("execModel") == null || arguments.get("execModel").equals("dual"))
-		{
-			Logger.output("ModelMaker.makeModel(): Making EFA model for the dual execution model.");
-			theBuilder = new DualExecModelBuilder(arguments);
-		}
-		else
+		if(arguments.get("execModel") == null || arguments.get("execModel").equals("seq"))
 		{
 			Logger.output("ModelMaker.makeModel(): Making EFA model for the sequential execution model.");
 			theBuilder = new SequentialExecModelBuilder(arguments);
+		}
+		else
+		{
+			Logger.output("ModelMaker.makeModel(): Making EFA model for the dual execution model.");
+			theBuilder = new DualExecModelBuilder(arguments);
 		}
 			
 		Logger.output("ModelMaker.makeModel(): Loading the System -------------------------------------");
