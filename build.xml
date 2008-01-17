@@ -33,8 +33,8 @@
     <property name="supremica_basepackage" value="org.supremica"/>
     <property name="supremica_basedir" value="org/supremica"/>
     
-    <property name="jgrafchart_basepackage" value="org.jgrafchart"/>
-    <property name="jgrafchart_basedir" value="org/jgrafchart"/>
+    <!--property name="jgrafchart_basepackage" value="org.jgrafchart"/>
+    <property name="jgrafchart_basedir" value="org/jgrafchart"/-->
     
     <property name="project.name" value="Supremica"/>
     <property name="backup.dir" value="../backup"/>
@@ -267,8 +267,7 @@
                deprecation="false"
                verbose="false"
                nowarn="true"
-               excludes="${jgrafchart_basedir}/**,
-                  ${supremica_basedir}/external/robotCoordination/**,
+               excludes="${supremica_basedir}/external/robotCoordination/**,
                   net/sourceforge/waters/mbt/**"
                source="1.5"
                fork="true"
@@ -289,8 +288,7 @@
                deprecation="false"
                verbose="false"
                nowarn="true"
-               excludes="${jgrafchart_basedir}/**,
-               ${supremica_basedir}/external/robotCoordination/**"
+               excludes="${supremica_basedir}/external/robotCoordination/**"
                source="1.5"
                fork="true"
                memoryMaximumSize="128M">

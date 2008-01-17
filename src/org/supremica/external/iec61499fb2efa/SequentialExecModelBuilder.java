@@ -945,39 +945,49 @@ class SequentialExecModelBuilder extends ModelBuilder
 		}
 
 		instanceQueue.addIntegerVariable("current_fb", 0, fbMaxID, 0, 0);
+		instanceQueue.addIntegerVariable("fb_first", 1, places, 1, 0);
 		
 		instanceQueue.addInitialState("s0");
-		for (int i = 1; i <= places; i++)
-		{
-			instanceQueue.addIntegerVariable("fb_place_" + i, 0, fbMaxID, 0, 0);
+		for (int i = 0; i <= (places - 1); i++)
+		{			
+			instanceQueue.addIntegerVariable("fb_place_" + (i+1), 0, fbMaxID, 0, 0);
 
-			instanceQueue.addState("s" + i);
-			//Transiton when queuing instance
-			String from = "s" + (i-1);
-			String to = "s" + i;
+			instanceQueue.addState("s" + (i+1));
+
+			String from = "s" + i;
+			String to = "s" + (i+1);
 			String event = "";
+			String guard = "";
 			String action = "";
+			
+			//Transiton when queuing instance
+			// i is number of blocks in queue when making the transition
 			for (Iterator fbIter = basicFunctionBlocks.keySet().iterator(); fbIter.hasNext();)
 			{
 				String fbName = (String) fbIter.next();		
 				Integer fbID = (Integer) basicFunctionBlocksID.get(fbName);
-
+				
 				event = "queue_fb_" + fbName + ";";
-				action = "fb_place_" + i + " = " + fbID + ";";
-				instanceQueue.addTransition(from, to, event, null, action);
+				for (int j = 1; j<=places; j++)
+				{
+					guard = "fb_first == " + j;
+					action = "fb_place_" + ((((j-1)+i) % places) + 1) + " = " + fbID + ";";
+					instanceQueue.addTransition(from, to, event, guard, action);
+				}
 			}
-
+			
 			// Transiton when dequeuing instance
-			from = "s" + i;
-			to = "s" + (i-1);
+			from = "s" + (i+1);
+			to = "s" + i;
 			event = "remove_fb;";      
-			action = "current_fb = fb_place_1;";
-			for (int j = 1; j <= i-1; j++)
+			for (int j = 1; j<=places; j++)
 			{
-				action = action + "fb_place_" + j + " = fb_place_" + (j+1) + ";";
+				guard = "fb_first == " + j;
+				action = "current_fb = fb_place_" + j + ";";
+				action = action + "fb_first = " + ((j % places) + 1) + ";";
+				action = action + "fb_place_" + j + " = 0;";
+				instanceQueue.addTransition(from, to, event, guard, action);
 			}
-			action = action + "fb_place_" + i + " = 0;";
-			instanceQueue.addTransition(from, to, event, null, action);      
 		}
 		automata.addAutomaton(instanceQueue);
 	}

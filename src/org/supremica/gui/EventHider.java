@@ -22,7 +22,6 @@ import org.supremica.automata.Automaton;
 import org.supremica.automata.Alphabet;
 import org.supremica.automata.AlphabetHelpers;
 import org.supremica.gui.ide.actions.IDEActionInterface;
-import org.supremica.gui.*;
 
 /**
  * Lets the user choose events to be hidden.
