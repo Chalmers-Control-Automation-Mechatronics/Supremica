@@ -193,18 +193,23 @@ public class ExtendedAutomata
 					// get actions
 					List <BinaryExpressionProxy> curActions = curBlock.getActions();
 					String actionsText = "";
+					String origActionsText = "";
 					if (curActions.size() > 0 )
 					{
 						Logger.output(Logger.DEBUG, "ExtendedAutomata.expandTransitions(): Actions", 3);
-						for(BinaryExpressionProxy action: curActions){
-							actionsText = actionsText + action.toString() + "; ";	
-						}
-						/*
 						for (Iterator iter = curActions.iterator(); iter.hasNext();)
 						{
-							actionsText = actionsText + ((BinaryExpressionProxy) iter.next()).getPlainText() + "; ";
+							BinaryExpressionProxy curAction = (BinaryExpressionProxy) iter.next();
+							actionsText = actionsText + curAction.toString() + "; ";
+							if (iter.hasNext())
+							{
+								origActionsText = origActionsText + curAction.toString() + "; ";
+							}
+							else
+							{
+								origActionsText = origActionsText + curAction.toString();
+							}
 						}
-						*/
 						Logger.output(Logger.DEBUG, actionsText, 4);
 					}
 
@@ -408,141 +413,150 @@ public class ExtendedAutomata
 
 									// count through all actions expression identifers and evaluate the actions
 									// initialize couters and upper bounds maps
-									Map actionsIdentCounters = new LinkedHashMap();
-									Map actionsIdentUpperBounds = new HashMap();
-									Map actionsIdentLowerBounds = new HashMap();
-									Logger.output(Logger.DEBUG,"ExtendedAutomata.expandTransitions(): Initializing actions identifiers counters", 3);
-									for (Iterator iter = actionsExpressionIdents.iterator(); iter.hasNext();)
+									if (actionsExpressionIdents.size()>0)
 									{
-										String curIdent = (String) iter.next();
-										VariableComponentProxy curModuleVariable = (VariableComponentProxy) moduleVariables.get(curIdent);
-
-										Logger.output(Logger.DEBUG, curIdent, 4);
-										
-										Integer lowerBound = VariableHelper.getLowerBound(curModuleVariable);
-										Integer upperBound = VariableHelper.getUpperBound(curModuleVariable);	
-										if (!actionsIdentCounters.keySet().contains(curIdent))
-										{
-											// intialize identifier to lower bound
-											actionsIdentCounters.put(curIdent, lowerBound);
-										}
-										if (!actionsIdentUpperBounds.keySet().contains(curIdent))
-										{
-											actionsIdentUpperBounds.put(curIdent, upperBound);
-										}
-										if (!actionsIdentLowerBounds.keySet().contains(curIdent))
-										{
-											actionsIdentLowerBounds.put(curIdent, lowerBound);
-										}
-									}
-									
-									// count up all identifiers and evaluate the actions
-									evaluator = null;
-									Variables updatedSymbols = null;
-									boolean keepCountingActions = true;
-									String oldGuard = guard;
-									Logger.output(Logger.DEBUG, "ExtendedAutomata.expandTransitions(): Counting actions identifiers", 3);
-									while (keepCountingActions)
-									{
-										Logger.output(Logger.DEBUG, actionsIdentCounters.toString(), 4);
-										
-										// set action expression symbols to counters
-										addToGuard = "";
+										Map actionsIdentCounters = new LinkedHashMap();
+										Map actionsIdentUpperBounds = new HashMap();
+										Map actionsIdentLowerBounds = new HashMap();
+										Logger.output(Logger.DEBUG,"ExtendedAutomata.expandTransitions(): Initializing actions identifiers counters", 3);
 										for (Iterator iter = actionsExpressionIdents.iterator(); iter.hasNext();)
 										{
 											String curIdent = (String) iter.next();
-											int value = ((Integer) actionsIdentCounters.get(curIdent)).intValue();
-											((IntegerVariable) symbols.getVariable(curIdent)).setValue(value);
-											addToGuard = addToGuard + curIdent + " == " + value;
-											if (iter.hasNext())
+											VariableComponentProxy curModuleVariable = (VariableComponentProxy) moduleVariables.get(curIdent);
+											
+											Logger.output(Logger.DEBUG, curIdent, 4);
+											
+											Integer lowerBound = VariableHelper.getLowerBound(curModuleVariable);
+											Integer upperBound = VariableHelper.getUpperBound(curModuleVariable);	
+											if (!actionsIdentCounters.keySet().contains(curIdent))
 											{
-												addToGuard = addToGuard + " & ";
+												// intialize identifier to lower bound
+												actionsIdentCounters.put(curIdent, lowerBound);
+											}
+											if (!actionsIdentUpperBounds.keySet().contains(curIdent))
+											{
+												actionsIdentUpperBounds.put(curIdent, upperBound);
+											}
+											if (!actionsIdentLowerBounds.keySet().contains(curIdent))
+											{
+												actionsIdentLowerBounds.put(curIdent, lowerBound);
 											}
 										}
 										
-										if (!addToGuard.equals(""))
+										// count up all identifiers and evaluate the actions
+										evaluator = null;
+										Variables updatedSymbols = null;
+										boolean keepCountingActions = true;
+										String oldGuard = guard;
+										Logger.output(Logger.DEBUG, "ExtendedAutomata.expandTransitions(): Counting actions identifiers", 3);
+										while (keepCountingActions)
 										{
-											guard = oldGuard + " & " + addToGuard;
-										}
-
-										// evaluate the actions
-										if (evaluator == null)
-										{
-											evaluator = new Evaluator(symbols);
-										}
-										else
-										{
-											evaluator.setVariables(symbols);
-										}
-										updatedSymbols = (Variables) evaluator.evaluateNonSequentially(actionsSyntaxTree);
-										
-										// make new actions
-										String actions = "";
-										for (Iterator iter = actionsAssignmentIdents.iterator(); iter.hasNext();)
-										{
-											String curIdent = (String) iter.next();
-											int value = ((IntegerVariable) updatedSymbols.getVariable(curIdent)).getValue().intValue();
+											Logger.output(Logger.DEBUG, actionsIdentCounters.toString(), 4);
 											
-											actions = actions + curIdent + " = " + value + ";";
-										}
-										
-										// mark new edge for adding
-										addEdges.add(makeTransition((NodeProxy) source/*.clone()*/, (NodeProxy) target/*.clone()*/, 
-												(LabelBlockProxy) curLabel.clone(), guard, actions));
-										
-										// increase actions ident counters
-										List atUpperBound = new LinkedList();
-										for (Iterator countIter = actionsIdentCounters.keySet().iterator(); countIter.hasNext();)
-										{
-											String curIdent = (String) countIter.next();
-											int value = ((Integer) actionsIdentCounters.get(curIdent)).intValue();
-											int upperBound = ((Integer) actionsIdentUpperBounds.get(curIdent)).intValue();
-											
-											if (value < upperBound)
+											// set action expression symbols to counters
+											addToGuard = "";
+											for (Iterator iter = actionsExpressionIdents.iterator(); iter.hasNext();)
 											{
-												actionsIdentCounters.put(curIdent, new Integer(value + 1));
-												if (atUpperBound.size() > 0)
+												String curIdent = (String) iter.next();
+												int value = ((Integer) actionsIdentCounters.get(curIdent)).intValue();
+												((IntegerVariable) symbols.getVariable(curIdent)).setValue(value);
+												addToGuard = addToGuard + curIdent + " == " + value;
+												if (iter.hasNext())
 												{
-													for (Iterator iter = atUpperBound.iterator(); iter.hasNext();)
-													{
-														String curAtBound = (String) iter.next();
-														int lowerBound = ((Integer) actionsIdentLowerBounds.get(curAtBound)).intValue();
-														
-														actionsIdentCounters.put(curAtBound, new Integer(lowerBound));
-													}
-													atUpperBound.clear();
+													addToGuard = addToGuard + " & ";
 												}
-												break;
+											}
+											
+											if (!addToGuard.equals(""))
+											{
+												guard = oldGuard + " & " + addToGuard;
+											}
+											
+											// evaluate the actions
+											if (evaluator == null)
+											{
+												evaluator = new Evaluator(symbols);
 											}
 											else
 											{
-												atUpperBound.add(curIdent);
+												evaluator.setVariables(symbols);
 											}
+											updatedSymbols = (Variables) evaluator.evaluateNonSequentially(actionsSyntaxTree);
+											
+											// make new actions
+											String actions = "";
+											for (Iterator iter = actionsAssignmentIdents.iterator(); iter.hasNext();)
+											{
+												String curIdent = (String) iter.next();
+												int value = ((IntegerVariable) updatedSymbols.getVariable(curIdent)).getValue().intValue();
+												
+												actions = actions + curIdent + " = " + value + ";";
+											}
+											
+											// mark new edge for adding
+											addEdges.add(makeTransition((NodeProxy) source/*.clone()*/, (NodeProxy) target/*.clone()*/, 
+																		(LabelBlockProxy) curLabel.clone(), guard, actions));
+										
+											// increase actions ident counters
+											List atUpperBound = new LinkedList();
+											for (Iterator countIter = actionsIdentCounters.keySet().iterator(); countIter.hasNext();)
+											{
+												String curIdent = (String) countIter.next();
+												int value = ((Integer) actionsIdentCounters.get(curIdent)).intValue();
+												int upperBound = ((Integer) actionsIdentUpperBounds.get(curIdent)).intValue();
+												
+												if (value < upperBound)
+												{
+													actionsIdentCounters.put(curIdent, new Integer(value + 1));
+													if (atUpperBound.size() > 0)
+													{
+														for (Iterator iter = atUpperBound.iterator(); iter.hasNext();)
+														{
+															String curAtBound = (String) iter.next();
+															int lowerBound = ((Integer) actionsIdentLowerBounds.get(curAtBound)).intValue();
+															
+															actionsIdentCounters.put(curAtBound, new Integer(lowerBound));
+														}
+														atUpperBound.clear();
+													}
+													break;
+												}
+												else
+												{
+													atUpperBound.add(curIdent);
+												}
+											}
+											
+											// calculate keepCoutingActions condition
+											keepCountingActions = (atUpperBound.size() != actionsIdentCounters.keySet().size()); 
 										}
-
-										// calculate keepCoutingActions condition
-										keepCountingActions = (atUpperBound.size() != actionsIdentCounters.keySet().size()); 
+									}
+									else
+									{
+										// mark new edge for adding
+										addEdges.add(makeTransition((NodeProxy) source/*.clone()*/, (NodeProxy) target/*.clone()*/, 
+																	(LabelBlockProxy) curLabel.clone(), guard, origActionsText));
 									}
 								}
 								else
 								{
 									// mark new edge for adding
 									addEdges.add(makeTransition((NodeProxy) source/*.clone()*/, (NodeProxy) target/*.clone()*/, 
-											(LabelBlockProxy) curLabel.clone(), guard, ""));
+																(LabelBlockProxy) curLabel.clone(), guard, ""));
 								}
 							}
-												
+
 							// increase guard ident counters
 							List atUpperBound = new LinkedList();
 							for (Iterator countIter = identCounters.keySet().iterator(); countIter.hasNext();)
 							{
-									String curIdent = (String) countIter.next();
-									int value = ((Integer) identCounters.get(curIdent)).intValue();
-									int upperBound = ((Integer) identUpperBounds.get(curIdent)).intValue();
+								String curIdent = (String) countIter.next();
+								int value = ((Integer) identCounters.get(curIdent)).intValue();
+								int upperBound = ((Integer) identUpperBounds.get(curIdent)).intValue();
 									
-									if (value < upperBound)
-									{
-										identCounters.put(curIdent, new Integer(value + 1));
+								if (value < upperBound)
+								{
+									identCounters.put(curIdent, new Integer(value + 1));
 									if (atUpperBound.size() > 0)
 									{
 										for (Iterator iter = atUpperBound.iterator(); iter.hasNext();)
@@ -672,7 +686,7 @@ public class ExtendedAutomata
 							
 							// mark new edge for adding
 							addEdges.add(makeTransition((NodeProxy) source/*.clone()*/, (NodeProxy) target/*.clone()*/,
-									(LabelBlockProxy) curLabel.clone(), guard, actions));
+														(LabelBlockProxy) curLabel.clone(), guard, actions));
 							
 							// increase actions ident counters
 							List atUpperBound = new LinkedList();
@@ -725,6 +739,8 @@ public class ExtendedAutomata
  				edges.add(iter.next());
  			}
 		}
+
+		writeModuleToFile(module ,"blah.wmod");
 
 		Logger.output("ExtendedAutomata.expandTransitions(): Done expanding transitions.");
 

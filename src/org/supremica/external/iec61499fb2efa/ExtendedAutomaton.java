@@ -160,12 +160,12 @@ public class ExtendedAutomaton
 		SimpleNodeSubject fromNode = (SimpleNodeSubject) graph.getNodesModifiable().get(from);
 		if (fromNode == null)
 		{
-			System.out.println("ExtendedAutomaton.addNormalTransition(): From node " + from + " does not exist!");
+			System.out.println("ExtendedAutomaton.addTransition(): From node " + from + " does not exist!");
 		}
 		SimpleNodeSubject toNode = (SimpleNodeSubject) graph.getNodesModifiable().get(to);
 		if (toNode == null)
 		{
-			System.out.println("ExtendedAutomaton.addNormalTransition(): To node " + to + " does not exist!");
+			System.out.println("ExtendedAutomaton.addTransition(): To node " + to + " does not exist!");
 		}
 			
 		// parse label into event name list and make LabelBlockSubject 
@@ -199,7 +199,7 @@ public class ExtendedAutomaton
 		}
 		catch (ParseException exception)
 		{
-			System.out.println("ExtendedAutomaton.addNormalTransition(): Syntax error in guard!");
+			System.out.println("ExtendedAutomaton.addTransition(): Syntax error in guard!");
 			System.out.println("\t automaton: " + name);
 			System.out.print("\t from: " + from);
 			System.out.println(" to: " + to);
@@ -231,7 +231,7 @@ public class ExtendedAutomaton
 					}
 					catch (ParseException exception)
 					{
-						System.out.println("ExtendedAutomaton.addNormalTransition(): Syntax error in action!");
+						System.out.println("ExtendedAutomaton.addTransition(): Syntax error in action!");
 						System.out.println("\t automaton: " + name);
 						System.out.print("\t from: " + from);
 						System.out.println(" to: " + to);
@@ -242,7 +242,7 @@ public class ExtendedAutomaton
 					}
 					catch (TypeMismatchException exception)
 					{
-						System.out.println("ExtendedAutomaton.addNormalTransition(): Type mismatch error in action!");
+						System.out.println("ExtendedAutomaton.addTransition(): Type mismatch error in action!");
 						System.out.println("\t automaton: " + name);
 						System.out.print("\t from: " + from);
 						System.out.println(" to: " + to);
