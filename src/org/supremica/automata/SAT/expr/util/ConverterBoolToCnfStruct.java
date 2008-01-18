@@ -77,7 +77,7 @@ public class ConverterBoolToCnfStruct {
                         enn.add(e1);
                 }
                 // convert the rest that was not replaced
-                en = ConverterBoolToCnfSatNew.convert(enn);
+                en = ConverterBoolToCnfSat.convert(enn);
                 return new Pair(en, et);
             case LIT:
                 return new Pair(e, new mAnd());

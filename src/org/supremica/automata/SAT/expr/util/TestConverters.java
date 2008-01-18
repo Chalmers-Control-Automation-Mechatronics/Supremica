@@ -44,11 +44,11 @@ public class TestConverters {
 
         System.out.println(ExhaustiveSearch.isSatisfiable(e, env));
         System.out.println(ExhaustiveSearch.isSatisfiable(
-                ConverterBoolToCnfSatNew.convert(e), env));
+                ConverterBoolToCnfSat.convert(e), env));
         
         System.out.println("toCnfSatNew:");
         System.out.println(PrinterInfix.print(
-                ConverterBoolToCnfSatNew.convert(e)));
+                ConverterBoolToCnfSat.convert(e)));
         
         ConverterBoolToCnfStruct conv = new ConverterBoolToCnfStruct(env);
         Expr es = conv.convertAll(e);

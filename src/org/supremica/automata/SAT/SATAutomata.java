@@ -73,7 +73,7 @@ public class SATAutomata {
             atb = new AutomataToBoolForDeadlock(ats, totalSteps);
         }
         else {
-            throw new IllegalArgumentException("no task (MSR or CV expected)");
+            throw new IllegalArgumentException("no task (MSR or CV or DV expected)");
         }
         PrintWriter cnfFile = new PrintWriter(System.out);
         if(args[2].equalsIgnoreCase("--DimacsSat")){

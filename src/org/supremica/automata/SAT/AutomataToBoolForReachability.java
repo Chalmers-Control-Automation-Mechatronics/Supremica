@@ -80,7 +80,7 @@ public class AutomataToBoolForReachability implements IAutomataToBool
         System.err.println(" done");
                        
         System.err.print("Converting to CNF...");
-        Expr nBC = ConverterBoolToCnfSat.convertAll(nB);
+        Expr nBC = ConverterBoolToCnfSatOld.convertAll(nB);
         System.err.println(" done");        
         
         System.err.print("Flattening expression tree...");

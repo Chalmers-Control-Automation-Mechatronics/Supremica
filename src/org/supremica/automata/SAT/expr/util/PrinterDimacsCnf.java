@@ -14,7 +14,7 @@ import  java.io.PrintWriter;
  */
 public class PrinterDimacsCnf /*implements IPrinter*/ {
     public static String print(Expr n){
-        if(!ConverterBoolToCnfSat.isInCNF(n))
+        if(!CheckerIfInCnf.isInCNF(n))
             throw new IllegalArgumentException("expression is not in CNF");
         
         StringBuffer s;
@@ -43,7 +43,7 @@ public class PrinterDimacsCnf /*implements IPrinter*/ {
         
     }
     public static void print(Expr n, PrintWriter out){
-        if(!ConverterBoolToCnfSat.isInCNF(n))
+        if(!CheckerIfInCnf.isInCNF(n))
             throw new IllegalArgumentException("expression is not in CNF");
         
         switch(n.type)

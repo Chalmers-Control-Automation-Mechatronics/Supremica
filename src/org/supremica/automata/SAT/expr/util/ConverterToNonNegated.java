@@ -63,7 +63,7 @@ public class ConverterToNonNegated {
      * @param c  child node of NOT
      * @return   expression with removed NOT
      */
-    static Expr pushNegationDown(Expr c) {
+    public static Expr pushNegationDown(Expr c) {
         //Expr c = node.child;
 
         switch (c.type) {
