@@ -56,60 +56,11 @@ import net.sourceforge.waters.xsd.base.EventKind;
 import org.supremica.automata.VariableHelper;
 
 
-public class ExtendedAutomata
+public class ExtendedAutomataExpander
 {
 
 	private static ModuleSubjectFactory factory = ModuleSubjectFactory.getInstance();
-	private IdentifierSubject identifier;
-	private ModuleSubject module;
-	private boolean expand;
-
 	private static ExpressionParser parser = new ExpressionParser(ModuleSubjectFactory.getInstance(), CompilerOperatorTable.getInstance());
-
-	public ExtendedAutomata(String name, boolean expand) 
-	{
-		identifier = factory.createSimpleIdentifierProxy(name);
-
-		module = new ModuleSubject(identifier.getName(), null);
-
-		// make marking proposition
-		module.getEventDeclListModifiable().add(factory.createEventDeclProxy(EventDeclProxy.DEFAULT_MARKING_NAME, EventKind.PROPOSITION));
-
-		this.expand = expand;
-
-		//factory = ModuleSubjectFactory.getInstance();
-
-		
-		//parser = new ExpressionParser(factory, CompilerOperatorTable.getInstance());
-	}
-
-	protected ModuleSubject getModule()
-	{
-		return module;
-	}
-
-	public void addEvent(String name)
-	{
-		addEvent(name,"controllable");
-	}
-	
-	public void addEvent(String name, String kind)
-	{
-		if (kind.equals("controllable"))
-		{
-			module.getEventDeclListModifiable().add(factory.createEventDeclProxy(name, EventKind.CONTROLLABLE));
-		}
-		else if (kind.equals("uncontrollable"))
-		{
-			module.getEventDeclListModifiable().add(factory.createEventDeclProxy(name, EventKind.UNCONTROLLABLE));
-		}
-	}
-
-
-	public void addAutomaton(ExtendedAutomaton automaton)
-	{
-		module.getComponentListModifiable().add(automaton.getComponent());
-	}
 
 	public static void expandTransitions(ModuleSubject module)
 	{
@@ -837,29 +788,7 @@ public class ExtendedAutomata
 		return newEdge;
 	}
 
-	
-	public void writeToFile(File file)
-	{
-
-		if (expand)
-		{
-			expandTransitions(module);
-		}
-
-		Logger.output("ExtendedAutomata.writeToFile(): Writing model file.");
-
-		try
-		{
-			JAXBModuleMarshaller marshaller = new JAXBModuleMarshaller(factory, CompilerOperatorTable.getInstance());	
-			marshaller.marshal(module, file);
-		}
-		catch (Exception e)
-		{
-			e.printStackTrace();
-		}
-	}
-
-	public static void writeModuleToFile(ModuleSubject module, String fileName)
+	private static void writeModuleToFile(ModuleSubject module, String fileName)
 	{
 
 		Logger.output("ExtendedAutomata.writeModuleToFile(): Writing module to file.");
@@ -874,5 +803,4 @@ public class ExtendedAutomata
 			e.printStackTrace();
 		}
 	}
-
 }

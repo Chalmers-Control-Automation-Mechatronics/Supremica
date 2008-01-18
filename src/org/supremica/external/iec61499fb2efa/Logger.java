@@ -17,7 +17,7 @@ class Logger
 	public static final int INFO = 1;
 	public static final int DEBUG = 2;
 
-	private static int verboseLevel = DEBUG;
+	private static int verboseLevel = INFO;
 
 	public static void setVerboseLevel(int level)
 	{
