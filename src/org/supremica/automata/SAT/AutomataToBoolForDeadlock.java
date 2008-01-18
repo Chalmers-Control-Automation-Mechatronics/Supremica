@@ -49,6 +49,8 @@ public class AutomataToBoolForDeadlock implements IAutomataToBool
     Environment env = new Environment();
     Environment envBool = new Environment();
     
+    String stayEventName = "stay";
+    
     ConverterVarEqToBool vareq;
     
     /*
@@ -68,6 +70,7 @@ public class AutomataToBoolForDeadlock implements IAutomataToBool
         addInit();
         addTransitions();
         System.err.println(" done");
+        System.err.println("\nexpr type after creation is "+ completeExpression.type.toString());
         
         System.err.println("Expr:");        
         System.err.println(PrinterInfix.print(completeExpression));
@@ -76,28 +79,39 @@ public class AutomataToBoolForDeadlock implements IAutomataToBool
         vareq = new ConverterVarEqToBool(env, envBool);        
         Expr nB = vareq.initConvert(completeExpression);
         System.err.println(" done");
-                               
+        System.err.println("\nexpr type after converting to boolean is "+ nB.type.toString());
+
+        System.err.println("Expr:");        
+        System.err.println(PrinterInfix.print(completeExpression));
+        
         System.err.print("Removing negations...");
         Expr nBN = ConverterToNonNegated.removeAllNegations(nB);
         System.err.println(" done");                        
+        System.err.println("\nexpr type after removing negations is "+ nBN.type.toString());
+
+        System.err.println("Expr:");        
+        System.err.println(PrinterInfix.print(completeExpression));
                 
-        System.err.print("Flattening expression tree...");
-        Expr nBNF = ConverterToFlattened.convert(nBN);
-        System.err.println(" done");                        
+//        System.err.print("Flattening expression tree...");
+//        Expr nBNF = ConverterToFlattened.convert(nBN);
+//        System.err.println(" done");                        
         
         System.err.print("Converting to CNF...");
 //        ConverterBoolToCnfStruct conv = new ConverterBoolToCnfStruc(env);
 //        Expr nBNFC = conv.convertAll(nBNF);
-        Expr nBNFC = ConverterBoolToCnfSat.convert(nBNF);
+        Expr nBNC = ConverterBoolToCnfSat.convert(nBN);
         System.err.println(" done");        
 
-        System.err.print("Flattening expression tree again...");
-        Expr nBNFCF = ConverterToFlattened.convert(nBNFC);
-        System.err.println(" done");                        
+        System.err.println("Expr:");        
+        System.err.println(PrinterInfix.print(completeExpression));
 
+//        System.err.print("Flattening expression tree again...");
+//        Expr nBNFCF = ConverterToFlattened.convert(nBNFC);
+//        System.err.println(" done");                        
+
+        System.err.println("\n\nexpr to return' type is "+ nBNC.type.toString());
         
-        
-        return nBNFCF;
+        return nBNC;
     }
     
     public void printDimacsCnfStr(PrintWriter pwOut){
@@ -198,7 +212,7 @@ public class AutomataToBoolForDeadlock implements IAutomataToBool
 
         //addMarking();
         abc = ats.setIndices(); // set indices for states and get union alphabet        
-        //addAllStay();
+        addAllStay();
         //addTraps();
         abc = ats.setIndices(); // addTraps added some events...
         
@@ -457,45 +471,36 @@ public class AutomataToBoolForDeadlock implements IAutomataToBool
             addClause(forbCond);
     }
     void addBlockingDetermination(){
-        //int timestep = totalSteps;
-        mOr disabledSometime = new mOr();
-        for(int timestep = 1; timestep < totalSteps; timestep++ ){
+        int timestep = totalSteps-1;
+        //mOr disabledSometime = new mOr();
+        //for(int timestep = 1; timestep < totalSteps; timestep++ ){
             mAnd allEventsNowDisabled = new mAnd();
             for(LabeledEvent e : abc){
-                mOr eventDisabledSomewhere = new mOr();
-                for(Automaton a: ats){      
-                    if(a.getAlphabet().contains(e.getLabel())){
-//                        mAnd disabledInA = new mAnd();
-//                        for(State s: a){
-//                            if(s.doesDefine(e)){
-//                                disabledInA.add(new Not(
-//                                        new VarEqInt(
-//                                        getStateVariable(a.getName(), timestep), 
-//                                        s.getIndex())));
-//                            }
-//                        }
-//                        eventDisabledSomewhere.add(disabledInA);
-
-                        mOr disabledInA = new mOr();
-                        for(State s: a){
-                            if(!s.doesDefine(e)){
-                                disabledInA.add(new VarEqInt(                                        
-                                        getStateVariable(a.getName(), timestep), 
-                                        s.getIndex()));
+                if(!e.getName().equals(stayEventName)){
+                    mOr eventDisabledSomewhere = new mOr();
+                    for(Automaton a: ats){      
+                        if(a.getAlphabet().contains(e.getLabel())){
+                            mOr disabledInA = new mOr();
+                            for(State s: a){
+                                if(!s.doesDefine(e)){
+                                    disabledInA.add(new VarEqInt(                                        
+                                            getStateVariable(a.getName(), timestep), 
+                                            s.getIndex()));
+                                }
                             }
+                            eventDisabledSomewhere.add(disabledInA);
                         }
-                        eventDisabledSomewhere.add(disabledInA);
-
                     }
+                    allEventsNowDisabled.add(eventDisabledSomewhere);                    
                 }
-                allEventsNowDisabled.add(eventDisabledSomewhere);
             }
-            disabledSometime.add(allEventsNowDisabled);
-        }
-        addClause(disabledSometime);
+            addClause(allEventsNowDisabled);
+        //    disabledSometime.add(allEventsNowDisabled);
+        //}
+        //addClause(disabledSometime);
     }
     void addAllStay(){
-        LabeledEvent stay = new LabeledEvent("stay");
+        LabeledEvent stay = new LabeledEvent(stayEventName);
         for(Automaton a: ats){
             a.getAlphabet().add(stay);
             for(State s: a)

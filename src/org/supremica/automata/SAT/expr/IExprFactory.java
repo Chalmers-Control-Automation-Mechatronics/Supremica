@@ -12,8 +12,6 @@ package org.supremica.automata.SAT.expr;
 public interface IExprFactory {
     public Expr And(Expr e1, Expr e2);
     public Expr Or(Expr e1, Expr e2);
-    public Expr InitAnd(Expr e);
-    public Expr InitOr(Expr e);
     public Expr InitAnd();
     public Expr InitOr();
 }
