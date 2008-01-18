@@ -65,11 +65,11 @@ public class ExtendedAutomataExpander
 	public static void expandTransitions(ModuleSubject module)
 	{
 		
-		Logger.output("ExtendedAutomata.expandTransitions(): Expanding transitions.");
+		Logger.output("ExtendedAutomataExpander.expandTransitions(): Expanding transitions.");
 		
 		// get all component variables
 		// and put them in a map
-		Logger.output(Logger.DEBUG, "ExtendedAutomata.expandTransitions(): Making module variables map.");
+		Logger.output(Logger.DEBUG, "ExtendedAutomataExpander.expandTransitions(): Making module variables map.");
 		Map moduleVariables = new HashMap();
         for (final Proxy proxy : module.getComponentList()) {
             if (proxy instanceof VariableComponentProxy) {
@@ -78,7 +78,7 @@ public class ExtendedAutomataExpander
 				final String curVarName = curVar.getName();
 				if (moduleVariables.keySet().contains(curVarName))
 				{
-					Logger.output(Logger.WARN, "ExtendedAutomata.expandTransitions(): Warning!: The module contains duplicate variable definitions.");
+					Logger.output(Logger.WARN, "ExtendedAutomataExpander.expandTransitions(): Warning!: The module contains duplicate variable definitions.");
 					Logger.output(Logger.WARN, "Variable name: " + curVarName, 1);
 				}
                 else
@@ -96,7 +96,7 @@ public class ExtendedAutomataExpander
             final SimpleComponentProxy curComponent =
                 (SimpleComponentProxy) proxy;
 			String curComponentName = curComponent.getName();
-			Logger.output(Logger.DEBUG, "ExtendedAutomata.expandTransitions(): Component", 1);
+			Logger.output(Logger.DEBUG, "ExtendedAutomataExpander.expandTransitions(): Component", 1);
 			Logger.output(Logger.DEBUG, curComponentName, 2);
 
 			ListSubject edges = ((GraphSubject) curComponent.getGraph()).getEdgesModifiable();
@@ -117,14 +117,14 @@ public class ExtendedAutomataExpander
 				// do expansion only if guard and actions block is present
 				if (curBlock != null)
 				{
-					Logger.output(Logger.DEBUG, "ExtendedAutomata.expandTransitions(): Expanding edge", 2);
+					Logger.output(Logger.DEBUG, "ExtendedAutomataExpander.expandTransitions(): Expanding edge", 2);
 
 					// get guards
 					List curGuards = curBlock.getGuards();
 					String guardText = "(";
 					if (curGuards.size() > 0 )
 					{
-						Logger.output(Logger.DEBUG, "ExtendedAutomata.expandTransitions(): Guard", 3);
+						Logger.output(Logger.DEBUG, "ExtendedAutomataExpander.expandTransitions(): Guard", 3);
 						for (Iterator iter = curGuards.iterator(); iter.hasNext();)
 						{
 							//guardText = guardText + ((SimpleExpressionProxy) iter.next()).getPlainText();
@@ -147,7 +147,7 @@ public class ExtendedAutomataExpander
 					String origActionsText = "";
 					if (curActions.size() > 0 )
 					{
-						Logger.output(Logger.DEBUG, "ExtendedAutomata.expandTransitions(): Actions", 3);
+						Logger.output(Logger.DEBUG, "ExtendedAutomataExpander.expandTransitions(): Actions", 3);
 						for (Iterator iter = curActions.iterator(); iter.hasNext();)
 						{
 							BinaryExpressionProxy curAction = (BinaryExpressionProxy) iter.next();
@@ -177,7 +177,7 @@ public class ExtendedAutomataExpander
 						}
 						catch(Exception e)
 						{
-							Logger.output(Logger.ERROR, "ExtendedAutomaton.addExtendedTransition(): Couldn't parse the action!");
+							Logger.output(Logger.ERROR, "ExtendedAutomataExpander.expandTransitions(): Couldn't parse the action!");
 							Logger.output(Logger.ERROR, "\t automaton: " + curComponentName);
 							Logger.output(Logger.ERROR, "\t from: " + source.getName());
 							Logger.output(Logger.ERROR, " to: " + target.getName());
@@ -186,7 +186,7 @@ public class ExtendedAutomataExpander
 							System.exit(1);
 						}
 						
-						Logger.output(Logger.DEBUG, "ExtendedAutomata.expandTransitions(): Succesfully parsed guard.", 3);
+						Logger.output(Logger.DEBUG, "ExtendedAutomataExpander.expandTransitions(): Succesfully parsed guard.", 3);
 					}
 					
 					// parse transition actions
@@ -202,7 +202,7 @@ public class ExtendedAutomataExpander
 						}
 						catch(Exception e)
 						{
-							Logger.output(Logger.ERROR, "ExtendedAutomaton.addExtendedTransition(): Couldn't parse the action!");
+							Logger.output(Logger.ERROR, "ExtendedAutomataExpander.expandTransition(): Couldn't parse the action!");
 							Logger.output(Logger.ERROR, "\t automaton: " + curComponentName);
 							Logger.output(Logger.ERROR, "\t from: " + source.getName());
 							Logger.output(Logger.ERROR, " to: " + target.getName());
@@ -211,7 +211,7 @@ public class ExtendedAutomataExpander
 							System.exit(1);
 						}
 						
-						Logger.output(Logger.DEBUG, "ExtendedAutomata.expandTransitions(): Succesfully parsed actions.", 3);
+						Logger.output(Logger.DEBUG, "ExtendedAutomataExpander.expandTransitions(): Succesfully parsed actions.", 3);
 					}
 					
 					// get guard identifiers
@@ -278,7 +278,7 @@ public class ExtendedAutomataExpander
 						Map identCounters = new LinkedHashMap();
 						Map identUpperBounds = new HashMap();
 						Map identLowerBounds = new HashMap();
-						Logger.output(Logger.DEBUG,"ExtendedAutomata.expandTransitions(): Initializing guard identifiers counters", 3);
+						Logger.output(Logger.DEBUG,"ExtendedAutomataExpander.expandTransitions(): Initializing guard identifiers counters", 3);
 						for (Iterator iter = guardExpressionIdents.iterator(); iter.hasNext();)
 						{
 							String curIdent = (String) iter.next();
@@ -307,7 +307,7 @@ public class ExtendedAutomataExpander
 						Evaluator evaluator = null;
 						Boolean oldGuardValue = false;
 						boolean keepCountingGuard = true;
-						Logger.output(Logger.DEBUG, "ExtendedAutomata.expandTransitions(): Counting guard identifiers", 3);
+						Logger.output(Logger.DEBUG, "ExtendedAutomataExpander.expandTransitions(): Counting guard identifiers", 3);
 						while (keepCountingGuard)
 						{
 							Logger.output(Logger.DEBUG, identCounters.toString(), 4);
@@ -370,7 +370,7 @@ public class ExtendedAutomataExpander
 										Map actionsIdentCounters = new LinkedHashMap();
 										Map actionsIdentUpperBounds = new HashMap();
 										Map actionsIdentLowerBounds = new HashMap();
-										Logger.output(Logger.DEBUG,"ExtendedAutomata.expandTransitions(): Initializing actions identifiers counters", 3);
+										Logger.output(Logger.DEBUG,"ExtendedAutomataExpander.expandTransitions(): Initializing actions identifiers counters", 3);
 										for (Iterator iter = actionsExpressionIdents.iterator(); iter.hasNext();)
 										{
 											String curIdent = (String) iter.next();
@@ -400,7 +400,7 @@ public class ExtendedAutomataExpander
 										Variables updatedSymbols = null;
 										boolean keepCountingActions = true;
 										String oldGuard = guard;
-										Logger.output(Logger.DEBUG, "ExtendedAutomata.expandTransitions(): Counting actions identifiers", 3);
+										Logger.output(Logger.DEBUG, "ExtendedAutomataExpander.expandTransitions(): Counting actions identifiers", 3);
 										while (keepCountingActions)
 										{
 											Logger.output(Logger.DEBUG, actionsIdentCounters.toString(), 4);
@@ -569,7 +569,7 @@ public class ExtendedAutomataExpander
 							Map actionsIdentCounters = new LinkedHashMap();
 							Map actionsIdentUpperBounds = new HashMap();
 							Map actionsIdentLowerBounds = new HashMap();
-							Logger.output(Logger.DEBUG,"ExtendedAutomata.expandTransitions(): Initializing actions identifiers counters", 3);
+							Logger.output(Logger.DEBUG,"ExtendedAutomataExpander.expandTransitions(): Initializing actions identifiers counters", 3);
 							for (Iterator iter = actionsExpressionIdents.iterator(); iter.hasNext();)
 							{
 								String curIdent = (String) iter.next();
@@ -598,7 +598,7 @@ public class ExtendedAutomataExpander
 							Evaluator evaluator = null;
 							Variables updatedSymbols = null;
 							boolean keepCountingActions = true;
-							Logger.output(Logger.DEBUG, "ExtendedAutomata.expandTransitions(): Counting actions identifiers", 3);
+							Logger.output(Logger.DEBUG, "ExtendedAutomataExpander.expandTransitions(): Counting actions identifiers", 3);
 							while (keepCountingActions)
 							{
 								Logger.output(Logger.DEBUG, actionsIdentCounters.toString(), 4);
@@ -703,9 +703,9 @@ public class ExtendedAutomataExpander
  			}
 		}
 
-		writeModuleToFile(module ,"blah.wmod");
+		//writeModuleToFile(module ,"blah.wmod");
 
-		Logger.output("ExtendedAutomata.expandTransitions(): Done expanding transitions.");
+		Logger.output("ExtendedAutomataExpander.expandTransitions(): Done expanding transitions.");
 
 	}
 
@@ -724,7 +724,7 @@ public class ExtendedAutomataExpander
 		}
 		catch (ParseException exception)
 		{
-			System.out.println("ExtendedAutomaton.addNormalTransition(): Syntax error in guard!");
+			System.out.println("ExtendedAutomataExpander.makeTransition(): Syntax error in guard!");
 			System.out.println("\t guard: " + guardIn);
 			System.out.println("\t action: " + actionIn);
 			return null;
@@ -752,14 +752,14 @@ public class ExtendedAutomataExpander
 					}
 					catch (ParseException exception)
 					{
-						System.out.println("ExtendedAutomaton.addNormalTransition(): Syntax error in action!");
+						System.out.println("ExtendedAutomataExpander.makeTransition(): Syntax error in action!");
 						System.out.println("\t guard: " + guardIn);
 						System.out.println("\t action: " + actionIn);
 						return null;
 					}
 					catch (TypeMismatchException exception)
 					{
-						System.out.println("ExtendedAutomaton.addNormalTransition(): Type mismatch error in action!");
+						System.out.println("ExtendedAutomataExpander.makeTransition(): Type mismatch error in action!");
 						System.out.println("\t guard: " + guardIn);
 						System.out.println("\t action: " + actionIn);
 						return null;
@@ -791,7 +791,7 @@ public class ExtendedAutomataExpander
 	private static void writeModuleToFile(ModuleSubject module, String fileName)
 	{
 
-		Logger.output("ExtendedAutomata.writeModuleToFile(): Writing module to file.");
+		Logger.output("ExtendedAutomataExpander.writeModuleToFile(): Writing module to file.");
 
 		try
 		{
