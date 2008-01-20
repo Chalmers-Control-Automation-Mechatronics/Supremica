@@ -41,7 +41,10 @@ public class SATAutomata {
 
     }
     
-    public static void main(String[] args)
+    public static void main(String[] args) 
+            throws FileNotFoundException, 
+                   IOException,
+                   Exception
     {
         /*String atsFileName = "c:\\alex\\coding\\ats-sup\\ft06.xml";        
         int totalSteps = 71;
@@ -54,52 +57,60 @@ public class SATAutomata {
         
         // Default options:
         int totalSteps = 10;
-        String task = "MSR";
-        boolean printAsDimacsSat = false;
+        String problem = "MSR";
+        String action = "makeCnf";
+        String answerFile = "out.txt";
         
         // Options parsingIAutomataToBool atb;                
         for(int i = 0; i < args.length; i++){
             if(args[i].equalsIgnoreCase("--steps"))
                 totalSteps = Integer.parseInt(args[++i]);
-            if(args[i].equalsIgnoreCase("--task"))
-                task = args[++i];
-            if(args[i].equalsIgnoreCase("--DimacsSat"))
-                printAsDimacsSat = true;
-                
+            if(args[i].equalsIgnoreCase("--problem"))
+                problem = args[++i];
+            if(args[i].equalsIgnoreCase("--action"))
+                action = args[++i];
+            if(args[i].equalsIgnoreCase("--answerFile"))
+                answerFile = args[++i];
         }
         
         Project ats = null;
-        try {            
-            ProjectBuildFromXML builder = new ProjectBuildFromXML();
-            ats = builder.build(System.in);
-        } catch (Exception ex) {            
-            Logger.getLogger(SATAutomata.class.getName()).log(Level.SEVERE, null, ex);
-        }
+        ProjectBuildFromXML builder = new ProjectBuildFromXML();
+        ats = builder.build(System.in);
         
         
         IAutomataToBool atb;
         
-        if(task.equalsIgnoreCase("MSR")){
+        if(problem.equalsIgnoreCase("MSR")){
             atb = new AutomataToBoolForReachability(ats, totalSteps);
         }
-        else if (task.equalsIgnoreCase("CV")) {
+        else if (problem.equalsIgnoreCase("CV")) {
             atb = new AutomataToBoolForControlability(ats, totalSteps);
         }
-        else if (task.equalsIgnoreCase("DV")) {
+        else if (problem.equalsIgnoreCase("DV")) {
             atb = new AutomataToBoolForDeadlock(ats, totalSteps);
         }
         else {
-            throw new IllegalArgumentException("no task (MSR or CV or DV expected)");
+            throw new IllegalArgumentException(
+                    "no task (MSR or CV or DV expected)");
         }
 
         
         PrintWriter cnfFile = new PrintWriter(System.out);
-        if(printAsDimacsSat)
+        
+        if(action.equalsIgnoreCase("makeSat"))
             atb.printDimacsSatStr(cnfFile);
-        else 
-            atb.printDimacsCnfStr(cnfFile);               
-        
-        
+        else if(action.equalsIgnoreCase("makeCnf"))
+            atb.printDimacsCnfStr(cnfFile);     
+        else if(action.equalsIgnoreCase("decode")){
+            BufferedReader br = new BufferedReader(
+                    new FileReader(answerFile));
+            String line = br.readLine();
+            if(line.contains("SAT"))
+                line = br.readLine();
+            System.err.println("line to decode: " + line);
+            atb.printDimacsCnfStr(cnfFile);
+            atb.decode(line);            
+        }        
     }
 
 

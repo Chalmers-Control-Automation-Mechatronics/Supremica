@@ -244,29 +244,23 @@ public class Convert {
     }
     
     public static void print(Clauses cs, int totalVars, PrintStream out){
-        out.print("p cnf " + totalVars + " " + cs.size());
+        out.println("p cnf " + totalVars + " " + cs.size());
         for(Clause c: cs){
-            out.println();
-            print(c, out);
-            out.print("0");
+            for(int i: c)
+                out.print(""+i+" ");
+            out.println("0");
         }
-        out.println("\b ");
-        //out.println(" ");
-    }
-    public static void print(Clause c, PrintStream out){
-        for(int i: c)
-            out.print(""+i+" ");
     }
     public static String toDimacsCnfString(Clauses cs, int totalVars){
         StringBuilder sb = new StringBuilder();
         sb.append("p cnf " + totalVars + " " + cs.size() + "\n");
         for(Clause c: cs){
             for(int i: c){
-                sb.append(" "+i+" ");
+                sb.append(""+i+" ");
             }
             sb.append("0\n");
         }
-        sb.deleteCharAt(sb.length()-1);
+        sb.append("  \n");
         return sb.toString();
     }
     public static Clauses removeTrue(Clauses cs, int trueValue){

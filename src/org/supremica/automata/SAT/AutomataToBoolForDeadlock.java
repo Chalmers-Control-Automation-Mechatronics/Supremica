@@ -140,6 +140,7 @@ public class AutomataToBoolForDeadlock implements IAutomataToBool
         System.err.print("Producing DIMACS CNF...");
         pwOut.println(org.supremica.automata.SAT2.Convert.toDimacsCnfString(
                 cs, conv.varCounter));
+        pwOut.flush();
         System.err.println(" done");                                
     }
     public void printDimacsCnfStrOld(PrintWriter pwOut){
@@ -197,7 +198,7 @@ public class AutomataToBoolForDeadlock implements IAutomataToBool
     public void decode(int[] answer)
     {
         for(int i: answer){
-            if(i!=0){
+            if(i!=0 && Math.abs(i) < envBool.vars.size()){
                 Variable v = envBool.vars.get(Math.abs(i));
                 envBool.assign(v, i>0?1:0);
             } else {
@@ -217,7 +218,7 @@ public class AutomataToBoolForDeadlock implements IAutomataToBool
     {
         for(String s: answer.split("\\s")){
             int i = Integer.parseInt(s);
-            if(i!=0){
+            if(i!=0 && Math.abs(i) < envBool.vars.size()){
                 Variable v = envBool.vars.get(Math.abs(i));
                 envBool.assign(v, i>0?1:0);
             }
@@ -240,7 +241,7 @@ public class AutomataToBoolForDeadlock implements IAutomataToBool
         for(LabeledEvent e: abc)
             if(e.getIndex()==id)
                 return e.getLabel();
-        throw new IllegalArgumentException("index not found");
+        return "some event with id " + id;
     }
     /** Creates a new instance of AutomataToBool */
     public AutomataToBoolForDeadlock(Automata iats, int steps)
@@ -511,19 +512,19 @@ public class AutomataToBoolForDeadlock implements IAutomataToBool
     void addBlockingDetermination(){
         int timestep = totalSteps-1;
         //mOr disabledSometime = new mOr();
-        //for(int timestep = 1; timestep < totalSteps; timestep++ ){
+        //for(int timestep = 0; timestep < totalSteps; timestep++ ){
             mAnd allEventsNowDisabled = new mAnd();
             for(LabeledEvent e : abc){
                 if(!e.getName().equals(stayEventName)){
                     mOr eventDisabledSomewhere = new mOr();
                     for(Automaton a: ats){      
                         if(a.getAlphabet().contains(e.getLabel())){
-                            mOr disabledInA = new mOr();
+                            mAnd disabledInA = new mAnd();
                             for(State s: a){
-                                if(!s.doesDefine(e)){
-                                    disabledInA.add(new VarEqInt(                                        
+                                if(s.doesDefine(e)){
+                                    disabledInA.add(new Not(new VarEqInt(                                        
                                             getStateVariable(a.getName(), timestep), 
-                                            s.getIndex()));
+                                            s.getIndex())));
                                 }
                             }
                             eventDisabledSomewhere.add(disabledInA);
@@ -533,16 +534,18 @@ public class AutomataToBoolForDeadlock implements IAutomataToBool
                 }
             }
             addClause(allEventsNowDisabled);
-        //    disabledSometime.add(allEventsNowDisabled);
-        //}
-        //addClause(disabledSometime);
+//            disabledSometime.add(allEventsNowDisabled);
+//        }
+//        addClause(disabledSometime);
     }
     void addAllStay(){
         LabeledEvent stay = new LabeledEvent(stayEventName);
         for(Automaton a: ats){
             a.getAlphabet().add(stay);
-            for(State s: a)
+            for(State s: a){
+                //s.getOutgoingArcs().add(new Arc(s, s, stay));
                 a.addArc(new Arc(s, s, stay));
+            }
         }
     }
     
