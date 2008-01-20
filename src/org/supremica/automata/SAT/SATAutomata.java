@@ -52,35 +52,53 @@ public class SATAutomata {
         //solveCSP(ats, totalSteps);       
          * */
         
-        int totalSteps = Integer.parseInt(args[0]);
+        // Default options:
+        int totalSteps = 10;
+        String task = "MSR";
+        boolean printAsDimacsSat = false;
+        
+        // Options parsingIAutomataToBool atb;                
+        for(int i = 0; i < args.length; i++){
+            if(args[i].equalsIgnoreCase("--steps"))
+                totalSteps = Integer.parseInt(args[++i]);
+            if(args[i].equalsIgnoreCase("--task"))
+                task = args[++i];
+            if(args[i].equalsIgnoreCase("--DimacsSat"))
+                printAsDimacsSat = true;
+                
+        }
+        
         Project ats = null;
-        try {
-            
+        try {            
             ProjectBuildFromXML builder = new ProjectBuildFromXML();
-
             ats = builder.build(System.in);
         } catch (Exception ex) {            
             Logger.getLogger(SATAutomata.class.getName()).log(Level.SEVERE, null, ex);
         }
+        
+        
         IAutomataToBool atb;
-        if(args[1].equalsIgnoreCase("MSR")){
+        
+        if(task.equalsIgnoreCase("MSR")){
             atb = new AutomataToBoolForReachability(ats, totalSteps);
         }
-        else if (args[1].equalsIgnoreCase("CV")) {
+        else if (task.equalsIgnoreCase("CV")) {
             atb = new AutomataToBoolForControlability(ats, totalSteps);
         }
-        else if (args[1].equalsIgnoreCase("DV")) {
+        else if (task.equalsIgnoreCase("DV")) {
             atb = new AutomataToBoolForDeadlock(ats, totalSteps);
         }
         else {
             throw new IllegalArgumentException("no task (MSR or CV or DV expected)");
         }
+
+        
         PrintWriter cnfFile = new PrintWriter(System.out);
-        if(args[2].equalsIgnoreCase("--DimacsSat")){
+        if(printAsDimacsSat)
             atb.printDimacsSatStr(cnfFile);
-        } else {
+        else 
             atb.printDimacsCnfStr(cnfFile);               
-        }
+        
         
     }
 

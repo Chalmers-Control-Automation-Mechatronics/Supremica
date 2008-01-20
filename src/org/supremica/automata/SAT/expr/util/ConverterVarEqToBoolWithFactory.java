@@ -11,13 +11,15 @@ import java.util.*;
  *
  * @author voronov
  */
-public class ConverterVarEqToBool {
+public class ConverterVarEqToBoolWithFactory {
     Environment envInt;
     Environment envBool;
     
+    static ExprFactoryM exprFac = new ExprFactoryM();
+    
     List<int[]> intIdToBoolId = new ArrayList<int[]>();
     
-    public ConverterVarEqToBool(Environment ienv, Environment benv){
+    public ConverterVarEqToBoolWithFactory(Environment ienv, Environment benv){
         if(ienv==null)
             throw new IllegalArgumentException("int env can't be null");
         if(benv==null)
@@ -34,7 +36,7 @@ public class ConverterVarEqToBool {
         //nodeBool = convert(addForbiddenByDomain(nodeInt, envInt));
         Expr fd = ForbiddenByDomain(envInt);
         return  (fd==null)? convert(iNode) : 
-            new And(convert(iNode), convert(fd));
+            exprFac.And(convert(iNode), convert(fd));
     }
     /*private static Expr addForbiddenByDomain(Expr n, Environment env){
         Expr res = n;
@@ -46,16 +48,27 @@ public class ConverterVarEqToBool {
         return res;
     }*/
     private Expr ForbiddenByDomain(Environment env){        
-        Expr res = null;
+//        Expr res = null;
+//        for(Variable v: env.vars){
+//            if(v.domain.size()>2){ // this if should not be necessary...
+//                int maxVal = 1 << v.domain.significantBits();
+//                for(int i = v.domain.size(); i < maxVal; i++){
+//                    // here!
+//                    //Expr f = new Not(new VarEqInt(v, i, true));
+//                    Expr f = /*NodeCnfConverter.convertAll*/(
+//                            /*convert*/(exprFac.Not(exprFac.VarEqInt(v, i, true))));
+//                    res = (res==null) ? f : (new And( res, f));
+//                }
+//            }
+//        }
+//        return res;        
+        Expr res = exprFac.InitAnd();
         for(Variable v: env.vars){
-            if(v.domain.size()>2){ // this if should not be necessary...
+            if(v.domain.size()>2){ // we forbid something only if domain is bigger than boolean
                 int maxVal = 1 << v.domain.significantBits();
                 for(int i = v.domain.size(); i < maxVal; i++){
-                    // here!
-                    //Expr f = new Not(new VarEqInt(v, i, true));
-                    Expr f = /*NodeCnfConverter.convertAll*/(
-                            /*convert*/(new Not(new VarEqInt(v, i, true))));
-                    res = (res==null) ? f : (new And( res, f));
+                    Expr f = exprFac.Not(exprFac.VarEqInt(v, i, true));
+                    res = exprFac.And(res, f);
                 }
             }
         }
@@ -109,23 +122,23 @@ public class ConverterVarEqToBool {
         case AND:
             l = convert(((And)n).left);
             r = convert(((And)n).right);
-            return new And(l,r);//return l==null?r:(r==null?l:new And(l,r));
+            return exprFac.And(l,r);//return l==null?r:(r==null?l:new And(l,r));
         case OR:
             l = convert(((Or)n).left);
             r = convert(((Or)n).right);
-            return new Or(l,r); //return l==null?r:(r==null?l:new Or(l,r));
+            return exprFac.Or(l,r); //return l==null?r:(r==null?l:new Or(l,r));
         case MAND:
-            mAnd ma = new mAnd();
+            Expr ma = exprFac.InitAnd();
             for(Expr n1: (mAnd)n)
-                ma.add(convert(n1));
+                exprFac.And(ma, convert(n1));
             return ma;
         case MOR:
-            mOr mo = new mOr();
+            Expr mo = exprFac.InitOr();
             for(Expr n1: (mOr)n)
-                mo.add(convert(n1));
+                exprFac.Or(mo, convert(n1));
             return mo;
         case NOT:
-            return new Not(convert(((Not)n).child));
+            return exprFac.Not(convert(((Not)n).child));
         case LIT:
             return createLiteral(
                     ((Literal)n).variable, 
@@ -145,22 +158,26 @@ public class ConverterVarEqToBool {
     
     private Expr toBoolExpr(VarEqInt ve)
     {
-        Expr res = null; //getEqIntBitLiteral(ve, 0);
+        //Expr res = null; //getEqIntBitLiteral(ve, 0);
         //mAnd res = new mAnd();
+        Expr res = exprFac.InitAnd();
         for(int i = 0; i < ve.variable.significantBits(); i++){
             Literal n = getEqIntBitLiteral(ve,i);
-            res = (res==null) ? n : new And(n, res);
+            res = exprFac.And(res, n);
+            //res = (res==null) ? n : new And(n, res);
             //res.add(n);
         }
         return res;        
     }    
     private Expr toBoolExpr(VarEqVar ve)
     {
-        Expr res = null; //getEqVarBitNode(ve, 0);
+        //Expr res = null; //getEqVarBitNode(ve, 0);
         //mAnd res = new mAnd();
+        Expr res = exprFac.InitAnd();
         for(int i = 0; i < ve.var1.significantBits(); i++){
             Expr n = getEqVarBitNode(ve,i);
-            res = (res==null) ? n : new And(n, res);
+            res = exprFac.And(res, n);
+            //res = (res==null) ? n : new And(n, res);
             //res.add(n);
         }
         return res;        
@@ -169,29 +186,29 @@ public class ConverterVarEqToBool {
         boolean p = 1==((ve.value >> bitIndex) & 1);
         return createLiteral(ve.variable, bitIndex, p);
     }    
-    private And getEqVarBitNode(VarEqVar ve, int bitIndex)
+    private Expr getEqVarBitNode(VarEqVar ve, int bitIndex)
     {
         /* a=b   <=>   (a&b)|(!a&!b)  <=>  (!a|b)&(a|!b)  */
-        return new And(
-                new Or(
+        return exprFac.And(
+                exprFac.Or(
                     createLiteral(ve.var1, bitIndex, false),
                     createLiteral(ve.var2, bitIndex, true)
                     ),
-                new Or(
+                exprFac.Or(
                     createLiteral(ve.var1, bitIndex, true),
                     createLiteral(ve.var2, bitIndex, false)
                     )
                 );
     }
-    private Or getEqVarBitNodeForNegation(VarEqVar ve, int bitIndex)
+    private Expr getEqVarBitNodeForNegation(VarEqVar ve, int bitIndex)
     {
         /* a=b   <=>   (a&b)|(!a&!b)  <=>  (!a|b)&(a|!b)  */
-        return new Or(
-                new And(
+        return exprFac.Or(
+                exprFac.And(
                     createLiteral(ve.var1, bitIndex, true),
                     createLiteral(ve.var2, bitIndex, true)
                     ), 
-                new And(
+                exprFac.And(
                     createLiteral(ve.var1, bitIndex, false),
                     createLiteral(ve.var2, bitIndex, false)                
                     )

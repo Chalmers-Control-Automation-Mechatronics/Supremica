@@ -115,6 +115,34 @@ public class AutomataToBoolForDeadlock implements IAutomataToBool
     }
     
     public void printDimacsCnfStr(PrintWriter pwOut){
+        System.err.print("Generating expression...");
+        addInit();
+        addTransitions();
+        addBlockingDetermination();
+        System.err.println(" done");
+                                
+        System.err.print("Converting variables to boolean...");
+        vareq = new ConverterVarEqToBool(env, envBool);        
+        Expr nB = vareq.initConvert(completeExpression);
+        System.err.println(" done");
+
+        System.err.print("Converting old expr to new expr...");
+        org.supremica.automata.SAT2.Convert.Expr e2 = 
+                ConverterOldExprToNewExpr.convert(nB);
+        System.err.println(" done");
+                
+        System.err.print("Converting to CNF...");
+        org.supremica.automata.SAT2.Convert conv = 
+                new org.supremica.automata.SAT2.Convert(envBool.vars.size()+1);
+        org.supremica.automata.SAT2.Convert.Clauses cs = conv.convert(e2);
+        System.err.println(" done");        
+        
+        System.err.print("Producing DIMACS CNF...");
+        pwOut.println(org.supremica.automata.SAT2.Convert.toDimacsCnfString(
+                cs, conv.varCounter));
+        System.err.println(" done");                                
+    }
+    public void printDimacsCnfStrOld(PrintWriter pwOut){
         Expr nBCF = getBoolCnfFlatExpr();
         System.err.print("Producing DIMACS CNF...");
         int numClauses = ((mAnd)nBCF).childs.size();
@@ -123,6 +151,16 @@ public class AutomataToBoolForDeadlock implements IAutomataToBool
         pwOut.flush();
         System.err.println(" done");                                
     }
+    public  void  printDimacsSatStr(PrintWriter pwOut){
+        throw new UnsupportedOperationException("not yet");
+//        Expr nBCF = getBoolCnfFlatExpr();
+//        System.err.print("Producing DIMACS SAT...");
+//        pwOut.println("p sat "+ envBool.vars.size());
+//        pwOut.print(PrinterDimacsSat.Print2(nBCF));
+//        pwOut.flush();
+//        System.err.println(" done");                  
+    }
+    
     public void chargeSolver(ISolver solver)
     {
         Expr nBCF = getBoolCnfFlatExpr();
@@ -506,14 +544,6 @@ public class AutomataToBoolForDeadlock implements IAutomataToBool
             for(State s: a)
                 a.addArc(new Arc(s, s, stay));
         }
-    }
-    public  void  printDimacsSatStr(PrintWriter pwOut){
-        Expr nBCF = getBoolCnfFlatExpr();
-        System.err.print("Producing DIMACS SAT...");
-        pwOut.println("p sat "+ envBool.vars.size());
-        pwOut.print(PrinterDimacsSat.Print2(nBCF));
-        pwOut.flush();
-        System.err.println(" done");                  
     }
     
     Expr Or(Expr e1, Expr e2){

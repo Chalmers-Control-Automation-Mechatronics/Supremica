@@ -90,7 +90,32 @@ public class AutomataToBoolForControlability implements IAutomataToBool
         return nBCF;
     }
     
-    public void printDimacsCnfStr(PrintWriter pwOut){
+    public void printDimacsCnfStr(PrintWriter pwOut){                        
+        initExpr();
+                
+        System.err.print("Converting variables to boolean...");
+        vareq = new ConverterVarEqToBool(env, envBool);        
+        Expr nB = vareq.initConvert(completeExpression);
+        System.err.println(" done");
+                       
+        System.err.print("Converting to new expr...");
+        org.supremica.automata.SAT2.Convert.Expr nBN = 
+                ConverterOldExprToNewExpr.convert(nB);
+        System.err.println(" done");
+
+        System.err.print("Converting to cnf...");
+        org.supremica.automata.SAT2.Convert conv = 
+                new org.supremica.automata.SAT2.Convert(envBool.vars.size()+1);
+        org.supremica.automata.SAT2.Convert.Clauses cs = conv.convert(nBN);
+        System.err.println(" done");
+
+        System.err.print("Producing DIMACS CNF...");
+        pwOut.println(org.supremica.automata.SAT2.Convert.toDimacsCnfString(
+                cs, conv.varCounter));
+        pwOut.flush();
+        System.err.println(" done");                                
+    }
+    public void printDimacsCnfStrOld(PrintWriter pwOut){
         Expr nBCF = getBoolCnfFlatExpr();
         System.err.print("Producing DIMACS CNF...");
         int numClauses = ((mAnd)nBCF).childs.size();
