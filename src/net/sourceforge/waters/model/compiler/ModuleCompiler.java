@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.module
 //# CLASS:   ModuleCompiler
 //###########################################################################
-//# $Id: ModuleCompiler.java,v 1.93 2008-01-21 16:12:04 markus Exp $
+//# $Id: ModuleCompiler.java,v 1.94 2008-01-21 17:17:44 markus Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.compiler;
@@ -1300,14 +1300,20 @@ private void addGuardToExpression(LocationsAndExpression locExp, List<SimpleExpr
 	SimpleExpressionProxy g2 = mModuleFactory.createIntConstantProxy(1);
 	final BinaryOperator andop = mOperatorTable.getAndOperator();
     for(SimpleExpressionProxy c1: locExp.getExpression()){
-    	for (SimpleExpressionProxy c2: sortedAndClauses)
+    	for (SimpleExpressionProxy c2: sortedAndClauses){
     	g1= mModuleFactory.createBinaryExpressionProxy(andop, c1, c2);
     	g2= mModuleFactory.createBinaryExpressionProxy(andop, g1, g2);
-    }
-	final CompiledNormalForm dnfUncGuard = mDNFConverter.convertToDNF(g2);
-	final CompiledNormalForm mdnfUncGuard = mDNFMinimizer.minimize(dnfUncGuard);
+    }}
+	final CompiledNormalForm dnf = mDNFConverter.convertToDNF(g2);
+	if(!dnf.isEmpty()){
+	final CompiledNormalForm mdnf = mDNFMinimizer.minimize(dnf);
 	locExp.setExpression(mDNFConverter
-			.createSortedClauseList(mdnfUncGuard));
+			.createSortedClauseList(mdnf));
+	}
+	else{
+		locExp.setExpression(new LinkedList<SimpleExpressionProxy>());
+	}
+	
 }
 
 

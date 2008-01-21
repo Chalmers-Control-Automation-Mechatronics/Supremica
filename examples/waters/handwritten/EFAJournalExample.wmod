@@ -133,14 +133,14 @@
                             <Point Y="127" X="183"/>
                         </SplineGeometry>
                         <GuardActionBlock>
-                            <Actions>
-                                <BinaryExpression Operator="=">
+                            <Guards>
+                                <BinaryExpression Operator="==">
                                     <SimpleIdentifier Name="v"/>
                                     <IntConstant Value="0"/>
                                 </BinaryExpression>
-                            </Actions>
+                            </Guards>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="20" X="0"/>
+                                <Point Y="21" X="1"/>
                             </LabelGeometry>
                         </GuardActionBlock>
                     </Edge>
