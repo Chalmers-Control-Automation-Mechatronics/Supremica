@@ -7,6 +7,21 @@
         <EventDecl Kind="UNCONTROLLABLE" Name="a"/>
     </EventDeclList>
     <ComponentList>
+        <VariableComponent Deterministic="false">
+            <SimpleIdentifier Name="v"/>
+            <VariableRange>
+                <BinaryExpression Operator="..">
+                    <IntConstant Value="0"/>
+                    <IntConstant Value="2"/>
+                </BinaryExpression>
+            </VariableRange>
+            <VariableInitial>
+                <BinaryExpression Operator="==">
+                    <SimpleIdentifier Name="v"/>
+                    <IntConstant Value="0"/>
+                </BinaryExpression>
+            </VariableInitial>
+        </VariableComponent>
         <SimpleComponent Kind="SPEC">
             <SimpleIdentifier Name="K"/>
             <Graph>
@@ -153,16 +168,6 @@
                     </Edge>
                 </EdgeList>
             </Graph>
-            <VariableList>
-                <Variable Name="v">
-                    <BinaryExpression Operator="..">
-                        <IntConstant Value="0"/>
-                        <IntConstant Value="2"/>
-                    </BinaryExpression>
-                    <IntConstant Value="0"/>
-                    <IntConstant Value="0"/>
-                </Variable>
-            </VariableList>
         </SimpleComponent>
     </ComponentList>
 </Module>
