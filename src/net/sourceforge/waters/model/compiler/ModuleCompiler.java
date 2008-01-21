@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.module
 //# CLASS:   ModuleCompiler
 //###########################################################################
-//# $Id: ModuleCompiler.java,v 1.92 2008-01-18 18:17:08 cengic Exp $
+//# $Id: ModuleCompiler.java,v 1.93 2008-01-21 16:12:04 markus Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.compiler;
@@ -1137,7 +1137,8 @@ private EventProxy findOriginalEvent(EventProxy event) {
 	}
 }
 
-private void findForbiddenStates(final EventProxy event, Set<EventProxy> newEvents) throws EvalException {
+private void findForbiddenStates(final EventProxy event, Set<EventProxy> newEvents) 
+throws EvalException {
 	/*
 	 * If a specification automaton contains the
 	 * event in the alphabet but not in transitions forbidden
@@ -1183,7 +1184,6 @@ private void findForbiddenStates(final EventProxy event, Set<EventProxy> newEven
 						.getName());
 			}			
 			if (!sortedPlantClauses.isEmpty()){
-			for (final SimpleExpressionProxy plantExpr : sortedPlantClauses) {			
 				final String name = event
 				.getName()
 				+ "*"
@@ -1194,7 +1194,7 @@ private void findForbiddenStates(final EventProxy event, Set<EventProxy> newEven
 						event.getKind(),
 					     event.isObservable());
 		mEventForbiddenStatesMap.put
-		(forbiddenEvent, new LocationsAndExpression(forbiddenLoc, plantExpr));
+		(forbiddenEvent, new LocationsAndExpression(forbiddenLoc, sortedPlantClauses));
 		newEvents.add(forbiddenEvent);
 		/*
 		 * If the plant guard is always true we still have a controllability problem 
@@ -1202,13 +1202,18 @@ private void findForbiddenStates(final EventProxy event, Set<EventProxy> newEven
 		 * the plant guard always is false is not yet handleled.
 		 */
 		mForbiddenEvents.add(forbiddenEvent);
-			}}
+			//}
+			}
 			else{
 				/*
 				 * I am not sure if this possibility exists.
 				 */
+				IntConstantProxy constant = mModuleFactory.createIntConstantProxy(1);
+				List <SimpleExpressionProxy> exp = new LinkedList <SimpleExpressionProxy>();
+				exp.add(constant);
 				mEventForbiddenStatesMap.put
-				(event, new LocationsAndExpression(forbiddenLoc,mModuleFactory.createIntConstantProxy(1)));
+				(event, new LocationsAndExpression
+						(forbiddenLoc, exp));
 			    mForbiddenEvents.add(event);
 			}
 		}
@@ -1229,11 +1234,11 @@ else{
 							collectUncontrollableGuard(plantExpr, specGuard);
 						final CompiledNormalForm dnfUncGuard = mDNFConverter
 								.convertToDNF(uncGuard);
-						 List<SimpleExpressionProxy> sortedUncClauses = mDNFConverter
-						.createSortedClauseList(dnfUncGuard);
+						 List<SimpleExpressionProxy> sortedUncClauses
+						 = mDNFConverter.createSortedClauseList(dnfUncGuard);
 						if(!dnfUncGuard.isEmpty()){
 						final CompiledNormalForm mdnfUncGuard = mDNFMinimizer.minimize(dnfUncGuard);
-						 sortedUncClauses = mDNFConverter
+						sortedUncClauses = mDNFConverter
 								.createSortedClauseList(mdnfUncGuard);
 						}
 						
@@ -1250,29 +1255,61 @@ else{
 									
 								}
 							}
-							for (final SimpleExpressionProxy uncExpr : sortedUncClauses) {
+							/*for (final SimpleExpressionProxy uncExpr : sortedUncClauses) {
 								final String name = event
 								.getName()
 								+ "*"
 								+ mCurrentEventID++;
-						final EventProxy forbiddenEvent = mDESFactory
+						
+								*/
+							boolean createNewEvent=true;
+							for(LocationsAndExpression locExp: mEventForbiddenStatesMap.values()){
+								if(fLoc.equals(locExp.getLocations())){
+									addGuardToExpression(locExp, sortedUncClauses);
+									createNewEvent=false;
+							}
+								}
+							if(createNewEvent){
+							final String name = event
+							.getName()
+							+ "*"
+							+ mCurrentEventID++;	
+							final EventProxy forbiddenEvent = mDESFactory
 								.createEventProxy(
 										name,
 										event.getKind(),
 									     event.isObservable());
-						mEventForbiddenStatesMap.put
-						(forbiddenEvent, new LocationsAndExpression(fLoc, uncExpr));
+							
+							
+							mEventForbiddenStatesMap.put
+						(forbiddenEvent, new LocationsAndExpression(fLoc, sortedUncClauses));
 						//Forbidden events are added to the global alphabet.
 						newEvents.add(forbiddenEvent);
-							}							
 							}
-						}
+							}	
 					}
 				}
 			}
-		}
-	}
+		}}}
 }
+	
+	
+					
+private void addGuardToExpression(LocationsAndExpression locExp, List<SimpleExpressionProxy> sortedAndClauses) throws EvalException {
+	SimpleExpressionProxy g1 = mModuleFactory.createIntConstantProxy(1);
+	SimpleExpressionProxy g2 = mModuleFactory.createIntConstantProxy(1);
+	final BinaryOperator andop = mOperatorTable.getAndOperator();
+    for(SimpleExpressionProxy c1: locExp.getExpression()){
+    	for (SimpleExpressionProxy c2: sortedAndClauses)
+    	g1= mModuleFactory.createBinaryExpressionProxy(andop, c1, c2);
+    	g2= mModuleFactory.createBinaryExpressionProxy(andop, g1, g2);
+    }
+	final CompiledNormalForm dnfUncGuard = mDNFConverter.convertToDNF(g2);
+	final CompiledNormalForm mdnfUncGuard = mDNFMinimizer.minimize(dnfUncGuard);
+	locExp.setExpression(mDNFConverter
+			.createSortedClauseList(mdnfUncGuard));
+}
+
 
 private void updateTransitionsInCompiledAutomata()
   {
@@ -1451,8 +1488,9 @@ private void updateTransitionsInCompiledAutomata()
       final Set<TransitionProxy> variableTransitions =
         new TreeSet<TransitionProxy>();
       for (EventProxy forbiddenEvent: mEventForbiddenStatesMap.keySet()){
-        final SimpleExpressionProxy clause =
-          mEventForbiddenStatesMap.get(forbiddenEvent).getExpression();  
+       final List <SimpleExpressionProxy> andClauseList =
+          mEventForbiddenStatesMap.get(forbiddenEvent).getExpression();
+        for(SimpleExpressionProxy clause: andClauseList){
         if (searcher.search(clause)){
           final String name = variable.getName();
           for (final IndexValue item : range.getValues()) {
@@ -1478,6 +1516,7 @@ private void updateTransitionsInCompiledAutomata()
             }
           }
         }
+      }
       }
       for (EventProxy relabeledEvent : mEFAEventGuardClauseMap.keySet()) {
         // Get the right action.
@@ -2324,7 +2363,7 @@ private List<List<BinaryExpressionProxy>>
    * and specifications that contains events that have been relabelled into more 
    * than one name.    
    */
-  private Map<EventProxy,LocationsAndExpression> mEventForbiddenStatesMap;
+  private Map<EventProxy, LocationsAndExpression> mEventForbiddenStatesMap;
   private Set<EventProxy> mForbiddenEvents;
   private Map<String,CompiledAutomaton> mCompiledAutomata;
 }

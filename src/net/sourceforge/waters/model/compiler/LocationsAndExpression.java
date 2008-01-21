@@ -1,7 +1,9 @@
 
 package net.sourceforge.waters.model.compiler;
+import java.util.List;
 import java.util.Set;
 
+import net.sourceforge.waters.model.expr.BinaryOperator;
 import net.sourceforge.waters.model.module.SimpleExpressionProxy;
 
 
@@ -10,11 +12,11 @@ class LocationsAndExpression
 
   //#########################################################################
   //# Constructors
-	LocationsAndExpression(final Set<String> forbiddenLoc, 
-		  final SimpleExpressionProxy sortedUncClause)
+	LocationsAndExpression(Set<String> forbiddenLoc, 
+		  List <SimpleExpressionProxy> sortedDNFClause)
   {
 	  mForbiddenLoc = forbiddenLoc;
-	  mUncontrollableClauses = sortedUncClause;
+	  mUncontrollableClauses = sortedDNFClause;
   }
 
 
@@ -25,15 +27,26 @@ class LocationsAndExpression
     return mForbiddenLoc;
   }
 
-  SimpleExpressionProxy getExpression()
+  List <SimpleExpressionProxy> getExpression()
   {
     return mUncontrollableClauses;
   }
+  
+  //#########################################################################
+  //# Setters
+  void setLocations(Set<String> forbiddenLoc)
+  {
+   mForbiddenLoc = forbiddenLoc;
+  }
 
-
+  void setExpression(List <SimpleExpressionProxy> uncontrollableClauses)
+  {
+   mUncontrollableClauses = uncontrollableClauses;
+  }
+  
   //#########################################################################
   //# Data Members
-  private final Set<String> mForbiddenLoc;
-  private final SimpleExpressionProxy mUncontrollableClauses;
+  private Set<String> mForbiddenLoc;
+  private List <SimpleExpressionProxy> mUncontrollableClauses;
 
 }
