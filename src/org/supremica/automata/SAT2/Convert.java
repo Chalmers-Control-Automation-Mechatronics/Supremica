@@ -202,9 +202,6 @@ public class Convert {
     }
 
  
-//    public static Expr Eq(Expr e1, Expr e2){
-//        return And(Or(Not(e1), e2), Or(Not(e2), e1));
-//    }
     public static Expr Lit(int i){
         return new Lit(i);
     }
@@ -219,6 +216,12 @@ public class Convert {
         add(res,e1);
         add(res,e2);
         return res;
+    }
+    public static Expr Impl(Expr e1, Expr e2){
+        return Or(Not(e1), e2);
+    }
+    public static Expr Eq(Expr e1, Expr e2){
+        return And(Impl(e1,e2), Impl(e2,e1));
     }
     private static void add(MOp big, Expr e){
         if(e.getType()==big.type)

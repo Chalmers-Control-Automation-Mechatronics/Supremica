@@ -146,7 +146,6 @@ public class AutomataToBoolForControlability implements IAutomataToBool
     public void printDimacsSatStr(PrintWriter pwOut){
         Expr nBCF = getBoolFlatExpr();
         System.err.print("Producing DIMACS SAT...");
-        int numClauses = ((mAnd)nBCF).childs.size();
         pwOut.println("p sat "+ envBool.vars.size());
         pwOut.print(PrinterDimacsSat.Print2(nBCF));
         pwOut.flush();
@@ -514,47 +513,6 @@ public class AutomataToBoolForControlability implements IAutomataToBool
             System.err.println("warning: no clauses for forbidden states were added");
         else
             addClause(forbCond);
-    }
-    void addBlockingDetermination(){
-        Map<String, Map <String, List<int[]>>> arcsMap = 
-                new HashMap<String, Map <String, List<int[]>>>();
-        for(Automaton a: ats){
-            arcsMap.put(a.getName(), getArcsForEvents(a));
-        }
-        Expr sometimeDisabled = null;
-        for(int timestep = 0; timestep < totalSteps; timestep++){
-            Expr allEventsDisabled = null;
-            for(LabeledEvent e : abc){
-                //mAnd eventIsEanbled = new mAnd();
-                Expr eventIsEanbled = null;
-                for(Automaton a: ats){      
-                    if(a.getAlphabet().contains(e.getLabel())){
-                        //mOr enabledInA = new mOr();
-                        Expr enabledInA = null;
-                        Map<String, List<int[]>> arcs = arcsMap.get(a.getName());
-                        for(int[] ft: arcs.get(e.getLabel())){
-                            Expr node = replaceNode(new VarEqInt(
-                                    getStateVariable(a.getName(), timestep), 
-                                    ft[0]
-                                    ));
-                            enabledInA = enabledInA==null?node:new Or(enabledInA, node);
-                            //enabledInA.add(node);
-                        }
-                        //eventIsEanbled.add(enabledInA);
-                        eventIsEanbled = eventIsEanbled==null?enabledInA:
-                            new And(eventIsEanbled, enabledInA);
-                        //addAnd(eventIsEanbled, enabledInA);
-                    }
-                }
-                Expr evDisabled = new Not(replaceNode(eventIsEanbled));
-                allEventsDisabled = allEventsDisabled==null? evDisabled: 
-                    new And(allEventsDisabled, evDisabled);
-            }
-            allEventsDisabled = replaceNode(allEventsDisabled);
-            sometimeDisabled = sometimeDisabled==null? allEventsDisabled:
-                new Or(sometimeDisabled, allEventsDisabled);
-        }
-        addClause(sometimeDisabled);
     }
    
 }

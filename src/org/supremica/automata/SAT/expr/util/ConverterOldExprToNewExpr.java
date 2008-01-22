@@ -4,8 +4,8 @@
  */
 
 package org.supremica.automata.SAT.expr.util;
-import org.supremica.automata.SAT.expr.*;
-import org.supremica.automata.SAT2.Convert.*;
+import  org.supremica.automata.SAT.expr.*;
+import  org.supremica.automata.SAT2.Convert.*;
 
 /**
  *

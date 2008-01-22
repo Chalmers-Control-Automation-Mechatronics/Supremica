@@ -110,7 +110,19 @@ public class SATAutomata {
             System.err.println("line to decode: " + line);
             atb.printDimacsCnfStr(cnfFile);
             atb.decode(line);            
-        }        
+        } else if(action.equalsIgnoreCase("solveSat4j")){
+            org.sat4j.specs.ISolver solver = SolverFactory.newDefault();            
+            atb.chargeSolver(solver);
+            System.out.println("Start solving...");
+            if(solver.isSatisfiable()) {
+                System.out.println("Satisfiable !");
+                atb.decode(solver.model());
+            } else {
+                System.out.println("Unsatisfiable !");
+            }
+            
+        }
+
     }
 
 

@@ -62,73 +62,45 @@ public class AutomataToBoolForDeadlock implements IAutomataToBool
      *
      */
     
-    private Expr getBoolCnfFlatExpr(){
-        System.err.print("Generating expression...");
-        //addGoal();        
-        addBlockingDetermination();
-        //addForbidden();
-        addInit();
-        addTransitions();
-        System.err.println(" done");
-        System.err.println("\nexpr type after creation is "+ completeExpression.type.toString());
         
-        System.err.println("Expr:");        
-        System.err.println(PrinterInfix.print(completeExpression));
-                        
+    private void addAllClauses(){
+        System.err.print("Generating expression...");
+
+        //addClausesForGoal();        
+        addClausesForBlockingDetermination();
+        //addClausesForForbiddenStates();
+        addClausesForInitState();
+        addClausesForTransitions();
+        
+        System.err.println(" done");        
+    }
+    private Expr getBoolExpr(){
+        addAllClauses();
+
         System.err.print("Converting variables to boolean...");
         vareq = new ConverterVarEqToBool(env, envBool);        
-        Expr nB = vareq.initConvert(completeExpression);
+        Expr e = vareq.initConvert(completeExpression);
         System.err.println(" done");
-        System.err.println("\nexpr type after converting to boolean is "+ nB.type.toString());
-
-        System.err.println("Expr:");        
-        System.err.println(PrinterInfix.print(completeExpression));
         
-        System.err.print("Removing negations...");
-        Expr nBN = ConverterToNonNegated.removeAllNegations(nB);
-        System.err.println(" done");                        
-        System.err.println("\nexpr type after removing negations is "+ nBN.type.toString());
-
-        System.err.println("Expr:");        
-        System.err.println(PrinterInfix.print(completeExpression));
-                
-//        System.err.print("Flattening expression tree...");
-//        Expr nBNF = ConverterToFlattened.convert(nBN);
-//        System.err.println(" done");                        
+        return e;
+    }
         
-        System.err.print("Converting to CNF...");
-//        ConverterBoolToCnfStruct conv = new ConverterBoolToCnfStruc(env);
-//        Expr nBNFC = conv.convertAll(nBNF);
-        Expr nBNC = ConverterBoolToCnfSat.convert(nBN);
-        System.err.println(" done");        
-
-        System.err.println("Expr:");        
-        System.err.println(PrinterInfix.print(completeExpression));
-
-//        System.err.print("Flattening expression tree again...");
-//        Expr nBNFCF = ConverterToFlattened.convert(nBNFC);
-//        System.err.println(" done");                        
-
-        System.err.println("\n\nexpr to return' type is "+ nBNC.type.toString());
-        
-        return nBNC;
+    
+    private class Pair<A,B>{
+        public final A a;
+        public final B b;
+        public Pair(A v1, B v2){
+            a=v1;
+            b=v2;                  
+        }
     }
     
-    public void printDimacsCnfStr(PrintWriter pwOut){
-        System.err.print("Generating expression...");
-        addInit();
-        addTransitions();
-        addBlockingDetermination();
-        System.err.println(" done");
-                                
-        System.err.print("Converting variables to boolean...");
-        vareq = new ConverterVarEqToBool(env, envBool);        
-        Expr nB = vareq.initConvert(completeExpression);
-        System.err.println(" done");
+    private Pair<org.supremica.automata.SAT2.Convert.Clauses, Integer>
+            oldExprToNewClauses(Expr e){
 
         System.err.print("Converting old expr to new expr...");
         org.supremica.automata.SAT2.Convert.Expr e2 = 
-                ConverterOldExprToNewExpr.convert(nB);
+                ConverterOldExprToNewExpr.convert(e);
         System.err.println(" done");
                 
         System.err.print("Converting to CNF...");
@@ -137,57 +109,62 @@ public class AutomataToBoolForDeadlock implements IAutomataToBool
         org.supremica.automata.SAT2.Convert.Clauses cs = conv.convert(e2);
         System.err.println(" done");        
         
+        return new Pair(cs, conv.varCounter);
+    }
+    
+    public void printDimacsCnfStr(PrintWriter pwOut){        
+        
+        Expr e = getBoolExpr();
+        
+        Pair<org.supremica.automata.SAT2.Convert.Clauses, Integer> p =
+                oldExprToNewClauses(e);
+
+        org.supremica.automata.SAT2.Convert.Clauses cs = p.a;
+        int varCounter = p.b;
+        
         System.err.print("Producing DIMACS CNF...");
         pwOut.println(org.supremica.automata.SAT2.Convert.toDimacsCnfString(
-                cs, conv.varCounter));
+                cs, varCounter));
         pwOut.flush();
         System.err.println(" done");                                
     }
-    public void printDimacsCnfStrOld(PrintWriter pwOut){
-        Expr nBCF = getBoolCnfFlatExpr();
-        System.err.print("Producing DIMACS CNF...");
-        int numClauses = ((mAnd)nBCF).childs.size();
-        pwOut.println("p cnf "+ envBool.vars.size() + " " + numClauses);
-        PrinterDimacsCnf.print(nBCF, pwOut);
-        pwOut.flush();
-        System.err.println(" done");                                
-    }
-    public  void  printDimacsSatStr(PrintWriter pwOut){
-        throw new UnsupportedOperationException("not yet");
+//    public void printDimacsCnfStrOld(PrintWriter pwOut){
 //        Expr nBCF = getBoolCnfFlatExpr();
-//        System.err.print("Producing DIMACS SAT...");
-//        pwOut.println("p sat "+ envBool.vars.size());
-//        pwOut.print(PrinterDimacsSat.Print2(nBCF));
+//        System.err.print("Producing DIMACS CNF...");
+//        int numClauses = ((mAnd)nBCF).childs.size();
+//        pwOut.println("p cnf "+ envBool.vars.size() + " " + numClauses);
+//        PrinterDimacsCnf.print(nBCF, pwOut);
 //        pwOut.flush();
-//        System.err.println(" done");                  
+//        System.err.println(" done");                                
+//    }
+    public  void  printDimacsSatStr(PrintWriter pwOut){
+        Expr e = getBoolExpr();       
+        System.err.print("Producing DIMACS SAT...");
+        pwOut.println("p sat "+ envBool.vars.size());
+        pwOut.print(PrinterDimacsSat.Print2(e));
+        pwOut.flush();
+        System.err.println(" done");                  
     }
     
     public void chargeSolver(ISolver solver)
     {
-        Expr nBCF = getBoolCnfFlatExpr();
+        Expr e = getBoolExpr();
+        
+        Pair<org.supremica.automata.SAT2.Convert.Clauses, Integer> p =
+                oldExprToNewClauses(e);
+
+        org.supremica.automata.SAT2.Convert.Clauses cs = p.a;
+                
         System.err.print("Producing Solver...");
         solver.newVar(envBool.vars.size());
-        for(Expr clause: (mAnd) nBCF)
+        for(org.supremica.automata.SAT2.Convert.Clause c: cs)
         {
             try {
                 IVecInt vi = new VecInt();
-                switch(clause.type){
-                    case LIT:
-                        vi.push((((Literal) clause).isPositive ? 1 : -1) * 
-                                ((Literal) clause).variable.id);
-                        break;
-                    case MOR:
-                        for (Expr lit : (mOr) clause) {
-                            vi.push((((Literal) lit).isPositive ? 1 : -1) * 
-                                    ((Literal) lit).variable.id);
-                        }
-                        break;
-                    default:
-                        throw new IllegalArgumentException("Unexpected "+
-                                clause.type.toString());
-                }
+                for(int i: c)
+                    vi.push(i);
+                
                 solver.addClause(vi);
-
             } catch (ContradictionException ex) {
                 System.err.println("  contradiction found...");
             }
@@ -338,7 +315,7 @@ public class AutomataToBoolForDeadlock implements IAutomataToBool
         completeExpression.add(n);
     }
     
-    void addInit()
+    void addClausesForInitState()
     {
         int initTimeStep = 0;
         for(Automaton a: ats)
@@ -348,7 +325,7 @@ public class AutomataToBoolForDeadlock implements IAutomataToBool
                     ));        
     }
     
-    void addTransitions()
+    void addClausesForTransitions()
     {
         for(Automaton a : ats){       
             Map<String, List<int[]>> statesForEvents = 
@@ -473,7 +450,7 @@ public class AutomataToBoolForDeadlock implements IAutomataToBool
         addClause(n);        
     }
             
-    void addGoal(){
+    void addClausesForGoal(){
         //Expr n = /*replaceNode*/(new VarEqInt(
         //        getEventVariable(0), 
         //        abc.getEvent("marking").getIndex()));
@@ -490,7 +467,7 @@ public class AutomataToBoolForDeadlock implements IAutomataToBool
         }
         addClause(res);        
     }
-    void addForbidden(){
+    void addClausesForForbiddenStates(){
         Expr forbCond = null;
         for(int timeStep = 0; timeStep < totalSteps; timeStep++){
             for(Automaton a: ats){
@@ -509,7 +486,7 @@ public class AutomataToBoolForDeadlock implements IAutomataToBool
         else
             addClause(forbCond);
     }
-    void addBlockingDetermination(){
+    void addClausesForBlockingDetermination(){
         int timestep = totalSteps-1;
         //mOr disabledSometime = new mOr();
         //for(int timestep = 0; timestep < totalSteps; timestep++ ){
