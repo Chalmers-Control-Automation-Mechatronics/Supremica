@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.module
 //# CLASS:   ModuleCompiler
 //###########################################################################
-//# $Id: ModuleCompiler.java,v 1.94 2008-01-21 17:17:44 markus Exp $
+//# $Id: ModuleCompiler.java,v 1.95 2008-01-22 15:50:23 markus Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.compiler;
@@ -899,7 +899,6 @@ private void isEFA(List<Proxy> componentList) {
           }
        
           final CompiledNormalForm dnf = mDNFConverter.convertToDNF(guard);
-          //Collection<CompiledClause> andClauses = dnf.getClauses();
           List<SimpleExpressionProxy> sortedAndClauses =
               mDNFConverter.createSortedClauseList(dnf);
           if(!dnf.isEmpty()){
@@ -907,7 +906,6 @@ private void isEFA(List<Proxy> componentList) {
           sortedAndClauses = mDNFConverter.createSortedClauseList(mdnf);
           }
           if (!sortedAndClauses.isEmpty()) {
-            //final List<SimpleExpressionProxy> sortedAndClauses = mDNFConverter.createSortedClauseList(andClauses);
             newEvents.remove(orgEvent);
             final List<List<BinaryExpressionProxy>> actionLists =
               collectAction(path);
@@ -1142,9 +1140,7 @@ throws EvalException {
 	/*
 	 * If a specification automaton contains the
 	 * event in the alphabet but not in transitions forbidden
-	 * is set to true, i.e non-empty. This can not
-	 * occur in the editor but can be implemented using 
-	 * a transition with the guard "false". 
+	 * is set to true, i.e non-empty.  
 	 */
 	Set<Boolean> forbidden =
         new HashSet<Boolean>();
@@ -1165,14 +1161,18 @@ throws EvalException {
 		final SimpleExpressionProxy plantGuard = collectGuard(plantTrans);
 		CompiledNormalForm dnfPlant = mDNFConverter
 				.convertToDNF(plantGuard);
-		List<SimpleExpressionProxy> sortedPlantClauses = mDNFConverter
-		.createSortedClauseList(dnfPlant);
+		/*
+		 * dnfPlant.isEmpty() means plantguard always true.
+		 */
 		if(!dnfPlant.isEmpty()){
 		CompiledNormalForm mdnfPlant = mDNFMinimizer.minimize(dnfPlant);
-		sortedPlantClauses = mDNFConverter
+		List<SimpleExpressionProxy> sortedPlantClauses = mDNFConverter
 				.createSortedClauseList(mdnfPlant);
-		}
-		if(!forbidden.isEmpty()){
+		/*
+		 * A specification automaton contains the
+	     * event in the alphabet but not in transitions.
+		 */
+		if(!forbidden.isEmpty()&& !sortedPlantClauses.isEmpty()){
 			Set<String> forbiddenLoc=new TreeSet<String>();
 			/*
 			 * Collect forbidden locations. Since the event 
@@ -1183,8 +1183,17 @@ throws EvalException {
 						.getSource()
 						.getName());
 			}			
-			if (!sortedPlantClauses.isEmpty()){
-				final String name = event
+
+			boolean createNew=true;
+			for(LocationsAndExpression locExp: mEventForbiddenStatesMap.values()){
+				if(forbiddenLoc.equals(locExp.getLocations())){
+					addGuardToExpression(locExp, sortedPlantClauses);
+					createNew=false;
+			}
+				}
+			if(createNew){		
+			
+	    final String name = event
 				.getName()
 				+ "*"
 				+ mCurrentEventID++;
@@ -1196,29 +1205,14 @@ throws EvalException {
 		mEventForbiddenStatesMap.put
 		(forbiddenEvent, new LocationsAndExpression(forbiddenLoc, sortedPlantClauses));
 		newEvents.add(forbiddenEvent);
+		mForbiddenEvents.add(forbiddenEvent);
 		/*
 		 * If the plant guard is always true we still have a controllability problem 
 		 * i.e. either way we must forbid the event. The case when 
-		 * the plant guard always is false is not yet handleled.
+		 * the plant guard always is false should correspond to the case 
+		 * when sortedPlantClauses.isEmpty().
 		 */
-		mForbiddenEvents.add(forbiddenEvent);
-			//}
-			}
-			else{
-				/*
-				 * I am not sure if this possibility exists.
-				 */
-				IntConstantProxy constant = mModuleFactory.createIntConstantProxy(1);
-				List <SimpleExpressionProxy> exp = new LinkedList <SimpleExpressionProxy>();
-				exp.add(constant);
-				mEventForbiddenStatesMap.put
-				(event, new LocationsAndExpression
-						(forbiddenLoc, exp));
-			    mForbiddenEvents.add(event);
-			}
-		}
-			
-		
+		}}		
 else{
 		for (final SimpleExpressionProxy plantExpr : sortedPlantClauses) {
 			for (List<TransitionProxy> specTrans : plantSpecTrans
@@ -1234,13 +1228,10 @@ else{
 							collectUncontrollableGuard(plantExpr, specGuard);
 						final CompiledNormalForm dnfUncGuard = mDNFConverter
 								.convertToDNF(uncGuard);
-						 List<SimpleExpressionProxy> sortedUncClauses
-						 = mDNFConverter.createSortedClauseList(dnfUncGuard);
 						if(!dnfUncGuard.isEmpty()){
 						final CompiledNormalForm mdnfUncGuard = mDNFMinimizer.minimize(dnfUncGuard);
-						sortedUncClauses = mDNFConverter
+						List<SimpleExpressionProxy> sortedUncClauses = mDNFConverter
 								.createSortedClauseList(mdnfUncGuard);
-						}
 						
 						if (!sortedUncClauses.isEmpty()) {
 							Set<String> fLoc=new TreeSet<String>();
@@ -1251,17 +1242,9 @@ else{
 								for (TransitionProxy spec : specTrans) {
 									String name=spec.getSource().getName(); 
 									fLoc.add(name);
-								//collectUncontrollableEFASpec(name);
-									
 								}
 							}
-							/*for (final SimpleExpressionProxy uncExpr : sortedUncClauses) {
-								final String name = event
-								.getName()
-								+ "*"
-								+ mCurrentEventID++;
 						
-								*/
 							boolean createNewEvent=true;
 							for(LocationsAndExpression locExp: mEventForbiddenStatesMap.values()){
 								if(fLoc.equals(locExp.getLocations())){
@@ -1283,14 +1266,14 @@ else{
 							
 							mEventForbiddenStatesMap.put
 						(forbiddenEvent, new LocationsAndExpression(fLoc, sortedUncClauses));
-						//Forbidden events are added to the global alphabet.
 						newEvents.add(forbiddenEvent);
+						mForbiddenEvents.add(forbiddenEvent);
 							}
-							}	
+							}	}
 					}
 				}
 			}
-		}}}
+		}}}}
 }
 	
 	
