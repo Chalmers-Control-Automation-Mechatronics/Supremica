@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.module
 //# CLASS:   ModuleCompiler
 //###########################################################################
-//# $Id: ModuleCompiler.java,v 1.96 2008-01-23 13:59:20 markus Exp $
+//# $Id: ModuleCompiler.java,v 1.97 2008-01-23 14:49:52 markus Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.compiler;
@@ -1267,8 +1267,8 @@ else{
 						(forbiddenEvent, new LocationsAndExpression(fLoc, sortedUncClauses));
 						newEvents.add(forbiddenEvent);
 						mForbiddenEvents.add(forbiddenEvent);
-							
-							}	}
+							}	
+							}
 					}
 				}
 			}
@@ -1497,7 +1497,9 @@ private void updateTransitionsInCompiledAutomata()
           mEventForbiddenStatesMap.get(forbiddenEvent).getExpression();
         for(SimpleExpressionProxy clause: andClauseList){
         if (searcher.search(clause)){
-          final String name = variable.getName();
+        	 variableAlphabet.add(forbiddenEvent); 
+             mForbiddenEvents.add(forbiddenEvent);
+        	final String name = variable.getName();
           for (final IndexValue item : range.getValues()) {
             final StateProxy source = variableStates.get(item);
             mContext.add(name, item);
@@ -1512,8 +1514,6 @@ private void updateTransitionsInCompiledAutomata()
                                                     forbiddenEvent,
                                                     source);
                 variableTransitions.add(forbiddenTransition);
-                variableAlphabet.add(forbiddenEvent); 
-                mForbiddenEvents.add(forbiddenEvent);
               }
             }
             finally {
