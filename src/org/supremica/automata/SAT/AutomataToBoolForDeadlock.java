@@ -105,7 +105,9 @@ public class AutomataToBoolForDeadlock implements IAutomataToBool
                 
         System.err.print("Converting to CNF...");
         org.supremica.automata.SAT2.Convert conv = 
-                new org.supremica.automata.SAT2.Convert(envBool.vars.size()+1);
+                new org.supremica.automata.SAT2.Convert(
+                envBool.vars.size()+1,
+                envBool.vars.size()+1);
         org.supremica.automata.SAT2.Convert.Clauses cs = conv.convert(e2);
         System.err.println(" done");        
         

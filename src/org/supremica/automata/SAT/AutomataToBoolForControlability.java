@@ -105,7 +105,7 @@ public class AutomataToBoolForControlability implements IAutomataToBool
 
         System.err.print("Converting to cnf...");
         org.supremica.automata.SAT2.Convert conv = 
-                new org.supremica.automata.SAT2.Convert(envBool.vars.size()+1);
+                new org.supremica.automata.SAT2.Convert(envBool.vars.size()+1,envBool.vars.size()+1);
         org.supremica.automata.SAT2.Convert.Clauses cs = conv.convert(nBN);
         System.err.println(" done");
 

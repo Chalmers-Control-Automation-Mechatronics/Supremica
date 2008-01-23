@@ -36,7 +36,7 @@ public class Convert {
     }
 
     public static class MOp extends HashSet<Expr> implements Expr{
-        private final ExType type;
+        public final ExType type;
         public ExType getType(){
             return type;
         }
@@ -111,16 +111,24 @@ public class Convert {
     private Map<Expr, Integer> cache = new HashMap<Expr,Integer>();
     // remember to reserve one variable for "TRUE" and never use variable "0"
     public int varCounter;  
+    public int trueVar=1;
     
+    PrintStream out = System.out;
+    int clauseCounter = 0;
     // ----
     
-    public Convert(int trueAndStartVar){
-        varCounter = trueAndStartVar;
+    /**
+     * OBS! do not forget to add trueVar explicitly to CNF if not use removeTrue
+     * @param trueVar_
+     * @param totalUsedVars
+     */
+    public Convert(int trueVar_, int totalUsedVars){
+        varCounter = totalUsedVars;
+        trueVar = trueVar_;
     }
     
     public Clauses convert(Expr f){
-        int trueVar = varCounter;
-        return removeTrue(subst(f, varCounter), trueVar);
+        return removeTrue(subst(f, trueVar), trueVar);
     }
     
     public Clauses subst(Expr f, int vf){
@@ -148,7 +156,37 @@ public class Convert {
         }
     }
             
-    // not working yet -- hash of Expr is not correct
+    public void substOnline(Expr f, int vf){
+        if(wasSubstituted(f))
+            printClauses(toCnfVarEqVar(vf, getCached(f)));
+        else if(atomic(f))
+            printClauses(toCnfVarEqExpr(vf, f));
+        else {
+            MOp ori = new MOp( ((MOp)f).type);
+            for(Expr h: (MOp)f){
+                if(h.getType()==ExType.LIT){ // already atom
+                    ori.add(h);
+                } else {
+                    int vh = nextBool();
+                    ori.add(Lit(vh)); // TODO: "Lit" or somehow else?                    
+                    substOnline(h, vh);
+                }
+            }
+            printClauses(toCnfVarEqExpr(vf, ori));
+            cache(f, vf);
+        }
+    }
+
+    private void printClauses(Clauses cs){
+        for(Clause c: cs){
+            clauseCounter++;
+            for(int i: c)
+                out.print(""+i+" ");
+            out.print("0\n");
+        }        
+    }
+    
+    
     private void cache(Expr f, int vf){
         cache.put(f, vf);
     }
@@ -332,16 +370,17 @@ public class Convert {
         return csRes;
     }
     
+    public static Expr te = Or(And(Lit(1),Lit(2)), Or(And(Lit(3),Lit(4)), And(Lit(1),Lit(3))) );
+    
     public static void main(String[] args){
-        do2();
+        do1();
+        System.out.println("---");
+        do3();
     }
     private static void do1(){
-        System.out.println("hello world");
 //        Expr e = Or(And(Lit(1), Lit(2)),Not(And(Lit(3), Lit(4))));
-        Expr e = Or(And(Lit(1),Lit(2)), Or(And(Lit(1),Lit(2)), And(Lit(1),Lit(2))) );
-        Convert conv = new Convert(10);
-        Clauses cs = conv.convert(e);
-        System.out.println("number of clauses: " + cs.size());
+        Convert conv = new Convert(10, 10);
+        Clauses cs = conv.convert(te);
         //Convert.print(cs, conv.varCounter, System.out);
         System.out.println(toDimacsCnfString(cs, conv.varCounter));
     }
@@ -353,5 +392,16 @@ public class Convert {
         System.out.println("e1 h: " + e1.hashCode());
         System.out.println("e2 h: " + e2.hashCode());
         System.out.println(e1.equals(e2)?"eq":"ne!");
+    }
+    private static void do3(){
+//        Expr e = Or(And(Lit(1), Lit(2)),Not(And(Lit(3), Lit(4))));
+        int t = 10;
+        Convert conv = new Convert(t,10);
+        conv.substOnline(te, t);
+        System.out.println(""+t+" 0");
+        System.out.println("p cnf " 
+                + conv.varCounter + " " 
+                + (conv.clauseCounter+1));
+        
     }
 }

@@ -121,7 +121,7 @@ public class MSR {
                                 a.addArc(new Arc(s, forb, e));
                         
     }
-    
+
     
     public static void main(String [] args) throws Exception{       
         int          steps = Integer.parseInt(args[0]);
@@ -129,7 +129,7 @@ public class MSR {
         modifyCV(ats);
         MSR          msr   = new MSR(ats);
         Convert.Expr e     = msr.full(steps);
-        Convert      conv  = new Convert(msr.trueVariable);
+        Convert      conv  = new Convert(msr.trueVariable,msr.trueVariable);
         Convert.Clauses cs = conv.convert(e);
         String out         = Convert.toDimacsCnfString(cs, conv.varCounter);
         
