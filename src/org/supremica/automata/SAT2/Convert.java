@@ -16,7 +16,7 @@ import java.util.*;
  */
 public class Convert {
     
-    public enum ExType{
+    public static enum ExType{
         MAND,
         MOR,
         LIT
@@ -43,10 +43,56 @@ public class Convert {
         public MOp(ExType t){
             type = t;
         }
+        @Override
+        public int hashCode(){
+            int code = 0;
+            for(Expr e: this)
+                code += e.hashCode();
+            return code*((type == ExType.MAND)?13:17);
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            if (obj == null) {
+                return false;
+            }
+            if (getClass() != obj.getClass()) {
+                return false;
+            }
+            final MOp other = (MOp) obj;
+            if(type != other.type)
+                return false;
+            if(size() != other.size())
+                return false;
+            for(Expr e: other)
+                if(!this.contains(e))
+                    return false;
+            
+            return true;
+        }
     }    
     public static class Lit implements Expr{
         private final ExType type;
         public final int var; 
+        @Override
+        public int hashCode(){
+            return var;
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            if (obj == null) {
+                return false;
+            }
+            if (getClass() != obj.getClass()) {
+                return false;
+            }
+            final Lit other = (Lit) obj;
+            if (this.var != other.var) {
+                return false;
+            }
+            return true;
+        }
         public ExType getType(){
             return type;
         }
@@ -286,7 +332,10 @@ public class Convert {
         return csRes;
     }
     
-    public static void main(String[] args){        
+    public static void main(String[] args){
+        do2();
+    }
+    private static void do1(){
         System.out.println("hello world");
 //        Expr e = Or(And(Lit(1), Lit(2)),Not(And(Lit(3), Lit(4))));
         Expr e = Or(And(Lit(1),Lit(2)), Or(And(Lit(1),Lit(2)), And(Lit(1),Lit(2))) );
@@ -295,5 +344,14 @@ public class Convert {
         System.out.println("number of clauses: " + cs.size());
         //Convert.print(cs, conv.varCounter, System.out);
         System.out.println(toDimacsCnfString(cs, conv.varCounter));
+    }
+    private static void do2(){
+        
+        Expr e1 = Or(Lit(1),Lit(2));
+        Expr e2 = And(Lit(1),Lit(2));
+        
+        System.out.println("e1 h: " + e1.hashCode());
+        System.out.println("e2 h: " + e2.hashCode());
+        System.out.println(e1.equals(e2)?"eq":"ne!");
     }
 }

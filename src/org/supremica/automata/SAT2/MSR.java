@@ -18,6 +18,7 @@ public class MSR {
     private Automata ats;
     private Alphabet abc;
     final static String MARKING_NAME = "marking";
+    final static String FORBIDDEN_NAME = "forbidden";
     
     public MSR(Automata inputAutomata){
         ats = inputAutomata;
@@ -103,7 +104,7 @@ public class MSR {
     }
 
     public static void modifyCV(Automata ats){
-        State forb = new State("forbidden");
+        State forb = new State(FORBIDDEN_NAME);
         LabeledEvent marking = new LabeledEvent(MARKING_NAME);
         for(Automaton a: ats){
             a.addState(forb);                

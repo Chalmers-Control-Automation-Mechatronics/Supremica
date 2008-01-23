@@ -65,12 +65,14 @@ public class SATAutomata {
         for(int i = 0; i < args.length; i++){
             if(args[i].equalsIgnoreCase("--steps"))
                 totalSteps = Integer.parseInt(args[++i]);
-            if(args[i].equalsIgnoreCase("--problem"))
+            else if(args[i].equalsIgnoreCase("--problem"))
                 problem = args[++i];
-            if(args[i].equalsIgnoreCase("--action"))
+            else if(args[i].equalsIgnoreCase("--action"))
                 action = args[++i];
-            if(args[i].equalsIgnoreCase("--answerFile"))
+            else if(args[i].equalsIgnoreCase("--answerFile"))
                 answerFile = args[++i];
+            else 
+                System.err.println("usage: --steps <> --problem {CV,DV,MSR} --action {makeCnf,makeSat}");
         }
         
         Project ats = null;
