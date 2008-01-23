@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.module
 //# CLASS:   ModuleCompiler
 //###########################################################################
-//# $Id: ModuleCompiler.java,v 1.95 2008-01-22 15:50:23 markus Exp $
+//# $Id: ModuleCompiler.java,v 1.96 2008-01-23 13:59:20 markus Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.compiler;
@@ -147,7 +147,7 @@ public class ModuleCompiler extends AbstractModuleProxyVisitor
       mIsEFA = false;
       isEFA(module.getComponentList());
       if(mIsEFA){
-    	  ExtendedAutomataExpander.expandTransitions((ModuleSubject)module);
+    	 ExtendedAutomataExpander.expandTransitions((ModuleSubject)module);
       }
       visitModuleProxy(module);
       /*
@@ -905,7 +905,7 @@ private void isEFA(List<Proxy> componentList) {
           final CompiledNormalForm mdnf = mDNFMinimizer.minimize(dnf);
           sortedAndClauses = mDNFConverter.createSortedClauseList(mdnf);
           }
-          if (!sortedAndClauses.isEmpty()) {
+ //         if (!sortedAndClauses.isEmpty()) {
             newEvents.remove(orgEvent);
             final List<List<BinaryExpressionProxy>> actionLists =
               collectAction(path);
@@ -923,7 +923,7 @@ private void isEFA(List<Proxy> componentList) {
               // New transitions with the new event names are added to
               // the automata.
               addNewTransitionsToCompiledAutomtata(relabeledEvent, path);
-             }
+   //          }
           }
         }
       }
@@ -1172,7 +1172,7 @@ throws EvalException {
 		 * A specification automaton contains the
 	     * event in the alphabet but not in transitions.
 		 */
-		if(!forbidden.isEmpty()&& !sortedPlantClauses.isEmpty()){
+		if(!forbidden.isEmpty()&& containsVariableCondition(sortedPlantClauses)){
 			Set<String> forbiddenLoc=new TreeSet<String>();
 			/*
 			 * Collect forbidden locations. Since the event 
@@ -1219,7 +1219,6 @@ else{
 					.get(1)) {
 				if (!specTrans.isEmpty()) {
 					final SimpleExpressionProxy specGuard = collectGuard(specTrans);
-					if (!specGuard.equals("1")) {
 						/*
 						 * Collect forbidden guards and
 						 * locations.
@@ -1233,7 +1232,7 @@ else{
 						List<SimpleExpressionProxy> sortedUncClauses = mDNFConverter
 								.createSortedClauseList(mdnfUncGuard);
 						
-						if (!sortedUncClauses.isEmpty()) {
+						if (containsVariableCondition(sortedUncClauses)) {
 							Set<String> fLoc=new TreeSet<String>();
 							for (TransitionProxy plant : plantTrans) {
 								fLoc.add(plant
@@ -1268,13 +1267,30 @@ else{
 						(forbiddenEvent, new LocationsAndExpression(fLoc, sortedUncClauses));
 						newEvents.add(forbiddenEvent);
 						mForbiddenEvents.add(forbiddenEvent);
-							}
+							
 							}	}
 					}
 				}
 			}
 		}}}}
 }
+	private boolean containsVariableCondition(
+			List<SimpleExpressionProxy> clauses) {
+		for (VariableComponentProxy variable : mVariableComponents) {
+			try {
+				VariableSearcher searcher = new VariableSearcher(variable);
+				for (SimpleExpressionProxy clause : clauses) {
+					if (searcher.search(clause)) {
+						return true;
+					}
+				}
+			} catch (final VisitorException exception) {
+				exception.getStackTrace();
+			}
+
+		}
+		return false;
+	}
 	
 	
 					
@@ -1789,13 +1805,13 @@ private void updateTransitionsInCompiledAutomata()
   private SimpleExpressionProxy collectUncontrollableGuard
   (SimpleExpressionProxy plantGuard, SimpleExpressionProxy specGuard)
 {
-  final BinaryOperator andop = mOperatorTable.getAndOperator();
-  final UnaryOperator notop = mOperatorTable.getNotOperator();
+  final BinaryOperator andOp = mOperatorTable.getAndOperator();
+  final UnaryOperator notOp = mOperatorTable.getNotOperator();
   SimpleExpressionProxy falseSpecGuard = null;
   SimpleExpressionProxy result = null;
-  falseSpecGuard=mModuleFactory.createUnaryExpressionProxy(notop, specGuard);
+  falseSpecGuard=mModuleFactory.createUnaryExpressionProxy(notOp, specGuard);
       result =
- mModuleFactory.createBinaryExpressionProxy(andop, falseSpecGuard, plantGuard);
+ mModuleFactory.createBinaryExpressionProxy(andOp, falseSpecGuard, plantGuard);
       
   if (result == null) {
     return mModuleFactory.createIntConstantProxy(1);
@@ -1815,9 +1831,9 @@ private void updateTransitionsInCompiledAutomata()
         mEFATransitionGuardActionBlockMap.get(trans);
       if (block != null) {
         for (final SimpleExpressionProxy guard : block.getGuards()) {
-        	/*if(guard.toString().equals("false")){
+        	if(guard.toString().equals("false")){
         		return mModuleFactory.createSimpleIdentifierProxy("false");
-        		  }*/
+        	}
         	if (result == null) {
             result = guard;
           } else {
