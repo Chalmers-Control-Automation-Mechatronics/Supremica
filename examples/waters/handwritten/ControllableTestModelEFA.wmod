@@ -9,7 +9,7 @@
         <EventDecl Kind="CONTROLLABLE" Name="b"/>
     </EventDeclList>
     <ComponentList>
-        <VariableComponent>
+        <VariableComponent Deterministic="false">
             <SimpleIdentifier Name="x"/>
             <VariableRange>
                 <BinaryExpression Operator="..">
@@ -26,7 +26,7 @@
         </VariableComponent>
         <SimpleComponent Kind="PLANT">
             <SimpleIdentifier Name="P1"/>
-            <Graph>
+            <Graph Deterministic="false">
                 <NodeList>
                     <SimpleNode Initial="true" Name="S0">
                         <PointGeometry>
@@ -86,7 +86,7 @@
         </SimpleComponent>
         <SimpleComponent Kind="SPEC">
             <SimpleIdentifier Name="S1"/>
-            <Graph>
+            <Graph Deterministic="false">
                 <NodeList>
                     <SimpleNode Initial="true" Name="S0">
                         <PointGeometry>
@@ -201,7 +201,7 @@
         </SimpleComponent>
         <SimpleComponent Kind="PLANT">
             <SimpleIdentifier Name="P2"/>
-            <Graph>
+            <Graph Deterministic="false">
                 <NodeList>
                     <SimpleNode Initial="true" Name="S0">
                         <PointGeometry>
