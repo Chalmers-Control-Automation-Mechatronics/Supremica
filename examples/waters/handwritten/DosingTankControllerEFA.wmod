@@ -16,6 +16,81 @@
         <EventDecl Kind="CONTROLLABLE" Name="open_in"/>
     </EventDeclList>
     <ComponentList>
+        <VariableComponent>
+            <SimpleIdentifier Name="vout"/>
+            <VariableRange>
+                <BinaryExpression Operator="..">
+                    <IntConstant Value="0"/>
+                    <IntConstant Value="1"/>
+                </BinaryExpression>
+            </VariableRange>
+            <VariableInitial>
+                <BinaryExpression Operator="==">
+                    <SimpleIdentifier Name="vout"/>
+                    <IntConstant Value="0"/>
+                </BinaryExpression>
+            </VariableInitial>
+        </VariableComponent>
+        <VariableComponent>
+            <SimpleIdentifier Name="vin"/>
+            <VariableRange>
+                <BinaryExpression Operator="..">
+                    <IntConstant Value="0"/>
+                    <IntConstant Value="1"/>
+                </BinaryExpression>
+            </VariableRange>
+            <VariableInitial>
+                <BinaryExpression Operator="==">
+                    <SimpleIdentifier Name="vin"/>
+                    <IntConstant Value="0"/>
+                </BinaryExpression>
+            </VariableInitial>
+        </VariableComponent>
+        <VariableComponent>
+            <SimpleIdentifier Name="vreq"/>
+            <VariableRange>
+                <BinaryExpression Operator="..">
+                    <IntConstant Value="0"/>
+                    <IntConstant Value="1"/>
+                </BinaryExpression>
+            </VariableRange>
+            <VariableInitial>
+                <BinaryExpression Operator="==">
+                    <SimpleIdentifier Name="vreq"/>
+                    <IntConstant Value="0"/>
+                </BinaryExpression>
+            </VariableInitial>
+        </VariableComponent>
+        <VariableComponent>
+            <SimpleIdentifier Name="vs1"/>
+            <VariableRange>
+                <BinaryExpression Operator="..">
+                    <IntConstant Value="0"/>
+                    <IntConstant Value="1"/>
+                </BinaryExpression>
+            </VariableRange>
+            <VariableInitial>
+                <BinaryExpression Operator="==">
+                    <SimpleIdentifier Name="vs1"/>
+                    <IntConstant Value="0"/>
+                </BinaryExpression>
+            </VariableInitial>
+        </VariableComponent>
+        <VariableComponent>
+            <SimpleIdentifier Name="vs2"/>
+            <VariableRange>
+                <BinaryExpression Operator="..">
+                    <IntConstant Value="0"/>
+                    <IntConstant Value="1"/>
+                </BinaryExpression>
+            </VariableRange>
+            <VariableInitial>
+                <BinaryExpression Operator="==">
+                    <SimpleIdentifier Name="vs2"/>
+                    <IntConstant Value="0"/>
+                </BinaryExpression>
+            </VariableInitial>
+        </VariableComponent>
         <SimpleComponent Kind="SPEC">
             <SimpleIdentifier Name="OutletValve"/>
             <Graph>
@@ -48,15 +123,9 @@
                                 <Point Y="16" X="-19"/>
                             </LabelGeometry>
                         </LabelBlock>
-                        <StartPointGeometry>
-                            <Point Y="176" X="528"/>
-                        </StartPointGeometry>
                         <SplineGeometry>
                             <Point Y="193" X="449"/>
                         </SplineGeometry>
-                        <EndPointGeometry>
-                            <Point Y="176" X="368"/>
-                        </EndPointGeometry>
                         <GuardActionBlock>
                             <Guards>
                                 <BinaryExpression Operator="==">
@@ -82,15 +151,9 @@
                                 <Point Y="-67" X="-16"/>
                             </LabelGeometry>
                         </LabelBlock>
-                        <StartPointGeometry>
-                            <Point Y="176" X="368"/>
-                        </StartPointGeometry>
                         <SplineGeometry>
                             <Point Y="159" X="448"/>
                         </SplineGeometry>
-                        <EndPointGeometry>
-                            <Point Y="176" X="528"/>
-                        </EndPointGeometry>
                         <GuardActionBlock>
                             <Guards>
                                 <BinaryExpression Operator="&amp;">
@@ -123,15 +186,6 @@
                     </Edge>
                 </EdgeList>
             </Graph>
-            <VariableList>
-                <Variable Name="vout">
-                    <BinaryExpression Operator="..">
-                        <IntConstant Value="0"/>
-                        <IntConstant Value="1"/>
-                    </BinaryExpression>
-                    <IntConstant Value="0"/>
-                </Variable>
-            </VariableList>
         </SimpleComponent>
         <SimpleComponent Kind="SPEC">
             <SimpleIdentifier Name="InletValve"/>
@@ -165,15 +219,9 @@
                                 <Point Y="14" X="-19"/>
                             </LabelGeometry>
                         </LabelBlock>
-                        <StartPointGeometry>
-                            <Point Y="192" X="544"/>
-                        </StartPointGeometry>
                         <SplineGeometry>
                             <Point Y="208" X="465"/>
                         </SplineGeometry>
-                        <EndPointGeometry>
-                            <Point Y="192" X="384"/>
-                        </EndPointGeometry>
                         <GuardActionBlock>
                             <Guards>
                                 <BinaryExpression Operator="==" Text="vs2 ==1">
@@ -187,6 +235,9 @@
                                     <IntConstant Value="0"/>
                                 </BinaryExpression>
                             </Actions>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="20" X="0"/>
+                            </LabelGeometry>
                         </GuardActionBlock>
                     </Edge>
                     <Edge Target="S5" Source="S1">
@@ -196,15 +247,9 @@
                                 <Point Y="-63" X="-16"/>
                             </LabelGeometry>
                         </LabelBlock>
-                        <StartPointGeometry>
-                            <Point Y="192" X="384"/>
-                        </StartPointGeometry>
                         <SplineGeometry>
                             <Point Y="175" X="464"/>
                         </SplineGeometry>
-                        <EndPointGeometry>
-                            <Point Y="192" X="544"/>
-                        </EndPointGeometry>
                         <GuardActionBlock>
                             <Guards>
                                 <BinaryExpression Operator="&amp;">
@@ -230,19 +275,13 @@
                                     <IntConstant Value="1"/>
                                 </BinaryExpression>
                             </Actions>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="20" X="0"/>
+                            </LabelGeometry>
                         </GuardActionBlock>
                     </Edge>
                 </EdgeList>
             </Graph>
-            <VariableList>
-                <Variable Name="vin">
-                    <BinaryExpression Operator="..">
-                        <IntConstant Value="0"/>
-                        <IntConstant Value="1"/>
-                    </BinaryExpression>
-                    <IntConstant Value="0"/>
-                </Variable>
-            </VariableList>
         </SimpleComponent>
         <SimpleComponent Kind="PLANT">
             <SimpleIdentifier Name="Requests"/>
@@ -276,15 +315,9 @@
                                 <Point Y="-57" X="-19"/>
                             </LabelGeometry>
                         </LabelBlock>
-                        <StartPointGeometry>
-                            <Point Y="128" X="192"/>
-                        </StartPointGeometry>
                         <SplineGeometry>
                             <Point Y="112" X="272"/>
                         </SplineGeometry>
-                        <EndPointGeometry>
-                            <Point Y="128" X="352"/>
-                        </EndPointGeometry>
                         <GuardActionBlock>
                             <Actions>
                                 <BinaryExpression Operator="=">
@@ -292,6 +325,9 @@
                                     <IntConstant Value="1"/>
                                 </BinaryExpression>
                             </Actions>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="20" X="0"/>
+                            </LabelGeometry>
                         </GuardActionBlock>
                     </Edge>
                     <Edge Target="S2" Source="S5">
@@ -301,15 +337,9 @@
                                 <Point Y="13" X="-25"/>
                             </LabelGeometry>
                         </LabelBlock>
-                        <StartPointGeometry>
-                            <Point Y="128" X="352"/>
-                        </StartPointGeometry>
                         <SplineGeometry>
                             <Point Y="144" X="273"/>
                         </SplineGeometry>
-                        <EndPointGeometry>
-                            <Point Y="128" X="192"/>
-                        </EndPointGeometry>
                         <GuardActionBlock>
                             <Actions>
                                 <BinaryExpression Operator="=">
@@ -317,19 +347,13 @@
                                     <IntConstant Value="0"/>
                                 </BinaryExpression>
                             </Actions>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="20" X="0"/>
+                            </LabelGeometry>
                         </GuardActionBlock>
                     </Edge>
                 </EdgeList>
             </Graph>
-            <VariableList>
-                <Variable Name="vreq">
-                    <BinaryExpression Operator="..">
-                        <IntConstant Value="0"/>
-                        <IntConstant Value="1"/>
-                    </BinaryExpression>
-                    <IntConstant Value="0"/>
-                </Variable>
-            </VariableList>
         </SimpleComponent>
         <SimpleComponent Kind="PLANT">
             <SimpleIdentifier Name="S1"/>
@@ -363,15 +387,9 @@
                                 <Point Y="-67" X="-19"/>
                             </LabelGeometry>
                         </LabelBlock>
-                        <StartPointGeometry>
-                            <Point Y="160" X="240"/>
-                        </StartPointGeometry>
                         <SplineGeometry>
                             <Point Y="145" X="320"/>
                         </SplineGeometry>
-                        <EndPointGeometry>
-                            <Point Y="160" X="400"/>
-                        </EndPointGeometry>
                         <GuardActionBlock>
                             <Guards>
                                 <BinaryExpression Operator="==">
@@ -385,6 +403,9 @@
                                     <IntConstant Value="1"/>
                                 </BinaryExpression>
                             </Actions>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="20" X="0"/>
+                            </LabelGeometry>
                         </GuardActionBlock>
                     </Edge>
                     <Edge Target="S3" Source="S5">
@@ -394,15 +415,9 @@
                                 <Point Y="13" X="-17"/>
                             </LabelGeometry>
                         </LabelBlock>
-                        <StartPointGeometry>
-                            <Point Y="160" X="400"/>
-                        </StartPointGeometry>
                         <SplineGeometry>
                             <Point Y="178" X="321"/>
                         </SplineGeometry>
-                        <EndPointGeometry>
-                            <Point Y="160" X="240"/>
-                        </EndPointGeometry>
                         <GuardActionBlock>
                             <Guards>
                                 <BinaryExpression Operator="&amp;">
@@ -422,19 +437,13 @@
                                     <IntConstant Value="0"/>
                                 </BinaryExpression>
                             </Actions>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="20" X="0"/>
+                            </LabelGeometry>
                         </GuardActionBlock>
                     </Edge>
                 </EdgeList>
             </Graph>
-            <VariableList>
-                <Variable Name="vs1">
-                    <BinaryExpression Operator="..">
-                        <IntConstant Value="0"/>
-                        <IntConstant Value="1"/>
-                    </BinaryExpression>
-                    <IntConstant Value="0"/>
-                </Variable>
-            </VariableList>
         </SimpleComponent>
         <SimpleComponent Kind="PLANT">
             <SimpleIdentifier Name="S2"/>
@@ -468,15 +477,9 @@
                                 <Point Y="-67" X="-18"/>
                             </LabelGeometry>
                         </LabelBlock>
-                        <StartPointGeometry>
-                            <Point Y="176" X="192"/>
-                        </StartPointGeometry>
                         <SplineGeometry>
                             <Point Y="160" X="273"/>
                         </SplineGeometry>
-                        <EndPointGeometry>
-                            <Point Y="176" X="352"/>
-                        </EndPointGeometry>
                         <GuardActionBlock>
                             <Guards>
                                 <BinaryExpression Operator="&amp;">
@@ -496,6 +499,9 @@
                                     <IntConstant Value="1"/>
                                 </BinaryExpression>
                             </Actions>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="20" X="0"/>
+                            </LabelGeometry>
                         </GuardActionBlock>
                     </Edge>
                     <Edge Target="S4" Source="S5">
@@ -505,15 +511,9 @@
                                 <Point Y="14" X="-19"/>
                             </LabelGeometry>
                         </LabelBlock>
-                        <StartPointGeometry>
-                            <Point Y="176" X="352"/>
-                        </StartPointGeometry>
                         <SplineGeometry>
                             <Point Y="193" X="273"/>
                         </SplineGeometry>
-                        <EndPointGeometry>
-                            <Point Y="176" X="192"/>
-                        </EndPointGeometry>
                         <GuardActionBlock>
                             <Guards>
                                 <BinaryExpression Operator="==">
@@ -527,20 +527,13 @@
                                     <IntConstant Value="0"/>
                                 </BinaryExpression>
                             </Actions>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="20" X="0"/>
+                            </LabelGeometry>
                         </GuardActionBlock>
                     </Edge>
                 </EdgeList>
             </Graph>
-            <VariableList>
-                <Variable Name="vs2">
-                    <BinaryExpression Operator="..">
-                        <IntConstant Value="0"/>
-                        <IntConstant Value="1"/>
-                    </BinaryExpression>
-                    <IntConstant Value="0"/>
-                </Variable>
-            </VariableList>
         </SimpleComponent>
     </ComponentList>
 </Module>
-
