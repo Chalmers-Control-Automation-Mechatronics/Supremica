@@ -43,6 +43,7 @@ import net.sourceforge.waters.model.expr.ExpressionParser;
 import net.sourceforge.waters.model.expr.Operator;
 import net.sourceforge.waters.model.expr.ParseException;
 
+import org.supremica.automata.VariableHelper;
 
 public class ExtendedAutomaton
 {
