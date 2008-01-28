@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.module
 //# CLASS:   ModuleCompiler
 //###########################################################################
-//# $Id: ModuleCompiler.java,v 1.99 2008-01-28 09:33:28 markus Exp $
+//# $Id: ModuleCompiler.java,v 1.100 2008-01-28 10:25:17 markus Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.compiler;
@@ -2070,7 +2070,7 @@ private List<List<BinaryExpressionProxy>>
         }
         if (mIsEFA && edge.getGuardActionBlock()!= null) {
         for (SimpleExpressionProxy guard : edge.getGuardActionBlock().getGuards()){
-    		if(guard.toString().equals("false")){
+    		if(guard.toString().equals("false") || guard.toString().equals("0")){
     			create=false; 
     			/*
     			 * The in transition is removed but the event 
