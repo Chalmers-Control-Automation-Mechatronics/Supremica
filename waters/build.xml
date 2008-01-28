@@ -63,6 +63,7 @@
   <path id="supremica.efa.classpath">
     <pathelement location="${fuber.jar}"/>
     <pathelement location="${java_cup.jar}"/>
+    <pathelement location="${supremica.lib}/unjared"/>
   </path>
 
   <path id="waters.compile.classpath">
