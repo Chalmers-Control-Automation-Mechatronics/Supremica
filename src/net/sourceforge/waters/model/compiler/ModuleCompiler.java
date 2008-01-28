@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.module
 //# CLASS:   ModuleCompiler
 //###########################################################################
-//# $Id: ModuleCompiler.java,v 1.98 2008-01-28 00:55:08 robi Exp $
+//# $Id: ModuleCompiler.java,v 1.99 2008-01-28 09:33:28 markus Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.compiler;
@@ -839,7 +839,8 @@ public class ModuleCompiler extends AbstractModuleProxyVisitor
      * Mappings used to handle controllability instantiated. All variable automata 
      * translated as plants.
      */
-    mEventForbiddenStatesMap= new HashMap<EventProxy,LocationsAndExpression>();
+//    mEventForbiddenStatesMap= new HashMap<EventProxy,LocationsAndExpression>();
+    mForbiddenStates= new HashSet<LocationsAndExpression>();
     /*
      * Because of a stupid parser that does not simplify x>1 & x<1 to
      * false, we use the extra set mForbiddenEvents. Only after we have
@@ -913,6 +914,10 @@ public class ModuleCompiler extends AbstractModuleProxyVisitor
           }
         }
       }
+      
+      
+      createForbiddenEvents(newEvents);
+      
       /*
        * The variable automata are constructed using mVariableComponents,
        * mEFAEventGuardClauseMap and mEFAEventActionListMap. To handle
@@ -977,7 +982,7 @@ public class ModuleCompiler extends AbstractModuleProxyVisitor
 
 private void createForbiddenSelfLoopsInCompiledAutomata() {		
 	for (EventProxy event: mForbiddenEvents){
-	for(String loc: mEventForbiddenStatesMap.get(event).getLocations()){
+	for(String loc: mEventForbiddenLocations.get(event)){
 	for(CompiledAutomaton aut: mCompiledAutomata.values()){
 	if(aut.getKind()== ComponentKind.PLANT){
 		for (StateProxy state: aut.getStates()){
@@ -1170,35 +1175,26 @@ throws EvalException {
 						.getName());
 			}			
 
-			boolean createNew=true;
-			for(LocationsAndExpression locExp: mEventForbiddenStatesMap.values()){
+			boolean createLocation=true;
+			for(LocationsAndExpression locExp: mForbiddenStates){
 				if(forbiddenLoc.equals(locExp.getLocations())){
-					addGuardToExpression(locExp, sortedPlantClauses);
-					createNew=false;
+					addGuardToExpression(event.getName(), locExp, sortedPlantClauses);
+					createLocation=false;
+					break;
 			}
 				}
-			if(createNew){		
+			if(createLocation){	
+				mForbiddenStates.add
+		(new LocationsAndExpression(event.getName(), forbiddenLoc, sortedPlantClauses));
 			
-	    final String name = event
-				.getName()
-				+ "*"
-				+ mCurrentEventID++;
-		final EventProxy forbiddenEvent = mDESFactory
-				.createEventProxy(
-						name,
-						event.getKind(),
-					     event.isObservable());
-		mEventForbiddenStatesMap.put
-		(forbiddenEvent, new LocationsAndExpression(forbiddenLoc, sortedPlantClauses));
-		newEvents.add(forbiddenEvent);
-		mForbiddenEvents.add(forbiddenEvent);
+				}
 		/*
 		 * If the plant guard is always true we still have a controllability problem 
 		 * i.e. either way we must forbid the event. The case when 
 		 * the plant guard always is false should correspond to the case 
 		 * when sortedPlantClauses.isEmpty().
 		 */
-		}}		
+	}		
 else{
 		for (final SimpleExpressionProxy plantExpr : sortedPlantClauses) {
 			for (List<TransitionProxy> specTrans : plantSpecTrans
@@ -1230,29 +1226,19 @@ else{
 								}
 							}
 						
-							boolean createNewEvent=true;
-							for(LocationsAndExpression locExp: mEventForbiddenStatesMap.values()){
+							boolean createNewLocation=true;
+							for(LocationsAndExpression locExp: mForbiddenStates){
 								if(fLoc.equals(locExp.getLocations())){
-									addGuardToExpression(locExp, sortedUncClauses);
-									createNewEvent=false;
+									addGuardToExpression(event.getName(), 
+											locExp, sortedUncClauses);
+									createNewLocation=false;
+									break;
 							}
 								}
-							if(createNewEvent){
-							final String name = event
-							.getName()
-							+ "*"
-							+ mCurrentEventID++;	
-							final EventProxy forbiddenEvent = mDESFactory
-								.createEventProxy(
-										name,
-										event.getKind(),
-									     event.isObservable());
 							
-							
-							mEventForbiddenStatesMap.put
-						(forbiddenEvent, new LocationsAndExpression(fLoc, sortedUncClauses));
-						newEvents.add(forbiddenEvent);
-						mForbiddenEvents.add(forbiddenEvent);
+							if(createNewLocation){
+							mForbiddenStates.add
+						(new LocationsAndExpression(event.getName(), fLoc, sortedUncClauses));
 							}	
 							}
 					}
@@ -1280,16 +1266,26 @@ else{
 	
 	
 					
-private void addGuardToExpression(LocationsAndExpression locExp, List<SimpleExpressionProxy> sortedAndClauses) throws EvalException {
-	SimpleExpressionProxy g1 = mModuleFactory.createIntConstantProxy(1);
-	SimpleExpressionProxy g2 = mModuleFactory.createIntConstantProxy(1);
-	final BinaryOperator andop = mOperatorTable.getAndOperator();
-    for(SimpleExpressionProxy c1: locExp.getExpression()){
-    	for (SimpleExpressionProxy c2: sortedAndClauses){
-    	g1= mModuleFactory.createBinaryExpressionProxy(andop, c1, c2);
-    	g2= mModuleFactory.createBinaryExpressionProxy(andop, g1, g2);
-    }}
-	final CompiledNormalForm dnf = mDNFConverter.convertToDNF(g2);
+private void addGuardToExpression(String eventName, LocationsAndExpression locExp, List<SimpleExpressionProxy> sortedAndClauses) throws EvalException {
+	SimpleExpressionProxy guard;
+	SimpleExpressionProxy guardExp1 = mModuleFactory.createIntConstantProxy(0);
+	SimpleExpressionProxy guardExp2 = mModuleFactory.createIntConstantProxy(0);
+	final BinaryOperator orOp = mOperatorTable.getOrOperator();
+	final BinaryOperator andOp = mOperatorTable.getAndOperator();
+	for (SimpleExpressionProxy clause: sortedAndClauses){
+    	guardExp1= mModuleFactory.createBinaryExpressionProxy(orOp, clause, guardExp1);
+    	}
+	
+   for(SimpleExpressionProxy exp: locExp.getExpression()){
+	   guardExp2= mModuleFactory.createBinaryExpressionProxy(orOp, exp, guardExp2); 	
+   }
+   if(locExp.getEvent()== eventName){
+   guard = mModuleFactory.createBinaryExpressionProxy(andOp, guardExp1, guardExp2);
+   }
+   else{
+   guard = mModuleFactory.createBinaryExpressionProxy(orOp, guardExp1, guardExp2);
+	}
+   final CompiledNormalForm dnf = mDNFConverter.convertToDNF(guard);
 	if(!dnf.isEmpty()){
 	final CompiledNormalForm mdnf = mDNFMinimizer.minimize(dnf);
 	locExp.setExpression(mDNFConverter
@@ -1467,6 +1463,27 @@ private void updateTransitionsInCompiledAutomata()
     }
   }
 
+  
+  private void createForbiddenEvents(Set<EventProxy> globalAlphabet) {
+	 mEventForbiddenExp = new HashMap<EventProxy,SimpleExpressionProxy>();
+	  mEventForbiddenLocations = 
+		  new HashMap<EventProxy, Set<String>>();
+	   for(LocationsAndExpression locExp: mForbiddenStates){
+		   for(SimpleExpressionProxy clause: locExp.getExpression()){
+		final EventProxy forbiddenEvent = mDESFactory.
+				createEventProxy(
+						"u"
+						+ "*"
+						+ mCurrentEventID++, EventKind.UNCONTROLLABLE,
+						true);
+		mEventForbiddenExp.put(forbiddenEvent,clause);
+		  mEventForbiddenLocations.put(forbiddenEvent,
+				  locExp.getLocations());
+		  mForbiddenEvents.add(forbiddenEvent);
+		  globalAlphabet.add(forbiddenEvent);
+		   }
+	   }
+	 }
   private Set<TransitionProxy>
     createVariableTransitions(final VariableComponentProxy variable,
                               final RangeValue range,
@@ -1478,10 +1495,9 @@ private void updateTransitionsInCompiledAutomata()
       final VariableSearcher searcher = new VariableSearcher(variable);
       final Set<TransitionProxy> variableTransitions =
         new TreeSet<TransitionProxy>();
-      for (EventProxy forbiddenEvent: mEventForbiddenStatesMap.keySet()){
-       final List <SimpleExpressionProxy> andClauseList =
-          mEventForbiddenStatesMap.get(forbiddenEvent).getExpression();
-        for(SimpleExpressionProxy clause: andClauseList){
+      for (EventProxy forbiddenEvent: mEventForbiddenExp.keySet()){
+       final SimpleExpressionProxy clause =
+          mEventForbiddenExp.get(forbiddenEvent);
         if (searcher.search(clause)){
         	 variableAlphabet.add(forbiddenEvent); 
              mForbiddenEvents.add(forbiddenEvent);
@@ -1507,7 +1523,6 @@ private void updateTransitionsInCompiledAutomata()
             }
           }
         }
-      }
       }
       for (EventProxy relabeledEvent : mEFAEventGuardClauseMap.keySet()) {
         // Get the right action.
@@ -1795,10 +1810,16 @@ private void updateTransitionsInCompiledAutomata()
   final UnaryOperator notOp = mOperatorTable.getNotOperator();
   SimpleExpressionProxy falseSpecGuard = null;
   SimpleExpressionProxy result = null;
-  falseSpecGuard=mModuleFactory.createUnaryExpressionProxy(notOp, specGuard);
+  falseSpecGuard=mModuleFactory.createUnaryExpressionProxy(
+		  "!"/*notOp.toString()*/+ "(" + specGuard.toString() + ")",
+		  notOp, 
+		  specGuard);
       result =
- mModuleFactory.createBinaryExpressionProxy(andOp, falseSpecGuard, plantGuard);
-      
+ mModuleFactory.createBinaryExpressionProxy(
+		 "(" +plantGuard.toString()+ ")"+ "&amp;"+ "(" +falseSpecGuard.toString()+ ")",
+		 andOp, 
+		 falseSpecGuard, 
+		 plantGuard);
   if (result == null) {
     return mModuleFactory.createIntConstantProxy(1);
   } else {
@@ -2354,7 +2375,9 @@ private List<List<BinaryExpressionProxy>>
    * and specifications that contains events that have been relabelled into more 
    * than one name.    
    */
-  private Map<EventProxy, LocationsAndExpression> mEventForbiddenStatesMap;
+  private Set<LocationsAndExpression> mForbiddenStates;
+  private Map<EventProxy, SimpleExpressionProxy> mEventForbiddenExp;
+  private Map<EventProxy, Set<String>> mEventForbiddenLocations;
   private Set<EventProxy> mForbiddenEvents;
   private Map<String,CompiledAutomaton> mCompiledAutomata;
 }

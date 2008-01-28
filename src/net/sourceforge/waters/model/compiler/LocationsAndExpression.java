@@ -12,9 +12,10 @@ class LocationsAndExpression
 
   //#########################################################################
   //# Constructors
-	LocationsAndExpression(Set<String> forbiddenLoc, 
+	LocationsAndExpression(String event, Set<String> forbiddenLoc, 
 		  List <SimpleExpressionProxy> sortedDNFClause)
   {
+	  mEvent = event;
 	  mForbiddenLoc = forbiddenLoc;
 	  mUncontrollableClauses = sortedDNFClause;
   }
@@ -22,7 +23,11 @@ class LocationsAndExpression
 
   //#########################################################################
   //# Simple Access
-  Set<String> getLocations()
+  String getEvent(){
+	  return mEvent;
+  }
+	
+	Set<String> getLocations()
   {
     return mForbiddenLoc;
   }
@@ -34,6 +39,10 @@ class LocationsAndExpression
   
   //#########################################################################
   //# Setters
+  void setEvent(String name){
+	  mEvent = name;
+  }
+  
   void setLocations(Set<String> forbiddenLoc)
   {
    mForbiddenLoc = forbiddenLoc;
@@ -46,6 +55,7 @@ class LocationsAndExpression
   
   //#########################################################################
   //# Data Members
+  private String mEvent;
   private Set<String> mForbiddenLoc;
   private List <SimpleExpressionProxy> mUncontrollableClauses;
 
