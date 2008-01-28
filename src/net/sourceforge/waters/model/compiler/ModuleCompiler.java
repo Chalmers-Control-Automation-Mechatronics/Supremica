@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.module
 //# CLASS:   ModuleCompiler
 //###########################################################################
-//# $Id: ModuleCompiler.java,v 1.100 2008-01-28 10:25:17 markus Exp $
+//# $Id: ModuleCompiler.java,v 1.101 2008-01-28 12:06:44 markus Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.compiler;
@@ -84,8 +84,7 @@ import net.sourceforge.waters.xsd.base.ComponentKind;
 import net.sourceforge.waters.xsd.base.EventKind;
 import net.sourceforge.waters.xsd.module.ScopeKind;
 
-import org.supremica.external.iec61499fb2efa.ExtendedAutomataExpander;
-
+import org.supremica.automata.ExtendedAutomataExpander;
 
 public class ModuleCompiler extends AbstractModuleProxyVisitor
 {

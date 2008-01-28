@@ -2,8 +2,6 @@
 package net.sourceforge.waters.model.compiler;
 import java.util.List;
 import java.util.Set;
-
-import net.sourceforge.waters.model.expr.BinaryOperator;
 import net.sourceforge.waters.model.module.SimpleExpressionProxy;
 
 
