@@ -1,59 +1,50 @@
-//# -*- tab-width: 4  indent-tabs-mode: nil  c-basic-offset: 4 -*-
-//###########################################################################
-//# PROJECT: Supremica
-//# PACKAGE: org.supremica.automata
-//# CLASS:   ExtendedAutomaton
-//###########################################################################
-//# $Id: ExtendedAutomaton.java,v 1.5 2008-01-28 00:55:08 robi Exp $
-//###########################################################################
-
 /*
- * Supremica Software License Agreement
+ *  Supremica Software License Agreement
  *
- * The Supremica software is not in the public domain
- * However, it is freely available without fee for education,
- * research, and non-profit purposes.  By obtaining copies of
- * this and other files that comprise the Supremica software,
- * you, the Licensee, agree to abide by the following
- * conditions and understandings with respect to the
- * copyrighted software:
+ *  The Supremica software is not in the public domain
+ *  However, it is freely available without fee for education,
+ *  research, and non-profit purposes.  By obtaining copies of
+ *  this and other files that comprise the Supremica software,
+ *  you, the Licensee, agree to abide by the following
+ *  conditions and understandings with respect to the
+ *  copyrighted software:
  *
- * The software is copyrighted in the name of Supremica,
- * and ownership of the software remains with Supremica.
+ *  The software is copyrighted in the name of Supremica,
+ *  and ownership of the software remains with Supremica.
  *
- * Permission to use, copy, and modify this software and its
- * documentation for education, research, and non-profit
- * purposes is hereby granted to Licensee, provided that the
- * copyright notice, the original author's names and unit
- * identification, and this permission notice appear on all
- * such copies, and that no charge be made for such copies.
- * Any entity desiring permission to incorporate this software
- * into commercial products or to use it for commercial
- * purposes should contact:
+ *  Permission to use, copy, and modify this software and its
+ *  documentation for education, research, and non-profit
+ *  purposes is hereby granted to Licensee, provided that the
+ *  copyright notice, the original author's names and unit
+ *  identification, and this permission notice appear on all
+ *  such copies, and that no charge be made for such copies.
+ *  Any entity desiring permission to incorporate this software
+ *  into commercial products or to use it for commercial
+ *  purposes should contact:
  *
- * Knut Akesson (KA), knut@supremica.org
- * Supremica,
- * Knarrhogsgatan 10
- * SE-431 60 MOLNDAL
- * SWEDEN
+ *  Knut Akesson (KA), knut@supremica.org
+ *  Supremica,
+ *  Haradsgatan 26A
+ *  431 42 Molndal
+ *  SWEDEN
  *
- * to discuss license terms. No cost evaluation licenses are
- * available.
+ *  to discuss license terms. No cost evaluation licenses are
+ *  available.
  *
- * Licensee may not use the name, logo, or any other symbol
- * of Supremica nor the names of any of its employees nor
- * any adaptation thereof in advertising or publicity
- * pertaining to the software without specific prior written
- * approval of the Supremica.
+ *  Licensee may not use the name, logo, or any other symbol
+ *  of Supremica nor the names of any of its employees nor
+ *  any adaptation thereof in advertising or publicity
+ *  pertaining to the software without specific prior written
+ *  approval of the Supremica.
  *
- * SUPREMICA AND KA MAKES NO REPRESENTATIONS ABOUT THE
- * SUITABILITY OF THE SOFTWARE FOR ANY PURPOSE.
- * IT IS PROVIDED "AS IS" WITHOUT EXPRESS OR IMPLIED WARRANTY.
+ *  SUPREMICA AND KA MAKES NO REPRESENTATIONS ABOUT THE
+ *  SUITABILITY OF THE SOFTWARE FOR ANY PURPOSE.
+ *  IT IS PROVIDED "AS IS" WITHOUT EXPRESS OR IMPLIED WARRANTY.
  *
- * Supremica or KA shall not be liable for any damages
- * suffered by Licensee from the use of this software.
+ *  Supremica or KA shall not be liable for any damages
+ *  suffered by Licensee from the use of this software.
  *
- * Supremica is owned and represented by KA.
+ *  Supremica is owned and represented by KA.
  */
 
 /*
@@ -68,24 +59,26 @@ import java.util.LinkedList;
 import java.util.ArrayList;
 import java.util.Iterator;
 
-import net.sourceforge.waters.model.module.EventDeclProxy;
-import net.sourceforge.waters.subject.module.BinaryExpressionSubject;
-import net.sourceforge.waters.subject.module.EdgeSubject;
-import net.sourceforge.waters.subject.module.EventDeclSubject;
-import net.sourceforge.waters.subject.module.GraphSubject;
-import net.sourceforge.waters.subject.module.GuardActionBlockSubject;
-import net.sourceforge.waters.subject.module.IdentifierSubject;
-import net.sourceforge.waters.subject.module.LabelBlockSubject;
-import net.sourceforge.waters.subject.module.ModuleSubject;
 import net.sourceforge.waters.subject.module.ModuleSubjectFactory;
-import net.sourceforge.waters.subject.module.PlainEventListSubject;
+import net.sourceforge.waters.subject.module.IdentifierSubject;
+import net.sourceforge.waters.subject.module.ModuleSubject;
 import net.sourceforge.waters.subject.module.SimpleComponentSubject;
-import net.sourceforge.waters.subject.module.SimpleExpressionSubject;
-import net.sourceforge.waters.subject.module.SimpleExpressionSubject;
+import net.sourceforge.waters.subject.module.GraphSubject;
 import net.sourceforge.waters.subject.module.SimpleNodeSubject;
+import net.sourceforge.waters.subject.module.EdgeSubject;
+import net.sourceforge.waters.subject.module.LabelBlockSubject;
+import net.sourceforge.waters.subject.module.SimpleExpressionSubject;
+import net.sourceforge.waters.subject.module.GuardActionBlockSubject;
+import net.sourceforge.waters.subject.module.BinaryExpressionSubject;
+import net.sourceforge.waters.subject.module.SimpleExpressionSubject;
+import net.sourceforge.waters.subject.module.PlainEventListSubject;
+import net.sourceforge.waters.subject.module.EventDeclSubject;
+import net.sourceforge.waters.model.module.EventDeclProxy;
 
 import net.sourceforge.waters.xsd.base.ComponentKind;
 import net.sourceforge.waters.xsd.base.EventKind;
+
+import net.sourceforge.waters.model.base.Proxy;
 
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
 import net.sourceforge.waters.model.compiler.TypeMismatchException;
@@ -93,8 +86,6 @@ import net.sourceforge.waters.model.compiler.TypeMismatchException;
 import net.sourceforge.waters.model.expr.ExpressionParser;
 import net.sourceforge.waters.model.expr.Operator;
 import net.sourceforge.waters.model.expr.ParseException;
-
-import org.supremica.external.iec61499fb2efa.VariableHelper;
 
 
 public class ExtendedAutomaton
@@ -182,10 +173,14 @@ public class ExtendedAutomaton
 		{
 			if (accepting)
 			{
-				List propList = new LinkedList();
-				propList.add(factory.createSimpleIdentifierProxy(EventDeclProxy.DEFAULT_MARKING_NAME));
-				PlainEventListSubject acceptingProposition = factory.createPlainEventListProxy(propList);
-				graph.getNodesModifiable().add(factory.createSimpleNodeProxy(name, acceptingProposition, initial, null, null, null));
+				final List<Proxy> propList = new LinkedList<Proxy>();
+				propList.add(factory.createSimpleIdentifierProxy
+                               (EventDeclProxy.DEFAULT_MARKING_NAME));
+				PlainEventListSubject acceptingProposition =
+                    factory.createPlainEventListProxy(propList);
+				graph.getNodesModifiable().add
+                    (factory.createSimpleNodeProxy(name, acceptingProposition,
+                                                   initial, null, null, null));
 			}
 			else
 			{
@@ -196,7 +191,7 @@ public class ExtendedAutomaton
 
 	public void addIntegerVariable(String name, int lowerBound, int upperBound, int initialValue, Integer markedValue)
 	{
-		module.getComponentListModifiable().add(VariableHelper.createIntegerVariable(name, lowerBound, upperBound, initialValue, markedValue));
+		module.getComponentListModifiable().add(VariableHelper.createIntegerVariable(name, lowerBound, upperBound, initialValue, null));
 	}
 
 	/**
@@ -213,16 +208,16 @@ public class ExtendedAutomaton
 		SimpleNodeSubject fromNode = (SimpleNodeSubject) graph.getNodesModifiable().get(from);
 		if (fromNode == null)
 		{
-			System.out.println("ExtendedAutomaton.addNormalTransition(): From node " + from + " does not exist!");
+			System.out.println("ExtendedAutomaton.addTransition(): From node " + from + " does not exist!");
 		}
 		SimpleNodeSubject toNode = (SimpleNodeSubject) graph.getNodesModifiable().get(to);
 		if (toNode == null)
 		{
-			System.out.println("ExtendedAutomaton.addNormalTransition(): To node " + to + " does not exist!");
+			System.out.println("ExtendedAutomaton.addTransition(): To node " + to + " does not exist!");
 		}
 			
 		// parse label into event name list and make LabelBlockSubject 
-		List events = new LinkedList();
+		final List<Proxy> events = new LinkedList<Proxy>();
 		String remainingEvents = label;
 		String curEvent;
 		while(remainingEvents.contains(";"))
@@ -252,7 +247,7 @@ public class ExtendedAutomaton
 		}
 		catch (ParseException exception)
 		{
-			System.out.println("ExtendedAutomaton.addNormalTransition(): Syntax error in guard!");
+			System.out.println("ExtendedAutomaton.addTransition(): Syntax error in guard!");
 			System.out.println("\t automaton: " + name);
 			System.out.print("\t from: " + from);
 			System.out.println(" to: " + to);
@@ -284,7 +279,7 @@ public class ExtendedAutomaton
 					}
 					catch (ParseException exception)
 					{
-						System.out.println("ExtendedAutomaton.addNormalTransition(): Syntax error in action!");
+						System.out.println("ExtendedAutomaton.addTransition(): Syntax error in action!");
 						System.out.println("\t automaton: " + name);
 						System.out.print("\t from: " + from);
 						System.out.println(" to: " + to);
@@ -295,7 +290,7 @@ public class ExtendedAutomaton
 					}
 					catch (TypeMismatchException exception)
 					{
-						System.out.println("ExtendedAutomaton.addNormalTransition(): Type mismatch error in action!");
+						System.out.println("ExtendedAutomaton.addTransition(): Type mismatch error in action!");
 						System.out.println("\t automaton: " + name);
 						System.out.print("\t from: " + from);
 						System.out.println(" to: " + to);
