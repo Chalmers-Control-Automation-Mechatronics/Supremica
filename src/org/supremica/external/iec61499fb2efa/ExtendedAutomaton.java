@@ -1,3 +1,4 @@
+//# -*- tab-width: 4  indent-tabs-mode: nil  c-basic-offset: 4 -*-
 /*
  *   Copyright (C) 2006 Goran Cengic
  */
@@ -33,15 +34,14 @@ import net.sourceforge.waters.model.module.EventDeclProxy;
 import net.sourceforge.waters.xsd.base.ComponentKind;
 import net.sourceforge.waters.xsd.base.EventKind;
 
+import net.sourceforge.waters.model.base.Proxy;
+
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
 import net.sourceforge.waters.model.compiler.TypeMismatchException;
 
 import net.sourceforge.waters.model.expr.ExpressionParser;
 import net.sourceforge.waters.model.expr.Operator;
 import net.sourceforge.waters.model.expr.ParseException;
-
-import org.supremica.automata.VariableHelper;
-
 
 
 public class ExtendedAutomaton
@@ -129,10 +129,14 @@ public class ExtendedAutomaton
 		{
 			if (accepting)
 			{
-				List propList = new LinkedList();
-				propList.add(factory.createSimpleIdentifierProxy(EventDeclProxy.DEFAULT_MARKING_NAME));
-				PlainEventListSubject acceptingProposition = factory.createPlainEventListProxy(propList);
-				graph.getNodesModifiable().add(factory.createSimpleNodeProxy(name, acceptingProposition, initial, null, null, null));
+				final List<Proxy> propList = new LinkedList<Proxy>();
+				propList.add(factory.createSimpleIdentifierProxy
+                               (EventDeclProxy.DEFAULT_MARKING_NAME));
+				PlainEventListSubject acceptingProposition =
+                    factory.createPlainEventListProxy(propList);
+				graph.getNodesModifiable().add
+                    (factory.createSimpleNodeProxy(name, acceptingProposition,
+                                                   initial, null, null, null));
 			}
 			else
 			{
@@ -169,7 +173,7 @@ public class ExtendedAutomaton
 		}
 			
 		// parse label into event name list and make LabelBlockSubject 
-		List events = new LinkedList();
+		final List<Proxy> events = new LinkedList<Proxy>();
 		String remainingEvents = label;
 		String curEvent;
 		while(remainingEvents.contains(";"))

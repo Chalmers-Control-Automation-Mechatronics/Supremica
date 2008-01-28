@@ -53,8 +53,6 @@ import net.sourceforge.waters.subject.base.ListSubject;
 import net.sourceforge.waters.subject.module.*;
 import net.sourceforge.waters.xsd.base.EventKind;
 
-import org.supremica.automata.VariableHelper;
-
 
 public class ExtendedAutomata
 {

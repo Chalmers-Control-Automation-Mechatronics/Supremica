@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.compiler
 //# CLASS:   CompilerTest
 //###########################################################################
-//# $Id: CompilerTest.java,v 1.15 2007-12-04 03:22:58 robi Exp $
+//# $Id: CompilerTest.java,v 1.16 2008-01-28 00:55:08 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.compiler;
@@ -455,8 +455,9 @@ public class CompilerTest
   //#########################################################################
   //# Overrides for junit.framework.TestCase
   protected void setUp()
-    throws JAXBException, SAXException
-  { 
+    throws Exception
+  {
+    super.setUp();
     mInputDirectory = new File(getInputRoot(), "handwritten");
     mOutputDirectory = getOutputDirectory();
     mModuleFactory = ModuleElementFactory.getInstance();
@@ -472,6 +473,7 @@ public class CompilerTest
   }
 
   protected void tearDown()
+    throws Exception
   {
     mInputDirectory = null;
     mOutputDirectory = null;
@@ -480,6 +482,7 @@ public class CompilerTest
     mModuleMarshaller = null;
     mProductDESMarshaller = null;
     mDocumentManager = null;
+    super.tearDown();
   }
 
 

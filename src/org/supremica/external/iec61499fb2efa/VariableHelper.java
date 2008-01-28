@@ -1,14 +1,14 @@
 //# -*- tab-width: 4  indent-tabs-mode: nil  c-basic-offset: 4 -*-
 //###########################################################################
 //# PROJECT: Supremica
-//# PACKAGE: org.supremica.automata
-//# CLASS:   ExtendedAutomaton
+//# PACKAGE: org.supremica.external.iec61499fb2efa
+//# CLASS:   VariableHelper
 //###########################################################################
-//# $Id: VariableHelper.java,v 1.2 2007-12-04 03:22:58 robi Exp $
+//# $Id: VariableHelper.java,v 1.1 2008-01-28 00:55:08 robi Exp $
 //###########################################################################
 
 
-package org.supremica.automata;
+package org.supremica.external.iec61499fb2efa;
 
 import java.util.Collections;
 import java.util.List;

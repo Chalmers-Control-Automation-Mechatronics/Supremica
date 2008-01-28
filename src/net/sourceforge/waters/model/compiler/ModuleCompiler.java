@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.module
 //# CLASS:   ModuleCompiler
 //###########################################################################
-//# $Id: ModuleCompiler.java,v 1.97 2008-01-23 14:49:52 markus Exp $
+//# $Id: ModuleCompiler.java,v 1.98 2008-01-28 00:55:08 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.compiler;
@@ -26,7 +26,6 @@ import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.Set;
 
-import net.sourceforge.waters.model.base.DocumentProxy;
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.base.VisitorException;
 import net.sourceforge.waters.model.base.WatersRuntimeException;
@@ -67,6 +66,7 @@ import net.sourceforge.waters.model.module.IndexedIdentifierProxy;
 import net.sourceforge.waters.model.module.InstanceProxy;
 import net.sourceforge.waters.model.module.IntConstantProxy;
 import net.sourceforge.waters.model.module.ModuleProxy;
+import net.sourceforge.waters.model.module.ModuleProxyCloner;
 import net.sourceforge.waters.model.module.ModuleProxyFactory;
 import net.sourceforge.waters.model.module.NodeProxy;
 import net.sourceforge.waters.model.module.ParameterBindingProxy;
@@ -79,11 +79,13 @@ import net.sourceforge.waters.model.module.VariableComponentProxy;
 import net.sourceforge.waters.model.module.VariableMarkingProxy;
 import net.sourceforge.waters.plain.module.ModuleElementFactory;
 import net.sourceforge.waters.subject.module.ModuleSubject;
+import net.sourceforge.waters.subject.module.ModuleSubjectFactory;
 import net.sourceforge.waters.xsd.base.ComponentKind;
 import net.sourceforge.waters.xsd.base.EventKind;
 import net.sourceforge.waters.xsd.module.ScopeKind;
 
 import org.supremica.external.iec61499fb2efa.ExtendedAutomataExpander;
+
 
 public class ModuleCompiler extends AbstractModuleProxyVisitor
 {
@@ -136,21 +138,6 @@ public class ModuleCompiler extends AbstractModuleProxyVisitor
           // No marshaller --- O.K.
         }
       }
-      ModuleProxy module= (ModuleProxy) mModule.clone();
-      mContext = new CompilerContext(module);
-      mGlobalAlphabet = new TreeSet<EventProxy>();
-      mAutomata = new TreeMap<String, AutomatonProxy>();
-      if (bindings != null) {
-        mParameterMap = new TreeMap<String,CompiledParameterBinding>();
-        visitCollection(bindings);
-      }
-      mIsEFA = false;
-      isEFA(module.getComponentList());
-      if(mIsEFA){
-    	 ExtendedAutomataExpander.expandTransitions((ModuleSubject)module);
-      }
-      visitModuleProxy(module);
-      /*
       mContext = new CompilerContext(mModule);
       mGlobalAlphabet = new TreeSet<EventProxy>();
       mAutomata = new TreeMap<String, AutomatonProxy>();
@@ -158,18 +145,18 @@ public class ModuleCompiler extends AbstractModuleProxyVisitor
         mParameterMap = new TreeMap<String,CompiledParameterBinding>();
         visitCollection(bindings);
       }
-     */
-      /*
-       * mIsEFA is set to true if a component in mModule has a non-empty GuardActionBlock. 
-       */
-      /*
       mIsEFA = false;
       isEFA(mModule.getComponentList());
-      if(mIsEFA){
-    	  ExtendedAutomata.expandTransitions((ModuleSubject)mModule);
+      if (mIsEFA) {
+        // AARGH! We must not clone here!!!
+        final ModuleProxyCloner cloner =
+          ModuleSubjectFactory.getCloningInstance();
+        final ModuleSubject subject = (ModuleSubject) cloner.getClone(mModule);
+        ExtendedAutomataExpander.expandTransitions(subject);
+        visitModuleProxy(subject);
+      } else {
+        visitModuleProxy(mModule);
       }
-      visitModuleProxy(mModule);
-      */
       return mDESFactory.createProductDESProxy
         (name, comment, desLocation, mGlobalAlphabet, mAutomata.values());
     } catch (final VisitorException exception) {
@@ -187,25 +174,24 @@ public class ModuleCompiler extends AbstractModuleProxyVisitor
   }
 
 
-private void isEFA(List<Proxy> componentList) {
-	if(componentList.isEmpty()){
-		return;
-	}
-	else{
-	for (final Proxy proxy : componentList) {
-        if (proxy instanceof SimpleComponentProxy) {
-          final SimpleComponentProxy comp = (SimpleComponentProxy) proxy;
-          final Collection<EdgeProxy> edges = comp.getGraph().getEdges();
-          mIsEFA = mIsEFA || componentHasNonEmptyGuardActionBlock(edges);
-        }
-        if (proxy instanceof ForeachComponentProxy) {
-            final ForeachComponentProxy comp = (ForeachComponentProxy) proxy;
-            final List<Proxy> proxyList = comp.getBody();
-            isEFA(proxyList);
-          }
+  private void isEFA(List<Proxy> componentList)
+  {
+    for (final Proxy proxy : componentList) {
+      if (proxy instanceof SimpleComponentProxy) {
+        final SimpleComponentProxy comp = (SimpleComponentProxy) proxy;
+        final Collection<EdgeProxy> edges = comp.getGraph().getEdges();
+        mIsEFA = mIsEFA || componentHasNonEmptyGuardActionBlock(edges);
+      } else if (proxy instanceof ForeachComponentProxy) {
+        final ForeachComponentProxy comp = (ForeachComponentProxy) proxy;
+        final List<Proxy> proxyList = comp.getBody();
+        isEFA(proxyList);
       }
-   }
-}
+      if (mIsEFA) {
+        return;
+      }
+    }
+  }
+
 
   //##########################################################################
   //# Interface net.sourceforge.waters.model.module.ModuleProxyVisitor
@@ -2354,7 +2340,7 @@ private List<List<BinaryExpressionProxy>>
   private Map<EventProxy,SimpleExpressionProxy> mEFAEventGuardClauseMap;
   private List<VariableComponentProxy> mVariableComponents;
   private Map<EventProxy, EventProxy> mEFAEventEventMap;
-  private Integer mCurrentEventID;
+  private int mCurrentEventID;
   private Set<EventProxy> mOriginalAlphabet;
   private boolean mIsEFA;
   /*

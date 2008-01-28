@@ -7,13 +7,14 @@
   <property file="build.properties"/>                                    
 
   <property name="supremica.root" location=".."/>
-  <property name="supremica.build" location="${supremica.root}/build"/>
   <property name="supremica.lib" location="${supremica.root}/lib"/>
   <property name="supremica.src" location="${supremica.root}/src"/>
   <property name="supremica.testsrc" location="${supremica.root}/tests/src"/>
 
   <property name="activation.jar" location="${supremica.lib}/activation.jar"/>
+  <property name="fuber.jar" location="${supremica.lib}/fuber.jar"/>
   <property name="javabdd.jar" location="${supremica.lib}/javabdd-2.0.jar"/>
+  <property name="java_cup.jar" location="${supremica.lib}/java_cup.jar"/>
   <property name="jaxb-api.jar" location="${supremica.lib}/jaxb-api.jar"/>
   <property name="jaxb-impl.jar" location="${supremica.lib}/jaxb-impl.jar"/>
   <property name="jaxb-xjc.jar" location="${supremica.lib}/jaxb-xjc.jar"/>
@@ -59,14 +60,18 @@
   <property name="javadoc552" location="java/docs552"/>
   <property name="waters552.jar" location="${jar}/waters552.jar"/>
 
+  <path id="supremica.efa.classpath">
+    <pathelement location="${fuber.jar}"/>
+    <pathelement location="${java_cup.jar}"/>
+  </path>
+
   <path id="waters.compile.classpath">
     <path refid="jaxb.classpath"/>
     <pathelement location="${jaxb.jar}"/>
     <pathelement location="${javabdd.jar}"/>
     <pathelement location="${log4j.jar}"/>
     <pathelement location="${trove.jar}"/>
-    <pathelement location="${supremica.lib}/log4j.jar"/>
-    <pathelement location="${supremica.build}"/>
+    <path refid="supremica.efa.classpath"/>
   </path>
 
   <path id="waters.test.classpath">
@@ -138,12 +143,21 @@
       <compilerarg value="-Xlint:unchecked"/>
       <compilerarg value="-Xlint:deprecation"/>
       <include name="net/sourceforge/waters/**/*.java"/>
-      <exclude name="net/sourceforge/waters/gui/**/*.java"/>
+       <exclude name="net/sourceforge/waters/gui/**/*.java"/>
       <exclude name="net/sourceforge/waters/mbt/**/*.java"/>
       <exclude
           name="net/sourceforge/waters/analysis/modular/supremica/*.java"/>
       <exclude name="net/sourceforge/waters/model/unchecked/**/*.java"/>
-    </javac>
+      <include name="org/supremica/external/iec61499fb2efa/**/*.java"/>
+      <!-- The following files can be included when -Xlint:unchecked and
+           -Xlint:deprecation gives no more warnings -->
+      <exclude
+          name="org/supremica/external/iec61499fb2efa/ModelMaker.java"/>
+      <exclude
+          name="org/supremica/external/iec61499fb2efa/ModuleToIEC61499.java"/>
+      <exclude
+          name="org/supremica/external/iec61499fb2efa/*ModelBuilder.java"/>
+   </javac>
   </target>
 
   <target name="waters-jar" depends="waters-compile">
@@ -161,6 +175,7 @@
         <exclude name="net/sourceforge/waters/gui/**"/>
         <exclude name="net/sourceforge/waters/model/unchecked/**"/>
         <exclude name="net/sourceforge/waters/xsd/**"/>
+        <include name="org/supremica/external/iec61499fb2efa/**"/>
       </fileset>
     </jar>
   </target>

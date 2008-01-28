@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.compiler
 //# CLASS:   CompilerContext
 //###########################################################################
-//# $Id: CompilerContext.java,v 1.4 2006-02-20 22:20:21 robi Exp $
+//# $Id: CompilerContext.java,v 1.5 2008-01-28 00:55:08 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.compiler;

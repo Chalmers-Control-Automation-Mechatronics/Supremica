@@ -1,3 +1,4 @@
+//# -*- tab-width: 4  indent-tabs-mode: nil  c-basic-offset: 4 -*-
 /*
  *   Copyright (C) 2006 Goran Cengic
  */
@@ -53,16 +54,14 @@ import net.sourceforge.waters.subject.base.ListSubject;
 import net.sourceforge.waters.subject.module.*;
 import net.sourceforge.waters.xsd.base.EventKind;
 
-import org.supremica.automata.VariableHelper;
-
 
 public class ExtendedAutomataExpander
 {
 
 	private static ModuleSubjectFactory factory = ModuleSubjectFactory.getInstance();
-	private static ExpressionParser parser = new ExpressionParser(ModuleSubjectFactory.getInstance(), CompilerOperatorTable.getInstance());
+	private static ExpressionParser parser = new ExpressionParser(factory, CompilerOperatorTable.getInstance());
 
-	public static void expandTransitions(ModuleSubject module)
+	public static void expandTransitions(final ModuleSubject module)
 	{
 		
 		Logger.output("ExtendedAutomataExpander.expandTransitions(): Expanding transitions.");
@@ -70,7 +69,8 @@ public class ExtendedAutomataExpander
 		// get all component variables
 		// and put them in a map
 		Logger.output(Logger.DEBUG, "ExtendedAutomataExpander.expandTransitions(): Making module variables map.");
-		Map moduleVariables = new HashMap();
+		final Map<String,VariableComponentProxy> moduleVariables =
+            new HashMap<String,VariableComponentProxy>();
         for (final Proxy proxy : module.getComponentList()) {
             if (proxy instanceof VariableComponentProxy) {
                 final VariableComponentProxy curVar =
@@ -99,9 +99,11 @@ public class ExtendedAutomataExpander
 			Logger.output(Logger.DEBUG, "ExtendedAutomataExpander.expandTransitions(): Component", 1);
 			Logger.output(Logger.DEBUG, curComponentName, 2);
 
-			ListSubject edges = ((GraphSubject) curComponent.getGraph()).getEdgesModifiable();
-			List removeEdges = new LinkedList();
-			List addEdges = new LinkedList();
+			final ListSubject<EdgeSubject> edges =
+                ((GraphSubject) curComponent.getGraph()).getEdgesModifiable();
+			final List<EdgeSubject> removeEdges =
+                new LinkedList<EdgeSubject>();
+			final List<EdgeSubject> addEdges = new LinkedList<EdgeSubject>();
 
 			for (Iterator edgeIter = edges.iterator(); edgeIter.hasNext();)
 			{
@@ -215,7 +217,8 @@ public class ExtendedAutomataExpander
 					}
 					
 					// get guard identifiers
-					Set guardExpressionIdents = new LinkedHashSet();
+					Set<String> guardExpressionIdents =
+                        new LinkedHashSet<String>();
 					if (guardSyntaxTree != null)
 					{
 						Finder finder = new Finder(guardSyntaxTree);
@@ -231,9 +234,12 @@ public class ExtendedAutomataExpander
 					}
 										
 					// get actions identifiers
-					Set actionsAssignmentIdents = new LinkedHashSet();
-					// expression idents found in actions that are not in the guard
-					Set actionsExpressionIdents = new LinkedHashSet();
+					Set<String> actionsAssignmentIdents =
+                        new LinkedHashSet<String>();
+					// expression idents found in actions
+                    // that are not in the guard
+					Set<String> actionsExpressionIdents =
+                        new LinkedHashSet<String>();
 					if (actionsSyntaxTree != null)
 					{
 						Finder finder = new Finder(actionsSyntaxTree);
@@ -275,9 +281,12 @@ public class ExtendedAutomataExpander
 			
 						// count through all expression identifers and evaluate the guard
 						// initialize couters and upper bounds maps
-						Map identCounters = new LinkedHashMap();
-						Map identUpperBounds = new HashMap();
-						Map identLowerBounds = new HashMap();
+						Map<String,Integer> identCounters =
+                            new LinkedHashMap<String,Integer>();
+						Map<String,Integer> identUpperBounds =
+                            new HashMap<String,Integer>();
+						Map<String,Integer> identLowerBounds =
+                            new HashMap<String,Integer>();
 						Logger.output(Logger.DEBUG,"ExtendedAutomataExpander.expandTransitions(): Initializing guard identifiers counters", 3);
 						for (Iterator iter = guardExpressionIdents.iterator(); iter.hasNext();)
 						{
@@ -314,11 +323,14 @@ public class ExtendedAutomataExpander
 						
 							// set expression symbols to counters and make guard addition
 							String addToGuard = "";
-							for (Iterator iter = guardExpressionIdents.iterator(); iter.hasNext();)
-							{
-								String curIdent = (String) iter.next();
-								int value = ((Integer) identCounters.get(curIdent)).intValue();
-								((IntegerVariable) symbols.getVariable(curIdent)).setValue(value);
+							for (final Iterator<String> iter = 
+                                     guardExpressionIdents.iterator();
+                                 iter.hasNext(); ) {
+                                final String curIdent = iter.next();
+								final int value = identCounters.get(curIdent);
+                                final IntegerVariable intvar =
+                                    (IntegerVariable) symbols.getVariable(curIdent);
+								intvar.setValue(value);
 								addToGuard = addToGuard + curIdent + " == " + value;
 								if (iter.hasNext())
 								{
@@ -367,9 +379,9 @@ public class ExtendedAutomataExpander
 
 										// count through all actions expression identifers and evaluate the actions
 										// initialize couters and upper bounds maps
-										Map actionsIdentCounters = new LinkedHashMap();
-										Map actionsIdentUpperBounds = new HashMap();
-										Map actionsIdentLowerBounds = new HashMap();
+										Map<String,Integer> actionsIdentCounters = new LinkedHashMap<String,Integer>();
+										Map<String,Integer> actionsIdentUpperBounds = new HashMap<String,Integer>();
+										Map<String,Integer> actionsIdentLowerBounds = new HashMap<String,Integer>();
 										Logger.output(Logger.DEBUG,"ExtendedAutomataExpander.expandTransitions(): Initializing actions identifiers counters", 3);
 										for (Iterator iter = actionsExpressionIdents.iterator(); iter.hasNext();)
 										{
@@ -450,7 +462,8 @@ public class ExtendedAutomataExpander
 																		(LabelBlockProxy) curLabel.clone(), guard, actions));
 										
 											// increase actions ident counters
-											List atUpperBound = new LinkedList();
+											List<String> atUpperBound =
+                                                new LinkedList<String>();
 											for (Iterator countIter = actionsIdentCounters.keySet().iterator(); countIter.hasNext();)
 											{
 												String curIdent = (String) countIter.next();
@@ -459,7 +472,7 @@ public class ExtendedAutomataExpander
 												
 												if (value < upperBound)
 												{
-													actionsIdentCounters.put(curIdent, new Integer(value + 1));
+													actionsIdentCounters.put(curIdent, value + 1);
 													if (atUpperBound.size() > 0)
 													{
 														for (Iterator iter = atUpperBound.iterator(); iter.hasNext();)
@@ -467,7 +480,7 @@ public class ExtendedAutomataExpander
 															String curAtBound = (String) iter.next();
 															int lowerBound = ((Integer) actionsIdentLowerBounds.get(curAtBound)).intValue();
 															
-															actionsIdentCounters.put(curAtBound, new Integer(lowerBound));
+															actionsIdentCounters.put(curAtBound, lowerBound);
 														}
 														atUpperBound.clear();
 													}
@@ -499,7 +512,8 @@ public class ExtendedAutomataExpander
 							}
 
 							// increase guard ident counters
-							List atUpperBound = new LinkedList();
+							final List<String> atUpperBound =
+                                new LinkedList<String>();
 							for (Iterator countIter = identCounters.keySet().iterator(); countIter.hasNext();)
 							{
 								String curIdent = (String) countIter.next();
@@ -508,7 +522,7 @@ public class ExtendedAutomataExpander
 									
 								if (value < upperBound)
 								{
-									identCounters.put(curIdent, new Integer(value + 1));
+									identCounters.put(curIdent, value + 1);
 									if (atUpperBound.size() > 0)
 									{
 										for (Iterator iter = atUpperBound.iterator(); iter.hasNext();)
@@ -516,7 +530,7 @@ public class ExtendedAutomataExpander
 											String curAtBound = (String) iter.next();
 											int lowerBound = ((Integer) identLowerBounds.get(curAtBound)).intValue();
 										
-											identCounters.put(curAtBound, new Integer(lowerBound));
+											identCounters.put(curAtBound, lowerBound);
 										}
 										atUpperBound.clear();
 									}
@@ -566,9 +580,12 @@ public class ExtendedAutomataExpander
 							
 							// count through all actions expression identifers and evaluate the actions
 							// initialize couters and upper bounds maps
-							Map actionsIdentCounters = new LinkedHashMap();
-							Map actionsIdentUpperBounds = new HashMap();
-							Map actionsIdentLowerBounds = new HashMap();
+							final Map<String,Integer> actionsIdentCounters =
+                                new LinkedHashMap<String,Integer>();
+							final Map<String,Integer> actionsIdentUpperBounds =
+                                new HashMap<String,Integer>();
+							final Map<String,Integer> actionsIdentLowerBounds =
+                                new HashMap<String,Integer>();
 							Logger.output(Logger.DEBUG,"ExtendedAutomataExpander.expandTransitions(): Initializing actions identifiers counters", 3);
 							for (Iterator iter = actionsExpressionIdents.iterator(); iter.hasNext();)
 							{
@@ -645,7 +662,8 @@ public class ExtendedAutomataExpander
 															(LabelBlockProxy) curLabel.clone(), guard, actions));
 								
 								// increase actions ident counters
-								List atUpperBound = new LinkedList();
+								final List<String> atUpperBound =
+                                    new LinkedList<String>();
 								for (Iterator countIter = actionsIdentCounters.keySet().iterator(); countIter.hasNext();)
 								{
 									String curIdent = (String) countIter.next();
@@ -654,7 +672,7 @@ public class ExtendedAutomataExpander
 									
 									if (value < upperBound)
 									{
-										actionsIdentCounters.put(curIdent, new Integer(value + 1));
+										actionsIdentCounters.put(curIdent, value + 1);
 										if (atUpperBound.size() > 0)
 										{
 											for (Iterator iter = atUpperBound.iterator(); iter.hasNext();)
@@ -662,7 +680,7 @@ public class ExtendedAutomataExpander
 												String curAtBound = (String) iter.next();
 												int lowerBound = ((Integer) actionsIdentLowerBounds.get(curAtBound)).intValue();
 												
-												actionsIdentCounters.put(curAtBound, new Integer(lowerBound));
+												actionsIdentCounters.put(curAtBound, lowerBound);
 											}
 											atUpperBound.clear();
 										}
@@ -691,16 +709,9 @@ public class ExtendedAutomataExpander
  			}
 
  			// remove old edges
- 			for (Iterator iter = removeEdges.iterator(); iter.hasNext();)
- 			{
- 				edges.remove(iter.next());
- 			}
-			
+            edges.removeAll(removeEdges);
  			// add new edges
- 			for (Iterator iter = addEdges.iterator(); iter.hasNext();)
- 			{
- 				edges.add(iter.next());
- 			}
+            edges.addAll(addEdges);
 		}
 
 		//writeModuleToFile(module ,"blah.wmod");

@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.automata
 //# CLASS:   ExtendedAutomaton
 //###########################################################################
-//# $Id: ExtendedAutomaton.java,v 1.4 2007-12-04 03:22:58 robi Exp $
+//# $Id: ExtendedAutomaton.java,v 1.5 2008-01-28 00:55:08 robi Exp $
 //###########################################################################
 
 /*
@@ -94,6 +94,7 @@ import net.sourceforge.waters.model.expr.ExpressionParser;
 import net.sourceforge.waters.model.expr.Operator;
 import net.sourceforge.waters.model.expr.ParseException;
 
+import org.supremica.external.iec61499fb2efa.VariableHelper;
 
 
 public class ExtendedAutomaton
