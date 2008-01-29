@@ -1,10 +1,10 @@
 //# -*- tab-width: 4  indent-tabs-mode: t  c-basic-offset: 4 -*-
 //###########################################################################
 //# PROJECT: Supremica
-//# PACKAGE: org.supremica.log
+//# PACKAGE: org.supremica.gui
 //# CLASS:   LogDisplay
 //###########################################################################
-//# $Id: LogDisplay.java,v 1.36 2007-10-31 14:58:54 flordal Exp $
+//# $Id: LogDisplay.java,v 1.5 2008-01-29 02:12:15 robi Exp $
 //###########################################################################
 
 /*
@@ -56,7 +56,7 @@
  * Supremica is owned and represented by KA.
  */
 
-package org.supremica.log;
+package org.supremica.gui;
 
 import java.awt.Color;
 import java.awt.event.*;
@@ -76,16 +76,23 @@ import java.util.StringTokenizer;
 import javax.swing.*;
 import javax.swing.text.*;
 
-import org.apache.log4j.*;
+import org.apache.log4j.AppenderSkeleton;
+import org.apache.log4j.Layout;
+import org.apache.log4j.Level;
+import org.apache.log4j.PatternLayout;
 import org.apache.log4j.spi.LoggingEvent;
 import org.apache.log4j.helpers.OptionConverter;
 
-import org.supremica.util.VPopupMenu;
 import org.supremica.gui.*;
+import org.supremica.log.Logger;
+import org.supremica.log.LoggerFactory;
+import org.supremica.log.LoggerFilter;
+import org.supremica.log.SupremicaLevel;
 import org.supremica.properties.BooleanProperty;
 import org.supremica.properties.Config;
 import org.supremica.properties.SupremicaPropertyChangeEvent;
 import org.supremica.properties.SupremicaPropertyChangeListener;
+import org.supremica.util.VPopupMenu;
 
 
 public class LogDisplay
@@ -100,7 +107,6 @@ public class LogDisplay
         if (theLogDisplay == null)
         {
             theLogDisplay = new LogDisplay();
-            theLogDisplay.addFilter(factory.getLoggerFilter());
             theLogDisplay.connectStreams();
         }
         return theLogDisplay;
@@ -110,7 +116,8 @@ public class LogDisplay
     //# Constructors
     private LogDisplay()
     {
-        mLayout = new PatternLayout("%-5p %m%n");
+        final LoggerFactory factory = LoggerFactory.getInstance();
+        mLayout = factory.getLayout();
         setTextPane(new JTextPane());
         theTextPaneScrollPane = new JScrollPane(mTextPane);
         createAttributes();
@@ -164,6 +171,7 @@ public class LogDisplay
         StyleConstants.setForeground(attWarn, new Color(255, 128, 0));
         MutableAttributeSet attInfo = new SimpleAttributeSet();
         mAttributeMap.put(Level.INFO, attInfo);
+        mAttributeMap.put(SupremicaLevel.VERBOSE, attInfo);
         StyleConstants.setFontSize(attInfo, 14);
         StyleConstants.setForeground(attInfo, new Color(0, 80, 0));
         MutableAttributeSet attDebug = new SimpleAttributeSet();
@@ -204,6 +212,7 @@ public class LogDisplay
         mIconMap.put(Level.FATAL, getIcon("/icons/BlackFlag.gif"));
         mIconMap.put(Level.ERROR, getIcon("/icons/RedFlag.gif"));
         mIconMap.put(Level.WARN, getIcon("/icons/OrangeFlag.gif"));
+        mIconMap.put(SupremicaLevel.VERBOSE, getIcon("/icons/GreenFlag.gif"));
         mIconMap.put(Level.INFO, getIcon("/icons/GreenFlag.gif"));
         mIconMap.put(Level.DEBUG, getIcon("/icons/BlueFlag.gif"));
         mIconMap.put(Level.ALL, getIcon("/icons/BlackFlag.gif"));

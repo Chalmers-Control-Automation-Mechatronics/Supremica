@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.log
 //# CLASS:   LoggerFactory
 //###########################################################################
-//# $Id: Logger.java,v 1.14 2007-10-31 13:01:00 flordal Exp $
+//# $Id: Logger.java,v 1.15 2008-01-29 02:12:15 robi Exp $
 //###########################################################################
 
 /*
@@ -114,6 +114,5 @@ public interface Logger
     void verbose(Object message);
     
     boolean isDebugEnabled();
-    
-    void setLogToConsole(boolean log);
+
 }

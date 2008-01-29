@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.log
 //# CLASS:   SupremicaLogger
 //###########################################################################
-//# $Id: SupremicaLogger.java,v 1.4 2007-08-21 03:43:42 robi Exp $
+//# $Id: SupremicaLogger.java,v 1.5 2008-01-29 02:12:15 robi Exp $
 //###########################################################################
 
 /*
@@ -62,8 +62,6 @@ import java.io.StringWriter;
 import java.io.PrintWriter;
 
 import org.apache.log4j.Appender;
-
-import org.supremica.properties.Config;
 
 
 class SupremicaLogger
@@ -187,10 +185,7 @@ class SupremicaLogger
      */
     public void verbose(final Object message)
     {
-        if (Config.VERBOSE_MODE.isTrue())
-        {
-            info(message);
-        }
+        mLogger.log(SupremicaLevel.VERBOSE, message);
     }
     
     /**
@@ -207,17 +202,6 @@ class SupremicaLogger
     public boolean isDebugEnabled()
     {
         return mLogger.isDebugEnabled();
-    }
-    
-    public void setLogToConsole(final boolean log)
-    {
-        final LoggerFactory factory = LoggerFactory.getInstance();
-        final Appender appender = factory.getConsoleAppender();
-        if (log) {
-            mLogger.addAppender(appender);
-        } else {
-            mLogger.removeAppender(appender);
-        }
     }
     
     private String getStackTraceAsString(final Throwable t)

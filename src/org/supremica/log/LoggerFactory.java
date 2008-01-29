@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.log
 //# CLASS:   LoggerFactory
 //###########################################################################
-//# $Id: LoggerFactory.java,v 1.21 2007-10-31 14:58:54 flordal Exp $
+//# $Id: LoggerFactory.java,v 1.22 2008-01-29 02:12:15 robi Exp $
 //###########################################################################
 
 /*
@@ -66,57 +66,45 @@ import java.io.PrintStream;
 import java.io.PrintWriter;
 
 import org.apache.log4j.Appender;
+import org.apache.log4j.Layout;
 import org.apache.log4j.PatternLayout;
 import org.apache.log4j.WriterAppender;
+import org.apache.log4j.spi.Filter;
 import org.apache.log4j.varia.NullAppender;
-
-import org.supremica.properties.BooleanProperty;
-import org.supremica.properties.Config;
-import org.supremica.properties.SupremicaPropertyChangeEvent;
-import org.supremica.properties.SupremicaPropertyChangeListener;
 
 
 public class LoggerFactory
-    implements SupremicaPropertyChangeListener
 {
+
+    //#######################################################################
+    //# Initialisation
+	public static LoggerFactory initialiseSimpleLoggerFactory()
+	{
+		final LoggerFactory factory = new LoggerFactory();
+		install(factory);
+		return factory;
+	}
+
+
     //#######################################################################
     //# Constructors
-    private LoggerFactory()
+    protected LoggerFactory()
     {
-        final PatternLayout layout = new PatternLayout("%-5p %m%n");
-        final PrintWriter writer = new PrintWriter(System.out);
-        final Appender cappender = new WriterAppender(layout, writer);
-        final LoggerFilter filter = new LoggerFilter();
-        cappender.addFilter(filter);
-        mConsoleAppender = cappender;
-        mLayout = layout;
-        mFilter = filter;
+        mLayout = new PatternLayout("%-5p %m%n");
+        mLoggerFilter = new LoggerFilter();
+    }
 
-        Config.LOG_TO_CONSOLE.addPropertyChangeListener(this);
-        Config.LOG_TO_GUI.addPropertyChangeListener(this);
-    }
-    
-    public void initialiseAppenders()
-    {
-        final org.apache.log4j.Logger root =
-            org.apache.log4j.Logger.getRootLogger();
-        if (Config.LOG_TO_CONSOLE.isTrue())
-        {
-            root.addAppender(mConsoleAppender);
-        }
-        
-        if (Config.LOG_TO_GUI.isTrue())
-        {
-            final Appender dappender = LogDisplay.getInstance();
-            root.addAppender(dappender);
-        }
-    }
+    protected void initialiseAppenders()
+	{
+		install(this);
+	}
+
     
     //#######################################################################
     //# Factory Methods
     public LoggerFilter getLoggerFilter()
     {
-        return mFilter;
+        return mLoggerFilter;
     }
     
     public Logger createLoggerFor(final Class clazz)
@@ -131,11 +119,11 @@ public class LoggerFactory
         return new SupremicaLogger(logger);
     }
     
-    public Appender getConsoleAppender()
+    public Layout getLayout()
     {
-        return mConsoleAppender;
+        return mLayout;
     }
-    
+
     
     //#######################################################################
     //# Redirection
@@ -186,52 +174,12 @@ public class LoggerFactory
     
     
     //#######################################################################
-    //# Interface org.supremica.properties.SupremicaPropertyChangeListener
-    /**
-     * Updates the appenders of the root logger after a change to
-     * Supremica properties. This method adds or removes appenders
-     * to the root logger, thus changing the behaviour of all loggers
-     * that do not implement specific behaviour.
-     * @param  event     The event fired in response to the property change.
-     */
-    public void propertyChanged(final SupremicaPropertyChangeEvent event)
-    {
-        final BooleanProperty property = (BooleanProperty) event.getSource();
-        final Appender appender;
-        if (property == Config.LOG_TO_CONSOLE)
-        {
-            appender = mConsoleAppender;
-        }
-        else if (property == Config.LOG_TO_GUI)
-        {
-            appender = LogDisplay.getInstance();
-        }
-        else
-        {
-            throw new IllegalArgumentException
-                ("Unsupported property: " + property.getKey() + "!");
-        }
-        final org.apache.log4j.Logger root =
-            org.apache.log4j.Logger.getRootLogger();
-        if (property.isTrue())
-        {
-            root.addAppender(appender);
-        }
-        else
-        {
-            root.removeAppender(appender);
-        }
-    }
-    
-    
-    //#######################################################################
     //# Static Access
     public static LoggerFactory getInstance()
     {
-        /*
-        if (theInstance == null)
-            theInstance = new LoggerFactory();
-         */
+        if (theInstance == null) {
+			theInstance = initialiseSimpleLoggerFactory();
+		}
         return theInstance;
     }
     
@@ -244,16 +192,28 @@ public class LoggerFactory
     {
         return getInstance().createLoggerFor(name);
     }
-    
-    
+
+
+    //#######################################################################
+    //# Initialisation
+	private static void install(final LoggerFactory factory)
+	{
+		if (theInstance == null) {
+			theInstance = factory;
+		} else {
+			throw new IllegalStateException
+				("Trying to install a second logger factory!");
+		}
+	}
+
+
     //#######################################################################
     //# Data Members
-    private final PatternLayout mLayout;
-    private final LoggerFilter mFilter;
-    private final Appender mConsoleAppender;
+    private final Layout mLayout;
+    private final LoggerFilter mLoggerFilter;
     
     
     //#######################################################################
     //# Singleton Pattern
-    private static final LoggerFactory theInstance = new LoggerFactory();
+    private static LoggerFactory theInstance = null;
 }

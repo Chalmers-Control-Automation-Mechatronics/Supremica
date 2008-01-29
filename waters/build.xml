@@ -62,7 +62,7 @@
   <path id="supremica.efa.classpath">
     <pathelement location="${fuber.jar}"/>
     <pathelement location="${java_cup.jar}"/>
-    <pathelement location="${supremica.root}/build"/>
+    <!-- Cannot depend on Supremica/build !!! -->
   </path>
 
   <path id="waters.compile.classpath">
@@ -148,15 +148,10 @@
       <exclude
           name="net/sourceforge/waters/analysis/modular/supremica/*.java"/>
       <exclude name="net/sourceforge/waters/model/unchecked/**/*.java"/>
-      <include name="org/supremica/external/iec61499fb2efa/**/*.java"/>
-      <!-- The following files can be included when -Xlint:unchecked and
-           -Xlint:deprecation gives no more warnings -->
-      <exclude
-          name="org/supremica/external/iec61499fb2efa/ModelMaker.java"/>
-      <exclude
-          name="org/supremica/external/iec61499fb2efa/ModuleToIEC61499.java"/>
-      <exclude
-          name="org/supremica/external/iec61499fb2efa/*ModelBuilder.java"/>
+      <include name="org/supremica/log/**/*.java"/>
+      <!-- Don't really want to depend on org.supremica.automata -->
+      <include name="org/supremica/automata/ExtendedAutomataExpander.java"/>
+      <include name="org/supremica/automata/VariableHelper.java"/>
    </javac>
   </target>
 
@@ -175,7 +170,8 @@
         <exclude name="net/sourceforge/waters/gui/**"/>
         <exclude name="net/sourceforge/waters/model/unchecked/**"/>
         <exclude name="net/sourceforge/waters/xsd/**"/>
-        <include name="org/supremica/external/iec61499fb2efa/**"/>
+        <include name="org/supremica/automata/**"/>
+        <include name="org/supremica/log/**"/>
       </fileset>
     </jar>
   </target>

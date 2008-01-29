@@ -1,5 +1,6 @@
 package org.supremica.gui.ide;
 
+import org.supremica.gui.LogDisplay;
 import org.supremica.gui.WhiteScrollPane;
 import org.supremica.log.*;
 

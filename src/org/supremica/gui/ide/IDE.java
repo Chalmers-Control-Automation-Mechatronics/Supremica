@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.gui.ide
 //# CLASS:   IDE
 //###########################################################################
-//# $Id: IDE.java,v 1.110 2008-01-11 12:55:04 torda Exp $
+//# $Id: IDE.java,v 1.111 2008-01-29 02:12:15 robi Exp $
 //###########################################################################
 
 package org.supremica.gui.ide;
@@ -35,19 +35,20 @@ import net.sourceforge.waters.gui.transfer.FocusTracker;
 import net.sourceforge.waters.model.base.DocumentProxy;
 import net.sourceforge.waters.model.marshaller.DocumentManager;
 
+import org.supremica.Version;
 import org.supremica.apps.SupremicaWithGui;
 import org.supremica.automata.Project;
+import org.supremica.comm.xmlrpc.Server;
+import org.supremica.gui.InterfaceManager;
+import org.supremica.gui.LogDisplay;
+import org.supremica.gui.SupremicaLoggerFactory;
+import org.supremica.gui.Utility;
 import org.supremica.gui.ide.actions.Actions;
 import org.supremica.gui.ide.actions.ExitAction;
 import org.supremica.gui.ide.actions.IDEActionInterface;
-import org.supremica.gui.InterfaceManager;
-import org.supremica.gui.Utility;
 import org.supremica.log.Logger;
-import org.supremica.log.LoggerFactory;
 import org.supremica.properties.Config;
 import org.supremica.util.ProcessCommandLineArguments;
-import org.supremica.Version;
-import org.supremica.comm.xmlrpc.Server;
 import org.xml.sax.SAXException;
 
 /**
@@ -68,11 +69,6 @@ public class IDE
     public IDE()
     throws JAXBException, SAXException
     {
-        // Initialise logging
-        if (logger == null) logger = LoggerFactory.createLogger(IDE.class);
-    	LoggerFactory.getInstance().initialiseAppenders();        
-        info("Supremica version: " + (new Version()));
-                
         // Instantiate all actions
         mObservers = new LinkedList<Observer>();
         mFocusTracker = new FocusTracker(this);
@@ -107,6 +103,10 @@ public class IDE
         // Initialise document managers
         mDocumentContainerManager = new DocumentContainerManager(this);
         mDocumentContainerManager.attach(this);
+
+        // Show Version number
+        info("Supremica version: " + (new Version()));
+        logger.verbose("this is verbose");
 
         // Initialise XML_RPC
         if (Config.XML_RPC_ACTIVE.isTrue())
@@ -367,6 +367,10 @@ public class IDE
         // Process command line arguments
         final List<File> files = ProcessCommandLineArguments.process(args);
         
+        // Initialise logging
+        SupremicaLoggerFactory.initialiseSupremicaLoggerFactory();
+        logger = SupremicaLoggerFactory.createLogger(IDE.class);
+
         // Now start the gui...
         InterfaceManager.getInstance().initLookAndFeel();
         final IDE ide = new IDE();
@@ -421,7 +425,7 @@ public class IDE
         Locale.setDefault(Locale.ENGLISH);
         Config.XML_RPC_ACTIVE.set(false);
         Config.DOT_USE.set(true);
-        Config.LOG_TO_CONSOLE.set(false);
+        Config.LOG_TO_CONSOLE.set(false); // why?
         Config.LOG_TO_GUI.set(true);
     }
 }

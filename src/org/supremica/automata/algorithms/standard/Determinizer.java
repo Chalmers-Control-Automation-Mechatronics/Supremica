@@ -491,7 +491,7 @@ public class Determinizer
     // To test stuff, no GUI
     public static void main(String[] args)
     {
-        logger.setLogToConsole(true);
+        //logger.setLogToConsole(true);
         
         Automaton automaton = new Automaton("Determinizer test");
         State q0 = new State("q0");

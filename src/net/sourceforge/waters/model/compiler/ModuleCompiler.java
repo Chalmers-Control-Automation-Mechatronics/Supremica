@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.module
 //# CLASS:   ModuleCompiler
 //###########################################################################
-//# $Id: ModuleCompiler.java,v 1.101 2008-01-28 12:06:44 markus Exp $
+//# $Id: ModuleCompiler.java,v 1.102 2008-01-29 02:12:15 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.compiler;
@@ -84,12 +84,16 @@ import net.sourceforge.waters.xsd.base.ComponentKind;
 import net.sourceforge.waters.xsd.base.EventKind;
 import net.sourceforge.waters.xsd.module.ScopeKind;
 
+/*
+ * Depend on org.supremica.automata ? Frown ...
+ */
 import org.supremica.automata.ExtendedAutomataExpander;
+
 
 public class ModuleCompiler extends AbstractModuleProxyVisitor
 {
  
-//##########################################################################
+  //##########################################################################
   //# Constructors
   public ModuleCompiler(final DocumentManager manager,
                         final ProductDESProxyFactory desfactory,
@@ -154,6 +158,7 @@ public class ModuleCompiler extends AbstractModuleProxyVisitor
         ExtendedAutomataExpander.expandTransitions(subject);
         visitModuleProxy(subject);
       } else {
+        // Only this case now really works ...
         visitModuleProxy(mModule);
       }
       return mDESFactory.createProductDESProxy

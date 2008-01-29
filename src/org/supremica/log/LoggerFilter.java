@@ -52,6 +52,7 @@ package org.supremica.log;
 import org.apache.log4j.*;
 import org.apache.log4j.spi.*;
 
+
 public class LoggerFilter
     extends Filter
 {
@@ -60,13 +61,6 @@ public class LoggerFilter
     private boolean allowDebugs = false;
     private boolean allowFatals = true;
     private boolean allowErrors = true;
-    
-    public LoggerFilter()
-    {}
-    
-    public void setOption(String option, String value)
-    {    // Not implemented
-    }
     
     public String[] getOptionStrings()
     {
@@ -87,11 +81,11 @@ public class LoggerFilter
             return Filter.DENY;
         }
         
-        if (prio == Level.INFO)
+        if (prio == Level.INFO || prio == SupremicaLevel.VERBOSE)
         {
             if (allowInfos)
             {
-                return Filter.ACCEPT;
+               return Filter.ACCEPT;
             }
             
             return Filter.DENY;
