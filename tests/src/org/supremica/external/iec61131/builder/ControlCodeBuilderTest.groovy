@@ -223,12 +223,12 @@ class ControlCodeBuilderTest extends GroovyTestCase {
 			input 'y2'
 			sequentialProgram('program') {
 				sequence('mySequence') {
-					Step 'S1'
+					Step('S1')
 					'y1'(to:['L1', 'R1'])
 					Step('L1')
 					'not y1'()
-					Step 'L2'
-					Step 'R1'
+					Step('L2')
+					Step('R1')
 					'y2'(from:['L2', 'R1'])
 				}
 			}
@@ -616,7 +616,7 @@ class ControlCodeBuilderTest extends GroovyTestCase {
 			output 'u7'
 			output 'u4'
 			output 'u8'
-			RS 'RS1'
+			RS('RS1')
 			functionblock('FB1') {
 				input 'y1'
 				input 'y2'
