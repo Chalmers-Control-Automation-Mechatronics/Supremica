@@ -284,7 +284,7 @@ public class Milp
             
             //new... test... (should be called when mutex constraints already are created)
             //TODO: better name... better implementation...
-//            createConsecutiveBookingConstraints();
+            createConsecutiveBookingConstraints();
             
             milpSolver.createModelFile();
             

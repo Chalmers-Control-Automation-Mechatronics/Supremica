@@ -27,12 +27,22 @@ public class BookingPairsGraphExplorer
     private ArrayList<int[]>[] edges = null;
     private boolean[] inComponent;
     private int[] rootIndex;
+    private Vertex[] vertices;
+    
+    ArrayList<Vertex> tarjanStack = new ArrayList<Vertex>();
+    int tarjanIndex = 0; 
     
     public BookingPairsGraphExplorer(ArrayList<int[]>[] edges)
     {
         this.edges = edges;
         inComponent = new boolean[edges.length];
         rootIndex = new int[edges.length];
+        
+        vertices = new Vertex[edges.length];
+        for (int i = 0; i < vertices.length; i++)
+        {
+            vertices[i] = new Vertex(i, edges[i]);
+        }
         
         //TODO: Implementera Tarjan's algorithm
         
@@ -44,6 +54,41 @@ public class BookingPairsGraphExplorer
                         edges[i].get(j)[0] + " with color P" + edges[i].get(j)[1] + 
                         " and overlapping_property = " + edges[i].get(j)[4]);
             }
+        }
+        
+        tarjan(vertices[0]);
+    }
+    
+    private void tarjan(Vertex v)
+    {
+        tarjanIndex++;
+        tarjanStack.add(v);
+        
+        ArrayList<int[]> edges = v.getOutEdges();
+        for (int j = 0; j < edges.size(); j++)
+        {
+            Vertex toVertex = vertices[edges.get(j)[0]];
+            if (toVertex.depthIndex == -1)
+            {
+                tarjan(toVertex);
+                v.setLowlinkIndex(Math.min(v.getLowlinkIndex(), toVertex.getLowlinkIndex()));
+            }
+            else
+            {
+                v.setLowlinkIndex(Math.min(v.getLowlinkIndex(), toVertex.getDepthIndex()));
+            }
+        }
+        
+        if (v.getLowlinkIndex() == v.getDepthIndex())
+        {
+            System.out.println("Connected component (acc to Tarjan): ");
+            Vertex toVertex = null;
+            while (!v.equals(toVertex))
+            {
+                toVertex = tarjanStack.remove(tarjanStack.size()-1);
+                System.out.print(toVertex.getVertexIndex() + " ");
+            }
+            System.out.println("");
         }
     }
     
@@ -120,4 +165,25 @@ public class BookingPairsGraphExplorer
 //        
 //        return false;
 //    }
+}
+
+class Vertex
+{
+    int vertexIndex;
+    int depthIndex = -1;
+    int lowlinkIndex = -1;
+    ArrayList<int[]> outEdges;
+    
+    public Vertex(int vertexIndex, ArrayList<int[]> outgoingEdges)
+    {
+        this.vertexIndex = vertexIndex;
+        outEdges = outgoingEdges;
+    }
+    
+    public int getVertexIndex() { return vertexIndex; }
+    public int getDepthIndex() { return depthIndex; }
+    public void setDepthIndex(int newDepthIndex) { depthIndex = newDepthIndex; }
+    public int getLowlinkIndex() { return lowlinkIndex; }
+    public void setLowlinkIndex(int newLowlinkIndex) { lowlinkIndex = newLowlinkIndex; }
+    public ArrayList<int[]> getOutEdges() { return outEdges; }
 }
