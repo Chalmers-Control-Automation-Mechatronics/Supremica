@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.gui.ide
 //# CLASS:   IDE
 //###########################################################################
-//# $Id: IDE.java,v 1.111 2008-01-29 02:12:15 robi Exp $
+//# $Id: IDE.java,v 1.112 2008-02-01 09:42:19 torda Exp $
 //###########################################################################
 
 package org.supremica.gui.ide;
@@ -412,7 +412,9 @@ public class IDE
     // "IDE", _both_ should give output, to console and logdisplay,
     // respectively.
     private static Logger logger = null;
-    
+    public static void setLogger(Logger aLogger) {
+    	logger = aLogger;
+    }
     
     //#######################################################################
     //# Static Class Constants
