@@ -303,13 +303,13 @@ public class ExtendedAutomataExpander
 						for (Iterator iter = expressionIdents.iterator(); iter.hasNext();)
 						{
 							String curIdent = ((Identifier) iter.next()).a;
-							if (!guardExpressionIdents.contains(curIdent))
-							{
+							//if (!guardExpressionIdents.contains(curIdent))
+							//{
 								if (!actionsExpressionIdents.contains(curIdent))
 								{
 									actionsExpressionIdents.add(curIdent);
 								}
-							}
+							//}
 						}
 					}
 
