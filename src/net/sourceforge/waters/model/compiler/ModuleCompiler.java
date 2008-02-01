@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.module
 //# CLASS:   ModuleCompiler
 //###########################################################################
-//# $Id: ModuleCompiler.java,v 1.102 2008-01-29 02:12:15 robi Exp $
+//# $Id: ModuleCompiler.java,v 1.103 2008-02-01 13:46:43 markus Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.compiler;
@@ -1610,17 +1610,28 @@ private void updateTransitionsInCompiledAutomata()
   private BinaryExpressionProxy findAction
     (String name, List<List<BinaryExpressionProxy>> actionLists)
   {
-    //TODO: check that only one automaton updates each variable.
-    for (List<BinaryExpressionProxy> actions : actionLists){
+      BinaryExpressionProxy action1=null;
+	  BinaryExpressionProxy action2=null;
+	  for (List<BinaryExpressionProxy> actions : actionLists){
       for (BinaryExpressionProxy action : actions) {
         if (((SimpleIdentifierProxy) action.getLeft()).
             getName().
             equals(name)){
-          return action;
+        	if(action1!=null){
+        		action2=action1;
+        		action1=action;
+        		if(!action1.getRight().equalsByContents(action2.getRight())){
+        			return null;
+        		}
+        	}
+        	else{
+        		action1=action;
+        		action2=action;
+        	}
         }
       }
     }
-    return null;
+    return action1;
   }
 
   /*
