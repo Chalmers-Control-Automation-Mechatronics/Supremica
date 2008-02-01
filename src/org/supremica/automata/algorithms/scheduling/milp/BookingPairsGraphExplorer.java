@@ -32,6 +32,8 @@ public class BookingPairsGraphExplorer
     ArrayList<Vertex> tarjanStack = new ArrayList<Vertex>();
     int tarjanIndex = 0; 
     
+    ArrayList<ArrayList<Vertex>> maxSCCList = new ArrayList<ArrayList<Vertex>>();
+    
     public BookingPairsGraphExplorer(ArrayList<int[]>[] edges)
     {
         this.edges = edges;
@@ -41,11 +43,18 @@ public class BookingPairsGraphExplorer
         vertices = new Vertex[edges.length];
         for (int i = 0; i < vertices.length; i++)
         {
-            vertices[i] = new Vertex(i, edges[i]);
+            vertices[i] = new Vertex(i); //, edges[i]);
         }
         
-        //TODO: Implementera Tarjan's algorithm
-        
+        for (int i = 0; i < edges.length; i++)
+        {
+            for (int j = 0; j < edges[i].size(); j++)
+            {
+                vertices[i].addOutEdge(new Edge(vertices[i], vertices[edges[i].get(j)[0]], 
+                        edges[i].get(j)[1], edges[i].get(j)[4]));
+            }
+        }
+
         for (int i = 0; i < edges.length; i++)
         {
             for (int j = 0; j < edges[i].size(); j++)
@@ -57,8 +66,48 @@ public class BookingPairsGraphExplorer
         }
         
         tarjan(vertices[0]);
+        
+        for (ArrayList<Vertex> currSCC : maxSCCList)
+        {
+            for (Vertex vStart : currSCC)
+            {
+                vStart.resetEdgeCopies();  
+                while (vStart.getEdgeCopies().size() > 0)
+                {
+                    ArrayList<Integer> visitedColors = new ArrayList<Integer>();
+                    ArrayList<Vertex> visitedVertices = new ArrayList<Vertex>();
+                    ArrayList<Edge> visitedEdges = new ArrayList<Edge>();
+                    
+                    visitedVertices.add(vStart);  
+                    
+                    //findMinSCC(vStart, visitedColors, visitedVertices, visitedEdges);
+                    
+                    Edge edge = vStart.removeEdgeCopy(0);
+                    
+                    Vertex toVertex = edge.getToVertex();
+                    if (haveSameRoot(vStart, toVertex, currSCC))
+                    {
+                        if (!visitedVertices.contains(toVertex))
+                        {
+                            visitedVertices.add(toVertex);
+                            visitedEdges.add(edge);
+                            visitedColors.add(edge.getColor()); //behövs här???
+                        }
+                        else
+                        {
+                            System.out.println("MinSCC found");
+                        }
+                    }
+
+                }
+            }
+        }
     }
     
+    /**
+     * Finds maximal strongly connected components (SCC) using the Tarjan's algorithm, 
+     * see http://en.wikipedia.org/wiki/Tarjan's_strongly_connected_components_algorithm.
+     */
     private void tarjan(Vertex v)
     {
         v.setDepthIndex(tarjanIndex);
@@ -67,10 +116,9 @@ public class BookingPairsGraphExplorer
         tarjanIndex++;
         tarjanStack.add(v);
         
-        ArrayList<int[]> edges = v.getOutEdges();
-        for (int j = 0; j < edges.size(); j++)
+        for (Edge edge : v.getOutEdges())
         {
-            Vertex toVertex = vertices[edges.get(j)[0]];
+            Vertex toVertex = edge.getToVertex();
             if (toVertex.depthIndex == -1)
             {
                 tarjan(toVertex);
@@ -84,16 +132,50 @@ public class BookingPairsGraphExplorer
         
         if (v.getLowlinkIndex() == v.getDepthIndex())
         {
-            System.out.println("Connected component (acc to Tarjan): ");
+            System.out.println("Connected component (acc to Tarjan):");
+            ArrayList<Vertex> currMaxSCCList = new ArrayList<Vertex>();
+            
             Vertex toVertex = null;
             while (!v.equals(toVertex))
             {
                 toVertex = tarjanStack.remove(tarjanStack.size()-1);
                 System.out.println("v" + toVertex.getVertexIndex() + ": lowlink = v" + toVertex.getLowlinkIndex());
+                currMaxSCCList.add(toVertex);
             }
             System.out.println("");
+            maxSCCList.add(currMaxSCCList);
         }
     }
+    
+    /**
+     * Checks whether the vertices v1 and v2 could belong to the same minimal SCC. 
+     */
+    private boolean haveSameRoot(Vertex v1, Vertex v2, ArrayList<Vertex> currSCC)
+    {
+        if (v1.getLowlinkIndex() != v2.getDepthIndex() && v1.getLowlinkIndex() != v2.getLowlinkIndex())
+        {
+            return false;
+        }
+        if (!currSCC.contains(v2) || !currSCC.contains(v1))
+        {
+            return false;
+        }
+        
+        return true;
+    }
+    
+//    private void findMinSCC(Vertex v, ArrayList<Integer> visitedColors, 
+//            ArrayList<Vertex>visitedVertices, ArrayList<Edge> visitedEdges)
+//    {
+//        for (Edge edge : visitedEdges)
+//        {
+//            Vertex toVertex = edge.getToVertex();
+//            if (!haveSameRoot(v, toVertex, ))
+//            {
+//                
+//            }
+//        }
+//    }
     
 //    /** Creates a new instance of BookingPairsGraphExplorer */
 //    public BookingPairsGraphExplorer(int[][] bPairIndices)
@@ -175,11 +257,18 @@ class Vertex
     int vertexIndex;
     int depthIndex = -1;
     int lowlinkIndex = -1;
-    ArrayList<int[]> outEdges;
+    ArrayList<Edge> outEdges;
+    ArrayList<Edge> edgeCopies;
     
-    public Vertex(int vertexIndex, ArrayList<int[]> outgoingEdges)
+    public Vertex (int vertexIndex)
     {
         this.vertexIndex = vertexIndex;
+        outEdges = new ArrayList<Edge>();
+    }
+    
+    public Vertex(int vertexIndex, ArrayList<Edge> outgoingEdges)
+    {
+        this(vertexIndex);
         outEdges = outgoingEdges;
     }
     
@@ -188,5 +277,43 @@ class Vertex
     public void setDepthIndex(int newDepthIndex) { depthIndex = newDepthIndex; }
     public int getLowlinkIndex() { return lowlinkIndex; }
     public void setLowlinkIndex(int newLowlinkIndex) { lowlinkIndex = newLowlinkIndex; }
-    public ArrayList<int[]> getOutEdges() { return outEdges; }
+    public ArrayList<Edge> getOutEdges() { return outEdges; }
+    public void setOutEdges(ArrayList<Edge> outEdges) { this.outEdges = outEdges; }
+    public void addOutEdge(Edge edge) { outEdges.add(edge); }
+    public ArrayList<Edge> getEdgeCopies() { return edgeCopies; }
+    public void resetEdgeCopies()
+    {
+        edgeCopies = new ArrayList<Edge>();
+        for (Edge edge : outEdges)
+        {
+            edgeCopies.add(edge);
+        }
+    }
+    public Edge removeEdgeCopy(int index) { return edgeCopies.remove(index); }
+}
+
+class Edge
+{
+    int edgeIndex;
+    int color;
+    int overlappingProperty;
+    Vertex fromVertex;
+    Vertex toVertex;
+    
+    public Edge(Vertex fromVertex, Vertex toVertex, int color, int overlappingProperty)
+    {
+        this.fromVertex = fromVertex;
+        this.toVertex = toVertex;
+        this.color = color;
+        this.overlappingProperty = overlappingProperty;
+    }
+    
+    public Vertex getFromVertex() { return fromVertex; }
+    public Vertex getToVertex() { return toVertex; }
+    public int getColor() { return color; }
+    public int getOverlappingProperty() { return overlappingProperty; }
+    public void setFromVertex(Vertex fromVertex) { this.fromVertex = fromVertex; }
+    public void setToVertex(Vertex toVertex) { this.toVertex = toVertex; }
+    public void setColor(int color) { this.color = color; }
+    public void setOverlappingProperty(int overlappingProperty) { this.overlappingProperty = overlappingProperty; }
 }
