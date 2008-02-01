@@ -2127,170 +2127,170 @@ public class Milp
         
         
         
-        
-        
-        
-        
-        
-        
-        
-        // Find the consecutive bookings of the same zone-pairs that are made by different
-        // plants. Check for (almost) all combinations of z1&z2
-        int counter = 1;
-        for (int z1 = 0; z1 < zones.size(); z1++)
-        {
-            for (int z2 = 0; z2 < zones.size(); z2++)
-            {
-                if (z1 != z2)
-                {
-                    // Used in for-loops to decrease code-repetition
-                    int[] currZoneIndices = new int[]{z1, z2};
-                    
-                    // Check for all combinations of p1 < p2 (this suffices since the mutex
-                    // variables are always of the form "pi_books_zx_before_pj", where i < j)
-                    for (int p1 = 0; p1 < plants.size() - 1; p1++)
-                    {
-                        ArrayList<int[]> consecutiveTicsP1 = consecutiveBookingTicsIndices.get(new int[]{p1, z1, z2});
-                        if (consecutiveTicsP1 != null)
-                        {
-                            // If p1 books z1 and then z2 consecutively (consecutiveTicsP1 = non_null), then
-                            // there should be a consecutive booking secuense in som plant with higher index than p1...
-                            for (int p2 = p1 + 1; p2 < plants.size(); p2++)
-                            {
-                                // To check both for the booking z1 -> z2 and z2 -> z1, a new index variable (zInd)
-                                // is needed
-                                for (int zInd = 0; zInd < currZoneIndices.length; zInd++)
-                                {
-                                    // If also p2 books the same zones consecutively, i.e. no unbooking between
-                                    // z1 and z2, then constraint construction begins...
-                                    ArrayList<int[]> consecutiveTicsP2 = consecutiveBookingTicsIndices.get(
-                                            new int[]{p2, currZoneIndices[zInd], currZoneIndices[1 - zInd]});
-                                    if (consecutiveTicsP2 != null)
-                                    {
-                                        for (int[] tic1 : consecutiveTicsP1)
-                                        {
-                                            // Find nearest upwards path splits for each consecutive booking of p1
-                                            ArrayList<int[]> pathSplitInfosP1 = new ArrayList<int[]>();
-                                            for (int localZInd = 0; localZInd < currZoneIndices.length; localZInd++)
-                                            {
-                                                int stateIndex = bookingTics[currZoneIndices[localZInd]][p1][STATE_SWITCH][tic1[localZInd]];
-                                                int eventIndex = bookingTics[currZoneIndices[localZInd]][p1][EVENT_SWITCH][tic1[localZInd]];
-                                                State bState = indexMap.getStateAt(plants.getAutomatonAt(p1), stateIndex);
-                                                LabeledEvent bEvent = indexMap.getEventAt(eventIndex);
-                                                
-                                                findNearestPathSplits(plants.getAutomatonAt(p1), bState.nextState(bEvent),
-                                                        pathSplitInfosP1, bEvent);
-                                            }
-                                            
-                                            // Create path split variables from the path split indices (for p1)
-                                            String pathSplitStrP1 = "";
-                                            int pathSplitCounterP1 = 0;
-                                            for (Iterator<int[]> it = pathSplitInfosP1.iterator(); it.hasNext();)
-                                            {
-                                                int[] pathSplitInfo = it.next();
-                                                if (pathSplitInfo[0] != NO_PATH_SPLIT_INDEX)
-                                                {
-                                                    pathSplitCounterP1++;
-                                                    pathSplitStrP1 += " - " + makeAltPathsVariable(p1, pathSplitInfo[0], pathSplitInfo[1]);
-                                                }
-                                            }
-                                            
-                                            // Create path split variables for p2 and write the consecutive
-                                            // booking constraints (primal and dual) to the MILP-file
-                                            String nonCrossConstrStr = "";
-                                            String dualNonCrossConstrStr = "";
-                                            ArrayList<int[]> pathSplitInfosP2 = new ArrayList<int[]>();
-                                            for (int[] tic2 : consecutiveTicsP2)
-                                            {
-                                                
-                                                for (int localZInd = 0; localZInd < currZoneIndices.length; localZInd++)
-                                                {
-                                                    // This index is the combination of localZInd and zInd, ensuring that the tic2-elements
-                                                    // used below correspond to the tic1[localZInd] (that is tic2[correspondingZInd] represents
-                                                    // the same zone as tic1[localZInd]).
-                                                    int correspondingZInd = (int)Math.IEEEremainder(zInd + localZInd, 2);
-                                                    
-                                                    nonCrossConstrStr += "r" + p1 + "_books_z" + currZoneIndices[localZInd] + "_before_r" + p2;
-                                                    dualNonCrossConstrStr += "r" + p1 + "_books_z" + currZoneIndices[1 - localZInd] + "_before_r" + p2;
-                                                    
-                                                    // If there is a "var_x"-appendix corresponding to the current variable, it should be appended
-                                                    Integer varCounter = mutexVarCounterMap.get(new int[]{currZoneIndices[localZInd], p1, p2,
-                                                    tic1[localZInd], tic2[correspondingZInd]});
-                                                    if (varCounter != null)
-                                                    {
-                                                        nonCrossConstrStr += "_var" + varCounter;
-                                                    }
-                                                    // If there is a "var_x"-appendix corresponding to the dual variable, it should be appended
-                                                    varCounter = mutexVarCounterMap.get(new int[]{currZoneIndices[1 - localZInd], p1, p2,
-                                                    tic1[1 - localZInd], tic2[1 - correspondingZInd]});
-                                                    if (varCounter != null)
-                                                    {
-                                                        dualNonCrossConstrStr += "_var" + varCounter;
-                                                    }
-                                                    
-                                                    if (! nonCrossConstrStr.contains(">="))
-                                                    {
-                                                        nonCrossConstrStr = "consecutive_booking_" + counter + " : " + nonCrossConstrStr + " >= ";
-                                                        dualNonCrossConstrStr = "consecutive_booking_" + counter++ + "_dual : " + dualNonCrossConstrStr + " >= ";
-                                                    }
-                                                    
-                                                    // Find nearest upwards path splits for each consecutive booking of p2
-                                                    int stateIndex = bookingTics[localZInd][p2][STATE_SWITCH][tic2[correspondingZInd]];
-                                                    int eventIndex = bookingTics[localZInd][p2][EVENT_SWITCH][tic2[correspondingZInd]];
-                                                    State bState = indexMap.getStateAt(plants.getAutomatonAt(p2), stateIndex);
-                                                    LabeledEvent bEvent = indexMap.getEventAt(eventIndex);
-                                                    
-                                                    findNearestPathSplits(plants.getAutomatonAt(p2), bState.nextState(bEvent),
-                                                            pathSplitInfosP2, bEvent);
-                                                }
-                                                
-                                                // Create path split variables from the path split indices (for p2)
-                                                int pathSplitCounterP2 = 0;
-                                                String pathSplitStrP2 = "";
-                                                for (Iterator<int[]> it = pathSplitInfosP2.iterator(); it.hasNext();)
-                                                {
-                                                    int[] pathSplitInfo = it.next();
-                                                    if (pathSplitInfo[0] != NO_PATH_SPLIT_INDEX)
-                                                    {
-                                                        pathSplitCounterP2++;
-                                                        pathSplitStrP2 += " - " + makeAltPathsVariable(p2, pathSplitInfo[0], pathSplitInfo[1]);
-                                                    }
-                                                }
-                                                
-                                                // Add the path split variables to the newly created constraints
-                                                if ((pathSplitCounterP1 + pathSplitCounterP2) > 0)
-                                                {
-                                                    nonCrossConstrStr += " - bigM*(" + (pathSplitCounterP1 + pathSplitCounterP2) +
-                                                            pathSplitStrP1 + pathSplitStrP2 + ")";
-                                                    dualNonCrossConstrStr += " - bigM*(" + (pathSplitCounterP1 + pathSplitCounterP2) +
-                                                            pathSplitStrP1 + pathSplitStrP2 + ")";
-                                                }
-                                                
-                                                // Add the constraints to the constraint collection
-                                                nonCrossbookingConstraints += nonCrossConstrStr + ";\n";
-                                                nonCrossbookingConstraints += dualNonCrossConstrStr + ";\n";
-                                            }
-                                        }
-                                        
-                                        //TODO: Installera och lek med RobotStudio
-                                        //TODO: Varför blir g*_suboptimal = 0 för FT6x6???
-                                        //      ... jo, för att den inte hittar ngn lösning.
-                                        //      1) connected components behöver fixas;
-                                        //      2) path-variablerna är ju också connectade... fixa.
-                                        //TODO: hyfsa till RandomPathUsingMilp.java;
-                                        //      man behöver kanske inte det systematiska variabelvalet.
-                                        //      Det är nog så om alla robotar börjar utanför zoner.
-                                        //      Annars fundera...
-                                        //TODO: dokumentera i /tankar/milp.tex
-                                        //TODO: VelocityBalansering
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
+//        OBS!!! TILLFÄLLIGT BORTKOMMENTERAT PGA BUGG (INDEX_OUT_OF_BOUNDS_EXCEPTION för /artiklar/AK/journal_milp/xml-filer/connected_components_abc.wmod)
+//        KOMMENTERA IN IGEN (ALT. ANVÄND SOM INSPIRATION FÖR ATT LÄGGA IN MILP-CONSTRAINTS) VID TILLFÄLLE.
+//        
+//        
+//        
+//        
+//        
+//        // Find the consecutive bookings of the same zone-pairs that are made by different
+//        // plants. Check for (almost) all combinations of z1&z2
+//        int counter = 1;
+//        for (int z1 = 0; z1 < zones.size(); z1++)
+//        {
+//            for (int z2 = 0; z2 < zones.size(); z2++)
+//            {
+//                if (z1 != z2)
+//                {
+//                    // Used in for-loops to decrease code-repetition
+//                    int[] currZoneIndices = new int[]{z1, z2};
+//                    
+//                    // Check for all combinations of p1 < p2 (this suffices since the mutex
+//                    // variables are always of the form "pi_books_zx_before_pj", where i < j)
+//                    for (int p1 = 0; p1 < plants.size() - 1; p1++)
+//                    {
+//                        ArrayList<int[]> consecutiveTicsP1 = consecutiveBookingTicsIndices.get(new int[]{p1, z1, z2});
+//                        if (consecutiveTicsP1 != null)
+//                        {
+//                            // If p1 books z1 and then z2 consecutively (consecutiveTicsP1 = non_null), then
+//                            // there should be a consecutive booking secuense in som plant with higher index than p1...
+//                            for (int p2 = p1 + 1; p2 < plants.size(); p2++)
+//                            {
+//                                // To check both for the booking z1 -> z2 and z2 -> z1, a new index variable (zInd)
+//                                // is needed
+//                                for (int zInd = 0; zInd < currZoneIndices.length; zInd++)
+//                                {
+//                                    // If also p2 books the same zones consecutively, i.e. no unbooking between
+//                                    // z1 and z2, then constraint construction begins...
+//                                    ArrayList<int[]> consecutiveTicsP2 = consecutiveBookingTicsIndices.get(
+//                                            new int[]{p2, currZoneIndices[zInd], currZoneIndices[1 - zInd]});
+//                                    if (consecutiveTicsP2 != null)
+//                                    {
+//                                        for (int[] tic1 : consecutiveTicsP1)
+//                                        {
+//                                            // Find nearest upwards path splits for each consecutive booking of p1
+//                                            ArrayList<int[]> pathSplitInfosP1 = new ArrayList<int[]>();
+//                                            for (int localZInd = 0; localZInd < currZoneIndices.length; localZInd++)
+//                                            {
+//                                                int stateIndex = bookingTics[currZoneIndices[localZInd]][p1][STATE_SWITCH][tic1[localZInd]];
+//                                                int eventIndex = bookingTics[currZoneIndices[localZInd]][p1][EVENT_SWITCH][tic1[localZInd]];
+//                                                State bState = indexMap.getStateAt(plants.getAutomatonAt(p1), stateIndex);
+//                                                LabeledEvent bEvent = indexMap.getEventAt(eventIndex);
+//                                                
+//                                                findNearestPathSplits(plants.getAutomatonAt(p1), bState.nextState(bEvent),
+//                                                        pathSplitInfosP1, bEvent);
+//                                            }
+//                                            
+//                                            // Create path split variables from the path split indices (for p1)
+//                                            String pathSplitStrP1 = "";
+//                                            int pathSplitCounterP1 = 0;
+//                                            for (Iterator<int[]> it = pathSplitInfosP1.iterator(); it.hasNext();)
+//                                            {
+//                                                int[] pathSplitInfo = it.next();
+//                                                if (pathSplitInfo[0] != NO_PATH_SPLIT_INDEX)
+//                                                {
+//                                                    pathSplitCounterP1++;
+//                                                    pathSplitStrP1 += " - " + makeAltPathsVariable(p1, pathSplitInfo[0], pathSplitInfo[1]);
+//                                                }
+//                                            }
+//                                            
+//                                            // Create path split variables for p2 and write the consecutive
+//                                            // booking constraints (primal and dual) to the MILP-file
+//                                            String nonCrossConstrStr = "";
+//                                            String dualNonCrossConstrStr = "";
+//                                            ArrayList<int[]> pathSplitInfosP2 = new ArrayList<int[]>();
+//                                            for (int[] tic2 : consecutiveTicsP2)
+//                                            {
+//                                                
+//                                                for (int localZInd = 0; localZInd < currZoneIndices.length; localZInd++)
+//                                                {
+//                                                    // This index is the combination of localZInd and zInd, ensuring that the tic2-elements
+//                                                    // used below correspond to the tic1[localZInd] (that is tic2[correspondingZInd] represents
+//                                                    // the same zone as tic1[localZInd]).
+//                                                    int correspondingZInd = (int)Math.IEEEremainder(zInd + localZInd, 2);
+//                                                    
+//                                                    nonCrossConstrStr += "r" + p1 + "_books_z" + currZoneIndices[localZInd] + "_before_r" + p2;
+//                                                    dualNonCrossConstrStr += "r" + p1 + "_books_z" + currZoneIndices[1 - localZInd] + "_before_r" + p2;
+//                                                    
+//                                                    // If there is a "var_x"-appendix corresponding to the current variable, it should be appended
+//                                                    Integer varCounter = mutexVarCounterMap.get(new int[]{currZoneIndices[localZInd], p1, p2,
+//                                                    tic1[localZInd], tic2[correspondingZInd]});
+//                                                    if (varCounter != null)
+//                                                    {
+//                                                        nonCrossConstrStr += "_var" + varCounter;
+//                                                    }
+//                                                    // If there is a "var_x"-appendix corresponding to the dual variable, it should be appended
+//                                                    varCounter = mutexVarCounterMap.get(new int[]{currZoneIndices[1 - localZInd], p1, p2,
+//                                                    tic1[1 - localZInd], tic2[1 - correspondingZInd]});
+//                                                    if (varCounter != null)
+//                                                    {
+//                                                        dualNonCrossConstrStr += "_var" + varCounter;
+//                                                    }
+//                                                    
+//                                                    if (! nonCrossConstrStr.contains(">="))
+//                                                    {
+//                                                        nonCrossConstrStr = "consecutive_booking_" + counter + " : " + nonCrossConstrStr + " >= ";
+//                                                        dualNonCrossConstrStr = "consecutive_booking_" + counter++ + "_dual : " + dualNonCrossConstrStr + " >= ";
+//                                                    }
+//                                                    
+//                                                    // Find nearest upwards path splits for each consecutive booking of p2
+//                                                    int stateIndex = bookingTics[localZInd][p2][STATE_SWITCH][tic2[correspondingZInd]];
+//                                                    int eventIndex = bookingTics[localZInd][p2][EVENT_SWITCH][tic2[correspondingZInd]];
+//                                                    State bState = indexMap.getStateAt(plants.getAutomatonAt(p2), stateIndex);
+//                                                    LabeledEvent bEvent = indexMap.getEventAt(eventIndex);
+//                                                    
+//                                                    findNearestPathSplits(plants.getAutomatonAt(p2), bState.nextState(bEvent),
+//                                                            pathSplitInfosP2, bEvent);
+//                                                }
+//                                                
+//                                                // Create path split variables from the path split indices (for p2)
+//                                                int pathSplitCounterP2 = 0;
+//                                                String pathSplitStrP2 = "";
+//                                                for (Iterator<int[]> it = pathSplitInfosP2.iterator(); it.hasNext();)
+//                                                {
+//                                                    int[] pathSplitInfo = it.next();
+//                                                    if (pathSplitInfo[0] != NO_PATH_SPLIT_INDEX)
+//                                                    {
+//                                                        pathSplitCounterP2++;
+//                                                        pathSplitStrP2 += " - " + makeAltPathsVariable(p2, pathSplitInfo[0], pathSplitInfo[1]);
+//                                                    }
+//                                                }
+//                                                
+//                                                // Add the path split variables to the newly created constraints
+//                                                if ((pathSplitCounterP1 + pathSplitCounterP2) > 0)
+//                                                {
+//                                                    nonCrossConstrStr += " - bigM*(" + (pathSplitCounterP1 + pathSplitCounterP2) +
+//                                                            pathSplitStrP1 + pathSplitStrP2 + ")";
+//                                                    dualNonCrossConstrStr += " - bigM*(" + (pathSplitCounterP1 + pathSplitCounterP2) +
+//                                                            pathSplitStrP1 + pathSplitStrP2 + ")";
+//                                                }
+//                                                
+//                                                // Add the constraints to the constraint collection
+//                                                nonCrossbookingConstraints += nonCrossConstrStr + ";\n";
+//                                                nonCrossbookingConstraints += dualNonCrossConstrStr + ";\n";
+//                                            }
+//                                        }
+//                                        
+//                                        //TODO: Installera och lek med RobotStudio
+//                                        //TODO: Varför blir g*_suboptimal = 0 för FT6x6???
+//                                        //      ... jo, för att den inte hittar ngn lösning.
+//                                        //      1) connected components behöver fixas;
+//                                        //      2) path-variablerna är ju också connectade... fixa.
+//                                        //TODO: hyfsa till RandomPathUsingMilp.java;
+//                                        //      man behöver kanske inte det systematiska variabelvalet.
+//                                        //      Det är nog så om alla robotar börjar utanför zoner.
+//                                        //      Annars fundera...
+//                                        //TODO: dokumentera i /tankar/milp.tex
+//                                        //TODO: VelocityBalansering
+//                                    }
+//                                }
+//                            }
+//                        }
+//                    }
+//                }
+//            }
+//        }
         
 //        BookingPairsGraphExplorer graphExplorer = new BookingPairsGraphExplorer(bEventPairs);
 //        graphExplorer.findConnectedCycles();

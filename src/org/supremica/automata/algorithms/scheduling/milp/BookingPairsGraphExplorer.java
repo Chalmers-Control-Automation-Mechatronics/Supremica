@@ -61,6 +61,9 @@ public class BookingPairsGraphExplorer
     
     private void tarjan(Vertex v)
     {
+        v.setDepthIndex(tarjanIndex);
+        v.setLowlinkIndex(tarjanIndex);
+        
         tarjanIndex++;
         tarjanStack.add(v);
         
@@ -86,7 +89,7 @@ public class BookingPairsGraphExplorer
             while (!v.equals(toVertex))
             {
                 toVertex = tarjanStack.remove(tarjanStack.size()-1);
-                System.out.print(toVertex.getVertexIndex() + " ");
+                System.out.println("v" + toVertex.getVertexIndex() + ": lowlink = v" + toVertex.getLowlinkIndex());
             }
             System.out.println("");
         }
