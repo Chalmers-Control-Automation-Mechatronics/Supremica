@@ -26,6 +26,8 @@ import org.supremica.automata.IO.ProjectBuildFromWaters
 import org.supremica.automata.Project
 import org.supremica.automata.algorithms.AutomataVerifier
 import net.sourceforge.waters.model.marshaller.DocumentManager
+import org.supremica.gui.SupremicaLoggerFactory
+
 
 class Util {
 	private static final factory = ModuleSubjectFactory.instance
@@ -84,6 +86,8 @@ class Util {
 	
 	public static void openInSupremica(ModuleProxy module) {
 		InterfaceManager.instance.initLookAndFeel();
+        SupremicaLoggerFactory.initialiseSupremicaLoggerFactory();
+        IDE.logger = SupremicaLoggerFactory.createLogger(IDE.class);
 		if (!ide) ide = new IDE()
 		ide.visible = true
 		//ide.documentManager.newDocument(module)
