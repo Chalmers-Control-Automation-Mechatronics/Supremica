@@ -48,6 +48,11 @@
  */
 
 /*
+ * Copyright (C) 2008 Markus Skoldstam
+ * Copyright (C) 2005 Goran Cengic
+*/
+/*
+ * @author Markus Sköldstam (skoldsta@chalmers.se)
  * @author Goran Cengic (cengic@chalmers.se)
  */
 
