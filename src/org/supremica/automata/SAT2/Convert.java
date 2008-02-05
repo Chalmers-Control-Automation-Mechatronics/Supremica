@@ -111,7 +111,7 @@ public class Convert {
     private Map<Expr, Integer> cache = new HashMap<Expr,Integer>();
     // remember to reserve one variable for "TRUE" and never use variable "0"
     public int varCounter;  
-    public int trueVar=1;
+    public int trueVar;
     
     PrintStream out = System.out;
     int clauseCounter = 0;
@@ -307,7 +307,7 @@ public class Convert {
     public static Expr Eq(Expr e1, Expr e2){
         return And(Impl(e1,e2), Impl(e2,e1));
     }
-    private static void add(MOp big, Expr e){
+    public static void add(MOp big, Expr e){
         if(e.getType()==big.type)
             big.addAll((MOp)e);
         else 

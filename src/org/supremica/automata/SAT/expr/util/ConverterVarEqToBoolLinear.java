@@ -11,13 +11,13 @@ import java.util.*;
  *
  * @author voronov
  */
-public class ConverterVarEqToBool implements IConverterVarEqToBool {
+public class ConverterVarEqToBoolLinear  implements IConverterVarEqToBool {
     Environment envInt;
     Environment envBool;
     
     List<int[]> intIdToBoolId = new ArrayList<int[]>();
     
-    public ConverterVarEqToBool(Environment ienv, Environment benv){
+    public ConverterVarEqToBoolLinear(Environment ienv, Environment benv){
         if(ienv==null)
             throw new IllegalArgumentException("int env can't be null");
         if(benv==null)
@@ -32,36 +32,8 @@ public class ConverterVarEqToBool implements IConverterVarEqToBool {
         if(iNode==null)
             throw new IllegalArgumentException("can't convert null node");
         //nodeBool = convert(addForbiddenByDomain(nodeInt, envInt));
-        Expr fd = ForbiddenByDomain(envInt);
-        return  (fd==null)? convert(iNode) : 
-            new And(convert(iNode), convert(fd));
+        return  convert(iNode);
     }
-    /*private static Expr addForbiddenByDomain(Expr n, Environment env){
-        Expr res = n;
-        for(Variable v: env.vars){
-            int maxVal = 1 << v.domain.significantBits();
-            for(int i = v.domain.size(); i < maxVal; i++)
-                res = new And( res, (new Not(new VarEqInt(v, i, true))));
-        }
-        return res;
-    }*/
-    private Expr ForbiddenByDomain(Environment env){        
-        Expr res = null;
-        for(Variable v: env.vars){
-            if(v.domain.size()>2){ // this if should not be necessary...
-                int maxVal = 1 << v.domain.significantBits();
-                for(int i = v.domain.size(); i < maxVal; i++){
-                    // here!
-                    //Expr f = new Not(new VarEqInt(v, i, true));
-                    Expr f = /*NodeCnfConverter.convertAll*/(
-                            /*convert*/(new Not(new VarEqInt(v, i, true))));
-                    res = (res==null) ? f : (new And( res, f));
-                }
-            }
-        }
-        return res;        
-    }
-
 
     /**
      * This method has side effect setting intIdToBoolId 
@@ -73,10 +45,10 @@ public class ConverterVarEqToBool implements IConverterVarEqToBool {
         Domain boolDomain = Domain.BINARY();
         envB.add("dummy_index_0", boolDomain);
         for(Variable v: envI.vars){
-            int[] varIds = new int[v.significantBits()];
-            for(int bitIndex = 0; bitIndex < v.significantBits(); bitIndex++)
-                varIds[bitIndex] = 
-                        envB.add(v.Name + "_bit" + bitIndex, boolDomain);
+            int[] varIds = new int[v.domain.size()];
+            for(int val = 0; val < v.domain.size(); val++)
+                varIds[val] = 
+                        envB.add(v.Name + "_eq" + val, boolDomain);
             intIdToBoolId.add(varIds);
         }
     }
@@ -86,11 +58,11 @@ public class ConverterVarEqToBool implements IConverterVarEqToBool {
         for(Variable varInt: envInt.vars)
         {
             int value = 0;
-            for(int bitIndex = 0; bitIndex < varInt.significantBits(); bitIndex++)
-            {
-                int idBool = intIdToBoolId.get(varInt.id)[bitIndex];
+            for(int val = 0; val < varInt.domain.size(); val++){
+                int idBool = intIdToBoolId.get(varInt.id)[val];            
                 Variable varBool = envBool.vars.get(idBool);
-                value = value | ((1&envBool.getValueFor(varBool))<<bitIndex);
+                if(envBool.getValueFor(varBool)>0)
+                    value = val;
             }
             envInt.assign(varInt, value);
         }
@@ -101,7 +73,7 @@ public class ConverterVarEqToBool implements IConverterVarEqToBool {
         return envBool;
     }
 */    
-    private Expr convert(Expr n) {
+    public Expr convert(Expr n) {
         if(n==null)
             throw new IllegalArgumentException("can't convert null node");
         Expr l, r;
@@ -127,11 +99,12 @@ public class ConverterVarEqToBool implements IConverterVarEqToBool {
         case NOT:
             return new Not(convert(((Not)n).child));
         case LIT:
-            return createLiteral(
-                    ((Literal)n).variable, 
-                    0, //if it is literal, it has only one bit
-                    ((Literal)n).isPositive);
-            //return n;
+            return n;
+//            return createLiteral(
+//                    ((Literal)n).variable, 
+//                    0, //if it is literal, it has only one bit
+//                    ((Literal)n).isPositive);
+//            //return n;
         case VAREQVAR:
             return toBoolExpr((VarEqVar)n);
         case VAREQINT:
@@ -145,30 +118,22 @@ public class ConverterVarEqToBool implements IConverterVarEqToBool {
     
     private Expr toBoolExpr(VarEqInt ve)
     {
-        Expr res = null; //getEqIntBitLiteral(ve, 0);
-        //mAnd res = new mAnd();
-        for(int i = 0; i < ve.variable.significantBits(); i++){
-            Literal n = getEqIntBitLiteral(ve,i);
+        Expr res = null; 
+        for(int i = 0; i < ve.variable.domain.size(); i++){
+            Expr n = createLiteral(ve.variable, ve.value, ve.value==i);            
             res = (res==null) ? n : new And(n, res);
-            //res.add(n);
         }
         return res;        
     }    
     private Expr toBoolExpr(VarEqVar ve)
     {
-        Expr res = null; //getEqVarBitNode(ve, 0);
-        //mAnd res = new mAnd();
-        for(int i = 0; i < ve.var1.significantBits(); i++){
+        Expr res = null;
+        for(int i = 0; i < ve.var1.domain.size(); i++){
             Expr n = getEqVarBitNode(ve,i);
             res = (res==null) ? n : new And(n, res);
-            //res.add(n);
         }
         return res;        
     }
-    private Literal getEqIntBitLiteral(VarEqInt ve, int bitIndex){
-        boolean p = 1==((ve.value >> bitIndex) & 1);
-        return createLiteral(ve.variable, bitIndex, p);
-    }    
     private And getEqVarBitNode(VarEqVar ve, int bitIndex)
     {
         /* a=b   <=>   (a&b)|(!a&!b)  <=>  (!a|b)&(a|!b)  */
@@ -183,26 +148,12 @@ public class ConverterVarEqToBool implements IConverterVarEqToBool {
                     )
                 );
     }
-    private Or getEqVarBitNodeForNegation(VarEqVar ve, int bitIndex)
-    {
-        /* a=b   <=>   (a&b)|(!a&!b)  <=>  (!a|b)&(a|!b)  */
-        return new Or(
-                new And(
-                    createLiteral(ve.var1, bitIndex, true),
-                    createLiteral(ve.var2, bitIndex, true)
-                    ), 
-                new And(
-                    createLiteral(ve.var1, bitIndex, false),
-                    createLiteral(ve.var2, bitIndex, false)                
-                    )
-                );
-    }
-    private Literal createLiteral(Variable v, int bitIndex, boolean isPositive){
+    private Literal createLiteral(Variable v, int value, boolean isPositive){
         int[] ids = intIdToBoolId.get(v.id);
         if(ids==null)
             throw new IllegalArgumentException(
                     "can't find bit ids for variable " + v.Name + ", id:" +v.id);
-        int id = ids[bitIndex];
+        int id = ids[value];
         Variable bv = envBool.vars.get(id);
         if(bv==null)
             throw new IllegalArgumentException(

@@ -51,7 +51,7 @@ public class AutomataToBoolForDeadlock implements IAutomataToBool
     
     String stayEventName = "stay";
     
-    ConverterVarEqToBool vareq;
+    IConverterVarEqToBool vareq;
     
     /*
      * +add Init          
@@ -78,7 +78,8 @@ public class AutomataToBoolForDeadlock implements IAutomataToBool
         addAllClauses();
 
         System.err.print("Converting variables to boolean...");
-        vareq = new ConverterVarEqToBool(env, envBool);        
+        //vareq = new ConverterVarEqToBool(env, envBool);        
+        vareq = new ConverterVarEqToBoolLinear(env, envBool);        
         Expr e = vareq.initConvert(completeExpression);
         System.err.println(" done");
         

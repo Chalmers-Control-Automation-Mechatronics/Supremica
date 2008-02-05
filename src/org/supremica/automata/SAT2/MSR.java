@@ -94,22 +94,22 @@ public class MSR {
     
     public static void modifyMSR(Automata ats){
         LabeledEvent marking = new LabeledEvent(MARKING_NAME);
-        for(Automaton a: ats)
-            a.getAlphabet().addEvent(marking);
                
-        for(Automaton a: ats)
+        for(Automaton a: ats){
+            a.getAlphabet().addEvent(marking);
             for(State s: a)
                 if(s.isAccepting())
                     a.addArc(new Arc(s, s, marking));
+        }
     }
 
     public static void modifyCV(Automata ats){
         State forb = new State(FORBIDDEN_NAME);
-        LabeledEvent marking = new LabeledEvent(MARKING_NAME);
-        for(Automaton a: ats){
-            a.addState(forb);                
-            a.getAlphabet().addEvent(marking);
-            a.addArc(new Arc(forb, forb, marking));
+        forb.setAccepting(true); // mark forbiden state
+        for(Automaton a: ats){            
+            for(State s: a)
+                s.setAccepting(false); // remove all other "markings"
+            a.addState(forb);                            
         }
         
         for(LabeledEvent e: ats.getUnionAlphabet())
@@ -119,7 +119,8 @@ public class MSR {
                         for(State s: a)
                             if(!s.doesDefine(e))
                                 a.addArc(new Arc(s, forb, e));
-                        
+                                                
+        modifyMSR(ats); // CV reduced to MSR
     }
 
     
