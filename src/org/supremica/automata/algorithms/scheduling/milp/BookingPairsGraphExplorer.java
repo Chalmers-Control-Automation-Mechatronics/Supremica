@@ -32,6 +32,10 @@ public class BookingPairsGraphExplorer
     ArrayList<Vertex> tarjanStack = new ArrayList<Vertex>();
     int tarjanIndex = 0; 
     
+    ArrayList<Vertex>[] unpromisingVertices;
+    ArrayList<Vertex> johnsonStack = new ArrayList<Vertex>();
+    boolean[] blockedStatus;
+    
     ArrayList<ArrayList<Vertex>> maxSCCList = new ArrayList<ArrayList<Vertex>>();
     
     public BookingPairsGraphExplorer(ArrayList<int[]>[] edges)
@@ -67,41 +71,140 @@ public class BookingPairsGraphExplorer
         
         tarjan(vertices[0]);
         
-        for (ArrayList<Vertex> currSCC : maxSCCList)
+        System.out.println("FindCycles START");
+        johnsonStack = new ArrayList<Vertex>();
+        unpromisingVertices =  new ArrayList[vertices.length];
+        blockedStatus = new boolean[vertices.length];
+        for (int i = 0; i < vertices.length - 1; i++)
         {
-            for (Vertex vStart : currSCC)
-            {
-                vStart.resetEdgeCopies();  
-                while (vStart.getEdgeCopies().size() > 0)
+            // Reset the info about blocking and unpromising vertices
+            for (int j = 0; j < blockedStatus.length; j++)
+            {           
+                if (unpromisingVertices[j] == null)
                 {
-                    ArrayList<Integer> visitedColors = new ArrayList<Integer>();
-                    ArrayList<Vertex> visitedVertices = new ArrayList<Vertex>();
-                    ArrayList<Edge> visitedEdges = new ArrayList<Edge>();
-                    
-                    visitedVertices.add(vStart);  
-                    
-                    //findMinSCC(vStart, visitedColors, visitedVertices, visitedEdges);
-                    
-                    Edge edge = vStart.removeEdgeCopy(0);
-                    
-                    Vertex toVertex = edge.getToVertex();
-                    if (haveSameRoot(vStart, toVertex, currSCC))
+                    unpromisingVertices[j] = new ArrayList<Vertex>();
+                }
+                else
+                {
+                    unpromisingVertices[j].clear();
+                }
+                blockedStatus[j] = false;
+            }
+            
+            findCycles(vertices[i], vertices[i]);
+        }
+        
+        System.out.println("FindCycles DONE");
+    }
+    
+    private boolean findCycles(Vertex inVertex, Vertex startVertex)
+    {
+        boolean cycleFound = false; 
+        johnsonStack.add(inVertex); // stack v;
+        blockedStatus[inVertex.getVertexIndex()] = true; // blocked(v) := true;
+        
+        String s = "s";
+        
+        for (Edge edge : inVertex.getOutEdges())
+        {
+            Vertex toVertex = edge.getToVertex();
+            int a = 0;
+            if (toVertex.getVertexIndex() >= startVertex.getVertexIndex())
+            { // Look only in forward direction to avoid cycle repetition
+                if (toVertex.getVertexIndex() == startVertex.getVertexIndex())
+                {
+                    System.out.println("index equality");
+                }
+                
+                if (toVertex.equals(startVertex))
+                { // If the start vertex if found again, we have a cycle
+                    //temp (output circuit)
+                    String str = "Johnson-circuit: ";
+                    for (Vertex v : johnsonStack)
                     {
-                        if (!visitedVertices.contains(toVertex))
-                        {
-                            visitedVertices.add(toVertex);
-                            visitedEdges.add(edge);
-                            visitedColors.add(edge.getColor()); //behövs här???
-                        }
-                        else
-                        {
-                            System.out.println("MinSCC found");
-                        }
+                        str += "v" + v.getVertexIndex() + " - ";
                     }
+                    str += "v" + startVertex.getVertexIndex();
+                    System.out.println(str);
 
+                    cycleFound = true; 
+                }
+                else if (!blockedStatus[toVertex.getVertexIndex()])
+                { // Else loop in DFS-manner
+                    if (findCycles(toVertex, startVertex))
+                    {
+                        cycleFound = true; 
+                    }
+                }
+            }
+        }  
+
+        if (cycleFound)
+        {
+            //UNBLOCK(v);
+            blockedStatus[inVertex.getVertexIndex()] = false;
+            for (Vertex unpromising : unpromisingVertices[inVertex.getVertexIndex()])
+            {
+                blockedStatus[unpromising.getVertexIndex()] = false;
+            }
+            unpromisingVertices[inVertex.getVertexIndex()].clear();
+        }
+        else
+        {
+            for (Edge edge : inVertex.getOutEdges())
+            {
+                Vertex toVertex = edge.getToVertex();
+                if (toVertex.getVertexIndex() >= startVertex.getVertexIndex())
+                { // Look only in forward direction to avoid cycle repetition
+                    if (!unpromisingVertices[toVertex.getVertexIndex()].contains(inVertex))
+                    {
+                        unpromisingVertices[toVertex.getVertexIndex()].add(inVertex);
+                    }
                 }
             }
         }
+        
+        //unstack v;
+        johnsonStack.remove(inVertex);
+        
+        return cycleFound;
+        
+//        for (ArrayList<Vertex> currSCC : maxSCCList)
+//        {
+//            for (Vertex vStart : currSCC)
+//            {
+//                vStart.resetEdgeCopies();  
+//                while (vStart.getEdgeCopies().size() > 0)
+//                {
+//                    ArrayList<Integer> visitedColors = new ArrayList<Integer>();
+//                    ArrayList<Vertex> visitedVertices = new ArrayList<Vertex>();
+//                    ArrayList<Edge> visitedEdges = new ArrayList<Edge>();
+//                    
+//                    visitedVertices.add(vStart);  
+//                    
+//                    //findMinSCC(vStart, visitedColors, visitedVertices, visitedEdges);
+//                    
+//                    Edge edge = vStart.removeEdgeCopy(0);
+//                    
+//                    Vertex toVertex = edge.getToVertex();
+//                    if (haveSameRoot(vStart, toVertex, currSCC))
+//                    {
+//                        if (!visitedVertices.contains(toVertex))
+//                        {
+//                            visitedVertices.add(toVertex);
+//                            visitedEdges.add(edge);
+//                            visitedColors.add(edge.getColor()); //behövs här???
+//                        }
+//                        else
+//                        {
+//                            System.out.println("MinSCC found");
+//                        }
+//                    }
+//
+//                }
+//            }
+//        }
+//>>>>>>> 1.4
     }
     
     /**
