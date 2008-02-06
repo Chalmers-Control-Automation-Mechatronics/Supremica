@@ -104,21 +104,30 @@ public class MSR {
     }
 
     public static void modifyCV(Automata ats){
-        State forb = new State(FORBIDDEN_NAME);
-        forb.setAccepting(true); // mark forbiden state
-        for(Automaton a: ats){            
+        // mark all states in Plants and remove old markings from Sup/Sp
+        for(Automaton a: ats){
+            boolean mark = !(a.isSupervisor()||a.isSpecification());
             for(State s: a)
-                s.setAccepting(false); // remove all other "markings"
-            a.addState(forb);                            
+                s.setAccepting(mark);
         }
+
+        // add forb. states to Sup/Sp
+        for(Automaton a: ats)
+            if(a.isSupervisor()||a.isSpecification()){
+                State forb = new State(FORBIDDEN_NAME);
+                forb.setAccepting(true); // mark forbiden state
+                a.addState(forb);                            
+            }
         
         for(LabeledEvent e: ats.getUnionAlphabet())
             if(!e.isControllable())
                 for(Automaton a: ats)
-                    if(a.isSupervisor()||a.isSpecification())
+                    if((a.isSupervisor()||a.isSpecification()) 
+                                        && a.getAlphabet().contains(e))
                         for(State s: a)
                             if(!s.doesDefine(e))
-                                a.addArc(new Arc(s, forb, e));
+                                a.addArc(new Arc(s, 
+                                        a.getStateWithName(FORBIDDEN_NAME), e));
                                                 
         modifyMSR(ats); // CV reduced to MSR
     }

@@ -35,7 +35,7 @@ public class Convert {
         public ExType getType();
     }
 
-    public static class MOp extends HashSet<Expr> implements Expr{
+    public static class MOp extends ArrayList/*HashSet*/<Expr> implements Expr{
         public final ExType type;
         public ExType getType(){
             return type;
@@ -114,6 +114,7 @@ public class Convert {
     public int trueVar;
     
     PrintStream out = System.out;
+    StringBuilder sbOut = new StringBuilder();
     int clauseCounter = 0;
     // ----
     
@@ -129,6 +130,20 @@ public class Convert {
     
     public Clauses convert(Expr f){
         return removeTrue(subst(f, trueVar), trueVar);
+    }
+    /**
+     * Substitue non-cnf clauses and store them to output string directly
+     * print progress on the way
+     * @param f
+     * @return
+     */
+    public void getSubstOnlineDimacsCnfString(Expr f){
+        System.err.println();
+        substOnline(f, trueVar);
+        System.err.println();
+        sbOut.insert(0, "p cnf " + varCounter + " " + clauseCounter + "\n" 
+                + trueVar + " 0\n");
+        System.out.println(sbOut.toString());
     }
     
     public Clauses subst(Expr f, int vf){
@@ -177,13 +192,26 @@ public class Convert {
         }
     }
 
+//    /**
+//     * print to system.out 
+//     * @param cs
+//     */
+//    private void printClauses(Clauses cs){
+//        for(Clause c: cs){
+//            clauseCounter++;
+//            for(int i: c)
+//                out.print(""+i+" ");
+//            out.print("0\n");
+//        }        
+//    }
     private void printClauses(Clauses cs){
         for(Clause c: cs){
             clauseCounter++;
             for(int i: c)
-                out.print(""+i+" ");
-            out.print("0\n");
-        }        
+                sbOut.append(""+i+" ");
+            sbOut.append("0\n");
+        }
+        System.err.print("\rTotal clauses produced:" + clauseCounter);
     }
     
     
@@ -308,9 +336,20 @@ public class Convert {
         return And(Impl(e1,e2), Impl(e2,e1));
     }
     public static void add(MOp big, Expr e){
-        if(e.getType()==big.type)
-            big.addAll((MOp)e);
-        else 
+//        if(e.getType()==big.type)
+//            big.addAll((MOp)e);
+//        else 
+//            big.add(e);
+            
+        if(e instanceof MOp){
+            if(e.getType()==big.type || ((MOp)e).size()==1)
+                for(Expr e1: (MOp)e)
+                    add(big, e1);
+            else if (((MOp)e).size()>1)
+                big.add(e);
+            // else if size == 0 do nothing
+        }
+        else // Lit
             big.add(e);
     }
     public static Expr Not(Expr e){
@@ -337,6 +376,23 @@ public class Convert {
                 out.print(""+i+" ");
             out.println("0");
         }
+    }
+    public static String toDimacsSatString(Expr e, int totalVars){
+        StringBuilder sb = new StringBuilder();
+        sb.append("p sat " + totalVars + "\n");        
+        toSatString(e, sb);
+        return sb.toString();
+    }
+    private static void toSatString(Expr e, StringBuilder sb){
+        if(e instanceof MOp){
+            String opMark = (e.getType()==ExType.MAND) ? "*":"+";
+            sb.append(opMark + "(");
+            for(Expr e1: (MOp)e)
+                toSatString(e1, sb);            
+            sb.append("\b) ");
+        }
+        else //if(e instanceof Lit)
+            sb.append(""+((Lit)e).var+" ");
     }
     public static String toDimacsCnfString(Clauses cs, int totalVars){
         StringBuilder sb = new StringBuilder();

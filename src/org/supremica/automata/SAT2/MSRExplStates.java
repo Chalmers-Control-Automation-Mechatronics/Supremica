@@ -6,6 +6,7 @@
 package org.supremica.automata.SAT2;
 
 import org.supremica.automata.*;
+import org.supremica.automata.IO.AutomataToXML;
 import org.supremica.automata.IO.ProjectBuildFromXML;
 
 /**
@@ -42,8 +43,8 @@ public class MSRExplStates {
                                     stateEq(step+1, a, s.nextState(e))));
                         }
                     }                
-                    // TODO: what to do if event in alphabet but not in transitions?
-                    // should imply false
+                    // if event in alphabet but not in transitions,
+                    // then event should never be fired (should imply false)
                     if(tran.size()<1){
                         System.err.println(" warning: event " + e.getLabel() + 
                                 " has no transitions");
@@ -112,6 +113,7 @@ public class MSRExplStates {
 
     private Convert.Expr stateEq(int step, Automaton a, State s){
         int start = startStepVar(step);
+        start += ats.getUnionAlphabet().size();
         inc: for(Automaton a1: ats){
             if(a1.equals(a))
                 break inc;
@@ -127,8 +129,8 @@ public class MSRExplStates {
     }
 
     private Convert.Expr keepState(int step, Automaton a){
-        int startCur = startStepVar(step);
-        int startNext = startStepVar(step+1);
+        int startCur = startStepVar(step)+ats.getUnionAlphabet().size();
+        int startNext = startStepVar(step+1)+ats.getUnionAlphabet().size();
         Convert.MOp res = new Convert.MOp(Convert.ExType.MAND);        
         for(State s: a){
             Convert.add(res, Convert.Eq(
@@ -141,7 +143,36 @@ public class MSRExplStates {
         return res;
     }
     
-    public Convert.Expr fullExpr(){
+    public Convert.Expr goalDV(){
+        // during at least in one time step ...
+        Convert.MOp allTimesteps = new Convert.MOp(Convert.ExType.MOR);
+        for(int step = 0; step < totalSteps; step++){
+            // ... every event ...
+            Convert.MOp allEvents = new Convert.MOp(Convert.ExType.MAND);
+            for(LabeledEvent e: ats.getUnionAlphabet()){
+                // ... should be forbidden in at least one automaton ... 
+                Convert.MOp allAutomata = new Convert.MOp(Convert.ExType.MOR);
+                for(Automaton a: ats){
+                    if(a.getAlphabet().contains(e)){
+                        // ... and forbidden means automaton is in any of the states, 
+                        // where this event is not feasible
+                        Convert.MOp allStates = new Convert.MOp(Convert.ExType.MAND);
+                        for(State s: a){
+                            if(s.doesDefine(e)){
+                                Convert.add(allStates, Convert.Not(stateEq(step, a, s)));
+                            }
+                        }
+                        Convert.add(allAutomata, allStates);                        
+                    }
+                }
+                Convert.add(allEvents, allAutomata);
+            }
+            Convert.add(allTimesteps, allEvents);
+        }
+        return allTimesteps;
+    }
+    
+    public Convert.Expr fullExprMSR(){
         Convert.MOp res = new Convert.MOp(Convert.ExType.MAND);
         Convert.add(res, Convert.Lit(trueVariable));
         Convert.add(res, goalMarkingEvent());
@@ -150,20 +181,57 @@ public class MSRExplStates {
         Convert.add(res, stay());
         return res;
     }
+    public Convert.Expr fullExprDV(){
+        Convert.MOp res = new Convert.MOp(Convert.ExType.MAND);
+        Convert.add(res, Convert.Lit(trueVariable));
+        Convert.add(res, goalDV());
+        Convert.add(res, init());
+        Convert.add(res, tran());
+        Convert.add(res, stay());
+        return res;
+    }
     
     public static void main(String [] args) throws Exception{       
+        do1(args);
+    }
+    public static void do2(String [] args)  throws Exception {
+        int          steps = Integer.parseInt(args[0]);
+        Project      ats   = (new ProjectBuildFromXML()).build(System.in);
+        //MSR.modifyMSR(ats);
+        //AutomataToXML a2xml = new AutomataToXML(ats);
+        //a2xml.serialize("debug_ats.xml");
+        
+        
+        MSRExplStates msr  = new MSRExplStates(ats, steps);
+        Convert.Expr e     = msr.fullExprDV();
+        //System.err.println(
+        //        Convert.toDimacsSatString(e, msr.startStepVar(steps+1) -1));
+        Convert      conv  = new Convert(msr.trueVariable,
+                msr.startStepVar(steps+1) -1);
+        //Convert.Clauses cs = conv.convert(e);
+        //String out         = Convert.toDimacsCnfString(cs, conv.varCounter);
+        //System.out.println(out);       
+        conv.getSubstOnlineDimacsCnfString(e);        
+    }
+    public static void do1(String [] args)  throws Exception {
         int          steps = Integer.parseInt(args[0]);
         Project      ats   = (new ProjectBuildFromXML()).build(System.in);
         MSR.modifyCV(ats);
+        //AutomataToXML a2xml = new AutomataToXML(ats);
+        //a2xml.serialize("debug_ats.xml");
+        
         
         MSRExplStates msr  = new MSRExplStates(ats, steps);
-        Convert.Expr e     = msr.fullExpr();
+        Convert.Expr e     = msr.fullExprMSR();
+        //System.err.println(
+        //        Convert.toDimacsSatString(e, msr.startStepVar(steps+1) -1));
         Convert      conv  = new Convert(msr.trueVariable,
-                msr.startStepVar(steps+2));
-        Convert.Clauses cs = conv.convert(e);
-        String out         = Convert.toDimacsCnfString(cs, conv.varCounter);
+                msr.startStepVar(steps+1) -1);
+        //Convert.Clauses cs = conv.convert(e);
+        //String out         = Convert.toDimacsCnfString(cs, conv.varCounter);
+        //System.out.println(out);       
+        conv.getSubstOnlineDimacsCnfString(e);
         
-        System.out.println(out);       
     }
     
 
