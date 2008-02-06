@@ -127,6 +127,17 @@ public class MSRExplStates {
         }            
         return res;
     }
+    private Convert.Expr allowedEvents(){
+        Convert.MOp res = new Convert.MOp(Convert.ExType.MAND);
+        for(int step = 0; step < totalSteps; step++){
+            Convert.MOp atLeastOneEventInStep = 
+                    new Convert.MOp(Convert.ExType.MOR);            
+            for(LabeledEvent e: ats.getUnionAlphabet())
+                Convert.add(atLeastOneEventInStep, tranEq(step, e));
+            Convert.add(res, atLeastOneEventInStep);
+        }
+        return res;
+    }
 
     private Convert.Expr keepState(int step, Automaton a){
         int startCur = startStepVar(step)+ats.getUnionAlphabet().size();
@@ -144,32 +155,38 @@ public class MSRExplStates {
     }
     
     public Convert.Expr goalDV(){
+        
+        //int step = totalSteps-1;
         // during at least in one time step ...
         Convert.MOp allTimesteps = new Convert.MOp(Convert.ExType.MOR);
         for(int step = 0; step < totalSteps; step++){
             // ... every event ...
             Convert.MOp allEvents = new Convert.MOp(Convert.ExType.MAND);
             for(LabeledEvent e: ats.getUnionAlphabet()){
-                // ... should be forbidden in at least one automaton ... 
-                Convert.MOp allAutomata = new Convert.MOp(Convert.ExType.MOR);
-                for(Automaton a: ats){
-                    if(a.getAlphabet().contains(e)){
-                        // ... and forbidden means automaton is in any of the states, 
-                        // where this event is not feasible
-                        Convert.MOp allStates = new Convert.MOp(Convert.ExType.MAND);
-                        for(State s: a){
-                            if(s.doesDefine(e)){
-                                Convert.add(allStates, Convert.Not(stateEq(step, a, s)));
+                if(!"stay".equalsIgnoreCase(e.getLabel())){
+                    // ... should be forbidden in at least one automaton ... 
+                    Convert.MOp allAutomata = new Convert.MOp(Convert.ExType.MOR);
+                    for(Automaton a: ats){
+                        if(a.getAlphabet().contains(e.getLabel())){
+                            // ... and forbidden means automaton is in any of the states, 
+                            // where this event is not feasible
+                            Convert.MOp allStates = new Convert.MOp(Convert.ExType.MOR);
+                            Convert.add(allStates, Convert.Lit(-trueVariable));
+                            for(State s: a){
+                                if(!s.doesDefine(e)){
+                                    Convert.add(allStates, (stateEq(step, a, s)));
+                                }
                             }
+                            Convert.add(allAutomata, allStates);                        
                         }
-                        Convert.add(allAutomata, allStates);                        
                     }
+                    Convert.add(allEvents, allAutomata);                    
                 }
-                Convert.add(allEvents, allAutomata);
             }
             Convert.add(allTimesteps, allEvents);
         }
         return allTimesteps;
+        //return allEvents;
     }
     
     public Convert.Expr fullExprMSR(){
@@ -188,24 +205,32 @@ public class MSRExplStates {
         Convert.add(res, init());
         Convert.add(res, tran());
         Convert.add(res, stay());
+        Convert.add(res, allowedEvents());
         return res;
     }
     
     public static void main(String [] args) throws Exception{       
-        do1(args);
+        do2(args);
     }
     public static void do2(String [] args)  throws Exception {
         int          steps = Integer.parseInt(args[0]);
         Project      ats   = (new ProjectBuildFromXML()).build(System.in);
-        //MSR.modifyMSR(ats);
-        //AutomataToXML a2xml = new AutomataToXML(ats);
-        //a2xml.serialize("debug_ats.xml");
+//        MSR.modifyMSR(ats);
+        for(Automaton a: ats){
+            LabeledEvent stay = new LabeledEvent("stay");
+            a.getAlphabet().addEvent(stay);
+            for(State s: a)
+                a.addArc(new Arc(s, s, stay));
+        }
+        
+        AutomataToXML a2xml = new AutomataToXML(ats);
+        a2xml.serialize("debug_ats.xml");
         
         
         MSRExplStates msr  = new MSRExplStates(ats, steps);
         Convert.Expr e     = msr.fullExprDV();
-        //System.err.println(
-        //        Convert.toDimacsSatString(e, msr.startStepVar(steps+1) -1));
+        System.err.println(
+                Convert.toDimacsSatString(e, msr.startStepVar(steps+1) -1));
         Convert      conv  = new Convert(msr.trueVariable,
                 msr.startStepVar(steps+1) -1);
         //Convert.Clauses cs = conv.convert(e);
