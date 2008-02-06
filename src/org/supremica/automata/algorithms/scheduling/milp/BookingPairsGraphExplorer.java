@@ -71,7 +71,6 @@ public class BookingPairsGraphExplorer
         
         tarjan(vertices[0]);
         
-        System.out.println("FindCycles START");
         johnsonStack = new ArrayList<Vertex>();
         unpromisingVertices =  new ArrayList[vertices.length];
         blockedStatus = new boolean[vertices.length];
@@ -93,8 +92,6 @@ public class BookingPairsGraphExplorer
             
             findCycles(vertices[i], vertices[i]);
         }
-        
-        System.out.println("FindCycles DONE");
     }
     
     private boolean findCycles(Vertex inVertex, Vertex startVertex)
@@ -108,14 +105,9 @@ public class BookingPairsGraphExplorer
         for (Edge edge : inVertex.getOutEdges())
         {
             Vertex toVertex = edge.getToVertex();
-            int a = 0;
+
             if (toVertex.getVertexIndex() >= startVertex.getVertexIndex())
-            { // Look only in forward direction to avoid cycle repetition
-                if (toVertex.getVertexIndex() == startVertex.getVertexIndex())
-                {
-                    System.out.println("index equality");
-                }
-                
+            { // Look only in forward direction to avoid cycle repetition                
                 if (toVertex.equals(startVertex))
                 { // If the start vertex if found again, we have a cycle
                     //temp (output circuit)
