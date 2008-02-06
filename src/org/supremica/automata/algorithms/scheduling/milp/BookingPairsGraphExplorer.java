@@ -20,112 +20,158 @@ public class BookingPairsGraphExplorer
 {
     //temp
     private org.supremica.log.Logger logger = org.supremica.log.LoggerFactory.createLogger(BookingPairsGraphExplorer.class);
- 
-//    private ArrayList<int[]>[] neighbors;
-//    private int[][] vertices;
     
     private ArrayList<int[]>[] edges = null;
     private boolean[] inComponent;
     private int[] rootIndex;
-    private Vertex[] vertices;
+    private Vertice[] vertices;
     
-    ArrayList<Vertex> tarjanStack = new ArrayList<Vertex>();
+    ArrayList<Vertice> tarjanStack = new ArrayList<Vertice>();
     int tarjanIndex = 0; 
     
-    ArrayList<Vertex>[] unpromisingVertices;
-    ArrayList<Vertex> johnsonStack = new ArrayList<Vertex>();
-    boolean[] blockedStatus;
+    ArrayList<Vertice>[] unpromisingVertices;
+    ArrayList<Edge> johnsonStack = new ArrayList<Edge>(); // We modify the stack used in Johnson to store edges.
+    boolean[] verticeBlocked;
+    boolean[] colorBlocked;
     
-    ArrayList<ArrayList<Vertex>> maxSCCList = new ArrayList<ArrayList<Vertex>>();
+    int nrOfColors;
     
-    public BookingPairsGraphExplorer(ArrayList<int[]>[] edges)
+    /** The vertex-edge-vertex-edge-...-sequences of rainbow-cycles found in the current graph. */
+    ArrayList<ArrayList<Edge>> cycleSequences;
+    
+    ArrayList<ArrayList<Vertice>> maxSCCList = new ArrayList<ArrayList<Vertice>>();
+    
+    public BookingPairsGraphExplorer(ArrayList<int[]>[] edges, int nrOfColors)
     {
         this.edges = edges;
+        this.nrOfColors = nrOfColors;
         inComponent = new boolean[edges.length];
         rootIndex = new int[edges.length];
         
-        vertices = new Vertex[edges.length];
+        vertices = new Vertice[edges.length];
         for (int i = 0; i < vertices.length; i++)
         {
-            vertices[i] = new Vertex(i); //, edges[i]);
+            vertices[i] = new Vertice(i);
         }
         
         for (int i = 0; i < edges.length; i++)
         {
             for (int j = 0; j < edges[i].size(); j++)
             {
-                vertices[i].addOutEdge(new Edge(vertices[i], vertices[edges[i].get(j)[0]], 
-                        edges[i].get(j)[1], edges[i].get(j)[4]));
+                vertices[i].addOutEdge(new Edge(vertices[i], vertices[edges[i].get(j)[0]], edges[i].get(j)));
             }
         }
-
-        for (int i = 0; i < edges.length; i++)
-        {
-            for (int j = 0; j < edges[i].size(); j++)
-            {
-                logger.info("There is an edge between Z" + i + " and Z" + 
-                        edges[i].get(j)[0] + " with color P" + edges[i].get(j)[1] + 
-                        " and overlapping_property = " + edges[i].get(j)[4]);
-            }
-        }
+    }
+    
+    /**
+     * Starts the procedure of finding and returning all cycles in the booking pairs 
+     * graph, that have rainbow-colored edges. Johnson's algorithm, see 
+     * http://scitation.aip.org/getabs/servlet/GetabsServlet?prog=normal&id=SMJCAT000004000001000077000001&idtype=cvips&gifs=yes
+     * B. D. Johnson, "Finding all the elementary cicruits of a directed graph",
+     * is extended with a color check to find such cycles. 
+     */
+    public ArrayList<ArrayList<Edge>> enumerateAllCycles()
+    {
+        cycleSequences = new ArrayList<ArrayList<Edge>>();
         
-        tarjan(vertices[0]);
+        //TODO:
+        // Möjligt att pre-processing med tarjan(all_vertices) och sedan utplockning av
+        // mindre-SCC genom att sönderdela max-SCC i submängder med gemensam rotnod kan 
+        // minska antalet cykler i findCyclesFrom. Vore det bra eller dåligt???
+        //tarjan(vertices[0]);
         
-        johnsonStack = new ArrayList<Vertex>();
+        johnsonStack = new ArrayList<Edge>();
         unpromisingVertices =  new ArrayList[vertices.length];
-        blockedStatus = new boolean[vertices.length];
+        verticeBlocked = new boolean[vertices.length];
+        colorBlocked = new boolean[nrOfColors];
         for (int i = 0; i < vertices.length - 1; i++)
         {
             // Reset the info about blocking and unpromising vertices
-            for (int j = 0; j < blockedStatus.length; j++)
+            for (int j = 0; j < verticeBlocked.length; j++)
             {           
                 if (unpromisingVertices[j] == null)
                 {
-                    unpromisingVertices[j] = new ArrayList<Vertex>();
+                    unpromisingVertices[j] = new ArrayList<Vertice>();
                 }
                 else
                 {
                     unpromisingVertices[j].clear();
                 }
-                blockedStatus[j] = false;
+                
+                verticeBlocked[j] = false;
             }
             
-            findCycles(vertices[i], vertices[i]);
-        }
+            for (int j = 0; j < nrOfColors; j++)
+            {
+                colorBlocked[j] = false;                
+            }
+            
+            findCyclesFrom(vertices[i], null);
+        }  
+        
+        return cycleSequences;
     }
     
-    private boolean findCycles(Vertex inVertex, Vertex startVertex)
+    /**
+     * This method is called recursively and is used to take a step from inVertice 
+     * in the search for a cycle having startVertice as its root.
+     *
+     * @param - inVerice is the vertice from which a search step is taken;
+     * @param - startVertice is the root vertice of the path being currently explored;
+     * @param - inEdge is the edge leading to the inVertice along the current path;
+     * @return - true if a cycle from startVertice, including inVertice, has been found.
+     */
+    private boolean findCyclesFrom(Vertice startVertice, Edge inEdge)
     {
         boolean cycleFound = false; 
-        johnsonStack.add(inVertex); // stack v;
-        blockedStatus[inVertex.getVertexIndex()] = true; // blocked(v) := true;
+        //johnsonStack.add(inVertice); // stack v;
         
-        String s = "s";
-        
-        for (Edge edge : inVertex.getOutEdges())
+        Vertice inVertice = startVertice;
+        if (inEdge != null)
         {
-            Vertex toVertex = edge.getToVertex();
+            johnsonStack.add(inEdge);
+            colorBlocked[inEdge.getColor()] = true;
+            inVertice = inEdge.getToVertice();
+        }
+        verticeBlocked[inVertice.getVerticeIndex()] = true; // blocked(v) := true;
+        
+        for (Edge edge : inVertice.getOutEdges())
+        {
+            if (! colorBlocked[edge.getColor()])
+            { // Only search for cycle if the color of the current edge has not been used yet         
+                Vertice toVertice = edge.getToVertice();
 
-            if (toVertex.getVertexIndex() >= startVertex.getVertexIndex())
-            { // Look only in forward direction to avoid cycle repetition                
-                if (toVertex.equals(startVertex))
-                { // If the start vertex if found again, we have a cycle
-                    //temp (output circuit)
-                    String str = "Johnson-circuit: ";
-                    for (Vertex v : johnsonStack)
-                    {
-                        str += "v" + v.getVertexIndex() + " - ";
-                    }
-                    str += "v" + startVertex.getVertexIndex();
-                    System.out.println(str);
-
-                    cycleFound = true; 
-                }
-                else if (!blockedStatus[toVertex.getVertexIndex()])
-                { // Else loop in DFS-manner
-                    if (findCycles(toVertex, startVertex))
-                    {
+                if (toVertice.getVerticeIndex() >= startVertice.getVerticeIndex())
+                { // Look only in forward direction to avoid cycle repetition                
+                    if (toVertice.equals(startVertice))
+                    { // If the start Vertice if found again, we have a cycle
+                        ArrayList newCycleSequence = new ArrayList<Edge>();
+                        
+                        //temp (output circuit)
+//                        String str = "Johnson-circuit: ";
+//                        str += "v" + startVertice.getVerticeIndex();
+                        for (Edge e : johnsonStack)
+                        {
+//                            str += " - C" + e.getColor();
+//                            str += " - v" + e.getToVertice().getVerticeIndex();
+                            
+                            newCycleSequence.add(e);
+                        }
+//                        str += " - C" + edge.getColor();
+                        newCycleSequence.add(edge);
+                        
+                        cycleSequences.add(newCycleSequence);
+                            
+//                        System.out.println(str);
+                        
                         cycleFound = true; 
+                    }
+                    else if (!verticeBlocked[toVertice.getVerticeIndex()])
+                    { // Else loop in DFS-manner
+                        if (findCyclesFrom(startVertice, edge))
+                        {
+                            cycleFound = true; 
+                        }
                     }
                 }
             }
@@ -134,42 +180,50 @@ public class BookingPairsGraphExplorer
         if (cycleFound)
         {
             //UNBLOCK(v);
-            blockedStatus[inVertex.getVertexIndex()] = false;
-            for (Vertex unpromising : unpromisingVertices[inVertex.getVertexIndex()])
+            if (inEdge != null)
             {
-                blockedStatus[unpromising.getVertexIndex()] = false;
+                colorBlocked[inEdge.getColor()] = false;
             }
-            unpromisingVertices[inVertex.getVertexIndex()].clear();
+            verticeBlocked[inVertice.getVerticeIndex()] = false;
+            for (Vertice unpromising : unpromisingVertices[inVertice.getVerticeIndex()])
+            {
+                verticeBlocked[unpromising.getVerticeIndex()] = false;
+            }
+            unpromisingVertices[inVertice.getVerticeIndex()].clear();
         }
         else
         {
-            for (Edge edge : inVertex.getOutEdges())
+            for (Edge edge : inVertice.getOutEdges())
             {
-                Vertex toVertex = edge.getToVertex();
-                if (toVertex.getVertexIndex() >= startVertex.getVertexIndex())
+                Vertice toVertice = edge.getToVertice();
+                if (toVertice.getVerticeIndex() >= startVertice.getVerticeIndex())
                 { // Look only in forward direction to avoid cycle repetition
-                    if (!unpromisingVertices[toVertex.getVertexIndex()].contains(inVertex))
+                    if (!unpromisingVertices[toVertice.getVerticeIndex()].contains(inVertice))
                     {
-                        unpromisingVertices[toVertex.getVertexIndex()].add(inVertex);
+                        unpromisingVertices[toVertice.getVerticeIndex()].add(inVertice);
                     }
                 }
             }
         }
         
         //unstack v;
-        johnsonStack.remove(inVertex);
+        //johnsonStack.remove(inVertice);
+        if (inEdge != null)
+        {
+            johnsonStack.remove(inEdge);
+        }
         
         return cycleFound;
         
-//        for (ArrayList<Vertex> currSCC : maxSCCList)
+//        for (ArrayList<Vertice> currSCC : maxSCCList)
 //        {
-//            for (Vertex vStart : currSCC)
+//            for (Vertice vStart : currSCC)
 //            {
 //                vStart.resetEdgeCopies();  
 //                while (vStart.getEdgeCopies().size() > 0)
 //                {
 //                    ArrayList<Integer> visitedColors = new ArrayList<Integer>();
-//                    ArrayList<Vertex> visitedVertices = new ArrayList<Vertex>();
+//                    ArrayList<Vertice> visitedVertices = new ArrayList<Vertice>();
 //                    ArrayList<Edge> visitedEdges = new ArrayList<Edge>();
 //                    
 //                    visitedVertices.add(vStart);  
@@ -178,12 +232,12 @@ public class BookingPairsGraphExplorer
 //                    
 //                    Edge edge = vStart.removeEdgeCopy(0);
 //                    
-//                    Vertex toVertex = edge.getToVertex();
-//                    if (haveSameRoot(vStart, toVertex, currSCC))
+//                    Vertice toVertice = edge.getToVertice();
+//                    if (haveSameRoot(vStart, toVertice, currSCC))
 //                    {
-//                        if (!visitedVertices.contains(toVertex))
+//                        if (!visitedVertices.contains(toVertice))
 //                        {
-//                            visitedVertices.add(toVertex);
+//                            visitedVertices.add(toVertice);
 //                            visitedEdges.add(edge);
 //                            visitedColors.add(edge.getColor()); //behövs här???
 //                        }
@@ -202,8 +256,10 @@ public class BookingPairsGraphExplorer
     /**
      * Finds maximal strongly connected components (SCC) using the Tarjan's algorithm, 
      * see http://en.wikipedia.org/wiki/Tarjan's_strongly_connected_components_algorithm.
+     *
+     * @param - v is the root vertice of the path being currently explored by the Tarjan's alg. 
      */
-    private void tarjan(Vertex v)
+    private void tarjan(Vertice v)
     {
         v.setDepthIndex(tarjanIndex);
         v.setLowlinkIndex(tarjanIndex);
@@ -213,29 +269,29 @@ public class BookingPairsGraphExplorer
         
         for (Edge edge : v.getOutEdges())
         {
-            Vertex toVertex = edge.getToVertex();
-            if (toVertex.depthIndex == -1)
+            Vertice toVertice = edge.getToVertice();
+            if (toVertice.depthIndex == -1)
             {
-                tarjan(toVertex);
-                v.setLowlinkIndex(Math.min(v.getLowlinkIndex(), toVertex.getLowlinkIndex()));
+                tarjan(toVertice);
+                v.setLowlinkIndex(Math.min(v.getLowlinkIndex(), toVertice.getLowlinkIndex()));
             }
             else
             {
-                v.setLowlinkIndex(Math.min(v.getLowlinkIndex(), toVertex.getDepthIndex()));
+                v.setLowlinkIndex(Math.min(v.getLowlinkIndex(), toVertice.getDepthIndex()));
             }
         }
         
         if (v.getLowlinkIndex() == v.getDepthIndex())
         {
             System.out.println("Connected component (acc to Tarjan):");
-            ArrayList<Vertex> currMaxSCCList = new ArrayList<Vertex>();
+            ArrayList<Vertice> currMaxSCCList = new ArrayList<Vertice>();
             
-            Vertex toVertex = null;
-            while (!v.equals(toVertex))
+            Vertice toVertice = null;
+            while (!v.equals(toVertice))
             {
-                toVertex = tarjanStack.remove(tarjanStack.size()-1);
-                System.out.println("v" + toVertex.getVertexIndex() + ": lowlink = v" + toVertex.getLowlinkIndex());
-                currMaxSCCList.add(toVertex);
+                toVertice = tarjanStack.remove(tarjanStack.size()-1);
+                System.out.println("v" + toVertice.getVerticeIndex() + ": lowlink = v" + toVertice.getLowlinkIndex());
+                currMaxSCCList.add(toVertice);
             }
             System.out.println("");
             maxSCCList.add(currMaxSCCList);
@@ -245,7 +301,7 @@ public class BookingPairsGraphExplorer
     /**
      * Checks whether the vertices v1 and v2 could belong to the same minimal SCC. 
      */
-    private boolean haveSameRoot(Vertex v1, Vertex v2, ArrayList<Vertex> currSCC)
+    private boolean haveSameRoot(Vertice v1, Vertice v2, ArrayList<Vertice> currSCC)
     {
         if (v1.getLowlinkIndex() != v2.getDepthIndex() && v1.getLowlinkIndex() != v2.getLowlinkIndex())
         {
@@ -259,13 +315,13 @@ public class BookingPairsGraphExplorer
         return true;
     }
     
-//    private void findMinSCC(Vertex v, ArrayList<Integer> visitedColors, 
-//            ArrayList<Vertex>visitedVertices, ArrayList<Edge> visitedEdges)
+//    private void findMinSCC(Vertice v, ArrayList<Integer> visitedColors, 
+//            ArrayList<Vertice>visitedVertices, ArrayList<Edge> visitedEdges)
 //    {
 //        for (Edge edge : visitedEdges)
 //        {
-//            Vertex toVertex = edge.getToVertex();
-//            if (!haveSameRoot(v, toVertex, ))
+//            Vertice toVertice = edge.getToVertice();
+//            if (!haveSameRoot(v, toVertice, ))
 //            {
 //                
 //            }
@@ -347,27 +403,27 @@ public class BookingPairsGraphExplorer
 //    }
 }
 
-class Vertex
+class Vertice
 {
-    int vertexIndex;
+    int VerticeIndex;
     int depthIndex = -1;
     int lowlinkIndex = -1;
     ArrayList<Edge> outEdges;
-    ArrayList<Edge> edgeCopies;
+    //ArrayList<Edge> edgeCopies; @Deprecated
     
-    public Vertex (int vertexIndex)
+    public Vertice (int VerticeIndex)
     {
-        this.vertexIndex = vertexIndex;
+        this.VerticeIndex = VerticeIndex;
         outEdges = new ArrayList<Edge>();
     }
     
-    public Vertex(int vertexIndex, ArrayList<Edge> outgoingEdges)
+    public Vertice(int VerticeIndex, ArrayList<Edge> outgoingEdges)
     {
-        this(vertexIndex);
+        this(VerticeIndex);
         outEdges = outgoingEdges;
     }
     
-    public int getVertexIndex() { return vertexIndex; }
+    public int getVerticeIndex() { return VerticeIndex; }
     public int getDepthIndex() { return depthIndex; }
     public void setDepthIndex(int newDepthIndex) { depthIndex = newDepthIndex; }
     public int getLowlinkIndex() { return lowlinkIndex; }
@@ -375,40 +431,48 @@ class Vertex
     public ArrayList<Edge> getOutEdges() { return outEdges; }
     public void setOutEdges(ArrayList<Edge> outEdges) { this.outEdges = outEdges; }
     public void addOutEdge(Edge edge) { outEdges.add(edge); }
-    public ArrayList<Edge> getEdgeCopies() { return edgeCopies; }
-    public void resetEdgeCopies()
+    //public ArrayList<Edge> getEdgeCopies() { return edgeCopies; } @Deprecated
+    /**public void resetEdgeCopies()
     {
         edgeCopies = new ArrayList<Edge>();
         for (Edge edge : outEdges)
         {
             edgeCopies.add(edge);
         }
-    }
-    public Edge removeEdgeCopy(int index) { return edgeCopies.remove(index); }
+    } @Deprecated */
+    //public Edge removeEdgeCopy(int index) { return edgeCopies.remove(index); } @Deprecated
 }
 
 class Edge
 {
     int edgeIndex;
     int color;
-    int overlappingProperty;
-    Vertex fromVertex;
-    Vertex toVertex;
+    int fromTic;
+    int toTic;
+    boolean bufferExists;
+    Vertice fromVertice;
+    Vertice toVertice;
     
-    public Edge(Vertex fromVertex, Vertex toVertex, int color, int overlappingProperty)
+    public Edge(Vertice fromVertice, Vertice toVertice, int[] edgeInfo) 
     {
-        this.fromVertex = fromVertex;
-        this.toVertex = toVertex;
-        this.color = color;
-        this.overlappingProperty = overlappingProperty;
+        this.fromVertice = fromVertice;
+        this.toVertice = toVertice;
+        this.color = edgeInfo[1];
+        this.fromTic = edgeInfo[2];
+        this.toTic = edgeInfo[3];
+        this.bufferExists = edgeInfo[4] != 0;
     }
     
-    public Vertex getFromVertex() { return fromVertex; }
-    public Vertex getToVertex() { return toVertex; }
+    public Vertice getFromVertice() { return fromVertice; }
+    public Vertice getToVertice() { return toVertice; }
     public int getColor() { return color; }
-    public int getOverlappingProperty() { return overlappingProperty; }
-    public void setFromVertex(Vertex fromVertex) { this.fromVertex = fromVertex; }
-    public void setToVertex(Vertex toVertex) { this.toVertex = toVertex; }
-    public void setColor(int color) { this.color = color; }
-    public void setOverlappingProperty(int overlappingProperty) { this.overlappingProperty = overlappingProperty; }
+    public int getFromTic() { return fromTic; }
+    public int getToTic() { return toTic; }
+    public boolean getBufferExists() { return bufferExists; }
+//    public void setFromVertice(Vertice fromVertice) { this.fromVertice = fromVertice; }
+//    public void setToVertice(Vertice toVertice) { this.toVertice = toVertice; }
+//    public void setColor(int color) { this.color = color; }
+//    public void setFromTic(int tic) { this.fromTic = tic; }
+//    public void setToTic(int tic) { this.toTic = tic; }
+//    public void setBufferExists(boolean bufferExists) { this.bufferExists = bufferExists; }
 }

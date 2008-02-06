@@ -213,10 +213,21 @@ public class GlpkUI
 //        w.write(externalConstraints);
 //        w.newLine();
   
-//TODO: This will be generalized to n robots... (connected components)
-//        // The constraints preventing cross-booking of zone pairs 
-//        w.write(nonCrossbookingConstraints);
-//        w.newLine();
+        // The constraints representing deadlocks (found as possible circular wait 
+        // in connected components graph) and their antidots, unfeasible combinations 
+        // of booking variables. In many cases (if there is a buffer within a "circular wait",
+        // only unfeasible constraints are added. 
+        counter = 0;
+        for (ArrayList<String> currConstraint : milpConstructor.getNonCrossbookingConstraints())
+        {
+            w.write("non_cross_" + counter++ + " : ");
+            for (int i = 0; i < currConstraint.size() - 1; i++)
+            {
+                w.write(currConstraint.get(i) + " + ");
+            }
+            w.write(currConstraint.get(currConstraint.size() - 1) + " >= 1;\n");
+        }
+        w.newLine();
         
         // The end of the model-section and the beginning of the data-section
         w.newLine();
@@ -343,7 +354,8 @@ public class GlpkUI
         // ...and prints it to stdout
         String milpEchoStr = "";
         String totalMilpEchoStr = "";
-        String simplexIterationNr = "";
+        String totalIterationCount = "";
+        String lpIterationCount = "";
         while ((milpEchoStr = milpEcho.readLine()) != null)
         {
             totalMilpEchoStr += milpEchoStr + "\n";
@@ -351,7 +363,11 @@ public class GlpkUI
             if (milpEchoStr.contains("+") && milpEchoStr.contains(":") && 
                     milpEchoStr.contains("mip") && milpEchoStr.contains(">="))
             {
-                simplexIterationNr = milpEchoStr.substring(milpEchoStr.indexOf("+") + 1, milpEchoStr.indexOf(":")).trim();
+                totalIterationCount = milpEchoStr.substring(milpEchoStr.indexOf("+") + 1, milpEchoStr.indexOf(":")).trim();
+            }
+            else if (milpEchoStr.contains("*") && milpEchoStr.contains("objval"))
+            {
+                lpIterationCount = milpEchoStr.substring(milpEchoStr.indexOf("*") + 1, milpEchoStr.indexOf(":")).trim();
             }
             
 //             if (milpEchoStr.contains("INTEGER OPTIMAL SOLUTION FOUND") || milpEchoStr.contains("Time") || milpEchoStr.contains("Memory"))
@@ -364,7 +380,7 @@ public class GlpkUI
 //                 // 					outputStr += "\t" + milpEchoStr + "\n";
 //                 // 				}
 //             }
-            if (milpEchoStr.contains("NO") && milpEchoStr.contains("FEASIBLE SOLUTION"))
+            else if (milpEchoStr.contains("NO") && milpEchoStr.contains("FEASIBLE SOLUTION"))
             {
                 throw new MilpException(milpEchoStr + " (specifications should be relaxed if possible).");
             }
@@ -374,8 +390,8 @@ public class GlpkUI
             }
         }
          
-        milpConstructor.addToMessages("\tNr of simplex iterations = " + simplexIterationNr + "\n",
-                SchedulingConstants.MESSAGE_TYPE_INFO);
+        milpConstructor.addToMessages("\tNr of GLPK-iterations = " + totalIterationCount + " (incl. " + 
+                lpIterationCount + " LP-iterations)\n", SchedulingConstants.MESSAGE_TYPE_INFO);
     }
     
     /**

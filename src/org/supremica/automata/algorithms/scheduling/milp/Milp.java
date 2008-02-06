@@ -186,7 +186,7 @@ public class Milp
      * should decrease the running time. Also, approximative solutions are easier
      * to obtains using these constraints.
      */
-    private String nonCrossbookingConstraints = "";
+    private ArrayList<ArrayList<String>> nonCrossbookingConstraints = null;
     
     /*
      * The thread that performs the search for the optimal solution
@@ -284,7 +284,7 @@ public class Milp
             
             //new... test... (should be called when mutex constraints already are created)
             //TODO: better name... better implementation...
-            createConsecutiveBookingConstraints();
+            createNonCrossbookingConstraints();
             
             milpSolver.createModelFile();
             
@@ -617,6 +617,7 @@ public class Milp
         mutexConstraints = new ArrayList<Constraint>();
         altPathsConstraints = new ArrayList<Constraint>();
         xorConstraints = new ArrayList<ArrayList<int[]>>();
+        nonCrossbookingConstraints = new ArrayList<ArrayList<String>>();
         
         pathCutTable = new Hashtable<State,String>();
         
@@ -1987,7 +1988,7 @@ public class Milp
      * Of course, the situation is identical if the robots book the zones in the same order,
      * the important thing here is that there is no unbooking between the zones.
      */
-    private void createConsecutiveBookingConstraints()
+    private void createNonCrossbookingConstraints()
     throws Exception
     {
         // Connectivity-test
@@ -2064,40 +2065,108 @@ public class Milp
 //            consecutiveBookingTicsIndices.keySet().toArray(new int[][]{}));
 //        graphExplorer.findConnectedCycles();
         // Sanity-check...
-        new BookingPairsGraphExplorer(consecutiveBookingEdges);
+        ActionTimer at = new ActionTimer();
+        at.start();
+        BookingPairsGraphExplorer cycleFinder =  
+                new BookingPairsGraphExplorer(consecutiveBookingEdges, plants.size());
         
-        for (int p = 0; p < plants.size(); p++)
-        {
-            for (int z1 = 0; z1 < bookingTics.length; z1++)
-            {
-                for (int z2 = 0; z2 < bookingTics.length; z2++)
-                {
-                    if (z1 != z2)
-                    {
-                        ArrayList<int[]> testList = consecutiveBookingTicsIndices.get(new int[]{p, z1, z2});
-                        if (testList != null)
-                        {
-                            for (int[] inList : testList)
-                            {
-                                String str = "P" + p + "_Z" + z1 + "_Z" + z2;
-                                if (inList[2] == 0)
-                                {
-                                    str += " (overlapping): ";
-                                }
-                                else
-                                    str += " (buffered): ";
-                                
-                                str += bookingTics[z1][p][STATE_SWITCH][inList[0]] + " ";
-                                str += bookingTics[z2][p][STATE_SWITCH][inList[1]] + " ";
-                                str += inList[2];
-                                
-                                warnMsgs += str + "\n";
-                            }
-                        }
-                    }
-                }
-            }
-        }
+       ArrayList<ArrayList<Edge>> rainbowCycles = cycleFinder.enumerateAllCycles();
+       at.stop();
+       addToMessages("circuit searching time = " + at.elapsedTime() + "ms", SchedulingConstants.MESSAGE_TYPE_WARN);
+       for (ArrayList<Edge> cycle : rainbowCycles)
+       {
+           ArrayList<String> deadlockConstraint = new ArrayList<String>();
+           ArrayList<String> unfeasibilityConstraint = new ArrayList<String>();
+           
+//           String str = "";
+//           for (Edge e : cycle)
+//           {
+//               str += "v" + e.getFromVertice().getVerticeIndex() + " -> c" + e.getColor() + " -> ";
+//           }
+//           addToMessages(str, SchedulingConstants.MESSAGE_TYPE_WARN);
+           
+           boolean bufferInCycle = false;
+//           str = "Problems if: ";
+//           String probStr = "Problematic variable combination:\n";
+           for (int i = 0; i < cycle.size(); i++)
+           {
+               Edge precedingEdge;
+               if (i != 0)
+               {
+                   precedingEdge = cycle.get(i-1);
+               }
+               else
+               {
+                   precedingEdge = cycle.get(cycle.size() - 1);
+               }
+               
+               int zoneIndex = cycle.get(i).getFromVertice().getVerticeIndex();
+               int firstPlantIndex = precedingEdge.getColor();
+               int secondPlantIndex = cycle.get(i).getColor();
+               int firstTic = precedingEdge.getToTic();
+               int secondTic = cycle.get(i).getFromTic();
+               
+               try
+               {
+                   if (firstPlantIndex < secondPlantIndex)
+                   {
+                       int repeatedBookingIndex = mutexVarCounterMap.get(new int[]{
+                           zoneIndex, firstPlantIndex, secondPlantIndex, firstTic, secondTic}).intValue();
+
+                       deadlockConstraint.add("r" + firstPlantIndex + "_books_z" + zoneIndex + "_before_r" + 
+                               secondPlantIndex + "_var" + repeatedBookingIndex);
+                       unfeasibilityConstraint.add("(1 - r" + firstPlantIndex + "_books_z" + zoneIndex + "_before_r" + 
+                               secondPlantIndex + "_var" + repeatedBookingIndex + ")");
+                   }
+                   else
+                   {
+                      int repeatedBookingIndex = mutexVarCounterMap.get(new int[]{
+                           zoneIndex, secondPlantIndex, firstPlantIndex, secondTic, firstTic}).intValue();
+
+                       deadlockConstraint.add("(1 - r" + secondPlantIndex + "_books_z" + zoneIndex + "_before_r" + 
+                               firstPlantIndex + "_var" + repeatedBookingIndex + ")");
+                       unfeasibilityConstraint.add("r" + secondPlantIndex + "_books_z" + zoneIndex + "_before_r" + 
+                               firstPlantIndex + "_var" + repeatedBookingIndex);
+                   }
+               }
+               catch (NullPointerException ex)
+               {
+                   addToMessages("Mutex variable with key = {" + zoneIndex + ", " + 
+                           firstPlantIndex + ", " + secondPlantIndex + ", " + firstTic + ", " + secondTic +
+                           "} not found in the variable map.", SchedulingConstants.MESSAGE_TYPE_ERROR);
+                   throw ex;
+               }
+                       
+               
+               if (cycle.get(i).getBufferExists())
+               {
+                   bufferInCycle = true;
+               }
+               
+//               addToMessages("What comes first, P" + firstPlantIndex + "_books_Z" + zoneIndex + " or P" + 
+//                       secondPlantIndex + "_books_Z" + zoneIndex + "?", SchedulingConstants.MESSAGE_TYPE_WARN);
+               
+//               str += "P" + secondPlantIndex + "_books_Z" + zoneIndex + "_before_P" + 
+//                       firstPlantIndex + " AND ";
+               
+           }
+//           String notString = "";
+//           if (bufferInCycle)
+//           {
+//               notString = "NOT ";
+//           }
+//           addToMessages(str + "deadlock can " + notString + "occur!", SchedulingConstants.MESSAGE_TYPE_WARN);
+//           addToMessages(probStr + "Deadlock can " + notString + "occur!!!", SchedulingConstants.MESSAGE_TYPE_WARN);
+           
+           // Unfeasability constraints are always valid, while deadlocks can only occur
+           // if there is no buffer within the current cycle
+           nonCrossbookingConstraints.add(unfeasibilityConstraint);
+           if (! bufferInCycle)
+           {
+               nonCrossbookingConstraints.add(deadlockConstraint);
+           }
+       } 
+        
 // @Deprecated: tänkte om...
 //                    for (int p = 0; p < plants.size(); p++)
 //                    {
@@ -3308,5 +3377,9 @@ public class Milp
     public ArrayList<ArrayList<int[]>> getXorConstraints()
     {
         return xorConstraints;
+    }
+    public ArrayList<ArrayList<String>> getNonCrossbookingConstraints()
+    {
+        return nonCrossbookingConstraints;
     }
 }
