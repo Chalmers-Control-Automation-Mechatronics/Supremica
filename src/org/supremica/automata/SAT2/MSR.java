@@ -17,8 +17,9 @@ public class MSR {
     public int trueVariable;
     private Automata ats;
     private Alphabet abc;
-    final static String MARKING_NAME = "marking";
+    final static String MARKING_NAME   = "marking";
     final static String FORBIDDEN_NAME = "forbidden";
+    final static String STAY_NAME      = "stay";
     
     public MSR(Automata inputAutomata){
         ats = inputAutomata;
@@ -106,7 +107,7 @@ public class MSR {
     public static void modifyCV(Automata ats){
         // mark all states in Plants and remove old markings from Sup/Sp
         for(Automaton a: ats){
-            boolean mark = !(a.isSupervisor()||a.isSpecification());
+            boolean mark = a.isPlant();
             for(State s: a)
                 s.setAccepting(mark);
         }
@@ -119,11 +120,11 @@ public class MSR {
                 a.addState(forb);                            
             }
         
+        // add transitions to forbidden
         for(LabeledEvent e: ats.getUnionAlphabet())
             if(!e.isControllable())
                 for(Automaton a: ats)
-                    if((a.isSupervisor()||a.isSpecification()) 
-                                        && a.getAlphabet().contains(e))
+                    if((!a.isPlant()) && a.getAlphabet().contains(e))
                         for(State s: a)
                             if(!s.doesDefine(e))
                                 a.addArc(new Arc(s, 
@@ -132,6 +133,14 @@ public class MSR {
         modifyMSR(ats); // CV reduced to MSR
     }
 
+    public static void modifyAddAllStay(Automata ats){
+        for(Automaton a: ats){
+            LabeledEvent stay = new LabeledEvent(STAY_NAME);
+            a.getAlphabet().addEvent(stay);
+            for(State s: a)
+                a.addArc(new Arc(s, s, stay));
+        }        
+    }    
     
     public static void main(String [] args) throws Exception{       
         int          steps = Integer.parseInt(args[0]);
