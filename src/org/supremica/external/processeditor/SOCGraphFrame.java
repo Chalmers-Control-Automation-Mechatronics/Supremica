@@ -5,6 +5,7 @@ import java.awt.*;
 import java.io.*;
 
 import org.supremica.external.processeditor.processgraph.*;
+import org.supremica.external.processeditor.processgraph.ilcell.*;
 import org.supremica.external.processeditor.processgraph.resrccell.*;
 import org.supremica.external.processeditor.xgraph.*;
 import org.supremica.external.processeditor.xml.*;
@@ -213,6 +214,16 @@ public class SOCGraphFrame extends JInternalFrame implements SelectionListener {
 	    graph.updateLargePreferredSize();
 	}
     }
+    
+    public void newInterLock() {
+    	GraphCell newInterLock = new InterLockCell();
+    	graph.insert(newInterLock, 0);
+    	Point p = graphScroll.getCornerValue();
+    	p.translate(INSERT_MARGIN_X, INSERT_MARGIN_Y);
+    	newInterLock.setPos(p);
+    	graph.updateLargePreferredSize();
+    }
+    
     /**
      * Adds a new relation to selected resource.
      * <p>

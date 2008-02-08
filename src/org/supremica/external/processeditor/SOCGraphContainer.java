@@ -13,6 +13,7 @@ import java.awt.print.*;
 import java.io.*;
 
 import org.supremica.external.processeditor.processgraph.*;
+import org.supremica.external.processeditor.processgraph.ilcell.*;
 import org.supremica.external.processeditor.processgraph.opcell.*;
 import org.supremica.external.processeditor.processgraph.resrccell.*;
 import org.supremica.external.processeditor.xml.ConvertAutomatas;
@@ -887,6 +888,13 @@ public class SOCGraphContainer
 		newAlgebraic(JOptionPane.showInputDialog("New Algebraic")); 
 	}
     }
+    
+    public void newInterLock() {
+    	if(getSelectedFrame() != null) {
+    		getSelectedFrame().newInterLock();
+    	}
+   }
+    
     /**
      * Inserts a new resource to the active worksheet.
      * <p>
