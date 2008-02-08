@@ -8,7 +8,9 @@ import javax.xml.transform.stream.StreamSource;
 public class Loader {
 	
 	private final String PKGS = "org.supremica.manufacturingTables.xsd.processeditor";
-    private JAXBContext jaxbContext;
+	private final String PKGS_IL = "org.supremica.manufacturingTables.xsd.il";
+	
+	private JAXBContext jaxbContext;
     private Unmarshaller u;
     private Marshaller m;
     
@@ -80,19 +82,33 @@ public class Loader {
     }
     
     public void save(Object o, File file) {	
-    	try {			
+    	
+    	try {
+    		
+    		//Save processeditor
     		jaxbContext = JAXBContext.newInstance(PKGS);    
     		m = jaxbContext.createMarshaller();
     		m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);	    
 	    
     		try {				
-    			m.marshal(o, new FileOutputStream(file));	    
+    			m.marshal(o, new FileOutputStream(file));
     		}catch (Exception ex) {		
-    			System.out.println("ERROR! in FileOutputStrem");		
-    		}		      	    
+    			//System.out.println("ERROR! in FileOutputStrem " + PKGS);		
+    		}
+    		
+    		// Save IL		
+        	jaxbContext = JAXBContext.newInstance(PKGS_IL);    
+        	m = jaxbContext.createMarshaller();
+        	m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true); 
+    	    
+        	try {				
+        		m.marshal(o, new FileOutputStream(file));
+        	}catch (Exception ex) {		
+        		//System.out.println("ERROR! in FileOutputStrem " + PKGS_IL);	
+        	}
     	}
     	catch(JAXBException je) {
-    		je.printStackTrace();	    
+    		je.printStackTrace();
     	}
     }
     
