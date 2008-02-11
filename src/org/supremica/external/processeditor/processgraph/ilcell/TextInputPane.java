@@ -7,8 +7,8 @@ import java.awt.Color;
 import java.awt.event.*;
 
 public class TextInputPane 
-					extends 
-						JPanel
+						extends 
+							JPanel
 {
 	TextInputPane(String title, String[] names){
 		super();
@@ -97,7 +97,7 @@ class TextPane
 	}
 	
 	public String getText(){
-		return txtField.getText();
+		return dataLabel.getText();
 	}
 	
 	public String getName(){
@@ -125,7 +125,6 @@ class TextPane
 	public void mouseExited(MouseEvent e){};
     public void mousePressed(MouseEvent e){}; 
     public void mouseReleased(MouseEvent e){};
-    
     
     /* --- FocusListener --- */
     public void actionPerformed(ActionEvent e){

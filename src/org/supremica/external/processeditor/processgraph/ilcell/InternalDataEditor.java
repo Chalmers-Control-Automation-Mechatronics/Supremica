@@ -100,6 +100,7 @@ public class InternalDataEditor
 			value = "";
 		}
 		internalTable.getTable().initColumnSizes();
+		internalTable.getTable().setPreferredScrollableViewportSize(internalTable.getTable().getPreferredSize());
 		internalTable.validate();
 		internalTable.repaint();
 	}

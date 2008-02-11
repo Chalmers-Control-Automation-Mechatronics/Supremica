@@ -26,7 +26,8 @@ public class ILInfoWindow
 { 
     private JButton ok, cancel;
     
-    private JPanel topPanel, bottomPanel;
+    private TextInputPane topPanel;
+    private JPanel bottomPanel;
     
     private TableGroupPane tableGroup;
     
@@ -69,9 +70,6 @@ public class ILInfoWindow
     	
     	this.il = il;
     	
-    	topPanel = new JPanel();
-    	topPanel.setLayout(new BoxLayout(topPanel, BoxLayout.Y_AXIS));
-    	
     	bottomPanel = new JPanel();
     	bottomPanel.setLayout(new FlowLayout(FlowLayout.RIGHT));
     	
@@ -85,10 +83,10 @@ public class ILInfoWindow
     	
     	topPanel = new TextInputPane("InterLock", new String[]{ID,COMMENT,ACTUATOR,OPERATION});
     	
-    	((TextInputPane)topPanel).setText(ID, il.getId());
-    	((TextInputPane)topPanel).setText(COMMENT, il.getComment());
-    	((TextInputPane)topPanel).setText(ACTUATOR, il.getActuator());
-    	((TextInputPane)topPanel).setText(OPERATION, il.getOperation());
+    	topPanel.setText(ID, il.getId());
+    	topPanel.setText(COMMENT, il.getComment());
+    	topPanel.setText(ACTUATOR, il.getActuator());
+    	topPanel.setText(OPERATION, il.getOperation());
     	
     	getContentPane().add(topPanel, BorderLayout.PAGE_START);
     	getContentPane().add(tableGroup, BorderLayout.CENTER);
@@ -123,10 +121,10 @@ public class ILInfoWindow
     public void actionPerformed(ActionEvent e){
     	if(e.getSource().equals(ok)){
     		
-    		il.setId(((TextInputPane)topPanel).getText(ID));
-    		il.setActuator(((TextInputPane)topPanel).getText(ACTUATOR));
-    		il.setComment(((TextInputPane)topPanel).getText(COMMENT));
-    		il.setOperation(((TextInputPane)topPanel).getText(OPERATION));
+    		il.setId(topPanel.getText(ID));
+    		il.setActuator(topPanel.getText(ACTUATOR));
+    		il.setComment(topPanel.getText(COMMENT));
+    		il.setOperation(topPanel.getText(OPERATION));
     		
     		ILStructure ils = ((ILStructureGroupPane)tableGroup).getILStructure();
     		il.setILStructure(ils);
