@@ -84,8 +84,32 @@ public class BasicTableModel
 		fireTableStructureChanged();
 	}
 	
+	public int removeCol(String name) {
+		int index = columnNames.indexOf(name);
+		removeCol(index);
+		return index;
+	}
+	
+	public void removeCol(int index) {
+		if(index < 0 || index >= getColumnCount()){
+			return;
+		}
+		
+		for(List<Object> row : dataList){
+			row.remove(index);
+		}
+		columnNames.remove(index);
+		
+		fireTableStructureChanged();
+	}
+	
+	
 	public void setRowName(int row, String name) {
 		rowNames.set(row, name);
+	}
+	
+	public void removeRow(String name) {
+		removeCol(rowNames.indexOf(name));
 	}
 	
 	public void addRow(String name) {

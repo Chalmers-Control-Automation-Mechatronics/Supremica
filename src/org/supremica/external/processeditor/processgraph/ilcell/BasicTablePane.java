@@ -41,7 +41,7 @@ public class BasicTablePane
 		
 		table = new BasicTable();
 		
-		table.setPreferredScrollableViewportSize(new Dimension(500, 70));
+		table.setPreferredScrollableViewportSize(table.getPreferredSize());
         table.setFillsViewportHeight(true);
 
         scrollPane = new JScrollPane(table);
@@ -82,11 +82,14 @@ public class BasicTablePane
 	
 	public void addCol(String colName){
 		table.getModel().addCol(colName);
+		table.initColumnSizes();
+		table.setPreferredScrollableViewportSize(table.getPreferredSize());
 		showRowHeader(showRowHeader);
 	}
 	
 	public void addRow(String rowName){
 		table.addRow(rowName);
+		table.setPreferredScrollableViewportSize(table.getPreferredSize());
 		showRowHeader(showRowHeader);
 	}
 	

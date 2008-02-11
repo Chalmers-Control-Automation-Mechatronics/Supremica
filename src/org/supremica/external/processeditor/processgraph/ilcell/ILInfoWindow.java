@@ -75,7 +75,7 @@ public class ILInfoWindow
     	bottomPanel = new JPanel();
     	bottomPanel.setLayout(new FlowLayout(FlowLayout.RIGHT));
     	
-    	tableGroup = new ILStructureGroupPane();
+    	tableGroup = new ILStructureGroupPane(il.getILStructure());
     	
     	bottomPanel.add(ok = new JButton("OK")); 	    	    	    	    
     	bottomPanel.add(cancel = new JButton("Cancel"));	    
@@ -85,6 +85,10 @@ public class ILInfoWindow
     	
     	topPanel = new TextInputPane("InterLock", new String[]{ID,COMMENT,ACTUATOR,OPERATION});
     	
+    	((TextInputPane)topPanel).setText(ID, il.getId());
+    	((TextInputPane)topPanel).setText(COMMENT, il.getComment());
+    	((TextInputPane)topPanel).setText(ACTUATOR, il.getActuator());
+    	((TextInputPane)topPanel).setText(OPERATION, il.getOperation());
     	
     	getContentPane().add(topPanel, BorderLayout.PAGE_START);
     	getContentPane().add(tableGroup, BorderLayout.CENTER);
@@ -152,6 +156,23 @@ public class ILInfoWindow
     	
     	ObjectFactory factory = new ObjectFactory();
     	IL il = factory.createIL();
+    	
+    	il.setId("152Y18");
+    	il.setComment("go to work position");
+    	il.setOperation("FIX152");
+    	il.setActuator("152Y18YE2");
+    	
+    	il.setILStructure(factory.createILStructure());
+    	il.getILStructure().setInternalComponents(factory.createInternalComponents());
+    	
+    	il.getILStructure().getInternalComponents().getActuator().add("A1");
+    	il.getILStructure().getInternalComponents().getActuator().add("A2");
+    	
+    	il.getILStructure().getInternalComponents().getSensor().add("S1");
+    	il.getILStructure().getInternalComponents().getSensor().add("S2");
+    	
+    	il.getILStructure().getInternalComponents().getVariable().add("V1");
+    	il.getILStructure().getInternalComponents().getVariable().add("V2");
     	
     	ILInfoWindow ilInfoWin = new ILInfoWindow(il);
     	ilInfoWin.setVisible(true);

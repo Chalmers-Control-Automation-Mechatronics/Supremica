@@ -9,50 +9,122 @@ import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
 import java.awt.Component;
 import javax.swing.BorderFactory;
-import java.awt.*;
+import java.awt.Color;
+import java.util.List;
+import java.util.LinkedList;
 
-
+import org.supremica.manufacturingTables.xsd.il.InternalComponents;
 
 public class InternalTablePane 
 						extends 
 							BasicTablePane
 {
-	InternalTablePane(){
+	public static final String ACTUATOR = "Actuator";
+	public static final String VARIABLE = "Variable";
+	public static final String SENSOR = "Sensor";
+	
+	private List<JComboBox> comboBoxList = null;
+	
+	public InternalTablePane(InternalComponents internalComponents){
 		super();
 		setHeader("Internal components state");
 		
-		addCol("Y18");
-		addCol("Y16");
-		addCol("Y14");
-		
+		//Add default rows
 		addRow("Type");
 		addRow("Initial");
 		addRow("Action1");
 		
-		setUpTypeRow();
+		comboBoxList = new LinkedList<JComboBox>();
+		
+		if(internalComponents == null){
+			setUpTypeRow();
+			return;
+		}
+		
+		List<String> stringList = internalComponents.getActuator();
+		for(String actuator : stringList){
+			addActuator(actuator, new String[]{"ON","OFF"});
+		}
+		
+		stringList = internalComponents.getVariable();
+		for(String variable : stringList){
+			addVariable(variable,  new String[]{"0","1","2"});
+		}
+		
+		stringList = internalComponents.getSensor();
+		for(String sensor : stringList){
+			addSensor(sensor);
+		}
 	}
 	
 	private void setUpTypeRow() {
-		
 		int numberOfColumns = table.getColumnCount();
 		for(int col = 0; col < numberOfColumns; col++){
 			table.getColumnModel().
 				  getColumn( col ).
-				  	setCellEditor( new InternalCellEditor() );
+				  	setCellEditor( new InternalCellEditor(comboBoxList.get(col)) );
 		}
 	}
 	
-	public void addCol(String name){
-		super.addCol( name );
+	public void addActuator(String name){
+		addActuator(name, null);
+	}
+	
+	public void addActuator(String name, String[] values){
+		addCol( name );
+		table.setValueAt(ACTUATOR, 0, getColumnCount()-1);
+		comboBoxList.add(buildComboBox(values));
 		setUpTypeRow();
 	}
 	
+	public void addVariable(String name){
+		addVariable(name, null);
+	}
+	
+	public void addVariable(String name, String[] values){
+		addCol( name );
+		table.setValueAt(VARIABLE, 0, getColumnCount()-1);
+		comboBoxList.add(buildComboBox(values));
+		setUpTypeRow();
+	}
+	
+	public void addSensor(String name){
+		addSensor(name, null);
+	}
+	
+	public void addSensor(String name, String[] values){
+		addCol( name );
+		table.setValueAt(SENSOR, 0, getColumnCount()-1);
+		comboBoxList.add(buildComboBox(values));
+		setUpTypeRow();
+	}
+	
+	private JComboBox buildComboBox(String[] values){
+		JComboBox comboBox = null;
+		if(values != null && values.length > 0){
+			comboBox = new JComboBox();
+			for(int i = 0; i < values.length; i++){
+				comboBox.addItem(values[i]);
+			}
+		}
+		return comboBox;
+	}
+	
+	public void removeInternalComponent(String name){
+		if(name == null){
+			return;
+		}
+		comboBoxList.remove(table.removeCol(name));
+	}
+	
+	//override
 	public void addRow(String name){
 		super.addRow( name );
 		
 		int numberOfRows = getRowCount();
 		Object previousValue;
 		
+		//copy last row data to next row
 		if(numberOfRows > 1){
 			for(int col = 0; col < getColumnCount(); col++){
 				previousValue = getValueAt(numberOfRows - 2, col);
@@ -73,25 +145,31 @@ public class InternalTablePane
 class InternalCellEditor extends
 							DefaultCellEditor
 {
+	private static final String ACTUATOR = "Actuator";
+	private static final String VARIABLE = "Variable";
+	private static final String SENSOR = "Sensor";
+	
 	private int editor = -1;
 	
-	JComboBox comboBox = null;
+	JComboBox validTypesComboBox = null;
+	JComboBox validDataComboBox = null;
+	
 	JTextField txtField = null;
 	
-	InternalCellEditor(){
+	public InternalCellEditor( JComboBox dataComboBox ){
 		super(new JTextField());
 		
 		//Set up the editor
-		comboBox = new JComboBox();
+		validTypesComboBox = new JComboBox();
 		
-		comboBox.addItem("Actuator");
-		comboBox.addItem("Variable");
-		comboBox.addItem("Sensor");
+		validDataComboBox = dataComboBox;
+		
+		validTypesComboBox.addItem(ACTUATOR);
+		validTypesComboBox.addItem(VARIABLE);
+		validTypesComboBox.addItem(SENSOR);
 		
 		txtField = new JTextField();
 		txtField.setBorder(BorderFactory.createLineBorder(Color.black));
-		
-		//setClickCountToStart(1);
 	}
 	
 	//override in DefaultCellEditor
@@ -104,11 +182,16 @@ class InternalCellEditor extends
 		switch(row){
 		case 0:
 			editor = 1;
-			return comboBox;
+			return validTypesComboBox;
 		default:
-			editor = 0;
-			txtField.setText(value.toString());
-			return txtField;
+			if(validDataComboBox == null){
+				editor = 0;
+				txtField.setText(value.toString());
+				return txtField;
+			}
+			
+			editor = 2;
+			return validDataComboBox;
 		}
 	}
 	
@@ -119,10 +202,18 @@ class InternalCellEditor extends
 		case 0:
 			return txtField.getText();
 		case 1:
-			return comboBox.getSelectedItem();
+			return validTypesComboBox.getSelectedItem();
+		case 2:
+			return validDataComboBox.getSelectedItem();
 		}
 		
 		//default return
 		return super.getCellEditorValue();
 	}
 }
+
+
+
+
+
+

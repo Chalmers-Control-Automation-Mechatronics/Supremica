@@ -44,6 +44,25 @@ public class TextInputPane
 		}
 		return "";
 	}
+	
+	public void setText(String name, String text){
+		int numberOfTextPanes = getComponentCount();
+		
+		if(name == null){
+			return;
+		}
+		
+		for(int i = 0; i < numberOfTextPanes; i++){
+			Object o = getComponent(i);
+			if(o instanceof TextPane){
+				if(name.equals(((TextPane)o).getName())){
+					((TextPane)o).setText(text);
+				}
+			}
+		}
+		return;
+	}
+	
 }
 
 class TextPane 
@@ -85,6 +104,9 @@ class TextPane
 		return nameLabel.getText();
 	}
 	
+	public void setText(String text){
+		dataLabel.setText(text);
+	}
 	
 	/* --- MouseListener --- */
 	public void mouseClicked(MouseEvent e){

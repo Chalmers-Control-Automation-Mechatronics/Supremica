@@ -11,15 +11,19 @@ public class ILStructureGroupPane
 							extends 
 								TableGroupPane
 {
-	BasicTablePane tableInternal = null;
+	InternalTablePane tableInternal = null;
 	BasicTablePane tableExternal = null;
 	BasicTablePane tableOperation = null;
 	BasicTablePane tableZone = null;
 	
-	ILStructureGroupPane(){
+	ILStructureGroupPane(ILStructure ilStructure){
 		super();
 		
-		tableInternal = new InternalTablePane();
+		if(ilStructure == null){
+			ilStructure = (new ObjectFactory()).createILStructure();
+		}
+		
+		tableInternal = new InternalTablePane(ilStructure.getInternalComponents());
 		tableExternal = new ExternalTablePane();
     	tableOperation = new OperationTablePane();
     	tableZone = new ZoneTablePane();
@@ -30,6 +34,13 @@ public class ILStructureGroupPane
     	addTable(tableExternal);
     	addTable(tableOperation);
     	addTable(tableZone);
+    	
+    	showInternalTableEditor();
+	}
+	
+	public void showInternalTableEditor(){
+		InternalDataEditor dataEditor = new InternalDataEditor(tableInternal);
+		dataEditor.setVisible(true);
 	}
 	
 	public ILStructure getILStructure(){

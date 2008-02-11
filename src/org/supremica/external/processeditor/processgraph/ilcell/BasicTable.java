@@ -1,12 +1,9 @@
 package org.supremica.external.processeditor.processgraph.ilcell;
 
-import javax.swing.JMenuItem;
-import javax.swing.JPopupMenu;
 import javax.swing.JTable;
-
-import java.awt.AWTEvent;
-import java.awt.Point;
-import java.awt.event.*;
+import javax.swing.table.TableColumn;
+import javax.swing.table.TableCellRenderer;
+import java.awt.Component;
 
 import javax.swing.event.*;
 import java.util.*;
@@ -22,7 +19,44 @@ public class BasicTable
 		super();
 		tableModel = new BasicTableModel();
 		setModel(tableModel);
+		initColumnSizes();
 	}
+	
+	
+	/*
+     * This method picks good column sizes.
+     *
+     */
+    public void initColumnSizes() {
+        
+        TableColumn column = null;
+        Component comp = null;
+        int headerWidth = 0;
+        int cellWidth = 0;
+        
+        TableCellRenderer headerRenderer = getTableHeader().getDefaultRenderer();
+        
+        //All columns
+        for (int col = 0; col < getColumnCount(); col++) {
+            column = getColumnModel().getColumn(col);
+
+            comp = headerRenderer.getTableCellRendererComponent(null, column.getHeaderValue(),false, false, 0, 0);
+            headerWidth = comp.getPreferredSize().width;
+            
+            //All rows in column
+            for(int row = 0; row < getRowCount(); row++){
+            	comp = getDefaultRenderer(tableModel.getColumnClass(col)).getTableCellRendererComponent(this, getValueAt(row, col),false, false, 0, col);
+            	
+            	//take the widest
+            	if(cellWidth < comp.getPreferredSize().width){
+            		cellWidth = comp.getPreferredSize().width;
+            	}
+            }
+            column.setPreferredWidth(Math.max(headerWidth, cellWidth));
+        }
+    }
+    
+
 	
 	public BasicTableModel getModel(){
 		return tableModel;
@@ -43,6 +77,21 @@ public class BasicTable
 		}
 	}
 	
+	public void removeRow(String name){
+		tableModel.removeRow(name);
+		if(tableListener != null){
+			tableListener.rowRemoved(new TableEvent(this));
+		}
+	}
+	
+	public int removeCol(String name){
+		int index = tableModel.removeCol(name);
+		if(tableListener != null){
+			tableListener.columnRemoved(new TableEvent(this));
+		}
+		return index;
+	}
+	
 	public void addTableListener(TableListener l){
 		tableListener = l;
 	}
@@ -58,6 +107,13 @@ public class BasicTable
 	public void insertRow(List<Object> rowData, int rowIndex, String rowName){
 		tableModel.insertRow(rowData, rowIndex, rowName);
 	}
+	
+	public void removeSelectedRows(){
+    	int rows[] = getSelectedRows();
+    	for(int i = 0; i < rows.length; i++){
+    		getModel().removeRow(rows[i]-i);
+    	}
+    }
 	
 	//override
 	public void valueChanged(ListSelectionEvent e){
