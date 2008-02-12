@@ -3,148 +3,151 @@
     <ns2:Comment>An elegant (perhaps not so much) solution to the classical 'Wine Merchant's Problem'. A wine merchant has three bottles, capable of storing 3, 5 and 8 litres of wine respectively. Initially, he has 8 litres in the third bottle but he wants to split this volume in half, i.e. two bottles of four litres each. How does he do that if he can not use any measuring equipment except for the three bottles which, of course, are not graded. That is, how do you move from the state '008' to the state '044' in as few steps as possible? The event called 'e12', for example, represents that the contents of bottle 1 is poured into bottle 2, until bottle 2 is full or bottle 1 is empty (whichever happens first). 
 Try solving the problem using 'Explore states' from the analyzer's popup menu (one double click plus one single click should be enough...).</ns2:Comment>
     <EventDeclList>
-        <EventDecl Kind="CONTROLLABLE" Observable="true" Name="e12"/>
-        <EventDecl Kind="CONTROLLABLE" Observable="true" Name="e13"/>
-        <EventDecl Kind="CONTROLLABLE" Observable="true" Name="e21"/>
-        <EventDecl Kind="CONTROLLABLE" Observable="true" Name="e23"/>
-        <EventDecl Kind="CONTROLLABLE" Observable="true" Name="e31"/>
-        <EventDecl Kind="CONTROLLABLE" Observable="true" Name="e32"/>
-        <EventDecl Kind="PROPOSITION" Observable="true" Name=":accepting"/>
+        <EventDecl Kind="CONTROLLABLE" Name="e12"/>
+        <EventDecl Kind="CONTROLLABLE" Name="e13"/>
+        <EventDecl Kind="CONTROLLABLE" Name="e21"/>
+        <EventDecl Kind="CONTROLLABLE" Name="e23"/>
+        <EventDecl Kind="CONTROLLABLE" Name="e31"/>
+        <EventDecl Kind="CONTROLLABLE" Name="e32"/>
+        <EventDecl Kind="PROPOSITION" Name=":accepting"/>
     </EventDeclList>
     <ComponentList>
         <SimpleComponent Kind="PLANT">
-            <SimpleIdentifier Name="Wine Merchant"/>
-            <Graph Deterministic="true">
+            <SimpleIdentifier Name="WineMerchant"/>
+            <Graph>
                 <NodeList>
                     <SimpleNode Initial="true" Name="008">
                         <PointGeometry>
-                            <Point X="448" Y="320"/>
+                            <Point Y="320" X="448"/>
                         </PointGeometry>
-                        <LabelGeometry Anchor="SW">
-                            <Point X="0" Y="20"/>
+                        <InitialArrowGeometry>
+                            <Point Y="-5" X="-5"/>
+                        </InitialArrowGeometry>
+                        <LabelGeometry>
+                            <Point Y="20" X="0"/>
                         </LabelGeometry>
                     </SimpleNode>
-                    <SimpleNode Initial="false" Name="017">
+                    <SimpleNode Name="017">
                         <PointGeometry>
-                            <Point X="368" Y="320"/>
+                            <Point Y="320" X="368"/>
                         </PointGeometry>
-                        <LabelGeometry Anchor="SW">
-                            <Point X="0" Y="20"/>
+                        <LabelGeometry>
+                            <Point Y="20" X="0"/>
                         </LabelGeometry>
                     </SimpleNode>
-                    <SimpleNode Initial="false" Name="026">
+                    <SimpleNode Name="026">
                         <PointGeometry>
-                            <Point X="288" Y="320"/>
+                            <Point Y="320" X="288"/>
                         </PointGeometry>
-                        <LabelGeometry Anchor="SW">
-                            <Point X="0" Y="20"/>
+                        <LabelGeometry>
+                            <Point Y="20" X="0"/>
                         </LabelGeometry>
                     </SimpleNode>
-                    <SimpleNode Initial="false" Name="035">
+                    <SimpleNode Name="035">
                         <PointGeometry>
-                            <Point X="208" Y="320"/>
+                            <Point Y="320" X="208"/>
                         </PointGeometry>
-                        <LabelGeometry Anchor="SW">
-                            <Point X="0" Y="20"/>
+                        <LabelGeometry>
+                            <Point Y="20" X="0"/>
                         </LabelGeometry>
                     </SimpleNode>
-                    <SimpleNode Initial="false" Name="044">
+                    <SimpleNode Name="044">
                         <EventList>
                             <SimpleIdentifier Name=":accepting"/>
                         </EventList>
                         <PointGeometry>
-                            <Point X="128" Y="320"/>
+                            <Point Y="320" X="128"/>
                         </PointGeometry>
-                        <LabelGeometry Anchor="SW">
-                            <Point X="0" Y="20"/>
+                        <LabelGeometry>
+                            <Point Y="20" X="0"/>
                         </LabelGeometry>
                     </SimpleNode>
-                    <SimpleNode Initial="false" Name="053">
+                    <SimpleNode Name="053">
                         <PointGeometry>
-                            <Point X="48" Y="320"/>
+                            <Point Y="320" X="48"/>
                         </PointGeometry>
-                        <LabelGeometry Anchor="SW">
-                            <Point X="0" Y="20"/>
+                        <LabelGeometry>
+                            <Point Y="20" X="0"/>
                         </LabelGeometry>
                     </SimpleNode>
-                    <SimpleNode Initial="false" Name="107">
+                    <SimpleNode Name="107">
                         <PointGeometry>
-                            <Point X="448" Y="240"/>
+                            <Point Y="240" X="448"/>
                         </PointGeometry>
-                        <LabelGeometry Anchor="SW">
-                            <Point X="0" Y="20"/>
+                        <LabelGeometry>
+                            <Point Y="-7" X="18"/>
                         </LabelGeometry>
                     </SimpleNode>
-                    <SimpleNode Initial="false" Name="152">
+                    <SimpleNode Name="152">
                         <PointGeometry>
-                            <Point X="48" Y="240"/>
+                            <Point Y="240" X="48"/>
                         </PointGeometry>
-                        <LabelGeometry Anchor="SW">
-                            <Point X="0" Y="20"/>
+                        <LabelGeometry>
+                            <Point Y="-7" X="-45"/>
                         </LabelGeometry>
                     </SimpleNode>
-                    <SimpleNode Initial="false" Name="206">
+                    <SimpleNode Name="206">
                         <PointGeometry>
-                            <Point X="448" Y="160"/>
+                            <Point Y="160" X="448"/>
                         </PointGeometry>
-                        <LabelGeometry Anchor="SW">
-                            <Point X="0" Y="20"/>
+                        <LabelGeometry>
+                            <Point Y="-7" X="18"/>
                         </LabelGeometry>
                     </SimpleNode>
-                    <SimpleNode Initial="false" Name="251">
+                    <SimpleNode Name="251">
                         <PointGeometry>
-                            <Point X="48" Y="160"/>
+                            <Point Y="160" X="48"/>
                         </PointGeometry>
-                        <LabelGeometry Anchor="SW">
-                            <Point X="0" Y="20"/>
+                        <LabelGeometry>
+                            <Point Y="-7" X="-45"/>
                         </LabelGeometry>
                     </SimpleNode>
-                    <SimpleNode Initial="false" Name="305">
+                    <SimpleNode Name="305">
                         <PointGeometry>
-                            <Point X="448" Y="80"/>
+                            <Point Y="80" X="448"/>
                         </PointGeometry>
-                        <LabelGeometry Anchor="SW">
-                            <Point X="-1" Y="-34"/>
+                        <LabelGeometry>
+                            <Point Y="-34" X="-1"/>
                         </LabelGeometry>
                     </SimpleNode>
-                    <SimpleNode Initial="false" Name="314">
+                    <SimpleNode Name="314">
                         <PointGeometry>
-                            <Point X="368" Y="80"/>
+                            <Point Y="80" X="368"/>
                         </PointGeometry>
-                        <LabelGeometry Anchor="SW">
-                            <Point X="-1" Y="-34"/>
+                        <LabelGeometry>
+                            <Point Y="-34" X="-1"/>
                         </LabelGeometry>
                     </SimpleNode>
-                    <SimpleNode Initial="false" Name="341">
+                    <SimpleNode Name="341">
                         <PointGeometry>
-                            <Point X="128" Y="80"/>
+                            <Point Y="80" X="128"/>
                         </PointGeometry>
-                        <LabelGeometry Anchor="SW">
-                            <Point X="-1" Y="-34"/>
+                        <LabelGeometry>
+                            <Point Y="-34" X="-1"/>
                         </LabelGeometry>
                     </SimpleNode>
-                    <SimpleNode Initial="false" Name="350">
+                    <SimpleNode Name="350">
                         <PointGeometry>
-                            <Point X="48" Y="80"/>
+                            <Point Y="80" X="48"/>
                         </PointGeometry>
-                        <LabelGeometry Anchor="SW">
-                            <Point X="-1" Y="-34"/>
+                        <LabelGeometry>
+                            <Point Y="-34" X="-1"/>
                         </LabelGeometry>
                     </SimpleNode>
-                    <SimpleNode Initial="false" Name="323">
+                    <SimpleNode Name="323">
                         <PointGeometry>
-                            <Point X="288" Y="80"/>
+                            <Point Y="80" X="288"/>
                         </PointGeometry>
-                        <LabelGeometry Anchor="SW">
-                            <Point X="-1" Y="-34"/>
+                        <LabelGeometry>
+                            <Point Y="-34" X="-1"/>
                         </LabelGeometry>
                     </SimpleNode>
-                    <SimpleNode Initial="false" Name="332">
+                    <SimpleNode Name="332">
                         <PointGeometry>
-                            <Point X="208" Y="80"/>
+                            <Point Y="80" X="208"/>
                         </PointGeometry>
-                        <LabelGeometry Anchor="SW">
-                            <Point X="-1" Y="-34"/>
+                        <LabelGeometry>
+                            <Point Y="-34" X="-1"/>
                         </LabelGeometry>
                     </SimpleNode>
                     <GroupNode Name="NodeGroup4">
@@ -152,7 +155,7 @@ Try solving the problem using 'Explore states' from the analyzer's popup menu (o
                         <NodeRef Name="107"/>
                         <NodeRef Name="206"/>
                         <BoxGeometry>
-                            <Box Height="192" Width="48" X="416" Y="144"/>
+                            <Box Y="144" X="424" Width="48" Height="192"/>
                         </BoxGeometry>
                     </GroupNode>
                     <GroupNode Name="NodeGroup1">
@@ -160,7 +163,7 @@ Try solving the problem using 'Explore states' from the analyzer's popup menu (o
                         <NodeRef Name="206"/>
                         <NodeRef Name="305"/>
                         <BoxGeometry>
-                            <Box Height="192" Width="32" X="432" Y="64"/>
+                            <Box Y="56" X="432" Width="32" Height="200"/>
                         </BoxGeometry>
                     </GroupNode>
                     <GroupNode Name="NodeGroup5">
@@ -168,7 +171,7 @@ Try solving the problem using 'Explore states' from the analyzer's popup menu (o
                         <NodeRef Name="251"/>
                         <NodeRef Name="350"/>
                         <BoxGeometry>
-                            <Box Height="192" Width="48" X="32" Y="64"/>
+                            <Box Y="64" X="24" Width="48" Height="192"/>
                         </BoxGeometry>
                     </GroupNode>
                     <GroupNode Name="NodeGroup3">
@@ -176,7 +179,7 @@ Try solving the problem using 'Explore states' from the analyzer's popup menu (o
                         <NodeRef Name="152"/>
                         <NodeRef Name="251"/>
                         <BoxGeometry>
-                            <Box Height="192" Width="32" X="32" Y="144"/>
+                            <Box Y="144" X="32" Width="32" Height="200"/>
                         </BoxGeometry>
                     </GroupNode>
                     <GroupNode Name="NodeGroup6">
@@ -186,7 +189,7 @@ Try solving the problem using 'Explore states' from the analyzer's popup menu (o
                         <NodeRef Name="332"/>
                         <NodeRef Name="341"/>
                         <BoxGeometry>
-                            <Box Height="32" Width="352" X="112" Y="64"/>
+                            <Box Y="64" X="112" Width="360" Height="32"/>
                         </BoxGeometry>
                     </GroupNode>
                     <GroupNode Name="NodeGroup2">
@@ -196,7 +199,7 @@ Try solving the problem using 'Explore states' from the analyzer's popup menu (o
                         <NodeRef Name="341"/>
                         <NodeRef Name="350"/>
                         <BoxGeometry>
-                            <Box Height="48" Width="352" X="32" Y="64"/>
+                            <Box Y="56" X="32" Width="352" Height="48"/>
                         </BoxGeometry>
                     </GroupNode>
                     <GroupNode Name="NodeGroup0">
@@ -206,7 +209,7 @@ Try solving the problem using 'Explore states' from the analyzer's popup menu (o
                         <NodeRef Name="035"/>
                         <NodeRef Name="044"/>
                         <BoxGeometry>
-                            <Box Height="48" Width="352" X="112" Y="288"/>
+                            <Box Y="296" X="112" Width="352" Height="48"/>
                         </BoxGeometry>
                     </GroupNode>
                     <GroupNode Name="NodeGroup7">
@@ -216,592 +219,399 @@ Try solving the problem using 'Explore states' from the analyzer's popup menu (o
                         <NodeRef Name="044"/>
                         <NodeRef Name="053"/>
                         <BoxGeometry>
-                            <Box Height="32" Width="352" X="32" Y="304"/>
+                            <Box Y="304" X="24" Width="360" Height="32"/>
                         </BoxGeometry>
                     </GroupNode>
                 </NodeList>
                 <EdgeList>
-                    <Edge Source="044" Target="341">
+                    <Edge Target="341" Source="044">
                         <LabelBlock>
                             <SimpleIdentifier Name="e31"/>
                             <LabelGeometry Anchor="NW">
-                                <Point X="-3" Y="-98"/>
+                                <Point Y="-99" X="-7"/>
                             </LabelGeometry>
                         </LabelBlock>
-                        <StartPointGeometry>
-                            <Point X="128" Y="320"/>
-                        </StartPointGeometry>
-                        <SplineGeometry Kind="INTERPOLATING">
-                            <Point X="139" Y="196"/>
+                        <SplineGeometry>
+                            <Point Y="196" X="139"/>
                         </SplineGeometry>
-                        <EndPointGeometry>
-                            <Point X="128" Y="80"/>
-                        </EndPointGeometry>
                     </Edge>
-                    <Edge Source="035" Target="332">
+                    <Edge Target="332" Source="035">
                         <LabelBlock>
                             <SimpleIdentifier Name="e31"/>
                             <LabelGeometry Anchor="NW">
-                                <Point X="-3" Y="-98"/>
+                                <Point Y="-99" X="-7"/>
                             </LabelGeometry>
                         </LabelBlock>
-                        <StartPointGeometry>
-                            <Point X="208" Y="320"/>
-                        </StartPointGeometry>
-                        <SplineGeometry Kind="INTERPOLATING">
-                            <Point X="219" Y="196"/>
+                        <SplineGeometry>
+                            <Point Y="196" X="219"/>
                         </SplineGeometry>
-                        <EndPointGeometry>
-                            <Point X="208" Y="80"/>
-                        </EndPointGeometry>
                     </Edge>
-                    <Edge Source="026" Target="323">
+                    <Edge Target="323" Source="026">
                         <LabelBlock>
                             <SimpleIdentifier Name="e31"/>
                             <LabelGeometry Anchor="NW">
-                                <Point X="-3" Y="-98"/>
+                                <Point Y="-99" X="-7"/>
                             </LabelGeometry>
                         </LabelBlock>
-                        <StartPointGeometry>
-                            <Point X="288" Y="320"/>
-                        </StartPointGeometry>
-                        <SplineGeometry Kind="INTERPOLATING">
-                            <Point X="299" Y="196"/>
+                        <SplineGeometry>
+                            <Point Y="196" X="299"/>
                         </SplineGeometry>
-                        <EndPointGeometry>
-                            <Point X="288" Y="80"/>
-                        </EndPointGeometry>
                     </Edge>
-                    <Edge Source="017" Target="314">
+                    <Edge Target="314" Source="017">
                         <LabelBlock>
                             <SimpleIdentifier Name="e31"/>
                             <LabelGeometry Anchor="NW">
-                                <Point X="-3" Y="-98"/>
+                                <Point Y="-99" X="-7"/>
                             </LabelGeometry>
                         </LabelBlock>
-                        <StartPointGeometry>
-                            <Point X="368" Y="320"/>
-                        </StartPointGeometry>
-                        <SplineGeometry Kind="INTERPOLATING">
-                            <Point X="379" Y="196"/>
+                        <SplineGeometry>
+                            <Point Y="196" X="379"/>
                         </SplineGeometry>
-                        <EndPointGeometry>
-                            <Point X="368" Y="80"/>
-                        </EndPointGeometry>
                     </Edge>
-                    <Edge Source="341" Target="044">
+                    <Edge Target="044" Source="341">
                         <LabelBlock>
                             <SimpleIdentifier Name="e13"/>
                             <LabelGeometry Anchor="NW">
-                                <Point X="-16" Y="88"/>
+                                <Point Y="88" X="-16"/>
                             </LabelGeometry>
                         </LabelBlock>
-                        <StartPointGeometry>
-                            <Point X="128" Y="80"/>
-                        </StartPointGeometry>
-                        <SplineGeometry Kind="INTERPOLATING">
-                            <Point X="115" Y="204"/>
+                        <SplineGeometry>
+                            <Point Y="204" X="115"/>
                         </SplineGeometry>
-                        <EndPointGeometry>
-                            <Point X="128" Y="320"/>
-                        </EndPointGeometry>
                     </Edge>
-                    <Edge Source="332" Target="035">
+                    <Edge Target="035" Source="332">
                         <LabelBlock>
                             <SimpleIdentifier Name="e13"/>
                             <LabelGeometry Anchor="NW">
-                                <Point X="-16" Y="88"/>
+                                <Point Y="88" X="-16"/>
                             </LabelGeometry>
                         </LabelBlock>
-                        <StartPointGeometry>
-                            <Point X="208" Y="80"/>
-                        </StartPointGeometry>
-                        <SplineGeometry Kind="INTERPOLATING">
-                            <Point X="195" Y="204"/>
+                        <SplineGeometry>
+                            <Point Y="204" X="195"/>
                         </SplineGeometry>
-                        <EndPointGeometry>
-                            <Point X="208" Y="320"/>
-                        </EndPointGeometry>
                     </Edge>
-                    <Edge Source="323" Target="026">
+                    <Edge Target="026" Source="323">
                         <LabelBlock>
                             <SimpleIdentifier Name="e13"/>
                             <LabelGeometry Anchor="NW">
-                                <Point X="-16" Y="88"/>
+                                <Point Y="88" X="-16"/>
                             </LabelGeometry>
                         </LabelBlock>
-                        <StartPointGeometry>
-                            <Point X="288" Y="80"/>
-                        </StartPointGeometry>
-                        <SplineGeometry Kind="INTERPOLATING">
-                            <Point X="275" Y="204"/>
+                        <SplineGeometry>
+                            <Point Y="204" X="275"/>
                         </SplineGeometry>
-                        <EndPointGeometry>
-                            <Point X="288" Y="320"/>
-                        </EndPointGeometry>
                     </Edge>
-                    <Edge Source="314" Target="017">
+                    <Edge Target="017" Source="314">
                         <LabelBlock>
                             <SimpleIdentifier Name="e13"/>
                             <LabelGeometry Anchor="NW">
-                                <Point X="-16" Y="88"/>
+                                <Point Y="88" X="-16"/>
                             </LabelGeometry>
                         </LabelBlock>
-                        <StartPointGeometry>
-                            <Point X="368" Y="80"/>
-                        </StartPointGeometry>
-                        <SplineGeometry Kind="INTERPOLATING">
-                            <Point X="355" Y="204"/>
+                        <SplineGeometry>
+                            <Point Y="204" X="355"/>
                         </SplineGeometry>
-                        <EndPointGeometry>
-                            <Point X="368" Y="320"/>
-                        </EndPointGeometry>
                     </Edge>
-                    <Edge Source="NodeGroup1" Target="008">
+                    <Edge Target="008" Source="NodeGroup1">
                         <LabelBlock>
                             <SimpleIdentifier Name="e13"/>
                             <LabelGeometry Anchor="NW">
-                                <Point X="3" Y="6"/>
+                                <Point Y="6" X="3"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <StartPointGeometry>
-                            <Point X="449" Y="256"/>
+                            <Point Y="256" X="449"/>
                         </StartPointGeometry>
-                        <SplineGeometry Kind="INTERPOLATING">
-                            <Point X="449" Y="288"/>
+                        <SplineGeometry>
+                            <Point Y="288" X="449"/>
                         </SplineGeometry>
-                        <EndPointGeometry>
-                            <Point X="448" Y="320"/>
-                        </EndPointGeometry>
                     </Edge>
-                    <Edge Source="NodeGroup3" Target="350">
+                    <Edge Target="350" Source="NodeGroup3">
                         <LabelBlock>
                             <SimpleIdentifier Name="e31"/>
                             <LabelGeometry Anchor="NW">
-                                <Point X="-26" Y="-17"/>
+                                <Point Y="-17" X="-26"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <StartPointGeometry>
-                            <Point X="49" Y="144"/>
+                            <Point Y="144" X="49"/>
                         </StartPointGeometry>
-                        <SplineGeometry Kind="INTERPOLATING">
-                            <Point X="49" Y="112"/>
+                        <SplineGeometry>
+                            <Point Y="112" X="49"/>
                         </SplineGeometry>
-                        <EndPointGeometry>
-                            <Point X="48" Y="80"/>
-                        </EndPointGeometry>
                     </Edge>
-                    <Edge Source="NodeGroup4" Target="305">
+                    <Edge Target="305" Source="NodeGroup4">
                         <LabelBlock>
                             <SimpleIdentifier Name="e31"/>
                             <LabelGeometry Anchor="NW">
-                                <Point X="2" Y="-17"/>
+                                <Point Y="-17" X="2"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <StartPointGeometry>
-                            <Point X="448" Y="144"/>
+                            <Point Y="144" X="449"/>
                         </StartPointGeometry>
-                        <SplineGeometry Kind="INTERPOLATING">
-                            <Point X="448" Y="114"/>
-                        </SplineGeometry>
-                        <EndPointGeometry>
-                            <Point X="448" Y="80"/>
-                        </EndPointGeometry>
                     </Edge>
-                    <Edge Source="NodeGroup5" Target="053">
+                    <Edge Target="053" Source="NodeGroup5">
                         <LabelBlock>
                             <SimpleIdentifier Name="e13"/>
                             <LabelGeometry Anchor="NW">
-                                <Point X="-25" Y="1"/>
+                                <Point Y="1" X="-25"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <StartPointGeometry>
-                            <Point X="48" Y="256"/>
+                            <Point Y="256" X="48"/>
                         </StartPointGeometry>
-                        <SplineGeometry Kind="INTERPOLATING">
-                            <Point X="48" Y="288"/>
-                        </SplineGeometry>
-                        <EndPointGeometry>
-                            <Point X="48" Y="320"/>
-                        </EndPointGeometry>
                     </Edge>
-                    <Edge Source="251" Target="206">
+                    <Edge Target="206" Source="251">
                         <LabelBlock>
                             <SimpleIdentifier Name="e23"/>
                             <LabelGeometry Anchor="NW">
-                                <Point X="141" Y="-6"/>
+                                <Point Y="-10" X="140"/>
                             </LabelGeometry>
                         </LabelBlock>
-                        <StartPointGeometry>
-                            <Point X="48" Y="160"/>
-                        </StartPointGeometry>
-                        <SplineGeometry Kind="INTERPOLATING">
-                            <Point X="250" Y="173"/>
+                        <SplineGeometry>
+                            <Point Y="173" X="250"/>
                         </SplineGeometry>
-                        <EndPointGeometry>
-                            <Point X="448" Y="160"/>
-                        </EndPointGeometry>
                     </Edge>
-                    <Edge Source="152" Target="107">
+                    <Edge Target="107" Source="152">
                         <LabelBlock>
                             <SimpleIdentifier Name="e23"/>
                             <LabelGeometry Anchor="NW">
-                                <Point X="143" Y="-4"/>
+                                <Point Y="-10" X="142"/>
                             </LabelGeometry>
                         </LabelBlock>
-                        <StartPointGeometry>
-                            <Point X="48" Y="240"/>
-                        </StartPointGeometry>
-                        <SplineGeometry Kind="INTERPOLATING">
-                            <Point X="250" Y="253"/>
+                        <SplineGeometry>
+                            <Point Y="253" X="250"/>
                         </SplineGeometry>
-                        <EndPointGeometry>
-                            <Point X="448" Y="240"/>
-                        </EndPointGeometry>
                     </Edge>
-                    <Edge Source="107" Target="152">
+                    <Edge Target="152" Source="107">
                         <LabelBlock>
                             <SimpleIdentifier Name="e32"/>
                             <LabelGeometry Anchor="NW">
-                                <Point X="-176" Y="-10"/>
+                                <Point Y="-11" X="-177"/>
                             </LabelGeometry>
                         </LabelBlock>
-                        <StartPointGeometry>
-                            <Point X="448" Y="240"/>
-                        </StartPointGeometry>
-                        <SplineGeometry Kind="INTERPOLATING">
-                            <Point X="252" Y="233"/>
+                        <SplineGeometry>
+                            <Point Y="233" X="252"/>
                         </SplineGeometry>
-                        <EndPointGeometry>
-                            <Point X="48" Y="240"/>
-                        </EndPointGeometry>
                     </Edge>
-                    <Edge Source="206" Target="251">
+                    <Edge Target="251" Source="206">
                         <LabelBlock>
                             <SimpleIdentifier Name="e32"/>
                             <LabelGeometry Anchor="NW">
-                                <Point X="-175" Y="-10"/>
+                                <Point Y="-11" X="-176"/>
                             </LabelGeometry>
                         </LabelBlock>
-                        <StartPointGeometry>
-                            <Point X="448" Y="160"/>
-                        </StartPointGeometry>
-                        <SplineGeometry Kind="INTERPOLATING">
-                            <Point X="252" Y="153"/>
+                        <SplineGeometry>
+                            <Point Y="153" X="252"/>
                         </SplineGeometry>
-                        <EndPointGeometry>
-                            <Point X="48" Y="160"/>
-                        </EndPointGeometry>
                     </Edge>
-                    <Edge Source="NodeGroup0" Target="053">
+                    <Edge Target="053" Source="NodeGroup0">
                         <LabelBlock>
                             <SimpleIdentifier Name="e32"/>
                             <LabelGeometry Anchor="NW">
-                                <Point X="-4" Y="3"/>
+                                <Point Y="0" X="-6"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <StartPointGeometry>
-                            <Point X="112" Y="320"/>
+                            <Point Y="321" X="112"/>
                         </StartPointGeometry>
-                        <SplineGeometry Kind="INTERPOLATING">
-                            <Point X="89" Y="320"/>
-                        </SplineGeometry>
-                        <EndPointGeometry>
-                            <Point X="48" Y="320"/>
-                        </EndPointGeometry>
                     </Edge>
-                    <Edge Source="NodeGroup7" Target="008">
+                    <Edge Target="008" Source="NodeGroup7">
                         <LabelBlock>
                             <SimpleIdentifier Name="e23"/>
                             <LabelGeometry Anchor="NW">
-                                <Point X="-17" Y="3"/>
+                                <Point Y="2" X="-20"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <StartPointGeometry>
-                            <Point X="384" Y="320"/>
+                            <Point Y="320" X="384"/>
                         </StartPointGeometry>
-                        <SplineGeometry Kind="INTERPOLATING">
-                            <Point X="416" Y="320"/>
+                        <SplineGeometry>
+                            <Point Y="320" X="416"/>
                         </SplineGeometry>
-                        <EndPointGeometry>
-                            <Point X="448" Y="320"/>
-                        </EndPointGeometry>
                     </Edge>
-                    <Edge Source="NodeGroup2" Target="305">
+                    <Edge Target="305" Source="NodeGroup2">
                         <LabelBlock>
                             <SimpleIdentifier Name="e23"/>
                             <LabelGeometry Anchor="NW">
-                                <Point X="-11" Y="-15"/>
+                                <Point Y="-15" X="-11"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <StartPointGeometry>
-                            <Point X="384" Y="80"/>
+                            <Point Y="79" X="384"/>
                         </StartPointGeometry>
-                        <SplineGeometry Kind="INTERPOLATING">
-                            <Point X="413" Y="80"/>
-                        </SplineGeometry>
-                        <EndPointGeometry>
-                            <Point X="448" Y="80"/>
-                        </EndPointGeometry>
                     </Edge>
-                    <Edge Source="NodeGroup6" Target="350">
+                    <Edge Target="350" Source="NodeGroup6">
                         <LabelBlock>
                             <SimpleIdentifier Name="e32"/>
                             <LabelGeometry Anchor="NW">
-                                <Point X="-3" Y="-15"/>
+                                <Point Y="-15" X="-3"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <StartPointGeometry>
-                            <Point X="112" Y="80"/>
+                            <Point Y="80" X="112"/>
                         </StartPointGeometry>
-                        <SplineGeometry Kind="INTERPOLATING">
-                            <Point X="80" Y="80"/>
+                        <SplineGeometry>
+                            <Point Y="80" X="80"/>
                         </SplineGeometry>
-                        <EndPointGeometry>
-                            <Point X="48" Y="80"/>
-                        </EndPointGeometry>
                     </Edge>
-                    <Edge Source="305" Target="035">
+                    <Edge Target="035" Source="305">
                         <LabelBlock>
                             <SimpleIdentifier Name="e12"/>
                             <LabelGeometry Anchor="NW">
-                                <Point X="-103" Y="77"/>
+                                <Point Y="69" X="-103"/>
                             </LabelGeometry>
                         </LabelBlock>
-                        <StartPointGeometry>
-                            <Point X="448" Y="80"/>
-                        </StartPointGeometry>
-                        <SplineGeometry Kind="INTERPOLATING">
-                            <Point X="324" Y="192"/>
+                        <SplineGeometry>
+                            <Point Y="192" X="324"/>
                         </SplineGeometry>
-                        <EndPointGeometry>
-                            <Point X="208" Y="320"/>
-                        </EndPointGeometry>
                     </Edge>
-                    <Edge Source="314" Target="044">
+                    <Edge Target="044" Source="314">
                         <LabelBlock>
                             <SimpleIdentifier Name="e12"/>
                             <LabelGeometry Anchor="NW">
-                                <Point X="-102" Y="76"/>
+                                <Point Y="68" X="-102"/>
                             </LabelGeometry>
                         </LabelBlock>
-                        <StartPointGeometry>
-                            <Point X="368" Y="80"/>
-                        </StartPointGeometry>
-                        <SplineGeometry Kind="INTERPOLATING">
-                            <Point X="244" Y="192"/>
+                        <SplineGeometry>
+                            <Point Y="192" X="244"/>
                         </SplineGeometry>
-                        <EndPointGeometry>
-                            <Point X="128" Y="320"/>
-                        </EndPointGeometry>
                     </Edge>
-                    <Edge Source="323" Target="053">
+                    <Edge Target="053" Source="323">
                         <LabelBlock>
                             <SimpleIdentifier Name="e12"/>
                             <LabelGeometry Anchor="NW">
-                                <Point X="-113" Y="86"/>
+                                <Point Y="80" X="-113"/>
                             </LabelGeometry>
                         </LabelBlock>
-                        <StartPointGeometry>
-                            <Point X="288" Y="80"/>
-                        </StartPointGeometry>
-                        <SplineGeometry Kind="INTERPOLATING">
-                            <Point X="164" Y="192"/>
+                        <SplineGeometry>
+                            <Point Y="192" X="164"/>
                         </SplineGeometry>
-                        <EndPointGeometry>
-                            <Point X="48" Y="320"/>
-                        </EndPointGeometry>
                     </Edge>
-                    <Edge Source="206" Target="026">
+                    <Edge Target="026" Source="206">
                         <LabelBlock>
                             <SimpleIdentifier Name="e12"/>
                             <LabelGeometry Anchor="NW">
-                                <Point X="-64" Y="35"/>
+                                <Point Y="27" X="-64"/>
                             </LabelGeometry>
                         </LabelBlock>
-                        <StartPointGeometry>
-                            <Point X="448" Y="160"/>
-                        </StartPointGeometry>
-                        <SplineGeometry Kind="INTERPOLATING">
-                            <Point X="364" Y="232"/>
+                        <SplineGeometry>
+                            <Point Y="232" X="364"/>
                         </SplineGeometry>
-                        <EndPointGeometry>
-                            <Point X="288" Y="320"/>
-                        </EndPointGeometry>
                     </Edge>
-                    <Edge Source="107" Target="017">
+                    <Edge Target="017" Source="107">
                         <LabelBlock>
                             <SimpleIdentifier Name="e12"/>
                             <LabelGeometry Anchor="NW">
-                                <Point X="-27" Y="-4"/>
+                                <Point Y="-10" X="-24"/>
                             </LabelGeometry>
                         </LabelBlock>
-                        <StartPointGeometry>
-                            <Point X="448" Y="240"/>
-                        </StartPointGeometry>
-                        <SplineGeometry Kind="INTERPOLATING">
-                            <Point X="404" Y="272"/>
+                        <SplineGeometry>
+                            <Point Y="272" X="404"/>
                         </SplineGeometry>
-                        <EndPointGeometry>
-                            <Point X="368" Y="320"/>
-                        </EndPointGeometry>
                     </Edge>
-                    <Edge Source="332" Target="152">
+                    <Edge Target="152" Source="332">
                         <LabelBlock>
                             <SimpleIdentifier Name="e12"/>
                             <LabelGeometry Anchor="NW">
-                                <Point X="-81" Y="51"/>
+                                <Point Y="42" X="-76"/>
                             </LabelGeometry>
                         </LabelBlock>
-                        <StartPointGeometry>
-                            <Point X="208" Y="80"/>
-                        </StartPointGeometry>
-                        <SplineGeometry Kind="INTERPOLATING">
-                            <Point X="124" Y="152"/>
+                        <SplineGeometry>
+                            <Point Y="152" X="124"/>
                         </SplineGeometry>
-                        <EndPointGeometry>
-                            <Point X="48" Y="240"/>
-                        </EndPointGeometry>
                     </Edge>
-                    <Edge Source="341" Target="251">
+                    <Edge Target="251" Source="341">
                         <LabelBlock>
                             <SimpleIdentifier Name="e12"/>
                             <LabelGeometry Anchor="NW">
-                                <Point X="-27" Y="-6"/>
+                                <Point Y="-13" X="-26"/>
                             </LabelGeometry>
                         </LabelBlock>
-                        <StartPointGeometry>
-                            <Point X="128" Y="80"/>
-                        </StartPointGeometry>
-                        <SplineGeometry Kind="INTERPOLATING">
-                            <Point X="84" Y="112"/>
+                        <SplineGeometry>
+                            <Point Y="112" X="84"/>
                         </SplineGeometry>
-                        <EndPointGeometry>
-                            <Point X="48" Y="160"/>
-                        </EndPointGeometry>
                     </Edge>
-                    <Edge Source="017" Target="107">
+                    <Edge Target="107" Source="017">
                         <LabelBlock>
                             <SimpleIdentifier Name="e21"/>
                             <LabelGeometry Anchor="NW">
-                                <Point X="8" Y="-8"/>
+                                <Point Y="-14" X="5"/>
                             </LabelGeometry>
                         </LabelBlock>
-                        <StartPointGeometry>
-                            <Point X="368" Y="320"/>
-                        </StartPointGeometry>
-                        <SplineGeometry Kind="INTERPOLATING">
-                            <Point X="413" Y="282"/>
+                        <SplineGeometry>
+                            <Point Y="282" X="413"/>
                         </SplineGeometry>
-                        <EndPointGeometry>
-                            <Point X="448" Y="240"/>
-                        </EndPointGeometry>
                     </Edge>
-                    <Edge Source="026" Target="206">
+                    <Edge Target="206" Source="026">
                         <LabelBlock>
                             <SimpleIdentifier Name="e21"/>
                             <LabelGeometry Anchor="NW">
-                                <Point X="49" Y="-48"/>
+                                <Point Y="-55" X="45"/>
                             </LabelGeometry>
                         </LabelBlock>
-                        <StartPointGeometry>
-                            <Point X="288" Y="320"/>
-                        </StartPointGeometry>
-                        <SplineGeometry Kind="INTERPOLATING">
-                            <Point X="373" Y="242"/>
+                        <SplineGeometry>
+                            <Point Y="242" X="373"/>
                         </SplineGeometry>
-                        <EndPointGeometry>
-                            <Point X="448" Y="160"/>
-                        </EndPointGeometry>
                     </Edge>
-                    <Edge Source="035" Target="305">
+                    <Edge Target="305" Source="035">
                         <LabelBlock>
                             <SimpleIdentifier Name="e21"/>
                             <LabelGeometry Anchor="NW">
-                                <Point X="82" Y="-88"/>
+                                <Point Y="-88" X="77"/>
                             </LabelGeometry>
                         </LabelBlock>
-                        <StartPointGeometry>
-                            <Point X="208" Y="320"/>
-                        </StartPointGeometry>
-                        <SplineGeometry Kind="INTERPOLATING">
-                            <Point X="333" Y="202"/>
+                        <SplineGeometry>
+                            <Point Y="202" X="333"/>
                         </SplineGeometry>
-                        <EndPointGeometry>
-                            <Point X="448" Y="80"/>
-                        </EndPointGeometry>
                     </Edge>
-                    <Edge Source="044" Target="314">
+                    <Edge Target="314" Source="044">
                         <LabelBlock>
                             <SimpleIdentifier Name="e21"/>
                             <LabelGeometry Anchor="NW">
-                                <Point X="82" Y="-88"/>
+                                <Point Y="-88" X="77"/>
                             </LabelGeometry>
                         </LabelBlock>
-                        <StartPointGeometry>
-                            <Point X="128" Y="320"/>
-                        </StartPointGeometry>
-                        <SplineGeometry Kind="INTERPOLATING">
-                            <Point X="253" Y="202"/>
+                        <SplineGeometry>
+                            <Point Y="202" X="253"/>
                         </SplineGeometry>
-                        <EndPointGeometry>
-                            <Point X="368" Y="80"/>
-                        </EndPointGeometry>
                     </Edge>
-                    <Edge Source="053" Target="323">
+                    <Edge Target="323" Source="053">
                         <LabelBlock>
                             <SimpleIdentifier Name="e21"/>
                             <LabelGeometry Anchor="NW">
-                                <Point X="82" Y="-88"/>
+                                <Point Y="-88" X="77"/>
                             </LabelGeometry>
                         </LabelBlock>
-                        <StartPointGeometry>
-                            <Point X="48" Y="320"/>
-                        </StartPointGeometry>
-                        <SplineGeometry Kind="INTERPOLATING">
-                            <Point X="173" Y="202"/>
+                        <SplineGeometry>
+                            <Point Y="202" X="173"/>
                         </SplineGeometry>
-                        <EndPointGeometry>
-                            <Point X="288" Y="80"/>
-                        </EndPointGeometry>
                     </Edge>
-                    <Edge Source="152" Target="332">
+                    <Edge Target="332" Source="152">
                         <LabelBlock>
                             <SimpleIdentifier Name="e21"/>
                             <LabelGeometry Anchor="NW">
-                                <Point X="41" Y="-46"/>
+                                <Point Y="-46" X="36"/>
                             </LabelGeometry>
                         </LabelBlock>
-                        <StartPointGeometry>
-                            <Point X="48" Y="240"/>
-                        </StartPointGeometry>
-                        <SplineGeometry Kind="INTERPOLATING">
-                            <Point X="133" Y="162"/>
+                        <SplineGeometry>
+                            <Point Y="162" X="133"/>
                         </SplineGeometry>
-                        <EndPointGeometry>
-                            <Point X="208" Y="80"/>
-                        </EndPointGeometry>
                     </Edge>
-                    <Edge Source="251" Target="341">
+                    <Edge Target="341" Source="251">
                         <LabelBlock>
                             <SimpleIdentifier Name="e21"/>
                             <LabelGeometry Anchor="NW">
-                                <Point X="2" Y="-4"/>
+                                <Point Y="-4" X="-3"/>
                             </LabelGeometry>
                         </LabelBlock>
-                        <StartPointGeometry>
-                            <Point X="48" Y="160"/>
-                        </StartPointGeometry>
-                        <SplineGeometry Kind="INTERPOLATING">
-                            <Point X="93" Y="122"/>
+                        <SplineGeometry>
+                            <Point Y="122" X="93"/>
                         </SplineGeometry>
-                        <EndPointGeometry>
-                            <Point X="128" Y="80"/>
-                        </EndPointGeometry>
                     </Edge>
                 </EdgeList>
             </Graph>
         </SimpleComponent>
     </ComponentList>
 </Module>
-

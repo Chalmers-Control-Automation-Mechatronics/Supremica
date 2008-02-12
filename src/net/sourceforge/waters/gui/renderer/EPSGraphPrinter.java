@@ -116,7 +116,7 @@ public class EPSGraphPrinter extends Renderer
     final double y1 = point.getY();
     gen.writeln(gen.formatDouble(x1) + " " + gen.formatDouble(y1) + " M");
     gen.writeln("1 -1 scale");
-    gen.writeln("(" + text + ") t");
+    gen.writeln("(" + text + ") t"); // Hm... gen replaces åäö with ???... 
     gen.writeln("grestore");
   }
 
