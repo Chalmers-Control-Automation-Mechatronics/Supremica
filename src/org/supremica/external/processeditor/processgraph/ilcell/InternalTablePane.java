@@ -4,12 +4,11 @@ import javax.swing.DefaultCellEditor;
 import javax.swing.JComboBox;
 import javax.swing.JTextField;
 import javax.swing.JTable;
-import javax.swing.table.DefaultTableCellRenderer;
-import javax.swing.table.TableCellRenderer;
-import javax.swing.table.TableColumn;
 import java.awt.Component;
 import javax.swing.BorderFactory;
 import java.awt.Color;
+import java.awt.event.ActionListener;
+import java.awt.event.ActionEvent;
 import java.util.List;
 import java.util.LinkedList;
 
@@ -18,19 +17,24 @@ import org.supremica.manufacturingTables.xsd.il.InternalComponents;
 public class InternalTablePane 
 						extends 
 							BasicTablePane
+						implements
+							ActionListener
 {
 	public static final String ACTUATOR = "Actuator";
 	public static final String VARIABLE = "Variable";
 	public static final String SENSOR = "Sensor";
 	
 	private List<JComboBox> comboBoxList = null;
+	private InternalDataEditor editor = null;
 	
 	public InternalTablePane(InternalComponents internalComponents){
 		super();
 		setHeader("Internal components state");
 		
+		tableHeader.addActionListener(this);
+		
 		//Add default rows
-		addRow("Type");
+		addRow("");
 		addRow("Initial");
 		addRow("Action1");
 		
@@ -43,18 +47,22 @@ public class InternalTablePane
 		
 		List<String> stringList = internalComponents.getActuator();
 		for(String actuator : stringList){
-			addActuator(actuator, new String[]{"ON","OFF"});
+			addActuator(actuator);
 		}
 		
 		stringList = internalComponents.getVariable();
 		for(String variable : stringList){
-			addVariable(variable,  new String[]{"0","1","2"});
+			addVariable(variable);
 		}
 		
 		stringList = internalComponents.getSensor();
 		for(String sensor : stringList){
 			addSensor(sensor);
 		}
+	}
+	
+	public InternalComponents getInternalComponents(){
+		return TableExtractor.getInternalComponentsFromTable(table);
 	}
 	
 	private void setUpTypeRow() {
@@ -115,6 +123,13 @@ public class InternalTablePane
 			return;
 		}
 		comboBoxList.remove(table.removeCol(name));
+		setUpTypeRow();
+	}
+	
+	
+	public void setCellEditor(int col, String[] values){
+		comboBoxList.set(col, buildComboBox(values));
+		setUpTypeRow();
 	}
 	
 	//override
@@ -134,6 +149,17 @@ public class InternalTablePane
 		
 		setUpTypeRow();
 	}
+	
+	// --- ActionListener ---
+	public void actionPerformed(ActionEvent e) {
+        Object o = e.getSource();
+        if(o == tableHeader){
+        	editor = new InternalDataEditor(this);
+        	editor.setVisible(true);
+		}else{
+        	System.err.println("unknown source " + o);
+        }
+    }
 }
 
 
@@ -170,6 +196,20 @@ class InternalCellEditor extends
 		
 		txtField = new JTextField();
 		txtField.setBorder(BorderFactory.createLineBorder(Color.black));
+	}
+	
+	public Object[] getValidValues(){
+		if(validDataComboBox == null){
+			return null;
+		}
+		
+		int numberOfItems = validDataComboBox.getItemCount();
+		
+		Object[] os = new Object[numberOfItems];
+		for(int i = 0; i < numberOfItems; i++){
+			os[i] = validDataComboBox.getItemAt(i);
+		}
+		return os;
 	}
 	
 	//override in DefaultCellEditor

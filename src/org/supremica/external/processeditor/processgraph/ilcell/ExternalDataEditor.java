@@ -8,7 +8,10 @@ import java.awt.event.ActionListener;
 import javax.swing.table.TableColumn;
 import javax.swing.*;
 
-public class InternalDataEditor 
+import org.supremica.manufacturingTables.xsd.il.ObjectFactory;
+import org.supremica.manufacturingTables.xsd.il.ExternalComponent;
+
+public class ExternalDataEditor 
 							extends
 								JFrame
 							implements
@@ -19,34 +22,25 @@ public class InternalDataEditor
 	private JButton jbApply = null;
 	
 	private DataTablePane tablePane = null;
-	private InternalTablePane internalTable = null;
+	private ExternalTablePane externalTable = null;
 	
-	public InternalDataEditor(InternalTablePane internalTable){
-		super("Internal components");
+	public ExternalDataEditor(ExternalTablePane externalTable){
+		super("External components");
 		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		
 		getContentPane().setLayout(new BorderLayout());
 		
-		this.internalTable = internalTable;
+		this.externalTable = externalTable;
 		
 		//tabel panel
 		tablePane = new DataTablePane();
 		
 		tablePane.getTable().addCol("Component");
-		tablePane.getTable().addCol("Type");
+		tablePane.getTable().addCol("Machine");
 		tablePane.getTable().addCol("Values");
 		tablePane.getTable().initColumnSizes();
 		
-		fillTable(internalTable.getTable());
-		
-		//Set up the editor
-		JComboBox validTypesComboBox = new JComboBox();
-		validTypesComboBox.addItem("Actuator");
-		validTypesComboBox.addItem("Variable");
-		validTypesComboBox.addItem("Sensor");
-		
-		TableColumn column = tablePane.getTable().getColumnModel().getColumn(1);
-		column.setCellEditor(new DefaultCellEditor(validTypesComboBox));
+		fillTable(externalTable.getTable());
 		
 		getContentPane().add(tablePane, BorderLayout.CENTER);
 		
@@ -84,7 +78,7 @@ public class InternalDataEditor
 			value = table.getColumnName(col);
 			tablePane.getTable().setValueAt(value, col, 0);
 			
-			//get type
+			//get machine
 			value = table.getValueAt(0, col);
 			tablePane.getTable().setValueAt(value, col, 1);
 			
@@ -106,13 +100,13 @@ public class InternalDataEditor
 		}
 	}
 	
-	private void updateInternalTable(){
+	private void updateExternalTable(){
 		
 		BasicTable table = tablePane.getTable();
 		
 		int numberOfRows = table.getRowCount();
 		
-		String name, type, value; 
+		String component, machine, value;
 		String[] values = null;
 		boolean isNewComponent = false;
 		
@@ -120,11 +114,11 @@ public class InternalDataEditor
 		
 		for(int row = 0; row < numberOfRows; row++){
 			
-			name = table.getValueAt(row, 0).toString();
-			type = table.getValueAt(row, 1).toString();
+			component = table.getValueAt(row, 0).toString();
+			machine = table.getValueAt(row, 1).toString();
 			value = table.getValueAt(row, 2).toString();
 			
-			if(name.length() > 0 && type.length() > 0){
+			if(component.length() > 0 && machine.length() > 0){
 				
 				values = value.split(",");
 				if(values.length == 1 && values[0].length() == 0){
@@ -132,37 +126,36 @@ public class InternalDataEditor
 				}
 				
 				isNewComponent = true;
-				for(int col = 0; col < internalTable.getColumnCount(); col++){
-					if(internalTable.getColumnName(col).equals(name)){
-						internalTable.getTable().setValueAt(type, 0, col);
-						internalTable.setCellEditor(col, values);
+				for(int col = 0; col < externalTable.getColumnCount(); col++){
+					if(externalTable.getColumnName(col).equals(component)){
+						externalTable.getTable().setValueAt(machine, 0, col);
+						externalTable.setCellEditor(col, values);
 						isNewComponent = false;
 					}
 				}
 				
 				if(isNewComponent){
-					if(InternalTablePane.ACTUATOR.equals(type)){
-						internalTable.addActuator(name, values);
-					}else if(InternalTablePane.SENSOR.equals(type)){
-						internalTable.addSensor(name, values);
-					}else if(InternalTablePane.VARIABLE.equals(type)){
-						internalTable.addVariable(name, values);
-					}
+					ExternalComponent extComp = (new ObjectFactory()).createExternalComponent();
+					
+					extComp.setComponent(component);
+					extComp.setMachine(machine);
+					
+					externalTable.addExternalComponent(extComp, values);
 				}
 			}
 			
 			values = null;
 			value = "";
 		}
-		internalTable.getTable().initColumnSizes();
-		internalTable.getTable().setPreferredScrollableViewportSize(internalTable.getTable().getPreferredSize());
-		internalTable.validate();
-		internalTable.repaint();
+		externalTable.getTable().initColumnSizes();
+		externalTable.getTable().setPreferredScrollableViewportSize(externalTable.getTable().getPreferredSize());
+		externalTable.validate();
+		externalTable.repaint();
 	}
 	
 	public void removeDeletedColumns(){
 		
-		//remove columns in internalTable
+		//remove columns in externalTable
 		int col = 0;
 		
 		String name = "";
@@ -170,19 +163,27 @@ public class InternalDataEditor
 		int numberOfRows = table.getRowCount();
 		boolean remove = true;
 		
-		while(col < internalTable.getColumnCount()){
+		while(col < externalTable.getColumnCount()){
 			remove = true;
 			
 			for(int row = 0; row < numberOfRows; row++){
 				name = table.getValueAt(row, 0).toString();
-				if(internalTable.getColumnName(col).equals(name)){
+				if(externalTable.getColumnName(col).equals(name)){
 					remove = false;
 				}
 			}
 			
 			if(remove){
-				name = internalTable.getColumnName(col);
-				internalTable.removeInternalComponent(name);
+				
+				ExternalComponent extComp = (new ObjectFactory()).createExternalComponent();
+				
+				name = externalTable.getColumnName(col);
+				extComp.setComponent(name);
+				
+				name = externalTable.getValueAt(0, col).toString();
+				extComp.setMachine(name);
+				
+				externalTable.removeExternalComponent(extComp);
 			}else{
 				col++;
 			}
@@ -196,11 +197,11 @@ public class InternalDataEditor
         Object o = e.getSource();
         
         if(o == jbOk){
-        	updateInternalTable();
+        	updateExternalTable();
         	setVisible(false);
         	dispose();
         }else if(o == jbApply){
-        	updateInternalTable();
+        	updateExternalTable();
         }else if(o == jbCancel){
         	setVisible(false);
         	dispose();

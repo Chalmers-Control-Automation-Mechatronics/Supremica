@@ -25,7 +25,7 @@ public class BasicTablePane
 							JPanel
 
 {
-	protected JLabel tableHeaderLabel = null; 
+	protected JButton tableHeader = null; 
 	protected BasicTable table = null;
 	protected JScrollPane scrollPane = null;
 	
@@ -35,7 +35,15 @@ public class BasicTablePane
 		super();
 		setLayout(new BoxLayout(this,BoxLayout.Y_AXIS));
 		
-		tableHeaderLabel = new JLabel("Table");
+		tableHeader = new JButton("Table");
+		
+		//hide button
+		tableHeader.setBackground(getBackground());
+		tableHeader.setForeground(getForeground());
+		tableHeader.setContentAreaFilled(false);
+		tableHeader.setBorderPainted(false);
+		tableHeader.setFocusable(false);
+		
 		//tableHeaderLabel.setBorder(BorderFactory.createLineBorder(Color.black));
 		//setBorder(BorderFactory.createLineBorder(Color.black));
 		
@@ -46,12 +54,12 @@ public class BasicTablePane
 
         scrollPane = new JScrollPane(table);
         
-        add(tableHeaderLabel);
+        add(tableHeader);
         add(scrollPane);
 	}
 	
 	public void setHeader(String headerText){
-		tableHeaderLabel.setText(headerText);
+		tableHeader.setText(headerText);
 	}
 	
 	public void showRowHeader(boolean show){

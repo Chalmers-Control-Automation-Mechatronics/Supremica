@@ -58,8 +58,7 @@ public class TableGroupPane
 	}
 	
 	/*
-	 * Funkar inte som jag vill
-	 * kan bara välja en rad??????
+	 * TODO: Allow user to select multiple rows
 	 */
 	public void setSelectedRows(){
 		

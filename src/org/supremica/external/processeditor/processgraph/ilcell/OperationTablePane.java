@@ -1,5 +1,7 @@
 package org.supremica.external.processeditor.processgraph.ilcell;
 
+import org.supremica.manufacturingTables.xsd.il.Operations;
+
 public class OperationTablePane 
 						extends 
 							BasicTablePane
@@ -11,8 +13,12 @@ public class OperationTablePane
 		addCol("NOT started");
 		addCol("NOT ongoing");
 		
-		addRow("Type");
+		addRow("");
 		addRow("Initial");
 		addRow("Action1");
+	}
+	
+	public Operations getOperations(){
+		return TableExtractor.getOperationsFromTable(table);
 	}
 }

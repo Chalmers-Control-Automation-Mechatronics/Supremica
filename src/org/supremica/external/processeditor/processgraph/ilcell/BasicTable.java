@@ -5,6 +5,7 @@ import javax.swing.table.TableColumn;
 import javax.swing.table.TableCellRenderer;
 import java.awt.Component;
 
+import javax.swing.table.TableCellEditor;
 import javax.swing.event.*;
 import java.util.*;
 
@@ -71,7 +72,20 @@ public class BasicTable
 	}
 	
 	public void addRow(String name){
+		
+		int numberOfCols = getColumnCount();
+		TableCellEditor[] cellEditor = new TableCellEditor[numberOfCols];
+		
+		for(int col = 0; col < numberOfCols; col++){
+			cellEditor[col] = getColumnModel().getColumn(col).getCellEditor();
+		}
+		
 		tableModel.addRow(name);
+		
+		for(int col = 0; col < numberOfCols; col++){
+			getColumnModel().getColumn(col).setCellEditor(cellEditor[col]);
+		}
+		
 		if(tableListener != null){
 			tableListener.rowAdded(new TableEvent(this));
 		}
@@ -90,6 +104,13 @@ public class BasicTable
 			tableListener.columnRemoved(new TableEvent(this));
 		}
 		return index;
+	}
+	
+	public void removeCol(int index){
+		tableModel.removeCol(index);
+		if(tableListener != null){
+			tableListener.columnRemoved(new TableEvent(this));
+		}
 	}
 	
 	public void addTableListener(TableListener l){

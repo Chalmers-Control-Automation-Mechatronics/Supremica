@@ -50,11 +50,6 @@ public class DataTablePane
      
 		table = new BasicTable();
 		
-		table.addCol("Name");
-		table.addCol("Type");
-		table.addCol("Values");
-		table.initColumnSizes();
-		
 		table.setShowHorizontalLines(true);  
 		table.setShowVerticalLines(true); 
     
@@ -96,6 +91,11 @@ public class DataTablePane
     }
 	
 	private void addRow(){
+		
+		for(int col = 0; col < table.getColumnCount(); col++){
+			
+		}
+		
 		table.addRow("");
 	}
 	
@@ -141,7 +141,7 @@ public class DataTablePane
     }
 	
 	/**
-	 *	Removes selected ROP files from table
+	 *	Removes selected
 	 */
     private void remove(){
     	table.removeSelectedRows();

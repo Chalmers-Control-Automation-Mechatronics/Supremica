@@ -13,7 +13,7 @@ public class BasicTableModel
 	
 	private List<List<Object>> dataList;
 
-	BasicTableModel(){
+	public BasicTableModel(){
 		
 		columnNames = new LinkedList<String>();
 		rowNames = new LinkedList<String>();

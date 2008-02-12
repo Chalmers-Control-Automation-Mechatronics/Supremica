@@ -5,6 +5,9 @@ import java.awt.event.ActionEvent;
 
 import javax.swing.JMenuItem;
 
+import java.util.List;
+import java.util.LinkedList;
+
 import org.supremica.manufacturingTables.xsd.il.*;
 
 public class ILStructureGroupPane 
@@ -12,11 +15,18 @@ public class ILStructureGroupPane
 								TableGroupPane
 {
 	InternalTablePane tableInternal = null;
-	BasicTablePane tableExternal = null;
-	BasicTablePane tableOperation = null;
-	BasicTablePane tableZone = null;
+	ExternalTablePane tableExternal = null;
+	OperationTablePane tableOperation = null;
+	ZoneTablePane tableZone = null;
 	
-	ILStructureGroupPane(ILStructure ilStructure){
+	List<BasicTablePane> tableList = null;
+	
+	boolean showTableInternal = true;
+	boolean showTableExternal = true;
+	boolean showTableOperation = true;
+	boolean showTableZone = true;
+	
+	public ILStructureGroupPane(ILStructure ilStructure){
 		super();
 		
 		if(ilStructure == null){
@@ -24,26 +34,54 @@ public class ILStructureGroupPane
 		}
 		
 		tableInternal = new InternalTablePane(ilStructure.getInternalComponents());
-		tableExternal = new ExternalTablePane();
+		tableExternal = new ExternalTablePane(ilStructure.getExternalComponents());
     	tableOperation = new OperationTablePane();
     	tableZone = new ZoneTablePane();
     	
-    	tableInternal.showRowHeader(true);
+    	setRowNames();
     	
-    	addTable(tableInternal);
-    	addTable(tableExternal);
-    	addTable(tableOperation);
-    	addTable(tableZone);
-    	
-    	showInternalTableEditor();
+    	showTables();
 	}
 	
-	public void showInternalTableEditor(){
-		InternalDataEditor dataEditor = new InternalDataEditor(tableInternal);
-		dataEditor.setVisible(true);
+	private void showTables(){
+		boolean rowHeader = true;
+		
+		removeAll();
+		
+		if( showTableInternal ){
+			tableInternal.showRowHeader(rowHeader);
+			rowHeader = false;
+			
+			addTable(tableInternal);
+		}
+		
+		if( showTableExternal ){
+			tableExternal.showRowHeader(rowHeader);
+			rowHeader = false;
+			
+			addTable(tableExternal);
+		}
+		
+		if( showTableOperation ){
+			tableOperation.showRowHeader(rowHeader);
+			rowHeader = false;
+			
+			addTable(tableOperation);
+		}
+		
+		if( showTableZone ){
+			tableZone.showRowHeader(rowHeader);
+			rowHeader = false;
+			
+			addTable(tableZone);
+		}
+		
+		validate();
+		repaint();
 	}
 	
 	public ILStructure getILStructure(){
+		
 		Term[] terms = null;
 		ObjectFactory factory = new ObjectFactory();
 		ILStructure ilStructure = factory.createILStructure();
@@ -62,29 +100,64 @@ public class ILStructureGroupPane
 	}
 	
 	public InternalComponents getInternalComponents(){
-		return TableExtractor.
-					getInternalComponentsFromTable(tableInternal.getTable());
+		return tableInternal.getInternalComponents();
 	}
 	
 	public ExternalComponents getExternalComponents(){
-		return TableExtractor.
-					getExternalComponentsFromTable(tableExternal.getTable());
+		return tableExternal.getExternalComponents();
 	}
 	
 	public Zones getZones(){
-		return TableExtractor.
-					getZonesFromTable(tableZone.getTable());
+		return tableZone.getZones();
 	}
 	
 	public Operations getOperations(){
-		return TableExtractor.
-					getOperationsFromTable(tableOperation.getTable());
+		return tableOperation.getOperations();
 	}
-	
 	
 	public Term[] getTerms(){
 		return TableExtractor.getTerms(tableInternal, tableExternal, tableOperation, tableZone);
 	}
+	
+	public void showInternalTable(boolean show){
+		if(show == showTableInternal){
+			return;
+		}
+		
+		showTableInternal = show;
+		showTables();
+	}
+	
+	public void showExternalTable(boolean show){
+		
+		if(show == showTableExternal){
+			return;
+		}
+		
+		showTableExternal = show;
+		showTables();
+	}
+	
+	public void showOperationTable(boolean show){
+		
+		if(show == showTableOperation){
+			return;
+		}
+		
+		showTableOperation = show;
+		showTables();
+	}
+	
+	public void showZoneTable(boolean show){
+		
+		if(show == showTableZone){
+			return;
+		}
+		
+		showTableZone = show;
+		showTables();
+	}
+	
 	
 	public void addAction(){
 		
@@ -97,6 +170,7 @@ public class ILStructureGroupPane
 	}
 	
 	public void deleteAction(int index){
+		
 		tableInternal.removeRow(index);
 		tableExternal.removeRow(index);
     	tableOperation.removeRow(index);
@@ -135,17 +209,25 @@ public class ILStructureGroupPane
 	
 	private void setRowNames(){
 		
+		tableInternal.getTable().getModel().setRowName(0, "");
+		tableExternal.getTable().getModel().setRowName(0, "");
+    	tableOperation.getTable().getModel().setRowName(0, "");
+    	tableZone.getTable().getModel().setRowName(0, "");
+    	
 		tableInternal.getTable().getModel().setRowName(1, "Initial");
 		tableExternal.getTable().getModel().setRowName(1, "Initial");
     	tableOperation.getTable().getModel().setRowName(1, "Initial");
     	tableZone.getTable().getModel().setRowName(1, "Initial");
     	
     	String rowName = "Action";
-    	for(int i = 1; i < tableInternal.getRowCount(); i++ ){
-    		tableInternal.getTable().getModel().setRowName(i, rowName + i);
-    		tableExternal.getTable().getModel().setRowName(i, rowName + i);
-    		tableOperation.getTable().getModel().setRowName(i, rowName + i);
-    		tableZone.getTable().getModel().setRowName(i, rowName + i);
+    	int row;
+    	for(int i = 2; i < tableInternal.getRowCount(); i++ ){
+    		row = i - 1;
+    		
+    		tableInternal.getTable().getModel().setRowName(i, rowName + row);
+    		tableExternal.getTable().getModel().setRowName(i, rowName + row);
+    		tableOperation.getTable().getModel().setRowName(i, rowName + row);
+    		tableZone.getTable().getModel().setRowName(i, rowName + row);
     	}
     	
     	tableInternal.getTable().getModel().fireTableStructureChanged();

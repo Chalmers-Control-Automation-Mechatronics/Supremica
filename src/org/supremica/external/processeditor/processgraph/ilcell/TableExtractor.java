@@ -37,9 +37,9 @@ public class TableExtractor {
 		
 		for(int col = 0; col < numberOfComponents; col++){
 			extComp = factory.createExternalComponent();
-			
-			extComp.setMachine(table.getColumnName(col));
-			extComp.setComponent(table.getValueAt(TYPE_ROW,col).toString());
+		
+			extComp.setComponent(table.getColumnName(col));
+			extComp.setMachine(table.getValueAt(TYPE_ROW,col).toString());
 			
 			extComponents.getExternalComponent().add(extComp);
 		}
@@ -145,13 +145,6 @@ public class TableExtractor {
 		}
 		return ops;
 	}
-	
-	
-	
-	
-	
-	
-	
 	
 	public static Term[] getTerms(BasicTablePane tableInternal, 
 					   BasicTablePane tableExternal,
@@ -273,9 +266,6 @@ public class TableExtractor {
 		
 		/*
 		 * Add information from zoneTable
-		 * Actuator
-		 * Sensor
-		 * Variable
 		 */
 		numberOfColumns = tableZone.getColumnCount();
 		if(numberOfColumns == 2){
@@ -287,7 +277,6 @@ public class TableExtractor {
 				for(int z = 0; z < zones.length; z++){
 					beforeZones.getZone().add(zones[z]);
 				}
-				
 				
 				afterZones = factory.createAfterZones();
 				zones = tableZone.getValueAt(row, 1).toString().split(",");
@@ -304,6 +293,46 @@ public class TableExtractor {
 			}	
 		}
 		//----------------------------------------------------------------------------------------//
+		
+		
+		OperationCheck opCheck = null;
+		NotOngoing notOngoing = null;
+		NotStarted notStarted = null;
+		
+		/*
+		 * Add information from operationTable
+		 */
+		numberOfColumns = tableOperation.getColumnCount();
+		if(numberOfColumns == 2){
+			for(int i = 0; i < terms.length; i++){
+				row = i + 1;
+				
+				//not started operations
+				notStarted = factory.createNotStarted();
+				String[] operations = tableOperation.getValueAt(row, 0).toString().split(",");
+				for(int op = 0; op < operations.length; op++){
+					notStarted.getOperation().add(operations[op]);
+				}
+				
+				//not ongoing operations
+				notOngoing = factory.createNotOngoing();
+				operations = tableOperation.getValueAt(row, 1).toString().split(",");
+				for(int op = 0; op < operations.length; op++){
+					notOngoing.getOperation().add(operations[op]);
+				}
+				
+				opCheck = factory.createOperationCheck();
+				opCheck.setNotStarted(notStarted);
+				opCheck.setNotOngoing(notOngoing);
+				
+				//add to term
+				terms[i].getOperationCheck().add(opCheck);
+			}	
+		}
+		//----------------------------------------------------------------------------------------//
+		
+		
+		
 		
 		return terms;
 	}
