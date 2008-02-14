@@ -22,9 +22,6 @@ public class DataTablePane
 	private JButton jbRemove;
 	private JButton jbFromFile;
 	
-	private int xSize = 50;
-	private int ySize = 50;
-	
 	private BasicTable table;
 	private JFileChooser fc;
 	
@@ -42,6 +39,8 @@ public class DataTablePane
 		jbRemove.addActionListener(this); 
 		jbFromFile.addActionListener(this);
 		
+		jbFromFile.setEnabled(false);
+		
 		buttonPanel.add(jbAdd);
 		buttonPanel.add(Box.createRigidArea(new Dimension(1,10)));
 		buttonPanel.add(jbRemove);	    	    	   
@@ -49,18 +48,17 @@ public class DataTablePane
 		buttonPanel.add(jbFromFile);
      
 		table = new BasicTable();
+		table.initColumnSizes();
 		
 		table.setShowHorizontalLines(true);  
 		table.setShowVerticalLines(true); 
-    
-		table.setSize(((xSize*4)/5),ySize);
+		
 		table.setRowHeight(20);
     	    
 		JScrollPane scrollPane = new JScrollPane(table);	    	    	    
     
 		add(scrollPane, BorderLayout.CENTER);
-		add(buttonPanel, BorderLayout.EAST);	    
-		setSize(xSize, ySize);	   
+		add(buttonPanel, BorderLayout.EAST);
 	}
 	
 	public BasicTable getTable(){

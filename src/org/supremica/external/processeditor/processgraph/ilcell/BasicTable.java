@@ -16,7 +16,7 @@ public class BasicTable
 	private BasicTableModel tableModel = null;
 	private TableListener tableListener = null;
 	
-	BasicTable(){
+	public BasicTable(){
 		super();
 		tableModel = new BasicTableModel();
 		setModel(tableModel);
@@ -111,6 +111,10 @@ public class BasicTable
 		if(tableListener != null){
 			tableListener.columnRemoved(new TableEvent(this));
 		}
+	}
+	
+	public int findColumn(String name){
+		return tableModel.findColumn(name);
 	}
 	
 	public void addTableListener(TableListener l){

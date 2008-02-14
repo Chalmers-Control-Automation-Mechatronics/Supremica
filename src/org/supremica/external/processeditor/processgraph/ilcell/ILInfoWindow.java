@@ -1,14 +1,10 @@
 package org.supremica.external.processeditor.processgraph.ilcell;
 
-import java.util.*;
+
 import javax.swing.*;
-import javax.swing.table.*;
-import javax.swing.event.*;
-import javax.swing.border.*;
-import java.text.*;
+
 import java.awt.*;
 import java.awt.event.*;
-import java.awt.Font.*;
 import java.io.*;
 
 import org.supremica.manufacturingTables.xsd.il.*;
@@ -24,10 +20,10 @@ public class ILInfoWindow
 						implements 
 							ActionListener 
 { 
-    private JButton jbOk, jbCancel;
+    private JButton jbOk, jbCancel, jbCondition;
     
-    private TextInputPane topPanel;
-    private JPanel bottomPanel;
+    private TextInputPane textInputPane;
+    private JPanel topPanel, bottomPanel;
     
     private ILStructureGroupPane tableGroup;
     
@@ -40,10 +36,12 @@ public class ILInfoWindow
     
     private ObjectFactory factory = new ObjectFactory();
     
-    private JMenuItem jmiSave, jmiSaveAs;
+    private JMenuItem jmiSave, jmiSaveAs, jmiOpen;
     
     private JCheckBoxMenuItem jcbmiShowInt, jcbmiShowExt,
-    						  jcbmiShowOperation, jcbmiShowZone;
+    						  jcbmiShowOperation, jcbmiShowZone,
+    						  jcbmiShowMode, jcbmiShowProduct,
+    						  jcbmiShowRowHeader;
     
     private File file = null; 
     private JFileChooser fc = null;
@@ -82,25 +80,46 @@ public class ILInfoWindow
     	
     	tableGroup = new ILStructureGroupPane(il.getILStructure());
     	
+    	bottomPanel.add(jbCondition = new JButton("New condition"));
     	bottomPanel.add(jbOk = new JButton("OK")); 	    	    	    	    
     	bottomPanel.add(jbCancel = new JButton("Cancel"));	    
     	
+    	
     	jbOk.addActionListener(this);
     	jbCancel.addActionListener(this);
+    	jbCondition.addActionListener(this);
     	
-    	topPanel = new TextInputPane("InterLock", new String[]{ID,COMMENT,ACTUATOR,OPERATION});
+    	textInputPane = new TextInputPane(null, new String[]{ID,COMMENT,ACTUATOR,OPERATION});
     	
-    	topPanel.setText(ID, il.getId());
-    	topPanel.setText(COMMENT, il.getComment());
-    	topPanel.setText(ACTUATOR, il.getActuator());
-    	topPanel.setText(OPERATION, il.getOperation());
+    	textInputPane.setText(ID, il.getId());
+    	textInputPane.setText(COMMENT, il.getComment());
+    	textInputPane.setText(ACTUATOR, il.getActuator());
+    	textInputPane.setText(OPERATION, il.getOperation());
+    	
+    	topPanel = new JPanel();
+    	topPanel.setLayout(new BorderLayout());
+    	topPanel.setBorder(BorderFactory.createTitledBorder("InterLock"));
+    	
+    	topPanel.add(textInputPane, BorderLayout.LINE_START);
+    	
+    	initMenu();
+    	
+    	//sync tableGroup with the menu
+    	tableGroup.showInternalTable(jcbmiShowInt.isSelected());
+    	tableGroup.showExternalTable(jcbmiShowExt.isSelected());
+    	tableGroup.showOperationTable(jcbmiShowOperation.isSelected());
+    	tableGroup.showZoneTable(jcbmiShowZone.isSelected());
+    	tableGroup.showModeTable(jcbmiShowMode.isSelected());
+    	tableGroup.showProductTable(jcbmiShowProduct.isSelected());
+    	tableGroup.setRowHeaderVisible(jcbmiShowRowHeader.isSelected());
+    	
     	
     	getContentPane().add(topPanel, BorderLayout.PAGE_START);
     	getContentPane().add(tableGroup, BorderLayout.CENTER);
     	getContentPane().add(bottomPanel, BorderLayout.PAGE_END);
     	
-    	initMenu();
-    
+    	
+    	
     	pack();
     	
     	setLocation((Toolkit.getDefaultToolkit().getScreenSize().width-getWidth())/2,
@@ -108,23 +127,26 @@ public class ILInfoWindow
     }
     
     protected void initMenu(){
+    	
     	//menu bar
     	JMenuBar menuBar = new JMenuBar();
-    	setJMenuBar(menuBar);
-    
+    	
     	//file menu
     	JMenu fileMenu = new JMenu("File");
     	
     	jmiSave = new JMenuItem("Save");
     	jmiSaveAs = new JMenuItem("Save as");
+    	jmiOpen = new JMenuItem("Open");
     	
     	jmiSave.setAccelerator(KeyStroke.getKeyStroke('S', ActionEvent.CTRL_MASK));
     	
     	jmiSave.addActionListener(this);
     	jmiSaveAs.addActionListener(this);
+    	jmiOpen.addActionListener(this);
     	
     	fileMenu.add(jmiSave);
     	fileMenu.add(jmiSaveAs);
+    	fileMenu.add(jmiOpen);
     	menuBar.add(fileMenu);
     	
     	//table menu
@@ -139,22 +161,46 @@ public class ILInfoWindow
     	jcbmiShowOperation = new JCheckBoxMenuItem("Operation");
     	jcbmiShowZone = new JCheckBoxMenuItem("Zone");
     	
+    	jcbmiShowMode = new JCheckBoxMenuItem("Mode");
+    	jcbmiShowProduct = new JCheckBoxMenuItem("Product");
+    	
+    	jcbmiShowRowHeader = new JCheckBoxMenuItem("Row header");
+    	
+    	
     	jcbmiShowInt.setSelected(true);
     	jcbmiShowExt.setSelected(true);
-    	jcbmiShowOperation.setSelected(true);
     	jcbmiShowZone.setSelected(true);
+    	jcbmiShowOperation.setSelected(true);
     	
+    	jcbmiShowMode.setSelected(false);
+    	jcbmiShowProduct.setSelected(false);
+    	
+    	jcbmiShowRowHeader.setSelected(false);
     	
     	jcbmiShowInt.addActionListener(this);
     	jcbmiShowExt.addActionListener(this);
     	jcbmiShowOperation.addActionListener(this);
     	jcbmiShowZone.addActionListener(this);
+    	jcbmiShowMode.addActionListener(this);
+    	jcbmiShowProduct.addActionListener(this);
+    	jcbmiShowRowHeader.addActionListener(this);
+    	
+    	showMenu.add(jcbmiShowMode);
+    	showMenu.add(jcbmiShowProduct);
+    	
+    	
+    	showMenu.addSeparator();
     	
     	showMenu.add(jcbmiShowInt);
     	showMenu.add(jcbmiShowExt);
     	showMenu.add(jcbmiShowOperation);
     	showMenu.add(jcbmiShowZone);
     	
+    	showMenu.addSeparator();
+    	
+    	showMenu.add(jcbmiShowRowHeader);
+    	
+    	setJMenuBar(menuBar);
     }
     
     public void setFile(File file){
@@ -169,7 +215,7 @@ public class ILInfoWindow
     	updateIL();
     	
     	Loader loader = new Loader();
-		loader.save(il, file);
+		loader.saveIL(il, file);
     }
     
     public void saveAs(){
@@ -196,17 +242,80 @@ public class ILInfoWindow
         fc.setFileSelectionMode(tmp);
     }
     
+    public void open(){
+    	
+    	File tmpFile = null;
+    	Loader loader = null;
+    	Object o = null;
+    	
+    	if(fc == null){
+			fc = new JFileChooser();
+		}
+		
+        //store selection mode
+        int tmp = fc.getFileSelectionMode();
+        
+        //set selection mode
+        fc.setFileSelectionMode(JFileChooser.FILES_ONLY);
+        
+    	int returnVal = fc.showOpenDialog(this);
+
+        if( returnVal == JFileChooser.APPROVE_OPTION ){
+        	tmpFile = fc.getSelectedFile();
+        }
+        
+        //restore selection mode
+        fc.setFileSelectionMode(tmp);
+        
+        //open file
+        loader = new Loader();
+        o = loader.openIL(tmpFile);
+        
+        if(o instanceof IL){
+        	file = tmpFile;
+        	il = (IL) o;
+        	
+        	textInputPane.setText(ID, il.getId());
+        	textInputPane.setText(COMMENT, il.getComment());
+        	textInputPane.setText(ACTUATOR, il.getActuator());
+        	textInputPane.setText(OPERATION, il.getOperation());
+        	
+        	getContentPane().remove(tableGroup);
+        	tableGroup = new ILStructureGroupPane(il.getILStructure());
+        	
+        	//sync tableGroup with the menu
+        	tableGroup.showInternalTable(jcbmiShowInt.isSelected());
+        	tableGroup.showExternalTable(jcbmiShowExt.isSelected());
+        	tableGroup.showOperationTable(jcbmiShowOperation.isSelected());
+        	tableGroup.showZoneTable(jcbmiShowZone.isSelected());
+        	tableGroup.showModeTable(jcbmiShowMode.isSelected());
+        	tableGroup.showProductTable(jcbmiShowProduct.isSelected());
+        	tableGroup.setRowHeaderVisible(jcbmiShowRowHeader.isSelected());
+        	
+        	getContentPane().add(tableGroup);
+        	
+        	validate();
+        }else{
+        	;
+        }
+        
+    }
+    
     private void updateIL(){
-    	il.setId(topPanel.getText(ID));
-		il.setActuator(topPanel.getText(ACTUATOR));
-		il.setComment(topPanel.getText(COMMENT));
-		il.setOperation(topPanel.getText(OPERATION));
+    	il.setId(textInputPane.getText(ID));
+		il.setActuator(textInputPane.getText(ACTUATOR));
+		il.setComment(textInputPane.getText(COMMENT));
+		il.setOperation(textInputPane.getText(OPERATION));
 		
 		ILStructure ils = ((ILStructureGroupPane)tableGroup).getILStructure();
 		il.setILStructure(ils);
     }
     
     public void actionPerformed(ActionEvent e){
+    	
+    	//---------------------------------------
+    	//	Buttons
+    	//--------------------------------------
     	if( e.getSource().equals(jbOk) ){
     		updateIL();
     		setVisible(false);
@@ -214,25 +323,41 @@ public class ILInfoWindow
     	}else if(e.getSource().equals(jbCancel)){
     		setVisible(false);
     		dispose();
+    	}else if(e.getSource().equals(jbCondition)){
+    		tableGroup.addConditionRow();
     	}
     	
+    	//-------------------------------------------
+    	//	MenuItems
+    	//-------------------------------------------
     	if(e.getSource() instanceof JMenuItem){
-    		if( e.getSource().equals(jmiSave) ){
+    		if( e.getSource().equals( jmiSave) ){
     			save();
-    		}else if( e.getSource().equals(jmiSaveAs )){
+    		}else if( e.getSource().equals( jmiSaveAs )){
     			saveAs();
-    		}else if( e.getSource().equals(jcbmiShowInt )){
+    		}else if( e.getSource().equals( jmiOpen )){
+    			open();
+    		}else if( e.getSource().equals( jcbmiShowInt )){
     			tableGroup.
-    				showInternalTable(jcbmiShowInt.isSelected());
-    		}else if( e.getSource().equals(jcbmiShowExt )){
+    				showInternalTable( jcbmiShowInt.isSelected() );
+    		}else if( e.getSource().equals( jcbmiShowExt )){
     			tableGroup.
-					showExternalTable(jcbmiShowExt.isSelected());
+					showExternalTable( jcbmiShowExt.isSelected() );
     		}else if( e.getSource().equals( jcbmiShowOperation )){
     			tableGroup.
-					showOperationTable(jcbmiShowOperation.isSelected());
+					showOperationTable( jcbmiShowOperation.isSelected() );
     		}else if( e.getSource().equals( jcbmiShowZone )){
     			tableGroup.
-    				showZoneTable(jcbmiShowZone.isSelected());
+    				showZoneTable( jcbmiShowZone.isSelected() );
+    		}else if( e.getSource().equals( jcbmiShowMode )){
+    			tableGroup.
+					showModeTable(jcbmiShowMode.isSelected());
+    		}else if( e.getSource().equals( jcbmiShowProduct )){
+    			tableGroup.
+    				showProductTable( jcbmiShowProduct.isSelected() );
+    		}else if( e.getSource().equals( jcbmiShowRowHeader )){
+    			tableGroup.
+    				setRowHeaderVisible( jcbmiShowRowHeader.isSelected() );
     		}
     	}
 	}
@@ -247,29 +372,8 @@ public class ILInfoWindow
     	ObjectFactory factory = new ObjectFactory();
     	IL il = factory.createIL();
     	
-    	il.setId("152Y18");
-    	il.setComment("go to work position");
-    	il.setOperation("FIX152");
-    	il.setActuator("152Y18YE2");
-    	
-    	//internal components
-    	il.setILStructure(factory.createILStructure());
-    	il.getILStructure().setInternalComponents(factory.createInternalComponents());
-    	
-    	il.getILStructure().getInternalComponents().getActuator().add("A1");
-    	il.getILStructure().getInternalComponents().getActuator().add("A2");
-    	
-    	il.getILStructure().getInternalComponents().getSensor().add("S1");
-    	il.getILStructure().getInternalComponents().getSensor().add("S2");
-    	
-    	il.getILStructure().getInternalComponents().getVariable().add("V1");
-    	il.getILStructure().getInternalComponents().getVariable().add("V2");
-    	
     	ILInfoWindow ilInfoWin = new ILInfoWindow(il);
     	ilInfoWin.setVisible(true);
-        
-        //Loader loader = new Loader();
-		//loader.save(il, new File("iltest.xml"));
     }
 
     public static void main(String[] args) {
@@ -278,6 +382,9 @@ public class ILInfoWindow
         //creating and showing this application's GUI.
         javax.swing.SwingUtilities.invokeLater(new Runnable() {
             public void run() {
+            	try {
+            		UIManager.setLookAndFeel("com.sun.java.swing.plaf.windows.WindowsLookAndFeel");
+            	}catch(Exception ex) {}
                 createAndShowGUI();
             }
         });

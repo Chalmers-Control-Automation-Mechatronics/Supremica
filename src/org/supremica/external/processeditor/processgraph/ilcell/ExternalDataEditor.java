@@ -37,7 +37,7 @@ public class ExternalDataEditor
 		
 		tablePane.getTable().addCol("Component");
 		tablePane.getTable().addCol("Machine");
-		tablePane.getTable().addCol("Values");
+		tablePane.getTable().addCol("Value set");
 		tablePane.getTable().initColumnSizes();
 		
 		fillTable(externalTable.getTable());
@@ -63,7 +63,7 @@ public class ExternalDataEditor
 		
 		getContentPane().add(buttonPane, BorderLayout.SOUTH);
 		
-		pack();
+		setSize(350,500);
 	}
 	
 	private void fillTable(BasicTable table){
@@ -98,6 +98,11 @@ public class ExternalDataEditor
 				}
 			}
 		}
+		
+		//Add some empty rows
+		tablePane.getTable().addRow("");
+		tablePane.getTable().addRow("");
+		tablePane.getTable().addRow("");
 	}
 	
 	private void updateExternalTable(){

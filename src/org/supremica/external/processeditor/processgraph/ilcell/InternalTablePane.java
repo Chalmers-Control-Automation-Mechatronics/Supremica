@@ -5,20 +5,25 @@ import javax.swing.JComboBox;
 import javax.swing.JTextField;
 import javax.swing.JTable;
 import java.awt.Component;
+import java.awt.Point;
 import javax.swing.BorderFactory;
 import java.awt.Color;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseListener;
 import java.awt.event.ActionEvent;
+import java.awt.event.MouseEvent;
 import java.util.List;
 import java.util.LinkedList;
 
 import org.supremica.manufacturingTables.xsd.il.InternalComponents;
+import org.supremica.manufacturingTables.xsd.il.Term;
 
 public class InternalTablePane 
 						extends 
 							BasicTablePane
 						implements
-							ActionListener
+							ActionListener,
+							MouseListener
 {
 	public static final String ACTUATOR = "Actuator";
 	public static final String VARIABLE = "Variable";
@@ -31,12 +36,11 @@ public class InternalTablePane
 		super();
 		setHeader("Internal components state");
 		
-		tableHeader.addActionListener(this);
+		jbTableHeader.addActionListener(this);
+		jbTableHeader.addMouseListener(this);
 		
-		//Add default rows
-		addRow("");
-		addRow("Initial");
-		addRow("Action1");
+		//first row not editable
+		table.getModel().setRowEditable(0, false);
 		
 		comboBoxList = new LinkedList<JComboBox>();
 		
@@ -45,6 +49,7 @@ public class InternalTablePane
 			return;
 		}
 		
+		//Add columns
 		List<String> stringList = internalComponents.getActuator();
 		for(String actuator : stringList){
 			addActuator(actuator);
@@ -59,10 +64,17 @@ public class InternalTablePane
 		for(String sensor : stringList){
 			addSensor(sensor);
 		}
+		setUpTypeRow();
+	}
+	
+	public void insertTerms(List<Term> termList){
+		for(Term term : termList){
+			ILTableFiller.insertInternalConditionFromTermToTable(term, table);
+		}
 	}
 	
 	public InternalComponents getInternalComponents(){
-		return TableExtractor.getInternalComponentsFromTable(table);
+		return ILTableExtractor.getInternalComponentsFromTable(table);
 	}
 	
 	private void setUpTypeRow() {
@@ -140,7 +152,7 @@ public class InternalTablePane
 		Object previousValue;
 		
 		//copy last row data to next row
-		if(numberOfRows > 1){
+		if(numberOfRows > 2){
 			for(int col = 0; col < getColumnCount(); col++){
 				previousValue = getValueAt(numberOfRows - 2, col);
 				getTable().setValueAt(previousValue, numberOfRows - 1, col);
@@ -153,13 +165,39 @@ public class InternalTablePane
 	// --- ActionListener ---
 	public void actionPerformed(ActionEvent e) {
         Object o = e.getSource();
-        if(o == tableHeader){
+        if(o == jbTableHeader){
+        	Point pos =  jbTableHeader.getLocationOnScreen();
+        	
         	editor = new InternalDataEditor(this);
+        	pos.translate( 0, -editor.getHeight()/2 );
+        	
+        	if(pos.y < 0){
+        		pos.translate( 0, editor.getHeight()/2 );
+        	}
+        	
+        	editor.setLocation(pos);     	
         	editor.setVisible(true);
 		}else{
         	System.err.println("unknown source " + o);
         }
     }
+	
+	/* --- MouseListener --- */
+    public void mouseClicked(MouseEvent e){}
+    public void mouseEntered(MouseEvent e){
+    	if(e.getSource().equals(jbTableHeader)){
+    		jbTableHeader.setContentAreaFilled(true);
+    		jbTableHeader.setBorderPainted(true);
+    	}
+    }
+    public void mouseExited(MouseEvent e){
+    	if(e.getSource().equals(jbTableHeader)){
+    		jbTableHeader.setContentAreaFilled(false);
+    		jbTableHeader.setBorderPainted(false);
+    	}
+    } 
+    public void mousePressed(MouseEvent e){}
+    public void mouseReleased(MouseEvent e){}
 }
 
 

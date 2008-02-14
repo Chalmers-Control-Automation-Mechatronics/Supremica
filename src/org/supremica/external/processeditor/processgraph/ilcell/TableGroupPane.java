@@ -18,7 +18,8 @@ public class TableGroupPane
 						implements
 							TableListener,
 							ActionListener,
-							MouseListener
+							MouseListener,
+							KeyListener
 {
 	private Object[] rowTableCopy = null;
 	private String rowCopyName = null;
@@ -53,6 +54,7 @@ public class TableGroupPane
 		c.gridy = 0;
 		
 		table.addtableListener(this);
+		table.addKeyListener(this);
 		
 		add(table, c);
 	}
@@ -132,18 +134,15 @@ public class TableGroupPane
 	public void columnRemoved(TableEvent e){};
 	public void rowRemoved(TableEvent e){};
 	//--- End TableListener ---- //
-	
-	
+
+	// --- KeyListener ---
+	public void keyPressed(KeyEvent e){} 
+    public void keyReleased(KeyEvent e){}
+    public void keyTyped(KeyEvent e){}
 	
 	/* Handel popup menu */
 	protected void makePopupMenu(){
-		// Create some menu items for the popup
-		JMenuItem menuEdit = new JMenuItem( "New row" );
-	
-		popupMenu.add( menuEdit );
-		
-		menuEdit.addActionListener( this );
-		
+		//override this to make pop-up-menu
 		// Action and mouse listener support
 		enableEvents( AWTEvent.MOUSE_EVENT_MASK );
 	}

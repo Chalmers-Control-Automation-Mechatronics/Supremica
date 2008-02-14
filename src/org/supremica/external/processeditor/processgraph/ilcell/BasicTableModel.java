@@ -8,11 +8,12 @@ public class BasicTableModel
 						extends 
 							AbstractTableModel
 {
-	private List<String> columnNames;
-	private List<String> rowNames;
+	private List<String> columnNames = null;
+	private List<String> rowNames = null;
 	
-	private List<List<Object>> dataList;
-
+	private List<List<Object>> dataList = null;
+	private List<Integer> noEditableRowList = null;
+	
 	public BasicTableModel(){
 		
 		columnNames = new LinkedList<String>();
@@ -56,12 +57,41 @@ public class BasicTableModel
 		return getValueAt(0, c).getClass();
 	}
 
+	public void setRowEditable(int row, boolean editable){
+		
+		if(noEditableRowList == null){
+			noEditableRowList = new LinkedList<Integer>();
+			if(!editable){
+				noEditableRowList.add(row);
+			}
+			return;
+		}
+		
+		if(editable){
+			//try to remove from list
+			noEditableRowList.remove(new Integer(row));
+		}else{
+			//add to list
+			if(!noEditableRowList.contains(new Integer(row))){
+				noEditableRowList.add(row);
+			}
+		}
+	}
+	
 	/*
 	 * Don't need to implement this method unless your table's
 	 * editable.
 	 */
-
 	public boolean isCellEditable(int row, int col) {
+		
+		if(noEditableRowList == null){
+			return true;
+		}
+		
+		if(noEditableRowList.contains(new Integer(row))){
+			return false;
+		}
+		
 		return true;
 	}
 

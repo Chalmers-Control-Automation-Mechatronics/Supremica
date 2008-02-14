@@ -19,7 +19,9 @@ public class InterLockCell
 	public InterLockCell(){
 		super("IL");
 		setLayout(null);
+		
 		setBorder(BorderFactory.createLineBorder(Color.black));
+		
 		il = (new ObjectFactory()).createIL();
 	}
 	

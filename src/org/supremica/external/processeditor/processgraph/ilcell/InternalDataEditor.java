@@ -2,7 +2,6 @@ package org.supremica.external.processeditor.processgraph.ilcell;
 
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
-import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import javax.swing.table.TableColumn;
@@ -34,7 +33,7 @@ public class InternalDataEditor
 		
 		tablePane.getTable().addCol("Component");
 		tablePane.getTable().addCol("Type");
-		tablePane.getTable().addCol("Values");
+		tablePane.getTable().addCol("Value set");
 		tablePane.getTable().initColumnSizes();
 		
 		fillTable(internalTable.getTable());
@@ -69,7 +68,7 @@ public class InternalDataEditor
 		
 		getContentPane().add(buttonPane, BorderLayout.SOUTH);
 		
-		pack();
+		setSize(350,500);
 	}
 	
 	private void fillTable(BasicTable table){
@@ -104,6 +103,11 @@ public class InternalDataEditor
 				}
 			}
 		}
+		
+		//Add some empty rows
+		tablePane.getTable().addRow("");
+		tablePane.getTable().addRow("");
+		tablePane.getTable().addRow("");
 	}
 	
 	private void updateInternalTable(){

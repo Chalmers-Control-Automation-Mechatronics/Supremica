@@ -1,6 +1,9 @@
 package org.supremica.external.processeditor.processgraph.ilcell;
 
+import java.util.List;
+
 import org.supremica.manufacturingTables.xsd.il.Operations;
+import org.supremica.manufacturingTables.xsd.il.Term;
 
 public class OperationTablePane 
 						extends 
@@ -13,12 +16,19 @@ public class OperationTablePane
 		addCol("NOT started");
 		addCol("NOT ongoing");
 		
-		addRow("");
-		addRow("Initial");
-		addRow("Action1");
+		table.getModel().setRowEditable(0, false);
+
+		table.setValueAt("- # -", 0, 0);
+		table.setValueAt("- # -", 0, 1);
 	}
 	
 	public Operations getOperations(){
-		return TableExtractor.getOperationsFromTable(table);
+		return ILTableExtractor.getOperationsFromTable(table);
+	}
+	
+	public void insertTerms(List<Term> termList){
+		for(Term term : termList){
+			ILTableFiller.insertOperationConditionFromTermToTable(term, table);
+		}
 	}
 }

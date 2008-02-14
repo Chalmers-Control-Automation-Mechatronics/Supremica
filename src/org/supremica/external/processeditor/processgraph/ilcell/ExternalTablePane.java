@@ -2,8 +2,11 @@ package org.supremica.external.processeditor.processgraph.ilcell;
 
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -15,12 +18,14 @@ import javax.swing.JTextField;
 
 import org.supremica.manufacturingTables.xsd.il.ExternalComponents;
 import org.supremica.manufacturingTables.xsd.il.ExternalComponent;
+import org.supremica.manufacturingTables.xsd.il.Term;
 
 public class ExternalTablePane 
 						extends 
 							BasicTablePane
 						implements
-							ActionListener
+							ActionListener,
+							MouseListener
 {
 	private ExternalDataEditor editor = null;
 	private List<JComboBox> comboBoxList = null;
@@ -31,11 +36,10 @@ public class ExternalTablePane
 		
 		comboBoxList = new LinkedList<JComboBox>();
 		
-		tableHeader.addActionListener(this);
+		jbTableHeader.addActionListener(this);
+		jbTableHeader.addMouseListener(this);
 		
-		addRow("Type");
-		addRow("Initial");
-		addRow("Action1");
+		table.getModel().setRowEditable(0, false);
 		
 		if(externalComponents == null){
 			return;
@@ -47,11 +51,17 @@ public class ExternalTablePane
 	}
 	
 	public ExternalComponents getExternalComponents(){
-		return TableExtractor.getExternalComponentsFromTable(table);
+		return ILTableExtractor.getExternalComponentsFromTable(table);
 	}
 	
 	public void addExternalComponent(ExternalComponent component){
 		addExternalComponent(component, null);
+	}
+	
+	public void insertTerms(List<Term> termList){
+		for(Term term : termList){
+			ILTableFiller.insertExternalConditionFromTermToTable(term, table);
+		}
 	}
 	
 	public void addExternalComponent(ExternalComponent component, String[] values){
@@ -95,15 +105,43 @@ public class ExternalTablePane
 		setUpTypeRow();
 	}
 	
+	/* --- ActionListener --- */
 	public void actionPerformed(ActionEvent e) {
         Object o = e.getSource();
-        if(o == tableHeader){
+        if(o == jbTableHeader){
+        	Point pos =  jbTableHeader.getLocationOnScreen();
+        	
         	editor = new ExternalDataEditor(this);
+        	pos.translate( 0, -editor.getHeight()/2 );
+        	
+        	if(pos.y < 0){
+        		pos.translate( 0, editor.getHeight()/2 );
+        	}
+        	
+        	editor.setLocation(pos);     	
         	editor.setVisible(true);
+        	
 		}else{
         	System.err.println("unknown source " + o);
         }
     }
+	
+	/* --- MouseListener --- */
+    public void mouseClicked(MouseEvent e){}
+    public void mouseEntered(MouseEvent e){
+    	if(e.getSource().equals(jbTableHeader)){
+    		jbTableHeader.setContentAreaFilled(true);
+    		jbTableHeader.setBorderPainted(true);
+    	}
+    }
+    public void mouseExited(MouseEvent e){
+    	if(e.getSource().equals(jbTableHeader)){
+    		jbTableHeader.setContentAreaFilled(false);
+    		jbTableHeader.setBorderPainted(false);
+    	}
+    } 
+    public void mousePressed(MouseEvent e){}
+    public void mouseReleased(MouseEvent e){}
 }
 
 

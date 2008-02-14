@@ -1,12 +1,12 @@
 package org.supremica.external.processeditor.processgraph.ilcell;
 
-import java.awt.AWTEvent;
+import java.util.List;
 import java.awt.event.ActionEvent;
+import java.awt.event.KeyEvent;
 
 import javax.swing.JMenuItem;
 
-import java.util.List;
-import java.util.LinkedList;
+
 
 import org.supremica.manufacturingTables.xsd.il.*;
 
@@ -14,17 +14,28 @@ public class ILStructureGroupPane
 							extends 
 								TableGroupPane
 {
+	private static final String ROWNAME = "or"; 
+	
+	
+	ModeTablePane tableMode = null;
 	InternalTablePane tableInternal = null;
 	ExternalTablePane tableExternal = null;
 	OperationTablePane tableOperation = null;
 	ZoneTablePane tableZone = null;
+	ProductTablePane tableProduct = null;
 	
 	List<BasicTablePane> tableList = null;
 	
+	boolean showTableMode = true;
 	boolean showTableInternal = true;
 	boolean showTableExternal = true;
 	boolean showTableOperation = true;
 	boolean showTableZone = true;
+	boolean showTableProduct = true;
+	
+	boolean showRowHeader = true;
+	
+	private long timeStamp = 0;
 	
 	public ILStructureGroupPane(ILStructure ilStructure){
 		super();
@@ -33,20 +44,45 @@ public class ILStructureGroupPane
 			ilStructure = (new ObjectFactory()).createILStructure();
 		}
 		
+		tableMode = new ModeTablePane();
 		tableInternal = new InternalTablePane(ilStructure.getInternalComponents());
 		tableExternal = new ExternalTablePane(ilStructure.getExternalComponents());
     	tableOperation = new OperationTablePane();
     	tableZone = new ZoneTablePane();
+    	tableProduct = new ProductTablePane();
+    	
+    	addConditionRow(); //first row contain additional information
+    	addConditionRow(); //first condition row
+    	
+    	insertTerms(ilStructure.getTerm());
     	
     	setRowNames();
     	
     	showTables();
+    	
+	}
+	
+	public void insertTerms(List<Term> termList){
+		
+		tableMode.insertTerms(termList);
+		tableInternal.insertTerms(termList);
+		tableExternal.insertTerms(termList);
+		tableOperation.insertTerms(termList);
+		tableZone.insertTerms(termList);
+		tableProduct.insertTerms(termList);
 	}
 	
 	private void showTables(){
-		boolean rowHeader = true;
+		boolean rowHeader = showRowHeader;
 		
 		removeAll();
+		
+		if( showTableMode ){
+			tableMode.showRowHeader(rowHeader);
+			rowHeader = false;
+			
+			addTable(tableMode);
+		}
 		
 		if( showTableInternal ){
 			tableInternal.showRowHeader(rowHeader);
@@ -76,8 +112,25 @@ public class ILStructureGroupPane
 			addTable(tableZone);
 		}
 		
+		if( showTableProduct ){
+			
+			tableProduct.showRowHeader(rowHeader);
+			rowHeader = false;
+			
+			addTable(tableProduct);
+		}
+		
 		validate();
 		repaint();
+	}
+	
+	public void setRowHeaderVisible(boolean show){
+		if(showRowHeader == show){
+			return;
+		}
+		
+		showRowHeader = show;
+		showTables();
 	}
 	
 	public ILStructure getILStructure(){
@@ -116,7 +169,21 @@ public class ILStructureGroupPane
 	}
 	
 	public Term[] getTerms(){
-		return TableExtractor.getTerms(tableInternal, tableExternal, tableOperation, tableZone);
+		return ILTableExtractor.getTerms(tableMode.getTable(),
+										 tableInternal.getTable(),
+										 tableExternal.getTable(),
+										 tableOperation.getTable(),
+										 tableZone.getTable(),
+										 tableProduct.getTable());
+	}
+	
+	public void showModeTable(boolean show){
+		if(show == showTableMode){
+			return;
+		}
+		
+		showTableMode = show;
+		showTables();
 	}
 	
 	public void showInternalTable(boolean show){
@@ -158,49 +225,101 @@ public class ILStructureGroupPane
 		showTables();
 	}
 	
-	
-	public void addAction(){
+	public void showProductTable(boolean show){
+		if(show == showTableProduct){
+			return;
+		}
 		
-		String rowName = "Action" + Integer.toString(tableInternal.getRowCount() - 1); 
-			
-		tableInternal.addRow(rowName);
-		tableExternal.addRow(rowName);
-    	tableOperation.addRow(rowName);
-    	tableZone.addRow(rowName);
+		showTableProduct = show;
+		showTables();
 	}
 	
-	public void deleteAction(int index){
+	
+	public void addConditionRow(){
+		tableMode.addRow(ROWNAME);
+		tableInternal.addRow(ROWNAME);
+		tableExternal.addRow(ROWNAME);
+    	tableOperation.addRow(ROWNAME);
+    	tableZone.addRow(ROWNAME);
+    	tableProduct.addRow(ROWNAME);
+	}
+	
+	public void addConditionRow(Term term){
+		int row = -1;
 		
+		if(term == null){
+			return;
+		}
+		
+		row = term.getRow().intValue();
+		
+		//add empty rows until we reach this term row
+		while(tableInternal.getRowCount() < row){
+			addConditionRow();
+		}
+		
+		//tableInternal
+		
+	}
+	
+	
+	public void deleteConditionRow(int index){
+		
+		//don't remove type identifier row
+		if(index == 0){
+			return;
+		}
+		
+		//dont delete last condition row
+		if(tableMode.getRowCount() <= 2){
+			return;
+		}
+		
+		tableMode.removeRow(index);
 		tableInternal.removeRow(index);
 		tableExternal.removeRow(index);
     	tableOperation.removeRow(index);
     	tableZone.removeRow(index);
+    	tableProduct.removeRow(index);
     	
     	setRowNames();
 	}
 	
+	private void deleteSelectedRows(BasicTable table){
+		
+		int row = selectedRows[0];
+		
+		for(int i = 0; i < selectedRows.length; i++){
+			deleteConditionRow(selectedRows[i]);
+		}
+		
+		if(row >= table.getRowCount()){
+			row = table.getRowCount() - 1;
+		}
+		
+		table.getSelectionModel().setSelectionInterval(row, row);
+	}
+	
+	
 	protected void makePopupMenu(){
 		super.makePopupMenu();
 		// Create some menu items for the popup
-		JMenuItem menuEdit = new JMenuItem( "new Action" );
+		JMenuItem menuEdit = new JMenuItem( "add condition" );
 		popupMenu.add( menuEdit );
 		menuEdit.addActionListener( this );
 		
-		menuEdit = new JMenuItem( "remove Action" );
+		menuEdit = new JMenuItem( "remove condition" );
 		popupMenu.add( menuEdit );
 		menuEdit.addActionListener( this );
-	
-		// Action and mouse listener support
-		enableEvents( AWTEvent.MOUSE_EVENT_MASK );
 	}
 	
 	//override
 	public void actionPerformed( ActionEvent event ){
-		if(event.getActionCommand().equals("new Action")){
-			addAction();
-		}else if(event.getActionCommand().equals("remove Action")){
+		if(event.getActionCommand().equals("add condition")){
+			addConditionRow();
+		}else if(event.getActionCommand().equals("remove condition")){
 			for(int i = 0; i < selectedRows.length; i++){
-				deleteAction(selectedRows[i]);
+				deleteConditionRow(selectedRows[i]);
 			}
 		}else{
 			super.actionPerformed(event);
@@ -209,30 +328,59 @@ public class ILStructureGroupPane
 	
 	private void setRowNames(){
 		
+		tableMode.getTable().getModel().setRowName(0, "");
 		tableInternal.getTable().getModel().setRowName(0, "");
 		tableExternal.getTable().getModel().setRowName(0, "");
     	tableOperation.getTable().getModel().setRowName(0, "");
     	tableZone.getTable().getModel().setRowName(0, "");
+    	tableProduct.getTable().getModel().setRowName(0, "");
     	
-		tableInternal.getTable().getModel().setRowName(1, "Initial");
-		tableExternal.getTable().getModel().setRowName(1, "Initial");
-    	tableOperation.getTable().getModel().setRowName(1, "Initial");
-    	tableZone.getTable().getModel().setRowName(1, "Initial");
-    	
-    	String rowName = "Action";
-    	int row;
+    	tableMode.getTable().getModel().setRowName(1, "");
+		tableInternal.getTable().getModel().setRowName(1, "");
+		tableExternal.getTable().getModel().setRowName(1, "");
+    	tableOperation.getTable().getModel().setRowName(1, "");
+    	tableZone.getTable().getModel().setRowName(1, "");
+    	tableProduct.getTable().getModel().setRowName(1, "");
+ 
     	for(int i = 2; i < tableInternal.getRowCount(); i++ ){
-    		row = i - 1;
-    		
-    		tableInternal.getTable().getModel().setRowName(i, rowName + row);
-    		tableExternal.getTable().getModel().setRowName(i, rowName + row);
-    		tableOperation.getTable().getModel().setRowName(i, rowName + row);
-    		tableZone.getTable().getModel().setRowName(i, rowName + row);
+    		tableMode.getTable().getModel().setRowName(i, ROWNAME);
+    		tableInternal.getTable().getModel().setRowName(i, ROWNAME);
+    		tableExternal.getTable().getModel().setRowName(i, ROWNAME);
+    		tableOperation.getTable().getModel().setRowName(i, ROWNAME);
+    		tableZone.getTable().getModel().setRowName(i, ROWNAME);
+    		tableProduct.getTable().getModel().setRowName(i, ROWNAME);
     	}
     	
+    	tableMode.getTable().getModel().fireTableStructureChanged();
     	tableInternal.getTable().getModel().fireTableStructureChanged();
 		tableExternal.getTable().getModel().fireTableStructureChanged();
 		tableOperation.getTable().getModel().fireTableStructureChanged();
 		tableZone.getTable().getModel().fireTableStructureChanged();
+		tableProduct.getTable().getModel().fireTableStructureChanged();
+		
+	}
+	
+	//override
+	public void keyReleased(KeyEvent e){
+		
+		/*
+		 * All tables fire KeyEvent on same event
+		 * if we have a different time stamp it is a new event
+		 */
+		
+		if(timeStamp != e.getWhen()){
+			timeStamp = e.getWhen();
+			
+			if(e.getKeyCode() == KeyEvent.VK_DELETE){
+				if(e.getSource() instanceof BasicTable){
+					deleteSelectedRows((BasicTable) e.getSource());
+				}
+			}
+			
+			if(e.getKeyCode() == KeyEvent.VK_N &&
+					e.getModifiersEx() == KeyEvent.CTRL_DOWN_MASK){
+				addConditionRow();
+			}
+		}
 	}
 }
