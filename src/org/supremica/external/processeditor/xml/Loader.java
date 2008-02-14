@@ -29,6 +29,19 @@ public class Loader {
     	}
     }
     
+    public Object openIL(File file) {
+    	try {			
+    		jaxbContext = JAXBContext.newInstance(PKGS_IL);
+    		u = jaxbContext.createUnmarshaller();	    	    
+    		return load(file);
+    	}
+    	catch(JAXBException je) {
+    		je.printStackTrace();
+    	}
+    	return null;
+    }
+    
+    
     public Object open(String xmlStr, String PKGS) {	
     	
     	try {			
@@ -81,6 +94,24 @@ public class Loader {
     	return null;
     }
     
+    public void saveIL(Object o, File file){
+    	try {
+    		// Save IL		
+        	jaxbContext = JAXBContext.newInstance(PKGS_IL);    
+        	m = jaxbContext.createMarshaller();
+        	m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true); 
+    	    
+        	try {				
+        		m.marshal(o, new FileOutputStream(file));
+        	}catch (Exception ex) {		
+        		//System.out.println("ERROR! in FileOutputStrem " + PKGS_IL);	
+        	}
+    	}
+    	catch(JAXBException je) {
+    		je.printStackTrace();
+    	}
+    }
+    
     public void save(Object o, File file) {	
     	
     	try {
@@ -95,17 +126,6 @@ public class Loader {
     		}catch (Exception ex) {		
     			//System.out.println("ERROR! in FileOutputStrem " + PKGS);		
     		}
-    		
-    		// Save IL		
-        	jaxbContext = JAXBContext.newInstance(PKGS_IL);    
-        	m = jaxbContext.createMarshaller();
-        	m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true); 
-    	    
-        	try {				
-        		m.marshal(o, new FileOutputStream(file));
-        	}catch (Exception ex) {		
-        		//System.out.println("ERROR! in FileOutputStrem " + PKGS_IL);	
-        	}
     	}
     	catch(JAXBException je) {
     		je.printStackTrace();
