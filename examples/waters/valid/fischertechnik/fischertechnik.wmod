@@ -3,58 +3,75 @@
 <ConstantAliasList>
 <ConstantAlias>
 <SimpleIdentifier Name="STATION"/>
+<ConstantAliasExpression>
 <EnumSetExpression>
 <SimpleIdentifier Name="S1"/>
 <SimpleIdentifier Name="S2"/>
 <SimpleIdentifier Name="S3"/>
 <SimpleIdentifier Name="S4"/>
 </EnumSetExpression>
+</ConstantAliasExpression>
 </ConstantAlias>
 </ConstantAliasList>
 <EventDeclList>
 <EventDecl Kind="UNCONTROLLABLE" Name="L_at_X5">
+<RangeList>
 <BinaryExpression Operator="..">
 <IntConstant Value="1"/>
 <IntConstant Value="2"/>
 </BinaryExpression>
+</RangeList>
 </EventDecl>
 <EventDecl Kind="UNCONTROLLABLE" Name="L_at_X6">
+<RangeList>
 <BinaryExpression Operator="..">
 <IntConstant Value="1"/>
 <IntConstant Value="2"/>
 </BinaryExpression>
+</RangeList>
 </EventDecl>
 <EventDecl Kind="UNCONTROLLABLE" Name="L_at_X7">
+<RangeList>
 <BinaryExpression Operator="..">
 <IntConstant Value="1"/>
 <IntConstant Value="2"/>
 </BinaryExpression>
+</RangeList>
 </EventDecl>
 <EventDecl Kind="UNCONTROLLABLE" Name="L_at_X8">
+<RangeList>
 <BinaryExpression Operator="..">
 <IntConstant Value="2"/>
 <IntConstant Value="2"/>
 </BinaryExpression>
+</RangeList>
 </EventDecl>
 <EventDecl Kind="CONTROLLABLE" Name="L_drop_B2">
+<RangeList>
 <BinaryExpression Operator="..">
 <IntConstant Value="2"/>
 <IntConstant Value="2"/>
 </BinaryExpression>
+</RangeList>
 </EventDecl>
 <EventDecl Kind="CONTROLLABLE" Name="L_down">
+<RangeList>
 <BinaryExpression Operator="..">
 <IntConstant Value="1"/>
 <IntConstant Value="2"/>
 </BinaryExpression>
+</RangeList>
 </EventDecl>
 <EventDecl Kind="CONTROLLABLE" Name="L_up">
+<RangeList>
 <BinaryExpression Operator="..">
 <IntConstant Value="1"/>
 <IntConstant Value="2"/>
 </BinaryExpression>
+</RangeList>
 </EventDecl>
 <EventDecl Kind="CONTROLLABLE" Name="L_pickS">
+<RangeList>
 <EnumSetExpression>
 <SimpleIdentifier Name="S"/>
 <SimpleIdentifier Name="S1"/>
@@ -66,6 +83,7 @@
 <IntConstant Value="1"/>
 <IntConstant Value="2"/>
 </BinaryExpression>
+</RangeList>
 </EventDecl>
 <EventDecl Kind="UNCONTROLLABLE" Name="T_X1"/>
 <EventDecl Kind="UNCONTROLLABLE" Name="T_X2"/>
@@ -76,124 +94,163 @@
 <EventDecl Kind="UNCONTROLLABLE" Name="T_X7"/>
 <EventDecl Kind="UNCONTROLLABLE" Name="T_X8"/>
 <EventDecl Kind="CONTROLLABLE" Name="L_mag_on">
+<RangeList>
 <BinaryExpression Operator="..">
 <IntConstant Value="1"/>
 <IntConstant Value="2"/>
 </BinaryExpression>
+</RangeList>
 </EventDecl>
 <EventDecl Kind="CONTROLLABLE" Name="LED_on">
+<RangeList>
 <EnumSetExpression>
 <SimpleIdentifier Name="S1"/>
 <SimpleIdentifier Name="S2"/>
 <SimpleIdentifier Name="S3"/>
 <SimpleIdentifier Name="S4"/>
 </EnumSetExpression>
+</RangeList>
 </EventDecl>
 <EventDecl Kind="UNCONTROLLABLE" Name="LS_off_B1">
+<RangeList>
 <BinaryExpression Operator="..">
 <IntConstant Value="2"/>
 <IntConstant Value="2"/>
 </BinaryExpression>
+</RangeList>
 </EventDecl>
 <EventDecl Kind="CONTROLLABLE" Name="L_back">
+<RangeList>
 <BinaryExpression Operator="..">
 <IntConstant Value="1"/>
 <IntConstant Value="2"/>
 </BinaryExpression>
+</RangeList>
 </EventDecl>
 <EventDecl Kind="UNCONTROLLABLE" Name="TL_X1">
+<RangeList>
 <BinaryExpression Operator="..">
 <IntConstant Value="1"/>
 <IntConstant Value="1"/>
 </BinaryExpression>
+</RangeList>
 </EventDecl>
 <EventDecl Kind="UNCONTROLLABLE" Name="TL_Y1">
+<RangeList>
 <BinaryExpression Operator="..">
 <IntConstant Value="1"/>
 <IntConstant Value="2"/>
 </BinaryExpression>
+</RangeList>
 </EventDecl>
 <EventDecl Kind="UNCONTROLLABLE" Name="TL_Y2">
+<RangeList>
 <BinaryExpression Operator="..">
 <IntConstant Value="1"/>
 <IntConstant Value="2"/>
 </BinaryExpression>
+</RangeList>
 </EventDecl>
 <EventDecl Kind="UNCONTROLLABLE" Name="TL_X8">
+<RangeList>
 <BinaryExpression Operator="..">
 <IntConstant Value="2"/>
 <IntConstant Value="2"/>
 </BinaryExpression>
+</RangeList>
 </EventDecl>
 <EventDecl Kind="UNCONTROLLABLE" Name="TL_Y3">
+<RangeList>
 <BinaryExpression Operator="..">
 <IntConstant Value="1"/>
 <IntConstant Value="2"/>
 </BinaryExpression>
+</RangeList>
 </EventDecl>
 <EventDecl Kind="UNCONTROLLABLE" Name="LS_on_B1">
+<RangeList>
 <BinaryExpression Operator="..">
 <IntConstant Value="1"/>
 <IntConstant Value="2"/>
 </BinaryExpression>
+</RangeList>
 </EventDecl>
 <EventDecl Kind="UNCONTROLLABLE" Name="LS_on_B2">
+<RangeList>
 <BinaryExpression Operator="..">
 <IntConstant Value="1"/>
 <IntConstant Value="1"/>
 </BinaryExpression>
+</RangeList>
 </EventDecl>
 <EventDecl Kind="UNCONTROLLABLE" Name="TL_Z1">
+<RangeList>
 <BinaryExpression Operator="..">
 <IntConstant Value="1"/>
 <IntConstant Value="2"/>
 </BinaryExpression>
+</RangeList>
 </EventDecl>
 <EventDecl Kind="UNCONTROLLABLE" Name="TL_Z2">
+<RangeList>
 <BinaryExpression Operator="..">
 <IntConstant Value="1"/>
 <IntConstant Value="2"/>
 </BinaryExpression>
+</RangeList>
 </EventDecl>
 <EventDecl Kind="UNCONTROLLABLE" Name="LS1_off_B2">
+<RangeList>
 <BinaryExpression Operator="..">
 <IntConstant Value="1"/>
 <IntConstant Value="1"/>
 </BinaryExpression>
+</RangeList>
 </EventDecl>
 <EventDecl Kind="CONTROLLABLE" Name="L_right">
+<RangeList>
 <BinaryExpression Operator="..">
 <IntConstant Value="1"/>
 <IntConstant Value="2"/>
 </BinaryExpression>
+</RangeList>
 </EventDecl>
 <EventDecl Kind="CONTROLLABLE" Name="init_done"/>
 <EventDecl Kind="CONTROLLABLE" Name="B1_stop"/>
 <EventDecl Kind="CONTROLLABLE" Name="L_mX1">
+<RangeList>
 <BinaryExpression Operator="..">
 <IntConstant Value="1"/>
 <IntConstant Value="1"/>
 </BinaryExpression>
+</RangeList>
 </EventDecl>
 <EventDecl Kind="CONTROLLABLE" Name="L_mag_off">
+<RangeList>
 <BinaryExpression Operator="..">
 <IntConstant Value="1"/>
 <IntConstant Value="2"/>
 </BinaryExpression>
+</RangeList>
 </EventDecl>
 <EventDecl Kind="CONTROLLABLE" Name="L_mX2">
+<RangeList>
 <BinaryExpression Operator="..">
 <IntConstant Value="1"/>
 <IntConstant Value="2"/>
 </BinaryExpression>
+</RangeList>
 </EventDecl>
 <EventDecl Kind="CONTROLLABLE" Name="L_mX3">
+<RangeList>
 <BinaryExpression Operator="..">
 <IntConstant Value="1"/>
 <IntConstant Value="2"/>
 </BinaryExpression>
+</RangeList>
 </EventDecl>
 <EventDecl Kind="CONTROLLABLE" Name="L_dropS">
+<RangeList>
 <EnumSetExpression>
 <SimpleIdentifier Name="S"/>
 <SimpleIdentifier Name="S1"/>
@@ -205,122 +262,159 @@
 <IntConstant Value="1"/>
 <IntConstant Value="2"/>
 </BinaryExpression>
+</RangeList>
 </EventDecl>
 <EventDecl Kind="CONTROLLABLE" Name="L_mX4">
+<RangeList>
 <BinaryExpression Operator="..">
 <IntConstant Value="1"/>
 <IntConstant Value="2"/>
 </BinaryExpression>
+</RangeList>
 </EventDecl>
 <EventDecl Kind="CONTROLLABLE" Name="L_mX5">
+<RangeList>
 <BinaryExpression Operator="..">
 <IntConstant Value="1"/>
 <IntConstant Value="2"/>
 </BinaryExpression>
+</RangeList>
 </EventDecl>
 <EventDecl Kind="CONTROLLABLE" Name="L_mX6">
+<RangeList>
 <BinaryExpression Operator="..">
 <IntConstant Value="1"/>
 <IntConstant Value="2"/>
 </BinaryExpression>
+</RangeList>
 </EventDecl>
 <EventDecl Kind="CONTROLLABLE" Name="L_mY1">
+<RangeList>
 <BinaryExpression Operator="..">
 <IntConstant Value="1"/>
 <IntConstant Value="2"/>
 </BinaryExpression>
+</RangeList>
 </EventDecl>
 <EventDecl Kind="CONTROLLABLE" Name="L_mX7">
+<RangeList>
 <BinaryExpression Operator="..">
 <IntConstant Value="1"/>
 <IntConstant Value="2"/>
 </BinaryExpression>
+</RangeList>
 </EventDecl>
 <EventDecl Kind="CONTROLLABLE" Name="L_mY2">
+<RangeList>
 <BinaryExpression Operator="..">
 <IntConstant Value="1"/>
 <IntConstant Value="2"/>
 </BinaryExpression>
+</RangeList>
 </EventDecl>
 <EventDecl Kind="CONTROLLABLE" Name="L_mX8">
+<RangeList>
 <BinaryExpression Operator="..">
 <IntConstant Value="2"/>
 <IntConstant Value="2"/>
 </BinaryExpression>
+</RangeList>
 </EventDecl>
 <EventDecl Kind="CONTROLLABLE" Name="L_mY3">
+<RangeList>
 <BinaryExpression Operator="..">
 <IntConstant Value="1"/>
 <IntConstant Value="2"/>
 </BinaryExpression>
+</RangeList>
 </EventDecl>
 <EventDecl Kind="CONTROLLABLE" Name="init"/>
 <EventDecl Kind="CONTROLLABLE" Name="B1_start"/>
 <EventDecl Kind="CONTROLLABLE" Name="L_forward">
+<RangeList>
 <BinaryExpression Operator="..">
 <IntConstant Value="1"/>
 <IntConstant Value="2"/>
 </BinaryExpression>
+</RangeList>
 </EventDecl>
 <EventDecl Kind="CONTROLLABLE" Name="LED_off">
+<RangeList>
 <EnumSetExpression>
 <SimpleIdentifier Name="S1"/>
 <SimpleIdentifier Name="S2"/>
 <SimpleIdentifier Name="S3"/>
 <SimpleIdentifier Name="S4"/>
 </EnumSetExpression>
+</RangeList>
 </EventDecl>
 <EventDecl Kind="CONTROLLABLE" Name="L_left">
+<RangeList>
 <BinaryExpression Operator="..">
 <IntConstant Value="1"/>
 <IntConstant Value="2"/>
 </BinaryExpression>
+</RangeList>
 </EventDecl>
 <EventDecl Kind="CONTROLLABLE" Name="L_pick_B1">
+<RangeList>
 <BinaryExpression Operator="..">
 <IntConstant Value="1"/>
 <IntConstant Value="1"/>
 </BinaryExpression>
+</RangeList>
 </EventDecl>
 <EventDecl Kind="UNCONTROLLABLE" Name="LS_on">
+<RangeList>
 <EnumSetExpression>
 <SimpleIdentifier Name="S2"/>
 <SimpleIdentifier Name="S3"/>
 <SimpleIdentifier Name="S1"/>
 <SimpleIdentifier Name="S4"/>
 </EnumSetExpression>
+</RangeList>
 </EventDecl>
 <EventDecl Kind="UNCONTROLLABLE" Name="L_at_X1">
+<RangeList>
 <BinaryExpression Operator="..">
 <IntConstant Value="1"/>
 <IntConstant Value="1"/>
 </BinaryExpression>
+</RangeList>
 </EventDecl>
 <EventDecl Kind="UNCONTROLLABLE" Name="L_at_X2">
+<RangeList>
 <BinaryExpression Operator="..">
 <IntConstant Value="1"/>
 <IntConstant Value="2"/>
 </BinaryExpression>
+</RangeList>
 </EventDecl>
 <EventDecl Kind="UNCONTROLLABLE" Name="LS_off">
+<RangeList>
 <EnumSetExpression>
 <SimpleIdentifier Name="S2"/>
 <SimpleIdentifier Name="S3"/>
 <SimpleIdentifier Name="S1"/>
 <SimpleIdentifier Name="S4"/>
 </EnumSetExpression>
+</RangeList>
 </EventDecl>
 <EventDecl Kind="UNCONTROLLABLE" Name="L_at_X3">
+<RangeList>
 <BinaryExpression Operator="..">
 <IntConstant Value="1"/>
 <IntConstant Value="2"/>
 </BinaryExpression>
+</RangeList>
 </EventDecl>
 <EventDecl Kind="UNCONTROLLABLE" Name="L_at_X4">
+<RangeList>
 <BinaryExpression Operator="..">
 <IntConstant Value="1"/>
 <IntConstant Value="2"/>
 </BinaryExpression>
+</RangeList>
 </EventDecl>
 <EventDecl Kind="PROPOSITION" Name=":accepting"/>
 </EventDeclList>

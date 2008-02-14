@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   ModuleContext
 //###########################################################################
-//# $Id: ModuleContext.java,v 1.5 2007-12-12 23:57:49 robi Exp $
+//# $Id: ModuleContext.java,v 1.6 2008-02-14 02:24:09 robi Exp $
 //###########################################################################
 
 
@@ -19,7 +19,6 @@ import java.util.regex.Pattern;
 import javax.swing.ImageIcon;
 
 import net.sourceforge.waters.gui.language.ProxyNamer;
-import net.sourceforge.waters.model.base.IndexedList;
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.base.VisitorException;
 import net.sourceforge.waters.model.expr.ParseException;
@@ -38,6 +37,7 @@ import net.sourceforge.waters.subject.base.AbstractSubject;
 import net.sourceforge.waters.subject.base.ListSubject;
 import net.sourceforge.waters.subject.base.ModelChangeEvent;
 import net.sourceforge.waters.subject.base.ModelObserver;
+import net.sourceforge.waters.subject.base.ProxySubject;
 import net.sourceforge.waters.subject.base.Subject;
 import net.sourceforge.waters.subject.module.EventDeclSubject;
 import net.sourceforge.waters.subject.module.IdentifierSubject;
@@ -63,7 +63,6 @@ import net.sourceforge.waters.xsd.base.EventKind;
  */
 
 public class ModuleContext
-  implements ModelObserver
 {
 
   //#########################################################################
@@ -74,6 +73,10 @@ public class ModuleContext
     mCanDropVisitor = new CanDropVisitor();
     mIconGetterVisitor = new IconGetterVisitor();
     mToolTipGetterVisitor = new ToolTipGetterVisitor();
+    mEventDeclListWrapper =
+      new ListSubjectWrapper(module.getEventDeclListModifiable());
+    mComponentListWrapper =
+      new ListSubjectWrapper(module.getComponentListModifiable());
   }
 
 
@@ -367,89 +370,12 @@ public class ModuleContext
   //# Direct Access
   public EventDeclProxy getEventDecl(final String name)
   {
-    final IndexedList<EventDeclSubject> decls =
-      mModule.getEventDeclListModifiable();
-    return decls.get(name);
+    return (EventDeclProxy) mEventDeclListWrapper.get(name);
   }
 
   public IdentifiedProxy getComponent(final String name)
   {
-    final Map<String,IdentifiedProxy> map = getComponentMap();
-    return map.get(name);
-  }
-
-
-  //#########################################################################
-  //# Interface net.sourceforge.waters.subject.base.ModelObserver
-  public void modelChanged(final ModelChangeEvent event)
-  {
-    final Subject source = event.getSource();
-    final ListSubject<AbstractSubject> list =
-      mModule.getComponentListModifiable();
-    final Object value = event.getValue();
-    switch (event.getKind()) {
-    case ModelChangeEvent.ITEM_ADDED:
-      if (source == list && value instanceof IdentifiedProxy) {
-        final IdentifiedProxy comp = (IdentifiedProxy) value;
-        final IdentifierProxy ident = comp.getIdentifier();
-        if (ident instanceof SimpleIdentifierProxy) {
-          final String name = ident.getName();
-          if (!mComponentMap.containsKey(name)) {
-            mComponentMap.put(name, comp);
-          }
-        }
-      }
-      break;
-    case ModelChangeEvent.ITEM_REMOVED:
-      if (source == list && value instanceof IdentifiedProxy) {
-        final IdentifiedProxy comp = (IdentifiedProxy) value;
-        final IdentifierProxy ident = comp.getIdentifier();
-        if (ident instanceof SimpleIdentifierProxy) {
-          mComponentMap = null;
-          list.removeModelObserver(this);
-        }
-      }
-      break;
-    case ModelChangeEvent.STATE_CHANGED:
-      // Identifier and IdentifiedProxy objects fire STATE_CHANGED,
-      // not NAME_CHANGED ...
-      final Subject parent = source.getParent();
-      if (source instanceof IdentifiedProxy &&
-          parent == list ||
-          source instanceof SimpleIdentifierProxy &&
-          parent.getParent() == list) {
-        mComponentMap = null;
-        list.removeModelObserver(this);
-      }
-      break;
-    default:
-      break;
-    }
-  }
-
-
-  //#########################################################################
-  //# Auxiliary Methods
-  private Map<String,IdentifiedProxy> getComponentMap()
-  {
-    if (mComponentMap == null) { 
-      final ListSubject<AbstractSubject> list =
-        mModule.getComponentListModifiable();
-      final int size = list.size();
-      mComponentMap = new HashMap<String,IdentifiedProxy>(size);
-      for (final AbstractSubject subject : list) {
-        if (subject instanceof IdentifiedProxy) {
-          final IdentifiedProxy comp = (IdentifiedProxy) subject;
-          final IdentifierProxy ident = comp.getIdentifier();
-          if (ident instanceof SimpleIdentifierProxy) {
-            final String name = ident.getName();
-            mComponentMap.put(name, comp);
-          }
-        }
-      }
-      list.addModelObserver(this);
-    }
-    return mComponentMap;
+    return mComponentListWrapper.get(name);
   }
 
 
@@ -500,6 +426,102 @@ public class ModuleContext
     //#######################################################################
     //# Invocation
     public boolean isNameTaken(String name);
+
+  }
+
+
+  //#########################################################################
+  //# Inner Class ListSubjectWrapper
+  private class ListSubjectWrapper
+    implements ModelObserver
+  {
+
+    //#######################################################################
+    //# Constructor
+    private ListSubjectWrapper(final ListSubject<? extends ProxySubject> list)
+    {
+      mList = list;
+      mMap = null;
+    }
+
+    //#######################################################################
+    //# Access
+    private IdentifiedProxy get(final String name)
+    {
+      final Map<String,IdentifiedProxy> map = getMap();
+      return map.get(name);
+    }
+
+    private Map<String,IdentifiedProxy> getMap()
+    {
+      if (mMap == null) {
+        final int size = mList.size();
+        mMap = new HashMap<String,IdentifiedProxy>(size);
+        for (final ProxySubject item : mList) {
+          if (item instanceof IdentifiedProxy) {
+            final IdentifiedProxy comp = (IdentifiedProxy) item;
+            final IdentifierProxy ident = comp.getIdentifier();
+            if (ident instanceof SimpleIdentifierProxy) {
+              final String name = ident.getName();
+              mMap.put(name, comp);
+            }
+          }
+        }
+        mList.addModelObserver(this);
+      }
+      return mMap;
+    }
+
+    //#######################################################################
+    //# Interface net.sourceforge.waters.subject.base.ModelObserver
+    public void modelChanged(final ModelChangeEvent event)
+    {
+      final Subject source = event.getSource();
+      final Object value = event.getValue();
+      switch (event.getKind()) {
+      case ModelChangeEvent.ITEM_ADDED:
+        if (source == mList && value instanceof IdentifiedProxy) {
+          final IdentifiedProxy comp = (IdentifiedProxy) value;
+          final IdentifierProxy ident = comp.getIdentifier();
+          if (ident instanceof SimpleIdentifierProxy) {
+            final String name = ident.getName();
+            if (!mMap.containsKey(name)) {
+              mMap.put(name, comp);
+            }
+          }
+        }
+        break;
+      case ModelChangeEvent.ITEM_REMOVED:
+        if (source == mList && value instanceof IdentifiedProxy) {
+          final IdentifiedProxy comp = (IdentifiedProxy) value;
+          final IdentifierProxy ident = comp.getIdentifier();
+          if (ident instanceof SimpleIdentifierProxy) {
+            mMap = null;
+            mList.removeModelObserver(this);
+          }
+        }
+        break;
+      case ModelChangeEvent.STATE_CHANGED:
+        // Identifier and IdentifiedProxy objects fire STATE_CHANGED,
+        // not NAME_CHANGED ...
+        final Subject parent = source.getParent();
+        if (source instanceof IdentifiedProxy &&
+            parent == mList ||
+            source instanceof SimpleIdentifierProxy &&
+            parent.getParent() == mList) {
+          mMap = null;
+          mList.removeModelObserver(this);
+        }
+        break;
+      default:
+        break;
+      }
+    }
+
+    //#######################################################################
+    //# Data Members
+    private final ListSubject<? extends ProxySubject> mList;
+    private Map<String,IdentifiedProxy> mMap;
 
   }
 
@@ -718,7 +740,8 @@ public class ModuleContext
   private final IconGetterVisitor mIconGetterVisitor;
   private final ToolTipGetterVisitor mToolTipGetterVisitor;
 
-  private Map<String,IdentifiedProxy> mComponentMap = null;
+  private final ListSubjectWrapper mEventDeclListWrapper;
+  private final ListSubjectWrapper mComponentListWrapper;
 
 
   //#########################################################################

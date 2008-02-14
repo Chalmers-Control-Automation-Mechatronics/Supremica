@@ -2,51 +2,39 @@
 <Module Name="dmt10" xmlns="http://waters.sourceforge.net/xsd/module">
 <ConstantAliasList>
 <ConstantAlias>
-<SimpleIdentifier Name="street"/>
+<SimpleIdentifier Name="Streets"/>
+<ConstantAliasExpression>
 <EnumSetExpression>
 <SimpleIdentifier Name="main"/>
 <SimpleIdentifier Name="side"/>
 </EnumSetExpression>
+</ConstantAliasExpression>
 </ConstantAlias>
 </ConstantAliasList>
 <EventDeclList>
 <EventDecl Kind="UNCONTROLLABLE" Name="arrive">
+<RangeList>
 <EnumSetExpression>
 <SimpleIdentifier Name="side"/>
 </EnumSetExpression>
+</RangeList>
 </EventDecl>
 <EventDecl Kind="UNCONTROLLABLE" Name="enter">
+<RangeList>
 <EnumSetExpression>
-<SimpleIdentifier Name="main"/>
 <SimpleIdentifier Name="side"/>
+<SimpleIdentifier Name="main"/>
 </EnumSetExpression>
+</RangeList>
 </EventDecl>
 <EventDecl Kind="UNCONTROLLABLE" Name="leave">
+<RangeList>
 <EnumSetExpression>
 <SimpleIdentifier Name="main"/>
 <SimpleIdentifier Name="side"/>
 </EnumSetExpression>
+</RangeList>
 </EventDecl>
-<EventDecl Kind="UNCONTROLLABLE" Name="tick"/>
-<EventDecl Kind="CONTROLLABLE" Name="green">
-<EnumSetExpression>
-<SimpleIdentifier Name="main"/>
-<SimpleIdentifier Name="side"/>
-</EnumSetExpression>
-</EventDecl>
-<EventDecl Kind="CONTROLLABLE" Name="red">
-<EnumSetExpression>
-<SimpleIdentifier Name="main"/>
-<SimpleIdentifier Name="side"/>
-</EnumSetExpression>
-</EventDecl>
-<EventDecl Kind="CONTROLLABLE" Name="yellow">
-<EnumSetExpression>
-<SimpleIdentifier Name="main"/>
-<SimpleIdentifier Name="side"/>
-</EnumSetExpression>
-</EventDecl>
-<EventDecl Kind="PROPOSITION" Name=":accepting"/>
 </EventDeclList>
 <ComponentList>
 <SimpleComponent Kind="PLANT">

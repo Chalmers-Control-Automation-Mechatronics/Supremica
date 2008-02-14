@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.gui.ide.actions
 //# CLASS:   ScheduleDialog
 //###########################################################################
-//# $Id: ScheduleDialog.java,v 1.56 2007-12-04 03:22:58 robi Exp $
+//# $Id: ScheduleDialog.java,v 1.57 2008-02-14 02:24:09 robi Exp $
 //###########################################################################
 
 package org.supremica.gui;
@@ -518,14 +518,21 @@ public class ScheduleDialog
 						net.sourceforge.waters.subject.module.ModuleSubject module = ide.getActiveDocumentContainer().getEditorPanel().getModuleSubject();
 						boolean problem = false;
 						for (org.supremica.automata.LabeledEvent event : scheduleAuto.getAlphabet()) {
-							if (!event.getName().contains("[")) {
-								if (!module.getEventDeclListModifiable().containsName(event.getName())) {
-									final net.sourceforge.waters.model.des.EventProxy proxy = 
-										(net.sourceforge.waters.model.des.EventProxy) event;
+							final String name = event.getName();
+							if (!name.contains("[")) {
+								boolean found = false;
+								for (final net.sourceforge.waters.model.module.EventDeclProxy decl : module.getEventDeclList()) {
+									if (decl.getName().equals(name)) {
+										found = true;
+										break;
+									}
+								}
+								if (!found) {
+									final net.sourceforge.waters.subject.module.SimpleIdentifierSubject nameident = new net.sourceforge.waters.subject.module.SimpleIdentifierSubject(name);
 									final net.sourceforge.waters.subject.module.EventDeclSubject decl =
-										new net.sourceforge.waters.subject.module.EventDeclSubject(proxy.getName(),
-																								   proxy.getKind(),
-																								   proxy.isObservable(),
+										new net.sourceforge.waters.subject.module.EventDeclSubject(nameident,
+																								   event.getKind(),
+																								   event.isObservable(),
 																								   net.sourceforge.waters.xsd.module.ScopeKind.LOCAL,
 																								   null, null);
 									module.getEventDeclListModifiable().add(decl);

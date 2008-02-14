@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.gui.ide.actions
 //# CLASS:   AnalyzerSendToEditorAction
 //###########################################################################
-//# $Id: AnalyzerSendToEditorAction.java,v 1.12 2007-12-04 03:22:58 robi Exp $
+//# $Id: AnalyzerSendToEditorAction.java,v 1.13 2008-02-14 02:24:09 robi Exp $
 //###########################################################################
 
 package org.supremica.gui.ide.actions;
@@ -26,6 +26,7 @@ import net.sourceforge.waters.subject.base.AbstractSubject;
 import net.sourceforge.waters.subject.module.EventDeclSubject;
 import net.sourceforge.waters.subject.module.ModuleSubject;
 import net.sourceforge.waters.subject.module.ModuleSubjectFactory;
+import net.sourceforge.waters.subject.module.SimpleIdentifierSubject;
 
 import org.supremica.automata.Automata;
 import org.supremica.automata.Automaton;
@@ -89,18 +90,20 @@ public class AnalyzerSendToEditorAction
 					// Add all (new) events to the module
 					ModuleSubject module = ide.getActiveDocumentContainer().getEditorPanel().getModuleSubject();
 					boolean problem = false;
-					for (EventProxy event: aut.getEvents()) {
-						if (event.getName().contains("[")) {
+					for (final EventProxy event: aut.getEvents()) {
+						final String name = event.getName();
+						if (name.contains("[")) {
 							problem = true;
-						} else if (!module.getEventDeclListModifiable().containsName(event.getName())) {
-								final EventProxy proxy = (EventProxy) event;
-								final EventDeclSubject decl =
-									new EventDeclSubject(proxy.getName(),
-														 proxy.getKind(),
-														 proxy.isObservable(),
-														 ScopeKind.LOCAL,
-														 null, null);
-								module.getEventDeclListModifiable().add(decl);
+						} else if (context.getEventDecl(name) == null) {
+							final SimpleIdentifierSubject nameident =
+								new SimpleIdentifierSubject(name);
+							final EventDeclSubject decl =
+								new EventDeclSubject(nameident,
+													 event.getKind(),
+													 event.isObservable(),
+													 ScopeKind.LOCAL,
+													 null, null);
+							module.getEventDeclListModifiable().add(decl);
 						}
 					}
 					if (problem) {

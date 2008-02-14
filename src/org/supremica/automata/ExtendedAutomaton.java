@@ -1,3 +1,4 @@
+//# -*- tab-width: 4  indent-tabs-mode: nil  c-basic-offset: 4 -*-
 /*
  *  Supremica Software License Agreement
  *
@@ -122,23 +123,6 @@ public class ExtendedAutomaton
 		allAcceptingStates = acceptingStates;
 	}
 
-// 	public ExtendedAutomaton(String name, ComponentKind kind, ExtendedAutomata automata) 
-// 	{
-// 		this.name = name;
-
-// 		factory = ModuleSubjectFactory.getInstance();
-		
-// 		this.automata = automata;
-		
-// 		module = automata.getModule();
-
-// 		identifier = factory.createSimpleIdentifierProxy(name);
-// 		graph = factory.createGraphProxy();
-// 		component = factory.createSimpleComponentProxy(identifier, kind, graph);
-
-// 		parser = new ExpressionParser(factory, CompilerOperatorTable.getInstance());
-// 	}
-
 	protected SimpleComponentSubject getComponent()
 	{
 		return component;
@@ -227,10 +211,7 @@ public class ExtendedAutomaton
 			events.add(factory.createSimpleIdentifierProxy(curEvent));
 
 			// Add event declaration to the module if needed
-			if (!module.getEventDeclListModifiable().containsName(curEvent))
-			{
-				automata.addEvent(curEvent);
-			}
+            automata.includeControllableEvent(curEvent);
 		}
 		LabelBlockSubject labelBlock = factory.createLabelBlockProxy(events, null);
 			

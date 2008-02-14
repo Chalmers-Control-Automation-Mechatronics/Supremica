@@ -3,48 +3,62 @@
 <ConstantAliasList>
 <ConstantAlias>
 <SimpleIdentifier Name="Streets"/>
+<ConstantAliasExpression>
 <EnumSetExpression>
 <SimpleIdentifier Name="main"/>
 <SimpleIdentifier Name="side"/>
 </EnumSetExpression>
+</ConstantAliasExpression>
 </ConstantAlias>
 </ConstantAliasList>
 <EventDeclList>
 <EventDecl Kind="UNCONTROLLABLE" Name="arrive">
+<RangeList>
 <EnumSetExpression>
 <SimpleIdentifier Name="side"/>
 </EnumSetExpression>
+</RangeList>
 </EventDecl>
 <EventDecl Kind="UNCONTROLLABLE" Name="enter">
+<RangeList>
 <EnumSetExpression>
 <SimpleIdentifier Name="side"/>
 <SimpleIdentifier Name="main"/>
 </EnumSetExpression>
+</RangeList>
 </EventDecl>
 <EventDecl Kind="UNCONTROLLABLE" Name="leave">
+<RangeList>
 <EnumSetExpression>
 <SimpleIdentifier Name="main"/>
 <SimpleIdentifier Name="side"/>
 </EnumSetExpression>
+</RangeList>
 </EventDecl>
 <EventDecl Kind="UNCONTROLLABLE" Name="tick"/>
 <EventDecl Kind="CONTROLLABLE" Name="green">
+<RangeList>
 <EnumSetExpression>
 <SimpleIdentifier Name="main"/>
 <SimpleIdentifier Name="side"/>
 </EnumSetExpression>
+</RangeList>
 </EventDecl>
 <EventDecl Kind="CONTROLLABLE" Name="red">
+<RangeList>
 <EnumSetExpression>
 <SimpleIdentifier Name="main"/>
 <SimpleIdentifier Name="side"/>
 </EnumSetExpression>
+</RangeList>
 </EventDecl>
 <EventDecl Kind="CONTROLLABLE" Name="yellow">
+<RangeList>
 <EnumSetExpression>
 <SimpleIdentifier Name="main"/>
 <SimpleIdentifier Name="side"/>
 </EnumSetExpression>
+</RangeList>
 </EventDecl>
 <EventDecl Kind="PROPOSITION" Name=":accepting"/>
 </EventDeclList>

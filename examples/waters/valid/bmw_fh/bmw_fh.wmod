@@ -5,10 +5,12 @@
 <EventDecl Kind="UNCONTROLLABLE" Name="nocountry"/>
 <EventDecl Kind="CONTROLLABLE" Name="cmft_start"/>
 <EventDecl Kind="UNCONTROLLABLE" Name="OPENDOOR">
+<RangeList>
 <EnumSetExpression>
 <SimpleIdentifier Name="PSD"/>
 <SimpleIdentifier Name="DRD"/>
 </EnumSetExpression>
+</RangeList>
 </EventDecl>
 <EventDecl Kind="CONTROLLABLE" Name="reset"/>
 <EventDecl Kind="CONTROLLABLE" Name="fh_cond_ecefin"/>
@@ -16,18 +18,22 @@
 <EventDecl Kind="CONTROLLABLE" Name="cmft_cond_doors"/>
 <EventDecl Kind="UNCONTROLLABLE" Name="ecefin"/>
 <EventDecl Kind="CONTROLLABLE" Name="CMFT_BACK">
+<RangeList>
 <EnumSetExpression>
 <SimpleIdentifier Name="CLOSE"/>
 <SimpleIdentifier Name="OPEN"/>
 </EnumSetExpression>
+</RangeList>
 </EventDecl>
 <EventDecl Kind="UNCONTROLLABLE" Name="KEY_PLUG"/>
 <EventDecl Kind="CONTROLLABLE" Name="cmft_cond_key"/>
 <EventDecl Kind="UNCONTROLLABLE" Name="CLOSEDOOR">
+<RangeList>
 <EnumSetExpression>
 <SimpleIdentifier Name="DRD"/>
 <SimpleIdentifier Name="PSD"/>
 </EnumSetExpression>
+</RangeList>
 </EventDecl>
 <EventDecl Kind="UNCONTROLLABLE" Name="KL_R_OFF"/>
 <EventDecl Kind="UNCONTROLLABLE" Name="KL_R_ON"/>
@@ -37,25 +43,31 @@
 <EventDecl Kind="UNCONTROLLABLE" Name="KL_50_OFF"/>
 <EventDecl Kind="CONTROLLABLE" Name="timer"/>
 <EventDecl Kind="CONTROLLABLE" Name="CMFT_FRONT">
+<RangeList>
 <EnumSetExpression>
 <SimpleIdentifier Name="CLOSE"/>
 <SimpleIdentifier Name="OPEN"/>
 </EnumSetExpression>
+</RangeList>
 </EventDecl>
 <EventDecl Kind="UNCONTROLLABLE" Name="KEY_UNPLUG"/>
 <EventDecl Kind="UNCONTROLLABLE" Name="REQ">
+<RangeList>
 <EnumSetExpression>
 <SimpleIdentifier Name="OPEN"/>
 <SimpleIdentifier Name="STOP"/>
 <SimpleIdentifier Name="CLOSE"/>
 </EnumSetExpression>
+</RangeList>
 </EventDecl>
 <EventDecl Kind="CONTROLLABLE" Name="FH_LOCK"/>
 <EventDecl Kind="CONTROLLABLE" Name="CMFT_ROOF">
+<RangeList>
 <EnumSetExpression>
 <SimpleIdentifier Name="CLOSE"/>
 <SimpleIdentifier Name="OPEN"/>
 </EnumSetExpression>
+</RangeList>
 </EventDecl>
 <EventDecl Kind="CONTROLLABLE" Name="CMFT_STOP"/>
 <EventDecl Kind="CONTROLLABLE" Name="fh_cond_kl_r"/>

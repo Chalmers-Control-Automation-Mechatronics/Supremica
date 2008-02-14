@@ -322,7 +322,7 @@ proc Java_ProcessClassHierarchy {impl subpack inMapName outMapName} {
     set special \
 	[list "method" \
 	     "Interface net.sourceforge.waters.model.base.NamedProxy" \
-	     "String getName()" "" "return mIdentifier.getName();"]
+	     "String getName()" "" "return mIdentifier.toString();"]
     set classinfo [Java_ClassSetSpecial $classinfo $special]
     set outClassMap(IdentifiedProxy) $classinfo
 

@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.samples.maze
 //# CLASS:   AbstractMazeTest
 //###########################################################################
-//# $Id: AbstractMazeTest.java,v 1.6 2007-11-02 00:30:37 robi Exp $
+//# $Id: AbstractMazeTest.java,v 1.7 2008-02-14 02:24:09 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.samples.maze;
@@ -486,7 +486,7 @@ public abstract class AbstractMazeTest extends AbstractWatersTest
   protected void setUp()
     throws JAXBException, SAXException
   {
-    mInputDirectory = new File(getInputRoot(), "maze");
+    mInputDirectory = new File(getWatersInputRoot(), "maze");
     mOutputDirectory = getOutputDirectory();
     final ModuleProxyFactory moduleFactory =
       ModuleElementFactory.getInstance();

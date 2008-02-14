@@ -1,3 +1,4 @@
+//# -*- tab-width: 4  indent-tabs-mode: nil  c-basic-offset: 4 -*-
 /*
  *   Copyright (C) 2006 Goran Cengic
  */
@@ -70,7 +71,10 @@ public class ExtendedAutomata
 		module = new ModuleSubject(identifier.getName(), null);
 
 		// make marking proposition
-		module.getEventDeclListModifiable().add(factory.createEventDeclProxy(EventDeclProxy.DEFAULT_MARKING_NAME, EventKind.PROPOSITION));
+        final SimpleIdentifierProxy ident = factory.createSimpleIdentifierProxy
+            (EventDeclProxy.DEFAULT_MARKING_NAME);
+		module.getEventDeclListModifiable().add
+            (factory.createEventDeclProxy(ident, EventKind.PROPOSITION));
 
 		this.expand = expand;
 
@@ -90,16 +94,17 @@ public class ExtendedAutomata
 	
 	public void addEvent(String name, String kind)
 	{
-		if (kind.equals("controllable"))
-		{
-			module.getEventDeclListModifiable().add(factory.createEventDeclProxy(name, EventKind.CONTROLLABLE));
-		}
-		else if (kind.equals("uncontrollable"))
-		{
-			module.getEventDeclListModifiable().add(factory.createEventDeclProxy(name, EventKind.UNCONTROLLABLE));
+        final SimpleIdentifierProxy ident =
+            factory.createSimpleIdentifierProxy(name);
+		if (kind.equals("controllable")) {
+			module.getEventDeclListModifiable().add
+                (factory.createEventDeclProxy(ident, EventKind.CONTROLLABLE));
+		} else if (kind.equals("uncontrollable")) {
+			module.getEventDeclListModifiable().add
+                (factory.createEventDeclProxy(ident,
+                                              EventKind.UNCONTROLLABLE));
 		}
 	}
-
 
 	public void addAutomaton(ExtendedAutomaton automaton)
 	{
@@ -127,4 +132,37 @@ public class ExtendedAutomata
 			e.printStackTrace();
 		}
 	}
+
+
+    //######################################################################
+    //# Event Declarations
+    /**
+     * Checks whether the underlying module contains an event with the
+     * given name.
+     */
+    boolean containsEvent(final String name)
+    {
+        for (final EventDeclProxy decl : module.getEventDeclList()) {
+            if (decl.getName().equals(name)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Adds a controllable event with the given name to the underlying
+     * module if not yet present.
+     */
+    void includeControllableEvent(final String name)
+    {
+        if (!containsEvent(name)) {
+            final SimpleIdentifierProxy ident =
+                factory.createSimpleIdentifierProxy(name);
+            final EventDeclSubject decl =
+                factory.createEventDeclProxy(ident, EventKind.CONTROLLABLE);
+            module.getEventDeclListModifiable().add(decl);
+        }
+    }
+
 }

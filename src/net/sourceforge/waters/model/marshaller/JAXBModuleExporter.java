@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.marshaller
 //# CLASS:   JAXBModuleExporter
 //###########################################################################
-//# $Id: JAXBModuleExporter.java,v 1.24 2007-12-04 03:37:59 robi Exp $
+//# $Id: JAXBModuleExporter.java,v 1.25 2008-02-14 02:24:09 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.marshaller;
@@ -74,6 +74,7 @@ import net.sourceforge.waters.xsd.module.BoxGeometry;
 import net.sourceforge.waters.xsd.module.Color;
 import net.sourceforge.waters.xsd.module.ColorGeometry;
 import net.sourceforge.waters.xsd.module.ConstantAlias;
+import net.sourceforge.waters.xsd.module.ConstantAliasExpression;
 import net.sourceforge.waters.xsd.module.Edge;
 import net.sourceforge.waters.xsd.module.EnumSetExpression;
 import net.sourceforge.waters.xsd.module.EventAlias;
@@ -103,6 +104,7 @@ import net.sourceforge.waters.xsd.module.ObjectFactory;
 import net.sourceforge.waters.xsd.module.ParameterBinding;
 import net.sourceforge.waters.xsd.module.Point;
 import net.sourceforge.waters.xsd.module.PointGeometryType;
+import net.sourceforge.waters.xsd.module.RangeList;
 import net.sourceforge.waters.xsd.module.ScopeKind;
 import net.sourceforge.waters.xsd.module.SimpleComponent;
 import net.sourceforge.waters.xsd.module.SimpleExpressionType;
@@ -596,10 +598,13 @@ public class JAXBModuleExporter
     throws VisitorException
   {
     copyAliasProxy(proxy, element);
+    final ConstantAliasExpression wrapper =
+      mFactory.createConstantAliasExpression();
     final ExpressionProxy expressionProxy = proxy.getExpression();
     final SimpleExpressionType expressionElement =
       (SimpleExpressionType) expressionProxy.acceptVisitor(this);
-    element.setExpression(expressionElement);
+    wrapper.setExpression(expressionElement);
+    element.setConstantAliasExpression(wrapper);
     final ScopeKind scope = proxy.getScope();
     if (scope != ScopeKind.LOCAL) {
       element.setScope(scope);
@@ -683,7 +688,7 @@ public class JAXBModuleExporter
        final EventDecl element)
     throws VisitorException
   {
-    copyNamedProxy(proxy, element);
+    copyIdentifiedProxy(proxy, element);
     element.setKind(proxy.getKind());
     if (!proxy.isObservable()) {
       element.setObservable(false);
@@ -693,9 +698,13 @@ public class JAXBModuleExporter
       element.setScope(scope);
     }
     final List<SimpleExpressionProxy> rangesProxy = proxy.getRanges();
-    final List<ElementType> rangesElement =
-      Casting.toList(element.getRanges());
-    copyCollection(rangesProxy, rangesElement);
+    if (!rangesProxy.isEmpty()) {
+      final RangeList rangeList = mFactory.createRangeList();
+      final List<ElementType> rangesElement =
+        Casting.toList(rangeList.getRanges());
+      copyCollection(rangesProxy, rangesElement);
+      element.setRangeList(rangeList);
+    }
     final ColorGeometryProxy colorGeometryProxy = proxy.getColorGeometry();
     if (colorGeometryProxy != null) {
       final ColorGeometry colorGeometryElement =
@@ -822,9 +831,14 @@ public class JAXBModuleExporter
   {
     copyProxy(proxy, element);
     final IdentifierProxy identifierProxy = proxy.getIdentifier();
-    final IdentifierType identifierElement =
-      (IdentifierType) identifierProxy.acceptVisitor(this);
-    element.setIdentifier(identifierElement);
+    if (identifierProxy instanceof SimpleIdentifierProxy) {
+      final String name = identifierProxy.getName();
+      element.setName(name);
+    } else {
+      final IdentifierType identifierElement =
+        (IdentifierType) identifierProxy.acceptVisitor(this);
+      element.setIdentifier(identifierElement);
+    }
   }
 
   private void copyIdentifierProxy

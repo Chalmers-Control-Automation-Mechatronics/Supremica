@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.samples.algorithms
 //# CLASS:   AlgorithmsTest
 //###########################################################################
-//# $Id: AlgorithmsTest.java,v 1.7 2006-11-19 21:12:23 robi Exp $
+//# $Id: AlgorithmsTest.java,v 1.8 2008-02-14 02:24:09 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.samples.algorithms;
@@ -363,8 +363,8 @@ public class AlgorithmsTest extends AbstractWatersTest
   protected void setUp()
     throws JAXBException, SAXException
   {
-    mWatersInputDirectory = new File(getInputRoot(), "handwritten");
-    mValidInputDirectory = new File(getInputRoot(), "valid");
+    mWatersInputDirectory = new File(getWatersInputRoot(), "handwritten");
+    mValidInputDirectory = new File(getWatersInputRoot(), "valid");
     mOutputDirectory = getOutputDirectory();
     final ModuleProxyFactory moduleFactory =
       ModuleElementFactory.getInstance();

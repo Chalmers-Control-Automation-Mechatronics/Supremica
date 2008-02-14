@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.module
 //# CLASS:   AbstractModuleTest
 //###########################################################################
-//# $Id: AbstractModuleTest.java,v 1.14 2007-08-15 12:23:17 robi Exp $
+//# $Id: AbstractModuleTest.java,v 1.15 2008-02-14 02:24:09 robi Exp $
 //###########################################################################
 
 
@@ -383,8 +383,10 @@ public abstract class AbstractModuleTest extends AbstractJAXBTest<ModuleProxy>
     final String compname = "comp";
     final String modname = "pointgeo";
 
+    final IdentifierProxy eventident =
+      factory.createSimpleIdentifierProxy(eventname);
     final EventDeclProxy decl = factory.createEventDeclProxy
-      (eventname, EventKind.CONTROLLABLE);
+      (eventident, EventKind.CONTROLLABLE);
 
     final PlainEventListProxy nprops =
       factory.createPlainEventListProxy(null);
@@ -487,13 +489,13 @@ public abstract class AbstractModuleTest extends AbstractJAXBTest<ModuleProxy>
   protected ModuleProxy testCrossClone(final String name)
     throws Exception
   {
-    return testCrossClone(getInputDirectory(), name);
+    return testCrossClone(getWatersInputRoot(), name);
   }
 
   protected ModuleProxy testCrossClone(final String dirname, final String name)
     throws Exception
   {
-    final File dir = new File(getInputDirectory(), dirname);
+    final File dir = new File(getWatersInputRoot(), dirname);
     return testCrossClone(dir, name);
   }
 
@@ -502,7 +504,7 @@ public abstract class AbstractModuleTest extends AbstractJAXBTest<ModuleProxy>
                                        final String name)
     throws Exception
   {
-    final File dir1 = new File(getInputDirectory(), dirname1);
+    final File dir1 = new File(getWatersInputRoot(), dirname1);
     final File dir2 = new File(dir1, dirname2);
     return testCrossClone(dir2, name);
   }

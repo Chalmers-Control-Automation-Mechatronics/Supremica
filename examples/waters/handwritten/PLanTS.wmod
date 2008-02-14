@@ -1,67 +1,89 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<Module Name="Passenger Land-Transportation System - From 'Supervising Passenger Land-Transportation Systems' by K.T. Seow et al." xmlns="http://waters.sourceforge.net/xsd/module">
+<Module Name="Passenger Land-Transportation System" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
+<ns2:Comment>Adapted from 'Supervising Passenger Land-Transportation Systems' by K.T. Seow and M. Pasquier. The system is controllable and nonblocking. This is a model of a traffic system where a number of vehicles are serving a number of travelers. The parameters n and m represent the number of vehicles and travellers respectively. The parametrisation does not work here however, since the models 'FleetServiceDiligence' and 'VehicleAssignmentQueueCapacity' (maybe others too?) needs to have a parametrisable number of states which is currently not supported. So n is fixed at 3 and m is fixed at 4. Plant size: 559872 states, specification size: 9720000 states, plant||specification size: 4907968 states.</ns2:Comment>
     <ConstantAliasList>
         <ConstantAlias Scope="REQUIRED_PARAMETER">
             <SimpleIdentifier Name="n"/>
-            <IntConstant Value="3"/>
+            <ConstantAliasExpression>
+                <IntConstant Value="3"/>
+            </ConstantAliasExpression>
         </ConstantAlias>
         <ConstantAlias Scope="REQUIRED_PARAMETER">
             <SimpleIdentifier Name="m"/>
-            <IntConstant Value="4"/>
+            <ConstantAliasExpression>
+                <IntConstant Value="4"/>
+            </ConstantAliasExpression>
         </ConstantAlias>
     </ConstantAliasList>
     <EventDeclList>
         <EventDecl Kind="CONTROLLABLE" Name="tstart"/>
         <EventDecl Kind="CONTROLLABLE" Name="tstop"/>
         <EventDecl Kind="UNCONTROLLABLE" Name="inj">
+            <RangeList>
             <BinaryExpression Operator="..">
                 <IntConstant Value="1"/>
                 <SimpleIdentifier Name="n"/>
             </BinaryExpression>
+            </RangeList>
         </EventDecl>
         <EventDecl Kind="UNCONTROLLABLE" Name="outj">
+            <RangeList>
             <BinaryExpression Operator="..">
                 <IntConstant Value="1"/>
                 <SimpleIdentifier Name="n"/>
             </BinaryExpression>
+            </RangeList>
         </EventDecl>
         <EventDecl Kind="CONTROLLABLE" Name="st">
+            <RangeList>
             <BinaryExpression Operator="..">
                 <IntConstant Value="1"/>
                 <SimpleIdentifier Name="n"/>
             </BinaryExpression>
+            </RangeList>
         </EventDecl>
         <EventDecl Kind="CONTROLLABLE" Name="end">
+            <RangeList>
             <BinaryExpression Operator="..">
                 <IntConstant Value="1"/>
                 <SimpleIdentifier Name="n"/>
             </BinaryExpression>
+            </RangeList>
         </EventDecl>
         <EventDecl Kind="UNCONTROLLABLE" Name="dwn">
+            <RangeList>
             <BinaryExpression Operator="..">
                 <IntConstant Value="1"/>
                 <SimpleIdentifier Name="n"/>
             </BinaryExpression>
+            </RangeList>
         </EventDecl>
         <EventDecl Kind="UNCONTROLLABLE" Name="ret">
+            <RangeList>
             <BinaryExpression Operator="..">
                 <IntConstant Value="1"/>
                 <SimpleIdentifier Name="n"/>
             </BinaryExpression>
+            </RangeList>
         </EventDecl>
         <EventDecl Kind="CONTROLLABLE" Name="ad">
+            <RangeList>
             <BinaryExpression Operator="..">
                 <IntConstant Value="1"/>
                 <SimpleIdentifier Name="m"/>
             </BinaryExpression>
+            </RangeList>
         </EventDecl>
         <EventDecl Kind="UNCONTROLLABLE" Name="xx">
+            <RangeList>
             <BinaryExpression Operator="..">
                 <IntConstant Value="1"/>
                 <SimpleIdentifier Name="m"/>
             </BinaryExpression>
+            </RangeList>
         </EventDecl>
         <EventDecl Kind="CONTROLLABLE" Name="as">
+            <RangeList>
             <BinaryExpression Operator="..">
                 <IntConstant Value="1"/>
                 <SimpleIdentifier Name="m"/>
@@ -70,8 +92,10 @@
                 <IntConstant Value="1"/>
                 <SimpleIdentifier Name="n"/>
             </BinaryExpression>
+            </RangeList>
         </EventDecl>
         <EventDecl Kind="CONTROLLABLE" Name="ras">
+            <RangeList>
             <BinaryExpression Operator="..">
                 <IntConstant Value="1"/>
                 <SimpleIdentifier Name="m"/>
@@ -80,14 +104,18 @@
                 <IntConstant Value="1"/>
                 <SimpleIdentifier Name="n"/>
             </BinaryExpression>
+            </RangeList>
         </EventDecl>
         <EventDecl Kind="UNCONTROLLABLE" Name="tout">
+            <RangeList>
             <BinaryExpression Operator="..">
                 <IntConstant Value="1"/>
                 <SimpleIdentifier Name="m"/>
             </BinaryExpression>
+            </RangeList>
         </EventDecl>
         <EventDecl Kind="CONTROLLABLE" Name="enter">
+            <RangeList>
             <BinaryExpression Operator="..">
                 <IntConstant Value="1"/>
                 <SimpleIdentifier Name="m"/>
@@ -96,8 +124,10 @@
                 <IntConstant Value="1"/>
                 <SimpleIdentifier Name="n"/>
             </BinaryExpression>
+            </RangeList>
         </EventDecl>
         <EventDecl Kind="CONTROLLABLE" Name="ecall">
+            <RangeList>
             <BinaryExpression Operator="..">
                 <IntConstant Value="1"/>
                 <SimpleIdentifier Name="m"/>
@@ -106,8 +136,10 @@
                 <IntConstant Value="1"/>
                 <SimpleIdentifier Name="n"/>
             </BinaryExpression>
+            </RangeList>
         </EventDecl>
         <EventDecl Kind="UNCONTROLLABLE" Name="leave">
+            <RangeList>
             <BinaryExpression Operator="..">
                 <IntConstant Value="1"/>
                 <SimpleIdentifier Name="m"/>
@@ -116,6 +148,7 @@
                 <IntConstant Value="1"/>
                 <SimpleIdentifier Name="n"/>
             </BinaryExpression>
+            </RangeList>
         </EventDecl>
         <EventDecl Kind="PROPOSITION" Name=":accepting"/>
     </EventDeclList>

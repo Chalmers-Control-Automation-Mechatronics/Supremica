@@ -2,23 +2,29 @@
 <Module Name="safetydisplay" xmlns="http://waters.sourceforge.net/xsd/module">
 <EventDeclList>
 <EventDecl Kind="CONTROLLABLE" Name="displayon">
+<RangeList>
 <BinaryExpression Operator="..">
 <IntConstant Value="1"/>
 <IntConstant Value="3"/>
 </BinaryExpression>
+</RangeList>
 </EventDecl>
 <EventDecl Kind="CONTROLLABLE" Name="displayoff"/>
 <EventDecl Kind="UNCONTROLLABLE" Name="switchoff">
+<RangeList>
 <BinaryExpression Operator="..">
 <IntConstant Value="1"/>
 <IntConstant Value="3"/>
 </BinaryExpression>
+</RangeList>
 </EventDecl>
 <EventDecl Kind="UNCONTROLLABLE" Name="switchon">
+<RangeList>
 <BinaryExpression Operator="..">
 <IntConstant Value="1"/>
 <IntConstant Value="3"/>
 </BinaryExpression>
+</RangeList>
 </EventDecl>
 <EventDecl Kind="PROPOSITION" Name=":accepting"/>
 </EventDeclList>

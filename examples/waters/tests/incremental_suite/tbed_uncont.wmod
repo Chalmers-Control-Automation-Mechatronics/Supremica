@@ -3,13 +3,16 @@
 <ConstantAliasList>
 <ConstantAlias>
 <SimpleIdentifier Name="CRANES"/>
+<ConstantAliasExpression>
 <BinaryExpression Operator="..">
 <IntConstant Value="1"/>
 <IntConstant Value="3"/>
 </BinaryExpression>
+</ConstantAliasExpression>
 </ConstantAlias>
 <ConstantAlias>
 <SimpleIdentifier Name="SECTIONS"/>
+<ConstantAliasExpression>
 <EnumSetExpression>
 <SimpleIdentifier Name="t0"/>
 <SimpleIdentifier Name="t1"/>
@@ -38,51 +41,69 @@
 <SimpleIdentifier Name="t26"/>
 <SimpleIdentifier Name="t27"/>
 </EnumSetExpression>
+</ConstantAliasExpression>
 </ConstantAlias>
 <ConstantAlias>
 <SimpleIdentifier Name="TRAINS"/>
+<ConstantAliasExpression>
 <BinaryExpression Operator="..">
 <IntConstant Value="1"/>
 <IntConstant Value="2"/>
 </BinaryExpression>
+</ConstantAliasExpression>
 </ConstantAlias>
 <ConstantAlias>
 <SimpleIdentifier Name="SWITCHES_A"/>
+<ConstantAliasExpression>
 <EnumSetExpression>
 <SimpleIdentifier Name="t4"/>
 <SimpleIdentifier Name="t5"/>
 <SimpleIdentifier Name="t6"/>
 <SimpleIdentifier Name="t7"/>
 </EnumSetExpression>
+</ConstantAliasExpression>
 </ConstantAlias>
 <ConstantAlias>
 <SimpleIdentifier Name="SWITCHES_B"/>
+<ConstantAliasExpression>
 <EnumSetExpression>
 <SimpleIdentifier Name="t3"/>
 <SimpleIdentifier Name="t8"/>
 </EnumSetExpression>
+</ConstantAliasExpression>
 </ConstantAlias>
 </ConstantAliasList>
 <EventDeclList>
 <EventDecl Kind="UNCONTROLLABLE" Name="not_at">
+<RangeList>
 <SimpleIdentifier Name="SECTIONS"/>
+</RangeList>
 </EventDecl>
 <EventDecl Kind="CONTROLLABLE" Name="start_load">
+<RangeList>
 <BinaryExpression Operator="..">
 <IntConstant Value="1"/>
 <IntConstant Value="3"/>
 </BinaryExpression>
+</RangeList>
 </EventDecl>
 <EventDecl Kind="CONTROLLABLE" Name="turn_left">
+<RangeList>
 <SimpleIdentifier Name="SECTIONS"/>
+</RangeList>
 </EventDecl>
 <EventDecl Kind="UNCONTROLLABLE" Name="cpl_right">
+<RangeList>
 <SimpleIdentifier Name="SECTIONS"/>
+</RangeList>
 </EventDecl>
 <EventDecl Kind="CONTROLLABLE" Name="turn_right">
+<RangeList>
 <SimpleIdentifier Name="SECTIONS"/>
+</RangeList>
 </EventDecl>
 <EventDecl Kind="CONTROLLABLE" Name="req_sw">
+<RangeList>
 <BinaryExpression Operator="..">
 <IntConstant Value="1"/>
 <IntConstant Value="2"/>
@@ -95,47 +116,62 @@
 <SimpleIdentifier Name="t3"/>
 <SimpleIdentifier Name="t8"/>
 </EnumSetExpression>
+</RangeList>
 </EventDecl>
 <EventDecl Kind="UNCONTROLLABLE" Name="at">
+<RangeList>
 <SimpleIdentifier Name="TRAINS"/>
 <SimpleIdentifier Name="SECTIONS"/>
+</RangeList>
 </EventDecl>
 <EventDecl Kind="CONTROLLABLE" Name="straight">
+<RangeList>
 <EnumSetExpression>
 <SimpleIdentifier Name="t4"/>
 <SimpleIdentifier Name="t5"/>
 <SimpleIdentifier Name="t6"/>
 <SimpleIdentifier Name="t7"/>
 </EnumSetExpression>
+</RangeList>
 </EventDecl>
 <EventDecl Kind="UNCONTROLLABLE" Name="unmove">
+<RangeList>
 <BinaryExpression Operator="..">
 <IntConstant Value="1"/>
 <IntConstant Value="2"/>
 </BinaryExpression>
+</RangeList>
 </EventDecl>
 <EventDecl Kind="UNCONTROLLABLE" Name="cpl_left">
+<RangeList>
 <SimpleIdentifier Name="SECTIONS"/>
+</RangeList>
 </EventDecl>
 <EventDecl Kind="CONTROLLABLE" Name="turn">
+<RangeList>
 <EnumSetExpression>
 <SimpleIdentifier Name="t4"/>
 <SimpleIdentifier Name="t5"/>
 <SimpleIdentifier Name="t6"/>
 <SimpleIdentifier Name="t7"/>
 </EnumSetExpression>
+</RangeList>
 </EventDecl>
 <EventDecl Kind="CONTROLLABLE" Name="enable">
+<RangeList>
 <BinaryExpression Operator="..">
 <IntConstant Value="1"/>
 <IntConstant Value="2"/>
 </BinaryExpression>
+</RangeList>
 </EventDecl>
 <EventDecl Kind="UNCONTROLLABLE" Name="done_load">
+<RangeList>
 <BinaryExpression Operator="..">
 <IntConstant Value="1"/>
 <IntConstant Value="3"/>
 </BinaryExpression>
+</RangeList>
 </EventDecl>
 <EventDecl Kind="PROPOSITION" Name=":accepting"/>
 </EventDeclList>

@@ -13,24 +13,30 @@
         <EventDecl Kind="UNCONTROLLABLE" Name="tick"/>
         <EventDecl Observable="false" Kind="UNCONTROLLABLE" Name="transfer_maetlyft_maetstation"/>
         <EventDecl Kind="CONTROLLABLE" Name="InPortvakt">
+<RangeList>
             <BinaryExpression Operator="..">
                 <IntConstant Value="0"/>
                 <IntConstant Value="1"/>
             </BinaryExpression>
+</RangeList>
         </EventDecl>
         <EventDecl Kind="CONTROLLABLE" Name="UrPortvakt">
+<RangeList>
             <BinaryExpression Operator="..">
                 <IntConstant Value="0"/>
                 <IntConstant Value="1"/>
             </BinaryExpression>
+</RangeList>
         </EventDecl>
         <EventDecl Kind="UNCONTROLLABLE" Name="KulaPortvakt"/>
         <EventDecl Kind="UNCONTROLLABLE" Name="KulaMaetlyft"/>
         <EventDecl Kind="CONTROLLABLE" Name="UppMaetlyft">
+<RangeList>
             <BinaryExpression Operator="..">
                 <IntConstant Value="0"/>
                 <IntConstant Value="1"/>
             </BinaryExpression>
+</RangeList>
         </EventDecl>
         <EventDecl Kind="UNCONTROLLABLE" Name="MaetlyftNere"/>
         <EventDecl Kind="UNCONTROLLABLE" Name="MaetlyftUppe"/>

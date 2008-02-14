@@ -2,24 +2,31 @@
 
 <Module xmlns="http://waters.sourceforge.net/xsd/module"
         Name="small_factory_n">
-<ParameterList>
-  <IntParameter Name="n">
-    <IntConstant Value="2"/>
-  </IntParameter>
-</ParameterList>
+<ConstantAliasList>
+  <ConstantAlias Scope="REQUIRED_PARAMETER">
+    <SimpleIdentifier Name="n"/>
+    <ConstantAliasExpression>
+      <IntConstant Value="2"/>
+    </ConstantAliasExpression>
+  </ConstantAlias>
+</ConstantAliasList>
 <EventDeclList>
   <EventDecl Name="start" Kind="CONTROLLABLE">
+    <RangeList>
     <BinaryExpression Operator="..">
       <IntConstant Value="1"/>
       <SimpleIdentifier Name="n"/>
     </BinaryExpression>
+    </RangeList>
     <Comment>This is just to test whether I can have text in here.</Comment>
   </EventDecl>
   <EventDecl Name="finish" Kind="UNCONTROLLABLE">
+    <RangeList>
     <BinaryExpression Operator="..">
       <IntConstant Value="1"/>
       <SimpleIdentifier Name="n"/>
     </BinaryExpression>
+    </RangeList>
   </EventDecl>
   <EventDecl Name=":accepting" Kind="PROPOSITION"/>
 </EventDeclList>

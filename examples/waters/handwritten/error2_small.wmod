@@ -3,90 +3,96 @@
 <Module xmlns="http://waters.sourceforge.net/xsd/module"
         Name="small_factory_n">
 <ConstantAliasList>
-  <ConstantAlias Scope="REQUIRED_PARAMETER">
-    <SimpleIdentifier Name="n"/>
-    <IntConstant Value="2"/>
-  </ConstantAlias>
+<ConstantAlias Scope="REQUIRED_PARAMETER">
+<SimpleIdentifier Name="n"/>
+<ConstantAliasExpression>
+<IntConstant Value="2"/>
+</ConstantAliasExpression>
+</ConstantAlias>
 </ConstantAliasList>
 <EventDeclList>
-  <EventDecl Name="start" Kind="CONTROLLABLE">
-    <BinaryExpression Operator="..">
-      <IntConstant Value="1"/>
-      <SimpleIdentifier Name="n"/>
-    </BinaryExpression>
-    <Comment>This is just to test whether I can have text in here.</Comment>
-  </EventDecl>
-  <EventDecl Name="finish" Kind="UNCONTROLLABLE">
-    <BinaryExpression Operator="..">
-      <IntConstant Value="1"/>
-      <SimpleIdentifier Name="n"/>
-    </BinaryExpression>
-  </EventDecl>
-  <EventDecl Name=":accepting" Kind="PROPOSITION"/>
+<EventDecl Name="start" Kind="CONTROLLABLE">
+<RangeList>
+<BinaryExpression Operator="..">
+<IntConstant Value="1"/>
+<SimpleIdentifier Name="n"/>
+</BinaryExpression>
+</RangeList>
+<Comment>This is just to test whether I can have text in here.</Comment>
+</EventDecl>
+<EventDecl Name="finish" Kind="UNCONTROLLABLE">
+<RangeList>
+<BinaryExpression Operator="..">
+<IntConstant Value="1"/>
+<SimpleIdentifier Name="n"/>
+</BinaryExpression>
+</RangeList>
+</EventDecl>
+<EventDecl Name=":accepting" Kind="PROPOSITION"/>
 </EventDeclList>
 <ComponentList>
-  <ForeachComponent Name="i">
-    <BinaryExpression Operator="..">
-      <IntConstant Value="1"/>
-      <SimpleIdentifier Name="n"/>
-    </BinaryExpression>
-    <ComponentList>
-      <Instance ModuleName="machine_break">
-        <IndexedIdentifier Name="machine">
-          <SimpleIdentifier Name="i"/>
-        </IndexedIdentifier>
-        <ParameterBinding Name="start">
-          <IndexedIdentifier Name="start">
-            <SimpleIdentifier Name="i"/>
-          </IndexedIdentifier>
-        </ParameterBinding>
-        <ParameterBinding Name="finish">
-          <IndexedIdentifier Name="finish">
-            <SimpleIdentifier Name="i"/>
-          </IndexedIdentifier>
-        </ParameterBinding>
-        <ParameterBinding Name=":accepting">
-          <SimpleIdentifier Name=":accepting"/>
-        </ParameterBinding>
-      </Instance>
-    </ComponentList>
-  </ForeachComponent>
-  <ForeachComponent Name="i">
-    <BinaryExpression Operator="..">
-      <IntConstant Value="1"/>
-      <BinaryExpression Operator="-">
-        <SimpleIdentifier Name="n"/>
-        <IntConstant Value="1"/>
-      </BinaryExpression>
-    </BinaryExpression>
-    <ComponentList>
-      <Instance ModuleName="buffer_sf1">
-        <IndexedIdentifier Name="buffer">
-          <SimpleIdentifier Name="i"/>
-        </IndexedIdentifier>
-        <ParameterBinding Name="start_before">
-          <IndexedIdentifier Name="start">
-            <SimpleIdentifier Name="i"/>
-          </IndexedIdentifier>
-        </ParameterBinding>
-        <ParameterBinding Name="finish_before">
-          <IndexedIdentifier Name="finish">
-            <SimpleIdentifier Name="i"/>
-          </IndexedIdentifier>
-        </ParameterBinding>
-        <ParameterBinding Name="start_after">
-          <IndexedIdentifier Name="start">
-            <BinaryExpression Operator="+">
-              <SimpleIdentifier Name="i"/>
-              <IntConstant Value="1"/>
-            </BinaryExpression>
-          </IndexedIdentifier>
-        </ParameterBinding>
-        <ParameterBinding Name=":accepting">
-          <SimpleIdentifier Name=":accepting"/>
-        </ParameterBinding>
-      </Instance>
-    </ComponentList>
-  </ForeachComponent>
+<ForeachComponent Name="i">
+<BinaryExpression Operator="..">
+<IntConstant Value="1"/>
+<SimpleIdentifier Name="n"/>
+</BinaryExpression>
+<ComponentList>
+<Instance ModuleName="machine_break">
+<IndexedIdentifier Name="machine">
+<SimpleIdentifier Name="i"/>
+</IndexedIdentifier>
+<ParameterBinding Name="start">
+<IndexedIdentifier Name="start">
+<SimpleIdentifier Name="i"/>
+</IndexedIdentifier>
+</ParameterBinding>
+<ParameterBinding Name="finish">
+<IndexedIdentifier Name="finish">
+<SimpleIdentifier Name="i"/>
+</IndexedIdentifier>
+</ParameterBinding>
+<ParameterBinding Name=":accepting">
+<SimpleIdentifier Name=":accepting"/>
+</ParameterBinding>
+</Instance>
+</ComponentList>
+</ForeachComponent>
+<ForeachComponent Name="i">
+<BinaryExpression Operator="..">
+<IntConstant Value="1"/>
+<BinaryExpression Operator="-">
+<SimpleIdentifier Name="n"/>
+<IntConstant Value="1"/>
+</BinaryExpression>
+</BinaryExpression>
+<ComponentList>
+<Instance ModuleName="buffer_sf1">
+<IndexedIdentifier Name="buffer">
+<SimpleIdentifier Name="i"/>
+</IndexedIdentifier>
+<ParameterBinding Name="start_before">
+<IndexedIdentifier Name="start">
+<SimpleIdentifier Name="i"/>
+</IndexedIdentifier>
+</ParameterBinding>
+<ParameterBinding Name="finish_before">
+<IndexedIdentifier Name="finish">
+<SimpleIdentifier Name="i"/>
+</IndexedIdentifier>
+</ParameterBinding>
+<ParameterBinding Name="start_after">
+<IndexedIdentifier Name="start">
+<BinaryExpression Operator="+">
+<SimpleIdentifier Name="i"/>
+<IntConstant Value="1"/>
+</BinaryExpression>
+</IndexedIdentifier>
+</ParameterBinding>
+<ParameterBinding Name=":accepting">
+<SimpleIdentifier Name=":accepting"/>
+</ParameterBinding>
+</Instance>
+</ComponentList>
+</ForeachComponent>
 </ComponentList>
 </Module>

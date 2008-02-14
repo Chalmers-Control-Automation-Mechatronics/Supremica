@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <Module Name="Ball_Control" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
-    <ns2:Comment></ns2:Comment>
-    <ParameterList>
-        <EventParameter Kind="CONTROLLABLE" Name="control">
+    <EventDeclList>
+        <EventDecl Kind="CONTROLLABLE" Name="control"
+                   Scope="REQUIRED_PARAMETER">
+          <RangeList>
             <BinaryExpression Operator="..">
                 <IntConstant Value="0"/>
                 <IntConstant Value="1"/>
             </BinaryExpression>
-        </EventParameter>
-    </ParameterList>
-    <EventDeclList>
+          </RangeList>
+        </EventDecl>
         <EventDecl Kind="PROPOSITION" Name=":accepting"/>
         <EventDecl Kind="PROPOSITION" Name=":forbidden"/>
     </EventDeclList>

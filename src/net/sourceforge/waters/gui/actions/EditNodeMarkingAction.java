@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui.actions
 //# CLASS:   EditNodeMarkingAction
 //###########################################################################
-//# $Id: EditNodeMarkingAction.java,v 1.2 2007-12-04 03:22:54 robi Exp $
+//# $Id: EditNodeMarkingAction.java,v 1.3 2008-02-14 02:24:09 robi Exp $
 //###########################################################################
 
 
@@ -141,7 +141,7 @@ public class EditNodeMarkingAction
       return null;
     }
     final EventDeclSubject newdecl =
-      new EventDeclSubject(name, EventKind.PROPOSITION);
+      new EventDeclSubject(mIdentifier, EventKind.PROPOSITION);
     final SelectionOwner panel = root.getEventsPanel();
     return new InsertCommand(newdecl, panel, false);
   }

@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<ProductDES Name="tictactoe" xmlns="http://waters.sourceforge.net/xsd/des">
+<ProductDES Name="tictactoe" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/des">
+  <ns2:Comment>A model of a tic tac toe game. The size of the game board can be parametrised. The model uses event aliases in the 'game_over' model and the 'white_never_wins' model.</ns2:Comment>
   <EventList>
     <Event Kind="PROPOSITION" Name=":accepting"/>
     <Event Kind="CONTROLLABLE" Name="black[1][1]"/>

@@ -75,13 +75,25 @@
     <xs:complexContent>
       <xs:extension base="M:IdentifiedType">
         <xs:sequence>
+          <xs:element ref="M:ConstantAliasExpression"/>
+        </xs:sequence>
+        <xs:attribute name="Scope" type="M:ScopeKind" default="LOCAL"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+</xs:element>
+
+<xs:element name="ConstantAliasExpression">
+  <xs:complexType>
+    <xs:complexContent>
+      <xs:extension base="B:ElementType">
+        <xs:sequence>
           <xs:group ref="M:ArithmeticOrRangeExpression">
             <xs:annotation><xs:appinfo>
               <jaxb:property name="Expression"/>
             </xs:appinfo></xs:annotation>
           </xs:group>
         </xs:sequence>
-        <xs:attribute name="Scope" type="M:ScopeKind" default="LOCAL"/>
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>
@@ -162,20 +174,31 @@
 <xs:element name="EventDecl">
   <xs:complexType>
     <xs:complexContent>
-      <xs:extension base="B:NamedType">
+      <xs:extension base="M:IdentifiedType">
         <xs:sequence>
-          <xs:group ref="M:RangeExpression"
-                    minOccurs="0" maxOccurs="unbounded">
-            <xs:annotation><xs:appinfo>
-              <jaxb:property name="Ranges"/>
-            </xs:appinfo></xs:annotation>
-          </xs:group>
+          <xs:element ref="M:RangeList" minOccurs="0"/>
           <xs:element name="Comment" type="xs:string" minOccurs="0"/>
           <xs:element ref="M:ColorGeometry" minOccurs="0"/>
         </xs:sequence>
         <xs:attribute name="Kind" type="B:EventKind" use="required"/>
         <xs:attribute name="Observable" type="xs:boolean" default="true"/>
         <xs:attribute name="Scope" type="M:ScopeKind" default="LOCAL"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+</xs:element>
+
+<xs:element name="RangeList">
+  <xs:complexType>
+    <xs:complexContent>
+      <xs:extension base="B:ElementType">
+        <xs:sequence>
+          <xs:group ref="M:RangeExpression" maxOccurs="unbounded">
+            <xs:annotation><xs:appinfo>
+              <jaxb:property name="Ranges"/>
+            </xs:appinfo></xs:annotation>
+          </xs:group>
+        </xs:sequence>
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>
@@ -951,12 +974,13 @@
   <xs:complexContent>
     <xs:extension base="B:ElementType">
       <xs:sequence>
-        <xs:group ref="M:Identifier">
+        <xs:group ref="M:Identifier" minOccurs="0">
           <xs:annotation><xs:appinfo>
             <jaxb:property name="Identifier"/>
           </xs:appinfo></xs:annotation>
         </xs:group>
       </xs:sequence>
+      <xs:attribute name="Name" type="xs:string"/>
     </xs:extension>
   </xs:complexContent>
 </xs:complexType>

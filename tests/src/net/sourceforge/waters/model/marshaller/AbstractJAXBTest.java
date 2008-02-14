@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.marshaller
 //# CLASS:   AbstractJAXBTest
 //###########################################################################
-//# $Id: AbstractJAXBTest.java,v 1.6 2007-08-15 12:23:17 robi Exp $
+//# $Id: AbstractJAXBTest.java,v 1.7 2008-02-14 02:24:09 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.marshaller;
@@ -12,7 +12,9 @@ package net.sourceforge.waters.model.marshaller;
 import java.net.URI;
 import java.net.URL;
 import java.io.File;
+import java.io.FileFilter;
 import java.io.IOException;
+import java.util.Arrays;
 
 import net.sourceforge.waters.model.base.DocumentProxy;
 import net.sourceforge.waters.model.printer.ProxyPrinter;
@@ -25,17 +27,43 @@ public abstract class AbstractJAXBTest<D extends DocumentProxy>
 {
 
   //#########################################################################
+  //# Test Cases
+  public void testParseAll()
+    throws Exception
+  {
+    mIsPrinting = false;
+    final FileFilter filter = new TestDirectoryFilter();
+    final File root = getInputRoot();
+    testDirectory(root, filter);
+  }
+
+
+  //#########################################################################
   //# Utilities
+  protected void testDirectory(final File file, final FileFilter filter)
+    throws Exception
+  {
+    if (file.isDirectory()) {
+      final File[] children = file.listFiles(filter);
+      Arrays.sort(children);
+      for (final File child : children) {
+        testDirectory(child, filter);
+      }
+    } else {
+      testParse(file);
+    }
+  }
+
   protected D testParse(final String name)
     throws Exception
   {
-    return testParse(getInputDirectory(), name);
+    return testParse(getWatersInputRoot(), name);
   }
 
   protected D testParse(final String dirname, final String name)
     throws Exception
   {
-    final File dir = new File(getInputDirectory(), dirname);
+    final File dir = new File(getWatersInputRoot(), dirname);
     return testParse(dir, name);
   }
 
@@ -44,7 +72,7 @@ public abstract class AbstractJAXBTest<D extends DocumentProxy>
                         final String name)
     throws Exception
   {
-    final File dir1 = new File(getInputDirectory(), dirname1);
+    final File dir1 = new File(getWatersInputRoot(), dirname1);
     final File dir2 = new File(dir1, dirname2);
     return testParse(dir2, name);
   }
@@ -65,22 +93,20 @@ public abstract class AbstractJAXBTest<D extends DocumentProxy>
     final URI uri = filename.toURI();
     final D proxy = unmarshaller.unmarshal(uri);
     checkIntegrity(proxy);
-    final ProxyPrinter printer = getPrinter();
-    printer.pprint(proxy);
-    printer.flush();
+    checkPrint(proxy);
     return proxy;
   }
 
   protected D testMarshal(final String name)
     throws WatersMarshalException, WatersUnmarshalException, IOException
   {
-    return testMarshal(getInputDirectory(), name);
+    return testMarshal(getWatersInputRoot(), name);
   }
 
   protected D testMarshal(final String dirname, final String name)
     throws WatersMarshalException, WatersUnmarshalException, IOException
   {
-    final File dir = new File(getInputDirectory(), dirname);
+    final File dir = new File(getWatersInputRoot(), dirname);
     return testMarshal(dir, name);
   }
 
@@ -89,7 +115,7 @@ public abstract class AbstractJAXBTest<D extends DocumentProxy>
                           final String name)
     throws WatersMarshalException, WatersUnmarshalException, IOException
   {
-    final File dir1 = new File(getInputDirectory(), dirname1);
+    final File dir1 = new File(getWatersInputRoot(), dirname1);
     final File dir2 = new File(dir1, dirname2);
     return testMarshal(dir2, name);
   }
@@ -160,7 +186,7 @@ public abstract class AbstractJAXBTest<D extends DocumentProxy>
     final URL url = AbstractJAXBTest.class.getResource(infilename);
     final DocumentManager manager = getDocumentManager();
     final DocumentProxy proxy1 = manager.load(url);
-    final File truefile = new File(getInputDirectory(), infile.toString());
+    final File truefile = new File(getWatersInputRoot(), infile.toString());
     final DocumentProxy proxy2 = manager.load(truefile);
     assertTrue("Structure in JAR differs from file!",
                proxy1.equalsByContents(proxy2));
@@ -177,7 +203,7 @@ public abstract class AbstractJAXBTest<D extends DocumentProxy>
   protected void testHandcraft(final String dirname, final D handcrafted)
     throws Exception
   {
-    final File subdir = new File(getInputDirectory(), dirname);
+    final File subdir = new File(getWatersInputRoot(), dirname);
     testHandcraft(subdir, handcrafted);
   }
 
@@ -187,7 +213,7 @@ public abstract class AbstractJAXBTest<D extends DocumentProxy>
                                final D handcrafted)
     throws Exception
   {
-    final File dir1 = new File(getInputDirectory(), dirname1);
+    final File dir1 = new File(getWatersInputRoot(), dirname1);
     final File dir2 = new File(dir1, dirname2);
     testHandcraft(dir2, handcrafted);
   }
@@ -228,13 +254,13 @@ public abstract class AbstractJAXBTest<D extends DocumentProxy>
   protected D testClone(final String name)
     throws Exception
   {
-    return testClone(getInputDirectory(), name);
+    return testClone(getWatersInputRoot(), name);
   }
 
   protected D testClone(final String dirname, final String name)
     throws Exception
   {
-    final File dir = new File(getInputDirectory(), dirname);
+    final File dir = new File(getWatersInputRoot(), dirname);
     return testClone(dir, name);
   }
 
@@ -243,7 +269,7 @@ public abstract class AbstractJAXBTest<D extends DocumentProxy>
                         final String name)
     throws Exception
   {
-    final File dir1 = new File(getInputDirectory(), dirname1);
+    final File dir1 = new File(getWatersInputRoot(), dirname1);
     final File dir2 = new File(dir1, dirname2);
     return testClone(dir2, name);
   }
@@ -277,6 +303,16 @@ public abstract class AbstractJAXBTest<D extends DocumentProxy>
   {
     final DocumentIntegrityChecker checker = getIntegrityChecker();
     checker.check(document);
+  }
+
+  protected void checkPrint(final D proxy)
+    throws Exception
+  {
+    if (mIsPrinting) {
+      final ProxyPrinter printer = getPrinter();
+      printer.pprint(proxy);
+      printer.flush();
+    }
   }
 
 
@@ -314,7 +350,34 @@ public abstract class AbstractJAXBTest<D extends DocumentProxy>
 
 
   //#########################################################################
+  //# Inner Class TestDirectoryFilter
+  private class TestDirectoryFilter implements FileFilter {
+
+    //#######################################################################
+    //# Interface java.io.FileFilter
+    public boolean accept(final File path)
+    {
+      if (path.isDirectory()) {
+        return true;
+      } else {
+        final String name = path.getName();
+        final int dotpos = name.lastIndexOf('.');
+        if (dotpos < 0) {
+          return false;
+        }
+        final String ext = name.substring(dotpos);
+        final ProxyUnmarshaller<D> unmarshaller = getProxyUnmarshaller();
+        final String dftext = unmarshaller.getDefaultExtension();
+        return ext.equals(dftext);
+      }
+    }
+
+  }
+
+
+  //#########################################################################
   //# Data Members
   private DocumentManager mDocumentManager;
+  private boolean mIsPrinting = true;
 
 }

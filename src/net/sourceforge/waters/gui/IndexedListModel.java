@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   IndexedListModel
 //###########################################################################
-//# $Id: IndexedListModel.java,v 1.7 2007-12-16 22:55:30 robi Exp $
+//# $Id: IndexedListModel.java,v 1.8 2008-02-14 02:24:09 robi Exp $
 //###########################################################################
 
 
@@ -18,21 +18,21 @@ import java.util.NoSuchElementException;
 import javax.swing.AbstractListModel;
 import javax.swing.ListSelectionModel;
 
+import net.sourceforge.waters.subject.base.ListSubject;
 import net.sourceforge.waters.subject.base.Subject;
-import net.sourceforge.waters.subject.base.IndexedListSubject;
 import net.sourceforge.waters.subject.base.ModelChangeEvent;
 import net.sourceforge.waters.subject.base.ModelObserver;
-import net.sourceforge.waters.subject.base.NamedSubject;
+import net.sourceforge.waters.subject.module.IdentifiedSubject;
 
 
-public class IndexedListModel<E extends NamedSubject>
+public class IndexedListModel<E extends IdentifiedSubject>
   extends AbstractListModel
   implements ModelObserver
 {
 
   //#########################################################################
   //# Constructor
-  public IndexedListModel(final IndexedListSubject<E> subject)
+  public IndexedListModel(final ListSubject<E> subject)
   {
     mSubject = subject;
     mSortedMirror = new ArrayList<E>(subject);
@@ -67,8 +67,8 @@ public class IndexedListModel<E extends NamedSubject>
 
   public int indexOf(final Object item)
   {
-    if (item instanceof NamedSubject) {
-      final NamedSubject named = (NamedSubject) item;
+    if (item instanceof IdentifiedSubject) {
+      final IdentifiedSubject named = (IdentifiedSubject) item;
       final int index = Collections.binarySearch(mSortedMirror, named);
       if (index >= 0) {
         final E member = mSortedMirror.get(index);
@@ -150,7 +150,7 @@ public class IndexedListModel<E extends NamedSubject>
       break;
     case ModelChangeEvent.ITEM_REMOVED:
       {
-        final NamedSubject value = (NamedSubject) event.getValue();
+        final IdentifiedSubject value = (IdentifiedSubject) event.getValue();
         final int index = Collections.binarySearch(mSortedMirror, value);
         if (index < 0) {
           final String name = value.getName();
@@ -162,22 +162,13 @@ public class IndexedListModel<E extends NamedSubject>
       }
       break;
     case ModelChangeEvent.NAME_CHANGED:
+    case ModelChangeEvent.STATE_CHANGED:
       {
+        // Identifier and IdentifiedProxy objects fire STATE_CHANGED,
+        // not NAME_CHANGED ...
         Collections.sort(mSortedMirror);
         final int last = mSortedMirror.size() - 1;
         fireContentsChanged(this, 0, last);
-      }
-      break;
-    case ModelChangeEvent.STATE_CHANGED:
-      {
-        final NamedSubject named = (NamedSubject) source;
-        final int index = Collections.binarySearch(mSortedMirror, named);
-        if (index < 0) {
-          final String name = named.getName();
-          throw new IllegalStateException
-            ("Modified item '" + name + "' not found in mirror!");
-        }
-        fireContentsChanged(this, index, index);
       }
       break;
     default:
@@ -188,11 +179,11 @@ public class IndexedListModel<E extends NamedSubject>
 
   //#########################################################################
   //# Auxiliary Methods
-  private NamedSubject getChangeRoot(final Subject value)
+  private IdentifiedSubject getChangeRoot(final Subject value)
   {
     final Subject parent = value.getParent();
     if (parent == mSubject) {
-      return (NamedSubject) value;
+      return (IdentifiedSubject) value;
     } else {
       return getChangeRoot(parent);
     }
@@ -284,7 +275,7 @@ public class IndexedListModel<E extends NamedSubject>
 
   //#########################################################################
   //# Data Members
-  private IndexedListSubject<E> mSubject;
+  private ListSubject<E> mSubject;
   private List<E> mSortedMirror;
 
 }

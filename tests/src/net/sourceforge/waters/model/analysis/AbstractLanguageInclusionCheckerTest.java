@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.analysis
 //# CLASS:   AbstractLanguageInclusionCheckerTest
 //###########################################################################
-//# $Id: AbstractLanguageInclusionCheckerTest.java,v 1.6 2007-07-06 02:09:50 robi Exp $
+//# $Id: AbstractLanguageInclusionCheckerTest.java,v 1.7 2008-02-14 02:24:09 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.analysis;
@@ -138,7 +138,7 @@ public abstract class AbstractLanguageInclusionCheckerTest
                                   final String propname)
     throws Exception
   {
-    final File rootdir = getInputRoot();
+    final File rootdir = getWatersInputRoot();
     final File groupdir = new File(rootdir, group);
     runModelVerifier(groupdir, name, expect, propname);
   }
@@ -150,7 +150,7 @@ public abstract class AbstractLanguageInclusionCheckerTest
                                   final String propname)
     throws Exception
   {
-    final File rootdir = getInputRoot();
+    final File rootdir = getWatersInputRoot();
     final File groupdir = new File(rootdir, group);
     runModelVerifier(groupdir, subdir, name, expect, propname);
   }

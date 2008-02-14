@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.marshaller
 //# CLASS:   JAXBModuleImporter
 //###########################################################################
-//# $Id: JAXBModuleImporter.java,v 1.26 2007-12-04 03:22:55 robi Exp $
+//# $Id: JAXBModuleImporter.java,v 1.27 2008-02-14 02:24:09 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.marshaller;
@@ -75,6 +75,7 @@ import net.sourceforge.waters.xsd.module.BoxGeometry;
 import net.sourceforge.waters.xsd.module.Color;
 import net.sourceforge.waters.xsd.module.ColorGeometry;
 import net.sourceforge.waters.xsd.module.ConstantAlias;
+import net.sourceforge.waters.xsd.module.ConstantAliasExpression;
 import net.sourceforge.waters.xsd.module.Edge;
 import net.sourceforge.waters.xsd.module.EnumSetExpression;
 import net.sourceforge.waters.xsd.module.EventAlias;
@@ -88,6 +89,7 @@ import net.sourceforge.waters.xsd.module.Graph;
 import net.sourceforge.waters.xsd.module.GroupNode;
 import net.sourceforge.waters.xsd.module.GuardActionBlock;
 import net.sourceforge.waters.xsd.module.Guards;
+import net.sourceforge.waters.xsd.module.IdentifiedType;
 import net.sourceforge.waters.xsd.module.IdentifierType;
 import net.sourceforge.waters.xsd.module.IndexedIdentifier;
 import net.sourceforge.waters.xsd.module.Instance;
@@ -99,6 +101,7 @@ import net.sourceforge.waters.xsd.module.NodeRef;
 import net.sourceforge.waters.xsd.module.ParameterBinding;
 import net.sourceforge.waters.xsd.module.Point;
 import net.sourceforge.waters.xsd.module.PointGeometryType;
+import net.sourceforge.waters.xsd.module.RangeList;
 import net.sourceforge.waters.xsd.module.ScopeKind;
 import net.sourceforge.waters.xsd.module.SimpleComponent;
 import net.sourceforge.waters.xsd.module.SimpleExpressionType;
@@ -509,10 +512,10 @@ public class JAXBModuleImporter
 
   private ConstantAliasProxy importConstantAlias(final ConstantAlias element)
   {
-    final IdentifierType identifierElement = element.getIdentifier();
-    final IdentifierProxy identifier =
-      (IdentifierProxy) importElement(identifierElement);
-    final ExpressionType expressionElement = element.getExpression();
+    final IdentifierProxy identifier = createIdentifier(element);
+    final ConstantAliasExpression wrapper =
+      element.getConstantAliasExpression();
+    final ExpressionType expressionElement = wrapper.getExpression();
     final ExpressionProxy expression =
       (ExpressionProxy) importElement(expressionElement);
     final ScopeKind scope = element.getScope();
@@ -610,9 +613,7 @@ public class JAXBModuleImporter
 
   private EventAliasProxy importEventAlias(final EventAlias element)
   {
-    final IdentifierType identifierElement = element.getIdentifier();
-    final IdentifierProxy identifier =
-      (IdentifierProxy) importElement(identifierElement);
+    final IdentifierProxy identifier = createIdentifier(element);
     final EventListExpression eventListElement = element.getExpression();
     final EventListExpressionProxy eventList =
       importPlainEventList(eventListElement);
@@ -621,23 +622,26 @@ public class JAXBModuleImporter
 
   private EventDeclProxy importEventDecl(final EventDecl element)
   {
-    final String name = element.getName();
+    final IdentifierProxy identifier = createIdentifier(element);
     final EventKind kind = element.getKind();
     final boolean observable = element.isObservable();
     final ScopeKind scope = element.getScope();
     final List<SimpleExpressionProxy> ranges =
       new LinkedList<SimpleExpressionProxy>();
-    final List<SimpleExpressionType> rangesElement =
-      Casting.toList(element.getRanges());
-    for (final SimpleExpressionType itemElement : rangesElement) {
-      final SimpleExpressionProxy itemProxy =
-        (SimpleExpressionProxy) importElement(itemElement);
-      ranges.add(itemProxy);
+    final RangeList rangeList = element.getRangeList();
+    if (rangeList != null) {
+      final List<SimpleExpressionType> rangesElement =
+        Casting.toList(rangeList.getRanges());
+      for (final SimpleExpressionType itemElement : rangesElement) {
+        final SimpleExpressionProxy itemProxy =
+          (SimpleExpressionProxy) importElement(itemElement);
+        ranges.add(itemProxy);
+      }
     }
     final ColorGeometry colorGeometryElement = element.getColorGeometry();
     final ColorGeometryProxy colorGeometry =
       importColorGeometry(colorGeometryElement);
-    return mFactory.createEventDeclProxy(name,
+    return mFactory.createEventDeclProxy(identifier,
                                          kind,
                                          observable,
                                          scope,
@@ -763,9 +767,7 @@ public class JAXBModuleImporter
 
   private InstanceProxy importInstance(final Instance element)
   {
-    final IdentifierType identifierElement = element.getIdentifier();
-    final IdentifierProxy identifier =
-      (IdentifierProxy) importElement(identifierElement);
+    final IdentifierProxy identifier = createIdentifier(element);
     final String moduleName = element.getModuleName();
     final List<ParameterBindingProxy> bindingList =
       new LinkedList<ParameterBindingProxy>();
@@ -902,9 +904,7 @@ public class JAXBModuleImporter
   private SimpleComponentProxy importSimpleComponent
     (final SimpleComponent element)
   {
-    final IdentifierType identifierElement = element.getIdentifier();
-    final IdentifierProxy identifier =
-      (IdentifierProxy) importElement(identifierElement);
+    final IdentifierProxy identifier = createIdentifier(element);
     final ComponentKind kind = element.getKind();
     final Graph graphElement = element.getGraph();
     final GraphProxy graph = importGraph(graphElement);
@@ -979,9 +979,7 @@ public class JAXBModuleImporter
   private VariableComponentProxy importVariableComponent
     (final VariableComponent element)
   {
-    final IdentifierType identifierElement = element.getIdentifier();
-    final IdentifierProxy identifier =
-      (IdentifierProxy) importElement(identifierElement);
+    final IdentifierProxy identifier = createIdentifier(element);
     final boolean deterministic = element.isDeterministic();
     final VariableRange vrange = element.getVariableRange();
     final SimpleExpressionType typeElement = vrange.getRange();
@@ -1018,6 +1016,20 @@ public class JAXBModuleImporter
     final SimpleExpressionProxy predicate =
       (SimpleExpressionProxy) importElement(predicateElement);
     return mFactory.createVariableMarkingProxy(proposition, predicate);
+  }
+
+
+  //#########################################################################
+  //# Auxiliary Methods
+  private IdentifierProxy createIdentifier(final IdentifiedType element)
+  {
+    final IdentifierType identifierElement = element.getIdentifier();
+    if (identifierElement == null) {
+      final String name = element.getName();
+      return mFactory.createSimpleIdentifierProxy(name);
+    } else {
+      return (IdentifierProxy) importElement(identifierElement);
+    }
   }
 
 

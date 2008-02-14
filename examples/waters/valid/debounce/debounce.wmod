@@ -3,27 +3,39 @@
 <ConstantAliasList>
 <ConstantAlias>
 <SimpleIdentifier Name="BITS"/>
+<ConstantAliasExpression>
 <BinaryExpression Operator="..">
 <IntConstant Value="1"/>
 <IntConstant Value="1"/>
 </BinaryExpression>
+</ConstantAliasExpression>
 </ConstantAlias>
 </ConstantAliasList>
 <EventDeclList>
 <EventDecl Kind="CONTROLLABLE" Name="chg_value">
+<RangeList>
 <SimpleIdentifier Name="BITS"/>
+</RangeList>
 </EventDecl>
 <EventDecl Kind="CONTROLLABLE" Name="reset">
+<RangeList>
 <SimpleIdentifier Name="BITS"/>
+</RangeList>
 </EventDecl>
 <EventDecl Kind="CONTROLLABLE" Name="timer">
+<RangeList>
 <SimpleIdentifier Name="BITS"/>
+</RangeList>
 </EventDecl>
 <EventDecl Kind="UNCONTROLLABLE" Name="timeout">
+<RangeList>
 <SimpleIdentifier Name="BITS"/>
+</RangeList>
 </EventDecl>
 <EventDecl Kind="UNCONTROLLABLE" Name="new_value">
+<RangeList>
 <SimpleIdentifier Name="BITS"/>
+</RangeList>
 </EventDecl>
 <EventDecl Kind="PROPOSITION" Name=":accepting"/>
 </EventDeclList>

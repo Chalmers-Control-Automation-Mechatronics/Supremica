@@ -3,38 +3,54 @@
 <ConstantAliasList>
 <ConstantAlias Scope="OPTIONAL_PARAMETER">
 <SimpleIdentifier Name="N"/>
+<ConstantAliasExpression>
 <IntConstant Value="1"/>
+</ConstantAliasExpression>
 </ConstantAlias>
 <ConstantAlias>
 <SimpleIdentifier Name="GROUPS"/>
+<ConstantAliasExpression>
 <BinaryExpression Operator="..">
 <IntConstant Value="1"/>
 <SimpleIdentifier Name="N"/>
 </BinaryExpression>
+</ConstantAliasExpression>
 </ConstantAlias>
 <ConstantAlias>
 <SimpleIdentifier Name="IGROUPS"/>
+<ConstantAliasExpression>
 <BinaryExpression Operator="..">
 <IntConstant Value="0"/>
 <SimpleIdentifier Name="N"/>
 </BinaryExpression>
+</ConstantAliasExpression>
 </ConstantAlias>
 </ConstantAliasList>
 <EventDeclList>
 <EventDecl Kind="UNCONTROLLABLE" Name="tu_reject">
+<RangeList>
 <SimpleIdentifier Name="GROUPS"/>
+</RangeList>
 </EventDecl>
 <EventDecl Kind="CONTROLLABLE" Name="tu_load">
+<RangeList>
 <SimpleIdentifier Name="IGROUPS"/>
+</RangeList>
 </EventDecl>
 <EventDecl Kind="UNCONTROLLABLE" Name="tu_accept">
+<RangeList>
 <SimpleIdentifier Name="IGROUPS"/>
+</RangeList>
 </EventDecl>
 <EventDecl Kind="UNCONTROLLABLE" Name="machine_unload">
+<RangeList>
 <SimpleIdentifier Name="GROUPS"/>
+</RangeList>
 </EventDecl>
 <EventDecl Kind="CONTROLLABLE" Name="machine_load">
+<RangeList>
 <SimpleIdentifier Name="GROUPS"/>
+</RangeList>
 </EventDecl>
 <EventDecl Kind="PROPOSITION" Name=":accepting"/>
 </EventDeclList>

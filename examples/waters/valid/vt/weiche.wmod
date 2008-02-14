@@ -3,13 +3,16 @@
 <ConstantAliasList>
 <ConstantAlias>
 <SimpleIdentifier Name="TRAINS"/>
+<ConstantAliasExpression>
 <BinaryExpression Operator="..">
 <IntConstant Value="1"/>
 <IntConstant Value="2"/>
 </BinaryExpression>
+</ConstantAliasExpression>
 </ConstantAlias>
 <ConstantAlias>
 <SimpleIdentifier Name="POS"/>
+<ConstantAliasExpression>
 <EnumSetExpression>
 <SimpleIdentifier Name="l1"/>
 <SimpleIdentifier Name="l2"/>
@@ -18,10 +21,12 @@
 <SimpleIdentifier Name="r1"/>
 <SimpleIdentifier Name="r2"/>
 </EnumSetExpression>
+</ConstantAliasExpression>
 </ConstantAlias>
 </ConstantAliasList>
 <EventDeclList>
 <EventDecl Kind="UNCONTROLLABLE" Name="not_at">
+<RangeList>
 <EnumSetExpression>
 <SimpleIdentifier Name="r1"/>
 <SimpleIdentifier Name="r2"/>
@@ -30,14 +35,18 @@
 <SimpleIdentifier Name="m1"/>
 <SimpleIdentifier Name="m2"/>
 </EnumSetExpression>
+</RangeList>
 </EventDecl>
 <EventDecl Kind="UNCONTROLLABLE" Name="stopped">
+<RangeList>
 <BinaryExpression Operator="..">
 <IntConstant Value="1"/>
 <IntConstant Value="2"/>
 </BinaryExpression>
+</RangeList>
 </EventDecl>
 <EventDecl Kind="UNCONTROLLABLE" Name="at">
+<RangeList>
 <EnumSetExpression>
 <SimpleIdentifier Name="r2"/>
 <SimpleIdentifier Name="l2"/>
@@ -50,20 +59,25 @@
 <IntConstant Value="1"/>
 <IntConstant Value="2"/>
 </BinaryExpression>
+</RangeList>
 </EventDecl>
 <EventDecl Kind="CONTROLLABLE" Name="straight"/>
 <EventDecl Kind="CONTROLLABLE" Name="req">
+<RangeList>
 <BinaryExpression Operator="..">
 <IntConstant Value="1"/>
 <IntConstant Value="2"/>
 </BinaryExpression>
+</RangeList>
 </EventDecl>
 <EventDecl Kind="CONTROLLABLE" Name="curve"/>
 <EventDecl Kind="CONTROLLABLE" Name="enable">
+<RangeList>
 <BinaryExpression Operator="..">
 <IntConstant Value="1"/>
 <IntConstant Value="2"/>
 </BinaryExpression>
+</RangeList>
 </EventDecl>
 <EventDecl Kind="PROPOSITION" Name=":accepting"/>
 </EventDeclList>

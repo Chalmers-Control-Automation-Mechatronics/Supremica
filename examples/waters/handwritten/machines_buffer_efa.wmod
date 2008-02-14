@@ -250,17 +250,28 @@
                     </Edge>
                 </EdgeList>
             </Graph>
-            <VariableList>
-                <Variable Name="items">
-                    <BinaryExpression Operator="..">
-                        <IntConstant Value="0"/>
-                        <IntConstant Value="2"/>
-                    </BinaryExpression>
-                    <IntConstant Value="0"/>
-                    <IntConstant Value="0"/>
-                </Variable>
-            </VariableList>
         </SimpleComponent>
+        <VariableComponent Name="items">
+          <VariableRange>
+            <BinaryExpression Operator="..">
+              <IntConstant Value="0"/>
+              <IntConstant Value="2"/>
+            </BinaryExpression>
+          </VariableRange>
+          <VariableInitial>
+            <BinaryExpression Operator="==">
+              <SimpleIdentifier Name="items"/>
+              <IntConstant Value="0"/>
+            </BinaryExpression>
+          </VariableInitial>
+          <VariableMarking>
+            <SimpleIdentifier Name=":accepting"/>
+            <BinaryExpression Operator="==">
+              <SimpleIdentifier Name="items"/>
+              <IntConstant Value="0"/>
+            </BinaryExpression>
+          </VariableMarking>
+        </VariableComponent>
     </ComponentList>
 </Module>
 

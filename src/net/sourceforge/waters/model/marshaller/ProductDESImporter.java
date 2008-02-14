@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.marshaller
 //# CLASS:   ProductDESImporter
 //###########################################################################
-//# $Id: ProductDESImporter.java,v 1.9 2007-11-06 17:08:15 avenir Exp $
+//# $Id: ProductDESImporter.java,v 1.10 2008-02-14 02:24:09 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.marshaller;
@@ -245,11 +245,11 @@ public class ProductDESImporter
   //# Visitor Methods
   private EventDeclProxy importEventDecl(final EventProxy event)
   {
-    final String name = event.getName();
+    final SimpleIdentifierProxy ident = importEvent(event);
     final EventKind kind = event.getKind();
     final boolean observable = event.isObservable();
     return mFactory.createEventDeclProxy
-      (name, kind, observable, ScopeKind.LOCAL, null, null);
+      (ident, kind, observable, ScopeKind.LOCAL, null, null);
   }
 
   private SimpleIdentifierProxy importEvent(final EventProxy event)

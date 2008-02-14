@@ -681,7 +681,7 @@ Class-Path: ${manifest.pathlist}</echo>
                 <pathelement location="${dist}/SupremicaTest.jar"/>
                 <pathelement path="${java.class.path}"/>
             </classpath>
-            <sysproperty key="waters.test.inputdir" value="${waters.examples}"/>
+            <sysproperty key="waters.test.inputdir" value="${examples}"/>
             <sysproperty key="waters.test.outputdir" value="${logs.results}"/>
             <sysproperty key="java.library.path" value="${dist}"/>
         </junit>
@@ -711,7 +711,7 @@ Class-Path: ${manifest.pathlist}</echo>
                 <pathelement location="${dist}/SupremicaTest.jar"/>
                 <pathelement path="${java.class.path}"/>
             </classpath>
-            <sysproperty key="waters.test.inputdir" value="${waters.examples}"/>
+            <sysproperty key="waters.test.inputdir" value="${examples}"/>
             <sysproperty key="waters.test.outputdir" value="${logs.results}"/>
             <sysproperty key="java.library.path" value="${dist}"/>
         </junit>
@@ -736,7 +736,7 @@ Class-Path: ${manifest.pathlist}</echo>
                 <pathelement location="${dist}/SupremicaTest.jar"/>
                 <pathelement path="${java.class.path}"/>
             </classpath>
-            <sysproperty key="waters.test.inputdir" value="${waters.examples}"/>
+            <sysproperty key="waters.test.inputdir" value="${examples}"/>
             <sysproperty key="waters.test.outputdir" value="${logs.results}"/>
             <sysproperty key="java.library.path" value="${dist}"/>
         </junit>
@@ -750,7 +750,7 @@ Class-Path: ${manifest.pathlist}</echo>
                 <pathelement location="${dist}/SupremicaTest.jar"/>
                 <pathelement path="${java.class.path}"/>
             </classpath>
-            <sysproperty key="waters.test.inputdir" value="${waters.examples}"/>
+            <sysproperty key="waters.test.inputdir" value="${examples}"/>
             <sysproperty key="waters.test.outputdir" value="${logs.results}"/>
             <sysproperty key="java.library.path" value="${dist}"/>
         </java>

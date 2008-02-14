@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.automata.algorithms.minimization
 //# CLASS:   TestAutomatonMinimizer
 //###########################################################################
-//# $Id: TestAutomatonMinimizer.java,v 1.13 2007-05-29 09:08:10 robi Exp $
+//# $Id: TestAutomatonMinimizer.java,v 1.14 2008-02-14 02:24:09 robi Exp $
 //###########################################################################
 
 /*
@@ -341,7 +341,7 @@ public class TestAutomatonMinimizer
         final String groupname = "valid";
         final String subdirname = "bmw_fh";
         final String filename = "bmw_fh.wdes";
-        final File rootdir = getInputRoot();
+        final File rootdir = getWatersInputRoot();
         final File groupdir = new File(rootdir, groupname);
         final File subdir = new File(groupdir, subdirname);
         final File file = new File(subdir, filename);

@@ -3,130 +3,192 @@
 <ConstantAliasList>
 <ConstantAlias>
 <SimpleIdentifier Name="HeckTueren"/>
+<ConstantAliasExpression>
 <EnumSetExpression>
 <SimpleIdentifier Name="HT"/>
 </EnumSetExpression>
+</ConstantAliasExpression>
 </ConstantAlias>
 <ConstantAlias>
 <SimpleIdentifier Name="Timers"/>
+<ConstantAliasExpression>
 <EnumSetExpression>
 <SimpleIdentifier Name="FT"/>
 <SimpleIdentifier Name="BT"/>
 <SimpleIdentifier Name="HT"/>
 </EnumSetExpression>
+</ConstantAliasExpression>
 </ConstantAlias>
 <ConstantAlias>
 <SimpleIdentifier Name="NichtFahrerTueren"/>
+<ConstantAliasExpression>
 <EnumSetExpression>
 <SimpleIdentifier Name="BT"/>
 <SimpleIdentifier Name="HT"/>
 </EnumSetExpression>
+</ConstantAliasExpression>
 </ConstantAlias>
 <ConstantAlias>
 <SimpleIdentifier Name="FahrerTueren"/>
+<ConstantAliasExpression>
 <EnumSetExpression>
 <SimpleIdentifier Name="FT"/>
 </EnumSetExpression>
+</ConstantAliasExpression>
 </ConstantAlias>
 <ConstantAlias>
 <SimpleIdentifier Name="VorderTueren"/>
+<ConstantAliasExpression>
 <EnumSetExpression>
 <SimpleIdentifier Name="FT"/>
 <SimpleIdentifier Name="BT"/>
 </EnumSetExpression>
+</ConstantAliasExpression>
 </ConstantAlias>
 <ConstantAlias>
 <SimpleIdentifier Name="Tueren"/>
+<ConstantAliasExpression>
 <EnumSetExpression>
 <SimpleIdentifier Name="FT"/>
 <SimpleIdentifier Name="BT"/>
 <SimpleIdentifier Name="HT"/>
 </EnumSetExpression>
+</ConstantAliasExpression>
 </ConstantAlias>
 </ConstantAliasList>
 <EventDeclList>
 <EventDecl Kind="CONTROLLABLE" Name="stop_VR">
+<RangeList>
 <SimpleIdentifier Name="Tueren"/>
+</RangeList>
 </EventDecl>
 <EventDecl Kind="CONTROLLABLE" Name="MER_an">
+<RangeList>
 <SimpleIdentifier Name="Tueren"/>
+</RangeList>
 </EventDecl>
 <EventDecl Kind="CONTROLLABLE" Name="soft_ZS"/>
 <EventDecl Kind="CONTROLLABLE" Name="stop_ZS">
+<RangeList>
 <SimpleIdentifier Name="Tueren"/>
+</RangeList>
 </EventDecl>
 <EventDecl Kind="CONTROLLABLE" Name="time_ER">
+<RangeList>
 <SimpleIdentifier Name="Tueren"/>
+</RangeList>
 </EventDecl>
 <EventDecl Kind="UNCONTROLLABLE" Name="tuer_auf">
+<RangeList>
 <SimpleIdentifier Name="Tueren"/>
+</RangeList>
 </EventDecl>
 <EventDecl Kind="CONTROLLABLE" Name="start_ER">
+<RangeList>
 <SimpleIdentifier Name="Tueren"/>
+</RangeList>
 </EventDecl>
 <EventDecl Kind="CONTROLLABLE" Name="reset">
+<RangeList>
 <SimpleIdentifier Name="Timers"/>
+</RangeList>
 </EventDecl>
 <EventDecl Kind="CONTROLLABLE" Name="MVR_aus">
+<RangeList>
 <SimpleIdentifier Name="Tueren"/>
+</RangeList>
 </EventDecl>
 <EventDecl Kind="CONTROLLABLE" Name="done_ER"/>
 <EventDecl Kind="CONTROLLABLE" Name="async">
+<RangeList>
 <SimpleIdentifier Name="Tueren"/>
+</RangeList>
 </EventDecl>
 <EventDecl Kind="CONTROLLABLE" Name="sync">
+<RangeList>
 <SimpleIdentifier Name="Tueren"/>
+</RangeList>
 </EventDecl>
 <EventDecl Kind="CONTROLLABLE" Name="time_VR">
+<RangeList>
 <SimpleIdentifier Name="Tueren"/>
+</RangeList>
 </EventDecl>
 <EventDecl Kind="CONTROLLABLE" Name="MVR_an">
+<RangeList>
 <SimpleIdentifier Name="Tueren"/>
+</RangeList>
 </EventDecl>
 <EventDecl Kind="CONTROLLABLE" Name="MZS_aus">
+<RangeList>
 <SimpleIdentifier Name="Tueren"/>
+</RangeList>
 </EventDecl>
 <EventDecl Kind="CONTROLLABLE" Name="soft_SER">
+<RangeList>
 <SimpleIdentifier Name="Tueren"/>
+</RangeList>
 </EventDecl>
 <EventDecl Kind="CONTROLLABLE" Name="soft_CS"/>
 <EventDecl Kind="CONTROLLABLE" Name="time_ZS">
+<RangeList>
 <SimpleIdentifier Name="Tueren"/>
+</RangeList>
 </EventDecl>
 <EventDecl Kind="CONTROLLABLE" Name="start_VR">
+<RangeList>
 <SimpleIdentifier Name="Tueren"/>
+</RangeList>
 </EventDecl>
 <EventDecl Kind="CONTROLLABLE" Name="soft_ER"/>
 <EventDecl Kind="CONTROLLABLE" Name="done_VR"/>
 <EventDecl Kind="CONTROLLABLE" Name="time_W">
+<RangeList>
 <SimpleIdentifier Name="Tueren"/>
+</RangeList>
 </EventDecl>
 <EventDecl Kind="UNCONTROLLABLE" Name="tuer_zu">
+<RangeList>
 <SimpleIdentifier Name="Tueren"/>
+</RangeList>
 </EventDecl>
 <EventDecl Kind="CONTROLLABLE" Name="stop_ER">
+<RangeList>
 <SimpleIdentifier Name="Tueren"/>
+</RangeList>
 </EventDecl>
 <EventDecl Kind="CONTROLLABLE" Name="start_ZS">
+<RangeList>
 <SimpleIdentifier Name="Tueren"/>
+</RangeList>
 </EventDecl>
 <EventDecl Kind="CONTROLLABLE" Name="done_ZS"/>
 <EventDecl Kind="CONTROLLABLE" Name="MER_aus">
+<RangeList>
 <SimpleIdentifier Name="Tueren"/>
+</RangeList>
 </EventDecl>
 <EventDecl Kind="CONTROLLABLE" Name="MZS_an">
+<RangeList>
 <SimpleIdentifier Name="Tueren"/>
+</RangeList>
 </EventDecl>
 <EventDecl Kind="UNCONTROLLABLE" Name="STZV">
+<RangeList>
 <SimpleIdentifier Name="Tueren"/>
+</RangeList>
 </EventDecl>
 <EventDecl Kind="UNCONTROLLABLE" Name="timeout">
+<RangeList>
 <SimpleIdentifier Name="Timers"/>
+</RangeList>
 </EventDecl>
 <EventDecl Kind="CONTROLLABLE" Name="soft_VR"/>
 <EventDecl Kind="CONTROLLABLE" Name="CS_ok"/>
 <EventDecl Kind="CONTROLLABLE" Name="done_SER">
+<RangeList>
 <SimpleIdentifier Name="Tueren"/>
+</RangeList>
 </EventDecl>
 <EventDecl Kind="PROPOSITION" Name=":accepting"/>
 </EventDeclList>

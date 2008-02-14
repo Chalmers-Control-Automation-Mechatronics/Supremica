@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.valid
 //# CLASS:   ValidTest
 //###########################################################################
-//# $Id: ValidTest.java,v 1.5 2006-08-07 04:44:06 robi Exp $
+//# $Id: ValidTest.java,v 1.6 2008-02-14 02:24:09 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.valid;
@@ -275,7 +275,7 @@ public class ValidTest extends AbstractWatersTest
   protected void setUp()
     throws JAXBException, SAXException
   {
-    mInputDirectory = new File(getInputRoot(), "valid");
+    mInputDirectory = new File(getWatersInputRoot(), "valid");
     mOutputDirectory = getOutputDirectory();
     final ModuleProxyFactory moduleFactory =
       ModuleElementFactory.getInstance();

@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.gui.ide
 //# CLASS:   ModuleContainer
 //###########################################################################
-//# $Id: ModuleContainer.java,v 1.68 2007-12-04 03:22:58 robi Exp $
+//# $Id: ModuleContainer.java,v 1.69 2008-02-14 02:24:09 robi Exp $
 //###########################################################################
 
 
@@ -216,21 +216,7 @@ public class ModuleContainer
     {
         return mExpressionParser;
     }
-    
-    public void addStandardPropositions()
-    {
-        EventDeclSubject accepting = new EventDeclSubject(EventDeclProxy.DEFAULT_MARKING_NAME, EventKind.PROPOSITION);
-        if (!getModule().getEventDeclListModifiable().containsName(EventDeclProxy.DEFAULT_MARKING_NAME))
-        {
-            getModule().getEventDeclListModifiable().add(accepting);
-        }
-        EventDeclSubject forbidden = new EventDeclSubject(EventDeclProxy.DEFAULT_FORBIDDEN_NAME, EventKind.PROPOSITION);
-        if (!getModule().getEventDeclListModifiable().containsName(EventDeclProxy.DEFAULT_FORBIDDEN_NAME))
-        {
-            getModule().getEventDeclListModifiable().add(forbidden);
-        }
-    }
-    
+
     public ProxyPrinter getPrinter()
     {
         return mPrinter;

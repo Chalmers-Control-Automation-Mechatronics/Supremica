@@ -4,14 +4,13 @@
 //# PACKAGE: net.sourceforge.waters.model.module
 //# CLASS:   EventDeclProxy
 //###########################################################################
-//# $Id: EventDeclProxy.java,v 1.10 2007-06-08 10:57:34 robi Exp $
+//# $Id: EventDeclProxy.java,v 1.11 2008-02-14 02:24:09 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.module;
 
 import java.util.List;
 
-import net.sourceforge.waters.model.base.NamedProxy;
 import net.sourceforge.waters.xsd.base.EventKind;
 import net.sourceforge.waters.xsd.module.ScopeKind;
 
@@ -58,7 +57,7 @@ import net.sourceforge.waters.xsd.module.ScopeKind;
  */
 // @short event declaration
 
-public interface EventDeclProxy extends NamedProxy {
+public interface EventDeclProxy extends IdentifiedProxy {
 
   //#########################################################################
   //# Getters and Setters

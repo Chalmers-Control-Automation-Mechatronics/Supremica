@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.samples.maze
 //# CLASS:   MazeCompiler
 //###########################################################################
-//# $Id: MazeCompiler.java,v 1.12 2007-06-08 10:45:20 robi Exp $
+//# $Id: MazeCompiler.java,v 1.13 2008-02-14 02:24:09 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.samples.maze;
@@ -244,8 +244,10 @@ public class MazeCompiler implements ProxyUnmarshaller<ModuleProxy>
   {
     final String name = action.getName();
     if (!mEvents.containsName(name)) {
+      final SimpleIdentifierProxy ident =
+        mFactory.createSimpleIdentifierProxy(name);
       final EventKind kind = EventKind.UNCONTROLLABLE;
-      final EventDeclProxy decl = mFactory.createEventDeclProxy(name, kind);
+      final EventDeclProxy decl = mFactory.createEventDeclProxy(ident, kind);
       mEvents.add(decl);
       if (action.isEscapeAction()) {
         escapes.add(action);

@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.analysis
 //# CLASS:   AbstractModelVerifierTest
 //###########################################################################
-//# $Id: AbstractModelVerifierTest.java,v 1.14 2007-11-02 00:30:37 robi Exp $
+//# $Id: AbstractModelVerifierTest.java,v 1.15 2008-02-14 02:24:09 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.analysis;
@@ -56,7 +56,7 @@ public abstract class AbstractModelVerifierTest extends AbstractAnalysisTest
                                   final boolean expect)
     throws Exception
   {
-    final File rootdir = getInputRoot();
+    final File rootdir = getWatersInputRoot();
     final File groupdir = new File(rootdir, group);
     runModelVerifier(groupdir, name, bindings, expect);
   }
@@ -68,7 +68,7 @@ public abstract class AbstractModelVerifierTest extends AbstractAnalysisTest
                                   final boolean expect)
     throws Exception
   {
-    final File rootdir = getInputRoot();
+    final File rootdir = getWatersInputRoot();
     final File groupdir = new File(rootdir, group);
     runModelVerifier(groupdir, subdir, name, bindings, expect);
   }
@@ -102,7 +102,7 @@ public abstract class AbstractModelVerifierTest extends AbstractAnalysisTest
                                   final boolean expect)
     throws Exception
   {
-    final File rootdir = getInputRoot();
+    final File rootdir = getWatersInputRoot();
     final File groupdir = new File(rootdir, group);
     runModelVerifier(groupdir, name, expect);
   }
@@ -113,7 +113,7 @@ public abstract class AbstractModelVerifierTest extends AbstractAnalysisTest
                                   final boolean expect)
     throws Exception
   {
-    final File rootdir = getInputRoot();
+    final File rootdir = getWatersInputRoot();
     final File groupdir = new File(rootdir, group);
     runModelVerifier(groupdir, subdir, name, expect);
   }

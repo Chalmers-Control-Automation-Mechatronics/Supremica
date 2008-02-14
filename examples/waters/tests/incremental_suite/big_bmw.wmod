@@ -3,6 +3,7 @@
 <EventDeclList>
 <EventDecl Kind="UNCONTROLLABLE" Name="usaus"/>
 <EventDecl Kind="UNCONTROLLABLE" Name="WINDOW_MANUAL_CLOSE">
+<RangeList>
 <EnumSetExpression>
 <SimpleIdentifier Name="FRONT"/>
 <SimpleIdentifier Name="REAR"/>
@@ -11,11 +12,13 @@
 <SimpleIdentifier Name="LEFT"/>
 <SimpleIdentifier Name="RIGHT"/>
 </EnumSetExpression>
+</RangeList>
 </EventDecl>
 <EventDecl Kind="CONTROLLABLE" Name="roof_manual_stop"/>
 <EventDecl Kind="UNCONTROLLABLE" Name="nocountry"/>
 <EventDecl Kind="CONTROLLABLE" Name="cmft_start"/>
 <EventDecl Kind="CONTROLLABLE" Name="window_manual_close">
+<RangeList>
 <EnumSetExpression>
 <SimpleIdentifier Name="FRONT"/>
 <SimpleIdentifier Name="REAR"/>
@@ -24,12 +27,15 @@
 <SimpleIdentifier Name="LEFT"/>
 <SimpleIdentifier Name="RIGHT"/>
 </EnumSetExpression>
+</RangeList>
 </EventDecl>
 <EventDecl Kind="UNCONTROLLABLE" Name="OPENDOOR">
+<RangeList>
 <EnumSetExpression>
 <SimpleIdentifier Name="DRD"/>
 <SimpleIdentifier Name="PSD"/>
 </EnumSetExpression>
+</RangeList>
 </EventDecl>
 <EventDecl Kind="UNCONTROLLABLE" Name="ROOF_MANUAL_OPEN"/>
 <EventDecl Kind="UNCONTROLLABLE" Name="ROOF_MANUAL_CLOSE"/>
@@ -39,6 +45,7 @@
 <EventDecl Kind="CONTROLLABLE" Name="read_country"/>
 <EventDecl Kind="UNCONTROLLABLE" Name="ecefin"/>
 <EventDecl Kind="CONTROLLABLE" Name="window_manual_open">
+<RangeList>
 <EnumSetExpression>
 <SimpleIdentifier Name="FRONT"/>
 <SimpleIdentifier Name="REAR"/>
@@ -47,8 +54,10 @@
 <SimpleIdentifier Name="LEFT"/>
 <SimpleIdentifier Name="RIGHT"/>
 </EnumSetExpression>
+</RangeList>
 </EventDecl>
 <EventDecl Kind="UNCONTROLLABLE" Name="WINDOW_MANUAL_OPEN">
+<RangeList>
 <EnumSetExpression>
 <SimpleIdentifier Name="REAR"/>
 <SimpleIdentifier Name="FRONT"/>
@@ -57,20 +66,25 @@
 <SimpleIdentifier Name="LEFT"/>
 <SimpleIdentifier Name="RIGHT"/>
 </EnumSetExpression>
+</RangeList>
 </EventDecl>
 <EventDecl Kind="CONTROLLABLE" Name="CMFT_BACK">
+<RangeList>
 <EnumSetExpression>
 <SimpleIdentifier Name="CLOSE"/>
 <SimpleIdentifier Name="OPEN"/>
 </EnumSetExpression>
+</RangeList>
 </EventDecl>
 <EventDecl Kind="UNCONTROLLABLE" Name="KEY_PLUG"/>
 <EventDecl Kind="CONTROLLABLE" Name="cmft_cond_key"/>
 <EventDecl Kind="UNCONTROLLABLE" Name="CLOSEDOOR">
+<RangeList>
 <EnumSetExpression>
 <SimpleIdentifier Name="DRD"/>
 <SimpleIdentifier Name="PSD"/>
 </EnumSetExpression>
+</RangeList>
 </EventDecl>
 <EventDecl Kind="UNCONTROLLABLE" Name="KL_R_OFF"/>
 <EventDecl Kind="UNCONTROLLABLE" Name="KL_R_ON"/>
@@ -81,32 +95,39 @@
 <EventDecl Kind="UNCONTROLLABLE" Name="KL_50_OFF"/>
 <EventDecl Kind="CONTROLLABLE" Name="timer"/>
 <EventDecl Kind="CONTROLLABLE" Name="CMFT_FRONT">
+<RangeList>
 <EnumSetExpression>
 <SimpleIdentifier Name="CLOSE"/>
 <SimpleIdentifier Name="OPEN"/>
 </EnumSetExpression>
+</RangeList>
 </EventDecl>
 <EventDecl Kind="CONTROLLABLE" Name="roof_manual_close"/>
 <EventDecl Kind="UNCONTROLLABLE" Name="KEY_UNPLUG"/>
 <EventDecl Kind="UNCONTROLLABLE" Name="REQ">
+<RangeList>
 <EnumSetExpression>
 <SimpleIdentifier Name="OPEN"/>
 <SimpleIdentifier Name="STOP"/>
 <SimpleIdentifier Name="CLOSE"/>
 </EnumSetExpression>
+</RangeList>
 </EventDecl>
 <EventDecl Kind="CONTROLLABLE" Name="FH_LOCK"/>
 <EventDecl Kind="CONTROLLABLE" Name="CMFT_ROOF">
+<RangeList>
 <EnumSetExpression>
 <SimpleIdentifier Name="CLOSE"/>
 <SimpleIdentifier Name="OPEN"/>
 </EnumSetExpression>
+</RangeList>
 </EventDecl>
 <EventDecl Kind="UNCONTROLLABLE" Name="ROOF_MANUAL_STOP"/>
 <EventDecl Kind="CONTROLLABLE" Name="CMFT_STOP"/>
 <EventDecl Kind="CONTROLLABLE" Name="fh_cond_kl_r"/>
 <EventDecl Kind="UNCONTROLLABLE" Name="timeout"/>
 <EventDecl Kind="CONTROLLABLE" Name="window_manual_stop">
+<RangeList>
 <EnumSetExpression>
 <SimpleIdentifier Name="FRONT"/>
 <SimpleIdentifier Name="REAR"/>
@@ -115,8 +136,10 @@
 <SimpleIdentifier Name="LEFT"/>
 <SimpleIdentifier Name="RIGHT"/>
 </EnumSetExpression>
+</RangeList>
 </EventDecl>
 <EventDecl Kind="UNCONTROLLABLE" Name="WINDOW_MANUAL_STOP">
+<RangeList>
 <EnumSetExpression>
 <SimpleIdentifier Name="REAR"/>
 <SimpleIdentifier Name="FRONT"/>
@@ -125,6 +148,7 @@
 <SimpleIdentifier Name="LEFT"/>
 <SimpleIdentifier Name="RIGHT"/>
 </EnumSetExpression>
+</RangeList>
 </EventDecl>
 <EventDecl Kind="CONTROLLABLE" Name="FH_UNLOCK"/>
 <EventDecl Kind="PROPOSITION" Name=":accepting"/>

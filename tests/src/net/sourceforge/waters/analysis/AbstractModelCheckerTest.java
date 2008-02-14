@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.analysis
 //# CLASS:   AbstractModelCheckerTest
 //###########################################################################
-//# $Id: AbstractModelCheckerTest.java,v 1.4 2006-11-09 06:30:01 robi Exp $
+//# $Id: AbstractModelCheckerTest.java,v 1.5 2008-02-14 02:24:09 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.analysis;
@@ -61,7 +61,7 @@ public abstract class AbstractModelCheckerTest extends AbstractWatersTest
                        final boolean expect)
     throws Exception
   {
-    final File rootdir = getInputRoot();
+    final File rootdir = getWatersInputRoot();
     final File groupdir = new File(rootdir, group);
     runModelChecker(groupdir, name, bindings, expect);
   }
@@ -73,7 +73,7 @@ public abstract class AbstractModelCheckerTest extends AbstractWatersTest
                        final boolean expect)
     throws Exception
   {
-    final File rootdir = getInputRoot();
+    final File rootdir = getWatersInputRoot();
     final File groupdir = new File(rootdir, group);
     runModelChecker(groupdir, subdir, name, bindings, expect);
   }
@@ -107,7 +107,7 @@ public abstract class AbstractModelCheckerTest extends AbstractWatersTest
                        final boolean expect)
     throws Exception
   {
-    final File rootdir = getInputRoot();
+    final File rootdir = getWatersInputRoot();
     final File groupdir = new File(rootdir, group);
     runModelChecker(groupdir, name, expect);
   }
@@ -118,7 +118,7 @@ public abstract class AbstractModelCheckerTest extends AbstractWatersTest
                        final boolean expect)
     throws Exception
   {
-    final File rootdir = getInputRoot();
+    final File rootdir = getWatersInputRoot();
     final File groupdir = new File(rootdir, group);
     runModelChecker(groupdir, subdir, name, expect);
   }

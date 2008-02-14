@@ -4,28 +4,34 @@
 <EventDeclList>
 <EventDecl Kind="PROPOSITION" Name=":accepting"/>
 <EventDecl Kind="CONTROLLABLE" Name="InPortvakt">
+<RangeList>
 <BinaryExpression Operator="..">
 <IntConstant Value="0"/>
 <IntConstant Value="1"/>
 </BinaryExpression>
+</RangeList>
 </EventDecl>
 <EventDecl Kind="UNCONTROLLABLE" Name="KulaPortvakt"/>
 <EventDecl Kind="UNCONTROLLABLE" Name="KulaMaetlyft"/>
 <EventDecl Kind="CONTROLLABLE" Name="UrPortvakt">
+<RangeList>
 <BinaryExpression Operator="..">
 <IntConstant Value="0"/>
 <IntConstant Value="1"/>
 </BinaryExpression>
+</RangeList>
 </EventDecl>
 <EventDecl Observable="false" Kind="UNCONTROLLABLE" Name="maetlyft_dropped"/>
 <EventDecl Observable="false" Kind="UNCONTROLLABLE" Name="portvakt_enter"/>
 <EventDecl Observable="false" Kind="UNCONTROLLABLE" Name="portvakt_exit"/>
 <EventDecl Observable="false" Kind="UNCONTROLLABLE" Name="maetlyft_enter"/>
 <EventDecl Kind="CONTROLLABLE" Name="UppMaetlyft">
+<RangeList>
 <BinaryExpression Operator="..">
 <IntConstant Value="0"/>
 <IntConstant Value="1"/>
 </BinaryExpression>
+</RangeList>
 </EventDecl>
 <EventDecl Kind="UNCONTROLLABLE" Name="MaetlyftNere"/>
 <EventDecl Kind="UNCONTROLLABLE" Name="MaetlyftUppe"/>
@@ -43,18 +49,22 @@
 <EventDecl Observable="false" Kind="UNCONTROLLABLE" Name="maetstation_dropped"/>
 <EventDecl Kind="UNCONTROLLABLE" Name="KulaMaetStation"/>
 <EventDecl Kind="CONTROLLABLE" Name="UrMaetning">
+<RangeList>
 <BinaryExpression Operator="..">
 <IntConstant Value="0"/>
 <IntConstant Value="1"/>
 </BinaryExpression>
+</RangeList>
 </EventDecl>
 <EventDecl Kind="UNCONTROLLABLE" Name="StorKula"/>
 <EventDecl Kind="UNCONTROLLABLE" Name="LitenKula"/>
 <EventDecl Kind="CONTROLLABLE" Name="Maet">
+<RangeList>
 <BinaryExpression Operator="..">
 <IntConstant Value="0"/>
 <IntConstant Value="1"/>
 </BinaryExpression>
+</RangeList>
 </EventDecl>
 <EventDecl Kind="CONTROLLABLE" Name="maetstation_timer"/>
 <EventDecl Kind="CONTROLLABLE" Name="maetstation_reset"/>

@@ -1,253 +1,268 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
-<Module xmlns="http://waters.sourceforge.net/xsd/module"
-        Name="tictactoe">
+<Module Name="tictactoe" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
+<ns2:Comment>A model of a tic tac toe game. The size of the game board can be parametrised. The model uses event aliases in the 'game_over' model and the 'white_never_wins' model.</ns2:Comment>
 <ConstantAliasList>
-  <ConstantAlias>
-    <SimpleIdentifier Name="size"/>
-    <IntConstant Value="3"/>
-  </ConstantAlias>
-  <ConstantAlias>
-    <SimpleIdentifier Name="coords"/>
-    <BinaryExpression Operator="..">
-      <IntConstant Value="1"/>
-      <SimpleIdentifier Name="size"/>
-    </BinaryExpression>
-  </ConstantAlias>
+<ConstantAlias>
+<SimpleIdentifier Name="size"/>
+<ConstantAliasExpression>
+<IntConstant Value="3"/>
+</ConstantAliasExpression>
+</ConstantAlias>
+<ConstantAlias>
+<SimpleIdentifier Name="coords"/>
+<ConstantAliasExpression>
+<BinaryExpression Operator="..">
+<IntConstant Value="1"/>
+<SimpleIdentifier Name="size"/>
+</BinaryExpression>
+</ConstantAliasExpression>
+</ConstantAlias>
 </ConstantAliasList>
 <EventDeclList>
-  <EventDecl Name="white" Kind="UNCONTROLLABLE">
-    <SimpleIdentifier Name="coords"/>
-    <SimpleIdentifier Name="coords"/>
-  </EventDecl>
-  <EventDecl Name="black" Kind="CONTROLLABLE">
-    <SimpleIdentifier Name="coords"/>
-    <SimpleIdentifier Name="coords"/>
-  </EventDecl>
-  <EventDecl Name="draw" Kind="UNCONTROLLABLE"/>
-  <EventDecl Name="white_win_x" Kind="UNCONTROLLABLE">
-    <SimpleIdentifier Name="coords"/>
-  </EventDecl>
-  <EventDecl Name="white_win_y" Kind="UNCONTROLLABLE">
-    <SimpleIdentifier Name="coords"/>
-  </EventDecl>
-  <EventDecl Name="white_win_d1" Kind="UNCONTROLLABLE"/>
-  <EventDecl Name="white_win_d2" Kind="UNCONTROLLABLE"/>
-  <EventDecl Name="black_win_x" Kind="UNCONTROLLABLE">
-    <SimpleIdentifier Name="coords"/>
-  </EventDecl>
-  <EventDecl Name="black_win_y" Kind="UNCONTROLLABLE">
-    <SimpleIdentifier Name="coords"/>
-  </EventDecl>
-  <EventDecl Name="black_win_d1" Kind="UNCONTROLLABLE"/>
-  <EventDecl Name="black_win_d2" Kind="UNCONTROLLABLE"/>
-  <EventDecl Name=":accepting" Kind="PROPOSITION"/>
+<EventDecl Name="white" Kind="UNCONTROLLABLE">
+<RangeList>
+<SimpleIdentifier Name="coords"/>
+<SimpleIdentifier Name="coords"/>
+</RangeList>
+</EventDecl>
+<EventDecl Name="black" Kind="CONTROLLABLE">
+<RangeList>
+<SimpleIdentifier Name="coords"/>
+<SimpleIdentifier Name="coords"/>
+</RangeList>
+</EventDecl>
+<EventDecl Name="draw" Kind="UNCONTROLLABLE"/>
+<EventDecl Name="white_win_x" Kind="UNCONTROLLABLE">
+<RangeList>
+<SimpleIdentifier Name="coords"/>
+</RangeList>
+</EventDecl>
+<EventDecl Name="white_win_y" Kind="UNCONTROLLABLE">
+<RangeList>
+<SimpleIdentifier Name="coords"/>
+</RangeList>
+</EventDecl>
+<EventDecl Name="white_win_d1" Kind="UNCONTROLLABLE"/>
+<EventDecl Name="white_win_d2" Kind="UNCONTROLLABLE"/>
+<EventDecl Name="black_win_x" Kind="UNCONTROLLABLE">
+<RangeList>
+<SimpleIdentifier Name="coords"/>
+</RangeList>
+</EventDecl>
+<EventDecl Name="black_win_y" Kind="UNCONTROLLABLE">
+<RangeList>
+<SimpleIdentifier Name="coords"/>
+</RangeList>
+</EventDecl>
+<EventDecl Name="black_win_d1" Kind="UNCONTROLLABLE"/>
+<EventDecl Name="black_win_d2" Kind="UNCONTROLLABLE"/>
+<EventDecl Name=":accepting" Kind="PROPOSITION"/>
 </EventDeclList>
 <EventAliasList>
-  <EventAlias>
-    <SimpleIdentifier Name="white_win"/>
-    <EventListExpression>
-      <EventList>
-        <SimpleIdentifier Name="white_win_x"/>
-        <SimpleIdentifier Name="white_win_y"/>
-        <SimpleIdentifier Name="white_win_d1"/>
-        <SimpleIdentifier Name="white_win_d2"/>
-      </EventList>
-    </EventListExpression>
-  </EventAlias>
-  <EventAlias>
-    <SimpleIdentifier Name="black_win"/>
-    <EventListExpression>
-      <EventList>
-        <SimpleIdentifier Name="black_win_x"/>
-        <SimpleIdentifier Name="black_win_y"/>
-        <SimpleIdentifier Name="black_win_d1"/>
-        <SimpleIdentifier Name="black_win_d2"/>
-      </EventList>
-    </EventListExpression>
-  </EventAlias>
+<EventAlias>
+<SimpleIdentifier Name="white_win"/>
+<EventListExpression>
+<EventList>
+<SimpleIdentifier Name="white_win_x"/>
+<SimpleIdentifier Name="white_win_y"/>
+<SimpleIdentifier Name="white_win_d1"/>
+<SimpleIdentifier Name="white_win_d2"/>
+</EventList>
+</EventListExpression>
+</EventAlias>
+<EventAlias>
+<SimpleIdentifier Name="black_win"/>
+<EventListExpression>
+<EventList>
+<SimpleIdentifier Name="black_win_x"/>
+<SimpleIdentifier Name="black_win_y"/>
+<SimpleIdentifier Name="black_win_d1"/>
+<SimpleIdentifier Name="black_win_d2"/>
+</EventList>
+</EventListExpression>
+</EventAlias>
 </EventAliasList>
 <ComponentList>
-  <ForeachComponent Name="x">
-    <SimpleIdentifier Name="coords"/>
-    <ComponentList>
-      <ForeachComponent Name="y">
-        <SimpleIdentifier Name="coords"/>
-        <ComponentList>
-          <SimpleComponent Kind="PLANT">
-            <IndexedIdentifier Name="square">
-              <SimpleIdentifier Name="x"/>
-              <SimpleIdentifier Name="y"/>
-            </IndexedIdentifier>
-            <Graph>
-              <NodeList>
-                <SimpleNode Name="free" Initial="true"/>
-                <SimpleNode Name="white"/>
-                <SimpleNode Name="black"/>
-              </NodeList>
-              <EdgeList>
-                <Edge Source="free" Target="white">
-                  <LabelBlock>
-                    <IndexedIdentifier Name="white">
-                      <SimpleIdentifier Name="x"/>
-                      <SimpleIdentifier Name="y"/>
-                    </IndexedIdentifier>
-                  </LabelBlock>
-                </Edge>
-                <Edge Source="white" Target="white">
-                  <LabelBlock>
-                    <IndexedIdentifier Name="white_win_x">
-                      <SimpleIdentifier Name="x"/>
-                    </IndexedIdentifier>
-                    <IndexedIdentifier Name="white_win_y">
-                      <SimpleIdentifier Name="y"/>
-                    </IndexedIdentifier>
-                    <ForeachEvent Name=":dummy">
-                      <BinaryExpression Operator="..">
-                        <IntConstant Value="0"/>
-                        <IntConstant Value="0"/>
-                      </BinaryExpression>
-                      <BinaryExpression Operator="==">
-                        <SimpleIdentifier Name="x"/>
-                        <SimpleIdentifier Name="y"/>
-                      </BinaryExpression>
-                      <EventList>
-                        <SimpleIdentifier Name="white_win_d1"/>
-                      </EventList>
-                    </ForeachEvent>
-                    <ForeachEvent Name=":dummy">
-                      <BinaryExpression Operator="..">
-                        <IntConstant Value="0"/>
-                        <IntConstant Value="0"/>
-                      </BinaryExpression>
-                      <BinaryExpression Operator="==">
-                        <SimpleIdentifier Name="x"/>
-                        <BinaryExpression Operator="+">
-                          <BinaryExpression Operator="-">
-                            <SimpleIdentifier Name="size"/>
-                            <SimpleIdentifier Name="y"/>
-                          </BinaryExpression>
-                          <IntConstant Value="1"/>
-                        </BinaryExpression>
-                      </BinaryExpression>
-                      <EventList>
-                        <SimpleIdentifier Name="white_win_d2"/>
-                      </EventList>
-                    </ForeachEvent>
-                    <SimpleIdentifier Name="draw"/>
-                  </LabelBlock>
-                </Edge>
-                <Edge Source="free" Target="black">
-                  <LabelBlock>
-                    <IndexedIdentifier Name="black">
-                      <SimpleIdentifier Name="x"/>
-                      <SimpleIdentifier Name="y"/>
-                    </IndexedIdentifier>
-                  </LabelBlock>
-                </Edge>
-                <Edge Source="black" Target="black">
-                  <LabelBlock>
-                    <IndexedIdentifier Name="black_win_x">
-                      <SimpleIdentifier Name="x"/>
-                    </IndexedIdentifier>
-                    <IndexedIdentifier Name="black_win_y">
-                      <SimpleIdentifier Name="y"/>
-                    </IndexedIdentifier>
-                    <ForeachEvent Name=":dummy">
-                      <BinaryExpression Operator="..">
-                        <IntConstant Value="0"/>
-                        <IntConstant Value="0"/>
-                      </BinaryExpression>
-                      <BinaryExpression Operator="==">
-                        <SimpleIdentifier Name="x"/>
-                        <SimpleIdentifier Name="y"/>
-                      </BinaryExpression>
-                      <EventList>
-                        <SimpleIdentifier Name="black_win_d1"/>
-                      </EventList>
-                    </ForeachEvent>
-                    <ForeachEvent Name=":dummy">
-                      <BinaryExpression Operator="..">
-                        <IntConstant Value="0"/>
-                        <IntConstant Value="0"/>
-                      </BinaryExpression>
-                      <BinaryExpression Operator="==">
-                        <SimpleIdentifier Name="x"/>
-                        <BinaryExpression Operator="+">
-                          <BinaryExpression Operator="-">
-                            <SimpleIdentifier Name="size"/>
-                            <SimpleIdentifier Name="y"/>
-                          </BinaryExpression>
-                          <IntConstant Value="1"/>
-                        </BinaryExpression>
-                      </BinaryExpression>
-                      <EventList>
-                        <SimpleIdentifier Name="black_win_d2"/>
-                      </EventList>
-                    </ForeachEvent>
-                    <SimpleIdentifier Name="draw"/>
-                  </LabelBlock>
-                </Edge>
-              </EdgeList>
-            </Graph>
-          </SimpleComponent>
-        </ComponentList>
-      </ForeachComponent>
-    </ComponentList>
-  </ForeachComponent>
-  <SimpleComponent Kind="PLANT">
-    <SimpleIdentifier Name="turn"/>
-    <Graph>
-      <NodeList>
-        <SimpleNode Name="white" Initial="true"/>
-        <SimpleNode Name="black"/>
-      </NodeList>
-      <EdgeList>
-        <Edge Source="white" Target="black">
-          <LabelBlock>
-            <SimpleIdentifier Name="white"/>
-          </LabelBlock>
-        </Edge>
-        <Edge Source="black" Target="white">
-          <LabelBlock>
-            <SimpleIdentifier Name="black"/>
-          </LabelBlock>
-        </Edge>
-      </EdgeList>
-    </Graph>
-  </SimpleComponent>
-  <SimpleComponent Kind="PLANT">
-    <SimpleIdentifier Name="game_over"/>
-    <Graph>
-      <NodeList>
-        <SimpleNode Name="game" Initial="true"/>
-        <SimpleNode Name="over">
-          <EventList>
-            <SimpleIdentifier Name=":accepting"/>
-          </EventList>
-        </SimpleNode>
-      </NodeList>
-      <EdgeList>
-        <Edge Source="game" Target="over">
-          <LabelBlock>
-            <SimpleIdentifier Name="white_win"/>
-            <SimpleIdentifier Name="black_win"/>
-            <SimpleIdentifier Name="draw"/>
-          </LabelBlock>
-        </Edge>
-      </EdgeList>
-    </Graph>
-  </SimpleComponent>
-  <SimpleComponent Kind="SPEC">
-    <SimpleIdentifier Name="white_never_wins"/>
-    <Graph>
-      <LabelBlock>
-        <SimpleIdentifier Name="white_win"/>
-      </LabelBlock>
-      <NodeList>
-        <SimpleNode Name="init" Initial="true"/>
-      </NodeList>
-    </Graph>
-  </SimpleComponent>
+<ForeachComponent Name="x">
+<SimpleIdentifier Name="coords"/>
+<ComponentList>
+<ForeachComponent Name="y">
+<SimpleIdentifier Name="coords"/>
+<ComponentList>
+<SimpleComponent Kind="PLANT">
+<IndexedIdentifier Name="square">
+<SimpleIdentifier Name="x"/>
+<SimpleIdentifier Name="y"/>
+</IndexedIdentifier>
+<Graph>
+<NodeList>
+<SimpleNode Name="free" Initial="true"/>
+<SimpleNode Name="white"/>
+<SimpleNode Name="black"/>
+</NodeList>
+<EdgeList>
+<Edge Source="free" Target="white">
+<LabelBlock>
+<IndexedIdentifier Name="white">
+<SimpleIdentifier Name="x"/>
+<SimpleIdentifier Name="y"/>
+</IndexedIdentifier>
+</LabelBlock>
+</Edge>
+<Edge Source="white" Target="white">
+<LabelBlock>
+<IndexedIdentifier Name="white_win_x">
+<SimpleIdentifier Name="x"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="white_win_y">
+<SimpleIdentifier Name="y"/>
+</IndexedIdentifier>
+<ForeachEvent Name=":dummy">
+<BinaryExpression Operator="..">
+<IntConstant Value="0"/>
+<IntConstant Value="0"/>
+</BinaryExpression>
+<BinaryExpression Operator="==">
+<SimpleIdentifier Name="x"/>
+<SimpleIdentifier Name="y"/>
+</BinaryExpression>
+<EventList>
+<SimpleIdentifier Name="white_win_d1"/>
+</EventList>
+</ForeachEvent>
+<ForeachEvent Name=":dummy">
+<BinaryExpression Operator="..">
+<IntConstant Value="0"/>
+<IntConstant Value="0"/>
+</BinaryExpression>
+<BinaryExpression Operator="==">
+<SimpleIdentifier Name="x"/>
+<BinaryExpression Operator="+">
+<BinaryExpression Operator="-">
+<SimpleIdentifier Name="size"/>
+<SimpleIdentifier Name="y"/>
+</BinaryExpression>
+<IntConstant Value="1"/>
+</BinaryExpression>
+</BinaryExpression>
+<EventList>
+<SimpleIdentifier Name="white_win_d2"/>
+</EventList>
+</ForeachEvent>
+<SimpleIdentifier Name="draw"/>
+</LabelBlock>
+</Edge>
+<Edge Source="free" Target="black">
+<LabelBlock>
+<IndexedIdentifier Name="black">
+<SimpleIdentifier Name="x"/>
+<SimpleIdentifier Name="y"/>
+</IndexedIdentifier>
+</LabelBlock>
+</Edge>
+<Edge Source="black" Target="black">
+<LabelBlock>
+<IndexedIdentifier Name="black_win_x">
+<SimpleIdentifier Name="x"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="black_win_y">
+<SimpleIdentifier Name="y"/>
+</IndexedIdentifier>
+<ForeachEvent Name=":dummy">
+<BinaryExpression Operator="..">
+<IntConstant Value="0"/>
+<IntConstant Value="0"/>
+</BinaryExpression>
+<BinaryExpression Operator="==">
+<SimpleIdentifier Name="x"/>
+<SimpleIdentifier Name="y"/>
+</BinaryExpression>
+<EventList>
+<SimpleIdentifier Name="black_win_d1"/>
+</EventList>
+</ForeachEvent>
+<ForeachEvent Name=":dummy">
+<BinaryExpression Operator="..">
+<IntConstant Value="0"/>
+<IntConstant Value="0"/>
+</BinaryExpression>
+<BinaryExpression Operator="==">
+<SimpleIdentifier Name="x"/>
+<BinaryExpression Operator="+">
+<BinaryExpression Operator="-">
+<SimpleIdentifier Name="size"/>
+<SimpleIdentifier Name="y"/>
+</BinaryExpression>
+<IntConstant Value="1"/>
+</BinaryExpression>
+</BinaryExpression>
+<EventList>
+<SimpleIdentifier Name="black_win_d2"/>
+</EventList>
+</ForeachEvent>
+<SimpleIdentifier Name="draw"/>
+</LabelBlock>
+</Edge>
+</EdgeList>
+</Graph>
+</SimpleComponent>
+</ComponentList>
+</ForeachComponent>
+</ComponentList>
+</ForeachComponent>
+<SimpleComponent Kind="PLANT">
+<SimpleIdentifier Name="turn"/>
+<Graph>
+<NodeList>
+<SimpleNode Name="white" Initial="true"/>
+<SimpleNode Name="black"/>
+</NodeList>
+<EdgeList>
+<Edge Source="white" Target="black">
+<LabelBlock>
+<SimpleIdentifier Name="white"/>
+</LabelBlock>
+</Edge>
+<Edge Source="black" Target="white">
+<LabelBlock>
+<SimpleIdentifier Name="black"/>
+</LabelBlock>
+</Edge>
+</EdgeList>
+</Graph>
+</SimpleComponent>
+<SimpleComponent Kind="PLANT">
+<SimpleIdentifier Name="game_over"/>
+<Graph>
+<NodeList>
+<SimpleNode Name="game" Initial="true"/>
+<SimpleNode Name="over">
+<EventList>
+<SimpleIdentifier Name=":accepting"/>
+</EventList>
+</SimpleNode>
+</NodeList>
+<EdgeList>
+<Edge Source="game" Target="over">
+<LabelBlock>
+<SimpleIdentifier Name="white_win"/>
+<SimpleIdentifier Name="black_win"/>
+<SimpleIdentifier Name="draw"/>
+</LabelBlock>
+</Edge>
+</EdgeList>
+</Graph>
+</SimpleComponent>
+<SimpleComponent Kind="SPEC">
+<SimpleIdentifier Name="white_never_wins"/>
+<Graph>
+<LabelBlock>
+<SimpleIdentifier Name="white_win"/>
+</LabelBlock>
+<NodeList>
+<SimpleNode Name="init" Initial="true"/>
+</NodeList>
+</Graph>
+</SimpleComponent>
 </ComponentList>
 </Module>

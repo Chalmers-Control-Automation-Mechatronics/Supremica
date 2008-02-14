@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.marshaller
 //# CLASS:   AbstractProductDESImporterTest
 //###########################################################################
-//# $Id: AbstractProductDESImporterTest.java,v 1.4 2006-11-09 06:30:01 robi Exp $
+//# $Id: AbstractProductDESImporterTest.java,v 1.5 2008-02-14 02:24:09 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.marshaller;
@@ -92,13 +92,13 @@ public abstract class AbstractProductDESImporterTest
   protected ModuleProxy testImport(final String name)
     throws Exception
   {
-    return testImport(getInputDirectory(), name);
+    return testImport(getWatersInputRoot(), name);
   }
 
   protected ModuleProxy testImport(final String dirname, final String name)
     throws Exception
   {
-    final File dir = new File(getInputDirectory(), dirname);
+    final File dir = new File(getWatersInputRoot(), dirname);
     return testImport(dir, name);
   }
 
@@ -107,7 +107,7 @@ public abstract class AbstractProductDESImporterTest
                                    final String name)
     throws Exception
   {
-    final File dir1 = new File(getInputDirectory(), dirname1);
+    final File dir1 = new File(getWatersInputRoot(), dirname1);
     final File dir2 = new File(dir1, dirname2);
     return testImport(dir2, name);
   }

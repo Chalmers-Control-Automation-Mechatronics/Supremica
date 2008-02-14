@@ -2,127 +2,173 @@
 <Module Name="ftuer" xmlns="http://waters.sourceforge.net/xsd/module">
 <EventDeclList>
 <EventDecl Kind="CONTROLLABLE" Name="stop_VR">
+<RangeList>
 <EnumSetExpression>
 <SimpleIdentifier Name="TUER"/>
 </EnumSetExpression>
+</RangeList>
 </EventDecl>
 <EventDecl Kind="CONTROLLABLE" Name="MER_an">
+<RangeList>
 <EnumSetExpression>
 <SimpleIdentifier Name="TUER"/>
 </EnumSetExpression>
+</RangeList>
 </EventDecl>
 <EventDecl Kind="CONTROLLABLE" Name="soft_ZS"/>
 <EventDecl Kind="CONTROLLABLE" Name="stop_ZS">
+<RangeList>
 <EnumSetExpression>
 <SimpleIdentifier Name="TUER"/>
 </EnumSetExpression>
+</RangeList>
 </EventDecl>
 <EventDecl Kind="CONTROLLABLE" Name="time_ER">
+<RangeList>
 <EnumSetExpression>
 <SimpleIdentifier Name="TUER"/>
 </EnumSetExpression>
+</RangeList>
 </EventDecl>
 <EventDecl Kind="UNCONTROLLABLE" Name="tuer_auf">
+<RangeList>
 <EnumSetExpression>
 <SimpleIdentifier Name="TUER"/>
 </EnumSetExpression>
+</RangeList>
 </EventDecl>
 <EventDecl Kind="CONTROLLABLE" Name="start_ER">
+<RangeList>
 <EnumSetExpression>
 <SimpleIdentifier Name="TUER"/>
 </EnumSetExpression>
+</RangeList>
 </EventDecl>
 <EventDecl Kind="CONTROLLABLE" Name="reset">
+<RangeList>
 <EnumSetExpression>
 <SimpleIdentifier Name="TUER"/>
 </EnumSetExpression>
+</RangeList>
 </EventDecl>
 <EventDecl Kind="CONTROLLABLE" Name="MVR_aus">
+<RangeList>
 <EnumSetExpression>
 <SimpleIdentifier Name="TUER"/>
 </EnumSetExpression>
+</RangeList>
 </EventDecl>
 <EventDecl Kind="CONTROLLABLE" Name="done_ER"/>
 <EventDecl Kind="CONTROLLABLE" Name="async">
+<RangeList>
 <EnumSetExpression>
 <SimpleIdentifier Name="TUER"/>
 </EnumSetExpression>
+</RangeList>
 </EventDecl>
 <EventDecl Kind="CONTROLLABLE" Name="sync">
+<RangeList>
 <EnumSetExpression>
 <SimpleIdentifier Name="TUER"/>
 </EnumSetExpression>
+</RangeList>
 </EventDecl>
 <EventDecl Kind="CONTROLLABLE" Name="time_VR">
+<RangeList>
 <EnumSetExpression>
 <SimpleIdentifier Name="TUER"/>
 </EnumSetExpression>
+</RangeList>
 </EventDecl>
 <EventDecl Kind="CONTROLLABLE" Name="MVR_an">
+<RangeList>
 <EnumSetExpression>
 <SimpleIdentifier Name="TUER"/>
 </EnumSetExpression>
+</RangeList>
 </EventDecl>
 <EventDecl Kind="CONTROLLABLE" Name="soft_CS"/>
 <EventDecl Kind="CONTROLLABLE" Name="soft_SER">
+<RangeList>
 <EnumSetExpression>
 <SimpleIdentifier Name="TUER"/>
 </EnumSetExpression>
+</RangeList>
 </EventDecl>
 <EventDecl Kind="CONTROLLABLE" Name="time_ZS">
+<RangeList>
 <EnumSetExpression>
 <SimpleIdentifier Name="TUER"/>
 </EnumSetExpression>
+</RangeList>
 </EventDecl>
 <EventDecl Kind="CONTROLLABLE" Name="start_VR">
+<RangeList>
 <EnumSetExpression>
 <SimpleIdentifier Name="TUER"/>
 </EnumSetExpression>
+</RangeList>
 </EventDecl>
 <EventDecl Kind="CONTROLLABLE" Name="soft_ER"/>
 <EventDecl Kind="CONTROLLABLE" Name="time_W">
+<RangeList>
 <EnumSetExpression>
 <SimpleIdentifier Name="TUER"/>
 </EnumSetExpression>
+</RangeList>
 </EventDecl>
 <EventDecl Kind="CONTROLLABLE" Name="done_VR"/>
 <EventDecl Kind="UNCONTROLLABLE" Name="tuer_zu">
+<RangeList>
 <EnumSetExpression>
 <SimpleIdentifier Name="TUER"/>
 </EnumSetExpression>
+</RangeList>
 </EventDecl>
 <EventDecl Kind="CONTROLLABLE" Name="stop_ER">
+<RangeList>
 <EnumSetExpression>
 <SimpleIdentifier Name="TUER"/>
 </EnumSetExpression>
+</RangeList>
 </EventDecl>
 <EventDecl Kind="CONTROLLABLE" Name="start_ZS">
+<RangeList>
 <EnumSetExpression>
 <SimpleIdentifier Name="TUER"/>
 </EnumSetExpression>
+</RangeList>
 </EventDecl>
 <EventDecl Kind="CONTROLLABLE" Name="done_ZS"/>
 <EventDecl Kind="CONTROLLABLE" Name="MER_aus">
+<RangeList>
 <EnumSetExpression>
 <SimpleIdentifier Name="TUER"/>
 </EnumSetExpression>
+</RangeList>
 </EventDecl>
 <EventDecl Kind="UNCONTROLLABLE" Name="timeout">
+<RangeList>
 <EnumSetExpression>
 <SimpleIdentifier Name="TUER"/>
 </EnumSetExpression>
+</RangeList>
 </EventDecl>
 <EventDecl Kind="UNCONTROLLABLE" Name="STZV">
+<RangeList>
 <EnumSetExpression>
 <SimpleIdentifier Name="TUER"/>
 </EnumSetExpression>
+</RangeList>
 </EventDecl>
 <EventDecl Kind="CONTROLLABLE" Name="CS_ok"/>
 <EventDecl Kind="CONTROLLABLE" Name="soft_VR"/>
 <EventDecl Kind="CONTROLLABLE" Name="done_SER">
+<RangeList>
 <EnumSetExpression>
 <SimpleIdentifier Name="TUER"/>
 </EnumSetExpression>
+</RangeList>
 </EventDecl>
 <EventDecl Kind="PROPOSITION" Name=":accepting"/>
 </EventDeclList>

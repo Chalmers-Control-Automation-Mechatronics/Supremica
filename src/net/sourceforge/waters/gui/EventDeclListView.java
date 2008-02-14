@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   EventDeclListView
 //###########################################################################
-//# $Id: EventDeclListView.java,v 1.15 2007-12-16 22:55:30 robi Exp $
+//# $Id: EventDeclListView.java,v 1.16 2008-02-14 02:24:09 robi Exp $
 //###########################################################################
 
 
@@ -71,7 +71,6 @@ import net.sourceforge.waters.model.module.LabelBlockProxy;
 import net.sourceforge.waters.model.module.ModuleProxyCloner;
 import net.sourceforge.waters.model.unchecked.Casting;
 import net.sourceforge.waters.subject.base.AbstractSubject;
-import net.sourceforge.waters.subject.base.IndexedListSubject;
 import net.sourceforge.waters.subject.base.ListSubject;
 import net.sourceforge.waters.subject.module.EventDeclSubject;
 import net.sourceforge.waters.subject.module.GraphSubject;
@@ -109,7 +108,7 @@ public class EventDeclListView
     mObservers = null;
 
     final ModuleSubject module = root.getModuleSubject();
-    final IndexedListSubject<EventDeclSubject> events =
+    final ListSubject<EventDeclSubject> events =
       module.getEventDeclListModifiable();
     mModel = new IndexedListModel<EventDeclSubject>(events);
     setModel(mModel);
@@ -337,7 +336,9 @@ public class EventDeclListView
       final EventDeclSubject decl = (EventDeclSubject) cloner.getClone(proxy);
       final String name = decl.getName();
       final String unique = context.getPastedEventName(name, names);
-      decl.setName(unique);
+      final SimpleIdentifierSubject ident =
+        new SimpleIdentifierSubject(unique);
+      decl.setIdentifier(ident);
       final InsertInfo info = new InsertInfo(decl);
       result.add(info);
       names.add(unique);

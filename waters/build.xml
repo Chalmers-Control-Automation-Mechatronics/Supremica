@@ -34,7 +34,8 @@
   <property name="cpp" location="cpp"/>
   <property name="cpplib" location="${cpp}/lib"/>
   <property name="docsrc" location="java/javadoc"/>
-  <property name="examples" location="${supremica.root}/examples/waters"/>
+  <property name="supremica.examples" location="${supremica.root}/examples"/>
+  <property name="waters.examples" location="${supremica.examples}/waters"/>
   <property name="jar" location="java/jar"/>
   <property name="javadoc" location="java/docs"/>
   <property name="logs" location="logs"/>
@@ -277,7 +278,7 @@
       <fileset dir="${test.classes}">
         <include name="net/sourceforge/waters/**/*.class"/>
       </fileset>
-      <zipfileset dir="${examples}"
+      <zipfileset dir="${waters.examples}"
                   prefix="net/sourceforge/waters/model/marshaller/examples"/>
     </jar>
   </target>
@@ -302,7 +303,7 @@
         </fileset>
       </batchtest>
       <classpath refid="waters.test.classpath"/>
-      <sysproperty key="waters.test.inputdir" value="${examples}"/>
+      <sysproperty key="waters.test.inputdir" value="${supremica.examples}"/>
       <sysproperty key="waters.test.outputdir" value="${logs.results}"/>
       <sysproperty key="java.library.path" value="${waters.library.path}"/>
     </junit>
@@ -314,12 +315,13 @@
       <formatter type="xml"/>
       <batchtest todir="${logs.results}">
         <fileset dir="${supremica.testsrc}">
-          <include name="net/sourceforge/waters/**/*CompilerTest.java"/>
+          <include name="net/sourceforge/waters/**/CompilerTest.java"/>
+          <include name="net/sourceforge/waters/**/BDDLanguageInclusionCheckerTest.java"/>
           <exclude name="**/Abstract*.java"/>
         </fileset>
       </batchtest>
       <classpath refid="waters.test.classpath"/>
-      <sysproperty key="waters.test.inputdir" value="${examples}"/>
+      <sysproperty key="waters.test.inputdir" value="${supremica.examples}"/>
       <sysproperty key="waters.test.outputdir" value="${logs.results}"/>
       <sysproperty key="java.library.path" value="${waters.library.path}"/>
     </junit>
@@ -336,7 +338,7 @@
         </fileset>
       </batchtest>
       <classpath refid="waters.test.classpath"/>
-      <sysproperty key="waters.test.inputdir" value="${examples}"/>
+      <sysproperty key="waters.test.inputdir" value="${supremica.examples}"/>
       <sysproperty key="waters.test.outputdir" value="${logs.results}"/>
     </junit>
   </target>
@@ -352,7 +354,7 @@
         </fileset>
       </batchtest>
       <classpath refid="waters.test.classpath"/>
-      <sysproperty key="waters.test.inputdir" value="${examples}"/>
+      <sysproperty key="waters.test.inputdir" value="${supremica.examples}"/>
       <sysproperty key="waters.test.outputdir" value="${logs.results}"/>
       <sysproperty key="java.library.path" value="${waters.library.path}"/>
     </junit>
@@ -368,7 +370,7 @@
         </fileset>
       </batchtest>
       <classpath refid="waters.test.classpath"/>
-      <sysproperty key="waters.test.inputdir" value="${examples}"/>
+      <sysproperty key="waters.test.inputdir" value="${supremica.examples}"/>
       <sysproperty key="waters.test.outputdir" value="${logs.results}"/>
     </junit>
   </target>
@@ -384,7 +386,7 @@
         </fileset>
       </batchtest>
       <classpath refid="waters.test.classpath"/>
-      <sysproperty key="waters.test.inputdir" value="${examples}"/>
+      <sysproperty key="waters.test.inputdir" value="${supremica.examples}"/>
       <sysproperty key="waters.test.outputdir" value="${logs.results}"/>
       <sysproperty key="java.library.path" value="${waters.library.path}"/>
     </junit>
@@ -393,7 +395,7 @@
   <target name="run_test6">
     <java classname="net.sourceforge.waters.analysis.modular.SpeedComparison" fork="true" maxmemory="512m">
       <classpath refid="waters.test.classpath"/>
-      <sysproperty key="waters.test.inputdir" value="${examples}"/>
+      <sysproperty key="waters.test.inputdir" value="${supremica.examples}"/>
       <sysproperty key="waters.test.outputdir" value="${logs.results}"/>
       <sysproperty key="java.library.path" value="${waters.library.path}"/>
     </java>
@@ -409,28 +411,11 @@
         </fileset>
       </batchtest>
       <classpath refid="waters.test.classpath"/>
-      <sysproperty key="waters.test.inputdir" value="${examples}"/>
+      <sysproperty key="waters.test.inputdir" value="${supremica.examples}"/>
       <sysproperty key="waters.test.outputdir" value="${logs.results}"/>
       <sysproperty key="java.library.path" value="${waters.library.path}"/>
     </junit>
   </target>
-
-	  <target name="run_test8" depends="test-jar,cpp">
-	    <mkdir dir="${logs.results}"/>
-	    <junit printsummary="on" fork="true" maxmemory="512m">
-	      <formatter type="xml"/>
-	      <batchtest todir="${logs.results}">
-	        <fileset dir="${supremica.testsrc}">
-	          <include name="net/sourceforge/waters/model/compiler/*.java"/>
-	          <exclude name="**/Abstract*.java"/>
-	        </fileset>
-	      </batchtest>
-	      <classpath refid="waters.test.classpath"/>
-	      <sysproperty key="waters.test.inputdir" value="${examples}"/>
-	      <sysproperty key="waters.test.outputdir" value="${logs.results}"/>
-	      <sysproperty key="java.library.path" value="${waters.library.path}"/>
-	    </junit>
-	  </target>
 
   <target name="test-report">
     <mkdir dir="${logs.reports}"/>
@@ -458,9 +443,6 @@
           description="Run some test cases."/>
     
   <target name="test7" depends="run_test7,test-report"
-     description="Run some test cases."/>
-    
-  <target name="test8" depends="run_test8,test-report"
      description="Run some test cases."/>
 
   <target name="doc" depends="jaxb-generate"

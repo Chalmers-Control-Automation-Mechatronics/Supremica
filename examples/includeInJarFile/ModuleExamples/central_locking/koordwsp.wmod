@@ -3,24 +3,30 @@
 <ConstantAliasList>
 <ConstantAlias>
 <SimpleIdentifier Name="Timers"/>
+<ConstantAliasExpression>
 <EnumSetExpression>
 <SimpleIdentifier Name="FS"/>
 <SimpleIdentifier Name="WSP"/>
 </EnumSetExpression>
+</ConstantAliasExpression>
 </ConstantAlias>
 <ConstantAlias>
 <SimpleIdentifier Name="Counters"/>
+<ConstantAliasExpression>
 <EnumSetExpression>
 <SimpleIdentifier Name="WSP"/>
 </EnumSetExpression>
+</ConstantAliasExpression>
 </ConstantAlias>
 <ConstantAlias>
 <SimpleIdentifier Name="Tueren"/>
+<ConstantAliasExpression>
 <EnumSetExpression>
 <SimpleIdentifier Name="FT"/>
 <SimpleIdentifier Name="BT"/>
 <SimpleIdentifier Name="HT"/>
 </EnumSetExpression>
+</ConstantAliasExpression>
 </ConstantAlias>
 </ConstantAliasList>
 <EventDeclList>
@@ -32,56 +38,76 @@
 <EventDecl Kind="UNCONTROLLABLE" Name="zuendung_an"/>
 <EventDecl Kind="UNCONTROLLABLE" Name="zuendung_aus"/>
 <EventDecl Kind="UNCONTROLLABLE" Name="tuer_auf">
+<RangeList>
 <SimpleIdentifier Name="Tueren"/>
+</RangeList>
 </EventDecl>
 <EventDecl Kind="CONTROLLABLE" Name="reset">
+<RangeList>
 <SimpleIdentifier Name="Timers"/>
+</RangeList>
 </EventDecl>
 <EventDecl Kind="CONTROLLABLE" Name="wsp"/>
 <EventDecl Kind="CONTROLLABLE" Name="TAST"/>
 <EventDecl Kind="CONTROLLABLE" Name="done_ER"/>
 <EventDecl Kind="UNCONTROLLABLE" Name="ctr_lt_max">
+<RangeList>
 <SimpleIdentifier Name="Counters"/>
+</RangeList>
 </EventDecl>
 <EventDecl Kind="UNCONTROLLABLE" Name="ER_BT"/>
 <EventDecl Kind="CONTROLLABLE" Name="time">
+<RangeList>
 <SimpleIdentifier Name="Timers"/>
+</RangeList>
 </EventDecl>
 <EventDecl Kind="UNCONTROLLABLE" Name="ER_FS"/>
 <EventDecl Kind="UNCONTROLLABLE" Name="ER_FT"/>
 <EventDecl Kind="UNCONTROLLABLE" Name="ER_HK"/>
 <EventDecl Kind="CONTROLLABLE" Name="soft_CS"/>
 <EventDecl Kind="CONTROLLABLE" Name="soft_SER">
+<RangeList>
 <SimpleIdentifier Name="Tueren"/>
+</RangeList>
 </EventDecl>
 <EventDecl Kind="UNCONTROLLABLE" Name="CS"/>
 <EventDecl Kind="CONTROLLABLE" Name="soft_ER"/>
 <EventDecl Kind="UNCONTROLLABLE" Name="cod_ser"/>
 <EventDecl Kind="CONTROLLABLE" Name="done_VR"/>
 <EventDecl Kind="UNCONTROLLABLE" Name="tuer_zu">
+<RangeList>
 <SimpleIdentifier Name="Tueren"/>
+</RangeList>
 </EventDecl>
 <EventDecl Kind="CONTROLLABLE" Name="ZSA"/>
 <EventDecl Kind="CONTROLLABLE" Name="ER"/>
 <EventDecl Kind="CONTROLLABLE" Name="autom_VR"/>
 <EventDecl Kind="UNCONTROLLABLE" Name="ctr_ge_max">
+<RangeList>
 <SimpleIdentifier Name="Counters"/>
+</RangeList>
 </EventDecl>
 <EventDecl Kind="CONTROLLABLE" Name="ZSI"/>
 <EventDecl Kind="CONTROLLABLE" Name="done_ZS"/>
 <EventDecl Kind="CONTROLLABLE" Name="SER"/>
 <EventDecl Kind="UNCONTROLLABLE" Name="TASTVR"/>
 <EventDecl Kind="UNCONTROLLABLE" Name="timeout">
+<RangeList>
 <SimpleIdentifier Name="Timers"/>
+</RangeList>
 </EventDecl>
 <EventDecl Kind="CONTROLLABLE" Name="is_cod_ser"/>
 <EventDecl Kind="CONTROLLABLE" Name="is_cod_er"/>
 <EventDecl Kind="CONTROLLABLE" Name="reset_ctr">
+<RangeList>
 <SimpleIdentifier Name="Counters"/>
+</RangeList>
 </EventDecl>
 <EventDecl Kind="UNCONTROLLABLE" Name="VR_BT"/>
 <EventDecl Kind="CONTROLLABLE" Name="inc_ctr">
+<RangeList>
 <SimpleIdentifier Name="Counters"/>
+</RangeList>
 </EventDecl>
 <EventDecl Kind="CONTROLLABLE" Name="CS_ok"/>
 <EventDecl Kind="CONTROLLABLE" Name="soft_VR"/>
@@ -89,7 +115,9 @@
 <EventDecl Kind="UNCONTROLLABLE" Name="VR_FT"/>
 <EventDecl Kind="UNCONTROLLABLE" Name="VR_HK"/>
 <EventDecl Kind="CONTROLLABLE" Name="done_SER">
+<RangeList>
 <SimpleIdentifier Name="Tueren"/>
+</RangeList>
 </EventDecl>
 <EventDecl Kind="PROPOSITION" Name=":accepting"/>
 </EventDeclList>

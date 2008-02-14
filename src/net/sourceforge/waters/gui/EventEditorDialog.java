@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   EventEditorDialog
 //###########################################################################
-//# $Id: EventEditorDialog.java,v 1.22 2007-12-04 03:22:54 robi Exp $
+//# $Id: EventEditorDialog.java,v 1.23 2008-02-14 02:24:09 robi Exp $
 //###########################################################################
 
 
@@ -62,6 +62,7 @@ import net.sourceforge.waters.model.expr.ParseException;
 import net.sourceforge.waters.subject.module.EventDeclSubject;
 import net.sourceforge.waters.subject.module.ModuleSubject;
 import net.sourceforge.waters.subject.module.SimpleExpressionSubject;
+import net.sourceforge.waters.subject.module.SimpleIdentifierSubject;
 import net.sourceforge.waters.xsd.base.EventKind;
 import net.sourceforge.waters.xsd.module.ScopeKind;
 
@@ -857,6 +858,7 @@ public class EventEditorDialog
       }
     } else {
       final String name = mNameInput.getText();
+      final SimpleIdentifierSubject ident = new SimpleIdentifierSubject(name);
       final EventKind kind;
       if (mControllableButton.isSelected()) {
         kind = EventKind.CONTROLLABLE;
@@ -899,7 +901,7 @@ public class EventEditorDialog
       }
       final SelectionOwner panel = mRoot.getEventsPanel();
       final EventDeclSubject template =
-        new EventDeclSubject(name, kind, observable, scope, ranges, null);
+        new EventDeclSubject(ident, kind, observable, scope, ranges, null);
       if (mEventDecl == null) {
         final Command command = new InsertCommand(template, panel);
         mEventDecl = template;
@@ -1104,7 +1106,9 @@ public class EventEditorDialog
   //#########################################################################
   //# Class Constants
   private static final Insets INSETS = new Insets(2, 4, 2, 4);
+  private static final SimpleIdentifierSubject TEMPLATE_IDENT =
+    new SimpleIdentifierSubject("");
   private static final EventDeclSubject TEMPLATE =
-    new EventDeclSubject("", EventKind.CONTROLLABLE);
+    new EventDeclSubject(TEMPLATE_IDENT, EventKind.CONTROLLABLE);
 
 }

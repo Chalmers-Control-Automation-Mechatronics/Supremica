@@ -31,6 +31,7 @@
 <EventDecl Kind="CONTROLLABLE" Name="HOST__t_10_8__7"/>
 <EventDecl Kind="CONTROLLABLE" Name="HOST__t_10_8__8"/>
 <EventDecl Kind="UNCONTROLLABLE" Name="SLAVE__rcv">
+<RangeList>
 <EnumSetExpression>
 <SimpleIdentifier Name="pv"/>
 </EnumSetExpression>
@@ -46,6 +47,7 @@
 <SimpleIdentifier Name="ok"/>
 <SimpleIdentifier Name="nok"/>
 </EnumSetExpression>
+</RangeList>
 </EventDecl>
 <EventDecl Kind="CONTROLLABLE" Name="SLAVE__t_22_26__1"/>
 <EventDecl Kind="CONTROLLABLE" Name="SLAVE__t_22_26__2"/>
@@ -54,10 +56,12 @@
 <EventDecl Kind="CONTROLLABLE" Name="SLAVE__t_22_26__5"/>
 <EventDecl Kind="CONTROLLABLE" Name="HOST__t_9_8"/>
 <EventDecl Kind="UNCONTROLLABLE" Name="HOST__preset__in_cons_num">
+<RangeList>
 <BinaryExpression Operator="..">
 <IntConstant Value="0"/>
 <IntConstant Value="4"/>
 </BinaryExpression>
+</RangeList>
 </EventDecl>
 <EventDecl Kind="UNCONTROLLABLE" Name="HOST__preset__fs_slave_bit2_CRCNO"/>
 <EventDecl Kind="CONTROLLABLE" Name="SLAVE__t_26_27"/>
@@ -81,6 +85,7 @@
 <EventDecl Kind="CONTROLLABLE" Name="HOST__t_6_7__5"/>
 <EventDecl Kind="UNCONTROLLABLE" Name="HOST__preset__fs_master_bit3_TO"/>
 <EventDecl Kind="UNCONTROLLABLE" Name="HOST__rcv">
+<RangeList>
 <BinaryExpression Operator="..">
 <IntConstant Value="0"/>
 <IntConstant Value="1"/>
@@ -101,6 +106,7 @@
 <SimpleIdentifier Name="nok"/>
 <SimpleIdentifier Name="ok"/>
 </EnumSetExpression>
+</RangeList>
 </EventDecl>
 <EventDecl Kind="CONTROLLABLE" Name="HOST__t_4_8__1"/>
 <EventDecl Kind="CONTROLLABLE" Name="HOST__t_4_8__2"/>
@@ -127,16 +133,19 @@
 <EventDecl Kind="CONTROLLABLE" Name="SLAVE__t_28_26__9"/>
 <EventDecl Kind="CONTROLLABLE" Name="SLAVE__t_25_26__10"/>
 <EventDecl Kind="UNCONTROLLABLE" Name="HOST__write__app_FV_requested">
+<RangeList>
 <BinaryExpression Operator="..">
 <IntConstant Value="0"/>
 <IntConstant Value="1"/>
 </BinaryExpression>
+</RangeList>
 </EventDecl>
 <EventDecl Kind="UNCONTROLLABLE" Name="HOST__preset__in_ps_status_bit3_TO"/>
 <EventDecl Kind="UNCONTROLLABLE" Name="HOST__delay_timeout"/>
 <EventDecl Kind="CONTROLLABLE" Name="HOST__t_2_3"/>
 <EventDecl Kind="CONTROLLABLE" Name="HOST__init"/>
 <EventDecl Kind="UNCONTROLLABLE" Name="HOST__send">
+<RangeList>
 <EnumSetExpression>
 <SimpleIdentifier Name="pv"/>
 </EnumSetExpression>
@@ -148,8 +157,10 @@
 <IntConstant Value="0"/>
 <IntConstant Value="4"/>
 </BinaryExpression>
+</RangeList>
 </EventDecl>
 <EventDecl Kind="UNCONTROLLABLE" Name="SLAVE__send">
+<RangeList>
 <BinaryExpression Operator="..">
 <IntConstant Value="0"/>
 <IntConstant Value="1"/>
@@ -166,6 +177,7 @@
 <IntConstant Value="0"/>
 <IntConstant Value="4"/>
 </BinaryExpression>
+</RangeList>
 </EventDecl>
 <EventDecl Kind="CONTROLLABLE" Name="HOST__t_3_4"/>
 <EventDecl Kind="CONTROLLABLE" Name="HOST__t_3_8"/>
@@ -187,6 +199,7 @@
 <EventDecl Kind="CONTROLLABLE" Name="SLAVE__t_22_23__5"/>
 <EventDecl Kind="CONTROLLABLE" Name="HOST__t_3_3__2"/>
 <EventDecl Kind="UNCONTROLLABLE" Name="ACK__drop">
+<RangeList>
 <BinaryExpression Operator="..">
 <IntConstant Value="0"/>
 <IntConstant Value="1"/>
@@ -206,6 +219,7 @@
 <EnumSetExpression>
 <SimpleIdentifier Name="ok"/>
 </EnumSetExpression>
+</RangeList>
 </EventDecl>
 <EventDecl Kind="CONTROLLABLE" Name="HOST__t_1_8__1"/>
 <EventDecl Kind="CONTROLLABLE" Name="SLAVE__t_23_24"/>
@@ -301,6 +315,7 @@
 <EventDecl Kind="CONTROLLABLE" Name="SLAVE__t_28_26__15"/>
 <EventDecl Kind="CONTROLLABLE" Name="SLAVE__t_28_26__20"/>
 <EventDecl Kind="UNCONTROLLABLE" Name="MSG__drop">
+<RangeList>
 <EnumSetExpression>
 <SimpleIdentifier Name="pv"/>
 </EnumSetExpression>
@@ -315,6 +330,7 @@
 <EnumSetExpression>
 <SimpleIdentifier Name="ok"/>
 </EnumSetExpression>
+</RangeList>
 </EventDecl>
 <EventDecl Kind="UNCONTROLLABLE" Name="HOST__operator_ack"/>
 <EventDecl Kind="CONTROLLABLE" Name="SLAVE__t_28_26__16"/>
@@ -331,9 +347,11 @@
 <EventDecl Kind="CONTROLLABLE" Name="HOST__t_7_8__3"/>
 <EventDecl Kind="CONTROLLABLE" Name="HOST__t_7_8__4"/>
 <EventDecl Kind="UNCONTROLLABLE" Name="SLAVE__read__app_process_data">
+<RangeList>
 <EnumSetExpression>
 <SimpleIdentifier Name="pv"/>
 </EnumSetExpression>
+</RangeList>
 </EventDecl>
 <EventDecl Kind="CONTROLLABLE" Name="HOST__t_7_8__5"/>
 <EventDecl Kind="CONTROLLABLE" Name="HOST__t_7_8__6"/>

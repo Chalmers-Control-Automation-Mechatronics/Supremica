@@ -6,10 +6,12 @@
 <EventDecl Kind="UNCONTROLLABLE" Scope="REQUIRED_PARAMETER" Name="timeout"/>
 <EventDecl Kind="CONTROLLABLE" Scope="OPTIONAL_PARAMETER" Name="reset"/>
 <EventDecl Kind="CONTROLLABLE" Scope="REQUIRED_PARAMETER" Name="control">
+<RangeList>
 <BinaryExpression Operator="..">
 <IntConstant Value="0"/>
 <IntConstant Value="1"/>
 </BinaryExpression>
+</RangeList>
 </EventDecl>
 <EventDecl Kind="UNCONTROLLABLE" Scope="REQUIRED_PARAMETER" Name="sensor"/>
 <EventDecl Kind="PROPOSITION" Name=":accepting"/>

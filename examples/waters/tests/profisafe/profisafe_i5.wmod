@@ -15,12 +15,15 @@
 <EventDecl Kind="CONTROLLABLE" Name="HOST__t_10_8__7"/>
 <EventDecl Kind="CONTROLLABLE" Name="HOST__t_10_8__8"/>
 <EventDecl Kind="UNCONTROLLABLE" Name="HOST__read__app_process_data">
+<RangeList>
 <EnumSetExpression>
 <SimpleIdentifier Name="fv"/>
 <SimpleIdentifier Name="pv"/>
 </EnumSetExpression>
+</RangeList>
 </EventDecl>
 <EventDecl Kind="UNCONTROLLABLE" Name="SLAVE__rcv">
+<RangeList>
 <BinaryExpression Operator="..">
 <IntConstant Value="0"/>
 <IntConstant Value="5"/>
@@ -29,6 +32,7 @@
 <SimpleIdentifier Name="nok"/>
 <SimpleIdentifier Name="ok"/>
 </EnumSetExpression>
+</RangeList>
 </EventDecl>
 <EventDecl Kind="CONTROLLABLE" Name="SLAVE__t_22_26__1"/>
 <EventDecl Kind="CONTROLLABLE" Name="SLAVE__t_22_26__2"/>
@@ -38,10 +42,12 @@
 <EventDecl Kind="CONTROLLABLE" Name="HOST__t_9_8"/>
 <EventDecl Kind="CONTROLLABLE" Name="SLAVE__t_22_26__6"/>
 <EventDecl Kind="UNCONTROLLABLE" Name="HOST__preset__in_cons_num">
+<RangeList>
 <BinaryExpression Operator="..">
 <IntConstant Value="0"/>
 <IntConstant Value="5"/>
 </BinaryExpression>
+</RangeList>
 </EventDecl>
 <EventDecl Kind="UNCONTROLLABLE" Name="HOST__preset__fs_slave_bit2_CRCNO"/>
 <EventDecl Kind="CONTROLLABLE" Name="SLAVE__t_26_27"/>
@@ -61,23 +67,28 @@
 <EventDecl Kind="CONTROLLABLE" Name="HOST__t_6_7__3"/>
 <EventDecl Kind="CONTROLLABLE" Name="SLAVE__t_25_26__8"/>
 <EventDecl Kind="UNCONTROLLABLE" Name="HOST__read__app_FV_active">
+<RangeList>
 <BinaryExpression Operator="..">
 <IntConstant Value="0"/>
 <IntConstant Value="1"/>
 </BinaryExpression>
+</RangeList>
 </EventDecl>
 <EventDecl Kind="CONTROLLABLE" Name="HOST__t_6_7__4"/>
 <EventDecl Kind="CONTROLLABLE" Name="SLAVE__t_25_26__9"/>
 <EventDecl Kind="CONTROLLABLE" Name="HOST__t_6_7__5"/>
 <EventDecl Kind="CONTROLLABLE" Name="HOST__t_6_7__6"/>
 <EventDecl Kind="UNCONTROLLABLE" Name="HOST__read__fs_slave_bit3_TO">
+<RangeList>
 <BinaryExpression Operator="..">
 <IntConstant Value="0"/>
 <IntConstant Value="1"/>
 </BinaryExpression>
+</RangeList>
 </EventDecl>
 <EventDecl Kind="UNCONTROLLABLE" Name="HOST__preset__fs_master_bit3_TO"/>
 <EventDecl Kind="UNCONTROLLABLE" Name="HOST__rcv">
+<RangeList>
 <EnumSetExpression>
 <SimpleIdentifier Name="pv"/>
 </EnumSetExpression>
@@ -101,6 +112,7 @@
 <SimpleIdentifier Name="ok"/>
 <SimpleIdentifier Name="nok"/>
 </EnumSetExpression>
+</RangeList>
 </EventDecl>
 <EventDecl Kind="CONTROLLABLE" Name="HOST__t_4_8__1"/>
 <EventDecl Kind="CONTROLLABLE" Name="HOST__t_4_8__2"/>
@@ -124,51 +136,64 @@
 <EventDecl Kind="CONTROLLABLE" Name="SLAVE__t_28_26__6"/>
 <EventDecl Kind="CONTROLLABLE" Name="SLAVE__t_28_26__7"/>
 <EventDecl Kind="UNCONTROLLABLE" Name="SLAVE__write__app_process_data">
+<RangeList>
 <EnumSetExpression>
 <SimpleIdentifier Name="fv"/>
 <SimpleIdentifier Name="pv"/>
 </EnumSetExpression>
+</RangeList>
 </EventDecl>
 <EventDecl Kind="CONTROLLABLE" Name="SLAVE__t_28_26__8"/>
 <EventDecl Kind="CONTROLLABLE" Name="SLAVE__t_28_26__9"/>
 <EventDecl Kind="CONTROLLABLE" Name="SLAVE__t_25_26__10"/>
 <EventDecl Kind="CONTROLLABLE" Name="SLAVE__t_25_26__11"/>
 <EventDecl Kind="UNCONTROLLABLE" Name="MSG__transmit">
+<RangeList>
 <BinaryExpression Operator="..">
 <IntConstant Value="0"/>
 <IntConstant Value="5"/>
 </BinaryExpression>
+</RangeList>
 </EventDecl>
 <EventDecl Kind="CONTROLLABLE" Name="SLAVE__t_25_26__12"/>
 <EventDecl Kind="UNCONTROLLABLE" Name="HOST__read__fs_slave_bit2_CRCNO">
+<RangeList>
 <BinaryExpression Operator="..">
 <IntConstant Value="0"/>
 <IntConstant Value="1"/>
 </BinaryExpression>
+</RangeList>
 </EventDecl>
 <EventDecl Kind="UNCONTROLLABLE" Name="HOST__preset__in_ps_status_bit3_TO"/>
 <EventDecl Kind="UNCONTROLLABLE" Name="HOST__delay_timeout"/>
 <EventDecl Kind="UNCONTROLLABLE" Name="HOST__read__fs_master_bit3_TO">
+<RangeList>
 <BinaryExpression Operator="..">
 <IntConstant Value="0"/>
 <IntConstant Value="1"/>
 </BinaryExpression>
+</RangeList>
 </EventDecl>
 <EventDecl Kind="CONTROLLABLE" Name="HOST__t_2_3"/>
 <EventDecl Kind="UNCONTROLLABLE" Name="HOST__read__fs_master_bit2_CRCNO">
+<RangeList>
 <BinaryExpression Operator="..">
 <IntConstant Value="0"/>
 <IntConstant Value="1"/>
 </BinaryExpression>
+</RangeList>
 </EventDecl>
 <EventDecl Kind="CONTROLLABLE" Name="HOST__init"/>
 <EventDecl Kind="UNCONTROLLABLE" Name="HOST__send">
+<RangeList>
 <BinaryExpression Operator="..">
 <IntConstant Value="0"/>
 <IntConstant Value="5"/>
 </BinaryExpression>
+</RangeList>
 </EventDecl>
 <EventDecl Kind="UNCONTROLLABLE" Name="SLAVE__send">
+<RangeList>
 <EnumSetExpression>
 <SimpleIdentifier Name="pv"/>
 </EnumSetExpression>
@@ -188,6 +213,7 @@
 <IntConstant Value="0"/>
 <IntConstant Value="5"/>
 </BinaryExpression>
+</RangeList>
 </EventDecl>
 <EventDecl Kind="CONTROLLABLE" Name="HOST__t_3_4"/>
 <EventDecl Kind="CONTROLLABLE" Name="HOST__t_3_8"/>
@@ -200,6 +226,7 @@
 <EventDecl Kind="CONTROLLABLE" Name="HOST__t_10_5__6"/>
 <EventDecl Kind="UNCONTROLLABLE" Name="HOST__preset__in_ps_status_bit4_FV"/>
 <EventDecl Kind="UNCONTROLLABLE" Name="ACK__transmit">
+<RangeList>
 <EnumSetExpression>
 <SimpleIdentifier Name="pv"/>
 </EnumSetExpression>
@@ -219,6 +246,7 @@
 <IntConstant Value="0"/>
 <IntConstant Value="5"/>
 </BinaryExpression>
+</RangeList>
 </EventDecl>
 <EventDecl Kind="CONTROLLABLE" Name="SLAVE__t_22_23__1"/>
 <EventDecl Kind="CONTROLLABLE" Name="SLAVE__t_22_23__2"/>
@@ -232,6 +260,7 @@
 <EventDecl Kind="CONTROLLABLE" Name="HOST__t_3_3__2"/>
 <EventDecl Kind="CONTROLLABLE" Name="SLAVE__t_22_23__6"/>
 <EventDecl Kind="UNCONTROLLABLE" Name="ACK__drop">
+<RangeList>
 <EnumSetExpression>
 <SimpleIdentifier Name="pv"/>
 </EnumSetExpression>
@@ -251,6 +280,7 @@
 <IntConstant Value="0"/>
 <IntConstant Value="5"/>
 </BinaryExpression>
+</RangeList>
 </EventDecl>
 <EventDecl Kind="CONTROLLABLE" Name="HOST__t_1_8__1"/>
 <EventDecl Kind="CONTROLLABLE" Name="SLAVE__t_23_24"/>
@@ -359,10 +389,12 @@
 <EventDecl Kind="CONTROLLABLE" Name="SLAVE__t_28_26__20"/>
 <EventDecl Kind="CONTROLLABLE" Name="SLAVE__t_28_26__15"/>
 <EventDecl Kind="UNCONTROLLABLE" Name="MSG__drop">
+<RangeList>
 <BinaryExpression Operator="..">
 <IntConstant Value="0"/>
 <IntConstant Value="5"/>
 </BinaryExpression>
+</RangeList>
 </EventDecl>
 <EventDecl Kind="CONTROLLABLE" Name="HOST__t_4_8__46"/>
 <EventDecl Kind="UNCONTROLLABLE" Name="HOST__operator_ack"/>
@@ -383,9 +415,11 @@
 <EventDecl Kind="CONTROLLABLE" Name="SLAVE__t_28_26__28"/>
 <EventDecl Kind="CONTROLLABLE" Name="HOST__t_7_8__3"/>
 <EventDecl Kind="UNCONTROLLABLE" Name="SLAVE__read__app_process_data">
+<RangeList>
 <EnumSetExpression>
 <SimpleIdentifier Name="pv"/>
 </EnumSetExpression>
+</RangeList>
 </EventDecl>
 <EventDecl Kind="CONTROLLABLE" Name="HOST__t_7_8__4"/>
 <EventDecl Kind="CONTROLLABLE" Name="HOST__t_7_8__5"/>

@@ -46,9 +46,11 @@
         <xsl:value-of select="@name"/>
       </xsl:attribute>
     </SimpleIdentifier>
-    <xsl:call-template name="parse-range">
-      <xsl:with-param name="expr" select="@expression"/>
-    </xsl:call-template>
+    <ConstantAliasExpression>
+      <xsl:call-template name="parse-range">
+        <xsl:with-param name="expr" select="@expression"/>
+      </xsl:call-template>
+    </ConstantAliasExpression>
   </ConstantAlias>
 </xsl:template>
 
@@ -82,7 +84,9 @@
       </xsl:if>
     </xsl:attribute>
     <xsl:if test="local-name(following::*[1]) = 'foreach-alias'">
-      <xsl:apply-templates select="following::*[1]"/>
+      <RangeList>
+        <xsl:apply-templates select="following::*[1]"/>
+      </RangeList>
     </xsl:if>
     <xsl:apply-templates select="comment"/>
   </EventDecl>

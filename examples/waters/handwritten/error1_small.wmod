@@ -3,27 +3,35 @@
 <ConstantAliasList>
 <ConstantAlias>
 <SimpleIdentifier Name="MACHS"/>
+<ConstantAliasExpression>
 <BinaryExpression Operator="..">
 <IntConstant Value="1"/>
 <IntConstant Value="2"/>
 </BinaryExpression>
+</ConstantAliasExpression>
 </ConstantAlias>
 </ConstantAliasList>
 <EventDeclList>
 <EventDecl Name="finish" Kind="UNCONTROLLABLE">
+<RangeList>
 <SimpleIdentifier Name="MACHS"/>
+</RangeList>
 <Comment>
 Machine finishes operation.
 </Comment>
 </EventDecl>
 <EventDecl Name="break" Kind="UNCONTROLLABLE">
+<RangeList>
 <SimpleIdentifier Name="MACHS"/>
+</RangeList>
 <Comment>
 Machine breaks down.
 </Comment>
 </EventDecl>
 <EventDecl Name="start" Kind="CONTROLLABLE">
+<RangeList>
 <SimpleIdentifier Name="MACHS"/>
+</RangeList>
 <Comment>
 Start a machine.
 This code fragment should start operation of the machine given as its
@@ -31,7 +39,9 @@ parameter.
 </Comment>
 </EventDecl>
 <EventDecl Name="repair" Kind="CONTROLLABLE">
+<RangeList>
 <SimpleIdentifier Name="MACHS"/>
+</RangeList>
 <Comment>
 Repair a machine.
 This code fragment should initiate the repair of the machine given as

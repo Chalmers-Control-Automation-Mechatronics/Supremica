@@ -3,24 +3,34 @@
 <ConstantAliasList>
 <ConstantAlias>
 <SimpleIdentifier Name="MACHS"/>
+<ConstantAliasExpression>
 <BinaryExpression Operator="..">
 <IntConstant Value="1"/>
 <IntConstant Value="2"/>
 </BinaryExpression>
+</ConstantAliasExpression>
 </ConstantAlias>
 </ConstantAliasList>
 <EventDeclList>
 <EventDecl Kind="UNCONTROLLABLE" Name="finish">
+<RangeList>
 <SimpleIdentifier Name="MACHS"/>
+</RangeList>
 </EventDecl>
 <EventDecl Kind="UNCONTROLLABLE" Name="break">
+<RangeList>
 <SimpleIdentifier Name="MACHS"/>
+</RangeList>
 </EventDecl>
 <EventDecl Kind="CONTROLLABLE" Name="start">
+<RangeList>
 <SimpleIdentifier Name="MACHS"/>
+</RangeList>
 </EventDecl>
 <EventDecl Kind="CONTROLLABLE" Name="repair">
+<RangeList>
 <SimpleIdentifier Name="MACHS"/>
+</RangeList>
 </EventDecl>
 <EventDecl Kind="PROPOSITION" Name=":accepting"/>
 </EventDeclList>

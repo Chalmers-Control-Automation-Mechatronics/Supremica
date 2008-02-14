@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.junit
 //# CLASS:   AbstractWatersTest
 //###########################################################################
-//# $Id: AbstractWatersTest.java,v 1.7 2007-07-21 06:28:07 robi Exp $
+//# $Id: AbstractWatersTest.java,v 1.8 2008-02-14 02:24:09 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.junit;
@@ -85,9 +85,9 @@ public abstract class AbstractWatersTest
     return mOutputRoot;
   }
 
-  protected File getInputDirectory()
+  protected File getWatersInputRoot()
   {
-    return getInputRoot();
+    return new File(getInputRoot(), "waters");
   }
 
   protected File getOutputDirectory()
@@ -124,11 +124,5 @@ public abstract class AbstractWatersTest
   private final File mOutputRoot;
 
   private File mLogFile;
-
-
-  //#########################################################################
-  //# Class Constants
-  private static final String LOGGERFACTORY =
-    "org.supremica.log.LoggerFactory";
 
 }

@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.compiler
 //# CLASS:   CompilerTest
 //###########################################################################
-//# $Id: CompilerTest.java,v 1.16 2008-01-28 00:55:08 robi Exp $
+//# $Id: CompilerTest.java,v 1.17 2008-02-14 02:24:09 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.compiler;
@@ -458,7 +458,7 @@ public class CompilerTest
     throws Exception
   {
     super.setUp();
-    mInputDirectory = new File(getInputRoot(), "handwritten");
+    mInputDirectory = new File(getWatersInputRoot(), "handwritten");
     mOutputDirectory = getOutputDirectory();
     mModuleFactory = ModuleElementFactory.getInstance();
     mProductDESFactory = ProductDESElementFactory.getInstance();

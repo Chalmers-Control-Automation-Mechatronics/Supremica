@@ -4,555 +4,764 @@
 <ConstantAliasList>
 <ConstantAlias>
 <SimpleIdentifier Name="AS1_2"/>
+<ConstantAliasExpression>
 <EnumSetExpression>
 <SimpleIdentifier Name="AS1"/>
 <SimpleIdentifier Name="AS2"/>
 </EnumSetExpression>
+</ConstantAliasExpression>
 </ConstantAlias>
 <ConstantAlias>
 <SimpleIdentifier Name="TU1_2"/>
+<ConstantAliasExpression>
 <EnumSetExpression>
 <SimpleIdentifier Name="TU1"/>
 <SimpleIdentifier Name="TU2"/>
 </EnumSetExpression>
+</ConstantAliasExpression>
 </ConstantAlias>
 <ConstantAlias>
 <SimpleIdentifier Name="TU1_2_4"/>
+<ConstantAliasExpression>
 <EnumSetExpression>
 <SimpleIdentifier Name="TU1"/>
 <SimpleIdentifier Name="TU2"/>
 <SimpleIdentifier Name="TU4"/>
 </EnumSetExpression>
+</ConstantAliasExpression>
 </ConstantAlias>
 <ConstantAlias>
 <SimpleIdentifier Name="TUall"/>
+<ConstantAliasExpression>
 <EnumSetExpression>
 <SimpleIdentifier Name="TU1"/>
 <SimpleIdentifier Name="TU2"/>
 <SimpleIdentifier Name="TU3"/>
 <SimpleIdentifier Name="TU4"/>
 </EnumSetExpression>
+</ConstantAliasExpression>
 </ConstantAlias>
 <ConstantAlias>
 <SimpleIdentifier Name="TU3_4"/>
+<ConstantAliasExpression>
 <EnumSetExpression>
 <SimpleIdentifier Name="TU3"/>
 <SimpleIdentifier Name="TU4"/>
 </EnumSetExpression>
+</ConstantAliasExpression>
 </ConstantAlias>
 <ConstantAlias>
 <SimpleIdentifier Name="AS1to3"/>
+<ConstantAliasExpression>
 <EnumSetExpression>
 <SimpleIdentifier Name="AS1"/>
 <SimpleIdentifier Name="AS2"/>
 <SimpleIdentifier Name="AS3"/>
 </EnumSetExpression>
+</ConstantAliasExpression>
 </ConstantAlias>
 </ConstantAliasList>
 <EventDeclList>
 <EventDecl Kind="CONTROLLABLE" Name="OpNeeded">
+<RangeList>
 <EnumSetExpression>
 <SimpleIdentifier Name="TU1"/>
 </EnumSetExpression>
+</RangeList>
 </EventDecl>
 <EventDecl Kind="UNCONTROLLABLE" Name="DoneWrite">
+<RangeList>
 <EnumSetExpression>
 <SimpleIdentifier Name="AS1"/>
 </EnumSetExpression>
-</EventDecl>
-<EventDecl Kind="CONTROLLABLE" Name="QCplT2A_2B">
-<EnumSetExpression>
-<SimpleIdentifier Name="TU1"/>
-</EnumSetExpression>
+</RangeList>
 </EventDecl>
 <EventDecl Kind="UNCONTROLLABLE" Name="NoErr">
+<RangeList>
 <EnumSetExpression>
 <SimpleIdentifier Name="TU1"/>
 </EnumSetExpression>
+</RangeList>
+</EventDecl>
+<EventDecl Kind="CONTROLLABLE" Name="QCplT2A_2B">
+<RangeList>
+<EnumSetExpression>
+<SimpleIdentifier Name="TU1"/>
+</EnumSetExpression>
+</RangeList>
 </EventDecl>
 <EventDecl Kind="CONTROLLABLE" Name="RobUp">
+<RangeList>
 <EnumSetExpression>
 <SimpleIdentifier Name="AS1"/>
 </EnumSetExpression>
+</RangeList>
 </EventDecl>
 <EventDecl Kind="CONTROLLABLE" Name="TrnsfToEL">
+<RangeList>
 <EnumSetExpression>
 <SimpleIdentifier Name="TU1"/>
 </EnumSetExpression>
+</RangeList>
 </EventDecl>
 <EventDecl Kind="UNCONTROLLABLE" Name="DrwArvCL">
+<RangeList>
 <EnumSetExpression>
 <SimpleIdentifier Name="TU1"/>
 </EnumSetExpression>
+</RangeList>
 </EventDecl>
 <EventDecl Kind="UNCONTROLLABLE" Name="PArvAtExtractor">
+<RangeList>
 <EnumSetExpression>
 <SimpleIdentifier Name="AS1"/>
 </EnumSetExpression>
+</RangeList>
 </EventDecl>
 <EventDecl Kind="UNCONTROLLABLE" Name="PalletArvDrwCL">
+<RangeList>
 <EnumSetExpression>
 <SimpleIdentifier Name="TU1"/>
 </EnumSetExpression>
+</RangeList>
 </EventDecl>
 <EventDecl Kind="UNCONTROLLABLE" Name="DrwArvEL">
+<RangeList>
 <EnumSetExpression>
 <SimpleIdentifier Name="TU1"/>
 </EnumSetExpression>
+</RangeList>
 </EventDecl>
 <EventDecl Kind="CONTROLLABLE" Name="TrnsfCplToEL_d">
+<RangeList>
 <EnumSetExpression>
 <SimpleIdentifier Name="TU1"/>
 </EnumSetExpression>
+</RangeList>
 </EventDecl>
 <EventDecl Kind="UNCONTROLLABLE" Name="PalletArvDrwEL">
+<RangeList>
 <EnumSetExpression>
 <SimpleIdentifier Name="TU1"/>
 </EnumSetExpression>
+</RangeList>
 </EventDecl>
 <EventDecl Kind="CONTROLLABLE" Name="ProcErr">
+<RangeList>
 <EnumSetExpression>
 <SimpleIdentifier Name="AS1"/>
 </EnumSetExpression>
+</RangeList>
 </EventDecl>
 <EventDecl Kind="CONTROLLABLE" Name="QType">
+<RangeList>
 <EnumSetExpression>
 <SimpleIdentifier Name="AS1"/>
 <SimpleIdentifier Name="TU1"/>
 </EnumSetExpression>
-</EventDecl>
-<EventDecl Kind="UNCONTROLLABLE" Name="DrwAtCL">
-<EnumSetExpression>
-<SimpleIdentifier Name="TU1"/>
-</EnumSetExpression>
+</RangeList>
 </EventDecl>
 <EventDecl Kind="CONTROLLABLE" Name="QOpNeeded">
+<RangeList>
 <EnumSetExpression>
 <SimpleIdentifier Name="TU1"/>
 </EnumSetExpression>
+</RangeList>
+</EventDecl>
+<EventDecl Kind="UNCONTROLLABLE" Name="DrwAtCL">
+<RangeList>
+<EnumSetExpression>
+<SimpleIdentifier Name="TU1"/>
+</EnumSetExpression>
+</RangeList>
 </EventDecl>
 <EventDecl Kind="CONTROLLABLE" Name="RobDwn">
+<RangeList>
 <EnumSetExpression>
 <SimpleIdentifier Name="AS1"/>
 </EnumSetExpression>
+</RangeList>
 </EventDecl>
 <EventDecl Kind="UNCONTROLLABLE" Name="DrwAtEL">
+<RangeList>
 <EnumSetExpression>
 <SimpleIdentifier Name="TU1"/>
 </EnumSetExpression>
+</RangeList>
 </EventDecl>
 <EventDecl Kind="CONTROLLABLE" Name="QErr1A">
+<RangeList>
 <EnumSetExpression>
 <SimpleIdentifier Name="TU1"/>
 </EnumSetExpression>
+</RangeList>
 </EventDecl>
 <EventDecl Kind="CONTROLLABLE" Name="QErr1B">
+<RangeList>
 <EnumSetExpression>
 <SimpleIdentifier Name="TU1"/>
 </EnumSetExpression>
+</RangeList>
 </EventDecl>
 <EventDecl Kind="CONTROLLABLE" Name="QErr2A">
+<RangeList>
 <EnumSetExpression>
 <SimpleIdentifier Name="TU1"/>
 </EnumSetExpression>
-</EventDecl>
-<EventDecl Kind="CONTROLLABLE" Name="QErr2B">
-<EnumSetExpression>
-<SimpleIdentifier Name="TU1"/>
-</EnumSetExpression>
-</EventDecl>
-<EventDecl Kind="UNCONTROLLABLE" Name="RobRprCpl">
-<EnumSetExpression>
-<SimpleIdentifier Name="AS1"/>
-</EnumSetExpression>
+</RangeList>
 </EventDecl>
 <EventDecl Kind="UNCONTROLLABLE" Name="PalletLvGCL">
+<RangeList>
 <EnumSetExpression>
 <SimpleIdentifier Name="TU1"/>
 </EnumSetExpression>
+</RangeList>
+</EventDecl>
+<EventDecl Kind="UNCONTROLLABLE" Name="RobRprCpl">
+<RangeList>
+<EnumSetExpression>
+<SimpleIdentifier Name="AS1"/>
+</EnumSetExpression>
+</RangeList>
+</EventDecl>
+<EventDecl Kind="CONTROLLABLE" Name="QErr2B">
+<RangeList>
+<EnumSetExpression>
+<SimpleIdentifier Name="TU1"/>
+</EnumSetExpression>
+</RangeList>
 </EventDecl>
 <EventDecl Kind="CONTROLLABLE" Name="StrRtask1A">
+<RangeList>
 <EnumSetExpression>
 <SimpleIdentifier Name="AS1"/>
 </EnumSetExpression>
+</RangeList>
 </EventDecl>
 <EventDecl Kind="CONTROLLABLE" Name="StrRtask1B">
+<RangeList>
 <EnumSetExpression>
 <SimpleIdentifier Name="AS1"/>
 </EnumSetExpression>
+</RangeList>
 </EventDecl>
 <EventDecl Kind="UNCONTROLLABLE" Name="ExtrArvPlatf">
+<RangeList>
 <EnumSetExpression>
 <SimpleIdentifier Name="AS1"/>
 </EnumSetExpression>
+</RangeList>
 </EventDecl>
 <EventDecl Kind="UNCONTROLLABLE" Name="AError1A">
+<RangeList>
 <EnumSetExpression>
 <SimpleIdentifier Name="AS1"/>
 </EnumSetExpression>
+</RangeList>
 </EventDecl>
 <EventDecl Kind="UNCONTROLLABLE" Name="AError1B">
+<RangeList>
 <EnumSetExpression>
 <SimpleIdentifier Name="AS1"/>
 </EnumSetExpression>
-</EventDecl>
-<EventDecl Kind="CONTROLLABLE" Name="QDrwLoc">
-<EnumSetExpression>
-<SimpleIdentifier Name="TU1"/>
-</EnumSetExpression>
+</RangeList>
 </EventDecl>
 <EventDecl Kind="CONTROLLABLE" Name="PStopClosesEL_1">
+<RangeList>
 <EnumSetExpression>
 <SimpleIdentifier Name="TU1"/>
 </EnumSetExpression>
+</RangeList>
+</EventDecl>
+<EventDecl Kind="CONTROLLABLE" Name="QDrwLoc">
+<RangeList>
+<EnumSetExpression>
+<SimpleIdentifier Name="TU1"/>
+</EnumSetExpression>
+</RangeList>
 </EventDecl>
 <EventDecl Kind="CONTROLLABLE" Name="PStopClosesEL_2">
+<RangeList>
 <EnumSetExpression>
 <SimpleIdentifier Name="AS1"/>
 </EnumSetExpression>
+</RangeList>
 </EventDecl>
 <EventDecl Kind="UNCONTROLLABLE" Name="ZRtimeout">
+<RangeList>
 <EnumSetExpression>
 <SimpleIdentifier Name="AS1"/>
 </EnumSetExpression>
+</RangeList>
 </EventDecl>
 <EventDecl Kind="CONTROLLABLE" Name="WrtCplT1A_1B">
+<RangeList>
 <EnumSetExpression>
 <SimpleIdentifier Name="AS1"/>
 </EnumSetExpression>
+</RangeList>
 </EventDecl>
 <EventDecl Kind="CONTROLLABLE" Name="GOpensEL_1">
+<RangeList>
 <EnumSetExpression>
 <SimpleIdentifier Name="TU1"/>
 </EnumSetExpression>
+</RangeList>
 </EventDecl>
 <EventDecl Kind="CONTROLLABLE" Name="GOpensEL_2">
+<RangeList>
 <EnumSetExpression>
 <SimpleIdentifier Name="AS1"/>
 </EnumSetExpression>
-</EventDecl>
-<EventDecl Kind="CONTROLLABLE" Name="MvDrwToCL">
-<EnumSetExpression>
-<SimpleIdentifier Name="TU1"/>
-</EnumSetExpression>
+</RangeList>
 </EventDecl>
 <EventDecl Kind="UNCONTROLLABLE" Name="DoneRead">
+<RangeList>
 <EnumSetExpression>
 <SimpleIdentifier Name="AS1"/>
 <SimpleIdentifier Name="TU1"/>
 </EnumSetExpression>
+</RangeList>
+</EventDecl>
+<EventDecl Kind="CONTROLLABLE" Name="MvDrwToCL">
+<RangeList>
+<EnumSetExpression>
+<SimpleIdentifier Name="TU1"/>
+</EnumSetExpression>
+</RangeList>
 </EventDecl>
 <EventDecl Kind="CONTROLLABLE" Name="ZNoTrnsfCL">
+<RangeList>
 <EnumSetExpression>
 <SimpleIdentifier Name="TU1"/>
 </EnumSetExpression>
+</RangeList>
 </EventDecl>
 <EventDecl Kind="CONTROLLABLE" Name="DelayTrnsfCplToCL">
+<RangeList>
 <EnumSetExpression>
 <SimpleIdentifier Name="TU1"/>
 </EnumSetExpression>
-</EventDecl>
-<EventDecl Kind="UNCONTROLLABLE" Name="PalletLvTUAtCL">
-<EnumSetExpression>
-<SimpleIdentifier Name="TU1"/>
-</EnumSetExpression>
+</RangeList>
 </EventDecl>
 <EventDecl Kind="CONTROLLABLE" Name="StartTrnsfToCL">
+<RangeList>
 <EnumSetExpression>
 <SimpleIdentifier Name="TU1"/>
 </EnumSetExpression>
+</RangeList>
+</EventDecl>
+<EventDecl Kind="UNCONTROLLABLE" Name="PalletLvTUAtCL">
+<RangeList>
+<EnumSetExpression>
+<SimpleIdentifier Name="TU1"/>
+</EnumSetExpression>
+</RangeList>
 </EventDecl>
 <EventDecl Kind="CONTROLLABLE" Name="MvDrwToEL">
+<RangeList>
 <EnumSetExpression>
 <SimpleIdentifier Name="TU1"/>
 </EnumSetExpression>
+</RangeList>
 </EventDecl>
 <EventDecl Kind="CONTROLLABLE" Name="TrnsfELToCL">
+<RangeList>
 <EnumSetExpression>
 <SimpleIdentifier Name="TU1"/>
 </EnumSetExpression>
+</RangeList>
 </EventDecl>
 <EventDecl Kind="UNCONTROLLABLE" Name="PalletLvGEL_1">
+<RangeList>
 <EnumSetExpression>
 <SimpleIdentifier Name="TU1"/>
 </EnumSetExpression>
+</RangeList>
 </EventDecl>
 <EventDecl Kind="UNCONTROLLABLE" Name="PalletLvGEL_2">
+<RangeList>
 <EnumSetExpression>
 <SimpleIdentifier Name="AS1"/>
 </EnumSetExpression>
+</RangeList>
 </EventDecl>
 <EventDecl Kind="CONTROLLABLE" Name="TrnsfCplToCL">
+<RangeList>
 <EnumSetExpression>
 <SimpleIdentifier Name="TU1"/>
 </EnumSetExpression>
+</RangeList>
 </EventDecl>
 <EventDecl Kind="CONTROLLABLE" Name="PStopOpensEL_1">
+<RangeList>
 <EnumSetExpression>
 <SimpleIdentifier Name="TU1"/>
 </EnumSetExpression>
+</RangeList>
 </EventDecl>
 <EventDecl Kind="CONTROLLABLE" Name="PStopOpensEL_2">
+<RangeList>
 <EnumSetExpression>
 <SimpleIdentifier Name="AS1"/>
 </EnumSetExpression>
+</RangeList>
 </EventDecl>
 <EventDecl Kind="CONTROLLABLE" Name="PStopClosesCL">
+<RangeList>
 <EnumSetExpression>
 <SimpleIdentifier Name="TU1"/>
 </EnumSetExpression>
-</EventDecl>
-<EventDecl Kind="CONTROLLABLE" Name="AssmbErrA">
-<EnumSetExpression>
-<SimpleIdentifier Name="AS1"/>
-</EnumSetExpression>
+</RangeList>
 </EventDecl>
 <EventDecl Kind="CONTROLLABLE" Name="TrnsfCplToEL">
+<RangeList>
 <EnumSetExpression>
 <SimpleIdentifier Name="TU1"/>
 </EnumSetExpression>
+</RangeList>
+</EventDecl>
+<EventDecl Kind="CONTROLLABLE" Name="AssmbErrA">
+<RangeList>
+<EnumSetExpression>
+<SimpleIdentifier Name="AS1"/>
+</EnumSetExpression>
+</RangeList>
 </EventDecl>
 <EventDecl Kind="CONTROLLABLE" Name="AssmbErrB">
+<RangeList>
 <EnumSetExpression>
 <SimpleIdentifier Name="AS1"/>
 </EnumSetExpression>
+</RangeList>
 </EventDecl>
 <EventDecl Kind="UNCONTROLLABLE" Name="IsCpl">
+<RangeList>
 <EnumSetExpression>
 <SimpleIdentifier Name="TU1"/>
 </EnumSetExpression>
+</RangeList>
 </EventDecl>
 <EventDecl Kind="UNCONTROLLABLE" Name="RtaskCpl1A">
+<RangeList>
 <EnumSetExpression>
 <SimpleIdentifier Name="AS1"/>
 </EnumSetExpression>
-</EventDecl>
-<EventDecl Kind="UNCONTROLLABLE" Name="RtaskCpl1B">
-<EnumSetExpression>
-<SimpleIdentifier Name="AS1"/>
-</EnumSetExpression>
+</RangeList>
 </EventDecl>
 <EventDecl Kind="CONTROLLABLE" Name="GOpensCL">
+<RangeList>
 <EnumSetExpression>
 <SimpleIdentifier Name="TU1"/>
 </EnumSetExpression>
+</RangeList>
+</EventDecl>
+<EventDecl Kind="UNCONTROLLABLE" Name="RtaskCpl1B">
+<RangeList>
+<EnumSetExpression>
+<SimpleIdentifier Name="AS1"/>
+</EnumSetExpression>
+</RangeList>
 </EventDecl>
 <EventDecl Kind="CONTROLLABLE" Name="QCplT1A_1B">
+<RangeList>
 <EnumSetExpression>
 <SimpleIdentifier Name="TU1"/>
 </EnumSetExpression>
-</EventDecl>
-<EventDecl Kind="CONTROLLABLE" Name="PalletRlsd_d">
-<EnumSetExpression>
-<SimpleIdentifier Name="TU1"/>
-</EnumSetExpression>
+</RangeList>
 </EventDecl>
 <EventDecl Kind="UNCONTROLLABLE" Name="ExtrArvConv">
+<RangeList>
 <EnumSetExpression>
 <SimpleIdentifier Name="AS1"/>
 </EnumSetExpression>
+</RangeList>
 </EventDecl>
-<EventDecl Kind="CONTROLLABLE" Name="NoError">
+<EventDecl Kind="CONTROLLABLE" Name="PalletRlsd_d">
+<RangeList>
 <EnumSetExpression>
 <SimpleIdentifier Name="TU1"/>
 </EnumSetExpression>
+</RangeList>
 </EventDecl>
 <EventDecl Kind="CONTROLLABLE" Name="RTasksCpl">
+<RangeList>
 <EnumSetExpression>
 <SimpleIdentifier Name="AS1"/>
 </EnumSetExpression>
+</RangeList>
 </EventDecl>
-<EventDecl Kind="CONTROLLABLE" Name="ASDwn">
+<EventDecl Kind="CONTROLLABLE" Name="NoError">
+<RangeList>
 <EnumSetExpression>
-<SimpleIdentifier Name="AS1"/>
+<SimpleIdentifier Name="TU1"/>
 </EnumSetExpression>
+</RangeList>
 </EventDecl>
 <EventDecl Kind="CONTROLLABLE" Name="NotOpNeeded">
+<RangeList>
 <EnumSetExpression>
 <SimpleIdentifier Name="TU1"/>
 </EnumSetExpression>
+</RangeList>
 </EventDecl>
-<EventDecl Kind="CONTROLLABLE" Name="QError">
+<EventDecl Kind="CONTROLLABLE" Name="ASDwn">
+<RangeList>
 <EnumSetExpression>
-<SimpleIdentifier Name="TU1"/>
+<SimpleIdentifier Name="AS1"/>
 </EnumSetExpression>
+</RangeList>
 </EventDecl>
 <EventDecl Kind="UNCONTROLLABLE" Name="IsType1">
+<RangeList>
+<EnumSetExpression>
+<SimpleIdentifier Name="AS1"/>
+<SimpleIdentifier Name="TU1"/>
+</EnumSetExpression>
+</RangeList>
+</EventDecl>
+<EventDecl Kind="CONTROLLABLE" Name="QError">
+<RangeList>
 <EnumSetExpression>
 <SimpleIdentifier Name="TU1"/>
-<SimpleIdentifier Name="AS1"/>
 </EnumSetExpression>
+</RangeList>
 </EventDecl>
 <EventDecl Kind="UNCONTROLLABLE" Name="IsType2">
+<RangeList>
 <EnumSetExpression>
-<SimpleIdentifier Name="TU1"/>
 <SimpleIdentifier Name="AS1"/>
+<SimpleIdentifier Name="TU1"/>
 </EnumSetExpression>
+</RangeList>
 </EventDecl>
 <EventDecl Kind="UNCONTROLLABLE" Name="PalletLvTUAtEL_1">
+<RangeList>
 <EnumSetExpression>
 <SimpleIdentifier Name="TU1"/>
 </EnumSetExpression>
+</RangeList>
 </EventDecl>
 <EventDecl Kind="CONTROLLABLE" Name="ZNotASUp">
+<RangeList>
 <EnumSetExpression>
 <SimpleIdentifier Name="AS1"/>
 </EnumSetExpression>
-</EventDecl>
-<EventDecl Kind="UNCONTROLLABLE" Name="PalletArvGEL_1">
-<EnumSetExpression>
-<SimpleIdentifier Name="TU1"/>
-</EnumSetExpression>
+</RangeList>
 </EventDecl>
 <EventDecl Kind="CONTROLLABLE" Name="StrRobRepair">
+<RangeList>
 <EnumSetExpression>
 <SimpleIdentifier Name="AS1"/>
 </EnumSetExpression>
+</RangeList>
 </EventDecl>
-<EventDecl Kind="UNCONTROLLABLE" Name="PalletArvGEL_2">
-<EnumSetExpression>
-<SimpleIdentifier Name="AS1"/>
-</EnumSetExpression>
-</EventDecl>
-<EventDecl Kind="CONTROLLABLE" Name="RelPallet">
-<EnumSetExpression>
-<SimpleIdentifier Name="AS1"/>
-</EnumSetExpression>
-</EventDecl>
-<EventDecl Kind="CONTROLLABLE" Name="SkipTrnsfCL">
+<EventDecl Kind="UNCONTROLLABLE" Name="PalletArvGEL_1">
+<RangeList>
 <EnumSetExpression>
 <SimpleIdentifier Name="TU1"/>
 </EnumSetExpression>
+</RangeList>
+</EventDecl>
+<EventDecl Kind="UNCONTROLLABLE" Name="PalletArvGEL_2">
+<RangeList>
+<EnumSetExpression>
+<SimpleIdentifier Name="AS1"/>
+</EnumSetExpression>
+</RangeList>
+</EventDecl>
+<EventDecl Kind="CONTROLLABLE" Name="RelPallet">
+<RangeList>
+<EnumSetExpression>
+<SimpleIdentifier Name="AS1"/>
+</EnumSetExpression>
+</RangeList>
+</EventDecl>
+<EventDecl Kind="CONTROLLABLE" Name="SkipTrnsfCL">
+<RangeList>
+<EnumSetExpression>
+<SimpleIdentifier Name="TU1"/>
+</EnumSetExpression>
+</RangeList>
 </EventDecl>
 <EventDecl Kind="CONTROLLABLE" Name="junk"/>
 <EventDecl Kind="CONTROLLABLE" Name="WrtErr1A">
+<RangeList>
 <EnumSetExpression>
 <SimpleIdentifier Name="AS1"/>
 </EnumSetExpression>
-</EventDecl>
-<EventDecl Kind="CONTROLLABLE" Name="WrtErr1B">
-<EnumSetExpression>
-<SimpleIdentifier Name="AS1"/>
-</EnumSetExpression>
+</RangeList>
 </EventDecl>
 <EventDecl Kind="CONTROLLABLE" Name="LibPallet">
+<RangeList>
 <EnumSetExpression>
 <SimpleIdentifier Name="TU1"/>
 </EnumSetExpression>
+</RangeList>
+</EventDecl>
+<EventDecl Kind="CONTROLLABLE" Name="WrtErr1B">
+<RangeList>
+<EnumSetExpression>
+<SimpleIdentifier Name="AS1"/>
+</EnumSetExpression>
+</RangeList>
 </EventDecl>
 <EventDecl Kind="CONTROLLABLE" Name="ASUpYet">
+<RangeList>
 <EnumSetExpression>
 <SimpleIdentifier Name="AS1"/>
 </EnumSetExpression>
+</RangeList>
 </EventDecl>
 <EventDecl Kind="CONTROLLABLE" Name="MvExtrToPlatf">
+<RangeList>
 <EnumSetExpression>
 <SimpleIdentifier Name="AS1"/>
 </EnumSetExpression>
+</RangeList>
 </EventDecl>
 <EventDecl Kind="CONTROLLABLE" Name="GClosesEL_1">
+<RangeList>
 <EnumSetExpression>
 <SimpleIdentifier Name="TU1"/>
 </EnumSetExpression>
+</RangeList>
 </EventDecl>
 <EventDecl Kind="CONTROLLABLE" Name="GClosesEL_2">
+<RangeList>
 <EnumSetExpression>
 <SimpleIdentifier Name="AS1"/>
 </EnumSetExpression>
+</RangeList>
 </EventDecl>
 <EventDecl Kind="CONTROLLABLE" Name="ReadLabel">
+<RangeList>
 <EnumSetExpression>
 <SimpleIdentifier Name="AS1"/>
 <SimpleIdentifier Name="TU1"/>
 </EnumSetExpression>
+</RangeList>
 </EventDecl>
 <EventDecl Kind="CONTROLLABLE" Name="ProcPallet">
+<RangeList>
 <EnumSetExpression>
 <SimpleIdentifier Name="AS1"/>
 </EnumSetExpression>
+</RangeList>
 </EventDecl>
 <EventDecl Kind="UNCONTROLLABLE" Name="IsErr1A">
+<RangeList>
 <EnumSetExpression>
 <SimpleIdentifier Name="TU1"/>
 </EnumSetExpression>
+</RangeList>
 </EventDecl>
 <EventDecl Kind="UNCONTROLLABLE" Name="IsErr1B">
+<RangeList>
 <EnumSetExpression>
 <SimpleIdentifier Name="TU1"/>
 </EnumSetExpression>
+</RangeList>
 </EventDecl>
 <EventDecl Kind="CONTROLLABLE" Name="DoRpr">
+<RangeList>
 <EnumSetExpression>
 <SimpleIdentifier Name="AS1"/>
 </EnumSetExpression>
-</EventDecl>
-<EventDecl Kind="CONTROLLABLE" Name="StrRtimer">
-<EnumSetExpression>
-<SimpleIdentifier Name="AS1"/>
-</EnumSetExpression>
+</RangeList>
 </EventDecl>
 <EventDecl Kind="UNCONTROLLABLE" Name="IsErr2A">
+<RangeList>
 <EnumSetExpression>
 <SimpleIdentifier Name="TU1"/>
 </EnumSetExpression>
+</RangeList>
+</EventDecl>
+<EventDecl Kind="CONTROLLABLE" Name="StrRtimer">
+<RangeList>
+<EnumSetExpression>
+<SimpleIdentifier Name="AS1"/>
+</EnumSetExpression>
+</RangeList>
 </EventDecl>
 <EventDecl Kind="UNCONTROLLABLE" Name="IsErr2B">
+<RangeList>
 <EnumSetExpression>
 <SimpleIdentifier Name="TU1"/>
 </EnumSetExpression>
+</RangeList>
 </EventDecl>
 <EventDecl Kind="CONTROLLABLE" Name="GClosesCL">
+<RangeList>
 <EnumSetExpression>
 <SimpleIdentifier Name="TU1"/>
 </EnumSetExpression>
+</RangeList>
 </EventDecl>
 <EventDecl Kind="CONTROLLABLE" Name="MvExtrToConv">
+<RangeList>
 <EnumSetExpression>
 <SimpleIdentifier Name="AS1"/>
 </EnumSetExpression>
+</RangeList>
 </EventDecl>
 <EventDecl Kind="CONTROLLABLE" Name="PStopOpensCL">
+<RangeList>
 <EnumSetExpression>
 <SimpleIdentifier Name="TU1"/>
 </EnumSetExpression>
+</RangeList>
 </EventDecl>
 <EventDecl Kind="CONTROLLABLE" Name="ProcCpl">
+<RangeList>
 <EnumSetExpression>
 <SimpleIdentifier Name="AS1"/>
 </EnumSetExpression>
-</EventDecl>
-<EventDecl Kind="CONTROLLABLE" Name="PalletRlsd">
-<EnumSetExpression>
-<SimpleIdentifier Name="TU1"/>
-</EnumSetExpression>
+</RangeList>
 </EventDecl>
 <EventDecl Kind="CONTROLLABLE" Name="NoTrnsfEL">
+<RangeList>
 <EnumSetExpression>
 <SimpleIdentifier Name="TU1"/>
 </EnumSetExpression>
+</RangeList>
 </EventDecl>
-<EventDecl Kind="UNCONTROLLABLE" Name="NotCpl">
+<EventDecl Kind="CONTROLLABLE" Name="PalletRlsd">
+<RangeList>
 <EnumSetExpression>
 <SimpleIdentifier Name="TU1"/>
 </EnumSetExpression>
+</RangeList>
 </EventDecl>
 <EventDecl Kind="UNCONTROLLABLE" Name="PalletLvAS">
+<RangeList>
 <EnumSetExpression>
 <SimpleIdentifier Name="AS1"/>
 </EnumSetExpression>
+</RangeList>
+</EventDecl>
+<EventDecl Kind="UNCONTROLLABLE" Name="NotCpl">
+<RangeList>
+<EnumSetExpression>
+<SimpleIdentifier Name="TU1"/>
+</EnumSetExpression>
+</RangeList>
 </EventDecl>
 <EventDecl Kind="CONTROLLABLE" Name="ProcTyp1">
+<RangeList>
 <EnumSetExpression>
 <SimpleIdentifier Name="AS1"/>
 </EnumSetExpression>
+</RangeList>
 </EventDecl>
 <EventDecl Kind="CONTROLLABLE" Name="ProcTyp2">
+<RangeList>
 <EnumSetExpression>
 <SimpleIdentifier Name="AS1"/>
 </EnumSetExpression>
+</RangeList>
 </EventDecl>
 <EventDecl Kind="PROPOSITION" Name=":accepting"/>
-<EventDecl Kind="PROPOSITION" Name=":forbidden"/>
 </EventDeclList>
 <ComponentList>
 <ForeachComponent Name="k">

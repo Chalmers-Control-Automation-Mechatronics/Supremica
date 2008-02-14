@@ -6,10 +6,12 @@
 <ConstantAliasList>
 <ConstantAlias>
 <SimpleIdentifier Name="boolean"/>
+<ConstantAliasExpression>
 <BinaryExpression Operator="..">
 <IntConstant Value="0"/>
 <IntConstant Value="1"/>
 </BinaryExpression>
+</ConstantAliasExpression>
 </ConstantAlias>
 </ConstantAliasList>
 <EventDeclList>

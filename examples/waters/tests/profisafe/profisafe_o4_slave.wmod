@@ -20,6 +20,7 @@
 <EventDecl Kind="CONTROLLABLE" Name="SLAVE__t_25_23__26"/>
 <EventDecl Kind="CONTROLLABLE" Name="SLAVE__t_25_23__27"/>
 <EventDecl Kind="UNCONTROLLABLE" Name="SLAVE__rcv">
+<RangeList>
 <EnumSetExpression>
 <SimpleIdentifier Name="pv"/>
 </EnumSetExpression>
@@ -35,6 +36,7 @@
 <SimpleIdentifier Name="nok"/>
 <SimpleIdentifier Name="ok"/>
 </EnumSetExpression>
+</RangeList>
 </EventDecl>
 <EventDecl Kind="CONTROLLABLE" Name="SLAVE__t_22_26__1"/>
 <EventDecl Kind="CONTROLLABLE" Name="SLAVE__t_22_26__2"/>
@@ -65,6 +67,7 @@
 <EventDecl Kind="CONTROLLABLE" Name="SLAVE__t_28_26__9"/>
 <EventDecl Kind="CONTROLLABLE" Name="SLAVE__t_25_26__10"/>
 <EventDecl Kind="UNCONTROLLABLE" Name="SLAVE__send">
+<RangeList>
 <BinaryExpression Operator="..">
 <IntConstant Value="0"/>
 <IntConstant Value="1"/>
@@ -81,6 +84,7 @@
 <IntConstant Value="0"/>
 <IntConstant Value="4"/>
 </BinaryExpression>
+</RangeList>
 </EventDecl>
 <EventDecl Kind="UNCONTROLLABLE" Name="SLAVE__slave_timeout"/>
 <EventDecl Kind="CONTROLLABLE" Name="SLAVE__t_22_23__1"/>
@@ -132,10 +136,12 @@
 <EventDecl Kind="CONTROLLABLE" Name="SLAVE__t_28_26__23"/>
 <EventDecl Kind="CONTROLLABLE" Name="SLAVE__t_28_26__19"/>
 <EventDecl Kind="UNCONTROLLABLE" Name="SLAVE__read__app_process_data">
+<RangeList>
 <EnumSetExpression>
 <SimpleIdentifier Name="pv"/>
 <SimpleIdentifier Name="fv"/>
 </EnumSetExpression>
+</RangeList>
 </EventDecl>
 <EventDecl Kind="UNCONTROLLABLE" Name="SLAVE__resume"/>
 <EventDecl Kind="PROPOSITION" Name=":accepting"/>

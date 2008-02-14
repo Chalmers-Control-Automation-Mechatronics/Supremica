@@ -3,18 +3,22 @@
 <ConstantAliasList>
 <ConstantAlias>
 <SimpleIdentifier Name="modus"/>
+<ConstantAliasExpression>
 <EnumSetExpression>
 <SimpleIdentifier Name="WH"/>
 <SimpleIdentifier Name="PH"/>
 </EnumSetExpression>
+</ConstantAliasExpression>
 </ConstantAlias>
 </ConstantAliasList>
 <EventDeclList>
 <EventDecl Kind="UNCONTROLLABLE" Name="notAktiv">
+<RangeList>
 <EnumSetExpression>
 <SimpleIdentifier Name="PH"/>
 <SimpleIdentifier Name="WH"/>
 </EnumSetExpression>
+</RangeList>
 </EventDecl>
 <EventDecl Kind="UNCONTROLLABLE" Name="wendeVollzogen"/>
 <EventDecl Kind="CONTROLLABLE" Name="abfahrBereit"/>
@@ -23,10 +27,12 @@
 <EventDecl Kind="UNCONTROLLABLE" Name="frei"/>
 <EventDecl Kind="UNCONTROLLABLE" Name="tuerenGeoeffnet"/>
 <EventDecl Kind="UNCONTROLLABLE" Name="zugAn">
+<RangeList>
 <EnumSetExpression>
 <SimpleIdentifier Name="PH"/>
 <SimpleIdentifier Name="WH"/>
 </EnumSetExpression>
+</RangeList>
 </EventDecl>
 <EventDecl Kind="UNCONTROLLABLE" Name="fastAbfahrt"/>
 <EventDecl Kind="UNCONTROLLABLE" Name="ausstiegBeendet"/>
