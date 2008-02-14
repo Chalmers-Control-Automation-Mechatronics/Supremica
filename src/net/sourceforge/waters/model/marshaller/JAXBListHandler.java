@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.marshaller
 //# CLASS:   JAXBListHandler
 //###########################################################################
-//# $Id: JAXBListHandler.java,v 1.4 2006-11-03 15:01:57 torda Exp $
+//# $Id: JAXBListHandler.java,v 1.5 2008-02-14 06:46:26 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.marshaller;
@@ -55,6 +55,7 @@ abstract class JAXBListHandler
   void fromJAXB(final JAXBImporter importer,
                 final C container,
                 final Collection<P> proxies)
+    throws WatersUnmarshalException
   {
     final L listelem = getListElement(container);
     if (listelem != null) {

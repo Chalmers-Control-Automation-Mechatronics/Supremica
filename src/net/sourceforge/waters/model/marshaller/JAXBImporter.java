@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.marshaller
 //# CLASS:   JAXBImporter
 //###########################################################################
-//# $Id: JAXBImporter.java,v 1.3 2006-11-03 15:01:57 torda Exp $
+//# $Id: JAXBImporter.java,v 1.4 2008-02-14 06:46:26 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.marshaller;
@@ -25,13 +25,15 @@ abstract class JAXBImporter
 
   //#########################################################################
   //# Invocation
-  abstract Object importElement(final ElementType element);
+  abstract Object importElement(final ElementType element)
+    throws WatersUnmarshalException;
 
 
   //#########################################################################
   //# Copying Data
   void copyList(final List<ElementType> elements,
                 final Collection<? extends Proxy> proxies)
+    throws WatersUnmarshalException
   {
     final Collection<Proxy> unsafe = Casting.toCollection(proxies);
     for (final ElementType element : elements) {
@@ -42,6 +44,7 @@ abstract class JAXBImporter
 
   void copyCheckedList(final List<ElementType> elements,
                        final IndexedCollection<? extends NamedProxy> proxies)
+    throws WatersUnmarshalException
   {
     final Class<IndexedCollection<NamedProxy>> clazz =
       Casting.toClass(IndexedCollection.class);

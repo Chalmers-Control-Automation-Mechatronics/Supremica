@@ -30,6 +30,7 @@
     <pathelement location="${jsr173_api.jar}"/>
   </path>
 
+  <property name="bddlib" location="${supremica.root}/dist"/>
   <property name="classes" location="java/classes"/>
   <property name="cpp" location="cpp"/>
   <property name="cpplib" location="${cpp}/lib"/>
@@ -86,6 +87,7 @@
     <path>
       <pathelement path="${java.library.path}"/>
       <pathelement location="${cpplib}"/>
+      <pathelement location="${bddlib}"/>
     </path>
   </pathconvert>
 
@@ -315,8 +317,7 @@
       <formatter type="xml"/>
       <batchtest todir="${logs.results}">
         <fileset dir="${supremica.testsrc}">
-          <include name="net/sourceforge/waters/**/CompilerTest.java"/>
-          <include name="net/sourceforge/waters/**/BDDLanguageInclusionCheckerTest.java"/>
+          <include name="net/sourceforge/waters/**/PlainModuleTest.java"/>
           <exclude name="**/Abstract*.java"/>
         </fileset>
       </batchtest>

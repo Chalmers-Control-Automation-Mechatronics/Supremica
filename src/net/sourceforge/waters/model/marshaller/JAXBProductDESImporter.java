@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.marshaller
 //# CLASS:   JAXBProductDESImporter
 //###########################################################################
-//# $Id: JAXBProductDESImporter.java,v 1.6 2006-11-03 15:01:57 torda Exp $
+//# $Id: JAXBProductDESImporter.java,v 1.7 2008-02-14 06:46:26 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.marshaller;
@@ -48,6 +48,7 @@ class JAXBProductDESImporter
   //#########################################################################
   //# Overrides for Abstract Base Class JAXBImporter
   Proxy importElement(final ElementType element)
+    throws WatersUnmarshalException
   {
     if (element instanceof Transition) {
       return importTransition((Transition) element);
@@ -68,6 +69,7 @@ class JAXBProductDESImporter
 
   public ProductDESProxy importDocument(final ProductDES element,
                                         final URI uri)
+    throws WatersUnmarshalException
   {
     return importProductDES(element, uri);
   }
@@ -76,12 +78,14 @@ class JAXBProductDESImporter
   //#########################################################################
   //# Importing Elements
   private ProductDESProxy importProductDES(final ProductDES element)
+    throws WatersUnmarshalException
   {
     return importProductDES(element, null);
   }
 
   private ProductDESProxy importProductDES(final ProductDES element,
                                            final URI uri)
+    throws WatersUnmarshalException
   {
     try {
       final String name = element.getName();
@@ -104,6 +108,7 @@ class JAXBProductDESImporter
   }
 
   private AutomatonProxy importAutomaton(final Automaton element)
+    throws WatersUnmarshalException
   {
     try {
       final String name = element.getName();
@@ -138,6 +143,7 @@ class JAXBProductDESImporter
   }
 
   private StateProxy importState(final State element)
+    throws WatersUnmarshalException
   {
     final String name = element.getName();
     final boolean initial = element.isInitial();

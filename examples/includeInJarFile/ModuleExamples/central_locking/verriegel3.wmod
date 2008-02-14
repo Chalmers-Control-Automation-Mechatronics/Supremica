@@ -69,119 +69,177 @@
 <EventDeclList>
 <EventDecl Kind="UNCONTROLLABLE" Observable="true" Name="cod_er"/>
 <EventDecl Kind="CONTROLLABLE" Observable="true" Name="stop_VR">
+<RangeList>
 <SimpleIdentifier Name="Tueren"/>
+</RangeList>
 </EventDecl>
 <EventDecl Kind="CONTROLLABLE" Observable="true" Name="SERFS"/>
 <EventDecl Kind="CONTROLLABLE" Observable="true" Name="MER_an">
+<RangeList>
 <SimpleIdentifier Name="Tueren"/>
+</RangeList>
 </EventDecl>
 <EventDecl Kind="CONTROLLABLE" Observable="true" Name="soft_ZS"/>
 <EventDecl Kind="CONTROLLABLE" Observable="true" Name="ZS"/>
 <EventDecl Kind="CONTROLLABLE" Observable="true" Name="kein_ZS"/>
 <EventDecl Kind="CONTROLLABLE" Observable="true" Name="stop_ZS">
+<RangeList>
 <SimpleIdentifier Name="Tueren"/>
+</RangeList>
 </EventDecl>
 <EventDecl Kind="UNCONTROLLABLE" Observable="true" Name="zuendung_an"/>
 <EventDecl Kind="UNCONTROLLABLE" Observable="true" Name="zuendung_aus"/>
 <EventDecl Kind="CONTROLLABLE" Observable="true" Name="time_ER">
+<RangeList>
 <SimpleIdentifier Name="Tueren"/>
+</RangeList>
 </EventDecl>
 <EventDecl Kind="UNCONTROLLABLE" Observable="true" Name="tuer_auf">
+<RangeList>
 <SimpleIdentifier Name="Tueren"/>
+</RangeList>
 </EventDecl>
 <EventDecl Kind="CONTROLLABLE" Observable="true" Name="start_ER">
+<RangeList>
 <SimpleIdentifier Name="Tueren"/>
+</RangeList>
 </EventDecl>
 <EventDecl Kind="CONTROLLABLE" Observable="true" Name="reset">
+<RangeList>
 <SimpleIdentifier Name="Timers"/>
+</RangeList>
 </EventDecl>
 <EventDecl Kind="CONTROLLABLE" Observable="true" Name="MVR_aus">
+<RangeList>
 <SimpleIdentifier Name="Tueren"/>
+</RangeList>
 </EventDecl>
 <EventDecl Kind="CONTROLLABLE" Observable="true" Name="done_ER"/>
 <EventDecl Kind="CONTROLLABLE" Observable="true" Name="TAST"/>
 <EventDecl Kind="CONTROLLABLE" Observable="true" Name="async">
+<RangeList>
 <SimpleIdentifier Name="Tueren"/>
+</RangeList>
 </EventDecl>
 <EventDecl Kind="UNCONTROLLABLE" Observable="true" Name="ctr_lt_max">
+<RangeList>
 <SimpleIdentifier Name="Counters"/>
+</RangeList>
 </EventDecl>
 <EventDecl Kind="UNCONTROLLABLE" Observable="true" Name="ER_BT"/>
 <EventDecl Kind="CONTROLLABLE" Observable="true" Name="time">
+<RangeList>
 <SimpleIdentifier Name="Timers"/>
+</RangeList>
 </EventDecl>
 <EventDecl Kind="CONTROLLABLE" Observable="true" Name="wsp"/>
 <EventDecl Kind="UNCONTROLLABLE" Observable="true" Name="ER_FS"/>
 <EventDecl Kind="UNCONTROLLABLE" Observable="true" Name="ER_FT"/>
 <EventDecl Kind="UNCONTROLLABLE" Observable="true" Name="ER_HK"/>
 <EventDecl Kind="CONTROLLABLE" Observable="true" Name="sync">
+<RangeList>
 <SimpleIdentifier Name="Tueren"/>
+</RangeList>
 </EventDecl>
 <EventDecl Kind="CONTROLLABLE" Observable="true" Name="time_VR">
+<RangeList>
 <SimpleIdentifier Name="Tueren"/>
+</RangeList>
 </EventDecl>
 <EventDecl Kind="CONTROLLABLE" Observable="true" Name="MVR_an">
+<RangeList>
 <SimpleIdentifier Name="Tueren"/>
+</RangeList>
 </EventDecl>
 <EventDecl Kind="CONTROLLABLE" Observable="true" Name="MZS_aus">
+<RangeList>
 <SimpleIdentifier Name="Tueren"/>
+</RangeList>
 </EventDecl>
 <EventDecl Kind="CONTROLLABLE" Observable="true" Name="soft_SER">
+<RangeList>
 <SimpleIdentifier Name="Tueren"/>
+</RangeList>
 </EventDecl>
 <EventDecl Kind="CONTROLLABLE" Observable="true" Name="soft_CS"/>
 <EventDecl Kind="CONTROLLABLE" Observable="true" Name="time_ZS">
+<RangeList>
 <SimpleIdentifier Name="Tueren"/>
+</RangeList>
 </EventDecl>
 <EventDecl Kind="CONTROLLABLE" Observable="true" Name="start_VR">
+<RangeList>
 <SimpleIdentifier Name="Tueren"/>
+</RangeList>
 </EventDecl>
 <EventDecl Kind="CONTROLLABLE" Observable="true" Name="soft_ER"/>
 <EventDecl Kind="UNCONTROLLABLE" Observable="true" Name="CS"/>
 <EventDecl Kind="UNCONTROLLABLE" Observable="true" Name="cod_ser"/>
 <EventDecl Kind="CONTROLLABLE" Observable="true" Name="done_VR"/>
 <EventDecl Kind="CONTROLLABLE" Observable="true" Name="time_W">
+<RangeList>
 <SimpleIdentifier Name="Tueren"/>
+</RangeList>
 </EventDecl>
 <EventDecl Kind="CONTROLLABLE" Observable="true" Name="ZSA"/>
 <EventDecl Kind="UNCONTROLLABLE" Observable="true" Name="tuer_zu">
+<RangeList>
 <SimpleIdentifier Name="Tueren"/>
+</RangeList>
 </EventDecl>
 <EventDecl Kind="CONTROLLABLE" Observable="true" Name="ER"/>
 <EventDecl Kind="CONTROLLABLE" Observable="true" Name="autom_VR"/>
 <EventDecl Kind="CONTROLLABLE" Observable="true" Name="stop_ER">
+<RangeList>
 <SimpleIdentifier Name="Tueren"/>
+</RangeList>
 </EventDecl>
 <EventDecl Kind="UNCONTROLLABLE" Observable="true" Name="ctr_ge_max">
+<RangeList>
 <SimpleIdentifier Name="Counters"/>
+</RangeList>
 </EventDecl>
 <EventDecl Kind="CONTROLLABLE" Observable="true" Name="ZSI"/>
 <EventDecl Kind="CONTROLLABLE" Observable="true" Name="start_ZS">
+<RangeList>
 <SimpleIdentifier Name="Tueren"/>
+</RangeList>
 </EventDecl>
 <EventDecl Kind="CONTROLLABLE" Observable="true" Name="done_ZS"/>
 <EventDecl Kind="CONTROLLABLE" Observable="true" Name="SER"/>
 <EventDecl Kind="CONTROLLABLE" Observable="true" Name="MER_aus">
+<RangeList>
 <SimpleIdentifier Name="Tueren"/>
+</RangeList>
 </EventDecl>
 <EventDecl Kind="CONTROLLABLE" Observable="true" Name="MZS_an">
+<RangeList>
 <SimpleIdentifier Name="Tueren"/>
+</RangeList>
 </EventDecl>
 <EventDecl Kind="UNCONTROLLABLE" Observable="true" Name="TASTVR"/>
 <EventDecl Kind="UNCONTROLLABLE" Observable="true" Name="STZV">
+<RangeList>
 <SimpleIdentifier Name="Tueren"/>
+</RangeList>
 </EventDecl>
 <EventDecl Kind="UNCONTROLLABLE" Observable="true" Name="timeout">
+<RangeList>
 <SimpleIdentifier Name="Timers"/>
+</RangeList>
 </EventDecl>
 <EventDecl Kind="CONTROLLABLE" Observable="true" Name="is_cod_ser"/>
 <EventDecl Kind="CONTROLLABLE" Observable="true" Name="is_cod_er"/>
 <EventDecl Kind="CONTROLLABLE" Observable="true" Name="reset_ctr">
+<RangeList>
 <SimpleIdentifier Name="Counters"/>
+</RangeList>
 </EventDecl>
 <EventDecl Kind="UNCONTROLLABLE" Observable="true" Name="VR_BT"/>
 <EventDecl Kind="CONTROLLABLE" Observable="true" Name="inc_ctr">
+<RangeList>
 <SimpleIdentifier Name="Counters"/>
+</RangeList>
 </EventDecl>
 <EventDecl Kind="CONTROLLABLE" Observable="true" Name="soft_VR"/>
 <EventDecl Kind="CONTROLLABLE" Observable="true" Name="CS_ok"/>
@@ -189,7 +247,9 @@
 <EventDecl Kind="UNCONTROLLABLE" Observable="true" Name="VR_FT"/>
 <EventDecl Kind="UNCONTROLLABLE" Observable="true" Name="VR_HK"/>
 <EventDecl Kind="CONTROLLABLE" Observable="true" Name="done_SER">
+<RangeList>
 <SimpleIdentifier Name="Tueren"/>
+</RangeList>
 </EventDecl>
 <EventDecl Kind="PROPOSITION" Observable="true" Name=":accepting"/>
 </EventDeclList>

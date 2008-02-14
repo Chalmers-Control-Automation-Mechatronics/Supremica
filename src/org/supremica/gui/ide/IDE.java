@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.gui.ide
 //# CLASS:   IDE
 //###########################################################################
-//# $Id: IDE.java,v 1.112 2008-02-01 09:42:19 torda Exp $
+//# $Id: IDE.java,v 1.113 2008-02-14 06:46:26 robi Exp $
 //###########################################################################
 
 package org.supremica.gui.ide;
@@ -106,7 +106,6 @@ public class IDE
 
         // Show Version number
         info("Supremica version: " + (new Version()));
-        logger.verbose("this is verbose");
 
         // Initialise XML_RPC
         if (Config.XML_RPC_ACTIVE.isTrue())

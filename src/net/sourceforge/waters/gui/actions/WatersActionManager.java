@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui.actions
 //# CLASS:   WatersActionManager
 //###########################################################################
-//# $Id: WatersActionManager.java,v 1.7 2007-12-04 03:22:54 robi Exp $
+//# $Id: WatersActionManager.java,v 1.8 2008-02-14 06:46:26 robi Exp $
 //###########################################################################
 
 
@@ -43,6 +43,7 @@ public abstract class WatersActionManager
     addAction(new IDEPropertiesAction(ide));
     addAction(new IDESelectAllAction(ide));
     addAction(new InsertEventDeclAction(ide));
+    addAction(new InsertForeachComponentAction(ide));
     addAction(new InsertSimpleComponentAction(ide));
     addAction(new InsertVariableAction(ide));
     addAction(new ShowGraphAction(ide));

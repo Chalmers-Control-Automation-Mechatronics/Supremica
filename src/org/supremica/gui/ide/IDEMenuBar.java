@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.gui.ide
 //# CLASS:   IDEMenuBar
 //###########################################################################
-//# $Id: IDEMenuBar.java,v 1.59 2007-12-04 03:22:58 robi Exp $
+//# $Id: IDEMenuBar.java,v 1.60 2008-02-14 06:46:26 robi Exp $
 //###########################################################################
 
 package org.supremica.gui.ide;
@@ -31,6 +31,7 @@ import net.sourceforge.waters.gui.actions.IDEPasteAction;
 import net.sourceforge.waters.gui.actions.IDEPropertiesAction;
 import net.sourceforge.waters.gui.actions.IDESelectAllAction;
 import net.sourceforge.waters.gui.actions.InsertEventDeclAction;
+import net.sourceforge.waters.gui.actions.InsertForeachComponentAction;
 import net.sourceforge.waters.gui.actions.InsertSimpleComponentAction;
 import net.sourceforge.waters.gui.actions.InsertVariableAction;
 import net.sourceforge.waters.gui.actions.ShowGraphAction;
@@ -168,6 +169,9 @@ public class IDEMenuBar
         menu.add(inscomp);
         final Action insvar = actions.getAction(InsertVariableAction.class);
         menu.add(insvar);
+        final Action insforeach =
+			actions.getAction(InsertForeachComponentAction.class);
+        menu.add(insforeach);
         final Action insevent = actions.getAction(InsertEventDeclAction.class);
         menu.add(insevent);
         //menu.add(ide.getActions().editorAddForeachComponentAction.getMenuItem());

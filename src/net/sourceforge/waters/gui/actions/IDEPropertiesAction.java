@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui.actions
 //# CLASS:   IDEPropertiesAction
 //###########################################################################
-//# $Id: IDEPropertiesAction.java,v 1.2 2007-12-04 03:22:54 robi Exp $
+//# $Id: IDEPropertiesAction.java,v 1.3 2008-02-14 06:46:26 robi Exp $
 //###########################################################################
 
 
@@ -17,6 +17,7 @@ import javax.swing.KeyStroke;
 
 import net.sourceforge.waters.gui.EditorEditEdgeDialog;
 import net.sourceforge.waters.gui.EventEditorDialog;
+import net.sourceforge.waters.gui.ForeachComponentEditorDialog;
 import net.sourceforge.waters.gui.ModuleWindowInterface;
 import net.sourceforge.waters.gui.SimpleComponentEditorDialog;
 import net.sourceforge.waters.gui.VariableEditorDialog;
@@ -27,10 +28,12 @@ import net.sourceforge.waters.model.base.VisitorException;
 import net.sourceforge.waters.model.module.AbstractModuleProxyVisitor;
 import net.sourceforge.waters.model.module.EdgeProxy;
 import net.sourceforge.waters.model.module.EventDeclProxy;
+import net.sourceforge.waters.model.module.ForeachComponentProxy;
 import net.sourceforge.waters.model.module.SimpleComponentProxy;
 import net.sourceforge.waters.model.module.VariableComponentProxy;
 import net.sourceforge.waters.subject.module.EdgeSubject;
 import net.sourceforge.waters.subject.module.EventDeclSubject;
+import net.sourceforge.waters.subject.module.ForeachComponentSubject;
 import net.sourceforge.waters.subject.module.SimpleComponentSubject;
 import net.sourceforge.waters.subject.module.VariableComponentSubject;
 
@@ -171,6 +174,17 @@ public class IDEPropertiesAction
         final ModuleWindowInterface root = getActiveModuleWindowInterface();
         final EventDeclSubject subject = (EventDeclSubject) decl;
         new EventEditorDialog(root, subject);
+      }
+      return true;
+    }
+
+    public Boolean visitForeachComponentProxy
+      (final ForeachComponentProxy comp)
+    {
+      if (mDoEdit) {
+        final ModuleWindowInterface root = getActiveModuleWindowInterface();
+        final ForeachComponentSubject subject = (ForeachComponentSubject) comp;
+        new ForeachComponentEditorDialog(root, subject);
       }
       return true;
     }

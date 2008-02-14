@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.marshaller
 //# CLASS:   JAXBModuleImporter
 //###########################################################################
-//# $Id: JAXBModuleImporter.java,v 1.27 2008-02-14 02:24:09 robi Exp $
+//# $Id: JAXBModuleImporter.java,v 1.28 2008-02-14 06:46:26 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.marshaller;
@@ -22,7 +22,6 @@ import java.util.Set;
 
 import net.sourceforge.waters.model.unchecked.Casting;
 import net.sourceforge.waters.model.base.IndexedList;
-import net.sourceforge.waters.model.base.NameNotFoundException;
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.expr.BinaryOperator;
 import net.sourceforge.waters.model.expr.OperatorTable;
@@ -131,6 +130,7 @@ public class JAXBModuleImporter
     ImportHandler handler;
     handler = new ImportHandler() {
       public BinaryExpressionProxy importElement(final ElementType element)
+        throws WatersUnmarshalException
       {
         final BinaryExpression downcast = (BinaryExpression) element;
         return importBinaryExpression(downcast);
@@ -140,6 +140,7 @@ public class JAXBModuleImporter
       (net.sourceforge.waters.xsd.module.BinaryExpression.class, handler);
     handler = new ImportHandler() {
       public BoxGeometryProxy importElement(final ElementType element)
+        throws WatersUnmarshalException
       {
         final BoxGeometry downcast = (BoxGeometry) element;
         return importBoxGeometry(downcast);
@@ -149,6 +150,7 @@ public class JAXBModuleImporter
       (net.sourceforge.waters.xsd.module.BoxGeometry.class, handler);
     handler = new ImportHandler() {
       public Rectangle importElement(final ElementType element)
+        throws WatersUnmarshalException
       {
         final Box downcast = (Box) element;
         return importRectangle(downcast);
@@ -158,6 +160,7 @@ public class JAXBModuleImporter
       (net.sourceforge.waters.xsd.module.Box.class, handler);
     handler = new ImportHandler() {
       public ColorGeometryProxy importElement(final ElementType element)
+        throws WatersUnmarshalException
       {
         final ColorGeometry downcast = (ColorGeometry) element;
         return importColorGeometry(downcast);
@@ -167,6 +170,7 @@ public class JAXBModuleImporter
       (net.sourceforge.waters.xsd.module.ColorGeometry.class, handler);
     handler = new ImportHandler() {
       public java.awt.Color importElement(final ElementType element)
+        throws WatersUnmarshalException
       {
         final Color downcast = (Color) element;
         return importColor(downcast);
@@ -176,6 +180,7 @@ public class JAXBModuleImporter
       (net.sourceforge.waters.xsd.module.Color.class, handler);
     handler = new ImportHandler() {
       public ConstantAliasProxy importElement(final ElementType element)
+        throws WatersUnmarshalException
       {
         final ConstantAlias downcast = (ConstantAlias) element;
         return importConstantAlias(downcast);
@@ -185,6 +190,7 @@ public class JAXBModuleImporter
       (net.sourceforge.waters.xsd.module.ConstantAlias.class, handler);
     handler = new ImportHandler() {
       public EdgeProxy importElement(final ElementType element)
+        throws WatersUnmarshalException
       {
         final Edge downcast = (Edge) element;
         return importEdge(downcast);
@@ -193,6 +199,7 @@ public class JAXBModuleImporter
     mHandlerMap.put(net.sourceforge.waters.xsd.module.Edge.class, handler);
     handler = new ImportHandler() {
       public EnumSetExpressionProxy importElement(final ElementType element)
+        throws WatersUnmarshalException
       {
         final EnumSetExpression downcast = (EnumSetExpression) element;
         return importEnumSetExpression(downcast);
@@ -202,6 +209,7 @@ public class JAXBModuleImporter
       (net.sourceforge.waters.xsd.module.EnumSetExpression.class, handler);
     handler = new ImportHandler() {
       public EventAliasProxy importElement(final ElementType element)
+        throws WatersUnmarshalException
       {
         final EventAlias downcast = (EventAlias) element;
         return importEventAlias(downcast);
@@ -211,6 +219,7 @@ public class JAXBModuleImporter
       (net.sourceforge.waters.xsd.module.EventAlias.class, handler);
     handler = new ImportHandler() {
       public EventDeclProxy importElement(final ElementType element)
+        throws WatersUnmarshalException
       {
         final EventDecl downcast = (EventDecl) element;
         return importEventDecl(downcast);
@@ -220,6 +229,7 @@ public class JAXBModuleImporter
       (net.sourceforge.waters.xsd.module.EventDecl.class, handler);
     handler = new ImportHandler() {
       public PlainEventListProxy importElement(final ElementType element)
+        throws WatersUnmarshalException
       {
         final EventListExpression downcast =
           (EventListExpression) element;
@@ -230,6 +240,7 @@ public class JAXBModuleImporter
       (net.sourceforge.waters.xsd.module.EventListExpression.class, handler);
     handler = new ImportHandler() {
       public ForeachComponentProxy importElement(final ElementType element)
+        throws WatersUnmarshalException
       {
         final ForeachComponent downcast = (ForeachComponent) element;
         return importForeachComponent(downcast);
@@ -239,6 +250,7 @@ public class JAXBModuleImporter
       (net.sourceforge.waters.xsd.module.ForeachComponent.class, handler);
     handler = new ImportHandler() {
       public ForeachEventAliasProxy importElement(final ElementType element)
+        throws WatersUnmarshalException
       {
         final ForeachEventAlias downcast = (ForeachEventAlias) element;
         return importForeachEventAlias(downcast);
@@ -248,6 +260,7 @@ public class JAXBModuleImporter
       (net.sourceforge.waters.xsd.module.ForeachEventAlias.class, handler);
     handler = new ImportHandler() {
       public ForeachEventProxy importElement(final ElementType element)
+        throws WatersUnmarshalException
       {
         final ForeachEvent downcast = (ForeachEvent) element;
         return importForeachEvent(downcast);
@@ -256,7 +269,9 @@ public class JAXBModuleImporter
     mHandlerMap.put(net.sourceforge.waters.xsd.module.ForeachEvent.class,
                     handler);
     handler = new ImportHandler() {
-        public GraphProxy importElement(final ElementType element) {
+        public GraphProxy importElement(final ElementType element)
+          throws WatersUnmarshalException
+        {
           final Graph downcast = (Graph) element;
           return importGraph(downcast);
         }
@@ -264,6 +279,7 @@ public class JAXBModuleImporter
     mHandlerMap.put(net.sourceforge.waters.xsd.module.Graph.class, handler);
     handler = new ImportHandler() {
       public GroupNodeProxy importElement(final ElementType element)
+        throws WatersUnmarshalException
       {
         final GroupNode downcast = (GroupNode) element;
         return importGroupNode(downcast);
@@ -273,6 +289,7 @@ public class JAXBModuleImporter
       (net.sourceforge.waters.xsd.module.GroupNode.class, handler);
     handler = new ImportHandler() {
       public IndexedIdentifierProxy importElement(final ElementType element)
+        throws WatersUnmarshalException
       {
         final IndexedIdentifier downcast = (IndexedIdentifier) element;
         return importIndexedIdentifier(downcast);
@@ -281,16 +298,18 @@ public class JAXBModuleImporter
     mHandlerMap.put
       (net.sourceforge.waters.xsd.module.IndexedIdentifier.class, handler);
     handler = new ImportHandler() {
-        public GuardActionBlockProxy importElement(final ElementType element)
-        {
-          final GuardActionBlock downcast = (GuardActionBlock) element;
-          return importGuardActionBlock(downcast);
-        }
-      };
+      public GuardActionBlockProxy importElement(final ElementType element)
+        throws WatersUnmarshalException
+      {
+        final GuardActionBlock downcast = (GuardActionBlock) element;
+        return importGuardActionBlock(downcast);
+      }
+    };
     mHandlerMap.put
       (net.sourceforge.waters.xsd.module.GuardActionBlock.class, handler);
     handler = new ImportHandler() {
       public InstanceProxy importElement(final ElementType element)
+        throws WatersUnmarshalException
       {
         final Instance downcast = (Instance) element;
         return importInstance(downcast);
@@ -300,6 +319,7 @@ public class JAXBModuleImporter
       (net.sourceforge.waters.xsd.module.Instance.class, handler);
     handler = new ImportHandler() {
       public IntConstantProxy importElement(final ElementType element)
+        throws WatersUnmarshalException
       {
         final IntConstant downcast = (IntConstant) element;
         return importIntConstant(downcast);
@@ -309,6 +329,7 @@ public class JAXBModuleImporter
       (net.sourceforge.waters.xsd.module.IntConstant.class, handler);
     handler = new ImportHandler() {
       public LabelBlockProxy importElement(final ElementType element)
+        throws WatersUnmarshalException
       {
         final LabelBlock downcast = (LabelBlock) element;
         return importLabelBlock(downcast);
@@ -319,6 +340,7 @@ public class JAXBModuleImporter
     
     handler = new ImportHandler() {
       public LabelGeometryProxy importElement(final ElementType element)
+        throws WatersUnmarshalException
       {
         final LabelGeometry downcast = (LabelGeometry) element;
         return importLabelGeometry(downcast);
@@ -328,6 +350,7 @@ public class JAXBModuleImporter
       (net.sourceforge.waters.xsd.module.LabelGeometry.class, handler);
     handler = new ImportHandler() {
       public ModuleProxy importElement(final ElementType element)
+        throws WatersUnmarshalException
       {
         final Module downcast = (Module) element;
         return importModule(downcast);
@@ -337,6 +360,7 @@ public class JAXBModuleImporter
       (net.sourceforge.waters.xsd.module.Module.class, handler);
     handler = new ImportHandler() {
       public ParameterBindingProxy importElement(final ElementType element)
+        throws WatersUnmarshalException
       {
         final ParameterBinding downcast = (ParameterBinding) element;
         return importParameterBinding(downcast);
@@ -346,6 +370,7 @@ public class JAXBModuleImporter
       (net.sourceforge.waters.xsd.module.ParameterBinding.class, handler);
     handler = new ImportHandler() {
       public PointGeometryProxy importElement(final ElementType element)
+        throws WatersUnmarshalException
       {
         final PointGeometryType downcast = (PointGeometryType) element;
         return importPointGeometryType(downcast);
@@ -355,6 +380,7 @@ public class JAXBModuleImporter
       (net.sourceforge.waters.xsd.module.PointGeometryType.class, handler);
     handler = new ImportHandler() {
       public java.awt.Point importElement(final ElementType element)
+        throws WatersUnmarshalException
       {
         final Point downcast = (Point) element;
         return importPoint(downcast);
@@ -364,6 +390,7 @@ public class JAXBModuleImporter
       (net.sourceforge.waters.xsd.module.Point.class, handler);
     handler = new ImportHandler() {
       public SimpleComponentProxy importElement(final ElementType element)
+        throws WatersUnmarshalException
       {
         final SimpleComponent downcast = (SimpleComponent) element;
         return importSimpleComponent(downcast);
@@ -373,6 +400,7 @@ public class JAXBModuleImporter
       (net.sourceforge.waters.xsd.module.SimpleComponent.class, handler);
     handler = new ImportHandler() {
       public SimpleIdentifierProxy importElement(final ElementType element)
+        throws WatersUnmarshalException
       {
         final SimpleIdentifier downcast = (SimpleIdentifier) element;
         return importSimpleIdentifier(downcast);
@@ -382,6 +410,7 @@ public class JAXBModuleImporter
       (net.sourceforge.waters.xsd.module.SimpleIdentifier.class, handler);
     handler = new ImportHandler() {
       public SimpleNodeProxy importElement(final ElementType element)
+        throws WatersUnmarshalException
       {
         final SimpleNode downcast = (SimpleNode) element;
         return importSimpleNode(downcast);
@@ -391,6 +420,7 @@ public class JAXBModuleImporter
       (net.sourceforge.waters.xsd.module.SimpleNode.class, handler);
     handler = new ImportHandler() {
       public SplineGeometryProxy importElement(final ElementType element)
+        throws WatersUnmarshalException
       {
         final SplineGeometry downcast = (SplineGeometry) element;
         return importSplineGeometry(downcast);
@@ -400,6 +430,7 @@ public class JAXBModuleImporter
       (net.sourceforge.waters.xsd.module.SplineGeometry.class, handler);
     handler = new ImportHandler() {
       public UnaryExpressionProxy importElement(final ElementType element)
+        throws WatersUnmarshalException
       {
         final UnaryExpression downcast = (UnaryExpression) element;
         return importUnaryExpression(downcast);
@@ -409,6 +440,7 @@ public class JAXBModuleImporter
       (net.sourceforge.waters.xsd.module.UnaryExpression.class, handler);
     handler = new ImportHandler() {
       public VariableComponentProxy importElement(final ElementType element)
+        throws WatersUnmarshalException
       {
         final VariableComponent downcast = (VariableComponent) element;
         return importVariableComponent(downcast);
@@ -418,6 +450,7 @@ public class JAXBModuleImporter
       (net.sourceforge.waters.xsd.module.VariableComponent.class, handler);
     handler = new ImportHandler() {
       public VariableMarkingProxy importElement(final ElementType element)
+        throws WatersUnmarshalException
       {
         final VariableMarking downcast = (VariableMarking) element;
         return importVariableMarking(downcast);
@@ -431,6 +464,7 @@ public class JAXBModuleImporter
   //#########################################################################
   //# Overrides for Abstract Base Class JAXBImporter
   Object importElement(final ElementType element)
+    throws WatersUnmarshalException
   {
     final Class clazz = element.getClass();
     ImportHandler handler = mHandlerMap.get(clazz);
@@ -454,6 +488,7 @@ public class JAXBModuleImporter
 
   public ModuleProxy importDocument(final Module element,
                                     final URI uri)
+    throws WatersUnmarshalException
   {
     return importModule(element, uri);
   }
@@ -463,6 +498,7 @@ public class JAXBModuleImporter
   //# Importing Elements
   private BinaryExpressionProxy importBinaryExpression
     (final BinaryExpression element)
+    throws WatersUnmarshalException
   {
     final String text = element.getText();
     final String operatorName = element.getOperator();
@@ -511,6 +547,7 @@ public class JAXBModuleImporter
   }
 
   private ConstantAliasProxy importConstantAlias(final ConstantAlias element)
+    throws WatersUnmarshalException
   {
     final IdentifierProxy identifier = createIdentifier(element);
     final ConstantAliasExpression wrapper =
@@ -526,6 +563,7 @@ public class JAXBModuleImporter
 //EFA----------------------
   private GuardActionBlockProxy importGuardActionBlock
     (final GuardActionBlock element)
+    throws WatersUnmarshalException
   {
     if (element == null) {
       return null;
@@ -563,6 +601,7 @@ public class JAXBModuleImporter
   // ------------------------
 
   private EdgeProxy importEdge(final Edge element)
+    throws WatersUnmarshalException
   {
     final String sourceName = element.getSource();
     final NodeProxy source = mGraphNodeList.find(sourceName);
@@ -597,6 +636,7 @@ public class JAXBModuleImporter
 
   private EnumSetExpressionProxy importEnumSetExpression
     (final EnumSetExpression element)
+    throws WatersUnmarshalException
   {
     final String text = element.getText();
     final List<SimpleIdentifierProxy> items =
@@ -612,6 +652,7 @@ public class JAXBModuleImporter
   }
 
   private EventAliasProxy importEventAlias(final EventAlias element)
+    throws WatersUnmarshalException
   {
     final IdentifierProxy identifier = createIdentifier(element);
     final EventListExpression eventListElement = element.getExpression();
@@ -621,6 +662,7 @@ public class JAXBModuleImporter
   }
 
   private EventDeclProxy importEventDecl(final EventDecl element)
+    throws WatersUnmarshalException
   {
     final IdentifierProxy identifier = createIdentifier(element);
     final EventKind kind = element.getKind();
@@ -651,6 +693,7 @@ public class JAXBModuleImporter
 
   private ForeachComponentProxy importForeachComponent
     (final ForeachComponent element)
+    throws WatersUnmarshalException
   {
     final String name = element.getName();
     final List<SimpleExpressionType> list = element.getRangeAndGuard();
@@ -669,6 +712,7 @@ public class JAXBModuleImporter
 
   private ForeachEventAliasProxy importForeachEventAlias
     (final ForeachEventAlias element)
+    throws WatersUnmarshalException
   {
     final String name = element.getName();
     final List<SimpleExpressionType> list = element.getRangeAndGuard();
@@ -686,6 +730,7 @@ public class JAXBModuleImporter
   }
 
   private ForeachEventProxy importForeachEvent(final ForeachEvent element)
+    throws WatersUnmarshalException
   {
     final String name = element.getName();
     final List<SimpleExpressionType> list = element.getRangeAndGuard();
@@ -704,6 +749,7 @@ public class JAXBModuleImporter
 
 
   private GraphProxy importGraph(final Graph element)
+    throws WatersUnmarshalException
   {
     try {
       final boolean deterministic = element.isDeterministic();
@@ -725,6 +771,7 @@ public class JAXBModuleImporter
   }
 
   private GroupNodeProxy importGroupNode(final GroupNode element)
+    throws WatersUnmarshalException
   {
     final String name = element.getName();
     final List<Proxy> eventList = new LinkedList<Proxy>();
@@ -750,6 +797,7 @@ public class JAXBModuleImporter
 
   private IndexedIdentifierProxy importIndexedIdentifier
     (final IndexedIdentifier element)
+    throws WatersUnmarshalException
   {
     final String text = element.getText();
     final String name = element.getName();
@@ -766,6 +814,7 @@ public class JAXBModuleImporter
   }
 
   private InstanceProxy importInstance(final Instance element)
+    throws WatersUnmarshalException
   {
     final IdentifierProxy identifier = createIdentifier(element);
     final String moduleName = element.getModuleName();
@@ -789,6 +838,7 @@ public class JAXBModuleImporter
   }
 
   private LabelBlockProxy importLabelBlock(final LabelBlock element)
+    throws WatersUnmarshalException
   {
     if (element != null) {
       final List<Proxy> eventList = new LinkedList<Proxy>();
@@ -808,6 +858,7 @@ public class JAXBModuleImporter
 
   private LabelGeometryProxy importLabelGeometry
     (final LabelGeometry element)
+    throws WatersUnmarshalException
   {
     if (element == null) {
       return null;
@@ -820,12 +871,14 @@ public class JAXBModuleImporter
   }
 
   private ModuleProxy importModule(final Module element)
+    throws WatersUnmarshalException
   {
     return importModule(element, null);
   }
 
   private ModuleProxy importModule(final Module element,
                                    final URI uri)
+    throws WatersUnmarshalException
   {
     final String name = element.getName();
     final String comment = element.getComment();
@@ -849,7 +902,6 @@ public class JAXBModuleImporter
   }
 
   private NodeProxy importNodeRef(final NodeRef element)
-    throws NameNotFoundException
   {
     final String name = element.getName();
     return mGraphNodeList.find(name);
@@ -857,6 +909,7 @@ public class JAXBModuleImporter
 
   private ParameterBindingProxy importParameterBinding
     (final ParameterBinding element)
+    throws WatersUnmarshalException
   {
     final String name = element.getName();
     final ExpressionType expressionElement = element.getExpression();
@@ -867,6 +920,7 @@ public class JAXBModuleImporter
 
   private PlainEventListProxy importPlainEventList
     (final EventListExpression element)
+    throws WatersUnmarshalException
   {
     final List<Proxy> eventList = new LinkedList<Proxy>();
     mEventListExpressionEventListHandler.fromJAXB(this, element, eventList);
@@ -903,6 +957,7 @@ public class JAXBModuleImporter
 
   private SimpleComponentProxy importSimpleComponent
     (final SimpleComponent element)
+    throws WatersUnmarshalException
   {
     final IdentifierProxy identifier = createIdentifier(element);
     final ComponentKind kind = element.getKind();
@@ -920,6 +975,7 @@ public class JAXBModuleImporter
   }
 
   private SimpleNodeProxy importSimpleNode(final SimpleNode element)
+    throws WatersUnmarshalException
   {
     final String name = element.getName();
     final List<Proxy> eventList = new LinkedList<Proxy>();
@@ -965,6 +1021,7 @@ public class JAXBModuleImporter
 
   private UnaryExpressionProxy importUnaryExpression
     (final UnaryExpression element)
+    throws WatersUnmarshalException
   {
     final String text = element.getText();
     final String operatorName = element.getOperator();
@@ -978,6 +1035,7 @@ public class JAXBModuleImporter
 
   private VariableComponentProxy importVariableComponent
     (final VariableComponent element)
+    throws WatersUnmarshalException
   {
     final IdentifierProxy identifier = createIdentifier(element);
     final boolean deterministic = element.isDeterministic();
@@ -1005,6 +1063,7 @@ public class JAXBModuleImporter
 
   private VariableMarkingProxy importVariableMarking
     (final VariableMarking element)
+    throws WatersUnmarshalException
   {
     final List<SimpleExpressionType> pair =
       element.getPropositionAndPredicate();
@@ -1022,13 +1081,18 @@ public class JAXBModuleImporter
   //#########################################################################
   //# Auxiliary Methods
   private IdentifierProxy createIdentifier(final IdentifiedType element)
+    throws WatersUnmarshalException
   {
     final IdentifierType identifierElement = element.getIdentifier();
+    final String name = element.getName();
     if (identifierElement == null) {
-      final String name = element.getName();
       return mFactory.createSimpleIdentifierProxy(name);
-    } else {
+    } else if (name == null) {
       return (IdentifierProxy) importElement(identifierElement);
+    } else {
+      throw new WatersUnmarshalException
+        ("Identified element with two names: '" + name + "' and '" +
+         identifierElement.getName() + "'!");
     }
   }
 
@@ -1037,7 +1101,8 @@ public class JAXBModuleImporter
   //# Inner Class ImportHandler
   private interface ImportHandler
   {
-    public Object importElement(ElementType element);
+    public Object importElement(ElementType element)
+      throws WatersUnmarshalException;
   }
 
 

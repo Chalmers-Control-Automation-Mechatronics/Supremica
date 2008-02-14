@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.marshaller
 //# CLASS:   JAXBTraceImporter
 //###########################################################################
-//# $Id: JAXBTraceImporter.java,v 1.5 2007-12-04 03:22:55 robi Exp $
+//# $Id: JAXBTraceImporter.java,v 1.6 2008-02-14 06:46:26 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.marshaller;
@@ -149,6 +149,7 @@ class JAXBTraceImporter
 
   private IndexedSet<AutomatonProxy> getAutomata(final TraceType element,
                                                  final ProductDESProxy des)
+    throws WatersUnmarshalException
   {
     final String name = element.getName();
     final IndexedSet<AutomatonProxy> automata0 =
