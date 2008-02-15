@@ -67,8 +67,7 @@ public class ExtendedAutomata
 	public ExtendedAutomata(String name, boolean expand) 
 	{
 		identifier = factory.createSimpleIdentifierProxy(name);
-
-		module = new ModuleSubject(identifier.getName(), null);
+		module = new ModuleSubject(name, null);
 
 		// make marking proposition
         final SimpleIdentifierProxy ident = factory.createSimpleIdentifierProxy

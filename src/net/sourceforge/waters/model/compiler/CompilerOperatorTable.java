@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.compiler
 //# CLASS:   CompilerOperatorTable
 //###########################################################################
-//# $Id: CompilerOperatorTable.java,v 1.10 2008-02-15 02:17:19 robi Exp $
+//# $Id: CompilerOperatorTable.java,v 1.11 2008-02-15 07:31:49 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.compiler;
@@ -21,7 +21,9 @@ import net.sourceforge.waters.model.expr.OperatorTable;
 import net.sourceforge.waters.model.expr.UnaryOperator;
 import net.sourceforge.waters.model.expr.Value;
 import net.sourceforge.waters.model.module.BinaryExpressionProxy;
+import net.sourceforge.waters.model.module.IdentifierProxy;
 import net.sourceforge.waters.model.module.ModuleProxyFactory;
+import net.sourceforge.waters.model.module.QualifiedIdentifierProxy;
 import net.sourceforge.waters.model.module.SimpleExpressionProxy;
 
 
@@ -85,6 +87,7 @@ public class CompilerOperatorTable extends AbstractOperatorTable {
     store(new BinaryModuloOperator());
     store(new UnaryMinusOperator());
     store(mRangeOperator);
+    store(new BinaryQualificationOperator());
     storeComplements(mEqualsOperator, mNotEqualsOperator);
     storeComplements(mLessThanOperator, mGreaterEqualsOperator);
     storeComplements(mGreaterThanOperator, mLessEqualsOperator);
@@ -179,7 +182,7 @@ public class CompilerOperatorTable extends AbstractOperatorTable {
 
 
   //#########################################################################
-  //# Inner Class AbstractBinaryIntOperator
+  //# Inner Class AbstractBinaryOperator
   /**
    * The abstract type of all binary operators whose parse result is
    * a binary expression ({@link BinaryExpressionProxy}).
@@ -202,6 +205,8 @@ public class CompilerOperatorTable extends AbstractOperatorTable {
   }
 
 
+  //#########################################################################
+  //# Inner Class AbstractBinaryIntOperator
   /**
    * The abstract type of all binary operators that combine two integer
    * values and return another integer.
@@ -1162,6 +1167,70 @@ public class CompilerOperatorTable extends AbstractOperatorTable {
 
 
   //#########################################################################
+  //# Inner Class BinaryQualificationOperator
+  /**
+   * The abstract type of all binary operators that combine two integer
+   * values and return another integer.
+   */
+  private static class BinaryQualificationOperator
+    implements BinaryOperator
+  {
+
+    //#######################################################################
+    //# Interface net.sourceforge.waters.model.expr.Operator
+    public String getName()
+    {
+      return OPNAME_QUAL;
+    }
+
+    public int getPriority()
+    {
+      return PRIORITY_QUAL;
+    }
+
+    //#######################################################################
+    //# Interface net.sourceforge.waters.model.expr.BinaryOperator
+    public int getLHSTypes()
+    {
+      return Operator.TYPE_NAME;
+    }
+
+    public int getRHSTypes()
+    {
+      return Operator.TYPE_NAME;
+    }
+
+    public int getReturnTypes(final int lhsType, final int rhsType)
+    {
+      return lhsType & rhsType & Operator.TYPE_NAME;
+    }
+
+    public int getAssociativity()
+    {
+      return BinaryOperator.ASSOC_RIGHT;
+    }
+
+    public QualifiedIdentifierProxy createExpression
+      (final ModuleProxyFactory factory,
+       final SimpleExpressionProxy lhs,
+       final SimpleExpressionProxy rhs,
+       final String text)
+    {
+      return factory.createQualifiedIdentifierProxy
+        (text, (IdentifierProxy) lhs, (IdentifierProxy) rhs);
+    }
+
+    public Value eval(final Value lhsValue, final Value rhsValue)
+      throws EvalException
+    {
+      throw new IllegalStateException
+        ("BinaryQualificationOperator cannot be evaluated!");
+    }
+
+  }
+
+
+  //#########################################################################
   //# Data Members
   private final BinaryOperator mAndOperator;
   private final BinaryOperator mOrOperator;
@@ -1184,6 +1253,7 @@ public class CompilerOperatorTable extends AbstractOperatorTable {
   private static final CompilerOperatorTable INSTANCE =
     new CompilerOperatorTable();
 
+  private static final String OPNAME_QUAL = ".";
   private static final String OPNAME_EQUALS = "==";
   private static final String OPNAME_NOTEQUALS = "!=";
   private static final String OPNAME_GREATER_THAN = ">";
@@ -1203,6 +1273,7 @@ public class CompilerOperatorTable extends AbstractOperatorTable {
   private static final String OPNAME_DECREMENT = "-=";
   private static final String OPNAME_ASSIGNMENT = "=";
 
+  private static final int PRIORITY_QUAL = 100;
   private static final int PRIORITY_UNARY = 90;
   private static final int PRIORITY_TIMES = 80;
   private static final int PRIORITY_PLUS = 70;

@@ -1184,7 +1184,7 @@ proc Java_GenerateClass {impl subpack prefix destname classinfo
             "  public int compareTo(final $partnertype partner)"
 	Java_WriteLn $stream $umap "  \{"
 	Java_WriteLn $stream $umap \
-            "    return getName().compareTo(partner.getName());"
+            "    return toString().compareTo(partner.toString());"
 	Java_WriteLn $stream $umap "  \}"
 	Java_WriteLn $stream $umap ""
       } else {

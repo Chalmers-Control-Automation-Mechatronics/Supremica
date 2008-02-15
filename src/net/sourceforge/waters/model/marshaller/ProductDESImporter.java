@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.marshaller
 //# CLASS:   ProductDESImporter
 //###########################################################################
-//# $Id: ProductDESImporter.java,v 1.10 2008-02-14 02:24:09 robi Exp $
+//# $Id: ProductDESImporter.java,v 1.11 2008-02-15 07:31:49 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.marshaller;
@@ -225,6 +225,7 @@ public class ProductDESImporter
         blockedlabels.add(label);
       }
       final LabelBlockProxy blockedblock =
+        blockedlabels.isEmpty() ? null :
         mFactory.createLabelBlockProxy(blockedlabels, null);
       final Collection<SimpleNodeProxy> nodes = mCurrentNodeMap.values();
       final GraphProxy graph =

@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   ComponentsTree
 //###########################################################################
-//# $Id: ComponentsTree.java,v 1.8 2007-12-16 22:55:30 robi Exp $
+//# $Id: ComponentsTree.java,v 1.9 2008-02-15 07:31:49 robi Exp $
 //###########################################################################
 
 
@@ -322,9 +322,7 @@ public class ComponentsTree
         final IdentifierSubject oldident = comp.getIdentifier();
         final IdentifierSubject newident =
           context.getPastedComponentName(oldident, names);
-        final String newname = newident.getName();
         comp.setIdentifier(newident);
-        names.add(newname);
       }
       final ListInsertPosition inspos = new ListInsertPosition(list, pos++);
       final InsertInfo info = new InsertInfo(cloned, inspos);

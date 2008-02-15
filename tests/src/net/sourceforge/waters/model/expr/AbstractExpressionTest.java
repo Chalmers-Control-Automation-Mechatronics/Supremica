@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.expr
 //# CLASS:   AbstractExpressionTest
 //###########################################################################
-//# $Id: AbstractExpressionTest.java,v 1.2 2007-11-19 03:05:23 robi Exp $
+//# $Id: AbstractExpressionTest.java,v 1.3 2008-02-15 07:31:49 robi Exp $
 //###########################################################################
 
 
@@ -15,7 +15,9 @@ import java.util.List;
 import junit.framework.TestCase;
 
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
+import net.sourceforge.waters.model.module.IndexedIdentifierProxy;
 import net.sourceforge.waters.model.module.ModuleProxyFactory;
+import net.sourceforge.waters.model.module.QualifiedIdentifierProxy;
 import net.sourceforge.waters.model.module.SimpleExpressionProxy;
 import net.sourceforge.waters.model.module.SimpleIdentifierProxy;
 
@@ -240,6 +242,24 @@ public abstract class AbstractExpressionTest extends TestCase
     testExpression("event[-2]", mExpr_event_m2, Operator.TYPE_NAME);
   }
 
+  public void testExpression_bqc()
+    throws ParseException
+  {
+    testExpression("b.c", mExpr_bqc, Operator.TYPE_NAME);
+  }
+
+  public void testExpression_aqbqc()
+    throws ParseException
+  {
+    testExpression("a.b.c", mExpr_aqbqc, Operator.TYPE_NAME);
+  }
+
+  public void testExpression_aqe1()
+    throws ParseException
+  {
+    testExpression("a . event[1]", mExpr_aqe1, Operator.TYPE_NAME);
+  }
+
   public void testExpression_1_multi()
     throws ParseException
   {
@@ -422,6 +442,12 @@ public abstract class AbstractExpressionTest extends TestCase
     exlist.clear();
     exlist.add(mExpr_m2.clone());
     mExpr_event_m2 = factory.createIndexedIdentifierProxy("event", exlist);
+    mExpr_bqc = factory.createQualifiedIdentifierProxy(mExpr_b.clone(),
+                                                       mExpr_c.clone());
+    mExpr_aqbqc = factory.createQualifiedIdentifierProxy(mExpr_a.clone(),
+                                                         mExpr_bqc.clone());
+    mExpr_aqe1 = factory.createQualifiedIdentifierProxy(mExpr_a.clone(),
+                                                        mExpr_event_1.clone());
   }
 
   protected void tearDown()
@@ -458,6 +484,9 @@ public abstract class AbstractExpressionTest extends TestCase
     mExpr_event_1 = null;
     mExpr_event_1_1plus1 = null;
     mExpr_event_m2 = null;
+    mExpr_bqc = null;
+    mExpr_aqbqc = null;
+    mExpr_aqe1 = null;
   }
 
 
@@ -493,8 +522,11 @@ public abstract class AbstractExpressionTest extends TestCase
   private SimpleExpressionProxy mExpr_m_a;
   private SimpleExpressionProxy mExpr_aminus1;
   private SimpleExpressionProxy mExpr_a_b_c;
-  private SimpleExpressionProxy mExpr_event_1;
+  private IndexedIdentifierProxy mExpr_event_1;
   private SimpleExpressionProxy mExpr_event_1_1plus1;
   private SimpleExpressionProxy mExpr_event_m2;
+  private QualifiedIdentifierProxy mExpr_bqc;
+  private QualifiedIdentifierProxy mExpr_aqbqc;
+  private QualifiedIdentifierProxy mExpr_aqe1;
 
 }

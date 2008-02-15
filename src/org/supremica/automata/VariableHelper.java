@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.external.iec61499fb2efa
 //# CLASS:   VariableHelper
 //###########################################################################
-//# $Id: VariableHelper.java,v 1.4 2008-01-28 11:54:38 cengic Exp $
+//# $Id: VariableHelper.java,v 1.5 2008-02-15 07:31:49 robi Exp $
 //###########################################################################
 
 
@@ -201,10 +201,13 @@ public class VariableHelper {
         VariableMarkingProxy found = null;
         for (final VariableMarkingProxy marking : markings) {
             final IdentifierProxy ident = marking.getProposition();
-            if (ident instanceof SimpleIdentifierProxy &&
-                ident.getName().equals
-                  (EventDeclProxy.DEFAULT_MARKING_NAME)) {
-                found = marking;
+            if (ident instanceof SimpleIdentifierProxy) {
+                final SimpleIdentifierProxy simple =
+                    (SimpleIdentifierProxy) ident;
+                if (simple.getName().equals
+                      (EventDeclProxy.DEFAULT_MARKING_NAME)) {
+                    found = marking;
+                }
             }
         }
         if (found == null) {
@@ -343,10 +346,13 @@ public class VariableHelper {
         VariableMarkingProxy found = null;
         for (final VariableMarkingProxy marking : markings) {
             final IdentifierProxy ident = marking.getProposition();
-            if (ident instanceof SimpleIdentifierProxy &&
-                ident.getName().equals
-                  (EventDeclProxy.DEFAULT_MARKING_NAME)) {
-                found = marking;
+            if (ident instanceof SimpleIdentifierProxy) {
+                final SimpleIdentifierProxy simple =
+                    (SimpleIdentifierProxy) ident;
+                if (simple.getName().equals
+                      (EventDeclProxy.DEFAULT_MARKING_NAME)) {
+                    found = marking;
+                }
             }
         }
         if (found == null) {

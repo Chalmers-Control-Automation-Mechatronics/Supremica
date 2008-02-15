@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.module
 //# CLASS:   IdentifierProxy
 //###########################################################################
-//# $Id: IdentifierProxy.java,v 1.2 2005-11-03 01:24:16 robi Exp $
+//# $Id: IdentifierProxy.java,v 1.3 2008-02-15 07:31:49 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.module;
@@ -16,9 +16,11 @@ package net.sourceforge.waters.model.module;
  * This class represents all expressions whose main component is an
  * identifier, where an identifier is a name that can be bound to different
  * values in different contexts. There can be simple identifiers ({@link
- * SimpleIdentifierProxy}) that only consist of a name, or indexed
- * identifiers ({@link IndexedIdentifierProxy}) that consist of a name and a
- * sequence of array indexes.
+ * SimpleIdentifierProxy}) that only consist of a name, indexed identifiers
+ * ({@link IndexedIdentifierProxy}) that consist of a name and a sequence
+ * of array indexes, and qualified identifiers ({@link
+ * QualifiedIdentifierProxy}) that combine the name of a context and an
+ * enclosed component.
  *
  * @author Robi Malik
  */
@@ -26,9 +28,5 @@ package net.sourceforge.waters.model.module;
 public interface IdentifierProxy
   extends SimpleExpressionProxy, Comparable<IdentifierProxy>
 {
-
-  //#########################################################################
-  //# Getters
-  public String getName();
 
 }

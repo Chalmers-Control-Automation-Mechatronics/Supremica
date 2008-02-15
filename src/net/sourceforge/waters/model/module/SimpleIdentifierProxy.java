@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.module
 //# CLASS:   SimpleIdentifierProxy
 //###########################################################################
-//# $Id: SimpleIdentifierProxy.java,v 1.3 2007-11-19 02:16:52 robi Exp $
+//# $Id: SimpleIdentifierProxy.java,v 1.4 2008-02-15 07:31:49 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.module;
@@ -21,6 +21,12 @@ package net.sourceforge.waters.model.module;
 
 public interface SimpleIdentifierProxy extends IdentifierProxy {
 
+  //#########################################################################
+  //# General Object Handling
   public SimpleIdentifierProxy clone();
+
+  //#########################################################################
+  //# Getters
+  public String getName();
 
 }

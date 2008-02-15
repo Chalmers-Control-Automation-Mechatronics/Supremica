@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   ModuleContext
 //###########################################################################
-//# $Id: ModuleContext.java,v 1.6 2008-02-14 02:24:09 robi Exp $
+//# $Id: ModuleContext.java,v 1.7 2008-02-15 07:31:49 robi Exp $
 //###########################################################################
 
 
@@ -28,6 +28,7 @@ import net.sourceforge.waters.model.module.ForeachProxy;
 import net.sourceforge.waters.model.module.ForeachEventProxy;
 import net.sourceforge.waters.model.module.IdentifiedProxy;
 import net.sourceforge.waters.model.module.IdentifierProxy;
+import net.sourceforge.waters.model.module.IndexedIdentifierProxy;
 import net.sourceforge.waters.model.module.InstanceProxy;
 import net.sourceforge.waters.model.module.ParameterBindingProxy;
 import net.sourceforge.waters.model.module.SimpleComponentProxy;
@@ -71,6 +72,7 @@ public class ModuleContext
   {
     mModule = module;
     mCanDropVisitor = new CanDropVisitor();
+    mIdentifierNameVisitor = new IdentifierNameVisitor();
     mIconGetterVisitor = new IconGetterVisitor();
     mToolTipGetterVisitor = new ToolTipGetterVisitor();
     mEventDeclListWrapper =
@@ -114,7 +116,7 @@ public class ModuleContext
    */
   public EventKind guessEventKind(final IdentifierProxy ident)
   {
-    final String name = ident.getName();
+    final String name = mIdentifierNameVisitor.getIdentifierName(ident);
     final EventDeclProxy decl = getEventDecl(name);
     return decl == null ? null : decl.getKind();
   }
@@ -126,7 +128,7 @@ public class ModuleContext
    */
   public ImageIcon guessEventIcon(final IdentifierProxy ident)
   {
-    final String name = ident.getName();
+    final String name = mIdentifierNameVisitor.getIdentifierName(ident);
     final EventDeclProxy decl = getEventDecl(name);
     return decl == null ? IconLoader.ICON_EVENT : getImageIcon(decl);
   }
@@ -141,7 +143,7 @@ public class ModuleContext
    */
   public ImageIcon guessPropositionIcon(final IdentifierProxy ident)
   {
-    final String name = ident.getName();
+    final String name = mIdentifierNameVisitor.getIdentifierName(ident);
     final EventDeclProxy decl = getEventDecl(name);
     if (decl != null) {
       return getImageIcon(decl);
@@ -160,7 +162,7 @@ public class ModuleContext
    */
   public String guessEventToolTipText(final IdentifierProxy ident)
   {
-    final String name = ident.getName();
+    final String name = mIdentifierNameVisitor.getIdentifierName(ident);
     final EventDeclProxy decl = getEventDecl(name);
     return decl == null ? "Event" : getToolTipText(decl);
   }
@@ -224,7 +226,8 @@ public class ModuleContext
     throws ParseException
   {
     if (ident instanceof SimpleIdentifierProxy) {
-      final String name = ident.getName();
+      final SimpleIdentifierProxy simple = (SimpleIdentifierProxy) ident;
+      final String name = simple.getName();
       final IdentifiedProxy found = getComponent(name);
       if (found != null) {
         final StringBuffer buffer = new StringBuffer("Name '");
@@ -288,7 +291,8 @@ public class ModuleContext
     (final IdentifierSubject ident)
   {
     if (ident instanceof SimpleIdentifierProxy) {
-      final String name = ident.getName();
+      final SimpleIdentifierProxy simple = (SimpleIdentifierProxy) ident;
+      final String name = simple.getName();
       final NameChecker checker = new NameChecker() {
           public boolean isNameTaken(final String name) {
             return getComponent(name) != null;
@@ -310,19 +314,27 @@ public class ModuleContext
    *                  SimpleComponentProxy}, {@link VariableComponentProxy},
    *                  etc.) to be added.
    * @param  alsoUsed A set of names also to be considered as taken.
+   *                  If the chosen name is not in this set, it is
+   *                  automatically added.
    */
   public IdentifierSubject getPastedComponentName
     (final IdentifierSubject ident, final Set<String> alsoUsed)
   {
     if (ident instanceof SimpleIdentifierProxy) {
-      final String name = ident.getName();
+      final SimpleIdentifierProxy simple = (SimpleIdentifierProxy) ident;
+      final String name = simple.getName();
       final NameChecker checker = new NameChecker() {
           public boolean isNameTaken(final String name) {
             return getComponent(name) != null || alsoUsed.contains(name);
           }
         };
       final String newname = getPastedName(name, checker);
-      return newname == name ? ident : new SimpleIdentifierSubject(newname);
+      if (newname == name) {
+        return ident;
+      } else {
+        alsoUsed.add(newname);
+        return new SimpleIdentifierSubject(newname);
+      }
     } else {
       return ident;
     }
@@ -462,7 +474,9 @@ public class ModuleContext
             final IdentifiedProxy comp = (IdentifiedProxy) item;
             final IdentifierProxy ident = comp.getIdentifier();
             if (ident instanceof SimpleIdentifierProxy) {
-              final String name = ident.getName();
+              final SimpleIdentifierProxy simple =
+                (SimpleIdentifierProxy) ident;
+              final String name = simple.getName();
               mMap.put(name, comp);
             }
           }
@@ -484,7 +498,8 @@ public class ModuleContext
           final IdentifiedProxy comp = (IdentifiedProxy) value;
           final IdentifierProxy ident = comp.getIdentifier();
           if (ident instanceof SimpleIdentifierProxy) {
-            final String name = ident.getName();
+            final SimpleIdentifierProxy simple = (SimpleIdentifierProxy) ident;
+            final String name = simple.getName();
             if (!mMap.containsKey(name)) {
               mMap.put(name, comp);
             }
@@ -583,6 +598,47 @@ public class ModuleContext
     //#######################################################################
     //# Data Members
     private EventKind[] mAllowed;
+
+  }
+
+
+  //#########################################################################
+  //# Inner Class IdentifierNameVisitor
+  private static class IdentifierNameVisitor
+    extends AbstractModuleProxyVisitor
+  {
+
+    //#######################################################################
+    //# Invocation
+    private String getIdentifierName(final IdentifierProxy ident)
+    {
+      try {
+	return (String) ident.acceptVisitor(this);
+      } catch (final VisitorException exception) {
+	throw exception.getRuntimeException();
+      }
+    }
+
+    //#######################################################################
+    //# Interface net.sourceforge.waters.model.printer.ProxyVisitor
+    public ImageIcon visitProxy(final Proxy proxy)
+    {
+      return null;
+    }
+
+    //#######################################################################
+    //# Interface net.sourceforge.waters.model.printer.ModuleProxyVisitor
+    public String visitIndexedIdentifierProxy
+      (final IndexedIdentifierProxy ident)
+    {
+      return ident.getName();
+    }
+
+    public String visitSimpleIdentifierProxy
+      (final SimpleIdentifierProxy ident)
+    {
+      return ident.getName();
+    }
 
   }
 
@@ -737,6 +793,7 @@ public class ModuleContext
   //# Data Members
   private final ModuleSubject mModule;
   private final CanDropVisitor mCanDropVisitor;
+  private final IdentifierNameVisitor mIdentifierNameVisitor;
   private final IconGetterVisitor mIconGetterVisitor;
   private final ToolTipGetterVisitor mToolTipGetterVisitor;
 

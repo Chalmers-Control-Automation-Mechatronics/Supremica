@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui.actions
 //# CLASS:   EditNodeMarkingAction
 //###########################################################################
-//# $Id: EditNodeMarkingAction.java,v 1.3 2008-02-14 02:24:09 robi Exp $
+//# $Id: EditNodeMarkingAction.java,v 1.4 2008-02-15 07:31:49 robi Exp $
 //###########################################################################
 
 
@@ -129,7 +129,9 @@ public class EditNodeMarkingAction
     if (!(mIdentifier instanceof SimpleIdentifierSubject)) {
       return null;
     }
-    final String name = mIdentifier.getName();
+    final SimpleIdentifierSubject simple =
+      (SimpleIdentifierSubject) mIdentifier;
+    final String name = simple.getName();
     if (!EventDeclProxy.DEFAULT_MARKING_NAME.equals(name) &&
         !EventDeclProxy.DEFAULT_FORBIDDEN_NAME.equals(name)) {
       return null;

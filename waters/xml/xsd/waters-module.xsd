@@ -774,6 +774,7 @@
   <xs:choice>
     <xs:element ref="M:SimpleIdentifier"/>
     <xs:element ref="M:IndexedIdentifier"/>
+    <xs:element ref="M:QualifiedIdentifier"/>
     <xs:element ref="M:IntConstant"/>
     <xs:element ref="M:UnaryExpression"/>
     <xs:element ref="M:BinaryExpression"/>
@@ -785,6 +786,7 @@
   <xs:choice>
     <xs:element ref="M:SimpleIdentifier"/>
     <xs:element ref="M:IndexedIdentifier"/>
+    <xs:element ref="M:QualifiedIdentifier"/>
   </xs:choice>
 </xs:group>
 
@@ -801,6 +803,7 @@
     <xs:element ref="M:BinaryExpression"/>
     <xs:element ref="M:IntConstant"/>
     <xs:element ref="M:SimpleIdentifier"/>
+    <xs:element ref="M:QualifiedIdentifier"/>
     <xs:element ref="M:UnaryExpression"/>
   </xs:choice>
 </xs:group>
@@ -808,6 +811,7 @@
 <xs:group name="ArithmeticOrRangeExpression">
   <xs:choice>
     <xs:element ref="M:SimpleIdentifier"/>
+    <xs:element ref="M:QualifiedIdentifier"/>
     <xs:element ref="M:IntConstant"/>
     <xs:element ref="M:UnaryExpression"/>
     <xs:element ref="M:BinaryExpression"/>
@@ -817,16 +821,16 @@
 
 <xs:complexType name="IdentifierType">
   <xs:complexContent>
-    <xs:extension base="M:SimpleExpressionType">
-      <xs:attribute name="Name" type="xs:string" use="required"/>
-    </xs:extension>
+    <xs:extension base="M:SimpleExpressionType"/>
   </xs:complexContent>
 </xs:complexType>
 
 <xs:element name="SimpleIdentifier">
   <xs:complexType>
     <xs:complexContent>
-      <xs:extension base="M:IdentifierType"/>
+      <xs:extension base="M:IdentifierType">
+        <xs:attribute name="Name" type="xs:string" use="required"/>
+      </xs:extension>
     </xs:complexContent>
   </xs:complexType>
 </xs:element>
@@ -840,6 +844,23 @@
                     minOccurs="0" maxOccurs="unbounded">
             <xs:annotation><xs:appinfo>
               <jaxb:property name="Indexes"/>
+            </xs:appinfo></xs:annotation>
+	  </xs:group>
+        </xs:sequence>
+        <xs:attribute name="Name" type="xs:string" use="required"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+</xs:element>
+
+<xs:element name="QualifiedIdentifier">
+  <xs:complexType>
+    <xs:complexContent>
+      <xs:extension base="M:IdentifierType">
+        <xs:sequence>
+          <xs:group ref="M:Identifier" minOccurs="2" maxOccurs="2">
+            <xs:annotation><xs:appinfo>
+              <jaxb:property name="Identifiers"/>
             </xs:appinfo></xs:annotation>
 	  </xs:group>
         </xs:sequence>

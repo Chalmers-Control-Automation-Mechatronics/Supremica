@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   EventTableModel
 //###########################################################################
-//# $Id: EventTableModel.java,v 1.32 2007-12-08 22:22:31 robi Exp $
+//# $Id: EventTableModel.java,v 1.33 2008-02-15 07:31:49 robi Exp $
 //###########################################################################
 
 
@@ -35,8 +35,8 @@ import net.sourceforge.waters.model.module.ForeachEventProxy;
 import net.sourceforge.waters.model.module.NodeProxy;
 import net.sourceforge.waters.subject.base.AbstractSubject;
 import net.sourceforge.waters.subject.base.ListSubject;
-import net.sourceforge.waters.subject.base.ModelObserver;
 import net.sourceforge.waters.subject.base.ModelChangeEvent;
+import net.sourceforge.waters.subject.base.ModelObserver;
 import net.sourceforge.waters.subject.base.Subject;
 import net.sourceforge.waters.subject.module.EdgeSubject;
 import net.sourceforge.waters.subject.module.EventDeclSubject;
@@ -44,6 +44,7 @@ import net.sourceforge.waters.subject.module.EventListExpressionSubject;
 import net.sourceforge.waters.subject.module.ForeachEventSubject;
 import net.sourceforge.waters.subject.module.GraphSubject;
 import net.sourceforge.waters.subject.module.IdentifierSubject;
+import net.sourceforge.waters.subject.module.IndexedIdentifierSubject;
 import net.sourceforge.waters.subject.module.LabelBlockSubject;
 import net.sourceforge.waters.subject.module.ModuleSubject;
 import net.sourceforge.waters.subject.module.SimpleIdentifierSubject;
@@ -216,7 +217,19 @@ public class EventTableModel
       int last = first;
       for (int index = first + 1; index < size; index++) {
         final IdentifierSubject ident = getEvent(index);
-        if (ident.getName().equals(name)) {
+        final String iname;
+        if (ident instanceof SimpleIdentifierSubject) {
+          final SimpleIdentifierSubject simple =
+            (SimpleIdentifierSubject) ident;
+          iname = simple.getName();
+        } else if (ident instanceof IndexedIdentifierSubject) {
+          final IndexedIdentifierSubject indexed =
+            (IndexedIdentifierSubject) ident;
+          iname = indexed.getName();
+        } else {
+          break;
+        }
+        if (iname.equals(name)) {
           last++;
         } else {
           break;

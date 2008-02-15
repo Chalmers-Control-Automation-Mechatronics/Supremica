@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.marshaller
 //# CLASS:   JAXBModuleExporter
 //###########################################################################
-//# $Id: JAXBModuleExporter.java,v 1.25 2008-02-14 02:24:09 robi Exp $
+//# $Id: JAXBModuleExporter.java,v 1.26 2008-02-15 07:31:49 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.marshaller;
@@ -54,6 +54,7 @@ import net.sourceforge.waters.model.module.NodeProxy;
 import net.sourceforge.waters.model.module.ParameterBindingProxy;
 import net.sourceforge.waters.model.module.PlainEventListProxy;
 import net.sourceforge.waters.model.module.PointGeometryProxy;
+import net.sourceforge.waters.model.module.QualifiedIdentifierProxy;
 import net.sourceforge.waters.model.module.SimpleComponentProxy;
 import net.sourceforge.waters.model.module.SimpleExpressionProxy;
 import net.sourceforge.waters.model.module.SimpleIdentifierProxy;
@@ -104,6 +105,7 @@ import net.sourceforge.waters.xsd.module.ObjectFactory;
 import net.sourceforge.waters.xsd.module.ParameterBinding;
 import net.sourceforge.waters.xsd.module.Point;
 import net.sourceforge.waters.xsd.module.PointGeometryType;
+import net.sourceforge.waters.xsd.module.QualifiedIdentifier;
 import net.sourceforge.waters.xsd.module.RangeList;
 import net.sourceforge.waters.xsd.module.ScopeKind;
 import net.sourceforge.waters.xsd.module.SimpleComponent;
@@ -135,17 +137,6 @@ public class JAXBModuleExporter
 
   //#########################################################################
   //# Interface net.sourceforge.waters.model.module.ModuleProxyVisitor
-//EFA------------------- 
-  public GuardActionBlock visitGuardActionBlockProxy
-    (final GuardActionBlockProxy proxy)
-    throws VisitorException
-  {
-    final GuardActionBlock element = mFactory.createGuardActionBlock();
-    copyGuardActionBlockProxy(proxy, element);
-    return element;
-  }
-//--------------------------------
-
   public Object visitAliasProxy(final AliasProxy proxy)
     throws VisitorException
   {
@@ -203,7 +194,6 @@ public class JAXBModuleExporter
     return element;
   }
 
-
   public PointGeometryType visitEndPointGeometryProxy
       (final PointGeometryProxy proxy)
     throws VisitorException
@@ -236,6 +226,15 @@ public class JAXBModuleExporter
   {
     final EventDecl element = mFactory.createEventDecl();
     copyEventDeclProxy(proxy, element);
+    return element;
+  }
+
+  public GuardActionBlock visitGuardActionBlockProxy
+    (final GuardActionBlockProxy proxy)
+    throws VisitorException
+  {
+    final GuardActionBlock element = mFactory.createGuardActionBlock();
+    copyGuardActionBlockProxy(proxy, element);
     return element;
   }
 
@@ -413,6 +412,15 @@ public class JAXBModuleExporter
   {
     final PointGeometryType element = mFactory.createPointGeometryType();
     copyPointGeometryProxy(proxy, element);
+    return element;
+  }
+
+  public QualifiedIdentifier visitQualifiedIdentifierProxy
+      (final QualifiedIdentifierProxy proxy)
+    throws VisitorException
+  {
+    final QualifiedIdentifier element = mFactory.createQualifiedIdentifier();
+    copyQualifiedIdentifierProxy(proxy, element);
     return element;
   }
 
@@ -832,7 +840,9 @@ public class JAXBModuleExporter
     copyProxy(proxy, element);
     final IdentifierProxy identifierProxy = proxy.getIdentifier();
     if (identifierProxy instanceof SimpleIdentifierProxy) {
-      final String name = identifierProxy.getName();
+      final SimpleIdentifierProxy simple =
+        (SimpleIdentifierProxy) identifierProxy;
+      final String name = simple.getName();
       element.setName(name);
     } else {
       final IdentifierType identifierElement =
@@ -847,7 +857,6 @@ public class JAXBModuleExporter
     throws VisitorException
   {
     copySimpleExpressionProxy(proxy, element);
-    element.setName(proxy.getName());
   }
 
   private void copyIndexedIdentifierProxy
@@ -856,6 +865,7 @@ public class JAXBModuleExporter
     throws VisitorException
   {
     copyIdentifierProxy(proxy, element);
+    element.setName(proxy.getName());
     final List<SimpleExpressionProxy> indexesProxy = proxy.getIndexes();
     final List<ElementType> indexesElement =
       Casting.toList(element.getIndexes());
@@ -981,6 +991,23 @@ public class JAXBModuleExporter
     element.setPoint(pointElement);
   }
 
+  private void copyQualifiedIdentifierProxy
+      (final QualifiedIdentifierProxy proxy,
+       final QualifiedIdentifier element)
+    throws VisitorException
+  {
+    copyIdentifierProxy(proxy, element);
+    final List<IdentifierType> list = element.getIdentifiers();
+    final IdentifierProxy baseProxy = proxy.getBaseIdentifier();
+    final IdentifierType baseElement =
+      (IdentifierType) baseProxy.acceptVisitor(this);
+    list.add(baseElement);
+    final IdentifierProxy compProxy = proxy.getComponentIdentifier();
+    final IdentifierType compElement =
+      (IdentifierType) compProxy.acceptVisitor(this);
+    list.add(compElement);
+  }
+
   private void copySimpleComponentProxy
     (final SimpleComponentProxy proxy,
      final SimpleComponent element)
@@ -1009,6 +1036,7 @@ public class JAXBModuleExporter
     throws VisitorException
   {
     copyIdentifierProxy(proxy, element);
+    element.setName(proxy.getName());
   }
 
   private void copySimpleNodeProxy

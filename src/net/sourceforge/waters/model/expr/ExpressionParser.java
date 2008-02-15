@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.expr
 //# CLASS:   ExpressionParser
 //###########################################################################
-//# $Id: ExpressionParser.java,v 1.11 2007-11-19 03:05:23 robi Exp $
+//# $Id: ExpressionParser.java,v 1.12 2008-02-15 07:31:49 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.expr;
@@ -120,7 +120,14 @@ public class ExpressionParser {
     if (ident instanceof SimpleIdentifierProxy) {
       return (SimpleIdentifierProxy) ident;
     } else {
-      final int pos = input.indexOf('[');
+      final int len = input.length();
+      int pos = 0;
+      do {
+        final char ch = input.charAt(pos);
+        if (!isIdentifierCharacter(ch) && !isWhitespace(ch)) {
+          break;
+        }
+      } while (++pos < len);
       throw new ParseException("Structured names are not allowed here!", pos);
     }
   }

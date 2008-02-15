@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.module
 //# CLASS:   ModuleCompiler
 //###########################################################################
-//# $Id: ModuleCompiler.java,v 1.103 2008-02-01 13:46:43 markus Exp $
+//# $Id: ModuleCompiler.java,v 1.104 2008-02-15 07:31:49 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.compiler;
@@ -223,7 +223,8 @@ public class ModuleCompiler extends AbstractModuleProxyVisitor
       if (!(ident instanceof SimpleIdentifierProxy)) {
         throw new IndexOutOfRangeException(proxy);
       }
-      final String name = ident.getName();
+      final SimpleIdentifierProxy simple = (SimpleIdentifierProxy) ident;
+      final String name = simple.getName();
       final ExpressionProxy defaultExpr = proxy.getExpression();
       final SimpleValue defaultValue =
         evalTyped(defaultExpr, SimpleValue.class, "LITERAL");
@@ -289,12 +290,15 @@ public class ModuleCompiler extends AbstractModuleProxyVisitor
   {
     try {
       final IdentifierProxy ident = proxy.getIdentifier();
-      final String name = ident.getName();
       final ExpressionProxy expr = proxy.getExpression();
       final EventValue event = evalTyped(expr, EventValue.class, "EVENT");
       if (ident instanceof SimpleIdentifierProxy) {
+        final SimpleIdentifierProxy simple = (SimpleIdentifierProxy) ident;
+        final String name = simple.getName();
         mContext.add(name, event);
-      } else {
+      } else if (ident instanceof IndexedIdentifierProxy) {
+        final IndexedIdentifierProxy indexed = (IndexedIdentifierProxy) ident;
+        final String name = indexed.getName();
         final Value found = mContext.get(name);
         CompiledArrayAliasValue entry;
         if (found == null) {
@@ -329,6 +333,9 @@ public class ModuleCompiler extends AbstractModuleProxyVisitor
             entry.set(indexValue, event);
           }
         }
+      } else {
+        throw new UnsupportedOperationException
+          ("Support for qualified indentifiers not yet implemented!");
       }
       return event;
     } catch (final EvalException exception) {

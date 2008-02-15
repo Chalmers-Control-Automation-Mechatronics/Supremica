@@ -111,9 +111,9 @@ public class ExtendedAutomata
 
 	public ExtendedAutomata(String name, boolean expand) 
 	{
+		factory = ModuleSubjectFactory.getInstance();
 		identifier = factory.createSimpleIdentifierProxy(name);
-
-		module = new ModuleSubject(identifier.getName(), null);
+		module = new ModuleSubject(name, null);
 
 		// make marking proposition
         final SimpleIdentifierProxy ident = factory.createSimpleIdentifierProxy
@@ -123,7 +123,6 @@ public class ExtendedAutomata
 
 		this.expand = expand;
 
-		factory = ModuleSubjectFactory.getInstance();
 		parser = new ExpressionParser(factory, CompilerOperatorTable.getInstance());
 	}
 

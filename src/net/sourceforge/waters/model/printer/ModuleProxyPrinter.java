@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.printer
 //# CLASS:   ModuleProxyPrinter
 //###########################################################################
-//# $Id: ModuleProxyPrinter.java,v 1.15 2007-12-04 03:22:58 robi Exp $
+//# $Id: ModuleProxyPrinter.java,v 1.16 2008-02-15 07:31:49 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.printer;
@@ -54,6 +54,7 @@ import net.sourceforge.waters.model.module.NodeProxy;
 import net.sourceforge.waters.model.module.ParameterBindingProxy;
 import net.sourceforge.waters.model.module.PlainEventListProxy;
 import net.sourceforge.waters.model.module.PointGeometryProxy;
+import net.sourceforge.waters.model.module.QualifiedIdentifierProxy;
 import net.sourceforge.waters.model.module.SimpleComponentProxy;
 import net.sourceforge.waters.model.module.SimpleExpressionProxy;
 import net.sourceforge.waters.model.module.SimpleIdentifierProxy;
@@ -365,8 +366,7 @@ public class ModuleProxyPrinter
       (final IdentifierProxy proxy)
     throws VisitorException
   {
-    print(proxy.getName());
-    return null;
+    return visitSimpleExpressionProxy(proxy);
   }
 
   public Object visitIndexedIdentifierProxy
@@ -380,7 +380,7 @@ public class ModuleProxyPrinter
       final int savedPriority = mPriority; 
       final boolean savedAssocBraces = mAssocBraces;
       try {
-        visitIdentifierProxy(proxy);
+        print(proxy.getName());
         mPriority = OperatorTable.PRIORITY_OUTER;
         mAssocBraces = false;
         final List<SimpleExpressionProxy> indexes = proxy.getIndexes();
@@ -515,6 +515,23 @@ public class ModuleProxyPrinter
     return null;
   }
 
+  public Object visitQualifiedIdentifierProxy
+      (final QualifiedIdentifierProxy proxy)
+    throws VisitorException
+  {
+    final String text = proxy.getPlainText();
+    if (text != null) {
+      print(text);
+    } else {
+      final IdentifierProxy base = proxy.getBaseIdentifier();
+      base.acceptVisitor(this);
+      print('.');
+      final IdentifierProxy comp = proxy.getComponentIdentifier();
+      comp.acceptVisitor(this);
+    }
+    return null;
+  }
+
   public Object visitSimpleComponentProxy
       (final SimpleComponentProxy proxy)
     throws VisitorException
@@ -547,10 +564,10 @@ public class ModuleProxyPrinter
     final String text = proxy.getPlainText();
     if (text != null) {
       print(text);
-      return null;
     } else {
-      return visitIdentifierProxy(proxy);
+      print(proxy.getName());
     }
+    return null;
   }
 
   public Object visitSimpleNodeProxy

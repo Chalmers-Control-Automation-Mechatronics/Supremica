@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.marshaller
 //# CLASS:   JAXBModuleImporter
 //###########################################################################
-//# $Id: JAXBModuleImporter.java,v 1.28 2008-02-14 06:46:26 robi Exp $
+//# $Id: JAXBModuleImporter.java,v 1.29 2008-02-15 07:31:49 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.marshaller;
@@ -54,6 +54,7 @@ import net.sourceforge.waters.model.module.NodeProxy;
 import net.sourceforge.waters.model.module.ParameterBindingProxy;
 import net.sourceforge.waters.model.module.PlainEventListProxy;
 import net.sourceforge.waters.model.module.PointGeometryProxy;
+import net.sourceforge.waters.model.module.QualifiedIdentifierProxy;
 import net.sourceforge.waters.model.module.SimpleComponentProxy;
 import net.sourceforge.waters.model.module.SimpleExpressionProxy;
 import net.sourceforge.waters.model.module.SimpleIdentifierProxy;
@@ -100,6 +101,7 @@ import net.sourceforge.waters.xsd.module.NodeRef;
 import net.sourceforge.waters.xsd.module.ParameterBinding;
 import net.sourceforge.waters.xsd.module.Point;
 import net.sourceforge.waters.xsd.module.PointGeometryType;
+import net.sourceforge.waters.xsd.module.QualifiedIdentifier;
 import net.sourceforge.waters.xsd.module.RangeList;
 import net.sourceforge.waters.xsd.module.ScopeKind;
 import net.sourceforge.waters.xsd.module.SimpleComponent;
@@ -398,6 +400,16 @@ public class JAXBModuleImporter
     };
     mHandlerMap.put
       (net.sourceforge.waters.xsd.module.SimpleComponent.class, handler);
+    handler = new ImportHandler() {
+      public QualifiedIdentifierProxy importElement(final ElementType element)
+        throws WatersUnmarshalException
+      {
+        final QualifiedIdentifier downcast = (QualifiedIdentifier) element;
+        return importQualifiedIdentifier(downcast);
+      }
+    };
+    mHandlerMap.put
+      (net.sourceforge.waters.xsd.module.QualifiedIdentifier.class, handler);
     handler = new ImportHandler() {
       public SimpleIdentifierProxy importElement(final ElementType element)
         throws WatersUnmarshalException
@@ -946,6 +958,19 @@ public class JAXBModuleImporter
     }
   }
 
+  private QualifiedIdentifierProxy importQualifiedIdentifier
+    (final QualifiedIdentifier element)
+    throws WatersUnmarshalException
+  {
+    final String text = element.getText();
+    final List<IdentifierType> idents = element.getIdentifiers();
+    final IdentifierType baseElement = idents.get(0);
+    final IdentifierProxy base = (IdentifierProxy) importElement(baseElement);
+    final IdentifierType compElement = idents.get(1);
+    final IdentifierProxy comp = (IdentifierProxy) importElement(compElement);
+    return mFactory.createQualifiedIdentifierProxy(text, base, comp);
+  }
+
   private Rectangle importRectangle(final Box element)
   {
     final int x = element.getX();
@@ -1090,9 +1115,11 @@ public class JAXBModuleImporter
     } else if (name == null) {
       return (IdentifierProxy) importElement(identifierElement);
     } else {
+      final IdentifierProxy ident =
+        (IdentifierProxy) importElement(identifierElement);
       throw new WatersUnmarshalException
         ("Identified element with two names: '" + name + "' and '" +
-         identifierElement.getName() + "'!");
+         ident.toString() + "'!");
     }
   }
 

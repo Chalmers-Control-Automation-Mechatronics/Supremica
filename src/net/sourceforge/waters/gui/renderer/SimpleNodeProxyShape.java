@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui.renderer
 //# CLASS:   SimpleNodeProxyShape
 //###########################################################################
-//# $Id: SimpleNodeProxyShape.java,v 1.19 2007-12-04 03:22:55 robi Exp $
+//# $Id: SimpleNodeProxyShape.java,v 1.20 2008-02-15 07:31:49 robi Exp $
 //###########################################################################
 
 
@@ -28,8 +28,9 @@ import net.sourceforge.waters.gui.EditorColor;
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.module.ColorGeometryProxy;
 import net.sourceforge.waters.model.module.EventDeclProxy;
-import net.sourceforge.waters.model.module.IdentifierProxy;
+import net.sourceforge.waters.model.module.IndexedIdentifierProxy;
 import net.sourceforge.waters.model.module.ModuleProxy;
+import net.sourceforge.waters.model.module.SimpleIdentifierProxy;
 import net.sourceforge.waters.model.module.SimpleNodeProxy;
 
 import org.supremica.properties.Config;
@@ -113,45 +114,46 @@ public class SimpleNodeProxyShape
      */
     private void updateColors()
     {
-        mColors.clear();
-        if (mModule != null)
-        {
-            Map<String, EventDeclProxy> map =
-                new HashMap<String, EventDeclProxy>(mModule.getEventDeclList().size());
-            final List<Proxy> list =
-                getProxy().getPropositions().getEventList();
-            if (list.isEmpty())
-            {
-                return;
-            }
-            for (EventDeclProxy e : mModule.getEventDeclList())
-            {
-                map.put(e.getName(), e);
-            }
-            for (final Proxy prop : list)
-            {
-                // BUG: ForeachEventSubject not supported!
-                final IdentifierProxy p = (IdentifierProxy)prop;
-                final EventDeclProxy decl = map.get(p.getName());
-                if (decl == null)
-                {
-                    mColors.add(EditorColor.DEFAULTMARKINGCOLOR);
-                    continue;
-                }
-                if (decl.getName().equals(EventDeclProxy.DEFAULT_FORBIDDEN_NAME))
-                {
-                    isForbidden = true;
-                    continue;
-                }
-                final ColorGeometryProxy geo = decl.getColorGeometry();
-                if (geo == null)
-                {
-                    mColors.add(EditorColor.DEFAULTMARKINGCOLOR);
-                    continue;
-                }
-                mColors.addAll(geo.getColorSet());
-            }
+      mColors.clear();
+      if (mModule != null) {
+        Map<String, EventDeclProxy> map = new HashMap<String, EventDeclProxy>
+          (mModule.getEventDeclList().size());
+        final List<Proxy> list = getProxy().getPropositions().getEventList();
+        if (list.isEmpty()) {
+          return;
         }
+        for (EventDeclProxy e : mModule.getEventDeclList()) {
+          map.put(e.getName(), e);
+        }
+        for (final Proxy prop : list) {
+          // BUG: ForeachEventSubject not supported!
+          final String name;
+          if (prop instanceof SimpleIdentifierProxy) {
+            final SimpleIdentifierProxy ident = (SimpleIdentifierProxy) prop;
+            name = ident.getName();
+          } else if (prop instanceof IndexedIdentifierProxy) {
+            final IndexedIdentifierProxy ident = (IndexedIdentifierProxy) prop;
+            name = ident.getName();
+          } else {
+            continue;
+          }
+          final EventDeclProxy decl = map.get(name);
+          if (decl == null) {
+            mColors.add(EditorColor.DEFAULTMARKINGCOLOR);
+            continue;
+          }
+          if (decl.getName().equals(EventDeclProxy.DEFAULT_FORBIDDEN_NAME)) {
+            isForbidden = true;
+            continue;
+          }
+          final ColorGeometryProxy geo = decl.getColorGeometry();
+          if (geo == null) {
+            mColors.add(EditorColor.DEFAULTMARKINGCOLOR);
+            continue;
+          }
+          mColors.addAll(geo.getColorSet());
+        }
+      }
     }
     
     public SimpleNodeProxyShape(SimpleNodeProxy proxy, ModuleProxy module)

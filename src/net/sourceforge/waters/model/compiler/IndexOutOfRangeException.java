@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.compiler
 //# CLASS:   IndexOutOfRangeException
 //###########################################################################
-//# $Id: IndexOutOfRangeException.java,v 1.5 2007-06-08 10:57:34 robi Exp $
+//# $Id: IndexOutOfRangeException.java,v 1.6 2008-02-15 07:31:49 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.compiler;
@@ -91,7 +91,7 @@ public class IndexOutOfRangeException extends EvalException {
     if (location instanceof ConstantAliasProxy) {
       final ConstantAliasProxy alias = (ConstantAliasProxy) location;
       final IdentifierProxy ident = alias.getIdentifier();
-      final String name = ident.getName();
+      final String name = ident.toString();
       return "Constant alias '" + name + "' cannot be declared as array!";
     } else if (mValue == null) {
       return null;

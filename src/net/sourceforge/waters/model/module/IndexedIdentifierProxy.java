@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.module
 //# CLASS:   IndexedIdentifierProxy
 //###########################################################################
-//# $Id: IndexedIdentifierProxy.java,v 1.3 2006-09-06 11:52:21 robi Exp $
+//# $Id: IndexedIdentifierProxy.java,v 1.4 2008-02-15 07:31:49 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.module;
@@ -32,7 +32,14 @@ import java.util.List;
 public interface IndexedIdentifierProxy extends IdentifierProxy {
 
   //#########################################################################
-  //# Simple Access
+  //# General Object Handling
+  public IndexedIdentifierProxy clone();
+
+
+  //#########################################################################
+  //# Getters
+  public String getName();
+
   /**
    * Gets the list of array indexes of this identifier.
    * @return An unmodifiable list of expression, representing the

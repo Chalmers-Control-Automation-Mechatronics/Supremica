@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui.renderer
 //# CLASS:   ProxyShapeProducer
 //###########################################################################
-//# $Id: ProxyShapeProducer.java,v 1.29 2007-12-06 21:33:49 robi Exp $
+//# $Id: ProxyShapeProducer.java,v 1.30 2008-02-15 07:31:49 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.gui.renderer;
@@ -33,12 +33,13 @@ import net.sourceforge.waters.model.module.EventDeclProxy;
 import net.sourceforge.waters.model.module.GraphProxy;
 import net.sourceforge.waters.model.module.GroupNodeProxy;
 import net.sourceforge.waters.model.module.GuardActionBlockProxy;
-import net.sourceforge.waters.model.module.IdentifierProxy;
+import net.sourceforge.waters.model.module.IndexedIdentifierProxy;
 import net.sourceforge.waters.model.module.LabelBlockProxy;
 import net.sourceforge.waters.model.module.LabelGeometryProxy;
 import net.sourceforge.waters.model.module.ModuleProxy;
 import net.sourceforge.waters.model.module.NodeProxy;
 import net.sourceforge.waters.model.module.SimpleExpressionProxy;
+import net.sourceforge.waters.model.module.SimpleIdentifierProxy;
 import net.sourceforge.waters.model.module.SimpleNodeProxy;
 
 import net.sourceforge.waters.xsd.base.EventKind;
@@ -281,9 +282,17 @@ public class ProxyShapeProducer
       for (final Proxy proxy : block.getEventList()) {
         // Use different font for different event kinds.
         Font font = DEFAULT;
-        if (proxy instanceof IdentifierProxy) {
-          final IdentifierProxy ident = (IdentifierProxy) proxy;
-          final String name = ident.getName();
+        final String name;
+        if (proxy instanceof SimpleIdentifierProxy) {
+          final SimpleIdentifierProxy ident = (SimpleIdentifierProxy) proxy;
+          name = ident.getName();
+        } else if (proxy instanceof IndexedIdentifierProxy) {
+          final IndexedIdentifierProxy ident = (IndexedIdentifierProxy) proxy;
+          name = ident.getName();
+        } else {
+          name = null;
+        }
+        if (name != null) {
           for (final EventDeclProxy event : mModule.getEventDeclList()) {
             if (event.getName().equals(name)) {
               if (event.getKind() == EventKind.UNCONTROLLABLE) {

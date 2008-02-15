@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   EventDeclDeleteVisitor
 //###########################################################################
-//# $Id: EventDeclDeleteVisitor.java,v 1.3 2007-12-14 21:04:26 robi Exp $
+//# $Id: EventDeclDeleteVisitor.java,v 1.4 2008-02-15 07:31:49 robi Exp $
 //###########################################################################
 
 
@@ -38,10 +38,12 @@ import net.sourceforge.waters.model.module.ForeachProxy;
 import net.sourceforge.waters.model.module.GraphProxy;
 import net.sourceforge.waters.model.module.IdentifiedProxy;
 import net.sourceforge.waters.model.module.IdentifierProxy;
+import net.sourceforge.waters.model.module.IndexedIdentifierProxy;
 import net.sourceforge.waters.model.module.LabelBlockProxy;
 import net.sourceforge.waters.model.module.ModuleProxy;
 import net.sourceforge.waters.model.module.NodeProxy;
 import net.sourceforge.waters.model.module.SimpleComponentProxy;
+import net.sourceforge.waters.model.module.SimpleIdentifierProxy;
 import net.sourceforge.waters.model.module.VariableComponentProxy;
 import net.sourceforge.waters.model.module.VariableMarkingProxy;
 import net.sourceforge.waters.model.unchecked.Casting;
@@ -239,21 +241,11 @@ class EventDeclDeleteVisitor
     return null;
   }
 
-  public Object visitIdentifierProxy(final IdentifierProxy ident)
+  public Object visitIndexedIdentifierProxy(final IndexedIdentifierProxy ident)
     throws VisitorException
   {
     final String name = ident.getName();
-    if (mNames.contains(name)) {
-      maybeShowDialog(name);
-      final Proxy proxy = mVictim == null ? ident : mVictim;
-      final ProxySubject subject = (ProxySubject) proxy;
-      final ListSubject<? extends Proxy> list =
-        (ListSubject<? extends Proxy>) subject.getParent();
-      final int index = list.indexOf(proxy);
-      final ListInsertPosition inspos = new ListInsertPosition(list, index);
-      final InsertInfo info = new InsertInfo(proxy, inspos);
-      mDeletionVictims.add(info);
-    }
+    handleNamedIdentifier(ident, name);
     return null;
   }
 
@@ -282,6 +274,14 @@ class EventDeclDeleteVisitor
     return graph.acceptVisitor(this);
   }
 
+  public Object visitSimpleIdentifierProxy(final SimpleIdentifierProxy ident)
+    throws VisitorException
+  {
+    final String name = ident.getName();
+    handleNamedIdentifier(ident, name);
+    return null;
+  }
+
   public Object visitVariableComponentProxy(final VariableComponentProxy var)
     throws VisitorException
   {
@@ -303,6 +303,23 @@ class EventDeclDeleteVisitor
 
   //#########################################################################
   //# Showing the Dialog
+  private void handleNamedIdentifier(final IdentifierProxy ident,
+                                     final String name)
+    throws VisitorException
+  {
+    if (mNames.contains(name)) {
+      maybeShowDialog(name);
+      final Proxy proxy = mVictim == null ? ident : mVictim;
+      final ProxySubject subject = (ProxySubject) proxy;
+      final ListSubject<? extends Proxy> list =
+        (ListSubject<? extends Proxy>) subject.getParent();
+      final int index = list.indexOf(proxy);
+      final ListInsertPosition inspos = new ListInsertPosition(list, index);
+      final InsertInfo info = new InsertInfo(proxy, inspos);
+      mDeletionVictims.add(info);
+    }
+  }
+
   private void maybeShowDialog(final String name)
     throws VisitorException
   {
