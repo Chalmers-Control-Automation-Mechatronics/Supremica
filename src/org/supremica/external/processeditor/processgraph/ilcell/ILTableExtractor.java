@@ -219,9 +219,13 @@ public class ILTableExtractor {
 						row = i + 1;
 					
 						senVal = factory.createSensorValue();
+						
 						senVal.setSensor(tableInternal.getColumnName(col));
-						senVal.setValue(tableInternal.getValueAt(row, col).toString().trim());
-					
+						if(null == tableInternal.getValueAt(row, col)){
+							senVal.setValue("");
+						}else{
+							senVal.setValue(tableInternal.getValueAt(row, col).toString().trim());
+						}
 						terms[i].getSensorValue().add(senVal);
 					}	
 				}
@@ -353,16 +357,22 @@ public class ILTableExtractor {
 		//	Product information from tableProduct
 		//-----------------------------------------------------
 		if(null != tableProduct){
+			
 			for(int i = 0; i < terms.length; i++){
 				row = i + 1;
 				
 				//not started operations
 				products = factory.createProducts();
-				String[] productNames = tableOperation.getValueAt(row, 0).toString().split(",");
-				for(int p = 0; p < productNames.length; p++){
-					products.getProduct().add(productNames[p].trim());
-				}
 				
+				if(null != tableProduct.getValueAt(row, 0)){
+					String[] productNames = tableProduct.getValueAt(row, 0).toString().split(",");
+					for(int p = 0; p < productNames.length; p++){						
+						products.getProduct().add(productNames[p].trim());
+					}
+				}else{
+					products.getProduct().add("");
+				}
+				terms[i].getProducts().add(products);
 			}
 		}
 		

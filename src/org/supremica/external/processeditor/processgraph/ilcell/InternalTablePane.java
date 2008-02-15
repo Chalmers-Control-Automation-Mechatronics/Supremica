@@ -145,6 +145,7 @@ public class InternalTablePane
 	}
 	
 	//override
+	/*
 	public void addRow(String name){
 		super.addRow( name );
 		
@@ -161,6 +162,7 @@ public class InternalTablePane
 		
 		setUpTypeRow();
 	}
+	*/
 	
 	// --- ActionListener ---
 	public void actionPerformed(ActionEvent e) {

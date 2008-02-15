@@ -129,8 +129,12 @@ public class BasicTable
 		return tableModel.getRow(rowIndex);
 	}
 	
-	public void insertRow(List<Object> rowData, int rowIndex, String rowName){
-		tableModel.insertRow(rowData, rowIndex, rowName);
+	public void addRow(List<Object> rowData, int rowIndex, String rowName){
+		tableModel.addRow(rowData, rowIndex, rowName);
+		
+		if(tableListener != null){
+			tableListener.rowAdded(new TableEvent(this));
+		}
 	}
 	
 	public void removeSelectedRows(){

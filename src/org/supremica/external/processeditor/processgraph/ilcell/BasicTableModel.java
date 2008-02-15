@@ -173,20 +173,23 @@ public class BasicTableModel
 		return dataList.get(rowIndex);
 	}
 	
-	public void insertRow(List<Object> rowData, int rowIndex, String rowName){
-		if(rowData == null ||
-		   rowIndex > dataList.size()){
-			return;
+	public void addRow(List<Object> rowData, int rowIndex, String rowName){
+		
+		if(rowData == null){
+			rowData = new LinkedList<Object>();
 		}
 		
-		if(rowData.size() != getRowCount()){
-			return;
+		if(rowData.size() > getRowCount()){
+			rowData = rowData.subList(0, getRowCount()-1);
 		}
 		
+		while(rowData.size() < getRowCount()){
+			rowData.add("");
+		}
 		
 		dataList.add(rowIndex, rowData);
-		fireTableStructureChanged();
+		rowNames.add(rowName);
 		
-		System.out.println("Row data added");
+		fireTableStructureChanged();
 	}
 }

@@ -1,9 +1,10 @@
 package org.supremica.external.processeditor.processgraph.ilcell;
 
 import java.util.List;
+import java.util.LinkedList;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
-
+import java.math.BigInteger;
 import javax.swing.JMenuItem;
 
 
@@ -36,6 +37,9 @@ public class ILStructureGroupPane
 	boolean showRowHeader = true;
 	
 	private long timeStamp = 0;
+	private boolean controlDown = false;
+	
+	private List<Term> termCopyList = null;
 	
 	public ILStructureGroupPane(ILStructure ilStructure){
 		super();
@@ -234,6 +238,47 @@ public class ILStructureGroupPane
 		showTables();
 	}
 	
+	public void copyTerms(){
+		Term[] terms = getTerms();
+		
+		if(selectedRows.length > 0){
+			termCopyList = new LinkedList<Term>();
+			
+			for(int i = 0; i < selectedRows.length; i++){
+				
+				/*
+				 * terms[0] is row 1 in table.
+				 * Thats why selectedRows[i]-1 
+				 */
+				if(0 <= selectedRows[i] - 1){
+					termCopyList.add(terms[selectedRows[i]-1]);
+				}
+			}
+		}
+	}
+	
+	public void insertTermCopies(){
+		int diff = 0;
+		
+		if(null == termCopyList || termCopyList.size() == 0){
+			return;
+		}
+		
+		if(selectedRows.length == 0){
+			return;
+		}
+		
+		diff = selectedRows[0] - termCopyList.get(0).getRow().intValue();
+		for(Term term : termCopyList){
+			
+			term.setRow(term.getRow().add(BigInteger.valueOf(diff - 1)));
+			//add empty row
+			addConditionRow(term.getRow().intValue() + 1, null);
+		}
+		
+		//writhe to empty row
+		insertTerms(termCopyList);
+	}
 	
 	public void addConditionRow(){
 		tableMode.addRow(ROWNAME);
@@ -242,6 +287,27 @@ public class ILStructureGroupPane
     	tableOperation.addRow(ROWNAME);
     	tableZone.addRow(ROWNAME);
     	tableProduct.addRow(ROWNAME);
+	}
+	
+	public void addConditionRow(int rowIndex, BasicTable table){
+		
+		if(rowIndex == 0){
+			rowIndex = 1;
+		}else if(rowIndex > tableMode.getRowCount()){
+			addConditionRow();
+			return;
+		}
+		
+		tableMode.addRow(rowIndex, ROWNAME);
+		tableInternal.addRow(rowIndex, ROWNAME);
+		tableExternal.addRow(rowIndex, ROWNAME);
+    	tableOperation.addRow(rowIndex, ROWNAME);
+    	tableZone.addRow(rowIndex, ROWNAME);
+    	tableProduct.addRow(rowIndex, ROWNAME);
+    	
+    	if(null != table){
+    		table.getSelectionModel().setSelectionInterval(rowIndex, rowIndex);
+    	}
 	}
 	
 	public void addConditionRow(Term term){
@@ -326,6 +392,10 @@ public class ILStructureGroupPane
 		}
 	}
 	
+	public void columnRemoved(TableEvent e){
+		termCopyList = null;
+	}
+	
 	private void setRowNames(){
 		
 		tableMode.getTable().getModel().setRowName(0, "");
@@ -361,6 +431,10 @@ public class ILStructureGroupPane
 	}
 	
 	//override
+	public void keyPressed(KeyEvent e){
+		controlDown = (e.getModifiersEx() == KeyEvent.CTRL_DOWN_MASK);
+	} 
+	
 	public void keyReleased(KeyEvent e){
 		
 		/*
@@ -377,9 +451,41 @@ public class ILStructureGroupPane
 				}
 			}
 			
-			if(e.getKeyCode() == KeyEvent.VK_N &&
-					e.getModifiersEx() == KeyEvent.CTRL_DOWN_MASK){
-				addConditionRow();
+			//Is CTRL down 
+			if(controlDown){
+				
+				//N
+				if(e.getKeyCode() == KeyEvent.VK_N){
+					if(selectedRows.length > 0){
+						if(e.getSource() instanceof BasicTable){
+							addConditionRow(selectedRows[0] + 1, (BasicTable) e.getSource());
+						}
+					}
+				}
+				
+				//C
+				if(e.getKeyCode() == KeyEvent.VK_C){
+						copyTerms();
+				}
+				
+				//V
+				if(e.getKeyCode() == KeyEvent.VK_V){
+					int row = selectedRows[0];
+					insertTermCopies();	
+					
+					if(e.getSource() instanceof BasicTable){
+						
+						((BasicTable)e.getSource()).getSelectionModel().setSelectionInterval(row,row);
+					}
+				}
+				
+				//X
+				if(e.getKeyCode() == KeyEvent.VK_X){
+					copyTerms();
+					if(e.getSource() instanceof BasicTable){
+						deleteSelectedRows((BasicTable) e.getSource());
+					}
+				}
 			}
 		}
 	}

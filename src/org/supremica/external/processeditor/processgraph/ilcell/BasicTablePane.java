@@ -107,6 +107,12 @@ public class BasicTablePane
 		showRowHeader(showRowHeader);
 	}
 	
+	public void addRow(int rowIndex, String rowName){
+		table.addRow(null, rowIndex, rowName);
+		table.setPreferredScrollableViewportSize(table.getPreferredSize());
+		showRowHeader(showRowHeader);
+	}
+	
 	public void removeRow(int index){
 		table.getModel().removeRow(index);
 		showRowHeader(showRowHeader);

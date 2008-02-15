@@ -100,29 +100,6 @@ public class TableGroupPane
 		}
 	}
 	
-	public void insertRowCopyAt(int index){
-		
-		BasicTablePane table = null;
-		
-		if(rowTableCopy == null){
-			return;
-		}
-		
-		if(rowTableCopy.length != getComponentCount()){
-			return;
-		}
-		
-		
-		for(int i = 0; i < getComponentCount(); i++){
-			Object o = getComponent(i);
-			if(o instanceof BasicTablePane){
-				table = (BasicTablePane) o;
-				table.getTable().insertRow((List<Object>)rowTableCopy[i], index, rowCopyName);
-			}	
-		}
-	}
-	
-	
 	// ---- TableListener ---- //
 	public void tableSelectionChanged(TableEvent e){
 		selectedRows = e.getSource().getSelectedRows();
@@ -149,12 +126,6 @@ public class TableGroupPane
 	
 	public void actionPerformed( ActionEvent event ){
 		// Add action handling code here
-		if(event.getActionCommand().equals("New row")){
-			copyRow(1);
-			insertRowCopyAt(1);
-		}else{
-			System.out.println( "Unknown event: " + event );
-		}
 	}
 	
 	public void mousePressed(MouseEvent e) {
