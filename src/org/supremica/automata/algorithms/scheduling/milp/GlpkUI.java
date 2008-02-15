@@ -42,7 +42,11 @@ public class GlpkUI
         throws Exception
     {
         this.milpConstructor = milpConstructor;
-        
+    }
+    
+    public void initialize()
+        throws MilpException, IOException
+    {
         // Initialize the model file
         modelFile = File.createTempFile("milp", ".mod");
         modelFile.deleteOnExit();
@@ -363,11 +367,15 @@ public class GlpkUI
             if (milpEchoStr.contains("+") && milpEchoStr.contains(":") && 
                     milpEchoStr.contains("mip") && milpEchoStr.contains(">="))
             {
+                if (lpIterationCount.equals("") && totalIterationCount.equals(""))
+                {
+                    lpIterationCount = milpEchoStr.substring(milpEchoStr.indexOf("+") + 1, milpEchoStr.indexOf(":")).trim();
+                }
                 totalIterationCount = milpEchoStr.substring(milpEchoStr.indexOf("+") + 1, milpEchoStr.indexOf(":")).trim();
             }
-            else if (milpEchoStr.contains("*") && milpEchoStr.contains("objval"))
+            else if (milpEchoStr.contains("objval"))
             {
-                lpIterationCount = milpEchoStr.substring(milpEchoStr.indexOf("*") + 1, milpEchoStr.indexOf(":")).trim();
+                lpIterationCount = milpEchoStr.substring(0, milpEchoStr.indexOf(":")).trim();
             }
             
 //             if (milpEchoStr.contains("INTEGER OPTIMAL SOLUTION FOUND") || milpEchoStr.contains("Time") || milpEchoStr.contains("Memory"))

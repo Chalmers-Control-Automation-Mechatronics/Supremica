@@ -222,15 +222,40 @@ public class Milp
     public Milp(Automata theAutomata, boolean buildSchedule)
     throws Exception
     {
-        this(theAutomata, buildSchedule, false);
+        this(theAutomata, buildSchedule, SchedulingConstants.MILP_GLPK);
+    }
+    
+    public Milp(Automata theAutomata, boolean buildSchedule, String milpSolverName)
+        throws Exception
+    {
+        this(theAutomata, buildSchedule, milpSolverName, false);
     }
     
     public Milp(Automata theAutomata, boolean buildSchedule, boolean balanceVelocities)
     throws Exception
     {
+        this(theAutomata, buildSchedule, SchedulingConstants.MILP_GLPK, balanceVelocities);
+    }
+    
+    public Milp(Automata theAutomata, boolean buildSchedule, String milpSolverName, boolean balanceVelocities)
+    throws Exception
+    {
         this.theAutomata = theAutomata;
         this.buildSchedule = buildSchedule;
         this.balanceVelocities = balanceVelocities;
+        
+        if (milpSolverName.equals(SchedulingConstants.MILP_GLPK))
+        {
+            milpSolver = new GlpkUI(this);
+        }
+        else if (milpSolverName.equals(SchedulingConstants.MILP_CBC))
+        {
+            milpSolver = new MpsUI(this);
+        }
+        else
+        {
+            throw new Exception(milpSolverName + " = is not a known MILP-solver.");
+        }
     }
     
     public void startSearchThread()
@@ -284,7 +309,12 @@ public class Milp
             
             //new... test... (should be called when mutex constraints already are created)
             //TODO: better name... better implementation...
+            ActionTimer at = new ActionTimer();
+            at.start();
             createNonCrossbookingConstraints();
+            at.stop();
+            addToMessages("Time for the creation of noncrossbooking constraints = " + 
+                    at.elapsedTime() + "ms", SchedulingConstants.MESSAGE_TYPE_INFO);
             
             milpSolver.createModelFile();
             
@@ -626,7 +656,7 @@ public class Milp
         
         initAltPathVarTrees();
         
-        milpSolver = new GlpkUI(this);
+        milpSolver.initialize();
     }
     
     
@@ -2065,14 +2095,10 @@ public class Milp
 //            consecutiveBookingTicsIndices.keySet().toArray(new int[][]{}));
 //        graphExplorer.findConnectedCycles();
         // Sanity-check...
-        ActionTimer at = new ActionTimer();
-        at.start();
         BookingPairsGraphExplorer cycleFinder =  
                 new BookingPairsGraphExplorer(consecutiveBookingEdges, plants.size());
         
        ArrayList<ArrayList<Edge>> rainbowCycles = cycleFinder.enumerateAllCycles();
-       at.stop();
-       addToMessages("circuit searching time = " + at.elapsedTime() + "ms", SchedulingConstants.MESSAGE_TYPE_WARN);
        for (ArrayList<Edge> cycle : rainbowCycles)
        {
            ArrayList<String> deadlockConstraint = new ArrayList<String>();

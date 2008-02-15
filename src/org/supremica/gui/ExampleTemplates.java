@@ -355,6 +355,9 @@ public class ExampleTemplates
         thisGroup.addItem(new TemplateItem("Fisher & Thompson, 6x6 (6 robots, 6 zones)", prefix + "ft06.xml"));
         thisGroup.addItem(new TemplateItem("Fisher & Thompson, 10x10 (10 robots, 10 zones)", prefix + "ft10.xml"));
         thisGroup.addItem(new TemplateItem("Fisher & Thompson, 20x5 (20 robots, 5 zones)", prefix + "ft20.xml"));
+        thisGroup.addItem(new TemplateItem("Modified Fisher & Thompson, 6x6 (6 robots, 6 zones, no buffers)", prefix + "ft06_no_buffers.xml"));
+        thisGroup.addItem(new TemplateItem("Modified Fisher & Thompson, 10x10 (10 robots, 10 zones, no buffers)", prefix + "ft10_no_buffers.xml"));
+        thisGroup.addItem(new TemplateItem("Modified Fisher & Thompson, 20x5 (20 robots, 5 zones, no buffers)", prefix + "ft20_no_buffers.xml"));
     }
     
     /*

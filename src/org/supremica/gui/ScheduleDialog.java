@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.gui.ide.actions
 //# CLASS:   ScheduleDialog
 //###########################################################################
-//# $Id: ScheduleDialog.java,v 1.57 2008-02-14 02:24:09 robi Exp $
+//# $Id: ScheduleDialog.java,v 1.58 2008-02-15 07:59:16 avenir Exp $
 //###########################################################################
 
 package org.supremica.gui;
@@ -26,7 +26,7 @@ public class ScheduleDialog
     extends JDialog
 {
     private static final long serialVersionUID = 1L;
-    private static final String[] optimizationMethods = new String[] {SchedulingConstants.MODIFIED_A_STAR, SchedulingConstants.MILP, SchedulingConstants.VIS_GRAPH, SchedulingConstants.MULTITHREADED_A_STAR, "Velocity Balancing"}; //, "Modified IDA*", "Modified SMA*"};
+    private static final String[] optimizationMethods = new String[] {SchedulingConstants.MODIFIED_A_STAR, SchedulingConstants.MILP_GLPK, SchedulingConstants.MILP_CBC, SchedulingConstants.VIS_GRAPH, SchedulingConstants.MULTITHREADED_A_STAR, "Velocity Balancing"}; //, "Modified IDA*", "Modified SMA*"};
     private static final String[] astarHeuristics = new String[] {SchedulingConstants.ONE_PRODUCT_RELAXATION, SchedulingConstants.SUBOPTIMAL, SchedulingConstants.TWO_PRODUCT_RELAXATION, SchedulingConstants.VIS_GRAPH_TIME_RELAXATION, SchedulingConstants.VIS_GRAPH_NODE_RELAXATION, SchedulingConstants.BRUTE_FORCE_RELAXATION};
     private static final String[] milpHeuristics = new String[] {SchedulingConstants.OPTIMAL, SchedulingConstants.SUBOPTIMAL };
     private static Logger logger = LoggerFactory.createLogger(ScheduleDialog.class);
@@ -164,7 +164,7 @@ public class ScheduleDialog
                             heuristicsBox.addItem(heuristic);
                     }
                 }
-                else if (((String)optiMethodsBox.getSelectedItem()).equals("MILP"))
+                else if (((String)optiMethodsBox.getSelectedItem()).contains(SchedulingConstants.MILP))
                 {
                     heuristicsBox.setEnabled(true);
                     
@@ -295,11 +295,11 @@ public class ScheduleDialog
                     sched = new ModifiedAstar(selectedAutomata, (String) heuristicsBox.getSelectedItem(), nodeExpander.isSelected(), buildAutomaton.isSelected()); 
                 }
             }
-            else if (optiMethodsBox.getSelectedItem().equals(SchedulingConstants.MILP))
+            else if (((String)optiMethodsBox.getSelectedItem()).contains(SchedulingConstants.MILP))
             {
                 if (selectedHeuristic.equals(SchedulingConstants.OPTIMAL))
                 {
-                    sched = new Milp(selectedAutomata, buildAutomaton.isSelected()); 
+                    sched = new Milp(selectedAutomata, buildAutomaton.isSelected(), (String)optiMethodsBox.getSelectedItem()); 
                 }
                 else if (selectedHeuristic.equals(SchedulingConstants.SUBOPTIMAL))
                 {

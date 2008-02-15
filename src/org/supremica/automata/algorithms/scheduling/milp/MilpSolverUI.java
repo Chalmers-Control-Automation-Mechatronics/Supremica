@@ -23,6 +23,9 @@ public interface MilpSolverUI
     public void createModelFile()
         throws MilpException, IOException;
     
+    public void initialize()
+        throws MilpException, IOException;
+    
     /**
      * Launches the (external) MILP-solver.
      */
