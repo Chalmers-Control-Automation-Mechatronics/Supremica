@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.compiler
 //# CLASS:   CompilerOperatorTable
 //###########################################################################
-//# $Id: CompilerOperatorTable.java,v 1.9 2007-12-04 03:22:55 robi Exp $
+//# $Id: CompilerOperatorTable.java,v 1.10 2008-02-15 02:17:19 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.compiler;
@@ -20,6 +20,9 @@ import net.sourceforge.waters.model.expr.Operator;
 import net.sourceforge.waters.model.expr.OperatorTable;
 import net.sourceforge.waters.model.expr.UnaryOperator;
 import net.sourceforge.waters.model.expr.Value;
+import net.sourceforge.waters.model.module.BinaryExpressionProxy;
+import net.sourceforge.waters.model.module.ModuleProxyFactory;
+import net.sourceforge.waters.model.module.SimpleExpressionProxy;
 
 
 /**
@@ -178,11 +181,33 @@ public class CompilerOperatorTable extends AbstractOperatorTable {
   //#########################################################################
   //# Inner Class AbstractBinaryIntOperator
   /**
+   * The abstract type of all binary operators whose parse result is
+   * a binary expression ({@link BinaryExpressionProxy}).
+   */
+  private static abstract class AbstractBinaryOperator
+    implements BinaryOperator
+  {
+
+    //#######################################################################
+    //# Interface net.sourceforge.waters.model.expr.BinaryOperator
+    public BinaryExpressionProxy createExpression
+      (final ModuleProxyFactory factory,
+       final SimpleExpressionProxy lhs,
+       final SimpleExpressionProxy rhs,
+       final String text)
+    {
+      return factory.createBinaryExpressionProxy(text, this, lhs, rhs);
+    }
+
+  }
+
+
+  /**
    * The abstract type of all binary operators that combine two integer
    * values and return another integer.
    */
   private static abstract class AbstractBinaryIntOperator
-    implements BinaryOperator
+    extends AbstractBinaryOperator
   {
 
     //#######################################################################
@@ -458,7 +483,7 @@ public class CompilerOperatorTable extends AbstractOperatorTable {
    * arbitrary, but matching types and return a boolean value as result.
    */
   private abstract static class AbstractBinaryEqualsOperator
-    implements BinaryOperator
+    extends AbstractBinaryOperator
   {
 
     //#######################################################################
@@ -558,7 +583,7 @@ public class CompilerOperatorTable extends AbstractOperatorTable {
    * values and return a boolean result.
    */
   private static abstract class AbstractBinaryComparisonOperator
-    implements BinaryOperator
+    extends AbstractBinaryOperator
   {
 
     //#######################################################################
@@ -717,7 +742,7 @@ public class CompilerOperatorTable extends AbstractOperatorTable {
    * values and return another Boolean.
    */
   private static abstract class AbstractBinaryBooleanOperator
-    implements BinaryOperator
+    extends AbstractBinaryOperator
   {
 
     //#######################################################################
@@ -906,7 +931,8 @@ public class CompilerOperatorTable extends AbstractOperatorTable {
 
   //#########################################################################
   //# Inner Class BinaryRangeOperator
-  private static class BinaryRangeOperator implements BinaryOperator
+  private static class BinaryRangeOperator
+    extends AbstractBinaryOperator
   {
 
     //#######################################################################
@@ -977,7 +1003,7 @@ public class CompilerOperatorTable extends AbstractOperatorTable {
    * When evaluated, they produce the result of the assignment.
    */
   private abstract static class AbstractBinaryAssignmentOperator
-    implements BinaryOperator
+    extends AbstractBinaryOperator
   {
 
     //#######################################################################

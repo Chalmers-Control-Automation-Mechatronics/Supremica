@@ -4,19 +4,20 @@
 //# PACKAGE: net.sourceforge.waters.model.expr
 //# CLASS:   BinaryExpressionResult
 //###########################################################################
-//# $Id: BinaryExpressionResult.java,v 1.1 2006-09-06 11:52:21 robi Exp $
+//# $Id: BinaryExpressionResult.java,v 1.2 2008-02-15 02:17:19 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.expr;
 
 import net.sourceforge.waters.model.module.ModuleProxyFactory;
 import net.sourceforge.waters.model.module.SimpleExpressionProxy;
-import net.sourceforge.waters.model.module.BinaryExpressionProxy;
 
 
 /**
- * An intermediate result of the expression parser that produces an
- * binary expression ({@link BinaryExpressionProxy}) object.
+ * An intermediate result of the expression parser that produces an binary
+ * expression ({@link
+ * net.sourceforge.waters.model.module.BinaryExpressionProxy
+ * BinaryExpressionProxy}) object.
  *
  * @author Robi Malik
  */
@@ -45,12 +46,12 @@ class BinaryExpressionResult extends ParseResult {
     return mOperator.getReturnTypes(lhstypes, rhstypes);
   }
 
-  BinaryExpressionProxy createProxy(final ModuleProxyFactory factory,
+  SimpleExpressionProxy createProxy(final ModuleProxyFactory factory,
                                     final String text)
   {
     final SimpleExpressionProxy lhs = mLHS.createProxy(factory);
     final SimpleExpressionProxy rhs = mRHS.createProxy(factory);
-    return factory.createBinaryExpressionProxy(text, mOperator, lhs, rhs);
+    return mOperator.createExpression(factory, lhs, rhs, text);
   }
 
 

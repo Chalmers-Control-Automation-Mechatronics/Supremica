@@ -4,10 +4,13 @@
 //# PACKAGE: net.sourceforge.waters.model.expr
 //# CLASS:   BinaryOperator
 //###########################################################################
-//# $Id: BinaryOperator.java,v 1.2 2005-11-03 01:24:16 robi Exp $
+//# $Id: BinaryOperator.java,v 1.3 2008-02-15 02:17:19 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.expr;
+
+import net.sourceforge.waters.model.module.ModuleProxyFactory;
+import net.sourceforge.waters.model.module.SimpleExpressionProxy;
 
 
 /**
@@ -27,6 +30,15 @@ public interface BinaryOperator extends Operator {
   public int getLHSTypes();
 
   public int getRHSTypes();
+
+
+  //#########################################################################
+  //# Parsing Support
+  public SimpleExpressionProxy createExpression
+    (final ModuleProxyFactory factory,
+     final SimpleExpressionProxy lhs,
+     final SimpleExpressionProxy rhs,
+     final String text);
 
 
   //#########################################################################
