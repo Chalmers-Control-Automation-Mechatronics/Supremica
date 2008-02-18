@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.gui.ide.actions
 //# CLASS:   ScheduleDialog
 //###########################################################################
-//# $Id: ScheduleDialog.java,v 1.58 2008-02-15 07:59:16 avenir Exp $
+//# $Id: ScheduleDialog.java,v 1.59 2008-02-18 11:44:04 avenir Exp $
 //###########################################################################
 
 package org.supremica.gui;
@@ -13,6 +13,7 @@ import javax.swing.*;
 import java.awt.GridLayout;
 import java.awt.event.*;
 import java.io.*;
+import org.supremica.automata.AlphabetHelpers;
 import org.supremica.automata.algorithms.scheduling.milp.RandomPathUsingMilp;
 import org.supremica.log.Logger;
 import org.supremica.log.LoggerFactory;
@@ -242,6 +243,13 @@ public class ScheduleDialog
                 for (int i = 0; i < vb.getOptimalSubPlants().size(); i++)
                 {
                     ide.getActiveDocumentContainer().getAnalyzerPanel().addAutomaton(vb.getOptimalSubPlants().getAutomatonAt(i));
+                }
+                
+                //temp
+                Automata subControllers = vb.getSubControllers();
+                for (int i = 0; i < subControllers.size(); i++)
+                {
+                    ide.getActiveDocumentContainer().getAnalyzerPanel().addAutomaton(subControllers.getAutomatonAt(i));
                 }
                 
                 close();

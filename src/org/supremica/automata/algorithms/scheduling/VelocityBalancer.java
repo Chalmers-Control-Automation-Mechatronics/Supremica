@@ -1735,4 +1735,91 @@ public class VelocityBalancer
     {
         return optimalSubPlants;
     }
+    
+    public Automata getSubControllers()
+    {
+        Alphabet zoneAlphabet = new Alphabet();
+        for (Automaton zone : specs)
+        {
+            zoneAlphabet.union(zone.getAlphabet());
+        } 
+        
+        Automata subControllers =  new Automata();
+        for (int i = 0; i < plants.size(); i++)
+        {
+            Automaton subController = new Automaton("subC_" + plants.getAutomatonAt(i).getName());
+            State currState = new State("q0");
+            currState.setInitial(true);
+            currState.setAccepting(true);
+            subController.addState(currState);
+            subControllers.addAutomaton(subController);
+        }    
+        Automaton subController = new Automaton("subC_" + schedule.getName());
+        State currState = new State("q0");
+        currState.setInitial(true);
+        currState.setAccepting(true);
+        subController.addState(currState);
+        subControllers.addAutomaton(subController);
+        
+        State scheduleState = schedule.getInitialState();
+        boolean firstLoop = true;
+        while (firstLoop || !scheduleState.isInitial())
+        {
+            firstLoop = false;
+            Arc arc = scheduleState.outgoingArcsIterator().next();
+            
+            if (zoneAlphabet.contains(arc.getEvent()))
+            {
+                Automaton commonSubController = subControllers.getAutomatonAt(subControllers.size()-1);
+                State currCommonState = commonSubController.getStateWithName("q" + (commonSubController.nbrOfStates() - 1));
+                State nextCommonState = new State("q" + commonSubController.nbrOfStates());
+                Arc newArc = new Arc(currCommonState, nextCommonState, arc.getEvent());
+                commonSubController.addState(nextCommonState);
+                commonSubController.addArc(newArc);
+                if (!commonSubController.getAlphabet().contains(arc.getEvent()))
+                {
+                    commonSubController.getAlphabet().addEvent(arc.getEvent());
+                }
+            }
+            else
+            {
+                for (int i = 0; i < plants.size(); i++)
+                {
+                    if (optimalSubPlants.getAutomatonAt(i).getAlphabet().contains(arc.getEvent()))
+                    {
+                        Automaton currSubController = subControllers.getAutomatonAt(i);
+                        State currSubState = currSubController.getStateWithName("q" + (currSubController.nbrOfStates() - 1));
+                        State nextSubState = new State("q" + currSubController.nbrOfStates());
+                        Arc newArc = new Arc(currSubState, nextSubState, arc.getEvent());
+                        currSubController.addState(nextSubState);
+                        currSubController.addArc(newArc);
+                        if (!currSubController.getAlphabet().contains(arc.getEvent()))
+                        {
+                            currSubController.getAlphabet().addEvent(arc.getEvent());
+                        }
+                    }
+                }
+            }
+            
+            scheduleState = arc.getToState();
+        }
+         
+        for (int i = 0; i < subControllers.size(); i++)
+        {
+            Automaton currSubC = subControllers.getAutomatonAt(i);
+            for (int j=0; j<currSubC.nbrOfStates(); j++)
+            {
+                State state = currSubC.getStateWithIndex(j);
+                if (!state.outgoingArcsIterator().hasNext())
+                {
+                    Arc inArc = state.incomingArcsIterator().next();
+                    currSubC.addArc(new Arc(inArc.getFromState(), currSubC.getInitialState(), inArc.getEvent()));
+                    currSubC.removeState(state);
+                    break;
+                }
+            }
+        }
+        
+        return subControllers;
+    }
 }
