@@ -33,10 +33,12 @@ public class MpsUI
     private Milp milpConstructor = null;
             
     /** The optimal times (for each plant-state) that the GLPK solver returns */
-    private double[][] optimalTimes = null;
+//    private double[][] optimalTimes = null;
+    private double[] optimalTimeVarValues = null;
     
     /** The optimal alt. path variables (booleans) for each [plant][start_state][end_state] */
-    private boolean[][][] optimalAltPathVariables = null;
+//    private boolean[][][] optimalAltPathVariables = null;
+    private boolean[] optimalBinVarValues = null;
     
     Hashtable<String, Integer> binVarIndexMap = new Hashtable<String, Integer>();
     Hashtable<String, Integer> timeVarIndexMap = new Hashtable<String, Integer>();
@@ -58,11 +60,11 @@ public class MpsUI
         mpsFile.deleteOnExit();
 
         // Initialize the solution file
-//        solutionFile = File.createTempFile("milp", ".txt");
-//        solutionFile.deleteOnExit();
+        solutionFile = File.createTempFile("milp", ".sol");
+        solutionFile.deleteOnExit();
         
         milpConstructor.addToMessages("model: " + mpsFile.getPath() + "\n", SchedulingConstants.MESSAGE_TYPE_INFO);
-//        milpConstructor.addToMessages("solution: " + solutionFile.getPath() + "\n", SchedulingConstants.MESSAGE_TYPE_INFO);
+        milpConstructor.addToMessages("solution: " + solutionFile.getPath() + "\n", SchedulingConstants.MESSAGE_TYPE_INFO);
     }
     
     /**
@@ -440,42 +442,65 @@ public class MpsUI
      * This method-header allows to choose the model file manually (instead of 
      * a temporary file that would be created by the system automatically).
      */
-    private void launchMilpSolver(File currmpsFile)
+    private void launchMilpSolver(File mpsFile)
         throws MilpException, IOException
-    {
-        // Defines the name of the .exe-file that will launch the GLPK-solver,
-        // as well the arguments that are sent as input to the solve (e.g. *.mod and *.sol file names)
-//        String[] cmds = new String[5];
-//        cmds[0] = "glpsol";
-//        cmds[1] = "-m";
-//        cmds[2] = currmpsFile.getAbsolutePath();
-//        cmds[3] = "-o";
-//        cmds[4] = solutionFile.getAbsolutePath();
+    {               
+        try
+        {
+            // Launches the MILP-solver
+            milpProcess = Runtime.getRuntime().exec(new String[]{"cbc"});
+            BufferedWriter commandWriter = new BufferedWriter(
+                    new OutputStreamWriter(new DataOutputStream(milpProcess.getOutputStream())));
+            commandWriter.write("import " + mpsFile.getAbsolutePath() + "\n");
+            commandWriter.write("solve\n");
+            commandWriter.write("solution " + solutionFile.getAbsolutePath() + "\n");
+            commandWriter.write("quit\n");
+            commandWriter.flush();
+            commandWriter.close();
+        }
+        catch (IOException milpNotFoundException)
+        {
+            milpConstructor.addToMessages("The CBC-solver 'cbc.exe' not found. " +
+                    "Make sure that it is registered in your path.", SchedulingConstants.MESSAGE_TYPE_ERROR);
+            
+            throw new MilpException(milpNotFoundException.getMessage());
+        }
         
-//        try
-//        {
-//            // Launches the MILP-solver with the arguments defined above
-//            milpProcess = Runtime.getRuntime().exec(cmds);
-//        }
-//        catch (IOException milpNotFoundException)
-//        {
-//            milpConstructor.addToMessages("The GLPK-solver 'glpsol.exe' not found. " +
-//                    "Make sure that it is registered in your path.", SchedulingConstants.MESSAGE_TYPE_ERROR);
-//            
-//            throw new MilpException(milpNotFoundException.getMessage());
-//        }
-//        
-//        // Listens for the output of MILP (that is the input to this application)...
-//        BufferedReader milpEcho = new BufferedReader(
-//                new InputStreamReader(new DataInputStream(milpProcess.getInputStream())));
-//        
-//        // ...and prints it to stdout
-//        String milpEchoStr = "";
-//        String totalMilpEchoStr = "";
-//        String totalIterationCount = "";
-//        String lpIterationCount = "";
-//        while ((milpEchoStr = milpEcho.readLine()) != null)
-//        {
+        // Listens for the output of MILP (that is the input to this application)...
+        BufferedReader milpEcho = new BufferedReader(
+                new InputStreamReader(new DataInputStream(milpProcess.getInputStream())));
+        
+        // ...and prints it to stdout
+        String milpEchoStr = "";
+        String totalMilpEchoStr = "";
+        String totalIterationCount = "";
+        String lpIterationCount = "";
+        while ((milpEchoStr = milpEcho.readLine()) != null)
+        {
+            if (milpEchoStr.contains("Result"))
+            {
+                System.out.println("milpecho = " + milpEchoStr);
+                
+                milpEchoStr = milpEchoStr.substring(milpEchoStr.indexOf("objective") + 10).trim();
+                String objValue = milpEchoStr.substring(0, milpEchoStr.indexOf("after")).trim();
+                
+                milpEchoStr = milpEchoStr.substring(milpEchoStr.indexOf("after") + 6).trim();
+                String nrNodes = milpEchoStr.substring(0, milpEchoStr.indexOf("node")).trim();
+                
+                milpEchoStr = milpEchoStr.substring(milpEchoStr.indexOf("and") + 4).trim();
+                String nrIters = milpEchoStr.substring(0, milpEchoStr.indexOf("iteration")).trim();
+                
+                milpEchoStr = milpEchoStr.substring(milpEchoStr.indexOf("took") + 5).trim();
+                String runTime = milpEchoStr.substring(0, milpEchoStr.indexOf("sec")).trim();
+                
+                milpConstructor.addToMessages("\tOptimization time = " + runTime, 
+                        SchedulingConstants.MESSAGE_TYPE_INFO); 
+                milpConstructor.addToMessages("\t\tOPTIMAL MAKESPAN: " + objValue, 
+                        SchedulingConstants.MESSAGE_TYPE_INFO);
+                milpConstructor.addToMessages("\t Nr of nodes = " + nrNodes +"; nr of iterations = " + nrIters, 
+                        SchedulingConstants.MESSAGE_TYPE_INFO);
+            }
+        }
 //            totalMilpEchoStr += milpEchoStr + "\n";
 //            
 //            if (milpEchoStr.contains("+") && milpEchoStr.contains(":") && 
@@ -513,25 +538,54 @@ public class MpsUI
     public void processSolutionFile()
         throws MilpException, FileNotFoundException, IOException
     {       
-//        optimalTimes = new double[milpConstructor.getDeltaTimes().length][];
-//        for (int i=0; i<optimalTimes.length; i++)
-//        {
-//            optimalTimes[i] = new double[milpConstructor.getDeltaTimes()[i].length];
-//        }
-//        
-//        optimalAltPathVariables = new boolean[milpConstructor.getDeltaTimes().length][][];
-//        for (int i=0; i<optimalAltPathVariables.length; i++)
-//        {
-//            optimalAltPathVariables[i] = new boolean[milpConstructor.getDeltaTimes()[i].length]
-//                    [milpConstructor.getDeltaTimes()[i].length];
-//        }
-//        
-//        BufferedReader r = new BufferedReader(new FileReader(solutionFile));
-//        String str = r.readLine();
-//        
-//        // Go through the solution file and extract the suggested optimal times for each state
-//        while (str != null)
-//        {
+        optimalTimeVarValues = new double[timeVarIndexMap.size()];
+        for (int i = 0; i < optimalTimeVarValues.length; i++)
+        {
+            optimalTimeVarValues[i] = 0;
+        }
+        optimalBinVarValues = new boolean[binVarIndexMap.size()];
+        for (int i = 0; i < optimalBinVarValues.length; i++)
+        {
+            optimalBinVarValues[i] = false;
+        }
+        
+        BufferedReader r = new BufferedReader(new FileReader(solutionFile));
+     
+        // Go through the solution file and extract the suggested optimal times for each state
+        String str;
+        while ((str = r.readLine()) != null)
+        {
+            int cutIndex = str.indexOf("X");
+            if (cutIndex > 0)
+            {
+                str = str.substring(cutIndex + 1);
+                cutIndex = str.indexOf(" ");
+                int varIndex = (new Integer(str.substring(0, cutIndex).trim())).intValue();
+                
+                str = str.substring(cutIndex).trim();
+                cutIndex = str.indexOf(" ");
+                double varValue = (new Integer(str.substring(0, cutIndex).trim())).intValue();
+                
+                optimalBinVarValues[varIndex] = (varValue == 1);
+            }
+            else 
+            {
+                cutIndex = str.indexOf("T");
+                if (cutIndex > 0)
+                {
+                    str = str.substring(cutIndex + 1);
+                    cutIndex = str.indexOf(" ");
+                    int varIndex = (new Integer(str.substring(0, cutIndex).trim())).intValue();
+
+                    str = str.substring(cutIndex).trim();
+                    cutIndex = str.indexOf(" ");
+                    double varValue = (new Double(str.substring(0, cutIndex).trim())).intValue();
+
+                    optimalTimeVarValues[varIndex] = varValue;
+                }
+            }
+            
+            
 //            if (str.indexOf(" time[") > -1)
 //            {
 //                String strPlantIndex = str.substring(str.indexOf("[") + 1, str.indexOf(",")).trim();
@@ -593,9 +647,21 @@ public class MpsUI
 //                    optimalAltPathVariables[plantIndex][startStateIndex][endStateIndex] = true;
 //                }
 //            }
-//            
-//            str = r.readLine();
-//        }
+        }
+        
+        //temp
+        String s = "binVars: ";
+        for (int i = 0; i < optimalBinVarValues.length; i++)
+        {
+            s += "[" + i + " -> " + optimalBinVarValues[i] + "], ";
+        }
+        System.out.println(s);
+        s = "timeVArs: ";
+        for (int i = 0; i < optimalTimeVarValues.length; i++)
+        {
+            s += "[" + i + " -> " + optimalTimeVarValues[i] + "], ";
+        }
+        System.out.println(s);
     }
      
     /**
@@ -631,13 +697,17 @@ public class MpsUI
     /** Returns the optimal event occurrence times for each plant-state. */
     public double[][] getOptimalTimes()
     {
-        return optimalTimes;
+        //TODO...
+        //return optimalTimes;
+        return null;
     }
     
     /** Returns the optimal alt. path variable choices. */
     public boolean[][][] getOptimalAltPathVariables()
     {
-        return optimalAltPathVariables;
+        //TODO...
+        //return optimalAltPathVariables;
+       return null;
     }
     
     /**
