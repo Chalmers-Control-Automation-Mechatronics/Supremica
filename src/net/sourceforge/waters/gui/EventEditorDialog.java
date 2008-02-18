@@ -4,13 +4,14 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   EventEditorDialog
 //###########################################################################
-//# $Id: EventEditorDialog.java,v 1.23 2008-02-14 02:24:09 robi Exp $
+//# $Id: EventEditorDialog.java,v 1.24 2008-02-18 02:59:13 robi Exp $
 //###########################################################################
 
 
 package net.sourceforge.waters.gui;
 
 import java.awt.AWTKeyStroke;
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
@@ -29,6 +30,7 @@ import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.LinkedList;
 import java.util.Set;
@@ -36,6 +38,7 @@ import javax.swing.BorderFactory;
 import javax.swing.ButtonGroup;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
+import javax.swing.JColorChooser;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JTable;
@@ -59,6 +62,7 @@ import net.sourceforge.waters.gui.transfer.SelectionOwner;
 import net.sourceforge.waters.model.expr.ExpressionParser;
 import net.sourceforge.waters.model.expr.Operator;
 import net.sourceforge.waters.model.expr.ParseException;
+import net.sourceforge.waters.subject.module.ColorGeometrySubject;
 import net.sourceforge.waters.subject.module.EventDeclSubject;
 import net.sourceforge.waters.subject.module.ModuleSubject;
 import net.sourceforge.waters.subject.module.SimpleExpressionSubject;
@@ -243,6 +247,13 @@ public class EventEditorDialog
           }
         });
       mButtonsPanel.add(cancelButton);
+      // And record the colour ...
+      final ColorGeometrySubject geo = template.getColorGeometry();
+      if (geo == null || geo.getColorSet().isEmpty()) {
+        mChosenColor = EditorColor.DEFAULTMARKINGCOLOR;
+      } else {
+        mChosenColor = geo.getColorSet().iterator().next();
+      }
     }
     if (mDisplayingMoreOptions && mIndexPanel == null) {
       // Initialising with more options, and index panel not used before.
@@ -265,19 +276,35 @@ public class EventEditorDialog
       mRequiredButton.setRequestFocusEnabled(false);
       mRequiredButton.setSelected(scope != ScopeKind.OPTIONAL_PARAMETER);
       updateRequiredEnabled();
-      mColourButton = new JButton("Color ...");
-      mColourButton.setRequestFocusEnabled(false);
+      mColorDisplay = new JPanel();
+      mColorDisplay.setBackground(mChosenColor);
+      mColorDisplay.addMouseListener(new MouseAdapter() {
+          public void mouseClicked(final MouseEvent event)
+          {
+            if (event.getClickCount() == 2) {
+              chooseColor();
+            }
+          }
+        });
+      mColorButton = new JButton("Color ...");
+      mColorButton.setRequestFocusEnabled(false);
+      mColorButton.addActionListener(new ActionListener() {
+          public void actionPerformed(final ActionEvent event)
+          {
+            chooseColor();
+          }
+        });
       // ... add listeners to enable/disable the colour button ...
       final ActionListener kindlistener = new ActionListener() {
           public void actionPerformed(final ActionEvent event)
           {
-            updateColourEnabled();
+            updateColorEnabled();
           }
         };
       mControllableButton.addActionListener(kindlistener);
       mUncontrollableButton.addActionListener(kindlistener);
       mPropositionButton.addActionListener(kindlistener);
-      updateColourEnabled();
+      updateColorEnabled();
       // ... and create index panel.
       mIndexPanel = new RaisedDialogPanel();
       final List<SimpleExpressionSubject> ranges =
@@ -517,17 +544,21 @@ public class EventEditorDialog
     constraints.gridy++;
     layout.setConstraints(mRequiredButton, constraints);
     mNamePanel.add(mRequiredButton);
-    // mColourButton
+    // mColorButton
     constraints.gridx += 2;
     constraints.gridy -= 2;
     constraints.gridwidth = 1;
     constraints.weightx = 0.0;
     constraints.fill = GridBagConstraints.HORIZONTAL;
     constraints.anchor = GridBagConstraints.EAST;
-    layout.setConstraints(mColourButton, constraints);
-    mNamePanel.add(mColourButton);
+    layout.setConstraints(mColorButton, constraints);
+    mNamePanel.add(mColorButton);
+    // mColorDisplay
+    constraints.gridy += 1;
+    layout.setConstraints(mColorDisplay, constraints);
+    mNamePanel.add(mColorDisplay);
     // mMoreOptionsButton
-    constraints.gridy += 2;
+    constraints.gridy += 1;
     mMoreOptionsButton.setText("<< Less Options");
     layout.setConstraints(mMoreOptionsButton, constraints);
     mNamePanel.add(mMoreOptionsButton);
@@ -644,18 +675,35 @@ public class EventEditorDialog
     mRequiredButton.setEnabled(enable);
   }
 
+  /**
+   * Pops up a colour selection dialog to choose a colour for
+   * a proposition event.
+   */
+  private void chooseColor()
+  {
+    final Color newcolor = JColorChooser.showDialog
+      (this, "Choose Colour for Proposition", mChosenColor);
+    if (newcolor != null) {
+      mChosenColor = newcolor;
+      mColorDisplay.setBackground(mChosenColor);
+    }
+  }
 
   /**
    * Enables or disables the colour button.
    * This method is attached to action listeners in response to the
    * selection or deselection of the proposition radio button.
    */
-  private void updateColourEnabled()
+  private void updateColorEnabled()
   {
-    if (mColourButton != null) {
-      // final boolean enable = mPropositionButton.isSelected();
-      final boolean enable = false;
-      mColourButton.setEnabled(enable);
+    if (mColorButton != null) {
+      final boolean enable = mPropositionButton.isSelected();
+      mColorButton.setEnabled(enable);
+      mColorDisplay.setOpaque(enable);
+      final Border border = enable ?
+        BorderFactory.createLoweredBevelBorder() :
+        BorderFactory.createEmptyBorder();
+      mColorDisplay.setBorder(border);
     }
   }
 
@@ -899,9 +947,17 @@ public class EventEditorDialog
         }
         // ***
       }
+      final ColorGeometrySubject geo;
+      if (kind != EventKind.PROPOSITION ||
+          mChosenColor.equals(EditorColor.DEFAULTMARKINGCOLOR)) {
+        geo = null;
+      } else {
+        final Set<Color> set = Collections.singleton(mChosenColor);
+        geo = new ColorGeometrySubject(set);
+      }
       final SelectionOwner panel = mRoot.getEventsPanel();
       final EventDeclSubject template =
-        new EventDeclSubject(ident, kind, observable, scope, ranges, null);
+        new EventDeclSubject(ident, kind, observable, scope, ranges, geo);
       if (mEventDecl == null) {
         final Command command = new InsertCommand(template, panel);
         mEventDecl = template;
@@ -1072,7 +1128,8 @@ public class EventEditorDialog
   private JCheckBox mObservableButton;
   private JCheckBox mParameterButton;
   private JCheckBox mRequiredButton;
-  private JButton mColourButton;
+  private JButton mColorButton;
+  private JPanel mColorDisplay;
   private JButton mMoreOptionsButton;
   private JPanel mIndexPanel;
   private ListTableModel<SimpleExpressionSubject> mIndexModel;
@@ -1101,6 +1158,12 @@ public class EventEditorDialog
    * committed to the model when the OK button is pressed.</P>
    */
   private EventDeclSubject mEventDecl;
+  /**
+   * The colour chosen by the user, or <CODE>null</CODE>.
+   * This variable is initialised to the colour of the edited event
+   * declaration, and changed whenever the colour selection dialog closes.
+   */
+  private Color mChosenColor;
 
 
   //#########################################################################
