@@ -11,11 +11,12 @@ class LocationsAndExpression
   //#########################################################################
   //# Constructors
 	LocationsAndExpression(String event, Set<String> forbiddenLoc, 
-		  List <SimpleExpressionProxy> sortedDNFClause)
+		  List <SimpleExpressionProxy> sortedDNFClause, SimpleExpressionProxy plantGuard)
   {
 	  mEvent = event;
 	  mForbiddenLoc = forbiddenLoc;
 	  mUncontrollableClauses = sortedDNFClause;
+	  mPlantGuard = plantGuard;
   }
 
 
@@ -33,6 +34,11 @@ class LocationsAndExpression
   List <SimpleExpressionProxy> getExpression()
   {
     return mUncontrollableClauses;
+  }
+  
+  SimpleExpressionProxy getPlantGuard()
+  {
+	return mPlantGuard;  
   }
   
   //#########################################################################
@@ -56,5 +62,5 @@ class LocationsAndExpression
   private String mEvent;
   private Set<String> mForbiddenLoc;
   private List <SimpleExpressionProxy> mUncontrollableClauses;
-
+  private SimpleExpressionProxy mPlantGuard;
 }

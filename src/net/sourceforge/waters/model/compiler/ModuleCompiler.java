@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.module
 //# CLASS:   ModuleCompiler
 //###########################################################################
-//# $Id: ModuleCompiler.java,v 1.104 2008-02-15 07:31:49 robi Exp $
+//# $Id: ModuleCompiler.java,v 1.105 2008-02-19 12:12:01 markus Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.compiler;
@@ -1189,14 +1189,14 @@ throws EvalException {
 			boolean createLocation=true;
 			for(LocationsAndExpression locExp: mForbiddenStates){
 				if(forbiddenLoc.equals(locExp.getLocations())){
-					addGuardToExpression(event.getName(), locExp, sortedPlantClauses);
+					addGuardToExpression(event.getName(), locExp, sortedPlantClauses, plantGuard);
 					createLocation=false;
 					break;
 			}
 				}
 			if(createLocation){	
 				mForbiddenStates.add
-		(new LocationsAndExpression(event.getName(), forbiddenLoc, sortedPlantClauses));
+		(new LocationsAndExpression(event.getName(), forbiddenLoc, sortedPlantClauses, plantGuard));
 			
 				}
 		/*
@@ -1220,28 +1220,31 @@ else{
 							collectUncontrollableGuard(plantExpr, specGuard);
 						final CompiledNormalForm dnfUncGuard = mDNFConverter
 								.convertToDNF(uncGuard);
+						Set<String> fLoc=new TreeSet<String>();
+						for (TransitionProxy plant : plantTrans) {
+							fLoc.add(plant
+									.getSource()
+									.getName());
+							for (TransitionProxy spec : specTrans) {
+								String name=spec.getSource().getName(); 
+								fLoc.add(name);
+							}
+						}
 						if(!dnfUncGuard.isEmpty()){
 						final CompiledNormalForm mdnfUncGuard = mDNFMinimizer.minimize(dnfUncGuard);
 						List<SimpleExpressionProxy> sortedUncClauses = mDNFConverter
 								.createSortedClauseList(mdnfUncGuard);
 						
 						if (containsVariableCondition(sortedUncClauses)) {
-							Set<String> fLoc=new TreeSet<String>();
-							for (TransitionProxy plant : plantTrans) {
-								fLoc.add(plant
-										.getSource()
-										.getName());
-								for (TransitionProxy spec : specTrans) {
-									String name=spec.getSource().getName(); 
-									fLoc.add(name);
-								}
-							}
+							
 						
 							boolean createNewLocation=true;
 							for(LocationsAndExpression locExp: mForbiddenStates){
-								if(fLoc.equals(locExp.getLocations())){
+								if(fLoc.equals(locExp.getLocations()) &&
+										locExp.getPlantGuard().equals(plantGuard) &&
+										locExp.getEvent() == event.getName() ){
 									addGuardToExpression(event.getName(), 
-											locExp, sortedUncClauses);
+											locExp, sortedUncClauses, plantGuard);
 									createNewLocation=false;
 									break;
 							}
@@ -1249,10 +1252,27 @@ else{
 							
 							if(createNewLocation){
 							mForbiddenStates.add
-						(new LocationsAndExpression(event.getName(), fLoc, sortedUncClauses));
+						(new LocationsAndExpression(event.getName(), fLoc, sortedUncClauses, plantGuard));
 							}	
 							}
 					}
+						else{
+							boolean createNewLocation=true;
+							for(LocationsAndExpression locExp: mForbiddenStates){
+								if(fLoc.equals(locExp.getLocations()) &&
+										locExp.getPlantGuard().equals(plantGuard) &&
+										locExp.getEvent() == event.getName() ){
+									locExp.setExpression(new LinkedList<SimpleExpressionProxy>());
+									createNewLocation=false;
+									break;
+							}
+						}
+							if(createNewLocation){
+								mForbiddenStates.add
+							(new LocationsAndExpression(event.getName(), fLoc, 
+									new LinkedList<SimpleExpressionProxy>(), plantGuard));
+								}	
+						}
 				}
 			}
 		}}}}
@@ -1277,7 +1297,8 @@ else{
 	
 	
 					
-private void addGuardToExpression(String eventName, LocationsAndExpression locExp, List<SimpleExpressionProxy> sortedAndClauses) throws EvalException {
+private void addGuardToExpression(String eventName, LocationsAndExpression locExp, 
+		List<SimpleExpressionProxy> sortedAndClauses, SimpleExpressionProxy plantGuard) throws EvalException {
 	SimpleExpressionProxy guard;
 	SimpleExpressionProxy guardExp1 = mModuleFactory.createIntConstantProxy(0);
 	SimpleExpressionProxy guardExp2 = mModuleFactory.createIntConstantProxy(0);
@@ -1290,10 +1311,14 @@ private void addGuardToExpression(String eventName, LocationsAndExpression locEx
    for(SimpleExpressionProxy exp: locExp.getExpression()){
 	   guardExp2= mModuleFactory.createBinaryExpressionProxy(orOp, exp, guardExp2); 	
    }
-   if(locExp.getEvent()== eventName){
+   if(locExp.getEvent()== eventName && locExp.getPlantGuard().equals(plantGuard)){
    guard = mModuleFactory.createBinaryExpressionProxy(andOp, guardExp1, guardExp2);
    }
    else{
+	   /*
+	    * This can occur if the event is always blocked by a specification
+	    * and only the plant guard is considered.
+	    */
    guard = mModuleFactory.createBinaryExpressionProxy(orOp, guardExp1, guardExp2);
 	}
    final CompiledNormalForm dnf = mDNFConverter.convertToDNF(guard);
