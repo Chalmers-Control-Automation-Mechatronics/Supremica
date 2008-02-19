@@ -168,6 +168,8 @@ public class Milp
     
     private ArrayList<ArrayList<int[]>> xorConstraints = null;
     
+    private ArrayList<ArrayList<ArrayList<int[]>>> sharedEventConstraints = null;
+    
     /**
      * Contains the minimal state times of each plant,
      * indexed as [milpPlantIndex, stateIndex].
@@ -648,6 +650,7 @@ public class Milp
         altPathsConstraints = new ArrayList<Constraint>();
         xorConstraints = new ArrayList<ArrayList<int[]>>();
         nonCrossbookingConstraints = new ArrayList<ArrayList<String>>();
+        sharedEventConstraints = new ArrayList<ArrayList<ArrayList<int[]>>>();
         
         pathCutTable = new Hashtable<State,String>();
         
@@ -2421,7 +2424,6 @@ public class Milp
                 }
                 else if (state.nbrOfOutgoingMultiArcs() > 1)
                 {
-                    addToMessages("Inside else (state.name = " + state.getName() + ")", SchedulingConstants.MESSAGE_TYPE_INFO);
                     for (Iterator<State> stateIt = state.nextStateIterator(); stateIt.hasNext();)
                     {
                         State nextState = stateIt.next();
@@ -2571,6 +2573,26 @@ public class Milp
         int nrOfPlants = plants.size();
         int nrOfZones = zones.size();
         
+        // This alphabet is needed to check which events are shared by the plants.
+        // The firing times of corresponding transitions should be equal for each shared event.
+        // Also, the altPathVariableValues leading to such transitions should agree.
+        Alphabet sharedPlantAlphabet = new Alphabet();
+        for (int i=0; i<plants.size() - 1; i++)
+        {
+            Alphabet firstAlphabet = plants.getAutomatonAt(i).getAlphabet();
+            
+            for (int j=i+1; j<plants.size(); j++)
+            {
+                Alphabet secondAlphabet = plants.getAutomatonAt(j).getAlphabet();
+                
+                sharedPlantAlphabet.addEvents(AlphabetHelpers.intersect(firstAlphabet, secondAlphabet));
+            }
+        }
+        
+        // Each value of this map contains a list of time variables corresponding to a shared event 
+        // (the keys of the map are the event names).
+        Hashtable<LabeledEvent, IntArrayTreeSet> sharedEventTimeVarsMap = new Hashtable<LabeledEvent,IntArrayTreeSet>();
+        
         for (int i=0; i<nrOfPlants; i++)
         {
             Automaton currPlant = plants.getAutomatonAt(i);
@@ -2590,6 +2612,24 @@ public class Milp
                 int nbrOfOutgoingMultiArcs = currState.nbrOfOutgoingMultiArcs();
                 if (nbrOfOutgoingMultiArcs > 0)
                 {
+                    for (Iterator<MultiArc> multiArcIt = currState.outgoingMultiArcIterator(); multiArcIt.hasNext();)
+                    {
+                        MultiArc multiArc = multiArcIt.next();
+                        for (LabeledEvent ev : multiArc.getEvents())
+                        {
+                            if (sharedPlantAlphabet.contains(ev))
+                            {
+                                IntArrayTreeSet sharedVarList = sharedEventTimeVarsMap.get(ev);
+                                if (sharedVarList == null)
+                                {
+                                    sharedVarList = new IntArrayTreeSet();
+                                }
+                                sharedVarList.add(new int[]{i, currStateIndex});
+                                sharedEventTimeVarsMap.put(ev, sharedVarList);
+                            }
+                        }
+                    }
+                    
                     if (currState.isInitial())
                     {
                         initPrecConstraints.add(new int[]{i, currStateIndex});
@@ -2694,6 +2734,81 @@ public class Milp
                     cycleTimeConstraints.add(new int[]{i, currStateIndex});
                 }
             }
+        }
+        
+        // Add the constraints for the time variables associated with shared events
+        for (LabeledEvent sharedEvent : sharedEventTimeVarsMap.keySet())
+        {
+            ArrayList<ArrayList<int[]>> currSharedEventInfoList = new ArrayList<ArrayList<int[]>>();
+            
+            IntArrayTreeSet sharedTimeVars = sharedEventTimeVarsMap.get(sharedEvent);
+            int currCounter = 0;
+            
+            int prevRobotIndex = -1;
+            ArrayList<int[]> currSharedEventInRobotList = null;
+            for (Iterator<int[]> sharedTimeVarIt = sharedTimeVars.iterator(); sharedTimeVarIt.hasNext();)
+            {
+                int[] sharedTimeVar = sharedTimeVarIt.next();
+                if (sharedTimeVar[0] != prevRobotIndex)
+                {
+                    currSharedEventInRobotList = new ArrayList<int[]>();
+                    currSharedEventInfoList.add(currSharedEventInRobotList);
+                    prevRobotIndex = sharedTimeVar[0];
+                }
+                
+                currSharedEventInRobotList.add(0, sharedTimeVar);
+                currSharedEventInRobotList.addAll(getActiveAltPathVars(new int[]{sharedTimeVar[0], sharedTimeVar[1], indexMap.getEventIndex(sharedEvent)}));
+                
+                
+//                for (int j = i+1; j < sharedTimeVars.size(); j++)
+//                {
+//                    String header = "shared_event_" + sharedEvent.getLabel() + "_" + currCounter + " : ";
+//                    int[] firstSharedTimeVar = sharedTimeVars.get(i);
+//                    int[] secondSharedTimeVar = sharedTimeVars.get(j);
+//                    System.out.println(header + "time[" + firstSharedTimeVar[0] + ", " + firstSharedTimeVar[1] + 
+//                            "] = time[" + secondSharedTimeVar[0] + ", " + secondSharedTimeVar[1] + "];");
+//                    
+//                    //int[] firstUpstreamsAltPathInfo = upstreamsAltPathVars[sharedTimeVars.get(i)[0]][sharedTimeVars.get(i)[1]]
+//                    //        int[] firstUpstreamsAltPathInfo = upstreamsAltPathVars[sharedTimeVars.get(i)[0]][sharedTimeVars.get(i)[1]]
+//                    String body = "shared_event_" + sharedEvent.getLabel() + "_alt_paths_" + currCounter++ + " : ";
+//                    Collection<int[]> firstAltPathInfoList = getActiveAltPathVars(new int[]{firstSharedTimeVar[0], firstSharedTimeVar[1], 
+//                        indexMap.getEventIndex(sharedEvent)});
+//                    Collection<int[]> secondAltPathInfoList = getActiveAltPathVars(new int[]{secondSharedTimeVar[0], secondSharedTimeVar[1], 
+//                        indexMap.getEventIndex(sharedEvent)});
+//                    
+//                                        
+//                    if (firstAltPathInfoList.size() == 0)
+//                    {
+//                        body += "1";
+//                    }
+//                    else
+//                    {
+//                        for (int[] altPathInfo : firstAltPathInfoList)
+//                        {
+//                            body += makeAltPathsVariable(altPathInfo[0], altPathInfo[1], altPathInfo[2]) + " + ";
+//                        }
+//                        body = body.substring(0, body.lastIndexOf("+")).trim();
+//                    }
+//                    body += " = ";
+//                    if (secondAltPathInfoList.size() == 0)
+//                    {
+//                        body += "1";
+//                    }
+//                    else
+//                    {
+//                        for (int[] altPathInfo : secondAltPathInfoList)
+//                        {
+//                            body += makeAltPathsVariable(altPathInfo[0], altPathInfo[1], altPathInfo[2]) + " + ";
+//                        }
+//                        body = body.substring(0, body.lastIndexOf("+")).trim();
+//                    }
+//                    body += ";";
+//                    System.out.println(body);
+//                }
+            }
+            
+            //TODO... fixa omtolkningen i GLPK OCH CBC
+            sharedEventConstraints.add(currSharedEventInfoList);
         }
         
         // Constructing the mutex constraints
