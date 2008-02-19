@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   ComponentsTree
 //###########################################################################
-//# $Id: ComponentsTree.java,v 1.9 2008-02-15 07:31:49 robi Exp $
+//# $Id: ComponentsTree.java,v 1.10 2008-02-19 02:56:50 robi Exp $
 //###########################################################################
 
 
@@ -27,7 +27,7 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.LinkedList;
 import java.util.Set;
-import javax.swing.ImageIcon;
+import javax.swing.Icon;
 import javax.swing.JOptionPane;
 import javax.swing.JTree;
 import javax.swing.SwingUtilities;
@@ -599,7 +599,7 @@ public class ComponentsTree
       final Proxy proxy = (Proxy) value;
       final String text = mPrinter.toString(proxy);
       setText(text);
-      final ImageIcon icon = mModuleContext.getImageIcon(proxy);
+      final Icon icon = mModuleContext.getIcon(proxy);
       setIcon(icon);
       final String tooltip = mModuleContext.getToolTipText(proxy);
       setToolTipText(tooltip);

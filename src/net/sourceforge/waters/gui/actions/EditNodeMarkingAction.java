@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui.actions
 //# CLASS:   EditNodeMarkingAction
 //###########################################################################
-//# $Id: EditNodeMarkingAction.java,v 1.4 2008-02-15 07:31:49 robi Exp $
+//# $Id: EditNodeMarkingAction.java,v 1.5 2008-02-19 02:56:50 robi Exp $
 //###########################################################################
 
 
@@ -15,7 +15,7 @@ import java.awt.event.KeyEvent;
 import java.util.Iterator;
 import java.util.List;
 import javax.swing.Action;
-import javax.swing.ImageIcon;
+import javax.swing.Icon;
 
 import net.sourceforge.waters.gui.IconLoader;
 import net.sourceforge.waters.gui.ModuleContext;
@@ -71,7 +71,7 @@ public class EditNodeMarkingAction
       putValue(Action.SHORT_DESCRIPTION, "Mark this node as " + name);
     }
     final ModuleContext context = getModuleContext();
-    final ImageIcon icon = context.guessPropositionIcon(ident);
+    final Icon icon = context.guessPropositionIcon(ident);
     putValue(Action.SMALL_ICON, icon);
     setEnabled(true);
   }

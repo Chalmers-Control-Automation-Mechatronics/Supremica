@@ -4,25 +4,27 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   ModuleContext
 //###########################################################################
-//# $Id: ModuleContext.java,v 1.7 2008-02-15 07:31:49 robi Exp $
+//# $Id: ModuleContext.java,v 1.8 2008-02-19 02:56:50 robi Exp $
 //###########################################################################
 
 
 package net.sourceforge.waters.gui;
 
+import java.awt.Color;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import javax.swing.ImageIcon;
+import javax.swing.Icon;
 
 import net.sourceforge.waters.gui.language.ProxyNamer;
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.base.VisitorException;
 import net.sourceforge.waters.model.expr.ParseException;
 import net.sourceforge.waters.model.module.AbstractModuleProxyVisitor;
+import net.sourceforge.waters.model.module.ColorGeometryProxy;
 import net.sourceforge.waters.model.module.EventDeclProxy;
 import net.sourceforge.waters.model.module.ForeachProxy;
 import net.sourceforge.waters.model.module.ForeachEventProxy;
@@ -87,7 +89,7 @@ public class ModuleContext
   /**
    * Gets an icon to be displayed for the given module element.
    */
-  public ImageIcon getImageIcon(final Proxy item)
+  public Icon getIcon(final Proxy item)
   {
     return mIconGetterVisitor.getIcon(item);
   }
@@ -126,11 +128,11 @@ public class ModuleContext
    * @return Always returns an icon, but it may be just the default
    *         'event' icon.
    */
-  public ImageIcon guessEventIcon(final IdentifierProxy ident)
+  public Icon guessEventIcon(final IdentifierProxy ident)
   {
     final String name = mIdentifierNameVisitor.getIdentifierName(ident);
     final EventDeclProxy decl = getEventDecl(name);
-    return decl == null ? IconLoader.ICON_EVENT : getImageIcon(decl);
+    return decl == null ? IconLoader.ICON_EVENT : getIcon(decl);
   }
 
   /**
@@ -141,17 +143,17 @@ public class ModuleContext
    * @return Always returns an icon, but it may be just the default
    *         'proposition' icon.
    */
-  public ImageIcon guessPropositionIcon(final IdentifierProxy ident)
+  public Icon guessPropositionIcon(final IdentifierProxy ident)
   {
     final String name = mIdentifierNameVisitor.getIdentifierName(ident);
     final EventDeclProxy decl = getEventDecl(name);
     if (decl != null) {
-      return getImageIcon(decl);
+      return getIcon(decl);
     } else if (ident instanceof SimpleIdentifierProxy &&
                name.equals(EventDeclProxy.DEFAULT_FORBIDDEN_NAME)) {
       return IconLoader.ICON_FORBIDDEN;      
     } else {
-      return IconLoader.ICON_PROPOSITION;
+      return PropositionIcon.getDefaultIcon();
     }
   }
 
@@ -343,7 +345,7 @@ public class ModuleContext
 
   //#########################################################################
   //# Static Methods
-  public static ImageIcon getComponentKindIcon(final ComponentKind kind)
+  public static Icon getComponentKindIcon(final ComponentKind kind)
   {
     switch (kind) {
     case PLANT:
@@ -621,7 +623,7 @@ public class ModuleContext
 
     //#######################################################################
     //# Interface net.sourceforge.waters.model.printer.ProxyVisitor
-    public ImageIcon visitProxy(final Proxy proxy)
+    public Icon visitProxy(final Proxy proxy)
     {
       return null;
     }
@@ -651,10 +653,10 @@ public class ModuleContext
 
     //#######################################################################
     //# Invocation
-    private ImageIcon getIcon(final Proxy proxy)
+    private Icon getIcon(final Proxy proxy)
     {
       try {
-	return (ImageIcon) proxy.acceptVisitor(this);
+	return (Icon) proxy.acceptVisitor(this);
       } catch (final VisitorException exception) {
 	throw exception.getRuntimeException();
       }
@@ -662,14 +664,14 @@ public class ModuleContext
 
     //#######################################################################
     //# Interface net.sourceforge.waters.model.printer.ProxyVisitor
-    public ImageIcon visitProxy(final Proxy proxy)
+    public Icon visitProxy(final Proxy proxy)
     {
       return null;
     }
 
     //#######################################################################
     //# Interface net.sourceforge.waters.model.printer.ModuleProxyVisitor
-    public ImageIcon visitEventDeclProxy(final EventDeclProxy decl)
+    public Icon visitEventDeclProxy(final EventDeclProxy decl)
     {
       final EventKind kind = decl.getKind();
       switch (kind) {
@@ -679,10 +681,14 @@ public class ModuleContext
 	return IconLoader.ICON_UNCONTROLLABLE;
       case PROPOSITION:
 	final String name = decl.getName();
-	if (name.equals(EventDeclProxy.DEFAULT_FORBIDDEN_NAME)) {
+        final ColorGeometryProxy geo = decl.getColorGeometry();
+        if (geo != null && !geo.getColorSet().isEmpty()) {
+          final Color color = geo.getColorSet().iterator().next();
+          return PropositionIcon.getIcon(color);
+        } else if (name.equals(EventDeclProxy.DEFAULT_FORBIDDEN_NAME)) {
 	  return IconLoader.ICON_FORBIDDEN;
 	} else {
-	  return IconLoader.ICON_PROPOSITION;
+          return PropositionIcon.getDefaultIcon();
 	}
       default:
 	throw new IllegalArgumentException
@@ -690,29 +696,29 @@ public class ModuleContext
       }
     }
 
-    public ImageIcon visitForeachProxy(final ForeachProxy foreach)
+    public Icon visitForeachProxy(final ForeachProxy foreach)
     {
       return IconLoader.ICON_FOREACH;
     }
 
-    public ImageIcon visitInstanceProxy(final InstanceProxy inst)
+    public Icon visitInstanceProxy(final InstanceProxy inst)
     {
       return IconLoader.ICON_INSTANCE;
     }
 
-    public ImageIcon visitParameterBindingProxy
+    public Icon visitParameterBindingProxy
       (final ParameterBindingProxy binding)
     {
       return IconLoader.ICON_BINDING;
     }
 
-    public ImageIcon visitSimpleComponentProxy(final SimpleComponentProxy comp)
+    public Icon visitSimpleComponentProxy(final SimpleComponentProxy comp)
     {
       final ComponentKind kind = comp.getKind();
       return getComponentKindIcon(kind);
     }
 
-    public ImageIcon visitVariableComponentProxy
+    public Icon visitVariableComponentProxy
       (final VariableComponentProxy var)
     {
       return IconLoader.ICON_VARIABLE;

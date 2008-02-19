@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   IndexedListModel
 //###########################################################################
-//# $Id: IndexedListModel.java,v 1.8 2008-02-14 02:24:09 robi Exp $
+//# $Id: IndexedListModel.java,v 1.9 2008-02-19 02:56:50 robi Exp $
 //###########################################################################
 
 
@@ -119,9 +119,8 @@ public class IndexedListModel<E extends IdentifiedSubject>
       switch (kind) {
       case ModelChangeEvent.NAME_CHANGED:
       case ModelChangeEvent.STATE_CHANGED:
-        break;
       case ModelChangeEvent.GEOMETRY_CHANGED:
-        return;
+        break;
       default:
         throw new IllegalStateException
           ("Unexpected notification " + kind + " for list member!");
@@ -169,6 +168,18 @@ public class IndexedListModel<E extends IdentifiedSubject>
         Collections.sort(mSortedMirror);
         final int last = mSortedMirror.size() - 1;
         fireContentsChanged(this, 0, last);
+      }
+      break;
+    case ModelChangeEvent.GEOMETRY_CHANGED:
+      {
+        final IdentifiedSubject isource = (IdentifiedSubject) source;
+        final int index = Collections.binarySearch(mSortedMirror, isource);
+        if (index < 0) {
+          final String name = isource.getName();
+          throw new IllegalStateException
+            ("Changed item '" + name + "' not found in mirror!");
+        }
+        fireContentsChanged(this, index, index);
       }
       break;
     default:

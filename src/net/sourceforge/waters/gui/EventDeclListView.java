@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   EventDeclListView
 //###########################################################################
-//# $Id: EventDeclListView.java,v 1.16 2008-02-14 02:24:09 robi Exp $
+//# $Id: EventDeclListView.java,v 1.17 2008-02-19 02:56:50 robi Exp $
 //###########################################################################
 
 
@@ -107,12 +107,13 @@ public class EventDeclListView
     mDeleteVisitor = new EventDeclDeleteVisitor(root);
     mObservers = null;
 
+    final ModuleContext context = root.getModuleContext();
     final ModuleSubject module = root.getModuleSubject();
     final ListSubject<EventDeclSubject> events =
       module.getEventDeclListModifiable();
     mModel = new IndexedListModel<EventDeclSubject>(events);
     setModel(mModel);
-    setCellRenderer(new EventListCell());
+    setCellRenderer(new EventListCell(context));
 
     setSelectionBackground(EditorColor.BACKGROUND_NOTFOCUSSED);
     addFocusListener(this);

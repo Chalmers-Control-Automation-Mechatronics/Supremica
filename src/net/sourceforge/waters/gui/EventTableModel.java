@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   EventTableModel
 //###########################################################################
-//# $Id: EventTableModel.java,v 1.33 2008-02-15 07:31:49 robi Exp $
+//# $Id: EventTableModel.java,v 1.34 2008-02-19 02:56:50 robi Exp $
 //###########################################################################
 
 
@@ -21,7 +21,7 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.ListIterator;
 import java.util.List;
-import javax.swing.ImageIcon;
+import javax.swing.Icon;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.event.TableModelEvent;
 
@@ -58,7 +58,6 @@ import net.sourceforge.waters.subject.module.SimpleIdentifierSubject;
 
 public class EventTableModel
   extends AbstractTableModel
-  implements ModelObserver
 {
 
   //#########################################################################
@@ -74,56 +73,8 @@ public class EventTableModel
     final ModuleSubject module = mRoot.getModuleSubject();
     final ListSubject<EventDeclSubject> events =
       module.getEventDeclListModifiable();
-    events.addModelObserver(this);
-    graph.addModelObserver(this);
-  }
-
-
-  //#########################################################################
-  //# Interface net.sourceforge.waters.subject.base.ModelObserver
-  public void modelChanged(final ModelChangeEvent event)
-  {
-    final Subject source = event.getSource();
-    final Object value = event.getValue();
-    switch (event.getKind()) {
-    case ModelChangeEvent.ITEM_ADDED:
-      if (source.getParent() instanceof EventListExpressionSubject) {
-        if (value instanceof IdentifierSubject) {
-          final IdentifierSubject ident = (IdentifierSubject) value;
-          addIdentifier(ident);
-        } else if (value instanceof ForeachEventSubject) {
-          final ForeachEventSubject foreach = (ForeachEventSubject) value;
-          final List<AbstractSubject> body = foreach.getBodyModifiable();
-          addIdentifiers(body);
-        }
-      } else if (value instanceof EventDeclSubject &&
-                 mTable.isDisplayedEditor()) {
-        final EventDeclSubject decl = (EventDeclSubject) value;
-        final String name = decl.getName();
-        final IdentifierSubject ident = new SimpleIdentifierSubject(name);
-        addIdentifier(ident);
-      } else if (value instanceof EdgeSubject) {
-        final EdgeSubject edge = (EdgeSubject) value;
-        final LabelBlockSubject block = edge.getLabelBlock();
-        addIdentifiers(block);
-      }
-      break;
-    case ModelChangeEvent.ITEM_REMOVED:
-      if (value instanceof EventDeclSubject) {
-        final EventDeclSubject decl = (EventDeclSubject) value;
-        final String name = decl.getName();
-        removeIdentifiers(name);
-      }
-      break;
-    case ModelChangeEvent.STATE_CHANGED:
-      if (source == mGraph) {
-        final LabelBlockSubject block = mGraph.getBlockedEvents();
-        addIdentifiers(block);
-      }
-      break;
-    default:
-      break;
-    }
+    events.addModelObserver(new EventDeclListModelObserver());
+    graph.addModelObserver(new GraphModelObserver());
   }
 
 
@@ -143,7 +94,7 @@ public class EventTableModel
   {
     switch (column) {
     case 0:
-      return ImageIcon.class;
+      return Icon.class;
     case 1:
       return IdentifierSubject.class;
     default:
@@ -368,7 +319,79 @@ public class EventTableModel
 
 
   //#########################################################################
-  //# Local Class EventEntry
+  //# Inner Class GraphModelObserver
+  private class GraphModelObserver
+    implements ModelObserver
+  {
+
+    //#######################################################################
+    //# Interface net.sourceforge.waters.subject.base.ModelObserver
+    public void modelChanged(final ModelChangeEvent event)
+    {
+      final Subject source = event.getSource();
+      final Object value = event.getValue();
+      switch (event.getKind()) {
+      case ModelChangeEvent.ITEM_ADDED:
+        if (source.getParent() instanceof EventListExpressionSubject) {
+          if (value instanceof IdentifierSubject) {
+            final IdentifierSubject ident = (IdentifierSubject) value;
+            addIdentifier(ident);
+          } else if (value instanceof ForeachEventSubject) {
+            final ForeachEventSubject foreach = (ForeachEventSubject) value;
+            final List<AbstractSubject> body = foreach.getBodyModifiable();
+            addIdentifiers(body);
+          }
+        } else if (value instanceof EventDeclSubject &&
+                   mTable.isDisplayedEditor()) {
+          final EventDeclSubject decl = (EventDeclSubject) value;
+          final String name = decl.getName();
+          final IdentifierSubject ident = new SimpleIdentifierSubject(name);
+          addIdentifier(ident);
+        } else if (value instanceof EdgeSubject) {
+          final EdgeSubject edge = (EdgeSubject) value;
+          final LabelBlockSubject block = edge.getLabelBlock();
+          addIdentifiers(block);
+        }
+        break;
+      case ModelChangeEvent.ITEM_REMOVED:
+        if (value instanceof EventDeclSubject) {
+          final EventDeclSubject decl = (EventDeclSubject) value;
+          final String name = decl.getName();
+          removeIdentifiers(name);
+        }
+        break;
+      case ModelChangeEvent.STATE_CHANGED:
+        if (source == mGraph) {
+          final LabelBlockSubject block = mGraph.getBlockedEvents();
+          addIdentifiers(block);
+        }
+        break;
+      default:
+        break;
+      }
+    }
+
+  }
+
+
+  //#########################################################################
+  //# Inner Class EventDeclListModelObserver
+  private class EventDeclListModelObserver
+    implements ModelObserver
+  {
+
+    //#######################################################################
+    //# Interface net.sourceforge.waters.subject.base.ModelObserver
+    public void modelChanged(final ModelChangeEvent event)
+    {
+      fireTableDataChanged();
+    }
+
+  }
+
+
+  //#########################################################################
+  //# Inner Class EventEntry
   private class EventEntry implements Comparable<EventEntry>
   {
 
@@ -442,7 +465,7 @@ public class EventTableModel
 
 
   //#########################################################################
-  //# Local Class ChangeEventNameCommand
+  //# Inner Class ChangeEventNameCommand
   private class ChangeEventNameCommand
     implements Command
   {
@@ -536,7 +559,7 @@ public class EventTableModel
 
 
   //#########################################################################
-  //# Local Class AddToTableCommand
+  //# Inner Class AddToTableCommand
   private class AddToTableCommand
     implements Command
   {
@@ -577,7 +600,7 @@ public class EventTableModel
 
 
   //#########################################################################
-  //# Local Class AddToTableCommand
+  //# Inner Class AddToTableCommand
   private class RemoveFromTableCommand
     implements Command
   {
