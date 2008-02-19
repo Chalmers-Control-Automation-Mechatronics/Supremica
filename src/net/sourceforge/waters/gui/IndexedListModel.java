@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   IndexedListModel
 //###########################################################################
-//# $Id: IndexedListModel.java,v 1.9 2008-02-19 02:56:50 robi Exp $
+//# $Id: IndexedListModel.java,v 1.10 2008-02-19 03:03:40 robi Exp $
 //###########################################################################
 
 
@@ -48,7 +48,6 @@ public class IndexedListModel<E extends IdentifiedSubject>
     if (mSubject != null) {
       mSubject.removeModelObserver(this);
       mSubject = null;
-      mSortedMirror = null;
     }
   }
 
@@ -287,6 +286,6 @@ public class IndexedListModel<E extends IdentifiedSubject>
   //#########################################################################
   //# Data Members
   private ListSubject<E> mSubject;
-  private List<E> mSortedMirror;
+  private final List<E> mSortedMirror;
 
 }
