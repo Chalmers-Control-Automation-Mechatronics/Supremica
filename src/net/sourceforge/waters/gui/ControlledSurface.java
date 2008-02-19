@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   ControlledSurface
 //###########################################################################
-//# $Id: ControlledSurface.java,v 1.155 2007-12-18 02:38:10 robi Exp $
+//# $Id: ControlledSurface.java,v 1.156 2008-02-19 01:03:46 robi Exp $
 //###########################################################################
 
 
@@ -106,8 +106,7 @@ import org.supremica.properties.Config;
 
 public class ControlledSurface
   extends EditorSurface
-  implements SelectionOwner,
-             Observer, ModelObserver, EmbedderObserver, FocusListener
+  implements SelectionOwner, Observer, EmbedderObserver, FocusListener
 {
   //#########################################################################
   //# Constructors
@@ -143,7 +142,9 @@ public class ControlledSurface
 
     mIsPermanentFocusOwner = false;
     addFocusListener(this);
-    graph.addModelObserver(this);
+    graph.addModelObserver(mGraphModelObserver);
+    module.getEventDeclListModifiable().addModelObserver
+      (mEventDeclListModelObserver);
     if (root != null) {
       if (toolbar != null) {
         toolbar.attach(this);
@@ -731,7 +732,10 @@ public class ControlledSurface
     final ProxyShapeProducer shaper = getShapeProducer();
     shaper.close();
     final GraphSubject graph = getGraph();
-    graph.removeModelObserver(this);
+    graph.removeModelObserver(mGraphModelObserver);
+    final ModuleSubject module = getModule();
+    module.getEventDeclListModifiable().removeModelObserver
+      (mEventDeclListModelObserver);
     if (mToolbar != null) {
       mToolbar.detach(this);
     }
@@ -1480,7 +1484,7 @@ public class ControlledSurface
       mSecondaryGraph = new EditorGraph(getGraph());
       mSecondaryShapeProducer = new SubjectShapeProducer
         (mSecondaryGraph, mSecondaryGraph, getModule());
-      mSecondaryGraph.addModelObserver(ControlledSurface.this);
+      mSecondaryGraph.addModelObserver(mGraphModelObserver);
       return true;
     } else {
       return false;
@@ -1490,7 +1494,7 @@ public class ControlledSurface
   private void clearSecondaryGraph()
   {
     if (mSecondaryGraph != null) {
-      mSecondaryGraph.removeModelObserver(ControlledSurface.this);
+      mSecondaryGraph.removeModelObserver(mGraphModelObserver);
       mSecondaryGraph = null;
       mSecondaryShapeProducer = null;
       repaint();
@@ -1559,6 +1563,42 @@ public class ControlledSurface
       }
     }
     return null;
+  }
+
+
+  //#########################################################################
+  //# Inner Class GraphModelObserver
+  private class GraphModelObserver implements ModelObserver
+  {
+
+    //#######################################################################
+    //# Interface net.sourceforge.waters.subject.base.ModelObserver
+    public void modelChanged(final ModelChangeEvent event)
+    {
+      checkGroupNodeHierarchyUpdate(event);
+      updateError();
+      mController.updateHighlighting();
+      repaint();
+      mSizeMayHaveChanged = true;
+    }
+
+  }
+
+
+  //#########################################################################
+  //# Inner Class GraphModelObserver
+  private class EventDeclListModelObserver implements ModelObserver
+  {
+
+    //#######################################################################
+    //# Interface net.sourceforge.waters.subject.base.ModelObserver
+    public void modelChanged(final ModelChangeEvent event)
+    {
+      if (event.getKind() == ModelChangeEvent.GEOMETRY_CHANGED) {
+        repaint();
+      }
+    }
+
   }
 
 
@@ -4540,6 +4580,10 @@ public class ControlledSurface
   private int mExternalDragAction = DnDConstants.ACTION_COPY;
   private DRAGOVERSTATUS mExternalDragStatus = DRAGOVERSTATUS.NOTDRAG;
 
+  private final GraphModelObserver mGraphModelObserver =
+    new GraphModelObserver();
+  private final EventDeclListModelObserver mEventDeclListModelObserver =
+    new EventDeclListModelObserver();
   private final SelectableVisitor mSelectableVisitor = new SelectableVisitor();
   private final DataFlavorVisitor mDataFlavorVisitor = new DataFlavorVisitor();
   private final GraphTransferableVisitor mGraphTransferableVisitor =

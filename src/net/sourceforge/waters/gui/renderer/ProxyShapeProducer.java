@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui.renderer
 //# CLASS:   ProxyShapeProducer
 //###########################################################################
-//# $Id: ProxyShapeProducer.java,v 1.30 2008-02-15 07:31:49 robi Exp $
+//# $Id: ProxyShapeProducer.java,v 1.31 2008-02-19 01:03:46 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.gui.renderer;
@@ -74,6 +74,11 @@ public class ProxyShapeProducer
   public GraphProxy getGraph()
   {
     return mGraph;
+  }
+
+  public ModuleProxy getModule()
+  {
+    return mModule;
   }
 
 
