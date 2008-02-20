@@ -2,6 +2,7 @@ package org.supremica.external.processeditor.processgraph.table;
 
 import java.awt.Component;
 import java.awt.event.KeyListener;
+import java.awt.event.MouseListener;
 
 import javax.swing.BoxLayout;
 import javax.swing.JPanel;
@@ -63,6 +64,13 @@ public class BasicTablePane
 		table.addKeyListener(l);
 		super.addKeyListener(l);
 	}
+	
+	//override
+	public void addMouseListener(MouseListener l){
+		table.addMouseListener(l);
+		super.addMouseListener(l);
+	}
+	
 	
 	public void showRowHeader(boolean show){
 		

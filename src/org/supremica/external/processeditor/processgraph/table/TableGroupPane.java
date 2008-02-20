@@ -1,20 +1,21 @@
 package org.supremica.external.processeditor.processgraph.table;
 
 
-import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 
 import java.awt.*;
 import java.awt.event.*;
 
-import javax.swing.event.*;
+import org.jdesktop.swingx.*;
+import org.jdesktop.swingx.MultiSplitLayout.*;
 
+import java.util.*;
 import java.util.List;
 
 public class TableGroupPane 
 						extends 
-							JPanel
+							MultiSplitPane
 						implements
 							TableListener,
 							ActionListener,
@@ -22,41 +23,63 @@ public class TableGroupPane
 							KeyListener
 {
 	private Object[] rowTableCopy = null;
-	private String rowCopyName = null;
 	
 	protected JPopupMenu popupMenu;
 	
 	protected int[] selectedRows = null;
 	
 	public TableGroupPane(){
-		super(new GridBagLayout());
-		setComponentOrientation(ComponentOrientation.LEFT_TO_RIGHT);
-		//setBorder(BorderFactory.createLineBorder(Color.black));
-		
-		// Create a popup menu
+		super();
 		popupMenu = new JPopupMenu( "Menu" );
 		makePopupMenu();
-		add( popupMenu );
-		
 		addMouseListener(this);
 	}
 	
 	public void addTable(BasicTablePane table){
 		
-		GridBagConstraints c = new GridBagConstraints();
+		Component[] comps = getComponents();
+		List<MultiSplitLayout.Node> children = new LinkedList<MultiSplitLayout.Node>();
+		Split modelRoot = new Split();
 		
-		c.fill = GridBagConstraints.BOTH;
-		
-		c.weightx = 1;
-		c.weighty = 1;
-		
-		c.gridx = getComponentCount();
-		c.gridy = 0;
+		removeAll();
 		
 		table.addtableListener(this);
 		table.addKeyListener(this);
+		table.addMouseListener(this);
 		
-		add(table, c);
+		if(comps.length == 0){
+			children.add(new Leaf("0"));
+			children.add(new Divider());
+			children.add(new Leaf("1"));
+			modelRoot.setChildren(children);
+			getMultiSplitLayout().setModel(modelRoot);
+			add(table,"0");
+			add(new JPanel(),"1");
+			return;
+		}
+		
+		//make split layout
+		for(int i = 0; i < comps.length; i++){
+			if(comps[i] instanceof BasicTablePane){
+				children.add(new Leaf(Integer.toString(i)));
+				children.add(new Divider());
+			}
+		}
+		children.add(new Leaf(Integer.toString(comps.length)));
+		
+		modelRoot.setChildren(children);
+		getMultiSplitLayout().setModel(modelRoot);
+		
+		//add tables
+		for(int i = 0; i < comps.length; i++){
+			if(comps[i] instanceof BasicTablePane){
+				add(comps[i], Integer.toString(i));
+			}
+		}
+		add(table, Integer.toString(comps.length));
+		
+		validate();
+		
 	}
 	
 	/*
@@ -129,14 +152,12 @@ public class TableGroupPane
 	}
 	
 	public void mousePressed(MouseEvent e) {
-		if(e.isPopupTrigger()){
-			showPopupMenu(e.getPoint());
-		}
+		;
 	}
 	
 	public void mouseReleased(MouseEvent e) {
 		if(e.isPopupTrigger()){
-			showPopupMenu(e.getPoint());
+			showPopupMenu(e);
 		}
 	}
 	
@@ -144,8 +165,27 @@ public class TableGroupPane
 	public void mouseEntered(MouseEvent e) {}
     public void mouseExited(MouseEvent e) {}
 	
-	private void showPopupMenu(Point pos){
-		popupMenu.show(this, pos.x, pos.y);
+	private void showPopupMenu(MouseEvent e){
+		
+		if(e.getSource() instanceof BasicTable){
+			BasicTable table = (BasicTable)e.getSource();
+			if(null != table.getComponentAt(e.getPoint())){
+				
+				 
+				int col = table.columnAtPoint(e.getPoint());
+				int row = table.rowAtPoint(e.getPoint());
+				
+				System.out.println("Column: " + col);
+				System.out.println("Row: " + row);
+			}else{
+				System.out.println("Null");
+			}
+		}else{
+			System.out.println("No BasicTable");
+		}
+		
+		popupMenu.setLocation(e.getLocationOnScreen());
+		popupMenu.setVisible(true);
 	}
 	/* End Handel popup menu */
 }

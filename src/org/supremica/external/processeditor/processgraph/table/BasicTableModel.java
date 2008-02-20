@@ -177,11 +177,11 @@ public class BasicTableModel
 			rowData = new LinkedList<Object>();
 		}
 		
-		if(rowData.size() > getRowCount()){
-			rowData = rowData.subList(0, getRowCount()-1);
+		if(rowData.size() > getColumnCount()){
+			rowData = rowData.subList(0, getColumnCount()-1);
 		}
 		
-		while(rowData.size() < getRowCount()){
+		while(rowData.size() < getColumnCount()){
 			rowData.add("");
 		}
 		

@@ -66,6 +66,15 @@ public class ILStructureGroupPane
     	
     	setRowNames();
     	
+    	//add all tables one time
+    	addTable( tableMode );
+    	addTable( tableInternal );
+    	addTable( tableExternal );
+    	addTable( tableOperation );
+    	addTable( tableZone );
+    	addTable( tableProduct );		
+    	
+    	//show selected tables only
     	showTables();
     	
 	}
@@ -352,6 +361,7 @@ public class ILStructureGroupPane
 	}
 	
 	
+	//override
 	protected void makePopupMenu(){
 		
 		super.makePopupMenu();
@@ -371,6 +381,7 @@ public class ILStructureGroupPane
 		if(event.getActionCommand().equals("add condition")){
 			addConditionRow();
 		}else if(event.getActionCommand().equals("remove condition")){
+			
 			for(int i = 0; i < selectedRows.length; i++){
 				deleteConditionRow(selectedRows[i]);
 			}

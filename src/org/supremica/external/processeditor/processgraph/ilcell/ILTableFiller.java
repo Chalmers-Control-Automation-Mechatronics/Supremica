@@ -121,19 +121,25 @@ public class ILTableFiller {
 		//add actuator values
 		for(ActuatorValue actVal : term.getActuatorValue()){			
 			col = table.findColumn(actVal.getActuator());
-			table.setValueAt(actVal.getValue(), row, col);
+			if(-1 != col){
+				table.setValueAt(actVal.getValue(), row, col);
+			}
 		}
 		
 		//add sensor values
 		for(SensorValue sensVal : term.getSensorValue()){			
 			col = table.findColumn(sensVal.getSensor());
-			table.setValueAt(sensVal.getValue(), row, col);
+			if(-1 != col){
+				table.setValueAt(sensVal.getValue(), row, col);
+			}
 		}
 		
 		//add variable values
 		for(VariableValue varVal : term.getVariableValue()){			
 			col = table.findColumn(varVal.getVariable());
-			table.setValueAt(varVal.getValue(), row, col);
+			if(-1 != col){
+				table.setValueAt(varVal.getValue(), row, col);
+			}
 		}
 	}
 	
