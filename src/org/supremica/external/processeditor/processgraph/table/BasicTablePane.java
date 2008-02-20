@@ -118,7 +118,7 @@ public class BasicTablePane
 	}
 	
 	public void removeRow(int index){
-		table.getModel().removeRow(index);
+		table.removeRow(index);
 		showRowHeader(showRowHeader);
 	}
 	

@@ -48,13 +48,17 @@ public class TableGroupPane
 		table.addMouseListener(this);
 		
 		if(comps.length == 0){
+			
 			children.add(new Leaf("0"));
 			children.add(new Divider());
 			children.add(new Leaf("1"));
+			
 			modelRoot.setChildren(children);
 			getMultiSplitLayout().setModel(modelRoot);
+			
 			add(table,"0");
 			add(new JPanel(),"1");
+			
 			return;
 		}
 		

@@ -93,6 +93,7 @@ public class ILStructureGroupPane
 		boolean rowHeader = showRowHeader;
 		
 		removeAll();
+		validate();
 		
 		if( showTableMode ){
 			tableMode.showRowHeader(rowHeader);

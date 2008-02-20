@@ -108,11 +108,49 @@ public class BasicTable
 	 * @param name - name of row to be removed.
 	 */
 	public void removeRow(String name){
+		
+		int numberOfCols = getColumnCount();
+		TableCellEditor[] cellEditor = new TableCellEditor[numberOfCols];
+		
+		for(int col = 0; col < numberOfCols; col++){
+			cellEditor[col] = getColumnModel().getColumn(col).getCellEditor();
+		}
+		
 		tableModel.removeRow(name);
+		
+		for(int col = 0; col < numberOfCols; col++){
+			getColumnModel().getColumn(col).setCellEditor(cellEditor[col]);
+		}
+		
 		if(tableListener != null){
 			tableListener.rowRemoved(new TableEvent(this));
 		}
 	}
+	
+	/**
+	 * Removes one row.
+	 * @param index - row to be removed
+	 */
+	public void removeRow(int index){
+		
+		int numberOfCols = getColumnCount();
+		TableCellEditor[] cellEditor = new TableCellEditor[numberOfCols];
+		
+		for(int col = 0; col < numberOfCols; col++){
+			cellEditor[col] = getColumnModel().getColumn(col).getCellEditor();
+		}
+		
+		tableModel.removeRow(index);
+		
+		for(int col = 0; col < numberOfCols; col++){
+			getColumnModel().getColumn(col).setCellEditor(cellEditor[col]);
+		}
+		
+		if(tableListener != null){
+			tableListener.rowRemoved(new TableEvent(this));
+		}
+	}
+	
 	
 	/**
 	 * Removes one column
@@ -177,7 +215,19 @@ public class BasicTable
 	 * @param rowName - Name of the new row.
 	 */
 	public void addRow(List<Object> rowData, int rowIndex, String rowName){
+		int numberOfCols = getColumnCount();
+		TableCellEditor[] cellEditor = new TableCellEditor[numberOfCols];
+		
+		for(int col = 0; col < numberOfCols; col++){
+			cellEditor[col] = getColumnModel().getColumn(col).getCellEditor();
+		}
+		
+		
 		tableModel.addRow(rowData, rowIndex, rowName);
+		
+		for(int col = 0; col < numberOfCols; col++){
+			getColumnModel().getColumn(col).setCellEditor(cellEditor[col]);
+		}
 		
 		if(tableListener != null){
 			tableListener.rowAdded(new TableEvent(this));
@@ -189,9 +239,21 @@ public class BasicTable
 	 */
 	public void removeSelectedRows(){
     	int rows[] = getSelectedRows();
+    	
+    	int numberOfCols = getColumnCount();
+		TableCellEditor[] cellEditor = new TableCellEditor[numberOfCols];
+		
+		for(int col = 0; col < numberOfCols; col++){
+			cellEditor[col] = getColumnModel().getColumn(col).getCellEditor();
+		}
+		
     	for(int i = 0; i < rows.length; i++){
     		getModel().removeRow(rows[i]-i);
     	}
+    	
+    	for(int col = 0; col < numberOfCols; col++){
+			getColumnModel().getColumn(col).setCellEditor(cellEditor[col]);
+		}
     }
 	
 	//override
