@@ -122,6 +122,9 @@
     	<unjar src="${lib}/jniwrap-3.1.jar" dest="${lib}/${unjared}"/>
     	<unjar src="${lib}/jexcel-1.0.jar" dest="${lib}/${unjared}"/>
     	
+    	<!-- Create multisplit pane without nesting -->
+    	<unjar src="${lib}/multisplit.jar" dest="${lib}/${unjared}"/>
+    	
     	<unjar src="${lib}/JGo.jar" dest="${lib}/${unjared}"/>	
         <unjar src="${lib}/JGoLayout.jar" dest="${lib}/${unjared}"/>
         <unjar src="${lib}/antlr.jar" dest="${lib}/${unjared}"/>
