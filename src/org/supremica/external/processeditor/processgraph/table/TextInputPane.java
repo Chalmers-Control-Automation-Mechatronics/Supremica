@@ -1,4 +1,4 @@
-package org.supremica.external.processeditor.processgraph.ilcell;
+package org.supremica.external.processeditor.processgraph.table;
 
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;

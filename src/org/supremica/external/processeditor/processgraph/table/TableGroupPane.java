@@ -1,4 +1,4 @@
-package org.supremica.external.processeditor.processgraph.ilcell;
+package org.supremica.external.processeditor.processgraph.table;
 
 
 import javax.swing.JMenuItem;
@@ -28,7 +28,7 @@ public class TableGroupPane
 	
 	protected int[] selectedRows = null;
 	
-	TableGroupPane(){
+	public TableGroupPane(){
 		super(new GridBagLayout());
 		setComponentOrientation(ComponentOrientation.LEFT_TO_RIGHT);
 		//setBorder(BorderFactory.createLineBorder(Color.black));

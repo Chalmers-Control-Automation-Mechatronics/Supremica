@@ -15,6 +15,7 @@ import java.awt.event.MouseEvent;
 import java.util.List;
 import java.util.LinkedList;
 
+import org.supremica.external.processeditor.processgraph.table.BasicTablePane;
 import org.supremica.manufacturingTables.xsd.il.InternalComponents;
 import org.supremica.manufacturingTables.xsd.il.Term;
 

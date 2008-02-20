@@ -7,6 +7,9 @@ import java.awt.event.ActionListener;
 import javax.swing.table.TableColumn;
 import javax.swing.*;
 
+import org.supremica.external.processeditor.processgraph.table.BasicTable;
+import org.supremica.external.processeditor.processgraph.table.DataTablePane;
+
 public class InternalDataEditor 
 							extends
 								JFrame

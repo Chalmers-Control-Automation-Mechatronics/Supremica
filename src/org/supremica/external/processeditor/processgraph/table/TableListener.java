@@ -1,4 +1,4 @@
-package org.supremica.external.processeditor.processgraph.ilcell;
+package org.supremica.external.processeditor.processgraph.table;
 
 public interface TableListener {
     public void tableSelectionChanged(TableEvent e);

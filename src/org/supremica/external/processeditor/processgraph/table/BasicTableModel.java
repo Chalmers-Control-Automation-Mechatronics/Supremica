@@ -1,4 +1,4 @@
-package org.supremica.external.processeditor.processgraph.ilcell;
+package org.supremica.external.processeditor.processgraph.table;
 
 import javax.swing.table.AbstractTableModel;
 import java.util.List;
@@ -49,9 +49,7 @@ public class BasicTableModel
 
 	/*
 	 * JTable uses this method to determine the default renderer/
-	 * editor for each cell.  If we didn't implement this method,
-	 * then the last column would contain text ("true"/"false"),
-	 * rather than a check box.
+	 * editor for each cell.
 	 */
 	public Class getColumnClass(int c) {
 		return getValueAt(0, c).getClass();

@@ -1,4 +1,4 @@
-package org.supremica.external.processeditor.processgraph.ilcell;
+package org.supremica.external.processeditor.processgraph.table;
 
 import javax.swing.JTable;
 import javax.swing.table.TableColumn;
@@ -46,7 +46,9 @@ public class BasicTable
             
             //All rows in column
             for(int row = 0; row < getRowCount(); row++){
-            	comp = getDefaultRenderer(tableModel.getColumnClass(col)).getTableCellRendererComponent(this, getValueAt(row, col),false, false, 0, col);
+            	comp = getDefaultRenderer(tableModel.
+            								getColumnClass(col)).
+            								getTableCellRendererComponent(this, getValueAt(row, col),false, false, 0, col);
             	
             	//take the widest
             	if(cellWidth < comp.getPreferredSize().width){
@@ -58,11 +60,17 @@ public class BasicTable
     }
     
 
-	
+	/**
+	 * Return table model from class <code>BasicTableModel</code>
+	 */
 	public BasicTableModel getModel(){
 		return tableModel;
 	}
 	
+	/**
+	 * Add a column to the table. 
+	 * @param name - column name
+	 */
 	public void addCol(String name){
 		tableModel.addCol(name);
 		
@@ -71,6 +79,10 @@ public class BasicTable
 		}
 	}
 	
+	/**
+	 * Add a new row to the table.
+	 * @param name - row name
+	 */
 	public void addRow(String name){
 		
 		int numberOfCols = getColumnCount();
@@ -91,6 +103,10 @@ public class BasicTable
 		}
 	}
 	
+	/**
+	 * Removes one row.
+	 * @param name - name of row to be removed.
+	 */
 	public void removeRow(String name){
 		tableModel.removeRow(name);
 		if(tableListener != null){
@@ -98,6 +114,11 @@ public class BasicTable
 		}
 	}
 	
+	/**
+	 * Removes one column
+	 * @param name - the name of the column to be removed
+	 * @return the index of the removed column, or -1 if no column were removed.
+	 */
 	public int removeCol(String name){
 		int index = tableModel.removeCol(name);
 		if(tableListener != null){
@@ -106,6 +127,10 @@ public class BasicTable
 		return index;
 	}
 	
+	/**
+	 * Remove one column from table.
+	 * @param index - the index of column to be removed
+	 */
 	public void removeCol(int index){
 		tableModel.removeCol(index);
 		if(tableListener != null){
@@ -113,22 +138,44 @@ public class BasicTable
 		}
 	}
 	
+	/**
+	 * Return the index of the first column with name.
+	 * @param name - the name of column to find.
+	 * @return index of column if found or -1
+	 */
 	public int findColumn(String name){
 		return tableModel.findColumn(name);
 	}
-	
+	/**
+	 * Set the table listener for this table.
+	 * @param l - TableListener
+	 */
 	public void addTableListener(TableListener l){
 		tableListener = l;
 	}
 	
+	/**
+	 * Removes the table listener from this table.
+	 */
 	public void removeTableListener(){
 		tableListener = null;
 	}
 	
+	/**
+	 * Get all data from a row.
+	 * @param rowIndex - index of row to get data from.
+	 * @return A List<Object> with data from row.
+	 */
 	public List<Object> getRow(int rowIndex){
 		return tableModel.getRow(rowIndex);
 	}
 	
+	/**
+	 * Add one row to table.
+	 * @param rowData - List<Object> with data to be inserted to the row.
+	 * @param rowIndex - the index of the inserted row.
+	 * @param rowName - Name of the new row.
+	 */
 	public void addRow(List<Object> rowData, int rowIndex, String rowName){
 		tableModel.addRow(rowData, rowIndex, rowName);
 		
@@ -137,6 +184,9 @@ public class BasicTable
 		}
 	}
 	
+	/**
+	 * Removes all the selected rows from table.
+	 */
 	public void removeSelectedRows(){
     	int rows[] = getSelectedRows();
     	for(int i = 0; i < rows.length; i++){

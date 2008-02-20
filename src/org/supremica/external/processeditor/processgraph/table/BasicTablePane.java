@@ -1,24 +1,25 @@
-package org.supremica.external.processeditor.processgraph.ilcell;
+package org.supremica.external.processeditor.processgraph.table;
 
-import java.awt.Dimension;
-import java.awt.GridLayout;
+import java.awt.Component;
+import java.awt.event.KeyListener;
 
 import javax.swing.BoxLayout;
 import javax.swing.JPanel;
 import javax.swing.JList;
 import javax.swing.JLabel;
 import javax.swing.JScrollPane;
-import javax.swing.BorderFactory;
+import javax.swing.JButton;
+import javax.swing.JTable;
 
-import java.awt.*;
-import java.awt.event.*;
-import javax.swing.*;
-import javax.swing.table.*;
+//import javax.swing.JList;
+import javax.swing.ListCellRenderer;
 
-import java.awt.event.*;
-import javax.swing.event.*;
+import javax.swing.UIManager;
+import javax.swing.table.JTableHeader;
 
-import java.awt.Color;
+//import javax.swing.JScrollPane;
+
+
 
 public class BasicTablePane 
 						extends
@@ -31,7 +32,7 @@ public class BasicTablePane
 	
 	private boolean showRowHeader = false;
 	
-	BasicTablePane(){
+	public BasicTablePane(){
 		super();
 		setLayout(new BoxLayout(this,BoxLayout.Y_AXIS));
 		
@@ -42,9 +43,6 @@ public class BasicTablePane
 		jbTableHeader.setBorderPainted(false);
 		jbTableHeader.setFocusable(false);
 		
-		//tableHeaderLabel.setBorder(BorderFactory.createLineBorder(Color.black));
-		//setBorder(BorderFactory.createLineBorder(Color.black));
-		
 		table = new BasicTable();
 		
 		table.setPreferredScrollableViewportSize(table.getPreferredSize());
@@ -54,8 +52,6 @@ public class BasicTablePane
         
         add(jbTableHeader);
         add(scrollPane);
-        
-        
 	}
 	
 	public void setHeader(String headerText){

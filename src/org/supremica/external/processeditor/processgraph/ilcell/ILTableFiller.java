@@ -1,5 +1,6 @@
 package org.supremica.external.processeditor.processgraph.ilcell;
 
+import org.supremica.external.processeditor.processgraph.table.BasicTable;
 import org.supremica.manufacturingTables.xsd.il.*;
 
 public class ILTableFiller {

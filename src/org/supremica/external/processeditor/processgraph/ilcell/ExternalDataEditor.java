@@ -2,12 +2,14 @@ package org.supremica.external.processeditor.processgraph.ilcell;
 
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
-import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import javax.swing.table.TableColumn;
-import javax.swing.*;
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JPanel;
 
+import org.supremica.external.processeditor.processgraph.table.BasicTable;
+import org.supremica.external.processeditor.processgraph.table.DataTablePane;
 import org.supremica.manufacturingTables.xsd.il.ObjectFactory;
 import org.supremica.manufacturingTables.xsd.il.ExternalComponent;
 
@@ -32,7 +34,7 @@ public class ExternalDataEditor
 		
 		this.externalTable = externalTable;
 		
-		//tabel panel
+		//table panel
 		tablePane = new DataTablePane();
 		
 		tablePane.getTable().addCol("Component");
@@ -196,7 +198,7 @@ public class ExternalDataEditor
 	}
 	
 	
-	// --- ActionListener ---
+	/* ---ActionListener--- */
 	public void actionPerformed(ActionEvent e) {
     	
         Object o = e.getSource();

@@ -16,6 +16,7 @@ import javax.swing.JComboBox;
 import javax.swing.JTable;
 import javax.swing.JTextField;
 
+import org.supremica.external.processeditor.processgraph.table.BasicTablePane;
 import org.supremica.manufacturingTables.xsd.il.ExternalComponents;
 import org.supremica.manufacturingTables.xsd.il.ExternalComponent;
 import org.supremica.manufacturingTables.xsd.il.Term;

@@ -2,6 +2,7 @@ package org.supremica.external.processeditor.processgraph.ilcell;
 
 import java.util.List;
 
+import org.supremica.external.processeditor.processgraph.table.BasicTablePane;
 import org.supremica.manufacturingTables.xsd.il.Operations;
 import org.supremica.manufacturingTables.xsd.il.Term;
 

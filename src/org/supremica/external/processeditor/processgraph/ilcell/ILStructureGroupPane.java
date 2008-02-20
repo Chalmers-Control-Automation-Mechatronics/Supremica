@@ -9,6 +9,10 @@ import javax.swing.JMenuItem;
 
 
 
+import org.supremica.external.processeditor.processgraph.table.BasicTable;
+import org.supremica.external.processeditor.processgraph.table.BasicTablePane;
+import org.supremica.external.processeditor.processgraph.table.TableEvent;
+import org.supremica.external.processeditor.processgraph.table.TableGroupPane;
 import org.supremica.manufacturingTables.xsd.il.*;
 
 public class ILStructureGroupPane 
@@ -85,35 +89,35 @@ public class ILStructureGroupPane
 			tableMode.showRowHeader(rowHeader);
 			rowHeader = false;
 			
-			addTable(tableMode);
+			addTable( tableMode );
 		}
 		
 		if( showTableInternal ){
 			tableInternal.showRowHeader(rowHeader);
 			rowHeader = false;
 			
-			addTable(tableInternal);
+			addTable( tableInternal );
 		}
 		
 		if( showTableExternal ){
 			tableExternal.showRowHeader(rowHeader);
 			rowHeader = false;
 			
-			addTable(tableExternal);
+			addTable( tableExternal );
 		}
 		
 		if( showTableOperation ){
 			tableOperation.showRowHeader(rowHeader);
 			rowHeader = false;
 			
-			addTable(tableOperation);
+			addTable( tableOperation );
 		}
 		
 		if( showTableZone ){
 			tableZone.showRowHeader(rowHeader);
 			rowHeader = false;
 			
-			addTable(tableZone);
+			addTable( tableZone );
 		}
 		
 		if( showTableProduct ){
@@ -121,7 +125,7 @@ public class ILStructureGroupPane
 			tableProduct.showRowHeader(rowHeader);
 			rowHeader = false;
 			
-			addTable(tableProduct);
+			addTable( tableProduct );
 		}
 		
 		validate();
@@ -209,7 +213,7 @@ public class ILStructureGroupPane
 		showTables();
 	}
 	
-	public void showOperationTable(boolean show){
+	public void showOperationTable( boolean show ){
 		
 		if(show == showTableOperation){
 			return;
@@ -219,7 +223,7 @@ public class ILStructureGroupPane
 		showTables();
 	}
 	
-	public void showZoneTable(boolean show){
+	public void showZoneTable( boolean show ){
 		
 		if(show == showTableZone){
 			return;
@@ -229,7 +233,7 @@ public class ILStructureGroupPane
 		showTables();
 	}
 	
-	public void showProductTable(boolean show){
+	public void showProductTable( boolean show ){
 		if(show == showTableProduct){
 			return;
 		}
@@ -277,7 +281,7 @@ public class ILStructureGroupPane
 		}
 		
 		//writhe to empty row
-		insertTerms(termCopyList);
+		insertTerms( termCopyList );
 	}
 	
 	public void addConditionRow(){
@@ -310,25 +314,6 @@ public class ILStructureGroupPane
     	}
 	}
 	
-	public void addConditionRow(Term term){
-		int row = -1;
-		
-		if(term == null){
-			return;
-		}
-		
-		row = term.getRow().intValue();
-		
-		//add empty rows until we reach this term row
-		while(tableInternal.getRowCount() < row){
-			addConditionRow();
-		}
-		
-		//tableInternal
-		
-	}
-	
-	
 	public void deleteConditionRow(int index){
 		
 		//don't remove type identifier row
@@ -336,7 +321,7 @@ public class ILStructureGroupPane
 			return;
 		}
 		
-		//dont delete last condition row
+		//don't delete last condition row
 		if(tableMode.getRowCount() <= 2){
 			return;
 		}
@@ -351,7 +336,7 @@ public class ILStructureGroupPane
     	setRowNames();
 	}
 	
-	private void deleteSelectedRows(BasicTable table){
+	private void deleteSelectedRows( BasicTable table ){
 		
 		int row = selectedRows[0];
 		
@@ -368,7 +353,9 @@ public class ILStructureGroupPane
 	
 	
 	protected void makePopupMenu(){
+		
 		super.makePopupMenu();
+		
 		// Create some menu items for the popup
 		JMenuItem menuEdit = new JMenuItem( "add condition" );
 		popupMenu.add( menuEdit );
@@ -398,6 +385,10 @@ public class ILStructureGroupPane
 	
 	private void setRowNames(){
 		
+		if(tableInternal.getRowCount() == 0){
+			return;
+		}
+		
 		tableMode.getTable().getModel().setRowName(0, "");
 		tableInternal.getTable().getModel().setRowName(0, "");
 		tableExternal.getTable().getModel().setRowName(0, "");
@@ -405,13 +396,15 @@ public class ILStructureGroupPane
     	tableZone.getTable().getModel().setRowName(0, "");
     	tableProduct.getTable().getModel().setRowName(0, "");
     	
-    	tableMode.getTable().getModel().setRowName(1, "");
-		tableInternal.getTable().getModel().setRowName(1, "");
-		tableExternal.getTable().getModel().setRowName(1, "");
-    	tableOperation.getTable().getModel().setRowName(1, "");
-    	tableZone.getTable().getModel().setRowName(1, "");
-    	tableProduct.getTable().getModel().setRowName(1, "");
- 
+    	if(tableInternal.getRowCount() >= 1){
+    		tableMode.getTable().getModel().setRowName(1, "");
+    		tableInternal.getTable().getModel().setRowName(1, "");
+    		tableExternal.getTable().getModel().setRowName(1, "");
+    		tableOperation.getTable().getModel().setRowName(1, "");
+    		tableZone.getTable().getModel().setRowName(1, "");
+    		tableProduct.getTable().getModel().setRowName(1, "");
+    	}
+    	
     	for(int i = 2; i < tableInternal.getRowCount(); i++ ){
     		tableMode.getTable().getModel().setRowName(i, ROWNAME);
     		tableInternal.getTable().getModel().setRowName(i, ROWNAME);
@@ -445,6 +438,9 @@ public class ILStructureGroupPane
 		if(timeStamp != e.getWhen()){
 			timeStamp = e.getWhen();
 			
+			//----------------------------------------
+			//	DELETE
+			//----------------------------------------
 			if(e.getKeyCode() == KeyEvent.VK_DELETE){
 				if(e.getSource() instanceof BasicTable){
 					deleteSelectedRows((BasicTable) e.getSource());
@@ -454,7 +450,9 @@ public class ILStructureGroupPane
 			//Is CTRL down 
 			if(controlDown){
 				
-				//N
+				//----------------------------------
+				//	CTRL + N
+				//----------------------------------
 				if(e.getKeyCode() == KeyEvent.VK_N){
 					if(selectedRows.length > 0){
 						if(e.getSource() instanceof BasicTable){
@@ -463,23 +461,31 @@ public class ILStructureGroupPane
 					}
 				}
 				
-				//C
+				//----------------------------------
+				//	CTRL + C
+				//----------------------------------
 				if(e.getKeyCode() == KeyEvent.VK_C){
 						copyTerms();
 				}
 				
-				//V
+				//------------------------------------
+				//	CTRL + V
+				//------------------------------------
 				if(e.getKeyCode() == KeyEvent.VK_V){
 					int row = selectedRows[0];
 					insertTermCopies();	
 					
 					if(e.getSource() instanceof BasicTable){
 						
-						((BasicTable)e.getSource()).getSelectionModel().setSelectionInterval(row,row);
+						((BasicTable)e.getSource())
+								.getSelectionModel()
+									.setSelectionInterval(row,row);
 					}
 				}
 				
-				//X
+				//------------------------------------
+				//	CTRL + X
+				//------------------------------------
 				if(e.getKeyCode() == KeyEvent.VK_X){
 					copyTerms();
 					if(e.getSource() instanceof BasicTable){

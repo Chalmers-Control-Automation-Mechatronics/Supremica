@@ -1,15 +1,21 @@
-package org.supremica.external.processeditor.processgraph.ilcell;
+package org.supremica.external.processeditor.processgraph.table;
 
-import java.util.*;
-import java.util.List;
 
-import javax.swing.*;
-import javax.swing.border.*;
-import java.text.*;
-import java.awt.*;
-import java.awt.event.*;
-import java.awt.Font.*;
-import java.io.*;
+
+import javax.swing.JButton;
+import javax.swing.JPanel;
+import javax.swing.BoxLayout;
+import javax.swing.JFileChooser;
+import javax.swing.Box;
+import javax.swing.JScrollPane;
+
+import java.awt.BorderLayout;
+import java.awt.Dimension;
+
+import java.awt.event.ActionListener;
+import java.awt.event.ActionEvent;
+
+import java.io.File;
 
 public class DataTablePane
 						extends 
@@ -97,9 +103,7 @@ public class DataTablePane
 		table.addRow("");
 	}
 	
-	/**
-	 * 	
-	 */
+	//TODO: Implement this function
 	private void fromFile(){
 		
 		if(fc == null){

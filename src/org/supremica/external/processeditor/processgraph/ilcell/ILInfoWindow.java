@@ -1,14 +1,33 @@
 package org.supremica.external.processeditor.processgraph.ilcell;
 
 
-import javax.swing.*;
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JPanel;
+import javax.swing.JMenuItem;
+import javax.swing.JMenu;
+import javax.swing.JCheckBoxMenuItem;
+import javax.swing.JFileChooser;
+import javax.swing.JLabel;
+import javax.swing.BorderFactory;
+import javax.swing.JMenuBar;
+import javax.swing.KeyStroke;
+import javax.swing.UIManager;
 
-import java.awt.*;
-import java.awt.event.*;
-import java.io.*;
+import java.awt.BorderLayout;
+import java.awt.Toolkit;
+import java.awt.FlowLayout;
 
-import org.supremica.manufacturingTables.xsd.il.*;
-import org.supremica.external.processeditor.xml.*;
+import java.awt.event.ActionListener;
+import java.awt.event.ActionEvent;
+import java.io.File;
+
+import org.supremica.manufacturingTables.xsd.il.IL;
+import org.supremica.manufacturingTables.xsd.il.ILStructure;
+import org.supremica.manufacturingTables.xsd.il.ObjectFactory;
+
+import org.supremica.external.processeditor.processgraph.table.TextInputPane;
+import org.supremica.external.processeditor.xml.Loader;
 
 /**
  * Displays the operation info window, which allow the user to edit 
@@ -33,8 +52,6 @@ public class ILInfoWindow
     private static final String COMMENT = "Comment:";
     private static final String ACTUATOR = "Actuator:";
     private static final String OPERATION = "Operation:";
-    
-    private ObjectFactory factory = new ObjectFactory();
     
     private JMenuItem jmiSave, jmiSaveAs, jmiOpen;
     
