@@ -168,7 +168,7 @@ public class Milp
     
     private ArrayList<ArrayList<int[]>> xorConstraints = null;
     
-    private ArrayList<ArrayList<ArrayList<int[]>>> sharedEventConstraints = null;
+    private ArrayList<ArrayList<ArrayList<ArrayList<int[]>>>> sharedEventConstraints = null;
     
     /**
      * Contains the minimal state times of each plant,
@@ -650,7 +650,7 @@ public class Milp
         altPathsConstraints = new ArrayList<Constraint>();
         xorConstraints = new ArrayList<ArrayList<int[]>>();
         nonCrossbookingConstraints = new ArrayList<ArrayList<String>>();
-        sharedEventConstraints = new ArrayList<ArrayList<ArrayList<int[]>>>();
+        sharedEventConstraints = new ArrayList<ArrayList<ArrayList<ArrayList<int[]>>>>();
         
         pathCutTable = new Hashtable<State,String>();
         
@@ -2739,25 +2739,28 @@ public class Milp
         // Add the constraints for the time variables associated with shared events
         for (LabeledEvent sharedEvent : sharedEventTimeVarsMap.keySet())
         {
-            ArrayList<ArrayList<int[]>> currSharedEventInfoList = new ArrayList<ArrayList<int[]>>();
+            ArrayList<ArrayList<ArrayList<int[]>>> currSharedEventInfoList = new ArrayList<ArrayList<ArrayList<int[]>>>();
             
             IntArrayTreeSet sharedTimeVars = sharedEventTimeVarsMap.get(sharedEvent);
             int currCounter = 0;
             
             int prevRobotIndex = -1;
-            ArrayList<int[]> currSharedEventInRobotList = null;
+            ArrayList<ArrayList<int[]>> currSharedEventInRobotList = null;
             for (Iterator<int[]> sharedTimeVarIt = sharedTimeVars.iterator(); sharedTimeVarIt.hasNext();)
             {
                 int[] sharedTimeVar = sharedTimeVarIt.next();
                 if (sharedTimeVar[0] != prevRobotIndex)
                 {
-                    currSharedEventInRobotList = new ArrayList<int[]>();
+                    currSharedEventInRobotList = new ArrayList<ArrayList<int[]>>();
                     currSharedEventInfoList.add(currSharedEventInRobotList);
                     prevRobotIndex = sharedTimeVar[0];
                 }
                 
-                currSharedEventInRobotList.add(0, sharedTimeVar);
-                currSharedEventInRobotList.addAll(getActiveAltPathVars(new int[]{sharedTimeVar[0], sharedTimeVar[1], indexMap.getEventIndex(sharedEvent)}));
+                ArrayList<int[]> currSharedEventInStateList = new ArrayList<int[]>();
+                currSharedEventInRobotList.add(currSharedEventInStateList);
+                
+                currSharedEventInStateList.add(sharedTimeVar);
+                currSharedEventInStateList.addAll(getActiveAltPathVars(new int[]{sharedTimeVar[0], sharedTimeVar[1], indexMap.getEventIndex(sharedEvent)}));
                 
                 
 //                for (int j = i+1; j < sharedTimeVars.size(); j++)
@@ -3522,6 +3525,10 @@ public class Milp
     public ArrayList<ArrayList<String>> getNonCrossbookingConstraints()
     {
         return nonCrossbookingConstraints;
+    }
+    public ArrayList<ArrayList<ArrayList<ArrayList<int[]>>>> getSharedEventConstraints()
+    {
+        return sharedEventConstraints;
     }
     
     public Automata getSubControllers()

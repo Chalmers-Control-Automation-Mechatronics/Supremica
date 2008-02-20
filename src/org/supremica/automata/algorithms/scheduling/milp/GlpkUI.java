@@ -216,6 +216,80 @@ public class GlpkUI
 //TODO: w.write(externalPrecConstraints) - så jobbigt att jag lämnar det till sist...        
 //        w.write(externalConstraints);
 //        w.newLine();
+        
+        // The constraints on the events that are shared between the robots
+        counter = 0;
+        for (ArrayList<ArrayList<ArrayList<int[]>>> sharedEventConstraintsBlock : milpConstructor.getSharedEventConstraints())
+        {
+            for (int i1 = 0; i1 < sharedEventConstraintsBlock.size() - 1; i1++)
+            {
+                ArrayList<ArrayList<int[]>> allSharedTimeVarsInFirstPlant = sharedEventConstraintsBlock.get(i1);
+                String allAltPathVarsInFirstPlantStr = "";
+                
+                for (int i2 = i1 + 1; i2 < sharedEventConstraintsBlock.size(); i2++)
+                {
+                     ArrayList<ArrayList<int[]>> allSharedTimeVarsInSecondPlant = sharedEventConstraintsBlock.get(i2);
+                     String allAltPathVarsInSecondPlantStr = "";
+                     
+                     for (int j1 = 0; j1 < allSharedTimeVarsInFirstPlant.size(); j1++)
+                     {
+                         ArrayList<int[]> currSharedTimeVarsInFirstPlant = allSharedTimeVarsInFirstPlant.get(j1);
+                         String constraintTailFirstPlant = "";
+                         for (int k1 = 1; k1 < currSharedTimeVarsInFirstPlant.size(); k1++)
+                         {
+                             constraintTailFirstPlant += " - " + makeAltPathsVariableStr(currSharedTimeVarsInFirstPlant.get(k1));
+                             allAltPathVarsInFirstPlantStr += " + " + makeAltPathsVariableStr(currSharedTimeVarsInFirstPlant.get(k1));
+                         }
+                         if (currSharedTimeVarsInFirstPlant.size() == 1) // If there is no alt. path up to the shared event (i.e. if the event must occur in this plant)
+                         {
+                             allAltPathVarsInFirstPlantStr += " + 1";
+                         }
+                         
+                         for (int j2 = 0; j2 < allSharedTimeVarsInSecondPlant.size(); j2++)
+                         {
+                             ArrayList<int[]> currSharedTimeVarsInSecondPlant = allSharedTimeVarsInSecondPlant.get(j2);
+                             String primalConstraint = "shared_event_" + counter + " : time[" + currSharedTimeVarsInFirstPlant.get(0)[0] + ", " +
+                                     currSharedTimeVarsInFirstPlant.get(0)[1] + "] >= time[" + currSharedTimeVarsInSecondPlant.get(0)[0] + 
+                                     ", " + currSharedTimeVarsInSecondPlant.get(0)[1] + "]";
+                             String dualConstraint = "shared_event_dual_" + counter++ + " : time[" + currSharedTimeVarsInSecondPlant.get(0)[0] + ", " +
+                                     currSharedTimeVarsInSecondPlant.get(0)[1] + "] >= time[" + currSharedTimeVarsInFirstPlant.get(0)[0] + 
+                                     ", " + currSharedTimeVarsInFirstPlant.get(0)[1] + "]";
+                             
+                             String constraintTail = "";
+                             int currNrAltPathVars = currSharedTimeVarsInFirstPlant.size() + currSharedTimeVarsInSecondPlant.size() - 2;
+                             if (currNrAltPathVars > 0)
+                             {
+                                 constraintTail = " - bigM*(" + currNrAltPathVars + constraintTailFirstPlant;
+                                 
+                                 for (int k2 = 1; k2 < currSharedTimeVarsInSecondPlant.size(); k2++)
+                                 {
+                                     constraintTail += " - " + makeAltPathsVariableStr(currSharedTimeVarsInSecondPlant.get(k2));
+                                     allAltPathVarsInSecondPlantStr += " + " + makeAltPathsVariableStr(currSharedTimeVarsInSecondPlant.get(k2));
+                                 }
+                                 constraintTail += ")";
+                             }
+                             constraintTail += ";\n";
+                             
+                             if (currSharedTimeVarsInSecondPlant.size() == 1) // If there is no alt. path up to the shared event (i.e. if the event must occur in this plant)
+                             {
+                                 allAltPathVarsInSecondPlantStr += " + 1";
+                             }
+                             
+                             w.write(primalConstraint + constraintTail);
+                             w.write(dualConstraint + constraintTail);
+                         }
+                     }
+                     
+                     // Remove the first ' + ' of the altPathStrings
+                     allAltPathVarsInFirstPlantStr = allAltPathVarsInFirstPlantStr.substring(3);
+                     allAltPathVarsInSecondPlantStr = allAltPathVarsInSecondPlantStr.substring(3);
+                     
+                     w.write("shared_event_equal_occurrence_" + counter++ + " : " + 
+                             allAltPathVarsInFirstPlantStr + " = " + allAltPathVarsInSecondPlantStr + ";\n");
+                }
+            }
+        }
+        w.newLine();                
   
         // The constraints representing deadlocks (found as possible circular wait 
         // in connected components graph) and their antidots, unfeasible combinations 
