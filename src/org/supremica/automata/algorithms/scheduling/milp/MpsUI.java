@@ -44,6 +44,7 @@ public class MpsUI
     Hashtable<String, Integer> timeVarIndexMap = new Hashtable<String, Integer>();
     ArrayList<double[]>[] varCoeffs;
     ArrayList<Double> bUpper;
+    ArrayList<Integer> equalityRowIndices;
     
     /** Creates a new instance of GlpkUI */
     public MpsUI(Milp milpConstructor)
@@ -99,6 +100,7 @@ public class MpsUI
         }
         
         int constraintCounter = 0;
+        equalityRowIndices = new ArrayList<Integer>();
         bUpper = new ArrayList<Double>();
         varCoeffs = new ArrayList[binVarIndexMap.size() + timeVarIndexMap.size() + 1];
         for (int i = 0; i < varCoeffs.length; i++)
@@ -140,7 +142,7 @@ public class MpsUI
                     add(new double[]{constraintCounter, 1});
             varCoeffs[timeVarIndexMap.get("time[" + constr[0] + ", " + constr[2] + "]")].
                     add(new double[]{constraintCounter++, -1});
-            bUpper.add(new Double(-1 * (milpConstructor.getDeltaTimes()[constr[0]][constr[1]] + Milp.EPSILON)));
+            bUpper.add(new Double(-1 * (milpConstructor.getDeltaTimes()[constr[0]][constr[2]] + Milp.EPSILON)));
         }
         
         // The alternative paths constraints
@@ -189,26 +191,180 @@ public class MpsUI
             
             processConstraintString(constrBody, constraintCounter++);
         }
+        
+        // The shared events constraints (a block of constrains for each shared event)
+        for (ArrayList<ArrayList<ArrayList<int[]>>> eventBlock : milpConstructor.getSharedEventConstraints())
+        {
+            for (int i1 = 0; i1 < eventBlock.size() - 1; i1++)
+            {
+                ArrayList<ArrayList<int[]>> allSharedTimeVarsInFirstPlant = eventBlock.get(i1);
+                
+                for (int i2 = i1+1; i2 < eventBlock.size(); i2++)
+                {
+                    ArrayList<ArrayList<int[]>> allSharedTimeVarsInSecondPlant = eventBlock.get(i2);
+                    
+                    // The hashtables are needed to ensure that the event occurs as many times in both plants
+                    Hashtable<Integer, Integer> firstPlantFrequencyMap = new Hashtable<Integer, Integer>();
+                    Hashtable<Integer, Integer> secondPlantFrequencyMap = new Hashtable<Integer, Integer>();
+                    // Forced occurrences of an event (no path choices upstreams) are stored at index -1
+                    firstPlantFrequencyMap.put(-1, 0);
+                    secondPlantFrequencyMap.put(-1, 0);
+                    
+                    for (int j1 = 0; j1 < allSharedTimeVarsInFirstPlant.size(); j1++)
+                    {
+                        ArrayList<int[]> currSharedTimeVarsInFirstPlant = allSharedTimeVarsInFirstPlant.get(j1);
+                        int[] firstPlantState = currSharedTimeVarsInFirstPlant.get(0);
+                        
+                        // Update the frequency of forced event occurrence if there are no altPath variables for this plant-state
+                        if (currSharedTimeVarsInFirstPlant.size() == 1)
+                        {
+                            int forcedFrequency = firstPlantFrequencyMap.get(-1);
+                            firstPlantFrequencyMap.put(-1, forcedFrequency + 1);
+                        }
+                        
+                        for (int j2 = 0; j2 < allSharedTimeVarsInFirstPlant.size(); j2++)
+                        {
+                            ArrayList<int[]> currSharedTimeVarsInSecondPlant = allSharedTimeVarsInSecondPlant.get(j2);                            
+                            int[] secondPlantState = currSharedTimeVarsInSecondPlant.get(0);
+                            
+                            // Update the frequency of forced event occurrence if there are no altPath variables for this plant-state
+                            if (currSharedTimeVarsInSecondPlant.size() == 1)
+                            {
+                                int forcedFrequency = secondPlantFrequencyMap.get(-1);
+                                secondPlantFrequencyMap.put(-1, forcedFrequency + 1);
+                            }
+                            
+                            // Creating two constraints for each plant-state-pair
+                            varCoeffs[timeVarIndexMap.get("time[" + secondPlantState[0] + ", " + 
+                                    secondPlantState[1] + "]")].add(new double[]{constraintCounter, 1});
+                            varCoeffs[timeVarIndexMap.get("time[" + secondPlantState[0] + ", " + 
+                                    secondPlantState[1] + "]")].add(new double[]{constraintCounter + 1, -1});
+                            varCoeffs[timeVarIndexMap.get("time[" + firstPlantState[0] + ", " + 
+                                    firstPlantState[1] + "]")].add(new double[]{constraintCounter, -1});
+                            varCoeffs[timeVarIndexMap.get("time[" + firstPlantState[0] + ", " + 
+                                    firstPlantState[1] + "]")].add(new double[]{constraintCounter + 1, 1});
+                            
+                            // The occurrence frequency of each altPathVariable is important 
+                            int altPathCounter = 0;
+                            Hashtable<Integer, Integer> currFrequencyMap = new Hashtable<Integer, Integer>();
+                            for (int k1 = 1; k1 < currSharedTimeVarsInFirstPlant.size(); k1++)
+                            {
+                                int altPathIndex = binVarIndexMap.get(makeAltPathsVariableStr(
+                                        currSharedTimeVarsInFirstPlant.get(k1)));
+                                
+                                Integer currFrequency = currFrequencyMap.get(new Integer(altPathIndex));
+                                if (currFrequency == null)
+                                {
+                                    currFrequency = new Integer(0);
+                                }
+                                currFrequencyMap.put(altPathIndex, currFrequency.intValue() + 1);
+                                
+                                Integer firstPlantFrequency = firstPlantFrequencyMap.get(new Integer(altPathIndex));
+                                if (firstPlantFrequency == null)
+                                {
+                                    firstPlantFrequency = new Integer(0);
+                                }
+                                firstPlantFrequencyMap.put(altPathIndex, firstPlantFrequency.intValue() + 1);
+                                
+                                altPathCounter++;
+                            }
+                            for (int k2 = 1; k2 < currSharedTimeVarsInSecondPlant.size(); k2++)
+                            {
+                                int altPathIndex = binVarIndexMap.get(makeAltPathsVariableStr(
+                                        currSharedTimeVarsInSecondPlant.get(k2)));
+                                
+                                Integer currFrequency = currFrequencyMap.get(new Integer(altPathIndex));
+                                if (currFrequency == null)
+                                {
+                                    currFrequency = new Integer(0);
+                                }
+                                currFrequencyMap.put(altPathIndex, currFrequency.intValue() + 1);
+                                
+                                Integer secondPlantFrequency = secondPlantFrequencyMap.get(new Integer(altPathIndex));
+                                if (secondPlantFrequency == null)
+                                {
+                                    secondPlantFrequency = new Integer(0);
+                                }
+                                secondPlantFrequencyMap.put(altPathIndex, secondPlantFrequency.intValue() + 1);
+                                
+                                altPathCounter++;
+                            }
+                            
+                            // The occurrence frequencys are added to the coefficients of current row for each variable
+                            for (Integer altPathIndex : currFrequencyMap.keySet())
+                            {
+                                varCoeffs[altPathIndex].add(new double[]{constraintCounter, 
+                                    Milp.BIG_M_VALUE * currFrequencyMap.get(altPathIndex)});
+                                varCoeffs[altPathIndex].add(new double[]{constraintCounter + 1, 
+                                    Milp.BIG_M_VALUE * currFrequencyMap.get(altPathIndex)});
+                            }
+                            
+                            // Two right-hand-side-expressions are needed
+                            bUpper.add(new Double(Milp.BIG_M_VALUE * altPathCounter));
+                            bUpper.add(new Double(Milp.BIG_M_VALUE * altPathCounter));
+                            
+                            constraintCounter += 2;
+                        }
+                    }
+                    
+                    // The last constraint ensures that the number of event occurrences is equal in both plants 
+                    for (Integer altPathIndex : firstPlantFrequencyMap.keySet())
+                    {
+                        if (altPathIndex > -1)
+                        {
+                            varCoeffs[altPathIndex].add(new double[]{
+                                constraintCounter, -1 * firstPlantFrequencyMap.get(altPathIndex)});
+                        }
+                    }
+                    for (Integer altPathIndex : secondPlantFrequencyMap.keySet())
+                    {
+                        if (altPathIndex > -1)
+                        {
+                            varCoeffs[altPathIndex].add(new double[]{
+                                constraintCounter, secondPlantFrequencyMap.get(altPathIndex)});
+                        }
+                    }
+                    // The right-hand-side is generally = 0, but here it contains the numbers of
+                    // forces event occurrences (no alt. paths upstreams)
+                    bUpper.add(new Double(firstPlantFrequencyMap.get(-1) - secondPlantFrequencyMap.get(-1)));
+                    
+                    // The list of equality row indices is updated
+                    equalityRowIndices.add(constraintCounter);
+                    constraintCounter++;
+                }
+            }
+        }
 
         // Populate the mps-file
         w.write("NAME          DESUPREMICA\n");
         
         w.write("ROWS\n");
         w.write(" N  MAKESP\n");
-        int firstLConstrNr = milpConstructor.getCycleTimeConstraints().size() + 
-                milpConstructor.getInitPrecConstraints().size() + milpConstructor.getPrecConstraints().size() +
-                milpConstructor.getAltPathsConstraints().size() + milpConstructor.getMutexConstraints().size();
-        for (int i = 0; i < firstLConstrNr; i++)
+//        int firstLConstrNr = milpConstructor.getCycleTimeConstraints().size() + 
+//                milpConstructor.getInitPrecConstraints().size() + milpConstructor.getPrecConstraints().size() +
+//                milpConstructor.getAltPathsConstraints().size() + milpConstructor.getMutexConstraints().size();
+//        for (int i = 0; i < firstLConstrNr; i++)
+//        {
+//            w.write(" L  R" + i + "\n");
+//        }
+//        for (int i = firstLConstrNr; i < milpConstructor.getXorConstraints().size(); i++)
+//        {
+//            w.write(" E  R" + i + "\n");
+//        }
+//        for (int i = firstLConstrNr + milpConstructor.getXorConstraints().size(); i < constraintCounter; i++)
+//        {
+//            w.write(" L  R" + i + "\n");
+//        }
+        for (int i = 0; i < constraintCounter; i++)
         {
-            w.write(" L  R" + i + "\n");
-        }
-        for (int i = firstLConstrNr; i < milpConstructor.getXorConstraints().size(); i++)
-        {
-            w.write(" E  R" + i + "\n");
-        }
-        for (int i = firstLConstrNr + milpConstructor.getXorConstraints().size(); i < constraintCounter; i++)
-        {
-            w.write(" L  R" + i + "\n");
+            if (equalityRowIndices.contains(i))
+            {
+                w.write(" E  R" + i + "\n");
+            }
+            else
+            {
+                w.write(" L  R" + i + "\n");
+            }
         }
         
         w.write("COLUMNS\n");
@@ -493,7 +649,7 @@ public class MpsUI
                 milpEchoStr = milpEchoStr.substring(milpEchoStr.indexOf("took") + 5).trim();
                 String runTime = milpEchoStr.substring(0, milpEchoStr.indexOf("sec")).trim();
                 
-                milpConstructor.addToMessages("\tOptimization time = " + runTime, 
+                milpConstructor.addToMessages("\tOptimization time = " + runTime + "ms", 
                         SchedulingConstants.MESSAGE_TYPE_INFO); 
                 milpConstructor.addToMessages("\t\tOPTIMAL MAKESPAN: " + objValue, 
                         SchedulingConstants.MESSAGE_TYPE_INFO);
@@ -529,6 +685,25 @@ public class MpsUI
 //         
 //        milpConstructor.addToMessages("\tNr of GLPK-iterations = " + totalIterationCount + " (incl. " + 
 //                lpIterationCount + " LP-iterations)\n", SchedulingConstants.MESSAGE_TYPE_INFO);
+        
+        //temp
+        for (String key : binVarIndexMap.keySet())
+        {
+            System.out.println("key = " + key + " => X" + binVarIndexMap.get(key));
+        }
+        for (String key : timeVarIndexMap.keySet())
+        {
+            System.out.println("key = " + key + " => T" + timeVarIndexMap.get(key));
+        }      
+        for (int i = 0; i < milpConstructor.getDeltaTimes().length; i++)
+        {
+            String s = "";
+            for (int j = 0; j < milpConstructor.getDeltaTimes()[i].length; j++)
+            {
+                s += "dt[" + i + ", " + j + "] = " + milpConstructor.getDeltaTimes()[i][j] + "; ";
+            }
+            System.out.println(s);
+        }
     }
     
     /**
