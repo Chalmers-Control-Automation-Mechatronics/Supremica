@@ -33,12 +33,10 @@ public class MpsUI
     private Milp milpConstructor = null;
             
     /** The optimal times (for each plant-state) that the GLPK solver returns */
-//    private double[][] optimalTimes = null;
-    private double[] optimalTimeVarValues = null;
+    private double[][] optimalTimes = null;
     
     /** The optimal alt. path variables (booleans) for each [plant][start_state][end_state] */
-//    private boolean[][][] optimalAltPathVariables = null;
-    private boolean[] optimalBinVarValues = null;
+    private boolean[][][] optimalAltPathVariables = null;
     
     Hashtable<String, Integer> binVarIndexMap = new Hashtable<String, Integer>();
     Hashtable<String, Integer> timeVarIndexMap = new Hashtable<String, Integer>();
@@ -112,19 +110,10 @@ public class MpsUI
         // The cycle time constraints
         for (int[] constr : milpConstructor.getCycleTimeConstraints())
         {
-            try
-            {
             varCoeffs[timeVarIndexMap.get("time[" + constr[0] + ", " + constr[1] + "]")].
                     add(new double[]{constraintCounter, 1});
             varCoeffs[binVarIndexMap.size()].add(new double[]{constraintCounter++, -1});
             bUpper.add(new Double(0));
-            }
-            catch (Exception e)
-            {
-                System.out.println("var = " + "time[" + constr[0] + ", " + constr[1] + "]");
-                System.out.println("res = " + timeVarIndexMap.get("time[" + constr[0] + ", " + constr[1] + "]"));
-                return;
-            }
         }
         
         // The initial (precedence) constraints
@@ -525,10 +514,6 @@ public class MpsUI
             else if (currToken.contains(">="))
             {
                 multiplier = 1;
-                if (str.contains("non_cross_0"))
-                {
-                    System.out.println("resetting multiplier to " + multiplier);
-                }
                 tokenSign = 1;
             }
             else if (currToken.contains("-"))
@@ -600,16 +585,20 @@ public class MpsUI
      */
     private void launchMilpSolver(File mpsFile)
         throws MilpException, IOException
-    {               
+    {      
+        BufferedWriter commandWriter = null;
         try
         {
             // Launches the MILP-solver
             milpProcess = Runtime.getRuntime().exec(new String[]{"cbc"});
-            BufferedWriter commandWriter = new BufferedWriter(
+            commandWriter = new BufferedWriter(
                     new OutputStreamWriter(new DataOutputStream(milpProcess.getOutputStream())));
             commandWriter.write("import " + mpsFile.getAbsolutePath() + "\n");
             commandWriter.write("solve\n");
-            commandWriter.write("solution " + solutionFile.getAbsolutePath() + "\n");
+            commandWriter.write("directory c:\n"); // A needed fix to cope with unix-file-finding
+            String solutionPath = solutionFile.getAbsolutePath();
+            solutionPath = solutionPath.substring(3);
+            commandWriter.write("solution " + solutionPath + "\n");
             commandWriter.write("quit\n");
             commandWriter.flush();
             commandWriter.close();
@@ -636,7 +625,7 @@ public class MpsUI
             if (milpEchoStr.contains("Result"))
             {
                 System.out.println("milpecho = " + milpEchoStr);
-                
+     
                 milpEchoStr = milpEchoStr.substring(milpEchoStr.indexOf("objective") + 10).trim();
                 String objValue = milpEchoStr.substring(0, milpEchoStr.indexOf("after")).trim();
                 
@@ -653,56 +642,9 @@ public class MpsUI
                         SchedulingConstants.MESSAGE_TYPE_INFO); 
                 milpConstructor.addToMessages("\t\tOPTIMAL MAKESPAN: " + objValue, 
                         SchedulingConstants.MESSAGE_TYPE_INFO);
-                milpConstructor.addToMessages("\t Nr of nodes = " + nrNodes +"; nr of iterations = " + nrIters, 
+                milpConstructor.addToMessages("\tNr of nodes = " + nrNodes +"; nr of iterations = " + nrIters, 
                         SchedulingConstants.MESSAGE_TYPE_INFO);
             }
-        }
-//            totalMilpEchoStr += milpEchoStr + "\n";
-//            
-//            if (milpEchoStr.contains("+") && milpEchoStr.contains(":") && 
-//                    milpEchoStr.contains("mip") && milpEchoStr.contains(">="))
-//            {
-//                if (lpIterationCount.equals("") && totalIterationCount.equals(""))
-//                {
-//                    lpIterationCount = milpEchoStr.substring(milpEchoStr.indexOf("+") + 1, milpEchoStr.indexOf(":")).trim();
-//                }
-//                totalIterationCount = milpEchoStr.substring(milpEchoStr.indexOf("+") + 1, milpEchoStr.indexOf(":")).trim();
-//            }
-//            else if (milpEchoStr.contains("objval"))
-//            {
-//                lpIterationCount = milpEchoStr.substring(0, milpEchoStr.indexOf(":")).trim();
-//            }
-
-//        else if (milpEchoStr.contains("NO") && milpEchoStr.contains("FEASIBLE SOLUTION"))
-//            {
-//                throw new MilpException(milpEchoStr + " (specifications should be relaxed if possible).");
-//            }
-//            else if (milpEchoStr.contains("error"))
-//            {
-//                throw new MilpException(totalMilpEchoStr);
-//            }
-//        }
-//         
-//        milpConstructor.addToMessages("\tNr of GLPK-iterations = " + totalIterationCount + " (incl. " + 
-//                lpIterationCount + " LP-iterations)\n", SchedulingConstants.MESSAGE_TYPE_INFO);
-        
-        //temp
-        for (String key : binVarIndexMap.keySet())
-        {
-            System.out.println("key = " + key + " => X" + binVarIndexMap.get(key));
-        }
-        for (String key : timeVarIndexMap.keySet())
-        {
-            System.out.println("key = " + key + " => T" + timeVarIndexMap.get(key));
-        }      
-        for (int i = 0; i < milpConstructor.getDeltaTimes().length; i++)
-        {
-            String s = "";
-            for (int j = 0; j < milpConstructor.getDeltaTimes()[i].length; j++)
-            {
-                s += "dt[" + i + ", " + j + "] = " + milpConstructor.getDeltaTimes()[i][j] + "; ";
-            }
-            System.out.println(s);
         }
     }
     
@@ -713,16 +655,8 @@ public class MpsUI
     public void processSolutionFile()
         throws MilpException, FileNotFoundException, IOException
     {       
-        optimalTimeVarValues = new double[timeVarIndexMap.size()];
-        for (int i = 0; i < optimalTimeVarValues.length; i++)
-        {
-            optimalTimeVarValues[i] = 0;
-        }
-        optimalBinVarValues = new boolean[binVarIndexMap.size()];
-        for (int i = 0; i < optimalBinVarValues.length; i++)
-        {
-            optimalBinVarValues[i] = false;
-        }
+        Hashtable<Integer, Double> optimalTimeVarValues = new Hashtable<Integer, Double>();
+        Hashtable<Integer, Integer> optimalBinVarValues = new Hashtable<Integer, Integer>();
         
         BufferedReader r = new BufferedReader(new FileReader(solutionFile));
      
@@ -735,13 +669,13 @@ public class MpsUI
             {
                 str = str.substring(cutIndex + 1);
                 cutIndex = str.indexOf(" ");
-                int varIndex = (new Integer(str.substring(0, cutIndex).trim())).intValue();
+                Integer varIndex = new Integer(str.substring(0, cutIndex).trim());
                 
                 str = str.substring(cutIndex).trim();
                 cutIndex = str.indexOf(" ");
-                double varValue = (new Integer(str.substring(0, cutIndex).trim())).intValue();
+                Integer varValue = new Integer(str.substring(0, cutIndex).trim());
                 
-                optimalBinVarValues[varIndex] = (varValue == 1);
+                optimalBinVarValues.put(new Integer(varIndex), varValue);
             }
             else 
             {
@@ -750,17 +684,58 @@ public class MpsUI
                 {
                     str = str.substring(cutIndex + 1);
                     cutIndex = str.indexOf(" ");
-                    int varIndex = (new Integer(str.substring(0, cutIndex).trim())).intValue();
+                    Integer varIndex = new Integer(str.substring(0, cutIndex).trim());
 
                     str = str.substring(cutIndex).trim();
                     cutIndex = str.indexOf(" ");
-                    double varValue = (new Double(str.substring(0, cutIndex).trim())).intValue();
+                    Double varValue = new Double(str.substring(0, cutIndex).trim());
 
-                    optimalTimeVarValues[varIndex] = varValue;
+                    optimalTimeVarValues.put(varIndex, varValue);
                 }
             }
+        }
+        
+        // Initialize the arrays of optimal variable values
+        optimalTimes = new double[milpConstructor.getDeltaTimes().length][];
+        optimalAltPathVariables = new boolean[milpConstructor.getDeltaTimes().length][][];
+        for (int i = 0; i < optimalTimes.length; i++)
+        {
+            optimalTimes[i] = new double[milpConstructor.getDeltaTimes()[i].length];
+            optimalAltPathVariables[i] = new boolean[milpConstructor.getDeltaTimes()[i].length]
+                    [milpConstructor.getDeltaTimes()[i].length];
+        }
+        
+        // Fill the arrays of optimal times with appropriate values
+        for (String varKey : timeVarIndexMap.keySet())
+        {
+            int plantIndex = (new Integer(varKey.substring(varKey.indexOf("[") + 1, varKey.indexOf(",")).trim())).intValue();
+            int stateIndex = (new Integer(varKey.substring(varKey.indexOf(",") + 1, varKey.indexOf("]")).trim())).intValue();
             
-            
+            Double optimalVarValue = optimalTimeVarValues.get(timeVarIndexMap.get(varKey));
+            if (optimalVarValue != null)
+            {
+                optimalTimes[plantIndex][stateIndex] = optimalVarValue.doubleValue();
+            }
+        }
+        // Fill the arrays of optimal alt path variables with appropriate values
+        for (String varKey : binVarIndexMap.keySet())
+        {
+            // If this is an alt.path variable, then store it. Otherwise, do nothing.
+            if (varKey.contains("_from_") && varKey.contains("_to_"))
+            {
+                int[] plantStateIndices = unmakeAltPathsVariableStr(varKey);
+                Integer optimalVarValue = optimalBinVarValues.get(binVarIndexMap.get(varKey));
+                if (optimalVarValue != null)
+                {
+                    optimalAltPathVariables[plantStateIndices[0]][plantStateIndices[1]][plantStateIndices[2]] = 
+                            (optimalVarValue.intValue() == 1);
+                }
+                else
+                {
+                    optimalAltPathVariables[plantStateIndices[0]][plantStateIndices[1]][plantStateIndices[2]] = false;
+                }
+            }
+        }
 //            if (str.indexOf(" time[") > -1)
 //            {
 //                String strPlantIndex = str.substring(str.indexOf("[") + 1, str.indexOf(",")).trim();
@@ -822,21 +797,6 @@ public class MpsUI
 //                    optimalAltPathVariables[plantIndex][startStateIndex][endStateIndex] = true;
 //                }
 //            }
-        }
-        
-        //temp
-        String s = "binVars: ";
-        for (int i = 0; i < optimalBinVarValues.length; i++)
-        {
-            s += "[" + i + " -> " + optimalBinVarValues[i] + "], ";
-        }
-        System.out.println(s);
-        s = "timeVArs: ";
-        for (int i = 0; i < optimalTimeVarValues.length; i++)
-        {
-            s += "[" + i + " -> " + optimalTimeVarValues[i] + "], ";
-        }
-        System.out.println(s);
     }
      
     /**
@@ -872,17 +832,13 @@ public class MpsUI
     /** Returns the optimal event occurrence times for each plant-state. */
     public double[][] getOptimalTimes()
     {
-        //TODO...
-        //return optimalTimes;
-        return null;
+        return optimalTimes;
     }
     
     /** Returns the optimal alt. path variable choices. */
     public boolean[][][] getOptimalAltPathVariables()
     {
-        //TODO...
-        //return optimalAltPathVariables;
-       return null;
+       return optimalAltPathVariables;
     }
     
     /**
@@ -893,5 +849,16 @@ public class MpsUI
     public String makeAltPathsVariableStr(int[] altPathsVariable)
     {
         return "r" + altPathsVariable[0] + "_from_" + altPathsVariable[1] + "_to_" + altPathsVariable[2];
+    }
+    
+    private int[] unmakeAltPathsVariableStr(String varStr)
+    {
+        int[] varIndices = new int[3];
+        
+        varIndices[0] = (new Integer(varStr.substring(1, varStr.indexOf("_")))).intValue();
+        varIndices[1] = (new Integer(varStr.substring(varStr.indexOf("om_") + 3, varStr.indexOf("_to")))).intValue();
+        varIndices[2] = (new Integer(varStr.substring(varStr.indexOf("to_") + 3, varStr.length()))).intValue();
+        
+        return varIndices;
     }
 }

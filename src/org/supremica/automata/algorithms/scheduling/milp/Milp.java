@@ -281,6 +281,7 @@ public class Milp
             
             errorMsgs += "Milp::schedule() -> " + ex;
             debugMsgs.add(ex.getStackTrace());
+            ex.printStackTrace();//temp
         }
     }
     
@@ -490,7 +491,8 @@ public class Milp
                                 // to the optimal path, since precedence constraints are not fulfilled
                                 // Otherwise, this could be the path
 //                                 if (optimalTimes[plantIndex][nextStateIndex] >= currTime + indexMap.getStateAt(currPlant, nextStateIndex).getCost())
-                                if (milpSolver.getOptimalAltPathVariables()[plantIndex][currStateIndex][nextStateIndex])
+                                if (currState.nbrOfOutgoingMultiArcs() == 1  || 
+                                        milpSolver.getOptimalAltPathVariables()[plantIndex][currStateIndex][nextStateIndex])
                                 {
                                     // But! Care should be taken with the events common to any pair of plants.
                                     // When synched, the slowest plant should fire the synchronizing event.

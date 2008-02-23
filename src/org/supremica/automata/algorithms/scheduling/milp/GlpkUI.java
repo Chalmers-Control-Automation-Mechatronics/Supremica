@@ -536,7 +536,7 @@ public class GlpkUI
                 int startStateIndex = (new Integer(strStartStateIndex)).intValue();
                 int endStateIndex = (new Integer(strEndStateIndex)).intValue();
                 
-                optimalAltPathVariables[plantIndex][startStateIndex][endStateIndex] = true;
+//                optimalAltPathVariables[plantIndex][startStateIndex][endStateIndex] = true;
             }
             else if (str.indexOf("_from") > -1 && str.indexOf("alt_paths") < 0)
             {
