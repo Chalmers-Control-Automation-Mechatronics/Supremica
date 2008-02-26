@@ -71,6 +71,9 @@ public class BasicTablePane
 		super.addMouseListener(l);
 	}
 	
+	public boolean isRowHeaderVisible(){
+		return showRowHeader;
+	}
 	
 	public void showRowHeader(boolean show){
 		
@@ -91,7 +94,7 @@ public class BasicTablePane
 		}
 		
 		rowHeader = new JList(headers);
-	    rowHeader.setFixedCellWidth(50);
+	    rowHeader.setFixedCellWidth(60);
 	    rowHeader.setFixedCellHeight(table.getRowHeight());
 	    rowHeader.setCellRenderer(new RowHeaderRenderer(table));
 		
@@ -142,6 +145,10 @@ public class BasicTablePane
 		return table.getColumnName(column);
 	}
 	
+	public void setRowName(int row, String name){
+		table.setRowName(row, name);
+	}
+	
 	public String getRowName(int row){
 		return table.getModel().getRowName(row);
 	}
@@ -169,6 +176,7 @@ class RowHeaderRenderer extends
 						implements 
 							ListCellRenderer
 {
+	  /* constructor */
 	  RowHeaderRenderer(JTable table) {
 	    JTableHeader header = table.getTableHeader();
 	    setOpaque(true);

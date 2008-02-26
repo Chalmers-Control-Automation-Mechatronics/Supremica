@@ -4,13 +4,23 @@ package org.supremica.external.processeditor.processgraph.table;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 
-import java.awt.*;
-import java.awt.event.*;
+import java.awt.Component;
+import java.awt.AWTEvent;
 
-import org.jdesktop.swingx.*;
-import org.jdesktop.swingx.MultiSplitLayout.*;
+import java.awt.event.ActionListener;
+import java.awt.event.MouseListener;
+import java.awt.event.KeyListener;
+import java.awt.event.KeyEvent;
+import java.awt.event.ActionEvent;
+import java.awt.event.MouseEvent;
 
-import java.util.*;
+import org.jdesktop.swingx.MultiSplitPane;
+import org.jdesktop.swingx.MultiSplitLayout;
+import org.jdesktop.swingx.MultiSplitLayout.Split;
+import org.jdesktop.swingx.MultiSplitLayout.Leaf;
+import org.jdesktop.swingx.MultiSplitLayout.Divider;
+
+import java.util.LinkedList;
 import java.util.List;
 
 public class TableGroupPane 
@@ -22,7 +32,6 @@ public class TableGroupPane
 							MouseListener,
 							KeyListener
 {
-	private Object[] rowTableCopy = null;
 	
 	protected JPopupMenu popupMenu;
 	
@@ -107,23 +116,6 @@ public class TableGroupPane
 				table.setRowSelectionIntervall(selectedRows[0], selectedRows[0]);
 				table.addtableListener(this);
 			}
-		}
-	}
-	
-	public void copyRow(int index){
-		
-		BasicTablePane table = null;
-		
-		rowTableCopy = new Object[getComponentCount()];
-		
-		for(int i = 0; i < rowTableCopy.length; i++){
-			
-			Object o = getComponent(i);
-			
-			if(o instanceof BasicTablePane){
-				table = (BasicTablePane) o;
-				rowTableCopy[i] = table.getTable().getRow(index);
-			}	
 		}
 	}
 	

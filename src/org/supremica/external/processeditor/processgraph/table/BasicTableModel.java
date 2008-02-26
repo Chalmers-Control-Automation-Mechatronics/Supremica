@@ -134,6 +134,7 @@ public class BasicTableModel
 	
 	public void setRowName(int row, String name) {
 		rowNames.set(row, name);
+		fireTableDataChanged();
 	}
 	
 	public void removeRow(String name) {

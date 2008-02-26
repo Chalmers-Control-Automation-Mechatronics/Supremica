@@ -6,6 +6,7 @@ import java.io.*;
 
 import org.supremica.external.processeditor.processgraph.*;
 import org.supremica.external.processeditor.processgraph.ilcell.*;
+import org.supremica.external.processeditor.processgraph.eopcell.ExecutionOfOperationCell;
 import org.supremica.external.processeditor.processgraph.resrccell.*;
 import org.supremica.external.processeditor.xgraph.*;
 import org.supremica.external.processeditor.xml.*;
@@ -221,6 +222,15 @@ public class SOCGraphFrame extends JInternalFrame implements SelectionListener {
     	Point p = graphScroll.getCornerValue();
     	p.translate(INSERT_MARGIN_X, INSERT_MARGIN_Y);
     	newInterLock.setPos(p);
+    	graph.updateLargePreferredSize();
+    }
+    
+    public void newExecutionOfOperation() {
+    	GraphCell newExecutionOfOperation = new ExecutionOfOperationCell();
+    	graph.insert(newExecutionOfOperation, 0);
+    	Point p = graphScroll.getCornerValue();
+    	p.translate(INSERT_MARGIN_X, INSERT_MARGIN_Y);
+    	newExecutionOfOperation.setPos(p);
     	graph.updateLargePreferredSize();
     }
     

@@ -9,6 +9,7 @@ public class Loader {
 	
 	private final String PKGS = "org.supremica.manufacturingTables.xsd.processeditor";
 	private final String PKGS_IL = "org.supremica.manufacturingTables.xsd.il";
+	private final String PKGS_EOP = "org.supremica.manufacturingTables.xsd.eop";
 	
 	private JAXBContext jaxbContext;
     private Unmarshaller u;
@@ -41,6 +42,17 @@ public class Loader {
     	return null;
     }
     
+    public Object openEOP(File file) {
+    	try {			
+    		jaxbContext = JAXBContext.newInstance(PKGS_EOP);
+    		u = jaxbContext.createUnmarshaller();	    	    
+    		return load(file);
+    	}
+    	catch(JAXBException je) {
+    		je.printStackTrace();
+    	}
+    	return null;
+    }
     
     public Object open(String xmlStr, String PKGS) {	
     	
@@ -105,6 +117,24 @@ public class Loader {
         		m.marshal(o, new FileOutputStream(file));
         	}catch (Exception ex) {		
         		//System.out.println("ERROR! in FileOutputStrem " + PKGS_IL);	
+        	}
+    	}
+    	catch(JAXBException je) {
+    		je.printStackTrace();
+    	}
+    }
+    
+    public void saveEOP(Object o, File file){
+    	try {
+    		// Save IL		
+        	jaxbContext = JAXBContext.newInstance(PKGS_EOP);    
+        	m = jaxbContext.createMarshaller();
+        	m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true); 
+    	    
+        	try {				
+        		m.marshal(o, new FileOutputStream(file));
+        	}catch (Exception ex) {		
+        		//System.out.println("ERROR! in FileOutputStrem " + PKGS_EOP);	
         	}
     	}
     	catch(JAXBException je) {

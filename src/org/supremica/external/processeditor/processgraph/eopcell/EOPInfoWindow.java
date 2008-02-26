@@ -1,4 +1,4 @@
-package org.supremica.external.processeditor.processgraph.ilcell;
+package org.supremica.external.processeditor.processgraph.eopcell;
 
 
 import javax.swing.JButton;
@@ -22,9 +22,12 @@ import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import java.io.File;
 
-import org.supremica.manufacturingTables.xsd.il.IL;
-import org.supremica.manufacturingTables.xsd.il.ILStructure;
-import org.supremica.manufacturingTables.xsd.il.ObjectFactory;
+import org.supremica.manufacturingTables.xsd.eop.*;
+import org.supremica.manufacturingTables.xsd.eop.EOP;
+import org.supremica.manufacturingTables.xsd.eop.Action;
+import org.supremica.manufacturingTables.xsd.eop.InitialState;
+import org.supremica.manufacturingTables.xsd.eop.InitialStateCheck;
+import org.supremica.manufacturingTables.xsd.eop.ObjectFactory;
 
 import org.supremica.external.processeditor.processgraph.table.TextInputPane;
 import org.supremica.external.processeditor.xml.Loader;
@@ -33,7 +36,7 @@ import org.supremica.external.processeditor.xml.Loader;
  * Displays the operation info window, which allow the user to edit 
  * the operation, predecessor and attribute information.
  */
-public class ILInfoWindow
+public class EOPInfoWindow
 						extends 
 							JFrame 
 						implements 
@@ -44,20 +47,16 @@ public class ILInfoWindow
     private TextInputPane textInputPane;
     private JPanel topPanel, bottomPanel;
     
-    private ILStructureGroupPane tableGroup;
+    private EOPTableGroupPane tableGroup;
     
-    private IL il = null;
+    private EOP eop = null;
     
-    private static final String ID = "Id:";
-    private static final String COMMENT = "Comment:";
-    private static final String ACTUATOR = "Actuator:";
-    private static final String OPERATION = "Operation:";
+    private static final String ALARMDELAY = "Alarm delay:";
+    private static final String ALARMTYPE = "Alarm type:";
     
-    private JMenuItem jmiSave, jmiSaveAs, jmiOpen;
+    private JMenuItem jmiSave, jmiSaveAs, jmiOpen, jmiExit;
     
-    private JCheckBoxMenuItem jcbmiShowInt, jcbmiShowExt,
-    						  jcbmiShowOperation, jcbmiShowZone,
-    						  jcbmiShowMode, jcbmiShowProduct,
+    private JCheckBoxMenuItem jcbmiShowInt, jcbmiShowExt,jcbmiShowZone,
     						  jcbmiShowRowHeader;
     
     private File file = null; 
@@ -68,15 +67,15 @@ public class ILInfoWindow
      * @param a the object that is to be edit by this info window
      * @param c the operation cell that launched this info window
      */
-    public ILInfoWindow(IL il){
-    	super();
+    public EOPInfoWindow(EOP eop){
+    	super("Execution of operation");
     	
     	setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
     	
     	getContentPane().setLayout(new BorderLayout());
     	
-    	if(il == null){
-    		getContentPane().add(new JLabel("Error! No InterLock"), BorderLayout.CENTER);
+    	if(eop == null){
+    		getContentPane().add(new JLabel("Error! No Execution op operation"), BorderLayout.CENTER);
     		getContentPane().add(jbCancel = new JButton("Cancel"), BorderLayout.PAGE_END);
     		jbCancel.addActionListener(this);
     		
@@ -88,14 +87,14 @@ public class ILInfoWindow
     		return;
     	}
     	
-    	this.il = il;
+    	this.eop = eop;
     	
     	bottomPanel = new JPanel();
     	bottomPanel.setLayout(new FlowLayout(FlowLayout.RIGHT));
     	
-    	tableGroup = new ILStructureGroupPane(il.getILStructure());
+    	tableGroup = new EOPTableGroupPane(eop);
     	
-    	bottomPanel.add(jbCondition = new JButton("New condition"));
+    	bottomPanel.add(jbCondition = new JButton("New action"));
     	bottomPanel.add(jbOk = new JButton("OK")); 	    	    	    	    
     	bottomPanel.add(jbCancel = new JButton("Cancel"));	    
     	
@@ -104,16 +103,11 @@ public class ILInfoWindow
     	jbCancel.addActionListener(this);
     	jbCondition.addActionListener(this);
     	
-    	textInputPane = new TextInputPane(null, new String[]{ID,COMMENT,ACTUATOR,OPERATION});
-    	
-    	textInputPane.setText(ID, il.getId());
-    	textInputPane.setText(COMMENT, il.getComment());
-    	textInputPane.setText(ACTUATOR, il.getActuator());
-    	textInputPane.setText(OPERATION, il.getOperation());
+    	textInputPane = new TextInputPane(null, new String[]{ALARMTYPE,ALARMDELAY});
     	
     	topPanel = new JPanel();
     	topPanel.setLayout(new BorderLayout());
-    	topPanel.setBorder(BorderFactory.createTitledBorder("InterLock"));
+    	topPanel.setBorder(BorderFactory.createTitledBorder("Initial state check"));
     	
     	topPanel.add(textInputPane, BorderLayout.LINE_START);
     	
@@ -122,10 +116,7 @@ public class ILInfoWindow
     	//sync tableGroup with the menu
     	tableGroup.showInternalTable(jcbmiShowInt.isSelected());
     	tableGroup.showExternalTable(jcbmiShowExt.isSelected());
-    	tableGroup.showOperationTable(jcbmiShowOperation.isSelected());
     	tableGroup.showZoneTable(jcbmiShowZone.isSelected());
-    	tableGroup.showModeTable(jcbmiShowMode.isSelected());
-    	tableGroup.showProductTable(jcbmiShowProduct.isSelected());
     	tableGroup.setRowHeaderVisible(jcbmiShowRowHeader.isSelected());
     	
     	
@@ -152,16 +143,22 @@ public class ILInfoWindow
     	jmiSave = new JMenuItem("Save");
     	jmiSaveAs = new JMenuItem("Save as");
     	jmiOpen = new JMenuItem("Open");
+    	jmiExit = new JMenuItem("Exit");
     	
     	jmiSave.setAccelerator(KeyStroke.getKeyStroke('S', ActionEvent.CTRL_MASK));
     	
     	jmiSave.addActionListener(this);
     	jmiSaveAs.addActionListener(this);
     	jmiOpen.addActionListener(this);
+    	jmiExit.addActionListener(this);
     	
     	fileMenu.add(jmiSave);
     	fileMenu.add(jmiSaveAs);
     	fileMenu.add(jmiOpen);
+    	
+    	fileMenu.addSeparator();
+    	
+    	fileMenu.add(jmiExit);
     	menuBar.add(fileMenu);
     	
     	//table menu
@@ -172,43 +169,25 @@ public class ILInfoWindow
     	
     	jcbmiShowInt = new JCheckBoxMenuItem("Internal components");
     	jcbmiShowExt = new JCheckBoxMenuItem("External components");
-    	
-    	jcbmiShowOperation = new JCheckBoxMenuItem("Operation");
     	jcbmiShowZone = new JCheckBoxMenuItem("Zone");
-    	
-    	jcbmiShowMode = new JCheckBoxMenuItem("Mode");
-    	jcbmiShowProduct = new JCheckBoxMenuItem("Product");
     	
     	jcbmiShowRowHeader = new JCheckBoxMenuItem("Row header");
     	
-    	
     	jcbmiShowInt.setSelected(true);
-    	jcbmiShowExt.setSelected(true);
+    	jcbmiShowExt.setSelected(false);
     	jcbmiShowZone.setSelected(true);
-    	jcbmiShowOperation.setSelected(true);
     	
-    	jcbmiShowMode.setSelected(false);
-    	jcbmiShowProduct.setSelected(false);
-    	
-    	jcbmiShowRowHeader.setSelected(false);
+    	jcbmiShowRowHeader.setSelected(true);
     	
     	jcbmiShowInt.addActionListener(this);
     	jcbmiShowExt.addActionListener(this);
-    	jcbmiShowOperation.addActionListener(this);
+    	
     	jcbmiShowZone.addActionListener(this);
-    	jcbmiShowMode.addActionListener(this);
-    	jcbmiShowProduct.addActionListener(this);
     	jcbmiShowRowHeader.addActionListener(this);
-    	
-    	showMenu.add(jcbmiShowMode);
-    	showMenu.add(jcbmiShowProduct);
-    	
-    	
-    	showMenu.addSeparator();
     	
     	showMenu.add(jcbmiShowInt);
     	showMenu.add(jcbmiShowExt);
-    	showMenu.add(jcbmiShowOperation);
+    	
     	showMenu.add(jcbmiShowZone);
     	
     	showMenu.addSeparator();
@@ -227,10 +206,10 @@ public class ILInfoWindow
     		saveAs();
     	}
     	
-    	updateIL();
+    	updateEOP();
     	
     	Loader loader = new Loader();
-		loader.saveIL(il, file);
+		loader.saveEOP(eop, file);
     }
     
     public void saveAs(){
@@ -284,27 +263,26 @@ public class ILInfoWindow
         
         //open file
         loader = new Loader();
-        o = loader.openIL(tmpFile);
+        o = loader.openEOP(tmpFile);
         
-        if(o instanceof IL){
+        if(o instanceof EOP){
         	file = tmpFile;
-        	il = (IL) o;
+        	eop = (EOP) o;
         	
-        	textInputPane.setText(ID, il.getId());
-        	textInputPane.setText(COMMENT, il.getComment());
-        	textInputPane.setText(ACTUATOR, il.getActuator());
-        	textInputPane.setText(OPERATION, il.getOperation());
+        	if( null != eop.getInitialState() ){
+        		if( null != eop.getInitialState().getInitialStateCheck() ){
+        			textInputPane.setText(ALARMDELAY, eop.getInitialState().getInitialStateCheck().getAlarmDelay());
+        			textInputPane.setText(ALARMTYPE, eop.getInitialState().getInitialStateCheck().getAlarmType());
+        		}
+        	}
         	
         	getContentPane().remove(tableGroup);
-        	tableGroup = new ILStructureGroupPane(il.getILStructure());
+        	tableGroup = new EOPTableGroupPane(eop);
         	
         	//sync tableGroup with the menu
         	tableGroup.showInternalTable(jcbmiShowInt.isSelected());
         	tableGroup.showExternalTable(jcbmiShowExt.isSelected());
-        	tableGroup.showOperationTable(jcbmiShowOperation.isSelected());
         	tableGroup.showZoneTable(jcbmiShowZone.isSelected());
-        	tableGroup.showModeTable(jcbmiShowMode.isSelected());
-        	tableGroup.showProductTable(jcbmiShowProduct.isSelected());
         	tableGroup.setRowHeaderVisible(jcbmiShowRowHeader.isSelected());
         	
         	getContentPane().add(tableGroup);
@@ -316,35 +294,76 @@ public class ILInfoWindow
         
     }
     
-    private void updateIL(){
-    	il.setId(textInputPane.getText(ID));
-		il.setActuator(textInputPane.getText(ACTUATOR));
-		il.setComment(textInputPane.getText(COMMENT));
-		il.setOperation(textInputPane.getText(OPERATION));
-		
-		ILStructure ils = ((ILStructureGroupPane)tableGroup).getILStructure();
-		il.setILStructure(ils);
+    private void updateEOP(){
+    	
+    	//External components
+    	eop.setExternalComponents(((EOPTableGroupPane)tableGroup).getExternalComponents());
+    	
+    	//Internal components
+    	eop.setInternalComponents(((EOPTableGroupPane)tableGroup).getInternalComponents());
+    	
+    	//Zones
+    	eop.setZones(((EOPTableGroupPane)tableGroup).getZones());
+    	
+    	Action[] actions = ((EOPTableGroupPane)tableGroup).getActions();
+    	
+    	//Initial state
+    	InitialState initial = (new ObjectFactory()).createInitialState();
+    	for(ActuatorValue val : actions[0].getActuatorValue()){
+    		initial.getActuatorValue().add(val);
+    	}
+    	
+    	for(SensorValue val : actions[0].getSensorValue()){
+    		initial.getSensorValue().add(val);
+    	}
+    	
+    	for(VariableValue val : actions[0].getVariableValue()){
+    		initial.getVariableValue().add(val);
+    	}
+    	
+    	for(ZoneState val : actions[0].getZoneState()){
+    		initial.getZoneState().add(val);
+    	}
+    	
+    	ExternalComponentValue[] extCompVal = ((EOPTableGroupPane)tableGroup).getExternalComponentsInitialValue();
+    	for(int i = 0; i < extCompVal.length; i++){
+    		initial.getExternalComponentValue().add(extCompVal[i]);
+    	}
+    	
+    	InitialStateCheck initialCheck = (new ObjectFactory()).createInitialStateCheck();
+    	initialCheck.setAlarmDelay(textInputPane.getText(ALARMDELAY));
+    	initialCheck.setAlarmType(textInputPane.getText(ALARMTYPE));
+    	
+    	initial.setInitialStateCheck(initialCheck);
+    	
+    	eop.setInitialState(initial);
+    	
+    	//Actions
+    	eop.getAction().clear();
+    	for(int i = 1; i < actions.length; i++){
+    		eop.getAction().add(actions[i]);
+    	}
     }
     
     public void actionPerformed(ActionEvent e){
     	
-    	//---------------------------------------
+    	//--------------------------------------
     	//	Buttons
     	//--------------------------------------
     	if( e.getSource().equals(jbOk) ){
-    		updateIL();
+    		updateEOP();
     		setVisible(false);
     		dispose();
     	}else if(e.getSource().equals(jbCancel)){
     		setVisible(false);
     		dispose();
     	}else if(e.getSource().equals(jbCondition)){
-    		tableGroup.addConditionRow();
+    		tableGroup.addActionRow();
     	}
     	
-    	//-------------------------------------------
+    	//----------------------------------------
     	//	MenuItems
-    	//-------------------------------------------
+    	//----------------------------------------
     	if(e.getSource() instanceof JMenuItem){
     		if( e.getSource().equals( jmiSave) ){
     			save();
@@ -352,24 +371,18 @@ public class ILInfoWindow
     			saveAs();
     		}else if( e.getSource().equals( jmiOpen )){
     			open();
+    		}else if( e.getSource().equals( jmiExit )){
+    			setVisible(false);
+    			dispose();
     		}else if( e.getSource().equals( jcbmiShowInt )){
     			tableGroup.
     				showInternalTable( jcbmiShowInt.isSelected() );
     		}else if( e.getSource().equals( jcbmiShowExt )){
     			tableGroup.
 					showExternalTable( jcbmiShowExt.isSelected() );
-    		}else if( e.getSource().equals( jcbmiShowOperation )){
-    			tableGroup.
-					showOperationTable( jcbmiShowOperation.isSelected() );
     		}else if( e.getSource().equals( jcbmiShowZone )){
     			tableGroup.
     				showZoneTable( jcbmiShowZone.isSelected() );
-    		}else if( e.getSource().equals( jcbmiShowMode )){
-    			tableGroup.
-					showModeTable(jcbmiShowMode.isSelected());
-    		}else if( e.getSource().equals( jcbmiShowProduct )){
-    			tableGroup.
-    				showProductTable( jcbmiShowProduct.isSelected() );
     		}else if( e.getSource().equals( jcbmiShowRowHeader )){
     			tableGroup.
     				setRowHeaderVisible( jcbmiShowRowHeader.isSelected() );
@@ -385,9 +398,9 @@ public class ILInfoWindow
     private static void createAndShowGUI() {
     	
     	ObjectFactory factory = new ObjectFactory();
-    	IL il = factory.createIL();
+    	EOP eop = factory.createEOP();
     	
-    	ILInfoWindow ilInfoWin = new ILInfoWindow(il);
+    	EOPInfoWindow ilInfoWin = new EOPInfoWindow(eop);
     	ilInfoWin.setVisible(true);
     }
 

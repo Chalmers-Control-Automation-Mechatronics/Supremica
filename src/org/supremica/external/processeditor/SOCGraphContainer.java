@@ -893,7 +893,13 @@ public class SOCGraphContainer
     	if(getSelectedFrame() != null) {
     		getSelectedFrame().newInterLock();
     	}
-   }
+    }
+    
+    public void newExecutionOfOperation() {
+    	if(getSelectedFrame() != null) {
+    		getSelectedFrame().newExecutionOfOperation();
+    	}
+    }
     
     /**
      * Inserts a new resource to the active worksheet.

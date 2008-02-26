@@ -69,6 +69,7 @@ public class SOCMenuBar extends JMenuBar implements ActionListener,
 			     "New Relation Type",
 			     "New Algebraic...",
 			     "New InterLock",
+			     "New Execution of operation",
 			     "SEPARATOR",
 			     "Insert Resource...",
 			     "SEPARATOR",
@@ -704,6 +705,8 @@ public class SOCMenuBar extends JMenuBar implements ActionListener,
     			graphContainer.newAlgebraic();
     		}else if("New InterLock".equals(e.getActionCommand())) {
     			graphContainer.newInterLock();
+    		}else if("New Execution of operation".equals(e.getActionCommand())) {
+    			graphContainer.newExecutionOfOperation();
     		}else if("Insert Resource...".equals(e.getActionCommand())) {
     			graphContainer.insertResource();
     		}else if("Create Outer Relation".equals(e.getActionCommand())) {

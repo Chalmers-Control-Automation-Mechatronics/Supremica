@@ -103,6 +103,10 @@ public class BasicTable
 		}
 	}
 	
+	public void setRowName(int row, String name){
+		tableModel.setRowName(row, name);
+	}
+	
 	/**
 	 * Removes one row.
 	 * @param name - name of row to be removed.
