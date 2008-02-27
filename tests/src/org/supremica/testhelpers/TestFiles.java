@@ -72,10 +72,12 @@ public class TestFiles
     public static final TestFiles CentralLocking3Doors = new TestFiles("centralLocking3Doors.xml");
     public static final TestFiles CircularTable = new TestFiles("circularTable.xml");
     public static final TestFiles ConflictEquivalence = new TestFiles("ConflictEquivalenceExamples.xml");
+    public static final TestFiles EOPExample = new TestFiles("EOPExample.xml");
     public static final TestFiles Ex4_5_a = new TestFiles("ex4_5_a.xml");
     public static final TestFiles Ex4_5_b = new TestFiles("ex4_5_b.xml");
     public static final TestFiles FlexibleManufacturingCell = new TestFiles("flexibleManufacturingCell.xml");
     public static final TestFiles FlexibleManufacturingSystem = new TestFiles("flexibleManufacturingSystem.xml");
+    public static final TestFiles ILExample = new TestFiles("ILExample.xml");
     public static final TestFiles MachineBufferMachine = new TestFiles("MachineBufferMachine.xml");
     public static final TestFiles NondeterministicComposition = new TestFiles("NondeterministicComposition.xml");
     public static final TestFiles ObservationEquivalence = new TestFiles("observationEquivalence.xml");
