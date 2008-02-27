@@ -48,6 +48,7 @@ public class ILInfoWindow
     private ILStructureGroupPane tableGroup;
     
     private IL il = null;
+    private InterLockCell ilCell = null;
     
     private static final String ID = "Id:";
     private static final String COMMENT = "Comment:";
@@ -63,6 +64,12 @@ public class ILInfoWindow
     
     private File file = null; 
     private JFileChooser fc = null;
+    
+    
+    public ILInfoWindow(InterLockCell ilCell){
+    	this(ilCell.getIL());
+    	this.ilCell = ilCell;
+    }
     /** 
      * Creates a new instance of the class.
      * 
@@ -290,31 +297,42 @@ public class ILInfoWindow
         if(o instanceof IL){
         	file = tmpFile;
         	il = (IL) o;
-        	
-        	textInputPane.setText(ID, il.getId());
-        	textInputPane.setText(COMMENT, il.getComment());
-        	textInputPane.setText(ACTUATOR, il.getActuator());
-        	textInputPane.setText(OPERATION, il.getOperation());
-        	
-        	getContentPane().remove(tableGroup);
-        	tableGroup = new ILStructureGroupPane(il.getILStructure());
-        	
-        	//sync tableGroup with the menu
-        	tableGroup.showInternalTable(jcbmiShowInt.isSelected());
-        	tableGroup.showExternalTable(jcbmiShowExt.isSelected());
-        	tableGroup.showOperationTable(jcbmiShowOperation.isSelected());
-        	tableGroup.showZoneTable(jcbmiShowZone.isSelected());
-        	tableGroup.showModeTable(jcbmiShowMode.isSelected());
-        	tableGroup.showProductTable(jcbmiShowProduct.isSelected());
-        	tableGroup.setRowHeaderVisible(jcbmiShowRowHeader.isSelected());
-        	
-        	getContentPane().add(tableGroup);
-        	
-        	validate();
+        	setIL(il);
         }else{
         	JOptionPane.showMessageDialog(this, "File contains no EOP","File error",JOptionPane.ERROR_MESSAGE);
         }
         
+    }
+    
+    public void setIL(IL il){
+    	if(null == il){
+    		return;
+    	}
+    	
+    	this.il = il;
+    	
+    	textInputPane.setText(ID, il.getId());
+    	textInputPane.setText(COMMENT, il.getComment());
+    	textInputPane.setText(ACTUATOR, il.getActuator());
+    	textInputPane.setText(OPERATION, il.getOperation());
+    	
+    	getContentPane().remove(tableGroup);
+    	tableGroup = new ILStructureGroupPane(il.getILStructure());
+    	
+    	//sync tableGroup with the menu
+    	tableGroup.showInternalTable(jcbmiShowInt.isSelected());
+    	tableGroup.showExternalTable(jcbmiShowExt.isSelected());
+    	tableGroup.showOperationTable(jcbmiShowOperation.isSelected());
+    	tableGroup.showZoneTable(jcbmiShowZone.isSelected());
+    	tableGroup.showModeTable(jcbmiShowMode.isSelected());
+    	tableGroup.showProductTable(jcbmiShowProduct.isSelected());
+    	tableGroup.setRowHeaderVisible(jcbmiShowRowHeader.isSelected());
+    	
+    	getContentPane().add(tableGroup);
+    	
+    	validate();
+    	
+    	
     }
     
     private void updateIL(){
@@ -334,6 +352,11 @@ public class ILInfoWindow
     	//--------------------------------------
     	if( e.getSource().equals(jbOk) ){
     		updateIL();
+    		
+    		if(null != ilCell){
+    			ilCell.setIL(il);
+    		}
+    		
     		setVisible(false);
     		dispose();
     	}else if(e.getSource().equals(jbCancel)){

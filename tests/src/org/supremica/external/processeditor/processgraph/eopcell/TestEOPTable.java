@@ -21,7 +21,7 @@ public class TestEOPTable
 	private static BasicTable table = null;
 	
 	public TestEOPTable(String name){
-        super(name);
+        super( name );
     }
     
     /**
@@ -31,7 +31,7 @@ public class TestEOPTable
     protected void setUp(){
     	
     	Loader loader = new Loader();
-    	Object o = loader.openEOP(TestFiles.getFile(TestFiles.EOPExample));
+    	Object o = loader.openEOP( TestFiles.getFile( TestFiles.EOPExample ) );
     	
     	if(o instanceof EOP){
     		eop = (EOP) o;
@@ -54,7 +54,7 @@ public class TestEOPTable
      * for all the test methods of this test case.
      */
     public static Test suite(){
-        TestSuite suite = new TestSuite(TestEOPTable.class);
+        TestSuite suite = new TestSuite( TestEOPTable.class );
         return suite;
     }
     
@@ -66,14 +66,14 @@ public class TestEOPTable
     	
     	String str1 = "", str2 = "";
     	
-    	ZoneTablePane tablePane = new ZoneTablePane(eop.getZones());
+    	ZoneTablePane tablePane = new ZoneTablePane( eop.getZones() );
     	
     	//insert actions
-    	tablePane.insertActions(eop.getAction());
+    	tablePane.insertActions( eop.getAction() );
     	table = tablePane.getTable();
     	
     	//extract actions
-    	actions = EOPTableExtractor.getActions(null, null, table);
+    	actions = EOPTableExtractor.getActions( null, null, table );
     	
     	//test
     	for(int i = 0; i < eop.getAction().size(); i++){
@@ -85,19 +85,17 @@ public class TestEOPTable
     			str1 = originalAction.getZoneState().get(ii).getState();
     			str2 = actions[i+1].getZoneState().get(ii).getState();
     			
-    			if(!str1.equals(str2)){
+    			if(!str1.equals( str2 )){
     				assertTrue(false);
         		}
     			
     			str1 = originalAction.getZoneState().get(ii).getZone();
     			str2 = actions[i].getZoneState().get(ii).getZone();
     			
-    			if(!str1.equals(str2)){
-        			assertTrue(false);
+    			if(!str1.equals( str2 )){
+        			assertTrue( false );
         		}
     		}
-    		
-    		
     	}
 	}
     
@@ -107,7 +105,7 @@ public class TestEOPTable
     	
     	String str1 = "", str2 = "";
     	
-    	InternalTablePane tablePane = new InternalTablePane(eop.getInternalComponents());
+    	InternalTablePane tablePane = new InternalTablePane( eop.getInternalComponents() );
     	
     	//insert actions
     	tablePane.insertActions(eop.getAction());
@@ -146,10 +144,10 @@ public class TestEOPTable
     	
     	String str1 = "", str2 = "";
     	
-    	InternalTablePane tablePane = new InternalTablePane(eop.getInternalComponents());
+    	InternalTablePane tablePane = new InternalTablePane( eop.getInternalComponents() );
     	
     	//insert actions
-    	tablePane.insertActions(eop.getAction());
+    	tablePane.insertActions( eop.getAction() );
     	table = tablePane.getTable();
     	
     	//extract actions
@@ -165,14 +163,14 @@ public class TestEOPTable
     			str1 = originalAction.getSensorValue().get(ii).getSensor();
     			str2 = actions[i+1].getSensorValue().get(ii).getSensor();
     			
-    			if(!str1.equals(str2)){
+    			if(!str1.equals( str2 )){
     				assertTrue(false);
         		}
     			
     			str1 = originalAction.getSensorValue().get(ii).getValue();
     			str2 = actions[i+1].getSensorValue().get(ii).getValue();
     			
-    			if(!str1.equals(str2)){
+    			if(!str1.equals( str2 )){
         			assertTrue(false);
         		}
     		}

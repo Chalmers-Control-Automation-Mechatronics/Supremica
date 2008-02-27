@@ -56,6 +56,7 @@ public class EOPInfoWindow
     private EOPTableGroupPane tableGroup;
     
     private EOP eop;
+    private ExecutionOfOperationCell eopCell = null;
     
     private static final String ALARMDELAY = "Alarm delay:";
     private static final String ALARMTYPE = "Alarm type:";
@@ -69,6 +70,12 @@ public class EOPInfoWindow
     
     private File file = null; 
     private JFileChooser fc = null;
+    
+    public EOPInfoWindow(ExecutionOfOperationCell eopCell){
+    	this(eopCell.getEOP());
+    	
+    	this.eopCell = eopCell;
+    }
     
     public EOPInfoWindow(EOP eop){
     	super("Execution of operation");
@@ -273,29 +280,38 @@ public class EOPInfoWindow
         if(o instanceof EOP){
         	file = tmpFile;
         	eop = (EOP) o;
-        	
-        	if( null != eop.getInitialState() ){
-        		if( null != eop.getInitialState().getInitialStateCheck() ){
-        			textInputPane.setText(ALARMDELAY, eop.getInitialState().getInitialStateCheck().getAlarmDelay());
-        			textInputPane.setText(ALARMTYPE, eop.getInitialState().getInitialStateCheck().getAlarmType());
-        		}
-        	}
-        	
-        	getContentPane().remove(tableGroup);
-        	tableGroup = new EOPTableGroupPane(eop);
-        	
-        	//sync tableGroup with the menu
-        	tableGroup.showInternalTable(jcbmiShowInt.isSelected());
-        	tableGroup.showExternalTable(jcbmiShowExt.isSelected());
-        	tableGroup.showZoneTable(jcbmiShowZone.isSelected());
-        	tableGroup.setRowHeaderVisible(jcbmiShowRowHeader.isSelected());
-        	
-        	getContentPane().add(tableGroup);
-        	
-        	validate();
+        	setEOP(eop);
         }else{
         	JOptionPane.showMessageDialog(this, "File contains no EOP","File error",JOptionPane.ERROR_MESSAGE);
         }
+    }
+    
+    public void setEOP(EOP eop){
+    	if(null == eop){
+    		return;
+    	}
+    	
+    	this.eop = eop;
+    	
+    	if( null != eop.getInitialState() ){
+    		if( null != eop.getInitialState().getInitialStateCheck() ){
+    			textInputPane.setText(ALARMDELAY, eop.getInitialState().getInitialStateCheck().getAlarmDelay());
+    			textInputPane.setText(ALARMTYPE, eop.getInitialState().getInitialStateCheck().getAlarmType());
+    		}
+    	}
+    	
+    	getContentPane().remove(tableGroup);
+    	tableGroup = new EOPTableGroupPane(eop);
+    	
+    	//sync tableGroup with the menu
+    	tableGroup.showInternalTable(jcbmiShowInt.isSelected());
+    	tableGroup.showExternalTable(jcbmiShowExt.isSelected());
+    	tableGroup.showZoneTable(jcbmiShowZone.isSelected());
+    	tableGroup.setRowHeaderVisible(jcbmiShowRowHeader.isSelected());
+    	
+    	getContentPane().add(tableGroup);
+    	
+    	validate();
     }
     
     /**
@@ -369,12 +385,21 @@ public class EOPInfoWindow
     	//	Buttons
     	//--------------------------------------
     	if( e.getSource().equals(jbOk) ){
+    		
     		updateEOP();
+    		
+    		if(null != eopCell){
+    			eopCell.setEOP(eop);
+    		}
+    		
     		setVisible(false);
     		dispose();
+    		
     	}else if(e.getSource().equals(jbCancel)){
+    		
     		setVisible(false);
     		dispose();
+    		
     	}else if(e.getSource().equals(jbAction)){
     		tableGroup.addActionRow();
     	}
