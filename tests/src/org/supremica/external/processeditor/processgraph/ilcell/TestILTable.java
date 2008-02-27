@@ -8,11 +8,6 @@ import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
 import org.supremica.testhelpers.*;
-import java.util.List;
-import java.util.LinkedList;
-import java.io.File;
-
-import org.supremica.external.processeditor.processgraph.ilcell.*;
 import org.supremica.external.processeditor.processgraph.table.BasicTable;
 import org.supremica.manufacturingTables.xsd.il.*;
 

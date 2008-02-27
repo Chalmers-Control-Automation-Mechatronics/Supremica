@@ -168,8 +168,17 @@ public class EOPTableExtractor {
 	{
 		ObjectFactory factory = new ObjectFactory();
 		
+		
+		int numberOfRows = -1;
+		
 		//all tables have the same numbers of rows
-		int numberOfRows = tableInternal.getRowCount();
+		if(null != tableInternal){
+			numberOfRows = tableInternal.getRowCount();
+		}else if(null != tableExternal){
+			numberOfRows = tableExternal.getRowCount();
+		}else if(null != tableZone){
+			numberOfRows = tableZone.getRowCount();
+		}
 		
 		//create all actions
 		//first row contains additional information 
