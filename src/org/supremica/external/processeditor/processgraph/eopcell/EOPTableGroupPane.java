@@ -27,8 +27,6 @@ public class EOPTableGroupPane
 	ExternalTablePane tableExternal = null;
 	ZoneTablePane tableZone = null;
 	
-	List<BasicTablePane> tableList = null;
-	
 	boolean showTableInternal = true;
 	boolean showTableExternal = true;
 	boolean showTableZone = true;
@@ -47,11 +45,9 @@ public class EOPTableGroupPane
 			eop = (new ObjectFactory()).createEOP();
 		}
 		
-		
 		tableInternal = new InternalTablePane(eop.getInternalComponents());
 		tableExternal = new ExternalTablePane(eop.getExternalComponents());
     	tableZone = new ZoneTablePane(eop.getZones());
-    	
     	
     	addActionRow(); //first row contain additional information
     	addActionRow(); //first action row
@@ -69,14 +65,13 @@ public class EOPTableGroupPane
     	
     	//show selected tables only
     	showTables();
-    	
 	}
 	
 	public void insertActions(List<Action> actionList){
 		
-		tableInternal.insertActions(actionList);
-		tableExternal.insertActions(actionList);
-		tableZone.insertActions(actionList);
+		tableInternal.insertActions( actionList );
+		tableExternal.insertActions( actionList );
+		tableZone.insertActions( actionList );
 		
 	}
 	

@@ -14,6 +14,7 @@ import javax.swing.BorderFactory;
 import javax.swing.DefaultCellEditor;
 import javax.swing.JComboBox;
 import javax.swing.JTable;
+import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.JTextField;
 
 import org.supremica.external.processeditor.processgraph.table.BasicTablePane;
@@ -40,6 +41,7 @@ public class ExternalTablePane
 		
 		table.getModel().setRowEditable(0, false);
 		
+		
 		if(externalComponents == null){
 			return;
 		}
@@ -61,6 +63,7 @@ public class ExternalTablePane
 		for(Action term : actionList){
 			EOPTableFiller.insertExternalConditionFromActionToTable(term, table);
 		}
+		
 	}
 	
 	public ExternalComponentValue[] getExternalComponentsInitialValue(){

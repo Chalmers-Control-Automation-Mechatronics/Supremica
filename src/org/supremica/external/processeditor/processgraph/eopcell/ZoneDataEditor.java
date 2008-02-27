@@ -60,7 +60,7 @@ public class ZoneDataEditor
 		
 		getContentPane().add(buttonPane, BorderLayout.SOUTH);
 		
-		setSize(350,500);
+		setSize(300,500);
 	}
 	
 	private void fillTable(BasicTable table){

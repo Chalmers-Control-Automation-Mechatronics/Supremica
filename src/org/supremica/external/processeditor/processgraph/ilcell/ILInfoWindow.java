@@ -3,6 +3,7 @@ package org.supremica.external.processeditor.processgraph.ilcell;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JMenuItem;
 import javax.swing.JMenu;
@@ -245,7 +246,7 @@ public class ILInfoWindow
         //set selection mode
         fc.setFileSelectionMode(JFileChooser.FILES_ONLY);
         
-    	int returnVal = fc.showOpenDialog(this);
+    	int returnVal = fc.showSaveDialog(this);
 
         if( returnVal == JFileChooser.APPROVE_OPTION ){
             
@@ -311,7 +312,7 @@ public class ILInfoWindow
         	
         	validate();
         }else{
-        	;
+        	JOptionPane.showMessageDialog(this, "File contains no EOP","File error",JOptionPane.ERROR_MESSAGE);
         }
         
     }

@@ -150,7 +150,7 @@ public class ZoneTablePane
  *
  */
 class ZoneCellEditor extends
-							DefaultCellEditor
+						DefaultCellEditor
 {
 	private static final String ACTUATOR = "Actuator";
 	private static final String VARIABLE = "Variable";

@@ -35,6 +35,9 @@ public class EOPTableExtractor {
 		
 		int numberOfComponents = table.getColumnCount();
 		
+		/*
+		 * Search all columns
+		 */
 		for(int col = 0; col < numberOfComponents; col++){
 			extComp = factory.createExternalComponent();
 		
@@ -43,6 +46,7 @@ public class EOPTableExtractor {
 			
 			extComponents.getExternalComponent().add(extComp);
 		}
+		
 		return extComponents;
 	}
 	
@@ -57,26 +61,49 @@ public class EOPTableExtractor {
 	public static InternalComponents
 		getInternalComponentsFromTable(BasicTable table)
 	{
-		InternalComponents intComponents = factory.createInternalComponents();
+		InternalComponents internalComponents = factory.createInternalComponents();
 		int numberOfComponents = table.getColumnCount();
+		
+		/*
+		 * Search all columns
+		 */
 		for(int col = 0; col < numberOfComponents; col++){
-			if(ACTUATOR.equals(table.getValueAt(TYPE_ROW, col))){	//Actuator
-				intComponents.getActuator().add(table.getColumnName(col));
-			}else if(SENSOR.equals(table.getValueAt(TYPE_ROW, col))){ //Sensor
-				intComponents.getSensor().add(table.getColumnName(col));
-			}else if(VARIABLE.equals(table.getValueAt(TYPE_ROW, col))){ //Variable
-				intComponents.getVariable().add(table.getColumnName(col));
+			if( ACTUATOR.equals( table.getValueAt( TYPE_ROW, col ) )){	
+				//Actuator
+				internalComponents.getActuator().add(table.getColumnName(col));
+			}else if( SENSOR.equals(table.getValueAt(TYPE_ROW, col))){ 
+				//Sensor
+				internalComponents.getSensor().add( table.getColumnName( col ) );
+			}else if( VARIABLE.equals( table.getValueAt( TYPE_ROW, col ) )){ 
+				//Variable
+				internalComponents.getVariable().add( table.getColumnName( col ) );
 			}else{
+				//Unsuportet type
 				//System.err.println("UNKNOWN: " + table.getValueAt(TYPE_ROW, col).toString());
 			}
 		}
-		return intComponents;
+		
+		return internalComponents;
 	}
 	
+	
+	/**
+	 * Extract ExternalComponentValue from a BasicTable.
+	 * Only the initial state contains external information
+	 * 
+	 * @param table
+	 * @return ExternalComponentValue[]
+	 */
 	public static ExternalComponentValue[]
 		getExternalComponentsInitialValueFromTable(BasicTable table)
 	{
-		int row = 1;
+		/*
+		 * Row header contains component name
+		 * row 0 contains machine
+		 * row 1 contains value
+		 */
+		
+		int row = 1; // row there value is to find
 		
 		ExternalComponent extComp = null;
 		int numberOfComponents = table.getColumnCount();
@@ -86,6 +113,9 @@ public class EOPTableExtractor {
 			extComponents[i] = factory.createExternalComponentValue();
 		}
 		
+		/*
+		 * Search all columns
+		 */
 		for(int col = 0; col < numberOfComponents; col++){
 			extComp = factory.createExternalComponent();
 			
@@ -101,11 +131,11 @@ public class EOPTableExtractor {
 	}
 	
 	/**
-	 * Extract zones from a BasicTable. Search all cells in table and parse  
-	 * Zone names as separated by ZONE_SEPARATOR.
+	 * Extract zones from a BasicTable. 
+	 * Zones are in the column names
 	 * 
 	 * @param table
-	 * @return
+	 * @return zones
 	 */
 	public static Zones
 		getZonesFromTable(BasicTable table)
@@ -124,10 +154,45 @@ public class EOPTableExtractor {
 		return zones;
 	}
 	
+	/**
+	 * Extract action step from basic tables.
+	 * 
+	 * @param tableInternal
+	 * @param tableExternal
+	 * @param tableZone
+	 * @return Array of action there first is initial action and the rest follows.
+	 */
 	public static Action[] getActions(BasicTable tableInternal, 
 									  BasicTable tableExternal,
 									  BasicTable tableZone)
 	{
+		ObjectFactory factory = new ObjectFactory();
+		
+		//all tables have the same numbers of rows
+		int numberOfRows = tableInternal.getRowCount();
+		
+		//create all actions
+		//first row contains additional information 
+		Action[] actions = new Action[numberOfRows - 1];
+		for(int i = 0; i < actions.length; i++){
+			actions[i] = factory.createAction();
+			actions[i].setActionNbr(BigInteger.valueOf(i));
+		}
+		
+		addInternalComponentsActionState(actions, tableInternal);
+		addExternalComponentsActionState(actions, tableExternal);
+		addZoneActionState(actions, tableZone);
+		
+		return actions;
+	}
+	
+	
+	/**
+	 * Add internal components state to actions
+	 * @param actions
+	 * @param table
+	 */
+	private static void addInternalComponentsActionState(Action[] actions, BasicTable table){
 		
 		int col = -1;
 		int row = -1;
@@ -138,126 +203,132 @@ public class EOPTableExtractor {
 		SensorValue senVal = null;
 		VariableValue varVal = null;
 		
+		int numberOfColumns = -1;
+		
+		//check input
+		if(null == table || null == actions|| 0 == actions.length){
+			return;
+		}
+		
+		numberOfColumns = table.getColumnCount();
+		for(col = 0; col < numberOfColumns; col++){
+			
+			if("Actuator".equals(table.getValueAt(0, col)))
+			{	
+				//Actuator
+				for(int i = 0; i < actions.length; i++){
+					row = i + 1;
+					
+					actVal = factory.createActuatorValue();
+					actVal.setActuator(table.getColumnName(col));
+					actVal.setValue(table.getValueAt(row, col).toString().trim());
+					
+					actions[i].getActuatorValue().add(actVal);
+				}	
+			}
+			else if("Sensor".equals(table.getValueAt(0, col)))
+			{ 
+				//Sensor
+				for(int i = 0; i < actions.length; i++){
+					row = i + 1;
+					
+					senVal = factory.createSensorValue();
+						
+					senVal.setSensor(table.getColumnName(col));
+					if(null == table.getValueAt(row, col)){
+						senVal.setValue("");
+					}else{
+						senVal.setValue(table.getValueAt(row, col).toString().trim());
+					}
+					actions[i].getSensorValue().add(senVal);
+				}	
+			}
+			else if("Variable".equals(table.getValueAt(0, col)))
+			{ 
+				//Variable
+				for(int i = 0; i < actions.length; i++){
+					row = i + 1;
+					
+					varVal = factory.createVariableValue();
+					varVal.setVariable(table.getColumnName(col));
+					varVal.setValue(table.getValueAt(row, col).toString().trim());
+					
+					actions[i].getVariableValue().add(varVal);
+				}	
+			}
+			else
+			{
+				;
+			}
+		}
+	}
+	
+	/**
+	 * Does nothing, external components state only exist in initial state.
+	 * 
+	 * @param actions
+	 * @param table
+	 */
+	private static void addExternalComponentsActionState(Action[] actions, BasicTable table){
+		
+		return;
+		
+		/*
+		ObjectFactory factory = new ObjectFactory();
+		
 		ExternalComponentValue extCompVal = null;
 		ExternalComponent extComp = null;
 		
-		//all tables have the same numbers of rows
-		int numberOfRows = tableInternal.getRowCount();
+		int numberOfColumns = table.getColumnCount();
+		
+		if(null == table || null == actions || 0 == actions.length){
+			return;
+		}
+		
+		for( int col = 0 ; col < numberOfColumns ; col++ ){
+			
+			extComp = factory.createExternalComponent();
+			extComp.setComponent( table.getColumnName( col ) );
+			extComp.setMachine( table.getValueAt( 0, col ).toString().trim() );
+			
+			for(int i = 0 ; i < actions.length ; i++ ){
+				
+				extCompVal = factory.createExternalComponentValue();
+				extCompVal.setExternalComponent(extComp);
+				
+				extCompVal.setValue(table.getValueAt(i+1, col).toString().trim());
+					//actions[i].getExternalComponentValue() .add(extCompVal);
+			}
+		}
+		*/
+	}
+	
+	/**
+	 * Add zone state information to actions
+	 * 
+	 * @param actions
+	 * @param table
+	 */
+	private static void addZoneActionState(Action[] actions, BasicTable table){
+		
+		
 		int numberOfColumns = -1;
 		
-		//create all terms
-		//first row contains additional information 
-		Action[] actions = new Action[numberOfRows - 1];
-		for(int i = 0; i < actions.length; i++){
-			actions[i] = factory.createAction();
-			actions[i].setActionNbr(BigInteger.valueOf(i));
-		}
-		
-		//-----------------------------------------------------
-		//	Internal components information from tableInternal
-		//-----------------------------------------------------
-		if(null != tableInternal){
-			numberOfColumns = tableInternal.getColumnCount();
-			for(col = 0; col < numberOfColumns; col++){
-			
-				if("Actuator".equals(tableInternal.getValueAt(0, col)))
-				{	
-					//Actuator
-					for(int i = 0; i < actions.length; i++){
-						row = i + 1;
-					
-						actVal = factory.createActuatorValue();
-						actVal.setActuator(tableInternal.getColumnName(col));
-						actVal.setValue(tableInternal.getValueAt(row, col).toString().trim());
-					
-						actions[i].getActuatorValue().add(actVal);
-					}	
-				}
-				else if("Sensor".equals(tableInternal.getValueAt(0, col)))
-				{ 
-					//Sensor
-					for(int i = 0; i < actions.length; i++){
-						row = i + 1;
-					
-						senVal = factory.createSensorValue();
-						
-						senVal.setSensor(tableInternal.getColumnName(col));
-						if(null == tableInternal.getValueAt(row, col)){
-							senVal.setValue("");
-						}else{
-							senVal.setValue(tableInternal.getValueAt(row, col).toString().trim());
-						}
-						actions[i].getSensorValue().add(senVal);
-					}	
-				}
-				else if("Variable".equals(tableInternal.getValueAt(0, col)))
-				{ 
-					//Variable
-					for(int i = 0; i < actions.length; i++){
-						row = i + 1;
-					
-						varVal = factory.createVariableValue();
-						varVal.setVariable(tableInternal.getColumnName(col));
-						varVal.setValue(tableInternal.getValueAt(row, col).toString().trim());
-					
-						actions[i].getVariableValue().add(varVal);
-					}	
-				}
-				else
-				{
-					;
-				}
-			}
-		}//end if
-		
-		
-		
-		//-----------------------------------------------------
-		//	External components information from tableExternal
-		//-----------------------------------------------------
-		if(null != tableExternal){
-			numberOfColumns = tableExternal.getColumnCount();
-			for(col = 0; col < numberOfColumns; col++){
-			
-				extComp = factory.createExternalComponent();
-				extComp.setComponent(tableExternal.getColumnName(col));
-				extComp.setMachine(tableExternal.getValueAt(0, col).toString().trim());
-			
-			
-				for(int i = 0; i < actions.length; i++){
-					row = i + 1;
-				
-					extCompVal = factory.createExternalComponentValue();
-					extCompVal.setExternalComponent(extComp);
-				
-					extCompVal.setValue(tableExternal.getValueAt(row, col).toString().trim());
-					//actions[i].getExternalComponentValue() .add(extCompVal);
-				}
-			}
-		}
-		
 		ZoneState zoneState = null;
-		//-----------------------------------------------------
-		//	Zone information from tableZone
-		//-----------------------------------------------------
-		if(null != tableZone){
-			numberOfColumns = tableZone.getColumnCount();
-			for(col = 0; col < numberOfColumns; col++){
-				
-				for(int i = 0; i < actions.length; i++){
-					row = i + 1;
-					
-					zoneState = factory.createZoneState();
-					zoneState.setZone(tableZone.getColumnName(col));
-					zoneState.setState(tableZone.getValueAt(row, col).toString().trim());
-					
-					actions[i].getZoneState().add(zoneState);
-				}
-			}
+		ObjectFactory factory = new ObjectFactory();
+		
+		if(null == table || null == actions || 0 == actions.length){
+			return;
 		}
 		
-		
-		
-		return actions;
+		numberOfColumns = table.getColumnCount();
+		for(int col = 0; col < numberOfColumns; col++){
+			for(int i = 0; i < actions.length; i++){
+				zoneState = factory.createZoneState();
+				zoneState.setZone(table.getColumnName(col));
+				zoneState.setState(table.getValueAt(i+1, col).toString().trim());
+				actions[i].getZoneState().add(zoneState);
+			}
+		}
 	}
 }

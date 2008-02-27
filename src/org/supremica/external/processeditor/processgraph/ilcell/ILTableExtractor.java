@@ -166,9 +166,24 @@ public class ILTableExtractor {
 		ExternalComponentValue extCompVal = null;
 		ExternalComponent extComp = null;
 		
-		//all tables have the same numbers of rows
-		int numberOfRows = tableInternal.getRowCount();
+		
+		int numberOfRows = -1;
 		int numberOfColumns = -1;
+		
+		//all tables have the same numbers of rows
+		if(null != tableInternal){
+			numberOfRows = tableInternal.getRowCount();
+		}else if(null != tableExternal){
+			numberOfRows = tableExternal.getRowCount();
+		}else if(null != tableOperation){
+			numberOfRows = tableOperation.getRowCount();
+		}else if(null != tableZone){
+			numberOfRows = tableZone.getRowCount();
+		}else if(null != tableProduct){
+			numberOfRows = tableProduct.getRowCount();
+		}else if(null != tableMode){
+			numberOfRows = tableMode.getRowCount();
+		}
 		
 		//create all terms
 		//first row contains additional information 

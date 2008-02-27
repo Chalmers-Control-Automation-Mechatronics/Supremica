@@ -81,11 +81,7 @@ public class EOPTableFiller {
 	}
 	
 	/**
-	 * Insert ExternalCondition data to a table. This information can be extracted
-	 * by EOPTableExtractor. 
-	 * 
-	 * table is supposed to contain necessary columns. Column head should contain
-	 * component name. 
+	 * Does nothing only initial state contains information about external components.
 	 * 
 	 * @param term
 	 * @param table

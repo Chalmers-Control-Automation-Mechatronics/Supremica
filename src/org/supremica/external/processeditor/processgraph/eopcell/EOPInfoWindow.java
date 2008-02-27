@@ -9,6 +9,7 @@ import javax.swing.JMenu;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.BorderFactory;
 import javax.swing.JMenuBar;
 import javax.swing.KeyStroke;
@@ -22,19 +23,24 @@ import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import java.io.File;
 
-import org.supremica.manufacturingTables.xsd.eop.*;
 import org.supremica.manufacturingTables.xsd.eop.EOP;
 import org.supremica.manufacturingTables.xsd.eop.Action;
+import org.supremica.manufacturingTables.xsd.eop.ZoneState;
+import org.supremica.manufacturingTables.xsd.eop.SensorValue;
 import org.supremica.manufacturingTables.xsd.eop.InitialState;
-import org.supremica.manufacturingTables.xsd.eop.InitialStateCheck;
+import org.supremica.manufacturingTables.xsd.eop.VariableValue;
+import org.supremica.manufacturingTables.xsd.eop.ActuatorValue;
 import org.supremica.manufacturingTables.xsd.eop.ObjectFactory;
+import org.supremica.manufacturingTables.xsd.eop.InitialStateCheck;
+import org.supremica.manufacturingTables.xsd.eop.ExternalComponentValue;
+
 
 import org.supremica.external.processeditor.processgraph.table.TextInputPane;
 import org.supremica.external.processeditor.xml.Loader;
 
 /**
- * Displays the operation info window, which allow the user to edit 
- * the operation, predecessor and attribute information.
+ * Displays the Execution of operation info window, which allow the user to edit 
+ * the execution of operation
  */
 public class EOPInfoWindow
 						extends 
@@ -42,31 +48,28 @@ public class EOPInfoWindow
 						implements 
 							ActionListener 
 { 
-    private JButton jbOk, jbCancel, jbCondition;
+    private JButton jbOk, jbCancel, jbAction;
     
     private TextInputPane textInputPane;
     private JPanel topPanel, bottomPanel;
     
     private EOPTableGroupPane tableGroup;
     
-    private EOP eop = null;
+    private EOP eop;
     
     private static final String ALARMDELAY = "Alarm delay:";
     private static final String ALARMTYPE = "Alarm type:";
     
     private JMenuItem jmiSave, jmiSaveAs, jmiOpen, jmiExit;
     
-    private JCheckBoxMenuItem jcbmiShowInt, jcbmiShowExt,jcbmiShowZone,
+    private JCheckBoxMenuItem jcbmiShowInt,
+    						  jcbmiShowExt,
+    						  jcbmiShowZone,
     						  jcbmiShowRowHeader;
     
     private File file = null; 
     private JFileChooser fc = null;
-    /** 
-     * Creates a new instance of the class.
-     * 
-     * @param a the object that is to be edit by this info window
-     * @param c the operation cell that launched this info window
-     */
+    
     public EOPInfoWindow(EOP eop){
     	super("Execution of operation");
     	
@@ -76,7 +79,7 @@ public class EOPInfoWindow
     	
     	if(eop == null){
     		getContentPane().add(new JLabel("Error! No Execution op operation"), BorderLayout.CENTER);
-    		getContentPane().add(jbCancel = new JButton("Cancel"), BorderLayout.PAGE_END);
+    		getContentPane().add(jbCancel = new JButton("Ok"), BorderLayout.PAGE_END);
     		jbCancel.addActionListener(this);
     		
     		pack();
@@ -94,14 +97,14 @@ public class EOPInfoWindow
     	
     	tableGroup = new EOPTableGroupPane(eop);
     	
-    	bottomPanel.add(jbCondition = new JButton("New action"));
+    	bottomPanel.add(jbAction = new JButton("New action"));
     	bottomPanel.add(jbOk = new JButton("OK")); 	    	    	    	    
     	bottomPanel.add(jbCancel = new JButton("Cancel"));	    
     	
     	
     	jbOk.addActionListener(this);
     	jbCancel.addActionListener(this);
-    	jbCondition.addActionListener(this);
+    	jbAction.addActionListener(this);
     	
     	textInputPane = new TextInputPane(null, new String[]{ALARMTYPE,ALARMDELAY});
     	
@@ -119,12 +122,9 @@ public class EOPInfoWindow
     	tableGroup.showZoneTable(jcbmiShowZone.isSelected());
     	tableGroup.setRowHeaderVisible(jcbmiShowRowHeader.isSelected());
     	
-    	
     	getContentPane().add(topPanel, BorderLayout.PAGE_START);
     	getContentPane().add(tableGroup, BorderLayout.CENTER);
     	getContentPane().add(bottomPanel, BorderLayout.PAGE_END);
-    	
-    	
     	
     	pack();
     	
@@ -159,6 +159,7 @@ public class EOPInfoWindow
     	fileMenu.addSeparator();
     	
     	fileMenu.add(jmiExit);
+    	
     	menuBar.add(fileMenu);
     	
     	//table menu
@@ -186,9 +187,8 @@ public class EOPInfoWindow
     	jcbmiShowRowHeader.addActionListener(this);
     	
     	showMenu.add(jcbmiShowInt);
-    	showMenu.add(jcbmiShowExt);
-    	
     	showMenu.add(jcbmiShowZone);
+    	showMenu.add(jcbmiShowExt);
     	
     	showMenu.addSeparator();
     	
@@ -199,6 +199,10 @@ public class EOPInfoWindow
     
     public void setFile(File file){
     	this.file = file;
+    }
+    
+    public File getFile(){
+    	return file;
     }
     
     public void save(){
@@ -224,10 +228,9 @@ public class EOPInfoWindow
         //set selection mode
         fc.setFileSelectionMode(JFileChooser.FILES_ONLY);
         
-    	int returnVal = fc.showOpenDialog(this);
+    	int returnVal = fc.showSaveDialog(this);
 
         if( returnVal == JFileChooser.APPROVE_OPTION ){
-            
         	file = fc.getSelectedFile();
         	save();
         }
@@ -256,6 +259,8 @@ public class EOPInfoWindow
 
         if( returnVal == JFileChooser.APPROVE_OPTION ){
         	tmpFile = fc.getSelectedFile();
+        }else{
+        	return;
         }
         
         //restore selection mode
@@ -289,25 +294,36 @@ public class EOPInfoWindow
         	
         	validate();
         }else{
-        	;
+        	JOptionPane.showMessageDialog(this, "File contains no EOP","File error",JOptionPane.ERROR_MESSAGE);
         }
-        
     }
     
+    /**
+     * Reads information from tables and update EOP.
+     */
     private void updateEOP(){
     	
+    	//--------------------------------
     	//External components
+    	//--------------------------------
     	eop.setExternalComponents(((EOPTableGroupPane)tableGroup).getExternalComponents());
     	
+    	//---------------------------------
     	//Internal components
+    	//---------------------------------
     	eop.setInternalComponents(((EOPTableGroupPane)tableGroup).getInternalComponents());
     	
+    	//---------------------------------
     	//Zones
+    	//---------------------------------
     	eop.setZones(((EOPTableGroupPane)tableGroup).getZones());
     	
     	Action[] actions = ((EOPTableGroupPane)tableGroup).getActions();
     	
+    	
+    	//-----------------------------------------------------------------
     	//Initial state
+    	//-----------------------------------------------------------------
     	InitialState initial = (new ObjectFactory()).createInitialState();
     	for(ActuatorValue val : actions[0].getActuatorValue()){
     		initial.getActuatorValue().add(val);
@@ -338,7 +354,9 @@ public class EOPInfoWindow
     	
     	eop.setInitialState(initial);
     	
+    	//-------------------------------
     	//Actions
+    	//-------------------------------
     	eop.getAction().clear();
     	for(int i = 1; i < actions.length; i++){
     		eop.getAction().add(actions[i]);
@@ -357,7 +375,7 @@ public class EOPInfoWindow
     	}else if(e.getSource().equals(jbCancel)){
     		setVisible(false);
     		dispose();
-    	}else if(e.getSource().equals(jbCondition)){
+    	}else if(e.getSource().equals(jbAction)){
     		tableGroup.addActionRow();
     	}
     	
@@ -399,6 +417,8 @@ public class EOPInfoWindow
     	
     	ObjectFactory factory = new ObjectFactory();
     	EOP eop = factory.createEOP();
+    	
+    	//eop = null;
     	
     	EOPInfoWindow ilInfoWin = new EOPInfoWindow(eop);
     	ilInfoWin.setVisible(true);

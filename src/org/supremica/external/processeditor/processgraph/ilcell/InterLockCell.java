@@ -1,29 +1,26 @@
 package org.supremica.external.processeditor.processgraph.ilcell;
 
 import javax.swing.BorderFactory;
+
 import java.awt.Color;
 import java.awt.event.MouseEvent;
 
 import org.supremica.external.processeditor.xgraph.*;
-import org.supremica.external.processeditor.processgraph.*;
 import org.supremica.manufacturingTables.xsd.il.IL;
 import org.supremica.manufacturingTables.xsd.il.ObjectFactory;
 
 
 public class InterLockCell 
 						extends 
-							GraphCell
+							GraphCell 
 {
-	IL il = null;
+	private IL il = null;
 	
 	public InterLockCell(){
 		super("IL");
-		setLayout(null);
-		
-		setBorder(BorderFactory.createLineBorder(Color.black));
-		
 		il = (new ObjectFactory()).createIL();
-	}
+		setBorder(BorderFactory.createLineBorder(Color.red));
+	}     
 	
 	public void mouseClicked(MouseEvent e) {
 		if(e.getClickCount() == 2){
