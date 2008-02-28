@@ -303,7 +303,7 @@ public class ILInfoWindow
         	il = (IL) o;
         	setIL(il);
         }else{
-        	JOptionPane.showMessageDialog(this, "File contains no EOP","File error",JOptionPane.ERROR_MESSAGE);
+        	JOptionPane.showMessageDialog(this, "File contains no IL","File error",JOptionPane.ERROR_MESSAGE);
         }
         
     }
