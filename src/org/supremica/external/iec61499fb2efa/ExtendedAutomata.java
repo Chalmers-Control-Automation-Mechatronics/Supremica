@@ -66,6 +66,8 @@ public class ExtendedAutomata
 
 	public ExtendedAutomata(String name, boolean expand) 
 	{
+		factory = ModuleSubjectFactory.getInstance();
+
 		identifier = factory.createSimpleIdentifierProxy(name);
 		module = new ModuleSubject(name, null);
 
@@ -77,7 +79,6 @@ public class ExtendedAutomata
 
 		this.expand = expand;
 
-		factory = ModuleSubjectFactory.getInstance();
 		parser = new ExpressionParser(factory, CompilerOperatorTable.getInstance());
 	}
 
