@@ -55,7 +55,7 @@ public class ILInfoWindow
     private static final String ACTUATOR = "Actuator:";
     private static final String OPERATION = "Operation:";
     
-    private JMenuItem jmiSave, jmiSaveAs, jmiOpen;
+    private JMenuItem jmiSave, jmiSaveAs, jmiOpen, jmiExit;
     
     private JCheckBoxMenuItem jcbmiShowInt, jcbmiShowExt,
     						  jcbmiShowOperation, jcbmiShowZone,
@@ -160,16 +160,23 @@ public class ILInfoWindow
     	jmiSave = new JMenuItem("Save");
     	jmiSaveAs = new JMenuItem("Save as");
     	jmiOpen = new JMenuItem("Open");
+    	jmiExit = new JMenuItem("Exit");
     	
     	jmiSave.setAccelerator(KeyStroke.getKeyStroke('S', ActionEvent.CTRL_MASK));
     	
     	jmiSave.addActionListener(this);
     	jmiSaveAs.addActionListener(this);
     	jmiOpen.addActionListener(this);
+    	jmiExit.addActionListener(this);
     	
     	fileMenu.add(jmiSave);
     	fileMenu.add(jmiSaveAs);
     	fileMenu.add(jmiOpen);
+    	
+    	fileMenu.addSeparator();
+    	
+    	fileMenu.add(jmiExit);
+    	
     	menuBar.add(fileMenu);
     	
     	//table menu
@@ -376,6 +383,9 @@ public class ILInfoWindow
     			saveAs();
     		}else if( e.getSource().equals( jmiOpen )){
     			open();
+    		}else if( e.getSource().equals( jmiExit )){
+    			setVisible(false);
+        		dispose();
     		}else if( e.getSource().equals( jcbmiShowInt )){
     			tableGroup.
     				showInternalTable( jcbmiShowInt.isSelected() );

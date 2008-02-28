@@ -17,6 +17,7 @@ import javax.swing.JTable;
 import javax.swing.JTextField;
 
 import org.supremica.external.processeditor.processgraph.table.BasicTablePane;
+import org.supremica.external.processeditor.processgraph.table.ValueChangedCellRenderer;
 import org.supremica.manufacturingTables.xsd.eop.Action;
 import org.supremica.manufacturingTables.xsd.eop.Zones;
 
@@ -35,6 +36,7 @@ public class ZoneTablePane
 		setHeader("Zones");
 		
 		table.getModel().setRowEditable(0, false);
+		table.setDefaultRenderer(Object.class, new ValueChangedCellRenderer());
 		
 		jbTableHeader.addActionListener(this);
 		jbTableHeader.addMouseListener(this);

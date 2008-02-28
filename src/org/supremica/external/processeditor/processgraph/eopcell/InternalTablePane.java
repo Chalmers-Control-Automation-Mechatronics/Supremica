@@ -16,6 +16,7 @@ import java.util.List;
 import java.util.LinkedList;
 
 import org.supremica.external.processeditor.processgraph.table.BasicTablePane;
+import org.supremica.external.processeditor.processgraph.table.ValueChangedCellRenderer;
 import org.supremica.manufacturingTables.xsd.eop.*;
 
 public class InternalTablePane 
@@ -41,6 +42,7 @@ public class InternalTablePane
 		
 		//first row not editable
 		table.getModel().setRowEditable(0, false);
+		table.setDefaultRenderer(Object.class, new ValueChangedCellRenderer());
 		
 		comboBoxList = new LinkedList<JComboBox>();
 		

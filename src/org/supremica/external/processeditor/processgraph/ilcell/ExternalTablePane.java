@@ -16,7 +16,9 @@ import javax.swing.JComboBox;
 import javax.swing.JTable;
 import javax.swing.JTextField;
 
+import org.supremica.external.processeditor.processgraph.table.BasicCellRenderer;
 import org.supremica.external.processeditor.processgraph.table.BasicTablePane;
+import org.supremica.external.processeditor.processgraph.table.ValueChangedCellRenderer;
 import org.supremica.manufacturingTables.xsd.il.ExternalComponents;
 import org.supremica.manufacturingTables.xsd.il.ExternalComponent;
 import org.supremica.manufacturingTables.xsd.il.Term;
@@ -41,6 +43,7 @@ public class ExternalTablePane
 		jbTableHeader.addMouseListener(this);
 		
 		table.getModel().setRowEditable(0, false);
+		table.setDefaultRenderer(Object.class, new ValueChangedCellRenderer());
 		
 		if(externalComponents == null){
 			return;

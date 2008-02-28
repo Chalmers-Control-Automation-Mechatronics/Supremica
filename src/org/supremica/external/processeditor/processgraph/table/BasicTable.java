@@ -1,9 +1,12 @@
 package org.supremica.external.processeditor.processgraph.table;
 
 import javax.swing.JTable;
+import javax.swing.JLabel;
+import javax.swing.SwingConstants;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableCellRenderer;
 import java.awt.Component;
+import java.awt.Color;
 
 import javax.swing.table.TableCellEditor;
 import javax.swing.event.*;
@@ -38,8 +41,8 @@ public class BasicTable
         TableCellRenderer headerRenderer = getTableHeader().getDefaultRenderer();
         
         //All columns
-        for (int col = 0; col < getColumnCount(); col++) {
-            column = getColumnModel().getColumn(col);
+        for ( int col = 0 ; col < getColumnCount() ; col++ ) {
+            column = getColumnModel().getColumn( col );
 
             comp = headerRenderer.getTableCellRendererComponent(null, column.getHeaderValue(),false, false, 0, 0);
             headerWidth = comp.getPreferredSize().width;
@@ -58,7 +61,6 @@ public class BasicTable
             column.setPreferredWidth(Math.max(headerWidth, cellWidth));
         }
     }
-    
 
 	/**
 	 * Return table model from class <code>BasicTableModel</code>
@@ -88,12 +90,14 @@ public class BasicTable
 		int numberOfCols = getColumnCount();
 		TableCellEditor[] cellEditor = new TableCellEditor[numberOfCols];
 		
+		//store table cell editor
 		for(int col = 0; col < numberOfCols; col++){
 			cellEditor[col] = getColumnModel().getColumn(col).getCellEditor();
 		}
 		
 		tableModel.addRow(name);
 		
+		//reset table cell editor
 		for(int col = 0; col < numberOfCols; col++){
 			getColumnModel().getColumn(col).setCellEditor(cellEditor[col]);
 		}
@@ -116,12 +120,14 @@ public class BasicTable
 		int numberOfCols = getColumnCount();
 		TableCellEditor[] cellEditor = new TableCellEditor[numberOfCols];
 		
+		//store cell editor
 		for(int col = 0; col < numberOfCols; col++){
 			cellEditor[col] = getColumnModel().getColumn(col).getCellEditor();
 		}
 		
 		tableModel.removeRow(name);
 		
+		//reset cell editor
 		for(int col = 0; col < numberOfCols; col++){
 			getColumnModel().getColumn(col).setCellEditor(cellEditor[col]);
 		}
@@ -140,12 +146,14 @@ public class BasicTable
 		int numberOfCols = getColumnCount();
 		TableCellEditor[] cellEditor = new TableCellEditor[numberOfCols];
 		
+		//store cell editor
 		for(int col = 0; col < numberOfCols; col++){
 			cellEditor[col] = getColumnModel().getColumn(col).getCellEditor();
 		}
 		
 		tableModel.removeRow(index);
 		
+		//reset cell editor
 		for(int col = 0; col < numberOfCols; col++){
 			getColumnModel().getColumn(col).setCellEditor(cellEditor[col]);
 		}
@@ -247,6 +255,7 @@ public class BasicTable
     	int numberOfCols = getColumnCount();
 		TableCellEditor[] cellEditor = new TableCellEditor[numberOfCols];
 		
+		//store cell editor
 		for(int col = 0; col < numberOfCols; col++){
 			cellEditor[col] = getColumnModel().getColumn(col).getCellEditor();
 		}
@@ -255,6 +264,7 @@ public class BasicTable
     		getModel().removeRow(rows[i]-i);
     	}
     	
+    	//reset cell editor
     	for(int col = 0; col < numberOfCols; col++){
 			getColumnModel().getColumn(col).setCellEditor(cellEditor[col]);
 		}

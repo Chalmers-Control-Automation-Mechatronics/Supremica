@@ -64,6 +64,10 @@ public class ExternalTablePane
 			EOPTableFiller.insertExternalConditionFromActionToTable(term, table);
 		}
 		
+		//set only initial state editable
+		for(int i = 2; i < table.getRowCount(); i++){
+			table.getModel().setRowEditable(i, false);
+		}
 	}
 	
 	public ExternalComponentValue[] getExternalComponentsInitialValue(){

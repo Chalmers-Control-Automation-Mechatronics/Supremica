@@ -84,9 +84,7 @@ public class BasicTableModel
 		
 		if(noEditableRowList == null){
 			return true;
-		}
-		
-		if(noEditableRowList.contains(new Integer(row))){
+		}else if(noEditableRowList.contains(new Integer(row))){
 			return false;
 		}
 		
@@ -158,6 +156,7 @@ public class BasicTableModel
 		if(index >= getRowCount()){
 			return;
 		}
+		
 		dataList.remove(index);
 		rowNames.remove(index);
 		

@@ -45,6 +45,7 @@ public class BasicTablePane
 		jbTableHeader.setFocusable(false);
 		
 		table = new BasicTable();
+		table.setDefaultRenderer(Object.class, new BasicCellRenderer());
 		
 		table.setPreferredScrollableViewportSize(table.getPreferredSize());
         table.setFillsViewportHeight(true);
@@ -176,8 +177,8 @@ class RowHeaderRenderer extends
 						implements 
 							ListCellRenderer
 {
-	  /* constructor */
-	  RowHeaderRenderer(JTable table) {
+	  //constructor
+	  public RowHeaderRenderer(JTable table) {
 	    JTableHeader header = table.getTableHeader();
 	    setOpaque(true);
 	    setBorder(UIManager.getBorder("TableHeader.cellBorder"));
