@@ -58,6 +58,7 @@ public class BasicTablePane
 	
 	public void setHeader(String headerText){
 		jbTableHeader.setText(headerText);
+		setName(headerText);
 	}
 	
 	//override
@@ -119,6 +120,12 @@ public class BasicTablePane
 		table.addRow(null, rowIndex, rowName);
 		table.setPreferredScrollableViewportSize(table.getPreferredSize());
 		showRowHeader(showRowHeader);
+	}
+	
+	public void fillColumn(Object value,int column, int startIndex, int endIndex){
+		for(int row = startIndex; row < endIndex; row++){
+			table.setValueAt(value, row, column);
+		}
 	}
 	
 	public void removeRow(int index){

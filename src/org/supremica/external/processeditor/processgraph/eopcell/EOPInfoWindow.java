@@ -278,7 +278,7 @@ public class EOPInfoWindow
         o = loader.openEOP(tmpFile);
         
         if(o instanceof EOP){
-        	file = tmpFile;
+        	setFile(tmpFile);
         	eop = (EOP) o;
         	setEOP(eop);
         }else{
@@ -418,17 +418,17 @@ public class EOPInfoWindow
     			setVisible(false);
     			dispose();
     		}else if( e.getSource().equals( jcbmiShowInt )){
-    			tableGroup.
-    				showInternalTable( jcbmiShowInt.isSelected() );
+    			updateEOP();
+    			setEOP(eop);
     		}else if( e.getSource().equals( jcbmiShowExt )){
-    			tableGroup.
-					showExternalTable( jcbmiShowExt.isSelected() );
+    			updateEOP();
+    			setEOP(eop);
     		}else if( e.getSource().equals( jcbmiShowZone )){
-    			tableGroup.
-    				showZoneTable( jcbmiShowZone.isSelected() );
+    			updateEOP();
+    			setEOP(eop);
     		}else if( e.getSource().equals( jcbmiShowRowHeader )){
-    			tableGroup.
-    				setRowHeaderVisible( jcbmiShowRowHeader.isSelected() );
+    			updateEOP();
+    			setEOP(eop);
     		}
     	}
 	}

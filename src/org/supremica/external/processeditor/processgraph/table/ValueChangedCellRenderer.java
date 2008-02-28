@@ -9,7 +9,7 @@ public class ValueChangedCellRenderer
 								extends
 									BasicCellRenderer
 {
-	private final Color CHANGED_VALUE_CELL_COLOR = Color.ORANGE;
+	private final Color CHANGED_VALUE_CELL_COLOR = new Color(153,186,250,200);
 	
 	public ValueChangedCellRenderer() {
 		super();
@@ -18,7 +18,6 @@ public class ValueChangedCellRenderer
 	public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
 		
 		Component comp = super.getTableCellRendererComponent(table,value,isSelected,hasFocus,row,column);
-		
 		
 		if(isSelected || !table.isCellEditable(row, column)){
 			return comp;

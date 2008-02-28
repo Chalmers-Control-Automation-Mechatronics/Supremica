@@ -141,8 +141,6 @@ public class ILInfoWindow
     	getContentPane().add(tableGroup, BorderLayout.CENTER);
     	getContentPane().add(bottomPanel, BorderLayout.PAGE_END);
     	
-    	
-    	
     	pack();
     	
     	setLocation((Toolkit.getDefaultToolkit().getScreenSize().width-getWidth())/2,
@@ -217,7 +215,6 @@ public class ILInfoWindow
     	
     	showMenu.add(jcbmiShowMode);
     	showMenu.add(jcbmiShowProduct);
-    	
     	
     	showMenu.addSeparator();
     	
@@ -338,8 +335,6 @@ public class ILInfoWindow
     	getContentPane().add(tableGroup);
     	
     	validate();
-    	
-    	
     }
     
     private void updateIL(){
@@ -387,26 +382,26 @@ public class ILInfoWindow
     			setVisible(false);
         		dispose();
     		}else if( e.getSource().equals( jcbmiShowInt )){
-    			tableGroup.
-    				showInternalTable( jcbmiShowInt.isSelected() );
+    			updateIL();
+    			setIL(il);
     		}else if( e.getSource().equals( jcbmiShowExt )){
-    			tableGroup.
-					showExternalTable( jcbmiShowExt.isSelected() );
+    			updateIL();
+    			setIL(il);
     		}else if( e.getSource().equals( jcbmiShowOperation )){
-    			tableGroup.
-					showOperationTable( jcbmiShowOperation.isSelected() );
+    			updateIL();
+    			setIL(il);
     		}else if( e.getSource().equals( jcbmiShowZone )){
-    			tableGroup.
-    				showZoneTable( jcbmiShowZone.isSelected() );
+    			updateIL();
+    			setIL(il);
     		}else if( e.getSource().equals( jcbmiShowMode )){
-    			tableGroup.
-					showModeTable(jcbmiShowMode.isSelected());
+    			updateIL();
+    			setIL(il);
     		}else if( e.getSource().equals( jcbmiShowProduct )){
-    			tableGroup.
-    				showProductTable( jcbmiShowProduct.isSelected() );
+    			updateIL();
+    			setIL(il);
     		}else if( e.getSource().equals( jcbmiShowRowHeader )){
-    			tableGroup.
-    				setRowHeaderVisible( jcbmiShowRowHeader.isSelected() );
+    			updateIL();
+    			setIL(il);
     		}
     	}
 	}

@@ -40,7 +40,7 @@ public class InterLockCell
 		
 		Graphics2D g2 = (Graphics2D) g;
 		
-		g2.setColor(new Color(100,0,0,50));
+		g2.setColor(new Color(250,119,19,80));
 		g2.fillOval(-diff, -diff, getHeight()+diff*2, getWidth()+diff*2);
 		
 		g2.setColor(Color.black);

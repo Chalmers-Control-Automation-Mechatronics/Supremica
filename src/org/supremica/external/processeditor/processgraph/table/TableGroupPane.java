@@ -1,6 +1,7 @@
 package org.supremica.external.processeditor.processgraph.table;
 
 
+import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 
@@ -37,6 +38,10 @@ public class TableGroupPane
 	
 	protected int[] selectedRows = null;
 	
+	private BasicTable table = null;
+	private int col = -1;
+	private int row = -1;
+	
 	public TableGroupPane(){
 		super();
 		popupMenu = new JPopupMenu( "Menu" );
@@ -51,6 +56,7 @@ public class TableGroupPane
 		Split modelRoot = new Split();
 		
 		removeAll();
+		validate();
 		
 		table.addtableListener(this);
 		table.addKeyListener(this);
@@ -63,7 +69,7 @@ public class TableGroupPane
 			children.add(new Leaf("1"));
 			
 			modelRoot.setChildren(children);
-			getMultiSplitLayout().setModel(modelRoot);
+			setModel(modelRoot);
 			
 			add(table,"0");
 			add(new JPanel(),"1");
@@ -81,7 +87,8 @@ public class TableGroupPane
 		children.add(new Leaf(Integer.toString(comps.length)));
 		
 		modelRoot.setChildren(children);
-		getMultiSplitLayout().setModel(modelRoot);
+		setModel(modelRoot);
+		setDividerSize(1);
 		
 		//add tables
 		for(int i = 0; i < comps.length; i++){
@@ -92,7 +99,6 @@ public class TableGroupPane
 		add(table, Integer.toString(comps.length));
 		
 		validate();
-		
 	}
 	
 	/*
@@ -141,10 +147,20 @@ public class TableGroupPane
 		//override this to make pop-up-menu
 		// Action and mouse listener support
 		enableEvents( AWTEvent.MOUSE_EVENT_MASK );
+		
+		// Create some menu items for the popup
+		JMenuItem menuItem = new JMenuItem( "Fill down" );
+		popupMenu.add( menuItem );
+		menuItem.addActionListener( this );
 	}
 	
 	public void actionPerformed( ActionEvent event ){
 		// Add action handling code here
+		if(event.getActionCommand().equals("Fill down")){
+			if(null != table){
+				table.fillColumn(table.getValueAt(row, col), col, row, table.getRowCount());
+			}
+		}
 	}
 	
 	public void mousePressed(MouseEvent e) {
@@ -164,20 +180,15 @@ public class TableGroupPane
 	private void showPopupMenu(MouseEvent e){
 		
 		if(e.getSource() instanceof BasicTable){
-			BasicTable table = (BasicTable)e.getSource();
-			if(null != table.getComponentAt(e.getPoint())){
-				
-				 
-				int col = table.columnAtPoint(e.getPoint());
-				int row = table.rowAtPoint(e.getPoint());
-				
-				System.out.println("Column: " + col);
-				System.out.println("Row: " + row);
-			}else{
-				System.out.println("Null");
+			table = (BasicTable)e.getSource();
+			
+			col = table.columnAtPoint(e.getPoint());
+			row = table.rowAtPoint(e.getPoint());
+			
+			if(-1 != row){
+				table.getSelectionModel().setSelectionInterval(row, row);
 			}
-		}else{
-			System.out.println("No BasicTable");
+				
 		}
 		
 		popupMenu.setLocation(e.getLocationOnScreen());

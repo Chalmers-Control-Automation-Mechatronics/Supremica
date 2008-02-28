@@ -107,6 +107,12 @@ public class BasicTable
 		}
 	}
 	
+	public void fillColumn(Object value,int column, int startIndex, int endIndex){
+		for(int row = startIndex; row < endIndex; row++){
+			setValueAt(value, row, column);
+		}
+	}
+	
 	public void setRowName(int row, String name){
 		tableModel.setRowName(row, name);
 	}

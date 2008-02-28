@@ -317,27 +317,34 @@ public class EOPTableGroupPane
 	
 	//override
 	protected void makePopupMenu(){
+	
+		// Create some menu items for the popup
+		JMenuItem menuEdit = new JMenuItem( "Insert action" );
+		popupMenu.add( menuEdit );
+		menuEdit.addActionListener( this );
+		
+		menuEdit = new JMenuItem( "Remove action" );
+		popupMenu.add( menuEdit );
+		menuEdit.addActionListener( this );
+		
+		popupMenu.addSeparator();
 		
 		super.makePopupMenu();
-		
-		// Create some menu items for the popup
-		JMenuItem menuEdit = new JMenuItem( "add condition" );
-		popupMenu.add( menuEdit );
-		menuEdit.addActionListener( this );
-		
-		menuEdit = new JMenuItem( "remove condition" );
-		popupMenu.add( menuEdit );
-		menuEdit.addActionListener( this );
 	}
 	
 	//override
 	public void actionPerformed( ActionEvent event ){
-		if(event.getActionCommand().equals("add condition")){
-			addActionRow();
-		}else if(event.getActionCommand().equals("remove condition")){
-			
-			for(int i = 0; i < selectedRows.length; i++){
-				deleteActionRow(selectedRows[i]);
+		if(event.getActionCommand().equals("Insert action")){
+			if(null != selectedRows && selectedRows.length > 0){
+				addActionRow(selectedRows[0],null);
+			}else{
+				addActionRow();
+			}
+		}else if(event.getActionCommand().equals("Remove action")){
+			if(null != selectedRows){
+				for(int i = 0; i < selectedRows.length; i++){
+					deleteActionRow(selectedRows[i]);
+				}
 			}
 		}else{
 			super.actionPerformed(event);

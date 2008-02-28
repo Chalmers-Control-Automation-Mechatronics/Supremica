@@ -70,6 +70,21 @@ public class ExternalTablePane
 		}
 	}
 	
+	public void addRow(String rowName){
+		super.addRow(rowName);
+		
+		if(2 > table.getRowCount()){
+			table.getModel().setRowEditable(table.getRowCount()-1, false);
+		}
+	}
+	
+	public void addRow(int rowIndex, String rowName){
+		super.addRow(rowIndex, rowName);
+		if(2 > table.getRowCount()){
+			table.getModel().setRowEditable(table.getRowCount()-1, false);
+		}
+	}
+	
 	public ExternalComponentValue[] getExternalComponentsInitialValue(){
 		return EOPTableExtractor.getExternalComponentsInitialValueFromTable(table);
 	}

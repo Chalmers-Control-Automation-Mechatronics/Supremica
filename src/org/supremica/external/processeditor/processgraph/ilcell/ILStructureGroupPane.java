@@ -66,14 +66,6 @@ public class ILStructureGroupPane
     	
     	setRowNames();
     	
-    	//add all tables one time
-    	addTable( tableMode );
-    	addTable( tableInternal );
-    	addTable( tableExternal );
-    	addTable( tableOperation );
-    	addTable( tableZone );
-    	addTable( tableProduct );		
-    	
     	//show selected tables only
     	showTables();
     	
@@ -365,26 +357,33 @@ public class ILStructureGroupPane
 	//override
 	protected void makePopupMenu(){
 		
-		super.makePopupMenu();
-		
 		// Create some menu items for the popup
-		JMenuItem menuEdit = new JMenuItem( "add condition" );
+		JMenuItem menuEdit = new JMenuItem( "Add condition" );
 		popupMenu.add( menuEdit );
 		menuEdit.addActionListener( this );
 		
-		menuEdit = new JMenuItem( "remove condition" );
+		menuEdit = new JMenuItem( "Remove condition" );
 		popupMenu.add( menuEdit );
 		menuEdit.addActionListener( this );
+		
+		popupMenu.addSeparator();
+		
+		super.makePopupMenu();
 	}
 	
 	//override
 	public void actionPerformed( ActionEvent event ){
-		if(event.getActionCommand().equals("add condition")){
-			addConditionRow();
-		}else if(event.getActionCommand().equals("remove condition")){
-			
-			for(int i = 0; i < selectedRows.length; i++){
-				deleteConditionRow(selectedRows[i]);
+		if(event.getActionCommand().equals("Add condition")){
+			if(null != selectedRows && selectedRows.length > 0){
+				addConditionRow(selectedRows[0],null);
+			}else{
+				addConditionRow();
+			}
+		}else if(event.getActionCommand().equals("Remove condition")){
+			if(null != selectedRows){
+				for(int i = 0; i < selectedRows.length; i++){
+					deleteConditionRow(selectedRows[i]);
+				}
 			}
 		}else{
 			super.actionPerformed(event);
@@ -425,14 +424,6 @@ public class ILStructureGroupPane
     		tableZone.getTable().getModel().setRowName(i, ROWNAME);
     		tableProduct.getTable().getModel().setRowName(i, ROWNAME);
     	}
-    	
-    	tableMode.getTable().getModel().fireTableStructureChanged();
-    	tableInternal.getTable().getModel().fireTableStructureChanged();
-		tableExternal.getTable().getModel().fireTableStructureChanged();
-		tableOperation.getTable().getModel().fireTableStructureChanged();
-		tableZone.getTable().getModel().fireTableStructureChanged();
-		tableProduct.getTable().getModel().fireTableStructureChanged();
-		
 	}
 	
 	//override
@@ -468,7 +459,7 @@ public class ILStructureGroupPane
 				if(e.getKeyCode() == KeyEvent.VK_N){
 					if(selectedRows.length > 0){
 						if(e.getSource() instanceof BasicTable){
-							addConditionRow(selectedRows[0] + 1, (BasicTable) e.getSource());
+							addConditionRow(selectedRows[0], (BasicTable) e.getSource());
 						}
 					}
 				}
