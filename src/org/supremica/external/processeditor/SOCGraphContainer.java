@@ -33,6 +33,8 @@ import org.supremica.external.processeditor.processgraph.resrccell.ResourceCell;
 import org.supremica.manufacturingTables.xsd.processeditor.ObjectFactory;
 import org.supremica.manufacturingTables.xsd.processeditor.ROP;
 import org.supremica.manufacturingTables.xsd.processeditor.RelationType;
+import org.supremica.manufacturingTables.xsd.il.IL;
+import org.supremica.manufacturingTables.xsd.eop.EOP;
 
 import org.supremica.external.processeditor.xml.Converter;
 
@@ -427,30 +429,39 @@ public class SOCGraphContainer
      * If not the <code>saveAs</code> method will be invoked instead.
      */
     public void save() {
-	ResourceCell resrcCell = getSelectedResourceCell();
-	if(resrcCell != null && resrcCell.getROP() != null) {
-	    if(resrcCell.getFile() != null) {
-		Loader loader = new Loader();			       
-		loader.save(resrcCell.getFunction(), resrcCell.getFile()); 
-	    }else {
-		saveAs();
-	    }
-	}
+    	ResourceCell resrcCell = getSelectedResourceCell();
+    	
+    	if(resrcCell != null && resrcCell.getFunction() != null) {
+    		if(resrcCell.getFile() != null) {
+    			Loader loader = new Loader();
+    			Object o = resrcCell.getFunction();
+    			
+    			if(o instanceof ROP){
+    				loader.save(o, resrcCell.getFile());
+    			}else if(o instanceof IL){
+    				loader.saveIL(o, resrcCell.getFile());
+    			}else if(o instanceof EOP){
+    				loader.saveEOP(o, resrcCell.getFile());
+    			}
+    		}else {
+    			saveAs();
+    		}
+    	}
     }	
     /**
      * Saves selected resource to the URL chosen by the user.
      */
     public void saveAs() {
-	//DEBUG
-	//System.out.println("SOCGraphContainer.save()");
-	//END DEBUG
-	ResourceCell resrcCell = getSelectedResourceCell();
-	if(resrcCell != null && resrcCell.getROP() != null) {
-	    File file = saveObjectAs(resrcCell.getFunction());
-	    if(file != null) {
-		resrcCell.setFile(file);
-	    }	    
-	}
+    	//DEBUG
+    	//System.out.println("SOCGraphContainer.save()");
+    	//END DEBUG
+    	ResourceCell resrcCell = getSelectedResourceCell();
+    	if(resrcCell != null && resrcCell.getFunction() != null) {
+    		File file = saveObjectAs(resrcCell.getFunction());
+    		if(file != null) {
+    			resrcCell.setFile(file);
+    		}
+    	}
     }	
     /**
      * Show the save dialog and saves the object to the chosen URL.
@@ -461,35 +472,47 @@ public class SOCGraphContainer
      * assignment failed.
      */
     protected File saveObjectAs(Object o) {
-	if(o instanceof ROP) {	    
-	    JFileChooser fc;
-	    if(cDir != null) {
-		fc = new JFileChooser(cDir);
-	    }else {
-		fc = new JFileChooser();
-	    }
-	    fc.addChoosableFileFilter(xmlFilter);			    
-	    fc.setAcceptAllFileFilterUsed(true);
-	    fc.setFileFilter(xmlFilter);
-	    int result = fc.showSaveDialog(this);
-	    if(result == JFileChooser.APPROVE_OPTION) {			
-		cDir = fc.getSelectedFile().getParentFile();
-		File file = fc.getSelectedFile();		
-		if(!fc.getFileFilter().accept(file)) {		
-		    file = new File(file.getAbsolutePath()+
-				    fc.getFileFilter().getDescription()); 
-		}
-		if(xmlFilter.accept(file)) {
-		    Loader loader = new Loader();			   
-		    Converter.printROP(o);
-		    loader.save(o, file);    	
-		    return file;
-		}
-	    }else if(result == JFileChooser.CANCEL_OPTION) {	   
-	    }else if(result == JFileChooser.ERROR_OPTION) {		    
-	    }		
-	}
-	return null;	
+    	if(o instanceof ROP ||
+    	   o instanceof IL  ||
+    	   o instanceof EOP) 
+    	{	    
+    		JFileChooser fc;
+    		if(cDir != null) {
+    			fc = new JFileChooser(cDir);
+    		}else {
+    			fc = new JFileChooser();
+    		}
+    		
+    		fc.addChoosableFileFilter(xmlFilter);			    
+    		fc.setAcceptAllFileFilterUsed(true);
+    		fc.setFileFilter(xmlFilter);
+    		
+    		int result = fc.showSaveDialog(this);
+    		if(result == JFileChooser.APPROVE_OPTION) {			
+    			cDir = fc.getSelectedFile().getParentFile();
+    			File file = fc.getSelectedFile();		
+    			if(!fc.getFileFilter().accept(file)) {		
+    				file = new File(file.getAbsolutePath()+
+    						fc.getFileFilter().getDescription()); 
+    			}
+    			if(xmlFilter.accept(file)) {
+    				Loader loader = new Loader();			   
+    				
+    				if(o instanceof ROP){
+        				loader.save(o, file);
+        				//Converter.printROP(o);
+        			}else if(o instanceof IL){
+        				loader.saveIL(o, file);
+        			}else if(o instanceof EOP){
+        				loader.saveEOP(o, file);
+        			} 	
+    				return file;
+    			}
+    		}else if(result == JFileChooser.CANCEL_OPTION) {	   
+    		}else if(result == JFileChooser.ERROR_OPTION) {		    
+    		}		
+    	}
+    	return null;	
     }
     /**
      * Exports the active worksheet to .bmp image file.
@@ -990,28 +1013,27 @@ public class SOCGraphContainer
      * Copies the selection.         
      */
     public void copy() {
-	NestedCellListener nestedCellList = getSelectedNestedCellListener();
-	if(nestedCellList != null) {
-	    memory = nestedCellList;
-	    //jmiPaste.setEnabled(true);
-	    menubar.setEnabled("Paste",true);
-	    toolbar.setPasteEnabled(true);
-	}
+    	NestedCellListener nestedCellList = getSelectedNestedCellListener();
+    	if(nestedCellList != null) {
+    		memory = nestedCellList;
+    		menubar.setEnabled("Paste",true);
+    		toolbar.setPasteEnabled(true);
+    	}
     }
     /**
      * Pastes the copied object into the selected object. 
      */
     public void paste() {
-	//DEBUG
-	//System.out.println("SOCGraphContainer.paste()");
-	//END DEBUG
-	NestedCellListener nestedCellList = getSelectedNestedCellListener();
-	if(nestedCellList != null) {
-	    nestedCellList.paste(((NestedCellListener)memory).copy());	      
-	    removeAllSelected();		
-	}else {	       
-	    getSelectedFrame().paste(((NestedCellListener)memory).copy()); 
-	}	
+    	//DEBUG
+    	//System.out.println("SOCGraphContainer.paste()");
+    	//END DEBUG
+    	NestedCellListener nestedCellList = getSelectedNestedCellListener();
+    	if(nestedCellList != null) {
+    		nestedCellList.paste(((NestedCellListener)memory).copy());	      
+    		removeAllSelected();		
+    	}else {	       
+    		getSelectedFrame().paste(((NestedCellListener)memory).copy()); 
+    	}	
     }
     /**
      * Deletes the selection.

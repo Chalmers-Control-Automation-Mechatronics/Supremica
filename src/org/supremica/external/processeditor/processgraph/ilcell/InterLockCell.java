@@ -1,34 +1,28 @@
 package org.supremica.external.processeditor.processgraph.ilcell;
 
-import javax.swing.BorderFactory;
-
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.event.MouseEvent;
 import java.io.File;
 
-import org.supremica.external.processeditor.processgraph.eopcell.EOPInfoWindow;
-import org.supremica.external.processeditor.xgraph.*;
-import org.supremica.manufacturingTables.xsd.eop.EOP;
+import org.supremica.external.processeditor.processgraph.NestedCell;
+import org.supremica.external.processeditor.processgraph.resrccell.*;
 import org.supremica.manufacturingTables.xsd.il.IL;
 import org.supremica.manufacturingTables.xsd.il.ObjectFactory;
 
 
 public class InterLockCell 
 						extends 
-							GraphCell 
+							ResourceCell 
 {
-	private IL il = null;
 	private ILInfoWindow ilInfoWin = null;
-	private File ilFile = null;
 	
-	private int x = 40;
+	private int x = 30;
 	
 	public InterLockCell(){
-		super("IL");
-		il = (new ObjectFactory()).createIL();
-		//setBorder(BorderFactory.createLineBorder(Color.red));
+		super();
+		setIL((new ObjectFactory()).createIL());
 		this.setSize(x,x);
 	}     
 	
@@ -52,13 +46,14 @@ public class InterLockCell
 		
 	}
 	
+	@Override
 	public void mouseClicked(MouseEvent e) {
 		if(e.getClickCount() == 2){
 			
 			if(null == ilInfoWin){
 				ilInfoWin = new ILInfoWindow(this);
 			}else{
-				ilInfoWin.setIL(il);
+				ilInfoWin.setIL(getIL());
 			}
 	    	ilInfoWin.setVisible(true);
 		}else{
@@ -66,11 +61,52 @@ public class InterLockCell
 		}
 	}
 	
+	@Override
+	public void mouseReleased(MouseEvent e) {}
+	
 	public IL getIL(){
-		return il;
+		Object o = getFunction();
+		if(o instanceof IL){
+			return (IL) o;
+		}
+		return null;
 	}
 	
 	public void setIL(IL il){
-		this.il = il;
+		setFunction(il);
 	}
+	
+	@Override
+	public void setFile(File file) {
+		super.setFile(file);
+		setToolTipText(file.getAbsolutePath());
+	}
+	
+	@Override
+	public void pack(){};
+	
+	@Override
+	public boolean isEmpty() {
+    	return false;
+    }
+	
+	@Override
+	protected NestedCell clone() {
+		ObjectFactory factory = new ObjectFactory();
+		
+		IL originalIL = getIL();
+		IL cloneIL = factory.createIL();
+		
+		cloneIL.setActuator(originalIL.getActuator());
+		cloneIL.setComment(originalIL.getComment());
+		cloneIL.setId(originalIL.getId());
+		cloneIL.setOperation(originalIL.getOperation());
+		
+		cloneIL.setILStructure(originalIL.getILStructure());
+		
+		InterLockCell ilCell = new InterLockCell();
+		ilCell.setIL(cloneIL);
+		
+    	return ilCell;
+    }
 }

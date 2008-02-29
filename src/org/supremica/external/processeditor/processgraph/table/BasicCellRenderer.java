@@ -12,7 +12,7 @@ public class BasicCellRenderer
 {
 	private final Color NOT_EDITABLE_CELL_COLOR = Color.LIGHT_GRAY;
 	private final Color VALUE_CELL_COLOR = new Color(153,186,243,80);
-	private final Color SELECTED_CELL_BODER_COLOR = new Color(0,0,0,80);
+	private final Color SELECTED_CELL_BODER_COLOR = new Color(0,0,0,100);
 	
 	public BasicCellRenderer() {
 		setOpaque(true);
@@ -47,6 +47,13 @@ public class BasicCellRenderer
 		
 		//set text
 		this.setText(value.toString());
+		
+		//set tooltiptext if value to long
+		if(getFontMetrics(getFont()).stringWidth(getText()) > table.getColumnModel().getColumn(column).getWidth()){
+			setToolTipText(getText());
+		}else{
+			setToolTipText(null);
+		}
 		
 		return this;
 	}

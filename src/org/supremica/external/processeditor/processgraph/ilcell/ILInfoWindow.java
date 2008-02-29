@@ -27,6 +27,7 @@ import org.supremica.manufacturingTables.xsd.il.IL;
 import org.supremica.manufacturingTables.xsd.il.ILStructure;
 import org.supremica.manufacturingTables.xsd.il.ObjectFactory;
 
+import org.supremica.external.processeditor.SOCFrame;
 import org.supremica.external.processeditor.processgraph.table.TextInputPane;
 import org.supremica.external.processeditor.xml.Loader;
 
@@ -40,6 +41,8 @@ public class ILInfoWindow
 						implements 
 							ActionListener 
 { 
+	private static final String TITLE = "InterLock";
+	
     private JButton jbOk, jbCancel, jbCondition;
     
     private TextInputPane textInputPane;
@@ -69,6 +72,7 @@ public class ILInfoWindow
     public ILInfoWindow(InterLockCell ilCell){
     	this(ilCell.getIL());
     	this.ilCell = ilCell;
+    	file = ilCell.getFile();
     }
     /** 
      * Creates a new instance of the class.
@@ -77,9 +81,14 @@ public class ILInfoWindow
      * @param c the operation cell that launched this info window
      */
     public ILInfoWindow(IL il){
-    	super();
+    	super(TITLE);
     	
     	setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+    	
+    	//SOC icon
+    	this.setIconImage(Toolkit.getDefaultToolkit().
+  			  getImage(SOCFrame.class.getClass().
+  				   getResource("/icons/processeditor/icon.gif")));	
     	
     	getContentPane().setLayout(new BorderLayout());
     	
@@ -121,7 +130,7 @@ public class ILInfoWindow
     	
     	topPanel = new JPanel();
     	topPanel.setLayout(new BorderLayout());
-    	topPanel.setBorder(BorderFactory.createTitledBorder("InterLock"));
+    	topPanel.setBorder(BorderFactory.createTitledBorder("InterLock data"));
     	
     	topPanel.add(textInputPane, BorderLayout.LINE_START);
     	
@@ -232,6 +241,11 @@ public class ILInfoWindow
     
     public void setFile(File file){
     	this.file = file;
+    	if(null != ilCell){
+    		ilCell.setFile(file);
+    	}
+    	
+    	setTitle(TITLE+" "+file.getAbsolutePath());
     }
     
     public void save(){
@@ -261,7 +275,7 @@ public class ILInfoWindow
 
         if( returnVal == JFileChooser.APPROVE_OPTION ){
             
-        	file = fc.getSelectedFile();
+        	setFile(fc.getSelectedFile());
         	save();
         }
         
@@ -299,7 +313,7 @@ public class ILInfoWindow
         o = loader.openIL(tmpFile);
         
         if(o instanceof IL){
-        	file = tmpFile;
+        	setFile(tmpFile);
         	il = (IL) o;
         	setIL(il);
         }else{

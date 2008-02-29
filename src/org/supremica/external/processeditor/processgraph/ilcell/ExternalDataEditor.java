@@ -2,12 +2,14 @@ package org.supremica.external.processeditor.processgraph.ilcell;
 
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
+import org.supremica.external.processeditor.SOCFrame;
 import org.supremica.external.processeditor.processgraph.table.BasicTable;
 import org.supremica.external.processeditor.processgraph.table.DataTablePane;
 import org.supremica.manufacturingTables.xsd.il.ObjectFactory;
@@ -29,6 +31,11 @@ public class ExternalDataEditor
 	public ExternalDataEditor(ExternalTablePane externalTable){
 		super("External components");
 		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+		
+		//SOC icon
+    	this.setIconImage(Toolkit.getDefaultToolkit().
+  			  getImage(SOCFrame.class.getClass().
+  				   getResource("/icons/processeditor/icon.gif")));	
 		
 		getContentPane().setLayout(new BorderLayout());
 		

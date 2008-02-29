@@ -335,18 +335,18 @@ public class SOCGraphFrame extends JInternalFrame implements SelectionListener {
      * @param o the object to paste
      */
     public void paste(Object o) {	
-	//DEBUG
-	//System.out.println("SOCGraphFrame.paste()");
-	//END DEBUG
-	if(o instanceof NestedCell) {
-	    GraphCell clone = ((NestedCell)o).copy();
-	    graph.insert(clone,0);	    	    
-	    Point p = graphScroll.getCornerValue();
-	    p.translate(INSERT_MARGIN_X, INSERT_MARGIN_Y);
-	    clone.setPos(p);
-	    graph.updateLargePreferredSize();
-	    //graph.validate();
-	}
+    	//DEBUG
+    	//System.out.println("SOCGraphFrame.paste()");
+    	//END DEBUG
+    	if(o instanceof NestedCell) {
+    		GraphCell clone = ((NestedCell)o).copy();
+    		graph.insert(clone,0);	    	    
+    		Point p = graphScroll.getCornerValue();
+    		p.translate(INSERT_MARGIN_X, INSERT_MARGIN_Y);
+    		clone.setPos(p);
+    		graph.updateLargePreferredSize();
+    		//graph.validate();
+    	}
     }
     /**
      * Maximizes and restores the worksheet.

@@ -1,6 +1,7 @@
 package org.supremica.external.processeditor.processgraph.table;
 
 import java.awt.Component;
+import java.awt.Font;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseListener;
 
@@ -11,6 +12,7 @@ import javax.swing.JLabel;
 import javax.swing.JScrollPane;
 import javax.swing.JButton;
 import javax.swing.JTable;
+import javax.swing.SwingConstants;
 
 //import javax.swing.JList;
 import javax.swing.ListCellRenderer;
@@ -35,9 +37,16 @@ public class BasicTablePane
 	
 	public BasicTablePane(){
 		super();
+		
+		Font tmpFont = null;
+		
 		setLayout(new BoxLayout(this,BoxLayout.Y_AXIS));
 		
 		jbTableHeader = new JButton("Table");
+		
+		//bold table header font 
+		tmpFont = jbTableHeader.getFont().deriveFont(Font.BOLD);
+		jbTableHeader.setFont(tmpFont);
 		
 		//hide button
 		jbTableHeader.setContentAreaFilled(false);
@@ -46,6 +55,14 @@ public class BasicTablePane
 		
 		table = new BasicTable();
 		table.setDefaultRenderer(Object.class, new BasicCellRenderer());
+		
+		//bold column header text
+		tmpFont = table.getTableHeader().getFont().deriveFont(Font.BOLD);
+		table.getTableHeader().setFont(tmpFont);
+		
+		//center column header text
+		JLabel renderer = (JLabel)table.getTableHeader().getDefaultRenderer();
+		renderer.setHorizontalAlignment(SwingConstants.CENTER);
 		
 		table.setPreferredScrollableViewportSize(table.getPreferredSize());
         table.setFillsViewportHeight(true);
@@ -192,7 +209,7 @@ class RowHeaderRenderer extends
 	    setHorizontalAlignment(CENTER);
 	    setForeground(header.getForeground());
 	    setBackground(header.getBackground());
-	    setFont(header.getFont());
+	    setFont(header.getFont().deriveFont(Font.PLAIN));
 	  }
 	  
 	  public Component getListCellRendererComponent( JList list, 

@@ -2,11 +2,13 @@ package org.supremica.external.processeditor.processgraph.eopcell;
 
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import javax.swing.table.TableColumn;
 import javax.swing.*;
 
+import org.supremica.external.processeditor.SOCFrame;
 import org.supremica.external.processeditor.processgraph.table.BasicTable;
 import org.supremica.external.processeditor.processgraph.table.DataTablePane;
 
@@ -26,6 +28,11 @@ public class ZoneDataEditor
 	public ZoneDataEditor(ZoneTablePane zoneTable){
 		super("Zones");
 		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+		
+		//SOC icon
+    	this.setIconImage(Toolkit.getDefaultToolkit().
+  			  getImage(SOCFrame.class.getClass().
+  				   getResource("/icons/processeditor/icon.gif")));	
 		
 		getContentPane().setLayout(new BorderLayout());
 		

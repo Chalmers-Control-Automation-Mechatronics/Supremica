@@ -35,6 +35,7 @@ import org.supremica.manufacturingTables.xsd.eop.InitialStateCheck;
 import org.supremica.manufacturingTables.xsd.eop.ExternalComponentValue;
 
 
+import org.supremica.external.processeditor.SOCFrame;
 import org.supremica.external.processeditor.processgraph.table.TextInputPane;
 import org.supremica.external.processeditor.xml.Loader;
 
@@ -48,6 +49,8 @@ public class EOPInfoWindow
 						implements 
 							ActionListener 
 { 
+	private static final String TITLE = "Execution Of Operation";
+	
     private JButton jbOk, jbCancel, jbAction;
     
     private TextInputPane textInputPane;
@@ -75,12 +78,18 @@ public class EOPInfoWindow
     	this(eopCell.getEOP());
     	
     	this.eopCell = eopCell;
+    	file = eopCell.getFile();
     }
     
     public EOPInfoWindow(EOP eop){
-    	super("Execution of operation");
+    	super(TITLE);
     	
     	setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+    	
+    	//SOC icon
+    	this.setIconImage(Toolkit.getDefaultToolkit().
+  			  getImage(SOCFrame.class.getClass().
+  				   getResource("/icons/processeditor/icon.gif")));	
     	
     	getContentPane().setLayout(new BorderLayout());
     	
@@ -134,6 +143,10 @@ public class EOPInfoWindow
     	getContentPane().add(bottomPanel, BorderLayout.PAGE_END);
     	
     	pack();
+    	
+    	if(getSize().height < 400 || getSize().height < 500){
+    		setSize(400, 500);
+    	}
     	
     	setLocation((Toolkit.getDefaultToolkit().getScreenSize().width-getWidth())/2,
     		     (Toolkit.getDefaultToolkit().getScreenSize().height-getHeight())/2);
@@ -206,6 +219,11 @@ public class EOPInfoWindow
     
     public void setFile(File file){
     	this.file = file;
+    	if(null != eopCell){
+    		eopCell.setFile(file);
+    	}
+    	
+    	setTitle(TITLE+" "+file.getAbsolutePath());
     }
     
     public File getFile(){
@@ -238,7 +256,7 @@ public class EOPInfoWindow
     	int returnVal = fc.showSaveDialog(this);
 
         if( returnVal == JFileChooser.APPROVE_OPTION ){
-        	file = fc.getSelectedFile();
+        	setFile(fc.getSelectedFile());
         	save();
         }
         

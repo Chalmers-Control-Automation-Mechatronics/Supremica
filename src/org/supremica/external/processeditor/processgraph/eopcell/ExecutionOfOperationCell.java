@@ -1,39 +1,30 @@
 package org.supremica.external.processeditor.processgraph.eopcell;
 
-import javax.swing.BorderFactory;
 import java.awt.Color;
-import java.awt.GradientPaint;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.event.MouseEvent;
-import java.awt.Dimension;
-import java.awt.Point;
 
-import org.supremica.external.processeditor.xgraph.*;
 import org.supremica.external.processeditor.processgraph.*;
+import org.supremica.external.processeditor.processgraph.resrccell.*;
+
 import org.supremica.manufacturingTables.xsd.eop.*;
 
 import java.io.File;
 
 
 public class ExecutionOfOperationCell 
-						extends 
-							GraphCell
+									extends 
+										ResourceCell
 {
-	EOP eop = null;
 	EOPInfoWindow eopInfoWin = null;
 	File eopFile = null;
 	
-	private int x = 40;
+	private int x = 30;
 	
 	public ExecutionOfOperationCell(){
-		super("EOP");
-		setLayout(null);
-		
-		//setBorder(BorderFactory.createLineBorder(Color.black));
-		
-		eop = (new ObjectFactory()).createEOP();
-		
+		super();
+		setEOP((new ObjectFactory()).createEOP());
 		setSize(x,x);
 	}
 	
@@ -53,16 +44,25 @@ public class ExecutionOfOperationCell
 		x = (getWidth() - g2.getFontMetrics().stringWidth(txt))/2;
 		y = getHeight()/2 + g2.getFontMetrics().getHeight()/4;
 		
-		g2.drawString("EOP",x,y);
+		g2.drawString(txt,x,y);
 		
 	} 
 	
 	public void setEOP(EOP eop){
-		this.eop = eop;
+		setFunction(eop);
 	}
 	
 	public EOP getEOP(){
-		return eop;
+		Object o = getFunction();
+		if(o instanceof EOP){
+			return (EOP) o;
+		}
+		return null;
+	}
+	
+	public void setFile(File file) {
+		super.setFile(file);
+		setToolTipText(file.getAbsolutePath());
 	}
 	
 	public void mouseClicked(MouseEvent e) {
@@ -71,7 +71,7 @@ public class ExecutionOfOperationCell
 			if(null == eopInfoWin){
 				eopInfoWin = new EOPInfoWindow(this);
 			}else{
-				eopInfoWin.setEOP(eop);
+				eopInfoWin.setEOP(getEOP());
 			}
 			
 			eopInfoWin.setVisible(true);
@@ -80,4 +80,35 @@ public class ExecutionOfOperationCell
 			super.mouseClicked(e);
 		}
 	}
+	
+	@Override
+	public void mouseReleased(MouseEvent e) {}
+	
+	@Override
+	public void pack(){};
+	
+	@Override
+	public boolean isEmpty() {
+    	return false;
+    }
+	
+	@Override
+	protected NestedCell clone() {
+		ObjectFactory factory = new ObjectFactory();
+		
+		EOP originalEOP = getEOP();
+		EOP cloneEOP = factory.createEOP();
+		
+		cloneEOP.setExternalComponents(originalEOP.getExternalComponents());
+		cloneEOP.setInitialState(originalEOP.getInitialState());
+		cloneEOP.setInternalComponents(originalEOP.getInternalComponents());
+		cloneEOP.setZones(originalEOP.getZones());
+		
+		cloneEOP.getAction().addAll(originalEOP.getAction());
+		
+		ExecutionOfOperationCell eopCell = new ExecutionOfOperationCell();
+		eopCell.setEOP(cloneEOP);
+		
+    	return eopCell;
+    }
 }

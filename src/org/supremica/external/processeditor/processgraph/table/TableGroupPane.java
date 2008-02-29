@@ -88,7 +88,7 @@ public class TableGroupPane
 		
 		modelRoot.setChildren(children);
 		setModel(modelRoot);
-		setDividerSize(1);
+		setDividerSize(3);
 		
 		//add tables
 		for(int i = 0; i < comps.length; i++){
