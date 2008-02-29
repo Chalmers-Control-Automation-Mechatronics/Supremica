@@ -17,34 +17,43 @@ public class ExecutionOfOperationCell
 									extends 
 										ResourceCell
 {
+	
+	private static final Color bgColor = new Color(0,0,100,50);
+	private static final Color fgColor = Color.BLACK;
+	
+	private static final String TEXT = "EOP";
+	
 	EOPInfoWindow eopInfoWin = null;
 	File eopFile = null;
 	
-	private int x = 30;
+	public ExecutionOfOperationCell(EOP eop){
+		this();
+		if(null != eop){
+			setEOP(eop);
+		}
+	}
 	
 	public ExecutionOfOperationCell(){
 		super();
 		setEOP((new ObjectFactory()).createEOP());
-		setSize(x,x);
+		setSize(30,30);
 	}
 	
 	public void paintComponent(Graphics g) {
 		int diff = 4;
 		int x,y;
-		
-		String txt = "EOP";
-		
+	
 		Graphics2D g2 = (Graphics2D) g;
 		
-		g2.setColor(new Color(0,0,100,50));
+		g2.setColor(bgColor);
 		g2.fillOval(-diff, -diff, getHeight()+diff*2, getWidth()+diff*2);
 		
-		g2.setColor(Color.black);
+		g2.setColor(fgColor);
 		
-		x = (getWidth() - g2.getFontMetrics().stringWidth(txt))/2;
+		x = (getWidth() - g2.getFontMetrics().stringWidth(TEXT))/2;
 		y = getHeight()/2 + g2.getFontMetrics().getHeight()/4;
 		
-		g2.drawString(txt,x,y);
+		g2.drawString(TEXT,x,y);
 		
 	} 
 	
@@ -66,7 +75,12 @@ public class ExecutionOfOperationCell
 	}
 	
 	public void mouseClicked(MouseEvent e) {
-		if(e.getClickCount() == 2){
+		
+	}
+	
+	@Override
+	public void mouseReleased(MouseEvent e) {
+		if(e.getClickCount() > 1){
 			
 			if(null == eopInfoWin){
 				eopInfoWin = new EOPInfoWindow(this);
@@ -75,14 +89,14 @@ public class ExecutionOfOperationCell
 			}
 			
 			eopInfoWin.setVisible(true);
+			if(null != getFile()){
+	    		eopInfoWin.setFile(getFile());
+	    	}
 			
 		}else{
-			super.mouseClicked(e);
+			super.mouseReleased(e);
 		}
 	}
-	
-	@Override
-	public void mouseReleased(MouseEvent e) {}
 	
 	@Override
 	public void pack(){};

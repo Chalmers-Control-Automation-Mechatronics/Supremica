@@ -6,14 +6,19 @@ import java.awt.event.*;
 /**
  * The class draws and handles the cell and edge components. 
  */
-public class Graph extends JPanel implements MouseListener,
-					     MouseMotionListener,
-					     KeyListener,
-					     CellListener {
+public class Graph 
+				extends 
+					JPanel 
+				implements 
+					MouseListener,
+					MouseMotionListener,
+					KeyListener,
+					CellListener
+{
     public GraphEdge[] edges = new GraphEdge[0];
     public GraphCell[] cells = new GraphCell[0];    
     protected Selection selection = new Selection(this);
-    public boolean selectionMoves = false;    
+    public boolean selectionMoves = false;
     public Point selectionAreaStart = new Point();
     public Point selectionAreaStop = new Point();
     public KeyEvent key;

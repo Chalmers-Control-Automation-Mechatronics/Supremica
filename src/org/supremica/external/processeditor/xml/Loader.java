@@ -15,17 +15,53 @@ public class Loader {
     private Unmarshaller u;
     private Marshaller m;
     
+    private boolean printDebugInfo = true;
+    
+    
     public Loader() {}
     
     public Object open(File file) {	
-	
+    	Object o = null;
+    	
+    	printDebugInfo = false;
+    	
+    	//ROP
+    	o = openROP(file);
+    	if(null != o){
+    		printDebugInfo = true;
+    		return o;
+    	}
+    	
+    	//EOP
+    	o = openEOP(file);
+    	if(null != o){
+    		printDebugInfo = true;
+    		return o;
+    	}
+    	
+    	//IL
+    	o = openIL(file);
+    	if(null != o){
+    		printDebugInfo = true;
+    		return o;
+    	}
+    	
+    	//unknown
+    	printDebugInfo = true;
+    	return null;
+    }
+    
+    public Object openROP(File file) {	
+    	
     	try {			
     		jaxbContext = JAXBContext.newInstance(PKGS);
     		u = jaxbContext.createUnmarshaller();	    	    
     		return load(file);
     	}
     	catch(JAXBException je) {
-    		je.printStackTrace();
+    		if(printDebugInfo){
+    		     je.printStackTrace();
+    		}
     		return null;
     	}
     }
@@ -37,7 +73,9 @@ public class Loader {
     		return load(file);
     	}
     	catch(JAXBException je) {
-    		je.printStackTrace();
+    		if(printDebugInfo){
+    			je.printStackTrace();
+    		}
     	}
     	return null;
     }
@@ -49,7 +87,9 @@ public class Loader {
     		return load(file);
     	}
     	catch(JAXBException je) {
-    		je.printStackTrace();
+    		if(printDebugInfo){
+    			je.printStackTrace();
+    		}
     	}
     	return null;
     }
@@ -62,7 +102,9 @@ public class Loader {
     		return load(xmlStr, PKGS);
     	}
     	catch(JAXBException je) {
-    		je.printStackTrace();
+    		if(printDebugInfo){
+    			je.printStackTrace();
+    		}
     		return null;
     	}
     } 
@@ -76,11 +118,15 @@ public class Loader {
     			java.lang.System.err.println("Problems reading the file!");
     		}
     	}catch(UnmarshalException ue) {
-    		java.lang.System.err.println("Invalid XML code (UnmarshalException)" );
-    		ue.printStackTrace();
+    		if(printDebugInfo){
+    			java.lang.System.err.println("Invalid XML code (UnmarshalException)" );
+    			ue.printStackTrace();
+    		}
     	}catch(JAXBException je) {
-    		java.lang.System.err.println("JAXBException caught!");
-    		je.printStackTrace();
+    		if(printDebugInfo){
+    			java.lang.System.err.println("JAXBException caught!");
+    			je.printStackTrace();
+    		}
     	}
     	return null;
     }

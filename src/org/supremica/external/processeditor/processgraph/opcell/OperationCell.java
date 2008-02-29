@@ -18,8 +18,13 @@ import org.supremica.external.processeditor.processgraph.opcell.OperationCellIte
  * <code>org.xml.rop.Activity</code> class, which includes 
  * operation and predecessors.
  */
-public class OperationCell extends GraphCell implements NestedCellListener,
-                                                        AttributeListener {
+public class OperationCell 
+						extends 
+							GraphCell 
+						implements 
+							NestedCellListener,
+                            AttributeListener
+{
     public JPanel predecessorBar = new JPanel();
     public int predecessorSpaceY = 1;
     public int predecessorSpaceX = 0;
@@ -39,15 +44,12 @@ public class OperationCell extends GraphCell implements NestedCellListener,
      * Creates a new instance of the class.
      */
     public OperationCell(String s) {	
-	super(s);
-	//DEBUG
-	//System.out.println("OperationCell(String s)");
-	//END DEBUG
-	JLabel tag = new JLabel(s);
-	setLayout(null);
-	tag.setBounds(0, 0,
-		      tag.getPreferredSize().width, tag.getPreferredSize().height);
-	add(tag);		
+    	super(s);
+	
+    	JLabel tag = new JLabel(s);
+    	setLayout(null);
+    	tag.setBounds(0, 0,tag.getPreferredSize().width, tag.getPreferredSize().height);
+    	add(tag);
     }  
     /**
      * Creates a new instance of the class that will be associated with the 

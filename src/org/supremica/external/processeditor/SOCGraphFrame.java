@@ -16,8 +16,12 @@ import org.supremica.external.processeditor.xgraph.Graph;
 import org.supremica.external.processeditor.xgraph.GraphCell;
 import org.supremica.external.processeditor.xgraph.GraphScrollPane;
 import org.supremica.external.processeditor.processgraph.resrccell.ResourceCell;
+import org.supremica.external.processeditor.processgraph.ilcell.InterLockCell;
+import org.supremica.external.processeditor.processgraph.eopcell.ExecutionOfOperationCell;
 import org.supremica.manufacturingTables.xsd.processeditor.ObjectFactory;
 import org.supremica.manufacturingTables.xsd.processeditor.ROP;
+import org.supremica.manufacturingTables.xsd.il.IL;
+import org.supremica.manufacturingTables.xsd.eop.EOP;
 
 import org.supremica.manufacturingTables.xsd.processeditor.RelationType;
 import org.supremica.external.processeditor.xgraph.Selection;
@@ -308,26 +312,29 @@ public class SOCGraphFrame extends JInternalFrame implements SelectionListener {
      * @param file URL associated with the object      
      */
     public void insertResource(Object o, File file) {
-	//DEBUG
-	//System.out.println("SOCGraphFrame.insertResource()");
-	//END DEBUG
-       	if(o instanceof ROP) {	    	    
-	    try{	       
-		//GraphCell cell = new ResourceCell((ROPType)o);	    
-		ResourceCell cell = new ResourceCell((ROP)o);
-		cell.setFile(file);
-		graph.insert(cell,0);
-		cell.setPos(new Point(INSERT_MARGIN_X, INSERT_MARGIN_Y));      
-		graph.updateLargePreferredSize();		
-	    }catch(Exception ex) {
-		if(ex instanceof NullPointerException) {
-		    System.out.println("EMPTY ROP!");
-		}else {
-		    System.out.println("ERROR! while building rop"+
-				       "in SOCGraphFrame()");
-		}
-	    }
-	}
+    	try{
+    		ResourceCell cell = null;
+    		
+    		if(o instanceof ROP) {
+    			cell = new ResourceCell((ROP)o);
+    		}else if(o instanceof EOP){
+    			cell = new ExecutionOfOperationCell((EOP)o);
+    		}else if(o instanceof IL){
+    			cell = new InterLockCell((IL)o);
+    		}
+    			
+    		cell.setFile(file);
+    		graph.insert(cell,0);
+    		cell.setPos(new Point(INSERT_MARGIN_X, INSERT_MARGIN_Y));      
+    		graph.updateLargePreferredSize();		
+    	}catch(Exception ex) {
+    		if(ex instanceof NullPointerException) {
+    			System.err.println("EMPTY resource");
+    		}else {
+    			System.err.println("ERROR! while building resource "+
+				       "in SOCGraphFrame() from " + o.toString());
+    		}
+    	}
     }    
     /**
      * Pastes the copied object into the selected object.

@@ -20,7 +20,10 @@ import org.supremica.manufacturingTables.xsd.processeditor.*;
  * Grahically representation of the objects ot the <code>org.xml.ROP</code> 
  * class.
  */
-public class ResourceCell extends NestedCell  {    
+public class ResourceCell
+					extends 
+						NestedCell 
+{    
     private boolean emptyCell = true;    
 
     public GraphCell initCell = null;
@@ -42,9 +45,10 @@ public class ResourceCell extends NestedCell  {
      * <p>     
      */
     public ResourceCell() {
-	setLayout(null);	
-	cell.addGraphListener(this);
-	cells.addGraphListener(this);
+    	super();
+    	setLayout(null);	
+    	cell.addGraphListener(this);
+    	cells.addGraphListener(this);
     }  
     /**
      * Creates a new instance of the class that will be associated with the 
@@ -515,7 +519,7 @@ public class ResourceCell extends NestedCell  {
      * Returns <code>false</code>.
      */
     public boolean isCompressed() {
-	return false;
+    	return false;
     }
     /**
      * Displays the resource info window, which allow the user to edit
@@ -536,7 +540,7 @@ public class ResourceCell extends NestedCell  {
      * @param file the file
      */
     public void setFile(File file) {
-	myFile = file;
+    	myFile = file;
     }
     /**
      * Returns the file associated with this resource.

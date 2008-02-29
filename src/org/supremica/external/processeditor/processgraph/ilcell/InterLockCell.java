@@ -16,53 +16,61 @@ public class InterLockCell
 						extends 
 							ResourceCell 
 {
+	private static final Color bgColor = new Color(250,119,19,80);
+	private static final Color fgColor = Color.BLACK;
+	
+	private static final String TEXT = "IL";
+	
 	private ILInfoWindow ilInfoWin = null;
 	
-	private int x = 30;
+	public InterLockCell(IL il){
+		this();
+		if(null != il){
+			setIL(il);
+		}
+	}  
 	
 	public InterLockCell(){
 		super();
 		setIL((new ObjectFactory()).createIL());
-		this.setSize(x,x);
+		this.setSize(30,30);
 	}     
 	
 	public void paintComponent(Graphics g) {
 		int diff = 4;
 		int x,y;
 		
-		String txt = "IL";
-		
 		Graphics2D g2 = (Graphics2D) g;
 		
-		g2.setColor(new Color(250,119,19,80));
+		g2.setColor(bgColor);
 		g2.fillOval(-diff, -diff, getHeight()+diff*2, getWidth()+diff*2);
 		
-		g2.setColor(Color.black);
+		g2.setColor(fgColor);
 		
-		x = (getWidth() - g2.getFontMetrics().stringWidth(txt))/2;
+		x = (getWidth() - g2.getFontMetrics().stringWidth(TEXT))/2;
 		y = getHeight()/2 + g2.getFontMetrics().getHeight()/4;
 		
-		g2.drawString(txt,x,y);
+		g2.drawString(TEXT,x,y);
 		
 	}
 	
 	@Override
-	public void mouseClicked(MouseEvent e) {
-		if(e.getClickCount() == 2){
-			
+	public void mouseReleased(MouseEvent e) {
+		if(e.getClickCount() > 1){
 			if(null == ilInfoWin){
 				ilInfoWin = new ILInfoWindow(this);
 			}else{
 				ilInfoWin.setIL(getIL());
 			}
+			
 	    	ilInfoWin.setVisible(true);
+	    	if(null != getFile()){
+	    		ilInfoWin.setFile(getFile());
+	    	}
 		}else{
-			super.mouseClicked(e);
+			super.mouseReleased(e);
 		}
 	}
-	
-	@Override
-	public void mouseReleased(MouseEvent e) {}
 	
 	public IL getIL(){
 		Object o = getFunction();

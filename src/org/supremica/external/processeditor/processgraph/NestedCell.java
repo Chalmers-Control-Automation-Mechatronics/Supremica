@@ -26,17 +26,22 @@ import org.supremica.manufacturingTables.xsd.processeditor.*;
  * that can be considered as graph. i.e. nested cells.
  * 
  */
-public class NestedCell extends GraphCell implements MouseListener,
-						     MouseMotionListener,
-						     CellListener,
-                                                     NestedCellListener {     
+public class NestedCell
+					extends 
+						GraphCell 
+					implements 
+						MouseListener,
+						MouseMotionListener,
+						CellListener,
+                        NestedCellListener
+{     
     public int cellStepX = 0;    
     public int cellStepY = 0;
     public int conditionWidth = 30;
     public int conditionThickness = 2; 
 
     public JPanel cellItemContainer = new JPanel();
-    public NestedGraph cell = new NestedGraph();            
+    public NestedGraph cell = new NestedGraph();          
     public NestedGraph cells = new NestedGraph();
     public OperationCell operationCell = null; 
     public NestedCellListener nestedCellListener = null;       
@@ -46,14 +51,14 @@ public class NestedCell extends GraphCell implements MouseListener,
 
     public static boolean multiStructure;
     public boolean multiMode = true;
-    public boolean compressed = true;    
+    public boolean compressed = true;
 
     private ObjectFactory objectFactory = new ObjectFactory();
    
     /**
      * Creates a new instance of the class
      */
-    public NestedCell() {	
+    public NestedCell() {
     }   
     /**
      * Creates a new instance of the class with specified name.
