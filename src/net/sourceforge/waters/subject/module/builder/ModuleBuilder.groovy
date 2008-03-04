@@ -65,8 +65,8 @@ class ModuleBuilder extends BuilderSupport {
 			node = attributes.module ? attributes.module : factory.createModuleProxy(attributes.name, null)
 			if (attributes.name) node.name = attributes.name
 			if (!attributes.module) {
-				node.eventDeclListModifiable << factory.createEventDeclProxy(EventDeclProxy.DEFAULT_MARKING_NAME, EventKind.PROPOSITION)
-				node.eventDeclListModifiable << factory.createEventDeclProxy(EventDeclProxy.DEFAULT_FORBIDDEN_NAME, EventKind.PROPOSITION)
+				node.eventDeclListModifiable << factory.createEventDeclProxy(factory.createSimpleIdentifierProxy(EventDeclProxy.DEFAULT_MARKING_NAME), EventKind.PROPOSITION)
+				node.eventDeclListModifiable << factory.createEventDeclProxy(factory.createSimpleIdentifierProxy(EventDeclProxy.DEFAULT_FORBIDDEN_NAME), EventKind.PROPOSITION)
 			}
 			['module'].each{attributes.remove(it)}
 			break
@@ -82,7 +82,7 @@ class ModuleBuilder extends BuilderSupport {
 		case 'event' :
 			if (attributes.range && !attributes.ranges) return createNode(name, [ranges:[attributes.range], *:attributes])
 			Closure createEvent = {label ->
-				factory.createEventDeclProxy(label,
+				factory.createEventDeclProxy(factory.createSimpleIdentifierProxy(label),
                             attributes.controllable == null || attributes.controllable ? EventKind.CONTROLLABLE : EventKind.UNCONTROLLABLE,
                             true,
                             ScopeKind.LOCAL,
@@ -93,7 +93,7 @@ class ModuleBuilder extends BuilderSupport {
 			['controllable', 'ranges', 'range'].each{attributes.remove(it)}
 			break
 		case 'proposition':
-			node = factory.createEventDeclProxy(attributes.name, EventKind.PROPOSITION)
+			node = factory.createEventDeclProxy(factory.createSimpleIdentifierProxy(attributes.name), EventKind.PROPOSITION)
 			break
 		case 'specification' :
 			attributes.isSpecification = true

@@ -92,7 +92,7 @@ class Util {
 		ide.visible = true
 		//ide.documentManager.newDocument(module)
 		ModuleContainer moduleContainer = [ide, module]
-		moduleContainer.addStandardPropositions()
+//		moduleContainer.addStandardPropositions()
 		ide.documentContainerManager.addContainer([ide, module] as ModuleContainer)
 	}
 	public static boolean verifyNonblocking(ModuleProxy module) {
