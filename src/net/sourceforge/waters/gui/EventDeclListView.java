@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   EventDeclListView
 //###########################################################################
-//# $Id: EventDeclListView.java,v 1.17 2008-02-19 02:56:50 robi Exp $
+//# $Id: EventDeclListView.java,v 1.18 2008-03-07 04:11:02 robi Exp $
 //###########################################################################
 
 
@@ -19,9 +19,6 @@ import java.awt.dnd.DnDConstants;
 import java.awt.dnd.DragGestureEvent;
 import java.awt.dnd.DragGestureListener;
 import java.awt.dnd.DragSource;
-import java.awt.dnd.DragSourceAdapter;
-import java.awt.dnd.DragSourceDragEvent;
-import java.awt.dnd.DragSourceListener;
 import java.awt.dnd.InvalidDnDOperationException;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -38,6 +35,7 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
+import javax.swing.Action;
 import javax.swing.JDialog;
 import javax.swing.JList;
 import javax.swing.JMenu;
@@ -94,7 +92,8 @@ import net.sourceforge.waters.xsd.base.EventKind;
 
 public class EventDeclListView
   extends JList
-  implements SelectionOwner, FocusListener, ListSelectionListener
+  implements SelectionOwner, FocusListener,
+             DragGestureListener, ListSelectionListener
 {
 
   //#########################################################################
@@ -124,17 +123,14 @@ public class EventDeclListView
     manager.installCutCopyPasteActions(this);
 
     final DragSource dragsource = DragSource.getDefaultDragSource();
-    final DragGestureListener glistener = new EventDeclDragGestureListener();
-    final DragSourceListener slistener = new EventDeclDragSourceListener();
     dragsource.createDefaultDragGestureRecognizer
-      (this, DRAG_ACTION, glistener);
-    dragsource.addDragSourceListener(slistener);
+      (this, DnDConstants.ACTION_COPY, this);
   }
 
 
   //#########################################################################
   //# Interface net.sourceforge.waters.gui.transfer.SelectionOwner
-  public UndoInterface getUndoInterface()
+  public UndoInterface getUndoInterface(final Action action)
   {
     return mRoot.getUndoInterface();
   }
@@ -452,6 +448,29 @@ public class EventDeclListView
 
 
   //#########################################################################
+  //# Interface java.awt.dnd.DragGestureListener
+  public void dragGestureRecognized(final DragGestureEvent event)
+  {
+    final int index = locationToIndex(event.getDragOrigin());
+    final List<EventDeclSubject> data;
+    if (isSelectedIndex(index)) {
+      data = getCurrentSelection();
+    } else if (index >= 0 && index < mModel.getSize()) {
+      final EventDeclSubject decl = mModel.getElementAt(index);
+      data = Collections.singletonList(decl);
+    } else {
+      return;
+    }
+    final Transferable trans = createTransferable(data);
+    try {
+      event.startDrag(DragSource.DefaultCopyDrop, trans);
+    } catch (InvalidDnDOperationException exception) {
+      throw new IllegalArgumentException(exception);
+    }
+  }
+  
+
+  //#########################################################################
   //# Interface javax.swing.event.ListSelectionListener
   public void valueChanged(final ListSelectionEvent event)
   {
@@ -687,50 +706,6 @@ public class EventDeclListView
 
 
   //#########################################################################
-  //# Inner Class EventDeclDragGestureListener
-  private class EventDeclDragGestureListener implements DragGestureListener
-  {
-    //#######################################################################
-    //# Interface java.awt.dnd.DragGestureListener
-    public void dragGestureRecognized(final DragGestureEvent event)
-    {
-      final int index = locationToIndex(event.getDragOrigin());
-      final List<EventDeclSubject> data;
-      if (isSelectedIndex(index)) {
-        data = getCurrentSelection();
-      } else if (index >= 0 && index < mModel.getSize()) {
-        final EventDeclSubject decl = mModel.getElementAt(index);
-        data = Collections.singletonList(decl);
-      } else {
-        return;
-      }
-      final Transferable trans = createTransferable(data);
-      try {
-        event.startDrag(DragSource.DefaultCopyDrop, trans);
-      } catch (InvalidDnDOperationException exception) {
-        throw new IllegalArgumentException(exception);
-      }
-    }
-
-  }
-
-
-  //#########################################################################
-  //# Inner Class EventDeclDragSourceListener
-  private class EventDeclDragSourceListener extends DragSourceAdapter
-  {
-    public void dragOver(final DragSourceDragEvent event)
-    {
-      if (event.getTargetActions() == DnDConstants.ACTION_COPY) {
-        event.getDragSourceContext().setCursor(DragSource.DefaultCopyDrop);
-      } else {
-        event.getDragSourceContext().setCursor(DragSource.DefaultCopyNoDrop);
-      }
-    }
-  }
-
-
-  //#########################################################################
   //# Data Members
   private final IndexedListModel<EventDeclSubject> mModel;
   private final ModuleWindowInterface mRoot;
@@ -738,10 +713,5 @@ public class EventDeclListView
   private final EventDeclDeleteVisitor mDeleteVisitor;
 
   private List<Observer> mObservers;
-
-
-  //#########################################################################
-  //# Class Constants
-  private static final int DRAG_ACTION = DnDConstants.ACTION_COPY;
 
 }

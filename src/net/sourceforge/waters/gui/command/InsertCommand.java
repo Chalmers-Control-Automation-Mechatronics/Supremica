@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui.command
 //# CLASS:   InsertCommand
 //###########################################################################
-//# $Id: InsertCommand.java,v 1.4 2007-12-16 22:09:39 robi Exp $
+//# $Id: InsertCommand.java,v 1.5 2008-03-07 04:11:02 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.gui.command;
@@ -22,7 +22,7 @@ import net.sourceforge.waters.model.base.Proxy;
  * <P>A general command for inserting a list of items.</P>
  *
  * <P>This command can insert any collection of items to a component that
- * implement the {@link SelectionOwner} interface. When executed, the
+ * implements the {@link SelectionOwner} interface. When executed, the
  * command first inserts the items and then selects them, using the {@link
  * SelectionOwner} interface. When undone, the items are deselected and
  * deleted.</P>

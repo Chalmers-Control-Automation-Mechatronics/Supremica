@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.gui.ide
 //# CLASS:   IDE
 //###########################################################################
-//# $Id: IDE.java,v 1.113 2008-02-14 06:46:26 robi Exp $
+//# $Id: IDE.java,v 1.114 2008-03-07 04:11:02 robi Exp $
 //###########################################################################
 
 package org.supremica.gui.ide;
@@ -32,6 +32,7 @@ import net.sourceforge.waters.gui.observer.EditorChangedEvent;
 import net.sourceforge.waters.gui.observer.Observer;
 import net.sourceforge.waters.gui.observer.Subject;
 import net.sourceforge.waters.gui.transfer.FocusTracker;
+import net.sourceforge.waters.gui.transfer.WatersDragSourceListener;
 import net.sourceforge.waters.model.base.DocumentProxy;
 import net.sourceforge.waters.model.marshaller.DocumentManager;
 
@@ -270,16 +271,24 @@ public class IDE
     
     public boolean editorActive()
     {
-        final DocumentContainer active =
-            mDocumentContainerManager.getActiveContainer();
-        return active != null && active.isEditorActive();
+        if (mDocumentContainerManager == null) {
+            return false;
+        } else {
+            final DocumentContainer active =
+                mDocumentContainerManager.getActiveContainer();
+            return active != null && active.isEditorActive();
+        }
     }
     
     public boolean analyzerActive()
     {
-        final DocumentContainer active =
-            mDocumentContainerManager.getActiveContainer();
-        return active != null && active.isAnalyzerActive();
+        if (mDocumentContainerManager == null) {
+            return false;
+        } else {
+            final DocumentContainer active =
+                mDocumentContainerManager.getActiveContainer();
+            return active != null && active.isAnalyzerActive();
+        }
     }
     
     public Project getActiveProject()
@@ -372,6 +381,7 @@ public class IDE
 
         // Now start the gui...
         InterfaceManager.getInstance().initLookAndFeel();
+        WatersDragSourceListener.setup();
         final IDE ide = new IDE();
 
         // Open initial module(s)

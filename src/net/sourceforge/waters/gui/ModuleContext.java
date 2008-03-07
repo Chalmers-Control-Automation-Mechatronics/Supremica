@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   ModuleContext
 //###########################################################################
-//# $Id: ModuleContext.java,v 1.8 2008-02-19 02:56:50 robi Exp $
+//# $Id: ModuleContext.java,v 1.9 2008-03-07 04:11:02 robi Exp $
 //###########################################################################
 
 
@@ -106,6 +106,23 @@ public class ModuleContext
   //#########################################################################
   //# Special Access for Events
   /**
+   * Tries to determine an event declaration for the given identifier.
+   * Given an event name, this method inspects the module to determine
+   * whether the name represents a controllable event, and uncontrollable
+   * event, or a proposition.
+   * @param  ident   The identifier representing the event name to be
+   *                 looked up.
+   * @return The event declaration that will be used when compiling the given
+   *         identifier in the context of this module, or <CODE>null</CODE>
+   *         if no suitable event declaration could be found.
+   */
+  public EventDeclProxy guessEventDecl(final IdentifierProxy ident)
+  {
+    final String name = mIdentifierNameVisitor.getIdentifierName(ident);
+    return getEventDecl(name);
+  }
+
+  /**
    * Tries to determine an event kind for the given identifier.  Given an
    * event name, this method inspects the module to determine whether the
    * name represents a controllable event, and uncontrollable event, or a
@@ -114,12 +131,11 @@ public class ModuleContext
    *                 checked.
    * @return The event kind that will be associated with the given
    *         identifier after compilation of the module, or <CODE>null</CODE>
-   *         that the event kind cannot be determined.
+   *         to indicate that the event kind cannot be determined.
    */
   public EventKind guessEventKind(final IdentifierProxy ident)
   {
-    final String name = mIdentifierNameVisitor.getIdentifierName(ident);
-    final EventDeclProxy decl = getEventDecl(name);
+    final EventDeclProxy decl = guessEventDecl(ident);
     return decl == null ? null : decl.getKind();
   }
 
@@ -130,8 +146,7 @@ public class ModuleContext
    */
   public Icon guessEventIcon(final IdentifierProxy ident)
   {
-    final String name = mIdentifierNameVisitor.getIdentifierName(ident);
-    final EventDeclProxy decl = getEventDecl(name);
+    final EventDeclProxy decl = guessEventDecl(ident);
     return decl == null ? IconLoader.ICON_EVENT : getIcon(decl);
   }
 
@@ -164,8 +179,7 @@ public class ModuleContext
    */
   public String guessEventToolTipText(final IdentifierProxy ident)
   {
-    final String name = mIdentifierNameVisitor.getIdentifierName(ident);
-    final EventDeclProxy decl = getEventDecl(name);
+    final EventDeclProxy decl = guessEventDecl(ident);
     return decl == null ? "Event" : getToolTipText(decl);
   }
 
@@ -615,7 +629,11 @@ public class ModuleContext
     private String getIdentifierName(final IdentifierProxy ident)
     {
       try {
-	return (String) ident.acceptVisitor(this);
+        if (ident == null) {
+          return null;
+        } else {
+          return (String) ident.acceptVisitor(this);
+        }
       } catch (final VisitorException exception) {
 	throw exception.getRuntimeException();
       }

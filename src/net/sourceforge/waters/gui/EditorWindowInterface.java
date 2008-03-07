@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.waters.gui
 //# CLASS:   EditorWindowInterface
 //###########################################################################
-//# $Id: EditorWindowInterface.java,v 1.18 2007-12-04 03:22:54 robi Exp $
+//# $Id: EditorWindowInterface.java,v 1.19 2008-03-07 04:11:02 robi Exp $
 //###########################################################################
 
 
@@ -32,18 +32,13 @@ public interface EditorWindowInterface
     public ModuleWindowInterface getModuleWindowInterface();
     
     public ControlledSurface getControlledSurface();
-    
-    public EditorEvents getEventPane();
+
+	public GraphEventPanel getEventPanel();
     
     public UndoInterface getUndoInterface();
-    
+
+	// Deprecated.
     public void copyAsWMFToClipboard();
-    
-    public void exportPDF();
-    
-    public void exportPostscript();
-    
-    public void printFigure();
 
     public JFrame getFrame();
     

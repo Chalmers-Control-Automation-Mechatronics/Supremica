@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.gui.ide.actions
 //# CLASS:   WatersPopupActionManager
 //###########################################################################
-//# $Id: WatersPopupActionManager.java,v 1.3 2007-12-06 08:41:20 robi Exp $
+//# $Id: WatersPopupActionManager.java,v 1.4 2008-03-07 04:11:02 robi Exp $
 //###########################################################################
 
 
@@ -42,8 +42,8 @@ public class WatersPopupActionManager
     master.installCutCopyPasteActions(comp);
   }
 
-  public void invokeDoubleClickAction(final IDEAction action,
-                                      final MouseEvent event)
+  public void invokeMouseClickAction(final IDEAction action,
+                                     final MouseEvent event)
   {
     if (action.isEnabled()) {
       final String key = (String) action.getValue(Action.ACTION_COMMAND_KEY);
@@ -91,6 +91,11 @@ public class WatersPopupActionManager
     return new EditEdgeFlipAction(mIDE, arg);
   }
 
+  public IDEAction getEditEventLabelAction(final Proxy arg)
+  {
+    return new EditEventLabelAction(mIDE, arg);
+  }
+
   public IDEAction getGraphLayoutAction()
   {
     final WatersActionManager master = mIDE.getActions();
@@ -100,6 +105,12 @@ public class WatersPopupActionManager
   public IDEAction getInsertBlockedEventListAction(final Point point)
   {
     return new InsertBlockedEventListAction(mIDE, point);
+  }
+
+  public IDEAction getInsertEventLabelAction()
+  {
+    final WatersActionManager master = mIDE.getActions();
+    return master.getAction(InsertEventLabelAction.class);
   }
 
   public IDEAction getPasteAction()

@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui.actions
 //# CLASS:   IDEDeselectAllAction
 //###########################################################################
-//# $Id: IDEDeselectAllAction.java,v 1.2 2007-12-04 03:22:54 robi Exp $
+//# $Id: IDEDeselectAllAction.java,v 1.3 2008-03-07 04:11:02 robi Exp $
 //###########################################################################
 
 
@@ -49,9 +49,9 @@ public class IDEDeselectAllAction
     super(ide);
     putValue(Action.NAME, "Deselect All");
     putValue(Action.SHORT_DESCRIPTION, "Clear the selection");
-    putValue(Action.MNEMONIC_KEY, KeyEvent.VK_D);
+    putValue(Action.MNEMONIC_KEY, KeyEvent.VK_ESCAPE);
     putValue(Action.ACCELERATOR_KEY,
-	     KeyStroke.getKeyStroke(KeyEvent.VK_U, ActionEvent.CTRL_MASK));
+             KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0));
     setEnabled(false);
   }
 

@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui.actions
 //# CLASS:   WatersGraphAction
 //###########################################################################
-//# $Id: WatersGraphAction.java,v 1.1 2007-08-10 04:34:31 robi Exp $
+//# $Id: WatersGraphAction.java,v 1.2 2008-03-07 04:11:02 robi Exp $
 //###########################################################################
 
 
@@ -12,6 +12,7 @@ package net.sourceforge.waters.gui.actions;
 
 import net.sourceforge.waters.gui.ControlledSurface;
 import net.sourceforge.waters.gui.EditorWindowInterface;
+import net.sourceforge.waters.gui.GraphEventPanel;
 import net.sourceforge.waters.gui.observer.EditorChangedEvent;
 import org.supremica.gui.ide.DocumentContainer;
 import org.supremica.gui.ide.IDE;
@@ -95,6 +96,17 @@ public abstract class WatersGraphAction
   {
     final EditorWindowInterface gui = getActiveEditorWindowInterface();
     return gui == null ? null : gui.getControlledSurface();
+  }
+
+  /**
+   * Retrieves the event panel of the active graph editor panel.
+   * @return  The currently active event panel, or <CODE>null</CODE>
+   *          if no graph is being edited.
+   */
+  GraphEventPanel getActiveGraphEventPanel()
+  {
+    final EditorWindowInterface gui = getActiveEditorWindowInterface();
+    return gui == null ? null : gui.getEventPanel();
   }
 
 }

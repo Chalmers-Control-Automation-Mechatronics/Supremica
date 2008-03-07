@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui.transfer
 //# CLASS:   SelectionOwner
 //###########################################################################
-//# $Id: SelectionOwner.java,v 1.5 2007-12-16 22:09:39 robi Exp $
+//# $Id: SelectionOwner.java,v 1.6 2008-03-07 04:11:02 robi Exp $
 //###########################################################################
 
 
@@ -14,6 +14,7 @@ import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
 import java.io.IOException;
 import java.util.List;
+import javax.swing.Action;
 
 import net.sourceforge.waters.gui.command.UndoInterface;
 import net.sourceforge.waters.gui.observer.Subject;
@@ -38,10 +39,11 @@ public interface SelectionOwner
 
   /**
    * Gets the undo interface to be used for commands applied to this panel.
+   * @param  action  The action to be undone.
    * @return The undo interface to be used, or <CODE>null</CODE> if the
-   *         panel does not support undo.
+   *         panel does not support undo of the specified action.
    */
-  public UndoInterface getUndoInterface();
+  public UndoInterface getUndoInterface(final Action action);
 
   /**
    * Determines whether any items are selected in this component.
@@ -76,7 +78,7 @@ public interface SelectionOwner
   public List<? extends Proxy> getAllSelectableItems();
 
   /**
-   * Gets the focussed of the current selection.
+   * Gets the focussed item of the current selection.
    * The focussed item is the item in the component that was selected
    * last, which typically is the target of a 'properties' or similar action.
    * @return The single selected item that is to be considered as the anchor,
@@ -206,7 +208,7 @@ public interface SelectionOwner
    *                {@link #getCurrentSelection()} method.
    * @return <CODE>true</CODE> if the {@link #getDeletionVictims(List<Proxy>)
    *         getDeletionVictims()} method would return a non-empty list
-   *         when passed the current selection as input.
+   *         when passed the given selection as input.
    */
   public boolean canDelete(List<? extends Proxy> items);
 

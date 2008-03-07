@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui.actions
 //# CLASS:   IDEDeleteAction
 //###########################################################################
-//# $Id: IDEDeleteAction.java,v 1.2 2007-12-04 03:22:54 robi Exp $
+//# $Id: IDEDeleteAction.java,v 1.3 2008-03-07 04:11:02 robi Exp $
 //###########################################################################
 
 
@@ -89,7 +89,7 @@ public class IDEDeleteAction
     // The user may now have cancelled the deletion ...
     if (deletes != null) {
       final Command cmd = new DeleteCommand(deletes, panel);
-      final UndoInterface undoer = panel.getUndoInterface();
+      final UndoInterface undoer = panel.getUndoInterface(this);
       if (undoer == null) {
         // If there is no undo interface, just delete them ...
         cmd.execute();

@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui.transfer
 //# CLASS:   InsertInfo
 //###########################################################################
-//# $Id: InsertInfo.java,v 1.2 2007-12-04 03:22:55 robi Exp $
+//# $Id: InsertInfo.java,v 1.3 2008-03-07 04:11:02 robi Exp $
 //###########################################################################
 
 
@@ -52,7 +52,7 @@ public class InsertInfo
   public InsertInfo(final Proxy proxy, final Object inspos)
   {
     mProxy = proxy;
-    mInsertPosition = inspos;
+    mPosition = inspos;
   }
 
 
@@ -76,7 +76,7 @@ public class InsertInfo
    */
   public Object getInsertPosition()
   {
-    return mInsertPosition;
+    return mPosition;
   }
 
 
@@ -101,6 +101,6 @@ public class InsertInfo
   //#########################################################################
   //# Data Members
   private final Proxy mProxy;
-  private final Object mInsertPosition;
+  private final Object mPosition;
 
 }

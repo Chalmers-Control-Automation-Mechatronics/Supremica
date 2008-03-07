@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   ModuleWindowInterface
 //###########################################################################
-//# $Id: ModuleWindowInterface.java,v 1.12 2007-12-04 03:22:54 robi Exp $
+//# $Id: ModuleWindowInterface.java,v 1.13 2008-03-07 04:11:02 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.gui;
@@ -97,8 +97,9 @@ public interface ModuleWindowInterface
     (SimpleComponentSubject comp);
     
   /**
-   * Gets the currently active graph editor, or <CODE>null</CODE> if
-   * none is active.
+   * Gets the currently graph editor that is currently displayed,
+   * or <CODE>null</CODE>. The returned editor does not necessarily
+   * own the keyboard focus.
    */
   public EditorWindowInterface getActiveEditorWindowInterface();
     

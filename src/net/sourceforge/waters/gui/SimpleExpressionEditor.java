@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.waters.gui
 //# CLASS:   SimpleExpressionEditor
 //###########################################################################
-//# $Id: SimpleExpressionEditor.java,v 1.4 2007-12-04 03:22:54 robi Exp $
+//# $Id: SimpleExpressionEditor.java,v 1.5 2008-03-07 04:11:02 robi Exp $
 //###########################################################################
 
 
@@ -51,6 +51,12 @@ public class SimpleExpressionEditor
   {
     final SimpleExpressionCell cell = getComponent();
     cell.setToolTipText(tooltip);
+  }
+
+  void addFocusListener(final FocusListener listener)
+  {
+    final SimpleExpressionCell cell = getComponent();
+    cell.addFocusListener(listener);
   }
 
 

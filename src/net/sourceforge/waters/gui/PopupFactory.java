@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   PopupFactory
 //###########################################################################
-//# $Id: PopupFactory.java,v 1.2 2007-12-04 03:22:54 robi Exp $
+//# $Id: PopupFactory.java,v 1.3 2008-03-07 04:11:02 robi Exp $
 //###########################################################################
 
 
@@ -167,7 +167,7 @@ abstract class PopupFactory
 
 
   //#######################################################################
-  //# Interface net.sourceforge.waters.model.printer.ProxyVisitor
+  //# Interface net.sourceforge.waters.model.base.ProxyVisitor
   public Object visitProxy(final Proxy proxy)
   {
     final IDEAction props = mMaster.getPropertiesAction(proxy);

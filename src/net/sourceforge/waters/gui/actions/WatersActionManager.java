@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui.actions
 //# CLASS:   WatersActionManager
 //###########################################################################
-//# $Id: WatersActionManager.java,v 1.8 2008-02-14 06:46:26 robi Exp $
+//# $Id: WatersActionManager.java,v 1.9 2008-03-07 04:11:02 robi Exp $
 //###########################################################################
 
 
@@ -32,7 +32,10 @@ public abstract class WatersActionManager
   //# Constructor
   public WatersActionManager(final IDE ide)
   {
-    mActionMap = new HashMap<Class<? extends IDEAction>, IDEAction>(32);
+    final int SIZE = 32;
+    mActionMap = new HashMap<Class<? extends IDEAction>, IDEAction>(SIZE);
+    mKeyboardActionMap = new HashMap<Class<? extends IDEAction>, Action>(SIZE);
+    addAction(new EditEventLabelAction(ide));
     addAction(new GraphLayoutAction(ide));
     addAction(new GraphSaveEPSAction(ide));
     addAction(new IDECopyAction(ide));
@@ -43,6 +46,7 @@ public abstract class WatersActionManager
     addAction(new IDEPropertiesAction(ide));
     addAction(new IDESelectAllAction(ide));
     addAction(new InsertEventDeclAction(ide));
+    addAction(new InsertEventLabelAction(ide));
     addAction(new InsertForeachComponentAction(ide));
     addAction(new InsertSimpleComponentAction(ide));
     addAction(new InsertVariableAction(ide));
@@ -65,7 +69,6 @@ public abstract class WatersActionManager
     return mActionMap.get(clazz);
   }
 
-
   //#########################################################################
   //# Installing Keyboard Shortcuts
   public void installCutCopyPasteActions(final JComponent comp)
@@ -73,16 +76,17 @@ public abstract class WatersActionManager
     installAction(comp, IDECutAction.class);
     installAction(comp, IDECopyAction.class);
     installAction(comp, IDEPasteAction.class);
+    installAction(comp, IDEDeselectAllAction.class);
   }
 
   public void installAction(final JComponent comp,
                             final Class<? extends IDEAction> clazz)
   {
-    final IDEAction action = getAction(clazz);
-    final InputMap imap = comp.getInputMap();
-    final ActionMap amap = comp.getActionMap();
+    final Action action = getKeyboardAction(clazz);
     final String name = (String) action.getValue(Action.NAME);
     final KeyStroke key = (KeyStroke) action.getValue(Action.ACCELERATOR_KEY);
+    final InputMap imap = comp.getInputMap();
+    final ActionMap amap = comp.getActionMap();
     imap.put(key, name);
     amap.put(name, action);
   }
@@ -108,7 +112,22 @@ public abstract class WatersActionManager
 
 
   //#######################################################################
+  //# Keyboard Actions
+  private Action getKeyboardAction(final Class<? extends IDEAction> clazz)
+  {
+    Action action = mKeyboardActionMap.get(clazz);
+    if (action == null) {
+      action = getAction(clazz);
+      action = new KeyboardAction(action);
+      mKeyboardActionMap.put(clazz, action);
+    }
+    return action;
+  }
+
+
+  //#######################################################################
   //# Data Members
   private final Map<Class<? extends IDEAction>, IDEAction> mActionMap;
+  private final Map<Class<? extends IDEAction>, Action> mKeyboardActionMap;
 
 }

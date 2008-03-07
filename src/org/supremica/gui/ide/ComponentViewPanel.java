@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.gui.ide
 //# CLASS:   ComponentViewPanel
 //###########################################################################
-//# $Id: ComponentViewPanel.java,v 1.9 2007-12-04 03:22:58 robi Exp $
+//# $Id: ComponentViewPanel.java,v 1.10 2008-03-07 04:11:02 robi Exp $
 //###########################################################################
 
 package org.supremica.gui.ide;
@@ -22,9 +22,10 @@ import javax.swing.*;
 
 import net.sourceforge.waters.gui.ControlledSurface;
 import net.sourceforge.waters.gui.ControlledToolbar;
-import net.sourceforge.waters.gui.EditorEvents;
 import net.sourceforge.waters.gui.EditorWindowInterface;
+import net.sourceforge.waters.gui.GraphEventPanel;
 import net.sourceforge.waters.gui.ModuleWindowInterface;
+import net.sourceforge.waters.gui.actions.WatersPopupActionManager;
 import net.sourceforge.waters.gui.command.UndoInterface;
 import net.sourceforge.waters.gui.renderer.GeometryAbsentException;
 import net.sourceforge.waters.subject.module.ModuleSubject;
@@ -51,7 +52,7 @@ public class ComponentViewPanel
     
     private ModuleContainer mModuleContainer;
     private ControlledSurface surface;
-    private EditorEvents events;
+    private GraphEventPanel events;
     private SimpleComponentSubject element = null;
     private ModuleSubject mModule = null;
     private GraphicsToClipboard toClipboard = null;
@@ -75,15 +76,13 @@ public class ComponentViewPanel
         mModuleContainer = moduleContainer;
         mModule = moduleContainer.getModule();
 		final IDE ide = moduleContainer.getIDE();
+		final WatersPopupActionManager manager = ide.getPopupActionManager();
         surface = new ControlledSurface
             (element.getGraph(), mModule, this,
-			 (ControlledToolbar) ide.getToolBar(),
-			 ide.getPopupActionManager());
+			 (ControlledToolbar) ide.getToolBar(), manager);
         surface.setPreferredSize(IDEDimensions.rightAnalyzerPreferredSize);
         surface.setMinimumSize(IDEDimensions.rightAnalyzerMinimumSize);
-        
-        final ModuleWindowInterface root = mModuleContainer.getEditorPanel();
-        events = new EditorEvents(root, element, this);
+        events = new GraphEventPanel(this, element, manager);
         
         final LayoutManager layout = new BorderLayout();
         setLayout(layout);
@@ -100,6 +99,9 @@ public class ComponentViewPanel
         add(split, BorderLayout.CENTER);
     }
 
+
+	//########################################################################
+    //# Interface net.sourceforge.waters.gui.EditorWindowInterface
     public SimpleComponentSubject getComponent()
     {
         return element;
@@ -115,14 +117,11 @@ public class ComponentViewPanel
         return surface;
     }
     
-    public EditorEvents getEventPane()
+    public GraphEventPanel getEventPanel()
     {
         return events;
     }
-    
 
-	//########################################################################
-    //# Interface net.sourceforge.waters.gui.EditorWindowInterface
 	public ModuleWindowInterface getModuleWindowInterface()
 	{
 		return mModuleContainer.getEditorPanel();
@@ -157,92 +156,6 @@ public class ComponentViewPanel
         
         surface.print(theGraphics);
         toClipboard.copyToClipboard();
-    }
-    
-    
-    public void exportPDF()
-    {
-        // Get file to export to
-        JFileChooser chooser = new JFileChooser();
-        chooser.setSelectedFile(new File(mModule.getName() + ".pdf"));
-        int returnVal = chooser.showSaveDialog(surface);
-        File file = chooser.getSelectedFile();
-        // Not OK?
-        if (returnVal != JFileChooser.APPROVE_OPTION)
-        {
-            return;
-        }
-        
-        // Create output
-        int width = surface.getWidth();
-        int height = surface.getHeight();
-        Document document = new Document(new com.lowagie.text.Rectangle(width, height));
-        
-        try
-        {
-            PdfWriter writer= PdfWriter.getInstance(document,  new FileOutputStream(file));
-            
-            document.addAuthor("Supremica");
-            document.open();
-            
-            PdfContentByte cb = writer.getDirectContent();
-            PdfTemplate tp = cb.createTemplate(width, height);
-            Graphics2D g2 = tp.createGraphics(width, height, new DefaultFontMapper());
-            surface.print(g2);
-            //Rectangle2D rectangle2D = new Rectangle2D.Double(0, 0, width, height);
-            //chart.draw(g2, rectangle2D);
-            g2.dispose();
-            cb.addTemplate(tp, 0, 0);
-            
-        }
-        catch (DocumentException de)
-        {
-            System.err.println(de.getMessage());
-        }
-        catch (IOException ioe)
-        {
-            System.err.println(ioe.getMessage());
-        }
-        
-        document.close();
-    }
-    
-    public void exportPostscript()
-    {}
-    
-    public void printFigure()
-    {
-        try
-        {
-            PrinterJob printJob = PrinterJob.getPrinterJob();
-            if (printJob.getPrintService() == null)
-            {
-                System.err.println("No default printer set.");
-                return;
-            }
-            printJob.setPrintable(surface);
-            
-            // Printing attributes
-            PrintRequestAttribute name = new JobName("Supremica Printing", Locale.ENGLISH);
-            PrintRequestAttributeSet attributes = new HashPrintRequestAttributeSet();
-            attributes.add(name);
-            
-            // Show printing dialog
-            if (printJob.printDialog(attributes))
-            {
-                // Print!
-                printJob.print(attributes);
-            }
-        }
-        catch (Exception ex)
-        {
-            System.err.println(ex.getStackTrace());
-        }
-    }
-    
-    public void createEvent()
-    { // do nothing
-        
     }
     
 }

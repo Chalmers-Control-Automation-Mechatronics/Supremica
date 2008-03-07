@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui.actions
 //# CLASS:   IDECutAction
 //###########################################################################
-//# $Id: IDECutAction.java,v 1.2 2007-12-04 03:22:54 robi Exp $
+//# $Id: IDECutAction.java,v 1.3 2008-03-07 04:11:02 robi Exp $
 //###########################################################################
 
 
@@ -99,8 +99,11 @@ public class IDECutAction
       fireClipboardChanged();
       final List<InsertInfo> deletes =
         watersOwner.getDeletionVictims(selection);
+      if (deletes == null) {
+        return;
+      }
       final Command cmd = new DeleteCommand(deletes, watersOwner);
-      final UndoInterface undoer = watersOwner.getUndoInterface();
+      final UndoInterface undoer = watersOwner.getUndoInterface(this);
       if (undoer == null) {
         // If there is no undo interface, just delete them ...
         cmd.execute();

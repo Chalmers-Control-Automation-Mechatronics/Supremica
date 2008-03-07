@@ -4,16 +4,11 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   EventTableModel
 //###########################################################################
-//# $Id: EventTableModel.java,v 1.34 2008-02-19 02:56:50 robi Exp $
+//# $Id: EventTableModel.java,v 1.35 2008-03-07 04:11:02 robi Exp $
 //###########################################################################
 
 
 package net.sourceforge.waters.gui;
-
-import net.sourceforge.waters.gui.command.Command;
-import net.sourceforge.waters.gui.command.CompoundCommand;
-import net.sourceforge.waters.gui.command.AddEventCommand;
-import net.sourceforge.waters.gui.command.RemoveEventCommand;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -28,11 +23,21 @@ import javax.swing.event.TableModelEvent;
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.base.ProxyAccessorHashMapByContents;
 import net.sourceforge.waters.model.base.ProxyAccessorMap;
+import net.sourceforge.waters.model.base.ProxyTools;
+import net.sourceforge.waters.model.base.VisitorException;
+import net.sourceforge.waters.model.module.AbstractModuleProxyVisitor;
 import net.sourceforge.waters.model.module.EdgeProxy;
 import net.sourceforge.waters.model.module.EventDeclProxy;
 import net.sourceforge.waters.model.module.EventListExpressionProxy;
 import net.sourceforge.waters.model.module.ForeachEventProxy;
+import net.sourceforge.waters.model.module.ForeachEventProxy;
+import net.sourceforge.waters.model.module.GraphProxy;
+import net.sourceforge.waters.model.module.IdentifierProxy;
+import net.sourceforge.waters.model.module.LabelBlockProxy;
+import net.sourceforge.waters.model.module.ModuleProxyCloner;
+import net.sourceforge.waters.model.module.ModuleProxyVisitor;
 import net.sourceforge.waters.model.module.NodeProxy;
+import net.sourceforge.waters.model.module.PlainEventListProxy;
 import net.sourceforge.waters.subject.base.AbstractSubject;
 import net.sourceforge.waters.subject.base.ListSubject;
 import net.sourceforge.waters.subject.base.ModelChangeEvent;
@@ -47,6 +52,7 @@ import net.sourceforge.waters.subject.module.IdentifierSubject;
 import net.sourceforge.waters.subject.module.IndexedIdentifierSubject;
 import net.sourceforge.waters.subject.module.LabelBlockSubject;
 import net.sourceforge.waters.subject.module.ModuleSubject;
+import net.sourceforge.waters.subject.module.ModuleSubjectFactory;
 import net.sourceforge.waters.subject.module.SimpleIdentifierSubject;
 
 
@@ -63,18 +69,34 @@ public class EventTableModel
   //#########################################################################
   //# Constructors
   EventTableModel(final GraphSubject graph,
-                  final ModuleWindowInterface root,
-                  final EditorEvents table)
+                  final GraphEventHandler handler,
+                  final ModuleWindowInterface root)
   {
-    mTable = table;
     mGraph = graph;
+    mEventHandler = handler;
     mRoot = root;
     mEvents = collectEvents();
     final ModuleSubject module = mRoot.getModuleSubject();
     final ListSubject<EventDeclSubject> events =
       module.getEventDeclListModifiable();
-    events.addModelObserver(new EventDeclListModelObserver());
-    graph.addModelObserver(new GraphModelObserver());
+    mEventDeclListModelObserver = new EventDeclListModelObserver();
+    mGraphModelObserver = new GraphModelObserver();
+    mIdentifierCollectVisitor = new IdentifierCollectVisitor();
+    mGraphSearchVisitor = new GraphSearchVisitor();
+    events.addModelObserver(mEventDeclListModelObserver);
+    graph.addModelObserver(mGraphModelObserver);
+  }
+
+
+  //#########################################################################
+  //# Clean Up
+  void close()
+  {
+    final ModuleSubject module = mRoot.getModuleSubject();
+    final ListSubject<EventDeclSubject> events =
+      module.getEventDeclListModifiable();
+    events.removeModelObserver(mEventDeclListModelObserver);
+    mGraph.removeModelObserver(mGraphModelObserver);
   }
 
 
@@ -124,9 +146,73 @@ public class EventTableModel
     return column == 1;
   }
 
-  public void addIdentifier(final IdentifierSubject value)
+  public void setValueAt(final Object value,
+                         final int row,
+                         final int column)
   {
-    final IdentifierSubject ident = value == null ? null : value.clone();
+    switch (column) {
+      case 0:
+        return;
+      case 1:
+        final Proxy proxy = (Proxy) value;
+        final ModuleProxyCloner cloner =
+          ModuleSubjectFactory.getCloningInstance();
+        final IdentifierSubject neo =
+          (IdentifierSubject) cloner.getClone(proxy);
+        final IdentifierSubject old = getIdentifier(row);
+        if (old == null) {
+          cleanUpNullItemAtEnd();
+          if (neo != null) {
+            mEventHandler.addEvent(neo);
+          }
+        } else if (neo == null) {
+          mEventHandler.removeEvent(old);
+        } else if (!old.equalsWithGeometry(neo)) {
+          mEventHandler.replaceEvent(old, neo);
+        }
+        return;
+      default:
+        throw new ArrayIndexOutOfBoundsException
+          ("Bad column number for event table model!");
+    }
+  }
+
+
+  //#########################################################################
+  //# More Specific Access
+  IdentifierSubject getIdentifier(final int row)
+  {
+    final EventEntry entry = mEvents.get(row);
+    return entry.getName();
+  }
+
+  int getRow(final IdentifierSubject ident)
+  {
+    final EventEntry entry = new EventEntry(ident);
+    final int index = Collections.binarySearch(mEvents, entry);
+    if (index < 0) {
+      return index;
+    } else if (getIdentifier(index) == ident) {
+      return index;
+    } else {
+      return -1;
+    }
+  }
+
+  boolean containsEqualIdentifier(final IdentifierSubject ident)
+  {
+    final EventEntry entry = new EventEntry(ident);
+    final int index = Collections.binarySearch(mEvents, entry);
+    if (index < 0) {
+      return false;
+    } else {
+      final IdentifierSubject found = getIdentifier(index);
+      return found.equalsByContents(ident);
+    }
+  }
+
+  void addIdentifier(final IdentifierSubject ident)
+  {
     final EventEntry entry = new EventEntry(ident);
     final int index = Collections.binarySearch(mEvents, entry);
     if (index < 0) {
@@ -136,29 +222,7 @@ public class EventTableModel
     }
   }
 
-  private void addIdentifiers(final List<AbstractSubject> list)
-  {
-    for (final AbstractSubject item : list) {
-      if (item instanceof IdentifierSubject) {
-        final IdentifierSubject ident = (IdentifierSubject) item;
-        addIdentifier(ident);
-      } else if (item instanceof ForeachEventSubject) {
-        final ForeachEventSubject foreach = (ForeachEventSubject) item;
-        final List<AbstractSubject> body = foreach.getBodyModifiable();
-        addIdentifiers(body);
-      }
-    }
-  }
-
-  private void addIdentifiers(final EventListExpressionSubject expr)
-  {
-    if (expr != null) {
-      final List<AbstractSubject> events = expr.getEventListModifiable();
-      addIdentifiers(events);
-    }
-  }
-
-  private void removeIdentifiers(final String name)
+  void removeIdentifiers(final String name)
   {
     final IdentifierSubject tester = new SimpleIdentifierSubject(name);
     final EventEntry entry = new EventEntry(tester);
@@ -167,7 +231,7 @@ public class EventTableModel
       final int size = mEvents.size();
       int last = first;
       for (int index = first + 1; index < size; index++) {
-        final IdentifierSubject ident = getEvent(index);
+        final IdentifierSubject ident = getIdentifier(index);
         final String iname;
         if (ident instanceof SimpleIdentifierSubject) {
           final SimpleIdentifierSubject simple =
@@ -186,14 +250,11 @@ public class EventTableModel
           break;
         }
       }
-      for (int index = last; index >= first; index--) {
-        mEvents.remove(index);
-      }
-      fireTableRowsDeleted(first, last);
+      removeIdentifierRange(first, last);
     }
   }
 
-  private void removeIdentifier(final IdentifierSubject ident)
+  void removeIdentifier(final IdentifierSubject ident)
   {
     final EventEntry entry = new EventEntry(ident);
     final int index = Collections.binarySearch(mEvents, entry);
@@ -201,43 +262,6 @@ public class EventTableModel
       mEvents.remove(index);
       fireTableRowsDeleted(index, index);
     }
-  }
-
-  public void setValueAt(final Object value,
-                         final int row,
-                         final int column)
-  {
-    switch (column) {
-      case 0:
-        return;
-      case 1:
-        final IdentifierSubject ident =
-          value == null ? null : ((IdentifierSubject) value).clone();
-        final IdentifierSubject old = getEvent(row);
-        if (ident == null) {
-          Command c = new RemoveFromTableCommand(this, old);
-          mTable.getEditorInterface().getUndoInterface().executeCommand(c);
-        } else if (old == null) {
-          Command c = new AddToTableCommand(this, ident);
-          mTable.getEditorInterface().getUndoInterface().executeCommand(c);
-        } else if (!old.equalsByContents(ident)) {
-          Command c = new ChangeEventNameCommand(mGraph, this, old, ident);
-          mTable.getEditorInterface().getUndoInterface().executeCommand(c);
-        }
-        return;
-      default:
-        throw new ArrayIndexOutOfBoundsException
-          ("Bad column number for event table model!");
-    }
-  }
-
-
-  //#########################################################################
-  //# More Specific Access
-  IdentifierSubject getEvent(final int row)
-  {
-    final EventEntry entry = mEvents.get(row);
-    return entry.getName();
   }
 
   int createEvent()
@@ -249,11 +273,30 @@ public class EventTableModel
     return row;
   }
 
+  void cleanUpNullItemAtEnd()
+  {
+    final int row = getRowCount() - 1;
+    if (row >= 0 && getIdentifier(row) == null) {
+      removeIdentifierRange(row, row);
+    }
+  }
+
   String getToolTipText(final int row)
   {
     final ModuleContext context = mRoot.getModuleContext();
-    final IdentifierSubject event = getEvent(row);
+    final IdentifierSubject event = getIdentifier(row);
     return context.guessEventToolTipText(event);
+  }
+
+  boolean isDisplayed()
+  {
+    final EditorWindowInterface iface = mRoot.getActiveEditorWindowInterface();
+    if (iface == null) {
+      return false;
+    } else {
+      final ControlledSurface surface = iface.getControlledSurface();
+      return surface.getGraph() == mGraph;
+    }
   }
 
 
@@ -317,6 +360,33 @@ public class EventTableModel
     return index >= 0;
   }
 
+  private int getFirstRow(final EventDeclSubject decl)
+  {
+    final IdentifierSubject ident = decl.getIdentifier();
+    final EventEntry entry = new EventEntry(ident);
+    final int index = Collections.binarySearch(mEvents, entry);
+    if (index < 0) {
+      return -index - 1;
+    } else {
+      return index;
+    }
+  }
+
+  private EventDeclProxy guessEventDecl(final int row)
+  {
+    final ModuleContext context = mRoot.getModuleContext();
+    final IdentifierSubject ident = getIdentifier(row);
+    return context.guessEventDecl(ident);
+  }
+
+  private void removeIdentifierRange(final int row0, final int row1)
+  {
+    for (int row = row1; row >= row0; row--) {
+      mEvents.remove(row);
+    }
+    fireTableRowsDeleted(row0, row1);
+  }
+
 
   //#########################################################################
   //# Inner Class GraphModelObserver
@@ -328,42 +398,18 @@ public class EventTableModel
     //# Interface net.sourceforge.waters.subject.base.ModelObserver
     public void modelChanged(final ModelChangeEvent event)
     {
-      final Subject source = event.getSource();
-      final Object value = event.getValue();
       switch (event.getKind()) {
       case ModelChangeEvent.ITEM_ADDED:
-        if (source.getParent() instanceof EventListExpressionSubject) {
-          if (value instanceof IdentifierSubject) {
-            final IdentifierSubject ident = (IdentifierSubject) value;
-            addIdentifier(ident);
-          } else if (value instanceof ForeachEventSubject) {
-            final ForeachEventSubject foreach = (ForeachEventSubject) value;
-            final List<AbstractSubject> body = foreach.getBodyModifiable();
-            addIdentifiers(body);
-          }
-        } else if (value instanceof EventDeclSubject &&
-                   mTable.isDisplayedEditor()) {
-          final EventDeclSubject decl = (EventDeclSubject) value;
-          final String name = decl.getName();
-          final IdentifierSubject ident = new SimpleIdentifierSubject(name);
-          addIdentifier(ident);
-        } else if (value instanceof EdgeSubject) {
-          final EdgeSubject edge = (EdgeSubject) value;
-          final LabelBlockSubject block = edge.getLabelBlock();
-          addIdentifiers(block);
-        }
-        break;
-      case ModelChangeEvent.ITEM_REMOVED:
-        if (value instanceof EventDeclSubject) {
-          final EventDeclSubject decl = (EventDeclSubject) value;
-          final String name = decl.getName();
-          removeIdentifiers(name);
-        }
+        final Proxy value = (Proxy) event.getValue();
+        mIdentifierCollectVisitor.addClonedIdentifiers(value);
         break;
       case ModelChangeEvent.STATE_CHANGED:
+        final Subject source = event.getSource();
         if (source == mGraph) {
           final LabelBlockSubject block = mGraph.getBlockedEvents();
-          addIdentifiers(block);
+          mIdentifierCollectVisitor.addClonedIdentifiers(block);
+        } else {
+          // more?
         }
         break;
       default:
@@ -384,7 +430,95 @@ public class EventTableModel
     //# Interface net.sourceforge.waters.subject.base.ModelObserver
     public void modelChanged(final ModelChangeEvent event)
     {
-      fireTableDataChanged();
+      int kind = event.getKind();
+      final AbstractSubject subject;
+      switch (kind) {
+      case ModelChangeEvent.ITEM_ADDED:
+      case ModelChangeEvent.ITEM_REMOVED:
+        subject = (AbstractSubject) event.getValue();
+        if (!(subject instanceof EventDeclSubject)) {
+          kind = ModelChangeEvent.STATE_CHANGED;
+        }
+        break;
+      default:
+        subject = (AbstractSubject) event.getSource(); 
+        break;
+      }
+      final EventDeclSubject decl =
+        subject.getAncestor(EventDeclSubject.class);
+      final int rowcount = getRowCount();
+      int row0, row1;
+      switch (kind) {
+      case ModelChangeEvent.ITEM_ADDED:
+        if (isDisplayed()) {
+          mIdentifierCollectVisitor.addClonedIdentifiers(decl);
+        }
+        // fall through ...
+      case ModelChangeEvent.GEOMETRY_CHANGED:
+        row0 = row1 = getFirstRow(decl);
+        while (row1 < rowcount && guessEventDecl(row1) == decl) {
+          row1++;          
+        }
+        if (row0 < row1) {
+          fireTableRowsUpdated(row0, row1 - 1);
+        }
+        break;
+      case ModelChangeEvent.ITEM_REMOVED:
+        boolean deleting = false;
+        row0 = -1;
+        for (row1 = getFirstRow(decl);
+             row1 < getRowCount() && guessEventDecl(row1) == decl;
+             row1++) {
+          final IdentifierProxy ident = getIdentifier(row1);
+          if (mGraphSearchVisitor.isEventInGraph(ident)) {
+            if (row0 < 0) {
+              row0 = row1;
+              deleting = true;
+            } else if (!deleting) {
+              fireTableRowsUpdated(row0, row1 - 1);
+              row0 = row1;
+              deleting = true;
+            }              
+          } else {
+            if (row0 < 0) {
+              row0 = row1;
+              deleting = false;
+            } else if (deleting) {
+              removeIdentifierRange(row0, row1 - 1);
+              row1 = row0;
+              deleting = false;
+            }              
+          }
+        }
+        if (row0 >= 0) {
+          if (deleting) {
+            removeIdentifierRange(row0, row1 - 1);
+          } else {
+            fireTableRowsUpdated(row0, row1 - 1);
+          }
+        }
+        break;
+      case ModelChangeEvent.STATE_CHANGED:
+        row0 = row1 = -1;
+        for (int row = 0; row < rowcount; row++) {
+          if (guessEventDecl(row) == decl) {
+            if (row0 < 0) {
+              row0 = row;
+            }
+            row1 = row;
+          } else if (row0 >= 0) {
+            fireTableRowsUpdated(row0, row1);
+            row0 = -1;
+          }
+        }
+        if (row0 >= 0) {
+          fireTableRowsUpdated(row0, row1);
+        }
+        break;
+      default:
+        fireTableDataChanged();
+        break;
+      }
     }
 
   }
@@ -419,9 +553,7 @@ public class EventTableModel
     {
       if (partner != null && partner.getClass() == getClass()) {
         final EventEntry entry = (EventEntry) partner;
-        return
-          mName == null ? entry.mName == null :
-          mName.equalsByContents(entry.mName);
+        return ProxyTools.equalsByContents(mName, entry.mName);
       } else {
         return false;
       }
@@ -465,185 +597,206 @@ public class EventTableModel
 
 
   //#########################################################################
-  //# Inner Class ChangeEventNameCommand
-  private class ChangeEventNameCommand
-    implements Command
+  //# Inner Class IdentifierCollectVisitor
+  private class IdentifierCollectVisitor
+    extends AbstractModuleProxyVisitor
   {
-    public ChangeEventNameCommand(final GraphSubject graph,
-                                  final EventTableModel model,
-                                  final IdentifierSubject old,
-                                  final IdentifierSubject neo)
-    {
-      mGraph = graph;
-      mOld = old;
-      mNew = neo;
-      mModel = model;
-      mCommands = new CompoundCommand();
-      if (mOld != null) {
-        mCommands.addCommand(new RemoveFromTableCommand(mModel, mOld));
-      }
-      if (!mModel.containsEvent(mNew)) {
-        mCommands.addCommand(new AddToTableCommand(mModel, mNew));
-      }
-      if (mOld != null) {
-        addCommandsFromList(mGraph.getBlockedEvents());
-        for (final EdgeSubject edge : mGraph.getEdgesModifiable()) {
-          addCommandsFromList(edge.getLabelBlock());
-        }
-      }
-      mCommands.end();
-    }
 
-    /**
-     * Renames edge labels to reflect a rename operation in the event list
-     * panel.
-     */
-    private void addCommandsFromList(final EventListExpressionSubject list)
+    //#######################################################################
+    //# Invocation
+    private void addClonedIdentifiers(final Proxy proxy)
     {
-      if (list != null) {
-        final ListIterator<AbstractSubject> iter =
-          list.getEventListModifiable().listIterator();
-        boolean removal = false;
-        boolean add = true;
-        int index = 0;
-        while (iter.hasNext()) {
-          final AbstractSubject a = iter.next();
-          if (a.equalsByContents(mNew)) {
-            add = false;
-          }
-          if (a.equalsByContents(mOld)) {
-            mCommands.addCommand(new RemoveEventCommand(list, a));
-            removal = true;
-            index = iter.nextIndex() - 1;
-          }
-        }
-        if (add && removal) {
-          mCommands.addCommand(new AddEventCommand(list, mNew, index));
-        }
+      try {
+        proxy.acceptVisitor(this);
+      } catch (final VisitorException exception) {
+        throw exception.getRuntimeException();
       }
     }
 
-    /**
-     * Executes the Creation of the Node
-     */
-    public void execute()
+    //#######################################################################
+    //# Interface net.sourceforge.waters.model.base.ProxyVisitor
+    public Object visitProxy(final Proxy proxy)
     {
-      mCommands.execute();
+      return null;
     }
 
-    /**
-     * Undoes the Command
-     */
-    public void undo()
+    //#######################################################################
+    //# Interface net.sourceforge.waters.model.module.ModuleProxyVisitor
+    public Object visitEdgeProxy(final EdgeProxy edge)
+      throws VisitorException
     {
-      mCommands.undo();
+      final LabelBlockProxy block = edge.getLabelBlock();
+      if (block != null) {
+        visitLabelBlockProxy(block);
+      }
+      return null;
     }
 
-    public boolean isSignificant()
+    public Object visitEventDeclProxy(final EventDeclProxy decl)
+      throws VisitorException
     {
-      return true;
+      final IdentifierProxy ident = decl.getIdentifier();
+      return ident.acceptVisitor(this);
     }
 
-    public String getName()
+    public Object visitForeachEventProxy(final ForeachEventProxy foreach)
+      throws VisitorException
     {
-      return mDescription;
+      final List<? extends Proxy> body = foreach.getBody();
+      visitCollection(body);
+      return null;
     }
 
-    private final GraphSubject mGraph;
-    private final IdentifierSubject mOld;
-    private final IdentifierSubject mNew;
-    private final EventTableModel mModel;
-    private final CompoundCommand mCommands;
-    private final static String mDescription = "Change Event Name";
+    public Object visitGraphProxy(final GraphProxy graph)
+      throws VisitorException
+    {
+      final LabelBlockProxy blocked = graph.getBlockedEvents();
+      if (blocked != null) {
+        visitLabelBlockProxy(blocked);
+      }
+      final Collection<NodeProxy> nodes = graph.getNodes();
+      visitCollection(nodes);
+      final Collection<EdgeProxy> edges = graph.getEdges();
+      visitCollection(edges);
+      return null;
+    }
+
+    public Object visitIdentifierProxy(final IdentifierProxy ident)
+    {
+      final ModuleProxyCloner cloner =
+        ModuleSubjectFactory.getCloningInstance();
+      final IdentifierSubject cloned =
+        (IdentifierSubject) cloner.getClone(ident);
+      addIdentifier(cloned);
+      return null;
+    }
+
+    public Object visitEventListExpressionProxy
+      (final EventListExpressionProxy expr)
+      throws VisitorException
+    {
+      final List<? extends Proxy> eventlist = expr.getEventList();
+      visitCollection(eventlist);
+      return null;
+    }
+
+    public Object visitNodeProxy(final NodeProxy node)
+      throws VisitorException
+    {
+      final PlainEventListProxy props = node.getPropositions();
+      return visitPlainEventListProxy(props);
+    }
+
   }
 
 
   //#########################################################################
-  //# Inner Class AddToTableCommand
-  private class AddToTableCommand
-    implements Command
+  //# Inner Class GraphSearchVisitor
+  private class GraphSearchVisitor
+    extends AbstractModuleProxyVisitor
   {
-    private final EventTableModel mModel;
-    private final IdentifierSubject mIdentifier;
-    private final String mDescription = "Add Event";
 
-    public AddToTableCommand(EventTableModel model,
-                             IdentifierSubject identifier)
+    //#######################################################################
+    //# Invocation
+    private boolean isEventInGraph(final IdentifierProxy ident)
     {
-      mModel = model;
-      mIdentifier = identifier;
+      try {
+        mIdentifier = ident;
+        return (Boolean) mGraph.acceptVisitor(this);
+      } catch (final VisitorException exception) {
+        throw exception.getRuntimeException();
+      }
     }
 
-    public void execute()
+    //#######################################################################
+    //# Interface net.sourceforge.waters.model.base.ProxyVisitor
+    public Boolean visitProxy(final Proxy proxy)
     {
-      mModel.addIdentifier(mIdentifier);
+      return false;
     }
 
-    /**
-     * Undoes the command.
-     */
-    public void undo()
+    //#######################################################################
+    //# Interface net.sourceforge.waters.model.module.ModuleProxyVisitor
+    public Boolean visitEdgeProxy(final EdgeProxy edge)
+      throws VisitorException
     {
-      mModel.removeIdentifier(mIdentifier);
+      final LabelBlockProxy block = edge.getLabelBlock();
+      if (block != null) {
+        return (Boolean) visitLabelBlockProxy(block);
+      } else {
+        return false;
+      }
     }
 
-    public boolean isSignificant()
+    public Boolean visitForeachEventProxy(final ForeachEventProxy foreach)
+      throws VisitorException
     {
-      return true;
+      final List<? extends Proxy> body = foreach.getBody();
+      return processList(body);
     }
 
-    public String getName()
+    public Boolean visitGraphProxy(final GraphProxy graph)
+      throws VisitorException
     {
-      return mDescription;
-    }
-  }
-
-
-  //#########################################################################
-  //# Inner Class AddToTableCommand
-  private class RemoveFromTableCommand
-    implements Command
-  {
-    private final EventTableModel mModel;
-    private final IdentifierSubject mIdentifier;
-    private final String mDescription = "Add Event";
-
-    public RemoveFromTableCommand(EventTableModel model,
-                                  IdentifierSubject identifier)
-    {
-      mModel = model;
-      mIdentifier = identifier;
+      final LabelBlockProxy blocked = graph.getBlockedEvents();
+      if (blocked != null && (Boolean) visitLabelBlockProxy(blocked)) {
+        return true;
+      }
+      return
+        processList(graph.getNodes()) ||
+        processList(graph.getEdges());
     }
 
-    public void execute()
+    public Boolean visitIdentifierProxy(final IdentifierProxy ident)
     {
-      mModel.removeIdentifier(mIdentifier);
+      return mIdentifier.equalsByContents(ident);
     }
 
-    /**
-     * Undoes the Command.
-     */
-    public void undo()
+    public Boolean visitEventListExpressionProxy
+      (final EventListExpressionProxy expr)
+      throws VisitorException
     {
-      mModel.addIdentifier(mIdentifier);
+      final List<? extends Proxy> eventlist = expr.getEventList();
+      return processList(eventlist);
     }
 
-    public boolean isSignificant()
+    public Boolean visitNodeProxy(final NodeProxy node)
+      throws VisitorException
     {
-      return true;
+      final PlainEventListProxy props = node.getPropositions();
+      return (Boolean) visitPlainEventListProxy(props);
     }
 
-    public String getName()
+    //#######################################################################
+    //# Auxiliary Methods
+    private Boolean processList(final Collection<? extends Proxy> list)
+      throws VisitorException
     {
-      return mDescription;
+      for (final Proxy proxy : list) {
+        final boolean found = (Boolean) proxy.acceptVisitor(this);
+        if (found) {
+          return true;
+        }
+      }
+      return false;
     }
+
+    //#######################################################################
+    //# Data Members
+    private IdentifierProxy mIdentifier;
+
   }
 
 
   //#######################################################################
   //# Data Members
   private final GraphSubject mGraph;
+  private final GraphEventHandler mEventHandler;
   private final ModuleWindowInterface mRoot;
   private final List<EventEntry> mEvents;
-  private final EditorEvents mTable;
+  private final EventDeclListModelObserver mEventDeclListModelObserver;
+  private final GraphModelObserver mGraphModelObserver;
+  private final IdentifierCollectVisitor mIdentifierCollectVisitor;
+  private final GraphSearchVisitor mGraphSearchVisitor;
+
 }

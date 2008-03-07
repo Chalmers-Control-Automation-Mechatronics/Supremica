@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   ControlledSurface
 //###########################################################################
-//# $Id: ControlledSurface.java,v 1.156 2008-02-19 01:03:46 robi Exp $
+//# $Id: ControlledSurface.java,v 1.157 2008-03-07 04:11:02 robi Exp $
 //###########################################################################
 
 
@@ -17,8 +17,16 @@ import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.StringSelection;
 import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
-import java.awt.dnd.*;
+import java.awt.dnd.DnDConstants;
+import java.awt.dnd.DragGestureEvent;
+import java.awt.dnd.DragGestureListener;
 import java.awt.dnd.DragSource;
+import java.awt.dnd.DropTarget;
+import java.awt.dnd.DropTargetAdapter;
+import java.awt.dnd.DropTargetDragEvent;
+import java.awt.dnd.DropTargetDropEvent;
+import java.awt.dnd.DropTargetListener;
+import java.awt.dnd.InvalidDnDOperationException;
 import java.awt.event.*;
 import java.awt.geom.Arc2D;
 import java.awt.geom.GeneralPath;
@@ -54,7 +62,6 @@ import net.sourceforge.waters.gui.command.CompoundCommand;
 import net.sourceforge.waters.gui.command.DeleteCommand;
 import net.sourceforge.waters.gui.command.InsertCommand;
 import net.sourceforge.waters.gui.command.ReorganizeListCommand;
-import net.sourceforge.waters.gui.command.SelectCommand;
 import net.sourceforge.waters.gui.command.UndoableCommand;
 import net.sourceforge.waters.gui.command.UndoInterface;
 import net.sourceforge.waters.gui.observer.EditorChangedEvent;
@@ -106,7 +113,8 @@ import org.supremica.properties.Config;
 
 public class ControlledSurface
   extends EditorSurface
-  implements SelectionOwner, Observer, EmbedderObserver, FocusListener
+  implements SelectionOwner, Observer, EmbedderObserver,
+             FocusListener, DragGestureListener
 {
   //#########################################################################
   //# Constructors
@@ -124,10 +132,6 @@ public class ControlledSurface
     setFocusable(true);
     final DropTargetListener dtListener = new DTListener();
     final DropTarget dropTarget = new DropTarget(this, dtListener);
-    mExternalDragSource = DragSource.getDefaultDragSource();
-    mDGListener = new DGListener();
-    final DragSourceListener dsListener = new DSListener();
-    mExternalDragSource.addDragSourceListener(dsListener);
     addKeyListener(new KeySpy());
     updateTool();
 
@@ -229,6 +233,11 @@ public class ControlledSurface
 
   //#########################################################################
   //# Interface net.sourceforge.waters.gui.transfer.SelectionOwner
+  public UndoInterface getUndoInterface(final Action action)
+  {
+    return getUndoInterface();
+  }
+
   public boolean hasNonEmptySelection()
   {
     return !mSelectedList.isEmpty();
@@ -855,6 +864,25 @@ public class ControlledSurface
 
 
   //#########################################################################
+  //# Interface java.awt.dnd.DragGestureListener
+  public void dragGestureRecognized(final DragGestureEvent event)
+  {
+    if (mInternalDragAction instanceof InternalDragActionDND) {
+      final InternalDragActionDND action =
+        (InternalDragActionDND) mInternalDragAction;
+      final List<IdentifierSubject> toBeDragged =
+        action.getIdentifiersToBeDragged();
+      final Transferable trans = new IdentifierTransferable(toBeDragged);
+      try {
+        event.startDrag(DragSource.DefaultCopyDrop, trans);
+      } catch (final InvalidDnDOperationException exception) {
+        throw new IllegalArgumentException(exception);
+      }
+    }
+  }
+
+
+  //#########################################################################
   //# Repainting
   protected void paintComponent(final Graphics graphics)
   {
@@ -935,8 +963,9 @@ public class ControlledSurface
       mController = controller;
       addMouseListener(mController);
       addMouseMotionListener(mController);
-      mExternalDragSource.createDefaultDragGestureRecognizer
-        (this, mExternalDragAction, mDGListener);
+      final DragSource source = DragSource.getDefaultDragSource();
+      source.createDefaultDragGestureRecognizer
+        (this, DnDConstants.ACTION_COPY, this);
       mController.installed();
     }
   }
@@ -1168,16 +1197,17 @@ public class ControlledSurface
 
   private DRAGOVERSTATUS getDragOver(ProxySubject s)
   {
-    if (!isFocused(s)) {
+    if (mInternalDragAction == null || !isFocused(s)) {
       return DRAGOVERSTATUS.NOTDRAG;
+    } else {
+      return mInternalDragAction.getExternalDragStatus();
     }
-    return mExternalDragStatus;
   }
 
   public RenderingInformation getRenderingInformation(final Proxy proxy)
   {
     final ProxySubject item = (ProxySubject) proxy;
-    final boolean isFocused = isRenderedFocused(item);
+    final boolean focused = isRenderedFocused(item);
     final boolean selected = isRenderedSelected(item);
     final boolean showHandles;
     if (!selected) {
@@ -1191,22 +1221,23 @@ public class ControlledSurface
       showHandles = mController.canBeSelected(item);
     }
     final boolean error = isError(item);
-    EditorSurface.DRAGOVERSTATUS dragOver =
-      EditorSurface.DRAGOVERSTATUS.NOTDRAG;
     int priority = getPriority(item);
     if (mDontDraw.contains(item)) {
       priority = -1;
     } else if (selected) {
       priority += 6;
     }
-    if (isFocused) {
-      dragOver = mExternalDragStatus;
+    final DRAGOVERSTATUS dragover;
+    if (focused && mInternalDragAction != null) {
+      dragover = mInternalDragAction.getExternalDragStatus();
+    } else {
+      dragover = DRAGOVERSTATUS.NOTDRAG;
     }
     return new RenderingInformation
-      (showHandles, isFocused,
-       EditorColor.getColor(item, dragOver, selected,
+      (showHandles, focused,
+       EditorColor.getColor(item, dragover, selected,
                             error, mIsPermanentFocusOwner),
-       EditorColor.getShadowColor(item, dragOver, selected,
+       EditorColor.getShadowColor(item, dragover, selected,
                                   error, mIsPermanentFocusOwner),
        priority);
   }
@@ -1647,7 +1678,7 @@ public class ControlledSurface
   private abstract class ToolController
     implements MouseListener, MouseMotionListener
   {
-
+    
     //#######################################################################
     //# Highlighting and Selecting
     int getHighlightPriority(ProxySubject item)
@@ -1660,7 +1691,7 @@ public class ControlledSurface
       return getHighlightPriority(item) > 0;
     }
 
-    /**
+   /**
      * Updates highlighting based on the given new location of the mouse
      * pointer.
      */
@@ -1690,6 +1721,24 @@ public class ControlledSurface
       }
       if (object != mFocusedObject) {
         mFocusedObject = object;
+        repaint();
+      }
+    }
+
+    /**
+     * Stops any external drag-and-drop.
+     * There is no notification if an external drag-and-drop is cancelled,
+     * but we know for sure that it is finished when we receive normal mouse
+     * events again. Therefore, this method is called first by certain mouse
+     * listeners.
+     */
+    void abortExternalDrag(final MouseEvent event)
+    {
+      if (mInternalDragAction != null &&
+          mInternalDragAction instanceof InternalDragActionDND) {
+        final Point point = event.getPoint();
+        mInternalDragAction.cancelDrag(point);
+        mInternalDragAction = null;
         repaint();
       }
     }
@@ -1752,6 +1801,7 @@ public class ControlledSurface
 
     public void mouseEntered(final MouseEvent event)
     {
+      abortExternalDrag(event);
       final Point point = event.getPoint();
       updateHighlighting(point);
     }
@@ -1759,6 +1809,7 @@ public class ControlledSurface
     public void mouseExited(final MouseEvent event)
     {
       if (mInternalDragAction != null) {
+        abortExternalDrag(event);
         final Point point = event.getPoint();
         updateHighlighting(point);
       } else {
@@ -1771,6 +1822,7 @@ public class ControlledSurface
     //# Interface java.awt.MouseMotionListener
     public void mouseMoved(final MouseEvent event)
     {
+      abortExternalDrag(event);
       final Point point = event.getPoint();
       updateHighlighting(point);
     }
@@ -1794,6 +1846,7 @@ public class ControlledSurface
     //# Interface java.awt.MouseListener
     public void mousePressed(final MouseEvent event)
     {
+      abortExternalDrag(event);
       requestFocusInWindow();
       // No popup!
     }
@@ -2036,6 +2089,7 @@ public class ControlledSurface
     //# Interface java.awt.MouseListener
     public void mousePressed(final MouseEvent event)
     {
+      abortExternalDrag(event);
       requestFocusInWindow();
       mPopupFactory.maybeShowPopup
         (ControlledSurface.this, event, mFocusedObject);
@@ -2107,7 +2161,7 @@ public class ControlledSurface
           final WatersPopupActionManager manager = mPopupFactory.getMaster();
           final IDEAction action =
             manager.getNodeSelfloopAction(mFocusedObject);
-          manager.invokeDoubleClickAction(action, event);        
+          manager.invokeMouseClickAction(action, event);        
         } else if (mFocusedObject instanceof EdgeSubject) {
           EditorEditEdgeDialog.showDialog((EdgeSubject) mFocusedObject, mRoot);
         } else if (mFocusedObject instanceof GuardActionBlockSubject) {
@@ -2119,6 +2173,7 @@ public class ControlledSurface
 
     public void mousePressed(final MouseEvent event)
     {
+      abortExternalDrag(event);
       requestFocusInWindow();
       mPopupFactory.maybeShowPopup
         (ControlledSurface.this, event, mFocusedObject);
@@ -2348,6 +2403,11 @@ public class ControlledSurface
     int getHighlightPriority(final ProxySubject item)
     {
       return -1;
+    }
+
+    DRAGOVERSTATUS getExternalDragStatus()
+    {
+      return DRAGOVERSTATUS.NOTDRAG;
     }
 
     //#######################################################################
@@ -2749,6 +2809,7 @@ public class ControlledSurface
       mLabelBlock = (LabelBlockSubject) mFocusedObject;
       mClickedLabel = label;
       addToSelection(mClickedLabel);
+      mExternalDragStatus = DRAGOVERSTATUS.NOTDRAG;
     }
 
     private InternalDragActionDND(final Point point)
@@ -2756,6 +2817,7 @@ public class ControlledSurface
       super(point, point, false);
       mLabelBlock = null;
       mClickedLabel = null;
+      mExternalDragStatus = DRAGOVERSTATUS.NOTDRAG;
     }
 
     //#######################################################################
@@ -2765,23 +2827,23 @@ public class ControlledSurface
       final Point point = event.getLocation();
       continueDrag(point);
       mController.updateHighlighting(point);
-
       final Transferable transferable = event.getTransferable();
       final EventListExpressionSubject elist =
         mIdentifierPasteVisitor.getIdentifierPasteTarget
           (mFocusedObject, transferable);
       final Line2D line;
-      if (elist != null && elist instanceof LabelBlockSubject) {
-        final LabelBlockSubject block = (LabelBlockSubject) elist;
+      if (elist != null &&
+          elist instanceof LabelBlockSubject &&
+          !elist.getEventList().isEmpty()) {
         final Rectangle2D bounds =
-          getShapeProducer().getShape(block).getShape().getBounds();
+          getShapeProducer().getShape(elist).getShape().getBounds();
         final double x1 = bounds.getMinX();
         final double x2 = bounds.getMaxX();
         double y;
         if (elist == mFocusedObject) {
           y = bounds.getMinY();
           mDropIndex = 0;
-          for (final ProxySubject item : block.getEventListModifiable()) {
+          for (final ProxySubject item : elist.getEventListModifiable()) {
             final ProxyShape shape = getShapeProducer().getShape(item);
             final Rectangle2D rect = shape.getShape().getBounds();
             if (point.getY() < rect.getCenterY()) {
@@ -2801,21 +2863,17 @@ public class ControlledSurface
         line = null;
         mDropIndex = -1;
       }
-
-      final int operation = DnDConstants.ACTION_COPY;
       if (elist == null) {
-        mExternalDragStatus = EditorSurface.DRAGOVERSTATUS.CANTDROP;
+        mExternalDragStatus = DRAGOVERSTATUS.CANTDROP;
+        event.acceptDrag(0);
       } else {
-        mExternalDragStatus = EditorSurface.DRAGOVERSTATUS.CANDROP;
+        mExternalDragStatus = DRAGOVERSTATUS.CANDROP;
+        event.acceptDrag(DnDConstants.ACTION_COPY);
       }
       if (line == null ? mLine != null : !line.equals(mLine)) {
         mLine = line;
         repaint();
       }
-      event.getDropTargetContext().getDropTarget().
-        setDefaultActions(operation);
-      event.acceptDrag(operation);
-
       return true;
     }
 
@@ -2824,7 +2882,7 @@ public class ControlledSurface
       final Point point = event.getLocation();
       commitDrag(point);
       try {
-        if (mExternalDragStatus == EditorSurface.DRAGOVERSTATUS.CANDROP) {
+        if (mExternalDragStatus == DRAGOVERSTATUS.CANDROP) {
           final Transferable transferable = event.getTransferable();
           final List<InsertInfo> inserts = new LinkedList<InsertInfo>();
           mIdentifierPasteVisitor.addInsertInfo
@@ -2836,7 +2894,7 @@ public class ControlledSurface
         } else {
           event.dropComplete(false);
         }
-        mExternalDragStatus = EditorSurface.DRAGOVERSTATUS.NOTDRAG;
+        mExternalDragStatus = DRAGOVERSTATUS.NOTDRAG;
       } catch (final UnsupportedFlavorException exception) {
         throw new IllegalArgumentException(exception);
       } catch (final IOException exception) {
@@ -2868,6 +2926,11 @@ public class ControlledSurface
       } else {
         return -1;
       }
+    }
+
+    DRAGOVERSTATUS getExternalDragStatus()
+    {
+      return mExternalDragStatus;
     }
 
     //#######################################################################
@@ -2917,6 +2980,7 @@ public class ControlledSurface
     private final ProxySubject mClickedLabel;
     private Line2D mLine;
     private int mDropIndex;
+    private DRAGOVERSTATUS mExternalDragStatus;
 
   }
 
@@ -3881,76 +3945,6 @@ public class ControlledSurface
 
 
   //#########################################################################
-  //# Inner Class DSListener
-  private class DSListener extends DragSourceAdapter
-  {
-    public void dragOver(DragSourceDragEvent e)
-    {
-      if (e.getTargetActions() == DnDConstants.ACTION_COPY)
-        {
-          e.getDragSourceContext().setCursor
-            (DragSource.DefaultCopyDrop);
-        }
-      else
-        {
-          e.getDragSourceContext().setCursor
-            (DragSource.DefaultCopyNoDrop);
-        }
-    }
-  }
-
-
-  //#########################################################################
-  //# Inner Class DGListener
-  private class DGListener implements DragGestureListener
-  {
-    public void dragGestureRecognized(final DragGestureEvent event)
-    {
-      if (mInternalDragAction instanceof InternalDragActionDND) {
-        final InternalDragActionDND action =
-          (InternalDragActionDND) mInternalDragAction;
-        final List<IdentifierSubject> toBeDragged =
-          action.getIdentifiersToBeDragged();
-        final Transferable trans = new IdentifierTransferable(toBeDragged);
-        try {
-          event.startDrag(DragSource.DefaultCopyDrop, trans);
-        } catch (final InvalidDnDOperationException exception) {
-          throw new IllegalArgumentException(exception);
-        }
-      }
-    }
-  }
-
-  private Collection<IdentifierSubject> DNDLabel(Point pos)
-  {
-    // *** BUG ***
-    // What about non-identifiers?
-    // ***
-    Subject parent = null;
-    Collection<IdentifierSubject> labels = null;
-    for (final ProxySubject item : mSelectedList) {
-      parent = item.getParent();
-      if (parent.getParent() instanceof EventListExpressionSubject &&
-          getShapeProducer().getShape(item).getShape().
-            getBounds().contains(pos)) {
-        labels = new ArrayList<IdentifierSubject>();
-        break;
-      }
-    }
-    if (labels != null) {
-      for (final ProxySubject item : mSelectedList) {
-        if (item instanceof IdentifierSubject &&
-            item.getParent() == parent) {
-          final IdentifierSubject ident = (IdentifierSubject) item;
-          labels.add(ident);
-        }
-      }
-    }
-    return labels;
-  }
-
-
-  //#########################################################################
   //# Inner Class DataFlavorVisitor
   private class DataFlavorVisitor
     extends AbstractModuleProxyVisitor
@@ -4574,11 +4568,6 @@ public class ControlledSurface
   private ToolController mEmbedderController;
 
   private final PopupFactory mPopupFactory;
-
-  private DragSource mExternalDragSource;
-  private final DragGestureListener mDGListener;
-  private int mExternalDragAction = DnDConstants.ACTION_COPY;
-  private DRAGOVERSTATUS mExternalDragStatus = DRAGOVERSTATUS.NOTDRAG;
 
   private final GraphModelObserver mGraphModelObserver =
     new GraphModelObserver();

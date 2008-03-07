@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.gui.ide
 //# CLASS:   ComponentEditorPanel
 //###########################################################################
-//# $Id: ComponentEditorPanel.java,v 1.58 2007-12-04 03:22:58 robi Exp $
+//# $Id: ComponentEditorPanel.java,v 1.59 2008-03-07 04:11:02 robi Exp $
 //###########################################################################
 
 
@@ -26,11 +26,12 @@ import javax.print.*;
 
 import net.sourceforge.waters.gui.ControlledSurface;
 import net.sourceforge.waters.gui.ControlledToolbar;
-import net.sourceforge.waters.gui.EditorEvents;
 import net.sourceforge.waters.gui.EditorWindowInterface;
 import net.sourceforge.waters.gui.EventEditorDialog;
 import net.sourceforge.waters.gui.EventTableModel;
+import net.sourceforge.waters.gui.GraphEventPanel;
 import net.sourceforge.waters.gui.ModuleWindowInterface;
+import net.sourceforge.waters.gui.actions.WatersPopupActionManager;
 import net.sourceforge.waters.gui.command.UndoInterface;
 import net.sourceforge.waters.gui.renderer.GeometryAbsentException;
 import net.sourceforge.waters.subject.base.NamedSubject;
@@ -77,15 +78,13 @@ public class ComponentEditorPanel
         mModuleContainer = moduleContainer;
         mModule = moduleContainer.getModule();
 		final IDE ide = moduleContainer.getIDE();
+		final WatersPopupActionManager manager = ide.getPopupActionManager();
         mSurface = new ControlledSurface
             (component.getGraph(), mModule, this,
-			 (ControlledToolbar) ide.getToolBar(),
-			 ide.getPopupActionManager());
+			 (ControlledToolbar) ide.getToolBar(), manager);
         mSurface.setPreferredSize(IDEDimensions.rightEditorPreferredSize);
         mSurface.setMinimumSize(IDEDimensions.rightEditorMinimumSize);
-        
-        final ModuleWindowInterface root = mModuleContainer.getEditorPanel();
-        mEventsPane = new EditorEvents(root, component, this);
+        mEventsPane = new GraphEventPanel(this, component, manager);
         
         final LayoutManager layout = new BorderLayout();
         setLayout(layout);
@@ -125,7 +124,7 @@ public class ComponentEditorPanel
         return mSurface;
     }
     
-    public EditorEvents getEventPane()
+    public GraphEventPanel getEventPanel()
     {
         return mEventsPane;
     }
@@ -311,7 +310,7 @@ public class ComponentEditorPanel
     //# Data Members
     private final ModuleContainer mModuleContainer;
     private final ControlledSurface mSurface;
-    private final EditorEvents mEventsPane;
+    private final GraphEventPanel mEventsPane;
     private final SimpleComponentSubject mComponent;
     private final ModuleSubject mModule;
 

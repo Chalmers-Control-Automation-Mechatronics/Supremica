@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   ComponentsTree
 //###########################################################################
-//# $Id: ComponentsTree.java,v 1.10 2008-02-19 02:56:50 robi Exp $
+//# $Id: ComponentsTree.java,v 1.11 2008-03-07 04:11:02 robi Exp $
 //###########################################################################
 
 
@@ -27,6 +27,7 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.LinkedList;
 import java.util.Set;
+import javax.swing.Action;
 import javax.swing.Icon;
 import javax.swing.JOptionPane;
 import javax.swing.JTree;
@@ -126,7 +127,7 @@ public class ComponentsTree
 
   //#########################################################################
   //# Interface net.sourceforge.waters.gui.transfer.SelectionOwner
-  public UndoInterface getUndoInterface()
+  public UndoInterface getUndoInterface(final Action action)
   {
     return mRoot.getUndoInterface();
   }
@@ -632,7 +633,7 @@ public class ComponentsTree
         final IDEAction action = getDoubleClickAction(proxy);
         if (action != null) {
           final WatersPopupActionManager manager = mPopupFactory.getMaster();
-          manager.invokeDoubleClickAction(action, event);        
+          manager.invokeMouseClickAction(action, event);        
         }
       }
     }
