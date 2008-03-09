@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui.command
 //# CLASS:   ReplaceCommand
 //###########################################################################
-//# $Id: ReplaceCommand.java,v 1.1 2008-03-07 04:11:02 robi Exp $
+//# $Id: ReplaceCommand.java,v 1.2 2008-03-09 21:52:09 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.gui.command;
@@ -47,17 +47,14 @@ public class ReplaceCommand
    * @param  replacements      The list of replacements to be performed.
    * @param  panel             The panel that contains the items
    *                           and controls the operation.
-   * @param  altpanel          Another panel whose selection is to be
-   *                           updated as well, or <CODE>null</CODE>.
    * @param  name              The name to be given to the command,
    *                           or <CODE>null</CODE>.
    */
   public ReplaceCommand(final List<ReplaceInfo> replacements,
 			final SelectionOwner panel,
-			final SelectionOwner altpanel,
 			final String name)
   {
-    this(replacements, panel, altpanel, name, true);
+    this(replacements, panel, name, true);
   }
 
   /**
@@ -65,8 +62,6 @@ public class ReplaceCommand
    * @param  replacements      The list of replacements to be performed.
    * @param  panel             The panel that contains the items
    *                           and controls the operation.
-   * @param  altpanel          Another panel whose selection is to be
-   *                           updated as well, or <CODE>null</CODE>.
    * @param  name              The name to be given to the command,
    *                           or <CODE>null</CODE>.
    * @param  updatesSelection  A flag, indicating whether this command should
@@ -75,13 +70,11 @@ public class ReplaceCommand
    */
   public ReplaceCommand(final List<ReplaceInfo> replacements,
 			final SelectionOwner panel,
-			final SelectionOwner altpanel,
 			final String name,
 			final boolean updatesSelection)
   {
     super(panel, updatesSelection);
     mReplacements = replacements;
-    mAlternatePanel = altpanel;
     if (name == null) {
       final List<Proxy> list = ReplaceInfo.getOldProxies(replacements);
       final String altname = ProxyNamer.getCollectionClassName(list);
@@ -115,10 +108,7 @@ public class ReplaceCommand
     final int size = mReplacements.size();
     final SelectionOwner panel = getPanel();
     if (selecting) {
-      panel.clearSelection();
-      if (mAlternatePanel != null) {
-	mAlternatePanel.clearSelection();
-      }
+      panel.clearSelection(true);
     } else {
       final List<Proxy> deselect =
         ReplaceInfo.getOldProxies(mReplacements, undoing);
@@ -168,6 +158,5 @@ public class ReplaceCommand
   //#########################################################################
   //# Data Members
   private final List<ReplaceInfo> mReplacements;
-  private final SelectionOwner mAlternatePanel;
 
 }

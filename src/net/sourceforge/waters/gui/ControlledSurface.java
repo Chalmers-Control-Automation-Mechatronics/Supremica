@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   ControlledSurface
 //###########################################################################
-//# $Id: ControlledSurface.java,v 1.157 2008-03-07 04:11:02 robi Exp $
+//# $Id: ControlledSurface.java,v 1.158 2008-03-09 21:52:09 robi Exp $
 //###########################################################################
 
 
@@ -298,13 +298,9 @@ public class ControlledSurface
     }
   }
 
-  public void clearSelection()
+  public void clearSelection(final boolean propagate)
   {
-    if (!mSelectedList.isEmpty()) {
-      mSelectedList.clear();
-      mSelectedSet.clear();
-      fireSelectionChanged();
-    }
+    clearSelection();
   }
 
   public Proxy getSelectableAncestor(final Proxy item)
@@ -1046,6 +1042,18 @@ public class ControlledSurface
 
   //#########################################################################
   //# Auxiliary Methods for Selection Handling
+  /**
+   * Clears the selection.
+   */
+  private void clearSelection()
+  {
+    if (!mSelectedList.isEmpty()) {
+      mSelectedList.clear();
+      mSelectedSet.clear();
+      fireSelectionChanged();
+    }
+  }
+
   /**
    * Replaces the selection.
    * This method ensures that only the given item is selected.

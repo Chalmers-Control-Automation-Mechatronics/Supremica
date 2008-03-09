@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   ComponentsTree
 //###########################################################################
-//# $Id: ComponentsTree.java,v 1.11 2008-03-07 04:11:02 robi Exp $
+//# $Id: ComponentsTree.java,v 1.12 2008-03-09 21:52:09 robi Exp $
 //###########################################################################
 
 
@@ -186,6 +186,11 @@ public class ComponentsTree
     } else {
       return (Proxy) path.getLastPathComponent();
     }
+  }
+
+  public void clearSelection(final boolean propagate)
+  {
+    clearSelection();
   }
 
   public Proxy getSelectableAncestor(final Proxy item)

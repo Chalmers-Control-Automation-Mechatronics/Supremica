@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui.command
 //# CLASS:   UpdateCommand
 //###########################################################################
-//# $Id: UpdateCommand.java,v 1.4 2007-12-08 21:17:53 robi Exp $
+//# $Id: UpdateCommand.java,v 1.5 2008-03-09 21:52:09 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.gui.command;
@@ -133,7 +133,7 @@ public class UpdateCommand
       super.execute();
       mPanel.replaceSelection(visible);
     } else {
-      mPanel.clearSelection();
+      mPanel.clearSelection(true);
       super.execute();
       mPanel.addToSelection(visible);
     }
@@ -154,7 +154,7 @@ public class UpdateCommand
       super.undo();
       mPanel.replaceSelection(visible);
     } else {
-      mPanel.clearSelection();
+      mPanel.clearSelection(true);
       super.undo();
       mPanel.addToSelection(visible);
     }

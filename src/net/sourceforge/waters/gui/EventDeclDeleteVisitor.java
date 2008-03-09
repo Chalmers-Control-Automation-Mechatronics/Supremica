@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   EventDeclDeleteVisitor
 //###########################################################################
-//# $Id: EventDeclDeleteVisitor.java,v 1.4 2008-02-15 07:31:49 robi Exp $
+//# $Id: EventDeclDeleteVisitor.java,v 1.5 2008-03-09 21:52:09 robi Exp $
 //###########################################################################
 
 
@@ -145,8 +145,7 @@ class EventDeclDeleteVisitor
       }
     }
     if (!selection.isEmpty()) {
-      surface.clearSelection();
-      surface.addToSelection(selection);
+      surface.replaceSelection(selection);
       surface.scrollToVisible(selection);
     }
   }
@@ -366,8 +365,7 @@ class EventDeclDeleteVisitor
         comp.acceptVisitor(this);
         final List<Proxy> selection = findSelection(mDeletionVictims);
         final SelectionOwner panel = iface.getControlledSurface();
-        panel.clearSelection();
-        panel.addToSelection(selection);
+        panel.replaceSelection(selection);
         panel.scrollToVisible(selection);
         mDeletionVictims.clear();
         // Restore keyboard focus!

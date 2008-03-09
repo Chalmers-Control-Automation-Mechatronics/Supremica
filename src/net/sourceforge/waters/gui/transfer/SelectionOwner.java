@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui.transfer
 //# CLASS:   SelectionOwner
 //###########################################################################
-//# $Id: SelectionOwner.java,v 1.6 2008-03-07 04:11:02 robi Exp $
+//# $Id: SelectionOwner.java,v 1.7 2008-03-09 21:52:09 robi Exp $
 //###########################################################################
 
 
@@ -103,8 +103,15 @@ public interface SelectionOwner
 
   /**
    * Resets the current selection to be empty.
+   * @param  propagate  A flag, indicating whether any associated panels
+   *                    should have their selection cleared as well.
+   *                    This is used by the {@link
+   *                    net.sourceforge.waters.gui.GraphEventPanel
+   *                    GraphEventPanel}, which in some cases needs to
+   *                    clear the selection in the associated graph as
+   *                    well.
    */
-  public void clearSelection();
+  public void clearSelection(boolean propagate);
 
   /**
    * Replaces the component's current selection by the given list.

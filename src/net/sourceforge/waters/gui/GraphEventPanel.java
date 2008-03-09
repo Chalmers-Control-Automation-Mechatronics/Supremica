@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   GraphEventPanel
 //###########################################################################
-//# $Id: GraphEventPanel.java,v 1.1 2008-03-07 04:11:02 robi Exp $
+//# $Id: GraphEventPanel.java,v 1.2 2008-03-09 21:52:09 robi Exp $
 //###########################################################################
 
 
@@ -275,12 +275,26 @@ public class GraphEventPanel
     return item;
   }
 
-  // public void clearSelection()
-  // inherited from javax.swing.JTable
+  public void clearSelection(final boolean propagate)
+  {
+    clearSelection();
+    if (propagate) {
+      final ControlledSurface surface = mRoot.getControlledSurface();
+      surface.clearSelection(propagate);
+    }
+  }
 
   public void replaceSelection(List<? extends Proxy> items)
   {
-    clearSelection();
+    boolean propagate = false;
+    for (final Proxy proxy : items) {
+      final int row = getRow(proxy);
+      if (row < 0) {
+        propagate = true;
+        break;
+      }
+    }
+    clearSelection(propagate);
     addToSelection(items);
   }
 
@@ -1091,10 +1105,8 @@ public class GraphEventPanel
         final boolean undoable = !replacements.isEmpty();
         final ReplaceInfo replacement = new ReplaceInfo(old, neo);
         replacements.add(0, replacement);
-        final ControlledSurface surface = mRoot.getControlledSurface();
-        final Command cmd =
-          new ReplaceCommand(replacements, GraphEventPanel.this,
-                             surface, "Label Editing");
+        final Command cmd = new ReplaceCommand
+          (replacements, GraphEventPanel.this, "Label Editing");
         if (undoable) {
           final UndoInterface undoer = mRoot.getUndoInterface();
           undoer.executeCommand(cmd);

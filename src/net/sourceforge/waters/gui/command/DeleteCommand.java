@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui.command
 //# CLASS:   DeleteCommand
 //###########################################################################
-//# $Id: DeleteCommand.java,v 1.4 2007-12-16 22:09:39 robi Exp $
+//# $Id: DeleteCommand.java,v 1.5 2008-03-09 21:52:09 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.gui.command;
@@ -117,7 +117,7 @@ public class DeleteCommand
     final List<Proxy> selection;
     final SelectionOwner panel = getPanel();
     if (getUpdatesSelection() && mHasBeenExecuted) {
-      panel.clearSelection();
+      panel.clearSelection(true);
       selection = getSelectionAfterDelete(mDeletes);
     } else {
       final List<Proxy> deselect = InsertInfo.getProxies(mDeletes);

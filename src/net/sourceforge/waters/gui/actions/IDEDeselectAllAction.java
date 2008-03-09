@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui.actions
 //# CLASS:   IDEDeselectAllAction
 //###########################################################################
-//# $Id: IDEDeselectAllAction.java,v 1.3 2008-03-07 04:11:02 robi Exp $
+//# $Id: IDEDeselectAllAction.java,v 1.4 2008-03-09 21:52:09 robi Exp $
 //###########################################################################
 
 
@@ -32,8 +32,8 @@ import org.supremica.gui.ide.IDE;
  * the system clipboard. To support this action, components including
  * editable items must implement the {@link
  * SelectionOwner#hasNonEmptySelection() hasNonEmptySelection()} and {@link
- * SelectionOwner#clearSelection() clearSelection()} methods of the {@link
- * SelectionOwner} interface.</P>
+ * SelectionOwner#clearSelection(boolean) clearSelection()} methods of the
+ * {@link SelectionOwner} interface.</P>
  *
  * @author Robi Malik
  */
@@ -64,7 +64,7 @@ public class IDEDeselectAllAction
     final SelectionOwner watersOwner = tracker.getWatersSelectionOwner();
     final JTextComponent swingOwner = tracker.getSwingSelectionOwner();
     if (watersOwner != null) {
-      watersOwner.clearSelection();
+      watersOwner.clearSelection(false);
     } else if (swingOwner != null) {
       final int pos = swingOwner.getSelectionStart();
       swingOwner.setCaretPosition(pos);

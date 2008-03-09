@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui.actions
 //# CLASS:   IDESelectAllAction
 //###########################################################################
-//# $Id: IDESelectAllAction.java,v 1.2 2007-12-04 03:22:54 robi Exp $
+//# $Id: IDESelectAllAction.java,v 1.3 2008-03-09 21:52:09 robi Exp $
 //###########################################################################
 
 
@@ -35,9 +35,8 @@ import org.supremica.gui.ide.IDE;
  * items must implement the {@link SelectionOwner#canSelectMore()
  * canSelectMore()}, {@link SelectionOwner#getAllSelectableItems()
  * getAllSelectableItems()}, {@link SelectionOwner#canSelectMore()
- * canSelectMore()}, {@link SelectionOwner#clearSelection()
- * clearSelection()}, and {@link SelectionOwner#addToSelection(List<?
- * extends Proxy>) addToSelection()} methods of the {@link SelectionOwner}
+ * canSelectMore()}, {@link SelectionOwner#replaceSelection(List<?
+ * extends Proxy>) replaceSelection()} methods of the {@link SelectionOwner}
  * interface.</P>
  *
  * @author Robi Malik
@@ -70,8 +69,7 @@ public class IDESelectAllAction
     final JTextComponent swingOwner = tracker.getSwingSelectionOwner();
     if (watersOwner != null) {
       final List<? extends Proxy> all = watersOwner.getAllSelectableItems();
-      watersOwner.clearSelection();
-      watersOwner.addToSelection(all);
+      watersOwner.replaceSelection(all);
     } else if (swingOwner != null) {
       final int len = swingOwner.getText().length();
       swingOwner.setCaretPosition(0);
