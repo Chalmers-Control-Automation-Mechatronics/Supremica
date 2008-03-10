@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   SimpleComponentEditorDialog
 //###########################################################################
-//# $Id: SimpleComponentEditorDialog.java,v 1.3 2008-03-10 22:50:39 robi Exp $
+//# $Id: SimpleComponentEditorDialog.java,v 1.4 2008-03-10 23:55:03 robi Exp $
 //###########################################################################
 
 
@@ -30,7 +30,6 @@ import javax.swing.JCheckBox;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JRadioButton;
 import javax.swing.border.Border;
 
 import net.sourceforge.waters.gui.command.Command;
@@ -38,6 +37,7 @@ import net.sourceforge.waters.gui.command.EditCommand;
 import net.sourceforge.waters.gui.command.InsertCommand;
 import net.sourceforge.waters.gui.renderer.GeometryAbsentException;
 import net.sourceforge.waters.gui.transfer.SelectionOwner;
+import net.sourceforge.waters.gui.util.IconRadioButton;
 import net.sourceforge.waters.gui.util.RaisedDialogPanel;
 import net.sourceforge.waters.model.base.WatersRuntimeException;
 import net.sourceforge.waters.model.expr.ExpressionParser;
@@ -132,18 +132,15 @@ public class SimpleComponentEditorDialog
     mNameInput.setToolTipText("Enter automaton name, e.g., x or v[i]");
     mKindLabel = new JLabel("Kind:");
     mKindGroup = new ButtonGroup();
-    mPlantButton = new JRadioButton("Plant");
-    mPlantButton.setRequestFocusEnabled(false);
-    mKindGroup.add(mPlantButton);
-    mPropertyButton = new JRadioButton("Property");
-    mPropertyButton.setRequestFocusEnabled(false);
-    mKindGroup.add(mPropertyButton);
-    mSpecButton = new JRadioButton("Specification");
-    mSpecButton.setRequestFocusEnabled(false);
-    mKindGroup.add(mSpecButton);
-    mSupervisorButton = new JRadioButton("Supervisor");
-    mSupervisorButton.setRequestFocusEnabled(false);
-    mKindGroup.add(mSupervisorButton);
+    mPlantButton =
+      new IconRadioButton("Plant", IconLoader.ICON_PLANT, mKindGroup);
+    mPropertyButton =
+      new IconRadioButton("Property", IconLoader.ICON_PROPERTY, mKindGroup);
+    mSpecButton =
+      new IconRadioButton("Specification", IconLoader.ICON_SPEC, mKindGroup);
+    mSupervisorButton =
+      new IconRadioButton("Supervisor", IconLoader.ICON_SUPERVISOR,
+                          mKindGroup);
     switch (template.getKind()) {
     case PLANT:
       mPlantButton.setSelected(true);
@@ -269,8 +266,8 @@ public class SimpleComponentEditorDialog
     constraints.gridy = GridBagConstraints.RELATIVE;
     constraints.gridwidth = GridBagConstraints.REMAINDER;
     constraints.weightx = 1.0;
-    constraints.weighty = 0.0;
-    constraints.fill = GridBagConstraints.HORIZONTAL;
+    constraints.weighty = 1.0;
+    constraints.fill = GridBagConstraints.BOTH;
     constraints.insets = new Insets(0, 0, 0, 0);
     layout.setConstraints(mMainPanel, constraints);
     contents.add(mMainPanel);
@@ -371,10 +368,10 @@ public class SimpleComponentEditorDialog
   private JLabel mDeterministicLabel;
   private JLabel mKindLabel;
   private ButtonGroup mKindGroup;
-  private JRadioButton mPlantButton;
-  private JRadioButton mPropertyButton;
-  private JRadioButton mSpecButton;
-  private JRadioButton mSupervisorButton;
+  private IconRadioButton mPlantButton;
+  private IconRadioButton mPropertyButton;
+  private IconRadioButton mSpecButton;
+  private IconRadioButton mSupervisorButton;
   private JCheckBox mDeterministicButton;
 
   private JPanel mErrorPanel;

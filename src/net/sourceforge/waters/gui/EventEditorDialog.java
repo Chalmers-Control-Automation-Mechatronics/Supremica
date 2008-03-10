@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   EventEditorDialog
 //###########################################################################
-//# $Id: EventEditorDialog.java,v 1.25 2008-03-10 22:50:38 robi Exp $
+//# $Id: EventEditorDialog.java,v 1.26 2008-03-10 23:55:03 robi Exp $
 //###########################################################################
 
 
@@ -43,7 +43,6 @@ import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JTable;
 import javax.swing.JPanel;
-import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
 import javax.swing.ListSelectionModel;
 import javax.swing.SwingUtilities;
@@ -60,6 +59,7 @@ import net.sourceforge.waters.gui.command.InsertCommand;
 import net.sourceforge.waters.gui.command.EditCommand;
 import net.sourceforge.waters.gui.transfer.SelectionOwner;
 import net.sourceforge.waters.gui.util.RaisedDialogPanel;
+import net.sourceforge.waters.gui.util.IconRadioButton;
 import net.sourceforge.waters.model.expr.ExpressionParser;
 import net.sourceforge.waters.model.expr.Operator;
 import net.sourceforge.waters.model.expr.ParseException;
@@ -197,16 +197,16 @@ public class EventEditorDialog
         });
       mKindLabel = new JLabel("Kind:");
       mKindGroup = new ButtonGroup();
-      mControllableButton = new JRadioButton("Controllable");
-      mControllableButton.setRequestFocusEnabled(false);
-      mKindGroup.add(mControllableButton);
-      mUncontrollableButton = new JRadioButton("Uncontrollable");
-      mUncontrollableButton.setRequestFocusEnabled(false);
-      mKindGroup.add(mUncontrollableButton);
-      mPropositionButton = new JRadioButton("Proposition");
-      mPropositionButton.setRequestFocusEnabled(false);
+      mControllableButton =
+        new IconRadioButton("Controllable", IconLoader.ICON_CONTROLLABLE,
+                            mKindGroup);
+      mUncontrollableButton =
+        new IconRadioButton("Uncontrollable", IconLoader.ICON_UNCONTROLLABLE,
+                            mKindGroup);
+      mPropositionButton =
+        new IconRadioButton("Proposition", PropositionIcon.getDefaultIcon(),
+                            mKindGroup);
       mPropositionButton.setEnabled(advanced);
-      mKindGroup.add(mPropositionButton);
       switch (template.getKind()) {
       case CONTROLLABLE:
         mControllableButton.setSelected(true);
@@ -1121,11 +1121,11 @@ public class EventEditorDialog
   private JPanel mNamePanel;
   private JLabel mNameLabel;
   private SimpleExpressionCell mNameInput;
-  private JRadioButton mControllableButton;
   private JLabel mKindLabel;
   private ButtonGroup mKindGroup;
-  private JRadioButton mUncontrollableButton;
-  private JRadioButton mPropositionButton;
+  private IconRadioButton mControllableButton;
+  private IconRadioButton mUncontrollableButton;
+  private IconRadioButton mPropositionButton;
   private JCheckBox mObservableButton;
   private JCheckBox mParameterButton;
   private JCheckBox mRequiredButton;
