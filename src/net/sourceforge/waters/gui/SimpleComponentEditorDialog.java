@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   SimpleComponentEditorDialog
 //###########################################################################
-//# $Id: SimpleComponentEditorDialog.java,v 1.2 2007-12-04 03:22:54 robi Exp $
+//# $Id: SimpleComponentEditorDialog.java,v 1.3 2008-03-10 22:50:39 robi Exp $
 //###########################################################################
 
 
@@ -38,6 +38,7 @@ import net.sourceforge.waters.gui.command.EditCommand;
 import net.sourceforge.waters.gui.command.InsertCommand;
 import net.sourceforge.waters.gui.renderer.GeometryAbsentException;
 import net.sourceforge.waters.gui.transfer.SelectionOwner;
+import net.sourceforge.waters.gui.util.RaisedDialogPanel;
 import net.sourceforge.waters.model.base.WatersRuntimeException;
 import net.sourceforge.waters.model.expr.ExpressionParser;
 import net.sourceforge.waters.model.module.IdentifierProxy;

@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   VariableEditorDialog
 //###########################################################################
-//# $Id: VariableEditorDialog.java,v 1.5 2007-12-04 03:22:54 robi Exp $
+//# $Id: VariableEditorDialog.java,v 1.6 2008-03-10 22:50:39 robi Exp $
 //###########################################################################
 
 
@@ -55,6 +55,7 @@ import net.sourceforge.waters.gui.command.Command;
 import net.sourceforge.waters.gui.command.EditCommand;
 import net.sourceforge.waters.gui.command.InsertCommand;
 import net.sourceforge.waters.gui.transfer.SelectionOwner;
+import net.sourceforge.waters.gui.util.RaisedDialogPanel;
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
 import net.sourceforge.waters.model.expr.BinaryOperator;
 import net.sourceforge.waters.model.expr.ExpressionParser;

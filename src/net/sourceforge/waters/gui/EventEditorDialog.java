@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   EventEditorDialog
 //###########################################################################
-//# $Id: EventEditorDialog.java,v 1.24 2008-02-18 02:59:13 robi Exp $
+//# $Id: EventEditorDialog.java,v 1.25 2008-03-10 22:50:38 robi Exp $
 //###########################################################################
 
 
@@ -59,6 +59,7 @@ import net.sourceforge.waters.gui.command.Command;
 import net.sourceforge.waters.gui.command.InsertCommand;
 import net.sourceforge.waters.gui.command.EditCommand;
 import net.sourceforge.waters.gui.transfer.SelectionOwner;
+import net.sourceforge.waters.gui.util.RaisedDialogPanel;
 import net.sourceforge.waters.model.expr.ExpressionParser;
 import net.sourceforge.waters.model.expr.Operator;
 import net.sourceforge.waters.model.expr.ParseException;

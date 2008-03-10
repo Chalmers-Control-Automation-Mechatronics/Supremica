@@ -1,14 +1,14 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
 //# PROJECT: Waters
-//# PACKAGE: net.sourceforge.waters.gui
+//# PACKAGE: net.sourceforge.waters.gui.util
 //# CLASS:   RaisedDialogPanel
 //###########################################################################
-//# $Id: RaisedDialogPanel.java,v 1.1 2006-08-08 23:59:21 robi Exp $
+//# $Id: RaisedDialogPanel.java,v 1.1 2008-03-10 22:50:39 robi Exp $
 //###########################################################################
 
 
-package net.sourceforge.waters.gui;
+package net.sourceforge.waters.gui.util;
 
 import javax.swing.BorderFactory;
 import javax.swing.JPanel;
