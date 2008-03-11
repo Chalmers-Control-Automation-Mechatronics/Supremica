@@ -77,6 +77,11 @@ public class MultithreadedAstar
     {
         super(theAutomata, heuristic, manualExpansion, buildSchedule, isRelaxationProvider);
         
+        // Creates an instance of a class that is resposible for the expansion of 
+        // the synchronized states. The second parameter, 'immediateChoiceAtUncontrollability', 
+        // is changed to true compared to in ModifiedAstar.java.
+        expander = new NodeExpander(manualExpansion, true, theAutomata, this);
+        
         this.rootNode = rootNode;
         this.branchingProbality = branchingProbality;
         
@@ -87,6 +92,7 @@ public class MultithreadedAstar
     }
     
     public MultithreadedAstar(MultithreadedAstar parentThread, MultithreadedNode rootNode, double branchingProbality)
+        throws Exception
     {
         this.parentThread = parentThread;
         theAutomata = parentThread.getAllAutomata();
@@ -103,10 +109,12 @@ public class MultithreadedAstar
         
         this.rootNode = rootNode;
         this.branchingProbality = branchingProbality;
+        
+        init();
     }
     
     protected void init()
-    throws Exception
+        throws Exception
     {
         if (rootNode == null)
         {
@@ -121,6 +129,8 @@ public class MultithreadedAstar
             initTrees();
             
             openTree.add(rootNode);
+            
+            isInitialized = true; // Is needed for synchronization purposes
         }
     }
     

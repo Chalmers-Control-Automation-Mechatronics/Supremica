@@ -272,10 +272,19 @@ public class Milp
         try
         {
             schedule();
+            
+            if (isRunning)
+            {
+                requestStop(true);
+            }
+            else
+            {
+                errorMsgs += "Scheduling interrupted";
+            }
         }
         catch (Exception ex)
         {
-            milpSolver.cleanUp();
+            //milpSolver.cleanUp();
             
             isRunning = false;
             
@@ -362,15 +371,6 @@ public class Milp
             Automata autosToBeBalanced = theAutomata.clone();
             autosToBeBalanced.addAutomaton(getSchedule());
             new VelocityBalancer(autosToBeBalanced, this);
-        }
-        
-        if (isRunning)
-        {
-            requestStop(true);
-        }
-        else
-        {
-            errorMsgs += "Scheduling interrupted";
         }
     }
     

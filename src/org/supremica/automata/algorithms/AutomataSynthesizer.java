@@ -243,7 +243,6 @@ public class AutomataSynthesizer
 
             AutomataBDDSynthesizer bddSynthesizer = new AutomataBDDSynthesizer(newAutomata, do_nb, do_c);
 
-
             if (synthesizerOptions.doExtractSupervisor())
             {
 				//Perform BDD synthesis

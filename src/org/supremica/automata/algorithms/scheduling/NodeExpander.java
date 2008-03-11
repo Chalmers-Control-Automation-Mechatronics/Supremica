@@ -128,90 +128,90 @@ public class NodeExpander
     }
 
     public Collection expandNodeManually(Node node, int[] activeAutomataIndex) 
-	{
-		uncontrollableEventFound = false;
-		ArrayList children = new ArrayList();
+    {
+        uncontrollableEventFound = false;
+        ArrayList children = new ArrayList();
 
-		for (int i=0; i<activeAutomataIndex.length; i++)
-		{
-			int automatonIndex = activeAutomataIndex[i]; 
-			int stateIndex = (int)node.getValueAt(automatonIndex);
+        for (int i=0; i<activeAutomataIndex.length; i++)
+        {
+            int automatonIndex = activeAutomataIndex[i]; 
+            int stateIndex = (int)node.getValueAt(automatonIndex);
 
-			State st = indexMap.getStateAt(indexMap.getAutomatonAt(automatonIndex), stateIndex);
-			Iterator<Arc> arcIt = st.outgoingArcsIterator();
+            State st = indexMap.getStateAt(indexMap.getAutomatonAt(automatonIndex), stateIndex);
+            Iterator<Arc> arcIt = st.outgoingArcsIterator();
 
-			while (arcIt.hasNext()) 
-			{
-				LabeledEvent currEvent = arcIt.next().getEvent();
+            while (arcIt.hasNext()) 
+            {
+                LabeledEvent currEvent = arcIt.next().getEvent();
 
-				// If uncontrollable events should be immediately chosen when possible,
-				// special treatment is needed when finding the successors of the current state...
-				if (immediateChoiceAtUncontrollability)
-				{
-					if (uncontrollableEventFound)
-					{
-						// If an outgoing uncontrollable event already has been detected,
-						// loop until another uncontrollable event is found.
-						while (currEvent.isControllable())
-						{
-							if (!arcIt.hasNext())
-							{
-								// If no more uncontrollale events are found, return.
-								return children;
-							}
-							
-							currEvent = arcIt.next().getEvent();
-						}
-					}
-					else 
-					{
-						// If the current event is the first uncontrollanble event that is found 
-						// during this expansion, then previously collected "controllable" 
-						// successors are no longer legitimate successors. Thus the 'children'-list
-						// is cleared. 
-						if (!currEvent.isControllable())
-						{
-							uncontrollableEventFound = true;
-							children.clear();
-						}
-					}
-				}
-				
-				Object currSpecIndexObj = specEventTable.get(currEvent);
+                // If uncontrollable events should be immediately chosen when possible,
+                // special treatment is needed when finding the successors of the current state...
+                if (immediateChoiceAtUncontrollability)
+                {
+                    if (uncontrollableEventFound)
+                    {
+                        // If an outgoing uncontrollable event already has been detected,
+                        // loop until another uncontrollable event is found.
+                        while (currEvent.isControllable())
+                        {
+                            if (!arcIt.hasNext())
+                            {
+                                // If no more uncontrollale events are found, return.
+                                return children;
+                            }
 
-				// If current event is not booking/unbooking, change the current plants state
-				if (currSpecIndexObj == null) 
-				{
-					Node newNode = node.emptyClone();
-					newNode.setBasis(newNodeBasis(node, new int[]{i}, new int[]{st.nextState(currEvent).getIndex()}, st.nextState(currEvent).getCost()));
-					children.add(newNode);
-				}
-				// Else, change the current plants state together with the state of the appropriate zone
-				else 
-				{
-					int currSpecIndex = ((Integer)currSpecIndexObj).intValue();
-					Iterator<State> enabledStatesIt = indexMap.getAutomatonAt(currSpecIndex).statesThatEnableEventIterator(currEvent.getLabel());
+                            currEvent = arcIt.next().getEvent();
+                        }
+                    }
+                    else 
+                    {
+                        // If the current event is the first uncontrollanble event that is found 
+                        // during this expansion, then previously collected "controllable" 
+                        // successors are no longer legitimate successors. Thus the 'children'-list
+                        // is cleared. 
+                        if (!currEvent.isControllable())
+                        {
+                            uncontrollableEventFound = true;
+                            children.clear();
+                        }
+                    }
+                }
 
-					while (enabledStatesIt.hasNext()) 
-					{
-						State specState = enabledStatesIt.next();
-						if (node.getValueAt(currSpecIndex) == specState.getIndex()) 
-						{
-							int[] changedIndices = new int[]{activeAutomataIndex[i], currSpecIndex};
-							int[] newStateIndices = new int[]{st.nextState(currEvent).getIndex(), specState.nextState(currEvent).getIndex()};
+                Object currSpecIndexObj = specEventTable.get(currEvent);
 
-							Node newNode = node.emptyClone();
-							newNode.setBasis(newNodeBasis(node, changedIndices, newStateIndices, st.nextState(currEvent).getCost()));
-							children.add(newNode);
+                // If current event is not booking/unbooking, change the current plants state
+                if (currSpecIndexObj == null) 
+                {
+                    Node newNode = node.emptyClone();
+                    newNode.setBasis(newNodeBasis(node, new int[]{i}, new int[]{st.nextState(currEvent).getIndex()}, st.nextState(currEvent).getCost()));
+                    children.add(newNode);
+                }
+                // Else, change the current plants state together with the state of the appropriate zone
+                else 
+                {
+                    int currSpecIndex = ((Integer)currSpecIndexObj).intValue();
+                    Iterator<State> enabledStatesIt = indexMap.getAutomatonAt(currSpecIndex).statesThatEnableEventIterator(currEvent.getLabel());
 
-							break;
-						}
-					}
-				}
-			}
-		}
+                    while (enabledStatesIt.hasNext()) 
+                    {
+                        State specState = enabledStatesIt.next();
+                        if (node.getValueAt(currSpecIndex) == specState.getIndex()) 
+                        {
+                            int[] changedIndices = new int[]{activeAutomataIndex[i], currSpecIndex};
+                            int[] newStateIndices = new int[]{st.nextState(currEvent).getIndex(), specState.nextState(currEvent).getIndex()};
 
-		return children;
+                            Node newNode = node.emptyClone();
+                            newNode.setBasis(newNodeBasis(node, changedIndices, newStateIndices, st.nextState(currEvent).getCost()));
+                            children.add(newNode);
+
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+
+        return children;
     }
 
 	//Tillf (Test)
@@ -571,10 +571,10 @@ public class NodeExpander
         return newNodeBasis;
     }
 
-	public double[] getCosts(Node node)
-	{
-		return getCosts(node.getBasis());
-	}
+    public double[] getCosts(Node node)
+    {
+            return getCosts(node.getBasis());
+    }
 
     public double[] getCosts(double[] node) 
 	{
@@ -588,10 +588,10 @@ public class NodeExpander
 		return costs;
     }
 
-	public boolean isUncontrollableEventFound()
-	{
-		return uncontrollableEventFound;
-	}
+    public boolean isUncontrollableEventFound()
+    {
+        return uncontrollableEventFound;
+    }
 
     /**
      * Converts the representation of the initial state to the double[]-representation of a node.

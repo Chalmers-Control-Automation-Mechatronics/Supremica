@@ -216,6 +216,8 @@ public class ModifiedAstar
         this.manualExpansion = manualExpansion;
         this.buildSchedule = buildSchedule;
         this.isRelaxationProvider = isRelaxationProvider;
+        
+        init();
     }    
 	
     public ModifiedAstar(Automata theAutomata, String heuristic, boolean manualExpansion, boolean buildSchedule) 
@@ -247,12 +249,12 @@ public class ModifiedAstar
     /*                                 INIT METHODS                                         */
     /****************************************************************************************/
     
-	public void startSearchThread()
-	{
+    public void startSearchThread()
+    {
         astarThread = new Thread(this);
         isRunning = true;
         astarThread.start();
-	}
+    }
 
     public void run()
     {
@@ -260,20 +262,11 @@ public class ModifiedAstar
         {
             ActionTimer totalTimer = new ActionTimer();
 
-            if (isRunning)
-            {
-                totalTimer.restart();
-
-                init();
-
-                // Is needed for synchronization purposes
-                isInitialized = true;
-            }
-
             if (!isRelaxationProvider)
             {
                 if (isRunning)
                 {
+                    totalTimer.restart();
                     schedule();
 
                     String totalTimeStr = "Total optimization time = " + totalTimer.elapsedTime() + "ms";
@@ -342,7 +335,7 @@ public class ModifiedAstar
 
         // Creates an instance of the relaxation class (search guidance), as 
         // specified by the user through the GUI.
-		initRelaxer();
+        initRelaxer();
 
         //Borde r�cka med plantAutomata.size(), fast d� kanske man m�ste �ndra lite p� andra st�llen ocks�
         keyMapping = new int[theAutomata.size()];
@@ -362,6 +355,8 @@ public class ModifiedAstar
 
         String initTimeStr = "Initialization time = " + timer.elapsedTime() + "ms";
 		infoMsgs += "\t" + initTimeStr + "\n";
+                
+        isInitialized = true; // Is needed for synchronization purposes
     }
     
     protected void initAuxIndices()
@@ -1299,18 +1294,18 @@ public class ModifiedAstar
             if (fromNode.getValueAt(i) != toNode.getValueAt(i))
             {
                 Automaton auto = indexMap.getAutomatonAt(i);
-				State fromState = indexMap.getStateAt(auto, (int)fromNode.getValueAt(i));
-				State toState = indexMap.getStateAt(auto, (int)toNode.getValueAt(i));
-                
-				for (Iterator<Arc> arcsIt = fromState.outgoingArcsIterator(); arcsIt.hasNext(); )
-				{
-					Arc currArc = arcsIt.next();
+                State fromState = indexMap.getStateAt(auto, (int)fromNode.getValueAt(i));
+                State toState = indexMap.getStateAt(auto, (int)toNode.getValueAt(i));
 
-					if (currArc.getToState().equals(toState))
-					{
-						return currArc;
-					}
-				}
+                for (Iterator<Arc> arcsIt = fromState.outgoingArcsIterator(); arcsIt.hasNext(); )
+                {
+                    Arc currArc = arcsIt.next();
+
+                    if (currArc.getToState().equals(toState))
+                    {
+                        return currArc;
+                    }
+                }
             }
         }
         

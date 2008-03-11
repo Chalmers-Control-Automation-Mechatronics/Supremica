@@ -69,8 +69,8 @@ public class Arc
     private State toState;
 
     // TEMP-solution (use EFA instead)
-    public static final double UNDEF_PROBABILITY = -1;
-    private double probability = UNDEF_PROBABILITY;  
+    public static final double DEFAULT_PROBABILITY = 1;
+    private double probability = DEFAULT_PROBABILITY;  
     
     public Arc(State from, State to, LabeledEvent event)
     {
@@ -288,6 +288,7 @@ public class Arc
 
     public void setProbability(double probability)
     {
+        String label = getEvent().getName();
 	this.probability = probability;
     }
 
