@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.automata.IO
 //# CLASS:   ProjectBuildFromWaters
 //###########################################################################
-//# $Id: ProjectBuildFromWaters.java,v 1.28 2008-03-13 16:18:40 avenir Exp $
+//# $Id: ProjectBuildFromWaters.java,v 1.29 2008-03-13 23:25:22 robi Exp $
 //###########################################################################
 
 /*
@@ -71,9 +71,10 @@ import net.sourceforge.waters.model.module.ModuleProxy;
 import net.sourceforge.waters.model.module.EventDeclProxy;
 import net.sourceforge.waters.plain.des.ProductDESElementFactory;
 import net.sourceforge.waters.xsd.base.EventKind;
-import org.supremica.log.*;
 
+import org.supremica.log.*;
 import org.supremica.automata.*;
+import org.supremica.properties.Config;
 
 
 /**
@@ -148,7 +149,8 @@ public class ProjectBuildFromWaters
             ProductDESElementFactory.getInstance();
         ModuleCompiler compiler =
             new ModuleCompiler(mDocumentManager, factory, module);
-        
+		final boolean expand = Config.EXPAND_EXTENDED_AUTOMATA.isTrue();
+        compiler.setExpandingEFATransitions(expand);
         return build(compiler.compile());
     }
     

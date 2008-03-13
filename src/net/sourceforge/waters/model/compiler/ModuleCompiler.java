@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.module
 //# CLASS:   ModuleCompiler
 //###########################################################################
-//# $Id: ModuleCompiler.java,v 1.106 2008-03-13 16:18:23 avenir Exp $
+//# $Id: ModuleCompiler.java,v 1.107 2008-03-13 23:25:22 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.compiler;
@@ -88,7 +88,6 @@ import net.sourceforge.waters.xsd.module.ScopeKind;
  * Depend on org.supremica.automata ? Frown ...
  */
 import org.supremica.automata.ExtendedAutomataExpander;
-import org.supremica.properties.Config;
 
 
 public class ModuleCompiler extends AbstractModuleProxyVisitor
@@ -109,6 +108,7 @@ public class ModuleCompiler extends AbstractModuleProxyVisitor
         new DNFConverter(mModuleFactory, mOperatorTable, mComparator);
     mDNFMinimizer =
         new DNFMinimizer(mDNFConverter, mOperatorTable);
+    mIsExpandingEFATransitions = true;
     mModule = module;
     mContext = null;
     mParameterMap = null;
@@ -156,12 +156,9 @@ public class ModuleCompiler extends AbstractModuleProxyVisitor
         final ModuleProxyCloner cloner =
           ModuleSubjectFactory.getCloningInstance();
         final ModuleSubject subject = (ModuleSubject) cloner.getClone(mModule);
-        if (Config.EXPAND_EXTENDED_AUTOMATA.isTrue())
-        {
+        if (mIsExpandingEFATransitions) {
             ExtendedAutomataExpander.expandTransitions(subject);
-        }
-        else
-        {
+        } else {
             ExtendedAutomataExpander.dontExpandTransitions(subject);
         }
         visitModuleProxy(subject);
@@ -186,6 +183,21 @@ public class ModuleCompiler extends AbstractModuleProxyVisitor
   }
 
 
+  //##########################################################################
+  //# Configuration
+  public boolean isExpandingEFATransitions()
+  {
+    return mIsExpandingEFATransitions;
+  }
+
+  public void setExpandingEFATransitions(final boolean expand)
+  {
+    mIsExpandingEFATransitions = expand;
+  }
+
+
+  //##########################################################################
+  //# EFA
   private void isEFA(List<Proxy> componentList)
   {
     for (final Proxy proxy : componentList) {
@@ -580,8 +592,7 @@ public class ModuleCompiler extends AbstractModuleProxyVisitor
     visitCollection(aliases);
     final List<Proxy> components = module.getComponentList();
     visitCollection(components);
-    if (mIsEFA && Config.EXPAND_EXTENDED_AUTOMATA.isTrue())
-    {
+    if (mIsEFA && mIsExpandingEFATransitions) {
         compileEFA();
     }
     return null;
@@ -2391,6 +2402,8 @@ private List<List<BinaryExpressionProxy>>
   private final ModuleProxyFactory mModuleFactory;
   private final ModuleProxy mModule;
   private final NameCompiler mNameCompiler = new NameCompiler();
+
+  private boolean mIsExpandingEFATransitions;
 
   private CompilerContext mContext;
   private CompiledEventListValue mEventList;
