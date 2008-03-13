@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   EventEditorDialog
 //###########################################################################
-//# $Id: EventEditorDialog.java,v 1.26 2008-03-10 23:55:03 robi Exp $
+//# $Id: EventEditorDialog.java,v 1.27 2008-03-13 01:30:11 robi Exp $
 //###########################################################################
 
 
@@ -25,8 +25,6 @@ import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.KeyAdapter;
-import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
@@ -34,6 +32,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.LinkedList;
 import java.util.Set;
+import javax.swing.Action;
 import javax.swing.BorderFactory;
 import javax.swing.ButtonGroup;
 import javax.swing.JButton;
@@ -43,6 +42,7 @@ import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JTable;
 import javax.swing.JPanel;
+import javax.swing.JRootPane;
 import javax.swing.JScrollPane;
 import javax.swing.ListSelectionModel;
 import javax.swing.SwingUtilities;
@@ -58,11 +58,13 @@ import net.sourceforge.waters.gui.command.Command;
 import net.sourceforge.waters.gui.command.InsertCommand;
 import net.sourceforge.waters.gui.command.EditCommand;
 import net.sourceforge.waters.gui.transfer.SelectionOwner;
+import net.sourceforge.waters.gui.util.DialogCancelAction;
 import net.sourceforge.waters.gui.util.RaisedDialogPanel;
 import net.sourceforge.waters.gui.util.IconRadioButton;
 import net.sourceforge.waters.model.expr.ExpressionParser;
 import net.sourceforge.waters.model.expr.Operator;
 import net.sourceforge.waters.model.expr.ParseException;
+import net.sourceforge.waters.model.module.SimpleIdentifierProxy;
 import net.sourceforge.waters.subject.module.ColorGeometrySubject;
 import net.sourceforge.waters.subject.module.EventDeclSubject;
 import net.sourceforge.waters.subject.module.ModuleSubject;
@@ -178,7 +180,7 @@ public class EventEditorDialog
       mNamePanel = new RaisedDialogPanel();
       mNameLabel = new JLabel("Name:");
       final FormattedInputParser parser = new EventNameInputParser();
-      mNameInput = new SimpleExpressionCell(template.getName(), parser);
+      mNameInput = new SimpleExpressionCell(template.getIdentifier(), parser);
       commithandler = new ActionListener() {
           public void actionPerformed(final ActionEvent event)
           {
@@ -187,14 +189,6 @@ public class EventEditorDialog
           }
         };
       mNameInput.addActionListener(commithandler);
-      mNameInput.addKeyListener(new KeyAdapter() {
-          public void keyTyped(final KeyEvent event)
-          {
-            if (event.getKeyChar() == '\n' && event.getModifiers() == 0) {
-              commitDialog();
-            }
-          }
-        });
       mKindLabel = new JLabel("Kind:");
       mKindGroup = new ButtonGroup();
       mControllableButton =
@@ -239,7 +233,8 @@ public class EventEditorDialog
       okButton.setRequestFocusEnabled(false);
       okButton.addActionListener(commithandler);
       mButtonsPanel.add(okButton);
-      final JButton cancelButton = new JButton("Cancel");
+      final Action cancelAction = DialogCancelAction.getInstance();
+      final JButton cancelButton = new JButton(cancelAction);
       cancelButton.setRequestFocusEnabled(false);
       cancelButton.addActionListener(new ActionListener() {
           public void actionPerformed(final ActionEvent event)
@@ -248,6 +243,11 @@ public class EventEditorDialog
           }
         });
       mButtonsPanel.add(cancelButton);
+
+      final JRootPane root = getRootPane();
+      root.setDefaultButton(okButton);
+      DialogCancelAction.register(this);
+
       // And record the colour ...
       final ColorGeometrySubject geo = template.getColorGeometry();
       if (geo == null || geo.getColorSet().isEmpty()) {
@@ -906,8 +906,8 @@ public class EventEditorDialog
           });
       }
     } else {
-      final String name = mNameInput.getText();
-      final SimpleIdentifierSubject ident = new SimpleIdentifierSubject(name);
+      final SimpleIdentifierSubject ident = 
+        (SimpleIdentifierSubject) mNameInput.getValue();
       final EventKind kind;
       if (mControllableButton.isSelected()) {
         kind = EventKind.CONTROLLABLE;
@@ -1012,16 +1012,17 @@ public class EventEditorDialog
 
     //#######################################################################
     //# Interface net.sourceforge.waters.gui.FormattedInputParser
-    public String parse(final String text)
+    public SimpleIdentifierProxy parse(final String text)
       throws ParseException
     {
       final ExpressionParser parser = getExpressionParser();
-      parser.parseSimpleIdentifier(text);
+      final SimpleIdentifierProxy ident = parser.parseSimpleIdentifier(text);
+      final String newname = ident.getName();
       final String oldname = mEventDecl == null ? "" : mEventDecl.getName();
-      if (!text.equals(oldname)) {
-        mModuleContext.checkNewEventName(text);
+      if (!newname.equals(oldname)) {
+        mModuleContext.checkNewEventName(newname);
       }
-      return text;
+      return ident;
     }
 
     public DocumentFilter getDocumentFilter()

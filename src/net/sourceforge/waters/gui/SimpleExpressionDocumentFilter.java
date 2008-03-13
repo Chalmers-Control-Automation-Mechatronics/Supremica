@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   SimpleExpressionDocumentFilter
 //###########################################################################
-//# $Id: SimpleExpressionDocumentFilter.java,v 1.2 2007-12-04 03:22:54 robi Exp $
+//# $Id: SimpleExpressionDocumentFilter.java,v 1.3 2008-03-13 01:30:11 robi Exp $
 //###########################################################################
 
 
@@ -27,8 +27,8 @@ class SimpleExpressionDocumentFilter
   {
     mExpressionParser = parser;
   }
-		       
-  
+
+
   //#########################################################################
   //# Overrides for class javax.swing.DocumentFilter
   public void insertString(final DocumentFilter.FilterBypass bypass,

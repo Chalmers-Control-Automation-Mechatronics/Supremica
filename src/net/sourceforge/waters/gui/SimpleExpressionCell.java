@@ -4,15 +4,22 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   SimpleExpressionCell
 //###########################################################################
-//# $Id: SimpleExpressionCell.java,v 1.11 2007-12-04 03:22:54 robi Exp $
+//# $Id: SimpleExpressionCell.java,v 1.12 2008-03-13 01:30:11 robi Exp $
 //###########################################################################
 
 
 package net.sourceforge.waters.gui;
 
+import java.awt.event.ActionEvent;
+import java.awt.event.KeyEvent;
+import java.beans.PropertyChangeListener;
+import javax.swing.Action;
+import javax.swing.ActionMap;
+import javax.swing.InputMap;
 import javax.swing.InputVerifier;
 import javax.swing.JComponent;
 import javax.swing.JFormattedTextField;
+import javax.swing.KeyStroke;
 import javax.swing.text.DefaultFormatter;
 import javax.swing.text.DefaultFormatterFactory;
 import javax.swing.text.DocumentFilter;
@@ -71,6 +78,12 @@ public class SimpleExpressionCell
     setFormatterFactory(factory);
     setInputVerifier(mVerifier);
     setValue(value);
+
+    final KeyStroke stroke = KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0);
+    final InputMap imap = getInputMap();
+    final ActionMap amap = getActionMap();
+    final Object name = imap.get(stroke);
+    mTextFieldEscapeAction = amap.get(name);
   }
 
 
@@ -88,11 +101,35 @@ public class SimpleExpressionCell
 
 
   //#########################################################################
-  //# Overrides for Base Class JFormattedTextField
+  //# Overrides for Base Class javax.swing.JFormattedTextField
   public void setValue(final Object value)
   {
     super.setValue(value);
     mAllowNull = (value == null);
+  }
+
+
+  //#########################################################################
+  //# Overrides for Base Class javax.swing.JComponent
+  public void setToolTipText(final String text)
+  {
+    super.setToolTipText(text);
+    final KeyStroke stroke = KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0);
+    final InputMap imap = getInputMap();
+    final ActionMap amap = getActionMap();
+    final Object name = imap.get(stroke);
+    final Action action = amap.get(name);
+    if (text == null) {
+      if (action != mTextFieldEscapeAction) {
+        amap.put(name, mTextFieldEscapeAction);
+      }
+    } else {
+      if (!(action instanceof CombinedEscapeAction)) {
+        final Action combined =
+          new CombinedEscapeAction(mTextFieldEscapeAction, action);
+        amap.put(name, combined);
+      }
+    }
   }
 
 
@@ -141,7 +178,7 @@ public class SimpleExpressionCell
 
 
   //#########################################################################
-  //# Local Class DefaultInputParser
+  //# Inner Class DefaultInputParser
   private static class DefaultInputParser
     extends DocumentFilter
     implements FormattedInputParser
@@ -179,7 +216,7 @@ public class SimpleExpressionCell
 
 
   //#########################################################################
-  //# Local Class SimpleExpressionFormatter
+  //# Inner Class SimpleExpressionFormatter
   private class SimpleExpressionFormatter extends DefaultFormatter
   {
 
@@ -233,7 +270,7 @@ public class SimpleExpressionCell
 
 
   //#########################################################################
-  //# Local Class SimpleExpressionVerifier
+  //# Inner Class SimpleExpressionVerifier
   private class SimpleExpressionVerifier
     extends InputVerifier
   {
@@ -271,9 +308,85 @@ public class SimpleExpressionCell
 
 
   //#########################################################################
+  //# Inner Class CombinedEscapeAction
+  /**
+   * This is an attempt to fix a bug in Swing. When a text field has a
+   * tooltip set, any ESCAPE key events are consumed by the tooltip,
+   * even if the tooltip is not visible. This wrapper class sends the
+   * action to the tooltip if it is visible, otherwise uses the old
+   * textfield action.
+   */
+  private static class CombinedEscapeAction implements Action
+  {
+
+    //#######################################################################
+    //# Constructor
+    private CombinedEscapeAction(final Action text, final Action tooltip)
+    {
+      mTextFieldAction = text;
+      mToolTipAction = tooltip;
+    }
+
+    //#######################################################################
+    //# Interface javax.swing.Action
+    public void addPropertyChangeListener
+      (final PropertyChangeListener listener)
+    {
+      mTextFieldAction.addPropertyChangeListener(listener);
+      mToolTipAction.addPropertyChangeListener(listener);
+    }
+
+    public Object getValue(final String key)
+    {
+      return mTextFieldAction.getValue(key);
+    }
+
+    public boolean isEnabled()
+    {
+      return mTextFieldAction.isEnabled() || mToolTipAction.isEnabled();
+    }
+
+    public void putValue(final String key, final Object value)
+    {
+      mTextFieldAction.putValue(key, value);
+    }
+
+    public void removePropertyChangeListener
+      (final PropertyChangeListener listener)
+    {
+      mTextFieldAction.removePropertyChangeListener(listener);
+      mToolTipAction.removePropertyChangeListener(listener);
+    }
+
+    public void setEnabled(final boolean enabled)
+    {
+      mTextFieldAction.setEnabled(enabled);
+    }
+
+    //#######################################################################
+    //# Interface java.awt.event.ActionListener
+    public void actionPerformed(final ActionEvent event)
+    {
+      if (mToolTipAction.isEnabled()) {
+        mToolTipAction.actionPerformed(event);
+      } else if (mTextFieldAction.isEnabled()) {
+        mTextFieldAction.actionPerformed(event);
+      }
+    }
+
+    //#######################################################################
+    //# Data Members
+    private final Action mTextFieldAction;
+    private final Action mToolTipAction;
+
+  }
+
+
+  //#########################################################################
   //# Data Members
   private final FormattedInputParser mParser;
   private final SimpleExpressionVerifier mVerifier;
+  private final Action mTextFieldEscapeAction;
 
   private boolean mAllowNull;
   private ErrorDisplay mErrorDisplay;

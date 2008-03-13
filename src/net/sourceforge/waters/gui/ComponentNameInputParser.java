@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   ComponentNameInputParser
 //###########################################################################
-//# $Id: ComponentNameInputParser.java,v 1.2 2007-12-04 03:22:54 robi Exp $
+//# $Id: ComponentNameInputParser.java,v 1.3 2008-03-13 01:30:11 robi Exp $
 //###########################################################################
 
 
@@ -40,13 +40,15 @@ class ComponentNameInputParser
   public IdentifierProxy parse(final String text)
     throws ParseException
   {
-    if (!text.equals(mOldName)) {
-      final IdentifierProxy ident = mExpressionParser.parseIdentifier(text);
-      mModuleContext.checkNewComponentName(ident);
-      return ident;
-    } else {
+    if (text.equals(mOldName)) {
+      return mOldIdentifier;
+    } 
+    final IdentifierProxy ident = mExpressionParser.parseIdentifier(text);
+    if (mOldIdentifier.equalsWithGeometry(ident)) {
       return mOldIdentifier;
     }
+    mModuleContext.checkNewComponentName(ident);
+    return ident;
   }
 
   public DocumentFilter getDocumentFilter()

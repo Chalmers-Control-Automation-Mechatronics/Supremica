@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   ForeachComponentEditorDialog
 //###########################################################################
-//# $Id: ForeachComponentEditorDialog.java,v 1.2 2008-03-10 22:50:39 robi Exp $
+//# $Id: ForeachComponentEditorDialog.java,v 1.3 2008-03-13 01:30:11 robi Exp $
 //###########################################################################
 
 
@@ -20,20 +20,19 @@ import java.awt.Insets;
 import java.awt.LayoutManager;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.KeyAdapter;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JRootPane;
 import javax.swing.border.Border;
 
 import net.sourceforge.waters.gui.command.Command;
 import net.sourceforge.waters.gui.command.EditCommand;
 import net.sourceforge.waters.gui.command.InsertCommand;
 import net.sourceforge.waters.gui.transfer.SelectionOwner;
+import net.sourceforge.waters.gui.util.DialogCancelAction;
 import net.sourceforge.waters.gui.util.RaisedDialogPanel;
 import net.sourceforge.waters.model.base.ProxyTools;
 import net.sourceforge.waters.model.expr.ExpressionParser;
@@ -105,14 +104,6 @@ public class ForeachComponentEditorDialog
           commitDialog();
         }
       };
-    final KeyListener keyhandler = new KeyAdapter() {
-        public void keyTyped(final KeyEvent event)
-        {
-          if (event.getKeyChar() == '\n' && event.getModifiers() == 0) {
-            commitDialog();
-          }
-        }
-      };
 
     // Main panel ...
     mMainPanel = new RaisedDialogPanel();
@@ -123,14 +114,12 @@ public class ForeachComponentEditorDialog
       new SimpleIdentifierInputParser(ident, parser);
     mVariableInput = new SimpleExpressionCell(ident, nameparser);
     mVariableInput.addActionListener(commithandler);
-    mVariableInput.addKeyListener(keyhandler);
     mVariableInput.setToolTipText("Enter the name of the index variable");
     mRangeLabel = new JLabel("Range:");
     final SimpleExpressionProxy oldrange = template.getRange();
     mRangeInput =
       new SimpleExpressionCell(oldrange, Operator.TYPE_RANGE, parser);
     mRangeInput.addActionListener(commithandler);
-    mRangeInput.addKeyListener(keyhandler);
     mRangeInput.setToolTipText
       ("Enter the index range, e.g., 1..10 or {a,b,c}"); 
     mGuardLabel = new JLabel("Guard:");
@@ -139,7 +128,6 @@ public class ForeachComponentEditorDialog
       new SimpleExpressionCell(oldguard, Operator.TYPE_BOOLEAN, parser);
     mGuardInput.setAllowNull(true);
     mGuardInput.addActionListener(commithandler);
-    mGuardInput.addKeyListener(keyhandler);
     mGuardInput.setToolTipText("Optionally enter a Boolean expression"); 
 
     // Error panel ...

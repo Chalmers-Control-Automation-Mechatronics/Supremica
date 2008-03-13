@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   SimpleComponentEditorDialog
 //###########################################################################
-//# $Id: SimpleComponentEditorDialog.java,v 1.4 2008-03-10 23:55:03 robi Exp $
+//# $Id: SimpleComponentEditorDialog.java,v 1.5 2008-03-13 01:30:11 robi Exp $
 //###########################################################################
 
 
@@ -20,9 +20,7 @@ import java.awt.Insets;
 import java.awt.LayoutManager;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.KeyAdapter;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
+import javax.swing.Action;
 import javax.swing.BorderFactory;
 import javax.swing.ButtonGroup;
 import javax.swing.JButton;
@@ -30,6 +28,7 @@ import javax.swing.JCheckBox;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JRootPane;
 import javax.swing.border.Border;
 
 import net.sourceforge.waters.gui.command.Command;
@@ -37,6 +36,7 @@ import net.sourceforge.waters.gui.command.EditCommand;
 import net.sourceforge.waters.gui.command.InsertCommand;
 import net.sourceforge.waters.gui.renderer.GeometryAbsentException;
 import net.sourceforge.waters.gui.transfer.SelectionOwner;
+import net.sourceforge.waters.gui.util.DialogCancelAction;
 import net.sourceforge.waters.gui.util.IconRadioButton;
 import net.sourceforge.waters.gui.util.RaisedDialogPanel;
 import net.sourceforge.waters.model.base.WatersRuntimeException;
@@ -111,14 +111,6 @@ public class SimpleComponentEditorDialog
           commitDialog();
         }
       };
-    final KeyListener keyhandler = new KeyAdapter() {
-        public void keyTyped(final KeyEvent event)
-        {
-          if (event.getKeyChar() == '\n' && event.getModifiers() == 0) {
-            commitDialog();
-          }
-        }
-      };
 
     // Main panel ...
     mMainPanel = new RaisedDialogPanel();
@@ -128,7 +120,6 @@ public class SimpleComponentEditorDialog
       new ComponentNameInputParser(oldname, context, parser);
     mNameInput = new SimpleExpressionCell(oldname, nameparser);
     mNameInput.addActionListener(commithandler);
-    mNameInput.addKeyListener(keyhandler);
     mNameInput.setToolTipText("Enter automaton name, e.g., x or v[i]");
     mKindLabel = new JLabel("Kind:");
     mKindGroup = new ButtonGroup();
@@ -174,15 +165,14 @@ public class SimpleComponentEditorDialog
     okButton.setRequestFocusEnabled(false);
     okButton.addActionListener(commithandler);
     mButtonsPanel.add(okButton);
-    final JButton cancelButton = new JButton("Cancel");
+    final Action cancelAction = DialogCancelAction.getInstance();
+    final JButton cancelButton = new JButton(cancelAction);
     cancelButton.setRequestFocusEnabled(false);
-    cancelButton.addActionListener(new ActionListener() {
-        public void actionPerformed(final ActionEvent event)
-        {
-          dispose();
-        }
-      });
     mButtonsPanel.add(cancelButton);
+
+    final JRootPane root = getRootPane();
+    root.setDefaultButton(okButton);
+    DialogCancelAction.register(this);
   }
 
   /**
