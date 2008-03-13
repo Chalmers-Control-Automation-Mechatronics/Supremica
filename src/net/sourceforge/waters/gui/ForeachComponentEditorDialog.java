@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   ForeachComponentEditorDialog
 //###########################################################################
-//# $Id: ForeachComponentEditorDialog.java,v 1.3 2008-03-13 01:30:11 robi Exp $
+//# $Id: ForeachComponentEditorDialog.java,v 1.4 2008-03-13 02:44:45 robi Exp $
 //###########################################################################
 
 
@@ -116,7 +116,8 @@ public class ForeachComponentEditorDialog
     mVariableInput.addActionListener(commithandler);
     mVariableInput.setToolTipText("Enter the name of the index variable");
     mRangeLabel = new JLabel("Range:");
-    final SimpleExpressionProxy oldrange = template.getRange();
+    final SimpleExpressionProxy oldrange =
+      mForeach == null ? null : template.getRange();
     mRangeInput =
       new SimpleExpressionCell(oldrange, Operator.TYPE_RANGE, parser);
     mRangeInput.addActionListener(commithandler);
@@ -154,6 +155,10 @@ public class ForeachComponentEditorDialog
         }
       });
     mButtonsPanel.add(cancelButton);
+
+    final JRootPane root = getRootPane();
+    root.setDefaultButton(okButton);
+    DialogCancelAction.register(this);
   }
 
   /**
@@ -251,12 +256,16 @@ public class ForeachComponentEditorDialog
   {
     if (isInputLocked()) {
       // nothing
+    } else if (!mRangeInput.shouldYieldFocus()) {
+      mRangeInput.requestFocusInWindow();
     } else {
       final String name = mVariableInput.getText();
-      final SimpleExpressionSubject range =
+      final SimpleExpressionSubject range0 =
         (SimpleExpressionSubject) mRangeInput.getValue();
-      final SimpleExpressionSubject guard =
+      final SimpleExpressionSubject range = makeUnique(range0);
+      final SimpleExpressionSubject guard0 =
         (SimpleExpressionSubject) mGuardInput.getValue();
+      final SimpleExpressionSubject guard = makeUnique(guard0);
       if (mForeach == null) {
         final ForeachComponentSubject template =
           new ForeachComponentSubject(name, range, guard, null);
@@ -297,7 +306,7 @@ public class ForeachComponentEditorDialog
   //#########################################################################
   //# Auxiliary Methods
   /**
-   * Checks whether it is unsafe the current input to commit the currently
+   * Checks whether it is unsafe to commit the currently
    * edited text field. If this method returns <CODE>true</CODE>, it is
    * unsafe to commit the current dialog contents, and shifting the focus
    * is to be avoided.
@@ -311,6 +320,17 @@ public class ForeachComponentEditorDialog
       mVariableInput.isFocusOwner() && !mVariableInput.shouldYieldFocus() ||
       mRangeInput.isFocusOwner() && !mRangeInput.shouldYieldFocus() ||
       mGuardInput.isFocusOwner() && !mGuardInput.shouldYieldFocus();
+  }
+
+
+  private SimpleExpressionSubject makeUnique
+    (final SimpleExpressionSubject subject)
+  {
+    if (subject == null || subject.getParent() == null) {
+      return subject;
+    } else {
+      return subject.clone();
+    }
   }
 
 

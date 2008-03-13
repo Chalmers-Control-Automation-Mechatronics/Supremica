@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.waters.gui
 //# CLASS:   SimpleExpressionEditor
 //###########################################################################
-//# $Id: SimpleExpressionEditor.java,v 1.5 2008-03-07 04:11:02 robi Exp $
+//# $Id: SimpleExpressionEditor.java,v 1.6 2008-03-13 02:44:45 robi Exp $
 //###########################################################################
 
 
@@ -47,6 +47,12 @@ public class SimpleExpressionEditor
 
   //#########################################################################
   //# Simple Access
+  void setAllowNull(final boolean allow)
+  {
+    final SimpleExpressionCell cell = getComponent();
+    cell.setAllowNull(allow);
+  }
+
   void setToolTipText(final String tooltip)
   {
     final SimpleExpressionCell cell = getComponent();

@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   GraphEventPanel
 //###########################################################################
-//# $Id: GraphEventPanel.java,v 1.2 2008-03-09 21:52:09 robi Exp $
+//# $Id: GraphEventPanel.java,v 1.3 2008-03-13 02:44:45 robi Exp $
 //###########################################################################
 
 
@@ -171,6 +171,7 @@ public class GraphEventPanel
     setDefaultRenderer(Object.class, textrenderer1);
     final SimpleExpressionEditor editor =
       new SimpleExpressionEditor(Operator.TYPE_NAME, parser);
+    editor.setAllowNull(true);
     editor.addFocusListener(handler);
     setDefaultEditor(Object.class, editor);
 

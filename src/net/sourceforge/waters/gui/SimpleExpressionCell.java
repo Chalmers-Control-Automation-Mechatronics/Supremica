@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   SimpleExpressionCell
 //###########################################################################
-//# $Id: SimpleExpressionCell.java,v 1.12 2008-03-13 01:30:11 robi Exp $
+//# $Id: SimpleExpressionCell.java,v 1.13 2008-03-13 02:44:45 robi Exp $
 //###########################################################################
 
 
@@ -105,7 +105,6 @@ public class SimpleExpressionCell
   public void setValue(final Object value)
   {
     super.setValue(value);
-    mAllowNull = (value == null);
   }
 
 
