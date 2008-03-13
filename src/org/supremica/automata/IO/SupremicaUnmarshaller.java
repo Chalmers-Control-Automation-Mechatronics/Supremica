@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.automata.IO
 //# CLASS:   SupremicaUnmarshaller
 //###########################################################################
-//# $Id: SupremicaUnmarshaller.java,v 1.19 2007-10-31 13:15:02 flordal Exp $
+//# $Id: SupremicaUnmarshaller.java,v 1.20 2008-03-13 16:18:40 avenir Exp $
 //###########################################################################
 
 package org.supremica.automata.IO;
@@ -131,20 +131,6 @@ public class SupremicaUnmarshaller
             return false;
         }
         
-        for (Automaton aut : project)
-        {
-            for (State state : aut)
-            {
-                // This now works?
-                /*
-                if (state.getCost() != State.UNDEF_COST)
-                {
-                    System.out.println("State cost information in the automata model is not supported by the editor.");
-                    return false;
-                }
-                */
-            }
-        }
         return true;
     }
 

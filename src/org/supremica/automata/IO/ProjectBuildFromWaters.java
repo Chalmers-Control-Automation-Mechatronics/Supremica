@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.automata.IO
 //# CLASS:   ProjectBuildFromWaters
 //###########################################################################
-//# $Id: ProjectBuildFromWaters.java,v 1.27 2007-07-16 11:34:32 flordal Exp $
+//# $Id: ProjectBuildFromWaters.java,v 1.28 2008-03-13 16:18:40 avenir Exp $
 //###########################################################################
 
 /*
@@ -57,6 +57,9 @@
  */
 package org.supremica.automata.IO;
 
+import java.io.StreamTokenizer;
+import java.io.StringReader;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 
@@ -167,7 +170,6 @@ public class ProjectBuildFromWaters
         for (final AutomatonProxy aut : des.getAutomata())
         {
             final Automaton supaut = build(aut);
-            addCostToStates(supaut);
             currProject.addAutomaton(supaut);
         }
         return currProject;
@@ -253,23 +255,26 @@ public class ProjectBuildFromWaters
         // Create transitions
         for (final TransitionProxy currWatersTransition :
             aut.getTransitions())
-            {
-                StateProxy watersSourceState = currWatersTransition.getSource();
-                StateProxy watersTargetState = currWatersTransition.getTarget();
-                EventProxy watersEvent = currWatersTransition.getEvent();
-                State supremicaSourceState =
-                    supaut.getStateWithName(watersSourceState.getName());
-                State supremicaTargetState =
-                    supaut.getStateWithName(watersTargetState.getName());
-                LabeledEvent supremicaEvent =
-                    currSupremicaAlphabet.getEvent(watersEvent.getName());
-                Arc currSupremicaArc = new Arc(supremicaSourceState,
-                    supremicaTargetState,
-                    supremicaEvent);
-                supaut.addArc(currSupremicaArc);
-            }
+        {
+            StateProxy watersSourceState = currWatersTransition.getSource();
+            StateProxy watersTargetState = currWatersTransition.getTarget();
+            EventProxy watersEvent = currWatersTransition.getEvent();
+            State supremicaSourceState =
+                supaut.getStateWithName(watersSourceState.getName());
+            State supremicaTargetState =
+                supaut.getStateWithName(watersTargetState.getName());
+            LabeledEvent supremicaEvent =
+                currSupremicaAlphabet.getEvent(watersEvent.getName());
+            Arc currSupremicaArc = new Arc(supremicaSourceState,
+                supremicaTargetState,
+                supremicaEvent);
+            supaut.addArc(currSupremicaArc);
+        }
             
-            return supaut;
+        addCostToStates(supaut);
+        addProbabilityToTransitions(supaut);    
+            
+        return supaut;
     }
     
     /**
@@ -301,43 +306,118 @@ public class ProjectBuildFromWaters
      */ 
     private void addCostToStates(Automaton aut)
         throws EvalException
-    {
+    {       
         for (Iterator<State> stateIt = aut.iterator(); stateIt.hasNext();)
         {
             State state = stateIt.next();
-            String stateName = state.getName();
+            String stateName = state.getName();           
             if (stateName.contains("cost") && stateName.contains("="))
             {
-                Double costValue = null;
-                String costStr = stateName.substring(stateName.lastIndexOf("=") + 1).trim();
-                while (costStr.length() > 0)
+                int pivotIndex = stateName.indexOf("cost");
+                String prefixStr = stateName.substring(0, pivotIndex);
+                String suffixStr = stateName.substring(pivotIndex);
+                double costValue = -1;
+                
+                // Find the first numerical value, following the 'cost'-keyword (that is our state cost)
+                try
                 {
-                    try
+                    StreamTokenizer tokenizer = new StreamTokenizer(new StringReader(suffixStr));
+                    tokenizer.parseNumbers();
+                    
+                    int type = tokenizer.nextToken();
+                    while (type != tokenizer.TT_EOF)
                     {
-                        costValue = new Double(costStr);
-                        break;
+                        if (type == tokenizer.TT_NUMBER)
+                        {
+                            costValue = tokenizer.nval;
+                        }
+                        
+                        type = tokenizer.nextToken();
                     }
-                    catch (NumberFormatException ex)
-                    {
-                        costStr = costStr.substring(0, costStr.length() - 1);
-                    }                        
+                }
+                catch (Exception e)
+                {
+                    e.printStackTrace();
                 }
 
-                if (costValue == null)
+                if (costValue == -1)
                 {
                     throw new EvalException("The cost, defined in state '" + stateName + "', could not be parsed");
                 }
                 else
                 {
-                    stateName = stateName.substring(0, stateName.indexOf("cost")).trim();
-                    if (stateName.endsWith(","))
+                    // Remove comma before the 'cost'-keyword
+                    if (prefixStr.trim().endsWith(","))
                     {
-                        stateName = stateName.substring(0, stateName.length() - 1).trim();
+                        prefixStr = prefixStr.substring(0, prefixStr.lastIndexOf(","));
                     }
-                    state.setName(stateName);
-                    state.setCost(costValue.doubleValue());
+                    
+                    // Find the actual cost string (note that integer cost values must be re-casted into int.
+                    String costStr = "cost=" + costValue;
+                    if (!suffixStr.startsWith(costStr))
+                    {
+                        costStr = "cost=" + (int)costValue;
+                    }
+                    
+                    // Remove the cost string from the suffix and construct the state name
+                    suffixStr = suffixStr.substring(costStr.length());
+                    state.setName(prefixStr + suffixStr);
+                    // Set the state cost
+                    state.setCost(costValue);
                 }
             }
+        }
+    }
+    
+    private void addProbabilityToTransitions(Automaton aut)
+    {
+        ArrayList<Arc> arcsToBeRemoved = new ArrayList<Arc>();
+        ArrayList<Arc> arcsToBeAdded = new ArrayList<Arc>();
+        
+        for (Iterator<Arc> arcIt = aut.arcIterator(); arcIt.hasNext();)
+        {
+            Arc arc = arcIt.next();
+            String label = arc.getLabel();
+            if (label.contains("prob_"))
+            {
+                Double percentage = null;
+                try
+                {
+                    percentage = new Double(label.substring(label.lastIndexOf("prob_") + 5).trim());
+                }
+                catch (NumberFormatException e) 
+                {
+                    logger.error("Parsing of transition named " + label + " failed.");
+                }
+                
+                if (percentage != null)
+                {
+                    label = label.substring(0, label.indexOf("prob_")).trim();
+                    if (label.endsWith("_")) 
+                    {
+                        label = label.substring(0, label.length()-1);
+                    } 
+                    
+                    LabeledEvent newEvent = new LabeledEvent(label);
+                    Arc newArc = new Arc(arc.getSource(), arc.getTarget(), newEvent, percentage/100);
+                    if (! aut.getAlphabet().contains(newEvent))
+                    {
+                        aut.getAlphabet().addEvent(newEvent);
+                    }
+                    
+                    arcsToBeAdded.add(newArc);
+                    arcsToBeRemoved.add(arc);
+                }
+            }
+        }
+        
+        for (int i=0; i<arcsToBeRemoved.size(); i++)
+        {
+            aut.removeArc(arcsToBeRemoved.get(i));
+        }
+        for (int i=0; i<arcsToBeAdded.size(); i++)
+        {
+            aut.addArc(arcsToBeAdded.get(i));
         }
     }
 }

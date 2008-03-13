@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.module
 //# CLASS:   ModuleCompiler
 //###########################################################################
-//# $Id: ModuleCompiler.java,v 1.105 2008-02-19 12:12:01 markus Exp $
+//# $Id: ModuleCompiler.java,v 1.106 2008-03-13 16:18:23 avenir Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.compiler;
@@ -88,6 +88,7 @@ import net.sourceforge.waters.xsd.module.ScopeKind;
  * Depend on org.supremica.automata ? Frown ...
  */
 import org.supremica.automata.ExtendedAutomataExpander;
+import org.supremica.properties.Config;
 
 
 public class ModuleCompiler extends AbstractModuleProxyVisitor
@@ -155,7 +156,14 @@ public class ModuleCompiler extends AbstractModuleProxyVisitor
         final ModuleProxyCloner cloner =
           ModuleSubjectFactory.getCloningInstance();
         final ModuleSubject subject = (ModuleSubject) cloner.getClone(mModule);
-        ExtendedAutomataExpander.expandTransitions(subject);
+        if (Config.EXPAND_EXTENDED_AUTOMATA.isTrue())
+        {
+            ExtendedAutomataExpander.expandTransitions(subject);
+        }
+        else
+        {
+            ExtendedAutomataExpander.dontExpandTransitions(subject);
+        }
         visitModuleProxy(subject);
       } else {
         // Only this case now really works ...
@@ -572,8 +580,9 @@ public class ModuleCompiler extends AbstractModuleProxyVisitor
     visitCollection(aliases);
     final List<Proxy> components = module.getComponentList();
     visitCollection(components);
-    if (mIsEFA) {
-      compileEFA();
+    if (mIsEFA && Config.EXPAND_EXTENDED_AUTOMATA.isTrue())
+    {
+        compileEFA();
     }
     return null;
   }

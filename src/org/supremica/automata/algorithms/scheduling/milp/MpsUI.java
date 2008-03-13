@@ -622,6 +622,11 @@ public class MpsUI
         String lpIterationCount = "";
         while ((milpEchoStr = milpEcho.readLine()) != null)
         {
+            if (milpEchoStr.contains("infeasible"))
+            {
+                throw new MilpException(milpEchoStr + " (specifications should be relaxed if possible).");
+            }
+            
             if (milpEchoStr.contains("Result"))
             {
                 System.out.println("milpecho = " + milpEchoStr);

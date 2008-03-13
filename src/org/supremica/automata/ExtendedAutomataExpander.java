@@ -113,9 +113,7 @@ public class ExtendedAutomataExpander
     private static Logger log = LoggerFactory.createLogger(ExtendedAutomataExpander.class);
 
 	public static void expandTransitions(final ModuleSubject module)
-	{
-
-
+	{           
 		log.info("ExtendedAutomataExpander.expandTransitions(): Expanding transitions.");
 		
 		// get all component variables
@@ -171,7 +169,7 @@ public class ExtendedAutomataExpander
 				// do expansion only if guard and actions block is present
 				if (curBlock != null)
 				{
-					log.debug("ExtendedAutomataExpander.expandTransitions(): Expanding edge");
+					log.debug("ExtendedAutomataExpander.expandTransitions(): Expanding edge ");
 
 					// get guards
 					List curGuards = curBlock.getGuards();
@@ -771,6 +769,113 @@ public class ExtendedAutomataExpander
 		log.info("ExtendedAutomataExpander.expandTransitions(): Done expanding transitions.");
 
 	}
+        
+        public static void dontExpandTransitions(final ModuleSubject module)
+        {
+            log.info("ExtendedAutomataExpander.dontExpandTransitions(): Not expanding transitions.");
+
+            // get all component variables
+            // and put them in a map
+            log.debug("ExtendedAutomataExpander.expandTransitions(): Making module variables map.");
+            final Map<String,VariableComponentProxy> moduleVariables = new HashMap<String,VariableComponentProxy>();
+            for (final Proxy proxy : module.getComponentList()) 
+            {
+                if (proxy instanceof VariableComponentProxy) 
+                {
+                    final VariableComponentProxy curVar = (VariableComponentProxy) proxy;
+                    final String curVarName = curVar.getName();
+                    if (moduleVariables.keySet().contains(curVarName))
+                    {
+                        log.warn("ExtendedAutomataExpander.expandTransitions(): Warning!: The module contains duplicate variable definitions.");
+                        log.warn("Variable name: " + curVarName);
+                    }
+                    else
+                    {
+                        moduleVariables.put(curVar.getName(), curVar);    
+                    }
+                }
+            }
+
+            // expand transitions for all components in the module
+            for (final Proxy proxy : module.getComponentList()) 
+            {
+                if (!(proxy instanceof SimpleComponentProxy)) 
+                {
+                    continue;
+                }
+                final SimpleComponentProxy curComponent = (SimpleComponentProxy) proxy;
+                String curComponentName = curComponent.getName();
+                log.debug("ExtendedAutomataExpander.expandTransitions(): Component");
+                log.debug(curComponentName);
+
+                final ListSubject<EdgeSubject> edges = ((GraphSubject) curComponent.getGraph()).getEdgesModifiable();
+                final List<EdgeSubject> removeEdges = new LinkedList<EdgeSubject>();
+                final List<EdgeSubject> addEdges = new LinkedList<EdgeSubject>();
+
+                for (Iterator edgeIter = edges.iterator(); edgeIter.hasNext();)
+                {
+                    EdgeSubject curEdge = (EdgeSubject) edgeIter.next();
+                    
+                    NodeProxy source = curEdge.getSource();
+                    NodeProxy target = curEdge.getTarget();
+
+                    LabelBlockProxy curLabel = curEdge.getLabelBlock();
+
+                    GuardActionBlockProxy curBlock = curEdge.getGuardActionBlock();
+
+                    // do expansion only if guard and actions block is present
+                    if (curBlock != null)
+                    {
+                        log.debug("ExtendedAutomataExpander.expandTransitions(): Expanding edge ");
+
+                        // get guards
+                        List curGuards = curBlock.getGuards();
+                        String guardText = "(";
+                        if (curGuards.size() > 0 )
+                        {
+                            log.debug("ExtendedAutomataExpander.expandTransitions(): Guard");
+                            for (Iterator iter = curGuards.iterator(); iter.hasNext();)
+                            {
+                                //guardText = guardText + ((SimpleExpressionProxy) iter.next()).getPlainText();
+                                guardText = guardText + ((SimpleExpressionProxy) iter.next()).toString();
+                                if (iter.hasNext())
+                                {
+                                    guardText = guardText + ") & (";
+                                }
+                                else
+                                {
+                                    guardText = guardText + ")";
+                                }
+                            }
+                            log.debug(guardText);
+                        }
+
+                        // get actions
+                        List <BinaryExpressionProxy> curActions = curBlock.getActions();
+                        String actionsText = "";
+                        String origActionsText = "";
+                        if (curActions.size() > 0 )
+                        {
+                            log.debug("ExtendedAutomataExpander.expandTransitions(): Actions");
+                            for (Iterator iter = curActions.iterator(); iter.hasNext();)
+                            {
+                                BinaryExpressionProxy curAction = (BinaryExpressionProxy) iter.next();
+                                actionsText = actionsText + curAction.toString() + "; ";
+                                if (iter.hasNext())
+                                {
+                                    origActionsText = origActionsText + curAction.toString() + "; ";
+                                }
+                                else
+                                {
+                                    origActionsText = origActionsText + curAction.toString();
+                                }
+                            }
+                            log.debug(actionsText);
+                        }
+                    }
+                }
+            }
+        }
 
 	private static EdgeSubject makeTransition(NodeProxy from, NodeProxy to, LabelBlockProxy labelBlock, String guardIn, String actionIn)
 	{
@@ -867,3 +972,4 @@ public class ExtendedAutomataExpander
 		}
 	}
 }
+                

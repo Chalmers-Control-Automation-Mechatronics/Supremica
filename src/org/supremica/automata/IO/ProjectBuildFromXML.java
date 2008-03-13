@@ -674,23 +674,28 @@ public class ProjectBuildFromXML
         }
         
         LabeledEvent event = (LabeledEvent) idEventMap.get(eventId);
-        
-        // Create and add the arc
-        Arc arc = new Arc(sourceState, destState, event);
-        
+               
         // TEMP-solution (use EFA instead)
+        double probability = Arc.DEFAULT_PROBABILITY;
         String probabilityStr = attributes.getValue("probability");
         if (probabilityStr != null)
         {
-            double probability = Double.valueOf(probabilityStr).doubleValue();
-            
+            probability = Double.valueOf(probabilityStr).doubleValue();    
             if (probability < 0 || probability > 1)
             {
                 throwException("the probability value is out of range");
             }
             
-            arc.setProbability(probability);
+//            currAutomaton.getAlphabet().removeEvent(event);
+            event = new LabeledEvent(event.getLabel() + "_prob_" + (int)(probability*100)); // Multiplication with 100 since Waters cannot accept digital numbers in events names
+            if (! currAutomaton.getAlphabet().contains(event))
+            {
+                currAutomaton.getAlphabet().addEvent(event);
+            }
         }
+        
+        // Create and add the arc
+        Arc arc = new Arc(sourceState, destState, event, probability);
         
         // Arc arc = new Arc(sourceState, destState, eventId);
         try

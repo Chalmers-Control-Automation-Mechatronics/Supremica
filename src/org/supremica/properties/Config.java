@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.properties
 //# CLASS:   Config
 //###########################################################################
-//# $Id: Config.java,v 1.44 2007-11-14 15:16:34 millares Exp $
+//# $Id: Config.java,v 1.45 2008-03-13 16:18:29 avenir Exp $
 //###########################################################################
 
 /*
@@ -280,6 +280,7 @@ public final class Config
 
     // ALGORITHMS_HMI
     public static final BooleanProperty INCLUDE_USERINTERFACE = new BooleanProperty(PropertyType.ALGORITHMS_HMI, "includeUserInterface", false, "Include SwiXML analyzer tools");
+    public static final BooleanProperty EXPAND_EXTENDED_AUTOMATA = new BooleanProperty(PropertyType.ALGORITHMS_HMI, "expandEFA", true, "Expand extended automata into DFA");
 
     private static Config instance = null;
 
