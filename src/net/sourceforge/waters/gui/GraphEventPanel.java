@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   GraphEventPanel
 //###########################################################################
-//# $Id: GraphEventPanel.java,v 1.3 2008-03-13 02:44:45 robi Exp $
+//# $Id: GraphEventPanel.java,v 1.4 2008-03-14 00:12:22 robi Exp $
 //###########################################################################
 
 
@@ -79,6 +79,7 @@ import net.sourceforge.waters.gui.transfer.ListInsertPosition;
 import net.sourceforge.waters.gui.transfer.ReplaceInfo;
 import net.sourceforge.waters.gui.transfer.SelectionOwner;
 import net.sourceforge.waters.gui.transfer.WatersDataFlavor;
+import net.sourceforge.waters.gui.util.NonTypingTable;
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.base.ProxyAccessorHashMapByContents;
 import net.sourceforge.waters.model.base.ProxyAccessorMap;
@@ -121,7 +122,7 @@ import net.sourceforge.waters.subject.module.SimpleComponentSubject;
  */
 
 public class GraphEventPanel
-  extends JTable
+  extends NonTypingTable
   implements FocusListener, DragGestureListener, SelectionOwner
 {
 

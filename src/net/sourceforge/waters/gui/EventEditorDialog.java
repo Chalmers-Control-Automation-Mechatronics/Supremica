@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   EventEditorDialog
 //###########################################################################
-//# $Id: EventEditorDialog.java,v 1.27 2008-03-13 01:30:11 robi Exp $
+//# $Id: EventEditorDialog.java,v 1.28 2008-03-14 00:12:22 robi Exp $
 //###########################################################################
 
 
@@ -25,25 +25,32 @@ import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.InputEvent;
+import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.List;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Set;
+import javax.swing.AbstractAction;
 import javax.swing.Action;
+import javax.swing.ActionMap;
 import javax.swing.BorderFactory;
 import javax.swing.ButtonGroup;
+import javax.swing.InputMap;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JColorChooser;
+import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
-import javax.swing.JTable;
 import javax.swing.JPanel;
 import javax.swing.JRootPane;
 import javax.swing.JScrollPane;
+import javax.swing.JTable;
+import javax.swing.KeyStroke;
 import javax.swing.ListSelectionModel;
 import javax.swing.SwingUtilities;
 import javax.swing.border.Border;
@@ -59,8 +66,9 @@ import net.sourceforge.waters.gui.command.InsertCommand;
 import net.sourceforge.waters.gui.command.EditCommand;
 import net.sourceforge.waters.gui.transfer.SelectionOwner;
 import net.sourceforge.waters.gui.util.DialogCancelAction;
-import net.sourceforge.waters.gui.util.RaisedDialogPanel;
 import net.sourceforge.waters.gui.util.IconRadioButton;
+import net.sourceforge.waters.gui.util.NonTypingTable;
+import net.sourceforge.waters.gui.util.RaisedDialogPanel;
 import net.sourceforge.waters.model.expr.ExpressionParser;
 import net.sourceforge.waters.model.expr.Operator;
 import net.sourceforge.waters.model.expr.ParseException;
@@ -236,12 +244,6 @@ public class EventEditorDialog
       final Action cancelAction = DialogCancelAction.getInstance();
       final JButton cancelButton = new JButton(cancelAction);
       cancelButton.setRequestFocusEnabled(false);
-      cancelButton.addActionListener(new ActionListener() {
-          public void actionPerformed(final ActionEvent event)
-          {
-            dispose();
-          }
-        });
       mButtonsPanel.add(cancelButton);
 
       final JRootPane root = getRootPane();
@@ -314,7 +316,7 @@ public class EventEditorDialog
         new ArrayList<SimpleExpressionSubject>(ranges);
       mIndexModel = new ListTableModel<SimpleExpressionSubject>
         (copy, SimpleExpressionSubject.class);
-      mIndexTable = new JTable(mIndexModel);
+      mIndexTable = new NonTypingTable(mIndexModel);
       mIndexTable.setTableHeader(null);
       mIndexTable.setShowGrid(false);
       mIndexTable.setSurrendersFocusOnKeystroke(true);
@@ -332,11 +334,13 @@ public class EventEditorDialog
         (KeyboardFocusManager.BACKWARD_TRAVERSAL_KEYS);
       mIndexTable.setFocusTraversalKeys
         (KeyboardFocusManager.BACKWARD_TRAVERSAL_KEYS, backward);
+      mIndexTable.addEscapeAction();
       final ExpressionParser parser = getExpressionParser();
-      final TableCellEditor editor =
+      final SimpleExpressionEditor editor =
         new SimpleExpressionEditor(Operator.TYPE_RANGE, parser, mErrorLabel);
-      mIndexTable.setDefaultEditor(Object.class, editor);
+      editor.setAllowNull(true);
       editor.addCellEditorListener(mIndexModel);
+      mIndexTable.setDefaultEditor(Object.class, editor);
       final ListSelectionModel selmodel = mIndexTable.getSelectionModel();
       selmodel.addListSelectionListener(new ListSelectionListener() {
           public void valueChanged(final ListSelectionEvent event)
@@ -350,38 +354,30 @@ public class EventEditorDialog
             handleIndexTableClick(event);
           }
         });
-      mAddButton = new JButton("Add");
+      mAddAction = new AddIndexRangeAction();
+      final JRootPane root = getRootPane();
+      final String name = (String) mAddAction.getValue(Action.NAME);
+      final KeyStroke key =
+        (KeyStroke) mAddAction.getValue(Action.ACCELERATOR_KEY);
+      final InputMap imap =
+        root.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
+      final ActionMap amap = root.getActionMap();
+      imap.put(key, name);
+      amap.put(name, mAddAction);
+      mAddButton = new JButton(mAddAction);
       mAddButton.setRequestFocusEnabled(false);
-      mAddButton.addActionListener(new ActionListener() {
-          public void actionPerformed(final ActionEvent event)
-          {
-            addIndexRange();
-          }
-        });
-      mRemoveButton = new JButton("Remove");
+      mRemoveAction = new RemoveIndexRangesAction();
+      mIndexTable.addKeyboardAction(mRemoveAction);
+      mRemoveButton = new JButton(mRemoveAction);
       mRemoveButton.setRequestFocusEnabled(false);
-      mRemoveButton.addActionListener(new ActionListener() {
-          public void actionPerformed(final ActionEvent event)
-          {
-            removeIndexRange();
-          }
-        });
-      mUpButton = new JButton("Up");
+      mUpAction = new MoveIndexRangesUpAction();
+      mIndexTable.addKeyboardAction(mUpAction);
+      mUpButton = new JButton(mUpAction);
       mUpButton.setRequestFocusEnabled(false);
-      mUpButton.addActionListener(new ActionListener() {
-          public void actionPerformed(final ActionEvent event)
-          {
-            moveIndexRangeUp();
-          }
-        });
-      mDownButton = new JButton("Down");
+      mDownAction = new MoveIndexRangesDownAction();
+      mIndexTable.addKeyboardAction(mDownAction);
+      mDownButton = new JButton(mDownAction);
       mDownButton.setRequestFocusEnabled(false);
-      mDownButton.addActionListener(new ActionListener() {
-          public void actionPerformed(final ActionEvent event)
-          {
-            moveIndexRangeDown();
-          }
-        });
       updateListControlEnabled();
       layoutIndexPanel();
     }
@@ -718,19 +714,19 @@ public class EventEditorDialog
   {
     final int selcount = mIndexTable.getSelectedRowCount();
     if (selcount > 0) {
-      mRemoveButton.setEnabled(true);
+      mRemoveAction.setEnabled(true);
       final ListSelectionModel selmodel = mIndexTable.getSelectionModel();
       final int maxindex = selmodel.getMaxSelectionIndex();
       final int minindex = selmodel.getMinSelectionIndex();
       final int lastrow = mIndexTable.getRowCount() - 1;
-      mUpButton.setEnabled(minindex > 0 ||
+      mUpAction.setEnabled(minindex > 0 ||
                            minindex + selcount - 1 < maxindex);
-      mDownButton.setEnabled(maxindex < lastrow ||
+      mDownAction.setEnabled(maxindex < lastrow ||
                              maxindex - selcount + 1 > minindex);
     } else {
-      mRemoveButton.setEnabled(false);
-      mUpButton.setEnabled(false);
-      mDownButton.setEnabled(false);
+      mRemoveAction.setEnabled(false);
+      mUpAction.setEnabled(false);
+      mDownAction.setEnabled(false);
     }
   }
 
@@ -766,7 +762,7 @@ public class EventEditorDialog
 
   /**
    * Creates a new index range.
-   * This method is attached to action listener of the 'add' button
+   * This method is attached as an action listener of the 'add' button
    * of the index list control.
    */
   private void addIndexRange()
@@ -799,10 +795,10 @@ public class EventEditorDialog
 
   /**
    * Removes all selected indexes.
-   * This method is attached to action listener of the 'remove' button
+   * This method is attached as an action listener of the 'remove' button
    * of the index list control.
    */
-  private void removeIndexRange()
+  private void removeIndexRanges()
   {
     final ListSelectionModel selmodel = mIndexTable.getSelectionModel();
     if (mIndexTable.isEditing()) {
@@ -829,10 +825,10 @@ public class EventEditorDialog
 
   /**
    * Moves all selected indexes up by one step.
-   * This method is attached to action listener of the 'up' button
+   * This method is attached as an action listener of the 'up' button
    * of the index list control.
    */
-  private void moveIndexRangeUp()
+  private void moveIndexRangesUp()
   {
     if (mIndexTable.isEditing()) {
       final TableCellEditor editor = mIndexTable.getCellEditor();
@@ -841,7 +837,7 @@ public class EventEditorDialog
         SwingUtilities.invokeLater(new Runnable() {
             public void run()
             {
-              moveIndexRangeUp();
+              moveIndexRangesUp();
             }
           });
       }
@@ -861,7 +857,7 @@ public class EventEditorDialog
    * This method is attached to action listener of the 'down' button
    * of the index list control.
    */
-  private void moveIndexRangeDown()
+  private void moveIndexRangesDown()
   {
     if (mIndexTable.isEditing()) {
       final TableCellEditor editor = mIndexTable.getCellEditor();
@@ -870,7 +866,7 @@ public class EventEditorDialog
         SwingUtilities.invokeLater(new Runnable() {
             public void run()
             {
-              moveIndexRangeDown();
+              moveIndexRangesDown();
             }
           });
       }
@@ -887,7 +883,7 @@ public class EventEditorDialog
 
   /**
    * Commits the contents of this dialog to the model.
-   * This method is attached to action listener of the 'OK' button
+   * This method is attached as an action listener of the 'OK' button
    * of the event editor dialog.
    */
   public void commitDialog()
@@ -1113,6 +1109,116 @@ public class EventEditorDialog
 
 
   //#########################################################################
+  //# Inner Class AddIndexAction
+  private class AddIndexRangeAction extends AbstractAction
+  {
+
+    //#######################################################################
+    //# Constructor
+    private AddIndexRangeAction()
+    {
+      putValue(Action.NAME, "Add");
+      putValue(Action.SHORT_DESCRIPTION, "Create a new index range");
+      putValue(Action.MNEMONIC_KEY, KeyEvent.VK_INSERT);
+      putValue(Action.ACCELERATOR_KEY,
+               KeyStroke.getKeyStroke(KeyEvent.VK_INSERT, 0));
+      setEnabled(true);
+    }
+ 
+    //#######################################################################
+    //# Interface java.awt.event.ActionListener
+    public void actionPerformed(final ActionEvent event)
+    {
+      addIndexRange();
+    }
+
+  }
+
+
+  //#########################################################################
+  //# Inner Class RemoveIndexRangesAction
+  private class RemoveIndexRangesAction extends AbstractAction
+  {
+
+    //#######################################################################
+    //# Constructor
+    private RemoveIndexRangesAction()
+    {
+      putValue(Action.NAME, "Remove");
+      putValue(Action.SHORT_DESCRIPTION, "Delete all selected index ranges");
+      putValue(Action.MNEMONIC_KEY, KeyEvent.VK_DELETE);
+      putValue(Action.ACCELERATOR_KEY,
+               KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, 0));
+      setEnabled(false);
+    }
+ 
+    //#######################################################################
+    //# Interface java.awt.event.ActionListener
+    public void actionPerformed(final ActionEvent event)
+    {
+      removeIndexRanges();
+    }
+
+  }
+
+
+  //#########################################################################
+  //# Inner Class MoveIndexRangesUpAction
+  private class MoveIndexRangesUpAction extends AbstractAction
+  {
+
+    //#######################################################################
+    //# Constructor
+    private MoveIndexRangesUpAction()
+    {
+      putValue(Action.NAME, "Up");
+      putValue(Action.SHORT_DESCRIPTION, "Move selected index ranges up");
+      putValue(Action.MNEMONIC_KEY, KeyEvent.VK_UP);
+      putValue(Action.ACCELERATOR_KEY,
+               KeyStroke.getKeyStroke(KeyEvent.VK_UP,
+                                      InputEvent.CTRL_DOWN_MASK));
+      setEnabled(false);
+    }
+ 
+    //#######################################################################
+    //# Interface java.awt.event.ActionListener
+    public void actionPerformed(final ActionEvent event)
+    {
+      moveIndexRangesUp();
+    }
+
+  }
+
+
+  //#########################################################################
+  //# Inner Class MoveIndexRangesDownAction
+  private class MoveIndexRangesDownAction extends AbstractAction
+  {
+
+    //#######################################################################
+    //# Constructor
+    private MoveIndexRangesDownAction()
+    {
+      putValue(Action.NAME, "Down");
+      putValue(Action.SHORT_DESCRIPTION, "Move selected index ranges down");
+      putValue(Action.MNEMONIC_KEY, KeyEvent.VK_DOWN);
+      putValue(Action.ACCELERATOR_KEY,
+               KeyStroke.getKeyStroke(KeyEvent.VK_DOWN,
+                                      InputEvent.CTRL_DOWN_MASK));
+      setEnabled(false);
+    }
+ 
+    //#######################################################################
+    //# Interface java.awt.event.ActionListener
+    public void actionPerformed(final ActionEvent event)
+    {
+      moveIndexRangesDown();
+    }
+
+  }
+
+
+  //#########################################################################
   //# Data Members
   // Dialog state
   private final ModuleWindowInterface mRoot;
@@ -1135,7 +1241,11 @@ public class EventEditorDialog
   private JButton mMoreOptionsButton;
   private JPanel mIndexPanel;
   private ListTableModel<SimpleExpressionSubject> mIndexModel;
-  private JTable mIndexTable;
+  private NonTypingTable mIndexTable;
+  private Action mAddAction;
+  private Action mRemoveAction;
+  private Action mUpAction;
+  private Action mDownAction;
   private JButton mAddButton;
   private JButton mRemoveButton;
   private JButton mUpButton;

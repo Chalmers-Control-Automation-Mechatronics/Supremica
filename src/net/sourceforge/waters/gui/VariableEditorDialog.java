@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   VariableEditorDialog
 //###########################################################################
-//# $Id: VariableEditorDialog.java,v 1.7 2008-03-13 01:30:11 robi Exp $
+//# $Id: VariableEditorDialog.java,v 1.8 2008-03-14 00:12:22 robi Exp $
 //###########################################################################
 
 
@@ -24,21 +24,29 @@ import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.InputEvent;
+import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Set;
+import javax.swing.AbstractAction;
+import javax.swing.Action;
+import javax.swing.ActionMap;
 import javax.swing.BorderFactory;
+import javax.swing.InputMap;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
+import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
-import javax.swing.JTable;
 import javax.swing.JPanel;
 import javax.swing.JRootPane;
 import javax.swing.JScrollPane;
+import javax.swing.JTable;
+import javax.swing.KeyStroke;
 import javax.swing.ListSelectionModel;
 import javax.swing.SwingUtilities;
 import javax.swing.border.Border;
@@ -54,6 +62,7 @@ import net.sourceforge.waters.gui.command.EditCommand;
 import net.sourceforge.waters.gui.command.InsertCommand;
 import net.sourceforge.waters.gui.transfer.SelectionOwner;
 import net.sourceforge.waters.gui.util.DialogCancelAction;
+import net.sourceforge.waters.gui.util.NonTypingTable;
 import net.sourceforge.waters.gui.util.RaisedDialogPanel;
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
 import net.sourceforge.waters.model.expr.BinaryOperator;
@@ -210,9 +219,11 @@ public class VariableEditorDialog
       (KeyboardFocusManager.BACKWARD_TRAVERSAL_KEYS);
     mMarkingsTable.setFocusTraversalKeys
       (KeyboardFocusManager.BACKWARD_TRAVERSAL_KEYS, backward);
+    mMarkingsTable.addEscapeAction();
     final SimpleExpressionEditor propeditor =
       new SimpleExpressionEditor(Operator.TYPE_NAME, parser, mErrorLabel);
     mMarkingsTable.setDefaultEditor(IdentifierSubject.class, propeditor);
+    propeditor.setAllowNull(true);
     propeditor.setToolTipText("Enter the name of a proposition event");
     propeditor.addCellEditorListener(mMarkingsModel);
     final TableCellEditor prededitor = new PredicateExpressionEditor(parser);
@@ -231,38 +242,29 @@ public class VariableEditorDialog
           handleMarkingsTableClick(event);
         }
       });
-    mAddButton = new JButton("Add");
+    mAddAction = new AddMarkingAction();
+    final JRootPane root = getRootPane();
+    final String name = (String) mAddAction.getValue(Action.NAME);
+    final KeyStroke key =
+      (KeyStroke) mAddAction.getValue(Action.ACCELERATOR_KEY);
+    final InputMap imap = root.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
+    final ActionMap amap = root.getActionMap();
+    imap.put(key, name);
+    amap.put(name, mAddAction);
+    mAddButton = new JButton(mAddAction);
     mAddButton.setRequestFocusEnabled(false);
-    mAddButton.addActionListener(new ActionListener() {
-        public void actionPerformed(final ActionEvent event)
-        {
-          addMarking();
-        }
-      });
-    mRemoveButton = new JButton("Remove");
+    mRemoveAction = new RemoveMarkingsAction();
+    mMarkingsTable.addKeyboardAction(mRemoveAction);
+    mRemoveButton = new JButton(mRemoveAction);
     mRemoveButton.setRequestFocusEnabled(false);
-    mRemoveButton.addActionListener(new ActionListener() {
-        public void actionPerformed(final ActionEvent event)
-        {
-          removeMarking();
-        }
-      });
-    mUpButton = new JButton("Up");
+    mUpAction = new MoveMarkingsUpAction();
+    mMarkingsTable.addKeyboardAction(mUpAction);
+    mUpButton = new JButton(mUpAction);
     mUpButton.setRequestFocusEnabled(false);
-    mUpButton.addActionListener(new ActionListener() {
-        public void actionPerformed(final ActionEvent event)
-        {
-          moveMarkingUp();
-        }
-      });
-    mDownButton = new JButton("Down");
+    mDownAction = new MoveMarkingsDownAction();
+    mMarkingsTable.addKeyboardAction(mDownAction);
+    mDownButton = new JButton(mDownAction);
     mDownButton.setRequestFocusEnabled(false);
-    mDownButton.addActionListener(new ActionListener() {
-        public void actionPerformed(final ActionEvent event)
-        {
-          moveMarkingDown();
-        }
-      });
 
     // Buttons panel ...
     mButtonsPanel = new JPanel();
@@ -271,17 +273,11 @@ public class VariableEditorDialog
     okButton.setRequestFocusEnabled(false);
     okButton.addActionListener(commithandler);
     mButtonsPanel.add(okButton);
-    final JButton cancelButton = new JButton("Cancel");
+    final Action cancelAction = DialogCancelAction.getInstance();
+    final JButton cancelButton = new JButton(cancelAction);
     cancelButton.setRequestFocusEnabled(false);
-    cancelButton.addActionListener(new ActionListener() {
-        public void actionPerformed(final ActionEvent event)
-        {
-          dispose();
-        }
-      });
     mButtonsPanel.add(cancelButton);
 
-    final JRootPane root = getRootPane();
     root.setDefaultButton(okButton);
     DialogCancelAction.register(this);
   }
@@ -436,19 +432,19 @@ public class VariableEditorDialog
   {
     final int selcount = mMarkingsTable.getSelectedRowCount();
     if (selcount > 0) {
-      mRemoveButton.setEnabled(true);
+      mRemoveAction.setEnabled(true);
       final ListSelectionModel selmodel = mMarkingsTable.getSelectionModel();
       final int maxindex = selmodel.getMaxSelectionIndex();
       final int minindex = selmodel.getMinSelectionIndex();
       final int lastrow = mMarkingsTable.getRowCount() - 1;
-      mUpButton.setEnabled(minindex > 0 ||
+      mUpAction.setEnabled(minindex > 0 ||
                            minindex + selcount - 1 < maxindex);
-      mDownButton.setEnabled(maxindex < lastrow ||
+      mDownAction.setEnabled(maxindex < lastrow ||
                              maxindex - selcount + 1 > minindex);
     } else {
-      mRemoveButton.setEnabled(false);
-      mUpButton.setEnabled(false);
-      mDownButton.setEnabled(false);
+      mRemoveAction.setEnabled(false);
+      mUpAction.setEnabled(false);
+      mDownAction.setEnabled(false);
     }
   }
 
@@ -529,7 +525,7 @@ public class VariableEditorDialog
    * This method is attached to action listener of the 'remove' button
    * of the markings list control.
    */
-  private void removeMarking()
+  private void removeMarkings()
   {
     final ListSelectionModel selmodel = mMarkingsTable.getSelectionModel();
     if (mMarkingsTable.isEditing()) {
@@ -559,7 +555,7 @@ public class VariableEditorDialog
    * This method is attached to action listener of the 'up' button
    * of the markings list control.
    */
-  private void moveMarkingUp()
+  private void moveMarkingsUp()
   {
     if (mMarkingsTable.isEditing()) {
       final TableCellEditor editor = mMarkingsTable.getCellEditor();
@@ -568,7 +564,7 @@ public class VariableEditorDialog
         SwingUtilities.invokeLater(new Runnable() {
             public void run()
             {
-              moveMarkingUp();
+              moveMarkingsUp();
             }
           });
       }
@@ -588,7 +584,7 @@ public class VariableEditorDialog
    * This method is attached to action listener of the 'down' button
    * of the markings list control.
    */
-  private void moveMarkingDown()
+  private void moveMarkingsDown()
   {
     if (mMarkingsTable.isEditing()) {
       final TableCellEditor editor = mMarkingsTable.getCellEditor();
@@ -597,7 +593,7 @@ public class VariableEditorDialog
         SwingUtilities.invokeLater(new Runnable() {
             public void run()
             {
-              moveMarkingDown();
+              moveMarkingsDown();
             }
           });
       }
@@ -953,7 +949,7 @@ public class VariableEditorDialog
    * columns.
    */
   private static class VariableMarkingTable
-    extends JTable
+    extends NonTypingTable
   {
 
     //#######################################################################
@@ -980,6 +976,116 @@ public class VariableEditorDialog
 
 
   //#########################################################################
+  //# Inner Class AddIndexAction
+  private class AddMarkingAction extends AbstractAction
+  {
+
+    //#######################################################################
+    //# Constructor
+    private AddMarkingAction()
+    {
+      putValue(Action.NAME, "Add");
+      putValue(Action.SHORT_DESCRIPTION, "Create a new index range");
+      putValue(Action.MNEMONIC_KEY, KeyEvent.VK_INSERT);
+      putValue(Action.ACCELERATOR_KEY,
+               KeyStroke.getKeyStroke(KeyEvent.VK_INSERT, 0));
+      setEnabled(true);
+    }
+ 
+    //#######################################################################
+    //# Interface java.awt.event.ActionListener
+    public void actionPerformed(final ActionEvent event)
+    {
+      addMarking();
+    }
+
+  }
+
+
+  //#########################################################################
+  //# Inner Class RemoveMarkingsAction
+  private class RemoveMarkingsAction extends AbstractAction
+  {
+
+    //#######################################################################
+    //# Constructor
+    private RemoveMarkingsAction()
+    {
+      putValue(Action.NAME, "Remove");
+      putValue(Action.SHORT_DESCRIPTION, "Delete all selected index ranges");
+      putValue(Action.MNEMONIC_KEY, KeyEvent.VK_DELETE);
+      putValue(Action.ACCELERATOR_KEY,
+               KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, 0));
+      setEnabled(false);
+    }
+ 
+    //#######################################################################
+    //# Interface java.awt.event.ActionListener
+    public void actionPerformed(final ActionEvent event)
+    {
+      removeMarkings();
+    }
+
+  }
+
+
+  //#########################################################################
+  //# Inner Class MoveMarkingsUpAction
+  private class MoveMarkingsUpAction extends AbstractAction
+  {
+
+    //#######################################################################
+    //# Constructor
+    private MoveMarkingsUpAction()
+    {
+      putValue(Action.NAME, "Up");
+      putValue(Action.SHORT_DESCRIPTION, "Move selected index ranges up");
+      putValue(Action.MNEMONIC_KEY, KeyEvent.VK_UP);
+      putValue(Action.ACCELERATOR_KEY,
+               KeyStroke.getKeyStroke(KeyEvent.VK_UP,
+                                      InputEvent.CTRL_DOWN_MASK));
+      setEnabled(false);
+    }
+ 
+    //#######################################################################
+    //# Interface java.awt.event.ActionListener
+    public void actionPerformed(final ActionEvent event)
+    {
+      moveMarkingsUp();
+    }
+
+  }
+
+
+  //#########################################################################
+  //# Inner Class MoveMarkingsDownAction
+  private class MoveMarkingsDownAction extends AbstractAction
+  {
+
+    //#######################################################################
+    //# Constructor
+    private MoveMarkingsDownAction()
+    {
+      putValue(Action.NAME, "Down");
+      putValue(Action.SHORT_DESCRIPTION, "Move selected index ranges down");
+      putValue(Action.MNEMONIC_KEY, KeyEvent.VK_DOWN);
+      putValue(Action.ACCELERATOR_KEY,
+               KeyStroke.getKeyStroke(KeyEvent.VK_DOWN,
+                                      InputEvent.CTRL_DOWN_MASK));
+      setEnabled(false);
+    }
+ 
+    //#######################################################################
+    //# Interface java.awt.event.ActionListener
+    public void actionPerformed(final ActionEvent event)
+    {
+      moveMarkingsDown();
+    }
+
+  }
+
+
+  //#########################################################################
   //# Data Members
   // Dialog state
   private final ModuleWindowInterface mRoot;
@@ -997,7 +1103,11 @@ public class VariableEditorDialog
 
   private JPanel mMarkingsPanel;
   private VariableMarkingTableModel mMarkingsModel;
-  private JTable mMarkingsTable;
+  private VariableMarkingTable mMarkingsTable;
+  private Action mAddAction;
+  private Action mRemoveAction;
+  private Action mUpAction;
+  private Action mDownAction;
   private JButton mAddButton;
   private JButton mRemoveButton;
   private JButton mUpButton;
