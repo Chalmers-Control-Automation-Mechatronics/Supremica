@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui.actions
 //# CLASS:   InsertEventLabelAction
 //###########################################################################
-//# $Id: InsertEventLabelAction.java,v 1.1 2008-03-07 04:11:02 robi Exp $
+//# $Id: InsertEventLabelAction.java,v 1.2 2008-03-16 21:27:39 robi Exp $
 //###########################################################################
 
 
@@ -41,7 +41,7 @@ public class InsertEventLabelAction
     putValue(Action.SHORT_DESCRIPTION, "Add an event label to the graph");
     putValue(Action.MNEMONIC_KEY, KeyEvent.VK_L);
     putValue(Action.ACCELERATOR_KEY,
-             KeyStroke.getKeyStroke(KeyEvent.VK_L, ActionEvent.ALT_MASK));
+             KeyStroke.getKeyStroke(KeyEvent.VK_INSERT, 0));
     putValue(Action.SMALL_ICON, IconLoader.ICON_EVENT);
   }
 

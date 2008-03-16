@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   GraphEventPanel
 //###########################################################################
-//# $Id: GraphEventPanel.java,v 1.4 2008-03-14 00:12:22 robi Exp $
+//# $Id: GraphEventPanel.java,v 1.5 2008-03-16 21:27:39 robi Exp $
 //###########################################################################
 
 
@@ -31,8 +31,6 @@ import java.awt.dnd.InvalidDnDOperationException;
 import java.awt.event.ActionEvent;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
-import java.awt.event.InputEvent;
-import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
@@ -43,14 +41,10 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
-import javax.swing.AbstractAction;
 import javax.swing.Action;
-import javax.swing.ActionMap;
 import javax.swing.Icon;
-import javax.swing.InputMap;
 import javax.swing.JComponent;
 import javax.swing.JTable;
-import javax.swing.KeyStroke;
 import javax.swing.ListSelectionModel;
 import javax.swing.SwingUtilities;
 import javax.swing.event.ListSelectionEvent;
@@ -192,12 +186,9 @@ public class GraphEventPanel
     final DropTargetListener dropper = new DropListener();
     final DropTarget droptarget = new DropTarget(this, dropper);
 
-    final InputMap inputmap = getInputMap();
-    inputmap.put(STROKE_TAB, ACTNAME_DOWN);
-    inputmap.put(STROKE_SHIFT_TAB, ACTNAME_UP);
-    final ActionMap actionmap = getActionMap();
-    actionmap.put(ACTNAME_DOWN, new NavigationAction(ACTNAME_DOWN, 1));
-    actionmap.put(ACTNAME_UP, new NavigationAction(ACTNAME_UP, -1));
+    final Action add = manager.getInsertEventLabelAction();
+    addKeyboardAction(add);
+    addCycleActions();
     manager.installCutCopyPasteActions(this);
   }
 
@@ -625,52 +616,6 @@ public class GraphEventPanel
   {
     final Container viewport = getParent();
     return getPreferredSize().height < viewport.getHeight();
-  }
-
-  /**
-   * Disables standard editing behaviour of JTable.
-   * Normally, when input is typed (or DELETE is pressed), JTable will
-   * will open a cell editor for the current component and start editing.
-   * This override disables the default behaviour, so editing is only
-   * possible after having double-clicked a cell. Most importantly,
-   * pressing DELETE deletes the event label and not just its first
-   * character.
-   */
-  protected boolean processKeyBinding(final KeyStroke stroke,
-                                      final KeyEvent event,
-                                      final int cond,
-                                      final boolean pressed)
-  {
-    if (isEditing()) {
-      return super.processKeyBinding(stroke, event, cond, pressed);
-    } else {
-      final InputMap imap0 = getInputMap(cond);
-      final ActionMap amap0 = getActionMap();
-      if (imap0 != null && amap0 != null) {
-        final Object binding = imap0.get(stroke);
-        if (binding != null && amap0.get(binding) != null) {
-          return super.processKeyBinding(stroke, event, cond, pressed);
-        }
-      }
-      final int row = getSelectedRow();
-      final int column = getSelectedColumn();
-      if (row >= 0 && column >= 0) {
-        final TableCellRenderer renderer = getCellRenderer(row, column);
-        final Component comp = prepareRenderer(renderer, row, column);
-        if (comp instanceof JComponent) {
-          final JComponent jcomp = (JComponent) comp;
-          final InputMap imap = jcomp.getInputMap();
-          final ActionMap amap = jcomp.getActionMap();
-          if (imap != null && amap != null) {
-            final Object binding = imap.get(stroke);
-            if (binding != null && amap.get(binding) != null) {
-              return super.processKeyBinding(stroke, event, cond, pressed);
-            }
-          }
-        }
-      }
-      return false;
-    }
   }
 
 
@@ -1148,39 +1093,6 @@ public class GraphEventPanel
 
 
   //#########################################################################
-  //# Local Class NavigationAction
-  private class NavigationAction extends AbstractAction
-  {
-
-    //#######################################################################
-    //# Data Members
-    private NavigationAction(final String name, final int offset)
-    {
-      super(name);
-      mOffset = offset;
-    }
-
-    //#######################################################################
-    //# Interface java.awt.event.ActionListener
-    public void actionPerformed(final ActionEvent event)
-    {
-      if (!isEditing()) {
-	final ListSelectionModel selmodel = getSelectionModel();
-	final int numrows = getRowCount();
-	final int selrow = selmodel.getLeadSelectionIndex();
-	final int newrow = (selrow + numrows + mOffset) % numrows;
-	setRowSelectionInterval(newrow, newrow);
-      }
-    }
-
-    //#######################################################################
-    //# Data Members
-    private final int mOffset;
-
-  }
-
-
-  //#########################################################################
   //# Inner Class DeleteVisitor
   private class DeleteVisitor
     extends AbstractModuleProxyVisitor
@@ -1426,15 +1338,5 @@ public class GraphEventPanel
   private static final int MINCOLUMNWIDTH0 = 20;
   private static final int COLUMNWIDTH1 = 96;
   private static final int MINCOLUMNWIDTH1 = 24;
-
-  private static final KeyStroke STROKE_DELETE =
-    KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, 0);
-  private static final KeyStroke STROKE_TAB =
-    KeyStroke.getKeyStroke(KeyEvent.VK_TAB, 0);
-  private static final KeyStroke STROKE_SHIFT_TAB =
-    KeyStroke.getKeyStroke(KeyEvent.VK_TAB, InputEvent.SHIFT_MASK);
-
-  private static final String ACTNAME_DOWN = "GraphEventPanel.DOWN";
-  private static final String ACTNAME_UP = "GraphEventPanel.UP";
 
 }

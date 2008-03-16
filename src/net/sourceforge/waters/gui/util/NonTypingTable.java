@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui.util
 //# CLASS:   NonTypingTable
 //###########################################################################
-//# $Id: NonTypingTable.java,v 1.1 2008-03-14 00:12:22 robi Exp $
+//# $Id: NonTypingTable.java,v 1.2 2008-03-16 21:27:39 robi Exp $
 //###########################################################################
 
 
@@ -12,6 +12,7 @@ package net.sourceforge.waters.gui.util;
 
 import java.awt.Component;
 import java.awt.event.ActionEvent;
+import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
@@ -80,6 +81,14 @@ public class NonTypingTable
 
   //#########################################################################
   //# Special Key Bindings
+  public void addCycleActions()
+  {
+    final Action down = new CycleAction(CYCLE_DOWN, STROKE_TAB, 1);
+    addKeyboardAction(down);
+    final Action up = new CycleAction(CYCLE_UP, STROKE_SHIFT_TAB, -1);
+    addKeyboardAction(up);
+  }
+
   public void addEscapeAction()
   {
     final Action action = new DeselectAllAction();
@@ -92,8 +101,10 @@ public class NonTypingTable
     final KeyStroke key = (KeyStroke) action.getValue(Action.ACCELERATOR_KEY);
     final InputMap imap = getInputMap();
     final ActionMap amap = getActionMap();
-    imap.put(key, name);
-    amap.put(name, action);
+    if (key != null && imap != null && amap != null) {
+      imap.put(key, name);
+      amap.put(name, action);
+    }
   }
   
 
@@ -206,5 +217,52 @@ public class NonTypingTable
     }
 
   }
+
+
+  //#########################################################################
+  //# Local Class CycleAction
+  private class CycleAction extends AbstractAction
+  {
+
+    //#######################################################################
+    //# Data Members
+    private CycleAction(final String name,
+                        final KeyStroke stroke,
+                        final int offset)
+    {
+      super(name);
+      putValue(Action.ACCELERATOR_KEY, stroke);
+      mOffset = offset;
+    }
+
+    //#######################################################################
+    //# Interface java.awt.event.ActionListener
+    public void actionPerformed(final ActionEvent event)
+    {
+      if (!isEditing()) {
+	final ListSelectionModel selmodel = getSelectionModel();
+	final int numrows = getRowCount();
+	final int selrow = selmodel.getLeadSelectionIndex();
+	final int newrow = (selrow + numrows + mOffset) % numrows;
+	setRowSelectionInterval(newrow, newrow);
+      }
+    }
+
+    //#######################################################################
+    //# Data Members
+    private final int mOffset;
+
+  }
+
+
+  //#########################################################################
+  //# Class Constants
+  private static final KeyStroke STROKE_TAB =
+    KeyStroke.getKeyStroke(KeyEvent.VK_TAB, 0);
+  private static final KeyStroke STROKE_SHIFT_TAB =
+    KeyStroke.getKeyStroke(KeyEvent.VK_TAB, InputEvent.SHIFT_MASK);
+
+  private static final String CYCLE_DOWN = "Cycle Down";
+  private static final String CYCLE_UP = "Cycle Up";
 
 }
