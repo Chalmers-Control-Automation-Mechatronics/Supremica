@@ -125,7 +125,7 @@ class ModelMaker
                     }
                 }
             }
-            if (args[i].charAt(0) != '-')
+            if (i+1 == args.length)
             {
                 arguments.put("systemFileName", args[i]);
                 if (arguments.get("outputFileName") == null)

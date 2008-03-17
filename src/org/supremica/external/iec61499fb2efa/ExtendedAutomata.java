@@ -120,7 +120,7 @@ public class ExtendedAutomata
 			ExtendedAutomataExpander.expandTransitions(module);
 		}
 
-		Logger.output("ExtendedAutomata.writeToFile(): Writing model file.");
+		Logger.output("ExtendedAutomata.writeToFile(): Writing model file: " + file.getName());
 
 		try
 		{
