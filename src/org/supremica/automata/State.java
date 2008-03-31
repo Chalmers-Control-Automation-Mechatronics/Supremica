@@ -143,7 +143,7 @@ public class State
     public State(String name, State otherState)
     {
         this(name);
-        
+
         index = otherState.index;
         initial = otherState.initial;
         accepting = otherState.accepting;
@@ -153,6 +153,24 @@ public class State
         cost = otherState.cost;
         stateSet = otherState.stateSet;
         visited = otherState.visited;
+    }
+    
+    public State(State state, String name)
+    {
+        this(name);
+
+        incomingArcs = state.incomingArcs;
+        outgoingArcs = state.outgoingArcs;
+        
+        index = state.index;
+        initial = state.initial;
+        accepting = state.accepting;
+        forbidden = state.forbidden;
+        first = state.first;
+        last = state.last;
+        cost = state.cost;
+        stateSet = state.stateSet;
+        visited = state.visited;
     }
 
     public NamedProxy clone()

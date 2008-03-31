@@ -193,8 +193,7 @@ public class OnlineBDDSupervisor
 		supervisor.setType(AutomatonType.SUPERVISOR);
 		String supervisorName = "sup(" + automata[0].getName();
 		for(int i = 1; i < automata.length; i++) {
-			supervisorName += Config.SYNC_AUTOMATON_NAME_SEPARATOR.get() + 
-			automata[i].getName();
+			supervisorName += Config.SYNC_AUTOMATON_NAME_SEPARATOR.get() + automata[i].getName();
 		}
 		supervisorName += ")";
 		//supervisor.setName(supervisorName);
@@ -235,7 +234,9 @@ public class OnlineBDDSupervisor
 		}
 		
 		//traverse automata
+                int counter = 0;
 		while(!frontierSet.isEmpty()) {
+                        counter++;
 			//remove a state from the frontier set
 			org.supremica.automata.State[] currentState = frontierSet.remove();
 			org.supremica.automata.State[] targetState = 
@@ -352,7 +353,6 @@ public class OnlineBDDSupervisor
 				}
 			}
 		}
-		
 		//return result
 		return supervisor;
 	}

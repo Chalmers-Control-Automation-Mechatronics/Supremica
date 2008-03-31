@@ -50,6 +50,7 @@
 package org.supremica.gui;
 
 import java.awt.*;
+import java.math.BigDecimal;
 import javax.swing.*;
 import java.util.*;
 import org.supremica.log.*;
@@ -71,58 +72,62 @@ public class AutomataSynthesisWorker
     implements Stoppable
 {
     private static Logger logger = LoggerFactory.createLogger(AutomataSynthesisWorker.class);
-    
+
     private IDEActionInterface ide;
     private Automata theAutomata;
     private SynthesizerOptions synthOptions;
-    
+
     private ExecutionDialog executionDialog;
     private boolean stopRequested = false;
     private EventQueue eventQueue = new EventQueue();
-    
+    private ActionTimer timer;
+    private Automata result;
+
     public AutomataSynthesisWorker(IDEActionInterface gui, Automata theAutomata, SynthesizerOptions options)
     {
         this.ide = gui;
         this.theAutomata = theAutomata;
         this.synthOptions = options;
-        
+
         this.start();
     }
-    
+
     public void run()
     {
         // Initialize the ExecutionDialog
         ArrayList threadsToStop = new ArrayList();
         threadsToStop.add(this);
-        executionDialog = new ExecutionDialog(ide.getFrame(), "Synthesizing", threadsToStop);
-        executionDialog.setMode(ExecutionDialogMode.SYNTHESIZING);
-        
+        if(ide != null){
+            executionDialog = new ExecutionDialog(ide.getFrame(), "Synthesizing", threadsToStop);
+            executionDialog.setMode(ExecutionDialogMode.SYNTHESIZING);
+        }
+
         // OK options?
         String errorMessage = synthOptions.validOptions();
         if (errorMessage != null)
         {
-            JOptionPane.showMessageDialog(ide.getFrame(), errorMessage, "Alert", JOptionPane.ERROR_MESSAGE);
+            if(ide != null)
+                JOptionPane.showMessageDialog(ide.getFrame(), errorMessage, "Alert", JOptionPane.ERROR_MESSAGE);
             requestStop();
             return;
         }
-        
+        timer = new ActionTimer();
         // Timer
-        ActionTimer timer = new ActionTimer();
         timer.start();
-        
+
         // Do the work!!
-        Automata result = new Automata();
+        result = new Automata();
         // Are there many or just one automaton?
         if (theAutomata.size() > 1)
         {
             // Get default synchronization options
             SynchronizationOptions syncOptions = SynchronizationOptions.getDefaultSynthesisOptions();
-                 
+
             try
             {
-                AutomataSynthesizer synthesizer = new AutomataSynthesizer(theAutomata, syncOptions,
-                    synthOptions);
-                synthesizer.setExecutionDialog(executionDialog);
+                AutomataSynthesizer synthesizer = new AutomataSynthesizer(theAutomata, syncOptions, synthOptions);
+                if(ide != null)
+                    synthesizer.setExecutionDialog(executionDialog);
                 threadsToStop.add(synthesizer);
                 result.addAutomata(synthesizer.execute());
                 threadsToStop.remove(synthesizer);
@@ -137,7 +142,7 @@ public class AutomataSynthesisWorker
         {
             // Make copy
             Automaton theAutomaton = new Automaton(theAutomata.getFirstAutomaton());
-            
+
             try
             {
                 // ARASH: this is IDIOTIC! why didn't we prepare for more than one monolithc algorithm???
@@ -157,49 +162,101 @@ public class AutomataSynthesisWorker
                 logger.debug(ex.getStackTrace());
             }
         }
-        
+
         // Timer
         timer.stop();
-        
+
         // Hide execution dialog
         EventQueue.invokeLater(new Runnable()
         {
             public void run()
             {
-                if (executionDialog != null)
+                if(ide != null)
                 {
-                    executionDialog.setMode(ExecutionDialogMode.HIDE);
+                    if (executionDialog != null)
+                    {
+                        executionDialog.setMode(ExecutionDialogMode.HIDE);
+                    }
                 }
             }
         });
-        
+
         // Present result
         if (!stopRequested)
         {
             logger.info("Synthesis completed after " + timer.toString() + ".");
-            
+
             // Add new automata
-            try
+            if(ide != null)
             {
-                ide.getIDE().getActiveDocumentContainer().getAnalyzerPanel().addAutomata(result);
-            }
-            catch (Exception ex)
-            {
-                logger.error(ex);
+                try
+                {
+                    ide.getIDE().getActiveDocumentContainer().getAnalyzerPanel().addAutomata(result);
+                }
+                catch (Exception ex)
+                {
+                    logger.error(ex);
+                }
             }
         }
         else
         {
             logger.info("Execution stopped after " + timer.toString());
         }
-        
-        // We're finished! Make sure to kill the ExecutionDialog!
-        if (executionDialog != null)
+
+        if(ide != null)
         {
-            executionDialog.setMode(ExecutionDialogMode.HIDE);
+            // We're finished! Make sure to kill the ExecutionDialog!
+            if (executionDialog != null)
+            {
+                executionDialog.setMode(ExecutionDialogMode.HIDE);
+            }
         }
     }
-    
+
+    public Automaton getSupervisor()
+    {
+        return result.getFirstAutomaton();
+    }
+
+    public String getTime()
+    {
+        return timer.toString();
+    }
+
+    public BigDecimal getTimeSeconds()
+    {
+        String[] result = (getTime()).split("\\s");
+        Float out = (float)-1;
+        if(result.length==2)
+            out = (new Float(result[0]))/1000;
+        else
+        {
+            Float f1=new Float(-1),f2=new Float(-1);
+            if(result[1].equals("seconds"))
+                f1 = new Float(result[0]);
+            else if(result[1].equals("minutes"))
+                f1 = new Float(result[0])*60;
+            else if(result[1].equals("hours"))
+                f1 = new Float(result[0])*120;
+            
+            if(result[3].equals("milliseconds"))
+                f2 = new Float(result[2])/ 1000;
+            else if(result[3].equals("seconds"))
+                f2 = new Float(result[2]);
+            else if(result[3].equals("minutes"))
+                f2 = new Float(result[2])*60;
+
+            out = (f1+f2);
+        }
+        
+        BigDecimal bd = new BigDecimal(out);
+        bd = bd.setScale(3,BigDecimal.ROUND_DOWN);
+        
+        return bd;
+        
+    }
+
     /**
      * Does the actual work.
      *
@@ -208,13 +265,13 @@ public class AutomataSynthesisWorker
     private Automata work()
     {
         Automata result = new Automata();
-        
+
         // Are there many or just one automaton?
         if (theAutomata.size() > 1)
         {
             // Get default synchronization options
             SynchronizationOptions syncOptions = SynchronizationOptions.getDefaultSynthesisOptions();
-            
+
             try
             {
                 AutomataSynthesizer synthesizer = new AutomataSynthesizer(theAutomata, syncOptions,
@@ -230,7 +287,7 @@ public class AutomataSynthesisWorker
         else    // single automaton selected
         {
             Automaton theAutomaton = theAutomata.getFirstAutomaton();
-            
+
             try
             {
                 // ARASH: this is IDIOTIC! why didnt we prepare for more than one monolithc algorithm???
@@ -239,7 +296,7 @@ public class AutomataSynthesisWorker
                 //? new AutomatonSynthesizerSingleFixpoint(theAutomaton, options)
                 //: new AutomatonSynthesizer(theAutomaton, options);
                 AutomatonSynthesizer synthesizer = new AutomatonSynthesizer(theAutomaton, synthOptions);
-                    
+
                 // AutomatonSynthesizer synthesizer = new AutomatonSynthesizer(theAutomaton,synthesizerOptions);
                 synthesizer.synthesize();
             }
@@ -249,10 +306,10 @@ public class AutomataSynthesisWorker
                 logger.debug(ex.getStackTrace());
             }
         }
-        
+
         return result;
     }
-    
+
     /**
      * Method that stops the worker as soon as possible.
      *
@@ -261,15 +318,15 @@ public class AutomataSynthesisWorker
     public void requestStop()
     {
         stopRequested = true;
-        
+
         logger.debug("AutomataSynthesisWorker requested to stop.");
-        
+
         if (executionDialog != null)
         {
             executionDialog.setMode(ExecutionDialogMode.HIDE);
         }
     }
-    
+
     public boolean isStopped()
     {
         return stopRequested;

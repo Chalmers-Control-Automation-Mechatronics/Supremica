@@ -55,7 +55,18 @@ public class Builder
 	{
 		this.s_automata = s_automata;
 		automata = new Automata();
-
+                
+/*                System.out.println("New builderrrrrrrrrrrr");
+                
+                
+                for (Iterator<org.supremica.automata.State> sit = s_automata.getFirstAutomaton().stateIterator(); sit.hasNext(); )
+		{
+                    org.supremica.automata.State s_st = sit.next();
+                    String name = s_st.getName();
+                    System.out.println("state name: "+name);
+                    System.out.println("num arcs: "+s_st.nbrOfOutgoingArcs());
+                }
+ */
 		// build the automata
 		for (Iterator it = s_automata.iterator(); it.hasNext(); )
 		{
@@ -79,6 +90,7 @@ public class Builder
 
 				String id = le.getLabel();    // le.getId() has DEFAULT ACCESS, why??
 				String label = le.getLabel();
+                                
 
 				if (label == null)
 				{
@@ -116,6 +128,7 @@ public class Builder
 				a.addState(name, name_id, initial, marked, forbidden);
 
 				// add arcs
+//                                System.out.println("automaton name: "+a.getName());
 				for(Iterator<org.supremica.automata.Arc> ait = s_st.outgoingArcsIterator(); 
 					ait.hasNext(); )
 				{

@@ -25,7 +25,7 @@ public class AutomataBDDSynthesizer
 		this.theAutomata = theAutomata;
 		this.type_c = supC;
 		this.type_nb = supNB;
-
+                
 		try
 		{
 			Builder bu = new Builder(theAutomata);
@@ -60,14 +60,34 @@ public class AutomataBDDSynthesizer
 			ba.cleanup();
 		}
 	}
-
+        
+        public int coReachStates()
+        {
+            return sup.getCoReachables();
+        }
+        
+        public int reachStates()
+        {
+            return sup.getReachables();
+        }
+        
+        public int deadStates()
+        {
+            return sup.getDeadlocks();
+        }
+        
+        public BDDAutomata getBDDAutomata()
+        {
+            return ba;
+        }
+        
 	/**
 	 * compute the safe states for the given options
 	 *
 	 */
-	protected int compute()
+	public int compute()
 	{
-		return sup.getSafeStates(type_nb, type_c);
+            return sup.getSafeStates(type_nb, type_c);
 	}
 
 	/**

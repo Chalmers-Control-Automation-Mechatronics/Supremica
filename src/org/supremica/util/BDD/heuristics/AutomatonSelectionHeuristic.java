@@ -4,7 +4,7 @@ import org.supremica.util.BDD.*;
 
 /**
  * interface for heuristics where given the data above, a queue is sorted with
- * (probabley) best automaton at the _end_ of the queue and the least relevant
+ * (probably) best automaton at the _end_ of the queue and the least relevant
  * in the beginning
  *
  */

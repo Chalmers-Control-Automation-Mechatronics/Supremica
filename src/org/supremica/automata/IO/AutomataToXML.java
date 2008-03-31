@@ -273,6 +273,14 @@ public class AutomataToXML
         serialize(theFile.getAbsolutePath());
     }
     
+    public String serialize()
+    {
+        StringWriter sw = new StringWriter();
+        PrintWriter pw = new PrintWriter(sw);
+        serialize(pw);
+        return sw.toString();
+    }
+    
     void printIntArray(PrintWriter pw, int[] theArray)
     {
         for (int i : theArray)

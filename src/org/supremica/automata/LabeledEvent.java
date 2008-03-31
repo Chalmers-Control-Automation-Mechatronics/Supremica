@@ -103,6 +103,19 @@ public class LabeledEvent
         index = e.index;
     }
     
+    public LabeledEvent(LabeledEvent e, String newLabel)
+    {
+        controllable = e.controllable;
+        prioritized = e.prioritized;
+        observable = e.observable;
+        operatorIncrease = e.operatorIncrease;
+        operatorReset = e.operatorReset;
+        immediate = e.immediate;
+        proposition = e.proposition;
+        index = e.index;
+        label = newLabel;
+    }
+    
     public LabeledEvent(EventProxy e)
     {
         label = e.getName();

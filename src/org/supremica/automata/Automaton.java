@@ -2539,7 +2539,6 @@ public class Automaton
     public boolean replaceEvent(LabeledEvent old_event, LabeledEvent new_event)
     {
         boolean done_anything = false; // not yet...
-        
         // We start with removing teh old event, and adding teh new event, '
         // to minimize the risk for ending up in an inconsistent state, due to exceptions
         // remove old_event from the alphabet - *no* testing for existence, may throw!
@@ -2566,6 +2565,12 @@ public class Automaton
         }
         
         return done_anything;
+    }
+    
+     public void replaceState(State old_state, State new_state)
+    {
+        getStateSet().remove(old_state);
+        getStateSet().add(new_state);
     }
     
     // Since events are immutable, renaming is actually replacing the old with a new

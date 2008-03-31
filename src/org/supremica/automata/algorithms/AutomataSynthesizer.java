@@ -49,6 +49,7 @@
  */
 package org.supremica.automata.algorithms;
 
+import java.math.BigDecimal;
 import java.util.*;
 import org.supremica.log.*;
 import org.supremica.gui.*;
@@ -56,7 +57,9 @@ import org.supremica.automata.*;
 import org.supremica.automata.algorithms.minimization.*;
 import org.supremica.properties.Config;
 import org.supremica.automata.BDD.BDDSynthesizer;
+import org.supremica.util.ActionTimer;
 import org.supremica.util.BDD.OnlineBDDSupervisor;
+import org.supremica.util.BDD.BDDAutomata;
 
 // This one is used for doMonolithic to return two values
 class MonolithicReturnValue
@@ -90,8 +93,13 @@ public class AutomataSynthesizer
     // For the optimization...
     private boolean maximallyPermissive;
 
+    
+    private ActionTimer timer = new ActionTimer();
     // Statistics
     AutomataSynchronizerHelperStatistics helperStatistics = new AutomataSynchronizerHelperStatistics();
+    
+    private long numberOfStatesBDD;
+    private long numberOfNodesBDD;
 
     public AutomataSynthesizer(Automata theAutomata, SynchronizationOptions synchronizationOptions,
         SynthesizerOptions synthesizerOptions)
@@ -133,6 +141,9 @@ public class AutomataSynthesizer
     public Automata execute()
     throws Exception
     {
+        timer = new ActionTimer();
+        timer.start();
+        
         Automata result = new Automata();
 
         /*
@@ -242,33 +253,59 @@ public class AutomataSynthesizer
             Automata newAutomata = new Automata(theAutomata);
 
             AutomataBDDSynthesizer bddSynthesizer = new AutomataBDDSynthesizer(newAutomata, do_nb, do_c);
+            
+            BDDAutomata bdda = bddSynthesizer.getBDDAutomata();
+            int bdd_int = bddSynthesizer.compute();
+/*            
+            int reach_int = bddSynthesizer.coReachStates();
+            int coreach_int = bddSynthesizer.reachStates();
+            int dead_int = bddSynthesizer.deadStates();
+*/
+            System.err.println("Computing number of states and nodes...");
+/*            
+            bdda.show_states(reach_int);
+            bdda.show_states(coreach_int);
+            bdda.show_states(dead_int);
+*/            
+            numberOfStatesBDD = bdda.count_states(bdd_int);
+//            bdda.show_states(bdd_int);
+ 
+            numberOfNodesBDD = bdda.nodeCount(bdd_int);
+            
+            System.err.println("number of nodes (BDD): "+numberOfNodesBDD);
+
+            System.err.println("number of states (BDD): "+numberOfStatesBDD);
 
             if (synthesizerOptions.doExtractSupervisor())
             {
-				//Perform BDD synthesis
-				OnlineBDDSupervisor supervisor = bddSynthesizer.extractOnlineSupervisor();
+                    //Perform BDD synthesis
+                    OnlineBDDSupervisor supervisor = bddSynthesizer.extractOnlineSupervisor();
 
-				//result.addAutomaton(sup);
-				try
-				{
-					result.addAutomaton(supervisor.createAutomaton());
-				}
-				catch(Exception ex)
-				{
-					logger.error(ex);
-					//ex.printStackTrace();
-				}
-				finally
-				{
-					//clean up (this is needed because of the buddy lib)
-					supervisor.cleanup();
-					bddSynthesizer.cleanup();
-				}
-		}
-		else
-		{
-			bddSynthesizer.cleanup();
-		}
+                    //result.addAutomaton(sup);
+                    try
+                    {
+                        Automaton supAutomaton = supervisor.createAutomaton();
+//                        for(int i=0;i<supAutomaton.nbrOfStates();i++)
+//                            System.err.println(supAutomaton.getStateWithIndex(i).getName());
+                            
+                        result.addAutomaton(supAutomaton);
+                    }
+                    catch(Exception ex)
+                    {
+                            logger.error(ex);
+                            //ex.printStackTrace();
+                    }
+                    finally
+                    {
+                            //clean up (this is needed because of the buddy lib)
+                            supervisor.cleanup();
+                            bddSynthesizer.cleanup();
+                    }
+            }
+            else
+            {
+                    bddSynthesizer.cleanup();
+            }
         }
         else if (synthesizerOptions.getSynthesisAlgorithm() == SynthesisAlgorithm.MONOLITHICBDD)
         {
@@ -282,8 +319,58 @@ public class AutomataSynthesizer
         {
             logger.error("Unknown synthesis algorithm");
         }
-
+        
+        timer.stop();
         return result;
+    }
+    
+    public String getTime()
+    {
+        System.err.println(timer.toString());
+        return timer.toString();
+    }
+    
+    public BigDecimal getTimeSeconds()
+    {
+        String[] result = (getTime()).split("\\s");
+        Float out = (float)-1;
+        if(result.length==2)
+            out = (new Float(result[0]))/1000;
+        else
+        {
+            Float f1=new Float(-1),f2=new Float(-1);
+            if(result[1].equals("seconds"))
+                f1 = new Float(result[0]);
+            else if(result[1].equals("minutes"))
+                f1 = new Float(result[0])*60;
+            else if(result[1].equals("hours"))
+                f1 = new Float(result[0])*60*60;
+            
+            if(result[3].equals("milliseconds"))
+                f2 = new Float(result[2])/ 1000;
+            else if(result[3].equals("seconds"))
+                f2 = new Float(result[2]);
+            else if(result[3].equals("minutes"))
+                f2 = new Float(result[2])*60;
+
+            out = (f1+f2);
+        }
+        
+        BigDecimal bd = new BigDecimal(out);
+        bd = bd.setScale(3,BigDecimal.ROUND_DOWN);
+        
+        return bd;
+        
+    }
+    
+    public long getNbrOfStatesBDD()
+    {
+        return numberOfStatesBDD;
+    }
+    
+    public long getNbrOfNodesBDD()
+    {
+        return numberOfNodesBDD;
     }
 
     /**

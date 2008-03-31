@@ -1028,9 +1028,6 @@ public class Supervisor
         int xp, x = manager.ref( getUncontrollableStates() );
         timer.report("Uncontrollable by syncronization found", true);
         
-        
-        
-        
         // 1.b if there are any explicitly forbidden states, we must add them to!
         int explicitly_forbidden = manager.computeF();
         x = manager.orTo(x, explicitly_forbidden);
@@ -1051,6 +1048,7 @@ public class Supervisor
                 case Options.SUP_REACHABILITY_ALL:
                     int not_reachable = manager.not(getReachables() );
                     x = manager.orTo(x, not_reachable);
+                    x = manager.andTo(x, getCoReachables() );
                     manager.deref(not_reachable);
                     msg = "added unreachable states as forbidden states";
                     break;
