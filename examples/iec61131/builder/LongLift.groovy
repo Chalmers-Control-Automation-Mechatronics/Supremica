@@ -33,8 +33,8 @@ app = ccb.application('LongLift') {
 	Output 'forbidden_middleOutWhenUp'
 	Output 'forbidden_middleOutWhenAboveMiddle'
 	LogicProgram('main') {
-		RS(Q:'qToUp', S:'iBallInLift and iLiftDown and iToUp', R:'not iBallInLift')	// (1)
-		RS(Q:'qToMiddle', S:'iBallInLift and iLiftDown and iToMiddle', R:'not iBallInLift')	// (2)
+		RS(Q:'qToUp', S:'iBallInLift and iLiftDown and iToUp and not qToMiddle', R:'not iBallInLift')	// (1)
+		RS(Q:'qToMiddle', S:'iBallInLift and iLiftDown and iToMiddle and not qToUp', R:'not iBallInLift')	// (2)
 		'qMiddleOut := iBallInLift and iLiftMiddle and not qToUp'()
 //		'qMiddleOut := iBallInLift and iLiftUp'() //Incorrect, copy'n paste error
 		'qUpOut := iBallInLift and iLiftUp'() //Correct
