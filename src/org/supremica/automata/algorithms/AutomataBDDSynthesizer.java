@@ -60,6 +60,11 @@ public class AutomataBDDSynthesizer
 			ba.cleanup();
 		}
 	}
+                
+        public int UCStates()
+        {
+            return sup.getUncontrollableStates();
+        }
         
         public int coReachStates()
         {

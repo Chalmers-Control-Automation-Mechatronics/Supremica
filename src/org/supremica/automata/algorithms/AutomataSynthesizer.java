@@ -256,11 +256,17 @@ public class AutomataSynthesizer
             
             BDDAutomata bdda = bddSynthesizer.getBDDAutomata();
             int bdd_int = bddSynthesizer.compute();
+            
 /*            
-            int reach_int = bddSynthesizer.coReachStates();
-            int coreach_int = bddSynthesizer.reachStates();
+            int coreach_int = bddSynthesizer.coReachStates();
             int dead_int = bddSynthesizer.deadStates();
-*/
+
+            int reach_int = bddSynthesizer.reachStates();
+            int uc_int = bddSynthesizer.UCStates();
+            
+            System.err.println("number of reachable states: "+bdda.count_states(reach_int));
+            System.err.println("number of uncontrollable states: "+bdda.count_states(uc_int));
+*/            
             System.err.println("Computing number of states and nodes...");
 /*            
             bdda.show_states(reach_int);

@@ -29,7 +29,7 @@ public class AOH_Random
 			order[i] = i;
 		}
 
-		for (int i = 0; i < size; i++)
+/*		for (int i = 0; i < size; i++)
 		{
 			int j = (int) (Math.random() * size);
 			int tmp = order[i];
@@ -37,5 +37,6 @@ public class AOH_Random
 			order[i] = order[j];
 			order[j] = tmp;
 		}
+ */               
 	}
 }

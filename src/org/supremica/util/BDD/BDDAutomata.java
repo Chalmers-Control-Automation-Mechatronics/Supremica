@@ -40,8 +40,8 @@ public class BDDAutomata
 
 	public BDDAutomata(Automata a)
 	{
-//		super(a.getVariableCount(), Util.suggest_nodecount(a));
-            	super(a.getVariableCount(), 10);
+		super(a.getVariableCount(), Util.suggest_nodecount(a));
+//            	super(a.getVariableCount(), 10);
                 
 		ref_count++;
 

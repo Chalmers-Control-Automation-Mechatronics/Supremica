@@ -39,7 +39,7 @@ class ExtEatingPhilosopher extends EatingPhilosopher
     {
         super();
         this.length = length;
-        this.numInterm=numInterm;
+        this.numInterm = numInterm;
         intermStates = new State[(numInterm-2)];
         
         for(j=0; j<(numInterm-2); j++)
@@ -47,27 +47,10 @@ class ExtEatingPhilosopher extends EatingPhilosopher
             intermStates[j] = new State("intermediate_"+(j+2));
         }
 
-/*        if (inited)
-        {
-            // The only thing that may need to be changed is the controllability
-            Alphabet alpha = EXTphilo.getAlphabet();
-            alpha.getEvent(events[L_TAKE].getLabel()).setControllable(l_take);
-            alpha.getEvent(events[R_TAKE].getLabel()).setControllable(r_take);
-            alpha.getEvent(events[L_PUT].getLabel()).setControllable(l_put);
-            alpha.getEvent(events[R_PUT].getLabel()).setControllable(r_put);
-            alpha.getEvent(events[START_EATING].getLabel()).setControllable(true);
-            
-            alpha.getEvent(events[INTERM_EVENT].getLabel()).setControllable(true);
-                 
-            return;
-
-        }
-*/        
         // Here we create the "template" automaton, EXTphilo
         EXTphilo = new Automaton("EXTPhilo template");
         EXTphilo.setType(AutomatonType.PLANT);
 
-        // These are fivestate project
         states[0].setInitial(true);
         states[0].setAccepting(true);
         for (int i = 0; i < states.length; ++i)

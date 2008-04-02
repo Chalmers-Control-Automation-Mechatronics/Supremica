@@ -248,7 +248,7 @@ public class Supervisor
         return count;
     }
     
-    // ------------------------------------------------------------------------------
+    // ------------------------------------------------------------------------------    
     public int getUncontrollableStates()
     {
         if (!has_uncontrollables)
@@ -264,7 +264,6 @@ public class Supervisor
         timer.reset();
         
         int sigma_u = manager.and(plant.getSigmaU(), spec.getSigmaU());    // WAS manager.getSigmaU();
-        
         bdd_uncontrollables = possibleLanguageContainmentCounterexample(sigma_u, true);
         has_uncontrollables = true;
         
@@ -1119,6 +1118,7 @@ public class Supervisor
         int not_x = manager.not(x);
         manager.deref(x);
         
+//        int output = manager.andTo(trim, not_x );
         
         if (gf != null)
         {
@@ -1127,10 +1127,8 @@ public class Supervisor
         
         timer.report("Safe states computed with " + itr + " iterations", true);
         return not_x;
+//        return output;
     }
-    
-    
-    
     
     // -----[ synthesis helper functions ]--------------------------------------------------------
     /**

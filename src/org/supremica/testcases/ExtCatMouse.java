@@ -86,7 +86,7 @@ public class ExtCatMouse{
     Automata theAutomata = new Automata();
     int number_of_levels, number_of_cats;
     
-    int MODEL_ID = 3;
+    int MODEL_ID = 4;
     
     /** Creates a new instance of ExtCatMouse */
     public ExtCatMouse() {}
@@ -177,7 +177,25 @@ public class ExtCatMouse{
                 }
             }
         }
-        
+        else if(MODEL_ID == 4)
+        {
+            CatBuffer[][] cb = new CatBuffer[num_levels][5];
+            MouseBuffer[][] mb = new MouseBuffer[num_levels][5];
+            ExtRoomSpec[][] spec = new ExtRoomSpec[num_levels][5];
+            int init_id;
+            for (int i = 0; i < num_levels; ++i)
+            {
+                for (int j = 0; j < 5; ++j)
+                {
+                    cb[i][j] = new CatBuffer(num,number_of_levels,i+1,j+1);
+                    mb[i][j] = new MouseBuffer(num,number_of_levels,i+1,j+1);
+                    
+                    spec[i][j] = new ExtRoomSpec(i+1,j+1,number_of_cats, num_levels, cb[i][j].getFEvents(),cb[i][j].getBEvents(),mb[i][j].getFEvents(),mb[i][j].getBEvents());                    
+                    project.addAutomaton(spec[i][j].getAutomaton());
+                    theAutomata.addAutomaton(spec[i][j].getAutomaton());
+                }
+            }
+        }     
     }
     
     public Automata getAutomata()
