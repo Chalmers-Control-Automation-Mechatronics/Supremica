@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.gui
 //# CLASS:   PropertiesDialog
 //###########################################################################
-//# $Id: PropertiesDialog.java,v 1.18 2007-10-19 12:38:28 flordal Exp $
+//# $Id: PropertiesDialog.java,v 1.19 2008-04-03 11:36:25 knut Exp $
 //###########################################################################
 
 /*
@@ -64,6 +64,7 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.*;
 import java.text.NumberFormat;
+import java.text.ParseException;
 import java.util.LinkedList;
 import java.util.List;
 import javax.swing.*;
@@ -85,30 +86,30 @@ public class PropertiesDialog
     extends JDialog
 {
     private static final long serialVersionUID = 1L;
-    
+
     private Frame owner;
     private JPanel dialogPanel = null;
     /** Where the properties show up. */
     private JTabbedPane tabbedPane = null;
     /** The place for controlbuttons for this dialog. */
     private PropertiesControllerPanel controlPanel = null;
-    
+
     private final List<Chooser> chooserList = new LinkedList<Chooser>();
-    
+
     public PropertiesDialog(Frame owner)
     {
         // Create dialog
         super(owner, "Preferences", true);
-        
+
         // Remember owner
         this.owner = owner;
-        
+
         // Get the panel of this dialog
         dialogPanel = (JPanel) getContentPane();
         // Add tabbed pane to panel
         tabbedPane = new JTabbedPane();
         dialogPanel.add(tabbedPane, BorderLayout.CENTER);
-        
+
         // The panel for controlling the dialog
         controlPanel = new PropertiesControllerPanel(this);
         dialogPanel.add(controlPanel, BorderLayout.SOUTH);
@@ -118,7 +119,7 @@ public class PropertiesDialog
         {
             // Create a new panel to put in a tabbed pane
             JPanel panel = new JPanel(new FlowLayout(FlowLayout.CENTER));
-            
+
             /*
             JPanel panel = new JPanel();
             BoxLayout layout = new BoxLayout(panel, BoxLayout.PAGE_AXIS);
@@ -162,23 +163,23 @@ public class PropertiesDialog
                     }
                 }
             }
-            
+
             /*
             JScrollPane pane = new JScrollPane(panel);
             pane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
-            pane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED); 
+            pane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
             */
-            
+
             // Add panel to tabbed pane (only add nonempty panels)
             if (panel.getComponentCount() > 0)
             {
                 tabbedPane.add(type.toString(), panel);
             }
         }
-        
+
         setSize(700, 525);
         //pack();
-        
+
         // Center the window
         Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
         Dimension frameSize = getSize();
@@ -190,7 +191,7 @@ public class PropertiesDialog
         {
             frameSize.width = screenSize.width;
         }
-        
+
         setLocation((screenSize.width - frameSize.width) / 2, (screenSize.height - frameSize.height) / 2);
         addWindowListener(new WindowAdapter()
         {
@@ -200,17 +201,17 @@ public class PropertiesDialog
             }
         });
     }
-    
+
     public Frame getOwnerFrame()
     {
         return owner;
     }
-    
+
     public void doCancel()
     {
         setVisible(false);
     }
-    
+
     public void doApply()
     {
         // Attept to set attributes, if successful, save them!
@@ -225,23 +226,23 @@ public class PropertiesDialog
             {
                 System.err.println("Failed to save changes to config-file: " + exx.getMessage());
             }
-            
+
             doCancel();    // ok, not really cancel. what we do is to close the dialog
         }
-        
+
         owner.repaint();
     }
-    
+
     public void setVisible(boolean toVisible)
     {
         if (toVisible)
         {
             getAttributes();
         }
-        
+
         super.setVisible(toVisible);
     }
-    
+
     /**
      * Update all properties to the current value in Config.
      */
@@ -252,7 +253,7 @@ public class PropertiesDialog
             chooser.getFromConfig();
         }
     }
-    
+
     /**
      * Set all properties in Config to the current values in this dialog.
      */
@@ -262,13 +263,13 @@ public class PropertiesDialog
         {
             chooser.setInConfig();
         }
-        
+
         // The old BDD options (Arash's) are treated specially. They method still use integer variables
-        // in BDD.Options instead of the Config-values. The BDD.Options values are updated by the 
-        // SupremicaProperties.saveProperties()-method (which is run after successfully running this method).        
+        // in BDD.Options instead of the Config-values. The BDD.Options values are updated by the
+        // SupremicaProperties.saveProperties()-method (which is run after successfully running this method).
         return true;
     }
-    
+
     /**
      * Interface for setting and getting a property from Config.
      */
@@ -278,31 +279,31 @@ public class PropertiesDialog
          * Put the current value in the config.
          */
         public void setInConfig();
-        
+
         /**
          * Update to current value in the config.
          */
         public void getFromConfig();
     }
-    
+
     private class BooleanChooser
         extends JCheckBox
         implements Chooser
     {
         private final BooleanProperty property;
-        
+
         BooleanChooser(BooleanProperty property)
         {
             super(property.getComment(), ((BooleanProperty) property).get());
             this.property = property;
         }
-        
+
         public void setInConfig()
         {
             if (!property.isImmutable())
                 property.set(isSelected());
         }
-        
+
         public void getFromConfig()
         {
             setSelected(property.get());
@@ -310,7 +311,7 @@ public class PropertiesDialog
     }
 
     /**
-     * Chooser for IntegerProperty:s. The chooser is a JFormattedTextField and if the property has a range 
+     * Chooser for IntegerProperty:s. The chooser is a JFormattedTextField and if the property has a range
      * (a min and a max value) then there's also a JSlider.
      */
     private class IntegerChooser
@@ -318,26 +319,27 @@ public class PropertiesDialog
         implements Chooser
     {
         private final IntegerProperty property;
-        
+
         JFormattedTextField text;
         JSlider slider;
-        
+        NumberFormat numberFormat;
+
         IntegerChooser(final IntegerProperty property)
         {
             super();
             this.property = property;
-            
+
             // Label
             JLabel label = new JLabel(property.getComment());
             this.add(label);
 
             // JFormattedTextField!
-            NumberFormat numberFormat = NumberFormat.getIntegerInstance();
+            numberFormat = NumberFormat.getIntegerInstance();
             NumberFormatter formatter = new NumberFormatter(numberFormat);
             formatter.setMinimum(new Integer(property.getMinValue()));
             formatter.setMaximum(new Integer(property.getMaxValue()));
             text = new JFormattedTextField(formatter);
-            text.setColumns(Math.max((property.get()+"").length()+1,4));                        
+            text.setColumns(Math.max((property.get()+"").length()+1,4));
 
             // If there is a closed range, also create a slider
             if (property.getMinValue() == Integer.MIN_VALUE || property.getMaxValue() == Integer.MAX_VALUE)
@@ -351,9 +353,9 @@ public class PropertiesDialog
                 slider.setMajorTickSpacing(property.getTick()*2);
                 slider.setMinorTickSpacing(property.getTick());
                 slider.setSnapToTicks(true);
-                //slider.setPaintTicks(true); 
-                //slider.createStandardLabels(property.getTick()); 
-                //slider.setPaintLabels(true); 
+                //slider.setPaintTicks(true);
+                //slider.createStandardLabels(property.getTick());
+                //slider.setPaintLabels(true);
                 this.add(slider);
 
                 // Add listeners for updating text and slider to correspond
@@ -384,7 +386,7 @@ public class PropertiesDialog
                             text.setValue(new Integer(slider.getValue()));
                         }
                         else
-                        {    
+                        {
                             //value is adjusting; just set the text
                             text.setText(String.valueOf(slider.getValue()));
                         }
@@ -395,17 +397,24 @@ public class PropertiesDialog
             // Lastly, add text
             this.add(text);
         }
-        
+
         public void setInConfig()
         {
             if (!property.isImmutable())
             {
                 try
                 {
-                    property.set(Integer.parseInt(text.getText()));
+					Number num = numberFormat.parse(text.getText());
+                    property.set(num.intValue());
+                }
+                catch (ParseException ex)
+                {
+					System.err.println("ParseException: " + ex.getMessage());
+                    // Error in number format, ignore this result without error message!
                 }
                 catch (NumberFormatException ex)
                 {
+					System.err.println("NumberFormatException: " + ex.getMessage());
                     // Error in number format, ignore this result without error message!
                 }
                 catch (IllegalArgumentException ex)
@@ -414,7 +423,7 @@ public class PropertiesDialog
                 }
             }
         }
-        
+
         public void getFromConfig()
         {
             text.setText(""+property.get());
@@ -429,15 +438,15 @@ public class PropertiesDialog
         implements Chooser
     {
         private final DoubleProperty property;
-        
+
         JFormattedTextField text;
 //        JSlider slider;
-        
+
         DoubleChooser(final DoubleProperty property)
         {
             super();
             this.property = property;
-            
+
             // Label
             JLabel label = new JLabel(property.getComment());
             this.add(label);
@@ -449,12 +458,12 @@ public class PropertiesDialog
             formatter.setMinimum(new Double(property.getMinValue()));
             formatter.setMaximum(new Double(property.getMaxValue()));
             text = new JFormattedTextField(formatter);
-            text.setColumns(Math.max((property.get()+"").length()+1,6));                        
+            text.setColumns(Math.max((property.get()+"").length()+1,6));
 
             // Lastly, add text
             this.add(text);
         }
-        
+
         public void setInConfig()
         {
             if (!property.isImmutable())
@@ -473,16 +482,16 @@ public class PropertiesDialog
                 }
             }
         }
-        
+
         public void getFromConfig()
         {
             text.setText(""+property.get());
         }
     }
-    
+
     /**
-     * Chooser for StringProperty:s. If the StringProperty has a set of legal values, 
-     * this becomes a JComboBox with those as choices, otherwise this becomes an 
+     * Chooser for StringProperty:s. If the StringProperty has a set of legal values,
+     * this becomes a JComboBox with those as choices, otherwise this becomes an
      * editable JTextField.
      */
     private class StringChooser
@@ -490,17 +499,17 @@ public class PropertiesDialog
         implements Chooser
     {
         private final ObjectProperty property;
-        
+
         private JTextField text = null;
         private JComboBox selector = null;
-                
+
         StringChooser(ObjectProperty property)
         {
             super();
             this.property = property;
             JLabel label = new JLabel(property.getComment());
             this.add(label);
-            
+
             if (property.legalValues() == null)
             {
                 text = new JTextField();
@@ -517,7 +526,7 @@ public class PropertiesDialog
                 this.add(selector);
             }
         }
-        
+
         public void setInConfig()
         {
             if (!property.isImmutable())
@@ -533,9 +542,9 @@ public class PropertiesDialog
                 {
                     property.set(text.getText());
                 }
-            }       
-        }   
-            
+            }
+        }
+
         public void getFromConfig()
         {
             if (text != null)
@@ -551,13 +560,13 @@ class PropertiesControllerPanel
 {
     private static final long serialVersionUID = 1L;
     private PropertiesDialog theDialog = null;
-    
+
     public PropertiesControllerPanel(PropertiesDialog theDialog)
     {
         this.theDialog = theDialog;
-        
+
         Box buttonBox = new Box(BoxLayout.X_AXIS);
-        
+
         Action applyAction = new ApplyChangesAction(theDialog);
         JButton applyButton = new JButton(applyAction);
         theDialog.getRootPane().getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER,0),"apply");
@@ -570,19 +579,19 @@ class PropertiesControllerPanel
         theDialog.getRootPane().getActionMap().put("cancel", cancelAction);
         add(cancelButton, BorderLayout.CENTER);
     }
-    
+
     private class CancelDialogAction
         extends AbstractAction
     {
         private final JDialog dialog;
-        
+
         public CancelDialogAction(JDialog dialog)
         {
             super("Cancel");
             putValue(SHORT_DESCRIPTION, "Cancel the dialog without saving the preferences");
             putValue(MNEMONIC_KEY, KeyEvent.VK_C);
             putValue(ACCELERATOR_KEY, KeyEvent.VK_ESCAPE); // Does not work?
-      
+
             this.dialog = dialog;
         }
 
@@ -596,25 +605,25 @@ class PropertiesControllerPanel
         extends AbstractAction
     {
         private final PropertiesDialog dialog;
-        
+
         public ApplyChangesAction(PropertiesDialog dialog)
         {
             super("Apply");
             putValue(SHORT_DESCRIPTION, "Saves the preferences and closes this dialog");
             putValue(MNEMONIC_KEY, KeyEvent.VK_A);
             putValue(ACCELERATOR_KEY, KeyEvent.VK_ENTER);
-        
+
             this.dialog = dialog;
         }
 
         public void actionPerformed(ActionEvent e)
         {
             dialog.doApply();
-            
+
             /*
             // Update LookAndFeel
             String lookAndFeel = Config.GENERAL_LOOKANDFEEL.get();
-            
+
             try
             {
                 if ((lookAndFeel == null) || "System".equalsIgnoreCase(lookAndFeel))
@@ -633,7 +642,7 @@ class PropertiesControllerPanel
                     UIManager.setLookAndFeel(lookAndFeel);
             }
             catch (Exception ex)
-            { 
+            {
                 System.err.println("Error while setting look and feel: " + ex);
                 System.err.println("Reverting to System look and feel.");
                 try
