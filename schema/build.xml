@@ -53,10 +53,10 @@
     </xjc>
   </target>
 
-  <target name="gen_iec61131" description="Generate IEC 61131 JAXB classes.">
-    <xjc target="${src}" extension="true" removeOldOutput="yes" package="org.supremica.external.iec61131">
+  <target name="gen_genericPLCProgramDescription" description="Generate generic PLC Program JAXB classes (extended PLC Open IEC 61131).">
+    <xjc target="${src}" extension="true" removeOldOutput="yes" package="org.supremica.external.genericPLCProgramDescription.xsd">
       <schema dir="${xsd_iec61131}" includes="TC6_XML_V10.xsd"/>
-      <produces dir="${src}/org/supremica/external/iec61131"/>
+      <produces dir="${src}/org/supremica/external/genericPLCProgramDescription/xsd"/>
     </xjc>
   </target>
 
