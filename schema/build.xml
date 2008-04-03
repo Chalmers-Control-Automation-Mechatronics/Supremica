@@ -20,7 +20,7 @@
          
           <!-- New files due to the JAXB upgrade /-->        
           <pathelement location="${lib}/activation.jar"/>
-          <pathelement location="${lib}/jsr173_api.jar"/>
+          <pathelement location="${lib}/jsr173_1.0_api.jar"/>
 
 	</classpath>
   </taskdef>
