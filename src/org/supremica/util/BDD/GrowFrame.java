@@ -131,7 +131,6 @@ public class GrowFrame
 		count++;
 		last_value = value;
 
-
 		// put it in the vector, if any
 		if(vars != null) vars.add(value);
 

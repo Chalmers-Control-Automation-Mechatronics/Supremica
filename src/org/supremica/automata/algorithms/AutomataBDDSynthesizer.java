@@ -109,7 +109,8 @@ public class AutomataBDDSynthesizer
 
 		try
 		{
-			ret = new OnlineBDDSupervisor(ba, compute());
+                        int safe_states = compute();       
+			ret = new OnlineBDDSupervisor(ba, safe_states);
 		}
 		catch (Exception exx)
 		{

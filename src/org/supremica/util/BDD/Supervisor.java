@@ -1063,7 +1063,6 @@ public class Supervisor
             }
         }
         
-        
         // 2. get the marked state
         int marked = GroupHelper.getM(manager, spec, plant);
         
@@ -1073,9 +1072,9 @@ public class Supervisor
             xp = x;
             itr++;
             
+            /*
             // NOTE: we have two ways of doing the inner-loop
-            
-                        /*
+                        
                         // METHOD ONE: straightforward implementation
                         int qp_k = restrictedBackward(marked, x);
                         int not_qp_k = manager.not(qp_k);
@@ -1084,8 +1083,8 @@ public class Supervisor
                         int qpp_k = uncontrollableBackward(not_qp_k);
                         x = manager.orTo(x, qpp_k);
                         manager.deref(qpp_k);
-                         */
-            
+              */           
+           
             // METHOD TWO: get out of the loop as soon as you can
             int qp_k = uncontrollableBackward(x);
             
@@ -1104,8 +1103,7 @@ public class Supervisor
             
             x = manager.not(qpp_k);
             manager.deref(qpp_k);
-            
-            
+                   
             if (gf != null)
             {
                 gf.add(x);
@@ -1113,13 +1111,12 @@ public class Supervisor
         }
         while (x != xp);
         
+
         manager.deref(marked);
         
-        int not_x = manager.not(x);
+        int not_x = manager.not(x);     
         manager.deref(x);
-        
-//        int output = manager.andTo(trim, not_x );
-        
+        //not_x = manager.andTo(not_x, getReachables() );          
         if (gf != null)
         {
             gf.stopTimer();

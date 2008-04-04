@@ -21,7 +21,6 @@ public class OnlineBDDSupervisor
 	public OnlineBDDSupervisor(BDDAutomata ba, int safe_states)
 		throws Exception
 	{
-
 		this.ba = ba;
 		this.safe_states = safe_states;
 		this.state_vector = new org.supremica.util.BDD.State[ba.getSize()];
@@ -30,10 +29,10 @@ public class OnlineBDDSupervisor
 		{
 			state_vector[i] = null;
 		}
-
+                
 		//create unique names to be used with the BDD synthesis
 		createUniqueNames();
-		
+                
 		try
 		{
 			setup_mapping();
@@ -82,7 +81,7 @@ public class OnlineBDDSupervisor
 		supremicaState2BDDStateMap = 
 			new HashMap<String, org.supremica.util.BDD.State>();
 
-		BDDAutomaton[] bddAutomataArray = ba.getAutomataVector();
+                BDDAutomaton[] bddAutomataArray = ba.getAutomataVector();
 
 		for (int i = 0; i < bddAutomataArray.length; i++)
 		{

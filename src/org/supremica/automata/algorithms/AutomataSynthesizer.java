@@ -58,6 +58,7 @@ import org.supremica.automata.algorithms.minimization.*;
 import org.supremica.properties.Config;
 import org.supremica.automata.BDD.BDDSynthesizer;
 import org.supremica.util.ActionTimer;
+import org.supremica.util.BDD.BDDAutomaton;
 import org.supremica.util.BDD.OnlineBDDSupervisor;
 import org.supremica.util.BDD.BDDAutomata;
 
@@ -276,9 +277,9 @@ public class AutomataSynthesizer
             numberOfStatesBDD = bdda.count_states(bdd_int);
 //            bdda.show_states(bdd_int);
  
-            numberOfNodesBDD = bdda.nodeCount(bdd_int);
+//            numberOfNodesBDD = bdda.nodeCount(bdd_int);
             
-            System.err.println("number of nodes (BDD): "+numberOfNodesBDD);
+//            System.err.println("number of nodes (BDD): "+numberOfNodesBDD);
 
             System.err.println("number of states (BDD): "+numberOfStatesBDD);
 
@@ -291,8 +292,6 @@ public class AutomataSynthesizer
                     try
                     {
                         Automaton supAutomaton = supervisor.createAutomaton();
-//                        for(int i=0;i<supAutomaton.nbrOfStates();i++)
-//                            System.err.println(supAutomaton.getStateWithIndex(i).getName());
                             
                         result.addAutomaton(supAutomaton);
                     }
