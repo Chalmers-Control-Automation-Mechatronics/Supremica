@@ -368,7 +368,7 @@ class ExtPhilosPanel
 {
     private static final long serialVersionUID = 1L;
     IntegerField int_num = new IntegerField("5", 6);
-    IntegerField int_interm_num = new IntegerField("3", 6);
+    IntegerField int_interm_num = new IntegerField("2", 6);
     IntegerField int_step_phils = new IntegerField("0", 6);
     IntegerField int_step_intermStates = new IntegerField("0", 6);
     IntegerField int_numberOfInstances = new IntegerField("1", 6);
