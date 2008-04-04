@@ -33,7 +33,7 @@ class EatingPhilosopher
     final static int R_DN = 5;
     final static int EAT = 6;
     
-    static int number_of_events = 6;
+    static int number_of_events = 7;
     static LabeledEvent[] events = new LabeledEvent[number_of_events];
 
     // indicies into events[]
@@ -43,6 +43,7 @@ class EatingPhilosopher
     final static int R_PUT = 3;
     final static int START_EATING = 4;
     final static int INTERM_EVENT = 5;
+    final static int PUT = 6;
     final static String LABEL_SEP = "_";
     
     // note, must be the same in both Philosopher and Fork
@@ -71,6 +72,7 @@ class EatingPhilosopher
          events[3] = new LabeledEvent("R_put");    // put down right
          events[4] = new LabeledEvent("Start_eating");
          events[5] = new LabeledEvent("Interm_event");
+         events[6] = new LabeledEvent("Put");
         
     }
     public EatingPhilosopher(boolean l_take, boolean r_take, boolean l_put, boolean r_put)
@@ -153,6 +155,7 @@ class EatingPhilosopher
         renameEvent(sm, R_TAKE, "take" + pad(id)+ LABEL_SEP +pad(r_fork));
         renameEvent(sm, L_PUT, "put" + pad(id)+ LABEL_SEP +pad(l_fork));
         renameEvent(sm, R_PUT, "put" + pad(id)+ LABEL_SEP +pad(r_fork));
+        renameEvent(sm, PUT, "put" + pad(id));
         
         renameEvent(sm, START_EATING, "start_eating" + pad(id));
         renameEvent(sm, INTERM_EVENT, "intermediate" + pad(id));
@@ -255,9 +258,11 @@ class Chopstick
 
     static State[] states = new State[2];
     
-    static LabeledEvent[] events = new LabeledEvent[4];
+    static int number_of_arcs = 4;
     
-    static Arc[] arcs = new Arc[4];
+    static LabeledEvent[] events = new LabeledEvent[number_of_arcs];
+    
+    static Arc[] arcs = new Arc[number_of_arcs];
     
     final static int L_TAKE = 0;
     final static int R_TAKE = 1;
@@ -286,8 +291,10 @@ class Chopstick
 
 	arcs[0] = new Arc(states[0], states[1], events[0]);
         arcs[1] = new Arc(states[1], states[0], events[2]);
+        
         arcs[2] = new Arc(states[0], states[1], events[1]);
         arcs[3] = new Arc(states[1], states[0], events[3]);
+        
     }
     
     public Chopstick(boolean l_take, boolean r_take, boolean l_put, boolean r_put, int length)
@@ -321,7 +328,7 @@ class Chopstick
         {
             fork.addArc(arcs[i]);
         }
-        
+                
         inited = true;
     }
     
@@ -348,8 +355,13 @@ class Chopstick
         
         renameEvent(sm, L_TAKE, "take" + pad(l_philo) + LABEL_SEP + pad(id));
         renameEvent(sm, R_TAKE, "take" + pad(r_philo) + LABEL_SEP + pad(id));
-        renameEvent(sm, L_PUT, "put" + pad(l_philo) + LABEL_SEP + pad(id));
-        renameEvent(sm, R_PUT, "put" + pad(r_philo) + LABEL_SEP + pad(id));
+        
+        ///////////VERY NASTY!!! Just for the extended version
+//        renameEvent(sm, L_PUT, "put" + pad(l_philo) + LABEL_SEP + pad(id));
+//        renameEvent(sm, R_PUT, "put" + pad(r_philo) + LABEL_SEP + pad(id));
+
+        renameEvent(sm, L_PUT, "put" + pad(l_philo));
+        renameEvent(sm, R_PUT, "put" + pad(r_philo));
         
         if(i_l_take)
         {   
