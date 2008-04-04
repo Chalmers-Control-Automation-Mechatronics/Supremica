@@ -32,6 +32,8 @@ class ExtEatingPhilosopher extends EatingPhilosopher
     int j;
     private int numInterm;
     static State[] intermStates;
+    final static int PUT = 6;
+    LabeledEvent put_event = new LabeledEvent("put"); 
     Automaton EXTphilo;
 
     public ExtEatingPhilosopher(boolean l_take, boolean r_take, boolean l_put, boolean r_put, int length, int numInterm)
@@ -77,6 +79,7 @@ class ExtEatingPhilosopher extends EatingPhilosopher
         {
             EXTphilo.getAlphabet().addEvent(events[i]);
         }
+        EXTphilo.getAlphabet().addEvent(put_event);
         
         // And finally the arcs - first the left side (where the left is picked up
         // and put down first)
@@ -99,6 +102,12 @@ class ExtEatingPhilosopher extends EatingPhilosopher
         EXTphilo.addArc(new Arc(states[R_UP], states[READY], events[L_TAKE]));
         EXTphilo.addArc(new Arc(states[EAT], states[R_DN], events[R_PUT]));
         EXTphilo.addArc(new Arc(states[R_DN], states[INIT], events[L_PUT]));
+        
+        EXTphilo.addArc(new Arc(states[EAT], states[INIT], put_event));
+        
+        EXTphilo.removeState(states[R_DN]);
+        EXTphilo.removeState(states[L_DN]);
+        EXTphilo.removeState(states[R_UP]);
         
         inited = true;
     }
