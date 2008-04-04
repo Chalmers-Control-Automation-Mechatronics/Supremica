@@ -40,12 +40,16 @@ class ExtEatingPhilosopher extends EatingPhilosopher
         super();
         this.length = length;
         this.numInterm = numInterm;
-        intermStates = new State[(numInterm-2)];
         
-        for(j=0; j<(numInterm-2); j++)
+        intermStates = new State[(numInterm-1)];
+        if(numInterm > 1)
         {
-            intermStates[j] = new State("intermediate_"+(j+2));
+            for(j=0; j<(numInterm-1); j++)
+            {
+                intermStates[j] = new State("intermediate_"+(j+1));
+            }
         }
+
 
         // Here we create the "template" automaton, EXTphilo
         EXTphilo = new Automaton("EXTPhilo template");
@@ -83,14 +87,20 @@ class ExtEatingPhilosopher extends EatingPhilosopher
         // and put down first)
         
         EXTphilo.addArc(new Arc(states[INIT], states[L_UP], events[L_TAKE]));
-        EXTphilo.addArc(new Arc(states[L_UP], intermStates[0], events[INTERM_EVENT]));
-        
-        for (j = 0; j < (intermStates.length-1); ++j)
+        if(numInterm > 1)
         {
-            EXTphilo.addArc(new Arc(intermStates[j], intermStates[j+1], events[INTERM_EVENT]));
-        }       
+            EXTphilo.addArc(new Arc(states[L_UP], intermStates[0], events[INTERM_EVENT]));
         
-        EXTphilo.addArc(new Arc(intermStates[(intermStates.length-1)], states[READY], events[R_TAKE]));
+            for (j = 0; j < (intermStates.length-1); ++j)
+            {
+                EXTphilo.addArc(new Arc(intermStates[j], intermStates[j+1], events[INTERM_EVENT]));
+            }
+            EXTphilo.addArc(new Arc(intermStates[(intermStates.length-1)], states[READY], events[R_TAKE]));
+        }
+        else
+            EXTphilo.addArc(new Arc( states[L_UP], states[READY], events[R_TAKE]));
+        
+        
         EXTphilo.addArc(new Arc(states[READY], states[EAT], events[START_EATING]));
         EXTphilo.addArc(new Arc(states[EAT], states[L_DN], events[L_PUT]));
         EXTphilo.addArc(new Arc(states[L_DN], states[INIT], events[R_PUT]));
