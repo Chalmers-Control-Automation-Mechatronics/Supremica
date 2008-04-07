@@ -95,7 +95,8 @@ public class ExtRoomSpec {
         
         
         spec.addState(emptyState);
-        spec.addState(FORBIDDEN_STATE);
+        if(ROOM_ID == 2 || ROOM_ID == 4)
+            spec.addState(FORBIDDEN_STATE);
         for (int i = 0; i < num_cats; ++i)
         {
             spec.addState(states[0][i]);
@@ -118,7 +119,8 @@ public class ExtRoomSpec {
                     State temp_state = states[1][j];
                     String state_name = temp_state.getName();
                     
-                    spec.addArc(new Arc(temp_state,FORBIDDEN_STATE,CFEvents[i]));
+                    if(!CFEvents[i].isControllable())
+                        spec.addArc(new Arc(temp_state,FORBIDDEN_STATE,CFEvents[i]));
                 }
             }
         }
@@ -138,7 +140,7 @@ public class ExtRoomSpec {
             for(int j=0; j<num_cats-1;j++)
                 spec.addArc(new Arc(states[1][j],states[1][j+1],MFEvents[i]));
             
-            String event_name = MFEvents[i].getName();
+/*            String event_name = MFEvents[i].getName();
             if(String.valueOf(""+event_name.charAt(event_name.length()-1)).equals(""+ROOM_ID))
             {
                 for(int j=0; j<states[0].length;j++)
@@ -148,7 +150,7 @@ public class ExtRoomSpec {
                     
                     spec.addArc(new Arc(temp_state,FORBIDDEN_STATE,MFEvents[i]));
                 }
-            }
+            }*/
         }
         
         for (int i = 0; i < MBEvents.length; ++i)
