@@ -131,7 +131,6 @@ public class Main
 	}
 	catch (Exception e)
 	{
-	    System.err.println("You must specify a fileName and optionally a path!");
 	    e.printStackTrace();
 	}
 	
