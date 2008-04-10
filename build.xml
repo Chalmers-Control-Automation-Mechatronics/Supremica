@@ -164,6 +164,7 @@
         <unjar src="${lib}/javabdd-2.0.jar" dest="${lib}/${unjared}"/>
         <unjar src="${waters.jaxbjar}" dest="${lib}/${unjared}"/>
         <unjar src="${lib}/manufacturingTables_jaxb.jar" dest="${lib}/${unjared}"/>
+        <unjar src="${lib}/genericPLCProgramDescription_jaxb.jar" dest="${lib}/${unjared}"/>
         <unjar src="${lib}/itext.jar" dest="${lib}/${unjared}"/>
         <unjar src="${lib}/sat4j.jar" dest="${lib}/${unjared}"/>       
         <!-- unjar src="${lib}/java_cup.jar" dest="${lib}/${unjared}"/-->
@@ -328,6 +329,21 @@
             source="1.5"
         />
     </target>
+
+    <target name="compile_genericPLCProgramDescription_jaxb">
+        <javac
+            srcdir="${src}"
+            destdir="${build}"
+            classpath="${lib}/${unjared}"
+            includeJavaRuntime="yes"
+            deprecation="false"
+            verbose="false"
+            nowarn="true"
+            includes="${supremica_basedir}/external/genericPLCProgramDescription/xsd/**"		
+            source="1.5"
+        />
+    </target>
+
     
     <!-- Compile:
 *	Reuses existing class files, but recompiles those
@@ -534,6 +550,21 @@ Class-Path: ${manifest.pathlist}</echo>
         </delete>
         <unjar src="${lib}/manufacturingTables_jaxb.jar" dest="${lib}/${unjared}"/>
     </target>
+
+    <target name="jar_genericPLCProgramDescription_jaxb" depends="compile_genericPLCProgramDescription_jaxb">
+        <jar jarfile="${lib}/genericPLCProgramDescription_jaxb.jar"> 
+            <fileset dir="${build}/">
+                <include name="org/supremica/external/genericPLCProgramDescription/xsd/**"/>
+            </fileset>
+        </jar>
+        <delete>
+            <fileset dir="${lib}">
+                <include name="org/supremica/external/genericPLCProgramDescription/xsd/**"/>
+            </fileset>
+        </delete>
+        <unjar src="${lib}/genericPLCProgramDescription_jaxb.jar" dest="${lib}/${unjared}"/>
+    </target>
+
     
     <target name="-startfiles_local_supremica">
         <!--
@@ -542,6 +573,11 @@ Class-Path: ${manifest.pathlist}</echo>
 	<copy file="${templates}/SupremicaJGrafchartLocal.cmd" todir="${dist}"/>
 	<chmod file="${dist}/SupremicaJGrafchartLocal.cmd" perm="644"/>
 -->
+
+        <copy file="${templates}/loadGenericPLCProgramDescriptionLocal.cmd" todir="${dist}"/>
+        <chmod file="${dist}/loadGenericPLCProgramDescriptionLocal.cmd" perm="644"/>
+        <copy file="${templates}/loadGenericPLCProgramDescription.cmd" todir="${dist}"/>
+        <chmod file="${dist}/loadGenericPLCProgramDescription.cmd" perm="644"/>
         <copy file="${templates}/manufacturingTablesTestLocal" todir="${dist}"/>
         <chmod file="${dist}/manufacturingTablesTestLocal" perm="644"/>
         <copy file="${templates}/manufacturingTablesTestLocal.cmd" todir="${dist}"/>
