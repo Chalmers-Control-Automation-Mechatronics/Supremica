@@ -1,0 +1,2891 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xmlns="http://www.plcopen.org/xml/tc6.xsd"
+         xmlns:xhtml="http://www.w3.org/1999/xhtml"
+         xsi:schemaLocation="http://www.plcopen.org/xml/tc6.xsd http://www.plcopen.org/xml/tc6.xsd">
+  <fileHeader companyName="CTH"
+              companyURL="www.chalmers.se"
+              productName="FIX1"
+              productVersion="1.0"
+              creationDateTime="2008-03-19 20:31:26"/>
+  <contentHeader name="Cell Example "
+                 version="1.0"
+                 modificationDateTime="2008-04-03 16:58:09"
+                 organization="SS2"
+                 author="CTH SS2"
+                 language="en-US">
+    <coordinateInfo>
+      <fbd>
+        <scaling x="0" y="0"/>
+      </fbd>
+      <ld>
+        <scaling x="0" y="0"/>
+      </ld>
+      <sfc>
+        <scaling x="0" y="0"/>
+      </sfc>
+    </coordinateInfo>
+  </contentHeader>
+  <types>
+    <dataTypes/>
+    <pous>
+      <pou name="TwoPositionsMovement" pouType="functionBlock">
+        <interface>
+          <inputVars>
+            <variable name="forward">
+              <type>
+                <BOOL/>
+              </type>
+              <initialValue>
+                <simpleValue value="0"/>
+              </initialValue>
+            </variable>
+            <variable name="backward">
+              <type>
+                <BOOL/>
+              </type>
+              <initialValue>
+                <simpleValue value="0"/>
+              </initialValue>
+            </variable>
+            <variable name="sensor_fwd">
+              <type>
+                <BOOL/>
+              </type>
+              <initialValue>
+                <simpleValue value="0"/>
+              </initialValue>
+            </variable>
+            <variable name="sensor_bwd">
+              <type>
+                <BOOL/>
+              </type>
+              <initialValue>
+                <simpleValue value="0"/>
+              </initialValue>
+            </variable>
+          </inputVars>
+          <outputVars>
+            <variable name="in_forward">
+              <type>
+                <BOOL/>
+              </type>
+              <initialValue>
+                <simpleValue value="0"/>
+              </initialValue>
+            </variable>
+            <variable name="in_backward">
+              <type>
+                <BOOL/>
+              </type>
+              <initialValue>
+                <simpleValue value="0"/>
+              </initialValue>
+            </variable>
+            <variable name="out_forward">
+              <type>
+                <BOOL/>
+              </type>
+              <initialValue>
+                <simpleValue value="0"/>
+              </initialValue>
+            </variable>
+            <variable name="out_backward">
+              <type>
+                <BOOL/>
+              </type>
+              <initialValue>
+                <simpleValue value="0"/>
+              </initialValue>
+            </variable>
+          </outputVars>
+        </interface>
+        <body>
+          <FBD>
+            <inVariable localId="1" height="32" width="80">
+              <position x="104" y="63"/>
+              <connectionPointOut>
+                <relPosition x="80" y="16"/>
+              </connectionPointOut>
+              <expression>forward</expression>
+            </inVariable>
+            <inVariable localId="2" height="31" width="90">
+              <position x="100" y="122"/>
+              <connectionPointOut>
+                <relPosition x="90" y="15"/>
+              </connectionPointOut>
+              <expression>backward</expression>
+            </inVariable>
+            <inVariable localId="3" height="42" width="110">
+              <position x="97" y="188"/>
+              <connectionPointOut>
+                <relPosition x="110" y="21"/>
+              </connectionPointOut>
+              <expression>sensor_fwd</expression>
+            </inVariable>
+            <inVariable localId="4" height="45" width="115">
+              <position x="100" y="254"/>
+              <connectionPointOut>
+                <relPosition x="115" y="22"/>
+              </connectionPointOut>
+              <expression>sensor_bwd</expression>
+            </inVariable>
+            <outVariable localId="5" height="42" width="110">
+              <position x="482" y="20"/>
+              <connectionPointIn>
+                <relPosition x="0" y="21"/>
+                <connection refLocalId="3">
+                  <position x="482" y="41"/>
+                  <position x="377" y="41"/>
+                  <position x="377" y="209"/>
+                  <position x="207" y="209"/>
+                </connection>
+              </connectionPointIn>
+              <expression>in_forward</expression>
+            </outVariable>
+            <outVariable localId="6" height="40" width="120">
+              <position x="483" y="81"/>
+              <connectionPointIn>
+                <relPosition x="0" y="20"/>
+                <connection refLocalId="4">
+                  <position x="483" y="101"/>
+                  <position x="415" y="101"/>
+                  <position x="415" y="276"/>
+                  <position x="215" y="276"/>
+                </connection>
+              </connectionPointIn>
+              <expression>in_backward</expression>
+            </outVariable>
+            <outVariable localId="7" height="38" width="120">
+              <position x="487" y="166"/>
+              <connectionPointIn>
+                <relPosition x="0" y="19"/>
+                <connection refLocalId="1">
+                  <position x="487" y="185"/>
+                  <position x="298" y="185"/>
+                  <position x="298" y="79"/>
+                  <position x="184" y="79"/>
+                </connection>
+              </connectionPointIn>
+              <expression>out_forward</expression>
+            </outVariable>
+            <outVariable localId="8" height="56" width="131">
+              <position x="490" y="222"/>
+              <connectionPointIn>
+                <relPosition x="0" y="28"/>
+                <connection refLocalId="2">
+                  <position x="490" y="250"/>
+                  <position x="267" y="250"/>
+                  <position x="267" y="137"/>
+                  <position x="190" y="137"/>
+                </connection>
+              </connectionPointIn>
+              <expression>out_backward</expression>
+            </outVariable>
+          </FBD>
+        </body>
+      </pou>
+      <pou name="PartDetection" pouType="functionBlock">
+        <interface>
+          <inputVars>
+            <variable name="sensor_1">
+              <type>
+                <BOOL/>
+              </type>
+              <initialValue>
+                <simpleValue value="0"/>
+              </initialValue>
+            </variable>
+            <variable name="sensor_2">
+              <type>
+                <BOOL/>
+              </type>
+              <initialValue>
+                <simpleValue value="0"/>
+              </initialValue>
+            </variable>
+          </inputVars>
+          <outputVars>
+            <variable name="part_present">
+              <type>
+                <BOOL/>
+              </type>
+              <initialValue>
+                <simpleValue value="0"/>
+              </initialValue>
+            </variable>
+          </outputVars>
+        </interface>
+        <body>
+          <FBD>
+            <inVariable localId="1" height="28" width="90">
+              <position x="70" y="131"/>
+              <connectionPointOut>
+                <relPosition x="90" y="14"/>
+              </connectionPointOut>
+              <expression>sensor_1</expression>
+            </inVariable>
+            <inVariable localId="2" height="28" width="90">
+              <position x="70" y="201"/>
+              <connectionPointOut>
+                <relPosition x="90" y="14"/>
+              </connectionPointOut>
+              <expression>sensor_2</expression>
+            </inVariable>
+            <block localId="3" width="92" height="161" typeName="AND">
+              <position x="286" y="90"/>
+              <inputVariables>
+                <variable formalParameter="IN1">
+                  <connectionPointIn>
+                    <relPosition x="0" y="55"/>
+                    <connection refLocalId="1">
+                      <position x="286" y="145"/>
+                      <position x="160" y="145"/>
+                    </connection>
+                  </connectionPointIn>
+                </variable>
+                <variable formalParameter="IN2">
+                  <connectionPointIn>
+                    <relPosition x="0" y="125"/>
+                    <connection refLocalId="2">
+                      <position x="286" y="215"/>
+                      <position x="160" y="215"/>
+                    </connection>
+                  </connectionPointIn>
+                </variable>
+              </inputVariables>
+              <inOutVariables/>
+              <outputVariables>
+                <variable formalParameter="OUT">
+                  <connectionPointOut>
+                    <relPosition x="92" y="55"/>
+                  </connectionPointOut>
+                </variable>
+              </outputVariables>
+            </block>
+            <outVariable localId="4" height="28" width="130">
+              <position x="445" y="131"/>
+              <connectionPointIn>
+                <relPosition x="0" y="14"/>
+                <connection refLocalId="3" formalParameter="OUT">
+                  <position x="445" y="145"/>
+                  <position x="378" y="145"/>
+                </connection>
+              </connectionPointIn>
+              <expression>part_present</expression>
+            </outVariable>
+          </FBD>
+        </body>
+      </pou>
+      <pou name="singleZoneBooking" pouType="functionBlock">
+        <interface>
+          <inputVars>
+            <variable name="request_1">
+              <type>
+                <BOOL/>
+              </type>
+              <initialValue>
+                <simpleValue value="0"/>
+              </initialValue>
+            </variable>
+            <variable name="request_2">
+              <type>
+                <BOOL/>
+              </type>
+              <initialValue>
+                <simpleValue value="0"/>
+              </initialValue>
+            </variable>
+          </inputVars>
+          <outputVars>
+            <variable name="booked_by_1">
+              <type>
+                <BOOL/>
+              </type>
+              <initialValue>
+                <simpleValue value="0"/>
+              </initialValue>
+            </variable>
+            <variable name="booked_by_2">
+              <type>
+                <BOOL/>
+              </type>
+              <initialValue>
+                <simpleValue value="0"/>
+              </initialValue>
+            </variable>
+          </outputVars>
+        </interface>
+        <body>
+          <FBD>
+            <inVariable localId="3" height="28" width="100">
+              <position x="98" y="125"/>
+              <connectionPointOut>
+                <relPosition x="100" y="14"/>
+              </connectionPointOut>
+              <expression>request_1</expression>
+            </inVariable>
+            <inVariable localId="4" height="28" width="100">
+              <position x="99" y="206"/>
+              <connectionPointOut>
+                <relPosition x="100" y="14"/>
+              </connectionPointOut>
+              <expression>request_2</expression>
+            </inVariable>
+            <outVariable localId="6" height="28" width="120">
+              <position x="400" y="125"/>
+              <connectionPointIn>
+                <relPosition x="0" y="14"/>
+                <connection refLocalId="3">
+                  <position x="400" y="139"/>
+                  <position x="198" y="139"/>
+                </connection>
+              </connectionPointIn>
+              <expression>booked_by_1</expression>
+            </outVariable>
+            <outVariable localId="7" height="28" width="120">
+              <position x="400" y="206"/>
+              <connectionPointIn>
+                <relPosition x="0" y="14"/>
+                <connection refLocalId="4">
+                  <position x="400" y="220"/>
+                  <position x="199" y="220"/>
+                </connection>
+              </connectionPointIn>
+              <expression>booked_by_2</expression>
+            </outVariable>
+          </FBD>
+        </body>
+      </pou>
+      <pou name="EOP30" pouType="program">
+        <interface>
+          <externalVars>
+            <variable name="Op30_start">
+              <type>
+                <BOOL/>
+              </type>
+            </variable>
+            <variable name="positioning_in_home_pos">
+              <type>
+                <BOOL/>
+              </type>
+            </variable>
+            <variable name="fixation_in_locked">
+              <type>
+                <BOOL/>
+              </type>
+            </variable>
+            <variable name="clamp_in_open">
+              <type>
+                <BOOL/>
+              </type>
+            </variable>
+            <variable name="part_detection_part_present">
+              <type>
+                <BOOL/>
+              </type>
+            </variable>
+            <variable name="Op30_end">
+              <type>
+                <BOOL/>
+              </type>
+            </variable>
+          </externalVars>
+        </interface>
+        <body>
+          <SFC>
+            <step localId="1" height="32" width="54" name="Init" initialStep="true">
+              <position x="459" y="37"/>
+              <connectionPointOut formalParameter="">
+                <relPosition x="27" y="32"/>
+              </connectionPointOut>
+            </step>
+            <inVariable localId="2" height="28" width="110">
+              <position x="271" y="84"/>
+              <connectionPointOut>
+                <relPosition x="110" y="14"/>
+              </connectionPointOut>
+              <expression>Op30_start</expression>
+            </inVariable>
+            <transition localId="3" height="2" width="20">
+              <position x="476" y="97"/>
+              <connectionPointIn>
+                <relPosition x="10" y="0"/>
+                <connection refLocalId="1">
+                  <position x="486" y="97"/>
+                  <position x="486" y="69"/>
+                </connection>
+              </connectionPointIn>
+              <connectionPointOut>
+                <relPosition x="10" y="2"/>
+              </connectionPointOut>
+              <condition>
+                <connection refLocalId="2">
+                  <position x="476" y="98"/>
+                  <position x="381" y="98"/>
+                </connection>
+              </condition>
+            </transition>
+            <step localId="4" height="28" width="30" name="S1">
+              <position x="471" y="136"/>
+              <connectionPointIn>
+                <relPosition x="15" y="0"/>
+                <connection refLocalId="3">
+                  <position x="486" y="136"/>
+                  <position x="486" y="99"/>
+                </connection>
+              </connectionPointIn>
+              <connectionPointOut formalParameter="">
+                <relPosition x="15" y="28"/>
+              </connectionPointOut>
+            </step>
+            <step localId="5" height="28" width="30" name="S2">
+              <position x="471" y="268"/>
+              <connectionPointIn>
+                <relPosition x="15" y="0"/>
+                <connection refLocalId="6">
+                  <position x="486" y="268"/>
+                  <position x="486" y="223"/>
+                </connection>
+              </connectionPointIn>
+              <connectionPointOut formalParameter="">
+                <relPosition x="15" y="28"/>
+              </connectionPointOut>
+              <connectionPointOutAction formalParameter="">
+                <relPosition x="30" y="14"/>
+              </connectionPointOutAction>
+            </step>
+            <transition localId="6" height="2" width="20">
+              <position x="476" y="221"/>
+              <connectionPointIn>
+                <relPosition x="10" y="0"/>
+                <connection refLocalId="4">
+                  <position x="486" y="221"/>
+                  <position x="486" y="164"/>
+                </connection>
+              </connectionPointIn>
+              <connectionPointOut>
+                <relPosition x="10" y="2"/>
+              </connectionPointOut>
+              <condition>
+                <connection refLocalId="8" formalParameter="OUT">
+                  <position x="476" y="222"/>
+                  <position x="410" y="222"/>
+                </connection>
+              </condition>
+            </transition>
+            <block localId="8" width="65" height="100" typeName="AND">
+              <position x="345" y="192"/>
+              <inputVariables>
+                <variable formalParameter="IN1">
+                  <connectionPointIn>
+                    <relPosition x="0" y="30"/>
+                    <connection refLocalId="9">
+                      <position x="345" y="222"/>
+                      <position x="298" y="222"/>
+                      <position x="298" y="201"/>
+                      <position x="250" y="201"/>
+                    </connection>
+                  </connectionPointIn>
+                </variable>
+                <variable formalParameter="IN2">
+                  <connectionPointIn>
+                    <relPosition x="0" y="50"/>
+                    <connection refLocalId="10">
+                      <position x="345" y="242"/>
+                      <position x="201" y="242"/>
+                    </connection>
+                  </connectionPointIn>
+                </variable>
+                <variable formalParameter="IN3">
+                  <connectionPointIn>
+                    <relPosition x="0" y="70"/>
+                    <connection refLocalId="11">
+                      <position x="345" y="262"/>
+                      <position x="249" y="262"/>
+                      <position x="249" y="282"/>
+                      <position x="152" y="282"/>
+                    </connection>
+                  </connectionPointIn>
+                </variable>
+                <variable formalParameter="IN4" negated="true">
+                  <connectionPointIn>
+                    <relPosition x="0" y="90"/>
+                    <connection refLocalId="12">
+                      <position x="345" y="282"/>
+                      <position x="318" y="282"/>
+                      <position x="318" y="332"/>
+                      <position x="291" y="332"/>
+                    </connection>
+                  </connectionPointIn>
+                </variable>
+              </inputVariables>
+              <inOutVariables/>
+              <outputVariables>
+                <variable formalParameter="OUT">
+                  <connectionPointOut>
+                    <relPosition x="65" y="30"/>
+                  </connectionPointOut>
+                </variable>
+              </outputVariables>
+            </block>
+            <inVariable localId="9" height="28" width="240">
+              <position x="10" y="187"/>
+              <connectionPointOut>
+                <relPosition x="240" y="14"/>
+              </connectionPointOut>
+              <expression>positioning_in_home_pos</expression>
+            </inVariable>
+            <inVariable localId="10" height="28" width="190">
+              <position x="11" y="228"/>
+              <connectionPointOut>
+                <relPosition x="190" y="14"/>
+              </connectionPointOut>
+              <expression>fixation_in_locked</expression>
+            </inVariable>
+            <inVariable localId="11" height="28" width="140">
+              <position x="12" y="268"/>
+              <connectionPointOut>
+                <relPosition x="140" y="14"/>
+              </connectionPointOut>
+              <expression>clamp_in_open</expression>
+            </inVariable>
+            <inVariable localId="12" height="28" width="280">
+              <position x="11" y="318"/>
+              <connectionPointOut>
+                <relPosition x="280" y="14"/>
+              </connectionPointOut>
+              <expression>part_detection_part_present</expression>
+            </inVariable>
+            <actionBlock localId="13" height="30" width="120">
+              <position x="552" y="267"/>
+              <connectionPointIn>
+                <relPosition x="0" y="15"/>
+                <connection refLocalId="5">
+                  <position x="552" y="282"/>
+                  <position x="501" y="282"/>
+                </connection>
+              </connectionPointIn>
+              <action indicator="Op30_end">
+                <inline>
+                  <ST>
+<![CDATA[]]>
+                  </ST>
+                </inline>
+              </action>
+            </actionBlock>
+            <jumpStep localId="14" height="13" width="12" targetName="Init">
+              <position x="480" y="351"/>
+              <connectionPointIn>
+                <relPosition x="6" y="0"/>
+                <connection refLocalId="5">
+                  <position x="486" y="351"/>
+                  <position x="486" y="296"/>
+                </connection>
+              </connectionPointIn>
+            </jumpStep>
+            <comment localId="15" height="39" width="214">
+              <position x="29" y="18"/>
+              <content>
+<![CDATA[Check initial state]]>
+              </content>
+            </comment>
+          </SFC>
+        </body>
+      </pou>
+      <pou name="EOP33" pouType="program">
+        <interface>
+          <externalVars>
+            <variable name="Op33_start">
+              <type>
+                <BOOL/>
+              </type>
+            </variable>
+            <variable name="Op33_end">
+              <type>
+                <BOOL/>
+              </type>
+            </variable>
+            <variable name="positioning_in_home_pos">
+              <type>
+                <BOOL/>
+              </type>
+            </variable>
+            <variable name="positioning_in_work_pos">
+              <type>
+                <BOOL/>
+              </type>
+            </variable>
+            <variable name="positioning_to_work_pos">
+              <type>
+                <BOOL/>
+              </type>
+            </variable>
+            <variable name="fixation_in_locked">
+              <type>
+                <BOOL/>
+              </type>
+            </variable>
+            <variable name="fixation_in_unlocked">
+              <type>
+                <BOOL/>
+              </type>
+            </variable>
+            <variable name="fixation_to_locked">
+              <type>
+                <BOOL/>
+              </type>
+            </variable>
+            <variable name="fixation_to_unlocked">
+              <type>
+                <BOOL/>
+              </type>
+            </variable>
+            <variable name="clamp_in_close">
+              <type>
+                <BOOL/>
+              </type>
+            </variable>
+            <variable name="part_detection_part_present">
+              <type>
+                <BOOL/>
+              </type>
+            </variable>
+            <variable name="Fix1_zone2_booked">
+              <type>
+                <BOOL/>
+              </type>
+            </variable>
+            <variable name="Fix1_zone3_booked">
+              <type>
+                <BOOL/>
+              </type>
+            </variable>
+            <variable name="Fix1_book_zone2">
+              <type>
+                <BOOL/>
+              </type>
+            </variable>
+            <variable name="Fix1_book_zone3">
+              <type>
+                <BOOL/>
+              </type>
+            </variable>
+          </externalVars>
+        </interface>
+        <body>
+          <SFC>
+            <step localId="1" height="32" width="54" name="Init" initialStep="true">
+              <position x="509" y="34"/>
+              <connectionPointOut formalParameter="">
+                <relPosition x="27" y="32"/>
+              </connectionPointOut>
+            </step>
+            <transition localId="2" height="2" width="20">
+              <position x="526" y="92"/>
+              <connectionPointIn>
+                <relPosition x="10" y="0"/>
+                <connection refLocalId="1">
+                  <position x="536" y="92"/>
+                  <position x="536" y="66"/>
+                </connection>
+              </connectionPointIn>
+              <connectionPointOut>
+                <relPosition x="10" y="2"/>
+              </connectionPointOut>
+              <condition>
+                <connection refLocalId="3">
+                  <position x="526" y="93"/>
+                  <position x="436" y="93"/>
+                </connection>
+              </condition>
+            </transition>
+            <inVariable localId="3" height="28" width="110">
+              <position x="326" y="79"/>
+              <connectionPointOut>
+                <relPosition x="110" y="14"/>
+              </connectionPointOut>
+              <expression>Op33_start</expression>
+            </inVariable>
+            <step localId="4" height="28" width="30" name="S1">
+              <position x="521" y="132"/>
+              <connectionPointIn>
+                <relPosition x="15" y="0"/>
+                <connection refLocalId="2">
+                  <position x="536" y="132"/>
+                  <position x="536" y="94"/>
+                </connection>
+              </connectionPointIn>
+              <connectionPointOut formalParameter="">
+                <relPosition x="15" y="28"/>
+              </connectionPointOut>
+            </step>
+            <transition localId="5" height="2" width="20">
+              <position x="526" y="225"/>
+              <connectionPointIn>
+                <relPosition x="10" y="0"/>
+                <connection refLocalId="4">
+                  <position x="536" y="225"/>
+                  <position x="536" y="160"/>
+                </connection>
+              </connectionPointIn>
+              <connectionPointOut>
+                <relPosition x="10" y="2"/>
+              </connectionPointOut>
+              <condition>
+                <connection refLocalId="7" formalParameter="OUT">
+                  <position x="526" y="226"/>
+                  <position x="434" y="226"/>
+                </connection>
+              </condition>
+            </transition>
+            <step localId="6" height="28" width="30" name="S2">
+              <position x="521" y="418"/>
+              <connectionPointIn>
+                <relPosition x="15" y="0"/>
+                <connection refLocalId="5">
+                  <position x="536" y="418"/>
+                  <position x="536" y="227"/>
+                </connection>
+              </connectionPointIn>
+              <connectionPointOut formalParameter="">
+                <relPosition x="15" y="28"/>
+              </connectionPointOut>
+              <connectionPointOutAction formalParameter="">
+                <relPosition x="30" y="14"/>
+              </connectionPointOutAction>
+            </step>
+            <block localId="7" width="65" height="185" typeName="AND">
+              <position x="369" y="186"/>
+              <inputVariables>
+                <variable formalParameter="IN1">
+                  <connectionPointIn>
+                    <relPosition x="0" y="40"/>
+                    <connection refLocalId="8">
+                      <position x="369" y="226"/>
+                      <position x="298" y="226"/>
+                    </connection>
+                  </connectionPointIn>
+                </variable>
+                <variable formalParameter="IN2">
+                  <connectionPointIn>
+                    <relPosition x="0" y="81"/>
+                    <connection refLocalId="9">
+                      <position x="369" y="267"/>
+                      <position x="297" y="267"/>
+                    </connection>
+                  </connectionPointIn>
+                </variable>
+                <variable formalParameter="IN3">
+                  <connectionPointIn>
+                    <relPosition x="0" y="122"/>
+                    <connection refLocalId="10">
+                      <position x="369" y="308"/>
+                      <position x="297" y="308"/>
+                    </connection>
+                  </connectionPointIn>
+                </variable>
+                <variable formalParameter="IN4">
+                  <connectionPointIn>
+                    <relPosition x="0" y="163"/>
+                    <connection refLocalId="11">
+                      <position x="369" y="349"/>
+                      <position x="297" y="349"/>
+                    </connection>
+                  </connectionPointIn>
+                </variable>
+              </inputVariables>
+              <inOutVariables/>
+              <outputVariables>
+                <variable formalParameter="OUT">
+                  <connectionPointOut>
+                    <relPosition x="65" y="40"/>
+                  </connectionPointOut>
+                </variable>
+              </outputVariables>
+            </block>
+            <inVariable localId="8" height="28" width="240">
+              <position x="58" y="212"/>
+              <connectionPointOut>
+                <relPosition x="240" y="14"/>
+              </connectionPointOut>
+              <expression>positioning_in_home_pos</expression>
+            </inVariable>
+            <inVariable localId="9" height="28" width="190">
+              <position x="107" y="253"/>
+              <connectionPointOut>
+                <relPosition x="190" y="14"/>
+              </connectionPointOut>
+              <expression>fixation_in_locked</expression>
+            </inVariable>
+            <inVariable localId="10" height="28" width="150">
+              <position x="147" y="294"/>
+              <connectionPointOut>
+                <relPosition x="150" y="14"/>
+              </connectionPointOut>
+              <expression>clamp_in_close</expression>
+            </inVariable>
+            <inVariable localId="11" height="28" width="280">
+              <position x="17" y="335"/>
+              <connectionPointOut>
+                <relPosition x="280" y="14"/>
+              </connectionPointOut>
+              <expression>part_detection_part_present</expression>
+            </inVariable>
+            <actionBlock localId="12" height="69" width="390">
+              <position x="605" y="417"/>
+              <connectionPointIn>
+                <relPosition x="0" y="15"/>
+                <connection refLocalId="6">
+                  <position x="605" y="432"/>
+                  <position x="551" y="432"/>
+                </connection>
+              </connectionPointIn>
+              <action indicator="fixation_to_unlocked">
+                <inline>
+                  <ST>
+<![CDATA[]]>
+                  </ST>
+                </inline>
+              </action>
+              <action qualifier="S">
+                <reference name="Fix1_book_zone2"/>
+              </action>
+              <action qualifier="S">
+                <reference name="Fix1_book_zone3"/>
+              </action>
+            </actionBlock>
+            <transition localId="13" height="2" width="20">
+              <position x="526" y="526"/>
+              <connectionPointIn>
+                <relPosition x="10" y="0"/>
+                <connection refLocalId="6">
+                  <position x="536" y="526"/>
+                  <position x="536" y="446"/>
+                </connection>
+              </connectionPointIn>
+              <connectionPointOut>
+                <relPosition x="10" y="2"/>
+              </connectionPointOut>
+              <condition>
+                <connection refLocalId="15" formalParameter="OUT">
+                  <position x="526" y="527"/>
+                  <position x="427" y="527"/>
+                </connection>
+              </condition>
+            </transition>
+            <step localId="14" height="28" width="30" name="S3">
+              <position x="521" y="787"/>
+              <connectionPointIn>
+                <relPosition x="15" y="0"/>
+                <connection refLocalId="13">
+                  <position x="536" y="787"/>
+                  <position x="536" y="528"/>
+                </connection>
+              </connectionPointIn>
+              <connectionPointOut formalParameter="">
+                <relPosition x="15" y="28"/>
+              </connectionPointOut>
+              <connectionPointOutAction formalParameter="">
+                <relPosition x="30" y="14"/>
+              </connectionPointOutAction>
+            </step>
+            <block localId="15" width="65" height="268" typeName="AND">
+              <position x="362" y="487"/>
+              <inputVariables>
+                <variable formalParameter="IN1">
+                  <connectionPointIn>
+                    <relPosition x="0" y="40"/>
+                    <connection refLocalId="16">
+                      <position x="362" y="527"/>
+                      <position x="283" y="527"/>
+                    </connection>
+                  </connectionPointIn>
+                </variable>
+                <variable formalParameter="IN2">
+                  <connectionPointIn>
+                    <relPosition x="0" y="81"/>
+                    <connection refLocalId="17">
+                      <position x="362" y="568"/>
+                      <position x="283" y="568"/>
+                    </connection>
+                  </connectionPointIn>
+                </variable>
+                <variable formalParameter="IN3">
+                  <connectionPointIn>
+                    <relPosition x="0" y="122"/>
+                    <connection refLocalId="18">
+                      <position x="362" y="609"/>
+                      <position x="284" y="609"/>
+                    </connection>
+                  </connectionPointIn>
+                </variable>
+                <variable formalParameter="IN4">
+                  <connectionPointIn>
+                    <relPosition x="0" y="163"/>
+                    <connection refLocalId="19">
+                      <position x="362" y="650"/>
+                      <position x="288" y="650"/>
+                    </connection>
+                  </connectionPointIn>
+                </variable>
+                <variable formalParameter="IN5">
+                  <connectionPointIn>
+                    <relPosition x="0" y="204"/>
+                    <connection refLocalId="20">
+                      <position x="362" y="691"/>
+                      <position x="288" y="691"/>
+                    </connection>
+                  </connectionPointIn>
+                </variable>
+                <variable formalParameter="IN6">
+                  <connectionPointIn>
+                    <relPosition x="0" y="245"/>
+                    <connection refLocalId="21">
+                      <position x="362" y="732"/>
+                      <position x="289" y="732"/>
+                    </connection>
+                  </connectionPointIn>
+                </variable>
+              </inputVariables>
+              <inOutVariables/>
+              <outputVariables>
+                <variable formalParameter="OUT">
+                  <connectionPointOut>
+                    <relPosition x="65" y="40"/>
+                  </connectionPointOut>
+                </variable>
+              </outputVariables>
+            </block>
+            <inVariable localId="16" height="28" width="240">
+              <position x="43" y="513"/>
+              <connectionPointOut>
+                <relPosition x="240" y="14"/>
+              </connectionPointOut>
+              <expression>positioning_in_home_pos</expression>
+            </inVariable>
+            <inVariable localId="17" height="28" width="210">
+              <position x="73" y="554"/>
+              <connectionPointOut>
+                <relPosition x="210" y="14"/>
+              </connectionPointOut>
+              <expression>fixation_in_unlocked</expression>
+            </inVariable>
+            <inVariable localId="18" height="28" width="150">
+              <position x="134" y="595"/>
+              <connectionPointOut>
+                <relPosition x="150" y="14"/>
+              </connectionPointOut>
+              <expression>clamp_in_close</expression>
+            </inVariable>
+            <inVariable localId="19" height="28" width="280">
+              <position x="8" y="636"/>
+              <connectionPointOut>
+                <relPosition x="280" y="14"/>
+              </connectionPointOut>
+              <expression>part_detection_part_present</expression>
+            </inVariable>
+            <inVariable localId="20" height="28" width="180">
+              <position x="108" y="677"/>
+              <connectionPointOut>
+                <relPosition x="180" y="14"/>
+              </connectionPointOut>
+              <expression>Fix1_zone2_booked</expression>
+            </inVariable>
+            <inVariable localId="21" height="28" width="180">
+              <position x="109" y="718"/>
+              <connectionPointOut>
+                <relPosition x="180" y="14"/>
+              </connectionPointOut>
+              <expression>Fix1_zone3_booked</expression>
+            </inVariable>
+            <actionBlock localId="22" height="30" width="270">
+              <position x="611" y="786"/>
+              <connectionPointIn>
+                <relPosition x="0" y="15"/>
+                <connection refLocalId="14">
+                  <position x="611" y="801"/>
+                  <position x="551" y="801"/>
+                </connection>
+              </connectionPointIn>
+              <action indicator="positioning_to_work_pos">
+                <inline>
+                  <ST>
+<![CDATA[]]>
+                  </ST>
+                </inline>
+              </action>
+            </actionBlock>
+            <step localId="25" height="28" width="30" name="S4">
+              <position x="521" y="1178"/>
+              <connectionPointIn>
+                <relPosition x="15" y="0"/>
+                <connection refLocalId="26">
+                  <position x="536" y="1178"/>
+                  <position x="536" y="919"/>
+                </connection>
+              </connectionPointIn>
+              <connectionPointOut formalParameter="">
+                <relPosition x="15" y="28"/>
+              </connectionPointOut>
+              <connectionPointOutAction formalParameter="">
+                <relPosition x="30" y="14"/>
+              </connectionPointOutAction>
+            </step>
+            <transition localId="26" height="2" width="21">
+              <position x="526" y="917"/>
+              <connectionPointIn>
+                <relPosition x="10" y="0"/>
+                <connection refLocalId="14">
+                  <position x="536" y="917"/>
+                  <position x="536" y="815"/>
+                </connection>
+              </connectionPointIn>
+              <connectionPointOut>
+                <relPosition x="10" y="2"/>
+              </connectionPointOut>
+              <condition>
+                <connection refLocalId="27" formalParameter="OUT">
+                  <position x="526" y="918"/>
+                  <position x="430" y="918"/>
+                </connection>
+              </condition>
+            </transition>
+            <block localId="27" width="65" height="268" typeName="AND">
+              <position x="365" y="878"/>
+              <inputVariables>
+                <variable formalParameter="IN1">
+                  <connectionPointIn>
+                    <relPosition x="0" y="40"/>
+                    <connection refLocalId="28">
+                      <position x="365" y="918"/>
+                      <position x="290" y="918"/>
+                    </connection>
+                  </connectionPointIn>
+                </variable>
+                <variable formalParameter="IN2">
+                  <connectionPointIn>
+                    <relPosition x="0" y="81"/>
+                    <connection refLocalId="31">
+                      <position x="365" y="959"/>
+                      <position x="291" y="959"/>
+                    </connection>
+                  </connectionPointIn>
+                </variable>
+                <variable formalParameter="IN3">
+                  <connectionPointIn>
+                    <relPosition x="0" y="122"/>
+                    <connection refLocalId="32">
+                      <position x="365" y="1000"/>
+                      <position x="290" y="1000"/>
+                    </connection>
+                  </connectionPointIn>
+                </variable>
+                <variable formalParameter="IN4">
+                  <connectionPointIn>
+                    <relPosition x="0" y="163"/>
+                    <connection refLocalId="33">
+                      <position x="365" y="1041"/>
+                      <position x="290" y="1041"/>
+                    </connection>
+                  </connectionPointIn>
+                </variable>
+                <variable formalParameter="IN5">
+                  <connectionPointIn>
+                    <relPosition x="0" y="204"/>
+                    <connection refLocalId="34">
+                      <position x="365" y="1082"/>
+                      <position x="290" y="1082"/>
+                    </connection>
+                  </connectionPointIn>
+                </variable>
+                <variable formalParameter="IN6">
+                  <connectionPointIn>
+                    <relPosition x="0" y="245"/>
+                    <connection refLocalId="35">
+                      <position x="365" y="1123"/>
+                      <position x="289" y="1123"/>
+                    </connection>
+                  </connectionPointIn>
+                </variable>
+              </inputVariables>
+              <inOutVariables/>
+              <outputVariables>
+                <variable formalParameter="OUT">
+                  <connectionPointOut>
+                    <relPosition x="65" y="40"/>
+                  </connectionPointOut>
+                </variable>
+              </outputVariables>
+            </block>
+            <inVariable localId="28" height="28" width="240">
+              <position x="50" y="904"/>
+              <connectionPointOut>
+                <relPosition x="240" y="14"/>
+              </connectionPointOut>
+              <expression>positioning_in_work_pos</expression>
+            </inVariable>
+            <actionBlock localId="29" height="46" width="370">
+              <position x="620" y="1177"/>
+              <connectionPointIn>
+                <relPosition x="0" y="15"/>
+                <connection refLocalId="25">
+                  <position x="620" y="1192"/>
+                  <position x="551" y="1192"/>
+                </connection>
+              </connectionPointIn>
+              <action indicator="fixation_to_locked">
+                <inline>
+                  <ST>
+<![CDATA[]]>
+                  </ST>
+                </inline>
+              </action>
+              <action qualifier="R">
+                <reference name="Fix1_book_zone3"/>
+              </action>
+            </actionBlock>
+            <step localId="30" height="28" width="30" name="S5">
+              <position x="521" y="1552"/>
+              <connectionPointIn>
+                <relPosition x="15" y="0"/>
+                <connection refLocalId="37">
+                  <position x="536" y="1552"/>
+                  <position x="536" y="1299"/>
+                </connection>
+              </connectionPointIn>
+              <connectionPointOut formalParameter="">
+                <relPosition x="15" y="28"/>
+              </connectionPointOut>
+              <connectionPointOutAction formalParameter="">
+                <relPosition x="30" y="14"/>
+              </connectionPointOutAction>
+            </step>
+            <inVariable localId="31" height="28" width="210">
+              <position x="81" y="945"/>
+              <connectionPointOut>
+                <relPosition x="210" y="14"/>
+              </connectionPointOut>
+              <expression>fixation_in_unlocked</expression>
+            </inVariable>
+            <inVariable localId="32" height="28" width="150">
+              <position x="140" y="986"/>
+              <connectionPointOut>
+                <relPosition x="150" y="14"/>
+              </connectionPointOut>
+              <expression>clamp_in_close</expression>
+            </inVariable>
+            <inVariable localId="33" height="28" width="280">
+              <position x="10" y="1027"/>
+              <connectionPointOut>
+                <relPosition x="280" y="14"/>
+              </connectionPointOut>
+              <expression>part_detection_part_present</expression>
+            </inVariable>
+            <inVariable localId="34" height="28" width="180">
+              <position x="110" y="1068"/>
+              <connectionPointOut>
+                <relPosition x="180" y="14"/>
+              </connectionPointOut>
+              <expression>Fix1_zone2_booked</expression>
+            </inVariable>
+            <inVariable localId="35" height="28" width="180">
+              <position x="109" y="1109"/>
+              <connectionPointOut>
+                <relPosition x="180" y="14"/>
+              </connectionPointOut>
+              <expression>Fix1_zone3_booked</expression>
+            </inVariable>
+            <jumpStep localId="36" height="13" width="12" targetName="Init">
+              <position x="530" y="1637"/>
+              <connectionPointIn>
+                <relPosition x="6" y="0"/>
+                <connection refLocalId="30">
+                  <position x="536" y="1637"/>
+                  <position x="536" y="1580"/>
+                </connection>
+              </connectionPointIn>
+            </jumpStep>
+            <transition localId="37" height="2" width="20">
+              <position x="526" y="1297"/>
+              <connectionPointIn>
+                <relPosition x="10" y="0"/>
+                <connection refLocalId="25">
+                  <position x="536" y="1297"/>
+                  <position x="536" y="1206"/>
+                </connection>
+              </connectionPointIn>
+              <connectionPointOut>
+                <relPosition x="10" y="2"/>
+              </connectionPointOut>
+              <condition>
+                <connection refLocalId="38" formalParameter="OUT">
+                  <position x="526" y="1298"/>
+                  <position x="445" y="1298"/>
+                </connection>
+              </condition>
+            </transition>
+            <block localId="38" width="65" height="238" typeName="AND">
+              <position x="380" y="1260"/>
+              <inputVariables>
+                <variable formalParameter="IN1">
+                  <connectionPointIn>
+                    <relPosition x="0" y="38"/>
+                    <connection refLocalId="40">
+                      <position x="380" y="1298"/>
+                      <position x="297" y="1298"/>
+                    </connection>
+                  </connectionPointIn>
+                </variable>
+                <variable formalParameter="IN2">
+                  <connectionPointIn>
+                    <relPosition x="0" y="74"/>
+                    <connection refLocalId="41">
+                      <position x="380" y="1334"/>
+                      <position x="297" y="1334"/>
+                    </connection>
+                  </connectionPointIn>
+                </variable>
+                <variable formalParameter="IN3">
+                  <connectionPointIn>
+                    <relPosition x="0" y="110"/>
+                    <connection refLocalId="42">
+                      <position x="380" y="1370"/>
+                      <position x="296" y="1370"/>
+                    </connection>
+                  </connectionPointIn>
+                </variable>
+                <variable formalParameter="IN4">
+                  <connectionPointIn>
+                    <relPosition x="0" y="146"/>
+                    <connection refLocalId="43">
+                      <position x="380" y="1406"/>
+                      <position x="296" y="1406"/>
+                    </connection>
+                  </connectionPointIn>
+                </variable>
+                <variable formalParameter="IN5">
+                  <connectionPointIn>
+                    <relPosition x="0" y="182"/>
+                    <connection refLocalId="44">
+                      <position x="380" y="1442"/>
+                      <position x="296" y="1442"/>
+                    </connection>
+                  </connectionPointIn>
+                </variable>
+                <variable formalParameter="IN6">
+                  <connectionPointIn>
+                    <relPosition x="0" y="218"/>
+                    <connection refLocalId="45">
+                      <position x="380" y="1478"/>
+                      <position x="297" y="1478"/>
+                    </connection>
+                  </connectionPointIn>
+                </variable>
+              </inputVariables>
+              <inOutVariables/>
+              <outputVariables>
+                <variable formalParameter="OUT">
+                  <connectionPointOut>
+                    <relPosition x="65" y="38"/>
+                  </connectionPointOut>
+                </variable>
+              </outputVariables>
+            </block>
+            <actionBlock localId="39" height="30" width="120">
+              <position x="610" y="1551"/>
+              <connectionPointIn>
+                <relPosition x="0" y="15"/>
+                <connection refLocalId="30">
+                  <position x="610" y="1566"/>
+                  <position x="551" y="1566"/>
+                </connection>
+              </connectionPointIn>
+              <action indicator="Op33_end">
+                <inline>
+                  <ST>
+<![CDATA[]]>
+                  </ST>
+                </inline>
+              </action>
+            </actionBlock>
+            <inVariable localId="40" height="28" width="240">
+              <position x="57" y="1284"/>
+              <connectionPointOut>
+                <relPosition x="240" y="14"/>
+              </connectionPointOut>
+              <expression>positioning_in_work_pos</expression>
+            </inVariable>
+            <inVariable localId="41" height="28" width="190">
+              <position x="107" y="1320"/>
+              <connectionPointOut>
+                <relPosition x="190" y="14"/>
+              </connectionPointOut>
+              <expression>fixation_in_locked</expression>
+            </inVariable>
+            <inVariable localId="42" height="28" width="150">
+              <position x="146" y="1356"/>
+              <connectionPointOut>
+                <relPosition x="150" y="14"/>
+              </connectionPointOut>
+              <expression>clamp_in_close</expression>
+            </inVariable>
+            <inVariable localId="43" height="28" width="280">
+              <position x="16" y="1392"/>
+              <connectionPointOut>
+                <relPosition x="280" y="14"/>
+              </connectionPointOut>
+              <expression>part_detection_part_present</expression>
+            </inVariable>
+            <inVariable localId="44" height="28" width="180">
+              <position x="116" y="1428"/>
+              <connectionPointOut>
+                <relPosition x="180" y="14"/>
+              </connectionPointOut>
+              <expression>Fix1_zone2_booked</expression>
+            </inVariable>
+            <inVariable localId="45" height="28" width="180">
+              <position x="117" y="1464"/>
+              <connectionPointOut>
+                <relPosition x="180" y="14"/>
+              </connectionPointOut>
+              <expression>Fix1_zone3_booked</expression>
+            </inVariable>
+            <comment localId="46" height="44" width="211">
+              <position x="28" y="14"/>
+              <content>
+<![CDATA[Go to work position]]>
+              </content>
+            </comment>
+          </SFC>
+        </body>
+      </pou>
+      <pou name="FunctionBlocks" pouType="program">
+        <interface>
+          <externalVars>
+            <variable name="positioning_in_home_pos">
+              <type>
+                <BOOL/>
+              </type>
+            </variable>
+            <variable name="positioning_to_home_pos">
+              <type>
+                <BOOL/>
+              </type>
+            </variable>
+            <variable name="positioning_output_to_home_pos">
+              <type>
+                <BOOL/>
+              </type>
+            </variable>
+            <variable name="positioning_sensor_in_home_pos">
+              <type>
+                <BOOL/>
+              </type>
+            </variable>
+            <variable name="positioning_in_work_pos">
+              <type>
+                <BOOL/>
+              </type>
+            </variable>
+            <variable name="positioning_to_work_pos">
+              <type>
+                <BOOL/>
+              </type>
+            </variable>
+            <variable name="positioning_output_to_work_pos">
+              <type>
+                <BOOL/>
+              </type>
+            </variable>
+            <variable name="positioning_sensor_in_work_pos">
+              <type>
+                <BOOL/>
+              </type>
+            </variable>
+            <variable name="fixation_in_locked">
+              <type>
+                <BOOL/>
+              </type>
+            </variable>
+            <variable name="fixation_to_locked">
+              <type>
+                <BOOL/>
+              </type>
+            </variable>
+            <variable name="fixation_output_to_locked">
+              <type>
+                <BOOL/>
+              </type>
+            </variable>
+            <variable name="fixation_sensor_in_locked">
+              <type>
+                <BOOL/>
+              </type>
+            </variable>
+            <variable name="fixation_in_unlocked">
+              <type>
+                <BOOL/>
+              </type>
+            </variable>
+            <variable name="fixation_to_unlocked">
+              <type>
+                <BOOL/>
+              </type>
+            </variable>
+            <variable name="fixation_output_to_unlocked">
+              <type>
+                <BOOL/>
+              </type>
+            </variable>
+            <variable name="fixation_sensor_in_unlocked">
+              <type>
+                <BOOL/>
+              </type>
+            </variable>
+            <variable name="clamp_in_open">
+              <type>
+                <BOOL/>
+              </type>
+            </variable>
+            <variable name="clamp_to_open">
+              <type>
+                <BOOL/>
+              </type>
+            </variable>
+            <variable name="clamp_output_to_open">
+              <type>
+                <BOOL/>
+              </type>
+            </variable>
+            <variable name="clamp_sensor_in_open">
+              <type>
+                <BOOL/>
+              </type>
+            </variable>
+            <variable name="clamp_in_close">
+              <type>
+                <BOOL/>
+              </type>
+            </variable>
+            <variable name="clamp_to_closed">
+              <type>
+                <BOOL/>
+              </type>
+            </variable>
+            <variable name="clamp_output_to_closed">
+              <type>
+                <BOOL/>
+              </type>
+            </variable>
+            <variable name="clamp_sensor_in_closed">
+              <type>
+                <BOOL/>
+              </type>
+            </variable>
+            <variable name="part_detection_part_present">
+              <type>
+                <BOOL/>
+              </type>
+            </variable>
+            <variable name="part_detection_sensor_1">
+              <type>
+                <BOOL/>
+              </type>
+            </variable>
+            <variable name="part_detection_sensor_2">
+              <type>
+                <BOOL/>
+              </type>
+            </variable>
+            <variable name="Fix1_book_zone2">
+              <type>
+                <BOOL/>
+              </type>
+            </variable>
+            <variable name="Fix1_book_zone3">
+              <type>
+                <BOOL/>
+              </type>
+            </variable>
+            <variable name="Fix1_zone2_booked">
+              <type>
+                <BOOL/>
+              </type>
+            </variable>
+            <variable name="Fix1_zone3_booked">
+              <type>
+                <BOOL/>
+              </type>
+            </variable>
+          </externalVars>
+          <localVars>
+            <variable name="Positioning_1">
+              <type>
+                <derived name="TwoPositionsMovement"/>
+              </type>
+            </variable>
+            <variable name="PartDetection_1">
+              <type>
+                <derived name="PartDetection"/>
+              </type>
+            </variable>
+            <variable name="Fixation">
+              <type>
+                <derived name="TwoPositionsMovement"/>
+              </type>
+            </variable>
+            <variable name="Clamp">
+              <type>
+                <derived name="TwoPositionsMovement"/>
+              </type>
+            </variable>
+            <variable name="Zone2">
+              <type>
+                <derived name="singleZoneBooking"/>
+              </type>
+            </variable>
+            <variable name="Zone3">
+              <type>
+                <derived name="singleZoneBooking"/>
+              </type>
+            </variable>
+          </localVars>
+        </interface>
+        <body>
+          <FBD>
+            <block localId="1" width="210" height="223" typeName="TwoPositionsMovement" instanceName="Positioning_1">
+              <position x="423" y="50"/>
+              <inputVariables>
+                <variable formalParameter="forward">
+                  <connectionPointIn>
+                    <relPosition x="0" y="45"/>
+                    <connection refLocalId="2">
+                      <position x="423" y="95"/>
+                      <position x="337" y="95"/>
+                    </connection>
+                  </connectionPointIn>
+                </variable>
+                <variable formalParameter="backward">
+                  <connectionPointIn>
+                    <relPosition x="0" y="95"/>
+                    <connection refLocalId="3">
+                      <position x="423" y="145"/>
+                      <position x="337" y="145"/>
+                    </connection>
+                  </connectionPointIn>
+                </variable>
+                <variable formalParameter="sensor_fwd">
+                  <connectionPointIn>
+                    <relPosition x="0" y="145"/>
+                    <connection refLocalId="4">
+                      <position x="423" y="195"/>
+                      <position x="340" y="195"/>
+                    </connection>
+                  </connectionPointIn>
+                </variable>
+                <variable formalParameter="sensor_bwd">
+                  <connectionPointIn>
+                    <relPosition x="0" y="195"/>
+                    <connection refLocalId="5">
+                      <position x="423" y="245"/>
+                      <position x="341" y="245"/>
+                    </connection>
+                  </connectionPointIn>
+                </variable>
+              </inputVariables>
+              <inOutVariables/>
+              <outputVariables>
+                <variable formalParameter="in_forward">
+                  <connectionPointOut>
+                    <relPosition x="210" y="45"/>
+                  </connectionPointOut>
+                </variable>
+                <variable formalParameter="in_backward">
+                  <connectionPointOut>
+                    <relPosition x="210" y="95"/>
+                  </connectionPointOut>
+                </variable>
+                <variable formalParameter="out_forward">
+                  <connectionPointOut>
+                    <relPosition x="210" y="145"/>
+                  </connectionPointOut>
+                </variable>
+                <variable formalParameter="out_backward">
+                  <connectionPointOut>
+                    <relPosition x="210" y="195"/>
+                  </connectionPointOut>
+                </variable>
+              </outputVariables>
+            </block>
+            <inVariable localId="2" height="28" width="240">
+              <position x="97" y="81"/>
+              <connectionPointOut>
+                <relPosition x="240" y="14"/>
+              </connectionPointOut>
+              <expression>positioning_to_work_pos</expression>
+            </inVariable>
+            <inVariable localId="3" height="28" width="240">
+              <position x="97" y="131"/>
+              <connectionPointOut>
+                <relPosition x="240" y="14"/>
+              </connectionPointOut>
+              <expression>positioning_to_home_pos</expression>
+            </inVariable>
+            <inVariable localId="4" height="28" width="310">
+              <position x="30" y="181"/>
+              <connectionPointOut>
+                <relPosition x="310" y="14"/>
+              </connectionPointOut>
+              <expression>positioning_sensor_in_work_pos</expression>
+            </inVariable>
+            <inVariable localId="5" height="28" width="310">
+              <position x="31" y="231"/>
+              <connectionPointOut>
+                <relPosition x="310" y="14"/>
+              </connectionPointOut>
+              <expression>positioning_sensor_in_home_pos</expression>
+            </inVariable>
+            <outVariable localId="6" height="28" width="240">
+              <position x="741" y="81"/>
+              <connectionPointIn>
+                <relPosition x="0" y="14"/>
+                <connection refLocalId="1" formalParameter="in_forward">
+                  <position x="741" y="95"/>
+                  <position x="633" y="95"/>
+                </connection>
+              </connectionPointIn>
+              <expression>positioning_in_work_pos</expression>
+            </outVariable>
+            <block localId="10" width="214" height="111" typeName="PartDetection" instanceName="PartDetection_1">
+              <position x="425" y="1057"/>
+              <inputVariables>
+                <variable formalParameter="sensor_1">
+                  <connectionPointIn>
+                    <relPosition x="0" y="42"/>
+                    <connection refLocalId="16">
+                      <position x="425" y="1099"/>
+                      <position x="376" y="1099"/>
+                    </connection>
+                  </connectionPointIn>
+                </variable>
+                <variable formalParameter="sensor_2">
+                  <connectionPointIn>
+                    <relPosition x="0" y="87"/>
+                    <connection refLocalId="17">
+                      <position x="425" y="1144"/>
+                      <position x="377" y="1144"/>
+                    </connection>
+                  </connectionPointIn>
+                </variable>
+              </inputVariables>
+              <inOutVariables/>
+              <outputVariables>
+                <variable formalParameter="part_present">
+                  <connectionPointOut>
+                    <relPosition x="214" y="42"/>
+                  </connectionPointOut>
+                </variable>
+              </outputVariables>
+            </block>
+            <outVariable localId="12" height="28" width="240">
+              <position x="744" y="131"/>
+              <connectionPointIn>
+                <relPosition x="0" y="14"/>
+                <connection refLocalId="1" formalParameter="in_backward">
+                  <position x="744" y="145"/>
+                  <position x="633" y="145"/>
+                </connection>
+              </connectionPointIn>
+              <expression>positioning_in_home_pos</expression>
+            </outVariable>
+            <outVariable localId="13" height="28" width="310">
+              <position x="746" y="181"/>
+              <connectionPointIn>
+                <relPosition x="0" y="14"/>
+                <connection refLocalId="1" formalParameter="out_forward">
+                  <position x="746" y="195"/>
+                  <position x="633" y="195"/>
+                </connection>
+              </connectionPointIn>
+              <expression>positioning_output_to_work_pos</expression>
+            </outVariable>
+            <outVariable localId="15" height="28" width="310">
+              <position x="748" y="231"/>
+              <connectionPointIn>
+                <relPosition x="0" y="14"/>
+                <connection refLocalId="1" formalParameter="out_backward">
+                  <position x="748" y="245"/>
+                  <position x="633" y="245"/>
+                </connection>
+              </connectionPointIn>
+              <expression>positioning_output_to_home_pos</expression>
+            </outVariable>
+            <inVariable localId="16" height="28" width="240">
+              <position x="136" y="1085"/>
+              <connectionPointOut>
+                <relPosition x="240" y="14"/>
+              </connectionPointOut>
+              <expression>part_detection_sensor_1</expression>
+            </inVariable>
+            <inVariable localId="17" height="28" width="240">
+              <position x="137" y="1130"/>
+              <connectionPointOut>
+                <relPosition x="240" y="14"/>
+              </connectionPointOut>
+              <expression>part_detection_sensor_2</expression>
+            </inVariable>
+            <outVariable localId="18" height="28" width="280">
+              <position x="759" y="1085"/>
+              <connectionPointIn>
+                <relPosition x="0" y="14"/>
+                <connection refLocalId="10" formalParameter="part_present">
+                  <position x="759" y="1099"/>
+                  <position x="639" y="1099"/>
+                </connection>
+              </connectionPointIn>
+              <expression>part_detection_part_present</expression>
+            </outVariable>
+            <block localId="19" width="210" height="201" typeName="TwoPositionsMovement" instanceName="Fixation">
+              <position x="423" y="409"/>
+              <inputVariables>
+                <variable formalParameter="forward">
+                  <connectionPointIn>
+                    <relPosition x="0" y="42"/>
+                    <connection refLocalId="20">
+                      <position x="423" y="451"/>
+                      <position x="363" y="451"/>
+                    </connection>
+                  </connectionPointIn>
+                </variable>
+                <variable formalParameter="backward">
+                  <connectionPointIn>
+                    <relPosition x="0" y="87"/>
+                    <connection refLocalId="21">
+                      <position x="423" y="496"/>
+                      <position x="365" y="496"/>
+                    </connection>
+                  </connectionPointIn>
+                </variable>
+                <variable formalParameter="sensor_fwd">
+                  <connectionPointIn>
+                    <relPosition x="0" y="132"/>
+                    <connection refLocalId="22">
+                      <position x="423" y="541"/>
+                      <position x="367" y="541"/>
+                    </connection>
+                  </connectionPointIn>
+                </variable>
+                <variable formalParameter="sensor_bwd">
+                  <connectionPointIn>
+                    <relPosition x="0" y="177"/>
+                    <connection refLocalId="24">
+                      <position x="423" y="586"/>
+                      <position x="368" y="586"/>
+                    </connection>
+                  </connectionPointIn>
+                </variable>
+              </inputVariables>
+              <inOutVariables/>
+              <outputVariables>
+                <variable formalParameter="in_forward">
+                  <connectionPointOut>
+                    <relPosition x="210" y="42"/>
+                  </connectionPointOut>
+                </variable>
+                <variable formalParameter="in_backward">
+                  <connectionPointOut>
+                    <relPosition x="210" y="87"/>
+                  </connectionPointOut>
+                </variable>
+                <variable formalParameter="out_forward">
+                  <connectionPointOut>
+                    <relPosition x="210" y="132"/>
+                  </connectionPointOut>
+                </variable>
+                <variable formalParameter="out_backward">
+                  <connectionPointOut>
+                    <relPosition x="210" y="177"/>
+                  </connectionPointOut>
+                </variable>
+              </outputVariables>
+            </block>
+            <inVariable localId="20" height="28" width="190">
+              <position x="173" y="437"/>
+              <connectionPointOut>
+                <relPosition x="190" y="14"/>
+              </connectionPointOut>
+              <expression>fixation_to_locked</expression>
+            </inVariable>
+            <inVariable localId="21" height="28" width="210">
+              <position x="155" y="482"/>
+              <connectionPointOut>
+                <relPosition x="210" y="14"/>
+              </connectionPointOut>
+              <expression>fixation_to_unlocked</expression>
+            </inVariable>
+            <inVariable localId="22" height="28" width="260">
+              <position x="107" y="527"/>
+              <connectionPointOut>
+                <relPosition x="260" y="14"/>
+              </connectionPointOut>
+              <expression>fixation_sensor_in_locked</expression>
+            </inVariable>
+            <inVariable localId="24" height="28" width="280">
+              <position x="88" y="572"/>
+              <connectionPointOut>
+                <relPosition x="280" y="14"/>
+              </connectionPointOut>
+              <expression>fixation_sensor_in_unlocked</expression>
+            </inVariable>
+            <outVariable localId="25" height="28" width="190">
+              <position x="752" y="437"/>
+              <connectionPointIn>
+                <relPosition x="0" y="14"/>
+                <connection refLocalId="19" formalParameter="in_forward">
+                  <position x="752" y="451"/>
+                  <position x="633" y="451"/>
+                </connection>
+              </connectionPointIn>
+              <expression>fixation_in_locked</expression>
+            </outVariable>
+            <outVariable localId="27" height="28" width="260">
+              <position x="755" y="527"/>
+              <connectionPointIn>
+                <relPosition x="0" y="14"/>
+                <connection refLocalId="19" formalParameter="out_forward">
+                  <position x="755" y="541"/>
+                  <position x="633" y="541"/>
+                </connection>
+              </connectionPointIn>
+              <expression>fixation_output_to_locked</expression>
+            </outVariable>
+            <outVariable localId="26" height="28" width="210">
+              <position x="754" y="482"/>
+              <connectionPointIn>
+                <relPosition x="0" y="14"/>
+                <connection refLocalId="19" formalParameter="in_backward">
+                  <position x="754" y="496"/>
+                  <position x="633" y="496"/>
+                </connection>
+              </connectionPointIn>
+              <expression>fixation_in_unlocked</expression>
+            </outVariable>
+            <outVariable localId="28" height="28" width="280">
+              <position x="757" y="572"/>
+              <connectionPointIn>
+                <relPosition x="0" y="14"/>
+                <connection refLocalId="19" formalParameter="out_backward">
+                  <position x="757" y="586"/>
+                  <position x="633" y="586"/>
+                </connection>
+              </connectionPointIn>
+              <expression>fixation_output_to_unlocked</expression>
+            </outVariable>
+            <block localId="29" width="210" height="210" typeName="TwoPositionsMovement" instanceName="Clamp">
+              <position x="423" y="738"/>
+              <inputVariables>
+                <variable formalParameter="forward">
+                  <connectionPointIn>
+                    <relPosition x="0" y="43"/>
+                    <connection refLocalId="30">
+                      <position x="423" y="781"/>
+                      <position x="368" y="781"/>
+                    </connection>
+                  </connectionPointIn>
+                </variable>
+                <variable formalParameter="backward">
+                  <connectionPointIn>
+                    <relPosition x="0" y="90"/>
+                    <connection refLocalId="31">
+                      <position x="423" y="828"/>
+                      <position x="369" y="828"/>
+                    </connection>
+                  </connectionPointIn>
+                </variable>
+                <variable formalParameter="sensor_fwd">
+                  <connectionPointIn>
+                    <relPosition x="0" y="137"/>
+                    <connection refLocalId="32">
+                      <position x="423" y="875"/>
+                      <position x="369" y="875"/>
+                    </connection>
+                  </connectionPointIn>
+                </variable>
+                <variable formalParameter="sensor_bwd">
+                  <connectionPointIn>
+                    <relPosition x="0" y="184"/>
+                    <connection refLocalId="33">
+                      <position x="423" y="922"/>
+                      <position x="370" y="922"/>
+                    </connection>
+                  </connectionPointIn>
+                </variable>
+              </inputVariables>
+              <inOutVariables/>
+              <outputVariables>
+                <variable formalParameter="in_forward">
+                  <connectionPointOut>
+                    <relPosition x="210" y="43"/>
+                  </connectionPointOut>
+                </variable>
+                <variable formalParameter="in_backward">
+                  <connectionPointOut>
+                    <relPosition x="210" y="90"/>
+                  </connectionPointOut>
+                </variable>
+                <variable formalParameter="out_forward">
+                  <connectionPointOut>
+                    <relPosition x="210" y="137"/>
+                  </connectionPointOut>
+                </variable>
+                <variable formalParameter="out_backward">
+                  <connectionPointOut>
+                    <relPosition x="210" y="184"/>
+                  </connectionPointOut>
+                </variable>
+              </outputVariables>
+            </block>
+            <inVariable localId="30" height="28" width="160">
+              <position x="208" y="767"/>
+              <connectionPointOut>
+                <relPosition x="160" y="14"/>
+              </connectionPointOut>
+              <expression>clamp_to_closed</expression>
+            </inVariable>
+            <inVariable localId="31" height="28" width="140">
+              <position x="229" y="814"/>
+              <connectionPointOut>
+                <relPosition x="140" y="14"/>
+              </connectionPointOut>
+              <expression>clamp_to_open</expression>
+            </inVariable>
+            <inVariable localId="32" height="28" width="230">
+              <position x="139" y="861"/>
+              <connectionPointOut>
+                <relPosition x="230" y="14"/>
+              </connectionPointOut>
+              <expression>clamp_sensor_in_closed</expression>
+            </inVariable>
+            <inVariable localId="33" height="28" width="210">
+              <position x="160" y="908"/>
+              <connectionPointOut>
+                <relPosition x="210" y="14"/>
+              </connectionPointOut>
+              <expression>clamp_sensor_in_open</expression>
+            </inVariable>
+            <outVariable localId="34" height="28" width="150">
+              <position x="759" y="767"/>
+              <connectionPointIn>
+                <relPosition x="0" y="14"/>
+                <connection refLocalId="29" formalParameter="in_forward">
+                  <position x="759" y="781"/>
+                  <position x="633" y="781"/>
+                </connection>
+              </connectionPointIn>
+              <expression>clamp_in_close</expression>
+            </outVariable>
+            <outVariable localId="35" height="28" width="140">
+              <position x="761" y="814"/>
+              <connectionPointIn>
+                <relPosition x="0" y="14"/>
+                <connection refLocalId="29" formalParameter="in_backward">
+                  <position x="761" y="828"/>
+                  <position x="633" y="828"/>
+                </connection>
+              </connectionPointIn>
+              <expression>clamp_in_open</expression>
+            </outVariable>
+            <outVariable localId="36" height="28" width="230">
+              <position x="762" y="861"/>
+              <connectionPointIn>
+                <relPosition x="0" y="14"/>
+                <connection refLocalId="29" formalParameter="out_forward">
+                  <position x="762" y="875"/>
+                  <position x="633" y="875"/>
+                </connection>
+              </connectionPointIn>
+              <expression>clamp_output_to_closed</expression>
+            </outVariable>
+            <outVariable localId="37" height="28" width="210">
+              <position x="763" y="908"/>
+              <connectionPointIn>
+                <relPosition x="0" y="14"/>
+                <connection refLocalId="29" formalParameter="out_backward">
+                  <position x="763" y="922"/>
+                  <position x="633" y="922"/>
+                </connection>
+              </connectionPointIn>
+              <expression>clamp_output_to_open</expression>
+            </outVariable>
+            <block localId="39" width="211" height="113" typeName="singleZoneBooking" instanceName="Zone2">
+              <position x="432" y="1235"/>
+              <inputVariables>
+                <variable formalParameter="request_1">
+                  <connectionPointIn>
+                    <relPosition x="0" y="43"/>
+                    <connection refLocalId="40">
+                      <position x="432" y="1278"/>
+                      <position x="378" y="1278"/>
+                    </connection>
+                  </connectionPointIn>
+                </variable>
+                <variable formalParameter="request_2">
+                  <connectionPointIn>
+                    <relPosition x="0" y="89"/>
+                  </connectionPointIn>
+                </variable>
+              </inputVariables>
+              <inOutVariables/>
+              <outputVariables>
+                <variable formalParameter="booked_by_1">
+                  <connectionPointOut>
+                    <relPosition x="211" y="43"/>
+                  </connectionPointOut>
+                </variable>
+                <variable formalParameter="booked_by_2">
+                  <connectionPointOut>
+                    <relPosition x="211" y="89"/>
+                  </connectionPointOut>
+                </variable>
+              </outputVariables>
+            </block>
+            <inVariable localId="40" height="28" width="160">
+              <position x="218" y="1264"/>
+              <connectionPointOut>
+                <relPosition x="160" y="14"/>
+              </connectionPointOut>
+              <expression>Fix1_book_zone2</expression>
+            </inVariable>
+            <outVariable localId="41" height="28" width="180">
+              <position x="761" y="1264"/>
+              <connectionPointIn>
+                <relPosition x="0" y="14"/>
+                <connection refLocalId="39" formalParameter="booked_by_1">
+                  <position x="761" y="1278"/>
+                  <position x="643" y="1278"/>
+                </connection>
+              </connectionPointIn>
+              <expression>Fix1_zone2_booked</expression>
+            </outVariable>
+            <block localId="42" width="217" height="107" typeName="singleZoneBooking" instanceName="Zone3">
+              <position x="436" y="1432"/>
+              <inputVariables>
+                <variable formalParameter="request_1">
+                  <connectionPointIn>
+                    <relPosition x="0" y="41"/>
+                    <connection refLocalId="43">
+                      <position x="436" y="1473"/>
+                      <position x="382" y="1473"/>
+                    </connection>
+                  </connectionPointIn>
+                </variable>
+                <variable formalParameter="request_2">
+                  <connectionPointIn>
+                    <relPosition x="0" y="84"/>
+                  </connectionPointIn>
+                </variable>
+              </inputVariables>
+              <inOutVariables/>
+              <outputVariables>
+                <variable formalParameter="booked_by_1">
+                  <connectionPointOut>
+                    <relPosition x="217" y="41"/>
+                  </connectionPointOut>
+                </variable>
+                <variable formalParameter="booked_by_2">
+                  <connectionPointOut>
+                    <relPosition x="217" y="84"/>
+                  </connectionPointOut>
+                </variable>
+              </outputVariables>
+            </block>
+            <inVariable localId="43" height="28" width="160">
+              <position x="222" y="1459"/>
+              <connectionPointOut>
+                <relPosition x="160" y="14"/>
+              </connectionPointOut>
+              <expression>Fix1_book_zone3</expression>
+            </inVariable>
+            <outVariable localId="44" height="28" width="180">
+              <position x="760" y="1459"/>
+              <connectionPointIn>
+                <relPosition x="0" y="14"/>
+                <connection refLocalId="42" formalParameter="booked_by_1">
+                  <position x="760" y="1473"/>
+                  <position x="653" y="1473"/>
+                </connection>
+              </connectionPointIn>
+              <expression>Fix1_zone3_booked</expression>
+            </outVariable>
+          </FBD>
+        </body>
+      </pou>
+      <pou name="COP1" pouType="program">
+        <interface>
+          <externalVars>
+            <variable name="Op30_start">
+              <type>
+                <BOOL/>
+              </type>
+            </variable>
+            <variable name="Op30_end">
+              <type>
+                <BOOL/>
+              </type>
+            </variable>
+            <variable name="Op31_start">
+              <type>
+                <BOOL/>
+              </type>
+            </variable>
+            <variable name="Op31_end">
+              <type>
+                <BOOL/>
+              </type>
+            </variable>
+            <variable name="Op32_start">
+              <type>
+                <BOOL/>
+              </type>
+            </variable>
+            <variable name="Op32_end">
+              <type>
+                <BOOL/>
+              </type>
+            </variable>
+            <variable name="Op33_start">
+              <type>
+                <BOOL/>
+              </type>
+            </variable>
+            <variable name="Op33_end">
+              <type>
+                <BOOL/>
+              </type>
+            </variable>
+            <variable name="Op34_start">
+              <type>
+                <BOOL/>
+              </type>
+            </variable>
+            <variable name="Op34_end">
+              <type>
+                <BOOL/>
+              </type>
+            </variable>
+            <variable name="Cop1_start">
+              <type>
+                <BOOL/>
+              </type>
+            </variable>
+          </externalVars>
+        </interface>
+        <body>
+          <SFC>
+            <step localId="1" height="32" width="54" name="Init" initialStep="true">
+              <position x="336" y="22"/>
+              <connectionPointOut formalParameter="">
+                <relPosition x="27" y="32"/>
+              </connectionPointOut>
+            </step>
+            <inVariable localId="2" height="28" width="110">
+              <position x="145" y="113"/>
+              <connectionPointOut>
+                <relPosition x="110" y="14"/>
+              </connectionPointOut>
+              <expression>Cop1_start</expression>
+            </inVariable>
+            <transition localId="3" height="2" width="20">
+              <position x="353" y="126"/>
+              <connectionPointIn>
+                <relPosition x="10" y="0"/>
+                <connection refLocalId="1">
+                  <position x="363" y="126"/>
+                  <position x="363" y="54"/>
+                </connection>
+              </connectionPointIn>
+              <connectionPointOut>
+                <relPosition x="10" y="2"/>
+              </connectionPointOut>
+              <condition>
+                <connection refLocalId="2">
+                  <position x="353" y="127"/>
+                  <position x="255" y="127"/>
+                </connection>
+              </condition>
+            </transition>
+            <step localId="4" height="28" width="30" name="S1">
+              <position x="348" y="186"/>
+              <connectionPointIn>
+                <relPosition x="15" y="0"/>
+                <connection refLocalId="3">
+                  <position x="363" y="186"/>
+                  <position x="363" y="128"/>
+                </connection>
+              </connectionPointIn>
+              <connectionPointOut formalParameter="">
+                <relPosition x="15" y="28"/>
+              </connectionPointOut>
+              <connectionPointOutAction formalParameter="">
+                <relPosition x="30" y="14"/>
+              </connectionPointOutAction>
+            </step>
+            <actionBlock localId="5" height="30" width="140">
+              <position x="444" y="185"/>
+              <connectionPointIn>
+                <relPosition x="0" y="15"/>
+                <connection refLocalId="4">
+                  <position x="444" y="200"/>
+                  <position x="378" y="200"/>
+                </connection>
+              </connectionPointIn>
+              <action indicator="Op30_start">
+                <inline>
+                  <ST>
+<![CDATA[]]>
+                  </ST>
+                </inline>
+              </action>
+            </actionBlock>
+            <transition localId="6" height="2" width="20">
+              <position x="353" y="268"/>
+              <connectionPointIn>
+                <relPosition x="10" y="0"/>
+                <connection refLocalId="4">
+                  <position x="363" y="268"/>
+                  <position x="363" y="214"/>
+                </connection>
+              </connectionPointIn>
+              <connectionPointOut>
+                <relPosition x="10" y="2"/>
+              </connectionPointOut>
+              <condition>
+                <connection refLocalId="9">
+                  <position x="353" y="269"/>
+                  <position x="258" y="269"/>
+                </connection>
+              </condition>
+            </transition>
+            <step localId="7" height="28" width="30" name="S2">
+              <position x="348" y="298"/>
+              <connectionPointIn>
+                <relPosition x="15" y="0"/>
+                <connection refLocalId="6">
+                  <position x="363" y="298"/>
+                  <position x="363" y="270"/>
+                </connection>
+              </connectionPointIn>
+              <connectionPointOut formalParameter="">
+                <relPosition x="15" y="28"/>
+              </connectionPointOut>
+              <connectionPointOutAction formalParameter="">
+                <relPosition x="30" y="14"/>
+              </connectionPointOutAction>
+            </step>
+            <actionBlock localId="8" height="30" width="140">
+              <position x="448" y="297"/>
+              <connectionPointIn>
+                <relPosition x="0" y="15"/>
+                <connection refLocalId="7">
+                  <position x="448" y="312"/>
+                  <position x="378" y="312"/>
+                </connection>
+              </connectionPointIn>
+              <action indicator="Op31_start">
+                <inline>
+                  <ST>
+<![CDATA[]]>
+                  </ST>
+                </inline>
+              </action>
+            </actionBlock>
+            <inVariable localId="9" height="28" width="110">
+              <position x="148" y="255"/>
+              <connectionPointOut>
+                <relPosition x="110" y="14"/>
+              </connectionPointOut>
+              <expression>Op30_end</expression>
+            </inVariable>
+            <inVariable localId="11" height="28" width="110">
+              <position x="148" y="372"/>
+              <connectionPointOut>
+                <relPosition x="110" y="14"/>
+              </connectionPointOut>
+              <expression>Op31_end</expression>
+            </inVariable>
+            <step localId="12" height="28" width="30" name="S3">
+              <position x="348" y="430"/>
+              <connectionPointIn>
+                <relPosition x="15" y="0"/>
+                <connection refLocalId="13">
+                  <position x="363" y="430"/>
+                  <position x="363" y="387"/>
+                </connection>
+              </connectionPointIn>
+              <connectionPointOut formalParameter="">
+                <relPosition x="15" y="28"/>
+              </connectionPointOut>
+              <connectionPointOutAction formalParameter="">
+                <relPosition x="30" y="14"/>
+              </connectionPointOutAction>
+            </step>
+            <transition localId="13" height="2" width="20">
+              <position x="353" y="385"/>
+              <connectionPointIn>
+                <relPosition x="10" y="0"/>
+                <connection refLocalId="7">
+                  <position x="363" y="385"/>
+                  <position x="363" y="326"/>
+                </connection>
+              </connectionPointIn>
+              <connectionPointOut>
+                <relPosition x="10" y="2"/>
+              </connectionPointOut>
+              <condition>
+                <connection refLocalId="11">
+                  <position x="353" y="386"/>
+                  <position x="258" y="386"/>
+                </connection>
+              </condition>
+            </transition>
+            <actionBlock localId="14" height="30" width="140">
+              <position x="447" y="429"/>
+              <connectionPointIn>
+                <relPosition x="0" y="15"/>
+                <connection refLocalId="12">
+                  <position x="447" y="444"/>
+                  <position x="378" y="444"/>
+                </connection>
+              </connectionPointIn>
+              <action indicator="Op32_start">
+                <inline>
+                  <ST>
+<![CDATA[]]>
+                  </ST>
+                </inline>
+              </action>
+            </actionBlock>
+            <step localId="15" height="28" width="30" name="S4">
+              <position x="348" y="554"/>
+              <connectionPointIn>
+                <relPosition x="15" y="0"/>
+                <connection refLocalId="16">
+                  <position x="363" y="554"/>
+                  <position x="363" y="510"/>
+                </connection>
+              </connectionPointIn>
+              <connectionPointOut formalParameter="">
+                <relPosition x="15" y="28"/>
+              </connectionPointOut>
+              <connectionPointOutAction formalParameter="">
+                <relPosition x="30" y="14"/>
+              </connectionPointOutAction>
+            </step>
+            <transition localId="16" height="2" width="20">
+              <position x="353" y="508"/>
+              <connectionPointIn>
+                <relPosition x="10" y="0"/>
+                <connection refLocalId="12">
+                  <position x="363" y="508"/>
+                  <position x="363" y="458"/>
+                </connection>
+              </connectionPointIn>
+              <connectionPointOut>
+                <relPosition x="10" y="2"/>
+              </connectionPointOut>
+              <condition>
+                <connection refLocalId="17">
+                  <position x="353" y="509"/>
+                  <position x="258" y="509"/>
+                </connection>
+              </condition>
+            </transition>
+            <inVariable localId="17" height="28" width="106">
+              <position x="152" y="495"/>
+              <connectionPointOut>
+                <relPosition x="106" y="14"/>
+              </connectionPointOut>
+              <expression>Op32_end</expression>
+            </inVariable>
+            <actionBlock localId="18" height="30" width="140">
+              <position x="447" y="553"/>
+              <connectionPointIn>
+                <relPosition x="0" y="15"/>
+                <connection refLocalId="15">
+                  <position x="447" y="568"/>
+                  <position x="378" y="568"/>
+                </connection>
+              </connectionPointIn>
+              <action indicator="Op33_start">
+                <inline>
+                  <ST>
+<![CDATA[]]>
+                  </ST>
+                </inline>
+              </action>
+            </actionBlock>
+            <step localId="19" height="28" width="30" name="S5">
+              <position x="348" y="685"/>
+              <connectionPointIn>
+                <relPosition x="15" y="0"/>
+                <connection refLocalId="21">
+                  <position x="363" y="685"/>
+                  <position x="363" y="623"/>
+                </connection>
+              </connectionPointIn>
+              <connectionPointOut formalParameter="">
+                <relPosition x="15" y="28"/>
+              </connectionPointOut>
+              <connectionPointOutAction formalParameter="">
+                <relPosition x="30" y="14"/>
+              </connectionPointOutAction>
+            </step>
+            <jumpStep localId="20" height="13" width="12" targetName="Init">
+              <position x="357" y="830"/>
+              <connectionPointIn>
+                <relPosition x="6" y="0"/>
+                <connection refLocalId="23">
+                  <position x="363" y="830"/>
+                  <position x="363" y="765"/>
+                </connection>
+              </connectionPointIn>
+            </jumpStep>
+            <transition localId="21" height="2" width="20">
+              <position x="353" y="621"/>
+              <connectionPointIn>
+                <relPosition x="10" y="0"/>
+                <connection refLocalId="15">
+                  <position x="363" y="621"/>
+                  <position x="363" y="582"/>
+                </connection>
+              </connectionPointIn>
+              <connectionPointOut>
+                <relPosition x="10" y="2"/>
+              </connectionPointOut>
+              <condition>
+                <connection refLocalId="25">
+                  <position x="353" y="622"/>
+                  <position x="256" y="622"/>
+                </connection>
+              </condition>
+            </transition>
+            <actionBlock localId="22" height="30" width="140">
+              <position x="446" y="684"/>
+              <connectionPointIn>
+                <relPosition x="0" y="15"/>
+                <connection refLocalId="19">
+                  <position x="446" y="699"/>
+                  <position x="378" y="699"/>
+                </connection>
+              </connectionPointIn>
+              <action indicator="Op34_start">
+                <inline>
+                  <ST>
+<![CDATA[]]>
+                  </ST>
+                </inline>
+              </action>
+            </actionBlock>
+            <transition localId="23" height="2" width="20">
+              <position x="353" y="763"/>
+              <connectionPointIn>
+                <relPosition x="10" y="0"/>
+                <connection refLocalId="19">
+                  <position x="363" y="763"/>
+                  <position x="363" y="713"/>
+                </connection>
+              </connectionPointIn>
+              <connectionPointOut>
+                <relPosition x="10" y="2"/>
+              </connectionPointOut>
+              <condition>
+                <connection refLocalId="24">
+                  <position x="353" y="764"/>
+                  <position x="263" y="764"/>
+                </connection>
+              </condition>
+            </transition>
+            <inVariable localId="24" height="28" width="110">
+              <position x="153" y="750"/>
+              <connectionPointOut>
+                <relPosition x="110" y="14"/>
+              </connectionPointOut>
+              <expression>Op34_end</expression>
+            </inVariable>
+            <inVariable localId="25" height="28" width="106">
+              <position x="150" y="608"/>
+              <connectionPointOut>
+                <relPosition x="106" y="14"/>
+              </connectionPointOut>
+              <expression>Op33_end</expression>
+            </inVariable>
+          </SFC>
+        </body>
+      </pou>
+    </pous>
+  </types>
+  <instances>
+    <configurations>
+      <configuration name="ExampleCell">
+        <resource name="FIX1">
+          <task name="Task_COP1" single="Cop1_start" priority="0">
+            <pouInstance name="Instance_EOP30" type="EOP30"/>
+            <pouInstance name="Instance_EOP33" type="EOP33"/>
+            <pouInstance name="Instance_COP1" type="COP1"/>
+            <pouInstance name="Instance_FunctionBlocks" type="FunctionBlocks"/>
+          </task>
+          <globalVars>
+            <variable name="Op30_start">
+              <type>
+                <BOOL/>
+              </type>
+              <initialValue>
+                <simpleValue value="0"/>
+              </initialValue>
+            </variable>
+            <variable name="Op30_end">
+              <type>
+                <BOOL/>
+              </type>
+              <initialValue>
+                <simpleValue value="0"/>
+              </initialValue>
+            </variable>
+            <variable name="Op31_start">
+              <type>
+                <BOOL/>
+              </type>
+              <initialValue>
+                <simpleValue value="0"/>
+              </initialValue>
+            </variable>
+            <variable name="Op31_end">
+              <type>
+                <BOOL/>
+              </type>
+              <initialValue>
+                <simpleValue value="0"/>
+              </initialValue>
+            </variable>
+            <variable name="Op32_start">
+              <type>
+                <BOOL/>
+              </type>
+              <initialValue>
+                <simpleValue value="0"/>
+              </initialValue>
+            </variable>
+            <variable name="Op32_end">
+              <type>
+                <BOOL/>
+              </type>
+              <initialValue>
+                <simpleValue value="0"/>
+              </initialValue>
+            </variable>
+            <variable name="Op33_start">
+              <type>
+                <BOOL/>
+              </type>
+              <initialValue>
+                <simpleValue value="0"/>
+              </initialValue>
+            </variable>
+            <variable name="Op33_end">
+              <type>
+                <BOOL/>
+              </type>
+              <initialValue>
+                <simpleValue value="0"/>
+              </initialValue>
+            </variable>
+            <variable name="Op34_start">
+              <type>
+                <BOOL/>
+              </type>
+              <initialValue>
+                <simpleValue value="0"/>
+              </initialValue>
+            </variable>
+            <variable name="Op34_end">
+              <type>
+                <BOOL/>
+              </type>
+              <initialValue>
+                <simpleValue value="0"/>
+              </initialValue>
+            </variable>
+            <variable name="positioning_in_home_pos">
+              <type>
+                <BOOL/>
+              </type>
+              <initialValue>
+                <simpleValue value="0"/>
+              </initialValue>
+            </variable>
+            <variable name="positioning_to_home_pos">
+              <type>
+                <BOOL/>
+              </type>
+              <initialValue>
+                <simpleValue value="0"/>
+              </initialValue>
+            </variable>
+            <variable name="positioning_output_to_home_pos">
+              <type>
+                <BOOL/>
+              </type>
+              <initialValue>
+                <simpleValue value="0"/>
+              </initialValue>
+            </variable>
+            <variable name="positioning_sensor_in_home_pos">
+              <type>
+                <BOOL/>
+              </type>
+              <initialValue>
+                <simpleValue value="0"/>
+              </initialValue>
+            </variable>
+            <variable name="positioning_in_work_pos">
+              <type>
+                <BOOL/>
+              </type>
+              <initialValue>
+                <simpleValue value="0"/>
+              </initialValue>
+            </variable>
+            <variable name="positioning_to_work_pos">
+              <type>
+                <BOOL/>
+              </type>
+              <initialValue>
+                <simpleValue value="0"/>
+              </initialValue>
+            </variable>
+            <variable name="positioning_output_to_work_pos">
+              <type>
+                <BOOL/>
+              </type>
+              <initialValue>
+                <simpleValue value="0"/>
+              </initialValue>
+            </variable>
+            <variable name="positioning_sensor_in_work_pos">
+              <type>
+                <BOOL/>
+              </type>
+              <initialValue>
+                <simpleValue value="0"/>
+              </initialValue>
+            </variable>
+            <variable name="fixation_in_locked">
+              <type>
+                <BOOL/>
+              </type>
+              <initialValue>
+                <simpleValue value="0"/>
+              </initialValue>
+            </variable>
+            <variable name="fixation_to_locked">
+              <type>
+                <BOOL/>
+              </type>
+              <initialValue>
+                <simpleValue value="0"/>
+              </initialValue>
+            </variable>
+            <variable name="fixation_output_to_locked">
+              <type>
+                <BOOL/>
+              </type>
+              <initialValue>
+                <simpleValue value="0"/>
+              </initialValue>
+            </variable>
+            <variable name="fixation_sensor_in_locked">
+              <type>
+                <BOOL/>
+              </type>
+              <initialValue>
+                <simpleValue value="0"/>
+              </initialValue>
+            </variable>
+            <variable name="fixation_in_unlocked">
+              <type>
+                <BOOL/>
+              </type>
+              <initialValue>
+                <simpleValue value="0"/>
+              </initialValue>
+            </variable>
+            <variable name="fixation_to_unlocked">
+              <type>
+                <BOOL/>
+              </type>
+              <initialValue>
+                <simpleValue value="0"/>
+              </initialValue>
+            </variable>
+            <variable name="fixation_output_to_unlocked">
+              <type>
+                <BOOL/>
+              </type>
+              <initialValue>
+                <simpleValue value="0"/>
+              </initialValue>
+            </variable>
+            <variable name="fixation_sensor_in_unlocked">
+              <type>
+                <BOOL/>
+              </type>
+              <initialValue>
+                <simpleValue value="0"/>
+              </initialValue>
+            </variable>
+            <variable name="clamp_in_open">
+              <type>
+                <BOOL/>
+              </type>
+              <initialValue>
+                <simpleValue value="0"/>
+              </initialValue>
+            </variable>
+            <variable name="clamp_to_open">
+              <type>
+                <BOOL/>
+              </type>
+              <initialValue>
+                <simpleValue value="0"/>
+              </initialValue>
+            </variable>
+            <variable name="clamp_output_to_open">
+              <type>
+                <BOOL/>
+              </type>
+              <initialValue>
+                <simpleValue value="0"/>
+              </initialValue>
+            </variable>
+            <variable name="clamp_sensor_in_open">
+              <type>
+                <BOOL/>
+              </type>
+              <initialValue>
+                <simpleValue value="0"/>
+              </initialValue>
+            </variable>
+            <variable name="clamp_in_close">
+              <type>
+                <BOOL/>
+              </type>
+              <initialValue>
+                <simpleValue value="0"/>
+              </initialValue>
+            </variable>
+            <variable name="clamp_to_closed">
+              <type>
+                <BOOL/>
+              </type>
+              <initialValue>
+                <simpleValue value="0"/>
+              </initialValue>
+            </variable>
+            <variable name="clamp_output_to_closed">
+              <type>
+                <BOOL/>
+              </type>
+              <initialValue>
+                <simpleValue value="0"/>
+              </initialValue>
+            </variable>
+            <variable name="clamp_sensor_in_closed">
+              <type>
+                <BOOL/>
+              </type>
+              <initialValue>
+                <simpleValue value="0"/>
+              </initialValue>
+            </variable>
+            <variable name="part_detection_part_present">
+              <type>
+                <BOOL/>
+              </type>
+              <initialValue>
+                <simpleValue value="0"/>
+              </initialValue>
+            </variable>
+            <variable name="part_detection_sensor_1">
+              <type>
+                <BOOL/>
+              </type>
+              <initialValue>
+                <simpleValue value="0"/>
+              </initialValue>
+            </variable>
+            <variable name="part_detection_sensor_2">
+              <type>
+                <BOOL/>
+              </type>
+              <initialValue>
+                <simpleValue value="0"/>
+              </initialValue>
+            </variable>
+            <variable name="Fix1_book_zone2">
+              <type>
+                <BOOL/>
+              </type>
+              <initialValue>
+                <simpleValue value="0"/>
+              </initialValue>
+            </variable>
+            <variable name="Fix1_book_zone3">
+              <type>
+                <BOOL/>
+              </type>
+              <initialValue>
+                <simpleValue value="0"/>
+              </initialValue>
+            </variable>
+          </globalVars>
+        </resource>
+        <resource name="COP2"/>
+        <globalVars>
+          <variable name="Cop1_start">
+            <type>
+              <BOOL/>
+            </type>
+            <initialValue>
+              <simpleValue value="0"/>
+            </initialValue>
+          </variable>
+          <variable name="Cop1_end">
+            <type>
+              <BOOL/>
+            </type>
+            <initialValue>
+              <simpleValue value="0"/>
+            </initialValue>
+          </variable>
+          <variable name="Fix1_zone2_booked">
+            <type>
+              <BOOL/>
+            </type>
+            <initialValue>
+              <simpleValue value="0"/>
+            </initialValue>
+          </variable>
+          <variable name="Fix1_zone3_booked">
+            <type>
+              <BOOL/>
+            </type>
+            <initialValue>
+              <simpleValue value="0"/>
+            </initialValue>
+          </variable>
+        </globalVars>
+      </configuration>
+    </configurations>
+  </instances>
+</project>
