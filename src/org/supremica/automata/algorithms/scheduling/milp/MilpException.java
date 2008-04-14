@@ -21,7 +21,7 @@ public class MilpException
      */
     public MilpException()
     {
-        super("Exception when solving MILP from Supremica.");
+        super("Exception when solving MILP from Supremica. ");
     }
     
     
@@ -31,6 +31,6 @@ public class MilpException
      */
     public MilpException(String msg)
     {
-        super("Exception when solving MILP from Supremica." + msg);
+        super("Exception when solving MILP from Supremica. " + msg);
     }
 }
