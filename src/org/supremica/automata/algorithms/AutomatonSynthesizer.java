@@ -217,7 +217,6 @@ public class AutomatonSynthesizer
         int iteration = 0;
         do
         {
-            logger.info("Synthesis iteration: " + iteration++);
             stateList = doCoreachable();
             newUnsafeStates = stateList.size() > 0;
             if (newUnsafeStates)

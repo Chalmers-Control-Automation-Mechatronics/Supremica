@@ -26,21 +26,22 @@ public class SchedulingHelper
 {
     /**
      *  This method prepares a plant for a scheduling algorithm.
-     *  It checks whether the plant has an initial state (
-     *  prior to the call to this method, the plant is composed with
+     *  It checks whether the plant has an initial state 
+     *  (prior to the call to this method, the plant is composed with
      *  its specifications, i.e. specifications that only consist of events in
      *  this plant. If the specifications are too restrictive, an initial
      *  state may not exist). Next, if the initial state of the plant is also
      *  accepting, a dummy accepting state is added to the plant in order to
      *  allow the optimization algorithm to start. If there is a self-loop
      *  in the initial state (which should only occur after one run of the
-     *  optimization algorithm), it is removed (otherwise MILP cannot function).
+     *  optimization algorithm), it is removed (otherwise MILP cannot function). 
+     *  If there are several accepting states, they are replaced by one accepting state. 
      *
      *  @param currPlant The plant to be prepared for the scheduling.
      */
     public static void preparePlantForScheduling(Automaton currPlant)
         throws Exception
-    {
+    {       
         State currInitialState = currPlant.getInitialState();
         
         // If there is no initial state, throw exception
@@ -76,10 +77,10 @@ public class SchedulingHelper
         {
             currPlant.removeArc(arc);
         }
-        if (selfLoopDetected)
-        {
-            currPlant.remapStateIndices();
-        }
+//        if (selfLoopDetected)
+//        {
+//            currPlant.remapStateIndices();
+//        }
              
         // Add a dummy accepting state if the initial state is accepting
         if (currInitialState.isAccepting())
@@ -101,8 +102,50 @@ public class SchedulingHelper
             dummyState.setAccepting(true);
             dummyState.setCost(0);
             
-            currPlant.remapStateIndices();
+//            currPlant.remapStateIndices();
         }
+        
+        // Collect the accepting states
+        ArrayList<State> acceptingStates = new ArrayList<State>();
+        for (Iterator<State> stateIt = currPlant.stateIterator(); stateIt.hasNext();)
+        {
+            State state = stateIt.next();
+            if (state.isAccepting())
+            {
+                acceptingStates.add(state);
+            }
+        }
+        // If they are more than one, unmark them and add a dummy event from 
+        // each of them to a new (dummy) accepting state
+        if (acceptingStates.size() > 1)
+        {
+            String accStateName = "q_dummy_acc";
+            while (currPlant.containsStateWithName(accStateName))
+            {
+                accStateName += "1";
+            }
+            State newAccState = new State(accStateName);
+            newAccState.setAccepting(true);
+            newAccState.setCost(0);
+            currPlant.addState(newAccState);
+            
+            String dummyEventName = currPlant.getName() + "_dummy_event";
+            while (currPlant.getAlphabet().contains(dummyEventName))
+            {
+                dummyEventName += "1";
+            }
+            LabeledEvent dummyEvent = new LabeledEvent(dummyEventName);
+            currPlant.getAlphabet().addEvent(dummyEvent);
+            
+            for (int i = 0; i < acceptingStates.size(); i++)
+            {
+                State oldAccState = acceptingStates.get(i);
+                currPlant.addArc(new Arc(oldAccState, newAccState, dummyEvent));
+                oldAccState.setAccepting(false);
+            }
+        }
+        
+        currPlant.remapStateIndices();
     }    
     
     /**

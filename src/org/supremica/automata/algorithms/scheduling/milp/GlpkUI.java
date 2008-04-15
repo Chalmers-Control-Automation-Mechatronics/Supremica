@@ -224,17 +224,18 @@ public class GlpkUI
             for (int i1 = 0; i1 < sharedEventConstraintsBlock.size() - 1; i1++)
             {
                 ArrayList<ArrayList<int[]>> allSharedTimeVarsInFirstPlant = sharedEventConstraintsBlock.get(i1);
-                String allAltPathVarsInFirstPlantStr = "";
+//                String allAltPathVarsInFirstPlantStr = "";
                 
                 for (int i2 = i1 + 1; i2 < sharedEventConstraintsBlock.size(); i2++)
                 {
                      ArrayList<ArrayList<int[]>> allSharedTimeVarsInSecondPlant = sharedEventConstraintsBlock.get(i2);
-                     String allAltPathVarsInSecondPlantStr = "";
+//                     String allAltPathVarsInSecondPlantStr = "";
                      
                      for (int j1 = 0; j1 < allSharedTimeVarsInFirstPlant.size(); j1++)
                      {
                          ArrayList<int[]> currSharedTimeVarsInFirstPlant = allSharedTimeVarsInFirstPlant.get(j1);
                          String constraintTailFirstPlant = "";
+                         String allAltPathVarsInFirstPlantStr = "";
                          for (int k1 = 1; k1 < currSharedTimeVarsInFirstPlant.size(); k1++)
                          {
                              constraintTailFirstPlant += " - " + makeAltPathsVariableStr(currSharedTimeVarsInFirstPlant.get(k1));
@@ -244,19 +245,28 @@ public class GlpkUI
                          {
                              allAltPathVarsInFirstPlantStr += " + 1";
                          }
-                         
+                         // Remove the first ' + ' of the altPathString
+                         allAltPathVarsInFirstPlantStr = allAltPathVarsInFirstPlantStr.substring(3);
+
                          for (int j2 = 0; j2 < allSharedTimeVarsInSecondPlant.size(); j2++)
                          {
+                             String allAltPathVarsInSecondPlantStr = "";
+                             
                              ArrayList<int[]> currSharedTimeVarsInSecondPlant = allSharedTimeVarsInSecondPlant.get(j2);
                              String primalConstraint = "shared_event_" + counter + " : time[" + currSharedTimeVarsInFirstPlant.get(0)[0] + ", " +
                                      currSharedTimeVarsInFirstPlant.get(0)[1] + "] >= time[" + currSharedTimeVarsInSecondPlant.get(0)[0] + 
                                      ", " + currSharedTimeVarsInSecondPlant.get(0)[1] + "]";
-                             String dualConstraint = "shared_event_dual_" + counter++ + " : time[" + currSharedTimeVarsInSecondPlant.get(0)[0] + ", " +
+                             String dualConstraint = "shared_event_dual_" + counter + " : time[" + currSharedTimeVarsInSecondPlant.get(0)[0] + ", " +
                                      currSharedTimeVarsInSecondPlant.get(0)[1] + "] >= time[" + currSharedTimeVarsInFirstPlant.get(0)[0] + 
                                      ", " + currSharedTimeVarsInFirstPlant.get(0)[1] + "]";
                              
                              String constraintTail = "";
                              int currNrAltPathVars = currSharedTimeVarsInFirstPlant.size() + currSharedTimeVarsInSecondPlant.size() - 2;
+                             // At most two variables can be active here, one for each plant
+                             if (currNrAltPathVars > 2)
+                             {
+                                 currNrAltPathVars = 2;
+                             }
                              if (currNrAltPathVars > 0)
                              {
                                  constraintTail = " - bigM*(" + currNrAltPathVars + constraintTailFirstPlant;
@@ -274,18 +284,17 @@ public class GlpkUI
                              {
                                  allAltPathVarsInSecondPlantStr += " + 1";
                              }
-                             
+                             // Remove the first ' + ' of the altPathStrings
+                             allAltPathVarsInSecondPlantStr = allAltPathVarsInSecondPlantStr.substring(3);
+                                                         
                              w.write(primalConstraint + constraintTail);
-                             w.write(dualConstraint + constraintTail);
+                             w.write(dualConstraint + constraintTail);                             
+                             w.write("shared_event_tot_" + counter++ + " : " + 
+                                     allAltPathVarsInFirstPlantStr + " = " + allAltPathVarsInSecondPlantStr + ";\n");
                          }
-                     }
-                     
-                     // Remove the first ' + ' of the altPathStrings
-                     allAltPathVarsInFirstPlantStr = allAltPathVarsInFirstPlantStr.substring(3);
-                     allAltPathVarsInSecondPlantStr = allAltPathVarsInSecondPlantStr.substring(3);
-                     
-                     w.write("shared_event_equal_occurrence_" + counter++ + " : " + 
-                             allAltPathVarsInFirstPlantStr + " = " + allAltPathVarsInSecondPlantStr + ";\n");
+                     }                     
+//                     w.write("shared_event_equal_occurrence_" + counter++ + " : " + 
+//                             allAltPathVarsInFirstPlantStr + " = " + allAltPathVarsInSecondPlantStr + ";\n");
                 }
             }
         }

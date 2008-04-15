@@ -356,7 +356,7 @@ public class Milp
         }
         
         // Builds the optimal schedule (if solicited)
-        if (isRunning)
+        if (isRunning && buildSchedule)
         {
             buildScheduleAutomaton();
             
@@ -550,6 +550,10 @@ public class Milp
             currScheduledState.setCost(smallestTime - accumulatedTime);
             // Update the accumulated time
             accumulatedTime = smallestTime;
+            
+            //temp
+            addToMessages("accTime = " + accumulatedTime + ", optEvent = " + currOptimalEvent, 
+                    SchedulingConstants.MESSAGE_TYPE_INFO);
             
             // Make a transition (in the synchronizer) to the state that is reachable in one step at cheapest cost
             // This state will be the next parting point in our walk
@@ -826,6 +830,18 @@ public class Milp
         // Before constructing the MILP-formulation, ensure that the plants do not contain loops 
         // (throw exception if they do)
         checkForLoops(plants);
+        
+        //temp
+        for (Iterator<Automaton> autIt = plants.iterator(); autIt.hasNext();)
+        {
+            Automaton auto = autIt.next();
+            for (Iterator<State> stateIt = auto.stateIterator(); stateIt.hasNext();)
+            {
+                State state = stateIt.next();
+                addToMessages(auto.getName() + "." + state.getName() + "  -->  " + 
+                        indexMap.getStateIndex(auto, state) + ", cost = " + state.getCost(), SchedulingConstants.MESSAGE_TYPE_INFO);
+            }
+        }
     }
     
     /**
