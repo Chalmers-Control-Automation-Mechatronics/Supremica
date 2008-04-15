@@ -306,7 +306,7 @@ public class Milp
     throws Exception
     {
         long totalTime = 0;
-               
+                      
         if (isRunning)
         {
             timer.restart();
@@ -674,7 +674,7 @@ public class Milp
      */
     private void initAutomata()
     throws Exception
-    {
+    {               
         // Making all state names coherent to avoid bugs due to inappropriate state names
         for (Iterator<Automaton> autIt = theAutomata.iterator(); autIt.hasNext(); )
         {
@@ -689,7 +689,7 @@ public class Milp
         
         // The index map is initialized
         indexMap = new AutomataIndexMap(theAutomata);
-        
+               
         plants = theAutomata.getPlantAutomata();
         zones = new Automata();
         externalSpecs = new Automata();
@@ -793,14 +793,12 @@ public class Milp
                 plants.addAutomaton(restrictedPlant);
                 
                 infoMsgs += "\t" + str.substring(0, str.lastIndexOf("||")) + " synthesized into " + restrictedPlant.getName() + "\n";
-                String tempStr = "\t" + str.substring(0, str.lastIndexOf("||")) + " synthesized into " + restrictedPlant.getName();
-                System.out.println("\t" + str.substring(0, str.lastIndexOf("||")) + " synthesized into " + restrictedPlant.getName());
             }
         }
         
         // Rescale the times in plants if necessary
 //        rescalePlantTimes();
-        
+                
         // Prepare the plants before scheduling (add dummy initial state if needed, remove selfloops if needed)
         SchedulingHelper.preparePlantsForScheduling(plants);
         
@@ -824,12 +822,10 @@ public class Milp
         theAutomata.addAutomata(externalSpecs);
         indexMap = new AutomataIndexMap(theAutomata);
         //updateGui(theAutomata); @Deprecated
-        
-        // Before constructing the MILP-formulation, ensure that the plants do not contain loops (throw exception otherwise)
-        for (Iterator<Automaton> autIt = plants.iterator(); autIt.hasNext();)
-        {
-            checkForLoops(autIt.next());
-        }
+
+        // Before constructing the MILP-formulation, ensure that the plants do not contain loops 
+        // (throw exception if they do)
+        checkForLoops(plants);
     }
     
     /**
@@ -964,16 +960,19 @@ public class Milp
                         throw new Exception(exceptionStr);
                     }
                     
-                    bookingTics[i][j][STATE_SWITCH] = new int[bookingStates.size()];
-                    unbookingTics[i][j][STATE_SWITCH] = new int[unbookingStates.size()];
-                    bookingTics[i][j][EVENT_SWITCH] = new int[bookingStates.size()];
-                    unbookingTics[i][j][EVENT_SWITCH] = new int[unbookingStates.size()];
-                    for (int k=0; k<bookingStates.size(); k++)
+                    if (bookingStates.size() > 0)
                     {
-                        bookingTics[i][j][STATE_SWITCH][k] = indexMap.getStateIndex(currPlant, bookingStates.get(k));
-                        unbookingTics[i][j][STATE_SWITCH][k] = indexMap.getStateIndex(currPlant, unbookingStates.get(k));
-                        bookingTics[i][j][EVENT_SWITCH][k] = indexMap.getEventIndex(bookingEvents.get(k));
-                        unbookingTics[i][j][EVENT_SWITCH][k] = indexMap.getEventIndex(unbookingEvents.get(k));
+                        bookingTics[i][j][STATE_SWITCH] = new int[bookingStates.size()];
+                        unbookingTics[i][j][STATE_SWITCH] = new int[unbookingStates.size()];
+                        bookingTics[i][j][EVENT_SWITCH] = new int[bookingStates.size()];
+                        unbookingTics[i][j][EVENT_SWITCH] = new int[unbookingStates.size()];
+                        for (int k=0; k<bookingStates.size(); k++)
+                        {
+                            bookingTics[i][j][STATE_SWITCH][k] = indexMap.getStateIndex(currPlant, bookingStates.get(k));
+                            unbookingTics[i][j][STATE_SWITCH][k] = indexMap.getStateIndex(currPlant, unbookingStates.get(k));
+                            bookingTics[i][j][EVENT_SWITCH][k] = indexMap.getEventIndex(bookingEvents.get(k));
+                            unbookingTics[i][j][EVENT_SWITCH][k] = indexMap.getEventIndex(unbookingEvents.get(k));
+                        }
                     }
                 }
             }
@@ -3640,52 +3639,64 @@ public class Milp
      * (since we don't want any limitation here, any cycle should be found). The fromTic-, toTic-
      * and bufferExists-parameters of the Edge class are not used in this case. 
      */
-    private void checkForLoops(Automaton plant)
+    private void checkForLoops(Automata autos)
         throws MilpException
     {
-        ArrayList<int[]>[] edgeInfos = new ArrayList[plant.nbrOfStates()];
-        for (Iterator<State> stateIt = plant.stateIterator(); stateIt.hasNext();)
+        String exceptionStr = "";
+        
+        for (Iterator<Automaton> autIt = autos.iterator(); autIt.hasNext();)
         {
-            State state = stateIt.next();
-            int stateIndex = indexMap.getStateIndex(plant, state);
-            edgeInfos[stateIndex] = new ArrayList<int[]>();
+            Automaton auto = autIt.next();
             
-            for (Iterator<State> nextStateIt = state.nextStateIterator(); nextStateIt.hasNext(); )
+            ArrayList<int[]>[] edgeInfos = new ArrayList[auto.nbrOfStates()];
+            for (Iterator<State> stateIt = auto.stateIterator(); stateIt.hasNext();)
             {
-                State nextState = nextStateIt.next();
-                if (state.equalState(nextState))
+                State state = stateIt.next();
+                int stateIndex = indexMap.getStateIndex(auto, state);
+                edgeInfos[stateIndex] = new ArrayList<int[]>();
+
+                for (Iterator<State> nextStateIt = state.nextStateIterator(); nextStateIt.hasNext(); )
                 {
-                    // If a self-loop is found, throw exception
-                    throw new MilpException("Self-loop found in plant '" + plant.getName() + "', state '" + state.getName() + "'. MILP-formulation impossible.");
+                    State nextState = nextStateIt.next();
+                    if (state.equalState(nextState))
+                    {
+                        // If a self-loop is found, throw exception
+                        throw new MilpException("Self-loop found in '" + auto.getName() + "', state '" + state.getName() + "'. MILP-formulation impossible.");
+                    }
+                    else
+                    {
+                        // Otherwise, construct the edges representing this automaton
+                        edgeInfos[stateIndex].add(new int[]{indexMap.getStateIndex(auto, nextState), stateIndex, -1, -1, -1});
+                    }
                 }
-                else
+            }
+
+            // Enumerate all cycles using BookingPairsGraphExplorer.java (note that the number of colors is equal to the number of states).
+            // If a cycle was detected, throw exception displaying the states that are involved in the cycle(s).
+            BookingPairsGraphExplorer cycleFinder = new BookingPairsGraphExplorer(edgeInfos, edgeInfos.length);
+            ArrayList<ArrayList<Edge>> cycles = cycleFinder.enumerateAllCycles();
+            if (! cycles.isEmpty())
+            {
+                String loopStr = "";
+                for (Iterator<ArrayList<Edge>> cycleIt = cycles.iterator(); cycleIt.hasNext();)
                 {
-                    // Otherwise, construct the edges representing this automaton
-                    edgeInfos[stateIndex].add(new int[]{indexMap.getStateIndex(plant, nextState), stateIndex, -1, -1, -1});
+                    loopStr += "\n -> ";
+
+                    ArrayList<Edge> cycle = cycleIt.next();
+                    for (Iterator<Edge> edgeIt = cycle.iterator(); edgeIt.hasNext();)
+                    {
+                        Edge edge = edgeIt.next();
+                        loopStr += indexMap.getStateAt(auto, edge.getToVertice().getVerticeIndex()).getName() +  " -> ";
+                    }
                 }
+
+                exceptionStr += "\n Loops found in '" + auto.getName() + "':" + loopStr;
             }
         }
         
-        // Enumerate all cycles using BookingPairsGraphExplorer.java (note that the number of colors is equal to the number of states).
-        // If a cycle was detected, throw exception displaying the states that are involved in the cycle(s).
-        BookingPairsGraphExplorer cycleFinder = new BookingPairsGraphExplorer(edgeInfos, edgeInfos.length);
-        ArrayList<ArrayList<Edge>> cycles = cycleFinder.enumerateAllCycles();
-        if (! cycles.isEmpty())
+        if (exceptionStr != "")
         {
-            String loopStr = "";
-            for (Iterator<ArrayList<Edge>> cycleIt = cycles.iterator(); cycleIt.hasNext();)
-            {
-                loopStr += " -> ";
-                
-                ArrayList<Edge> cycle = cycleIt.next();
-                for (Iterator<Edge> edgeIt = cycle.iterator(); edgeIt.hasNext();)
-                {
-                    Edge edge = edgeIt.next();
-                    loopStr += indexMap.getStateAt(plant, edge.getToVertice().getVerticeIndex()).getName() +  " -> ";
-                }
-                loopStr += "\n";
-            }
-            throw new MilpException("Loops found in plant '" + plant.getName() + "':" + loopStr + "'. MILP-formulation impossible.");
+            throw new MilpException(exceptionStr + "\n MILP-formulation impossible!");
         }
     }
 }

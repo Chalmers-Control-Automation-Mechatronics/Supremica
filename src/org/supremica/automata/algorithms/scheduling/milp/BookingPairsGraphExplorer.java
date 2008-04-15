@@ -122,7 +122,7 @@ public class BookingPairsGraphExplorer
      * @return - true if a cycle from startVertice, including inVertice, has been found.
      */
     private boolean findCyclesFrom(Vertice startVertice, Edge inEdge)
-    {
+    {        
         boolean cycleFound = false; 
         //johnsonStack.add(inVertice); // stack v;
         
@@ -176,14 +176,16 @@ public class BookingPairsGraphExplorer
                 }
             }
         }  
+        
+        // Unblock the currently used color before returning, regardless of whether the cycle was found or not.
+        if (inEdge != null)
+        {
+            colorBlocked[inEdge.getColor()] = false;
+        }
 
         if (cycleFound)
         {
             //UNBLOCK(v);
-            if (inEdge != null)
-            {
-                colorBlocked[inEdge.getColor()] = false;
-            }
             verticeBlocked[inVertice.getVerticeIndex()] = false;
             for (Vertice unpromising : unpromisingVertices[inVertice.getVerticeIndex()])
             {
