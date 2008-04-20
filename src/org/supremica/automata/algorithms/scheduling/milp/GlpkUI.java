@@ -29,7 +29,6 @@ public class GlpkUI
     
     /** The pointer to the constructor of MILP-formulation. */
     private Milp milpConstructor = null;
-    
            
     /** The optimal times (for each plant-state) that the GLPK solver returns */
     private double[][] optimalTimes = null;

@@ -1124,7 +1124,7 @@ public class Milp
                             int currEventIndex = indexMap.getEventIndex(currEvent);
                               
                             // Find the closest alt.path-variables leading to the current plant state
-                            Collection<int[]> currPathSplitVars = getActiveAltPathVars(new int[]{currPlantIndex, currStateIndex, currEventIndex});
+                            Collection<int[]> currPathSplitVars = getActiveAltPathVars(new int[]{currPlantIndex, currStateIndex, currEventIndex});                            
                             if (currPathSplitVars.size() == 0)
                             {
                                 // If this state is always reached from the initial state, add a default alt.path variable
