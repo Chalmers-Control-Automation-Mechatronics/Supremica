@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.gui.ide.actions
 //# CLASS:   ScheduleDialog
 //###########################################################################
-//# $Id: ScheduleDialog.java,v 1.60 2008-02-23 17:08:47 avenir Exp $
+//# $Id: ScheduleDialog.java,v 1.61 2008-04-20 13:18:28 avenir Exp $
 //###########################################################################
 
 package org.supremica.gui;
@@ -32,7 +32,7 @@ public class ScheduleDialog
     private static final String[] milpHeuristics = new String[] {SchedulingConstants.OPTIMAL, SchedulingConstants.SUBOPTIMAL };
     private static Logger logger = LoggerFactory.createLogger(ScheduleDialog.class);
     private JComboBox optiMethodsBox, heuristicsBox;
-    private JCheckBox nodeExpander, buildAutomaton, vgDrawer;
+    private JCheckBox nodeExpander, buildAutomaton, vgDrawer, balanceVelocities;
     private int memoryCapacity;
     private JTextField memoryCapacityField;
     private JButton okButton, cancelButton;
@@ -69,7 +69,8 @@ public class ScheduleDialog
         
         nodeExpander = new JCheckBox("use AK's node expander", false);
         buildAutomaton = new JCheckBox("build schedule", true);
-        vgDrawer = new JCheckBox("Draw Visibility Graph", true);
+        vgDrawer = new JCheckBox("draw visibility graph", true);
+        balanceVelocities = new JCheckBox("balance velocities", false);
         
         memoryCapacityField = new JTextField("300", 10);
         
@@ -102,10 +103,11 @@ public class ScheduleDialog
         algorithmPanel.add(heuristicsPanel);
         
         JPanel specPanel = new JPanel();
-        specPanel.setLayout(new GridLayout(3, 1));
+        specPanel.setLayout(new GridLayout(2, 2));
         specPanel.add(nodeExpander);
         specPanel.add(buildAutomaton);
         specPanel.add(vgDrawer);
+        specPanel.add(balanceVelocities);
         //	specPanel.add(smaPanel);
         
         JTabbedPane tabbedPane = new JTabbedPane();
@@ -190,6 +192,7 @@ public class ScheduleDialog
             public void actionPerformed(ActionEvent e)
             {
                 File rootDir = new File(org.supremica.properties.Config.FILE_OPEN_PATH.getAsString());
+//                System.out.println("location = " + ide.getIDE().getActiveProject().getLocation().toString()); 
                 File[] files = rootDir.listFiles();
                 
                 try
@@ -268,7 +271,8 @@ public class ScheduleDialog
                 else if (heuristicsBox.getSelectedItem().equals(SchedulingConstants.SUBOPTIMAL))
                 {
                     sched = new ModifiedAstar(selectedAutomata, SchedulingConstants.ONE_PRODUCT_RELAXATION, 
-                            nodeExpander.isSelected(), buildAutomaton.isSelected(), new double[]{30, 40});
+                            nodeExpander.isSelected(), buildAutomaton.isSelected(), balanceVelocities. isSelected(), 
+                            new double[]{30, 40});
                            
                     
                     
@@ -302,18 +306,20 @@ public class ScheduleDialog
                 }
                 else
                 {
-                    sched = new ModifiedAstar(selectedAutomata, (String) heuristicsBox.getSelectedItem(), nodeExpander.isSelected(), buildAutomaton.isSelected()); 
+                    sched = new ModifiedAstar(selectedAutomata, (String) heuristicsBox.getSelectedItem(), 
+                            nodeExpander.isSelected(), buildAutomaton.isSelected(), balanceVelocities.isSelected()); 
                 }
             }
             else if (((String)optiMethodsBox.getSelectedItem()).contains(SchedulingConstants.MILP))
             {
                 if (selectedHeuristic.equals(SchedulingConstants.OPTIMAL))
                 {
-                    sched = new Milp(selectedAutomata, buildAutomaton.isSelected(), (String)optiMethodsBox.getSelectedItem()); 
+                    sched = new Milp(selectedAutomata, buildAutomaton.isSelected(), 
+                            (String)optiMethodsBox.getSelectedItem(), balanceVelocities.isSelected()); 
                 }
                 else if (selectedHeuristic.equals(SchedulingConstants.SUBOPTIMAL))
                 {
-                    sched = new RandomPathUsingMilp(selectedAutomata, buildAutomaton.isSelected());
+                    sched = new RandomPathUsingMilp(selectedAutomata, buildAutomaton.isSelected(), balanceVelocities.isSelected());
                 }
             }
             else if (optiMethodsBox.getSelectedItem().equals(SchedulingConstants.VIS_GRAPH))
@@ -322,7 +328,8 @@ public class ScheduleDialog
             }
             else if (optiMethodsBox.getSelectedItem().equals(SchedulingConstants.MULTITHREADED_A_STAR))
             {
-                sched = new MultithreadedAstar(selectedAutomata, (String) heuristicsBox.getSelectedItem(), nodeExpander.isSelected(), buildAutomaton.isSelected(), false);
+                sched = new MultithreadedAstar(selectedAutomata, (String) heuristicsBox.getSelectedItem(), 
+                        nodeExpander.isSelected(), buildAutomaton.isSelected(), false);
             }
 // 			else if (optiMethodsBox.getSelectedItem().equals("Modified IDA*"))
 // 				throw new Exception("IMA* not implemented yet...");

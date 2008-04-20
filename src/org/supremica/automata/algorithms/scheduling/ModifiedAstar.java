@@ -141,6 +141,8 @@ public class ModifiedAstar
     /** Decides if the schedule should be built */
     protected boolean buildSchedule;
     
+    protected boolean balanceVelocities;
+    
     /**
      * If this boolean is true, node expansion is done manually
      * (i.e. not using Supremica's synchronization methods)
@@ -208,25 +210,32 @@ public class ModifiedAstar
     public ModifiedAstar() {}
 
     public ModifiedAstar(Automata theAutomata, String heuristic, boolean manualExpansion, boolean buildSchedule, 
-            boolean isRelaxationProvider) 
+            boolean balanceVelocities, boolean isRelaxationProvider) 
 		throws Exception
     {
         this.theAutomata = theAutomata;
         this.heuristic = heuristic;
         this.manualExpansion = manualExpansion;
         this.buildSchedule = buildSchedule;
+        this.balanceVelocities = balanceVelocities;
         this.isRelaxationProvider = isRelaxationProvider;
         
         init();
     }    
 	
+    public ModifiedAstar(Automata theAutomata, String heuristic, boolean manualExpansion, boolean buildSchedule, boolean balanceVelocities) 
+            throws Exception
+    {
+        this(theAutomata, heuristic, manualExpansion, buildSchedule, balanceVelocities, false); 
+    }
+    
     public ModifiedAstar(Automata theAutomata, String heuristic, boolean manualExpansion, boolean buildSchedule) 
             throws Exception
     {
-        this(theAutomata, heuristic, manualExpansion, buildSchedule, false); 
+        this(theAutomata, heuristic, manualExpansion, buildSchedule, false, false); 
     }
     
-    public ModifiedAstar(Automata theAutomata, String heuristic, boolean manualExpansion, boolean buildSchedule, double[] approximationWeights) 
+    public ModifiedAstar(Automata theAutomata, String heuristic, boolean manualExpansion, boolean buildSchedule, boolean balanceVelocities, double[] approximationWeights) 
             //ScheduleDialog scheduleDialog, double[] approximationWeights)
             throws Exception
     {
@@ -276,6 +285,11 @@ public class ModifiedAstar
                 if (isRunning && buildSchedule)
                 {
                     buildScheduleAutomaton();
+                }
+                
+                if (isRunning && buildSchedule && balanceVelocities)
+                {
+                    balanceVelocities();
                 }
 
                 if (isRunning)
@@ -1104,11 +1118,6 @@ public class ModifiedAstar
         scheduleAuto.removeState(acceptingState);
         
         infoMsgs += "Schedule was built in " + timer.elapsedTime() + "ms";
-
-        //TODO: TEMP-TEST
-        Automata autosToBeBalanced = theAutomata.clone();
-        autosToBeBalanced.addAutomaton(scheduleAuto);
-        new VelocityBalancer(autosToBeBalanced);
     }
 
 	/**
@@ -1310,6 +1319,26 @@ public class ModifiedAstar
         }
         
         return null;
+    }
+    
+    /**
+     * This method create an instance of VelocityBalancer, supplying the selected 
+     * automata (theAutomata) and the newly built schedule, if it exists. 
+     * VelocityBalancer balances then the velocities of the selected plants.
+     */
+    protected void balanceVelocities()
+        throws Exception
+    {
+        if (scheduleAuto == null)
+        {
+            addToMessages("Velocities were not balanced since the schedule could not be found.",
+                    SchedulingConstants.MESSAGE_TYPE_ERROR);
+            return;
+        }
+        
+        Automata autosToBeBalanced = theAutomata.clone();
+        autosToBeBalanced.addAutomaton(scheduleAuto);
+        new VelocityBalancer(autosToBeBalanced);
     }
     
 // This should be done by adding a specification forcing the plants to execute once, I think. /AK

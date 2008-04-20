@@ -28,10 +28,10 @@ public class RandomPathUsingMilp
         extends Milp
 {    
     /** Creates a new instance of RandomPathUsingMilp */
-    public RandomPathUsingMilp(Automata theAutomata, boolean buildSchedule)
+    public RandomPathUsingMilp(Automata theAutomata, boolean buildSchedule, boolean balanceVelocities)
         throws Exception
     {
-        super(theAutomata, buildSchedule);
+        super(theAutomata, buildSchedule, balanceVelocities);
     }
         
 //  TEMP OUTCOMMENTED DUE TO COMPILATION ERRORS (DUE TO MOVE TO MILP-PACKAGE).  

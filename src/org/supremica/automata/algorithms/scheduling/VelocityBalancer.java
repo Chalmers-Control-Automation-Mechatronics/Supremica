@@ -153,30 +153,30 @@ public class VelocityBalancer
         // Checks for each pair of points (except for consecutive points) 
         // whether they can see eachother.
         // This is needed only during the development phase (to see what happens with our small example)
-        for (int i=0; i<pathPoints.size()-2; i++)
-        {
-            for (int j=i+2; j<pathPoints.size(); j++)
-            {
-                String str = "";
-
-                for (int k=0; k<pathPoints.get(i).length; k++)
-                {
-                        str += pathPoints.get(i)[k] + " ";
-                }
-                str += "---> ";
-
-                for (int k=0; k<pathPoints.get(j).length; k++)
-                {
-                        str += pathPoints.get(j)[k] + " ";
-                }
-
-                if (areVisible(pathPoints.get(i), pathPoints.get(j)))
-                {
-                        str += "see eachother!!!!!!";
-                        addToMessages(str, SchedulingConstants.MESSAGE_TYPE_WARN);
-                }
-            }
-        }
+//        for (int i=0; i<pathPoints.size()-2; i++)
+//        {
+//            for (int j=i+2; j<pathPoints.size(); j++)
+//            {
+//                String str = "";
+//
+//                for (int k=0; k<pathPoints.get(i).length; k++)
+//                {
+//                        str += pathPoints.get(i)[k] + " ";
+//                }
+//                str += "---> ";
+//
+//                for (int k=0; k<pathPoints.get(j).length; k++)
+//                {
+//                        str += pathPoints.get(j)[k] + " ";
+//                }
+//
+//                if (areVisible(pathPoints.get(i), pathPoints.get(j)))
+//                {
+//                        str += "see eachother!!!!!!";
+//                        addToMessages(str, SchedulingConstants.MESSAGE_TYPE_WARN);
+//                }
+//            }
+//        }
 
         // Finds the key points, i.e. points allowing to decrease the number of robot stops 
         findKeyPoints();
@@ -225,18 +225,16 @@ public class VelocityBalancer
         setRelativeVelocitiesInPlants(relativeVelocities);
 
         // Gathers some statistics about the velocity changes (smooth schedule)
-        addToMessages("", SchedulingConstants.MESSAGE_TYPE_WARN);
-        addToMessages("SMOOTH SCHEDULE......", SchedulingConstants.MESSAGE_TYPE_WARN);
         calcVelocityStatisticsForVisibilitySmoothing(keyPoints);
+
+        addToMessages("", SchedulingConstants.MESSAGE_TYPE_WARN);
+        addToMessages("SINGLE-EVENT BALANCING.....", SchedulingConstants.MESSAGE_TYPE_WARN);
+        calcVelocityStatisticsForEventSmoothing();
 
         addToMessages("", SchedulingConstants.MESSAGE_TYPE_WARN);
         addToMessages("UNPROCESSED SCHEDULE.....", SchedulingConstants.MESSAGE_TYPE_WARN);
         calcVelocityStatisticsForUnprocessedSchedule();
-
-        addToMessages("", SchedulingConstants.MESSAGE_TYPE_WARN);
-        addToMessages("EVENT SMOOTHING:", SchedulingConstants.MESSAGE_TYPE_WARN);
-        calcVelocityStatisticsForEventSmoothing();
-
+        
         addToMessages("Smoooth gliding.......", SchedulingConstants.MESSAGE_TYPE_WARN);	
     }
     
@@ -267,14 +265,28 @@ public class VelocityBalancer
         
         plants = theAutomata.getPlantAutomata();
         specs = theAutomata.getSpecificationAutomata(); 
+        Automata powerlessSpecs = new Automata();
         for (Automaton spec : specs)
         {
-            if (spec.nbrOfStates() < 3)
+            // We don't need to care about single-state specs, while zone specs are taken care of further down the code
+            if (spec.nbrOfStates() == 2)
             {
-                throw new Exception("The velocity balancing is not implemented for specifications of other type that zones. " +
+                // If the non-initial state has outgoing transition, then this is a prec spec.
+                // Such specs should be taken care of, but it is not done yet -> TODO...
+                if (spec.getInitialState().nextStateIterator().next().nbrOfOutgoingArcs() > 0)
+                {                
+                    throw new Exception("The velocity balancing is not implemented for specifications of other type that zones. " +
                         "(Note that zones should have at least three states).");
+                }
+                else
+                {
+                    powerlessSpecs.addAutomaton(spec);
+                }
             }
         }
+        // We don't need to bother about the specifications that cannot cause 
+        // deadlocks at this point, so we remove them. 
+        specs.removeAutomata(powerlessSpecs);
         
         indexMap = new AutomataIndexMap(plants);
         
@@ -378,6 +390,7 @@ public class VelocityBalancer
                     
                     for (int plantIndex = 0; plantIndex < currPlantStates.length; plantIndex++)
                     {
+                        String str = indexMap.getAutomatonAt(plantIndex).getName();
                         Alphabet currPlantEvents = currPlantStates[plantIndex].activeEvents(false);
                         if (currPlantEvents.contains(currEvent))
                         {
@@ -789,16 +802,31 @@ public class VelocityBalancer
             // The first element of relativeVelocities is zero (the robots are stopped)
             relativeVelocities[i] = new double[simulationTimes[i].length + 1];
 
-            relativeVelocities[i][1] = simulationTimes[i][0] / firingTimes[i][0];
+            if (firingTimes[i][0] == 0)
+            {
+                relativeVelocities[i][1] = 0;
+            }
+            else
+            {
+                relativeVelocities[i][1] = simulationTimes[i][0] / firingTimes[i][0];
+            }
             str += roundOff(relativeVelocities[i][1], 2) + " ";
 
             for (int j=1; j<simulationTimes[i].length; j++)
             {
-                relativeVelocities[i][j+1] = simulationTimes[i][j] / (firingTimes[i][j] - firingTimes[i][j-1]);
+                if (firingTimes[i][j] == firingTimes[i][j-1])
+                {
+                    relativeVelocities[i][j+1] = relativeVelocities[i][j];
+                }
+                else
+                {
+                    relativeVelocities[i][j+1] = simulationTimes[i][j] / (firingTimes[i][j] - firingTimes[i][j-1]);
+                }
+                
                 str += roundOff(relativeVelocities[i][j+1], 2) + " ";
             }
 
-            addToMessages(str, SchedulingConstants.MESSAGE_TYPE_WARN);
+            addToMessages("\t\t Rel. velocities per event in Rob_" + i + " : "+ str, SchedulingConstants.MESSAGE_TYPE_WARN);
         }
 
         // COPY-PASTE
@@ -808,8 +836,7 @@ public class VelocityBalancer
         double[] totalVelocityChange = new double[relativeVelocities.length];
         double[] meanVelocityChange = new double[relativeVelocities.length];
 
-        addToMessages("", SchedulingConstants.MESSAGE_TYPE_WARN);
-        addToMessages("Smooth-per-event-velocity statistics: ", SchedulingConstants.MESSAGE_TYPE_WARN);
+        addToMessages("Single-event balancing statistics: ", SchedulingConstants.MESSAGE_TYPE_WARN);
         for (int i=0; i<relativeVelocities.length; i++)
         {
             for (int j=0; j<relativeVelocities[i].length; j++)
@@ -829,7 +856,6 @@ public class VelocityBalancer
                 } 
 
                 double velocityChange;
-
                 if (j < relativeVelocities[i].length - 1)
                 {
                     velocityChange = Math.abs(relativeVelocities[i][j+1] - relativeVelocities[i][j]);					
@@ -854,13 +880,12 @@ public class VelocityBalancer
             totalVelocityChange[i] = roundOff(totalVelocityChange[i], 2); 			
             meanVelocityChange[i] = roundOff(meanVelocityChange[i], 2);
 
-            addToMessages("Rob_" + i + "... total change: " + totalVelocityChange[i] + 
+            addToMessages("\t\t Rob_" + i + "... total change: " + totalVelocityChange[i] + 
                     "; nr of changes: " + nrOfVelocityChanges[i] + "; mean change: " + 
                     meanVelocityChange[i] + "; nr of stops: " + nrOfMinVelocityPassages[i] + 
                     "; nr of full-speed-runs: " + nrOfMaxVelocityPassages[i], 
                     SchedulingConstants.MESSAGE_TYPE_WARN);
         }
-        addToMessages("", SchedulingConstants.MESSAGE_TYPE_WARN);
         // COPY-PASTE-DONE
     }
 
@@ -877,7 +902,34 @@ public class VelocityBalancer
         double[] totalVelocityChange = new double[pathPoints.get(0).length];
         double[] meanVelocityChange = new double[pathPoints.get(0).length];
 
-        addToMessages("", SchedulingConstants.MESSAGE_TYPE_WARN);
+        for (int plantIndex = 0; plantIndex < optimalSubPlants.size(); plantIndex++)
+        {
+            double accTime = 0;
+            int firingTimeIndex = 0;
+            State state = optimalSubPlants.getAutomatonAt(plantIndex).getInitialState();
+            State nextState = state;
+            String velPerEventStr = "(0) ";
+            do
+            {
+                nextState = state.nextStateIterator().next();
+                accTime += state.getCost();
+                if (accTime == firingTimes[plantIndex][firingTimeIndex])
+                {
+                    velPerEventStr += "1.0 ";
+                }
+                else 
+                {
+                    velPerEventStr += "1.0->0.0 ";
+                    accTime = firingTimes[plantIndex][firingTimeIndex];
+                }
+                
+                firingTimeIndex++;
+                state = nextState;
+            } while (!nextState.isAccepting());
+            addToMessages("\t\t Rel. velocities per event in Rob_" + plantIndex + " : " + velPerEventStr + "(0)",
+                    SchedulingConstants.MESSAGE_TYPE_WARN);
+        }
+        
         addToMessages("Unprocessed schedule statistics:", SchedulingConstants.MESSAGE_TYPE_WARN);
         for (int j=0; j<pathPoints.get(0).length; j++)
         {
@@ -929,7 +981,7 @@ public class VelocityBalancer
 
             meanVelocityChange[j] = totalVelocityChange[j] / nrOfVelocityChanges[j];
 
-            addToMessages("Rob_" + j + "... total change: " + totalVelocityChange[j] + 
+            addToMessages("\t\t Rob_" + j + "... total change: " + totalVelocityChange[j] + 
                     "; nr of changes: " + nrOfVelocityChanges[j] + "; mean change: " + 
                     meanVelocityChange[j] + "; nr of stops: " + nrOfMinVelocityPassages[j] + 
                     "; nr of full-speed-runs: " + nrOfMaxVelocityPassages[j], 
@@ -953,8 +1005,7 @@ public class VelocityBalancer
         double[] totalVelocityChange = new double[points.get(0).length];
         double[] meanVelocityChange = new double[points.get(0).length];
 
-        addToMessages("", SchedulingConstants.MESSAGE_TYPE_WARN);
-        addToMessages("Velocity statistics: ", SchedulingConstants.MESSAGE_TYPE_WARN);
+        addToMessages("Multi-balanced statistics: ", SchedulingConstants.MESSAGE_TYPE_WARN);
         for (int j=0; j<relativeVelocities[0].length; j++)
         {
             for (int i=0; i<relativeVelocities.length; i++)
@@ -996,13 +1047,12 @@ public class VelocityBalancer
             totalVelocityChange[j] = roundOff(totalVelocityChange[j], 2); 			
             meanVelocityChange[j] = roundOff(meanVelocityChange[j], 2);
 
-            addToMessages("Rob_" + j + "... total change: " + totalVelocityChange[j] + 
+            addToMessages("\t\t Rob_" + j + "... total change: " + totalVelocityChange[j] + 
                     "; nr of changes: " + nrOfVelocityChanges[j] + "; mean change: " + 
                     meanVelocityChange[j] + "; nr of stops: " + nrOfMinVelocityPassages[j] + 
                     "; nr of full-speed-runs: " + nrOfMaxVelocityPassages[j], 
                     SchedulingConstants.MESSAGE_TYPE_WARN);
         }
-        addToMessages("", SchedulingConstants.MESSAGE_TYPE_WARN);
     }
 
     /**
@@ -1079,8 +1129,6 @@ public class VelocityBalancer
         // for every key point. The robot with the largest velocity change is adjusted,
         // such that the velocity to the current and to the next point is set equal. 
         // The key points are then adjusted consequently.
-        addToMessages("", SchedulingConstants.MESSAGE_TYPE_WARN);
-        addToMessages("diff velocities:  ", SchedulingConstants.MESSAGE_TYPE_WARN);
         for (int i=1; i<keyPoints.size()-1; i++)
         {
             // The index of the robot that currently changes its velocity most.
@@ -1161,7 +1209,35 @@ public class VelocityBalancer
 
         //TEMP
         addToMessages("", SchedulingConstants.MESSAGE_TYPE_WARN);
-        addToMessages("Relative velocities (after):", SchedulingConstants.MESSAGE_TYPE_WARN);
+        addToMessages("MULTI-BALANCED SCHEDULE", SchedulingConstants.MESSAGE_TYPE_WARN);
+        
+        // Printing out the relative velocities per event
+        for (int plantNr = 0; plantNr < optimalSubPlants.size(); plantNr++)
+        {
+            State state = optimalSubPlants.getAutomatonAt(plantNr).getInitialState();
+            State nextState = state.nextStateIterator().next(); // every state should have exactly one successor
+            int eff_time = 0;
+            int keyPointNr = 1; // Start with the first key point since the 0th is trivial (0 0 0)
+            String velPerPlantStr = "";
+            do
+            {
+                nextState = state.nextStateIterator().next();
+                
+                eff_time += state.getCost(); // * relativeVelocities[keyPointNr][plantNr];
+                while (eff_time > keyPoints.get(keyPointNr)[plantNr])
+                {
+                    keyPointNr++;
+                }
+                
+                velPerPlantStr += roundOff(relativeVelocities[keyPointNr][plantNr], 2) + "(" + state.getName() + ") ";
+                state = nextState;
+            }
+            while (!nextState.isAccepting());
+            addToMessages("\t\t Rel. velocities per event in Rob_" + plantNr + " : "+ velPerPlantStr.trim(), 
+                    SchedulingConstants.MESSAGE_TYPE_WARN);
+        }
+        
+        addToMessages("Relative velocities per keypoint:", SchedulingConstants.MESSAGE_TYPE_WARN);
         for (int i=0; i<keyPoints.size(); i++)
         {
             String str = "";
@@ -1169,22 +1245,35 @@ public class VelocityBalancer
             {
                 str += roundOff(relativeVelocities[i][j], 2) + " ";
             }
-            addToMessages(str, SchedulingConstants.MESSAGE_TYPE_WARN);
-        }
-        addToMessages("", SchedulingConstants.MESSAGE_TYPE_WARN);
 
-        addToMessages("", SchedulingConstants.MESSAGE_TYPE_WARN);
+            str += " in '";
+            if (i > 0)
+            {
+                for (int j = 0; j < keyPoints.get(i-1).length; j++)
+                {
+                    str += roundOff(keyPoints.get(i-1)[j], 2) + " ";
+                }
+                str = str.trim() + "' -> '";
+            }
+            for (int j = 0; j < keyPoints.get(i).length; j++)
+            {
+                str += roundOff(keyPoints.get(i)[j], 2) + " ";
+            }
+            str = str.trim() + "'";
+            addToMessages("\t\t " + str, SchedulingConstants.MESSAGE_TYPE_WARN);
+        }
+        
         addToMessages("Key points (after): ", SchedulingConstants.MESSAGE_TYPE_WARN);
+        String str = "";
         for (int i=0; i<keyPoints.size(); i++)
         {
-            String str = "";
             for (int j=0; j<keyPoints.get(i).length; j++)
             {
                 str += roundOff(keyPoints.get(i)[j], 2) + " ";
             }
-            addToMessages(str, SchedulingConstants.MESSAGE_TYPE_WARN);
+            str += " --> ";
         }
-        addToMessages("", SchedulingConstants.MESSAGE_TYPE_WARN);
+        addToMessages("\t\t " + str, SchedulingConstants.MESSAGE_TYPE_WARN);
         
         return relativeVelocities;
     }
@@ -1688,7 +1777,8 @@ public class VelocityBalancer
                         break innerForLoop;
                     }
                     
-                    currState.setName(currState.getName() + "; velocity=" + relativeVelocities[relVelIndex][plantIndex]);
+                    currState.setName(currState.getName() + "; velocity=" + 
+                            roundOff(relativeVelocities[relVelIndex][plantIndex], 2));
                     accCost += currState.getCost();
                     currState = currState.outgoingArcsIterator().next().getToState();
                 }

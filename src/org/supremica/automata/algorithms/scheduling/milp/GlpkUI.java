@@ -190,6 +190,7 @@ public class GlpkUI
         }
         
         // The constraints due to external specifications
+        w.newLine();
         counter = 0;
         for (ArrayList<int[]> xorConstraintsBlock : milpConstructor.getXorConstraints())
         {
@@ -211,7 +212,6 @@ public class GlpkUI
             
             w.write(tempStr + " = 1;\n");
         }
-        w.newLine();
 
 //TODO: w.write(externalPrecConstraints) - så jobbigt att jag lämnar det till sist...        
 //        w.write(externalConstraints);

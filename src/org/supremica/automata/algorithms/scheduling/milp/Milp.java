@@ -359,18 +359,16 @@ public class Milp
         if (isRunning && buildSchedule)
         {
             buildScheduleAutomaton();
-            
+
             long procTime = timer.elapsedTime();
             infoMsgs += "\tPost-processing time (incl. schedule construction) = " + procTime + "ms\n";
             totalTime += procTime;
             infoMsgs += "\tTotal time = " + totalTime + "ms\n";
         }
         
-        if (isRunning && balanceVelocities)
+        if (isRunning && buildSchedule && balanceVelocities)
         {
-            Automata autosToBeBalanced = theAutomata.clone();
-            autosToBeBalanced.addAutomaton(getSchedule());
-            new VelocityBalancer(autosToBeBalanced, this);
+            balanceVelocities();
         }
     }
     
@@ -551,10 +549,6 @@ public class Milp
             // Update the accumulated time
             accumulatedTime = smallestTime;
             
-            //temp
-            addToMessages("accTime = " + accumulatedTime + ", optEvent = " + currOptimalEvent, 
-                    SchedulingConstants.MESSAGE_TYPE_INFO);
-            
             // Make a transition (in the synchronizer) to the state that is reachable in one step at cheapest cost
             // This state will be the next parting point in our walk
             currComposedStateIndices = stepper.step(currComposedStateIndices, currOptimalEvent);
@@ -626,6 +620,27 @@ public class Milp
 //            plantAuto.getAlphabet().addEvent(resetEvent);
 //            plantAuto.addArc(new Arc(plantAuto.getInitialState(), plantAuto.getInitialState(), resetEvent));
 //        }
+    }
+    
+    /**
+     * This method create an instance of VelocityBalancer, supplying the selected 
+     * automata (theAutomata) and the newly built schedule, if it exists. 
+     * VelocityBalancer balances then the velocities of the selected plants.
+     */
+    protected void balanceVelocities()
+        throws Exception
+    {
+        if (schedule == null)
+        {
+            addToMessages("Velocities were not balanced since the schedule could not be found.",
+                    SchedulingConstants.MESSAGE_TYPE_ERROR);
+            return;
+        }
+        
+        Automata autosToBeBalanced = theAutomata.clone();
+        autosToBeBalanced.addAutomaton(schedule);
+        
+        new VelocityBalancer(autosToBeBalanced);
     }
     
     
@@ -831,17 +846,17 @@ public class Milp
         // (throw exception if they do)
         checkForLoops(plants);
         
-        //temp
-        for (Iterator<Automaton> autIt = plants.iterator(); autIt.hasNext();)
-        {
-            Automaton auto = autIt.next();
-            for (Iterator<State> stateIt = auto.stateIterator(); stateIt.hasNext();)
-            {
-                State state = stateIt.next();
-                addToMessages(auto.getName() + "." + state.getName() + "  -->  " + 
-                        indexMap.getStateIndex(auto, state) + ", cost = " + state.getCost(), SchedulingConstants.MESSAGE_TYPE_INFO);
-            }
-        }
+//        //temp
+//        for (Iterator<Automaton> autIt = plants.iterator(); autIt.hasNext();)
+//        {
+//            Automaton auto = autIt.next();
+//            for (Iterator<State> stateIt = auto.stateIterator(); stateIt.hasNext();)
+//            {
+//                State state = stateIt.next();
+//                addToMessages(auto.getName() + "." + state.getName() + "  -->  " + 
+//                        indexMap.getStateIndex(auto, state) + ", cost = " + state.getCost(), SchedulingConstants.MESSAGE_TYPE_INFO);
+//            }
+//        }
     }
     
     /**
@@ -1085,106 +1100,48 @@ public class Milp
         ArrayList<int[]> currXorConstraints = new ArrayList<int[]>();
         
         State currSpecState = currSpec.getInitialState();
-// 		for (Iterator<State> specStateIt = currSpec.stateIterator(); specStateIt.hasNext(); )
-// 		{
-// 			State currSpecState = specStateIt.next();
-// 			if (!currSpecState.isAccepting())
-// 			{
-        
-//        ArrayList<ArrayList> altPathVariablesSet = new ArrayList<ArrayList>();
-        
+                
         for (int i=0; i<plants.size(); i++)
         {
             Automaton currPlant = plants.getAutomatonAt(i);
             Alphabet commonActiveAlphabet = AlphabetHelpers.intersect(currPlant.getAlphabet(), currSpecState.activeEvents(false));
-            
+
+            // If this plant shares events with the current specification...
             if (commonActiveAlphabet.size() > 0)
             {
-// 				TreeSet<int[]> altPathVariablesStrArray = new TreeSet<int[]>(new PathSplipIndexComparator());
-                ArrayList<int[]> currAltPathVariables = new ArrayList<int[]>();
+                // For each common event...
                 for (Iterator<LabeledEvent> eventIt = commonActiveAlphabet.iterator(); eventIt.hasNext(); )
                 {
                     LabeledEvent currEvent = eventIt.next();
+                    // Find the state(s) in the plant where the common event can occur
                     for (Iterator <State> plantStateIt = currPlant.stateIterator(); plantStateIt.hasNext(); )
                     {
                         State currPlantState = plantStateIt.next();
                         if (currPlantState.activeEvents(false).contains(currEvent))
                         {
-                            // Should start the search from the next state to find the nearest path split
-                            findNearestPathSplits(currPlant, currPlantState.nextState(currEvent), currAltPathVariables, currEvent);
-                            
-                            
-                            //TODO: slutade här (071024)
                             int currPlantIndex = indexMap.getAutomatonIndex(currPlant);
-                            int currPlantStateIndex = indexMap.getStateIndex(currPlant, currPlantState);
-                            int nextPlantStateIndex = indexMap.getStateIndex(currPlant, currPlantState.nextState(currEvent));
-                            IntArrayTreeSet currPathSplitVars = upstreamsAltPathVars[i][currPlantStateIndex];
-                            int[] activeSplitVar = altPathVariablesTree.get(new int[]{currPlantIndex, currPlantStateIndex, nextPlantStateIndex});
-                            if (activeSplitVar != null)
-                            {
-                                currPathSplitVars.add(activeSplitVar);
-                            }
+                            int currStateIndex = indexMap.getStateIndex(currPlant, currPlantState);
+                            int currEventIndex = indexMap.getEventIndex(currEvent);
+                              
+                            // Find the closest alt.path-variables leading to the current plant state
+                            Collection<int[]> currPathSplitVars = getActiveAltPathVars(new int[]{currPlantIndex, currStateIndex, currEventIndex});
                             if (currPathSplitVars.size() == 0)
                             {
+                                // If this state is always reached from the initial state, add a default alt.path variable
                                 currXorConstraints.add(new int[]{-1});
                             }
                             else
                             {
+                                // Else, add the closest alt.path-variables
                                 currXorConstraints.addAll(currPathSplitVars);
                             }
                         }
                     }
                 }
-                
-// 				altPathVariablesStrArray = replaceFalsePathSplits(currPlant, altPathVariablesStrArray);
-                
-                for (Iterator<int[]> it = currAltPathVariables.iterator(); it.hasNext(); )
-                {
-                    int[] pathSplitState = it.next();
-                    
-                    if (pathSplitState[0] != NO_PATH_SPLIT_INDEX)
-                    {
-                        specStr += makeAltPathsVariable(indexMap.getAutomatonIndex(currPlant), pathSplitState[0], pathSplitState[1]) + " + ";
-                    }
-                    else
-                    {
-                        specStr += "1 + ";
-                    }
-                }
-                
-//                altPathVariablesSet.add(altPathVariablesStrArray);
             }
         }
-        
-// 		boolean dominatingPlantFound = false;
-// 		for (int j=0; j<altPathVariablesSet.size(); j++)
-// 		{
-// 			if (altPathVariablesSet.get(j).size() == 0)
-// 			{
-// 				if (dominatingPlantFound)
-// 				{
-// 					throw new Exception(currSpec.getName() + " prevents the system from reaching its final state, since at least 2 plants want (but must not) execute a mutually exclussive event.");
-// 				}
-// 				else
-// 				{
-// 					dominatingPlantFound = true;
-// 				}
-// 			}
-// 		}
-        specStr = specStr.substring(0, specStr.lastIndexOf("+")) + "= 1;";
-// 		if (dominatingPlantFound)
-// 		{
-// 			specStr += "= 0;";
-// 		}
-// 		else
-// 		{
-// 			specStr += "= 1;";
-// 		}
-        
-        externalConstraints += specStr + "\n";
-        // 	}
-// 		}
-        
+       
+        // Collect all alt.path-variables coupled with the events in this specification into one block for future use
         xorConstraints.add(currXorConstraints);
     }
     

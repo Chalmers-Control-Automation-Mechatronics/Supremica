@@ -142,10 +142,12 @@ public class Automaton
         for (Arc arc : orgAut.iterableArcs())
         {
             // We can use indices which is much faster, since the indices can not have changed!
-            //State fromState = getStateWithName(arc.getFromState().getName());
-            //State toState = getStateWithName(arc.getToState().getName());
-            State fromState = getStateWithIndex(arc.getFromState().getIndex());
-            State toState = getStateWithIndex(arc.getToState().getIndex());
+            // No, we cannot! Inexplicably, the indices do change sometimes. If indices are used,
+            // which is nice, AutomataIndexMap should be used in some form. /AK
+            State fromState = getStateWithName(arc.getFromState().getName());
+            State toState = getStateWithName(arc.getToState().getName());
+            //State fromState = getStateWithIndex(arc.getFromState().getIndex());
+            //State toState = getStateWithIndex(arc.getToState().getIndex());
             LabeledEvent event = alphabet.getEvent(arc.getEvent().getLabel());
             Arc newArc = new Arc(fromState, toState, event);
             
@@ -2220,6 +2222,7 @@ public class Automaton
     {
         Automaton theAutomaton = new Automaton();
         State stateZero = new State("zero");
+
         
         theAutomaton.addState(stateZero);
         

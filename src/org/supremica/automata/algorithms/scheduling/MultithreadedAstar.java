@@ -75,7 +75,8 @@ public class MultithreadedAstar
     public MultithreadedAstar(Automata theAutomata, String heuristic, boolean manualExpansion, boolean buildSchedule, boolean isRelaxationProvider, MultithreadedNode rootNode, double branchingProbality)
     throws Exception
     {
-        super(theAutomata, heuristic, manualExpansion, buildSchedule, isRelaxationProvider);
+        // Call the superconstructor and make sure it does not balance the robot velocities after optimization
+        super(theAutomata, heuristic, manualExpansion, buildSchedule, false, isRelaxationProvider);
         
         // Creates an instance of a class that is resposible for the expansion of 
         // the synchronized states. The second parameter, 'immediateChoiceAtUncontrollability', 
