@@ -245,8 +245,14 @@ public class ExampleTemplates
         thisGroup.addItem(new TemplateItem("Central Lock - 4 Doors - Language Exclusion", prefix + "verriegel4_language_exclusion.xml"));
         
         // Subsystems
-        thisGroup.addItem(new TemplateItem("Central Locking - ftuer", prefix + "/ModuleExamples/central_locking/ftuer.wmod"));
-        thisGroup.addItem(new TemplateItem("Central Locking - koordwsp", prefix + "/ModuleExamples/central_locking/koordwsp.wmod"));
+        thisGroup.addItem(new TemplateItem
+			    ("Central Locking - ftuer",
+			     basePrefix +
+			     "/ModuleExamples/central_locking/ftuer.wmod"));
+        thisGroup.addItem(new TemplateItem
+			    ("Central Locking - koordwsp",
+			     basePrefix +
+			     "/ModuleExamples/central_locking/koordwsp.wmod"));
     }
     
     private void initializeOperatorSupervisorExamples()
