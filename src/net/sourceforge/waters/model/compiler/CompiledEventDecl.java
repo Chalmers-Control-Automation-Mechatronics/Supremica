@@ -4,11 +4,12 @@
 //# PACKAGE: net.sourceforge.waters.model.compiler
 //# CLASS:   CompiledEventDecl
 //###########################################################################
-//# $Id: CompiledEventDecl.java,v 1.5 2006-11-03 15:01:57 torda Exp $
+//# $Id: CompiledEventDecl.java,v 1.6 2008-04-21 21:58:25 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.compiler;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -104,16 +105,15 @@ class CompiledEventDecl
 
   EventValue getValue(List<? extends IndexValue> indexes)
   {
-    final List<IndexValue> indexValues =
-      Collections.unmodifiableList(indexes);
-    EventValue result = mIndexValueMap.get(indexValues);
+    EventValue result = mIndexValueMap.get(indexes);
     if (result == null) {
+      final List<IndexValue> indexcopy = new ArrayList<IndexValue>(indexes);
       if (indexes.size() < mRanges.size()) {
-	result = new CompiledArrayEventValue(this, indexes);
+	result = new CompiledArrayEventValue(this, indexcopy);
       } else {
-	result = new CompiledSingleEventValue(this, indexes);
+	result = new CompiledSingleEventValue(this, indexcopy);
       }
-      mIndexValueMap.put(indexValues, result);
+      mIndexValueMap.put(indexcopy, result);
     }
     return result;
   }

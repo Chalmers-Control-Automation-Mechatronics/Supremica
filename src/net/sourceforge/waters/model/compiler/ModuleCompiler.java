@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.module
 //# CLASS:   ModuleCompiler
 //###########################################################################
-//# $Id: ModuleCompiler.java,v 1.107 2008-03-13 23:25:22 robi Exp $
+//# $Id: ModuleCompiler.java,v 1.108 2008-04-21 21:58:25 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.compiler;
@@ -2064,17 +2064,17 @@ private List<List<BinaryExpressionProxy>>
                                  final NodeProxy target,
                                  final CompiledNode groupEntry,
                                  final boolean deterministic,
-                                 final EdgeProxy edge/* EFA */)
+                                 final EdgeProxy edge /* EFA */)
     throws VisitorException
   {
     if (source instanceof SimpleNodeProxy) {
       final SimpleNodeProxy simpleSource = (SimpleNodeProxy) source;
       createTransitions(simpleSource, events, target, groupEntry,
-                        deterministic, edge/* EFA */);
+                        deterministic, edge /* EFA */);
     } else {
       for (final NodeProxy child : source.getImmediateChildNodes()) {
         createTransitions(child, events, target, groupEntry,
-                          deterministic, edge/* EFA */);
+                          deterministic, edge /* EFA */);
       }
     }
   }
@@ -2084,17 +2084,17 @@ private List<List<BinaryExpressionProxy>>
                                  final NodeProxy target,
                                  final CompiledNode groupEntry,
                                  final boolean deterministic,
-                                 final EdgeProxy edge/* EFA */)
+                                 final EdgeProxy edge /* EFA */)
     throws VisitorException
   {
     if (target instanceof SimpleNodeProxy) {
       final SimpleNodeProxy simpleTarget = (SimpleNodeProxy) target;
       createTransitions(source, events, simpleTarget, groupEntry,
-                        deterministic, edge/* EFA */);
+                        deterministic, edge /* EFA */);
     } else {
       for (final NodeProxy child : target.getImmediateChildNodes()) {
         createTransitions(source, events, child, groupEntry,
-                          deterministic, edge/* EFA */);
+                          deterministic, edge /* EFA */);
       }
     }
   }
@@ -2104,7 +2104,7 @@ private List<List<BinaryExpressionProxy>>
                                  final SimpleNodeProxy target,
                                  final CompiledNode groupEntry,
                                  final boolean deterministic,
-                                 final EdgeProxy edge/* EFA */)
+                                 final EdgeProxy edge /* EFA */)
     throws VisitorException
   {
     try {
@@ -2112,12 +2112,12 @@ private List<List<BinaryExpressionProxy>>
       final CompiledNode targetEntry = mPrecompiledNodes.get(target);
       final StateProxy sourceState = sourceEntry.getState();
       final StateProxy targetState = targetEntry.getState();
-      final Iterator<CompiledSingleEventValue> iter = events
-        .getEventIterator();
+      final Iterator<CompiledSingleEventValue> iter =
+        events.getEventIterator();
       while (iter.hasNext()) {
         final CompiledSingleEventValue value = iter.next();
         final EventProxy event = value.getEventProxy();
-        CompiledTransition duplicate=null;
+        CompiledTransition duplicate = null;
         boolean create = true;
         final Collection<CompiledTransition> compiledTransitions =
           sourceEntry.getCompiledTransitions(event);
@@ -2136,28 +2136,30 @@ private List<List<BinaryExpressionProxy>>
           }
         }
         if (mIsEFA && edge.getGuardActionBlock()!= null) {
-        for (SimpleExpressionProxy guard : edge.getGuardActionBlock().getGuards()){
-    		if(guard.toString().equals("false") || guard.toString().equals("0")){
-    			create=false; 
-    			/*
-    			 * The in transition is removed but the event 
-    			 * is in the alphabet.
-    			 */
-    			mGlobalAlphabet.add(event);
-                mLocalAlphabet.add(event);
-    		}
+          for (SimpleExpressionProxy guard :
+                 edge.getGuardActionBlock().getGuards()){
+            if (guard.toString().equals("false") ||
+                guard.toString().equals("0")) {
+              create=false; 
+              /*
+               * The in transition is removed but the event 
+               * is in the alphabet.
+               */
+              mGlobalAlphabet.add(event);
+              mLocalAlphabet.add(event);
+            }
     	  }
         }
         if (create) {
           final NodeProxy group = groupEntry.getNode();
           if (duplicate == null) {
-        	  final TransitionProxy trans = mDESFactory.createTransitionProxy
+            final TransitionProxy trans = mDESFactory.createTransitionProxy
               (sourceState, event, targetState);
-        	  //EFA with shared variables----------
-        	  if (mIsEFA && edge.getGuardActionBlock()!= null){
-        	  mEFATransitionGuardActionBlockMap.put
-              (trans, edge.getGuardActionBlock());
-        	  }
+            //EFA with shared variables----------
+            if (mIsEFA && edge.getGuardActionBlock() != null) {
+              mEFATransitionGuardActionBlockMap.put
+                (trans, edge.getGuardActionBlock());
+            }
             //---------------------------
             mTransitions.add(trans);
             sourceEntry.addTransition(trans, group);
@@ -2169,9 +2171,8 @@ private List<List<BinaryExpressionProxy>>
                * EFA: duplicate but with different
                * GuardActionBlock, needs to relabeled.
                */
-            	if (mEFATransitionGuardActionBlockMap.containsKey(trans)) {
-            	   
-            	  if (!mEFATransitionGuardActionBlockMap.get(trans).equals
+              if (mEFATransitionGuardActionBlockMap.containsKey(trans)) {
+                if (!mEFATransitionGuardActionBlockMap.get(trans).equals
                       (edge.getGuardActionBlock())) {
                   final EventProxy relabeledEvent =
                     mDESFactory.createEventProxy(trans.getEvent().getName()

@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.compiler
 //# CLASS:   CompilerTest
 //###########################################################################
-//# $Id: CompilerTest.java,v 1.17 2008-02-14 02:24:09 robi Exp $
+//# $Id: CompilerTest.java,v 1.18 2008-04-21 21:58:25 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.compiler;
@@ -95,114 +95,124 @@ public class CompilerTest
 
   //#########################################################################
   //# Successful Test Cases
+  public void testCompile_array()
+    throws IOException, WatersException
+  {
+    compile("tests", "nasty", "array");
+  }
+
   public void testCompile_buffer_sf1()
     throws IOException, WatersException
   {
-    compile("buffer_sf1");
+    compile("handwritten", "buffer_sf1");
   }
 
   public void testCompile_buffertest()
     throws IOException, WatersException
   {
-    compile("buffertest");
+    compile("handwritten", "buffertest");
   }
 
   public void testCompile_colours()
     throws IOException, WatersException
   {
-    compile("colours");
+    compile("handwritten", "colours");
   }
 
   public void testCompile_machine()
     throws IOException, WatersException
   {
-    compile("machine");
+    compile("handwritten", "machine");
   }
 
   public void testCompile_nodegroup1()
     throws IOException, WatersException
   {
-    compile("nodegroup1");
+    compile("handwritten", "nodegroup1");
   }
 
   public void testCompile_nodegroup2()
     throws IOException, WatersException
   {
-    compile("nodegroup2");
+    compile("handwritten", "nodegroup2");
   }
 
   public void testCompile_nodegroup4()
     throws IOException, WatersException
   {
-    compile("nodegroup4");
+    compile("handwritten", "nodegroup4");
   }
 
   public void testCompile_manwolfgoatcabbage()
     throws IOException, WatersException
   {
-    compile("manwolfgoatcabbage");
+    compile("handwritten", "manwolfgoatcabbage");
   }
 
   public void testCompile_markus2()
     throws IOException, WatersException
   {
-    compile("markus2");
+    compile("handwritten", "markus2");
   }
 
   public void testCompile_PLanTS()
     throws IOException, WatersException
   {
-    compile("PLanTS");
+    compile("handwritten", "PLanTS");
   }
 
   public void testCompile_small_factory_2()
     throws IOException, WatersException
   {
-    compile("small_factory_2");
+    compile("handwritten", "small_factory_2");
   }
 
   public void testCompile_small_factory_n()
     throws IOException, WatersException
   {
-    compile("small_factory_n");
+    compile("handwritten", "small_factory_n");
   }
 
   public void testCompile_tictactoe()
     throws IOException, WatersException
   {
-    compile("tictactoe");
+    compile("handwritten", "tictactoe");
   }
 
   public void testCompile_transferline()
     throws IOException, WatersException
   {
-    compile("transferline");
+    compile("handwritten", "transferline");
   }
 
   public void testCompile_transferline__1()
     throws IOException, WatersException
   {
+    final File root = getWatersInputRoot();
+    final File dir = new File(root, "handwritten");
     final List<ParameterBindingProxy> bindings =
       new LinkedList<ParameterBindingProxy>();
     final ParameterBindingProxy binding = createBinding("N", 1);
     bindings.add(binding);
-    compile("transferline", bindings, false);
+    compile(dir, "transferline", bindings, false);
   }
 
   public void testCompile_transferline__2()
     throws IOException, WatersException
   {
+    final File root = getWatersInputRoot();
+    final File dir = new File(root, "handwritten");
     final List<ParameterBindingProxy> bindings =
       new LinkedList<ParameterBindingProxy>();
     final ParameterBindingProxy binding = createBinding("N", 2);
     bindings.add(binding);
-    compile("transferline", bindings, true);
+    compile(dir, "transferline", bindings, true);
   }
 
   public void testCompile_winemerchant()
     throws IOException, WatersException
   {
-    compile("winemerchant");
+    compile("handwritten", "winemerchant");
   }
 
 
@@ -211,31 +221,31 @@ public class CompilerTest
   public void testCompile_dosingtankEFA()
     throws IOException, WatersException
   {
-    compile("dosingtankEFA");
+    compile("handwritten", "dosingtankEFA");
   }
 
   public void testCompile_EFA0()
     throws IOException, WatersException
   {
-    compile("EFA0");
+    compile("handwritten", "EFA0");
   }
 
   public void testCompile_GlobalAndLocalVariables()
     throws IOException, WatersException
   {
-    compile("GlobalAndLocalVariables");
+    compile("handwritten", "GlobalAndLocalVariables");
   }
 
   public void testCompile_sensoractuator()
     throws IOException, WatersException
   {
-    compile("sensoractuator");
+    compile("handwritten", "sensoractuator");
   }
 
   public void testCompile_stick_picking_game()
     throws IOException, WatersException
   {
-    compile("stick_picking_game");
+    compile("handwritten", "stick_picking_game");
   }
 
 
@@ -244,20 +254,20 @@ public class CompilerTest
   public void testCompile_edge0()
     throws IOException, WatersException
   {
-    compileError("edge0", null, EmptyLabelBlockException.class);
+    compileError("handwritten", "edge0", null, EmptyLabelBlockException.class);
   }
 
   public void testCompile_error1_small()
     throws IOException, WatersException
   {
-    compileError("error1_small", null,
+    compileError("handwritten", "error1_small", null,
                  DuplicateIdentifierException.class, "'mach'");
   }
 
   public void testCompile_error2_small()
     throws IOException, WatersException
   {
-    compileError("error2_small",null, 
+    compileError("handwritten", "error2_small",null, 
                  UndefinedIdentifierException.class,
                  "required parameter 'break'");
   }
@@ -265,73 +275,101 @@ public class CompilerTest
   public void testCompile_error3_small()
     throws IOException, WatersException
   {
-    compileError("error3_small", null,
+    compileError("handwritten", "error3_small", null,
                  UndefinedIdentifierException.class, "'finish_after'");
   }
 
   public void testCompile_error4_small()
     throws IOException, WatersException
   {
-    compileError("error4_small", null, EventKindException.class, "'start1'");
+    compileError("handwritten", "error4_small", null,
+                 EventKindException.class, "'start1'");
   }
 
   public void testCompile_error5_small()
     throws IOException, WatersException
   {
-    compileError("error5_small", null, 
+    compileError("handwritten", "error5_small", null, 
                  UndefinedIdentifierException.class, "'finish_before'");
   }
 
   public void testCompile_error6_small()
     throws IOException, WatersException
   {
-    compileError("error6_small", null, EventKindException.class, "'start2'");
+    compileError("handwritten", "error6_small", null,
+                 EventKindException.class, "'start2'");
   }
 
   public void testCompile_markus1()
     throws IOException, WatersException
   {
-    compileError("markus1", null,
+    compileError("handwritten", "markus1", null,
                  NondeterministicModuleException.class, "'s0'", "'a'");
   }
 
   public void testCompile_nodegroup3()
     throws IOException, WatersException
   {
-    compileError("nodegroup3", null,
+    compileError("handwritten", "nodegroup3", null,
                  NondeterministicModuleException.class, "'q0'", "'e'");
   }
 
   public void testCompile_twoinit()
     throws IOException, WatersException
   {
-    compileError("twoinit", null,
+    compileError("handwritten", "twoinit", null,
                  NondeterministicModuleException.class, "'comp'");
   }
 
 
   //#########################################################################
   //# Utilities
-  private void compileError(final String name,
+  private void compileError(final String dirname,
+                            final String name,
                             final List<ParameterBindingProxy> bindings,
                             final Class<? extends WatersException> exclass)
     throws IOException, WatersException
   {
     final String[] culprits = {};
-    compileError(name, bindings, exclass, culprits);
+    compileError(dirname, name, bindings, exclass, culprits);
   }
 
-  private void compileError(final String name,
+  private void compileError(final String dirname,
+                            final String subdirname,
+                            final String name,
+                            final List<ParameterBindingProxy> bindings,
+                            final Class<? extends WatersException> exclass)
+    throws IOException, WatersException
+  {
+    final String[] culprits = {};
+    compileError(dirname, subdirname, name, bindings, exclass, culprits);
+  }
+
+  private void compileError(final String dirname,
+                            final String name,
                             final List<ParameterBindingProxy> bindings,
                             final Class<? extends WatersException> exclass,
                             final String culprit)
     throws IOException, WatersException
   {
     final String[] culprits = {culprit};
-    compileError(name, bindings, exclass, culprits);
+    compileError(dirname, name, bindings, exclass, culprits);
   }
 
-  private void compileError(final String name,
+  private void compileError(final String dirname,
+                            final String subdirname,
+                            final String name,
+                            final List<ParameterBindingProxy> bindings,
+                            final Class<? extends WatersException> exclass,
+                            final String culprit)
+    throws IOException, WatersException
+  {
+    final String[] culprits = {culprit};
+    compileError(dirname, subdirname, name, bindings, exclass, culprits);
+  }
+
+  private void compileError(final String dirname,
+                            final String name,
                             final List<ParameterBindingProxy> bindings,
                             final Class<? extends WatersException> exclass,
                             final String culprit1,
@@ -339,10 +377,50 @@ public class CompilerTest
     throws IOException, WatersException
   {
     final String[] culprits = {culprit1, culprit2};
-    compileError(name, bindings, exclass, culprits);
+    compileError(dirname, name, bindings, exclass, culprits);
   }
 
-  private void compileError(final String name,
+  private void compileError(final String dirname,
+                            final String subdirname,
+                            final String name,
+                            final List<ParameterBindingProxy> bindings,
+                            final Class<? extends WatersException> exclass,
+                            final String culprit1,
+                            final String culprit2)
+    throws IOException, WatersException
+  {
+    final String[] culprits = {culprit1, culprit2};
+    compileError(dirname, subdirname, name, bindings, exclass, culprits);
+  }
+
+  private void compileError(final String dirname,
+                            final String name,
+                            final List<ParameterBindingProxy> bindings,
+                            final Class<? extends WatersException> exclass,
+                            final String[] culprits)
+    throws IOException, WatersException
+  {
+    final File root = getWatersInputRoot();
+    final File dir = new File(root, dirname);
+    compileError(dir, name, bindings, exclass, culprits);
+  }
+
+  private void compileError(final String dirname,
+                            final String subdirname,
+                            final String name,
+                            final List<ParameterBindingProxy> bindings,
+                            final Class<? extends WatersException> exclass,
+                            final String[] culprits)
+    throws IOException, WatersException
+  {
+    final File root = getWatersInputRoot();
+    final File dir = new File(root, dirname);
+    final File subdir = new File(dir, subdirname);
+    compileError(dir, name, bindings, exclass, culprits);
+  }
+
+  private void compileError(final File dir,
+                            final String name,
                             final List<ParameterBindingProxy> bindings,
                             final Class<? extends WatersException> exclass,
                             final String[] culprits)
@@ -350,7 +428,7 @@ public class CompilerTest
   {
     try {
       final String inextname = name + mModuleMarshaller.getDefaultExtension();
-      final File infilename = new File(mInputDirectory, inextname);
+      final File infilename = new File(dir, inextname);
       final String outextname =
         name + mProductDESMarshaller.getDefaultExtension();
       final File outfilename = new File(mOutputDirectory, outextname);
@@ -379,19 +457,33 @@ public class CompilerTest
     }
   }
 
-  private void compile(final String name)
+  private void compile(final String dirname, final String name)
     throws IOException, WatersException
   {
-    compile(name, null, false);
+    final File root = getWatersInputRoot();
+    final File dir = new File(root, dirname);
+    compile(dir, name, null, false);
   }
 
-  private void compile(final String name,
+  private void compile(final String dirname,
+                       final String subdirname,
+                       final String name)
+    throws IOException, WatersException
+  {
+    final File root = getWatersInputRoot();
+    final File dir = new File(root, dirname);
+    final File subdir = new File(dir, subdirname);
+    compile(subdir, name, null, false);
+  }
+
+  private void compile(final File dir,
+                       final String name,
                        final List<ParameterBindingProxy> bindings,
                        final boolean appendToName)
     throws IOException, WatersException
   {
     final String inextname = name + mModuleMarshaller.getDefaultExtension();
-    final File infilename = new File(mInputDirectory, inextname);
+    final File infilename = new File(dir, inextname);
     final StringBuffer buffer = new StringBuffer(name);
     if (bindings != null && appendToName) {
       for (final ParameterBindingProxy binding : bindings) {
@@ -403,7 +495,7 @@ public class CompilerTest
     final String outextname = buffer.toString();
     final File outfilename = new File(mOutputDirectory, outextname);
     compile(infilename, outfilename, bindings);
-    final File compfilename = new File(mInputDirectory, outextname);
+    final File compfilename = new File(dir, outextname);
     compare(outfilename, compfilename);
   }
 
@@ -458,7 +550,6 @@ public class CompilerTest
     throws Exception
   {
     super.setUp();
-    mInputDirectory = new File(getWatersInputRoot(), "handwritten");
     mOutputDirectory = getOutputDirectory();
     mModuleFactory = ModuleElementFactory.getInstance();
     mProductDESFactory = ProductDESElementFactory.getInstance();
@@ -475,7 +566,6 @@ public class CompilerTest
   protected void tearDown()
     throws Exception
   {
-    mInputDirectory = null;
     mOutputDirectory = null;
     mModuleFactory = null;
     mProductDESFactory = null;
@@ -488,7 +578,6 @@ public class CompilerTest
 
   //#########################################################################
   //# Data Members
-  private File mInputDirectory;
   private File mOutputDirectory;
   private ModuleProxyFactory mModuleFactory;
   private ProductDESProxyFactory mProductDESFactory;
