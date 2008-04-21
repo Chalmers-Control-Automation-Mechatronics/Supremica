@@ -1338,7 +1338,7 @@ public class ModifiedAstar
         
         Automata autosToBeBalanced = theAutomata.clone();
         autosToBeBalanced.addAutomaton(scheduleAuto);
-        new VelocityBalancer(autosToBeBalanced);
+        new VelocityBalancer(autosToBeBalanced, this);
     }
     
 // This should be done by adding a specification forcing the plants to execute once, I think. /AK

@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.gui.ide
 //# CLASS:   ModuleContainer
 //###########################################################################
-//# $Id: ModuleContainer.java,v 1.69 2008-02-14 02:24:09 robi Exp $
+//# $Id: ModuleContainer.java,v 1.70 2008-04-21 16:32:00 avenir Exp $
 //###########################################################################
 
 
@@ -71,7 +71,7 @@ public class ModuleContainer
     public ModuleContainer(final IDE ide, final ModuleSubject module)
     {
         super(ide, module);
-
+        
         mModuleContext = new ModuleContext(module);
         final ModuleProxyFactory factory = ModuleSubjectFactory.getInstance();
         final OperatorTable optable = CompilerOperatorTable.getInstance();
@@ -106,15 +106,15 @@ public class ModuleContainer
     //#######################################################################
     //# Overrides for Abstract Base Class
     //# org.supremica.gui.ide.DocumentContainer
-	public boolean hasUnsavedChanges()
-	{
-		return mUndoIndex != mUndoCheckPoint;
-	}
+    public boolean hasUnsavedChanges()
+    {
+            return mUndoIndex != mUndoCheckPoint;
+    }
 
-	public void setCheckPoint()
-	{
-		mUndoCheckPoint = mUndoIndex;
-	}
+    public void setCheckPoint()
+    {
+            mUndoCheckPoint = mUndoIndex;
+    }
 
     public void close()
     {

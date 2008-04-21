@@ -2,18 +2,15 @@ package org.supremica.automata.algorithms.scheduling.milp;
 
 import java.util.*;
 import java.io.*;
-import org.jacorb.orb.domain.TEST_POLICY_ID;
 
 import org.supremica.automata.*;
 import org.supremica.automata.algorithms.*;
 import org.supremica.automata.algorithms.scheduling.SchedulingConstants;
-import org.supremica.external.processAlgebraPetriNet.algorithms.PermutationGenerator;
 import org.supremica.util.ActionTimer;
 import org.supremica.automata.algorithms.scheduling.Scheduler;
 import org.supremica.automata.algorithms.scheduling.SchedulingHelper;
 import org.supremica.automata.algorithms.scheduling.SynchronizationStepper;
 import org.supremica.automata.algorithms.scheduling.VelocityBalancer;
-import org.supremica.util.BDD.IntArray;
 
 //TODO (always): Structure the code. Comment better.
 public class Milp
@@ -288,7 +285,7 @@ public class Milp
             
             isRunning = false;
             
-            errorMsgs += "Milp::schedule() -> " + ex;
+            errorMsgs += "Milp::schedule() -> " + ex.getMessage();
             debugMsgs.add(ex.getStackTrace());
             ex.printStackTrace();//temp
         }
@@ -327,6 +324,7 @@ public class Milp
             at.stop();
             addToMessages("Time for the creation of noncrossbooking constraints = " + 
                     at.elapsedTime() + "ms", SchedulingConstants.MESSAGE_TYPE_INFO);
+           
             
             milpSolver.createModelFile();
             
@@ -353,6 +351,7 @@ public class Milp
             timer.restart();
             
             milpSolver.processSolutionFile();
+            String t = "";
         }
         
         // Builds the optimal schedule (if solicited)
@@ -640,7 +639,7 @@ public class Milp
         Automata autosToBeBalanced = theAutomata.clone();
         autosToBeBalanced.addAutomaton(schedule);
         
-        new VelocityBalancer(autosToBeBalanced);
+        new VelocityBalancer(autosToBeBalanced, this);
     }
     
     
@@ -2068,14 +2067,14 @@ public class Milp
         
         
         // TODO: sigue leendo... (UNDER CONSTRUCTION...)
-        // Denna for-slinga är nästan en upprepning av det som görs längre ner
-        // (måste komma här för att få med ALLA bEventPar och inte bara de överlappande).
-        // Detta är dock endast tillfälligt (hoppas jag, annars strukturera om)
-        // då den nedanstående endast funkar för 2 plantor och bör på sikt försvinna
+        // Denna for-slinga ï¿½r nï¿½stan en upprepning av det som gï¿½rs lï¿½ngre ner
+        // (mï¿½ste komma hï¿½r fï¿½r att fï¿½ med ALLA bEventPar och inte bara de ï¿½verlappande).
+        // Detta ï¿½r dock endast tillfï¿½lligt (hoppas jag, annars strukturera om)
+        // dï¿½ den nedanstï¿½ende endast funkar fï¿½r 2 plantor och bï¿½r pï¿½ sikt fï¿½rsvinna
         // (tror jag) /AK
-        // Skall infon om tillstånd vara med i bEventPairs??? /AK
-//TODO: De följande tre raderna skall inte vara bortkommenterade (ÄN) utan är det för att slippa lägga
-//      till BookingPairsGraphExplorer.java i CVS-en. Vad skall göras här???
+        // Skall infon om tillstï¿½nd vara med i bEventPairs??? /AK
+//TODO: De fï¿½ljande tre raderna skall inte vara bortkommenterade (ï¿½N) utan ï¿½r det fï¿½r att slippa lï¿½gga
+//      till BookingPairsGraphExplorer.java i CVS-en. Vad skall gï¿½ras hï¿½r???
 //        BookingPairsGraphExplorer graphExplorer = new BookingPairsGraphExplorer(
 //            consecutiveBookingTicsIndices.keySet().toArray(new int[][]{}));
 //        graphExplorer.findConnectedCycles();
@@ -2178,7 +2177,7 @@ public class Milp
            }
        } 
         
-// @Deprecated: tänkte om...
+// @Deprecated: tï¿½nkte om...
 //                    for (int p = 0; p < plants.size(); p++)
 //                    {
 //                        ArrayList<int[]> consecutiveTics = consecutiveBookingTicsIndices.get(new int[]{p, z1, z2});
@@ -2207,8 +2206,8 @@ public class Milp
         
         
         
-//        OBS!!! TILLFÄLLIGT BORTKOMMENTERAT PGA BUGG (INDEX_OUT_OF_BOUNDS_EXCEPTION för /artiklar/AK/journal_milp/xml-filer/connected_components_abc.wmod)
-//        KOMMENTERA IN IGEN (ALT. ANVÄND SOM INSPIRATION FÖR ATT LÄGGA IN MILP-CONSTRAINTS) VID TILLFÄLLE.
+//        OBS!!! TILLFï¿½LLIGT BORTKOMMENTERAT PGA BUGG (INDEX_OUT_OF_BOUNDS_EXCEPTION fï¿½r /artiklar/AK/journal_milp/xml-filer/connected_components_abc.wmod)
+//        KOMMENTERA IN IGEN (ALT. ANVï¿½ND SOM INSPIRATION Fï¿½R ATT Lï¿½GGA IN MILP-CONSTRAINTS) VID TILLFï¿½LLE.
 //        
 //        
 //        
@@ -2353,13 +2352,13 @@ public class Milp
 //                                        }
 //                                        
 //                                        //TODO: Installera och lek med RobotStudio
-//                                        //TODO: Varför blir g*_suboptimal = 0 för FT6x6???
-//                                        //      ... jo, för att den inte hittar ngn lösning.
-//                                        //      1) connected components behöver fixas;
-//                                        //      2) path-variablerna är ju också connectade... fixa.
+//                                        //TODO: Varfï¿½r blir g*_suboptimal = 0 fï¿½r FT6x6???
+//                                        //      ... jo, fï¿½r att den inte hittar ngn lï¿½sning.
+//                                        //      1) connected components behï¿½ver fixas;
+//                                        //      2) path-variablerna ï¿½r ju ocksï¿½ connectade... fixa.
 //                                        //TODO: hyfsa till RandomPathUsingMilp.java;
-//                                        //      man behöver kanske inte det systematiska variabelvalet.
-//                                        //      Det är nog så om alla robotar börjar utanför zoner.
+//                                        //      man behï¿½ver kanske inte det systematiska variabelvalet.
+//                                        //      Det ï¿½r nog sï¿½ om alla robotar bï¿½rjar utanfï¿½r zoner.
 //                                        //      Annars fundera...
 //                                        //TODO: dokumentera i /tankar/milp.tex
 //                                        //TODO: VelocityBalansering

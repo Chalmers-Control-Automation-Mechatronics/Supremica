@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.gui.ide.actions
 //# CLASS:   ScheduleDialog
 //###########################################################################
-//# $Id: ScheduleDialog.java,v 1.61 2008-04-20 13:18:28 avenir Exp $
+//# $Id: ScheduleDialog.java,v 1.62 2008-04-21 16:32:00 avenir Exp $
 //###########################################################################
 
 package org.supremica.gui;
@@ -13,7 +13,7 @@ import javax.swing.*;
 import java.awt.GridLayout;
 import java.awt.event.*;
 import java.io.*;
-import org.supremica.automata.AlphabetHelpers;
+import net.sourceforge.waters.gui.observer.EditorChangedEvent;
 import org.supremica.automata.algorithms.scheduling.milp.RandomPathUsingMilp;
 import org.supremica.log.Logger;
 import org.supremica.log.LoggerFactory;
@@ -48,7 +48,7 @@ public class ScheduleDialog
     public Thread milpThread = null;
     
     private BufferedWriter writer = null; //Tillf
-    
+      
     public ScheduleDialog(IDEActionInterface ide)
     {
         super(ide.getFrame(), "Schedule Selected Automata", true);
@@ -191,39 +191,58 @@ public class ScheduleDialog
         {
             public void actionPerformed(ActionEvent e)
             {
-                File rootDir = new File(org.supremica.properties.Config.FILE_OPEN_PATH.getAsString());
-//                System.out.println("location = " + ide.getIDE().getActiveProject().getLocation().toString()); 
-                File[] files = rootDir.listFiles();
-                
                 try
                 {
-                    File resultFile = null;
-                    if (((String)optiMethodsBox.getSelectedItem()).equals(SchedulingConstants.MODIFIED_A_STAR))
-                    {
-                        resultFile = new File(rootDir + File.separator + "_" + heuristicsBox.getSelectedItem() + ".txt");
-                    }
-                    else
-                    {
-                        resultFile = new File(rootDir + File.separator + "_" + optiMethodsBox.getSelectedItem() + ".txt");
-                    }
-                    resultFile.createNewFile();
-                    
-                    writer =  new BufferedWriter(new FileWriter(resultFile));
+                    prepareAutoTest();
                 }
-                catch (IOException ioe)
+                catch (Exception ex)
                 {
-                    logger.error("Error at file creation : " + rootDir + File.separator + optiMethodsBox.getSelectedItem() + "_" + heuristicsBox.getSelectedItem() + ".txt");
+                    logger.error("Exception while performing autotest. " + ex.getMessage());
                 }
-                
-                for (int i=0; i<files.length; i++)
-                {
-                    filesToSchedule.add(files[i]);
-                }
-                
-                autoTestButton.setEnabled(false);
-                done();
             }
         });
+    }
+    
+    public void prepareAutoTest()
+            throws Exception
+    {        
+        File rootDir = new File(org.supremica.properties.Config.FILE_OPEN_PATH.getAsString());
+        File[] files = rootDir.listFiles(new FilenameFilter()
+            {
+                public boolean accept(File dir, String name)
+                {
+                    return name.endsWith(".xml");
+                }
+            });
+
+        try
+        {
+            File resultFile = null;
+            if (((String)optiMethodsBox.getSelectedItem()).equals(SchedulingConstants.MODIFIED_A_STAR))
+            {
+                resultFile = new File(rootDir + File.separator + heuristicsBox.getSelectedItem() + "_stat.txt");
+            }
+            else
+            {
+                resultFile = new File(rootDir + File.separator + optiMethodsBox.getSelectedItem() + "_stat.txt");
+            }
+            resultFile.createNewFile();
+
+            writer =  new BufferedWriter(new FileWriter(resultFile));
+        }
+        catch (IOException ioe)
+        {
+            logger.error("Error at file creation : " + rootDir + File.separator + optiMethodsBox.getSelectedItem() + "_" + heuristicsBox.getSelectedItem() + ".txt");
+        }
+
+        for (int i=0; i<files.length; i++)
+        {
+            filesToSchedule.add(files[i]);
+        }
+
+        autoTestButton.setEnabled(false);
+        
+        done();
     }
     
     /**
@@ -340,8 +359,14 @@ public class ScheduleDialog
             {
                 throw new Exception("Unknown optimization method");
             }
+            
+            // If autotest is used, a print-out is done elsewhere
+            if (autoTestButton.isEnabled())
+            {
+                logger.info("Scheduling started...");
+            }
 
-            logger.info("Scheduling started...");
+            // Start the scheduling thread
             sched.startSearchThread();
 
             // Wait for the Scheduler to become stopped...
@@ -350,19 +375,23 @@ public class ScheduleDialog
                 Thread.sleep(10);
             }
             
-            // ... add the schedule automaton to the GUI...
-            addAutomatonToGUI(sched.getSchedule());
+            // ... add the schedule automaton to the GUI...¨(unless autotest is running)
+            // If autotest is running, only print error messages
+            if (autoTestButton.isEnabled())
+            {
+                addAutomatonToGUI(sched.getSchedule());
 
-            // ... Print the messages (if there are any) to the screen...
-            if (sched.getMessages(SchedulingConstants.MESSAGE_TYPE_INFO) != "")
-            {
-                    logger.info(sched.getMessages(SchedulingConstants.MESSAGE_TYPE_INFO));
+                // ... Print the messages (if there are any) to the screen...
+                if (! sched.getMessages(SchedulingConstants.MESSAGE_TYPE_INFO).equals(""))
+                {
+                        logger.info(sched.getMessages(SchedulingConstants.MESSAGE_TYPE_INFO));
+                }
+                if (! sched.getMessages(SchedulingConstants.MESSAGE_TYPE_WARN).equals(""))
+                {
+                        logger.warn(sched.getMessages(SchedulingConstants.MESSAGE_TYPE_WARN));
+                }
             }
-            if (sched.getMessages(SchedulingConstants.MESSAGE_TYPE_WARN) != "")
-            {
-                    logger.warn(sched.getMessages(SchedulingConstants.MESSAGE_TYPE_WARN));
-            }
-            if (sched.getMessages(SchedulingConstants.MESSAGE_TYPE_ERROR) != "")
+            if (! sched.getMessages(SchedulingConstants.MESSAGE_TYPE_ERROR).equals(""))
             {
                     logger.error(sched.getMessages(SchedulingConstants.MESSAGE_TYPE_ERROR));
             }
@@ -397,6 +426,8 @@ public class ScheduleDialog
                 setVisible(false);
                 dispose();
                 getParent().repaint();
+                
+                logger.info("Scheduling done");
             }
             else
             {
@@ -414,22 +445,37 @@ public class ScheduleDialog
                     
                     File currFile = (File)filesToSchedule.remove(0);
                     
+                    logger.info("Scheduling " + currFile.getPath());
+                    
                     writer.write(currFile.getName());
                     writer.newLine();
                     
-                    if (currFile.getName().contains(".xml"))
-                    {
-                        ActionMan.automataDeleteAll_actionPerformed(ActionMan.getGui());
-                        ActionMan.openFile(ActionMan.getGui(), currFile);
-                        ActionMan.getGui().invertSelection();
+//                    if (currFile.getName().contains(".xml"))
+//                    {
+//                        ActionMan.automataDeleteAll_actionPerformed(ActionMan.getGui());
+//                        ActionMan.openFile(ActionMan.getGui(), currFile);
+//                        ActionMan.getGui().invertSelection();
                         // 					getParent().repaint();
                         
+//                        ide.getActiveDocumentContainer().getAnalyzerPanel().getVisualProject().clear();
+                        //ide.getActiveDocumentContainer().getAnalyzerPanel().addProject();                
+                        //ide.getIDE().getDocumentContainerManager().openContainer(currFile);
+                    
+                        // Open the current file
+                        ide.getActiveDocumentContainer().getIDE().getDocumentContainerManager().openContainer(currFile);
+                        // Switch to the analyzer panel
+                        ((JTabbedPane)ide.getActiveDocumentContainer().getPanel()).setSelectedComponent(
+                                ide.getActiveDocumentContainer().getAnalyzerPanel());
+                        // Select all the automata
+                        selectedAutomata = ide.getActiveDocumentContainer().getAnalyzerPanel().getAllAutomata();
+                        
+                        // Schedule using the chosen settings
                         doit();
-                    }
-                    else
-                    {
-                        done();
-                    }
+//                    }
+//                    else
+//                    {
+//                        done();
+//                    }
                 }
                 else
                 {
@@ -437,6 +483,7 @@ public class ScheduleDialog
                     writer.close();
                     
                     autoTestButton.setEnabled(true);
+                    
                     done();
                 }
             }
@@ -494,7 +541,7 @@ public class ScheduleDialog
         {
             // Choose a name for the schedule automaton
             String scheduleName = "";
-            while (scheduleName != null && scheduleName.trim() == "")
+            while (scheduleName != null && scheduleName.trim().equals(""))
             {
                 scheduleName = getIde().getActiveDocumentContainer().getAnalyzerPanel().getNewAutomatonName(
                         "Enter a name for the schedule", "Schedule");
@@ -614,9 +661,7 @@ class ApproxWeightsDialog
     }
     
     public void run()
-    {
-        logger.info("in run");
-               
+    {               
 //        try 
 //        {
 //            while (xWeight < 0 || yWeight < 0)
@@ -627,11 +672,10 @@ class ApproxWeightsDialog
         for (int i = 0; i < 5; i++)
         {
             repaint();
-            logger.warn("in_run_nr_" + i);
         } 
 
             
-            logger.info("thread done");
+            
             threadDone = true;
             notifyAll();
 //        }

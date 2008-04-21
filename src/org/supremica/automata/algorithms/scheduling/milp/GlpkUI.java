@@ -9,6 +9,7 @@ package org.supremica.automata.algorithms.scheduling.milp;
 
 import java.io.*;
 import java.util.ArrayList;
+import java.util.StringTokenizer;
 import org.supremica.automata.algorithms.scheduling.SchedulingConstants;
 
 /**
@@ -212,7 +213,7 @@ public class GlpkUI
             w.write(tempStr + " = 1;\n");
         }
 
-//TODO: w.write(externalPrecConstraints) - så jobbigt att jag lämnar det till sist...        
+//TODO: w.write(externalPrecConstraints) - sï¿½ jobbigt att jag lï¿½mnar det till sist...        
 //        w.write(externalConstraints);
 //        w.newLine();
         
@@ -490,7 +491,7 @@ public class GlpkUI
      */
     public void processSolutionFile()
         throws MilpException, FileNotFoundException, IOException
-    {       
+    {        
         optimalTimes = new double[milpConstructor.getDeltaTimes().length][];
         for (int i=0; i<optimalTimes.length; i++)
         {
@@ -510,22 +511,61 @@ public class GlpkUI
         // Go through the solution file and extract the suggested optimal times for each state
         while (str != null)
         {
+            StringTokenizer tokenizer = new StringTokenizer(str);
+            String tokenStr = ""; 
+            if (tokenizer.hasMoreTokens())
+                tokenStr = tokenizer.nextToken();
+            
             if (str.indexOf(" time[") > -1)
             {
                 String strPlantIndex = str.substring(str.indexOf("[") + 1, str.indexOf(",")).trim();
                 String strStateIndex = str.substring(str.indexOf(",") + 1, str.indexOf("]")).trim();
-                String strCost = str.substring(str.indexOf("]") + 1).trim();
+                
+                double cost = -1;
+                boolean valFound = false;
+                while ((tokenStr = tokenizer.nextToken()) != null)
+                {
+                    try
+                    {
+                        cost = Double.parseDouble(tokenStr.trim());
+                        valFound = true;
+                        break;
+                    }
+                    catch (NumberFormatException ex){}
+                }
+                if (! valFound)
+                {
+                    throw new MilpException("Cost not found in '" + str + "' (GlpkUI.processSolutionFile())");
+                }
+//                String strCost = str.substring(str.indexOf("]") + 1).trim();
                 
                 int plantIndex = (new Integer(strPlantIndex)).intValue();
                 int stateIndex = (new Integer(strStateIndex)).intValue();
-                double cost = (new Double(strCost)).doubleValue();
+//                double cost = (new Double(strCost)).doubleValue();
                 
                 optimalTimes[plantIndex][stateIndex] = cost;
             }
             else if (str.indexOf("c ") >  -1) // Print out the makespan of the system
             {
-                String strMakespan = str.substring(str.indexOf("c") + 1).trim();
-                double makespan = milpConstructor.removeEpsilons((new Double(strMakespan)).doubleValue());
+//                String strMakespan = str.substring(str.indexOf("c") + 1).trim();
+                double makespan = -1;
+                boolean valFound = false;
+                while ((tokenStr = tokenizer.nextToken()) != null)
+                {
+                    try
+                    {
+                        makespan = Double.parseDouble(tokenStr.trim());
+                        valFound = true;
+                        break;
+                    }
+                    catch (NumberFormatException ex){}
+                }
+                if (! valFound)
+                {
+                    throw new MilpException("Makespan not found in '" + str + "' (GlpkUI.processSolutionFile())");
+                }
+                
+                makespan = milpConstructor.removeEpsilons(makespan);
                 milpConstructor.addToMessages("\t\tOPTIMAL MAKESPAN: " + makespan + ".............................\n",
                     SchedulingConstants.MESSAGE_TYPE_INFO);
             }

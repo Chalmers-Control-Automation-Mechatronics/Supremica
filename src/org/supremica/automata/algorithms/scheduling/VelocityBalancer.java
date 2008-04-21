@@ -99,7 +99,7 @@ public class VelocityBalancer
         String tempStr = "\n";
         for (int i = 0; i < firingTimes.length; i++)
         {
-            tempStr += "(firing) i = " + i + " --> ";
+            tempStr += "(firing) i = " + i + "(" + plants.getAutomatonAt(i).getName() + ") --> ";
             for (int j = 0; j < firingTimes[i].length; j++)
             {
                 tempStr += firingTimes[i][j] + " ";
@@ -115,8 +115,8 @@ public class VelocityBalancer
             }
             tempStr += "\n";
         }
-        addToMessages(tempStr, SchedulingConstants.MESSAGE_TYPE_INFO);
-        tempStr = "(path points): ";
+        addToMessages(tempStr, SchedulingConstants.MESSAGE_TYPE_INFO, false);
+        tempStr = "Path points: \n\t";
         for (double[] teff : pathPoints)
         {
             tempStr += "[";
@@ -126,8 +126,7 @@ public class VelocityBalancer
             }
             tempStr = tempStr.trim() + "] ";           
         }
-        addToMessages(tempStr, SchedulingConstants.MESSAGE_TYPE_INFO);
-        tempStr = "(mutex limits): \n";
+        tempStr += "\nMutex limits: \n\t";
         for (int i = 0; i < mutexLimitsNew.length; i++)
         {
             for (int j = 0; j < mutexLimitsNew[i].length; j++)
@@ -143,9 +142,7 @@ public class VelocityBalancer
                     tempStr = tempStr.trim() + "] ";           
                 }
             }
-        }   
-        addToMessages(tempStr, SchedulingConstants.MESSAGE_TYPE_ERROR); 
-        
+        }        
         
         // Creates a test problem. This is a temporary construction
 //        makeTestPath();
@@ -180,20 +177,16 @@ public class VelocityBalancer
 
         // Finds the key points, i.e. points allowing to decrease the number of robot stops 
         findKeyPoints();
-
-        addToMessages("", SchedulingConstants.MESSAGE_TYPE_WARN);
-        addToMessages("Initial key points:", SchedulingConstants.MESSAGE_TYPE_WARN);
-        String str = "";
+        tempStr += "\nKey points (initial):\n\t";
         for (int i=0; i<keyPoints.size(); i++)
         {
             for (int j=0; j<keyPoints.get(i).length; j++)
             {
-                str += keyPoints.get(i)[j] + " ";
+                tempStr += keyPoints.get(i)[j] + " ";
             }
-            str += "---> ";
+            tempStr += "---> ";
         }
-        str += "KLART!!!";
-        addToMessages(str, SchedulingConstants.MESSAGE_TYPE_WARN);
+        addToMessages(tempStr, SchedulingConstants.MESSAGE_TYPE_INFO, false);
         
         // Loops through the key points and smooth out the robot velocities even more when possible
 //        double[][] relativeVelocities = improveKeyPointsUsingVisibilitySmoothing();
@@ -226,12 +219,10 @@ public class VelocityBalancer
 
         // Gathers some statistics about the velocity changes (smooth schedule)
         calcVelocityStatisticsForVisibilitySmoothing(keyPoints);
-
-        addToMessages("", SchedulingConstants.MESSAGE_TYPE_WARN);
+        
         addToMessages("SINGLE-EVENT BALANCING.....", SchedulingConstants.MESSAGE_TYPE_WARN);
         calcVelocityStatisticsForEventSmoothing();
 
-        addToMessages("", SchedulingConstants.MESSAGE_TYPE_WARN);
         addToMessages("UNPROCESSED SCHEDULE.....", SchedulingConstants.MESSAGE_TYPE_WARN);
         calcVelocityStatisticsForUnprocessedSchedule();
         
@@ -826,7 +817,7 @@ public class VelocityBalancer
                 str += roundOff(relativeVelocities[i][j+1], 2) + " ";
             }
 
-            addToMessages("\t\t Rel. velocities per event in Rob_" + i + " : "+ str, SchedulingConstants.MESSAGE_TYPE_WARN);
+            addToMessages("\tRel. velocities per event in Rob_" + i + " : "+ str, SchedulingConstants.MESSAGE_TYPE_WARN);
         }
 
         // COPY-PASTE
@@ -836,7 +827,7 @@ public class VelocityBalancer
         double[] totalVelocityChange = new double[relativeVelocities.length];
         double[] meanVelocityChange = new double[relativeVelocities.length];
 
-        addToMessages("Single-event balancing statistics: ", SchedulingConstants.MESSAGE_TYPE_WARN);
+        addToMessages("Single-event balancing statistics: ", SchedulingConstants.MESSAGE_TYPE_INFO);
         for (int i=0; i<relativeVelocities.length; i++)
         {
             for (int j=0; j<relativeVelocities[i].length; j++)
@@ -880,11 +871,11 @@ public class VelocityBalancer
             totalVelocityChange[i] = roundOff(totalVelocityChange[i], 2); 			
             meanVelocityChange[i] = roundOff(meanVelocityChange[i], 2);
 
-            addToMessages("\t\t Rob_" + i + "... total change: " + totalVelocityChange[i] + 
+            addToMessages("\tRob_" + i + "... total change: " + totalVelocityChange[i] + 
                     "; nr of changes: " + nrOfVelocityChanges[i] + "; mean change: " + 
                     meanVelocityChange[i] + "; nr of stops: " + nrOfMinVelocityPassages[i] + 
                     "; nr of full-speed-runs: " + nrOfMaxVelocityPassages[i], 
-                    SchedulingConstants.MESSAGE_TYPE_WARN);
+                    SchedulingConstants.MESSAGE_TYPE_INFO);
         }
         // COPY-PASTE-DONE
     }
@@ -926,11 +917,11 @@ public class VelocityBalancer
                 firingTimeIndex++;
                 state = nextState;
             } while (!nextState.isAccepting());
-            addToMessages("\t\t Rel. velocities per event in Rob_" + plantIndex + " : " + velPerEventStr + "(0)",
+            addToMessages("\tRel. velocities per event in Rob_" + plantIndex + " : " + velPerEventStr + "(0)",
                     SchedulingConstants.MESSAGE_TYPE_WARN);
         }
         
-        addToMessages("Unprocessed schedule statistics:", SchedulingConstants.MESSAGE_TYPE_WARN);
+        addToMessages("Unprocessed schedule statistics:", SchedulingConstants.MESSAGE_TYPE_INFO);
         for (int j=0; j<pathPoints.get(0).length; j++)
         {
             boolean lastVelocityWasZero = true;
@@ -981,11 +972,11 @@ public class VelocityBalancer
 
             meanVelocityChange[j] = totalVelocityChange[j] / nrOfVelocityChanges[j];
 
-            addToMessages("\t\t Rob_" + j + "... total change: " + totalVelocityChange[j] + 
+            addToMessages("\tRob_" + j + "... total change: " + totalVelocityChange[j] + 
                     "; nr of changes: " + nrOfVelocityChanges[j] + "; mean change: " + 
                     meanVelocityChange[j] + "; nr of stops: " + nrOfMinVelocityPassages[j] + 
                     "; nr of full-speed-runs: " + nrOfMaxVelocityPassages[j], 
-                    SchedulingConstants.MESSAGE_TYPE_WARN);
+                    SchedulingConstants.MESSAGE_TYPE_INFO);
         }
     }
 
@@ -1005,7 +996,7 @@ public class VelocityBalancer
         double[] totalVelocityChange = new double[points.get(0).length];
         double[] meanVelocityChange = new double[points.get(0).length];
 
-        addToMessages("Multi-balanced statistics: ", SchedulingConstants.MESSAGE_TYPE_WARN);
+        addToMessages("Multi-balanced statistics: ", SchedulingConstants.MESSAGE_TYPE_INFO);
         for (int j=0; j<relativeVelocities[0].length; j++)
         {
             for (int i=0; i<relativeVelocities.length; i++)
@@ -1047,11 +1038,11 @@ public class VelocityBalancer
             totalVelocityChange[j] = roundOff(totalVelocityChange[j], 2); 			
             meanVelocityChange[j] = roundOff(meanVelocityChange[j], 2);
 
-            addToMessages("\t\t Rob_" + j + "... total change: " + totalVelocityChange[j] + 
+            addToMessages("\tRob_" + j + "... total change: " + totalVelocityChange[j] + 
                     "; nr of changes: " + nrOfVelocityChanges[j] + "; mean change: " + 
                     meanVelocityChange[j] + "; nr of stops: " + nrOfMinVelocityPassages[j] + 
                     "; nr of full-speed-runs: " + nrOfMaxVelocityPassages[j], 
-                    SchedulingConstants.MESSAGE_TYPE_WARN);
+                    SchedulingConstants.MESSAGE_TYPE_INFO);
         }
     }
 
@@ -1208,7 +1199,6 @@ public class VelocityBalancer
         }
 
         //TEMP
-        addToMessages("", SchedulingConstants.MESSAGE_TYPE_WARN);
         addToMessages("MULTI-BALANCED SCHEDULE", SchedulingConstants.MESSAGE_TYPE_WARN);
         
         // Printing out the relative velocities per event
@@ -1233,7 +1223,7 @@ public class VelocityBalancer
                 state = nextState;
             }
             while (!nextState.isAccepting());
-            addToMessages("\t\t Rel. velocities per event in Rob_" + plantNr + " : "+ velPerPlantStr.trim(), 
+            addToMessages("\tRel. velocities per event in Rob_" + plantNr + " : "+ velPerPlantStr.trim(), 
                     SchedulingConstants.MESSAGE_TYPE_WARN);
         }
         
@@ -1260,11 +1250,10 @@ public class VelocityBalancer
                 str += roundOff(keyPoints.get(i)[j], 2) + " ";
             }
             str = str.trim() + "'";
-            addToMessages("\t\t " + str, SchedulingConstants.MESSAGE_TYPE_WARN);
+            addToMessages("\t" + str, SchedulingConstants.MESSAGE_TYPE_WARN);
         }
         
-        addToMessages("Key points (after): ", SchedulingConstants.MESSAGE_TYPE_WARN);
-        String str = "";
+        String str = "Key points (adjusted):\n\t";
         for (int i=0; i<keyPoints.size(); i++)
         {
             for (int j=0; j<keyPoints.get(i).length; j++)
@@ -1273,7 +1262,7 @@ public class VelocityBalancer
             }
             str += " --> ";
         }
-        addToMessages("\t\t " + str, SchedulingConstants.MESSAGE_TYPE_WARN);
+        addToMessages(str, SchedulingConstants.MESSAGE_TYPE_INFO);
         
         return relativeVelocities;
     }
@@ -1798,9 +1787,18 @@ public class VelocityBalancer
     
     private void addToMessages(String str, int msgType)
     {
+        addToMessages(str, msgType, true);
+    }
+        
+    private void addToMessages(String str, int msgType, boolean linebreak)
+    {
         if (callingScheduler != null)
         {
-            callingScheduler.addToMessages(str + "\n", msgType);
+            if (linebreak)
+            {
+                str += "\n";
+            }
+            callingScheduler.addToMessages(str, msgType);
         }
         else
         {
