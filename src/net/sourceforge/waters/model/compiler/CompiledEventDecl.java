@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.compiler
 //# CLASS:   CompiledEventDecl
 //###########################################################################
-//# $Id: CompiledEventDecl.java,v 1.6 2008-04-21 21:58:25 robi Exp $
+//# $Id: CompiledEventDecl.java,v 1.7 2008-04-21 22:54:29 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.compiler;
@@ -107,7 +107,12 @@ class CompiledEventDecl
   {
     EventValue result = mIndexValueMap.get(indexes);
     if (result == null) {
-      final List<IndexValue> indexcopy = new ArrayList<IndexValue>(indexes);
+      final List<IndexValue> indexcopy;
+      if (indexes.isEmpty()) {
+        indexcopy = Collections.emptyList();
+      } else {
+        indexcopy = new ArrayList<IndexValue>(indexes);
+      }
       if (indexes.size() < mRanges.size()) {
 	result = new CompiledArrayEventValue(this, indexcopy);
       } else {
