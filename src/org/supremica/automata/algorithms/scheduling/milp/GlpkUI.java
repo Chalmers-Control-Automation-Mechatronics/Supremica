@@ -302,17 +302,66 @@ public class GlpkUI
   
         // The constraints representing deadlocks (found as possible circular wait 
         // in connected components graph) and their antidots, unfeasible combinations 
-        // of booking variables. In many cases (if there is a buffer within a "circular wait",
-        // only unfeasible constraints are added. 
+        // of booking variables. In many cases (if there is a buffer within a potential 
+        // "circular wait", only unfeasible constraints are added.        
         counter = 0;
-        for (ArrayList<String> currConstraint : milpConstructor.getNonCrossbookingConstraints())
+        for (CircularWaitConstraintBlock currConstraint : milpConstructor.getCircularWaitConstraints())
         {
-            w.write("non_cross_" + counter++ + " : ");
-            for (int i = 0; i < currConstraint.size() - 1; i++)
-            {
-                w.write(currConstraint.get(i) + " + ");
+            boolean bufferInCycle = false;
+            String circWaitConstrStr = "circ_wait_" + counter + " : ";
+            String unfeasConstrStr = "unfeas_" + counter++ + " : ";
+            
+            for (int i = 0; i < currConstraint.size(); i++)
+            {    
+                // Retrieve the plant-zone-state-information about the current circular wait constraint part
+                int plant1 = currConstraint.get(i)[0];
+                int plant2 = currConstraint.get(i)[1];
+                int zone = currConstraint.get(i)[2];
+                int tic1 = currConstraint.get(i)[3];
+                int tic2 = currConstraint.get(i)[4];
+
+                try
+                {                                    
+                    if (plant1 < plant2)
+                    {
+                        int mutexVarIndex = milpConstructor.getMutexVarCounterMap().get(new int[]{
+                            zone, plant1, plant2, tic1, tic2}).intValue();
+                        
+                        unfeasConstrStr += "(1 - r" + plant1 + "_books_z" + zone + "_before_r" + 
+                                plant2 + "_var" + mutexVarIndex + ") + ";
+                        circWaitConstrStr += "r" + plant1 + "_books_z" + zone + "_before_r" + 
+                                plant2 + "_var" + mutexVarIndex + " + ";
+                    }
+                    else
+                    {
+                        int mutexVarIndex = milpConstructor.getMutexVarCounterMap().get(new int[]{
+                            zone, plant2, plant1, tic2, tic1}).intValue();
+                        
+                        unfeasConstrStr += "r" + plant2 + "_books_z" + zone + "_before_r" + 
+                               plant1 + "_var" + mutexVarIndex + " + ";                          
+                        circWaitConstrStr += "(1 - r" + plant2 + "_books_z" + zone + "_before_r" + 
+                               plant1 + "_var" + mutexVarIndex + ") + ";
+                    }
+               }
+               catch (NullPointerException ex)
+               {
+                   milpConstructor.addToMessages("Mutex variable with key = {" + zone + ", " + 
+                           plant1 + ", " + plant2 + ", " + tic1 + ", " + tic2 +
+                           "} not found in the variable map.", SchedulingConstants.MESSAGE_TYPE_ERROR);
+                   throw ex;
+               }   
             }
-            w.write(currConstraint.get(currConstraint.size() - 1) + " >= 1;\n");
+            // If there is a real constraint, add it to the mod.file
+            // Note that the unfeasability constraints are always valid, while 
+            // deadlocks can only occur if there is no buffer within the current cycle
+            if (!unfeasConstrStr.trim().endsWith(":"))
+            {
+                w.write(unfeasConstrStr.substring(0, unfeasConstrStr.lastIndexOf("+")).trim() + " >= 1;\n");
+            }
+            if (!currConstraint.hasBuffer() && !circWaitConstrStr.trim().endsWith(":"))
+            {
+                w.write(circWaitConstrStr.substring(0, circWaitConstrStr.lastIndexOf("+")).trim() + " >= 1;\n");
+            }
         }
         w.newLine();
         

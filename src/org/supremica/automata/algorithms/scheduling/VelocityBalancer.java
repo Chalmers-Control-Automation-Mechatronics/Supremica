@@ -10,9 +10,10 @@
 package org.supremica.automata.algorithms.scheduling;
 
 import java.util.*;
+import java.util.ArrayList;
 import org.supremica.automata.*;
 import org.supremica.automata.algorithms.*;
-import org.supremica.automata.algorithms.scheduling.milp.IntArrayTreeSet;
+import org.supremica.automata.algorithms.scheduling.milp.*;
 import org.supremica.log.Logger;
 import org.supremica.log.LoggerFactory;
 import org.supremica.petrinet.Place;
@@ -142,8 +143,26 @@ public class VelocityBalancer
                     tempStr = tempStr.trim() + "] ";           
                 }
             }
-        }        
-        
+        }   
+        tempStr += "\nDeadlock limits: \n\t";
+        for (int i = 0; i < deadlockLimitsNew.length; i++) 
+        {
+            for (int j = 0; j < deadlockLimitsNew[i].length; j++)
+            {
+                tempStr += "i = " + i + ", j = " + j + ": ";
+                for (double[] lim : deadlockLimitsNew[i][j])
+                {
+                    tempStr += "[";
+                    for (int k = 0; k < lim.length; k++)
+                    {
+                        tempStr += lim[k] + " ";
+                    }
+                    tempStr = tempStr.trim() + "] ";           
+                }
+            }
+        }
+
+
         // Creates a test problem. This is a temporary construction
 //        makeTestPath();
 
@@ -509,7 +528,7 @@ public class VelocityBalancer
         
         Automata plantsAndSpecs = new Automata(optimalSubPlants);
         plantsAndSpecs.addAutomata(specs);
-        findDeadlockLimits(plantsAndSpecs);
+        findDeadlockLimits(plantsAndSpecs); 
         
         // Transfer the info about firing and simulation times from temporary containers
         // into more lasting ones. 
@@ -525,208 +544,403 @@ public class VelocityBalancer
         }   
     }
     
-    private void findDeadlockLimits(Automata plantsAndSpecs)
-        throws Exception
-    {        
-        AutomataSynchronizer synchronizer = new AutomataSynchronizer(plantsAndSpecs, SynchronizationOptions.getDefaultSynchronizationOptions());
-        synchronizer.execute();
-        Automaton synthAuto = synchronizer.getAutomaton();
-        synthAuto.setName("Plants||Specs");
-        synthAuto.setType(AutomatonType.PLANT);
-                
-        AutomataIndexMap synthIndexMap = new AutomataIndexMap(new Automata(synthAuto));
-        
-        // Contains the indices of allowed states that lead to a forbidden state in one transition,
-        // together with the indices of the events leading to a forbidden state, i.e. one entry is 
-        // [border_allowed_state_index, event_leading_to_forbidden_state_index].
-        IntArrayTreeSet borderAllowedStates = new IntArrayTreeSet();
-        
-        ArrayList<State> listOfForbiddenRegionRoots = new ArrayList<State>();
-        for (Iterator<State> stateIt = synthAuto.stateIterator(); stateIt.hasNext();)
-        {
-            State state = stateIt.next();
-            if (state.isForbidden())
-            { 
-                boolean isRootOfForbiddenRegion = true;
-                for (Iterator<Arc> incomingArcIt = state.incomingArcsIterator(); incomingArcIt.hasNext();)
-                {
-                    Arc incomingArc = incomingArcIt.next();
-                
-                    if (incomingArc.getFromState().isForbidden())
-                    {
-                        isRootOfForbiddenRegion = false;
-                    }
-                    else
-                    {
-                        borderAllowedStates.add(new int[]{synthIndexMap.getStateIndex(synthAuto, incomingArc.getFromState()), 
-                            synthIndexMap.getEventIndex(incomingArc.getEvent())});
-                    }
-                }
-                
-                if (isRootOfForbiddenRegion)
-                {   
-                    listOfForbiddenRegionRoots.add(state);
-                }
-            }
-        }
-        
-        // Create the deadlock limit array
-        deadlockLimitsNew = new ArrayList[listOfForbiddenRegionRoots.size()][plants.size()];
-        
-        for (int j = 0; j < listOfForbiddenRegionRoots.size(); j++)
-        {
-            for (int k = 0; k < deadlockLimitsNew[j].length; k++)
-            {
-                deadlockLimitsNew[j][k] = new ArrayList<double[]>();
-            }
-            
-            State state = listOfForbiddenRegionRoots.get(j);
-                
-//                    // This array contains true values for each plant that is involved in a deadlock in current forbidden state
-//                    boolean[] isLockedPlant = new boolean[plants.size()];
-//                    for (int i = 0; i < isLockedPlant.length; i++)
+//    private void findDeadlockLimits(Automata plantsAndSpecs)
+//        throws Exception
+//    {        
+//        AutomataSynchronizer synchronizer = new AutomataSynchronizer(plantsAndSpecs, SynchronizationOptions.getDefaultSynchronizationOptions());
+//        synchronizer.execute();
+//        Automaton synthAuto = synchronizer.getAutomaton();
+//        synthAuto.setName("Plants||Specs");
+//        synthAuto.setType(AutomatonType.PLANT);
+//                
+//        AutomataIndexMap synthIndexMap = new AutomataIndexMap(new Automata(synthAuto));
+//        
+//        // Contains the indices of allowed states that lead to a forbidden state in one transition,
+//        // together with the indices of the events leading to a forbidden state, i.e. one entry is 
+//        // [border_allowed_state_index, event_leading_to_forbidden_state_index].
+//        IntArrayTreeSet borderAllowedStates = new IntArrayTreeSet();
+//        
+//        ArrayList<State> listOfForbiddenRegionRoots = new ArrayList<State>();
+//               
+//        for (Iterator<State> stateIt = synthAuto.stateIterator(); stateIt.hasNext();)
+//        {
+//            State state = stateIt.next();
+//            if (state.isDeadlock())
+//            { 
+//                //temp
+//                addToMessages("Found deadlock state = " + state.getName(), SchedulingConstants.MESSAGE_TYPE_ERROR);
+//                
+//                boolean isRootOfForbiddenRegion = true;
+//                for (Iterator<Arc> incomingArcIt = state.incomingArcsIterator(); incomingArcIt.hasNext();)
+//                {
+//                    Arc incomingArc = incomingArcIt.next();                   
+//                    if (incomingArc.getFromState().isForbidden())
 //                    {
-//                        isLockedPlant[i] = false;
+//                        isRootOfForbiddenRegion = false;
 //                    }
-//                    // Set isLockedPlant[i] to true if there is an event belonging to plants[i] leading to the root of 
-//                    // the current forbidden region
-//                    for (Iterator<Arc> incomingArcIt = state.incomingArcsIterator(); incomingArcIt.hasNext();)
+//                    else
 //                    {
-//                        LabeledEvent incomingEvent = incomingArcIt.next().getEvent();
-//                        for (int i = 0; i < plants.size(); i++)
+//                        borderAllowedStates.add(new int[]{synthIndexMap.getStateIndex(synthAuto, incomingArc.getFromState()), 
+//                            synthIndexMap.getEventIndex(incomingArc.getEvent())});
+//                    }
+//                }
+//                
+//                if (isRootOfForbiddenRegion)
+//                {   
+//                    listOfForbiddenRegionRoots.add(state);
+//                }
+//            }
+//        }
+//        
+//        // Create the deadlock limit array
+//        deadlockLimitsNew = new ArrayList[listOfForbiddenRegionRoots.size()][plants.size()];
+//        
+//        for (int j = 0; j < listOfForbiddenRegionRoots.size(); j++)
+//        {
+//            for (int k = 0; k < deadlockLimitsNew[j].length; k++)
+//            {
+//                deadlockLimitsNew[j][k] = new ArrayList<double[]>();
+//            }
+//            
+//            State state = listOfForbiddenRegionRoots.get(j);
+//                
+////                    // This array contains true values for each plant that is involved in a deadlock in current forbidden state
+////                    boolean[] isLockedPlant = new boolean[plants.size()];
+////                    for (int i = 0; i < isLockedPlant.length; i++)
+////                    {
+////                        isLockedPlant[i] = false;
+////                    }
+////                    // Set isLockedPlant[i] to true if there is an event belonging to plants[i] leading to the root of 
+////                    // the current forbidden region
+////                    for (Iterator<Arc> incomingArcIt = state.incomingArcsIterator(); incomingArcIt.hasNext();)
+////                    {
+////                        LabeledEvent incomingEvent = incomingArcIt.next().getEvent();
+////                        for (int i = 0; i < plants.size(); i++)
+////                        {
+////                            if (!isLockedPlant[i]) // No need to check plants that are already detected to be involved in deadlock
+////                            {
+////                                if (plants.getAutomatonAt(i).getAlphabet().contains(incomingEvent))
+////                                {
+////                                    isLockedPlant[i] = true;
+////                                }
+////                            }
+////                        }
+////                    }
+//
+//
+////            double[] minDLLimit = new double[plants.size()];
+////            double[] maxDLLimit = new double[plants.size()];
+////            for (int i = 0; i < minDLLimit.length; i++)
+////            {
+////                minDLLimit[i] = Double.MAX_VALUE;
+////                maxDLLimit[i] = 0;
+////            }
+//
+//            for (Iterator<Arc> incomingArcIt = state.incomingArcsIterator(); incomingArcIt.hasNext();)
+//            {
+//                Arc incomingArc = incomingArcIt.next();
+//                LabeledEvent incomingEvent = incomingArc.getEvent();
+//
+//                for (int i = 0; i < plants.size(); i++)
+//                {
+//                    Automaton auto = plantsAndSpecs.getPlantAutomata().getAutomatonAt(plantIndexMapping[i]);
+//                    if (auto.getAlphabet().contains(incomingArc.getEvent()))
+//                    {
+//                        for (Iterator<State> stIt = auto.stateIterator(); stIt.hasNext();)
 //                        {
-//                            if (!isLockedPlant[i]) // No need to check plants that are already detected to be involved in deadlock
+//                            State stateInAuto = stIt.next();
+//                            if (stateInAuto.activeEvents(false).contains(incomingEvent))
 //                            {
-//                                if (plants.getAutomatonAt(i).getAlphabet().contains(incomingEvent))
+//                                double currMinDLLimit = 0;
+//
+//                                //Assumes that the number of incoming transitions is one in this state
+//                                while (!stateInAuto.isInitial())
 //                                {
-//                                    isLockedPlant[i] = true;
+//                                    currMinDLLimit += stateInAuto.getCost();
+//                                    stateInAuto = stateInAuto.incomingArcsIterator().next().getFromState();
+//                                }   
+//                                currMinDLLimit += stateInAuto.getCost();
+//
+//                                int nrOfAddedDLLimits = deadlockLimitsNew[j][i].size();
+//                                if ((nrOfAddedDLLimits > 0) && (deadlockLimitsNew[j][i].get(nrOfAddedDLLimits - 1)[0] == -1))
+//                                {
+//                                    deadlockLimitsNew[j][i].get(nrOfAddedDLLimits - 1)[0] = currMinDLLimit;
+//                                }
+//                                else 
+//                                {
+//                                    deadlockLimitsNew[j][i].add(new double[]{currMinDLLimit, -1});
+//                                } 
+//                                
+////                                if (minDLLimit[i] > currMinDLLimit)
+////                                {
+////                                    minDLLimit[i] = currMinDLLimit;
+////                                }
+//                            }
+//                        }
+//                    }
+//                }                        
+//
+//                ArrayList<State> stackOfAllowedStates = new ArrayList<State>();
+//                stackOfAllowedStates.add(incomingArc.getFromState());
+//                while (!stackOfAllowedStates.isEmpty())
+//                {
+//                    State allowedState = stackOfAllowedStates.remove(0);
+//                    for (Iterator<Arc> arcIt = allowedState.outgoingArcsIterator(); arcIt.hasNext();)
+//                    {
+//                        Arc arc = arcIt.next();
+//                        if (!arc.getEvent().equals(incomingEvent))
+//                        {
+//                            State nextState = arc.getToState();
+//                            if (borderAllowedStates.get(new int[]{synthIndexMap.getStateIndex(synthAuto, nextState),
+//                                                                    synthIndexMap.getEventIndex(incomingArc.getEvent())}) != null)
+//                            {
+//                                stackOfAllowedStates.add(nextState);
+//                            }
+//                            else
+//                            {
+//                                for (int i = 0; i < plants.size(); i++)
+//                                {
+//                                    Automaton auto = plantsAndSpecs.getPlantAutomata().getAutomatonAt(plantIndexMapping[i]);
+//                                    if (auto.getAlphabet().contains(arc.getEvent()))
+//                                    {
+//                                        for (Iterator<State> stIt = auto.stateIterator(); stIt.hasNext();)
+//                                        {
+//                                            State stateInAuto = stIt.next();
+//                                            if (stateInAuto.activeEvents(false).contains(arc.getEvent()))
+//                                            {
+//                                                double currMaxDLLimit = 0;
+//
+//                                                // Assumes that the number of incoming transitions is one in this state
+//                                                while (!stateInAuto.isInitial())
+//                                                {
+//                                                    currMaxDLLimit += stateInAuto.getCost();
+//                                                    stateInAuto = stateInAuto.incomingArcsIterator().next().getFromState();
+//                                                }   
+//                                                currMaxDLLimit += stateInAuto.getCost();
+//
+//                                                int nrOfAddedDLLimits = deadlockLimitsNew[j][i].size();
+//                                                if ((nrOfAddedDLLimits > 0) && (deadlockLimitsNew[j][i].get(nrOfAddedDLLimits - 1)[1] == -1))
+//                                                {
+//                                                    deadlockLimitsNew[j][i].get(nrOfAddedDLLimits - 1)[1] = currMaxDLLimit;
+//                                                }
+//                                                else 
+//                                                {
+//                                                    deadlockLimitsNew[j][i].add(new double[]{-1, currMaxDLLimit});
+//                                                } 
+//                                                
+////                                                if (maxDLLimit[i] < currMaxDLLimit)
+////                                                {
+////                                                    maxDLLimit[i] = currMaxDLLimit;
+////                                                }
+//                                            }
+//                                        }
+//                                    }
 //                                }
 //                            }
 //                        }
 //                    }
-
-
-//            double[] minDLLimit = new double[plants.size()];
-//            double[] maxDLLimit = new double[plants.size()];
-//            for (int i = 0; i < minDLLimit.length; i++)
-//            {
-//                minDLLimit[i] = Double.MAX_VALUE;
-//                maxDLLimit[i] = 0;
+//                }  
 //            }
-
-            for (Iterator<Arc> incomingArcIt = state.incomingArcsIterator(); incomingArcIt.hasNext();)
-            {
-                Arc incomingArc = incomingArcIt.next();
-                LabeledEvent incomingEvent = incomingArc.getEvent();
-
-                for (int i = 0; i < plants.size(); i++)
-                {
-                    Automaton auto = plantsAndSpecs.getPlantAutomata().getAutomatonAt(plantIndexMapping[i]);
-                    if (auto.getAlphabet().contains(incomingArc.getEvent()))
-                    {
-                        for (Iterator<State> stIt = auto.stateIterator(); stIt.hasNext();)
-                        {
-                            State stateInAuto = stIt.next();
-                            if (stateInAuto.activeEvents(false).contains(incomingEvent))
-                            {
-                                double currMinDLLimit = 0;
-
-                                //Assumes that the number of incoming transitions is one in this state
-                                while (!stateInAuto.isInitial())
-                                {
-                                    currMinDLLimit += stateInAuto.getCost();
-                                    stateInAuto = stateInAuto.incomingArcsIterator().next().getFromState();
-                                }   
-                                currMinDLLimit += stateInAuto.getCost();
-
-                                int nrOfAddedDLLimits = deadlockLimitsNew[j][i].size();
-                                if ((nrOfAddedDLLimits > 0) && (deadlockLimitsNew[j][i].get(nrOfAddedDLLimits - 1)[0] == -1))
-                                {
-                                    deadlockLimitsNew[j][i].get(nrOfAddedDLLimits - 1)[0] = currMinDLLimit;
-                                }
-                                else 
-                                {
-                                    deadlockLimitsNew[j][i].add(new double[]{currMinDLLimit, -1});
-                                } 
-                                
-//                                if (minDLLimit[i] > currMinDLLimit)
-//                                {
-//                                    minDLLimit[i] = currMinDLLimit;
-//                                }
-                            }
-                        }
-                    }
-                }                        
-
-                ArrayList<State> stackOfAllowedStates = new ArrayList<State>();
-                stackOfAllowedStates.add(incomingArc.getFromState());
-                while (!stackOfAllowedStates.isEmpty())
-                {
-                    State allowedState = stackOfAllowedStates.remove(0);
-                    for (Iterator<Arc> arcIt = allowedState.outgoingArcsIterator(); arcIt.hasNext();)
-                    {
-                        Arc arc = arcIt.next();
-                        if (!arc.getEvent().equals(incomingEvent))
-                        {
-                            State nextState = arc.getToState();
-                            if (borderAllowedStates.get(new int[]{synthIndexMap.getStateIndex(synthAuto, nextState),
-                                                                    synthIndexMap.getEventIndex(incomingArc.getEvent())}) != null)
-                            {
-                                stackOfAllowedStates.add(nextState);
-                            }
-                            else
-                            {
-                                for (int i = 0; i < plants.size(); i++)
-                                {
-                                    Automaton auto = plantsAndSpecs.getPlantAutomata().getAutomatonAt(plantIndexMapping[i]);
-                                    if (auto.getAlphabet().contains(arc.getEvent()))
-                                    {
-                                        for (Iterator<State> stIt = auto.stateIterator(); stIt.hasNext();)
-                                        {
-                                            State stateInAuto = stIt.next();
-                                            if (stateInAuto.activeEvents(false).contains(arc.getEvent()))
-                                            {
-                                                double currMaxDLLimit = 0;
-
-                                                // Assumes that the number of incoming transitions is one in this state
-                                                while (!stateInAuto.isInitial())
-                                                {
-                                                    currMaxDLLimit += stateInAuto.getCost();
-                                                    stateInAuto = stateInAuto.incomingArcsIterator().next().getFromState();
-                                                }   
-                                                currMaxDLLimit += stateInAuto.getCost();
-
-                                                int nrOfAddedDLLimits = deadlockLimitsNew[j][i].size();
-                                                if ((nrOfAddedDLLimits > 0) && (deadlockLimitsNew[j][i].get(nrOfAddedDLLimits - 1)[1] == -1))
-                                                {
-                                                    deadlockLimitsNew[j][i].get(nrOfAddedDLLimits - 1)[1] = currMaxDLLimit;
-                                                }
-                                                else 
-                                                {
-                                                    deadlockLimitsNew[j][i].add(new double[]{-1, currMaxDLLimit});
-                                                } 
-                                                
-//                                                if (maxDLLimit[i] < currMaxDLLimit)
-//                                                {
-//                                                    maxDLLimit[i] = currMaxDLLimit;
-//                                                }
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }  
+//            
+////            String dlStr = "State " + state.getName() + " is the root of forbidden region...\n";
+////            for (int i = 0; i < maxDLLimit.length; i++)
+////            {
+////                dlStr += "\t[" + minDLLimit[i] + " " + maxDLLimit[i] + "]";
+////            }
+////            logger.info(dlStr);
+//        } 
+//
+//        //temp
+//        addToMessages("CIRCULAR WAIT LIMITS : ", SchedulingConstants.MESSAGE_TYPE_WARN);
+//        for (int i = 0; i < deadlockLimitsNew.length; i++)
+//        {
+//            for (int j = 0; j < deadlockLimitsNew[i].length; j++)
+//            {
+//                for (double[] limit : deadlockLimitsNew[i][j])
+//                {
+//                    String tstr = "DL_limit : ";
+//                    for (int k = 0; k < limit.length; k++)
+//                    {
+//                        tstr += limit[k] + " ";
+//                    }
+//
+//                    addToMessages(tstr, SchedulingConstants.MESSAGE_TYPE_WARN);
+//                }
+//            }
+//        }
+//    }
+    
+    private void findDeadlockLimits(Automata plantsAndSpecs)
+        throws Exception
+    {
+        AutomataIndexMap map = new AutomataIndexMap(plantsAndSpecs);
+        ArrayList<int[]>[] edges = new ArrayList[plantsAndSpecs.getSpecificationAutomata().size()];
+        for (int specIndex = 0; specIndex < edges.length; specIndex++)
+        {
+            edges[specIndex] = new ArrayList<int[]>();
+        }
+        
+        for (int plantIndex = 0; plantIndex < plantsAndSpecs.getPlantAutomata().size(); plantIndex++)
+        {
+            Automaton plant = plantsAndSpecs.getPlantAutomata().getAutomatonAt(plantIndex);
+            Alphabet[] bookingAlphabets = new Alphabet[edges.length];
+            Alphabet[] unbookingAlphabets = new Alphabet[edges.length];
+            
+            for (int specIndex = 0; specIndex < edges.length; specIndex++)
+            {            
+                Alphabet commonAlphabet = AlphabetHelpers.intersect(plant.getAlphabet(), 
+                        plantsAndSpecs.getSpecificationAutomata().getAutomatonAt(specIndex).getAlphabet());
+                bookingAlphabets[specIndex] = AlphabetHelpers.intersect(commonAlphabet, 
+                        plantsAndSpecs.getSpecificationAutomata().getAutomatonAt(specIndex).getInitialState().activeEvents(false));
+                unbookingAlphabets[specIndex] = AlphabetHelpers.minus(commonAlphabet, bookingAlphabets[specIndex]);
             }
             
-//            String dlStr = "State " + state.getName() + " is the root of forbidden region...\n";
-//            for (int i = 0; i < maxDLLimit.length; i++)
+            State state = plant.getInitialState();
+            int zoneIndex1 = -1;
+            int stateIndex1 = -1;
+            int intermediateUnbooking = 0;
+            
+            do
+            {
+                boolean bookingFound = false;
+                Arc arc = state.outgoingArcsIterator().next(); // Note that the plants should have exactly one outgoing arc per state
+                
+                for (int j = 0; j < bookingAlphabets.length; j++)
+                {
+                    if (bookingAlphabets[j] != null && bookingAlphabets[j].contains(arc.getEvent()))
+                    {
+                        int zoneIndex2 = j;
+                        int stateIndex2 = map.getStateIndex(plant, state);
+                        
+                        if (zoneIndex1 != -1)
+                        {
+                            edges[zoneIndex1].add(new int[]{zoneIndex2, plantIndex, stateIndex1, stateIndex2, intermediateUnbooking});
+                        }
+                        
+                        zoneIndex1 = zoneIndex2;
+                        stateIndex1 = stateIndex2;
+                        intermediateUnbooking = 0;
+                        bookingFound = true;
+                        
+                        break;
+                    }
+                }
+                
+                if (!bookingFound && zoneIndex1 > -1 && unbookingAlphabets[zoneIndex1].contains(arc.getEvent()))
+                {
+                    intermediateUnbooking = 1;
+                }
+                
+                state = arc.getToState();
+            } 
+            while (! state.isAccepting());
+        }
+        
+        for (int i = 0; i < edges.length; i++)
+        {
+            for (int[] is : edges[i])
+            {
+                addToMessages("p" + is[1] + " in z" + i + " (q" + is[2] + ") -> z" + is[0] +
+                        " (q" + is[3] + "), bufferExists = " + is[4], SchedulingConstants.MESSAGE_TYPE_ERROR);
+            }
+        }
+        
+        ConnectedComponentsGraph cycleFinder = new ConnectedComponentsGraph(edges, plantsAndSpecs.getPlantAutomata().size());
+        ArrayList<ArrayList<ConnectedComponentEdge>> cycles = cycleFinder.enumerateAllCycles();
+        for (ArrayList<ConnectedComponentEdge> cycle : cycles)
+        {
+            // For each edge in the current rainbow cycle
+            boolean bufferInCycle = false;
+            String str = "";
+            for (int i = 0; i < cycle.size(); i++)
+            {
+                ConnectedComponentEdge precedingEdge;
+                if (i != 0)
+                {
+                    precedingEdge = cycle.get(i-1);
+                } 
+                else
+                {
+                    precedingEdge = cycle.get(cycle.size() - 1);
+                }
+
+                // Convert the information stored in the edge into plant-state-bookingtic-form
+                int zoneIndex = cycle.get(i).getFromVertice().getVerticeIndex();
+                int plantIndex1 = precedingEdge.getColor();
+                int plantIndex2 = cycle.get(i).getColor();
+                int stateIndex1 = precedingEdge.getToTic(); // In this case the tic are equivalent to tics
+                int stateIndex2 = cycle.get(i).getFromTic();
+                
+                // Remember that this cycle contains buffers if one is found on any edge 
+                if (cycle.get(i).getBufferExists())
+                {
+                    bufferInCycle = true;                    
+                } 
+
+                State minLimState = map.getStateAt(plantsAndSpecs.getAutomatonAt(plantIndex2), stateIndex2);
+                int accCost = 0;
+                int minLimCost = -1;
+                int maxLimCost = -1;
+                State state = plantsAndSpecs.getAutomatonAt(plantIndex2).getInitialState();
+                do
+                {                    
+                    accCost += state.getCost();
+                    
+                    if (minLimCost > -1)
+                    {
+                        LabeledEvent event = state.outgoingArcsIterator().next().getEvent();
+                        if (plantsAndSpecs.getAutomatonAt(zoneIndex).getAlphabet().contains(event))
+                        {
+                            maxLimCost = accCost;
+                            break;
+                        }
+                    }
+                    
+                    if (state.equals(minLimState))
+                    {
+                        minLimCost = accCost;
+                    }
+                    
+                    state = state.nextStateIterator().next();
+                } 
+                while (! state.isAccepting());
+                
+                str += "p" + plantIndex2 + " books z" + zoneIndex + " from q" + stateIndex2 + 
+                        ", mutex = [" + minLimCost + ", " + maxLimCost + "]\n";   
+            }
+            
+            if (!bufferInCycle)
+            {
+                addToMessages("Circular wait found as: ", SchedulingConstants.MESSAGE_TYPE_ERROR);
+                addToMessages(str, SchedulingConstants.MESSAGE_TYPE_ERROR);
+            }
+         }
+
+//
+//    
+//        if (callingScheduler instanceof Milp)
+//        {
+//            ArrayList<CircularWaitConstraintBlock> circWaitConstraints = ((Milp) callingScheduler).getCircularWaitConstraints();
+//            for (CircularWaitConstraintBlock currConstraintBlock : circWaitConstraints)
 //            {
-//                dlStr += "\t[" + minDLLimit[i] + " " + maxDLLimit[i] + "]";
+//                if (! currConstraintBlock.hasBuffer())
+//                {
+//                    for (int[] plantStateInfo : currConstraintBlock)
+//                    {
+//                        int plantIndex = plantStateInfo[0];
+//                        int ticIndex = plantStateInfo[3];
+//                        int stateIndex = 
+//                    }
+//                }
 //            }
-//            logger.info(dlStr);
-        } 
+//
+//
+//        }
+//        else
+//        {
+//            addToMessages("The deadlock search has not yet been implemented for non-MILP schedulers", 
+//                    SchedulingConstants.MESSAGE_TYPE_ERROR);
+//        }
     }
 
     /**

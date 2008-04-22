@@ -167,19 +167,20 @@ public class MpsUI
             
             bUpper.add(new Double(rhs));
         }
-        
-        // The non-crossbooking constraints
-        for (ArrayList<String> currConstraint : milpConstructor.getNonCrossbookingConstraints())
-        {
-            String constrBody = "";
-            for (int i = 0; i < currConstraint.size() - 1; i++)
-            {
-                constrBody += currConstraint.get(i) + " + ";
-            }
-            constrBody += currConstraint.get(currConstraint.size() - 1) + " >= 1";
-            
-            processConstraintString(constrBody, constraintCounter++);
-        }
+  
+// TODO: Add circWaitConstraints to the mps-files        
+//        // The non-crossbooking constraints
+//        for (ArrayList<String> currConstraint : milpConstructor.getNonCrossbookingConstraints())
+//        {
+//            String constrBody = "";
+//            for (int i = 0; i < currConstraint.size() - 1; i++)
+//            {
+//                constrBody += currConstraint.get(i) + " + ";
+//            }
+//            constrBody += currConstraint.get(currConstraint.size() - 1) + " >= 1";
+//            
+//            processConstraintString(constrBody, constraintCounter++);
+//        }
         
         // The shared events constraints (a block of constrains for each shared event)
         for (ArrayList<ArrayList<ArrayList<int[]>>> eventBlock : milpConstructor.getSharedEventConstraints())

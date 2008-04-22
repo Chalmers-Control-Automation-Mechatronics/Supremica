@@ -5,12 +5,8 @@ import java.io.*;
 
 import org.supremica.automata.*;
 import org.supremica.automata.algorithms.*;
-import org.supremica.automata.algorithms.scheduling.SchedulingConstants;
+import org.supremica.automata.algorithms.scheduling.*;
 import org.supremica.util.ActionTimer;
-import org.supremica.automata.algorithms.scheduling.Scheduler;
-import org.supremica.automata.algorithms.scheduling.SchedulingHelper;
-import org.supremica.automata.algorithms.scheduling.SynchronizationStepper;
-import org.supremica.automata.algorithms.scheduling.VelocityBalancer;
 
 //TODO (always): Structure the code. Comment better.
 public class Milp
@@ -177,15 +173,21 @@ public class Milp
     private String externalConstraints = "";
     
     /**
-     * The constraints preventing cross-booking of zone pairs. When R_i first
-     * books Z_k and then Z_l (without unbooking Z_k), while R_j does the reverse
-     * (Z_l -> Z_k), the robot robot ordering should then be the same for Z_k and
+     * The constraints preventing circular wait situations du to cross-booking of 
+     * zones. A simple example of this is when R_i first books Z_k and then Z_l 
+     * (without unboking Z_k), while R_j does the reverse (Z_l -> Z_k), 
+     * the robot robot ordering should then be the same for Z_k and
      * Z_l to avoid deadlock. This is taken care of during the optimization, but
      * with the help of these constraints, the search field is narrowed, which
      * should decrease the running time. Also, approximative solutions are easier
-     * to obtains using these constraints.
+     * to obtains using these constraints. 
+     * 
+     * Each CircularWaitConstraintBlock contains a list of int[]-objects and a boolean.
+     * The boolean keeps track of whether any buffer corresponds to the current
+     * constraint, while each int[] consists of the following indices: 
+     * [plant1, plant2, zone, bookingTicPlant1, bookingTicPlant2].
      */
-    private ArrayList<ArrayList<String>> nonCrossbookingConstraints = null;
+    private ArrayList<CircularWaitConstraintBlock> circularWaitConstraints = null;
     
     /*
      * The thread that performs the search for the optimal solution
@@ -320,7 +322,7 @@ public class Milp
             //TODO: better name... better implementation...
             ActionTimer at = new ActionTimer();
             at.start();
-            createNonCrossbookingConstraints();
+            createCircularWaitConstraints();
             at.stop();
             addToMessages("Time for the creation of noncrossbooking constraints = " + 
                     at.elapsedTime() + "ms", SchedulingConstants.MESSAGE_TYPE_INFO);
@@ -669,7 +671,7 @@ public class Milp
         mutexConstraints = new ArrayList<Constraint>();
         altPathsConstraints = new ArrayList<Constraint>();
         xorConstraints = new ArrayList<ArrayList<int[]>>();
-        nonCrossbookingConstraints = new ArrayList<ArrayList<String>>();
+        circularWaitConstraints = new ArrayList<CircularWaitConstraintBlock>();
         sharedEventConstraints = new ArrayList<ArrayList<ArrayList<ArrayList<int[]>>>>();
         
         pathCutTable = new Hashtable<State,String>();
@@ -2002,7 +2004,7 @@ public class Milp
      * Of course, the situation is identical if the robots book the zones in the same order,
      * the important thing here is that there is no unbooking between the zones.
      */
-    private void createNonCrossbookingConstraints()
+    private void createCircularWaitConstraints()
     throws Exception
     {
         // Connectivity-test
@@ -2060,12 +2062,7 @@ public class Milp
             }
         }
         
-        
-        
-        
-        
-        
-        
+        // Är följande gamla kommentarer? /AK - 080422
         // TODO: sigue leendo... (UNDER CONSTRUCTION...)
         // Denna for-slinga �r n�stan en upprepning av det som g�rs l�ngre ner
         // (m�ste komma h�r f�r att f� med ALLA bEventPar och inte bara de �verlappande).
@@ -2079,28 +2076,22 @@ public class Milp
 //            consecutiveBookingTicsIndices.keySet().toArray(new int[][]{}));
 //        graphExplorer.findConnectedCycles();
         // Sanity-check...
-        BookingPairsGraphExplorer cycleFinder =  
-                new BookingPairsGraphExplorer(consecutiveBookingEdges, plants.size());
         
-       ArrayList<ArrayList<Edge>> rainbowCycles = cycleFinder.enumerateAllCycles();
-       for (ArrayList<Edge> cycle : rainbowCycles)
-       {
-           ArrayList<String> deadlockConstraint = new ArrayList<String>();
-           ArrayList<String> unfeasibilityConstraint = new ArrayList<String>();
-           
-//           String str = "";
-//           for (Edge e : cycle)
-//           {
-//               str += "v" + e.getFromVertice().getVerticeIndex() + " -> c" + e.getColor() + " -> ";
-//           }
-//           addToMessages(str, SchedulingConstants.MESSAGE_TYPE_WARN);
-           
+        // Create a graph explorer
+        ConnectedComponentsGraph cycleFinder =  
+                new ConnectedComponentsGraph(consecutiveBookingEdges, plants.size());
+        
+        // Find and enumerate all cycles where every edge is of different color
+        ArrayList<ArrayList<ConnectedComponentEdge>> rainbowCycles = cycleFinder.enumerateAllCycles();
+        for (ArrayList<ConnectedComponentEdge> cycle : rainbowCycles)
+        {
+           CircularWaitConstraintBlock currCircularWaitConstraints = new CircularWaitConstraintBlock();
            boolean bufferInCycle = false;
-//           str = "Problems if: ";
-//           String probStr = "Problematic variable combination:\n";
+
+           // For each edge in the current rainbow cycle
            for (int i = 0; i < cycle.size(); i++)
            {
-               Edge precedingEdge;
+               ConnectedComponentEdge precedingEdge;
                if (i != 0)
                {
                    precedingEdge = cycle.get(i-1);
@@ -2109,73 +2100,29 @@ public class Milp
                {
                    precedingEdge = cycle.get(cycle.size() - 1);
                }
-               
+
+               // Convert the information stored in the edge into plant-state-bookingtic-form
                int zoneIndex = cycle.get(i).getFromVertice().getVerticeIndex();
                int firstPlantIndex = precedingEdge.getColor();
                int secondPlantIndex = cycle.get(i).getColor();
                int firstTic = precedingEdge.getToTic();
                int secondTic = cycle.get(i).getFromTic();
                
-               try
-               {
-                   if (firstPlantIndex < secondPlantIndex)
-                   {
-                       int repeatedBookingIndex = mutexVarCounterMap.get(new int[]{
-                           zoneIndex, firstPlantIndex, secondPlantIndex, firstTic, secondTic}).intValue();
-
-                       deadlockConstraint.add("r" + firstPlantIndex + "_books_z" + zoneIndex + "_before_r" + 
-                               secondPlantIndex + "_var" + repeatedBookingIndex);
-                       unfeasibilityConstraint.add("(1 - r" + firstPlantIndex + "_books_z" + zoneIndex + "_before_r" + 
-                               secondPlantIndex + "_var" + repeatedBookingIndex + ")");
-                   }
-                   else
-                   {
-                      int repeatedBookingIndex = mutexVarCounterMap.get(new int[]{
-                           zoneIndex, secondPlantIndex, firstPlantIndex, secondTic, firstTic}).intValue();
-
-                       deadlockConstraint.add("(1 - r" + secondPlantIndex + "_books_z" + zoneIndex + "_before_r" + 
-                               firstPlantIndex + "_var" + repeatedBookingIndex + ")");
-                       unfeasibilityConstraint.add("r" + secondPlantIndex + "_books_z" + zoneIndex + "_before_r" + 
-                               firstPlantIndex + "_var" + repeatedBookingIndex);
-                   }
-               }
-               catch (NullPointerException ex)
-               {
-                   addToMessages("Mutex variable with key = {" + zoneIndex + ", " + 
-                           firstPlantIndex + ", " + secondPlantIndex + ", " + firstTic + ", " + secondTic +
-                           "} not found in the variable map.", SchedulingConstants.MESSAGE_TYPE_ERROR);
-                   throw ex;
-               }
-                       
-               
+               // Remember that this cycle contains buffers if one is found on any edge 
                if (cycle.get(i).getBufferExists())
                {
-                   bufferInCycle = true;
+                   bufferInCycle = true;                    
                }
-               
-//               addToMessages("What comes first, P" + firstPlantIndex + "_books_Z" + zoneIndex + " or P" + 
-//                       secondPlantIndex + "_books_Z" + zoneIndex + "?", SchedulingConstants.MESSAGE_TYPE_WARN);
-               
-//               str += "P" + secondPlantIndex + "_books_Z" + zoneIndex + "_before_P" + 
-//                       firstPlantIndex + " AND ";
-               
-           }
-//           String notString = "";
-//           if (bufferInCycle)
-//           {
-//               notString = "NOT ";
-//           }
-//           addToMessages(str + "deadlock can " + notString + "occur!", SchedulingConstants.MESSAGE_TYPE_WARN);
-//           addToMessages(probStr + "Deadlock can " + notString + "occur!!!", SchedulingConstants.MESSAGE_TYPE_WARN);
-           
-           // Unfeasability constraints are always valid, while deadlocks can only occur
-           // if there is no buffer within the current cycle
-           nonCrossbookingConstraints.add(unfeasibilityConstraint);
-           if (! bufferInCycle)
-           {
-               nonCrossbookingConstraints.add(deadlockConstraint);
-           }
-       } 
+
+               // Add the plant-state-bookingtic-info to the current constraint block
+               currCircularWaitConstraints.add(new int[]{
+                       firstPlantIndex, secondPlantIndex, zoneIndex, firstTic, secondTic
+                   });  
+            }
+
+            currCircularWaitConstraints.setBuffer(bufferInCycle);
+            circularWaitConstraints.add(currCircularWaitConstraints);
+        } 
         
 // @Deprecated: t�nkte om...
 //                    for (int p = 0; p < plants.size(); p++)
@@ -3478,6 +3425,10 @@ public class Milp
     {
         return internalPrecVariables;
     }
+    public TreeMap<int[], Integer> getMutexVarCounterMap()
+    {
+        return mutexVarCounterMap;
+    }
     public ArrayList<int[]> getCycleTimeConstraints()
     {
         return cycleTimeConstraints;
@@ -3503,9 +3454,9 @@ public class Milp
     {
         return xorConstraints;
     }
-    public ArrayList<ArrayList<String>> getNonCrossbookingConstraints()
+    public ArrayList<CircularWaitConstraintBlock> getCircularWaitConstraints()
     {
-        return nonCrossbookingConstraints;
+        return circularWaitConstraints;
     }
     public ArrayList<ArrayList<ArrayList<ArrayList<int[]>>>> getSharedEventConstraints()
     {
@@ -3645,30 +3596,30 @@ public class Milp
 
             // Enumerate all cycles using BookingPairsGraphExplorer.java (note that the number of colors is equal to the number of states).
             // If a cycle was detected, throw exception displaying the states that are involved in the cycle(s).
-            BookingPairsGraphExplorer cycleFinder = new BookingPairsGraphExplorer(edgeInfos, edgeInfos.length);
-            ArrayList<ArrayList<Edge>> cycles = cycleFinder.enumerateAllCycles();
+            ConnectedComponentsGraph cycleFinder = new ConnectedComponentsGraph(edgeInfos, edgeInfos.length);
+            ArrayList<ArrayList<ConnectedComponentEdge>> cycles = cycleFinder.enumerateAllCycles();
             if (! cycles.isEmpty())
             {
                 String loopStr = "";
-                for (Iterator<ArrayList<Edge>> cycleIt = cycles.iterator(); cycleIt.hasNext();)
+                for (Iterator<ArrayList<ConnectedComponentEdge>> cycleIt = cycles.iterator(); cycleIt.hasNext();)
                 {
-                    loopStr += "\n -> ";
+                    loopStr += "\n-> ";
 
-                    ArrayList<Edge> cycle = cycleIt.next();
-                    for (Iterator<Edge> edgeIt = cycle.iterator(); edgeIt.hasNext();)
+                    ArrayList<ConnectedComponentEdge> cycle = cycleIt.next();
+                    for (Iterator<ConnectedComponentEdge> edgeIt = cycle.iterator(); edgeIt.hasNext();)
                     {
-                        Edge edge = edgeIt.next();
+                        ConnectedComponentEdge edge = edgeIt.next();
                         loopStr += indexMap.getStateAt(auto, edge.getToVertice().getVerticeIndex()).getName() +  " -> ";
                     }
                 }
 
-                exceptionStr += "\n Loops found in '" + auto.getName() + "':" + loopStr;
+                exceptionStr += "\nLoops found in '" + auto.getName() + "':" + loopStr;
             }
         }
         
-        if (exceptionStr != "")
+        if (!exceptionStr.equals(""))
         {
-            throw new MilpException(exceptionStr + "\n MILP-formulation impossible!");
+            throw new MilpException(exceptionStr + "\nMILP-formulation impossible!");
         }
     }
 }
