@@ -17,6 +17,7 @@ import org.supremica.automata.algorithms.scheduling.milp.*;
 import org.supremica.log.Logger;
 import org.supremica.log.LoggerFactory;
 import org.supremica.petrinet.Place;
+import org.supremica.util.ActionTimer;
 
 /**
  * Creates a new instance of VelocityBalancer
@@ -37,18 +38,21 @@ public class VelocityBalancer
     ArrayList<double[]> keyPoints = new ArrayList<double[]>();
 
     /** 
-     * Each mutexLimits-variable contains the time values 
-     * of when each plant enters and exits a zone (and null if that 
-     * never happens). 
+     * The array of mutexLimit-variables, indexed by [specIndex][plantIndex].
+     * Each variable in the array contains the time values of when a plant 
+     * books and unbookes a zone. (What if the zone is never unbooked on the current path?).
      */
-//    ArrayList[] mutexLimits = null;
-    ArrayList<double[]>[][] mutexLimitsNew =  null;
+    ArrayList<double[]>[][] mutexLimits =  null;
 
     /**
-     * Possible deadlocks give rise to forbidden time-zones.
+     * The array of circular wait limit variables, indexed by [specIndex][plantIndex].
+     * Each variable in the array contains the time values of when a plant 
+     * books the first and the second zone (or another exclusive spec) that is 
+     * involved in a circular wait situation (it seems enough to extend the limit
+     * variables to the second booking event instead of the first unbooking event,
+     * at least when at most 2 zones can be booked consecutively).
      */
-//       ArrayList[] deadlockLimits = null;
-    ArrayList<double[]>[][] deadlockLimitsNew =  null;
+    ArrayList<double[]>[][] circWaitLimits =  null;
     
     /** The indices of path points where velocities should be changed, i.e. the indices of key points. */
     ArrayList<Integer> keyPointIndices = null;
@@ -86,6 +90,9 @@ public class VelocityBalancer
     public VelocityBalancer(Automata theAutomata, Scheduler callingScheduler)
         throws Exception
     {        
+        ActionTimer timer = new ActionTimer();
+        timer.start();
+        
         this.callingScheduler = callingScheduler;
         
         // Initializes pointers to automata, time variables, indexMap, etc
@@ -94,7 +101,7 @@ public class VelocityBalancer
         // Extracts plant times from the optimal schedule - TODO: RENAME
         extractFiringTimes();
         
-//        findDeadlockLimits();
+//        FindCircWaitLimits();
         
         // Feasibility check
         String tempStr = "\n";
@@ -128,12 +135,12 @@ public class VelocityBalancer
             tempStr = tempStr.trim() + "] ";           
         }
         tempStr += "\nMutex limits: \n\t";
-        for (int i = 0; i < mutexLimitsNew.length; i++)
+        for (int i = 0; i < mutexLimits.length; i++)
         {
-            for (int j = 0; j < mutexLimitsNew[i].length; j++)
+            for (int j = 0; j < mutexLimits[i].length; j++)
             {
                 tempStr += "i = " + i + ", j = " + j + ": ";
-                for (double[] mutlim : mutexLimitsNew[i][j])
+                for (double[] mutlim : mutexLimits[i][j])
                 {
                     tempStr += "[";
                     for (int k = 0; k < mutlim.length; k++)
@@ -145,19 +152,22 @@ public class VelocityBalancer
             }
         }   
         tempStr += "\nDeadlock limits: \n\t";
-        for (int i = 0; i < deadlockLimitsNew.length; i++) 
+        for (int i = 0; i < circWaitLimits.length; i++) 
         {
-            for (int j = 0; j < deadlockLimitsNew[i].length; j++)
+            for (int j = 0; j < circWaitLimits[i].length; j++)
             {
-                tempStr += "i = " + i + ", j = " + j + ": ";
-                for (double[] lim : deadlockLimitsNew[i][j])
+                if (circWaitLimits[i][j].size() > 0)
                 {
-                    tempStr += "[";
-                    for (int k = 0; k < lim.length; k++)
+                    tempStr += "i = " + i + ", j = " + j + ": ";
+                    for (double[] lim : circWaitLimits[i][j])
                     {
-                        tempStr += lim[k] + " ";
+                        tempStr += "[";
+                        for (int k = 0; k < lim.length; k++)
+                        {
+                            tempStr += lim[k] + " ";
+                        }
+                        tempStr = tempStr.trim() + "] ";           
                     }
-                    tempStr = tempStr.trim() + "] ";           
                 }
             }
         }
@@ -246,6 +256,8 @@ public class VelocityBalancer
         calcVelocityStatisticsForUnprocessedSchedule();
         
         addToMessages("Smoooth gliding.......", SchedulingConstants.MESSAGE_TYPE_WARN);	
+        
+        addToMessages("Velocities balanced in " + timer.elapsedTime() + "ms", SchedulingConstants.MESSAGE_TYPE_INFO);
     }
     
     private void init(Automata theAutomata)
@@ -311,12 +323,12 @@ public class VelocityBalancer
         pathPoints = new ArrayList<double[]>();
         keyPointIndices = new ArrayList<Integer>();
         
-        mutexLimitsNew = new ArrayList[specs.size()][plants.size()];
-        for (int i = 0; i < mutexLimitsNew.length; i++)
+        mutexLimits = new ArrayList[specs.size()][plants.size()];
+        for (int i = 0; i < mutexLimits.length; i++)
         {
-            for (int j = 0; j < mutexLimitsNew[i].length; j++)
+            for (int j = 0; j < mutexLimits[i].length; j++)
             {
-                mutexLimitsNew[i][j] = new ArrayList<double[]>();
+                mutexLimits[i][j] = new ArrayList<double[]>();
             }
         }
         
@@ -486,14 +498,14 @@ public class VelocityBalancer
                     {
                         if (specs.getAutomatonAt(i).getAlphabet().contains(currEvent))
                         {
-                            int nrOfAddedMutexLimits = mutexLimitsNew[i][activeAutomatonIndex].size();
-                            if ((nrOfAddedMutexLimits > 0) && (mutexLimitsNew[i][activeAutomatonIndex].get(nrOfAddedMutexLimits - 1)[1] == -1))
+                            int nrOfAddedMutexLimits = mutexLimits[i][activeAutomatonIndex].size();
+                            if ((nrOfAddedMutexLimits > 0) && (mutexLimits[i][activeAutomatonIndex].get(nrOfAddedMutexLimits - 1)[1] == -1))
                             {
-                                mutexLimitsNew[i][activeAutomatonIndex].get(nrOfAddedMutexLimits - 1)[1] = currPathPoint[activeAutomatonIndex];
+                                mutexLimits[i][activeAutomatonIndex].get(nrOfAddedMutexLimits - 1)[1] = currPathPoint[activeAutomatonIndex];
                             }
                             else 
                             {
-                                mutexLimitsNew[i][activeAutomatonIndex].add(new double[]{currPathPoint[activeAutomatonIndex], -1});
+                                mutexLimits[i][activeAutomatonIndex].add(new double[]{currPathPoint[activeAutomatonIndex], -1});
                             } 
                         }
                     }
@@ -528,7 +540,7 @@ public class VelocityBalancer
         
         Automata plantsAndSpecs = new Automata(optimalSubPlants);
         plantsAndSpecs.addAutomata(specs);
-        findDeadlockLimits(plantsAndSpecs); 
+        FindCircWaitLimits(plantsAndSpecs); 
         
         // Transfer the info about firing and simulation times from temporary containers
         // into more lasting ones. 
@@ -543,8 +555,9 @@ public class VelocityBalancer
             }
         }   
     }
-    
-//    private void findDeadlockLimits(Automata plantsAndSpecs)
+
+// @Deprecated method    
+//    private void FindCircWaitLimits(Automata plantsAndSpecs)
 //        throws Exception
 //    {        
 //        AutomataSynchronizer synchronizer = new AutomataSynchronizer(plantsAndSpecs, SynchronizationOptions.getDefaultSynchronizationOptions());
@@ -593,13 +606,13 @@ public class VelocityBalancer
 //        }
 //        
 //        // Create the deadlock limit array
-//        deadlockLimitsNew = new ArrayList[listOfForbiddenRegionRoots.size()][plants.size()];
+//        circWaitLimits = new ArrayList[listOfForbiddenRegionRoots.size()][plants.size()];
 //        
 //        for (int j = 0; j < listOfForbiddenRegionRoots.size(); j++)
 //        {
-//            for (int k = 0; k < deadlockLimitsNew[j].length; k++)
+//            for (int k = 0; k < circWaitLimits[j].length; k++)
 //            {
-//                deadlockLimitsNew[j][k] = new ArrayList<double[]>();
+//                circWaitLimits[j][k] = new ArrayList<double[]>();
 //            }
 //            
 //            State state = listOfForbiddenRegionRoots.get(j);
@@ -661,14 +674,14 @@ public class VelocityBalancer
 //                                }   
 //                                currMinDLLimit += stateInAuto.getCost();
 //
-//                                int nrOfAddedDLLimits = deadlockLimitsNew[j][i].size();
-//                                if ((nrOfAddedDLLimits > 0) && (deadlockLimitsNew[j][i].get(nrOfAddedDLLimits - 1)[0] == -1))
+//                                int nrOfAddedDLLimits = circWaitLimits[j][i].size();
+//                                if ((nrOfAddedDLLimits > 0) && (circWaitLimits[j][i].get(nrOfAddedDLLimits - 1)[0] == -1))
 //                                {
-//                                    deadlockLimitsNew[j][i].get(nrOfAddedDLLimits - 1)[0] = currMinDLLimit;
+//                                    circWaitLimits[j][i].get(nrOfAddedDLLimits - 1)[0] = currMinDLLimit;
 //                                }
 //                                else 
 //                                {
-//                                    deadlockLimitsNew[j][i].add(new double[]{currMinDLLimit, -1});
+//                                    circWaitLimits[j][i].add(new double[]{currMinDLLimit, -1});
 //                                } 
 //                                
 ////                                if (minDLLimit[i] > currMinDLLimit)
@@ -718,14 +731,14 @@ public class VelocityBalancer
 //                                                }   
 //                                                currMaxDLLimit += stateInAuto.getCost();
 //
-//                                                int nrOfAddedDLLimits = deadlockLimitsNew[j][i].size();
-//                                                if ((nrOfAddedDLLimits > 0) && (deadlockLimitsNew[j][i].get(nrOfAddedDLLimits - 1)[1] == -1))
+//                                                int nrOfAddedDLLimits = circWaitLimits[j][i].size();
+//                                                if ((nrOfAddedDLLimits > 0) && (circWaitLimits[j][i].get(nrOfAddedDLLimits - 1)[1] == -1))
 //                                                {
-//                                                    deadlockLimitsNew[j][i].get(nrOfAddedDLLimits - 1)[1] = currMaxDLLimit;
+//                                                    circWaitLimits[j][i].get(nrOfAddedDLLimits - 1)[1] = currMaxDLLimit;
 //                                                }
 //                                                else 
 //                                                {
-//                                                    deadlockLimitsNew[j][i].add(new double[]{-1, currMaxDLLimit});
+//                                                    circWaitLimits[j][i].add(new double[]{-1, currMaxDLLimit});
 //                                                } 
 //                                                
 ////                                                if (maxDLLimit[i] < currMaxDLLimit)
@@ -752,11 +765,11 @@ public class VelocityBalancer
 //
 //        //temp
 //        addToMessages("CIRCULAR WAIT LIMITS : ", SchedulingConstants.MESSAGE_TYPE_WARN);
-//        for (int i = 0; i < deadlockLimitsNew.length; i++)
+//        for (int i = 0; i < circWaitLimits.length; i++)
 //        {
-//            for (int j = 0; j < deadlockLimitsNew[i].length; j++)
+//            for (int j = 0; j < circWaitLimits[i].length; j++)
 //            {
-//                for (double[] limit : deadlockLimitsNew[i][j])
+//                for (double[] limit : circWaitLimits[i][j])
 //                {
 //                    String tstr = "DL_limit : ";
 //                    for (int k = 0; k < limit.length; k++)
@@ -770,7 +783,7 @@ public class VelocityBalancer
 //        }
 //    }
     
-    private void findDeadlockLimits(Automata plantsAndSpecs)
+    private void FindCircWaitLimits(Automata plantsAndSpecs)
         throws Exception
     {
         AutomataIndexMap map = new AutomataIndexMap(plantsAndSpecs);
@@ -836,22 +849,26 @@ public class VelocityBalancer
             while (! state.isAccepting());
         }
         
-        for (int i = 0; i < edges.length; i++)
-        {
-            for (int[] is : edges[i])
-            {
-                addToMessages("p" + is[1] + " in z" + i + " (q" + is[2] + ") -> z" + is[0] +
-                        " (q" + is[3] + "), bufferExists = " + is[4], SchedulingConstants.MESSAGE_TYPE_ERROR);
-            }
-        }
-        
         ConnectedComponentsGraph cycleFinder = new ConnectedComponentsGraph(edges, plantsAndSpecs.getPlantAutomata().size());
         ArrayList<ArrayList<ConnectedComponentEdge>> cycles = cycleFinder.enumerateAllCycles();
-        for (ArrayList<ConnectedComponentEdge> cycle : cycles)
+        
+        circWaitLimits = new ArrayList[cycles.size()][plantsAndSpecs.size()];
+        for (int i = 0; i < circWaitLimits.length; i++)
         {
+            for (int j = 0; j < circWaitLimits[i].length; j++)
+            {
+                circWaitLimits[i][j] = new ArrayList<double[]>();
+            }
+        }
+       
+        for (int cycleIndex = 0; cycleIndex < cycles.size(); cycleIndex++)
+        {
+            ArrayList<ConnectedComponentEdge> cycle = cycles.get(cycleIndex);
+            
+            ArrayList<double[]> tempLimitList = new ArrayList<double[]>();
+                    
             // For each edge in the current rainbow cycle
             boolean bufferInCycle = false;
-            String str = "";
             for (int i = 0; i < cycle.size(); i++)
             {
                 ConnectedComponentEdge precedingEdge;
@@ -865,11 +882,10 @@ public class VelocityBalancer
                 }
 
                 // Convert the information stored in the edge into plant-state-bookingtic-form
-                int zoneIndex = cycle.get(i).getFromVertice().getVerticeIndex();
-                int plantIndex1 = precedingEdge.getColor();
-                int plantIndex2 = cycle.get(i).getColor();
-                int stateIndex1 = precedingEdge.getToTic(); // In this case the tic are equivalent to tics
-                int stateIndex2 = cycle.get(i).getFromTic();
+//                int zoneIndex = cycle.get(i).getFromVertice().getVerticeIndex();
+                int plantIndex = cycle.get(i).getColor();
+                int stateIndex1 = cycle.get(i).getFromTic(); // In this case the tic are equivalent to the booking state
+                int stateIndex2 = cycle.get(i).getToTic(); // In this case the tic are equivalent to the booking state
                 
                 // Remember that this cycle contains buffers if one is found on any edge 
                 if (cycle.get(i).getBufferExists())
@@ -877,42 +893,37 @@ public class VelocityBalancer
                     bufferInCycle = true;                    
                 } 
 
-                State minLimState = map.getStateAt(plantsAndSpecs.getAutomatonAt(plantIndex2), stateIndex2);
+                State minLimState = map.getStateAt(plantsAndSpecs.getAutomatonAt(plantIndex), stateIndex1);
+                State maxLimState = map.getStateAt(plantsAndSpecs.getAutomatonAt(plantIndex), stateIndex2);
                 int accCost = 0;
                 int minLimCost = -1;
-                int maxLimCost = -1;
-                State state = plantsAndSpecs.getAutomatonAt(plantIndex2).getInitialState();
+                State state = plantsAndSpecs.getAutomatonAt(plantIndex).getInitialState();
                 do
                 {                    
                     accCost += state.getCost();
-                    
-                    if (minLimCost > -1)
-                    {
-                        LabeledEvent event = state.outgoingArcsIterator().next().getEvent();
-                        if (plantsAndSpecs.getAutomatonAt(zoneIndex).getAlphabet().contains(event))
-                        {
-                            maxLimCost = accCost;
-                            break;
-                        }
-                    }
                     
                     if (state.equals(minLimState))
                     {
                         minLimCost = accCost;
                     }
+                    else if (state.equals(maxLimState))
+                    {
+                        tempLimitList.add(new double[]{plantIndex, minLimCost, accCost});
+                        break;
+                    }
                     
                     state = state.nextStateIterator().next();
                 } 
                 while (! state.isAccepting());
-                
-                str += "p" + plantIndex2 + " books z" + zoneIndex + " from q" + stateIndex2 + 
-                        ", mutex = [" + minLimCost + ", " + maxLimCost + "]\n";   
             }
             
             if (!bufferInCycle)
             {
-                addToMessages("Circular wait found as: ", SchedulingConstants.MESSAGE_TYPE_ERROR);
-                addToMessages(str, SchedulingConstants.MESSAGE_TYPE_ERROR);
+                for (double[] tempLimitInfo : tempLimitList)
+                {
+                    int plantIndex = (int)tempLimitInfo[0];
+                    circWaitLimits[cycleIndex][plantIndex].add(new double[]{tempLimitInfo[0], tempLimitInfo[0]});
+                }
             }
          }
 
@@ -1625,10 +1636,10 @@ public class VelocityBalancer
     private boolean areVisible(double[] startPoint, double[] endPoint)
     {
         // For each mutex zone...
-        for (int i=0; i<mutexLimitsNew.length; i++)
+        for (int i=0; i<mutexLimits.length; i++)
         {
             // Start and end times of collisions between the startPoint-endPoint-line and current mutex zone
-            ArrayList<double[]>[] collisionTimes = getCollisionTimesForZone(startPoint, endPoint, mutexLimitsNew[i]);
+            ArrayList<double[]>[] collisionTimes = getCollisionTimesForZone(startPoint, endPoint, mutexLimits[i]);
             
 //            //temp
 //            logger.error("Checking zone_" + i + ", " + startPoint[0] + " " + startPoint[1] + " " + startPoint[2] + " --> " + 
@@ -1668,18 +1679,18 @@ public class VelocityBalancer
             }
         }
 
-        // For each deadlock-zone...
-        for (int i=0; i<deadlockLimitsNew.length; i++)
+        // For each circwait-zone...
+        for (int i=0; i<circWaitLimits.length; i++)
         {
             // Start and end times of collisions between the startPoint-endPoint-line and current deadlock zone
-            ArrayList<double[]>[] collisionTimes = getCollisionTimesForZone(startPoint, endPoint, deadlockLimitsNew[i]);
+            ArrayList<double[]>[] collisionTimes = getCollisionTimesForZone(startPoint, endPoint, circWaitLimits[i]);
 
             // If any robot that is involved in current circular wait does not pass through the 
             // corresponding DL-obstacle between startPoint and endPoint, this deadlock cannot occor.
             boolean deadlockPossible = true;
-            for (int j = 0; j < deadlockLimitsNew[i].length; j++)
+            for (int j = 0; j < circWaitLimits[i].length; j++)
             {
-                if ((deadlockLimitsNew[i][j].size() > 0) && (collisionTimes[j].size() == 0))
+                if ((circWaitLimits[i][j].size() > 0) && (collisionTimes[j].size() == 0))
                 {
                    deadlockPossible = false;
                 }
