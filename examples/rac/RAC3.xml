@@ -1,0 +1,244 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xmlns="http://www.plcopen.org/xml/tc6.xsd"
+         xmlns:xhtml="http://www.w3.org/1999/xhtml"
+         xsi:schemaLocation="http://www.plcopen.org/xml/tc6.xsd http://www.plcopen.org/xml/tc6.xsd">
+  <fileHeader companyName="CTH"
+              companyURL="www.chalmers.se"
+              productName="FIX1"
+              productVersion="1.0"
+              creationDateTime="2008-03-19T20:31:26"/>
+  <contentHeader name="Cell Example "
+                 version="1.0"
+                 modificationDateTime="2008-04-16T16:39:13"
+                 organization="SS2"
+                 author="CTH SS2"
+                 language="en-US">
+    <coordinateInfo>
+      <fbd>
+        <scaling x="0" y="0"/>
+      </fbd>
+      <ld>
+        <scaling x="0" y="0"/>
+      </ld>
+      <sfc>
+        <scaling x="0" y="0"/>
+      </sfc>
+    </coordinateInfo>
+  </contentHeader>
+  <types>
+    <dataTypes>
+      <dataType name="BinaryPositions">
+        <baseType>
+          <enum>
+            <values>
+              <value name=""/>
+            </values>
+          </enum>
+        </baseType>
+      </dataType>
+    </dataTypes>
+    <pous>
+      <pou name="RAC" pouType="functionBlock">
+        <interface>
+          <inputVars>
+            <variable name="IN1">
+              <type>
+                <BOOL/>
+              </type>
+              <initialValue>
+                <simpleValue value="FALSE"/>
+              </initialValue>
+            </variable>
+          </inputVars>
+          <outputVars>
+            <variable name="OUT">
+              <type>
+                <BOOL/>
+              </type>
+              <initialValue>
+                <simpleValue value="FALSE"/>
+              </initialValue>
+            </variable>
+          </outputVars>
+          <localVars>
+            <variable name="internal">
+              <type>
+                <INT/>
+              </type>
+              <initialValue>
+                <simpleValue value="0"/>
+              </initialValue>
+            </variable>
+          </localVars>
+          <inputVars>
+            <variable name="data">
+              <type>
+                <string/>
+              </type>
+              <initialValue>
+                <simpleValue value="Undefined"/>
+              </initialValue>
+            </variable>
+            <variable name="IN2">
+              <type>
+                <BOOL/>
+              </type>
+            </variable>
+          </inputVars>
+          <localVars>
+            <variable name="IN3">
+              <type>
+                <BOOL/>
+              </type>
+            </variable>
+            <variable name="IN4">
+              <type>
+                <BOOL/>
+              </type>
+            </variable>
+          </localVars>
+        </interface>
+        <body>
+          <LD>
+            <contact localId="1" height="15" width="21">
+              <position x="262" y="63"/>
+              <connectionPointIn>
+                <relPosition x="0" y="8"/>
+                <connection refLocalId="12">
+                  <position x="262" y="71"/>
+                  <position x="227" y="71"/>
+                </connection>
+              </connectionPointIn>
+              <connectionPointOut>
+                <relPosition x="21" y="8"/>
+              </connectionPointOut>
+              <variable>IN1</variable>
+            </contact>
+            <contact localId="2" height="15" width="21" negated="true">
+              <position x="308" y="63"/>
+              <connectionPointIn>
+                <relPosition x="0" y="8"/>
+                <connection refLocalId="1">
+                  <position x="308" y="71"/>
+                  <position x="283" y="71"/>
+                </connection>
+              </connectionPointIn>
+              <connectionPointOut>
+                <relPosition x="21" y="8"/>
+              </connectionPointOut>
+              <variable>IN2</variable>
+            </contact>
+            <coil localId="3" height="15" width="21" storage="set">
+              <position x="432" y="63"/>
+              <connectionPointIn>
+                <relPosition x="0" y="8"/>
+                <connection refLocalId="2">
+                  <position x="432" y="71"/>
+                  <position x="329" y="71"/>
+                </connection>
+                <connection refLocalId="9">
+                  <position x="432" y="71"/>
+                  <position x="369" y="71"/>
+                  <position x="369" y="127"/>
+                  <position x="307" y="127"/>
+                </connection>
+              </connectionPointIn>
+              <connectionPointOut>
+                <relPosition x="21" y="8"/>
+              </connectionPointOut>
+              <variable>OUT</variable>
+            </coil>
+            <leftPowerRail localId="4" height="40" width="2">
+              <position x="27" y="51"/>
+              <connectionPointOut formalParameter="">
+                <relPosition x="2" y="20"/>
+              </connectionPointOut>
+            </leftPowerRail>
+            <rightPowerRail localId="5" height="40" width="2">
+              <position x="503" y="51"/>
+              <connectionPointIn>
+                <relPosition x="0" y="20"/>
+                <connection refLocalId="3">
+                  <position x="503" y="71"/>
+                  <position x="453" y="71"/>
+                </connection>
+              </connectionPointIn>
+            </rightPowerRail>
+            <contact localId="9" height="15" width="21">
+              <position x="286" y="119"/>
+              <connectionPointIn>
+                <relPosition x="0" y="8"/>
+                <connection refLocalId="12">
+                  <position x="286" y="127"/>
+                  <position x="256" y="127"/>
+                  <position x="256" y="71"/>
+                  <position x="227" y="71"/>
+                </connection>
+              </connectionPointIn>
+              <connectionPointOut>
+                <relPosition x="21" y="8"/>
+              </connectionPointOut>
+              <variable>IN3</variable>
+            </contact>
+            <contact localId="10" height="15" width="21">
+              <position x="134" y="63"/>
+              <connectionPointIn>
+                <relPosition x="0" y="8"/>
+                <connection refLocalId="4">
+                  <position x="134" y="71"/>
+                  <position x="29" y="71"/>
+                </connection>
+              </connectionPointIn>
+              <connectionPointOut>
+                <relPosition x="21" y="8"/>
+              </connectionPointOut>
+              <variable>IN4</variable>
+            </contact>
+            <contact localId="11" height="15" width="21" negated="true">
+              <position x="143" y="120"/>
+              <connectionPointIn>
+                <relPosition x="0" y="8"/>
+                <connection refLocalId="4">
+                  <position x="143" y="128"/>
+                  <position x="86" y="128"/>
+                  <position x="86" y="71"/>
+                  <position x="29" y="71"/>
+                </connection>
+              </connectionPointIn>
+              <connectionPointOut>
+                <relPosition x="21" y="8"/>
+              </connectionPointOut>
+              <variable>IN3</variable>
+            </contact>
+            <contact localId="12" height="15" width="21">
+              <position x="206" y="63"/>
+              <connectionPointIn>
+                <relPosition x="0" y="8"/>
+                <connection refLocalId="11">
+                  <position x="206" y="71"/>
+                  <position x="185" y="71"/>
+                  <position x="185" y="128"/>
+                  <position x="164" y="128"/>
+                </connection>
+                <connection refLocalId="10">
+                  <position x="206" y="71"/>
+                  <position x="155" y="71"/>
+                </connection>
+              </connectionPointIn>
+              <connectionPointOut>
+                <relPosition x="21" y="8"/>
+              </connectionPointOut>
+              <variable>IN2</variable>
+            </contact>
+          </LD>
+        </body>
+      </pou>
+    </pous>
+  </types>
+  <instances>
+    <configurations>
+      <configuration name="ExampleCell"/>
+    </configurations>
+  </instances>
+</project>
