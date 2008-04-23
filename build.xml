@@ -574,6 +574,10 @@ Class-Path: ${manifest.pathlist}</echo>
 	<chmod file="${dist}/SupremicaJGrafchartLocal.cmd" perm="644"/>
 -->
 
+        <copy file="${templates}/verifyRACLocal.cmd" todir="${dist}"/>
+        <chmod file="${dist}/verifyRACLocal.cmd" perm="644"/>
+        <copy file="${templates}/verifyRAC.cmd" todir="${dist}"/>
+        <chmod file="${dist}/verifyRAC.cmd" perm="644"/>
         <copy file="${templates}/loadGenericPLCProgramDescriptionLocal.cmd" todir="${dist}"/>
         <chmod file="${dist}/loadGenericPLCProgramDescriptionLocal.cmd" perm="644"/>
         <copy file="${templates}/loadGenericPLCProgramDescription.cmd" todir="${dist}"/>
