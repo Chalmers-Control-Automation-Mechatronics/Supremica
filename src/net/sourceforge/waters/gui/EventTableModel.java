@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   EventTableModel
 //###########################################################################
-//# $Id: EventTableModel.java,v 1.35 2008-03-07 04:11:02 robi Exp $
+//# $Id: EventTableModel.java,v 1.36 2008-04-24 03:45:31 robi Exp $
 //###########################################################################
 
 
@@ -407,7 +407,9 @@ public class EventTableModel
         final Subject source = event.getSource();
         if (source == mGraph) {
           final LabelBlockSubject block = mGraph.getBlockedEvents();
-          mIdentifierCollectVisitor.addClonedIdentifiers(block);
+          if (block != null) {
+            mIdentifierCollectVisitor.addClonedIdentifiers(block);
+          }
         } else {
           // more?
         }
