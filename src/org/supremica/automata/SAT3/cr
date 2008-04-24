@@ -1,0 +1,8 @@
+
+javac -classpath "c:\\alex\\coding\\supremica-cvsed\\Supremica\\lib\\unjared\\;c:\\alex\\coding\\supremica-cvsed\\Supremica\\src\\" CnfClauseAcceptorSat4jTest.java
+javac -classpath "c:\\alex\\coding\\supremica-cvsed\\Supremica\\lib\\unjared\\;c:\\alex\\coding\\supremica-cvsed\\Supremica\\src\\" ToCnfStructTest.java
+
+java -classpath "c:\\alex\\coding\\supremica-cvsed\\Supremica\\lib\\unjared\\;c:\\alex\\coding\\supremica-cvsed\\Supremica\\src\\" org.supremica.automata.SAT3.CnfClauseAcceptorSat4jTest
+java -classpath "c:\\alex\\coding\\supremica-cvsed\\Supremica\\lib\\unjared\\;c:\\alex\\coding\\supremica-cvsed\\Supremica\\src\\" org.supremica.automata.SAT3.ToCnfStructTest
+
+
