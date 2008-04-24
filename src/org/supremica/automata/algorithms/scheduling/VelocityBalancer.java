@@ -151,7 +151,7 @@ public class VelocityBalancer
                 }
             }
         }   
-        tempStr += "\nDeadlock limits: \n\t";
+        tempStr += "\nCircular wait limits: \n\t";
         for (int i = 0; i < circWaitLimits.length; i++) 
         {
             for (int j = 0; j < circWaitLimits[i].length; j++)
@@ -412,7 +412,7 @@ public class VelocityBalancer
                     
                     for (int plantIndex = 0; plantIndex < currPlantStates.length; plantIndex++)
                     {
-                        String str = indexMap.getAutomatonAt(plantIndex).getName();
+                        String str = indexMap.getAutomatonAt(plantIndexMapping[plantIndex]).getName();
                         Alphabet currPlantEvents = currPlantStates[plantIndex].activeEvents(false);
                         if (currPlantEvents.contains(currEvent))
                         {
@@ -852,7 +852,18 @@ public class VelocityBalancer
         ConnectedComponentsGraph cycleFinder = new ConnectedComponentsGraph(edges, plantsAndSpecs.getPlantAutomata().size());
         ArrayList<ArrayList<ConnectedComponentEdge>> cycles = cycleFinder.enumerateAllCycles();
         
-        circWaitLimits = new ArrayList[cycles.size()][plantsAndSpecs.size()];
+        //temp
+        for (ArrayList<ConnectedComponentEdge> cycle : cycles)
+        {
+            logger.error("Cycle start:");
+            for (ConnectedComponentEdge edge : cycle)
+            {
+                logger.info("edge: p" + edge.getColor() + " on z" + edge.getFromVertice().getVerticeIndex() + " -> z" + 
+                        edge.getToVertice().getVerticeIndex());
+            }
+        }
+        
+        circWaitLimits = new ArrayList[cycles.size()][plantsAndSpecs.getPlantAutomata().size()];
         for (int i = 0; i < circWaitLimits.length; i++)
         {
             for (int j = 0; j < circWaitLimits[i].length; j++)
@@ -922,7 +933,7 @@ public class VelocityBalancer
                 for (double[] tempLimitInfo : tempLimitList)
                 {
                     int plantIndex = (int)tempLimitInfo[0];
-                    circWaitLimits[cycleIndex][plantIndex].add(new double[]{tempLimitInfo[0], tempLimitInfo[0]});
+                    circWaitLimits[cycleIndex][plantIndex].add(new double[]{tempLimitInfo[1], tempLimitInfo[2]});
                 }
             }
          }
@@ -1423,7 +1434,6 @@ public class VelocityBalancer
             while (maxDiffVelocityIndex > -1);
         }
 
-        //TEMP
         addToMessages("MULTI-BALANCED SCHEDULE", SchedulingConstants.MESSAGE_TYPE_WARN);
         
         // Printing out the relative velocities per event

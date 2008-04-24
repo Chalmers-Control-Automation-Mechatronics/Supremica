@@ -842,7 +842,7 @@ public class Milp
         theAutomata.addAutomata(externalSpecs);
         indexMap = new AutomataIndexMap(theAutomata);
         //updateGui(theAutomata); @Deprecated
-
+        
         // Before constructing the MILP-formulation, ensure that the plants do not contain loops 
         // (throw exception if they do)
         checkForLoops(plants);
