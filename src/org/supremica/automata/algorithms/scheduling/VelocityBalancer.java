@@ -110,7 +110,7 @@ public class VelocityBalancer
             tempStr += "(firing) i = " + i + "(" + plants.getAutomatonAt(i).getName() + ") --> ";
             for (int j = 0; j < firingTimes[i].length; j++)
             {
-                tempStr += firingTimes[i][j] + " ";
+                tempStr += roundOff(firingTimes[i][j], 2) + " ";
             }
             tempStr += "\n";
         }
@@ -130,7 +130,7 @@ public class VelocityBalancer
             tempStr += "[";
             for (int i = 0; i < teff.length; i++)
             {
-                tempStr += teff[i] + " ";
+                tempStr += roundOff(teff[i], 2) + " ";
             }
             tempStr = tempStr.trim() + "] ";           
         }
@@ -852,16 +852,16 @@ public class VelocityBalancer
         ConnectedComponentsGraph cycleFinder = new ConnectedComponentsGraph(edges, plantsAndSpecs.getPlantAutomata().size());
         ArrayList<ArrayList<ConnectedComponentEdge>> cycles = cycleFinder.enumerateAllCycles();
         
-        //temp
-        for (ArrayList<ConnectedComponentEdge> cycle : cycles)
-        {
-            logger.error("Cycle start:");
-            for (ConnectedComponentEdge edge : cycle)
-            {
-                logger.info("edge: p" + edge.getColor() + " on z" + edge.getFromVertice().getVerticeIndex() + " -> z" + 
-                        edge.getToVertice().getVerticeIndex());
-            }
-        }
+//        //temp
+//        for (ArrayList<ConnectedComponentEdge> cycle : cycles)
+//        {
+//            logger.error("Cycle start:");
+//            for (ConnectedComponentEdge edge : cycle)
+//            {
+//                logger.info("edge: p" + edge.getColor() + " on z" + edge.getFromVertice().getVerticeIndex() + " -> z" + 
+//                        edge.getToVertice().getVerticeIndex());
+//            }
+//        }
         
         circWaitLimits = new ArrayList[cycles.size()][plantsAndSpecs.getPlantAutomata().size()];
         for (int i = 0; i < circWaitLimits.length; i++)
@@ -1712,6 +1712,7 @@ public class VelocityBalancer
                 // passes through a deadlock obstacle
                 if (intersectRecursively(collisionTimes, 0).size() > 0)
                 {
+                    logger.warn("Intersection with CW");
                     return false;
                 }
                 
