@@ -62,17 +62,25 @@ public class ExprFactoryArrayList implements ExprFactory {
     }
 
     private Expr combine(Expr e1, Expr e2, Expr.Type type){
+        Mop res = new Mop(type);
+        /*res = */add(res,e1);
+        /*return*/add(res,e2);
+        return res;
+    }
+    /**
+     * combine destructively two expression giving "type"
+     * @param e1
+     * @param e2
+     * @param type     AND or OR
+     * @return
+     */
+    private Expr combineD(Expr e1, Expr e2, Expr.Type type){
         if(e1.getType()==type){
-            add(e1, e2);
-            return e1;            
+            return add(e1, e2);
         } else if (e2.getType() == type){
-            add(e2, e1);
-            return e2;
+            return add(e2, e1);
         } else {
-            Mop res = new Mop(type);
-            add(res,e1);
-            add(res,e2);
-            return res;                    
+            return combine(e1,e2, type);
         }                
     }
     
@@ -122,19 +130,21 @@ public class ExprFactoryArrayList implements ExprFactory {
         }
     }
     
-    public void add(Expr big, Expr e){
+    public Expr add(Expr big, Expr e){
         if(big.getType()==Expr.Type.LIT)
             throw new IllegalArgumentException("can't add to LIT");
-        if(e instanceof Mop){
+        else if(e instanceof Mop){
             if(e.getType()==big.getType() || ((Mop)e).size()==1)
                 for(Expr e1: (Mop)e)
                     add(big, e1);
             else if (((Mop)e).size()>1)
                 big.add(e);
-            // else if size == 0 do nothing
+            // else if e.size == 0 do nothing
         }
-        else // Lit
+        else // e is Lit
             big.add(e);        
+        
+        return big;
     }
 
     private Expr.Type oppositeType(Expr.Type t){
@@ -144,7 +154,6 @@ public class ExprFactoryArrayList implements ExprFactory {
             default:   throw new IllegalArgumentException(
                         "don't know opposite to " + t.toString());
         }
-    }
-    
+    }    
     
 }

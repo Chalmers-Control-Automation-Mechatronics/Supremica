@@ -31,8 +31,8 @@ public class CnfClauseAcceptorSat4j implements CnfClauseAcceptor{
     public void accept(Collection<Integer> c) {        
         try {
             IVecInt vi = new VecInt();
-            for (int i : c) {
-                vi.push(i);
+            for (int i : c) {                
+                vi.push(i);                
             }
             solver.addClause(vi);
         } catch (ContradictionException ex) {

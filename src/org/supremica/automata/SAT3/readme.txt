@@ -23,4 +23,6 @@ Arbitrary formula to cnf works.
 
 next step is to get boolean formula. Out of integer formula or out of automaton directly
 I should look what automaton produces and then see what do i neet to implement it
+i think I would prefer strait conversion to boolean by means of the function, 
+withoiut intermediate storage of integer in form of some datatype.
 

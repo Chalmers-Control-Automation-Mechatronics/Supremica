@@ -75,18 +75,18 @@ public class ToCnfStruct implements ToCnf {
                 } else if (expr.size()==1) {
                     for(Expr elem: expr)
                         fun(elem);
-                } else if (atomicOr(expr)) {
+                } else if (isAtomicOr(expr)) {
                     fun(OrToCnfVP(expr));
                 } else {
                     Expr res = ef.Or();
                     for(Expr elem: expr){
                         switch(elem.getType()){
                             case LIT:
-                                res.add(elem);
+                                res = ef.add(res,elem);
                                 break;
                             case AND:
                                 // add v instead of el
-                                res.add(ef.Lit(curNew));
+                                res = ef.add(res, ef.Lit(curNew));
                                 curNew++;
                                 // v 'implies' el
                                 fun(ef.Or(ef.Not(ef.Lit(curNew-1)), elem  ));
@@ -103,14 +103,16 @@ public class ToCnfStruct implements ToCnf {
         }        
     }    
     /**
-     * Atomic will correspond that this expression will be sent to 
-     * variable-preserving conversion. 
-     * This should be done if there is only two elements, one of which is Literal
+     * Determines if there is only two elements in this OR, 
+     * at least one of which is Literal.
      * 
-     * @param expr  disjunction (OR) with not all literals for check
+     * Only formulas that are atomicOr:s have to be sent to 
+     * variable-preserving conversion. 
+     * 
+     * @param expr  disjunction (OR) for check, with some non-LIT:s
      * @return
      */
-    private boolean atomicOr(Expr expr){        
+    private boolean isAtomicOr(Expr expr){        
         if(expr.size()==2)
             for(Expr elem: expr)
                 if(elem.getType()==Expr.Type.LIT)
@@ -120,7 +122,8 @@ public class ToCnfStruct implements ToCnf {
         
         
     /**
-     * Convert atomic to cnf. two elements, one of which is literal and another is and
+     * Convert OR that is atomicOr, i.e. has two elems, one of which is LIT,
+     * to CNF using variable-preserving transformation
      * 
      * @param expr expression to convert. Precond.: atomicOr(expr) should be true
      * @return expression in CNF
@@ -140,7 +143,7 @@ public class ToCnfStruct implements ToCnf {
 
         Expr res = ef.And();
         for(Expr elem: and)
-            res = ef.And(res, ef.Or(lit, elem));
+            res = ef.add(res, ef.Or(lit, elem));
         return res;        
     }
     
