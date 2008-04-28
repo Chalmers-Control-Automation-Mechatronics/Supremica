@@ -31,10 +31,13 @@ public class CnfClauseAcceptorSat4j implements CnfClauseAcceptor{
     public void accept(Collection<Integer> c) {        
         try {
             IVecInt vi = new VecInt();
+//            System.err.print("adding clause: ");
             for (int i : c) {                
-                vi.push(i);                
+                vi.push(i);         
+//                System.err.print(""+i+" ");
             }
             solver.addClause(vi);
+//            System.err.println();
         } catch (ContradictionException ex) {
             Logger.getLogger(CnfClauseAcceptorSat4j.class.getName()).log(Level.SEVERE, "contradiction in the clause!", ex);
         }

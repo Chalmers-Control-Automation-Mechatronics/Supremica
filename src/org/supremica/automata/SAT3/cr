@@ -9,8 +9,10 @@ java  -classpath "c:\\alex\\coding\\supremica-cvsed\\Supremica\\lib\\unjared\\;c
 javac -classpath "c:\\alex\\coding\\supremica-cvsed\\Supremica\\lib\\unjared\\;c:\\alex\\coding\\supremica-cvsed\\Supremica\\src\\"                             ToCnfVarTest.java
 java  -classpath "c:\\alex\\coding\\supremica-cvsed\\Supremica\\lib\\unjared\\;c:\\alex\\coding\\supremica-cvsed\\Supremica\\src\\" org.supremica.automata.SAT3.ToCnfVarTest
 
-javac -classpath "c:\\alex\\coding\\supremica-cvsed\\Supremica\\lib\\unjared\\;c:\\alex\\coding\\supremica-cvsed\\Supremica\\src\\"                             ToCnfSat4jTest.java
-java  -classpath "c:\\alex\\coding\\supremica-cvsed\\Supremica\\lib\\unjared\\;c:\\alex\\coding\\supremica-cvsed\\Supremica\\src\\" org.supremica.automata.SAT3.ToCnfSat4jTest
+javac -classpath "c:\\alex\\coding\\supremica-cvsed\\Supremica\\lib\\unjared\\;c:\\alex\\coding\\supremica-cvsed\\Supremica\\src\\"                             ToCnfCompareTest.java
+java  -classpath "c:\\alex\\coding\\supremica-cvsed\\Supremica\\lib\\unjared\\;c:\\alex\\coding\\supremica-cvsed\\Supremica\\src\\" org.supremica.automata.SAT3.ToCnfCompareTest
 
+javac -classpath "c:\\alex\\coding\\supremica-cvsed\\Supremica\\lib\\unjared\\;c:\\alex\\coding\\supremica-cvsed\\Supremica\\src\\"                             VarsLayoutStepSeqTest.java
+java  -classpath "c:\\alex\\coding\\supremica-cvsed\\Supremica\\lib\\unjared\\;c:\\alex\\coding\\supremica-cvsed\\Supremica\\src\\" org.supremica.automata.SAT3.VarsLayoutStepSeqTest
 
 

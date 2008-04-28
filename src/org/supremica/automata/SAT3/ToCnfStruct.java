@@ -82,11 +82,11 @@ public class ToCnfStruct implements ToCnf {
                     for(Expr elem: expr){
                         switch(elem.getType()){
                             case LIT:
-                                res = ef.add(res,elem);
+                                res.add(elem);
                                 break;
                             case AND:
                                 // add v instead of el
-                                res = ef.add(res, ef.Lit(curNew));
+                                res.add(ef.Lit(curNew));
                                 curNew++;
                                 // v 'implies' el
                                 fun(ef.Or(ef.Not(ef.Lit(curNew-1)), elem  ));
@@ -131,19 +131,21 @@ public class ToCnfStruct implements ToCnf {
     private Expr OrToCnfVP(Expr expr){
         Expr lit = null, and = null;
         for(Expr elem: expr){
-            if(elem.getType()==Expr.Type.LIT)
-                lit = elem;
-            else if(elem.getType()==Expr.Type.AND)
-                and = elem;            
+            switch(elem.getType()){
+                case LIT: lit = elem; break;
+                case AND: and = elem; break;
+                default:
+                    throw new IllegalArgumentException("unexpected type");                    
+            }
         }
         if(lit==null)
-            throw new IllegalArgumentException("no literal found");
+            throw new IllegalArgumentException("no LIT found");
         if(lit==null)
             throw new IllegalArgumentException("no AND found");
 
         Expr res = ef.And();
         for(Expr elem: and)
-            res = ef.add(res, ef.Or(lit, elem));
+            res.add(ef.Or(lit, elem));
         return res;        
     }
     

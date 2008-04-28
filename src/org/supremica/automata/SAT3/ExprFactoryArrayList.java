@@ -5,6 +5,8 @@
 
 package org.supremica.automata.SAT3;
 
+import java.io.PrintStream;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Collection;
 
@@ -156,4 +158,23 @@ public class ExprFactoryArrayList implements ExprFactory {
         }
     }    
     
+    public void printExpr(Expr e, PrintStream pw){
+        switch(e.getType()){
+            case LIT:
+                pw.print(((Lit)e).getVar()+" ");
+                break;
+            case AND:
+                pw.print("AND(");
+                for(Expr elem: e)
+                    printExpr(elem, pw);
+                pw.print(")");
+                break;
+            case OR:
+                pw.print("OR(");
+                for(Expr elem: e)
+                    printExpr(elem, pw);
+                pw.print(")");
+                break;
+        }
+    }
 }
