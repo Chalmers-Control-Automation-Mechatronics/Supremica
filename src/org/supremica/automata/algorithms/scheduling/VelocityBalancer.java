@@ -16,7 +16,6 @@ import org.supremica.automata.algorithms.*;
 import org.supremica.automata.algorithms.scheduling.milp.*;
 import org.supremica.log.Logger;
 import org.supremica.log.LoggerFactory;
-import org.supremica.petrinet.Place;
 import org.supremica.util.ActionTimer;
 
 /**
@@ -445,13 +444,14 @@ public class VelocityBalancer
                     // Of course, when treating the plant that fired the schedule event, 
                     // we know that the time update is equal to current cost of the schedule state.                    
                     double[] newPathPoint = new double[plants.size()];
+                    double activeTime = remainingTimesInState[activeAutomatonIndex]; // currCost could also be used instead of activeTime (even though they are not always identical) 
                     for (int i = 0; i < currPathPoint.length; i++)
                     {                        
-                        newPathPoint[i] = currPathPoint[i] + Math.min(currCost, remainingTimesInState[i]);
+                        newPathPoint[i] = currPathPoint[i] + Math.min(activeTime, remainingTimesInState[i]);
                         
                         if (i != activeAutomatonIndex)
                         {
-                            remainingTimesInState[i] = Math.max(0, remainingTimesInState[i] - currCost);
+                            remainingTimesInState[i] = Math.max(0, remainingTimesInState[i] - activeTime);
                         }
                         else
                         {
@@ -474,7 +474,7 @@ public class VelocityBalancer
 //                            newPathPoint[i] = currPathPoint[i] + Math.min(currCost, remainingTimeInState);
 //                        }
                     }
-                    
+
                     // Add the newly created path point to the list, avoiding repetitions of identical points
                     for (int i = 0; i < currPathPoint.length; i++)
                     {
@@ -1019,7 +1019,7 @@ public class VelocityBalancer
      */
     private void calcVelocityStatisticsForEventSmoothing()
     {
-        // here, relativeVelocities[robot_index][state_index]
+        // here, relativeVelocities[robot_index][path_point_index]
         double[][] relativeVelocities = new double[simulationTimes.length][];
 
         for (int i=0; i<simulationTimes.length; i++)
@@ -1165,6 +1165,17 @@ public class VelocityBalancer
             for (int i=0; i<pathPoints.size()-1; i++)
             {
                 double timeDiff;
+                
+                // This seems ugly (3 for-loops), I know, but for the moment I don't have the time to think
+                double activeTime = -1;
+                for (int k = 0; k < pathPoints.get(i).length; k++)
+                {
+                    double aTime = roundOff(pathPoints.get(i+1)[k] - pathPoints.get(i)[k], 2);
+                    if (aTime > activeTime)
+                    {
+                        activeTime = aTime;
+                    }
+                }
 
                 timeDiff = roundOff(pathPoints.get(i+1)[j] - pathPoints.get(i)[j], 2);
 
@@ -1181,8 +1192,17 @@ public class VelocityBalancer
                         totalVelocityChange[j]++;
                         nrOfVelocityChanges[j]++;
                     }
-
+                    
                     lastVelocityWasZero = false;
+                    
+                    // If this is a 1->0-passage
+                    if (activeTime > timeDiff)
+                    {
+                        totalVelocityChange[j]++;
+                        nrOfVelocityChanges[j]++;
+                        
+                        lastVelocityWasZero = true;
+                    }
                 }
                 else 
                 {
@@ -1712,7 +1732,6 @@ public class VelocityBalancer
                 // passes through a deadlock obstacle
                 if (intersectRecursively(collisionTimes, 0).size() > 0)
                 {
-                    logger.warn("Intersection with CW");
                     return false;
                 }
                 
