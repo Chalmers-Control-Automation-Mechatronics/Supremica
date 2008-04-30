@@ -81,6 +81,7 @@ public class Loader {
     }
     
     public Object openEOP(File file) {
+    	
     	try {			
     		jaxbContext = JAXBContext.newInstance(PKGS_EOP);
     		u = jaxbContext.createUnmarshaller();	    	    

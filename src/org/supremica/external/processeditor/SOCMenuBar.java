@@ -94,6 +94,7 @@ public class SOCMenuBar extends JMenuBar implements ActionListener,
 			     "Attributes",
 			     "Automata..."};
 	String[] buildMenu = {"DOP to EFA",
+			      "Specification synthes",
 				  "SEPARATOR",
 				  "Synthesis",
 			      "Automatas",
@@ -790,6 +791,8 @@ public class SOCMenuBar extends JMenuBar implements ActionListener,
     			graphContainer.generateSupervisor(SOCGraphContainer.SIMPLIFIED);
     		}else if("DOP to EFA".equals(e.getActionCommand())) {
     			graphContainer.viewDOPtoEFAFrame();
+    		}else if("Specification synthes".equals(e.getActionCommand())) {
+    			graphContainer.viewSpecificationSynthesFrame();
     		}else if("Cascade".equals(e.getActionCommand())) {
     			graphContainer.cascade();
     		}else {

@@ -40,6 +40,7 @@ import org.supremica.external.processeditor.xml.Converter;
 
 import org.supremica.external.processeditor.tools.db.DBInterface;
 import org.supremica.external.processeditor.tools.dop2efa.gui.DOPtoEFAInterface;
+import org.supremica.external.processeditor.tools.specificationsynthes.SpecificationSynthesInterface;
 
 /**
  * The most central GUI class of the <code>org.soc</code> package. 
@@ -64,6 +65,7 @@ public class SOCGraphContainer
     public SOCMenuBar menubar = new SOCMenuBar(this);
     
     private DOPtoEFAInterface dopToEfaFrame = null; 
+    private SpecificationSynthesInterface specificationSynthesFrame = null; 
     
     private Object memory;
     private Object numOfCopies = 0;
@@ -823,6 +825,55 @@ public class SOCGraphContainer
     	fcOutput.setFileFilter(wmodFilter);
     	
     	dopToEfaFrame.setOutputFileChooser(fcOutput);
+    }
+    
+    public void viewSpecificationSynthesFrame() {
+        
+    	/*
+    	 * Create frame
+    	 */
+    	if( specificationSynthesFrame == null ){
+    		specificationSynthesFrame = new SpecificationSynthesInterface();
+    		specificationSynthesFrame.setGraphContainer( this );
+    		setIconToFrame( specificationSynthesFrame );
+    	}
+    	
+    	//show frame
+    	specificationSynthesFrame.setVisible(true);
+    	
+    	/*
+    	 * Set input file chooser
+    	 */
+    	JFileChooser fcInput;
+    	
+    	if(cDir != null) {
+    	    fcInput = new JFileChooser(cDir);
+    	}else {
+    	    fcInput = new JFileChooser();
+    	}
+    	
+    	fcInput.addChoosableFileFilter(xmlFilter);
+    	fcInput.setFileFilter(xmlFilter);
+    	fcInput.setAcceptAllFileFilterUsed(false);
+    	
+    	specificationSynthesFrame.setInputFileChooser(fcInput);
+    	
+    	/*
+    	 * Set output file chooser
+    	 */
+    	JFileChooser fcOutput;
+    	
+    	if(cDir != null) {
+    	    fcOutput = new JFileChooser(cDir);
+    	}else {
+    	    fcOutput = new JFileChooser();
+    	}
+    	
+    	fcOutput.setAcceptAllFileFilterUsed(true);
+    	fcOutput.addChoosableFileFilter(wmodFilter);
+    	fcOutput.setFileFilter(wmodFilter);
+    	
+    	specificationSynthesFrame.setOutputFileChooser(fcOutput);
     }
     
     /**
