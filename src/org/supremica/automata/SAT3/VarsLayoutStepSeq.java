@@ -6,6 +6,7 @@
 package org.supremica.automata.SAT3;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import org.supremica.automata.Automata;
 import org.supremica.automata.Automaton;
 import org.supremica.automata.LabeledEvent;
@@ -37,13 +38,21 @@ public class VarsLayoutStepSeq implements VarsLayout {
     
     ExprFactory ef;
     
-    VarEq coder;
+    CoDecIntToBool coder;
     
+    private HashMap<LabeledEvent, Integer> eventsIndexes;
+    private HashMap<Automaton, Integer>    automataIndexes;
+    private HashMap<Automaton, HashMap<State, Integer>> statesIndexes;
     
+    /**
+     * @param ats    Automata to code
+     * @param ef     basic operations for expressions (AND,OR,LIT)
+     * @param coder  convert integer to list of booleans
+     */
     public VarsLayoutStepSeq(
             Automata ats, 
             ExprFactory ef, 
-            VarEq coder
+            CoDecIntToBool coder
             )
     {
         this.ats     = ats;
@@ -52,30 +61,38 @@ public class VarsLayoutStepSeq implements VarsLayout {
         
         
         tranVarWidth = width(ats.getUnionAlphabet().size());
+        stepWidth    = getStepWidth(tranVarWidth, ats);
+        
+        eventsIndexes   = reindex(ats.getUnionAlphabet());
+        automataIndexes = reindex(ats);
+        statesIndexes   = reindexStates(ats);
+    }
+    
+    private int getStepWidth(int tranVarWidth, Automata ats){
         int sum = 0;
         for(Automaton a: ats)
             sum += width(a);
-        stepWidth = tranVarWidth + sum;
+        return tranVarWidth + sum;
     }
-
+    
     public Expr StateEqState(Automaton a, int step, State s) {
         return eqBits(
-                toBits(s.getIndex(), width(a)), 
+                toBits(getIndex(a,s), width(a)), 
                 stepStart(step)+startStateVar(a));
     }
     private int startStateVar(Automaton a){
         int res = tranVarWidth;
         for(Automaton ai: ats){
-            if(a.getIndex()==ai.getIndex())
+            if(getIndex(a)==getIndex(ai))
                 return res;
             res += width(ai);
         }
         throw new IllegalArgumentException(
-                "automaton not found, getIndex is: " + a.getIndex());
+                "automaton " + a.getName() + " not found, getIndex is: " + getIndex(a));
     }
 
     public Expr TransitionEqLabel(int step, LabeledEvent e) {
-        return eqBits(toBits(e.getIndex(), tranVarWidth), stepStart(step));
+        return eqBits(toBits(getIndex(e), tranVarWidth), stepStart(step));
     }
 
     /**
@@ -131,6 +148,10 @@ public class VarsLayoutStepSeq implements VarsLayout {
         return res;
     }
     
+    /** first variable of the step
+     * @param step
+     * @return
+     */
     private int stepStart(int step){
         return    1                /* 0 can't be used (+0 -0) */ 
                 + 1                /* we reserved 1 for TRUE  */ 
@@ -154,20 +175,7 @@ public class VarsLayoutStepSeq implements VarsLayout {
     private int width(int value){
         return coder.width(value);
     }
-
-    /**
-     * @param step 
-     * @return
-     */
-    public Expr EnsureOnlyOneValueThisStep(int step) {
-        Expr res = ef.And();
-        res.add(ensureOneEventThisStep(step));
-
-        for(Automaton a: ats)
-            res.add(ensureOneStateThisStep(step, a));            
-
-        return res;
-    }
+    
     /**
      * (e=1 & e!=2 & e!=3) | (e!=1 & e=2 & e!=3) | ( )
      * @param step
@@ -209,20 +217,60 @@ public class VarsLayoutStepSeq implements VarsLayout {
      * @param step
      * @return
      */
-    private Expr ensureOneEventThisStep(int step){
+    public Expr EnsureOneEventThisStep(int step){
         Expr res = ef.Or();
         for(LabeledEvent ev: ats.getUnionAlphabet())
-            res.add(TransitionEqLabel(step, ev));
+            res = ef.add(res, TransitionEqLabel(step, ev));
         
         return res;        
+    }
+    
+    public Expr EnsureOneStateThisStep(int step){
+        Expr res = ef.And();
+        for(Automaton a: ats)
+            res.add(ensureOneStateThisStep(step, a));            
+        return res;
     }
     
     private Expr ensureOneStateThisStep(int step, Automaton a){
         Expr res = ef.Or();
         for(State s: a)
-            res.add(StateEqState(a, step, s));
+            res = ef.add(res, StateEqState(a, step, s));
         
         return res;
+    }
+
+    public int FirstFreeAfterNSteps(int steps) {
+        return stepStart(steps);
+    }
+    
+    private <T> HashMap<T, Integer> reindex(Iterable<T> collection){
+        HashMap<T, Integer> map = new HashMap<T, Integer>();
+        int i = 0;
+        for(T a: collection){
+            map.put(a, i);
+            i++;
+        }
+        
+        return map;        
+    }
+    private HashMap<Automaton, HashMap<State, Integer>> reindexStates(Automata ats){
+        HashMap<Automaton, HashMap<State, Integer>> map = 
+                new HashMap<Automaton, HashMap<State, Integer>>();
+        for(Automaton a: ats)
+            map.put(a, reindex(a));
+        
+        return map;
+    }
+
+    private int getIndex(LabeledEvent ev){
+        return eventsIndexes.get(ev);
+    }
+    private int getIndex(Automaton a){
+        return automataIndexes.get(a);
+    }
+    private int getIndex(Automaton a, State s){
+        return (statesIndexes.get(a)).get(s);
     }
     
 

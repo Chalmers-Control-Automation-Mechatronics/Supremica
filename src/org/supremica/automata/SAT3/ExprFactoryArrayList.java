@@ -127,8 +127,11 @@ public class ExprFactoryArrayList implements ExprFactory {
                 }
                 return res;
             default:
+                StringBuilder sb = new StringBuilder();
+                buildStringFromExpr(expr,sb);
                 throw new IllegalArgumentException(
-                        "this is not a clause, this is: " + expr.getType().toString());
+                        "this is not a clause, this is: " + expr.getType().toString()+
+                        " "+ sb.toString());
         }
     }
     
@@ -158,23 +161,27 @@ public class ExprFactoryArrayList implements ExprFactory {
         }
     }    
     
-    public void printExpr(Expr e, PrintStream pw){
+    public void buildStringFromExpr(Expr e, StringBuilder sb){
         switch(e.getType()){
             case LIT:
-                pw.print(((Lit)e).getVar()+" ");
+                sb.append(LitToString(e)+" ");
                 break;
             case AND:
-                pw.print("AND(");
+                sb.append("AND(");
                 for(Expr elem: e)
-                    printExpr(elem, pw);
-                pw.print(")");
+                    buildStringFromExpr(elem, sb);
+                sb.append(")");
                 break;
             case OR:
-                pw.print("OR(");
+                sb.append("OR(");
                 for(Expr elem: e)
-                    printExpr(elem, pw);
-                pw.print(")");
+                    buildStringFromExpr(elem, sb);
+                sb.append(")");
                 break;
         }
+    }
+
+    public String LitToString(Expr expr) {
+        return Integer.toString(((Lit)expr).getVar());
     }
 }

@@ -67,5 +67,12 @@ public interface ExprFactory {
     
     
     public Expr Not(Expr expr);
+    
+    /**
+     * Converts Literal to String
+     * @param expr 
+     * @return
+     */
+    public String LitToString(Expr expr);    
 
 }

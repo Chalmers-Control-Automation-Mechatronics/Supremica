@@ -5,11 +5,14 @@
 
 package org.supremica.automata.SAT3;
 
+import java.util.ArrayList;
+
 /**
  *
  * @author voronov
  */
-public interface ToCnf {
+public interface CoDecIntToBool {
 
-    public void accept(Expr expr);
+    public int width(int value);    
+    public ArrayList<Boolean> toBits(int value, int width);
 }

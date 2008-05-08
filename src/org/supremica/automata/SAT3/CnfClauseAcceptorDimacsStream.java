@@ -31,7 +31,7 @@ public class CnfClauseAcceptorDimacsStream implements CnfClauseAcceptor{
     public void accept(Collection<Integer> c) {
         for(int i: c)
             out.print("" + i + " ");
-        out.println();
+        out.println("0");
         out.flush();
     }
 }

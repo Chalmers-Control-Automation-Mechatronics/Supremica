@@ -11,7 +11,7 @@ import java.util.ArrayList;
  *
  * @author voronov
  */
-public class VarEqLinear implements VarEq {
+public class CoDecIntToBoolLinear implements CoDecIntToBool {
 
     public int width(int value) {
         return value;

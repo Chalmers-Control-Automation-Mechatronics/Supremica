@@ -5,17 +5,19 @@
 
 package org.supremica.automata.SAT3;
 
+import java.io.PrintWriter;
+
 
 /**
  *
  * @author voronov
  */
-public class ToCnfVar implements ToCnf {
+public class ExprAcceptorToCnfVar implements ExprAcceptor {
     
     ExprFactory ef;
     CnfClauseAcceptor acceptor;
 
-    public ToCnfVar(ExprFactory ef, CnfClauseAcceptor acceptor){
+    public ExprAcceptorToCnfVar(ExprFactory ef, CnfClauseAcceptor acceptor){
         this.ef = ef;
         this.acceptor = acceptor;
     }
@@ -27,9 +29,14 @@ public class ToCnfVar implements ToCnf {
                 acceptor.accept(ef.PlainToCollection(cnf));
                 break;
             case AND:
+                try{
                 for(Expr elem: cnf)
                     acceptor.accept(ef.PlainToCollection(elem));
-                break;
+                } catch(IllegalArgumentException e){
+                    (new ExprAcceptorPlainPrint(ef, new PrintWriter(System.err, true))).accept(cnf);
+                    throw e;
+                }
+                break;                
             case OR:
                 if(isOnlyLits(expr))
                     acceptor.accept(ef.PlainToCollection(cnf));
@@ -51,7 +58,7 @@ public class ToCnfVar implements ToCnf {
             case AND:
                 Expr res = ef.And();
                 for(Expr elem: expr)
-                    res.add(fun(elem));
+                    res = ef.add(res, fun(elem));
                 return res;
             case OR:
                 if(isOnlyLits(expr))
@@ -83,17 +90,17 @@ public class ToCnfVar implements ToCnf {
         for(Expr elem: expr){
             switch(elem.getType()){
                 case AND:
-                    res.add(elem);
+                    res = ef.add(res, elem);
                     break;
                 case LIT:
-                    lits.add(elem);
+                    lits = ef.add(lits, elem);
                     break;
                 default:
                     throw new IllegalArgumentException("and or lit expected");
             }
         }
         if(lits.size()>0)
-            res.add(lits);
+            res = ef.add(res, lits);
         
         return res;
     }
@@ -110,19 +117,19 @@ public class ToCnfVar implements ToCnf {
     private Expr permute(Expr souDis){
         
         Expr resConj = ef.And();
-        Expr newResConj = ef.And();
         
         for(Expr oneSouCon: souDis){
+            Expr newResConj = ef.And();
             for(Expr oneElemOfSouCon: oneSouCon){
                 if(resConj.size()==0)
-                    newResConj.add(oneElemOfSouCon);
+                    newResConj = ef.add(newResConj,oneElemOfSouCon);
                 else
                     for(Expr oneResDis: resConj){
-                        newResConj.add(ef.Or(oneResDis, oneElemOfSouCon));
+                        newResConj = ef.add(newResConj, ef.Or(oneResDis, oneElemOfSouCon));
                 }                
             }
             resConj = newResConj;
-            newResConj = ef.And();
+            //newResConj = ef.And();
         }
         return resConj;
     }        

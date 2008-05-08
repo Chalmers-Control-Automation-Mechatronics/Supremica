@@ -67,7 +67,7 @@ public class CnfClauseAcceptorDimacsFile implements CnfClauseAcceptor{
 
         RandomAccessFile raf = new RandomAccessFile(file, "rw");
         raf.skipBytes(10);  // "p cnf   "
-        raf.writeChars(""+variables+" "+clauses);
+        raf.writeBytes(""+variables+" "+clauses);
         raf.close();
     }
 

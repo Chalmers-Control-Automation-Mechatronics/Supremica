@@ -18,5 +18,7 @@ public interface VarsLayout {
     public Expr StateEqState(Automaton a, int step, State s);
     public Expr TransitionEqLabel(int step, LabeledEvent e);
     public Expr KeepState(Automaton a, int currentStep);
-    public Expr EnsureOnlyOneValueThisStep(int step);
+    public Expr EnsureOneEventThisStep(int step);
+    public Expr EnsureOneStateThisStep(int step);
+    public int  FirstFreeAfterNSteps(int steps);
 }

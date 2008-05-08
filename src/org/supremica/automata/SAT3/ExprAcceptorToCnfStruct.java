@@ -37,12 +37,12 @@ package org.supremica.automata.SAT3;
  *   - if it is AND, we modify:
  *       - if OR was atomic, i.e.  except *this AND* there is nothing or one literal,
  *         we replace it in a variables-preserving way
- *       - if OR contains more than one literal (or contains AND), then we replace
- *         this one in a structure-preserving way
+ *       - if OR contains more than one literal together with this AND, 
+ *         or contains other AND:s, then we replace this one in a structure-preserving way
  * 
  * @author voronov
  */
-public class ToCnfStruct implements ToCnf {
+public class ExprAcceptorToCnfStruct implements ExprAcceptor {
 
     private int curNew;
     private CnfClauseAcceptor acceptor;
@@ -52,7 +52,7 @@ public class ToCnfStruct implements ToCnf {
         fun(expr);
     }
 
-    public ToCnfStruct(int startVariable, ExprFactory ef, CnfClauseAcceptor acceptor){
+    public ExprAcceptorToCnfStruct(int startVariable, ExprFactory ef, CnfClauseAcceptor acceptor){
         this.curNew   = startVariable;
         this.ef       = ef;
         this.acceptor = acceptor;        

@@ -5,14 +5,11 @@
 
 package org.supremica.automata.SAT3;
 
-import java.util.ArrayList;
-
 /**
  *
  * @author voronov
  */
-public interface VarEq {
+public interface ExprAcceptor {
 
-    public int width(int value);    
-    public ArrayList<Boolean> toBits(int value, int width);
+    public void accept(Expr expr);
 }
