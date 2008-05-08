@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<Automata name="two" comment="test">
+<Automaton name="A" type="Plant">
+	<Events>
+		<Event id="0" label="a" controllable="false"/>
+		<Event id="1" label="b"/>
+	</Events>
+	<States>
+		<State id="0" name="q0" initial="true" cost="0"/>
+		<State id="1" name="q1" cost="8"/>
+		<State id="2" name="q2" accepting="true" cost="0"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="0"/>
+		<Transition source="1" dest="2" event="1"/>
+		<Transition source="2" dest="0" event="0"/>
+	</Transitions>
+</Automaton>
+<Automaton name="B" type="Supervisor">
+	<Events>
+		<Event id="0" label="a" controllable="false"/>
+		<Event id="1" label="b"/>
+	</Events>
+	<States>
+		<State id="0" name="q0" initial="true" accepting="true" cost="0"/>
+		<State id="1" name="q1" cost="6"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="1"/>
+		<Transition source="1" dest="0" event="0"/>
+	</Transitions>
+</Automaton>
+</Automata>

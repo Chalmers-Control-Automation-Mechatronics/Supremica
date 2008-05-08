@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<Automata name="one" comment="test">
+<Automaton name="A" type="Plant">
+	<Events>
+		<Event id="0" label="m"/>
+		<Event id="1" label="a"/>
+	</Events>
+	<States>
+		<State id="0" name="q0" initial="true"/>
+		<State id="1" name="q1" accepting="true"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="1"/>
+		<Transition source="1" dest="0" event="1"/>
+		<Transition source="0" dest="0" event="0"/>
+	</Transitions>
+</Automaton>
+</Automata>
