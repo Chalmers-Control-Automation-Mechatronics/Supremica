@@ -61,7 +61,7 @@
     <property name="jaxb1-impl.jar" location="${lib}/jaxb1-impl.jar"/>
     <property name="jsr173_api.jar" location="${lib}/jsr173_1.0_api.jar"/>
     
-    <property name="groovy-all.jar" location="${lib}/groovy-all-1.5.4.jar"/>
+    <property name="groovy-all.jar" location="${lib}/groovy-all-1.6-beta-1.jar"/>
     
     <path id="jaxb.classpath">
         <pathelement location="${activation.jar}"/>
