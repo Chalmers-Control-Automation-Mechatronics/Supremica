@@ -5,7 +5,8 @@ import javax.swing.Action;
 import javax.swing.KeyStroke;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
-import org.supremica.gui.TestCasesDialog;
+
+import org.supremica.gui.examplegenerator.TestCasesDialog;
 
 /**
  * A new action
