@@ -10,12 +10,18 @@ import javax.swing.*;
 
 import org.jdom.Document;
 import org.jdom.output.XMLOutputter;
+
+import org.supremica.manufacturingTables.xsd.processeditor.ROP;
 import org.supremica.manufacturingTables.xsd.eop.EOP;
+import org.supremica.manufacturingTables.xsd.eop.Operation;
 import org.supremica.manufacturingTables.xsd.il.IL;
 
 import org.supremica.external.specificationSynthesis.algorithms.ConverterILtoAutomata;
 import org.supremica.external.specificationSynthesis.algorithms.SpecificationSynthesInputBuilder;
-import org.supremica.external.specificationSynthesis.gui.Gui;
+
+import org.supremica.external.processeditor.tools.dop2efa.DOPtoEFA;
+import org.supremica.external.processeditor.tools.dop2efa.Module;
+
 import org.supremica.external.processeditor.xml.Loader;
 
 public class ConvertPanel 
@@ -24,7 +30,8 @@ public class ConvertPanel
 							    ActionListener
 {
 	
-	private static final String EXTENSION = ".xml";
+	private static final String XML_EXTENSION = ".xml";
+	private static final String WATER_MODULE_EXTENSION = ".wmod";
 	
 	private TablePane leftPane;
 	private JPanel rigthPane;
@@ -57,7 +64,7 @@ public class ConvertPanel
     	bottomRigthPane = new JPanel();
     	
     	outputPane = new FilePathPane();
-    	outputPane.setFileExtension( EXTENSION );
+    	outputPane.setFileExtension("");
     	
     	configPane = new ParameterPane();
     	buttonPane = new JPanel();
@@ -67,11 +74,11 @@ public class ConvertPanel
     	tfModuleName.setText( "Module" );
     	
         leftPane.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createTitledBorder("SOC files"),
+                BorderFactory.createTitledBorder("Specification files"),
                 BorderFactory.createEmptyBorder(5,5,5,5)));
         
         outputPane.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createTitledBorder("Output file"),
+                BorderFactory.createTitledBorder("Output folder"),
                 BorderFactory.createEmptyBorder(5,5,5,5)));
         
         configPane.setBorder(BorderFactory.createCompoundBorder(
@@ -123,7 +130,7 @@ public class ConvertPanel
     }
     
     public void setOutputFileChooser(JFileChooser fc) {
-    	outputPane.setFileChooser(fc);
+    	outputPane.setFileChooser( fc );
     }
     
     public void addActionListener(ActionListener l) {
@@ -146,7 +153,11 @@ public class ConvertPanel
         Object o = evt.getSource();
         
         if(o == jbToFile){
-        	convert();
+        	if( checkInputToConvertAndInformUser() ){
+        		buildDOPtoEFA();
+            	buildSpecificationSynthes();
+        	}
+        	
         }else if(o == jbExit){
         	if(l != null){
         		l.actionPerformed(new ActionEvent(o,0,EXIT));
@@ -156,6 +167,40 @@ public class ConvertPanel
         }
     }
     
+    private void buildDOPtoEFA() {
+    	
+    	String outFile = "";
+    	String moduleName = "";
+    	
+    	Module mod = null;
+    	
+    	List<String> filePathList = null;
+    	
+    	filePathList = ((TablePane)leftPane).getMarkedFilePathList();
+    	moduleName = tfModuleName.getText();
+    	
+    	outFile = ((FilePathPane)outputPane).getFilePath()
+    	          + System.getProperty("file.separator")
+    	          + moduleName 
+    	          + WATER_MODULE_EXTENSION;
+    	
+    	
+    	
+    	//convert
+    	mod = DOPtoEFA.buildModule(filePathList,
+    							 moduleName,
+    							 configPane.getValueOption("block"));
+    	if( mod != null ){
+    		mod.writeToFile( new File( outFile ) );
+    	}else{
+    		JOptionPane.
+				showMessageDialog(dialogReferenceFrame,
+								  "Couldn't create module",
+								  "Problem",
+								  JOptionPane.ERROR_MESSAGE);
+    	}
+    }
+    
     /**
      * 1. Opens all files and gets EOP and IL objects
      * 
@@ -163,7 +208,7 @@ public class ConvertPanel
      * 
      * 3. Convert Document to automata
      */
-    private void convert(){
+    private void buildSpecificationSynthes() {
     	
     	Object o = null;
     	String outFile = "";
@@ -175,18 +220,21 @@ public class ConvertPanel
     	
     	List<String> filePathList = null;
     	
-    	//Sanity check
-    	if( !checkInputToConvertAndInformUser() ){
-    		return;
-    	}
-    	
     	//init
     	loader = new Loader();
     	builder = new SpecificationSynthesInputBuilder();
     	filePathList = ((TablePane)leftPane).getMarkedFilePathList();
-    	outFile = ((FilePathPane)outputPane).getFilePath();
+    	
     	moduleName = tfModuleName.getText();
-    		
+    	
+    	outFile = ((FilePathPane)outputPane).getFilePath()
+    	          + System.getProperty("file.separator")
+    	          + moduleName
+    	          + XML_EXTENSION;
+    	
+    	if( null == filePathList || 0 == filePathList.size()){
+    		return;
+    	}
     		
     	/*
     	 * 
@@ -202,14 +250,28 @@ public class ConvertPanel
         	 *  2. Merge all EOP and IL objects to a single Document
         	 * 
         	 */
-    		if( o instanceof EOP ){
+            if( o instanceof Operation ){
+    			String id = ((Operation)o).getOpID()
+    			            + "::" 
+    			            + ((Operation)o).getMachine();
     			
-    			builder.addEOP( (EOP)o );
+    			builder.addEOP( ((Operation)o).getEOP(), id);
     			
-    		}else if(o instanceof IL){
+    		}else if( o instanceof EOP ){
     			
-    			builder.addIL( (IL)o );
+    			JOptionPane.
+				showMessageDialog(dialogReferenceFrame,
+								  "EOP contain no operation information",
+								  "Problem",
+								  JOptionPane.ERROR_MESSAGE);
     			
+    		}else if( o instanceof IL ){
+    			
+    			builder.addIL( (IL)o ); //Were is information if this is a robot IL
+    			//builder.addRobotIL( (IL)o );
+    			
+    		}else if( o instanceof ROP ){
+    			System.out.println("ROP");//do nothing with ROP
     		}else{
     			JOptionPane.
     				showMessageDialog(dialogReferenceFrame,
@@ -218,9 +280,11 @@ public class ConvertPanel
     								  JOptionPane.ERROR_MESSAGE);
     		}
     	}
-    		
+    	
+    	//debug
     	//Save document for debug purpose
     	saveDocument(builder.getDoc(), outFile + "_" );
+    	//debug
     	
     	/*
     	 * 

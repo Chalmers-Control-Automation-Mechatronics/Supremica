@@ -37,6 +37,7 @@ public class FilePathPane
     	if(this.fc == null){
     		this.fc = fc;
     	}
+    	fc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
     }
     
     public void setFileExtension(String ext){

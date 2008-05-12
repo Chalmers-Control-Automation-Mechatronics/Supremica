@@ -19,10 +19,11 @@ import java.io.File;
 
 import org.supremica.external.processeditor.xml.Loader;
 
-import org.supremica.manufacturingTables.xsd.eop.EOP;
+import org.supremica.manufacturingTables.xsd.processeditor.ROP;
+import org.supremica.manufacturingTables.xsd.eop.Operation;
 import org.supremica.manufacturingTables.xsd.il.IL;
 
-public class EOPILtable extends JTable {
+public class SpecificationTable extends JTable {
     
     TableModel model = null;
     
@@ -31,7 +32,7 @@ public class EOPILtable extends JTable {
                                          "comments about the machine",
                                          "If checked, included in convert"};
 
-    public EOPILtable() {
+    public SpecificationTable() {
         super(new BasicTableModel());
         setPreferredScrollableViewportSize(new Dimension(50, 100));
         setFillsViewportHeight(true);
@@ -43,7 +44,7 @@ public class EOPILtable extends JTable {
     
     public void addFile(File file){
     	
-    	String machineName = "";
+    	String name = "";
     	String comment = "";
     	String type = "";
     	
@@ -56,21 +57,33 @@ public class EOPILtable extends JTable {
     		return;
     	}
     	
-    	if(o instanceof EOP){
+    	if(o instanceof ROP){
     		
-    		machineName = "";
-        	comment = "";
+    		name = ((ROP)o).getMachine();
+        	comment = ((ROP)o).getComment();
+        	type = ((ROP)o).getType().value();
+        	
+    	}else if(o instanceof Operation){
+    		
+    		name = ((Operation)o).getOpID() +"::"+ ((Operation)o).getMachine();
+        	comment = ((Operation)o).getComment();
         	type = "EOP";
         	
     	}else if(o instanceof IL){
     		
-    		machineName = "";
-        	comment = "";
+    		name = ((IL)o).getId();
+        	comment = ((IL)o).getComment();
         	type = "IL";
         	
+    	}else{
+    		//debug
+    		//System.out.println("Unkonwn " + o.toString());
+    		//debug
+    		
+    		return; //Add nothing
     	}
     	
-    	os = new Object[]{machineName,
+    	os = new Object[]{name,
 				  		  type,
 				  		  comment,
 				  		  new Boolean(true),
@@ -96,7 +109,8 @@ public class EOPILtable extends JTable {
     	while(row < getModel().getRowCount()){
     		
     		//create file
-    		file = new File((String)getModel().getValueAt(row,getModel().FILE_PATH_COL));
+    		file = new File((String)getModel().
+    							getValueAt(row,getModel().FILE_PATH_COL));
     		
     		//create rop
     		o = getObjectFromFile( file );
@@ -105,9 +119,12 @@ public class EOPILtable extends JTable {
     			getModel().deleteRow(row);
     		}else{
     			//test if property have changed
-    			name = (String)getModel().getValueAt(row, getModel().NAME_COL);
-    			type = (String)getModel().getValueAt(row, getModel().TYPE_COL);
-    			comment = (String)getModel().getValueAt(row, getModel().COMMENT_COL);
+    			name = (String)getModel().
+    							getValueAt(row, getModel().NAME_COL);
+    			type = (String)getModel().
+    							getValueAt(row, getModel().TYPE_COL);
+    			comment = (String)getModel().
+    							getValueAt(row, getModel().COMMENT_COL);
     			
     			
     			
@@ -119,9 +136,10 @@ public class EOPILtable extends JTable {
     
     public List<String> getFilePathList(){
     	List<String> filePathList = new LinkedList<String>();
+    	String filePath = "";
     	
     	for(int i = 0; i < getRowCount(); i++){
-    		String filePath = (String)getModel().getValueAt(i,getModel().FILE_PATH_COL);
+    		filePath = (String)getModel().getValueAt(i,getModel().FILE_PATH_COL);
     		filePathList.add(filePath);
     	}
     	
@@ -130,10 +148,11 @@ public class EOPILtable extends JTable {
     
     public List<String> getMarkedFilePathList(){
     	List<String> filePathList = new LinkedList<String>();
+    	String filePath = "";
     	
     	for(int i = 0; i < getRowCount(); i++){
     		if((Boolean)getValueAt(i,getModel().BOOLEAN_COL)){
-    			String filePath = (String)getModel().getValueAt(i,getModel().FILE_PATH_COL);
+    			filePath = (String)getModel().getValueAt(i,getModel().FILE_PATH_COL);
     			filePathList.add(filePath);
     		}
     	}
@@ -154,7 +173,7 @@ public class EOPILtable extends JTable {
     	
     	String fileName = null;
     	String type = null;
-		String machineName = null;
+		String name = null;
 		String comment = null;
 		
     	java.awt.Point p = e.getPoint();
@@ -168,16 +187,16 @@ public class EOPILtable extends JTable {
     	switch(realColumnIndex){
     		case 0://Machine name column
     			fileName = (String)model.getValueAt(rowIndex,getModel().FILE_PATH_COL);
-    			machineName = (String)model.getValueAt(rowIndex,colIndex);
+    			name = (String)model.getValueAt(rowIndex,colIndex);
     			
-    			if(fileName != null && machineName != null){
-    				if(fileName.length() > 0 && machineName.length() > 0){
-    					tip = machineName +" in "+fileName;
+    			if(fileName != null && name != null){
+    				if(fileName.length() > 0 && name.length() > 0){
+    					tip = name +" in "+fileName;
     				}
     			}
     			break;
     		
-    		case 1: //RopType column
+    		case 1: //Type column
     			type = (String)getValueAt(rowIndex, colIndex);
     			if(type != null && type.length() > 0){
     				tip = type;
@@ -191,15 +210,15 @@ public class EOPILtable extends JTable {
         		break;
     		case 3: // Checked column
     			
-    			machineName = (String)model.getValueAt(rowIndex,0);
+    			name = (String)model.getValueAt(rowIndex,0);
     			
                 Object checked = model.getValueAt(rowIndex,colIndex);
     			
                 if(checked instanceof Boolean){
                 	if((Boolean)checked){
-                		tip = machineName + " will be converted";
+                		tip = name + " will be converted";
                 	}else{
-                		tip = machineName + " will NOT be converted";
+                		tip = name + " will NOT be converted";
                 	}
                 }
         		break;
@@ -238,6 +257,7 @@ public class EOPILtable extends JTable {
 			Loader loader = new Loader();
 			
 			Object o = null;
+			
 			try{
 				o = loader.open(file);
 			}catch(Exception e){
@@ -265,7 +285,7 @@ public class EOPILtable extends JTable {
         JComponent newContentPane = new JPanel(new GridLayout(1,0));
         
         //Create the scroll pane and add the table to it.
-        JScrollPane scrollPane = new JScrollPane(new EOPILtable());
+        JScrollPane scrollPane = new JScrollPane(new SpecificationTable());
 
         //Add the scroll pane to this panel.
         newContentPane.add(scrollPane);

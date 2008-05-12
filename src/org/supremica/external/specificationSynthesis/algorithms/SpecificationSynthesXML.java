@@ -24,7 +24,10 @@ public class SpecificationSynthesXML {
 	public static final String ROBOT_IL           = "Robot_interlocking";
 	
 	public static final String INT_STATE           = "Internal_state";
-	public static final String EXT_STATE           = "Extrenal_state";
+	public static final String EXT_STATE           = "External_state";
+	
+	public static final String OP_NOT_ONGOING           = "Op_not_ongoing";
+	public static final String OP_NOT_STARTED           = "Op_not_started";
 	
 	//XML definitions used as attributes
 	public static final String ID                 = "id";

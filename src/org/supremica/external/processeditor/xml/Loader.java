@@ -25,13 +25,6 @@ public class Loader {
     	
     	printDebugInfo = false;
     	
-    	//ROP
-    	o = openROP(file);
-    	if(null != o){
-    		printDebugInfo = true;
-    		return o;
-    	}
-    	
     	//EOP
     	o = openEOP(file);
     	if(null != o){
@@ -39,6 +32,13 @@ public class Loader {
     		return o;
     	}
     	
+    	//ROP
+    	o = openROP(file);
+    	if(null != o){
+    		printDebugInfo = true;
+    		return o;
+    	}
+    
     	//IL
     	o = openIL(file);
     	if(null != o){

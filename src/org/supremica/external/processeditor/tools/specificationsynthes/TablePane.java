@@ -21,7 +21,7 @@ public class TablePane
 	private int xSize = 100;
 	private int ySize = 100;
 	
-	private EOPILtable table ;
+	private SpecificationTable table ;
 	private JFileChooser fc;
 	
 	public TablePane(){
@@ -40,7 +40,7 @@ public class TablePane
 		buttonPanel.add( Box.createRigidArea( new Dimension( 1, 10 )) );
 		buttonPanel.add( jbRemove );	    	    	   
     
-		table = new EOPILtable();
+		table = new SpecificationTable();
     
 		table.setShowHorizontalLines( true );  
 		table.setShowVerticalLines( true ); 

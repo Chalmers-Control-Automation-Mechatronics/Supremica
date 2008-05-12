@@ -14,17 +14,12 @@ public class ConverterILandEOPtoILEOP {
 
 	}
 
-
-
-	public void convertILandEOPtoILEOP(Document ILDoc, Document EOPDoc) {
-
+	public void convertILandEOPtoILEOP(Document ILDoc, Document EOPDoc) {      
 
 		// ILEOPDoc corresponds to the output xml document.
 		ILEOPDoc = new Document(ILsEOPs);
 		Element EOProot = EOPDoc.getRootElement();
 		Element ILroot = ILDoc.getRootElement();
-
-
 
 
 		// To make the file look like Petter´s old testfiles...
@@ -51,7 +46,6 @@ public class ConverterILandEOPtoILEOP {
 			Element evILelement = (Element) evILIter.next();
 			Element evIL = (Element) evILelement.clone();
 			ILsEOPs.addContent(evIL);
-
 		}
 
 		List rILList = ILroot.getChildren("Robot_interlocking");
@@ -61,7 +55,6 @@ public class ConverterILandEOPtoILEOP {
 			Element rILelement = (Element) rILIter.next();
 			Element rIL = (Element) rILelement.clone();
 			ILsEOPs.addContent(rIL);
-
 		}
 
 	}

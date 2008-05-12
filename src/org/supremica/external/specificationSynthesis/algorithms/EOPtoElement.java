@@ -1,6 +1,15 @@
+/*
+ * This class contains functions to build an Element from EOP 
+ * 
+ * This class is an small step toward the input to the 
+ * specification synthes algorithm made by Kristin Andersson
+ * 
+ */
+
 package org.supremica.external.specificationSynthesis.algorithms;
 
 import org.jdom.Element;
+
 import org.supremica.manufacturingTables.xsd.eop.Action;
 import org.supremica.manufacturingTables.xsd.eop.EOP;
 import org.supremica.manufacturingTables.xsd.eop.ActuatorValue;
@@ -17,17 +26,16 @@ class EOPtoElement
 	private static Element event = null;
 	private static Element restriction = null;
 	private static Element and = null;
-	private static Element state = null;
 	
 	//Empty constructor
 	EOPtoElement(){}
 	
 	/**
 	 * 
-	 * Function to create an Element object from an EOP object
+	 * Function to create an instance of Element from an instance of EOP
 	 * 
 	 */
-	public static Element createElement( EOP eop ){
+	public static Element createElement( EOP eop, String id ){
 		
 		Element element = null;
 		
@@ -39,12 +47,15 @@ class EOPtoElement
 		//init
 		element = new Element( OPERATION );
 		
+		//Add attributes
+		element.setAttribute( ID , id );
+		
 		//Add initial process
-		element.addContent( createElement( eop.getInitialState() ) );
+		element.addContent( createElement( eop.getInitialState(), id ) );
 		
 		//Add processes from action
-		for(Action action : eop.getAction()){
-			element.addContent( createElement( action ) );
+		for( Action action : eop.getAction() ){
+			element.addContent( createElement( action, id ) );
 		}
 		
 		return element;
@@ -67,8 +78,6 @@ class EOPtoElement
 		event = new Element( EVENT );
 		restriction = new Element( RESTRICTION );
 		and = new Element( AND );
-		state = new Element( STATE );
-		
 	}
 	
 	
@@ -81,7 +90,7 @@ class EOPtoElement
 	 * @param initialState
 	 * @return
 	 */
-	private static Element createElement(InitialState initialState){
+	private static Element createElement( InitialState initialState, String id){
 	
 		final String ID_PREFIX = "init";
 		
@@ -95,10 +104,8 @@ class EOPtoElement
 		init();
 		
 		//add attributes
-		process.setAttribute( ID ,
-				              ID_PREFIX + "VAD SKA DET VARA FÖR ATTRIBUTTT!!!!" );
-		event.setAttribute( ID ,
-				            ID_PREFIX + "VAD SKA DET VARA FÖR ATTRIBUTTT!!!!" );
+		process.setAttribute( ID , ID_PREFIX + id );
+		event.setAttribute( ID , ID_PREFIX + id );
 		
 		//Create structure
 		process.addContent( event );
@@ -136,7 +143,7 @@ class EOPtoElement
 	 * @param initialState
 	 * @return
 	 */
-	private static Element createElement( Action action ){
+	private static Element createElement( Action action , String id){
 	
 		final String ACTION = "action";
 		
@@ -150,7 +157,7 @@ class EOPtoElement
 		
 		//add attributes
 		process.setAttribute( ID , ACTION + action.getActionNbr() );
-		//event.setAttribute( ID , "" );
+		event.setAttribute( ID , id + "_" + ACTION + action.getActionNbr() );
 		
 		//Create structure
 		process.addContent( event );
@@ -159,7 +166,7 @@ class EOPtoElement
 		
 		
 		//Actuator values
-		for(ActuatorValue actVal : action.getActuatorValue()){
+		for( ActuatorValue actVal : action.getActuatorValue() ){
 			
 			element = createElement( actVal );
 			if( element != null ){
@@ -182,12 +189,14 @@ class EOPtoElement
 	
 	/**
 	 * 
-	 * Creates an Element from an instance of an ActuatorValue
+	 * Creates an Element from an instance of ActuatorValue
 	 * 
 	 * @param actVal
 	 * @return
 	 */
 	private static Element createElement( ActuatorValue actVal ){
+		
+		Element state = null;
 		
 		//Sanity check
 		if(actVal == null){
@@ -223,6 +232,8 @@ class EOPtoElement
 	 * @return
 	 */
 	private static Element createElement( SensorValue sensVal ){
+		
+		Element state = null;
 		
 		//Sanity check
 		if(sensVal == null){

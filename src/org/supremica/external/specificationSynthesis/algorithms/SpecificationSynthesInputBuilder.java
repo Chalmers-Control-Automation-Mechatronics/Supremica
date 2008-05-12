@@ -16,13 +16,11 @@
 
 package org.supremica.external.specificationSynthesis.algorithms;
 
-import java.io.*;
-import java.util.*;
-import org.jdom.*;
-import org.jdom.output.*;
+import org.jdom.Document;
+import org.jdom.Element;
 
-import org.supremica.manufacturingTables.xsd.il.*;
-import org.supremica.manufacturingTables.xsd.eop.*;
+import org.supremica.manufacturingTables.xsd.il.IL;
+import org.supremica.manufacturingTables.xsd.eop.EOP;
 
 public class SpecificationSynthesInputBuilder 
                                          extends
@@ -47,21 +45,48 @@ public class SpecificationSynthesInputBuilder
 	/*  
 	/*-----------------------------------------------------------------------*/
 	
+	
 	/**
 	 * 
 	 * Function to add EOP to builder
 	 * 
 	 */
-	public void addEOP( EOP eop ){
-		ilseops.addContent( EOPtoElement.createElement( eop ) );
+	public void addEOP( EOP eop, String opID ) {
+		
+		//Sanity check
+		if( eop == null ){
+			return;
+		}
+		
+		ilseops.addContent( EOPtoElement.createElement( eop, opID ) );
 	}
 
 	/**
 	 * Function to add IL to builder
 	 * 
 	 */
-	public void addIL( IL il ){
-		ilseops.addContent( ILtoElement.createElement( il ) );
+	public void addIL( IL il ) {
+		
+		//Sanity check
+		if( il == null ){
+			return;
+		}
+		
+		ilseops.addContent( ILtoElement.createElement( il, false ) );
+	}
+	
+	/**
+	 * Function to add IL as a Robot IL to builder
+	 * 
+	 */
+	public void addRobotIL( IL il ) {
+		
+		//Sanity check
+		if( il == null ){
+			return;
+		}
+		
+		ilseops.addContent( ILtoElement.createElement( il, true ) );
 	}
 	
 	/**
@@ -85,7 +110,7 @@ public class SpecificationSynthesInputBuilder
 	 *	Initialization of internal variables
 	 * 
 	 */
-	private void init(){
+	private void init() {
 		ilseops = new Element( ILSEOPS );
 		docILEOP = new Document( ilseops );
 		placeSimultaneity();
@@ -98,17 +123,20 @@ public class SpecificationSynthesInputBuilder
 	 * old xml structure.
 	 * 
 	 */
-	private void placeSimultaneity()
-	{
+	private void placeSimultaneity() {
+		
+		//create element
 		Element sim = new Element( SIMULTANEITY );
 		Element proc1 = new Element( PROCESS );
-		
-		proc1.setAttribute( ID , "OA" );
-		sim.addContent( proc1 );
-		
 		Element proc2 = new Element( PROCESS );
-		proc2.setAttribute( ID , "OB");
-		sim.addContent(proc2);
-		ilseops.addContent(sim);
+		
+		//set attributes
+		proc1.setAttribute( ID , "OA" );
+		proc2.setAttribute( ID , "OB" );
+		
+		sim.addContent( proc1 );
+		sim.addContent( proc2 );
+		
+		ilseops.addContent( sim );
 	}
 }

@@ -1,9 +1,14 @@
 package org.supremica.external.processeditor.processgraph.eopcell;
 
+import java.awt.AWTEvent;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.event.ActionEvent;
 import java.awt.event.MouseEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.FocusListener;
+import java.awt.event.FocusEvent;
 
 import org.supremica.external.processeditor.processgraph.*;
 import org.supremica.external.processeditor.processgraph.resrccell.*;
@@ -12,10 +17,17 @@ import org.supremica.manufacturingTables.xsd.eop.*;
 
 import java.io.File;
 
+import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
+import javax.swing.JPopupMenu;
+
 
 public class ExecutionOfOperationCell 
 									extends 
 										ResourceCell
+									implements
+										ActionListener,
+										FocusListener
 {
 	
 	private static final Color bgColor = new Color(0,0,100,50);
@@ -23,8 +35,10 @@ public class ExecutionOfOperationCell
 	
 	private static final String TEXT = "EOP";
 	
-	EOPInfoWindow eopInfoWin = null;
-	File eopFile = null;
+	private EOPInfoWindow eopInfoWin = null;
+	
+	private JPopupMenu popupMenu = null;
+	
 	
 	public ExecutionOfOperationCell(EOP eop){
 		this();
@@ -35,8 +49,14 @@ public class ExecutionOfOperationCell
 	
 	public ExecutionOfOperationCell(){
 		super();
-		setEOP((new ObjectFactory()).createEOP());
+		
+		popupMenu = new JPopupMenu( "Menu" );
+		makePopupMenu();
+		
+		setOperation((new ObjectFactory()).createOperation());
 		setSize(30,30);
+		
+		this.addFocusListener(this);
 	}
 	
 	public void paintComponent(Graphics g) {
@@ -58,14 +78,35 @@ public class ExecutionOfOperationCell
 	} 
 	
 	public void setEOP(EOP eop){
-		setFunction(eop);
+		Object o = getFunction();
+		if(o instanceof Operation){
+			((Operation)o).setEOP(eop);
+		}
+		setFunction(o);
+	}
+	
+    public void setOperation(Operation op){
+    	if(null == op.getEOP()){
+    		op.setEOP((new ObjectFactory()).createEOP());
+    	}
+		setFunction(op);
 	}
 	
 	public EOP getEOP(){
 		Object o = getFunction();
-		if(o instanceof EOP){
-			return (EOP) o;
+		if(o instanceof Operation){
+			return ((Operation)o).getEOP();
 		}
+		return null;
+	}
+	
+	public Operation getOperation(){
+		Object o = getFunction();
+		
+		if(o instanceof Operation){
+			return (Operation)o;
+		}
+		
 		return null;
 	}
 	
@@ -75,12 +116,15 @@ public class ExecutionOfOperationCell
 	}
 	
 	public void mouseClicked(MouseEvent e) {
-		
+		;
 	}
 	
 	@Override
 	public void mouseReleased(MouseEvent e) {
-		if(e.getClickCount() > 1){
+		
+		if(e.isPopupTrigger()){
+			showPopupMenu(e);
+		}else if(e.getClickCount() > 1){
 			
 			if(null == eopInfoWin){
 				eopInfoWin = new EOPInfoWindow(this);
@@ -97,6 +141,84 @@ public class ExecutionOfOperationCell
 			super.mouseReleased(e);
 		}
 	}
+	
+	/* Handel popup menu */
+	protected void makePopupMenu(){
+		
+		//override this to make pop-up-menu
+		// Action and mouse listener support
+		enableEvents( AWTEvent.MOUSE_EVENT_MASK );
+		
+		// Create some menu items for the popup
+		JMenuItem menuItem = new JMenuItem( "Set Operation" );
+		menuItem.addActionListener( this );
+		popupMenu.add( menuItem );
+		
+		menuItem = new JMenuItem( "Set Machine" );
+		menuItem.addActionListener( this );
+		popupMenu.add( menuItem );
+	}
+	
+	private void showPopupMenu( MouseEvent e ){
+		popupMenu.setLocation( e.getLocationOnScreen() );
+		popupMenu.setVisible( true );
+	}
+	
+	
+	public void actionPerformed( ActionEvent event ){
+		String tmp = "";
+		
+		// Add action handling code here
+		if( event.getActionCommand().equals( "Set Operation" ) ){
+			
+			//hide popupmenu
+			popupMenu.setVisible( false );
+			
+			//show text input dialog
+			tmp = (String)JOptionPane.showInputDialog(
+                    null,
+                    "Operation",
+                    "Set Operation",
+                    JOptionPane.PLAIN_MESSAGE,
+                    null,
+                    null,
+                    getOperation().getOpID());
+			
+			//set text to operation id
+			if( "" != tmp ){
+				getOperation().setOpID( tmp );
+			}
+			
+		}else if( event.getActionCommand().equals( "Set Machine" ) ){
+			
+			//hide popoup menu
+			popupMenu.setVisible( false );
+			
+			//show text input dialog
+			tmp = (String)JOptionPane.showInputDialog(
+                    null,
+                    "Machine",
+                    "Set Machine",
+                    JOptionPane.PLAIN_MESSAGE,
+                    null,
+                    null,
+                    getOperation().getMachine());
+			
+			//set text to machine
+			if( "" != tmp ){
+				getOperation().setMachine( tmp );
+			}
+		}
+	}
+	
+	public void focusGained(FocusEvent e){
+		
+	}
+	
+    public void focusLost(FocusEvent e){
+    	//hide popupmenu
+		popupMenu.setVisible( false );
+    }
 	
 	@Override
 	public void pack(){};

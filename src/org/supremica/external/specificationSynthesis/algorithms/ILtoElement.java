@@ -1,6 +1,8 @@
 /*
- *  This class builds an Element from an IL object. It is an
- *  help class to SpecificationSynthesInputBuilder
+ *  This class contains functions to build an Element from IL 
+ * 
+ * This class is an small step toward the input to the 
+ * specification synthes algorithm made by Kristin Andersson
  *  
  */
 
@@ -12,6 +14,8 @@ import org.supremica.manufacturingTables.xsd.il.IL;
 import org.supremica.manufacturingTables.xsd.il.Term;
 import org.supremica.manufacturingTables.xsd.il.ActuatorValue;
 import org.supremica.manufacturingTables.xsd.il.SensorValue;
+import org.supremica.manufacturingTables.xsd.il.ExternalComponentValue;
+import org.supremica.manufacturingTables.xsd.il.OperationCheck;
 
 class ILtoElement
               extends
@@ -19,7 +23,7 @@ class ILtoElement
 {
 	
 	//Local elements
-	private static Element eventInterlocking = null;
+	private static Element interlock = null;
 	private static Element event = null;
 	private static Element restriction = null;
 	private static Element or = null;
@@ -27,6 +31,7 @@ class ILtoElement
 	
 	//Empty constructor
 	ILtoElement(){}
+	
 	
 	/**
 	 * 
@@ -36,21 +41,37 @@ class ILtoElement
 	 * @return
 	 */
 	public static Element createElement( IL il ){
+	    return createElement( il , false );
+	}
+	
+	/**
+	 * 
+	 * Creates an Element from an IL object, if robot is true
+	 * an robot interlock is created else an event interlock is 
+	 * created
+	 * 
+	 * @param il
+	 * @return
+	 */
+	public static Element createElement( IL il , boolean robot ){
 		
-		if(il == null){
+		//Sanity check
+		if( il == null ){
 			return null;
 		}
 		
 		init();
 		
-		//add attributes
-		eventInterlocking.setAttribute( ID , il.getComment() );
-		eventInterlocking.setAttribute( TYPE , "safe");
+		if( robot ){
+			interlock = new Element( ROBOT_IL );
+		}
 		
-		event.setAttribute( ID , "" );
+		//add attributes
+		interlock.setAttribute( ID , il.getId() );
+		interlock.setAttribute( TYPE , "safe");
 		
 		//Create tree structure
-		eventInterlocking.addContent( event );
+		interlock.addContent( event );
 		event.addContent( restriction );
 		restriction.addContent( or );
 		
@@ -60,8 +81,10 @@ class ILtoElement
 		}
 		
 		//Add to ilseops
-		return eventInterlocking;
+		return interlock;
 	}
+	
+	
 	
 	/**
 	 * 
@@ -71,7 +94,7 @@ class ILtoElement
 	private static void init(){
 		
 		//Initialize elements
-		eventInterlocking = new Element( EVENT_IL );
+		interlock = new Element( EVENT_IL );
 		event = new Element( EVENT );
 		restriction = new Element( RESTRICTION );
 		or = new Element( OR );
@@ -85,12 +108,12 @@ class ILtoElement
 	 * @param term
 	 * @return
 	 */
-	private static Element buildElement(Term term){
+	private static Element buildElement( Term term ){
 		
 		Element tmp = null;
 		
 		//Sanity check
-		if(term == null){
+		if( term == null ){
 			return null;
 		}
 		
@@ -111,9 +134,51 @@ class ILtoElement
 			
 			tmp = createElement( sensVal );
 			if( tmp != null ){
-	            and.addContent( createElement( sensVal ) );
+	            and.addContent( tmp );
 			}
 		}
+		
+		
+		//External component state
+		for( ExternalComponentValue extVal : term.getExternalComponentValue() ){
+			
+			tmp = createElement( extVal );
+			if( tmp != null ){
+	            and.addContent( tmp );
+			}
+		}
+		
+		
+		//Operations state
+		for( OperationCheck opCheck : term.getOperationCheck() ){
+			
+			//Add not ongoing operations
+			if( null != opCheck.getNotOngoing() ){
+			    for( String op : opCheck.getNotOngoing().getOperation() ){
+			    	if( isValidString( op ) ){
+						
+						tmp = new Element( OP_NOT_ONGOING  );
+						tmp.setAttribute( NAME, op );
+			            
+						and.addContent( tmp );
+					}
+			    }
+			}
+			
+			//Add not started operations
+			if( null != opCheck.getNotOngoing() ){
+			    for( String op : opCheck.getNotStarted().getOperation() ){
+			    	if( isValidString( op ) ){
+						
+						tmp = new Element( OP_NOT_ONGOING  );
+						tmp.setAttribute( NAME, op );
+			            
+						and.addContent( tmp );
+					}
+			    }
+			}
+		}
+		
 		
 		return and;
 	}
@@ -132,7 +197,7 @@ class ILtoElement
 		Element state = null;
 		
 		//Sanity check
-		if(actVal == null){
+		if( null == actVal ){
 			return null;
 		}
 		
@@ -190,4 +255,50 @@ class ILtoElement
 		
 		return state;
 	}
+	
+	
+	
+	
+	
+	
+	
+	/**
+	 * 
+	 * Creates an Element from an instance of an ExternalCompopnentValue
+	 * 
+	 * @param sensVal
+	 * @return
+	 */
+	private static Element createElement( ExternalComponentValue extVal ){
+		
+		Element state = null;
+		
+		//Sanity check
+		if( extVal == null ){
+			return null;
+		}else if( extVal.getExternalComponent() == null ){
+			return null;
+		}
+		
+		/*
+		 *  if external component value contains a valid value 
+		 *  a new Element are created
+		 * 
+		 */
+		if( isValidString( extVal.getValue() ) ){
+			
+			state = new Element( EXT_STATE );
+			state.setAttribute( NAME, extVal.getExternalComponent().
+                                                              getComponent() );
+			state.setAttribute( ID, extVal.getValue() );
+		
+		}else{
+			return null;
+		}
+		
+		return state;
+	}
+	
+	
+	
 }

@@ -34,7 +34,7 @@ import org.supremica.manufacturingTables.xsd.processeditor.ObjectFactory;
 import org.supremica.manufacturingTables.xsd.processeditor.ROP;
 import org.supremica.manufacturingTables.xsd.processeditor.RelationType;
 import org.supremica.manufacturingTables.xsd.il.IL;
-import org.supremica.manufacturingTables.xsd.eop.EOP;
+import org.supremica.manufacturingTables.xsd.eop.Operation;
 
 import org.supremica.external.processeditor.xml.Converter;
 
@@ -442,7 +442,7 @@ public class SOCGraphContainer
     				loader.save(o, resrcCell.getFile());
     			}else if(o instanceof IL){
     				loader.saveIL(o, resrcCell.getFile());
-    			}else if(o instanceof EOP){
+    			}else if(o instanceof Operation){
     				loader.saveEOP(o, resrcCell.getFile());
     			}
     		}else {
@@ -476,7 +476,7 @@ public class SOCGraphContainer
     protected File saveObjectAs(Object o) {
     	if(o instanceof ROP ||
     	   o instanceof IL  ||
-    	   o instanceof EOP) 
+    	   o instanceof Operation) 
     	{	    
     		JFileChooser fc;
     		if(cDir != null) {
@@ -505,7 +505,7 @@ public class SOCGraphContainer
         				//Converter.printROP(o);
         			}else if(o instanceof IL){
         				loader.saveIL(o, file);
-        			}else if(o instanceof EOP){
+        			}else if(o instanceof Operation){
         				loader.saveEOP(o, file);
         			} 	
     				return file;

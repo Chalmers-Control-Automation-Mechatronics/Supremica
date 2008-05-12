@@ -249,15 +249,25 @@ public class DOPtoEFA
 	 */
 	public static ROP getROPfromFile(File ropFile){
 		
-		if(ropFile != null && ropFile.exists()){
-			Loader loader = new Loader();
-			Object o = loader.open(ropFile);
-			if(o instanceof ROP){
-				return (ROP)o;
-			}
+		Loader loader = null;
+		Object o = null;
+		
+		//Sanity check
+		if(null == ropFile || !ropFile.exists()){
+			return null;
 		}
 		
-		System.err.println("File " + ropFile + " contains no ROP.");
+		loader = new Loader();
+		o = loader.open(ropFile);
+		
+		if(o instanceof ROP){
+			return (ROP)o;
+		}
+		
+		//debug
+		//System.err.println("File " + ropFile + " contains no ROP.");
+		//debug
+		
 		return null;
 	}
 	
