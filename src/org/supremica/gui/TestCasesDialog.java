@@ -694,6 +694,7 @@ class CatMousePanel
     Box theBox;
     JPanel numberOfInstances;
     Util util = new Util();
+    private static Logger logger = LoggerFactory.createLogger(CatMousePanel.class);
 
     public CatMousePanel()
     {
@@ -727,7 +728,10 @@ class CatMousePanel
         add(theBox, BorderLayout.NORTH);
     }
     
-    public void compute(IDE ide)throws Exception{}
+    public void compute(IDE ide) throws Exception {
+    	// TODO: implement this one
+    	logger.warn("Not implemented");
+    }
     
     public void actionPerformed(ActionEvent e) 
     {
@@ -767,6 +771,7 @@ class ExtCatMousePanel
     JPanel traversing_algorithms;
     JRadioButton zigzagButton = new JRadioButton("Zigzag traversing");    
     JRadioButton verticalButton = new JRadioButton("Vertical traversing");
+    private static Logger logger = LoggerFactory.createLogger(ExtCatMousePanel.class);
 
 
     public ExtCatMousePanel()
@@ -907,8 +912,11 @@ class ExtCatMousePanel
         {
             result_text += "\n";
             
-            try { out_back[i] = new BufferedWriter(new FileWriter("Results/CM/results_catmouse"+i+".txt"));} 
-            catch (IOException e) {}
+            try {
+            	out_back[i] = new BufferedWriter(new FileWriter("Results/CM/results_catmouse"+i+".txt"));
+            } catch (IOException ex) {
+            	logger.error(ex);
+            }
             
             if(all_cases.isSelected())
             {
@@ -980,11 +988,10 @@ class ExtCatMousePanel
             
             result_text += "\t";
             
-            util.writeToFile(out_back[i],result_text,true); 
-            
-            try { out_back[i].close(); } 
-            catch (IOException e) {}
-            
+            if (out_back[i] != null) {
+            	util.writeToFile(out_back[i],result_text,true); 
+            	out_back[i].close();
+            }
         }
         
         result_text += "\n \n------------------------------------------------------------------ \n";
