@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.log
 //# CLASS:   SupremicaLogger
 //###########################################################################
-//# $Id: SupremicaLogger.java,v 1.5 2008-01-29 02:12:15 robi Exp $
+//# $Id: SupremicaLogger.java,v 1.6 2008-05-12 12:43:31 torda Exp $
 //###########################################################################
 
 /*
@@ -60,8 +60,6 @@ package org.supremica.log;
 
 import java.io.StringWriter;
 import java.io.PrintWriter;
-
-import org.apache.log4j.Appender;
 
 
 class SupremicaLogger
