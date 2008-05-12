@@ -90,7 +90,7 @@ class Cat
         // These are fivestate project
         states[0][2].setInitial(true);
         states[0][2].setAccepting(true);
-        for (int i = 0; i < states.length; ++i)
+        for (int i = 0; i < states[0].length; ++i)
         {
             cat.addState(states[0][i]);
         }
@@ -327,7 +327,7 @@ class Mouse
         // These are fivestate project
         states[0][4].setInitial(true);
         states[0][4].setAccepting(true);
-        for (int i = 0; i < states.length; ++i)
+        for (int i = 0; i < states[0].length; ++i)
         {
             mouse.addState(states[0][i]);
         }
