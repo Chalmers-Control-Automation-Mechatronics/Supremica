@@ -251,7 +251,7 @@ public class Milp
         }
         else if (milpSolverName.equals(SchedulingConstants.MILP_CBC))
         {
-            milpSolver = new MpsUI(this);
+            milpSolver = new CbcUI(this);
         }
         else
         {

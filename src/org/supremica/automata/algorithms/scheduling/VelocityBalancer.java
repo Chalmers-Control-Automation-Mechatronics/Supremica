@@ -446,7 +446,7 @@ public class VelocityBalancer
                     double[] newPathPoint = new double[plants.size()];
                     double activeTime = remainingTimesInState[activeAutomatonIndex]; // currCost could also be used instead of activeTime (even though they are not always identical) 
                     for (int i = 0; i < currPathPoint.length; i++)
-                    {                        
+                    {                            
                         newPathPoint[i] = currPathPoint[i] + Math.min(activeTime, remainingTimesInState[i]);
                         
                         if (i != activeAutomatonIndex)
@@ -455,7 +455,14 @@ public class VelocityBalancer
                         }
                         else
                         {
-                            remainingTimesInState[activeAutomatonIndex] = currPlantStates[activeAutomatonIndex].getCost();
+                            if (currPlantStates[activeAutomatonIndex].isAccepting())
+                            {
+                                remainingTimesInState[activeAutomatonIndex] = 0; // This means that the cycle is completed when we encounter an accepting state (event if it also is an initial state) 
+                            }
+                            else 
+                            {
+                                remainingTimesInState[activeAutomatonIndex] = currPlantStates[activeAutomatonIndex].getCost();
+                            }
                         }
 //                        if (i == activeAutomatonIndex) // Update the active automaton
 //                        {

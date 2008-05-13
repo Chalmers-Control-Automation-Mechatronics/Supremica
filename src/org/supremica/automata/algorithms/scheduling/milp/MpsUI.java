@@ -14,29 +14,29 @@ import java.util.StringTokenizer;
 import org.supremica.automata.algorithms.scheduling.SchedulingConstants;
 
 /**
- * This class implements the interface to the freeware milp-solver GLPK.
- * See www.gnu.org/software/glpk/ for more information about GLPK.
+ * This class constructs MILP problem files of MPS-format. The launchMilpSolver()-methos
+ * is left as abstract, to be implemented by the MILP solvers that accept the MPS-format.
  */
-public class MpsUI
+public abstract class MpsUI
         implements MilpSolverUI
 {
     /** The *.mps file that serves as an input to the Glpk-solver. */
     protected File mpsFile;
     
     /** The *.sol file that stores the solution, i.e. the output of the Glpk-solver. */
-    private File solutionFile;
+    protected File solutionFile;
     
     /** The process responsible for the MILP-solver. */
-    private Process milpProcess;
+    protected Process milpProcess;
     
     /** The pointer to the constructor of MILP-formulation. */
-    private Milp milpConstructor = null;
+    protected Milp milpConstructor = null;
             
     /** The optimal times (for each plant-state) that the GLPK solver returns */
-    private double[][] optimalTimes = null;
+    protected double[][] optimalTimes = null;
     
     /** The optimal alt. path variables (booleans) for each [plant][start_state][end_state] */
-    private boolean[][][] optimalAltPathVariables = null;
+    protected boolean[][][] optimalAltPathVariables = null;
     
     Hashtable<String, Integer> binVarIndexMap = new Hashtable<String, Integer>();
     Hashtable<String, Integer> timeVarIndexMap = new Hashtable<String, Integer>();
@@ -446,7 +446,7 @@ public class MpsUI
         w.close();
     }
     
-    private void processConstraintString(String str, int constraintCounter)
+    protected void processConstraintString(String str, int constraintCounter)
     {            
         double currBUpper = 0;
         int multiplier = -1;
@@ -580,80 +580,13 @@ public class MpsUI
     }
     
     /**
-     * Launches the GLPK-solver (glpsol.exe must be included in the path).
+     * Launches the appropriate MILP-solver (that should be included in the path).
      * This method-header allows to choose the model file manually (instead of 
      * a temporary file that would be created by the system automatically).
      */
-    private void launchMilpSolver(File mpsFile)
-        throws MilpException, IOException
-    {      
-        BufferedWriter commandWriter = null;
-        try
-        {
-            // Launches the MILP-solver
-            milpProcess = Runtime.getRuntime().exec(new String[]{"cbc"});
-            commandWriter = new BufferedWriter(
-                    new OutputStreamWriter(new DataOutputStream(milpProcess.getOutputStream())));
-            commandWriter.write("import " + mpsFile.getAbsolutePath() + "\n");
-            commandWriter.write("solve\n");
-            commandWriter.write("directory c:\n"); // A needed fix to cope with unix-file-finding
-            String solutionPath = solutionFile.getAbsolutePath();
-            solutionPath = solutionPath.substring(3);
-            commandWriter.write("solution " + solutionPath + "\n");
-            commandWriter.write("quit\n");
-            commandWriter.flush();
-            commandWriter.close();
-        }
-        catch (IOException milpNotFoundException)
-        {
-            milpConstructor.addToMessages("The CBC-solver 'cbc.exe' not found. " +
-                    "Make sure that it is registered in your path.", SchedulingConstants.MESSAGE_TYPE_ERROR);
-            
-            throw new MilpException(milpNotFoundException.getMessage());
-        }
-        
-        // Listens for the output of MILP (that is the input to this application)...
-        BufferedReader milpEcho = new BufferedReader(
-                new InputStreamReader(new DataInputStream(milpProcess.getInputStream())));
-        
-        // ...and prints it to stdout
-        String milpEchoStr = "";
-        String totalMilpEchoStr = "";
-        String totalIterationCount = "";
-        String lpIterationCount = "";
-        while ((milpEchoStr = milpEcho.readLine()) != null)
-        {
-            if (milpEchoStr.contains("infeasible"))
-            {
-                throw new MilpException(milpEchoStr + " (specifications should be relaxed if possible).");
-            }
-            
-            if (milpEchoStr.contains("Result"))
-            {
-                System.out.println("milpecho = " + milpEchoStr);
-     
-                milpEchoStr = milpEchoStr.substring(milpEchoStr.indexOf("objective") + 10).trim();
-                String objValue = milpEchoStr.substring(0, milpEchoStr.indexOf("after")).trim();
-                
-                milpEchoStr = milpEchoStr.substring(milpEchoStr.indexOf("after") + 6).trim();
-                String nrNodes = milpEchoStr.substring(0, milpEchoStr.indexOf("node")).trim();
-                
-                milpEchoStr = milpEchoStr.substring(milpEchoStr.indexOf("and") + 4).trim();
-                String nrIters = milpEchoStr.substring(0, milpEchoStr.indexOf("iteration")).trim();
-                
-                milpEchoStr = milpEchoStr.substring(milpEchoStr.indexOf("took") + 5).trim();
-                String runTime = milpEchoStr.substring(0, milpEchoStr.indexOf("sec")).trim();
-                
-                milpConstructor.addToMessages("\tOptimization time = " + runTime + "ms", 
-                        SchedulingConstants.MESSAGE_TYPE_INFO); 
-                milpConstructor.addToMessages("\t\tOPTIMAL MAKESPAN: " + objValue, 
-                        SchedulingConstants.MESSAGE_TYPE_INFO);
-                milpConstructor.addToMessages("\tNr of nodes = " + nrNodes +"; nr of iterations = " + nrIters, 
-                        SchedulingConstants.MESSAGE_TYPE_INFO);
-            }
-        }
-    }
-    
+    public abstract void launchMilpSolver(File mpsFile)
+        throws MilpException, IOException;
+       
     /**
      * Processes the output from the GLPK-solver, transforming it into a sequence 
      * of event firing times.
@@ -857,7 +790,7 @@ public class MpsUI
         return "r" + altPathsVariable[0] + "_from_" + altPathsVariable[1] + "_to_" + altPathsVariable[2];
     }
     
-    private int[] unmakeAltPathsVariableStr(String varStr)
+    protected int[] unmakeAltPathsVariableStr(String varStr)
     {
         int[] varIndices = new int[3];
         
