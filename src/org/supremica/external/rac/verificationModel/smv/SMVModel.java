@@ -86,23 +86,34 @@ public class SMVModel extends VerificationModel
     private String moduleHead;
     private Map<String, Variable> inputMap;
     private Map<String, Variable> internalVariableMap;
+    private Map<String, Variable> fbOutputVariableMap;
     private Map<String, Variable> outputMap;
-    // temp variables should probably map name to linked list with all 
-    // temp variables representing one output or variable
 
-    //inputs, outputs, variables, assignments, specification etc.
     public SMVModel()
     {
 	super();
 	inputMap = new LinkedHashMap<String, Variable>(4); //initial capacity 4 and default load factor (0.75)
 	internalVariableMap = new LinkedHashMap<String, Variable>(8);
+	fbOutputVariableMap = new LinkedHashMap<String, Variable>(8);
 	outputMap = new LinkedHashMap<String, Variable>(4);
-	variableDeclaration = 	"\n # Variable declaration\n";    
+	variableDeclaration = 	" # Variable declaration\n";    
 	initialValues = 	"\n # Initial values\n";    
 	expressions = "\n # Model code\n"; 
 	moduleHead = "";
     }
     
+    public void clear()
+    {
+	inputMap.clear();
+	internalVariableMap.clear();
+	fbOutputVariableMap.clear();
+	outputMap.clear();
+	variableDeclaration = 	" # Variable declaration\n";    
+	initialValues = 	"\n # Initial values\n";    
+	expressions = "\n # Model code\n"; 
+	moduleHead = "";
+    }
+
     public void addInput(Variable input)
     {
 	inputMap.put(input.name, input);
@@ -111,6 +122,16 @@ public class SMVModel extends VerificationModel
     {
 	internalVariableMap.put(variable.name, variable);
     }
+
+    public String addFBOutputVariable()
+    {
+	String tempVariableName = "temp" + (fbOutputVariableMap.size()+1);
+	Variable var = new BooleanVariable(tempVariableName);
+	// (actual output may not be boolean, but it does not matter, since this variable is never used)
+	fbOutputVariableMap.put(tempVariableName, var);
+	return tempVariableName;
+    }
+
     public void addOutput(Variable output)
     {
 	outputMap.put(output.name, output);
@@ -182,7 +203,7 @@ public class SMVModel extends VerificationModel
 
 
     // Change name of an internal variable or output.
-    // Also add variable declaration and initialization information to SMV-code
+    // Also add variable declaration to SMV-code
     // Return true if it succeeds (varable is found), false otherwise.
     public boolean updateInternalOrOutputName(String originalName, String newName)
     {
@@ -191,7 +212,8 @@ public class SMVModel extends VerificationModel
 	{
 	    var.setName(newName);
 	    variableDeclaration += " " + var.getVariableDeclaration() + " # temp variable;\n";
-	    initialValues += " init(" + newName + ") := " + var.getInitialValue() + ";\n";
+	    //initialValues += " init(" + newName + ") := " + var.getInitialValue() + ";\n";
+	    // (need not be initialized, since only temporal variable)
 	    return true;
 	}
 	var = outputMap.get(originalName);
@@ -199,7 +221,8 @@ public class SMVModel extends VerificationModel
 	{
 	    var.setName(newName);
 	    variableDeclaration += " " + var.getVariableDeclaration() + " # temp variable;\n" ;
-	    initialValues += " init(" + newName + ") := " + var.getInitialValue() + ";\n";
+	    //initialValues += " init(" + newName + ") := " + var.getInitialValue() + ";\n";
+	    // (need not be initialized, since only temporal variable)
 	    return true;
 	}
 	return false;
@@ -237,9 +260,9 @@ public class SMVModel extends VerificationModel
 	}
     }
 
-    public void createFile(String fileName, String path)
+    public void createModule(String moduleName)
     {
-	moduleHead += "module main(";
+	moduleHead += "module " + moduleName + "(";
 	for (String inputName : inputMap.keySet())
 	{
 	    moduleHead += inputName + ", ";    
@@ -250,6 +273,12 @@ public class SMVModel extends VerificationModel
 	}
 	moduleHead = moduleHead.substring(0, moduleHead.length()-2) + ")\n{\n";
 	
+	for (Variable fbOutputVariable : fbOutputVariableMap.values())
+	{
+	    variableDeclaration += " " + fbOutputVariable.getVariableDeclaration() + " # FB output, temp variable;\n";
+	    // (fbOutputVariable need not be initialized, since only temporal variable)
+	}
+
 	expressions += "\n # New outputs and internal variables\n";
 	for (Entry<String, Variable> variableEntry : internalVariableMap.entrySet())
 	{
@@ -259,8 +288,11 @@ public class SMVModel extends VerificationModel
 	{
 	    expressions += " Next(" +  outputEntry.getKey() + ") := " + outputEntry.getValue().getName() + ";\n";    
 	}
-	
-	System.out.println(moduleHead + variableDeclaration + initialValues + expressions);
+	System.out.println(moduleHead + variableDeclaration + initialValues + expressions + "}\n");
+    }
+
+    public void createFile(String fileName, String path)
+    {
     }
     
 }

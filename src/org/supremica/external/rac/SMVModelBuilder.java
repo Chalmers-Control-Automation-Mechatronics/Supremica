@@ -85,18 +85,22 @@ import java.util.List;
 import java.util.LinkedList;
 import java.util.Map;
 import java.util.HashMap;
+import java.util.Set;
+import java.util.HashSet;
+import java.util.LinkedHashSet;
 
 public class SMVModelBuilder extends VerificationModelBuilder
 {
     private SMVModel smvModel;
     private Functions functions;
-
+    private FunctionBlocks internalFBs;
 
     public SMVModelBuilder()
     {
 	super();
 	smvModel = null;
 	functions = new Functions();
+	internalFBs = new FunctionBlocks();
     }
 
     public VerificationModel getVerificationModel()
@@ -107,6 +111,7 @@ public class SMVModelBuilder extends VerificationModelBuilder
     public void createNewVerificationModel(Project plcProject, String rac)
     {
 	smvModel = new SMVModel();
+	internalFBs.clear();
 	Pou pou = getRAC(plcProject, rac);
 
 	// Inputs, outputs and internal variables
@@ -134,7 +139,12 @@ public class SMVModelBuilder extends VerificationModelBuilder
 		for (org.supremica.external.genericPLCProgramDescription.xsd.VarListPlain.Variable 
 			 var : varList.getVariable())
 		{
-		    smvModel.addInternalVariable(createVariable(var));
+		    Variable variable = createVariable(var);
+		    if (variable != null)
+		    {
+			smvModel.addInternalVariable(variable);
+		    }
+		    // if variable is null it is probably a Function Block, which we handle later.
 		}
 	    }
 	    if (varList instanceof TempVars)
@@ -217,7 +227,8 @@ public class SMVModelBuilder extends VerificationModelBuilder
 			}
 			else
 			{
-			    orExpression += expandExpression(ldComponents, prevComp, ldComp);
+			    orExpression += expandExpression(ldComponents, prevComp, connection.getFormalParameter()
+							     , ldComp);
 			}
 			
 			// end of sub-expression
@@ -253,6 +264,9 @@ public class SMVModelBuilder extends VerificationModelBuilder
 				   + "So far only LD is supported as RAC implementation language!");
 	}
 	
+   	smvModel.createModule("main");
+	smvModel.clear();
+	internalFBs.createModules();
 	smvModel.createFile("fil", "mjölk");
 
     }
@@ -300,8 +314,9 @@ public class SMVModelBuilder extends VerificationModelBuilder
 	return compareString.substring(i-1, compareString.length());
     }
 
-    // Expand the LD expression with the LD component and continue leftwards
-    private String expandExpression(List<Object> ldComponents, Object ldComp, Object currentCoil)
+    // Expand the LD expression with the LD component (called at the output outputName
+    // , if applicable (for FBs)) and continue leftwards
+    private String expandExpression(List<Object> ldComponents, Object ldComp, String outputName, Object currentCoil)
     {
 	String s = "";
 	List<Connection> connectionList = null; 
@@ -329,28 +344,40 @@ public class SMVModelBuilder extends VerificationModelBuilder
 	    connectionList = ((Contact) ldComp).getConnectionPointIn().getConnection();
 	} 
 
-	// functions
+	// functions or FBs
 	else if (ldComp instanceof Block)
 	{
-	    String functionName = ((Block) ldComp).getTypeName();
-	    if (functions.isBooleanFunction(functionName))
+	    String typeName = ((Block) ldComp).getTypeName();
+	    String instanceName = ((Block) ldComp).getInstanceName();
+	    
+	    // function
+	    if (instanceName == null)
 	    {
-		s += functions.expandBooleanFunction(ldComponents, (Block) ldComp, functionName, currentCoil);
+		if (functions.isBooleanFunction(typeName))
+		{
+		    s += functions.expandBooleanFunction(ldComponents, (Block) ldComp, typeName, currentCoil);
+		}
+		else if (functions.isComparisonFunction(typeName))
+		{
+		    s += functions.expandComparisonFunction(ldComponents, (Block) ldComp, typeName, currentCoil);
+		}
+		else if (functions.isArithmeticEnableFunction(typeName))
+		{
+		    String nonBooleanOutputName = getOutputVariableName(ldComponents, ((Block) ldComp).getLocalId());
+		    s += functions.expandArithmeticEnableFunction(ldComponents, (Block) ldComp, 
+								  typeName, nonBooleanOutputName, currentCoil);
+		}
+		else
+		{
+		    System.out.println("SMVModelBuilder: Warning! Function " + typeName + " could not be found!");
+		}		
 	    }
-	    else if (functions.isComparisonFunction(functionName))
-	    {
-		s += functions.expandComparisonFunction(ldComponents, (Block) ldComp, functionName, currentCoil);
-	    }
-	    else if (functions.isArithmeticEnableFunction(functionName))
-	    {
-		String nonBooleanOutputName = getOutputVariableName(ldComponents, ((Block) ldComp).getLocalId());
-		s += functions.expandArithmeticEnableFunction(ldComponents, (Block) ldComp, 
-							      functionName, nonBooleanOutputName, currentCoil);
-	    }
+	    // FB
 	    else
 	    {
-		System.out.println("SMVModelBuilder: Warning! Function " + functionName + " could not be found!");
-	    }		
+		s += internalFBs.expandFB(ldComponents, (Block) ldComp, typeName, instanceName, 
+					  outputName, currentCoil);
+	    }
 	}
 
 	// inVariable
@@ -375,7 +402,7 @@ public class SMVModelBuilder extends VerificationModelBuilder
 		}
 		else
 		{
-		    orExpression += expandExpression(ldComponents, prevComp, currentCoil);
+		    orExpression += expandExpression(ldComponents, prevComp, connection.getFormalParameter(), currentCoil);
 		}
 		
 		// end of sub-expression
@@ -521,6 +548,108 @@ public class SMVModelBuilder extends VerificationModelBuilder
     }
 
 
+    private class FunctionBlocks {
+	
+	private Set<String> usedFBTypes;
+	private Set<String> usedFBInstances;
+	
+	private FunctionBlocks()
+	{
+	    usedFBTypes = new LinkedHashSet<String>(4);
+	    usedFBInstances = new HashSet<String>(5);
+	}
+
+	private String expandFB(List<Object> ldComponents, Block fb, 
+				String typeName, String instanceName, String outputName, Object currentCoil)
+	{
+	    if (!usedFBTypes.contains(typeName));
+	    {
+		usedFBTypes.add(typeName);
+	    }
+	    if (!usedFBInstances.contains(instanceName))
+	    {
+		usedFBInstances.add(instanceName);
+		
+		// FB instance in SMV looks like:
+		// instance : TYPE( input1, input2, temp1, temp2 );
+		String fbInstance = instanceName + " : " + typeName + "( ";
+		for (org.supremica.external.genericPLCProgramDescription.xsd.Body.SFC.Block.InputVariables.Variable 
+			 inputVariable : fb.getInputVariables().getVariable())
+		{
+		    // In PLCOpenEditor (perhaps also in IEC 61131-3?) FB inputs must be single branches,
+		    // not parallel (OR-branches), hence only one connection.
+		    Connection connection = inputVariable.getConnectionPointIn().getConnection().get(0);
+		    Object prevComp = getLDComponent(ldComponents, connection.getRefLocalId());
+		    fbInstance += expandExpression(ldComponents, prevComp, connection.getFormalParameter(), currentCoil);
+		    // end of sub-expression
+		    if (fbInstance.endsWith(" & "))
+		    {
+			fbInstance = fbInstance.substring(0, fbInstance.length()-3);
+		    }
+		    fbInstance += ", ";
+		}
+		for (org.supremica.external.genericPLCProgramDescription.xsd.Body.SFC.Block.OutputVariables.Variable 
+			 outputVariable : fb.getOutputVariables().getVariable())
+		{
+		    fbInstance += smvModel.addFBOutputVariable() + ", ";
+		}
+		// remove last ", "
+		fbInstance = fbInstance.substring(0, fbInstance.length()-2) + " )";
+		
+		smvModel.addExpression(fbInstance);
+		// And the call of the FB looks like:
+		// Variable_i := Next(instance.O_j);   , for output O_j,
+		// both for this boolean output and all other connected output variables
+		    //	return outputvariable + " := Next(" + 
+	    }
+	    String fbCall = " := Next(" + instanceName + "." + outputName + ")";
+	    return fbCall;
+
+	    
+	    
+	    
+// 	    else if (booleanFunctionToSMV.containsKey(functionName))
+// 	    {
+// 		String smvOperator = booleanFunctionToSMV.get(functionName);
+// 		s += "(";
+// 		for (org.supremica.external.genericPLCProgramDescription.xsd.Body.SFC.Block.InputVariables.Variable var : variableList)
+// 		{
+// 		    // In PLCOpenEditor (perhaps also in IEC 61131-3?) function inputs must be single branches,
+// 		    // not parallel (OR-branches), hence only one connection.
+// 		    Object prevComp = getLDComponent(ldComponents, 
+// 						     var.getConnectionPointIn().getConnection().get(0).getRefLocalId());
+// 		    s += expandExpression(ldComponents, prevComp, currentCoil);
+// 		    // end of sub-expression
+// 		    if (s.endsWith(" & "))
+// 		    {
+// 			s = s.substring(0, s.length()-3);
+// 		    }
+// 		    s += smvOperator;
+// 		}
+// 		s = s.substring(0, s.length() - smvOperator.length()) + ")";
+// 	    }
+// 	    else
+// 	    {
+// 		System.out.println("SMVModelBuilder.Functions: Warning! boolean function " 
+// 				   + functionName + " could not be found!");
+// 	    }
+	}
+
+	private void createModules()
+	{
+	    for (String moduleName : usedFBTypes)
+	    {
+		smvModel.createModule(moduleName);
+	    }
+	}
+
+	private void clear()
+	{
+	    usedFBInstances.clear();
+	    usedFBTypes.clear();
+   	}
+    }
+
 
     private class Functions {
 	
@@ -584,9 +713,11 @@ public class SMVModelBuilder extends VerificationModelBuilder
 	    {
 		// In PLCOpenEditor (perhaps also in IEC 61131-3?) function inputs must be single branches,
 		// not parallel (OR-branches), hence only one connection.
-		Object prevComp = getLDComponent(ldComponents, variableList.get(0).getConnectionPointIn()
-						 .getConnection().get(0).getRefLocalId());
-		s += booleanFunctionToSMV.get(functionName) + "(" + expandExpression(ldComponents, prevComp, currentCoil);
+		Connection connection = variableList.get(0).getConnectionPointIn().getConnection().get(0);
+		Object prevComp = getLDComponent(ldComponents, connection.getRefLocalId());
+		s += booleanFunctionToSMV.get(functionName) + "(" + expandExpression(ldComponents, prevComp
+										     , connection.getFormalParameter() 
+										     , currentCoil);
 		// end of sub-expression
 		if (s.endsWith(" & "))
 		{
@@ -602,9 +733,9 @@ public class SMVModelBuilder extends VerificationModelBuilder
 		{
 		    // In PLCOpenEditor (perhaps also in IEC 61131-3?) function inputs must be single branches,
 		    // not parallel (OR-branches), hence only one connection.
-		    Object prevComp = getLDComponent(ldComponents, 
-						     var.getConnectionPointIn().getConnection().get(0).getRefLocalId());
-		    s += expandExpression(ldComponents, prevComp, currentCoil);
+		    Connection connection = variableList.get(0).getConnectionPointIn().getConnection().get(0);
+		    Object prevComp = getLDComponent(ldComponents, connection.getRefLocalId());
+		    s += expandExpression(ldComponents, prevComp, connection.getFormalParameter(), currentCoil);
 		    // end of sub-expression
 		    if (s.endsWith(" & "))
 		    {
@@ -635,18 +766,18 @@ public class SMVModelBuilder extends VerificationModelBuilder
 		
 		// In PLCOpenEditor (perhaps also in IEC 61131-3?) function inputs must be single branches,
 		// not parallel (OR-branches), hence only one connection.
-		Object input1 = getLDComponent(ldComponents, variableList.get(0).getConnectionPointIn()
-					       .getConnection().get(0).getRefLocalId());
-		Object input2 = getLDComponent(ldComponents, variableList.get(1).getConnectionPointIn()
-					       .getConnection().get(0).getRefLocalId());
+		Connection connection1 = variableList.get(0).getConnectionPointIn().getConnection().get(0);
+		Connection connection2 = variableList.get(1).getConnectionPointIn().getConnection().get(0);
+		Object input1 = getLDComponent(ldComponents, connection1.getRefLocalId());
+		Object input2 = getLDComponent(ldComponents, connection2.getRefLocalId());
 
-		s += expandExpression(ldComponents, input1, currentCoil);
+		s += expandExpression(ldComponents, input1, connection1.getFormalParameter(), currentCoil);
 		// end of sub-expression
 		if (s.endsWith(" & "))
 		{
 		    s = s.substring(0, s.length()-3);
 		}
-		s += smvOperator + expandExpression(ldComponents, input2, currentCoil);
+		s += smvOperator + expandExpression(ldComponents, input2, connection2.getFormalParameter(), currentCoil);
 		if (s.endsWith(" & "))
 		{
 		    s = s.substring(0, s.length()-3);
@@ -678,9 +809,10 @@ public class SMVModelBuilder extends VerificationModelBuilder
 		String smvOperator = arithmeticEnableFunctionToSMV.get(functionName);
 		// In PLCOpenEditor (perhaps also in IEC 61131-3?) function inputs must be single branches,
 		// not parallel (OR-branches), hence only one connection.
-		Object enableInput = getLDComponent(ldComponents, variableList.get(0).getConnectionPointIn()
-					       .getConnection().get(0).getRefLocalId());
-		enableCondition = expandExpression(ldComponents, enableInput, currentCoil);
+		Connection connection1 = variableList.get(0).getConnectionPointIn().getConnection().get(0);
+		Object enableInput = getLDComponent(ldComponents, connection1.getRefLocalId());
+		enableCondition = expandExpression(ldComponents, enableInput, connection1.getFormalParameter()
+						   , currentCoil);
 		if (enableCondition.endsWith(" & "))
 		{
 		    enableCondition = enableCondition.substring(0, enableCondition.length()-3);
@@ -693,9 +825,9 @@ public class SMVModelBuilder extends VerificationModelBuilder
 		// Functions with more inputs than the enable input: MOVE_E, ADD_E, MUL_E etc
 		if (variableList.size() > 1)
 		{
-		    Object input2 = getLDComponent(ldComponents, variableList.get(1).getConnectionPointIn()
-						   .getConnection().get(0).getRefLocalId());
-		    ifExpr += expandExpression(ldComponents, input2, currentCoil);
+		    Connection connection2 = variableList.get(1).getConnectionPointIn().getConnection().get(0);
+		    Object input2 = getLDComponent(ldComponents, connection2.getRefLocalId());
+		    ifExpr += expandExpression(ldComponents, input2, connection2.getFormalParameter(), currentCoil);
 		    // end of sub-expression
 		    if (ifExpr.endsWith(" & "))
 		    {
@@ -711,9 +843,9 @@ public class SMVModelBuilder extends VerificationModelBuilder
 		// Functions with more than two inputs: ADD_E, MUL_E etc
 		if (variableList.size() > 2)
 		{
-		    Object input3 = getLDComponent(ldComponents, variableList.get(2).getConnectionPointIn()
-						   .getConnection().get(0).getRefLocalId());
-		    ifExpr += expandExpression(ldComponents, input3, currentCoil);
+		    Connection connection3 = variableList.get(2).getConnectionPointIn().getConnection().get(0);
+		    Object input3 = getLDComponent(ldComponents, connection3.getRefLocalId());
+		    ifExpr += expandExpression(ldComponents, input3, connection3.getFormalParameter(), currentCoil);
 		    if (ifExpr.endsWith(" & "))
 		    {
 			ifExpr = ifExpr.substring(0, ifExpr.length()-3);
