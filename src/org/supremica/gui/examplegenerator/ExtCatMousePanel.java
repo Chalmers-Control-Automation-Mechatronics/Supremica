@@ -38,7 +38,7 @@ class ExtCatMousePanel extends CatMousePanel implements TestCase,
 	IntegerField int_step_levels = new IntegerField("0", 6);
 	IntegerField int_N = new IntegerField("0", 6);
 	IntegerField int_K = new IntegerField("0", 6);
-	JCheckBox synth_algorithm = new JCheckBox(
+	JCheckBox chooseSynthesisAlgorithmManually = new JCheckBox(
 			"Choose synthesis algorithm manually (deafult is BDD)", false);
 	JCheckBox all_cases = new JCheckBox(
 			"Compute all cases for n in interval (1,N) and k in interval (1,K)",
@@ -94,7 +94,7 @@ class ExtCatMousePanel extends CatMousePanel implements TestCase,
 
 		theBox.add(stepsL);
 		theBox.add(numberOfInstances);
-		theBox.add(synth_algorithm);
+		theBox.add(chooseSynthesisAlgorithmManually);
 		theBox.add(all_cases);
 		theBox.add(traversing_algorithms);
 		theBox.add(NK);
@@ -135,11 +135,9 @@ class ExtCatMousePanel extends CatMousePanel implements TestCase,
 
 		String result_text = "n \t k \t t \t m \t s \t d \n";
 
-		BufferedWriter[] out_back;
-
 		SynthesizerOptions synthesizerOptions = new SynthesizerOptions();
 
-		if (synth_algorithm.isSelected()) {
+		if (chooseSynthesisAlgorithmManually.isSelected()) {
 			// Manually select the synthesis algorithm
 			SynthesizerDialog synthesizerDialog = new SynthesizerDialog(ide
 					.getFrame(), 2 * number_of_cats + 5 * number_of_levels,
@@ -154,11 +152,6 @@ class ExtCatMousePanel extends CatMousePanel implements TestCase,
 			synthesizerOptions.setMaximallyPermissive(true);
 			synthesizerOptions.setMaximallyPermissiveIncremental(true);
 		}
-
-		AutomataSynthesizer synthesizer;
-
-		ExtCatMouse ecm;
-		AutomataSynthesisWorker asw;
 
 		int finalNbrOfInstances;
 		Point[] p = null;
@@ -177,16 +170,15 @@ class ExtCatMousePanel extends CatMousePanel implements TestCase,
 				util.verticalTraversing(p, 0, int_num.get(), int_num_levels
 						.get(), int_num.get(), int_num_levels.get(), int_N
 						.get(), int_K.get());
-		} else
+		} else {
 			finalNbrOfInstances = number_of_instances;
-
-		out_back = new BufferedWriter[finalNbrOfInstances];
+		}
 
 		for (int i = 0; i < finalNbrOfInstances; i++) {
 			result_text += "\n";
-
+			BufferedWriter out_back = null;
 			try {
-				out_back[i] = new BufferedWriter(new FileWriter(
+				out_back = new BufferedWriter(new FileWriter(
 						"Results/CM/results_catmouse" + i + ".txt"));
 			} catch (IOException ex) {
 				logger.error(ex);
@@ -210,12 +202,12 @@ class ExtCatMousePanel extends CatMousePanel implements TestCase,
 			result_text += " " + number_of_levels + "\t";
 
 			// INSTANCE GENERATION
-			ecm = new ExtCatMouse(number_of_cats, number_of_levels);
+			ExtCatMouse ecm = new ExtCatMouse(number_of_cats, number_of_levels);
 			// INSTANCE GENERATION
 
-			if (synth_algorithm.isSelected()) {
-				asw = new AutomataSynthesisWorker(null, ecm.getAutomata(),
-						synthesizerOptions);
+			if (chooseSynthesisAlgorithmManually.isSelected()) {
+				AutomataSynthesisWorker asw = new AutomataSynthesisWorker(null,
+						ecm.getAutomata(), synthesizerOptions);
 				asw.join();
 
 				result_text += " " + asw.getTimeSeconds() + "\t";
@@ -224,9 +216,9 @@ class ExtCatMousePanel extends CatMousePanel implements TestCase,
 				Automaton supervisor = asw.getSupervisor();
 				result_text += " " + supervisor.nbrOfStates();
 			} else {
-				synthesizer = new AutomataSynthesizer(ecm.getAutomata(),
-						SynchronizationOptions.getDefaultSynthesisOptions(),
-						synthesizerOptions);
+				AutomataSynthesizer synthesizer = new AutomataSynthesizer(ecm
+						.getAutomata(), SynchronizationOptions
+						.getDefaultSynthesisOptions(), synthesizerOptions);
 
 				if (synthesizerOptions.getSynthesisAlgorithm() == SynthesisAlgorithm.BDD) {
 					synthesizer.execute();
@@ -258,9 +250,9 @@ class ExtCatMousePanel extends CatMousePanel implements TestCase,
 
 			result_text += "\t";
 
-			if (out_back[i] != null) {
-				util.writeToFile(out_back[i], result_text, true);
-				out_back[i].close();
+			if (out_back != null) {
+				util.writeToFile(out_back, result_text, true);
+				out_back.close();
 			}
 		}
 
@@ -274,5 +266,4 @@ class ExtCatMousePanel extends CatMousePanel implements TestCase,
 		ExtCatMouse cm = new ExtCatMouse(int_num.get(), int_num_levels.get());
 		return cm.getProject();
 	}
-
 }
