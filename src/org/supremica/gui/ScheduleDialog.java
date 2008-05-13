@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.gui.ide.actions
 //# CLASS:   ScheduleDialog
 //###########################################################################
-//# $Id: ScheduleDialog.java,v 1.62 2008-04-21 16:32:00 avenir Exp $
+//# $Id: ScheduleDialog.java,v 1.63 2008-05-13 19:33:01 avenir Exp $
 //###########################################################################
 
 package org.supremica.gui;
@@ -27,9 +27,22 @@ public class ScheduleDialog
     extends JDialog
 {
     private static final long serialVersionUID = 1L;
-    private static final String[] optimizationMethods = new String[] {SchedulingConstants.MODIFIED_A_STAR, SchedulingConstants.MILP_GLPK, SchedulingConstants.MILP_CBC, SchedulingConstants.VIS_GRAPH, SchedulingConstants.MULTITHREADED_A_STAR, "Velocity Balancing"}; //, "Modified IDA*", "Modified SMA*"};
-    private static final String[] astarHeuristics = new String[] {SchedulingConstants.ONE_PRODUCT_RELAXATION, SchedulingConstants.SUBOPTIMAL, SchedulingConstants.TWO_PRODUCT_RELAXATION, SchedulingConstants.VIS_GRAPH_TIME_RELAXATION, SchedulingConstants.VIS_GRAPH_NODE_RELAXATION, SchedulingConstants.BRUTE_FORCE_RELAXATION};
-    private static final String[] milpHeuristics = new String[] {SchedulingConstants.OPTIMAL, SchedulingConstants.SUBOPTIMAL };
+    private static final String[] optimizationMethods = new String[] {
+        SchedulingConstants.MODIFIED_A_STAR, 
+        SchedulingConstants.MILP_GLPK, 
+        SchedulingConstants.MILP_CBC, 
+        SchedulingConstants.MILP_CPLEX,
+        SchedulingConstants.VIS_GRAPH, 
+        SchedulingConstants.MULTITHREADED_A_STAR, 
+        "Velocity Balancing"}; //, "Modified IDA*", "Modified SMA*"};
+    private static final String[] astarHeuristics = new String[] {
+        SchedulingConstants.ONE_PRODUCT_RELAXATION, 
+        SchedulingConstants.SUBOPTIMAL, 
+        SchedulingConstants.TWO_PRODUCT_RELAXATION, 
+        SchedulingConstants.VIS_GRAPH_TIME_RELAXATION, 
+        SchedulingConstants.VIS_GRAPH_NODE_RELAXATION, 
+        SchedulingConstants.BRUTE_FORCE_RELAXATION};
+    private static final String[] milpHeuristics = new String[] {SchedulingConstants.OPTIMAL, SchedulingConstants.SUBOPTIMAL};
     private static Logger logger = LoggerFactory.createLogger(ScheduleDialog.class);
     private JComboBox optiMethodsBox, heuristicsBox;
     private JCheckBox nodeExpander, buildAutomaton, vgDrawer, balanceVelocities;

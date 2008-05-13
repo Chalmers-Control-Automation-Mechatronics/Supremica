@@ -6,6 +6,7 @@ public class SchedulingConstants
         public static final String MILP = "MILP";
 	public static final String MILP_GLPK = "MILP_GLPK";
         public static final String MILP_CBC = "MILP_CBC";
+        public static final String MILP_CPLEX = "MILP_CPLEX";
 	public static final String VIS_GRAPH = "Visibility Graph";
 	public static final String MULTITHREADED_A_STAR = "Multithreaded A*";
 

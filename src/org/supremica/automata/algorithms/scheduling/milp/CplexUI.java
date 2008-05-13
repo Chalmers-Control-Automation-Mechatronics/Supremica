@@ -28,22 +28,22 @@ public class CplexUI
         try
         {
             // Launches the CPLEX-solver
-            milpProcess = Runtime.getRuntime().exec(new String[]{"cbc"});
-            commandWriter = new BufferedWriter(
+            milpProcess = Runtime.getRuntime().exec(new String[]{"cplex"});
+ /*           commandWriter = new BufferedWriter(
                     new OutputStreamWriter(new DataOutputStream(milpProcess.getOutputStream())));
-            commandWriter.write("import " + mpsFile.getAbsolutePath() + "\n");
-            commandWriter.write("solve\n");
-            commandWriter.write("directory c:\n"); // A needed fix to cope with unix-file-finding
+            commandWriter.write("read " + mpsFile.getAbsolutePath() + "\n");
+            commandWriter.write("optimize\n");
+            //commandWriter.write("directory c:\n"); // A needed fix to cope with unix-file-finding
             String solutionPath = solutionFile.getAbsolutePath();
-            solutionPath = solutionPath.substring(3);
-            commandWriter.write("solution " + solutionPath + "\n");
-            commandWriter.write("quit\n");
+            //solutionPath = solutionPath.substring(3);
+            commandWriter.write("write " + solutionPath + "\n");
+            commandWriter.write("quit\n");*/
             commandWriter.flush();
             commandWriter.close();
         }
         catch (IOException milpNotFoundException)
         {
-            milpConstructor.addToMessages("The CBC-solver 'cbc.exe' not found. " +
+            milpConstructor.addToMessages("The Cplex-solver 'cplex.exe' not found. " +
                     "Make sure that it is registered in your path.", SchedulingConstants.MESSAGE_TYPE_ERROR);
             
             throw new MilpException(milpNotFoundException.getMessage());
@@ -91,4 +91,9 @@ public class CplexUI
         }
     }
 
+    public void processSolutionFile()
+        throws MilpException, FileNotFoundException, IOException
+    {    
+        
+    }
 }

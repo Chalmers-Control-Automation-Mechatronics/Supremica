@@ -253,6 +253,10 @@ public class Milp
         {
             milpSolver = new CbcUI(this);
         }
+        else if (milpSolverName.equals(SchedulingConstants.MILP_CPLEX))
+        {
+            milpSolver = new CplexUI(this);
+        }
         else
         {
             throw new Exception(milpSolverName + " = is not a known MILP-solver.");
