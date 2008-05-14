@@ -8,8 +8,16 @@ package org.supremica.automata.algorithms.scheduling.milp;
 import java.util.ArrayList;
 
 /**
- *
- * @author avenir
+ * This class implements a circular wait constraint, consisting of an information list
+ * about involved boolean milp-variables (stored as int[]-arrays). Also, a boolean 
+ * variable, 'hasBuffer', is stored to represent whether this block in fact 
+ * corresponds to a circular wait or if it only can be used to construct unfeasibility
+ * constraints. Each int[]-array contains 
+ * [zoneIndex, firstPlantIndex, secondPlantIndex, firstTic, secondTic],
+ * which allows to build a milp-variable, e.g. as "r" + firstPlantIndex + "_books_" + 
+ * zoneIndex + "_before_" + secondPlantIndex + "var" + indexInFunctionOf(firstTic, secondTic).
+ * 
+ * @author Avenir Kobetski
  */
 public class CircularWaitConstraintBlock 
     extends ArrayList<int[]>

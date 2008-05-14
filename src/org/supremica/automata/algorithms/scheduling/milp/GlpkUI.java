@@ -314,12 +314,12 @@ public class GlpkUI
             for (int i = 0; i < currConstraint.size(); i++)
             {
                 // Retrieve the plant-zone-state-information about the current circular wait constraint part
-                int plant1 = currConstraint.get(i)[0];
-                int plant2 = currConstraint.get(i)[1];
-                int zone = currConstraint.get(i)[2];
+                int zone = currConstraint.get(i)[0];
+                int plant1 = currConstraint.get(i)[1];
+                int plant2 = currConstraint.get(i)[2];
                 int tic1 = currConstraint.get(i)[3];
                 int tic2 = currConstraint.get(i)[4];
-
+ 
                 try
                 {
                     if (plant1 < plant2)
@@ -385,11 +385,11 @@ public class GlpkUI
         w.newLine();
         w.write("param nrOfZones := " + (milpConstructor.getNrOfZones() - 1) + ";");
         w.newLine();
-        w.write("param bigM := " + Milp.BIG_M_VALUE + ";");
+        w.write("param bigM := " + SchedulingConstants.BIG_M_VALUE + ";");
         w.newLine();
         w.write("param maxTic := " + (maxNrOfStates - 1) + ";");
         w.newLine();
-        w.write("param epsilon := " + Milp.EPSILON + ";");
+        w.write("param epsilon := " + SchedulingConstants.EPSILON + ";");
 
         w.newLine();
         w.write("param deltaTime default 0\n:");

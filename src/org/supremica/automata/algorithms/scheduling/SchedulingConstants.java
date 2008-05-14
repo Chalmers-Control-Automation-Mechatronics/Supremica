@@ -21,4 +21,16 @@ public class SchedulingConstants
         public static final int MESSAGE_TYPE_INFO = 0;
         public static final int MESSAGE_TYPE_WARN = 1;
         public static final int MESSAGE_TYPE_ERROR = 2;
+        
+        /** A big enough value used by the MILP-solver (should be greater than any time-variable). */
+        public static final int BIG_M_VALUE = 1000;
+    
+        /**
+         *  The safety buffer between unbooking and booking, used in MILP. To use the
+         *  automatic deduction of epsilon from the optmal time values in
+         *  {@link buildScheduleAutomaton}, it should be a power of 10. For correct
+         *  functioning, this variable should be strictly smaller than 10^(-x), where
+         *  x is the total number of (individual) plalnt states.
+         */
+        public static final double EPSILON = 0.001;
 }

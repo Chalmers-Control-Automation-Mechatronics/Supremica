@@ -17,19 +17,7 @@ public class Milp
     /****************************************************************************************/
     
     private static final int NO_PATH_SPLIT_INDEX = -1;
-    
-    /** A big enough value used by the MILP-solver (should be greater than any time-variable). */
-    public static final int BIG_M_VALUE = 1000;
-    
-    /**
-     *  The safety buffer between unbooking and booking, used in MILP. To use the
-     *  automatic deduction of epsilon from the optmal time values in
-     *  {@link buildScheduleAutomaton}, it should be a power of 10. For correct
-     *  functioning, this variable should be strictly smaller than 10^(-x), where
-     *  x is the total number of (individual) plalnt states.
-     */
-    public static final double EPSILON = 0.001;
-    
+       
     /** The involved automata, plants, zone specifications */
     private Automata theAutomata, plants, zones, externalSpecs;
     
@@ -185,7 +173,7 @@ public class Milp
      * Each CircularWaitConstraintBlock contains a list of int[]-objects and a boolean.
      * The boolean keeps track of whether any buffer corresponds to the current
      * constraint, while each int[] consists of the following indices: 
-     * [plant1, plant2, zone, bookingTicPlant1, bookingTicPlant2].
+     * [zone, plant1, plant2, bookingTicPlant1, bookingTicPlant2].
      */
     private ArrayList<CircularWaitConstraintBlock> circularWaitConstraints = null;
     
@@ -196,7 +184,7 @@ public class Milp
     
     /**
      *  Used to round off the optimal times, as returned by MILP, thus removing
-     *  the added epsilons.
+     *  the added EPSILONs.
      */
     private double roundOffCoeff = -1;
     
@@ -887,8 +875,8 @@ public class Milp
                 }
             }
         }
-        timeThroughBigMApprox = (maxCost * totNrStates) / BIG_M_VALUE;
-//        timeThroughBigMApprox = Math.ceil((maxCost * totNrStates) / BIG_M_VALUE);
+        timeThroughBigMApprox = (maxCost * totNrStates) / SchedulingConstants.BIG_M_VALUE;
+//        timeThroughBigMApprox = Math.ceil((maxCost * totNrStates) / SchedulingConstants.BIG_M_VALUE);
         if (timeThroughBigMApprox > 1) // Rescale the times if their total maximal sum is higher than bigM
         {
             for (Iterator<Automaton> autIt = plants.iterator(); autIt.hasNext();)
@@ -2038,8 +2026,14 @@ public class Milp
         
         for (int p = 0; p < plants.size(); p++)
         {
+            //test
+            IntArrayTreeSet[][] t = new IntArrayTreeSet[zones.size()][];
+            
             for (int z1 = 0; z1 < bookingTics.length; z1++)
             {
+                //test
+                t[z1] = new IntArrayTreeSet[bookingTics[z1][p][STATE_SWITCH].length];
+                
                 for (int z2 = 0; z2 < bookingTics.length; z2++)
                 {
                     if (z1 != z2)
@@ -2047,18 +2041,74 @@ public class Milp
                         if ((bookingTics[z1][p][STATE_SWITCH][0] != -1) && (bookingTics[z2][p][STATE_SWITCH][0] != -1))
                         {
                             ArrayList<int[]> currConsecutiveBookingTicsIndices = findBookingStatesSequences(p, z1, z2);
+                            
+                            //temp
+                            findBookingTicSequences(p);
+                            //temp
+                            for (int[] is : currConsecutiveBookingTicsIndices)
+                            {
+                                //System.out.println("bseq(r" + p + "_z" + z1 + "_z" + z2 + ") : " + 
+//                                        bookingTics[z1][p][STATE_SWITCH][is[0]] + " " + 
+//                                        bookingTics[z2][p][STATE_SWITCH][is[1]] + " " + is[2]);
+                                
+                                //test
+                                if (t[z1][is[0]] == null)
+                                {
+                                    t[z1][is[0]] = new IntArrayTreeSet();
+                                }
+                                
+                                t[z1][is[0]].add(new int[]{z2, is[1], is[2]});
+                            }
+                            
                             if (currConsecutiveBookingTicsIndices.size() > 0)
                             {
                                 consecutiveBookingTicsIndices.put(new int[]{p, z1, z2}, currConsecutiveBookingTicsIndices);
                                 
                                 //TODO: totally ugly (snabb fix): needs to be redone!
-                                for (int i = 0; i < currConsecutiveBookingTicsIndices.size(); i++)
-                                {
-                                    consecutiveBookingEdges[z1].add(new int[]{z2, p,
-                                    currConsecutiveBookingTicsIndices.get(i)[0],
-                                    currConsecutiveBookingTicsIndices.get(i)[1],
-                                    currConsecutiveBookingTicsIndices.get(i)[2]});
-                                }
+//                                for (int i = 0; i < currConsecutiveBookingTicsIndices.size(); i++)
+//                                {
+//                                    consecutiveBookingEdges[z1].add(new int[]{z2, p,
+//                                        currConsecutiveBookingTicsIndices.get(i)[0],
+//                                        currConsecutiveBookingTicsIndices.get(i)[1],
+//                                        currConsecutiveBookingTicsIndices.get(i)[2]});
+//                                }
+                            }
+                        }
+                    }
+                }
+            }
+            
+            //test
+            for (int z1 = 0; z1 < t.length; z1++)
+            {
+                for (int tic1 = 0; tic1 < t[z1].length; tic1++)
+                {
+                    if (t[z1][tic1] != null)
+                    {
+                        ArrayList<int[]> n = new ArrayList<int[]>();
+                        n.addAll(t[z1][tic1]);
+
+                        while(!n.isEmpty())
+                        {
+                            int[] newKey = n.remove(0);
+                            
+                            int bufferExists = 1;
+                            if (t[z1][tic1].contains(newKey))
+                            {
+                                bufferExists = newKey[2];
+                            }
+                            consecutiveBookingEdges[z1].add(new int[]{newKey[0], p, tic1, newKey[1], bufferExists});
+
+                            //temp
+                            System.out.println("r" + p + "_z" + z1 + "_z" + newKey[0] + " (test) : " + 
+                                    bookingTics[z1][p][STATE_SWITCH][tic1] + " " + 
+                                    bookingTics[newKey[0]][p][STATE_SWITCH][newKey[1]] + " " + 
+                                    bufferExists);
+                            
+                            IntArrayTreeSet newTree = t[newKey[0]][newKey[1]];
+                            if (newTree != null)
+                            {
+                                n.addAll(newTree);
                             }
                         }
                     }
@@ -2087,46 +2137,87 @@ public class Milp
         
         // Find and enumerate all cycles where every edge is of different color
         ArrayList<ArrayList<ConnectedComponentEdge>> rainbowCycles = cycleFinder.enumerateAllCycles();
+        //temp
         for (ArrayList<ConnectedComponentEdge> cycle : rainbowCycles)
         {
-           CircularWaitConstraintBlock currCircularWaitConstraints = new CircularWaitConstraintBlock();
-           boolean bufferInCycle = false;
-
-           // For each edge in the current rainbow cycle
-           for (int i = 0; i < cycle.size(); i++)
-           {
-               ConnectedComponentEdge precedingEdge;
-               if (i != 0)
-               {
-                   precedingEdge = cycle.get(i-1);
-               }
-               else
-               {
-                   precedingEdge = cycle.get(cycle.size() - 1);
-               }
-
-               // Convert the information stored in the edge into plant-state-bookingtic-form
-               int zoneIndex = cycle.get(i).getFromVertice().getVerticeIndex();
-               int firstPlantIndex = precedingEdge.getColor();
-               int secondPlantIndex = cycle.get(i).getColor();
-               int firstTic = precedingEdge.getToTic();
-               int secondTic = cycle.get(i).getFromTic();
-               
-               // Remember that this cycle contains buffers if one is found on any edge 
-               if (cycle.get(i).getBufferExists())
-               {
-                   bufferInCycle = true;                    
-               }
-
-               // Add the plant-state-bookingtic-info to the current constraint block
-               currCircularWaitConstraints.add(new int[]{
-                       firstPlantIndex, secondPlantIndex, zoneIndex, firstTic, secondTic
-                   });  
+            System.out.println("Cycle start:");
+            for (ConnectedComponentEdge edge : cycle)
+            {
+                System.out.println("\tedge from v" + edge.getFromVertice().getVerticeIndex() + 
+                        " to v" + edge.getToVertice().getVerticeIndex());
             }
+        }
+        for (ArrayList<ConnectedComponentEdge> cycle : rainbowCycles)
+        {
+            // If this is a self-loop in the CC-graph, it deserves special treatment.
+            // All incoming tics to the self-loop vertice, except the self-loop,
+            // give raise to unfeasibility constraints, together with the self-loop.
+            if (cycle.size() == 1)
+            {
+                ConnectedComponentEdge loop = cycle.get(0);
+                ConnectedComponentVertice loopVertice = loop.getToVertice();
+                for (int vIndex = 0; vIndex < cycleFinder.getVertices().length; vIndex++)
+                {
+                    ConnectedComponentVertice v = cycleFinder.getVertices()[vIndex];
+                    for (ConnectedComponentEdge edge : v.getOutEdges())
+                    {
+                        if (edge.getToVertice().equals(loopVertice) && !edge.equals(cycle.get(0)))
+                        {
+                            CircularWaitConstraintBlock currCircularWaitConstraints = new CircularWaitConstraintBlock();
+                            
+                            // Add the plant-state-bookingtic-info to the current constraint block
+                            currCircularWaitConstraints.add(new int[]{
+                                   loopVertice.getVerticeIndex(), edge.getColor(), loop.getColor(), edge.getToTic(), loop.getFromTic()}); 
+                            currCircularWaitConstraints.add(new int[]{
+                                   loopVertice.getVerticeIndex(), loop.getColor(), edge.getColor(), loop.getToTic(), edge.getToTic()});
+                           
+                            currCircularWaitConstraints.setBuffer(true);
+                            circularWaitConstraints.add(currCircularWaitConstraints);
+                        }
+                    }
+                }
+            }
+            else
+            {
+               CircularWaitConstraintBlock currCircularWaitConstraints = new CircularWaitConstraintBlock();
+               boolean bufferInCycle = false;
 
-            currCircularWaitConstraints.setBuffer(bufferInCycle);
-            circularWaitConstraints.add(currCircularWaitConstraints);
-        } 
+               // For each edge in the current rainbow cycle
+               for (int i = 0; i < cycle.size(); i++)
+               {
+                   ConnectedComponentEdge precedingEdge;
+                   if (i != 0)
+                   {
+                       precedingEdge = cycle.get(i-1);
+                   }
+                   else
+                   {
+                       precedingEdge = cycle.get(cycle.size() - 1);
+                   }
+
+                   // Convert the information stored in the edge into plant-state-bookingtic-form
+                   int zoneIndex = cycle.get(i).getFromVertice().getVerticeIndex();
+                   int firstPlantIndex = precedingEdge.getColor();
+                   int secondPlantIndex = cycle.get(i).getColor();
+                   int firstTic = precedingEdge.getToTic();
+                   int secondTic = cycle.get(i).getFromTic();
+
+                   // Remember that this cycle contains buffers if one is found on any edge 
+                   if (cycle.get(i).getBufferExists())
+                   {
+                       bufferInCycle = true;                    
+                   }
+
+                   // Add the plant-state-bookingtic-info to the current constraint block
+                   currCircularWaitConstraints.add(new int[]{
+                           zoneIndex, firstPlantIndex, secondPlantIndex, firstTic, secondTic
+                       });  
+                }
+
+                currCircularWaitConstraints.setBuffer(bufferInCycle);
+                circularWaitConstraints.add(currCircularWaitConstraints);
+            } 
+        }
         
 // @Deprecated: t�nkte om...
 //                    for (int p = 0; p < plants.size(); p++)
@@ -2377,15 +2468,43 @@ public class Milp
         }
     }
     
+    //test
+    public void findBookingTicSequences(int plantIndex)
+    {
+        Alphabet[] bookingAlphabets = new Alphabet[zones.size()];
+        for (int i = 0; i < bookingAlphabets.length; i++)
+        {
+            bookingAlphabets[i] = zones.getAutomatonAt(i).getInitialState().activeEvents(false);
+        }
+
+
+
+
+        
+        Automaton plant = plants.getAutomatonAt(plantIndex);
+        
+        ArrayList<State> stateQueue = new ArrayList<State>();
+        stateQueue.add(plant.getInitialState());
+        
+        while (!stateQueue.isEmpty())
+        {
+            State state = stateQueue.remove(0);
+            
+            
+        }
+    }
+    
     /**
      * Finds all pairs of booking tics, such that the plant with index plantIndex
      * books the mutex zone with index pZoneIndex first and the zone corresponding
      * to fZoneIndex second without(!) unbooking pZoneIndex in between.
      *
+     * @param   plantIndex  the internal index of the plant, booking the mutex zones
      * @param   pZoneIndex  the internal index of the firstly booked zone
      * @param   fZoneIndex  the internal index of the secondly booked zone
-     * @param   plantIndex  the internal index of the plant, booking the mutex zones
-     * @return  array of int[], containg pairs of booking tics indices
+     * 
+     * @return  array of int[], each containing pairs of booking tics indices and an int, 
+     *          showing if there is a buffer (appropriate unbooking event) between the booking tics. 
      */
     private ArrayList<int[]> findBookingStatesSequences(int plantIndex, int pZoneIndex, int fZoneIndex)
     {
@@ -2878,7 +2997,7 @@ public class Milp
 //                                    mutexConstraints += " - bigM*" + pathCutEnsurance;
 //                                }
 //                                mutexConstraints += ";\n";
-//                                mutexConstraints += "dual_mutex_z" + i + "_r" + j1 + "_r" + j2  + "_var" + repeatedBooking + " : time[" + j2 + ", " + bookingTics[i][j2][STATE_SWITCH][k2] + "] >= " + "time[" + j1 + ", " + unbookingTics[i][j1][STATE_SWITCH][k1] + "] - bigM*(1 - " + currMutexVariable + ")" + " + " + epsilon;
+//                                mutexConstraints += "dual_mutex_z" + i + "_r" + j1 + "_r" + j2  + "_var" + repeatedBooking + " : time[" + j2 + ", " + bookingTics[i][j2][STATE_SWITCH][k2] + "] >= " + "time[" + j1 + ", " + unbookingTics[i][j1][STATE_SWITCH][k1] + "] - bigM*(1 - " + currMutexVariable + ")" + " + " + SchedulingConstants.EPSILON;
 //                                pathCutEnsurance = pathCutTable.get(indexMap.getStateAt(plants.getAutomatonAt(j2), k2));
 //                                if (pathCutEnsurance != null)
 //                                {
@@ -2987,7 +3106,7 @@ public class Milp
     
     public int getBIG_M_VALUE()
     {
-        return BIG_M_VALUE;
+        return SchedulingConstants.BIG_M_VALUE;
     }
     
     //TO BE DEPRECATED
@@ -3014,7 +3133,7 @@ public class Milp
             {
                 totalNrOfTimes += deltaTimes[i].length;
             }
-            roundOffCoeff = EPSILON * Math.pow(10, ("" + totalNrOfTimes).length());
+            roundOffCoeff = SchedulingConstants.EPSILON * Math.pow(10, ("" + totalNrOfTimes).length());
         }
         
         // Remove epsilons from the current time.

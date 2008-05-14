@@ -404,4 +404,9 @@ public class ConnectedComponentsGraph
 //        
 //        return false;
 //    }
+    
+    public ConnectedComponentVertice[] getVertices()
+    {
+        return vertices;
+    }
 }
