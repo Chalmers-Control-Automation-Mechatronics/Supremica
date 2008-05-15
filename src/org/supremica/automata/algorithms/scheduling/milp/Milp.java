@@ -2065,55 +2065,49 @@ public class Milp
                                 consecutiveBookingTicsIndices.put(new int[]{p, z1, z2}, currConsecutiveBookingTicsIndices);
                                 
                                 //TODO: totally ugly (snabb fix): needs to be redone!
-//                                for (int i = 0; i < currConsecutiveBookingTicsIndices.size(); i++)
-//                                {
-//                                    consecutiveBookingEdges[z1].add(new int[]{z2, p,
-//                                        currConsecutiveBookingTicsIndices.get(i)[0],
-//                                        currConsecutiveBookingTicsIndices.get(i)[1],
-//                                        currConsecutiveBookingTicsIndices.get(i)[2]});
-//                                }
+                                for (int i = 0; i < currConsecutiveBookingTicsIndices.size(); i++)
+                                {
+                                    consecutiveBookingEdges[z1].add(new int[]{z2, p,
+                                        currConsecutiveBookingTicsIndices.get(i)[0],
+                                        currConsecutiveBookingTicsIndices.get(i)[1],
+                                        currConsecutiveBookingTicsIndices.get(i)[2]});
+                                }
                             }
                         }
                     }
                 }
             }
             
-            //test
-            for (int z1 = 0; z1 < t.length; z1++)
-            {
-                for (int tic1 = 0; tic1 < t[z1].length; tic1++)
-                {
-                    if (t[z1][tic1] != null)
-                    {
-                        ArrayList<int[]> n = new ArrayList<int[]>();
-                        n.addAll(t[z1][tic1]);
-
-                        while(!n.isEmpty())
-                        {
-                            int[] newKey = n.remove(0);
-                            
-                            int bufferExists = 1;
-                            if (t[z1][tic1].contains(newKey))
-                            {
-                                bufferExists = newKey[2];
-                            }
-                            consecutiveBookingEdges[z1].add(new int[]{newKey[0], p, tic1, newKey[1], bufferExists});
-
-                            //temp
-                            System.out.println("r" + p + "_z" + z1 + "_z" + newKey[0] + " (test) : " + 
-                                    bookingTics[z1][p][STATE_SWITCH][tic1] + " " + 
-                                    bookingTics[newKey[0]][p][STATE_SWITCH][newKey[1]] + " " + 
-                                    bufferExists);
-                            
-                            IntArrayTreeSet newTree = t[newKey[0]][newKey[1]];
-                            if (newTree != null)
-                            {
-                                n.addAll(newTree);
-                            }
-                        }
-                    }
-                }
-            }
+            //test (DIDN'T WORK)
+//            for (int z1 = 0; z1 < t.length; z1++)
+//            {
+//                for (int tic1 = 0; tic1 < t[z1].length; tic1++)
+//                {
+//                    if (t[z1][tic1] != null)
+//                    {
+//                        ArrayList<int[]> n = new ArrayList<int[]>();
+//                        n.addAll(t[z1][tic1]);
+//
+//                        while(!n.isEmpty())
+//                        {
+//                            int[] newKey = n.remove(0);
+//                            
+//                            int bufferExists = 1;
+//                            if (t[z1][tic1].contains(newKey))
+//                            {
+//                                bufferExists = newKey[2];
+//                            }
+//                            consecutiveBookingEdges[z1].add(new int[]{newKey[0], p, tic1, newKey[1], bufferExists});
+//
+//                            IntArrayTreeSet newTree = t[newKey[0]][newKey[1]];
+//                            if (newTree != null)
+//                            {
+//                                n.addAll(newTree);
+//                            }
+//                        }
+//                    }
+//                }
+//            }
         }
         
         // Är följande gamla kommentarer? /AK - 080422
@@ -2137,42 +2131,42 @@ public class Milp
         
         // Find and enumerate all cycles where every edge is of different color
         ArrayList<ArrayList<ConnectedComponentEdge>> rainbowCycles = cycleFinder.enumerateAllCycles();
-        //temp
-        for (ArrayList<ConnectedComponentEdge> cycle : rainbowCycles)
-        {
-            System.out.println("Cycle start:");
-            for (ConnectedComponentEdge edge : cycle)
-            {
-                System.out.println("\tedge from v" + edge.getFromVertice().getVerticeIndex() + 
-                        " to v" + edge.getToVertice().getVerticeIndex());
-            }
-        }
+
         for (ArrayList<ConnectedComponentEdge> cycle : rainbowCycles)
         {
             // If this is a self-loop in the CC-graph, it deserves special treatment.
             // All incoming tics to the self-loop vertice, except the self-loop,
             // give raise to unfeasibility constraints, together with the self-loop.
-            if (cycle.size() == 1)
+            if (cycle.size() == 1) // @Deprecated? I don't think that loops can appear, since only depth-2 sequences are used in the end
             {
+                IntArrayTreeSet usedColorTics = new IntArrayTreeSet();
+                
                 ConnectedComponentEdge loop = cycle.get(0);
                 ConnectedComponentVertice loopVertice = loop.getToVertice();
+
                 for (int vIndex = 0; vIndex < cycleFinder.getVertices().length; vIndex++)
                 {
                     ConnectedComponentVertice v = cycleFinder.getVertices()[vIndex];
                     for (ConnectedComponentEdge edge : v.getOutEdges())
                     {
-                        if (edge.getToVertice().equals(loopVertice) && !edge.equals(cycle.get(0)))
+                        if ((edge.getToVertice().equals(loopVertice))
+                                && !(edge.getColor() == loop.getColor()))
                         {
-                            CircularWaitConstraintBlock currCircularWaitConstraints = new CircularWaitConstraintBlock();
+                            int[] colorTic = new int[]{edge.getColor(), edge.getToTic()};
+                            if (usedColorTics.get(colorTic) == null)
+                            {
+                                usedColorTics.add(colorTic);
                             
-                            // Add the plant-state-bookingtic-info to the current constraint block
-                            currCircularWaitConstraints.add(new int[]{
-                                   loopVertice.getVerticeIndex(), edge.getColor(), loop.getColor(), edge.getToTic(), loop.getFromTic()}); 
-                            currCircularWaitConstraints.add(new int[]{
-                                   loopVertice.getVerticeIndex(), loop.getColor(), edge.getColor(), loop.getToTic(), edge.getToTic()});
-                           
-                            currCircularWaitConstraints.setBuffer(true);
-                            circularWaitConstraints.add(currCircularWaitConstraints);
+                                CircularWaitConstraintBlock currCircularWaitConstraints = new CircularWaitConstraintBlock();
+
+                                // Add the plant-state-bookingtic-info to the current constraint block
+                                currCircularWaitConstraints.add(new int[]{
+                                       loopVertice.getVerticeIndex(), edge.getColor(), loop.getColor(), edge.getToTic(), loop.getFromTic()}); 
+                                currCircularWaitConstraints.add(new int[]{
+                                       loopVertice.getVerticeIndex(), loop.getColor(), edge.getColor(), loop.getToTic(), edge.getToTic()});
+
+                                currCircularWaitConstraints.setBuffer(true);
+                                circularWaitConstraints.add(currCircularWaitConstraints);                            }
                         }
                     }
                 }
