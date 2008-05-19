@@ -1,9 +1,21 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!-- Created with Liquid XML Studio 1.0.5.0 (http://www.liquid-technologies.com) -->
-<xs:schema xmlns:jaxb="http://java.sun.com/xml/ns/jaxb" attributeFormDefault="unqualified" elementFormDefault="qualified" version="1.0" jaxb:version="1.0" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<xs:schema xmlns:jaxb="http://java.sun.com/xml/ns/jaxb" attributeFormDefault="unqualified" elementFormDefault="qualified" version="1.0" jaxb:version="2.0" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+
+  <!-- Definition of simple types ___________________________________-->
+  <xs:simpleType name="ILType">
+	<xs:restriction base="xs:string">
+		<xs:enumeration value="Event"/>
+		<xs:enumeration value="Operation"/>
+	</xs:restriction>
+  </xs:simpleType>
+  
   <xs:simpleType name="ComponentType">
     <xs:restriction base="xs:string" />
   </xs:simpleType>
+  
+  
+  <!-- Definition of simple elements ________________________________-->
   <xs:element name="Comment" type="xs:string" />
   <xs:element name="Machine" type="xs:string" />
   <xs:element name="Actuator" type="xs:string" />
@@ -14,10 +26,22 @@
   <xs:element name="Zone" type="xs:string" />
   <xs:element name="Operation" type="xs:string" />
   <xs:element name="Product" type="xs:string" />
+  
+  
+  <!-- Definition of attributes _____________________________________-->
   <xs:attribute name="id" type="xs:string" />
   <xs:attribute name="row" type="xs:positiveInteger" />
   <xs:attribute name="mode" type="xs:string" />
+  
+  <!-- Definition of complex elements _______________________________-->
   <xs:element name="IL">
+  
+  	<xs:annotation>
+      <xs:documentation xml:lang="en">
+      	InterLock.
+      </xs:documentation>
+   	</xs:annotation>
+   
     <xs:complexType>
       <xs:sequence>
         <xs:element minOccurs="0" maxOccurs="1" ref="Comment" />
@@ -25,9 +49,16 @@
         <xs:element minOccurs="1" maxOccurs="1" ref="Actuator" />
         <xs:element minOccurs="1" maxOccurs="1" ref="ILStructure" />
       </xs:sequence>
+      
+      <!-- id is used by specification synthesis to match IL with a state change in EOP an -->
       <xs:attribute ref="id" use="required" />
+      
+      <!-- ILType is used by specification synthesis to discern between IL for a whole operation or just an event -->
+      <xs:attribute name="type" type="ILType" />
+      
     </xs:complexType>
   </xs:element>
+  
   <xs:element name="ILStructure">
     <xs:complexType>
       <xs:sequence>
@@ -39,6 +70,7 @@
       </xs:sequence>
     </xs:complexType>
   </xs:element>
+  
   <xs:element name="InternalComponents">
     <xs:complexType>
       <xs:sequence>
@@ -48,6 +80,7 @@
       </xs:sequence>
     </xs:complexType>
   </xs:element>
+  
   <xs:element name="ExternalComponents">
     <xs:complexType>
       <xs:sequence>
@@ -55,6 +88,7 @@
       </xs:sequence>
     </xs:complexType>
   </xs:element>
+  
   <xs:element name="Zones">
     <xs:complexType>
       <xs:sequence>
@@ -62,6 +96,7 @@
       </xs:sequence>
     </xs:complexType>
   </xs:element>
+  
   <xs:element name="Operations">
     <xs:complexType>
       <xs:sequence>
@@ -69,7 +104,15 @@
       </xs:sequence>
     </xs:complexType>
   </xs:element>
+  
   <xs:element name="Term">
+  
+    <xs:annotation>
+      <xs:documentation xml:lang="en">
+      	Terms: (Term1) OR (Term2) OR ...
+      </xs:documentation>
+   	</xs:annotation>
+   	
     <xs:complexType>
       <xs:sequence>
         <xs:element minOccurs="0" maxOccurs="unbounded" ref="ActuatorValue" />
@@ -84,6 +127,7 @@
       <xs:attribute ref="mode" use="required" />
     </xs:complexType>
   </xs:element>
+  
   <xs:element name="ActuatorValue">
     <xs:complexType>
       <xs:sequence>
@@ -92,6 +136,7 @@
       </xs:sequence>
     </xs:complexType>
   </xs:element>
+  
   <xs:element name="SensorValue">
     <xs:complexType>
       <xs:sequence>
@@ -100,6 +145,7 @@
       </xs:sequence>
     </xs:complexType>
   </xs:element>
+  
   <xs:element name="VariableValue">
     <xs:complexType>
       <xs:sequence>
@@ -108,6 +154,7 @@
       </xs:sequence>
     </xs:complexType>
   </xs:element>
+  
   <xs:element name="ExternalComponentValue">
     <xs:complexType>
       <xs:sequence>
@@ -116,6 +163,7 @@
       </xs:sequence>
     </xs:complexType>
   </xs:element>
+  
   <xs:element name="ExternalComponent">
     <xs:complexType>
       <xs:sequence>
@@ -124,6 +172,7 @@
       </xs:sequence>
     </xs:complexType>
   </xs:element>
+  
   <xs:element name="ZoneCheck">
     <xs:complexType>
       <xs:sequence>
@@ -132,6 +181,7 @@
       </xs:sequence>
     </xs:complexType>
   </xs:element>
+  
   <xs:element name="BeforeZones">
     <xs:complexType>
       <xs:sequence>
@@ -139,6 +189,7 @@
       </xs:sequence>
     </xs:complexType>
   </xs:element>
+  
   <xs:element name="AfterZones">
     <xs:complexType>
       <xs:sequence>
@@ -146,6 +197,7 @@
       </xs:sequence>
     </xs:complexType>
   </xs:element>
+  
   <xs:element name="OperationCheck">
     <xs:complexType>
       <xs:sequence>
@@ -154,6 +206,7 @@
       </xs:sequence>
     </xs:complexType>
   </xs:element>
+  
   <xs:element name="NotStarted">
     <xs:complexType>
       <xs:sequence>
@@ -161,6 +214,7 @@
       </xs:sequence>
     </xs:complexType>
   </xs:element>
+  
   <xs:element name="NotOngoing">
     <xs:complexType>
       <xs:sequence>
@@ -168,6 +222,7 @@
       </xs:sequence>
     </xs:complexType>
   </xs:element>
+  
   <xs:element name="Products">
     <xs:complexType>
       <xs:sequence>
@@ -175,4 +230,5 @@
       </xs:sequence>
     </xs:complexType>
   </xs:element>
+  
 </xs:schema>

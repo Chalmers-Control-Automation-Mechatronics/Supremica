@@ -1,10 +1,5 @@
-﻿<?xml version="1.0" encoding="UTF-8"?>
-<xs:schema 
-	xmlns:xs="http://www.w3.org/2001/XMLSchema"
-	xmlns:jaxb="http://java.sun.com/xml/ns/jaxb" jaxb:version="2.0"
-	elementFormDefault="qualified"
-	attributeFormDefault="unqualified"
-	version="1.0">  
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<xs:schema xmlns:jaxb="http://java.sun.com/xml/ns/jaxb" xmlns:xs="http://www.w3.org/2001/XMLSchema" attributeFormDefault="unqualified" elementFormDefault="qualified" jaxb:version="2.0" version="1.0">  
 
  <!-- Definition of simple types ___________________________________-->
  <xs:simpleType name="ComponentType">
@@ -36,149 +31,206 @@
 
 
  <!-- Definition of attributes _____________________________________-->
+ <xs:attribute name="id" type="xs:string"/>
  <xs:attribute name="opID" type="xs:string"/>
  <xs:attribute name="actionNbr" type="xs:positiveInteger"/>
 
  <!-- Definition of complex elements _______________________________-->
 
- <xs:element name='Operation'>
+ <xs:element name="Operation">
+   
+   <xs:annotation>
+     <xs:documentation xml:lang="en">
+      Operation.
+     </xs:documentation>
+   </xs:annotation>
+  
   <xs:complexType>
    <xs:sequence>
-    <xs:element ref='Type' minOccurs='1' maxOccurs='1'/>
-    <xs:element ref='Comment' minOccurs='0' maxOccurs='1'/>
-    <xs:element ref='Machine' minOccurs='1' maxOccurs='1'/>
-    <xs:element ref='EOP' minOccurs='1' maxOccurs='1'/>
+    <xs:element maxOccurs="1" minOccurs="1" ref="Type"/>
+    <xs:element maxOccurs="1" minOccurs="0" ref="Comment"/>
+    <xs:element maxOccurs="1" minOccurs="1" ref="Machine"/>
+    <xs:element maxOccurs="1" minOccurs="1" ref="EOP"/>
    </xs:sequence>
-   <xs:attribute ref='opID' use='required'/>
+   <xs:attribute ref="opID" use="required"/>
   </xs:complexType>
  </xs:element>
 
- <xs:element name='EOP'>
+ <xs:element name="EOP">
+ 
+  <xs:annotation>
+    <xs:documentation xml:lang="en">
+      Execution of Operation.
+    </xs:documentation>
+  </xs:annotation>
+  
   <xs:complexType>
    <xs:sequence>
-    <xs:element ref='InternalComponents' minOccurs='1' maxOccurs='1'/>
-    <xs:element ref='ExternalComponents' minOccurs='0' maxOccurs='1'/>
-    <xs:element ref='Zones' minOccurs='0' maxOccurs='1'/>
-    <xs:element ref='InitialState' minOccurs='1' maxOccurs='1'/>
-    <xs:element ref='Action' minOccurs='0' maxOccurs='unbounded'/>
+    <xs:element maxOccurs="1" minOccurs="1" ref="InternalComponents"/>
+    <xs:element maxOccurs="1" minOccurs="0" ref="ExternalComponents"/>
+    <xs:element maxOccurs="1" minOccurs="0" ref="Zones"/>
+    <xs:element maxOccurs="1" minOccurs="1" ref="InitialState"/>
+    <xs:element maxOccurs="unbounded" minOccurs="0" ref="Action"/>
    </xs:sequence>
+   
+   <!-- opID is used by specification synthesis. It is intended to match EOP to Operation -->
+   <xs:attribute ref="opID" default="NONE"/>
+   
   </xs:complexType>
+   
  </xs:element>
 
- <xs:element name='InternalComponents'>
+ <xs:element name="InternalComponents">
+ 
+   <xs:annotation>
+     <xs:documentation xml:lang="en">
+      Components (actuators, sensors and variables) who I can manipulate.
+     </xs:documentation>
+   </xs:annotation>
+  
   <xs:complexType>
    <xs:sequence>
-    <xs:element ref='Actuator' minOccurs='0' maxOccurs='unbounded'/>
-    <xs:element ref='Sensor' minOccurs='0' maxOccurs='unbounded'/>
-    <xs:element ref='Variable' minOccurs='0' maxOccurs='unbounded'/>
-   </xs:sequence>
-  </xs:complexType>
- </xs:element>
-
- <xs:element name='ExternalComponents'>
-  <xs:complexType>
-   <xs:sequence>
-    <xs:element ref='ExternalComponent' minOccurs='1' maxOccurs='unbounded'/>
-   </xs:sequence>
-  </xs:complexType>
- </xs:element>
-
- <xs:element name='Zones'>
-  <xs:complexType>
-   <xs:sequence>
-    <xs:element ref='Zone' minOccurs='1' maxOccurs='unbounded'/>
-   </xs:sequence>
-  </xs:complexType>
- </xs:element>
-
- <xs:element name='InitialState'>
-  <xs:complexType>
-   <xs:sequence>
-    <xs:element ref='ActuatorValue' minOccurs='0' maxOccurs='unbounded'/>
-    <xs:element ref='SensorValue' minOccurs='0' maxOccurs='unbounded'/>
-    <xs:element ref='VariableValue' minOccurs='0' maxOccurs='unbounded'/>
-    <xs:element ref='ExternalComponentValue' minOccurs='0' maxOccurs='unbounded'/>
-    <xs:element ref='ZoneState' minOccurs='0' maxOccurs='unbounded'/>
-    <xs:element ref='InitialStateCheck' minOccurs='1' maxOccurs='1'/>
+    <xs:element maxOccurs="unbounded" minOccurs="0" ref="Actuator"/>
+    <xs:element maxOccurs="unbounded" minOccurs="0" ref="Sensor"/>
+    <xs:element maxOccurs="unbounded" minOccurs="0" ref="Variable"/>
    </xs:sequence>
   </xs:complexType>
  </xs:element>
 
- <xs:element name='Action'>
+ <xs:element name="ExternalComponents">
+ 
+   <xs:annotation>
+     <xs:documentation xml:lang="en">
+      Components who I can't manipulate.
+     </xs:documentation>
+   </xs:annotation>
+   
   <xs:complexType>
    <xs:sequence>
-    <xs:element ref='ActuatorValue' minOccurs='0' maxOccurs='unbounded'/>
-    <xs:element ref='SensorValue' minOccurs='0' maxOccurs='unbounded'/>
-    <xs:element ref='VariableValue' minOccurs='0' maxOccurs='unbounded'/>
-    <xs:element ref='ZoneState' minOccurs='0' maxOccurs='unbounded'/>
-   </xs:sequence>
-   <xs:attribute ref='actionNbr' use='required'/>
-  </xs:complexType>
- </xs:element>
-
- <xs:element name='ActuatorValue'>
-  <xs:complexType>
-   <xs:sequence>
-    <xs:element ref='Actuator' minOccurs='1' maxOccurs='1'/>
-    <xs:element ref='Value' minOccurs='1' maxOccurs='1'/>
+    <xs:element maxOccurs="unbounded" minOccurs="1" ref="ExternalComponent"/>
    </xs:sequence>
   </xs:complexType>
  </xs:element>
 
- <xs:element name='SensorValue'>
+ <xs:element name="Zones">
   <xs:complexType>
    <xs:sequence>
-    <xs:element ref='Sensor' minOccurs='1' maxOccurs='1'/>
-    <xs:element ref='Value' minOccurs='1' maxOccurs='1'/>
+    <xs:element maxOccurs="unbounded" minOccurs="1" ref="Zone"/>
    </xs:sequence>
   </xs:complexType>
  </xs:element>
 
- <xs:element name='VariableValue'>
+ <xs:element name="InitialState">
+ 
+   <xs:annotation>
+     <xs:documentation xml:lang="en">
+      First state.
+     </xs:documentation>
+   </xs:annotation>
+   
   <xs:complexType>
    <xs:sequence>
-    <xs:element ref='Variable' minOccurs='1' maxOccurs='1'/>
-    <xs:element ref='Value' minOccurs='1' maxOccurs='1'/>
+    <xs:element maxOccurs="unbounded" minOccurs="0" ref="ActuatorValue"/>
+    <xs:element maxOccurs="unbounded" minOccurs="0" ref="SensorValue"/>
+    <xs:element maxOccurs="unbounded" minOccurs="0" ref="VariableValue"/>
+    <xs:element maxOccurs="unbounded" minOccurs="0" ref="ExternalComponentValue"/>
+    <xs:element maxOccurs="unbounded" minOccurs="0" ref="ZoneState"/>
+    <xs:element maxOccurs="1" minOccurs="1" ref="InitialStateCheck"/>
+   </xs:sequence>
+  </xs:complexType>
+ </xs:element>
+
+ <xs:element name="Action">
+  
+   <!-- Anotation to Action -->
+   <xs:annotation>
+     <xs:documentation xml:lang="en">
+      Contains information of a specific state.
+      The attribute id is used by the specification
+      synthesis to identify a state change with a interlock.   
+     </xs:documentation>
+   </xs:annotation>
+  
+  <!-- Type structure of Action -->
+  <xs:complexType>
+   <xs:sequence>
+    <xs:element maxOccurs="unbounded" minOccurs="0" ref="ActuatorValue"/>
+    <xs:element maxOccurs="unbounded" minOccurs="0" ref="SensorValue"/>
+    <xs:element maxOccurs="unbounded" minOccurs="0" ref="VariableValue"/>
+    <xs:element maxOccurs="unbounded" minOccurs="0" ref="ZoneState"/>
+   </xs:sequence>
+   
+   <!-- Attributes to Action -->
+   <xs:attribute ref="id" default="NONE"/>
+   <xs:attribute ref="actionNbr" use="required"/>
+   
+  </xs:complexType>
+  
+ </xs:element>
+
+
+ <xs:element name="ActuatorValue">
+  <xs:complexType>
+   <xs:sequence>
+    <xs:element maxOccurs="1" minOccurs="1" ref="Actuator"/>
+    <xs:element maxOccurs="1" minOccurs="1" ref="Value"/>
+   </xs:sequence>
+  </xs:complexType>
+ </xs:element>
+
+ <xs:element name="SensorValue">
+  <xs:complexType>
+   <xs:sequence>
+    <xs:element maxOccurs="1" minOccurs="1" ref="Sensor"/>
+    <xs:element maxOccurs="1" minOccurs="1" ref="Value"/>
+   </xs:sequence>
+  </xs:complexType>
+ </xs:element>
+
+ <xs:element name="VariableValue">
+  <xs:complexType>
+   <xs:sequence>
+    <xs:element maxOccurs="1" minOccurs="1" ref="Variable"/>
+    <xs:element maxOccurs="1" minOccurs="1" ref="Value"/>
    </xs:sequence>
   </xs:complexType>
  </xs:element> 
 
- <xs:element name='ExternalComponentValue'>
+ <xs:element name="ExternalComponentValue">
   <xs:complexType>
    <xs:sequence>
-    <xs:element ref='ExternalComponent' minOccurs='1' maxOccurs='1'/>
-    <xs:element ref='Value' minOccurs='1' maxOccurs='1'/>
+    <xs:element maxOccurs="1" minOccurs="1" ref="ExternalComponent"/>
+    <xs:element maxOccurs="1" minOccurs="1" ref="Value"/>
    </xs:sequence>
   </xs:complexType>
  </xs:element>
 
- <xs:element name='ExternalComponent'>
+ <xs:element name="ExternalComponent">
   <xs:complexType>
    <xs:sequence>
-    <xs:element ref='Component' minOccurs='1' maxOccurs='1'/>
-    <xs:element ref='Machine' minOccurs='1' maxOccurs='1'/>
+    <xs:element maxOccurs="1" minOccurs="1" ref="Component"/>
+    <xs:element maxOccurs="1" minOccurs="1" ref="Machine"/>
    </xs:sequence>
   </xs:complexType>
  </xs:element>
 
- <xs:element name='ZoneState'>
+ <xs:element name="ZoneState">
   <xs:complexType>
    <xs:sequence>
-    <xs:element ref='Zone' minOccurs='1' maxOccurs='1'/>
-    <xs:element ref='State' minOccurs='1' maxOccurs='1'/>
+    <xs:element maxOccurs="1" minOccurs="1" ref="Zone"/>
+    <xs:element maxOccurs="1" minOccurs="1" ref="State"/>
    </xs:sequence>
   </xs:complexType>
  </xs:element>
 
- <xs:element name='InitialStateCheck'>
+ <xs:element name="InitialStateCheck">
   <xs:complexType>
    <xs:sequence>
-    <xs:element ref='AlarmType' minOccurs='1' maxOccurs='1'/>
-    <xs:element ref='AlarmDelay' minOccurs='1' maxOccurs='1'/>
+    <xs:element maxOccurs="1" minOccurs="1" ref="AlarmType"/>
+    <xs:element maxOccurs="1" minOccurs="1" ref="AlarmDelay"/>
    </xs:sequence>
   </xs:complexType>
  </xs:element>
 
 
 </xs:schema>
-
