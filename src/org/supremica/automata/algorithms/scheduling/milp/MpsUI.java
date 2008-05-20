@@ -170,8 +170,13 @@ public abstract class MpsUI
         }
   
         // The circular wait constraints
+        IntArrayTreeSet unfeasiblePairs = new IntArrayTreeSet(); //test
         for (CircularWaitConstraintBlock constraint : milpConstructor.getCircularWaitConstraints())
         {
+            //test
+            ArrayList<int[]> currUFPair = new ArrayList<int[]>();
+            boolean testReduction = false; // use this flag to override the reduction test
+            
             // The counters of 1's in the rhs of the constraint-to-be
             int uBoundCW = -1;
             int uBoundUF = -1;
@@ -195,26 +200,93 @@ public abstract class MpsUI
                     uBoundCW++;
                 }
                 
-                // Add the coefficient for 'var' in the unfeasibility constraint
-                varCoeffs[binVarIndexMap.get(mutexVar)].add(new double[]{constraintCounter, coeffUF});
-                if (!constraint.hasBuffer())
+                //test
+                if (testReduction && constraint.size() == 2)
                 {
-                    // If there is no buffer here, add the coefficient for 'var' in the circular wait constraint.
-                    // Note that the coefficient is opposite (in sign) to the UF-coefficient. 
-                    varCoeffs[binVarIndexMap.get(mutexVar)].add(new double[]{constraintCounter + 1, -1*coeffUF});
+                    int ufVarValue = (coeffUF == -1) ? 0 : 1;
+                    currUFPair.add(new int[]{binVarIndexMap.get(mutexVar), ufVarValue});
+                }
+                else
+                {
+                    // Add the coefficient for 'var' in the unfeasibility constraint
+                    varCoeffs[binVarIndexMap.get(mutexVar)].add(new double[]{constraintCounter, coeffUF});
+                    if (!constraint.hasBuffer())
+                    {
+                        // If there is no buffer here, add the coefficient for 'var' in the circular wait constraint.
+                        // Note that the coefficient is opposite (in sign) to the UF-coefficient. 
+                        varCoeffs[binVarIndexMap.get(mutexVar)].add(new double[]{constraintCounter + 1, -1*coeffUF});
+                    }
                 }
             }
-            
-            // Add the upper bounds for the new constraints
-            bUpper.add(new Double(uBoundUF));
-            if (!constraint.hasBuffer())
+                       
+            //test
+            if (testReduction && currUFPair.size() > 0)
             {
-                bUpper.add(new Double(uBoundCW));
-                constraintCounter++;
+                boolean similarPairFound = false;
+                
+                java.util.SortedSet<int[]> headSet = unfeasiblePairs.headSet(new int[]{currUFPair.get(0)[0]+1, 0, 0, 0});
+                java.util.SortedSet<int[]> currVarSet = headSet.tailSet(new int[]{currUFPair.get(0)[0], 0, 0, 0});
+
+                if (currVarSet.size() > 0)
+                {
+                    for (int[] currPair : currVarSet)
+                    {
+                        int[] similarPair = new int[]{currPair[2], Math.abs(currPair[3] - 1), 
+                                                      currUFPair.get(1)[0], currUFPair.get(1)[1]};
+                        if (unfeasiblePairs.contains(similarPair))
+                        {
+                            similarPairFound = true;
+                            break;
+                        }
+                    }
+                }
+                
+                if (!similarPairFound)
+                {
+                    unfeasiblePairs.add(new int[]{currUFPair.get(0)[0], currUFPair.get(0)[1], 
+                                                  currUFPair.get(1)[0], currUFPair.get(1)[1]});
+                    
+                    double currCoeff = (currUFPair.get(0)[1] == 0) ? -1 : 1;
+                    varCoeffs[currUFPair.get(0)[0]].add(new double[]{constraintCounter, currCoeff});           
+                    if (!constraint.hasBuffer())
+                    {
+                        // If there is no buffer here, add the coefficient for 'var' in the circular wait constraint.
+                        // Note that the coefficient is opposite (in sign) to the UF-coefficient. 
+                        varCoeffs[currUFPair.get(0)[0]].add(new double[]{constraintCounter + 1, -1*currCoeff});
+                    }
+                    currCoeff = (currUFPair.get(1)[1] == 0) ? -1 : 1;
+                    varCoeffs[currUFPair.get(1)[0]].add(new double[]{constraintCounter, currCoeff});                    
+                    if (!constraint.hasBuffer())
+                    {
+                        // If there is no buffer here, add the coefficient for 'var' in the circular wait constraint.
+                        // Note that the coefficient is opposite (in sign) to the UF-coefficient. 
+                        varCoeffs[currUFPair.get(1)[0]].add(new double[]{constraintCounter + 1, -1*currCoeff});
+                    }
+                    
+                    double uBound = currUFPair.get(0)[1] + currUFPair.get(1)[1] - 1;
+                    bUpper.add(new Double(uBound));
+                    if (!constraint.hasBuffer())
+                    {
+                        bUpper.add(new Double(-1*uBound));
+                        constraintCounter++;
+                    }
+                }
+            }
+            else
+            {
+                // Add the upper bounds for the new constraints
+                bUpper.add(new Double(uBoundUF));
+                if (!constraint.hasBuffer())
+                {
+                    bUpper.add(new Double(uBoundCW));
+                    constraintCounter++;
+                }
             }
             
             constraintCounter++;
         }
+        
+        
         
         // The shared events constraints (a block of constrains for each shared event)
         for (ArrayList<ArrayList<ArrayList<int[]>>> eventBlock : milpConstructor.getSharedEventConstraints())

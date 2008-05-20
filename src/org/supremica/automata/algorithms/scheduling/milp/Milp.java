@@ -2002,6 +2002,9 @@ public class Milp
         // Connectivity-test
         ArrayList<LabeledEvent[]> bEventPairs = new ArrayList<LabeledEvent[]>();
         
+        //test-flag to choose between looking far or near into the future in search of connected components
+        boolean fullCC = false;
+        
         // Each entry of this map contains an ArrayList of pairs of consecutive
         // booking states together with the information about whether there is
         // a buffer between the bookings or not, e.g. [Z1_b_index Z2_b_index isBuffer].
@@ -2022,7 +2025,6 @@ public class Milp
         {
             consecutiveBookingEdges[z] = new ArrayList<int[]>();
         }
-        
         
         for (int p = 0; p < plants.size(); p++)
         {
@@ -2065,12 +2067,15 @@ public class Milp
                                 consecutiveBookingTicsIndices.put(new int[]{p, z1, z2}, currConsecutiveBookingTicsIndices);
                                 
                                 //TODO: totally ugly (snabb fix): needs to be redone!
-                                for (int i = 0; i < currConsecutiveBookingTicsIndices.size(); i++)
+                                if (!fullCC)
                                 {
-                                    consecutiveBookingEdges[z1].add(new int[]{z2, p,
-                                        currConsecutiveBookingTicsIndices.get(i)[0],
-                                        currConsecutiveBookingTicsIndices.get(i)[1],
-                                        currConsecutiveBookingTicsIndices.get(i)[2]});
+                                    for (int i = 0; i < currConsecutiveBookingTicsIndices.size(); i++)
+                                    {
+                                        consecutiveBookingEdges[z1].add(new int[]{z2, p,
+                                            currConsecutiveBookingTicsIndices.get(i)[0],
+                                            currConsecutiveBookingTicsIndices.get(i)[1],
+                                            currConsecutiveBookingTicsIndices.get(i)[2]});
+                                    }
                                 }
                             }
                         }
@@ -2079,35 +2084,38 @@ public class Milp
             }
             
             //test (DIDN'T WORK)
-//            for (int z1 = 0; z1 < t.length; z1++)
-//            {
-//                for (int tic1 = 0; tic1 < t[z1].length; tic1++)
-//                {
-//                    if (t[z1][tic1] != null)
-//                    {
-//                        ArrayList<int[]> n = new ArrayList<int[]>();
-//                        n.addAll(t[z1][tic1]);
-//
-//                        while(!n.isEmpty())
-//                        {
-//                            int[] newKey = n.remove(0);
-//                            
-//                            int bufferExists = 1;
-//                            if (t[z1][tic1].contains(newKey))
-//                            {
-//                                bufferExists = newKey[2];
-//                            }
-//                            consecutiveBookingEdges[z1].add(new int[]{newKey[0], p, tic1, newKey[1], bufferExists});
-//
-//                            IntArrayTreeSet newTree = t[newKey[0]][newKey[1]];
-//                            if (newTree != null)
-//                            {
-//                                n.addAll(newTree);
-//                            }
-//                        }
-//                    }
-//                }
-//            }
+            if (fullCC)
+            {
+                for (int z1 = 0; z1 < t.length; z1++)
+                {
+                    for (int tic1 = 0; tic1 < t[z1].length; tic1++)
+                    {
+                        if (t[z1][tic1] != null)
+                        {
+                            ArrayList<int[]> n = new ArrayList<int[]>();
+                            n.addAll(t[z1][tic1]);
+
+                            while(!n.isEmpty())
+                            {
+                                int[] newKey = n.remove(0);
+
+                                int bufferExists = 1;
+                                if (t[z1][tic1].contains(newKey))
+                                {
+                                    bufferExists = newKey[2];
+                                }
+                                consecutiveBookingEdges[z1].add(new int[]{newKey[0], p, tic1, newKey[1], bufferExists});
+
+                                IntArrayTreeSet newTree = t[newKey[0]][newKey[1]];
+                                if (newTree != null)
+                                {
+                                    n.addAll(newTree);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
         }
         
         // Är följande gamla kommentarer? /AK - 080422
@@ -2128,6 +2136,47 @@ public class Milp
         // Create a graph explorer
         ConnectedComponentsGraph cycleFinder =  
                 new ConnectedComponentsGraph(consecutiveBookingEdges, plants.size());
+        
+        //test (UF when moving in the same direction between two (zones connected by an edge in the cc-space)
+        for (ConnectedComponentVertice vertice : cycleFinder.getVertices())
+        {
+            for (int i=0; i<vertice.getOutEdges().size()-1; i++)
+            {
+                ConnectedComponentEdge edge1 = vertice.getOutEdges().get(i);
+                for (int j=i+1; j<vertice.getOutEdges().size(); j++)
+                {
+                    ConnectedComponentEdge edge2 = vertice.getOutEdges().get(j);
+                    if (edge1.getToVertice().equals(edge2.getToVertice()))
+                    {                      
+                        if (!edge1.getBufferExists())
+                        {
+                            CircularWaitConstraintBlock currCircularWaitConstraints = new CircularWaitConstraintBlock();
+                            // Add the plant-state-bookingtic-info to the current constraint block
+                            currCircularWaitConstraints.setBuffer(true); // No extra CW-constraints should be created
+                            currCircularWaitConstraints.add(new int[]{vertice.getVerticeIndex(), 
+                                edge1.getColor(), edge2.getColor(), edge1.getFromTic(), edge2.getFromTic()});
+                            currCircularWaitConstraints.add(new int[]{edge1.getToVertice().getVerticeIndex(), 
+                                edge2.getColor(), edge1.getColor(), edge2.getToTic(), edge1.getToTic()});
+                            
+                            circularWaitConstraints.add(currCircularWaitConstraints);
+                        }
+                        if (!edge2.getBufferExists())
+                        {
+                            CircularWaitConstraintBlock currCircularWaitConstraints = new CircularWaitConstraintBlock();
+                                                        
+                            // Add the plant-state-bookingtic-info to the current constraint block
+                            currCircularWaitConstraints.setBuffer(true); // No extra CW-constraints should be created
+                            currCircularWaitConstraints.add(new int[]{vertice.getVerticeIndex(), 
+                                edge2.getColor(), edge1.getColor(), edge2.getFromTic(), edge1.getFromTic()});
+                            currCircularWaitConstraints.add(new int[]{edge2.getToVertice().getVerticeIndex(), 
+                                edge1.getColor(), edge2.getColor(), edge1.getToTic(), edge2.getToTic()});
+                            
+                            circularWaitConstraints.add(currCircularWaitConstraints);
+                        }
+                    }
+                }
+            }
+        }
         
         // Find and enumerate all cycles where every edge is of different color
         ArrayList<ArrayList<ConnectedComponentEdge>> rainbowCycles = cycleFinder.enumerateAllCycles();
