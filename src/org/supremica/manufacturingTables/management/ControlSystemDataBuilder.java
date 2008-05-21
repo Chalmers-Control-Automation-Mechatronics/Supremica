@@ -237,7 +237,7 @@ public class ControlSystemDataBuilder
 	nbrOfBlanks++;
 
 	// Create EOPData	
-	EOPData EOPData = new EOPData(operation.getOpID(), operation.getType().value());
+	EOPData EOPData = new EOPData(operation.getOpID(), operation.getType());
 
 	//System.out.println(blanks.substring(0,nbrOfBlanks) + "<Type>" + operation.getType() + "</Type>");
 

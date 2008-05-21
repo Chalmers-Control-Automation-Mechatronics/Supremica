@@ -51,42 +51,28 @@ public class SpecificationSynthesInputBuilder
 	 * Function to add EOP to builder
 	 * 
 	 */
-	public void addEOP( EOP eop, String opID ) {
+	public void add( EOP eop ) {
 		
 		//Sanity check
 		if( eop == null ){
 			return;
 		}
 		
-		ilseops.addContent( EOPtoElement.createElement( eop, opID ) );
+		ilseops.addContent( EOPtoElement.createElement( eop ) );
 	}
 
 	/**
 	 * Function to add IL to builder
 	 * 
 	 */
-	public void addIL( IL il ) {
+	public void add( IL il ) {
 		
 		//Sanity check
 		if( il == null ){
 			return;
 		}
 		
-		ilseops.addContent( ILtoElement.createElement( il, false ) );
-	}
-	
-	/**
-	 * Function to add IL as a Robot IL to builder
-	 * 
-	 */
-	public void addRobotIL( IL il ) {
-		
-		//Sanity check
-		if( il == null ){
-			return;
-		}
-		
-		ilseops.addContent( ILtoElement.createElement( il, true ) );
+		ilseops.addContent( ILtoElement.createElement( il ) );
 	}
 	
 	/**

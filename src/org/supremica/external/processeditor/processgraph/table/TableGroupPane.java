@@ -160,6 +160,7 @@ public class TableGroupPane
 			if(null != table){
 				table.fillColumn(table.getValueAt(row, col), col, row, table.getRowCount());
 			}
+			hidePopupMenu();
 		}
 	}
 	
@@ -170,6 +171,8 @@ public class TableGroupPane
 	public void mouseReleased(MouseEvent e) {
 		if(e.isPopupTrigger()){
 			showPopupMenu(e);
+		}else{
+			hidePopupMenu();
 		}
 	}
 	
@@ -194,5 +197,10 @@ public class TableGroupPane
 		popupMenu.setLocation(e.getLocationOnScreen());
 		popupMenu.setVisible(true);
 	}
+	
+	protected void hidePopupMenu(){
+		popupMenu.setVisible(false);
+	}
+	
 	/* End Handel popup menu */
 }

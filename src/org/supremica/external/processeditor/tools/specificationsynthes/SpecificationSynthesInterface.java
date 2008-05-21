@@ -24,8 +24,8 @@ public class SpecificationSynthesInterface
 									              ActionListener
 {
 	
-	ConvertPanel cPanel;
-	SOCGraphContainer graphContainer;
+	ConvertPanel cPanel = null;
+	SOCGraphContainer graphContainer = null;
 	
 	public SpecificationSynthesInterface(){
 		

@@ -1,19 +1,17 @@
 package org.supremica.external.processeditor.tools.specificationsynthes;
 
-import java.util.*;
 import java.util.List;
 
 import javax.swing.*;
-import javax.swing.border.*;
-import java.text.*;
 import java.awt.*;
 import java.awt.event.*;
-import java.awt.Font.*;
 import java.io.*;
 
 public class TablePane
-					extends JPanel 
-							implements ActionListener{
+					extends
+					    JPanel 
+							implements
+							    ActionListener{
 	
 	private JButton jbAddFile;
 	private JButton jbRemove;

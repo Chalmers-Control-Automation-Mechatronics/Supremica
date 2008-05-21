@@ -3,21 +3,18 @@
 
 
   <!-- Definition of simple types ___________________________________-->
-  <xs:simpleType name="ILType">
-	<xs:restriction base="xs:string">
-		<xs:enumeration value="Event"/>
-		<xs:enumeration value="Operation"/>
-	</xs:restriction>
-  </xs:simpleType>
-  
   <xs:simpleType name="ComponentType">
     <xs:restriction base="xs:string" />
   </xs:simpleType>
   
   
   <!-- Definition of simple elements ________________________________-->
+  
+  <xs:element name="Type" type="xs:string" />
   <xs:element name="Comment" type="xs:string" />
+  
   <xs:element name="Machine" type="xs:string" />
+  
   <xs:element name="Actuator" type="xs:string" />
   <xs:element name="Sensor" type="xs:string" />
   <xs:element name="Variable" type="xs:string" />
@@ -44,7 +41,11 @@
    
     <xs:complexType>
       <xs:sequence>
+        
+        <!-- Type is used by specification synthesis to discern between IL for a whole operation or just an event -->
+        <xs:element minOccurs="0" maxOccurs="1" ref="Type" />
         <xs:element minOccurs="0" maxOccurs="1" ref="Comment" />
+        
         <xs:element minOccurs="1" maxOccurs="1" ref="Operation" />
         <xs:element minOccurs="1" maxOccurs="1" ref="Actuator" />
         <xs:element minOccurs="1" maxOccurs="1" ref="ILStructure" />
@@ -52,9 +53,6 @@
       
       <!-- id is used by specification synthesis to match IL with a state change in EOP an -->
       <xs:attribute ref="id" use="required" />
-      
-      <!-- ILType is used by specification synthesis to discern between IL for a whole operation or just an event -->
-      <xs:attribute name="type" type="ILType" />
       
     </xs:complexType>
   </xs:element>

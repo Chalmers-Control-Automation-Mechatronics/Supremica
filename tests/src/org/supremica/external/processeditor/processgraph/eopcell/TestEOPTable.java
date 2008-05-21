@@ -73,7 +73,7 @@ public class TestEOPTable
     	table = tablePane.getTable();
     	
     	//extract actions
-    	actions = EOPTableExtractor.getActions( null, null, table );
+    	actions = EOPTableExtractor.getActions(null, null, null, table );
     	
     	//test
     	for(int i = 0; i < eop.getAction().size(); i++){
@@ -112,7 +112,7 @@ public class TestEOPTable
     	table = tablePane.getTable();
     	
     	//extract actions
-    	actions = EOPTableExtractor.getActions(table, null, null);
+    	actions = EOPTableExtractor.getActions(null, table, null, null);
     	
     	//test
     	for(int i = 0; i < eop.getAction().size(); i++){
@@ -151,7 +151,7 @@ public class TestEOPTable
     	table = tablePane.getTable();
     	
     	//extract actions
-    	actions = EOPTableExtractor.getActions(table, null, null);
+    	actions = EOPTableExtractor.getActions(null, table, null, null);
     	
     	//test
     	for(int i = 0; i < eop.getAction().size(); i++){
@@ -190,7 +190,7 @@ public class TestEOPTable
     	table = tablePane.getTable();
     	
     	//extract actions
-    	actions = EOPTableExtractor.getActions(table, null, null);
+    	actions = EOPTableExtractor.getActions(null, table, null, null);
     	
     	//test
     	for(int i = 0; i < eop.getAction().size(); i++){

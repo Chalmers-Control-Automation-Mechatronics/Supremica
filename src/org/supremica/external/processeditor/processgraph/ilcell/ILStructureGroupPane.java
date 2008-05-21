@@ -379,12 +379,18 @@ public class ILStructureGroupPane
 			}else{
 				addConditionRow();
 			}
+			
+			hidePopupMenu();
+			
 		}else if(event.getActionCommand().equals("Remove condition")){
 			if(null != selectedRows){
 				for(int i = 0; i < selectedRows.length; i++){
 					deleteConditionRow(selectedRows[i]);
 				}
 			}
+			
+			hidePopupMenu();
+			
 		}else{
 			super.actionPerformed(event);
 		}

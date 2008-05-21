@@ -162,7 +162,8 @@ public class EOPTableExtractor {
 	 * @param tableZone
 	 * @return Array of action there first is initial action and the rest follows.
 	 */
-	public static Action[] getActions(BasicTable tableInternal, 
+	public static Action[] getActions(BasicTable tableId,
+			                          BasicTable tableInternal, 
 									  BasicTable tableExternal,
 									  BasicTable tableZone)
 	{
@@ -188,6 +189,7 @@ public class EOPTableExtractor {
 			actions[i].setActionNbr(BigInteger.valueOf(i));
 		}
 		
+		addIdActionState(actions, tableId);
 		addInternalComponentsActionState(actions, tableInternal);
 		addExternalComponentsActionState(actions, tableExternal);
 		addZoneActionState(actions, tableZone);
@@ -337,6 +339,33 @@ public class EOPTableExtractor {
 				zoneState.setZone(table.getColumnName(col));
 				zoneState.setState(table.getValueAt(i+1, col).toString().trim());
 				actions[i].getZoneState().add(zoneState);
+			}
+		}
+	}
+	
+	
+	/**
+	 * Add id information to actions
+	 * 
+	 * @param actions
+	 * @param table
+	 */
+	private static void addIdActionState(Action[] actions, BasicTable table){
+		
+		
+		int numberOfColumns = -1;
+		
+		ZoneState zoneState = null;
+		ObjectFactory factory = new ObjectFactory();
+		
+		if(null == table || null == actions || 0 == actions.length){
+			return;
+		}
+		
+		numberOfColumns = table.getColumnCount();
+		for(int col = 0; col < numberOfColumns; col++){
+			for(int i = 0; i < actions.length; i++){
+				actions[i].setId( table.getValueAt(i+1, col).toString().trim() );
 			}
 		}
 	}

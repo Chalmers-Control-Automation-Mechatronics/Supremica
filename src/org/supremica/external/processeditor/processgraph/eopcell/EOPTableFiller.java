@@ -151,4 +151,33 @@ public class EOPTableFiller {
 		}
 		
 	}
+	
+	/**
+	 * Insert ZoneCondition data to a table. This information can be extracted
+	 * by EOPTableExtractor. 
+	 * 
+	 * table is supposed to have two columns.
+	 * 
+	 * @param term
+	 * @param table
+	 */
+	public static void insertIdFromActionToTable(Action action, BasicTable table){
+		//check input
+		if(action == null || table == null){
+			return;
+		}
+		
+		setUp(action, table);
+		
+	    col = 0;
+		table.setValueAt(action.getId(), row, col);
+		
+	}
+	
+	
+	
+	
+	
+	
+	
 }

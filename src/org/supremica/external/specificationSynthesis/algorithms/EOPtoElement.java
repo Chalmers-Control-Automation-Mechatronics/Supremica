@@ -35,7 +35,7 @@ class EOPtoElement
 	 * Function to create an instance of Element from an instance of EOP
 	 * 
 	 */
-	public static Element createElement( EOP eop, String id ){
+	public static Element createElement( EOP eop ){
 		
 		Element element = null;
 		
@@ -48,14 +48,16 @@ class EOPtoElement
 		element = new Element( OPERATION );
 		
 		//Add attributes
-		element.setAttribute( ID , id );
+		if( isValidString( eop.getId() ) ){
+		    element.setAttribute( ID , eop.getId() );
+		}
 		
 		//Add initial process
-		element.addContent( createElement( eop.getInitialState(), id ) );
+		element.addContent( createElement( eop.getInitialState(), eop.getId() ) );
 		
 		//Add processes from action
 		for( Action action : eop.getAction() ){
-			element.addContent( createElement( action, id ) );
+			element.addContent( createElement( action ) );
 		}
 		
 		return element;
@@ -104,8 +106,10 @@ class EOPtoElement
 		init();
 		
 		//add attributes
-		process.setAttribute( ID , ID_PREFIX + id );
-		event.setAttribute( ID , ID_PREFIX + id );
+		if( isValidString( ID_PREFIX + id ) ){
+		    process.setAttribute( ID , ID_PREFIX + id );
+		    event.setAttribute( ID , ID_PREFIX + id );
+		}
 		
 		//Create structure
 		process.addContent( event );
@@ -143,7 +147,7 @@ class EOPtoElement
 	 * @param initialState
 	 * @return
 	 */
-	private static Element createElement( Action action , String id){
+	private static Element createElement( Action action){
 	
 		final String ACTION = "action";
 		
@@ -156,8 +160,13 @@ class EOPtoElement
 		init();
 		
 		//add attributes
-		process.setAttribute( ID , ACTION + action.getActionNbr() );
-		event.setAttribute( ID , id + "_" + ACTION + action.getActionNbr() );
+		if( isValidString( ACTION + action.getActionNbr() ) ){
+		    process.setAttribute( ID , ACTION + action.getActionNbr() );
+		}
+		
+		if( isValidString( action.getId() ) ){
+		    event.setAttribute( ID , action.getId() );
+		}
 		
 		//Create structure
 		process.addContent( event );

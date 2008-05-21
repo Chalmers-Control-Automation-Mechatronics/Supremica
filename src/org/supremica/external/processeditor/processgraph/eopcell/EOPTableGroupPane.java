@@ -26,7 +26,9 @@ public class EOPTableGroupPane
 	InternalTablePane tableInternal = null;
 	ExternalTablePane tableExternal = null;
 	ZoneTablePane tableZone = null;
+	StateChangeIdTablePane tableId = null;
 	
+	boolean showTableId = true;
 	boolean showTableInternal = true;
 	boolean showTableExternal = true;
 	boolean showTableZone = true;
@@ -45,6 +47,7 @@ public class EOPTableGroupPane
 			eop = (new ObjectFactory()).createEOP();
 		}
 		
+		tableId = new StateChangeIdTablePane();
 		tableInternal = new InternalTablePane(eop.getInternalComponents());
 		tableExternal = new ExternalTablePane(eop.getExternalComponents());
     	tableZone = new ZoneTablePane(eop.getZones());
@@ -59,6 +62,7 @@ public class EOPTableGroupPane
     	setRowNames();
     	
     	//add all tables one time
+    	addTable( tableId );
     	addTable( tableInternal );
     	addTable( tableExternal );
     	addTable( tableZone );		
@@ -69,6 +73,7 @@ public class EOPTableGroupPane
 	
 	public void insertActions(List<Action> actionList){
 		
+		tableId.insertActions( actionList );
 		tableInternal.insertActions( actionList );
 		tableExternal.insertActions( actionList );
 		tableZone.insertActions( actionList );
@@ -117,6 +122,13 @@ public class EOPTableGroupPane
 		
 		removeAll();
 		validate();
+		
+		if( showTableId ){
+			tableId.showRowHeader(rowHeader);
+			rowHeader = false;
+			
+			addTable( tableId );
+		}
 		
 		if( showTableInternal ){
 			tableInternal.showRowHeader(rowHeader);
@@ -169,9 +181,19 @@ public class EOPTableGroupPane
 	}
 	
 	public Action[] getActions(){
-		return EOPTableExtractor.getActions(tableInternal.getTable(),
+		return EOPTableExtractor.getActions(tableId.getTable(),
+				                            tableInternal.getTable(),
 										    tableExternal.getTable(),
 										    tableZone.getTable());
+	}
+	
+	public void showStateChangeIdTable(boolean show){
+		if(show == showTableId){
+			return;
+		}
+		
+		showTableId = show;
+		showTables();
 	}
 	
 	public void showInternalTable(boolean show){
@@ -249,6 +271,7 @@ public class EOPTableGroupPane
 	
 	public void addActionRow(){
 		
+		tableId.addRow(ROWNAME);
 		tableInternal.addRow(ROWNAME);
 		tableExternal.addRow(ROWNAME);
     	tableZone.addRow(ROWNAME);
@@ -265,6 +288,7 @@ public class EOPTableGroupPane
 			return;
 		}
 		
+		tableId.addRow(rowIndex, ROWNAME);
 		tableInternal.addRow(rowIndex, ROWNAME);
 		tableExternal.addRow(rowIndex, ROWNAME);
     	tableZone.addRow(rowIndex, ROWNAME);
@@ -288,6 +312,7 @@ public class EOPTableGroupPane
 			return;
 		}
 		
+		tableId.removeRow(index);
 		tableInternal.removeRow(index);
 		tableExternal.removeRow(index);
     	tableZone.removeRow(index);
@@ -340,12 +365,18 @@ public class EOPTableGroupPane
 			}else{
 				addActionRow();
 			}
+			
+			hidePopupMenu();
+			
 		}else if(event.getActionCommand().equals("Remove action")){
 			if(null != selectedRows){
 				for(int i = 0; i < selectedRows.length; i++){
 					deleteActionRow(selectedRows[i]);
 				}
 			}
+			
+			hidePopupMenu();
+			
 		}else{
 			super.actionPerformed(event);
 		}
@@ -361,22 +392,26 @@ public class EOPTableGroupPane
     	
     		switch(i){
     			case 0:
+    				tableId.setRowName(0, "");
     				tableInternal.setRowName(0, "");
     				tableExternal.setRowName(0, "");
     		    	tableZone.setRowName(0, "");
     		    	break;
     			case 1:
+    				tableId.setRowName(1, "Initial");
     				tableInternal.setRowName(1, "Initial");
     	    		tableExternal.setRowName(1, "Initial");
     	    		tableZone.setRowName(1, "Initial");
     	    		break;
     	    	default:
+    	    		tableId.setRowName(i, ROWNAME + (i-1));
     	    		tableInternal.setRowName(i, ROWNAME + (i-1));
         			tableExternal.setRowName(i, ROWNAME + (i-1));
         			tableZone.setRowName(i, ROWNAME + (i-1));	
     		}
     	}
     	
+    	tableId.showRowHeader(tableId.isRowHeaderVisible());
     	tableInternal.showRowHeader(tableInternal.isRowHeaderVisible());
     	tableExternal.showRowHeader(tableExternal.isRowHeaderVisible());
     	tableZone.showRowHeader(tableZone.isRowHeaderVisible());

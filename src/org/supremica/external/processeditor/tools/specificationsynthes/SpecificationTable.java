@@ -20,7 +20,7 @@ import java.io.File;
 import org.supremica.external.processeditor.xml.Loader;
 
 import org.supremica.manufacturingTables.xsd.processeditor.ROP;
-import org.supremica.manufacturingTables.xsd.eop.Operation;
+import org.supremica.manufacturingTables.xsd.eop.EOP;
 import org.supremica.manufacturingTables.xsd.il.IL;
 
 public class SpecificationTable extends JTable {
@@ -42,34 +42,34 @@ public class SpecificationTable extends JTable {
     	return (BasicTableModel) super.getModel();
     }
     
-    public void addFile(File file){
+    public void addFile( File file ){
     	
     	String name = "";
     	String comment = "";
     	String type = "";
     	
     	String filePath = file.getAbsolutePath();
-    	Object o = getObjectFromFile(file);
+    	Object o = getObjectFromFile( file );
     	Object[] os = null;
     	
     	//Sanity check
-    	if(o == null){
+    	if( null == o ){
     		return;
     	}
     	
-    	if(o instanceof ROP){
+    	if( o instanceof ROP ){
     		
     		name = ((ROP)o).getMachine();
         	comment = ((ROP)o).getComment();
         	type = ((ROP)o).getType().value();
         	
-    	}else if(o instanceof Operation){
+    	}else if( o instanceof EOP ){
     		
-    		name = ((Operation)o).getOpID() +"::"+ ((Operation)o).getMachine();
-        	comment = ((Operation)o).getComment();
+    		name = ((EOP)o).getId();
+        	comment = ((EOP)o).getComment();
         	type = "EOP";
         	
-    	}else if(o instanceof IL){
+    	}else if( o instanceof IL ){
     		
     		name = ((IL)o).getId();
         	comment = ((IL)o).getComment();
@@ -90,8 +90,8 @@ public class SpecificationTable extends JTable {
 				  	      filePath};
     	
     	//add Object to table
-		if(!getModel().rowExist(os)){
-			getModel().insertRow(os);
+		if( !getModel().rowExist( os ) ){
+			getModel().insertRow( os );
 	    	repaint();
 		}
     }
@@ -245,13 +245,12 @@ public class SpecificationTable extends JTable {
     }
     
     /**
-     *	Open file and return a ROP if the file is a valid
-     *	ROP file. Otherwise null
+     *	Open file and return a JAXB object
      * 
      * @param file
-     * @return a ROP from file
+     * @return object
      */
-    private Object getObjectFromFile(File file){
+    private Object getObjectFromFile( File file ){
 		
 		if(file != null && file.exists()){
 			Loader loader = new Loader();

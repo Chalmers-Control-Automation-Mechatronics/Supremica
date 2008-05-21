@@ -21,7 +21,7 @@ public class SpecificationSynthesXML {
 	public static final String OR                 = "Or";
 	
 	public static final String EVENT_IL           = "Event_interlocking";
-	public static final String ROBOT_IL           = "Robot_interlocking";
+	public static final String OPERATION_IL           = "Robot_interlocking";
 	
 	public static final String INT_STATE           = "Internal_state";
 	public static final String EXT_STATE           = "External_state";
@@ -36,7 +36,7 @@ public class SpecificationSynthesXML {
 	
 	
 	//This array contains strings who can be treated as empty
-	public static final String[] NOT_VALID_STRINGS = new String[]{ "-", "*" };
+	public static final String[] NOT_VALID_STRINGS = new String[]{ "-", "" };
 	
 	/*-----------------------------------------------------------------------*/
 	/*

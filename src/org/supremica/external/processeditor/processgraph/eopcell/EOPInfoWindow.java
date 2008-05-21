@@ -40,8 +40,8 @@ import org.supremica.external.processeditor.processgraph.table.TextInputPane;
 import org.supremica.external.processeditor.xml.Loader;
 
 /**
- * Displays the Execution of operation info window, which allow the user to edit 
- * the execution of operation
+ * Displays the Execution of operation info window, which allow 
+ * the user to edit the execution of operation
  */
 public class EOPInfoWindow
 						extends 
@@ -51,16 +51,20 @@ public class EOPInfoWindow
 { 
 	private static final String TITLE = "Execution Of Operation";
 	
-    private JButton jbOk, jbCancel, jbAction;
+    private JButton jbOk = null;
+    private JButton jbCancel = null;
+    private JButton jbAction = null;
     
-    private TextInputPane textInputPane;
-    private JPanel topPanel, bottomPanel;
+    private TextInputPane textInputPane = null;
+    private JPanel topPanel, bottomPanel = null;
     
-    private EOPTableGroupPane tableGroup;
+    private EOPTableGroupPane tableGroup = null;
     
-    private EOP eop;
+    private EOP eop = null;
     private ExecutionOfOperationCell eopCell = null;
     
+    
+    private static final String EOP_ID = "Id:";
     private static final String ALARMDELAY = "Alarm delay:";
     private static final String ALARMTYPE = "Alarm type:";
     
@@ -81,7 +85,7 @@ public class EOPInfoWindow
     	file = eopCell.getFile();
     }
     
-    public EOPInfoWindow(EOP eop){
+    public EOPInfoWindow( EOP eop ){
     	super(TITLE);
     	
     	setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
@@ -94,14 +98,20 @@ public class EOPInfoWindow
     	getContentPane().setLayout(new BorderLayout());
     	
     	if(eop == null){
-    		getContentPane().add(new JLabel("Error! No Execution op operation"), BorderLayout.CENTER);
-    		getContentPane().add(jbCancel = new JButton("Ok"), BorderLayout.PAGE_END);
+    		getContentPane().add(new JLabel("Error! No Execution op operation"),
+    				             BorderLayout.CENTER);
+    		getContentPane().add(jbCancel = new JButton("Ok"),
+    				                                    BorderLayout.PAGE_END);
     		jbCancel.addActionListener(this);
     		
     		pack();
     		
-    		setLocation((Toolkit.getDefaultToolkit().getScreenSize().width-getWidth())/2,
-       		     (Toolkit.getDefaultToolkit().getScreenSize().height-getHeight())/2);
+    		setLocation((Toolkit.getDefaultToolkit().
+    				                         getScreenSize().
+    				                                 width-getWidth())/2,
+       		                 (Toolkit.getDefaultToolkit().
+       		    		                     getScreenSize().
+       		    		                             height-getHeight())/2);
     		
     		return;
     	}
@@ -122,11 +132,30 @@ public class EOPInfoWindow
     	jbCancel.addActionListener(this);
     	jbAction.addActionListener(this);
     	
-    	textInputPane = new TextInputPane(null, new String[]{ALARMTYPE,ALARMDELAY});
+    	textInputPane = new TextInputPane(null,
+    			                          new String[]{EOP_ID,
+    			                                       ALARMTYPE,
+    			                                       ALARMDELAY});
+    	
+    	//Get value from EOP
+    	textInputPane.setText(EOP_ID, eop.getId());
+    	if( null != eop.getInitialState() ){
+    		if( null != eop.getInitialState().getInitialStateCheck() ){
+    			textInputPane.setText(ALARMDELAY,
+    					                  eop.getInitialState().
+    					                     getInitialStateCheck().
+    					                         getAlarmDelay());
+    			textInputPane.setText(ALARMTYPE,
+    					              eop.getInitialState().
+    					                  getInitialStateCheck().
+    					                      getAlarmType());
+    		}
+    	}
     	
     	topPanel = new JPanel();
     	topPanel.setLayout(new BorderLayout());
-    	topPanel.setBorder(BorderFactory.createTitledBorder("Initial state check"));
+    	topPanel.setBorder(BorderFactory.
+    			               createTitledBorder("Execution of OPeration data"));
     	
     	topPanel.add(textInputPane, BorderLayout.LINE_START);
     	
@@ -297,10 +326,11 @@ public class EOPInfoWindow
         
         if(o instanceof EOP){
         	setFile(tmpFile);
-        	eop = (EOP) o;
-        	setEOP(eop);
+        	setEOP((EOP) o);
         }else{
-        	JOptionPane.showMessageDialog(this, "File contains no EOP","File error",JOptionPane.ERROR_MESSAGE);
+        	JOptionPane.showMessageDialog(this, "File contains no EOP",
+        			                            "File error",
+        			                            JOptionPane.ERROR_MESSAGE);
         }
     }
     
@@ -310,6 +340,9 @@ public class EOPInfoWindow
     	}
     	
     	this.eop = eop;
+    	
+    	//Get value from EOP
+    	textInputPane.setText(EOP_ID, eop.getId());
     	
     	if( null != eop.getInitialState() ){
     		if( null != eop.getInitialState().getInitialStateCheck() ){
@@ -337,27 +370,34 @@ public class EOPInfoWindow
      */
     private void updateEOP(){
     	
-    	//--------------------------------
+    	//---------------------------------------------------------------------
+    	//Attributes
+    	//---------------------------------------------------------------------
+    	eop.setId( textInputPane.getText( EOP_ID ) );
+    	
+    	//---------------------------------------------------------------------
     	//External components
-    	//--------------------------------
-    	eop.setExternalComponents(((EOPTableGroupPane)tableGroup).getExternalComponents());
+    	//---------------------------------------------------------------------
+    	eop.setExternalComponents(((EOPTableGroupPane)tableGroup).
+    			                                      getExternalComponents());
     	
-    	//---------------------------------
+    	//---------------------------------------------------------------------
     	//Internal components
-    	//---------------------------------
-    	eop.setInternalComponents(((EOPTableGroupPane)tableGroup).getInternalComponents());
+    	//---------------------------------------------------------------------
+    	eop.setInternalComponents(((EOPTableGroupPane)tableGroup).
+    			                                      getInternalComponents());
     	
-    	//---------------------------------
+    	//---------------------------------------------------------------------
     	//Zones
-    	//---------------------------------
+    	//---------------------------------------------------------------------
     	eop.setZones(((EOPTableGroupPane)tableGroup).getZones());
     	
     	Action[] actions = ((EOPTableGroupPane)tableGroup).getActions();
     	
     	
-    	//-----------------------------------------------------------------
+    	//---------------------------------------------------------------------
     	//Initial state
-    	//-----------------------------------------------------------------
+    	//---------------------------------------------------------------------
     	InitialState initial = (new ObjectFactory()).createInitialState();
     	for(ActuatorValue val : actions[0].getActuatorValue()){
     		initial.getActuatorValue().add(val);

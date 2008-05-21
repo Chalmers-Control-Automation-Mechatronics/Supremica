@@ -251,27 +251,13 @@ public class ConvertPanel
         	 * 
         	 */
             if( o instanceof Operation ){
-    			String id = ((Operation)o).getOpID()
-    			            + "::" 
-    			            + ((Operation)o).getMachine();
-    			
-    			builder.addEOP( ((Operation)o).getEOP(), id);
-    			
+    			builder.add( ((Operation)o).getEOP() );
     		}else if( o instanceof EOP ){
-    			
-    			JOptionPane.
-				showMessageDialog(dialogReferenceFrame,
-								  "EOP contain no operation information",
-								  "Problem",
-								  JOptionPane.ERROR_MESSAGE);
-    			
+    			builder.add( (EOP)o );
     		}else if( o instanceof IL ){
-    			
-    			builder.addIL( (IL)o ); //Were is information if this is a robot IL
-    			//builder.addRobotIL( (IL)o );
-    			
+    			builder.add( (IL)o );
     		}else if( o instanceof ROP ){
-    			System.out.println("ROP");//do nothing with ROP
+    			//do nothing with ROP
     		}else{
     			JOptionPane.
     				showMessageDialog(dialogReferenceFrame,
@@ -302,7 +288,7 @@ public class ConvertPanel
      * @param document
      * @param filePath
      */
-    private void saveDocument(Document document, String filePath){
+    private void saveDocument( Document document, String filePath ){
     	
 		try{
 			XMLOutputter outp = new XMLOutputter();
@@ -312,10 +298,10 @@ public class ConvertPanel
 
 			outp.output( document, fileStream );
 		}
-		catch (FileNotFoundException e) {
-			System.out.println("No file");
+		catch ( FileNotFoundException e ) {
+			System.out.println( "No file" );
 		}
-		catch (IOException e) {
+		catch ( IOException e ) {
 			;
 		}
 	}

@@ -8,6 +8,7 @@
   </xs:restriction>
  </xs:simpleType>
 
+ <!-- Type were type="TypeType" before, this is stored if problems arise -->
  <xs:simpleType name="TypeType">
   <xs:restriction base="xs:string">
    <xs:enumeration value="basic"/>
@@ -16,9 +17,11 @@
  </xs:simpleType>
 
  <!-- Definition of simple elements ________________________________-->
- <xs:element name="Type" type="TypeType"/>
+ <xs:element name="Type" type="xs:string"/>
  <xs:element name="Comment" type="xs:string"/>
+ 
  <xs:element name="Machine" type="xs:string"/>
+ 
  <xs:element name="Actuator" type="xs:string"/>
  <xs:element name="Sensor" type="xs:string"/>
  <xs:element name="Variable" type="xs:string"/>
@@ -26,6 +29,7 @@
  <xs:element name="Value" type="xs:string"/>
  <xs:element name="State" type="xs:string"/>
  <xs:element name="Zone" type="xs:string"/>
+ 
  <xs:element name="AlarmType" type="xs:string"/>
  <xs:element name="AlarmDelay" type="xs:string"/>
 
@@ -66,6 +70,10 @@
   
   <xs:complexType>
    <xs:sequence>
+    
+    <xs:element minOccurs="0" maxOccurs="1" ref="Type" />
+    <xs:element minOccurs="0" maxOccurs="1" ref="Comment" />
+        
     <xs:element maxOccurs="1" minOccurs="1" ref="InternalComponents"/>
     <xs:element maxOccurs="1" minOccurs="0" ref="ExternalComponents"/>
     <xs:element maxOccurs="1" minOccurs="0" ref="Zones"/>
@@ -73,8 +81,8 @@
     <xs:element maxOccurs="unbounded" minOccurs="0" ref="Action"/>
    </xs:sequence>
    
-   <!-- opID is used by specification synthesis. It is intended to match EOP to Operation -->
-   <xs:attribute ref="opID" default="NONE"/>
+   <!-- id is used by specification synthesis. It is intended to match EOP to an Operation -->
+   <xs:attribute ref="id"/>
    
   </xs:complexType>
    

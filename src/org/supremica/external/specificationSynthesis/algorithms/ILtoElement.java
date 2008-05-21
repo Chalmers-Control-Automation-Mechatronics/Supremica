@@ -35,17 +35,6 @@ class ILtoElement
 	
 	/**
 	 * 
-	 * Creates an Element from an IL object
-	 * 
-	 * @param il
-	 * @return
-	 */
-	public static Element createElement( IL il ){
-	    return createElement( il , false );
-	}
-	
-	/**
-	 * 
 	 * Creates an Element from an IL object, if robot is true
 	 * an robot interlock is created else an event interlock is 
 	 * created
@@ -53,22 +42,33 @@ class ILtoElement
 	 * @param il
 	 * @return
 	 */
-	public static Element createElement( IL il , boolean robot ){
+	public static Element createElement( IL il ){
 		
 		//Sanity check
-		if( il == null ){
+		if( null == il ){
+			return null;
+		}else if( null == il.getType()){
 			return null;
 		}
 		
-		init();
+		init();	
 		
-		if( robot ){
-			interlock = new Element( ROBOT_IL );
+		if( OPERATION_IL.equals( il.getType() ) ){
+			interlock = new Element( OPERATION_IL );
+		}else if( EVENT_IL.equals( il.getType() ) ){
+		    interlock = new Element( EVENT_IL );
+		}else{
+		    //Unknown IL type
+		    System.err.println( "Warning: unknown IL type "
+		    			        + il.getType().toString() );
 		}
 		
 		//add attributes
-		interlock.setAttribute( ID , il.getId() );
-		interlock.setAttribute( TYPE , "safe");
+		if( isValidString( il.getId() ) ){
+		    interlock.setAttribute( ID , il.getId() );
+		}
+		
+		interlock.setAttribute( TYPE , "safe");  //always safe
 		
 		//Create tree structure
 		interlock.addContent( event );
@@ -170,7 +170,7 @@ class ILtoElement
 			    for( String op : opCheck.getNotStarted().getOperation() ){
 			    	if( isValidString( op ) ){
 						
-						tmp = new Element( OP_NOT_ONGOING  );
+						tmp = new Element( OP_NOT_STARTED  );
 						tmp.setAttribute( NAME, op );
 			            
 						and.addContent( tmp );
