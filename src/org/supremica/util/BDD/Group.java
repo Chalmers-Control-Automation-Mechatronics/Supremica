@@ -257,10 +257,9 @@ public class Group
 	 * return the set of automata that use this event in their alphabet
 	 *
 	 */
-	public Collection getUsers(Event e)
+	public Collection<BDDAutomaton> getUsers(Event e)
 	{
-		LinkedList ret = new LinkedList();
-
+		LinkedList<BDDAutomaton> ret = new LinkedList<BDDAutomaton>();
 		for (int i = 0; i < size; i++)
 		{
 			if(members[i].eventUsed(e))
@@ -268,9 +267,7 @@ public class Group
 				ret.add(members[i]);
 			}
 		}
-
 		return ret;
-
 	}
 
 	// --------------------------------------------------------------------------
@@ -361,15 +358,6 @@ public class Group
 
 			manager.ref(bdd_t);
 		}
-
-		/*
-		else if (size == 1)
-		{
-				bdd_t = members[0].getT();
-
-				manager.ref(bdd_t);    // because we will deref it later here (see reset)
-		}
-		*/
 		else
 		{
 			bdd_t = manager.getOne();
@@ -427,7 +415,6 @@ public class Group
 	public int forward_reachables()
 	{
 		int permute = manager.getPermuteSp2S();
-		int ec = manager.getEventCube();
 		int cube = manager.and(bdd_cube, manager.getEventCube());
 		int t = getT();
 		Timer timer = new Timer(name);
