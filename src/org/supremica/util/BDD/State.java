@@ -6,12 +6,12 @@ public class State
 {
 	public State()
 	{
-		next = new Vector();
-		outgoing = new Vector();
-		incoming = new Vector();
+		next = new Vector<State>();
+		outgoing = new Vector<Arc>();
+		incoming = new Vector<Arc>();
 	}
 
-	public int extra1;
+	public int encodingIndex; // Help variable used for encoding
 
 	/** for algorithmic use, to have a f:state->int map */
 	/* package */
@@ -19,15 +19,16 @@ public class State
 	/* package */
 	int id, code;
 	/* package */
-	int bdd_s, bdd_sp;
+	int bdd_s; // The bdd representing the encoding of this state (current), e.g. v1 & !v2 for state 2
+	int bdd_sp;// The bdd representing the encoding of this state (next), e.g. v1' & !v2' for state 2
 	/* package */
 	boolean i, m, f;
 	/* package */
-	Vector next;    /* next state according to the transitions in ArcSet */
+	Vector<State> next;    /* next state according to the transitions in ArcSet */
 	/* package */
-	Vector outgoing;    /* outgoing arcs  */
+	Vector<Arc> outgoing;    /* outgoing arcs  */
 	/* package */
-	Vector incoming;    /* incoming arcs  */
+	Vector<Arc> incoming;    /* incoming arcs  */
 
 	/**
 	 * sorry, we shouldn't make this public, but we cant have it package-access since
@@ -54,12 +55,12 @@ public class State
 		return f;
 	}
 
-	public Enumeration in()
+	public Enumeration<Arc> in()
 	{
 		return incoming.elements();
 	}
 
-	public Enumeration out()
+	public Enumeration<Arc> out()
 	{
 		return outgoing.elements();
 	}
