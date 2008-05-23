@@ -49,7 +49,6 @@
  */
 package org.supremica.automata;
 
-import org.supremica.util.SupremicaException;
 import java.util.*;
 import org.supremica.log.*;
 
@@ -83,19 +82,16 @@ public class EventHelpers
 	 *
 	 *@param  eventSet Description of the Parameter
 	 *@return  Description of the Return Value
-	 *@exception  IllegalArgumentException Description of the Exception
-	 *@exception  Exception Description of the Exception
 	 */
-	static LabeledEvent createEvent(EventsSet eventSet, boolean requireConsistentControllability, 
+	static LabeledEvent createEvent(Set<LabeledEvent> eventSet, boolean requireConsistentControllability, 
 									boolean requireConsistentImmediate)
-		throws IllegalArgumentException, Exception
 	{
 		if (eventSet.size() <= 0)
 		{
 			throw new IllegalArgumentException("At least one event in the set is necessary");
 		}
 
-		Iterator eventIt = eventSet.iterator();
+		Iterator<LabeledEvent> eventIt = eventSet.iterator();
 		LabeledEvent firstEvent = (LabeledEvent) eventIt.next();
 
 		// Some initializations
@@ -117,7 +113,7 @@ public class EventHelpers
 
 			if (!label.equals(tmpEvent.getLabel()))
 			{
-				throw new SupremicaException("All events must have the same label");
+				throw new IllegalArgumentException("All events must have the same label");
 			}
 
 			if (requireConsistentControllability && (controllable != tmpEvent.isControllable()))
@@ -125,7 +121,7 @@ public class EventHelpers
 				String errorMsg = "Controllability of an event must be the same in all automata. " +
 					"Controllability of " + label + " is not consistent.";
 				
-				throw new SupremicaException(errorMsg);
+				throw new IllegalArgumentException(errorMsg);
 			}
 
 			if (requireConsistentImmediate && (immediate != tmpEvent.isImmediate()))
@@ -133,7 +129,7 @@ public class EventHelpers
 				String errorMsg = "Immediate of an event must be the same in all automata. " + 
 					"Immediate of " + label + " is not consistent.";
 
-				throw new SupremicaException(errorMsg);
+				throw new IllegalArgumentException(errorMsg);
 			}
 
 			if (operatorIncrease != tmpEvent.isOperatorIncrease())
@@ -141,7 +137,7 @@ public class EventHelpers
 				String errorMsg = "OperatorIncrease of an event must be the same in all automata. " + 
 					"Operator of " + label + " is not consistent.";
 
-				throw new SupremicaException(errorMsg);
+				throw new IllegalArgumentException(errorMsg);
 			}
 
 			if (operatorReset != tmpEvent.isOperatorReset())
@@ -149,7 +145,7 @@ public class EventHelpers
 				String errorMsg = "OperatorReset of an event must be the same in all automata. " + 
 					"Operator of " + label + " is not consistent.";
 
-				throw new SupremicaException(errorMsg);
+				throw new IllegalArgumentException(errorMsg);
 			}
 
 			if (observable != tmpEvent.isObservable())
@@ -157,7 +153,7 @@ public class EventHelpers
 				String errorMsg = "Observability of an event must be the same in all automata. " + 
 					"Observability of " + label + " is not consistent.";
 
-				throw new SupremicaException(errorMsg);
+				throw new IllegalArgumentException(errorMsg);
 			}
 
 			prioritized = prioritized || tmpEvent.isPrioritized();
