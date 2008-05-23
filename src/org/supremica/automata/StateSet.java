@@ -17,7 +17,8 @@ import net.sourceforge.waters.model.des.StateProxy;
 public class StateSet
     extends TreeSet<State>
 {
-    //private SortedSet<State> theSet = null;
+	private static final long serialVersionUID = 1L;
+	//private SortedSet<State> theSet = null;
     //private HashMap<String,State> nameToStateMap = null;
     private State singleStateRepresentation = null;
     
@@ -59,12 +60,12 @@ public class StateSet
         return modified(super.remove(object));
     }
     
-    public boolean removeAll(Collection collection)
+    public boolean removeAll(Collection<?> collection)
     {
         return modified(super.removeAll(collection));
     }
     
-    public boolean retainAll(Collection collection)
+    public boolean retainAll(Collection<?> collection)
     {
         return modified(super.retainAll(collection));
     }
