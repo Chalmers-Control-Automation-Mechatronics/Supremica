@@ -42,8 +42,6 @@ public class Automaton
 	private Object original;    // the Supremica automata
 	private int[][] eventFlowMatrix = null;
 	private boolean[] care_set, care_set_uc;    // Events that we have in our alphabeth, and are uncontrollabe
-	private int[] event_usage;    // how many times each event was used
-
 	// ------------------------------------------------------------------------------------------
 	public Automaton(String name, EventManager alphabet, Object original)
 	{
@@ -108,13 +106,13 @@ public class Automaton
 	}
 
 	// ------------------------------------------------------------
-	private void saturate(Vector v)
+	private void saturate(Vector<Event> v)
 	{
-		Enumeration it = v.elements();
+		Enumeration<Event> it = v.elements();
 
 		while (it.hasMoreElements())
 		{
-			Event e = (Event) it.nextElement();
+			Event e = it.nextElement();
 
 			saturate(e);
 		}
@@ -122,12 +120,12 @@ public class Automaton
 
 	private void saturate(Event e)
 	{
-		Vector v = arcSet.getArcVector(e);
-		Enumeration it = v.elements();
+		Vector<Arc> v = arcSet.getArcVector(e);
+		Enumeration<Arc> it = v.elements();
 
 		while (it.hasMoreElements())
 		{
-			Arc a = (Arc) it.nextElement();
+			Arc a = it.nextElement();
 
 			arcSet.saturate(a.state1, a.state2, e, eventSet);
 		}
@@ -152,7 +150,7 @@ public class Automaton
 		// find my local events
 		if (Options.local_saturation)
 		{
-			Vector v = alphabet.getLocalEvents(this);
+			Vector<Event> v = alphabet.getLocalEvents(this);
 
 			saturate(v);
 		}
@@ -168,7 +166,7 @@ public class Automaton
 		// Options.out.println("done!");
 		care_set = eventSet.getEventCareSet(false);
 		care_set_uc = eventSet.getEventCareSet(true);
-		event_usage = arcSet.getEventUsageCount();
+		arcSet.getEventUsageCount();
 
 		// DEBUG: dump careset
 		// alphabet.dumpSubset("  Regular events for " + getName(), care_set);
@@ -348,7 +346,7 @@ public class Automaton
 		return arcSet;
 	}
 
-	public int getStateVectorSize()
+	public int nrOfBitsNeededForStateEncoding()
 	{
 		return Util.log2ceil(getStatesSize());
 	}
@@ -468,10 +466,8 @@ public class Automaton
 		{
 			Arc a1 = arcs[as];
 
-			for (Enumeration e = a1.next.elements(); e.hasMoreElements(); )
+			for (Arc a2 : a1.next)
 			{
-				Arc a2 = (Arc) e.nextElement();
-
 				i = a1.o_event.id;
 				j = a2.o_event.id;
 
