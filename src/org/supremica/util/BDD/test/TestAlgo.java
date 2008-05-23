@@ -1,6 +1,9 @@
 package org.supremica.util.BDD.test;
 
 import java.io.*;
+import java.util.HashMap;
+import java.util.Map;
+
 import org.supremica.util.BDD.*;
 import org.supremica.util.BDD.li.*;
 import org.supremica.automata.IO.*;
@@ -26,12 +29,12 @@ public class TestAlgo
     private static final String[] TEST_FILES = {
         // the first four (or was it number 2,3,4) are used in some slower tests
         "../examples/SynthesizerTest.xml",
-        "../examples/includeInJarFile/OtherExamples/agv.xml",
-        "../examples/includeInJarFile/OtherExamples/catmouse.xml",
-        "../examples/includeInJarFile/OtherExamples/circularTable.xml",
+        "../examples/includeInJarFile/OtherExamples/agv.xml",//AGV
+        "../examples/includeInJarFile/CCSBookExercises/Ex4_4.xml",//CatMouse
+        "../examples/includeInJarFile/ManufacturingExamples/circularTable.xml",
         // and the rest...
-        "../examples/includeInJarFile/OtherExamples/parallelManufacturingExample.xml",
-        "../examples/includeInJarFile/OtherExamples/flexibleManufacturingSystem.xml",
+        "../examples/includeInJarFile/ManufacturingExamples/parallelManufacturingExample.xml",
+        "../examples/includeInJarFile/ManufacturingExamples/flexibleManufacturingSystem.xml",
         "../examples/benchmark/simple1.xml",
         "../examples/includeInJarFile/OtherExamples/aip/System4_system4.xml",
         "../examples/c3.xml" };
@@ -46,12 +49,12 @@ public class TestAlgo
      */
     private static final String[] TEST_FILES_SUP = {
         "../examples/SynthesizerTest.xml",
-        "../examples/includeInJarFile/OtherExamples/catmouse.xml",
-        "../examples/includeInJarFile/OtherExamples/circularTable.xml",
+        "../examples/includeInJarFile/CCSBookExercises/Ex4_4.xml",//CatMouse
+        "../examples/includeInJarFile/ManufacturingExamples/circularTable.xml",
         "../examples/includeInJarFile/OtherExamples/dosingUnit.xml",
         "../examples/includeInJarFile/OtherExamples/telecommunicationsNetwork.xml",
         "../examples/benchmark/simple1.xml",
-        "../examples/includeInJarFile/OtherExamples/agv.xml"
+        "../examples/includeInJarFile/OtherExamples/agv.xml"//AGV
     };
     
     // XXX:         these number probably haev double-floating-point  overflows, so if we count them in some other way we might not
@@ -76,7 +79,9 @@ public class TestAlgo
         Options.ALGO_DISJUNCTIVE_STEPSTONE
     };
     
-    
+	// State count cache
+	private final Map<Integer, Long> stateCountCache = new HashMap<Integer, Long>();
+
     // The reachability algos that currently use the disjunctive optimization
     private static final int [] DISJ_OPT_ALGOS = {
         Options.ALGO_DISJUNCTIVE,
@@ -122,6 +127,7 @@ public class TestAlgo
     private void load(String name)
     throws Exception
     {
+        clearStateCountCache();
         automata1 = builder.build(new File(name));
         verifier = new AutomataBDDVerifier(automata1);
         automata2 = verifier.getBDDAutomata();
@@ -155,11 +161,17 @@ public class TestAlgo
         fail++;
     }
     
+    private void clearStateCountCache() {
+    	for (Integer bdd : stateCountCache.keySet()) {
+    		automata2.deref(bdd);
+    	}
+    	stateCountCache.clear();
+    }
     // ----------------------------------------------------------------
     /**
      * count the number of states in the safe state supervisor.
      * the problem we face here is that these states are not all reachable so we cant just compare the
-     * results with supremicas traditional algorithms. we can compute the intersaction fo safe states and
+     * results with supremicas traditional algorithms. We can compute the intersection for safe states and
      * the reachable states, but that doesnt remove states that are both safe and reachable  buth unreachable
      * _under supervision_.
      *
@@ -269,7 +281,7 @@ public class TestAlgo
         System.out.print("R ");
         
         int bdd_r = supervisor.getReachables();
-        double got = automata2.count_states(bdd_r);
+        double got = countStates(bdd_r);
         
         if (got != states_r)
         {
@@ -279,6 +291,25 @@ public class TestAlgo
         }
         
         pass++;
+    }
+    
+    private long countStates(int bdd) {
+        Long cachedCount = null;
+        for (Integer cachedBdd : stateCountCache.keySet()) {
+        	int areEqual = automata2.biimp(cachedBdd, bdd);
+        	if (areEqual == automata2.getOne()) {
+        		cachedCount = stateCountCache.get(cachedBdd);
+        		automata2.deref(areEqual);
+        		break;
+        	}
+        	automata2.deref(areEqual);
+        }
+        long nrOfStates = cachedCount != null ? cachedCount : automata2.count_states(bdd);
+        if (cachedCount == null) {
+        	stateCountCache.put(bdd, nrOfStates);
+        	automata2.ref(bdd);
+        }
+    	return nrOfStates;
     }
     
     private void testCR(double states_cr)
@@ -291,11 +322,10 @@ public class TestAlgo
         System.out.print("coR ");
         
         int bdd_r = supervisor.getCoReachables();
-        double got = automata2.count_states(bdd_r);
-        
-        if (got != states_cr)
+        long stateCount = countStates(bdd_r);
+        if (stateCount != states_cr)
         {
-            error("[co-reachability] " + got + " states reachable, expected " + states_cr);
+            error("[co-reachability] " + stateCount + " states reachable, expected " + states_cr);
             
             return;
         }
@@ -421,9 +451,9 @@ public class TestAlgo
         fail = pass = 0;
         int oldalgo, oldopt;
         
-        // find the small models that we will use in some expreiments
+        // find the small models that we will use in some experiments
         int agv = find("agv.xml");
-        int catmouse = find("catmouse.xml");
+        int catmouse = find("Ex4_4.xml");
         
         // small models
         SMALL_MODELS = new int[2];
@@ -439,7 +469,7 @@ public class TestAlgo
             System.out.println("\n***** Testing all search algorithms");
             
             int save_algo_family = Options.algo_family;    // save the default crap
-            
+
             load(TEST_FILES[k]);
             
             for (int i = 0; i < Options.REACH_ALGO_NAMES.length; i++)
@@ -779,6 +809,10 @@ public class TestAlgo
 
 /*
  $Log: not supported by cvs2svn $
+ Revision 1.34  2007-05-11 12:09:23  flordal
+ Slight improvement of the conflict equivalence minimisation algorithm.
+ Also, now the BDD options are beginning to look like they used to.
+
  Revision 1.33  2007/03/20 19:30:24  knut
  no message
  
