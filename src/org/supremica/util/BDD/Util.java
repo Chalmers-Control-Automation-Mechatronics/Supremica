@@ -4,19 +4,7 @@ import java.util.*;
 
 public class Util
 {
-	private static int free_memory;    // free memory in MB
 	private static final long MIN_NODES = 10000, MAX_NODES = 8000000;
-
-	static
-	{
-
-		// I have no idea why i wrote this part....
-		Runtime rt = Runtime.getRuntime();
-
-		free_memory = (int) (rt.freeMemory() / (1024 * 1024));
-	}
-
-	// -------------------------------------------------
 
 	/** duplicates a vector of booleans */
 	public static boolean[] duplicate(boolean[] x)
@@ -173,7 +161,7 @@ public class Util
 	 * create a BDD for a number, using the default encoding.
 	 *
 	 */
-	public static int getNumber(BDDAutomata manager, int[] vars, int number)
+	public static int createBddForNumber(BDDAutomata manager, int[] vars, int number)
 	{
 		int ret = manager.getOne();
 
@@ -336,9 +324,9 @@ public class Util
 	 * duplicates are NOT ignored :(
 	 *
 	 */
-	public static void append(Vector append_to, Vector append_from)
+	public static <T> void append(Vector<T> append_to, Vector<T> append_from)
 	{
-		for (Enumeration e = append_from.elements(); e.hasMoreElements(); )
+		for (Enumeration<T> e = append_from.elements(); e.hasMoreElements(); )
 		{
 			append_to.addElement(e.nextElement());
 		}
