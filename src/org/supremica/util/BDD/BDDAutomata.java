@@ -4,7 +4,6 @@ import org.supremica.util.BDD.encoding.*;
 
 // NEW CUDD: FIXED
 import java.io.*;
-import java.util.*;
 
 public class BDDAutomata
 	extends JBDD
@@ -12,19 +11,20 @@ public class BDDAutomata
 	private static int ref_count = 0;
 	private boolean has_events = false;
 	private Automata original_automata;
-	private int components;    // number of automata
-	private BDDAutomaton[] automata;
+	private int nrOfAutomata;    // number of automata
+	private BDDAutomaton[] bddAutomata;
 	private int permute_s2sp, permute_sp2s, permute_spp2sp, permute_sp2spp;
 	private int keep;    // the global keep
 
 	// the global alphabet
 	private Event[] original_events;
 	private int events_size;
-	private int bdd_total_initial, bdd_dont_care;
+	private int bdd_total_initial;
+	private int bdd_dont_care; // nonexisting states
 	private int bdd_total_cube, bdd_total_cubep, bdd_total_cubepp;
-
+	
 	// vector sizes
-	private int size_states, size_events, size_all;
+	private int size_states, size_events;
 
 	// BDD sttufs for the alphabet
 	private int[] events;
@@ -67,10 +67,8 @@ public class BDDAutomata
 
 		this.original_automata = a;
 
-		Vector v = a.getAutomata();
-
-		this.components = v.size();
-		this.automata = new BDDAutomaton[components];
+		this.nrOfAutomata = a.getAutomata().size();
+		this.bddAutomata = new BDDAutomaton[nrOfAutomata];
 
 		// Dynamic reordering stuff:
 		reorder_setMethod(Options.reorder_algo);
@@ -83,54 +81,50 @@ public class BDDAutomata
 		// lets change the state encoding now:
 		Encoding enc = EncodingFactory.getEncoder();
 		size_states = 0;
-		for (Enumeration e = v.elements(); e.hasMoreElements(); )
+		for (Automaton automaton : a.getAutomata())
 		{
-			Automaton automaton = (Automaton) e.nextElement();
-
 			enc.encode(automaton);
-			size_states += automaton.getStateVectorSize();
+			size_states += automaton.nrOfBitsNeededForStateEncoding();
 		}
 
 
 
 		// first, we create all the variables
-		int[] tmp1 = new int[size_states];	// S
-		int[] tmp2 = new int[size_states];	// S'
-		int[] tmp3 = new int[size_states];	// S''
+		int[] currentStateVariables = new int[size_states];	// S
+		int[] nextStateVariables = new int[size_states];	// S'
+		int[] nextNextStateVariables = new int[size_states];	// S'' (meaning nextNext??)
 
 		if(Options.interleaved_variables)
 		{
 			for (int i = 0; i < size_states; i++)
 			{
-				tmp1[i] = createBDD();
-				tmp2[i] = createBDD();
-				tmp3[i] = createBDD();
+				currentStateVariables[i] = createBDD();
+				nextStateVariables[i] = createBDD();
+				nextNextStateVariables[i] = createBDD();
 			}
 		}
 		else
 		{
-			for (int i = 0; i < size_states; i++)	tmp1[i] = createBDD();
-			for (int i = 0; i < size_states; i++)	tmp2[i] = createBDD();
-			for (int i = 0; i < size_states; i++)	tmp3[i] = createBDD();
+			for (int i = 0; i < size_states; i++)	currentStateVariables[i] = createBDD();
+			for (int i = 0; i < size_states; i++)	nextStateVariables[i] = createBDD();
+			for (int i = 0; i < size_states; i++)	nextNextStateVariables[i] = createBDD();
 		}
 
 		// and create global S->S' and S'->S permutations
-		permute_s2sp = createPair(tmp1, tmp2);
-		permute_sp2s = createPair(tmp2, tmp1);
-		permute_spp2sp = createPair(tmp3, tmp2);
-		permute_sp2spp = createPair(tmp2, tmp3);
+		permute_s2sp = createPair(currentStateVariables, nextStateVariables);
+		permute_sp2s = createPair(nextStateVariables, currentStateVariables);
+		permute_spp2sp = createPair(nextNextStateVariables, nextStateVariables);
+		permute_sp2spp = createPair(nextStateVariables, nextNextStateVariables);
 
 		// then we create all automata...
 		int i = 0;
 
 		size_states = 0;
 
-		for (Enumeration e = v.elements(); e.hasMoreElements(); )
+		for (Automaton explicitAutomaton : a.getAutomata())
 		{
-			// automata[i] = new BDDAutomaton(this, (Automaton) e.nextElement(), i);
-			automata[i] = new BDDAutomaton(this, (Automaton) e.nextElement(), i, tmp1, tmp2, tmp3, size_states);
-			size_states += automata[i].getNumStateBits();
-
+			bddAutomata[i] = new BDDAutomaton(this, explicitAutomaton, i, currentStateVariables, nextStateVariables, nextNextStateVariables, size_states);
+			size_states += bddAutomata[i].getNumStateBits();
 			i++;
 
 			// BDDAssert.debug(automata[i-1].getName() + " created");
@@ -151,21 +145,21 @@ public class BDDAutomata
 		bdd_total_cubepp = ref ( getOne() );
 		bdd_dont_care = ref( getZero() );
 
-		for (i = components - 1; i >= 0; --i)
+		for (i = nrOfAutomata - 1; i >= 0; --i)
 		{
-			automata[i].init();
-			bdd_dont_care = orTo(bdd_dont_care, automata[i].getDontCareS() );
+			bddAutomata[i].init();
+			bdd_dont_care = orTo(bdd_dont_care, bddAutomata[i].getDontCareS() );
 
-			keep = andTo(keep, automata[i].getKeep());
-			bdd_total_initial = andTo(bdd_total_initial, automata[i].getI());
-			bdd_total_cube = andTo(bdd_total_cube, automata[i].getCube());
-			bdd_total_cubep = andTo(bdd_total_cubep, automata[i].getCubep());
-			bdd_total_cubepp = andTo(bdd_total_cubepp, automata[i].getCubepp());
+			keep = andTo(keep, bddAutomata[i].getKeep());
+			bdd_total_initial = andTo(bdd_total_initial, bddAutomata[i].getI());
+			bdd_total_cube = andTo(bdd_total_cube, bddAutomata[i].getCube());
+			bdd_total_cubep = andTo(bdd_total_cubep, bddAutomata[i].getCubep());
+			bdd_total_cubepp = andTo(bdd_total_cubepp, bddAutomata[i].getCubepp());
 
 			// check("Createdautomaton " + automata[i].getName() );
 			if (Options.reorderEnabled() && Options.reorder_with_groups)
 			{
-				reorder_createVariableGroup(automata[i].getTopBDD(), automata[i].getBottomBDD(), Options.reorder_within_group);
+				reorder_createVariableGroup(bddAutomata[i].getTopBDD(), bddAutomata[i].getBottomBDD(), Options.reorder_within_group);
 			}
 		}
 
@@ -182,9 +176,9 @@ public class BDDAutomata
 		// Options.out.println("CheckPackage returned " + checkPackage());
 		if (Options.show_encoding)
 		{
-			for (i = 0; i < components; i++)
+			for (i = 0; i < nrOfAutomata; i++)
 			{
-				automata[i].showEncoding(this);
+				bddAutomata[i].showEncoding(this);
 			}
 
 			original_automata.getAlphabeth().showEncoding(this);
@@ -233,7 +227,7 @@ public class BDDAutomata
 		{
 			original_events[i].code = i;    // quick and dirty event encoding :)
 
-			int bdd_e = Util.getNumber(this, events, original_events[i].code);
+			int bdd_e = Util.createBddForNumber(this, events, original_events[i].code);
 
 			original_events[i].bdd = bdd_e;
 
@@ -252,9 +246,6 @@ public class BDDAutomata
 
 		bdd_events = or(bdd_events_c, bdd_events_u);
 		has_events = true;
-
-
-		size_all = 3 * size_states + size_events;
 	}
 
 	// -------------------------------------------------------------------------------------
@@ -266,21 +257,21 @@ public class BDDAutomata
 	public int computeF()
 	{
 		int x = ref( getZero() );
-		for(int i = 0; i < automata.length; i++)
+		for(int i = 0; i < bddAutomata.length; i++)
 		{
-			x = orTo(x, automata[i].getF() );
+			x = orTo(x, bddAutomata[i].getF() );
 		}
 		return x;
 	}
 	// -------------------------------------------------------------------------------------
 	public BDDAutomaton[] getAutomataVector()
 	{
-		return automata;
+		return bddAutomata;
 	}
 
 	public int getSize()
 	{
-		return components;
+		return nrOfAutomata;
 	}
 
 	public long getReorderingTime()
@@ -392,9 +383,9 @@ public class BDDAutomata
 	{
 		check("cleanup");
 
-		for (int i = 0; i < components; i++)
+		for (int i = 0; i < nrOfAutomata; i++)
 		{
-			automata[i].cleanup();
+			bddAutomata[i].cleanup();
 		}
 
 		if (has_events)
@@ -425,9 +416,9 @@ public class BDDAutomata
 
 	public void dump(PrintStream ps)
 	{
-		for (int i = 0; i < components; i++)
+		for (int i = 0; i < nrOfAutomata; i++)
 		{
-			automata[i].dump(ps);
+			bddAutomata[i].dump(ps);
 		}
 
 		ps.println("-------------------- The alphabet:");
@@ -450,7 +441,7 @@ public class BDDAutomata
 
 	public void show_states(int bdd, boolean[] cares)
 	{
-		String[] states = new String[components];
+		String[] states = new String[nrOfAutomata];
 
 		Options.out.println("S = {");
 		show_states_rec(states, cares, bdd, 0);
@@ -459,7 +450,6 @@ public class BDDAutomata
 
 	private void show_states_rec(String[] saved, boolean[] cares, int bdd, int level)
 	{
-
 		// no need to continue if there is nothing there anyway...
 		if (bdd == getZero())
 		{
@@ -467,11 +457,11 @@ public class BDDAutomata
 		}
 
 		// termination condition
-		if (level >= components)
+		if (level >= nrOfAutomata)
 		{
 			Options.out.print(" < ");
 
-			for (int i = 0; i < components; i++)
+			for (int i = 0; i < nrOfAutomata; i++)
 			{
 				if (saved[i] != null)
 				{
@@ -492,7 +482,7 @@ public class BDDAutomata
 		}
 		else
 		{
-			if (dont_care(bdd, automata[level].getCareS(), automata[level].getCube()))
+			if (dont_care(bdd, bddAutomata[level].getCareS(), bddAutomata[level].getCube()))
 			{
 				saved[level] = "-";
 
@@ -502,7 +492,7 @@ public class BDDAutomata
 			}
 
 			int zero = getZero();    // ok not refed
-			State[] states = automata[level].getStates();
+			State[] states = bddAutomata[level].getStates();
 
 			for (int i = 0; i < states.length; i++)
 			{
@@ -525,14 +515,14 @@ public class BDDAutomata
 	{
 		Options.out.print(" ");
 
-		for (int i = 0; i < components; i++)
+		for (int i = 0; i < nrOfAutomata; i++)
 		{
 			if (i != 0)
 			{
 				Options.out.print(" x ");
 			}
 
-			Options.out.print(automata[i].getName());
+			Options.out.print(bddAutomata[i].getName());
 		}
 
 		Options.out.println("");
@@ -580,14 +570,14 @@ public class BDDAutomata
 
 	private int pick_one_state_rec(String[] names, int bdd, int level)
 	{
-		if (level >= components)
+		if (level >= nrOfAutomata)
 		{
 			ref(bdd);
 
 			return bdd;
 		}
 
-		State[] states = automata[level].getStates();
+		State[] states = bddAutomata[level].getStates();
 		int zero = getZero();
 
 		for (int i = 0; i < states.length; i++)
@@ -645,42 +635,44 @@ public class BDDAutomata
 			return (long) states;
 
 		case Options.COUNT_EXACT :
-
 			// the hard/boring/slow way :(
 			Counter c = new Counter();
-
-			count_transitions_rec0(c, bdd, 0);
-
+			count_states_exact(c, bdd, 0);
 			return c.get();
 		}
 		
 		return 0;    // just in case :)
 	}
 
-	private void count_transitions_rec0(Counter c, int bdd, int level)
+	/* Counts states by recursively enumerating all state combinations and prune the search tree
+	 * whenever possible. E.g. consider two automata. If state <p2,?> is not in set,
+	 * then we no not need to check global states <p2,q1>, <p2,q2> etc.
+	 * Searches through the hole Cartesian state space in worst case
+	 */
+	private void count_states_exact(Counter nrOfStatesFound, int inputStatesAsBdd, int automatonIndex)
 	{    // for S
-		if (level >= components)
-		{
-			c.increase();
-
+		if (automatonIndex >= nrOfAutomata)
+		{	// A state is found, therefore increase counter
+			nrOfStatesFound.increase();
 			return;
 		}
 
-		State[] states = automata[level].getStates();
+		State[] states = bddAutomata[automatonIndex].getStates();
 		int zero = getZero();
 
 		for (int i = 0; i < states.length; i++)
 		{
 			// dont know which one is faster in the total recursive run , probably relProd ?
-			int tmp = and(bdd, states[i].bdd_s);
-
-			// int tmp = relProd(bdd, states[i].bdd_s, automata[level].getCube());
-			if (tmp != zero)
+		//	final int inputStatesThatContainThisState = and(inputStatesAsBdd, states[i].bdd_s);
+			final int inputStatesThatContainThisState = relProd(inputStatesAsBdd, states[i].bdd_s, bddAutomata[automatonIndex].getCube());
+	//		final int inputStatesThatContainThisState = relProd(inputStatesAsBdd, states[i].bdd_s, getStateCube());
+			// if state is in set then try next automaton, otherwise prune search tree
+			if (inputStatesThatContainThisState != zero)
 			{
-				count_transitions_rec0(c, tmp, level + 1);
+				count_states_exact(nrOfStatesFound, inputStatesThatContainThisState, automatonIndex + 1);
 			}
 
-			deref(tmp);
+			deref(inputStatesThatContainThisState);
 		}
 	}
 
@@ -753,10 +745,10 @@ public class BDDAutomata
 	// -------------------------------------------------------- build incomplete state list for this event
 	IncompleteStateList getIncompleteStateList(int bdd, Event event)
 	{
-		BDDAutomaton[] involved = new BDDAutomaton[components];
+		BDDAutomaton[] involved = new BDDAutomaton[nrOfAutomata];
 		int count = 0;
 
-		for (int i = 0; i < components; i++)
+		for (int i = 0; i < nrOfAutomata; i++)
 		{
 
 			/* NOT working, we must have the aother automata too!
@@ -765,7 +757,7 @@ public class BDDAutomata
 					involved[count++] = automata[i];
 			}
 			*/
-			involved[count++] = automata[i];
+			involved[count++] = bddAutomata[i];
 		}
 
 		IncompleteStateList ret = new IncompleteStateList(involved, count);
@@ -861,7 +853,7 @@ public class BDDAutomata
 
 	private void show_transitions_internal(int bdd)
 	{
-		String[] names = new String[components * 2 + 1];    // the last one for events
+		String[] names = new String[nrOfAutomata * 2 + 1];    // the last one for events
 
 		for (int i = 0; i < names.length; i++)
 		{
@@ -884,7 +876,7 @@ public class BDDAutomata
 		}
 
 		// for S
-		if (level >= components)
+		if (level >= nrOfAutomata)
 		{
 			if (show_transition_is_half)
 			{
@@ -899,7 +891,7 @@ public class BDDAutomata
 		}
 
 		// see if it is dont care!
-		if (dont_care(bdd, automata[level].getCareS(), automata[level].getCube()))
+		if (dont_care(bdd, bddAutomata[level].getCareS(), bddAutomata[level].getCube()))
 		{
 			names[level] = "-";
 
@@ -909,7 +901,7 @@ public class BDDAutomata
 		}
 
 		// show exactly what it was:
-		State[] states = automata[level].getStates();
+		State[] states = bddAutomata[level].getStates();
 		int zero = getZero();
 
 		for (int i = 0; i < states.length; i++)
@@ -936,7 +928,7 @@ public class BDDAutomata
 		}
 
 		// for S'
-		if (level >= components)
+		if (level >= nrOfAutomata)
 		{
 			show_transitions_rec2(names, bdd);
 
@@ -944,16 +936,16 @@ public class BDDAutomata
 		}
 
 		// see if it doesnt matter
-		if (dont_care(bdd, automata[level].getCareSp(), automata[level].getCubep()))
+		if (dont_care(bdd, bddAutomata[level].getCareSp(), bddAutomata[level].getCubep()))
 		{
-			names[components + level] = "-";
+			names[nrOfAutomata + level] = "-";
 
 			show_transitions_rec1(names, bdd, level + 1);
 
 			return;
 		}
 
-		State[] states = automata[level].getStates();
+		State[] states = bddAutomata[level].getStates();
 		int zero = getZero();
 
 		for (int i = 0; i < states.length; i++)
@@ -962,7 +954,7 @@ public class BDDAutomata
 
 			if (tmp != zero)
 			{
-				names[components + level] = states[i].name;
+				names[nrOfAutomata + level] = states[i].name;
 
 				show_transitions_rec1(names, tmp, level + 1);
 			}
@@ -974,7 +966,7 @@ public class BDDAutomata
 	/** show the event part of a transition */
 	private void show_transitions_rec2(String[] names, int bdd)
 	{    // and for Sigma
-		final int pos = components * 2;
+		final int pos = nrOfAutomata * 2;
 		int zero = getZero();
 
 		if (bdd == zero)
@@ -1013,7 +1005,7 @@ public class BDDAutomata
 
 		Options.out.print("  [ (");
 
-		for (i = 0; i < components; i++)
+		for (i = 0; i < nrOfAutomata; i++)
 		{
 			if (i != 0)
 			{
@@ -1028,7 +1020,7 @@ public class BDDAutomata
 
 		Options.out.print("),  ");
 
-		String event = list[components * 2];
+		String event = list[nrOfAutomata * 2];
 
 		if (event == null)
 		{
@@ -1044,16 +1036,16 @@ public class BDDAutomata
 
 		Options.out.print(event + "       ==>>      (");
 
-		for (i = 0; i < components; i++)
+		for (i = 0; i < nrOfAutomata; i++)
 		{
 			if (i != 0)
 			{
 				Options.out.print(",");
 			}
 
-			if (list[components + i] != null)
+			if (list[nrOfAutomata + i] != null)
 			{
-				Options.out.print(list[components + i]);
+				Options.out.print(list[nrOfAutomata + i]);
 			}
 		}
 
@@ -1102,9 +1094,9 @@ public class BDDAutomata
 
 		ref(all_loop);
 
-		for (int i = 0; i < components; i++)
+		for (int i = 0; i < nrOfAutomata; i++)
 		{
-			all_loop = andTo(all_loop, automata[i].getKeep());
+			all_loop = andTo(all_loop, bddAutomata[i].getKeep());
 		}
 
 		int dont_keep = not(all_loop);
@@ -1122,9 +1114,9 @@ public class BDDAutomata
 	{
 		ref(bdd);
 
-		for (int i = 0; i < components; i++)
+		for (int i = 0; i < nrOfAutomata; i++)
 		{
-			bdd = andTo(bdd, automata[i].getCareS());
+			bdd = andTo(bdd, bddAutomata[i].getCareS());
 		}
 
 		return bdd;
@@ -1134,9 +1126,9 @@ public class BDDAutomata
 	{
 		ref(bdd);
 
-		for (int i = 0; i < components; i++)
+		for (int i = 0; i < nrOfAutomata; i++)
 		{
-			bdd = andTo(bdd, automata[i].getCareSp());
+			bdd = andTo(bdd, bddAutomata[i].getCareSp());
 		}
 
 		return bdd;
