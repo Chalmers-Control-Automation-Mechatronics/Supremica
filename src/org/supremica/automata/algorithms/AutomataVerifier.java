@@ -95,7 +95,7 @@ public class AutomataVerifier
      */
     private Map<LabeledEvent,Automata> uncontrollableEventToPlantsMap = null;
     private AutomataSynchronizerHelper synchHelper;
-    private ArrayList synchronizationExecuters = new ArrayList();
+    private ArrayList<AutomataSynchronizerExecuter> synchronizationExecuters = new ArrayList<AutomataSynchronizerExecuter>();
     private StateMemorizer potentiallyUncontrollableStates;
 
     // Used by findUncontrollableStates
@@ -563,7 +563,6 @@ public class AutomataVerifier
         }
 
         // Start all the synchronization executers and wait for completion
-        // For the moment we assume that we only have one thread
         for (int i = 0; i < synchronizationExecuters.size(); i++)
         {
             AutomataSynchronizerExecuter currExec =
@@ -573,7 +572,25 @@ public class AutomataVerifier
             currExec.start();
         }
 
-        ((AutomataSynchronizerExecuter) synchronizationExecuters.get(0)).join();
+        try {
+			for (AutomataSynchronizerExecuter synchExecuter : synchronizationExecuters) {
+			 	synchExecuter.join();
+			}
+		} catch (InterruptedException e) {
+			// Current thread has been interrupted, perhaps
+			// due to an exception in one of the executers.
+			// Stop all tasks and throw the original exception
+			for (AutomataSynchronizerExecuter synchExecuter : synchronizationExecuters) {
+	            synchExecuter.requestStop();
+	        }
+			for (AutomataSynchronizerExecuter synchExecuter : synchronizationExecuters) {
+			 	Throwable cause = synchExecuter.getCauseOfInterrupt();
+			 	if (cause != null) {
+			 		if (cause instanceof RuntimeException) throw (RuntimeException) cause;
+			 		else throw new RuntimeException(cause);
+			 	}
+			}
+		}
 
         if (stopRequested)
         {
@@ -1608,7 +1625,7 @@ public class AutomataVerifier
             if (result == null)
             {
                 requestStop();
-                return false;
+                throw new RuntimeException("Failure in compositional nonblocking verification");
             }
             threadToStop = null;
 
@@ -1620,7 +1637,7 @@ public class AutomataVerifier
             requestStop();
             logger.error("Error in AutomataVerifier when verifying nonblocking compositionally. " + ex);
             logger.error(ex.getStackTrace());
-            return false;
+            throw ex;
         }
 
         if (stopRequested)
