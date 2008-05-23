@@ -8,7 +8,7 @@ public class Automata
 {
 	private Automaton current = null;
 	private EventManager alphabet;
-	private Vector automata = new Vector();
+	private Vector<Automaton> automata = new Vector<Automaton>();
 	private boolean closed = false;
 	private int[] grupp_ordering = null;
 	private double total_size = 0, total_size_allocated = 0;
@@ -20,7 +20,7 @@ public class Automata
 		alphabet = new EventManager();
 	}
 
-	public Vector getAutomata()
+	public Vector<Automaton> getAutomata()
 	{
 		return automata;
 	}
@@ -99,10 +99,8 @@ public class Automata
 
 		int components;
 
-		for (Enumeration e = automata.elements(); e.hasMoreElements(); )
+		for (Automaton a : automata)
 		{
-			Automaton a = (Automaton) e.nextElement();
-
 			a.close2();
 		}
 
@@ -127,7 +125,7 @@ public class Automata
 		// now, use the new ordering to re-order the list:
 		components = automata.size();
 
-		Vector tmp = new Vector();
+		Vector<Automaton> tmp = new Vector<Automaton>();
 
 		for (int i = 0; i < components; i++)
 		{
@@ -142,15 +140,14 @@ public class Automata
 		total_size = 1;
 		variable_count = 0;
 
-		for (Enumeration e = automata.elements(); e.hasMoreElements(); )
+		for (Automaton a : automata)
 		{
-			Automaton a = (Automaton) e.nextElement();
 			int size = a.getStatesSize();
 
 			if (size > 0)
 			{
 				total_size *= size;
-				variable_count += a.getStateVectorSize();
+				variable_count += a.nrOfBitsNeededForStateEncoding();
 			}
 		}
 
@@ -169,10 +166,8 @@ public class Automata
 
 	public void dump(PrintStream ps)
 	{
-		for (Enumeration e = automata.elements(); e.hasMoreElements(); )
+		for (Automaton a : automata)
 		{
-			Automaton a = (Automaton) e.nextElement();
-
 			a.dump(ps);
 		}
 	}

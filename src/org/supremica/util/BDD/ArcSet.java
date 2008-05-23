@@ -4,8 +4,9 @@ import java.util.*;
 import java.io.*;
 
 public class ArcSet
-	extends Vector
+	extends Vector<Arc>
 {
+	private static final long serialVersionUID = 1L;
 	private int count = 0;
 	private int[] event_count = null;    // maps each event to number of times it was used
 	private boolean closed = false;
@@ -15,7 +16,7 @@ public class ArcSet
 	{
 
 		// TODO : do something smarter than binary search :)
-		for (Enumeration e = elements(); e.hasMoreElements(); )
+		for (Enumeration<Arc> e = elements(); e.hasMoreElements(); )
 		{
 			Arc a = (Arc) e.nextElement();
 
@@ -64,22 +65,13 @@ public class ArcSet
 		return arcs;
 	}
 
-	public Vector getArcVector(Event e)
+	public Vector<Arc> getArcVector(Event e)
 	{
 		BDDAssert.internalCheck(!closed, "[ArcSet.getArcVector] BAD FUNCTION CALL!");
 
-		Vector v = new Vector();
+		Vector<Arc> v = new Vector<Arc>();
 
-		for (Enumeration it = elements(); it.hasMoreElements(); )
-		{
-			Arc arc = (Arc) it.nextElement();
-
-			if (arc.event.equals(e.name_id))
-			{
-				v.add(arc);
-			}
-		}
-
+		for (Arc arc : this) if (arc.event.equals(e.name_id)) v.add(arc);
 		return v;
 	}
 
@@ -96,10 +88,8 @@ public class ArcSet
 	{
 		BDDAssert.internalCheck(!closed, "[ArcSet.saturate]BAD FUNCTION CALL!");
 
-		for (Enumeration e = elements(); e.hasMoreElements(); )
+		for (Arc arc : this)
 		{
-			Arc arc = (Arc) e.nextElement();
-
 			// FORWARD SATURATE
 			if (arc.state2.equals(from))
 			{
@@ -157,9 +147,8 @@ public class ArcSet
 			event_count[i] = 0;
 		}
 
-		for (Enumeration e = elements(); e.hasMoreElements(); )
+		for (Arc arc : this)
 		{
-			Arc arc = (Arc) e.nextElement();
 			Event event = es.getEventByName(arc.event);
 
 			BDDAssert.bddAssert(event != null, "event not found:" + arc.event);
@@ -179,7 +168,7 @@ public class ArcSet
 		}
 
 		/* build the next/prev arc vectors for each arc */
-		for (Enumeration e = elements(); e.hasMoreElements(); )
+		for (Enumeration<Arc> e = elements(); e.hasMoreElements(); )
 		{
 			Arc arc = (Arc) e.nextElement();
 

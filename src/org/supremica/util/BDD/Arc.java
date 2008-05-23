@@ -6,8 +6,8 @@ public class Arc
 {
 	public Arc()
 	{
-		next = new Vector();
-		prev = new Vector();
+		next = new Vector<Arc>();
+		prev = new Vector<Arc>();
 	}
 
 	public String toString()
@@ -23,8 +23,8 @@ public class Arc
 	int id;
 	/* int identifiers */
 	int e_code, s1_code, s2_code;
-	Vector next;    /* arc proceeding this one */
-	Vector prev;    /* arc preceeding this one */
+	Vector<Arc> next;    /* arc proceeding this one */
+	Vector<Arc> prev;    /* arc preceeding this one */
 
 	public State fromState()
 	{
