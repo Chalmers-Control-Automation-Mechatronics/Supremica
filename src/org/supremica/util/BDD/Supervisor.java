@@ -815,7 +815,7 @@ public class Supervisor
     //      far larger then the groups (plant and spec) given this supervisor...
     public void trace(String what, int from, int to)
     {
-        Vector frontiers = new Vector();
+        Vector<Integer> frontiers = new Vector<Integer>();
         
         if (trace_hlp(from, to, frontiers))
         {
@@ -833,7 +833,7 @@ public class Supervisor
             manager.deref(dumb);
             manager.printStateVector(states, "" + trace_len);
             
-            Vector enames = new Vector(trace_len);
+            Vector<String> enames = new Vector<String>(trace_len);
             String[] ename = new String[1];
             Object[] fronts = frontiers.toArray();
             
@@ -911,7 +911,7 @@ public class Supervisor
         }
     }
     
-    private boolean trace_hlp(int from, int to, Vector v)
+    private boolean trace_hlp(int from, int to, Vector<Integer> v)
     {
         int t_all = manager.relProd(plant.getT(), spec.getT(), e_cube);
         int r_all_p, r_all = from;
@@ -966,38 +966,16 @@ public class Supervisor
     
     public int getSafeStates(boolean nb, boolean c)
     {
-        if (nb && c)
-        {
-            return getSafeStatesNBC();
-        }
-        
-        if (nb)
-        {
-            return getSafeStatesNB();
-        }
-        
-        if (c)
-        {
-            return getSafeStatesC();
-        }
-        
-        return manager.ref(manager.getOne());    // what the hell are we doing??
+        if (nb && c) return getSafeStatesNBC();
+        if (nb) return getSafeStatesNB();
+        if (c) return getSafeStatesC();
+        // If neither controllability or nonbl is required, all states are safe
+        return manager.ref(manager.getOne());
     }
     
     /** return Q[supNB] */
     private int getSafeStatesNB()
     {
-                /*
-                // XXX: what the hell was this??
-                int forbidden = manager.ref(manager.getZero());
-                int marked = GroupHelper.getM(manager, spec, plant);
-                int ret = restrictedBackward(marked, forbidden);
-                 
-                manager.deref(marked);
-                manager.deref(forbidden);
-                 
-                return ret;
-                 */
         return getCoReachables();
     }
     
@@ -1249,12 +1227,12 @@ public class Supervisor
     }
     
     /** get the list of unsafe transitions */
-    public Vector getUnsafeTransitionList(int safe_states)
+    public Vector<DisablingPoint> getUnsafeTransitionList(int safe_states)
     {
         int unsafe = getUnsafeTransitions(safe_states);
         Event[] events = manager.getEvents();
         int events_size = events.length;
-        Vector results = new Vector();
+        Vector<DisablingPoint> results = new Vector<DisablingPoint>();
         
         for (int i = 0; i < events_size; i++)
         {
@@ -1272,7 +1250,7 @@ public class Supervisor
     }
     
     /** get the _tree_ of unsafe states */
-    public Vector getUnsafeTransitionTree(int safe_states)
+    public Vector<DisablingPoint> getUnsafeTransitionTree(int safe_states)
     {
         
         // TODO: do we need to remove E x Q' with relProd, or can we remove Q' before the loop??
@@ -1280,7 +1258,7 @@ public class Supervisor
         int cube = manager.and(e_cube, sp_cube);
         Event[] events = manager.getEvents();
         int events_size = events.length;
-        Vector results = new Vector();
+        Vector<DisablingPoint> results = new Vector<DisablingPoint>();
         
         for (int i = 0; i < events_size; i++)
         {

@@ -4,17 +4,18 @@ import java.util.*;
 import java.io.*;
 
 public class StateSet
-	extends Vector
+	extends Vector<State>
 {
+	private static final long serialVersionUID = 1L;
 	int count = 0;
 	boolean closed = false;
 
 	// ------------------------------------------------ stuffs used BEFORE closing!
 	private boolean in(String name)
 	{
-		for (Enumeration e = elements(); e.hasMoreElements(); )
+		for (Enumeration<State> e = elements(); e.hasMoreElements(); )
 		{
-			State s = (State) e.nextElement();
+			State s = e.nextElement();
 
 			if (s.name.equals(name))
 			{
@@ -28,7 +29,6 @@ public class StateSet
 	}
 
 	public State getByName(String name)
-		throws BDDException
 	{
 		State by_name = null;
 
@@ -49,10 +49,8 @@ public class StateSet
 		}
 		else
 		{
-			for (Enumeration e = elements(); e.hasMoreElements(); )
+			for (State s : this)
 			{
-				State s = (State) e.nextElement();
-
 				if (s.name_id.equals(name))
 				{
 					return s;
@@ -75,10 +73,8 @@ public class StateSet
 		// DEBUG:
 		System.out.println("Failed to find " + name + " dumping complete state set for this automaton:");
 
-		for (Enumeration e = elements(); e.hasMoreElements(); )
+		for (State s : this)
 		{
-			State s = (State) e.nextElement();
-
 			System.out.println("State " + s.name + ", id = " + s.name_id + ", id = " + s.id + ", code = " + s.code);
 		}
 
@@ -107,9 +103,9 @@ public class StateSet
 
 			int c = 0;
 
-			for (Enumeration e = elements(); e.hasMoreElements(); )
+			for (Enumeration<State> e = elements(); e.hasMoreElements(); )
 			{
-				State s = (State) e.nextElement();
+				State s = e.nextElement();
 
 				Options.out.println("state " + (c++) + " " + s.name + "/" + s.name_id + " " + s.id + "/" + s.code);
 			}
@@ -162,9 +158,9 @@ public class StateSet
 
 		states = new State[count];
 
-		for (Enumeration e = elements(); e.hasMoreElements(); )
+		for (Enumeration<State> e = elements(); e.hasMoreElements(); )
 		{
-			State ss = (State) e.nextElement();
+			State ss = e.nextElement();
 
 			states[ss.id] = ss;
 		}
