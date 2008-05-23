@@ -51,11 +51,7 @@ package org.supremica.automata.BDD;
 
 import net.sf.javabdd.*;
 import org.supremica.log.*;
-import org.supremica.util.SupremicaException;
 import java.util.*;
-import java.io.*;
-import org.supremica.automata.*;
-import org.supremica.automata.IO.*;
 import org.supremica.properties.Config;
 
 public class BDDManager
