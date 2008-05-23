@@ -163,14 +163,10 @@ public class Alphabet
         return new ControllableEventIterator(theEvents.values().iterator(), false);
     }
     
-    public void add(Object other)
+    public void add(LabeledEvent other)
     throws IllegalArgumentException
     {
-        if (!(other instanceof LabeledEvent))
-        {
-            throw new IllegalArgumentException("other must be of type LabeledEvent");
-        }
-        addEvent((LabeledEvent)other);
+        addEvent(other);
     }
     
     /**
@@ -409,7 +405,7 @@ public class Alphabet
      *
      *@return  Description of the Return Value
      */
-    public Collection values()
+    public Collection<LabeledEvent> values()
     {
         return theEvents.values();
     }
@@ -435,11 +431,11 @@ public class Alphabet
     static class ControllableEventIterator
         implements Iterator<LabeledEvent>
     {
-        private final Iterator theIterator;
+        private final Iterator<LabeledEvent> theIterator;
         private final boolean controllableEvents;
-        private Object nextEvent = null;
+        private LabeledEvent nextEvent = null;
         
-        public ControllableEventIterator(Iterator theIterator, boolean controllableEvents)
+        public ControllableEventIterator(Iterator<LabeledEvent> theIterator, boolean controllableEvents)
         {
             this.theIterator = theIterator;
             this.controllableEvents = controllableEvents;
@@ -457,11 +453,11 @@ public class Alphabet
         {
             if (nextEvent != null)
             {
-                Object oldEvent = nextEvent;
+                LabeledEvent oldEvent = nextEvent;
                 
                 findNextEvent();
                 
-                return (LabeledEvent) oldEvent;
+                return oldEvent;
             }
             else
             {
@@ -479,7 +475,7 @@ public class Alphabet
         {
             while (theIterator.hasNext())
             {
-                LabeledEvent currEvent = (LabeledEvent) theIterator.next();
+                LabeledEvent currEvent = theIterator.next();
                 
                 if (currEvent.isControllable() == controllableEvents)
                 {
@@ -652,9 +648,9 @@ public class Alphabet
     
     public boolean isAllEventsPrioritized()
     {
-        for (Iterator evIt = iterator(); evIt.hasNext(); )
+        for (Iterator<LabeledEvent> evIt = iterator(); evIt.hasNext(); )
         {
-            LabeledEvent currEvent = (LabeledEvent) evIt.next();
+            LabeledEvent currEvent = evIt.next();
             
             if (!currEvent.isPrioritized())
             {
@@ -667,9 +663,9 @@ public class Alphabet
     
     public boolean isAllEventsObservable()
     {
-        for (Iterator evIt = iterator(); evIt.hasNext(); )
+        for (Iterator<LabeledEvent> evIt = iterator(); evIt.hasNext(); )
         {
-            LabeledEvent currEvent = (LabeledEvent) evIt.next();
+            LabeledEvent currEvent = evIt.next();
             
             if (!currEvent.isObservable())
             {
