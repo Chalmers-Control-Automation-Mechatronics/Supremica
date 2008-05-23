@@ -4,14 +4,14 @@ import java.util.*;
 
 public class EventManager
 {
-	private Vector eventv;
+	private Vector<Event> eventv;
 	private Event[] events;
 	private int size;
 	private boolean closed;
 
 	public EventManager()
 	{
-		eventv = new Vector();
+		eventv = new Vector<Event>();
 		size = 0;
 		closed = false;
 	}
@@ -27,10 +27,8 @@ public class EventManager
 
 	private Event getEvent(Event e1)
 	{
-		for (Enumeration e = eventv.elements(); e.hasMoreElements(); )
+		for (Event e2 : eventv)
 		{
-			Event e2 = (Event) e.nextElement();
-
 			if (e1.label.equals(e2.label))
 			{
 				return e2;
@@ -66,9 +64,9 @@ public class EventManager
 	}
 
 	// -----------------------------------------------------
-	public Vector getLocalEvents(Automaton owner)
+	public Vector<Event> getLocalEvents(Automaton owner)
 	{
-		Vector ret = new Vector();
+		Vector<Event> ret = new Vector<Event>();
 
 		BDDAssert.internalCheck(closed, "[EventManager.registerEvent] BAD function call");
 
@@ -96,10 +94,8 @@ public class EventManager
 			events[i] = null;
 		}
 
-		for (Enumeration e = eventv.elements(); e.hasMoreElements(); )
+		for (Event ev : eventv)
 		{
-			Event ev = (Event) e.nextElement();
-
 			if (events[ev.id] != null)
 			{
 				BDDAssert.fatal("Event collision: " + events[ev.id].label + " and " + ev.label + " --> " + ev.id);

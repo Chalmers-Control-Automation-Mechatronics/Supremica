@@ -375,9 +375,7 @@ public class ConjSupervisor
 	 */
 	protected int possibleLanguageContainmentCounterexample(int considred_events, boolean remove_events)
 	{
-
 		int ret = manager.ref( manager.getZero() ); // answer bdd
-
 		// why waste time???
 		if(considred_events == manager.getZero()  || plant.isEmpty() || spec.isEmpty() )
 		{
@@ -385,20 +383,13 @@ public class ConjSupervisor
 			{
 				Options.out.println("Bypassing ConjSupervisor.possibleLanguageContainmentCounterexample()");
 			}
-
 			return ret;
 		}
-
-
-
-
-
 		Event [] events = manager.getEvents();
 		int cube = manager.and( manager.getStatepCube(), manager.getEventCube());
 
 		for(int i = 0; i < events.length; i++)
 		{
-
 			// see if the event is something that we care about:
 			int tmp = manager.and( events[i].bdd, considred_events);
 			boolean do_care =  (tmp != manager.getZero());
@@ -406,58 +397,44 @@ public class ConjSupervisor
 
 			if(do_care)
 			{
-
 				// what plans/specs are affected by this event?
-				Collection plant_care = plant.getUsers(events[i]);
-				Collection spec_care = spec.getUsers(events[i]);
+				Collection<BDDAutomaton> plant_care = plant.getUsers(events[i]);
+				Collection<BDDAutomaton> spec_care = spec.getUsers(events[i]);
 				if(! plant_care.isEmpty() &&  !spec_care.isEmpty())
 				{
-
 					// get (E.q', sigma : \delta_conj(q,sigma)=q')
 					int q_uc_plant = manager.ref (manager.getOne() );
-					for(Iterator it = plant_care.iterator(); it.hasNext(); )
+					for(BDDAutomaton aut : plant_care)
 					{
-						BDDAutomaton aut = (BDDAutomaton ) it.next();
 						tmp = manager.relProd(aut.getT(), events[i].bdd, cube);
 						q_uc_plant = manager.andTo(q_uc_plant, tmp);
 						manager.deref(tmp);
 					}
-
 					// dito for spec
 					int q_uc_spec = manager.ref (manager.getOne() );
-					for(Iterator it = spec_care.iterator(); it.hasNext(); )
+					for(BDDAutomaton aut : spec_care)
 					{
-						BDDAutomaton aut = (BDDAutomaton ) it.next();
 						tmp = manager.relProd(aut.getT(), events[i].bdd, cube);
 						q_uc_spec = manager.andTo(q_uc_spec, tmp);
 						manager.deref(tmp);
 					}
-
-
 					int not_q_uc_spec = manager.not(q_uc_spec);
 					manager.deref(q_uc_spec);
-
 
 					tmp = manager.and(not_q_uc_spec, q_uc_plant);
 					manager.deref(not_q_uc_spec);
 					manager.deref(q_uc_plant);
-
-
 					// put back the removed events
 					if(!remove_events)
 					{
 						tmp = manager.andTo(tmp,  events[i].bdd);
 					}
-
 					// save it:
 					ret = manager.orTo(ret, tmp);
 					manager.deref(tmp);
-
 				}
 			}
 		}
-
-
 
 		SizeWatch.setOwner("ConjSupervisor.possibleLanguageContainmentCounterexample");
 		SizeWatch.report(ret, "(language diff)");
@@ -465,5 +442,4 @@ public class ConjSupervisor
 		manager.deref(cube);
 		return ret;
 	}
-
 }

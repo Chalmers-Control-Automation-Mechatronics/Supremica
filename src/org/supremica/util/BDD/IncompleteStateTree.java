@@ -8,7 +8,7 @@ public class IncompleteStateTree
 	{
 		private String automaton;
 		private String state;
-		private Vector children;
+		private Vector<StateTreeNode> children;
 
 		public StateTreeNode()
 		{
@@ -19,7 +19,7 @@ public class IncompleteStateTree
 		{
 			this.automaton = name;
 			this.state = state;
-			this.children = new Vector();
+			this.children = new Vector<StateTreeNode>();
 		}
 
 		public boolean empty()
@@ -51,7 +51,7 @@ public class IncompleteStateTree
 			return state;
 		}
 
-		public Vector getChildren()
+		public Vector<StateTreeNode> getChildren()
 		{
 			return children;
 		}
