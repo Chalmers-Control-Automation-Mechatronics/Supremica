@@ -63,7 +63,6 @@ public class AutomataSynchronizerWorker
 {
     private IDEActionInterface ide = null;
     private Automata theAutomata = null;
-    private String newAutomatonName = null;
     private final static int MODE_SYNC = 1;
     private final static int MODE_UPDATE = 2;
     private int mode = MODE_SYNC;
@@ -75,7 +74,6 @@ public class AutomataSynchronizerWorker
     {
         this.ide = workbench;
         this.theAutomata = theAutomata;
-        this.newAutomatonName = newAutomatonName;
         this.syncOptions = syncOptions;
         
         // Order this thread to begin execution; the Jvm calls the run method of this thread.
@@ -109,7 +107,7 @@ public class AutomataSynchronizerWorker
             }
             
             // Initialize execution dialog
-            ArrayList threadsToStop = new ArrayList();
+            ArrayList<Stoppable> threadsToStop = new ArrayList<Stoppable>();
             threadsToStop.add(theSynchronizer);
             threadsToStop.add(this);
             ExecutionDialog executionDialog = new ExecutionDialog(ide.getFrame(), "Synchronizing", threadsToStop);
@@ -124,8 +122,7 @@ public class AutomataSynchronizerWorker
             catch (Exception ex)
             {
                 timer.stop();
-                ide.error("Exception while executing AutomataSynchronizer");
-                
+                ide.error("Exception while executing AutomataSynchronizer", ex);
                 // logger.error("Exception while executing AutomataSynchronizer");
                 // logger.debug(ex.getStackTrace());
                 return;
