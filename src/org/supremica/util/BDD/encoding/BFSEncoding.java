@@ -20,14 +20,14 @@ public class BFSEncoding
 	public void encode(Automaton a)
 	{
 		State[] states = a.getStates().getStateVector();
-		int size = states.length;
+		int nrOfStates = states.length;
 		int count = 0;
-		IntQueue queue = new IntQueue(size);
-		int[] codes = new int[size];
+		IntQueue queue = new IntQueue(nrOfStates);
+		int[] codes = new int[nrOfStates];
 
-		for (int i = 0; i < size; i++)
+		for (int i = 0; i < nrOfStates; i++)
 		{
-			states[i].extra1 = i;    // our "f: State -> int"  map
+			states[i].encodingIndex = i;    // our "f: State -> int"  map
 			codes[i] = -1;    // this state is not reached yet
 
 			// fill the initial round
@@ -47,15 +47,15 @@ public class BFSEncoding
 			// codes[state.extra1] = count++;
 			codes[curr] = count++;
 
-			for (Enumeration e = from_i
+			for (Enumeration<Arc> e = from_i
 								 ? state.out()
 								 : state.in(); e.hasMoreElements(); )
 			{
-				Arc arc = (Arc) e.nextElement();
+				Arc arc = e.nextElement();
 				State s = from_i
 						  ? arc.toState()
 						  : arc.fromState();
-				int index = s.extra1;
+				int index = s.encodingIndex;
 
 				if (codes[index] == -1)
 				{
@@ -67,7 +67,7 @@ public class BFSEncoding
 		}
 
 		// write the results to the structure:
-		for (int i = 0; i < size; i++)
+		for (int i = 0; i < nrOfStates; i++)
 		{
 			if (codes[i] == -1)
 			{
