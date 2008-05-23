@@ -156,7 +156,10 @@ public class AutomataSynchronizer
 	        }
 			for (AutomataSynchronizerExecuter synchExecuter : synchronizationExecuters) {
 			 	Throwable cause = synchExecuter.getCauseOfInterrupt();
-			 	if (cause != null) throw new RuntimeException(cause);
+			 	if (cause != null) {
+			 		if (cause instanceof RuntimeException) throw (RuntimeException) cause;
+			 		else throw new RuntimeException(cause);
+			 	}
 			}
 		}
     }
