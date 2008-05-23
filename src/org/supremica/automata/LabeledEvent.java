@@ -50,7 +50,6 @@
  */
 package org.supremica.automata;
 
-import org.supremica.util.Args;
 import net.sourceforge.waters.xsd.base.EventKind;
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.base.ProxyVisitor;
