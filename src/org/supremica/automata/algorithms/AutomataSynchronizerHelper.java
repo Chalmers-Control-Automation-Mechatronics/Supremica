@@ -116,16 +116,15 @@ public final class AutomataSynchronizerHelper
     private int stopExecutionLimit = -1;
     
     public AutomataSynchronizerHelper(Automata theAutomata, SynchronizationOptions syncOptions)
-    throws Exception
     {
         if (theAutomata == null)
         {
-            throw new SupremicaException("theAutomata must be non-null");
+            throw new IllegalArgumentException("theAutomata must be non-null");
         }
         
         if (syncOptions == null)
         {
-            throw new SupremicaException("syncOptions must be non-null");
+            throw new IllegalArgumentException("syncOptions must be non-null");
         }
         
         this.theAutomata = theAutomata;
@@ -147,7 +146,7 @@ public final class AutomataSynchronizerHelper
             logger.error("Error while computing AutomataIndexForm");
             logger.debug(e.getStackTrace());
             
-            throw e;
+            throw new RuntimeException(e);
         }
     }
     
@@ -378,7 +377,7 @@ public final class AutomataSynchronizerHelper
     
     // Add this state to theStates
     public void addState(int[] state)
-    throws Exception
+    throws SupremicaException
     {
         int[] newState = null;
         
