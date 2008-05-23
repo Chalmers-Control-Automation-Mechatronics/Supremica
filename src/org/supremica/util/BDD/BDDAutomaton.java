@@ -19,22 +19,31 @@ public class BDDAutomaton
 	private Event[] events;
 
 	// BDDs
-	private int[] var_s;
-	private int[] var_sp;
-	private int[] var_spp;
-	private int cube_s, cube_sp, cube_spp;
-	private int bdd_i, bdd_t, bdd_tu, bdd_t_top, bdd_t_pri;
-	private int bdd_m, bdd_f;
+	private final int[] var_s; //current state variables
+	private final int[] var_sp;//next state variables
+	private final int[] var_spp;
+	private int cube_s;//Current state
+	private int cube_sp;//Next state
+	private int cube_spp;
+	// The bdd_<something>-variables are symbolically represented sets
+	private int bdd_i; //initial states
+	private int bdd_t; //transitions
+	private int bdd_tu; //uncontrollable transitions
+	private int bdd_t_top;//transitions (bdd_t) plus extra self loops for every state event pair without outgoing transition
+	private int bdd_t_pri; //same as bdd_t_top, but self loops only for unprioritized events 
+	private int bdd_m; //marked (accepting)
+	private int bdd_f; //forbidden
 	private int bdd_events_p, bdd_events, bdd_events_u;
 	private int bdd_keep;
-	private int bdd_care_s, bdd_dontcare_s;
+	private int bdd_care_s;// The state set. Is true if the variable assignment encodes a state
+	private int bdd_dontcare_s; //True if the variable assignment does not encode a state 
 	private int bdd_care_sp, bdd_dontcare_sp;
-	private int index_first_bdd, index_last_bdd;
+	private final int index_first_bdd, index_last_bdd;
 	public int extra1, extra2;
 
 	/** used by other algos */
 
-	public BDDAutomaton(BDDAutomata manager, Automaton a, int index, int [] bdd1, int [] bdd2, int [] bdd3, int offset)
+	public BDDAutomaton(BDDAutomata manager, Automaton a, int index, int [] bdd1, int [] bdd2, int [] bdd3, int bitOffset)
 	{
 		this.manager = manager;
 		this.automaton = a;
@@ -52,13 +61,15 @@ public class BDDAutomaton
 		// copy the variables from the state vectors
 		for (int i = 0; i < num_bits; i++)
 		{
-			var_s[i] = bdd1[i + offset];
-			var_sp[i] = bdd2[i + offset];
-			var_spp[i] = bdd3[i + offset];
+			var_s[i] = bdd1[i + bitOffset];
+			var_sp[i] = bdd2[i + bitOffset];
+			var_spp[i] = bdd3[i + bitOffset];
 		}
 
 
-		// get the "keep" constraint for this automaton
+		// get the "keep" constraint for this automaton, i.e.
+		// a function that returns true if the state is unchanged:
+		// s(0)<=>s'(0) & s(1)<=>s'(1) & ...
 		bdd_keep = manager.ref( manager.getOne() );
 		for (int i = 0; i < num_bits; i++)
 		{
@@ -81,58 +92,44 @@ public class BDDAutomaton
 		cube_sp = manager.makeSet(var_sp, num_bits);
 		cube_spp = manager.makeSet(var_spp, num_bits);
 
-
-		// precalculate STATE -> BDD map
-		bdd_m = manager.getZero();
-
-		manager.ref(bdd_m);
-
-		bdd_f = manager.getZero();
-
-		manager.ref(bdd_f);
-
-		bdd_care_s = manager.getZero();
-
-		manager.ref(bdd_care_s);
-
-		bdd_care_sp = manager.getZero();
-
-		manager.ref(bdd_care_sp);
-
 		// interleaved simple state encoding.
 		for (int i = 0; i < num_states; i++)
 		{
 			int code = states[i].code;
-			int bdd_s = Util.getNumber(manager, var_s, code);
-			int bdd_sp = Util.getNumber(manager, var_sp, code);
+			int bdd_s = Util.createBddForNumber(manager, var_s, code);
+			int bdd_sp = Util.createBddForNumber(manager, var_sp, code);
 
 			states[i].bdd_s = bdd_s;
 			states[i].bdd_sp = bdd_sp;
 		}
 
+		// precalculate STATE -> BDD map
+		bdd_m = manager.getZero();
+		manager.ref(bdd_m);
+
+		bdd_f = manager.getZero();
+		manager.ref(bdd_f);
+
+		bdd_care_s = manager.getZero();
+		manager.ref(bdd_care_s);
+
+		bdd_care_sp = manager.getZero();
+		manager.ref(bdd_care_sp);
+
 		// Now, pre-build some important BDDs
 		for (int i = 0; i < num_states; i++)
 		{
-			if (states[i].m)
-			{
-				bdd_m = manager.orTo(bdd_m, states[i].bdd_s);
-			}
-
-			if (states[i].f)
-			{
-				bdd_f = manager.orTo(bdd_f, states[i].bdd_s);
-			}
-
+			if (states[i].m) bdd_m = manager.orTo(bdd_m, states[i].bdd_s);
+			if (states[i].f) bdd_f = manager.orTo(bdd_f, states[i].bdd_s);
+			
 			/* to count states correctly, we use only one encoding state -> the care set != entire S */
-
-			// if(!Options.fill_statevars) {
 			bdd_care_s = manager.orTo(bdd_care_s, states[i].bdd_s);
 			bdd_care_sp = manager.orTo(bdd_care_sp, states[i].bdd_sp);
-
-			//}
 		}
 
-		/* use the entire encoding space by having duplicate encodings per state*/
+		/* use the entire encoding space by having duplicate encodings per state
+		 * Example: Automata with states 0,1,2 and encodings 00,01,10.
+		 * Thus 11 is unused. We therefore let 11 encode state 0 also */
 		if (Options.fill_statevars)
 		{
 			int capacity = 1 << num_bits;
@@ -150,7 +147,7 @@ public class BDDAutomaton
 				code_used[states[i].code] = true;
 			}
 
-			/* append the unused encoding to some states, untill every code is used */
+			/* append the unused encoding to some states, until every code is used */
 			for (int i = 0; i < unused; i++)
 			{
 				int state = i;    /* the state to which we add an encoding */
@@ -164,8 +161,8 @@ public class BDDAutomaton
 				code_used[j] = true;
 
 				/* get the BDD for it */
-				int bdd_more_s = Util.getNumber(manager, var_s, code);
-				int bdd_more_sp = Util.getNumber(manager, var_sp, code);
+				int bdd_more_s = Util.createBddForNumber(manager, var_s, code);
+				int bdd_more_sp = Util.createBddForNumber(manager, var_sp, code);
 
 				/* append it to some state */
 				states[state].bdd_s = manager.orTo(states[state].bdd_s, bdd_more_s);
@@ -181,15 +178,12 @@ public class BDDAutomaton
 
 		// copy BDD encoding and get the prioritized events
 		bdd_events = manager.getZero();
-
 		manager.ref(bdd_events);
 
 		bdd_events_p = manager.getZero();
-
 		manager.ref(bdd_events_p);
 
 		bdd_events_u = manager.getZero();
-
 		manager.ref(bdd_events_u);
 
 		Event[] es = automaton.getEvents().getEventVector();
@@ -216,8 +210,8 @@ public class BDDAutomaton
 		}
 
 		// all setup done, create the BDDs:
-		createI();
-		createT();
+		createInitialStateBdd();
+		createTransitionBdds();
 		check("after creating I/T for automaton");
 
 		/*
@@ -507,7 +501,7 @@ public class BDDAutomaton
 	}
 
 	// ------------------------------------------------------------------
-	private void createI()
+	private void createInitialStateBdd()
 	{
 		bdd_i = manager.getOne();
 
@@ -517,14 +511,14 @@ public class BDDAutomaton
 		{
 			if (states[i].i)
 			{
-				int this_state = Util.getNumber(manager, var_s, states[i].code);
+				int this_state = Util.createBddForNumber(manager, var_s, states[i].code);
 
 				bdd_i = manager.andTo(bdd_i, this_state);
 			}
 		}
 	}
 
-	private void createT()
+	private void createTransitionBdds()
 	{
 		bdd_tu = manager.getZero();
 
@@ -537,12 +531,12 @@ public class BDDAutomaton
 		for (int i = 0; i < num_arcs; i++)
 		{
 			int bdd_event = events[arcs[i].e_code].bdd;
-			int bdd_state1 = states[arcs[i].s1_code].bdd_s;
-			int bdd_state2 = states[arcs[i].s2_code].bdd_sp;
+			int bdd_sourceState = states[arcs[i].s1_code].bdd_s;
+			int bdd_targetState = states[arcs[i].s2_code].bdd_sp;
 			boolean uncontrollable = !events[arcs[i].e_code].c;
-			int this_t = manager.and(bdd_event, bdd_state2);
+			int this_t = manager.and(bdd_event, bdd_targetState);
 
-			this_t = manager.andTo(this_t, bdd_state1);
+			this_t = manager.andTo(this_t, bdd_sourceState);
 			bdd_t = manager.orTo(bdd_t, this_t);
 
 			// if uncontrollable, we also add it to bdd_tu:
@@ -560,45 +554,31 @@ public class BDDAutomaton
 		// add a self-loop if there exists no transition for a given pair of state (current) and
 		// event.
 		// im not sure about the order of Exists and And  here :)
-		bdd_t_top = manager.exists(bdd_t, cube_sp);
+		// t_top = t | (!exists[targetState : t(s,e,targetState)] & keep)
+		final int bdd_stateEventPairsWithOutgoingTrans = manager.exists(bdd_t, cube_sp);
 
-		int tmp = manager.not(bdd_t_top);
+		final int bdd_stateEventPairsWithNoOutgoingTrans = manager.not(bdd_stateEventPairsWithOutgoingTrans);
+		manager.deref(bdd_stateEventPairsWithOutgoingTrans);
+		
+		final int bdd_selfLoopsForStateEventPairsWithNoOutgoingTrans = manager.andTo(bdd_stateEventPairsWithNoOutgoingTrans, bdd_keep);
 
-		manager.deref(bdd_t_top);
-
-		bdd_t_top = tmp;
-		tmp = manager.and(bdd_t_top, bdd_keep);
-
-		manager.deref(bdd_t_top);
-
-		bdd_t_top = tmp;
-		tmp = manager.or(bdd_t, bdd_t_top);
-
-		manager.deref(bdd_t_top);
-
-		bdd_t_top = tmp;
-
+		bdd_t_top = manager.or(bdd_t, bdd_selfLoopsForStateEventPairsWithNoOutgoingTrans);
+		manager.deref(bdd_selfLoopsForStateEventPairsWithNoOutgoingTrans);
+		
 		// -------------------------------------------------------------------------------
-		// create T-prioritized. The total T after prioritized composition is a cunjunction
+		// create T-prioritized. The total T after prioritized composition is a conjunction
 		// of these T's. The idea is to either use T if the event is prioritized or T-top when not
-		int not_sigma_p = manager.not(bdd_events_p);
+		// t_pri = t_top & exists[targetState:t(s,e,targetState) & e is unprio]
+		final int bdd_unprioritized_events = manager.not(bdd_events_p);
 
-		tmp = manager.or(bdd_t, not_sigma_p);
+		final int bdd_transitionsWithUnprioritizedEvents = manager.or(bdd_t, bdd_unprioritized_events);
+		manager.deref(bdd_unprioritized_events);
 
-		manager.deref(not_sigma_p);
+		final int bdd_stateAndUnprioEventPairsWithOutgoingTrans = manager.exists(bdd_transitionsWithUnprioritizedEvents, cube_sp);
+		manager.deref(bdd_transitionsWithUnprioritizedEvents);
 
-		bdd_t_pri = tmp;
-		tmp = manager.exists(bdd_t_pri, cube_sp);
-
-		manager.deref(bdd_t_pri);
-
-		bdd_t_pri = tmp;
-		tmp = manager.and(bdd_t_top, bdd_t_pri);
-
-		manager.deref(bdd_t_pri);
-
-		bdd_t_pri = tmp;
-
+		bdd_t_pri = manager.and(bdd_t_top, bdd_stateAndUnprioEventPairsWithOutgoingTrans);
+		manager.deref(bdd_stateAndUnprioEventPairsWithOutgoingTrans);
 		// BDDAssert.debug("BDD_T"); manager.printSet(bdd_t);
 		// BDDAssert.debug("BDD_T_TOP");        manager.printSet(bdd_t_top);
 		// BDDAssert.debug("BDD_T_PRI"); manager.printSet(bdd_t_pri);
