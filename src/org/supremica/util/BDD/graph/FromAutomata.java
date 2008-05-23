@@ -24,21 +24,21 @@ public class FromAutomata {
 
 	public static Graph build(Automata a) {
 
-		Vector automata = a.getAutomata();
+		Vector<Automaton> automata = a.getAutomata();
 		int size = automata.size();
 		Graph g = new Graph(false);
-		HashMap automata2node = new HashMap();
+		HashMap<Automaton,Node> automata2node = new HashMap<Automaton,Node>();
 
 		// add the nodes:
 		int i = 0;
-		for (Enumeration e = automata.elements(); e.hasMoreElements(); i++)
+		for (Enumeration<Automaton> e = automata.elements(); e.hasMoreElements(); i++)
 		{
-			Automaton a1 = (Automaton) e.nextElement();
+			Automaton a1 = e.nextElement();
 			Node n = new Node(i);
 			n.owner = a1;
 			n.label = a1.getName();
 			n.extra1 = i;
-			n.weight = a1.getStateVectorSize();
+			n.weight = a1.nrOfBitsNeededForStateEncoding();
 			automata2node.put(a1, n);
 			g.addNode(n);
 		}
@@ -47,22 +47,22 @@ public class FromAutomata {
 		// add the edges
 		try {
 			int[][] weightMatrix = a.getCommunicationMatrix();
-			for (Enumeration e = g.getNodes().elements(); e.hasMoreElements(); )
+			for (Enumeration<Node> e = g.getNodes().elements(); e.hasMoreElements(); )
 			{
-				Node n1 = (Node) e.nextElement();
+				Node n1 = e.nextElement();
 				int j = n1.extra1;
-
+	
 				for( i = 0; i < size; i++) {
 					if(weightMatrix[j][i] > 0 && i != j) {
 						Automaton a2 = (Automaton) automata.elementAt(i);
-						Node n2 = (Node)automata2node.get(a2);
+						Node n2 = automata2node.get(a2);
 						Edge ed = g.addEdge(n1, n2);
 						ed.weight = weightMatrix[j][i];
 					}
 				}
 			}
-		} catch(Exception exx) {
-			exx.printStackTrace();
+		} catch (BDDException e) {
+			throw new RuntimeException(e);
 		}
 
 		return g;
