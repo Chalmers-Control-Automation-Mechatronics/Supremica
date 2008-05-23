@@ -60,31 +60,26 @@ public class AlphabetHelpers
     private static Logger logger = LoggerFactory.createLogger(AlphabetHelpers.class);
     
     public static Alphabet getUnionAlphabet(Automata theAutomata)
-    throws Exception
     {
         return getUnionAlphabet(theAutomata, true, true);
     }
     
     public static Alphabet getUnionAlphabet(Automata theAutomata, boolean requireConsistentControllability, boolean requireConsistentImmediate)
-    throws Exception
     {
-        EventsSet eventsSet = new EventsSet();
+        Set<Alphabet> alphabets = new LinkedHashSet<Alphabet>();
         
-        for (Iterator autIt = theAutomata.iterator(); autIt.hasNext(); )
+        for (Automaton currAutomaton : theAutomata)
         {
-            Automaton currAutomaton = (Automaton) autIt.next();
-            Alphabet currAlphabet = currAutomaton.getAlphabet();
-            
-            eventsSet.add(currAlphabet);
+        	alphabets.add(currAutomaton.getAlphabet());
         }
         
-        return getUnionAlphabet(eventsSet, requireConsistentControllability, requireConsistentImmediate);
+        return getUnionAlphabet(alphabets, requireConsistentControllability, requireConsistentImmediate);
     }
     
-    public static Alphabet getUnionAlphabet(EventsSet alphas)
+    public static Alphabet getUnionAlphabet(Set<Alphabet> alphabets)
     throws IllegalArgumentException, Exception
     {
-        return getUnionAlphabet(alphas, /* "", */ true, true);
+        return getUnionAlphabet(alphabets, true, true);
     }
     
     /**
@@ -96,41 +91,32 @@ public class AlphabetHelpers
      *@exception  IllegalArgumentException Description of the Exception
      *@exception  Exception Description of the Exception
      */
-    private static Alphabet getUnionAlphabet(EventsSet alphabets, boolean requireConsistentControllability, boolean requireConsistentImmediate)
-    throws IllegalArgumentException, Exception
+    private static Alphabet getUnionAlphabet(Set<Alphabet> alphabets, boolean requireConsistentControllability, boolean requireConsistentImmediate)
     {
         if (alphabets.size() < 1)
         {
             throw new IllegalArgumentException("At least one alphabet is necessary");
         }
         
-        EventsSet eventsSet = new EventsSet();
         Alphabet unionEvents = AlphabetHelpers.union(alphabets);
         Alphabet newAlphabet = new Alphabet();
         
         // Iterate over all events - check consistency and add one for each label
-        Iterator eventsIt = unionEvents.iterator();
-        
-        while (eventsIt.hasNext())
+        for (LabeledEvent currEvent : unionEvents)
         {
-            LabeledEvent currEvent = (LabeledEvent) eventsIt.next();
-            
-            eventsSet.clear();
+        	Set<LabeledEvent> eventsWithSameLabel = new LinkedHashSet<LabeledEvent>();
             
             // Iterate over all alphabets, and find those alphabets that
             // contain an event with currEvent.getLabel
-            Iterator alphabetIt = alphabets.iterator();
-            while (alphabetIt.hasNext())
+            for (Alphabet currAlphabet : alphabets)
             {
-                Alphabet currAlphabet = (Alphabet) alphabetIt.next();
-                
                 if (currAlphabet.contains(currEvent.getLabel()))
                 {
-                    eventsSet.add(currAlphabet.getEvent(currEvent.getLabel()));
+                    eventsWithSameLabel.add(currAlphabet.getEvent(currEvent.getLabel()));
                 }
             }
             
-            LabeledEvent newEvent = EventHelpers.createEvent(eventsSet, requireConsistentControllability, requireConsistentImmediate);
+            LabeledEvent newEvent = EventHelpers.createEvent(eventsWithSameLabel, requireConsistentControllability, requireConsistentImmediate);
             
             // If we get here, the events are consistent (or consistency is not to be checked)
             // newEvent.setId(newAlphabet.getUniqueId(idPrefix));
@@ -144,33 +130,30 @@ public class AlphabetHelpers
      * Computes the union of all events in eventsSet.
      * No manipulation of the events.
      *
-     *@param  eventsSet Description of the Parameter
+     *@param  alphabets Description of the Parameter
      *@return  Description of the Return Value
      *@exception  IllegalArgumentException Description of the Exception
-     *@exception  Exception Description of the Exception
      */
-    private static Alphabet union(EventsSet eventsSet)
-    throws IllegalArgumentException, Exception
+    private static Alphabet union(Set<Alphabet> alphabets)
     {
-        if (eventsSet.size() >= 1)
+        if (alphabets.size() >= 1)
         {
             // this was >= 2 but why could we not have union over 1 or even 0 number of elements??
             // Build the new set of events
-            Iterator eventsSetIt = eventsSet.iterator();
-            Collection currEvents = ((Alphabet) eventsSetIt.next()).values();
-            TreeSet tmpEvents = new TreeSet(currEvents);
+            Iterator<Alphabet> eventsSetIt = alphabets.iterator();
+            TreeSet<LabeledEvent> tmpEvents = new TreeSet<LabeledEvent>(eventsSetIt.next().values());
             
             while (eventsSetIt.hasNext())
             {
-                tmpEvents.addAll((Collection) ((Alphabet) eventsSetIt.next()).values());
+                tmpEvents.addAll(eventsSetIt.next().values());
             }
             
             // Add all events to an Alphabet
-            Iterator eventIt = tmpEvents.iterator();
+            Iterator<LabeledEvent> eventIt = tmpEvents.iterator();
             Alphabet theEvents = new Alphabet();
             while (eventIt.hasNext())
             {
-                theEvents.addEvent((LabeledEvent) eventIt.next());
+                theEvents.addEvent(eventIt.next());
             }
             
             return theEvents;
