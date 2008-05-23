@@ -95,7 +95,7 @@ public class AutomataSynthesisWorker
     public void run()
     {
         // Initialize the ExecutionDialog
-        ArrayList threadsToStop = new ArrayList();
+        ArrayList<Stoppable> threadsToStop = new ArrayList<Stoppable>();
         threadsToStop.add(this);
         if(ide != null){
             executionDialog = new ExecutionDialog(ide.getFrame(), "Synthesizing", threadsToStop);
@@ -145,11 +145,6 @@ public class AutomataSynthesisWorker
 
             try
             {
-                // ARASH: this is IDIOTIC! why didn't we prepare for more than one monolithc algorithm???
-                // (this is a dirty fix, should use a factory instead)
-                //AutomatonSynthesizer synthesizer = (options.getSynthesisAlgorithm() == SynthesisAlgorithm.MonolithicSingleFixpoint)
-                //? new AutomatonSynthesizerSingleFixpoint(theAutomaton, options)
-                //: new AutomatonSynthesizer(theAutomaton, options);
                 AutomatonSynthesizer synthesizer = new AutomatonSynthesizer(theAutomaton, synthOptions);
                 threadsToStop.add(synthesizer);
                 synthesizer.synthesize();
@@ -255,59 +250,6 @@ public class AutomataSynthesisWorker
         
         return bd;
         
-    }
-
-    /**
-     * Does the actual work.
-     *
-     * @return The brand new supervisors.     .
-     */
-    private Automata work()
-    {
-        Automata result = new Automata();
-
-        // Are there many or just one automaton?
-        if (theAutomata.size() > 1)
-        {
-            // Get default synchronization options
-            SynchronizationOptions syncOptions = SynchronizationOptions.getDefaultSynthesisOptions();
-
-            try
-            {
-                AutomataSynthesizer synthesizer = new AutomataSynthesizer(theAutomata, syncOptions,
-                    synthOptions);
-                result.addAutomata(synthesizer.execute());
-            }
-            catch (Exception ex)
-            {
-                logger.error("Exception in AutomataSynthesisWorker. " + ex);
-                logger.debug(ex.getStackTrace());
-            }
-        }
-        else    // single automaton selected
-        {
-            Automaton theAutomaton = theAutomata.getFirstAutomaton();
-
-            try
-            {
-                // ARASH: this is IDIOTIC! why didnt we prepare for more than one monolithc algorithm???
-                // (this is a dirty fix, should use a factory instead)
-                //AutomatonSynthesizer synthesizer = (options.getSynthesisAlgorithm() == SynthesisAlgorithm.MonolithicSingleFixpoint)
-                //? new AutomatonSynthesizerSingleFixpoint(theAutomaton, options)
-                //: new AutomatonSynthesizer(theAutomaton, options);
-                AutomatonSynthesizer synthesizer = new AutomatonSynthesizer(theAutomaton, synthOptions);
-
-                // AutomatonSynthesizer synthesizer = new AutomatonSynthesizer(theAutomaton,synthesizerOptions);
-                synthesizer.synthesize();
-            }
-            catch (Exception ex)
-            {
-                logger.error("Exception in AutomataSynthesisWorker. Automaton: " + theAutomaton.getName(), ex);
-                logger.debug(ex.getStackTrace());
-            }
-        }
-
-        return result;
     }
 
     /**
