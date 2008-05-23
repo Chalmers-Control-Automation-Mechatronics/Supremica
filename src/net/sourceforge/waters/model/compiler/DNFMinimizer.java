@@ -24,6 +24,8 @@ public class DNFMinimizer {
 		CompiledNormalForm newExpression;
 		Formula convertedExpression;
 		
+		if (expression.isEmpty()) return expression;
+		
 		/*
 		 * Step 1: Convert the expression to the required input form
 		 */
