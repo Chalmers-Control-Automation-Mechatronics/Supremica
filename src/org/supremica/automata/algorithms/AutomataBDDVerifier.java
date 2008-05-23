@@ -222,10 +222,6 @@ public class AutomataBDDVerifier
 		int states = sup.computeReachableLanguageDifference();
 		boolean ret = (states == ba.getZero());
 
-		// get statistics
-		int Q_r = sup.getReachables();
-
-
 		if (!ret && Options.trace_on)
 		{
 			sup.trace_set("Language Inclusion counterexample", states, 1);
