@@ -70,7 +70,7 @@ class SynthesizerDialogStandardPanel
     private SynthesisSelector typeSelector;
     private AlgorithmSelector algorithmSelector;
     private JCheckBox purgeBox;
-    private JCheckBox optimizeBox;
+    private JCheckBox removeUnecessarySupBox;
     private NonblockNote nbNote;
     
     static class AlgorithmSelector
@@ -183,14 +183,14 @@ class SynthesizerDialogStandardPanel
         purgeBox = new JCheckBox("Purge result");
         purgeBox.setToolTipText("Remove all forbidden states");
         
-        optimizeBox = new JCheckBox("Optimize result");
-        optimizeBox.setToolTipText("Remove supervisors that don't affect the controllability");
+        removeUnecessarySupBox = new JCheckBox("Remove unnecessary supervisors");
+        removeUnecessarySupBox.setToolTipText("Remove supervisors that don't affect the controllability");
         
         nbNote = new NonblockNote();
         
         if (num == 1)
         {
-            optimizeBox.setEnabled(false);
+            removeUnecessarySupBox.setEnabled(false);
             nbNote.setVisible(false);
         }
         
@@ -214,7 +214,7 @@ class SynthesizerDialogStandardPanel
         panel = new JPanel();
         box = Box.createHorizontalBox();
         box.add(purgeBox);
-        box.add(optimizeBox);
+        box.add(removeUnecessarySupBox);
         panel.add(box);
         mainBox.add(panel);
         
@@ -233,7 +233,7 @@ class SynthesizerDialogStandardPanel
         typeSelector.setType(synthesizerOptions.getSynthesisType());
         algorithmSelector.setAlgorithm(synthesizerOptions.getSynthesisAlgorithm());
         purgeBox.setSelected(synthesizerOptions.doPurge());
-        optimizeBox.setSelected(synthesizerOptions.getOptimize());
+        removeUnecessarySupBox.setSelected(synthesizerOptions.getRemoveUnecessarySupervisors());
     }
     
     public void updatePanel()
@@ -279,7 +279,7 @@ class SynthesizerDialogStandardPanel
         synthesizerOptions.setSynthesisType(typeSelector.getType());
         synthesizerOptions.setSynthesisAlgorithm(algorithmSelector.getAlgorithm());
         synthesizerOptions.setPurge(purgeBox.isSelected());
-        synthesizerOptions.setOptimize(optimizeBox.isSelected());
+        synthesizerOptions.setRemoveUnecessarySupervisors(removeUnecessarySupBox.isSelected());
     }
     
     public void actionPerformed(ActionEvent e)
@@ -288,16 +288,16 @@ class SynthesizerDialogStandardPanel
         
         // Default
         purgeBox.setVisible(true); //X
-        optimizeBox.setVisible(true); //X
+        removeUnecessarySupBox.setVisible(true); //X
         nbNote.setVisible(false);
         
         if (algorithmSelector.getAlgorithm() == SynthesisAlgorithm.MONOLITHIC)
         {
-            optimizeBox.setVisible(false); //X
+            removeUnecessarySupBox.setVisible(false); //X
         }
         else if (algorithmSelector.getAlgorithm() == SynthesisAlgorithm.COMPOSITIONAL)
         {
-            optimizeBox.setVisible(false); //X
+            removeUnecessarySupBox.setVisible(false); //X
             purgeBox.setVisible(false); //X
         }
         else if (algorithmSelector.getAlgorithm() == SynthesisAlgorithm.MODULAR)
@@ -306,7 +306,7 @@ class SynthesizerDialogStandardPanel
                 (typeSelector.getType() == SynthesisType.NONBLOCKINGCONTROLLABLE))
             {
                 purgeBox.setVisible(false); //X
-                optimizeBox.setVisible(false); //X
+                removeUnecessarySupBox.setVisible(false); //X
                 nbNote.setVisible(true);
             }
         }
