@@ -266,7 +266,6 @@ public final class AutomataIndexForm
     }
     
     void generateEventIndices(Automata theAutomata, Automaton theAutomaton)
-    throws Exception
     {
         Alphabet theAlphabet = theAutomaton.getAlphabet();
         
