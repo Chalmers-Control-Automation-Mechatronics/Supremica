@@ -88,9 +88,6 @@ public class ExtCatMouse{
     
     int MODEL_ID = 4;
     
-    /** Creates a new instance of ExtCatMouse */
-    public ExtCatMouse() {}
-    
     public ExtCatMouse(int num, int num_levels)
         throws Exception
     {
