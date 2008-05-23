@@ -84,7 +84,6 @@ public class AutomatonSynthesizer
      * Synthesize a monolithic supervisor.
      */
     public boolean synthesize()
-    throws Exception
     {
         logger.debug("AutomatonSynthesizer.synthesize...");
         theAutomaton.beginTransaction();
@@ -151,7 +150,6 @@ public class AutomatonSynthesizer
      * Synthesize a controllable, nonblocking and observable supervisor.
      */
     protected boolean synthesizeControllableNonblockingObservable()
-    throws Exception
     {
         forcedPurge = true;
         boolean didSomething = false;
@@ -195,7 +193,6 @@ public class AutomatonSynthesizer
      * Synthesize a controllable and nonblocking supervisor.
      */
     protected boolean synthesizeControllableNonblocking()
-    throws Exception
     {
         StateSet stateList = new StateSet();
         logger.debug("AutomatonSynthesizer.synthesizeControllableNonblocking...");
@@ -245,7 +242,6 @@ public class AutomatonSynthesizer
      * Synthesize a controllable supervisor.
      */
     protected boolean synthesizeControllable()
-    throws Exception
     {
         logger.debug("AutomatonSynthesizer.synthesizeControllable...");
         // boolean newUnsafeStates;
@@ -284,7 +280,6 @@ public class AutomatonSynthesizer
     }
     
     protected boolean synthesizeNonblocking()
-    throws Exception
     {
         logger.debug("AutomatonSynthesizer.synthesizeNonblocking...");
         boolean newUnsafeStates;
@@ -319,7 +314,6 @@ public class AutomatonSynthesizer
      * @return the set of NON-coreachable states.
      */
     public StateSet doCoreachable()
-    throws Exception
     {
         logger.debug("AutomatonSynthesizer.doCoreachable...");
         theAutomaton.clearVisitedStates();
@@ -378,7 +372,6 @@ public class AutomatonSynthesizer
      * returns true if uncontrollable states found.
      */
     protected boolean doControllable(Collection<State> stateStack)
-    throws Exception
     {
         logger.debug("AutomatonSynthesizer.doControllable...");
         boolean newUnsafeStates = false;

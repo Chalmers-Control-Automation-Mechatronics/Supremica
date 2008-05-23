@@ -14,7 +14,6 @@ public class AutomatonSynthesizerSingleFixpoint
     extends AutomatonSynthesizer
 {
     public AutomatonSynthesizerSingleFixpoint(Automaton theAutomaton, SynthesizerOptions synthesizerOptions)
-    throws Exception
     {
         super(theAutomaton, synthesizerOptions);
     }
@@ -432,7 +431,6 @@ public class AutomatonSynthesizerSingleFixpoint
     // THIS IS FOR EDUCATION PURPOSE  ONLY (no double fix point)
     // Synthesize a controllable supervisor
     protected boolean synthesizeControllable()
-    throws Exception
     {
         
         // 1. setup
@@ -479,7 +477,6 @@ public class AutomatonSynthesizerSingleFixpoint
     // another "EDUCATION PURPOSE" algorithm (no double fix point)
     // Synthesize a non-blockingsupervisor
     protected boolean synthesizeNonblocking()
-    throws Exception
     {
         
         // 1. setup
