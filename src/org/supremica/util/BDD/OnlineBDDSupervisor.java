@@ -19,7 +19,6 @@ public class OnlineBDDSupervisor
 	private Map<String, String> uniqueNameOriginalNameMap;
 
 	public OnlineBDDSupervisor(BDDAutomata ba, int safe_states)
-		throws Exception
 	{
 		this.ba = ba;
 		this.safe_states = safe_states;
@@ -41,7 +40,7 @@ public class OnlineBDDSupervisor
 		{
 			cleanup();
 
-			throw exx;
+			throw new RuntimeException(exx);
 		}
 	}
 
@@ -74,7 +73,6 @@ public class OnlineBDDSupervisor
 
 	// ---------------------------------------------------------------
 	private void setup_mapping()
-		throws Exception
 	{
 		supremicaAut2BDDAutMap = 
 			new HashMap<Automaton, BDDAutomaton>();
@@ -188,17 +186,16 @@ public class OnlineBDDSupervisor
 			(org.supremica.automata.Automaton[]) automataSet.toArray(
 					new org.supremica.automata.Automaton[0]);
 		int nAutomata = automata.length;
-		Automaton supervisor = new Automaton();
-		supervisor.setType(AutomatonType.SUPERVISOR);
 		String supervisorName = "sup(" + automata[0].getName();
 		for(int i = 1; i < automata.length; i++) {
 			supervisorName += Config.SYNC_AUTOMATON_NAME_SEPARATOR.get() + automata[i].getName();
 		}
 		supervisorName += ")";
+		Automaton supervisor = new Automaton(supervisorName);
 		//supervisor.setName(supervisorName);
+		supervisor.setType(AutomatonType.SUPERVISOR);
 		supervisor.setComment(supervisorName);
 		
-		String stateName = "";
 		//the frontier set for the graph traversal
 		Queue<org.supremica.automata.State[]> frontierSet = 
 			new LinkedList<org.supremica.automata.State[]>();
