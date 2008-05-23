@@ -23,14 +23,15 @@ import java.util.*;
  */
 
 public class Graph {
-	protected Vector nodes, edges; /** V and E */
+	protected Vector<Node> nodes; // V
+	protected Vector<Edge> edges; // E
 	protected int count_nodes, count_edges; /** used to create unique ID:s for each element */
 	/* package */ boolean directed; /** G is a digraph */
 
 	public Graph(boolean directed) {
 		this.directed = directed;
-		this.nodes = new Vector();
-		this.edges = new Vector();
+		this.nodes = new Vector<Node> ();
+		this.edges = new Vector<Edge>();
 
 		// this is not a counter, its more of a label and can therefore start at 1
 		this.count_nodes = 1;
@@ -39,8 +40,8 @@ public class Graph {
 
 	// ----------------------------------------------------
 
-	public Vector getNodes() { return nodes; }
-	public Vector getEdges() { return edges; }
+	public Vector<Node> getNodes() { return nodes; }
+	public Vector<Edge> getEdges() { return edges; }
 
 	public int numOfNodes() { return nodes.size(); }	// order of the graph
 	public int numOfEdges() { return edges.size(); }
@@ -125,8 +126,7 @@ public class Graph {
 
 	public void removeAllEdges()  {
 		edges.removeAllElements();
-		for (Enumeration e = nodes.elements() ; e.hasMoreElements() ;) {
-			Node n = (Node) e.nextElement();
+		for (Node n : nodes) {
 			n.firstIn = n.firstOut = null;
 		}
 	}
@@ -138,8 +138,7 @@ public class Graph {
 
 	// ----------------------------------------------------
 	protected Edge findEdge(Node n1, Node n2) {
-		for (Enumeration e = edges.elements() ; e.hasMoreElements() ;) {
-			Edge edge = (Edge) e.nextElement();
+		for (Edge edge : edges) {
 			if(edge.n1 == n1 && edge.n2 == n2) return edge;
 			if(! directed) {
 				if(edge.n1 == n2 && edge.n2 == n1) return edge;
@@ -148,16 +147,14 @@ public class Graph {
 		return null;
 	}
 	protected Node findNode(Node n) {
-		for (Enumeration e = nodes.elements() ; e.hasMoreElements() ;) {
-			Node n2 = (Node) e.nextElement();
+		for (Node n2 : nodes) {
 			if(n == n2) return n;
 		}
 		return null;
 	}
 
 	public Node findNode(String label) {
-		for (Enumeration e = nodes.elements() ; e.hasMoreElements() ;) {
-			Node n = (Node) e.nextElement();
+		for (Node n : nodes) {
 			if(label.equals( n.label)) return n;
 		}
 		return null;
@@ -165,8 +162,7 @@ public class Graph {
 
 	// DEBUG
 	public void dump() {
-		for (Enumeration it = nodes.elements() ; it.hasMoreElements() ;) {
-			Node n = (Node) it.nextElement();
+		for (Node n : nodes) {
 			System.out.println("\nNode " + n.label+ ", extras= " + n.extra1 +" " + n.extra2 + " " +
 				n.extra3 + " " + n.extra4 + ", weight= " + n.weight);
 
