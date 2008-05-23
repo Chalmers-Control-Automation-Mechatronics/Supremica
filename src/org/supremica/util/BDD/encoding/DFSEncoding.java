@@ -28,7 +28,7 @@ public class DFSEncoding
 
 		for (int i = 0; i < size; i++)
 		{
-			states[i].extra1 = i;
+			states[i].encodingIndex = i;
 			codes[i] = -1;    // not reached
 
 			if ((from_i && states[i].isInitial()) || (!from_i && states[i].isMarked()))
@@ -42,15 +42,15 @@ public class DFSEncoding
 		{
 			State state = stack[--tos];
 
-			for (Enumeration e = from_i
+			for (Enumeration<Arc> e = from_i
 								 ? state.out()
 								 : state.in(); e.hasMoreElements(); )
 			{
-				Arc arc = (Arc) e.nextElement();
+				Arc arc = e.nextElement();
 				State s = from_i
 						  ? arc.toState()
 						  : arc.fromState();
-				int index = s.extra1;
+				int index = s.encodingIndex;
 
 				if (codes[index] == -1)
 				{
