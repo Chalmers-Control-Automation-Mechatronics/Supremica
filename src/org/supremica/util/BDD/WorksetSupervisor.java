@@ -71,8 +71,6 @@ public class WorksetSupervisor
 		size = dop.getSize();
 		clusters = dop.getClusters();
 
-		int count;
-
 		dependent = new int[size][size + 1];
 
 		for (int i = 0; i < size; i++)
