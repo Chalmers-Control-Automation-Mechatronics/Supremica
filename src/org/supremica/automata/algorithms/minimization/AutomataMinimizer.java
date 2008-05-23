@@ -97,15 +97,12 @@ public class AutomataMinimizer
     private EventToAutomataMap eventToAutomataMap;
     
     private boolean preserveControllability;
-    private boolean inadequateIgnoreBlocking;
     private boolean useShortStateNames;
 
     private Automata neighbours = new Automata();
     private Automata selection = new Automata();
     private Automata taskExtra = new Automata();
     
-    private static int nameIndex = 0;
-
     /**
      * Basic constructor.
      */
@@ -133,23 +130,18 @@ public class AutomataMinimizer
         this.options = options;
         
         // Are the options valid?
-        if (!options.isValid())
-        {
-            return null;
-        }
+        if (!options.isValid()) throw new IllegalArgumentException("Invalid compositional minimization options");
         
         if (options.getMinimizationType() == EquivalenceRelation.CONFLICTEQUIVALENCE &&
             theAutomata.hasForbiddenState())
         {
             logger.warn("All forbidden states must be removed before attempting the compositional approach.");
-            return null;
+            throw new IllegalArgumentException("Automata contain forbidden states, which is currently not supported by conflict equivalence");
         }
 
         // Preserve controllablity during hiding?
         //preserveControllability = options.getMinimizationType() == EquivalenceRelation.SUPERVISIONEQUIVALENCE;
         preserveControllability = true;
-        // Ignore blocking states when checking for inadequateness?
-        inadequateIgnoreBlocking = options.getMinimizationType() == EquivalenceRelation.CONFLICTEQUIVALENCE;
         // Do we care about state names?
         //useShortStateNames = options.getMinimizationType() != EquivalenceRelation.SUPERVISIONEQUIVALENCE; //**
         useShortStateNames = true;
@@ -447,7 +439,7 @@ public class AutomataMinimizer
      * Returns the next Automata that is predicted to be the best one
      * to do minimization on next and the Alphabet of events that can
      * be hidden.
-     *@return an aproptiate MinimizationTask or null if none can be found (e.g. too large automata).
+     *@return an appropriate MinimizationTask or null if none can be found (e.g. too large automata).
      */
     private MinimizationTask getNextMinimizationTask(boolean newAlgo)
     throws Exception

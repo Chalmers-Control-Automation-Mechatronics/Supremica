@@ -139,7 +139,7 @@ public class AutomatonMinimizer
         // Are the options valid?
         if (!options.isValid())
         {
-            return null;
+            throw new IllegalArgumentException("Invalid minimization options");
         }
         
         // Make accessible
@@ -205,7 +205,7 @@ public class AutomatonMinimizer
             {
                 logger.warn("Supervision equivalence can not cope with previously forbidden states.");
                 requestStop();
-                return null;
+                throw new IllegalArgumentException("Automaton contains forbidden states, which is currently not supported by supervision equivalence");
             }
             
             int countHWS = 0;
@@ -365,11 +365,8 @@ public class AutomatonMinimizer
                 
                 // Partition
                 findCoarsestPartitioning(equivClasses);
-            }
-            catch (Exception ex)
-            {
+            } catch (Exception ex) {
                 requestStop();
-                
                 throw ex;
             }
             
@@ -1901,9 +1898,8 @@ public class AutomatonMinimizer
             
             // Iterate over states in closure
             StateSet closure = from.epsilonClosure(addSelfloops);
-            for (Iterator<State> toIt = closure.iterator(); toIt.hasNext(); )
+            for (State to : closure)
             {
-                State to = toIt.next();
                 Arc arc = new Arc(from, to, tau);
                 if (!arc.getFromState().containsOutgoingArc(arc))
                 {
