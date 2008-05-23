@@ -52,6 +52,8 @@ package org.supremica.automata.algorithms;
 import org.supremica.automata.*;
 import org.supremica.automata.algorithms.Stoppable;
 import org.supremica.log.*;
+import org.supremica.util.SupremicaException;
+
 import java.util.*;
 
 public class AutomataSynchronizer
@@ -61,14 +63,13 @@ public class AutomataSynchronizer
     private Automata theAutomata;
     private AutomataSynchronizerHelper synchHelper;
     private SynchronizationOptions syncOptions;
-    private ArrayList synchronizationExecuters;
+    private ArrayList<AutomataSynchronizerExecuter> synchronizationExecuters;
     private AutomataIndexMap indexMap;
     
     // For stopping execution
     private boolean stopRequested = false;
     
     public AutomataSynchronizer(Automata automata, SynchronizationOptions options)
-    throws Exception
     {
         this.theAutomata = automata;
         this.syncOptions = options;
@@ -81,7 +82,6 @@ public class AutomataSynchronizer
      * Creates an AutomataSynchronizer based on an already existing helper.
      */
     public AutomataSynchronizer(AutomataSynchronizerHelper helper)
-    throws Exception
     {
         this.theAutomata = helper.getAutomata();
         this.syncOptions = helper.getSynchronizationOptions();
@@ -97,7 +97,7 @@ public class AutomataSynchronizer
     {
         // Allocate and initialize the synchronizationExecuters
         int nbrOfExecuters = syncOptions.getNbrOfExecuters();
-        synchronizationExecuters = new ArrayList(nbrOfExecuters);
+        synchronizationExecuters = new ArrayList<AutomataSynchronizerExecuter>(nbrOfExecuters);
         for (int i = 0; i < nbrOfExecuters; i++)
         {
             AutomataSynchronizerExecuter currSynchronizationExecuter = new AutomataSynchronizerExecuter(synchHelper);
@@ -108,19 +108,18 @@ public class AutomataSynchronizer
     }
     
     public void execute()
-    throws Exception
     {
         State currInitialState;
         int[] initialState = AutomataIndexFormHelper.createState(theAutomata.size());
         
         // Build the initial state - and the comment
-        Iterator autIt = theAutomata.iterator();
+        Iterator<Automaton> autIt = theAutomata.iterator();
         StringBuffer comment = new StringBuffer();;
         
         // Set an apropriate comment on the automaton
         while (autIt.hasNext())
         {
-            Automaton currAutomaton = (Automaton) autIt.next();
+            Automaton currAutomaton = autIt.next();
             
             currInitialState = currAutomaton.getInitialState();
             initialState[indexMap.getAutomatonIndex(currAutomaton)] = indexMap.getStateIndex(currAutomaton, currInitialState);
@@ -129,22 +128,37 @@ public class AutomataSynchronizer
             comment.append(syncOptions.getAutomatonNameSeparator());
         }
         comment.delete(comment.length() - syncOptions.getAutomatonNameSeparator().length(), comment.length());
-        synchHelper.addState(initialState);
+        try {
+			synchHelper.addState(initialState);
+		} catch (SupremicaException e1) {
+			throw new RuntimeException(e1);
+		}
         synchHelper.addComment(comment.toString());
         
         // Start all the synchronization executers and wait for completetion
-        for (int i = 0; i < synchronizationExecuters.size(); i++)
+        for (AutomataSynchronizerExecuter synchExecuter : synchronizationExecuters)
         {
-            AutomataSynchronizerExecuter currExec = (AutomataSynchronizerExecuter) synchronizationExecuters.get(i);
-            
-            currExec.start();
+            synchExecuter.start();
         }
         
         // Wait for completion
-        for (int i = 0; i < synchronizationExecuters.size(); i++)
-        {
-            ((AutomataSynchronizerExecuter) synchronizationExecuters.get(i)).join();
-        }
+        
+        try {
+			for (AutomataSynchronizerExecuter synchExecuter : synchronizationExecuters) {
+			 	synchExecuter.join();
+			}
+		} catch (InterruptedException e) {
+			// Current thread has been interrupted, perhaps
+			// due to an exception in one of the executers.
+			// Stop all tasks and throw the original exception
+			for (AutomataSynchronizerExecuter synchExecuter : synchronizationExecuters) {
+	            synchExecuter.requestStop();
+	        }
+			for (AutomataSynchronizerExecuter synchExecuter : synchronizationExecuters) {
+			 	Throwable cause = synchExecuter.getCauseOfInterrupt();
+			 	if (cause != null) throw new RuntimeException(cause);
+			}
+		}
     }
     
     public void displayInfo()
@@ -159,27 +173,16 @@ public class AutomataSynchronizer
     }
     
     public Automaton getAutomaton()
-    throws Exception
     {
         AutomataSynchronizerExecuter currExec = (AutomataSynchronizerExecuter) synchronizationExecuters.get(0);
         
-        try
+        if (currExec.buildAutomaton())
         {
-            if (currExec.buildAutomaton())
-            {
-                return synchHelper.getAutomaton();
-            }
-            else
-            {
-                return null;
-            }
+            return synchHelper.getAutomaton();
         }
-        catch (Exception ex)
+        else
         {
-            logger.error(ex.toString());
-            logger.debug(ex.getStackTrace());
-            
-            throw ex;
+            return null;
         }
     }
     
@@ -195,12 +198,8 @@ public class AutomataSynchronizer
     {
         theAutomata = null;
         synchHelper = null;
-        for (int i = 0; i < synchronizationExecuters.size(); i++)
-        {
-            AutomataSynchronizerExecuter currExec = (AutomataSynchronizerExecuter) synchronizationExecuters.get(i);
-            currExec = null;
-        }
         syncOptions = null;
+        synchronizationExecuters.clear();
         synchronizationExecuters = null;
     }
     
