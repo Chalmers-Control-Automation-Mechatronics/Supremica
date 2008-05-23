@@ -57,7 +57,6 @@ import org.supremica.gui.*;
 // For the automata selection methods
 import java.util.ArrayList;
 import java.util.Iterator;
-import org.supremica.automata.Alphabet;
 import org.supremica.automata.Arc;
 import org.supremica.automata.AutomataIndexForm;
 import org.supremica.automata.AutomataIndexFormHelper;
@@ -80,6 +79,9 @@ public final class AutomataSynchronizerExecuter
     extends Thread
 {
     private static Logger logger = LoggerFactory.createLogger(AutomataSynchronizerExecuter.class);
+    private final Thread threadToBeInterruptedUponException;
+    private Throwable causeOfInterrupt;
+    
     private final AutomataSynchronizerHelper helper;
     private final AutomataIndexForm indexForm;
     private final int nbrOfAutomata;
@@ -97,13 +99,11 @@ public final class AutomataSynchronizerExecuter
     private int[][] eventToAutomatonTable;
     private int[] currOutgoingEventsIndex;
     private int[] automataIndices;
-    private int[] currPlantAutomata;
     private int[] currEnabledEvents;
     private int[] disabledEvents;
     private boolean controllableState;
     private final static int IMMEDIATE_NOT_AVAILABLE = -1;
     private int immediateEvent = IMMEDIATE_NOT_AVAILABLE;
-    private int numberOfAddedStates = 0;
     
     /** Options determining how the synchronization should be performed. */
     private final SynchronizationOptions options;
@@ -168,8 +168,16 @@ public final class AutomataSynchronizerExecuter
      */
     public AutomataSynchronizerExecuter(AutomataSynchronizerHelper synchronizerHelper)
     {
-        setPriority(Thread.MIN_PRIORITY);
-        
+        setUncaughtExceptionHandler(new UncaughtExceptionHandler() {
+			@Override
+			public void uncaughtException(Thread thread, Throwable cause) {
+				cause.printStackTrace();
+				causeOfInterrupt = cause;
+				getThreadToBeInterruptedUponException().interrupt();
+			}
+        });
+    	setPriority(Thread.MIN_PRIORITY);
+        this.threadToBeInterruptedUponException = Thread.currentThread();
         // Helper parameters
         helper = synchronizerHelper;
         nbrOfAutomata = helper.getAutomata().size();
@@ -249,7 +257,7 @@ public final class AutomataSynchronizerExecuter
      *@param  automataToBeSelected ArrayList of the automata to be selected
      *@exception  Exception Throws exception if exhaustive search is used.
      */
-    public void selectAutomata(ArrayList automataToBeSelected)
+    public void selectAutomata(ArrayList<Automaton> automataToBeSelected)
     throws Exception
     {
         automataIndices = new int[automataToBeSelected.size()];
@@ -905,239 +913,229 @@ public final class AutomataSynchronizerExecuter
      *@exception  Exception Description of the Exception
      */
     public boolean buildAutomaton()
-    throws Exception
     {
-        try
+        Automaton theAutomaton = helper.getAutomaton();
+        
+        // Should we add disabled events to a dump state? If so, create that state!
+        org.supremica.automata.State dumpState = null;
+        if (rememberDisabledEvents)
         {
-            Automaton theAutomaton = helper.getAutomaton();
-            Alphabet theAlphabet = theAutomaton.getAlphabet();
-            
-            // Should we add disabled events to a dump state? If so, create that state!
-            org.supremica.automata.State dumpState = null;
-            if (rememberDisabledEvents)
+            dumpState = theAutomaton.createUniqueState("qf");
+            theAutomaton.addState(dumpState);
+            dumpState.setForbidden(true);
+        }
+        
+        // Initialize execution dialog
+        ExecutionDialog executionDialog = helper.getExecutionDialog();
+        if (executionDialog != null)
+        {
+            executionDialog.initProgressBar(0, helper.getStateTableSize());
+            executionDialog.setMode(ExecutionDialogMode.SYNCHRONIZINGBUILDINGSTATES);
+        }
+        
+        // Create all states
+        int[][] currStateTable = helper.getStateTable();
+        int stateNumber = 1; // 0 is reserved for the inital state
+        for (int i = 0; i < currStateTable.length; i++)
+        {
+            if (i % 100 == 0)
             {
-                dumpState = theAutomaton.createUniqueState("qf");
-                theAutomaton.addState(dumpState);
-                dumpState.setForbidden(true);
+                if (executionDialog != null)
+                {
+                    executionDialog.setProgress(i);
+                }
             }
             
-            // Initialize execution dialog
-            ExecutionDialog executionDialog = helper.getExecutionDialog();
-            if (executionDialog != null)
+            if (stopRequested)
             {
-                executionDialog.initProgressBar(0, helper.getStateTableSize());
-                executionDialog.setMode(ExecutionDialogMode.SYNCHRONIZINGBUILDINGSTATES);
+                return false;
             }
             
-            // Create all states
-            int[][] currStateTable = helper.getStateTable();
-            int stateNumber = 1; // 0 is reserved for the inital state
-            for (int i = 0; i < currStateTable.length; i++)
+            if (currStateTable[i] != null)
             {
-                if (i % 100 == 0)
-                {
-                    if (executionDialog != null)
-                    {
-                        executionDialog.setProgress(i);
-                    }
-                }
+                int[] currState = currStateTable[i];
+                CompositeState newState = null;
                 
-                if (stopRequested)
+                // Should the state name be based on the names of the states that
+                // it is constructed from or not?
+                if (options.useShortStateNames())
                 {
-                    return false;
-                }
-                
-                if (currStateTable[i] != null)
-                {
-                    int[] currState = currStateTable[i];
-                    CompositeState newState = null;
-                    
-                    // Should the state name be based on the names of the states that
-                    // it is constructed from or not?
-                    if (options.useShortStateNames())
+                    // Make sure the initial state gets number 0
+                    if (AutomataIndexFormHelper.isInitial(currState))
                     {
-                        // Make sure the initial state gets number 0
-                        if (AutomataIndexFormHelper.isInitial(currState))
-                        {
-                            newState = new CompositeState("q0", currState, helper);
-                        }
-                        else
-                        {
-                            newState = new CompositeState("q" + stateNumber++, currState, helper);
-                        }
+                        newState = new CompositeState("q0", currState, helper);
                     }
                     else
                     {
-                        org.supremica.automata.State[][] stateTable = indexForm.getStateTable();
-                        StringBuffer sb = new StringBuffer();
-                        
-                        for (int j = 0; j < currState.length - AutomataIndexFormHelper.STATE_EXTRA_DATA; j++)
-                        {
-                            // It should be name here, right? That's what the method description says...
-                            //sb.append(stateTable[j][currState[j]].getId());
-                            sb.append(stateTable[j][currState[j]].getName());
-                            sb.append(options.getStateNameSeparator());
-                        }
-                        
-                        // Remove last separator string element
-                        sb.setLength(sb.length() - options.getStateNameSeparator().length());
-                        
-                        // Create state
-                        newState = new CompositeState(sb.toString(), currState, helper);
+                        newState = new CompositeState("q" + stateNumber++, currState, helper);
                     }
-                    
-                    // Set some attributes of the state
-                    //newState.setAutomataSynchronizerExecutorIndex(i);
-                    newState.setIndex(i);
-                    //newState.setName(newState.getName());
-                    newState.setInitial(AutomataIndexFormHelper.isInitial(currState));
-                    newState.setAccepting(AutomataIndexFormHelper.isAccepting(currState));
-                    newState.setForbidden(AutomataIndexFormHelper.isForbidden(currState));
-                    newState.setFirst(AutomataIndexFormHelper.isFirst(currState));
-                    newState.setLast(AutomataIndexFormHelper.isLast(currState));
-                    newState.initCosts();
-                    
-                    theAutomaton.addState(newState);
                 }
-            }
-            
-            if (executionDialog != null)
-            {
-                executionDialog.initProgressBar(0, currStateTable.length);
-                executionDialog.setMode(ExecutionDialogMode.SYNCHRONIZINGBUILDINGTRANSITIONS);
-            }
-            
-            // Create all transitions
-            for (int k = 0; k < currStateTable.length; k++)
-            {
-                if (k % 100 == 0)
+                else
                 {
-                    if (executionDialog != null)
+                    org.supremica.automata.State[][] stateTable = indexForm.getStateTable();
+                    StringBuffer sb = new StringBuffer();
+                    
+                    for (int j = 0; j < currState.length - AutomataIndexFormHelper.STATE_EXTRA_DATA; j++)
                     {
-                        executionDialog.setProgress(k);
+                        // It should be name here, right? That's what the method description says...
+                        //sb.append(stateTable[j][currState[j]].getId());
+                        sb.append(stateTable[j][currState[j]].getName());
+                        sb.append(options.getStateNameSeparator());
                     }
+                    
+                    // Remove last separator string element
+                    sb.setLength(sb.length() - options.getStateNameSeparator().length());
+                    
+                    // Create state
+                    newState = new CompositeState(sb.toString(), currState, helper);
                 }
                 
-                if (stopRequested)
-                {
-                    theAlphabet = null;
-                    theAutomaton = null;
-                    
-                    return false;
-                }
+                // Set some attributes of the state
+                //newState.setAutomataSynchronizerExecutorIndex(i);
+                newState.setIndex(i);
+                //newState.setName(newState.getName());
+                newState.setInitial(AutomataIndexFormHelper.isInitial(currState));
+                newState.setAccepting(AutomataIndexFormHelper.isAccepting(currState));
+                newState.setForbidden(AutomataIndexFormHelper.isForbidden(currState));
+                newState.setFirst(AutomataIndexFormHelper.isFirst(currState));
+                newState.setLast(AutomataIndexFormHelper.isLast(currState));
+                newState.initCosts();
                 
-                if (currStateTable[k] != null)
-                {
-                    int[] currState = currStateTable[k];
-                    org.supremica.automata.State thisState = theAutomaton.getStateWithIndex(k);
-                    
-                    // Expand state? Otherwise the transitions will not be shown.
-                    if (thisState.isForbidden() && !expandForbiddenStates)
-                    {
-                        continue;
-                    }
-                    
-                    // Adjust the array currEnabledEvents to fit currState
-                    enabledEvents(currState);
-                    
-                    // Handle all events in a while-loop
-                    int i = 0;
-                    int currEventIndex = currEnabledEvents[i];
-                    while (currEventIndex != Integer.MAX_VALUE)
-                    {
-                                                /* **CHANGE FOR NONDETERMINISM**
-                                                // Generate an array that contains the indices of each state
-                                                // Copy the old state, some parts won't change!
-                                                int[] nextState = AutomataIndexFormHelper.createCopyOfState(currState);
-                                                 
-                                                // Iterate over all automata to construct the new state
-                                                for (int j = 0; j < automataIndices.length; j++)
-                                                {
-                                                        int currAutomatonIndex = automataIndices[j];
-                                                        int currSingleNextState = nextStateTable[currAutomatonIndex][currState[currAutomatonIndex]][currEventIndex];
-                                                 
-                                                        // Jump in all automata that have this event active.
-                                                        if (currSingleNextState != Integer.MAX_VALUE)
-                                                        {
-                                                                nextState[currAutomatonIndex] = currSingleNextState;
-                                                        }
-                                                }
-                                                 
-                                                // Add arc
-                                                try
-                                                {
-                                                        // Check if nextState exists
-                                                        int nextIndex = helper.getStateIndex(nextState);
-                                                 
-                                                        if (nextIndex >= 0)
-                                                        {
-                                                                // Create new arc
-                                                                State toState = theAutomaton.getStateWithIndex(nextIndex);
-                                                                LabeledEvent theEvent = theAlphabet.getEventWithIndex(currEventIndex);
-                                                                Arc newArc = new Arc(thisState, toState, theEvent);
-                                                 
-                                                                theAutomaton.addArc(newArc);
-                                                        }
-                                                }
-                                                catch (Exception e)
-                                                {
-                                                        logger.error("Exception when checking next state. " + e);
-                                                        logger.debug(e.getStackTrace());
-                                                }
-                                                 */
-                        
-                        // Recursion for adding arcs, also nondeterministic
-                        addNondeterministicArcPermutations(currState, currEventIndex);
-                        
-                        // Next event
-                        currEventIndex = currEnabledEvents[++i];
-                    }
-                    
-                    if (rememberDisabledEvents)
-                    {
-                        i = 0;
-                        
-                        int disabledEventIndex = disabledEvents[i];
-                        
-                        // Handle all events
-                        while (disabledEventIndex != Integer.MAX_VALUE)
-                        {
-                            //LabeledEvent theEvent = theAlphabet.getEventWithIndex(currDisabledEventIndex);
-                            LabeledEvent event = helper.getIndexMap().getEventAt(disabledEventIndex);
-                            Arc newArc = new Arc(thisState, dumpState, event);
-                            
-                            theAutomaton.addArc(newArc);
-                            
-                            disabledEventIndex = disabledEvents[++i];
-                        }
-                    }
-                }
+                theAutomaton.addState(newState);
             }
-            
-            if (helper.isAllAutomataPlants())
-            {
-                theAutomaton.setType(AutomatonType.PLANT);
-            }
-            else if (helper.isAllAutomataSupervisors())
-            {
-                theAutomaton.setType(AutomatonType.SUPERVISOR);
-            }
-            else if (helper.isAllAutomataSpecifications())
-            {
-                theAutomaton.setType(AutomatonType.SPECIFICATION);
-            }
-            else
-            {
-                // theAutomaton.setType(AutomatonType.Undefined);
-                theAutomaton.setType(AutomatonType.PLANT);
-            }
-            
-            return true;
         }
-        catch (OutOfMemoryError ex)
+        
+        if (executionDialog != null)
         {
-            throw new SupremicaException("Out of memory. Try to increase the JVM heap.");    // why not throw new SupremicaException(ex)?
+            executionDialog.initProgressBar(0, currStateTable.length);
+            executionDialog.setMode(ExecutionDialogMode.SYNCHRONIZINGBUILDINGTRANSITIONS);
         }
+        
+        // Create all transitions
+        for (int k = 0; k < currStateTable.length; k++)
+        {
+            if (k % 100 == 0)
+            {
+                if (executionDialog != null)
+                {
+                    executionDialog.setProgress(k);
+                }
+            }
+            
+            if (stopRequested)
+            {
+                theAutomaton = null;
+                
+                return false;
+            }
+            
+            if (currStateTable[k] != null)
+            {
+                int[] currState = currStateTable[k];
+                org.supremica.automata.State thisState = theAutomaton.getStateWithIndex(k);
+                
+                // Expand state? Otherwise the transitions will not be shown.
+                if (thisState.isForbidden() && !expandForbiddenStates)
+                {
+                    continue;
+                }
+                
+                // Adjust the array currEnabledEvents to fit currState
+                enabledEvents(currState);
+                
+                // Handle all events in a while-loop
+                int i = 0;
+                int currEventIndex = currEnabledEvents[i];
+                while (currEventIndex != Integer.MAX_VALUE)
+                {
+                                            /* **CHANGE FOR NONDETERMINISM**
+                                            // Generate an array that contains the indices of each state
+                                            // Copy the old state, some parts won't change!
+                                            int[] nextState = AutomataIndexFormHelper.createCopyOfState(currState);
+                                             
+                                            // Iterate over all automata to construct the new state
+                                            for (int j = 0; j < automataIndices.length; j++)
+                                            {
+                                                    int currAutomatonIndex = automataIndices[j];
+                                                    int currSingleNextState = nextStateTable[currAutomatonIndex][currState[currAutomatonIndex]][currEventIndex];
+                                             
+                                                    // Jump in all automata that have this event active.
+                                                    if (currSingleNextState != Integer.MAX_VALUE)
+                                                    {
+                                                            nextState[currAutomatonIndex] = currSingleNextState;
+                                                    }
+                                            }
+                                             
+                                            // Add arc
+                                            try
+                                            {
+                                                    // Check if nextState exists
+                                                    int nextIndex = helper.getStateIndex(nextState);
+                                             
+                                                    if (nextIndex >= 0)
+                                                    {
+                                                            // Create new arc
+                                                            State toState = theAutomaton.getStateWithIndex(nextIndex);
+                                                            LabeledEvent theEvent = theAlphabet.getEventWithIndex(currEventIndex);
+                                                            Arc newArc = new Arc(thisState, toState, theEvent);
+                                             
+                                                            theAutomaton.addArc(newArc);
+                                                    }
+                                            }
+                                            catch (Exception e)
+                                            {
+                                                    logger.error("Exception when checking next state. " + e);
+                                                    logger.debug(e.getStackTrace());
+                                            }
+                                             */
+                    
+                    // Recursion for adding arcs, also nondeterministic
+                    addNondeterministicArcPermutations(currState, currEventIndex);
+                    
+                    // Next event
+                    currEventIndex = currEnabledEvents[++i];
+                }
+                
+                if (rememberDisabledEvents)
+                {
+                    i = 0;
+                    
+                    int disabledEventIndex = disabledEvents[i];
+                    
+                    // Handle all events
+                    while (disabledEventIndex != Integer.MAX_VALUE)
+                    {
+                        //LabeledEvent theEvent = theAlphabet.getEventWithIndex(currDisabledEventIndex);
+                        LabeledEvent event = helper.getIndexMap().getEventAt(disabledEventIndex);
+                        Arc newArc = new Arc(thisState, dumpState, event);
+                        
+                        theAutomaton.addArc(newArc);
+                        
+                        disabledEventIndex = disabledEvents[++i];
+                    }
+                }
+            }
+        }
+        
+        if (helper.isAllAutomataPlants())
+        {
+            theAutomaton.setType(AutomatonType.PLANT);
+        }
+        else if (helper.isAllAutomataSupervisors())
+        {
+            theAutomaton.setType(AutomatonType.SUPERVISOR);
+        }
+        else if (helper.isAllAutomataSpecifications())
+        {
+            theAutomaton.setType(AutomatonType.SPECIFICATION);
+        }
+        else
+        {
+            // theAutomaton.setType(AutomatonType.Undefined);
+            theAutomaton.setType(AutomatonType.PLANT);
+        }
+        
+        return true;
     }
     
     
@@ -1522,4 +1520,12 @@ public final class AutomataSynchronizerExecuter
     {
         return controllableState;
     }
+
+	public Thread getThreadToBeInterruptedUponException() {
+		return threadToBeInterruptedUponException;
+	}
+
+	public Throwable getCauseOfInterrupt() {
+		return causeOfInterrupt;
+	}
 }
