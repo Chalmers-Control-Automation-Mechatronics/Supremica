@@ -60,7 +60,7 @@ public final class SynthesizerOptions
     private SynthesisType synthesisType;
     private SynthesisAlgorithm synthesisAlgorithm;
     private boolean purge;
-    private boolean optimize;
+    private boolean removeUnnecessarySupervisors;
     private boolean maximallyPermissive;
     private boolean maximallyPermissiveIncremental;
     private boolean reduceSupervisors;
@@ -92,12 +92,14 @@ public final class SynthesizerOptions
      * modify the necessary options one by one, starting from default! Much more readable and
      * also more practical when adding new options.
      */
-    private SynthesizerOptions(SynthesisType synthesisType, SynthesisAlgorithm synthesisAlgorithm, boolean purge, boolean optimize, boolean maximallyPermissive, boolean maximallyPermissiveIncremental, boolean reduceSupervisors, boolean bddExtractSupervisor)
+    private SynthesizerOptions(SynthesisType synthesisType, SynthesisAlgorithm synthesisAlgorithm,
+    		boolean purge, boolean removeUnnecessarySupervisors, boolean maximallyPermissive,
+    		boolean maximallyPermissiveIncremental, boolean reduceSupervisors, boolean bddExtractSupervisor)
     {
         this.synthesisType = synthesisType;
         this.synthesisAlgorithm = synthesisAlgorithm;
         this.purge = purge;
-        this.optimize = optimize;
+        this.removeUnnecessarySupervisors = removeUnnecessarySupervisors;
         this.maximallyPermissive = maximallyPermissive;
         this.maximallyPermissiveIncremental = maximallyPermissiveIncremental;
         this.reduceSupervisors = reduceSupervisors;
@@ -193,14 +195,14 @@ public final class SynthesizerOptions
         return rememberDisabledUncontrollableEvents;
     }
 
-    public void setOptimize(boolean bool)
+    public void setRemoveUnecessarySupervisors(boolean bool)
     {
-        optimize = bool;
+        removeUnnecessarySupervisors = bool;
     }
 
-    public boolean getOptimize()
+    public boolean getRemoveUnecessarySupervisors()
     {
-        return optimize;
+        return removeUnnecessarySupervisors;
     }
 
     public void setExtractSupervisor(boolean extract)
@@ -251,7 +253,7 @@ public final class SynthesizerOptions
         Config.SYNTHESIS_SYNTHESIS_TYPE.set(synthesisType);
         Config.SYNTHESIS_ALGORITHM_TYPE.set(synthesisAlgorithm);
         Config.SYNTHESIS_PURGE.set(purge);
-        Config.SYNTHESIS_OPTIMIZE.set(optimize);
+        Config.SYNTHESIS_OPTIMIZE.set(removeUnnecessarySupervisors);
         Config.SYNTHESIS_MAXIMALLY_PERMISSIVE.set(maximallyPermissive);
         Config.SYNTHESIS_MAXIMALLY_PERMISSIVE_INCREMENTAL.set(maximallyPermissiveIncremental);
         Config.SYNTHESIS_REDUCE_SUPERVISORS.set(reduceSupervisors);
@@ -275,7 +277,7 @@ public final class SynthesizerOptions
         SynthesizerOptions options = getDefaultSynthesizerOptions();
 		options.synthesisType = SynthesisType.NONBLOCKINGCONTROLLABLE;
         options.synthesisAlgorithm = SynthesisAlgorithm.MONOLITHIC;
-        options.optimize = false;
+        options.removeUnnecessarySupervisors = false;
         options.reduceSupervisors = false;
 
         return options;
