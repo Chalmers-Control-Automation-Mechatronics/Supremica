@@ -20,18 +20,18 @@ public class AOH_PCG
 	public void init(Automata a)
 		throws BDDException
 	{
-		Vector automata = a.getAutomata();
+		Vector<Automaton> automata = a.getAutomata();
 		PCG pcg = new PCG(automata);
 		int i = 0;
 
 		// get weights
-		for (Enumeration e = automata.elements(); e.hasMoreElements(); i++)
+		for (Enumeration<Automaton> e = automata.elements(); e.hasMoreElements(); i++)
 		{
-			Automaton a1 = (Automaton) e.nextElement();
+			Automaton a1 = e.nextElement();
 
 			for (int j = 0; j < i; j++)
 			{
-				Automaton a2 = (Automaton) automata.elementAt(j);
+				Automaton a2 = automata.elementAt(j);
 				int cc = a1.getCommunicationComplexity(a2);
 
 				if (cc != 0)
@@ -45,7 +45,7 @@ public class AOH_PCG
                 
                 
                 
-		int size = automata.size();
+/*		int size = automata.size();
                 //for dining philosopher
                 int temp = size/2;
                 int temp2 = 0;
@@ -62,6 +62,6 @@ public class AOH_PCG
                         temp = order[i]+1;
                     }
 		}
-                ////////////
+  */              ////////////
 	}
 }
