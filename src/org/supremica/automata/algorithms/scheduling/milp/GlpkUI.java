@@ -141,7 +141,7 @@ public class GlpkUI
         // The initial (precedence) constraints
         w.newLine();
         for (int[] constr : milpConstructor.getInitPrecConstraints())
-        {
+        {           
              w.write("initial_" + "r" + constr[0] + "_" + constr[1] + " : time[" +
                      constr[0] + ", " + constr[1] + "] >= deltaTime[" + constr[0] + ", " + constr[1] + "];\n");
         }
@@ -150,6 +150,20 @@ public class GlpkUI
         w.newLine();
         for (int[] constr : milpConstructor.getPrecConstraints())
         {
+            //test
+            int counter = 0;
+            java.util.Collection<int[]> activeAltVars = milpConstructor.getActiveAltPathVars(new int[]{constr[0], constr[1], constr[3]});
+            for (int[] altVar : activeAltVars)
+            {
+                w.write(
+                        "prec_" + "r" + constr[0] + "_" + constr[1] + "_" + constr[2] + "_" + counter++ + " : time[" +
+                     constr[0] + ", " + constr[2] + "] >= time[" + constr[0] + ", " + constr[1] +
+                     "] + deltaTime[" + constr[0] + ", " + constr[2] + "]" + 
+                     " - bigM*(1 - " +
+                     milpConstructor.makeAltPathsVariable(altVar[0], altVar[1], altVar[2]) +
+                     ") + epsilon;\n");
+            }
+            
              w.write("prec_" + "r" + constr[0] + "_" + constr[1] + "_" + constr[2] + " : time[" +
                      constr[0] + ", " + constr[2] + "] >= time[" + constr[0] + ", " + constr[1] +
                      "] + deltaTime[" + constr[0] + ", " + constr[2] + "] + epsilon;\n");
@@ -622,8 +636,16 @@ public class GlpkUI
             {
                 str = str.substring(str.indexOf("_r") + 2);
                 String strplantIndex = str.substring(0, str.indexOf("_"));
-                String strStartStateIndex = str.substring(str.indexOf("_") + 1, str.lastIndexOf("_"));
-                String strEndStateIndex = str.substring(str.lastIndexOf("_") + 1);
+                str = str.substring(str.indexOf("_") + 1);
+                String strStartStateIndex = str.substring(0, str.indexOf("_"));
+                str = str.substring(str.indexOf("_") + 1);
+                String strEndStateIndex = str;
+                int counterIndex = str.indexOf("_");
+                if (counterIndex > -1)
+                {
+                    strEndStateIndex = str.substring(0, counterIndex);
+                }
+                
                 if (strEndStateIndex.indexOf(" ") > -1)
                 {
                     strEndStateIndex = strEndStateIndex.substring(0, strEndStateIndex.indexOf(" "));

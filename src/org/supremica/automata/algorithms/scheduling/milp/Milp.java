@@ -136,6 +136,7 @@ public class Milp
      * [plant_time_index, from_state_index] - sum of alt.paths constraints <= 1.
      */
     private ArrayList<Constraint> altPathsConstraints = null;
+    private ArrayList<ArrayList<int[]>> newAltPathsConstraints = null;
     
     /**
      * The ArrayList containing mutex constraint objects.
@@ -662,6 +663,7 @@ public class Milp
         precConstraints = new ArrayList<int[]>();
         mutexConstraints = new ArrayList<Constraint>();
         altPathsConstraints = new ArrayList<Constraint>();
+        newAltPathsConstraints = new ArrayList<ArrayList<int[]>>();
         xorConstraints = new ArrayList<ArrayList<int[]>>();
         circularWaitConstraints = new ArrayList<CircularWaitConstraintBlock>();
         sharedEventConstraints = new ArrayList<ArrayList<ArrayList<ArrayList<int[]>>>>();
@@ -834,6 +836,26 @@ public class Milp
         theAutomata.addAutomata(externalSpecs);
         indexMap = new AutomataIndexMap(theAutomata);
         //updateGui(theAutomata); @Deprecated
+        
+        //temp
+        for (int i = 0; i < plants.size(); i++)
+        {
+            for (Iterator<State> stateIt = plants.getAutomatonAt(i).stateIterator(); stateIt.hasNext(); )
+            {
+                State state = stateIt.next();
+                Automaton plant = plants.getAutomatonAt(i);
+                System.out.println(state.getName() + " -> time[" + 
+                        indexMap.getAutomatonIndex(plant) + ", " + 
+                        indexMap.getStateIndex(plant, state) + "]");
+            }
+
+
+
+        }
+
+
+
+
         
         // Before constructing the MILP-formulation, ensure that the plants do not contain loops 
         // (throw exception if they do)
@@ -2737,7 +2759,10 @@ public class Milp
                         State nextState = nextStates.next();
                         int nextStateIndex = indexMap.getStateIndex(currPlant, nextState);
                         
-                        precConstraints.add(new int[]{i, currStateIndex, nextStateIndex});
+                        //test
+                        int eventIndex = indexMap.getEventIndex(currState.outgoingArcsIterator().next().getEvent());
+                        
+                        precConstraints.add(new int[]{i, currStateIndex, nextStateIndex, eventIndex});
                     }
 //                     // If there are two successors, add one alternative-path variable and corresponding constraint
 //                     else if (nbrOfOutgoingMultiArcs == 2)
@@ -2767,6 +2792,9 @@ public class Milp
                         int currAlternative = 0;
                         String sumConstraint = "";
                         
+                        //new 080529
+                        ArrayList<int[]> altPathInfo = new ArrayList<int[]>();
+                        
                         while (nextStates.hasNext())
                         {
                             State nextState = nextStates.next();
@@ -2774,6 +2802,9 @@ public class Milp
                             
                             String currAltPathsVariable = makeAltPathsVariable(i, currStateIndex, nextStateIndex);
                             sumConstraint += currAltPathsVariable + " + ";
+                            
+                            //new 080529
+                            altPathInfo.add(new int[]{i, currStateIndex, nextStateIndex});
                             
                             altPathVariablesStrArray.add(currAltPathsVariable); //TO BE DEPRECATED
 //                            altPathVariablesTree.add(new int[]{indexMap.getAutomatonIndex(currPlant),
@@ -2789,6 +2820,9 @@ public class Milp
                             
                             currAlternative++;
                         }
+                        
+                        //new 080529
+                        newAltPathsConstraints.add(altPathInfo);
                         
                         sumConstraint = sumConstraint.substring(0, sumConstraint.lastIndexOf("+")) + "= ";
                         
@@ -3158,6 +3192,11 @@ public class Milp
         return "r" + plantIndex + "_from_" + fromStateIndex + "_to_" + toStateIndex;
     }
     
+    public String makeTimeVariable(int plantIndex, int stateIndex)
+    {
+        return "time[" + plantIndex + ", " + stateIndex + "]";
+    }
+    
     /**
      *  Removes epsilons from the supplied time variable, by returning closest
      *  value that is smaller than time and cannot be affected by the sum of
@@ -3493,7 +3532,7 @@ public class Milp
      * @return  the collection of alt. path variables that correspond to the event
      *          actually occurring in stateIndex-state.
      */
-    private Collection<int[]> getActiveAltPathVars(int[] plantStateEvent)
+    public Collection<int[]> getActiveAltPathVars(int[] plantStateEvent)
     {
         if (plantStateEvent.length == 3)
         {
@@ -3613,8 +3652,11 @@ public class Milp
     }
     public ArrayList<Constraint> getAltPathsConstraints()
     {
-        int a = 0;
         return altPathsConstraints;
+    }
+    public ArrayList<ArrayList<int[]>> getNewAltPathsConstraints()
+    {
+        return newAltPathsConstraints;
     }
     public ArrayList<ArrayList<int[]>> getXorConstraints()
     {

@@ -79,20 +79,25 @@ public abstract class MpsUI
         // Map the variable names to an index
         for (int[] altPathVar : milpConstructor.getAltPathVaribles())
         {   
+            System.out.println("ap: X" + binVarIndexMap.size() + " : " + makeAltPathsVariableStr(altPathVar));
             binVarIndexMap.put(makeAltPathsVariableStr(altPathVar), binVarIndexMap.size());
         }
         for (String mutexVar : milpConstructor.getMutexVariables())
         {
+            System.out.println("mu: X" + binVarIndexMap.size() + " : " + mutexVar);
             binVarIndexMap.put(mutexVar, binVarIndexMap.size());
         }
         for (String internalPrecVar : milpConstructor.getInternalPrecVariables())
         {
+            System.out.println("ip: X" + binVarIndexMap.size() + " : " + internalPrecVar);
             binVarIndexMap.put(internalPrecVar, binVarIndexMap.size());
         } 
         for (int i = 0; i < milpConstructor.getDeltaTimes().length; i++)
         {
             for (int j = 0; j < milpConstructor.getDeltaTimes()[i].length; j++)
             {
+                System.out.println("T" + (timeVarIndexMap.size() + binVarIndexMap.size() + 1) + " : " + 
+                        "time[" + i + ", " + j + "]");
                 timeVarIndexMap.put("time[" + i + ", " + j + "]", 
                         timeVarIndexMap.size() + binVarIndexMap.size() + 1);
             }
@@ -131,15 +136,67 @@ public abstract class MpsUI
             varCoeffs[timeVarIndexMap.get("time[" + constr[0] + ", " + constr[1] + "]")].
                     add(new double[]{constraintCounter, 1});
             varCoeffs[timeVarIndexMap.get("time[" + constr[0] + ", " + constr[2] + "]")].
-                    add(new double[]{constraintCounter++, -1});
+                    add(new double[]{constraintCounter, -1});
+            //double rhs = -1 * (milpConstructor.getDeltaTimes()[constr[0]][constr[2]] + SchedulingConstants.EPSILON);
             bUpper.add(new Double(-1 * (milpConstructor.getDeltaTimes()[constr[0]][constr[2]] + SchedulingConstants.EPSILON)));
+            
+//            //test
+//            java.util.Collection<int[]> activeAltVars = milpConstructor.getActiveAltPathVars(new int[]{constr[0], constr[1], constr[3]});
+//            for (int[] altVar : activeAltVars)
+//            {
+//                int binVarIndex = binVarIndexMap.get(milpConstructor.makeAltPathsVariable(altVar[0], altVar[1], altVar[2]));
+//                System.out.println("counter = " + constraintCounter + "; found x" + binVarIndex);
+//                varCoeffs[binVarIndex].add(new double[]{constraintCounter, SchedulingConstants.BIG_M_VALUE});
+//            }
+//            if (activeAltVars.size() > 0)
+//            {
+//                System.out.println(SchedulingConstants.BIG_M_VALUE + " added to rhs");
+//                rhs += SchedulingConstants.BIG_M_VALUE;
+//            }
+            
+            //bUpper.add(new Double(rhs));
+            
+            constraintCounter++;
         }
         
         // The alternative paths constraints
-        for (Constraint constr : milpConstructor.getAltPathsConstraints())
+        for (ArrayList<int[]> constrBlock : milpConstructor.getNewAltPathsConstraints())
         {
-            processConstraintString(constr.getBody(), constraintCounter++);
+            for (int[] constr : constrBlock)
+            {
+                varCoeffs[timeVarIndexMap.get(milpConstructor.makeTimeVariable(
+                        constr[0], constr[1]))].add(new double[]{constraintCounter, 1});
+                varCoeffs[timeVarIndexMap.get(milpConstructor.makeTimeVariable(
+                        constr[0], constr[2]))].add(new double[]{constraintCounter, -1});
+                varCoeffs[binVarIndexMap.get(milpConstructor.makeAltPathsVariable(
+                        constr[0], constr[1], constr[2]))].add(
+                        new double[]{constraintCounter, SchedulingConstants.BIG_M_VALUE});
+                bUpper.add(new Double(SchedulingConstants.BIG_M_VALUE - SchedulingConstants.EPSILON - 
+                        milpConstructor.getDeltaTimes()[constr[0]][constr[2]]));
+                constraintCounter++;
+//            System.out.println("T" + timeVarIndexMap.get(milpConstructor.makeTimeVariable(
+//                    constr.getId()[0], constr.getId()[1])) + " -> 1 in R" + constraintCounter);
+//            System.out.println("T" + timeVarIndexMap.get(milpConstructor.makeTimeVariable(
+//                    constr.getId()[0], constr.getId()[2])) + " -> -1 in R" + constraintCounter);
+//            System.out.println("X" + binVarIndexMap.get(milpConstructor.makeAltPathsVariable(
+//                    constr.getId()[0], constr.getId()[1], constr.getId()[2])) + " -> bigM in R" + constraintCounter);
+//            System.out.println("<= bigM - epsilon - " + 
+//                    milpConstructor.getDeltaTimes()[constr.getId()[0]][constr.getId()[2]]);
+//            
+//            System.out.println("c_id = [" + constr.getId()[0] + " " + constr.getId()[1] + 
+//                    " " + constr.getId()[2] + "]");
+            //processConstraintString(constr.getBody(), constraintCounter++);
+            }
+            for (int[] constr : constrBlock)
+            {
+                varCoeffs[binVarIndexMap.get(milpConstructor.makeAltPathsVariable(
+                        constr[0], constr[1], constr[2]))].add(
+                        new double[]{constraintCounter, 1});
+            }
+            bUpper.add(new Double(1));
+            equalityRowIndices.add(constraintCounter++);
         }
+        
         
         // The mutex constraints
         for (Constraint constr : milpConstructor.getMutexConstraints())
@@ -560,6 +617,14 @@ public abstract class MpsUI
         int storedMultiplier = -1;
         boolean bigMMultiplication = false;
         boolean withinParenthesis = false;
+        
+        //temp
+        if (constraintCounter == 19)
+        {
+            System.out.println("str = " + str);
+        }
+        else
+            System.out.println(str);
 
         StringTokenizer tokenizer = new StringTokenizer(str);
         String varToken = "";
