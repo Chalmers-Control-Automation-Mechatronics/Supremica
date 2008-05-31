@@ -137,8 +137,22 @@ public abstract class MpsUI
                     add(new double[]{constraintCounter, 1});
             varCoeffs[timeVarIndexMap.get("time[" + constr[0] + ", " + constr[2] + "]")].
                     add(new double[]{constraintCounter, -1});
-            //double rhs = -1 * (milpConstructor.getDeltaTimes()[constr[0]][constr[2]] + SchedulingConstants.EPSILON);
-            bUpper.add(new Double(-1 * (milpConstructor.getDeltaTimes()[constr[0]][constr[2]] + SchedulingConstants.EPSILON)));
+            double rhs = -1 * (milpConstructor.getDeltaTimes()[constr[0]][constr[2]] + SchedulingConstants.EPSILON);
+            //bUpper.add(new Double(-1 * (milpConstructor.getDeltaTimes()[constr[0]][constr[2]] + SchedulingConstants.EPSILON)));
+            
+            if (constr.length > 3)
+            {
+                java.util.Collection<int[]> upstreamsAltPathVars = milpConstructor.getActiveAltPathVars(new int[]{constr[0], constr[1], constr[3]});
+                for (int[] altPathVar : upstreamsAltPathVars)
+                {
+                    varCoeffs[binVarIndexMap.get(milpConstructor.makeAltPathsVariable(altPathVar[0], altPathVar[1], altPathVar[2]))].
+                            add(new double[]{constraintCounter, SchedulingConstants.BIG_M_VALUE});
+                }
+                
+                rhs += upstreamsAltPathVars.size() * SchedulingConstants.BIG_M_VALUE;
+            }
+            
+            bUpper.add(new Double(rhs));
             
 //            //test
 //            java.util.Collection<int[]> activeAltVars = milpConstructor.getActiveAltPathVars(new int[]{constr[0], constr[1], constr[3]});

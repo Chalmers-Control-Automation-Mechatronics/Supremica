@@ -2675,7 +2675,7 @@ public class Milp
     }
     
     /****************************************************************************************/
-    /*                                 THE AUTOMATA-MILP-BRIDGE-METHODS                     */
+    /*                                 THE§ AUTOMATA-MILP-BRIDGE-METHODS                     */
     /****************************************************************************************/
     
     /**
@@ -2761,8 +2761,29 @@ public class Milp
                         
                         //test
                         int eventIndex = indexMap.getEventIndex(currState.outgoingArcsIterator().next().getEvent());
+                        int[] newConstraint = null;
                         
-                        precConstraints.add(new int[]{i, currStateIndex, nextStateIndex, eventIndex});
+                        //test contd.
+                        for (Iterator<State> prevStateIt = nextState.previousStateIterator(); prevStateIt.hasNext(); )
+                        {
+                            if (!currState.equalState(prevStateIt.next()))
+                            {
+                                newConstraint = new int[]{i, currStateIndex, nextStateIndex, eventIndex};
+                                break;
+                            }
+                        }
+                        if (newConstraint != null)
+                        {
+                            // If the next state is a convergence state for several paths, precConstraints contain the 
+                            // event index describing this path. This is used to construct constraints of the form
+                            // t_i >= t_j + T_i - M(1 - alpha_upstreams). Only one path is important at convergence. 
+                            precConstraints.add(newConstraint);
+                        }
+                        else
+                        {
+                            // precConstraints with 3 elements denote normal sequence, i.e. t_i >= t_j + T_i
+                            precConstraints.add(new int[]{i, currStateIndex, nextStateIndex});
+                        }
                     }
 //                     // If there are two successors, add one alternative-path variable and corresponding constraint
 //                     else if (nbrOfOutgoingMultiArcs == 2)
