@@ -146,7 +146,8 @@ public class Milp
      * which makes it possible to create unique headers for this constraint in the
      * language specific to some MILP-solver.
      */
-    private ArrayList<Constraint> mutexConstraints = null;
+//    private ArrayList<Constraint> mutexConstraints = null;
+    private ArrayList<int[]> mutexConstraints = null;
     
     private ArrayList<ArrayList<int[]>> xorConstraints = null;
     
@@ -661,7 +662,7 @@ public class Milp
         cycleTimeConstraints = new ArrayList<int[]>();
         initPrecConstraints = new ArrayList<int[]>();
         precConstraints = new ArrayList<int[]>();
-        mutexConstraints = new ArrayList<Constraint>();
+        mutexConstraints = new ArrayList<int[]>();
         altPathsConstraints = new ArrayList<Constraint>();
         newAltPathsConstraints = new ArrayList<ArrayList<int[]>>();
         xorConstraints = new ArrayList<ArrayList<int[]>>();
@@ -836,26 +837,6 @@ public class Milp
         theAutomata.addAutomata(externalSpecs);
         indexMap = new AutomataIndexMap(theAutomata);
         //updateGui(theAutomata); @Deprecated
-        
-        //temp
-        for (int i = 0; i < plants.size(); i++)
-        {
-            for (Iterator<State> stateIt = plants.getAutomatonAt(i).stateIterator(); stateIt.hasNext(); )
-            {
-                State state = stateIt.next();
-                Automaton plant = plants.getAutomatonAt(i);
-                System.out.println(state.getName() + " -> time[" + 
-                        indexMap.getAutomatonIndex(plant) + ", " + 
-                        indexMap.getStateIndex(plant, state) + "]");
-            }
-
-
-
-        }
-
-
-
-
         
         // Before constructing the MILP-formulation, ensure that the plants do not contain loops 
         // (throw exception if they do)
@@ -2675,7 +2656,7 @@ public class Milp
     }
     
     /****************************************************************************************/
-    /*                                 THE� AUTOMATA-MILP-BRIDGE-METHODS                     */
+    /*                                 THE� AUTOMATA-MILP-BRIDGE-METHODS                     */
     /****************************************************************************************/
     
     /**
@@ -2987,121 +2968,110 @@ public class Milp
                                 
                                 // Fills the map, that is used in restiction of cross-booking
                                 mutexVarCounterMap.put(new int[]{i, j1, j2, k1, k2}, new Integer(repeatedBooking));
+                                mutexVariables.add(makeMutexVariable(j1, j2, i, repeatedBooking));
                                 
-                                String currMutexVariable = "r" + j1 + "_books_z" + i + "_before_r" + j2 + "_var" + repeatedBooking;
-                                
-                                mutexVariables.add(currMutexVariable);
-                                
-                                //test
-                                ArrayList<int[]> bList = new ArrayList<int[]>();
-                                Automaton bPlant = indexMap.getAutomatonAt(j1);
-                                State bState = indexMap.getStateAt(bPlant, bookingTics[i][j1][STATE_SWITCH][k1]);
-                                LabeledEvent bEvent = indexMap.getEventAt(bookingTics[i][j1][EVENT_SWITCH][k1]);
-                                findNearestPathSplits(bPlant, bState.nextState(bEvent), bList, bEvent);
-                                
-                                //temp
-                                String bName = bEvent.getName();
-                                int sIndex = bookingTics[i][j1][STATE_SWITCH][k1];
-                                int pIndex = j1;
-                                int zIndex = i;
-                                int blistlength = bList.size();
-                                
-                                ArrayList<int[]> uList = new ArrayList<int[]>();
-                                Automaton uPlant = indexMap.getAutomatonAt(j2);
-                                State uState = indexMap.getStateAt(uPlant, unbookingTics[i][j2][STATE_SWITCH][k2]);
-                                LabeledEvent uEvent = indexMap.getEventAt(unbookingTics[i][j2][EVENT_SWITCH][k2]);
-                                findNearestPathSplits(uPlant, uState.nextState(uEvent), uList, uEvent);
-                                
-                                int totalNrOfPathSplits = 0;
-                                String altPathsCoupling = "";
-                                for (int[] bSplitState : bList)
-                                {
-                                    if (bSplitState[0] != NO_PATH_SPLIT_INDEX)
-                                    {
-                                        totalNrOfPathSplits++;
-                                        altPathsCoupling += " - " + makeAltPathsVariable(j1, bSplitState[0], bSplitState[1]);
-                                    }
-                                }
-                                for (int[] uSplitState : uList)
-                                {
-                                    if (uSplitState[0] != NO_PATH_SPLIT_INDEX)
-                                    {
-                                        totalNrOfPathSplits++;
-                                        altPathsCoupling += " - " + makeAltPathsVariable(j2, uSplitState[0], uSplitState[1]);
-                                    }
-                                }
-                                String mutexConstraintBody = "time[" + j1 + ", " + bookingTics[i][j1][STATE_SWITCH][k1] +
-                                        "] >= " + "time[" + j2 + ", " + unbookingTics[i][j2][STATE_SWITCH][k2] + "] - bigM*";
-                                if (totalNrOfPathSplits > 0)
-                                {
-                                    mutexConstraintBody += "(" + totalNrOfPathSplits + " + " + currMutexVariable + altPathsCoupling + ")";
-                                }
-                                else
-                                {
-                                    mutexConstraintBody += currMutexVariable;
-                                }
-                                mutexConstraintBody += " + epsilon";
-                                mutexConstraints.add(new Constraint(new int[]{i, j1, j2, repeatedBooking}, mutexConstraintBody));
-                                
-                                
-                                //test (forts...)
-                                bList = new ArrayList<int[]>();
-                                bPlant = uPlant;
-                                bState = indexMap.getStateAt(bPlant, bookingTics[i][j2][STATE_SWITCH][k2]);
-                                bEvent = indexMap.getEventAt(bookingTics[i][j2][EVENT_SWITCH][k2]);
-                                
-                                findNearestPathSplits(bPlant, bState.nextState(bEvent), bList, bEvent);
-                                uList = new ArrayList<int[]>();
-                                uPlant = indexMap.getAutomatonAt(j1);
-                                uState = indexMap.getStateAt(uPlant, unbookingTics[i][j1][STATE_SWITCH][k1]);
-                                uEvent = indexMap.getEventAt(unbookingTics[i][j1][EVENT_SWITCH][k1]);
-                                
-                                findNearestPathSplits(uPlant, uState.nextState(uEvent), uList, uEvent);
-                                totalNrOfPathSplits = 0;
-                                altPathsCoupling = "";
-                                for (int[] bSplitState : bList)
-                                {
-                                    if (bSplitState[0] != NO_PATH_SPLIT_INDEX)
-                                    {
-                                        totalNrOfPathSplits++;
-                                        altPathsCoupling += " - " + makeAltPathsVariable(j2, bSplitState[0], bSplitState[1]);
-                                    }
-                                }
-                                for (int[] uSplitState : uList)
-                                {
-                                    if (uSplitState[0] != NO_PATH_SPLIT_INDEX)
-                                    {
-                                        totalNrOfPathSplits++;
-                                        altPathsCoupling += " - " + makeAltPathsVariable(j1, uSplitState[0], uSplitState[1]);
-                                    }
-                                }
-                                mutexConstraintBody = "time[" + j2 + ", " + bookingTics[i][j2][STATE_SWITCH][k2] +
-                                        "] >= " + "time[" + j1 + ", " + unbookingTics[i][j1][STATE_SWITCH][k1] + "] - bigM*(";
-                                if (totalNrOfPathSplits > 0)
-                                {
-                                    mutexConstraintBody += (totalNrOfPathSplits+1) + " - " + currMutexVariable + altPathsCoupling + ")";
-                                }
-                                else
-                                {
-                                    mutexConstraintBody += "1 - " + currMutexVariable + ")";
-                                }
-                                mutexConstraintBody += " + epsilon";
-                                mutexConstraints.add(new Constraint(new int[]{i, j1, j2, repeatedBooking}, mutexConstraintBody));
-                                
-// Replace by the test above
-//                                String pathCutEnsurance = pathCutTable.get(indexMap.getStateAt(plants.getAutomatonAt(j1), k1));
-//                                if (pathCutEnsurance != null)
+//                                //test
+//                                ArrayList<int[]> bList = new ArrayList<int[]>();
+//                                Automaton bPlant = indexMap.getAutomatonAt(j1);
+//                                State bState = indexMap.getStateAt(bPlant, bookingTics[i][j1][STATE_SWITCH][k1]);
+//                                LabeledEvent bEvent = indexMap.getEventAt(bookingTics[i][j1][EVENT_SWITCH][k1]);
+//                                findNearestPathSplits(bPlant, bState.nextState(bEvent), bList, bEvent);
+//                                
+//                                //temp
+//                                String bName = bEvent.getName();
+//                                int sIndex = bookingTics[i][j1][STATE_SWITCH][k1];
+//                                int pIndex = j1;
+//                                int zIndex = i;
+//                                int blistlength = bList.size();
+//                                
+//                                ArrayList<int[]> uList = new ArrayList<int[]>();
+//                                Automaton uPlant = indexMap.getAutomatonAt(j2);
+//                                State uState = indexMap.getStateAt(uPlant, unbookingTics[i][j2][STATE_SWITCH][k2]);
+//                                LabeledEvent uEvent = indexMap.getEventAt(unbookingTics[i][j2][EVENT_SWITCH][k2]);
+//                                findNearestPathSplits(uPlant, uState.nextState(uEvent), uList, uEvent);
+//                                
+//                                int totalNrOfPathSplits = 0;
+//                                String altPathsCoupling = "";
+//                                for (int[] bSplitState : bList)
 //                                {
-//                                    mutexConstraints += " - bigM*" + pathCutEnsurance;
+//                                    if (bSplitState[0] != NO_PATH_SPLIT_INDEX)
+//                                    {
+//                                        totalNrOfPathSplits++;
+//                                        altPathsCoupling += " - " + makeAltPathsVariable(j1, bSplitState[0], bSplitState[1]);
+//                                    }
 //                                }
-//                                mutexConstraints += ";\n";
-//                                mutexConstraints += "dual_mutex_z" + i + "_r" + j1 + "_r" + j2  + "_var" + repeatedBooking + " : time[" + j2 + ", " + bookingTics[i][j2][STATE_SWITCH][k2] + "] >= " + "time[" + j1 + ", " + unbookingTics[i][j1][STATE_SWITCH][k1] + "] - bigM*(1 - " + currMutexVariable + ")" + " + " + SchedulingConstants.EPSILON;
-//                                pathCutEnsurance = pathCutTable.get(indexMap.getStateAt(plants.getAutomatonAt(j2), k2));
-//                                if (pathCutEnsurance != null)
+//                                for (int[] uSplitState : uList)
 //                                {
-//                                    mutexConstraints += " - bigM*" + pathCutEnsurance;
+//                                    if (uSplitState[0] != NO_PATH_SPLIT_INDEX)
+//                                    {
+//                                        totalNrOfPathSplits++;
+//                                        altPathsCoupling += " - " + makeAltPathsVariable(j2, uSplitState[0], uSplitState[1]);
+//                                    }
 //                                }
-//                                mutexConstraints += ";\n";
+//                                String mutexConstraintBody = "time[" + j1 + ", " + bookingTics[i][j1][STATE_SWITCH][k1] +
+//                                        "] >= " + "time[" + j2 + ", " + unbookingTics[i][j2][STATE_SWITCH][k2] + "] - bigM*";
+//                                if (totalNrOfPathSplits > 0)
+//                                {
+//                                    mutexConstraintBody += "(" + totalNrOfPathSplits + " + " + currMutexVariable + altPathsCoupling + ")";
+//                                }
+//                                else
+//                                {
+//                                    mutexConstraintBody += currMutexVariable;
+//                                }
+//                                mutexConstraintBody += " + epsilon";
+//                                mutexConstraints.add(new Constraint(new int[]{i, j1, j2, repeatedBooking}, mutexConstraintBody));
+//                                
+                                //TODO: Ta fram passande och snäva bigM utifrån planttiderna
+                                mutexConstraints.add(new int[]{
+                                    j1, bookingTics[i][j1][STATE_SWITCH][k1], bookingTics[i][j1][EVENT_SWITCH][k1], 
+                                    unbookingTics[i][j1][STATE_SWITCH][k1], unbookingTics[i][j1][EVENT_SWITCH][k1],
+                                    j2, bookingTics[i][j2][STATE_SWITCH][k2], bookingTics[i][j2][EVENT_SWITCH][k2], 
+                                    unbookingTics[i][j2][STATE_SWITCH][k2], unbookingTics[i][j2][EVENT_SWITCH][k2], 
+                                    i, repeatedBooking});
+                                
+//                                //test (forts...)
+//                                bList = new ArrayList<int[]>();
+//                                bPlant = uPlant;
+//                                bState = indexMap.getStateAt(bPlant, bookingTics[i][j2][STATE_SWITCH][k2]);
+//                                bEvent = indexMap.getEventAt(bookingTics[i][j2][EVENT_SWITCH][k2]);
+//                                
+//                                findNearestPathSplits(bPlant, bState.nextState(bEvent), bList, bEvent);
+//                                uList = new ArrayList<int[]>();
+//                                uPlant = indexMap.getAutomatonAt(j1);
+//                                uState = indexMap.getStateAt(uPlant, unbookingTics[i][j1][STATE_SWITCH][k1]);
+//                                uEvent = indexMap.getEventAt(unbookingTics[i][j1][EVENT_SWITCH][k1]);
+//                                
+//                                findNearestPathSplits(uPlant, uState.nextState(uEvent), uList, uEvent);
+//                                totalNrOfPathSplits = 0;
+//                                altPathsCoupling = "";
+//                                for (int[] bSplitState : bList)
+//                                {
+//                                    if (bSplitState[0] != NO_PATH_SPLIT_INDEX)
+//                                    {
+//                                        totalNrOfPathSplits++;
+//                                        altPathsCoupling += " - " + makeAltPathsVariable(j2, bSplitState[0], bSplitState[1]);
+//                                    }
+//                                }
+//                                for (int[] uSplitState : uList)
+//                                {
+//                                    if (uSplitState[0] != NO_PATH_SPLIT_INDEX)
+//                                    {
+//                                        totalNrOfPathSplits++;
+//                                        altPathsCoupling += " - " + makeAltPathsVariable(j1, uSplitState[0], uSplitState[1]);
+//                                    }
+//                                }
+//                                mutexConstraintBody = "time[" + j2 + ", " + bookingTics[i][j2][STATE_SWITCH][k2] +
+//                                        "] >= " + "time[" + j1 + ", " + unbookingTics[i][j1][STATE_SWITCH][k1] + "] - bigM*(";
+//                                if (totalNrOfPathSplits > 0)
+//                                {
+//                                    mutexConstraintBody += (totalNrOfPathSplits+1) + " - " + currMutexVariable + altPathsCoupling + ")";
+//                                }
+//                                else
+//                                {
+//                                    mutexConstraintBody += "1 - " + currMutexVariable + ")";
+//                                }
+//                                mutexConstraintBody += " + epsilon";
+//                                mutexConstraints.add(new Constraint(new int[]{i, j1, j2, repeatedBooking}, mutexConstraintBody));
                             }
                         }
                     }
@@ -3216,6 +3186,11 @@ public class Milp
     public String makeTimeVariable(int plantIndex, int stateIndex)
     {
         return "time[" + plantIndex + ", " + stateIndex + "]";
+    }
+    
+    public String makeMutexVariable(int r1, int r2, int z, int var)
+    {
+        return "r" + r1 + "_books_z" + z + "_before_r" + r2 + "_var" + var;
     }
     
     /**
@@ -3667,7 +3642,7 @@ public class Milp
     {
         return precConstraints;
     }
-    public ArrayList<Constraint> getMutexConstraints()
+    public ArrayList<int[]> getMutexConstraints()
     {
         return mutexConstraints;
     }

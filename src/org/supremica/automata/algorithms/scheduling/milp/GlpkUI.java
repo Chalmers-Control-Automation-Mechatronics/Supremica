@@ -152,21 +152,25 @@ public class GlpkUI
         {
             //test
             int counter = 0;
-            java.util.Collection<int[]> activeAltVars = milpConstructor.getActiveAltPathVars(new int[]{constr[0], constr[1], constr[3]});
-            for (int[] altVar : activeAltVars)
-            {
-                w.write(
-                        "prec_" + "r" + constr[0] + "_" + constr[1] + "_" + constr[2] + "_" + counter++ + " : time[" +
-                     constr[0] + ", " + constr[2] + "] >= time[" + constr[0] + ", " + constr[1] +
-                     "] + deltaTime[" + constr[0] + ", " + constr[2] + "]" + 
-                     " - bigM*(1 - " +
-                     milpConstructor.makeAltPathsVariable(altVar[0], altVar[1], altVar[2]) +
-                     ") + epsilon;\n");
-            }
             
-             w.write("prec_" + "r" + constr[0] + "_" + constr[1] + "_" + constr[2] + " : time[" +
-                     constr[0] + ", " + constr[2] + "] >= time[" + constr[0] + ", " + constr[1] +
-                     "] + deltaTime[" + constr[0] + ", " + constr[2] + "] + epsilon;\n");
+            if (constr.length > 3)
+            {
+                for (int[] altVar : milpConstructor.getActiveAltPathVars(new int[]{constr[0], constr[1], constr[3]}))
+                {
+                    w.write("prec_" + "r" + constr[0] + "_" + constr[1] + "_" + constr[2] + "_" + counter++ + " : " + 
+                            "time[" + constr[0] + ", " + constr[2] + "] >= " + 
+                            " time[" + constr[0] + ", " + constr[1] + "] + " + 
+                            "deltaTime[" + constr[0] + ", " + constr[2] + "]" + " - bigM*(1 - " +
+                            milpConstructor.makeAltPathsVariable(altVar[0], altVar[1], altVar[2]) +
+                            ") + epsilon;\n");
+                }
+            }
+            else
+            {
+                w.write("prec_" + "r" + constr[0] + "_" + constr[1] + "_" + constr[2] + " : time[" +
+                        constr[0] + ", " + constr[2] + "] >= time[" + constr[0] + ", " + constr[1] +
+                        "] + deltaTime[" + constr[0] + ", " + constr[2] + "] + epsilon;\n");
+            }
         }
 
         // The alternative paths constraints
@@ -189,23 +193,50 @@ public class GlpkUI
         }
 
         // The mutex constraints
-        w.newLine();
-        int counter = 0;
-        for (Constraint constr : milpConstructor.getMutexConstraints())
+        w.newLine();       
+        for (int[] constr : milpConstructor.getMutexConstraints())
         {
-            if (Math.IEEEremainder(counter++, 2) != 0)
+            // Find all active alt path variables for this b1u1-b2u2-pair
+            String allActiveAltVarsStr = "";
+            int convergingStatesCounter = 0;
+            for (int i=0; i<6; i+=5)
             {
-                w.write("dual_");
+                for (int j=i+1; j<i+5; j+=2)
+                {
+                    java.util.Collection<int[]> currActiveVars = milpConstructor.getActiveAltPathVars(
+                            new int[]{constr[i], constr[j], constr[j+1]});
+                    if (currActiveVars.size() > 0)
+                    {
+                        convergingStatesCounter++;                      
+                        for (int[] altVar : currActiveVars)
+                        {
+                            allActiveAltVarsStr += " - " + milpConstructor.makeAltPathsVariable(altVar[0], altVar[1], altVar[2]);
+                        }
+                    }
+                }
             }
 
-            int[] constrId = constr.getId();
-            w.write("mutex_z" + constrId[0] + "_r" + constrId[1] + "_r" + constrId[2] +
-                    "_var" + constrId[3] + " : " + constr.getBody() + ";\n");
+            w.write("mutex_z" + constr[10] + "_r" + constr[0] + "_r" + constr[5] + "_var" + constr[11] + " : " + 
+                    milpConstructor.makeTimeVariable(constr[0], constr[1]) + " >= " +
+                    milpConstructor.makeTimeVariable(constr[5], constr[8]) + " + epsilon - bigM * (" +
+                    convergingStatesCounter + allActiveAltVarsStr + " + " + 
+                    milpConstructor.makeMutexVariable(constr[0], constr[5], constr[10], constr[11]) + ");\n");
+            w.write("dual_mutex_z" + constr[10] + "_r" + constr[0] + "_r" + constr[5] + "_var" + constr[11] + " : " + 
+                    milpConstructor.makeTimeVariable(constr[5], constr[6]) + " >= " +
+                    milpConstructor.makeTimeVariable(constr[0], constr[3]) + " + epsilon - bigM * (" +
+                    (1 + convergingStatesCounter) + allActiveAltVarsStr + " - " + 
+                    milpConstructor.makeMutexVariable(constr[0], constr[5], constr[10], constr[11]) + ");\n");
+            if (convergingStatesCounter > 0)
+            {
+                w.write("mutex_var_limit_z" + constr[10] + "_r" + constr[0] + "_r" + constr[5] + "_var" + constr[11] + " : " + 
+                        "-" + milpConstructor.makeMutexVariable(constr[0], constr[5], constr[10], constr[11]) + " >= " + 
+                        1.0 / convergingStatesCounter + " * (" + allActiveAltVarsStr + ");\n");
+            }
         }
 
         // The constraints due to external specifications
         w.newLine();
-        counter = 0;
+        int counter = 0;
         for (ArrayList<int[]> xorConstraintsBlock : milpConstructor.getXorConstraints())
         {
             w.write("xor_" + counter++ + " : ");
