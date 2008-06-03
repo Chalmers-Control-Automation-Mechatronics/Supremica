@@ -140,7 +140,7 @@ class ModelMaker
         {
 			Logger.output(Logger.ERROR, "ERROR: No system file specified!");
 			Logger.output(Logger.ERROR);
-            Logger.output(Logger.ERROR, "Usage: ModelMaker [-d] [-q] [-p] [-e] [ [-m 'd' [-im int] [-ix int] [-ip int] [-jp int] [-ep int]] | [-m 's'] ] [-o outputFileName] [-lb libraryPathBase] [-lp libraryDirectory]... systemFile");
+            Logger.output(Logger.ERROR, "Usage: ModelMaker [-d (debug info)] [-q (quiet)] [-p (generate models as plants)] [-e (expand transitions (deprecated))] [-im int (int var min)] [-ix int (int var max)] [-m 'd' (dual exec model (deprecated)) | -m 's' (seq exec model (default))] [-ip int (instance q places)] [-ep int (event q places)] [-jp int (job q places (deprecated))] [-o outputFileName] [-lb libraryPathBase] [-lp libraryDirectory]... systemFile");
             return;
         }
 		
