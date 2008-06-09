@@ -12,7 +12,8 @@ import java.util.List;
 import java.util.LinkedList;
 import java.io.File;
 
-import org.supremica.external.processeditor.tools.dop2efa.*;
+import org.supremica.external.avocades.common.Module;
+import org.supremica.external.avocades.dop2efa.*;
 import org.supremica.manufacturingTables.xsd.processeditor.*;
 
 public class TestDOPtoEFA extends TestCase{

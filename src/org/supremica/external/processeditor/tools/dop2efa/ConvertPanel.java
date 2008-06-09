@@ -1,4 +1,4 @@
-package org.supremica.external.processeditor.tools.specificationsynthes;
+package org.supremica.external.processeditor.tools.dop2efa;
 
 import java.io.*;
 import java.util.List;
@@ -8,32 +8,16 @@ import java.awt.event.*;
 
 import javax.swing.*;
 
-import org.jdom.Document;
-import org.jdom.output.XMLOutputter;
-
-import org.supremica.manufacturingTables.xsd.processeditor.ROP;
-import org.supremica.manufacturingTables.xsd.eop.EOP;
-import org.supremica.manufacturingTables.xsd.eop.Operation;
-import org.supremica.manufacturingTables.xsd.il.IL;
-
-
 import org.supremica.external.avocades.common.Module;
 import org.supremica.external.avocades.dop2efa.DOPtoEFA;
-import org.supremica.external.avocades.specificationsynthesis.ConverterILtoAutomata;
-import org.supremica.external.avocades.specificationsynthesis.SpecificationSynthesInputBuilder;
-
-import org.supremica.external.processeditor.xml.Loader;
 
 public class ConvertPanel 
 					extends JPanel 
-							implements 
-							    ActionListener
-{
+							implements ActionListener {
 	
-	private static final String XML_EXTENSION = ".xml";
 	private static final String WATER_MODULE_EXTENSION = ".wmod";
 	
-	private TablePane leftPane;
+	private ROPtablePane leftPane;
 	private JPanel rigthPane;
 	private JPanel bottomRigthPane;
 	
@@ -56,29 +40,29 @@ public class ConvertPanel
     
     //constructor
     public ConvertPanel() {
-        super( new GridLayout(0,2) );
+        super(new GridLayout(0,2));
         
-        leftPane = new TablePane();
-    	rigthPane = new JPanel( new GridLayout(2,0) );
+        leftPane = new ROPtablePane();
+    	rigthPane = new JPanel(new GridLayout(2,0));
     	
     	bottomRigthPane = new JPanel();
     	
     	outputPane = new FilePathPane();
-    	outputPane.setFileExtension("");
+    	outputPane.setFileExtension(WATER_MODULE_EXTENSION);
     	
     	configPane = new ParameterPane();
     	buttonPane = new JPanel();
     	
     	moduleNamePane  = new JPanel();
-    	tfModuleName = new JTextField( 10 );
-    	tfModuleName.setText( "Module" );
+    	tfModuleName = new JTextField(10);
+    	tfModuleName.setText("Module");
     	
         leftPane.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createTitledBorder("Specification files"),
+                BorderFactory.createTitledBorder("SOC files"),
                 BorderFactory.createEmptyBorder(5,5,5,5)));
         
         outputPane.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createTitledBorder("Output folder"),
+                BorderFactory.createTitledBorder("Output file"),
                 BorderFactory.createEmptyBorder(5,5,5,5)));
         
         configPane.setBorder(BorderFactory.createCompoundBorder(
@@ -130,7 +114,7 @@ public class ConvertPanel
     }
     
     public void setOutputFileChooser(JFileChooser fc) {
-    	outputPane.setFileChooser( fc );
+    	outputPane.setFileChooser(fc);
     }
     
     public void addActionListener(ActionListener l) {
@@ -153,11 +137,7 @@ public class ConvertPanel
         Object o = evt.getSource();
         
         if(o == jbToFile){
-        	if( checkInputToConvertAndInformUser() ){
-        		buildDOPtoEFA();
-            	buildSpecificationSynthes();
-        	}
-        	
+        	convert();
         }else if(o == jbExit){
         	if(l != null){
         		l.actionPerformed(new ActionEvent(o,0,EXIT));
@@ -167,155 +147,37 @@ public class ConvertPanel
         }
     }
     
-    private void buildDOPtoEFA() {
+    private void convert(){
     	
-    	String outFile = "";
-    	String moduleName = "";
+    	String outFile;
+    	String moduleName;
     	
-    	Module mod = null;
+    	List<String> filePathList;
     	
-    	List<String> filePathList = null;
-    	
-    	filePathList = ((TablePane)leftPane).getMarkedFilePathList();
-    	moduleName = tfModuleName.getText();
-    	
-    	outFile = ((FilePathPane)outputPane).getFilePath()
-    	          + System.getProperty("file.separator")
-    	          + moduleName 
-    	          + WATER_MODULE_EXTENSION;
-    	
-    	
-    	
-    	//convert
-    	mod = DOPtoEFA.buildModule(filePathList,
+    	if(checkInputToConvertAndInformUser()){
+    		filePathList = ((ROPtablePane)leftPane).getMarkedFilePathList();
+    		outFile = ((FilePathPane)outputPane).getFilePath();
+    		moduleName = tfModuleName.getText();
+    		
+    		//convert
+    		Module mod = DOPtoEFA.buildModule(filePathList,
     							 moduleName,
     							 configPane.getValueOption("block"));
-    	if( mod != null ){
-    		mod.writeToFile( new File( outFile ) );
-    	}else{
-    		JOptionPane.
+    		if(mod != null){
+    			mod.writeToFile(new File(outFile));
+    		}else{
+    			JOptionPane.
 				showMessageDialog(dialogReferenceFrame,
 								  "Couldn't create module",
 								  "Problem",
 								  JOptionPane.ERROR_MESSAGE);
-    	}
-    }
-    
-    /**
-     * 1. Opens all files and gets EOP and IL objects
-     * 
-     * 2. Merge all EOP and IL objects to a single Document
-     * 
-     * 3. Convert Document to automata
-     */
-    private void buildSpecificationSynthes() {
-    	
-    	Object o = null;
-    	String outFile = "";
-    	String moduleName = "";
-    	
-    	ConverterILtoAutomata convAut = null;
-    	SpecificationSynthesInputBuilder builder = null;
-    	Loader loader = null;
-    	
-    	List<String> filePathList = null;
-    	
-    	//init
-    	loader = new Loader();
-    	builder = new SpecificationSynthesInputBuilder();
-    	filePathList = ((TablePane)leftPane).getMarkedFilePathList();
-    	
-    	moduleName = tfModuleName.getText();
-    	
-    	outFile = ((FilePathPane)outputPane).getFilePath()
-    	          + System.getProperty("file.separator")
-    	          + moduleName
-    	          + XML_EXTENSION;
-    	
-    	if( null == filePathList || 0 == filePathList.size()){
-    		return;
-    	}
-    		
-    	/*
-    	 * 
-    	 *  1. Opens all files and gets EOP and IL objects
-    	 * 
-    	 */
-    	for( String filePath : filePathList ){
-    			
-    		o = loader.open( new File( filePath ) );
-    			
-    		/*
-        	 * 
-        	 *  2. Merge all EOP and IL objects to a single Document
-        	 * 
-        	 */
-            if( o instanceof Operation ){
-    			builder.add( ((Operation)o).getEOP() );
-    		}else if( o instanceof EOP ){
-    			builder.add( (EOP)o );
-    		}else if( o instanceof IL ){
-    			builder.add( (IL)o );
-    		}else if( o instanceof ROP ){
-    			//do nothing with ROP
-    		}else{
-    			JOptionPane.
-    				showMessageDialog(dialogReferenceFrame,
-    								  "Unknown object in " + filePath,
-    								  "Problem",
-    								  JOptionPane.ERROR_MESSAGE);
     		}
     	}
-    	
-    	//debug
-    	//Save document for debug purpose
-    	saveDocument(builder.getDoc(), outFile + "_" );
-    	//debug
-    	
-    	/*
-    	 * 
-    	 *  3. Convert Document to automata 
-    	 * 
-    	 */
-    	convAut = new ConverterILtoAutomata();
-		convAut.convertILtoAutomata( builder.getDoc() );		
-		saveDocument( convAut.getDoc(), outFile );
-    		
     }
-    
-    /**
-     * 
-     * @param document
-     * @param filePath
-     */
-    private void saveDocument( Document document, String filePath ){
-    	
-		try{
-			XMLOutputter outp = new XMLOutputter();
-			outp.setFormat( org.jdom.output.Format.getPrettyFormat() );
-
-			FileOutputStream fileStream = new FileOutputStream( filePath );
-
-			outp.output( document, fileStream );
-		}
-		catch ( FileNotFoundException e ) {
-			System.out.println( "No file" );
-		}
-		catch ( IOException e ) {
-			;
-		}
-	}
-    
-    
-    
-    
-    
-    
-    
     
     private boolean checkInputToConvertAndInformUser(){
     	
-    	TablePane ropTablePane;
+    	ROPtablePane ropTablePane;
     	
     	String noFileTitle = "No rop";
     	String noFileMessage = "No rop to convert";
@@ -332,12 +194,12 @@ public class ConvertPanel
     	/*
     	 * Do we have somewhere to get files from
     	 */
-    	if(!(leftPane instanceof TablePane)){
+    	if(!(leftPane instanceof ROPtablePane)){
     		System.err.println("No ROPtablePane");
     		return false;
     	}
     	
-    	ropTablePane = (TablePane) leftPane;
+    	ropTablePane = (ROPtablePane) leftPane;
     	
     	/*
     	 * Do we have some files

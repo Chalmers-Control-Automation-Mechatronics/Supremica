@@ -27,7 +27,7 @@ import org.jdom.*;
 import org.jdom.input.SAXBuilder;
 import org.jdom.output.*;*/
 
-import org.supremica.external.specificationSynthesis.algorithms.*;
+import org.supremica.external.avocades.specificationsynthesis.*;
 
 
 public class ToolBar extends JPanel {

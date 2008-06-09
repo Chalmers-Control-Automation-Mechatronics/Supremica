@@ -65,6 +65,7 @@ public class EOPInfoWindow
     
     
     private static final String EOP_ID = "Id:";
+    private static final String COMMENT = "Comment:";
     private static final String ALARMDELAY = "Alarm delay:";
     private static final String ALARMTYPE = "Alarm type:";
     
@@ -134,11 +135,14 @@ public class EOPInfoWindow
     	
     	textInputPane = new TextInputPane(null,
     			                          new String[]{EOP_ID,
+    			                                       COMMENT,
     			                                       ALARMTYPE,
     			                                       ALARMDELAY});
     	
     	//Get value from EOP
-    	textInputPane.setText(EOP_ID, eop.getId());
+    	textInputPane.setText( EOP_ID, eop.getId() );
+    	textInputPane.setText( COMMENT, eop.getComment() );
+    	
     	if( null != eop.getInitialState() ){
     		if( null != eop.getInitialState().getInitialStateCheck() ){
     			textInputPane.setText(ALARMDELAY,
@@ -342,7 +346,8 @@ public class EOPInfoWindow
     	this.eop = eop;
     	
     	//Get value from EOP
-    	textInputPane.setText(EOP_ID, eop.getId());
+    	textInputPane.setText(EOP_ID, eop.getId() );
+    	textInputPane.setText(COMMENT, eop.getComment() );
     	
     	if( null != eop.getInitialState() ){
     		if( null != eop.getInitialState().getInitialStateCheck() ){
@@ -374,6 +379,8 @@ public class EOPInfoWindow
     	//Attributes
     	//---------------------------------------------------------------------
     	eop.setId( textInputPane.getText( EOP_ID ) );
+    	
+    	eop.setComment( textInputPane.getText( COMMENT ) );
     	
     	//---------------------------------------------------------------------
     	//External components
@@ -415,7 +422,10 @@ public class EOPInfoWindow
     		initial.getZoneState().add(val);
     	}
     	
-    	ExternalComponentValue[] extCompVal = ((EOPTableGroupPane)tableGroup).getExternalComponentsInitialValue();
+    	ExternalComponentValue[] extCompVal = 
+    		                       ((EOPTableGroupPane)tableGroup)
+    		                              .getExternalComponentsInitialValue();
+    	
     	for(int i = 0; i < extCompVal.length; i++){
     		initial.getExternalComponentValue().add(extCompVal[i]);
     	}
@@ -437,35 +447,35 @@ public class EOPInfoWindow
     	}
     }
     
-    public void actionPerformed(ActionEvent e){
+    public void actionPerformed( ActionEvent e ){
     	
     	//--------------------------------------
     	//	Buttons
     	//--------------------------------------
-    	if( e.getSource().equals(jbOk) ){
+    	if( e.getSource().equals( jbOk ) ){
     		
     		updateEOP();
     		
-    		if(null != eopCell){
-    			eopCell.setEOP(eop);
+    		if( null != eopCell ){
+    			eopCell.setEOP( eop );
     		}
     		
-    		setVisible(false);
+    		setVisible( false );
     		dispose();
     		
-    	}else if(e.getSource().equals(jbCancel)){
+    	}else if( e.getSource().equals( jbCancel ) ){
     		
-    		setVisible(false);
+    		setVisible( false );
     		dispose();
     		
-    	}else if(e.getSource().equals(jbAction)){
+    	}else if( e.getSource().equals( jbAction ) ){
     		tableGroup.addActionRow();
     	}
     	
     	//----------------------------------------
     	//	MenuItems
     	//----------------------------------------
-    	if(e.getSource() instanceof JMenuItem){
+    	if( e.getSource() instanceof JMenuItem ){
     		if( e.getSource().equals( jmiSave) ){
     			save();
     		}else if( e.getSource().equals( jmiSaveAs )){

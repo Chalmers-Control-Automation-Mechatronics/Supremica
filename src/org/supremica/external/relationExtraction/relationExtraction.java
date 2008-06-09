@@ -5,7 +5,8 @@ import javax.swing.*;
 import javax.swing.event.*;
 
 import java.util.*;
-import org.supremica.external.relationExtraction.Algorithms.*;
+
+import org.supremica.external.avocades.relationextraction.*;
 import org.supremica.external.relationExtraction.Gui.*;
 
 public class relationExtraction extends JFrame {

@@ -11,7 +11,7 @@ import org.supremica.testhelpers.*;
 import java.util.List;
 import java.util.Random;
 
-import org.supremica.external.processeditor.tools.dop2efa.Module;
+import org.supremica.external.avocades.common.Module;
 import org.supremica.manufacturingTables.xsd.processeditor.*;
 
 public class TestModule extends TestCase{

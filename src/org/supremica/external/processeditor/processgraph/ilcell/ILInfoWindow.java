@@ -32,8 +32,8 @@ import org.supremica.external.processeditor.processgraph.table.TextInputPane;
 import org.supremica.external.processeditor.xml.Loader;
 
 //static import
-import static org.supremica.external.specificationSynthesis.algorithms.SpecificationSynthesXML.OPERATION_IL;
-import static org.supremica.external.specificationSynthesis.algorithms.SpecificationSynthesXML.EVENT_IL;
+import static org.supremica.external.avocades.xml.SpecificationSynthesXML.EVENT_IL;
+import static org.supremica.external.avocades.xml.SpecificationSynthesXML.OPERATION_IL;
 
 /**
  * Displays the operation info window, which allow the user to edit 

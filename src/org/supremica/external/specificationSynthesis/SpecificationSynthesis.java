@@ -5,7 +5,8 @@ import javax.swing.*;
 import javax.swing.event.*;
 
 import java.util.*;
-import org.supremica.external.specificationSynthesis.algorithms.*;
+
+import org.supremica.external.avocades.specificationsynthesis.*;
 import org.supremica.external.specificationSynthesis.gui.*;
 
 

@@ -39,7 +39,7 @@ import org.supremica.manufacturingTables.xsd.eop.Operation;
 import org.supremica.external.processeditor.xml.Converter;
 
 import org.supremica.external.processeditor.tools.db.DBInterface;
-import org.supremica.external.processeditor.tools.dop2efa.gui.DOPtoEFAInterface;
+import org.supremica.external.processeditor.tools.dop2efa.DOPtoEFAInterface;
 import org.supremica.external.processeditor.tools.specificationsynthes.SpecificationSynthesInterface;
 
 /**

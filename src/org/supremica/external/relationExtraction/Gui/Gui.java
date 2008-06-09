@@ -16,7 +16,7 @@ import org.jdom.output.*;
 
 
 
-import org.supremica.external.relationExtraction.Algorithms.*;
+import org.supremica.external.avocades.relationextraction.*;
 
 
 public class Gui extends JFrame implements ActionListener{
