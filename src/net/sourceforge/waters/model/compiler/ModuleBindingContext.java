@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.compiler
 //# CLASS:   ModuleBindingContext
 //###########################################################################
-//# $Id: ModuleBindingContext.java,v 1.2 2008-06-10 08:30:42 robi Exp $
+//# $Id: ModuleBindingContext.java,v 1.3 2008-06-10 18:56:29 robi Exp $
 //###########################################################################
 
 
@@ -77,8 +77,7 @@ public class ModuleBindingContext implements BindingContext
   }
 
   /**
-   * Gets the prefix attached to be attached to all identifiers in the
-   * compiled module.
+   * Gets the prefix attached to all identifiers in the compiled module.
    * @return An {@link IdentifierProxy} encoding the prefix, or
    *         <CODE>null</CODE>, if the module was not obtained by
    *         instantiation.
