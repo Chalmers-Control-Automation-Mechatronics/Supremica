@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.compiler
 //# CLASS:   ModuleBindingContext
 //###########################################################################
-//# $Id: ModuleBindingContext.java,v 1.1 2008-03-17 02:08:21 robi Exp $
+//# $Id: ModuleBindingContext.java,v 1.2 2008-06-10 08:30:42 robi Exp $
 //###########################################################################
 
 
@@ -49,7 +49,7 @@ public class ModuleBindingContext implements BindingContext
     mMap = new HashMap<String,SimpleExpressionProxy>();
     mModule = module;
     mPrefix = prefix;
-    mModuleSource = info;
+    mInstanceSource = info;
   }
 
 
@@ -96,9 +96,9 @@ public class ModuleBindingContext implements BindingContext
    *         InstanceProxy}, or <CODE>null</CODE>, if the module was not
    *         obtained by instantiation.
    */
-  public SourceInfo getModuleSource()
+  public SourceInfo getInstanceSource()
   {
-    return mModuleSource;
+    return mInstanceSource;
   }
 
 
@@ -115,7 +115,7 @@ public class ModuleBindingContext implements BindingContext
   private final Map<String,SimpleExpressionProxy> mMap;
   private final ModuleProxy mModule;
   private final IdentifierProxy mPrefix;
-  private final SourceInfo mModuleSource;
+  private final SourceInfo mInstanceSource;
 
 }
 
