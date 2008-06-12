@@ -26,18 +26,20 @@ public class TestAlgo
      * non-blocking test only if can do reachability and co-reachability
      * supNBC only if supstates != -1
      */
+	private static final String TEST_FILES_FOLDER = "../tests/testfiles/bdd";
+	
     private static final String[] TEST_FILES = {
         // the first four (or was it number 2,3,4) are used in some slower tests
-        "../examples/SynthesizerTest.xml",
-        "../examples/includeInJarFile/OtherExamples/agv.xml",//AGV
-        "../examples/includeInJarFile/CCSBookExercises/Ex4_4.xml",//CatMouse
-        "../examples/includeInJarFile/ManufacturingExamples/circularTable.xml",
+    	TEST_FILES_FOLDER + "/SynthesizerTest.xml",
+    	TEST_FILES_FOLDER + "/agv.xml",//AGV
+    	TEST_FILES_FOLDER + "/CatAndMouse.xml",//CatMouse
+    	TEST_FILES_FOLDER + "/circularTable.xml",
         // and the rest...
-        "../examples/includeInJarFile/ManufacturingExamples/parallelManufacturingExample.xml",
-        "../examples/includeInJarFile/ManufacturingExamples/flexibleManufacturingSystem.xml",
-        "../examples/benchmark/simple1.xml",
-        "../examples/includeInJarFile/OtherExamples/aip/System4_system4.xml",
-        "../examples/c3.xml" };
+    	TEST_FILES_FOLDER + "/parallelManufacturingExample.xml",
+        //TEST_FILES_FOLDER + "/flexibleManufacturingSystem.xml",
+        TEST_FILES_FOLDER + "/simple1.xml",
+        TEST_FILES_FOLDER + "/System4_system4.xml",
+        TEST_FILES_FOLDER + "/c3.xml" };
     
     /**
      * when we dont have time for larger models
@@ -48,27 +50,31 @@ public class TestAlgo
      * Same as TEST_FILES, but for supNBC only. small enough for supNBC algo
      */
     private static final String[] TEST_FILES_SUP = {
-        "../examples/SynthesizerTest.xml",
-        "../examples/includeInJarFile/CCSBookExercises/Ex4_4.xml",//CatMouse
-        "../examples/includeInJarFile/ManufacturingExamples/circularTable.xml",
-        "../examples/includeInJarFile/OtherExamples/dosingUnit.xml",
-        "../examples/includeInJarFile/OtherExamples/telecommunicationsNetwork.xml",
-        "../examples/benchmark/simple1.xml",
-        "../examples/includeInJarFile/OtherExamples/agv.xml"//AGV
+        TEST_FILES_FOLDER + "/SynthesizerTest.xml",
+        TEST_FILES_FOLDER + "/CatAndMouse.xml",//CatMouse
+        TEST_FILES_FOLDER + "/circularTable.xml",
+        TEST_FILES_FOLDER + "/dosingUnit.xml",
+        TEST_FILES_FOLDER + "/telecommunicationsNetwork.xml",
+        TEST_FILES_FOLDER + "/simple1.xml",
+        TEST_FILES_FOLDER + "/agv.xml"//AGV
     };
     
     // XXX:         these number probably haev double-floating-point  overflows, so if we count them in some other way we might not
     //        get exactly the same number for the big ones!
     private static final double reachables[] = { 10,
-    25731072, 18, 199, 5702550, 2274519862886400.0, 10000000,1.101504E7, -1 };
+    25731072, 18, 199, 5702550, //2274519862886400.0,
+    10000000,1.101504E7, -1 };
     private static final double coreachables[] = {  6,
-    343692864, 20, 432, 5702550, 2274519862886400.0,10000000, -1, -1 };
+    343692864, 20, 432, 5702550, //2274519862886400.0,
+    10000000, -1, -1 };
     
     
     private static final boolean controllable[] = { false,
-    false, false, false, true, true, true, true, true };
+    false, false, false, true, //true,
+    true, true, true };
     private static final boolean nonblocking[] = { false,
-    true, true, false, true, false, true, true /* [2]*/, true /* [2] */
+    true, true, false, true, //false,
+    true, true /* [2]*/, true /* [2] */
     };
     
     // these are the classes that have their own sup algos (we replaced conjunctive with
@@ -449,11 +455,9 @@ public class TestAlgo
     {
         Options.test_integrity = true; // enable extra runtime tests!
         fail = pass = 0;
-        int oldalgo, oldopt;
-        
         // find the small models that we will use in some experiments
         int agv = find("agv.xml");
-        int catmouse = find("Ex4_4.xml");
+        int catmouse = find("CatAndMouse.xml");
         
         // small models
         SMALL_MODELS = new int[2];
@@ -461,201 +465,87 @@ public class TestAlgo
         SMALL_MODELS[1] = catmouse;
         
         
-        for (int k = 0; k < 4; k++)
+/*        for (int k = 0; k < 4; k++)
         {
             System.out.println("\nTarget #" + k + " is " + TEST_FILES[k]);
             
-            // test different algos
-            System.out.println("\n***** Testing all search algorithms");
-            
-            int save_algo_family = Options.algo_family;    // save the default crap
+            testSearchAlgorithms(k);
+            testEncodings(k);
+            testOrderingAlgorithms(k);
+        }
+        testInterleavedAndSeparatedOrdering(catmouse);
+        testDisjunctiveOptimization();
+        testTransitionOptimization();
+        testH1H2Heuristics();
+        testSctVerification();
+*/        testSctSynthesis();
+        
+        System.out.println("\n\n");
+        if (fail == 0)
+        {
+            System.out.println("All " + pass + " tests PASSED");
+        }
+        else
+        {
+            System.out.println("" + fail + ((fail == 1)
+            ? " test FAILED"
+                : " tests FAILED"));
+        }
+        
+        System.out.println("\n\n");
+        
+        // old C habbit, makes the launcher (Make, ANT, etc) to fail too
+        System.exit( fail == 0 ? 0 : 20);
+    }
 
-            load(TEST_FILES[k]);
-            
-            for (int i = 0; i < Options.REACH_ALGO_NAMES.length; i++)
-            {
-                Options.algo_family = i;
-                
-                adjust(Options.REACH_ALGO_NAMES[Options.algo_family], 40);
-                testR(reachables[k]);
-                testCR(coreachables[k]);
-                
-                if (i == save_algo_family)
-                {
-                    System.out.print("   (DEFAULT) ");
-                }
-                
-                System.out.println();
-            }
-            
-            verifier.cleanup();
-            
-            Options.algo_family = save_algo_family;
-            
-            // test different encodings
-            System.out.println("\n***** Testing all encoding functions");
-            
-            int save_encoding = Options.encoding_algorithm;
-            
-            for (int i = 0; i < Options.ENCODING_NAMES.length; i++)
-            {
-                load(TEST_FILES[k]);
-                
-                Options.encoding_algorithm = i;
-                
-                adjust(Options.ENCODING_NAMES[Options.encoding_algorithm], 40);
-                testR(reachables[k]);
-                testCR(coreachables[k]);
-                verifier.cleanup();
-                
-                if (i == save_encoding)
-                {
-                    System.out.print("   (DEFAULT) ");
-                }
-                
-                System.out.println();
-            }
-            
-            Options.encoding_algorithm = save_encoding;
-            
-            // test different encodings
-            System.out.println("\n***** Testing all ordering algorithms (slow!)");
-            int save_ordering = Options.ordering_algorithm;
-            for (int i = 0; i < Options.ORDERING_ALGORITHM_NAMES.length; i++)
-            {
-                load(TEST_FILES[k]);
-                
-                Options.ordering_algorithm = i;
-                
-                adjust(Options.ORDERING_ALGORITHM_NAMES[Options.ordering_algorithm], 40);
-                testR(reachables[k]);
-                testCR(coreachables[k]);
-                verifier.cleanup();
-                
-                if (i == save_ordering)
-                {
-                    System.out.print("   (DEFAULT) ");
-                }
-                
-                System.out.println();
-            }
-            
-            Options.ordering_algorithm = save_ordering;
-        }
-        
-        
-        
-        // test the interleaved/separated ordering
-        System.out.println("\n***** Testing interleaved & separated ordering, using catmouse");
-        boolean save_int = Options.interleaved_variables;
-        
-        for(int i = 0; i < 2; i++)
+	private void testSctSynthesis() {
+		System.out.println("\n***** Testing SCT/synthesis algorithms");
+        for (int i = 0; i < TEST_FILES_SUP.length; i++)
         {
-            Options.interleaved_variables = (i == 0);
-            load(TEST_FILES[catmouse]);
-            adjust(Options.interleaved_variables ? "interleaved" : "separated", 40);
+            System.out.println("Loading " + TEST_FILES_SUP[i] + "...");
             
-            testR(reachables[catmouse]);
-            testCR(coreachables[catmouse]);
-            
-            verifier.cleanup();
-            
-            if (Options.interleaved_variables == save_int)
+            for(int j = 0; j < Options.SUP_REACHABILITY_NAMES.length; j++)
             {
-                System.out.print("   (DEFAULT) ");
+                System.out.println(" Reachability mode: " + Options.SUP_REACHABILITY_NAMES[j]);
+                Options.sup_reachability_type = j;
+                testSupNBC(TEST_FILES_SUP[i]);
             }
+        }
+	}
+
+	private void testSctVerification() throws Exception {
+		// the supervisor synthesis
+        System.out.println("\n***** Testing DES and SCT/verification algorithms");
+        
+        
+        // XXX: for reasons i haven't figured out (might have to do with the selection heuristics),
+        //      modular code perform very bad will the default FORCE ordering heuristics
+        int save_ordering = Options.ordering_algorithm;
+        Options.ordering_algorithm = Options.AO_HEURISTIC_BFS;
+        System.out.println("   (note: temporarily switched to '" + Options.ORDERING_ALGORITHM_NAMES[Options.ordering_algorithm] + "' ordering)");
+        for (int i = 0; i < TEST_FILES.length; i++)
+        {
+            announce(TEST_FILES[i]);
+            load(TEST_FILES[i]);
+            testR(reachables[i]);
+            testCR(coreachables[i]);
+            testNB(reachables[i], coreachables[i], nonblocking[i]);
+            testC(controllable[i], reachables[i]);
+            verifier.cleanup();    // cleans up both supervisor and automata2
+            
+            // what a waste of resources, we will do all BDD pre-calcs again :(
+            incrementalC(controllable[i]);
+            modularC(controllable[i]);
             System.out.println();
-            
         }
         
-        Options.interleaved_variables = save_int;
-        
-        
-        
-        
-        // test the disjunctive optimization:
-        oldalgo = Options.algo_family;
-        oldopt = Options.disj_optimizer_algo;
-        for(int m = 0; m < SMALL_MODELS.length; m++)
-        {
-            int model = SMALL_MODELS[m];
-            System.out.println("\n***** Testing disjunctive optimization, using " + TEST_FILES[ model] );
-            
-            
-            for(int i = 0; i < DISJ_OPT_ALGOS.length; i++)
-            {
-                Options.algo_family = DISJ_OPT_ALGOS[i];
-                System.out.println("Reachability family: " + Options.REACH_ALGO_NAMES[Options.algo_family]);
-                
-                for(int k = 0; k < Options.DISJ_OPTIMIZER_NAMES.length; k++)
-                {
-                    
-                    Options.disj_optimizer_algo = k;
-                    announce("  optimizer " + Options.DISJ_OPTIMIZER_NAMES[k] );
-                    
-                    load(TEST_FILES[model]);
-                    testR(reachables[model]);
-                    testCR(coreachables[model]);
-                    
-                    if (k == oldopt)
-                    {
-                        System.out.print(" (DEFAULT) ");
-                    }
-                    
-                    verifier.cleanup();
-                    System.out.println();
-                    
-                }
-            }
-        }
-        Options.algo_family = oldalgo;
-        Options.disj_optimizer_algo = oldopt;
-        
-        
-        
-        
-        // test the transition optimization:
-        oldalgo = Options.algo_family;
-        oldopt = Options.transition_optimizer_algo;
-        
-        
-        for(int m = 0; m < SMALL_MODELS.length; m++)
-        {
-            int model = SMALL_MODELS[m];
-            
-            System.out.println("\n***** Testing transition optimization, using " + TEST_FILES[ model]);
-            
-            Options.algo_family = Options.ALGO_PETRINET;
-            System.out.println("Reachability family: " + Options.REACH_ALGO_NAMES[Options.algo_family]);
-            
-            for(int k = 0; k < Options.TRANSITION_OPTIMIZER_NAMES.length; k++)
-            {
-                Options.transition_optimizer_algo = k;
-                announce("  optimizer " + Options.TRANSITION_OPTIMIZER_NAMES[k] );
-                
-                load(TEST_FILES[model]);
-                testR(reachables[model]);
-                testCR(coreachables[model]);
-                
-                if (k == oldopt)
-                {
-                    System.out.print(" (DEFAULT) ");
-                }
-                
-                verifier.cleanup();
-                System.out.println();
-                
-            }
-        }
-        
-        Options.algo_family = oldalgo;
-        Options.transition_optimizer_algo = oldopt;
-        
-        
-        
-        
-        // We also test the H1/H2 heuristics. note that we dont test performance here
-        int oldh1 = Options.es_heuristics;
+        // cleanup
+        Options.ordering_algorithm = save_ordering;
+	}
+
+	private void testH1H2Heuristics() throws Exception {
+		int oldalgo;
+		int oldh1 = Options.es_heuristics;
         int oldh2 = Options.ndas_heuristics;
         oldalgo = Options.algo_family;
         for(int m = 0; m < SMALL_MODELS.length; m++)
@@ -702,72 +592,195 @@ public class TestAlgo
         Options.es_heuristics = oldh1 ;
         Options.ndas_heuristics = oldh2;
         Options.algo_family = oldalgo;
+	}
+
+	private void testTransitionOptimization() throws Exception {
+		int oldalgo;
+		int oldopt;
+		oldalgo = Options.algo_family;
+        oldopt = Options.transition_optimizer_algo;
         
         
-        
-        // the supervisor synthesis
-        System.out.println("\n***** Testing DES and SCT/verification algorithms");
-        
-        
-        // XXX: for reasons i haven't figured out (might have to do with the selection heuristics),
-        //      modular code perform very bad will the default FORCE ordering heuristics
-        int save_ordering = Options.ordering_algorithm;
-        Options.ordering_algorithm = Options.AO_HEURISTIC_BFS;
-        System.out.println("   (note: temporarily switched to '" + Options.ORDERING_ALGORITHM_NAMES[Options.ordering_algorithm] + "' ordering)");
-        for (int i = 0; i < TEST_FILES.length; i++)
+        for(int m = 0; m < SMALL_MODELS.length; m++)
         {
-            announce(TEST_FILES[i]);
-            load(TEST_FILES[i]);
-            testR(reachables[i]);
-            testCR(coreachables[i]);
-            testNB(reachables[i], coreachables[i], nonblocking[i]);
-            testC(controllable[i], reachables[i]);
-            verifier.cleanup();    // cleans up both supervisor and automata2
+            int model = SMALL_MODELS[m];
             
-            // what a waste of resources, we will do all BDD pre-calcs again :(
-            incrementalC(controllable[i]);
-            modularC(controllable[i]);
-            System.out.println();
-        }
-        
-        // cleanup
-        Options.ordering_algorithm = save_ordering;
-        
-        
-        // ------------------------- testing safe state supervisor synthesis:
-        System.out.println("\n***** Testing SCT/synthesis algorithms");
-        for (int i = 0; i < TEST_FILES_SUP.length; i++)
-        {
-            System.out.println("Loading " + TEST_FILES_SUP[i] + "...");
+            System.out.println("\n***** Testing transition optimization, using " + TEST_FILES[ model]);
             
-            for(int j = 0; j < Options.SUP_REACHABILITY_NAMES.length; j++)
+            Options.algo_family = Options.ALGO_PETRINET;
+            System.out.println("Reachability family: " + Options.REACH_ALGO_NAMES[Options.algo_family]);
+            
+            for(int k = 0; k < Options.TRANSITION_OPTIMIZER_NAMES.length; k++)
             {
-                System.out.println(" Reachability mode: " + Options.SUP_REACHABILITY_NAMES[j]);
-                Options.sup_reachability_type = j;
-                testSupNBC(TEST_FILES_SUP[i]);
+                Options.transition_optimizer_algo = k;
+                announce("  optimizer " + Options.TRANSITION_OPTIMIZER_NAMES[k] );
+                
+                load(TEST_FILES[model]);
+                testR(reachables[model]);
+                testCR(coreachables[model]);
+                
+                if (k == oldopt)
+                {
+                    System.out.print(" (DEFAULT) ");
+                }
+                
+                verifier.cleanup();
+                System.out.println();
+                
             }
         }
         
-        
-        
-        System.out.println("\n\n");
-        if (fail == 0)
+        Options.algo_family = oldalgo;
+        Options.transition_optimizer_algo = oldopt;
+	}
+
+	private void testDisjunctiveOptimization() throws Exception {
+		int oldalgo;
+		int oldopt;
+		oldalgo = Options.algo_family;
+        oldopt = Options.disj_optimizer_algo;
+        for(int m = 0; m < SMALL_MODELS.length; m++)
         {
-            System.out.println("All " + pass + " tests PASSED");
+            int model = SMALL_MODELS[m];
+            System.out.println("\n***** Testing disjunctive optimization, using " + TEST_FILES[ model] );
+            
+            
+            for(int i = 0; i < DISJ_OPT_ALGOS.length; i++)
+            {
+                Options.algo_family = DISJ_OPT_ALGOS[i];
+                System.out.println("Reachability family: " + Options.REACH_ALGO_NAMES[Options.algo_family]);
+                
+                for(int k = 0; k < Options.DISJ_OPTIMIZER_NAMES.length; k++)
+                {
+                    
+                    Options.disj_optimizer_algo = k;
+                    announce("  optimizer " + Options.DISJ_OPTIMIZER_NAMES[k] );
+                    
+                    load(TEST_FILES[model]);
+                    testR(reachables[model]);
+                    testCR(coreachables[model]);
+                    
+                    if (k == oldopt)
+                    {
+                        System.out.print(" (DEFAULT) ");
+                    }
+                    
+                    verifier.cleanup();
+                    System.out.println();
+                    
+                }
+            }
         }
-        else
+        Options.algo_family = oldalgo;
+        Options.disj_optimizer_algo = oldopt;
+	}
+
+	private void testInterleavedAndSeparatedOrdering(int testCaseIndex)
+			throws Exception {
+		System.out.println("\n***** Testing interleaved & separated ordering, using " + TEST_FILES[testCaseIndex]);
+        boolean save_int = Options.interleaved_variables;
+        
+        for(int i = 0; i < 2; i++)
         {
-            System.out.println("" + fail + ((fail == 1)
-            ? " test FAILED"
-                : " tests FAILED"));
+            Options.interleaved_variables = (i == 0);
+            load(TEST_FILES[testCaseIndex]);
+            adjust(Options.interleaved_variables ? "interleaved" : "separated", 40);
+            
+            testR(reachables[testCaseIndex]);
+            testCR(coreachables[testCaseIndex]);
+            
+            verifier.cleanup();
+            
+            if (Options.interleaved_variables == save_int)
+            {
+                System.out.print("   (DEFAULT) ");
+            }
+            System.out.println();
+            
         }
         
-        System.out.println("\n\n");
-        
-        // old C habbit, makes the launcher (Make, ANT, etc) to fail too
-        System.exit( fail == 0 ? 0 : 20);
-        
-    }
+        Options.interleaved_variables = save_int;
+	}
+
+	private void testOrderingAlgorithms(int testCaseIndex) throws Exception {
+		System.out.println("\n***** Testing all ordering algorithms (slow!)");
+		int save_ordering = Options.ordering_algorithm;
+		for (int i = 0; i < Options.ORDERING_ALGORITHM_NAMES.length; i++)
+		{
+		    load(TEST_FILES[testCaseIndex]);
+		    
+		    Options.ordering_algorithm = i;
+		    
+		    adjust(Options.ORDERING_ALGORITHM_NAMES[Options.ordering_algorithm], 40);
+		    testR(reachables[testCaseIndex]);
+		    testCR(coreachables[testCaseIndex]);
+		    verifier.cleanup();
+		    
+		    if (i == save_ordering)
+		    {
+		        System.out.print("   (DEFAULT) ");
+		    }
+		    
+		    System.out.println();
+		}
+		
+		Options.ordering_algorithm = save_ordering;
+	}
+
+	private void testEncodings(int testCaseIndex) throws Exception {
+		System.out.println("\n***** Testing all encoding functions");
+		
+		int save_encoding = Options.encoding_algorithm;
+		
+		for (int i = 0; i < Options.ENCODING_NAMES.length; i++)
+		{
+		    load(TEST_FILES[testCaseIndex]);
+		    
+		    Options.encoding_algorithm = i;
+		    
+		    adjust(Options.ENCODING_NAMES[Options.encoding_algorithm], 40);
+		    testR(reachables[testCaseIndex]);
+		    testCR(coreachables[testCaseIndex]);
+		    verifier.cleanup();
+		    
+		    if (i == save_encoding)
+		    {
+		        System.out.print("   (DEFAULT) ");
+		    }
+		    
+		    System.out.println();
+		}
+		
+		Options.encoding_algorithm = save_encoding;
+	}
+
+	private void testSearchAlgorithms(int testCaseIndex) throws Exception {
+		System.out.println("\n***** Testing all search algorithms");
+		
+		int save_algo_family = Options.algo_family;    // save the default crap
+
+		load(TEST_FILES[testCaseIndex]);
+		
+		for (int i = 0; i < Options.REACH_ALGO_NAMES.length; i++)
+		{
+		    Options.algo_family = i;
+		    
+		    adjust(Options.REACH_ALGO_NAMES[Options.algo_family], 40);
+		    testR(reachables[testCaseIndex]);
+		    testCR(coreachables[testCaseIndex]);
+		    
+		    if (i == save_algo_family)
+		    {
+		        System.out.print("   (DEFAULT) ");
+		    }
+		    
+		    System.out.println();
+		}
+		
+		verifier.cleanup();
+		
+		Options.algo_family = save_algo_family;
+	}
     
     public static void main(String[] args)
     {
@@ -809,6 +822,9 @@ public class TestAlgo
 
 /*
  $Log: not supported by cvs2svn $
+ Revision 1.35  2008-05-23 14:51:39  torda
+ *** empty log message ***
+
  Revision 1.34  2007-05-11 12:09:23  flordal
  Slight improvement of the conflict equivalence minimisation algorithm.
  Also, now the BDD options are beginning to look like they used to.
