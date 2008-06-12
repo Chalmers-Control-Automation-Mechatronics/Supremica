@@ -30,7 +30,7 @@ class ModuleBuilder extends BuilderSupport {
 		Util.openInSupremica(module)
 	}
 	static {
-		testBuilder()
+	//	testBuilder()
 	}
 	
 	private static final factory = ModuleSubjectFactory.instance
@@ -100,7 +100,7 @@ class ModuleBuilder extends BuilderSupport {
 		case 'plant':
 		case 'automaton' :
 			def identifier = parser.parseIdentifier(attributes.name)
-			node = current instanceof ModuleProxy ? current.componentList.find{it.identifier == identifier} : current.body.find{it.identifier == identifier} 
+			node = current instanceof ModuleProxy ?	current.componentList.grep(SimpleComponentProxy).find{it.identifier == identifier} : current.body.find{it.identifier == identifier} 
 			if (!node) {
 				node = factory.createSimpleComponentProxy(identifier,
 	                                                  attributes.isSpecification ? ComponentKind.SPEC : ComponentKind.PLANT,
@@ -319,6 +319,28 @@ class ModuleBuilder extends BuilderSupport {
 			event(name:'e5', ranges:[0..2, 0..3], controllable:false)
 			eventAlias(name:'someEvents', events:['e1', 'e2'])
 			booleanVariable(name:'y1', initialValue:false)
+			foreach('i', range:0..2) {
+				automaton('testcomponent3[i]', initialState:'q0') { //becomes plant by default 
+					state(name:'q0')
+					transition(event:'e4[i]',
+					           guard:'y0 & x0 < 4') {
+						action('x0 += 1')
+					}
+					transition(events:['e4[i]'],
+					           guard:'!y0 & x0 < 4') {
+						action('x0 += 1')
+					}
+					state(name:'q1', forbidden:true) {
+						outgoing(to:'q0', events:['e1', 'e0'])
+					}
+				}
+				foreach(name:'j', range:0..3) {
+					automaton(name:'testcomponent4[i][j]', initialState:'q0', isSpecification:true) {
+						state(name:'q0')
+						transition(from:'q0', to:'q0', events:['e5[i][j]'])
+					}
+				}
+			}
 			plant(name:'testcomponent', initialState:'q0', defaultEvent:'e0') {
 				state(name:'q0')
 				state('q1', marked:true)
@@ -344,28 +366,6 @@ class ModuleBuilder extends BuilderSupport {
 				}
 				transition(from:'s0', to:'s1', event:'e2', guard:'!y0')
 			}
-			foreach('i', range:0..2) {
-				automaton('testcomponent3[i]', initialState:'q0') { //becomes plant by default 
-					state(name:'q0')
-					transition(event:'e4[i]',
-					           guard:'y0 & x0 < 4') {
-						action('x0 += 1')
-					}
-					transition(events:['e4[i]'],
-					           guard:'!y0 & x0 < 4') {
-						action('x0 += 1')
-					}
-					state(name:'q1', forbidden:true) {
-						outgoing(to:'q0', events:['e1', 'e0'])
-					}
-				}
-				foreach(name:'j', range:0..3) {
-					automaton(name:'testcomponent4[i][j]', initialState:'q0', isSpecification:true) {
-						state(name:'q0')
-						transition(from:'q0', to:'q0', events:['e5[i][j]'])
-					}
-				}
-			}
 		}
 		assert module.name == 'testmodule'
 		assert module.componentList.name.contains('testcomponent')
@@ -376,7 +376,7 @@ class ModuleBuilder extends BuilderSupport {
 		assert module.eventAliasList.expression.eventList.name == [['e1','e2']] : module.eventAliasList.expression.eventList.name 
 		//assert module.componentList.find{it.name == VARIABLE_COMPONENT_NAME}.variables.type*.toString() == ['0..1', '1..4', '1..4']
         //assert module.componentList.find{it.name == VARIABLE_COMPONENT_NAME}.variables.initialValue.value == [0, 2, 2]
-		assert module.componentList.name == ['y0', 'x0', 'x1', 'y1', 'testcomponent', 'testcomponent2', 'i'] : module.componentList.name
+		assert module.componentList.name == ['y0', 'x0', 'x1', 'y1', 'i', 'testcomponent', 'testcomponent2'] : module.componentList.name
 		assert module.componentList.find{it.name == 'testcomponent'}.graph.deterministic
 		assert module.componentList.find{it.name == 'testcomponent'}.graph.nodes.name == ['q0', 'q1']
 		assert module.componentList.find{it.name == 'testcomponent'}.graph.nodes.find{it.name == 'q0'}.initial
