@@ -1,0 +1,312 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Automata name="Telecommunications Network" comment="This is a model of a telecommunications network adapted from 'Supervisory Control od Distributed Systems Part I: Modelling, Specification and Synthesis' by J.G. Thistle, R.P. Malhame and H.-H. Hoang. These automata represents Figures 4-7 in the article. This is not the complete model!">
+<!--
+<Automaton name="Old Subscriber i" type="Plant">
+	<Events>
+		<Event id="1" label="off-h_i"/>
+		<Event id="2" label="on-h_i"/>
+		<Event id="3" label="flash_i"/>
+		<Event id="4" label="req_ii"/>
+		<Event id="5" label="req_ij"/>
+		<Event id="6" label="req_ik"/>
+		<Event id="7" label="con_ij"/>
+		<Event id="8" label="con_ik"/>
+		<Event id="9" label="no-con_ii"/>
+		<Event id="10" label="no-con_ij"/>
+		<Event id="11" label="no-con_ik"/>
+		<Event id="12" label="fwd_iij"/>
+		<Event id="13" label="fwd_iji"/>
+		<Event id="14" label="fwd_iik"/>
+		<Event id="15" label="fwd_iki"/>
+		<Event id="16" label="fwd_ijk"/>
+		<Event id="17" label="fwd_ikj"/>
+	</Events>
+	<States>
+		<State id="0" initial="true" accepting="true"/>
+		<State id="1"/>
+		<State id="2"/>
+		<State id="3"/>
+		<State id="4"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="4" event="1"/>
+		<Transition source="4" dest="0" event="2"/>
+		<Transition source="4" dest="4" event="3"/>
+		<Transition source="4" dest="1" event="4"/>
+		<Transition source="1" dest="4" event="9"/>
+		<Transition source="4" dest="2" event="5"/>
+		<Transition source="2" dest="4" event="7"/>
+		<Transition source="2" dest="4" event="10"/>
+		<Transition source="4" dest="3" event="6"/>
+		<Transition source="3" dest="4" event="8"/>
+		<Transition source="3" dest="4" event="11"/>
+		<Transition source="1" dest="2" event="12"/>
+		<Transition source="2" dest="1" event="13"/>
+		<Transition source="1" dest="3" event="14"/>
+		<Transition source="3" dest="1" event="15"/>
+		<Transition source="2" dest="3" event="16"/>
+		<Transition source="3" dest="2" event="17"/>
+	</Transitions>
+</Automaton>
+-->
+<Automaton name="Subscriber i - part 1" type="Plant">
+	<Events>
+		<Event id="1" label="off-h_i"/>
+		<Event id="2" label="on-h_i"/>
+		<Event id="3" label="flash_i"/>
+		<Event id="4" label="req_ii"/>
+		<Event id="5" label="req_ij"/>
+		<Event id="6" label="req_ik"/>
+		<Event id="7" label="con_ij"/>
+		<Event id="8" label="con_ik"/>
+		<Event id="9" label="no-con_ii"/>
+		<Event id="10" label="no-con_ij"/>
+		<Event id="11" label="no-con_ik"/>
+		<Event id="12" label="fwd_iij"/>
+		<Event id="13" label="fwd_iji"/>
+		<Event id="14" label="fwd_iik"/>
+		<Event id="15" label="fwd_iki"/>
+		<Event id="16" label="fwd_ijk"/>
+		<Event id="17" label="fwd_ikj"/>
+	</Events>
+	<States>
+		<State id="0" initial="true" accepting="true"/>
+		<State id="1"/>
+		<State id="2"/>
+		<State id="3"/>
+		<State id="4"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="4" event="1"/>
+		<Transition source="4" dest="0" event="2"/>
+		<Transition source="4" dest="4" event="3"/>
+		<Transition source="4" dest="1" event="4"/>
+		<Transition source="4" dest="4" event="9"/>
+		<Transition source="1" dest="4" event="9"/>
+		<Transition source="4" dest="2" event="5"/>
+		<Transition source="2" dest="4" event="7"/>
+		<Transition source="2" dest="4" event="10"/>
+		<Transition source="4" dest="3" event="6"/>
+		<Transition source="3" dest="4" event="8"/>
+		<Transition source="3" dest="4" event="11"/>
+		<Transition source="1" dest="4" event="12"/>
+		<Transition source="2" dest="4" event="13"/>
+		<Transition source="1" dest="4" event="14"/>
+		<Transition source="3" dest="4" event="15"/>
+		<Transition source="2" dest="4" event="16"/>
+		<Transition source="3" dest="4" event="17"/>
+	</Transitions>
+</Automaton>
+<Automaton name="Subscriber i - part 2" type="Plant">
+	<Events>
+		<Event id="1" label="off-h_i"/>
+		<Event id="2" label="on-h_i"/>
+		<Event id="3" label="flash_i"/>
+		<Event id="4" label="req_ii"/>
+		<Event id="5" label="req_ij"/>
+		<Event id="6" label="req_ik"/>
+		<Event id="7" label="con_ii"/>
+		<Event id="8" label="con_ij"/>
+		<Event id="9" label="con_ik"/>
+		<Event id="10" label="no-con_ii"/>
+		<Event id="11" label="no-con_ij"/>
+		<Event id="12" label="no-con_ik"/>
+		<Event id="13" label="fwd_iij"/>
+		<Event id="14" label="fwd_iji"/>
+		<Event id="15" label="fwd_iik"/>
+		<Event id="16" label="fwd_iki"/>
+		<Event id="17" label="fwd_ijk"/>
+		<Event id="18" label="fwd_ikj"/>
+	</Events>
+	<States>
+		<State id="0" initial="true" accepting="true"/>
+		<State id="1"/>
+		<State id="2"/>
+		<State id="3"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="0" event="1"/>
+		<Transition source="0" dest="0" event="3"/>
+		<Transition source="0" dest="0" event="2"/>
+		<Transition source="0" dest="0" event="4"/>
+		<Transition source="0" dest="0" event="5"/>
+		<Transition source="0" dest="0" event="6"/>
+		<Transition source="0" dest="0" event="10"/>
+		<Transition source="0" dest="0" event="11"/>
+		<Transition source="0" dest="0" event="12"/>
+		<Transition source="0" dest="0" event="7"/>
+		<Transition source="0" dest="0" event="8"/>
+		<Transition source="0" dest="0" event="9"/>
+		<Transition source="0" dest="1" event="14"/>
+		<Transition source="0" dest="1" event="16"/>
+		<Transition source="1" dest="0" event="4"/>
+		<Transition source="1" dest="0" event="10"/>
+		<Transition source="0" dest="2" event="15"/>
+		<Transition source="0" dest="2" event="17"/>
+		<Transition source="2" dest="0" event="5"/>
+		<Transition source="2" dest="0" event="10"/>
+		<Transition source="0" dest="3" event="13"/>
+		<Transition source="0" dest="3" event="18"/>
+		<Transition source="3" dest="0" event="6"/>
+		<Transition source="3" dest="0" event="10"/>
+	</Transitions>
+</Automaton>
+<Automaton name="Call waiting i" type="Specification">
+	<Events>
+		<Event id="2" label="on-h_i"/>
+		<Event id="3" label="on-h_j"/>
+		<Event id="4" label="on-h_k"/>
+		<Event id="5" label="flash_i"/>
+		<Event id="10" label="con_ij"/>
+		<Event id="11" label="con_ji"/>
+		<Event id="12" label="con_ik"/>
+		<Event id="13" label="con_ki"/>
+	</Events>
+	<States>
+		<State id="0" initial="true" accepting="true"/>
+		<State id="1"/>
+		<State id="2"/>
+		<State id="3"/>
+		<State id="4"/>
+		<State id="5"/>
+		<State id="6"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="0" event="2"/>
+		<Transition source="0" dest="0" event="3"/>
+		<Transition source="0" dest="0" event="4"/>
+		<Transition source="0" dest="0" event="5"/>
+		<Transition source="0" dest="1" event="10"/>
+		<Transition source="0" dest="1" event="11"/>
+		<Transition source="1" dest="1" event="4"/>
+		<Transition source="1" dest="1" event="5"/>
+		<Transition source="1" dest="0" event="2"/>
+		<Transition source="1" dest="0" event="3"/>
+		<Transition source="1" dest="2" event="13"/>
+		<Transition source="2" dest="1" event="4"/>
+		<Transition source="2" dest="3" event="3"/>
+		<Transition source="2" dest="6" event="2"/>
+		<Transition source="2" dest="5" event="5"/>
+		<Transition source="0" dest="6" event="12"/>
+		<Transition source="0" dest="6" event="13"/>
+		<Transition source="6" dest="6" event="3"/>
+		<Transition source="6" dest="6" event="5"/>
+		<Transition source="6" dest="0" event="2"/>
+		<Transition source="6" dest="0" event="4"/>
+		<Transition source="6" dest="5" event="11"/>
+		<Transition source="5" dest="6" event="3"/>
+		<Transition source="5" dest="4" event="4"/>
+		<Transition source="5" dest="1" event="2"/>
+		<Transition source="5" dest="2" event="5"/>
+		<Transition source="4" dest="4" event="4"/>
+		<Transition source="4" dest="0" event="3"/>
+		<Transition source="4" dest="1" event="5"/>
+		<Transition source="3" dest="3" event="3"/>
+		<Transition source="3" dest="0" event="4"/>
+		<Transition source="3" dest="6" event="5"/>
+	</Transitions>
+</Automaton>
+<Automaton name="Three-way calling i" type="Specification">
+	<Events>
+		<Event id="1" label="on-h_i"/>
+		<Event id="2" label="on-h_j"/>
+		<Event id="3" label="on-h_k"/>
+		<Event id="4" label="con_ij"/>
+		<Event id="5" label="con_ji"/>
+		<Event id="6" label="con_ik"/>
+		<Event id="7" label="con_ki"/>
+	</Events>
+	<States>
+		<State id="0" initial="true" accepting="true"/>
+		<State id="1"/>
+		<State id="2"/>
+		<State id="3"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="0" event="1"/>
+		<Transition source="0" dest="0" event="2"/>
+		<Transition source="0" dest="0" event="3"/>
+		<Transition source="0" dest="2" event="6"/>
+		<Transition source="0" dest="2" event="7"/>
+		<Transition source="0" dest="3" event="4"/>
+		<Transition source="0" dest="3" event="5"/>
+		<Transition source="1" dest="0" event="1"/>
+		<Transition source="1" dest="2" event="2"/>
+		<Transition source="1" dest="3" event="3"/>
+		<Transition source="2" dest="0" event="1"/>
+		<Transition source="2" dest="0" event="3"/>
+		<Transition source="2" dest="1" event="4"/>
+		<Transition source="2" dest="2" event="2"/>
+		<Transition source="3" dest="0" event="1"/>
+		<Transition source="3" dest="0" event="2"/>
+		<Transition source="3" dest="1" event="6"/>
+		<Transition source="3" dest="3" event="3"/>
+	</Transitions>
+</Automaton>
+<Automaton name="Flash-hook i" type="Specification">
+	<Events>
+		<Event id="1" label="on-h_i"/>
+		<Event id="2" label="on-h_j"/>
+		<Event id="3" label="on-h_k"/>
+		<Event id="4" label="flash_i"/>
+		<Event id="5" label="req_ii"/>
+		<Event id="6" label="req_ij"/>
+		<Event id="7" label="req_ik"/>
+		<Event id="8" label="con_ii"/>
+		<Event id="9" label="con_ij"/>
+		<Event id="10" label="con_ji"/>
+		<Event id="11" label="con_ik"/>
+		<Event id="12" label="con_ki"/>
+		<Event id="13" label="no-con_ii"/>
+		<Event id="14" label="no-con_ij"/>
+		<Event id="15" label="no-con_ik"/>
+		<Event id="16" label="fwd_iij"/>
+		<Event id="17" label="fwd_iji"/>
+		<Event id="18" label="fwd_iik"/>
+		<Event id="19" label="fwd_iki"/>
+		<Event id="20" label="fwd_ijk"/>
+		<Event id="21" label="fwd_ikj"/>
+	</Events>
+	<States>
+		<State id="0" initial="true" accepting="true"/>
+		<State id="1"/>
+		<State id="2"/>
+		<State id="3"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="0" event="1"/>
+		<Transition source="0" dest="0" event="2"/>
+		<Transition source="0" dest="0" event="3"/>
+		<Transition source="0" dest="0" event="4"/>
+		<Transition source="0" dest="1" event="5"/>
+		<Transition source="0" dest="1" event="13"/>
+		<Transition source="0" dest="2" event="7"/>
+		<Transition source="0" dest="2" event="12"/>
+		<Transition source="0" dest="3" event="6"/>
+		<Transition source="0" dest="3" event="10"/>
+		<Transition source="1" dest="0" event="4"/>
+		<Transition source="1" dest="0" event="1"/>
+		<Transition source="1" dest="0" event="16"/>
+		<Transition source="1" dest="0" event="18"/>
+		<Transition source="1" dest="1" event="2"/>
+		<Transition source="1" dest="1" event="3"/>
+		<Transition source="1" dest="1" event="13"/>
+		<Transition source="2" dest="0" event="4"/>
+		<Transition source="2" dest="0" event="1"/>
+		<Transition source="2" dest="0" event="19"/>
+		<Transition source="2" dest="0" event="21"/>
+		<Transition source="2" dest="2" event="11"/>
+		<Transition source="2" dest="2" event="2"/>
+		<Transition source="2" dest="2" event="3"/>
+		<Transition source="2" dest="2" event="15"/>
+		<Transition source="3" dest="0" event="4"/>
+		<Transition source="3" dest="0" event="1"/>
+		<Transition source="3" dest="0" event="17"/>
+		<Transition source="3" dest="0" event="20"/>
+		<Transition source="3" dest="3" event="9"/>
+		<Transition source="3" dest="3" event="2"/>
+		<Transition source="3" dest="3" event="3"/>
+		<Transition source="3" dest="3" event="14"/>
+	</Transitions>
+</Automaton>
+</Automata>

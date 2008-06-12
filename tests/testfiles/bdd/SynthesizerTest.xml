@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Automata>
+<Automaton name="S" type="Supervisor">
+	<Events>
+		<Event id="a" label="a" controllable="true" prioritized="true"/>
+		<Event id="b" label="b" controllable="true" prioritized="true"/>
+		<Event id="c" label="c" controllable="false" prioritized="true"/>		
+	</Events>
+	<States>
+		<State id="s1" initial="true" accepting="true"/>
+		<State id="s2" accepting="true"/>
+		<State id="s3" accepting="false"/>
+		<State id="s4" accepting="false"/>
+		<State id="s5" accepting="false"/>
+		<State id="s6" accepting="false"/>
+		<State id="s7" accepting="false"/>
+		<State id="s8" accepting="false" forbidden="true"/>
+		<State id="q1" accepting="false"/>
+		<State id="q2" accepting="true"/>
+	</States>
+	<Transitions>
+		<Transition source="s1" dest="s2" event="a"/>
+		<Transition source="s2" dest="s3" event="b"/>
+		<Transition source="s3" dest="s4" event="a"/>
+		<Transition source="s4" dest="s5" event="c"/>
+		<Transition source="s5" dest="s6" event="c"/>
+		<Transition source="s6" dest="s7" event="c"/>
+		<Transition source="s7" dest="s8" event="c"/>
+		<Transition source="s3" dest="q1" event="b"/>
+		<Transition source="s5" dest="q2" event="b"/>
+	</Transitions>
+</Automaton>
+</Automata>

@@ -1,0 +1,229 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Automata name="Manufacturing cell" comment="This example is from 'Synthesis and Implementation of a Local Modular Supervisory Control for a Manufacturing Cell' by Max H. de Queiroz and J. E. R. Cury. The system is blocking and uncontrollable.">
+<Automaton name="G0" type="Plant">
+	<Events>
+		<Event id="a0" label="a0"/>
+		<Event id="b0" label="b0" controllable="false"/>
+	</Events>
+	<States>
+		<State id="g0" initial="true" accepting="true"/>
+		<State id="g1"/>
+	</States>
+	<Transitions>
+		<Transition source="g0" dest="g1" event="a0"/>
+		<Transition source="g1" dest="g0" event="b0"/>
+	</Transitions>
+</Automaton>
+<Automaton name="G1" type="Plant">
+	<Events>
+		<Event id="a1" label="a1"/>
+		<Event id="b1" label="b1" controllable="false"/>
+	</Events>
+	<States>
+		<State id="g0" initial="true" accepting="true"/>
+		<State id="g1"/>
+	</States>
+	<Transitions>
+		<Transition source="g0" dest="g1" event="a1"/>
+		<Transition source="g1" dest="g0" event="b1"/>
+	</Transitions>
+</Automaton>
+<Automaton name="G2" type="Plant">
+	<Events>
+		<Event id="a2" label="a2"/>
+		<Event id="b2" label="b2" controllable="false"/>
+	</Events>
+	<States>
+		<State id="g0" initial="true" accepting="true"/>
+		<State id="g1"/>
+	</States>
+	<Transitions>
+		<Transition source="g0" dest="g1" event="a2"/>
+		<Transition source="g1" dest="g0" event="b2"/>
+	</Transitions>
+</Automaton>
+<Automaton name="G3" type="Plant">
+	<Events>
+		<Event id="a3" label="a3"/>
+		<Event id="b3" label="b3" controllable="false"/>
+	</Events>
+	<States>
+		<State id="g0" initial="true" accepting="true"/>
+		<State id="g1"/>
+	</States>
+	<Transitions>
+		<Transition source="g0" dest="g1" event="a3"/>
+		<Transition source="g1" dest="g0" event="b3"/>
+	</Transitions>
+</Automaton>
+<Automaton name="G4" type="Plant">
+	<Events>
+		<Event id="a4" label="a4"/>
+		<Event id="b4" label="b4" controllable="false"/>
+	</Events>
+	<States>
+		<State id="g0" initial="true" accepting="true"/>
+		<State id="g1"/>
+	</States>
+	<Transitions>
+		<Transition source="g0" dest="g1" event="a4"/>
+		<Transition source="g1" dest="g0" event="b4"/>
+	</Transitions>
+</Automaton>
+<Automaton name="Egen_a" type="Specification">
+	<Events>
+		<Event id="a0" label="a0"/>
+		<Event id="b1" label="b1" controllable="false"/>
+		<Event id="b2" label="b2" controllable="false"/>
+		<Event id="b3" label="b3" controllable="false"/>
+	</Events>
+	<States>
+		<State id="e0" initial="true" accepting="true"/>
+		<State id="e1"/>
+	</States>
+	<Transitions>
+		<Transition source="e0" dest="e1" event="b1"/>
+		<Transition source="e0" dest="e1" event="b2"/>
+		<Transition source="e0" dest="e1" event="b3"/>
+		<Transition source="e1" dest="e0" event="a0"/>
+		<Transition source="e1" dest="e1" event="b1"/>
+		<Transition source="e1" dest="e1" event="b2"/>
+		<Transition source="e1" dest="e1" event="b3"/>
+	</Transitions>
+</Automaton>
+<Automaton name="Egen_b1" type="Specification">
+	<Events>
+		<Event id="a0" label="a0"/>
+		<Event id="a1" label="a1"/>
+		<Event id="b0" label="b0" controllable="false"/>
+		<Event id="b1" label="b1" controllable="false"/>
+	</Events>
+	<States>
+		<State id="e0" initial="true" accepting="true"/>
+		<State id="e1"/>
+	</States>
+	<Transitions>
+		<Transition source="e0" dest="e1" event="a0"/>
+		<Transition source="e0" dest="e1" event="a1"/>
+		<Transition source="e1" dest="e0" event="b0"/>
+		<Transition source="e1" dest="e0" event="b1"/>
+	</Transitions>
+</Automaton>
+<Automaton name="Egen_b2" type="Specification">
+	<Events>
+		<Event id="a0" label="a0"/>
+		<Event id="a2" label="a2"/>
+		<Event id="b0" label="b0" controllable="false"/>
+		<Event id="b2" label="b2" controllable="false"/>
+	</Events>
+	<States>
+		<State id="e0" initial="true" accepting="true"/>
+		<State id="e1"/>
+	</States>
+	<Transitions>
+		<Transition source="e0" dest="e1" event="a0"/>
+		<Transition source="e0" dest="e1" event="a2"/>
+		<Transition source="e1" dest="e0" event="b0"/>
+		<Transition source="e1" dest="e0" event="b2"/>
+	</Transitions>
+</Automaton>
+<Automaton name="Egen_b3" type="Specification">
+	<Events>
+		<Event id="a0" label="a0"/>
+		<Event id="a3" label="a3"/>
+		<Event id="b0" label="b0" controllable="false"/>
+		<Event id="b3" label="b3" controllable="false"/>
+	</Events>
+	<States>
+		<State id="e0" initial="true" accepting="true"/>
+		<State id="e1"/>
+	</States>
+	<Transitions>
+		<Transition source="e0" dest="e1" event="a0"/>
+		<Transition source="e0" dest="e1" event="a3"/>
+		<Transition source="e1" dest="e0" event="b0"/>
+		<Transition source="e1" dest="e0" event="b3"/>
+	</Transitions>
+</Automaton>
+<Automaton name="Egen_b4" type="Specification">
+	<Events>
+		<Event id="a0" label="a0"/>
+		<Event id="a4" label="a4"/>
+		<Event id="b0" label="b0" controllable="false"/>
+		<Event id="b4" label="b4" controllable="false"/>
+	</Events>
+	<States>
+		<State id="e0" initial="true" accepting="true"/>
+		<State id="e1"/>
+	</States>
+	<Transitions>
+		<Transition source="e0" dest="e1" event="a0"/>
+		<Transition source="e0" dest="e1" event="a4"/>
+		<Transition source="e1" dest="e0" event="b0"/>
+		<Transition source="e1" dest="e0" event="b4"/>
+	</Transitions>
+</Automaton>
+<Automaton name="Egen_c1" type="Specification">
+	<Events>
+		<Event id="a0" label="a0"/>
+		<Event id="a2" label="a2"/>
+		<Event id="b1" label="b1" controllable="false"/>
+	</Events>
+	<States>
+		<State id="e0" initial="true" accepting="true"/>
+		<State id="e1"/>
+		<State id="e2"/>
+		<State id="e3"/>
+	</States>
+	<Transitions>
+		<Transition source="e0" dest="e1" event="b1"/>
+		<Transition source="e0" dest="e0" event="a0"/>
+		<Transition source="e1" dest="e2" event="a0"/>
+		<Transition source="e2" dest="e3" event="b1"/>
+		<Transition source="e2" dest="e0" event="a2"/>
+		<Transition source="e3" dest="e1" event="a2"/>
+	</Transitions>
+</Automaton>
+<Automaton name="Egen_c2" type="Specification">
+	<Events>
+		<Event id="a0" label="a0"/>
+		<Event id="a3" label="a3"/>
+		<Event id="b2" label="b2" controllable="false"/>
+	</Events>
+	<States>
+		<State id="e0" initial="true" accepting="true"/>
+		<State id="e1"/>
+		<State id="e2"/>
+		<State id="e3"/>
+	</States>
+	<Transitions>
+		<Transition source="e0" dest="e1" event="b2"/>
+		<Transition source="e0" dest="e0" event="a0"/>
+		<Transition source="e1" dest="e2" event="a0"/>
+		<Transition source="e2" dest="e3" event="b2"/>
+		<Transition source="e2" dest="e0" event="a3"/>
+		<Transition source="e3" dest="e1" event="a3"/>
+	</Transitions>
+</Automaton>
+<Automaton name="Egen_c3" type="Specification">
+	<Events>
+		<Event id="a0" label="a0"/>
+		<Event id="a4" label="a4"/>
+		<Event id="b3" label="b3" controllable="false"/>
+	</Events>
+	<States>
+		<State id="e0" initial="true" accepting="true"/>
+		<State id="e1"/>
+		<State id="e2"/>
+		<State id="e3"/>
+	</States>
+	<Transitions>
+		<Transition source="e0" dest="e1" event="b3"/>
+		<Transition source="e0" dest="e0" event="a0"/>
+		<Transition source="e1" dest="e2" event="a0"/>
+		<Transition source="e2" dest="e3" event="b3"/>
+		<Transition source="e2" dest="e0" event="a4"/>
+		<Transition source="e3" dest="e1" event="a4"/>
+	</Transitions>
+</Automaton>
+</Automata>

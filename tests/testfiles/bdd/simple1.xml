@@ -1,0 +1,199 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Automata>
+<Automaton name="aut1" type="Plant">
+	<Events>
+		<Event id="e" label="e1" controllable="true" prioritized="true"/>
+	</Events>
+	<States>
+		<State id="q1" initial="true"/>
+		<State id="q2"/>
+		<State id="q3"/>	
+		<State id="q4"/>		
+		<State id="q5"/>	
+		<State id="q6"/>
+		<State id="q7"/>	
+		<State id="q8"/>		
+		<State id="q9"/>
+		<State id="q10" accepting="true"/>		
+	</States>
+	<Transitions>
+		<Transition source="q1" dest="q2" event="e"/>
+		<Transition source="q2" dest="q3" event="e"/>
+		<Transition source="q3" dest="q4" event="e"/>
+		<Transition source="q4" dest="q5" event="e"/>		
+		<Transition source="q5" dest="q6" event="e"/>		
+		<Transition source="q6" dest="q7" event="e"/>		
+		<Transition source="q7" dest="q8" event="e"/>
+		<Transition source="q8" dest="q9" event="e"/>	
+		<Transition source="q9" dest="q10" event="e"/>				
+	</Transitions>
+</Automaton>
+<Automaton name="aut2" type="Plant">
+	<Events>
+		<Event id="e" label="e2" controllable="true" prioritized="true"/>
+	</Events>
+	<States>
+		<State id="q1" initial="true"/>
+		<State id="q2"/>
+		<State id="q3"/>	
+		<State id="q4"/>		
+		<State id="q5"/>	
+		<State id="q6"/>
+		<State id="q7"/>	
+		<State id="q8"/>		
+		<State id="q9"/>
+		<State id="q10" accepting="true"/>		
+	</States>
+	<Transitions>
+		<Transition source="q1" dest="q2" event="e"/>
+		<Transition source="q2" dest="q3" event="e"/>
+		<Transition source="q3" dest="q4" event="e"/>
+		<Transition source="q4" dest="q5" event="e"/>		
+		<Transition source="q5" dest="q6" event="e"/>		
+		<Transition source="q6" dest="q7" event="e"/>		
+		<Transition source="q7" dest="q8" event="e"/>
+		<Transition source="q8" dest="q9" event="e"/>	
+		<Transition source="q9" dest="q10" event="e"/>				
+	</Transitions>
+</Automaton>
+<Automaton name="aut3" type="Plant">
+	<Events>
+		<Event id="e" label="e3" controllable="true" prioritized="true"/>
+	</Events>
+	<States>
+		<State id="q1" initial="true"/>
+		<State id="q2"/>
+		<State id="q3"/>	
+		<State id="q4"/>		
+		<State id="q5"/>	
+		<State id="q6"/>
+		<State id="q7"/>	
+		<State id="q8"/>		
+		<State id="q9"/>
+		<State id="q10" accepting="true"/>		
+	</States>
+	<Transitions>
+		<Transition source="q1" dest="q2" event="e"/>
+		<Transition source="q2" dest="q3" event="e"/>
+		<Transition source="q3" dest="q4" event="e"/>
+		<Transition source="q4" dest="q5" event="e"/>		
+		<Transition source="q5" dest="q6" event="e"/>		
+		<Transition source="q6" dest="q7" event="e"/>		
+		<Transition source="q7" dest="q8" event="e"/>
+		<Transition source="q8" dest="q9" event="e"/>	
+		<Transition source="q9" dest="q10" event="e"/>				
+	</Transitions>
+</Automaton>
+<Automaton name="aut4" type="Plant">
+	<Events>
+		<Event id="e" label="e4" controllable="true" prioritized="true"/>
+	</Events>
+	<States>
+		<State id="q1" initial="true"/>
+		<State id="q2"/>
+		<State id="q3"/>	
+		<State id="q4"/>		
+		<State id="q5"/>	
+		<State id="q6"/>
+		<State id="q7"/>	
+		<State id="q8"/>		
+		<State id="q9"/>
+		<State id="q10" accepting="true"/>		
+	</States>
+	<Transitions>
+		<Transition source="q1" dest="q2" event="e"/>
+		<Transition source="q2" dest="q3" event="e"/>
+		<Transition source="q3" dest="q4" event="e"/>
+		<Transition source="q4" dest="q5" event="e"/>		
+		<Transition source="q5" dest="q6" event="e"/>		
+		<Transition source="q6" dest="q7" event="e"/>		
+		<Transition source="q7" dest="q8" event="e"/>
+		<Transition source="q8" dest="q9" event="e"/>	
+		<Transition source="q9" dest="q10" event="e"/>				
+	</Transitions>
+</Automaton>
+<Automaton name="aut5" type="Plant">
+	<Events>
+		<Event id="e" label="e5" controllable="true" prioritized="true"/>
+	</Events>
+	<States>
+		<State id="q1" initial="true"/>
+		<State id="q2"/>
+		<State id="q3"/>	
+		<State id="q4"/>		
+		<State id="q5"/>	
+		<State id="q6"/>
+		<State id="q7"/>	
+		<State id="q8"/>		
+		<State id="q9"/>
+		<State id="q10" accepting="true"/>		
+	</States>
+	<Transitions>
+		<Transition source="q1" dest="q2" event="e"/>
+		<Transition source="q2" dest="q3" event="e"/>
+		<Transition source="q3" dest="q4" event="e"/>
+		<Transition source="q4" dest="q5" event="e"/>		
+		<Transition source="q5" dest="q6" event="e"/>		
+		<Transition source="q6" dest="q7" event="e"/>		
+		<Transition source="q7" dest="q8" event="e"/>
+		<Transition source="q8" dest="q9" event="e"/>	
+		<Transition source="q9" dest="q10" event="e"/>				
+	</Transitions>
+</Automaton>
+<Automaton name="aut6" type="Plant">
+	<Events>
+		<Event id="e" label="e6" controllable="true" prioritized="true"/>
+	</Events>
+	<States>
+		<State id="q1" initial="true"/>
+		<State id="q2"/>
+		<State id="q3"/>	
+		<State id="q4"/>		
+		<State id="q5"/>	
+		<State id="q6"/>
+		<State id="q7"/>	
+		<State id="q8"/>		
+		<State id="q9"/>
+		<State id="q10" accepting="true"/>		
+	</States>
+	<Transitions>
+		<Transition source="q1" dest="q2" event="e"/>
+		<Transition source="q2" dest="q3" event="e"/>
+		<Transition source="q3" dest="q4" event="e"/>
+		<Transition source="q4" dest="q5" event="e"/>		
+		<Transition source="q5" dest="q6" event="e"/>		
+		<Transition source="q6" dest="q7" event="e"/>		
+		<Transition source="q7" dest="q8" event="e"/>
+		<Transition source="q8" dest="q9" event="e"/>	
+		<Transition source="q9" dest="q10" event="e"/>				
+	</Transitions>
+</Automaton>
+<Automaton name="aut7" type="Plant">
+	<Events>
+		<Event id="e" label="e7" controllable="true" prioritized="true"/>
+	</Events>
+	<States>
+		<State id="q1" initial="true"/>
+		<State id="q2"/>
+		<State id="q3"/>	
+		<State id="q4"/>		
+		<State id="q5"/>	
+		<State id="q6"/>
+		<State id="q7"/>	
+		<State id="q8"/>		
+		<State id="q9"/>
+		<State id="q10" accepting="true"/>		
+	</States>
+	<Transitions>
+		<Transition source="q1" dest="q2" event="e"/>
+		<Transition source="q2" dest="q3" event="e"/>
+		<Transition source="q3" dest="q4" event="e"/>
+		<Transition source="q4" dest="q5" event="e"/>		
+		<Transition source="q5" dest="q6" event="e"/>		
+		<Transition source="q6" dest="q7" event="e"/>		
+		<Transition source="q7" dest="q8" event="e"/>
+		<Transition source="q8" dest="q9" event="e"/>	
+		<Transition source="q9" dest="q10" event="e"/>				
+	</Transitions>
+</Automaton>
+</Automata>
