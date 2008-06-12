@@ -249,7 +249,8 @@ public class TestAutomataVerifier
         }
     }
     
-    public void testCompositionalNonblockingArbiter()
+    //Memory/time consuming test case
+ /*   public void testCompositionalNonblockingArbiter()
     {
         // Arbiter example, turned out not to work for some sizes (22,
         // 24, 32, 33) at one point so it is now a testcase...
@@ -268,7 +269,7 @@ public class TestAutomataVerifier
             ex.printStackTrace();
             assertTrue(false);
         }
-    }
+    }*/
     
     public void testCompositionalNonblocking()
     throws Exception
