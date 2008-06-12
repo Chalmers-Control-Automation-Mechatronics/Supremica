@@ -42,26 +42,5 @@ public class AOH_PCG
 		}
 
 		order = pcg.getShortestPath();
-                
-                
-                
-/*		int size = automata.size();
-                //for dining philosopher
-                int temp = size/2;
-                int temp2 = 0;
-                for (i = 0; i < size; i++)
-                {
-                    if(i%2 == 0)
-                    {
-                        order[i] = temp2;
-                        temp2 = order[i]+1;
-                    }
-                    else
-                    {
-                        order[i] = temp;
-                        temp = order[i]+1;
-                    }
-		}
-  */              ////////////
 	}
 }
