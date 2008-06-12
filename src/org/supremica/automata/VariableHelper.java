@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.external.iec61499fb2efa
 //# CLASS:   VariableHelper
 //###########################################################################
-//# $Id: VariableHelper.java,v 1.5 2008-02-15 07:31:49 robi Exp $
+//# $Id: VariableHelper.java,v 1.6 2008-06-12 11:15:45 torda Exp $
 //###########################################################################
 
 
@@ -23,7 +23,6 @@ import net.sourceforge.waters.model.module.SimpleExpressionProxy;
 import net.sourceforge.waters.model.module.SimpleIdentifierProxy;
 import net.sourceforge.waters.model.module.VariableComponentProxy;
 import net.sourceforge.waters.model.module.VariableMarkingProxy;
-import net.sourceforge.waters.subject.module.BinaryExpressionSubject;
 import net.sourceforge.waters.subject.module.BinaryExpressionSubject;
 import net.sourceforge.waters.subject.module.IdentifierSubject;
 import net.sourceforge.waters.subject.module.IntConstantSubject;
@@ -153,30 +152,28 @@ public class VariableHelper {
         }
 	}
 
-	public static Integer getUpperBound(final VariableComponentProxy variable)
+	public static int getUpperBound(final VariableComponentProxy variable)
     {
 		if (!isInteger(variable)) {
-			return null;
-		} else {
-            return ((IntConstantProxy) ((BinaryExpressionProxy) variable.getType()).getRight()).getValue();
-        }
-	}
+			throw new IllegalArgumentException("The variable is not an integer");
+		} 
+        return ((IntConstantProxy) ((BinaryExpressionProxy) variable.getType()).getRight()).getValue();
+    }
 
-	public static Integer getLowerBound(final VariableComponentProxy variable)
+	public static int getLowerBound(final VariableComponentProxy variable)
     {
 		if (!isInteger(variable)) {
-			return null;
-		} else {
-            return ((IntConstantProxy) ((BinaryExpressionProxy) variable.getType()).getLeft()).getValue();
-        }
+			throw new IllegalArgumentException("The variable is not an integer");
+		} 
+		return ((IntConstantProxy) ((BinaryExpressionProxy) variable.getType()).getLeft()).getValue();
 	}
 
 	public static Integer getInitialIntegerValue
         (final VariableComponentProxy variable)
     {
 		if (!isInteger(variable)) {
-			return null;
-		}
+			throw new IllegalArgumentException("The variable is not an integer");
+		} 
         final SimpleExpressionProxy pred = variable.getInitialStatePredicate();
         if (!(pred instanceof BinaryExpressionProxy)) {
             return null;
@@ -226,154 +223,8 @@ public class VariableHelper {
         return intconst.getValue();
 	}
 
-
-    //#######################################################################
-    //# Boolean
-	public static VariableComponentSubject createBooleanVariable
-        (final String name,
-         final boolean initialValue,
-         final Boolean markedValue)
+	public static boolean isBinary(final VariableComponentProxy variable)
     {
-		final ModuleSubjectFactory factory =
-            ModuleSubjectFactory.getInstance();
-        final CompilerOperatorTable optable =
-            CompilerOperatorTable.getInstance();
-        final IdentifierSubject ident =
-            factory.createSimpleIdentifierProxy(name);
-        final SimpleExpressionSubject range =
-            factory.createSimpleIdentifierProxy(NAME_OF_BOOLEAN_TYPE);
-        final IdentifierSubject iclone1 = ident.clone();
-        final IntConstantSubject initval =
-            factory.createIntConstantProxy(initialValue ? 1 : 0);
-        final BinaryOperator opeq =  optable.getEqualsOperator();
-        final BinaryExpressionSubject init =
-            factory.createBinaryExpressionProxy(opeq, iclone1, initval);
-        final List<VariableMarkingSubject> markings;
-        if (markedValue == null) {
-            markings = null;
-        } else {
-            final IdentifierSubject accepting =
-                factory.createSimpleIdentifierProxy
-                (EventDeclProxy.DEFAULT_MARKING_NAME);
-            final IdentifierSubject iclone2 = ident.clone();
-            final IntConstantSubject markedval =
-                factory.createIntConstantProxy(markedValue ? 1 : 0);
-            final BinaryExpressionSubject pred =
-                factory.createBinaryExpressionProxy(opeq, iclone2, markedval);
-            final VariableMarkingSubject marking =
-                factory.createVariableMarkingProxy(accepting, pred);
-            markings = Collections.singletonList(marking);
-        }
-        return factory.createVariableComponentProxy
-            (ident, range, true, init, markings);
+        return isInteger(variable) && getLowerBound(variable) == 0 && getUpperBound(variable) == 1;
 	}
-
-    public static void setAsBoolean(final VariableComponentSubject variable,
-                                    final boolean initialValue,
-                                    final Boolean markedValue)
-    {
-		final ModuleSubjectFactory factory =
-            ModuleSubjectFactory.getInstance();
-        final CompilerOperatorTable optable =
-            CompilerOperatorTable.getInstance();
-        final SimpleExpressionSubject range =
-            factory.createSimpleIdentifierProxy(NAME_OF_BOOLEAN_TYPE);
-        variable.setType(range);
-        final IdentifierSubject ident = variable.getIdentifier();
-        final IdentifierSubject iclone1 = ident.clone();
-        final IntConstantSubject initval =
-            factory.createIntConstantProxy(initialValue ? 1 : 0);
-        final BinaryOperator opeq =  optable.getEqualsOperator();
-        final BinaryExpressionSubject init =
-            factory.createBinaryExpressionProxy(opeq, iclone1, initval);
-        variable.setInitialStatePredicate(init);
-        final List<VariableMarkingSubject> markings =
-            variable.getVariableMarkingsModifiable();
-        markings.clear();
-        if (markedValue != null) {
-            final IdentifierSubject accepting =
-                factory.createSimpleIdentifierProxy
-                (EventDeclProxy.DEFAULT_MARKING_NAME);
-            final IdentifierSubject iclone2 = ident.clone();
-            final IntConstantSubject markedval =
-                factory.createIntConstantProxy(markedValue ? 1 : 0);
-            final BinaryExpressionSubject pred =
-                factory.createBinaryExpressionProxy(opeq, iclone2, markedval);
-            final VariableMarkingSubject marking =
-                factory.createVariableMarkingProxy(accepting, pred);
-            markings.add(marking);
-        }
-    }
-
-	public static boolean isBoolean(final VariableComponentProxy variable)
-    {
-        final SimpleExpressionProxy type = variable.getType();
-        if (type instanceof SimpleIdentifierProxy) {
-            final SimpleIdentifierProxy ident = (SimpleIdentifierProxy) type;
-            return ident.getName().equals(NAME_OF_BOOLEAN_TYPE);
-        } else {
-            return false;
-        }
-	}
-
-    public static Boolean getInitialBooleanValue
-        (final VariableComponentProxy variable)
-    {
-        if (!isBoolean(variable)) {
-            return null;
-        }
-        final SimpleExpressionProxy pred = variable.getInitialStatePredicate();
-        if (!(pred instanceof BinaryExpressionProxy)) {
-            return null;
-        }
-        final BinaryExpressionProxy binpred = (BinaryExpressionProxy) pred;
-        final SimpleExpressionProxy rhs = binpred.getRight();
-        if (!(rhs instanceof IntConstantProxy)) {
-            return null;
-        }
-        final IntConstantProxy intconst = (IntConstantProxy) rhs;
-        return intconst.getValue() != 0;
-    }
-
-    public static Boolean getMarkedBooleanValue
-        (final VariableComponentProxy variable)
-    {
-        if (!isBoolean(variable)) {
-            return null;
-        }
-        final List<VariableMarkingProxy> markings =
-            variable.getVariableMarkings();
-        VariableMarkingProxy found = null;
-        for (final VariableMarkingProxy marking : markings) {
-            final IdentifierProxy ident = marking.getProposition();
-            if (ident instanceof SimpleIdentifierProxy) {
-                final SimpleIdentifierProxy simple =
-                    (SimpleIdentifierProxy) ident;
-                if (simple.getName().equals
-                      (EventDeclProxy.DEFAULT_MARKING_NAME)) {
-                    found = marking;
-                }
-            }
-        }
-        if (found == null) {
-            return null;
-        }
-        final SimpleExpressionProxy pred = found.getPredicate();
-        if (!(pred instanceof BinaryExpressionProxy)) {
-            return null;
-        }
-        final BinaryExpressionProxy binpred = (BinaryExpressionProxy) pred;
-        final SimpleExpressionProxy rhs = binpred.getRight();
-        if (!(rhs instanceof IntConstantProxy)) {
-            return null;
-        }
-        final IntConstantProxy intconst = (IntConstantProxy) rhs;
-        return intconst.getValue() != 0;
-    }
-   
-
-    //#######################################################################
-    //# Class Constants
-    public static final String NAME_OF_BOOLEAN_TYPE = "boolean";
-
 }
