@@ -281,45 +281,46 @@ public class Supervisor
      */
     protected int possibleLanguageContainmentCounterexample(int considred_events, boolean remove_events)
     {
-        int t_sp = spec.getT();
-        int t_p = plant.getT();
-        int cubep_sp = spec.getCubep();
-        int cubep_p = plant.getCubep();
+        final int t_sp = spec.getT();
+        final int t_p = plant.getT();
+        final int cubep_sp = spec.getCubep();
+        final int cubep_p = plant.getCubep();
         
         SizeWatch.setOwner("Supervisor.possibleLanguageContainmentCounterexample");
         SizeWatch.report(t_sp, "Tsp");
         SizeWatch.report(t_p, "Tp");
         
-        int tmp10 = manager.exists(t_sp, cubep_sp);
-        int tmp1 = manager.not(tmp10);
+        final int outgoingTransitions = manager.exists(t_sp, cubep_sp);
+        final int nonexistingOutgoingTransitions = manager.not(outgoingTransitions);
         
-        manager.deref(tmp10);
-        SizeWatch.report(tmp1, "~Eq'sp. Tsp");
+        manager.deref(outgoingTransitions);
+        SizeWatch.report(nonexistingOutgoingTransitions, "~Eq'sp. Tsp");
         
-        int tmp2 = manager.and(tmp1, considred_events);
+        final int nonexistingOutgTransWithConsideredEvents = manager.and(nonexistingOutgoingTransitions, considred_events);
         
-        manager.deref(tmp1);
-        SizeWatch.report(tmp2, "~Eq'sp. Tsp ^ (sigma in some Sigma)");
+        manager.deref(nonexistingOutgoingTransitions);
+        SizeWatch.report(nonexistingOutgTransWithConsideredEvents, "~Eq'sp. Tsp ^ (sigma in some Sigma)");
         
-        int tmp4;
+        int counterExampleStatesOrOutgoingTransitions;
         
         if (remove_events)
         {
-            int cube2 = manager.and(e_cube, cubep_p);
+            final int cube_targetStatesAndEvents = manager.and(e_cube, cubep_p);
+            //Calculate the states (uncontrollable states if considered_events = uncontrollable events)
+            counterExampleStatesOrOutgoingTransitions = manager.relProd(t_p, nonexistingOutgTransWithConsideredEvents, cube_targetStatesAndEvents);
             
-            tmp4 = manager.relProd(t_p, tmp2, cube2);
-            
-            manager.deref(cube2);
+            manager.deref(cube_targetStatesAndEvents);
         }
         else
         {
-            tmp4 = manager.relProd(t_p, tmp2, cubep_p);
+        	//Calculate the outgoing transitions (uncontrollable transitions if considered_events = uncontrollable events)
+        	counterExampleStatesOrOutgoingTransitions = manager.relProd(t_p, nonexistingOutgTransWithConsideredEvents, cubep_p);
         }
         
-        manager.deref(tmp2);
-        SizeWatch.report(tmp4, "(Language diff)");
+        manager.deref(nonexistingOutgTransWithConsideredEvents);
+        SizeWatch.report(counterExampleStatesOrOutgoingTransitions, "(Language diff)");
         
-        return tmp4;
+        return counterExampleStatesOrOutgoingTransitions;
     }
     
     /**
@@ -678,26 +679,21 @@ public class Supervisor
     
     /**
      * having a set x, subset of Q, we compute x intersection Q_reachable.
-     * If Q_reachable is not chaced, we compute reachability in out own way
      */
     public int getReachableSubset(int set)
-    {    // if already caches, use it
-        if (has_reachables)
-        {
-            return manager.and(set, bdd_reachables);
-        }
-        
-        return computeReachableSubset(set);
+    {    
+        return manager.and(set, getReachables());
     }
     
+    @Deprecated
     protected int computeReachableSubset(int set)
     {
-        GrowFrame gf = BDDGrow.getGrowFrame(manager, "Forward reachability with constriant");
+        final GrowFrame gf = BDDGrow.getGrowFrame(manager, "Forward reachability with constriant");
         
         timer.reset();
         
-        int t_all = manager.relProd(plant.getT(), spec.getT(), e_cube);
-        int i_all = manager.and(plant.getI(), spec.getI());
+        final int t_all = manager.relProd(plant.getT(), spec.getT(), e_cube);
+        final int i_all = manager.and(plant.getI(), spec.getI());
         int r_all_p, r_all = i_all;
         
         manager.ref(i_all);    // gets derefed by orTo and finally a recursiveDeref
@@ -710,30 +706,29 @@ public class Supervisor
         {
             r_all_p = r_all;
             
-            int tmp = manager.relProd(t_all, r_all, s_cube);
-            int tmp2 = manager.replace(tmp, perm_sp2s);
+            final int reachableNextStates = manager.relProd(t_all, r_all, s_cube);
+            final int reachableNextStatesAsCurrent = manager.replace(reachableNextStates, perm_sp2s);
             
-            manager.deref(tmp);
+            manager.deref(reachableNextStates);
             
-            int intersection = manager.and(set, tmp2);
+            final int intersection = manager.and(set, reachableNextStatesAsCurrent);
             
-            if (intersection != manager.getZero())
+            if (intersection == manager.getZero())
             {
                 
                 // clean up
                 manager.deref(r_all);
                 manager.deref(t_all);
                 manager.deref(i_all);
-                manager.deref(tmp2);
+                manager.deref(reachableNextStatesAsCurrent);
                 SizeWatch.report(intersection, "set intersection Qr");
                 timer.report("Forward reachablility with constraint");
                 
                 return intersection;
             }
-            
-            r_all = manager.orTo(r_all, tmp2);
-            
-            manager.deref(tmp2);
+            r_all = manager.orTo(r_all, reachableNextStatesAsCurrent);
+            manager.deref(intersection);
+            manager.deref(reachableNextStatesAsCurrent);
             
             if (gf != null)
             {
@@ -1002,7 +997,8 @@ public class Supervisor
         Timer timer = new Timer("SafeStatesNBC");
         
         // 1.a find the uncontrollable pairs
-        int xp, x = manager.ref( getUncontrollableStates() );
+        int xp;
+        int x = manager.ref( getUncontrollableStates() );
         timer.report("Uncontrollable by syncronization found", true);
         
         // 1.b if there are any explicitly forbidden states, we must add them to!
@@ -1082,7 +1078,8 @@ public class Supervisor
             x = manager.not(qpp_k);
             manager.deref(qpp_k);
                    
-            if (gf != null)
+            NodeCountStatistics.getInstance().addBdd(x, "SafeStatesNBC");
+			if (gf != null)
             {
                 gf.add(x);
             }
@@ -1138,6 +1135,8 @@ public class Supervisor
             
             r_all = manager.orTo(r_all, tmp2);
             
+            NodeCountStatistics.getInstance().addBdd(r_all, "restrictedBackward in Supervisor.java");
+			
             manager.deref(tmp2);
         }
         while (r_all_p != r_all);
@@ -1187,6 +1186,7 @@ public class Supervisor
             
             r_all = manager.orTo(r_all, tmp2);
             front = fso.choose(r_all, tmp2);    // Takes care of tmp2!
+            NodeCountStatistics.getInstance().addBdd(r_all, "uncontrollableBackward in Supervisor.java");
         } while (r_all_p != r_all);
         
         manager.deref(front); // (1) deref the work copy of front
