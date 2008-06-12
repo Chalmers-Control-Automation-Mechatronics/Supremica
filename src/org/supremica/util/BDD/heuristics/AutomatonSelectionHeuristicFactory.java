@@ -56,6 +56,7 @@ public class AutomatonSelectionHeuristicFactory
 			break;
 
 		default :
+			assert false;
 			System.err.println("[INTERNAL] BAD AutomatonSelectionHeuristic type...");
 
 			return null;
