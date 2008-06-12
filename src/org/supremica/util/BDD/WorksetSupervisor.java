@@ -266,6 +266,7 @@ public class WorksetSupervisor
 
 					manager.deref(tmp2);
 
+					NodeCountStatistics.getInstance().addBdd(r_all, "Backward reachability");
 					if (gf != null)
 					{
 						gf.add(r_all);
@@ -363,6 +364,7 @@ public class WorksetSupervisor
 
 				manager.deref(tmp2);
 
+				NodeCountStatistics.getInstance().addBdd(r_all, "restrictedBackward in WorksetSupervisor");
 				if (gf != null)
 				{
 					gf.add(r_all);
@@ -422,6 +424,7 @@ public class WorksetSupervisor
 
 				manager.deref(tmp2);
 
+				NodeCountStatistics.getInstance().addBdd(r_all, "uncontrollableBackward");
 				if (gf != null)
 				{
 					gf.add(r_all);
