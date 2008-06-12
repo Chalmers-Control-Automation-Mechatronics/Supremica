@@ -156,7 +156,7 @@ public class StepStoneSupervisor
 
 			manager.deref(tmp2);
 
-
+			NodeCountStatistics.getInstance().addBdd(r_all, "restrictedBackward in StepStone");
 			if (gf != null)
 			{
 				gf.add(r_all);
@@ -209,6 +209,7 @@ public class StepStoneSupervisor
 			workset.nonfixpoint_advance(p, (r_all != r_all_old));
 			manager.deref(tmp2);
 
+			NodeCountStatistics.getInstance().addBdd(r_all, "uncontrollableBackward in StepStone");
 			if (gf != null)
 			{
 				gf.add(r_all);

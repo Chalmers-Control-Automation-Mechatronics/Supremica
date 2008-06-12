@@ -112,6 +112,7 @@ public class AutomataCoverManager
 
 				manager.deref(tmp);
 
+				NodeCountStatistics.getInstance().addBdd(front, "AutomataCoverManager.forward_reachability [local]");
 				if (gf2 != null)
 				{
 					gf2.add(front);
@@ -131,6 +132,7 @@ public class AutomataCoverManager
 
 			front = new_;
 
+			NodeCountStatistics.getInstance().addBdd(ret, "AutomataCoverManager.forward_reachability [global]");
 			if (gf1 != null)
 			{
 				gf1.add(ret);
