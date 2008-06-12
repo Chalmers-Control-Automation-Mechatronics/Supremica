@@ -135,7 +135,7 @@ public class SupervisorFactory
 		int s1 = plant.getSize();
 		int s2 = spec.getSize();
 
-		if ((s1 > Options.MAX_MONOLITHIC_GROUP_SIZE) || (s1 > Options.MAX_MONOLITHIC_GROUP_SIZE) || (s1 + s2) > Options.MAX_MONOLITHIC_TOTAL_SIZE)
+		if ((s1 > Options.MAX_MONOLITHIC_GROUP_SIZE) || (s2 > Options.MAX_MONOLITHIC_GROUP_SIZE) || (s1 + s2) > Options.MAX_MONOLITHIC_TOTAL_SIZE)
 		{
 			return new SimplePartitionSupervisor(manager, plant, spec);
 
