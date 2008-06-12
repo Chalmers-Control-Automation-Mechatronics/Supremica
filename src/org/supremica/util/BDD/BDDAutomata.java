@@ -54,7 +54,9 @@ public class BDDAutomata
 
 		// }
 		SizeWatch.setManager(this);
-
+		NodeCountStatistics.getInstance().setManager(this);
+		NodeCountStatistics.getInstance().reset();
+		
 		// some funny thing with CUDD ...
 		int check0 = not(getZero());
 		int check1 = not(getOne());
@@ -73,7 +75,7 @@ public class BDDAutomata
 		// Dynamic reordering stuff:
 		reorder_setMethod(Options.reorder_algo);
 
-		if (Options.reorder_dyanmic)
+		if (Options.reorder_dynamic)
 		{
 			reorder_enableDyanamic(true);
 		}
