@@ -281,6 +281,7 @@ public class ConjSupervisor
 			r_all = manager.orTo(r_all, tmp2);
 			front = fso.choose(r_all, tmp2);    // Takes care of tmp2!
 
+			NodeCountStatistics.getInstance().addBdd(r_all, "Forward reachability");
 			if (gf != null)
 			{
 				gf.add(r_all);
@@ -332,6 +333,7 @@ public class ConjSupervisor
 			r_all = manager.orTo(r_all, tmp);
 			front = fso.choose(r_all, tmp);    // Takes care of tmp2!
 
+			NodeCountStatistics.getInstance().addBdd(r_all, "Backward reachability");
 			if (gf != null)
 			{
 				gf.add(r_all);
@@ -386,52 +388,52 @@ public class ConjSupervisor
 			return ret;
 		}
 		Event [] events = manager.getEvents();
-		int cube = manager.and( manager.getStatepCube(), manager.getEventCube());
+		int targetStatesAndEventsCube = manager.and( manager.getStatepCube(), manager.getEventCube());
 
 		for(int i = 0; i < events.length; i++)
 		{
 			// see if the event is something that we care about:
-			int tmp = manager.and( events[i].bdd, considred_events);
-			boolean do_care =  (tmp != manager.getZero());
-			manager.deref(tmp);
+			final int eventIsToBeConsidered = manager.and( events[i].bdd, considred_events);
+			boolean do_care =  (eventIsToBeConsidered != manager.getZero());
+			manager.deref(eventIsToBeConsidered);
 
 			if(do_care)
 			{
 				// what plans/specs are affected by this event?
 				Collection<BDDAutomaton> plant_care = plant.getUsers(events[i]);
 				Collection<BDDAutomaton> spec_care = spec.getUsers(events[i]);
-				if(! plant_care.isEmpty() &&  !spec_care.isEmpty())
+				if(!plant_care.isEmpty() &&  !spec_care.isEmpty())
 				{
 					// get (E.q', sigma : \delta_conj(q,sigma)=q')
 					int q_uc_plant = manager.ref (manager.getOne() );
 					for(BDDAutomaton aut : plant_care)
 					{
-						tmp = manager.relProd(aut.getT(), events[i].bdd, cube);
-						q_uc_plant = manager.andTo(q_uc_plant, tmp);
-						manager.deref(tmp);
+						final int statesWithThisEventAsOutgoing = manager.relProd(aut.getT(), events[i].bdd, targetStatesAndEventsCube);
+						q_uc_plant = manager.andTo(q_uc_plant, statesWithThisEventAsOutgoing);
+						manager.deref(statesWithThisEventAsOutgoing);
 					}
 					// dito for spec
 					int q_uc_spec = manager.ref (manager.getOne() );
 					for(BDDAutomaton aut : spec_care)
 					{
-						tmp = manager.relProd(aut.getT(), events[i].bdd, cube);
-						q_uc_spec = manager.andTo(q_uc_spec, tmp);
-						manager.deref(tmp);
+						final int statesWithThisEventAsOutgoing = manager.relProd(aut.getT(), events[i].bdd, targetStatesAndEventsCube);
+						q_uc_spec = manager.andTo(q_uc_spec, statesWithThisEventAsOutgoing);
+						manager.deref(statesWithThisEventAsOutgoing);
 					}
 					int not_q_uc_spec = manager.not(q_uc_spec);
 					manager.deref(q_uc_spec);
 
-					tmp = manager.and(not_q_uc_spec, q_uc_plant);
+					int counterExampleStatesOrOutgoingTransitionsWithThisEvent = manager.and(not_q_uc_spec, q_uc_plant);
 					manager.deref(not_q_uc_spec);
 					manager.deref(q_uc_plant);
 					// put back the removed events
 					if(!remove_events)
 					{
-						tmp = manager.andTo(tmp,  events[i].bdd);
+						counterExampleStatesOrOutgoingTransitionsWithThisEvent = manager.andTo(counterExampleStatesOrOutgoingTransitionsWithThisEvent,  events[i].bdd);
 					}
 					// save it:
-					ret = manager.orTo(ret, tmp);
-					manager.deref(tmp);
+					ret = manager.orTo(ret, counterExampleStatesOrOutgoingTransitionsWithThisEvent);
+					manager.deref(counterExampleStatesOrOutgoingTransitionsWithThisEvent);
 				}
 			}
 		}
@@ -439,7 +441,7 @@ public class ConjSupervisor
 		SizeWatch.setOwner("ConjSupervisor.possibleLanguageContainmentCounterexample");
 		SizeWatch.report(ret, "(language diff)");
 
-		manager.deref(cube);
+		manager.deref(targetStatesAndEventsCube);
 		return ret;
 	}
 }
