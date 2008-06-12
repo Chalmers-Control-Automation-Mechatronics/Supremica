@@ -21,7 +21,7 @@ public class SizeWatch
 		if (manager == null)
 		{
 			Options.out.println("[SizeWatch.SizeWatch] you should set the BDD manager first");
-			System.exit(20);
+			throw new RuntimeException("[SizeWatch.SizeWatch] you should set the BDD manager first");
 		}
 
 		setFont(new Font("Courier", Font.PLAIN, 12));
@@ -101,6 +101,8 @@ public class SizeWatch
 
 	public static void report(int bdd, String what)
 	{
+		NodeCountStatistics.getInstance().addBdd(bdd, what);
+		
 		SizeWatch me = getInstance();
 
 		if (me != null)
