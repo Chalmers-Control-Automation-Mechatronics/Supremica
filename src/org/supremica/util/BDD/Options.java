@@ -21,11 +21,11 @@ public class Options
     /** check if dynamic variable ordering is enabled anywhere */
     public static final boolean reorderEnabled()
     {
-        return (reorder_algo != JBDD.REORDER_NONE) && (reorder_dyanmic || reorder_after_build);
+        return (reorder_algo != JBDD.REORDER_NONE) && (reorder_dynamic || reorder_after_build);
     }
     
     public static int reorder_algo = JBDD.REORDER_SIFT;
-    public static boolean reorder_dyanmic = false;
+    public static boolean reorder_dynamic = false;
     
     /** enable on the fly reordering */
     public static boolean reorder_after_build = false;
@@ -295,7 +295,7 @@ public class Options
     public static boolean test_integrity = false; /** enables some internal test routines that are usually turned off to save time */
     public static boolean interleaved_variables = true; /** interleaved or seperated variable orders */
     public static boolean show_level_graph = false; /** shows the fillness of the workset sent to H1 */
-    
+    public static boolean collectNodeCountStatistics = false; // collect node counts to NodeCountStatistics
     
     
     /** initial burst mode: to do some initial work before the reachability algo realy starts */
