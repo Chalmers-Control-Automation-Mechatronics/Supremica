@@ -133,7 +133,7 @@
         <unjar src="${lib}/jdom.jar" dest="${lib}/${unjared}"/>
         <unjar src="${lib}/jhall.jar" dest="${lib}/${unjared}"/>
         <unjar src="${lib}/jlfgr-1_0.jar" dest="${lib}/${unjared}"/>
-        <unjar src="${lib}/junit.jar" dest="${lib}/${unjared}"/>	
+        <unjar src="${lib}/junit-4.4.jar" dest="${lib}/${unjared}"/>	
         <unjar src="${lib}/log4j.jar" dest="${lib}/${unjared}"/>
         <unjar src="${lib}/regler.jar" dest="${lib}/${unjared}"/>
         <unjar src="${lib}/jel.jar" dest="${lib}/${unjared}"/>
@@ -398,22 +398,23 @@
 *	source files that have changed.
     -->
     <target name="compile_benchmarks_supremica">
-        <javac
-            debug="on"
-            debuglevel="lines,source"
+        <groovyc
             srcdir="${benchmarkssrc}"
             destdir="${benchmarksbuild}"
             excludes="net/sourceforge/waters/junit/**/*.java"
             includeJavaRuntime="yes"
-            deprecation="false"
             verbose="false"
-            source="1.5"
         >
             <classpath>	
                 <pathelement location="${build}" />
                 <pathelement path="${lib}/${unjared}" />
             </classpath>
-        </javac>
+        	<javac
+				debug="on"        	            
+        		source="1.5"
+        		debuglevel="lines,source"
+				/>
+        </groovyc>
     </target>
     
     <!-- Compile:
