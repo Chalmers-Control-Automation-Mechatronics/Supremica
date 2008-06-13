@@ -1,1 +1,0 @@
-java  -Xss32m -Xms256m -Xmx512m -cp "/home/alex/NetBeansProjects/Supremica/build:/home/alex/NetBeansProjects/Supremica/src:/home/alex/NetBeansProjects/Supremica/lib/unjared:/home/alex/NetBeansProjects/Supremica/resources"  org.supremica.automata.SAT.expr.util.TestConverters

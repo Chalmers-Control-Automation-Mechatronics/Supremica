@@ -166,7 +166,8 @@
         <unjar src="${lib}/manufacturingTables_jaxb.jar" dest="${lib}/${unjared}"/>
         <unjar src="${lib}/genericPLCProgramDescription_jaxb.jar" dest="${lib}/${unjared}"/>
         <unjar src="${lib}/itext.jar" dest="${lib}/${unjared}"/>
-        <unjar src="${lib}/sat4j.jar" dest="${lib}/${unjared}"/>       
+        <unjar src="${lib}/sat4j-core-2.0.rc8.jar" dest="${lib}/${unjared}"/>       
+        <unjar src="${lib}/fsa2sat-1.0.jar" dest="${lib}/${unjared}"/>       
         <!-- unjar src="${lib}/java_cup.jar" dest="${lib}/${unjared}"/-->
 	<!-- unjar src="${lib}/bsh.jar" dest="${lib}/${unjared}"/-->
 	<!-- Tools for Adobe PostScript. -->

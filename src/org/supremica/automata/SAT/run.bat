@@ -1,1 +1,0 @@
-java  -Xss32m -Xms256m -Xmx512m -cp "c:\Documents and Settings\voronov\Supremica\src;c:\Documents and Settings\voronov\Supremica\lib\unjared;c:\Documents and Settings\voronov\Supremica\resources"  org.supremica.automata.SAT.SATAutomata
