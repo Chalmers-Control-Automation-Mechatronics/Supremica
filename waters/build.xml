@@ -13,12 +13,15 @@
 
   <property name="activation.jar" location="${supremica.lib}/activation.jar"/>
   <property name="fuber.jar" location="${supremica.lib}/fuber.jar"/>
+  <property name="groovy.jar"
+            location="${supremica.lib}/groovy-all-1.6-beta-1.jar"/>
   <property name="javabdd.jar" location="${supremica.lib}/javabdd-2.0.jar"/>
   <property name="java_cup.jar" location="${supremica.lib}/java_cup.jar"/>
   <property name="jaxb-api.jar" location="${supremica.lib}/jaxb-api.jar"/>
   <property name="jaxb-impl.jar" location="${supremica.lib}/jaxb-impl.jar"/>
   <property name="jaxb-xjc.jar" location="${supremica.lib}/jaxb-xjc.jar"/>
-  <property name="jsr173_api.jar" location="${supremica.lib}/jsr173_1.0_api.jar"/>
+  <property name="jsr173_api.jar"
+            location="${supremica.lib}/jsr173_1.0_api.jar"/>
   <property name="log4j.jar" location="${supremica.lib}/log4j.jar"/>
   <property name="junit.jar" location="${supremica.lib}/junit.jar"/>
   <property name="trove.jar" location="${supremica.lib}/trove.jar"/>
@@ -63,6 +66,7 @@
 
   <path id="supremica.efa.classpath">
     <pathelement location="${fuber.jar}"/>
+    <pathelement location="${groovy.jar}"/>
     <pathelement location="${java_cup.jar}"/>
     <!-- Cannot depend on Supremica/build !!! -->
   </path>
