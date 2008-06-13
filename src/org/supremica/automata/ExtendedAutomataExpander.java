@@ -112,10 +112,10 @@ import static org.supremica.automata.VariableHelper.getUpperBound;
 import org.supremica.log.*;
 
 /**
- * This class is a "quick fix" in order to handle more complex actions than x = 2 etc
+ * This class is a "quick fix" in order to handle more complex actions than just x = 2 etc
  * Example: Let all vars be of type 0..1. Assume transition with guard 'x & !y'
  * and action 'z = x & s'. By expanding this transition we get one transition with
- * [guard]/action [x==1 & y==0 & s==1]/x=1 and one with [x==1 & y==0 & s==0]/x=0
+ * [guard]/action [x==1 & y==0 & s==1]/z=1 and one with [x==1 & y==0 & s==0]/z=0
  * The parser of Fuber is used to find the identifiers, and the guards and actions
  * are evaluated using GroovyShell. In future, Supremicas/Waters own
  * parser/interpreter should be used instead of Fuber + Groovy 
@@ -320,8 +320,6 @@ public class ExtendedAutomataExpander
 		if (isGuard) sb.append("(Boolean) (").append(text).append(")");
 		else sb.append(text);
 		return sb.toString();
-		      
-//		return text.replaceAll("&", "&&").replaceAll("\\|", "||");
 	}
 
 	@SuppressWarnings("unchecked")
