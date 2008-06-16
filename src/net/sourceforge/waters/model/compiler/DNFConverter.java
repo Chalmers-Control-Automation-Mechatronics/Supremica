@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.compiler
 //# CLASS:   DNFConverter
 //###########################################################################
-//# $Id: DNFConverter.java,v 1.2 2007-03-19 22:13:38 martin Exp $
+//# $Id: DNFConverter.java,v 1.3 2008-06-16 07:09:50 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.compiler;
@@ -20,6 +20,7 @@ import net.sourceforge.waters.model.base.VisitorException;
 import net.sourceforge.waters.model.base.WatersRuntimeException;
 import net.sourceforge.waters.model.expr.BinaryOperator;
 import net.sourceforge.waters.model.expr.EvalException;
+import net.sourceforge.waters.model.expr.TypeMismatchException;
 import net.sourceforge.waters.model.expr.UnaryOperator;
 import net.sourceforge.waters.model.module.AbstractModuleProxyVisitor;
 import net.sourceforge.waters.model.module.BinaryExpressionProxy;

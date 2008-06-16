@@ -1,45 +1,49 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
 //# PROJECT: Waters
-//# PACKAGE: net.sourceforge.waters.model.compiler
-//# CLASS:   CompiledArrayAliasValue
+//# PACKAGE: net.sourceforge.waters.model.compiler.instance
+//# CLASS:   CompiledArrayAlias
 //###########################################################################
-//# $Id: CompiledArrayAliasValue.java,v 1.3 2008-06-16 07:09:50 robi Exp $
+//# $Id: CompiledArrayAlias.java,v 1.1 2008-06-16 07:09:51 robi Exp $
 //###########################################################################
 
-package net.sourceforge.waters.model.compiler;
+package net.sourceforge.waters.model.compiler.instance;
 
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 
+import net.sourceforge.waters.model.compiler.context.CompiledRange;
 import net.sourceforge.waters.model.compiler.context.
   DuplicateIdentifierException;
 import net.sourceforge.waters.model.compiler.context.
   UndefinedIdentifierException;
-import net.sourceforge.waters.model.expr.IndexValue;
-import net.sourceforge.waters.model.expr.RangeValue;
+import net.sourceforge.waters.model.module.IdentifierProxy;
+import net.sourceforge.waters.model.module.SimpleExpressionProxy;
+import net.sourceforge.waters.plain.module.IndexedIdentifierElement;
+import net.sourceforge.waters.plain.module.SimpleIdentifierElement;
 
 
-class CompiledArrayAliasValue implements ArrayValue, EventValue
+class CompiledArrayAlias implements CompiledEvent
 {
 
   //#########################################################################
   //# Constructor
-  CompiledArrayAliasValue(final String name)
+  CompiledArrayAlias(final String name)
   {
     mParentInfo = new RootParentInfo(name);
-    mMap = new HashMap<IndexValue,EventValue>();
+    mMap = new HashMap<SimpleExpressionProxy,CompiledEvent>();
   }
 
-  CompiledArrayAliasValue(final CompiledArrayAliasValue parent,
-                          final IndexValue index)
+  CompiledArrayAlias(final CompiledArrayAlias parent,
+                     final SimpleExpressionProxy index)
   {
     mParentInfo = new IndexedParentInfo(parent, index);
-    mMap = new HashMap<IndexValue,EventValue>();
+    mMap = new HashMap<SimpleExpressionProxy,CompiledEvent>();
   }
 
 
@@ -47,16 +51,44 @@ class CompiledArrayAliasValue implements ArrayValue, EventValue
   //# Overrides for java.lang.Object
   public String toString()
   {
-    return getName();
+    return getIdentifier().toString();
   }
 
 
-  //#######################################################################
-  //# Interface net.sourceforge.waters.model.compiler.ArrayValue
-  public EventValue find(final IndexValue index)
+  //#########################################################################
+  //# Interface net.sourceforge.waters.model.compiler.CompiledEvent
+  public int getKindMask()
+  {
+    int mask = 0;
+    for (final CompiledEvent event : mMap.values()) {
+      mask |= event.getKindMask();
+    }
+    return mask;
+  }
+
+  public boolean isObservable()
+  {
+    boolean observable = true;
+    for (final CompiledEvent event : mMap.values()) {
+      observable &= event.isObservable();
+    }
+    return observable;
+  }
+
+  public List<CompiledRange> getIndexRanges()
+  {
+    return Collections.emptyList();
+  }
+
+  public Iterator<CompiledSingleEvent> getEventIterator()
+  {
+    return new ArrayAliasIterator();
+  }
+
+  public CompiledEvent find(SimpleExpressionProxy index)
     throws UndefinedIdentifierException
   {
-    final EventValue result = get(index);
+    final CompiledEvent result = get(index);
     if (result == null) {
       final ParentInfo info = new IndexedParentInfo(this, index);
       final String name = info.getName();
@@ -66,50 +98,19 @@ class CompiledArrayAliasValue implements ArrayValue, EventValue
   }
 
 
-  //#######################################################################
-  //# Interface net.sourceforge.waters.model.compiler.EventValue
-  public int getKindMask()
-  {
-    int mask = 0;
-    for (final EventValue event : mMap.values()) {
-      mask |= event.getKindMask();
-    }
-    return mask;
-  }
-
-  public boolean isObservable()
-  {
-    boolean observable = true;
-    for (final EventValue event : mMap.values()) {
-      observable &= event.isObservable();
-    }
-    return observable;
-  }
-
-  public Iterator<CompiledSingleEventValue> getEventIterator()
-  {
-    return new ArrayAliasIterator();
-  }
-
-  public List<RangeValue> getIndexRanges()
-  {
-    return Collections.emptyList();
-  }
-
-
   //#########################################################################
   //# Specific Access
-  String getName()
+  IdentifierProxy getIdentifier()
   {
-    return mParentInfo.getName();
+    return mParentInfo.getIdentifier();
   }
 
-  EventValue get(final IndexValue index)
+  CompiledEvent get(final SimpleExpressionProxy index)
   {
     return mMap.get(index);
   }
 
-  void set(final IndexValue index, final EventValue value)
+  void set(final SimpleExpressionProxy index, final CompiledEvent value)
     throws DuplicateIdentifierException
   {
     if (!mMap.containsKey(index)) {
@@ -121,12 +122,39 @@ class CompiledArrayAliasValue implements ArrayValue, EventValue
     }
   }
 
+  void set(final List<SimpleExpressionProxy> indexes,
+           final CompiledEvent value)
+    throws DuplicateIdentifierException
+  {
+    if (indexes.isEmpty()) {
+      throw new IllegalArgumentException
+        ("Index list for new array alias must not be empty!");
+    } else {
+      final Iterator<SimpleExpressionProxy> iter = indexes.iterator();
+      set(iter, value);
+    }
+  }
+
 
   //#########################################################################
   //# Auxiliary Methods
   private ParentInfo getParentInfo()
   {
     return mParentInfo;
+  }
+
+  private void set(final Iterator<SimpleExpressionProxy> iter,
+                   final CompiledEvent value)
+    throws DuplicateIdentifierException
+  {
+    final SimpleExpressionProxy index = iter.next();
+    if (iter.hasNext()) {
+      final CompiledArrayAlias alias = new CompiledArrayAlias(this, index);
+      alias.set(iter, value);
+      set(index, alias);
+    } else {
+      set(index, value);
+    }      
   }
 
 
@@ -137,14 +165,21 @@ class CompiledArrayAliasValue implements ArrayValue, EventValue
 
     //#######################################################################
     //# Naming
-    private String getName()
+    String getName()
     {
-      final StringBuffer buffer = new StringBuffer();
-      appendName(buffer);
-      return buffer.toString();
+      final IdentifierProxy ident = getIdentifier();
+      return ident.toString();
     }
 
-    abstract void appendName(StringBuffer buffer);
+    IdentifierProxy getIdentifier()
+    {
+      final List<SimpleExpressionProxy> empty =
+        new LinkedList<SimpleExpressionProxy>();
+      return getIdentifier(empty);
+    }
+
+    abstract IdentifierProxy getIdentifier
+      (final List<SimpleExpressionProxy> indexes);
 
   }
 
@@ -162,9 +197,18 @@ class CompiledArrayAliasValue implements ArrayValue, EventValue
 
     //#######################################################################
     //# Naming
-    void appendName(final StringBuffer buffer)
+    IdentifierProxy getIdentifier()
     {
-      buffer.append(mName);
+      return new SimpleIdentifierElement(mName);
+    }
+
+    IdentifierProxy getIdentifier(final List<SimpleExpressionProxy> indexes)
+    {
+      if (indexes.isEmpty()) {
+        return new SimpleIdentifierElement(mName);
+      } else {
+        return new IndexedIdentifierElement(mName, indexes);
+      }
     }
 
     //#######################################################################
@@ -179,8 +223,8 @@ class CompiledArrayAliasValue implements ArrayValue, EventValue
 
     //#######################################################################
     //# Constructor
-    private IndexedParentInfo(final CompiledArrayAliasValue parent,
-                              final IndexValue index)
+    private IndexedParentInfo(final CompiledArrayAlias parent,
+                              final SimpleExpressionProxy index)
     {
       mParent = parent;
       mIndex = index;
@@ -188,19 +232,17 @@ class CompiledArrayAliasValue implements ArrayValue, EventValue
 
     //#######################################################################
     //# Naming
-    void appendName(final StringBuffer buffer)
+    IdentifierProxy getIdentifier(final List<SimpleExpressionProxy> indexes)
     {
-      final ParentInfo parentInfo = mParent.getParentInfo();
-      parentInfo.appendName(buffer);
-      buffer.append('[');
-      buffer.append(mIndex.toString());
-      buffer.append(']');
+      final ParentInfo info = mParent.getParentInfo();
+      indexes.add(0, mIndex);
+      return info.getIdentifier(indexes);
     }
 
     //#######################################################################
     //# Data Members
-    private final CompiledArrayAliasValue mParent;
-    private final IndexValue mIndex;
+    private final CompiledArrayAlias mParent;
+    private final SimpleExpressionProxy mIndex;
 
   }
 
@@ -208,7 +250,7 @@ class CompiledArrayAliasValue implements ArrayValue, EventValue
   //#########################################################################
   //# Local Class ArrayAliasIterator
   private class ArrayAliasIterator
-    implements Iterator<CompiledSingleEventValue>
+    implements Iterator<CompiledSingleEvent>
   {
 
     //#######################################################################
@@ -226,10 +268,10 @@ class CompiledArrayAliasValue implements ArrayValue, EventValue
       return mInnerIterator != null;
     }
 
-    public CompiledSingleEventValue next()
+    public CompiledSingleEvent next()
     {
       if (mInnerIterator != null) {
-        final CompiledSingleEventValue result = mInnerIterator.next();
+        final CompiledSingleEvent result = mInnerIterator.next();
         if (!mInnerIterator.hasNext()) {
           advance();
         }
@@ -251,8 +293,8 @@ class CompiledArrayAliasValue implements ArrayValue, EventValue
     private void advance()
     {
       if (mKeyIterator.hasNext()) {
-        final IndexValue index = mKeyIterator.next();
-        final EventValue value = mMap.get(index);
+        final SimpleExpressionProxy index = mKeyIterator.next();
+        final CompiledEvent value = mMap.get(index);
         mInnerIterator = value.getEventIterator();
       } else {
         mKeyIterator = null;
@@ -262,8 +304,8 @@ class CompiledArrayAliasValue implements ArrayValue, EventValue
 
     //#######################################################################
     //# Data Members
-    private Iterator<IndexValue> mKeyIterator;
-    private Iterator<CompiledSingleEventValue> mInnerIterator;
+    private Iterator<SimpleExpressionProxy> mKeyIterator;
+    private Iterator<CompiledSingleEvent> mInnerIterator;
 
   }
 
@@ -271,6 +313,6 @@ class CompiledArrayAliasValue implements ArrayValue, EventValue
   //#########################################################################
   //# Data Members
   private final ParentInfo mParentInfo;
-  private final Map<IndexValue,EventValue> mMap;
+  private final Map<SimpleExpressionProxy,CompiledEvent> mMap;
 
 }

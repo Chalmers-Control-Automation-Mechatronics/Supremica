@@ -1,0 +1,959 @@
+//# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
+//###########################################################################
+//# PROJECT: Waters
+//# PACKAGE: net.sourceforge.waters.model.compiler.instance
+//# CLASS:   ModuleInstanceCompiler
+//###########################################################################
+//# $Id: ModuleInstanceCompiler.java,v 1.1 2008-06-16 07:09:51 robi Exp $
+//###########################################################################
+
+package net.sourceforge.waters.model.compiler.instance;
+
+import java.io.IOException;
+import java.net.URI;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.IdentityHashMap;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
+import java.util.TreeSet;
+import java.util.Set;
+
+import net.sourceforge.waters.model.base.Proxy;
+import net.sourceforge.waters.model.base.VisitorException;
+import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
+import net.sourceforge.waters.model.compiler.context.CompiledRange;
+import net.sourceforge.waters.model.compiler.context.BindingContext;
+import net.sourceforge.waters.model.compiler.context.ModuleBindingContext;
+import net.sourceforge.waters.model.compiler.context.SimpleExpressionCompiler;
+import net.sourceforge.waters.model.compiler.context.
+  UndefinedIdentifierException;
+import net.sourceforge.waters.model.expr.BinaryOperator;
+import net.sourceforge.waters.model.expr.EvalException;
+import net.sourceforge.waters.model.expr.TypeMismatchException;
+import net.sourceforge.waters.model.expr.UnaryOperator;
+import net.sourceforge.waters.model.marshaller.DocumentManager;
+import net.sourceforge.waters.model.marshaller.ProxyMarshaller;
+import net.sourceforge.waters.model.marshaller.WatersUnmarshalException;
+import net.sourceforge.waters.model.module.AbstractModuleProxyVisitor;
+import net.sourceforge.waters.model.module.BinaryExpressionProxy;
+import net.sourceforge.waters.model.module.ConstantAliasProxy;
+import net.sourceforge.waters.model.module.EdgeProxy;
+import net.sourceforge.waters.model.module.EventAliasProxy;
+import net.sourceforge.waters.model.module.EventDeclProxy;
+import net.sourceforge.waters.model.module.EventListExpressionProxy;
+import net.sourceforge.waters.model.module.ExpressionProxy;
+import net.sourceforge.waters.model.module.ForeachProxy;
+import net.sourceforge.waters.model.module.GraphProxy;
+import net.sourceforge.waters.model.module.GroupNodeProxy;
+import net.sourceforge.waters.model.module.GuardActionBlockProxy;
+import net.sourceforge.waters.model.module.IdentifiedProxy;
+import net.sourceforge.waters.model.module.IdentifierProxy;
+import net.sourceforge.waters.model.module.IndexedIdentifierProxy;
+import net.sourceforge.waters.model.module.InstanceProxy;
+import net.sourceforge.waters.model.module.IntConstantProxy;
+import net.sourceforge.waters.model.module.LabelBlockProxy;
+import net.sourceforge.waters.model.module.ModuleProxy;
+import net.sourceforge.waters.model.module.ModuleProxyCloner;
+import net.sourceforge.waters.model.module.ModuleProxyFactory;
+import net.sourceforge.waters.model.module.NodeProxy;
+import net.sourceforge.waters.model.module.ParameterBindingProxy;
+import net.sourceforge.waters.model.module.PlainEventListProxy;
+import net.sourceforge.waters.model.module.QualifiedIdentifierProxy;
+import net.sourceforge.waters.model.module.SimpleComponentProxy;
+import net.sourceforge.waters.model.module.SimpleExpressionProxy;
+import net.sourceforge.waters.model.module.SimpleIdentifierProxy;
+import net.sourceforge.waters.model.module.SimpleNodeProxy;
+import net.sourceforge.waters.model.module.VariableComponentProxy;
+import net.sourceforge.waters.model.module.VariableMarkingProxy;
+import net.sourceforge.waters.plain.module.ModuleElementFactory;
+
+import net.sourceforge.waters.xsd.base.ComponentKind;
+import net.sourceforge.waters.xsd.base.EventKind;
+import net.sourceforge.waters.xsd.module.ScopeKind;
+
+
+public class ModuleInstanceCompiler extends AbstractModuleProxyVisitor
+{
+
+  //#########################################################################
+  //# Constructors
+  public ModuleInstanceCompiler(final DocumentManager manager,
+                                final ModuleProxy module)
+  {
+    mDocumentManager = manager;
+    mFactory = ModuleElementFactory.getInstance();
+    mOperatorTable = CompilerOperatorTable.getInstance();
+    mSimpleExpressionCompiler =
+      new SimpleExpressionCompiler(mFactory, mOperatorTable);
+    mNameCompiler = new NameCompiler();
+    mIndexAdder = new IndexAdder();
+    mNameSpaceVariablesContext = new NameSpaceVariablesContext();
+    mInputModule = module;
+  }
+
+
+  //#########################################################################
+  //# Invocation
+  public ModuleProxy compile(final List<ParameterBindingProxy> bindings)
+    throws EvalException
+  {
+    try {
+      mContext = new ModuleBindingContext(mInputModule);
+      mNameSpace = new CompiledNameSpace();
+      mCompiledEvents = new TreeSet<EventDeclProxy>();
+      mCompiledComponents = new LinkedList<Proxy>();
+      if (bindings != null) {
+        mParameterMap = new TreeMap<String,CompiledParameterBinding>();
+        visitCollection(bindings);
+      }
+      visitModuleProxy(mInputModule);
+      final String name = mInputModule.getName();
+      final String comment = mInputModule.getComment();
+      return mFactory.createModuleProxy
+        (name, comment, null,
+         null, mCompiledEvents, null, mCompiledComponents);
+    } catch (final VisitorException exception) {
+      final Throwable cause = exception.getCause();
+      if (cause instanceof EvalException) {
+        throw (EvalException) cause;
+      } else {
+        throw exception.getRuntimeException();
+      }
+    } finally {
+      mContext = null;
+      mNameSpace = null;
+      mCompiledEvents = null;
+      mCompiledComponents = null;
+      mParameterMap = null;
+    }
+  }
+
+
+  //#########################################################################
+  //# Interface net.sourceforge.waters.model.module.ModuleProxyVisitor
+  public SimpleExpressionProxy visitConstantAliasProxy
+    (final ConstantAliasProxy alias)
+    throws VisitorException
+  {
+    try {
+      final IdentifierProxy ident = alias.getIdentifier();
+      final ScopeKind scope = alias.getScope();
+      final CompiledParameterBinding binding =
+        getParameterBinding(ident, scope);
+      final SimpleExpressionProxy value;
+      if (binding == null) {
+        final SimpleExpressionProxy defaultExpr =
+          (SimpleExpressionProxy) alias.getExpression();
+        value = mSimpleExpressionCompiler.eval(defaultExpr, mContext);
+      } else {
+        value = binding.getSimpleValue();
+      }
+      final ModuleBindingContext context = mContext.getModuleBindingContext();
+      context.insertBinding(ident, value);
+      return value;
+    } catch (final EvalException exception) {
+      exception.provideLocation(alias);
+      throw wrap(exception);
+    }
+  }
+
+  public EdgeProxy visitEdgeProxy(final EdgeProxy edge)
+    throws VisitorException
+  {
+    try {
+      final NodeProxy source0 = edge.getSource();
+      final NodeProxy source1 = mNodeMap.get(source0);
+      final NodeProxy target0 = edge.getTarget();
+      final NodeProxy target1 = mNodeMap.get(target0);
+      final LabelBlockProxy labels0 = edge.getLabelBlock();
+      final CompiledEventList event = visitEventListExpressionProxy
+        (labels0, EventKindMask.TYPEMASK_EVENT);
+      final LabelBlockProxy labels1 = compileLabelBlock(event);
+      final GuardActionBlockProxy ga0 = edge.getGuardActionBlock();
+      GuardActionBlockProxy ga1 = null;
+      if (ga0 != null) {
+        ga1 = visitGuardActionBlockProxy(ga0);
+        final List<SimpleExpressionProxy> guards = ga1.getGuards();
+        final List<BinaryExpressionProxy> actions = ga1.getActions();
+        if (guards.isEmpty() && actions.isEmpty()) {
+          ga1 = null;
+        } else {
+          final Iterator<SimpleExpressionProxy> iter = guards.iterator();
+          final SimpleExpressionProxy guard = iter.next();
+          if (!iter.hasNext() &&
+              mSimpleExpressionCompiler.isAtomicValue(guard)) {
+            final boolean value =
+              mSimpleExpressionCompiler.getBooleanValue(guard);
+            if (!value) {
+              return null;
+            } else if (actions.isEmpty()) {
+              ga1 = null;
+            }
+          }
+        }
+      }
+      final EdgeProxy compiled = mFactory.createEdgeProxy
+        (source1, target1, labels1, ga1, null, null, null);
+      mCurrentEdges.add(compiled);
+      return compiled;
+    } catch (final TypeMismatchException exception) {
+      throw wrap(exception);
+    }
+  }
+
+  public CompiledEvent visitEventAliasProxy(final EventAliasProxy alias)
+    throws VisitorException
+  {
+    try {
+      final IdentifierProxy ident = alias.getIdentifier();
+      final ExpressionProxy expr = alias.getExpression();
+      final Object value = expr.acceptVisitor(this);
+      if (!(value instanceof CompiledEvent)) {
+        throw new TypeMismatchException(expr, "event");
+      }
+      final CompiledEvent event = (CompiledEvent) value;
+      mNameSpace.addEvent(ident, event);
+      return event;
+    } catch (final EvalException exception) {
+      exception.provideLocation(alias);
+      throw wrap(exception);
+    }
+  }
+
+  public CompiledEvent visitEventDeclProxy(final EventDeclProxy decl)
+    throws VisitorException
+  {
+    try {
+      final IdentifierProxy ident = decl.getIdentifier();
+      final ScopeKind scope = decl.getScope();
+      final CompiledParameterBinding binding =
+        getParameterBinding(ident, scope);
+      final List<SimpleExpressionProxy> declRanges = decl.getRanges();
+      CompiledEvent event = binding == null ? null : binding.getEventValue();
+      if (event == null) {
+        final List<CompiledRange> ranges =
+          new ArrayList<CompiledRange>(declRanges.size());
+        for (final SimpleExpressionProxy expr : declRanges) {
+          final SimpleExpressionProxy value =
+            mSimpleExpressionCompiler.eval(expr, mContext);
+          final CompiledRange range =
+            mSimpleExpressionCompiler.getRangeValue(value);
+          ranges.add(range);
+        }
+        final CompiledEventDecl entry =
+          new CompiledEventDecl(mNameSpace, decl, ranges);
+        event = entry.getCompiledEvent();
+      } else {
+        final EventKind kind = decl.getKind();
+        final int mask = event.getKindMask();
+        if (!EventKindMask.isAssignable(kind, mask) ||
+            decl.isObservable() && !event.isObservable()) {
+          throw new EventKindException(decl, event);
+        }
+        final Iterator<SimpleExpressionProxy> declIter =
+          declRanges.iterator();
+        final List<CompiledRange> eventRanges = event.getIndexRanges();
+        final Iterator<CompiledRange> eventIter = eventRanges.iterator();
+        int index = 0;
+        while (declIter.hasNext()) {
+          if (!eventIter.hasNext()) {
+            throw new EventKindException(decl, event, index);
+          }
+          final SimpleExpressionProxy expr = declIter.next();
+          final SimpleExpressionProxy value =
+            mSimpleExpressionCompiler.eval(expr, mContext);
+          final CompiledRange declRange =
+            mSimpleExpressionCompiler.getRangeValue(value);
+          final CompiledRange eventRange = eventIter.next();
+          if (!declRange.equals(eventRange)) {
+            throw new EventKindException(decl, event, index, declRange);
+          }
+          index++;
+        }
+      }
+      mNameSpace.addEvent(ident, event);
+      return event;
+    } catch (final EvalException exception) {
+      exception.provideLocation(decl);
+      throw wrap(exception);
+    }
+  }
+
+  public CompiledEventList visitEventListExpressionProxy
+    (final EventListExpressionProxy proxy)
+    throws VisitorException
+  {
+    return visitEventListExpressionProxy(proxy, EventKindMask.TYPEMASK_ANY);
+  }
+
+  public CompiledEventList visitEventListExpressionProxy
+    (final EventListExpressionProxy proxy, final int mask)
+    throws VisitorException
+  {
+    try {
+      mCurrentEventList = new CompiledEventList(mask);
+      final List<Proxy> list = proxy.getEventList();
+      visitCollection(list);
+      return mCurrentEventList;
+    } finally {
+      mCurrentEventList = null;
+    }
+  }
+
+  public Object visitForeachProxy(final ForeachProxy foreach)
+    throws VisitorException
+  {
+    try {
+      final BindingContext root = mContext;
+      final String name = foreach.getName();
+      final List<Proxy> body = foreach.getBody();
+      final SimpleExpressionProxy expr = foreach.getRange();
+      final SimpleExpressionProxy value =
+        mSimpleExpressionCompiler.eval(expr, mContext);
+      final CompiledRange range =
+        mSimpleExpressionCompiler.getRangeValue(value);
+      for (final SimpleExpressionProxy item : range.getValues()) {
+        try {
+          mContext = new ForeachBindingContext(name, item, root);
+          final SimpleExpressionProxy guard = foreach.getGuard();
+          if (guard == null) {
+            visitCollection(body);
+          } else {
+            final SimpleExpressionProxy gvalue =
+              mSimpleExpressionCompiler.eval(expr, mContext);
+            final boolean gboolean =
+              mSimpleExpressionCompiler.getBooleanValue(guard);
+            if (gboolean) {
+              visitCollection(body);
+            }
+          }
+        } finally {
+          mContext = root;
+        }
+      }
+      return null;
+    } catch (final EvalException exception) {
+      throw wrap(exception);
+    }
+  }
+
+  public GraphProxy visitGraphProxy(final GraphProxy graph)
+    throws VisitorException
+  {
+    try {
+      final boolean deterministic = graph.isDeterministic();
+      final LabelBlockProxy blocked0 = graph.getBlockedEvents();
+      final LabelBlockProxy blocked1;
+      if (blocked0 == null) {
+        blocked1 = null;
+      } else {
+        final CompiledEventList events =
+          visitEventListExpressionProxy(blocked0);
+        blocked1 = compileLabelBlock(events);
+      }
+      final Collection<NodeProxy> nodes = graph.getNodes();
+      final int numnodes = nodes.size();
+      mCurrentNodes = new ArrayList<NodeProxy>(numnodes);
+      mNodeMap = new HashMap<NodeProxy,NodeProxy>(numnodes);
+      visitCollection(nodes);
+      final Collection<EdgeProxy> edges = graph.getEdges();
+      final int numedges = edges.size();
+      mCurrentEdges = new ArrayList<EdgeProxy>(numedges);
+      visitCollection(edges);
+      return mFactory.createGraphProxy
+        (deterministic, blocked1, mCurrentNodes, mCurrentEdges);
+    } finally {
+      mCurrentNodes = null;
+      mNodeMap = null;
+      mCurrentEdges = null;
+    }
+  }
+
+  public GroupNodeProxy visitGroupNodeProxy(final GroupNodeProxy group)
+    throws VisitorException
+  {
+    final String name = group.getName();
+    final PlainEventListProxy props0 = group.getPropositions();
+    final CompiledEventList event = visitEventListExpressionProxy
+      (props0, EventKindMask.TYPEMASK_PROPOSITION);
+    final PlainEventListProxy props1 = compilePlainEventList(event);
+    final Set<NodeProxy> children0 = group.getImmediateChildNodes();
+    final int numchildren = children0.size();
+    final List<NodeProxy> children1 = new ArrayList<NodeProxy>(numchildren);
+    for (final NodeProxy child0 : children0) {
+      final NodeProxy child1 = mNodeMap.get(child0);
+      children1.add(child1);
+    }
+    final GroupNodeProxy compiled =
+      mFactory.createGroupNodeProxy(name, props1, children1, null);
+    mNodeMap.put(group, compiled);
+    mCurrentNodes.add(compiled);
+    return compiled;
+  }
+
+  public GuardActionBlockProxy visitGuardActionBlockProxy
+    (final GuardActionBlockProxy ga)
+    throws VisitorException
+  {
+    try {
+      final List<SimpleExpressionProxy> oldguards = ga.getGuards();
+      final int numguards = oldguards.size();
+      final List<SimpleExpressionProxy> newguards =
+        new ArrayList<SimpleExpressionProxy>(numguards);
+      for (final SimpleExpressionProxy oldguard : oldguards) {
+        final SimpleExpressionProxy newguard =
+          mSimpleExpressionCompiler.simplify
+          (oldguard, mNameSpaceVariablesContext);
+        if (!mSimpleExpressionCompiler.isAtomicValue(newguard)) {
+          newguards.add(newguard);
+        } else if (mSimpleExpressionCompiler.getBooleanValue(newguard)) {
+          // Don't bother to add true guards ...
+        } else {
+          // If a guard is false, no need for any other guards ...
+          newguards.clear();
+          newguards.add(newguard);
+          break;
+        }
+      }
+      final List<BinaryExpressionProxy> oldactions = ga.getActions();
+      final int numactions = oldactions.size();
+      final List<BinaryExpressionProxy> newactions =
+        new ArrayList<BinaryExpressionProxy>(numactions);
+      for (final BinaryExpressionProxy oldaction : oldactions) {
+        final SimpleExpressionProxy newaction =
+          mSimpleExpressionCompiler.simplify
+          (oldaction, mNameSpaceVariablesContext);
+        if (newaction instanceof BinaryExpressionProxy) {
+          final BinaryExpressionProxy newbinary =
+            (BinaryExpressionProxy) newaction;
+          newactions.add(newbinary);
+        } else {
+          throw new TypeMismatchException(oldaction, "ACTION");
+        }
+      }
+      return mFactory.createGuardActionBlockProxy(newguards, newactions, null);
+    } catch (final EvalException exception) {
+      throw wrap(exception);
+    }
+  }
+
+  public Object visitIdentifierProxy (final IdentifierProxy ident)
+    throws VisitorException
+  {
+    final IdentifierProxy newident = mNameCompiler.compileName(ident);
+    try {
+      if (mCurrentEventList == null) {
+        final SimpleExpressionProxy value =
+          mSimpleExpressionCompiler.simplify(newident, mContext);
+        if (mSimpleExpressionCompiler.isAtomicValue(value)) {
+          return value;
+        }
+        final IdentifierProxy ivalue = (IdentifierProxy) value;
+        final CompiledEvent event = mNameSpace.getEvent(ivalue);
+        if (event == null) {
+          throw new UndefinedIdentifierException(ident);
+        }
+        return event;
+      } else {
+        final CompiledEvent event = mNameSpace.findEvent(newident);
+        mCurrentEventList.addEvent(event);
+        return event;
+      }
+    } catch (final EvalException exception) {
+      throw wrap(exception);
+    }
+  }
+
+  public Object visitInstanceProxy(final InstanceProxy inst)
+    throws VisitorException
+  {
+    final BindingContext oldContext = mContext;
+    final CompiledNameSpace oldNameSpace = mNameSpace;
+    try {
+      final IdentifierProxy ident = inst.getIdentifier();
+      final IdentifierProxy suffix = mNameCompiler.compileName(ident);
+      final IdentifierProxy fullname =
+        mNameSpace.getPrefixedIdentifier(suffix, mFactory);
+      final List<ParameterBindingProxy> bindings = inst.getBindingList();
+      mParameterMap = new TreeMap<String,CompiledParameterBinding>();
+      visitCollection(bindings);
+      final ModuleBindingContext root = mContext.getModuleBindingContext();
+      final URI uri = root.getModule().getLocation();
+      final String filename = inst.getModuleName();
+      final ModuleProxy module =
+        mDocumentManager.load(uri, filename, ModuleProxy.class);
+      mContext = new ModuleBindingContext(module, fullname, null /*info*/);
+      mNameSpace = new CompiledNameSpace(suffix, mNameSpace);
+      return visitModuleProxy(module);
+    } catch (final IOException exception) {
+      final InstantiationException next =
+        new InstantiationException(exception, inst);
+      throw wrap(next);
+    } catch (final WatersUnmarshalException exception) {
+      final InstantiationException next =
+        new InstantiationException(exception, inst);
+      throw wrap(next);
+    } finally {
+      mContext = oldContext;
+      mNameSpace = oldNameSpace;
+      mParameterMap = null;
+    }
+  }
+
+  public Object visitModuleProxy(final ModuleProxy module)
+    throws VisitorException
+  {
+    final List<Proxy> parameters = new LinkedList<Proxy>();
+    final List<Proxy> nonparameters = new LinkedList<Proxy>();
+    for (final ConstantAliasProxy alias : module.getConstantAliasList()) {
+      if (alias.getScope() == ScopeKind.LOCAL) {
+        nonparameters.add(alias);
+      } else {
+        parameters.add(alias);
+      }
+    }
+    for (final EventDeclProxy decl : module.getEventDeclList()) {
+      if (decl.getScope() == ScopeKind.LOCAL) {
+        nonparameters.add(decl);
+      } else {
+        parameters.add(decl);
+      }
+    }
+    visitCollection(parameters);
+    if (mParameterMap != null && !mParameterMap.isEmpty()) {
+      // Throw exception when not all paremeters passed into the module
+      // have been consumed---unless compiling in top-level context.
+      final CompiledParameterBinding entry =
+        mParameterMap.values().iterator().next();
+      final ParameterBindingProxy binding = entry.getBinding();
+      final String name = binding.getName();
+      final UndefinedIdentifierException exception =
+        new UndefinedIdentifierException(name, "parameter", binding);
+      throw wrap(exception);
+    }
+    mParameterMap = null;
+    visitCollection(nonparameters);
+    final List<Proxy> aliases = module.getEventAliasList();
+    visitCollection(aliases);
+    final List<Proxy> components = module.getComponentList();
+    visitCollection(components);
+    return null;
+  }
+
+  public CompiledParameterBinding visitParameterBindingProxy
+    (final ParameterBindingProxy binding)
+    throws VisitorException
+  {
+    final String name = binding.getName();
+    final ExpressionProxy expr = binding.getExpression();
+    final Object value = expr.acceptVisitor(this);
+    final CompiledParameterBinding compiled =
+      new CompiledParameterBinding(binding, value);
+    mParameterMap.put(name, compiled);
+    return compiled;
+  }
+
+  public SimpleComponentProxy visitSimpleComponentProxy
+    (final SimpleComponentProxy comp)
+    throws VisitorException
+  {
+    try {
+      final IdentifierProxy ident = comp.getIdentifier();
+      final IdentifierProxy suffix = mNameCompiler.compileName(ident);
+      final IdentifierProxy fullname =
+        mNameSpace.getPrefixedIdentifier(suffix, mFactory);
+      final ComponentKind kind = comp.getKind();
+      final GraphProxy graph = comp.getGraph();
+      final GraphProxy newgraph = visitGraphProxy(graph);
+      final SimpleComponentProxy newcomp =
+        mFactory.createSimpleComponentProxy(fullname, kind, newgraph);
+      mNameSpace.addComponent(suffix, newcomp);
+      mCompiledComponents.add(newcomp);
+      return newcomp;
+    } catch (final EvalException exception) {
+      throw wrap(exception);
+    }
+  }
+
+  public SimpleExpressionProxy visitSimpleExpressionProxy
+    (final SimpleExpressionProxy expr)
+    throws VisitorException
+  {
+    try {
+      return mSimpleExpressionCompiler.eval(expr, mContext);
+    } catch (final EvalException exception) {
+      throw wrap(exception);
+    }
+  }
+
+  public SimpleNodeProxy visitSimpleNodeProxy(final SimpleNodeProxy node)
+    throws VisitorException
+  {
+    final String name = node.getName();
+    final boolean initial = node.isInitial();
+    final PlainEventListProxy props0 = node.getPropositions();
+    final CompiledEventList event = visitEventListExpressionProxy
+      (props0, EventKindMask.TYPEMASK_PROPOSITION);
+    final PlainEventListProxy props1 = compilePlainEventList(event);
+    final SimpleNodeProxy compiled =
+      mFactory.createSimpleNodeProxy(name, props1, initial, null, null, null);
+    mNodeMap.put(node, compiled);
+    mCurrentNodes.add(compiled);
+    return compiled;
+  }
+
+  public VariableComponentProxy visitVariableComponentProxy
+    (final VariableComponentProxy var)
+    throws VisitorException
+  {
+    try {
+      final IdentifierProxy ident = var.getIdentifier();
+      final IdentifierProxy suffix = mNameCompiler.compileName(ident);
+      final IdentifierProxy fullname =
+        mNameSpace.getPrefixedIdentifier(suffix, mFactory);
+      final BindingContext context = new SinglePrefixingContext(suffix);
+      final SimpleExpressionProxy expr = var.getType();
+      final SimpleExpressionProxy value =
+        mSimpleExpressionCompiler.eval(expr, mContext);
+      mSimpleExpressionCompiler.getRangeValue(value);
+      final boolean deterministic = var.isDeterministic();
+      final SimpleExpressionProxy oldinit = var.getInitialStatePredicate();
+      final SimpleExpressionProxy newinit =
+        mSimpleExpressionCompiler.simplify(oldinit, context);
+      final List<VariableMarkingProxy> oldmarkings = var.getVariableMarkings();
+      final List<VariableMarkingProxy> newmarkings =
+        new LinkedList<VariableMarkingProxy>();
+      for (final VariableMarkingProxy oldmarking : oldmarkings) {
+        final IdentifierProxy oldprop = oldmarking.getProposition();
+        final IdentifierProxy oldident = mNameCompiler.compileName(oldprop);
+        final CompiledEvent newevents = mNameSpace.findEvent(oldident);
+        final SimpleExpressionProxy oldpred = oldmarking.getPredicate();
+        final SimpleExpressionProxy newpred =
+          mSimpleExpressionCompiler.simplify(oldpred, context);
+        final Iterator<CompiledSingleEvent> iter =
+          newevents.getEventIterator();
+        while (iter.hasNext()) {
+          final CompiledSingleEvent event = iter.next();
+          if (event.getKind() != EventKind.PROPOSITION) {
+            final int mask = event.getKindMask();
+            final EventKindException exception =
+              new EventKindException(event, mask);
+            exception.provideLocation(oldprop);
+            throw exception;
+          }
+          final IdentifierProxy newident = compileSingleEvent(event);
+          final VariableMarkingProxy newmarking =
+            mFactory.createVariableMarkingProxy(newident, newpred);
+          newmarkings.add(newmarking);
+        }
+      }
+      final VariableComponentProxy newvar =
+        mFactory.createVariableComponentProxy
+        (fullname, value, deterministic, newinit, newmarkings);
+      mNameSpace.addComponent(suffix, newvar);
+      mCompiledComponents.add(newvar);
+      return newvar;
+    } catch (final EvalException exception) {
+      throw wrap(exception);
+    }
+  }
+
+
+  //#########################################################################
+  //# Specific Evaluation Methods
+  private CompiledParameterBinding getParameterBinding
+    (final IdentifierProxy ident, final ScopeKind scope)
+    throws UndefinedIdentifierException
+  {
+    if (mParameterMap == null || scope == ScopeKind.LOCAL) {
+      return null;
+    }
+    final CompiledParameterBinding binding;
+    if (ident instanceof SimpleIdentifierProxy) {
+      final SimpleIdentifierProxy simple = (SimpleIdentifierProxy) ident;
+      final String name = simple.getName();
+      binding = mParameterMap.remove(name);
+    } else {
+      binding = null;
+    }
+    if (binding == null && scope == ScopeKind.REQUIRED_PARAMETER) {
+      final String paramname = ident.toString();
+      throw new UndefinedIdentifierException
+        (paramname, "required parameter", null);
+    } else {
+      return binding;
+    }
+  }
+
+  private LabelBlockProxy compileLabelBlock(final CompiledEventList events)
+  {
+    final List<IdentifierProxy> elist = new LinkedList<IdentifierProxy>();
+    compileEventList(events, elist);
+    return mFactory.createLabelBlockProxy(elist, null);
+  }
+
+  private PlainEventListProxy compilePlainEventList
+    (final CompiledEventList events)
+  {
+    final List<IdentifierProxy> elist = new LinkedList<IdentifierProxy>();
+    compileEventList(events, elist);
+    return mFactory.createPlainEventListProxy(elist);
+  }
+
+  private void compileEventList(final CompiledEventList events,
+                                final List<IdentifierProxy> elist)
+  {
+    final Iterator<CompiledSingleEvent> iter = events.getEventIterator();
+    while (iter.hasNext()) {
+      final CompiledSingleEvent event = iter.next();
+      final IdentifierProxy ident = compileSingleEvent(event);
+      elist.add(ident);
+    }
+  }
+
+  private IdentifierProxy compileSingleEvent(final CompiledSingleEvent event)
+  {
+    IdentifierProxy ident = event.getIdentifier();
+    if (ident == null) {
+      final EventDeclProxy decl = compileEventDecl(event);
+      ident = decl.getIdentifier();
+      event.setIdentifier(ident);
+    }
+    return ident;
+  }
+
+  private EventDeclProxy compileEventDecl(final CompiledSingleEvent event)
+  {
+    final CompiledEventDecl cdecl = event.getCompiledEventDecl();
+    final EventDeclProxy edecl = cdecl.getEventDeclProxy();
+    final IdentifierProxy base = edecl.getIdentifier();
+    final List<SimpleExpressionProxy> indexes = event.getIndexes();
+    final IdentifierProxy suffix = mIndexAdder.addIndexes(base, indexes);
+    final CompiledNameSpace namespace = cdecl.getNameSpace();
+    final IdentifierProxy ident =
+      namespace.getPrefixedIdentifier(suffix, mFactory);
+    final EventKind kind = edecl.getKind();
+    final boolean observable = edecl.isObservable();
+    final EventDeclProxy decl = mFactory.createEventDeclProxy
+      (ident, kind, observable, ScopeKind.LOCAL, null, null);
+    mCompiledEvents.add(decl);
+    return decl;
+  }
+
+
+  //#########################################################################
+  //# Inner Class NameCompiler
+  private class NameCompiler extends AbstractModuleProxyVisitor {
+
+    //#######################################################################
+    //# Invocation
+    private IdentifierProxy compileName(final IdentifierProxy ident)
+      throws VisitorException
+    {
+      return (IdentifierProxy) ident.acceptVisitor(this);
+    }
+
+    //#######################################################################
+    //# Interface net.sourceforge.waters.model.module.ModuleProxyVisitor
+    public IndexedIdentifierProxy visitIndexedIdentifierProxy
+      (final IndexedIdentifierProxy ident)
+      throws VisitorException
+    {
+      try {
+        final String name = ident.getName();
+        final List<SimpleExpressionProxy> indexes = ident.getIndexes();
+        final List<SimpleExpressionProxy> values =
+          new ArrayList<SimpleExpressionProxy>(indexes.size());
+        boolean change = false;
+        for (final SimpleExpressionProxy index : indexes) {
+          final SimpleExpressionProxy value =
+            mSimpleExpressionCompiler.eval(index, mContext);
+          values.add(value);
+          change |= index != value;
+        }
+        return
+          change ? mFactory.createIndexedIdentifierProxy(name, values) : ident;
+      } catch (final EvalException exception) {
+        exception.provideLocation(ident);
+        throw wrap(exception);
+      }
+    }
+
+    public QualifiedIdentifierProxy visitQualifiedIdentifierProxy
+      (final QualifiedIdentifierProxy ident)
+      throws VisitorException
+    {
+      final IdentifierProxy base0 = ident.getBaseIdentifier();
+      final IdentifierProxy base1 =
+        (IdentifierProxy) base0.acceptVisitor(this);
+      final IdentifierProxy comp0 = ident.getComponentIdentifier();
+      final IdentifierProxy comp1 =
+        (IdentifierProxy) comp0.acceptVisitor(this);
+      if (base0 == base1 && comp0 == comp1) {
+        return ident;
+      } else {
+        return mFactory.createQualifiedIdentifierProxy(base1, comp1);
+      }
+    }
+
+    public SimpleIdentifierProxy visitSimpleIdentifierProxy
+      (final SimpleIdentifierProxy ident)
+    {
+      return ident;
+    }
+  }
+
+
+  //#########################################################################
+  //# Inner Class NameCompiler
+  private class IndexAdder extends AbstractModuleProxyVisitor {
+
+    //#######################################################################
+    //# Invocation
+    private IdentifierProxy addIndexes
+      (final IdentifierProxy ident,
+       final List<SimpleExpressionProxy> indexes)
+    {
+      try {
+        if (indexes.isEmpty()) {
+          return ident;
+        } else {
+          mIndexes = indexes;
+          return (IdentifierProxy) ident.acceptVisitor(this);
+        }
+      } catch (final VisitorException exception) {
+        throw exception.getRuntimeException();
+      }
+    }
+
+    //#######################################################################
+    //# Interface net.sourceforge.waters.model.module.ModuleProxyVisitor
+    public IndexedIdentifierProxy visitIndexedIdentifierProxy
+      (final IndexedIdentifierProxy ident)
+    {
+      final String name = ident.getName();
+      final List<SimpleExpressionProxy> indexes0 = ident.getIndexes();
+      final int numindexes = indexes0.size() + mIndexes.size();
+      final List<SimpleExpressionProxy> allindexes =
+        new ArrayList<SimpleExpressionProxy>(numindexes);
+      allindexes.addAll(indexes0);
+      allindexes.addAll(mIndexes);
+      return mFactory.createIndexedIdentifierProxy(name, mIndexes);
+    }
+
+    public QualifiedIdentifierProxy visitQualifiedIdentifierProxy
+      (final QualifiedIdentifierProxy ident)
+      throws VisitorException
+    {
+      final IdentifierProxy base = ident.getBaseIdentifier();
+      final IdentifierProxy comp0 = ident.getComponentIdentifier();
+      final IdentifierProxy comp1 =
+        (IdentifierProxy) comp0.acceptVisitor(this);
+      return mFactory.createQualifiedIdentifierProxy(base, comp1);
+    }
+
+    public IndexedIdentifierProxy visitSimpleIdentifierProxy
+      (final SimpleIdentifierProxy ident)
+    {
+      final String name = ident.getName();
+      return mFactory.createIndexedIdentifierProxy(name, mIndexes);
+    }
+
+    //#######################################################################
+    //# Data Members
+    private List<SimpleExpressionProxy> mIndexes;
+  }
+
+
+  //#########################################################################
+  //# Inner Class NameSpaceVariablesContext
+  private class NameSpaceVariablesContext implements BindingContext
+  {
+
+    //#######################################################################
+    //# Interface net.sourceforge.waters.model.compiler.context.BindingContext
+    public SimpleExpressionProxy getBoundExpression
+      (final IdentifierProxy ident)
+    {
+      final SimpleExpressionProxy bound = mContext.getBoundExpression(ident);
+      if (bound != null) {
+        return bound;
+      }
+      final IdentifiedProxy comp = mNameSpace.getComponent(ident);
+      if (comp != null) {
+        return comp.getIdentifier();
+      }
+      return null;
+    }
+
+    public ModuleBindingContext getModuleBindingContext()
+    {
+      return mContext.getModuleBindingContext();
+    }
+  }
+
+
+  //#########################################################################
+  //# Inner Class NameSpaceVariablesContext
+  private class SinglePrefixingContext implements BindingContext
+  {
+    //#######################################################################
+    //# Constructor
+    private SinglePrefixingContext(final IdentifierProxy suffix)
+    {
+      mSuffix = suffix;
+    }
+
+    //#######################################################################
+    //# Interface net.sourceforge.waters.model.compiler.context.BindingContext
+    public SimpleExpressionProxy getBoundExpression
+      (final IdentifierProxy ident)
+    {
+      if (ident.equalsByContents(mSuffix)) {
+        return mNameSpace.getPrefixedIdentifier(mSuffix, mFactory);
+      } else {
+        return mContext.getBoundExpression(ident);
+      }
+    }
+
+    public ModuleBindingContext getModuleBindingContext()
+    {
+      return mContext.getModuleBindingContext();
+    }
+
+    //#######################################################################
+    //# Data Members
+    private final IdentifierProxy mSuffix;
+  }
+
+
+  //#########################################################################
+  //# Data Members
+  private final DocumentManager mDocumentManager;
+  private final ModuleProxyFactory mFactory;
+  private final CompilerOperatorTable mOperatorTable;
+  private final SimpleExpressionCompiler mSimpleExpressionCompiler;
+  private final NameCompiler mNameCompiler;
+  private final IndexAdder mIndexAdder;
+  private final NameSpaceVariablesContext mNameSpaceVariablesContext;
+  private final ModuleProxy mInputModule;
+
+  private BindingContext mContext;
+  private CompiledNameSpace mNameSpace;
+  private Collection<EventDeclProxy> mCompiledEvents;
+  private Collection<Proxy> mCompiledComponents;
+  private Map<String,CompiledParameterBinding> mParameterMap;
+
+  private CompiledEventList mCurrentEventList;
+  private List<NodeProxy> mCurrentNodes;
+  private List<EdgeProxy> mCurrentEdges;
+  private Map<NodeProxy,NodeProxy> mNodeMap;
+
+}

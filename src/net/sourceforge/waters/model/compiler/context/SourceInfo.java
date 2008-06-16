@@ -1,15 +1,14 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
 //# PROJECT: Waters
-//# PACKAGE: net.sourceforge.waters.model.compiler
+//# PACKAGE: net.sourceforge.waters.model.compiler.context
 //# CLASS:   SourceInfo
 //###########################################################################
-//# $Id: SourceInfo.java,v 1.2 2008-06-10 08:30:42 robi Exp $
+//# $Id: SourceInfo.java,v 1.1 2008-06-16 07:09:51 robi Exp $
 //###########################################################################
 
 
-package net.sourceforge.waters.model.compiler;
-
+package net.sourceforge.waters.model.compiler.context;
 
 import net.sourceforge.waters.model.base.Proxy;
 

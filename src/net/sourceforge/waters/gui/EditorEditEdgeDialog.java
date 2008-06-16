@@ -28,10 +28,10 @@ import org.supremica.gui.Utility;
 
 import net.sourceforge.waters.gui.renderer.LabelBlockProxyShape;
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
-import net.sourceforge.waters.model.compiler.TypeMismatchException;
 import net.sourceforge.waters.model.expr.ExpressionParser;
 import net.sourceforge.waters.model.expr.Operator;
 import net.sourceforge.waters.model.expr.ParseException;
+import net.sourceforge.waters.model.expr.TypeMismatchException;
 import net.sourceforge.waters.subject.base.ListSubject;
 import net.sourceforge.waters.subject.base.ModelChangeEvent;
 import net.sourceforge.waters.subject.module.BinaryExpressionSubject;

@@ -1,19 +1,21 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
 //# PROJECT: Waters
-//# PACKAGE: net.sourceforge.waters.model.compiler
+//# PACKAGE: net.sourceforge.waters.model.compiler.context
 //# CLASS:   ModuleBindingContext
 //###########################################################################
-//# $Id: ModuleBindingContext.java,v 1.3 2008-06-10 18:56:29 robi Exp $
+//# $Id: ModuleBindingContext.java,v 1.1 2008-06-16 07:09:51 robi Exp $
 //###########################################################################
 
 
-package net.sourceforge.waters.model.compiler;
+package net.sourceforge.waters.model.compiler.context;
 
 
 import java.util.HashMap;
 import java.util.Map;
 
+import net.sourceforge.waters.model.base.ProxyAccessor;
+import net.sourceforge.waters.model.base.ProxyAccessorByContents;
 import net.sourceforge.waters.model.module.IdentifierProxy;
 import net.sourceforge.waters.model.module.ModuleProxy;
 import net.sourceforge.waters.model.module.SimpleExpressionProxy;
@@ -37,16 +39,16 @@ public class ModuleBindingContext implements BindingContext
 
   //#########################################################################
   //# Constructors
-  ModuleBindingContext(final ModuleProxy module)
+  public ModuleBindingContext(final ModuleProxy module)
   {
     this(module, null, null);
   }
 
-  ModuleBindingContext(final ModuleProxy module,
-                       final IdentifierProxy prefix,
-                       final SourceInfo info)
+  public ModuleBindingContext(final ModuleProxy module,
+                              final IdentifierProxy prefix,
+                              final SourceInfo info)
   {
-    mMap = new HashMap<String,SimpleExpressionProxy>();
+    mMap = new HashMap<ProxyAccessor<IdentifierProxy>,SimpleExpressionProxy>();
     mModule = module;
     mPrefix = prefix;
     mInstanceSource = info;
@@ -55,9 +57,11 @@ public class ModuleBindingContext implements BindingContext
 
   //#########################################################################
   //# Interface net.sourceforge.waters.model.compiler.BindingContext
-  public SimpleExpressionProxy getBoundExpression(final String name)
+  public SimpleExpressionProxy getBoundExpression(final IdentifierProxy ident)
   {
-    return mMap.get(name);
+    final ProxyAccessor<IdentifierProxy> key =
+      new ProxyAccessorByContents<IdentifierProxy>(ident);
+    return mMap.get(key);
   }
 
   public ModuleBindingContext getModuleBindingContext()
@@ -103,15 +107,32 @@ public class ModuleBindingContext implements BindingContext
 
   //#########################################################################
   //# Compilation
-  void addBinding(final String name, final SimpleExpressionProxy value)
+  public void addBinding(final IdentifierProxy ident,
+                         final SimpleExpressionProxy value)
   {
-    mMap.put(name, value);
+    final ProxyAccessor<IdentifierProxy> key =
+      new ProxyAccessorByContents<IdentifierProxy>(ident);
+    mMap.put(key, value);
+  }
+
+  public void insertBinding(final IdentifierProxy ident,
+                            final SimpleExpressionProxy value)
+    throws DuplicateIdentifierException
+  {
+    final ProxyAccessor<IdentifierProxy> key =
+      new ProxyAccessorByContents<IdentifierProxy>(ident);
+    if (mMap.containsKey(key)) {
+      final String name = ident.toString();
+      throw new DuplicateIdentifierException(name);
+    } else {
+      mMap.put(key, value);
+    }
   }
 
 
   //#########################################################################
   //# Data Members
-  private final Map<String,SimpleExpressionProxy> mMap;
+  private final Map<ProxyAccessor<IdentifierProxy>,SimpleExpressionProxy> mMap;
   private final ModuleProxy mModule;
   private final IdentifierProxy mPrefix;
   private final SourceInfo mInstanceSource;

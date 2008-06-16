@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.compiler
 //# CLASS:   CompilerTest
 //###########################################################################
-//# $Id: CompilerTest.java,v 1.18 2008-04-21 21:58:25 robi Exp $
+//# $Id: CompilerTest.java,v 1.19 2008-06-16 07:09:51 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.compiler;
@@ -21,12 +21,14 @@ import net.sourceforge.waters.model.base.DocumentProxy;
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.base.WatersException;
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
-import net.sourceforge.waters.model.compiler.DuplicateIdentifierException;
 import net.sourceforge.waters.model.compiler.EmptyLabelBlockException;
 import net.sourceforge.waters.model.compiler.InstantiationException;
 import net.sourceforge.waters.model.compiler.ModuleCompiler;
 import net.sourceforge.waters.model.compiler.NondeterministicModuleException;
-import net.sourceforge.waters.model.compiler.UndefinedIdentifierException;
+import net.sourceforge.waters.model.compiler.context.
+  DuplicateIdentifierException;
+import net.sourceforge.waters.model.compiler.context.
+  UndefinedIdentifierException;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 import net.sourceforge.waters.model.expr.EvalException;

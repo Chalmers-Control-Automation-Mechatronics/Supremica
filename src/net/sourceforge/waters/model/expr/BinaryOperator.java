@@ -4,11 +4,12 @@
 //# PACKAGE: net.sourceforge.waters.model.expr
 //# CLASS:   BinaryOperator
 //###########################################################################
-//# $Id: BinaryOperator.java,v 1.3 2008-02-15 02:17:19 robi Exp $
+//# $Id: BinaryOperator.java,v 1.4 2008-06-16 07:09:51 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.expr;
 
+import net.sourceforge.waters.model.module.BinaryExpressionProxy;
 import net.sourceforge.waters.model.module.ModuleProxyFactory;
 import net.sourceforge.waters.model.module.SimpleExpressionProxy;
 
@@ -44,6 +45,11 @@ public interface BinaryOperator extends Operator {
   //#########################################################################
   //# Evaluation
   public int getReturnTypes(int lhsType, int rhsType);
+
+  public SimpleExpressionProxy simplify
+    (BinaryExpressionProxy expr,
+     AbstractSimpleExpressionSimplifier simplifier)
+    throws EvalException;
 
   public Value eval(Value lhs, Value rhs) throws EvalException;
 

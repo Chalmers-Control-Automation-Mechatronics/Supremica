@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.compiler
 //# CLASS:   CompilerContext
 //###########################################################################
-//# $Id: CompilerContext.java,v 1.5 2008-01-28 00:55:08 robi Exp $
+//# $Id: CompilerContext.java,v 1.6 2008-06-16 07:09:50 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.compiler;
@@ -14,6 +14,10 @@ import java.util.List;
 import java.util.HashMap;
 import java.util.Map;
 
+import net.sourceforge.waters.model.compiler.context.
+  DuplicateIdentifierException;
+import net.sourceforge.waters.model.compiler.context.
+  UndefinedIdentifierException;
 import net.sourceforge.waters.model.expr.EvalException;
 import net.sourceforge.waters.model.expr.IndexValue;
 import net.sourceforge.waters.model.expr.Value;

@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.valid
 //# CLASS:   ValidTest
 //###########################################################################
-//# $Id: ValidTest.java,v 1.6 2008-02-14 02:24:09 robi Exp $
+//# $Id: ValidTest.java,v 1.7 2008-06-16 07:09:51 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.valid;
@@ -19,11 +19,11 @@ import net.sourceforge.waters.model.base.WatersException;
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
 import net.sourceforge.waters.model.compiler.IndexOutOfRangeException;
 import net.sourceforge.waters.model.compiler.ModuleCompiler;
-import net.sourceforge.waters.model.compiler.TypeMismatchException;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 import net.sourceforge.waters.model.expr.EvalException;
 import net.sourceforge.waters.model.expr.OperatorTable;
+import net.sourceforge.waters.model.expr.TypeMismatchException;
 import net.sourceforge.waters.model.marshaller.DocumentManager;
 import net.sourceforge.waters.model.marshaller.JAXBModuleMarshaller;
 import net.sourceforge.waters.model.marshaller.JAXBProductDESMarshaller;

@@ -1,12 +1,12 @@
 //###########################################################################
 //# PROJECT: Waters
-//# PACKAGE: net.sourceforge.waters.model.compiler
+//# PACKAGE: net.sourceforge.waters.model.compiler.context
 //# CLASS:   DuplicateIdentifierException
 //###########################################################################
-//# $Id: DuplicateIdentifierException.java,v 1.3 2006-11-17 03:38:22 robi Exp $
+//# $Id: DuplicateIdentifierException.java,v 1.1 2008-06-16 07:09:51 robi Exp $
 //###########################################################################
 
-package net.sourceforge.waters.model.compiler;
+package net.sourceforge.waters.model.compiler.context;
 
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.expr.EvalException;

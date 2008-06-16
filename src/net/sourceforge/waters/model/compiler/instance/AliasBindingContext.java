@@ -1,16 +1,19 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
 //# PROJECT: Waters
-//# PACKAGE: net.sourceforge.waters.model.compiler
+//# PACKAGE: net.sourceforge.waters.model.compiler.instance
 //# CLASS:   AliasBindingContext
 //###########################################################################
-//# $Id: AliasBindingContext.java,v 1.1 2008-06-10 18:56:29 robi Exp $
+//# $Id: AliasBindingContext.java,v 1.1 2008-06-16 07:09:51 robi Exp $
 //###########################################################################
 
 
-package net.sourceforge.waters.model.compiler;
+package net.sourceforge.waters.model.compiler.instance;
 
-
+import net.sourceforge.waters.model.compiler.context.BindingContext;
+import net.sourceforge.waters.model.compiler.context.ModuleBindingContext;
+import net.sourceforge.waters.model.compiler.context.SourceInfo;
+import net.sourceforge.waters.model.module.IdentifierProxy;
 import net.sourceforge.waters.model.module.SimpleExpressionProxy;
 
 
@@ -55,9 +58,9 @@ public class AliasBindingContext implements BindingContext
 
   //#########################################################################
   //# Interface net.sourceforge.waters.model.compiler.BindingContext
-  public SimpleExpressionProxy getBoundExpression(final String name)
+  public SimpleExpressionProxy getBoundExpression(final IdentifierProxy ident)
   {
-    return mParent.getBoundExpression(name);
+    return mParent.getBoundExpression(ident);
   }
 
   public ModuleBindingContext getModuleBindingContext()

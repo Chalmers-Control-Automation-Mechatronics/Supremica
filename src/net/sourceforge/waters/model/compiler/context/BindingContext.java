@@ -1,16 +1,17 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
 //# PROJECT: Waters
-//# PACKAGE: net.sourceforge.waters.model.compiler
+//# PACKAGE: net.sourceforge.waters.model.compiler.context
 //# CLASS:   BindingContext
 //###########################################################################
-//# $Id: BindingContext.java,v 1.1 2008-03-17 02:08:21 robi Exp $
+//# $Id: BindingContext.java,v 1.1 2008-06-16 07:09:51 robi Exp $
 //###########################################################################
 
 
-package net.sourceforge.waters.model.compiler;
+package net.sourceforge.waters.model.compiler.context;
 
 
+import net.sourceforge.waters.model.module.IdentifierProxy;
 import net.sourceforge.waters.model.module.SimpleExpressionProxy;
 
 
@@ -31,12 +32,14 @@ public interface BindingContext
 
   /**
    * Gets the value bound to the given name.
-   * @param  name    The name to be looked up.
+   * @param  ident   The name to be looked up.
+   *                 It is given as an identifier, simple or indexes,
+   *                 so array lookups can be supported.
    * @return A variable-free expression representing the concrete value
    *         bound to the given name in this context, or <CODE>null</CODE>
    *         if there is no binding for the given name.
    */
-  public SimpleExpressionProxy getBoundExpression(final String name);
+  public SimpleExpressionProxy getBoundExpression(IdentifierProxy ident);
 
   /**
    * Gets the module context of this binding.

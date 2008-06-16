@@ -1,17 +1,20 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
 //# PROJECT: Waters
-//# PACKAGE: net.sourceforge.waters.model.compiler
+//# PACKAGE: net.sourceforge.waters.model.compiler.instance
 //# CLASS:   ForeachBindingContext
 //###########################################################################
-//# $Id: ForeachBindingContext.java,v 1.1 2008-03-17 02:08:21 robi Exp $
+//# $Id: ForeachBindingContext.java,v 1.1 2008-06-16 07:09:51 robi Exp $
 //###########################################################################
 
 
-package net.sourceforge.waters.model.compiler;
+package net.sourceforge.waters.model.compiler.instance;
 
-
+import net.sourceforge.waters.model.compiler.context.BindingContext;
+import net.sourceforge.waters.model.compiler.context.ModuleBindingContext;
+import net.sourceforge.waters.model.module.IdentifierProxy;
 import net.sourceforge.waters.model.module.SimpleExpressionProxy;
+import net.sourceforge.waters.model.module.SimpleIdentifierProxy;
 
 
 /**
@@ -42,12 +45,17 @@ public class ForeachBindingContext implements BindingContext
 
   //#########################################################################
   //# Interface net.sourceforge.waters.model.compiler.BindingContext
-  public SimpleExpressionProxy getBoundExpression(final String name)
+  public SimpleExpressionProxy getBoundExpression(final IdentifierProxy ident)
   {
+    if (!(ident instanceof SimpleIdentifierProxy)) {
+      return mParent.getBoundExpression(ident);
+    }
+    final SimpleIdentifierProxy simple = (SimpleIdentifierProxy) ident;
+    final String name = simple.getName();
     if (mBoundName.equals(name)) {
       return mBoundValue;
     } else {
-      return mParent.getBoundExpression(name);
+      return mParent.getBoundExpression(ident);
     }
   }
 

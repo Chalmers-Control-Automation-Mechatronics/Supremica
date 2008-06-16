@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.base
 //# CLASS:   WatersException
 //###########################################################################
-//# $Id: WatersException.java,v 1.3 2006-11-17 03:38:22 robi Exp $
+//# $Id: WatersException.java,v 1.4 2008-06-16 07:09:50 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.base;
@@ -48,6 +48,19 @@ public class WatersException extends Exception {
   }
 
   
+  //#########################################################################
+  //# Rethrowing
+  /**
+   * Converts this exception to a runtime exception for rethrowing.
+   * Creates and returns a new runtime exception with this exception as its
+   * cause.
+   */
+  public RuntimeException getRuntimeException()
+  {
+    return new WatersRuntimeException(this);
+  }
+
+
   //#########################################################################
   //# Static Class Variables
   public static final long serialVersionUID = 1;

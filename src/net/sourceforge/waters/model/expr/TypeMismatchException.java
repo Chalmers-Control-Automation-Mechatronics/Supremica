@@ -4,14 +4,13 @@
 //# PACKAGE: net.sourceforge.waters.model.compiler
 //# CLASS:   TypeMismatchException
 //###########################################################################
-//# $Id: TypeMismatchException.java,v 1.3 2006-11-17 03:38:22 robi Exp $
+//# $Id: TypeMismatchException.java,v 1.4 2008-06-16 07:09:51 robi Exp $
 //###########################################################################
 
-package net.sourceforge.waters.model.compiler;
+package net.sourceforge.waters.model.expr;
 
 import net.sourceforge.waters.model.base.Proxy;
-import net.sourceforge.waters.model.expr.EvalException;
-import net.sourceforge.waters.model.expr.Value;
+import net.sourceforge.waters.model.module.ParameterBindingProxy;
 
 
 public class TypeMismatchException extends EvalException {
@@ -34,6 +33,20 @@ public class TypeMismatchException extends EvalException {
   public TypeMismatchException(final Proxy expr, final String typename)
   {
     super("Expression '" + expr + "' is not of type " + typename + "!", expr);
+  }
+
+  /**
+   * Constructs a new exception indicating that the given expression is not
+   * well-typed.
+   * @param  expr     The subterm that is not well-typed.
+   * @param  typename The name of the expected type.
+   */
+  public TypeMismatchException(final ParameterBindingProxy binding,
+                               final String typename)
+  {
+    super("Parameter '" + binding.getName() +
+          "' is not bound to a " + typename + "!",
+          binding);
   }
 
   /**

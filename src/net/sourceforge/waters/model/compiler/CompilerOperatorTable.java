@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.compiler
 //# CLASS:   CompilerOperatorTable
 //###########################################################################
-//# $Id: CompilerOperatorTable.java,v 1.11 2008-02-15 07:31:49 robi Exp $
+//# $Id: CompilerOperatorTable.java,v 1.12 2008-06-16 07:09:50 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.compiler;
@@ -13,18 +13,22 @@ import java.util.HashMap;
 import java.util.Map;
 
 import net.sourceforge.waters.model.expr.AbstractOperatorTable;
+import net.sourceforge.waters.model.expr.AbstractSimpleExpressionSimplifier;
 import net.sourceforge.waters.model.expr.BinaryOperator;
 import net.sourceforge.waters.model.expr.EvalException;
 import net.sourceforge.waters.model.expr.IntValue;
 import net.sourceforge.waters.model.expr.Operator;
 import net.sourceforge.waters.model.expr.OperatorTable;
+import net.sourceforge.waters.model.expr.TypeMismatchException;
 import net.sourceforge.waters.model.expr.UnaryOperator;
 import net.sourceforge.waters.model.expr.Value;
 import net.sourceforge.waters.model.module.BinaryExpressionProxy;
 import net.sourceforge.waters.model.module.IdentifierProxy;
+import net.sourceforge.waters.model.module.IntConstantProxy;
 import net.sourceforge.waters.model.module.ModuleProxyFactory;
 import net.sourceforge.waters.model.module.QualifiedIdentifierProxy;
 import net.sourceforge.waters.model.module.SimpleExpressionProxy;
+import net.sourceforge.waters.model.module.UnaryExpressionProxy;
 
 
 /**
@@ -66,6 +70,7 @@ public class CompilerOperatorTable extends AbstractOperatorTable {
     mAssignmentOperator = new BinaryAssignmentOperator();
     mIncrementOperator = new BinaryIncrementOperator();
     mDecrementOperator = new BinaryDecrementOperator();
+    mUnaryMinusOperator = new UnaryMinusOperator();
     mRangeOperator = new BinaryRangeOperator();
 
     store(mAndOperator);
@@ -85,7 +90,7 @@ public class CompilerOperatorTable extends AbstractOperatorTable {
     store(new BinaryTimesOperator());
     store(new BinaryDivideOperator());
     store(new BinaryModuloOperator());
-    store(new UnaryMinusOperator());
+    store(mUnaryMinusOperator);
     store(mRangeOperator);
     store(new BinaryQualificationOperator());
     storeComplements(mEqualsOperator, mNotEqualsOperator);
@@ -159,7 +164,8 @@ public class CompilerOperatorTable extends AbstractOperatorTable {
     return mDecrementOperator;
   }
 
-  public BinaryOperator getRangeOperator() {
+  public BinaryOperator getRangeOperator()
+  {
     return mRangeOperator;
   }
   
@@ -200,6 +206,37 @@ public class CompilerOperatorTable extends AbstractOperatorTable {
        final String text)
     {
       return factory.createBinaryExpressionProxy(text, this, lhs, rhs);
+    }
+
+    public SimpleExpressionProxy simplify
+      (final BinaryExpressionProxy expr,
+       final AbstractSimpleExpressionSimplifier simplifier)
+      throws EvalException
+    {
+      final SimpleExpressionProxy origLHS = expr.getLeft();
+      final SimpleExpressionProxy simpLHS = simplifier.simplify(origLHS);
+      final SimpleExpressionProxy origRHS = expr.getRight();
+      final SimpleExpressionProxy simpRHS = simplifier.simplify(origRHS);
+      return combine(expr, origLHS, simpLHS, origRHS, simpRHS, simplifier);
+    }
+
+    //#######################################################################
+    //# Auxiliary Methods
+    SimpleExpressionProxy combine
+      (final BinaryExpressionProxy expr,
+       final SimpleExpressionProxy origLHS,
+       final SimpleExpressionProxy simpLHS,
+       final SimpleExpressionProxy origRHS,
+       final SimpleExpressionProxy simpRHS,
+       final AbstractSimpleExpressionSimplifier simplifier)
+      throws EvalException
+    {
+      if (origLHS == simpLHS && origRHS == simpRHS) {
+        return expr;
+      } else {
+        final ModuleProxyFactory factory = simplifier.getFactory();
+        return factory.createBinaryExpressionProxy(this, simpLHS, simpRHS);
+      }
     }
 
   }
@@ -261,6 +298,29 @@ public class CompilerOperatorTable extends AbstractOperatorTable {
     abstract int eval(int lhs, int rhs)
       throws EvalException;
 
+    //#######################################################################
+    //# Auxiliary Methods
+    SimpleExpressionProxy combine
+      (final BinaryExpressionProxy expr,
+       final SimpleExpressionProxy origLHS,
+       final SimpleExpressionProxy simpLHS,
+       final SimpleExpressionProxy origRHS,
+       final SimpleExpressionProxy simpRHS,
+       final AbstractSimpleExpressionSimplifier simplifier)
+      throws EvalException
+    {
+      if (simplifier.isAtomicValue(simpLHS) &&
+          simplifier.isAtomicValue(simpRHS)) {
+        final int intLHS = simplifier.getIntValue(simpLHS);
+        final int intRHS = simplifier.getIntValue(simpRHS);
+        final int result = eval(intLHS, intRHS);
+        return simplifier.createIntConstantProxy(result);
+      } else {
+        return super.combine(expr, origLHS, simpLHS,
+                             origRHS, simpRHS, simplifier);
+      }
+    }
+
   }
 
 
@@ -279,6 +339,34 @@ public class CompilerOperatorTable extends AbstractOperatorTable {
     public int getPriority()
     {
       return PRIORITY_PLUS;
+    }
+
+    //#######################################################################
+    //# Interface net.sourceforge.waters.model.expr.BinaryOperator
+    public SimpleExpressionProxy simplify
+      (final BinaryExpressionProxy expr,
+       final AbstractSimpleExpressionSimplifier simplifier)
+      throws EvalException
+    {
+      final SimpleExpressionProxy origLHS = expr.getLeft();
+      final SimpleExpressionProxy simpLHS = simplifier.simplify(origLHS);
+      final SimpleExpressionProxy origRHS = expr.getRight();
+      final SimpleExpressionProxy simpRHS = simplifier.simplify(origRHS);
+      if (simpLHS instanceof IntConstantProxy) {
+        final IntConstantProxy constLHS = (IntConstantProxy) simpLHS;
+        final int intLHS = constLHS.getValue();
+        if (intLHS == 0) {
+          return simpRHS;
+        }
+      }
+      if (simpRHS instanceof IntConstantProxy) {
+        final IntConstantProxy constRHS = (IntConstantProxy) simpRHS;
+        final int intRHS = constRHS.getValue();
+        if (intRHS == 0) {
+          return simpLHS;
+        }
+      }
+      return combine(expr, origLHS, simpLHS, origRHS, simpRHS, simplifier);
     }
 
     //#######################################################################
@@ -309,6 +397,42 @@ public class CompilerOperatorTable extends AbstractOperatorTable {
     }
 
     //#######################################################################
+    //# Interface net.sourceforge.waters.model.expr.BinaryOperator
+    public SimpleExpressionProxy simplify
+      (final BinaryExpressionProxy expr,
+       final AbstractSimpleExpressionSimplifier simplifier)
+      throws EvalException
+    {
+      final SimpleExpressionProxy origRHS = expr.getRight();
+      final SimpleExpressionProxy simpRHS = simplifier.simplify(origRHS);
+      final SimpleExpressionProxy origLHS = expr.getLeft();
+      final SimpleExpressionProxy simpLHS = simplifier.simplify(origLHS);
+      if (simpRHS instanceof IntConstantProxy) {
+        final IntConstantProxy constRHS = (IntConstantProxy) simpRHS;
+        final int intRHS = constRHS.getValue();
+        if (intRHS == 0) {
+          return simpLHS;
+        }
+      }
+      if (simpLHS instanceof IntConstantProxy) {
+        final IntConstantProxy constLHS = (IntConstantProxy) simpLHS;
+        final int intLHS = constLHS.getValue();
+        if (intLHS == 0) {
+          final ModuleProxyFactory factory = simplifier.getFactory();
+          final UnaryExpressionProxy uminus =
+            factory.createUnaryExpressionProxy(INSTANCE.mUnaryMinusOperator,
+                                               simpRHS);  
+          return simplifier.simplify(uminus);
+        }
+      }
+      if (simpLHS.equalsByContents(simpRHS)) {
+        return simplifier.createIntConstantProxy(0);
+      } else {
+        return combine(expr, origLHS, simpLHS, origRHS, simpRHS, simplifier);
+      }
+    }
+
+    //#######################################################################
     //# Overrides for Abstract Baseclass AbstractBinaryIntOperator
     int eval(final int lhs, final int rhs)
     {
@@ -333,6 +457,56 @@ public class CompilerOperatorTable extends AbstractOperatorTable {
     public int getPriority()
     {
       return PRIORITY_TIMES;
+    }
+
+    //#######################################################################
+    //# Interface net.sourceforge.waters.model.expr.BinaryOperator
+    public SimpleExpressionProxy simplify
+      (final BinaryExpressionProxy expr,
+       final AbstractSimpleExpressionSimplifier simplifier)
+      throws EvalException
+    {
+      final SimpleExpressionProxy origLHS = expr.getLeft();
+      final SimpleExpressionProxy origRHS = expr.getRight();
+      final SimpleExpressionProxy simpLHS = simplifier.simplify(origLHS);
+      if (simpLHS instanceof IntConstantProxy) {
+        final IntConstantProxy constLHS = (IntConstantProxy) simpLHS;
+        final int intLHS = constLHS.getValue();
+        switch (intLHS) {
+        case 0:
+          return simplifier.createIntConstantProxy(0);
+        case 1:
+          return simplifier.simplify(origRHS);
+        case -1:
+          final ModuleProxyFactory factory = simplifier.getFactory();
+          final UnaryExpressionProxy uminus =
+            factory.createUnaryExpressionProxy(INSTANCE.mUnaryMinusOperator,
+                                               origRHS);  
+          return simplifier.simplify(uminus);
+        default:
+          break;
+        }
+      }
+      final SimpleExpressionProxy simpRHS = simplifier.simplify(origRHS);
+      if (simpRHS instanceof IntConstantProxy) {
+        final IntConstantProxy constRHS = (IntConstantProxy) simpRHS;
+        final int intRHS = constRHS.getValue();
+        switch (intRHS) {
+        case 0:
+          return simplifier.createIntConstantProxy(0);
+        case 1:
+          return simpLHS;
+        case -1:
+          final ModuleProxyFactory factory = simplifier.getFactory();
+          final UnaryExpressionProxy uminus =
+            factory.createUnaryExpressionProxy(INSTANCE.mUnaryMinusOperator,
+                                               simpLHS);  
+          return simplifier.simplify(uminus);
+        default:
+          break;
+        }
+      }
+      return combine(expr, origLHS, simpLHS, origRHS, simpRHS, simplifier);
     }
 
     //#######################################################################
@@ -438,6 +612,25 @@ public class CompilerOperatorTable extends AbstractOperatorTable {
       return argType & Operator.TYPE_INT;
     }
 
+    public SimpleExpressionProxy simplify
+      (final UnaryExpressionProxy expr,
+       final AbstractSimpleExpressionSimplifier simplifier)
+      throws EvalException
+    {
+      final SimpleExpressionProxy subexpr = expr.getSubTerm();
+      final SimpleExpressionProxy subresult = simplifier.simplify(subexpr);
+      if (simplifier.isAtomicValue(subresult)) {
+        final int subvalue = simplifier.getIntValue(subresult);
+        final int value = eval(subvalue);
+        return simplifier.createIntConstantProxy(value);
+      } else if (subexpr == subresult) {
+        return expr;
+      } else {
+        final ModuleProxyFactory factory = simplifier.getFactory();
+        return factory.createUnaryExpressionProxy(this, subresult);
+      }        
+    }
+
     public CompiledIntValue eval(final Value argValue)
       throws EvalException
     {
@@ -512,12 +705,44 @@ public class CompilerOperatorTable extends AbstractOperatorTable {
       }
     }
 
-    //#######################################################################
-    //# Interface net.sourceforge.waters.model.expr.BinaryOperator
     public int getAssociativity()
     {
       return BinaryOperator.ASSOC_RIGHT;
     }
+
+    public SimpleExpressionProxy simplify
+      (final BinaryExpressionProxy expr,
+       final AbstractSimpleExpressionSimplifier simplifier)
+      throws EvalException
+    {
+      final boolean eresult = getEqualsResult();
+      final SimpleExpressionProxy origLHS = expr.getLeft();
+      final SimpleExpressionProxy origRHS = expr.getRight();
+      if (origLHS.equalsByContents(origRHS)) {
+        return simplifier.createBooleanConstantProxy(eresult);
+      }
+      final SimpleExpressionProxy simpLHS = simplifier.simplify(origLHS);
+      final SimpleExpressionProxy simpRHS = simplifier.simplify(origRHS);
+      if (simpLHS.equalsByContents(simpRHS)) {
+        return simplifier.createBooleanConstantProxy(eresult);
+      } else if (simplifier.isAtomicValue(simpLHS) &&
+                 simplifier.isAtomicValue(simpRHS)) {
+        return simplifier.createBooleanConstantProxy(!eresult);
+      } else {
+        return combine(expr, origLHS, simpLHS, origRHS, simpRHS, simplifier);
+      }
+    }
+
+    public CompiledIntValue eval(final Value lhsValue, final Value rhsValue)
+    {
+      final boolean result = lhsValue.equals(rhsValue);
+      final boolean eresult = getEqualsResult();
+      return new CompiledIntValue(result ? eresult : !eresult);
+    }
+
+    //#######################################################################
+    //# Provided by Subclasses
+    abstract boolean getEqualsResult();
 
   }
 
@@ -541,11 +766,10 @@ public class CompilerOperatorTable extends AbstractOperatorTable {
     }
 
     //#######################################################################
-    //# Interface net.sourceforge.waters.model.expr.BinaryOperator
-    public CompiledIntValue eval(final Value lhsValue, final Value rhsValue)
+    //# Overrides for Abstract Base Class AbstractBinaryEqualsOperator
+    boolean getEqualsResult()
     {
-      final boolean result = lhsValue.equals(rhsValue);
-      return new CompiledIntValue(result);
+      return true;
     }
 
   }
@@ -569,13 +793,11 @@ public class CompilerOperatorTable extends AbstractOperatorTable {
       return PRIORITY_EQUALS;
     }
 
-
     //#######################################################################
-    //# Interface net.sourceforge.waters.model.expr.BinaryOperator
-    public CompiledIntValue eval(final Value lhsValue, final Value rhsValue)
+    //# Overrides for Abstract Base Class AbstractBinaryEqualsOperator
+    boolean getEqualsResult()
     {
-      final boolean result = !lhsValue.equals(rhsValue);
-      return new CompiledIntValue(result);
+      return false;
     }
 
   }
@@ -612,6 +834,29 @@ public class CompilerOperatorTable extends AbstractOperatorTable {
       }
     }
 
+    public SimpleExpressionProxy simplify
+      (final BinaryExpressionProxy expr,
+       final AbstractSimpleExpressionSimplifier simplifier)
+      throws EvalException
+    {
+      final SimpleExpressionProxy origLHS = expr.getLeft();
+      final SimpleExpressionProxy simpLHS = simplifier.simplify(origLHS);
+      final SimpleExpressionProxy origRHS = expr.getRight();
+      final SimpleExpressionProxy simpRHS = simplifier.simplify(origRHS);
+      if (simplifier.isAtomicValue(simpLHS) &&
+          simplifier.isAtomicValue(simpRHS)) {
+        final int intLHS = simplifier.getIntValue(simpLHS);
+        final int intRHS = simplifier.getIntValue(simpRHS);
+        final boolean result = eval(intLHS, intRHS);
+        return simplifier.createBooleanConstantProxy(result);
+      } else if (simpLHS.equalsByContents(simpRHS)) {
+        final boolean result = includesEquality();
+        return simplifier.createBooleanConstantProxy(result);
+      } else {
+        return combine(expr, origLHS, simpLHS, origRHS, simpRHS, simplifier);
+      }
+    }
+
     public Value eval(final Value lhsValue, final Value rhsValue)
       throws EvalException
     {
@@ -643,6 +888,8 @@ public class CompilerOperatorTable extends AbstractOperatorTable {
 
     //#######################################################################
     //# Provided by Subclasses
+    abstract boolean includesEquality();
+
     abstract boolean eval(int lhs, int rhs)
       throws EvalException;
 
@@ -664,6 +911,11 @@ public class CompilerOperatorTable extends AbstractOperatorTable {
 
     //#######################################################################
     //# Overrides for Abstract Baseclass AbstractBinaryComparisonOperator
+    boolean includesEquality()
+    {
+      return false;
+    }
+
     boolean eval(final int lhs, final int rhs)
     {
       return lhs > rhs;
@@ -687,6 +939,11 @@ public class CompilerOperatorTable extends AbstractOperatorTable {
 
     //#######################################################################
     //# Overrides for Abstract Baseclass AbstractBinaryComparisonOperator
+    boolean includesEquality()
+    {
+      return true;
+    }
+
     boolean eval(final int lhs, final int rhs)
     {
       return lhs >= rhs;
@@ -709,6 +966,11 @@ public class CompilerOperatorTable extends AbstractOperatorTable {
 
     //#######################################################################
     //# Overrides for Abstract Baseclass AbstractBinaryComparisonOperator
+    boolean includesEquality()
+    {
+      return false;
+    }
+
     boolean eval(final int lhs, final int rhs)
     {
       return lhs < rhs;
@@ -732,6 +994,11 @@ public class CompilerOperatorTable extends AbstractOperatorTable {
 
     //#######################################################################
     //# Overrides for Abstract Baseclass AbstractBinaryComparisonOperator
+    boolean includesEquality()
+    {
+      return true;
+    }
+
     boolean eval(final int lhs, final int rhs)
     {
       return lhs <= rhs;
@@ -802,6 +1069,30 @@ public class CompilerOperatorTable extends AbstractOperatorTable {
     abstract boolean eval(boolean lhs, boolean rhs)
       throws EvalException;
 
+
+    //#######################################################################
+    //# Auxiliary Methods
+    SimpleExpressionProxy combine
+      (final BinaryExpressionProxy expr,
+       final SimpleExpressionProxy origLHS,
+       final SimpleExpressionProxy simpLHS,
+       final SimpleExpressionProxy origRHS,
+       final SimpleExpressionProxy simpRHS,
+       final AbstractSimpleExpressionSimplifier simplifier)
+      throws EvalException
+    {
+      if (simplifier.isAtomicValue(simpLHS) &&
+          simplifier.isAtomicValue(simpRHS)) {
+        final boolean boolLHS = simplifier.getBooleanValue(simpLHS);
+        final boolean boolRHS = simplifier.getBooleanValue(simpRHS);
+        final boolean result = eval(boolLHS, boolRHS);
+        return simplifier.createBooleanConstantProxy(result);
+      } else {
+        return super.combine(expr, origLHS, simpLHS,
+                             origRHS, simpRHS, simplifier);
+      }
+    }
+
   }
 
 
@@ -820,6 +1111,36 @@ public class CompilerOperatorTable extends AbstractOperatorTable {
     public int getPriority()
     {
       return PRIORITY_AND;
+    }
+
+    //#######################################################################
+    //# Interface net.sourceforge.waters.model.expr.BinaryOperator
+    public SimpleExpressionProxy simplify
+      (final BinaryExpressionProxy expr,
+       final AbstractSimpleExpressionSimplifier simplifier)
+      throws EvalException
+    {
+      final SimpleExpressionProxy origLHS = expr.getLeft();
+      final SimpleExpressionProxy origRHS = expr.getRight();
+      final SimpleExpressionProxy simpLHS = simplifier.simplify(origLHS);
+      if (simplifier.isAtomicValue(simpLHS)) {
+        final boolean boolLHS = simplifier.getBooleanValue(simpLHS);
+        if (boolLHS) {
+          return simplifier.simplify(origRHS);
+        } else {
+          return simplifier.createBooleanConstantProxy(false);
+        }
+      }
+      final SimpleExpressionProxy simpRHS = simplifier.simplify(origRHS);
+      if (simplifier.isAtomicValue(simpRHS)) {
+        final boolean boolRHS = simplifier.getBooleanValue(simpRHS);
+        if (boolRHS) {
+          return simpLHS;
+        } else {
+          return simplifier.createBooleanConstantProxy(false);
+        }
+      }
+      return combine(expr, origLHS, simpLHS, origRHS, simpRHS, simplifier);
     }
 
     //#######################################################################
@@ -847,6 +1168,36 @@ public class CompilerOperatorTable extends AbstractOperatorTable {
     public int getPriority()
     {
       return PRIORITY_OR;
+    }
+
+    //#######################################################################
+    //# Interface net.sourceforge.waters.model.expr.BinaryOperator
+    public SimpleExpressionProxy simplify
+      (final BinaryExpressionProxy expr,
+       final AbstractSimpleExpressionSimplifier simplifier)
+      throws EvalException
+    {
+      final SimpleExpressionProxy origLHS = expr.getLeft();
+      final SimpleExpressionProxy origRHS = expr.getRight();
+      final SimpleExpressionProxy simpLHS = simplifier.simplify(origLHS);
+      if (simplifier.isAtomicValue(simpLHS)) {
+        final boolean boolLHS = simplifier.getBooleanValue(simpLHS);
+        if (boolLHS) {
+          return simplifier.createBooleanConstantProxy(true);
+        } else {
+          return simplifier.simplify(origRHS);
+        }
+      }
+      final SimpleExpressionProxy simpRHS = simplifier.simplify(origRHS);
+      if (simplifier.isAtomicValue(simpRHS)) {
+        final boolean boolRHS = simplifier.getBooleanValue(simpRHS);
+        if (boolRHS) {
+          return simplifier.createBooleanConstantProxy(true);
+        } else {
+          return simpLHS;
+        }
+      }
+      return combine(expr, origLHS, simpLHS, origRHS, simpRHS, simplifier);
     }
 
     //#######################################################################
@@ -888,6 +1239,25 @@ public class CompilerOperatorTable extends AbstractOperatorTable {
       return argType & Operator.TYPE_BOOLEAN;
     }
 
+    public SimpleExpressionProxy simplify
+      (final UnaryExpressionProxy expr,
+       final AbstractSimpleExpressionSimplifier simplifier)
+      throws EvalException
+    {
+      final SimpleExpressionProxy subexpr = expr.getSubTerm();
+      final SimpleExpressionProxy subresult = simplifier.simplify(subexpr);
+      if (simplifier.isAtomicValue(subresult)) {
+        final boolean subboolean = simplifier.getBooleanValue(subresult);
+        final boolean resboolean = eval(subboolean);
+        return simplifier.createBooleanConstantProxy(resboolean);
+      } else if (subexpr == subresult) {
+        return expr;
+      } else {
+        final ModuleProxyFactory factory = simplifier.getFactory();
+        return factory.createUnaryExpressionProxy(this, subresult);
+      }        
+    }
+
     public CompiledIntValue eval(final Value argValue)
       throws EvalException
     {
@@ -913,7 +1283,7 @@ public class CompilerOperatorTable extends AbstractOperatorTable {
 
 
   //#########################################################################
-  //# Inner Class UnaryMinusOperator
+  //# Inner Class UnaryNotOperator
   private static class UnaryNotOperator extends AbstractUnaryBooleanOperator
   {
 
@@ -994,6 +1364,27 @@ public class CompilerOperatorTable extends AbstractOperatorTable {
       final int lhs = lhsIntValue.getValue();
       final int rhs = rhsIntValue.getValue();
       return new CompiledIntRangeValue(lhs, rhs);
+    }
+
+    //#######################################################################
+    //# Auxiliary Methods
+    SimpleExpressionProxy combine
+      (final BinaryExpressionProxy expr,
+       final SimpleExpressionProxy origLHS,
+       final SimpleExpressionProxy simpLHS,
+       final SimpleExpressionProxy origRHS,
+       final SimpleExpressionProxy simpRHS,
+       final AbstractSimpleExpressionSimplifier simplifier)
+      throws EvalException
+    {
+      if (simplifier.isAtomicValue(simpLHS)) {
+        simplifier.getIntValue(simpLHS);
+      }
+      if (simplifier.isAtomicValue(simpRHS)) {
+        simplifier.getIntValue(simpRHS);
+      }
+      return super.combine(expr, origLHS, simpLHS,
+                           origRHS, simpRHS, simplifier);
     }
 
   }
@@ -1220,6 +1611,15 @@ public class CompilerOperatorTable extends AbstractOperatorTable {
         (text, (IdentifierProxy) lhs, (IdentifierProxy) rhs);
     }
 
+    public SimpleExpressionProxy simplify
+      (final BinaryExpressionProxy expr,
+       final AbstractSimpleExpressionSimplifier simplifier)
+      throws EvalException
+    {
+      throw new IllegalStateException
+        ("BinaryQualificationOperator cannot be simplified!");
+    }
+
     public Value eval(final Value lhsValue, final Value rhsValue)
       throws EvalException
     {
@@ -1235,7 +1635,6 @@ public class CompilerOperatorTable extends AbstractOperatorTable {
   private final BinaryOperator mAndOperator;
   private final BinaryOperator mOrOperator;
   private final UnaryOperator mNotOperator;
-  private final BinaryOperator mRangeOperator;
   private final BinaryOperator mEqualsOperator;
   private final BinaryOperator mNotEqualsOperator;
   private final BinaryOperator mGreaterThanOperator;
@@ -1245,6 +1644,8 @@ public class CompilerOperatorTable extends AbstractOperatorTable {
   private final BinaryOperator mAssignmentOperator;
   private final BinaryOperator mIncrementOperator;
   private final BinaryOperator mDecrementOperator;
+  private final UnaryOperator mUnaryMinusOperator;
+  private final BinaryOperator mRangeOperator;
   private final Map<BinaryOperator,BinaryOperator> mComplementMap;
 
 

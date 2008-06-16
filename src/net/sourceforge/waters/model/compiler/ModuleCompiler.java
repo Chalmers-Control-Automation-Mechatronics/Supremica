@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.module
 //# CLASS:   ModuleCompiler
 //###########################################################################
-//# $Id: ModuleCompiler.java,v 1.108 2008-04-21 21:58:25 robi Exp $
+//# $Id: ModuleCompiler.java,v 1.109 2008-06-16 07:09:50 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.compiler;
@@ -35,6 +35,10 @@ import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 import net.sourceforge.waters.model.des.StateProxy;
 import net.sourceforge.waters.model.des.TransitionProxy;
+import net.sourceforge.waters.model.compiler.context.
+  DuplicateIdentifierException;
+import net.sourceforge.waters.model.compiler.context.
+  UndefinedIdentifierException;
 import net.sourceforge.waters.model.expr.AtomValue;
 import net.sourceforge.waters.model.expr.BinaryOperator;
 import net.sourceforge.waters.model.expr.EvalException;
@@ -42,6 +46,7 @@ import net.sourceforge.waters.model.expr.IndexValue;
 import net.sourceforge.waters.model.expr.IntValue;
 import net.sourceforge.waters.model.expr.RangeValue;
 import net.sourceforge.waters.model.expr.SimpleValue;
+import net.sourceforge.waters.model.expr.TypeMismatchException;
 import net.sourceforge.waters.model.expr.UnaryOperator;
 import net.sourceforge.waters.model.expr.Value;
 import net.sourceforge.waters.model.marshaller.DocumentManager;

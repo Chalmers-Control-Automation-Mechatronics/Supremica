@@ -3,7 +3,7 @@
 //# PACKAGE: net.sourceforge.waters.model.compiler
 //# CLASS:   EventValue
 //###########################################################################
-//# $Id: EventValue.java,v 1.3 2006-11-03 15:01:57 torda Exp $
+//# $Id: EventValue.java,v 1.4 2008-06-16 07:09:50 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.compiler;

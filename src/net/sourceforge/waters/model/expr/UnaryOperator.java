@@ -4,10 +4,14 @@
 //# PACKAGE: net.sourceforge.waters.model.expr
 //# CLASS:   UnaryOperator
 //###########################################################################
-//# $Id: UnaryOperator.java,v 1.2 2005-11-03 01:24:16 robi Exp $
+//# $Id: UnaryOperator.java,v 1.3 2008-06-16 07:09:51 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.expr;
+
+
+import net.sourceforge.waters.model.module.SimpleExpressionProxy;
+import net.sourceforge.waters.model.module.UnaryExpressionProxy;
 
 
 /**
@@ -28,6 +32,11 @@ public interface UnaryOperator extends Operator {
   //#########################################################################
   //# Evaluation
   public int getReturnTypes(int argType);
+
+  public SimpleExpressionProxy simplify
+    (UnaryExpressionProxy expr,
+     AbstractSimpleExpressionSimplifier simplifier)
+    throws EvalException;
 
   public Value eval(Value arg) throws EvalException;
 
