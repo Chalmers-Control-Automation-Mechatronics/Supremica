@@ -30,10 +30,7 @@ import org.supremica.gui.SupremicaLoggerFactory
 
 
 class Util {
-	private static final factory = ModuleSubjectFactory.instance
-	private static final parser = new ExpressionParser(factory.instance, CompilerOperatorTable.instance)
-	private static final marshaller = new JAXBModuleMarshaller(factory, CompilerOperatorTable.instance)
-	
+		
 	public static void assertGeneratedModuleEqualsManual(ModuleProxy generatedModule, ModuleProxy manualModule) {
 		def generated, manual
 		assert ProxyTools.isEqualListByContents(generated = new ArrayList(generatedModule.eventDeclList).sort{it.name}, manual = new ArrayList(manualModule.eventDeclList).sort{it.name}), "\ngenerated:$generated\nmanual   :$manual\n"
@@ -61,28 +58,21 @@ class Util {
 //		assert generatedModule.equalsByContents(manualModule)
 	}
 
-/*
- * Sorry, I can't fix this, for lack of Groovy knowledge. You have to
- * use the document manager to get the marshaller for ModuleProxy.class,
- * and call its getDefaultExtension() method, to get the extension for
- * module files. ~~~Robi
-	public static void saveModuleToFile(ModuleProxy module, String filename = "./${module.name}.${WmodFileFilter.WMOD}") {
-    	saveModuleToFile(module, [filename] as File)
-	}
- */
+	private static final marshaller = new JAXBModuleMarshaller(ModuleSubjectFactory.instance, CompilerOperatorTable.instance)
+
  	public static void saveModuleToFile(ModuleProxy module) {
- 		saveModuleToFile(module, "./${module.name}${marshaller.defaultExtension}")
+ 		saveModuleToFile module, "./${module.name}${marshaller.defaultExtension}"
 	}
  
 	public static void saveModuleToFile(ModuleProxy module, String filename) {
-		saveModuleToFile(module, [filename] as File)
+		saveModuleToFile module, new File(filename)
 	}
 	
 	public static void saveModuleToFile(ModuleProxy module, File file) {
-		marshaller.marshal(module, file)
+		marshaller.marshal module, file
 	}
 	
-	private static IDE ide
+	private static final IDE ide
 	
 	public static void openInSupremica(ModuleProxy module) {
 		InterfaceManager.instance.initLookAndFeel();
@@ -93,7 +83,7 @@ class Util {
 		//ide.documentManager.newDocument(module)
 		ModuleContainer moduleContainer = [ide, module]
 //		moduleContainer.addStandardPropositions()
-		ide.documentContainerManager.addContainer([ide, module] as ModuleContainer)
+		ide.documentContainerManager.addContainer(new ModuleContainer(ide, module))
 	}
 	public static boolean verifyNonblocking(ModuleProxy module) {
 		def supremicaProjBuilderFromWatersModule = new ProjectBuildFromWaters(new DocumentManager());
