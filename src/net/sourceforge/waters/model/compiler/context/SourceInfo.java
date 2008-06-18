@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.compiler.context
 //# CLASS:   SourceInfo
 //###########################################################################
-//# $Id: SourceInfo.java,v 1.1 2008-06-16 07:09:51 robi Exp $
+//# $Id: SourceInfo.java,v 1.2 2008-06-18 09:35:34 robi Exp $
 //###########################################################################
 
 
@@ -55,7 +55,7 @@ public class SourceInfo
 
   //#########################################################################
   //# Constructor
-  SourceInfo(final Proxy proxy, final BindingContext context)
+  public SourceInfo(final Proxy proxy, final BindingContext context)
   {
     mSourceObject = proxy;
     mBindingContext = context;
@@ -72,6 +72,30 @@ public class SourceInfo
   public BindingContext getBindingContext()
   {
     return mBindingContext;
+  }
+
+
+  //#########################################################################
+  //# Navigation
+  /**
+   * Gets a parent of this source information record that indicates a
+   * location within a label block in a graph of the compiled module.
+   * Due to aliasing, the source information of a compiled transition
+   * does not necessarily indicate a position within a graph. In such cases,
+   * this method can be used to navigate the contexts and find the closest
+   * location within a graph (which represents the item that a simulator
+   * would want to highlight).
+   * @see AliasBindingContext
+   */
+  public SourceInfo getGraphSourceInfo()
+  {
+    if (mBindingContext instanceof AliasBindingContext) {
+      final AliasBindingContext alias = (AliasBindingContext) mBindingContext;
+      final SourceInfo info = alias.getAliasSource();
+      return info.getGraphSourceInfo();
+    } else {
+      return this;
+    }
   }
 
 

@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.compiler.instance
 //# CLASS:   CompiledEventList
 //###########################################################################
-//# $Id: CompiledEventList.java,v 1.1 2008-06-16 07:09:51 robi Exp $
+//# $Id: CompiledEventList.java,v 1.2 2008-06-18 09:35:34 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.compiler.instance;
@@ -16,6 +16,8 @@ import java.util.List;
 import java.util.NoSuchElementException;
 
 import net.sourceforge.waters.model.compiler.context.CompiledRange;
+import net.sourceforge.waters.model.compiler.context.SourceInfo;
+import net.sourceforge.waters.model.expr.EvalException;
 import net.sourceforge.waters.model.module.SimpleExpressionProxy;
 
 
@@ -67,20 +69,35 @@ class CompiledEventList implements CompiledEvent
     return mIsObservable;
   }
 
-  public Iterator<CompiledSingleEvent> getEventIterator()
-  {
-    return new NestedIterator();
-  }
-
   public List<CompiledRange> getIndexRanges()
   {
-    return Collections.emptyList();
+    final CompiledEvent event = getSingleEvent();
+    if (event == null) {
+      return Collections.emptyList();
+    } else {
+      return event.getIndexRanges();
+    }
   }
 
   public CompiledEvent find(final SimpleExpressionProxy index)
-    throws IndexOutOfRangeException
+    throws EvalException
   {
-    throw new IndexOutOfRangeException(this);
+    final CompiledEvent event = getSingleEvent();
+    if (event == null) {
+      throw new IndexOutOfRangeException(this);
+    } else {
+      return event.find(index);
+    }
+  }
+
+  public SourceInfo getSourceInfo()
+  {
+    return null;
+  }
+
+  public Iterator<CompiledEvent> getChildrenIterator()
+  {
+    return mList.iterator();
   }
 
 
@@ -99,77 +116,18 @@ class CompiledEventList implements CompiledEvent
     mList.add(value);
   }
 
-  CompiledEvent getSimplified()
-  {
-    if (mList.size() == 1) {
-      return mList.get(0);
-    } else {
-      return this;
-    }
-  }
-
 
   //#########################################################################
-  //# Local Class NestedIterator
-  private class NestedIterator implements Iterator<CompiledSingleEvent>
+  //# Auxiliary Methods
+  private CompiledEvent getSingleEvent()
   {
-
-    //#######################################################################
-    //# Constructor
-    NestedIterator()
-    {
-      mListIterator = mList.iterator();
-      mInnerIterator = null;
-      advance();
+    final Iterator<CompiledEvent> iter = mList.iterator();
+    if (iter.hasNext()) {
+      final CompiledEvent event = iter.next();
+      return iter.hasNext() ? null : event;
+    } else {
+      return null;
     }
-
-
-    //#######################################################################
-    //# Interface java.util.Iterator
-    public boolean hasNext()
-    {
-      return mListIterator != null;
-    }
-
-    public CompiledSingleEvent next()
-    {
-      if (mListIterator != null) {
-	final CompiledSingleEvent result = mInnerIterator.next();
-	advance();
-	return result;
-      } else {
-	throw new NoSuchElementException
-	  ("No more events in compiled event list iteration!");
-      }
-    }
-	
-    public void remove()
-    {
-      throw new UnsupportedOperationException
-	("Can't remove from compiled event list!");
-    }
-
-    //#######################################################################
-    //# Auxiliary Methods
-    private void advance()
-    {
-      while (mInnerIterator == null || !mInnerIterator.hasNext()) {
-	if (mListIterator.hasNext()) {
-	  final CompiledEvent value = mListIterator.next();
-	  mInnerIterator = value.getEventIterator();
-	} else {
-	  mListIterator = null;
-	  mInnerIterator = null;
-	  return;
-	}
-      }
-    }
-
-    //#######################################################################
-    //# Data Members
-    private Iterator<CompiledEvent> mListIterator;
-    private Iterator<CompiledSingleEvent> mInnerIterator;
-
   }
 
 

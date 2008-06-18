@@ -4,12 +4,10 @@
 //# PACKAGE: net.sourceforge.waters.model.compiler.instance
 //# CLASS:   EventKindException
 //###########################################################################
-//# $Id: EventKindException.java,v 1.1 2008-06-16 07:09:51 robi Exp $
+//# $Id: EventKindException.java,v 1.2 2008-06-18 09:35:34 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.compiler.instance;
-
-import java.util.Iterator;
 
 import net.sourceforge.waters.model.compiler.context.CompiledRange;
 import net.sourceforge.waters.model.expr.EvalException;
@@ -102,10 +100,10 @@ public class EventKindException extends EvalException {
   {
     if (mDecl == null) {
       final int badmask = mIndex;
-      final Iterator<CompiledSingleEvent> iter =
-        mEvent.getEventIterator();
-      while (iter.hasNext()) {
-        final CompiledSingleEvent event = iter.next();
+      final Iterable<SingleEventOutput> outputs =
+        new EventOutputIterable(mEvent);
+      for (final SingleEventOutput output : outputs) {
+        final CompiledSingleEvent event = output.getEvent();
         final int mask = event.getKindMask();
         if ((mask & badmask) != 0) {
           final String name = event.toString();
@@ -121,10 +119,10 @@ public class EventKindException extends EvalException {
       final String declName = mDecl.getName();
       final EventKind declKind = mDecl.getKind();
       final boolean declObs = mDecl.isObservable();
-      final Iterator<CompiledSingleEvent> iter =
-        mEvent.getEventIterator();
-      while (iter.hasNext()) {
-        final CompiledSingleEvent event = iter.next();
+      final Iterable<SingleEventOutput> outputs =
+        new EventOutputIterable(mEvent);
+      for (final SingleEventOutput output : outputs) {
+        final CompiledSingleEvent event = output.getEvent();
         if (!EventKindMask.isAssignable(declKind, event.getKindMask())) {
           return
             "Can't assign event '" + event.toString() + "' of kind " +

@@ -4,13 +4,14 @@
 //# PACKAGE: net.sourceforge.waters.model.expr
 //# CLASS:   AbstractSimpleExpressionSimplifier
 //###########################################################################
-//# $Id: AbstractSimpleExpressionSimplifier.java,v 1.1 2008-06-16 07:09:51 robi Exp $
+//# $Id: AbstractSimpleExpressionSimplifier.java,v 1.2 2008-06-18 09:35:34 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.expr;
 
 import net.sourceforge.waters.model.module.IdentifierProxy;
 import net.sourceforge.waters.model.module.IntConstantProxy;
+import net.sourceforge.waters.model.module.ModuleProxyCloner;
 import net.sourceforge.waters.model.module.ModuleProxyFactory;
 import net.sourceforge.waters.model.module.SimpleExpressionProxy;
 
@@ -32,6 +33,11 @@ public abstract class AbstractSimpleExpressionSimplifier
   public ModuleProxyFactory getFactory()
   {
     return mFactory;
+  }
+
+  public ModuleProxyCloner getCloner()
+  {
+    return mFactory.getCloner();
   }
 
 

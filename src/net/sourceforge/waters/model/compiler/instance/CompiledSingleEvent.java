@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.compiler.instance
 //# CLASS:   CompiledSingleEvent
 //###########################################################################
-//# $Id: CompiledSingleEvent.java,v 1.1 2008-06-16 07:09:51 robi Exp $
+//# $Id: CompiledSingleEvent.java,v 1.2 2008-06-18 09:35:34 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.compiler.instance;
@@ -17,6 +17,7 @@ import java.util.List;
 
 import net.sourceforge.waters.model.base.WatersRuntimeException;
 import net.sourceforge.waters.model.compiler.context.CompiledRange;
+import net.sourceforge.waters.model.compiler.context.SourceInfo;
 import net.sourceforge.waters.model.module.IdentifierProxy;
 import net.sourceforge.waters.model.module.SimpleExpressionProxy;
 import net.sourceforge.waters.model.printer.ProxyPrinter;
@@ -107,15 +108,20 @@ class CompiledSingleEvent implements CompiledEvent
     return Collections.emptyList();
   }
 
-  public Iterator<CompiledSingleEvent> getEventIterator()
-  {
-    return Collections.singletonList(this).iterator();
-  }
-
   public CompiledEvent find(final SimpleExpressionProxy index)
     throws IndexOutOfRangeException
   {
     throw new IndexOutOfRangeException(this);
+  }
+
+  public SourceInfo getSourceInfo()
+  {
+    return null;
+  }
+
+  public Iterator<CompiledEvent> getChildrenIterator()
+  {
+    return null;
   }
 
 

@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.compiler.instance
 //# CLASS:   CompiledArrayEvent
 //###########################################################################
-//# $Id: CompiledArrayEvent.java,v 1.1 2008-06-16 07:09:51 robi Exp $
+//# $Id: CompiledArrayEvent.java,v 1.2 2008-06-18 09:35:34 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.compiler.instance;
@@ -13,9 +13,9 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
-import java.util.NoSuchElementException;
 
 import net.sourceforge.waters.model.compiler.context.CompiledRange;
+import net.sourceforge.waters.model.compiler.context.SourceInfo;
 import net.sourceforge.waters.model.expr.EvalException;
 import net.sourceforge.waters.model.module.SimpleExpressionProxy;
 import net.sourceforge.waters.xsd.base.EventKind;
@@ -47,11 +47,6 @@ class CompiledArrayEvent implements CompiledEvent
     return mDecl.isObservable();
   }
 
-  public Iterator<CompiledSingleEvent> getEventIterator()
-  {
-    return new ArrayEventIterator(this);
-  }
-
   public List<CompiledRange> getIndexRanges()
   {
     final List<CompiledRange> ranges = mDecl.getRanges();
@@ -72,32 +67,36 @@ class CompiledArrayEvent implements CompiledEvent
     return mDecl.getCompiledEvent(indexes);
   }
 
+  public SourceInfo getSourceInfo()
+  {
+    return null;
+  }
+
+  public Iterator<CompiledEvent> getChildrenIterator()
+  {
+    return new ArrayEventIterator();
+  }
+
 
   //#########################################################################
   //# Local Class ArrayEventIterator
   private class ArrayEventIterator
-    implements Iterator<CompiledSingleEvent>
+    implements Iterator<CompiledEvent>
   {
 
     //#######################################################################
     //# Constructor
-    ArrayEventIterator(final CompiledArrayEvent value)
+    ArrayEventIterator()
     {
       mPos = mIndexes.size();
       final CompiledRange range = mDecl.getRange(mPos);
       mRangeIterator = range.getValues().iterator();
       if (mRangeIterator.hasNext()) {
-        final SimpleExpressionProxy first = mRangeIterator.next();
         mMoreIndexes = new ArrayList<SimpleExpressionProxy>(mPos + 1);
         mMoreIndexes.addAll(mIndexes);
-        mMoreIndexes.add(first);
-        final CompiledEvent event = mDecl.getCompiledEvent(mMoreIndexes);
-        mInnerIterator = event.getEventIterator();
-      }
-      if (mInnerIterator == null || !mInnerIterator.hasNext()) {
+        mMoreIndexes.add(null);
+      } else {
         mMoreIndexes = null;
-        mRangeIterator = null;
-        mInnerIterator = null;
       }
     }
 
@@ -105,30 +104,14 @@ class CompiledArrayEvent implements CompiledEvent
     //# Interface java.util.Iterator
     public boolean hasNext()
     {
-      return mInnerIterator != null;
+      return mRangeIterator.hasNext();
     }
 
-    public CompiledSingleEvent next()
+    public CompiledEvent next()
     {
-      if (mInnerIterator != null) {
-        final CompiledSingleEvent result = mInnerIterator.next();
-        if (!mInnerIterator.hasNext()) {
-          if (!mRangeIterator.hasNext()) {
-            mMoreIndexes = null;
-            mRangeIterator = null;
-            mInnerIterator = null;
-          } else {
-            final SimpleExpressionProxy next = mRangeIterator.next();
-            mMoreIndexes.set(mPos, next);
-            final CompiledEvent event = mDecl.getCompiledEvent(mMoreIndexes);
-            mInnerIterator = event.getEventIterator();
-          }
-        }
-        return result;
-      } else {
-        throw new NoSuchElementException
-          ("Out of elements in ArrayEventIterator!");
-      }
+      final SimpleExpressionProxy next = mRangeIterator.next();
+      mMoreIndexes.set(mPos, next);
+      return mDecl.getCompiledEvent(mMoreIndexes);
     }
 
     public void remove()
@@ -140,10 +123,8 @@ class CompiledArrayEvent implements CompiledEvent
     //#######################################################################
     //# Data Members
     private final int mPos;
-    private List<SimpleExpressionProxy> mMoreIndexes;
-    private Iterator<? extends SimpleExpressionProxy> mRangeIterator;
-    private Iterator<CompiledSingleEvent> mInnerIterator;
-
+    private final Iterator<? extends SimpleExpressionProxy> mRangeIterator;
+    private final List<SimpleExpressionProxy> mMoreIndexes;
   }
 
 

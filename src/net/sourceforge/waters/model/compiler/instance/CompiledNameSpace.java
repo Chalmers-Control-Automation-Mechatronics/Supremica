@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.compiler.instance
 //# CLASS:   CompiledNameSpace
 //###########################################################################
-//# $Id: CompiledNameSpace.java,v 1.1 2008-06-16 07:09:51 robi Exp $
+//# $Id: CompiledNameSpace.java,v 1.2 2008-06-18 09:35:34 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.compiler.instance;
@@ -28,6 +28,7 @@ import net.sourceforge.waters.model.module.AbstractModuleProxyVisitor;
 import net.sourceforge.waters.model.module.IdentifiedProxy;
 import net.sourceforge.waters.model.module.IdentifierProxy;
 import net.sourceforge.waters.model.module.IndexedIdentifierProxy;
+import net.sourceforge.waters.model.module.ModuleProxyCloner;
 import net.sourceforge.waters.model.module.ModuleProxyFactory;
 import net.sourceforge.waters.model.module.QualifiedIdentifierProxy;
 import net.sourceforge.waters.model.module.SimpleExpressionProxy;
@@ -128,7 +129,8 @@ class CompiledNameSpace
                                         final ModuleProxyFactory factory)
   {
     if (mParent == null) {
-      return ident;
+      final ModuleProxyCloner cloner = factory.getCloner();
+      return (IdentifierProxy) cloner.getClone(ident);
     } else {
       final IdentifierProxy base =
         mParent.getPrefixedIdentifier(mIdentifier, factory);

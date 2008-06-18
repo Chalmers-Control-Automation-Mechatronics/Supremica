@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.compiler.instance
 //# CLASS:   CompiledArrayAlias
 //###########################################################################
-//# $Id: CompiledArrayAlias.java,v 1.1 2008-06-16 07:09:51 robi Exp $
+//# $Id: CompiledArrayAlias.java,v 1.2 2008-06-18 09:35:34 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.compiler.instance;
@@ -18,6 +18,7 @@ import java.util.Map;
 import java.util.NoSuchElementException;
 
 import net.sourceforge.waters.model.compiler.context.CompiledRange;
+import net.sourceforge.waters.model.compiler.context.SourceInfo;
 import net.sourceforge.waters.model.compiler.context.
   DuplicateIdentifierException;
 import net.sourceforge.waters.model.compiler.context.
@@ -80,11 +81,6 @@ class CompiledArrayAlias implements CompiledEvent
     return Collections.emptyList();
   }
 
-  public Iterator<CompiledSingleEvent> getEventIterator()
-  {
-    return new ArrayAliasIterator();
-  }
-
   public CompiledEvent find(SimpleExpressionProxy index)
     throws UndefinedIdentifierException
   {
@@ -95,6 +91,16 @@ class CompiledArrayAlias implements CompiledEvent
       throw new UndefinedIdentifierException(name);
     }
     return result;
+  }
+
+  public SourceInfo getSourceInfo()
+  {
+    return null;
+  }
+
+  public Iterator<CompiledEvent> getChildrenIterator()
+  {
+    return mMap.values().iterator();
   }
 
 
@@ -243,69 +249,6 @@ class CompiledArrayAlias implements CompiledEvent
     //# Data Members
     private final CompiledArrayAlias mParent;
     private final SimpleExpressionProxy mIndex;
-
-  }
-
-
-  //#########################################################################
-  //# Local Class ArrayAliasIterator
-  private class ArrayAliasIterator
-    implements Iterator<CompiledSingleEvent>
-  {
-
-    //#######################################################################
-    //# Constructor
-    ArrayAliasIterator()
-    {
-      mKeyIterator = mMap.keySet().iterator();
-      advance();
-    }
-
-    //#######################################################################
-    //# Interface java.util.Iterator
-    public boolean hasNext()
-    {
-      return mInnerIterator != null;
-    }
-
-    public CompiledSingleEvent next()
-    {
-      if (mInnerIterator != null) {
-        final CompiledSingleEvent result = mInnerIterator.next();
-        if (!mInnerIterator.hasNext()) {
-          advance();
-        }
-        return result;
-      } else {
-        throw new NoSuchElementException
-          ("Out of elements in ArrayAliasIterator!");
-      }
-    }
-
-    public void remove()
-    {
-      throw new UnsupportedOperationException
-        ("ArrayAliasIterator does not support remove() operation!");
-    } 
-
-    //#######################################################################
-    //# Auxiliary Methods
-    private void advance()
-    {
-      if (mKeyIterator.hasNext()) {
-        final SimpleExpressionProxy index = mKeyIterator.next();
-        final CompiledEvent value = mMap.get(index);
-        mInnerIterator = value.getEventIterator();
-      } else {
-        mKeyIterator = null;
-        mInnerIterator = null;
-      }
-    }
-
-    //#######################################################################
-    //# Data Members
-    private Iterator<SimpleExpressionProxy> mKeyIterator;
-    private Iterator<CompiledSingleEvent> mInnerIterator;
 
   }
 

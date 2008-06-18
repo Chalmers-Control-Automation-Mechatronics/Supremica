@@ -1398,7 +1398,22 @@ proc Java_GenerateFactory {impl subpack prefix destname classnames
     if {!$iface} {
       Java_GenerateSeparatorComment $stream $umap \
 	  "Interface net.sourceforge.waters.model.$subpack.$interfacename"
+    } 
+    if {$iface} {
+      Java_WriteLn $stream $umap "  /**"
+      Java_WriteLn $stream $umap \
+          "   * Gets the cloning visitor that can convert $prefix objects from"
+      Java_WriteLn $stream $umap \
+          "   * arbitrary implementations into this implementation."
+      Java_WriteLn $stream $umap "   */"
+      Java_WriteLn $stream $umap "  public ${prefix}ProxyCloner getCloner();"
+    } else {
+      Java_WriteLn $stream $umap "  public ${prefix}ProxyCloner getCloner()"
+      Java_WriteLn $stream $umap "  \{"
+      Java_WriteLn $stream $umap "    return getCloningInstance();"
+      Java_WriteLn $stream $umap "  \}"
     }
+    Java_WriteLn $stream $umap ""
     set classnames [lsort $classnames]
     foreach classname $classnames {
       set classinfo $classMap($classname)
@@ -1433,8 +1448,10 @@ proc Java_GenerateFactory {impl subpack prefix destname classnames
           if {$withdft} {
             incr numattribs -$numdefaults
           }
-          Java_WriteConstructorComment $stream $umap $impl \
-              "method" $short $allattribs $withdft
+          if {$iface} {
+            Java_WriteConstructorComment $stream $umap $impl \
+                "method" $short $allattribs $withdft
+          }
           Java_Write $stream $umap "  public $returntype create$classname"
           if {$numattribs > 0} {
             Java_WriteLn $stream $umap ""

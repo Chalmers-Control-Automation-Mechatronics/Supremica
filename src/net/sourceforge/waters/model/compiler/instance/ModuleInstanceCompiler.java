@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.compiler.instance
 //# CLASS:   ModuleInstanceCompiler
 //###########################################################################
-//# $Id: ModuleInstanceCompiler.java,v 1.1 2008-06-16 07:09:51 robi Exp $
+//# $Id: ModuleInstanceCompiler.java,v 1.2 2008-06-18 09:35:34 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.compiler.instance;
@@ -32,6 +32,7 @@ import net.sourceforge.waters.model.compiler.context.CompiledRange;
 import net.sourceforge.waters.model.compiler.context.BindingContext;
 import net.sourceforge.waters.model.compiler.context.ModuleBindingContext;
 import net.sourceforge.waters.model.compiler.context.SimpleExpressionCompiler;
+import net.sourceforge.waters.model.compiler.context.SourceInfo;
 import net.sourceforge.waters.model.compiler.context.
   UndefinedIdentifierException;
 import net.sourceforge.waters.model.expr.BinaryOperator;
@@ -105,6 +106,8 @@ public class ModuleInstanceCompiler extends AbstractModuleProxyVisitor
     throws EvalException
   {
     try {
+      mSourceInfoMap = new HashMap<Proxy,SourceInfo>();
+      mHasGuardActionBlocks = false;
       mContext = new ModuleBindingContext(mInputModule);
       mNameSpace = new CompiledNameSpace();
       mCompiledEvents = new TreeSet<EventDeclProxy>();
@@ -175,7 +178,7 @@ public class ModuleInstanceCompiler extends AbstractModuleProxyVisitor
       final LabelBlockProxy labels0 = edge.getLabelBlock();
       final CompiledEventList event = visitEventListExpressionProxy
         (labels0, EventKindMask.TYPEMASK_EVENT);
-      final LabelBlockProxy labels1 = compileLabelBlock(event);
+      final LabelBlockProxy labels1 = createLabelBlock(event);
       final GuardActionBlockProxy ga0 = edge.getGuardActionBlock();
       GuardActionBlockProxy ga1 = null;
       if (ga0 != null) {
@@ -196,6 +199,8 @@ public class ModuleInstanceCompiler extends AbstractModuleProxyVisitor
             } else if (actions.isEmpty()) {
               ga1 = null;
             }
+          } else {
+            mHasGuardActionBlocks = true;
           }
         }
       }
@@ -356,7 +361,7 @@ public class ModuleInstanceCompiler extends AbstractModuleProxyVisitor
       } else {
         final CompiledEventList events =
           visitEventListExpressionProxy(blocked0);
-        blocked1 = compileLabelBlock(events);
+        blocked1 = createLabelBlock(events);
       }
       final Collection<NodeProxy> nodes = graph.getNodes();
       final int numnodes = nodes.size();
@@ -383,7 +388,7 @@ public class ModuleInstanceCompiler extends AbstractModuleProxyVisitor
     final PlainEventListProxy props0 = group.getPropositions();
     final CompiledEventList event = visitEventListExpressionProxy
       (props0, EventKindMask.TYPEMASK_PROPOSITION);
-    final PlainEventListProxy props1 = compilePlainEventList(event);
+    final PlainEventListProxy props1 = createPlainEventList(event);
     final Set<NodeProxy> children0 = group.getImmediateChildNodes();
     final int numchildren = children0.size();
     final List<NodeProxy> children1 = new ArrayList<NodeProxy>(numchildren);
@@ -395,6 +400,7 @@ public class ModuleInstanceCompiler extends AbstractModuleProxyVisitor
       mFactory.createGroupNodeProxy(name, props1, children1, null);
     mNodeMap.put(group, compiled);
     mCurrentNodes.add(compiled);
+    addSourceInfo(compiled, group);
     return compiled;
   }
 
@@ -444,10 +450,10 @@ public class ModuleInstanceCompiler extends AbstractModuleProxyVisitor
     }
   }
 
-  public Object visitIdentifierProxy (final IdentifierProxy ident)
+  public Object visitIdentifierProxy(final IdentifierProxy ident)
     throws VisitorException
   {
-    final IdentifierProxy newident = mNameCompiler.compileName(ident);
+    final IdentifierProxy newident = mNameCompiler.compileName(ident, false);
     try {
       if (mCurrentEventList == null) {
         final SimpleExpressionProxy value =
@@ -455,18 +461,24 @@ public class ModuleInstanceCompiler extends AbstractModuleProxyVisitor
         if (mSimpleExpressionCompiler.isAtomicValue(value)) {
           return value;
         }
-        final IdentifierProxy ivalue = (IdentifierProxy) value;
+        final IdentifierProxy ivalue =
+          mSimpleExpressionCompiler.getIdentifierValue(value);
         final CompiledEvent event = mNameSpace.getEvent(ivalue);
         if (event == null) {
           throw new UndefinedIdentifierException(ident);
         }
-        return event;
+        final SourceInfo info = new SourceInfo(ident, mContext);
+        final CompiledEvent occ = new CompiledEventOccurrence(event, info);
+        return occ;
       } else {
         final CompiledEvent event = mNameSpace.findEvent(newident);
-        mCurrentEventList.addEvent(event);
-        return event;
+        final SourceInfo info = new SourceInfo(ident, mContext);
+        final CompiledEvent occ = new CompiledEventOccurrence(event, info);
+        mCurrentEventList.addEvent(occ);
+        return occ;
       }
     } catch (final EvalException exception) {
+      exception.provideLocation(ident);
       throw wrap(exception);
     }
   }
@@ -489,7 +501,8 @@ public class ModuleInstanceCompiler extends AbstractModuleProxyVisitor
       final String filename = inst.getModuleName();
       final ModuleProxy module =
         mDocumentManager.load(uri, filename, ModuleProxy.class);
-      mContext = new ModuleBindingContext(module, fullname, null /*info*/);
+      final SourceInfo info = new SourceInfo(inst, mContext);
+      mContext = new ModuleBindingContext(module, fullname, info);
       mNameSpace = new CompiledNameSpace(suffix, mNameSpace);
       return visitModuleProxy(module);
     } catch (final IOException exception) {
@@ -576,6 +589,7 @@ public class ModuleInstanceCompiler extends AbstractModuleProxyVisitor
         mFactory.createSimpleComponentProxy(fullname, kind, newgraph);
       mNameSpace.addComponent(suffix, newcomp);
       mCompiledComponents.add(newcomp);
+      addSourceInfo(newcomp, comp);
       return newcomp;
     } catch (final EvalException exception) {
       throw wrap(exception);
@@ -601,11 +615,12 @@ public class ModuleInstanceCompiler extends AbstractModuleProxyVisitor
     final PlainEventListProxy props0 = node.getPropositions();
     final CompiledEventList event = visitEventListExpressionProxy
       (props0, EventKindMask.TYPEMASK_PROPOSITION);
-    final PlainEventListProxy props1 = compilePlainEventList(event);
+    final PlainEventListProxy props1 = createPlainEventList(event);
     final SimpleNodeProxy compiled =
       mFactory.createSimpleNodeProxy(name, props1, initial, null, null, null);
     mNodeMap.put(node, compiled);
     mCurrentNodes.add(compiled);
+    addSourceInfo(compiled, node);
     return compiled;
   }
 
@@ -631,24 +646,24 @@ public class ModuleInstanceCompiler extends AbstractModuleProxyVisitor
       final List<VariableMarkingProxy> newmarkings =
         new LinkedList<VariableMarkingProxy>();
       for (final VariableMarkingProxy oldmarking : oldmarkings) {
-        final IdentifierProxy oldprop = oldmarking.getProposition();
-        final IdentifierProxy oldident = mNameCompiler.compileName(oldprop);
-        final CompiledEvent newevents = mNameSpace.findEvent(oldident);
+        final IdentifierProxy prop = oldmarking.getProposition();
+        final CompiledEvent events =
+          (CompiledEvent) visitIdentifierProxy(prop);
         final SimpleExpressionProxy oldpred = oldmarking.getPredicate();
         final SimpleExpressionProxy newpred =
           mSimpleExpressionCompiler.simplify(oldpred, context);
-        final Iterator<CompiledSingleEvent> iter =
-          newevents.getEventIterator();
-        while (iter.hasNext()) {
-          final CompiledSingleEvent event = iter.next();
+        final Iterable<SingleEventOutput> outputs =
+          new EventOutputIterable(events);
+        for (final SingleEventOutput output : outputs) {
+          final CompiledSingleEvent event = output.getEvent();
           if (event.getKind() != EventKind.PROPOSITION) {
             final int mask = event.getKindMask();
             final EventKindException exception =
               new EventKindException(event, mask);
-            exception.provideLocation(oldprop);
+            exception.provideLocation(prop);
             throw exception;
           }
-          final IdentifierProxy newident = compileSingleEvent(event);
+          final IdentifierProxy newident = createSingleEvent(output);
           final VariableMarkingProxy newmarking =
             mFactory.createVariableMarkingProxy(newident, newpred);
           newmarkings.add(newmarking);
@@ -659,6 +674,7 @@ public class ModuleInstanceCompiler extends AbstractModuleProxyVisitor
         (fullname, value, deterministic, newinit, newmarkings);
       mNameSpace.addComponent(suffix, newvar);
       mCompiledComponents.add(newvar);
+      addSourceInfo(newvar, var);
       return newvar;
     } catch (final EvalException exception) {
       throw wrap(exception);
@@ -692,44 +708,47 @@ public class ModuleInstanceCompiler extends AbstractModuleProxyVisitor
     }
   }
 
-  private LabelBlockProxy compileLabelBlock(final CompiledEventList events)
+  private LabelBlockProxy createLabelBlock(final CompiledEventList events)
   {
     final List<IdentifierProxy> elist = new LinkedList<IdentifierProxy>();
-    compileEventList(events, elist);
+    createEventList(events, elist);
     return mFactory.createLabelBlockProxy(elist, null);
   }
 
-  private PlainEventListProxy compilePlainEventList
+  private PlainEventListProxy createPlainEventList
     (final CompiledEventList events)
   {
     final List<IdentifierProxy> elist = new LinkedList<IdentifierProxy>();
-    compileEventList(events, elist);
+    createEventList(events, elist);
     return mFactory.createPlainEventListProxy(elist);
   }
 
-  private void compileEventList(final CompiledEventList events,
-                                final List<IdentifierProxy> elist)
+  private void createEventList(final CompiledEventList events,
+                               final List<IdentifierProxy> elist)
   {
-    final Iterator<CompiledSingleEvent> iter = events.getEventIterator();
-    while (iter.hasNext()) {
-      final CompiledSingleEvent event = iter.next();
-      final IdentifierProxy ident = compileSingleEvent(event);
+    final Iterable<SingleEventOutput> outputs =
+      new EventOutputIterable(events);
+    for (final SingleEventOutput output : outputs) {
+      final IdentifierProxy ident = createSingleEvent(output);
       elist.add(ident);
     }
   }
 
-  private IdentifierProxy compileSingleEvent(final CompiledSingleEvent event)
+  private IdentifierProxy createSingleEvent(final SingleEventOutput output)
   {
+    final CompiledSingleEvent event = output.getEvent();
     IdentifierProxy ident = event.getIdentifier();
     if (ident == null) {
-      final EventDeclProxy decl = compileEventDecl(event);
+      final EventDeclProxy decl = createEventDecl(event);
       ident = decl.getIdentifier();
       event.setIdentifier(ident);
     }
-    return ident;
+    final IdentifierProxy iclone = ident.clone();
+    addSourceInfo(iclone, output);
+    return iclone;
   }
 
-  private EventDeclProxy compileEventDecl(final CompiledSingleEvent event)
+  private EventDeclProxy createEventDecl(final CompiledSingleEvent event)
   {
     final CompiledEventDecl cdecl = event.getCompiledEventDecl();
     final EventDeclProxy edecl = cdecl.getEventDeclProxy();
@@ -744,7 +763,23 @@ public class ModuleInstanceCompiler extends AbstractModuleProxyVisitor
     final EventDeclProxy decl = mFactory.createEventDeclProxy
       (ident, kind, observable, ScopeKind.LOCAL, null, null);
     mCompiledEvents.add(decl);
+    addSourceInfo(decl, edecl);
     return decl;
+  }
+
+  private SourceInfo addSourceInfo(final IdentifierProxy target,
+                                   final SingleEventOutput output)
+  {
+    final SourceInfo info = output.getSourceInfo();
+    mSourceInfoMap.put(target, info);
+    return info;
+  }
+
+  private SourceInfo addSourceInfo(final Proxy target, final Proxy source)
+  {
+    final SourceInfo info = new SourceInfo(source, mContext);
+    mSourceInfoMap.put(target, info);
+    return info;
   }
 
 
@@ -757,6 +792,14 @@ public class ModuleInstanceCompiler extends AbstractModuleProxyVisitor
     private IdentifierProxy compileName(final IdentifierProxy ident)
       throws VisitorException
     {
+      return compileName(ident, true);
+    }
+
+    private IdentifierProxy compileName(final IdentifierProxy ident,
+                                        final boolean cloning)
+      throws VisitorException
+    {
+      mIsCloning = cloning;
       return (IdentifierProxy) ident.acceptVisitor(this);
     }
 
@@ -771,15 +814,18 @@ public class ModuleInstanceCompiler extends AbstractModuleProxyVisitor
         final List<SimpleExpressionProxy> indexes = ident.getIndexes();
         final List<SimpleExpressionProxy> values =
           new ArrayList<SimpleExpressionProxy>(indexes.size());
-        boolean change = false;
+        boolean cloning = mIsCloning;
         for (final SimpleExpressionProxy index : indexes) {
           final SimpleExpressionProxy value =
             mSimpleExpressionCompiler.eval(index, mContext);
           values.add(value);
-          change |= index != value;
+          cloning |= !index.equalsByContents(value);
         }
-        return
-          change ? mFactory.createIndexedIdentifierProxy(name, values) : ident;
+        if (cloning) {
+          return mFactory.createIndexedIdentifierProxy(name, values);
+        } else {
+          return ident;
+        }
       } catch (final EvalException exception) {
         exception.provideLocation(ident);
         throw wrap(exception);
@@ -796,18 +842,30 @@ public class ModuleInstanceCompiler extends AbstractModuleProxyVisitor
       final IdentifierProxy comp0 = ident.getComponentIdentifier();
       final IdentifierProxy comp1 =
         (IdentifierProxy) comp0.acceptVisitor(this);
-      if (base0 == base1 && comp0 == comp1) {
-        return ident;
-      } else {
+      if (mIsCloning ||
+          !base0.equalsByContents(base1) ||
+          !comp0.equalsByContents(comp1)) {
         return mFactory.createQualifiedIdentifierProxy(base1, comp1);
+      } else {
+        return ident;
       }
     }
 
     public SimpleIdentifierProxy visitSimpleIdentifierProxy
       (final SimpleIdentifierProxy ident)
     {
-      return ident;
+      if (mIsCloning) {
+        final ModuleProxyCloner cloner = mFactory.getCloner();
+        return (SimpleIdentifierProxy) cloner.getClone(ident);
+      } else {
+        return ident;
+      }
     }
+
+    //#######################################################################
+    //# Data Members
+    private boolean mIsCloning;
+
   }
 
 
@@ -944,6 +1002,9 @@ public class ModuleInstanceCompiler extends AbstractModuleProxyVisitor
   private final IndexAdder mIndexAdder;
   private final NameSpaceVariablesContext mNameSpaceVariablesContext;
   private final ModuleProxy mInputModule;
+
+  private Map<Proxy,SourceInfo> mSourceInfoMap;
+  private boolean mHasGuardActionBlocks;
 
   private BindingContext mContext;
   private CompiledNameSpace mNameSpace;

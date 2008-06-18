@@ -1,14 +1,14 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
 //# PROJECT: Waters
-//# PACKAGE: net.sourceforge.waters.model.compiler.instance
+//# PACKAGE: net.sourceforge.waters.model.compiler.context
 //# CLASS:   AliasBindingContext
 //###########################################################################
-//# $Id: AliasBindingContext.java,v 1.1 2008-06-16 07:09:51 robi Exp $
+//# $Id: AliasBindingContext.java,v 1.1 2008-06-18 09:35:34 robi Exp $
 //###########################################################################
 
 
-package net.sourceforge.waters.model.compiler.instance;
+package net.sourceforge.waters.model.compiler.context;
 
 import net.sourceforge.waters.model.compiler.context.BindingContext;
 import net.sourceforge.waters.model.compiler.context.ModuleBindingContext;
@@ -26,11 +26,19 @@ import net.sourceforge.waters.model.module.SimpleExpressionProxy;
  *
  * <P>When an alias symbol in a label block is compiled, each generated
  * transition has a source information record ({@link SourceInfo})
- * indicating the location of the alias symbol in the label and with an
- * <CODE>BindingContext</CODE> as context, which contains another source
- * information record ({@link SourceInfo}). The context's source
- * information record indicates a symbol within the event list of the
- * corresponding alias declaration.</P>
+ * indicating the location of the elementary event label within the
+ * compiled alias declaration and with an <CODE>AliasBindingContext</CODE>
+ * as context, which contains another source information record ({@link
+ * SourceInfo}). That context's source information record indicates the
+ * location of the alias symbol that was replaced, which may be an
+ * occurrence on actual edge, or in the body of another alias
+ * declaration.</P>
+ *
+ * <P>Thus, the source object of a compiled transition's source information
+ * record ({@link SourceInfo}) does not necessarily indicate a location in
+ * a graph edge of the original model. To get a location within a graph, the
+ * source information's {@link SourceInfo#getGraphSourceInfo()
+ * getGraphSourceInfo()} method can be used.</P>
  *
  * @see BindingContext, SourceInfo
  * @author Robi Malik
@@ -43,13 +51,13 @@ public class AliasBindingContext implements BindingContext
   //# Constructors
   /**
    * Creates a new alias binding context.
-   * @param  info   The source information within the alias declaration
-   *                that is being compiled.
+   * @param  info   The source information of the alias declaration
+   *                that is being replaced.
    * @param  parent The parent binding context with additional bindings
    *                for the aliased symbol before its replacement.
    */
-  AliasBindingContext(final SourceInfo info,
-                      final BindingContext parent)
+  public AliasBindingContext(final SourceInfo info,
+                             final BindingContext parent)
   {
     mAliasSource = info;
     mParent = parent;
@@ -72,14 +80,14 @@ public class AliasBindingContext implements BindingContext
   //#########################################################################
   //# Simple Access
   /**
-   * Gets the source information record from which the alias has been
+   * Gets the source information record from where the alias has been
    * instantiated.
    * @return A {@link SourceInfo} record pointing to the {@link
    *         net.sourceforge.waters.model.module.SimpleExpressionProxy
-   *         SimpleExpressionProxy} within the compiled alias
-   *         expression.
+   *         SimpleExpressionProxy} of the alias identifier that
+   *         was replaced.
    */
-  SourceInfo getAliasSource()
+  public SourceInfo getAliasSource()
   {
     return mAliasSource;
   }
@@ -87,9 +95,9 @@ public class AliasBindingContext implements BindingContext
   /**
    * Gets the parent binding context of this alias binding.
    * The parent context may provide additional bindings
-   * for the aliased symbol before its replacement.
+   * for the aliased symbol after its replacement.
    */
-  BindingContext getParent()
+  public BindingContext getParent()
   {
     return mParent;
   }
@@ -101,4 +109,3 @@ public class AliasBindingContext implements BindingContext
   private final BindingContext mParent;
 
 }
-

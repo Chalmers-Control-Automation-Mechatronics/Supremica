@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.compiler.context
 //# CLASS:   SimpleExpressionCompiler
 //###########################################################################
-//# $Id: SimpleExpressionCompiler.java,v 1.1 2008-06-16 07:09:51 robi Exp $
+//# $Id: SimpleExpressionCompiler.java,v 1.2 2008-06-18 09:35:34 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.compiler.context;
@@ -26,6 +26,7 @@ import net.sourceforge.waters.model.module.EnumSetExpressionProxy;
 import net.sourceforge.waters.model.module.IdentifierProxy;
 import net.sourceforge.waters.model.module.IndexedIdentifierProxy;
 import net.sourceforge.waters.model.module.IntConstantProxy;
+import net.sourceforge.waters.model.module.ModuleProxyCloner;
 import net.sourceforge.waters.model.module.ModuleProxyFactory;
 import net.sourceforge.waters.model.module.QualifiedIdentifierProxy;
 import net.sourceforge.waters.model.module.SimpleExpressionProxy;
@@ -131,6 +132,7 @@ public class SimpleExpressionCompiler
     }
   }
 
+
   //#########################################################################
   //# Inner Class SimplificationVisitor
   private class SimplificationVisitor
@@ -156,6 +158,9 @@ public class SimpleExpressionCompiler
       throws VisitorException
     {
       final List<SimpleIdentifierProxy> items = expr.getItems();
+      final int numitems = items.size();
+      final List<SimpleIdentifierProxy> copies =
+        new ArrayList<SimpleIdentifierProxy>(numitems);
       for (final SimpleIdentifierProxy item : items) {
         final SimpleExpressionProxy found = getBoundExpression(item);
         if (found == null) {
@@ -173,39 +178,43 @@ public class SimpleExpressionCompiler
           throw wrap(exception);
         }
       }
-      return expr;
+      final ModuleProxyCloner cloner = getCloner();
+      return (EnumSetExpressionProxy) cloner.getClone(expr);
     }
 
     public SimpleExpressionProxy visitIndexedIdentifierProxy
-      (IndexedIdentifierProxy ident)
+      (final IndexedIdentifierProxy ident)
       throws VisitorException
     {
+      final String name = ident.getName();
       final List<SimpleExpressionProxy> origIndexes = ident.getIndexes();
       final int size = origIndexes.size();
       final List<SimpleExpressionProxy> compiledIndexes =
         new ArrayList<SimpleExpressionProxy>(size);
-      boolean change = false;
       for (final SimpleExpressionProxy orig : origIndexes) {
         final SimpleExpressionProxy compiled =
           (SimpleExpressionProxy) orig.acceptVisitor(this);
-        change |= (orig != compiled);
         compiledIndexes.add(compiled);
       }
-      if (change) {
-        final String name = ident.getName();
-        final ModuleProxyFactory factory = getFactory();
-        ident = factory.createIndexedIdentifierProxy(name, compiledIndexes);
+      final ModuleProxyFactory factory = getFactory();
+      final IndexedIdentifierProxy copy =
+        factory.createIndexedIdentifierProxy(name, compiledIndexes);
+      try {
+        return processIdentifier(copy, true);
+      } catch (final UndefinedIdentifierException exception) {
+        exception.provideLocation(ident);
+        throw wrap(exception);
       }
-      return processIdentifier(ident);
     }
 
     public IntConstantProxy visitIntConstantProxy(final IntConstantProxy expr)
     {
-      return expr;
+      final ModuleProxyCloner cloner = getCloner();
+      return (IntConstantProxy) cloner.getClone(expr);
     }
 
     public SimpleExpressionProxy visitQualifiedIdentifierProxy
-      (QualifiedIdentifierProxy ident)
+      (final QualifiedIdentifierProxy ident)
       throws VisitorException
     {
       try {
@@ -217,12 +226,14 @@ public class SimpleExpressionCompiler
         final SimpleExpressionProxy compv =
           (SimpleExpressionProxy) comp0.acceptVisitor(this);
         final IdentifierProxy comp1 = getIdentifierValue(compv);
-        if (base0 != base1 || comp0 != comp1) {
-          final ModuleProxyFactory factory = getFactory();
-          ident = factory.createQualifiedIdentifierProxy(base1, comp1);
-        }
-        return processIdentifier(ident);
+        final ModuleProxyFactory factory = getFactory();
+        final QualifiedIdentifierProxy copy =
+          factory.createQualifiedIdentifierProxy(base1, comp1);
+        return processIdentifier(copy, true);
       } catch (final TypeMismatchException exception) {
+        throw wrap(exception);
+      } catch (final UndefinedIdentifierException exception) {
+        exception.provideLocation(ident);
         throw wrap(exception);
       }
     }
@@ -231,7 +242,12 @@ public class SimpleExpressionCompiler
       (final SimpleIdentifierProxy ident)
       throws VisitorException
     {
-      return processIdentifier(ident);
+      try {
+        return processIdentifier(ident, false);
+      } catch (final UndefinedIdentifierException exception) {
+        exception.provideLocation(ident);
+        throw wrap(exception);
+      }
     }
 
     public SimpleExpressionProxy visitUnaryExpressionProxy
@@ -249,18 +265,20 @@ public class SimpleExpressionCompiler
     //#######################################################################
     //# Auxiliary Methods
     private SimpleExpressionProxy processIdentifier
-      (final IdentifierProxy ident)
-      throws VisitorException
+      (final IdentifierProxy ident, final boolean alreadyCloned)
+      throws UndefinedIdentifierException
     {
       final SimpleExpressionProxy bound = getBoundExpression(ident);
       if (bound != null) {
-        return bound;
+        final ModuleProxyCloner cloner = getCloner();
+        return (SimpleExpressionProxy) cloner.getClone(bound);
       } else if (mIsEvaluating) {
-        final UndefinedIdentifierException exception =
-          new UndefinedIdentifierException(ident);
-        throw wrap(exception);
-      } else {
+        throw new UndefinedIdentifierException(ident);
+      } else if (alreadyCloned) {
         return ident;
+      } else {
+        final ModuleProxyCloner cloner = getCloner();
+        return (IdentifierProxy) cloner.getClone(ident);
       }
     }
 
