@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.compiler.context
 //# CLASS:   CompiledEnumRange
 //###########################################################################
-//# $Id: CompiledEnumRange.java,v 1.1 2008-06-16 07:09:51 robi Exp $
+//# $Id: CompiledEnumRange.java,v 1.2 2008-06-18 11:45:49 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.compiler.context;
@@ -30,6 +30,38 @@ class CompiledEnumRange implements CompiledRange
 
   //#########################################################################
   //# Overrides for java.lang.Object
+  public boolean equals(final Object other)
+  {
+    if (other != null && getClass() == other.getClass()) {
+      final CompiledEnumRange range = (CompiledEnumRange) other;
+      final Iterator<SimpleIdentifierProxy> iter1 = mAtoms.iterator();
+      final Iterator<SimpleIdentifierProxy> iter2 = range.mAtoms.iterator();
+      while (iter1.hasNext()) {
+        if (!iter2.hasNext()) {
+          return false;
+        }
+        final SimpleIdentifierProxy atom1 = iter1.next();
+        final SimpleIdentifierProxy atom2 = iter2.next();
+        if (!atom1.equalsByContents(atom2)) {
+          return false;
+        }
+      }
+      return !iter2.hasNext();      
+    } else {
+      return false;
+    }
+  }
+
+  public int hashCode()
+  {
+    int result = getClass().hashCode();
+    for (final SimpleIdentifierProxy atom : mAtoms) {
+      result *= 5;
+      result += atom.hashCodeByContents();
+    }
+    return result;
+  }
+
   public String toString()
   {
     final StringBuffer result = new StringBuffer("{");

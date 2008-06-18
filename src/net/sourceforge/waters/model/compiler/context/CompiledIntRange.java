@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.compiler.context
 //# CLASS:   CompiledIntRange
 //###########################################################################
-//# $Id: CompiledIntRange.java,v 1.1 2008-06-16 07:09:51 robi Exp $
+//# $Id: CompiledIntRange.java,v 1.2 2008-06-18 11:45:49 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.compiler.context;
@@ -44,6 +44,26 @@ class CompiledIntRange implements CompiledRange
 
   //#########################################################################
   //# Overrides for java.lang.Object
+  public boolean equals(final Object other)
+  {
+    if (other != null && getClass() == other.getClass()) {
+      final CompiledIntRange range = (CompiledIntRange) other;
+      return mLower == range.mLower && mUpper == range.mUpper;
+    } else {
+      return false;
+    }
+  }
+
+  public int hashCode()
+  {
+    int result = getClass().hashCode();
+    result *= 31;
+    result += mLower;
+    result *= 31;
+    result += mUpper;
+    return result;
+  }
+
   public String toString()
   {
     return mLower + ".." + mUpper;

@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.compiler.instance
 //# CLASS:   ModuleInstanceCompiler
 //###########################################################################
-//# $Id: ModuleInstanceCompiler.java,v 1.2 2008-06-18 09:35:34 robi Exp $
+//# $Id: ModuleInstanceCompiler.java,v 1.3 2008-06-18 11:45:49 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.compiler.instance;
@@ -79,6 +79,28 @@ import net.sourceforge.waters.xsd.base.ComponentKind;
 import net.sourceforge.waters.xsd.base.EventKind;
 import net.sourceforge.waters.xsd.module.ScopeKind;
 
+
+/**
+ * <P>The first pass of the compiler.</P>
+ *
+ * <P>This compiler accepts a module ({@link ModuleProxy}) as input and
+ * produces another module as output. It expands all aliases, foreach
+ * constructs, and instantiations. Event arrays as well as component and
+ * variable arrays are enumerated explicitly. Variable components are
+ * preserved in the output, but all guards and actions are simplified by
+ * substituting values obtained from aliasing or instantiation.</P>
+ *
+ * <P>It is ensured that the resultant module only contains
+ * nodes of the following types.</P>
+ * <UL>
+ * <LI>{@link EventDeclProxy}, where only simple events are defined,
+ *     i.e., the list of ranges is guaranteed to be empty;</LI>
+ * <LI>{@link SimpleComponentProxy};</LI>
+ * <LI>{@link VariableComponentProxy}.</LI>
+ * </UL>
+ *
+ * @author Robi Malik
+ */
 
 public class ModuleInstanceCompiler extends AbstractModuleProxyVisitor
 {
@@ -171,14 +193,6 @@ public class ModuleInstanceCompiler extends AbstractModuleProxyVisitor
     throws VisitorException
   {
     try {
-      final NodeProxy source0 = edge.getSource();
-      final NodeProxy source1 = mNodeMap.get(source0);
-      final NodeProxy target0 = edge.getTarget();
-      final NodeProxy target1 = mNodeMap.get(target0);
-      final LabelBlockProxy labels0 = edge.getLabelBlock();
-      final CompiledEventList event = visitEventListExpressionProxy
-        (labels0, EventKindMask.TYPEMASK_EVENT);
-      final LabelBlockProxy labels1 = createLabelBlock(event);
       final GuardActionBlockProxy ga0 = edge.getGuardActionBlock();
       GuardActionBlockProxy ga1 = null;
       if (ga0 != null) {
@@ -204,6 +218,14 @@ public class ModuleInstanceCompiler extends AbstractModuleProxyVisitor
           }
         }
       }
+      final NodeProxy source0 = edge.getSource();
+      final NodeProxy source1 = mNodeMap.get(source0);
+      final NodeProxy target0 = edge.getTarget();
+      final NodeProxy target1 = mNodeMap.get(target0);
+      final LabelBlockProxy labels0 = edge.getLabelBlock();
+      final CompiledEventList event = visitEventListExpressionProxy
+        (labels0, EventKindMask.TYPEMASK_EVENT);
+      final LabelBlockProxy labels1 = createLabelBlock(event);
       final EdgeProxy compiled = mFactory.createEdgeProxy
         (source1, target1, labels1, ga1, null, null, null);
       mCurrentEdges.add(compiled);
@@ -262,8 +284,7 @@ public class ModuleInstanceCompiler extends AbstractModuleProxyVisitor
             decl.isObservable() && !event.isObservable()) {
           throw new EventKindException(decl, event);
         }
-        final Iterator<SimpleExpressionProxy> declIter =
-          declRanges.iterator();
+        final Iterator<SimpleExpressionProxy> declIter = declRanges.iterator();
         final List<CompiledRange> eventRanges = event.getIndexRanges();
         final Iterator<CompiledRange> eventIter = eventRanges.iterator();
         int index = 0;
@@ -319,12 +340,12 @@ public class ModuleInstanceCompiler extends AbstractModuleProxyVisitor
       final BindingContext root = mContext;
       final String name = foreach.getName();
       final List<Proxy> body = foreach.getBody();
-      final SimpleExpressionProxy expr = foreach.getRange();
-      final SimpleExpressionProxy value =
-        mSimpleExpressionCompiler.eval(expr, mContext);
-      final CompiledRange range =
-        mSimpleExpressionCompiler.getRangeValue(value);
-      for (final SimpleExpressionProxy item : range.getValues()) {
+      final SimpleExpressionProxy range = foreach.getRange();
+      final SimpleExpressionProxy rvalue =
+        mSimpleExpressionCompiler.eval(range, mContext);
+      final CompiledRange crange =
+        mSimpleExpressionCompiler.getRangeValue(rvalue);
+      for (final SimpleExpressionProxy item : crange.getValues()) {
         try {
           mContext = new ForeachBindingContext(name, item, root);
           final SimpleExpressionProxy guard = foreach.getGuard();
@@ -332,9 +353,9 @@ public class ModuleInstanceCompiler extends AbstractModuleProxyVisitor
             visitCollection(body);
           } else {
             final SimpleExpressionProxy gvalue =
-              mSimpleExpressionCompiler.eval(expr, mContext);
+              mSimpleExpressionCompiler.eval(guard, mContext);
             final boolean gboolean =
-              mSimpleExpressionCompiler.getBooleanValue(guard);
+              mSimpleExpressionCompiler.getBooleanValue(gvalue);
             if (gboolean) {
               visitCollection(body);
             }
@@ -453,8 +474,10 @@ public class ModuleInstanceCompiler extends AbstractModuleProxyVisitor
   public Object visitIdentifierProxy(final IdentifierProxy ident)
     throws VisitorException
   {
-    final IdentifierProxy newident = mNameCompiler.compileName(ident, false);
     try {
+      // First evaluate all indexes ...
+      final IdentifierProxy newident = mNameCompiler.compileName(ident, false);
+      // Second do a lookup ... Where? Depends on context ...
       if (mCurrentEventList == null) {
         final SimpleExpressionProxy value =
           mSimpleExpressionCompiler.simplify(newident, mContext);
