@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.compiler.context
 //# CLASS:   SourceInfoBuilder
 //###########################################################################
-//# $Id: SourceInfoBuilder.java,v 1.1 2008-06-19 11:34:55 robi Exp $
+//# $Id: SourceInfoBuilder.java,v 1.2 2008-06-19 19:10:10 robi Exp $
 //###########################################################################
 
 
@@ -42,10 +42,20 @@ public class SourceInfoBuilder
 
   //#########################################################################
   //# Access
+  public void reset()
+  {
+    reset(null);
+  }
+
   public void reset(final Map<Proxy,SourceInfo> parentmap)
   {
     mParentMap = parentmap;
     mResultMap = new HashMap<Proxy,SourceInfo>();
+  }
+
+  public void shift()
+  {
+    reset(mResultMap);
   }
 
   public SourceInfo add(final Proxy target, final Proxy source)
@@ -54,11 +64,10 @@ public class SourceInfoBuilder
     if (info == null) {
       info = new SourceInfo(source, null);
     }
-    mResultMap.put(target, info);
-    return info;
+    return add(target, info);
   }
 
-  public SourceInfo add(final Proxy proxy,
+  public SourceInfo add(final Proxy target,
                         final Proxy source,
                         final BindingContext context)
   {
@@ -70,7 +79,12 @@ public class SourceInfoBuilder
       final Proxy psource = pinfo.getSourceObject();
       info = new SourceInfo(psource, context);
     }
-    mResultMap.put(proxy, info);
+    return add(target, info);
+  }
+
+  public SourceInfo add(final Proxy target, final SourceInfo info)
+  {
+    mResultMap.put(target, info);
     return info;
   }
 

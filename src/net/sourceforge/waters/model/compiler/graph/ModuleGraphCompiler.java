@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.module.graph
 //# CLASS:   ModuleGraphCompiler
 //###########################################################################
-//# $Id: ModuleGraphCompiler.java,v 1.1 2008-06-19 11:34:55 robi Exp $
+//# $Id: ModuleGraphCompiler.java,v 1.2 2008-06-19 19:10:10 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.compiler.graph;
@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -23,6 +24,7 @@ import net.sourceforge.waters.model.base.ProxyAccessor;
 import net.sourceforge.waters.model.base.ProxyAccessorByContents;
 import net.sourceforge.waters.model.base.VisitorException;
 import net.sourceforge.waters.model.base.WatersRuntimeException;
+import net.sourceforge.waters.model.compiler.context.SourceInfoBuilder;
 import net.sourceforge.waters.model.compiler.context.
   DuplicateIdentifierException;
 import net.sourceforge.waters.model.compiler.context.
@@ -55,10 +57,12 @@ public class ModuleGraphCompiler extends AbstractModuleProxyVisitor
   //##########################################################################
   //# Constructors
   public ModuleGraphCompiler(final ProductDESProxyFactory factory,
-                             final ModuleProxy module)
+                             final ModuleProxy module,
+                             final SourceInfoBuilder builder)
   {
     mFactory = factory;
     mInputModule = module;
+    mSourceInfoBuilder = builder;
   }
 
 
@@ -100,6 +104,7 @@ public class ModuleGraphCompiler extends AbstractModuleProxyVisitor
     final boolean observable = decl.isObservable();
     final EventProxy event = mFactory.createEventProxy(name, kind, observable);
     addGlobalEvent(ident, event);
+    mSourceInfoBuilder.add(event, decl);
     return event;
   }
 
@@ -197,8 +202,9 @@ public class ModuleGraphCompiler extends AbstractModuleProxyVisitor
           final EventListExpressionProxy labels = edge.getLabelBlock();
           final List<EventProxy> events =
             visitEventListExpressionProxy(labels);
+          final List<Proxy> sources = labels.getEventList();
           createTransitions(source, events, target, sourceEntry,
-                            deterministic);
+                            deterministic, sources);
         }
         sourceEntry.clearProperChildNodes();
       }
@@ -210,6 +216,7 @@ public class ModuleGraphCompiler extends AbstractModuleProxyVisitor
         mFactory.createAutomatonProxy(name, kind, mLocalEventsList,
                                       mLocalStatesList, mLocalTransitionsList);
       addAutomaton(ident, aut);
+      mSourceInfoBuilder.add(aut, comp);
       return aut;
     } finally {
       mCurrentComponent = null;
@@ -244,6 +251,7 @@ public class ModuleGraphCompiler extends AbstractModuleProxyVisitor
     }
     final StateProxy state =
       mFactory.createStateProxy(name, initial, stateprops);
+    mSourceInfoBuilder.add(state, node);
     return addLocalState(state, node);
   }
 
@@ -325,17 +333,18 @@ public class ModuleGraphCompiler extends AbstractModuleProxyVisitor
                                  final List<EventProxy> events,
                                  final NodeProxy target,
                                  final CompiledNode groupEntry,
-                                 final boolean deterministic)
+                                 final boolean deterministic,
+                                 final List<Proxy> origs)
     throws VisitorException
   {
     if (source instanceof SimpleNodeProxy) {
       final SimpleNodeProxy simpleSource = (SimpleNodeProxy) source;
-      createTransitions(simpleSource, events, target, groupEntry,
-                        deterministic);
+      createTransitions(simpleSource, events, target,
+                        groupEntry, deterministic, origs);
     } else {
       for (final NodeProxy child : source.getImmediateChildNodes()) {
-        createTransitions(child, events, target, groupEntry,
-                          deterministic);
+        createTransitions(child, events, target,
+                          groupEntry, deterministic, origs);
       }
     }
   }
@@ -344,17 +353,18 @@ public class ModuleGraphCompiler extends AbstractModuleProxyVisitor
                                  final List<EventProxy> events,
                                  final NodeProxy target,
                                  final CompiledNode groupEntry,
-                                 final boolean deterministic)
+                                 final boolean deterministic,
+                                 final List<Proxy> origs)
     throws VisitorException
   {
     if (target instanceof SimpleNodeProxy) {
       final SimpleNodeProxy simpleTarget = (SimpleNodeProxy) target;
-      createTransitions(source, events, simpleTarget, groupEntry,
-                        deterministic);
+      createTransitions(source, events, simpleTarget,
+                        groupEntry, deterministic, origs);
     } else {
       for (final NodeProxy child : target.getImmediateChildNodes()) {
-        createTransitions(source, events, child, groupEntry,
-                          deterministic);
+        createTransitions(source, events, child,
+                          groupEntry, deterministic, origs);
       }
     }
   }
@@ -363,14 +373,17 @@ public class ModuleGraphCompiler extends AbstractModuleProxyVisitor
                                  final List<EventProxy> events,
                                  final SimpleNodeProxy target,
                                  final CompiledNode groupEntry,
-                                 final boolean deterministic)
+                                 final boolean deterministic,
+                                 final List<Proxy> origs)
     throws VisitorException
   {
     final CompiledNode sourceEntry = mPrecompiledNodesMap.get(source);
     final CompiledNode targetEntry = mPrecompiledNodesMap.get(target);
     final StateProxy sourceState = sourceEntry.getState();
     final StateProxy targetState = targetEntry.getState();
+    final Iterator<Proxy> origIter = origs.iterator();
     for (final EventProxy event : events) {
+      final Proxy orig = origIter.next();
       CompiledTransition duplicate = null;
       boolean create = true;
       final Collection<CompiledTransition> compiledTransitions =
@@ -402,6 +415,7 @@ public class ModuleGraphCompiler extends AbstractModuleProxyVisitor
           trans = duplicate.getTransition();
         }
         sourceEntry.addTransition(trans, group);
+        mSourceInfoBuilder.add(trans, orig);
       }
     }
   }
@@ -411,6 +425,7 @@ public class ModuleGraphCompiler extends AbstractModuleProxyVisitor
   //# Data Members
   private final ProductDESProxyFactory mFactory;
   private final ModuleProxy mInputModule;
+  private final SourceInfoBuilder mSourceInfoBuilder;
 
   private Map<ProxyAccessor<IdentifierProxy>,EventProxy> mGlobalEventsMap;
   private List<EventProxy> mGlobalEventsList;

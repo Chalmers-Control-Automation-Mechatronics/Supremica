@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.compiler.instance
 //# CLASS:   ModuleInstanceCompiler
 //###########################################################################
-//# $Id: ModuleInstanceCompiler.java,v 1.4 2008-06-19 11:34:55 robi Exp $
+//# $Id: ModuleInstanceCompiler.java,v 1.5 2008-06-19 19:10:10 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.compiler.instance;
@@ -31,6 +31,7 @@ import net.sourceforge.waters.model.compiler.context.BindingContext;
 import net.sourceforge.waters.model.compiler.context.ModuleBindingContext;
 import net.sourceforge.waters.model.compiler.context.SimpleExpressionCompiler;
 import net.sourceforge.waters.model.compiler.context.SourceInfo;
+import net.sourceforge.waters.model.compiler.context.SourceInfoBuilder;
 import net.sourceforge.waters.model.compiler.context.
   UndefinedIdentifierException;
 import net.sourceforge.waters.model.expr.BinaryOperator;
@@ -106,9 +107,11 @@ public class ModuleInstanceCompiler extends AbstractModuleProxyVisitor
   //#########################################################################
   //# Constructors
   public ModuleInstanceCompiler(final DocumentManager manager,
-                                final ModuleProxy module)
+                                final ModuleProxy module,
+                                final SourceInfoBuilder builder)
   {
     mDocumentManager = manager;
+    mSourceInfoBuilder = builder;
     mFactory = ModuleElementFactory.getInstance();
     mOperatorTable = CompilerOperatorTable.getInstance();
     mSimpleExpressionCompiler =
@@ -126,7 +129,6 @@ public class ModuleInstanceCompiler extends AbstractModuleProxyVisitor
     throws EvalException
   {
     try {
-      mSourceInfoMap = new HashMap<Proxy,SourceInfo>();
       mHasGuardActionBlocks = false;
       mContext = new ModuleBindingContext(mInputModule);
       mNameSpace = new CompiledNameSpace();
@@ -158,6 +160,10 @@ public class ModuleInstanceCompiler extends AbstractModuleProxyVisitor
     }
   }
 
+  public boolean getHasGuardActionBlocks()
+  {
+    return mHasGuardActionBlocks;
+  }
 
   //#########################################################################
   //# Interface net.sourceforge.waters.model.module.ModuleProxyVisitor
@@ -792,15 +798,12 @@ public class ModuleInstanceCompiler extends AbstractModuleProxyVisitor
                                    final SingleEventOutput output)
   {
     final SourceInfo info = output.getSourceInfo();
-    mSourceInfoMap.put(target, info);
-    return info;
+    return mSourceInfoBuilder.add(target, info);
   }
 
   private SourceInfo addSourceInfo(final Proxy target, final Proxy source)
   {
-    final SourceInfo info = new SourceInfo(source, mContext);
-    mSourceInfoMap.put(target, info);
-    return info;
+    return mSourceInfoBuilder.add(target, source, mContext);
   }
 
 
@@ -1016,6 +1019,7 @@ public class ModuleInstanceCompiler extends AbstractModuleProxyVisitor
   //#########################################################################
   //# Data Members
   private final DocumentManager mDocumentManager;
+  private final SourceInfoBuilder mSourceInfoBuilder;
   private final ModuleProxyFactory mFactory;
   private final CompilerOperatorTable mOperatorTable;
   private final SimpleExpressionCompiler mSimpleExpressionCompiler;
@@ -1024,7 +1028,6 @@ public class ModuleInstanceCompiler extends AbstractModuleProxyVisitor
   private final NameSpaceVariablesContext mNameSpaceVariablesContext;
   private final ModuleProxy mInputModule;
 
-  private Map<Proxy,SourceInfo> mSourceInfoMap;
   private boolean mHasGuardActionBlocks;
 
   private BindingContext mContext;
