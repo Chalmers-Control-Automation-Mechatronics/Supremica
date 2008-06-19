@@ -290,10 +290,10 @@ class SequentialExecModelBuilder extends ModelBuilder
     private void loadSystem(String fileName)
     {
 	
-		Logger.output("SequentialExecModelBuilder.loadSystem(" + fileName + "):");
-		Logger.output("Loading file " + fileName, 1);
-		
+		Logger.output("SequentialExecModelBuilder.loadSystem(" + fileName + "):");		
 		File file = getFile(fileName);
+
+		Logger.output("Loading file " + file.getName() + " from " + file.getParent(), 1);
 		
 		try
 		{
@@ -378,6 +378,8 @@ class SequentialExecModelBuilder extends ModelBuilder
 			
 			File file = getFile(fileName);
 			
+			Logger.output("Loading file " + file.getName() + " from " + file.getParent(), 1);
+
 			Object unmarshalledObject = null;
 			
 			try

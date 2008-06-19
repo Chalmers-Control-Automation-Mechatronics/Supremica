@@ -36,19 +36,19 @@ class ModelMaker
             {
 				Logger.setVerboseLevel(Logger.DEBUG);
             }
-            if (args[i].equals("-q"))
+            else if (args[i].equals("-q"))
             {
 				Logger.setVerboseLevel(Logger.QUIET);
             }
-            if (args[i].equals("-e"))
+            else if (args[i].equals("-e"))
             {
 				arguments.put("expandTransitions","true");
             }
-            if (args[i].equals("-p"))
+            else if (args[i].equals("-p"))
             {
 				arguments.put("generatePlantModels","false");
             }
-            if (args[i].equals("-m"))
+            else if (args[i].equals("-m"))
             {
                 if (i + 1 < args.length)
                 {
@@ -62,56 +62,56 @@ class ModelMaker
 					}
                 }
             }
-            if (args[i].equals("-im"))
+            else if (args[i].equals("-im"))
             {
                 if (i + 1 < args.length)
                 {
 					arguments.put("intVarMinValue", args[i + 1]);
                 }
             }
-            if (args[i].equals("-ix"))
+            else if (args[i].equals("-ix"))
             {
                 if (i + 1 < args.length)
                 {
 					arguments.put("intVarMaxValue", args[i + 1]);
                 }
             }
-            if (args[i].equals("-ip"))
+            else if (args[i].equals("-ip"))
             {
                 if (i + 1 < args.length)
                 {
 					arguments.put("instanceQueuePlaces", args[i + 1]);
                 }
             }
-            if (args[i].equals("-jp"))
+            else if (args[i].equals("-jp"))
             {
                 if (i + 1 < args.length)
                 {
 					arguments.put("jobQueuePlaces", args[i + 1]);
                 }
             }
-            if (args[i].equals("-ep"))
+            else if (args[i].equals("-ep"))
             {
                 if (i + 1 < args.length)
                 {
 					arguments.put("eventQueuePlaces", args[i + 1]);
                 }
             }
-            if (args[i].equals("-o"))
+            else if (args[i].equals("-o"))
             {
                 if (i + 1 < args.length)
                 {
 					arguments.put("outputFileName", args[i + 1]);
                 }
             }
-            if (args[i].equals("-lb"))
+            else if (args[i].equals("-lb"))
             {
                 if (i + 1 < args.length)
                 {
                     arguments.put("libraryPathBase", args[i + 1]);
                 }
             }
-            if (args[i].equals("-lp"))
+            else if (args[i].equals("-lp"))
             {
                 if (i + 1 < args.length)
                 {
@@ -125,7 +125,12 @@ class ModelMaker
                     }
                 }
             }
-            if (i+1 == args.length)
+            else if (args[i].startsWith("-"))
+            {
+				Logger.output(Logger.WARN, "Warning: Unknown argument!: " + args[i]);
+				Logger.output(Logger.WARN);
+            }
+            else if (i+1 == args.length)
             {
                 arguments.put("systemFileName", args[i]);
                 if (arguments.get("outputFileName") == null)
