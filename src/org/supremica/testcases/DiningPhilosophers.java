@@ -19,11 +19,18 @@ import uk.ac.ic.doc.scenebeans.Null;
 // Builds a Philo automaton
 class EatingPhilosopher
 {
-    private static Logger logger = LoggerFactory.createLogger(EatingPhilosopher.class);
-    public final String PHILO_NAME = "Philo";
-    
-    static int nbrOfStates = 7;
-    static State[] states = new State[nbrOfStates];
+    private final String PHILO_NAME = "Philo";
+    static State[] states =
+    {	new State("think"),
+        new State("lu"),    // left fork picked up
+        new State("ru"),    // right fork picked up
+        //new State("eat"),
+        new State("ready"),    // ready for eating
+        new State("ld"),    // left fork put down
+        new State("rd"),    // right fork put down
+        //new State("eat2")
+        new State("eat")
+    };
     // indices into states[]
     final static int INIT = 0;
     final static int L_UP = 1;
@@ -33,18 +40,20 @@ class EatingPhilosopher
     final static int R_DN = 5;
     final static int EAT = 6;
     
-    static int number_of_events = 7;
-    static LabeledEvent[] events = new LabeledEvent[number_of_events];
-
+    static LabeledEvent[] events =
+    {	new LabeledEvent("L_take"),    // pick up left
+        new LabeledEvent("R_take"),    // pick up right
+        new LabeledEvent("L_put"),    // put down left
+        new LabeledEvent("R_put"),    // put down right
+        new LabeledEvent("Start_eating")
+    };
     // indicies into events[]
     final static int L_TAKE = 0;
     final static int R_TAKE = 1;
     final static int L_PUT = 2;
     final static int R_PUT = 3;
     final static int START_EATING = 4;
-    final static int INTERM_EVENT = 5;
-    final static int PUT = 6;
-    final static String LABEL_SEP = "_";
+    final static String LABEL_SEP = ".";
     
     // note, must be the same in both Philosopher and Fork
     final static String NAME_SEP = ":";
@@ -54,31 +63,26 @@ class EatingPhilosopher
     
     static boolean inited = false;
     
-    int length;
+    private int length;
     
-    public EatingPhilosopher()
-    {
-         states[0] = new State("think");
-         states[1] = new State("lu");
-         states[2] = new State("ru");
-         states[3] = new State("ready");
-         states[4] = new State("ld");
-         states[5] = new State("rd");
-         states[6] = new State("eat");
-
-         events[0] = new LabeledEvent("L_take");    // pick up left
-         events[1] = new LabeledEvent("R_take");    // pick up right
-         events[2] = new LabeledEvent("L_put");    // put down left
-         events[3] = new LabeledEvent("R_put");    // put down right
-         events[4] = new LabeledEvent("Start_eating");
-         events[5] = new LabeledEvent("Interm_event");
-         events[6] = new LabeledEvent("Put");
-        
-    }
-    public EatingPhilosopher(boolean l_take, boolean r_take, boolean l_put, boolean r_put)
+    public EatingPhilosopher(boolean l_take, boolean r_take, boolean l_put, boolean r_put, int length)
     throws Exception
-    {       
-        this();
+    {
+        this.length = length;
+
+        if (inited)
+        {
+            // The only thing that may need to be changed is the controllability
+            Alphabet alpha = philo.getAlphabet();
+            alpha.getEvent(events[L_TAKE].getLabel()).setControllable(l_take);
+            alpha.getEvent(events[R_TAKE].getLabel()).setControllable(r_take);
+            alpha.getEvent(events[L_PUT].getLabel()).setControllable(l_put);
+            alpha.getEvent(events[R_PUT].getLabel()).setControllable(r_put);
+            alpha.getEvent(events[START_EATING].getLabel()).setControllable(true);
+            
+            return;
+        }
+        
         // Here we create the "template" automaton, philo
         philo = new Automaton("Philo template");
         philo.setType(AutomatonType.PLANT);
@@ -93,16 +97,15 @@ class EatingPhilosopher
         
         // Now the events, these should be (re)named uniquely for each philosopher
         // (each fork-pair, actually)
-          
         events[L_TAKE].setControllable(l_take);
         events[R_TAKE].setControllable(r_take);
         events[L_PUT].setControllable(l_put);
         events[R_PUT].setControllable(r_put);
-        events[INTERM_EVENT].setControllable(true);
         events[START_EATING].setControllable(true);
-        
         for (int i = 0; i < events.length; ++i)
+        {
             philo.getAlphabet().addEvent(events[i]);
+        }
         
         // And finally the arcs - first the left side (where the left is picked up
         // and put down first)
@@ -120,30 +123,26 @@ class EatingPhilosopher
         
         inited = true;
     }
-    
     public Automaton getPhilo()
     {
         return philo;
     }
     
     // Fake renaming, must replace the event due to immutability
-    public void renameEvent(Automaton sm, int ev_index, final String new_label)
+    private void renameEvent(Automaton sm, int ev_index, final String new_label)
     {
         Alphabet alpha = sm.getAlphabet();
         LabeledEvent ev_old = alpha.getEvent(events[ev_index].getLabel());
-        LabeledEvent ev_new = new LabeledEvent(ev_old, new_label);
-        sm.replaceEvent(ev_old, ev_new);        
+        LabeledEvent ev_new = new LabeledEvent(new_label);
+        sm.replaceEvent(ev_old, ev_new);
+        
     }
     
-    public Automaton build(boolean i_l_take, Automaton spec_philo, int id, int l_fork, int r_fork)
+    public Automaton build(boolean b, Automaton ph, int id, int l_fork, int r_fork)
     throws Exception
     {
-        //logger.info(philo.getAlphabet().toDebugString());
-        //AutomataToXML builder = new AutomataToXML(philo);
-        //logger.debug(builder.serialize());
         // deep copy, I hope
-        
-        Automaton sm = new Automaton(spec_philo);
+        Automaton sm = new Automaton(philo);
         sm.setName(PHILO_NAME + NAME_SEP + pad(id));
         
         // adjust the event names according to l_fork and r_fork
@@ -151,36 +150,24 @@ class EatingPhilosopher
         // R_take becomes take<id>.<r_fork>
         // L_put becomes put<id>.<l_fork>
         // R_put becomes put<id>.<r_fork>
-        renameEvent(sm, L_TAKE, "take" + pad(id)+ LABEL_SEP +pad(l_fork));
-        renameEvent(sm, R_TAKE, "take" + pad(id)+ LABEL_SEP +pad(r_fork));
-        renameEvent(sm, L_PUT, "put" + pad(id)+ LABEL_SEP +pad(l_fork));
-        renameEvent(sm, R_PUT, "put" + pad(id)+ LABEL_SEP +pad(r_fork));
-        renameEvent(sm, PUT, "put" + pad(id));
-        
+        renameEvent(sm, L_TAKE, "take" + pad(id) + LABEL_SEP + pad(l_fork));
+        renameEvent(sm, R_TAKE, "take" + pad(id) + LABEL_SEP + pad(r_fork));
+        renameEvent(sm, L_PUT, "put" + pad(id) + LABEL_SEP + pad(l_fork));
+        renameEvent(sm, R_PUT, "put" + pad(id) + LABEL_SEP + pad(r_fork));
         renameEvent(sm, START_EATING, "start_eating" + pad(id));
-        renameEvent(sm, INTERM_EVENT, "intermediate" + pad(id));
-        
-        if(i_l_take)
-        {   
-            if((id%2)==0)
-            {
-                sm.getAlphabet().getEvent("take" + id + LABEL_SEP + id).setControllable(false);
-            }
-        }
         
         // Used Automaton::replaceEvent, so no need to rehash
         // // must rehash since we've changed the label (that's the way it works (unfortunately))
         // alpha.rehash();
-        //AutomataToXML builder = new AutomataToXML(sm);
-        //logger.debug(builder.serialize());
+        
         return sm;
     }
     
-    public String pad(int num)
+    private String pad(int num)
     {
         String returnValue = "" + num;
-//        while (returnValue.length() < length)
-//            returnValue = "0" + returnValue;
+        while (returnValue.length() < length)
+            returnValue = "0" + returnValue;
         return returnValue;
     }
     
@@ -246,7 +233,7 @@ class EatingPhilosopher
 
 interface ChopstickBuilder
 {
-    public Automaton build(boolean i_l_take, int id, int l_philo, int r_philo)
+    public Automaton build(boolean b, int id, int l_philo, int r_philo)
     throws Exception;
 }
 
@@ -256,19 +243,28 @@ class Chopstick
 {
     private final String FORK_NAME = "Fork";
 
-    static State[] states = new State[2];
-    
-    static int number_of_arcs = 4;
-    
-    static LabeledEvent[] events = new LabeledEvent[number_of_arcs];
-    
-    static Arc[] arcs = new Arc[number_of_arcs];
+    static State[] states =
+    {	new State("0"),
+        new State("1")
+    };
+    static LabeledEvent[] events =
+    {	new LabeledEvent("L_up"),
+        new LabeledEvent("R_up"),
+        new LabeledEvent("L_dn"),
+        new LabeledEvent("R_dn")
+    };
+    static Arc[] arcs =
+    {	new Arc(states[0], states[1], events[0]),
+        new Arc(states[1], states[0], events[2]),
+        new Arc(states[0], states[1], events[1]),
+        new Arc(states[1], states[0], events[3])
+    };
     
     final static int L_TAKE = 0;
     final static int R_TAKE = 1;
     final static int L_PUT = 2;
     final static int R_PUT = 3;
-    final static String LABEL_SEP = "_";
+    final static String LABEL_SEP = ".";
     
     // note, must be the same in both Philosopher and Fork
     final static String NAME_SEP = ":";
@@ -279,29 +275,23 @@ class Chopstick
     static boolean inited = false;
     private int length;
     
-    public Chopstick()
-    {
-        states[0] = new State("0");
-        states[1] = new State("1");
-        
-	events[0] = new LabeledEvent("L_up");
-        events[1] = new LabeledEvent("R_up");
-        events[2] =new LabeledEvent("L_dn");
-        events[3] =new LabeledEvent("R_dn");
-
-	arcs[0] = new Arc(states[0], states[1], events[0]);
-        arcs[1] = new Arc(states[1], states[0], events[2]);
-        
-        arcs[2] = new Arc(states[0], states[1], events[1]);
-        arcs[3] = new Arc(states[1], states[0], events[3]);
-        
-    }
-    
     public Chopstick(boolean l_take, boolean r_take, boolean l_put, boolean r_put, int length)
     throws Exception
     {
-        this();
-     
+        this.length = length;
+
+        if (inited)
+        {
+            // The only thing that may need to be changed is the controllability
+            Alphabet alpha = fork.getAlphabet();
+            alpha.getEvent(events[L_TAKE].getLabel()).setControllable(l_take);
+            alpha.getEvent(events[R_TAKE].getLabel()).setControllable(r_take);
+            alpha.getEvent(events[L_PUT].getLabel()).setControllable(l_put);
+            alpha.getEvent(events[R_PUT].getLabel()).setControllable(r_put);
+
+            return;
+        }
+        
         fork = new Automaton("Fork template");
         fork.setType(AutomatonType.SPECIFICATION);
         
@@ -328,7 +318,7 @@ class Chopstick
         {
             fork.addArc(arcs[i]);
         }
-                
+        
         inited = true;
     }
     
@@ -338,12 +328,11 @@ class Chopstick
         Alphabet alpha = sm.getAlphabet();
         LabeledEvent ev_old = alpha.getEvent(events[ev_index].getLabel());
         LabeledEvent ev_new = new LabeledEvent(new_label);
-//        System.out.println(""+ev_new.isControllable());
         sm.replaceEvent(ev_old, ev_new);
         
     }
     
-    public Automaton build(boolean i_l_take, int id, int l_philo, int r_philo)
+    public Automaton build(boolean b, int id, int l_philo, int r_philo)
     throws Exception
     {
         Automaton sm = new Automaton(fork);
@@ -355,21 +344,8 @@ class Chopstick
         
         renameEvent(sm, L_TAKE, "take" + pad(l_philo) + LABEL_SEP + pad(id));
         renameEvent(sm, R_TAKE, "take" + pad(r_philo) + LABEL_SEP + pad(id));
-        
-        ///////////VERY NASTY!!! Just for the extended version
-//        renameEvent(sm, L_PUT, "put" + pad(l_philo) + LABEL_SEP + pad(id));
-//        renameEvent(sm, R_PUT, "put" + pad(r_philo) + LABEL_SEP + pad(id));
-
-        renameEvent(sm, L_PUT, "put" + pad(l_philo));
-        renameEvent(sm, R_PUT, "put" + pad(r_philo));
-        
-        if(i_l_take)
-        {   
-            if((id%2)==0)
-            {        
-                sm.getAlphabet().getEvent("take" + id + LABEL_SEP + id).setControllable(false);
-            }
-        }
+        renameEvent(sm, L_PUT, "put" + pad(l_philo) + LABEL_SEP + pad(id));
+        renameEvent(sm, R_PUT, "put" + pad(r_philo) + LABEL_SEP + pad(id));
         
         // alpha.getEvent(events[L_TAKE].getLabel()).setLabel("take" + l_philo + LABEL_SEP + id);
         // alpha.getEvent(events[R_TAKE].getLabel()).setLabel("take" + r_philo + LABEL_SEP + id);
@@ -385,8 +361,8 @@ class Chopstick
     private String pad(int num)
     {
         String returnValue = "" + num;
-//        while (returnValue.length() < length)
-//            returnValue = "0" + returnValue;
+        while (returnValue.length() < length)
+            returnValue = "0" + returnValue;
         return returnValue;
     }
 }
@@ -413,8 +389,7 @@ class MemoryChopstick
     final static int R_TAKE = 1;
     final static int L_PUT = 2;
     final static int R_PUT = 3;
-    final static String LABEL_SEP = "_";
-    final static String EVENT_SEP = ".";
+    final static String LABEL_SEP = ".";
     
     // note, must be the same in both Philosopher and Fork
     final static String NAME_SEP = ":";
@@ -480,7 +455,7 @@ class MemoryChopstick
         
     }
     
-    public Automaton build(boolean i_l_take, int id, int l_philo, int r_philo)
+    public Automaton build(boolean b, int id, int l_philo, int r_philo)
     throws Exception
     {
         Automaton sm = new Automaton(fork);
@@ -509,8 +484,8 @@ class MemoryChopstick
     private String pad(int num)
     {
         String returnValue = "" + num;
-//        while (returnValue.length() < length)
-//            returnValue = "0" + returnValue;
+        while (returnValue.length() < length)
+            returnValue = "0" + returnValue;
         return returnValue;
     }
 }
@@ -549,7 +524,7 @@ public class DiningPhilosophers
         }
     }
     public DiningPhilosophers(){}
-    
+        
     public DiningPhilosophers(int num, boolean l_take, boolean r_take,
         boolean l_put, boolean r_put, boolean animation, boolean forkmemory)
         throws Exception
@@ -580,7 +555,7 @@ public class DiningPhilosophers
         }
         
         // First the philosphers
-        EatingPhilosopher philo = new EatingPhilosopher(l_take, r_take, l_put, r_put);
+        EatingPhilosopher philo = new EatingPhilosopher(l_take, r_take, l_put, r_put,idLength);
         
         for (int i = 0; i < num; ++i)
         {
