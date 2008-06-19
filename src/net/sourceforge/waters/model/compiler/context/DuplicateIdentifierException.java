@@ -3,13 +3,14 @@
 //# PACKAGE: net.sourceforge.waters.model.compiler.context
 //# CLASS:   DuplicateIdentifierException
 //###########################################################################
-//# $Id: DuplicateIdentifierException.java,v 1.1 2008-06-16 07:09:51 robi Exp $
+//# $Id: DuplicateIdentifierException.java,v 1.2 2008-06-19 11:34:55 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.compiler.context;
 
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.expr.EvalException;
+import net.sourceforge.waters.model.module.IdentifierProxy;
 
 
 public class DuplicateIdentifierException extends EvalException {
@@ -21,6 +22,15 @@ public class DuplicateIdentifierException extends EvalException {
    */
   public DuplicateIdentifierException()
   {
+  }
+
+  /**
+   * Constructs a new exception indicating that the given identifier is already
+   * defined.
+   */
+  public DuplicateIdentifierException(final IdentifierProxy ident)
+  {
+    this(ident, "Name");
   }
 
   /**
@@ -40,6 +50,16 @@ public class DuplicateIdentifierException extends EvalException {
 				      final Proxy location)
   {
     this(name, "Name", location);
+  }
+
+  /**
+   * Constructs a new exception indicating that the given identifier is already
+   * defined.
+   */
+  public DuplicateIdentifierException(final IdentifierProxy ident,
+				      final String typename)
+  {
+    this(ident.toString(), typename, ident);
   }
 
   /**

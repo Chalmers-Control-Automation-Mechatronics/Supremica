@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.compiler.context
 //# CLASS:   UndefinedIdentifierException
 //###########################################################################
-//# $Id: UndefinedIdentifierException.java,v 1.1 2008-06-16 07:09:51 robi Exp $
+//# $Id: UndefinedIdentifierException.java,v 1.2 2008-06-19 11:34:55 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.compiler.context;
@@ -39,7 +39,17 @@ public class UndefinedIdentifierException extends EvalException {
    */
   public UndefinedIdentifierException(final IdentifierProxy ident)
   {
-    this(ident.toString(), null);
+    this(ident.toString(), ident);
+  }
+
+  /**
+   * Constructs a new exception indicating that the given identifier
+   * is not defined.
+   */
+  public UndefinedIdentifierException(final IdentifierProxy ident,
+                                      final String typename)
+  {
+    this(ident.toString(), typename, ident);
   }
 
   /**

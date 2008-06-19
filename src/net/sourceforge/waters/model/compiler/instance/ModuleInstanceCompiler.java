@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.compiler.instance
 //# CLASS:   ModuleInstanceCompiler
 //###########################################################################
-//# $Id: ModuleInstanceCompiler.java,v 1.3 2008-06-18 11:45:49 robi Exp $
+//# $Id: ModuleInstanceCompiler.java,v 1.4 2008-06-19 11:34:55 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.compiler.instance;
@@ -13,10 +13,8 @@ import java.io.IOException;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.IdentityHashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
