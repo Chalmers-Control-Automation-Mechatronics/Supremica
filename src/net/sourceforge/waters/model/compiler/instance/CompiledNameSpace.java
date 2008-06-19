@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.compiler.instance
 //# CLASS:   CompiledNameSpace
 //###########################################################################
-//# $Id: CompiledNameSpace.java,v 1.2 2008-06-18 09:35:34 robi Exp $
+//# $Id: CompiledNameSpace.java,v 1.3 2008-06-19 21:26:59 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.compiler.instance;
@@ -246,7 +246,6 @@ class CompiledNameSpace
     try {
       final StringWriter writer = new StringWriter();
       appendName(writer);
-      writer.write('.');
       writer.write(name);
       return writer.toString();
     } catch (final IOException exception) {
@@ -259,7 +258,6 @@ class CompiledNameSpace
     try {
       final StringWriter writer = new StringWriter();
       appendName(writer);
-      writer.write('.');
       ProxyPrinter.printProxy(writer, ident);
       return writer.toString();
     } catch (final IOException exception) {
@@ -272,8 +270,8 @@ class CompiledNameSpace
   {
     if (mParent != null) {
       mParent.appendName(writer);
-      writer.write('.');
       ProxyPrinter.printProxy(writer, mIdentifier);
+      writer.write('.');
     }
   }
 

@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.compiler.context
 //# CLASS:   AliasBindingContext
 //###########################################################################
-//# $Id: AliasBindingContext.java,v 1.1 2008-06-18 09:35:34 robi Exp $
+//# $Id: AliasBindingContext.java,v 1.2 2008-06-19 21:26:59 robi Exp $
 //###########################################################################
 
 
@@ -69,6 +69,11 @@ public class AliasBindingContext implements BindingContext
   public SimpleExpressionProxy getBoundExpression(final IdentifierProxy ident)
   {
     return mParent.getBoundExpression(ident);
+  }
+
+  public boolean isEnumAtom(final IdentifierProxy ident)
+  {
+    return mParent.isEnumAtom(ident);
   }
 
   public ModuleBindingContext getModuleBindingContext()

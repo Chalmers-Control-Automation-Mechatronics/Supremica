@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.compiler.context
 //# CLASS:   BindingContext
 //###########################################################################
-//# $Id: BindingContext.java,v 1.1 2008-06-16 07:09:51 robi Exp $
+//# $Id: BindingContext.java,v 1.2 2008-06-19 21:26:59 robi Exp $
 //###########################################################################
 
 
@@ -40,6 +40,12 @@ public interface BindingContext
    *         if there is no binding for the given name.
    */
   public SimpleExpressionProxy getBoundExpression(IdentifierProxy ident);
+
+  /**
+   * Determines whether the given identifier represents an enumeration atom
+   * in this context.
+   */
+  public boolean isEnumAtom(final IdentifierProxy ident);
 
   /**
    * Gets the module context of this binding.

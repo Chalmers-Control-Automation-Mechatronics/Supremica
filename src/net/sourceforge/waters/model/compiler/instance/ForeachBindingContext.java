@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.compiler.instance
 //# CLASS:   ForeachBindingContext
 //###########################################################################
-//# $Id: ForeachBindingContext.java,v 1.1 2008-06-16 07:09:51 robi Exp $
+//# $Id: ForeachBindingContext.java,v 1.2 2008-06-19 21:26:59 robi Exp $
 //###########################################################################
 
 
@@ -57,6 +57,17 @@ public class ForeachBindingContext implements BindingContext
     } else {
       return mParent.getBoundExpression(ident);
     }
+  }
+
+  public boolean isEnumAtom(final IdentifierProxy ident)
+  {
+    if (ident instanceof SimpleIdentifierProxy) {
+      final SimpleIdentifierProxy simple = (SimpleIdentifierProxy) ident;
+      if (simple.getName().equals(mBoundName)) {
+        return false;
+      }
+    }
+    return mParent.isEnumAtom(ident);
   }
 
   public ModuleBindingContext getModuleBindingContext()

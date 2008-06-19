@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.compiler.context
 //# CLASS:   ModuleBindingContext
 //###########################################################################
-//# $Id: ModuleBindingContext.java,v 1.1 2008-06-16 07:09:51 robi Exp $
+//# $Id: ModuleBindingContext.java,v 1.2 2008-06-19 21:26:59 robi Exp $
 //###########################################################################
 
 
@@ -19,6 +19,7 @@ import net.sourceforge.waters.model.base.ProxyAccessorByContents;
 import net.sourceforge.waters.model.module.IdentifierProxy;
 import net.sourceforge.waters.model.module.ModuleProxy;
 import net.sourceforge.waters.model.module.SimpleExpressionProxy;
+import net.sourceforge.waters.model.module.SimpleIdentifierProxy;
 
 
 /**
@@ -62,6 +63,16 @@ public class ModuleBindingContext implements BindingContext
     final ProxyAccessor<IdentifierProxy> key =
       new ProxyAccessorByContents<IdentifierProxy>(ident);
     return mMap.get(key);
+  }
+
+  public boolean isEnumAtom(final IdentifierProxy ident)
+  {
+    if (ident instanceof SimpleIdentifierProxy) {
+      final SimpleExpressionProxy bound = getBoundExpression(ident);
+      return ident.equalsByContents(bound);
+    } else {
+      return false;
+    }
   }
 
   public ModuleBindingContext getModuleBindingContext()

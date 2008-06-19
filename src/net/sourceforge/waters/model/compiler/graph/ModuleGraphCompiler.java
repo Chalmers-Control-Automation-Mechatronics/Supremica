@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.module.graph
 //# CLASS:   ModuleGraphCompiler
 //###########################################################################
-//# $Id: ModuleGraphCompiler.java,v 1.2 2008-06-19 19:10:10 robi Exp $
+//# $Id: ModuleGraphCompiler.java,v 1.3 2008-06-19 21:26:59 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.compiler.graph;
@@ -189,6 +189,7 @@ public class ModuleGraphCompiler extends AbstractModuleProxyVisitor
       final Collection<NodeProxy> nodes = graph.getNodes();
       final int numnodes = nodes.size();
       mPrecompiledNodesMap = new HashMap<NodeProxy,CompiledNode>(numnodes);
+      mLocalStatesMap = new HashMap<String,StateProxy>(numnodes);
       mLocalStatesList = new ArrayList<StateProxy>(numnodes);
       visitCollection(nodes);
       final Collection<EdgeProxy> edges = graph.getEdges();
@@ -221,6 +222,7 @@ public class ModuleGraphCompiler extends AbstractModuleProxyVisitor
     } finally {
       mCurrentComponent = null;
       mPrecompiledNodesMap = null;
+      mLocalStatesMap = null;
       mLocalStatesList = null;
       mLocalEventsSet = null;
       mLocalEventsList = null;
@@ -307,7 +309,7 @@ public class ModuleGraphCompiler extends AbstractModuleProxyVisitor
 
   private void addLocalEvent(final EventProxy event)
   {
-    if (!mLocalEventsSet.contains(event)) {
+    if (mLocalEventsSet.add(event)) {
       mLocalEventsList.add(event);
     }
   }

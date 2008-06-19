@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.compiler.instance
 //# CLASS:   ModuleInstanceCompiler
 //###########################################################################
-//# $Id: ModuleInstanceCompiler.java,v 1.5 2008-06-19 19:10:10 robi Exp $
+//# $Id: ModuleInstanceCompiler.java,v 1.6 2008-06-19 21:26:59 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.compiler.instance;
@@ -24,6 +24,8 @@ import java.util.TreeSet;
 import java.util.Set;
 
 import net.sourceforge.waters.model.base.Proxy;
+import net.sourceforge.waters.model.base.ProxyAccessorHashMapByContents;
+import net.sourceforge.waters.model.base.ProxyAccessorMap;
 import net.sourceforge.waters.model.base.VisitorException;
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
 import net.sourceforge.waters.model.compiler.context.CompiledRange;
@@ -197,14 +199,19 @@ public class ModuleInstanceCompiler extends AbstractModuleProxyVisitor
     throws VisitorException
   {
     try {
+      final LabelBlockProxy labels0 = edge.getLabelBlock();
+      final CompiledEventList events = visitLabelBlockProxy
+        (labels0, EventKindMask.TYPEMASK_EVENT);
       final GuardActionBlockProxy ga0 = edge.getGuardActionBlock();
       GuardActionBlockProxy ga1 = null;
       if (ga0 != null) {
         ga1 = visitGuardActionBlockProxy(ga0);
         final List<SimpleExpressionProxy> guards = ga1.getGuards();
         final List<BinaryExpressionProxy> actions = ga1.getActions();
-        if (guards.isEmpty() && actions.isEmpty()) {
-          ga1 = null;
+        if (guards.isEmpty()) {
+          if (actions.isEmpty()) {
+            ga1 = null;
+          }
         } else {
           final Iterator<SimpleExpressionProxy> iter = guards.iterator();
           final SimpleExpressionProxy guard = iter.next();
@@ -213,29 +220,29 @@ public class ModuleInstanceCompiler extends AbstractModuleProxyVisitor
             final boolean value =
               mSimpleExpressionCompiler.getBooleanValue(guard);
             if (!value) {
+              addAdditionalBlockedEvents(events);
               return null;
             } else if (actions.isEmpty()) {
               ga1 = null;
             }
-          } else {
-            mHasGuardActionBlocks = true;
           }
         }
       }
+      mHasGuardActionBlocks |= ga1 != null;
+      mCurrentEdge = edge;
       final NodeProxy source0 = edge.getSource();
       final NodeProxy source1 = mNodeMap.get(source0);
       final NodeProxy target0 = edge.getTarget();
       final NodeProxy target1 = mNodeMap.get(target0);
-      final LabelBlockProxy labels0 = edge.getLabelBlock();
-      final CompiledEventList event = visitEventListExpressionProxy
-        (labels0, EventKindMask.TYPEMASK_EVENT);
-      final LabelBlockProxy labels1 = createLabelBlock(event);
+      final LabelBlockProxy labels1 = createLabelBlock(events);
       final EdgeProxy compiled = mFactory.createEdgeProxy
         (source1, target1, labels1, ga1, null, null, null);
       mCurrentEdges.add(compiled);
       return compiled;
-    } catch (final TypeMismatchException exception) {
+    } catch (final EvalException exception) {
       throw wrap(exception);
+    } finally {
+      mCurrentEdge = null;
     }
   }
 
@@ -380,28 +387,29 @@ public class ModuleInstanceCompiler extends AbstractModuleProxyVisitor
     try {
       final boolean deterministic = graph.isDeterministic();
       final LabelBlockProxy blocked0 = graph.getBlockedEvents();
-      final LabelBlockProxy blocked1;
-      if (blocked0 == null) {
-        blocked1 = null;
-      } else {
-        final CompiledEventList events =
-          visitEventListExpressionProxy(blocked0);
-        blocked1 = createLabelBlock(events);
+      if (blocked0 != null) {
+        mCurrentBlockedEvents = visitLabelBlockProxy(blocked0);
       }
       final Collection<NodeProxy> nodes = graph.getNodes();
       final int numnodes = nodes.size();
       mCurrentNodes = new ArrayList<NodeProxy>(numnodes);
       mNodeMap = new HashMap<NodeProxy,NodeProxy>(numnodes);
       visitCollection(nodes);
+      mCurrentAlphabet = new ProxyAccessorHashMapByContents<IdentifierProxy>();
       final Collection<EdgeProxy> edges = graph.getEdges();
       final int numedges = edges.size();
       mCurrentEdges = new ArrayList<EdgeProxy>(numedges);
       visitCollection(edges);
+      final LabelBlockProxy blocked1 =
+        mCurrentBlockedEvents == null ? null :
+        createLabelBlock(mCurrentBlockedEvents);
       return mFactory.createGraphProxy
         (deterministic, blocked1, mCurrentNodes, mCurrentEdges);
     } finally {
       mCurrentNodes = null;
       mNodeMap = null;
+      mCurrentAlphabet = null;
+      mCurrentBlockedEvents = null;
       mCurrentEdges = null;
     }
   }
@@ -482,6 +490,7 @@ public class ModuleInstanceCompiler extends AbstractModuleProxyVisitor
       // First evaluate all indexes ...
       final IdentifierProxy newident = mNameCompiler.compileName(ident, false);
       // Second do a lookup ... Where? Depends on context ...
+      final CompiledEvent event;
       if (mCurrentEventList == null) {
         final SimpleExpressionProxy value =
           mSimpleExpressionCompiler.simplify(newident, mContext);
@@ -490,20 +499,22 @@ public class ModuleInstanceCompiler extends AbstractModuleProxyVisitor
         }
         final IdentifierProxy ivalue =
           mSimpleExpressionCompiler.getIdentifierValue(value);
-        final CompiledEvent event = mNameSpace.getEvent(ivalue);
+        event = mNameSpace.getEvent(ivalue);
         if (event == null) {
           throw new UndefinedIdentifierException(ident);
         }
-        final SourceInfo info = new SourceInfo(ident, mContext);
-        final CompiledEvent occ = new CompiledEventOccurrence(event, info);
-        return occ;
       } else {
-        final CompiledEvent event = mNameSpace.findEvent(newident);
-        final SourceInfo info = new SourceInfo(ident, mContext);
-        final CompiledEvent occ = new CompiledEventOccurrence(event, info);
-        mCurrentEventList.addEvent(occ);
-        return occ;
+        event = mNameSpace.findEvent(newident);
       }
+      final SourceInfo info = new SourceInfo(ident, mContext);
+      final CompiledEvent occ = new CompiledEventOccurrence(event, info);
+      if (mCurrentEventList != null) {
+        mCurrentEventList.addEvent(occ);
+      }
+      if (mCurrentAlphabet != null) {
+        mCurrentAlphabet.addProxy(newident);
+      }
+      return occ;
     } catch (final EvalException exception) {
       exception.provideLocation(ident);
       throw wrap(exception);
@@ -544,6 +555,26 @@ public class ModuleInstanceCompiler extends AbstractModuleProxyVisitor
       mContext = oldContext;
       mNameSpace = oldNameSpace;
       mParameterMap = null;
+    }
+  }
+
+  public CompiledEventList visitLabelBlockProxy(final LabelBlockProxy block)
+    throws VisitorException
+  {
+    return visitLabelBlockProxy(block, EventKindMask.TYPEMASK_ANY);
+  }
+
+  public CompiledEventList visitLabelBlockProxy
+    (final LabelBlockProxy block, final int mask)
+    throws VisitorException
+  {
+    final List<Proxy> list = block.getEventList();
+    if (list.isEmpty()) {
+      final EmptyLabelBlockException exception =
+        new EmptyLabelBlockException(block, mCurrentEdge, mCurrentComponent);
+      throw wrap(exception);
+    } else {
+      return visitEventListExpressionProxy(block);
     }
   }
 
@@ -605,6 +636,7 @@ public class ModuleInstanceCompiler extends AbstractModuleProxyVisitor
     throws VisitorException
   {
     try {
+      mCurrentComponent = comp;
       final IdentifierProxy ident = comp.getIdentifier();
       final IdentifierProxy suffix = mNameCompiler.compileName(ident);
       final IdentifierProxy fullname =
@@ -619,7 +651,10 @@ public class ModuleInstanceCompiler extends AbstractModuleProxyVisitor
       addSourceInfo(newcomp, comp);
       return newcomp;
     } catch (final EvalException exception) {
+      exception.provideLocation(comp);
       throw wrap(exception);
+    } finally {
+      mCurrentComponent = null;
     }
   }
 
@@ -704,6 +739,7 @@ public class ModuleInstanceCompiler extends AbstractModuleProxyVisitor
       addSourceInfo(newvar, var);
       return newvar;
     } catch (final EvalException exception) {
+      exception.provideLocation(var); // ???
       throw wrap(exception);
     }
   }
@@ -792,6 +828,15 @@ public class ModuleInstanceCompiler extends AbstractModuleProxyVisitor
     mCompiledEvents.add(decl);
     addSourceInfo(decl, edecl);
     return decl;
+  }
+
+  private void addAdditionalBlockedEvents(final CompiledEvent event)
+    throws EventKindException
+  {
+    if (mCurrentBlockedEvents == null) {
+      mCurrentBlockedEvents = new CompiledEventList();
+    }
+    mCurrentBlockedEvents.addEvent(event);
   }
 
   private SourceInfo addSourceInfo(final IdentifierProxy target,
@@ -975,6 +1020,11 @@ public class ModuleInstanceCompiler extends AbstractModuleProxyVisitor
       return null;
     }
 
+    public boolean isEnumAtom(final IdentifierProxy ident)
+    {
+      return mContext.isEnumAtom(ident);
+    }
+
     public ModuleBindingContext getModuleBindingContext()
     {
       return mContext.getModuleBindingContext();
@@ -1002,6 +1052,15 @@ public class ModuleInstanceCompiler extends AbstractModuleProxyVisitor
         return mNameSpace.getPrefixedIdentifier(mSuffix, mFactory);
       } else {
         return mContext.getBoundExpression(ident);
+      }
+    }
+
+    public boolean isEnumAtom(final IdentifierProxy ident)
+    {
+      if (ident.equalsByContents(mSuffix)) {
+        return false;
+      } else {
+        return mContext.isEnumAtom(ident);
       }
     }
 
@@ -1036,9 +1095,14 @@ public class ModuleInstanceCompiler extends AbstractModuleProxyVisitor
   private Collection<Proxy> mCompiledComponents;
   private Map<String,CompiledParameterBinding> mParameterMap;
 
-  private CompiledEventList mCurrentEventList;
+  private SimpleComponentProxy mCurrentComponent;
+  private ProxyAccessorMap<IdentifierProxy> mCurrentAlphabet;
+  private CompiledEventList mCurrentBlockedEvents;
   private List<NodeProxy> mCurrentNodes;
   private List<EdgeProxy> mCurrentEdges;
   private Map<NodeProxy,NodeProxy> mNodeMap;
+
+  private EdgeProxy mCurrentEdge;
+  private CompiledEventList mCurrentEventList;
 
 }

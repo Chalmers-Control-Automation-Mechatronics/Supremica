@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.compiler.context
 //# CLASS:   SimpleExpressionCompiler
 //###########################################################################
-//# $Id: SimpleExpressionCompiler.java,v 1.2 2008-06-18 09:35:34 robi Exp $
+//# $Id: SimpleExpressionCompiler.java,v 1.3 2008-06-19 21:26:59 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.compiler.context;
@@ -129,6 +129,15 @@ public class SimpleExpressionCompiler
       return null;
     } else {
       return mContext.getBoundExpression(ident);
+    }
+  }
+
+  private boolean isEnumAtom(final IdentifierProxy ident)
+  {
+    if (mContext == null) {
+      return false;
+    } else {
+      return mContext.isEnumAtom(ident);
     }
   }
 
@@ -319,12 +328,6 @@ public class SimpleExpressionCompiler
       return true;
     }
 
-    public Boolean visitIdentifierProxy(final IdentifierProxy ident)
-    {
-      final SimpleExpressionProxy bound = getBoundExpression(ident);
-      return ident.equalsByContents(bound);
-    }
-
     public Boolean visitIntConstantProxy(final IntConstantProxy expr)
     {
       return true;
@@ -333,6 +336,12 @@ public class SimpleExpressionCompiler
     public Boolean visitSimpleExpressionProxy(final SimpleExpressionProxy expr)
     {
       return false;
+    }
+
+    public Boolean visitSimpleIdentifierProxy
+      (final SimpleIdentifierProxy ident)
+    {
+      return isEnumAtom(ident);
     }
 
   }
