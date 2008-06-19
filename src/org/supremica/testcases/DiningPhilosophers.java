@@ -123,10 +123,6 @@ class EatingPhilosopher
         
         inited = true;
     }
-    public Automaton getPhilo()
-    {
-        return philo;
-    }
     
     // Fake renaming, must replace the event due to immutability
     private void renameEvent(Automaton sm, int ev_index, final String new_label)
@@ -138,7 +134,7 @@ class EatingPhilosopher
         
     }
     
-    public Automaton build(boolean b, Automaton ph, int id, int l_fork, int r_fork)
+    public Automaton build(int id, int l_fork, int r_fork)
     throws Exception
     {
         // deep copy, I hope
@@ -233,7 +229,7 @@ class EatingPhilosopher
 
 interface ChopstickBuilder
 {
-    public Automaton build(boolean b, int id, int l_philo, int r_philo)
+    public Automaton build(boolean extVersion, boolean i_l_take, int id, int l_philo, int r_philo)
     throws Exception;
 }
 
@@ -332,7 +328,7 @@ class Chopstick
         
     }
     
-    public Automaton build(boolean b, int id, int l_philo, int r_philo)
+    public Automaton build(boolean extVersion, boolean i_l_take, int id, int l_philo, int r_philo)
     throws Exception
     {
         Automaton sm = new Automaton(fork);
@@ -344,8 +340,17 @@ class Chopstick
         
         renameEvent(sm, L_TAKE, "take" + pad(l_philo) + LABEL_SEP + pad(id));
         renameEvent(sm, R_TAKE, "take" + pad(r_philo) + LABEL_SEP + pad(id));
-        renameEvent(sm, L_PUT, "put" + pad(l_philo) + LABEL_SEP + pad(id));
-        renameEvent(sm, R_PUT, "put" + pad(r_philo) + LABEL_SEP + pad(id));
+        
+        if(extVersion)
+        {
+            renameEvent(sm, L_PUT, "put" + pad(l_philo));
+            renameEvent(sm, R_PUT, "put" + pad(r_philo));
+        }
+        else
+        {
+            renameEvent(sm, L_PUT, "put" + pad(l_philo) + LABEL_SEP + pad(id));
+            renameEvent(sm, R_PUT, "put" + pad(r_philo) + LABEL_SEP + pad(id));
+        }
         
         // alpha.getEvent(events[L_TAKE].getLabel()).setLabel("take" + l_philo + LABEL_SEP + id);
         // alpha.getEvent(events[R_TAKE].getLabel()).setLabel("take" + r_philo + LABEL_SEP + id);
@@ -354,6 +359,14 @@ class Chopstick
         
         // // must rehash since we've changed the label (that's the way it works)
         // alpha.rehash();
+        
+        if(i_l_take)
+        {   
+            if((id%2)==0)
+            {        
+                sm.getAlphabet().getEvent("take" + id + LABEL_SEP + id).setControllable(false);
+            }
+        }
         
         return sm;
     }
@@ -455,7 +468,7 @@ class MemoryChopstick
         
     }
     
-    public Automaton build(boolean b, int id, int l_philo, int r_philo)
+    public Automaton build(boolean extVersion, boolean i_l_take, int id, int l_philo, int r_philo)
     throws Exception
     {
         Automaton sm = new Automaton(fork);
@@ -549,7 +562,7 @@ public class DiningPhilosophers
             int id = i + 1;
             
             // id's are from 1...n
-            project.addAutomaton(fork.build(false, id, prevId(id, num), id));
+            project.addAutomaton(fork.build(false,false, id, prevId(id, num), id));
             
             // To its right a fork has philo #id, and to its left philo #id-1
         }
@@ -561,7 +574,7 @@ public class DiningPhilosophers
         {
             int id = i + 1;
             
-            Automaton currPhil = philo.build(false,philo.getPhilo(), id, id, nextId(id, num));
+            Automaton currPhil = philo.build(id, id, nextId(id, num));
             
 //            Automaton currPhil = new EatingPhilosopher(l_take, r_take, l_put, r_put, id, id, nextId(id, num)).getPhilo();
             

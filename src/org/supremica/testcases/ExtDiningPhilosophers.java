@@ -27,17 +27,59 @@ import uk.ac.ic.doc.scenebeans.Null;
  * @author Sajed
  */
 
-class ExtEatingPhilosopher extends EatingPhilosopher
+class ExtEatingPhilosopher
 {
     int j;
     private int numInterm;
     static State[] intermStates;
     Automaton EXTphilo;
+    
+    public final String PHILO_NAME = "Philo";
+    
+    static int nbrOfStates = 3;
+    static State[] states = new State[nbrOfStates];
+    // indices into states[]
+    final static int INIT = 0;
+    final static int L_UP = 1;
+    final static int EAT = 2;
+    
+    static int number_of_events = 4;
+    static LabeledEvent[] events = new LabeledEvent[number_of_events];
 
+    // indicies into events[]
+    final static int L_TAKE = 0;
+    final static int R_TAKE = 1;
+    final static int INTERM_EVENT = 2;
+    final static int PUT = 3;
+    final static String LABEL_SEP = ".";
+    
+    // note, must be the same in both Philosopher and Fork
+    final static String NAME_SEP = ":";
+    
+    // Need not be the same everywhere
+    static Automaton philo = null;
+    
+    static boolean inited = false;
+    
+    int length;
+
+    public ExtEatingPhilosopher()
+    {
+         states[0] = new State("think");
+         states[1] = new State("lu");
+         states[2] = new State("eat");
+
+         events[0] = new LabeledEvent("L_take");    // pick up left
+         events[1] = new LabeledEvent("R_take");    // pick up right
+         events[2] = new LabeledEvent("Interm_event");
+         events[3] = new LabeledEvent("Put");
+        
+    }
+    
     public ExtEatingPhilosopher(boolean l_take, boolean r_take, boolean l_put, boolean r_put, int length, int numInterm)
     throws Exception
     {
-        super();
+        this();
         this.length = length;
         this.numInterm = numInterm;
         
@@ -71,11 +113,7 @@ class ExtEatingPhilosopher extends EatingPhilosopher
         // (each fork-pair, actually)
         events[L_TAKE].setControllable(l_take);
         events[R_TAKE].setControllable(r_take);
-        events[L_PUT].setControllable(l_put);
-        events[R_PUT].setControllable(r_put);
-        events[PUT].setControllable(true);
-        events[START_EATING].setControllable(true);
-        
+        events[PUT].setControllable(true); 
         events[INTERM_EVENT].setControllable(true);
         
         for (int i = 0; i < events.length; ++i)
@@ -95,29 +133,68 @@ class ExtEatingPhilosopher extends EatingPhilosopher
             {
                 EXTphilo.addArc(new Arc(intermStates[j], intermStates[j+1], events[INTERM_EVENT]));
             }
-            EXTphilo.addArc(new Arc(intermStates[(intermStates.length-1)], states[READY], events[R_TAKE]));
+            EXTphilo.addArc(new Arc(intermStates[(intermStates.length-1)], states[EAT], events[R_TAKE]));
         }
         else
-            EXTphilo.addArc(new Arc( states[L_UP], states[READY], events[R_TAKE]));
-        
-        
-        EXTphilo.addArc(new Arc(states[READY], states[EAT], events[START_EATING]));
-        EXTphilo.addArc(new Arc(states[EAT], states[L_DN], events[L_PUT]));
-        EXTphilo.addArc(new Arc(states[L_DN], states[INIT], events[R_PUT]));
-        
-        // And then the right side (where the right fork is picked up and put down first)
-        EXTphilo.addArc(new Arc(states[INIT], states[R_UP], events[R_TAKE]));
-        EXTphilo.addArc(new Arc(states[R_UP], states[READY], events[L_TAKE]));
-        EXTphilo.addArc(new Arc(states[EAT], states[R_DN], events[R_PUT]));
-        EXTphilo.addArc(new Arc(states[R_DN], states[INIT], events[L_PUT]));
+            EXTphilo.addArc(new Arc( states[L_UP], states[EAT], events[R_TAKE]));
         
         EXTphilo.addArc(new Arc(states[EAT], states[INIT], events[PUT]));
         
-        EXTphilo.removeState(states[R_DN]);
-        EXTphilo.removeState(states[L_DN]);
-        EXTphilo.removeState(states[R_UP]);
-        
         inited = true;
+    }
+     public void renameEvent(Automaton sm, int ev_index, final String new_label)
+    {
+        Alphabet alpha = sm.getAlphabet();
+        LabeledEvent ev_old = alpha.getEvent(events[ev_index].getLabel());
+        LabeledEvent ev_new = new LabeledEvent(ev_old, new_label);
+        sm.replaceEvent(ev_old, ev_new);        
+    }
+     
+    public Automaton build(boolean i_l_take, Automaton spec_philo, int id, int l_fork, int r_fork)
+    throws Exception
+    {
+        //logger.info(philo.getAlphabet().toDebugString());
+        //AutomataToXML builder = new AutomataToXML(philo);
+        //logger.debug(builder.serialize());
+        // deep copy, I hope
+        
+        Automaton sm = new Automaton(spec_philo);
+        sm.setName(PHILO_NAME + NAME_SEP + pad(id));
+        
+        // adjust the event names according to l_fork and r_fork
+        // L_take becomes take<id>.<l_fork>
+        // R_take becomes take<id>.<r_fork>
+        // L_put becomes put<id>.<l_fork>
+        // R_put becomes put<id>.<r_fork>
+        renameEvent(sm, L_TAKE, "take" + pad(id)+ LABEL_SEP +pad(l_fork));
+        renameEvent(sm, R_TAKE, "take" + pad(id)+ LABEL_SEP +pad(r_fork));
+        renameEvent(sm, PUT, "put" + pad(id));
+        
+//        renameEvent(sm, START_EATING, "start_eating" + pad(id));
+        renameEvent(sm, INTERM_EVENT, "intermediate" + pad(id));
+        
+        if(i_l_take)
+        {   
+            if((id%2)==0)
+            {
+                sm.getAlphabet().getEvent("take" + id + LABEL_SEP + id).setControllable(false);
+            }
+        }
+        
+        // Used Automaton::replaceEvent, so no need to rehash
+        // // must rehash since we've changed the label (that's the way it works (unfortunately))
+        // alpha.rehash();
+        //AutomataToXML builder = new AutomataToXML(sm);
+        //logger.debug(builder.serialize());
+        return sm;
+    }
+    
+    public String pad(int num)
+    {
+        String returnValue = "" + num;
+//        while (returnValue.length() < length)
+//            returnValue = "0" + returnValue;
+        return returnValue;
     }
     
     public Automaton getPhilo()
@@ -130,7 +207,7 @@ public class ExtDiningPhilosophers{
     
     Project project = new Project("Extended Dining philosophers");
     Automata theAutomata = new Automata();
-    final static String LABEL_SEP = "_";
+    final static String LABEL_SEP = ".";
     
     int nextId(int id, int modulo)
     {
@@ -166,7 +243,7 @@ public class ExtDiningPhilosophers{
         throws Exception
     {        
         // Add comment
-        project.setComment("Dining Philosophers (parameters: n = # philosophers, k = #  intermediate states of each philosopher). \nConsider the dining philosophers problem where the number of intermediates states (after taking the fork on the left and before taking the fork on the right) may vary. This means that each philosopher, from the idles state takes the fork on his left reaching intermediate state 1, executes k-1 intermediate events reaching intermediate state k, takes his right fork entering a state where he eats, and when he is done goes back to the idle state. The uncontrollable events are \"philosopher i takes the left fork\" for i even. There are n philosophers around the table. Design a maximally permissive nonblocking supervisor.");
+        project.setComment("Extended Dining Philosophers (parameters: n = # philosophers, k = #  intermediate states of each philosopher). \nConsider the dining philosophers problem where the number of intermediates states (after taking the fork on the left and before taking the fork on the right) may vary. This means that each philosopher, from the idles state takes the fork on his left reaching intermediate state 1, executes k-1 intermediate events reaching intermediate state k, takes his right fork entering a state where he eats, and when he is done goes back to the idle state. The uncontrollable events are \"philosopher i takes the left fork\" for i even. There are n philosophers around the table. Design a maximally permissive nonblocking supervisor.");
         
         int idLength = ("" + num).length();
         int intermLength = ("" + numInterm).length();
@@ -212,7 +289,7 @@ public class ExtDiningPhilosophers{
             int id = i + 1;
             
             // id's are from 1...n
-            Automaton currFork = fork.build(i_l_take, id, prevId(id, num), id);
+            Automaton currFork = fork.build(true, i_l_take, id, prevId(id, num), id);
             
 /*            if(i_l_take)
             {
