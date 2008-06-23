@@ -7,10 +7,14 @@ import javax.swing.*;
 import javax.swing.border.*;
 import javax.swing.event.*;
 import javax.swing.filechooser.*;
+import javax.xml.bind.JAXBException;
+
 import java.awt.*;
 import java.awt.event.*;
 import java.awt.print.*;
 import java.io.*;
+
+import org.supremica.gui.ide.IDE;
 
 import org.supremica.external.processeditor.processgraph.*;
 import org.supremica.external.processeditor.processgraph.ilcell.*;
@@ -41,6 +45,8 @@ import org.supremica.external.processeditor.xml.Converter;
 import org.supremica.external.processeditor.tools.db.DBInterface;
 import org.supremica.external.processeditor.tools.dop2efa.DOPtoEFAInterface;
 import org.supremica.external.processeditor.tools.specificationsynthes.SpecificationSynthesInterface;
+import org.supremica.external.processeditor.tools.copextractor.COPExtractInterface;
+import org.xml.sax.SAXException;
 
 /**
  * The most central GUI class of the <code>org.soc</code> package. 
@@ -65,7 +71,10 @@ public class SOCGraphContainer
     public SOCMenuBar menubar = new SOCMenuBar(this);
     
     private DOPtoEFAInterface dopToEfaFrame = null; 
-    private SpecificationSynthesInterface specificationSynthesFrame = null; 
+    private SpecificationSynthesInterface specificationSynthesFrame = null;
+    private COPExtractInterface copExtractFrame = null;
+    
+    private IDE ide = null;
     
     private Object memory;
     private Object numOfCopies = 0;
@@ -196,7 +205,37 @@ public class SOCGraphContainer
      */
     public JToolBar getToolBar() {
 	return toolbar;
-    } 
+    }
+    
+    /**
+     * Returns Supremica IDE, of no IDE exist
+     * a new will be created.
+     * 
+     * @return the IDE assigned
+     */
+    public IDE getIDE(){
+    	
+    	//if ide exist
+    	if( null != ide){
+    	    return ide;
+    	}
+    	
+    	//create new ide
+    	try{
+    	    ide = new IDE();
+    	}catch(JAXBException ex){
+    		ex.printStackTrace();
+    	}catch(SAXException ex){
+    		ex.printStackTrace();
+    	}
+    	
+    	return ide;
+    }
+    
+    public void setIDE(IDE ide){
+    	this.ide = ide;
+    }
+    
     /**
      * Organize the internal windows in a cascade.         
      */
@@ -288,6 +327,14 @@ public class SOCGraphContainer
 	    
 	}else if(result == JFileChooser.CANCEL_OPTION) {	    
 	}else if(result == JFileChooser.ERROR_OPTION) {}	    	
+    }
+    
+    
+    public void insertResource(File file){
+    	Loader loader = new Loader();	   
+	    Object newObject = loader.open(file);
+	    
+	    insertResource(newObject, file);
     }
     
     public void insertResource(Object o, File file) {
@@ -874,6 +921,56 @@ public class SOCGraphContainer
     	fcOutput.setFileFilter(wmodFilter);
     	
     	specificationSynthesFrame.setOutputFileChooser(fcOutput);
+    }
+    
+    
+    public void viewCOPExtractFrame() {
+        
+    	/*
+    	 * Create frame
+    	 */
+    	if( copExtractFrame == null ){
+    		copExtractFrame = new COPExtractInterface();
+    		copExtractFrame.setGraphContainer( this );
+    		setIconToFrame( copExtractFrame );
+    	}
+    	
+    	//show frame
+    	copExtractFrame.setVisible(true);
+    	
+    	/*
+    	 * Set input file chooser
+    	 */
+    	JFileChooser fcInput;
+    	
+    	if(cDir != null) {
+    	    fcInput = new JFileChooser(cDir);
+    	}else {
+    	    fcInput = new JFileChooser();
+    	}
+    	
+    	fcInput.addChoosableFileFilter(xmlFilter);
+    	fcInput.setFileFilter(xmlFilter);
+    	fcInput.setAcceptAllFileFilterUsed(false);
+    	
+    	copExtractFrame.setInputFileChooser(fcInput);
+    	
+    	/*
+    	 * Set output file chooser
+    	 */
+    	JFileChooser fcOutput;
+    	
+    	if(cDir != null) {
+    	    fcOutput = new JFileChooser(cDir);
+    	}else {
+    	    fcOutput = new JFileChooser();
+    	}
+    	
+    	fcOutput.setAcceptAllFileFilterUsed(true);
+    	fcOutput.addChoosableFileFilter(wmodFilter);
+    	fcOutput.setFileFilter(wmodFilter);
+    	
+    	copExtractFrame.setOutputFileChooser(fcOutput);
     }
     
     /**

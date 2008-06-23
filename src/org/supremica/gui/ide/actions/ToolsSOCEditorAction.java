@@ -43,5 +43,6 @@ public class ToolsSOCEditorAction
     public void doAction()
     {
     	SOCFrame soc = new SOCFrame();
+    	soc.getGraphContainer().setIDE( ide.getIDE() );
     }
 }

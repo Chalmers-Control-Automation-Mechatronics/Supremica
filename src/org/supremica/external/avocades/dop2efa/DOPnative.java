@@ -343,7 +343,6 @@ public class DOPnative {
 				preconList = precon.getPredecessor();
 			}
 			
-			
 			if(preconList != null && preconList.size() != 0){
 			
 				//predecessors exist 

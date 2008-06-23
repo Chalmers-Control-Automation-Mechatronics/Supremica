@@ -49,5 +49,9 @@ public class SOCFrame extends JFrame  {
     	this.setVisible(true);	
 
     	table.add(new SOCGraphFrame("Sheet"));              
-    }        
+    }
+    
+    public SOCGraphContainer getGraphContainer(){
+    	return table;
+    }
 }
