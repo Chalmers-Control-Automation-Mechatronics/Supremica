@@ -150,7 +150,6 @@ public class GlpkUI
         w.newLine();
         for (int[] constr : milpConstructor.getPrecConstraints())
         {
-            //test
             int counter = 0;
             
             if (constr.length > 3)
