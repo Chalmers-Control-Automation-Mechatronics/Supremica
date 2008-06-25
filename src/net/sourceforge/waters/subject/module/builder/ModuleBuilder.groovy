@@ -310,61 +310,61 @@ class ModuleBuilder extends BuilderSupport {
 	public static ModuleSubject testBuilder() {
 		def moduleBuilder = new ModuleBuilder();
 		ModuleSubject module = moduleBuilder.module('testmodule') {
-			booleanVariable('y0', initialValue:false, markedValue:true)
-			integerVariable(name:['x0', 'x1'], range:1..4, initialValue:2, markedValue:2)
-			event(name:'e0')
+			booleanVariable 'y0', initialValue:false, markedValue:true
+			integerVariable name:['x0', 'x1'], range:1..4, initialValue:2, markedValue:2
+			event name:'e0'
 			event(['e1', 'e2'], controllable:false)
-			proposition(name:'e3')
-			event('e4', ranges:[0..2])
-			event(name:'e5', ranges:[0..2, 0..3], controllable:false)
-			eventAlias(name:'someEvents', events:['e1', 'e2'])
-			booleanVariable(name:'y1', initialValue:false)
-			foreach('i', range:0..2) {
-				automaton('testcomponent3[i]', initialState:'q0') { //becomes plant by default 
-					state(name:'q0')
-					transition(event:'e4[i]',
-					           guard:'y0 & x0 < 4') {
-						action('x0 += 1')
+			proposition name:'e3'
+			event 'e4', ranges:[0..2]
+			event name:'e5', ranges:[0..2, 0..3], controllable:false
+			eventAlias name:'someEvents', events:['e1', 'e2']
+			booleanVariable name:'y1', initialValue:false
+			foreach 'i', range:0..2, {
+				automaton 'testcomponent3[i]', initialState:'q0', { //becomes plant by default 
+					state name:'q0'
+					transition event:'e4[i]',
+					           guard:'y0 & x0 < 4', {
+						action 'x0 += 1'
 					}
-					transition(events:['e4[i]'],
-					           guard:'!y0 & x0 < 4') {
-						action('x0 += 1')
+					transition events:['e4[i]'],
+					           guard:'!y0 & x0 < 4', {
+						action 'x0 += 1'
 					}
-					state(name:'q1', forbidden:true) {
-						outgoing(to:'q0', events:['e1', 'e0'])
+					state name:'q1', forbidden:true, {
+						outgoing to:'q0', events:['e1', 'e0']
 					}
 				}
-				foreach(name:'j', range:0..3) {
-					automaton(name:'testcomponent4[i][j]', initialState:'q0', isSpecification:true) {
-						state(name:'q0')
-						transition(from:'q0', to:'q0', events:['e5[i][j]'])
+				foreach name:'j', range:0..3, {
+					automaton name:'testcomponent4[i][j]', initialState:'q0', isSpecification:true, {
+						state name:'q0'
+						transition from:'q0', to:'q0', events:['e5[i][j]']
 					}
 				}
 			}
-			plant(name:'testcomponent', initialState:'q0', defaultEvent:'e0') {
-				state(name:'q0')
-				state('q1', marked:true)
-				transition(from:'q0',
+			plant name:'testcomponent', initialState:'q0', defaultEvent:'e0', {
+				state name:'q0'
+				state 'q1', marked:true
+				transition from:'q0',
 						   to:'q1',
-						   guard:'y0 & x0 < 4') {
-					action('x0 += 1')
-					set('y0')
+						   guard:'y0 & x0 < 4', {
+					action 'x0 += 1'
+					set 'y0'
 				}
-				transition(from:'q1',
+				transition from:'q1',
 						   to:'q0',
-						   events:['e1', 'e0'])
+						   events:['e1', 'e0']
 			}
-			specification(name:'testcomponent2', deterministic:false) {
-				state('s0') {
-					selfLoop(events:['e1'])
+			specification name:'testcomponent2', deterministic:false, {
+				state 's0', {
+					selfLoop events:['e1']
 				}
-				state(name:'s1', propositions:['e3']) {
-					selfLoop(events:['e1'])
-					incoming(from:'s0', events:['someEvents']) {
-						reset('y1')
+				state name:'s1', propositions:['e3'], {
+					selfLoop events:['e1']
+					incoming from:'s0', events:['someEvents'], {
+						reset 'y1'
 					}
 				}
-				transition(from:'s0', to:'s1', event:'e2', guard:'!y0')
+				transition from:'s0', to:'s1', events:[1..2,0..1].combinations().collect{"e5[${it[0]}][${it[1]}]"}, guard:'!y0'
 			}
 		}
 		assert module.name == 'testmodule'
@@ -383,7 +383,7 @@ class ModuleBuilder extends BuilderSupport {
 		assert module.componentList.find{it.name == 'testcomponent'}.graph.edges.collect {
 			[it.source.name,
 		     it.target.name,
-			 it.labelBlock.eventList.name,
+			 it.labelBlock.eventList*.toString(),
 			 it.guardActionBlock?.guards?.size() == 1 ? it.guardActionBlock.guards[0].toString() : null,
 			 it.guardActionBlock?.actions?.plainText]
 		} == [['q0', 'q1', ['e0'], 'y0 & x0 < 4', ['x0 += 1', 'y0 = 1']],
@@ -397,13 +397,13 @@ class ModuleBuilder extends BuilderSupport {
 		assert module.componentList.find{it.name == 'testcomponent2'}.graph.edges.collect {
 			[it.source.name,
 		     it.target.name,
-		     it.labelBlock.eventList.name,
+		     it.labelBlock.eventList*.toString(),
 		     it.guardActionBlock?.guards?.size() == 1 ? it.guardActionBlock.guards[0].toString() : null,
 		     it.guardActionBlock?.actions?.plainText]
 		} == [['s0', 's0', ['e1'], null, null], 
 		      ['s1', 's1', ['e1'], null, null],
 		      ['s0', 's1', ['someEvents'], null, ['y1 = 0']],
-		      ['s0', 's1', ['e2'], '!y0', []]]
+		      ['s0', 's1', ['e5[1][0]','e5[2][0]','e5[1][1]','e5[2][1]'], '!y0', []]]
 		module
 	}
 }
