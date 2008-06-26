@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.expr
 //# CLASS:   AbstractExpressionTest
 //###########################################################################
-//# $Id: AbstractExpressionTest.java,v 1.3 2008-02-15 07:31:49 robi Exp $
+//# $Id: AbstractExpressionTest.java,v 1.4 2008-06-26 02:29:59 robi Exp $
 //###########################################################################
 
 
@@ -120,6 +120,12 @@ public abstract class AbstractExpressionTest extends TestCase
     throws ParseException
   {
     testExpression("1+-2", mExpr_1plusm2, Operator.TYPE_INT);
+  }
+
+  public void testExpression_1times2()
+    throws ParseException
+  {
+    testExpression("1 *2", mExpr_1times2, Operator.TYPE_INT);
   }
 
   public void testExpression_1to2()
@@ -273,6 +279,11 @@ public abstract class AbstractExpressionTest extends TestCase
 
   //#########################################################################
   //# Unsuccessful Parse Tests
+  public void testError_overflow()
+  {
+    testExpression("999999999999", 0);
+  }
+
   public void testError_event_1to2()
   {
     testExpression("event[1..2]", "1..2");
@@ -373,6 +384,7 @@ public abstract class AbstractExpressionTest extends TestCase
 
     final BinaryOperator plus = optable.getBinaryOperator("+");
     final BinaryOperator minus = optable.getBinaryOperator("-");
+    final BinaryOperator times = optable.getBinaryOperator("*");
     final BinaryOperator equals = optable.getBinaryOperator("==");
     final BinaryOperator range = optable.getBinaryOperator("..");
     final UnaryOperator uminus = optable.getUnaryOperator("-");
@@ -405,6 +417,8 @@ public abstract class AbstractExpressionTest extends TestCase
       (plus, mExpr_1plus1.clone(), mExpr_2.clone());
     mExpr_1plusm2 = factory.createBinaryExpressionProxy
       (plus, mExpr_1.clone(), mExpr_m2.clone());
+    mExpr_1times2 = factory.createBinaryExpressionProxy
+      (times, mExpr_1.clone(), mExpr_2.clone());
     mExpr_1to2 = factory.createBinaryExpressionProxy
       (range, mExpr_1.clone(), mExpr_2.clone());
     mExpr_2eq1plus1 = factory.createBinaryExpressionProxy
@@ -468,6 +482,7 @@ public abstract class AbstractExpressionTest extends TestCase
     mExpr_1plus1eq2 = null;
     mExpr_1plus1plus2 = null;
     mExpr_1plusm2 = null;
+    mExpr_1times2 = null;
     mExpr_1to2 = null;
     mExpr_2eq1plus1 = null;
     mExpr_2minus1 = null;
@@ -506,6 +521,7 @@ public abstract class AbstractExpressionTest extends TestCase
   private SimpleExpressionProxy mExpr_1plus1eq2;
   private SimpleExpressionProxy mExpr_1plus1plus2;
   private SimpleExpressionProxy mExpr_1plusm2;
+  private SimpleExpressionProxy mExpr_1times2;
   private SimpleExpressionProxy mExpr_1to2;
   private SimpleExpressionProxy mExpr_2eq1plus1;
   private SimpleExpressionProxy mExpr_2plus1plus1;
