@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.compiler.instance
 //# CLASS:   ModuleInstanceCompiler
 //###########################################################################
-//# $Id: ModuleInstanceCompiler.java,v 1.6 2008-06-19 21:26:59 robi Exp $
+//# $Id: ModuleInstanceCompiler.java,v 1.7 2008-06-28 02:01:49 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.compiler.instance;
@@ -74,7 +74,6 @@ import net.sourceforge.waters.model.module.SimpleIdentifierProxy;
 import net.sourceforge.waters.model.module.SimpleNodeProxy;
 import net.sourceforge.waters.model.module.VariableComponentProxy;
 import net.sourceforge.waters.model.module.VariableMarkingProxy;
-import net.sourceforge.waters.plain.module.ModuleElementFactory;
 
 import net.sourceforge.waters.xsd.base.ComponentKind;
 import net.sourceforge.waters.xsd.base.EventKind;
@@ -109,12 +108,13 @@ public class ModuleInstanceCompiler extends AbstractModuleProxyVisitor
   //#########################################################################
   //# Constructors
   public ModuleInstanceCompiler(final DocumentManager manager,
-                                final ModuleProxy module,
-                                final SourceInfoBuilder builder)
+                                final ModuleProxyFactory factory,
+                                final SourceInfoBuilder builder,
+                                final ModuleProxy module)
   {
     mDocumentManager = manager;
+    mFactory = factory;
     mSourceInfoBuilder = builder;
-    mFactory = ModuleElementFactory.getInstance();
     mOperatorTable = CompilerOperatorTable.getInstance();
     mSimpleExpressionCompiler =
       new SimpleExpressionCompiler(mFactory, mOperatorTable);
@@ -1078,8 +1078,8 @@ public class ModuleInstanceCompiler extends AbstractModuleProxyVisitor
   //#########################################################################
   //# Data Members
   private final DocumentManager mDocumentManager;
-  private final SourceInfoBuilder mSourceInfoBuilder;
   private final ModuleProxyFactory mFactory;
+  private final SourceInfoBuilder mSourceInfoBuilder;
   private final CompilerOperatorTable mOperatorTable;
   private final SimpleExpressionCompiler mSimpleExpressionCompiler;
   private final NameCompiler mNameCompiler;

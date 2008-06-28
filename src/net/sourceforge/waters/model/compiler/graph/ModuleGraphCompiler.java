@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.module.graph
 //# CLASS:   ModuleGraphCompiler
 //###########################################################################
-//# $Id: ModuleGraphCompiler.java,v 1.3 2008-06-19 21:26:59 robi Exp $
+//# $Id: ModuleGraphCompiler.java,v 1.4 2008-06-28 02:01:49 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.compiler.graph;
@@ -57,12 +57,12 @@ public class ModuleGraphCompiler extends AbstractModuleProxyVisitor
   //##########################################################################
   //# Constructors
   public ModuleGraphCompiler(final ProductDESProxyFactory factory,
-                             final ModuleProxy module,
-                             final SourceInfoBuilder builder)
+                             final SourceInfoBuilder builder,
+                             final ModuleProxy module)
   {
     mFactory = factory;
-    mInputModule = module;
     mSourceInfoBuilder = builder;
+    mInputModule = module;
   }
 
 
@@ -426,8 +426,8 @@ public class ModuleGraphCompiler extends AbstractModuleProxyVisitor
   //#########################################################################
   //# Data Members
   private final ProductDESProxyFactory mFactory;
-  private final ModuleProxy mInputModule;
   private final SourceInfoBuilder mSourceInfoBuilder;
+  private final ModuleProxy mInputModule;
 
   private Map<ProxyAccessor<IdentifierProxy>,EventProxy> mGlobalEventsMap;
   private List<EventProxy> mGlobalEventsList;

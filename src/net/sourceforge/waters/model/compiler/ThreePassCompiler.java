@@ -4,11 +4,12 @@
 //# PACKAGE: net.sourceforge.waters.model.module
 //# CLASS:   ThreePassCompiler
 //###########################################################################
-//# $Id: ThreePassCompiler.java,v 1.1 2008-06-19 19:10:10 robi Exp $
+//# $Id: ThreePassCompiler.java,v 1.2 2008-06-28 02:01:49 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.compiler;
 
+import java.net.URI;
 import java.util.List;
 import java.util.Map;
 
@@ -22,8 +23,11 @@ import net.sourceforge.waters.model.compiler.instance.ModuleInstanceCompiler;
 import net.sourceforge.waters.model.expr.EvalException;
 import net.sourceforge.waters.model.expr.IndexValue;
 import net.sourceforge.waters.model.marshaller.DocumentManager;
+import net.sourceforge.waters.model.marshaller.ProxyMarshaller;
 import net.sourceforge.waters.model.module.ModuleProxy;
+import net.sourceforge.waters.model.module.ModuleProxyFactory;
 import net.sourceforge.waters.model.module.ParameterBindingProxy;
+import net.sourceforge.waters.plain.module.ModuleElementFactory;
 
 
 public class ThreePassCompiler
@@ -54,8 +58,9 @@ public class ThreePassCompiler
     throws EvalException
   {
     mSourceInfoBuilder.reset();
+    final ModuleProxyFactory modfactory = ModuleElementFactory.getInstance();
     final ModuleInstanceCompiler pass1 = new ModuleInstanceCompiler
-      (mDocumentManager, mInputModule, mSourceInfoBuilder);
+      (mDocumentManager, modfactory, mSourceInfoBuilder, mInputModule);
     final ModuleProxy step1 = pass1.compile(bindings);
     final boolean efa = pass1.getHasGuardActionBlocks();
     final ModuleProxy step2;
@@ -66,8 +71,10 @@ public class ThreePassCompiler
     }
     mSourceInfoBuilder.shift();
     final ModuleGraphCompiler pass3 =
-      new ModuleGraphCompiler(mFactory, step2, mSourceInfoBuilder);
-    return pass3.compile();
+      new ModuleGraphCompiler(mFactory, mSourceInfoBuilder, step2);
+    final ProductDESProxy des = pass3.compile();
+    setLocation(des);
+    return des;
   }
 
   public Map<Proxy,SourceInfo> getSourceInfoMap()
@@ -88,6 +95,25 @@ public class ThreePassCompiler
     mIsExpandingEFATransitions = expand;
   }
 
+
+  //#########################################################################
+  //# Auxiliary Methods
+  private void setLocation(final ProductDESProxy des)
+  {
+    final URI moduleLocation = mInputModule.getLocation();
+    if (moduleLocation != null) {
+      try {
+        final ProxyMarshaller<ProductDESProxy> marshaller =
+          mDocumentManager.findProxyMarshaller(ProductDESProxy.class);
+        final String ext = marshaller.getDefaultExtension();
+        final String name = mInputModule.getName();
+        final URI desLocation = moduleLocation.resolve(name + ext);
+        des.setLocation(desLocation);
+      } catch (final IllegalArgumentException exception) {
+        // No marshaller --- O.K.
+      }
+    }
+  }
 
 
   //#########################################################################
