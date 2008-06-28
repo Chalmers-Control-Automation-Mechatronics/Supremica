@@ -4,14 +4,34 @@
 //# PACKAGE: net.sourceforge.waters.model.compiler.efa
 //# CLASS:   EFACompiler
 //###########################################################################
-//# $Id: EFACompiler.java,v 1.1 2008-06-28 02:01:49 robi Exp $
+//# $Id: EFACompiler.java,v 1.2 2008-06-28 08:29:58 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.compiler.efa;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import net.sourceforge.waters.model.base.Proxy;
+import net.sourceforge.waters.model.base.ProxyAccessor;
+import net.sourceforge.waters.model.base.ProxyAccessorByContents;
+import net.sourceforge.waters.model.base.ProxyAccessorHashMapByContents;
+import net.sourceforge.waters.model.base.ProxyAccessorMap;
 import net.sourceforge.waters.model.base.VisitorException;
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
+import net.sourceforge.waters.model.compiler.context.CompiledEnumRange;
 import net.sourceforge.waters.model.compiler.context.CompiledRange;
+import net.sourceforge.waters.model.compiler.context.
+  DuplicateIdentifierException;
+import net.sourceforge.waters.model.compiler.context.
+  UndefinedIdentifierException;
+import net.sourceforge.waters.model.compiler.context.ModuleBindingContext;
+import net.sourceforge.waters.model.compiler.context.SimpleExpressionCompiler;
 import net.sourceforge.waters.model.compiler.context.SourceInfoBuilder;
 import net.sourceforge.waters.model.expr.EvalException;
 import net.sourceforge.waters.model.module.AbstractModuleProxyVisitor;
@@ -26,6 +46,7 @@ import net.sourceforge.waters.model.module.IdentifierProxy;
 import net.sourceforge.waters.model.module.LabelBlockProxy;
 import net.sourceforge.waters.model.module.ModuleProxy;
 import net.sourceforge.waters.model.module.ModuleProxyFactory;
+import net.sourceforge.waters.model.module.ModuleProxyVisitor;
 import net.sourceforge.waters.model.module.NodeProxy;
 import net.sourceforge.waters.model.module.PlainEventListProxy;
 import net.sourceforge.waters.model.module.SimpleComponentProxy;
@@ -124,7 +145,7 @@ import net.sourceforge.waters.xsd.module.ScopeKind;
  * @author Robi Malik
  */
 
-public class EFACompiler extends AbstractModuleProxyVisitor
+public class EFACompiler
 {
 
   //#########################################################################
@@ -133,9 +154,12 @@ public class EFACompiler extends AbstractModuleProxyVisitor
                      final SourceInfoBuilder builder,
                      final ModuleProxy module)
   {                     
-    mInputModule = module;
-    mSourceInfoBuilder = builder;
     mFactory = factory;
+    mSourceInfoBuilder = builder;
+    mOperatorTable = CompilerOperatorTable.getInstance();
+    mSimpleExpressionCompiler =
+      new SimpleExpressionCompiler(mFactory, mOperatorTable);
+    mInputModule = module;
   }
 
 
@@ -145,7 +169,10 @@ public class EFACompiler extends AbstractModuleProxyVisitor
     throws EvalException
   {
     try {
-      return visitModuleProxy(mInputModule);
+      mRootContext = new ModuleBindingContext(mInputModule);
+      final ModuleProxyVisitor pass1 = new Pass1Visitor();
+      mInputModule.acceptVisitor(pass1);
+      return null;
     } catch (final VisitorException exception) {
       final Throwable cause = exception.getCause();
       if (cause instanceof EvalException) {
@@ -154,92 +181,312 @@ public class EFACompiler extends AbstractModuleProxyVisitor
         throw exception.getRuntimeException();
       }
     } finally {
-      ;
+      mRootContext = null;
     }
   }
 
 
   //#########################################################################
-  //# Interface net.sourceforge.waters.model.module.ModuleProxyVisitor
-  public EdgeProxy visitEdgeProxy(final EdgeProxy edge)
-    throws VisitorException
+  //# Configuration
+  void setUsingEventAlphabet(final boolean using)
   {
-    return null;
+    mIsUsingEventAlphabet = using;
   }
 
-  public Object visitEventDeclProxy(final EventDeclProxy decl)
-    throws VisitorException
+
+  //#########################################################################
+  //# Auxiliary Methods
+  private void putRange(final IdentifierProxy ident, final CompiledRange range)
   {
-    return null;
+    final ProxyAccessor<IdentifierProxy> accessor =
+      new ProxyAccessorByContents<IdentifierProxy>(ident);
+    mRangeMap.put(accessor, range);
   }
 
-  public Object visitEventListExpressionProxy
-    (final EventListExpressionProxy proxy)
-    throws VisitorException
+  private CompiledRange getRange(final IdentifierProxy ident)
   {
-    return null;
+    final ProxyAccessor<IdentifierProxy> accessor =
+      new ProxyAccessorByContents<IdentifierProxy>(ident);
+    return mRangeMap.get(accessor);
   }
 
-  public GraphProxy visitGraphProxy(final GraphProxy graph)
-    throws VisitorException
+  private void checkVariableIdentifier(final IdentifierProxy ident)
+    throws UndefinedIdentifierException
   {
-    return null;
+    final ProxyAccessor<IdentifierProxy> accessor =
+      new ProxyAccessorByContents<IdentifierProxy>(ident);
+    if (!mRangeMap.containsKey(accessor)) {
+      throw new UndefinedIdentifierException(ident, "variable");
+    }
   }
 
-  public GroupNodeProxy visitGroupNodeProxy(final GroupNodeProxy group)
-    throws VisitorException
+  private void insertEvent(final IdentifierProxy ident,
+                           final CompiledEvent event)
+    throws DuplicateIdentifierException
   {
-    return null;
+    final ProxyAccessor<IdentifierProxy> accessor =
+      new ProxyAccessorByContents<IdentifierProxy>(ident);
+    if (mEventMap.containsKey(accessor)) {
+      throw new DuplicateIdentifierException(ident, "event");
+    } else {
+      mEventMap.put(accessor, event);
+    }
   }
 
-  public Object visitGuardActionBlockProxy(final GuardActionBlockProxy ga)
-    throws VisitorException
+  private CompiledEvent findEvent(final IdentifierProxy ident)
+    throws UndefinedIdentifierException
   {
-    return null;
+    final ProxyAccessor<IdentifierProxy> accessor =
+      new ProxyAccessorByContents<IdentifierProxy>(ident);
+    final CompiledEvent event = mEventMap.get(accessor);
+    if (event == null) {
+      throw new UndefinedIdentifierException(ident, "event");
+    } else {
+      return event;
+    }
   }
 
-  public Object visitIdentifierProxy(final IdentifierProxy ident)
-    throws VisitorException
+
+  //#########################################################################
+  //# Inner Class Pass1Visitor
+  /**
+   * The visitor implementing the first pass of EFA compilation.
+   * It initialises the range map {@link #mRangeMap} and associates the
+   * identifier of each simple or variable component with a {@link
+   * CompiledRange} object that represents the range of possible state
+   * values of that component.
+   */
+  private class Pass1Visitor extends AbstractModuleProxyVisitor
   {
-    return null;
+
+    //#######################################################################
+    //# Interface net.sourceforge.waters.model.module.ModuleProxyVisitor
+    public List<SimpleIdentifierProxy> visitGraphProxy(final GraphProxy graph)
+      throws VisitorException
+    {
+      try {
+        final Collection<NodeProxy> nodes = graph.getNodes();
+        final int size = nodes.size();
+        mCurrentRange = new ArrayList<SimpleIdentifierProxy>(size);
+        visitCollection(nodes);
+        return mCurrentRange;
+      } finally {
+        mCurrentRange = null;
+      }
+    }
+
+    public Object visitModuleProxy(final ModuleProxy module)
+      throws VisitorException
+    {
+      final List<Proxy> components = module.getComponentList();
+      final int size = components.size();
+      mRangeMap =
+        new HashMap<ProxyAccessor<IdentifierProxy>,CompiledRange>(size);
+      visitCollection(components);
+      return null;
+    }
+
+    public Object visitNodeProxy(final NodeProxy node)
+    {
+      return null;
+    }
+
+    public CompiledRange visitSimpleComponentProxy
+      (final SimpleComponentProxy comp)
+      throws VisitorException
+    {
+      final IdentifierProxy ident = comp.getIdentifier();
+      final GraphProxy graph = comp.getGraph();
+      final List<SimpleIdentifierProxy> list = visitGraphProxy(graph);
+      final CompiledRange range = new CompiledEnumRange(list);
+      putRange(ident, range);
+      return range;
+    }
+
+    public IdentifierProxy visitSimpleNodeProxy(final SimpleNodeProxy node)
+    {
+      final String name = node.getName();
+      final SimpleIdentifierProxy ident =
+        mFactory.createSimpleIdentifierProxy(name);
+      mRootContext.addBinding(ident, ident);
+      mCurrentRange.add(ident);
+      return ident;
+    }
+
+    public CompiledRange visitVariableComponentProxy
+      (final VariableComponentProxy var)
+      throws VisitorException
+    {
+      try {
+        final IdentifierProxy ident = var.getIdentifier();
+        final SimpleExpressionProxy expr = var.getType();
+        final CompiledRange range =
+          mSimpleExpressionCompiler.getRangeValue(expr);
+        putRange(ident, range);
+        return range;
+      } catch (final EvalException exception) {
+        throw wrap(exception);
+      }
+    }
+
+    //#######################################################################
+    //# Data Members
+    private List<SimpleIdentifierProxy> mCurrentRange;
   }
 
-  public Object visitLabelBlockProxy(final LabelBlockProxy block)
-    throws VisitorException
-  {
-    return null;
-  }
 
-  public ModuleProxy visitModuleProxy(final ModuleProxy module)
-    throws VisitorException
+  //#########################################################################
+  //# Inner Class Pass2Visitor
+  /**
+   * The visitor implementing the second pass of EFA compilation.
+   */
+  private class Pass2Visitor extends AbstractModuleProxyVisitor
   {
-    return null;
-  }
 
-  public SimpleComponentProxy visitSimpleComponentProxy
-    (final SimpleComponentProxy comp)
-    throws VisitorException
-  {
-    return null;
-  }
+    //#######################################################################
+    //# Interface net.sourceforge.waters.model.module.ModuleProxyVisitor
+    public Object visitBinaryExpressionProxy(final BinaryExpressionProxy expr)
+      throws VisitorException
+    {
+      try {
+        final SimpleExpressionProxy left = expr.getLeft();
+        if (left instanceof IdentifierProxy) {
+          final IdentifierProxy ident = (IdentifierProxy) left;
+          checkVariableIdentifier(ident);
+          mCollectedVariables.addProxy(ident);
+          return null;
+        } else {
+          throw new ActionSyntaxException(expr);
+        }
+      } catch (final EvalException exception) {
+        throw wrap(exception);
+      }
+    }
 
-  public SimpleExpressionProxy visitSimpleExpressionProxy
-    (final SimpleExpressionProxy expr)
-    throws VisitorException
-  {
-    return null;
-  }
+    public Object visitEdgeProxy(final EdgeProxy edge)
+      throws VisitorException
+    {
+      final GuardActionBlockProxy ga = edge.getGuardActionBlock();
+      final LabelBlockProxy block = edge.getLabelBlock();
+      if (mIsUsingEventAlphabet) {
+        if (ga != null) {
+          try {
+            mCollectedVariables =
+              new ProxyAccessorHashMapByContents<IdentifierProxy>();
+            visitGuardActionBlockProxy(ga);
+            visitLabelBlockProxy(block);
+          } finally {
+            mCollectedVariables = null;
+          }
+        }
+      } else {
+        if (ga != null) {
+          visitGuardActionBlockProxy(ga);
+        }
+        visitLabelBlockProxy(block);
+      }
+      return null;
+    }
 
-  public SimpleNodeProxy visitSimpleNodeProxy(final SimpleNodeProxy node)
-    throws VisitorException
-  {
-    return null;
-  }
+    public CompiledEvent visitEventDeclProxy(final EventDeclProxy decl)
+      throws VisitorException
+    {
+      try {
+        final IdentifierProxy ident = decl.getIdentifier();
+        final CompiledEvent event = new CompiledEvent(decl);
+        insertEvent(ident, event);
+        return event;
+      } catch (final DuplicateIdentifierException exception) {
+        throw wrap(exception);
+      }
+    }
 
-  public Object visitVariableComponentProxy(final VariableComponentProxy var)
-    throws VisitorException
-  {
-    return null;
+    public Object visitGraphProxy(final GraphProxy graph)
+      throws VisitorException
+    {
+      final Collection<EdgeProxy> edges = graph.getEdges();
+      if (mIsUsingEventAlphabet) {
+        visitCollection(edges);
+      } else {
+        try {
+          mCollectedEvents = new HashSet<CompiledEvent>();
+          mCollectedVariables =
+            new ProxyAccessorHashMapByContents<IdentifierProxy>();
+          final LabelBlockProxy blocked = graph.getBlockedEvents();
+          visitLabelBlockProxy(blocked);
+          visitCollection(edges);
+          for (final CompiledEvent event : mCollectedEvents) {
+            event.addVariables(mCollectedVariables.values());
+          }
+        } finally {
+          mCollectedEvents = null;
+          mCollectedVariables = null;
+        }
+      }
+      return null;
+    }
+
+    public Object visitGuardActionBlockProxy(final GuardActionBlockProxy ga)
+      throws VisitorException
+    {
+      final List<BinaryExpressionProxy> actions = ga.getActions();
+      visitCollection(actions);
+      return null;
+    }
+
+    public CompiledEvent visitIdentifierProxy(final IdentifierProxy ident)
+      throws VisitorException
+    {
+      try {
+        final CompiledEvent event = findEvent(ident);
+        if (mIsUsingEventAlphabet) {
+          event.addVariables(mCollectedVariables.values());
+        } else {
+          mCollectedEvents.add(event);
+        }
+        return event;
+      } catch (final UndefinedIdentifierException exception) {
+        throw wrap(exception);
+      }
+    }
+
+    public Object visitLabelBlockProxy(final LabelBlockProxy block)
+      throws VisitorException
+    {
+      final List<Proxy> list = block.getEventList();
+      visitCollection(list);
+      return null;
+    }
+
+    public Object visitModuleProxy(final ModuleProxy module)
+      throws VisitorException
+    {
+      final List<EventDeclProxy> events = module.getEventDeclList();
+      final int size = events.size();
+      mEventMap =
+        new HashMap<ProxyAccessor<IdentifierProxy>,CompiledEvent>(size);
+      visitCollection(events);
+      final List<Proxy> components = module.getComponentList();
+      visitCollection(components);
+      return null;
+    }
+
+    public Object visitSimpleComponentProxy(final SimpleComponentProxy comp)
+      throws VisitorException
+    {
+      final GraphProxy graph = comp.getGraph();
+      return visitGraphProxy(graph);
+    }
+
+    public Object visitVariableComponentProxy(final VariableComponentProxy var)
+    {
+      return null;
+    }
+
+    //#######################################################################
+    //# Data Members
+    private Set<CompiledEvent> mCollectedEvents;
+    private ProxyAccessorMap<IdentifierProxy> mCollectedVariables;
   }
 
 
@@ -247,6 +494,16 @@ public class EFACompiler extends AbstractModuleProxyVisitor
   //# Data Members
   private final ModuleProxyFactory mFactory;
   private final SourceInfoBuilder mSourceInfoBuilder;
+  private final CompilerOperatorTable mOperatorTable;
+  private final SimpleExpressionCompiler mSimpleExpressionCompiler;
   private final ModuleProxy mInputModule;
+
+  private boolean mIsUsingEventAlphabet = true;
+
+  private ModuleBindingContext mRootContext;
+  // Pass 1
+  private Map<ProxyAccessor<IdentifierProxy>,CompiledRange> mRangeMap;
+  // Pass 2
+  private Map<ProxyAccessor<IdentifierProxy>,CompiledEvent> mEventMap;
 
 }

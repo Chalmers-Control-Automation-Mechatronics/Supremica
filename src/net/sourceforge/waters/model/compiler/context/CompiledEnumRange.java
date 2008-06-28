@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.compiler.context
 //# CLASS:   CompiledEnumRange
 //###########################################################################
-//# $Id: CompiledEnumRange.java,v 1.2 2008-06-18 11:45:49 robi Exp $
+//# $Id: CompiledEnumRange.java,v 1.3 2008-06-28 08:29:58 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.compiler.context;
@@ -17,12 +17,12 @@ import net.sourceforge.waters.model.module.SimpleExpressionProxy;
 import net.sourceforge.waters.model.module.SimpleIdentifierProxy;
 
 
-class CompiledEnumRange implements CompiledRange
+public class CompiledEnumRange implements CompiledRange
 {
 
   //#########################################################################
   //# Constructors
-  CompiledEnumRange(final List<? extends SimpleIdentifierProxy> atoms)
+  public CompiledEnumRange(final List<? extends SimpleIdentifierProxy> atoms)
   {
     mAtoms = Collections.unmodifiableList(atoms);
   }

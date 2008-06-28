@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.module
 //# CLASS:   ThreePassCompiler
 //###########################################################################
-//# $Id: ThreePassCompiler.java,v 1.2 2008-06-28 02:01:49 robi Exp $
+//# $Id: ThreePassCompiler.java,v 1.3 2008-06-28 08:29:58 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.compiler;
@@ -90,9 +90,19 @@ public class ThreePassCompiler
     return mIsExpandingEFATransitions;
   }
 
-  public void setExpandingEFATransitions(final boolean expand)
+  public void setExpandingEFATransitions(final boolean expanding)
   {
-    mIsExpandingEFATransitions = expand;
+    mIsExpandingEFATransitions = expanding;
+  }
+
+  public boolean isUsingEventAlphabet()
+  {
+    return mIsUsingEventAlphabet;
+  }
+
+  public void setUsingEventAlphabet(final boolean using)
+  {
+    mIsUsingEventAlphabet = using;
   }
 
 
@@ -124,5 +134,6 @@ public class ThreePassCompiler
   private final ModuleProxy mInputModule;
 
   private boolean mIsExpandingEFATransitions = true;
+  private boolean mIsUsingEventAlphabet = true;
 
 }

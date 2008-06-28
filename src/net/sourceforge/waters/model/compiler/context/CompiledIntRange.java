@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.compiler.context
 //# CLASS:   CompiledIntRange
 //###########################################################################
-//# $Id: CompiledIntRange.java,v 1.2 2008-06-18 11:45:49 robi Exp $
+//# $Id: CompiledIntRange.java,v 1.3 2008-06-28 08:29:58 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.compiler.context;
@@ -17,12 +17,12 @@ import net.sourceforge.waters.model.module.SimpleExpressionProxy;
 import net.sourceforge.waters.plain.module.IntConstantElement;
 
 
-class CompiledIntRange implements CompiledRange
+public class CompiledIntRange implements CompiledRange
 {
 
   //#########################################################################
   //# Constructors
-  CompiledIntRange(final int lower, final int upper)
+  public CompiledIntRange(final int lower, final int upper)
   {
     mLower = lower;
     mUpper = upper;
