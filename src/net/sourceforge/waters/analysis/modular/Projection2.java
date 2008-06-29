@@ -159,7 +159,7 @@ public class Projection2
         explore(currentState, false);
       }
     }
-    System.out.println("Composition:" + states.values().size());
+    //System.out.println("Composition:" + states.values().size());
     mCompositionSize = states.values().size();
     states = null;
     currentState = new int[] {0};
@@ -196,7 +196,7 @@ public class Projection2
                                                           trans);
     newStates = null;
     trans = null;
-    System.out.println("Project:" + result.getStates().size());
+    //System.out.println("Project:" + result.getStates().size());
     //System.out.println("orig:\n" + result);
     try {
       Minimizer min = new Minimizer(result, mFactory);
@@ -209,7 +209,7 @@ public class Projection2
       /*System.exit(1);*/
     }
     //System.out.println("new:\n" + result);
-    System.out.println("disabled:" + mDisabled);
+    //System.out.println("disabled:" + mDisabled);
     return result;
   }
   

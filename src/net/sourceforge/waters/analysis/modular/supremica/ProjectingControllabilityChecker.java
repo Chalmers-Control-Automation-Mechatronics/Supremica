@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.analysis.modular
 //# CLASS:   ProjectingControllabilityChecker
 //###########################################################################
-//# $Id: ProjectingControllabilityChecker.java,v 1.18 2007-11-02 00:30:37 robi Exp $
+//# $Id: ProjectingControllabilityChecker.java,v 1.19 2008-06-29 22:49:20 robi Exp $
 //###########################################################################
 
 
@@ -179,7 +179,7 @@ public class ProjectingControllabilityChecker
           }
         }
       }
-      System.out.println("numAutomata:" + automata.size());
+      //System.out.println("numAutomata:" + automata.size());
 //      int numAutomata = numoccuring.firstKey().size();
       Set<Tuple> possible = new TreeSet<Tuple>();
       boolean stop = true;
@@ -232,9 +232,9 @@ public class ProjectingControllabilityChecker
         } catch (Throwable t) {
           System.out.println("OverFlow");
           overflows++;
-          /*if (overflows >= 2) {
+          if (overflows >= 2) {
             break;
-          }*/
+          }
           //t.printStackTrace();
           //System.out.println(p);
         }
@@ -242,7 +242,7 @@ public class ProjectingControllabilityChecker
       if (minlist != null) {
         p = minlist;
         automata = new HashSet<AutomatonProxy>(p.getModel().getAutomata());
-        System.out.println("minsize:" + minSize);
+        //System.out.println("minsize:" + minSize);
         stop = false;
       }
       if (stop) {

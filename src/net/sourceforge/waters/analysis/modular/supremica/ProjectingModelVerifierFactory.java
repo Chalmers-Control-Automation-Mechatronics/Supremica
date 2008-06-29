@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.cpp.analysis
 //# CLASS:   ProjectingModelVerifierFactory
 //###########################################################################
-//# $Id: ProjectingModelVerifierFactory.java,v 1.5 2007-08-19 03:23:47 siw4 Exp $
+//# $Id: ProjectingModelVerifierFactory.java,v 1.6 2008-06-29 22:49:20 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.analysis.modular.supremica;
@@ -14,12 +14,14 @@ import java.util.List;
 
 import net.sourceforge.waters.analysis.modular.HeuristicType;
 import net.sourceforge.waters.analysis.modular.MaxCommonEventsHeuristic;
+import net.sourceforge.waters.analysis.modular.RelMaxCommonEventsHeuristic;
 import net.sourceforge.waters.cpp.analysis.NativeControllabilityChecker;
 import net.sourceforge.waters.model.analysis.ModelVerifierFactory;
 import net.sourceforge.waters.model.analysis.LanguageInclusionChecker;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 import net.sourceforge.waters.analysis.monolithic.MonolithicControllabilityChecker;
 import net.sourceforge.waters.analysis.modular.MinNewEventsHeuristic;
+import net.sourceforge.waters.analysis.modular.MaxCommonUncontrollableEventsHeuristic;
 import net.sourceforge.waters.analysis.modular.OneUncontrollableChecker;
 
 
@@ -41,7 +43,7 @@ public class ProjectingModelVerifierFactory implements ModelVerifierFactory
       (null,
        factory,
        new NativeControllabilityChecker(factory),
-       new MaxCommonEventsHeuristic(HeuristicType.PREFERREALPLANT),
+       new RelMaxCommonEventsHeuristic(HeuristicType.NOPREF),
        false);
   }
 
@@ -53,7 +55,7 @@ public class ProjectingModelVerifierFactory implements ModelVerifierFactory
        /*new OneUncontrollableChecker(null, factory,
                                     createControllabilityChecker(factory)),*/
        createControllabilityChecker(factory),
-       new MaxCommonEventsHeuristic(HeuristicType.PREFERREALPLANT)
+       new RelMaxCommonEventsHeuristic(HeuristicType.NOPREF)
        );
   }
 
