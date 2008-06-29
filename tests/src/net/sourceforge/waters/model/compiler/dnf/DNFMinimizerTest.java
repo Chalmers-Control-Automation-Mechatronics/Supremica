@@ -1,22 +1,24 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
 //# PROJECT: Waters
-//# PACKAGE: net.sourceforge.waters.model.compiler
+//# PACKAGE: net.sourceforge.waters.model.compiler.dnf
 //# CLASS:   DNFMinimizerTest
 //###########################################################################
-//# $Id: DNFMinimizerTest.java,v 1.2 2007-05-24 20:20:57 robi Exp $
+//# $Id: DNFMinimizerTest.java,v 1.1 2008-06-29 07:13:44 robi Exp $
 //###########################################################################
 
 
-package net.sourceforge.waters.model.compiler;
+package net.sourceforge.waters.model.compiler.dnf;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
 import junit.framework.TestCase;
 
+import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
 import net.sourceforge.waters.model.expr.BinaryOperator;
 import net.sourceforge.waters.model.expr.EvalException;
+import net.sourceforge.waters.model.expr.ExpressionComparator;
 import net.sourceforge.waters.model.expr.ExpressionParser;
 import net.sourceforge.waters.model.expr.ParseException;
 import net.sourceforge.waters.model.module.ModuleProxyFactory;

@@ -1,13 +1,13 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
 //# PROJECT: Waters
-//# PACKAGE: net.sourceforge.waters.model.compiler
+//# PACKAGE: net.sourceforge.waters.model.compiler.dnf
 //# CLASS:   CompiledNormalForm
 //###########################################################################
-//# $Id: CompiledNormalForm.java,v 1.2 2007-03-19 22:13:38 martin Exp $
+//# $Id: CompiledNormalForm.java,v 1.1 2008-06-29 07:13:43 robi Exp $
 //###########################################################################
 
-package net.sourceforge.waters.model.compiler;
+package net.sourceforge.waters.model.compiler.dnf;
 
 import java.util.Collection;
 import java.util.HashSet;
@@ -36,42 +36,42 @@ public class CompiledNormalForm implements Cloneable
 
   //#########################################################################
   //# Access
-  BinaryOperator getOperator()
+  public BinaryOperator getOperator()
   {
     return mOperator;
   }
 
-  boolean isEmpty()
+  public boolean isEmpty()
   {
     return mClauses.isEmpty();
   }
 
-  int size()
+  public int size()
   {
     return mClauses.size();
   }
 
-  boolean contains(final CompiledClause clause)
+  public boolean contains(final CompiledClause clause)
   {
     return mClauses.contains(clause);
   }
 
-  boolean containsAll(final Collection<CompiledClause> clauses)
+  public boolean containsAll(final Collection<CompiledClause> clauses)
   {
     return mClauses.containsAll(clauses);
   }
 
-  boolean add(final CompiledClause clause)
+  public boolean add(final CompiledClause clause)
   {
     return mClauses.add(clause);
   }
 
-  boolean addAll(final Collection<CompiledClause> clauses)
+  public boolean addAll(final Collection<CompiledClause> clauses)
   {
     return mClauses.addAll(clauses);
   }
 
-  Collection<CompiledClause> getClauses()
+  public Collection<CompiledClause> getClauses()
   {
     return mClauses;
   }

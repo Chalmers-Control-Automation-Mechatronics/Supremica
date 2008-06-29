@@ -1,13 +1,13 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
 //# PROJECT: Waters
-//# PACKAGE: net.sourceforge.waters.model.compiler
+//# PACKAGE: net.sourceforge.waters.model.compiler.dnf
 //# CLASS:   DNFConverter
 //###########################################################################
-//# $Id: DNFConverter.java,v 1.3 2008-06-16 07:09:50 robi Exp $
+//# $Id: DNFConverter.java,v 1.1 2008-06-29 07:13:43 robi Exp $
 //###########################################################################
 
-package net.sourceforge.waters.model.compiler;
+package net.sourceforge.waters.model.compiler.dnf;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -18,6 +18,7 @@ import java.util.List;
 
 import net.sourceforge.waters.model.base.VisitorException;
 import net.sourceforge.waters.model.base.WatersRuntimeException;
+import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
 import net.sourceforge.waters.model.expr.BinaryOperator;
 import net.sourceforge.waters.model.expr.EvalException;
 import net.sourceforge.waters.model.expr.TypeMismatchException;
@@ -40,8 +41,8 @@ public class DNFConverter extends AbstractModuleProxyVisitor {
   //#########################################################################
   //# Constructors
   public DNFConverter(final ModuleProxyFactory factory,
-               final CompilerOperatorTable optable,
-               final Comparator<SimpleExpressionProxy> comparator)
+                      final CompilerOperatorTable optable,
+                      final Comparator<SimpleExpressionProxy> comparator)
   {
     mFactory = factory;
     mOpTable = optable;
@@ -59,7 +60,7 @@ public class DNFConverter extends AbstractModuleProxyVisitor {
     return convert(expr, orop, andop, false);
   }
 
-  CompiledNormalForm convertToCNF(final SimpleExpressionProxy expr)
+  public CompiledNormalForm convertToCNF(final SimpleExpressionProxy expr)
     throws EvalException
   {
     final BinaryOperator andop = mOpTable.getAndOperator();
@@ -67,10 +68,10 @@ public class DNFConverter extends AbstractModuleProxyVisitor {
     return convert(expr, andop, orop, true);
   }
 
-  CompiledNormalForm convert(final SimpleExpressionProxy expr,
-                             final BinaryOperator op1,
-                             final BinaryOperator op2,
-                             final boolean emptyval)
+  public CompiledNormalForm convert(final SimpleExpressionProxy expr,
+                                    final BinaryOperator op1,
+                                    final BinaryOperator op2,
+                                    final boolean emptyval)
     throws EvalException
   {
     try {
@@ -88,7 +89,7 @@ public class DNFConverter extends AbstractModuleProxyVisitor {
     }
   }
 
-  List<SimpleExpressionProxy> createSortedClauseList
+  public List<SimpleExpressionProxy> createSortedClauseList
     (final CompiledNormalForm nf)
   {
     final Collection<CompiledClause> clauses = nf.getClauses();

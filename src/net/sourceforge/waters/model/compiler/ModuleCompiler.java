@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.module
 //# CLASS:   ModuleCompiler
 //###########################################################################
-//# $Id: ModuleCompiler.java,v 1.109 2008-06-16 07:09:50 robi Exp $
+//# $Id: ModuleCompiler.java,v 1.110 2008-06-29 07:13:43 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.compiler;
@@ -29,6 +29,10 @@ import java.util.Set;
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.base.VisitorException;
 import net.sourceforge.waters.model.base.WatersRuntimeException;
+import net.sourceforge.waters.model.compiler.dnf.CompiledClause;
+import net.sourceforge.waters.model.compiler.dnf.CompiledNormalForm;
+import net.sourceforge.waters.model.compiler.dnf.DNFConverter;
+import net.sourceforge.waters.model.compiler.dnf.DNFMinimizer;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
@@ -41,6 +45,7 @@ import net.sourceforge.waters.model.compiler.context.
   UndefinedIdentifierException;
 import net.sourceforge.waters.model.expr.AtomValue;
 import net.sourceforge.waters.model.expr.BinaryOperator;
+import net.sourceforge.waters.model.expr.ExpressionComparator;
 import net.sourceforge.waters.model.expr.EvalException;
 import net.sourceforge.waters.model.expr.IndexValue;
 import net.sourceforge.waters.model.expr.IntValue;
@@ -108,7 +113,7 @@ public class ModuleCompiler extends AbstractModuleProxyVisitor
     mDESFactory = desfactory;
     mModuleFactory = ModuleElementFactory.getInstance();
     mOperatorTable = CompilerOperatorTable.getInstance();
-    mComparator = new ExpressionComparator();
+    mComparator = ExpressionComparator.getInstance();
     mDNFConverter =
         new DNFConverter(mModuleFactory, mOperatorTable, mComparator);
     mDNFMinimizer =

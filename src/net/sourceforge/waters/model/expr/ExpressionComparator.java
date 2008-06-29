@@ -1,13 +1,13 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
 //# PROJECT: Waters
-//# PACKAGE: net.sourceforge.waters.model.compiler
+//# PACKAGE: net.sourceforge.waters.model.expr
 //# CLASS:   ExpressionComparator
 //###########################################################################
-//# $Id: ExpressionComparator.java,v 1.3 2007-03-19 22:13:38 martin Exp $
+//# $Id: ExpressionComparator.java,v 1.1 2008-06-29 07:13:43 robi Exp $
 //###########################################################################
 
-package net.sourceforge.waters.model.compiler;
+package net.sourceforge.waters.model.expr;
 
 import java.util.Comparator;
 import java.util.HashMap;
@@ -17,8 +17,6 @@ import java.util.Map;
 
 import net.sourceforge.waters.model.base.VisitorException;
 import net.sourceforge.waters.model.base.WatersRuntimeException;
-import net.sourceforge.waters.model.expr.BinaryOperator;
-import net.sourceforge.waters.model.expr.UnaryOperator;
 import net.sourceforge.waters.model.module.AbstractModuleProxyVisitor;
 import net.sourceforge.waters.model.module.BinaryExpressionProxy;
 import net.sourceforge.waters.model.module.EnumSetExpressionProxy;
@@ -31,10 +29,10 @@ import net.sourceforge.waters.model.module.UnaryExpressionProxy;
 
 /**
  * A simple implementation of the {@link Comparator} interface, used to
- * compare Waters expressions.  This comparator imposes an ordering on
+ * compare Waters expressions. This comparator imposes an ordering on
  * objects of all subtypes of {@link SimpleExpressionProxy} and can be used
  * to ensure deterministic compiler output.
- * 
+ *
  * @author Robi Malik
  */
 
@@ -226,6 +224,19 @@ public class ExpressionComparator
       }
       return null;
     }
+  }
+
+
+  //#########################################################################
+  //# Singleton Pattern
+  public static Comparator<SimpleExpressionProxy> getInstance()
+  {
+    return SingletonHolder.INSTANCE;
+  }
+
+  private static class SingletonHolder {
+    private static final Comparator<SimpleExpressionProxy> INSTANCE =
+      new ExpressionComparator();
   }
 
 

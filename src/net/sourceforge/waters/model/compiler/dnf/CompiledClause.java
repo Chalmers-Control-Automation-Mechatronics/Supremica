@@ -1,13 +1,13 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
 //# PROJECT: Waters
-//# PACKAGE: net.sourceforge.waters.model.compiler
+//# PACKAGE: net.sourceforge.waters.model.compiler.dnf
 //# CLASS:   CompiledClause
 //###########################################################################
-//# $Id: CompiledClause.java,v 1.2 2006-11-03 15:01:57 torda Exp $
+//# $Id: CompiledClause.java,v 1.1 2008-06-29 07:13:43 robi Exp $
 //###########################################################################
 
-package net.sourceforge.waters.model.compiler;
+package net.sourceforge.waters.model.compiler.dnf;
 
 import java.util.Collection;
 
@@ -17,7 +17,7 @@ import net.sourceforge.waters.model.expr.BinaryOperator;
 import net.sourceforge.waters.model.module.SimpleExpressionProxy;
 
 
-class CompiledClause implements Cloneable
+public class CompiledClause implements Cloneable
 {
 
   //#########################################################################
@@ -38,27 +38,27 @@ class CompiledClause implements Cloneable
 
   //#########################################################################
   //# Access
-  BinaryOperator getOperator()
+  public BinaryOperator getOperator()
   {
     return mOperator;
   }
 
-  boolean isEmpty()
+  public boolean isEmpty()
   {
     return mLiterals.isEmpty();
   }
 
-  int size()
+  public int size()
   {
     return mLiterals.size();
   }
 
-  boolean contains(final SimpleExpressionProxy literal)
+  public boolean contains(final SimpleExpressionProxy literal)
   {
     return mLiterals.containsProxy(literal);
   }
 
-  boolean containsAll(final Collection<SimpleExpressionProxy> literals)
+  public boolean containsAll(final Collection<SimpleExpressionProxy> literals)
   {
     for (final SimpleExpressionProxy literal : literals) {
       if (!contains(literal)) {
@@ -68,12 +68,12 @@ class CompiledClause implements Cloneable
     return true;
   }
 
-  boolean add(final SimpleExpressionProxy literal)
+  public boolean add(final SimpleExpressionProxy literal)
   {
     return mLiterals.addProxy(literal);
   }
 
-  boolean addAll(final Collection<SimpleExpressionProxy> literals)
+  public boolean addAll(final Collection<SimpleExpressionProxy> literals)
   {
     boolean changed = false;
     for (final SimpleExpressionProxy literal : literals) {
@@ -82,17 +82,17 @@ class CompiledClause implements Cloneable
     return changed;
   }
 
-  Collection<SimpleExpressionProxy> getLiterals()
+  public Collection<SimpleExpressionProxy> getLiterals()
   {
     return mLiterals.values();
   }
 
-  boolean isSubsumedBy(final SimpleExpressionProxy literal)
+  public boolean isSubsumedBy(final SimpleExpressionProxy literal)
   {
     return contains(literal);
   }
 
-  boolean isSubsumedBy(final CompiledClause clause)
+  public boolean isSubsumedBy(final CompiledClause clause)
   {
     final Collection<SimpleExpressionProxy> literals = clause.getLiterals();
     return containsAll(literals);
