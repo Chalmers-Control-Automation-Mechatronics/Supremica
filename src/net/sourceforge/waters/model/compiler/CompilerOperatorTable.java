@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.compiler
 //# CLASS:   CompilerOperatorTable
 //###########################################################################
-//# $Id: CompilerOperatorTable.java,v 1.13 2008-06-18 09:35:34 robi Exp $
+//# $Id: CompilerOperatorTable.java,v 1.14 2008-06-29 04:01:43 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.compiler;
@@ -37,7 +37,7 @@ import net.sourceforge.waters.model.module.UnaryExpressionProxy;
  * the {@link OperatorTable}
  * interface, this class facilitates semantic access to logical and
  * assignment operators.
- * 
+ *
  * @author Robi Malik
  */
 
@@ -72,6 +72,7 @@ public class CompilerOperatorTable extends AbstractOperatorTable {
     mDecrementOperator = new BinaryDecrementOperator();
     mUnaryMinusOperator = new UnaryMinusOperator();
     mRangeOperator = new BinaryRangeOperator();
+    mUnaryNextOperator = new UnaryNextOperator();
 
     store(mAndOperator);
     store(mOrOperator);
@@ -93,6 +94,7 @@ public class CompilerOperatorTable extends AbstractOperatorTable {
     store(mUnaryMinusOperator);
     store(mRangeOperator);
     store(new BinaryQualificationOperator());
+    // store(mUnaryNextOperator);
     storeComplements(mEqualsOperator, mNotEqualsOperator);
     storeComplements(mLessThanOperator, mGreaterEqualsOperator);
     storeComplements(mGreaterThanOperator, mLessEqualsOperator);
@@ -124,27 +126,27 @@ public class CompilerOperatorTable extends AbstractOperatorTable {
   {
     return mNotOperator;
   }
-  
+
   public BinaryOperator getEqualsOperator() {
     return mEqualsOperator;
   }
-  
+
   public BinaryOperator getNotEqualsOperator() {
     return mNotEqualsOperator;
   }
-  
+
   public BinaryOperator getGreaterThanOperator() {
     return mGreaterThanOperator;
   }
-  
+
   public BinaryOperator getGreaterEqualsOperator() {
     return mGreaterEqualsOperator;
   }
-  
+
   public BinaryOperator getLessThanOperator() {
     return mLessThanOperator;
   }
-  
+
   public BinaryOperator getLessEqualsOperator() {
     return mLessEqualsOperator;
   }
@@ -168,20 +170,25 @@ public class CompilerOperatorTable extends AbstractOperatorTable {
   {
     return mRangeOperator;
   }
-  
+
+  public UnaryOperator getNextOperator()
+  {
+    return mUnaryNextOperator;
+  }
+
   public BinaryOperator getComplementaryOperator(final BinaryOperator op)
   {
     return mComplementMap.get(op);
   }
-  
+
   public boolean isNotEqualsOperator(BinaryOperator op) {
 		return (op instanceof BinaryNotEqualsOperator);
   }
-  
+
   public boolean isLessThanOperator(BinaryOperator op) {
 		return (op instanceof BinaryLessThanOperator);
   }
-  
+
   public boolean isLessEqualsOperator(BinaryOperator op) {
 		return (op instanceof BinaryLessEqualsOperator);
   }
@@ -229,6 +236,53 @@ public class CompilerOperatorTable extends AbstractOperatorTable {
     {
       final ModuleProxyFactory factory = simplifier.getFactory();
       return createExpression(factory, lhs, rhs, null);
+    }
+
+  }
+
+
+  //#########################################################################
+  //# Inner Class AbstractUnaryOperator
+  /**
+   * The abstract type of all binary operators whose parse result is
+   * a unary expression ({@link UnaryExpressionProxy}).
+   */
+  private static abstract class AbstractUnaryOperator
+    implements UnaryOperator
+  {
+
+    //#######################################################################
+    //# Interface net.sourceforge.waters.model.expr.Operator
+    public int getPriority()
+    {
+      return PRIORITY_UNARY;
+    }
+
+    //#######################################################################
+    //# Interface net.sourceforge.waters.model.expr.UnaryOperator
+    public boolean isPrefix()
+    {
+      return true;
+    }
+
+    public SimpleExpressionProxy simplify
+      (final UnaryExpressionProxy expr,
+       final AbstractSimpleExpressionSimplifier simplifier)
+      throws EvalException
+    {
+      final SimpleExpressionProxy subexpr = expr.getSubTerm();
+      final SimpleExpressionProxy subresult = simplifier.simplify(subexpr);
+      return createExpression(simplifier, subresult);
+    }
+
+    //#######################################################################
+    //# Auxiliary Methods
+    UnaryExpressionProxy createExpression
+      (final AbstractSimpleExpressionSimplifier simplifier,
+       final SimpleExpressionProxy subterm)
+    {
+      final ModuleProxyFactory factory = simplifier.getFactory();
+      return factory.createUnaryExpressionProxy(this, subterm);
     }
 
   }
@@ -404,7 +458,7 @@ public class CompilerOperatorTable extends AbstractOperatorTable {
       } else if (intLHS == 0) {
         final ModuleProxyFactory factory = simplifier.getFactory();
         return factory.createUnaryExpressionProxy
-          (INSTANCE.mUnaryMinusOperator, simpRHS);  
+          (INSTANCE.mUnaryMinusOperator, simpRHS);
       } else if (intRHS == 0) {
         return simpLHS;
       } else if (simpLHS.equalsByContents(simpRHS)) {
@@ -463,7 +517,7 @@ public class CompilerOperatorTable extends AbstractOperatorTable {
           final ModuleProxyFactory factory = simplifier.getFactory();
           final UnaryExpressionProxy uminus =
             factory.createUnaryExpressionProxy(INSTANCE.mUnaryMinusOperator,
-                                               origRHS);  
+                                               origRHS);
           return simplifier.simplify(uminus);
         default:
           break;
@@ -483,7 +537,7 @@ public class CompilerOperatorTable extends AbstractOperatorTable {
           } else {
             final ModuleProxyFactory factory = simplifier.getFactory();
             return factory.createUnaryExpressionProxy
-              (INSTANCE.mUnaryMinusOperator, simpLHS);  
+              (INSTANCE.mUnaryMinusOperator, simpLHS);
           }
         default:
           if (atomLHS) {
@@ -576,15 +630,8 @@ public class CompilerOperatorTable extends AbstractOperatorTable {
    * and return another integer.
    */
   private static abstract class AbstractUnaryIntOperator
-    implements UnaryOperator
+    extends AbstractUnaryOperator
   {
-
-    //#######################################################################
-    //# Interface net.sourceforge.waters.model.expr.Operator
-    public int getPriority()
-    {
-      return PRIORITY_UNARY;
-    }
 
     //#######################################################################
     //# Interface net.sourceforge.waters.model.expr.UnaryOperator
@@ -610,9 +657,8 @@ public class CompilerOperatorTable extends AbstractOperatorTable {
         final int value = eval(subvalue);
         return simplifier.createIntConstantProxy(value);
       } else {
-        final ModuleProxyFactory factory = simplifier.getFactory();
-        return factory.createUnaryExpressionProxy(this, subresult);
-      }        
+        return createExpression(simplifier, subresult);
+      }
     }
 
     public CompiledIntValue eval(final Value argValue)
@@ -1199,15 +1245,8 @@ public class CompilerOperatorTable extends AbstractOperatorTable {
    * and return another Boolean.
    */
   private static abstract class AbstractUnaryBooleanOperator
-    implements UnaryOperator
+    extends AbstractUnaryOperator
   {
-
-    //#######################################################################
-    //# Interface net.sourceforge.waters.model.expr.Operator
-    public int getPriority()
-    {
-      return PRIORITY_UNARY;
-    }
 
     //#######################################################################
     //# Interface net.sourceforge.waters.model.expr.UnaryOperator
@@ -1233,8 +1272,7 @@ public class CompilerOperatorTable extends AbstractOperatorTable {
         final boolean resboolean = eval(subboolean);
         return simplifier.createBooleanConstantProxy(resboolean);
       } else {
-        final ModuleProxyFactory factory = simplifier.getFactory();
-        return factory.createUnaryExpressionProxy(this, subresult);
+        return createExpression(simplifier, subresult);
       }
     }
 
@@ -1616,6 +1654,54 @@ public class CompilerOperatorTable extends AbstractOperatorTable {
 
 
   //#########################################################################
+  //# Inner Class UnaryNextOperator
+  /**
+   * The next-state (prime) operator.
+   * Takes as argument a name and returns a name.
+   */
+  private static class UnaryNextOperator
+    extends AbstractUnaryOperator
+  {
+
+    //#######################################################################
+    //# Interface net.sourceforge.waters.model.expr.Operator
+    public String getName()
+    {
+      return OPNAME_NEXT;
+    }
+
+    public int getPriority()
+    {
+      return PRIORITY_NEXT;
+    }
+
+    //#######################################################################
+    //# Interface net.sourceforge.waters.model.expr.UnaryOperator
+    public boolean isPrefix()
+    {
+      return false;
+    }
+
+    public int getArgTypes()
+    {
+      return Operator.TYPE_NAME;
+    }
+
+    public int getReturnTypes(final int argType)
+    {
+      return argType & Operator.TYPE_NAME;
+    }
+
+    public Value eval(final Value argValue)
+      throws EvalException
+    {
+      throw new EvalException("Next cannot be avaluated!");
+    }
+
+  }
+
+
+  //#########################################################################
   //# Data Members
   private final BinaryOperator mAndOperator;
   private final BinaryOperator mOrOperator;
@@ -1631,6 +1717,7 @@ public class CompilerOperatorTable extends AbstractOperatorTable {
   private final BinaryOperator mDecrementOperator;
   private final UnaryOperator mUnaryMinusOperator;
   private final BinaryOperator mRangeOperator;
+  private final UnaryOperator mUnaryNextOperator;
   private final Map<BinaryOperator,BinaryOperator> mComplementMap;
 
 
@@ -1655,11 +1742,13 @@ public class CompilerOperatorTable extends AbstractOperatorTable {
   private static final String OPNAME_AND = "&";
   private static final String OPNAME_OR = "|";
   private static final String OPNAME_NOT = "!";
+  private static final String OPNAME_NEXT = "'";
   private static final String OPNAME_INCREMENT = "+=";
   private static final String OPNAME_DECREMENT = "-=";
   private static final String OPNAME_ASSIGNMENT = "=";
 
   private static final int PRIORITY_QUAL = 100;
+  private static final int PRIORITY_NEXT = 95;
   private static final int PRIORITY_UNARY = 90;
   private static final int PRIORITY_TIMES = 80;
   private static final int PRIORITY_PLUS = 70;

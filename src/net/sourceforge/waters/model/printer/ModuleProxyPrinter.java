@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.printer
 //# CLASS:   ModuleProxyPrinter
 //###########################################################################
-//# $Id: ModuleProxyPrinter.java,v 1.16 2008-02-15 07:31:49 robi Exp $
+//# $Id: ModuleProxyPrinter.java,v 1.17 2008-06-29 04:01:44 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.printer;
@@ -600,27 +600,33 @@ public class ModuleProxyPrinter
     return null;
   }
 
-  public Object visitUnaryExpressionProxy
-      (final UnaryExpressionProxy proxy)
+  public Object visitUnaryExpressionProxy(final UnaryExpressionProxy expr)
     throws VisitorException
   {
-    final String text = proxy.getPlainText();
+    final String text = expr.getPlainText();
     if (text != null) {
       print(text);
     } else {
       final int savedPriority = mPriority; 
       final boolean savedAssocBraces = mAssocBraces;
       try {
-        final UnaryOperator operator = proxy.getOperator();
+        final UnaryOperator operator = expr.getOperator();
+        final boolean prefix = operator.isPrefix();
+        final String opname = operator.getName();
         mPriority = operator.getPriority();
         final boolean needBraces = (mPriority < savedPriority);
         if (needBraces) {
           print('(');
         }
         mAssocBraces = false;
-        print(operator.getName());
-        final SimpleExpressionProxy subTerm = proxy.getSubTerm();
+        if (prefix) {
+          print(opname);
+        }
+        final SimpleExpressionProxy subTerm = expr.getSubTerm();
         subTerm.acceptVisitor(this);
+        if (!prefix) {
+          print(opname);
+        }
         if (needBraces) {
           print(')');
         }
