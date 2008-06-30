@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.analysis
 //# CLASS:   AbstractControllabilityCheckerTest
 //###########################################################################
-//# $Id: AbstractControllabilityCheckerTest.java,v 1.13 2007-11-02 00:30:37 robi Exp $
+//# $Id: AbstractControllabilityCheckerTest.java,v 1.14 2008-06-30 21:05:32 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.analysis;
@@ -71,7 +71,7 @@ public abstract class AbstractControllabilityCheckerTest
   {
     try {
       final ModelVerifier verifier = getModelVerifier();
-      verifier.setNodeLimit(3);
+      verifier.setNodeLimit(2);
       testBigFactory();
       fail("Expected overflow not caught!");
     } catch (final OverflowException exception) {

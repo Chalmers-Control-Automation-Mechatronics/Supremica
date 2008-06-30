@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.analysis.modular
 //# CLASS:   Projection2
 //###########################################################################
-//# $Id: Projection2.java,v 1.4 2008-06-30 04:35:45 robi Exp $
+//# $Id: Projection2.java,v 1.5 2008-06-30 21:05:32 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.analysis.modular;
@@ -55,8 +55,6 @@ public class Projection2
     mDisabled = new HashSet<EventProxy>(mModel.getEvents());
     mDisabled.remove(mHide);
     numStates = 1;
-    //System.out.println("hide:" + hide);
-    //System.out.println("forbidden;" + forbidden);
   }
 
   public void setNodeLimit(int stateLimit)
@@ -127,7 +125,6 @@ public class Projection2
       }
       assert(l == aut[i].getStates().size());
       for (TransitionProxy t : aut[i].getTransitions()) {
-        //System.out.println(transitions[i][eventToIndex.get(t.getEvent()));
         transitions[i][eventToIndex.get(t.getEvent())]
                    [stateMap.get(t.getSource())] = stateMap.get(t.getTarget());
       }
@@ -164,13 +161,10 @@ public class Projection2
     unvisited.offer(currentState);
     while (!unvisited.isEmpty()) {
       currentState = unvisited.take();
-      //System.out.println(Arrays.toString(currentState));
-      //explore(currentState, true);
       if (!explore(currentState, true)) {
         explore(currentState, false);
       }
     }
-    //System.out.println("Composition:" + states.values().size());
     mCompositionSize = states.values().size();
     states = null;
     currentState = new int[] {0};
@@ -201,17 +195,16 @@ public class Projection2
     for (AutomatonProxy a : mModel.getAutomata()) {
       name.append(a.getName());
     }
-    AutomatonProxy result = mFactory.createAutomatonProxy(name.toString(),
-                                                          ComponentKind.PLANT,
-                                                          ev, newStates.values(),
-                                                          trans);
+    AutomatonProxy result =
+      mFactory.createAutomatonProxy(name.toString(), ComponentKind.PLANT,
+                                    ev, newStates.values(), trans);
     newStates = null;
     trans = null;
     final Minimizer min = new Minimizer(result, mFactory);
     result = min.run();
     return result;
   }
-  
+
   public boolean explore(int[] state, boolean forbidden)
     throws OverflowException
   {
@@ -254,7 +247,6 @@ public class Projection2
       result = true;
       mDisabled.remove(events[i]);
       Integer target = states.get(suc);
-      //System.out.println("suc:" + Arrays.toString(suc) + "targ:" + target);
       if (target == null) {
         target = numStates;
         states.put(suc, target);
@@ -268,7 +260,7 @@ public class Projection2
     }
     return result;
   }
-  
+
   public boolean explore2(int[] state, boolean forbidden)
     throws OverflowException
   {

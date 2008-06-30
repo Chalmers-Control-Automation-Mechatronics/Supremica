@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.analysis.modular
 //# CLASS:   Minimizer
 //###########################################################################
-//# $Id: Minimizer.java,v 1.3 2007-08-19 03:23:47 siw4 Exp $
+//# $Id: Minimizer.java,v 1.4 2008-06-30 21:05:32 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.analysis.modular;
@@ -201,16 +201,13 @@ public class Minimizer
           }
         }
       }
-      minAut = mFactory.createAutomatonProxy(mAutomaton.getName(),
-                                             mAutomaton.getKind(),
-                                             mAutomaton.getEvents(), states,
-                                             transitions);
+      return mFactory.createAutomatonProxy(mAutomaton.getName(),
+                                           mAutomaton.getKind(),
+                                           mAutomaton.getEvents(), states,
+                                           transitions);
+    } else {
+      return mAutomaton;
     }
-    else {
-      minAut = mAutomaton;
-    }
-    System.out.println("Minimized:" + minAut.getStates().size());
-    return minAut;
   }
   
   private void partition()
