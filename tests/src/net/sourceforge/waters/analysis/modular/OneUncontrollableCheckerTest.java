@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.analysis.modular
 //# CLASS:   ModularLanguageInclusionCheckerTest
 //###########################################################################
-//# $Id: OneUncontrollableCheckerTest.java,v 1.2 2007-01-03 00:49:08 robi Exp $
+//# $Id: OneUncontrollableCheckerTest.java,v 1.3 2008-06-30 01:50:57 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.analysis.modular;
@@ -14,12 +14,12 @@ import junit.framework.TestSuite;
 
 import net.sourceforge.waters.cpp.analysis.NativeControllabilityChecker;
 import net.sourceforge.waters.model.analysis.
-       AbstractLargeControllabilityCheckerTest;
+       AbstractControllabilityCheckerTest;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 
 
 public class OneUncontrollableCheckerTest
-  extends AbstractLargeControllabilityCheckerTest
+  extends AbstractControllabilityCheckerTest
 {
 
   //#########################################################################
@@ -43,10 +43,11 @@ public class OneUncontrollableCheckerTest
   {
     return new OneUncontrollableChecker
       (null, factory,
-       new ModularControllabilityChecker(null, factory,
-                                         new NativeControllabilityChecker(null, factory),
-                                         new MaxCommonEventsHeuristic(HeuristicType.NOPREF),
-                                         false));
+       new ModularControllabilityChecker
+       (null, factory,
+        new NativeControllabilityChecker(null, factory),
+        new MaxCommonEventsHeuristic(HeuristicType.NOPREF),
+        false));
   }
 
 }

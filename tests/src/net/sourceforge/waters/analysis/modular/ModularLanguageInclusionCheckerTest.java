@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.analysis.modular
 //# CLASS:   ModularLanguageInclusionCheckerTest
 //###########################################################################
-//# $Id: ModularLanguageInclusionCheckerTest.java,v 1.5 2007-07-12 05:18:30 siw4 Exp $
+//# $Id: ModularLanguageInclusionCheckerTest.java,v 1.6 2008-06-30 01:50:57 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.analysis.modular;
@@ -14,12 +14,12 @@ import junit.framework.TestSuite;
 
 import net.sourceforge.waters.cpp.analysis.NativeControllabilityChecker;
 import net.sourceforge.waters.model.analysis.
-       AbstractLargeLanguageInclusionCheckerTest;
+       AbstractLanguageInclusionCheckerTest;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 
 
 public class ModularLanguageInclusionCheckerTest
-  extends AbstractLargeLanguageInclusionCheckerTest
+  extends AbstractLanguageInclusionCheckerTest
 {
 
   //#########################################################################
@@ -61,8 +61,7 @@ public class ModularLanguageInclusionCheckerTest
     return new ModularLanguageInclusionChecker(
        null, factory,
        createControllabilityChecker(factory),
-       new MaxCommonEventsHeuristic(HeuristicType.PREFERREALPLANT)
-       );
+       new MaxCommonEventsHeuristic(HeuristicType.PREFERREALPLANT));
   }
 
 }

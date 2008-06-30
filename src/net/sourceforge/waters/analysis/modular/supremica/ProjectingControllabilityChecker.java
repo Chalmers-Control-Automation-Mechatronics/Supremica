@@ -4,28 +4,31 @@
 //# PACKAGE: net.sourceforge.waters.analysis.modular
 //# CLASS:   ProjectingControllabilityChecker
 //###########################################################################
-//# $Id: ProjectingControllabilityChecker.java,v 1.19 2008-06-29 22:49:20 robi Exp $
+//# $Id: ProjectingControllabilityChecker.java,v 1.20 2008-06-30 01:50:57 robi Exp $
 //###########################################################################
 
 
 package net.sourceforge.waters.analysis.modular.supremica;
 
-import org.supremica.log.Logger;
-import org.supremica.log.LoggerFactory;
+import java.lang.Comparable;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.PriorityQueue;
 import java.util.Queue;
 import java.util.Set;
+import java.util.SortedMap;
 import java.util.SortedSet;
 import java.util.Stack;
+import java.util.TreeMap;
 import java.util.TreeSet;
 
 import net.sourceforge.waters.analysis.modular.*;
@@ -43,15 +46,13 @@ import net.sourceforge.waters.model.des.SafetyTraceProxy;
 import net.sourceforge.waters.model.des.StateProxy;
 import net.sourceforge.waters.model.des.TraceProxy;
 import net.sourceforge.waters.model.des.TransitionProxy;
-import net.sourceforge.waters.model.marshaller.DocumentManager;
+import net.sourceforge.waters.model.unchecked.Casting;
 import net.sourceforge.waters.xsd.base.ComponentKind;
 import net.sourceforge.waters.xsd.base.EventKind;
 
-import java.util.Arrays;
-import java.util.Iterator;
-import java.util.SortedMap;
-import java.util.TreeMap;
-import java.lang.Comparable;
+import org.supremica.log.Logger;
+import org.supremica.log.LoggerFactory;
+
 
 public class ProjectingControllabilityChecker
   extends AbstractModelVerifier
@@ -179,8 +180,6 @@ public class ProjectingControllabilityChecker
           }
         }
       }
-      //System.out.println("numAutomata:" + automata.size());
-//      int numAutomata = numoccuring.firstKey().size();
       Set<Tuple> possible = new TreeSet<Tuple>();
       boolean stop = true;
       sets:
@@ -265,13 +264,6 @@ public class ProjectingControllabilityChecker
   public boolean run()
     throws AnalysisException
   {
-    System.out.println(getNodeLimit());
-    return run1();
-  }
-  
-  public boolean run1()
-    throws AnalysisException
-  {
     //LOGGER.debug("ProjectingControllabilityChecker: STARTING on " +
     //             getModel().getName());
     mStates = 0;
@@ -324,7 +316,7 @@ public class ProjectingControllabilityChecker
       Object[] array = convertSpec(origspec);
       final AutomatonProxy spec = (AutomatonProxy) array[1];
       AutomatonProxy plant = (AutomatonProxy) array[0];
-      Map<EventProxy, EventProxy> uncont = (Map<EventProxy, EventProxy>)array[2];
+      final Map<EventProxy,EventProxy> uncont = Casting.toMap((Map) array[2]);
       forbiddenEvents.clear();
       forbiddenEvents.addAll(spec.getEvents());
       for (AutomatonProxy a : plants) {
@@ -369,15 +361,9 @@ public class ProjectingControllabilityChecker
                           uncomposedspecplants,
                           uncomposedspecs,
                           counter,
-                          translator
-                          /*getKindTranslator()*/);
+                          translator);
         if (newComp == null) {
-          List<EventProxy> e = counter.getEvents();
-          counter = getFactory().createSafetyTraceProxy(getModel().getName(),
-                                                        getModel(),
-                                                        e.subList(0, e.size() - 1));
-          setFailedResult(counter);
-          return false;
+          return setFailedResult(counter, uncont);
         }
         for (AutomatonProxy automaton : newComp) {
           uncomposedplants.remove(automaton);
@@ -389,35 +375,16 @@ public class ProjectingControllabilityChecker
         comp = getFactory().createProductDESProxy("comp", events, composition);
         proj = project(comp, forbiddenEvents);
         mChecker.setModel(proj == null ? comp : proj.getModel());
-        //System.out.println(mChecker.getModel());
       }
       mStates += mChecker.getAnalysisResult().getTotalNumberOfStates();
-      /*specs.removeAll(composition);
-      plants.addAll(composition);*/
-      System.out.println("Comp");
-      for (AutomatonProxy aut : composition) {
-        System.out.println(aut.getName());
-      }
       specs.remove(origspec);
       specplants.add(origspec);
-      /*for (AutomatonProxy automaton : composition) {
-        if (specs.contains(automaton)) {
-          //System.out.println(mChecker.getAnalysisResult().getTotalNumberOfStates() + " " + automaton.getName() + " size " + automaton.getStates().size());
-          specs.remove(automaton);
-          specplants.remove(getplant.get(automaton));
-          specplants.add(getorig.get(automaton));
-        }*/
-        /*if (specplants.contains(automaton) || specs.contains(automaton)) {
-          thing.append(automaton.getName());
-          thing.append(',');
-        }*/
-      //}
-      //System.out.println(thing);
     }
     setSatisfiedResult();
     return true;
   }
-  
+
+  /*  
   public boolean run2()
     throws AnalysisException
   {
@@ -443,7 +410,7 @@ public class ProjectingControllabilityChecker
       AutomatonProxy spec = (AutomatonProxy) array[1];
       specs.add(spec);
       AutomatonProxy plant = (AutomatonProxy) array[0];
-      Map<EventProxy, EventProxy> uncont = (Map<EventProxy, EventProxy>)array[2];
+      final Map<EventProxy,EventProxy> uncont = Casting.toMap((Map) array[2]);
       Set<AutomatonProxy> newplants = new HashSet<AutomatonProxy>(plants.size());
       for (AutomatonProxy p : plants) {
         newplants.add(convertPlant(p, uncont));
@@ -492,12 +459,51 @@ public class ProjectingControllabilityChecker
       return false;
     }
   }
+  */
+
   
-  protected void addStatistics(VerificationResult result)
+  //#########################################################################
+  //# Overrides for Abstract Base Class
+  //# net.sourceforge.waters.model.analysis.AbstractModelVerifier
+  protected void addStatistics(final VerificationResult result)
   {
     result.setNumberOfStates(mStates);
   }
+
+
+  //#########################################################################
+  //# Auxiliary Methods
+  protected boolean setFailedResult(final TraceProxy counterexample,
+                                    final Map<EventProxy,EventProxy> uncont)
+  {
+    final ProductDESProxyFactory factory = getFactory();
+    final ProductDESProxy des = getModel();
+    final String desname = des.getName();
+    final String tracename = desname + ":uncontrollable";
+    final List<EventProxy> events = counterexample.getEvents();
+    final int len = events.size();
+    final List<EventProxy> modevents = new ArrayList<EventProxy>(len);
+    final Iterator<EventProxy> iter = events.iterator();
+    EventProxy event = iter.next();
+    while (iter.hasNext()) {
+      modevents.add(event);
+      event = iter.next();
+    }
+    for (final Map.Entry<EventProxy,EventProxy> entry : uncont.entrySet()) {
+      if (entry.getValue() == event) {
+        final EventProxy key = entry.getKey();
+        modevents.add(key);
+        break;
+      }
+    }
+    final SafetyTraceProxy wrapper =
+      factory.createSafetyTraceProxy(tracename, des, modevents);
+    return super.setFailedResult(wrapper);
+  }
   
+
+  //#########################################################################
+  //# Inner Class AutomatonComparator
   private final static class AutomatonComparator
     implements Comparator<AutomatonProxy>
   {

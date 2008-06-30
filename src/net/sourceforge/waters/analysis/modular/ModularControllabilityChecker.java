@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.analysis.modular
 //# CLASS:   ModularControllabilityChecker
 //###########################################################################
-//# $Id: ModularControllabilityChecker.java,v 1.14 2007-11-02 00:30:37 robi Exp $
+//# $Id: ModularControllabilityChecker.java,v 1.15 2008-06-30 01:50:57 robi Exp $
 //###########################################################################
 
 
@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
@@ -29,6 +30,8 @@ import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 import net.sourceforge.waters.model.des.SafetyTraceProxy;
+import net.sourceforge.waters.model.des.TraceProxy;
+import net.sourceforge.waters.model.des.TraceStepProxy;
 import net.sourceforge.waters.xsd.base.ComponentKind;
 import net.sourceforge.waters.xsd.base.EventKind;
 
@@ -121,7 +124,8 @@ public class ModularControllabilityChecker
       composition.add(spec);
       events.addAll(spec.getEvents());
       uncomposedspecs.remove(spec);
-      ProductDESProxy comp = getFactory().createProductDESProxy("comp", events, composition);
+      ProductDESProxy comp =
+        getFactory().createProductDESProxy("comp", events, composition);
       mChecker.setModel(comp);
       mChecker.setKindTranslator(new KindTranslator()
       {
@@ -138,7 +142,6 @@ public class ModularControllabilityChecker
       });
       while (!mChecker.run()) {
         mStates += mChecker.getAnalysisResult().getTotalNumberOfStates();
-        System.out.println("states:"+mStates);
         Collection<AutomatonProxy> newComp =
           mHeuristic.heur(comp,
                           uncomposedplants,
@@ -161,30 +164,43 @@ public class ModularControllabilityChecker
         mChecker.setModel(comp);
       }
       mStates += mChecker.getAnalysisResult().getTotalNumberOfStates();
-      /*specs.removeAll(composition);
-      plants.addAll(composition);*/
       for (AutomatonProxy automaton : composition) {
         if (specs.contains(automaton)) {
-          //System.out.println(mChecker.getAnalysisResult().getTotalNumberOfStates() + " " + automaton.getName() + " size " + automaton.getStates().size());
           specs.remove(automaton);
           specplants.add(automaton);
         }
-        /*if (specplants.contains(automaton) || specs.contains(automaton)) {
-          thing.append(automaton.getName());
-          thing.append(',');
-        }*/
       }
-      //System.out.println(thing);
     }
     setSatisfiedResult();
     return true;
+  }
+
+
+  //#########################################################################
+  //# Overrides for Abstract Base Class
+  //# net.sourceforge.waters.model.analysis.AbstractModelVerifier
+  protected boolean setFailedResult(final TraceProxy counterexample)
+  {
+    final ProductDESProxyFactory factory = getFactory();
+    final ProductDESProxy des = getModel();
+    final String desname = des.getName();
+    final String tracename = desname + ":uncontrollable";
+    final Collection<AutomatonProxy> automata = counterexample.getAutomata();
+    final List<TraceStepProxy> steps = counterexample.getTraceSteps();
+    final SafetyTraceProxy wrapper =
+      factory.createSafetyTraceProxy(tracename, null, null,
+                                     des, automata, steps);
+    return super.setFailedResult(wrapper);
   }
   
   protected void addStatistics(VerificationResult result)
   {
     result.setNumberOfStates(mStates);
   }
+
   
+  //#########################################################################
+  //# Inner Class AutomatonComparator
   private final static class AutomatonComparator
     implements Comparator<AutomatonProxy>
   {

@@ -152,8 +152,6 @@
       <include name="net/sourceforge/waters/**/*.java"/>
        <exclude name="net/sourceforge/waters/gui/**/*.java"/>
       <exclude name="net/sourceforge/waters/mbt/**/*.java"/>
-      <exclude
-          name="net/sourceforge/waters/analysis/modular/supremica/*.java"/>
       <exclude name="net/sourceforge/waters/model/unchecked/**/*.java"/>
       <include name="org/supremica/log/**/*.java"/>
       <!-- Don't really want to depend on org.supremica.automata -->
@@ -267,8 +265,7 @@
     <mkdir dir="${test.classes}"/>
     <javac srcdir="${supremica.testsrc}" destdir="${test.classes}" 
            includes="net/sourceforge/waters/**/*.java"
-           excludes="net/sourceforge/waters/gui/**/*.java
-                 net/sourceforge/waters/analysis/modular/supremica/**/*.java"
+           excludes="net/sourceforge/waters/gui/**/*.java"
            debug="${debug}" debuglevel="${debuglevel}" optimize="${optimize}">
       <classpath>
         <path refid="waters.compile.classpath"/>
@@ -297,8 +294,7 @@
         <fileset dir="${supremica.testsrc}">
           <include name="net/sourceforge/waters/**/*Test.java"/>
           <exclude name="net/sourceforge/waters/gui/**/*.java"/>
-          <exclude name="net/sourceforge/waters/analysis/modular/**/*.java"/>
-          <exclude name="**/*Heuristic*.java"/>
+          <exclude name="net/sourceforge/waters/analysis/**/*HeuristicTest.java"/>
           <exclude name="**/Abstract*.java"/>
           <exclude name="**/Native*.java"/>
         </fileset>

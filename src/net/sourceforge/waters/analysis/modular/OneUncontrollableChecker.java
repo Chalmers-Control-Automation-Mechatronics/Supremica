@@ -4,29 +4,30 @@
 //# PACKAGE: net.sourceforge.waters.analysis.modular
 //# CLASS:   ModularLanguageInclusionChecker
 //###########################################################################
-//# $Id: OneUncontrollableChecker.java,v 1.6 2007-11-02 00:30:37 robi Exp $
+//# $Id: OneUncontrollableChecker.java,v 1.7 2008-06-30 01:50:57 robi Exp $
 //###########################################################################
 
 
 package net.sourceforge.waters.analysis.modular;
 
-import net.sourceforge.waters.model.analysis.VerificationResult;
-import net.sourceforge.waters.model.analysis.AnalysisException;
-import java.util.Comparator;
-import net.sourceforge.waters.model.analysis.ControllabilityKindTranslator;
-import net.sourceforge.waters.model.des.EventProxy;
-import net.sourceforge.waters.xsd.base.EventKind;
-import java.util.Collections;
-import net.sourceforge.waters.xsd.base.ComponentKind;
-import java.util.List;
 import java.util.ArrayList;
-import net.sourceforge.waters.model.des.AutomatonProxy;
-import net.sourceforge.waters.model.analysis.ControllabilityChecker;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+
 import net.sourceforge.waters.model.analysis.AbstractModelVerifier;
+import net.sourceforge.waters.model.analysis.AnalysisException;
+import net.sourceforge.waters.model.analysis.ControllabilityChecker;
+import net.sourceforge.waters.model.analysis.ControllabilityKindTranslator;
 import net.sourceforge.waters.model.analysis.KindTranslator;
-import net.sourceforge.waters.model.des.SafetyTraceProxy;
-import net.sourceforge.waters.model.des.ProductDESProxyFactory;
+import net.sourceforge.waters.model.analysis.VerificationResult;
+import net.sourceforge.waters.model.des.AutomatonProxy;
+import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
+import net.sourceforge.waters.model.des.ProductDESProxyFactory;
+import net.sourceforge.waters.model.des.SafetyTraceProxy;
+import net.sourceforge.waters.xsd.base.ComponentKind;
+import net.sourceforge.waters.xsd.base.EventKind;
 
 
 public class OneUncontrollableChecker
@@ -68,17 +69,14 @@ public class OneUncontrollableChecker
   {
     mStates = 0;
     List<EventProxy> uncontrollables = new ArrayList<EventProxy>();
-    for (EventProxy event : getModel().getEvents()) {
-      if (getKindTranslator().getEventKind(event)
-          == EventKind.UNCONTROLLABLE) {
+    for (final EventProxy event : getModel().getEvents()) {
+      if (getKindTranslator().getEventKind(event) ==
+          EventKind.UNCONTROLLABLE) {
         uncontrollables.add(event);
       }
     }
     Collections.sort(uncontrollables, new EventComparator());
     for (final EventProxy event : uncontrollables) {
-      /*if (!event.getName().equals("HOST__read__app_FV_active[0]")) {
-        continue;
-      }*/
       mChecker.setModel(getModel());
       mChecker.setKindTranslator(new KindTranslator()
       {
@@ -90,10 +88,8 @@ public class OneUncontrollableChecker
         
         public ComponentKind getComponentKind(AutomatonProxy a)
         {
-          if (getKindTranslator().getComponentKind(a)
-              == ComponentKind.SPEC)
-          {
-            if (!a.getEvents().contains(event)/* && !a.getName().equals("HOST__read__app_FV_active[0]")*/) {
+          if (getKindTranslator().getComponentKind(a) == ComponentKind.SPEC) {
+            if (!a.getEvents().contains(event)) {
               return ComponentKind.PLANT;
             }
           }
@@ -101,19 +97,16 @@ public class OneUncontrollableChecker
         }
       });
       mChecker.setNodeLimit(getNodeLimit()/* - mStates*/);
-      try {
-        if (!mChecker.run()) {
-          System.out.println(event.getName() + " uncontrollable");
-          mStates += mChecker.getAnalysisResult().getTotalNumberOfStates();
-          setFailedResult(mChecker.getCounterExample());
-          return false;
-        }
-        System.out.println(event.getName() + " succeeded in " + mChecker.getAnalysisResult().getTotalNumberOfStates());
+      if (!mChecker.run()) {
+        // System.out.println(event.getName() + " uncontrollable");
         mStates += mChecker.getAnalysisResult().getTotalNumberOfStates();
-      } catch (AnalysisException a) {
-        System.out.println(event.getName() + " failed");
-        throw a;
+        setFailedResult(mChecker.getCounterExample());
+        return false;
       }
+      // System.out.println(event.getName() + " succeeded in " +
+      //                    mChecker.getAnalysisResult().
+      //                    getTotalNumberOfStates());
+      mStates += mChecker.getAnalysisResult().getTotalNumberOfStates();
     }
     setSatisfiedResult();
     return true;

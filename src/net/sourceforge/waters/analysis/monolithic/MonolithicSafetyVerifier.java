@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.analysis.monolithic
 //# CLASS:   MonolithicSafetyVerifier
 //###########################################################################
-//# $Id: MonolithicSafetyVerifier.java,v 1.11 2007-11-02 00:30:37 robi Exp $
+//# $Id: MonolithicSafetyVerifier.java,v 1.12 2008-06-30 01:50:57 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.analysis.monolithic;
@@ -444,8 +444,6 @@ public class MonolithicSafetyVerifier
    */
   private SafetyTraceProxy computeCounterExample()
   {
-    // The following creates a trace that consists of all the events in
-    // the input model.
     final ProductDESProxyFactory factory = getFactory();
     final ProductDESProxy des = getModel();
     final String desname = des.getName();

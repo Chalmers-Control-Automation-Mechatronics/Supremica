@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.analysis.modular.supremica
 //# CLASS:   ProjectingLanguageInclusionCheckerTest
 //###########################################################################
-//# $Id: ProjectingLanguageInclusionCheckerTest.java,v 1.2 2007-07-12 05:18:30 siw4 Exp $
+//# $Id: ProjectingLanguageInclusionCheckerTest.java,v 1.3 2008-06-30 01:50:57 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.analysis.modular.supremica;
@@ -19,14 +19,14 @@ import junit.framework.TestSuite;
 import net.sourceforge.waters.analysis.modular.supremica.
        ProjectingModelVerifierFactory;
 import net.sourceforge.waters.model.analysis.
-       AbstractLargeLanguageInclusionCheckerTest;
+       AbstractLanguageInclusionCheckerTest;
 import net.sourceforge.waters.model.analysis.LanguageInclusionChecker;
 import net.sourceforge.waters.model.analysis.ModelVerifierFactory;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 
 
 public class ProjectingLanguageInclusionCheckerTest
-  extends AbstractLargeLanguageInclusionCheckerTest
+  extends AbstractLanguageInclusionCheckerTest
 {
 
   //#########################################################################
@@ -72,7 +72,6 @@ public class ProjectingLanguageInclusionCheckerTest
     return new ModularLanguageInclusionChecker(
        null, factory,
        createControllabilityChecker(factory),
-       new MaxCommonEventsHeuristic(HeuristicType.PREFERREALPLANT)
-       );
+       new MaxCommonEventsHeuristic(HeuristicType.PREFERREALPLANT));
   }
 }

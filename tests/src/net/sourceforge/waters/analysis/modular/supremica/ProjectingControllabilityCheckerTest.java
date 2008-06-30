@@ -1,10 +1,10 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
 //# PROJECT: Waters
-//# PACKAGE: net.sourceforge.waters.analysis.monolithic
+//# PACKAGE: net.sourceforge.waters.analysis.modular.supremica
 //# CLASS:   ProjectingControllabilityCheckerTest
 //###########################################################################
-//# $Id: ProjectingControllabilityCheckerTest.java,v 1.2 2007-05-28 01:13:19 siw4 Exp $
+//# $Id: ProjectingControllabilityCheckerTest.java,v 1.3 2008-06-30 01:50:57 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.analysis.modular.supremica;
@@ -16,8 +16,6 @@ import net.sourceforge.waters.analysis.modular.HeuristicType;
 import net.sourceforge.waters.analysis.modular.MaxCommonEventsHeuristic;
 import net.sourceforge.waters.cpp.analysis.NativeControllabilityChecker;
 import net.sourceforge.waters.model.analysis.
-  AbstractLargeControllabilityCheckerTest;
-import net.sourceforge.waters.model.analysis.
   AbstractControllabilityCheckerTest;
 import net.sourceforge.waters.model.analysis.ControllabilityChecker;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
@@ -25,12 +23,13 @@ import net.sourceforge.waters.analysis.monolithic.MonolithicControllabilityCheck
 
 
 public class ProjectingControllabilityCheckerTest
-  extends AbstractLargeControllabilityCheckerTest
+  extends AbstractControllabilityCheckerTest
 {
 
   //#########################################################################
   //# Entry points in junit.framework.TestCase
-  public static Test suite() {
+  public static Test suite()
+  {
     TestSuite testSuite =
       new TestSuite(ProjectingControllabilityCheckerTest.class);
     return testSuite;
@@ -49,8 +48,9 @@ public class ProjectingControllabilityCheckerTest
   {
     return
       new ProjectingControllabilityChecker
-            (null, factory,
-             new MonolithicControllabilityChecker(factory),
-             new MaxCommonEventsHeuristic(HeuristicType.PREFERREALPLANT), false);
+      (null, factory,
+       new MonolithicControllabilityChecker(factory),
+       new MaxCommonEventsHeuristic(HeuristicType.PREFERREALPLANT), false);
   }
+
 }

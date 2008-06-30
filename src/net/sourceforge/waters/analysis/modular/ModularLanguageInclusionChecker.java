@@ -4,13 +4,14 @@
 //# PACKAGE: net.sourceforge.waters.analysis.modular
 //# CLASS:   ModularLanguageInclusionChecker
 //###########################################################################
-//# $Id: ModularLanguageInclusionChecker.java,v 1.12 2007-11-02 00:30:37 robi Exp $
+//# $Id: ModularLanguageInclusionChecker.java,v 1.13 2008-06-30 01:50:57 robi Exp $
 //###########################################################################
 
 
 package net.sourceforge.waters.analysis.modular;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashSet;
@@ -29,6 +30,8 @@ import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 import net.sourceforge.waters.model.des.SafetyTraceProxy;
+import net.sourceforge.waters.model.des.TraceProxy;
+import net.sourceforge.waters.model.des.TraceStepProxy;
 import net.sourceforge.waters.xsd.base.ComponentKind;
 import net.sourceforge.waters.xsd.base.EventKind;
 
@@ -85,33 +88,6 @@ public class ModularLanguageInclusionChecker
       }
     }
     Collections.sort(properties, new AutomatonComparator());
-    /*for (final AutomatonProxy automaton : properties) {
-      automata.add(automaton);
-      ProductDESProxy model = 
-        getFactory().createProductDESProxy("prop", getModel().getEvents(),
-                                           automata);
-      checker.setModel(model);
-      checker.setKindTranslator(new KindTranslator()
-      {
-        public EventKind getEventKind(EventProxy e)
-        {
-          return EventKind.UNCONTROLLABLE;
-        }
-        
-        public ComponentKind getComponentKind(AutomatonProxy a)
-        {
-          return a.equals(automaton) ? ComponentKind.SPEC : ComponentKind.PLANT;
-        }
-      });
-      automata.remove(automaton);
-      checker.setNodeLimit(getNodeLimit() - mStates);
-      if (!checker.run()) {
-        mStates += checker.getAnalysisResult().getTotalNumberOfStates();
-        setFailedResult(mChecker.getCounterExample());
-        return false;
-      }
-      mStates += checker.getAnalysisResult().getTotalNumberOfStates();
-    }*/
     for (AutomatonProxy p : properties) {
       automata.add(p);
       ProductDESProxy model = 
@@ -133,8 +109,7 @@ public class ModularLanguageInclusionChecker
       mChecker.setNodeLimit(getNodeLimit() - mStates);
       if (!mChecker.run()) {
         mStates += mChecker.getAnalysisResult().getTotalNumberOfStates();
-        setFailedResult(mChecker.getCounterExample());
-        return false;
+        return setFailedResult(mChecker.getCounterExample(), p);
       }
       mStates += mChecker.getAnalysisResult().getTotalNumberOfStates();
       automata.remove(p);
@@ -146,7 +121,30 @@ public class ModularLanguageInclusionChecker
   protected void addStatistics(VerificationResult result)
   {
     result.setNumberOfStates(mStates);
-  }  
+  } 
+
+
+  //#########################################################################
+  //# Auxiliary Methods
+  private boolean setFailedResult(final TraceProxy counterexample,
+                                  final AutomatonProxy property)
+  {
+    final ProductDESProxyFactory factory = getFactory();
+    final ProductDESProxy des = getModel();
+    final String desname = des.getName();
+    final String propname = property.getName();
+    final String tracename = desname + ":" + propname;
+    final Collection<AutomatonProxy> automata = counterexample.getAutomata();
+    final List<TraceStepProxy> steps = counterexample.getTraceSteps();
+    final SafetyTraceProxy wrapper =
+      factory.createSafetyTraceProxy(tracename, null, null,
+                                     des, automata, steps);
+    return setFailedResult(wrapper);
+  }
+
+
+  //#########################################################################
+  //# Inner Class AutomatonComparator
   private final static class AutomatonComparator
     implements Comparator<AutomatonProxy>
   {
