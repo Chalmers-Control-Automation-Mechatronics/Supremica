@@ -1,6 +1,13 @@
-package net.sourceforge.waters.analysis.modular;
+//# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
+//###########################################################################
+//# PROJECT: Waters
+//# PACKAGE: net.sourceforge.waters.analysis.modular
+//# CLASS:   Projection2
+//###########################################################################
+//# $Id: Projection2.java,v 1.4 2008-06-30 04:35:45 robi Exp $
+//###########################################################################
 
-import net.sourceforge.waters.xsd.base.ComponentKind;
+package net.sourceforge.waters.analysis.modular;
 
 import java.util.AbstractMap;
 import java.util.ArrayList;
@@ -16,6 +23,8 @@ import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
+import net.sourceforge.waters.model.analysis.AnalysisException;
+import net.sourceforge.waters.model.analysis.OverflowException;
 import net.sourceforge.waters.model.base.NamedProxy;
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.base.ProxyTools;
@@ -28,6 +37,8 @@ import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 import net.sourceforge.waters.model.des.ProductDESProxyVisitor;
 import net.sourceforge.waters.model.des.StateProxy;
 import net.sourceforge.waters.model.des.TransitionProxy;
+
+import net.sourceforge.waters.xsd.base.ComponentKind;
 
 
 public class Projection2
@@ -54,7 +65,7 @@ public class Projection2
   }
   
   public AutomatonProxy project()
-    throws Exception
+    throws AnalysisException
   {
     states = new IntMap(mNodeLimit);
     trans = new ArrayList<TransitionProxy>();
@@ -196,25 +207,13 @@ public class Projection2
                                                           trans);
     newStates = null;
     trans = null;
-    //System.out.println("Project:" + result.getStates().size());
-    //System.out.println("orig:\n" + result);
-    try {
-      Minimizer min = new Minimizer(result, mFactory);
-      result = min.run();
-    } catch (Throwable t) {
-      t.printStackTrace();
-      for (AutomatonProxy auto : mModel.getAutomata()) {
-        System.out.println(auto.getName());
-      }
-      /*System.exit(1);*/
-    }
-    //System.out.println("new:\n" + result);
-    //System.out.println("disabled:" + mDisabled);
+    final Minimizer min = new Minimizer(result, mFactory);
+    result = min.run();
     return result;
   }
   
   public boolean explore(int[] state, boolean forbidden)
-    throws Exception
+    throws OverflowException
   {
     boolean result = false;
     int numAutomata = transitions.length;
@@ -261,7 +260,7 @@ public class Projection2
         states.put(suc, target);
         numStates++;
         if (numStates > mNodeLimit * 10) {
-          throw new Exception("State Limit Exceeded");
+          throw new OverflowException(mNodeLimit * 10);
         }
         unvisited.offer(suc);
       }
@@ -271,7 +270,7 @@ public class Projection2
   }
   
   public boolean explore2(int[] state, boolean forbidden)
-    throws Exception
+    throws OverflowException
   {
     int min, max;
     if (forbidden) {
@@ -309,7 +308,7 @@ public class Projection2
         newStates.put(succ, target);
         numStates++;
         if (numStates > mNodeLimit) {
-          throw new Exception("State Limit Exceeded");
+          throw new OverflowException(mNodeLimit);
         }
         unvisited.offer(succ);
       }
@@ -409,7 +408,8 @@ public class Projection2
     public Object acceptVisitor(final ProxyVisitor visitor)
       throws VisitorException
     {
-      final ProductDESProxyVisitor desvisitor = (ProductDESProxyVisitor) visitor;
+      final ProductDESProxyVisitor desvisitor =
+	(ProductDESProxyVisitor) visitor;
       return desvisitor.visitStateProxy(this);
     }
 
