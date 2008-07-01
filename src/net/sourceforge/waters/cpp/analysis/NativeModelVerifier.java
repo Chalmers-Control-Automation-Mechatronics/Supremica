@@ -4,13 +4,14 @@
 //# PACKAGE: net.sourceforge.waters.cpp.analysis
 //# CLASS:   NativeModelVerifier
 //###########################################################################
-//# $Id: NativeModelVerifier.java,v 1.5 2006-11-17 03:38:22 robi Exp $
+//# $Id: NativeModelVerifier.java,v 1.6 2008-07-01 22:18:21 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.cpp.analysis;
 
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.ModelVerifier;
+import net.sourceforge.waters.model.analysis.OverflowException;
 import net.sourceforge.waters.model.analysis.VerificationResult;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
@@ -90,6 +91,39 @@ public abstract class NativeModelVerifier
   //#########################################################################
   //# Native Methods
   abstract VerificationResult runNativeAlgorithm() throws AnalysisException;
+
+
+  //#########################################################################
+  //# Auxiliary Methods
+  /*
+  private void dumpModel()
+  {
+    try {
+      final ProductDESProxy model = getModel();
+      // should also replace event and component kinds
+      // according to KindTranslator ...
+      final ProductDESProxyFactory factory = getFactory();
+      final net.sourceforge.waters.model.marshaller.
+        ProxyMarshaller<ProductDESProxy> marshaller =
+        new net.sourceforge.waters.model.marshaller.
+        JAXBProductDESMarshaller(factory);
+      final int code = model.hashCodeByContents();
+      final java.io.File file = new java.io.File("failed" + code + ".wdes");
+      marshaller.marshal(model, file);
+    } catch (final java.io.IOException exception) {
+      // ignore
+    } catch (final javax.xml.bind.JAXBException exception) {
+      // ignore
+    } catch (final org.xml.sax.SAXException exception) {
+      // ignore
+    } catch (final
+             net.sourceforge.waters.model.marshaller.WatersMarshalException
+             exception) {
+      // ignore
+    }
+  }
+  */
+
 
   //#########################################################################
   //# Data Members
