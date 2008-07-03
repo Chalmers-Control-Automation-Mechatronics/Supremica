@@ -1,0 +1,26 @@
+module R_TRIG(CLK, Q)
+{
+	# Variable declaration
+	input CLK : boolean;
+	CLK_previous : boolean;
+	M : boolean; 
+	M_previous : boolean; # last input value 
+	output Q : boolean;
+
+	# Initial Values
+#	init(M) := 0; # according to Lewis 1131-3 book
+#	init(M) := CLK; # To get correct initialization
+	init(M_previous) := CLK; # To get correct initialization
+##	init(CLK) := 0;
+	init(CLK_previous) := CLK;
+
+	# Model Code
+	Next(M_previous) := M;	
+	Next(CLK_previous) := CLK;	
+
+	Q := CLK & ~M_previous;
+	M := CLK;
+
+	# Specification 	
+	RisingEdge : assert G (CLK & ~CLK_previous <-> Q);
+}

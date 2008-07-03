@@ -63,7 +63,7 @@
 
 /**
  * The SMVModel class is used to store an SMV model of a RAC
- * including variables, assignments and specification.
+ * including main module and any used module.
  *
  *
  * Created: Mon Apr 14 14:48:39 2008
@@ -74,225 +74,159 @@
 package org.supremica.external.rac.verificationModel.smv;
 
 import org.supremica.external.rac.verificationModel.VerificationModel;
+import org.supremica.external.rac.SMVModelBuilder;
+import java.util.Set;
+import java.util.LinkedHashSet;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.LinkedHashMap;
+import java.io.*;
 
 public class SMVModel extends VerificationModel
 {
-    private String variableDeclaration;
-    private String initialValues;
-    private String expressions;
-    private String moduleHead;
-    private Map<String, Variable> inputMap;
-    private Map<String, Variable> internalVariableMap;
-    private Map<String, Variable> fbOutputVariableMap;
-    private Map<String, Variable> outputMap;
+    private Set<SMVModule> modules;
+    private Map<String, String> standardModulesNameToContentMap;
 
     public SMVModel()
     {
 	super();
-	inputMap = new LinkedHashMap<String, Variable>(4); //initial capacity 4 and default load factor (0.75)
-	internalVariableMap = new LinkedHashMap<String, Variable>(8);
-	fbOutputVariableMap = new LinkedHashMap<String, Variable>(8);
-	outputMap = new LinkedHashMap<String, Variable>(4);
-	variableDeclaration = 	" # Variable declaration\n";    
-	initialValues = 	"\n # Initial values\n";    
-	expressions = "\n # Model code\n"; 
-	moduleHead = "";
+	modules = new LinkedHashSet<SMVModule>(5); //initial capacity 5 and default load factor (0.75)
+	standardModulesNameToContentMap = new LinkedHashMap<String, String>(5); // -||-
+    }
+
+    // Add new module (if a module with the same name is not already included) and return true. 
+    // Return false if a module with the same name was already included
+    public boolean addNewModule(SMVModule newModule)
+    {
+	return modules.add(newModule);
     }
     
-    public void clear()
-    {
-	inputMap.clear();
-	internalVariableMap.clear();
-	fbOutputVariableMap.clear();
-	outputMap.clear();
-	variableDeclaration = 	" # Variable declaration\n";    
-	initialValues = 	"\n # Initial values\n";    
-	expressions = "\n # Model code\n"; 
-	moduleHead = "";
-    }
-
-    public void addInput(Variable input)
-    {
-	inputMap.put(input.name, input);
-    }
-    public void addInternalVariable(Variable variable)
-    {
-	internalVariableMap.put(variable.name, variable);
-    }
-
-    public String addFBOutputVariable()
-    {
-	String tempVariableName = "temp" + (fbOutputVariableMap.size()+1);
-	Variable var = new BooleanVariable(tempVariableName);
-	// (actual output may not be boolean, but it does not matter, since this variable is never used)
-	fbOutputVariableMap.put(tempVariableName, var);
-	return tempVariableName;
-    }
-
-    public void addOutput(Variable output)
-    {
-	outputMap.put(output.name, output);
-    }
-    public void addExpression(String expression)
-    {
-	expressions += " " + expression + ";\n";
-    }
-    
-    // Get the name of the latest representation (temporary variables are used inside the SMV model) 
-    // of this variable.
-    // Return null if variable not found.
-    public String getCurrentVariableName(String originalName)
-    {
-	Variable var = internalVariableMap.get(originalName);
-	if (var != null)
-	{
-	    return var.getName();
-	}
-	var = outputMap.get(originalName);
-	if (var != null)
-	{
-	    return var.getName();
-	}
-	var = inputMap.get(originalName);
-	if (var != null)
-	{
-	    return var.getName();
-	}
-	return null;
-    }
-
-    // Return the next updated name (temporary variables are used inside the SMV model)
-    // representing a specific internal variable or output.
-    // The temporary names of a variable Var will be Var_1, Var_2 etc. 
-    // Return null if internal variable or output not found.
-    public String getNextInternalOrOutputName(String originalName)
-    {
-	Variable var = internalVariableMap.get(originalName);
-	if (var == null)
-	{
-	    var = outputMap.get(originalName);
-	}
-	if (var != null)
-	{
-	    String currentName = var.getName();
-	    int number = 0;
-	    int index = currentName.lastIndexOf("_");
-	    if (index >= 0 && index < currentName.length()-1)
-	    {
-		try
-		{
-		    number = Integer.parseInt(currentName.substring(index+1));
-		}
-		catch(NumberFormatException e){}
-	    }
-	    if (number > 0)
-	    {
-		number++;
-		return currentName.substring(0, index+1) + number;
-	    }
-	    else
-	    {
-		return currentName + "_1";
-	    }
-	}
-	return null;
-    }
-
-
-    // Change name of an internal variable or output.
-    // Also add variable declaration to SMV-code
-    // Return true if it succeeds (varable is found), false otherwise.
-    public boolean updateInternalOrOutputName(String originalName, String newName)
-    {
-	Variable var = internalVariableMap.get(originalName);
-	if (var != null)
-	{
-	    var.setName(newName);
-	    variableDeclaration += " " + var.getVariableDeclaration() + " # temp variable;\n";
-	    //initialValues += " init(" + newName + ") := " + var.getInitialValue() + ";\n";
-	    // (need not be initialized, since only temporal variable)
-	    return true;
-	}
-	var = outputMap.get(originalName);
-	if (var != null)
-	{
-	    var.setName(newName);
-	    variableDeclaration += " " + var.getVariableDeclaration() + " # temp variable;\n" ;
-	    //initialValues += " init(" + newName + ") := " + var.getInitialValue() + ";\n";
-	    // (need not be initialized, since only temporal variable)
-	    return true;
-	}
-	return false;
-    }
-
-
-    public void declareVariablesAndInitialValues()
-    {
-	// Value Declaration
-	for (Variable input : inputMap.values())
-	{
-	    variableDeclaration += " input " + input.getVariableDeclaration() + ";\n";    
-	}
-	for (Variable variable : internalVariableMap.values())
-	{
-	    variableDeclaration += " " + variable.getVariableDeclaration() + ";\n";    
-	}
-	for (Variable output : outputMap.values())
-	{
-	    variableDeclaration += " output " + output.getVariableDeclaration() + ";\n";    
-	}
-
-	// Initial values
-	for (Variable input : inputMap.values())
-	{
-	    initialValues += " init(" + input.getName() + ") := " + input.getInitialValue() + ";\n";    
-	}
-	for (Variable variable : internalVariableMap.values())
-	{
-	    initialValues += " init(" + variable.getName() + ") := " + variable.getInitialValue() + ";\n";    
-	}
-	for (Variable output : outputMap.values())
-	{
-	    initialValues += " init(" + output.getName() + ") := " + output.getInitialValue() + ";\n";    
-	}
-    }
-
-    public void createModule(String moduleName)
-    {
-	moduleHead += "module " + moduleName + "(";
-	for (String inputName : inputMap.keySet())
-	{
-	    moduleHead += inputName + ", ";    
-	}
-	for (String outputName : outputMap.keySet())
-	{
-	    moduleHead += outputName + ", ";    
-	}
-	moduleHead = moduleHead.substring(0, moduleHead.length()-2) + ")\n{\n";
-	
-	for (Variable fbOutputVariable : fbOutputVariableMap.values())
-	{
-	    variableDeclaration += " " + fbOutputVariable.getVariableDeclaration() + " # FB output, temp variable;\n";
-	    // (fbOutputVariable need not be initialized, since only temporal variable)
-	}
-
-	expressions += "\n # New outputs and internal variables\n";
-	for (Entry<String, Variable> variableEntry : internalVariableMap.entrySet())
-	{
-	    expressions += " Next(" +  variableEntry.getKey() + ") := " + variableEntry.getValue().getName() + ";\n";    
-	}
-	for (Entry<String, Variable> outputEntry : outputMap.entrySet())
-	{
-	    expressions += " Next(" +  outputEntry.getKey() + ") := " + outputEntry.getValue().getName() + ";\n";    
-	}
-	System.out.println(moduleHead + variableDeclaration + initialValues + expressions + "}\n");
-    }
-
     public void createFile(String fileName, String path)
     {
+	File newFile = new File(path, fileName);
+	try
+	{
+	    BufferedWriter writer = new BufferedWriter( new FileWriter( newFile ) );
+
+	    // in this method we also go through the file, looking for SCAN_CYCLE_DENOTER
+	    // and replace that with the scancycletime chosen by the verifyer
+	    String scanCycle = null;
+
+	    for (SMVModule module : modules)
+	    {
+		String moduleCode = module.getModuleCode();
+		if (moduleCode.contains(SMVModelBuilder.SCAN_CYCLE_DENOTER))
+		{
+		    // Has the verifyer specified the scan cycle yet?
+		    if (scanCycle == null)
+		    {
+			try
+			{
+			    BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
+			    System.out.print("Specify scan cycle time in ms (as integer) to use in the verification process: ");
+			    System.out.flush();
+			    scanCycle = in.readLine();
+			}
+			catch(IOException exception)
+			{
+			    System.err.println("SMVModel: IOException! Could not read the input from the keybord!");
+			}
+			
+		    }
+		    moduleCode = moduleCode.replaceAll(SMVModelBuilder.SCAN_CYCLE_DENOTER, scanCycle + ".." + scanCycle);
+		}
+		
+		writer.write(moduleCode, 0, moduleCode.length());
+		writer.newLine(); // platform independent new line character
+	    }
+	    for (String standardModuleContent : standardModulesNameToContentMap.values())
+	    {
+		if (standardModuleContent.contains(SMVModelBuilder.SCAN_CYCLE_DENOTER))
+		{
+		    // Has the verifyer specified the scan cycle yet?
+		    if (scanCycle == null)
+		    {
+			try
+			{
+			    BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
+			    System.out.print("Specify scan cycle time in ms (as integer) to use in the verification process: ");
+			    System.out.flush();
+			    scanCycle = in.readLine();
+			}
+			catch(IOException exception)
+			{
+			    System.err.println("SMVModel: IOException! Could not read the input from the keybord!");
+			}
+			
+		    }
+		    standardModuleContent = standardModuleContent.replaceAll(SMVModelBuilder.SCAN_CYCLE_DENOTER, scanCycle + ".." + scanCycle);
+		}
+		writer.write(standardModuleContent, 0, standardModuleContent.length());
+		writer.newLine(); // platform independent new line character
+	    }
+	    writer.close();
+	}
+	catch(IOException e)
+	{
+	    System.err.println("Illegal result file!");
+	    e.printStackTrace();
+	}
+
+    }
+    
+    // Import a new standard module from a file (if a module with the same name is not already included) and return true. 
+    // Return false if a module with the same name was already included
+    public boolean importModuleFromFile(File theFile, String name)
+    {
+	try
+	{	
+	    
+	    BufferedReader reader = new BufferedReader( new InputStreamReader( new FileInputStream( theFile ) ) );
+	    // read the first line
+	    String line = reader.readLine();
+	    String content = "";		
+	    
+	    // Alternative way of finding the module name:
+	    // // Read through the first lines of comments (#) or blank lines
+	    // while ( line != null && (line.trim().startsWith("#") || line.trim().length() == 0) )
+	    // {
+	    // content += line + "\n";
+	    // line = reader.readLine();
+	    // }
+	    // String name = "";
+	    // if (line != null)
+	    // {
+	    // int startIndex = line.indexOf("module ") + 7; // length of "module " is 7
+	    // int endIndex = line.indexOf("(", startIndex);
+	    // if (startIndex >= 7 && endIndex > startIndex) // s.indexOf(ss) returns -1 if ss not found within s
+	    // {
+	    // name = line.substring(startIndex, endIndex);
+	    // }
+	    // }
+	    
+	    if (name != null && !standardModulesNameToContentMap.containsKey(name))
+	    {
+		while (line != null)
+		{
+		    content += line + "\n";
+		    line = reader.readLine();
+		    //StringBuffer row = new StringBuffer(line);
+		}
+		standardModulesNameToContentMap.put(name, content);
+		return true;
+	    }
+	}
+	catch(FileNotFoundException e)
+	{
+	    System.err.println("SMVModelBuilder: Error! Could not find the file " + theFile.getName());
+	    e.printStackTrace();
+	}
+	catch(IOException e)
+	{
+	    System.err.println("SMVModelBuilder: Error! Problems reading the file " + theFile.getName());
+	    e.printStackTrace();
+	}
+	return false;
+	
     }
     
 }

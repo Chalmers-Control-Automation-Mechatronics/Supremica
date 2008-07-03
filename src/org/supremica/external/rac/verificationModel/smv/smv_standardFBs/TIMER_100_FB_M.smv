@@ -1,0 +1,57 @@
+# Quickfix of TIMER_100_FB_M that resembles TON standard FB but with the initial value ValueIn.
+# Although the timer should only be updated each 100 ms, this module is updated each scan cycle.
+
+module TIMER_100_FB_M(Coil, Preset, ValueIn, ValueOut, Status)
+{
+	# Variable declaration
+	input Coil : boolean;
+	input Preset : 10..100; # Time in ms
+	input ValueIn : 0..100; 
+	SCT : scancycletime_mustbereplaced_withsystemscancycletime; # Scan cycle time in ms, should be specified by the verifyer
+	output ValueOut : 0..150; # Elapsed time in ms, held when equal to Preset
+	ValueOut_previous : 0..150; 
+	output Status : boolean;
+	Status_previous : boolean;
+
+	# Initial Values
+	init(ValueOut_previous) := ValueIn;
+	init(Status_previous) := 0;
+
+	# Model Code
+	Next(ValueOut_previous) := ValueOut;	
+	Next(Status_previous) := Status;	
+
+	# ValueOut
+	IF (Coil & (ValueOut_previous + SCT >= Preset))
+	{
+  		ValueOut := Preset;
+	}
+	ELSE IF (Coil & ~(ValueOut_previous + SCT >= Preset))
+	{
+		ValueOut := ValueOut_previous + SCT;
+	}
+	ELSE
+	{
+		ValueOut := 0;
+	}
+
+	# Status
+	IF (Coil & (ValueOut_previous + SCT >= Preset))
+	{
+  		Status := 1;
+	}
+	ELSE IF (Coil & ~(ValueOut_previous + SCT >= Preset))
+	{
+		Status := Status_previous;
+	}
+	ELSE
+	{
+		Status := 0;
+	}
+	
+	# Specification 	
+	Timer1 : assert G ( ValueOut >= Preset -> Status);
+	Reset : assert G ~(~Coil & Status);
+	Timer2 : assert G (G Coil -> F Status);
+}
+

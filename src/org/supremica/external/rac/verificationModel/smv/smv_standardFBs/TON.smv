@@ -1,0 +1,56 @@
+module TON(IN1, PT, Q, ET)
+{
+	# Variable declaration
+	input IN1 : boolean;
+	input PT : 1..100; # Time in ms
+	SCT : scancycletime_mustbereplaced_withsystemscancycletime; # Scan cycle time in ms, should be specified by the verifyer
+	output Q : boolean;
+	Q_previous : boolean;
+	output ET : 0..150; # Elapsed time in ms, held when equal to PT
+	ET_previous : 0..150; 
+
+	# Initial Values
+	#init(Q) := 0;
+	init(Q_previous) := 0;
+	#init(ET) := 0;
+	init(ET_previous) := 0;
+#	init(IN1):=0;	
+
+	# Model Code
+	Next(ET_previous) := ET;	
+	Next(Q_previous) := Q;	
+
+	# ET
+	IF (IN1 & (ET_previous + SCT >= PT))
+	{
+  		ET := PT;
+	}
+	ELSE IF (IN1 & ~(ET_previous + SCT >= PT))
+	{
+		ET := ET_previous + SCT;
+	}
+	ELSE
+	{
+		ET := 0;
+	}
+
+	# Q
+	IF (IN1 & (ET_previous + SCT >= PT))
+	{
+  		Q := 1;
+	}
+	ELSE IF (IN1 & ~(ET_previous + SCT >= PT))
+	{
+		Q := Q_previous;
+	}
+	ELSE
+	{
+		Q := 0;
+	}
+	
+	# Specification 	
+	Timer1 : assert G ( ET >= PT -> Q);
+	Reset : assert G ~(~IN1 & Q);
+	Timer2 : assert G (G IN1 -> F Q);
+}
+

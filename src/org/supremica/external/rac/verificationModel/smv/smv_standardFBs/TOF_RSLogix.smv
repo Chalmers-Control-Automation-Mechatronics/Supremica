@@ -1,0 +1,105 @@
+module TOF_RSLogix(TimerOffDelay, Preset, EnableO, DN, ACC, TT)
+{
+ # Variable declaration
+ input TimerOffDelay : boolean;
+ input Preset : 10..600;
+ output EnableO : boolean;
+ output DN : boolean;
+ output ACC : 0..625;
+ output TT : boolean;
+ EnableO_previous : boolean; # value from previous scan cycle 
+ EnableO_1 : boolean; # temp variable
+ DN_previous : boolean; # value from previous scan cycle 
+ DN_1 : boolean; # temp variable
+ ACC_1 : 0..625; # temp variable
+ TT_previous : boolean; # value from previous scan cycle 
+ TT_1 : boolean; # temp variable
+ temp1 : boolean; # FB output, temp variable
+ temp2 : boolean; # FB output, temp variable
+
+ # Initial values
+ init(EnableO_previous) := FALSE;
+ init(DN_previous) := FALSE;
+ init(TT_previous) := FALSE;
+
+ # Model code
+ Next(TT_previous) := TT;
+ Next(DN_previous) := DN;
+ Next(EnableO_previous) := EnableO;
+ EnableO_1 := TimerOffDelay;
+ TON1 : TON( ~TimerOffDelay, Preset, temp1, temp2 );
+ DN_1 := ~(TON1.Q);
+ ACC_1 := TON1.ET;
+ TT_1 := DN_1 & ~TimerOffDelay;
+
+ # New outputs and internal variables
+ EnableO := EnableO_1;
+ DN := DN_1;
+ ACC := ACC_1;
+ TT := TT_1;
+
+ # Specification 	
+ Timer1 : assert G ( ACC >= Preset -> ~DN);
+ Reset : assert G ~(TimerOffDelay & ~DN);
+ Timer2 : assert G (G ~TimerOffDelay -> F ~DN);
+ TTSpec : assert G (TT <-> ~TimerOffDelay & DN);
+
+}
+
+
+module TON(IN1, PT, Q, ET)
+{
+	# Variable declaration
+	input IN1 : boolean;
+	input PT : 10..600; # Time in ms
+	SCT : scancycletime_mustbereplaced_withsystemscancycletime; # Scan cycle time in ms, should be specified by the verifyer
+	output Q : boolean;
+	Q_previous : boolean;
+	output ET : 0..625; # Elapsed time in ms, held when equal to PT
+	ET_previous : 0..625; 
+
+	# Initial Values
+	#init(Q) := 0;
+	init(Q_previous) := 0;
+	#init(ET) := 0;
+	init(ET_previous) := 0;
+#	init(IN1):=0;	
+
+	# Model Code
+	Next(ET_previous) := ET;	
+	Next(Q_previous) := Q;	
+
+	# ET
+	IF (IN1 & (ET_previous + SCT >= PT))
+	{
+  		ET := PT;
+	}
+	ELSE IF (IN1 & ~(ET_previous + SCT >= PT))
+	{
+		ET := ET_previous + SCT;
+	}
+	ELSE
+	{
+		ET := 0;
+	}
+
+	# Q
+	IF (IN1 & (ET_previous + SCT >= PT))
+	{
+  		Q := 1;
+	}
+	ELSE IF (IN1 & ~(ET_previous + SCT >= PT))
+	{
+		Q := Q_previous;
+	}
+	ELSE
+	{
+		Q := 0;
+	}
+	
+	# Specification 	
+	Timer1 : assert G ( ET >= PT -> Q);
+	Reset : assert G ~(~IN1 & Q);
+	Timer2 : assert G (G IN1 -> F Q);
+}
+
