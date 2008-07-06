@@ -59,7 +59,6 @@ import net.sourceforge.waters.model.module.VariableMarkingProxy;
 
 import net.sourceforge.waters.xsd.base.ComponentKind;
 import net.sourceforge.waters.xsd.base.EventKind;
-import net.sourceforge.waters.xsd.module.ScopeKind;
 
 
 /**
@@ -158,6 +157,7 @@ public class EFACompiler
     mFactory = factory;
     mSourceInfoBuilder = builder;
     mOperatorTable = CompilerOperatorTable.getInstance();
+    mTrueCNF = new CompiledNormalForm(mOperatorTable.getAndOperator());
     mSimpleExpressionCompiler =
       new SimpleExpressionCompiler(mFactory, mOperatorTable);
     mGuardCompiler = new GuardCompiler(mFactory, mOperatorTable);
@@ -370,6 +370,7 @@ public class EFACompiler
     {
       try {
         mCurrentEdge = edge;
+        mCurrentGuard = mTrueCNF;
         final GuardActionBlockProxy ga = edge.getGuardActionBlock();
         final LabelBlockProxy block = edge.getLabelBlock();
         if (mIsUsingEventAlphabet) {
@@ -412,26 +413,17 @@ public class EFACompiler
     public Object visitGraphProxy(final GraphProxy graph)
       throws VisitorException
     {
-      final Collection<EdgeProxy> edges = graph.getEdges();
-      if (mIsUsingEventAlphabet) {
-        visitCollection(edges);
-      } else {
+      final LabelBlockProxy blocked = graph.getBlockedEvents();
+      if (blocked != null) {
         try {
-          mCollectedEvents =
-            new HashMap<CompiledEvent,CompiledGuardCollection>();
-          mCollectedVariables =
-            new ProxyAccessorHashMapByContents<IdentifierProxy>();
-          final LabelBlockProxy blocked = graph.getBlockedEvents();
+          mCurrentGuard = mTrueCNF;
           visitLabelBlockProxy(blocked);
-          visitCollection(edges);
-          for (final CompiledEvent event : mCollectedEvents.keySet()) {
-            event.addVariables(mCollectedVariables.values());
-          }
         } finally {
-          mCollectedEvents = null;
-          mCollectedVariables = null;
+          mCurrentGuard = null;
         }
       }
+      final Collection<EdgeProxy> edges = graph.getEdges();
+      visitCollection(edges);
       return null;
     }
 
@@ -488,8 +480,36 @@ public class EFACompiler
     public Object visitSimpleComponentProxy(final SimpleComponentProxy comp)
       throws VisitorException
     {
-      final GraphProxy graph = comp.getGraph();
-      return visitGraphProxy(graph);
+      try {
+        mCollectedEvents =
+          new HashMap<CompiledEvent,CompiledGuardCollection>();
+        if (!mIsUsingEventAlphabet) {
+          mCollectedVariables =
+            new ProxyAccessorHashMapByContents<IdentifierProxy>();
+        }
+        final ComponentKind ckind = comp.getKind();
+        final GraphProxy graph = comp.getGraph();
+        visitGraphProxy(graph);
+        for (final Map.Entry<CompiledEvent,CompiledGuardCollection> entry :
+               mCollectedEvents.entrySet()) {
+          final CompiledEvent event = entry.getKey();
+          final EventKind ekind = event.getKind();
+          final CompiledGuardCollection guard = entry.getValue();
+          if (!mIsUsingEventAlphabet) {
+            event.addVariables(mCollectedVariables.values());
+          }
+          if (ekind == EventKind.CONTROLLABLE &&
+              ckind == ComponentKind.PROPERTY ||
+              ekind == EventKind.UNCONTROLLABLE &&
+              ckind != ComponentKind.PLANT) {
+            guard.addGuard(mTrueCNF);
+          }
+        }
+        return null;
+      } finally {
+        mCollectedEvents = null;
+        mCollectedVariables = null;
+      }
     }
 
     public Object visitVariableComponentProxy(final VariableComponentProxy var)
@@ -504,10 +524,16 @@ public class EFACompiler
       final CompiledGuardCollection oldguard = mCollectedEvents.get(event);
       if (oldguard == null) {
         final CompiledGuardCollection newguard =
+          mCurrentEdge == null ?
+          new CompiledGuardCollection(mCurrentGuard) :
           new CompiledGuardCollection(mCurrentGuard, mCurrentEdge);
         mCollectedEvents.put(event, newguard);
       } else {
-        oldguard.addGuard(mCurrentGuard, mCurrentEdge);
+        if (mCurrentEdge == null) {
+          oldguard.addGuard(mCurrentGuard);
+        } else {
+          oldguard.addGuard(mCurrentGuard, mCurrentEdge);
+        }
       }
     }
 
@@ -525,6 +551,7 @@ public class EFACompiler
   private final ModuleProxyFactory mFactory;
   private final SourceInfoBuilder mSourceInfoBuilder;
   private final CompilerOperatorTable mOperatorTable;
+  private final CompiledNormalForm mTrueCNF;
   private final SimpleExpressionCompiler mSimpleExpressionCompiler;
   private final GuardCompiler mGuardCompiler;
   private final ModuleProxy mInputModule;

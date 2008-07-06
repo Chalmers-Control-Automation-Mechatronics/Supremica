@@ -33,6 +33,12 @@ class CompiledGuardCollection
     mMap = new HashMap<CompiledNormalForm,CompiledGuard>();
   }
 
+  CompiledGuardCollection(final CompiledNormalForm cnf)
+  {
+    this();
+    addGuard(cnf);
+  }
+
   CompiledGuardCollection(final CompiledNormalForm cnf, final EdgeProxy edge)
   {
     this();
@@ -42,6 +48,15 @@ class CompiledGuardCollection
 
   //#########################################################################
   //# Simple Access
+  void addGuard(final CompiledNormalForm cnf)
+  {
+    final CompiledGuard oldguard = mMap.get(cnf);
+    if (oldguard == null) {
+      final CompiledGuard newguard = new CompiledGuard(cnf);
+      mMap.put(cnf, newguard);
+    }
+  }
+
   void addGuard(final CompiledNormalForm cnf, final EdgeProxy edge)
   {
     final CompiledGuard oldguard = mMap.get(cnf);

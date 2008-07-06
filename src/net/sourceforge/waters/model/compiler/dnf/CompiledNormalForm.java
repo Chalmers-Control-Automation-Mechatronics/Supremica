@@ -21,13 +21,14 @@ public class CompiledNormalForm implements Cloneable
 
   //#########################################################################
   //# Constructors
-  CompiledNormalForm(final BinaryOperator op)
+  public CompiledNormalForm(final BinaryOperator op)
   {
     mOperator = op;
     mClauses = new HashSet<CompiledClause>();
   }
 
-  CompiledNormalForm(final BinaryOperator op, final CompiledClause clause)
+  public CompiledNormalForm(final BinaryOperator op,
+                            final CompiledClause clause)
   {
     this(op);
     add(clause);

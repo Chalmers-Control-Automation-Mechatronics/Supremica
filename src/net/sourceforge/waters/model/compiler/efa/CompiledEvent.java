@@ -16,6 +16,8 @@ import net.sourceforge.waters.model.base.ProxyAccessorHashMapByContents;
 import net.sourceforge.waters.model.module.EventDeclProxy;
 import net.sourceforge.waters.model.module.IdentifierProxy;
 
+import net.sourceforge.waters.xsd.base.EventKind;
+
 
 class CompiledEvent {
 
@@ -33,6 +35,11 @@ class CompiledEvent {
   EventDeclProxy getEventDecl()
   {
     return mEventDecl;
+  }
+
+  EventKind getKind()
+  {
+    return mEventDecl.getKind();
   }
 
   void addVariable(final IdentifierProxy ident)
