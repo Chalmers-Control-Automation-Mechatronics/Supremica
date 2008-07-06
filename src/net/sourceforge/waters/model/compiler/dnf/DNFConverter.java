@@ -21,6 +21,7 @@ import net.sourceforge.waters.model.base.WatersRuntimeException;
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
 import net.sourceforge.waters.model.expr.BinaryOperator;
 import net.sourceforge.waters.model.expr.EvalException;
+import net.sourceforge.waters.model.expr.ExpressionComparator;
 import net.sourceforge.waters.model.expr.TypeMismatchException;
 import net.sourceforge.waters.model.expr.UnaryOperator;
 import net.sourceforge.waters.model.module.AbstractModuleProxyVisitor;
@@ -40,6 +41,12 @@ public class DNFConverter extends AbstractModuleProxyVisitor {
 
   //#########################################################################
   //# Constructors
+  public DNFConverter(final ModuleProxyFactory factory,
+                      final CompilerOperatorTable optable)
+  {
+    this(factory, optable, ExpressionComparator.getInstance());
+  }
+
   public DNFConverter(final ModuleProxyFactory factory,
                       final CompilerOperatorTable optable,
                       final Comparator<SimpleExpressionProxy> comparator)

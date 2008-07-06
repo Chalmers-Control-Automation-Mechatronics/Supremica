@@ -10,13 +10,11 @@
 
 package net.sourceforge.waters.model.compiler.dnf;
 
-import java.util.Comparator;
 import junit.framework.TestCase;
 
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
 import net.sourceforge.waters.model.expr.BinaryOperator;
 import net.sourceforge.waters.model.expr.EvalException;
-import net.sourceforge.waters.model.expr.ExpressionComparator;
 import net.sourceforge.waters.model.expr.ExpressionParser;
 import net.sourceforge.waters.model.expr.ParseException;
 import net.sourceforge.waters.model.module.ModuleProxyFactory;
@@ -460,12 +458,10 @@ public class DNFConverterTest extends TestCase
   {
     final ModuleProxyFactory factory = ModuleElementFactory.getInstance();
     final CompilerOperatorTable optable = CompilerOperatorTable.getInstance();
-    final Comparator<SimpleExpressionProxy> comparator =
-      new ExpressionComparator();
     mAndOp = optable.getAndOperator();
     mOrOp = optable.getOrOperator();
     mParser = new ExpressionParser(factory, optable);
-    mConverter = new DNFConverter(factory, optable, comparator);
+    mConverter = new DNFConverter(factory, optable);
   }
 
   protected void tearDown()

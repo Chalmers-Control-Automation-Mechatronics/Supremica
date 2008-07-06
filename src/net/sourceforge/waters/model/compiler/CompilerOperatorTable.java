@@ -57,6 +57,7 @@ public class CompilerOperatorTable extends AbstractOperatorTable {
   {
     super(32, OPCHAR_MIN, OPCHAR_MAX);
     mComplementMap = new HashMap<BinaryOperator,BinaryOperator>(16);
+    mAssigningMap = new HashMap<BinaryOperator,BinaryOperator>(16);
 
     mAndOperator = new BinaryAndOperator();
     mOrOperator= new BinaryOrOperator();
@@ -73,6 +74,8 @@ public class CompilerOperatorTable extends AbstractOperatorTable {
     mUnaryMinusOperator = new UnaryMinusOperator();
     mRangeOperator = new BinaryRangeOperator();
     mUnaryNextOperator = new UnaryNextOperator();
+    mPlusOperator = new BinaryPlusOperator();
+    mMinusOperator = new BinaryMinusOperator();
 
     store(mAndOperator);
     store(mOrOperator);
@@ -84,10 +87,6 @@ public class CompilerOperatorTable extends AbstractOperatorTable {
     store(mLessThanOperator);
     store(mLessEqualsOperator);
     store(mAssignmentOperator);
-    store(mIncrementOperator);
-    store(mDecrementOperator);
-    store(new BinaryPlusOperator());
-    store(new BinaryMinusOperator());
     store(new BinaryTimesOperator());
     store(new BinaryDivideOperator());
     store(new BinaryModuloOperator());
@@ -98,6 +97,8 @@ public class CompilerOperatorTable extends AbstractOperatorTable {
     storeComplements(mEqualsOperator, mNotEqualsOperator);
     storeComplements(mLessThanOperator, mGreaterEqualsOperator);
     storeComplements(mGreaterThanOperator, mLessEqualsOperator);
+    storeAssignment(mIncrementOperator, mPlusOperator);
+    storeAssignment(mDecrementOperator, mMinusOperator);
   }
 
   private void storeComplements(final BinaryOperator op1,
@@ -107,6 +108,14 @@ public class CompilerOperatorTable extends AbstractOperatorTable {
     store(op2);
     mComplementMap.put(op1, op2);
     mComplementMap.put(op2, op1);
+  }
+
+  private void storeAssignment(final BinaryOperator op1,
+                               final BinaryOperator op2)
+  {
+    store(op1);
+    store(op2);
+    mAssigningMap.put(op1, op2);
   }
 
 
@@ -179,6 +188,11 @@ public class CompilerOperatorTable extends AbstractOperatorTable {
   public BinaryOperator getComplementaryOperator(final BinaryOperator op)
   {
     return mComplementMap.get(op);
+  }
+
+  public BinaryOperator getAssigningOperator(final BinaryOperator op)
+  {
+    return mAssigningMap.get(op);
   }
 
   public boolean isNotEqualsOperator(BinaryOperator op) {
@@ -1715,10 +1729,13 @@ public class CompilerOperatorTable extends AbstractOperatorTable {
   private final BinaryOperator mAssignmentOperator;
   private final BinaryOperator mIncrementOperator;
   private final BinaryOperator mDecrementOperator;
+  private final BinaryOperator mPlusOperator;
+  private final BinaryOperator mMinusOperator;
   private final UnaryOperator mUnaryMinusOperator;
   private final BinaryOperator mRangeOperator;
   private final UnaryOperator mUnaryNextOperator;
   private final Map<BinaryOperator,BinaryOperator> mComplementMap;
+  private final Map<BinaryOperator,BinaryOperator> mAssigningMap;
 
 
   //#########################################################################

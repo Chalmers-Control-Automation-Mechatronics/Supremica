@@ -33,6 +33,7 @@ import net.sourceforge.waters.model.compiler.context.
 import net.sourceforge.waters.model.compiler.context.ModuleBindingContext;
 import net.sourceforge.waters.model.compiler.context.SimpleExpressionCompiler;
 import net.sourceforge.waters.model.compiler.context.SourceInfoBuilder;
+import net.sourceforge.waters.model.compiler.dnf.CompiledNormalForm;
 import net.sourceforge.waters.model.expr.EvalException;
 import net.sourceforge.waters.model.module.AbstractModuleProxyVisitor;
 import net.sourceforge.waters.model.module.BinaryExpressionProxy;
@@ -159,6 +160,7 @@ public class EFACompiler
     mOperatorTable = CompilerOperatorTable.getInstance();
     mSimpleExpressionCompiler =
       new SimpleExpressionCompiler(mFactory, mOperatorTable);
+    mGuardCompiler = new GuardCompiler(mFactory, mOperatorTable);
     mInputModule = module;
   }
 
@@ -366,26 +368,32 @@ public class EFACompiler
     public Object visitEdgeProxy(final EdgeProxy edge)
       throws VisitorException
     {
-      final GuardActionBlockProxy ga = edge.getGuardActionBlock();
-      final LabelBlockProxy block = edge.getLabelBlock();
-      if (mIsUsingEventAlphabet) {
-        if (ga != null) {
-          try {
-            mCollectedVariables =
-              new ProxyAccessorHashMapByContents<IdentifierProxy>();
-            visitGuardActionBlockProxy(ga);
-            visitLabelBlockProxy(block);
-          } finally {
-            mCollectedVariables = null;
+      try {
+        mCurrentEdge = edge;
+        final GuardActionBlockProxy ga = edge.getGuardActionBlock();
+        final LabelBlockProxy block = edge.getLabelBlock();
+        if (mIsUsingEventAlphabet) {
+          if (ga != null) {
+            try {
+              mCollectedVariables =
+                new ProxyAccessorHashMapByContents<IdentifierProxy>();
+              visitGuardActionBlockProxy(ga);
+              visitLabelBlockProxy(block);
+            } finally {
+              mCollectedVariables = null;
+            }
           }
+        } else {
+          if (ga != null) {
+            visitGuardActionBlockProxy(ga);
+          }
+          visitLabelBlockProxy(block);
         }
-      } else {
-        if (ga != null) {
-          visitGuardActionBlockProxy(ga);
-        }
-        visitLabelBlockProxy(block);
+        return null;
+      } finally {
+        mCurrentEdge = null;
+        mCurrentGuard = null;
       }
-      return null;
     }
 
     public CompiledEvent visitEventDeclProxy(final EventDeclProxy decl)
@@ -409,13 +417,14 @@ public class EFACompiler
         visitCollection(edges);
       } else {
         try {
-          mCollectedEvents = new HashSet<CompiledEvent>();
+          mCollectedEvents =
+            new HashMap<CompiledEvent,CompiledGuardCollection>();
           mCollectedVariables =
             new ProxyAccessorHashMapByContents<IdentifierProxy>();
           final LabelBlockProxy blocked = graph.getBlockedEvents();
           visitLabelBlockProxy(blocked);
           visitCollection(edges);
-          for (final CompiledEvent event : mCollectedEvents) {
+          for (final CompiledEvent event : mCollectedEvents.keySet()) {
             event.addVariables(mCollectedVariables.values());
           }
         } finally {
@@ -426,12 +435,18 @@ public class EFACompiler
       return null;
     }
 
-    public Object visitGuardActionBlockProxy(final GuardActionBlockProxy ga)
+    public CompiledNormalForm visitGuardActionBlockProxy
+      (final GuardActionBlockProxy ga)
       throws VisitorException
     {
-      final List<BinaryExpressionProxy> actions = ga.getActions();
-      visitCollection(actions);
-      return null;
+      try {
+        mCurrentGuard = mGuardCompiler.getCompiledGuard(ga);
+        final List<BinaryExpressionProxy> actions = ga.getActions();
+        visitCollection(actions);
+        return mCurrentGuard;
+      } catch (final EvalException exception) {
+        throw wrap(exception);
+      }
     }
 
     public CompiledEvent visitIdentifierProxy(final IdentifierProxy ident)
@@ -439,10 +454,9 @@ public class EFACompiler
     {
       try {
         final CompiledEvent event = findEvent(ident);
+        addCollectedEvent(event);
         if (mIsUsingEventAlphabet) {
           event.addVariables(mCollectedVariables.values());
-        } else {
-          mCollectedEvents.add(event);
         }
         return event;
       } catch (final UndefinedIdentifierException exception) {
@@ -484,9 +498,25 @@ public class EFACompiler
     }
 
     //#######################################################################
+    //# Auxiliary Methods
+    private void addCollectedEvent(final CompiledEvent event)
+    {
+      final CompiledGuardCollection oldguard = mCollectedEvents.get(event);
+      if (oldguard == null) {
+        final CompiledGuardCollection newguard =
+          new CompiledGuardCollection(mCurrentGuard, mCurrentEdge);
+        mCollectedEvents.put(event, newguard);
+      } else {
+        oldguard.addGuard(mCurrentGuard, mCurrentEdge);
+      }
+    }
+
+    //#######################################################################
     //# Data Members
-    private Set<CompiledEvent> mCollectedEvents;
     private ProxyAccessorMap<IdentifierProxy> mCollectedVariables;
+    private Map<CompiledEvent,CompiledGuardCollection> mCollectedEvents;
+    private EdgeProxy mCurrentEdge;
+    private CompiledNormalForm mCurrentGuard;
   }
 
 
@@ -496,6 +526,7 @@ public class EFACompiler
   private final SourceInfoBuilder mSourceInfoBuilder;
   private final CompilerOperatorTable mOperatorTable;
   private final SimpleExpressionCompiler mSimpleExpressionCompiler;
+  private final GuardCompiler mGuardCompiler;
   private final ModuleProxy mInputModule;
 
   private boolean mIsUsingEventAlphabet = true;
