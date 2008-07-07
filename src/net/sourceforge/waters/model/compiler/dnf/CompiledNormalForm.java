@@ -72,6 +72,17 @@ public class CompiledNormalForm implements Cloneable
     return mClauses.addAll(clauses);
   }
 
+  public boolean addAll(final CompiledNormalForm partner)
+  {
+    if (getOperator() == partner.getOperator()) {
+      final Collection<CompiledClause> clauses = partner.getClauses();
+      return addAll(clauses);
+    } else {
+      throw new IllegalArgumentException
+        ("Trying to merge normal forms of different type!");
+    }
+  }
+
   public Collection<CompiledClause> getClauses()
   {
     return mClauses;

@@ -13,8 +13,13 @@ import java.util.Collection;
 
 import net.sourceforge.waters.model.base.ProxyAccessorMap;
 import net.sourceforge.waters.model.base.ProxyAccessorHashMapByContents;
+import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
+import net.sourceforge.waters.model.compiler.dnf.CompiledClause;
+import net.sourceforge.waters.model.compiler.dnf.CompiledNormalForm;
+import net.sourceforge.waters.model.expr.BinaryOperator;
 import net.sourceforge.waters.model.module.EventDeclProxy;
 import net.sourceforge.waters.model.module.IdentifierProxy;
+import net.sourceforge.waters.model.module.SimpleComponentProxy;
 
 import net.sourceforge.waters.xsd.base.EventKind;
 
@@ -23,10 +28,13 @@ class CompiledEvent {
 
   //#########################################################################
   //# Constructors
-  CompiledEvent(final EventDeclProxy decl)
+  CompiledEvent(final EventDeclProxy decl,
+                final CompilerOperatorTable optable)
   {
     mEventDecl = decl;
     mVariables = new ProxyAccessorHashMapByContents<IdentifierProxy>();
+    final BinaryOperator andop = optable.getAndOperator();
+    mAdditionalConjuncts = new CompiledNormalForm(andop);
   }
 
 
@@ -52,10 +60,32 @@ class CompiledEvent {
     mVariables.addAll(idents);
   }
 
+  void addGuardCollection(final SimpleComponentProxy comp,
+                          final CompiledGuardCollection collection)
+  {
+    final Collection<CompiledGuard> guards = collection.getGuards();
+    if (guards.size() == 1) {
+      final CompiledGuard guard = guards.iterator().next();
+      final CompiledNormalForm cnf = guard.getCNF();
+      mAdditionalConjuncts.addAll(cnf);
+    } else {
+    }
+  }
+
 
   //#########################################################################
   //# Data Members
   private final EventDeclProxy mEventDecl;
   private final ProxyAccessorMap<IdentifierProxy> mVariables;
+  /**
+   * Additional conjuncts in CNF.
+   * If in an automaton all transitions associated with a particular event
+   * have the same guard/action block, then that component does not need to
+   * be considered when separating the event. Instead, the constraints
+   * imposed by the one guard/action block are stored as additional
+   * conjuncts that constrain the possible value combinations for this
+   * event.
+   */
+  private final CompiledNormalForm mAdditionalConjuncts;
 
 }

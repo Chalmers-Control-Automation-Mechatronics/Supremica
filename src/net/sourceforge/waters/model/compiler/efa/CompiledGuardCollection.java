@@ -9,6 +9,7 @@
 
 package net.sourceforge.waters.model.compiler.efa;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -66,6 +67,11 @@ class CompiledGuardCollection
     } else {
       oldguard.addEdge(edge);
     }
+  }
+
+  Collection<CompiledGuard> getGuards()
+  {
+    return mMap.values();
   }
 
 

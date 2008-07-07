@@ -402,7 +402,7 @@ public class EFACompiler
     {
       try {
         final IdentifierProxy ident = decl.getIdentifier();
-        final CompiledEvent event = new CompiledEvent(decl);
+        final CompiledEvent event = new CompiledEvent(decl, mOperatorTable);
         insertEvent(ident, event);
         return event;
       } catch (final DuplicateIdentifierException exception) {
@@ -504,6 +504,7 @@ public class EFACompiler
               ckind != ComponentKind.PLANT) {
             guard.addGuard(mTrueCNF);
           }
+          event.addGuardCollection(comp, guard);
         }
         return null;
       } finally {
