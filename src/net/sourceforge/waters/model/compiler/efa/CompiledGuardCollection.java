@@ -9,12 +9,18 @@
 
 package net.sourceforge.waters.model.compiler.efa;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.Map;
 
+import net.sourceforge.waters.model.compiler.dnf.CompiledClause;
 import net.sourceforge.waters.model.compiler.dnf.CompiledNormalForm;
 import net.sourceforge.waters.model.module.EdgeProxy;
+import net.sourceforge.waters.model.module.SimpleComponentProxy;
 
 
 /**
@@ -29,20 +35,24 @@ class CompiledGuardCollection
 
   //#########################################################################
   //# Constructors
-  CompiledGuardCollection()
+  CompiledGuardCollection(final SimpleComponentProxy comp)
   {
+    mComponent = comp;
     mMap = new HashMap<CompiledNormalForm,CompiledGuard>();
   }
 
-  CompiledGuardCollection(final CompiledNormalForm cnf)
+  CompiledGuardCollection(final SimpleComponentProxy comp,
+                          final CompiledNormalForm cnf)
   {
-    this();
+    this(comp);
     addGuard(cnf);
   }
 
-  CompiledGuardCollection(final CompiledNormalForm cnf, final EdgeProxy edge)
+  CompiledGuardCollection(final SimpleComponentProxy comp,
+                          final CompiledNormalForm cnf,
+                          final EdgeProxy edge)
   {
-    this();
+    this(comp);
     addGuard(cnf, edge);
   }
 
@@ -76,7 +86,54 @@ class CompiledGuardCollection
 
 
   //#########################################################################
+  //# Compilation
+  Collection<CompiledClause> removeSharedConjuncts()
+  {
+    if (mMap.isEmpty()) {
+      return Collections.emptyList();
+    }
+    final Collection<CompiledGuard> guards = mMap.values();
+    Iterator<CompiledGuard> iter = guards.iterator();
+    final CompiledGuard guard1 = iter.next();
+    final CompiledNormalForm cnf1 = guard1.getCNF();
+    if (cnf1.isEmpty()) {
+      return Collections.emptyList();
+    }
+    final Collection<CompiledClause> result = new LinkedList<CompiledClause>();
+    for (final CompiledClause clause : cnf1.getClauses()) {
+      boolean shared = true;
+      while (iter.hasNext()) {
+        final CompiledGuard guard = iter.next();
+        final CompiledNormalForm cnf = guard.getCNF();
+        if (!cnf.contains(clause)) {
+          shared = false;
+          break;
+        }
+      }
+      if (shared) {
+        result.add(clause);
+      }
+      iter = guards.iterator();
+      iter.next();
+    }
+    if (result.isEmpty()) {
+      return Collections.emptyList();
+    }
+    final Collection<CompiledGuard> oldguards =
+      new ArrayList<CompiledGuard>(guards);
+    mMap.clear();
+    for (final CompiledGuard guard : oldguards) {
+      final CompiledNormalForm cnf = guard.getCNF();
+      cnf.removeAll(result);
+      mMap.put(cnf, guard);
+    }
+    return result;
+  }
+
+
+  //#########################################################################
   //# Data Members
-  private Map<CompiledNormalForm,CompiledGuard> mMap;
+  private final SimpleComponentProxy mComponent;
+  private final Map<CompiledNormalForm,CompiledGuard> mMap;
 
 }

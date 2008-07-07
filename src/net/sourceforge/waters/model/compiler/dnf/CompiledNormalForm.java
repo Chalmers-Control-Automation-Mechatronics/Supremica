@@ -83,6 +83,27 @@ public class CompiledNormalForm implements Cloneable
     }
   }
 
+  public boolean remove(final CompiledClause clause)
+  {
+    return mClauses.remove(clause);
+  }
+
+  public boolean removeAll(final Collection<CompiledClause> clauses)
+  {
+    return mClauses.removeAll(clauses);
+  }
+
+  public boolean removeAll(final CompiledNormalForm partner)
+  {
+    if (getOperator() == partner.getOperator()) {
+      final Collection<CompiledClause> clauses = partner.getClauses();
+      return removeAll(clauses);
+    } else {
+      throw new IllegalArgumentException
+        ("Trying to subtract normal forms of different type!");
+    }
+  }
+
   public Collection<CompiledClause> getClauses()
   {
     return mClauses;

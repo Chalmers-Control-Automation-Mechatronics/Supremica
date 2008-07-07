@@ -481,6 +481,7 @@ public class EFACompiler
       throws VisitorException
     {
       try {
+        mCurrentComponent = comp;
         mCollectedEvents =
           new HashMap<CompiledEvent,CompiledGuardCollection>();
         if (!mIsUsingEventAlphabet) {
@@ -504,10 +505,11 @@ public class EFACompiler
               ckind != ComponentKind.PLANT) {
             guard.addGuard(mTrueCNF);
           }
-          event.addGuardCollection(comp, guard);
+          event.addGuardCollection(guard);
         }
         return null;
       } finally {
+        mCurrentComponent = null;
         mCollectedEvents = null;
         mCollectedVariables = null;
       }
@@ -526,8 +528,9 @@ public class EFACompiler
       if (oldguard == null) {
         final CompiledGuardCollection newguard =
           mCurrentEdge == null ?
-          new CompiledGuardCollection(mCurrentGuard) :
-          new CompiledGuardCollection(mCurrentGuard, mCurrentEdge);
+          new CompiledGuardCollection(mCurrentComponent, mCurrentGuard) :
+          new CompiledGuardCollection(mCurrentComponent, mCurrentGuard,
+                                      mCurrentEdge);
         mCollectedEvents.put(event, newguard);
       } else {
         if (mCurrentEdge == null) {
@@ -540,6 +543,7 @@ public class EFACompiler
 
     //#######################################################################
     //# Data Members
+    private SimpleComponentProxy mCurrentComponent;
     private ProxyAccessorMap<IdentifierProxy> mCollectedVariables;
     private Map<CompiledEvent,CompiledGuardCollection> mCollectedEvents;
     private EdgeProxy mCurrentEdge;

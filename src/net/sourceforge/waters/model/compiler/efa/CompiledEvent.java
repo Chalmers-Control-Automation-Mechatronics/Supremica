@@ -10,6 +10,7 @@
 package net.sourceforge.waters.model.compiler.efa;
 
 import java.util.Collection;
+import java.util.LinkedList;
 
 import net.sourceforge.waters.model.base.ProxyAccessorMap;
 import net.sourceforge.waters.model.base.ProxyAccessorHashMapByContents;
@@ -19,7 +20,6 @@ import net.sourceforge.waters.model.compiler.dnf.CompiledNormalForm;
 import net.sourceforge.waters.model.expr.BinaryOperator;
 import net.sourceforge.waters.model.module.EventDeclProxy;
 import net.sourceforge.waters.model.module.IdentifierProxy;
-import net.sourceforge.waters.model.module.SimpleComponentProxy;
 
 import net.sourceforge.waters.xsd.base.EventKind;
 
@@ -33,6 +33,7 @@ class CompiledEvent {
   {
     mEventDecl = decl;
     mVariables = new ProxyAccessorHashMapByContents<IdentifierProxy>();
+    mGuardCollections = new LinkedList<CompiledGuardCollection>();
     final BinaryOperator andop = optable.getAndOperator();
     mAdditionalConjuncts = new CompiledNormalForm(andop);
   }
@@ -60,8 +61,7 @@ class CompiledEvent {
     mVariables.addAll(idents);
   }
 
-  void addGuardCollection(final SimpleComponentProxy comp,
-                          final CompiledGuardCollection collection)
+  void addGuardCollection(final CompiledGuardCollection collection)
   {
     final Collection<CompiledGuard> guards = collection.getGuards();
     if (guards.size() == 1) {
@@ -69,6 +69,10 @@ class CompiledEvent {
       final CompiledNormalForm cnf = guard.getCNF();
       mAdditionalConjuncts.addAll(cnf);
     } else {
+      final Collection<CompiledClause> shared =
+        collection.removeSharedConjuncts();
+      mAdditionalConjuncts.addAll(shared);
+      mGuardCollections.add(collection);
     }
   }
 
@@ -77,6 +81,7 @@ class CompiledEvent {
   //# Data Members
   private final EventDeclProxy mEventDecl;
   private final ProxyAccessorMap<IdentifierProxy> mVariables;
+  private final Collection<CompiledGuardCollection> mGuardCollections;
   /**
    * Additional conjuncts in CNF.
    * If in an automaton all transitions associated with a particular event
