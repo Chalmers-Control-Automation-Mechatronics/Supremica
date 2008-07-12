@@ -37,10 +37,13 @@ public class GuardActionBlockProxyShape
             g.setStroke(SHADOWSTROKE);
             g.fill(getShape());
         }
+	/*
         g.setColor(EditorColor.GUARDCOLOR);
         g.setStroke(BASICSTROKE);
         int offset = g.getFontMetrics().getHeight();
-       // g.drawString(mBlock.getGuards().toString(), (int) mBounds.getX(), (int) mBounds.getY() + offset);
+        g.drawString(mBlock.getGuards().toString(),
+                     (int) mBounds.getX(), (int) mBounds.getY() + offset);
+	*/
     }
     
     private RoundRectangle2D mBounds;

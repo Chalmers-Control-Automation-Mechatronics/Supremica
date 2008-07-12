@@ -10,9 +10,7 @@
 
 package net.sourceforge.waters.gui;
 
-import java.awt.Component;
 import java.awt.Container;
-import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.GridLayout;
@@ -20,13 +18,11 @@ import java.awt.Insets;
 import java.awt.LayoutManager;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JRootPane;
-import javax.swing.border.Border;
 
 import net.sourceforge.waters.gui.command.Command;
 import net.sourceforge.waters.gui.command.EditCommand;
@@ -38,12 +34,9 @@ import net.sourceforge.waters.model.base.ProxyTools;
 import net.sourceforge.waters.model.expr.ExpressionParser;
 import net.sourceforge.waters.model.expr.Operator;
 import net.sourceforge.waters.model.module.SimpleExpressionProxy;
-import net.sourceforge.waters.subject.module.ModuleSubject;
 import net.sourceforge.waters.subject.module.ForeachComponentSubject;
 import net.sourceforge.waters.subject.module.SimpleExpressionSubject;
 import net.sourceforge.waters.subject.module.SimpleIdentifierSubject;
-
-import net.sourceforge.waters.xsd.base.ComponentKind;
 
 
 public class ForeachComponentEditorDialog
@@ -141,7 +134,6 @@ public class ForeachComponentEditorDialog
 
     // Buttons panel ...
     mButtonsPanel = new JPanel();
-    final LayoutManager buttonsLayout = new GridLayout(2, 1);
     final JButton okButton = new JButton("OK");
     okButton.setRequestFocusEnabled(false);
     okButton.addActionListener(commithandler);

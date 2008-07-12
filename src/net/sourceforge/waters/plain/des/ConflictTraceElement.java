@@ -13,7 +13,6 @@ import java.net.URI;
 import java.util.Collection;
 import java.util.List;
 
-import net.sourceforge.waters.model.base.ItemNotFoundException;
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.base.ProxyVisitor;
 import net.sourceforge.waters.model.base.VisitorException;

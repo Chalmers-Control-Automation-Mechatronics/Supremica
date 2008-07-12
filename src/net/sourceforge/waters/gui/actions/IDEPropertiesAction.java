@@ -13,7 +13,6 @@ package net.sourceforge.waters.gui.actions;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import javax.swing.Action;
-import javax.swing.KeyStroke;
 
 import net.sourceforge.waters.gui.EditorEditEdgeDialog;
 import net.sourceforge.waters.gui.EventEditorDialog;

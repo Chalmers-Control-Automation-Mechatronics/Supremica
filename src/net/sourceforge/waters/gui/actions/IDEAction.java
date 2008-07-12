@@ -12,7 +12,6 @@ package net.sourceforge.waters.gui.actions;
 
 import javax.swing.AbstractAction;
 
-import net.sourceforge.waters.gui.command.UndoInterface;
 import net.sourceforge.waters.gui.observer.Observer;
 import net.sourceforge.waters.gui.observer.EditorChangedEvent;
 import net.sourceforge.waters.gui.transfer.FocusTracker;

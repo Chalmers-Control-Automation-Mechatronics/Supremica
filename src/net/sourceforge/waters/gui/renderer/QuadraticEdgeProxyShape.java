@@ -28,8 +28,6 @@ class QuadraticEdgeProxyShape
   QuadraticEdgeProxyShape(final EdgeProxy edge)
   {
     super(edge);
-    final Point2D start = GeometryTools.getStartPoint(edge);
-    final Point2D end = GeometryTools.getEndPoint(edge);
     mControl = GeometryTools.getControlPoint1(edge);
     mStart = GeometryTools.getRadialStartPoint(edge, mControl);
     mEnd = GeometryTools.getRadialEndPoint(edge, mControl);

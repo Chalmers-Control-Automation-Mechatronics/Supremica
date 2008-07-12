@@ -101,14 +101,6 @@ public class SimpleExpressionCell
 
 
   //#########################################################################
-  //# Overrides for Base Class javax.swing.JFormattedTextField
-  public void setValue(final Object value)
-  {
-    super.setValue(value);
-  }
-
-
-  //#########################################################################
   //# Overrides for Base Class javax.swing.JComponent
   public void setToolTipText(final String text)
   {

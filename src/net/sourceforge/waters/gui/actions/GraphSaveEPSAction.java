@@ -20,8 +20,6 @@ import javax.swing.JFileChooser;
 import javax.swing.filechooser.FileFilter;
 
 import net.sourceforge.waters.gui.ControlledSurface;
-import net.sourceforge.waters.gui.EditorColor;
-import net.sourceforge.waters.gui.EditorSurface;
 import net.sourceforge.waters.gui.EditorWindowInterface;
 import net.sourceforge.waters.gui.renderer.EPSGraphPrinter;
 import net.sourceforge.waters.gui.renderer.ProxyShapeProducer;

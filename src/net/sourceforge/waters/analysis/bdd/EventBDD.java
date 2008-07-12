@@ -80,11 +80,10 @@ abstract class EventBDD
 
   BDD getTransitionsBDD()
   {
-    if (mTransitionsBDD != null) {
-      if (mIsOnlySelfloops || mTransitionsBDD.isZero()) {
-        mTransitionsBDD.free();
-        mTransitionsBDD = null;
-      }
+    if (mTransitionsBDD != null &&
+        (mIsOnlySelfloops || mTransitionsBDD.isZero())) {
+      mTransitionsBDD.free();
+      mTransitionsBDD = null;
     }
     return mTransitionsBDD;
   }

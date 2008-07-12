@@ -28,8 +28,6 @@ import java.awt.dnd.DropTargetDropEvent;
 import java.awt.dnd.DropTargetListener;
 import java.awt.dnd.InvalidDnDOperationException;
 import java.awt.event.*;
-import java.awt.geom.Arc2D;
-import java.awt.geom.GeneralPath;
 import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
@@ -46,7 +44,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.TreeSet;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -67,7 +64,6 @@ import net.sourceforge.waters.gui.command.UndoInterface;
 import net.sourceforge.waters.gui.observer.EditorChangedEvent;
 import net.sourceforge.waters.gui.observer.Observer;
 import net.sourceforge.waters.gui.observer.SelectionChangedEvent;
-import net.sourceforge.waters.gui.observer.ToolbarChangedEvent;
 import net.sourceforge.waters.gui.renderer.GeneralShape;
 import net.sourceforge.waters.gui.renderer.GeometryAbsentException;
 import net.sourceforge.waters.gui.renderer.GeometryTools;
@@ -1203,15 +1199,6 @@ public class ControlledSurface
     }
   }
 
-  private DRAGOVERSTATUS getDragOver(ProxySubject s)
-  {
-    if (mInternalDragAction == null || !isFocused(s)) {
-      return DRAGOVERSTATUS.NOTDRAG;
-    } else {
-      return mInternalDragAction.getExternalDragStatus();
-    }
-  }
-
   public RenderingInformation getRenderingInformation(final Proxy proxy)
   {
     final ProxySubject item = (ProxySubject) proxy;
@@ -1495,6 +1482,7 @@ public class ControlledSurface
     return null;
   }
 
+  /*
   private ProxySubject findSelectableAncestor(final Subject subject)
   {
     if (subject instanceof IdentifierSubject ||
@@ -1513,6 +1501,7 @@ public class ControlledSurface
       return (ProxySubject) subject;
     }
   }
+  */
 
 
   //#########################################################################
@@ -1781,7 +1770,6 @@ public class ControlledSurface
         (ControlledSurface.this, event, mFocusedObject);
       if (mInternalDragAction != null) {
         final Point point = event.getPoint();
-        final boolean needRepaint;
         if (mInternalDragAction.hasDragged()) {
           mInternalDragAction.commitDrag(point);
         } else {
@@ -2573,11 +2561,6 @@ public class ControlledSurface
       } else {
         return false;
       }
-    }
-
-    void commitDrag(final Point point)
-    {
-      super.commitDrag(point);
     }
 
     void cancelDrag(final Point point)

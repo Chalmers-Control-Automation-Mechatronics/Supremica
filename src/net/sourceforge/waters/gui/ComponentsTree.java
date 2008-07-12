@@ -29,7 +29,6 @@ import java.util.LinkedList;
 import java.util.Set;
 import javax.swing.Action;
 import javax.swing.Icon;
-import javax.swing.JOptionPane;
 import javax.swing.JTree;
 import javax.swing.SwingUtilities;
 import javax.swing.ToolTipManager;
@@ -68,10 +67,6 @@ import net.sourceforge.waters.subject.module.IdentifiedSubject;
 import net.sourceforge.waters.subject.module.IdentifierSubject;
 import net.sourceforge.waters.subject.module.ModuleSubject;
 import net.sourceforge.waters.subject.module.ModuleSubjectFactory;
-import net.sourceforge.waters.subject.module.SimpleComponentSubject;
-import net.sourceforge.waters.subject.module.VariableComponentSubject;
-
-import org.supremica.util.VPopupMenu;
 
 
 /**
@@ -287,7 +282,6 @@ public class ComponentsTree
         transferred.add(proxy);
       }
     }
-    final Proxy first = transferred.iterator().next();
     return new ComponentTransferable(transferred);
   }
 
@@ -388,7 +382,6 @@ public class ComponentsTree
     final ListIterator<InsertInfo> iter = deletes.listIterator(size);
     while (iter.hasPrevious()) {
       final InsertInfo delete = (InsertInfo) iter.previous();
-      final Proxy victim = delete.getProxy();
       final ListInsertPosition inspos =
         (ListInsertPosition) delete.getInsertPosition();
       final ListSubject<? extends ProxySubject> list = inspos.getList();

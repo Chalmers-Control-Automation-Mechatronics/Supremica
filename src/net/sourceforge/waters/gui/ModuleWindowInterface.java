@@ -10,7 +10,6 @@
 package net.sourceforge.waters.gui;
 
 import java.awt.Frame;
-import java.awt.event.ActionListener;
 
 import net.sourceforge.waters.gui.command.UndoInterface;
 import net.sourceforge.waters.gui.renderer.GeometryAbsentException;

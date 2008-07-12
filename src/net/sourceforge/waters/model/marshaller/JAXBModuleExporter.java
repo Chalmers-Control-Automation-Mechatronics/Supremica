@@ -66,7 +66,6 @@ import net.sourceforge.waters.model.module.VariableMarkingProxy;
 import net.sourceforge.waters.model.unchecked.Casting;
 
 import net.sourceforge.waters.xsd.base.ElementType;
-import net.sourceforge.waters.xsd.base.NamedType;
 import net.sourceforge.waters.xsd.module.Actions;
 import net.sourceforge.waters.xsd.module.AnchorPosition;
 import net.sourceforge.waters.xsd.module.BinaryExpression;

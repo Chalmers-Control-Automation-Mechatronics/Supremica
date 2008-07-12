@@ -10,7 +10,6 @@
 
 package net.sourceforge.waters.gui;
 
-import java.awt.Color;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.datatransfer.Transferable;
@@ -29,21 +28,16 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 import javax.swing.Action;
-import javax.swing.JDialog;
 import javax.swing.JList;
 import javax.swing.JMenu;
-import javax.swing.JMenuItem;
-import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
 import javax.swing.JRadioButtonMenuItem;
-import javax.swing.ListModel;
 import javax.swing.ListSelectionModel;
 import javax.swing.SwingUtilities;
 import javax.swing.event.ListSelectionEvent;
@@ -61,21 +55,13 @@ import net.sourceforge.waters.gui.transfer.EventDeclTransferable;
 import net.sourceforge.waters.gui.transfer.InsertInfo;
 import net.sourceforge.waters.gui.transfer.SelectionOwner;
 import net.sourceforge.waters.gui.transfer.WatersDataFlavor;
-import net.sourceforge.waters.model.base.NamedProxy;
 import net.sourceforge.waters.model.base.Proxy;
-import net.sourceforge.waters.model.module.EdgeProxy;
-import net.sourceforge.waters.model.module.IdentifierProxy;
-import net.sourceforge.waters.model.module.LabelBlockProxy;
 import net.sourceforge.waters.model.module.ModuleProxyCloner;
 import net.sourceforge.waters.model.unchecked.Casting;
-import net.sourceforge.waters.subject.base.AbstractSubject;
 import net.sourceforge.waters.subject.base.ListSubject;
 import net.sourceforge.waters.subject.module.EventDeclSubject;
-import net.sourceforge.waters.subject.module.GraphSubject;
-import net.sourceforge.waters.subject.module.IdentifierSubject;
 import net.sourceforge.waters.subject.module.ModuleSubject;
 import net.sourceforge.waters.subject.module.ModuleSubjectFactory;
-import net.sourceforge.waters.subject.module.SimpleComponentSubject;
 import net.sourceforge.waters.subject.module.SimpleIdentifierSubject;
 import net.sourceforge.waters.xsd.base.EventKind;
 
@@ -557,8 +543,6 @@ public class EventDeclListView
     EventDeclPopup(final MouseEvent event)
     {
       final Iterable<EventDeclSubject> decls;
-      final ListSelectionModel selection =
-        EventDeclListView.this.getSelectionModel();
       final Point point = event.getPoint();
       final int index = locationToIndex(point);
       if (index < 0 || index >= mModel.getSize())
@@ -569,8 +553,6 @@ public class EventDeclListView
         final EventDeclSubject clicked = mModel.getElementAt(index);
         decls = Collections.singletonList(clicked);
       }
-
-
       int declcount = 0;
       int kindcount = 0;
       EventKind kind = null;

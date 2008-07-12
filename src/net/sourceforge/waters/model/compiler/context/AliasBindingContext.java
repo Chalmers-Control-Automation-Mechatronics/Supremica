@@ -10,9 +10,6 @@
 
 package net.sourceforge.waters.model.compiler.context;
 
-import net.sourceforge.waters.model.compiler.context.BindingContext;
-import net.sourceforge.waters.model.compiler.context.ModuleBindingContext;
-import net.sourceforge.waters.model.compiler.context.SourceInfo;
 import net.sourceforge.waters.model.module.IdentifierProxy;
 import net.sourceforge.waters.model.module.SimpleExpressionProxy;
 

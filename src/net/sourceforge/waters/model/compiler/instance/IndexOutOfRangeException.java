@@ -11,7 +11,6 @@ package net.sourceforge.waters.model.compiler.instance;
 
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.compiler.context.CompiledRange;
-import net.sourceforge.waters.model.module.IdentifierProxy;
 import net.sourceforge.waters.model.module.SimpleExpressionProxy;
 import net.sourceforge.waters.model.expr.EvalException;
 
@@ -74,7 +73,6 @@ public class IndexOutOfRangeException extends EvalException {
   //# Message
   public String getMessage()
   {
-    final Proxy location = getLocation();
     if (mValue == null) {
       return null;
     } else if (mRange == null) {

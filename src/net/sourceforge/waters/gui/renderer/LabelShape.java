@@ -11,21 +11,21 @@ import java.awt.font.TextLayout;
 import java.awt.geom.Rectangle2D;
 import java.awt.geom.RoundRectangle2D;
 
-import net.sourceforge.waters.gui.EditorColor;
 import net.sourceforge.waters.model.base.Proxy;
+
 
 public class LabelShape
     extends AbstractProxyShape
 {
-	public LabelShape(final Proxy p, final int x, final int y, final Font font, String auxilary)
-    {
-		this(p, x, y, font);
-		mAuxilary = auxilary;
-    }
-    public LabelShape(final Proxy p, final int x, final int y, final Font font)
+  public LabelShape(final Proxy p, final int x, final int y,
+		    final Font font, final String auxilary /*unused?*/)
+  {
+    this(p, x, y, font);
+  }
+  
+  public LabelShape(final Proxy p, final int x, final int y, final Font font)
     {
         super(p);
-        mAuxilary = "";
         mFont = font;
         mPoint = new Point(x + 2, y + (font.getSize()));
         mName = getProxy().toString();
@@ -55,7 +55,8 @@ public class LabelShape
             g.fill(getShape());
         }
     }
-	private String mAuxilary;
+
+
     private final Point mPoint;
     private final RoundRectangle2D mBounds;
     private final Font mFont;

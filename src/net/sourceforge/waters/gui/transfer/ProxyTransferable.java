@@ -21,7 +21,6 @@ import java.util.List;
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.base.ProxyCloner;
 import net.sourceforge.waters.model.printer.ProxyPrinter;
-import net.sourceforge.waters.model.unchecked.Casting;
 import net.sourceforge.waters.plain.module.ModuleElementFactory;
 
 

@@ -236,7 +236,6 @@ public class EventEditorDialog
       mNameInput.setErrorDisplay(mErrorLabel);
       // Buttons panel ...
       mButtonsPanel = new JPanel();
-      final LayoutManager buttonsLayout = new GridLayout(2, 1);
       final JButton okButton = new JButton("OK");
       okButton.setRequestFocusEnabled(false);
       okButton.addActionListener(commithandler);
@@ -977,11 +976,6 @@ public class EventEditorDialog
 
   //#########################################################################
   //# Auxiliary Access
-  private ModuleSubject getModule()
-  {
-    return mRoot.getModuleSubject();
-  }
-
   private ExpressionParser getExpressionParser()
   {
     return mRoot.getExpressionParser();

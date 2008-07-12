@@ -16,7 +16,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import net.sourceforge.waters.model.base.Proxy;
 
 /**
  * A collection of unchecked casts.  This class provides a set of static

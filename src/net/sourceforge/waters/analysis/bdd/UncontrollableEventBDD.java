@@ -87,7 +87,6 @@ class UncontrollableEventBDD extends EventBDD
   {
     if (mEnabledBDD != null) {
       final AutomatonBDD autbdd = getCurrentAutomaton();
-      final AutomatonProxy aut = autbdd.getAutomaton();
       final ComponentKind kind = autbdd.getKind();
       final int bitno = autbdd.getBitIndex();
       switch (kind) {

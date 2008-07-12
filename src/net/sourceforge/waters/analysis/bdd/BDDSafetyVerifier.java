@@ -11,7 +11,6 @@ package net.sourceforge.waters.analysis.bdd;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -34,10 +33,8 @@ import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 import net.sourceforge.waters.model.des.SafetyTraceProxy;
-import net.sourceforge.waters.model.des.StateProxy;
 import net.sourceforge.waters.model.des.TransitionProxy;
 import net.sourceforge.waters.xsd.base.ComponentKind;
-import net.sourceforge.waters.xsd.base.EventKind;
 
 import org.apache.log4j.Logger;
 
@@ -422,7 +419,6 @@ public class BDDSafetyVerifier
     BDD current = mBadStateBDD;
     final List<EventProxy> trace = new LinkedList<EventProxy>();
     final int depth = mLevels.size();
-    int d = depth;
     final ListIterator<BDD> liter = mLevels.listIterator(depth - 1);
     while (liter.hasPrevious()) {
       final BDD prev = liter.previous();

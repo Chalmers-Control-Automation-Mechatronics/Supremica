@@ -11,7 +11,6 @@ package net.sourceforge.waters.gui.language;
 
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 
 import net.sourceforge.waters.model.base.Proxy;

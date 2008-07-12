@@ -1,6 +1,5 @@
 package net.sourceforge.waters.gui;
 
-import net.sourceforge.waters.subject.module.IdentifierSubject;
 import java.util.Comparator;
 
 

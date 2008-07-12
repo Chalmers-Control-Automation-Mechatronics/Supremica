@@ -9,8 +9,6 @@
 
 package net.sourceforge.waters.model.base;
 
-import net.sourceforge.waters.model.base.WatersRuntimeException;
-
 
 /**
  * The class of exceptions throw by WATERS visitors.

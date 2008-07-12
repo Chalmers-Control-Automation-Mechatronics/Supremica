@@ -12,7 +12,6 @@ package net.sourceforge.waters.gui;
 
 import java.awt.Point;
 import java.awt.event.MouseEvent;
-import java.util.List;
 import java.util.SortedMap;
 import java.util.TreeMap;
 import javax.swing.JCheckBoxMenuItem;

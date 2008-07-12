@@ -168,8 +168,6 @@ public class SimpleExpressionCompiler
     {
       final List<SimpleIdentifierProxy> items = expr.getItems();
       final int numitems = items.size();
-      final List<SimpleIdentifierProxy> copies =
-        new ArrayList<SimpleIdentifierProxy>(numitems);
       for (final SimpleIdentifierProxy item : items) {
         final SimpleExpressionProxy found = getBoundExpression(item);
         if (found == null) {

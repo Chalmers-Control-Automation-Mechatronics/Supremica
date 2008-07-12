@@ -29,7 +29,6 @@ import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 import javax.swing.AbstractAction;
@@ -75,7 +74,6 @@ import net.sourceforge.waters.model.module.SimpleExpressionProxy;
 import net.sourceforge.waters.subject.module.BinaryExpressionSubject;
 import net.sourceforge.waters.subject.module.IdentifierSubject;
 import net.sourceforge.waters.subject.module.IntConstantSubject;
-import net.sourceforge.waters.subject.module.ModuleSubject;
 import net.sourceforge.waters.subject.module.SimpleExpressionSubject;
 import net.sourceforge.waters.subject.module.SimpleIdentifierSubject;
 import net.sourceforge.waters.subject.module.VariableComponentSubject;
@@ -268,7 +266,6 @@ public class VariableEditorDialog
 
     // Buttons panel ...
     mButtonsPanel = new JPanel();
-    final LayoutManager buttonsLayout = new GridLayout(2, 1);
     final JButton okButton = new JButton("OK");
     okButton.setRequestFocusEnabled(false);
     okButton.addActionListener(commithandler);

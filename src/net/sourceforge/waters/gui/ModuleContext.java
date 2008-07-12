@@ -36,13 +36,11 @@ import net.sourceforge.waters.model.module.ParameterBindingProxy;
 import net.sourceforge.waters.model.module.SimpleComponentProxy;
 import net.sourceforge.waters.model.module.SimpleIdentifierProxy;
 import net.sourceforge.waters.model.module.VariableComponentProxy;
-import net.sourceforge.waters.subject.base.AbstractSubject;
 import net.sourceforge.waters.subject.base.ListSubject;
 import net.sourceforge.waters.subject.base.ModelChangeEvent;
 import net.sourceforge.waters.subject.base.ModelObserver;
 import net.sourceforge.waters.subject.base.ProxySubject;
 import net.sourceforge.waters.subject.base.Subject;
-import net.sourceforge.waters.subject.module.EventDeclSubject;
 import net.sourceforge.waters.subject.module.IdentifierSubject;
 import net.sourceforge.waters.subject.module.ModuleSubject;
 import net.sourceforge.waters.subject.module.SimpleIdentifierSubject;
@@ -72,7 +70,6 @@ public class ModuleContext
   //# Constructor
   public ModuleContext(final ModuleSubject module)
   {
-    mModule = module;
     mCanDropVisitor = new CanDropVisitor();
     mIdentifierNameVisitor = new IdentifierNameVisitor();
     mIconGetterVisitor = new IconGetterVisitor();
@@ -815,7 +812,6 @@ public class ModuleContext
 
   //#########################################################################
   //# Data Members
-  private final ModuleSubject mModule;
   private final CanDropVisitor mCanDropVisitor;
   private final IdentifierNameVisitor mIdentifierNameVisitor;
   private final IconGetterVisitor mIconGetterVisitor;

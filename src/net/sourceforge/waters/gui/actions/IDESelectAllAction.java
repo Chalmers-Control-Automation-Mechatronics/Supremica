@@ -10,8 +10,6 @@
 
 package net.sourceforge.waters.gui.actions;
 
-import java.awt.Toolkit;
-import java.awt.datatransfer.Transferable;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.util.List;

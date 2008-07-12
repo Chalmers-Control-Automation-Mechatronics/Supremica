@@ -26,7 +26,6 @@ import net.sourceforge.waters.model.module.ModuleProxy;
 import org.apache.xmlgraphics.java2d.GraphicContext;
 import org.apache.xmlgraphics.java2d.ps.AbstractPSDocumentGraphics2D;
 import org.apache.xmlgraphics.java2d.ps.EPSDocumentGraphics2D;
-import org.apache.xmlgraphics.java2d.ps.PSGraphics2D;
 import org.apache.xmlgraphics.java2d.ps.TextHandler;
 import org.apache.xmlgraphics.ps.PSGenerator;
 
