@@ -106,11 +106,11 @@ public class DOPtoEFA
 		}
 		
 		if(ropList == null || ropList.size() == 0){
-			return new Module(moduleName,false);
+			return new Module(moduleName, false);
 		}
 		
 		
-		module = new Module(moduleName,false);
+		module = new Module(moduleName, false);
 		
 		//does this first so they will be easy to find
 		//in Supremica then many ROP:s are being converted.
@@ -225,7 +225,7 @@ public class DOPtoEFA
 		main_sequence = collapseRelationTree(main_sequence);
 		
 		//create main efa
-		main_efa = new EFA("main_" + machine,module);
+		main_efa = new EFA("main_" + machine, module);
 		module.addAutomaton(main_efa);
 		
 		startState = machine +  "_idle";

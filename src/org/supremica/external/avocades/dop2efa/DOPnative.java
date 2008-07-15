@@ -69,8 +69,8 @@ public class DOPnative {
 		String value = "";
 		String runningState = "";
 
-		EGA start = new EGA(); //stop event
-		EGA stop = new EGA(); //start event
+		EGA start = new EGA(); //start event
+		EGA stop = new EGA(); //stop event
 
 		boolean onlystart = false;
 		boolean onlystop = false;
@@ -248,7 +248,7 @@ public class DOPnative {
 		String tmpFrom = from;
 		String tmpTo = efa.newUniqueState();
 
-		nativeActivity(activity,tmpFrom,tmpTo,efa);
+		nativeActivity(activity, tmpFrom, tmpTo, efa);
 
 		while(i.hasNext()){
 			activity = i.next();

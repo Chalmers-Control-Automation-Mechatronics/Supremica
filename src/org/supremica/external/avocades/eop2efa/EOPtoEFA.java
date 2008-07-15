@@ -1,6 +1,6 @@
 package org.supremica.external.avocades.eop2efa;
 
-import org.supremica.manufacturingTables.xsd.eop.*;
+import org.supremica.manufacturingTables.xsd.eop.EOP;
 import org.supremica.external.avocades.common.*;
 
 public class EOPtoEFA {
@@ -32,21 +32,22 @@ public class EOPtoEFA {
 			return;
 		}
 		
+		//Build EFA
+	    efa = new EFA( eop.getId(), module );
+	    module.addAutomaton(efa);
+	    
+	    //Add states
+	    efa.addInitialState( INITIAL_STATE );
+	    efa.addState( EXCECUTION_STATE );
+	    efa.addState( END_STATE );
+	    
 		//Build event
 		start = new EGA(); //stop event
 		stop = new EGA(); //start event
 		
-		start.addAction( EVENT_START_PREFIX + eop.getId() );
-		stop.addAction( EVENT_STOP_PREFIX + eop.getId() );
+		start.setEvent( EVENT_START_PREFIX + eop.getId() );
+		stop.setEvent( EVENT_STOP_PREFIX + eop.getId() );
 		
-		//Build EFA
-	    efa = new EFA( eop.getId(), module );
-	  
-	    //Add states
-	    efa.addInitialState( INITIAL_STATE );
-	    efa.addInitialState( EXCECUTION_STATE );
-	    efa.addInitialState( END_STATE );
-	    
 	    //Add transitions
 		efa.addTransition( INITIAL_STATE, EXCECUTION_STATE,
 						   start.getEvent(),
@@ -56,7 +57,7 @@ public class EOPtoEFA {
 		efa.addTransition( EXCECUTION_STATE, END_STATE, 
 					       stop.getEvent(),
 					       stop.getGuard(),
-					       stop.getAction());
+					       stop.getAction()); 
 	}
 	
 	public Module getModule(){

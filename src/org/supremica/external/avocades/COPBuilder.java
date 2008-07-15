@@ -21,6 +21,7 @@ import org.supremica.external.avocades.xml.Converter;
 
 import org.supremica.external.avocades.common.Module;
 import org.supremica.external.avocades.dop2efa.DOPtoEFA;
+import org.supremica.external.avocades.eop2efa.EOPtoEFA;
 
 public class COPBuilder {
 	
@@ -114,6 +115,18 @@ public class COPBuilder {
     public Module getDOPtoEFAOutput(){
     	String moduleName = "DOPtoEFA";
     	return DOPtoEFA.buildModuleFromROP(ropList, moduleName, false); 
+    }
+    
+    public Module getEOPtoEFAOutput(){
+    	String moduleName = "EOPtoEFA";
+    	
+    	EOPtoEFA builder = new EOPtoEFA();
+    	
+    	for(EOP eop : eopList){
+    		builder.add(eop);
+    	}
+    	
+    	return builder.getModule(); 
     }
     
     //TODO: Make this work, unfinished
