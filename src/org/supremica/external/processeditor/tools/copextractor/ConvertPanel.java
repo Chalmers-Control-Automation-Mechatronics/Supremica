@@ -150,6 +150,12 @@ public class ConvertPanel
         		buildRelationsFromROP();
         	}
         	
+        }if( "Generate Operations".equals( evt.getActionCommand() ) ){
+        	
+        	if( checkInputToConvertAndInformUser() ){
+        		buildOperationsFromEOP();
+        	}
+        	
         }else{
         	System.err.println( "Unknown action: " + evt.getActionCommand() );
         }
@@ -237,6 +243,34 @@ public class ConvertPanel
     	
     	
     }
+    
+    private void buildOperationsFromEOP(){
+    	
+    	File file = null;
+    	Module module = null;
+    	
+    	loadFiles();
+    	module = builder.getEOPtoEFAOutput();
+    	
+    	//create temporary file
+    	try{
+            file = File.createTempFile("dop_relation_extract", WATER_MODULE_EXTENSION);
+        }catch( IOException e ){
+        	;
+        }
+        	
+        module.writeToFile( file );
+        openFileWithIDE( file );
+            
+    	//delete temporary file
+        if( null != file){
+        	file.delete();
+        }	
+    	
+    	
+    }
+    
+    
     
     private boolean checkInputToConvertAndInformUser(){
     	
