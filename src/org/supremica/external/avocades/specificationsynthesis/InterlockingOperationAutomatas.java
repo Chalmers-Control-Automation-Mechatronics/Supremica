@@ -3,6 +3,9 @@ package org.supremica.external.avocades.specificationsynthesis;
 import java.util.*;
 import org.jdom.*;
 
+import static org.supremica.external.avocades.AutomataNames.OPERATION_START_PREFIX;
+import static org.supremica.external.avocades.AutomataNames.OPERATION_STOP_PREFIX;
+
 public class InterlockingOperationAutomatas {
 
 	Element automata = new Element("Automata");
@@ -712,14 +715,14 @@ public class InterlockingOperationAutomatas {
 
 
 		Element event = new Element("Event");
-		event.setAttribute("id", "fin" + operationId );
-		event.setAttribute("label", "fin" + operationId);
+		event.setAttribute("id", OPERATION_STOP_PREFIX + operationId );
+		event.setAttribute("label", OPERATION_STOP_PREFIX + operationId);
 		event.setAttribute("controllable", "true");
 		event.setAttribute("prioritized", "true");
 		events.addContent(event);
 
 		Element transition = new Element("Transition");
-		transition.setAttribute("event", "fin" + operationId);
+		transition.setAttribute("event", OPERATION_STOP_PREFIX + operationId);
 		transition.setAttribute("source", "q" + 0);
 		transition.setAttribute("dest", "q" + 0);
 		transitions.addContent(transition);
@@ -731,20 +734,20 @@ public class InterlockingOperationAutomatas {
 			String trigger = (String) trigIter.next();
 
 			event = new Element("Event");
-			event.setAttribute("id", "st" + trigger);
-			event.setAttribute("label", "st" + trigger);
+			event.setAttribute("id", OPERATION_START_PREFIX + trigger);
+			event.setAttribute("label", OPERATION_START_PREFIX + trigger);
 			event.setAttribute("controllable", "true");
 			event.setAttribute("prioritized", "true");
 			events.addContent(event);
 
 			transition = new Element("Transition");
-			transition.setAttribute("event", "st" + trigger);
+			transition.setAttribute("event", OPERATION_START_PREFIX + trigger);
 			transition.setAttribute("source", "q" + 0);
 			transition.setAttribute("dest", "q" + 1);
 			transitions.addContent(transition);
 
 			transition = new Element("Transition");
-			transition.setAttribute("event", "st" + trigger);
+			transition.setAttribute("event", OPERATION_START_PREFIX + trigger);
 			transition.setAttribute("source", "q" + 1);
 			transition.setAttribute("dest", "q" + 1);
 			transitions.addContent(transition);
@@ -757,14 +760,14 @@ public class InterlockingOperationAutomatas {
 			String restore = (String) restIter.next();
 
 			event = new Element("Event");
-			event.setAttribute("id", "fin" + restore );
-			event.setAttribute("label", "fin" + restore);
+			event.setAttribute("id", OPERATION_STOP_PREFIX + restore );
+			event.setAttribute("label", OPERATION_STOP_PREFIX + restore);
 			event.setAttribute("controllable", "true");
 			event.setAttribute("prioritized", "true");
 			events.addContent(event);
 
 			transition = new Element("Transition");
-			transition.setAttribute("event", "fin" + restore );
+			transition.setAttribute("event", OPERATION_STOP_PREFIX + restore );
 			transition.setAttribute("source", "q" + 1);
 			transition.setAttribute("dest", "q" + 0);
 			transitions.addContent(transition);
@@ -812,14 +815,14 @@ public class InterlockingOperationAutomatas {
 
 
 		Element event = new Element("Event");
-		event.setAttribute("id", "fin" + operationId);
-		event.setAttribute("label", "fin" + operationId);
+		event.setAttribute("id", OPERATION_STOP_PREFIX + operationId);
+		event.setAttribute("label", OPERATION_STOP_PREFIX + operationId);
 		event.setAttribute("controllable", "true");
 		event.setAttribute("prioritized", "true");
 		events.addContent(event);
 
 		Element transition = new Element("Transition");
-		transition.setAttribute("event", "fin" + operationId );
+		transition.setAttribute("event", OPERATION_STOP_PREFIX + operationId );
 		transition.setAttribute("source", "q" + 1);
 		transition.setAttribute("dest", "q" + 1);
 		transitions.addContent(transition);
@@ -829,20 +832,20 @@ public class InterlockingOperationAutomatas {
 			String restore = (String) restIter.next();
 
 			event = new Element("Event");
-			event.setAttribute("id", "fin" + restore);
-			event.setAttribute("label", "fin" + restore);
+			event.setAttribute("id", OPERATION_STOP_PREFIX + restore);
+			event.setAttribute("label", OPERATION_STOP_PREFIX + restore);
 			event.setAttribute("controllable", "true");
 			event.setAttribute("prioritized", "true");
 			events.addContent(event);
 
 			transition = new Element("Transition");
-			transition.setAttribute("event", "fin" + restore);
+			transition.setAttribute("event", OPERATION_STOP_PREFIX + restore);
 			transition.setAttribute("source", "q" + 0);
 			transition.setAttribute("dest", "q" + 1);
 			transitions.addContent(transition);
 
 			transition = new Element("Transition");
-			transition.setAttribute("event", "fin" + restore);
+			transition.setAttribute("event", OPERATION_STOP_PREFIX + restore);
 			transition.setAttribute("source", "q" + 1);
 			transition.setAttribute("dest", "q" + 1);
 			transitions.addContent(transition);
@@ -854,20 +857,20 @@ public class InterlockingOperationAutomatas {
 			String safe = (String) safeIter.next();
 
 			event = new Element("Event");
-			event.setAttribute("id", "fin" + safe);
-			event.setAttribute("label", "fin" + safe);
+			event.setAttribute("id", OPERATION_STOP_PREFIX + safe);
+			event.setAttribute("label", OPERATION_STOP_PREFIX + safe);
 			event.setAttribute("controllable", "true");
 			event.setAttribute("prioritized", "true");
 			events.addContent(event);
 
 			transition = new Element("Transition");
-			transition.setAttribute("event", "fin" + safe);
+			transition.setAttribute("event", OPERATION_STOP_PREFIX + safe);
 			transition.setAttribute("source", "q" + 0);
 			transition.setAttribute("dest", "q" + 1);
 			transitions.addContent(transition);
 
 			transition = new Element("Transition");
-			transition.setAttribute("event", "fin" + safe);
+			transition.setAttribute("event", OPERATION_STOP_PREFIX + safe);
 			transition.setAttribute("source", "q" + 1);
 			transition.setAttribute("dest", "q" + 1);
 			transitions.addContent(transition);

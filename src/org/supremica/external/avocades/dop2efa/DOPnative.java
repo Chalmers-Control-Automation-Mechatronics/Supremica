@@ -13,34 +13,40 @@ import org.supremica.manufacturingTables.xsd.processeditor.OperationReferenceTyp
 import org.supremica.manufacturingTables.xsd.processeditor.Precondition;
 import org.supremica.manufacturingTables.xsd.processeditor.Properties;
 
+
+/*----------------------------------------------------------------------------
+ * 
+ * Static strings used by other algorithms
+ * 
+ *----------------------------------------------------------------------------*/
+import static org.supremica.external.avocades.AutomataNames.OPERATION_START_PREFIX;
+import static org.supremica.external.avocades.AutomataNames.OPERATION_STOP_PREFIX;
+
+import static org.supremica.external.avocades.AutomataNames.EVENT_MACHINE_SEPARATOR;
+import static org.supremica.external.avocades.AutomataNames.RUNNING_STATE_SUFFIX;
+
+import static org.supremica.external.avocades.AutomataNames.PRECON_FULFILLED_STATE;
+import static org.supremica.external.avocades.AutomataNames.PRECON_NOT_FULFILLED_STATE;
+
+
 /**
  * Native function code. Base functions for DOPrelation class
  */
 public class DOPnative {
 	
-	protected final static String EVENT_MACHINE_SEPARATOR = "::";
-	
-	protected final static String EVENT_STOP_PREFIX = "sto_";
-	protected final static String EVENT_START_PREFIX = "sta_";
-	
-	protected final static String RUNNING_STATE_SUFFIX = "_run";
-	
-	protected final static String PRECON_NOT_FULFILLED_STATE = "precon_not_fulfilled";
-	protected final static String PRECON_FULFILLED_STATE = "precon_fulfilled";
-	
 	protected static List<Activity> activityPreconList = new LinkedList<Activity>();
 	
 	protected final static int DEFAULT_RESOURCE_VALUE = 1;
 	
-	//---------------------------------------------------------------------------------------
+	//-------------------------------------------------------------------------
 	//Attribute types used by user
-	//---------------------------------------------------------------------------------------
+	//-------------------------------------------------------------------------
 	protected final static String RESOURCE = "RESOURCE";
 	
 	
-	//---------------------------------------------------------------------------------------
+	//-------------------------------------------------------------------------
 	//Attribute types used by algorithm
-	//---------------------------------------------------------------------------------------
+	//-------------------------------------------------------------------------
 	protected final static String AND_STA_GUARD = "ANDSTARTGUARD";
 	protected final static String OR_STA_GUARD = "ORSTARTGUARD";
 	
@@ -80,8 +86,8 @@ public class DOPnative {
 			return;
 		}
 
-		start.setEvent(EVENT_START_PREFIX + activity.getOperation());
-		stop.setEvent(EVENT_STOP_PREFIX + activity.getOperation());
+		start.setEvent(OPERATION_START_PREFIX + activity.getOperation());
+		stop.setEvent(OPERATION_STOP_PREFIX + activity.getOperation());
 
 		Properties properties = activity.getProperties();
 		if(properties != null){
@@ -356,7 +362,7 @@ public class DOPnative {
 					if(o instanceof OperationReferenceType){
 						pre = (OperationReferenceType)o;
 				
-						eventList.add(EVENT_STOP_PREFIX
+						eventList.add(OPERATION_STOP_PREFIX
 								+ pre.getOperation()+
 								EVENT_MACHINE_SEPARATOR
 								+pre.getMachine());
@@ -412,7 +418,7 @@ public class DOPnative {
 					//self loop to precon fulfilled
 					preconEFA.addTransition(PRECON_FULFILLED_STATE,
 							PRECON_FULFILLED_STATE,
-							EVENT_START_PREFIX+activity.getOperation(),"","");
+							OPERATION_START_PREFIX+activity.getOperation(),"","");
 				
 					module.addAutomaton(preconEFA);
 				}

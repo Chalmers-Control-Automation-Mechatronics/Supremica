@@ -14,6 +14,14 @@ import org.supremica.external.avocades.common.Module;
 import org.supremica.external.processeditor.xml.Loader;
 import org.supremica.manufacturingTables.xsd.processeditor.*;
 
+/*----------------------------------------------------------------------------
+ * 
+ * Static strings used by other algorithms
+ * 
+ *----------------------------------------------------------------------------*/
+import static org.supremica.external.avocades.AutomataNames.OPERATION_START_PREFIX;
+import static org.supremica.external.avocades.AutomataNames.OPERATION_STOP_PREFIX;
+
 /**
  * @author David Millares
  *
@@ -376,11 +384,11 @@ public class DOPtoEFA
 		for(String event : events){
 			
 			//search for stop events
-			if(event.startsWith(EVENT_STOP_PREFIX)){
+			if(event.startsWith(OPERATION_STOP_PREFIX)){
 				
 				//tmp is corresponding start event
-				tmp = event.replace(EVENT_STOP_PREFIX,
-									EVENT_START_PREFIX);
+				tmp = event.replace(OPERATION_STOP_PREFIX,
+									OPERATION_START_PREFIX);
 				
 				
 				//if we not have a start event block

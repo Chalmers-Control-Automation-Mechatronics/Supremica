@@ -826,7 +826,7 @@ public class DOPrelation
 			arbitrary_track = arbitrary_var +"_"+ i;
 			
 			//create new automata
-			tmp = new EFA(arbitrary_track,m);
+			tmp = new EFA(arbitrary_track, m);
 			m.addAutomaton(tmp);
 			
 			tmp.addInitialState(FIRST_STATE);

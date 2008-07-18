@@ -4,6 +4,8 @@ import java.util.Hashtable;
 import java.util.LinkedList;
 import java.util.List;
 
+import net.sourceforge.waters.subject.module.ModuleSubject;
+
 import org.supremica.automata.ExtendedAutomata;
 
 public class Module extends ExtendedAutomata{
@@ -45,6 +47,10 @@ public class Module extends ExtendedAutomata{
 	
 	public List<String> getEvents(){
 		return events;
+	}
+	
+	public ModuleSubject getModule(){
+		return super.getModule();
 	}
 	
 	public void initNodeVariables(){
