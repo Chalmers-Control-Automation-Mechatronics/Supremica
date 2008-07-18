@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.io.FileNotFoundException;
 
 import java.util.List;
+import java.util.LinkedList;
 
 import java.awt.*;
 import java.awt.event.*;
@@ -28,16 +29,24 @@ import org.supremica.manufacturingTables.xsd.processeditor.ROP;
 import org.supremica.manufacturingTables.xsd.eop.EOP;
 import org.supremica.manufacturingTables.xsd.il.IL;
 
-
-import org.supremica.external.avocades.common.Module;
+import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
+import net.sourceforge.waters.model.marshaller.JAXBModuleMarshaller;
+import net.sourceforge.waters.model.module.EventDeclProxy;
+import net.sourceforge.waters.subject.module.ModuleSubject;
+import net.sourceforge.waters.subject.module.ModuleSubjectFactory;
+import net.sourceforge.waters.subject.base.AbstractSubject;
+import net.sourceforge.waters.subject.module.EventDeclSubject;
 
 import org.supremica.external.processeditor.xml.Loader;
 
 import org.supremica.external.avocades.COPBuilder;
 
-import org.supremica.gui.ide.*;
+import org.supremica.gui.ide.IDE;
 import org.supremica.external.processeditor.SOCGraphContainer;
 import org.supremica.external.processeditor.SOCFileFilter;
+import javax.xml.bind.JAXBException;
+
+import org.xml.sax.SAXException;
 
 public class ConvertPanel 
 					extends 
@@ -52,7 +61,8 @@ public class ConvertPanel
 	
 	private final String[] jbuttons = new String[]{"Specification synthesis",
 			                                       "DOP to EFA",
-			                                       "Generate Operations"};
+			                                       "Generate Operations",
+			                                       "Synchronize safety spec"};
 	
 	private TablePane tablePane;
 	private JPanel buttonPane;
@@ -61,6 +71,8 @@ public class ConvertPanel
     private SOCGraphContainer container = null;
     
     private COPBuilder builder;
+    
+    private ModuleSubjectFactory factory;
     
     //constructor
     public ConvertPanel() {
@@ -144,27 +156,40 @@ public class ConvertPanel
             	buildSpecificationSynthes();
         	}
         	
-        }if( "DOP to EFA".equals( evt.getActionCommand() ) ){
+        }else if( "DOP to EFA".equals( evt.getActionCommand() ) ){
         	
         	if( checkInputToConvertAndInformUser() ){
         		buildRelationsFromROP();
         	}
         	
-        }if( "Generate Operations".equals( evt.getActionCommand() ) ){
+        }else if( "Generate Operations".equals( evt.getActionCommand() ) ){
         	
         	if( checkInputToConvertAndInformUser() ){
         		buildOperationsFromEOP();
         	}
         	
+        }else if( "Synchronize safety spec".equals( evt.getActionCommand() ) ){
+        	
+        	if( checkInputToConvertAndInformUser() ){
+        		buildTogether();
+        	}
+        	
         }else{
         	System.err.println( "Unknown action: " + evt.getActionCommand() );
         }
+        
     }
     
     private void loadFiles(){
         Object o = null;
     	
-    	builder = new COPBuilder();
+        try{
+        	builder = new COPBuilder();
+        }catch(JAXBException e){
+        	;
+        }catch(SAXException e){
+        	;
+        }
     	
     	Loader loader = null;
     	
@@ -201,7 +226,7 @@ public class ConvertPanel
     
     private void buildSpecificationSynthes() {
     	IDE ide = null;
-    	Document document= null;
+    	ModuleSubject document= null;
     	
     	loadFiles();
     	
@@ -211,17 +236,13 @@ public class ConvertPanel
     	    ide = container.getIDE();
     	}
     	
-    	if( null != ide ){
-    		openDocument( document );
-    	}else{
-    		saveDocument( document );
-    	}
+    	openWithIDE(document);
     }
     
     private void buildRelationsFromROP(){
     	
     	File file = null;
-    	Module module = null;
+    	ModuleSubject module = null;
     	
     	loadFiles();
     	module = builder.getDOPtoEFAOutput();
@@ -232,8 +253,20 @@ public class ConvertPanel
         }catch( IOException e ){
         	;
         }
-        	
-        module.writeToFile( file );
+        
+        //Save module to file
+        try
+		{
+			JAXBModuleMarshaller marshaller = 
+				new JAXBModuleMarshaller(factory, 
+						                 CompilerOperatorTable.getInstance());	
+			marshaller.marshal(module, file);
+		}
+		catch (Exception e)
+		{
+			e.printStackTrace();
+		}
+		
         openFileWithIDE( file );
             
     	//delete temporary file
@@ -247,19 +280,32 @@ public class ConvertPanel
     private void buildOperationsFromEOP(){
     	
     	File file = null;
-    	Module module = null;
+    	ModuleSubject module = null;
     	
     	loadFiles();
     	module = builder.getEOPtoEFAOutput();
     	
     	//create temporary file
     	try{
-            file = File.createTempFile("dop_relation_extract", WATER_MODULE_EXTENSION);
+            file = File.createTempFile("eop_build_efa", WATER_MODULE_EXTENSION);
         }catch( IOException e ){
         	;
         }
-        	
-        module.writeToFile( file );
+        
+        //Save module to file
+        try
+		{
+			JAXBModuleMarshaller marshaller = 
+				new JAXBModuleMarshaller(factory, 
+						                 CompilerOperatorTable.getInstance());	
+			marshaller.marshal(module, file);
+		}
+		catch (Exception e)
+		{
+			e.printStackTrace();
+		}
+		
+		//Open with IDE
         openFileWithIDE( file );
             
     	//delete temporary file
@@ -269,6 +315,67 @@ public class ConvertPanel
     	
     	
     }
+    
+    
+    
+    /*-------------------------------------------------------------------------
+     * 
+     * 
+     * 
+     * 
+     * 
+     * 
+     * 
+     *------------------------------------------------------------------------*/
+    private void buildTogether(){
+    	
+    	File file = null;
+    	ModuleSubject module = null;
+    	
+    	List<ModuleSubject> moduleList = new LinkedList<ModuleSubject>();
+    	
+    	//Update files
+    	loadFiles();
+    	
+    	//
+    	moduleList.add( builder.getEOPtoEFAOutput() );
+    	moduleList.add( builder.getDOPtoEFAOutput() );
+    	moduleList.add( builder.getSpecificationSynthesisOutput() );
+    	
+    	module = builder.mergeModules( moduleList );
+    	
+    	module.setName("Together");
+    	module.setComment("DOP to EFA output\n" + 
+    			          "DOP to EFA output\n" + 
+    			          "EOP to EFA output\n" + 
+    			          "Specification synthesis output\n");
+    	
+    	//create temporary file
+    	try{
+            file = File.createTempFile("build_all_togheter", WATER_MODULE_EXTENSION);
+        }catch( IOException e ){
+        	;
+        }
+        
+        try
+		{
+			JAXBModuleMarshaller marshaller = new JAXBModuleMarshaller(factory, CompilerOperatorTable.getInstance());	
+			marshaller.marshal(module, file);
+		}
+		catch (Exception e)
+		{
+			e.printStackTrace();
+		}
+  
+        openFileWithIDE( file );
+            
+    	//delete temporary file
+        if( null != file){
+        	file.delete();
+        }	
+    }
+    
+    
     
     
     
@@ -388,6 +495,29 @@ public class ConvertPanel
     	
     	//open file in IDE
     	ide.getDocumentContainerManager().openContainer( file );
+    	ide.setVisible(true);
+    }
+    
+    private void openWithIDE(ModuleSubject modsub){
+    	IDE ide = null;
+    	
+    	//Sanity check
+    	if( null == modsub){
+    		return;
+    	}
+    	
+    	if( null == container ){
+    	    return;    
+    	}
+    	
+    	ide = container.getIDE();
+    	
+    	//Sanity check
+    	if( null == ide ){
+            return;
+        }
+    	
+    	ide.getDocumentContainerManager().newContainer(modsub);
     	ide.setVisible(true);
     }
     
