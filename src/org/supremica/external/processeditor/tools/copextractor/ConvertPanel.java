@@ -62,7 +62,10 @@ public class ConvertPanel
 	private final String[] jbuttons = new String[]{"Specification synthesis",
 			                                       "DOP to EFA",
 			                                       "Generate Operations",
-			                                       "Synchronize safety spec"};
+			                                       "Build together",
+			                                       "Synthes",
+			                                       "RelationExtraction",
+			                                       "Save adapted"};
 	
 	private TablePane tablePane;
 	private JPanel buttonPane;
@@ -168,10 +171,28 @@ public class ConvertPanel
         		buildOperationsFromEOP();
         	}
         	
-        }else if( "Synchronize safety spec".equals( evt.getActionCommand() ) ){
+        }else if( "Build together".equals( evt.getActionCommand() ) ){
         	
         	if( checkInputToConvertAndInformUser() ){
         		buildTogether();
+        	}
+        	
+        }else if( "Synthes".equals( evt.getActionCommand() ) ){
+        	
+        	if( checkInputToConvertAndInformUser() ){
+        		buildSynthes();
+        	}
+        	
+        }else if( "RelationExtraction".equals( evt.getActionCommand() ) ){
+        	
+        	if( checkInputToConvertAndInformUser() ){
+        		relationExtraction();
+        	}
+        	
+        }else if( "Save adapted".equals( evt.getActionCommand() ) ){
+        	
+        	if( checkInputToConvertAndInformUser() ){
+        		saveAdaptedSpecifications();
         	}
         	
         }else{
@@ -225,18 +246,14 @@ public class ConvertPanel
     }
     
     private void buildSpecificationSynthes() {
-    	IDE ide = null;
-    	ModuleSubject document= null;
+    	
+    	ModuleSubject module = null;
     	
     	loadFiles();
     	
-    	document = builder.getSpecificationSynthesisOutput();
+    	module = builder.getSpecificationSynthesisOutput();
     	
-    	if( null != container ){
-    	    ide = container.getIDE();
-    	}
-    	
-    	openWithIDE(document);
+    	openWithIDE(module);
     }
     
     private void buildRelationsFromROP(){
@@ -338,9 +355,9 @@ public class ConvertPanel
     	loadFiles();
     	
     	//
+    	moduleList.add( builder.getSpecificationSynthesisOutput() );
     	moduleList.add( builder.getEOPtoEFAOutput() );
     	moduleList.add( builder.getDOPtoEFAOutput() );
-    	moduleList.add( builder.getSpecificationSynthesisOutput() );
     	
     	module = builder.mergeModules( moduleList );
     	
@@ -404,6 +421,75 @@ public class ConvertPanel
     	return true;
     }
     
+    private void buildSynthes() {
+    	File file = null;
+    	ModuleSubject module = null;
+    	
+    	List<ModuleSubject> moduleList = new LinkedList<ModuleSubject>();
+    	
+    	//Update files
+    	loadFiles();
+    	
+    	//
+    	moduleList.add( builder.getSpecificationSynthesisOutput() );
+    	moduleList.add( builder.getEOPtoEFAOutput() );
+    	moduleList.add( builder.getDOPtoEFAOutput() );
+    	
+    	module = builder.createSupervisor( moduleList );
+    	
+    	module.setName("Synthes");
+    	module.setComment("DOP to EFA output\n" + 
+    			          "DOP to EFA output\n" + 
+    			          "EOP to EFA output\n" + 
+    			          "Specification synthesis output\n");
+    	
+    	//create temporary file
+    	try{
+            file = File.createTempFile("sync_all_togheter", WATER_MODULE_EXTENSION);
+        }catch( IOException e ){
+        	;
+        }
+        
+        try
+		{
+			JAXBModuleMarshaller marshaller = new JAXBModuleMarshaller(factory, CompilerOperatorTable.getInstance());	
+			marshaller.marshal(module, file);
+		}
+		catch (Exception e)
+		{
+			e.printStackTrace();
+		}
+  
+        openFileWithIDE( file );
+            
+    	//delete temporary file
+        if( null != file){
+        	file.delete();
+        }	
+    }
+    
+    private void relationExtraction() {
+    	List<ROP> copList;
+    	
+    	loadFiles();
+    	
+    	copList = builder.getRelationExtractionOutput();
+    	
+    	if(null == copList || 0 == copList.size() ){
+    		System.out.println("No COP:s");
+    		return;
+    	}
+    	
+    	if(null != container){
+    		
+    		for(ROP rop : copList){
+    			container.insertResource(rop, null);
+    		}
+    	}
+    	
+    	
+    }
+    
     /**
      * Enables the user to save document to a file
      * @param document
@@ -430,6 +516,56 @@ public class ConvertPanel
         } else {
         	;
         }
+    }
+    
+    private void saveAdaptedSpecifications(){
+    	
+    	final String PATH = "c://a//";
+    	String fileName = "";
+    	
+    	Loader loader = new Loader();
+    	File file;
+    	
+    	loadFiles();
+    	
+    	List<EOP> eopList = builder.getAdaptedEOPList();
+    	for(int i = 0; i < eopList.size(); i++){
+    		
+    		fileName = "eop_" + i + ".xml";
+    		
+    		//debug
+    		System.out.println("Save: " + PATH + fileName);
+    		//debug
+    		
+    		file = new File(PATH + fileName);
+    		loader.saveEOP(eopList.get(i), file );
+    	}
+    	
+    	List<IL> ilList = builder.getAdaptedILList();
+    	for(int i = 0; i < ilList.size(); i++){
+    		
+    		fileName = "il_" + i + ".xml";
+    		
+    		//debug
+    		System.out.println("Save: " + PATH + fileName);
+    		//debug
+    		
+    		file = new File(PATH + fileName);
+    		loader.saveIL(ilList.get(i), file);
+    	}
+    	
+    	List<ROP> ropList = builder.getAdaptedROPList();
+    	for(int i = 0; i < ropList.size(); i++){
+    		
+    		fileName = "rop_" + i + ".xml";
+    		
+    		//debug
+    		System.out.println("Save: " + PATH + fileName);
+    		//debug
+    		
+    		file = new File(PATH + fileName);
+    		loader.save(ropList.get(i), file);
+    	}
     }
     
     /**
