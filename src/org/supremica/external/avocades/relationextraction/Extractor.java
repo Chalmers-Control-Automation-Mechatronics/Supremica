@@ -21,8 +21,8 @@ import org.jdom.*;
 import org.jdom.input.SAXBuilder;
 import org.jdom.output.*;
 
-
-
+import static org.supremica.external.avocades.AutomataNames.OPERATION_START_PREFIX;
+import static org.supremica.external.avocades.AutomataNames.OPERATION_STOP_PREFIX;
 
 public class Extractor
 {
@@ -84,20 +84,20 @@ public ArrayList extractRestrictions(Document sup, ArrayList ROPs)
 	{
 		Element event = (Element) eventIter.next();
 		String eventLabel = event.getAttributeValue("label");
-		if(eventLabel.length() > 2)
+		if(eventLabel.length() > OPERATION_START_PREFIX.length())
 		{
-			if(eventLabel.substring(0,2).equals("st"))
+			if(eventLabel.substring(0,OPERATION_START_PREFIX.length()).equals(OPERATION_START_PREFIX))
 			{
 
 				String eventId = event.getAttributeValue("id");
-				String opName = eventLabel.substring(2);
+				String opName = eventLabel.substring(OPERATION_START_PREFIX.length());
 				List opAndEvent = new ArrayList();
 				opAndEvent.add(0,opName);
 				opAndEvent.add(1,eventId);
 				opMatch.add(i, opAndEvent);
 				i++;
 			}
-			else if(!eventLabel.substring(0,3).equals("fin"))
+			else if(!eventLabel.substring(0,OPERATION_STOP_PREFIX.length()).equals(OPERATION_STOP_PREFIX))
 			{
 			}
 		}
@@ -238,8 +238,12 @@ public ArrayList getModelStates(List supStates, String eventId, List match)
 			String opStateName;
 			int index = supStateName.indexOf(opName);
 			int indexSeparator = supStateName.indexOf(stateSeparator, index);
-			//System.out.println("sep " + indexSeparator);
-
+			
+			//debug
+			//System.out.println("opName: " + opName);
+			//System.out.println("supStateName: " + supStateName);
+			//debug
+			
 			if(indexSeparator > index)
 			{
 				opStateName = supStateName.substring(index, indexSeparator);

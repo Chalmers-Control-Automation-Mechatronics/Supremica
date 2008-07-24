@@ -428,7 +428,8 @@ public class DOPnative {
 	
 	/**
 	 * 
-	 * @param event with event name and machine name separated by ::
+	 * @param event with event name and machine name separated by
+	 * EVENT_MACHINE_SEPARATOR
 	 * @return name of event without machine name
 	 */
 	protected static String getEvent(String event){
@@ -440,7 +441,8 @@ public class DOPnative {
 	
 	/**
 	 * 
-	 * @param event with event name and machine name separated by :: 
+	 * @param event with event name and machine name separated by 
+	 * EVENT_MACHINE_SEPARATOR 
 	 * @return machine name from event
 	 */
 	protected static String getMachine(String event){

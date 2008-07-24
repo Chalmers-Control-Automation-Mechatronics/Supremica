@@ -21,7 +21,7 @@ import org.supremica.manufacturingTables.xsd.processeditor.*;
  *----------------------------------------------------------------------------*/
 import static org.supremica.external.avocades.AutomataNames.OPERATION_START_PREFIX;
 import static org.supremica.external.avocades.AutomataNames.OPERATION_STOP_PREFIX;
-
+import static org.supremica.external.avocades.AutomataNames.EVENT_MACHINE_SEPARATOR;
 /**
  * @author David Millares
  *
@@ -515,7 +515,9 @@ public class DOPtoEFA
 				//add machine name to operation
 				if(machineName != null && machineName.length() > 0){
 					opName = ((Activity)o).getOperation();
-					((Activity)o).setOperation(opName +"::"+machineName);
+					((Activity)o).setOperation(opName +
+							                   EVENT_MACHINE_SEPARATOR +
+							                   machineName);
 				}
 				
 					
