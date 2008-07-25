@@ -33,7 +33,6 @@ import org.supremica.manufacturingTables.xsd.processeditor.Activity;
 import org.supremica.manufacturingTables.xsd.processeditor.OperationReferenceType;
 import org.supremica.manufacturingTables.xsd.processeditor.Relation;
 import org.supremica.manufacturingTables.xsd.eop.EOP;
-import org.supremica.manufacturingTables.xsd.eop.Action;
 import org.supremica.manufacturingTables.xsd.il.IL;
 import org.supremica.manufacturingTables.xsd.il.Term;
 import org.supremica.manufacturingTables.xsd.il.OperationCheck;
@@ -238,14 +237,13 @@ public class COPBuilder {
     public List<IL> getAdaptedILList(){
     	
     	List<IL> tmpILList = new LinkedList<IL>();
-    	IL tmpIL;
     	
     	for(IL il : ilList){
     		
     		/*
     		 * Create new il
     		 */
-    		tmpIL = copy( il );
+    		IL tmpIL = Converter.copy( il );
     		
     		/*
     		 * Rename Operations in Operation list
@@ -271,34 +269,13 @@ public class COPBuilder {
     	
     	final List<ROP> tmpROPList = new LinkedList<ROP>();
     	
-    	ROP tmpROP;
-    	
     	for(ROP rop : ropList){
-    		tmpROP = copy( rop );
+    		ROP tmpROP = Converter.copy( rop );
     		tmpROPList.add( tmpROP );
     	}
     	
-    	
-    	
     	return tmpROPList;
     }
-    
-    private ROP copy(final ROP rop){
-    	
-    	org.supremica.manufacturingTables.xsd.processeditor.ObjectFactory factory;
-    	factory = new org.supremica.manufacturingTables.xsd.processeditor.ObjectFactory();
-    	
-    	ROP newROP = factory.createROP();
-    	newROP.setComment(rop.getComment());
-    	newROP.setId(rop.getId());
-    	newROP.setMachine(rop.getMachine());
-    	newROP.setRelation(rop.getRelation());
-    	newROP.setType(rop.getType());
-    	 
-      	return newROP;
-    }
-    
-    
     
     private void renameILOperationList(List<String> operationList){
     	
@@ -410,23 +387,6 @@ public class COPBuilder {
 		}
     }
     
-    private IL copy( IL il ){
-    	
-    	org.supremica.manufacturingTables.xsd.il.ObjectFactory factory;
-    	factory = new org.supremica.manufacturingTables.xsd.il.ObjectFactory();
-    	
-    	IL newIL = factory.createIL();
-    	
-    	newIL.setActuator(il.getActuator());
-    	newIL.setComment(il.getComment());
-    	newIL.setId(il.getId());
-    	newIL.setILStructure(il.getILStructure()); //Ok??
-    	newIL.setOperation(il.getOperation());
-    	newIL.setType(il.getType());
-    	
-    	return il;
-    }
-    
     private DocumentProxy load(final URI uri){
         try {
             // The documentmanager does the loading, by extension.
@@ -530,7 +490,7 @@ public class COPBuilder {
     			if( eopIsUsedByROP(eop, rop) ){
     				
     				//Copy EOP
-    				tmpEOP = copy( eop );
+    				tmpEOP = Converter.copy( eop );
     				tmpEOP.setId(eop.getId() + 
     						     EVENT_MACHINE_SEPARATOR + 
     						     rop.getMachine());
@@ -582,40 +542,6 @@ public class COPBuilder {
     	
     	return false;
     }
-    
-    private EOP copy(EOP eop){
-    	
-    	org.supremica.manufacturingTables.xsd.eop.ObjectFactory factory;
-    	factory = new org.supremica.manufacturingTables.xsd.eop.ObjectFactory();
-    	
-    	EOP tmpEOP;
-    	
-    	//Sanity check
-    	if(null == eop){
-    		return null;
-    	}
-    	
-    	//Copy EOP
-		tmpEOP = factory.createEOP();
-		
-		tmpEOP.setId(eop.getId());
-		tmpEOP.setType(eop.getType());
-		tmpEOP.setComment(eop.getComment());
-		
-		tmpEOP.setInitialState(eop.getInitialState());
-		
-		for(Action a : eop.getAction()){
-			tmpEOP.getAction().add(a);
-		}
-		
-		tmpEOP.setInternalComponents(eop.getInternalComponents());
-		tmpEOP.setExternalComponents(eop.getExternalComponents());
-		
-		tmpEOP.setZones(eop.getZones());
-		
-    	return tmpEOP;
-    }
-    
     
     public List<ROP> getRelationExtractionOutput(){
     	
@@ -669,7 +595,7 @@ public class COPBuilder {
 			ROP rop = Converter.convertToROP( cop );
 			
 			if(null != rop){	
-				removeMachineNameFromActivitiesInROP(rop);
+				removeMachineNameFromActivitiesInROP( rop );
 				copList.add( rop );
 			}
 		}

@@ -197,7 +197,9 @@ public class DOPnative {
 
 
 		//------- Add running state ---------//
-		runningState = activity.getOperation().concat(RUNNING_STATE_SUFFIX);
+		runningState = activity.getOperation().
+		                        replace(EVENT_MACHINE_SEPARATOR, "").
+		                        concat(RUNNING_STATE_SUFFIX);
 
 		if(efa.stateExist(runningState)){
 			int i = 0;

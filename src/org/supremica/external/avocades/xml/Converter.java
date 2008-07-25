@@ -18,14 +18,25 @@ import org.jdom.input.SAXBuilder;
 import org.jdom.output.XMLOutputter;
 
 import org.supremica.manufacturingTables.xsd.processeditor.ROP;
+import org.supremica.manufacturingTables.xsd.eop.EOP;
+import org.supremica.manufacturingTables.xsd.il.IL;
 
 public class Converter {
 	
-	private static String PKGS_ROP = "org.supremica.manufacturingTables.xsd.processeditor";
+	private static final String PKGS_ROP = "org.supremica.manufacturingTables.xsd.processeditor";
+	private static final String PKGS_EOP = "org.supremica.manufacturingTables.xsd.eop";
+	private static final String PKGS_IL = "org.supremica.manufacturingTables.xsd.il";
+	
+	private static final Loader loader = new Loader();
+	
+	/*-------------------------------------------------------------------------
+	 * 
+	 * Convert functions
+	 * 
+	 *-------------------------------------------------------------------------*/
 	
 	public static ROP convertToROP( Document doc ){
 		
-		final Loader loader = new Loader();
 		final XMLOutputter outputter = new XMLOutputter();
 		final StringWriter sw = new StringWriter();
 		
@@ -73,6 +84,48 @@ public class Converter {
 		return sr.getWriter().toString();
 	}
 	
+	public static String convertToXMLString(EOP eop){
+		
+		final StreamResult sr = new StreamResult( new StringWriter() );
+    	
+    	try{
+    		JAXBContext jc = JAXBContext.newInstance(PKGS_EOP);
+    		Marshaller m = jc.createMarshaller();
+    		
+    		m.marshal(eop,  sr);
+    		
+    	}catch(UnmarshalException ue) {
+    		java.lang.System.err.println("Invalid XML code (UnmarshalException)" );
+    		ue.printStackTrace();
+    	}catch(JAXBException je) {
+    		java.lang.System.err.println("JAXBException caught!");
+    		je.printStackTrace();
+    	}
+    	
+		return sr.getWriter().toString();
+	}
+
+	public static String convertToXMLString(IL il){
+		
+		final StreamResult sr = new StreamResult( new StringWriter() );
+    	
+    	try{
+    		JAXBContext jc = JAXBContext.newInstance(PKGS_IL);
+    		Marshaller m = jc.createMarshaller();
+    		
+    		m.marshal(il,  sr);
+    		
+    	}catch(UnmarshalException ue) {
+    		java.lang.System.err.println("Invalid XML code (UnmarshalException)" );
+    		ue.printStackTrace();
+    	}catch(JAXBException je) {
+    		java.lang.System.err.println("JAXBException caught!");
+    		je.printStackTrace();
+    	}
+    	
+		return sr.getWriter().toString();
+	}
+	
 	public static Document convertToDocument(String xmlStr){
 		
 		Document doc = null;
@@ -93,5 +146,44 @@ public class Converter {
 	
 	public static Document convertToDocument(ROP rop){
 		return convertToDocument( convertToXMLString( rop ) );
+	}
+	
+	
+	/*-------------------------------------------------------------------------
+	 * 
+	 * Copy functions
+	 * 
+	 *-------------------------------------------------------------------------*/
+	
+	public static ROP copy(final ROP rop){
+		
+		final Object o = loader.openROP( convertToXMLString( rop ) );
+		
+		if(o instanceof ROP){
+			return (ROP)o;
+		}
+		
+		return null;
+	}
+	
+	public static EOP copy(final EOP eop){
+		final Object o = loader.openEOP( convertToXMLString( eop ) );
+		
+		if(o instanceof EOP){
+			return (EOP)o;
+		}
+		
+		return null;
+	}
+	
+	public static IL copy(final IL il){
+		
+		final Object o = loader.openIL( convertToXMLString( il ) );
+		
+		if(o instanceof IL){
+			return (IL)o;
+		}
+		
+		return null;
 	}
 }

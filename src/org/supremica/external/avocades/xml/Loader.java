@@ -5,6 +5,10 @@ import java.io.*;
 import javax.xml.bind.*;
 import javax.xml.transform.stream.StreamSource;
 
+import org.supremica.manufacturingTables.xsd.processeditor.ROP;
+import org.supremica.manufacturingTables.xsd.eop.EOP;
+import org.supremica.manufacturingTables.xsd.il.IL;
+
 public class Loader {
 	
 	private final String PKGS_ROP = "org.supremica.manufacturingTables.xsd.processeditor";
@@ -54,7 +58,74 @@ public class Loader {
     	
     	//Unknown object
     	return o; 
-    } 
+    }
+    
+    public EOP openEOP(String xmlStr){
+    	
+    	final Object o;
+    	try {			
+    		jaxbContext = JAXBContext.newInstance(PKGS_EOP);
+    		u = jaxbContext.createUnmarshaller();
+    		o = load(xmlStr, PKGS_EOP);
+    	}
+    	catch(JAXBException je) {
+    		if(printDebugInfo){
+    			je.printStackTrace();
+    		}
+    		return null;
+    	}
+    	
+    	if(o instanceof EOP){
+    		return (EOP)o;
+    	}
+    	
+    	return null;
+    }
+    
+    public ROP openROP(String xmlStr){
+    	
+    	final Object o;
+    	try {			
+    		jaxbContext = JAXBContext.newInstance(PKGS_ROP);
+    		u = jaxbContext.createUnmarshaller();
+    		o = load(xmlStr, PKGS_ROP);
+    	}
+    	catch(JAXBException je) {
+    		if(printDebugInfo){
+    			je.printStackTrace();
+    		}
+    		return null;
+    	}
+    	
+    	if(o instanceof ROP){
+    		return (ROP)o;
+    	}
+    	
+    	return null;
+    }
+    
+    public IL openIL(String xmlStr){
+    	
+    	final Object o;
+    	try {			
+    		jaxbContext = JAXBContext.newInstance(PKGS_IL);
+    		u = jaxbContext.createUnmarshaller();
+    		o = load(xmlStr, PKGS_IL);
+    	}
+    	catch(JAXBException je) {
+    		if(printDebugInfo){
+    			je.printStackTrace();
+    		}
+    		return null;
+    	}
+    	
+    	if(o instanceof IL){
+    		return (IL)o;
+    	}
+    	
+    	return null;
+    }
+    
 
     private Object open(String xmlStr, String PKGS) {	
     	

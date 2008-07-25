@@ -21,6 +21,7 @@ import static org.supremica.external.avocades.AutomataNames.OPERATION_START_PREF
 import static org.supremica.external.avocades.AutomataNames.OPERATION_STOP_PREFIX;
 
 import static org.supremica.external.avocades.AutomataNames.STATE_SEPARATOR;
+import static org.supremica.external.avocades.AutomataNames.STATE_INDICATOR;
 
 import static org.supremica.external.avocades.AutomataNames.INITIAL_STATE_POSTFIX;
 import static org.supremica.external.avocades.AutomataNames.EXECUTION_STATE_POSTFIX;
@@ -89,7 +90,7 @@ public ArrayList extractRestrictions(Document sup, ArrayList ROPs)
 		String eventLabel = event.getAttributeValue("label");
 		if(eventLabel.length() > OPERATION_START_PREFIX.length())
 		{
-			if(eventLabel.substring(0,OPERATION_START_PREFIX.length()).equals(OPERATION_START_PREFIX))
+			if( eventLabel.substring(0, OPERATION_START_PREFIX.length()).equals(OPERATION_START_PREFIX) )
 			{
 
 				String eventId = event.getAttributeValue("id");
@@ -121,9 +122,9 @@ public ArrayList extractRestrictions(Document sup, ArrayList ROPs)
 		restr.opName = opName;
 		
 		//debug
-		System.out.println("OpId: " + opId);
-		System.out.println("OpName: " + opName);
-		System.out.println("--");
+		//System.out.println("OpId: " + opId);
+		//System.out.println("OpName: " + opName);
+		//System.out.println("--");
 		//debug
 		
 
@@ -447,10 +448,6 @@ public ArrayList simplify(ArrayList operationList)
 ******************************************************/
 public ArrayList replaceIECpredSucc(ArrayList restr, ArrayList ps)
 {
-	String firstState	= INITIAL_STATE_POSTFIX;
-	String secondState	= EXECUTION_STATE_POSTFIX;
-	String thirdState	= END_STATE_POSTFIX;
-	String dontCareState= DONT_CARE_STATE_POSTFIX;
 
 	for(Iterator restrIter = restr.iterator(); restrIter.hasNext(); )
 	{
@@ -487,31 +484,31 @@ public ArrayList replaceIECpredSucc(ArrayList restr, ArrayList ps)
 						op = state;
 					}
 
-					if(state.equals(op.concat(thirdState)))
+					if(state.equals(op.concat(END_STATE_POSTFIX)))
 					{
 						allOpStatesThird = getRestrString(rList, i1);
-						allOpStatesThird = allOpStatesThird.replaceAll(op.concat(thirdState), "");
+						allOpStatesThird = allOpStatesThird.replaceAll(op.concat(END_STATE_POSTFIX), "");
 
 						int i2=0;
 						boolean found2 = false;
 						while(i2<noOfStates)
 						{
 							String state2 = (String) states.get(i2);
-							if(state2.equals(op.concat(secondState)))
+							if(state2.equals(op.concat(EXECUTION_STATE_POSTFIX)))
 							{
 								allOpStatesSecond = getRestrString(rList, i2);
-								allOpStatesSecond = allOpStatesSecond.replaceAll(op.concat(secondState), "");
+								allOpStatesSecond = allOpStatesSecond.replaceAll(op.concat(EXECUTION_STATE_POSTFIX), "");
 
 								int i3=0;
 								boolean found3 = false;
 								while(i3<noOfStates)
 								{
 									String state3 = (String) states.get(i3);
-									if(state3.equals(op.concat(firstState)))
+									if(state3.equals(op.concat(INITIAL_STATE_POSTFIX)))
 									{
 
 										allOpStatesFirst = getRestrString(rList, i3);
-										allOpStatesFirst = allOpStatesFirst.replaceAll(op.concat(firstState), "");
+										allOpStatesFirst = allOpStatesFirst.replaceAll(op.concat(INITIAL_STATE_POSTFIX), "");
 
 										// All strings found
 
@@ -544,7 +541,7 @@ public ArrayList replaceIECpredSucc(ArrayList restr, ArrayList ps)
 										{
 
 											changed = true;
-											rList = replaceState(rList, op, op.concat(dontCareState), i1);
+											rList = replaceState(rList, op, op.concat(DONT_CARE_STATE_POSTFIX), i1);
 											if(thePreds.size() > 0)
 											{
 												for(Iterator predIter = thePreds.iterator(); predIter.hasNext(); )
@@ -552,7 +549,7 @@ public ArrayList replaceIECpredSucc(ArrayList restr, ArrayList ps)
 
 													String thePred = (String) predIter.next();
 
-													rList = replaceState(rList, thePred, thePred.concat(thirdState), i1);
+													rList = replaceState(rList, thePred, thePred.concat(END_STATE_POSTFIX), i1);
 												}
 											}
 											if(theSuccs.size() > 0)
@@ -561,7 +558,7 @@ public ArrayList replaceIECpredSucc(ArrayList restr, ArrayList ps)
 												{
 													String theSucc = (String) succIter.next();
 
-													rList = replaceState(rList, theSucc, theSucc.concat(firstState), i1);
+													rList = replaceState(rList, theSucc, theSucc.concat(INITIAL_STATE_POSTFIX), i1);
 												}
 											}
 											if(i2>i3)
@@ -734,13 +731,13 @@ public ArrayList findReplaceIEC(ArrayList r)
 ******************************************************/
 public Restriction replaceIEC(Restriction restr)
 {
-	/* Replace unnecessary restrictions with a - (instead of init/exec/comp). For example, if there are three restrictions, where O2 is in O2_init in all of them, whereas O1 is in O1_init, O1_exec and O1_comp respectively, then this can be simplified to one restriction where O2 is in O2_init and O1 is in - (don't care). */
-
-	String stateIndicator = "_";
-	
-	String secondState = stateIndicator.concat("exec");
-	String thirdState = stateIndicator.concat("comp");
-	String dontCareState = stateIndicator.concat("-");
+	/* 
+	 * Replace unnecessary restrictions with a - (instead of init/exec/comp).
+	 * For example, if there are three restrictions, where O2 is in O2_init
+	 * in all of them, whereas O1 is in O1_init, O1_exec and O1_comp 
+	 * respectively, then this can be simplified to one restriction 
+	 * where O2 is in O2_init and O1 is in - (don't care). 
+	 */
 
 	String op = (String) restr.opName;
 
@@ -765,14 +762,19 @@ public Restriction replaceIEC(Restriction restr)
 		ArrayList states = (ArrayList) restrictions.get(i);
 		int stateNumber = -1;
 
-		/* For all states of the operation, e.g. O1_init, O1_init, O1_comp, O1_init etc. build two lists. allStatesList that in each entry contains a string for each alternative state combination, and otherStatesList that in each entry contains a string representing the states of the other operations (e.g. all but O1). */
+		/* For all states of the operation, e.g. O1_init, O1_init, O1_comp,
+		 * O1_init etc. build two lists. allStatesList that in each entry 
+		 * contains a string for each alternative state combination, and 
+		 * otherStatesList that in each entry contains a string representing 
+		 * the states of the other operations (e.g. all but O1). 
+		 */
 		for(Iterator stateIter = states.iterator(); stateIter.hasNext(); )
 		{
 			String stateName = (String) stateIter.next();
 
 			if(stateNumber == 2)
 			{
-				opName = stateName.substring(0, stateName.indexOf(stateIndicator));
+				opName = stateName.substring(0, stateName.indexOf(STATE_INDICATOR));
 				// e.g. O1
 			}
 			stateNumber++;
@@ -839,12 +841,18 @@ public Restriction replaceIEC(Restriction restr)
 				indT = allStatesList.indexOf(third);
 
 
-				// If there exist e.g. O1_init -> string, O1_exec -> string and O1_comp -> string, simplify to O1_- -> string, where - meand don't care.
+				/* If there exist
+				 * 	e.g.
+				 * 		O1_init -> string,
+				 * 		O1_exec -> string and O1_comp -> string,
+				 * 		simplify to O1_- -> string,
+				 * 	where - meand don't care. 
+				 */
 				if(indF > -1 && indS > -1 && indT > -1)
 				{
 
 					states.remove(indF+2);
-					String adding = opName.concat(dontCareState);
+					String adding = opName.concat(DONT_CARE_STATE_POSTFIX);
 					states.add(indF+2, adding);
 
 					remove.remove(indS+2);
@@ -904,7 +912,7 @@ public ArrayList findPredecessors(Restriction restr)
 			String state = (String) statesIter.next();
 			if(i>1)
 			{
-				if(!state.equals(opName.concat("_comp")))
+				if(!state.equals(opName.concat(END_STATE_POSTFIX)))
 				{
 					pred = false;
 				}

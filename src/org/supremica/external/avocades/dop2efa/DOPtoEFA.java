@@ -26,6 +26,9 @@ import static org.supremica.external.avocades.AutomataNames.EVENT_MACHINE_SEPARA
 import static org.supremica.external.avocades.AutomataNames.DONT_CARE_START_PREFIX;
 import static org.supremica.external.avocades.AutomataNames.DONT_CARE_STOP_PREFIX;
 
+import static org.supremica.external.avocades.AutomataNames.MACHINE_INITIAL_STATE_POSTFIX;
+import static org.supremica.external.avocades.AutomataNames.MACHINE_END_STATE_POSTFIX;
+
 /**
  * @author David Millares
  *
@@ -33,7 +36,7 @@ import static org.supremica.external.avocades.AutomataNames.DONT_CARE_STOP_PREFI
 public class DOPtoEFA
 				extends DOPrelation{
 	
-	
+	private static final String MAIN_AUTOMATA_PREFIX = "main_";
 	
 	public DOPtoEFA(){}
 	
@@ -161,8 +164,7 @@ public class DOPtoEFA
 	 * @param rop the ROP to add to module
 	 * @return a Module whit one ROP added
 	 */
-	public static Module buildModuleFromROP(ROP rop,
-											Module module){
+	public static Module buildModuleFromROP(ROP rop, Module module){
 		
 		String comment, machine;
 		String startState, endState;
@@ -182,7 +184,6 @@ public class DOPtoEFA
 		if(module == null){
 			module = new Module("module",false);
 		}
-		
 		
 		comment = rop.getComment(); 
 		if(comment == null || comment.length() == 0){
@@ -220,25 +221,25 @@ public class DOPtoEFA
 		
 		//Relabeling of events, for uniqueness and traceable
 		//to machine. 
-		rop.setRelation(renameEqualOperationName(rop.getRelation(),machine));
+		rop.setRelation( renameEqualOperationName( rop.getRelation(), machine) );
 		
 		//build main sequence
-		main_sequence.getActivityRelationGroup().add(start_machine);
-		main_sequence.getActivityRelationGroup().add(rop.getRelation());
-		main_sequence.getActivityRelationGroup().add(stop_machine);
+		main_sequence.getActivityRelationGroup().add( start_machine );
+		main_sequence.getActivityRelationGroup().add( rop.getRelation() );
+		main_sequence.getActivityRelationGroup().add( stop_machine );
 		
 		//------------------------------------//
 		// preprocessing of the relation tree //
 		//------------------------------------//
-		main_sequence = removeEmtyRelations(main_sequence);
-		main_sequence = collapseRelationTree(main_sequence);
+		main_sequence = removeEmtyRelations( main_sequence );
+		main_sequence = collapseRelationTree( main_sequence );
 		
 		//create main efa
-		main_efa = new EFA("main_" + machine, module);
+		main_efa = new EFA(MAIN_AUTOMATA_PREFIX + machine, module);
 		module.addAutomaton(main_efa);
 		
-		startState = machine +  "_idle";
-		endState = machine + "_finish";
+		startState 	= machine + MACHINE_INITIAL_STATE_POSTFIX;
+		endState 	= machine + MACHINE_END_STATE_POSTFIX;
 		
 		//First state not marked and initial
 		main_efa.addState(startState, false, true);
