@@ -77,6 +77,8 @@ public class ConvertPanel
     
     private ModuleSubjectFactory factory;
     
+    private JFileChooser fcOutput;
+    
     //constructor
     public ConvertPanel() {
         super( new BorderLayout() );
@@ -107,7 +109,7 @@ public class ConvertPanel
         	buttonPane.add( Box.createRigidArea( new Dimension( 1, 10 )) );
         }
         
-        
+        fcOutput = new JFileChooser();
         
         //Add Components to this panel.
         add( tablePane, BorderLayout.CENTER );
@@ -133,7 +135,7 @@ public class ConvertPanel
     
     //TODO: Make this work
     public void setOutputFileChooser(JFileChooser fc) {
-    	//outputPane.setFileChooser( fc );
+    	this.fcOutput = fc;
     }
     
     public void setInputFileChooser(JFileChooser fc) {
@@ -520,7 +522,8 @@ public class ConvertPanel
     
     private void saveAdaptedSpecifications(){
     	
-    	final String PATH = "c://a//";
+    	final String PATH;
+    	
     	String fileName = "";
     	
     	Loader loader = new Loader();
@@ -528,15 +531,23 @@ public class ConvertPanel
     	
     	loadFiles();
     	
+    	if(fcOutput == null){
+    		fcOutput = new JFileChooser();
+    	}
+    	
+    	fcOutput.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+    	
+        if(JFileChooser.APPROVE_OPTION == fcOutput.showOpenDialog(this)){
+            file = fcOutput.getSelectedFile();
+            PATH = file.getAbsolutePath() + "//";
+        }else{
+        	return;
+        }
+    	
     	List<EOP> eopList = builder.getAdaptedEOPList();
     	for(int i = 0; i < eopList.size(); i++){
     		
     		fileName = "eop_" + i + ".xml";
-    		
-    		//debug
-    		System.out.println("Save: " + PATH + fileName);
-    		//debug
-    		
     		file = new File(PATH + fileName);
     		loader.saveEOP(eopList.get(i), file );
     	}
@@ -545,11 +556,6 @@ public class ConvertPanel
     	for(int i = 0; i < ilList.size(); i++){
     		
     		fileName = "il_" + i + ".xml";
-    		
-    		//debug
-    		System.out.println("Save: " + PATH + fileName);
-    		//debug
-    		
     		file = new File(PATH + fileName);
     		loader.saveIL(ilList.get(i), file);
     	}
@@ -558,11 +564,6 @@ public class ConvertPanel
     	for(int i = 0; i < ropList.size(); i++){
     		
     		fileName = "rop_" + i + ".xml";
-    		
-    		//debug
-    		System.out.println("Save: " + PATH + fileName);
-    		//debug
-    		
     		file = new File(PATH + fileName);
     		loader.save(ropList.get(i), file);
     	}
