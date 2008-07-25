@@ -22,12 +22,18 @@ import org.supremica.manufacturingTables.xsd.processeditor.*;
 import static org.supremica.external.avocades.AutomataNames.OPERATION_START_PREFIX;
 import static org.supremica.external.avocades.AutomataNames.OPERATION_STOP_PREFIX;
 import static org.supremica.external.avocades.AutomataNames.EVENT_MACHINE_SEPARATOR;
+
+import static org.supremica.external.avocades.AutomataNames.DONT_CARE_START_PREFIX;
+import static org.supremica.external.avocades.AutomataNames.DONT_CARE_STOP_PREFIX;
+
 /**
  * @author David Millares
  *
  */
 public class DOPtoEFA
 				extends DOPrelation{
+	
+	
 	
 	public DOPtoEFA(){}
 	
@@ -163,8 +169,6 @@ public class DOPtoEFA
 		
 		EFA main_efa;
 		
-		ObjectFactory factory;
-		
 		Relation main_sequence;
 		Activity start_machine, stop_machine;
 		
@@ -190,25 +194,22 @@ public class DOPtoEFA
 			machine = "no_machine";
 		}
 		
-		factory = new ObjectFactory();
-		
 		main_sequence = factory.createRelation();
 		main_sequence.setType(RelationType.SEQUENCE);
 		
 		start_machine = factory.createActivity();
 		stop_machine = factory.createActivity();
 		
-		Attribute onlyStartAttribute = factory.createAttribute();
-		Attribute onlyStopAttribute = factory.createAttribute();
-		
 		Properties startProp = factory.createProperties();
 		Properties stopProp = factory.createProperties();
 		
-		onlyStartAttribute.setType(ONLY_STA);
-		onlyStopAttribute.setType(ONLY_STO);
+		startProp.getAttribute().add(createOnlyStartAttribute());
+		startProp.getAttribute().add(
+				createStartPrefixAttribute(DONT_CARE_START_PREFIX));
 		
-		startProp.getAttribute().add(onlyStartAttribute);
-		stopProp.getAttribute().add(onlyStopAttribute);
+		stopProp.getAttribute().add(createOnlyStopAttribute());
+		stopProp.getAttribute().add(
+				createStopPrefixAttribute(DONT_CARE_STOP_PREFIX));
 		
 		//special will be parsed in DOPnative 
 		start_machine.setOperation(machine);
@@ -252,6 +253,8 @@ public class DOPtoEFA
 		return module;
 	}
 	
+	
+
 	/**
 	 * Open a ROP file and return the ROP
 	 * @param ropFile 

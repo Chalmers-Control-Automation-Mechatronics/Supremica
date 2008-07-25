@@ -5,23 +5,13 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
-import java.io.StringReader;
-import java.io.StringWriter;
-
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.LinkedList;
 
-import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
-import javax.xml.bind.UnmarshalException;
-import javax.xml.bind.Unmarshaller;
-import javax.xml.bind.Marshaller;
-import javax.xml.transform.stream.StreamSource;
-import javax.xml.transform.stream.StreamResult;
-
 
 import org.jdom.Document;
 import org.jdom.output.XMLOutputter;
@@ -40,6 +30,7 @@ import org.supremica.external.avocades.specificationsynthesis.SpecificationSynth
 
 import org.supremica.manufacturingTables.xsd.processeditor.ROP;
 import org.supremica.manufacturingTables.xsd.processeditor.Activity;
+import org.supremica.manufacturingTables.xsd.processeditor.OperationReferenceType;
 import org.supremica.manufacturingTables.xsd.processeditor.Relation;
 import org.supremica.manufacturingTables.xsd.eop.EOP;
 import org.supremica.manufacturingTables.xsd.eop.Action;
@@ -625,7 +616,7 @@ public class COPBuilder {
     	return tmpEOP;
     }
     
-    //TODO: Make this work, unfinished
+    
     public List<ROP> getRelationExtractionOutput(){
     	
     	Extractor extractor = null;
@@ -678,21 +669,85 @@ public class COPBuilder {
 			ROP rop = Converter.convertToROP( cop );
 			
 			if(null != rop){	
-				removeMachineNameFromOperation(rop);
+				removeMachineNameFromActivitiesInROP(rop);
 				copList.add( rop );
 			}
 		}
 		return copList;
     }
     
-    private void removeMachineNameFromOperation(ROP rop){
-    	;//Gör klart denna funktion snart klar
+    private void removeMachineNameFromActivitiesInROP(final ROP rop){
+    	
+    	final String strMachineName;
+    	
+    	//Sanity check
+    	if(null == rop){
+    		return;
+    	}
+    	
+    	//String to be removed 
+    	strMachineName = EVENT_MACHINE_SEPARATOR + rop.getMachine();
+    	
+    	removeMachineNameFromActivitiesInRelation( rop.getRelation(), strMachineName);
     }
     
+    private void removeMachineNameFromActivitiesInRelation(
+    		final Relation relation,
+    		final String strMachineName)
+    {
+    	
+    	for(Object o : relation.getActivityRelationGroup()){
+    		if(o instanceof Activity){
+    			removeMachineNameFromActivity( (Activity)o, strMachineName );
+    		}else if(o instanceof Relation){
+    			
+    			//Recursion
+    			removeMachineNameFromActivitiesInRelation( (Relation)o, strMachineName );
+    		}else{
+    			System.err.println(
+    					"COPBuilder: " +
+    					"Unknown Object " + o.toString() );
+    		}
+    	}
+    }
     
-    
-    
-    
+    private void removeMachineNameFromActivity(
+    		final Activity activity, 
+    		String strMachineName )
+    {
+    	String strOperation;
+    	
+    	//Sanity check
+    	if(null == activity || null == strMachineName){
+    		return;
+    	}
+    	
+    	strOperation = activity.getOperation();
+    	
+    	//---------------------------------------------------------------------
+    	//	1. Remove machine name in Operation name
+    	//---------------------------------------------------------------------
+    	if( null != strOperation && 0 != strOperation.length() ){
+    		activity.setOperation( strOperation.replace( strMachineName, "" ) );
+    	}
+    	
+    	
+    	//---------------------------------------------------------------------
+    	//	2. Remove machine name in Preconditions
+    	//---------------------------------------------------------------------
+    	if( null != activity.getPrecondition() ){
+    		for(OperationReferenceType opRef : activity.getPrecondition().getPredecessor()){
+    		
+    			strOperation = opRef.getOperation();
+    			strMachineName = EVENT_MACHINE_SEPARATOR + opRef.getMachine();
+    			
+    			/*
+        	 	* Replaces machine name in operation name
+        	 	*/
+        		opRef.setOperation( strOperation.replace( strMachineName, "" ) );
+    		}
+    	}
+    }
     
     private Document watersModuleToProjectDocument(ModuleSubject module){
     	

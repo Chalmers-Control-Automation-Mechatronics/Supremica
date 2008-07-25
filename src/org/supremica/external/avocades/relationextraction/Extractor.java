@@ -8,27 +8,30 @@
 package org.supremica.external.avocades.relationextraction;
 
 import java.util.*;
-import javax.swing.*;
-import java.applet.*;
-import java.lang.*;
-
-import java.io.*;
-import javax.xml.parsers.*;
-
-import org.xml.sax.*;
-
 import org.jdom.*;
-import org.jdom.input.SAXBuilder;
-import org.jdom.output.*;
+
+
+/*-----------------------------------------------------------------------------
+ * 
+ * Imported constants
+ * 
+ *-----------------------------------------------------------------------------*/
 
 import static org.supremica.external.avocades.AutomataNames.OPERATION_START_PREFIX;
 import static org.supremica.external.avocades.AutomataNames.OPERATION_STOP_PREFIX;
 
+import static org.supremica.external.avocades.AutomataNames.STATE_SEPARATOR;
+
+import static org.supremica.external.avocades.AutomataNames.INITIAL_STATE_POSTFIX;
+import static org.supremica.external.avocades.AutomataNames.EXECUTION_STATE_POSTFIX;
+import static org.supremica.external.avocades.AutomataNames.END_STATE_POSTFIX;
+import static org.supremica.external.avocades.AutomataNames.DONT_CARE_STATE_POSTFIX;
+
 public class Extractor
 {
-	ArrayList COPList;
-	Document relationsDoc; // Output xml document.
-	Element relations = new Element("COP");
+	private ArrayList COPList;
+	private Document relationsDoc; // Output xml document.
+	private Element relations = new Element("COP");
 
 	public class Restriction {
 		public String opId;
@@ -116,6 +119,13 @@ public ArrayList extractRestrictions(Document sup, ArrayList ROPs)
 		String opName = dummy.toString();
 		restr.opId = opId;
 		restr.opName = opName;
+		
+		//debug
+		System.out.println("OpId: " + opId);
+		System.out.println("OpName: " + opName);
+		System.out.println("--");
+		//debug
+		
 
 		/* Get the supervisor states where eventId is enabled, e.g. q0 and q2 */
 		List enabledInSupStates = getSupervisorStates(theSupervisor, eventId);
@@ -213,8 +223,6 @@ public ArrayList getModelStates(List supStates, String eventId, List match)
 	state corresponds to the first */
 
 	ArrayList modelStates = new ArrayList();
-	char stateSeparator = '.';
-	String stateIndicator = "_";
 
 	int i = 0;
 	// For all operations
@@ -237,12 +245,7 @@ public ArrayList getModelStates(List supStates, String eventId, List match)
 			//System.out.println("Enabled in sup state "+ supStateName);
 			String opStateName;
 			int index = supStateName.indexOf(opName);
-			int indexSeparator = supStateName.indexOf(stateSeparator, index);
-			
-			//debug
-			//System.out.println("opName: " + opName);
-			//System.out.println("supStateName: " + supStateName);
-			//debug
+			int indexSeparator = supStateName.indexOf(STATE_SEPARATOR, index);
 			
 			if(indexSeparator > index)
 			{
@@ -444,12 +447,10 @@ public ArrayList simplify(ArrayList operationList)
 ******************************************************/
 public ArrayList replaceIECpredSucc(ArrayList restr, ArrayList ps)
 {
-
-	String stateIndicator = "_";
-	String firstState = stateIndicator.concat("init");
-	String secondState = stateIndicator.concat("exec");
-	String thirdState = stateIndicator.concat("comp");
-	String dontCareState = stateIndicator.concat("-");
+	String firstState	= INITIAL_STATE_POSTFIX;
+	String secondState	= EXECUTION_STATE_POSTFIX;
+	String thirdState	= END_STATE_POSTFIX;
+	String dontCareState= DONT_CARE_STATE_POSTFIX;
 
 	for(Iterator restrIter = restr.iterator(); restrIter.hasNext(); )
 	{
@@ -606,11 +607,7 @@ public boolean findPredSucc(String si, String se, String sc, ArrayList predsSucc
 {
 
 	boolean ans = false;
-	String stateIndicator = "_";
-	String firstState = stateIndicator.concat("init");
-	String thirdState = stateIndicator.concat("comp");
-	String dontCareState = stateIndicator.concat("-");
-
+	
 	if(si.equals(se) && si.equals(sc))
 	{
 		return true;
@@ -643,16 +640,23 @@ public boolean findPredSucc(String si, String se, String sc, ArrayList predsSucc
 				noPredsNew--;
 				thePreds.add(ps);
 				si2 = si;
-				se2 = se.replaceAll(ps.concat(dontCareState), ps.concat(thirdState));
-				sc2 = sc.replaceAll(ps.concat(dontCareState), ps.concat(thirdState));
+				
+				se2 = se.replaceAll( ps.concat(DONT_CARE_STATE_POSTFIX),
+						             ps.concat(END_STATE_POSTFIX));
+				
+				sc2 = sc.replaceAll( ps.concat(DONT_CARE_STATE_POSTFIX),
+						             ps.concat(END_STATE_POSTFIX));
 			}
 			else // ps is a successor
 			{
 				noSuccsNew--;
 				theSuccs.add(ps);
 				sc2 = sc;
-				se2 = se.replaceAll(ps.concat(dontCareState), ps.concat(firstState));
-				si2 = si.replaceAll(ps.concat(dontCareState), ps.concat(firstState));
+				se2 = se.replaceAll( ps.concat(DONT_CARE_STATE_POSTFIX),
+						             ps.concat(INITIAL_STATE_POSTFIX));
+				
+				si2 = si.replaceAll( ps.concat(DONT_CARE_STATE_POSTFIX),
+						             ps.concat(INITIAL_STATE_POSTFIX));
 
 			}
 
@@ -733,7 +737,7 @@ public Restriction replaceIEC(Restriction restr)
 	/* Replace unnecessary restrictions with a - (instead of init/exec/comp). For example, if there are three restrictions, where O2 is in O2_init in all of them, whereas O1 is in O1_init, O1_exec and O1_comp respectively, then this can be simplified to one restriction where O2 is in O2_init and O1 is in - (don't care). */
 
 	String stateIndicator = "_";
-	String firstState = stateIndicator.concat("init");
+	
 	String secondState = stateIndicator.concat("exec");
 	String thirdState = stateIndicator.concat("comp");
 	String dontCareState = stateIndicator.concat("-");
@@ -825,9 +829,9 @@ public Restriction replaceIEC(Restriction restr)
 				}
 
 
-				first.add(opName.concat(firstState));
-				second.add(opName.concat(secondState));
-				third.add(opName.concat(thirdState));
+				first.add(opName.concat(INITIAL_STATE_POSTFIX));
+				second.add(opName.concat(EXECUTION_STATE_POSTFIX));
+				third.add(opName.concat(END_STATE_POSTFIX));
 
 				// Check if there exist e.g. O1_init -> string, O1_exec -> string and O1_comp -> string
 				indF = allStatesList.indexOf(first);
@@ -1049,11 +1053,6 @@ public ArrayList replaceState(ArrayList l, String op, String s, int i)
 public ArrayList removeCompSequences(ArrayList restr, ArrayList ps)
 {
 
-	String stateIndicator = "_";
-	String thirdState = stateIndicator.concat("comp");
-	String dontCareState = stateIndicator.concat("-");
-
-
 	// For each predecessor-successor pair
 	for(Iterator psIter = ps.iterator(); psIter.hasNext(); )
 	{
@@ -1090,9 +1089,10 @@ public ArrayList removeCompSequences(ArrayList restr, ArrayList ps)
 						String restrString = getRestrString(rList, i);
 
 						// If the restriction contains both the pred and the succ in comp-state
-						if(restrString.indexOf(pred.concat(thirdState)) > -1 && restrString.indexOf(succ.concat(thirdState)) > -1)
+						if( restrString.indexOf(pred.concat(END_STATE_POSTFIX)) > -1 && 
+							restrString.indexOf(succ.concat(END_STATE_POSTFIX)) > -1 )
 						{
-							rList = replaceState(rList, pred, pred.concat(dontCareState), i);
+							rList = replaceState(rList, pred, pred.concat(DONT_CARE_STATE_POSTFIX), i);
 
 						}
 						i++;
@@ -1119,12 +1119,6 @@ public ArrayList removeCompSequences(ArrayList restr, ArrayList ps)
 
 public ArrayList removeCompExecSequences(ArrayList restr, ArrayList ps)
 {
-	String stateIndicator = "_";
-	String secondState = stateIndicator.concat("exec");
-	String thirdState = stateIndicator.concat("comp");
-	String dontCareState = stateIndicator.concat("-");
-
-
 	// For each predecessor-successor pair
 	for(Iterator psIter = ps.iterator(); psIter.hasNext(); )
 	{
@@ -1132,7 +1126,6 @@ public ArrayList removeCompExecSequences(ArrayList restr, ArrayList ps)
 
 		String pred = (String) predSucc.get(0);
 		String succ = (String) predSucc.get(1);
-
 
 		for(Iterator rIter = restr.iterator(); rIter.hasNext(); )
 		{
@@ -1160,9 +1153,10 @@ public ArrayList removeCompExecSequences(ArrayList restr, ArrayList ps)
 						String restrString = getRestrString(rList, i);
 
 						// If the restriction contains both the pred and the succ in comp-state
-						if(restrString.indexOf(pred.concat(thirdState)) > -1 && restrString.indexOf(succ.concat(secondState)) > -1)
+						if( restrString.indexOf(pred.concat(END_STATE_POSTFIX)) > -1 && 
+						    restrString.indexOf(succ.concat(EXECUTION_STATE_POSTFIX)) > -1 )
 						{
-							rList = replaceState(rList, pred, pred.concat(dontCareState), i);
+							rList = replaceState(rList, pred, pred.concat(DONT_CARE_STATE_POSTFIX), i);
 						}
 						i++;
 					}
@@ -1185,10 +1179,6 @@ public ArrayList removeCompExecSequences(ArrayList restr, ArrayList ps)
 
 public ArrayList removeInitInitSequences(ArrayList restr, ArrayList ps)
 {
-	String stateIndicator = "_";
-	String firstState = stateIndicator.concat("init");
-	String dontCareState = stateIndicator.concat("-");
-
 	// For each predecessor-successor pair
 	for(Iterator psIter = ps.iterator(); psIter.hasNext(); )
 	{
@@ -1218,10 +1208,11 @@ public ArrayList removeInitInitSequences(ArrayList restr, ArrayList ps)
 						String restrString = getRestrString(rList, i);
 
 						// If the restriction contains both the pred and the succ in comp-state
-						if(restrString.indexOf(pred.concat(firstState)) > -1 && restrString.indexOf(succ.concat(firstState)) > -1)
+						if( restrString.indexOf(pred.concat(INITIAL_STATE_POSTFIX)) > -1 &&
+							restrString.indexOf(succ.concat(INITIAL_STATE_POSTFIX)) > -1 )
 						{
 
-							rList = replaceState(rList, succ, succ.concat(dontCareState), i);
+							rList = replaceState(rList, succ, succ.concat(DONT_CARE_STATE_POSTFIX), i);
 						}
 						i++;
 					}
@@ -1245,12 +1236,6 @@ public ArrayList removeInitInitSequences(ArrayList restr, ArrayList ps)
 
 public ArrayList removeExecInitSequences(ArrayList restr, ArrayList ps)
 {
-	String stateIndicator = "_";
-	String firstState = stateIndicator.concat("init");
-	String secondState = stateIndicator.concat("exec");
-	String dontCareState = stateIndicator.concat("-");
-
-
 	// For each predecessor-successor pair
 	for(Iterator psIter = ps.iterator(); psIter.hasNext(); )
 	{
@@ -1279,9 +1264,10 @@ public ArrayList removeExecInitSequences(ArrayList restr, ArrayList ps)
 
 						String restrString = getRestrString(rList, i);
 						// If the restriction contains both the pred and the succ in comp-state
-						if(restrString.indexOf(pred.concat(secondState)) > -1 && restrString.indexOf(succ.concat(firstState)) > -1)
+						if( restrString.indexOf(pred.concat(EXECUTION_STATE_POSTFIX)) > -1 && 
+							restrString.indexOf(succ.concat(INITIAL_STATE_POSTFIX)) > -1)
 						{
-							rList = replaceState(rList, succ, succ.concat(dontCareState), i);
+							rList = replaceState(rList, succ, succ.concat(DONT_CARE_STATE_POSTFIX), i);
 						}
 						i++;
 					}
@@ -1357,11 +1343,6 @@ public ArrayList removeSuccessors(ArrayList restr , ArrayList ps)
 
 public ArrayList removeSequences(ArrayList restr, ArrayList ps)
 {
-
-	String stateIndicator = "_";
-	String thirdState = stateIndicator.concat("comp");
-	String dontCareState = stateIndicator.concat("-");
-
 	// For each operation
 	for(Iterator restrIter = restr.iterator(); restrIter.hasNext(); )
 	{
@@ -1446,9 +1427,6 @@ public HashSet getSuccessors(String opName, ArrayList ps)
 public ArrayList removeDontCareOperations(ArrayList restr)
 {
 
-	String stateIndicator = "_";
-	String dontCareState = stateIndicator.concat("-");
-
 	for(Iterator rIter = restr.iterator(); rIter.hasNext(); )
 	{
 		Restriction operation = (Restriction) rIter.next();
@@ -1472,7 +1450,7 @@ public ArrayList removeDontCareOperations(ArrayList restr)
 			{
 
 				String state = (String) sIter.next();
-				if(!state.equals(opName.concat(dontCareState)) && i>1)
+				if(!state.equals(opName.concat(DONT_CARE_STATE_POSTFIX)) && i>1)
 				{
 					allDontCare = false;
 				}
@@ -1506,9 +1484,6 @@ public ArrayList removeDontCareOperations(ArrayList restr)
 public ArrayList removeDontCareStates(ArrayList restr)
 {
 
-	String stateIndicator = "_";
-	String dontCareState = stateIndicator.concat("-");
-
 	for(Iterator rIter = restr.iterator(); rIter.hasNext(); )
 	{
 		Restriction operation = (Restriction) rIter.next();
@@ -1534,7 +1509,7 @@ public ArrayList removeDontCareStates(ArrayList restr)
 			while( j < noOfStates )
 			{
 				String state = (String) states.get(j);
-				if(state.equals(opName.concat(dontCareState)) )
+				if(state.equals(opName.concat(DONT_CARE_STATE_POSTFIX)) )
 				{
 
 					allOpStates = getRestrString(rList, j);
@@ -1834,9 +1809,6 @@ public String getMachine(String opName, ArrayList opsMachs)
 
 public void buildCOPDocs(ArrayList restr, ArrayList ROPs)
 {
-	String stateIndicator = "_";
-	String thirdState = stateIndicator.concat("comp");
-
 	ArrayList opsMachs = getOpMachMatching(ROPs);
 	for( Iterator COPiter = COPList.iterator(); COPiter.hasNext(); )
 	{
@@ -1883,7 +1855,7 @@ public void buildCOPDocs(ArrayList restr, ArrayList ROPs)
 						{
 							temp = state;
 						}
-						else if(i>1 && state.equals(temp.concat(thirdState)))
+						else if(i>1 && state.equals(temp.concat(END_STATE_POSTFIX)))
 						{
 							Element predecessor = new Element("Predecessor");
 							String predName = temp;

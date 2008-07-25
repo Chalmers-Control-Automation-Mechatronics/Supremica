@@ -59,6 +59,9 @@ public class DOPnative {
 	protected final static String ONLY_STA = "ONLYSTART";
 	protected final static String ONLY_STO = "ONLYSTOP";
 	
+	protected final static String START_PREFIX = "STARTPREFIX";
+	protected final static String STOP_PREFIX = "STOPPREFIX";
+	
 	/**
 	 * Build a basic Activity from one place to another.
 	 * 
@@ -85,7 +88,8 @@ public class DOPnative {
 		if(activity == null || efa == null){
 			return;
 		}
-
+		
+		//Default start and stop event
 		start.setEvent(OPERATION_START_PREFIX + activity.getOperation());
 		stop.setEvent(OPERATION_STOP_PREFIX + activity.getOperation());
 
@@ -133,6 +137,16 @@ public class DOPnative {
 					{
 						//only stop event for this process
 						onlystop = true;
+					}
+					else if(att.getType().equals(START_PREFIX))
+					{
+						//Change start event
+						start.setEvent(value + activity.getOperation());
+					}
+					else if(att.getType().equals(STOP_PREFIX))
+					{
+						//Change stop event
+						stop.setEvent(value + activity.getOperation());
 					}
 					else if(att.getType().equals(RESOURCE))
 					{

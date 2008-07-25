@@ -14,8 +14,20 @@ import org.supremica.external.avocades.common.EGA;
 import org.supremica.external.avocades.common.Module;
 import org.supremica.manufacturingTables.xsd.processeditor.*;
 
+import static org.supremica.external.avocades.AutomataNames.DONT_CARE_START_PREFIX;
+import static org.supremica.external.avocades.AutomataNames.DONT_CARE_STOP_PREFIX;
+
 public class DOPrelation
 					extends DOPnative{
+	
+	static final ObjectFactory factory = new ObjectFactory();
+	
+	static final Attribute attOnlyStart = createOnlyStartAttribute();
+	static final Attribute attStartPrefix = createStartPrefixAttribute(DONT_CARE_START_PREFIX);
+	
+	static final Attribute attOnlyStop = createOnlyStopAttribute();
+	static final Attribute attStopPrefix = createStopPrefixAttribute(DONT_CARE_STOP_PREFIX);
+	
 	/**
 	 * 
 	 * @param relation
@@ -485,27 +497,26 @@ public class DOPrelation
 	private static String addWaitForNodeToFinish(List<Activity> activityList,
 												 Relation relation, EFA efa){
 		
-		Activity start;
-		Attribute onlystart;
-		Attribute startguard;
-		Attribute startaction;
+		final Activity actStart;
+		final Activity actStop;
 		
-		Activity stop;
-		Attribute onlystop;
-		Attribute stopguard;
-		Attribute stopaction;
+		final Attribute attStartGuard;
+		final Attribute attStartAction;
 		
-		Module m = efa.getModule();
-		int numberOfTracks = relation.getActivityRelationGroup().size();
+		final Attribute attStopGuard;
+		final Attribute attStopAction;
+		
+		final Module m = efa.getModule();
+		
+		final int numberOfTracks = relation.getActivityRelationGroup().size();
+		
 		String var_name = "";
 		
-		ObjectFactory factory = new ObjectFactory();
+		String strStartguard = "";
+		String strStartaction = "";
 		
-		String startGuard = "";
-		String startAction = "";
-		
-		String stopGuard = "";
-		String stopAction = "";
+		String strStopguard = "";
+		String strStopaction = "";
 		
 		// node code //
 		if(RelationType.PARALLEL.equals(relation.getType())){
@@ -519,62 +530,48 @@ public class DOPrelation
 			return var_name;
 		}
 		
-		startGuard = "";
-		startAction = var_name + "=1;";
+		strStartguard = "";
+		strStartaction = var_name + "=1;";
 		
-		stopGuard = var_name + "==" + (numberOfTracks + 1);
-		stopAction = var_name + "=0;";
+		strStopguard = var_name + "==" + (numberOfTracks + 1);
+		strStopaction = var_name + "=0;";
 		
 		// set start conditions //
-		onlystart = factory.createAttribute();
-		onlystart.setType( ONLY_STA );
+		attStartGuard = createAttribute(strStartguard, AND_STA_GUARD);
+		attStartAction = createAttribute(strStartaction, ADD_STA_ACTION);
 		
-		startguard = factory.createAttribute();
-		startguard.setType( AND_STA_GUARD );
-		startguard.setAttributeValue(startGuard);
+		actStart = factory.createActivity();
+		actStart.setProperties(factory.createProperties());
 		
-		startaction = factory.createAttribute();
-		startaction.setType( ADD_STA_ACTION );
-		startaction.setAttributeValue(startAction);
+		actStart.getProperties().getAttribute().add(attOnlyStart);
+		actStart.getProperties().getAttribute().add(attStartPrefix);
+		actStart.getProperties().getAttribute().add(attStartGuard);
+		actStart.getProperties().getAttribute().add(attStartAction);
 		
-		start = factory.createActivity();
-		start.setProperties(factory.createProperties());
-		
-		start.getProperties().getAttribute().add(onlystart);
-		start.getProperties().getAttribute().add(startguard);
-		start.getProperties().getAttribute().add(startaction);
-		
-		start.setOperation(var_name);
+		actStart.setOperation(var_name);
 		// end set start conditions //
 		
 		
 		// Set stop conditions //
-		onlystop = factory.createAttribute();
-		onlystop.setType( ONLY_STO );
+		attStopGuard = createAttribute(strStopguard, AND_STO_GUARD);
+		attStopAction = createAttribute(strStopaction, ADD_STO_ACTION);
 		
-		stopguard = factory.createAttribute();
-		stopguard.setType( AND_STO_GUARD );
-		stopguard.setAttributeValue(stopGuard);
+		actStop = factory.createActivity();
+		actStop.setProperties(factory.createProperties());
 		
-		stopaction = factory.createAttribute();
-		stopaction.setType( ADD_STO_ACTION );
-		stopaction.setAttributeValue(stopAction);
+		actStop.getProperties().getAttribute().add(attOnlyStop);
+		actStop.getProperties().getAttribute().add(attStopPrefix);
+		actStop.getProperties().getAttribute().add(attStopGuard);
+		actStop.getProperties().getAttribute().add(attStopAction);
 		
-		stop = factory.createActivity();
-		stop.setProperties(factory.createProperties());
-		
-		stop.getProperties().getAttribute().add(onlystop);
-		stop.getProperties().getAttribute().add(stopguard);
-		stop.getProperties().getAttribute().add(stopaction);
-		
-		stop.setOperation(var_name);
+		actStop.setOperation(var_name);
 		// End stop conditions //
 		
 		//add Activity who starts node
-		activityList.add(start);
+		activityList.add(actStart);
 		
 		//add Activity who wait for node to finish
-		activityList.add(stop);
+		activityList.add(actStop);
 		
 		//return the variable name assigned to this node
 		return var_name;
@@ -654,19 +651,14 @@ public class DOPrelation
 				Activity start_par = factory.createActivity();
 				start_par.setProperties(factory.createProperties());
 				
-				Attribute onlystart = factory.createAttribute();
-				Attribute startguard = factory.createAttribute();
-				Attribute startaction = factory.createAttribute();
+				final Attribute attOnlyStart = createOnlyStartAttribute();
+				final Attribute startprefix = createStartPrefixAttribute(DONT_CARE_START_PREFIX);
 				
-				onlystart.setType(ONLY_STA);
+				final Attribute startguard = createAttribute(startGuard, AND_STA_GUARD);
+				final Attribute startaction = createAttribute(startAction, ADD_STA_ACTION);
 				
-				startguard.setType( AND_STA_GUARD );
-				startaction.setType( ADD_STA_ACTION );
-				
-				startguard.setAttributeValue(startGuard);
-				startaction.setAttributeValue(startAction);
-				
-				start_par.getProperties().getAttribute().add(onlystart);
+				start_par.getProperties().getAttribute().add(attOnlyStart);
+				start_par.getProperties().getAttribute().add(startprefix);
 				start_par.getProperties().getAttribute().add(startguard);
 				start_par.getProperties().getAttribute().add(startaction);
 				
@@ -677,19 +669,14 @@ public class DOPrelation
 				Activity stop_par = factory.createActivity();
 				stop_par.setProperties(factory.createProperties());
 				
-				Attribute onlystop = factory.createAttribute();
-				Attribute stopguard = factory.createAttribute();
-				Attribute stopaction = factory.createAttribute();
+				final Attribute onlystop = createOnlyStopAttribute();
+				final Attribute stopprefix = createStopPrefixAttribute(DONT_CARE_STOP_PREFIX);
 				
-				onlystop.setType(ONLY_STO);
-				
-				stopguard.setType( AND_STO_GUARD );
-				stopguard.setAttributeValue(stopGuard);
-				
-				stopaction.setType( ADD_STO_ACTION );
-				stopaction.setAttributeValue(stopAction);
+				final Attribute stopguard = createAttribute(stopGuard, AND_STO_GUARD);
+				final Attribute stopaction = createAttribute(stopAction, ADD_STO_ACTION);
 				
 				stop_par.getProperties().getAttribute().add(onlystop);
+				stop_par.getProperties().getAttribute().add(stopprefix);
 				stop_par.getProperties().getAttribute().add(stopguard);
 				stop_par.getProperties().getAttribute().add(stopaction);
 				
@@ -719,23 +706,11 @@ public class DOPrelation
 				}
 				
 				//create start/stop guard and action
-				Attribute startguard = factory.createAttribute();
-				Attribute startaction = factory.createAttribute();
+				final Attribute startguard = createAttribute(startGuard, AND_STA_GUARD);
+				final Attribute startaction = createAttribute(startAction, ADD_STA_ACTION);
 				
-				Attribute stopguard = factory.createAttribute();
-				Attribute stopaction = factory.createAttribute();
-				
-				startguard.setType( AND_STA_GUARD );
-				startguard.setAttributeValue( startGuard );
-				
-				stopguard.setType( AND_STO_GUARD );
-				stopguard.setAttributeValue( stopGuard );
-				
-				startaction.setType( ADD_STA_ACTION );
-				startaction.setAttributeValue( startAction );
-				
-				stopaction.setType( ADD_STO_ACTION );
-				stopaction.setAttributeValue( stopAction );
+				final Attribute stopguard = createAttribute(stopGuard, AND_STO_GUARD);
+				final Attribute stopaction = createAttribute(stopAction, ADD_STO_ACTION);
 				
 				//add to properties list
 				((Activity)activityRelations[i]).getProperties().getAttribute().add( startguard );
@@ -775,19 +750,21 @@ public class DOPrelation
 		Relation seq;
 		
 		Activity start_ao;
-		Attribute onlystart;
+		final Attribute attOnlyStart = createOnlyStartAttribute();
+		final Attribute startprefix = createStartPrefixAttribute(DONT_CARE_START_PREFIX);
+		
 		Attribute startguard;
 		Attribute startaction;
 		
 		Activity stop_ao;
-		Attribute onlystop;
+		final Attribute onlystop = createOnlyStopAttribute();
+		final Attribute stopprefix = createStopPrefixAttribute(DONT_CARE_STOP_PREFIX);
+		
 		Attribute stopguard;
 		Attribute stopaction;
 		
 		Object[] activityRelations;
 		EFA tmp;
-		
-		ObjectFactory factory = new ObjectFactory();  
 		
 		//test in data
 		if(r == null || m == null){
@@ -839,9 +816,6 @@ public class DOPrelation
 				//---------------------------//
 				
 				//------- Create start conditions --------//
-				onlystart = factory.createAttribute();
-				onlystart.setType(ONLY_STA);
-				
 				startguard = factory.createAttribute();
 				startguard.setType( AND_STA_GUARD );
 				startguard.setAttributeValue(startGuard);
@@ -854,28 +828,22 @@ public class DOPrelation
 				start_ao.setProperties(factory.createProperties());
 				start_ao.setOperation(arbitrary_track);
 				
-				start_ao.getProperties().getAttribute().add(onlystart);
+				start_ao.getProperties().getAttribute().add(attOnlyStart);
+				start_ao.getProperties().getAttribute().add(startprefix);
 				start_ao.getProperties().getAttribute().add(startguard);
 				start_ao.getProperties().getAttribute().add(startaction);
 				//------- End start conditions -------//
 				
 				// ------- Create stop conditions ------- //
-				onlystop = factory.createAttribute();
-				onlystop.setType( ONLY_STO );
-				
-				stopguard = factory.createAttribute();
-				stopguard.setType( AND_STO_GUARD );
-				stopguard.setAttributeValue(stopGuard);
-				
-				stopaction = factory.createAttribute();
-				stopaction.setType( ADD_STO_ACTION );
-				stopaction.setAttributeValue(stopAction);
+				stopguard = createAttribute(stopGuard,  AND_STO_GUARD);
+				stopaction = createAttribute(stopAction, ADD_STO_ACTION);
 				
 				stop_ao = factory.createActivity();
 				stop_ao.setProperties(factory.createProperties());
 				stop_ao.setOperation(arbitrary_track);
 				
 				stop_ao.getProperties().getAttribute().add(onlystop);
+				stop_ao.getProperties().getAttribute().add(stopprefix);
 				stop_ao.getProperties().getAttribute().add(stopguard);
 				stop_ao.getProperties().getAttribute().add(stopaction);		
 				// ------- End stop conditions ------- //
@@ -904,21 +872,10 @@ public class DOPrelation
 				}
 				
 				//create start/stop guard and action
-				startguard = factory.createAttribute();
-				startguard.setType( AND_STA_GUARD );
-				startguard.setAttributeValue( startGuard );
-				
-				startaction = factory.createAttribute();
-				startaction.setType( ADD_STA_ACTION );
-				startaction.setAttributeValue( startAction );
-				
-				stopguard = factory.createAttribute();
-				stopguard.setType( AND_STO_GUARD );
-				stopguard.setAttributeValue( stopGuard );
-				
-				stopaction = factory.createAttribute();
-				stopaction.setType( ADD_STO_ACTION );
-				stopaction.setAttributeValue( stopAction );
+				startguard = createAttribute(startGuard, AND_STA_GUARD);
+				startaction = createAttribute(startAction, ADD_STA_ACTION);
+				stopguard = createAttribute(stopGuard, AND_STO_GUARD);
+				stopaction = createAttribute(stopAction, ADD_STO_ACTION);
 				
 				//add to properties list
 				((Activity)activityRelations[i]).getProperties().getAttribute().add( startguard );
@@ -1013,4 +970,34 @@ public class DOPrelation
 			activity.getProperties().getAttribute().add(att);
 		}
 	}
+	
+	protected static Attribute createOnlyStartAttribute(){
+		return createAttribute(null, ONLY_STA);
+	}
+	
+	protected static Attribute createOnlyStopAttribute(){
+		return createAttribute(null, ONLY_STO);
+	}
+	
+	protected static Attribute createStartPrefixAttribute(final String prefix){
+		return createAttribute(prefix, START_PREFIX);
+	}
+	
+	protected static Attribute createStopPrefixAttribute(final String prefix){
+		return createAttribute(prefix, STOP_PREFIX);
+	}
+	
+	protected static Attribute createAttribute(final String value, final String type ){
+		
+		final Attribute attribute = factory.createAttribute();
+		
+		attribute.setType( type );
+		attribute.setAttributeValue( value );
+		
+		return attribute;
+	}
+	
+	
+	
+	
 }
