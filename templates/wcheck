@@ -17,6 +17,9 @@ for F in $@; do
 	-native)
 	    FACTORY="$WPACK.cpp.analysis.NativeModelVerifierFactory"
 	    ;;
+	-comp)
+	    FACTORY="$WPACK.analysis.composing.ComposeModelVerifierFactory"
+	    ;;
 	-mono)
 	    FACTORY="$WPACK.analysis.monolithic.MonolithicModelVerifierFactory"
 	    ;;
