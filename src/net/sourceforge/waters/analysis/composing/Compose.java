@@ -4,11 +4,12 @@ import java.util.Arrays;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.HashMap;
-import java.util.Map;
+//import java.util.HashMap;
+//import java.util.Map;
 import java.util.Set;
 
 import net.sourceforge.waters.model.analysis.AnalysisException;
+import net.sourceforge.waters.model.analysis.OverflowException;
 import net.sourceforge.waters.model.analysis.KindTranslator;
 import net.sourceforge.waters.analysis.modular.Projection2;
 import net.sourceforge.waters.model.des.AutomatonProxy;
@@ -27,7 +28,7 @@ public class Compose {
     mFactory = factory;
     mTranslator = translator;
     mEvents = new HashSet<EventProxy>(mModel.getEvents());
-    events  = new ArrayList<EventProxy>();
+    events  = new ArrayList<EventProxy>(mEvents);
     newAutomata = new HashSet<AutomatonProxy>();
     newEvents = new HashSet<EventProxy>();
   }
@@ -35,8 +36,7 @@ public class Compose {
   public ProductDESProxy run() throws AnalysisException {
   
     Set<AutomatonProxy>  plants = new HashSet<AutomatonProxy>();
-    final Set<AutomatonProxy>  specs  = new HashSet<AutomatonProxy>();
-    Map<String, Candidate> composition = new HashMap<String, Candidate>();
+    final Set<AutomatonProxy>  specs  = new HashSet<AutomatonProxy>();    
     
     for (AutomatonProxy automaton : mModel.getAutomata()) {      
       //Retain all events which are not mentioned in specs. This algorithm
@@ -45,23 +45,26 @@ public class Compose {
         case PLANT :  plants.add(automaton);
                       break;
         case SPEC  :  specs.add(automaton);
-                      mEvents.removeAll(automaton.getEvents());                      
+                      events.removeAll(automaton.getEvents());                      
                       break;
         default : break;
       }
     }
-    events.addAll(mEvents);
+    hiddenEvents = new ArrayList<EventProxy>(events);
     //Case: no plant  
     if (plants.isEmpty()) return mModel;
     //Case: no removable events  
-    if (mEvents.isEmpty()) return mModel;
+    if (hiddenEvents.isEmpty()) return mModel;
     
     //Assumption: All events which are not related with specs will be removed.
     //PS: (This might not be right, just for temporary use.)
-    //for (int i=0;i<mEvents.size();i++) {
-    while (true) {          
+    int loop = 0;
+    //for (int j=0;j<hiddenEvents.size();j++) {
+    while (true) {  
+      loop++;
+      ArrayList<Candidate> composition = new ArrayList<Candidate>();        
 		  //Step 1
-	    //mustL: A set of Automata using the particular event.	    
+	    //mustL: A set of Automata using the particular event.	       
 	    for (EventProxy e : events) {
 	      Set<AutomatonProxy> comp = new HashSet<AutomatonProxy>();
 	      Set<EventProxy> eventHidden = new HashSet<EventProxy>();	      
@@ -72,89 +75,75 @@ public class Compose {
 	      }	
 	      eventHidden.add(e);
 	      Candidate newCandidate = new Candidate(comp, eventHidden);	      
-	      if (!composition.containsKey(newCandidate.getName())) {	        
-	        composition.put(newCandidate.getName(),newCandidate);
-	        continue;
-	      }	
-   
-	      Set<EventProxy> eh = new HashSet<EventProxy>(composition.get(newCandidate.getName()).getLocalEvents());
-	      eh.add(e);
-	      newCandidate.setLocalEvents(eh);      
-	      composition.put(newCandidate.getName(),newCandidate);
+	      if (!composition.contains(newCandidate)) {	        
+	        composition.add(newCandidate);
+	        //continue;
+	      }	else {
+			      int i = composition.indexOf(newCandidate);
+			      Set<EventProxy> eh = new HashSet<EventProxy>(composition.get(i).getLocalEvents());
+			      eh.add(e);
+			      composition.get(i).setLocalEvents(eh);	
+	        }      
 	    }
 	    
 	    //Step 2
 	    //maxL: Choose the candidate with the highest proportion of 
 	    //      local events(that can be hidden).
-	    Candidate maxL = null;
-	    double highestProportion = 0;
-	    for (Candidate can : composition.values()) {
-	      double numLocalEvents = 0;
-	      double totalEvents  = 0;
-	      
-	      numLocalEvents = can.getLocalEvents().size();
-	      totalEvents = can.getAllEvents().size();
-	      
-	      if (numLocalEvents/totalEvents>highestProportion) {
-	        highestProportion = numLocalEvents/totalEvents;
-	        maxL = can;
-	      }
+	    ArrayList<Double> proportion = new ArrayList<Double>(composition.size());
+	    for (int i=0;i<composition.size();i++) {
+	      double numLocalEvents = composition.get(i).getLocalEvents().size();
+	      double totalEvents  = composition.get(i).getAllEvents().size();
+	      proportion.add(numLocalEvents/totalEvents);
 	    }
-	    //System.out.println("555555555555555555555 ");
-	    /*
-	    //maxS: Choose the candicate with the highest proportion of 
-	    //      common events(shared events).
-	    ProductDESProxy maxS;
-	    double maxs = 0;
-	    for (ProductDESProxy pdpS : composition.keySet()) {
-	      int common = 0;
-	      int totalS  = 0;
-	      totalS = pdpS.getEvents().size();
-	      for (EventProxy e1 : pdpS.getEvents()) {
-	        boolean isCommon = true;
-	        for (AutomtonProxy a1 : pdpS.getAutomata()) {
-	          if (!a1.getEvents().comtains(e1)) {
-	            isCommon = false; 
-	            break;
-	          }
+	    Double p[] = new Double[composition.size()];
+	    p = proportion.toArray(p);
+	    Arrays.sort(p);
+    
+			//Built an ordered array of proportion of local events
+			//call projecter
+			boolean projectOK = true;
+			for(int i=composition.size()-1;i>=0;i--) {			  
+			  Candidate maxL = composition.get(proportion.indexOf(p[i]));		    
+		    ProductDESProxy newP = 
+		            mFactory.createProductDESProxy(maxL.getName(),maxL.getAllEvents(),maxL.getAllAutomata());	
+		    Set<EventProxy> eForbidden = new HashSet<EventProxy>();    
+		    Projection2 proj = new Projection2(newP, mFactory, maxL.getLocalEvents(), eForbidden);	        
+	      proj.setNodeLimit(10000);
+	      try {
+	        AutomatonProxy newAutomaton = proj.project();	        
+          projectOK = true;	 
+                       
+	        plants.removeAll((HashSet)maxL.getAllAutomata());
+	        plants.add(newAutomaton);
+
+	        events.removeAll((HashSet)maxL.getLocalEvents());
+
+	        break;
+	      } catch (OverflowException oe) {
+	          //try next candidate
+	          projectOK = false;
+	          continue;
 	        }
-	        if (isCommon) common++;        
-	      }
-	      if (common/totalS>maxs) maxS = pdpS;
-	    }
-	    */
-	    
-			System.out.println("Get a new composing automaton "+maxL.getName());
-	    //call projecter
-	    ProductDESProxy newP = mFactory.createProductDESProxy(maxL.getName(),maxL.getAllEvents(),maxL.getAllAutomata());	
-	    Set<EventProxy> eForbidden = new HashSet<EventProxy>();    
-	    Projection2 proj = new Projection2(newP, mFactory, maxL.getLocalEvents(), eForbidden);	        
-      proj.setNodeLimit(20000000);
-      
-      AutomatonProxy newAutomaton = proj.project();
-      
-      composition.remove(maxL.getName());      
-      plants.removeAll((HashSet)maxL.getAllAutomata());
-      plants.add(newAutomaton);
-
-      events.removeAll((HashSet)maxL.getLocalEvents());
-
-      if (events.isEmpty()) break;
-      if (composition.isEmpty()) break;      
+      }
+      if (!projectOK) {
+        if (loop==1) return mModel;
+        else break;
+      }
+      if (events.isEmpty()) break;           
 		}
 		//Create new model
 	  newAutomata.addAll(plants);
     newAutomata.addAll(specs);
 
-    newEvents.addAll(mModel.getEvents());
-    newEvents.removeAll(mEvents); 
-   
+    newEvents.addAll(mEvents);
+    newEvents.removeAll(hiddenEvents); 
+    /*
           for (EventProxy e : newEvents) {
         System.out.println("new events "+e.getName());
       }
-                for (EventProxy e : mEvents) {
+                for (EventProxy e : hiddenEvents) {
         System.out.println("removed events "+e.getName());
-      }
+      }*/
     newModel = mFactory.createProductDESProxy(mModel.getName(), newEvents, newAutomata);
     return newModel;
   }
@@ -164,6 +153,7 @@ public class Compose {
   private Set<EventProxy>        mEvents;
   private KindTranslator         mTranslator; 
   private Collection<EventProxy> events;
+  private Collection<EventProxy> hiddenEvents;
   private ProductDESProxy        newModel;
   private Set<AutomatonProxy>    newAutomata;
   private Set<EventProxy>        newEvents;

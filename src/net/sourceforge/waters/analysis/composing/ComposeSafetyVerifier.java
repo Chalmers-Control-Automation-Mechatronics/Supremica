@@ -44,12 +44,9 @@ public class ComposeSafetyVerifier
   //#########################################################################
   //# Invocation
   public boolean run() throws AnalysisException { 
-    //debug
-    //System.out.println(getModel().getName());
         
     final Compose compose = new Compose(getModel(), mTranslator, getFactory());
     ProductDESProxy des = compose.run();
-    //System.out.println(des.getName());
     final SafetyVerifier checker =
       new NativeSafetyVerifier(des, mTranslator, getFactory());      
     final boolean result = checker.run();    

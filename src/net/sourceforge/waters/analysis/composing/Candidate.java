@@ -20,7 +20,7 @@ public class Candidate extends Object{
 	  for (AutomatonProxy a : cAutomata) {
 	    if (name==null) {
 	      name = a.getName();	      
-	    }else name += a.getName();
+	    }else name += ","+a.getName();
 	    for (EventProxy e : a.getEvents()) {	      
 	      if (!cEvents.contains(e)) {
 	        cEvents.add(e);	        
@@ -51,14 +51,16 @@ public class Candidate extends Object{
 	}
 	
 	public boolean equals(Object obj){
-		if(obj instanceof Candidate){
-			return cAutomata.equals((Candidate)obj);
-		}
-		return false;
+		if(obj != null && obj.getClass() == getClass()){
+		  Candidate temp = (Candidate)obj;
+			return cAutomata.equals(temp.getAllAutomata());
+		}else {
+		   return false;
+		 }
 	}
 	
 	public int hashCode(){
-		return name.hashCode();
+		return cAutomata.hashCode();
 	}
 	
 	private Set<AutomatonProxy> cAutomata;
