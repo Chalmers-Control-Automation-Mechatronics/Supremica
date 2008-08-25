@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2007 Goran Cengic
+ * Copyright (C) 2008 Goran Cengic
  */
 
 /*

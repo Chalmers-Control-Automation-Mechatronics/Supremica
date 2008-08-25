@@ -1,6 +1,5 @@
-//# -*- tab-width: 4  indent-tabs-mode: nil  c-basic-offset: 4 -*-
 /*
- *   Copyright (C) 2006 Goran Cengic
+ *   Copyright (C) 2008 Goran Cengic
  */
 
 /*
