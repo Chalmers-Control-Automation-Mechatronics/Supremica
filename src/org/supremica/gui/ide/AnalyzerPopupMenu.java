@@ -84,6 +84,10 @@ class AnalyzerPopupMenu
 
             experimentMenu.addSeparator();
             
+            experimentMenu.add(ide.getActions().analyzerSatAction.getMenuItem());           
+
+            experimentMenu.addSeparator();
+            
             // To try out new code, use this action...
             experimentMenu.add(ide.getActions().analyzerExperimentAction.getMenuItem());
         }
