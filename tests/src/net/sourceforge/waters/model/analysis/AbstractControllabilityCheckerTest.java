@@ -134,6 +134,14 @@ public abstract class AbstractControllabilityCheckerTest
     runModelVerifier(group, dir, name, false);
   }
 
+  public void testOrphanEvents() throws Exception
+  {
+    final String group = "tests";
+    final String dir = "nasty";
+    final String name = "orphan_events.wmod";
+    runModelVerifier(group, dir, name, true);
+  }
+
   public void testVerriegel4Counter2() throws Exception
   {
     final String group = "tests";

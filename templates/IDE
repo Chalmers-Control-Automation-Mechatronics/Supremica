@@ -9,5 +9,5 @@ export LD_LIBRARY_PATH=$DIR
 java -Xms512m \
 	-Xmx1280m \
   -cp "$DIR/Supremica.jar" -enableassertions \
-  org.supremica.gui.ide.IDE -p SupremicaProperties.cfg $*
+  org.supremica.gui.ide.IDE -p SupremicaProperties.cfg "$@"
 
