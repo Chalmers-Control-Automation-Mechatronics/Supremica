@@ -107,17 +107,13 @@ public abstract class AbstractLargeControllabilityCheckerTest
     runModelVerifier(group, dir, name, true);
   }
 
-  /*
-   * This one has never been solved by VALID. I do not know whether it is
-   * controllable or not ...
   public void testRhoneTough() throws Exception
   {
     final String group = "tests";
     final String dir = "incremental_suite";
-    final String name = "rhone_alps.wmod";
+    final String name = "rhone_tough.wmod";
     runModelVerifier(group, dir, name, false);
   }
-   */
 
   public void testTbedCTCT() throws Exception
   {
