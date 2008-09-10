@@ -62,6 +62,7 @@ class ILtoElement
 		    //Unknown IL type
 		    System.err.println( "Warning: unknown IL type "
 		    			        + il.getType().toString() );
+		    return null;
 		}
 		
 		//add attributes
@@ -155,6 +156,7 @@ class ILtoElement
 			
 			//Add not ongoing operations
 			if( null != opCheck.getNotOngoing() ){
+				
 			    for( String op : opCheck.getNotOngoing().getOperation() ){
 			    	if( isValidString( op ) ){
 						
@@ -164,10 +166,12 @@ class ILtoElement
 						and.addContent( tmp );
 					}
 			    }
+			    
 			}
 			
 			//Add not started operations
-			if( null != opCheck.getNotOngoing() ){
+			if( null != opCheck.getNotStarted() ){
+				
 			    for( String op : opCheck.getNotStarted().getOperation() ){
 			    	if( isValidString( op ) ){
 						

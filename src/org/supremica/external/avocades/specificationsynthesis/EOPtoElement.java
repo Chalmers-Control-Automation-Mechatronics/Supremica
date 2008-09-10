@@ -17,6 +17,14 @@ import org.supremica.manufacturingTables.xsd.eop.ActuatorValue;
 import org.supremica.manufacturingTables.xsd.eop.SensorValue;
 import org.supremica.manufacturingTables.xsd.eop.InitialState;
 
+//-----------------------------------------------------------------------------
+//
+//Imported constants
+//
+//-----------------------------------------------------------------------------
+
+import static org.supremica.external.avocades.AutomataNames.EVENT_MACHINE_SEPARATOR;
+
 class EOPtoElement
                extends
                    SpecificationSynthesXML
@@ -93,9 +101,10 @@ class EOPtoElement
 	 * @param initialState
 	 * @return the initial state represented in a Element
 	 */
-	private static Element createElement( InitialState initialState, String id){
+	private static Element createElement(final InitialState initialState, final String id){
 	
 		final String ID_PREFIX = "init";
+		final String noMachineNameId;
 		
 		Element element = null;
 		
@@ -106,10 +115,12 @@ class EOPtoElement
 		
 		init();
 		
+		noMachineNameId = removeMachineName(id);
+		
 		//add attributes
 		if( isValidString( ID_PREFIX + id ) ){
-		    process.setAttribute( ID , ID_PREFIX + id );
-		    event.setAttribute( ID , ID_PREFIX + id );
+		    process.setAttribute( ID , ID_PREFIX + noMachineNameId );
+		    event.setAttribute( ID , ID_PREFIX + noMachineNameId );
 		}
 		
 		//Create structure
@@ -138,6 +149,16 @@ class EOPtoElement
 		
 		
 		return process;
+	}
+	
+	private static String removeMachineName(String str){
+		
+		if (!str.contains( EVENT_MACHINE_SEPARATOR )){
+			return str;
+		}
+		
+		return str.substring(0, str.indexOf( EVENT_MACHINE_SEPARATOR ));
+		
 	}
 	
 	

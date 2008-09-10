@@ -189,6 +189,7 @@ public class COPBuilder {
     	
     	
     	comment = comment + "IL" + NEWLINE;
+    	
     	//Add all IL:s
     	for( IL il : getAdaptedILList() ){
     		builder.add( il );
@@ -198,6 +199,24 @@ public class COPBuilder {
     	convAut = new ConverterILtoAutomata();
 		convAut.convertILtoAutomata( builder.getDoc() );
 		
+/*		
+		//debug code
+		try{
+    		//create debug file
+            tmpFile = new File("eopsils.xml");
+            
+            //save JDOM document to file
+            saveDocument( builder.getDoc(), tmpFile );
+            
+            System.out.println("Saved debug file: " +
+            		               tmpFile.getAbsolutePath());
+            
+        }catch( Exception e ){
+        	tmpFile.delete();
+        	return null;
+        }
+		//end debug code
+*/			
     	try{
     		//create temporary file
             tmpFile = File.createTempFile("tmpSpecificationSynthes", ".xml");
@@ -248,7 +267,7 @@ public class COPBuilder {
     		/*
     		 * Rename Operations in Operation list
     		 */
-    		renameILOperationList( tmpIL.getILStructure().getOperations().getOperation() );
+    		renameILOperationInList( tmpIL.getILStructure().getOperations().getOperation() );
     		
     		/*
     		 * Rename Operation in term
@@ -277,7 +296,7 @@ public class COPBuilder {
     	return tmpROPList;
     }
     
-    private void renameILOperationList(List<String> operationList){
+    private void renameILOperationInList(List<String> operationList){
     	
     	/*
     	 * The renamed EOP list contains EOP:s with operation name and machine.
@@ -285,104 +304,83 @@ public class COPBuilder {
     	 */
     	final List<EOP> tmpEOPList = getAdaptedEOPList();
     	
-    	final List<String> tmpStrList = new LinkedList<String>();
+    	
+    	final List<String> machineList = new LinkedList<String>();
+    	
+    	for(EOP eop : tmpEOPList ){
+    		machineList.add( eop.getId() );
+		}
+    	
+    	renameStringsFromMachineStrings(operationList, machineList);
+    }
+    
+    private void renameStringsFromMachineStrings(List<String> operationList,
+    		                               final List<String> machineList)
+    {
+    	
+    	final List<String> renamedOperationList = new LinkedList<String>();
+    	final List<String> operationsToAddList = new LinkedList<String>();
+    	
+    	String operation;
+    	boolean operationAdded = false;
     	
     	/*
 		 * Rename Operations in Operation list
 		 */
-		for( String op : operationList ){
-			
-			for(EOP eop : tmpEOPList){
-				
-				
-				if(eop.getId().contains(EVENT_MACHINE_SEPARATOR)){
-					
-					if( eop.getId().indexOf(EVENT_MACHINE_SEPARATOR) ==  op.length() && 
-						eop.getId().substring(0, op.length()).equals( op ) )
-					{
-						tmpStrList.add( eop.getId() );
-					}
-					
-				}else{
-					if( eop.getId().equals(op) ){
-						tmpStrList.add( eop.getId() );
-					}
-				}
-    		}
+    	for(String op : operationList){
+    		
+    		operationAdded = false;
+    		
+    		for( String opm : machineList ){
+    			operation = removeMachineString(opm);
+    			
+    			if ( op.trim().equals(operation.trim()) ){
+    				
+    				operationsToAddList.add( opm );
+    				
+    				if (!operationAdded){
+    					renamedOperationList.add( op );
+    					operationAdded = true;
+    				}
+    			}
+			}
 		}
-		
-		//clear list
-		operationList.clear();
-		
-		//add new operations
-		for(String str : tmpStrList){
-			operationList.add(str);
-		}
+
+    	//remove renamed operations
+    	for(String op : renamedOperationList){
+    		operationList.remove(op);
+    	}
+
+    	
+    	operationList.addAll(operationsToAddList);	
+    }
+    
+    private String removeMachineString(String str){
+    	
+    	if (!str.contains(EVENT_MACHINE_SEPARATOR)){
+    		return str;
+    	}
+    	
+    	return str.substring(0, str.indexOf(EVENT_MACHINE_SEPARATOR));
     }
     
     
     private void renameOperationsInTermList( IL il ){
     	
-    	List<String> tmpStrList = new LinkedList<String>();
+    	final List<String> machineList = il.getILStructure().getOperations().getOperation();
     	
     	/*
 		 * Rename Operation in term
 		 */
 		for(Term term : il.getILStructure().getTerm() ){
 			for(OperationCheck operationCheck : term.getOperationCheck()){
+				renameStringsFromMachineStrings(
+						operationCheck.getNotOngoing().getOperation(),
+						machineList);
 				
-				/*
-				 * Rename not ongoing operations
-				 */
-				for(String operationNotOngoing : operationCheck.getNotOngoing().getOperation()){
-					
-					/*
-					 * find operation
-					 */
-    				for( String operation : il.getILStructure().getOperations().getOperation() ){
-    					
-    					if( operation.startsWith( operationNotOngoing ) ){
-    						//add
-    						tmpStrList.add( operation );
-    					}
-    					
-        			}
-				}
-				
-				//clear list
-				operationCheck.getNotOngoing().getOperation().clear();
-				
-				//add new operations
-				for(String str : tmpStrList){
-					operationCheck.getNotOngoing().getOperation().add(str);
-				}
-				tmpStrList.clear();
-				
-				
-				/*
-				 * Rename not started operations
-				 */
-				for(String operationNotStarted : operationCheck.getNotStarted().getOperation()){
-    				
-					/*
-					 * find operation
-					 */
-    				for( String operation : il.getILStructure().getOperations().getOperation() ){
-    					if( operation.startsWith( operationNotStarted ) ){
-    						//add
-    						tmpStrList.add( operation );
-    					}
-        			}
-				}
-				
-				//clear list
-				operationCheck.getNotStarted().getOperation().clear();
-				
-				//add new operations
-				for(String str : tmpStrList){
-					operationCheck.getNotStarted().getOperation().add(str);
-				}
-				tmpStrList.clear();
+				renameStringsFromMachineStrings(
+						operationCheck.getNotStarted().getOperation(),
+						machineList);
 			}
 		}
     }
