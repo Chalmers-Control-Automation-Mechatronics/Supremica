@@ -1,7 +1,11 @@
 package org.supremica.external.avocades.specificationsynthesis;
 
-import java.util.*;
-import org.jdom.*;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
+
+import org.jdom.Element;
 
 import static org.supremica.external.avocades.AutomataNames.OPERATION_START_PREFIX;
 import static org.supremica.external.avocades.AutomataNames.OPERATION_STOP_PREFIX;
@@ -714,6 +718,13 @@ public class InterlockingOperationAutomatas {
 		states.addContent(state);
 
 
+		state = new Element("State");
+		state.setAttribute("id", "q" + 2);
+		state.setAttribute("initial", "false");
+		state.setAttribute("accepting", "true");
+		states.addContent(state);
+
+
 		Element event = new Element("Event");
 		event.setAttribute("id", OPERATION_STOP_PREFIX + operationId );
 		event.setAttribute("label", OPERATION_STOP_PREFIX + operationId);
@@ -721,13 +732,26 @@ public class InterlockingOperationAutomatas {
 		event.setAttribute("prioritized", "true");
 		events.addContent(event);
 
+		event = new Element("Event");
+		event.setAttribute("id", OPERATION_START_PREFIX + operationId );
+		event.setAttribute("label", OPERATION_START_PREFIX + operationId);
+		event.setAttribute("controllable", "true");
+		event.setAttribute("prioritized", "true");
+		events.addContent(event);
+
+
+
 		Element transition = new Element("Transition");
-		transition.setAttribute("event", OPERATION_STOP_PREFIX + operationId);
+		transition.setAttribute("event", OPERATION_START_PREFIX + operationId);
 		transition.setAttribute("source", "q" + 0);
-		transition.setAttribute("dest", "q" + 0);
+		transition.setAttribute("dest", "q" + 2);
 		transitions.addContent(transition);
 
-
+		transition = new Element("Transition");
+		transition.setAttribute("event", OPERATION_STOP_PREFIX + operationId);
+		transition.setAttribute("source", "q" + 2);
+		transition.setAttribute("dest", "q" + 0);
+		transitions.addContent(transition);
 
 		for(Iterator trigIter = triggers.iterator(); trigIter.hasNext(); )
 		{
@@ -815,14 +839,14 @@ public class InterlockingOperationAutomatas {
 
 
 		Element event = new Element("Event");
-		event.setAttribute("id", OPERATION_STOP_PREFIX + operationId);
-		event.setAttribute("label", OPERATION_STOP_PREFIX + operationId);
+		event.setAttribute("id", OPERATION_START_PREFIX + operationId);
+		event.setAttribute("label", OPERATION_START_PREFIX + operationId);
 		event.setAttribute("controllable", "true");
 		event.setAttribute("prioritized", "true");
 		events.addContent(event);
 
 		Element transition = new Element("Transition");
-		transition.setAttribute("event", OPERATION_STOP_PREFIX + operationId );
+		transition.setAttribute("event", OPERATION_START_PREFIX + operationId );
 		transition.setAttribute("source", "q" + 1);
 		transition.setAttribute("dest", "q" + 1);
 		transitions.addContent(transition);
