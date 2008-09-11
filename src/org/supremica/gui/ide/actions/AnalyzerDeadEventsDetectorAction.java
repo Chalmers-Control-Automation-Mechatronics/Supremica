@@ -1,0 +1,60 @@
+package org.supremica.gui.ide.actions;
+
+import java.util.List;
+import javax.swing.Action;
+import java.awt.event.ActionEvent;
+import javax.swing.ImageIcon;
+import org.supremica.automata.Automata;
+import org.supremica.automata.algorithms.DeadEventsDetector;
+import org.supremica.gui.ide.IDE;
+import org.supremica.log.*;
+
+
+/**
+ * A new action
+ */
+public class AnalyzerDeadEventsDetectorAction
+    extends IDEAction
+{
+    private Logger logger = LoggerFactory.createLogger(IDE.class);
+
+    private static final long serialVersionUID = 1L;
+
+    /**
+     * Constructor.
+     */
+    public AnalyzerDeadEventsDetectorAction(List<IDEAction> actionList)
+    {
+        super(actionList);
+
+        setEditorActiveRequired(false);
+        setAnalyzerActiveRequired(true);
+
+        putValue(Action.NAME, "Dead Events Detector");
+        putValue(Action.SHORT_DESCRIPTION, "Find all events that are not present in any transition");
+//        putValue(Action.MNEMONIC_KEY, new Integer(KeyEvent.VK_A));
+//        putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_A, ActionEvent.CTRL_MASK));
+//        putValue(Action.SMALL_ICON, new ImageIcon(IDE.class.getResource("/toolbarButtonGraphics/general/Icon.gif")));
+        //putValue(Action.SMALL_ICON, new ImageIcon(IDE.class.getResource("/icons/waters/minimise16.gif")));
+    }
+
+    public void actionPerformed(ActionEvent e)
+    {
+        doAction();
+    }
+
+    /**
+     * The code that is run when the action is invoked.
+     */
+    public void doAction()
+    {
+        // Retrieve the selected automata and make a sanity check
+        Automata selectedAutomata = ide.getActiveDocumentContainer().getAnalyzerPanel().getSelectedAutomata();
+
+        // logger.info("Before action");
+
+        DeadEventsDetector detector = new DeadEventsDetector(selectedAutomata);
+        detector.execute();
+        //logger.info("After action");
+    }
+}
