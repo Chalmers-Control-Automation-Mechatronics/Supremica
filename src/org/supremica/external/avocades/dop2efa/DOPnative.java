@@ -41,8 +41,9 @@ public class DOPnative {
 	//-------------------------------------------------------------------------
 	//Attribute types used by user
 	//-------------------------------------------------------------------------
-	protected final static String RESOURCE = "RESOURCE";
-	
+	public final static String RESOURCE = "RESOURCE";
+	public final static String BOOK = "b";				//booking of zones
+	public final static String FREE = "f";				//zone free
 	
 	//-------------------------------------------------------------------------
 	//Attribute types used by algorithm
@@ -61,6 +62,8 @@ public class DOPnative {
 	
 	protected final static String START_PREFIX = "STARTPREFIX";
 	protected final static String STOP_PREFIX = "STOPPREFIX";
+	
+	protected final static String RESOURCE_PREFIX = "r";
 	
 	/**
 	 * Build a basic Activity from one place to another.
@@ -150,6 +153,13 @@ public class DOPnative {
 					}
 					else if(att.getType().equals(RESOURCE))
 					{
+						/*
+						 * Add resource prefix to attribute value. To avoid
+						 * problem with only numbers in attributevalue.
+						 */
+						att.setAttributeValue(RESOURCE_PREFIX +
+								                      att.getAttributeValue());
+						
 						//Resources
 						start = bookResource(start, efa.getModule(), att);
 						stop = unBookResource(stop, efa.getModule(), att);

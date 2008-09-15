@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.io.StringWriter;
 
+import java.util.Date;
+
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
@@ -28,6 +30,11 @@ public class Converter {
 	private static final String PKGS_IL = "org.supremica.manufacturingTables.xsd.il";
 	
 	private static final Loader loader = new Loader();
+	
+	private static Date startTime;
+	private static Date stopTime;
+	
+	private static final boolean PRINT_ELAPSED_TIME = false;
 	
 	/*-------------------------------------------------------------------------
 	 * 
@@ -58,7 +65,7 @@ public class Converter {
 		if( o instanceof ROP ){
 			return (ROP) o;
 		}
-		
+        
 		return null;
 	}
 	
@@ -66,7 +73,7 @@ public class Converter {
 	public static String convertToXMLString(ROP rop){
 		
 		final StreamResult sr = new StreamResult( new StringWriter() );
-    	
+		
     	try{
     		JAXBContext jc = JAXBContext.newInstance(PKGS_ROP);
     		Marshaller m = jc.createMarshaller();
@@ -87,7 +94,7 @@ public class Converter {
 	public static String convertToXMLString(EOP eop){
 		
 		final StreamResult sr = new StreamResult( new StringWriter() );
-    	
+		
     	try{
     		JAXBContext jc = JAXBContext.newInstance(PKGS_EOP);
     		Marshaller m = jc.createMarshaller();
@@ -108,7 +115,7 @@ public class Converter {
 	public static String convertToXMLString(IL il){
 		
 		final StreamResult sr = new StreamResult( new StringWriter() );
-    	
+		
     	try{
     		JAXBContext jc = JAXBContext.newInstance(PKGS_IL);
     		Marshaller m = jc.createMarshaller();
@@ -140,7 +147,7 @@ public class Converter {
 		}catch(IOException e){
 			e.printStackTrace();
 		}
-		
+	
 		return doc;
 	}
 	
@@ -157,7 +164,16 @@ public class Converter {
 	
 	public static ROP copy(final ROP rop){
 		
+		if(PRINT_ELAPSED_TIME){
+			startTime();
+		}
+		
 		final Object o = loader.openROP( convertToXMLString( rop ) );
+		
+		if(PRINT_ELAPSED_TIME){
+			stopTime();
+			System.out.println("copy ROP: " + getElapsedTime() + "ms");
+		}
 		
 		if(o instanceof ROP){
 			return (ROP)o;
@@ -167,7 +183,17 @@ public class Converter {
 	}
 	
 	public static EOP copy(final EOP eop){
+		
+		if(PRINT_ELAPSED_TIME){
+			startTime();
+		}
+		
 		final Object o = loader.openEOP( convertToXMLString( eop ) );
+		
+		if(PRINT_ELAPSED_TIME){
+			stopTime();
+			System.out.println("copy EOP: " + getElapsedTime() + "ms");
+		}
 		
 		if(o instanceof EOP){
 			return (EOP)o;
@@ -178,7 +204,16 @@ public class Converter {
 	
 	public static IL copy(final IL il){
 		
+		if(PRINT_ELAPSED_TIME){
+			startTime();
+		}
+		
 		final Object o = loader.openIL( convertToXMLString( il ) );
+		
+		if(PRINT_ELAPSED_TIME){
+			stopTime();
+			System.out.println("copy IL: " + getElapsedTime() + "ms");
+		}
 		
 		if(o instanceof IL){
 			return (IL)o;
@@ -186,4 +221,39 @@ public class Converter {
 		
 		return null;
 	}
+	
+	/*-------------------------------------------------------------------------
+	 * 
+	 * Timer functions
+	 * 
+	 *-------------------------------------------------------------------------*/
+	
+	private static void startTime(){
+		startTime = new Date();
+	}
+	
+	private static void stopTime(){
+		stopTime = new Date();
+	}
+	
+	private static long getElapsedTime(){
+		long diff = 0;
+		
+		//Sanity check
+		if ( null == stopTime || null == startTime ){
+			return -1;
+		}
+		
+		//calculate diff
+		diff =  stopTime.getTime() - startTime.getTime();
+		
+		//invalidate timers
+		startTime = null;
+		stopTime = null;
+		
+		//return difference
+		return diff;
+		
+	}
+	
 }

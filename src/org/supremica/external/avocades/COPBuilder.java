@@ -18,7 +18,9 @@ import org.jdom.output.XMLOutputter;
 import org.jdom.input.SAXBuilder;
 import org.jdom.JDOMException;
 
+import org.supremica.automata.Automata;
 import org.supremica.automata.Automaton;
+import org.supremica.automata.ModularSupervisor;
 import org.supremica.automata.Supervisor;
 
 import org.supremica.automata.Project;
@@ -30,9 +32,18 @@ import org.supremica.external.avocades.specificationsynthesis.SpecificationSynth
 
 import org.supremica.manufacturingTables.xsd.processeditor.ROP;
 import org.supremica.manufacturingTables.xsd.processeditor.Activity;
+import org.supremica.manufacturingTables.xsd.processeditor.Attribute;
+import org.supremica.manufacturingTables.xsd.processeditor.UpperIndicator;
+import org.supremica.manufacturingTables.xsd.processeditor.LowerIndicator;
+import org.supremica.manufacturingTables.xsd.processeditor.ObjectFactory;
 import org.supremica.manufacturingTables.xsd.processeditor.OperationReferenceType;
 import org.supremica.manufacturingTables.xsd.processeditor.Relation;
+import org.supremica.manufacturingTables.xsd.processeditor.RelationType;
 import org.supremica.manufacturingTables.xsd.eop.EOP;
+import org.supremica.manufacturingTables.xsd.eop.Action;
+import org.supremica.manufacturingTables.xsd.eop.ZoneState;
+import org.supremica.manufacturingTables.xsd.eop.Zones;
+
 import org.supremica.manufacturingTables.xsd.il.IL;
 import org.supremica.manufacturingTables.xsd.il.Term;
 import org.supremica.manufacturingTables.xsd.il.OperationCheck;
@@ -63,6 +74,8 @@ import net.sourceforge.waters.subject.module.ModuleSubjectFactory;
 
 import org.supremica.automata.algorithms.AutomataSynchronizer;
 import org.supremica.automata.algorithms.AutomataSynthesizer;
+import org.supremica.automata.algorithms.SynchronizationOptions;
+import org.supremica.automata.algorithms.SynthesizerOptions;
 
 import org.supremica.automata.IO.ProjectBuildFromWaters;
 
@@ -74,6 +87,10 @@ import org.supremica.automata.IO.ProjectBuildFromWaters;
 //-----------------------------------------------------------------------------
 
 import static org.supremica.external.avocades.AutomataNames.EVENT_MACHINE_SEPARATOR;
+import static org.supremica.external.avocades.dop2efa.DOPnative.RESOURCE;
+
+import static org.supremica.external.avocades.dop2efa.DOPnative.BOOK;
+import static org.supremica.external.avocades.dop2efa.DOPnative.FREE;
 
 public class COPBuilder {
 	
@@ -83,6 +100,9 @@ public class COPBuilder {
 	
 	private DocumentManager mDocumentManager = null;
 	private final ProductDESImporter mImporter;
+	
+	private SynchronizationOptions synchronizationOptions;
+	private SynthesizerOptions synthesizerOptions;
 	
 	/**
 	 * Constructor
@@ -94,7 +114,13 @@ public class COPBuilder {
         eopList = new LinkedList<EOP>();
         ilList = new LinkedList<IL>();
         
-     // Set up document manager ...
+        //Default options
+        synchronizationOptions = SynchronizationOptions.
+        							getDefaultSynthesisOptions();
+        synthesizerOptions = SynthesizerOptions.
+        						getDefaultMonolithicCNBSynthesizerOptions();
+        
+        // Set up document manager ...
         mDocumentManager = new DocumentManager();
         final ModuleProxyFactory factory = ModuleSubjectFactory.getInstance();
         final OperatorTable opTable = CompilerOperatorTable.getInstance();
@@ -161,9 +187,48 @@ public class COPBuilder {
     	ilList.add( il );
     }
     
+    
+    /**
+     * Sets the synchronization options to be used by synchronizations.
+     * @param synchronizationOptions
+     */
+    public void setSynchronizationOptions(SynchronizationOptions synchronizationOptions){
+    	this.synchronizationOptions = synchronizationOptions;
+    }
+    
+    /**
+     * Sets the synthesis options.
+     * 
+     * @param synthesizerOptions
+     */
+    public void setSynthesizerOptions(SynthesizerOptions synthesizerOptions){
+    	this.synthesizerOptions = synthesizerOptions;
+    }
+    
+    
     //-----------------------------------------------------------------------//
     // get
     //-----------------------------------------------------------------------//
+    
+    /**
+     * Get the synthes options used by the synthes
+     * 
+     * @param synthesizerOptions
+     * @return the synthesizer options
+     */
+    public SynthesizerOptions getSynthesizerOptions(SynthesizerOptions synthesizerOptions){
+    	return synthesizerOptions;
+    }
+    
+    
+    /**
+     * Get the synchronization options used by synchronization.
+     * @return the synchronization options
+     */
+    public SynchronizationOptions getSynchronizationOptions(){
+    	return synchronizationOptions;
+    }
+    
     public ModuleSubject getSpecificationSynthesisOutput(){
     	
     	final String NEWLINE = "\n";
@@ -290,11 +355,291 @@ public class COPBuilder {
     	
     	for(ROP rop : ropList){
     		ROP tmpROP = Converter.copy( rop );
+    		
+    		addZoneBookingFromEOP(tmpROP);
+    		
     		tmpROPList.add( tmpROP );
     	}
     	
     	return tmpROPList;
     }
+    
+    private void addZoneBookingFromEOP(ROP rop){
+    	List<String> preBookedZones = new LinkedList<String>();
+    	addZoneBookingFromEOP(rop.getRelation(), preBookedZones);
+    }
+    
+    private List<String> addZoneBookingFromEOP(Relation relation, List<String> preBookedZones){
+    	
+    	if (RelationType.SEQUENCE.equals( relation.getType() )){
+    		
+    		for(Object o : relation.getActivityRelationGroup() ){
+    			if (o instanceof Activity){
+    				preBookedZones = addZoneBookingFromEOP( (Activity)o, preBookedZones);
+        		} else if (o instanceof Relation){
+        			preBookedZones = addZoneBookingFromEOP( (Relation)o , preBookedZones);
+        		}
+    		}
+    		
+    		
+    	} else {
+    		
+    		List<String> tmpPreBookedZones1 = new LinkedList<String>();
+    		List<String> tmpPreBookedZones2 = new LinkedList<String>();
+    		
+    		//First object
+    		Object o = relation.getActivityRelationGroup().get(0);
+			if (o instanceof Activity){
+				tmpPreBookedZones1 = addZoneBookingFromEOP( (Activity)o, preBookedZones);
+    		} else if (o instanceof Relation){
+    			tmpPreBookedZones1 = addZoneBookingFromEOP( (Relation)o , preBookedZones);
+    		}
+			
+			//The rest of the objects
+    		for(int i = 1; i < relation.getActivityRelationGroup().size(); i++ ){
+    			o = relation.getActivityRelationGroup().get(i);
+    			
+    			if (o instanceof Activity){
+    				tmpPreBookedZones2 = addZoneBookingFromEOP( (Activity)o, preBookedZones);
+        		} else if (o instanceof Relation){
+        			tmpPreBookedZones2 = addZoneBookingFromEOP( (Relation)o , preBookedZones);
+        		}
+    			
+    			/*
+    			 * Remove zones that not are prebooked by all paths
+    			 */
+    			for(String zone : tmpPreBookedZones2){
+    				if ( !tmpPreBookedZones1.contains( zone ) ){
+    					tmpPreBookedZones1.remove( zone );
+    				}
+    			}
+    		}
+    		
+    		/*
+    		 * If there where prebooked zones before all zones needs to be prebooked
+    		 * again to still be prebooked. 
+    		 */
+    		if (0 == preBookedZones.size() ){
+    			preBookedZones = tmpPreBookedZones1;
+    		} else {
+    			
+    			/*
+    			 * Remove zones that not are prebooked by all paths
+    			 */
+    			for(String zone : tmpPreBookedZones1){
+    				if ( !preBookedZones.contains( zone ) ){
+    					preBookedZones.remove( zone );
+    				}
+    			}
+    			
+    		}
+    		
+    	}
+    	
+    	return preBookedZones;
+    }
+    
+    private List<String> addZoneBookingFromEOP(Activity activity, List<String> preBookedZones){
+    		
+    	//Sanity check
+    	if(null == activity){
+    		return preBookedZones;
+    	}
+    	
+    	//Find EOP
+    	EOP eop = getFirstMatchingEOPfromList(activity, eopList);
+    	
+    	//No EOP found
+    	if(null == eop){
+    		return preBookedZones;
+    	}
+    	
+    	addZonesFromEOPtoActivity(eop, activity);
+    	
+    	//Zone booking from initial state
+    	for (ZoneState zoneState : eop.getInitialState().getZoneState()){
+    		
+			//Booking of zones
+    		if (BOOK.equals( zoneState.getState() )){
+    			
+    			//is it prebooked?
+    			if ( !preBookedZones.contains( zoneState.getZone() ) ){
+    				
+    				for ( Attribute att : activity.getProperties().getAttribute()){
+						
+						if ( att.getAttributeValue().equals(zoneState.getZone()) ){
+							if ( att.getType().equals(RESOURCE) ){
+								
+								//book the zone
+    							att.getUpperIndicator().setIndicatorValue(true);
+    							preBookedZones.add( zoneState.getZone() );
+    							
+    						}
+						}
+					}
+    				
+    				
+    			}
+    			
+    		}else if(FREE.equals( zoneState.getState() )){
+    			//do nothing
+    		}
+    	}
+    	
+    	
+    	//Zone booking from action
+    	for(Action action : eop.getAction()){
+    		
+    		for (ZoneState zoneState : action.getZoneState()){
+    			
+    			//Booking of zones
+    			if (BOOK.equals( zoneState.getState() )){
+    			
+    				//is it prebooked?
+    				if ( !preBookedZones.contains( zoneState.getZone() ) ){
+    				
+    					for ( Attribute att : activity.getProperties().getAttribute()){
+    						
+    						if ( att.getAttributeValue().equals(zoneState.getZone()) ){
+    							if ( att.getType().equals(RESOURCE) ){
+    								
+    								//book the zone
+        							att.getUpperIndicator().setIndicatorValue(true);
+        							preBookedZones.add( zoneState.getZone() );
+        							
+        						}
+    						}
+    					}//end for
+    				}		
+    			}
+    		}//end for
+    	}
+    	
+    	if(0 == eop.getAction().size()){
+    		return preBookedZones;
+    	}
+    	
+    	Action lastAction = eop.getAction().get( eop.getAction().size() - 1 );
+    	for (ZoneState zoneState : lastAction.getZoneState()){
+			
+			//Booking of zones
+			if (FREE.equals( zoneState.getState() )){
+				
+				for ( Attribute att : activity.getProperties().getAttribute()){
+					
+					if ( att.getAttributeValue().equals(zoneState.getZone()) ){
+						if ( att.getType().equals(RESOURCE) ){
+							//unbook the zone
+    						att.getLowerIndicator().setIndicatorValue(true);			
+    					}
+					}
+				}
+				
+				if( !preBookedZones.remove( zoneState.getZone() ) ){
+					System.out.println("Warning");
+					System.out.println("Zone: " + zoneState.getZone());
+					System.out.println("Unbooked without being bocked");
+				}
+			}
+		}
+    	
+    	return preBookedZones;
+    }
+    
+    
+    
+    private static EOP getFirstMatchingEOPfromList(Activity activity, List<EOP> eopList){
+    	
+    	//Find EOP
+    	for(EOP eop : eopList){
+    		if (eop.getId().trim().equals( activity.getOperation().trim() )){
+    			return eop;
+    		}
+    	}
+    	
+    	return null;
+    }
+    
+    private static void addZonesFromEOPtoActivity(EOP eop, Activity activity){
+    	
+    	//Sanity check
+    	if(null == activity || null == eop){
+    		return;
+    	}
+    	
+    	if (null == eop.getZones() ||
+    	    null == eop.getZones().getZone() ||
+    	    0 == eop.getZones().getZone().size() )
+    	{
+    		return;
+    	}
+    	//end sanity check
+    	
+    	//add properties if needed
+    	if ( null == activity.getProperties() ){
+			activity.setProperties((new ObjectFactory()).createProperties());
+		}
+    	
+    	//create and add zone attribute
+    	for(String zone :  eop.getZones().getZone()){
+			Attribute att = createZoneAttribute( zone );
+			
+			if ( !contains(activity.getProperties().getAttribute(), att) ){
+				activity.getProperties().getAttribute().add(att);
+			}
+    	}
+    }
+    
+    private static boolean contains(List<Attribute> attributeList, Attribute attribute){
+    	
+    	for (Attribute att : attributeList){
+    		
+    		//Same value
+    		if ( attribute.getAttributeValue().trim().equals(att.
+    				getAttributeValue().trim()))
+    		{
+    			//Same type
+    			if(attribute.getType().trim().equals(att.getType().trim())){
+    				return true;
+    			}
+    		}
+    	}
+    	
+    	return false;
+    }
+    
+    
+    /**
+     * Creates a zone attribute
+     * @param zoneName - the zone name
+     * @return an attribute 
+     */
+    private static Attribute createZoneAttribute(String zoneName){
+    	
+    	ObjectFactory factory = new ObjectFactory();
+    	
+    	Attribute attribute = factory.createAttribute();
+		
+    	attribute.setInvisible(false);
+		
+		UpperIndicator uppInd = factory.createUpperIndicator();
+		LowerIndicator lowInd = factory.createLowerIndicator();
+		
+		uppInd.setIndicatorValue(false);
+		lowInd.setIndicatorValue(false);
+		
+		attribute.setUpperIndicator(uppInd);
+		attribute.setLowerIndicator(lowInd);
+		
+		attribute.setAttributeValue( zoneName );
+		attribute.setType(RESOURCE);
+		
+		return attribute;
+    }
+    
+    
+    
+    
     
     private void renameILOperationInList(List<String> operationList){
     	
@@ -355,6 +700,20 @@ public class COPBuilder {
     	operationList.addAll(operationsToAddList);	
     }
     
+    /**
+     * Removes all after EVENT_MACHINE_SEPARATOR from a string
+     * [String1][EVENT_MACHINE_SEPARATOR][String2]
+     * returns String2
+     * Ex.
+     * 
+     * EVENT_MACHINE_SEPARATOR = ::
+     * 
+     * Op2::Machine1 => Op2
+     *
+     * @param str the string to be parsed
+     * @return a substring from first index to last index of the
+     *         EVENT_MACHINE_SEPARATOR string.
+     */
     private String removeMachineString(String str){
     	
     	if (!str.contains(EVENT_MACHINE_SEPARATOR)){
@@ -587,7 +946,7 @@ public class COPBuilder {
 		 * 3. Fill COP list
 		 */
 		copList = new ArrayList<ROP>();
-		for( Iterator cIter = tmpROPList.iterator(); cIter.hasNext(); ){
+		for( Iterator<Document> cIter = tmpROPList.iterator(); cIter.hasNext(); ){
 			Document cop = (Document) cIter.next();
 			
 			ROP rop = Converter.convertToROP( cop );
@@ -771,7 +1130,9 @@ public class COPBuilder {
         
         //Synchronize
         try{
-        	automaton = AutomataSynchronizer.synchronizeAutomata(supremicaProject);
+        	automaton = AutomataSynchronizer.
+        					synchronizeAutomata(supremicaProject,
+        			                            synchronizationOptions);
         }catch(Exception e){
         	e.printStackTrace();
         }
@@ -815,7 +1176,16 @@ public class COPBuilder {
         
         //Supervisor
         try{
-        	supervisor = AutomataSynthesizer.synthesizeControllableNonblocking( supremicaProject );
+            AutomataSynthesizer synthesizer;
+            Automata result;
+            
+            synthesizer = new AutomataSynthesizer(supremicaProject,
+            		                              synchronizationOptions,
+            		                              synthesizerOptions);
+            result = synthesizer.execute();
+            
+            supervisor = new ModularSupervisor(result);
+        	
         }catch(Exception e){
         	e.printStackTrace();
         }
