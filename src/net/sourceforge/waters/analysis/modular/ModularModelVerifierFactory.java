@@ -9,26 +9,22 @@
 
 package net.sourceforge.waters.analysis.modular;
 
-import net.sourceforge.waters.analysis.modular.ModularControllabilityChecker;
-import net.sourceforge.waters.analysis.modular.ModularLanguageInclusionChecker;
 import java.util.List;
 
-import net.sourceforge.waters.analysis.modular.HeuristicType;
-import net.sourceforge.waters.analysis.modular.MaxCommonEventsHeuristic;
-import net.sourceforge.waters.cpp.analysis.NativeControllabilityChecker;
-import net.sourceforge.waters.model.analysis.ModelVerifierFactory;
-import net.sourceforge.waters.model.analysis.LanguageInclusionChecker;
-import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 import net.sourceforge.waters.analysis.monolithic.MonolithicControllabilityChecker;
+import net.sourceforge.waters.cpp.analysis.NativeControllabilityChecker;
+import net.sourceforge.waters.model.analysis.AbstractModelVerifierFactory;
+import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 
 
 /**
- * A factory that produces projecting model verifiers.
+ * A factory that produces modular/incremental model verifiers.
  *
  * @author Robi Malik
  */
 
-public class ModularModelVerifierFactory implements ModelVerifierFactory
+public class ModularModelVerifierFactory
+  extends AbstractModelVerifierFactory
 {
 
   //#########################################################################

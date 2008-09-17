@@ -104,11 +104,6 @@ public class CommandLineTool
         // No loggers---no trouble ...
       }
 
-      final Class<?> fclazz = loader.loadClass(factoryname);
-      final Method getinst = fclazz.getMethod("getInstance", List.class);
-      final ModelVerifierFactory factory =
-        (ModelVerifierFactory) getinst.invoke(null, arglist);
-
       final ModuleProxyFactory moduleFactory =
         ModuleElementFactory.getInstance();
       final ProductDESProxyFactory desFactory =
@@ -127,15 +122,21 @@ public class CommandLineTool
 
       final Iterator<String> iter = arglist.iterator();
       final String checkname = iter.next();
+      iter.remove();
+
+      final Class<?> fclazz = loader.loadClass(factoryname);
+      final Method getinst = fclazz.getMethod("getInstance", List.class);
+      final ModelVerifierFactory factory =
+        (ModelVerifierFactory) getinst.invoke(null, arglist);
       final String createname = "create" + checkname + "Checker";
       final Method getcheck =
         fclazz.getMethod(createname, ProductDESProxyFactory.class);
       final ModelVerifier checker =
         (ModelVerifier) getcheck.invoke(factory, desFactory);
+      final List<String> filenames = factory.loadArguments(checker);
+
       final Formatter formatter = new Formatter(System.out);
-      
-      while (iter.hasNext()) {
-        final String name = iter.next();
+      for (final String name : filenames) {
         final File filename = new File(name);
         final DocumentProxy doc = docManager.load(filename);
         ProductDESProxy des = null;

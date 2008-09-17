@@ -11,7 +11,7 @@ package net.sourceforge.waters.analysis.monolithic;
 
 import java.util.List;
 
-import net.sourceforge.waters.model.analysis.ModelVerifierFactory;
+import net.sourceforge.waters.model.analysis.AbstractModelVerifierFactory;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 
 
@@ -21,8 +21,21 @@ import net.sourceforge.waters.model.des.ProductDESProxyFactory;
  * @author Robi Malik
  */
 
-public class MonolithicModelVerifierFactory implements ModelVerifierFactory
+public class MonolithicModelVerifierFactory
+  extends AbstractModelVerifierFactory
 {
+
+  //#########################################################################
+  //# Constructors
+  private MonolithicModelVerifierFactory()
+  {
+  }
+
+  private MonolithicModelVerifierFactory(final List<String> arglist)
+  {
+    super(arglist);
+  }
+
 
   //#########################################################################
   //# Interface net.sourceforge.waters.model.analysis.ModelVerifierFactory
@@ -52,7 +65,7 @@ public class MonolithicModelVerifierFactory implements ModelVerifierFactory
   public static MonolithicModelVerifierFactory
     getInstance(final List<String> cmdline)
   {
-    return getInstance();
+    return new MonolithicModelVerifierFactory(cmdline);
   }
 
 

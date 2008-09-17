@@ -11,7 +11,7 @@ package net.sourceforge.waters.analysis.bdd;
 
 import java.util.List;
 
-import net.sourceforge.waters.model.analysis.ModelVerifierFactory;
+import net.sourceforge.waters.model.analysis.AbstractModelVerifierFactory;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 
 
@@ -21,8 +21,21 @@ import net.sourceforge.waters.model.des.ProductDESProxyFactory;
  * @author Robi Malik
  */
 
-public class BDDModelVerifierFactory implements ModelVerifierFactory
+public class BDDModelVerifierFactory
+  extends AbstractModelVerifierFactory
 {
+
+  //#########################################################################
+  //# Constructors
+  private BDDModelVerifierFactory()
+  {
+  }
+
+  private BDDModelVerifierFactory(final List<String> arglist)
+  {
+    super(arglist);
+  }
+
 
   //#########################################################################
   //# Interface net.sourceforge.waters.model.analysis.ModelVerifierFactory
@@ -52,7 +65,7 @@ public class BDDModelVerifierFactory implements ModelVerifierFactory
   public static BDDModelVerifierFactory
     getInstance(final List<String> cmdline)
   {
-    return getInstance();
+    return new BDDModelVerifierFactory(cmdline);
   }
 
 

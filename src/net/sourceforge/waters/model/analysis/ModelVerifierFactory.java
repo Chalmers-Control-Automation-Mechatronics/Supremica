@@ -9,6 +9,8 @@
 
 package net.sourceforge.waters.model.analysis;
 
+import java.util.List;
+
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 
 
@@ -34,5 +36,17 @@ public interface ModelVerifierFactory
    */
   public LanguageInclusionChecker createLanguageInclusionChecker
     (ProductDESProxyFactory factory);
+
+
+  //#########################################################################
+  //# Command Line Arguments
+  /**
+   * Configures the given model verifier according to any command line
+   * arguments passed to this factory.
+   * @return A string array containing all arguments that could not
+   *         be processed. These arguments are to be considered as
+   *         file names by the command line tool.
+   */
+  public List<String> loadArguments(ModelVerifier verifier);
 
 }
