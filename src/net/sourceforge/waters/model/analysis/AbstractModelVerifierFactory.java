@@ -46,6 +46,7 @@ public abstract class AbstractModelVerifierFactory
     mArgumentList = arglist;
     mArgumentMap = new HashMap<String,CommandLineArgument>(16);
     addArgument(new LimitArgument());
+    addArgument(new PropArgument());
   }
 
 
@@ -73,7 +74,7 @@ public abstract class AbstractModelVerifierFactory
         if (arg != null) {
           arg.parse(iter);
           arg.assign(verifier);
-        } else if (arg.equals("--")) {
+        } else if (name.equals("--")) {
           while (iter.hasNext()) {
             final String nextname = iter.next();
             filenames.add(nextname);
