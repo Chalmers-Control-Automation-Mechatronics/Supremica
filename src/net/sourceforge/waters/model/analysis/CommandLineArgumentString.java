@@ -24,14 +24,20 @@ public abstract class CommandLineArgumentString
 
   //#########################################################################
   //# Constructors
-  protected CommandLineArgumentString(final String name)
+  protected CommandLineArgumentString(final String name,
+                                      final String description)
   {
-    super(name);
+    super(name, description);
   }
 
 
   //#######################################################################
   //# Simple Access
+  protected String getArgumentTemplate()
+  {
+    return "<name>";
+  }
+
   protected String getValue()
   {
     return mValue;

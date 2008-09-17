@@ -9,6 +9,8 @@
 
 package net.sourceforge.waters.model.analysis;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -45,6 +47,7 @@ public abstract class AbstractModelVerifierFactory
   {
     mArgumentList = arglist;
     mArgumentMap = new HashMap<String,CommandLineArgument>(16);
+    addArgument(new HelpArgument());
     addArgument(new LimitArgument());
     addArgument(new PropArgument());
   }
@@ -92,13 +95,52 @@ public abstract class AbstractModelVerifierFactory
 
   //#########################################################################
   //# Inner Class LimitArgument
-  private static class LimitArgument extends CommandLineArgumentInteger
+  private class HelpArgument extends CommandLineArgument
+  {
+    //#######################################################################
+    //# Constructors
+    HelpArgument()
+    {
+      super("-help",
+            "Print this message");
+    }
+
+    //#######################################################################
+    //# Overrides for Abstract Base Class
+    //# net.sourceforge.waters.model.analysis.CommandLineArgument
+    protected void parse(final Iterator<String> iter)
+    {
+      final Class<?> clazz = AbstractModelVerifierFactory.this.getClass();
+      final String fullname = clazz.getName();
+      final int dotpos = fullname.lastIndexOf('.');
+      final String name = fullname.substring(dotpos + 1);
+      System.err.println
+        (name + " supports the following command line options:");
+
+      final List<CommandLineArgument> args =
+        new ArrayList<CommandLineArgument>(mArgumentMap.values());
+      Collections.sort(args);
+      for (final CommandLineArgument arg : args) {
+        arg.dump(System.err);
+      }
+    }
+
+    protected void assign(final ModelVerifier verifier)
+    {
+    }
+  }
+
+
+  //#########################################################################
+  //# Inner Class LimitArgument
+  private class LimitArgument extends CommandLineArgumentInteger
   {
     //#######################################################################
     //# Constructors
     LimitArgument()
     {
-      super("-limit");
+      super("-limit",
+            "Maximum number of states/nodes explored");
     }
 
     //#######################################################################
@@ -115,7 +157,7 @@ public abstract class AbstractModelVerifierFactory
 
   //#########################################################################
   //# Inner Class PropArgument
-  private static class PropArgument
+  private class PropArgument
     extends CommandLineArgumentString
     implements KindTranslator
   {
@@ -123,7 +165,9 @@ public abstract class AbstractModelVerifierFactory
     //# Constructors
     PropArgument()
     {
-      super("-property");
+      super("-property",
+            "Property for language inclusion check\n" +
+            "(can be used more than once)");
     }
 
     //#######################################################################

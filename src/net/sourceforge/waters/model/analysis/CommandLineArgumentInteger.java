@@ -24,14 +24,20 @@ public abstract class CommandLineArgumentInteger
 
   //#########################################################################
   //# Constructors
-  protected CommandLineArgumentInteger(final String name)
+  protected CommandLineArgumentInteger(final String name,
+                                       final String description)
   {
-    super(name);
+    super(name, description);
   }
 
 
   //#######################################################################
   //# Simple Access
+  protected String getArgumentTemplate()
+  {
+    return "<n>";
+  }
+
   protected int getValue()
   {
     return mValue;
