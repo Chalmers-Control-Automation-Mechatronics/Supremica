@@ -23,7 +23,7 @@
   <property name="jsr173_api.jar"
             location="${supremica.lib}/jsr173_1.0_api.jar"/>
   <property name="log4j.jar" location="${supremica.lib}/log4j.jar"/>
-  <property name="junit.jar" location="${supremica.lib}/junit.jar"/>
+  <property name="junit.jar" location="${supremica.lib}/junit-4.4.jar"/>
   <property name="trove.jar" location="${supremica.lib}/trove.jar"/>
 
   <path id="jaxb.classpath">

@@ -99,7 +99,7 @@ public abstract class AbstractModelVerifierFactory
   {
     //#######################################################################
     //# Constructors
-    HelpArgument()
+    private HelpArgument()
     {
       super("-help",
             "Print this message");
@@ -138,7 +138,7 @@ public abstract class AbstractModelVerifierFactory
   {
     //#######################################################################
     //# Constructors
-    LimitArgument()
+    private LimitArgument()
     {
       super("-limit",
             "Maximum number of states/nodes explored");
@@ -164,7 +164,7 @@ public abstract class AbstractModelVerifierFactory
   {
     //#######################################################################
     //# Constructors
-    PropArgument()
+    private PropArgument()
     {
       super("-property",
             "Property for language inclusion check\n" +
@@ -186,9 +186,8 @@ public abstract class AbstractModelVerifierFactory
         }
         mNames.add(name);
       } else {
-        throw new IllegalArgumentException
-          ("Command line option " + getName() +
-           " is only supported for language inclusion!");
+        fail("Command line option " + getName() +
+             " is only supported for language inclusion!");
       }
     }
 
