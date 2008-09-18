@@ -20,6 +20,9 @@ for F in $@; do
 	-comp)
 	    FACTORY="$WPACK.analysis.composing.ComposeModelVerifierFactory"
 	    ;;
+	-mod|-modular)
+	    FACTORY="$WPACK.analysis.modular.ModularModelVerifierFactory"
+	    ;;
 	-mono)
 	    FACTORY="$WPACK.analysis.monolithic.MonolithicModelVerifierFactory"
 	    ;;

@@ -79,7 +79,7 @@ public abstract class CommandLineArgument
       stream.print(template);
       len += template.length() + 1;
     }
-    indent(stream, INDENT - len);
+    doIndent(stream, INDENT - len);
     final String description = getDescription();
     int start = 0;
     int end = description.indexOf('\n');
@@ -89,7 +89,7 @@ public abstract class CommandLineArgument
       if (description.length() == end) {
         return;
       }
-      indent(stream, INDENT);
+      doIndent(stream, INDENT);
       start = end + 1;
       end = description.indexOf('\n', start);
     }
@@ -98,25 +98,28 @@ public abstract class CommandLineArgument
   }
 
 
-  //#########################################################################
-  //# Exception Handling
-  protected IllegalArgumentException getMissingValueException()
-  {
-    return new IllegalArgumentException
-      ("No value specified for command line argument " + getName() + "!");
-  }
-
-
-  //#########################################################################
-  //# Auxiliary Methods
-  private void indent(final PrintStream stream, final int spaces)
+  protected void doIndent(final PrintStream stream, final int spaces)
   {
     for (int i = 0; i < spaces; i++) {
       stream.print(' ');
     }
   }
 
-      
+
+  //#########################################################################
+  //# Exception Handling
+  protected void fail(final String msg)
+  {
+    System.err.println(msg);
+    System.exit(1);
+  }
+
+  protected void failMissingValue()
+  {
+    fail("No value specified for command line argument " + getName() + "!");
+  }
+
+
   //#########################################################################
   //# Data Members
   private final String mName;
@@ -125,6 +128,6 @@ public abstract class CommandLineArgument
 
   //#########################################################################
   //# Class Constants
-  private static final int INDENT = 20;
+  protected static final int INDENT = 20;
 
 }

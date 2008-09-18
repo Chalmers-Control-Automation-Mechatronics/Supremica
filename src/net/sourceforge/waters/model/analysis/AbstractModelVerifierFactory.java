@@ -123,6 +123,7 @@ public abstract class AbstractModelVerifierFactory
       for (final CommandLineArgument arg : args) {
         arg.dump(System.err);
       }
+      System.exit(0);
     }
 
     protected void assign(final ModelVerifier verifier)
@@ -133,7 +134,7 @@ public abstract class AbstractModelVerifierFactory
 
   //#########################################################################
   //# Inner Class LimitArgument
-  private class LimitArgument extends CommandLineArgumentInteger
+  private static class LimitArgument extends CommandLineArgumentInteger
   {
     //#######################################################################
     //# Constructors
@@ -157,7 +158,7 @@ public abstract class AbstractModelVerifierFactory
 
   //#########################################################################
   //# Inner Class PropArgument
-  private class PropArgument
+  private static class PropArgument
     extends CommandLineArgumentString
     implements KindTranslator
   {

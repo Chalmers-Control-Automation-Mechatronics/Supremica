@@ -51,7 +51,7 @@ public abstract class CommandLineArgumentString
     if (iter.hasNext()) {
       mValue = iter.next();
     } else {
-      throw getMissingValueException();
+      failMissingValue();
     }
   }
 

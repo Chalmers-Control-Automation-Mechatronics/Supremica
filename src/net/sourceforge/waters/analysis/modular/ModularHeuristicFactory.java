@@ -12,8 +12,12 @@ package net.sourceforge.waters.analysis.modular;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 
+import net.sourceforge.waters.model.analysis.CommandLineArgument;
+import net.sourceforge.waters.model.analysis.CommandLineArgumentEnum;
+import net.sourceforge.waters.model.analysis.ModelVerifier;
 import net.sourceforge.waters.model.base.WatersRuntimeException;
 import net.sourceforge.waters.model.unchecked.Casting;
+
 
 /**
  * The central access point to obtain a {@link ModularHeuristic} that
@@ -71,6 +75,72 @@ public class ModularHeuristicFactory {
 
 
   //#########################################################################
+  //# Command Line Support
+  public static CommandLineArgument getMethodArgument()
+  {
+    return new MethodArgument();
+  }
+
+  public static CommandLineArgument getPreferenceArgument()
+  {
+    return new PreferenceArgument();
+  }
+
+
+  //#########################################################################
+  //# Inner Class MethodArgument
+  private static class MethodArgument
+    extends CommandLineArgumentEnum<Method>
+  {
+    //#######################################################################
+    //# Constructor
+    private MethodArgument()
+    {
+      super("-heuristic", "Modular heuristic", Method.class);
+    }
+
+    //#######################################################################
+    //# Overrides for Abstract Base Class
+    //# net.sourceforge.waters.model.analysis.CommandLineArgument
+    protected void assign(final ModelVerifier verifier)
+    {
+      final AbstractModularSafetyVerifier modular =
+        (AbstractModularSafetyVerifier) verifier;
+      final Method method = getValue();
+      modular.setHeuristicMethod(method);
+    }
+  }
+
+    
+  //#########################################################################
+  //# Inner Class PreferenceArgument
+  private static class PreferenceArgument
+    extends CommandLineArgumentEnum<Preference>
+  {
+    //#######################################################################
+    //# Constructor
+    private PreferenceArgument()
+    {
+      super("-preference",
+            "Preference of modular heuristic",
+            Preference.class);
+    }
+
+    //#######################################################################
+    //# Overrides for Abstract Base Class
+    //# net.sourceforge.waters.model.analysis.CommandLineArgument
+    protected void assign(final ModelVerifier verifier)
+    {
+      final AbstractModularSafetyVerifier modular =
+        (AbstractModularSafetyVerifier) verifier;
+      final Preference preference = getValue();
+      modular.setHeuristicPreference(preference);
+    }
+
+  }
+
+    
+  //#########################################################################
   //# Enumeration Types
   public enum Method {
     All,                            
@@ -88,9 +158,9 @@ public class ModularHeuristicFactory {
   };
 
   public enum Preference {
-    PREFER_REAL_PLANT,
+    NOPREF,
     PREFER_PLANT,
-    NOPREF
+    PREFER_REAL_PLANT
   };
 
 }

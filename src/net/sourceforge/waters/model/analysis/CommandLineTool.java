@@ -2,7 +2,7 @@
 //##########################################################################
 //# PROJECT: Waters
 //# PACKAGE: net.sourceforge.waters.model.analysis
-//# CLASS:   ControlLoopChecker
+//# CLASS:   CommandLineTool
 //##########################################################################
 //# $Id: CommandLineTool.java,v 1.6 2007-11-02 00:30:37 robi Exp $
 //##########################################################################
@@ -153,32 +153,38 @@ public class CommandLineTool
 
         final long start = System.currentTimeMillis();
         checker.setModel(des);
-        checker.run();
-        final VerificationResult result = checker.getAnalysisResult();
-        final long stop = System.currentTimeMillis();
-        final boolean satisfied = result.isSatisfied();
-        final double numstates = result.getTotalNumberOfStates();
-        final float difftime = 0.001f * (stop - start);
-        final int numnodes = result.getPeakNumberOfNodes();
-        if (numstates < 0 && numnodes < 0) {
-          formatter.format("%b (%.3f s)\n", satisfied, difftime);
-        } else if (numnodes < 0 || (int) numnodes == (int) numstates) {
-          formatter.format("%b (%.0f states, %.3f s)\n",
-                           satisfied, numstates, difftime);
-        } else if (numstates < 0) {
-          formatter.format("%b (%d nodes, %.3f s)\n",
-                           satisfied, numnodes, difftime);
-        } else {
-          formatter.format("%b (%.0f states, %d nodes, %.3f s)\n",
-                           satisfied, numstates, numnodes, difftime);
-        }
-        if (verbose && !satisfied) {
-          final TraceProxy counterex = result.getCounterExample();
-          if (counterex != null) {
-            System.out.println("Counterexample:");
-            System.out.println(counterex.toString());
-            System.out.println();
+        try {
+          checker.run();
+          final VerificationResult result = checker.getAnalysisResult();
+          final long stop = System.currentTimeMillis();
+          final boolean satisfied = result.isSatisfied();
+          final double numstates = result.getTotalNumberOfStates();
+          final float difftime = 0.001f * (stop - start);
+          final int numnodes = result.getPeakNumberOfNodes();
+          if (numstates < 0 && numnodes < 0) {
+            formatter.format("%b (%.3f s)\n", satisfied, difftime);
+          } else if (numnodes < 0 || (int) numnodes == (int) numstates) {
+            formatter.format("%b (%.0f states, %.3f s)\n",
+                             satisfied, numstates, difftime);
+          } else if (numstates < 0) {
+            formatter.format("%b (%d nodes, %.3f s)\n",
+                             satisfied, numnodes, difftime);
+          } else {
+            formatter.format("%b (%.0f states, %d nodes, %.3f s)\n",
+                             satisfied, numstates, numnodes, difftime);
           }
+          if (verbose && !satisfied) {
+            final TraceProxy counterex = result.getCounterExample();
+            if (counterex != null) {
+              System.out.println("Counterexample:");
+              System.out.println(counterex.toString());
+              System.out.println();
+            }
+          }
+        } catch (final OverflowException overflow) {
+          final long stop = System.currentTimeMillis();
+          final float difftime = 0.001f * (stop - start);
+          formatter.format("OVERFLOW (%.3f s)\n", difftime);
         }
       }
 

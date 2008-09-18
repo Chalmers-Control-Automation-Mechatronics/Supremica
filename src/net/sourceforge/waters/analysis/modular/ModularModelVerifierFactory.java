@@ -36,6 +36,8 @@ public class ModularModelVerifierFactory
   public ModularModelVerifierFactory(final List<String> arglist)
   {
     super(arglist);
+    addArgument(ModularHeuristicFactory.getMethodArgument());
+    addArgument(ModularHeuristicFactory.getPreferenceArgument());
   }
 
 
@@ -74,7 +76,7 @@ public class ModularModelVerifierFactory
   public static ModularModelVerifierFactory
     getInstance(final List<String> cmdline)
   {
-    return getInstance();
+    return new ModularModelVerifierFactory(cmdline);
   }
 
 

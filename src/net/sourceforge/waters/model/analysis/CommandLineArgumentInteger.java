@@ -52,7 +52,7 @@ public abstract class CommandLineArgumentInteger
       final String value = iter.next();
       mValue = Integer.parseInt(value);
     } else {
-      throw getMissingValueException();
+      failMissingValue();
     }
   }
 

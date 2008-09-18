@@ -37,6 +37,8 @@ public class ProjectingModelVerifierFactory
   private ProjectingModelVerifierFactory(final List<String> arglist)
   {
     super(arglist);
+    addArgument(ModularHeuristicFactory.getMethodArgument());
+    addArgument(ModularHeuristicFactory.getPreferenceArgument());
   }
 
 
