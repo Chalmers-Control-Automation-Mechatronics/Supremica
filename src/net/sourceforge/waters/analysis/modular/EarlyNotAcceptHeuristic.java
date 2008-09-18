@@ -12,15 +12,15 @@ import java.util.Collection;
 public class EarlyNotAcceptHeuristic
   extends AbstractModularHeuristic
 {
-  private final HeuristicType mType;
+  private final ModularHeuristicFactory.Preference mType;
 	private final boolean foo = true;
   
   public EarlyNotAcceptHeuristic()
   {
-    this(HeuristicType.PREFERREALPLANT);
+    this(ModularHeuristicFactory.Preference.PREFER_REAL_PLANT);
   }
   
-  public EarlyNotAcceptHeuristic(HeuristicType type)
+  public EarlyNotAcceptHeuristic(ModularHeuristicFactory.Preference type)
   {
     mType = type;
   }
@@ -43,8 +43,8 @@ public class EarlyNotAcceptHeuristic
         }
       }
     }
-    boolean runspecs = mType == HeuristicType.PREFERREALPLANT && bestautomaton == null;
-    if (bestautomaton == null || mType != HeuristicType.PREFERREALPLANT) {
+    boolean runspecs = mType == ModularHeuristicFactory.Preference.PREFER_REAL_PLANT && bestautomaton == null;
+    if (bestautomaton == null || mType != ModularHeuristicFactory.Preference.PREFER_REAL_PLANT) {
       for (AutomatonProxy automaton : nonComposedSpecPlants) {
         int i = accepts(automaton, counterExample);
         if (i != counterExample.getEvents().size()) {
@@ -55,7 +55,7 @@ public class EarlyNotAcceptHeuristic
         }
       }
     }
-    if (bestautomaton == null || mType == HeuristicType.NOPREF || (runspecs && foo)) {
+    if (bestautomaton == null || mType == ModularHeuristicFactory.Preference.NOPREF || (runspecs && foo)) {
       for (AutomatonProxy automaton : nonComposedSpecs) {
         int i = accepts(automaton, counterExample);
         if (i != counterExample.getEvents().size()

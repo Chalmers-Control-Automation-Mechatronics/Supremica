@@ -14,15 +14,15 @@ import net.sourceforge.waters.xsd.base.EventKind;
 public class AllHeuristic
   extends AbstractModularHeuristic
 {
-  private final HeuristicType mType;
+  private final ModularHeuristicFactory.Preference mType;
 	private final boolean foo = true;
   
   public AllHeuristic()
   {
-    this(HeuristicType.PREFERREALPLANT);
+    this(ModularHeuristicFactory.Preference.PREFER_REAL_PLANT);
   }
   
-  public AllHeuristic(HeuristicType type)
+  public AllHeuristic(ModularHeuristicFactory.Preference type)
   {
     mType = type;
   }
@@ -40,15 +40,15 @@ public class AllHeuristic
         automata.add(automaton);
       }
     }
-    boolean runspecs = mType == HeuristicType.PREFERREALPLANT && automata.isEmpty();
-    if (automata.size() == 0 || mType != HeuristicType.PREFERREALPLANT) {
+    boolean runspecs = mType == ModularHeuristicFactory.Preference.PREFER_REAL_PLANT && automata.isEmpty();
+    if (automata.size() == 0 || mType != ModularHeuristicFactory.Preference.PREFER_REAL_PLANT) {
       for (AutomatonProxy automaton : nonComposedSpecPlants) {
         if (accepts(automaton, counterExample) != counterExample.getEvents().size()) {
           automata.add(automaton);
         }
       }
     }
-    if (automata.size() == 0 || mType == HeuristicType.NOPREF || (runspecs && foo)) {
+    if (automata.size() == 0 || mType == ModularHeuristicFactory.Preference.NOPREF || (runspecs && foo)) {
       for (AutomatonProxy automaton : nonComposedSpecs) {
         int i = accepts(automaton, counterExample);
         if (i != counterExample.getEvents().size()

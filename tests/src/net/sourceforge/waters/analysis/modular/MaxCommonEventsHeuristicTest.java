@@ -40,13 +40,15 @@ public class MaxCommonEventsHeuristicTest
   //#########################################################################
   //# Overrides for abstract base class
   //# net.sourceforge.waters.analysis.AbstractModelVerifierTest
-  protected ControllabilityChecker createModelVerifier
-    (final ProductDESProxyFactory factory)
+  protected ModularControllabilityChecker createModelVerifier
+    (final ProductDESProxyFactory desfactory)
   {
-    return
-      new ModularControllabilityChecker
-            (null, factory,
-             new NativeControllabilityChecker(factory),
-             new MaxCommonEventsHeuristic(HeuristicType.PREFERREALPLANT), false);
+    final ModularModelVerifierFactory checkerfactory =
+      ModularModelVerifierFactory.getInstance();
+    final ModularControllabilityChecker checker =
+      checkerfactory.createControllabilityChecker(desfactory);
+    checker.setHeuristicMethod(ModularHeuristicFactory.Method.MaxCommonEvents);
+    return checker;
   }
+
 }

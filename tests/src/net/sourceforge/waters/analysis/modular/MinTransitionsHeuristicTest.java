@@ -38,10 +38,15 @@ public class MinTransitionsHeuristicTest
   //#########################################################################
   //# Overrides for abstract base class
   //# net.sourceforge.waters.analysis.AbstractModelVerifierTest
-  protected ModularControllabilityChecker createModelVerifier(final ProductDESProxyFactory factory)
+  protected ModularControllabilityChecker createModelVerifier
+    (final ProductDESProxyFactory desfactory)
   {
-    return new ModularControllabilityChecker(null, factory,
-                                             new NativeControllabilityChecker(null, factory),
-                                             new MinTransitionsHeuristic(HeuristicType.NOPREF), false);
+    final ModularModelVerifierFactory checkerfactory =
+      ModularModelVerifierFactory.getInstance();
+    final ModularControllabilityChecker checker =
+      checkerfactory.createControllabilityChecker(desfactory);
+    checker.setHeuristicMethod(ModularHeuristicFactory.Method.MinTransitions);
+    return checker;
   }
+
 }

@@ -15,7 +15,6 @@ import junit.framework.TestSuite;
 import net.sourceforge.waters.cpp.analysis.NativeControllabilityChecker;
 import net.sourceforge.waters.model.analysis.
   AbstractControllabilityCheckerTest;
-import net.sourceforge.waters.model.analysis.ControllabilityChecker;
 import net.sourceforge.waters.model.analysis.OverflowException;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 
@@ -55,15 +54,12 @@ public class ModularControllabilityCheckerTest
   //#########################################################################
   //# Overrides for abstract base class
   //# net.sourceforge.waters.analysis.AbstractModelVerifierTest
-  protected ControllabilityChecker createModelVerifier
-    (final ProductDESProxyFactory factory)
+  protected ModularControllabilityChecker createModelVerifier
+    (final ProductDESProxyFactory desfactory)
   {
-    return
-      new ModularControllabilityChecker
-            (null, factory,
-             new NativeControllabilityChecker(factory),
-             new MaxCommonEventsHeuristic(HeuristicType.PREFERREALPLANT),
-             false);
+    final ModularModelVerifierFactory checkerfactory =
+      ModularModelVerifierFactory.getInstance();
+    return checkerfactory.createControllabilityChecker(desfactory);
   }
 
 }

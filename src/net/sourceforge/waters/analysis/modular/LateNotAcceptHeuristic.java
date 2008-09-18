@@ -12,15 +12,15 @@ import java.util.Collection;
 public class LateNotAcceptHeuristic
   extends AbstractModularHeuristic
 {
-  private final HeuristicType mType;
+  private final ModularHeuristicFactory.Preference mType;
 	private final boolean foo = true;
   
   public LateNotAcceptHeuristic()
   {
-    this(HeuristicType.PREFERREALPLANT);
+    this(ModularHeuristicFactory.Preference.PREFER_REAL_PLANT);
   }
   
-  public LateNotAcceptHeuristic(HeuristicType type)
+  public LateNotAcceptHeuristic(ModularHeuristicFactory.Preference type)
   {
     mType = type;
   }
@@ -43,8 +43,8 @@ public class LateNotAcceptHeuristic
         }
       }
     }
-    boolean runspecs = mType == HeuristicType.PREFERREALPLANT && bestautomaton == null;
-    if (bestautomaton == null || mType != HeuristicType.PREFERREALPLANT) {
+    boolean runspecs = mType == ModularHeuristicFactory.Preference.PREFER_REAL_PLANT && bestautomaton == null;
+    if (bestautomaton == null || mType != ModularHeuristicFactory.Preference.PREFER_REAL_PLANT) {
       for (AutomatonProxy automaton : nonComposedPlants) {
         int i = accepts(automaton, counterExample);
         if (i != counterExample.getEvents().size()) {
@@ -55,7 +55,7 @@ public class LateNotAcceptHeuristic
         }
       }
     }
-    if (bestautomaton == null || mType == HeuristicType.NOPREF || (runspecs && foo)) {
+    if (bestautomaton == null || mType == ModularHeuristicFactory.Preference.NOPREF || (runspecs && foo)) {
       for (AutomatonProxy automaton : nonComposedSpecs) {
         int i = accepts(automaton, counterExample);
         if (i != counterExample.getEvents().size()

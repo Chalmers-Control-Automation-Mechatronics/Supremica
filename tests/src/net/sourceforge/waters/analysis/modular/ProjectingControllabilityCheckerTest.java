@@ -1,25 +1,23 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
 //# PROJECT: Waters
-//# PACKAGE: net.sourceforge.waters.analysis.modular.supremica
+//# PACKAGE: net.sourceforge.waters.analysis.modular
 //# CLASS:   ProjectingControllabilityCheckerTest
 //###########################################################################
-//# $Id: ProjectingControllabilityCheckerTest.java,v 1.3 2008-06-30 01:50:57 robi Exp $
+//# $Id$
 //###########################################################################
 
-package net.sourceforge.waters.analysis.modular.supremica;
+package net.sourceforge.waters.analysis.modular;
 
 import junit.framework.Test;
 import junit.framework.TestSuite;
 
-import net.sourceforge.waters.analysis.modular.HeuristicType;
-import net.sourceforge.waters.analysis.modular.MaxCommonEventsHeuristic;
 import net.sourceforge.waters.cpp.analysis.NativeControllabilityChecker;
 import net.sourceforge.waters.model.analysis.
   AbstractControllabilityCheckerTest;
-import net.sourceforge.waters.model.analysis.ControllabilityChecker;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
-import net.sourceforge.waters.analysis.monolithic.MonolithicControllabilityChecker;
+import net.sourceforge.waters.analysis.monolithic.
+  MonolithicControllabilityChecker;
 
 
 public class ProjectingControllabilityCheckerTest
@@ -40,17 +38,16 @@ public class ProjectingControllabilityCheckerTest
     junit.textui.TestRunner.run(suite());
   }
 
+
   //#########################################################################
   //# Overrides for abstract base class
   //# net.sourceforge.waters.analysis.AbstractModelVerifierTest
-  protected ControllabilityChecker createModelVerifier
-    (final ProductDESProxyFactory factory)
+  protected ProjectingControllabilityChecker createModelVerifier
+    (final ProductDESProxyFactory desfactory)
   {
-    return
-      new ProjectingControllabilityChecker
-      (null, factory,
-       new MonolithicControllabilityChecker(factory),
-       new MaxCommonEventsHeuristic(HeuristicType.PREFERREALPLANT), false);
+    final ProjectingModelVerifierFactory checkerfactory =
+      ProjectingModelVerifierFactory.getInstance();
+    return checkerfactory.createControllabilityChecker(desfactory);
   }
 
 }

@@ -12,8 +12,6 @@ package net.sourceforge.waters.analysis.modular;
 import junit.framework.Test;
 import junit.framework.TestSuite;
 
-//import net.sourceforge.waters.analysis.monolithic.
-//       MonolithicControllabilityChecker;
 import net.sourceforge.waters.cpp.analysis.NativeControllabilityChecker;
 import net.sourceforge.waters.model.analysis.
        AbstractControllabilityCheckerTest;
@@ -41,11 +39,14 @@ public class OneHeuristicTest
   //# Overrides for abstract base class
   //# net.sourceforge.waters.analysis.AbstractModelVerifierTest
   protected ModularControllabilityChecker createModelVerifier
-    (final ProductDESProxyFactory factory)
+    (final ProductDESProxyFactory desfactory)
   {
-    return new ModularControllabilityChecker
-      (null, factory,
-       new NativeControllabilityChecker(null, factory),
-       new OneHeuristic(), false);
+    final ModularModelVerifierFactory checkerfactory =
+      ModularModelVerifierFactory.getInstance();
+    final ModularControllabilityChecker checker =
+      checkerfactory.createControllabilityChecker(desfactory);
+    checker.setHeuristicMethod(ModularHeuristicFactory.Method.One);
+    return checker;
   }
+
 }

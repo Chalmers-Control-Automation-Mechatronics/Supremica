@@ -41,27 +41,9 @@ public class ModularLanguageInclusionCheckerTest
   protected ModularLanguageInclusionChecker createModelVerifier
     (final ProductDESProxyFactory factory)
   {
-    return createLanguageInclusionChecker(factory);
-  }
-  
-  public ModularControllabilityChecker createControllabilityChecker
-    (final ProductDESProxyFactory factory)
-  {
-    return new ModularControllabilityChecker
-      (null,
-       factory,
-       new NativeControllabilityChecker(factory),
-       new MaxCommonEventsHeuristic(HeuristicType.PREFERREALPLANT),
-       false);
-  }
-
-  public ModularLanguageInclusionChecker createLanguageInclusionChecker
-    (final ProductDESProxyFactory factory)
-  {
-    return new ModularLanguageInclusionChecker(
-       null, factory,
-       createControllabilityChecker(factory),
-       new MaxCommonEventsHeuristic(HeuristicType.PREFERREALPLANT));
+    final ModularModelVerifierFactory checkerfactory =
+      ModularModelVerifierFactory.getInstance();
+    return checkerfactory.createLanguageInclusionChecker(factory);
   }
 
 }

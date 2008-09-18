@@ -24,7 +24,7 @@ for F in $@; do
 	    FACTORY="$WPACK.analysis.monolithic.MonolithicModelVerifierFactory"
 	    ;;
 	-proj)
-	    FACTORY="$WPACK.analysis.modular.supremica.ProjectingModelVerifierFactory"
+	    FACTORY="$WPACK.analysis.modular.ProjectingModelVerifierFactory"
 	    ;;
 	-cont)
 	    CHECK="Controllability"

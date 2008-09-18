@@ -74,14 +74,13 @@ public class OneUncontrollableCheckerTest
   //# Overrides for abstract base class
   //# net.sourceforge.waters.analysis.AbstractModelVerifierTest
   protected ControllabilityChecker createModelVerifier
-    (final ProductDESProxyFactory factory)
+    (final ProductDESProxyFactory desfactory)
   {
     return new OneUncontrollableChecker
-      (null, factory,
+      (null, desfactory,
        new ModularControllabilityChecker
-       (null, factory,
-        new NativeControllabilityChecker(null, factory),
-        new MaxCommonEventsHeuristic(HeuristicType.NOPREF),
+       (null, desfactory,
+        new NativeControllabilityChecker(null, desfactory),
         false));
   }
 

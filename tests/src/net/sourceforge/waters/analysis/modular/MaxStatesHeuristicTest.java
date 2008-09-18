@@ -14,7 +14,8 @@ import net.sourceforge.waters.cpp.analysis.NativeControllabilityChecker;
 import junit.framework.Test;
 import junit.framework.TestSuite;
 
-import net.sourceforge.waters.model.analysis.AbstractControllabilityCheckerTest;
+import net.sourceforge.waters.model.analysis.
+       AbstractControllabilityCheckerTest;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 
 
@@ -38,10 +39,15 @@ public class MaxStatesHeuristicTest
   //#########################################################################
   //# Overrides for abstract base class
   //# net.sourceforge.waters.analysis.AbstractModelVerifierTest
-  protected ModularControllabilityChecker createModelVerifier(final ProductDESProxyFactory factory)
+  protected ModularControllabilityChecker createModelVerifier
+    (final ProductDESProxyFactory desfactory)
   {
-    return new ModularControllabilityChecker(null, factory,
-                                             new NativeControllabilityChecker(null, factory),
-                                             new MaxStatesHeuristic(HeuristicType.NOPREF), false);
+    final ModularModelVerifierFactory checkerfactory =
+      ModularModelVerifierFactory.getInstance();
+    final ModularControllabilityChecker checker =
+      checkerfactory.createControllabilityChecker(desfactory);
+    checker.setHeuristicMethod(ModularHeuristicFactory.Method.MaxStates);
+    return checker;
   }
+
 }

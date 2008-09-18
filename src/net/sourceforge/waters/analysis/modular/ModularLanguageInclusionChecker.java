@@ -7,7 +7,6 @@
 //# $Id: ModularLanguageInclusionChecker.java,v 1.13 2008-06-30 01:50:57 robi Exp $
 //###########################################################################
 
-
 package net.sourceforge.waters.analysis.modular;
 
 import java.util.ArrayList;
@@ -18,11 +17,10 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import net.sourceforge.waters.model.analysis.AbstractModelVerifier;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.ControllabilityChecker;
-import net.sourceforge.waters.model.analysis.ControllabilityKindTranslator;
 import net.sourceforge.waters.model.analysis.KindTranslator;
+import net.sourceforge.waters.model.analysis.LanguageInclusionKindTranslator;
 import net.sourceforge.waters.model.analysis.LanguageInclusionChecker;
 import net.sourceforge.waters.model.analysis.VerificationResult;
 import net.sourceforge.waters.model.des.AutomatonProxy;
@@ -38,53 +36,51 @@ import net.sourceforge.waters.xsd.base.EventKind;
 import org.apache.log4j.Logger;
 
 
+/**
+ * The modular language inclusion check algorithm.
+ *
+ * @author Simon Ware
+ */
+
 public class ModularLanguageInclusionChecker
-  extends AbstractModelVerifier
+  extends AbstractModularSafetyVerifier
   implements LanguageInclusionChecker
 {
   
+  //#########################################################################
+  //# Constructor
   public ModularLanguageInclusionChecker(ProductDESProxy model,
                                          ProductDESProxyFactory factory,
-                                         ControllabilityChecker checker,
-                                         ModularHeuristic heuristic)
+                                         ControllabilityChecker checker)
   {
     super(model, factory);
+    setKindTranslator(LanguageInclusionKindTranslator.getInstance());
     mChecker = checker;
-    mHeuristic = heuristic;
-    mTranslator = ControllabilityKindTranslator.getInstance();
     mStates = 0;
     setNodeLimit(10000000);
   }
   
-  public SafetyTraceProxy getCounterExample()
-  {
-    return (SafetyTraceProxy)super.getCounterExample();
-  }
-  
-  public KindTranslator getKindTranslator()
-  {
-    return mTranslator;
-  }
-  
-  public void setKindTranslator(KindTranslator trans)
-  {
-    mTranslator = trans;
-  }
-  
+
+  //#########################################################################
+  //# Invocation
   public boolean run()
     throws AnalysisException
   {
     mStates = 0;
     final List<AutomatonProxy> properties = new ArrayList<AutomatonProxy>();
-    Set<AutomatonProxy> automata = 
+    final Set<AutomatonProxy> automata = 
       new HashSet<AutomatonProxy>(getModel().getAutomata().size());
-    for (AutomatonProxy automaton : getModel().getAutomata()) {
-      if (getKindTranslator().getComponentKind(automaton)
-          == ComponentKind.PROPERTY) {
-        properties.add(automaton);
-      } else if (getKindTranslator().getComponentKind(automaton)
-                 != ComponentKind.SUPERVISOR) {
+    final KindTranslator translator = getKindTranslator();
+    for (final AutomatonProxy automaton : getModel().getAutomata()) {
+      switch (translator.getComponentKind(automaton)) {
+      case PLANT:
         automata.add(automaton);
+        break;
+      case SPEC:
+        properties.add(automaton);
+        break;
+      default:
+        break;
       }
     }
     Collections.sort(properties, new AutomatonComparator());
@@ -158,8 +154,6 @@ public class ModularLanguageInclusionChecker
   //#########################################################################
   //# Data Members
   private final ControllabilityChecker mChecker;
-  private ModularHeuristic mHeuristic;
-  private KindTranslator mTranslator;
   private int mStates;
 
 

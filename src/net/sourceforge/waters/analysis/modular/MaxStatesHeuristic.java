@@ -14,15 +14,15 @@ import net.sourceforge.waters.model.des.TraceProxy;
 public class MaxStatesHeuristic
   extends AbstractModularHeuristic
 {
-  private final HeuristicType mType;
+  private final ModularHeuristicFactory.Preference mType;
 	private final boolean foo = true;
   
   public MaxStatesHeuristic()
   {
-    this(HeuristicType.PREFERREALPLANT);
+    this(ModularHeuristicFactory.Preference.PREFER_REAL_PLANT);
   }
   
-  public MaxStatesHeuristic(HeuristicType type)
+  public MaxStatesHeuristic(ModularHeuristicFactory.Preference type)
   {
     mType = type;
   }
@@ -37,13 +37,13 @@ public class MaxStatesHeuristic
     AutomatonProxy automaton = checkAutomata(false, nonComposedPlants,
                                              new MaxStatesComparator(),
                                              counterExample, translator);
-    boolean runspecs = mType == HeuristicType.PREFERREALPLANT && automaton == null;
-    if (automaton == null || mType != HeuristicType.PREFERREALPLANT) {
+    boolean runspecs = mType == ModularHeuristicFactory.Preference.PREFER_REAL_PLANT && automaton == null;
+    if (automaton == null || mType != ModularHeuristicFactory.Preference.PREFER_REAL_PLANT) {
       automaton = checkAutomata(automaton, false, nonComposedSpecPlants, 
                                 new MaxStatesComparator(),
                                 counterExample, translator);
     }
-    if (automaton == null || mType == HeuristicType.NOPREF || (runspecs && foo)) {
+    if (automaton == null || mType == ModularHeuristicFactory.Preference.NOPREF || (runspecs && foo)) {
       automaton = checkAutomata(automaton, true, nonComposedSpecs, 
                                 new MaxStatesComparator(),
                                 counterExample, translator);

@@ -14,15 +14,15 @@ import java.util.Collection;
 public class MaxCommonUncontrollableEventsHeuristic
   extends AbstractModularHeuristic
 {
-  private final HeuristicType mType;
+  private final ModularHeuristicFactory.Preference mType;
 	private final boolean foo = true;
   
   public MaxCommonUncontrollableEventsHeuristic()
   {
-    this(HeuristicType.PREFERREALPLANT);
+    this(ModularHeuristicFactory.Preference.PREFER_REAL_PLANT);
   }
   
-  public MaxCommonUncontrollableEventsHeuristic(HeuristicType type)
+  public MaxCommonUncontrollableEventsHeuristic(ModularHeuristicFactory.Preference type)
   {
     mType = type;
   }
@@ -37,13 +37,13 @@ public class MaxCommonUncontrollableEventsHeuristic
     AutomatonProxy automaton = checkAutomata(false, nonComposedPlants,
                                              new MaxEventComparator(composition, translator),
                                              counterExample, translator);
-    boolean runspecs = mType == HeuristicType.PREFERREALPLANT && automaton == null;
-    if (automaton == null || mType != HeuristicType.PREFERREALPLANT) {
+    boolean runspecs = mType == ModularHeuristicFactory.Preference.PREFER_REAL_PLANT && automaton == null;
+    if (automaton == null || mType != ModularHeuristicFactory.Preference.PREFER_REAL_PLANT) {
       automaton = checkAutomata(automaton, false, nonComposedSpecPlants, 
                                 new MaxEventComparator(composition, translator),
                                 counterExample, translator);
     }
-    if (automaton == null || mType == HeuristicType.NOPREF || (runspecs && foo)) {
+    if (automaton == null || mType == ModularHeuristicFactory.Preference.NOPREF || (runspecs && foo)) {
       automaton = checkAutomata(automaton, true, nonComposedSpecs, 
                                 new MaxEventComparator(composition, translator),
                                 counterExample, translator);

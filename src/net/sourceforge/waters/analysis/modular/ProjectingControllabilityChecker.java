@@ -4,11 +4,10 @@
 //# PACKAGE: net.sourceforge.waters.analysis.modular
 //# CLASS:   ProjectingControllabilityChecker
 //###########################################################################
-//# $Id: ProjectingControllabilityChecker.java,v 1.21 2008-06-30 04:35:45 robi Exp $
+//# $Id$
 //###########################################################################
 
-
-package net.sourceforge.waters.analysis.modular.supremica;
+package net.sourceforge.waters.analysis.modular;
 
 import java.lang.Comparable;
 import java.util.ArrayList;
@@ -31,7 +30,6 @@ import java.util.Stack;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
-import net.sourceforge.waters.analysis.modular.*;
 import net.sourceforge.waters.model.analysis.AbstractModelVerifier;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.ControllabilityChecker;
@@ -55,44 +53,33 @@ import org.supremica.log.Logger;
 import org.supremica.log.LoggerFactory;
 
 
+/**
+ * The projectiong controllability check algorithm.
+ *
+ * @author Simon Ware
+ */
+
 public class ProjectingControllabilityChecker
-  extends AbstractModelVerifier
+  extends AbstractModularSafetyVerifier
   implements ControllabilityChecker
 {
 
   //#########################################################################
   //# Constructors
-  public ProjectingControllabilityChecker(ProductDESProxy model,
-                                          ProductDESProxyFactory factory,
-                                          ControllabilityChecker checker,
-                                          ModularHeuristic heuristic,
-                                          boolean least)
+  public ProjectingControllabilityChecker(final ProductDESProxy model,
+                                          final ProductDESProxyFactory factory,
+                                          final ControllabilityChecker checker,
+                                          final boolean least)
   {
     super(model, factory);
+    setKindTranslator(ControllabilityKindTranslator.getInstance());
+    setHeuristicMethod(ModularHeuristicFactory.Method.MaxCommonEvents);
+    setHeuristicPreference
+      (ModularHeuristicFactory.Preference.PREFER_REAL_PLANT);
     mChecker = checker;
-    mHeuristic = heuristic;
-    mTranslator = ControllabilityKindTranslator.getInstance();
     mStates = 0;
     mLeast = least;
     setNodeLimit(10000000);
-  }
-
-
-  //#########################################################################
-  //# Simple Access
-  public SafetyTraceProxy getCounterExample()
-  {
-    return (SafetyTraceProxy)super.getCounterExample();
-  }
-
-  public KindTranslator getKindTranslator()
-  {
-    return mTranslator;
-  }
-
-  public void setKindTranslator(KindTranslator trans)
-  {
-    mTranslator = trans;
   }
 
 
@@ -189,16 +176,20 @@ public class ProjectingControllabilityChecker
         }
       };
       mChecker.setKindTranslator(translator);
+      final ModularHeuristic heuristic = getHeuristic();
       while (!mChecker.run()) {
         mStates += mChecker.getAnalysisResult().getTotalNumberOfStates();
-        TraceProxy counter = proj == null ? mChecker.getCounterExample() : proj.getTrace(mChecker.getCounterExample(), comp);
+        final TraceProxy counter =
+          proj == null ?
+          mChecker.getCounterExample() :
+          proj.getTrace(mChecker.getCounterExample(), comp);
         Collection<AutomatonProxy> newComp =
-          mHeuristic.heur(comp,
-                          uncomposedplants,
-                          uncomposedspecplants,
-                          uncomposedspecs,
-                          counter,
-                          translator);
+          heuristic.heur(comp,
+                         uncomposedplants,
+                         uncomposedspecplants,
+                         uncomposedspecs,
+                         counter,
+                         translator);
         if (newComp == null) {
           return setFailedResult(counter, uncont);
         }
@@ -884,13 +875,12 @@ public class ProjectingControllabilityChecker
   //# Data Members
   private int minSize = 1000;
   private final ControllabilityChecker mChecker;
-  private ModularHeuristic mHeuristic;
-  private KindTranslator mTranslator;
   private AutomatonProxy mSpec = null;
   private int mStates;
   private int mMaxProjStates;
   private final boolean mLeast;
-  private Map<AutomataHidden, AutomatonProxy> mMinAutMap = new HashMap<AutomataHidden, AutomatonProxy>();
+  private Map<AutomataHidden, AutomatonProxy> mMinAutMap =
+    new HashMap<AutomataHidden, AutomatonProxy>();
   private Set<AutomataHidden> mChecked = new HashSet<AutomataHidden>();
 
 
@@ -898,4 +888,5 @@ public class ProjectingControllabilityChecker
   //# Class Constants
   private static final Logger LOGGER =
     LoggerFactory.createLogger(ProjectingControllabilityChecker.class);
+
 }

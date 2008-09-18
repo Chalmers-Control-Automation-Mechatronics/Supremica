@@ -1,41 +1,84 @@
+//# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
+//###########################################################################
+//# PROJECT: Waters
+//# PACKAGE: net.sourceforge.waters.analysis.modular
+//# CLASS:   AbstractModularHeuristic
+//###########################################################################
+//# $Id$
+//###########################################################################
+
 package net.sourceforge.waters.analysis.modular;
 
-import net.sourceforge.waters.model.analysis.KindTranslator;
 import java.util.Comparator;
-import java.util.Set;
-import net.sourceforge.waters.model.des.EventProxy;
-import net.sourceforge.waters.model.des.TransitionProxy;
-import net.sourceforge.waters.model.des.TraceProxy;
 import java.util.HashMap;
-import net.sourceforge.waters.model.des.AutomatonProxy;
-import net.sourceforge.waters.model.des.StateProxy;
 import java.util.Map;
+import java.util.Set;
+
+import net.sourceforge.waters.model.analysis.KindTranslator;
+import net.sourceforge.waters.model.des.AutomatonProxy;
+import net.sourceforge.waters.model.des.EventProxy;
+import net.sourceforge.waters.model.des.StateProxy;
+import net.sourceforge.waters.model.des.TraceProxy;
+import net.sourceforge.waters.model.des.TransitionProxy;
 import net.sourceforge.waters.xsd.base.EventKind;
 
 
-public abstract class AbstractModularHeuristic
+/**
+ * A general-purpose implementation of the {@link ModularHeuristic}
+ * interface. This class merely contains several useful methods to help
+ * implementing the various heuristics. The actual heuristic procedure
+ * is implemented in each subclass using the tools provided here.
+ *
+ * @author Simon Ware
+ */
+
+abstract class AbstractModularHeuristic
   implements ModularHeuristic
 {
-  protected AutomatonProxy checkAutomata(boolean specs,
-                                         Set<AutomatonProxy> automata,
-                                         Comparator<AutomatonProxy> comp,
-                                         TraceProxy counterExample,
-                                         KindTranslator translator) {
-    return checkAutomata(null, specs, automata, comp, counterExample, translator);
+
+  //#########################################################################
+  //# Interface net.sourceforge.waters.analysis.modular.ModularHeuristic
+  public String getName()
+  {
+    final String fullname = getClass().getName();
+    final int dotpos = fullname.lastIndexOf('.');
+    final int start = dotpos + 1;
+    if (fullname.endsWith(HEURISTIC_SUFFIX)) {
+      final int end = fullname.length() - HEURISTIC_SUFFIX.length();
+      return fullname.substring(start, end);
+    } else {
+      return fullname.substring(start);
+    }
   }
-  
-  protected AutomatonProxy checkAutomata(AutomatonProxy bestautomaton,
-                                         boolean specs,
-                                         Set<AutomatonProxy> automata,
-                                         Comparator<AutomatonProxy> comp,
-                                         TraceProxy counterExample,
-                                         KindTranslator translator) {
-    for (AutomatonProxy automaton : automata) {
-      int i = accepts(automaton, counterExample);
+
+
+  //#########################################################################
+  //# Auxiliary Methods
+  AutomatonProxy checkAutomata(final boolean specs,
+			       final Set<AutomatonProxy> automata,
+			       final Comparator<AutomatonProxy> comp,
+			       final TraceProxy counterExample,
+			       final KindTranslator translator)
+  {
+    return checkAutomata
+      (null, specs, automata, comp, counterExample, translator);
+  }
+
+  AutomatonProxy checkAutomata(AutomatonProxy bestautomaton,
+			       final boolean specs,
+			       final Set<AutomatonProxy> automata,
+			       final Comparator<AutomatonProxy> comp,
+			       final TraceProxy counterExample,
+			       final KindTranslator translator)
+  {
+    for (final AutomatonProxy automaton : automata) {
+      final int i = accepts(automaton, counterExample);
       if (i != counterExample.getEvents().size()) {
-        if (!specs || translator.getEventKind(counterExample.getEvents().get(i)) 
-            == EventKind.CONTROLLABLE) {
-          if (bestautomaton == null || comp.compare(bestautomaton, automaton) < 0) {
+        if (!specs ||
+	    translator.getEventKind(counterExample.getEvents().get(i)) ==
+	    EventKind.CONTROLLABLE) {
+          if (bestautomaton == null ||
+	      comp.compare(bestautomaton, automaton) < 0) {
             bestautomaton = automaton;
           }
         }
@@ -44,26 +87,29 @@ public abstract class AbstractModularHeuristic
     return bestautomaton;
   }
   
-  public static boolean acc(AutomatonProxy automaton, TraceProxy counterExample)
+  static boolean acc(final AutomatonProxy automaton,
+		     final TraceProxy counterExample)
   {
-    return counterExample.getEvents().size() 
-            == accepts(automaton, counterExample);
+    return
+      counterExample.getEvents().size() ==
+      accepts(automaton, counterExample);
   }
   
-  protected static int accepts(AutomatonProxy automaton, TraceProxy counterExample)
+  static int accepts(final AutomatonProxy automaton,
+		     final TraceProxy counterExample)
   {
     Map<Key, StateProxy> mapAutomaton = createMap(automaton);
     int i = 0;
     StateProxy state = null;
-    for (StateProxy s : automaton.getStates()) {
+    for (final StateProxy s : automaton.getStates()) {
       if (s.isInitial()) {
         state = s;
         break;
       }
     }
-    for (EventProxy e : counterExample.getEvents()) {
+    for (final EventProxy e : counterExample.getEvents()) {
       if (automaton.getEvents().contains(e)) {
-        Key k = new Key(state, e);
+        final Key k = new Key(state, e);
         state = mapAutomaton.get(k);
         if (state == null) {
           break;
@@ -74,17 +120,20 @@ public abstract class AbstractModularHeuristic
     return i;
   }
   
-  private static Map<Key, StateProxy> createMap(AutomatonProxy automaton) 
+  static Map<Key, StateProxy> createMap(final AutomatonProxy automaton) 
   {
-    Map<Key, StateProxy> mapAutomaton =
+    final Map<Key, StateProxy> mapAutomaton =
       new HashMap<Key, StateProxy>(automaton.getTransitions().size());
-    for (TransitionProxy trans : automaton.getTransitions()) {
-      mapAutomaton.put(new Key(trans.getSource(), trans.getEvent())
-                     , trans.getTarget());
+    for (final TransitionProxy trans : automaton.getTransitions()) {
+      mapAutomaton.put(new Key(trans.getSource(), trans.getEvent()),
+		       trans.getTarget());
     }
     return mapAutomaton;
   }
-  
+
+
+  //#########################################################################
+  //# Inner Class Key
   private static final class Key
   {
     private final StateProxy mSource;
@@ -113,4 +162,10 @@ public abstract class AbstractModularHeuristic
       return hashCode;
     }
   }
+
+
+  //#########################################################################
+  //# Class Constants
+  static final String HEURISTIC_SUFFIX = "Heuristic";
+
 }

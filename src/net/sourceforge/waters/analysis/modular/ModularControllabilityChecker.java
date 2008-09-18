@@ -7,7 +7,6 @@
 //# $Id: ModularControllabilityChecker.java,v 1.15 2008-06-30 01:50:57 robi Exp $
 //###########################################################################
 
-
 package net.sourceforge.waters.analysis.modular;
 
 import java.util.ArrayList;
@@ -19,7 +18,6 @@ import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
-import net.sourceforge.waters.model.analysis.AbstractModelVerifier;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.ControllabilityChecker;
 import net.sourceforge.waters.model.analysis.ControllabilityKindTranslator;
@@ -38,41 +36,35 @@ import net.sourceforge.waters.xsd.base.EventKind;
 import org.apache.log4j.Logger;
 
 
+/**
+ * The modular controllability check algorithm.
+ *
+ * @author Simon Ware
+ */
+
 public class ModularControllabilityChecker
-  extends AbstractModelVerifier
+  extends AbstractModularSafetyVerifier
   implements ControllabilityChecker
 {
  
+  //#########################################################################
+  //# Constructor
   public ModularControllabilityChecker(ProductDESProxy model,
                                        ProductDESProxyFactory factory,
                                        ControllabilityChecker checker,
-                                       ModularHeuristic heuristic,
                                        boolean least)
   {
     super(model, factory);
+    setKindTranslator(ControllabilityKindTranslator.getInstance());
     mChecker = checker;
-    mHeuristic = heuristic;
-    mTranslator = ControllabilityKindTranslator.getInstance();
     mStates = 0;
     mLeast = least;
     setNodeLimit(2000000);
   }
   
-  public SafetyTraceProxy getCounterExample()
-  {
-    return (SafetyTraceProxy)super.getCounterExample();
-  }
   
-  public KindTranslator getKindTranslator()
-  {
-    return mTranslator;
-  }
-  
-  public void setKindTranslator(KindTranslator trans)
-  {
-    mTranslator = trans;
-  }
-  
+  //#########################################################################
+  //# Invocation
   public boolean run()
     throws AnalysisException
   {
@@ -140,15 +132,16 @@ public class ModularControllabilityChecker
                                    : ComponentKind.PLANT;
         }
       });
+      final ModularHeuristic heuristic = getHeuristic();
       while (!mChecker.run()) {
         mStates += mChecker.getAnalysisResult().getTotalNumberOfStates();
         Collection<AutomatonProxy> newComp =
-          mHeuristic.heur(comp,
-                          uncomposedplants,
-                          uncomposedspecplants,
-                          uncomposedspecs,
-                          mChecker.getCounterExample(),
-                          getKindTranslator());
+          heuristic.heur(comp,
+                         uncomposedplants,
+                         uncomposedspecplants,
+                         uncomposedspecs,
+                         mChecker.getCounterExample(),
+                         getKindTranslator());
         if (newComp == null) {
           setFailedResult(mChecker.getCounterExample());
           return false;
@@ -214,8 +207,6 @@ public class ModularControllabilityChecker
   //#########################################################################
   //# Data Members
   private final ControllabilityChecker mChecker;
-  private ModularHeuristic mHeuristic;
-  private KindTranslator mTranslator;
   private int mStates;
   private final boolean mLeast;
 

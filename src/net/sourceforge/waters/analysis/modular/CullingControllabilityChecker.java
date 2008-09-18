@@ -10,77 +10,62 @@
 
 package net.sourceforge.waters.analysis.modular;
 
-import java.io.PrintStream;
-import net.sourceforge.waters.model.des.TraceProxy;
-import java.util.List;
-import java.util.Iterator;
-import java.util.LinkedList;
-import net.sourceforge.waters.model.analysis.VerificationResult;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
-import net.sourceforge.waters.model.analysis.AbstractModelVerifier;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.ControllabilityChecker;
 import net.sourceforge.waters.model.analysis.ControllabilityKindTranslator;
 import net.sourceforge.waters.model.analysis.KindTranslator;
+import net.sourceforge.waters.model.analysis.VerificationResult;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 import net.sourceforge.waters.model.des.SafetyTraceProxy;
+import net.sourceforge.waters.model.des.TraceProxy;
 import net.sourceforge.waters.xsd.base.ComponentKind;
 import net.sourceforge.waters.xsd.base.EventKind;
 
 
+/**
+ * The culling controllability check algorithm.
+ *
+ * @author Simon Ware
+ */
+
 public class CullingControllabilityChecker
-  extends AbstractModelVerifier
+  extends AbstractModularSafetyVerifier
   implements ControllabilityChecker
 {
-  private final ControllabilityChecker mChecker;
-  private ModularHeuristic mHeuristic;
-  private KindTranslator mTranslator;
-  private int mStates;
-  private final boolean mLeast;
-  static ModularHeuristic ALL = new AllHeuristic(HeuristicType.NOPREF);
-  private final PrintStream mOut;
  
-  public CullingControllabilityChecker(ProductDESProxy model,
-                                       ProductDESProxyFactory factory,
-                                       ControllabilityChecker checker,
-                                       ModularHeuristic heuristic,
-                                       boolean least, PrintStream out)
+  //#########################################################################
+  //# Constructor
+  public CullingControllabilityChecker(final ProductDESProxy model,
+                                       final ProductDESProxyFactory factory,
+                                       final ControllabilityChecker checker,
+                                       final ModularHeuristic heuristic,
+                                       final boolean least)
   {
     super(model, factory);
+    setKindTranslator(ControllabilityKindTranslator.getInstance());
     mChecker = checker;
-    mHeuristic = heuristic;
-    mTranslator = ControllabilityKindTranslator.getInstance();
     mStates = 0;
     mLeast = least;
     setNodeLimit(2000000);
-    mOut = out;
   }
   
-  public SafetyTraceProxy getCounterExample()
-  {
-    return (SafetyTraceProxy)super.getCounterExample();
-  }
   
-  public KindTranslator getKindTranslator()
-  {
-    return mTranslator;
-  }
-  
-  public void setKindTranslator(KindTranslator trans)
-  {
-    mTranslator = trans;
-  }
-  
+  //#########################################################################
+  //# Invocation
   public boolean run()
     throws AnalysisException
   {
@@ -152,20 +137,19 @@ public class CullingControllabilityChecker
       mainloop:
       while (!mChecker.run()) {
         TraceProxy newcounter = mChecker.getCounterExample();
-        mOut.println("Size:" + newcounter.getEvents().size());
-        mOut.println(newcounter);
         mStates += mChecker.getAnalysisResult().getTotalNumberOfStates();
         mChecker.setNodeLimit(getNodeLimit());
+        final ModularHeuristic heuristic = getHeuristic();
         while (newcounter != null) {
           TraceProxy counter = newcounter;
           newcounter = null;
           Collection<AutomatonProxy> newComp =
-            mHeuristic.heur(comp,
-                            uncomposedplants,
-                            uncomposedspecplants,
-                            uncomposedspecs,
-                            counter,
-                            getKindTranslator());
+            heuristic.heur(comp,
+                           uncomposedplants,
+                           uncomposedspecplants,
+                           uncomposedspecs,
+                           counter,
+                           getKindTranslator());
           if (newComp == null) {
             setFailedResult(mChecker.getCounterExample());
             return false;
@@ -196,8 +180,6 @@ public class CullingControllabilityChecker
               if (mChecker.run()) {
                 break mainloop;
               };
-              mOut.println("Size:" + mChecker.getCounterExample().getEvents().size());
-              mOut.println(mChecker.getCounterExample());
               mStates += mChecker.getAnalysisResult().getTotalNumberOfStates();
               if (mChecker.getAnalysisResult().getTotalNumberOfStates() < prevstates) {
                 //newcounter = mChecker.getCounterExample();
@@ -275,4 +257,15 @@ public class CullingControllabilityChecker
       return a1.getName().compareTo(a2.getName());
     }
   }
+
+
+  //#########################################################################
+  //# Data Members
+  private final ControllabilityChecker mChecker;
+  private final boolean mLeast;
+  private int mStates;
+
+  private static final ModularHeuristic ALL =
+    new AllHeuristic(ModularHeuristicFactory.Preference.NOPREF);
+
 }

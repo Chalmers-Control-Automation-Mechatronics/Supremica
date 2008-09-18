@@ -14,15 +14,15 @@ import net.sourceforge.waters.model.des.TraceProxy;
 public class MinStatesHeuristic
   extends AbstractModularHeuristic
 {
-  private final HeuristicType mType;
+  private final ModularHeuristicFactory.Preference mType;
 	private final boolean foo = true;
   
   public MinStatesHeuristic()
   {
-    this(HeuristicType.PREFERREALPLANT);
+    this(ModularHeuristicFactory.Preference.PREFER_REAL_PLANT);
   }
   
-  public MinStatesHeuristic(HeuristicType type)
+  public MinStatesHeuristic(ModularHeuristicFactory.Preference type)
   {
     mType = type;
   }
@@ -37,13 +37,13 @@ public class MinStatesHeuristic
     AutomatonProxy automaton = checkAutomata(false, nonComposedPlants,
                                              new MinStatesComparator(),
                                              counterExample, translator);
-    boolean runspecs = mType == HeuristicType.PREFERREALPLANT && automaton == null;
-    if (automaton == null || mType != HeuristicType.PREFERREALPLANT) {
+    boolean runspecs = mType == ModularHeuristicFactory.Preference.PREFER_REAL_PLANT && automaton == null;
+    if (automaton == null || mType != ModularHeuristicFactory.Preference.PREFER_REAL_PLANT) {
       automaton = checkAutomata(automaton, false, nonComposedSpecPlants, 
                                 new MinStatesComparator(),
                                 counterExample, translator);
     }
-    if (automaton == null || mType == HeuristicType.NOPREF || (runspecs && foo)) {
+    if (automaton == null || mType == ModularHeuristicFactory.Preference.NOPREF || (runspecs && foo)) {
       automaton = checkAutomata(automaton, true, nonComposedSpecs, 
                                 new MinStatesComparator(),
                                 counterExample, translator);

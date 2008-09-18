@@ -1,23 +1,16 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
 //# PROJECT: Waters
-//# PACKAGE: net.sourceforge.waters.cpp.analysis
+//# PACKAGE: net.sourceforge.waters.analysis.modular
 //# CLASS:   ProjectingModelVerifierFactory
 //###########################################################################
-//# $Id: ProjectingModelVerifierFactory.java,v 1.6 2008-06-29 22:49:20 robi Exp $
+//# $Id$
 //###########################################################################
 
-package net.sourceforge.waters.analysis.modular.supremica;
+package net.sourceforge.waters.analysis.modular;
 
 import java.util.List;
 
-import net.sourceforge.waters.analysis.modular.HeuristicType;
-import net.sourceforge.waters.analysis.modular.MaxCommonEventsHeuristic;
-import net.sourceforge.waters.analysis.modular.MaxCommonUncontrollableEventsHeuristic;
-import net.sourceforge.waters.analysis.modular.MinNewEventsHeuristic;
-import net.sourceforge.waters.analysis.modular.ModularLanguageInclusionChecker;
-import net.sourceforge.waters.analysis.modular.OneUncontrollableChecker;
-import net.sourceforge.waters.analysis.modular.RelMaxCommonEventsHeuristic;
 import net.sourceforge.waters.analysis.monolithic.MonolithicControllabilityChecker;
 import net.sourceforge.waters.cpp.analysis.NativeControllabilityChecker;
 import net.sourceforge.waters.model.analysis.AbstractModelVerifierFactory;
@@ -56,7 +49,6 @@ public class ProjectingModelVerifierFactory
       (null,
        factory,
        new NativeControllabilityChecker(factory),
-       new RelMaxCommonEventsHeuristic(HeuristicType.NOPREF),
        false);
   }
 
@@ -67,9 +59,7 @@ public class ProjectingModelVerifierFactory
        null, factory,
        /*new OneUncontrollableChecker(null, factory,
                                     createControllabilityChecker(factory)),*/
-       createControllabilityChecker(factory),
-       new RelMaxCommonEventsHeuristic(HeuristicType.NOPREF)
-       );
+       createControllabilityChecker(factory));
   }
 
 

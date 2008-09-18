@@ -15,15 +15,14 @@ import net.sourceforge.waters.model.des.TraceProxy;
 public class RelMaxCommonEventsHeuristic
   extends AbstractModularHeuristic
 {
-  private final HeuristicType mType;
-	private final boolean foo = true;
+  private final ModularHeuristicFactory.Preference mType;
   
   public RelMaxCommonEventsHeuristic()
   {
-    this(HeuristicType.PREFERREALPLANT);
+    this(ModularHeuristicFactory.Preference.PREFER_REAL_PLANT);
   }
   
-  public RelMaxCommonEventsHeuristic(HeuristicType type)
+  public RelMaxCommonEventsHeuristic(ModularHeuristicFactory.Preference type)
   {
     mType = type;
   }
@@ -38,13 +37,13 @@ public class RelMaxCommonEventsHeuristic
     AutomatonProxy automaton = checkAutomata(false, nonComposedPlants,
                                              new RelMaxEventComparator(composition),
                                              counterExample, translator);
-    boolean runspecs = mType == HeuristicType.PREFERREALPLANT && automaton == null;
-    if (automaton == null || mType != HeuristicType.PREFERREALPLANT) {
+    boolean runspecs = mType == ModularHeuristicFactory.Preference.PREFER_REAL_PLANT && automaton == null;
+    if (automaton == null || mType != ModularHeuristicFactory.Preference.PREFER_REAL_PLANT) {
       automaton = checkAutomata(automaton, false, nonComposedSpecPlants, 
                                 new RelMaxEventComparator(composition),
                                 counterExample, translator);
     }
-    if (automaton == null || mType == HeuristicType.NOPREF || (runspecs && foo)) {
+    if (automaton == null || mType == ModularHeuristicFactory.Preference.NOPREF || runspecs) {
       automaton = checkAutomata(automaton, true, nonComposedSpecs, 
                                 new RelMaxEventComparator(composition),
                                 counterExample, translator);

@@ -28,6 +28,18 @@ public class ModularModelVerifierFactory
 {
 
   //#########################################################################
+  //# Constructors
+  public ModularModelVerifierFactory()
+  {
+  }
+
+  public ModularModelVerifierFactory(final List<String> arglist)
+  {
+    super(arglist);
+  }
+
+
+  //#########################################################################
   //# Interface net.sourceforge.waters.model.analysis.ModelVerifierFactory
   public ModularControllabilityChecker createControllabilityChecker
     (final ProductDESProxyFactory factory)
@@ -36,18 +48,16 @@ public class ModularModelVerifierFactory
       (null,
        factory,
        new NativeControllabilityChecker(factory),
-       new RelMaxCommonEventsHeuristic(HeuristicType.NOPREF),
        false);
   }
 
   public ModularLanguageInclusionChecker createLanguageInclusionChecker
     (final ProductDESProxyFactory factory)
   {
-    return new ModularLanguageInclusionChecker(
-       null, factory,
-       createControllabilityChecker(factory),
-       new RelMaxCommonEventsHeuristic(HeuristicType.NOPREF)
-       );
+    return new ModularLanguageInclusionChecker
+      (null,
+       factory,
+       createControllabilityChecker(factory));
   }
 
 

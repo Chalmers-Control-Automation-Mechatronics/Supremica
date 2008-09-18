@@ -1,23 +1,18 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
 //# PROJECT: Waters
-//# PACKAGE: net.sourceforge.waters.analysis.modular.supremica
+//# PACKAGE: net.sourceforge.waters.analysis.modular
 //# CLASS:   ProjectingLanguageInclusionCheckerTest
 //###########################################################################
-//# $Id: ProjectingLanguageInclusionCheckerTest.java,v 1.3 2008-06-30 01:50:57 robi Exp $
+//# $Id$
 //###########################################################################
 
-package net.sourceforge.waters.analysis.modular.supremica;
+package net.sourceforge.waters.analysis.modular;
 
-import net.sourceforge.waters.analysis.modular.ModularLanguageInclusionChecker;
-import net.sourceforge.waters.analysis.modular.HeuristicType;
-import net.sourceforge.waters.analysis.modular.MaxCommonEventsHeuristic;
-import net.sourceforge.waters.cpp.analysis.NativeControllabilityChecker;
 import junit.framework.Test;
 import junit.framework.TestSuite;
 
-import net.sourceforge.waters.analysis.modular.supremica.
-       ProjectingModelVerifierFactory;
+import net.sourceforge.waters.cpp.analysis.NativeControllabilityChecker;
 import net.sourceforge.waters.model.analysis.
        AbstractLanguageInclusionCheckerTest;
 import net.sourceforge.waters.model.analysis.LanguageInclusionChecker;
@@ -52,26 +47,7 @@ public class ProjectingLanguageInclusionCheckerTest
   {
     final ModelVerifierFactory checkerfactory =
       ProjectingModelVerifierFactory.getInstance();
-    return createLanguageInclusionChecker(desfactory);
+    return checkerfactory.createLanguageInclusionChecker(desfactory);
   }
 
-  public ProjectingControllabilityChecker createControllabilityChecker
-    (final ProductDESProxyFactory factory)
-  {
-    return new ProjectingControllabilityChecker
-      (null,
-       factory,
-       new NativeControllabilityChecker(factory),
-       new MaxCommonEventsHeuristic(HeuristicType.PREFERREALPLANT),
-       false);
-  }
-
-  public LanguageInclusionChecker createLanguageInclusionChecker
-    (final ProductDESProxyFactory factory)
-  {
-    return new ModularLanguageInclusionChecker(
-       null, factory,
-       createControllabilityChecker(factory),
-       new MaxCommonEventsHeuristic(HeuristicType.PREFERREALPLANT));
-  }
 }
