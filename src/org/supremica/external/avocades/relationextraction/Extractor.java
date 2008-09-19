@@ -243,10 +243,15 @@ public ArrayList getModelStates(List supStates, String eventId, List match)
 		for(Iterator stateIter = supStates.iterator(); stateIter.hasNext(); )
 		{
 			String supStateName = (String) stateIter.next();
-			//System.out.println("Enabled in sup state "+ supStateName);
+
 			String opStateName;
 			int index = supStateName.indexOf(opName);
 			int indexSeparator = supStateName.indexOf(STATE_SEPARATOR, index);
+			
+			//debug
+			//System.out.println("opName = " + opName + " at index = " + index);
+			//System.out.println("Enabled in sup state "+ supStateName);
+			//debug
 			
 			if(indexSeparator > index)
 			{

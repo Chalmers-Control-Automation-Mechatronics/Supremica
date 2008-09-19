@@ -4,13 +4,13 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.io.StringWriter;
 
-import java.util.Date;
-
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.UnmarshalException;
+import javax.xml.bind.Unmarshaller;
 import javax.xml.transform.stream.StreamResult;
+import javax.xml.transform.stream.StreamSource;
 
 import org.supremica.external.avocades.xml.Loader;
 
@@ -27,14 +27,10 @@ public class Converter {
 	
 	private static final String PKGS_ROP = "org.supremica.manufacturingTables.xsd.processeditor";
 	private static final String PKGS_EOP = "org.supremica.manufacturingTables.xsd.eop";
-	private static final String PKGS_IL = "org.supremica.manufacturingTables.xsd.il";
+	private static final String PKGS_IL  = "org.supremica.manufacturingTables.xsd.il";
 	
 	private static final Loader loader = new Loader();
 	
-	private static Date startTime;
-	private static Date stopTime;
-	
-	private static final boolean PRINT_ELAPSED_TIME = false;
 	
 	/*-------------------------------------------------------------------------
 	 * 
@@ -102,10 +98,10 @@ public class Converter {
     		m.marshal(eop,  sr);
     		
     	}catch(UnmarshalException ue) {
-    		java.lang.System.err.println("Invalid XML code (UnmarshalException)" );
+    		System.err.println( "Invalid XML code (UnmarshalException)" );
     		ue.printStackTrace();
     	}catch(JAXBException je) {
-    		java.lang.System.err.println("JAXBException caught!");
+    		System.err.println( "JAXBException caught!" );
     		je.printStackTrace();
     	}
     	
@@ -123,10 +119,10 @@ public class Converter {
     		m.marshal(il,  sr);
     		
     	}catch(UnmarshalException ue) {
-    		java.lang.System.err.println("Invalid XML code (UnmarshalException)" );
+    		System.err.println("Invalid XML code (UnmarshalException)" );
     		ue.printStackTrace();
     	}catch(JAXBException je) {
-    		java.lang.System.err.println("JAXBException caught!");
+    		System.err.println("JAXBException caught!");
     		je.printStackTrace();
     	}
     	
@@ -164,96 +160,105 @@ public class Converter {
 	
 	public static ROP copy(final ROP rop){
 		
-		if(PRINT_ELAPSED_TIME){
-			startTime();
-		}
+		final StreamResult sr;
+		final JAXBContext jc;
+		final Marshaller marshaller;
+		final Unmarshaller unmarshaller;
+		final Object o;
 		
-		final Object o = loader.openROP( convertToXMLString( rop ) );
-		
-		if(PRINT_ELAPSED_TIME){
-			stopTime();
-			System.out.println("copy ROP: " + getElapsedTime() + "ms");
-		}
-		
-		if(o instanceof ROP){
-			return (ROP)o;
-		}
+    	try{
+    		
+    		jc = JAXBContext.newInstance(PKGS_ROP);
+    		sr = new StreamResult( new StringWriter() );
+    		
+    		marshaller   = jc.createMarshaller();
+    		unmarshaller = jc.createUnmarshaller();
+    		
+    		marshaller.marshal(rop, sr);
+    		
+    		o = unmarshaller.unmarshal( new StreamSource(
+    				new StringReader( sr.getWriter().toString() ) ) );
+    		
+    		return (ROP)o;
+    		
+    	}catch(UnmarshalException ue) {
+    		System.err.println("Invalid XML code (UnmarshalException)" );
+    		ue.printStackTrace();
+    	}catch(JAXBException je) {
+    		System.err.println("JAXBException caught!");
+    		je.printStackTrace();
+    	}
 		
 		return null;
 	}
 	
 	public static EOP copy(final EOP eop){
 		
-		if(PRINT_ELAPSED_TIME){
-			startTime();
-		}
+		final StreamResult sr;
 		
-		final Object o = loader.openEOP( convertToXMLString( eop ) );
+		final JAXBContext jc;
+		final Marshaller marshaller;
+		final Unmarshaller unmarshaller;
+		final Object o;
 		
-		if(PRINT_ELAPSED_TIME){
-			stopTime();
-			System.out.println("copy EOP: " + getElapsedTime() + "ms");
-		}
-		
-		if(o instanceof EOP){
-			return (EOP)o;
-		}
+    	try{
+    		
+    		jc = JAXBContext.newInstance(PKGS_EOP);
+    		sr = new StreamResult( new StringWriter() );
+    		
+    		marshaller   = jc.createMarshaller();
+    		unmarshaller = jc.createUnmarshaller();
+    		
+    		marshaller.marshal(eop, sr);
+    		
+    		o = unmarshaller.unmarshal( new StreamSource(
+    				new StringReader( sr.getWriter().toString() ) ) );
+    		
+    		return (EOP)o;
+    		
+    	}catch(UnmarshalException ue) {
+    		System.err.println("Invalid XML code (UnmarshalException)" );
+    		ue.printStackTrace();
+    	}catch(JAXBException je) {
+    		System.err.println("JAXBException caught!");
+    		je.printStackTrace();
+    	}
 		
 		return null;
 	}
 	
 	public static IL copy(final IL il){
 		
-		if(PRINT_ELAPSED_TIME){
-			startTime();
-		}
+		final StreamResult sr;
 		
-		final Object o = loader.openIL( convertToXMLString( il ) );
+		final JAXBContext jc;
+		final Marshaller marshaller;
+		final Unmarshaller unmarshaller;
+		final Object o;
 		
-		if(PRINT_ELAPSED_TIME){
-			stopTime();
-			System.out.println("copy IL: " + getElapsedTime() + "ms");
-		}
-		
-		if(o instanceof IL){
-			return (IL)o;
-		}
+    	try{
+    		
+    		jc = JAXBContext.newInstance(PKGS_IL);
+    		sr = new StreamResult( new StringWriter() );
+    		
+    		marshaller   = jc.createMarshaller();
+    		unmarshaller = jc.createUnmarshaller();
+    		
+    		marshaller.marshal(il, sr);
+    		
+    		o = unmarshaller.unmarshal( new StreamSource(
+    				new StringReader( sr.getWriter().toString() ) ) );
+    		
+    		return (IL)o;
+    		
+    	}catch(UnmarshalException ue) {
+    		System.err.println("Invalid XML code (UnmarshalException)" );
+    		ue.printStackTrace();
+    	}catch(JAXBException je) {
+    		System.err.println("JAXBException caught!");
+    		je.printStackTrace();
+    	}
 		
 		return null;
 	}
-	
-	/*-------------------------------------------------------------------------
-	 * 
-	 * Timer functions
-	 * 
-	 *-------------------------------------------------------------------------*/
-	
-	private static void startTime(){
-		startTime = new Date();
-	}
-	
-	private static void stopTime(){
-		stopTime = new Date();
-	}
-	
-	private static long getElapsedTime(){
-		long diff = 0;
-		
-		//Sanity check
-		if ( null == stopTime || null == startTime ){
-			return -1;
-		}
-		
-		//calculate diff
-		diff =  stopTime.getTime() - startTime.getTime();
-		
-		//invalidate timers
-		startTime = null;
-		stopTime = null;
-		
-		//return difference
-		return diff;
-		
-	}
-	
 }

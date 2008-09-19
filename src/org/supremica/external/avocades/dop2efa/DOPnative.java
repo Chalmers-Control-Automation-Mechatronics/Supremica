@@ -49,10 +49,10 @@ public class DOPnative {
 	//Attribute types used by algorithm
 	//-------------------------------------------------------------------------
 	protected final static String AND_STA_GUARD = "ANDSTARTGUARD";
-	protected final static String OR_STA_GUARD = "ORSTARTGUARD";
+	protected final static String OR_STA_GUARD  = "ORSTARTGUARD";
 	
 	protected final static String AND_STO_GUARD = "ANDSTOPGUARD";
-	protected final static String OR_STO_GUARD = "ORSTOPGUARD";
+	protected final static String OR_STO_GUARD  = "ORSTOPGUARD";
 	
 	protected final static String ADD_STA_ACTION = "ADDSTARTACTION";
 	protected final static String ADD_STO_ACTION = "ADDSTOPACTION";
@@ -61,7 +61,7 @@ public class DOPnative {
 	protected final static String ONLY_STO = "ONLYSTOP";
 	
 	protected final static String START_PREFIX = "STARTPREFIX";
-	protected final static String STOP_PREFIX = "STOPPREFIX";
+	protected final static String STOP_PREFIX  = "STOPPREFIX";
 	
 	protected final static String RESOURCE_PREFIX = "r";
 	

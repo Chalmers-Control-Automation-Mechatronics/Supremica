@@ -1,6 +1,8 @@
 package org.supremica.external.processeditor.tools.copextractor;
 
 import java.io.File;
+import java.io.BufferedReader;
+
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.FileNotFoundException;
@@ -36,6 +38,8 @@ import net.sourceforge.waters.subject.module.ModuleSubject;
 import net.sourceforge.waters.subject.module.ModuleSubjectFactory;
 import net.sourceforge.waters.subject.base.AbstractSubject;
 import net.sourceforge.waters.subject.module.EventDeclSubject;
+
+import javax.swing.SwingWorker;
 
 import org.supremica.external.processeditor.xml.Loader;
 
@@ -471,26 +475,22 @@ public class ConvertPanel
     }
     
     private void relationExtraction() {
-    	List<ROP> copList;
     	
+    	SwingWorker<List<ROP>, Void> worker;
+    	
+    	System.out.println("Load files");
     	loadFiles();
+    	System.out.println("Done loading files");
     	
-    	copList = builder.getRelationExtractionOutput();
+    	//Create relation extraction swing worker thread
+    	worker = new RelationExtractionWorker(builder, container);
     	
-    	if(null == copList || 0 == copList.size() ){
-    		System.out.println("No COP:s");
-    		return;
-    	}
-    	
-    	if(null != container){
-    		
-    		for(ROP rop : copList){
-    			container.insertResource(rop, null);
-    		}
-    	}
-    	
-    	
+    	//Start relation extraction in the background
+    	worker.execute();
+   
     }
+    
+    
     
     /**
      * Enables the user to save document to a file

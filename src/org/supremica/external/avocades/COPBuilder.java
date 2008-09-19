@@ -5,11 +5,19 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
+
 import java.net.URI;
+
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.LinkedList;
+
+import java.util.Comparator;
+import java.util.Set;
+import java.util.TreeSet;
+
+import java.util.Date;
 
 import javax.xml.bind.JAXBException;
 
@@ -229,24 +237,31 @@ public class COPBuilder {
     	return synchronizationOptions;
     }
     
+    
     public ModuleSubject getSpecificationSynthesisOutput(){
+    	return getSpecificationSynthesisOutput( getAdaptedEOPList(),
+    			                                getAdaptedILList() );
+    }
+    
+    private ModuleSubject getSpecificationSynthesisOutput(final List<EOP> adaptedEOPList,
+    		                                              final List<IL> adaptedILList)
+    {
     	
     	final String NEWLINE = "\n";
+    	final ConverterILtoAutomata convAut;
+    	final SpecificationSynthesInputBuilder builder;
     	
     	String comment = "";
     	
     	File tmpFile = null;
     	ModuleSubject module = null;
-    	
-    	ConverterILtoAutomata convAut;
-    	
-    	SpecificationSynthesInputBuilder builder;
+ 
     	builder = new SpecificationSynthesInputBuilder();
     	
     	comment = "EOP" + NEWLINE;
     	
     	//Add all EOP:s
-    	for( EOP eop : getAdaptedEOPList() ){
+    	for( EOP eop : adaptedEOPList ){
     		builder.add( eop );
     		comment = comment + eop.getId() +", ";
     	}
@@ -256,7 +271,7 @@ public class COPBuilder {
     	comment = comment + "IL" + NEWLINE;
     	
     	//Add all IL:s
-    	for( IL il : getAdaptedILList() ){
+    	for( IL il : adaptedILList ){
     		builder.add( il );
     		comment = comment + il.getId() +", ";
     	}
@@ -305,12 +320,35 @@ public class COPBuilder {
         }
         
         //Debug info
-        module.setName("SpecificationSynthes");
-        module.setComment(comment);
+        module.setName( "SpecificationSynthes" );
+        module.setComment( comment );
         
         return module;
     }
     
+    
+    public List<EOP> getAdaptedEOPList(){
+    	
+    	List<EOP> tmpEOPList = new LinkedList<EOP>();
+    	EOP tmpEOP;
+    	
+    	for(EOP eop: eopList){
+    		for(ROP rop : ropList){
+    			
+    			if( eopIsUsedByROP(eop, rop) ){
+    				
+    				//Copy EOP
+    				tmpEOP = Converter.copy( eop );
+    				tmpEOP.setId(eop.getId() + 
+    						     EVENT_MACHINE_SEPARATOR + 
+    						     rop.getMachine());
+    				tmpEOPList.add(tmpEOP);
+    			}
+    		}
+    	}
+    	
+    	return tmpEOPList;
+    }
     
     /**
      * Returns a list of IL renamed to match the ROPs and EOPs added
@@ -320,7 +358,7 @@ public class COPBuilder {
      */
     public List<IL> getAdaptedILList(){
     	
-    	List<IL> tmpILList = new LinkedList<IL>();
+    	final List<IL> tmpILList = new LinkedList<IL>();
     	
     	for(IL il : ilList){
     		
@@ -356,13 +394,20 @@ public class COPBuilder {
     	for(ROP rop : ropList){
     		ROP tmpROP = Converter.copy( rop );
     		
-    		addZoneBookingFromEOP(tmpROP);
+    		//addZoneBookingFromEOP( tmpROP );
     		
     		tmpROPList.add( tmpROP );
     	}
     	
     	return tmpROPList;
     }
+    
+    
+    //-------------------------------------------------------------------------
+    //
+    //	Zone booking code
+    //
+    //-------------------------------------------------------------------------
     
     private void addZoneBookingFromEOP(ROP rop){
     	List<String> preBookedZones = new LinkedList<String>();
@@ -439,8 +484,9 @@ public class COPBuilder {
     	return preBookedZones;
     }
     
-    private List<String> addZoneBookingFromEOP(Activity activity, List<String> preBookedZones){
-    		
+    private List<String> addZoneBookingFromEOP(Activity activity,
+    		                                   List<String> preBookedZones)
+    {	
     	//Sanity check
     	if(null == activity){
     		return preBookedZones;
@@ -465,9 +511,11 @@ public class COPBuilder {
     			//is it prebooked?
     			if ( !preBookedZones.contains( zoneState.getZone() ) ){
     				
-    				for ( Attribute att : activity.getProperties().getAttribute()){
+    				for ( Attribute att : activity.getProperties().getAttribute() ){
 						
 						if ( att.getAttributeValue().equals(zoneState.getZone()) ){
+							
+							//look for zone/resource attribute
 							if ( att.getType().equals(RESOURCE) ){
 								
 								//book the zone
@@ -476,9 +524,7 @@ public class COPBuilder {
     							
     						}
 						}
-					}
-    				
-    				
+					}			
     			}
     			
     		}else if(FREE.equals( zoneState.getState() )){
@@ -488,7 +534,7 @@ public class COPBuilder {
     	
     	
     	//Zone booking from action
-    	for(Action action : eop.getAction()){
+    	for( Action action : eop.getAction() ){
     		
     		for (ZoneState zoneState : action.getZoneState()){
     			
@@ -515,41 +561,42 @@ public class COPBuilder {
     		}//end for
     	}
     	
-    	if(0 == eop.getAction().size()){
+    	if ( 0 == eop.getAction().size() ){
     		return preBookedZones;
     	}
     	
     	Action lastAction = eop.getAction().get( eop.getAction().size() - 1 );
-    	for (ZoneState zoneState : lastAction.getZoneState()){
+    	for ( ZoneState zoneState : lastAction.getZoneState() ){
 			
 			//Booking of zones
-			if (FREE.equals( zoneState.getState() )){
+			if ( FREE.equals( zoneState.getState() ) ){
 				
-				for ( Attribute att : activity.getProperties().getAttribute()){
+				for ( Attribute att : activity.getProperties().getAttribute() ){
 					
-					if ( att.getAttributeValue().equals(zoneState.getZone()) ){
+					if ( att.getAttributeValue().equals( zoneState.getZone() ) ){
 						if ( att.getType().equals(RESOURCE) ){
 							//unbook the zone
     						att.getLowerIndicator().setIndicatorValue(true);			
     					}
 					}
-				}
+				}//end for
 				
 				if( !preBookedZones.remove( zoneState.getZone() ) ){
 					System.out.println("Warning");
 					System.out.println("Zone: " + zoneState.getZone());
 					System.out.println("Unbooked without being bocked");
 				}
-			}
-		}
+			}//end if
+		}//end for
     	
     	return preBookedZones;
     }
     
     
     
-    private static EOP getFirstMatchingEOPfromList(Activity activity, List<EOP> eopList){
-    	
+    private static EOP getFirstMatchingEOPfromList(Activity activity,
+    		                                       List<EOP> eopList)
+    {	
     	//Find EOP
     	for(EOP eop : eopList){
     		if (eop.getId().trim().equals( activity.getOperation().trim() )){
@@ -590,7 +637,9 @@ public class COPBuilder {
     	}
     }
     
-    private static boolean contains(List<Attribute> attributeList, Attribute attribute){
+    private static boolean contains(List<Attribute> attributeList,
+    		                                   Attribute attribute)
+    {
     	
     	for (Attribute att : attributeList){
     		
@@ -636,10 +685,6 @@ public class COPBuilder {
 		
 		return attribute;
     }
-    
-    
-    
-    
     
     private void renameILOperationInList(List<String> operationList){
     	
@@ -761,7 +806,8 @@ public class COPBuilder {
 			XMLOutputter outp = new XMLOutputter();
 			outp.setFormat( org.jdom.output.Format.getPrettyFormat() );
 
-			FileOutputStream fileStream = new FileOutputStream( file.getAbsolutePath() );
+			FileOutputStream fileStream;
+			fileStream = new FileOutputStream( file.getAbsolutePath() );
 
 			outp.output( document, fileStream );
 		}
@@ -795,31 +841,43 @@ public class COPBuilder {
      * @return a waters ModuleSubject object to be opened with Supremica
      */
     public ModuleSubject getDOPtoEFAOutput(){
-    	ModuleSubject module;
+    	return getDOPtoEFAOutput( getAdaptedROPList() );
+    }
+    private ModuleSubject getDOPtoEFAOutput(final List<ROP> adaptedROPList){
     	
-    	String moduleName = "DOP to EFA output";
+    	final ModuleSubject module;
+    	final String moduleName = "DOP to EFA output";
     	
     	String comment = "Derived from following DOP(s):" + "\n";
-    	for(ROP rop : ropList){
+    	for(ROP rop : adaptedROPList){
     		comment = comment.concat( rop.getMachine() + ", ");
     	}
     	
-    	module = DOPtoEFA.buildModuleFromROP(ropList, moduleName, false).getModule();
+    	module = DOPtoEFA.buildModuleFromROP( adaptedROPList,
+    			                              moduleName, false ).getModule();
     	module.setComment(comment);
     	
     	return module;
     }
     
     public ModuleSubject getEOPtoEFAOutput(){
-    	ModuleSubject module;
+    	return getEOPtoEFAOutput( getAdaptedEOPList() );
+    }
+    private ModuleSubject getEOPtoEFAOutput(final List<EOP> adaptedEOPList){
     	
-    	String moduleName = "EOP to EFA output";
+    	final ModuleSubject module;
+    	final String moduleName = "EOP to EFA output";
+    	final EOPtoEFA builder = new EOPtoEFA();
+    	
     	String comment = "";
     	
-    	EOPtoEFA builder = new EOPtoEFA();
+    	//Sanity check
+    	if(null == adaptedEOPList || 0 == adaptedEOPList.size() ){
+    		return null;
+    	}
     	
     	comment = "Derived from following(renamed) EOP(s):" + "\n";
-    	for(EOP eop : getAdaptedEOPList() ){
+    	for(EOP eop :  adaptedEOPList ){
     		comment = comment.concat(eop.getId() + ", ");
     		builder.add(eop);
     	}
@@ -832,31 +890,6 @@ public class COPBuilder {
     	module.setComment(comment);
     	
     	return  module;
-    }
-    
-    
-    
-    public List<EOP> getAdaptedEOPList(){
-    	
-    	List<EOP> tmpEOPList = new LinkedList<EOP>();
-    	EOP tmpEOP;
-    	
-    	for(EOP eop: eopList){
-    		for(ROP rop : ropList){
-    			
-    			if( eopIsUsedByROP(eop, rop) ){
-    				
-    				//Copy EOP
-    				tmpEOP = Converter.copy( eop );
-    				tmpEOP.setId(eop.getId() + 
-    						     EVENT_MACHINE_SEPARATOR + 
-    						     rop.getMachine());
-    				tmpEOPList.add(tmpEOP);
-    			}
-    		}
-    	}
-    	
-    	return tmpEOPList;
     }
     
     private boolean eopIsUsedByROP(EOP eop, ROP rop){
@@ -885,7 +918,7 @@ public class COPBuilder {
     			 * if Activity Operation string equals EOP id. 
     			 * 
     			 */
-    			if( eop.getId().equals( ((Activity)o).getOperation() ) ){
+    			if( eop.getId().trim().equals( ((Activity)o).getOperation().trim() ) ){
     				return true;
     			}
     		}else if(o instanceof Relation){
@@ -902,7 +935,23 @@ public class COPBuilder {
     
     public List<ROP> getRelationExtractionOutput(){
     	
-    	Extractor extractor = null;
+    	Date start;
+    	Date stop;
+    	
+    	Long diff;
+    	
+    	start = new Date();
+    	//do this once!
+    	final List<ROP> adaptedROPList = getAdaptedROPList();
+    	final List<EOP> adaptedEOPList = getAdaptedEOPList();
+    	final List<IL>  adaptedILList  = getAdaptedILList();
+    	stop = new Date();
+    	
+    	diff =  stop.getTime() - start.getTime();
+    	System.out.println("All list adapted in " + diff + " ms");
+    	
+    	final Extractor extractor = new Extractor();
+    	
     	Document supDoc = null;
     	ArrayList<Document> tmpROPList = null;
     	List<ROP> copList = null;
@@ -917,20 +966,30 @@ public class COPBuilder {
    
     	moduleList = new LinkedList<ModuleSubject>();
     	
-    	moduleList.add( getSpecificationSynthesisOutput() );
-    	moduleList.add( getEOPtoEFAOutput() );
-    	moduleList.add( getDOPtoEFAOutput() );
+    	System.out.println("Create automatas");
+    	start = new Date();
+    	moduleList.add( getSpecificationSynthesisOutput(adaptedEOPList, adaptedILList) ); 
+    	moduleList.add( getEOPtoEFAOutput( adaptedEOPList ) );
+    	moduleList.add( getDOPtoEFAOutput( adaptedROPList ) );
+    	stop = new Date();
+    	diff =  stop.getTime() - start.getTime();
+    	System.out.println("Done: Create automatas in " + diff + " ms");
     	
+    	System.out.println("Create supervisor");
+    	start = new Date();
     	module = createSupervisor( moduleList );
+    	stop = new Date();
+    	diff =  stop.getTime() - start.getTime();
+    	System.out.println("Done: Create supervisor in " + diff + " ms");
     	
     	supDoc = watersModuleToProjectDocument( module );
+    	
     	
     	/*
     	 * 2. Extract relation 
     	 */
-    	
     	tmpROPList = new ArrayList<Document>();
-    	for(ROP rop : ropList){
+    	for(ROP rop : adaptedROPList){
     		tmpROPList.add( Converter.convertToDocument( rop ) );
     	}
     	
@@ -939,23 +998,41 @@ public class COPBuilder {
     	 * such that the states of the operation models are unique, and
     	 * separated by a dot in the supervisor states; 
     	 */
-    	extractor = new Extractor();
+    	
+    	System.out.println("Extract restrictions");
+    	start = new Date();
+    	
     	tmpROPList = extractor.extractRestrictions( supDoc , tmpROPList );
-
+    	
+    	stop = new Date();
+    	diff =  stop.getTime() - start.getTime();
+    	System.out.println("Done: Extract restrictions in " + diff + "ms");
+    	
 		/*
 		 * 3. Fill COP list
 		 */
-		copList = new ArrayList<ROP>();
+    	copList = new ArrayList<ROP>();
+    	
+    	System.out.println("Convert COPs");
+		start = new Date();
+		
 		for( Iterator<Document> cIter = tmpROPList.iterator(); cIter.hasNext(); ){
 			Document cop = (Document) cIter.next();
 			
 			ROP rop = Converter.convertToROP( cop );
 			
-			if(null != rop){	
+			if ( null != rop ){	
 				removeMachineNameFromActivitiesInROP( rop );
+				removeDuplicatesOfPreconditionsInOperations( rop.getRelation() );
 				copList.add( rop );
 			}
 		}
+		
+		stop = new Date();
+    	diff =  stop.getTime() - start.getTime();
+    	System.out.println("Done: Convert " +copList.size() + 
+    			           "st COP:s in " + diff + "ms");
+    	
 		return copList;
     }
     
@@ -981,15 +1058,13 @@ public class COPBuilder {
     	
     	for(Object o : relation.getActivityRelationGroup()){
     		if(o instanceof Activity){
+    			
+    			//Base case
     			removeMachineNameFromActivity( (Activity)o, strMachineName );
     		}else if(o instanceof Relation){
     			
     			//Recursion
     			removeMachineNameFromActivitiesInRelation( (Relation)o, strMachineName );
-    		}else{
-    			System.err.println(
-    					"COPBuilder: " +
-    					"Unknown Object " + o.toString() );
     		}
     	}
     }
@@ -1029,6 +1104,65 @@ public class COPBuilder {
         	 	*/
         		opRef.setOperation( strOperation.replace( strMachineName, "" ) );
     		}
+    	}
+    }
+    
+    private void removeDuplicatesOfPreconditionsInOperations(final Relation relation){
+    	
+    	//Sanity check
+    	if( null == relation){
+    		return;
+    	}
+    	
+    	for(Object o : relation.getActivityRelationGroup()){
+    		if (o instanceof Activity){
+    			if (null != ((Activity)o).getPrecondition() ){
+    				//base case
+        			removeDuplicates( ((Activity)o).
+        					             getPrecondition().
+        					                   getPredecessor() );
+    			}
+    		} else if(o instanceof Relation){
+    			//recursion
+    			removeDuplicatesOfPreconditionsInOperations( (Relation)o );
+    		}
+    	}
+    }
+    
+    private void removeDuplicates(final List<OperationReferenceType> opRefList){
+    	
+    	final Set<OperationReferenceType> opRefSet; 
+    	
+    	//Sanity check
+    	if (null == opRefList || 0 == opRefList.size()){
+    		return;
+    	}
+    	
+    	opRefSet = new TreeSet<OperationReferenceType>(new OperationReferenceComparator());
+    	opRefSet.addAll(opRefList);
+    	
+    	if(opRefList.size() != opRefSet.size()){
+    		opRefList.clear();
+    		opRefList.addAll(opRefSet);
+    	}
+    }
+    
+    /**
+     * Internal class to compare OperationReferenceType
+     * @author david.millares
+     *
+     */
+    private class OperationReferenceComparator 
+                                         implements 
+                                             Comparator<OperationReferenceType>
+    {	
+    	public int compare(final OperationReferenceType opRef1,
+    			           final OperationReferenceType opRef2)
+    	{
+    		final int operationCompare = opRef1.getOperation().compareTo( opRef2.getOperation() );
+    		final int machineCompare   = opRef1.getMachine().compareTo( opRef2.getMachine() );
+    		
+    		return operationCompare + machineCompare;
     	}
     }
     
