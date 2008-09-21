@@ -476,14 +476,17 @@ public class ConvertPanel
     
     private void relationExtraction() {
     	
-    	SwingWorker<List<ROP>, Void> worker;
+    	SwingWorker<List<ROP>, Void> worker = null;
     	
     	System.out.println("Load files");
     	loadFiles();
     	System.out.println("Done loading files");
     	
     	//Create relation extraction swing worker thread
+	/*
+        Forgotten to commit this class? ~~~Robi
     	worker = new RelationExtractionWorker(builder, container);
+	*/
     	
     	//Start relation extraction in the background
     	worker.execute();
