@@ -18,9 +18,10 @@ public class Candidate extends Object{
 		cEvents = new HashSet<EventProxy>();
 		name = null;
 	  for (AutomatonProxy a : cAutomata) {
+	    cStateNumber +=a.getStates().size();
 	    if (name==null) {
 	      name = a.getName();	      
-	    }else name += ","+a.getName();
+	    } else { name = name+","+a.getName(); }
 	    for (EventProxy e : a.getEvents()) {	      
 	      if (!cEvents.contains(e)) {
 	        cEvents.add(e);	        
@@ -33,9 +34,17 @@ public class Candidate extends Object{
 	public Set<AutomatonProxy> getAllAutomata(){
 		return cAutomata;
 	}
+	
+	public int getStateNumber(){
+	  return cStateNumber;
+	}
 
-	public void setLocalEvents(Set<EventProxy> e){
-		localEvents = e;
+	public void setLocalEvents(Set<EventProxy> es){
+		localEvents = es;
+	}
+	
+	public void addLocalEvents(EventProxy e){
+		localEvents.add(e);
 	}
 	
 	public Set<EventProxy> getLocalEvents(){		
@@ -48,6 +57,10 @@ public class Candidate extends Object{
 	
 	public String getName() {
 	  return name;
+	}
+	
+	public double getLocalProportion() {
+	  return (localEvents.size())/(cEvents.size());
 	}
 	
 	public boolean equals(Object obj){
@@ -67,4 +80,5 @@ public class Candidate extends Object{
 	private Set<EventProxy> cEvents;
 	private Set<EventProxy> localEvents;
 	private String name;
+	private int cStateNumber;
 }
