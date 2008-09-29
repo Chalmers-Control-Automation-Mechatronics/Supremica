@@ -50,7 +50,6 @@ import org.supremica.manufacturingTables.xsd.processeditor.RelationType;
 import org.supremica.manufacturingTables.xsd.eop.EOP;
 import org.supremica.manufacturingTables.xsd.eop.Action;
 import org.supremica.manufacturingTables.xsd.eop.ZoneState;
-import org.supremica.manufacturingTables.xsd.eop.Zones;
 
 import org.supremica.manufacturingTables.xsd.il.IL;
 import org.supremica.manufacturingTables.xsd.il.Term;
@@ -243,8 +242,11 @@ public class COPBuilder {
     			                                getAdaptedILList() );
     }
     
-    private ModuleSubject getSpecificationSynthesisOutput(final List<EOP> adaptedEOPList,
-    		                                              final List<IL> adaptedILList)
+    private ModuleSubject getSpecificationSynthesisOutput
+    (
+    	final List<EOP> adaptedEOPList,
+    	final List<IL> adaptedILList
+    )
     {
     	
     	final String NEWLINE = "\n";
@@ -394,7 +396,7 @@ public class COPBuilder {
     	for(ROP rop : ropList){
     		ROP tmpROP = Converter.copy( rop );
     		
-    		//addZoneBookingFromEOP( tmpROP );
+    		addZoneBookingFromEOP( tmpROP );
     		
     		tmpROPList.add( tmpROP );
     	}
@@ -982,6 +984,12 @@ public class COPBuilder {
     	diff =  stop.getTime() - start.getTime();
     	System.out.println("Done: Create supervisor in " + diff + " ms");
     	
+    	//System can not be started
+    	if( null == module ){
+    		System.out.println("No supervisor, system can not be started");
+    		return null;
+    	}
+    	
     	supDoc = watersModuleToProjectDocument( module );
     	
     	
@@ -1317,6 +1325,10 @@ public class COPBuilder {
             		                              synchronizationOptions,
             		                              synthesizerOptions);
             result = synthesizer.execute();
+            
+            if( null == result || !result.hasInitialState() ){
+            	return null;
+            } 
             
             supervisor = new ModularSupervisor(result);
         	

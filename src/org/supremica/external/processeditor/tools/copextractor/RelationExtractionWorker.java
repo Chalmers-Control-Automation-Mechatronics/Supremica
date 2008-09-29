@@ -67,6 +67,8 @@ class RelationExtractionWorker
 			for(ROP rop : copList){
 				container.insertResource(rop, null);
 			}
+			
+			container.setVisible(true);
 
 		} else {
 			System.out.println( "No SOC" );

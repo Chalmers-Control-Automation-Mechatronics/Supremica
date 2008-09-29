@@ -478,6 +478,11 @@ public class ConvertPanel
     	loadFiles();
     	System.out.println("Done loading files");
     	
+    	if(null == container){
+    		container = new SOCGraphContainer();
+    		container.setVisible(false);
+    	}
+    	
     	//Create relation extraction swing worker thread
     	worker = new RelationExtractionWorker(builder, container);
     	

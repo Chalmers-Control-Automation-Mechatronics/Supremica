@@ -95,6 +95,13 @@ public ArrayList extractRestrictions(Document sup, ArrayList ROPs)
 
 				String eventId = event.getAttributeValue("id");
 				String opName = eventLabel.substring(OPERATION_START_PREFIX.length());
+				
+				//EFA fix
+				if( opName.contains("_") ){
+					opName = opName.substring( 0, opName.indexOf("_") );
+				}
+				//End EFA fix
+				
 				List opAndEvent = new ArrayList();
 				opAndEvent.add(0,opName);
 				opAndEvent.add(1,eventId);
@@ -126,7 +133,6 @@ public ArrayList extractRestrictions(Document sup, ArrayList ROPs)
 		//System.out.println("OpName: " + opName);
 		//System.out.println("--");
 		//debug
-		
 
 		/* Get the supervisor states where eventId is enabled, e.g. q0 and q2 */
 		List enabledInSupStates = getSupervisorStates(theSupervisor, eventId);
@@ -197,7 +203,7 @@ public ArrayList getSupervisorStates(Element sup, String eventId)
 		}
 	}
 
-//	printStringList(enabledInStates);
+	//printStringList(enabledInStates);
 	return enabledInStates;
 }
 
@@ -245,7 +251,7 @@ public ArrayList getModelStates(List supStates, String eventId, List match)
 			String supStateName = (String) stateIter.next();
 
 			String opStateName;
-			int index = supStateName.indexOf(opName);
+			int index = supStateName.indexOf(opName + STATE_INDICATOR);
 			int indexSeparator = supStateName.indexOf(STATE_SEPARATOR, index);
 			
 			//debug
@@ -253,15 +259,28 @@ public ArrayList getModelStates(List supStates, String eventId, List match)
 			//System.out.println("Enabled in sup state "+ supStateName);
 			//debug
 			
-			if(indexSeparator > index)
+			if ( indexSeparator > index )
 			{
-				opStateName = supStateName.substring(index, indexSeparator);
+				opStateName = supStateName.substring( index, indexSeparator );
 			}
 			else
 			{
 				// Last state in string, take rest of string.
-				opStateName = supStateName.substring(index);
+				opStateName = supStateName.substring( index );
 			}
+			
+			//EFA fix
+			if ( opStateName.contains(opName + INITIAL_STATE_POSTFIX) ){
+				opStateName = opName + INITIAL_STATE_POSTFIX;
+			} else if ( opStateName.contains(opName + EXECUTION_STATE_POSTFIX) ) {
+				opStateName = opName + EXECUTION_STATE_POSTFIX;
+			} else if ( opStateName.contains(opName + END_STATE_POSTFIX) ) {
+				opStateName = opName + END_STATE_POSTFIX;
+			}else{
+				//Something is wrong
+				System.out.println( opStateName );
+			}
+			//End EFA fix
 
 			operationStates.add(place, opStateName);
 			place++;
