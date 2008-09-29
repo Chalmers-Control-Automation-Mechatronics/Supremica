@@ -1,7 +1,6 @@
 package org.supremica.external.processeditor.tools.copextractor;
 
 import java.io.File;
-import java.io.BufferedReader;
 
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -33,11 +32,8 @@ import org.supremica.manufacturingTables.xsd.il.IL;
 
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
 import net.sourceforge.waters.model.marshaller.JAXBModuleMarshaller;
-import net.sourceforge.waters.model.module.EventDeclProxy;
 import net.sourceforge.waters.subject.module.ModuleSubject;
 import net.sourceforge.waters.subject.module.ModuleSubjectFactory;
-import net.sourceforge.waters.subject.base.AbstractSubject;
-import net.sourceforge.waters.subject.module.EventDeclSubject;
 
 import javax.swing.SwingWorker;
 
@@ -483,10 +479,7 @@ public class ConvertPanel
     	System.out.println("Done loading files");
     	
     	//Create relation extraction swing worker thread
-	/*
-        Forgotten to commit this class? ~~~Robi
     	worker = new RelationExtractionWorker(builder, container);
-	*/
     	
     	//Start relation extraction in the background
     	worker.execute();

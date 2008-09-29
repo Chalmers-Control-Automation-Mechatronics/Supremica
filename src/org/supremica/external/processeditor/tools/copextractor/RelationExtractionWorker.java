@@ -27,9 +27,9 @@ class RelationExtractionWorker
 		
 		List<ROP> list;
 		
-		System.out.println("Relation extraction ...");
+		System.out.println( "Relation extraction ..." );
 		list = builder.getRelationExtractionOutput(); 
-		System.out.println("Done: Relation extraction");
+		System.out.println( "Done: Relation extraction" );
 
 		return list;
 	}
@@ -53,12 +53,12 @@ class RelationExtractionWorker
 				why = e.getMessage();
 			}
 			
-			System.err.println("Error: " + why);
+			System.err.println( "Error: " + why );
 		}
 
 
 		if(null == copList || 0 == copList.size() ){
-			System.out.println("No COP:s");
+			System.out.println( "No COP:s" );
 			return;
 		}
 		
@@ -69,7 +69,7 @@ class RelationExtractionWorker
 			}
 
 		} else {
-			System.out.println("No SOC");
+			System.out.println( "No SOC" );
 		}
 	}
 }
