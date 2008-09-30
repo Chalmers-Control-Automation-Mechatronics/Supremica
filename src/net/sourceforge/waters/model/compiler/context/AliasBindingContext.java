@@ -37,7 +37,8 @@ import net.sourceforge.waters.model.module.SimpleExpressionProxy;
  * source information's {@link SourceInfo#getGraphSourceInfo()
  * getGraphSourceInfo()} method can be used.</P>
  *
- * @see BindingContext, SourceInfo
+ * @see BindingContext
+ * @see SourceInfo
  * @author Robi Malik
  */
 

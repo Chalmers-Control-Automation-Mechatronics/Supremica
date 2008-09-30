@@ -70,7 +70,7 @@ import net.sourceforge.waters.xsd.base.EventKind;
  * components. Event arrays, aliases, foreach constructs, and
  * instantiations are not allowed in the input; these should be expanded by
  * a previous call the the module instance compiler ({@link
- * net.sourceforge.waters.model.compiler.ModuleInstanceCompiler
+ * net.sourceforge.waters.model.compiler.instance.ModuleInstanceCompiler
  * ModuleInstanceCompiler}).</P>
  *
  * <P>Th EFA compiler ensures that the resultant module only contains

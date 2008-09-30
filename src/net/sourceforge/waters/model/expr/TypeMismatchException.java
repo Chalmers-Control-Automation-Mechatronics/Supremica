@@ -36,9 +36,9 @@ public class TypeMismatchException extends EvalException {
   }
 
   /**
-   * Constructs a new exception indicating that the given expression is not
-   * well-typed.
-   * @param  expr     The subterm that is not well-typed.
+   * Constructs a new exception indicating that a parameter does not have
+   * an expected type.
+   * @param  binding  The binding of the parameter that causes the problem. 
    * @param  typename The name of the expected type.
    */
   public TypeMismatchException(final ParameterBindingProxy binding,

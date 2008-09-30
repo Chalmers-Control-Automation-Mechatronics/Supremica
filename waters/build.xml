@@ -203,7 +203,8 @@
     </jar>
     <jar jarfile="${waters552.jar}" update="true">
       <fileset dir="${waters.classes}">
-        <include name="net/sourceforge/waters/analysis/ModelChecker.class"/>
+        <include
+           name="net/sourceforge/waters/analysis/comp552/ModelChecker.class"/>
       </fileset>
     </jar>
   </target>
@@ -479,8 +480,9 @@
     <mkdir dir="${javadoc552}/src"/>
     <copy todir="${javadoc552}/src">
       <fileset dir="${supremica.src}">
-        <include name="net/sourceforge/waters/analysis/Controllability*"/>
-        <include name="net/sourceforge/waters/analysis/ModelChecker.java"/>
+        <include name="net/sourceforge/waters/analysis/comp552/Conflict*"/>
+        <include
+           name="net/sourceforge/waters/analysis/comp552/ModelChecker.java"/>
         <include name="net/sourceforge/waters/model/**"/>
         <exclude name="net/sourceforge/waters/model/analysis/**"/>
         <include name="net/sourceforge/waters/plain/**"/>

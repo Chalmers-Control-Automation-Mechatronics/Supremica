@@ -15,7 +15,7 @@ import net.sourceforge.waters.model.base.Proxy;
 
 /**
  * <P>A link between the input and the output of the {@link
- * ModuleCompiler}.</P>
+ * net.sourceforge.waters.model.compiler.ModuleCompiler ModuleCompiler}.</P>
  *
  * <P>Each item in the compiler output is associated with a source
  * information record that enables the user to trace from which item in the

@@ -330,5 +330,5 @@ public class ComposeSafetyVerifier
   //#########################################################################
   //# Class Constants
   private static final Logger LOGGER =
-    LoggerFactory.createLogger(ComposeControllabilityChecker.class);
+    LoggerFactory.createLogger(ComposeSafetyVerifier.class);
 }
