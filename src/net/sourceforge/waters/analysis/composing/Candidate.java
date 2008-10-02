@@ -21,7 +21,7 @@ public class Candidate extends Object{
 	    cStateNumber +=a.getStates().size();
 	    if (name==null) {
 	      name = a.getName();	      
-	    } else { name = name+","+a.getName(); }
+	    } else { name += ","+a.getName(); }
 	    for (EventProxy e : a.getEvents()) {	      
 	      if (!cEvents.contains(e)) {
 	        cEvents.add(e);	        

@@ -23,6 +23,9 @@ public class ConvertModel {
 
   //#########################################################################
   //# Constructors
+  public ConvertModel(){
+  }
+  
   public ConvertModel(final ProductDESProxy        model,
                       final KindTranslator         translator,
                       final ProductDESProxyFactory factory) {
@@ -155,6 +158,13 @@ public class ConvertModel {
     return mFactory.createAutomatonProxy
       (a.getName() + ":plant", ComponentKind.PLANT,
        events, a.getStates(), trans);
+  }
+  
+  public EventProxy getOriginalEvent(EventProxy newevent) {
+    for (EventProxy e : madeEvents.keySet()) {
+      if (madeEvents.get(e).contains(newevent)) return e;
+    }
+    return null;
   }
 
   

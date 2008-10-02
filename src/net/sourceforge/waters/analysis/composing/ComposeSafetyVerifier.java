@@ -13,8 +13,6 @@ import java.util.HashMap;
 import java.util.Queue;
 import java.util.PriorityQueue;
 
-import java.util.Date;
-
 import net.sourceforge.waters.model.analysis.AbstractModelVerifier;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.OverflowException;
@@ -31,9 +29,6 @@ import net.sourceforge.waters.model.analysis.VerificationResult;
 import net.sourceforge.waters.xsd.base.EventKind;
 import net.sourceforge.waters.analysis.bdd.BDDSafetyVerifier;
 import net.sourceforge.waters.cpp.analysis.NativeSafetyVerifier;
-//import net.sourceforge.waters.cpp.analysis.NativeControllabilityChecker;
-//import net.sourceforge.waters.analysis.modular.ModularControllabilityChecker;
-//import net.sourceforge.waters.analysis.modular.*;
 
 import org.supremica.log.Logger;
 import org.supremica.log.LoggerFactory;
@@ -70,53 +65,32 @@ public class ComposeSafetyVerifier
 
   //#########################################################################
   //# Invocation
-  public boolean run() throws AnalysisException { 
-    //Date start = new Date(); 
-    final ConvertModel convertModel = new ConvertModel(getModel(), mTranslator, getFactory());
-    ProductDESProxy desConverted = convertModel.run();      
-    final Compose compose = new Compose(desConverted, mTranslator, getFactory());
-    //compose.setNodeLimit(1000000);    
+  public boolean run() throws AnalysisException {        
+    final Compose compose = new Compose(getConvertedModel(), mTranslator, getFactory());     
     ProductDESProxy des = compose.run(); 
-    //Date composeTime = new Date();         
-    //System.out.println("\ncompose time "+(composeTime.getTime()-start.getTime())+" ms.");    
+    System.out.println("Composing is done!");  
     final SafetyVerifier checker =
       new NativeSafetyVerifier(des, mTranslator, getFactory());
       //new BDDSafetyVerifier(des, mTranslator, getFactory());
-      /*
-      new ModularControllabilityChecker(des, getFactory(),
-                                        //new BDDControllabilityChecker(getFactory()),
-                                        new NativeControllabilityChecker(getFactory()),
-                                        new RelMaxCommonEventsHeuristic(HeuristicType.NOPREF),
-                                        false);*/
-    checker.setNodeLimit(getNodeLimit());      
+    checker.setNodeLimit(getNodeLimit());        
     final boolean result = checker.run(); 
     mStates = (int)checker.getAnalysisResult().getTotalNumberOfStates();
-    //Date checkTime = new Date();    
-    //System.out.println("check time "+(checkTime.getTime()-composeTime.getTime())+" ms.");
-     
-    if (result) {
-      //System.out.println("Total number of states(Composed Model): "
-                        //+(int)checker.getAnalysisResult().getTotalNumberOfStates());
-      ArrayList<Candidate> candidates = new ArrayList<Candidate>(compose.getCandidates());
-      System.out.println(candidates.size());
-      for (int i=0; i<candidates.size(); i++) {
-        System.out.print(candidates.get(i).getAllAutomata().size()+" ");
-        System.out.println(candidates.get(i).getName());
-      }     
+    
+    ArrayList<Candidate> candidates = new ArrayList<Candidate>(compose.getCandidates());
+    
+    System.out.println("\n"+candidates.size()+" candidates:");
+    for (int i=0; i<candidates.size(); i++) {
+      System.out.print(candidates.get(i).getAllAutomata().size()+" ");
+      System.out.println(candidates.get(i).getName());
+    }
+    
+    if (result) {     
       return setSatisfiedResult();
     } else {
       final String tracename = getModel().getName() + ":uncontrollable";
       final SafetyTraceProxy counterexample = checker.getCounterExample();
       List<EventProxy> composedTrace = new LinkedList<EventProxy>(counterexample.getEvents());
-      ArrayList<Candidate> candidates = new ArrayList<Candidate>(compose.getCandidates());
-      for (int i=0; i<candidates.size(); i++) {
-        System.out.println(candidates.get(i).getName());
-      }
-      if (candidates.isEmpty()) {
-        //Date counterexampleTime = new Date();
-        //System.out.println("Counterexample compute time "+(counterexampleTime.getTime()-checkTime.getTime())+" ms.");
-        //System.out.println("Total number of states(Composed Model): "
-                        //+(int)checker.getAnalysisResult().getTotalNumberOfStates());
+      if (candidates.isEmpty()) {   
         return setFailedResult(counterexample);
       }
       for (int i=candidates.size()-1;i>=0;i--) {
@@ -125,14 +99,10 @@ public class ComposeSafetyVerifier
       }
       
       //decode the manmade event only if model is converted
-      composedTrace=decode(composedTrace);
+      composedTrace=convertTrace(composedTrace);
       
       final SafetyTraceProxy extendCounterexample =
-               getFactory().createSafetyTraceProxy(tracename, getModel(), composedTrace);
-      //Date counterexampleTime = new Date();
-      //System.out.println("Counterexample compute time "+(counterexampleTime.getTime()-checkTime.getTime())+" ms.");
-      //System.out.println("Total number of states(Composed Model): "
-                        //+(int)checker.getAnalysisResult().getTotalNumberOfStates());
+               getFactory().createSafetyTraceProxy(tracename, getModel(), composedTrace); 
       return setFailedResult(extendCounterexample);
     }
   }
@@ -316,11 +286,11 @@ public class ComposeSafetyVerifier
     result.setNumberOfStates(mStates);
   }
   
-  private List<EventProxy> decode(List<EventProxy> trace) {
-    String eventName = trace.get(trace.size()-1).getName();
-    String[] en = eventName.split(":");
-    trace.remove(trace.size()-1);
-    trace.add(getFactory().createEventProxy(en[0],EventKind.UNCONTROLLABLE));
+  public ProductDESProxy getConvertedModel() {
+    return getModel();
+  }
+  
+  public List<EventProxy> convertTrace(List<EventProxy> trace) {
     return trace;
   }
 

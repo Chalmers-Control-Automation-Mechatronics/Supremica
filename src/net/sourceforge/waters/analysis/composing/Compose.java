@@ -48,9 +48,9 @@ public class Compose {
       //Retain all events which are not mentioned in specs. This algorithm
       //only consider the events contained in the plants not in the specs.
       switch (mTranslator.getComponentKind(automaton)) {
-        case PLANT :  plants.add(automaton);
+        case PLANT :  plants.add(selfloopCheck(automaton));
                       break;
-        case SPEC  :  specs.add(automaton);
+        case SPEC  :  specs.add(selfloopCheck(automaton));
                       events.removeAll(automaton.getEvents());                      
                       break;
         default : break;
