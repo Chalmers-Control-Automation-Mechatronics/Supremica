@@ -13,7 +13,6 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.TreeMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.xml.bind.JAXBException;
@@ -21,7 +20,6 @@ import net.sourceforge.waters.model.base.DocumentProxy;
 import net.sourceforge.waters.model.base.GeometryProxy;
 import net.sourceforge.waters.model.base.NamedProxy;
 import net.sourceforge.waters.model.base.Proxy;
-import net.sourceforge.waters.model.base.ProxyVisitor;
 import net.sourceforge.waters.model.base.VisitorException;
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
 import net.sourceforge.waters.model.expr.OperatorTable;
@@ -70,15 +68,25 @@ import net.sourceforge.waters.model.module.UnaryExpressionProxy;
 import net.sourceforge.waters.model.module.VariableComponentProxy;
 import net.sourceforge.waters.model.module.VariableMarkingProxy;
 import net.sourceforge.waters.plain.module.ModuleElementFactory;
-import net.sourceforge.waters.subject.module.IdentifierSubject;
-import net.sourceforge.waters.subject.module.ModuleSubject;
-import net.sourceforge.waters.subject.module.ModuleSubjectFactory;
+import net.sourceforge.waters.xsd.base.EventKind;
 import org.xml.sax.SAXException;
 
 /**
+ * Converts Waters modules to NuSMV files
  * 
  * Precondition: all automata should be flattened out, no complex nodes, foreach
- * events etc. Otherwise result will symply be nonsense
+ * events etc. Otherwise result will symply be nonsense (e.g. there is filter for 
+ * SimpleIdentifierProxy, that silently discard all the rest)
+ * 
+ * This code is no more than a hack to convert Waters modules to NuSMV files.
+ * The code is probably inefficient and unclean. It uses a lot of 
+ * functional programming constructs in many places, and sometimes they are not
+ * consistent with the rest of the code. I will probably clean it up after reading some
+ * "functional programming in java" resources. The reason for all this mess is that
+ * I wrote conversion specification in the functional style
+ * 
+ * 
+ * 
  * <pre>
  * MODULE main
  * VAR
@@ -99,7 +107,10 @@ import org.xml.sax.SAXException;
  * 
  * </pre>
  *
- * 
+ * Since there are no marked states, but there are only propositions like 
+ * :accepting and :forbidden, it is very difficult to find single right way to 
+ * encode all the properties we would like to express. For now we will limit it to 
+ * :accepting proposition only for verification of non-blocking, but it have to be reconsidered.
  * 
  * 
  * 
@@ -110,7 +121,7 @@ public class EFAToNuSMV {
     
     private final static String EVENT_VAR_NAME = "event";
     private final static String INDENT = "  ";
-    private final static CompilerOperatorTable compilerOpTable = CompilerOperatorTable.getInstance();
+    //private final static CompilerOperatorTable compilerOpTable = CompilerOperatorTable.getInstance();
 
     public static void main(String[] args) throws JAXBException, SAXException, WatersUnmarshalException, IOException, URISyntaxException {
         //String name = "";
@@ -122,19 +133,20 @@ public class EFAToNuSMV {
         ModuleProxy module                    = moduleMarshaller.unmarshal(new URI(args[0]));
         
         PrintWriter pw = new PrintWriter(System.out);
-        (new EFAToNuSMV()).print(module, pw);
+        (new EFAToNuSMV()).print(module, pw, Arrays.asList(new SpecPrinterNonBlocking()));
         pw.flush();
     }
 
-    public void print(ModuleProxy m, PrintWriter pw) {
+    public void print(ModuleProxy m, PrintWriter pw, Collection<? extends SpecPrinter> specs) {
         pw.println("MODULE main");
         printVars(m, pw);
         printInits(m, pw);
         printTrans(m, pw);
-        printSpecs(m, pw);
-
+        for(SpecPrinter s: specs)
+            s.print(m, pw);
+        pw.println();
+        pw.flush();
     }
-
     /**
      * Precondition: ComponentList of the ModuleSubject have to be flattened out, 
      * i.e.  there should be only SimpleComponentProxy and VariableProxy, and no
@@ -175,33 +187,128 @@ public class EFAToNuSMV {
     private void printTrans(ModuleProxy m, PrintWriter pw) {
         pw.println("TRANS");
         Collection<String> allAutomata = new ArrayList<String>();
-        for(SimpleComponentProxy sc: getAutomata(m)){
+        for(SimpleComponentProxy sc: getAutomata(m)){            
             Collection<String> allEdges = new ArrayList<String>();
-            for(EdgeProxy edge: sc.getGraph().getEdges()){
-                Collection<String> elems = new ArrayList<String>();
-                elems.add(exprEquals(varName(sc), valueName(edge.getSource())));
-                elems.add(disjunctionOfEnabledEvents(edge));
-                elems.add(nextEquals(varName(sc), valueName(edge.getTarget())));
-                Collection<SimpleExpressionProxy> gs = edge.getGuardActionBlock().getGuards();
-                if(!gs.isEmpty())
-                    elems.add(allGuards(gs));
-                Collection<BinaryExpressionProxy> as = edge.getGuardActionBlock().getActions();
-                if(!as.isEmpty())
-                    elems.add(allActions(as));
-                allEdges.add(conjunction(elems));
-            }
-            String automatonExpression = disjunction(allEdges);
-            allAutomata.add(automatonExpression);
+            allEdges.addAll(transitionConditions(sc));
+            allEdges.addAll(stayConditions(sc, m));
+            allAutomata.add(disjunction(allEdges));
         }
         String allAutomataExpression = conjunction(allAutomata);
         pw.println(INDENT + allAutomataExpression);
         
     }
     
+    private Collection<String> transitionConditions(final SimpleComponentProxy sc){        
+        return map(new Function<EdgeProxy, String>() {
+            public String f(EdgeProxy edge) {
+                return transitionCondition(sc, edge.getSource(), edge.getTarget(), getEvents(edge), edge.getGuardActionBlock());
+            }
+        }, sc.getGraph().getEdges());        
+    }
+    private Collection<String> stayConditions(final SimpleComponentProxy sc, final ModuleProxy m){        
+        Collection<String> pred = map(new Function<SimpleNodeProxy, String>() {
+            public String f(SimpleNodeProxy n) {
+                return transitionCondition(sc, n, n, 
+                        filterType(SimpleIdentifierProxy.class, n.getPropositions().getEventList()), 
+                        null);
+            }
+        }, filterStatesWithPredicates(getStates(sc)));
+        pred.add(stayAllCondition(sc, eventsNotInAlphabet(m, sc)));
+        return pred;
+    }
+     
+    private Collection<SimpleNodeProxy> filterStatesWithPredicates(Collection<SimpleNodeProxy> nodes){
+        return filter(new Filter<SimpleNodeProxy>() {
+
+            public Boolean f(SimpleNodeProxy n) {
+                if(n.getPropositions()==null)
+                    return false;
+                else if(n.getPropositions().getEventList() == null)
+                    return false;
+                else 
+                    return n.getPropositions().getEventList().size() > 0;                    
+            }
+        }, nodes);
+    }
+    
+    private Collection<SimpleIdentifierProxy> eventsNotInAlphabet(ModuleProxy m, SimpleComponentProxy sc){
+        
+        final Collection<SimpleIdentifierProxy> events = getEvents(sc);
+        events.addAll(getPropositions(sc));
+        return filter(new Filter<SimpleIdentifierProxy>() {
+            public Boolean f(SimpleIdentifierProxy value) {
+                return !contains(events, value);
+            }
+        }, getEvents(m));        
+    }
+    private boolean contains(Collection<SimpleIdentifierProxy> ids, SimpleIdentifierProxy v){
+        for(SimpleIdentifierProxy i: ids)
+            if(i.getName().equals(v.getName()))
+                return true;
+        return false;
+    }
+    
+    private Collection<SimpleIdentifierProxy> getEvents(SimpleComponentProxy sc){
+        return unlines(map(new Function<EdgeProxy, Collection<SimpleIdentifierProxy>>() {
+            public Collection<SimpleIdentifierProxy> f(EdgeProxy value) {
+                return filterType(SimpleIdentifierProxy.class, value.getLabelBlock().getEventList());
+            }
+        }, sc.getGraph().getEdges()));
+    }
+    
+    private Collection<SimpleIdentifierProxy> getEvents(ModuleProxy m){
+        return filterType(SimpleIdentifierProxy.class, map(new Function<EventDeclProxy, IdentifierProxy>() {
+            public IdentifierProxy f(EventDeclProxy value) {
+                return value.getIdentifier();
+            }
+        }, m.getEventDeclList()));
+    }
+    
+    private <T> Collection<T> unlines(Collection<Collection<T>> cs){
+        Collection<T> res = new ArrayList<T>();
+        for(Collection<T> c: cs)
+            for(T e: c)
+                res.add(e);
+        return res;
+    }
+    
+    private String transitionCondition
+            ( SimpleComponentProxy sc
+            , NodeProxy source
+            , NodeProxy target
+            , Collection<SimpleIdentifierProxy> events
+            , GuardActionBlockProxy gab
+            ){
+        Collection<String> elems = new ArrayList<String>();
+        elems.add(exprEquals(varName(sc), valueName(source)));
+        elems.add(disjunctionOfEvents(events));
+        elems.add(nextEquals(varName(sc), valueName(target)));
+        if(gab != null){
+            Collection<SimpleExpressionProxy> gs = gab.getGuards();
+            if(gs!=null && !gs.isEmpty())
+                elems.add(allGuards(gs));
+            Collection<BinaryExpressionProxy> as = gab.getActions();
+            if(as!=null && !as.isEmpty())
+                elems.add(allActions(as));
+        }        
+        return conjunction(elems);
+    }
+    
+    private String stayAllCondition(SimpleComponentProxy sc, Collection<SimpleIdentifierProxy> events){
+        return conjunction(Arrays.asList(nextEquals(varName(sc), varName(sc)), disjunctionOfEvents(events)));
+    }
+    
     private Collection<SimpleIdentifierProxy> getEvents(EdgeProxy edge){
         return filterType(SimpleIdentifierProxy.class, edge.getLabelBlock().getEventList());
     }
     
+    private String disjunctionOfEvents(Collection<SimpleIdentifierProxy> events){
+        return disjunction(map(new Function<SimpleIdentifierProxy, String>() {
+                    public String f(SimpleIdentifierProxy value) {
+                        return exprEquals(EVENT_VAR_NAME, eventName(value));
+                    }
+                }, events));        
+    }
     private String disjunctionOfEnabledEvents(EdgeProxy edge){
         return disjunction(map(new Function<SimpleIdentifierProxy, String>() {
                     public String f(SimpleIdentifierProxy value) {
@@ -244,12 +351,7 @@ public class EFAToNuSMV {
     }
     private static String stmtNextAssign(String v, String e){
         return declVar("next(" + v + ")", e);
-    }
-
-    private void printSpecs(ModuleProxy m, PrintWriter pw) {
-        
-    }
-    
+    }  
     
     
     private static interface Function <S,D>{ public D f(S value); }
@@ -285,16 +387,16 @@ public class EFAToNuSMV {
         return res;            
     }
             
-    private Collection<SimpleComponentProxy> getAutomata(ModuleProxy m){
+    private static Collection<SimpleComponentProxy> getAutomata(ModuleProxy m){
         return filterType( SimpleComponentProxy.class,m.getComponentList());                 
     }
-    private Collection<VariableComponentProxy> getEFAVariables(ModuleProxy m){
+    private static Collection<VariableComponentProxy> getEFAVariables(ModuleProxy m){
         return filterType( VariableComponentProxy.class,m.getComponentList());                 
     }
-    private Collection<SimpleNodeProxy> getStates(SimpleComponentProxy sc){
+    private static Collection<SimpleNodeProxy> getStates(SimpleComponentProxy sc){
         return filterType( SimpleNodeProxy.class,sc.getGraph().getNodes());                 
     }
-    private Collection<SimpleNodeProxy> getInitialStates(SimpleComponentProxy sc){
+    private static Collection<SimpleNodeProxy> getInitialStates(SimpleComponentProxy sc){
         return filter(
               new Filter<SimpleNodeProxy>() {
                   public Boolean f(SimpleNodeProxy t) { return t.isInitial(); }
@@ -303,15 +405,51 @@ public class EFAToNuSMV {
         );
     }
     
-    private Collection<String> getNodeNames(SimpleComponentProxy sc) {
-        return valueNames(getStates(sc));
+    private Collection<String> edgeElements(EdgeProxy edge, SimpleComponentProxy sc){
+        Collection<String> elems = new ArrayList<String>();
+        elems.add(exprEquals(varName(sc), valueName(edge.getSource())));
+        elems.add(disjunctionOfEnabledEvents(edge));
+        elems.add(nextEquals(varName(sc), valueName(edge.getTarget())));
+        GuardActionBlockProxy gab = edge.getGuardActionBlock();
+        if(gab != null){
+            Collection<SimpleExpressionProxy> gs = gab.getGuards();
+            if(!gs.isEmpty())
+                elems.add(allGuards(gs));
+            Collection<BinaryExpressionProxy> as = edge.getGuardActionBlock().getActions();
+            if(!as.isEmpty())
+                elems.add(allActions(as));
+        }        
+        return elems;
     }
     
+    private String getPropositionAsSelfLoop(SimpleComponentProxy sc, NodeProxy n, SimpleIdentifierProxy idf){
+        return conjunction(Arrays.asList(
+                exprEquals(varName(sc), valueName(n))
+                , nextEquals(varName(sc), valueName(n))
+                , exprEquals(EVENT_VAR_NAME, eventName(idf))
+                ));
+    }
+    
+    private Collection<EventDeclProxy> filterPropositions(Collection<EventDeclProxy> evs){
+        return filter(new Filter<EventDeclProxy>() {
+            public Boolean f(EventDeclProxy value) {
+                return value.getKind()==EventKind.PROPOSITION;
+            }
+        }, evs);
+    }
+    private Collection<SimpleIdentifierProxy> getPropositions(SimpleComponentProxy sc){
+        Collection<SimpleIdentifierProxy> res  = new ArrayList<SimpleIdentifierProxy>();
+        for(NodeProxy n: sc.getGraph().getNodes()){
+            res.addAll(filterType(SimpleIdentifierProxy.class, n.getPropositions().getEventList()));
+        }
+        return res;
+    }
+                   
     private String varName(SimpleComponentProxy sc){
         return "a_" + escape(sc.getName());
     }
     private String valueName(NamedProxy p){
-        if(p instanceof SimpleNodeProxy){
+        if(p instanceof SimpleNodeProxy){            
             return escape(((SimpleNodeProxy)p).getName());  // state constants will have no prefix
         } else if(p instanceof EventDeclProxy){
             return eventName((EventDeclProxy)p);
@@ -319,17 +457,17 @@ public class EFAToNuSMV {
             throw new IllegalArgumentException("Unexpected element type: " + p.getClass().toString());
         }            
     }    
-    private String eventName(EventDeclProxy p){
+    private static String eventName(EventDeclProxy p){
         return eventName(p.getName());
     }
-    private String eventName(SimpleIdentifierProxy p){
+    private static String eventName(SimpleIdentifierProxy p){
         return eventName(p.getName());
     }
-    private String eventName(String name){
+    private static String eventName(String name){
         return "e_" + escape(name);
     }
             
-    private String escape(String s){
+    private static String escape(String s){
         return s.replace(":", "dblColon");
     }
     private <T extends NamedProxy> Collection<String> valueNames(Collection<T> es){
@@ -377,7 +515,7 @@ public class EFAToNuSMV {
         }
     }
         
-    private String watersExprToSmvExpr(SimpleExpressionProxy exp){
+    private static String watersExprToSmvExpr(SimpleExpressionProxy exp){
         try {
             return (String)exp.acceptVisitor(new ExpressionToSmvVisitorTransConstraint());
         } catch (VisitorException ex) {
@@ -419,6 +557,10 @@ public class EFAToNuSMV {
             //replaceable.put("=", "next()=");  // this replacement is only valid when converting Action Expression to NuSMV TRANS constraint
             replaceable.put("&", "&");
             replaceable.put("|", "|");
+            replaceable.put(">", ">");
+            replaceable.put("<", "<");
+            replaceable.put(">=", ">=");
+            replaceable.put("<=", "<=");
             replaceable.put("!=", "!="); 
             //replaceable.put("", "");
             
@@ -611,5 +753,41 @@ public class EFAToNuSMV {
         public Object visitDocumentProxy(DocumentProxy proxy) throws VisitorException {
             throw new UnsupportedOperationException("Not supported yet.");
         }
+    }
+    
+    public static interface SpecPrinter {
+        public void print(ModuleProxy m, PrintWriter pw);
+    }
+    public static class SpecPrinterNonBlocking implements SpecPrinter {
+
+        private String markingEventName;
+        public SpecPrinterNonBlocking(String markingEventName){
+            this.markingEventName = markingEventName;
+        }
+        public SpecPrinterNonBlocking(){
+            this(EventDeclProxy.DEFAULT_MARKING_NAME);
+        }
+        public void print(ModuleProxy m, PrintWriter pw) {
+            pw.print("CTLSPEC AG(EF(");
+            Collection<String> parts = new ArrayList<String>();
+            
+            /* first part - marking event is fired */
+            parts.add(exprEquals(EVENT_VAR_NAME, eventName(markingEventName)));
+            
+            /* second part - all EFA varables have "marked" values */
+            for(VariableComponentProxy v: getEFAVariables(m)){
+                for(VariableMarkingProxy vm: v.getVariableMarkings()){
+                    // for now we do only :accepting proposition
+                    if(vm.getProposition() instanceof SimpleIdentifierProxy){
+                        if(((SimpleIdentifierProxy)vm.getProposition()).getName().equals(markingEventName))
+                            parts.add(exprEquals(v.getName(), watersExprToSmvExpr(vm.getPredicate())));
+                    } else {
+                        throw new IllegalArgumentException("unsupported identifier class: " + vm.getProposition().getClass().toString());
+                    }
+                }
+            }
+            pw.print(conjunction(parts));
+            pw.println("))");
+        }        
     }
 }

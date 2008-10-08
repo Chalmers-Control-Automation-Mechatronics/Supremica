@@ -146,6 +146,7 @@ public class Actions extends WatersActionManager
     public IDEAction analyzerCountReachableAction = new AnalyzerCountReachableAction(mIDEActions);
     public IDEAction analyzerScheduleAction = new AnalyzerScheduleAction(mIDEActions);
     public IDEAction analyzerSatAction = new AnalyzerSatAction(mIDEActions);
+    public IDEAction analyzerSMVAction = new AnalyzerSMVAction(mIDEActions);       
     public IDEAction analyzerDeadEventsDetectorAction = new AnalyzerDeadEventsDetectorAction(mIDEActions);
 
     // Examples Actions

@@ -87,6 +87,8 @@ class AnalyzerPopupMenu
             experimentMenu.add(ide.getActions().simulatorLaunchSimulatorAction.getMenuItem());
 
             experimentMenu.addSeparator();
+            experimentMenu.add(ide.getActions().analyzerSMVAction.getMenuItem());           
+            
 
             experimentMenu.add(ide.getActions().analyzerSatAction.getMenuItem());
 
