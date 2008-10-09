@@ -140,9 +140,9 @@ public class Compose {
 			    projectOK = true;
 			    break;			    
 			  } catch (final OverflowException oe) {
-			      projectOK = false;
-			      badCandidate.add(maxL);
-	          continue;
+			    projectOK = false;
+			    badCandidate.add(maxL);
+			    continue;
 			  }
 			  /*		    
 		    ProductDESProxy newP = 

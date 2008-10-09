@@ -75,7 +75,7 @@ public class ConflictMain
   //# Main Method for Testing
   /**
    * Main method.
-   * This is a main method to check a set of files for control loop free.
+   * This is a main method to check a set of files for conflicts.
    * Please refer to the class documentation ({@link ConflictMain})
    * for more detailed information.
    * @param  args    Array of file names from the command line.

@@ -335,13 +335,14 @@
       <formatter type="xml"/>
       <batchtest todir="${logs.results}">
         <fileset dir="${supremica.testsrc}">
-          <include name="net/sourceforge/waters/analysis/bdd/**/*.java"/>
+          <include name="net/sourceforge/waters/analysis/composing/**/*.java"/>
           <exclude name="**/Abstract*.java"/>
         </fileset>
       </batchtest>
       <classpath refid="waters.test.classpath"/>
       <sysproperty key="waters.test.inputdir" value="${supremica.examples}"/>
       <sysproperty key="waters.test.outputdir" value="${logs.results}"/>
+      <sysproperty key="java.library.path" value="${waters.library.path}"/>
     </junit>
   </target>
   

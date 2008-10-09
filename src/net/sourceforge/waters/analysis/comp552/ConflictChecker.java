@@ -46,7 +46,7 @@ public class ConflictChecker extends ModelChecker
    * @param  desFactory Factory used for trace construction.
    */
   public ConflictChecker(final ProductDESProxy model,
-			 final ProductDESProxyFactory desFactory)
+                         final ProductDESProxyFactory desFactory)
   {
     this(model, getDefaultMarkingProposition(model), desFactory);
   }
@@ -65,8 +65,8 @@ public class ConflictChecker extends ModelChecker
    * @param  desFactory Factory used for trace construction.
    */
   public ConflictChecker(final ProductDESProxy model,
-			 final EventProxy marking,
-			 final ProductDESProxyFactory desFactory)
+                         final EventProxy marking,
+                         final ProductDESProxyFactory desFactory)
   {
     super(model, desFactory);
     mMarking = marking;
@@ -105,12 +105,12 @@ public class ConflictChecker extends ModelChecker
     for (final AutomatonProxy aut : model.getAutomata()) {
       // For each state ...
       for (final StateProxy state : aut.getStates()) {
-	// Does the list of propositions contain our marking?
-	final Collection<EventProxy> props = state.getPropositions();
-	if (props.contains(mMarking)) {
-	  // Yes --- this is a marked state.
-	  count++;
-	}
+        // Does the list of propositions contain our marking?
+        final Collection<EventProxy> props = state.getPropositions();
+        if (props.contains(mMarking)) {
+          // Yes --- this is a marked state.
+          count++;
+        }
       }
     }
     // Print the number of marked states that we have counted.
@@ -126,7 +126,7 @@ public class ConflictChecker extends ModelChecker
   //# Simple Access Methods
   /**
    * Gets the result of conflict checking.
-   * @return <CODE>true</CODE> if the model was found to be controllable,
+   * @return <CODE>true</CODE> if the model was found to be nonconflicting,
    *         <CODE>false</CODE> otherwise.
    * @throws IllegalStateException in all cases, because this method is
    *         not yet implemented.
@@ -138,13 +138,12 @@ public class ConflictChecker extends ModelChecker
   }
 
   /**
-   * Gets a counterexample if the model was found to be not controllable.
-   * representing a conflict error trace. A conflict error
-   * trace is a nonempty sequence of events such that all except the last
-   * event in the list can be executed by the model. The last event in the list
-   * is an uncontrollable event that is possible in all plant automata, but
-   * not in all specification automata present in the model. Thus, the last
-   * step demonstrates why the model is not controllable.
+   * Gets a counterexample if the model was found to be conflicting,
+   * representing a conflict error trace. A conflict error trace is a
+   * sequence of events that takes the model to a state that is not
+   * coreachable. That is, after executing the counterexample, the automata
+   * are in a state from where it is no longer possible to reach a state
+   * where all automata are marked at the same time.
    * @return A trace object representing the counterexample.
    *         The returned trace is constructed for the input product DES
    *         of this conflict checker and shares its automata and
@@ -174,7 +173,7 @@ public class ConflictChecker extends ModelChecker
     // this assignment---it will not be tested.
     final ConflictTraceProxy trace =
       desFactory.createConflictTraceProxy(tracename, model, tracelist,
-					  ConflictKind.CONFLICT);
+                                          ConflictKind.CONFLICT);
     return trace;
   }
 
@@ -193,8 +192,8 @@ public class ConflictChecker extends ModelChecker
   {
     for (final EventProxy event : model.getEvents()) {
       if (event.getKind() == EventKind.PROPOSITION &&
-	  event.getName().equals(EventDeclProxy.DEFAULT_MARKING_NAME)) {
-	return event;
+          event.getName().equals(EventDeclProxy.DEFAULT_MARKING_NAME)) {
+        return event;
       }
     }
     throw new IllegalArgumentException

@@ -37,7 +37,7 @@ import net.sourceforge.waters.model.des.TraceProxy;
  *   {@link net.sourceforge.waters.plain.des.ProductDESElementFactory}.{@link
  *   net.sourceforge.waters.plain.des.ProductDESElementFactory#getInstance()
  *   getInstance}();</CODE><BR>
- * <CODE>ModelChecker checker = new ControllabilityChecker(des, factory);
+ * <CODE>ModelChecker checker = new ConflictChecker(des, factory);
  * //</CODE> <I>e.g.</I><BR>
  * <CODE>checker.{@link #run()};</CODE><BR>
  * <CODE>boolean result = checker.{@link #getResult()};</CODE><BR>

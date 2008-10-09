@@ -67,6 +67,7 @@ public class ComposeSafetyVerifier
   //# Invocation
   public boolean run() throws AnalysisException {        
     final Compose compose = new Compose(getConvertedModel(), mTranslator, getFactory());     
+    compose.setNodeLimit(getNodeLimit());        
     ProductDESProxy des = compose.run(); 
     System.out.println("Composing is done!");  
     final SafetyVerifier checker =
