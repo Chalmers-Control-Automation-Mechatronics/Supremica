@@ -22,17 +22,17 @@ import net.sourceforge.waters.model.des.ProductDESProxyFactory;
  * @author Jinjian Shi, Robi Malik
  */
 
-public class ComposeModelVerifierFactory
+public class ComposingModelVerifierFactory
   extends AbstractModelVerifierFactory
 {
 
   //#########################################################################
   //# Constructors
-  private ComposeModelVerifierFactory()
+  private ComposingModelVerifierFactory()
   {
   }
 
-  private ComposeModelVerifierFactory(final List<String> arglist)
+  private ComposingModelVerifierFactory(final List<String> arglist)
   {
     super(arglist);
   }
@@ -40,38 +40,38 @@ public class ComposeModelVerifierFactory
 
   //#########################################################################
   //# Interface net.sourceforge.waters.model.analysis.ModelVerifierFactory
-  public ComposeControllabilityChecker createControllabilityChecker
+  public ComposingControllabilityChecker createControllabilityChecker
     (final ProductDESProxyFactory factory)
   {
-    return new ComposeControllabilityChecker(factory);
+    return new ComposingControllabilityChecker(factory);
   }
 
-  public ComposeLanguageInclusionChecker createLanguageInclusionChecker
+  public ComposingLanguageInclusionChecker createLanguageInclusionChecker
     (final ProductDESProxyFactory factory)
   {
-    return new ComposeLanguageInclusionChecker(factory);
+    return new ComposingLanguageInclusionChecker(factory);
   }
 
 
   //#########################################################################
   //# Factory Instantiation
-  public static ComposeModelVerifierFactory getInstance()
+  public static ComposingModelVerifierFactory getInstance()
   {
     if (theInstance == null) {
-      theInstance = new ComposeModelVerifierFactory();
+      theInstance = new ComposingModelVerifierFactory();
     }
     return theInstance;
   }
 
-  public static ComposeModelVerifierFactory
+  public static ComposingModelVerifierFactory
     getInstance(final List<String> cmdline)
   {
-    return new ComposeModelVerifierFactory(cmdline);
+    return new ComposingModelVerifierFactory(cmdline);
   }
 
 
   //#########################################################################
   //# Class Variables
-  private static ComposeModelVerifierFactory theInstance = null;
+  private static ComposingModelVerifierFactory theInstance = null;
 
 }

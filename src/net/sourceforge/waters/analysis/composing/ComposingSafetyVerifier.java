@@ -12,6 +12,7 @@ import java.util.HashSet;
 import java.util.HashMap;
 import java.util.Queue;
 import java.util.PriorityQueue;
+import java.io.File;
 
 import net.sourceforge.waters.model.analysis.AbstractModelVerifier;
 import net.sourceforge.waters.model.analysis.AnalysisException;
@@ -30,18 +31,27 @@ import net.sourceforge.waters.xsd.base.EventKind;
 import net.sourceforge.waters.analysis.bdd.BDDSafetyVerifier;
 import net.sourceforge.waters.cpp.analysis.NativeSafetyVerifier;
 
+import net.sourceforge.waters.model.expr.OperatorTable;
+import net.sourceforge.waters.model.marshaller.DocumentManager;
+import net.sourceforge.waters.model.marshaller.JAXBModuleMarshaller;
+import net.sourceforge.waters.model.marshaller.ProductDESImporter;
+import net.sourceforge.waters.model.module.ModuleProxy;
+import net.sourceforge.waters.model.module.ModuleProxyFactory;
+import net.sourceforge.waters.plain.module.ModuleElementFactory;
+import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
+
 import org.supremica.log.Logger;
 import org.supremica.log.LoggerFactory;
 
-public class ComposeSafetyVerifier 
+public class ComposingSafetyVerifier 
   extends AbstractModelVerifier
   implements SafetyVerifier {
 
   //#########################################################################
   //# Constructors
-  public ComposeSafetyVerifier(final ProductDESProxy model,
-                               final KindTranslator translator,
-                               final ProductDESProxyFactory factory) {
+  public ComposingSafetyVerifier(final ProductDESProxy model,
+                                 final KindTranslator translator,
+                                 final ProductDESProxyFactory factory) {
     super(model, factory); 
     mTranslator = translator; 
     setNodeLimit(10000000);    
@@ -66,10 +76,28 @@ public class ComposeSafetyVerifier
   //#########################################################################
   //# Invocation
   public boolean run() throws AnalysisException {        
-    final Compose compose = new Compose(getConvertedModel(), mTranslator, getFactory());     
-    compose.setNodeLimit(getNodeLimit());        
-    ProductDESProxy des = compose.run(); 
-    System.out.println("Composing is done!");  
+    final Composing composing = new Composing(getConvertedModel(), mTranslator, getFactory());
+    composing.setNodeLimit(getNodeLimit());     
+    ProductDESProxy des = composing.run(); 
+    System.out.println("Composing is done!"); 
+    
+    saveIntoFile(des);
+    
+    ArrayList<Candidate> candidates = new ArrayList<Candidate>(composing.getCandidates());
+    /*
+    //Display the composing infomation
+    System.out.println(candidates.size()+" candidates:");
+    for (int i=0; i<candidates.size(); i++) {
+      System.out.print("Step "+(i+1)+": ");
+      System.out.println(candidates.get(i).getAllAutomata().size()+" automata");
+      System.out.print("Hide "+candidates.get(i).getLocalEvents().size()+" events: ");
+      for (EventProxy e : candidates.get(i).getLocalEvents()) {
+        System.out.print(e.getName()+",");
+      }
+      System.out.println("\nAutomata: "+candidates.get(i).getName());
+    }*/
+    
+     
     final SafetyVerifier checker =
       new NativeSafetyVerifier(des, mTranslator, getFactory());
       //new BDDSafetyVerifier(des, mTranslator, getFactory());
@@ -77,13 +105,7 @@ public class ComposeSafetyVerifier
     final boolean result = checker.run(); 
     mStates = (int)checker.getAnalysisResult().getTotalNumberOfStates();
     
-    ArrayList<Candidate> candidates = new ArrayList<Candidate>(compose.getCandidates());
-    
-    System.out.println("\n"+candidates.size()+" candidates:");
-    for (int i=0; i<candidates.size(); i++) {
-      System.out.print(candidates.get(i).getAllAutomata().size()+" ");
-      System.out.println(candidates.get(i).getName());
-    }
+
     
     if (result) {     
       return setSatisfiedResult();
@@ -294,6 +316,32 @@ public class ComposeSafetyVerifier
   public List<EventProxy> convertTrace(List<EventProxy> trace) {
     return trace;
   }
+  
+  //################################################################
+  //Convert the Product DES structure into the Module structure and 
+  //save it into a file.
+  private void saveIntoFile(ProductDESProxy des) {    
+    try {
+	    final ModuleProxyFactory moduleFactory =  
+	      ModuleElementFactory.getInstance();
+	    final DocumentManager docManager = 
+	      new DocumentManager();
+	    final OperatorTable optable = 
+	      CompilerOperatorTable.getInstance();	    
+	    final JAXBModuleMarshaller moduleMarshaller =
+	      new JAXBModuleMarshaller(moduleFactory, optable);	        
+	    docManager.registerMarshaller(moduleMarshaller);	    
+	    final ProductDESImporter pdi = 
+	      new ProductDESImporter(moduleFactory,docManager);
+	    final ModuleProxy module = pdi.importModule(des);	    
+	    docManager.saveAs(module,new File("composedModel.wmod"));
+	  } catch (final Throwable exception) {
+        System.err.println("FATAL ERROR !!!");
+        System.err.println(exception.getClass().getName() +
+                         " caught in saving model!");
+        exception.printStackTrace(System.err);
+      }
+  }
 
   
   private KindTranslator mTranslator; 
@@ -301,5 +349,5 @@ public class ComposeSafetyVerifier
   //#########################################################################
   //# Class Constants
   private static final Logger LOGGER =
-    LoggerFactory.createLogger(ComposeSafetyVerifier.class);
+    LoggerFactory.createLogger(ComposingSafetyVerifier.class);
 }

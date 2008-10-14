@@ -18,15 +18,15 @@ import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 import net.sourceforge.waters.model.des.StateProxy;
 import net.sourceforge.waters.model.des.TransitionProxy;
-//import net.sourceforge.waters.xsd.base.EventKind;
+import net.sourceforge.waters.xsd.base.EventKind;
 
-public class Compose {
+public class Composing {
 
   //#########################################################################
   //# Constructors
-  public Compose(final ProductDESProxy        model,
-                 final KindTranslator         translator,
-                 final ProductDESProxyFactory factory) {
+  public Composing(final ProductDESProxy        model,
+                   final KindTranslator         translator,
+                   final ProductDESProxyFactory factory) {
     mModel = model;
     mFactory = factory;
     mTranslator = translator;
@@ -36,7 +36,7 @@ public class Compose {
     newEvents = new HashSet<EventProxy>();
     mCandidate = new ArrayList<Candidate>();
     badCandidate = new HashSet<Candidate>();
-    nodelimit = 1000;
+    nodelimit = 3000;
     plants = new HashSet<AutomatonProxy>();    
   }
   
@@ -65,13 +65,18 @@ public class Compose {
     //Assumption: All events which are not related with specs will be removed.    
     int loop = 0; 
     //for (int k=0;k<hiddenEvents.size();k++) {  
-    while (true) {  
+    while (true) {        
       loop++;
       ArrayList<Candidate> composition = new ArrayList<Candidate>();
       Set<EventProxy> dependedEvents = new HashSet<EventProxy>();        
 		  //Step 1
 	    //mustL: A set of Automata using the particular event.	       
 	    for (EventProxy e : events) {
+	      if(e.getKind()==EventKind.PROPOSITION) {
+	        dependedEvents.add(e);
+	        hiddenEvents.remove(e);
+	        continue;
+	      }
 	      Set<AutomatonProxy> comp = new HashSet<AutomatonProxy>();
 	      Set<EventProxy> eventHidden = new HashSet<EventProxy>();	      
 	      for (AutomatonProxy aut : plants) {
@@ -93,15 +98,12 @@ public class Compose {
 	        //Check if the new candidate is a subset of another
 	        //or it include some exist sets	        
 	        for (int i=0; i<composition.size();i++) {
-	          Set<AutomatonProxy> temp1 = new HashSet<AutomatonProxy>(comp);
-	          Set<AutomatonProxy> temp2 = new HashSet<AutomatonProxy>(composition.get(i).getAllAutomata());
-	          //new candidate is a subset of another 
-	          temp1.removeAll(composition.get(i).getAllAutomata());
-	          //it include some exist sets	
-	          temp2.removeAll(comp);         
-	          if (temp1.isEmpty()) {
-	            composition.get(i).addLocalEvents(e);
-	          } else if (temp2.isEmpty()) {
+	          //new candidate is a subset of another
+	          if (composition.get(i).getAllAutomata().containsAll(comp)) {
+	            composition.get(i).addLocalEvent(e);
+	          } 
+	          //it includs some exist sets	
+	          else if (comp.containsAll(composition.get(i).getAllAutomata())) {
 	            eventHidden.addAll(composition.get(i).getLocalEvents());
 	            newCandidate.setLocalEvents(eventHidden);
 	          }
@@ -109,27 +111,21 @@ public class Compose {
 	        composition.add(newCandidate);
 	      }	else {
 			      int i = composition.indexOf(newCandidate);
-			      composition.get(i).addLocalEvents(e);	
+			      composition.get(i).addLocalEvent(e);	
 	        }      
 	    }
 	    events.removeAll(dependedEvents);
 	    
 	    //Step 2
+	    //###############################################################
 	    //maxL: Choose the candidate with the highest proportion of 
 	    //      local events(that can be hidden).
+	    //composition = maxL(composition);
 	    
-	    //Sort the composition list
-	    if (composition.size()>1) {
-		    for (int i=0; i<composition.size()-1; i++) {
-		      for (int j=i+1;j<composition.size();j++) {
-		        if (composition.get(i).getLocalProportion() < composition.get(j).getLocalProportion()) {
-		          Candidate ctemp = composition.get(i);
-		          composition.set(i,composition.get(j));
-		          composition.set(j,ctemp);
-		        }
-		      }
-		    }
-	    }   
+	    //###############################################################	       
+			//minS: Choose the candidate with the lest synchronized product
+			//      states
+			composition = minS(composition);
 			
 			//call projecter
 			boolean projectOK = true;
@@ -140,34 +136,10 @@ public class Compose {
 			    projectOK = true;
 			    break;			    
 			  } catch (final OverflowException oe) {
-			    projectOK = false;
-			    badCandidate.add(maxL);
-			    continue;
-			  }
-			  /*		    
-		    ProductDESProxy newP = 
-		            mFactory.createProductDESProxy(maxL.getName(),maxL.getAllEvents(),maxL.getAllAutomata());	
-		    Set<EventProxy> eForbidden = new HashSet<EventProxy>();    
-		    Projection2 proj = new Projection2(newP, mFactory, maxL.getLocalEvents(), eForbidden);	        
-	      proj.setNodeLimit(nodelimit);
-	      try {
-	        AutomatonProxy newAutomaton = proj.project();	        
-          projectOK = true;	 
-          
-          mCandidate.add(maxL);
-                       
-	        plants.removeAll((HashSet)maxL.getAllAutomata());
-	        plants.add(newAutomaton);
-
-	        events.removeAll((HashSet)maxL.getLocalEvents());
-
-	        break;
-	      } catch (final OverflowException oe) {
-	          //lastOverflow = oe;
-	          //try next candidate	          
-	          projectOK = false;
+			      projectOK = false;
+			      badCandidate.add(maxL);
 	          continue;
-	        }*/
+			  }
       }
       
       if (!projectOK) {
@@ -198,8 +170,8 @@ public class Compose {
   }
   
   public void setNodeLimit(final int limit) {    
-    if (limit > 1000) {
-      nodelimit = 1000;
+    if (limit > 3000) {
+      nodelimit = 3000;
     } else {
       nodelimit = limit;
     }
@@ -263,6 +235,38 @@ public class Compose {
                                            aut.getStates(),
                                            newTrans);
     }
+  }
+  
+  private ArrayList<Candidate> maxL(ArrayList<Candidate> composition) {
+	  //Sort the composition list
+    if (composition.size()>1) {
+	    for (int i=0; i<composition.size()-1; i++) {
+	      for (int j=i+1;j<composition.size();j++) {
+	        if (composition.get(i).getLocalProportion() < composition.get(j).getLocalProportion()) {
+	          Candidate ctemp = composition.get(i);
+	          composition.set(i,composition.get(j));
+	          composition.set(j,ctemp);
+	        }
+	      }
+	    }
+    }
+    return composition;
+  }
+  
+  private ArrayList<Candidate> minS(ArrayList<Candidate> composition) {
+	  //Sort the composition list
+    if (composition.size()>1) {
+	    for (int i=0; i<composition.size()-1; i++) {
+	      for (int j=i+1;j<composition.size();j++) {
+	        if (composition.get(i).getSPSNumber() > composition.get(j).getSPSNumber()) {
+	          Candidate ctemp = composition.get(i);
+	          composition.set(i,composition.get(j));
+	          composition.set(j,ctemp);
+	        }
+	      }
+	    }
+    }
+    return composition;
   }
   
   private ProductDESProxy            mModel;

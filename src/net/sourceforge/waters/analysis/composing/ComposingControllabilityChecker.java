@@ -10,47 +10,37 @@ import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 
 
 
-public class ComposeControllabilityChecker
-  extends ComposeSafetyVerifier
+public class ComposingControllabilityChecker
+  extends ComposingSafetyVerifier
   implements ControllabilityChecker
 {
 
   //#########################################################################
   //# Constructors
-  public ComposeControllabilityChecker(final ProductDESProxyFactory factory)
+  public ComposingControllabilityChecker(final ProductDESProxyFactory factory)
   {
     this(null, factory);
   }
 
-  public ComposeControllabilityChecker(final ProductDESProxy model,
-                                       final ProductDESProxyFactory factory)
+  public ComposingControllabilityChecker(final ProductDESProxy model,
+                                         final ProductDESProxyFactory factory)
   {
     super(model, ControllabilityKindTranslator.getInstance(), factory);
     cModel = new ConvertModel();
   }
   
   public ProductDESProxy getConvertedModel() {
-    final ConvertModel convertModel = new ConvertModel(getModel(), 
-                                                       ControllabilityKindTranslator.getInstance(), 
-                                                       getFactory());
-    ProductDESProxy desConverted = convertModel.run();
-    setCmodel(convertModel);
-    return desConverted;
+    cModel = new ConvertModel(getModel(), 
+				                      ControllabilityKindTranslator.getInstance(), 
+				                      getFactory());  
+	  return cModel.run(); 
   }
   
   public List<EventProxy> convertTrace(List<EventProxy> trace) {
-    EventProxy ne = getCmodel().getOriginalEvent(trace.get(trace.size()-1)); 
+    EventProxy ne = cModel.getOriginalEvent(trace.get(trace.size()-1)); 
     trace.remove(trace.size()-1);
     trace.add(ne);
     return trace;
-  }
-  
-  private void setCmodel(ConvertModel cm) {
-    cModel = cm;
-  }
-  
-  private ConvertModel getCmodel() {
-    return cModel;
   }
 
   private ConvertModel cModel;
