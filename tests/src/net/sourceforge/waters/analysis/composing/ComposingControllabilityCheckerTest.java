@@ -1,3 +1,12 @@
+//# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
+//###########################################################################
+//# PROJECT: Waters
+//# PACKAGE: net.sourceforge.waters.analysis.modular
+//# CLASS:   ComposingControllabilityCheckerTest
+//###########################################################################
+//# $Id$
+//###########################################################################
+
 package net.sourceforge.waters.analysis.composing;
 
 import junit.framework.Test;
@@ -7,7 +16,7 @@ import net.sourceforge.waters.model.analysis.AbstractControllabilityCheckerTest;
 import net.sourceforge.waters.model.analysis.ControllabilityChecker;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 
-public class ComposeControllabilityCheckerTest
+public class ComposingControllabilityCheckerTest
   extends AbstractControllabilityCheckerTest {
 
   //#########################################################################
@@ -15,7 +24,7 @@ public class ComposeControllabilityCheckerTest
   public static Test suite()
   {
     TestSuite testSuite =
-      new TestSuite(ComposeControllabilityCheckerTest.class);
+      new TestSuite(ComposingControllabilityCheckerTest.class);
     return testSuite;
   }
 
@@ -31,7 +40,7 @@ public class ComposeControllabilityCheckerTest
     (final ProductDESProxyFactory factory)
   {
     return
-      new ComposeControllabilityChecker(null, factory);
+      new ComposingControllabilityChecker(null, factory);
   }
 
 }

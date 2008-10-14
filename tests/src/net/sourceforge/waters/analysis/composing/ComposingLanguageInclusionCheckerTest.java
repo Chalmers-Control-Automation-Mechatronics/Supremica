@@ -2,9 +2,9 @@
 //###########################################################################
 //# PROJECT: Waters
 //# PACKAGE: net.sourceforge.waters.analysis.modular
-//# CLASS:   ComposeLanguageInclusionCheckerTest
+//# CLASS:   ComposingLanguageInclusionCheckerTest
 //###########################################################################
-//# $Id: ComposeLanguageInclusionCheckerTest.java,v 1.6 2008-06-30 01:50:57 robi Exp $
+//# $Id: ComposingLanguageInclusionCheckerTest.java,v 1.6 2008-06-30 01:50:57 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.analysis.composing;
@@ -18,7 +18,7 @@ import net.sourceforge.waters.model.analysis.
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 
 
-public class ComposeLanguageInclusionCheckerTest
+public class ComposingLanguageInclusionCheckerTest
   extends AbstractLanguageInclusionCheckerTest
 {
 
@@ -26,7 +26,7 @@ public class ComposeLanguageInclusionCheckerTest
   //# Entry points in junit.framework.TestCase
   public static Test suite() {
     TestSuite testSuite =
-      new TestSuite(ComposeLanguageInclusionCheckerTest.class);
+      new TestSuite(ComposingLanguageInclusionCheckerTest.class);
     return testSuite;
   }
 
@@ -38,11 +38,11 @@ public class ComposeLanguageInclusionCheckerTest
   //#########################################################################
   //# Overrides for abstract base class
   //# net.sourceforge.waters.analysis.AbstractModelVerifierTest
-  protected ComposeLanguageInclusionChecker createModelVerifier
+  protected ComposingLanguageInclusionChecker createModelVerifier
     (final ProductDESProxyFactory factory)
   {
-    final ComposeModelVerifierFactory checkerfactory =
-      ComposeModelVerifierFactory.getInstance();
+    final ComposingModelVerifierFactory checkerfactory =
+      ComposingModelVerifierFactory.getInstance();
     return checkerfactory.createLanguageInclusionChecker(factory);
   }
 
