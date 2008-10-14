@@ -81,8 +81,8 @@ public class ComposingLanguageInclusionChecker
                getFactory().createSafetyTraceProxy(tracename, mModel, composedTrace); 
 	        return setFailedResult(fixedCounterexample); 
 	      } 
-	  }	  
-	  return setSatisfiedResult();  
+    }	  
+    return setSatisfiedResult();  
   }
   
   public ProductDESProxy getConvertedModel() {
@@ -90,6 +90,10 @@ public class ComposingLanguageInclusionChecker
 				                          LanguageInclusionKindTranslator.getInstance(), 
 				                          getFactory());  
 	  return cModel.run(); 
+  }
+
+  public KindTranslator getConvertedKindTranslator() {
+    return LanguageInclusionKindTranslator.getInstance();
   }
   
   public List<EventProxy> convertTrace(List<EventProxy> trace) {

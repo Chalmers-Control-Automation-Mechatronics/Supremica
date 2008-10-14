@@ -12,6 +12,8 @@ package net.sourceforge.waters.analysis.composing;
 import java.util.List;
 
 import net.sourceforge.waters.model.analysis.AbstractModelVerifierFactory;
+import net.sourceforge.waters.model.analysis.CommandLineArgumentInteger;
+import net.sourceforge.waters.model.analysis.ModelVerifier;
 import net.sourceforge.waters.model.analysis.ModelVerifierFactory;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 
@@ -35,6 +37,7 @@ public class ComposingModelVerifierFactory
   private ComposingModelVerifierFactory(final List<String> arglist)
   {
     super(arglist);
+    addArgument(new LimitArgument());
   }
 
 
@@ -67,6 +70,32 @@ public class ComposingModelVerifierFactory
     getInstance(final List<String> cmdline)
   {
     return new ComposingModelVerifierFactory(cmdline);
+  }
+
+
+  //#########################################################################
+  //# Inner Class LimitArgument
+  private static class LimitArgument extends CommandLineArgumentInteger
+  {
+    //#######################################################################
+    //# Constructors
+    private LimitArgument()
+    {
+      super("-plimit",
+            "Maximum number of states/nodes explored");
+    }
+
+    //#######################################################################
+    //# Overrides for Abstract Base Class
+    //# net.sourceforge.waters.model.analysis.CommandLineArgument
+    protected void assign(final ModelVerifier verifier)
+    {
+      final ComposingSafetyVerifier composing =
+        (ComposingSafetyVerifier) verifier;
+      final int limit = getValue();
+      composing.setProjectionNodeLimit(limit);
+    }
+
   }
 
 

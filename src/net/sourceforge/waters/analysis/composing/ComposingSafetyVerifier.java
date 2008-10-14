@@ -55,6 +55,7 @@ public class ComposingSafetyVerifier
     super(model, factory); 
     mTranslator = translator; 
     setNodeLimit(10000000);    
+    setProjectionNodeLimit(3000);    
   }
   
   
@@ -72,12 +73,29 @@ public class ComposingSafetyVerifier
     mTranslator = trans;
   }
 
+  public int getProjectionNodeLimit()
+  {
+    if (getNodeLimit() < mProjectionNodeLimit) {
+      return getNodeLimit();
+    } else {
+      return mProjectionNodeLimit;
+    }
+  }
+
+  public void setProjectionNodeLimit(final int limit)
+  {
+    mProjectionNodeLimit = limit;
+  }
+
 
   //#########################################################################
   //# Invocation
   public boolean run() throws AnalysisException {        
-    final Composing composing = new Composing(getConvertedModel(), mTranslator, getFactory());
-    composing.setNodeLimit(getNodeLimit());     
+    final Composing composing =
+      new Composing(getConvertedModel(),
+		    getConvertedKindTranslator(),
+		    getFactory());
+    composing.setNodeLimit(getProjectionNodeLimit());     
     ProductDESProxy des = composing.run(); 
     System.out.println("Composing is done!"); 
     
@@ -99,7 +117,8 @@ public class ComposingSafetyVerifier
     
      
     final SafetyVerifier checker =
-      new NativeSafetyVerifier(des, mTranslator, getFactory());
+      new NativeSafetyVerifier(des, getConvertedKindTranslator(),
+			       getFactory());
       //new BDDSafetyVerifier(des, mTranslator, getFactory());
     checker.setNodeLimit(getNodeLimit());        
     final boolean result = checker.run(); 
@@ -313,6 +332,10 @@ public class ComposingSafetyVerifier
     return getModel();
   }
   
+  public KindTranslator getConvertedKindTranslator() {
+    return getKindTranslator();
+  }
+  
   public List<EventProxy> convertTrace(List<EventProxy> trace) {
     return trace;
   }
@@ -344,8 +367,11 @@ public class ComposingSafetyVerifier
   }
 
   
-  private KindTranslator mTranslator; 
-  private int mStates; 
+  private KindTranslator mTranslator;
+  private int mProjectionNodeLimit;
+  private int mStates;
+
+
   //#########################################################################
   //# Class Constants
   private static final Logger LOGGER =

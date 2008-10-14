@@ -170,11 +170,7 @@ public class Composing {
   }
   
   public void setNodeLimit(final int limit) {    
-    if (limit > 3000) {
-      nodelimit = 3000;
-    } else {
-      nodelimit = limit;
-    }
+    nodelimit = limit;
   }
   
   private void project (Candidate can) throws AnalysisException {
