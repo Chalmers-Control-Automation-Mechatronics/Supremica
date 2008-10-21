@@ -10,6 +10,7 @@ package org.supremica.external.avocades.relationextraction;
 import java.util.*;
 import org.jdom.*;
 
+import java.util.Hashtable;
 
 /*-----------------------------------------------------------------------------
  * 
@@ -81,7 +82,9 @@ public ArrayList extractRestrictions(Document sup, ArrayList ROPs)
 	/* opMatch contains a matching between operation names and start-event IDs.
 	In each place lies an arrayList containing two strings, the operation name in
 	place 0 and the corresponding start-event ID in place 1. */
-	List opMatch = new ArrayList();
+	
+	/* Key is operation name who gives the operation id */
+	Hashtable<String, String> opMatch = new Hashtable<String, String>();
 
 	int i = 0;
 	for(Iterator eventIter = eventList.iterator(); eventIter.hasNext(); )
@@ -96,16 +99,16 @@ public ArrayList extractRestrictions(Document sup, ArrayList ROPs)
 				String eventId = event.getAttributeValue("id");
 				String opName = eventLabel.substring(OPERATION_START_PREFIX.length());
 				
-				//EFA fix
-				if( opName.contains("_") ){
-					opName = opName.substring( 0, opName.indexOf("_") );
-				}
-				//End EFA fix
 				
-				List opAndEvent = new ArrayList();
-				opAndEvent.add(0,opName);
-				opAndEvent.add(1,eventId);
-				opMatch.add(i, opAndEvent);
+				if( opName.contains("_") ){
+					//EFA fix
+					opName = opName.substring( 0, opName.indexOf("_") );
+					//End EFA fix
+					opMatch.put(opName, eventId);
+				} else {
+					opMatch.put(opName, eventId);
+				}
+				
 				i++;
 			}
 			else if(!eventLabel.substring(0,OPERATION_STOP_PREFIX.length()).equals(OPERATION_STOP_PREFIX))
@@ -115,35 +118,28 @@ public ArrayList extractRestrictions(Document sup, ArrayList ROPs)
 	}
 
 	/* For all operations, find the restrictions for their starting. */
-	for(Iterator matchIter = opMatch.iterator(); matchIter.hasNext(); )
+	for(Iterator<String> matchIter = opMatch.keySet().iterator(); matchIter.hasNext(); )
 	{
 		Restriction restr = new Restriction();
-		ArrayList m = (ArrayList) matchIter.next();
-		String eventId = (String) m.get(1);
-
-		Object dummy = m.get(1);
-		String opId = dummy.toString(); // Get id of the operation
-		dummy = m.get(0);
-		String opName = dummy.toString();
-		restr.opId = opId;
-		restr.opName = opName;
+		
+		restr.opName = matchIter.next();
+		restr.opId = opMatch.get( restr.opName ); // Get id of the operation
 		
 		//debug
-		//System.out.println("OpId: " + opId);
-		//System.out.println("OpName: " + opName);
+		//System.out.println("OpId: " + restr.opId);
+		//System.out.println("OpName: " + restr.opName);
 		//System.out.println("--");
 		//debug
 
 		/* Get the supervisor states where eventId is enabled, e.g. q0 and q2 */
-		List enabledInSupStates = getSupervisorStates(theSupervisor, eventId);
+		List<String> enabledInSupStates = getSupervisorStates(theSupervisor, restr.opId);
 
-		List enabledInModelStates = getModelStates(enabledInSupStates, eventId, opMatch);
+		List enabledInModelStates = getModelStates(enabledInSupStates, restr.opId, opMatch);
 
 		restr.restrictions = enabledInModelStates;
 		//printList(enabledInModelStates);
 		restrList.add(restr);
 	}
-
 
 	ArrayList simpleRestr = simplify((ArrayList) restrList);
 
@@ -160,7 +156,7 @@ public ArrayList extractRestrictions(Document sup, ArrayList ROPs)
 *
 ******************************************************/
 
-public ArrayList getSupervisorStates(Element sup, String eventId)
+public ArrayList<String> getSupervisorStates(Element sup, String eventId)
 {
 	//ArrayList enabledInStateIds = new ArrayList();
 	ArrayList enabledInStates = new ArrayList();
@@ -222,7 +218,7 @@ public ArrayList getSupervisorStates(Element sup, String eventId)
 *
 ******************************************************/
 
-public ArrayList getModelStates(List supStates, String eventId, List match)
+public ArrayList getModelStates(List supStates, String eventId, Hashtable<String, String> match)
 {
 	/* For each of the operations in the system, find out what state it has in
 	each of the supervisor states listed in supStates. Create an entry that
@@ -233,14 +229,20 @@ public ArrayList getModelStates(List supStates, String eventId, List match)
 
 	int i = 0;
 	// For all operations
-	for(Iterator matchIter = match.iterator(); matchIter.hasNext(); )
+	for(Iterator<String> matchIter = match.keySet().iterator(); matchIter.hasNext(); )
 	{
 		ArrayList operationStates = new ArrayList();
+		
+		/*
 		ArrayList m = (ArrayList) matchIter.next();
 		Object dummy = m.get(1);
-		String opId = dummy.toString(); // Get id of the operation
+		
 		dummy = m.get(0);
-		String opName = dummy.toString();
+		*/
+		
+		String opName = matchIter.next();
+		String opId = match.get( opName ); // Get id of the operation
+		
 		operationStates.add(0, opId); // Put id and name in restriction list
 		operationStates.add(1, opName);
 
