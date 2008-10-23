@@ -24,7 +24,7 @@
             location="${supremica.lib}/jsr173_1.0_api.jar"/>
   <property name="log4j.jar" location="${supremica.lib}/log4j.jar"/>
   <property name="junit.jar" location="${supremica.lib}/junit-4.4.jar"/>
-  <property name="trove.jar" location="${supremica.lib}/trove.jar"/>
+  <property name="trove.jar" location="${supremica.lib}/trove-2.0.4.jar"/>
 
   <path id="jaxb.classpath">
     <pathelement location="${activation.jar}"/>

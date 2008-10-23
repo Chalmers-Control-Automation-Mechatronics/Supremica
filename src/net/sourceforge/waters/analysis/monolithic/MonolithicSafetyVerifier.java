@@ -261,7 +261,7 @@ public class MonolithicSafetyVerifier
   private boolean isControllable(int[] sState)
     throws OverflowException
   {
-    THashSet systemSet = new THashSet();
+    THashSet<StateTuple> systemSet = new THashSet<StateTuple>();
     boolean enabled = true;
 
     // Add the initial synchronous product in systemSet and mStateSpace

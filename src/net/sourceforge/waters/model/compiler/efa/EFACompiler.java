@@ -117,7 +117,7 @@ import net.sourceforge.waters.xsd.base.EventKind;
  *         as <CODE>a&nbsp;&amp;&nbsp;b(</CODE><I>x</I><CODE>)</CODE> where
  *         <CODE>a</CODE> does not depend on&nbsp;<I>x</I>, and
  *         <CODE>b(</CODE><I>x</I><CODE>)</CODE> is an expression that
- *         depends on no variables except&nbsp;<I>x</I>, an is the same for
+ *         depends on no variables except&nbsp;<I>x</I>, and is the same for
  *         all guards associated with the given event in the automaton, then
  *         the variable&nbsp;<I>x</I> is not a checked component for that
  *         event. In this case the update operation for the
@@ -527,17 +527,11 @@ public class EFACompiler
       final CompiledGuardCollection oldguard = mCollectedEvents.get(event);
       if (oldguard == null) {
         final CompiledGuardCollection newguard =
-          mCurrentEdge == null ?
-          new CompiledGuardCollection(mCurrentComponent, mCurrentGuard) :
           new CompiledGuardCollection(mCurrentComponent, mCurrentGuard,
                                       mCurrentEdge);
         mCollectedEvents.put(event, newguard);
       } else {
-        if (mCurrentEdge == null) {
-          oldguard.addGuard(mCurrentGuard);
-        } else {
-          oldguard.addGuard(mCurrentGuard, mCurrentEdge);
-        }
+        oldguard.addGuard(mCurrentGuard, mCurrentEdge);
       }
     }
 

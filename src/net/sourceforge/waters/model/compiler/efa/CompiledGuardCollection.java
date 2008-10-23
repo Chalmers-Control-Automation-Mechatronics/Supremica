@@ -24,7 +24,7 @@ import net.sourceforge.waters.model.module.SimpleComponentProxy;
 
 
 /**
- * A compiler-internal representation of a set of guard/action relations
+ * A compiler-internal representation of a set of guard/action relations,
  * all related to the same event in an automaton.
  *
  * @author Robi Malik
@@ -44,8 +44,7 @@ class CompiledGuardCollection
   CompiledGuardCollection(final SimpleComponentProxy comp,
                           final CompiledNormalForm cnf)
   {
-    this(comp);
-    addGuard(cnf);
+    this(comp, cnf, null);
   }
 
   CompiledGuardCollection(final SimpleComponentProxy comp,
@@ -61,11 +60,7 @@ class CompiledGuardCollection
   //# Simple Access
   void addGuard(final CompiledNormalForm cnf)
   {
-    final CompiledGuard oldguard = mMap.get(cnf);
-    if (oldguard == null) {
-      final CompiledGuard newguard = new CompiledGuard(cnf);
-      mMap.put(cnf, newguard);
-    }
+    addGuard(cnf, null);
   }
 
   void addGuard(final CompiledNormalForm cnf, final EdgeProxy edge)

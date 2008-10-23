@@ -24,6 +24,34 @@ import net.sourceforge.waters.model.module.IdentifierProxy;
 import net.sourceforge.waters.xsd.base.EventKind;
 
 
+/**
+ * <P>A compiler-internal representation of an event group in a system
+ * of synchronised EFA.</P>
+ *
+ * <P>Each compiled event represents a single event declaration ({@link
+ * EventDeclProxy}) of the input module, which has been flattened so as not
+ * to allow any further array indexes. EFA compilation may split this
+ * event, creating individual events for different value combinations of
+ * EFA variable components ({@link
+ * net.sourceforge.waters.model.module.VariableComponentProxy
+ * VariableComponentProxy}).</P>
+ *
+ * <P>The compiled event data structure collects the information needed to
+ * determine how to split an event, and which transitions are to be
+ * associated with the resultant output events. It contains the following
+ * information:</P>
+ * <UL>
+ * <LI>The <I>event variable set</I>, consisting of all the variables
+ *     whose value may change when this event occurs.</LI>
+ * <LI>A <I>collection of guards</I> ({@link CompiledGuardCollection}),
+ *     grouping together combinations of guards and transitions used for
+ *     this event in different automata of the model.</LI>
+ * </UL>
+ *
+ * @see {@link EFACompiler}.
+ * @author Robi Malik
+ */
+
 class CompiledEvent {
 
   //#########################################################################
@@ -79,8 +107,22 @@ class CompiledEvent {
 
   //#########################################################################
   //# Data Members
+  /**
+   * The event declaration in the input module,
+   * from which this event is being compiled.
+   */
   private final EventDeclProxy mEventDecl;
+  /**
+   * The <I>event variable set</I>, consisting of all the variables
+   * whose value may change when this event occurs.
+   * @see {@link EFACompiler}.
+   */
   private final ProxyAccessorMap<IdentifierProxy> mVariables;
+  /**
+   * The collection of guards associated with these event.
+   * Each element of this list represents the guards and transitions
+   * in one particular automaton ({@link SimplecomponentProxy}).
+   */
   private final Collection<CompiledGuardCollection> mGuardCollections;
   /**
    * Additional conjuncts in CNF.

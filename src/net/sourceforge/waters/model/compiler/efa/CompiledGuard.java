@@ -32,13 +32,13 @@ class CompiledGuard
   //# Constructors
   CompiledGuard(final CompiledNormalForm cnf)
   {
-    mCNF = cnf;
-    mEdges = new LinkedList<EdgeProxy>();
+    this(cnf, null);
   }
 
   CompiledGuard(final CompiledNormalForm cnf, final EdgeProxy edge)
   {
-    this(cnf);
+    mCNF = cnf;
+    mEdges = new LinkedList<EdgeProxy>();
     addEdge(edge);
   }
 
@@ -57,7 +57,9 @@ class CompiledGuard
 
   void addEdge(final EdgeProxy edge)
   {
-    mEdges.add(edge);
+    if (edge != null) {
+      mEdges.add(edge);
+    }
   }
 
 

@@ -82,7 +82,7 @@ public class ComposingModelVerifierFactory
     private LimitArgument()
     {
       super("-plimit",
-            "Maximum number of states/nodes explored");
+            "Maximum number of states constructed in projection attempts");
     }
 
     //#######################################################################
