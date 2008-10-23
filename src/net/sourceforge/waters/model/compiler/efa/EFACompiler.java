@@ -559,8 +559,18 @@ public class EFACompiler
 
   private ModuleBindingContext mRootContext;
   // Pass 1
+  /**
+   * A map that assigns to each identifier of a variable component {@link
+   * VariableComponentProxy} or simple component {@link
+   * SimpleComponentProxy} the computed range of its state space.
+   */
   private Map<ProxyAccessor<IdentifierProxy>,CompiledRange> mRangeMap;
   // Pass 2
+  /**
+   * A map that assigns to each identifier of a event declaration {@link
+   * EventDeclProxy} the information about its event variable set and
+   * associated guards.
+   */
   private Map<ProxyAccessor<IdentifierProxy>,CompiledEvent> mEventMap;
 
 }
