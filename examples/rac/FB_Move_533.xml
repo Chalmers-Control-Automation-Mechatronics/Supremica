@@ -10,7 +10,7 @@
               creationDateTime="2008-03-19T20:31:26"/>
   <contentHeader name="Cell Example "
                  version="1.0"
-                 modificationDateTime="2008-05-30T23:21:46"
+                 modificationDateTime="2008-07-18T00:08:51"
                  organization="SS2"
                  author="CTH SS2"
                  language="en-US">
@@ -1515,6 +1515,8 @@
                 <simpleValue value="FALSE"/>
               </initialValue>
             </variable>
+          </localVars>
+          <outputVars>
             <variable name="OutputFwd">
               <type>
                 <BOOL/>
@@ -1539,8 +1541,6 @@
                 <simpleValue value="FALSE"/>
               </initialValue>
             </variable>
-          </localVars>
-          <outputVars>
             <variable name="TimeOutRev">
               <type>
                 <BOOL/>
