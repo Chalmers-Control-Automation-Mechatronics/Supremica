@@ -34,6 +34,8 @@ public interface ProxyAccessorMap<P extends Proxy>
 
   public boolean addAll(Collection<? extends P> collection);
 
+  public boolean addAll(ProxyAccessorMap<? extends P> map);
+
   public boolean containsProxy(Object item);
 
   public boolean containsAll(Collection<?> collection);
@@ -47,5 +49,7 @@ public interface ProxyAccessorMap<P extends Proxy>
   public boolean removeProxy(Object item);
 
   public boolean removeAll(Collection<?> collection);
+
+  public boolean removeAll(ProxyAccessorMap<? extends P> map);
 
 }

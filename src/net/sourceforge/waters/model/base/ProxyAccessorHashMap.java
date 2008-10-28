@@ -94,6 +94,20 @@ public abstract class ProxyAccessorHashMap<P extends Proxy>
     return result;
   }
 
+  @SuppressWarnings("unchecked")
+  public boolean addAll(final ProxyAccessorMap<? extends P> map)
+  {
+    boolean result = false;
+    for (final ProxyAccessor<? extends P> accessor : map.keySet()) {
+      if (!containsKey(accessor)) {
+        final P proxy = accessor.getProxy();
+        put((ProxyAccessor<P>) accessor, proxy);
+        result = true;
+      }
+    }
+    return result;
+  }
+
   public boolean containsProxy(final Object item)
   {
     if (item instanceof Proxy) {
@@ -138,8 +152,7 @@ public abstract class ProxyAccessorHashMap<P extends Proxy>
     if (item instanceof Proxy) {
       final Proxy proxy = (Proxy) item;
       final ProxyAccessor<Proxy> accessor = createAccessor(proxy);
-      if (containsKey(accessor)) {
-        remove(accessor);
+      if (remove(accessor) != null) {
         return true;
       }
     }
@@ -151,6 +164,17 @@ public abstract class ProxyAccessorHashMap<P extends Proxy>
     boolean result = false;
     for (final Object item : collection) {
       if (removeProxy(item)) {
+        result = true;
+      }
+    }
+    return result;
+  }
+
+  public boolean removeAll(final ProxyAccessorMap<? extends P> map)
+  {
+    boolean result = false;
+    for (final ProxyAccessor<? extends P> accessor : map.keySet()) {
+      if (remove(accessor) != null) {
         result = true;
       }
     }
