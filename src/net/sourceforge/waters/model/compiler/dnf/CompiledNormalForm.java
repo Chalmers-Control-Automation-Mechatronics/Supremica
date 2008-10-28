@@ -13,11 +13,51 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
+import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
 import net.sourceforge.waters.model.expr.BinaryOperator;
 
 
 public class CompiledNormalForm implements Cloneable
 {
+
+  //#########################################################################
+  //# Static Access
+  public static CompiledNormalForm getTrueCNF()
+  {
+    final CompilerOperatorTable optable = CompilerOperatorTable.getInstance();
+    final BinaryOperator andop = optable.getAndOperator();
+    return new CompiledNormalForm(andop);
+  }
+
+  public static CompiledNormalForm getTrueDNF()
+  {
+    final CompilerOperatorTable optable = CompilerOperatorTable.getInstance();
+    final BinaryOperator andop = optable.getAndOperator();
+    final BinaryOperator orop = optable.getOrOperator();
+    final CompiledNormalForm dnf = new CompiledNormalForm(orop);
+    final CompiledClause clause = new CompiledClause(andop);
+    dnf.add(clause);
+    return dnf;
+  }
+
+  public static CompiledNormalForm getFalseCNF()
+  {
+    final CompilerOperatorTable optable = CompilerOperatorTable.getInstance();
+    final BinaryOperator andop = optable.getAndOperator();
+    final BinaryOperator orop = optable.getOrOperator();
+    final CompiledNormalForm cnf = new CompiledNormalForm(andop);
+    final CompiledClause clause = new CompiledClause(orop);
+    cnf.add(clause);
+    return cnf;
+  }
+
+  public static CompiledNormalForm getFalseDNF()
+  {
+    final CompilerOperatorTable optable = CompilerOperatorTable.getInstance();
+    final BinaryOperator orop = optable.getAndOperator();
+    return new CompiledNormalForm(orop);
+  }
+
 
   //#########################################################################
   //# Constructors
@@ -107,6 +147,26 @@ public class CompiledNormalForm implements Cloneable
   public Collection<CompiledClause> getClauses()
   {
     return mClauses;
+  }
+
+  public boolean isTrue()
+  {
+    final CompilerOperatorTable optable = CompilerOperatorTable.getInstance();
+    if (mOperator == optable.getAndOperator()) {
+      return isEmpty();
+    } else {
+      return size() == 1 && mClauses.iterator().next().isEmpty();
+    }
+  }
+
+  public boolean isFalse()
+  {
+    final CompilerOperatorTable optable = CompilerOperatorTable.getInstance();
+    if (mOperator == optable.getOrOperator()) {
+      return isEmpty();
+    } else {
+      return size() == 1 && mClauses.iterator().next().isEmpty();
+    }
   }
 
 

@@ -9,6 +9,7 @@
 
 package net.sourceforge.waters.model.compiler.efa;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -40,30 +41,52 @@ class GuardCompiler
     mOpTable = optable;
     mDNFConverter = new DNFConverter(factory, optable);
     mCache =
-      new HashMap<ProxyAccessor<GuardActionBlockProxy>,CompiledNormalForm>();
+      new HashMap<ProxyAccessor<GuardActionBlockProxy>,CompiledGuard>();
   }
 
 
   //#########################################################################
   //# Invocation
-  CompiledNormalForm getCompiledGuard(final GuardActionBlockProxy block)
+  CompiledGuard getCompiledGuard(final GuardActionBlockProxy block)
     throws EvalException
   {
     final ProxyAccessor<GuardActionBlockProxy> accessor =
       new ProxyAccessorByContents<GuardActionBlockProxy>(block);
-    final CompiledNormalForm cached = mCache.get(accessor);
+    final CompiledGuard cached = mCache.get(accessor);
     if (cached != null) {
       return cached;
     }
-    final CompiledNormalForm cnf = computeNormalForm(block);
-    mCache.put(accessor, cnf);
-    return cnf;
+    final CompiledGuard result = computeNormalForm(block);
+    mCache.put(accessor, result);
+    return result;
+  }
+
+  CompiledGuard getComplementaryGuard
+    (final Collection<SimpleExpressionProxy> guards)
+    throws EvalException
+  {
+    SimpleExpressionProxy expr = null;
+    final UnaryOperator notop = mOpTable.getNotOperator();
+    for (final SimpleExpressionProxy guard : guards) {
+      final SimpleExpressionProxy notguard =
+        mFactory.createUnaryExpressionProxy(notop, guard);
+      expr = combine(expr, notguard);
+    }
+    if (expr == null) {
+      return null;
+    }
+    final CompiledNormalForm dnf = mDNFConverter.convertToDNF(expr);
+    if (dnf.isFalse()) {
+      return null;
+    } else {
+      return new CompiledGuard(expr, dnf);
+    }
   }
 
 
   //#########################################################################
   //# Auxiliary Methods
-  private CompiledNormalForm computeNormalForm
+  private CompiledGuard computeNormalForm
     (final GuardActionBlockProxy block)
     throws EvalException
   {
@@ -75,12 +98,12 @@ class GuardCompiler
       final SimpleExpressionProxy norm = convertAction(action);
       expr = combine(expr, norm);
     }
-    if (expr != null) {
-      return mDNFConverter.convertToCNF(expr);
-    } else {
+    if (expr == null) {
       throw new ActionSyntaxException("Empty guard/action block encountered!",
                                       block);
     }
+    final CompiledNormalForm dnf = mDNFConverter.convertToDNF(expr);
+    return new CompiledGuard(expr, dnf);
   }
 
   private SimpleExpressionProxy combine(final SimpleExpressionProxy lhs,
@@ -108,15 +131,16 @@ class GuardCompiler
     final SimpleExpressionProxy expr = action.getRight();
     final BinaryOperator assignment = action.getOperator();
     final BinaryOperator op = mOpTable.getAssigningOperator(assignment);
-    final BinaryOperator eqop = mOpTable.getAssignmentOperator();
+    final BinaryOperator assop = mOpTable.getAssignmentOperator();
     final SimpleExpressionProxy newexpr;
-    if (op != null) {
-      newexpr = mFactory.createBinaryExpressionProxy(op, ident, expr);
-    } else if (op == eqop) {
+    if (op == assop) {
       newexpr = expr;
+    } else if (op != null) {
+      newexpr = mFactory.createBinaryExpressionProxy(op, ident, expr);
     } else {
       throw new ActionSyntaxException(action);
     }
+    final BinaryOperator eqop = mOpTable.getEqualsOperator();
     final UnaryOperator nextop = mOpTable.getNextOperator();
     final UnaryExpressionProxy nextident =
       mFactory.createUnaryExpressionProxy(nextop, ident);
@@ -130,7 +154,6 @@ class GuardCompiler
   private final CompilerOperatorTable mOpTable;
   private final DNFConverter mDNFConverter;
 
-  private final Map<ProxyAccessor<GuardActionBlockProxy>,CompiledNormalForm>
-    mCache;
+  private final Map<ProxyAccessor<GuardActionBlockProxy>,CompiledGuard> mCache;
 
 }

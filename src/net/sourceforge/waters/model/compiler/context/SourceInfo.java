@@ -19,7 +19,7 @@ import net.sourceforge.waters.model.base.Proxy;
  *
  * <P>Each item in the compiler output is associated with a source
  * information record that enables the user to trace from which item in the
- * original module the compiled item was produced, and which binding were
+ * original module the compiled item was produced, and which bindings were
  * used. More specifically, the items of a {@link
  * net.sourceforge.waters.model.des.ProductDESProxy ProductDESProxy} are
  * associated with <CODE>SourceInfo</CODE> records as follows.</P>

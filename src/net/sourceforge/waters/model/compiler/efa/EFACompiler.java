@@ -33,7 +33,6 @@ import net.sourceforge.waters.model.compiler.context.
 import net.sourceforge.waters.model.compiler.context.ModuleBindingContext;
 import net.sourceforge.waters.model.compiler.context.SimpleExpressionCompiler;
 import net.sourceforge.waters.model.compiler.context.SourceInfoBuilder;
-import net.sourceforge.waters.model.compiler.dnf.CompiledNormalForm;
 import net.sourceforge.waters.model.expr.EvalException;
 import net.sourceforge.waters.model.module.AbstractModuleProxyVisitor;
 import net.sourceforge.waters.model.module.BinaryExpressionProxy;
@@ -157,7 +156,7 @@ public class EFACompiler
     mFactory = factory;
     mSourceInfoBuilder = builder;
     mOperatorTable = CompilerOperatorTable.getInstance();
-    mTrueCNF = new CompiledNormalForm(mOperatorTable.getAndOperator());
+    mTrueGuard = new CompiledGuard();
     mSimpleExpressionCompiler =
       new SimpleExpressionCompiler(mFactory, mOperatorTable);
     mGuardCompiler = new GuardCompiler(mFactory, mOperatorTable);
@@ -223,7 +222,7 @@ public class EFACompiler
   }
 
   private void insertEvent(final IdentifierProxy ident,
-                           final CompiledEvent event)
+                           final EFAEvent event)
     throws DuplicateIdentifierException
   {
     final ProxyAccessor<IdentifierProxy> accessor =
@@ -235,12 +234,12 @@ public class EFACompiler
     }
   }
 
-  private CompiledEvent findEvent(final IdentifierProxy ident)
+  private EFAEvent findEvent(final IdentifierProxy ident)
     throws UndefinedIdentifierException
   {
     final ProxyAccessor<IdentifierProxy> accessor =
       new ProxyAccessorByContents<IdentifierProxy>(ident);
-    final CompiledEvent event = mEventMap.get(accessor);
+    final EFAEvent event = mEventMap.get(accessor);
     if (event == null) {
       throw new UndefinedIdentifierException(ident, "event");
     } else {
@@ -370,7 +369,7 @@ public class EFACompiler
     {
       try {
         mCurrentEdge = edge;
-        mCurrentGuard = mTrueCNF;
+        mCurrentGuard = mTrueGuard;
         final GuardActionBlockProxy ga = edge.getGuardActionBlock();
         final LabelBlockProxy block = edge.getLabelBlock();
         if (mIsUsingEventAlphabet) {
@@ -397,12 +396,12 @@ public class EFACompiler
       }
     }
 
-    public CompiledEvent visitEventDeclProxy(final EventDeclProxy decl)
+    public EFAEvent visitEventDeclProxy(final EventDeclProxy decl)
       throws VisitorException
     {
       try {
         final IdentifierProxy ident = decl.getIdentifier();
-        final CompiledEvent event = new CompiledEvent(decl, mOperatorTable);
+        final EFAEvent event = new EFAEvent(decl);
         insertEvent(ident, event);
         return event;
       } catch (final DuplicateIdentifierException exception) {
@@ -416,7 +415,7 @@ public class EFACompiler
       final LabelBlockProxy blocked = graph.getBlockedEvents();
       if (blocked != null) {
         try {
-          mCurrentGuard = mTrueCNF;
+          mCurrentGuard = mTrueGuard;
           visitLabelBlockProxy(blocked);
         } finally {
           mCurrentGuard = null;
@@ -427,7 +426,7 @@ public class EFACompiler
       return null;
     }
 
-    public CompiledNormalForm visitGuardActionBlockProxy
+    public CompiledGuard visitGuardActionBlockProxy
       (final GuardActionBlockProxy ga)
       throws VisitorException
     {
@@ -441,15 +440,16 @@ public class EFACompiler
       }
     }
 
-    public CompiledEvent visitIdentifierProxy(final IdentifierProxy ident)
+    public EFAEvent visitIdentifierProxy(final IdentifierProxy ident)
       throws VisitorException
     {
       try {
-        final CompiledEvent event = findEvent(ident);
-        addCollectedEvent(event);
+        final EFAEvent event = findEvent(ident);
+        mCollectedEvents.add(event);
         if (mIsUsingEventAlphabet) {
           event.addVariables(mCollectedVariables.values());
         }
+        event.addTransitions(mCurrentComponent, mCurrentGuard, ident);
         return event;
       } catch (final UndefinedIdentifierException exception) {
         throw wrap(exception);
@@ -470,7 +470,7 @@ public class EFACompiler
       final List<EventDeclProxy> events = module.getEventDeclList();
       final int size = events.size();
       mEventMap =
-        new HashMap<ProxyAccessor<IdentifierProxy>,CompiledEvent>(size);
+        new HashMap<ProxyAccessor<IdentifierProxy>,EFAEvent>(size);
       visitCollection(events);
       final List<Proxy> components = module.getComponentList();
       visitCollection(components);
@@ -481,9 +481,9 @@ public class EFACompiler
       throws VisitorException
     {
       try {
+        final int size = mEventMap.size();
         mCurrentComponent = comp;
-        mCollectedEvents =
-          new HashMap<CompiledEvent,CompiledGuardCollection>();
+        mCollectedEvents = new HashSet<EFAEvent>(size);
         if (!mIsUsingEventAlphabet) {
           mCollectedVariables =
             new ProxyAccessorHashMapByContents<IdentifierProxy>();
@@ -491,23 +491,30 @@ public class EFACompiler
         final ComponentKind ckind = comp.getKind();
         final GraphProxy graph = comp.getGraph();
         visitGraphProxy(graph);
-        for (final Map.Entry<CompiledEvent,CompiledGuardCollection> entry :
-               mCollectedEvents.entrySet()) {
-          final CompiledEvent event = entry.getKey();
-          final EventKind ekind = event.getKind();
-          final CompiledGuardCollection guard = entry.getValue();
+        for (final EFAEvent event : mCollectedEvents) {
           if (!mIsUsingEventAlphabet) {
             event.addVariables(mCollectedVariables.values());
           }
+          final EventKind ekind = event.getKind();
           if (ekind == EventKind.CONTROLLABLE &&
               ckind == ComponentKind.PROPERTY ||
               ekind == EventKind.UNCONTROLLABLE &&
               ckind != ComponentKind.PLANT) {
-            guard.addGuard(mTrueCNF);
+            // Include a catch-all event to be blocked ...
+            final EFATransitionGroup trans = event.getTransitionGroup(comp);
+            final Collection<SimpleExpressionProxy> guards = trans.getGuards();
+            if (guards != null) {
+              final CompiledGuard complement =
+                mGuardCompiler.getComplementaryGuard(guards);
+              if (complement != null) {
+                trans.addTransitions(complement, null);
+              }
+            }
           }
-          event.addGuardCollection(guard);
         }
         return null;
+      } catch (final EvalException exception) {
+        throw wrap(exception);
       } finally {
         mCurrentComponent = null;
         mCollectedEvents = null;
@@ -521,27 +528,12 @@ public class EFACompiler
     }
 
     //#######################################################################
-    //# Auxiliary Methods
-    private void addCollectedEvent(final CompiledEvent event)
-    {
-      final CompiledGuardCollection oldguard = mCollectedEvents.get(event);
-      if (oldguard == null) {
-        final CompiledGuardCollection newguard =
-          new CompiledGuardCollection(mCurrentComponent, mCurrentGuard,
-                                      mCurrentEdge);
-        mCollectedEvents.put(event, newguard);
-      } else {
-        oldguard.addGuard(mCurrentGuard, mCurrentEdge);
-      }
-    }
-
-    //#######################################################################
     //# Data Members
     private SimpleComponentProxy mCurrentComponent;
     private ProxyAccessorMap<IdentifierProxy> mCollectedVariables;
-    private Map<CompiledEvent,CompiledGuardCollection> mCollectedEvents;
+    private Set<EFAEvent> mCollectedEvents;
     private EdgeProxy mCurrentEdge;
-    private CompiledNormalForm mCurrentGuard;
+    private CompiledGuard mCurrentGuard;
   }
 
 
@@ -550,7 +542,7 @@ public class EFACompiler
   private final ModuleProxyFactory mFactory;
   private final SourceInfoBuilder mSourceInfoBuilder;
   private final CompilerOperatorTable mOperatorTable;
-  private final CompiledNormalForm mTrueCNF;
+  private final CompiledGuard mTrueGuard;
   private final SimpleExpressionCompiler mSimpleExpressionCompiler;
   private final GuardCompiler mGuardCompiler;
   private final ModuleProxy mInputModule;
@@ -571,6 +563,6 @@ public class EFACompiler
    * EventDeclProxy} the information about its event variable set and
    * associated guards.
    */
-  private Map<ProxyAccessor<IdentifierProxy>,CompiledEvent> mEventMap;
+  private Map<ProxyAccessor<IdentifierProxy>,EFAEvent> mEventMap;
 
 }
