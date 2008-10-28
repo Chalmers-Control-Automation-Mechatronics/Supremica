@@ -10,7 +10,10 @@
 package net.sourceforge.waters.model.compiler.efa;
 
 import java.util.Collection;
+import java.util.Iterator;
+import java.util.Map;
 
+import net.sourceforge.waters.model.base.ProxyAccessor;
 import net.sourceforge.waters.model.base.ProxyAccessorHashMapByContents;
 import net.sourceforge.waters.model.base.ProxyAccessorMap;
 import net.sourceforge.waters.model.module.IdentifierProxy;
@@ -21,16 +24,53 @@ import net.sourceforge.waters.model.module.UnaryExpressionProxy;
 class EFAVariableCombination {
 
   //#########################################################################
-  //# Constructor
-  EFAVariableCombination(final ProxyAccessorMap<IdentifierProxy> identifiers,
-			 final ProxyAccessorMap<UnaryExpressionProxy> primed)
+  //# Creation
+  static EFAVariableCombination create
+    (final ProxyAccessorMap<SimpleExpressionProxy> contents)
   {
-    final int numident = identifiers.size();
-    final int numprimed = primed.size();
-    mContents = new ProxyAccessorHashMapByContents<SimpleExpressionProxy>
-      (numident + numprimed);
-    mContents.addAll(identifiers);
-    mContents.addAll(primed);
+    switch (contents.size()) {
+    case 0:
+    case 1:
+      return null;
+    case 2:
+      final Iterator<SimpleExpressionProxy> iter =
+        contents.values().iterator();
+      final SimpleExpressionProxy first = iter.next();
+      final SimpleExpressionProxy second = iter.next();
+      if (first instanceof IdentifierProxy &&
+          second instanceof UnaryExpressionProxy) {
+        final UnaryExpressionProxy expr = (UnaryExpressionProxy) second;
+        final SimpleExpressionProxy subterm = expr.getSubTerm();
+        if (first.equalsByContents(subterm)) {
+          return null;
+        } else {
+          return new EFAVariableCombination(contents);
+        }
+      } else if (first instanceof UnaryExpressionProxy &&
+                 second instanceof IdentifierProxy) {
+        final UnaryExpressionProxy expr = (UnaryExpressionProxy) first;
+        final SimpleExpressionProxy subterm = expr.getSubTerm();
+        if (second.equalsByContents(subterm)) {
+          return null;
+        } else {
+          return new EFAVariableCombination(contents);
+        }
+      } else {
+        return new EFAVariableCombination(contents);
+      }
+    default:
+      return new EFAVariableCombination(contents);
+    }
+  }
+
+
+  //#########################################################################
+  //# Constructor
+  private EFAVariableCombination
+    (final ProxyAccessorMap<SimpleExpressionProxy> contents)
+  {
+    mContents =
+      new ProxyAccessorHashMapByContents<SimpleExpressionProxy>(contents);
   }
 
 
@@ -39,6 +79,46 @@ class EFAVariableCombination {
   Collection<SimpleExpressionProxy> getContents()
   {
     return mContents.values();
+  }
+
+  ProxyAccessorMap<SimpleExpressionProxy> getContentsMap()
+  {
+    return mContents;
+  }
+
+  boolean contains(final SimpleExpressionProxy expr)
+  {
+    return mContents.containsProxy(expr);
+  }
+
+  
+  //#########################################################################
+  //# Simplification
+  EFAVariableCombination getReducedCombination
+    (final SimpleExpressionProxy removed)
+  {
+    if (contains(removed)) {
+      final int size = mContents.size();
+      if (size <= 2) {
+        return null;
+      } else {
+        final ProxyAccessorMap<SimpleExpressionProxy> newmap =
+          new ProxyAccessorHashMapByContents<SimpleExpressionProxy>(size - 1);
+        for (final Map.Entry<ProxyAccessor<SimpleExpressionProxy>,
+               SimpleExpressionProxy>
+               entry : mContents.entrySet()) {
+          final SimpleExpressionProxy expr = entry.getValue();
+          if (!expr.equalsByContents(removed)) {
+            final ProxyAccessor<SimpleExpressionProxy> accessor =
+              entry.getKey();
+            newmap.put(accessor, expr);
+          }
+        }
+        return create(newmap);
+      }
+    } else {
+      return this;
+    }
   }
 
 

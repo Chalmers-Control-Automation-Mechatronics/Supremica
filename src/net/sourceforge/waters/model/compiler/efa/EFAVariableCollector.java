@@ -53,9 +53,7 @@ public class EFAVariableCollector extends AbstractModuleProxyVisitor
   EFAVariableCollector(final CompilerOperatorTable optable)
   {
     mNextOperator = optable.getNextOperator();
-    mIdentifiers = new ProxyAccessorHashMapByContents<IdentifierProxy>();
-    mPrimedExpressions =
-      new ProxyAccessorHashMapByContents<UnaryExpressionProxy>();
+    mVariables = new ProxyAccessorHashMapByContents<SimpleExpressionProxy>();
   }
 
 
@@ -81,26 +79,11 @@ public class EFAVariableCollector extends AbstractModuleProxyVisitor
   {
     try {
       expr.acceptVisitor(this);
-      final int numident = mIdentifiers.size();
-      final int numprimed = mPrimedExpressions.size();
-      if (numprimed <= 1 && numident <= 1) {
-        if (numident == 0 || numprimed == 0) {
-          return null;
-        }
-        final IdentifierProxy ident = mIdentifiers.iterator().next();
-        final UnaryExpressionProxy primed =
-          mPrimedExpressions.iterator().next();
-        final SimpleExpressionProxy subterm = primed.getSubTerm();
-        if (ident.equalsByContents(subterm)) {
-          return null;
-        }
-      }
-      return new EFAVariableCombination(mIdentifiers, mPrimedExpressions);
+      return EFAVariableCombination.create(mVariables);
     } catch (final VisitorException exception) {
       throw exception.getRuntimeException();
     } finally {
-      mIdentifiers.clear();
-      mPrimedExpressions.clear();
+      mVariables.clear();
     }
   }
 
@@ -127,7 +110,7 @@ public class EFAVariableCollector extends AbstractModuleProxyVisitor
 
   public Object visitIdentifierProxy(final IdentifierProxy ident)
   {
-    mIdentifiers.addProxy(ident);
+    mVariables.addProxy(ident);
     return null;
   }
 
@@ -135,7 +118,7 @@ public class EFAVariableCollector extends AbstractModuleProxyVisitor
     throws VisitorException
   {
     if (expr.getOperator() == mNextOperator) {
-      mPrimedExpressions.addProxy(expr);
+      mVariables.addProxy(expr);
     } else {
       final SimpleExpressionProxy subterm = expr.getSubTerm();
       subterm.acceptVisitor(this);
@@ -147,7 +130,6 @@ public class EFAVariableCollector extends AbstractModuleProxyVisitor
   //#########################################################################
   //# Data Members
   private final UnaryOperator mNextOperator;
-  private final ProxyAccessorMap<IdentifierProxy> mIdentifiers;
-  private final ProxyAccessorMap<UnaryExpressionProxy> mPrimedExpressions;
+  private final ProxyAccessorMap<SimpleExpressionProxy> mVariables;
 
 }
