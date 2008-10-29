@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.compiler.efa
 //# CLASS:   EFACompiler
 //###########################################################################
-//# $Id: EFACompiler.java,v 1.2 2008-06-28 08:29:58 robi Exp $
+//# $Id$
 //###########################################################################
 
 package net.sourceforge.waters.model.compiler.efa;

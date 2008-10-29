@@ -3,7 +3,7 @@
 //# PACKAGE: net.sourceforge.waters.model.compiler.context
 //# CLASS:   ActionSyntaxException
 //###########################################################################
-//# $Id: ActionSyntaxException.java,v 1.1 2008-06-29 04:01:44 robi Exp $
+//# $Id$
 //###########################################################################
 
 package net.sourceforge.waters.model.compiler.efa;
