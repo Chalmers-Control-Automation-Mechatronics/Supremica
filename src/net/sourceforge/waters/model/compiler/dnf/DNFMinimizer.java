@@ -15,7 +15,6 @@ import java.io.*;
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
 import net.sourceforge.waters.model.expr.BinaryOperator;
 import net.sourceforge.waters.model.expr.EvalException;
-import net.sourceforge.waters.model.expr.ExpressionComparator;
 import net.sourceforge.waters.model.expr.ExpressionParser;
 import net.sourceforge.waters.model.expr.ParseException;
 import net.sourceforge.waters.model.expr.TypeMismatchException;
@@ -133,19 +132,18 @@ public class DNFMinimizer {
 	// in the literal list
                                 
         // possibly remove not operator first
-        boolean hasNegateOp = false;
+        final boolean hasNegateOp;
         if (literal instanceof UnaryExpressionProxy) {
           UnaryOperator op = ((UnaryExpressionProxy) literal).getOperator();
-          if(op.equals(mOperatorTable.getNotOperator())) {
-            hasNegateOp = true;
-          }
+          hasNegateOp = (op == mOperatorTable.getNotOperator());
         } else if (literal instanceof BinaryExpressionProxy) {
           BinaryOperator op = ((BinaryExpressionProxy) literal).getOperator();
-          if(mOperatorTable.isNotEqualsOperator(op) ||
-             mOperatorTable.isLessThanOperator(op) ||
-             mOperatorTable.isLessEqualsOperator(op)) {
-            hasNegateOp = true;
-          }
+          hasNegateOp =
+            op == mOperatorTable.getNotEqualsOperator() ||
+            op == mOperatorTable.getLessThanOperator() ||
+            op == mOperatorTable.getLessEqualsOperator();
+        } else {
+          hasNegateOp = false;
         }
         if (hasNegateOp) {
           try {
@@ -191,23 +189,22 @@ public class DNFMinimizer {
     for(CompiledClause clause : expression.getClauses()) {
       for(SimpleExpressionProxy localLiteral : clause.getLiterals()) {
         notUnique = false;
-        boolean hasNegateOp = false;
+        final boolean hasNegateOp;
         if(localLiteral instanceof UnaryExpressionProxy) {
           UnaryOperator op =
 	    ((UnaryExpressionProxy) localLiteral).getOperator();
-          if(op.equals(mOperatorTable.getNotOperator())) {
-            hasNegateOp = true;
-          }
+          hasNegateOp = (op == mOperatorTable.getNotOperator());
         } else if (localLiteral instanceof BinaryExpressionProxy) {
           BinaryOperator op =
 	    ((BinaryExpressionProxy) localLiteral).getOperator();
-          if(mOperatorTable.isNotEqualsOperator(op) ||
-             mOperatorTable.isLessThanOperator(op) ||
-             mOperatorTable.isLessEqualsOperator(op)) {
-            hasNegateOp = true;
-          }
+          hasNegateOp = 
+            op == mOperatorTable.getNotEqualsOperator() ||
+            op == mOperatorTable.getLessThanOperator() ||
+            op == mOperatorTable.getLessEqualsOperator();
+        } else {
+          hasNegateOp = false;
         }
-        if(hasNegateOp) {
+        if (hasNegateOp) {
           try {
             localLiteral = mConverter.getNegatedLiteral(localLiteral);
           } catch (TypeMismatchException e) {
@@ -580,8 +577,7 @@ public class DNFMinimizer {
     ModuleElementFactory factory = ModuleElementFactory.getInstance();
     ExpressionParser parser = new ExpressionParser(factory, opTable);
     SimpleExpressionProxy expr = null;
-    DNFConverter converter =
-      new DNFConverter(factory, opTable, ExpressionComparator.getInstance());
+    DNFConverter converter = new DNFConverter(factory, opTable);
     CompiledNormalForm cnf = null;
     DNFMinimizer minimizer = new DNFMinimizer(converter, opTable);
     try {

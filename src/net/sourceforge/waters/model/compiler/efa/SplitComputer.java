@@ -18,6 +18,8 @@ import java.util.HashMap;
 
 import net.sourceforge.waters.model.base.ProxyAccessor;
 import net.sourceforge.waters.model.base.ProxyAccessorByContents;
+import net.sourceforge.waters.model.base.ProxyAccessorHashMapByContents;
+import net.sourceforge.waters.model.base.ProxyAccessorMap;
 import net.sourceforge.waters.model.compiler.context.CompiledRange;
 import net.sourceforge.waters.model.module.IdentifierProxy;
 import net.sourceforge.waters.model.module.SimpleExpressionProxy;
@@ -91,23 +93,23 @@ class SplitComputer
       mBestCost = cost;
       mBestSolution = new ArrayList<SplitCandidate>(current);
     } else {
+      final ProxyAccessorMap<SimpleExpressionProxy> openvars =
+        new ProxyAccessorHashMapByContents<SimpleExpressionProxy>();
+      for (final EFAVariableCombination combination : open) {
+        final ProxyAccessorMap<SimpleExpressionProxy> contents =
+          combination.getContentsMap();
+        openvars.putAll(contents);
+      }
       final int numcandidates = mCandidatesList.size();
       for (int index = start; index < numcandidates; index++) {
         final SplitCandidate cand = mCandidatesList.get(index);
+        final SimpleExpressionProxy varname = cand.getVariableName();
+        if (!openvars.containsProxy(varname)) {
+          continue;
+        }
         final int rangesize = cand.getRangeSize();
         final long nextcost = cost * rangesize;
         if (nextcost >= mBestCost) {
-          continue;
-        }
-        final SimpleExpressionProxy varname = cand.getVariableName();
-        boolean contained = false;
-        for (final EFAVariableCombination combination : open) {
-          if (combination.contains(varname)) {
-            contained = true;
-            break;
-          }
-        }
-        if (!contained) {
           continue;
         }
         final int nextindex = index + 1;

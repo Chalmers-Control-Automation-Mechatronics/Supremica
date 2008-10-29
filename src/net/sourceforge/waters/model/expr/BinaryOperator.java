@@ -32,6 +32,8 @@ public interface BinaryOperator extends Operator {
 
   public int getRHSTypes();
 
+  public boolean isSymmetric();
+
 
   //#########################################################################
   //# Parsing Support

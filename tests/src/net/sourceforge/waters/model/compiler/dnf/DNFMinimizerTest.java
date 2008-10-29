@@ -201,14 +201,14 @@ public class DNFMinimizerTest extends TestCase
   public void testMinimizer_a_geq_b()
     throws EvalException, ParseException
   {
-    final String[][] expected = {{"a >= b"}};
+    final String[][] expected = {{"b <= a"}};
     testMinimizer("a >= b", expected);
   }
 
   public void testMinimizer_a_gt_b()
     throws EvalException, ParseException
   {
-    final String[][] expected = {{"a > b"}};
+    final String[][] expected = {{"b < a"}};
     testMinimizer("a > b", expected);
   }
 
@@ -229,14 +229,14 @@ public class DNFMinimizerTest extends TestCase
   public void testMinimizer_x_a_leq_b()
     throws EvalException, ParseException
   {
-    final String[][] expected = {{"a > b"}};
+    final String[][] expected = {{"b < a"}};
     testMinimizer("!(a <= b)", expected);
   }
 
   public void testMinimizer_x_a_lt_b()
     throws EvalException, ParseException
   {
-    final String[][] expected = {{"a >= b"}};
+    final String[][] expected = {{"b <= a"}};
     testMinimizer("!(a < b)", expected);
   }
 

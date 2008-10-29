@@ -15,23 +15,41 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.base.VisitorException;
-import net.sourceforge.waters.model.base.WatersRuntimeException;
 import net.sourceforge.waters.model.module.AbstractModuleProxyVisitor;
 import net.sourceforge.waters.model.module.BinaryExpressionProxy;
 import net.sourceforge.waters.model.module.EnumSetExpressionProxy;
+import net.sourceforge.waters.model.module.IdentifierProxy;
 import net.sourceforge.waters.model.module.IndexedIdentifierProxy;
 import net.sourceforge.waters.model.module.IntConstantProxy;
+import net.sourceforge.waters.model.module.QualifiedIdentifierProxy;
 import net.sourceforge.waters.model.module.SimpleExpressionProxy;
 import net.sourceforge.waters.model.module.SimpleIdentifierProxy;
 import net.sourceforge.waters.model.module.UnaryExpressionProxy;
 
 
 /**
- * A simple implementation of the {@link Comparator} interface, used to
- * compare Waters expressions. This comparator imposes an ordering on
- * objects of all subtypes of {@link SimpleExpressionProxy} and can be used
- * to ensure deterministic compiler output.
+ * <P>A simple implementation of the {@link Comparator} interface, used to
+ * compare Waters expressions.</P>
+ *
+ * <P>This comparator imposes an ordering on objects of all subtypes of
+ * {@link SimpleExpressionProxy} and can be used to ensure deterministic
+ * compiler output. The ordering is first based on proxy types according to
+ * the following list:</P>
+ * <OL>
+ * <LI>{@link IntConstantProxy}</LI>
+ * <LI>{@link SimpleIdentifierProxy}</LI>
+ * <LI>{@link IndexedIdentifierProxy}</LI>
+ * <LI>{@link QualifiedIdentifierProxy}</LI>
+ * <LI>{@link EnumSetExpressionProxy}</LI>
+ * <LI>{@link UnaryExpressionProxy}</LI>
+ * <LI>{@link BinaryExpressionProxy}</LI>
+ * </OL>
+ * <P>If the type is the same, the contents are examined. Identifiers are
+ * compared based on their names. Unary and binary expressions are compared
+ * first by their operators (whose ordering can be customised with names
+ * being the default), followed by the subterms.</P>
  *
  * @author Robi Malik
  */
@@ -43,15 +61,17 @@ public class ExpressionComparator
 
   //#########################################################################
   //# Constructors
-  public ExpressionComparator()
+  ExpressionComparator(final Map<? extends Operator,Integer> opvalues)
   {
-    mInterfaceValues = new HashMap<Class,Integer>(32);
+    mInterfaceValues = new HashMap<Class<? extends Proxy>,Integer>(32);
     mInterfaceValues.put(IntConstantProxy.class, 0);
     mInterfaceValues.put(SimpleIdentifierProxy.class, 1);
     mInterfaceValues.put(IndexedIdentifierProxy.class, 2);
-    mInterfaceValues.put(EnumSetExpressionProxy.class, 3);
-    mInterfaceValues.put(UnaryExpressionProxy.class, 4);
-    mInterfaceValues.put(BinaryExpressionProxy.class, 5);
+    mInterfaceValues.put(QualifiedIdentifierProxy.class, 3);
+    mInterfaceValues.put(EnumSetExpressionProxy.class, 4);
+    mInterfaceValues.put(UnaryExpressionProxy.class, 5);
+    mInterfaceValues.put(BinaryExpressionProxy.class, 6);
+    mOperatorValues = opvalues;
   }
 
 
@@ -60,11 +80,11 @@ public class ExpressionComparator
   public int compare(final SimpleExpressionProxy expr1,
                      final SimpleExpressionProxy expr2)
   {
-    final Class clazz1 = expr1.getClass();
-    final Class clazz2 = expr2.getClass();
+    final Class<? extends Proxy> clazz1 = expr1.getProxyInterface();
+    final Class<? extends Proxy> clazz2 = expr2.getProxyInterface();
     if (clazz1 != clazz2) {
-      final int classval1 = findInterfaceValue(clazz1);
-      final int classval2 = findInterfaceValue(clazz2);
+      final int classval1 = getInterfaceValue(clazz1);
+      final int classval2 = getInterfaceValue(clazz2);
       if (classval1 != classval2) {
         return classval1 - classval2;
       }
@@ -76,8 +96,7 @@ public class ExpressionComparator
       mExpr2 = old2;
       return result;
     } catch (final VisitorException exception) {
-      final Throwable cause = exception.getCause();
-      throw new WatersRuntimeException(cause);
+      throw exception.getRuntimeException();
     }
   }
 
@@ -89,9 +108,7 @@ public class ExpressionComparator
     final BinaryExpressionProxy expr2 = (BinaryExpressionProxy) mExpr2;
     final BinaryOperator op1 = expr1.getOperator();
     final BinaryOperator op2 = expr2.getOperator();
-    final String opname1 = op1.getName();
-    final String opname2 = op2.getName();
-    int result = opname1.compareTo(opname2);
+    int result = compareOperators(op1, op2);
     if (result != 0) {
       return result;
     }
@@ -170,6 +187,21 @@ public class ExpressionComparator
     }
   }
 
+  public Integer visitQualifiedIdentifierProxy
+    (final QualifiedIdentifierProxy ident1)
+  {
+    final QualifiedIdentifierProxy ident2 = (QualifiedIdentifierProxy) mExpr2;
+    final IdentifierProxy base1 = ident1.getBaseIdentifier();
+    final IdentifierProxy base2 = ident2.getBaseIdentifier();
+    final int result = compare(base1, base2);
+    if (result != 0) {
+      return result;
+    }
+    final IdentifierProxy comp1 = ident1.getComponentIdentifier();
+    final IdentifierProxy comp2 = ident2.getComponentIdentifier();
+    return compare(comp1, comp2);
+  }
+
   public Integer visitSimpleIdentifierProxy(final SimpleIdentifierProxy ident1)
   {
     final SimpleIdentifierProxy ident2 = (SimpleIdentifierProxy) mExpr2;
@@ -183,9 +215,7 @@ public class ExpressionComparator
     final UnaryExpressionProxy expr2 = (UnaryExpressionProxy) mExpr2;
     final UnaryOperator op1 = expr1.getOperator();
     final UnaryOperator op2 = expr2.getOperator();
-    final String opname1 = op1.getName();
-    final String opname2 = op2.getName();
-    int result = opname1.compareTo(opname2);
+    final int result = compareOperators(op1, op2);
     if (result != 0) {
       return result;
     }
@@ -197,9 +227,9 @@ public class ExpressionComparator
 
   //#########################################################################
   //# Auxiliary Methods
-  private int findInterfaceValue(final Class clazz)
+  private int getInterfaceValue(final Class<? extends Proxy> clazz)
   {
-    final Integer result = getInterfaceValue(clazz);
+    final Integer result = mInterfaceValues.get(clazz);
     if (result != null) {
       return result;
     } else {
@@ -208,22 +238,23 @@ public class ExpressionComparator
     }
   }
 
-  private Integer getInterfaceValue(final Class clazz)
+  private int compareOperators(final Operator op1, final Operator op2)
   {
-    final Integer cached = mInterfaceValues.get(clazz);
-    if (cached != null) {
-      return cached;
-    } else {
-      final Class[] interfaces = clazz.getInterfaces();
-      for (final Class iface : interfaces) {
-        final Integer result = getInterfaceValue(iface);
-        if (result != null) {
-          mInterfaceValues.put(clazz, result);
-          return result;
+    if (mOperatorValues != null) {
+      final Integer value1 = mOperatorValues.get(op1);
+      final Integer value2 = mOperatorValues.get(op2);
+      if (value1 != null && value2 != null) {
+        final int diff = value1 - value2;
+        if (diff != 0) {
+          return diff;
         }
+      } else if (value1 != value2) {
+        return value1 == null ? 1 : -1;
       }
-      return null;
     }
+    final String opname1 = op1.getName();
+    final String opname2 = op2.getName();
+    return opname1.compareTo(opname2);
   }
 
 
@@ -236,13 +267,14 @@ public class ExpressionComparator
 
   private static class SingletonHolder {
     private static final Comparator<SimpleExpressionProxy> INSTANCE =
-      new ExpressionComparator();
+      new ExpressionComparator(null);
   }
 
 
   //#########################################################################
   //# Data Members
-  private final Map<Class,Integer> mInterfaceValues;
+  private final Map<Class<? extends Proxy>,Integer> mInterfaceValues;
+  private final Map<? extends Operator,Integer> mOperatorValues;
   private SimpleExpressionProxy mExpr2;
 
 }

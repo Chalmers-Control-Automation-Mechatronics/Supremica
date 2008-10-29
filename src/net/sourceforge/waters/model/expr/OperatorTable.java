@@ -9,6 +9,10 @@
 
 package net.sourceforge.waters.model.expr;
 
+import java.util.Comparator;
+
+import net.sourceforge.waters.model.module.SimpleExpressionProxy;
+
 
 /**
  * <P>An operator table.</P>
@@ -30,6 +34,8 @@ public interface OperatorTable {
   public boolean contains(final String name);
 
   public boolean isOperatorCharacter(final char ch);
+
+  public Comparator<SimpleExpressionProxy> getExpressionComparator();
 
   //#########################################################################
   //# Class Constants

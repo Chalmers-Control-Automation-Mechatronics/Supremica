@@ -346,13 +346,13 @@
     </junit>
   </target>
   
-  <target name="run_test3" depends="test-jar,cpp">
+  <target name="runtest3" depends="test-jar,cpp">
     <mkdir dir="${logs.results}"/>
     <junit printsummary="on" fork="true" maxmemory="512m">
       <formatter type="xml"/>
       <batchtest todir="${logs.results}">
         <fileset dir="${supremica.testsrc}">
-          <include name="net/sourceforge/waters/**/*Maze*Test.java"/>
+          <include name="net/sourceforge/waters/**/DNF*Test.java"/>
           <exclude name="**/Abstract*.java"/>
         </fileset>
       </batchtest>
@@ -436,7 +436,7 @@
   <target name="test1" depends="runtest1,test-report"
           description="Run some test cases."/>
           
-  <target name="test3" depends="run_test3,test-report"
+  <target name="test3" depends="runtest3,test-report"
           description="Run some test cases."/>
 
   <target name="test4" depends="run_test4,test-report"

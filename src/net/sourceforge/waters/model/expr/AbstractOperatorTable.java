@@ -9,8 +9,11 @@
 
 package net.sourceforge.waters.model.expr;
 
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
+
+import net.sourceforge.waters.model.module.SimpleExpressionProxy;
 
 
 /**
@@ -30,6 +33,7 @@ public abstract class AbstractOperatorTable implements OperatorTable {
     mMinOpChar = minchar;
     mMaxOpChar = maxchar;
     mOperatorTable = new HashMap<String,Entry>(size);
+    mOperatorOrdering = new HashMap<Operator,Integer>(size);
     mOperatorChar = new boolean[maxchar - minchar];
   }
 
@@ -67,9 +71,23 @@ public abstract class AbstractOperatorTable implements OperatorTable {
       ch >= mMinOpChar && ch < mMaxOpChar && mOperatorChar[ch - mMinOpChar];
   }
 
+  public Comparator<SimpleExpressionProxy> getExpressionComparator()
+  {
+    if (mComparator == null) {
+      mComparator = new ExpressionComparator(mOperatorOrdering);
+    }
+    return mComparator;
+  }
+
 
   //#########################################################################
   //# Initialisation
+  protected void store(final Operator op, final int orderindex)
+  {
+    store(op);
+    mOperatorOrdering.put(op, orderindex);
+  }
+
   protected void store(final Operator op)
   {
     final String name = op.getName();
@@ -147,8 +165,11 @@ public abstract class AbstractOperatorTable implements OperatorTable {
   //#########################################################################
   //# Data Members
   private final Map<String,Entry> mOperatorTable;
+  private final Map<Operator,Integer> mOperatorOrdering;
   private final boolean mOperatorChar[];
   private final int mMinOpChar;
   private final int mMaxOpChar;
+
+  private Comparator<SimpleExpressionProxy> mComparator;
 
 }

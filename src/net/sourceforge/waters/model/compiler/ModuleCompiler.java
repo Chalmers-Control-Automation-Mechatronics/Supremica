@@ -14,7 +14,6 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.IdentityHashMap;
@@ -45,7 +44,6 @@ import net.sourceforge.waters.model.compiler.context.
   UndefinedIdentifierException;
 import net.sourceforge.waters.model.expr.AtomValue;
 import net.sourceforge.waters.model.expr.BinaryOperator;
-import net.sourceforge.waters.model.expr.ExpressionComparator;
 import net.sourceforge.waters.model.expr.EvalException;
 import net.sourceforge.waters.model.expr.IndexValue;
 import net.sourceforge.waters.model.expr.IntValue;
@@ -113,11 +111,8 @@ public class ModuleCompiler extends AbstractModuleProxyVisitor
     mDESFactory = desfactory;
     mModuleFactory = ModuleElementFactory.getInstance();
     mOperatorTable = CompilerOperatorTable.getInstance();
-    mComparator = ExpressionComparator.getInstance();
-    mDNFConverter =
-        new DNFConverter(mModuleFactory, mOperatorTable, mComparator);
-    mDNFMinimizer =
-        new DNFMinimizer(mDNFConverter, mOperatorTable);
+    mDNFConverter = new DNFConverter(mModuleFactory, mOperatorTable);
+    mDNFMinimizer = new DNFMinimizer(mDNFConverter, mOperatorTable);
     mIsExpandingEFATransitions = true;
     mModule = module;
     mContext = null;
@@ -2430,7 +2425,6 @@ private List<List<BinaryExpressionProxy>>
 
   // EFA---------------------
   private final CompilerOperatorTable mOperatorTable;
-  private final Comparator<SimpleExpressionProxy> mComparator;
   private final DNFConverter mDNFConverter;
   private final DNFMinimizer mDNFMinimizer;
   /*

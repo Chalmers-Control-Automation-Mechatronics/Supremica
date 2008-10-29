@@ -56,10 +56,10 @@ public class CompilerOperatorTable extends AbstractOperatorTable {
   {
     super(32, OPCHAR_MIN, OPCHAR_MAX);
     mComplementMap = new HashMap<BinaryOperator,BinaryOperator>(16);
+    mSwapMap = new HashMap<BinaryOperator,BinaryOperator>(16);
     mAssigningMap = new HashMap<BinaryOperator,BinaryOperator>(16);
 
-    mAndOperator = new BinaryAndOperator();
-    mOrOperator= new BinaryOrOperator();
+    mUnaryNextOperator = new UnaryNextOperator();
     mEqualsOperator = new BinaryEqualsOperator();
     mNotEqualsOperator = new BinaryNotEqualsOperator();
     mGreaterThanOperator = new BinaryGreaterThanOperator();
@@ -67,35 +67,43 @@ public class CompilerOperatorTable extends AbstractOperatorTable {
     mLessThanOperator = new BinaryLessThanOperator();
     mLessEqualsOperator = new BinaryLessEqualsOperator();
     mNotOperator = new UnaryNotOperator();
+    mAndOperator = new BinaryAndOperator();
+    mOrOperator= new BinaryOrOperator();
     mAssignmentOperator = new BinaryAssignmentOperator();
     mIncrementOperator = new BinaryIncrementOperator();
     mDecrementOperator = new BinaryDecrementOperator();
     mUnaryMinusOperator = new UnaryMinusOperator();
-    mRangeOperator = new BinaryRangeOperator();
-    mUnaryNextOperator = new UnaryNextOperator();
     mPlusOperator = new BinaryPlusOperator();
     mMinusOperator = new BinaryMinusOperator();
+    mRangeOperator = new BinaryRangeOperator();
 
-    store(mAndOperator);
-    store(mOrOperator);
-    store(mNotOperator);
-    store(mEqualsOperator);
-    store(mNotEqualsOperator);
-    store(mGreaterThanOperator);
-    store(mGreaterEqualsOperator);
-    store(mLessThanOperator);
-    store(mLessEqualsOperator);
-    store(mAssignmentOperator);
-    store(new BinaryTimesOperator());
-    store(new BinaryDivideOperator());
-    store(new BinaryModuloOperator());
-    store(mUnaryMinusOperator);
-    store(mRangeOperator);
-    store(new BinaryQualificationOperator());
-    // store(mUnaryNextOperator);
+    // store(mUnaryNextOperator, 0);
+    store(new BinaryQualificationOperator(), 1);
+    store(mEqualsOperator, 2);
+    store(mNotEqualsOperator, 3);
+    store(mLessThanOperator, 4);
+    store(mLessEqualsOperator, 5);
+    store(mGreaterThanOperator, 6);
+    store(mGreaterEqualsOperator, 7);
+    store(mNotOperator, 1);
+    store(mAndOperator, 8);
+    store(mOrOperator, 9);
+    store(mAssignmentOperator, 10);
+    store(mIncrementOperator, 11);
+    store(mDecrementOperator, 12);
+    store(mUnaryMinusOperator, 2);
+    store(mPlusOperator, 13);
+    store(mMinusOperator, 14);
+    store(new BinaryTimesOperator(), 15);
+    store(new BinaryDivideOperator(), 16);
+    store(new BinaryModuloOperator(), 17);
+    store(mRangeOperator, 18);
+
     storeComplements(mEqualsOperator, mNotEqualsOperator);
     storeComplements(mLessThanOperator, mGreaterEqualsOperator);
     storeComplements(mGreaterThanOperator, mLessEqualsOperator);
+    storeSwap(mGreaterThanOperator, mLessThanOperator);
+    storeSwap(mGreaterEqualsOperator, mLessEqualsOperator);
     storeAssignment(mIncrementOperator, mPlusOperator);
     storeAssignment(mDecrementOperator, mMinusOperator);
   }
@@ -103,17 +111,19 @@ public class CompilerOperatorTable extends AbstractOperatorTable {
   private void storeComplements(final BinaryOperator op1,
                                 final BinaryOperator op2)
   {
-    store(op1);
-    store(op2);
     mComplementMap.put(op1, op2);
     mComplementMap.put(op2, op1);
+  }
+
+  private void storeSwap(final BinaryOperator op,
+                         final BinaryOperator normal)
+  {
+    mSwapMap.put(op, normal);
   }
 
   private void storeAssignment(final BinaryOperator op1,
                                final BinaryOperator op2)
   {
-    store(op1);
-    store(op2);
     mAssigningMap.put(op1, op2);
   }
 
@@ -189,21 +199,14 @@ public class CompilerOperatorTable extends AbstractOperatorTable {
     return mComplementMap.get(op);
   }
 
+  public BinaryOperator getSwappedNormalOperator(final BinaryOperator op)
+  {
+    return mSwapMap.get(op);
+  }
+
   public BinaryOperator getAssigningOperator(final BinaryOperator op)
   {
     return mAssigningMap.get(op);
-  }
-
-  public boolean isNotEqualsOperator(BinaryOperator op) {
-		return (op instanceof BinaryNotEqualsOperator);
-  }
-
-  public boolean isLessThanOperator(BinaryOperator op) {
-		return (op instanceof BinaryLessThanOperator);
-  }
-
-  public boolean isLessEqualsOperator(BinaryOperator op) {
-		return (op instanceof BinaryLessEqualsOperator);
   }
 
 
@@ -400,6 +403,11 @@ public class CompilerOperatorTable extends AbstractOperatorTable {
 
     //#######################################################################
     //# Interface net.sourceforge.waters.model.expr.BinaryOperator
+    public boolean isSymmetric()
+    {
+      return true;
+    }
+
     public SimpleExpressionProxy simplify
       (final BinaryExpressionProxy expr,
        final AbstractSimpleExpressionSimplifier simplifier)
@@ -453,6 +461,11 @@ public class CompilerOperatorTable extends AbstractOperatorTable {
 
     //#######################################################################
     //# Interface net.sourceforge.waters.model.expr.BinaryOperator
+    public boolean isSymmetric()
+    {
+      return false;
+    }
+
     public SimpleExpressionProxy simplify
       (final BinaryExpressionProxy expr,
        final AbstractSimpleExpressionSimplifier simplifier)
@@ -510,6 +523,11 @@ public class CompilerOperatorTable extends AbstractOperatorTable {
 
     //#######################################################################
     //# Interface net.sourceforge.waters.model.expr.BinaryOperator
+    public boolean isSymmetric()
+    {
+      return true;
+    }
+
     public SimpleExpressionProxy simplify
       (final BinaryExpressionProxy expr,
        final AbstractSimpleExpressionSimplifier simplifier)
@@ -590,6 +608,13 @@ public class CompilerOperatorTable extends AbstractOperatorTable {
     }
 
     //#######################################################################
+    //# Interface net.sourceforge.waters.model.expr.BinaryOperator
+    public boolean isSymmetric()
+    {
+      return false;
+    }
+
+    //#######################################################################
     //# Overrides for Abstract Baseclass AbstractBinaryIntOperator
     int eval(final int lhs, final int rhs)
       throws DivisionByZeroException
@@ -619,6 +644,13 @@ public class CompilerOperatorTable extends AbstractOperatorTable {
     public int getPriority()
     {
       return PRIORITY_TIMES;
+    }
+
+    //#######################################################################
+    //# Interface net.sourceforge.waters.model.expr.BinaryOperator
+    public boolean isSymmetric()
+    {
+      return false;
     }
 
     //#######################################################################
@@ -737,6 +769,11 @@ public class CompilerOperatorTable extends AbstractOperatorTable {
     public int getRHSTypes()
     {
       return Operator.TYPE_ANY;
+    }
+
+    public boolean isSymmetric()
+    {
+      return true;
     }
 
     public int getReturnTypes(final int lhsType, final int rhsType)
@@ -866,6 +903,11 @@ public class CompilerOperatorTable extends AbstractOperatorTable {
     public int getRHSTypes()
     {
       return Operator.TYPE_INT;
+    }
+
+    public boolean isSymmetric()
+    {
+      return false;
     }
 
     public int getReturnTypes(final int lhsType, final int rhsType)
@@ -1071,6 +1113,11 @@ public class CompilerOperatorTable extends AbstractOperatorTable {
     public int getRHSTypes()
     {
       return Operator.TYPE_BOOLEAN;
+    }
+
+    public boolean isSymmetric()
+    {
+      return true;
     }
 
     public int getReturnTypes(final int lhsType, final int rhsType)
@@ -1371,6 +1418,11 @@ public class CompilerOperatorTable extends AbstractOperatorTable {
       return Operator.TYPE_INT;
     }
 
+    public boolean isSymmetric()
+    {
+      return false;
+    }
+
     public int getReturnTypes(final int lhsType, final int rhsType)
     {
       if ((lhsType & rhsType & Operator.TYPE_INT) != 0) {
@@ -1447,6 +1499,11 @@ public class CompilerOperatorTable extends AbstractOperatorTable {
     public int getRHSTypes()
     {
       return Operator.TYPE_ANY;
+    }
+
+    public boolean isSymmetric()
+    {
+      return false;
     }
 
     public int getReturnTypes(final int lhsType, final int rhsType)
@@ -1619,6 +1676,11 @@ public class CompilerOperatorTable extends AbstractOperatorTable {
       return Operator.TYPE_NAME;
     }
 
+    public boolean isSymmetric()
+    {
+      return false;
+    }
+
     public int getReturnTypes(final int lhsType, final int rhsType)
     {
       return lhsType & rhsType & Operator.TYPE_NAME;
@@ -1734,6 +1796,7 @@ public class CompilerOperatorTable extends AbstractOperatorTable {
   private final BinaryOperator mRangeOperator;
   private final UnaryOperator mUnaryNextOperator;
   private final Map<BinaryOperator,BinaryOperator> mComplementMap;
+  private final Map<BinaryOperator,BinaryOperator> mSwapMap;
   private final Map<BinaryOperator,BinaryOperator> mAssigningMap;
 
 

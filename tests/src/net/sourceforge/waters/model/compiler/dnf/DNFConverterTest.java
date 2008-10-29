@@ -315,11 +315,25 @@ public class DNFConverterTest extends TestCase
     testDNF("a == b", expected);
   }
 
+  public void testDNF_b_eq_a()
+    throws EvalException, ParseException
+  {
+    String[][] expected = {{"a == b"}};
+    testDNF("b == a", expected);
+  }
+
   public void testDNF_a_neq_b()
     throws EvalException, ParseException
   {
     String[][] expected = {{"a != b"}};
     testDNF("a != b", expected);
+  }
+
+  public void testDNF_b_neq_a()
+    throws EvalException, ParseException
+  {
+    String[][] expected = {{"a != b"}};
+    testDNF("b != a", expected);
   }
 
   public void testDNF_a_leq_b()
@@ -339,14 +353,14 @@ public class DNFConverterTest extends TestCase
   public void testDNF_a_geq_b()
     throws EvalException, ParseException
   {
-    String[][] expected = {{"a >= b"}};
+    String[][] expected = {{"b <= a"}};
     testDNF("a >= b", expected);
   }
 
   public void testDNF_a_gt_b()
     throws EvalException, ParseException
   {
-    String[][] expected = {{"a > b"}};
+    String[][] expected = {{"b < a"}};
     testDNF("a > b", expected);
   }
 
@@ -367,14 +381,14 @@ public class DNFConverterTest extends TestCase
   public void testDNF_x_a_leq_b()
     throws EvalException, ParseException
   {
-    String[][] expected = {{"a > b"}};
+    String[][] expected = {{"b < a"}};
     testDNF("!(a <= b)", expected);
   }
 
   public void testDNF_x_a_lt_b()
     throws EvalException, ParseException
   {
-    String[][] expected = {{"a >= b"}};
+    String[][] expected = {{"b <= a"}};
     testDNF("!(a < b)", expected);
   }
 
