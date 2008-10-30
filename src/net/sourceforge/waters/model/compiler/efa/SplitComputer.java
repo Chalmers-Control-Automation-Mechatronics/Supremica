@@ -21,9 +21,7 @@ import net.sourceforge.waters.model.base.ProxyAccessorByContents;
 import net.sourceforge.waters.model.base.ProxyAccessorHashMapByContents;
 import net.sourceforge.waters.model.base.ProxyAccessorMap;
 import net.sourceforge.waters.model.compiler.context.CompiledRange;
-import net.sourceforge.waters.model.module.IdentifierProxy;
 import net.sourceforge.waters.model.module.SimpleExpressionProxy;
-import net.sourceforge.waters.model.module.UnaryExpressionProxy;
 
 
 class SplitComputer
@@ -32,10 +30,10 @@ class SplitComputer
   //#########################################################################
   //# Constructors
   SplitComputer
-    (final Map<ProxyAccessor<IdentifierProxy>,EFAVariable> variables)
+    (final Map<ProxyAccessor<SimpleExpressionProxy>,EFAVariable> variables)
   {
     final int size = variables.size();
-    mVariables = variables;
+    mVariablesMap = variables;
     mCandidatesMap =
       new HashMap<ProxyAccessor<SimpleExpressionProxy>,SplitCandidate>(size);
     mCandidatesList = new ArrayList<SplitCandidate>(size);
@@ -44,7 +42,7 @@ class SplitComputer
 
   //#########################################################################
   //# Invocation
-  List<SimpleExpressionProxy> computeSplitList
+  List<EFAVariable> computeSplitList
     (final Collection<EFAVariableCombination> combinations)
   {
     try {
@@ -66,11 +64,10 @@ class SplitComputer
         return null;
       } else {
         final int size = mBestSolution.size();
-        final List<SimpleExpressionProxy> result =
-          new ArrayList<SimpleExpressionProxy>(size);
+        final List<EFAVariable> result = new ArrayList<EFAVariable>(size);
         for (final SplitCandidate cand : mBestSolution) {
-          final SimpleExpressionProxy varname = cand.getVariableName();
-          result.add(varname);
+          final EFAVariable var = cand.getVariable();
+          result.add(var);
         }
         return result;
       }
@@ -136,24 +133,13 @@ class SplitComputer
   //# Auxiliary Methods
   private SplitCandidate createCandidate(final SimpleExpressionProxy varname)
   {
-    final ProxyAccessor<SimpleExpressionProxy> vaccessor =
+    final ProxyAccessor<SimpleExpressionProxy> accessor =
       new ProxyAccessorByContents<SimpleExpressionProxy>(varname);
-    SplitCandidate cand = mCandidatesMap.get(vaccessor);
+    SplitCandidate cand = mCandidatesMap.get(accessor);
     if (cand == null) {
-      final IdentifierProxy ident;
-      if (varname instanceof IdentifierProxy) {
-        ident = (IdentifierProxy) varname;
-      } else if (varname instanceof UnaryExpressionProxy) {
-        final UnaryExpressionProxy unary = (UnaryExpressionProxy) varname;
-        ident = (IdentifierProxy) unary.getSubTerm();
-      } else {
-        throw new ClassCastException("Unsupported variable type: " + varname);
-      }
-      final ProxyAccessor<IdentifierProxy> iaccessor =
-        new ProxyAccessorByContents<IdentifierProxy>(ident);
-      final EFAVariable var = mVariables.get(iaccessor);
-      cand = new SplitCandidate(varname, var);
-      mCandidatesMap.put(vaccessor, cand);
+      final EFAVariable var = mVariablesMap.get(accessor);
+      cand = new SplitCandidate(var);
+      mCandidatesMap.put(accessor, cand);
       mCandidatesList.add(cand);
     }
     return cand;
@@ -173,11 +159,8 @@ class SplitComputer
 
     //#######################################################################
     //# Constructors
-    private SplitCandidate(final SimpleExpressionProxy varname,
-                           final EFAVariable var)
+    private SplitCandidate(final EFAVariable var)
     {
-      mVariableName = varname;
-      mIsNext = varname instanceof UnaryExpressionProxy;
       mVariable = var;
       mRangeSize = var.getRange().size();
       mNumCombinations = 0;
@@ -191,8 +174,6 @@ class SplitComputer
         return candidate.mNumCombinations - mNumCombinations;
       } else if (mRangeSize != candidate.mRangeSize) {
         return mRangeSize - candidate.mRangeSize;
-      } else if (mIsNext != candidate.mIsNext) {
-        return mIsNext ? 1 : -1;
       } else {
         return mVariable.compareTo(candidate.mVariable);
       }
@@ -202,12 +183,12 @@ class SplitComputer
     //# Simple Access
     private SimpleExpressionProxy getVariableName()
     {
-      return mVariableName;
+      return mVariable.getVariableName();
     }
 
     private boolean isNext()
     {
-      return mIsNext;
+      return mVariable.isNext();
     }
 
     private EFAVariable getVariable()
@@ -232,8 +213,6 @@ class SplitComputer
 
     //#######################################################################
     //# Data Members
-    private final SimpleExpressionProxy mVariableName;
-    private final boolean mIsNext;
     private final EFAVariable mVariable;
     private final int mRangeSize;
     private int mNumCombinations;
@@ -243,7 +222,8 @@ class SplitComputer
 
   //#########################################################################
   //# Data Members
-  private final Map<ProxyAccessor<IdentifierProxy>,EFAVariable> mVariables;
+  private final Map<ProxyAccessor<SimpleExpressionProxy>,EFAVariable>
+    mVariablesMap;
   private final Map<ProxyAccessor<SimpleExpressionProxy>,SplitCandidate>
     mCandidatesMap;
   private final List<SplitCandidate> mCandidatesList;

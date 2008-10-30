@@ -10,7 +10,10 @@
 package net.sourceforge.waters.model.compiler.efa;
 
 import net.sourceforge.waters.model.compiler.context.CompiledRange;
+import net.sourceforge.waters.model.module.ComponentProxy;
 import net.sourceforge.waters.model.module.IdentifierProxy;
+import net.sourceforge.waters.model.module.SimpleExpressionProxy;
+import net.sourceforge.waters.model.module.UnaryExpressionProxy;
 
 
 /**
@@ -23,23 +26,72 @@ class EFAVariable implements Comparable<EFAVariable> {
 
   //#########################################################################
   //# Constructors
-  EFAVariable(final IdentifierProxy ident, final CompiledRange range)
+  EFAVariable(final ComponentProxy comp,
+              final SimpleExpressionProxy varname,
+              final CompiledRange range)
   {
-    mIdentifier = ident;
+    mComponent = comp;
+    mVariableName = varname;
+    mIsNext = varname instanceof UnaryExpressionProxy;
+    if (mIsNext) {
+      final UnaryExpressionProxy unary = (UnaryExpressionProxy) varname;
+      mIdentifier = (IdentifierProxy) unary.getSubTerm();
+    } else {
+      mIdentifier = (IdentifierProxy) varname;
+    }
     mRange = range;
   }
 
 
   //#########################################################################
-  //# Interface java.lang.Comparable
+  //# Hashing and Comparing
+  public boolean equals(final Object other)
+  {
+    if (other.getClass() == getClass()) {
+      final EFAVariable var = (EFAVariable) other;
+      return mIsNext == var.mIsNext && mIdentifier.equals(var.mIdentifier);
+    } else {
+      return false;
+    }
+  }
+
+  public int hashCode()
+  {
+    int result = mIdentifier.hashCode();
+    if (mIsNext) {
+      result++;
+    }
+    return result;
+  }
+
+
   public int compareTo(final EFAVariable var)
   {
-    return mIdentifier.compareTo(var.mIdentifier);
+    if (mIsNext != var.mIsNext) {
+      return mIsNext ? 1 : -1;
+    } else {
+      return mIdentifier.compareTo(var.mIdentifier);
+    }
   }
 
 
   //#########################################################################
   //# Simple Access
+  ComponentProxy getComponent()
+  {
+    return mComponent;
+  }
+
+  SimpleExpressionProxy getVariableName()
+  {
+    return mVariableName;
+  }
+
+  boolean isNext()
+  {
+    return mIsNext;
+  }
+
   IdentifierProxy getIdentifier()
   {
     return mIdentifier;
@@ -53,7 +105,10 @@ class EFAVariable implements Comparable<EFAVariable> {
 
   //#########################################################################
   //# Data Members
+  private final ComponentProxy mComponent;
+  private final SimpleExpressionProxy mVariableName;
   private final IdentifierProxy mIdentifier;
+  private final boolean mIsNext;
   private final CompiledRange mRange;
 
 }

@@ -34,8 +34,10 @@ import net.sourceforge.waters.model.compiler.context.ModuleBindingContext;
 import net.sourceforge.waters.model.compiler.context.SimpleExpressionCompiler;
 import net.sourceforge.waters.model.compiler.context.SourceInfoBuilder;
 import net.sourceforge.waters.model.expr.EvalException;
+import net.sourceforge.waters.model.expr.UnaryOperator;
 import net.sourceforge.waters.model.module.AbstractModuleProxyVisitor;
 import net.sourceforge.waters.model.module.BinaryExpressionProxy;
+import net.sourceforge.waters.model.module.ComponentProxy;
 import net.sourceforge.waters.model.module.EdgeProxy;
 import net.sourceforge.waters.model.module.EventDeclProxy;
 import net.sourceforge.waters.model.module.EventListExpressionProxy;
@@ -53,6 +55,7 @@ import net.sourceforge.waters.model.module.SimpleComponentProxy;
 import net.sourceforge.waters.model.module.SimpleExpressionProxy;
 import net.sourceforge.waters.model.module.SimpleIdentifierProxy;
 import net.sourceforge.waters.model.module.SimpleNodeProxy;
+import net.sourceforge.waters.model.module.UnaryExpressionProxy;
 import net.sourceforge.waters.model.module.VariableComponentProxy;
 import net.sourceforge.waters.model.module.VariableMarkingProxy;
 
@@ -197,26 +200,29 @@ public class EFACompiler
 
   //#########################################################################
   //# Auxiliary Methods
-  private void putRange(final IdentifierProxy ident, final CompiledRange range)
+  private void createVariables(final ComponentProxy comp,
+                               final IdentifierProxy ident,
+                               final CompiledRange range)
   {
-    final ProxyAccessor<IdentifierProxy> accessor =
-      new ProxyAccessorByContents<IdentifierProxy>(ident);
-    mRangeMap.put(accessor, range);
-  }
-
-  private CompiledRange getRange(final IdentifierProxy ident)
-  {
-    final ProxyAccessor<IdentifierProxy> accessor =
-      new ProxyAccessorByContents<IdentifierProxy>(ident);
-    return mRangeMap.get(accessor);
+    final ProxyAccessor<SimpleExpressionProxy> curaccessor =
+      new ProxyAccessorByContents<SimpleExpressionProxy>(ident);
+    final EFAVariable curvar = new EFAVariable(comp, ident, range);
+    mVariablesMap.put(curaccessor, curvar);
+    final UnaryOperator nextop = mOperatorTable.getNextOperator();
+    final UnaryExpressionProxy nextident =
+      mFactory.createUnaryExpressionProxy(nextop, ident);
+    final ProxyAccessor<SimpleExpressionProxy> nextaccessor =
+      new ProxyAccessorByContents<SimpleExpressionProxy>(nextident);
+    final EFAVariable nextvar = new EFAVariable(comp, nextident, range);
+    mVariablesMap.put(nextaccessor, nextvar);
   }
 
   private void checkVariableIdentifier(final IdentifierProxy ident)
     throws UndefinedIdentifierException
   {
-    final ProxyAccessor<IdentifierProxy> accessor =
-      new ProxyAccessorByContents<IdentifierProxy>(ident);
-    if (!mRangeMap.containsKey(accessor)) {
+    final ProxyAccessor<SimpleExpressionProxy> accessor =
+      new ProxyAccessorByContents<SimpleExpressionProxy>(ident);
+    if (!mVariablesMap.containsKey(accessor)) {
       throw new UndefinedIdentifierException(ident, "variable");
     }
   }
@@ -251,11 +257,11 @@ public class EFACompiler
   //#########################################################################
   //# Inner Class Pass1Visitor
   /**
-   * The visitor implementing the first pass of EFA compilation.
-   * It initialises the range map {@link #mRangeMap} and associates the
-   * identifier of each simple or variable component with a {@link
-   * CompiledRange} object that represents the range of possible state
-   * values of that component.
+   * The visitor implementing the first pass of EFA compilation. It
+   * initialises the variables map {@link #mVariablesMap} and associates
+   * the identifier of each simple or variable component with a {@link
+   * EFAVariable} object that contains the range of possible state values
+   * of that component.
    */
   private class Pass1Visitor extends AbstractModuleProxyVisitor
   {
@@ -280,9 +286,9 @@ public class EFACompiler
       throws VisitorException
     {
       final List<Proxy> components = module.getComponentList();
-      final int size = components.size();
-      mRangeMap =
-        new HashMap<ProxyAccessor<IdentifierProxy>,CompiledRange>(size);
+      final int size = 2 * components.size();
+      mVariablesMap =
+        new HashMap<ProxyAccessor<SimpleExpressionProxy>,EFAVariable>(size);
       visitCollection(components);
       return null;
     }
@@ -300,7 +306,7 @@ public class EFACompiler
       final GraphProxy graph = comp.getGraph();
       final List<SimpleIdentifierProxy> list = visitGraphProxy(graph);
       final CompiledRange range = new CompiledEnumRange(list);
-      putRange(ident, range);
+      createVariables(comp, ident, range);
       return range;
     }
 
@@ -323,7 +329,7 @@ public class EFACompiler
         final SimpleExpressionProxy expr = var.getType();
         final CompiledRange range =
           mSimpleExpressionCompiler.getRangeValue(expr);
-        putRange(ident, range);
+        createVariables(var, ident, range);
         return range;
       } catch (final EvalException exception) {
         throw wrap(exception);
@@ -552,11 +558,13 @@ public class EFACompiler
   private ModuleBindingContext mRootContext;
   // Pass 1
   /**
-   * A map that assigns to each identifier of a variable component {@link
-   * VariableComponentProxy} or simple component {@link
-   * SimpleComponentProxy} the computed range of its state space.
+   * A map that assigns to each expression that refers to a variable
+   * component {@link VariableComponentProxy} or simple component {@link
+   * SimpleComponentProxy} an EFA variable object that contains the
+   * computed range of its state space. The map contains entries for
+   * the current state and next state variables.
    */
-  private Map<ProxyAccessor<IdentifierProxy>,CompiledRange> mRangeMap;
+  private Map<ProxyAccessor<SimpleExpressionProxy>,EFAVariable> mVariablesMap;
   // Pass 2
   /**
    * A map that assigns to each identifier of a event declaration {@link
