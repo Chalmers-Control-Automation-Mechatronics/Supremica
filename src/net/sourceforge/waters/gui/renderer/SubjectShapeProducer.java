@@ -117,9 +117,11 @@ public class SubjectShapeProducer
       }
       break;
     case ModelChangeEvent.STATE_CHANGED:
-      if (esource == getGraph() &&
-          getGraph().getBlockedEvents() == null &&
-          mOldBlockedEventsList != null) {
+      if (esource instanceof EdgeProxy) {
+        removeMapping(esource);
+      } else if (esource == getGraph() &&
+                 getGraph().getBlockedEvents() == null &&
+                 mOldBlockedEventsList != null) {
         removeMapping(mOldBlockedEventsList);
         mOldBlockedEventsList = null;
       }

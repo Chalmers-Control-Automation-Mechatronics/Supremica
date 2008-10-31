@@ -227,6 +227,7 @@ public class CloningGeometryListSubject<E extends Cloneable>
         if (newitem.equals(olditem)) {
           newlist.set(i, olditem);
           used[i] = true;
+        } else {
           useall = false;
         }
         i++;
