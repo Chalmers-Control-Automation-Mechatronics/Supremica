@@ -33,7 +33,7 @@ public interface BindingContext
   /**
    * Gets the value bound to the given name.
    * @param  ident   The name to be looked up.
-   *                 It is given as an identifier, simple or indexes,
+   *                 It is given as an identifier, simple or indexed,
    *                 so array lookups can be supported.
    * @return A variable-free expression representing the concrete value
    *         bound to the given name in this context, or <CODE>null</CODE>

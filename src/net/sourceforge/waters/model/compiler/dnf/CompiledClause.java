@@ -22,14 +22,21 @@ public class CompiledClause implements Cloneable
 
   //#########################################################################
   //# Constructors
-  CompiledClause(final BinaryOperator op)
+  public CompiledClause(final BinaryOperator op)
   {
     mOperator = op;
     mLiterals = new ProxyAccessorHashMapByContents<SimpleExpressionProxy>();
   }
 
-  CompiledClause(final BinaryOperator op,
-                 final SimpleExpressionProxy literal)
+  public CompiledClause(final BinaryOperator op, final int size)
+  {
+    mOperator = op;
+    mLiterals =
+      new ProxyAccessorHashMapByContents<SimpleExpressionProxy>(size);
+  }
+
+  public CompiledClause(final BinaryOperator op,
+                        final SimpleExpressionProxy literal)
   {
     this(op);
     add(literal);

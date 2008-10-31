@@ -13,7 +13,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import net.sourceforge.waters.model.base.VisitorException;
-import net.sourceforge.waters.model.base.WatersRuntimeException;
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
 import net.sourceforge.waters.model.expr.AbstractSimpleExpressionSimplifier;
 import net.sourceforge.waters.model.expr.BinaryOperator;
@@ -96,7 +95,7 @@ public class SimpleExpressionCompiler
       if (cause instanceof EvalException) {
         throw (EvalException) cause;
       } else {
-        throw new WatersRuntimeException(cause);
+        throw exception.getRuntimeException();
       }
     }
   }
@@ -106,8 +105,7 @@ public class SimpleExpressionCompiler
     try {
       return (Boolean) expr.acceptVisitor(mAtomicVisitor);
     } catch (final VisitorException exception) {
-      final Throwable cause = exception.getCause();
-      throw new WatersRuntimeException(cause);
+      throw exception.getRuntimeException();
     }
   }
 
