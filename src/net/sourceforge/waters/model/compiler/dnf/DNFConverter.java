@@ -95,6 +95,13 @@ public class DNFConverter extends AbstractModuleProxyVisitor {
     }
   }
 
+  public SimpleExpressionProxy getNegatedLiteral
+    (final SimpleExpressionProxy expr)
+    throws TypeMismatchException
+  {
+    return getNormalisedLiteral(expr, true);
+  }
+
   public List<SimpleExpressionProxy> createSortedClauseList
     (final CompiledNormalForm nf)
   {
@@ -320,12 +327,6 @@ public class DNFConverter extends AbstractModuleProxyVisitor {
     final BinaryOperator op = clause.getOperator();
     final SimpleExpressionProxy negliteral = getNegatedLiteral(literal);
     return new CompiledClause(op, negliteral);
-  }
-
-  SimpleExpressionProxy getNegatedLiteral(final SimpleExpressionProxy expr)
-    throws TypeMismatchException
-  {
-    return getNormalisedLiteral(expr, true);
   }
 
   SimpleExpressionProxy getNormalisedLiteral(final SimpleExpressionProxy expr,

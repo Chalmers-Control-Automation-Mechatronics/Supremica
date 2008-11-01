@@ -55,6 +55,17 @@ public abstract class AbstractSimpleExpressionSimplifier
 
   //#########################################################################
   //# Auxiliary Methods
+  public boolean isBooleanValue(final SimpleExpressionProxy expr)
+  {
+    if (expr instanceof IntConstantProxy) {
+      final IntConstantProxy intconst = (IntConstantProxy) expr;
+      final int value = intconst.getValue();
+      return value == 0 || value == 1;
+    } else {
+      return false;
+    }
+  }
+
   public int getIntValue(final SimpleExpressionProxy expr)
     throws TypeMismatchException
   {
