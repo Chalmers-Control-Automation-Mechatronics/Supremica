@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.analysis.modular
 //# CLASS:   ModularControllabilityChecker
 //###########################################################################
-//# $Id: CullingControllabilityChecker.java,v 1.6 2007-11-02 00:30:37 robi Exp $
+//# $Id$
 //###########################################################################
 
 

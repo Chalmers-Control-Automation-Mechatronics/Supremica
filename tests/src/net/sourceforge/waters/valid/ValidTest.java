@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.valid
 //# CLASS:   ValidTest
 //###########################################################################
-//# $Id: ValidTest.java,v 1.7 2008-06-16 07:09:51 robi Exp $
+//# $Id$
 //###########################################################################
 
 package net.sourceforge.waters.valid;

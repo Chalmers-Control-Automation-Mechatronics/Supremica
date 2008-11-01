@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.plain.base
 //# CLASS:   Element
 //###########################################################################
-//# $Id: Element.java,v 1.5 2007-07-03 11:20:53 robi Exp $
+//# $Id$
 //###########################################################################
 
 package net.sourceforge.waters.plain.base;

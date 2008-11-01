@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.module
 //# CLASS:   EventDeclProxy
 //###########################################################################
-//# $Id: EventDeclProxy.java,v 1.11 2008-02-14 02:24:09 robi Exp $
+//# $Id$
 //###########################################################################
 
 package net.sourceforge.waters.model.module;

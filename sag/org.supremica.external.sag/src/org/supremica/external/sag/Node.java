@@ -2,7 +2,7 @@
  * <copyright>
  * </copyright>
  *
- * $Id: Node.java,v 1.4 2007-01-12 14:23:46 torda Exp $
+ * $Id$
  */
 package org.supremica.external.sag;
 

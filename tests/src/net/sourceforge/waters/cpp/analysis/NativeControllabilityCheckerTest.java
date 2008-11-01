@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.cpp.analysis
 //# CLASS:   NativeControllabilityCheckerTest
 //###########################################################################
-//# $Id: NativeControllabilityCheckerTest.java,v 1.9 2007-05-26 11:29:22 robi Exp $
+//# $Id$
 //###########################################################################
 
 package net.sourceforge.waters.cpp.analysis;

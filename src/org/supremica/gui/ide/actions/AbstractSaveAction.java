@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.gui.ide.actions
 //# CLASS:   AbstractSaveAction
 //###########################################################################
-//# $Id: AbstractSaveAction.java,v 1.5 2007-06-26 20:45:14 robi Exp $
+//# $Id$
 //###########################################################################
 
 package org.supremica.gui.ide.actions;

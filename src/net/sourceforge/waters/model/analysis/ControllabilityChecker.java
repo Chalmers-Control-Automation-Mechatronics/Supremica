@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.analysis
 //# CLASS:   ControllabilityChecker
 //###########################################################################
-//# $Id: ControllabilityChecker.java,v 1.3 2006-11-03 01:00:07 robi Exp $
+//# $Id$
 //###########################################################################
 
 package net.sourceforge.waters.model.analysis;

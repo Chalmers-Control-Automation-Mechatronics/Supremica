@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.module.graph
 //# CLASS:   ModuleGraphCompiler
 //###########################################################################
-//# $Id: ModuleGraphCompiler.java,v 1.4 2008-06-28 02:01:49 robi Exp $
+//# $Id$
 //###########################################################################
 
 package net.sourceforge.waters.model.compiler.graph;

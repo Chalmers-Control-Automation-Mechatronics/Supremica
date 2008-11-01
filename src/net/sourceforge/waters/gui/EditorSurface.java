@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   EditorSurface
 //###########################################################################
-//# $Id: EditorSurface.java,v 1.84 2007-12-05 03:23:02 robi Exp $
+//# $Id$
 //###########################################################################
 
 package net.sourceforge.waters.gui;

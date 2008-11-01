@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.expr
 //# CLASS:   SimpleValue
 //###########################################################################
-//# $Id: SimpleValue.java,v 1.1 2006-11-30 01:58:05 robi Exp $
+//# $Id$
 //###########################################################################
 
 package net.sourceforge.waters.model.expr;

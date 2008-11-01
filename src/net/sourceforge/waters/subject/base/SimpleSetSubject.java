@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.subject.base
 //# CLASS:   SimpleSetSubject
 //###########################################################################
-//# $Id: SimpleSetSubject.java,v 1.4 2007-03-29 00:58:46 robi Exp $
+//# $Id$
 //###########################################################################
 
 package net.sourceforge.waters.subject.base;

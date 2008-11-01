@@ -2,7 +2,7 @@
  * <copyright>
  * </copyright>
  *
- * $Id: Graph.java,v 1.7 2007-03-07 10:26:15 torda Exp $
+ * $Id$
  */
 package org.supremica.external.sag;
 

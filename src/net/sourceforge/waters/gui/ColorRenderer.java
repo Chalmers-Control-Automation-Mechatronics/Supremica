@@ -4,7 +4,7 @@
 //# PACKAGE: waters.gui
 //# CLASS:   ColorRenderer
 //###########################################################################
-//# $Id: ColorRenderer.java,v 1.2 2005-02-18 03:09:06 knut Exp $
+//# $Id$
 //###########################################################################
 package net.sourceforge.waters.gui;
 

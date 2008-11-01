@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   GraphEventPanelPopupFactory
 //###########################################################################
-//# $Id: GraphEventPanelPopupFactory.java,v 1.1 2008-03-07 04:11:02 robi Exp $
+//# $Id$
 //###########################################################################
 
 

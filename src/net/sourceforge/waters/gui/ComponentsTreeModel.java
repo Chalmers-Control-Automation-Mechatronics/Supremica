@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   ComponentsTreeModel
 //###########################################################################
-//# $Id: ComponentsTreeModel.java,v 1.4 2007-12-04 22:30:27 robi Exp $
+//# $Id$
 //###########################################################################
 
 package net.sourceforge.waters.gui;

@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui.springembedder
 //# CLASS:   SpringEmbedder
 //###########################################################################
-//# $Id: SpringEmbedder.java,v 1.46 2007-12-04 03:22:55 robi Exp $
+//# $Id$
 //###########################################################################
 
 

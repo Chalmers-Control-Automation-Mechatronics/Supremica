@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.valid
 //# CLASS:   SupremicaUnmarshaller
 //###########################################################################
-//# $Id: UMDESUnmarshaller.java,v 1.2 2007-06-23 10:16:00 robi Exp $
+//# $Id$
 //###########################################################################
 
 package org.supremica.automata.IO;

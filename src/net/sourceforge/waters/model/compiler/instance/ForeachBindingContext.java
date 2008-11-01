@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.compiler.instance
 //# CLASS:   ForeachBindingContext
 //###########################################################################
-//# $Id: ForeachBindingContext.java,v 1.2 2008-06-19 21:26:59 robi Exp $
+//# $Id$
 //###########################################################################
 
 

@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.module
 //# CLASS:   SimpleNodeProxy
 //###########################################################################
-//# $Id: SimpleNodeProxy.java,v 1.6 2005-12-18 21:11:32 robi Exp $
+//# $Id$
 //###########################################################################
 
 package net.sourceforge.waters.model.module;

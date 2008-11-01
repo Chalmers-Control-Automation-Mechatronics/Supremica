@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.expr
 //# CLASS:   UnaryOperator
 //###########################################################################
-//# $Id: UnaryOperator.java,v 1.4 2008-06-29 04:01:44 robi Exp $
+//# $Id$
 //###########################################################################
 
 package net.sourceforge.waters.model.expr;

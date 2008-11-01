@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.waters.model.expr
 //# CLASS:   Operator
 //###########################################################################
-//# $Id: Operator.java,v 1.5 2007-07-21 22:13:24 robi Exp $
+//# $Id$
 //###########################################################################
 
 package net.sourceforge.waters.model.expr;

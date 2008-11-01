@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.gui.ide.actions
 //# CLASS:   IDEAction
 //###########################################################################
-//# $Id: IDEAction.java,v 1.11 2007-06-25 20:18:48 robi Exp $
+//# $Id$
 //###########################################################################
 
 package org.supremica.gui.ide.actions;

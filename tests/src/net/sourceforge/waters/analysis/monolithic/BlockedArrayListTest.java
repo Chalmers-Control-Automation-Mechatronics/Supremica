@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.analysis.monolithic
 //# CLASS:   BlockedArrayListTest
 //###########################################################################
-//# $Id: BlockedArrayListTest.java,v 1.1 2006-11-03 05:18:29 robi Exp $
+//# $Id$
 //###########################################################################
 
 

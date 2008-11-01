@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.cpp.analysis
 //# CLASS:   NativeHashSetTest
 //###########################################################################
-//# $Id: NativeHashSetTest.java,v 1.2 2006-08-20 11:09:59 robi Exp $
+//# $Id$
 //###########################################################################
 
 package net.sourceforge.waters.cpp.analysis;

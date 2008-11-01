@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.subject.module
 //# CLASS:   ModuleHierarchyChecker
 //###########################################################################
-//# $Id: ModuleHierarchyChecker.java,v 1.8 2007-07-21 08:46:39 robi Exp $
+//# $Id$
 //###########################################################################
 
 package net.sourceforge.waters.subject.module;

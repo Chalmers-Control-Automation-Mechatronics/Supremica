@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui.actions
 //# CLASS:   IDESelectAllAction
 //###########################################################################
-//# $Id: IDESelectAllAction.java,v 1.3 2008-03-09 21:52:09 robi Exp $
+//# $Id$
 //###########################################################################
 
 

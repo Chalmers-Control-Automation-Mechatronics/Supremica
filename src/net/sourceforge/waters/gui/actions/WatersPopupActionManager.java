@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.gui.ide.actions
 //# CLASS:   WatersPopupActionManager
 //###########################################################################
-//# $Id: WatersPopupActionManager.java,v 1.4 2008-03-07 04:11:02 robi Exp $
+//# $Id$
 //###########################################################################
 
 

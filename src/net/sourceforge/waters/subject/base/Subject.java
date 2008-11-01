@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.subject.base
 //# CLASS:   Subject
 //###########################################################################
-//# $Id: Subject.java,v 1.2 2005-11-03 01:24:16 robi Exp $
+//# $Id$
 //###########################################################################
 
 package net.sourceforge.waters.subject.base;

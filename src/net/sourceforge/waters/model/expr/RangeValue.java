@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.expr
 //# CLASS:   RangeValue
 //###########################################################################
-//# $Id: RangeValue.java,v 1.3 2006-11-30 01:58:05 robi Exp $
+//# $Id$
 //###########################################################################
 
 package net.sourceforge.waters.model.expr;

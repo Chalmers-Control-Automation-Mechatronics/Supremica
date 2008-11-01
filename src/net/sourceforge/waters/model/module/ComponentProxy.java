@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.module
 //# CLASS:   ComponentProxy
 //###########################################################################
-//# $Id: ComponentProxy.java,v 1.4 2007-12-04 03:22:55 robi Exp $
+//# $Id$
 //###########################################################################
 
 package net.sourceforge.waters.model.module;

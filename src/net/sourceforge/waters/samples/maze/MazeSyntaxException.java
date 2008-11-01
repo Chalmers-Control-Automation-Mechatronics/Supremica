@@ -3,7 +3,7 @@
 //# PACKAGE: waters.model.base
 //# CLASS:   MazeSyntaxException
 //###########################################################################
-//# $Id: MazeSyntaxException.java,v 1.2 2006-11-17 03:38:22 robi Exp $
+//# $Id$
 //###########################################################################
 
 package net.sourceforge.waters.samples.maze;

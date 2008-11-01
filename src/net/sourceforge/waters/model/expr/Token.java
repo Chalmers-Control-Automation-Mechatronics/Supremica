@@ -3,7 +3,7 @@
 //# PACKAGE: net.sourceforge.waters.model.expr
 //# CLASS:   Token
 //###########################################################################
-//# $Id: Token.java,v 1.4 2006-09-06 11:52:21 robi Exp $
+//# $Id$
 //###########################################################################
 
 package net.sourceforge.waters.model.expr;

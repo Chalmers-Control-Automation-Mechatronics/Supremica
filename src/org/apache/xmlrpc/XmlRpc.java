@@ -86,7 +86,7 @@ import javax.xml.parsers.*;
  * @author <a href="mailto:hannes@apache.org">Hannes Wallnoefer</a>
  * @author <a href="mailto:dlr@finemaltcoding.com">Daniel Rall</a>
  * @author <a href="mailto:andrew@kungfoocoder.org">Andrew Evers</a>
- * @version $Id: XmlRpc.java,v 1.5 2004-06-11 21:01:00 knut Exp $
+ * @version $Id$
  */
 
 // ajabaja tord, inte ändra kod du inte är insatt i bara för att få tyst på jikes:

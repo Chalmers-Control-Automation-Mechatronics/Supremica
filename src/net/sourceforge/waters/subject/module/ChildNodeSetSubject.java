@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.subject.module
 //# CLASS:   ChildNodeSetSubject
 //###########################################################################
-//# $Id: ChildNodeSetSubject.java,v 1.6 2007-02-26 21:41:18 robi Exp $
+//# $Id$
 //###########################################################################
 
 package net.sourceforge.waters.subject.module;

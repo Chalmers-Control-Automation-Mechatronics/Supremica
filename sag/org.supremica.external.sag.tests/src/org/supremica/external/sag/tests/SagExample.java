@@ -2,7 +2,7 @@
  * <copyright>
  * </copyright>
  *
- * $Id: SagExample.java,v 1.1 2006-12-18 15:26:16 torda Exp $
+ * $Id$
  */
 package org.supremica.external.sag.tests;
 

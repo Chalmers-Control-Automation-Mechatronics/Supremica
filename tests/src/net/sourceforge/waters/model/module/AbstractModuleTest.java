@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.module
 //# CLASS:   AbstractModuleTest
 //###########################################################################
-//# $Id: AbstractModuleTest.java,v 1.15 2008-02-14 02:24:09 robi Exp $
+//# $Id$
 //###########################################################################
 
 

@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui.command
 //# CLASS:   EditCommand
 //###########################################################################
-//# $Id: EditCommand.java,v 1.4 2007-12-16 22:09:39 robi Exp $
+//# $Id$
 //###########################################################################
 
 package net.sourceforge.waters.gui.command;

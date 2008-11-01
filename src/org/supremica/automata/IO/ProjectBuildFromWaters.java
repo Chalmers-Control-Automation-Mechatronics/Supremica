@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.automata.IO
 //# CLASS:   ProjectBuildFromWaters
 //###########################################################################
-//# $Id: ProjectBuildFromWaters.java,v 1.29 2008-03-13 23:25:22 robi Exp $
+//# $Id$
 //###########################################################################
 
 /*

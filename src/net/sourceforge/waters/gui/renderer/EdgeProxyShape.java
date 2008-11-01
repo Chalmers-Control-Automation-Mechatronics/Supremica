@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui.renderer
 //# CLASS:   EdgeProxyShape
 //###########################################################################
-//# $Id: EdgeProxyShape.java,v 1.19 2007-10-05 10:58:42 flordal Exp $
+//# $Id$
 //###########################################################################
 
 package net.sourceforge.waters.gui.renderer;

@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.module
 //# CLASS:   SimpleExpressionProxy
 //###########################################################################
-//# $Id: SimpleExpressionProxy.java,v 1.4 2007-11-19 02:16:52 robi Exp $
+//# $Id$
 //###########################################################################
 
 package net.sourceforge.waters.model.module;

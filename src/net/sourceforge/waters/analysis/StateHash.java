@@ -25,7 +25,7 @@ package net.sourceforge.waters.analysis;
  * Created: Wed Nov 28 21:11:16 2001
  *
  * @author Eric D. Friedman
- * @version $Id: StateHash.java,v 1.1 2006-09-19 04:52:50 yip1 Exp $
+ * @version $Id$
  */
 
 abstract public class StateHash implements Cloneable {

@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   ControlledToolbar
 //###########################################################################
-//# $Id: ControlledToolbar.java,v 1.4 2007-02-12 21:38:49 robi Exp $
+//# $Id$
 //###########################################################################
 
 package net.sourceforge.waters.gui;

@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui.springembedder
 //# CLASS:   SpringAbortDialog
 //###########################################################################
-//# $Id: SpringAbortDialog.java,v 1.3 2007-02-22 03:08:31 robi Exp $
+//# $Id$
 //###########################################################################
 
 

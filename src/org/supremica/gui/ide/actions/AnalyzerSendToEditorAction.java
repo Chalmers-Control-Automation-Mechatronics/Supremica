@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.gui.ide.actions
 //# CLASS:   AnalyzerSendToEditorAction
 //###########################################################################
-//# $Id: AnalyzerSendToEditorAction.java,v 1.13 2008-02-14 02:24:09 robi Exp $
+//# $Id$
 //###########################################################################
 
 package org.supremica.gui.ide.actions;

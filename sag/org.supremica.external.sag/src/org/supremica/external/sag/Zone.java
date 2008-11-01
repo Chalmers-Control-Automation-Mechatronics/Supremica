@@ -2,7 +2,7 @@
  * <copyright>
  * </copyright>
  *
- * $Id: Zone.java,v 1.7 2007-02-21 08:38:53 torda Exp $
+ * $Id$
  */
 package org.supremica.external.sag;
 

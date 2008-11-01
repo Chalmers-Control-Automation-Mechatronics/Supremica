@@ -75,7 +75,7 @@ import org.xml.sax.SAXException;
  * work better for you.
  *
  * @author <a href="mailto:hannes@apache.org">Hannes Wallnoefer</a>
- * @version $Id: XmlRpcClient.java,v 1.4 2004-06-11 21:01:00 knut Exp $
+ * @version $Id$
  */
 public class XmlRpcClient
 	implements XmlRpcHandler

@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.module
 //# CLASS:   EdgeProxy
 //###########################################################################
-//# $Id: EdgeProxy.java,v 1.5 2007-07-03 12:19:32 robi Exp $
+//# $Id$
 //###########################################################################
 
 package net.sourceforge.waters.model.module;

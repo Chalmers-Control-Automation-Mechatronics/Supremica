@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.subject.base
 //# CLASS:   CloningGeometryListSubject
 //###########################################################################
-//# $Id: CloningGeometryListSubject.java,v 1.7 2007-12-06 08:41:20 robi Exp $
+//# $Id$
 //###########################################################################
 
 package net.sourceforge.waters.subject.base;

@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.log
 //# CLASS:   SupremicaLevel
 //###########################################################################
-//# $Id: SupremicaLevel.java,v 1.1 2008-01-29 02:12:15 robi Exp $
+//# $Id$
 //###########################################################################
 
 package org.supremica.log;

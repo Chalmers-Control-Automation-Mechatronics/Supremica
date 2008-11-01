@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.analysis.monolithic
 //# CLASS:   MonolithicSafetyVerifier
 //###########################################################################
-//# $Id: MonolithicSafetyVerifier.java,v 1.12 2008-06-30 01:50:57 robi Exp $
+//# $Id$
 //###########################################################################
 
 package net.sourceforge.waters.analysis.monolithic;

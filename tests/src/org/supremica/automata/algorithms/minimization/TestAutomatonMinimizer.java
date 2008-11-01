@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.automata.algorithms.minimization
 //# CLASS:   TestAutomatonMinimizer
 //###########################################################################
-//# $Id: TestAutomatonMinimizer.java,v 1.14 2008-02-14 02:24:09 robi Exp $
+//# $Id$
 //###########################################################################
 
 /*

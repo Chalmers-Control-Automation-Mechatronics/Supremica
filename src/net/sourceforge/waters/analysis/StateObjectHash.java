@@ -26,7 +26,7 @@ import java.io.Serializable;
  * Created: Sun Nov  4 08:56:06 2001
  *
  * @author Eric D. Friedman
- * @version $Id: StateObjectHash.java,v 1.5 2006-11-03 15:01:57 torda Exp $
+ * @version $Id$
  */
 abstract public class StateObjectHash extends StateHash implements Serializable, StateObjectHashingStrategy {
     /** the set of Objects */

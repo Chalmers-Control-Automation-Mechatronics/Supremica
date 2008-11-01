@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.compiler.instance
 //# CLASS:   ModuleInstanceCompiler
 //###########################################################################
-//# $Id: ModuleInstanceCompiler.java,v 1.7 2008-06-28 02:01:49 robi Exp $
+//# $Id$
 //###########################################################################
 
 package net.sourceforge.waters.model.compiler.instance;

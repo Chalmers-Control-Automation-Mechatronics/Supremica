@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui.transfer
 //# CLASS:   ListInsertPosition
 //###########################################################################
-//# $Id: ListInsertPosition.java,v 1.2 2007-12-04 03:22:55 robi Exp $
+//# $Id$
 //###########################################################################
 
 package net.sourceforge.waters.gui.transfer;

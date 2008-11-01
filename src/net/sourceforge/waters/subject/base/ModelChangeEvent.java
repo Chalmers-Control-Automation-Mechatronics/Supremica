@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.subject.base
 //# CLASS:   ModelChangeEvent
 //###########################################################################
-//# $Id: ModelChangeEvent.java,v 1.8 2007-11-21 04:14:46 robi Exp $
+//# $Id$
 //###########################################################################
 
 package net.sourceforge.waters.subject.base;

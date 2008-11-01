@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.des
 //# CLASS:   AbstractProductDESTest
 //###########################################################################
-//# $Id: AbstractProductDESTest.java,v 1.3 2007-06-23 09:18:31 robi Exp $
+//# $Id$
 //###########################################################################
 
 

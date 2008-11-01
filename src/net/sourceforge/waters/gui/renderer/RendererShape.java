@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui.renderer
 //# CLASS:   RendererShape
 //###########################################################################
-//# $Id: RendererShape.java,v 1.5 2007-11-07 06:16:04 robi Exp $
+//# $Id$
 //###########################################################################
 
 package net.sourceforge.waters.gui.renderer;

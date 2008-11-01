@@ -3,7 +3,7 @@
 //# PACKAGE: net.sourceforge.waters.build.jniglue
 //# CLASS:   TypeGlue
 //###########################################################################
-//# $Id: TypeGlue.java,v 1.3 2005-11-05 09:47:15 robi Exp $
+//# $Id$
 //###########################################################################
 
 package net.sourceforge.waters.build.jniglue;

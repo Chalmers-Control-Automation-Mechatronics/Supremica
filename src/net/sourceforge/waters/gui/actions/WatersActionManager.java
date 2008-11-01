@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui.actions
 //# CLASS:   WatersActionManager
 //###########################################################################
-//# $Id: WatersActionManager.java,v 1.9 2008-03-07 04:11:02 robi Exp $
+//# $Id$
 //###########################################################################
 
 

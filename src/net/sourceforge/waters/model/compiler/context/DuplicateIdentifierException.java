@@ -3,7 +3,7 @@
 //# PACKAGE: net.sourceforge.waters.model.compiler.context
 //# CLASS:   DuplicateIdentifierException
 //###########################################################################
-//# $Id: DuplicateIdentifierException.java,v 1.2 2008-06-19 11:34:55 robi Exp $
+//# $Id$
 //###########################################################################
 
 package net.sourceforge.waters.model.compiler.context;

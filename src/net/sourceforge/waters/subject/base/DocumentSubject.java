@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.subject.base
 //# CLASS:   DocumentSubject
 //###########################################################################
-//# $Id: DocumentSubject.java,v 1.8 2007-07-03 11:20:53 robi Exp $
+//# $Id$
 //###########################################################################
 
 package net.sourceforge.waters.subject.base;

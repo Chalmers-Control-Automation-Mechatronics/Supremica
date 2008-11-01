@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.subject.base
 //# CLASS:   ArrayListSubject
 //###########################################################################
-//# $Id: ArrayListSubject.java,v 1.8 2007-12-04 03:22:58 robi Exp $
+//# $Id$
 //###########################################################################
 
 package net.sourceforge.waters.subject.base;

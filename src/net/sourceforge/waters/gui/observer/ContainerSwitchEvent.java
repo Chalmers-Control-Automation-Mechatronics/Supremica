@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui.observer
 //# CLASS:   ContainerSwitchEvent
 //###########################################################################
-//# $Id: ContainerSwitchEvent.java,v 1.1 2007-06-24 18:40:06 robi Exp $
+//# $Id$
 //###########################################################################
 
 package net.sourceforge.waters.gui.observer;

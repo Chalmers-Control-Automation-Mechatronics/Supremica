@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui.renderer
 //# CLASS:   SubjectShapeProducer
 //###########################################################################
-//# $Id: GroupNodeProxyShape.java,v 1.6 2007-02-20 22:48:11 robi Exp $
+//# $Id$
 //###########################################################################
 
 package net.sourceforge.waters.gui.renderer;

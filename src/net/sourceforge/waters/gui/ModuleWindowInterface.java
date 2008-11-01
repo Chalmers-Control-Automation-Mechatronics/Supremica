@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   ModuleWindowInterface
 //###########################################################################
-//# $Id: ModuleWindowInterface.java,v 1.13 2008-03-07 04:11:02 robi Exp $
+//# $Id$
 //###########################################################################
 
 package net.sourceforge.waters.gui;

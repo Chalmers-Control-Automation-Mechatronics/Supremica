@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.base
 //# CLASS:   Proxy
 //###########################################################################
-//# $Id: Proxy.java,v 1.4 2007-07-03 11:20:53 robi Exp $
+//# $Id$
 //###########################################################################
 
 package net.sourceforge.waters.model.base;

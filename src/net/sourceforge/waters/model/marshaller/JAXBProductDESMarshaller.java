@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.marshaller
 //# CLASS:   JAXBProductDESMarshaller
 //###########################################################################
-//# $Id: JAXBProductDESMarshaller.java,v 1.7 2006-11-08 01:28:05 robi Exp $
+//# $Id$
 //###########################################################################
 
 

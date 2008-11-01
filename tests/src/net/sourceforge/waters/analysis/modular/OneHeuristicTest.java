@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.analysis.monolithic
 //# CLASS:   OneHeuristicTest
 //###########################################################################
-//# $Id: OneHeuristicTest.java,v 1.3 2006-12-01 02:16:43 siw4 Exp $
+//# $Id$
 //###########################################################################
 
 package net.sourceforge.waters.analysis.modular;

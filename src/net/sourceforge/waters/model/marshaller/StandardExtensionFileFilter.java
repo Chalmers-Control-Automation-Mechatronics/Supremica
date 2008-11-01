@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.marshaller
 //# CLASS:   StandardExtensionFileFilter
 //###########################################################################
-//# $Id: StandardExtensionFileFilter.java,v 1.4 2007-07-03 11:20:53 robi Exp $
+//# $Id$
 //###########################################################################
 
 

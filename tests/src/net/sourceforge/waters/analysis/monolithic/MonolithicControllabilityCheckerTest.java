@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.analysis.monolithic
 //# CLASS:   MonolithicControllabilityCheckerTest
 //###########################################################################
-//# $Id: MonolithicControllabilityCheckerTest.java,v 1.4 2006-11-17 03:38:22 robi Exp $
+//# $Id$
 //###########################################################################
 
 package net.sourceforge.waters.analysis.monolithic;

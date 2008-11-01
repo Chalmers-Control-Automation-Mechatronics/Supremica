@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   EventDeclDeleteVisitor
 //###########################################################################
-//# $Id: EventDeclDeleteVisitor.java,v 1.5 2008-03-09 21:52:09 robi Exp $
+//# $Id$
 //###########################################################################
 
 

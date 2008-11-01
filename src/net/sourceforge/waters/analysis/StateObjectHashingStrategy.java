@@ -29,7 +29,7 @@ import java.io.Serializable;
  * Created: Sat Aug 17 10:52:32 2002
  *
  * @author Eric Friedman
- * @version $Id: StateObjectHashingStrategy.java,v 1.2 2006-09-22 19:42:11 robi Exp $
+ * @version $Id$
  */
 
 public interface StateObjectHashingStrategy extends Serializable {

@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui.renderer
 //# CLASS:   GeometryTools
 //###########################################################################
-//# $Id: GeometryTools.java,v 1.22 2007-12-08 22:22:31 robi Exp $
+//# $Id$
 //###########################################################################
 
 package net.sourceforge.waters.gui.renderer;

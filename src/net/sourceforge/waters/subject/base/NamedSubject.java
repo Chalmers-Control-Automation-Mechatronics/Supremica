@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.subject.base
 //# CLASS:   NamedSubject
 //###########################################################################
-//# $Id: NamedSubject.java,v 1.4 2007-03-02 05:21:14 robi Exp $
+//# $Id$
 //###########################################################################
 
 package net.sourceforge.waters.subject.base;

@@ -3,7 +3,7 @@
 //# PACKAGE: net.sourceforge.waters.build.jniglue
 //# CLASS:   TemplateFragment
 //###########################################################################
-//# $Id: TemplateFragment.java,v 1.2 2005-11-04 02:21:17 robi Exp $
+//# $Id$
 //###########################################################################
 
 package net.sourceforge.waters.build.jniglue;

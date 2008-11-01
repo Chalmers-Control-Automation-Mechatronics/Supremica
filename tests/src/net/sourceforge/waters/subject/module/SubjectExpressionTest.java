@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.subject.module
 //# CLASS:   SubjectExpressionTest
 //###########################################################################
-//# $Id: SubjectExpressionTest.java,v 1.1 2007-11-19 02:16:52 robi Exp $
+//# $Id$
 //###########################################################################
 
 package net.sourceforge.waters.subject.module;

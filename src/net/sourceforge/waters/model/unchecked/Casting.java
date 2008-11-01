@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.base
 //# CLASS:   Casting
 //###########################################################################
-//# $Id: Casting.java,v 1.4 2007-02-26 21:41:18 robi Exp $
+//# $Id$
 //###########################################################################
 
 package net.sourceforge.waters.model.unchecked;

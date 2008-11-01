@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.gui.ide
 //# CLASS:   AnalyzerAutomataPanel
 //###########################################################################
-//# $Id: AnalyzerAutomataPanel.java,v 1.30 2007-08-21 03:43:42 robi Exp $
+//# $Id$
 //###########################################################################
 
 package org.supremica.gui.ide;

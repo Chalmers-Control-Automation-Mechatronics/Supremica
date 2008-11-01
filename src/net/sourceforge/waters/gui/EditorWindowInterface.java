@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.waters.gui
 //# CLASS:   EditorWindowInterface
 //###########################################################################
-//# $Id: EditorWindowInterface.java,v 1.19 2008-03-07 04:11:02 robi Exp $
+//# $Id$
 //###########################################################################
 
 

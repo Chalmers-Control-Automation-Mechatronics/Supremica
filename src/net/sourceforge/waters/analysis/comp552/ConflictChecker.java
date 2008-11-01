@@ -3,7 +3,7 @@
 //# PACKAGE: net.sourceforge.waters.analysis
 //# CLASS:   ConflictChecker
 //###########################################################################
-//# $Id: ConflictChecker.java,v 1.1 2005/05/08 00:24:31 robi Exp $
+//# $Id$
 //###########################################################################
 
 package net.sourceforge.waters.analysis.comp552;

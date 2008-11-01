@@ -64,7 +64,7 @@ import java.util.Vector;
  * for an XML-RPC request.
  *
  * @author <a href="mailto:hannes@apache.org">Hannes Wallnoefer</a>
- * @version $Id: XmlRpcHandler.java,v 1.2 2004-06-11 21:01:00 knut Exp $
+ * @version $Id$
  */
 public interface XmlRpcHandler
 {

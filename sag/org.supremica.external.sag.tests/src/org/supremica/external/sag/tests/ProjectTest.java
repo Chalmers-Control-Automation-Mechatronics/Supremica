@@ -2,7 +2,7 @@
  * <copyright>
  * </copyright>
  *
- * $Id: ProjectTest.java,v 1.2 2007-01-23 16:08:52 torda Exp $
+ * $Id$
  */
 package org.supremica.external.sag.tests;
 

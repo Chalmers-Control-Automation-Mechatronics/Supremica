@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui.renderer
 //# CLASS:   InitialStateHandle
 //###########################################################################
-//# $Id: InitialStateHandle.java,v 1.9 2007-04-04 07:24:01 flordal Exp $
+//# $Id$
 //###########################################################################
 
 package net.sourceforge.waters.gui.renderer;

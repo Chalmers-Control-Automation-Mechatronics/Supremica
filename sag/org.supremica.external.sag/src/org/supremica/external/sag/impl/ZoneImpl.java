@@ -2,7 +2,7 @@
  * <copyright>
  * </copyright>
  *
- * $Id: ZoneImpl.java,v 1.8 2007-03-07 10:25:53 torda Exp $
+ * $Id$
  */
 package org.supremica.external.sag.impl;
 

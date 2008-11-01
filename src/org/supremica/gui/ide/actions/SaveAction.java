@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.gui.ide
 //# CLASS:   SaveAction
 //###########################################################################
-//# $Id: SaveAction.java,v 1.14 2007-06-26 20:45:14 robi Exp $
+//# $Id$
 //###########################################################################
 
 package org.supremica.gui.ide.actions;

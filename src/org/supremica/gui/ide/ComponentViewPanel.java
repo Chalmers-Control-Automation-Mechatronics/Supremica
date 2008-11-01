@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.gui.ide
 //# CLASS:   ComponentViewPanel
 //###########################################################################
-//# $Id: ComponentViewPanel.java,v 1.10 2008-03-07 04:11:02 robi Exp $
+//# $Id$
 //###########################################################################
 
 package org.supremica.gui.ide;

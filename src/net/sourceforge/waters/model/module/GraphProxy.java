@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.module
 //# CLASS:   GraphProxy
 //###########################################################################
-//# $Id: GraphProxy.java,v 1.5 2007-01-03 00:49:08 robi Exp $
+//# $Id$
 //###########################################################################
 
 package net.sourceforge.waters.model.module;

@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.module
 //# CLASS:   VariableMarkingProxy
 //###########################################################################
-//# $Id: VariableMarkingProxy.java,v 1.3 2007-12-06 08:41:20 robi Exp $
+//# $Id$
 //###########################################################################
 
 package net.sourceforge.waters.model.module;

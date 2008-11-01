@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.analysis.modular
 //# CLASS:   Projection2
 //###########################################################################
-//# $Id: Projection2.java,v 1.5 2008-06-30 21:05:32 robi Exp $
+//# $Id$
 //###########################################################################
 
 package net.sourceforge.waters.analysis.modular;

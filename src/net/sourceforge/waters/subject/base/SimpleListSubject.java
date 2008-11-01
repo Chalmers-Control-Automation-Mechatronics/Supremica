@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.subject.base
 //# CLASS:   SimpleListSubject
 //###########################################################################
-//# $Id: SimpleListSubject.java,v 1.5 2007-03-29 00:58:46 robi Exp $
+//# $Id$
 //###########################################################################
 
 package net.sourceforge.waters.subject.base;

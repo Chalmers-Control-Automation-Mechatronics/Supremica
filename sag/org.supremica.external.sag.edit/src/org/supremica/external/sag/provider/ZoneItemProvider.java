@@ -2,7 +2,7 @@
  * <copyright>
  * </copyright>
  *
- * $Id: ZoneItemProvider.java,v 1.3 2007-03-07 10:28:13 torda Exp $
+ * $Id$
  */
 package org.supremica.external.sag.provider;
 

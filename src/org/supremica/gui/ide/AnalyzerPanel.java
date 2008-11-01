@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.gui.ide
 //# CLASS:   AnalyzerPanel
 //###########################################################################
-//# $Id: AnalyzerPanel.java,v 1.36 2007-12-04 03:22:58 robi Exp $
+//# $Id$
 //###########################################################################
 
 package org.supremica.gui.ide;

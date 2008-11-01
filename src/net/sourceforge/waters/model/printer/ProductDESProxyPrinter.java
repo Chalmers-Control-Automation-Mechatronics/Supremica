@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.printer
 //# CLASS:   ProductDESProxyPrinter
 //###########################################################################
-//# $Id: ProductDESProxyPrinter.java,v 1.7 2006-11-03 15:01:57 torda Exp $
+//# $Id$
 //###########################################################################
 
 package net.sourceforge.waters.model.printer;

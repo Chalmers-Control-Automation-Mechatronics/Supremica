@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   ForeachComponentEditorDialog
 //###########################################################################
-//# $Id: ForeachComponentEditorDialog.java,v 1.4 2008-03-13 02:44:45 robi Exp $
+//# $Id$
 //###########################################################################
 
 

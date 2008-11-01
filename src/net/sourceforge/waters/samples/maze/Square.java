@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.samples.maze
 //# CLASS:   Square
 //###########################################################################
-//# $Id: Square.java,v 1.3 2006-07-25 22:06:07 robi Exp $
+//# $Id$
 //###########################################################################
 
 package net.sourceforge.waters.samples.maze;

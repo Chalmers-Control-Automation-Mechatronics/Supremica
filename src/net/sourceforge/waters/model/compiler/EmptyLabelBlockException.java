@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.compiler
 //# CLASS:   EmptyLabelBlockException
 //###########################################################################
-//# $Id: EmptyLabelBlockException.java,v 1.5 2007-02-20 04:00:42 robi Exp $
+//# $Id$
 //###########################################################################
 
 package net.sourceforge.waters.model.compiler;

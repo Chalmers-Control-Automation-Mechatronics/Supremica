@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.samples.maze
 //# CLASS:   MazeSolutionChecker
 //###########################################################################
-//# $Id: MazeSolutionChecker.java,v 1.2 2006-07-20 02:28:38 robi Exp $
+//# $Id$
 //###########################################################################
 
 package net.sourceforge.waters.samples.maze;

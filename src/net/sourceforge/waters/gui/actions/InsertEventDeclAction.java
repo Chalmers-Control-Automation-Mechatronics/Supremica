@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui.actions
 //# CLASS:   InsertEventDeclAction
 //###########################################################################
-//# $Id: InsertEventDeclAction.java,v 1.2 2007-12-04 03:22:54 robi Exp $
+//# $Id$
 //###########################################################################
 
 

@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.properties
 //# CLASS:   SupremicaPropertyChangeEvent
 //###########################################################################
-//# $Id: SupremicaPropertyChangeEvent.java,v 1.1 2007-08-21 03:43:42 robi Exp $
+//# $Id$
 //###########################################################################
 
 package org.supremica.properties;

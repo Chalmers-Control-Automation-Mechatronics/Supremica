@@ -2,7 +2,7 @@
  * <copyright>
  * </copyright>
  *
- * $Id: Sensor.java,v 1.4 2007-02-13 16:50:51 torda Exp $
+ * $Id$
  */
 package org.supremica.external.sag;
 

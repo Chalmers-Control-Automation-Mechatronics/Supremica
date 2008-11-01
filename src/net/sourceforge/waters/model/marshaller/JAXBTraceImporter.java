@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.marshaller
 //# CLASS:   JAXBTraceImporter
 //###########################################################################
-//# $Id: JAXBTraceImporter.java,v 1.6 2008-02-14 06:46:26 robi Exp $
+//# $Id$
 //###########################################################################
 
 package net.sourceforge.waters.model.marshaller;

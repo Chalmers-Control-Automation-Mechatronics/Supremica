@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.marshaller
 //# CLASS:   ModuleConstantAliasListHandler
 //###########################################################################
-//# $Id: ModuleConstantAliasListHandler.java,v 1.4 2007-06-08 10:45:20 robi Exp $
+//# $Id$
 //###########################################################################
 
 package net.sourceforge.waters.model.marshaller;

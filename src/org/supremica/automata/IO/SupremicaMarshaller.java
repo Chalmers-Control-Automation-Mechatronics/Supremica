@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.valid
 //# CLASS:   SupremicaMarshaller
 //###########################################################################
-//# $Id: SupremicaMarshaller.java,v 1.2 2007-07-16 11:34:32 flordal Exp $
+//# $Id$
 //###########################################################################
 
 package org.supremica.automata.IO;

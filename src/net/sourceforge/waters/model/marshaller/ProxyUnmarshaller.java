@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.marshaller
 //# CLASS:   ProxyMarshaller
 //###########################################################################
-//# $Id: ProxyUnmarshaller.java,v 1.6 2007-06-23 10:16:00 robi Exp $
+//# $Id$
 //###########################################################################
 
 package net.sourceforge.waters.model.marshaller;

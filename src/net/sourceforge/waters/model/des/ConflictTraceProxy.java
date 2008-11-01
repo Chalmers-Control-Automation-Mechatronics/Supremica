@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.des
 //# CLASS:   ConflictTraceProxy
 //###########################################################################
-//# $Id: ConflictTraceProxy.java,v 1.2 2006-07-20 02:28:37 robi Exp $
+//# $Id$
 //###########################################################################
 
 package net.sourceforge.waters.model.des;

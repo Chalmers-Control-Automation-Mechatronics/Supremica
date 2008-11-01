@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.plain.des
 //# CLASS:   PlainProductDESTest
 //###########################################################################
-//# $Id: PlainProductDESTest.java,v 1.3 2006-07-20 02:28:38 robi Exp $
+//# $Id$
 //###########################################################################
 
 

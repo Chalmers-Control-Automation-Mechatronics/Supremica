@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.base
 //# CLASS:   ProxyAccessorMap
 //###########################################################################
-//# $Id: ProxyAccessorMap.java,v 1.3 2006-08-18 06:39:29 robi Exp $
+//# $Id$
 //###########################################################################
 
 package net.sourceforge.waters.model.base;

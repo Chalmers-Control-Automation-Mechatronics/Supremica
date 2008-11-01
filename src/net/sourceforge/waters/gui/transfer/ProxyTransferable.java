@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui.transfer
 //# CLASS:   ProxyTransferable
 //###########################################################################
-//# $Id: ProxyTransferable.java,v 1.4 2007-12-13 23:49:37 robi Exp $
+//# $Id$
 //###########################################################################
 
 

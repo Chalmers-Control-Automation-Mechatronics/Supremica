@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.analysis
 //# CLASS:   AbstractModelCheckerTest
 //###########################################################################
-//# $Id: AbstractModelCheckerTest.java,v 1.5 2008-02-14 02:24:09 robi Exp $
+//# $Id$
 //###########################################################################
 
 package net.sourceforge.waters.analysis;

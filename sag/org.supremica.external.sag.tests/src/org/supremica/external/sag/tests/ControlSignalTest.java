@@ -2,7 +2,7 @@
  * <copyright>
  * </copyright>
  *
- * $Id: ControlSignalTest.java,v 1.1 2007-03-07 10:29:34 torda Exp $
+ * $Id$
  */
 package org.supremica.external.sag.tests;
 

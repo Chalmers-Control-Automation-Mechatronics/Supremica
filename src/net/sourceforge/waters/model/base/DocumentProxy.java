@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.base
 //# CLASS:   DocumentProxy
 //###########################################################################
-//# $Id: DocumentProxy.java,v 1.5 2007-07-16 11:34:32 flordal Exp $
+//# $Id$
 //###########################################################################
 
 package net.sourceforge.waters.model.base;

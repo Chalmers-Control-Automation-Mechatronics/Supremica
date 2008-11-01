@@ -1,5 +1,5 @@
 //# -*- tab-width: 4  indent-tabs-mode: t  c-basic-offset: 4 -*-
-//# $Id: FileDialogs.java,v 1.34 2007-10-04 15:14:56 flordal Exp $
+//# $Id$
 
 /*
  * Supremica Software License Agreement

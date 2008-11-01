@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui.observer
 //# CLASS:   UndoRedoEvent
 //###########################################################################
-//# $Id: UndoRedoEvent.java,v 1.3 2007-06-21 15:57:55 robi Exp $
+//# $Id$
 //###########################################################################
 
 package net.sourceforge.waters.gui.observer;

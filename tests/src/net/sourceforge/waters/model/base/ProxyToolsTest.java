@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.plain.des
 //# CLASS:   ProxyToolsTest
 //###########################################################################
-//# $Id: ProxyToolsTest.java,v 1.3 2007-07-03 11:20:53 robi Exp $
+//# $Id$
 //###########################################################################
 
 package net.sourceforge.waters.model.base;

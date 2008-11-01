@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.des
 //# CLASS:   TraceProxy
 //###########################################################################
-//# $Id: TraceProxy.java,v 1.3 2007-07-22 00:02:07 robi Exp $
+//# $Id$
 //###########################################################################
 
 package net.sourceforge.waters.model.des;

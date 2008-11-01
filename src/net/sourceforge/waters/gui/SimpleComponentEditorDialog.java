@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   SimpleComponentEditorDialog
 //###########################################################################
-//# $Id: SimpleComponentEditorDialog.java,v 1.5 2008-03-13 01:30:11 robi Exp $
+//# $Id$
 //###########################################################################
 
 

@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.analysis.modular
 //# CLASS:   ModularLanguageInclusionChecker
 //###########################################################################
-//# $Id: ModularLanguageInclusionChecker.java,v 1.13 2008-06-30 01:50:57 robi Exp $
+//# $Id$
 //###########################################################################
 
 package net.sourceforge.waters.analysis.modular;

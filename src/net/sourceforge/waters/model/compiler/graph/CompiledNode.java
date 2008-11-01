@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.compiler.graph
 //# CLASS:   CompiledNode
 //###########################################################################
-//# $Id: CompiledNode.java,v 1.1 2008-06-19 11:34:55 robi Exp $
+//# $Id$
 //###########################################################################
 
 package net.sourceforge.waters.model.compiler.graph;

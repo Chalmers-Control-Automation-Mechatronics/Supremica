@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.cpp.analysis
 //# CLASS:   NativeSafetyVerifier
 //###########################################################################
-//# $Id: NativeSafetyVerifier.java,v 1.4 2006-12-01 02:16:42 siw4 Exp $
+//# $Id$
 //###########################################################################
 
 package net.sourceforge.waters.cpp.analysis;

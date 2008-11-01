@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.subject.module
 //# CLASS:   SubjectModuleTest
 //###########################################################################
-//# $Id: SubjectProductDESImporterTest.java,v 1.1 2006-09-14 11:31:12 robi Exp $
+//# $Id$
 //###########################################################################
 
 

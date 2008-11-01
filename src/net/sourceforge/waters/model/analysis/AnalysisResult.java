@@ -3,7 +3,7 @@
 //# PACKAGE: net.sourceforge.waters.model.analysis
 //# CLASS:   AnalysisResult
 //###########################################################################
-//# $Id: AnalysisResult.java,v 1.2 2006-08-15 01:43:06 robi Exp $
+//# $Id$
 //###########################################################################
 
 package net.sourceforge.waters.model.analysis;

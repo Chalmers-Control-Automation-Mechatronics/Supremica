@@ -3,7 +3,7 @@
 //# PACKAGE: net.sourceforge.waters.analysis
 //# CLASS:   StateEncoding
 //###########################################################################
-//# $Id: EncodedStateTuple.java,v 1.7 2006-09-22 19:42:11 robi Exp $
+//# $Id$
 //###########################################################################
 
 package net.sourceforge.waters.analysis;

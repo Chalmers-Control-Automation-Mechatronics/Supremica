@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.analysis
 //# CLASS:   ModelVerifier
 //###########################################################################
-//# $Id: ModelVerifier.java,v 1.5 2006-11-14 03:32:30 robi Exp $
+//# $Id$
 //###########################################################################
 
 package net.sourceforge.waters.model.analysis;

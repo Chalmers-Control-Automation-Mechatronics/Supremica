@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.subject.base
 //# CLASS:   IndexedHashSetSubject
 //###########################################################################
-//# $Id: IndexedHashSetSubject.java,v 1.8 2007-12-04 03:22:58 robi Exp $
+//# $Id$
 //###########################################################################
 
 package net.sourceforge.waters.subject.base;

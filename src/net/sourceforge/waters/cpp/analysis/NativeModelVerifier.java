@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.cpp.analysis
 //# CLASS:   NativeModelVerifier
 //###########################################################################
-//# $Id: NativeModelVerifier.java,v 1.6 2008-07-01 22:18:21 robi Exp $
+//# $Id$
 //###########################################################################
 
 package net.sourceforge.waters.cpp.analysis;

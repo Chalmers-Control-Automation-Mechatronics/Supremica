@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.compiler
 //# CLASS:   ThreePassCompilerTest
 //###########################################################################
-//# $Id: ThreePassCompilerTest.java,v 1.1 2008-06-19 21:26:59 robi Exp $
+//# $Id$
 //###########################################################################
 
 package net.sourceforge.waters.model.compiler;

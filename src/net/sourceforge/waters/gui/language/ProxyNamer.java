@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui.language
 //# CLASS:   ProxyNamer
 //###########################################################################
-//# $Id: ProxyNamer.java,v 1.5 2007-12-07 06:24:03 robi Exp $
+//# $Id$
 //###########################################################################
 
 package net.sourceforge.waters.gui.language;

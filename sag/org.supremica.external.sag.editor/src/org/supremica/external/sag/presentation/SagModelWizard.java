@@ -2,7 +2,7 @@
  * <copyright>
  * </copyright>
  *
- * $Id: SagModelWizard.java,v 1.2 2007-01-05 13:29:27 torda Exp $
+ * $Id$
  */
 package org.supremica.external.sag.presentation;
 

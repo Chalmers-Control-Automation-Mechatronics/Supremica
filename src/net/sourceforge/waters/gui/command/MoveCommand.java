@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui.command
 //# CLASS:   MoveCommand
 //###########################################################################
-//# $Id: MoveCommand.java,v 1.3 2007-12-08 21:17:53 robi Exp $
+//# $Id$
 //###########################################################################
 
 package net.sourceforge.waters.gui.command;

@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui.command
 //# CLASS:   AbstractEditCommand
 //###########################################################################
-//# $Id: AbstractEditCommand.java,v 1.3 2007-12-16 22:09:39 robi Exp $
+//# $Id$
 //###########################################################################
 
 

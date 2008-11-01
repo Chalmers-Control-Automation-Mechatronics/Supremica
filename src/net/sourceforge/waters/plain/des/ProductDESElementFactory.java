@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.plain.des;
 //# CLASS:   ProductDESElementFactory
 //###########################################################################
-//# $Id: ProductDESElementFactory.java,v 1.8 2006-11-03 15:01:56 torda Exp $
+//# $Id$
 //###########################################################################
 
 package net.sourceforge.waters.plain.des;

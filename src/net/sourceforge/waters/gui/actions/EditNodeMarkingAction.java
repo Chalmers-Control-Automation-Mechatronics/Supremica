@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui.actions
 //# CLASS:   EditNodeMarkingAction
 //###########################################################################
-//# $Id: EditNodeMarkingAction.java,v 1.5 2008-02-19 02:56:50 robi Exp $
+//# $Id$
 //###########################################################################
 
 

@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.analysis.monolothic
 //# CLASS:   MonolithicLanguageInclusionChecker
 //###########################################################################
-//# $Id: MonolithicLanguageInclusionChecker.java,v 1.1 2006-11-06 03:23:35 robi Exp $
+//# $Id$
 //###########################################################################
 
 package net.sourceforge.waters.analysis.monolithic;

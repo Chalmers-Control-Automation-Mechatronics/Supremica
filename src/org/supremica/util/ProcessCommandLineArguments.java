@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.util
 //# CLASS:   ProcessCommandLineArguments
 //###########################################################################
-//# $Id: ProcessCommandLineArguments.java,v 1.19 2007-11-08 07:57:07 flordal Exp $
+//# $Id$
 //###########################################################################
 
 /*

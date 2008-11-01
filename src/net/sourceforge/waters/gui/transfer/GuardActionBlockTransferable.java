@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui.transfer
 //# CLASS:   GuardActionBlockTransferable
 //###########################################################################
-//# $Id: GuardActionBlockTransferable.java,v 1.1 2007-12-12 23:57:49 robi Exp $
+//# $Id$
 //###########################################################################
 
 

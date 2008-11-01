@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.waters.samples.algorithms
 //# CLASS:   ConflictEquiv
 //###########################################################################
-//# $Id: ConflictEquiv.java,v 1.3 2006-11-03 15:01:57 torda Exp $
+//# $Id$
 //###########################################################################
 
 

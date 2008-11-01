@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.des
 //# CLASS:   AbstractAutomatonTest
 //###########################################################################
-//# $Id: AbstractAutomatonTest.java,v 1.2 2006-07-20 02:28:38 robi Exp $
+//# $Id$
 //###########################################################################
 
 

@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.module
 //# CLASS:   ThreePassCompiler
 //###########################################################################
-//# $Id: ThreePassCompiler.java,v 1.3 2008-06-28 08:29:58 robi Exp $
+//# $Id$
 //###########################################################################
 
 package net.sourceforge.waters.model.compiler;

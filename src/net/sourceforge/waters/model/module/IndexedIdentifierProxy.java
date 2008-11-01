@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.module
 //# CLASS:   IndexedIdentifierProxy
 //###########################################################################
-//# $Id: IndexedIdentifierProxy.java,v 1.4 2008-02-15 07:31:49 robi Exp $
+//# $Id$
 //###########################################################################
 
 package net.sourceforge.waters.model.module;

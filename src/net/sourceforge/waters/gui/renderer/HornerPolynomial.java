@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui.renderer
 //# CLASS:   HornerPolynomial
 //###########################################################################
-//# $Id: HornerPolynomial.java,v 1.5 2007-08-17 00:38:47 robi Exp $
+//# $Id$
 //###########################################################################
 
 package net.sourceforge.waters.gui.renderer;

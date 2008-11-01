@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.module
 //# CLASS:   NodeProxy
 //###########################################################################
-//# $Id: NodeProxy.java,v 1.5 2006-09-20 16:24:12 robi Exp $
+//# $Id$
 //###########################################################################
 
 package net.sourceforge.waters.model.module;

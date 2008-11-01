@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.subject.module
 //# CLASS:   SubjectModuleTest
 //###########################################################################
-//# $Id: SubjectModuleTest.java,v 1.7 2007-07-03 11:20:54 robi Exp $
+//# $Id$
 //###########################################################################
 
 

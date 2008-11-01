@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.analysis
 //# CLASS:   StateTuple
 //###########################################################################
-//# $Id: StateTuple.java,v 1.1 2006-11-03 05:18:28 robi Exp $
+//# $Id$
 //###########################################################################
 
 package net.sourceforge.waters.analysis.monolithic;

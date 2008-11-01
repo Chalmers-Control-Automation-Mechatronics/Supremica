@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.gui.ide.actions
 //# CLASS:   ScheduleDialog
 //###########################################################################
-//# $Id: ScheduleDialog.java,v 1.63 2008-05-13 19:33:01 avenir Exp $
+//# $Id$
 //###########################################################################
 
 package org.supremica.gui;

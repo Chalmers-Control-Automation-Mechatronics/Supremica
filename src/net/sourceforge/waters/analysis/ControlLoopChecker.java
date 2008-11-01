@@ -3,7 +3,7 @@
 //# PACKAGE: net.sourceforge.waters.analysis
 //# CLASS:   ControlLoopChecker
 //###########################################################################
-//# $Id: ControlLoopChecker.java,v 1.20 2006-12-05 21:52:19 flordal Exp $
+//# $Id$
 //###########################################################################
 
 package net.sourceforge.waters.analysis;

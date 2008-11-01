@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.build.jniglue
 //# CLASS:   ObjectClassGlue
 //###########################################################################
-//# $Id: ObjectClassGlue.java,v 1.3 2006-08-16 02:56:42 robi Exp $
+//# $Id$
 //###########################################################################
 
 package net.sourceforge.waters.build.jniglue;

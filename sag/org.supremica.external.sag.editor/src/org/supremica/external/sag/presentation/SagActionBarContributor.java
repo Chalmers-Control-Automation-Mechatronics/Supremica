@@ -2,7 +2,7 @@
  * <copyright>
  * </copyright>
  *
- * $Id: SagActionBarContributor.java,v 1.4 2007-03-07 10:27:19 torda Exp $
+ * $Id$
  */
 package org.supremica.external.sag.presentation;
 

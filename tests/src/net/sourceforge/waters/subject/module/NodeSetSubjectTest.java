@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.subject.module
 //# CLASS:   NodeSetSubjectTest
 //###########################################################################
-//# $Id: NodeSetSubjectTest.java,v 1.3 2007-06-23 09:18:31 robi Exp $
+//# $Id$
 //###########################################################################
 
 

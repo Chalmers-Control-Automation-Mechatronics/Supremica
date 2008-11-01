@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui.renderer
 //# CLASS:   GeometryToolsTest
 //###########################################################################
-//# $Id: GeometryToolsTest.java,v 1.1 2007-05-24 20:20:57 robi Exp $
+//# $Id$
 //###########################################################################
 
 package net.sourceforge.waters.gui.renderer;

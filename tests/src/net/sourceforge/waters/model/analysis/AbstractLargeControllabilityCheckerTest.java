@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.analysis
 //# CLASS:   AbstractLargeControllabilityCheckerTest
 //###########################################################################
-//# $Id: AbstractLargeControllabilityCheckerTest.java,v 1.5 2007-11-02 00:30:37 robi Exp $
+//# $Id$
 //###########################################################################
 
 package net.sourceforge.waters.model.analysis;

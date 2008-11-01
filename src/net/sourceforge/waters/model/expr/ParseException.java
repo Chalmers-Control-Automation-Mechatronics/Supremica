@@ -3,7 +3,7 @@
 //# PACKAGE: net.sourceforge.waters.model.expr
 //# CLASS:   ParseException
 //###########################################################################
-//# $Id: ParseException.java,v 1.5 2006-11-17 03:38:22 robi Exp $
+//# $Id$
 //###########################################################################
 
 package net.sourceforge.waters.model.expr;

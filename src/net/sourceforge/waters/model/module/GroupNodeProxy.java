@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.module
 //# CLASS:   GroupNodeProxy
 //###########################################################################
-//# $Id: GroupNodeProxy.java,v 1.4 2005-11-03 01:24:16 robi Exp $
+//# $Id$
 //###########################################################################
 
 package net.sourceforge.waters.model.module;

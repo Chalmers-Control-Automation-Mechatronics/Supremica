@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.build.jniglue
 //# CLASS:   ConstructorGlue
 //###########################################################################
-//# $Id: ConstructorGlue.java,v 1.4 2007-03-19 04:44:56 robi Exp $
+//# $Id$
 //###########################################################################
 
 package net.sourceforge.waters.build.jniglue;

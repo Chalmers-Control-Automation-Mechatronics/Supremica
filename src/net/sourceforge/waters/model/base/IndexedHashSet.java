@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.base
 //# CLASS:   IndexedHashSet
 //###########################################################################
-//# $Id: IndexedHashSet.java,v 1.4 2006-07-20 02:28:37 robi Exp $
+//# $Id$
 //###########################################################################
 
 package net.sourceforge.waters.model.base;

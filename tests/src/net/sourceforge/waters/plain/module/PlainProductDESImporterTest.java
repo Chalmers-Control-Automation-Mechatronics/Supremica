@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.plain.module
 //# CLASS:   PlainModuleTest
 //###########################################################################
-//# $Id: PlainProductDESImporterTest.java,v 1.1 2006-09-14 11:31:12 robi Exp $
+//# $Id$
 //###########################################################################
 
 

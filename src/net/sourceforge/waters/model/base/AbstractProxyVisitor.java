@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.base
 //# CLASS:   AbstractProxyVisitor
 //###########################################################################
-//# $Id: AbstractProxyVisitor.java,v 1.2 2005-11-03 01:24:15 robi Exp $
+//# $Id$
 //###########################################################################
 
 package net.sourceforge.waters.model.base;

@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.subject.base
 //# CLASS:   ListSubject
 //###########################################################################
-//# $Id: ListSubject.java,v 1.6 2007-06-11 05:59:18 robi Exp $
+//# $Id$
 //###########################################################################
 
 package net.sourceforge.waters.subject.base;

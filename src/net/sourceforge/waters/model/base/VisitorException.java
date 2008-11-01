@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.base
 //# CLASS:   VisitorException
 //###########################################################################
-//# $Id: VisitorException.java,v 1.5 2007-12-04 03:22:55 robi Exp $
+//# $Id$
 //###########################################################################
 
 package net.sourceforge.waters.model.base;

@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.gui.ide
 //# CLASS:   DocumentContainerManager
 //###########################################################################
-//# $Id: DocumentContainerManager.java,v 1.9 2008-01-11 12:59:03 torda Exp $
+//# $Id$
 //###########################################################################
 
 package org.supremica.gui.ide;

@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.expr
 //# CLASS:   AbstractExpressionTest
 //###########################################################################
-//# $Id: AbstractExpressionTest.java,v 1.4 2008-06-26 02:29:59 robi Exp $
+//# $Id$
 //###########################################################################
 
 

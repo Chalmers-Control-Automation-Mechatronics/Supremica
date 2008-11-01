@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui.actions
 //# CLASS:   GraphSaveEPSAction
 //###########################################################################
-//# $Id: GraphSaveEPSAction.java,v 1.4 2007-12-04 03:22:54 robi Exp $
+//# $Id$
 //###########################################################################
 
 

@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.subject.base
 //# CLASS:   IndexedSetSubject
 //###########################################################################
-//# $Id: IndexedSetSubject.java,v 1.4 2007-07-03 11:20:53 robi Exp $
+//# $Id$
 //###########################################################################
 
 package net.sourceforge.waters.subject.base;

@@ -3,7 +3,7 @@
 //# PACKAGE: net.sourceforge.waters.analysis
 //# CLASS:   TransitionProperty
 //###########################################################################
-//# $Id: TransitionProperty.java,v 1.4 2006-09-07 23:19:17 yip1 Exp $
+//# $Id$
 //###########################################################################
 
 package net.sourceforge.waters.analysis;

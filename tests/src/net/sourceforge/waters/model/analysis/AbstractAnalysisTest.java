@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.analysis
 //# CLASS:   AbstractAnalysisTest
 //###########################################################################
-//# $Id: AbstractAnalysisTest.java,v 1.1 2007-05-26 13:35:32 robi Exp $
+//# $Id$
 //###########################################################################
 
 package net.sourceforge.waters.model.analysis;

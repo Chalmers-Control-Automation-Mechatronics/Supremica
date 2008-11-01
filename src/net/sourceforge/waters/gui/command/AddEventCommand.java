@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui.command
 //# CLASS:   CreateNodeCommand
 //###########################################################################
-//# $Id: AddEventCommand.java,v 1.12 2007-12-04 03:22:54 robi Exp $
+//# $Id$
 //###########################################################################
 
 package net.sourceforge.waters.gui.command;

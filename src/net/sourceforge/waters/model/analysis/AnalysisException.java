@@ -3,7 +3,7 @@
 //# PACKAGE: net.sourceforge.waters.model.analysis
 //# CLASS:   AnalysisException
 //###########################################################################
-//# $Id: AnalysisException.java,v 1.2 2006-11-17 03:38:22 robi Exp $
+//# $Id$
 //###########################################################################
 
 package net.sourceforge.waters.model.analysis;

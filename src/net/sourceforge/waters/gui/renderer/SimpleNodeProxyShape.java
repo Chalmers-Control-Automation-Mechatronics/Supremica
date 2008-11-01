@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui.renderer
 //# CLASS:   SimpleNodeProxyShape
 //###########################################################################
-//# $Id: SimpleNodeProxyShape.java,v 1.20 2008-02-15 07:31:49 robi Exp $
+//# $Id$
 //###########################################################################
 
 

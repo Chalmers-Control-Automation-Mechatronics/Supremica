@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.printer
 //# CLASS:   ProxyPrinter
 //###########################################################################
-//# $Id: ProxyPrinter.java,v 1.7 2007-04-23 02:51:11 robi Exp $
+//# $Id$
 //###########################################################################
 
 package net.sourceforge.waters.model.printer;

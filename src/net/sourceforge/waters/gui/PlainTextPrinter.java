@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   HTMLPrinter
 //###########################################################################
-//# $Id: PlainTextPrinter.java,v 1.3 2007-06-08 10:45:20 robi Exp $
+//# $Id$
 //###########################################################################
 
 package net.sourceforge.waters.gui;

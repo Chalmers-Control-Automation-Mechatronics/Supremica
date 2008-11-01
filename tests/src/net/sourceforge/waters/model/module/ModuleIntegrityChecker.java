@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.module
 //# CLASS:   ModuleIntegrityChecker
 //###########################################################################
-//# $Id: ModuleIntegrityChecker.java,v 1.3 2007-12-04 03:23:02 robi Exp $
+//# $Id$
 //###########################################################################
 
 

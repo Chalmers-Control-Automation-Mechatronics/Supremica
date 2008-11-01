@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui.observer
 //# CLASS:   EditorChangedEvent
 //###########################################################################
-//# $Id: EditorChangedEvent.java,v 1.6 2007-12-04 03:22:55 robi Exp $
+//# $Id$
 //###########################################################################
 
 

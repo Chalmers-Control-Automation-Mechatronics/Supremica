@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.automata.IO
 //# CLASS:   SupremicaUnmarshaller
 //###########################################################################
-//# $Id: SupremicaUnmarshaller.java,v 1.20 2008-03-13 16:18:40 avenir Exp $
+//# $Id$
 //###########################################################################
 
 package org.supremica.automata.IO;

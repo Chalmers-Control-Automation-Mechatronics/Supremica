@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.analysis.modular
 //# CLASS:   OneUncontrollableCheckerTest
 //###########################################################################
-//# $Id: OneUncontrollableCheckerTest.java,v 1.4 2008-07-01 22:18:21 robi Exp $
+//# $Id$
 //###########################################################################
 
 package net.sourceforge.waters.analysis.modular;

@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.samples.maze
 //# CLASS:   MazeCompiler
 //###########################################################################
-//# $Id: MazeCompiler.java,v 1.13 2008-02-14 02:24:09 robi Exp $
+//# $Id$
 //###########################################################################
 
 package net.sourceforge.waters.samples.maze;

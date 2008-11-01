@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.junit
 //# CLASS:   AbstractWatersTest
 //###########################################################################
-//# $Id: AbstractWatersTest.java,v 1.8 2008-02-14 02:24:09 robi Exp $
+//# $Id$
 //###########################################################################
 
 package net.sourceforge.waters.junit;

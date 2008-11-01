@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui.actions
 //# CLASS:   InsertVariableAction
 //###########################################################################
-//# $Id: InsertVariableAction.java,v 1.3 2007-12-04 03:22:54 robi Exp $
+//# $Id$
 //###########################################################################
 
 

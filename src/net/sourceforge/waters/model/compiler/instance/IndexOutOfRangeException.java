@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.compiler.instance
 //# CLASS:   IndexOutOfRangeException
 //###########################################################################
-//# $Id: IndexOutOfRangeException.java,v 1.1 2008-06-16 07:09:51 robi Exp $
+//# $Id$
 //###########################################################################
 
 package net.sourceforge.waters.model.compiler.instance;

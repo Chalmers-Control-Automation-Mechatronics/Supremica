@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.samples.maze
 //# CLASS:   NativeMazeTest
 //###########################################################################
-//# $Id: NativeMazeTest.java,v 1.3 2006-11-08 21:49:12 robi Exp $
+//# $Id$
 //###########################################################################
 
 package net.sourceforge.waters.samples.maze;

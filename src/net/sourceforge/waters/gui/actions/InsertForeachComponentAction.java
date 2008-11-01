@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui.actions
 //# CLASS:   InsertForeachComponentAction
 //###########################################################################
-//# $Id: InsertForeachComponentAction.java,v 1.1 2008-02-14 06:46:26 robi Exp $
+//# $Id$
 //###########################################################################
 
 

@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.module
 //# CLASS:   GuardActionBlockProxy
 //###########################################################################
-//# $Id: GuardActionBlockProxy.java,v 1.6 2006-10-31 16:50:44 martin Exp $
+//# $Id$
 //###########################################################################
 
 package net.sourceforge.waters.model.module;

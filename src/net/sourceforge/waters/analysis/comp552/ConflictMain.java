@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.analysis
 //# CLASS:   ConflictMain
 //##########################################################################
-//# $Id: ConflictMain.java,v 1.3 2006/11/03 15:01:57 torda Exp $
+//# $Id$
 //##########################################################################
 
 package net.sourceforge.waters.analysis.comp552;

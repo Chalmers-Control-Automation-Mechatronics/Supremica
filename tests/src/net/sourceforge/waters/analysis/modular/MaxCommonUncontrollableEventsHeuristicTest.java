@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.analysis.monolithic
 //# CLASS:   NativeControllabilityCheckerTest
 //###########################################################################
-//# $Id: MaxCommonUncontrollableEventsHeuristicTest.java,v 1.4 2007-01-03 00:49:08 robi Exp $
+//# $Id$
 //###########################################################################
 
 package net.sourceforge.waters.analysis.modular;

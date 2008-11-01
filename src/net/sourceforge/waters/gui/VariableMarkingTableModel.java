@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   VariableMarkingTableModel
 //###########################################################################
-//# $Id: VariableMarkingTableModel.java,v 1.2 2007-11-20 03:37:35 robi Exp $
+//# $Id$
 //###########################################################################
 
 

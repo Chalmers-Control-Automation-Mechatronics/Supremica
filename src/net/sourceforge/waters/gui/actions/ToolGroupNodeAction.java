@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui.actions
 //# CLASS:   ToolGroupNodeAction
 //###########################################################################
-//# $Id: ToolGroupNodeAction.java,v 1.1 2007-06-25 20:18:48 robi Exp $
+//# $Id$
 //###########################################################################
 
 

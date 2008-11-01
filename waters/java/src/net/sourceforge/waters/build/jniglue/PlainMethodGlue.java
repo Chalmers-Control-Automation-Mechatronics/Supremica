@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.build.jniglue
 //# CLASS:   PlainMethodGlue
 //###########################################################################
-//# $Id: PlainMethodGlue.java,v 1.6 2007-03-19 04:44:56 robi Exp $
+//# $Id$
 //###########################################################################
 
 package net.sourceforge.waters.build.jniglue;

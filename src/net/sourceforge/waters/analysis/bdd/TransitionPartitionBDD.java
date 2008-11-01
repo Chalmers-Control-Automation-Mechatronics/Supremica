@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.analysis.bdd
 //# CLASS:   TransitionPartitionBDD
 //###########################################################################
-//# $Id: TransitionPartitionBDD.java,v 1.1 2007-11-02 00:30:37 robi Exp $
+//# $Id$
 //###########################################################################
 
 package net.sourceforge.waters.analysis.bdd;

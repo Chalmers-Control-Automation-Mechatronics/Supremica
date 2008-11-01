@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.expr
 //# CLASS:   IntConstantResult
 //###########################################################################
-//# $Id: IntConstantResult.java,v 1.1 2006-09-06 11:52:21 robi Exp $
+//# $Id$
 //###########################################################################
 
 package net.sourceforge.waters.model.expr;

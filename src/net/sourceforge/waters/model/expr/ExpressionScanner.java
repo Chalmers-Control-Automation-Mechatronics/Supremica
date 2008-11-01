@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.expr
 //# CLASS:   ExpressionScanner
 //###########################################################################
-//# $Id: ExpressionScanner.java,v 1.8 2006-06-07 01:24:28 martin Exp $
+//# $Id$
 //###########################################################################
 
 package net.sourceforge.waters.model.expr;

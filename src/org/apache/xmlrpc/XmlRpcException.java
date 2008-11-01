@@ -61,7 +61,7 @@ package org.apache.xmlrpc;
  * IOException will be thrown instead.
  *
  * @author <a href="mailto:hannes@apache.org">Hannes Wallnoefer</a>
- * @version $Id: XmlRpcException.java,v 1.2 2004-06-11 21:01:00 knut Exp $
+ * @version $Id$
  */
 public class XmlRpcException
 	extends Exception

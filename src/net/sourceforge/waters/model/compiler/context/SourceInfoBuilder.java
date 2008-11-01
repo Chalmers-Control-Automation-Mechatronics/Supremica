@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.compiler.context
 //# CLASS:   SourceInfoBuilder
 //###########################################################################
-//# $Id: SourceInfoBuilder.java,v 1.2 2008-06-19 19:10:10 robi Exp $
+//# $Id$
 //###########################################################################
 
 

@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.marshaller
 //# CLASS:   GraphEdgeListHandler
 //###########################################################################
-//# $Id: GraphEdgeListHandler.java,v 1.3 2006-07-20 02:28:37 robi Exp $
+//# $Id$
 //###########################################################################
 
 package net.sourceforge.waters.model.marshaller;

@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.samples.maze
 //# CLASS:   MonolithicMazeTest
 //###########################################################################
-//# $Id: MonolithicMazeTest.java,v 1.2 2006-11-08 21:49:12 robi Exp $
+//# $Id$
 //###########################################################################
 
 package net.sourceforge.waters.samples.maze;

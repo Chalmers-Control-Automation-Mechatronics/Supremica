@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.compiler.dnf
 //# CLASS:   DNFConverterTest
 //###########################################################################
-//# $Id: DNFConverterTest.java,v 1.1 2008-06-29 07:13:44 robi Exp $
+//# $Id$
 //###########################################################################
 
 

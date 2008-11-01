@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.analysis
 //# CLASS:   AbstractLanguageInclusionCheckerTest
 //###########################################################################
-//# $Id: AbstractLanguageInclusionCheckerTest.java,v 1.7 2008-02-14 02:24:09 robi Exp $
+//# $Id$
 //###########################################################################
 
 package net.sourceforge.waters.model.analysis;

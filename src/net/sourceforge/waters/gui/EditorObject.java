@@ -4,8 +4,8 @@
 //# PACKAGE: wnet.sourceforge.aters.gui
 //# CLASS:   EditorObject
 //###########################################################################
-//# $Id: EditorObject.java,v 1.27 2007-10-04 15:14:56 flordal Exp $
-//# $Id: EditorObject.java,v 1.27 2007-10-04 15:14:56 flordal Exp $
+//# $Id$
+//# $Id$
 //###########################################################################
 
 

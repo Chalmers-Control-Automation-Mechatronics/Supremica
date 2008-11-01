@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.marshaller
 //# CLASS:   JAXBExporter
 //###########################################################################
-//# $Id: JAXBExporter.java,v 1.3 2006-09-19 15:53:20 robi Exp $
+//# $Id$
 //###########################################################################
 
 package net.sourceforge.waters.model.marshaller;

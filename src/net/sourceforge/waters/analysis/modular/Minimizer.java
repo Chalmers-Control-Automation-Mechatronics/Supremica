@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.analysis.modular
 //# CLASS:   Minimizer
 //###########################################################################
-//# $Id: Minimizer.java,v 1.4 2008-06-30 21:05:32 robi Exp $
+//# $Id$
 //###########################################################################
 
 package net.sourceforge.waters.analysis.modular;

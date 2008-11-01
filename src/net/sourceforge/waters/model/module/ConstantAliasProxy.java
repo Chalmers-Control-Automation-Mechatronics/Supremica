@@ -4,7 +4,7 @@
 //# PACKAGE: net.ourceforge.waters.model.module
 //# CLASS:   ConstantAliasProxy
 //###########################################################################
-//# $Id: ConstantAliasProxy.java,v 1.4 2007-06-08 10:57:34 robi Exp $
+//# $Id$
 //###########################################################################
 
 package net.sourceforge.waters.model.module;

@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.module
 //# CLASS:   EnumSetExpressionProxy
 //###########################################################################
-//# $Id: EnumSetExpressionProxy.java,v 1.3 2006-09-06 11:52:21 robi Exp $
+//# $Id$
 //###########################################################################
 
 package net.sourceforge.waters.model.module;

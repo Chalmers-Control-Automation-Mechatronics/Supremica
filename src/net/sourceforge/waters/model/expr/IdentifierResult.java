@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.expr
 //# CLASS:   IdentifierResult
 //###########################################################################
-//# $Id: IdentifierResult.java,v 1.2 2006-11-03 15:01:58 torda Exp $
+//# $Id$
 //###########################################################################
 
 package net.sourceforge.waters.model.expr;

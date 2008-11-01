@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.base
 //# CLASS:   ProxyCloner
 //###########################################################################
-//# $Id: ProxyCloner.java,v 1.3 2007-12-13 23:49:37 robi Exp $
+//# $Id$
 //###########################################################################
 
 package net.sourceforge.waters.model.base;

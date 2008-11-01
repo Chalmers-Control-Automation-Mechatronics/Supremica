@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.marshaller
 //# CLASS:   DocumentIntegrityChecker
 //###########################################################################
-//# $Id: DocumentIntegrityChecker.java,v 1.1 2007-06-23 09:18:31 robi Exp $
+//# $Id$
 //###########################################################################
 
 

@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.des
 //# CLASS:   ProductDESProxyFactory
 //###########################################################################
-//# $Id: ProductDESProxyFactory.java,v 1.8 2006-09-19 15:53:20 robi Exp $
+//# $Id$
 //###########################################################################
 
 package net.sourceforge.waters.model.des;

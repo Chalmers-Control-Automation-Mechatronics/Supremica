@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.subject.base
 //# CLASS:   NotCloningGeometrySetSubject
 //###########################################################################
-//# $Id: NotCloningGeometrySetSubject.java,v 1.5 2007-12-04 03:22:58 robi Exp $
+//# $Id$
 //###########################################################################
 
 package net.sourceforge.waters.subject.base;

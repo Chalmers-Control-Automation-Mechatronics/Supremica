@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.subject.base
 //# CLASS:   AbstractSubject
 //###########################################################################
-//# $Id: AbstractSubject.java,v 1.9 2007-12-16 22:09:39 robi Exp $
+//# $Id$
 //###########################################################################
 
 package net.sourceforge.waters.subject.base;

@@ -2,7 +2,7 @@
  * <copyright>
  * </copyright>
  *
- * $Id: NodeImpl.java,v 1.4 2007-01-12 14:23:10 torda Exp $
+ * $Id$
  */
 package org.supremica.external.sag.impl;
 

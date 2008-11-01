@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui.observer
 //# CLASS:   MainPanelSwitchdEvent
 //###########################################################################
-//# $Id: MainPanelSwitchEvent.java,v 1.2 2007-06-24 18:40:06 robi Exp $
+//# $Id$
 //###########################################################################
 
 package net.sourceforge.waters.gui.observer;

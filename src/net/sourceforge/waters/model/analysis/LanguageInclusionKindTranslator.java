@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.analysis
 //# CLASS:   LanguageInclusionKindTranslator
 //###########################################################################
-//# $Id: LanguageInclusionKindTranslator.java,v 1.2 2007-06-05 13:23:52 robi Exp $
+//# $Id$
 //###########################################################################
 
 package net.sourceforge.waters.model.analysis;

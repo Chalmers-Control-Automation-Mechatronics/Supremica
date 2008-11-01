@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.marshaller
 //# CLASS:   JAXBProductDESImporter
 //###########################################################################
-//# $Id: JAXBProductDESImporter.java,v 1.7 2008-02-14 06:46:26 robi Exp $
+//# $Id$
 //###########################################################################
 
 package net.sourceforge.waters.model.marshaller;

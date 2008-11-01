@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.expr
 //# CLASS:   IntValue
 //###########################################################################
-//# $Id: IntValue.java,v 1.3 2006-03-02 12:12:50 martin Exp $
+//# $Id$
 //###########################################################################
 
 package net.sourceforge.waters.model.expr;

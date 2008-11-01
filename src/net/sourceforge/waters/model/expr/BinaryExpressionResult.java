@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.expr
 //# CLASS:   BinaryExpressionResult
 //###########################################################################
-//# $Id: BinaryExpressionResult.java,v 1.2 2008-02-15 02:17:19 robi Exp $
+//# $Id$
 //###########################################################################
 
 package net.sourceforge.waters.model.expr;

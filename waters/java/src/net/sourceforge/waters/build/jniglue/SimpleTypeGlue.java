@@ -3,7 +3,7 @@
 //# PACKAGE: net.sourceforge.waters.build.jniglue
 //# CLASS:   SimpleTypeGlue
 //###########################################################################
-//# $Id: SimpleTypeGlue.java,v 1.4 2007-11-02 00:30:37 robi Exp $
+//# $Id$
 //###########################################################################
 
 package net.sourceforge.waters.build.jniglue;

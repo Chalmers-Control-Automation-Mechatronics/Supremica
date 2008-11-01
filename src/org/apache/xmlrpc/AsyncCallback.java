@@ -60,7 +60,7 @@ import java.net.URL;
  * A callback interface for an asynchronous XML-RPC call.
  *
  * @author <a href="mailto:hannes@apache.org">Hannes Wallnoefer</a>
- * @version $Id: AsyncCallback.java,v 1.2 2004-06-11 21:01:00 knut Exp $
+ * @version $Id$
  */
 public interface AsyncCallback
 {

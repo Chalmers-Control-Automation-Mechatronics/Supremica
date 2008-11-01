@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.des
 //# CLASS:   EventProxy
 //###########################################################################
-//# $Id: EventProxy.java,v 1.4 2006-10-24 14:16:10 flordal Exp $
+//# $Id$
 //###########################################################################
 
 package net.sourceforge.waters.model.des;

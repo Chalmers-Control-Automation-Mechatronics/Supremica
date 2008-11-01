@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.analysis
 //# CLASS:   ControlLoopCheckerTest
 //###########################################################################
-//# $Id: ControlLoopCheckerTest.java,v 1.16 2007-05-17 17:01:35 robi Exp $
+//# $Id$
 //###########################################################################
 
 package net.sourceforge.waters.analysis;

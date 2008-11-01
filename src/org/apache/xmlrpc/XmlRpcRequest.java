@@ -60,7 +60,7 @@ import java.util.Vector;
  * Encapsulates an XML-RPC request.
  *
  * @author <a href="mailto:andrew@kungfoocoder.org">Andrew Evers</a>
- * @version $Id: XmlRpcRequest.java,v 1.2 2004-06-11 21:01:00 knut Exp $
+ * @version $Id$
  * @since 1.2
  */
 public class XmlRpcRequest

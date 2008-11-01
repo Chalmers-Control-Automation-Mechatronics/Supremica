@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.marshaller
 //# CLASS:   JAXBListHandler
 //###########################################################################
-//# $Id: JAXBListHandler.java,v 1.5 2008-02-14 06:46:26 robi Exp $
+//# $Id$
 //###########################################################################
 
 package net.sourceforge.waters.model.marshaller;

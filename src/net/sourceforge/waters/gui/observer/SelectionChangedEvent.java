@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui.observer
 //# CLASS:   SelectionChangedEvent
 //###########################################################################
-//# $Id: SelectionChangedEvent.java,v 1.2 2007-06-21 15:57:55 robi Exp $
+//# $Id$
 //###########################################################################
 
 package net.sourceforge.waters.gui.observer;

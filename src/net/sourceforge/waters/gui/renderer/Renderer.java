@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui.renderer
 //# CLASS:   Renderer
 //###########################################################################
-//# $Id: Renderer.java,v 1.14 2007-12-04 03:22:55 robi Exp $
+//# $Id$
 //###########################################################################
 
 package net.sourceforge.waters.gui.renderer;

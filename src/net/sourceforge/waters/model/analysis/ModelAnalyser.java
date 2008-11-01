@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.analysis
 //# CLASS:   ModelAnalyser
 //###########################################################################
-//# $Id: ModelAnalyser.java,v 1.7 2007-11-02 00:30:37 robi Exp $
+//# $Id$
 //###########################################################################
 
 package net.sourceforge.waters.model.analysis;

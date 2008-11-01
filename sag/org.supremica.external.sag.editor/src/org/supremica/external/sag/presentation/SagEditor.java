@@ -2,7 +2,7 @@
  * <copyright>
  * </copyright>
  *
- * $Id: SagEditor.java,v 1.1 2006-12-18 15:25:46 torda Exp $
+ * $Id$
  */
 package org.supremica.external.sag.presentation;
 

@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   SimpleExpressionDocumentFilter
 //###########################################################################
-//# $Id: SimpleExpressionDocumentFilter.java,v 1.3 2008-03-13 01:30:11 robi Exp $
+//# $Id$
 //###########################################################################
 
 

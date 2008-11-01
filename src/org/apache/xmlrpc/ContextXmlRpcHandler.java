@@ -61,7 +61,7 @@ import java.util.Vector;
  *
  * @author <a href="mailto:hannes@apache.org">Hannes Wallnoefer</a>
  * @see org.apache.xmlrpc.AuthenticationFailed
- * @version $Id: ContextXmlRpcHandler.java,v 1.2 2004-06-11 21:01:00 knut Exp $
+ * @version $Id$
  * @since 1.2
  */
 public interface ContextXmlRpcHandler

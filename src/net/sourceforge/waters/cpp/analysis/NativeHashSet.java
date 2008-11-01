@@ -3,7 +3,7 @@
 //# PACKAGE: net.sourceforge.waters.cpp.analysis
 //# CLASS:   NativeHashSet
 //###########################################################################
-//# $Id: NativeHashSet.java,v 1.2 2007-03-20 12:11:31 knut Exp $
+//# $Id$
 //###########################################################################
 
 package net.sourceforge.waters.cpp.analysis;

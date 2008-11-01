@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.cpp.analysis
 //# CLASS:   NativeModelAnalyser
 //###########################################################################
-//# $Id: NativeModelAnalyser.java,v 1.4 2006-11-03 05:18:28 robi Exp $
+//# $Id$
 //###########################################################################
 
 package net.sourceforge.waters.cpp.analysis;

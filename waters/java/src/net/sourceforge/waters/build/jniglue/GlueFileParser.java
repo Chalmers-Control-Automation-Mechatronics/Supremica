@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.build.jniglue
 //# CLASS:   GlueFileParser
 //###########################################################################
-//# $Id: GlueFileParser.java,v 1.4 2005-11-05 01:02:23 robi Exp $
+//# $Id$
 //###########################################################################
 
 package net.sourceforge.waters.build.jniglue;

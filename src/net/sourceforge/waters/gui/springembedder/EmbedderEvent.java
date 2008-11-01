@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui.springembedder
 //# CLASS:   EmbedderEvent
 //###########################################################################
-//# $Id: EmbedderEvent.java,v 1.3 2007-10-31 13:01:00 flordal Exp $
+//# $Id$
 //###########################################################################
 
 

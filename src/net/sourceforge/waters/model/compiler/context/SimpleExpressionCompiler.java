@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.compiler.context
 //# CLASS:   SimpleExpressionCompiler
 //###########################################################################
-//# $Id: SimpleExpressionCompiler.java,v 1.3 2008-06-19 21:26:59 robi Exp $
+//# $Id$
 //###########################################################################
 
 package net.sourceforge.waters.model.compiler.context;

@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.analysis
 //# CLASS:   ControllabilityKindTranslator
 //###########################################################################
-//# $Id: ControllabilityKindTranslator.java,v 1.2 2007-06-05 13:45:21 robi Exp $
+//# $Id$
 //###########################################################################
 
 package net.sourceforge.waters.model.analysis;

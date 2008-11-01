@@ -2,7 +2,7 @@
  * <copyright>
  * </copyright>
  *
- * $Id: SagValidator.java,v 1.3 2007-02-13 16:50:51 torda Exp $
+ * $Id$
  */
 package org.supremica.external.sag.util;
 

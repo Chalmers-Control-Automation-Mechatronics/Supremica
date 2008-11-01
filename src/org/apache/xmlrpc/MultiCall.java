@@ -64,7 +64,7 @@ import java.util.Vector;
  * @author <a href="mailto:adam@megacz.com">Adam Megacz</a>
  * @author <a href="mailto:andrew@kungfoocoder.org">Andrew Evers</a>
  * @author <a href="mailto:dlr@finemaltcoding.com">Daniel Rall</a>
- * @version $Id: MultiCall.java,v 1.2 2004-06-11 21:01:00 knut Exp $
+ * @version $Id$
  * @since 1.2
  */
 public class MultiCall

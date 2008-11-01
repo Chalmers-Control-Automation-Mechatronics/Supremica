@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui.observer
 //# CLASS:   SubPanelSwitchdEvent
 //###########################################################################
-//# $Id: SubPanelSwitchEvent.java,v 1.1 2007-08-10 04:34:31 robi Exp $
+//# $Id$
 //###########################################################################
 
 package net.sourceforge.waters.gui.observer;

@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.samples.algorithms
 //# CLASS:   SimulatorMain
 //###########################################################################
-//# $Id: SimulatorMain.java,v 1.5 2007-04-03 03:53:33 robi Exp $
+//# $Id$
 //###########################################################################
 
 package net.sourceforge.waters.samples.algorithms;

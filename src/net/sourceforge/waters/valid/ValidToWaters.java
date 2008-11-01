@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.valid
 //# CLASS:   ValidToWaters
 //###########################################################################
-//# $Id: ValidToWaters.java,v 1.8 2006-11-03 15:01:56 torda Exp $
+//# $Id$
 //###########################################################################
 
 package net.sourceforge.waters.valid;

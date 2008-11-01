@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   IconLoader
 //###########################################################################
-//# $Id: IconLoader.java,v 1.10 2007-12-04 03:22:54 robi Exp $
+//# $Id$
 //###########################################################################
 
 package net.sourceforge.waters.gui;

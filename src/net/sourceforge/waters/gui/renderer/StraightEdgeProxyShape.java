@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui.renderer
 //# CLASS:   StraightEdgeProxyShape
 //###########################################################################
-//# $Id: StraightEdgeProxyShape.java,v 1.3 2007-10-04 15:14:56 flordal Exp $
+//# $Id$
 //###########################################################################
 
 package net.sourceforge.waters.gui.renderer;

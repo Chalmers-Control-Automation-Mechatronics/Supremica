@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.valid
 //# CLASS:   SupremicaUnmarshaller
 //###########################################################################
-//# $Id: HISCUnmarshaller.java,v 1.3 2007-10-31 13:15:02 flordal Exp $
+//# $Id$
 //###########################################################################
 
 package org.supremica.automata.IO;

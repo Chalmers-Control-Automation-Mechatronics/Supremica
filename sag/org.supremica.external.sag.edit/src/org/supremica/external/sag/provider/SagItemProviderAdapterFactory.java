@@ -2,7 +2,7 @@
  * <copyright>
  * </copyright>
  *
- * $Id: SagItemProviderAdapterFactory.java,v 1.3 2007-03-07 10:28:00 torda Exp $
+ * $Id$
  */
 package org.supremica.external.sag.provider;
 

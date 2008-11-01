@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.expr
 //# CLASS:   EnumSetExpressionResult
 //###########################################################################
-//# $Id: EnumSetExpressionResult.java,v 1.2 2007-11-19 02:16:52 robi Exp $
+//# $Id$
 //###########################################################################
 
 package net.sourceforge.waters.model.expr;

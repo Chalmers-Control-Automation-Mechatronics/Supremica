@@ -3,7 +3,7 @@
 //# PACKAGE: net.sourceforge.waters.model.compiler
 //# CLASS:   ArrayValue
 //###########################################################################
-//# $Id: ArrayValue.java,v 1.2 2005-11-03 01:24:15 robi Exp $
+//# $Id$
 //###########################################################################
 
 package net.sourceforge.waters.model.compiler;

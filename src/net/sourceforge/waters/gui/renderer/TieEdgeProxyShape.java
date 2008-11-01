@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui.renderer
 //# CLASS:   TieEdgeProxyShape
 //###########################################################################
-//# $Id: TieEdgeProxyShape.java,v 1.2 2007-02-22 06:37:42 robi Exp $
+//# $Id$
 //###########################################################################
 
 package net.sourceforge.waters.gui.renderer;

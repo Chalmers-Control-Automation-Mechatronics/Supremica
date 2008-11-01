@@ -2,7 +2,7 @@
  * <copyright>
  * </copyright>
  *
- * $Id: NamedImpl.java,v 1.3 2007-02-08 16:36:08 torda Exp $
+ * $Id$
  */
 package org.supremica.external.sag.impl;
 

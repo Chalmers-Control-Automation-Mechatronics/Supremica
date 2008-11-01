@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.compiler.instance
 //# CLASS:   SingleEventOutput
 //###########################################################################
-//# $Id: SingleEventOutput.java,v 1.1 2008-06-18 09:35:34 robi Exp $
+//# $Id$
 //###########################################################################
 
 package net.sourceforge.waters.model.compiler.instance;

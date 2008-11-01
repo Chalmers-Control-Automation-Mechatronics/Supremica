@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui.observer
 //# CLASS:   ToolbarChangedEvent
 //###########################################################################
-//# $Id: ToolbarChangedEvent.java,v 1.4 2007-06-25 20:18:48 robi Exp $
+//# $Id$
 //###########################################################################
 
 package net.sourceforge.waters.gui.observer;

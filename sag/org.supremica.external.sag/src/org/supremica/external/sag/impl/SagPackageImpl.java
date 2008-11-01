@@ -2,7 +2,7 @@
  * <copyright>
  * </copyright>
  *
- * $Id: SagPackageImpl.java,v 1.10 2007-03-07 10:25:41 torda Exp $
+ * $Id$
  */
 package org.supremica.external.sag.impl;
 
