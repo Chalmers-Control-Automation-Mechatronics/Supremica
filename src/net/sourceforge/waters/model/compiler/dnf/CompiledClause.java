@@ -65,7 +65,8 @@ public class CompiledClause implements Cloneable
     return mLiterals.containsProxy(literal);
   }
 
-  public boolean containsAll(final Collection<SimpleExpressionProxy> literals)
+  public boolean containsAll
+    (final Collection<? extends SimpleExpressionProxy> literals)
   {
     for (final SimpleExpressionProxy literal : literals) {
       if (!contains(literal)) {
@@ -80,7 +81,8 @@ public class CompiledClause implements Cloneable
     return mLiterals.addProxy(literal);
   }
 
-  public boolean addAll(final Collection<SimpleExpressionProxy> literals)
+  public boolean addAll
+    (final Collection<? extends SimpleExpressionProxy> literals)
   {
     boolean changed = false;
     for (final SimpleExpressionProxy literal : literals) {

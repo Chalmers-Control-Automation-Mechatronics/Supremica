@@ -60,41 +60,84 @@ class ConstraintPropagator
 
   //#########################################################################
   //# Invocation
+  CompiledClause propagate(final CompiledClause clause,
+                           final SimpleExpressionProxy varname,
+                           final SimpleExpressionProxy value)
+  {
+    try {
+      setup(clause, 1);
+      substitute(varname, value);
+      final BinaryExpressionProxy equation = createEquation(varname, value);
+      mProcessedEquations.add(equation);
+      mHasChanged = true;
+      return propagate();
+    } finally {
+      cleanup();
+    }
+  }
+
   CompiledClause propagate(final CompiledClause clause)
   {
-    final Comparator<SimpleExpressionProxy> comparator =
-      mVariableMap.getExpressionComparator();
-    final Collection<SimpleExpressionProxy> literals = clause.getLiterals();
-    mOpenLiterals = new TreeSet<SimpleExpressionProxy>(comparator);
-    mOpenLiterals.addAll(literals);
-    final int oldsize = mOpenLiterals.size();
-    mProcessedEquations = new ArrayList<SimpleExpressionProxy>(oldsize);
-    mIsFalse = false;
-    boolean change = false;
-    while (simplify()) {
-      change = true;
+    try {
+      setup(clause);
+      return propagate();
+    } finally {
+      cleanup();
     }
-    final CompiledClause result;
-    if (mIsFalse) {
-      result = null;
-    } else if (change) {
-      final BinaryOperator op = clause.getOperator();
-      final int newsize = mOpenLiterals.size() + mProcessedEquations.size();
-      result = new CompiledClause(op, newsize);
-      result.addAll(mProcessedEquations);
-      result.addAll(mOpenLiterals);
-      return result;
-    } else {
-      result = clause;
-    }
-    mOpenLiterals = null;
-    mProcessedEquations = null;
-    return result;
   }
 
 
   //#########################################################################
   //# Algorithm
+  private void setup(final CompiledClause clause)
+  {
+    setup(clause, 0);
+  }
+
+  private void setup(final CompiledClause clause, final int extra)
+  {
+    final BinaryOperator op = clause.getOperator();
+    if (op != mOperatorTable.getAndOperator()) {
+      throw new IllegalArgumentException
+        ("ConstraintPropagator can only handle AND-clauses!");
+    }
+    mClause = clause;
+    mHasChanged = false;
+    mIsFalse = false;
+    final Comparator<SimpleExpressionProxy> comparator =
+      mVariableMap.getExpressionComparator();
+    final Collection<SimpleExpressionProxy> literals = clause.getLiterals();
+    mOpenLiterals = new TreeSet<SimpleExpressionProxy>(comparator);
+    mOpenLiterals.addAll(literals);
+    final int size = mOpenLiterals.size() + extra;
+    mProcessedEquations = new ArrayList<BinaryExpressionProxy>(size);
+  }
+
+  private void cleanup()
+  {
+    mOpenLiterals = null;
+    mProcessedEquations = null;
+  }
+
+  private CompiledClause propagate()
+  {
+    while (simplify()) {
+      mHasChanged = true;
+    }
+    if (mIsFalse) {
+      return null;
+    } else if (mHasChanged) {
+      final BinaryOperator op = mClause.getOperator();
+      final int size = mOpenLiterals.size() + mProcessedEquations.size();
+      final CompiledClause result = new CompiledClause(op, size);
+      result.addAll(mProcessedEquations);
+      result.addAll(mOpenLiterals);
+      return result;
+    } else {
+      return mClause;
+    }
+  }
+
   private boolean simplify()
   {
     final BinaryOperator eqop = mOperatorTable.getEqualsOperator();
@@ -104,22 +147,22 @@ class ConstraintPropagator
       if (!(literal instanceof BinaryExpressionProxy)) {
         continue;
       }
-      final BinaryExpressionProxy binary = (BinaryExpressionProxy) literal;
-      final BinaryOperator op = binary.getOperator();
+      final BinaryExpressionProxy equation = (BinaryExpressionProxy) literal;
+      final BinaryOperator op = equation.getOperator();
       if (op != eqop) {
         continue;
       }
-      final SimpleExpressionProxy lhs = binary.getLeft();
+      final SimpleExpressionProxy lhs = equation.getLeft();
       final EFAVariable var = mVariableMap.getVariable(lhs);
       if (var == null) {
         continue;
       }
-      final SimpleExpressionProxy rhs = binary.getRight();
+      final SimpleExpressionProxy rhs = equation.getRight();
       if (mOccursCheckVisitor.occurs(lhs, rhs)) {
         continue;
       }
       iter.remove();
-      mProcessedEquations.add(literal);
+      mProcessedEquations.add(equation);
       substitute(lhs, rhs);
       return !mIsFalse;
     }
@@ -152,7 +195,33 @@ class ConstraintPropagator
           }
         }
       }
-    }    
+    }
+    final int numequations = mProcessedEquations.size();
+    for (int i = 0; i < numequations; i++) {
+      final BinaryExpressionProxy equation = mProcessedEquations.get(i);
+      final SimpleExpressionProxy rhs = equation.getRight();
+      final SimpleExpressionProxy subst =
+        mSubstitutionVisitor.substitute(rhs, varname, replacement);
+      if (rhs != subst) {
+        final SimpleExpressionProxy lhs = equation.getLeft();
+        final BinaryExpressionProxy newequation = createEquation(lhs, subst);
+        mProcessedEquations.set(i, newequation);
+      }
+    }
+  }
+
+  private BinaryExpressionProxy createEquation
+    (final SimpleExpressionProxy expr1,
+     final SimpleExpressionProxy expr2)
+  {
+    final BinaryOperator eqop = mOperatorTable.getEqualsOperator();
+    final Comparator<SimpleExpressionProxy> comparator =
+      mVariableMap.getExpressionComparator();
+    if (comparator.compare(expr1, expr2) < 0) {
+      return mFactory.createBinaryExpressionProxy(eqop, expr1, expr2);
+    } else {
+      return mFactory.createBinaryExpressionProxy(eqop, expr2, expr1);
+    }
   }
 
 
@@ -222,7 +291,7 @@ class ConstraintPropagator
         return true;
       } else {
         return (Boolean) expr.acceptVisitor(this);
-      }        
+      }
     }
 
     //#######################################################################
@@ -316,7 +385,7 @@ class ConstraintPropagator
         return mReplacement;
       } else {
         return (SimpleExpressionProxy) expr.acceptVisitor(this);
-      }        
+      }
     }
 
     //#######################################################################
@@ -414,8 +483,10 @@ class ConstraintPropagator
   private final OccursCheckVisitor mOccursCheckVisitor;
   private final SubstitutionVisitor mSubstitutionVisitor;
 
+  private CompiledClause mClause;
+  private boolean mHasChanged;
   private boolean mIsFalse;
   private Collection<SimpleExpressionProxy> mOpenLiterals;
-  private Collection<SimpleExpressionProxy> mProcessedEquations;
+  private List<BinaryExpressionProxy> mProcessedEquations;
 
 }
