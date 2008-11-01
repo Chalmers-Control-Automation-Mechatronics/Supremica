@@ -43,8 +43,16 @@ public class DNFConverter extends AbstractModuleProxyVisitor {
   public DNFConverter(final ModuleProxyFactory factory,
                       final CompilerOperatorTable optable)
   {
+    this(factory, optable, optable.getExpressionComparator());
+  }
+
+  public DNFConverter(final ModuleProxyFactory factory,
+                      final CompilerOperatorTable optable,
+                      final Comparator<SimpleExpressionProxy> comparator)
+  {
     mFactory = factory;
-    mOpTable = optable;
+    mOperatorTable = optable;
+    mComparator = comparator;
   }
 
 
@@ -53,16 +61,16 @@ public class DNFConverter extends AbstractModuleProxyVisitor {
   public CompiledNormalForm convertToDNF(final SimpleExpressionProxy expr)
     throws EvalException
   {
-    final BinaryOperator andop = mOpTable.getAndOperator();
-    final BinaryOperator orop = mOpTable.getOrOperator();
+    final BinaryOperator andop = mOperatorTable.getAndOperator();
+    final BinaryOperator orop = mOperatorTable.getOrOperator();
     return convert(expr, orop, andop, false);
   }
 
   public CompiledNormalForm convertToCNF(final SimpleExpressionProxy expr)
     throws EvalException
   {
-    final BinaryOperator andop = mOpTable.getAndOperator();
-    final BinaryOperator orop = mOpTable.getOrOperator();
+    final BinaryOperator andop = mOperatorTable.getAndOperator();
+    final BinaryOperator orop = mOperatorTable.getOrOperator();
     return convert(expr, andop, orop, true);
   }
 
@@ -90,8 +98,6 @@ public class DNFConverter extends AbstractModuleProxyVisitor {
   public List<SimpleExpressionProxy> createSortedClauseList
     (final CompiledNormalForm nf)
   {
-    final Comparator<SimpleExpressionProxy> comparator =
-      mOpTable.getExpressionComparator();
     final Collection<CompiledClause> clauses = nf.getClauses();
     final int numclauses = clauses.size();
     final List<SimpleExpressionProxy> list =
@@ -101,7 +107,7 @@ public class DNFConverter extends AbstractModuleProxyVisitor {
       final Collection<SimpleExpressionProxy> literals = clause.getLiterals();
       final List<SimpleExpressionProxy> sorted =
         new ArrayList<SimpleExpressionProxy>(literals);
-      Collections.sort(sorted, comparator);
+      Collections.sort(sorted, mComparator);
       SimpleExpressionProxy expr;
       final Iterator<SimpleExpressionProxy> iter = sorted.iterator();
       if (iter.hasNext()) {
@@ -110,14 +116,14 @@ public class DNFConverter extends AbstractModuleProxyVisitor {
           final SimpleExpressionProxy next = iter.next();
           expr = mFactory.createBinaryExpressionProxy(op, expr, next);
         }
-      } else if (op == mOpTable.getOrOperator()) {
+      } else if (op == mOperatorTable.getOrOperator()) {
         expr = mFactory.createIntConstantProxy(0);
       } else {
         expr = mFactory.createIntConstantProxy(1);
       }
       list.add(expr);
     }
-    Collections.sort(list, comparator);
+    Collections.sort(list, mComparator);
     return list;
   }
 
@@ -129,8 +135,8 @@ public class DNFConverter extends AbstractModuleProxyVisitor {
     throws VisitorException
   {
     try {
-      final BinaryOperator andop = mOpTable.getAndOperator();
-      final BinaryOperator orop = mOpTable.getOrOperator();
+      final BinaryOperator andop = mOperatorTable.getAndOperator();
+      final BinaryOperator orop = mOperatorTable.getOrOperator();
       final BinaryOperator op = expr.getOperator();
       if (op == orop || op == andop) {
         BinaryOperator mergeop = op;
@@ -148,7 +154,7 @@ public class DNFConverter extends AbstractModuleProxyVisitor {
         final CompiledNormalForm rhsnf =
           (CompiledNormalForm) rhs.acceptVisitor(this);
         return merge(mergeop, lhsnf, rhsnf);
-      } else if (mOpTable.getComplementaryOperator(op) == null) {
+      } else if (mOperatorTable.getComplementaryOperator(op) == null) {
         throw new TypeMismatchException(expr, "BOOLEAN");
       } else {
         final SimpleExpressionProxy literal =
@@ -199,7 +205,7 @@ public class DNFConverter extends AbstractModuleProxyVisitor {
   {
     try {
       final UnaryOperator op = expr.getOperator();
-      if (op == mOpTable.getNotOperator()) {
+      if (op == mOperatorTable.getNotOperator()) {
         mNegative = !mNegative;
         final SimpleExpressionProxy subterm = expr.getSubTerm();
         final CompiledNormalForm result =
@@ -326,12 +332,12 @@ public class DNFConverter extends AbstractModuleProxyVisitor {
                                              final boolean negated)
     throws TypeMismatchException
   {
-    final UnaryOperator notop = mOpTable.getNotOperator();
+    final UnaryOperator notop = mOperatorTable.getNotOperator();
     if (expr instanceof BinaryExpressionProxy) {
       final BinaryExpressionProxy binary = (BinaryExpressionProxy) expr;
       BinaryOperator op = binary.getOperator();
       if (negated) {
-        op = mOpTable.getComplementaryOperator(op);
+        op = mOperatorTable.getComplementaryOperator(op);
         if (op == null) {
           throw new TypeMismatchException(expr, "BOOLEAN");
         }
@@ -340,11 +346,10 @@ public class DNFConverter extends AbstractModuleProxyVisitor {
       final SimpleExpressionProxy rhs = binary.getRight();
       final boolean swap;
       if (op.isSymmetric()) {
-        final Comparator<SimpleExpressionProxy> comparator =
-          mOpTable.getExpressionComparator();
-        swap = comparator.compare(lhs, rhs) > 0;
+        swap = mComparator.compare(lhs, rhs) > 0;
       } else {
-        final BinaryOperator swapped = mOpTable.getSwappedNormalOperator(op);
+        final BinaryOperator swapped =
+          mOperatorTable.getSwappedNormalOperator(op);
         swap = swapped != null;
         if (swap) {
           op = swapped;
@@ -372,7 +377,7 @@ public class DNFConverter extends AbstractModuleProxyVisitor {
   //# Auxiliary Methods
   private CompiledNormalForm createNormalForm(final boolean value)
   {
-    if (value ^ (mTopLevelOperator == mOpTable.getOrOperator())) {
+    if (value ^ (mTopLevelOperator == mOperatorTable.getOrOperator())) {
       return createNormalFormZero();
     } else {
       return createNormalFormOne();
@@ -416,7 +421,8 @@ public class DNFConverter extends AbstractModuleProxyVisitor {
   //#########################################################################
   //# Data Members
   private final ModuleProxyFactory mFactory;
-  private final CompilerOperatorTable mOpTable;
+  private final CompilerOperatorTable mOperatorTable;
+  private final Comparator<SimpleExpressionProxy> mComparator;
 
   private boolean mNegative;
   private BinaryOperator mTopLevelOperator;

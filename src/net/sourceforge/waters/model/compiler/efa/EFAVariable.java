@@ -17,7 +17,7 @@ import net.sourceforge.waters.model.module.UnaryExpressionProxy;
 
 
 /**
- * <P>A compiler-internal representation of an EFA variable.
+ * A compiler-internal representation of an EFA variable.
  *
  * @author Robi Malik
  */

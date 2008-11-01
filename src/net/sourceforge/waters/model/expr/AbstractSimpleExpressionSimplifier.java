@@ -9,6 +9,8 @@
 
 package net.sourceforge.waters.model.expr;
 
+import java.util.Comparator;
+
 import net.sourceforge.waters.model.module.IdentifierProxy;
 import net.sourceforge.waters.model.module.IntConstantProxy;
 import net.sourceforge.waters.model.module.ModuleProxyCloner;
@@ -47,6 +49,8 @@ public abstract class AbstractSimpleExpressionSimplifier
     throws EvalException;
 
   public abstract boolean isAtomicValue(SimpleExpressionProxy expr);
+
+  public abstract Comparator<SimpleExpressionProxy> getExpressionComparator();
 
 
   //#########################################################################

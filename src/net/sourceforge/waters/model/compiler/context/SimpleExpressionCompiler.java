@@ -10,6 +10,7 @@
 package net.sourceforge.waters.model.compiler.context;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 import net.sourceforge.waters.model.base.VisitorException;
@@ -42,8 +43,17 @@ public class SimpleExpressionCompiler
   public SimpleExpressionCompiler(final ModuleProxyFactory factory,
                                   final CompilerOperatorTable optable)
   {
+    this(factory, optable, optable.getExpressionComparator());
+  }
+    
+  public SimpleExpressionCompiler
+    (final ModuleProxyFactory factory,
+     final CompilerOperatorTable optable,
+     final Comparator<SimpleExpressionProxy> comparator)
+  {
     super(factory);
     mOperatorTable = optable;
+    mComparator = comparator;
     mSimplificationVisitor = new SimplificationVisitor();
     mAtomicVisitor = new AtomicVisitor();
     mRangeVisitor = new RangeVisitor();
@@ -107,6 +117,11 @@ public class SimpleExpressionCompiler
     } catch (final VisitorException exception) {
       throw exception.getRuntimeException();
     }
+  }
+
+  public Comparator<SimpleExpressionProxy> getExpressionComparator()
+  {
+    return mComparator;
   }
 
 
@@ -410,6 +425,7 @@ public class SimpleExpressionCompiler
   //#########################################################################
   //# Data Members
   private final CompilerOperatorTable mOperatorTable;
+  private final Comparator<SimpleExpressionProxy> mComparator;
   private final SimplificationVisitor mSimplificationVisitor;
   private final AtomicVisitor mAtomicVisitor;
   private final RangeVisitor mRangeVisitor;

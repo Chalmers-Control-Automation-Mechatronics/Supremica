@@ -9,6 +9,7 @@
 
 package net.sourceforge.waters.model.compiler;
 
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -251,7 +252,13 @@ public class CompilerOperatorTable extends AbstractOperatorTable {
        final SimpleExpressionProxy rhs)
     {
       final ModuleProxyFactory factory = simplifier.getFactory();
-      return createExpression(factory, lhs, rhs, null);
+      final Comparator<SimpleExpressionProxy> comparator =
+        simplifier.getExpressionComparator();
+      if (isSymmetric() && comparator.compare(lhs, rhs) > 0) {
+        return createExpression(factory, rhs, lhs, null);
+      } else {
+        return createExpression(factory, lhs, rhs, null);
+      }
     }
 
   }

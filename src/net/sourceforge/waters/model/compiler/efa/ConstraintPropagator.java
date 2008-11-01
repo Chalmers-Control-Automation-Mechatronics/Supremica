@@ -14,10 +14,7 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 
-import net.sourceforge.waters.model.base.ProxyAccessor;
-import net.sourceforge.waters.model.base.ProxyAccessorByContents;
 import net.sourceforge.waters.model.base.VisitorException;
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
 import net.sourceforge.waters.model.compiler.dnf.CompiledClause;
@@ -41,11 +38,11 @@ class ConstraintPropagator
   ConstraintPropagator
     (final ModuleProxyFactory factory,
      final CompilerOperatorTable optable,
-     final Map<ProxyAccessor<SimpleExpressionProxy>,EFAVariable> variables)
+     final EFAVariableMap varmap)
   {
     mFactory = factory;
     mOperatorTable = optable;
-    mVariablesMap = variables;
+    mVariableMap = varmap;
     mSubstitutionVisitor = new SubstitutionVisitor();
   }
 
@@ -94,9 +91,7 @@ class ConstraintPropagator
         continue;
       }
       final SimpleExpressionProxy lhs = binary.getLeft();
-      final ProxyAccessor<SimpleExpressionProxy> accessor =
-        new ProxyAccessorByContents<SimpleExpressionProxy>(lhs);
-      final EFAVariable var = mVariablesMap.get(accessor);
+      final EFAVariable var = mVariableMap.getVariable(lhs);
       if (var == null) {
         continue;
       }
@@ -242,8 +237,7 @@ class ConstraintPropagator
   //# Data Members
   private final ModuleProxyFactory mFactory;
   private final CompilerOperatorTable mOperatorTable;
-  private final Map<ProxyAccessor<SimpleExpressionProxy>,EFAVariable>
-    mVariablesMap;
+  private final EFAVariableMap mVariableMap;
   private final SubstitutionVisitor mSubstitutionVisitor;
 
   private boolean mIsFalse;

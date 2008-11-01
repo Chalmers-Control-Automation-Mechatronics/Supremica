@@ -10,6 +10,7 @@
 package net.sourceforge.waters.model.compiler.efa;
 
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -35,11 +36,12 @@ class GuardCompiler
   //#########################################################################
   //# Constructors
   GuardCompiler(final ModuleProxyFactory factory,
-                final CompilerOperatorTable optable)
+                final CompilerOperatorTable optable,
+                final Comparator<SimpleExpressionProxy> comparator)
   {
     mFactory = factory;
-    mOpTable = optable;
-    mDNFConverter = new DNFConverter(factory, optable);
+    mOperatorTable = optable;
+    mDNFConverter = new DNFConverter(factory, optable, comparator);
     mCache =
       new HashMap<ProxyAccessor<GuardActionBlockProxy>,CompiledGuard>();
   }
@@ -66,7 +68,7 @@ class GuardCompiler
     throws EvalException
   {
     SimpleExpressionProxy expr = null;
-    final UnaryOperator notop = mOpTable.getNotOperator();
+    final UnaryOperator notop = mOperatorTable.getNotOperator();
     for (final SimpleExpressionProxy guard : guards) {
       final SimpleExpressionProxy notguard =
         mFactory.createUnaryExpressionProxy(notop, guard);
@@ -114,7 +116,7 @@ class GuardCompiler
     } else if (rhs == null) {
       return lhs;
     } else {
-      final BinaryOperator op = mOpTable.getAndOperator();
+      final BinaryOperator op = mOperatorTable.getAndOperator();
       return mFactory.createBinaryExpressionProxy(op, lhs, rhs);
     }
   }
@@ -130,8 +132,8 @@ class GuardCompiler
     final IdentifierProxy ident = (IdentifierProxy) lhs;
     final SimpleExpressionProxy expr = action.getRight();
     final BinaryOperator assignment = action.getOperator();
-    final BinaryOperator op = mOpTable.getAssigningOperator(assignment);
-    final BinaryOperator assop = mOpTable.getAssignmentOperator();
+    final BinaryOperator op = mOperatorTable.getAssigningOperator(assignment);
+    final BinaryOperator assop = mOperatorTable.getAssignmentOperator();
     final SimpleExpressionProxy newexpr;
     if (op == assop) {
       newexpr = expr;
@@ -140,8 +142,8 @@ class GuardCompiler
     } else {
       throw new ActionSyntaxException(action);
     }
-    final BinaryOperator eqop = mOpTable.getEqualsOperator();
-    final UnaryOperator nextop = mOpTable.getNextOperator();
+    final BinaryOperator eqop = mOperatorTable.getEqualsOperator();
+    final UnaryOperator nextop = mOperatorTable.getNextOperator();
     final UnaryExpressionProxy nextident =
       mFactory.createUnaryExpressionProxy(nextop, ident);
     return mFactory.createBinaryExpressionProxy(eqop, nextident, newexpr);
@@ -151,7 +153,7 @@ class GuardCompiler
   //#########################################################################
   //# Data Members
   private final ModuleProxyFactory mFactory;
-  private final CompilerOperatorTable mOpTable;
+  private final CompilerOperatorTable mOperatorTable;
   private final DNFConverter mDNFConverter;
 
   private final Map<ProxyAccessor<GuardActionBlockProxy>,CompiledGuard> mCache;

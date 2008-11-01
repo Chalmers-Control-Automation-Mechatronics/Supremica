@@ -11,6 +11,7 @@ package net.sourceforge.waters.model.compiler.efa;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -160,9 +161,12 @@ public class EFACompiler
     mSourceInfoBuilder = builder;
     mOperatorTable = CompilerOperatorTable.getInstance();
     mTrueGuard = new CompiledGuard();
+    mVariableMap = new EFAVariableMap(mFactory, mOperatorTable);
+    final Comparator<SimpleExpressionProxy> comparator =
+      mVariableMap.getExpressionComparator();
     mSimpleExpressionCompiler =
-      new SimpleExpressionCompiler(mFactory, mOperatorTable);
-    mGuardCompiler = new GuardCompiler(mFactory, mOperatorTable);
+      new SimpleExpressionCompiler(mFactory, mOperatorTable, comparator);
+    mGuardCompiler = new GuardCompiler(mFactory, mOperatorTable, comparator);
     mInputModule = module;
   }
 
@@ -186,6 +190,7 @@ public class EFACompiler
       }
     } finally {
       mRootContext = null;
+      mVariableMap.clear();
     }
   }
 
@@ -200,33 +205,6 @@ public class EFACompiler
 
   //#########################################################################
   //# Auxiliary Methods
-  private void createVariables(final ComponentProxy comp,
-                               final IdentifierProxy ident,
-                               final CompiledRange range)
-  {
-    final ProxyAccessor<SimpleExpressionProxy> curaccessor =
-      new ProxyAccessorByContents<SimpleExpressionProxy>(ident);
-    final EFAVariable curvar = new EFAVariable(comp, ident, range);
-    mVariablesMap.put(curaccessor, curvar);
-    final UnaryOperator nextop = mOperatorTable.getNextOperator();
-    final UnaryExpressionProxy nextident =
-      mFactory.createUnaryExpressionProxy(nextop, ident);
-    final ProxyAccessor<SimpleExpressionProxy> nextaccessor =
-      new ProxyAccessorByContents<SimpleExpressionProxy>(nextident);
-    final EFAVariable nextvar = new EFAVariable(comp, nextident, range);
-    mVariablesMap.put(nextaccessor, nextvar);
-  }
-
-  private void checkVariableIdentifier(final IdentifierProxy ident)
-    throws UndefinedIdentifierException
-  {
-    final ProxyAccessor<SimpleExpressionProxy> accessor =
-      new ProxyAccessorByContents<SimpleExpressionProxy>(ident);
-    if (!mVariablesMap.containsKey(accessor)) {
-      throw new UndefinedIdentifierException(ident, "variable");
-    }
-  }
-
   private void insertEvent(final IdentifierProxy ident,
                            final EFAEvent event)
     throws DuplicateIdentifierException
@@ -258,7 +236,7 @@ public class EFACompiler
   //# Inner Class Pass1Visitor
   /**
    * The visitor implementing the first pass of EFA compilation. It
-   * initialises the variables map {@link #mVariablesMap} and associates
+   * initialises the variables map {@link #mVariableMap} and associates
    * the identifier of each simple or variable component with a {@link
    * EFAVariable} object that contains the range of possible state values
    * of that component.
@@ -287,8 +265,7 @@ public class EFACompiler
     {
       final List<Proxy> components = module.getComponentList();
       final int size = 2 * components.size();
-      mVariablesMap =
-        new HashMap<ProxyAccessor<SimpleExpressionProxy>,EFAVariable>(size);
+      mVariableMap.reset(size);
       visitCollection(components);
       return null;
     }
@@ -306,7 +283,7 @@ public class EFACompiler
       final GraphProxy graph = comp.getGraph();
       final List<SimpleIdentifierProxy> list = visitGraphProxy(graph);
       final CompiledRange range = new CompiledEnumRange(list);
-      createVariables(comp, ident, range);
+      mVariableMap.createVariables(comp, ident, range);
       return range;
     }
 
@@ -329,7 +306,7 @@ public class EFACompiler
         final SimpleExpressionProxy expr = var.getType();
         final CompiledRange range =
           mSimpleExpressionCompiler.getRangeValue(expr);
-        createVariables(var, ident, range);
+        mVariableMap.createVariables(var, ident, range);
         return range;
       } catch (final EvalException exception) {
         throw wrap(exception);
@@ -359,7 +336,7 @@ public class EFACompiler
         final SimpleExpressionProxy left = expr.getLeft();
         if (left instanceof IdentifierProxy) {
           final IdentifierProxy ident = (IdentifierProxy) left;
-          checkVariableIdentifier(ident);
+          mVariableMap.checkIdentifier(ident);
           mCollectedVariables.addProxy(ident);
           return null;
         } else {
@@ -561,10 +538,9 @@ public class EFACompiler
    * A map that assigns to each expression that refers to a variable
    * component {@link VariableComponentProxy} or simple component {@link
    * SimpleComponentProxy} an EFA variable object that contains the
-   * computed range of its state space. The map contains entries for
-   * the current state and next state variables.
+   * computed range of its state space.
    */
-  private Map<ProxyAccessor<SimpleExpressionProxy>,EFAVariable> mVariablesMap;
+  private final EFAVariableMap mVariableMap;
   // Pass 2
   /**
    * A map that assigns to each identifier of a event declaration {@link
