@@ -15,6 +15,7 @@ import java.util.Map;
 
 import net.sourceforge.waters.model.base.ProxyAccessorMap;
 import net.sourceforge.waters.model.base.ProxyAccessorHashMapByContents;
+import net.sourceforge.waters.model.compiler.dnf.CompiledClause;
 import net.sourceforge.waters.model.module.EventDeclProxy;
 import net.sourceforge.waters.model.module.IdentifierProxy;
 import net.sourceforge.waters.model.module.SimpleComponentProxy;
@@ -45,6 +46,7 @@ class EFAEventDecl {
     mEventDecl = decl;
     mVariables = new ProxyAccessorHashMapByContents<IdentifierProxy>();
     mTransitionMap = new HashMap<SimpleComponentProxy,EFATransitionGroup>();
+    mEventMap = new HashMap<CompiledClause,EFAEvent>();
   }
 
 
@@ -58,6 +60,19 @@ class EFAEventDecl {
   EventKind getKind()
   {
     return mEventDecl.getKind();
+  }
+
+  boolean isBlocked()
+  {
+    return mIsBlocked;
+  }
+
+  void setBlocked()
+  {
+    mVariables.clear();
+    mTransitionMap.clear();
+    mEventMap.clear();
+    mIsBlocked = true;
   }
 
   EFATransitionGroup getTransitionGroup(final SimpleComponentProxy comp)
@@ -92,6 +107,16 @@ class EFAEventDecl {
     trans.addTransitions(guard, label);
   }
 
+  EFAEvent createEvent(final CompiledClause conditions)
+  {
+    EFAEvent event = mEventMap.get(conditions);
+    if (event == null) {
+      event = new EFAEvent(this, conditions);
+      mEventMap.put(conditions, event);
+    }
+    return event;
+  }
+
 
   //#########################################################################
   //# Data Members
@@ -110,8 +135,23 @@ class EFAEventDecl {
    * The map that assigns to each automaton ({@link SimpleComponentProxy})
    * the collection of transitions of this event that are to be associated
    * with it. Automata that do not have the event in their alphabet are
-   * not listed.
+   * not listed. Automata that block the event are listed with an empty
+   * transition group.
    */
   private final Map<SimpleComponentProxy,EFATransitionGroup> mTransitionMap;
-
+  /**
+   * The map of individual events to generated from this event group.  For
+   * each guard condition, representing a set of possible combination of
+   * variable values, an event may be generated. The map is needed since
+   * the compiler may come up with the same set of guard conditions more
+   * than once.
+   */
+  private final Map<CompiledClause,EFAEvent> mEventMap;
+  /**
+   * A flag indicating that the event has been recognised as globally blocked.
+   * In some cases, the EFA compiler can identify that an event is globally
+   * disabled and can never cause a violation of a safety property. Such
+   * an event is marked as blocked, and no transitions are generated for it.
+   */
+  private boolean mIsBlocked;
 }

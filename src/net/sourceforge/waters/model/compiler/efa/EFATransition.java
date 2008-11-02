@@ -12,8 +12,8 @@ package net.sourceforge.waters.model.compiler.efa;
 import java.util.Collection;
 import java.util.LinkedList;
 
+import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.compiler.dnf.CompiledClause;
-import net.sourceforge.waters.model.module.IdentifierProxy;
 import net.sourceforge.waters.model.module.SimpleComponentProxy;
 
 
@@ -36,7 +36,7 @@ class EFATransition
   {
     mComponent = comp;
     mConditions = conditions;
-    mSourceLabels = new LinkedList<IdentifierProxy>();
+    mSourceLocations = new LinkedList<Proxy>();
   }
 
 
@@ -52,15 +52,15 @@ class EFATransition
     return mConditions;
   }
 
-  Collection<IdentifierProxy> getSourceLabels()
+  Collection<Proxy> getSourceLocations()
   {
-    return mSourceLabels;
+    return mSourceLocations;
   }
 
-  void addSourceLabel(final IdentifierProxy label)
+  void addSourceLocation(final Proxy location)
   {
-    if (label != null) {
-      mSourceLabels.add(label);
+    if (!mConditions.isEmpty()) {
+      mSourceLocations.add(location);
     }
   }
 
@@ -69,6 +69,6 @@ class EFATransition
   //# Data Members
   private final SimpleComponentProxy mComponent;
   private final CompiledClause mConditions;
-  private final Collection<IdentifierProxy> mSourceLabels;
+  private final Collection<Proxy> mSourceLocations;
 
 }

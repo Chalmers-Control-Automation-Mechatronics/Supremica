@@ -13,6 +13,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
+import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.base.ProxyAccessorHashMapByContents;
 import net.sourceforge.waters.model.base.ProxyAccessorMap;
 import net.sourceforge.waters.model.compiler.dnf.CompiledClause;
@@ -41,6 +42,7 @@ class EFATransitionGroup implements Comparable<EFATransitionGroup>
     mComponent = comp;
     mPartialTransitions = new HashMap<CompiledClause,EFATransition>();
     mGuards = new ProxyAccessorHashMapByContents<SimpleExpressionProxy>();
+    mHasTrueGuard = false;
   }
 
 
@@ -56,45 +58,46 @@ class EFATransitionGroup implements Comparable<EFATransitionGroup>
     return mPartialTransitions.values();
   }
 
+  boolean isEmpty()
+  {
+    return mPartialTransitions.isEmpty();
+  }
+
   boolean isTrivial()
   {
-    switch (mPartialTransitions.size()) {
-    case 0:
-      return true;
-    case 1:
+    if (mPartialTransitions.size() == 1) {
       final CompiledClause clause =
         mPartialTransitions.keySet().iterator().next();
       return clause.isEmpty();
-    default:
+    } else {
       return false;
     }
   }
 
-  void addTransitions(final CompiledGuard guard,
-                      final IdentifierProxy label)
+  boolean hasTrueGuard()
   {
-    final CompiledNormalForm dnf = guard.getDNF();
-    if (dnf.isTrue()) {
-      final CompiledClause clause = dnf.getClauses().iterator().next();
-      addTransition(clause, label);
-      mGuards = null;
-    } else {
-      final SimpleExpressionProxy expr = guard.getExpression();
-      for (final CompiledClause clause : dnf.getClauses()) {
-        addTransition(clause, label);
-      }
-      mGuards.addProxy(expr);
-    }
+    return mHasTrueGuard;
   }
 
-  void addTransition(final CompiledClause clause, final IdentifierProxy label)
+  void addTransitions(final CompiledGuard guard, final Proxy location)
+  {
+    final CompiledNormalForm dnf = guard.getDNF();
+    final SimpleExpressionProxy expr = guard.getExpression();
+    for (final CompiledClause clause : dnf.getClauses()) {
+      addTransition(clause, location);
+    }
+    mGuards.addProxy(expr);
+    mHasTrueGuard |= dnf.isTrue();
+  }
+
+  void addTransition(final CompiledClause clause, final Proxy location)
   {
     EFATransition trans = mPartialTransitions.get(clause);
     if (trans == null) {
       trans = new EFATransition(mComponent, clause);
       mPartialTransitions.put(clause, trans);
     }
-    trans.addSourceLabel(label);
+    trans.addSourceLocation(location);
   }
 
 
@@ -122,6 +125,7 @@ class EFATransitionGroup implements Comparable<EFATransitionGroup>
   //# Data Members
   private final SimpleComponentProxy mComponent;
   private final Map<CompiledClause,EFATransition> mPartialTransitions;
-  private ProxyAccessorMap<SimpleExpressionProxy> mGuards;
+  private final ProxyAccessorMap<SimpleExpressionProxy> mGuards;
+  private boolean mHasTrueGuard;
 
 }

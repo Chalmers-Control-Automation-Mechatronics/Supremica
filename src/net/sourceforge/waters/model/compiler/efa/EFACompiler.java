@@ -15,6 +15,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -120,7 +121,7 @@ public class EFACompiler
   public EFACompiler(final ModuleProxyFactory factory,
                      final SourceInfoBuilder builder,
                      final ModuleProxy module)
-  {                     
+  {
     mFactory = factory;
     mSourceInfoBuilder = builder;
     mOperatorTable = CompilerOperatorTable.getInstance();
@@ -184,26 +185,32 @@ public class EFACompiler
   {
     final BinaryOperator andop = mOperatorTable.getAndOperator();
     final CompiledClause startcond = new CompiledClause(andop);
-    for (final EFAEventDecl event : mEventMap.values()) {
-      final Collection<EFATransitionGroup> allgroups =
-        event.getTransitionGroups();
-      final int numgroups = allgroups.size();
-      final List<EFATransitionGroup> groups =
-        new ArrayList<EFATransitionGroup>(numgroups);
-      for (final EFATransitionGroup group : allgroups) {
-        if (!group.isTrivial()) {
-          groups.add(group);
+    mEventMap = new HashMap<Proxy,Collection<EFAEvent>>();
+    for (final EFAEventDecl edecl : mEventDeclMap.values()) {
+      if (!edecl.isBlocked()) {
+        final Collection<EFATransitionGroup> allgroups =
+          edecl.getTransitionGroups();
+        final int allsize = allgroups.size();
+        final List<EFATransitionGroup> groups =
+          new ArrayList<EFATransitionGroup>(allsize);
+        for (final EFATransitionGroup group : allgroups) {
+          if (!group.isTrivial()) {
+            groups.add(group);
+          }
         }
-      }
-      if (!groups.isEmpty()) {
-        Collections.sort(groups);
-        collectEventPartition(event, groups, 0, startcond);
+        if (!groups.isEmpty()) {
+          final int size = groups.size();
+          final List<EFATransition> parts = new ArrayList<EFATransition>(size);
+          Collections.sort(groups);
+          collectEventPartition(edecl, groups, parts, 0, startcond);
+        }
       }
     }
   }
 
-  private void collectEventPartition(final EFAEventDecl event,
+  private void collectEventPartition(final EFAEventDecl edecl,
                                      final List<EFATransitionGroup> groups,
+                                     final List<EFATransition> parts,
                                      final int index,
                                      final CompiledClause prevcond)
   {
@@ -214,28 +221,30 @@ public class EFACompiler
         final CompiledClause nextcond =
           mConstraintPropagator.propagate(prevcond, cond);
         if (nextcond != null) {
-          collectEventPartition(event, groups, index + 1, nextcond);
+          parts.add(part);
+          collectEventPartition(edecl, groups, parts, index + 1, nextcond);
+          parts.remove(index);
         }
       }
     } else {
-      splitEventPartition(event, groups, prevcond);
+      splitEventPartition(edecl, parts, prevcond);
     }
   }
 
-  private void splitEventPartition(final EFAEventDecl event,
-                                   final List<EFATransitionGroup> groups,
+  private void splitEventPartition(final EFAEventDecl edecl,
+                                   final List<EFATransition> parts,
                                    final CompiledClause cond)
   {
     final List<EFAVariable> splitlist = mSplitComputer.computeSplitList(cond);
     if (splitlist.isEmpty()) {
-      // create an event!!!
+      createEvent(edecl, parts, cond);
     } else {
-      splitEventPartition(event, groups, cond, splitlist, 0);
+      splitEventPartition(edecl, parts, cond, splitlist, 0);
     }
   }
 
-  private void splitEventPartition(final EFAEventDecl event,
-                                   final List<EFATransitionGroup> groups,
+  private void splitEventPartition(final EFAEventDecl edecl,
+                                   final List<EFATransition> parts,
                                    final CompiledClause cond,
                                    final List<EFAVariable> splitlist,
                                    final int index)
@@ -248,11 +257,28 @@ public class EFACompiler
         final CompiledClause nextcond =
           mConstraintPropagator.propagate(cond, varname, value);
         if (nextcond != null) {
-          splitEventPartition(event, groups, nextcond, splitlist, index + 1);
+          splitEventPartition(edecl, parts, nextcond, splitlist, index + 1);
         }
       }
     } else {
-      splitEventPartition(event, groups, cond);
+      splitEventPartition(edecl, parts, cond);
+    }
+  }
+
+  private void createEvent(final EFAEventDecl edecl,
+                           final List<EFATransition> parts,
+                           final CompiledClause cond)
+  {
+    final EFAEvent event = edecl.createEvent(cond);
+    for (final EFATransition part : parts) {
+      for (final Proxy location : part.getSourceLocations()) {
+        Collection<EFAEvent> collection = mEventMap.get(location);
+        if (collection == null) {
+          collection = new LinkedList<EFAEvent>();
+          mEventMap.put(location, collection);
+        }
+        collection.add(event);
+      }
     }
   }
 
@@ -260,15 +286,15 @@ public class EFACompiler
   //#########################################################################
   //# Auxiliary Methods
   private void insertEvent(final IdentifierProxy ident,
-                           final EFAEventDecl event)
+                           final EFAEventDecl edecl)
     throws DuplicateIdentifierException
   {
     final ProxyAccessor<IdentifierProxy> accessor =
       new ProxyAccessorByContents<IdentifierProxy>(ident);
-    if (mEventMap.containsKey(accessor)) {
+    if (mEventDeclMap.containsKey(accessor)) {
       throw new DuplicateIdentifierException(ident, "event");
     } else {
-      mEventMap.put(accessor, event);
+      mEventDeclMap.put(accessor, edecl);
     }
   }
 
@@ -277,11 +303,11 @@ public class EFACompiler
   {
     final ProxyAccessor<IdentifierProxy> accessor =
       new ProxyAccessorByContents<IdentifierProxy>(ident);
-    final EFAEventDecl event = mEventMap.get(accessor);
-    if (event == null) {
+    final EFAEventDecl edecl = mEventDeclMap.get(accessor);
+    if (edecl == null) {
       throw new UndefinedIdentifierException(ident, "event");
     } else {
-      return event;
+      return edecl;
     }
   }
 
@@ -405,31 +431,24 @@ public class EFACompiler
       throws VisitorException
     {
       try {
-        mCurrentEdge = edge;
-        mCurrentGuard = mTrueGuard;
         final GuardActionBlockProxy ga = edge.getGuardActionBlock();
-        final LabelBlockProxy block = edge.getLabelBlock();
-        if (mIsUsingEventAlphabet) {
-          if (ga != null) {
-            try {
-              mCollectedVariables =
-                new ProxyAccessorHashMapByContents<IdentifierProxy>();
-              visitGuardActionBlockProxy(ga);
-              visitLabelBlockProxy(block);
-            } finally {
-              mCollectedVariables = null;
-            }
-          }
+        if (ga == null) {
+          mCurrentGuard = mTrueGuard;
         } else {
-          if (ga != null) {
-            visitGuardActionBlockProxy(ga);
+          if (mIsUsingEventAlphabet) {
+            mCollectedVariables =
+              new ProxyAccessorHashMapByContents<IdentifierProxy>();
           }
-          visitLabelBlockProxy(block);
+          visitGuardActionBlockProxy(ga);
         }
+        final LabelBlockProxy block = edge.getLabelBlock();
+        visitLabelBlockProxy(block);
         return null;
       } finally {
-        mCurrentEdge = null;
         mCurrentGuard = null;
+        if (mIsUsingEventAlphabet) {
+          mCollectedVariables = null;
+        }
       }
     }
 
@@ -438,9 +457,9 @@ public class EFACompiler
     {
       try {
         final IdentifierProxy ident = decl.getIdentifier();
-        final EFAEventDecl event = new EFAEventDecl(decl);
-        insertEvent(ident, event);
-        return event;
+        final EFAEventDecl edecl = new EFAEventDecl(decl);
+        insertEvent(ident, edecl);
+        return edecl;
       } catch (final DuplicateIdentifierException exception) {
         throw wrap(exception);
       }
@@ -450,14 +469,7 @@ public class EFACompiler
       throws VisitorException
     {
       final LabelBlockProxy blocked = graph.getBlockedEvents();
-      if (blocked != null) {
-        try {
-          mCurrentGuard = mTrueGuard;
-          visitLabelBlockProxy(blocked);
-        } finally {
-          mCurrentGuard = null;
-        }
-      }
+      visitLabelBlockProxy(blocked);
       final Collection<EdgeProxy> edges = graph.getEdges();
       visitCollection(edges);
       return null;
@@ -481,13 +493,17 @@ public class EFACompiler
       throws VisitorException
     {
       try {
-        final EFAEventDecl event = findEvent(ident);
-        mCollectedEvents.add(event);
-        if (mIsUsingEventAlphabet) {
-          event.addVariables(mCollectedVariables.values());
+        final EFAEventDecl edecl = findEvent(ident);
+        if (!edecl.isBlocked()) {
+          mCollectedEvents.add(edecl);
+          if (mIsUsingEventAlphabet && mCollectedVariables != null) {
+            edecl.addVariables(mCollectedVariables.values());
+          }
+          if (mCurrentGuard != null) {
+            edecl.addTransitions(mCurrentComponent, mCurrentGuard, ident);
+          }
         }
-        event.addTransitions(mCurrentComponent, mCurrentGuard, ident);
-        return event;
+        return edecl;
       } catch (final UndefinedIdentifierException exception) {
         throw wrap(exception);
       }
@@ -506,7 +522,7 @@ public class EFACompiler
     {
       final List<EventDeclProxy> events = module.getEventDeclList();
       final int size = events.size();
-      mEventMap =
+      mEventDeclMap =
         new HashMap<ProxyAccessor<IdentifierProxy>,EFAEventDecl>(size);
       visitCollection(events);
       final List<Proxy> components = module.getComponentList();
@@ -518,7 +534,7 @@ public class EFACompiler
       throws VisitorException
     {
       try {
-        final int size = mEventMap.size();
+        final int size = mEventDeclMap.size();
         mCurrentComponent = comp;
         mCollectedEvents = new HashSet<EFAEventDecl>(size);
         if (!mIsUsingEventAlphabet) {
@@ -528,24 +544,29 @@ public class EFACompiler
         final ComponentKind ckind = comp.getKind();
         final GraphProxy graph = comp.getGraph();
         visitGraphProxy(graph);
-        for (final EFAEventDecl event : mCollectedEvents) {
+        for (final EFAEventDecl edecl : mCollectedEvents) {
           if (!mIsUsingEventAlphabet) {
-            event.addVariables(mCollectedVariables.values());
+            edecl.addVariables(mCollectedVariables.values());
           }
-          final EventKind ekind = event.getKind();
+          final EventKind ekind = edecl.getKind();
+          final EFATransitionGroup trans = edecl.getTransitionGroup(comp);
           if (ekind == EventKind.CONTROLLABLE &&
               ckind == ComponentKind.PROPERTY ||
               ekind == EventKind.UNCONTROLLABLE &&
               ckind != ComponentKind.PLANT) {
             // Include a catch-all event to be blocked ...
-            final EFATransitionGroup trans = event.getTransitionGroup(comp);
-            final Collection<SimpleExpressionProxy> guards = trans.getGuards();
-            if (guards != null) {
+            if (!trans.hasTrueGuard()) {
+              final Collection<SimpleExpressionProxy> guards =
+                trans.getGuards();
               final CompiledGuard complement =
                 mGuardCompiler.getComplementaryGuard(guards);
               if (complement != null) {
                 trans.addTransitions(complement, null);
               }
+            }
+          } else {
+            if (trans.isEmpty()) {
+              edecl.setBlocked();
             }
           }
         }
@@ -569,7 +590,6 @@ public class EFACompiler
     private SimpleComponentProxy mCurrentComponent;
     private ProxyAccessorMap<IdentifierProxy> mCollectedVariables;
     private Set<EFAEventDecl> mCollectedEvents;
-    private EdgeProxy mCurrentEdge;
     private CompiledGuard mCurrentGuard;
   }
 
@@ -599,10 +619,22 @@ public class EFACompiler
   private final EFAVariableMap mVariableMap;
   // Pass 2
   /**
-   * A map that assigns to each identifier of a event declaration {@link
+   * A map that assigns to each identifier of an event declaration {@link
    * EventDeclProxy} the information about its event variable set and
    * associated guards.
    */
-  private Map<ProxyAccessor<IdentifierProxy>,EFAEventDecl> mEventMap;
+  private Map<ProxyAccessor<IdentifierProxy>,EFAEventDecl> mEventDeclMap;
+  // Pass 3
+  /**
+   * A map that assigns to each identifier of an event label on an edge the
+   * list of EFA events to be associated with it. Likewise, it assigns to
+   * each automaton ({@link SimpleComponentProxy}) a list of events to be
+   * blocked in globally in the automaton. Identifiers associated with true
+   * guards to not have entries in this table, as they will simply receive
+   * all events associated with the event declaration; all other
+   * identifiers receive mappings that reflect the results of simplifying
+   * their guards.
+   */
+  private Map<Proxy,Collection<EFAEvent>> mEventMap;
 
 }
