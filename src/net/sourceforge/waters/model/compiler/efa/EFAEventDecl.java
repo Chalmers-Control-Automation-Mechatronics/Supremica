@@ -2,7 +2,7 @@
 //###########################################################################
 //# PROJECT: Waters
 //# PACKAGE: net.sourceforge.waters.model.compiler.efa
-//# CLASS:   EFAEvent
+//# CLASS:   EFAEventDecl
 //###########################################################################
 //# $Id$
 //###########################################################################
@@ -29,20 +29,18 @@ import net.sourceforge.waters.xsd.base.EventKind;
  * <P>Each compiled event represents a single event declaration ({@link
  * EventDeclProxy}) of the input module, which has been flattened so as not
  * to allow any further array indexes. EFA compilation may split this
- * event, creating individual events for different value combinations of
- * EFA variable components ({@link
- * net.sourceforge.waters.model.module.VariableComponentProxy
- * VariableComponentProxy}).</P>
+ * event, creating individual events of type {@link EFAEvent} for different
+ * value combinations of EFA variable components.</P>
  *
  * @see {@link EFACompiler}.
  * @author Robi Malik
  */
 
-class EFAEvent {
+class EFAEventDecl {
 
   //#########################################################################
   //# Constructors
-  EFAEvent(final EventDeclProxy decl)
+  EFAEventDecl(final EventDeclProxy decl)
   {
     mEventDecl = decl;
     mVariables = new ProxyAccessorHashMapByContents<IdentifierProxy>();
