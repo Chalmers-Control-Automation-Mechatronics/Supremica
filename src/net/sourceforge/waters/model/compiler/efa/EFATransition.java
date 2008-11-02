@@ -14,6 +14,7 @@ import java.util.LinkedList;
 
 import net.sourceforge.waters.model.compiler.dnf.CompiledClause;
 import net.sourceforge.waters.model.module.IdentifierProxy;
+import net.sourceforge.waters.model.module.SimpleComponentProxy;
 
 
 /**
@@ -30,8 +31,10 @@ class EFATransition
 
   //#########################################################################
   //# Constructors
-  EFATransition(final CompiledClause conditions)
+  EFATransition(final SimpleComponentProxy comp,
+                final CompiledClause conditions)
   {
+    mComponent = comp;
     mConditions = conditions;
     mSourceLabels = new LinkedList<IdentifierProxy>();
   }
@@ -39,6 +42,11 @@ class EFATransition
 
   //#########################################################################
   //# Simple Access
+  SimpleComponentProxy getComponent()
+  {
+    return mComponent;
+  }
+
   CompiledClause getConditions()
   {
     return mConditions;
@@ -59,6 +67,7 @@ class EFATransition
 
   //#########################################################################
   //# Data Members
+  private final SimpleComponentProxy mComponent;
   private final CompiledClause mConditions;
   private final Collection<IdentifierProxy> mSourceLabels;
 

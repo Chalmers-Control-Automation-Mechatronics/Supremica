@@ -44,27 +44,7 @@ class EFAVariable implements Comparable<EFAVariable> {
 
 
   //#########################################################################
-  //# Hashing and Comparing
-  public boolean equals(final Object other)
-  {
-    if (other.getClass() == getClass()) {
-      final EFAVariable var = (EFAVariable) other;
-      return mIsNext == var.mIsNext && mIdentifier.equals(var.mIdentifier);
-    } else {
-      return false;
-    }
-  }
-
-  public int hashCode()
-  {
-    int result = mIdentifier.hashCode();
-    if (mIsNext) {
-      result++;
-    }
-    return result;
-  }
-
-
+  //# Interface java.lang.Comparable
   public int compareTo(final EFAVariable var)
   {
     if (mIsNext != var.mIsNext) {
@@ -90,6 +70,12 @@ class EFAVariable implements Comparable<EFAVariable> {
   boolean isNext()
   {
     return mIsNext;
+  }
+
+  boolean isPartnerOf(final EFAVariable var)
+  {
+    return
+      mIsNext != var.mIsNext && mIdentifier.equalsByContents(var.mIdentifier);
   }
 
   IdentifierProxy getIdentifier()

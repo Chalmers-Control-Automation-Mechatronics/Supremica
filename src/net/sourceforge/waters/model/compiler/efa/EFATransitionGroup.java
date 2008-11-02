@@ -18,6 +18,7 @@ import net.sourceforge.waters.model.base.ProxyAccessorMap;
 import net.sourceforge.waters.model.compiler.dnf.CompiledClause;
 import net.sourceforge.waters.model.compiler.dnf.CompiledNormalForm;
 import net.sourceforge.waters.model.module.IdentifierProxy;
+import net.sourceforge.waters.model.module.SimpleComponentProxy;
 import net.sourceforge.waters.model.module.SimpleExpressionProxy;
 
 
@@ -30,13 +31,14 @@ import net.sourceforge.waters.model.module.SimpleExpressionProxy;
  * @author Robi Malik
  */
 
-class EFATransitionGroup
+class EFATransitionGroup implements Comparable<EFATransitionGroup>
 {
 
   //#########################################################################
   //# Constructors
-  EFATransitionGroup()
+  EFATransitionGroup(final SimpleComponentProxy comp)
   {
+    mComponent = comp;
     mPartialTransitions = new HashMap<CompiledClause,EFATransition>();
     mGuards = new ProxyAccessorHashMapByContents<SimpleExpressionProxy>();
   }
@@ -47,6 +49,25 @@ class EFATransitionGroup
   Collection<SimpleExpressionProxy> getGuards()
   {
     return mGuards == null ? null : mGuards.values();
+  }
+
+  Collection<EFATransition> getPartialTransitions()
+  {
+    return mPartialTransitions.values();
+  }
+
+  boolean isTrivial()
+  {
+    switch (mPartialTransitions.size()) {
+    case 0:
+      return true;
+    case 1:
+      final CompiledClause clause =
+        mPartialTransitions.keySet().iterator().next();
+      return clause.isEmpty();
+    default:
+      return false;
+    }
   }
 
   void addTransitions(final CompiledGuard guard,
@@ -70,7 +91,7 @@ class EFATransitionGroup
   {
     EFATransition trans = mPartialTransitions.get(clause);
     if (trans == null) {
-      trans = new EFATransition(clause);
+      trans = new EFATransition(mComponent, clause);
       mPartialTransitions.put(clause, trans);
     }
     trans.addSourceLabel(label);
@@ -78,7 +99,28 @@ class EFATransitionGroup
 
 
   //#########################################################################
+  //# Interface java.lang.Comparable
+  public int compareTo(final EFATransitionGroup group)
+  {
+    final int numclauses1 = mPartialTransitions.size();
+    final int numclauses2 = group.mPartialTransitions.size();
+    if (numclauses1 != numclauses2) {
+      return numclauses1 - numclauses2;
+    }
+    final int numstates1 = mComponent.getGraph().getNodes().size();
+    final int numstates2 = group.mComponent.getGraph().getNodes().size();
+    if (numstates1 != numstates2) {
+      return numstates1 - numstates2;
+    }
+    final IdentifierProxy ident1 = mComponent.getIdentifier();
+    final IdentifierProxy ident2 = group.mComponent.getIdentifier();
+    return ident1.compareTo(ident2);
+  }
+
+
+  //#########################################################################
   //# Data Members
+  private final SimpleComponentProxy mComponent;
   private final Map<CompiledClause,EFATransition> mPartialTransitions;
   private ProxyAccessorMap<SimpleExpressionProxy> mGuards;
 

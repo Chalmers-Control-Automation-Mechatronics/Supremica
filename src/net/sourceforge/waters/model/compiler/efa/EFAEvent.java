@@ -67,6 +67,11 @@ class EFAEvent {
     return mTransitionMap.get(comp);
   }
 
+  Collection<EFATransitionGroup> getTransitionGroups()
+  {
+    return mTransitionMap.values();
+  }
+
   void addVariable(final IdentifierProxy ident)
   {
     mVariables.addProxy(ident);
@@ -83,7 +88,7 @@ class EFAEvent {
   {
     EFATransitionGroup trans = mTransitionMap.get(comp);
     if (trans == null) {
-      trans = new EFATransitionGroup();
+      trans = new EFATransitionGroup(comp);
       mTransitionMap.put(comp, trans);
     }
     trans.addTransitions(guard, label);

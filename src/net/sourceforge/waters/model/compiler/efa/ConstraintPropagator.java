@@ -60,26 +60,49 @@ class ConstraintPropagator
 
   //#########################################################################
   //# Invocation
-  CompiledClause propagate(final CompiledClause clause,
-                           final SimpleExpressionProxy varname,
-                           final SimpleExpressionProxy value)
+  CompiledClause propagate(final CompiledClause clause)
   {
     try {
-      setup(clause, 1);
-      substitute(varname, value);
-      final BinaryExpressionProxy equation = createEquation(varname, value);
-      mProcessedEquations.add(equation);
-      mHasChanged = true;
+      final Collection<SimpleExpressionProxy> literals = clause.getLiterals();
+      final int size = literals.size();
+      setup(size);
+      mOpenLiterals.addAll(literals);
       return propagate();
     } finally {
       cleanup();
     }
   }
 
-  CompiledClause propagate(final CompiledClause clause)
+  CompiledClause propagate(final CompiledClause clause1,
+                           final CompiledClause clause2)
   {
     try {
-      setup(clause);
+      final Collection<SimpleExpressionProxy> literals1 =
+        clause1.getLiterals();
+      final Collection<SimpleExpressionProxy> literals2 =
+        clause2.getLiterals();
+      final int size = literals1.size() + literals2.size();
+      setup(size);
+      mOpenLiterals.addAll(literals1);
+      mOpenLiterals.addAll(literals2);
+      return propagate();
+    } finally {
+      cleanup();
+    }
+  }
+
+  CompiledClause propagate(final CompiledClause clause,
+                           final SimpleExpressionProxy varname,
+                           final SimpleExpressionProxy value)
+  {
+    try {
+      final Collection<SimpleExpressionProxy> literals = clause.getLiterals();
+      final int size = literals.size();
+      setup(size + 1);
+      mOpenLiterals.addAll(literals);
+      substitute(varname, value);
+      final BinaryExpressionProxy equation = createEquation(varname, value);
+      mProcessedEquations.add(equation);
       return propagate();
     } finally {
       cleanup();
@@ -89,27 +112,12 @@ class ConstraintPropagator
 
   //#########################################################################
   //# Algorithm
-  private void setup(final CompiledClause clause)
+  private void setup(final int size)
   {
-    setup(clause, 0);
-  }
-
-  private void setup(final CompiledClause clause, final int extra)
-  {
-    final BinaryOperator op = clause.getOperator();
-    if (op != mOperatorTable.getAndOperator()) {
-      throw new IllegalArgumentException
-        ("ConstraintPropagator can only handle AND-clauses!");
-    }
-    mClause = clause;
-    mHasChanged = false;
     mIsFalse = false;
     final Comparator<SimpleExpressionProxy> comparator =
       mVariableMap.getExpressionComparator();
-    final Collection<SimpleExpressionProxy> literals = clause.getLiterals();
     mOpenLiterals = new TreeSet<SimpleExpressionProxy>(comparator);
-    mOpenLiterals.addAll(literals);
-    final int size = mOpenLiterals.size() + extra;
     mProcessedEquations = new ArrayList<BinaryExpressionProxy>(size);
   }
 
@@ -122,19 +130,17 @@ class ConstraintPropagator
   private CompiledClause propagate()
   {
     while (simplify()) {
-      mHasChanged = true;
+      // nothing ...
     }
     if (mIsFalse) {
       return null;
-    } else if (mHasChanged) {
-      final BinaryOperator op = mClause.getOperator();
+    } else {
+      final BinaryOperator andop = mOperatorTable.getAndOperator();
       final int size = mOpenLiterals.size() + mProcessedEquations.size();
-      final CompiledClause result = new CompiledClause(op, size);
+      final CompiledClause result = new CompiledClause(andop, size);
       result.addAll(mProcessedEquations);
       result.addAll(mOpenLiterals);
       return result;
-    } else {
-      return mClause;
     }
   }
 
@@ -483,8 +489,6 @@ class ConstraintPropagator
   private final OccursCheckVisitor mOccursCheckVisitor;
   private final SubstitutionVisitor mSubstitutionVisitor;
 
-  private CompiledClause mClause;
-  private boolean mHasChanged;
   private boolean mIsFalse;
   private Collection<SimpleExpressionProxy> mOpenLiterals;
   private List<BinaryExpressionProxy> mProcessedEquations;

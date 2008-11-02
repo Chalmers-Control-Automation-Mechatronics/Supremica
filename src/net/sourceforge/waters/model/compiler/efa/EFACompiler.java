@@ -11,6 +11,7 @@ package net.sourceforge.waters.model.compiler.efa;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -34,6 +35,8 @@ import net.sourceforge.waters.model.compiler.context.
 import net.sourceforge.waters.model.compiler.context.ModuleBindingContext;
 import net.sourceforge.waters.model.compiler.context.SimpleExpressionCompiler;
 import net.sourceforge.waters.model.compiler.context.SourceInfoBuilder;
+import net.sourceforge.waters.model.compiler.dnf.CompiledClause;
+import net.sourceforge.waters.model.expr.BinaryOperator;
 import net.sourceforge.waters.model.expr.EvalException;
 import net.sourceforge.waters.model.expr.UnaryOperator;
 import net.sourceforge.waters.model.module.AbstractModuleProxyVisitor;
@@ -91,58 +94,19 @@ import net.sourceforge.waters.xsd.base.EventKind;
  * <OL>
  * <LI>Identify all components (simple or variable) and their state
  *     space.</LI>
- * <LI>Identify the event variable set and the set of checked components for
- *     each event.
- *     <UL>
- *     <LI>The event variable set consists of the set of all variables whose
- *         value may change if an event occurs. It can be computed in two
- *         different ways, depending on the configuration.<BR>
- *         In <CODE>AUTOMATON_ALPHABET</CODE> mode, the event variable set
- *         of an event is the set of all the variables updated in some
- *         simple component using the event.<BR>
- *         In <CODE>EVENT_ALPHABET</CODE> mode, the event variable set
- *         of an event is the set of all the variables updated in some
- *         guard/action block whose edge includes the event.</LI>
- *     <LI>Independently of the event variable set, the set of checked
- *         components for an event consists of all the components
- *         (variable or simple) whose state value will be considered
- *         when partitioning the event.<BR>
- *         It contains all simple components using a given event, provided
- *         that the event is associated with at least two different
- *         guard/action blocks in that component. If all guard/action
- *         blocks in a component are equal, the associated state-update
- *         relation must be added to the state update relation of the
- *         event, and then the component will simply use all the event
- *         labels generated for the event.<BR>
- *         It also contains all the variables&nbsp;<I>x</I> in the event
- *         variable set, unless the following condition is satisfied. If in
- *         every automaton using the event, all the guards can be written
- *         as <CODE>a&nbsp;&amp;&nbsp;b(</CODE><I>x</I><CODE>)</CODE> where
- *         <CODE>a</CODE> does not depend on&nbsp;<I>x</I>, and
- *         <CODE>b(</CODE><I>x</I><CODE>)</CODE> is an expression that
- *         depends on no variables except&nbsp;<I>x</I>, and is the same for
- *         all guards associated with the given event in the automaton, then
- *         the variable&nbsp;<I>x</I> is not a checked component for that
- *         event. In this case the update operation for the
- *         variable&nbsp;<I>x</I> on the given event is the conjunction of
- *         all the terms <CODE>b(</CODE><I>x</I><CODE>)</CODE> and can be
- *         implemented separately.</LI>
- *     </UL>
- * <LI>Compute normalised state-update relations.<BR>
- *     For each event, iterate over all combinations of values of the
- *     checked components and compute the (nondeterministic set of)
- *     successor states. (Under the current syntax, where only action
- *     functions are permitted, the successor state sets can be represented
- *     as a Cartesian product of state sets of the checked components; this
- *     will change once arbitrary relations are allowed as guards.)<BR>
- *     Each combination of values with a nonempty set of successor states
- *     may warrant an event of its own. But some combinations may be
- *     merged. If, for some component&nbsp;<I>c</I>, there are two or more
- *     state combinations that agree on the current and successor states of
- *     all components except&nbsp;<I>c</I>, then these two or more state
- *     combinations can be represented by the same event label in the
- *     output.</LI>
- * <LI>Create partitioned events and build output automata.</LI>
+ * <LI>Collect and normalise guards, and identify the event variable set
+ *     for each event.<BR>
+ *     The event variable set consists of the set of all variables whose
+ *     value may change if an event occurs. It can be computed in two
+ *     different ways, depending on the configuration.<BR>
+ *     In <CODE>AUTOMATON_ALPHABET</CODE> mode, the event variable set of
+ *     an event is the set of all the variables updated in some simple
+ *     component using the event.<BR>
+ *     In <CODE>EVENT_ALPHABET</CODE> mode, the event variable set of an
+ *     event is the set of all the variables updated in some guard/action
+ *     block whose edge includes the event.</LI>
+ * <LI>Compute event partitionings.</LI>
+ * <LI>Build output automata.</LI>
  * </OL>
  *
  * @author Robi Malik
@@ -167,6 +131,10 @@ public class EFACompiler
     mSimpleExpressionCompiler =
       new SimpleExpressionCompiler(mFactory, mOperatorTable, comparator);
     mGuardCompiler = new GuardCompiler(mFactory, mOperatorTable, comparator);
+    mConstraintPropagator =
+      new ConstraintPropagator(mFactory, mOperatorTable,
+                               mSimpleExpressionCompiler, mVariableMap);
+    mSplitComputer = new SplitComputer(mVariableMap);
     mInputModule = module;
   }
 
@@ -180,6 +148,8 @@ public class EFACompiler
       mRootContext = new ModuleBindingContext(mInputModule);
       final ModuleProxyVisitor pass1 = new Pass1Visitor();
       mInputModule.acceptVisitor(pass1);
+      final ModuleProxyVisitor pass2 = new Pass2Visitor();
+      mInputModule.acceptVisitor(pass2);
       return null;
     } catch (final VisitorException exception) {
       final Throwable cause = exception.getCause();
@@ -200,6 +170,85 @@ public class EFACompiler
   void setUsingEventAlphabet(final boolean using)
   {
     mIsUsingEventAlphabet = using;
+  }
+
+
+  //#########################################################################
+  //# Event Partitioning
+  private void computeEventPartitions()
+  {
+    final BinaryOperator andop = mOperatorTable.getAndOperator();
+    for (final EFAEvent event : mEventMap.values()) {
+      final Collection<EFATransitionGroup> allgroups =
+        event.getTransitionGroups();
+      final int numgroups = allgroups.size();
+      final List<EFATransitionGroup> groups =
+        new ArrayList<EFATransitionGroup>(numgroups);
+      for (final EFATransitionGroup group : allgroups) {
+        if (!group.isTrivial()) {
+          groups.add(group);
+        }
+      }
+      if (!groups.isEmpty()) {
+        Collections.sort(groups);
+        final CompiledClause startcond = new CompiledClause(andop);
+        collectEventPartition(event, groups, 0, startcond);
+      }
+    }
+  }
+
+  private void collectEventPartition(final EFAEvent event,
+                                     final List<EFATransitionGroup> groups,
+                                     final int index,
+                                     final CompiledClause prevcond)
+  {
+    if (index < groups.size()) {
+      final EFATransitionGroup group = groups.get(index);
+      for (final EFATransition part : group.getPartialTransitions()) {
+        final CompiledClause cond = part.getConditions();
+        final CompiledClause nextcond =
+          mConstraintPropagator.propagate(prevcond, cond);
+        if (nextcond != null) {
+          collectEventPartition(event, groups, index + 1, nextcond);
+        }
+      }
+    } else {
+      splitEventPartition(event, groups, prevcond);
+    }
+  }
+
+  private void splitEventPartition(final EFAEvent event,
+                                   final List<EFATransitionGroup> groups,
+                                   final CompiledClause cond)
+  {
+    final List<EFAVariable> splitlist = mSplitComputer.computeSplitList(cond);
+    if (splitlist.isEmpty()) {
+      // create an event!!!
+    } else {
+      splitEventPartition(event, groups, cond, splitlist, 0);
+    }
+  }
+
+  private void splitEventPartition(final EFAEvent event,
+                                   final List<EFATransitionGroup> groups,
+                                   final CompiledClause cond,
+                                   final List<EFAVariable> splitlist,
+                                   final int index)
+  {
+    if (index < splitlist.size()) {
+      final EFAVariable var = splitlist.get(index);
+      final SimpleExpressionProxy varname = var.getVariableName();
+      final CompiledRange range = var.getRange();
+      for (final SimpleExpressionProxy value : range.getValues()) {
+        final CompiledClause nextcond =
+          mConstraintPropagator.propagate(cond, varname, value);
+        if (nextcond != null) {
+          splitEventPartition(event, groups, nextcond, splitlist, index + 1);
+        }
+      }
+    } else {
+      splitEventPartition(event, groups, cond);
+    }
   }
 
 
@@ -528,6 +577,8 @@ public class EFACompiler
   private final CompiledGuard mTrueGuard;
   private final SimpleExpressionCompiler mSimpleExpressionCompiler;
   private final GuardCompiler mGuardCompiler;
+  private final ConstraintPropagator mConstraintPropagator;
+  private final SplitComputer mSplitComputer;
   private final ModuleProxy mInputModule;
 
   private boolean mIsUsingEventAlphabet = true;

@@ -9,22 +9,30 @@
 
 package net.sourceforge.waters.model.compiler.efa;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import net.sourceforge.waters.model.base.ProxyAccessor;
 import net.sourceforge.waters.model.base.ProxyAccessorByContents;
 import net.sourceforge.waters.model.base.ProxyAccessorHashMapByContents;
 import net.sourceforge.waters.model.base.ProxyAccessorMap;
+import net.sourceforge.waters.model.base.VisitorException;
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
 import net.sourceforge.waters.model.compiler.context.CompiledRange;
 import net.sourceforge.waters.model.compiler.context.
   UndefinedIdentifierException;
 import net.sourceforge.waters.model.expr.UnaryOperator;
+import net.sourceforge.waters.model.module.AbstractModuleProxyVisitor;
+import net.sourceforge.waters.model.module.BinaryExpressionProxy;
 import net.sourceforge.waters.model.module.ComponentProxy;
 import net.sourceforge.waters.model.module.IdentifierProxy;
+import net.sourceforge.waters.model.module.IndexedIdentifierProxy;
 import net.sourceforge.waters.model.module.ModuleProxyFactory;
+import net.sourceforge.waters.model.module.QualifiedIdentifierProxy;
 import net.sourceforge.waters.model.module.SimpleExpressionProxy;
 import net.sourceforge.waters.model.module.UnaryExpressionProxy;
 
@@ -57,6 +65,7 @@ class EFAVariableMap {
     mFactory = factory;
     mOperatorTable = optable;
     mComparator = new EFAExpressionComparator();
+    mCollector = new EFAVariableCollector();
     mMap = null;
   }
 
@@ -73,14 +82,24 @@ class EFAVariableMap {
     mMap = new HashMap<ProxyAccessor<SimpleExpressionProxy>,EFAVariable>(size);
   }
 
+  int size()
+  {
+    return mMap.size();
+  }
+
   EFAVariable getVariable(final SimpleExpressionProxy varname)
   {
-    init();
     final ProxyAccessor<SimpleExpressionProxy> accessor =
       new ProxyAccessorByContents<SimpleExpressionProxy>(varname);
+    return getVariable(accessor);
+  }
+
+  EFAVariable getVariable(final ProxyAccessor<SimpleExpressionProxy> accessor)
+  {
+    init();
     return mMap.get(accessor);
   }
-    
+
   void createVariables(final ComponentProxy comp,
                        final IdentifierProxy ident,
                        final CompiledRange range)
@@ -115,6 +134,11 @@ class EFAVariableMap {
     return mComparator;
   }
 
+  Collection<EFAVariable> collectVariables(final SimpleExpressionProxy expr)
+  {
+    return mCollector.collect(expr);
+  }
+
 
   //#########################################################################
   //# Auxiliary Methods
@@ -127,11 +151,111 @@ class EFAVariableMap {
 
 
   //#########################################################################
+  //# Inner Class EFAVariableCollector
+  private class EFAVariableCollector
+    extends AbstractModuleProxyVisitor
+  {
+
+    //#######################################################################
+    //# Constructor
+    private EFAVariableCollector()
+    {
+      mMap = new HashMap<ProxyAccessor<SimpleExpressionProxy>,EFAVariable>();
+    }
+
+    //#######################################################################
+    //# Invocation
+    Collection<EFAVariable> collect(final SimpleExpressionProxy expr)
+    {
+      try {
+        process(expr);
+        final Collection<EFAVariable> values = mMap.values();
+        return new ArrayList<EFAVariable>(values);
+      } catch (final VisitorException exception) {
+        throw exception.getRuntimeException();
+      } finally {
+        mMap.clear();
+      }
+    }
+
+
+    //#######################################################################
+    //# Auxiliary Methods
+    void process(final SimpleExpressionProxy expr)
+      throws VisitorException
+    {
+      final ProxyAccessor<SimpleExpressionProxy> accessor =
+        new ProxyAccessorByContents<SimpleExpressionProxy>(expr);
+      final EFAVariable var = getVariable(accessor);
+      if (var == null) {
+        expr.acceptVisitor(this);
+      } else {
+        mMap.put(accessor, var);
+      }
+    }
+
+
+    //#######################################################################
+    //# Interface net.sourceforge.waters.model.module.ModuleProxyVisitor
+    public Object visitBinaryExpressionProxy(final BinaryExpressionProxy expr)
+      throws VisitorException
+    {
+      final SimpleExpressionProxy lhs = expr.getLeft();
+      process(lhs);
+      final SimpleExpressionProxy rhs = expr.getRight();
+      process(rhs);
+      return null;
+    }
+
+    public Object visitIndexedIdentifierProxy
+      (final IndexedIdentifierProxy ident)
+      throws VisitorException
+    {
+      final List<SimpleExpressionProxy> indexes = ident.getIndexes();
+      for (final SimpleExpressionProxy index : indexes) {
+        process(index);
+      }
+      return null;
+    }
+
+    public Object visitQualifiedIdentifierProxy
+      (final QualifiedIdentifierProxy ident)
+      throws VisitorException
+    {
+      final IdentifierProxy base = ident.getBaseIdentifier();
+      base.acceptVisitor(this);
+      final IdentifierProxy comp = ident.getComponentIdentifier();
+      return comp.acceptVisitor(this);
+    }
+
+    public Object visitSimpleExpressionProxy
+      (final SimpleExpressionProxy expr)
+    {
+      return null;
+    }
+
+    public Object visitUnaryExpressionProxy
+      (final UnaryExpressionProxy expr)
+      throws VisitorException
+    {
+      final SimpleExpressionProxy subterm = expr.getSubTerm();
+      process(subterm);
+      return null;
+    }
+
+    //#######################################################################
+    //# Data Members
+    private final Map<ProxyAccessor<SimpleExpressionProxy>,EFAVariable> mMap;
+
+  }
+
+
+  //#########################################################################
   //# Inner Class EFAExpressionComparator
   private class EFAExpressionComparator
     implements Comparator<SimpleExpressionProxy>
   {
-  
+
     //#######################################################################
     //# Interface java.util.Comparator
     public int compare(final SimpleExpressionProxy expr1,
@@ -164,6 +288,7 @@ class EFAVariableMap {
   private final ModuleProxyFactory mFactory;
   private final CompilerOperatorTable mOperatorTable;
   private final EFAExpressionComparator mComparator;
+  private final EFAVariableCollector mCollector;
 
   private Map<ProxyAccessor<SimpleExpressionProxy>,EFAVariable> mMap;
 

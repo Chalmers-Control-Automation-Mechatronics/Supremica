@@ -12,16 +12,23 @@ package net.sourceforge.waters.model.compiler.efa;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.HashMap;
+import java.util.Set;
 
-import net.sourceforge.waters.model.base.ProxyAccessor;
-import net.sourceforge.waters.model.base.ProxyAccessorByContents;
-import net.sourceforge.waters.model.base.ProxyAccessorHashMapByContents;
-import net.sourceforge.waters.model.base.ProxyAccessorMap;
+import net.sourceforge.waters.model.base.VisitorException;
 import net.sourceforge.waters.model.compiler.context.CompiledRange;
+import net.sourceforge.waters.model.compiler.dnf.CompiledClause;
+import net.sourceforge.waters.model.module.AbstractModuleProxyVisitor;
+import net.sourceforge.waters.model.module.BinaryExpressionProxy;
+import net.sourceforge.waters.model.module.IdentifierProxy;
+import net.sourceforge.waters.model.module.IndexedIdentifierProxy;
+import net.sourceforge.waters.model.module.QualifiedIdentifierProxy;
 import net.sourceforge.waters.model.module.SimpleExpressionProxy;
+import net.sourceforge.waters.model.module.UnaryExpressionProxy;
 
 
 class SplitComputer
@@ -29,31 +36,66 @@ class SplitComputer
 
   //#########################################################################
   //# Constructors
-  SplitComputer
-    (final Map<ProxyAccessor<SimpleExpressionProxy>,EFAVariable> variables)
+  SplitComputer(final EFAVariableMap varmap)
   {
-    final int size = variables.size();
-    mVariablesMap = variables;
-    mCandidatesMap =
-      new HashMap<ProxyAccessor<SimpleExpressionProxy>,SplitCandidate>(size);
-    mCandidatesList = new ArrayList<SplitCandidate>(size);
+    final int size = varmap.size();
+    mIndexSplitVisitor = new IndexSplitVisitor();
+    mVariableMap = varmap;
+    mCandidateMap = new HashMap<EFAVariable,SplitCandidate>(size);
+    mCandidateList = new ArrayList<SplitCandidate>(size);
   }
 
 
   //#########################################################################
   //# Invocation
-  List<EFAVariable> computeSplitList
+  List<EFAVariable> computeSplitList(final CompiledClause clause)
+  {
+    final EFAVariable isplit = computeIndexSplit(clause);
+    if (isplit != null) {
+      return Collections.singletonList(isplit);
+    } else {
+      return computeProperSplit(clause);
+    }
+  }
+
+  EFAVariable computeIndexSplit(final CompiledClause clause)
+  {
+    return mIndexSplitVisitor.getIndexSplit(clause);
+  }
+
+  List<EFAVariable> computeProperSplit(final CompiledClause clause)
+  {
+    final Collection<SimpleExpressionProxy> literals = clause.getLiterals();
+    final int size = literals.size();
+    final Collection<EFAVariableCombination> combinations =
+      new HashSet<EFAVariableCombination>(size);
+    for (final SimpleExpressionProxy literal : literals) {
+      final Collection<EFAVariable> vars =
+        mVariableMap.collectVariables(literal);
+      final EFAVariableCombination combination =
+        EFAVariableCombination.create(vars);
+      if (combination != null) {
+        combinations.add(combination);
+      }
+    }
+    return computeSplitList(combinations);
+  }
+
+
+  //#########################################################################
+  //# Algorithm
+  private List<EFAVariable> computeSplitList
     (final Collection<EFAVariableCombination> combinations)
   {
     try {
       for (final EFAVariableCombination combination : combinations) {
-        for (final SimpleExpressionProxy varname : combination.getContents()) {
-          final SplitCandidate cand = createCandidate(varname);
+        for (final EFAVariable var : combination.getContents()) {
+          final SplitCandidate cand = createCandidate(var);
           cand.addCombination();
         }
       }
-      Collections.sort(mCandidatesList);
-      final int numcandidates = mCandidatesList.size();
+      Collections.sort(mCandidateList);
+      final int numcandidates = mCandidateList.size();
       final List<SplitCandidate> current =
         new ArrayList<SplitCandidate>(numcandidates);
       mBestCost = MAX_COST;
@@ -72,14 +114,11 @@ class SplitComputer
         return result;
       }
     } finally {
-      mCandidatesMap.clear();
-      mCandidatesList.clear();
+      mCandidateMap.clear();
+      mCandidateList.clear();
     }
   }
 
-
-  //#########################################################################
-  //# Algorithm
   private void searchCandidatesList
     (final int start,
      final long cost,
@@ -90,18 +129,16 @@ class SplitComputer
       mBestCost = cost;
       mBestSolution = new ArrayList<SplitCandidate>(current);
     } else {
-      final ProxyAccessorMap<SimpleExpressionProxy> openvars =
-        new ProxyAccessorHashMapByContents<SimpleExpressionProxy>();
+      final Set<EFAVariable> openvars = new HashSet<EFAVariable>();
       for (final EFAVariableCombination combination : open) {
-        final ProxyAccessorMap<SimpleExpressionProxy> contents =
-          combination.getContentsMap();
-        openvars.putAll(contents);
+        final Set<EFAVariable> contents = combination.getContents();
+        openvars.addAll(contents);
       }
-      final int numcandidates = mCandidatesList.size();
+      final int numcandidates = mCandidateList.size();
       for (int index = start; index < numcandidates; index++) {
-        final SplitCandidate cand = mCandidatesList.get(index);
-        final SimpleExpressionProxy varname = cand.getVariableName();
-        if (!openvars.containsProxy(varname)) {
+        final SplitCandidate cand = mCandidateList.get(index);
+        final EFAVariable var = cand.getVariable();
+        if (!openvars.contains(var)) {
           continue;
         }
         final int rangesize = cand.getRangeSize();
@@ -117,7 +154,7 @@ class SplitComputer
           new ArrayList<EFAVariableCombination>(numopen);
         for (final EFAVariableCombination combination : open) {
           final EFAVariableCombination reduced =
-            combination.getReducedCombination(varname);
+            combination.getReducedCombination(var);
           if (reduced != null) {
             nextopen.add(reduced);
           }
@@ -131,25 +168,20 @@ class SplitComputer
 
   //#########################################################################
   //# Auxiliary Methods
-  private SplitCandidate createCandidate(final SimpleExpressionProxy varname)
+  private SplitCandidate createCandidate(final EFAVariable var)
   {
-    final ProxyAccessor<SimpleExpressionProxy> accessor =
-      new ProxyAccessorByContents<SimpleExpressionProxy>(varname);
-    SplitCandidate cand = mCandidatesMap.get(accessor);
+    SplitCandidate cand = mCandidateMap.get(var);
     if (cand == null) {
-      final EFAVariable var = mVariablesMap.get(accessor);
       cand = new SplitCandidate(var);
-      mCandidatesMap.put(accessor, cand);
-      mCandidatesList.add(cand);
+      mCandidateMap.put(var, cand);
+      mCandidateList.add(cand);
     }
     return cand;
   }
 
-  private SplitCandidate getCandidate(final SimpleExpressionProxy varname)
+  private SplitCandidate getCandidate(final EFAVariable var)
   {
-    final ProxyAccessor<SimpleExpressionProxy> accessor =
-      new ProxyAccessorByContents<SimpleExpressionProxy>(varname);
-    return mCandidatesMap.get(accessor);
+    return mCandidateMap.get(var);
   }
 
 
@@ -181,16 +213,6 @@ class SplitComputer
 
     //#######################################################################
     //# Simple Access
-    private SimpleExpressionProxy getVariableName()
-    {
-      return mVariable.getVariableName();
-    }
-
-    private boolean isNext()
-    {
-      return mVariable.isNext();
-    }
-
     private EFAVariable getVariable()
     {
       return mVariable;
@@ -198,7 +220,7 @@ class SplitComputer
 
     private int getRangeSize()
     {
-      return mRangeSize;       
+      return mRangeSize;
     }
 
     private int getNumCombinations()
@@ -221,12 +243,114 @@ class SplitComputer
 
 
   //#########################################################################
+  //# Inner Class IndexSplitVisitor
+  private class IndexSplitVisitor
+    extends AbstractModuleProxyVisitor
+  {
+
+    //#######################################################################
+    //# Invocation
+    EFAVariable getIndexSplit(final CompiledClause clause)
+    {
+      try {
+        mResult = null;
+        mInIndex = false;
+        for (final SimpleExpressionProxy literal : clause.getLiterals()) {
+          literal.acceptVisitor(this);
+        }
+        return mResult;
+      } catch (final VisitorException exception) {
+        throw exception.getRuntimeException();
+      }
+    }
+
+
+    //#######################################################################
+    //# Auxiliary Methods
+    void collect(final SimpleExpressionProxy expr)
+      throws VisitorException
+    {
+      if (mInIndex) {
+        final EFAVariable var = mVariableMap.getVariable(expr);
+        if (var != null) {
+          if (mResult == null || var.compareTo(mResult) < 0) {
+            mResult = var;
+            return;
+          }
+        }
+      }
+      expr.acceptVisitor(this);
+    }
+
+
+    //#######################################################################
+    //# Interface net.sourceforge.waters.model.module.ModuleProxyVisitor
+    public Object visitBinaryExpressionProxy(final BinaryExpressionProxy expr)
+      throws VisitorException
+    {
+      final SimpleExpressionProxy lhs = expr.getLeft();
+      collect(lhs);
+      final SimpleExpressionProxy rhs = expr.getRight();
+      collect(rhs);
+      return null;
+    }
+
+    public Object visitIndexedIdentifierProxy
+      (final IndexedIdentifierProxy ident)
+      throws VisitorException
+    {
+      final boolean save = mInIndex;
+      mInIndex = true;
+      try {
+        final List<SimpleExpressionProxy> indexes = ident.getIndexes();
+        for (final SimpleExpressionProxy index : indexes) {
+          collect(index);
+        }
+      } finally {
+        mInIndex = save;
+      }
+      return null;
+    }
+
+    public Object visitQualifiedIdentifierProxy
+      (final QualifiedIdentifierProxy ident)
+      throws VisitorException
+    {
+      final IdentifierProxy base = ident.getBaseIdentifier();
+      base.acceptVisitor(this);
+      final IdentifierProxy comp = ident.getComponentIdentifier();
+      return comp.acceptVisitor(this);
+    }
+
+    public Object visitSimpleExpressionProxy
+      (final SimpleExpressionProxy expr)
+    {
+      return null;
+    }
+
+    public Object visitUnaryExpressionProxy
+      (final UnaryExpressionProxy expr)
+      throws VisitorException
+    {
+      final SimpleExpressionProxy subterm = expr.getSubTerm();
+      collect(subterm);
+      return null;
+    }
+
+    //#######################################################################
+    //# Data Members
+    private boolean mInIndex;
+    private EFAVariable mResult;
+
+  }
+
+
+  //#########################################################################
   //# Data Members
-  private final Map<ProxyAccessor<SimpleExpressionProxy>,EFAVariable>
-    mVariablesMap;
-  private final Map<ProxyAccessor<SimpleExpressionProxy>,SplitCandidate>
-    mCandidatesMap;
-  private final List<SplitCandidate> mCandidatesList;
+  private final IndexSplitVisitor mIndexSplitVisitor;
+  private final EFAVariableMap mVariableMap;
+  private final Map<EFAVariable,SplitCandidate> mCandidateMap;
+  private final List<SplitCandidate> mCandidateList;
 
   private long mBestCost;
   private List<SplitCandidate> mBestSolution;
