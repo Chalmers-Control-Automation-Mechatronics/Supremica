@@ -66,6 +66,7 @@ import net.sourceforge.waters.model.module.VariableMarkingProxy;
 
 import net.sourceforge.waters.xsd.base.ComponentKind;
 import net.sourceforge.waters.xsd.base.EventKind;
+import net.sourceforge.waters.xsd.module.ScopeKind;
 
 
 /**
@@ -359,11 +360,10 @@ public class EFACompiler
       (final SimpleComponentProxy comp)
       throws VisitorException
     {
-      final IdentifierProxy ident = comp.getIdentifier();
       final GraphProxy graph = comp.getGraph();
       final List<SimpleIdentifierProxy> list = visitGraphProxy(graph);
       final CompiledRange range = new CompiledEnumRange(list);
-      mVariableMap.createVariables(comp, ident, range);
+      mVariableMap.createVariables(comp, range);
       return range;
     }
 
@@ -382,11 +382,10 @@ public class EFACompiler
       throws VisitorException
     {
       try {
-        final IdentifierProxy ident = var.getIdentifier();
         final SimpleExpressionProxy expr = var.getType();
         final CompiledRange range =
           mSimpleExpressionCompiler.getRangeValue(expr);
-        mVariableMap.createVariables(var, ident, range);
+        mVariableMap.createVariables(var, range);
         return range;
       } catch (final EvalException exception) {
         throw wrap(exception);
@@ -591,6 +590,52 @@ public class EFACompiler
     private ProxyAccessorMap<IdentifierProxy> mCollectedVariables;
     private Set<EFAEventDecl> mCollectedEvents;
     private CompiledGuard mCurrentGuard;
+  }
+
+
+  //#########################################################################
+  //# Inner Class Pass1Visitor
+  /**
+   * The visitor implementing the fourth pass of EFA compilation.
+   */
+  private class Pass4Visitor extends AbstractModuleProxyVisitor
+  {
+
+    //#######################################################################
+    //# Interface net.sourceforge.waters.model.module.ModuleProxyVisitor
+    public Object visitEventDeclProxy(final EventDeclProxy decl)
+      throws VisitorException
+    {
+      try {
+        final IdentifierProxy ident = decl.getIdentifier();
+        final EFAEventDecl edecl = findEvent(ident);
+        final EventKind kind = edecl.getKind();
+        final boolean observable = edecl.isObservable();
+        for (final EFAEvent event : edecl.getEvents()) {
+          final IdentifierProxy subident = event.createIdentifier();
+          final EventDeclProxy subdecl = mFactory.createEventDeclProxy
+            (subident, kind, observable, ScopeKind.LOCAL, null, null);
+          mEventDeclarations.add(subdecl);
+        }
+        return null;
+      } catch (final UndefinedIdentifierException exception) {
+        throw wrap(exception);
+      }
+    }
+
+    public Object visitSimpleComponentProxy(final SimpleComponentProxy comp)
+    {
+      return null;
+    }
+
+    public Object visitVariableComponentProxy(final VariableComponentProxy var)
+    {
+      return null;
+    }
+
+    //#######################################################################
+    //# Data Members
+    private List<EventDeclProxy> mEventDeclarations;
   }
 
 

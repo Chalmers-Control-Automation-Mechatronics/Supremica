@@ -62,6 +62,11 @@ class EFAEventDecl {
     return mEventDecl.getKind();
   }
 
+  boolean isObservable()
+  {
+    return mEventDecl.isObservable();
+  }
+
   boolean isBlocked()
   {
     return mIsBlocked;
@@ -83,6 +88,11 @@ class EFAEventDecl {
   Collection<EFATransitionGroup> getTransitionGroups()
   {
     return mTransitionMap.values();
+  }
+
+  Collection<EFAEvent> getEvents()
+  {
+    return mEventMap.values();
   }
 
   void addVariable(final IdentifierProxy ident)

@@ -25,7 +25,6 @@ import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
 import net.sourceforge.waters.model.compiler.context.CompiledRange;
 import net.sourceforge.waters.model.compiler.context.
   UndefinedIdentifierException;
-import net.sourceforge.waters.model.expr.UnaryOperator;
 import net.sourceforge.waters.model.module.AbstractModuleProxyVisitor;
 import net.sourceforge.waters.model.module.BinaryExpressionProxy;
 import net.sourceforge.waters.model.module.ComponentProxy;
@@ -100,21 +99,20 @@ class EFAVariableMap {
     return mMap.get(accessor);
   }
 
-  void createVariables(final ComponentProxy comp,
-                       final IdentifierProxy ident,
-                       final CompiledRange range)
+  void createVariables(final ComponentProxy comp, final CompiledRange range)
   {
     init();
+    final EFAVariable curvar =
+      new EFAVariable(false, comp, range, mFactory, mOperatorTable);
+    final SimpleExpressionProxy curvarname = curvar.getVariableName();
     final ProxyAccessor<SimpleExpressionProxy> curaccessor =
-      new ProxyAccessorByContents<SimpleExpressionProxy>(ident);
-    final EFAVariable curvar = new EFAVariable(comp, ident, range);
+      new ProxyAccessorByContents<SimpleExpressionProxy>(curvarname);
     mMap.put(curaccessor, curvar);
-    final UnaryOperator nextop = mOperatorTable.getNextOperator();
-    final UnaryExpressionProxy nextident =
-      mFactory.createUnaryExpressionProxy(nextop, ident);
+    final EFAVariable nextvar =
+      new EFAVariable(true, comp, range, mFactory, mOperatorTable);
+    final SimpleExpressionProxy nextvarname = nextvar.getVariableName();
     final ProxyAccessor<SimpleExpressionProxy> nextaccessor =
-      new ProxyAccessorByContents<SimpleExpressionProxy>(nextident);
-    final EFAVariable nextvar = new EFAVariable(comp, nextident, range);
+      new ProxyAccessorByContents<SimpleExpressionProxy>(nextvarname);
     mMap.put(nextaccessor, nextvar);
   }
 
