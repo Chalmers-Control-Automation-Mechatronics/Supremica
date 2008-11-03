@@ -47,7 +47,6 @@ class EFAEventNameBuilder {
                       final Comparator<SimpleExpressionProxy> comparator)
   {
     mComparator = comparator;
-    mEndOfClause = factory.createIntConstantProxy(0);
     mRoot = null;
   }
 
@@ -109,6 +108,14 @@ class EFAEventNameBuilder {
     private NameTreeNode()
     {
       mChildren = new TreeMap<SimpleExpressionProxy,NameTreeNode>(mComparator);
+      mIsEndOfClause = 0;
+    }
+
+    //#######################################################################
+    //# Simple Access
+    private int size()
+    {
+      return mChildren.size() + mIsEndOfClause;
     }
 
     //#######################################################################
@@ -124,7 +131,7 @@ class EFAEventNameBuilder {
         }
         child.add(iter);
       } else {
-        mChildren.put(mEndOfClause, null);
+        mIsEndOfClause = 1;
       }
     }
 
@@ -136,7 +143,7 @@ class EFAEventNameBuilder {
         final SimpleExpressionProxy literal = iter.next();
         final NameTreeNode child = mChildren.get(literal);
         final boolean nextfirst;
-        if (mChildren.size() == 1) {
+        if (size() == 1) {
           nextfirst = first;
         } else {
           try {
@@ -154,6 +161,7 @@ class EFAEventNameBuilder {
     //#######################################################################
     //# Data Members
     private final Map<SimpleExpressionProxy,NameTreeNode> mChildren;
+    private int mIsEndOfClause;
 
   }
 
@@ -161,7 +169,6 @@ class EFAEventNameBuilder {
   //#########################################################################
   //# Data Members
   private final Comparator<SimpleExpressionProxy> mComparator;
-  private final SimpleExpressionProxy mEndOfClause;
 
   private NameTreeNode mRoot;
 
