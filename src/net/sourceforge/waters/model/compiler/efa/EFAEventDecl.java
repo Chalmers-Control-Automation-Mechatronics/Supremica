@@ -90,6 +90,16 @@ class EFAEventDecl {
     return mTransitionMap.values();
   }
 
+  EFAEvent getEvent(final CompiledClause cond)
+  {
+    return mEventMap.get(cond);
+  }
+
+  Collection<CompiledClause> getEventKeys()
+  {
+    return mEventMap.keySet();
+  }
+
   Collection<EFAEvent> getEvents()
   {
     return mEventMap.values();

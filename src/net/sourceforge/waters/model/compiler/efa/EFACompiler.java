@@ -137,6 +137,7 @@ public class EFACompiler
       new ConstraintPropagator(mFactory, mOperatorTable,
                                mSimpleExpressionCompiler, mVariableMap);
     mSplitComputer = new SplitComputer(mVariableMap);
+    mEventNameBuilder = new EFAEventNameBuilder(factory, comparator);
     mInputModule = module;
   }
 
@@ -189,6 +190,7 @@ public class EFACompiler
     mEventMap = new HashMap<Proxy,Collection<EFAEvent>>();
     for (final EFAEventDecl edecl : mEventDeclMap.values()) {
       if (!edecl.isBlocked()) {
+        mEventNameBuilder.restart();
         final Collection<EFATransitionGroup> allgroups =
           edecl.getTransitionGroups();
         final int allsize = allgroups.size();
@@ -199,12 +201,16 @@ public class EFACompiler
             groups.add(group);
           }
         }
-        if (!groups.isEmpty()) {
-          final int size = groups.size();
-          final List<EFATransition> parts = new ArrayList<EFATransition>(size);
-          Collections.sort(groups);
-          collectEventPartition(edecl, groups, parts, 0, startcond);
+        final int size = groups.size();
+        final List<EFATransition> parts = new ArrayList<EFATransition>(size);
+        Collections.sort(groups);
+        collectEventPartition(edecl, groups, parts, 0, startcond);
+        for (final CompiledClause cond : edecl.getEventKeys()) {
+          final EFAEvent event = edecl.getEvent(cond);
+          final String suffix = mEventNameBuilder.getNameSuffix(cond);
+          event.setSuffix(suffix);
         }
+        mEventNameBuilder.clear();
       }
     }
   }
@@ -281,6 +287,7 @@ public class EFACompiler
         collection.add(event);
       }
     }
+    mEventNameBuilder.addClause(cond);
   }
 
 
@@ -612,7 +619,7 @@ public class EFACompiler
         final EventKind kind = edecl.getKind();
         final boolean observable = edecl.isObservable();
         for (final EFAEvent event : edecl.getEvents()) {
-          final IdentifierProxy subident = event.createIdentifier();
+          final IdentifierProxy subident = event.createIdentifier(mFactory);
           final EventDeclProxy subdecl = mFactory.createEventDeclProxy
             (subident, kind, observable, ScopeKind.LOCAL, null, null);
           mEventDeclarations.add(subdecl);
@@ -649,6 +656,7 @@ public class EFACompiler
   private final GuardCompiler mGuardCompiler;
   private final ConstraintPropagator mConstraintPropagator;
   private final SplitComputer mSplitComputer;
+  private final EFAEventNameBuilder mEventNameBuilder;
   private final ModuleProxy mInputModule;
 
   private boolean mIsUsingEventAlphabet = true;
