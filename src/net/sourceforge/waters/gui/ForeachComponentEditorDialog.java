@@ -103,11 +103,12 @@ public class ForeachComponentEditorDialog
     mVariableLabel = new JLabel("Variable:");
     final String oldname = template.getName();
     final SimpleIdentifierSubject ident = new SimpleIdentifierSubject(oldname);
-    final FormattedInputParser nameparser =
+    final SimpleIdentifierInputParser nameparser =
       new SimpleIdentifierInputParser(ident, parser);
     mVariableInput = new SimpleExpressionCell(ident, nameparser);
     mVariableInput.addActionListener(commithandler);
     mVariableInput.setToolTipText("Enter the name of the index variable");
+    nameparser.setCell(mVariableInput);
     mRangeLabel = new JLabel("Range:");
     final SimpleExpressionProxy oldrange =
       mForeach == null ? null : template.getRange();

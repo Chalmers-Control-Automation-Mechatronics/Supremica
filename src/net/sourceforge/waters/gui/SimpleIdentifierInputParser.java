@@ -10,6 +10,7 @@
 
 package net.sourceforge.waters.gui;
 
+import javax.swing.JFormattedTextField;
 import javax.swing.text.AttributeSet;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.DocumentFilter;
@@ -30,7 +31,7 @@ class SimpleIdentifierInputParser
   SimpleIdentifierInputParser(final SimpleIdentifierProxy oldident,
                               final ExpressionParser parser)
   {
-    mOldName = mLastName = oldident.getName();
+    mOldName = oldident.getName();
     mOldIdentifier = oldident;
     mExpressionParser = parser;
   }
@@ -38,11 +39,23 @@ class SimpleIdentifierInputParser
   SimpleIdentifierInputParser(final String oldname,
                               final ExpressionParser parser)
   {
-    mOldName = mLastName = oldname;
+    mOldName = oldname;
     mOldIdentifier = new SimpleIdentifierSubject(oldname);
     mExpressionParser = parser;
   }
 
+
+  //#########################################################################
+  //# Simple Access
+  String getOldName()
+  {
+    return mOldName;
+  }
+
+  void setCell(final JFormattedTextField cell)
+  {
+    mCell = cell;
+  }
 
 
   //#########################################################################
@@ -51,12 +64,10 @@ class SimpleIdentifierInputParser
     throws ParseException
   {
     if (!text.equals(mOldName)) {
-      mLastName = text;
       final SimpleIdentifierProxy result =
         mExpressionParser.parseSimpleIdentifier(text);
       return result;
     } else {
-      mLastName = mOldName;
       return mOldIdentifier;
     }
   }
@@ -99,9 +110,10 @@ class SimpleIdentifierInputParser
                      final int length)
     throws BadLocationException
   {
+    final String text = mCell.getText();
     boolean ok = true;
-    if (offset == 0 && length < mLastName.length()) {
-      final char ch = mLastName.charAt(length);
+    if (offset == 0 && length < text.length()) {
+      final char ch = text.charAt(length);
       ok = mExpressionParser.isIdentifierStart(ch);
     }
     if (ok) {
@@ -143,8 +155,6 @@ class SimpleIdentifierInputParser
   private final SimpleIdentifierProxy mOldIdentifier;
   private final ExpressionParser mExpressionParser;
 
-  private String mLastName;
+  private JFormattedTextField mCell;
   
 }
-
-

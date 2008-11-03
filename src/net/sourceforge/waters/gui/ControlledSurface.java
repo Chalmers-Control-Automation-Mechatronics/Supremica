@@ -53,9 +53,9 @@ import javax.swing.event.DocumentListener;
 import net.sourceforge.waters.gui.EditorSurface.DRAGOVERSTATUS;
 import net.sourceforge.waters.gui.actions.IDEAction;
 import net.sourceforge.waters.gui.actions.WatersPopupActionManager;
-import net.sourceforge.waters.gui.command.ChangeNameCommand;
 import net.sourceforge.waters.gui.command.Command;
 import net.sourceforge.waters.gui.command.CompoundCommand;
+import net.sourceforge.waters.gui.command.EditCommand;
 import net.sourceforge.waters.gui.command.DeleteCommand;
 import net.sourceforge.waters.gui.command.InsertCommand;
 import net.sourceforge.waters.gui.command.ReorganizeListCommand;
@@ -91,6 +91,7 @@ import net.sourceforge.waters.model.base.ProxyAccessorHashMapByContents;
 import net.sourceforge.waters.model.base.ProxyAccessorMap;
 import net.sourceforge.waters.model.base.VisitorException;
 import net.sourceforge.waters.model.base.WatersRuntimeException;
+import net.sourceforge.waters.model.expr.ParseException;
 import net.sourceforge.waters.model.module.*;
 import net.sourceforge.waters.model.unchecked.Casting;
 import net.sourceforge.waters.plain.module.GraphElement;
@@ -964,6 +965,16 @@ public class ControlledSurface
 
 
   //#########################################################################
+  //# State Renaming
+  private void editStateName(final SimpleNodeSubject node)
+  {
+    final String name = node.getName();
+    final SimpleIdentifierSubject ident = new SimpleIdentifierSubject(name);
+    final JTextField text = new StateNameInputCell(node, ident);
+  }
+
+
+  //#########################################################################
   //# Smart Creation Commands
   /**
    * Creates a simple node and selects it.
@@ -1482,27 +1493,6 @@ public class ControlledSurface
     return null;
   }
 
-  /*
-  private ProxySubject findSelectableAncestor(final Subject subject)
-  {
-    if (subject instanceof IdentifierSubject ||
-        subject instanceof ForeachEventSubject) {
-      Subject parent = subject;
-      do {
-        parent = parent.getParent();
-        if (parent == null) {
-          return null;
-        }
-      } while (!(parent instanceof LabelBlockSubject) &&
-               !(parent instanceof SimpleNodeSubject));
-      return (ProxySubject)
-        (parent instanceof SimpleNodeSubject ? parent : subject);
-    } else {
-      return (ProxySubject) subject;
-    }
-  }
-  */
-
 
   //#########################################################################
   //# Controller Auxiliaries
@@ -1890,13 +1880,9 @@ public class ControlledSurface
           event.getClickCount() == 2 &&
           mFocusedObject != null) {
         if (mFocusedObject instanceof LabelGeometrySubject) {
-          final LabelGeometrySubject label =
-            (LabelGeometrySubject) mFocusedObject;
-          final JTextField text = new NameEditField(label);
-          ControlledSurface.this.add(text);
-          text.setVisible(true);
-          text.requestFocusInWindow();
-          repaint();
+          final SimpleNodeSubject node =
+            (SimpleNodeSubject) mFocusedObject.getParent();
+          editStateName(node);
         } else if (mFocusedObject instanceof EdgeSubject) {
           EditorEditEdgeDialog.showDialog((EdgeSubject) mFocusedObject, mRoot);
         } else if (mFocusedObject instanceof GuardActionBlockSubject) {
@@ -2031,13 +2017,9 @@ public class ControlledSurface
                    mFocusedObject != null &&
                    mFocusedObject instanceof LabelGeometrySubject) {
           // Double-click to rename nodes
-          final LabelGeometrySubject label =
-            (LabelGeometrySubject) mFocusedObject;
-          final JTextField text = new NameEditField(label);
-          ControlledSurface.this.add(text);
-          text.setVisible(true);
-          text.requestFocusInWindow();
-          repaint();
+          final SimpleNodeSubject node =
+            (SimpleNodeSubject) mFocusedObject.getParent();
+          editStateName(node);
         }
       }
     }
@@ -3837,101 +3819,153 @@ public class ControlledSurface
 
 
   //#########################################################################
-  //# Inner Class NameEditField
-  private class NameEditField
-    extends JTextField
+  //# Inner Class StateNameInputCell
+  private class StateNameInputCell
+    extends SimpleExpressionCell
+    implements FocusListener
   {
-    private final LabelGeometrySubject mLabel;
-    private final SimpleNodeSubject mNode;
 
-    public NameEditField(LabelGeometrySubject label)
+    //#######################################################################
+    //# Constructor
+    private StateNameInputCell(final SimpleNodeSubject node,
+                               final SimpleIdentifierSubject ident)
     {
-      mLabel = label;
-      mNode = (SimpleNodeSubject)label.getParent();
-      Point p = new Point((int) label.getOffset().getX(),
-                          (int) label.getOffset().getY());
-      p.translate((int) mNode.getPointGeometry().getPoint().getX(),
-                  (int) mNode.getPointGeometry().getPoint().getY());
-      setText(mNode.getName());
-      setLocation(p);
-      setSize(getPreferredSize());
-      setBorder(new EmptyBorder(getBorder().getBorderInsets(this)));
-      setOpaque(false);
-      addFocusListener(new NameEditSpy());
-      getDocument().addDocumentListener(new DocumentListener()
-        {
-          public void changedUpdate(final DocumentEvent event)
+      super(ident, new StateNameInputParser(ident));
+      final StateNameInputParser parser =
+        (StateNameInputParser) getFormattedInputParser();
+      parser.setCell(this);
+
+      mNode = node;
+      final LabelGeometrySubject geo = node.getLabelGeometry();
+      final Point2D pgeo = node.getPointGeometry().getPoint();
+      final Point2D lgeo = geo.getOffset();
+      final Rectangle rect = ControlledSurface.this.getVisibleRect();
+      int x = (int) Math.round(pgeo.getX() + lgeo.getX());
+      int y = (int) Math.round(pgeo.getY() + lgeo.getY());
+      int width = STATE_INPUT_WIDTH;
+      int height = getPreferredSize().height;
+      if (width > rect.width) {
+        width = rect.width;
+      }
+      final int xmax = rect.x + rect.width;
+      if (x + width > xmax) {
+        x = xmax - width;
+      }
+      final Point pos = new Point(x, y);
+      final Dimension size = new Dimension(width, height);
+      setLocation(pos);
+      setSize(size);
+      setErrorDisplay(new LoggerErrorDisplay());
+
+      setFocusLostBehavior(JFormattedTextField.COMMIT_OR_REVERT);
+      addFocusListener(this);
+      final Action enter = new AbstractAction("<enter>") {
+          public void actionPerformed(final ActionEvent event)
           {
-            setSize(getPreferredSize());
+            try {
+              commitEdit();
+              cancel();
+            } catch (final java.text.ParseException exception) {
+              requestFocusInWindow();
+            }
           }
-          public void insertUpdate(final DocumentEvent event)
+        };
+      addEnterAction(enter);
+      final Action escape = new AbstractAction("<escape>") {
+          public void actionPerformed(final ActionEvent event)
           {
-            setSize(getPreferredSize());
+            cancel();
           }
-          public void removeUpdate(final DocumentEvent event)
-          {
-            setSize(getPreferredSize());
-          }
-        });
-      getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0), "enter");
-      getActionMap().put("enter", new AbstractAction()
-        {
-          public void actionPerformed(ActionEvent e)
-          {
-            reName();
-          }
-        });
-      getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), "escape");
-      getActionMap().put("escape", new AbstractAction()
-        {
-          public void actionPerformed(ActionEvent e)
-          {
-            setText(mNode.getName());
-            reName();
-          }
-        });
-      mDontDraw.add(mLabel);
+        };
+      addEscapeAction(escape);
+
+      ControlledSurface.this.add(this);
+      setVisible(true);
+      requestFocusInWindow();
+      mDontDraw.add(geo);
+      ControlledSurface.this.repaint();
     }
 
-    private void reName()
+    //#######################################################################
+    //# Cancalling
+    private void cancel()
     {
-      if (!getText().equals(mNode.getName()))
-        {
-          if (!getText().equals("") &&
-              !getGraph().getNodesModifiable().containsName(getText()))
-            {
-              Command u = new ChangeNameCommand(mNode.getName(),
-                                                getText(),
-                                                mNode);
-              u.execute();
-              ControlledSurface.this.remove(NameEditField.this);
-              mDontDraw.remove(mLabel);
-              getUndoInterface().addUndoable(new UndoableCommand(u));
-            }
-          else
-            {
-              JOptionPane.showMessageDialog(ControlledSurface.this,
-                                            "Each node must have a unique name");
-              selectAll();
-              setVisible(true);
-              requestFocus();
-            }
-        }
-      else
-        {
-          ControlledSurface.this.remove(NameEditField.this);
-          mDontDraw.remove(mLabel);
-        }
-    }
-
-    private class NameEditSpy
-      extends FocusAdapter
-    {
-      public void focusLost(FocusEvent e)
-      {
-        reName();
+      if (mNode != null) {
+        final LabelGeometrySubject geo = mNode.getLabelGeometry();
+        mNode = null;
+        mDontDraw.remove(geo);
+        // Warning: ControlledSurface.remove() calls commitEdit() again !!!
+        ControlledSurface.this.remove(this);
+        ControlledSurface.this.repaint();
       }
     }
+
+    //#######################################################################
+    //# Overrides for Superclass javax.swing.JFormattedTextField
+    public void commitEdit()
+      throws java.text.ParseException
+    {
+      if (mNode != null) {
+        // Try to parse and commit the current value in the text field ...
+        super.commitEdit();
+        // If we get here without exception, the value has been parsed
+        // successfully. Let us change the state name.
+        final SimpleNodeSubject newnode = mNode.clone();
+        final String newname = getText();
+        newnode.setName(newname);
+        final Command cmd =
+          new EditCommand(mNode, newnode,
+                          ControlledSurface.this, "State Renaming");
+        getUndoInterface().executeCommand(cmd);
+      }
+    }
+
+    //#######################################################################
+    //# Interface java.awt.event.FocusListener
+    public void focusGained(final FocusEvent event)
+    {
+    }
+
+    public void focusLost(final FocusEvent event)
+    {
+      cancel();
+    }
+
+    //#######################################################################
+    //# Data Members
+    private SimpleNodeSubject mNode;
+  }
+
+
+  //#########################################################################
+  //# Inner Class StateNameInputParser
+  private class StateNameInputParser
+    extends SimpleIdentifierInputParser
+  {
+
+    //#######################################################################
+    //# Constructor
+    private StateNameInputParser(final SimpleIdentifierProxy oldident)
+    {
+      super(oldident, mRoot.getModuleWindowInterface().getExpressionParser());
+    }
+
+    //#######################################################################
+    //# Interface net.sourceforge.waters.gui.FormattedInputParser
+    public SimpleIdentifierProxy parse(final String text)
+      throws ParseException
+    {
+      final SimpleIdentifierProxy ident = super.parse(text);
+      final String oldname = getOldName();
+      if (!text.equals(oldname)) {
+        if (getGraph().getNodesModifiable().containsName(text)) {
+          throw new ParseException
+            ("State name '" + text + "' is already taken!", 0);
+        }
+      }
+      return ident;
+    }
+
   }
 
 
@@ -4583,5 +4617,6 @@ public class ControlledSurface
     SimpleNodeProxyShape.RADIUS + 2;
   private static final double SELFLOOP_THRESHOLD =
     SELFLOOP_AUX_RADIUS * SELFLOOP_AUX_RADIUS;
+  private static final int STATE_INPUT_WIDTH = 128;
 
 }

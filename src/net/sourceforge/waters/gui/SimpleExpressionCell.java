@@ -139,6 +139,27 @@ public class SimpleExpressionCell
 
 
   //#########################################################################
+  //# Actions
+  public void addEnterAction(final Action action)
+  {
+    addKeyAction(KeyEvent.VK_ENTER, action);
+  }
+
+  public void addEscapeAction(final Action action)
+  {
+    addKeyAction(KeyEvent.VK_ESCAPE, action);
+  }
+
+  public void addKeyAction(final int keycode, final Action action)
+  {
+    final KeyStroke stroke = KeyStroke.getKeyStroke(keycode, 0);
+    final String name = (String) action.getValue(Action.NAME);
+    getInputMap().put(stroke, name);
+    getActionMap().put(name, action);
+  }
+
+
+  //#########################################################################
   //# Error Display
   public ErrorDisplay getErrorDisplay()
   {
@@ -150,9 +171,6 @@ public class SimpleExpressionCell
     mErrorDisplay = display;
   }
 
-
-  //#########################################################################
-  //# Auxiliary Methods
   public void setErrorMessage(final String msg)
   {
     if (mErrorDisplay != null) {
