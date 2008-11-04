@@ -1004,6 +1004,22 @@ class SequentialExecModelBuilder extends ModelBuilder
 				action = action + "fb_place_" + j + " = 0;";
 				instanceQueue.addTransition(from, to, event, guard, action);
 			}
+
+			// Operation Scheduler Freedom:
+			// introduced to add a degree of freedom to scheduler
+			// to see what will happlen during synthesis
+			// Transiton when discarding instance
+			from = "s" + (i+1);
+			to = "s" + i;
+			event = "discard_fb;";      
+			for (int j = 1; j<=places; j++)
+			{
+				guard = "fb_first == " + j;
+				//action = "current_fb = fb_place_" + j + ";";
+				action = "fb_first = " + ((j % places) + 1) + ";";
+				action = action + "fb_place_" + j + " = 0;";
+				instanceQueue.addTransition(from, to, event, guard, action);
+			}
 		}
 		automata.addAutomaton(instanceQueue);
 	}
@@ -1015,7 +1031,9 @@ class SequentialExecModelBuilder extends ModelBuilder
 		ExtendedAutomaton eventExecution = getNewAutomaton("Event Execution");
 
 		eventExecution.addInitialState("s0");
-		eventExecution.addState("s1");		
+		eventExecution.addState("s1");
+		// Operation Scheduler Freedom:
+		eventExecution.addTransition("s0", "s0", "discard_fb;", null, null);	
 		eventExecution.addTransition("s0", "s1", "remove_fb;", null, null);	
 
 		int nameCounter = 2;
@@ -1393,6 +1411,10 @@ class SequentialExecModelBuilder extends ModelBuilder
 		
 		eventQueue.addInitialState("s0");
 
+		// Operation Scheduler Freedom
+		event = "discard_fb;";
+		eventQueue.addTransition("s0", "s0", event, null, null);
+
 		for (int i = 1; i <= places; i++)
 		{
 			Integer numEvents = (Integer) eventsMaxID.get(fbName);
@@ -1441,7 +1463,7 @@ class SequentialExecModelBuilder extends ModelBuilder
 				}
 			}
 			
-			eventQueue.addState("s" + i);
+			eventQueue.addState("s" + i, true,false);
 
 			for (Iterator evIter = eventInputList.iterator(); evIter.hasNext();)
 			{
@@ -1511,10 +1533,14 @@ class SequentialExecModelBuilder extends ModelBuilder
 					to = "s" + i;
 					event = "received_event_" + eventName + "_" + fbName + ";";
 					eventQueue.addTransition(from, to, event, null, null);
+
 				}
 				
 			}
 
+			// Operation Scheduler Freedom
+			event = "discard_fb;";
+			eventQueue.addTransition(to, to, event, null, null);
 
 			// Transitions when dequeuing event
 			for (Iterator evIter = eventInputList.iterator(); evIter.hasNext();)
