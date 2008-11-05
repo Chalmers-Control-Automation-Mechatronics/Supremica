@@ -52,6 +52,7 @@ import net.sourceforge.waters.model.module.GuardActionBlockProxy;
 import net.sourceforge.waters.model.module.IdentifierProxy;
 import net.sourceforge.waters.model.module.LabelBlockProxy;
 import net.sourceforge.waters.model.module.ModuleProxy;
+import net.sourceforge.waters.model.module.ModuleProxyCloner;
 import net.sourceforge.waters.model.module.ModuleProxyFactory;
 import net.sourceforge.waters.model.module.ModuleProxyVisitor;
 import net.sourceforge.waters.model.module.NodeProxy;
@@ -158,7 +159,8 @@ public class EFACompiler
       // Pass 3 ...
       computeEventPartitions();
       // Pass 4 ...
-      return null;
+      final ModuleProxyVisitor pass4 = new Pass4Visitor();
+      return (ModuleProxy) pass4.visitModuleProxy(mInputModule);
     } catch (final VisitorException exception) {
       final Throwable cause = exception.getCause();
       if (cause instanceof EvalException) {
@@ -187,8 +189,8 @@ public class EFACompiler
   {
     final BinaryOperator andop = mOperatorTable.getAndOperator();
     final CompiledClause startcond = new CompiledClause(andop);
-    mEventMap = new HashMap<Proxy,Collection<EFAEvent>>();
-    for (final EFAEventDecl edecl : mEventDeclMap.values()) {
+    mEFAEventMap = new HashMap<Proxy,Collection<EFAEvent>>();
+    for (final EFAEventDecl edecl : mEFAEventDeclMap.values()) {
       if (!edecl.isBlocked()) {
         mEventNameBuilder.restart();
         final Collection<EFATransitionGroup> allgroups =
@@ -279,10 +281,10 @@ public class EFACompiler
     final EFAEvent event = edecl.createEvent(cond);
     for (final EFATransition part : parts) {
       for (final Proxy location : part.getSourceLocations()) {
-        Collection<EFAEvent> collection = mEventMap.get(location);
+        Collection<EFAEvent> collection = mEFAEventMap.get(location);
         if (collection == null) {
           collection = new LinkedList<EFAEvent>();
-          mEventMap.put(location, collection);
+          mEFAEventMap.put(location, collection);
         }
         collection.add(event);
       }
@@ -299,10 +301,10 @@ public class EFACompiler
   {
     final ProxyAccessor<IdentifierProxy> accessor =
       new ProxyAccessorByContents<IdentifierProxy>(ident);
-    if (mEventDeclMap.containsKey(accessor)) {
+    if (mEFAEventDeclMap.containsKey(accessor)) {
       throw new DuplicateIdentifierException(ident, "event");
     } else {
-      mEventDeclMap.put(accessor, edecl);
+      mEFAEventDeclMap.put(accessor, edecl);
     }
   }
 
@@ -311,7 +313,7 @@ public class EFACompiler
   {
     final ProxyAccessor<IdentifierProxy> accessor =
       new ProxyAccessorByContents<IdentifierProxy>(ident);
-    final EFAEventDecl edecl = mEventDeclMap.get(accessor);
+    final EFAEventDecl edecl = mEFAEventDeclMap.get(accessor);
     if (edecl == null) {
       throw new UndefinedIdentifierException(ident, "event");
     } else {
@@ -528,7 +530,7 @@ public class EFACompiler
     {
       final List<EventDeclProxy> events = module.getEventDeclList();
       final int size = events.size();
-      mEventDeclMap =
+      mEFAEventDeclMap =
         new HashMap<ProxyAccessor<IdentifierProxy>,EFAEventDecl>(size);
       visitCollection(events);
       final List<Proxy> components = module.getComponentList();
@@ -540,7 +542,7 @@ public class EFACompiler
       throws VisitorException
     {
       try {
-        final int size = mEventDeclMap.size();
+        final int size = mEFAEventDeclMap.size();
         mCurrentComponent = comp;
         mCollectedEvents = new HashSet<EFAEventDecl>(size);
         if (!mIsUsingEventAlphabet) {
@@ -601,12 +603,19 @@ public class EFACompiler
 
 
   //#########################################################################
-  //# Inner Class Pass1Visitor
+  //# Inner Class Pass4Visitor
   /**
    * The visitor implementing the fourth pass of EFA compilation.
    */
   private class Pass4Visitor extends AbstractModuleProxyVisitor
   {
+
+    //#######################################################################
+    //# Constructor
+    private Pass4Visitor()
+    {
+      mCloner = mFactory.getCloner();
+    }
 
     //#######################################################################
     //# Interface net.sourceforge.waters.model.module.ModuleProxyVisitor
@@ -630,19 +639,203 @@ public class EFACompiler
       }
     }
 
-    public Object visitSimpleComponentProxy(final SimpleComponentProxy comp)
+    public EdgeProxy visitEdgeProxy(final EdgeProxy edge)
+      throws VisitorException
     {
+      final NodeProxy source0 = edge.getSource();
+      final NodeProxy source1 = mNodeMap.get(source0);
+      final NodeProxy target0 = edge.getTarget();
+      final NodeProxy target1 = mNodeMap.get(target0);
+      final LabelBlockProxy block0 = edge.getLabelBlock();
+      final LabelBlockProxy block1 = visitLabelBlockProxy(block0);
+      final EdgeProxy result = mFactory.createEdgeProxy
+        (source1, target1, block1, null, null, null, null);
+      mEdgeList.add(result);
+      return result;
+    }
+
+    public GraphProxy visitGraphProxy(final GraphProxy graph)
+      throws VisitorException
+    {
+      try {
+        mEFAAlphabet = new HashSet<EFAEvent>();
+        final Collection<NodeProxy> nodes = graph.getNodes();
+        final int numnodes = nodes.size();
+        mNodeList = new ArrayList<NodeProxy>(numnodes);
+        mNodeMap = new HashMap<NodeProxy,NodeProxy>(numnodes);
+        visitCollection(nodes);
+        mInBlockedEventsList = false;
+        final Collection<EdgeProxy> edges = graph.getEdges();
+        final int numedges = edges.size();
+        mEdgeList = new ArrayList<EdgeProxy>(numedges);
+        visitCollection(edges);
+        mInBlockedEventsList = true;        
+        mLabelList = new LinkedList<IdentifierProxy>();
+        final LabelBlockProxy blocked0 = graph.getBlockedEvents();
+        if (blocked0 != null) {
+          final List<Proxy> list = blocked0.getEventList();
+          visitCollection(list);
+        }
+        final Collection<EFAEvent> events =
+          mEFAEventMap.get(mCurrentComponent);
+        if (events != null) {
+          for (final EFAEvent event : events) {
+            if (!mEFAAlphabet.contains(event)) {
+              final IdentifierProxy ident = event.createIdentifier(mFactory);
+              mLabelList.add(ident);
+            }
+          }
+        }
+        final LabelBlockProxy blocked1 =
+          mLabelList.isEmpty() ? null :
+          mFactory.createLabelBlockProxy(mLabelList, null);
+        final boolean deterministic = graph.isDeterministic();
+        return mFactory.createGraphProxy
+          (deterministic, blocked1, mNodeList, mEdgeList);
+      } finally {
+        mEFAAlphabet = null;
+        mNodeList = null;
+        mNodeMap = null;
+        mEdgeList = null;
+        mLabelList = null;
+        mInBlockedEventsList = false;
+      }
+    }
+
+    public GroupNodeProxy visitGroupNodeProxy(final GroupNodeProxy group)
+      throws VisitorException
+    {
+      final String name = group.getName();
+      final PlainEventListProxy props0 = group.getPropositions();
+      final PlainEventListProxy props1 =
+        (PlainEventListProxy) mCloner.getClone(props0);
+      final Collection<NodeProxy> children0 = group.getImmediateChildNodes();
+      final int numchildren = children0.size();
+      final Collection<NodeProxy> children1 =
+        new ArrayList<NodeProxy>(numchildren);
+      for (final NodeProxy child0 : children0) {
+        final NodeProxy child1 = mNodeMap.get(child0);
+        children1.add(child1);
+      }
+      final GroupNodeProxy result =
+        mFactory.createGroupNodeProxy(name, props1, children1, null);
+      mNodeList.add(result);
+      mNodeMap.put(group, result);
+      return result;
+    }
+
+    public Object visitIdentifierProxy(final IdentifierProxy ident)
+    {
+      Collection<EFAEvent> events = mEFAEventMap.get(ident);
+      if (events == null) {
+        final EFAEventDecl edecl = mEFAEventDeclMap.get(ident);
+        events = edecl.getEvents();
+      }
+      for (final EFAEvent event : events) {
+        if (mInBlockedEventsList) {
+          if (mEFAAlphabet.add(event)) {
+            final IdentifierProxy subident = event.createIdentifier(mFactory);
+            mLabelList.add(subident);
+          }
+        } else {
+          mEFAAlphabet.add(event);
+          final IdentifierProxy subident = event.createIdentifier(mFactory);
+          mLabelList.add(subident);
+        }
+      }
       return null;
     }
 
-    public Object visitVariableComponentProxy(final VariableComponentProxy var)
+    public LabelBlockProxy visitLabelBlockProxy(final LabelBlockProxy block)
+      throws VisitorException
+    {
+      try {
+        mLabelList = new LinkedList<IdentifierProxy>();
+        final List<Proxy> list = block.getEventList();
+        visitCollection(list);
+        return mFactory.createLabelBlockProxy(mLabelList, null);
+      } finally {
+        mLabelList = null;
+      }
+    }
+
+    public ModuleProxy visitModuleProxy(final ModuleProxy module)
+      throws VisitorException
+    {
+      try {
+        final String name = module.getName();
+        final String comment = module.getComment();
+        final List<EventDeclProxy> decls = module.getEventDeclList();
+        final int numdecls = decls.size();
+        mEventDeclarations = new ArrayList<EventDeclProxy>(numdecls);
+        visitCollection(decls);
+        final List<Proxy> components = module.getComponentList();
+        final int numcomps = components.size();
+        mComponents = new ArrayList<SimpleComponentProxy>(numcomps);
+        visitCollection(components);
+        return mFactory.createModuleProxy
+          (name, comment, null, null, mEventDeclarations, null, mComponents);
+      } finally {
+        mEventDeclarations = null;
+        mComponents = null;
+      }
+    }
+
+    public SimpleComponentProxy visitSimpleComponentProxy
+      (final SimpleComponentProxy comp)
+      throws VisitorException
+    {
+      try {
+        mCurrentComponent = comp;
+        final IdentifierProxy ident0 = comp.getIdentifier();
+        final IdentifierProxy ident1 =
+          (IdentifierProxy) mCloner.getClone(ident0);
+        final ComponentKind kind = comp.getKind();
+        final GraphProxy graph0 = comp.getGraph();
+        final GraphProxy graph1 = visitGraphProxy(graph0);
+        final SimpleComponentProxy result =
+          mFactory.createSimpleComponentProxy(ident1, kind, graph1);
+        mComponents.add(result);
+        return result;
+      } finally {
+        mCurrentComponent = null;
+      }
+    }
+
+    public SimpleNodeProxy visitSimpleNodeProxy(final SimpleNodeProxy node)
+      throws VisitorException
+    {
+      final String name = node.getName();
+      final PlainEventListProxy props0 = node.getPropositions();
+      final PlainEventListProxy props1 =
+        (PlainEventListProxy) mCloner.getClone(props0);
+      final boolean initial = node.isInitial();
+      final SimpleNodeProxy result = mFactory.createSimpleNodeProxy
+        (name, props1, initial, null, null, null);
+      mNodeList.add(result);
+      mNodeMap.put(node, result);
+      return result;
+    }
+
+    public SimpleComponentProxy visitVariableComponentProxy
+      (final VariableComponentProxy var)
     {
       return null;
     }
 
     //#######################################################################
     //# Data Members
+    private final ModuleProxyCloner mCloner;
+
     private List<EventDeclProxy> mEventDeclarations;
+    private List<SimpleComponentProxy> mComponents;
+    private SimpleComponentProxy mCurrentComponent;
+    private Set<EFAEvent> mEFAAlphabet;
+    private List<NodeProxy> mNodeList;
+    private Map<NodeProxy,NodeProxy> mNodeMap;
+    private List<EdgeProxy> mEdgeList;
+    private List<IdentifierProxy> mLabelList;
+    private boolean mInBlockedEventsList;
   }
 
 
@@ -676,18 +869,18 @@ public class EFACompiler
    * EventDeclProxy} the information about its event variable set and
    * associated guards.
    */
-  private Map<ProxyAccessor<IdentifierProxy>,EFAEventDecl> mEventDeclMap;
+  private Map<ProxyAccessor<IdentifierProxy>,EFAEventDecl> mEFAEventDeclMap;
   // Pass 3
   /**
    * A map that assigns to each identifier of an event label on an edge the
    * list of EFA events to be associated with it. Likewise, it assigns to
    * each automaton ({@link SimpleComponentProxy}) a list of events to be
    * blocked in globally in the automaton. Identifiers associated with true
-   * guards to not have entries in this table, as they will simply receive
+   * guards do not have entries in this table, as they will simply receive
    * all events associated with the event declaration; all other
    * identifiers receive mappings that reflect the results of simplifying
    * their guards.
    */
-  private Map<Proxy,Collection<EFAEvent>> mEventMap;
+  private Map<Proxy,Collection<EFAEvent>> mEFAEventMap;
 
 }
