@@ -41,6 +41,8 @@ import net.sourceforge.waters.subject.module.SimpleNodeSubject;
 
 import net.sourceforge.waters.xsd.module.SplineKind;
 
+import org.supremica.properties.Config;
+
 
 public class SpringEmbedder
   implements Runnable, EmbedderSubject
@@ -347,6 +349,8 @@ public class SpringEmbedder
     mEdgeRepulsion = EDGE_REPULSION;
     mMaxAttraction = 0.5 / maxfanout;
     mCenter = (Point2D) POINT_CENTER.clone();
+    final double diameter = 2.0 * Config.GUI_EDITOR_NODE_RADIUS.get();
+    mJumpThresholdSq = diameter * diameter;
     mTotalJumpsAvailable = numnodes;
   }
 
@@ -781,7 +785,7 @@ public class SpringEmbedder
       if (mPass > 0) {
         final Point2D old = getOldPoint();
         final double distsq = old.distanceSq(closest);
-        if (distsq < JUMP_THRESHOLD_SQ) {
+        if (distsq < mJumpThresholdSq) {
           if (mJumps == null) {
             final int numedges = mEdgeWrappers.length;
             mJumps = new HashMap<EdgeWrapper,EdgeJump>(numedges);
@@ -1212,6 +1216,7 @@ public class SpringEmbedder
   private int mNextWrapperId;
   private int mPass;
   private int mTotalJumpsAvailable;
+  private double mJumpThresholdSq;
 
   private volatile boolean mStop = false;
 
@@ -1223,10 +1228,6 @@ public class SpringEmbedder
   //# Class Constants
   private static final double EPSILON = 0.0000001;
   private static final double MAX_REPULSION_SQ = 50000.0;
-  private static final double JUMP_THRESHOLD =
-    2.0 * SimpleNodeProxyShape.RADIUS;
-  private static final double JUMP_THRESHOLD_SQ =
-    JUMP_THRESHOLD * JUMP_THRESHOLD;
   private static final int MAX_JUMPS_EACH = 3;
 
   private static final int NUM_PASSES = 3;

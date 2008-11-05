@@ -72,7 +72,6 @@ import net.sourceforge.waters.gui.renderer.MiscShape;
 import net.sourceforge.waters.gui.renderer.ProxyShape;
 import net.sourceforge.waters.gui.renderer.ProxyShapeProducer;
 import net.sourceforge.waters.gui.renderer.RenderingInformation;
-import net.sourceforge.waters.gui.renderer.SimpleNodeProxyShape;
 import net.sourceforge.waters.gui.renderer.SubjectShapeProducer;
 import net.sourceforge.waters.gui.springembedder.EmbedderEvent;
 import net.sourceforge.waters.gui.springembedder.EmbedderObserver;
@@ -106,12 +105,15 @@ import net.sourceforge.waters.subject.base.Subject;
 import net.sourceforge.waters.subject.module.*;
 
 import org.supremica.properties.Config;
+import org.supremica.properties.SupremicaPropertyChangeEvent;
+import org.supremica.properties.SupremicaPropertyChangeListener;
 
 
 public class ControlledSurface
   extends EditorSurface
   implements SelectionOwner, Observer, EmbedderObserver,
-             FocusListener, DragGestureListener
+             FocusListener, DragGestureListener,
+             SupremicaPropertyChangeListener
 {
   //#########################################################################
   //# Constructors
@@ -153,6 +155,7 @@ public class ControlledSurface
       final UndoInterface undoer = root.getUndoInterface();
       undoer.attach(this);
     }
+    Config.GUI_EDITOR_NODE_RADIUS.addPropertyChangeListener(this);
   }
 
   /**
@@ -872,6 +875,15 @@ public class ControlledSurface
         throw new IllegalArgumentException(exception);
       }
     }
+  }
+
+
+  //#########################################################################
+  //# Interface org.supremica.properties.SupremicaPropertyChangeListener
+  public void propertyChanged(final SupremicaPropertyChangeEvent event)
+  {
+    getShapeProducer().clear();
+    repaint();
   }
 
 
@@ -1855,11 +1867,11 @@ public class ControlledSurface
     //# Highlighting
     int getHighlightPriority(final ProxySubject item)
     {
-      if (item instanceof SimpleNodeSubject) {
+      if (item instanceof LabelGeometrySubject) {
         return 5;
-      } else if (item instanceof EdgeSubject) {
+      } else if (item instanceof SimpleNodeSubject) {
         return 4;
-      } else if (item instanceof LabelGeometrySubject) {
+      } else if (item instanceof EdgeSubject) {
         return 3;
       } else if (item instanceof LabelBlockSubject ||
                  item instanceof GuardActionBlockSubject) {
@@ -1956,9 +1968,9 @@ public class ControlledSurface
     //# Highlighting
     int getHighlightPriority(final ProxySubject item)
     {
-      if (item instanceof SimpleNodeSubject) {
+      if (item instanceof LabelGeometrySubject) {
         return 2;
-      } else if (item instanceof LabelGeometrySubject) {
+      } if (item instanceof SimpleNodeSubject) {
         return 1;
       } else {
         return -1;
@@ -3318,7 +3330,9 @@ public class ControlledSurface
         Point2D current = getDragCurrent();
         if (!mCanCreateSelfloop) {
           final double dist = mAnchor.distanceSq(current);
-          if (dist < SELFLOOP_THRESHOLD) {
+          final int radius = Config.GUI_EDITOR_NODE_RADIUS.get() + 2;
+          final int threshold = radius * radius;
+          if (dist < threshold) {
             return false;
           }
           mCanCreateSelfloop = true;
@@ -3703,8 +3717,8 @@ public class ControlledSurface
     //# Interface java.util.Comparator
     public int compare(final ProxySubject item1, final ProxySubject item2)
     {
-      final boolean sel1 = isSelected(item1);
-      final boolean sel2 = isSelected(item2);
+      final boolean sel1 = isRenderedSelected(item1);
+      final boolean sel2 = isRenderedSelected(item2);
       if (sel1 && !sel2) {
         return 1;
       } else if (!sel1 && sel2) {
@@ -3727,7 +3741,8 @@ public class ControlledSurface
     public void keyPressed(KeyEvent e)
     {
       // to be reimplemented
-      if (e.getKeyCode() == KeyEvent.VK_UP || e.getKeyCode() == KeyEvent.VK_KP_UP)
+      if (e.getKeyCode() == KeyEvent.VK_UP ||
+          e.getKeyCode() == KeyEvent.VK_KP_UP)
         {
           //System.err.println("UP");
           boolean hasMoved = false;
@@ -4613,10 +4628,6 @@ public class ControlledSurface
 
   //#########################################################################
   //# Class Constants
-  private static final int SELFLOOP_AUX_RADIUS =
-    SimpleNodeProxyShape.RADIUS + 2;
-  private static final double SELFLOOP_THRESHOLD =
-    SELFLOOP_AUX_RADIUS * SELFLOOP_AUX_RADIUS;
   private static final int STATE_INPUT_WIDTH = 128;
 
 }

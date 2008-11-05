@@ -67,6 +67,11 @@ public class ProxyShapeProducer
   {
   }
 
+  public void clear()
+  {
+    mMap.clear();
+  }
+
 
   //#########################################################################
   //# Simple Access

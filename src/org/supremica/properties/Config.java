@@ -184,6 +184,9 @@ public final class Config
     public static final BooleanProperty GUI_EDITOR_SHOW_GRID = new BooleanProperty(PropertyType.GUI_EDITOR, "showGrid", true, "Show grid");
     public static final IntegerProperty GUI_EDITOR_GRID_SIZE = new IntegerProperty(PropertyType.GUI_EDITOR, "gridSize", 16, "Grid size", false, 4, 64, 4);
     public static final BooleanProperty GUI_EDITOR_NODES_SNAP_TO_GRID = new BooleanProperty(PropertyType.GUI_EDITOR, "nodesSnapToGrid", true, "Nodes snap to grid");
+    public static final IntegerProperty GUI_EDITOR_NODE_RADIUS =
+        new IntegerProperty(PropertyType.GUI_EDITOR, "nodeRadius", 6,
+                            "Node size", false, 4, 32, 1);
     public static final BooleanProperty GUI_EDITOR_CONTROL_POINTS_MOVE_WITH_NODE = new BooleanProperty(PropertyType.GUI_EDITOR, "controlPointsMoveWithNode", true, "Control points move with node");
     public static final BooleanProperty GUI_EDITOR_EDGEARROW_AT_END = new BooleanProperty(PropertyType.GUI_EDITOR, "edgeArrowAtEnd", true, "Draw edge arrows at the end");
     public static enum LAYOUT_MODE_LEGALVALUES { Default, ChalmersIDES }

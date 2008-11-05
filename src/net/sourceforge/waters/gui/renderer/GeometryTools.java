@@ -38,6 +38,8 @@ import net.sourceforge.waters.subject.module.SplineGeometrySubject;
 
 import net.sourceforge.waters.xsd.module.SplineKind;
 
+import org.supremica.properties.Config;
+
 
 public final class GeometryTools
 {
@@ -699,8 +701,9 @@ public final class GeometryTools
     final Point2D center = getPosition(node);
     final double dx = normdir.getX();
     final double dy = normdir.getY();
-    final double x = center.getX() + (SimpleNodeProxyShape.RADIUS) * dx;
-    final double y = center.getY() + (SimpleNodeProxyShape.RADIUS) * dy;
+    final int radius = Config.GUI_EDITOR_NODE_RADIUS.get();
+    final double x = center.getX() + radius * dx;
+    final double y = center.getY() + radius * dy;
     return new Point2D.Double(x, y);
   }
 
