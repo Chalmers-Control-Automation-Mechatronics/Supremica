@@ -75,6 +75,10 @@ class ModelMaker
 					{
 						arguments.put("execModel", "seq");
 					}
+					else if (args[i + 1].equals("f"))
+					{
+						arguments.put("execModel", "freeseq");
+					}
                 }
             }
             else if (args[i].equals("-im"))
@@ -160,7 +164,7 @@ class ModelMaker
         {
 			Logger.output(Logger.ERROR, "ERROR: No system file specified!");
 			Logger.output(Logger.ERROR);
-            Logger.output(Logger.ERROR, "Usage: ModelMaker [-d (debug info)] [-q (quiet)] [-p (generate models as plants)] [-e (expand transitions (deprecated))] [-im int (int var min)] [-ix int (int var max)] [-m 'd' (dual exec model (deprecated)) | -m 's' (seq exec model (default))] [-ip int (instance q places)] [-ep int (event q places)] [-jp int (job q places (deprecated))] [-o outputFileName] [-lb libraryPathBase] [-lp libraryDirectory]... systemFile");
+            Logger.output(Logger.ERROR, "Usage: ModelMaker [-d (debug info)] [-q (quiet)] [-p (generate models as plants)] [-e (expand transitions (deprecated))] [-im int (int var min)] [-ix int (int var max)] [-m 'd' (dual exec model (deprecated)) |  -m 'f' (free seq exec model (default)) | -m 's' (seq exec model)] [-ip int (instance q places)] [-ep int (event q places)] [-jp int (job q places (deprecated))] [-o outputFileName] [-lb libraryPathBase] [-lp libraryDirectory]... systemFile");
             return;
         }
 		
@@ -186,7 +190,12 @@ class ModelMaker
 	{
 		ModelBuilder theBuilder;
 
-		if(arguments.get("execModel") == null || arguments.get("execModel").equals("seq"))
+		if(arguments.get("execModel") == null || arguments.get("execModel").equals("freeseq"))
+		{
+			Logger.output("ModelMaker.makeModel(): Making EFA model for the free sequential execution model.");
+			theBuilder = new FreeSequentialExecModelBuilder(arguments);
+		}
+		else if (arguments.get("execModel").equals("seq"))
 		{
 			Logger.output("ModelMaker.makeModel(): Making EFA model for the sequential execution model.");
 			theBuilder = new SequentialExecModelBuilder(arguments);
