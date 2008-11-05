@@ -5,7 +5,6 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
-
 import java.net.URI;
 
 import java.util.ArrayList;
@@ -99,6 +98,14 @@ import static org.supremica.external.avocades.dop2efa.DOPnative.RESOURCE;
 import static org.supremica.external.avocades.dop2efa.DOPnative.BOOK;
 import static org.supremica.external.avocades.dop2efa.DOPnative.FREE;
 
+
+/**
+ * <code>COPBuilder</code> is the main class in the <code>avocades</code>
+ * package.
+ * 
+ * @author       David Millares
+ * @version      %G%
+ */
 public class COPBuilder {
 	
 	private List<ROP> ropList = null;
@@ -163,10 +170,8 @@ public class COPBuilder {
     }
     
     /**
-     * 
      * Add new EOP to COPBuilder
      * @param eop - the EOP instance to be added
-     * 
      */
     public void add( EOP eop ){
     	
@@ -179,10 +184,8 @@ public class COPBuilder {
     }
     
     /**
-     * 
      * Add new IL to COPBuilder
      * @param il - the IL instance to be added
-     * 
      */
     public void add( IL il ){
     	
@@ -205,7 +208,6 @@ public class COPBuilder {
     
     /**
      * Sets the synthesis options.
-     * 
      * @param synthesizerOptions
      */
     public void setSynthesizerOptions(SynthesizerOptions synthesizerOptions){
@@ -218,8 +220,7 @@ public class COPBuilder {
     //-----------------------------------------------------------------------//
     
     /**
-     * Get the synthes options used by the synthes
-     * 
+     * Get the synthesis options
      * @param synthesizerOptions
      * @return the synthesizer options
      */
@@ -229,7 +230,7 @@ public class COPBuilder {
     
     
     /**
-     * Get the synchronization options used by synchronization.
+     * Get the synchronization options.
      * @return the synchronization options
      */
     public SynchronizationOptions getSynchronizationOptions(){
@@ -307,7 +308,6 @@ public class COPBuilder {
             saveDocument( convAut.getDoc(), tmpFile );
             
         }catch( IOException e ){
-        	tmpFile.delete();
         	return null;
         }
         
@@ -351,6 +351,7 @@ public class COPBuilder {
     	
     	return tmpEOPList;
     }
+    
     
     /**
      * Returns a list of IL renamed to match the ROPs and EOPs added
