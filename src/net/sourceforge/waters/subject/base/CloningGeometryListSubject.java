@@ -220,10 +220,10 @@ public class CloningGeometryListSubject<E extends Cloneable>
     // nor in position. These are transferred directly into the new list
     // and do not cause any change notification.
     i = 0;
-    final Iterator<? extends E> iter = list.iterator();
+    final Iterator<? extends E> olditer = mList.iterator();
     for (final E newitem : list) {
-      if (iter.hasNext()) {
-        final E olditem = iter.next();
+      if (olditer.hasNext()) {
+        final E olditem = olditer.next();
         if (newitem.equals(olditem)) {
           newlist.set(i, olditem);
           used[i] = true;
