@@ -280,7 +280,7 @@ class FreeSequentialExecModelBuilder extends ModelBuilder
 		
 		makeStartup();
 		
-		makeInstanceQueue();
+		//makeInstanceQueue();
 		
 		makeEventExecution();
 		
@@ -914,7 +914,7 @@ class FreeSequentialExecModelBuilder extends ModelBuilder
 
 			from = to;
 			to = "s3";
-			startup.addAcceptingState(to);
+			startup.addState(to);
 			event = "received_event_" + cntSignal + "_" + cntFB + ";";
 			startup.addTransition(from, to, event, null, null);
 
@@ -1033,7 +1033,7 @@ class FreeSequentialExecModelBuilder extends ModelBuilder
 		eventExecution.addInitialState("s0");
 		eventExecution.addState("s1");
 		// Operation Scheduler Freedom:
-		eventExecution.addTransition("s0", "s0", "discard_fb;", null, null);	
+		//eventExecution.addTransition("s0", "s0", "discard_fb;", null, null);	
 		eventExecution.addTransition("s0", "s1", "remove_fb;", null, null);	
 
 		int nameCounter = 2;
@@ -1047,8 +1047,9 @@ class FreeSequentialExecModelBuilder extends ModelBuilder
 			nameCounter++;
 			eventExecution.addState(to);
 			String event = "handle_event_" + instanceName + ";";
-			String guard = "current_fb == " + (Integer) basicFunctionBlocksID.get(instanceName);
-			eventExecution.addTransition(from, to, event, guard, null);
+			// Operation Scheduler Freedom:
+			//String guard = "current_fb == " + (Integer) basicFunctionBlocksID.get(instanceName);
+			eventExecution.addTransition(from, to, event, null, null);
 
 			from = to;
 			to = "s0";
@@ -1412,8 +1413,8 @@ class FreeSequentialExecModelBuilder extends ModelBuilder
 		eventQueue.addInitialState("s0");
 
 		// Operation Scheduler Freedom
-		event = "discard_fb;";
-		eventQueue.addTransition("s0", "s0", event, null, null);
+		//event = "discard_fb;";
+		//eventQueue.addTransition("s0", "s0", event, null, null);
 
 		for (int i = 1; i <= places; i++)
 		{
@@ -1463,7 +1464,7 @@ class FreeSequentialExecModelBuilder extends ModelBuilder
 				}
 			}
 			
-			eventQueue.addState("s" + i, true,false);
+			eventQueue.addState("s" + i);
 
 			for (Iterator evIter = eventInputList.iterator(); evIter.hasNext();)
 			{
@@ -1522,12 +1523,12 @@ class FreeSequentialExecModelBuilder extends ModelBuilder
 						eventQueue.addTransition(from, to, event, guard, action);
 					}
 
-					from = to;
-					to = "s" + (places + nameCounter);
-					nameCounter++;
-					eventQueue.addState(to);
-					event = "queue_fb_" + fbName + ";";
-					eventQueue.addTransition(from, to, event, null, null);
+					//from = to;
+					//to = "s" + (places + nameCounter);
+					//nameCounter++;
+					//eventQueue.addState(to);
+					//event = "queue_fb_" + fbName + ";";
+					//eventQueue.addTransition(from, to, event, null, null);
 					
 					from = to;
 					to = "s" + i;
@@ -1539,8 +1540,8 @@ class FreeSequentialExecModelBuilder extends ModelBuilder
 			}
 
 			// Operation Scheduler Freedom
-			event = "discard_fb;";
-			eventQueue.addTransition(to, to, event, null, null);
+			//event = "discard_fb;";
+			//eventQueue.addTransition(to, to, event, null, null);
 
 			// Transitions when dequeuing event
 			for (Iterator evIter = eventInputList.iterator(); evIter.hasNext();)
