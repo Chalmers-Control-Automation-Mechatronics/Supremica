@@ -102,7 +102,7 @@ public class ExtendedAutomata
 
 	public void addEvent(final String name)
 	{
-		addEvent(name,"cu");
+		addEvent(name,"co");
 	}
 	
 	public void addEvent(final String name, final String kind)
@@ -141,17 +141,6 @@ public class ExtendedAutomata
         }
         return false;
     }
-
-//     void includeEvent(final String name)
-//     {
-//         if (!containsEvent(name)) {
-//             final SimpleIdentifierProxy ident =
-//                 factory.createSimpleIdentifierProxy(name);
-//             final EventDeclSubject decl =
-//                 factory.createEventDeclProxy(ident, EventKind.CONTROLLABLE,true,ScopeKind.LOCAL,null,null);
-//             module.getEventDeclListModifiable().add(decl);
-//         }
-//     }
 
 	public void addAutomaton(ExtendedAutomaton automaton)
 	{

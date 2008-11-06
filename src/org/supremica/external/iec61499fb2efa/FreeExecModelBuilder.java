@@ -914,7 +914,14 @@ class FreeExecModelBuilder extends ModelBuilder
 
 			from = to;
 			to = "s3";
-			startup.addState(to);
+			if (stopInstance != null)
+			{
+				startup.addState(to);
+			}
+			else
+			{
+				startup.addAcceptingState(to);				
+			}
 			event = "received_event_" + cntSignal + "_" + cntFB + ";";
 			startup.addTransition(from, to, event, null, null);
 
