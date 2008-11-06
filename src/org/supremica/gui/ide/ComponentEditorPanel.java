@@ -19,10 +19,26 @@ import java.awt.event.ActionListener;
 import java.awt.print.*;
 import java.io.*;
 import java.util.Locale;
+import java.util.logging.Level;
 import javax.print.attribute.*;
 import javax.print.attribute.standard.*;
 import javax.swing.*;
 import javax.print.*;
+
+import java.awt.Rectangle;
+import java.awt.Graphics2D;
+import java.awt.Color;
+import java.io.Writer;
+import java.io.OutputStreamWriter;
+import java.io.IOException;
+
+import org.apache.batik.svggen.SVGGraphics2D;
+import org.apache.batik.dom.GenericDOMImplementation;
+
+//import org.w3c.dom.Document;
+import org.apache.batik.svggen.SVGGraphics2DIOException;
+import org.w3c.dom.DOMImplementation;
+
 
 import net.sourceforge.waters.gui.ControlledSurface;
 import net.sourceforge.waters.gui.ControlledToolbar;
@@ -264,6 +280,49 @@ public class ComponentEditorPanel
         {
             mModuleContainer.getIDE().info("No Postscript printer service installed.");
         }
+    }
+    
+    public void exportSVG(){
+        // Get file to export to
+        JFileChooser chooser = new JFileChooser();
+        chooser.setSelectedFile(new File(getName() + ".svg"));
+        int returnVal = chooser.showSaveDialog(mSurface);
+        File file = chooser.getSelectedFile();
+        // Not OK?
+        if (returnVal != JFileChooser.APPROVE_OPTION)
+        {
+            return;
+        }                
+        // Get a DOMImplementation.
+        DOMImplementation domImpl =
+            GenericDOMImplementation.getDOMImplementation();
+
+        // Create an instance of org.w3c.dom.Document.
+        String svgNS = "http://www.w3.org/2000/svg";
+        org.w3c.dom.Document document = domImpl.createDocument(svgNS, "svg", null);
+
+        // Create an instance of the SVG Generator.
+        SVGGraphics2D svgGenerator = new SVGGraphics2D(document);
+
+        // Ask the test to render into the SVG Graphics2D implementation.
+        //Graphics2D
+        mSurface.paint((java.awt.Graphics2D)svgGenerator);
+
+        // Finally, stream out SVG to the standard output using
+        // UTF-8 encoding.
+        boolean useCSS = true; // we want to use CSS style attributes
+        Writer out;
+        try {
+            out = new OutputStreamWriter(new FileOutputStream(file), "UTF-8");
+            svgGenerator.stream(out, useCSS);
+        } catch (UnsupportedEncodingException ex) {
+            java.util.logging.Logger.getLogger(ComponentEditorPanel.class.getName()).log(Level.SEVERE, "unsupported encoding UTF-8", ex);
+        } catch (SVGGraphics2DIOException ex) {
+            java.util.logging.Logger.getLogger(ComponentEditorPanel.class.getName()).log(Level.SEVERE, "somethign wrong with svg output", ex);
+        } catch (FileNotFoundException ex) {
+            java.util.logging.Logger.getLogger(ComponentEditorPanel.class.getName()).log(Level.SEVERE, "file not found", ex);
+        }
+        
     }
         
     /**

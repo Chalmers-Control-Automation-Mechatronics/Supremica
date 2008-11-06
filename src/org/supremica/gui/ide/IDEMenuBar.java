@@ -121,6 +121,7 @@ public class IDEMenuBar
 		final Action epsprint = actions.getAction(GraphSaveEPSAction.class);
         menu.add(epsprint);
         menu.add(ide.getActions().editorSavePDFAction.getMenuItem());
+        menu.add(ide.getActions().editorSaveSVGAction.getMenuItem());
         menu.addSeparator();
         final Action exit = actions.getAction(ExitAction.class);
         menu.add(exit);

@@ -97,6 +97,7 @@ public class Actions extends WatersActionManager
     // Printing Actions
     public IDEAction editorPrintAction = new EditorPrintAction(mIDEActions);
     public IDEAction editorSavePDFAction = new EditorSavePDFAction(mIDEActions);
+    public IDEAction editorSaveSVGAction = new EditorSaveSVGAction(mIDEActions);
     public IDEAction editorSavePostscriptAction = new EditorSavePostscriptAction(mIDEActions);
 
     // Editor Actions

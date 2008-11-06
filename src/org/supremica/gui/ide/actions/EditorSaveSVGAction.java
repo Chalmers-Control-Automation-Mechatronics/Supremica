@@ -1,0 +1,52 @@
+/*
+ * To change this template, choose Tools | Templates
+ * and open the template in the editor.
+ */
+
+package org.supremica.gui.ide.actions;
+
+import javax.swing.Action;
+import java.awt.event.ActionEvent;
+import java.util.List;
+import javax.swing.ImageIcon;
+import org.supremica.gui.ide.IDE;
+/**
+ *
+ * @author voronov
+ */
+public class EditorSaveSVGAction extends IDEAction {
+    private static final long serialVersionUID = 1L;
+
+    public EditorSaveSVGAction(List<IDEAction> actionList)
+    {
+        super(actionList);
+        
+        //setEditorActiveRequired(true);
+        
+        putValue(Action.NAME, "Save As SVG...");
+        putValue(Action.SHORT_DESCRIPTION, "Save As SVG");
+        putValue(Action.SMALL_ICON, new ImageIcon(IDE.class.getResource("/toolbarButtonGraphics/general/Print16.gif")));
+        
+        setEnabled(false);
+    }
+    
+    public void actionPerformed(ActionEvent e)
+    {
+        doAction();
+    }
+    
+    public void doAction()
+    {
+        try
+        {
+            ide.getActiveDocumentContainer().getEditorPanel().getActiveEditorWindowInterface().exportSVG();
+        }
+        catch (NullPointerException ex)
+        {
+            // This action should only be enabled when theres an editor panel open!
+            ide.getIDE().info("Must have an editor panel open.");
+        }
+    }    
+    
+    
+}

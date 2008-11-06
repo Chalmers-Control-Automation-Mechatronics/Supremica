@@ -168,6 +168,14 @@
         <unjar src="${lib}/itext.jar" dest="${lib}/${unjared}"/>
         <unjar src="${lib}/sat4j-core-2.0.rc8.jar" dest="${lib}/${unjared}"/>       
         <unjar src="${lib}/fsa2sat-1.0.jar" dest="${lib}/${unjared}"/>       
+        <!-- svg export -->
+        <unjar src="${lib}/batik-awt-util.jar" dest="${lib}/${unjared}"/>       
+        <unjar src="${lib}/batik-svggen.jar" dest="${lib}/${unjared}"/>       
+        <unjar src="${lib}/batik-dom.jar" dest="${lib}/${unjared}"/>       
+        <unjar src="${lib}/batik-util.jar" dest="${lib}/${unjared}"/>       
+        <unjar src="${lib}/batik-ext.jar" dest="${lib}/${unjared}"/>       
+        <unjar src="${lib}/xml-apis.jar" dest="${lib}/${unjared}"/>               
+        <unjar src="${lib}/batik-xml.jar" dest="${lib}/${unjared}"/>               
         <!-- unjar src="${lib}/java_cup.jar" dest="${lib}/${unjared}"/-->
 	<!-- unjar src="${lib}/bsh.jar" dest="${lib}/${unjared}"/-->
 	<!-- Tools for Adobe PostScript. -->
@@ -269,7 +277,7 @@
                debuglevel="lines,source,vars"
                srcdir="${src}"
                destdir="${build}"
-               deprecation="false"
+               deprecation="false"               
                verbose="false"
                nowarn="true"
                excludes="${supremica_basedir}/external/robotCoordination/**,
@@ -277,6 +285,8 @@
                source="1.5"
                fork="true"
                memoryMaximumSize="128M">
+            <compilerarg value="-Xlint:unchecked"/>       
+            <compilerarg value="-Xlint:deprecation"/>       
             <classpath>    
                 <pathelement location="${lib}/${unjared}"/>
             </classpath>
