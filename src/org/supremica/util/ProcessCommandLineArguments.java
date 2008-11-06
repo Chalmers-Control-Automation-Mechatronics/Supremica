@@ -57,13 +57,24 @@
  */
 package org.supremica.util;
 
+import java.awt.Dimension;
 import java.io.*;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.logging.Level;
+import javax.swing.JFrame;
+import javax.swing.JScrollPane;
 import javax.xml.bind.JAXBException;
 
+import net.sourceforge.waters.gui.ControlledSurface;
+import net.sourceforge.waters.gui.ControlledToolbar;
+import net.sourceforge.waters.gui.EditorWindowInterface;
+import net.sourceforge.waters.gui.actions.WatersPopupActionManager;
+import net.sourceforge.waters.gui.observer.EditorChangedEvent;
+import net.sourceforge.waters.gui.observer.Observer;
 import net.sourceforge.waters.gui.renderer.EPSGraphPrinter;
+import net.sourceforge.waters.gui.renderer.GeometryAbsentException;
 import net.sourceforge.waters.model.base.AbstractProxyVisitor;
 import net.sourceforge.waters.model.base.DocumentProxy;
 import net.sourceforge.waters.model.base.Proxy;
@@ -81,9 +92,14 @@ import net.sourceforge.waters.model.module.GraphProxy;
 import net.sourceforge.waters.model.module.ModuleProxy;
 import net.sourceforge.waters.model.module.ModuleProxyFactory;
 import net.sourceforge.waters.model.module.SimpleComponentProxy;
+import net.sourceforge.waters.subject.module.GraphSubject;
+import net.sourceforge.waters.subject.module.ModuleSubject;
 import net.sourceforge.waters.subject.module.ModuleSubjectFactory;
 import net.sourceforge.waters.valid.ValidUnmarshaller;
 
+import org.apache.batik.dom.GenericDOMImplementation;
+import org.apache.batik.svggen.SVGGraphics2D;
+import org.apache.batik.svggen.SVGGraphics2DIOException;
 import org.supremica.Version;
 import org.supremica.automata.IO.ADSUnmarshaller;
 import org.supremica.automata.IO.HISCUnmarshaller;
@@ -93,6 +109,7 @@ import org.supremica.automata.Project;
 import org.supremica.properties.Config;
 import org.supremica.properties.SupremicaProperties;
 
+import org.w3c.dom.DOMImplementation;
 import org.xml.sax.SAXException;
 
 /**
@@ -103,7 +120,7 @@ public class ProcessCommandLineArguments
     /**
      * Processes an array of arguments. Returns a list of files to be opened on startup.
      */
-    public static List<File> process(String[] args)
+    public static List<File> process(String[] args) throws GeometryAbsentException
     {
         boolean quit = false;
         boolean verbose = false;
@@ -252,6 +269,178 @@ public class ProcessCommandLineArguments
                 // Quit after this (even if there were no files)
                 quit = true;
             }
+            else if (args[i].equals("--svgfigs"))
+            {
+                // Create eps figs for all components in the supplied file
+                while ((i+1 < args.length) && !(args[i+1].startsWith("-")))
+                {
+                    String fileName = args[++i];
+                    File figFile = new File(fileName);
+
+                    // Set up document manager ...
+                    DocumentManager documentManager = new DocumentManager();
+                    ProductDESImporter importer; 
+                    try
+                    {
+                        final ModuleProxyFactory factory = ModuleSubjectFactory.getInstance();
+                        final OperatorTable opTable = CompilerOperatorTable.getInstance();
+                        final JAXBModuleMarshaller moduleMarshaller =
+                            new JAXBModuleMarshaller(factory, opTable);
+                        final ProxyUnmarshaller<Project> supremicaUnmarshaller =
+                            new SupremicaUnmarshaller(factory);
+                        final ProxyUnmarshaller<ModuleProxy> validUnmarshaller =
+                            new ValidUnmarshaller(factory, opTable);
+                        final ProxyUnmarshaller<ModuleProxy> hiscUnmarshaller =
+                            new HISCUnmarshaller(factory);
+                        final ProxyUnmarshaller<ModuleProxy> umdesUnmarshaller =
+                            new UMDESUnmarshaller(factory);
+                        final ProxyUnmarshaller<ModuleProxy> adsUnmarshaller =
+                            new ADSUnmarshaller(factory);
+                        // Add unmarshallers in order of importance ...
+                        // (shows up in the file-open dialog)
+                        documentManager.registerUnmarshaller(moduleMarshaller);
+                        documentManager.registerUnmarshaller(supremicaUnmarshaller);
+                        documentManager.registerUnmarshaller(validUnmarshaller);
+                        documentManager.registerUnmarshaller(hiscUnmarshaller);
+                        documentManager.registerUnmarshaller(umdesUnmarshaller);
+                        documentManager.registerUnmarshaller(adsUnmarshaller);
+                        
+                        importer = new ProductDESImporter(factory);
+                    }
+                    catch (SAXException ex)
+                    {
+                        System.err.println("SAXException when initialising document manager: " + ex);
+                        return null;
+                    }
+                    catch (JAXBException ex)
+                    {
+                        System.err.println("JAXBException when initialising document manager: " + ex);
+                        return null;
+                    }
+                
+                    // Do the printing
+                    try
+                    {                        
+                        // Load file
+                        DocumentProxy doc = documentManager.load(figFile);
+
+                        // Build module
+                        ModuleProxy module;
+                        if (doc instanceof ModuleProxy)
+                        {
+                            module = (ModuleProxy) doc;
+                        }
+                        else if (doc instanceof Project)
+                        {
+                            module = importer.importModule((Project) doc);
+                        }
+                        else
+                        {
+                            throw new ClassCastException("Unknown document type");
+                        }
+
+                        // Loop throgh components and print eps-figures
+                        //module.acceptVisitor(new EPSPrinterVisitor(module));
+                        final List<Proxy> components = module.getComponentList();
+                        //AbstractProxyVisitor visitor = new EPSPrinterVisitor(module, verbose);
+                        //visitor.visitCollection(components);
+
+                        for(Proxy p: components){
+                            if(!(p instanceof SimpleComponentProxy))
+                                continue;
+                            SimpleComponentProxy component = (SimpleComponentProxy)p;
+                            ControlledSurface mSurface = new ControlledSurface
+                                    ( (GraphSubject) component.getGraph()
+                                    , (ModuleSubject) module
+                                    , (EditorWindowInterface) null
+                                    , (ControlledToolbar) new ControlledToolbar() {
+
+                                            public Tool getTool() {
+                                                return ControlledToolbar.Tool.SELECT;
+                                            }
+                                            public void attach(Observer o) {
+                                                throw new UnsupportedOperationException("Not supported yet.");
+                                            }
+                                            public void detach(Observer o) {
+                                                throw new UnsupportedOperationException("Not supported yet.");
+                                            }
+                                            public void fireEditorChangedEvent(EditorChangedEvent e) {
+                                                throw new UnsupportedOperationException("Not supported yet.");
+                                            }
+                                        }
+                                    , (WatersPopupActionManager) null
+                                    );
+                            
+                            //mSurface.setPreferredSize(new Dimension(640, 480));
+                            //mSurface.setMinimumSize(new Dimension(640, 480));
+
+                            // Get a DOMImplementation.
+                            DOMImplementation domImpl =
+                                GenericDOMImplementation.getDOMImplementation();
+
+                            // Create an instance of org.w3c.dom.Document.
+                            String svgNS = "http://www.w3.org/2000/svg";
+                            org.w3c.dom.Document document = domImpl.createDocument(svgNS, "svg", null);
+
+                            // Create an instance of the SVG Generator.
+                            SVGGraphics2D svgGenerator = new SVGGraphics2D(document);
+
+                            // Ask the test to render into the SVG Graphics2D implementation.
+                            //Graphics2D
+                            final JScrollPane scrollsurface = new JScrollPane(mSurface);
+
+                            JFrame frame = new JFrame("ToolBarDemo");
+                            frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
+                            //Add content to the window.
+                            frame.add(scrollsurface);
+
+                            //Display the window.
+                            frame.pack();
+                            frame.setVisible(true);
+                            
+                            
+                            mSurface.print(svgGenerator);
+
+                            // Finally, stream out SVG to the standard output using
+                            // UTF-8 encoding.
+                            boolean useCSS = true; // we want to use CSS style attributes
+                            Writer out = 
+                                    new OutputStreamWriter( 
+                                      new FileOutputStream(
+                                        new File(
+                                          (fileName + "-"
+                                            + component.getName() 
+                                            + ".svg"
+                                          ).replace("|", "-").replace(":", "-")
+                                        )
+                                      )
+                                      , "UTF-8"
+                                    );
+                            svgGenerator.stream(out, useCSS);
+                        }
+                    }
+                    catch (IOException ex)
+                    {
+                        System.err.println("IO problem: " + ex);
+                    }                   
+                    catch (WatersUnmarshalException ex)
+                    {
+                        System.err.println("Problem unmarshalling: " + ex);
+                    }
+                    catch (ClassCastException ex)
+                    {
+                        System.err.println("Only import of modules is supported: " + ex);
+                    }                   
+                    //catch (VisitorException ex)
+                    //{
+                    //    System.err.println("Problems when visiting module: " + ex);
+                    //}                   
+                }
+
+                // Quit after this (even if there were no files)
+                quit = true;
+            }
             else if (args[i].equals("-l") || args[i].equals("--list"))
             {
                 System.out.println(SupremicaProperties.getProperties());
@@ -292,16 +481,21 @@ public class ProcessCommandLineArguments
      */
     private static void printUsage()
     {
-        System.out.println("Supremica: " + org.supremica.Version.version());
-        System.out.println("More information about Supremica is available at www.supremica.org\n");
-        System.out.println("Usage: IDE [OPTION] MODULE_FILES\n");
-        System.out.println("Property options: \n  -p, --properties FILE\t\t Load properties from FILE");
-        System.out.println("EPS-figure generation: \n  -e, --epsfigs FILE... \t Creates eps-figures from all components in FILEs");
-        System.out.println("List: \n  -l, --list [FILE]\t\t List properties with current values (or values in FILE)");
-        System.out.println("Help options: \n  -?, -h, --help, --usage\t show this help message");
-        System.out.println("Verbose mode: \n  --verbose\t\t be extra verbose");
-        System.out.println("Version: \n  -v, --version \t\t show version");
-        System.out.println("");
+        System.out.println
+                ( "Supremica: " + org.supremica.Version.version() + "\n"
+                + "More information about Supremica is available at www.supremica.org\n"
+                + "\n"
+                + "Usage: IDE [OPTION] MODULE_FILES\n"
+                + "\n"
+                + "Options:\n"
+                + "-p, --properties FILE        Load properties from FILE\n" 
+                + "-e, --epsfigs FILE...        Create eps-figures from all components in FILEs\n"
+                + "--svgfigs FILE               Create svg-figures from all components in FILE\n"
+                + "-l, --list [FILE]            List properties with current values (or values in FILE)\n"
+                + "-?, -h, --help, --usage      Show this help message\n"
+                + "--verbose                    be extra verbose\n"
+                + "-v, --version                show version\n"
+                + "\n");
     }
 }
 
