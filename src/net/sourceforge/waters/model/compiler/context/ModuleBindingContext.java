@@ -49,7 +49,8 @@ public class ModuleBindingContext implements BindingContext
                               final IdentifierProxy prefix,
                               final SourceInfo info)
   {
-    mMap = new HashMap<ProxyAccessor<IdentifierProxy>,SimpleExpressionProxy>();
+    mMap = new HashMap<ProxyAccessor<SimpleExpressionProxy>,
+                       SimpleExpressionProxy>();
     mModule = module;
     mPrefix = prefix;
     mInstanceSource = info;
@@ -58,10 +59,11 @@ public class ModuleBindingContext implements BindingContext
 
   //#########################################################################
   //# Interface net.sourceforge.waters.model.compiler.BindingContext
-  public SimpleExpressionProxy getBoundExpression(final IdentifierProxy ident)
+  public SimpleExpressionProxy getBoundExpression
+    (final SimpleExpressionProxy ident)
   {
-    final ProxyAccessor<IdentifierProxy> key =
-      new ProxyAccessorByContents<IdentifierProxy>(ident);
+    final ProxyAccessor<SimpleExpressionProxy> key =
+      new ProxyAccessorByContents<SimpleExpressionProxy>(ident);
     return mMap.get(key);
   }
 
@@ -118,20 +120,20 @@ public class ModuleBindingContext implements BindingContext
 
   //#########################################################################
   //# Compilation
-  public void addBinding(final IdentifierProxy ident,
+  public void addBinding(final SimpleExpressionProxy ident,
                          final SimpleExpressionProxy value)
   {
-    final ProxyAccessor<IdentifierProxy> key =
-      new ProxyAccessorByContents<IdentifierProxy>(ident);
+    final ProxyAccessor<SimpleExpressionProxy> key =
+      new ProxyAccessorByContents<SimpleExpressionProxy>(ident);
     mMap.put(key, value);
   }
 
-  public void insertBinding(final IdentifierProxy ident,
+  public void insertBinding(final SimpleExpressionProxy ident,
                             final SimpleExpressionProxy value)
     throws DuplicateIdentifierException
   {
-    final ProxyAccessor<IdentifierProxy> key =
-      new ProxyAccessorByContents<IdentifierProxy>(ident);
+    final ProxyAccessor<SimpleExpressionProxy> key =
+      new ProxyAccessorByContents<SimpleExpressionProxy>(ident);
     if (mMap.containsKey(key)) {
       final String name = ident.toString();
       throw new DuplicateIdentifierException(name);
@@ -143,7 +145,8 @@ public class ModuleBindingContext implements BindingContext
 
   //#########################################################################
   //# Data Members
-  private final Map<ProxyAccessor<IdentifierProxy>,SimpleExpressionProxy> mMap;
+  private final Map<ProxyAccessor<SimpleExpressionProxy>,SimpleExpressionProxy>
+    mMap;
   private final ModuleProxy mModule;
   private final IdentifierProxy mPrefix;
   private final SourceInfo mInstanceSource;

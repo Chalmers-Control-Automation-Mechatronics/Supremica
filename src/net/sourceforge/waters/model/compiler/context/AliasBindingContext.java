@@ -64,7 +64,8 @@ public class AliasBindingContext implements BindingContext
 
   //#########################################################################
   //# Interface net.sourceforge.waters.model.compiler.BindingContext
-  public SimpleExpressionProxy getBoundExpression(final IdentifierProxy ident)
+  public SimpleExpressionProxy getBoundExpression
+    (final SimpleExpressionProxy ident)
   {
     return mParent.getBoundExpression(ident);
   }

@@ -11,7 +11,7 @@ package net.sourceforge.waters.model.compiler.context;
 
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.expr.EvalException;
-import net.sourceforge.waters.model.module.IdentifierProxy;
+import net.sourceforge.waters.model.module.SimpleExpressionProxy;
 
 
 public class UndefinedIdentifierException extends EvalException {
@@ -37,7 +37,7 @@ public class UndefinedIdentifierException extends EvalException {
    * Constructs a new exception indicating that the given identifier
    * is not defined.
    */
-  public UndefinedIdentifierException(final IdentifierProxy ident)
+  public UndefinedIdentifierException(final SimpleExpressionProxy ident)
   {
     this(ident.toString(), ident);
   }
@@ -46,7 +46,7 @@ public class UndefinedIdentifierException extends EvalException {
    * Constructs a new exception indicating that the given identifier
    * is not defined.
    */
-  public UndefinedIdentifierException(final IdentifierProxy ident,
+  public UndefinedIdentifierException(final SimpleExpressionProxy ident,
                                       final String typename)
   {
     this(ident.toString(), typename, ident);

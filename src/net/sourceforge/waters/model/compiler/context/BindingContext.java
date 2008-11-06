@@ -33,13 +33,14 @@ public interface BindingContext
   /**
    * Gets the value bound to the given name.
    * @param  ident   The name to be looked up.
-   *                 It is given as an identifier, simple or indexed,
-   *                 so array lookups can be supported.
+   *                 It can be identifier, simple or indexed, (to support
+   *                 array lookups), or a unary expression (to support
+   *                 next-state value of EFA variables.
    * @return A variable-free expression representing the concrete value
    *         bound to the given name in this context, or <CODE>null</CODE>
    *         if there is no binding for the given name.
    */
-  public SimpleExpressionProxy getBoundExpression(IdentifierProxy ident);
+  public SimpleExpressionProxy getBoundExpression(SimpleExpressionProxy ident);
 
   /**
    * Determines whether the given identifier represents an enumeration atom

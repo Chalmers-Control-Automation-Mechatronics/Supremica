@@ -58,6 +58,7 @@ public class SimpleExpressionCompiler
     mAtomicVisitor = new AtomicVisitor();
     mRangeVisitor = new RangeVisitor();
     mIsEvaluating = false;
+    mNumPrimes = 0;
     mContext = null;
   }
 
@@ -70,6 +71,7 @@ public class SimpleExpressionCompiler
   {
     try {
       mIsEvaluating = false;
+      mNumPrimes = 0;
       mContext = context;
       return simplify(expr);
     } finally {
@@ -83,6 +85,7 @@ public class SimpleExpressionCompiler
   {
     try {
       mIsEvaluating = true;
+      mNumPrimes = 0;
       mContext = context;
       return simplify(expr);
     } finally {
@@ -136,7 +139,8 @@ public class SimpleExpressionCompiler
 
   //#########################################################################
   //# Auxiliary Methods
-  private SimpleExpressionProxy getBoundExpression(final IdentifierProxy ident)
+  private SimpleExpressionProxy getBoundExpression
+    (final SimpleExpressionProxy ident)
   {
     if (mContext == null) {
       return null;
@@ -211,10 +215,17 @@ public class SimpleExpressionCompiler
       final int size = origIndexes.size();
       final List<SimpleExpressionProxy> compiledIndexes =
         new ArrayList<SimpleExpressionProxy>(size);
-      for (final SimpleExpressionProxy orig : origIndexes) {
-        final SimpleExpressionProxy compiled =
-          (SimpleExpressionProxy) orig.acceptVisitor(this);
-        compiledIndexes.add(compiled);
+      final int numprimes = mNumPrimes;
+      try {
+        // Evaluate indexes even if primed!
+        mNumPrimes = 0;
+        for (final SimpleExpressionProxy orig : origIndexes) {
+          final SimpleExpressionProxy compiled =
+            (SimpleExpressionProxy) orig.acceptVisitor(this);
+          compiledIndexes.add(compiled);
+        }
+      } finally {
+        mNumPrimes = numprimes;
       }
       final ModuleProxyFactory factory = getFactory();
       final IndexedIdentifierProxy copy =
@@ -276,7 +287,23 @@ public class SimpleExpressionCompiler
     {
       try {
         final UnaryOperator operator = expr.getOperator();
-        return operator.simplify(expr, SimpleExpressionCompiler.this);
+        final SimpleExpressionProxy subterm = expr.getSubTerm();
+        if (operator == mOperatorTable.getNextOperator() &&
+            subterm instanceof IdentifierProxy) {
+          final int numprimes = mNumPrimes++;
+          final SimpleExpressionProxy subsimp;
+          try {
+            subsimp = (SimpleExpressionProxy) subterm.acceptVisitor(this);
+          } finally {
+            mNumPrimes = numprimes;
+          }
+          final ModuleProxyFactory factory = getFactory();
+          final UnaryExpressionProxy nextsubsimp =
+            factory.createUnaryExpressionProxy(operator, subsimp);
+          return processIdentifier(nextsubsimp, true);
+        } else {
+          return operator.simplify(expr, SimpleExpressionCompiler.this);
+        }
       } catch (final EvalException exception) {
         throw wrap(exception);
       }
@@ -285,9 +312,14 @@ public class SimpleExpressionCompiler
     //#######################################################################
     //# Auxiliary Methods
     private SimpleExpressionProxy processIdentifier
-      (final IdentifierProxy ident, final boolean alreadyCloned)
+      (final SimpleExpressionProxy ident, final boolean alreadyCloned)
       throws UndefinedIdentifierException
     {
+      if (mNumPrimes > 0) {
+        // Do not lookup names in primed subexpression! 
+        final ModuleProxyCloner cloner = getCloner();
+        return (SimpleExpressionProxy) cloner.getClone(ident);
+      }
       final SimpleExpressionProxy bound = getBoundExpression(ident);
       if (bound != null) {
         final ModuleProxyCloner cloner = getCloner();
@@ -298,7 +330,7 @@ public class SimpleExpressionCompiler
         return ident;
       } else {
         final ModuleProxyCloner cloner = getCloner();
-        return (IdentifierProxy) cloner.getClone(ident);
+        return (SimpleExpressionProxy) cloner.getClone(ident);
       }
     }
 
@@ -431,6 +463,7 @@ public class SimpleExpressionCompiler
   private final RangeVisitor mRangeVisitor;
 
   private boolean mIsEvaluating;
+  private int mNumPrimes;
   private BindingContext mContext;
 
 }

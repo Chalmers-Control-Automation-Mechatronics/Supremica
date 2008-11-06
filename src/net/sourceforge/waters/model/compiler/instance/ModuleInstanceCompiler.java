@@ -1002,15 +1002,18 @@ public class ModuleInstanceCompiler extends AbstractModuleProxyVisitor
     //#######################################################################
     //# Interface net.sourceforge.waters.model.compiler.context.BindingContext
     public SimpleExpressionProxy getBoundExpression
-      (final IdentifierProxy ident)
+      (final SimpleExpressionProxy expr)
     {
-      final SimpleExpressionProxy bound = mContext.getBoundExpression(ident);
+      final SimpleExpressionProxy bound = mContext.getBoundExpression(expr);
       if (bound != null) {
         return bound;
       }
-      final IdentifiedProxy comp = mNameSpace.getComponent(ident);
-      if (comp != null) {
-        return comp.getIdentifier();
+      if (expr instanceof IdentifierProxy) {
+        final IdentifierProxy ident = (IdentifierProxy) expr;
+        final IdentifiedProxy comp = mNameSpace.getComponent(ident);
+        if (comp != null) {
+          return comp.getIdentifier();
+        }
       }
       return null;
     }
@@ -1028,7 +1031,7 @@ public class ModuleInstanceCompiler extends AbstractModuleProxyVisitor
 
 
   //#########################################################################
-  //# Inner Class NameSpaceVariablesContext
+  //# Inner Class SinglePrefixingContext
   private class SinglePrefixingContext implements BindingContext
   {
     //#######################################################################
@@ -1041,12 +1044,13 @@ public class ModuleInstanceCompiler extends AbstractModuleProxyVisitor
     //#######################################################################
     //# Interface net.sourceforge.waters.model.compiler.context.BindingContext
     public SimpleExpressionProxy getBoundExpression
-      (final IdentifierProxy ident)
+      (final SimpleExpressionProxy expr)
     {
-      if (ident.equalsByContents(mSuffix)) {
+      if (expr.equalsByContents(mSuffix)) {
+        final IdentifierProxy ident = (IdentifierProxy) expr;
         return mNameSpace.getPrefixedIdentifier(mSuffix, mFactory);
       } else {
-        return mContext.getBoundExpression(ident);
+        return mContext.getBoundExpression(expr);
       }
     }
 

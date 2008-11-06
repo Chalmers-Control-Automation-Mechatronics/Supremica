@@ -45,7 +45,8 @@ public class ForeachBindingContext implements BindingContext
 
   //#########################################################################
   //# Interface net.sourceforge.waters.model.compiler.BindingContext
-  public SimpleExpressionProxy getBoundExpression(final IdentifierProxy ident)
+  public SimpleExpressionProxy getBoundExpression
+    (final SimpleExpressionProxy ident)
   {
     if (!(ident instanceof SimpleIdentifierProxy)) {
       return mParent.getBoundExpression(ident);
