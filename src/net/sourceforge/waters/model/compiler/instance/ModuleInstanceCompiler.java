@@ -31,6 +31,7 @@ import net.sourceforge.waters.model.compiler.context.CompiledRange;
 import net.sourceforge.waters.model.compiler.context.BindingContext;
 import net.sourceforge.waters.model.compiler.context.ModuleBindingContext;
 import net.sourceforge.waters.model.compiler.context.SimpleExpressionCompiler;
+import net.sourceforge.waters.model.compiler.context.SingleBindingContext;
 import net.sourceforge.waters.model.compiler.context.SourceInfo;
 import net.sourceforge.waters.model.compiler.context.SourceInfoBuilder;
 import net.sourceforge.waters.model.compiler.context.
@@ -353,7 +354,7 @@ public class ModuleInstanceCompiler extends AbstractModuleProxyVisitor
         mSimpleExpressionCompiler.getRangeValue(rvalue);
       for (final SimpleExpressionProxy item : crange.getValues()) {
         try {
-          mContext = new ForeachBindingContext(name, item, root);
+          mContext = new SingleBindingContext(mFactory, name, item, root);
           final SimpleExpressionProxy guard = foreach.getGuard();
           if (guard == null) {
             visitCollection(body);

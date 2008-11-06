@@ -186,6 +186,7 @@ public class EFACompiler
   //#########################################################################
   //# Event Partitioning
   private void computeEventPartitions()
+    throws EvalException
   {
     final BinaryOperator andop = mOperatorTable.getAndOperator();
     final CompiledClause startcond = new CompiledClause(andop);
@@ -222,13 +223,14 @@ public class EFACompiler
                                      final List<EFATransition> parts,
                                      final int index,
                                      final CompiledClause prevcond)
+    throws EvalException
   {
     if (index < groups.size()) {
       final EFATransitionGroup group = groups.get(index);
       for (final EFATransition part : group.getPartialTransitions()) {
         final CompiledClause cond = part.getConditions();
         final CompiledClause nextcond =
-          mConstraintPropagator.propagate(prevcond, cond);
+          mConstraintPropagator.propagate(prevcond, cond, mRootContext);
         if (nextcond != null) {
           parts.add(part);
           collectEventPartition(edecl, groups, parts, index + 1, nextcond);
@@ -243,6 +245,7 @@ public class EFACompiler
   private void splitEventPartition(final EFAEventDecl edecl,
                                    final List<EFATransition> parts,
                                    final CompiledClause cond)
+    throws EvalException
   {
     final List<EFAVariable> splitlist = mSplitComputer.computeSplitList(cond);
     if (splitlist.isEmpty()) {
@@ -257,6 +260,7 @@ public class EFACompiler
                                    final CompiledClause cond,
                                    final List<EFAVariable> splitlist,
                                    final int index)
+    throws EvalException
   {
     if (index < splitlist.size()) {
       final EFAVariable var = splitlist.get(index);
@@ -264,7 +268,7 @@ public class EFACompiler
       final CompiledRange range = var.getRange();
       for (final SimpleExpressionProxy value : range.getValues()) {
         final CompiledClause nextcond =
-          mConstraintPropagator.propagate(cond, varname, value);
+          mConstraintPropagator.propagate(cond, varname, value, mRootContext);
         if (nextcond != null) {
           splitEventPartition(edecl, parts, nextcond, splitlist, index + 1);
         }

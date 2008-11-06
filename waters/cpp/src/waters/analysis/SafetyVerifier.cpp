@@ -321,8 +321,8 @@ checkProperty()
         if (update == 0) {
           packednext[w] = packedcurrent[w];
         } else {
-          uint32 word = packedcurrent[w] &
-            update->getKeptMask() | update->getCommonTargets();
+          uint32 word = (packedcurrent[w] & update->getKeptMask()) |
+            update->getCommonTargets();
           for (TransitionRecord* trans = update->getTransitionRecords();
                trans != 0;
                trans = trans->getNextInUpdate()) {

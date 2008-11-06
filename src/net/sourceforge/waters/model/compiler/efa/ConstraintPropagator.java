@@ -16,23 +16,20 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.TreeSet;
 
-import net.sourceforge.waters.model.base.VisitorException;
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
+import net.sourceforge.waters.model.compiler.context.BindingContext;
+import net.sourceforge.waters.model.compiler.context.OccursChecker;
 import net.sourceforge.waters.model.compiler.context.SimpleExpressionCompiler;
+import net.sourceforge.waters.model.compiler.context.SingleBindingContext;
 import net.sourceforge.waters.model.compiler.dnf.CompiledClause;
 import net.sourceforge.waters.model.compiler.dnf.DNFConverter;
 import net.sourceforge.waters.model.expr.BinaryOperator;
 import net.sourceforge.waters.model.expr.EvalException;
 import net.sourceforge.waters.model.expr.TypeMismatchException;
-import net.sourceforge.waters.model.expr.UnaryOperator;
-import net.sourceforge.waters.model.module.AbstractModuleProxyVisitor;
 import net.sourceforge.waters.model.module.BinaryExpressionProxy;
 import net.sourceforge.waters.model.module.IdentifierProxy;
-import net.sourceforge.waters.model.module.IndexedIdentifierProxy;
 import net.sourceforge.waters.model.module.ModuleProxyFactory;
-import net.sourceforge.waters.model.module.QualifiedIdentifierProxy;
 import net.sourceforge.waters.model.module.SimpleExpressionProxy;
-import net.sourceforge.waters.model.module.UnaryExpressionProxy;
 
 
 class ConstraintPropagator
@@ -53,19 +50,19 @@ class ConstraintPropagator
     mSimpleExpressionCompiler = compiler;
     mDNFConverter = new DNFConverter(factory, optable, comparator);
     mVariableMap = varmap;
-    mOccursCheckVisitor = new OccursCheckVisitor();
-    mSubstitutionVisitor = new SubstitutionVisitor();
   }
 
 
   //#########################################################################
   //# Invocation
-  CompiledClause propagate(final CompiledClause clause)
+  CompiledClause propagate(final CompiledClause clause,
+                           final BindingContext context)
+    throws EvalException
   {
     try {
       final Collection<SimpleExpressionProxy> literals = clause.getLiterals();
       final int size = literals.size();
-      setup(size);
+      setup(context, size);
       mOpenLiterals.addAll(literals);
       return propagate();
     } finally {
@@ -74,7 +71,9 @@ class ConstraintPropagator
   }
 
   CompiledClause propagate(final CompiledClause clause1,
-                           final CompiledClause clause2)
+                           final CompiledClause clause2,
+                           final BindingContext context)
+    throws EvalException
   {
     try {
       final Collection<SimpleExpressionProxy> literals1 =
@@ -82,7 +81,7 @@ class ConstraintPropagator
       final Collection<SimpleExpressionProxy> literals2 =
         clause2.getLiterals();
       final int size = literals1.size() + literals2.size();
-      setup(size);
+      setup(context, size);
       mOpenLiterals.addAll(literals1);
       mOpenLiterals.addAll(literals2);
       return propagate();
@@ -93,12 +92,14 @@ class ConstraintPropagator
 
   CompiledClause propagate(final CompiledClause clause,
                            final SimpleExpressionProxy varname,
-                           final SimpleExpressionProxy value)
+                           final SimpleExpressionProxy value,
+                           final BindingContext context)
+    throws EvalException
   {
     try {
       final Collection<SimpleExpressionProxy> literals = clause.getLiterals();
       final int size = literals.size();
-      setup(size + 1);
+      setup(context, size + 1);
       mOpenLiterals.addAll(literals);
       substitute(varname, value);
       final BinaryExpressionProxy equation = createEquation(varname, value);
@@ -112,8 +113,9 @@ class ConstraintPropagator
 
   //#########################################################################
   //# Algorithm
-  private void setup(final int size)
+  private void setup(final BindingContext context, final int size)
   {
+    mRootContext = context;
     mIsFalse = false;
     final Comparator<SimpleExpressionProxy> comparator =
       mVariableMap.getExpressionComparator();
@@ -123,11 +125,13 @@ class ConstraintPropagator
 
   private void cleanup()
   {
+    mRootContext = null;
     mOpenLiterals = null;
     mProcessedEquations = null;
   }
 
   private CompiledClause propagate()
+    throws EvalException
   {
     while (simplify()) {
       // nothing ...
@@ -145,6 +149,7 @@ class ConstraintPropagator
   }
 
   private boolean simplify()
+    throws EvalException
   {
     final BinaryOperator eqop = mOperatorTable.getEqualsOperator();
     final Iterator<SimpleExpressionProxy> iter = mOpenLiterals.iterator();
@@ -163,8 +168,9 @@ class ConstraintPropagator
       if (var == null) {
         continue;
       }
+      final OccursChecker checker = OccursChecker.getInstance();
       final SimpleExpressionProxy rhs = equation.getRight();
-      if (mOccursCheckVisitor.occurs(lhs, rhs)) {
+      if (checker.occurs(lhs, rhs)) {
         continue;
       }
       iter.remove();
@@ -177,28 +183,26 @@ class ConstraintPropagator
 
   private void substitute(final SimpleExpressionProxy varname,
                           final SimpleExpressionProxy replacement)
+    throws EvalException
   {
+    final BindingContext context =
+      new SingleBindingContext(varname, replacement, mRootContext);
     final List<SimpleExpressionProxy> literals =
       new ArrayList<SimpleExpressionProxy>(mOpenLiterals);
     mOpenLiterals.clear();
     for (final SimpleExpressionProxy literal : literals) {
-      final SimpleExpressionProxy subst =
-        mSubstitutionVisitor.substitute(literal, varname, replacement);
-      if (literal == subst) {
-        mOpenLiterals.add(literal);
-      } else {
-        final SimpleExpressionProxy simp = simplify(subst);
-        if (isBooleanValue(simp)) {
-          if (!getBooleanValue(simp)) {
-            mIsFalse = true;
-            return;
-          }
-        } else if (mOpenLiterals.add(simp)) {
-          final SimpleExpressionProxy complement = getNegatedLiteral(simp);
-          if (mOpenLiterals.contains(complement)) {
-            mIsFalse = true;
-            return;
-          }
+      final SimpleExpressionProxy simp =
+        mSimpleExpressionCompiler.simplify(literal, context);
+      if (isBooleanValue(simp)) {
+        if (!getBooleanValue(simp)) {
+          mIsFalse = true;
+          return;
+        }
+      } else if (mOpenLiterals.add(simp)) {
+        final SimpleExpressionProxy complement = getNegatedLiteral(simp);
+        if (mOpenLiterals.contains(complement)) {
+          mIsFalse = true;
+          return;
         }
       }
     }
@@ -206,11 +210,11 @@ class ConstraintPropagator
     for (int i = 0; i < numequations; i++) {
       final BinaryExpressionProxy equation = mProcessedEquations.get(i);
       final SimpleExpressionProxy rhs = equation.getRight();
-      final SimpleExpressionProxy subst =
-        mSubstitutionVisitor.substitute(rhs, varname, replacement);
-      if (rhs != subst) {
+      final SimpleExpressionProxy simp =
+        mSimpleExpressionCompiler.simplify(rhs, context);
+      if (!rhs.equalsByContents(simp)) {
         final SimpleExpressionProxy lhs = equation.getLeft();
-        final BinaryExpressionProxy newequation = createEquation(lhs, subst);
+        final BinaryExpressionProxy newequation = createEquation(lhs, simp);
         mProcessedEquations.set(i, newequation);
       }
     }
@@ -268,227 +272,14 @@ class ConstraintPropagator
 
 
   //#########################################################################
-  //# Inner Class OccursCheckVisitor
-  private class OccursCheckVisitor
-    extends AbstractModuleProxyVisitor
-  {
-
-    //#######################################################################
-    //# Invocation
-    boolean occurs(final SimpleExpressionProxy varname,
-                   final SimpleExpressionProxy expr)
-    {
-      try {
-        mVarName = varname;
-        return occurs(expr);
-      } catch (final VisitorException exception) {
-        throw exception.getRuntimeException();
-      } finally {
-        mVarName = null;
-      }
-    }
-
-    //#######################################################################
-    //# Auxiliary Methods
-    private boolean occurs(final SimpleExpressionProxy expr)
-      throws VisitorException
-    {
-      if (expr.equalsByContents(mVarName)) {
-        return true;
-      } else {
-        return (Boolean) expr.acceptVisitor(this);
-      }
-    }
-
-    //#######################################################################
-    //# Interface net.sourceforge.waters.model.module.ModuleProxyVisitor
-    public Boolean visitBinaryExpressionProxy
-      (final BinaryExpressionProxy expr)
-      throws VisitorException
-    {
-      final SimpleExpressionProxy lhs = expr.getLeft();
-      final SimpleExpressionProxy rhs = expr.getRight();
-      return occurs(lhs) || occurs(rhs);
-    }
-
-    public Boolean visitIndexedIdentifierProxy
-      (final IndexedIdentifierProxy ident)
-      throws VisitorException
-    {
-      final List<SimpleExpressionProxy> indexes = ident.getIndexes();
-      for (final SimpleExpressionProxy index : indexes) {
-        if (occurs(index)) {
-          return true;
-        }
-      }
-      return false;
-    }
-
-    public Boolean visitQualifiedIdentifierProxy
-      (final QualifiedIdentifierProxy ident)
-      throws VisitorException
-    {
-      final IdentifierProxy base = ident.getBaseIdentifier();
-      final Boolean occbase = (Boolean) base.acceptVisitor(this);
-      if (occbase) {
-        return occbase;
-      }
-      final IdentifierProxy comp = ident.getComponentIdentifier();
-      return (Boolean) comp.acceptVisitor(this);
-    }
-
-    public Boolean visitSimpleExpressionProxy
-      (final SimpleExpressionProxy expr)
-    {
-      return false;
-    }
-
-    public Boolean visitUnaryExpressionProxy
-      (final UnaryExpressionProxy expr)
-      throws VisitorException
-    {
-      final SimpleExpressionProxy subterm = expr.getSubTerm();
-      return occurs(subterm);
-    }
-
-    //#######################################################################
-    //# Data Members
-    private SimpleExpressionProxy mVarName;
-
-  }
-
-
-  //#########################################################################
-  //# Inner Class SubstitutionVisitor
-  private class SubstitutionVisitor
-    extends AbstractModuleProxyVisitor
-  {
-
-    //#######################################################################
-    //# Invocation
-    SimpleExpressionProxy substitute(final SimpleExpressionProxy expr,
-                                     final SimpleExpressionProxy varname,
-                                     final SimpleExpressionProxy replacement)
-    {
-      try {
-        mVarName = varname;
-        mReplacement = replacement;
-        return substitute(expr);
-      } catch (final VisitorException exception) {
-        throw exception.getRuntimeException();
-      } finally {
-        mVarName = null;
-        mReplacement = null;
-      }
-    }
-
-    //#######################################################################
-    //# Auxiliary Methods
-    private SimpleExpressionProxy substitute(final SimpleExpressionProxy expr)
-      throws VisitorException
-    {
-      if (expr.equalsByContents(mVarName)) {
-        return mReplacement;
-      } else {
-        return (SimpleExpressionProxy) expr.acceptVisitor(this);
-      }
-    }
-
-    //#######################################################################
-    //# Interface net.sourceforge.waters.model.module.ModuleProxyVisitor
-    public SimpleExpressionProxy visitBinaryExpressionProxy
-      (final BinaryExpressionProxy expr)
-      throws VisitorException
-    {
-      final SimpleExpressionProxy oldlhs = expr.getLeft();
-      final SimpleExpressionProxy newlhs = substitute(oldlhs);
-      final SimpleExpressionProxy oldrhs = expr.getRight();
-      final SimpleExpressionProxy newrhs = substitute(oldrhs);
-      if (oldlhs != newlhs || oldrhs != newrhs) {
-        final BinaryOperator op = expr.getOperator();
-        return mFactory.createBinaryExpressionProxy(op, newlhs, newrhs);
-      } else {
-        return expr;
-      }
-    }
-
-    public SimpleExpressionProxy visitIndexedIdentifierProxy
-      (final IndexedIdentifierProxy ident)
-      throws VisitorException
-    {
-      boolean change = false;
-      final List<SimpleExpressionProxy> oldindexes = ident.getIndexes();
-      final int size = oldindexes.size();
-      final List<SimpleExpressionProxy> newindexes =
-        new ArrayList<SimpleExpressionProxy>(size);
-      for (final SimpleExpressionProxy oldindex : oldindexes) {
-        final SimpleExpressionProxy newindex = substitute(oldindex);
-        newindexes.add(newindex);
-        change |= (oldindex != newindex);
-      }
-      if (change) {
-        final String name = ident.getName();
-        return mFactory.createIndexedIdentifierProxy(name, newindexes);
-      } else {
-        return ident;
-      }
-    }
-
-    public SimpleExpressionProxy visitQualifiedIdentifierProxy
-      (final QualifiedIdentifierProxy ident)
-      throws VisitorException
-    {
-      final IdentifierProxy oldbase = ident.getBaseIdentifier();
-      final IdentifierProxy newbase =
-        (IdentifierProxy) oldbase.acceptVisitor(this);
-      final IdentifierProxy oldcomp = ident.getComponentIdentifier();
-      final IdentifierProxy newcomp =
-        (IdentifierProxy) oldcomp.acceptVisitor(this);
-      if (oldbase != newbase || oldcomp != newcomp) {
-        return mFactory.createQualifiedIdentifierProxy(newbase, newcomp);
-      } else {
-        return ident;
-      }
-    }
-
-    public SimpleExpressionProxy visitSimpleExpressionProxy
-      (final SimpleExpressionProxy expr)
-    {
-      return expr;
-    }
-
-    public SimpleExpressionProxy visitUnaryExpressionProxy
-      (final UnaryExpressionProxy expr)
-      throws VisitorException
-    {
-      final SimpleExpressionProxy oldsubterm = expr.getSubTerm();
-      final SimpleExpressionProxy newsubterm = substitute(oldsubterm);
-      if (oldsubterm != newsubterm) {
-        final UnaryOperator op = expr.getOperator();
-        return mFactory.createUnaryExpressionProxy(op, newsubterm);
-      } else {
-        return expr;
-      }
-    }
-
-    //#######################################################################
-    //# Data Members
-    private SimpleExpressionProxy mVarName;
-    private SimpleExpressionProxy mReplacement;
-
-  }
-
-
-  //#########################################################################
   //# Data Members
   private final ModuleProxyFactory mFactory;
   private final CompilerOperatorTable mOperatorTable;
   private final SimpleExpressionCompiler mSimpleExpressionCompiler;
   private final DNFConverter mDNFConverter;
   private final EFAVariableMap mVariableMap;
-  private final OccursCheckVisitor mOccursCheckVisitor;
-  private final SubstitutionVisitor mSubstitutionVisitor;
 
+  private BindingContext mRootContext;
   private boolean mIsFalse;
   private Collection<SimpleExpressionProxy> mOpenLiterals;
   private List<BinaryExpressionProxy> mProcessedEquations;

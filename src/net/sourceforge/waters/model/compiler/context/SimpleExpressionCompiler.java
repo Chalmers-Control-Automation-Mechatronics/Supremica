@@ -37,7 +37,7 @@ import net.sourceforge.waters.model.module.UnaryExpressionProxy;
 public class SimpleExpressionCompiler
   extends AbstractSimpleExpressionSimplifier
 {
- 
+
   //#########################################################################
   //# Constructors
   public SimpleExpressionCompiler(final ModuleProxyFactory factory,
@@ -45,7 +45,7 @@ public class SimpleExpressionCompiler
   {
     this(factory, optable, optable.getExpressionComparator());
   }
-    
+
   public SimpleExpressionCompiler
     (final ModuleProxyFactory factory,
      final CompilerOperatorTable optable,
@@ -316,7 +316,7 @@ public class SimpleExpressionCompiler
       throws UndefinedIdentifierException
     {
       if (mNumPrimes > 0) {
-        // Do not lookup names in primed subexpression! 
+        // Do not lookup names in primed subexpression!
         final ModuleProxyCloner cloner = getCloner();
         return (SimpleExpressionProxy) cloner.getClone(ident);
       }

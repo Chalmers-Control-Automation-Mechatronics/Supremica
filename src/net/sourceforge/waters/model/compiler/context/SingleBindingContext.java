@@ -1,43 +1,54 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
 //# PROJECT: Waters
-//# PACKAGE: net.sourceforge.waters.model.compiler.instance
-//# CLASS:   ForeachBindingContext
+//# PACKAGE: net.sourceforge.waters.model.compiler.context
+//# CLASS:   SingleBindingContext
 //###########################################################################
 //# $Id$
 //###########################################################################
 
 
-package net.sourceforge.waters.model.compiler.instance;
+package net.sourceforge.waters.model.compiler.context;
 
-import net.sourceforge.waters.model.compiler.context.BindingContext;
-import net.sourceforge.waters.model.compiler.context.ModuleBindingContext;
 import net.sourceforge.waters.model.module.IdentifierProxy;
+import net.sourceforge.waters.model.module.ModuleProxyFactory;
 import net.sourceforge.waters.model.module.SimpleExpressionProxy;
 import net.sourceforge.waters.model.module.SimpleIdentifierProxy;
 
 
 /**
- * A binding context constructed when compiling a foreach block.
- * A foreach binding context consists of a single name and bound value,
- * representing the index variable of the foreach block and its current
- * value, and a reference to an enclosing context that may contain
- * further bindings.
+ * <P>A binding context that binds a single variable to an expression.</P>
+ *
+ * <P>A single-variable binding context consists of an expression
+ * representing a single variable name and a bound value, plus a reference
+ * to an enclosing context that may contain further bindings.</P>
+ *
+ * <P>This binding context is used to bind the index variable of a forach
+ * block in the instance compiler, or to bind values to EFA variable in the
+ * EFA compiler.</P>
  *
  * @see BindingContext
  * @author Robi Malik
  */
 
-public class ForeachBindingContext implements BindingContext
+public class SingleBindingContext implements BindingContext
 {
 
   //#########################################################################
   //# Constructors
-  ForeachBindingContext(final String name,
-                        final SimpleExpressionProxy value,
-                        final BindingContext parent)
+  public SingleBindingContext(final ModuleProxyFactory factory,
+                              final String name,
+                              final SimpleExpressionProxy value,
+                              final BindingContext parent)
   {
-    mBoundName = name;
+    this(factory.createSimpleIdentifierProxy(name), value, parent);
+  }
+
+  public SingleBindingContext(final SimpleExpressionProxy varname,
+                              final SimpleExpressionProxy value,
+                              final BindingContext parent)
+  {
+    mBoundVariableName = varname;
     mBoundValue = value;
     mParent = parent;
   }
@@ -48,12 +59,7 @@ public class ForeachBindingContext implements BindingContext
   public SimpleExpressionProxy getBoundExpression
     (final SimpleExpressionProxy ident)
   {
-    if (!(ident instanceof SimpleIdentifierProxy)) {
-      return mParent.getBoundExpression(ident);
-    }
-    final SimpleIdentifierProxy simple = (SimpleIdentifierProxy) ident;
-    final String name = simple.getName();
-    if (mBoundName.equals(name)) {
+    if (mBoundVariableName.equalsByContents(ident)) {
       return mBoundValue;
     } else {
       return mParent.getBoundExpression(ident);
@@ -62,13 +68,12 @@ public class ForeachBindingContext implements BindingContext
 
   public boolean isEnumAtom(final IdentifierProxy ident)
   {
-    if (ident instanceof SimpleIdentifierProxy) {
-      final SimpleIdentifierProxy simple = (SimpleIdentifierProxy) ident;
-      if (simple.getName().equals(mBoundName)) {
-        return false;
-      }
+    if (ident instanceof SimpleIdentifierProxy &&
+        mBoundVariableName.equalsByContents(ident)) {
+      return false;
+    } else {
+      return mParent.isEnumAtom(ident);
     }
-    return mParent.isEnumAtom(ident);
   }
 
   public ModuleBindingContext getModuleBindingContext()
@@ -87,7 +92,7 @@ public class ForeachBindingContext implements BindingContext
 
   //#########################################################################
   //# Data Members
-  private final String mBoundName;
+  private final SimpleExpressionProxy mBoundVariableName;
   private final SimpleExpressionProxy mBoundValue;
   private final BindingContext mParent;
 
