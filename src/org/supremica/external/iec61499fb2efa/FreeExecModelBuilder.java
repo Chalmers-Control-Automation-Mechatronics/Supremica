@@ -171,11 +171,11 @@ class FreeExecModelBuilder extends ModelBuilder
 
 				if (!libraryPathBaseFile.isDirectory())
 				{
-					Logger.output(Logger.ERROR, "SequentialExecModelBuilder(): Specified library base is not a directory!: " + libraryPathBaseFile.getName());
+					Logger.output(Logger.ERROR, "FreeExecModelBuilder(): Specified library base is not a directory!: " + libraryPathBaseFile.getName());
 				}
 				else if (!libraryPathBaseFile.exists())
 				{
-					Logger.output(Logger.ERROR, "SequentialExecModelBuilder(): Specified library base does not exist!: " + libraryPathBaseFile.getName());
+					Logger.output(Logger.ERROR, "FreeExecModelBuilder(): Specified library base does not exist!: " + libraryPathBaseFile.getName());
 				}
 				else
 				{
@@ -202,11 +202,11 @@ class FreeExecModelBuilder extends ModelBuilder
 
 				if (!curLibraryDir.isDirectory())
 				{
-					Logger.output(Logger.ERROR, "SequentialExecModelBuilder(): Specified library path element " + curLibraryDir.getAbsolutePath() + " is not a directory!");
+					Logger.output(Logger.ERROR, "FreeExecModelBuilder(): Specified library path element " + curLibraryDir.getAbsolutePath() + " is not a directory!");
 				}
 				else if (!curLibraryDir.exists())
 				{
-					Logger.output(Logger.ERROR, "SequentialExecModelBuilder(): Specified library path element " + curLibraryDir.getAbsolutePath() + " does not exist!");
+					Logger.output(Logger.ERROR, "FreeExecModelBuilder(): Specified library path element " + curLibraryDir.getAbsolutePath() + " does not exist!");
 				}
 				else
 				{
@@ -246,14 +246,14 @@ class FreeExecModelBuilder extends ModelBuilder
 
 	void loadSystem()
 	{
-		Logger.output("SequentialExecModelBuilder.loadSystem()");
+		Logger.output("FreeExecModelBuilder.loadSystem()");
 
 		loadSystem(systemFileName);
 	}
 
 	void analyzeSystem()
 	{
-		Logger.output("SequentialExecModelBuilder.analyzeSystem()");
+		Logger.output("FreeExecModelBuilder.analyzeSystem()");
 
 		makeEventConnectionsMap(systemFBNetwork, null, 0);
 		
@@ -274,7 +274,7 @@ class FreeExecModelBuilder extends ModelBuilder
 	
 	void buildModels()
 	{
-		Logger.output("SequentialExecModelBuilder.buildModels()");
+		Logger.output("FreeExecModelBuilder.buildModels()");
 
  		automata = new ExtendedAutomata(theSystem.getName(), expandTransitions);
 		
@@ -297,14 +297,14 @@ class FreeExecModelBuilder extends ModelBuilder
 	
 	void writeResult()
 	{
-		Logger.output("SequentialExecModelBuilder.writeResult()");
+		Logger.output("FreeExecModelBuilder.writeResult()");
 		automata.writeToFile(new File(outputFileName));
 	}
 
     private void loadSystem(String fileName)
     {
 	
-		Logger.output("SequentialExecModelBuilder.loadSystem(" + fileName + "):");		
+		Logger.output("FreeExecModelBuilder.loadSystem(" + fileName + "):");		
 		File file = getFile(fileName);
 
 		Logger.output("Loading file " + file.getName() + " from " + file.getParent(), 1);
@@ -371,7 +371,7 @@ class FreeExecModelBuilder extends ModelBuilder
 		String typeName = fb.getType();
 		String fileName = typeName + ".fbt";
 	
-		Logger.output("SequentialExecModelBuilder.loadFB(" + instanceName + ", " + fileName + "):");
+		Logger.output("FreeExecModelBuilder.loadFB(" + instanceName + ", " + fileName + "):");
 				
 		if (typeName.equals("E_RESTART"))
 		{
@@ -505,7 +505,7 @@ class FreeExecModelBuilder extends ModelBuilder
 				}
 				else
 				{
-					Logger.output(Logger.ERROR, "Error!: SequentialExecModelBuilder.loadFB(" + instanceName + ", " + fileName + "): Unsupported FB type: " + typeName);
+					Logger.output(Logger.ERROR, "Error!: FreeExecModelBuilder.loadFB(" + instanceName + ", " + fileName + "): Unsupported FB type: " + typeName);
 					Logger.output(Logger.ERROR, "Neither a Basic FB nor a Composite FB.", 1);
 					exit(1);
 				}
@@ -523,7 +523,7 @@ class FreeExecModelBuilder extends ModelBuilder
 			{
 				File curLibraryDir = (File) iter.next();
 				theFile = new File(curLibraryDir, fileName);
-				Logger.output(Logger.DEBUG, "SequentialExecModelBuilder.getFile(): Looking for file " + theFile.toString());
+				Logger.output(Logger.DEBUG, "FreeExecModelBuilder.getFile(): Looking for file " + theFile.toString());
 				if (theFile.exists())
 				{
 					break;
@@ -533,7 +533,7 @@ class FreeExecModelBuilder extends ModelBuilder
 
 		if (!theFile.exists())
 		{
-			Logger.output(Logger.ERROR, "SequentialExecModelBuilder.getFile(" + fileName + "): The file " + fileName + " does not exist in the specified libraries...");
+			Logger.output(Logger.ERROR, "FreeExecModelBuilder.getFile(" + fileName + "): The file " + fileName + " does not exist in the specified libraries...");
 			if (libraryPathList != null)
 			{
 				for (Iterator iter = libraryPathList.iterator();iter.hasNext();)
@@ -556,11 +556,11 @@ class FreeExecModelBuilder extends ModelBuilder
 	{
 		if (parentInstance == null)
 		{
-			Logger.output("SequentialExecModelBuilder.makeEventConnectionMap(System):");
+			Logger.output("FreeExecModelBuilder.makeEventConnectionMap(System):");
 		}
 		else
 		{
-			Logger.output("SequentialExecModelBuilder.makeEventConnectionMap(" + parentInstance + "):");
+			Logger.output("FreeExecModelBuilder.makeEventConnectionMap(" + parentInstance + "):");
 		}
 		
 		for (Iterator connIter = fbNetwork.getEventConnections().getConnection().iterator();
@@ -706,11 +706,11 @@ class FreeExecModelBuilder extends ModelBuilder
 	{
 		if (parentInstance == null)
 		{
-			Logger.output("SequentialExecModelBuilder.makeDataConnectionMap(System):");
+			Logger.output("FreeExecModelBuilder.makeDataConnectionMap(System):");
 		}
 		else
 		{
-			Logger.output("SequentialExecModelBuilder.makeDataConnectionMap(" + parentInstance + "):");
+			Logger.output("FreeExecModelBuilder.makeDataConnectionMap(" + parentInstance + "):");
 		}
 		if (fbNetwork.isSetDataConnections())
 		{
@@ -877,7 +877,7 @@ class FreeExecModelBuilder extends ModelBuilder
 
 	private void makeStartup()
 	{
-		Logger.output("SequentialExecModelBuilder.makeStartup():");
+		Logger.output("FreeExecModelBuilder.makeStartup():");
 
 		String fbName = restartInstance;
 		
@@ -897,7 +897,7 @@ class FreeExecModelBuilder extends ModelBuilder
 		String to = "s1"; 
 		startup.addState(to);
 		String event = "send_output_COLD_" + fbName + ";";
-		startup.addTransition(from, to, event, null, null);
+		startup.addControllableTransition(from, to, event, null, null);
 
 		if (isEventConnected(fbName,"COLD"))
 		{			
@@ -921,7 +921,7 @@ class FreeExecModelBuilder extends ModelBuilder
 			from = to;
 			to = to;
 			event = "remove_fb;";
-			startup.addTransition(from, to, event, null, null);
+			startup.addControllableTransition(from, to, event, null, null);
 
 			if (stopInstance != null)
 			{
@@ -949,7 +949,7 @@ class FreeExecModelBuilder extends ModelBuilder
 
 	private void makeInstanceQueue()
 	{
-		Logger.output("SequentialExecModelBuilder.makeInstanceQueue():");
+		Logger.output("FreeExecModelBuilder.makeInstanceQueue():");
 
 		ExtendedAutomaton instanceQueue = getNewAutomaton("Instance Queue");
 		
@@ -1026,7 +1026,7 @@ class FreeExecModelBuilder extends ModelBuilder
 
 	private void makeEventExecution()
 	{
-		Logger.output("SequentialExecModelBuilder.makeEventExecution():");
+		Logger.output("FreeExecModelBuilder.makeEventExecution():");
 
 		ExtendedAutomaton eventExecution = getNewAutomaton("Event Execution");
 
@@ -1049,7 +1049,7 @@ class FreeExecModelBuilder extends ModelBuilder
 			String event = "handle_event_" + instanceName + ";";
 			// Operation Scheduler Freedom:
 			//String guard = "current_fb == " + (Integer) basicFunctionBlocksID.get(instanceName);
-			eventExecution.addTransition(from, to, event, null, null);
+			eventExecution.addControllableTransition(from, to, event, null, null);
 
 			from = to;
 			to = "s0";
@@ -1063,7 +1063,7 @@ class FreeExecModelBuilder extends ModelBuilder
 	{
 		if (algMaxID > 0)
 		{
-			Logger.output("SequentialExecModelBuilder.makeAlgorithmExecution():");
+			Logger.output("FreeExecModelBuilder.makeAlgorithmExecution():");
 			
 			ExtendedAutomaton algorithmExecution = getNewAutomaton("Algorithm Execution");
 				
@@ -1223,7 +1223,7 @@ class FreeExecModelBuilder extends ModelBuilder
 
 	private void makeBasicFB(String fbName)
 	{	
-		Logger.output("SequentialExecModelBuilder.makeBasicFB(" + fbName + "):");
+		Logger.output("FreeExecModelBuilder.makeBasicFB(" + fbName + "):");
 	
 		makeBasicFBEventHandling(fbName);
 		makeBasicFBEventQueue(fbName);
@@ -2476,7 +2476,7 @@ class FreeExecModelBuilder extends ModelBuilder
 
 	private void printFunctionBlocksMap()
 	{
-		Logger.output(Logger.DEBUG, "SequentialExecModelBuilder.printFunctionBlocksMap():");
+		Logger.output(Logger.DEBUG, "FreeExecModelBuilder.printFunctionBlocksMap():");
 		for (Iterator iter = functionBlocks.keySet().iterator(); iter.hasNext();)
 		{
 			String curBlock = (String) iter.next();
@@ -2487,7 +2487,7 @@ class FreeExecModelBuilder extends ModelBuilder
 
 	private void printBasicFunctionBlocksMap()
 	{
-		Logger.output(Logger.DEBUG, "SequentialExecModelBuilder.printBasicFunctionBlocksMap():");
+		Logger.output(Logger.DEBUG, "FreeExecModelBuilder.printBasicFunctionBlocksMap():");
 		for (Iterator iter = basicFunctionBlocks.keySet().iterator(); iter.hasNext();)
 		{
 			String curBlock = (String) iter.next();
@@ -2500,7 +2500,7 @@ class FreeExecModelBuilder extends ModelBuilder
 
 	private void printEventsMap()
 	{
-		Logger.output(Logger.DEBUG, "SequentialExecModelBuilder.printEventsMap():");
+		Logger.output(Logger.DEBUG, "FreeExecModelBuilder.printEventsMap():");
 		for (Iterator iter = events.keySet().iterator(); iter.hasNext();)
 		{
 			String curBlock = (String) iter.next();
@@ -2519,7 +2519,7 @@ class FreeExecModelBuilder extends ModelBuilder
 
 	private void printAlgorithmsMap()
 	{
-		Logger.output(Logger.DEBUG, "SequentialExecModelBuilder.printAlgorithmsMap():");
+		Logger.output(Logger.DEBUG, "FreeExecModelBuilder.printAlgorithmsMap():");
 		for (Iterator iter = algorithms.keySet().iterator(); iter.hasNext();)
 		{
 			String curBlock = (String) iter.next();
@@ -2537,7 +2537,7 @@ class FreeExecModelBuilder extends ModelBuilder
 
 	private void printAlgorithmTextsMap()
 	{
-		Logger.output(Logger.DEBUG, "SequentialExecModelBuilder.printAlgorithmTextsMap():");
+		Logger.output(Logger.DEBUG, "FreeExecModelBuilder.printAlgorithmTextsMap():");
 		for (Iterator iter = algorithmTexts.keySet().iterator(); iter.hasNext();)
 		{
 			String curBlock = (String) iter.next();
@@ -2554,7 +2554,7 @@ class FreeExecModelBuilder extends ModelBuilder
 	
 	private void printFBTypesMap()
 	{
-		Logger.output(Logger.DEBUG, "SequentialExecModelBuilder.printFBTypesMap():");
+		Logger.output(Logger.DEBUG, "FreeExecModelBuilder.printFBTypesMap():");
 		for (Iterator iter = fbTypes.keySet().iterator(); iter.hasNext();)
 		{
 			String curBlock = (String) iter.next();
@@ -2565,7 +2565,7 @@ class FreeExecModelBuilder extends ModelBuilder
 	
 	private void printEventConnectionsMap()
 	{
-		Logger.output(Logger.DEBUG, "SequentialExecModelBuilder.printEventConnectionsMap():");
+		Logger.output(Logger.DEBUG, "FreeExecModelBuilder.printEventConnectionsMap():");
 		for (Iterator fbIter = eventConnections.keySet().iterator(); fbIter.hasNext();)
 		{
 			String curBlock = (String) fbIter.next();
@@ -2582,7 +2582,7 @@ class FreeExecModelBuilder extends ModelBuilder
 	
 	private void printDataConnectionsMap()
 	{
-		Logger.output(Logger.DEBUG, "SequentialExecModelBuilder.printDataConnectionsMap():");
+		Logger.output(Logger.DEBUG, "FreeExecModelBuilder.printDataConnectionsMap():");
 		for (Iterator fbIter = dataConnections.keySet().iterator(); fbIter.hasNext();)
 		{
 			String curBlock = (String) fbIter.next();

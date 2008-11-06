@@ -65,6 +65,7 @@ import net.sourceforge.waters.model.module.*;
 import net.sourceforge.waters.subject.base.ListSubject;
 import net.sourceforge.waters.subject.module.*;
 import net.sourceforge.waters.xsd.base.EventKind;
+import net.sourceforge.waters.xsd.module.ScopeKind;
 
 
 public class ExtendedAutomata
@@ -99,59 +100,38 @@ public class ExtendedAutomata
 		return module;
 	}
 
-	public void addEvent(String name)
+	public void addEvent(final String name)
 	{
-		addEvent(name,"controllable");
+		addEvent(name,"cu");
 	}
 	
-	public void addEvent(String name, String kind)
+	public void addEvent(final String name, final String kind)
 	{
-        final SimpleIdentifierProxy ident =
-            factory.createSimpleIdentifierProxy(name);
-		if (kind.equals("controllable")) {
-			module.getEventDeclListModifiable().add
-                (factory.createEventDeclProxy(ident, EventKind.CONTROLLABLE));
-		} else if (kind.equals("uncontrollable")) {
-			module.getEventDeclListModifiable().add
-                (factory.createEventDeclProxy(ident,
-                                              EventKind.UNCONTROLLABLE));
+        if (!containsEvent(name)) {
+			final SimpleIdentifierProxy ident =
+				factory.createSimpleIdentifierProxy(name);
+			if (kind.equals("co")) {
+				module.getEventDeclListModifiable().add
+					(factory.createEventDeclProxy(ident,EventKind.CONTROLLABLE,true,ScopeKind.LOCAL,null,null));
+			} 
+			else if (kind.equals("uo")) 
+			{
+				module.getEventDeclListModifiable().add
+					(factory.createEventDeclProxy(ident,EventKind.UNCONTROLLABLE,true,ScopeKind.LOCAL,null,null));
+			}
+			else if (kind.equals("cu")) 
+			{
+				module.getEventDeclListModifiable().add
+					(factory.createEventDeclProxy(ident,EventKind.CONTROLLABLE,false,ScopeKind.LOCAL,null,null));
+			}
+			else if (kind.equals("uu")) 
+			{
+				module.getEventDeclListModifiable().add
+					(factory.createEventDeclProxy(ident,EventKind.UNCONTROLLABLE,false,ScopeKind.LOCAL,null,null));
+			}
 		}
 	}
 
-	public void addAutomaton(ExtendedAutomaton automaton)
-	{
-		module.getComponentListModifiable().add(automaton.getComponent());
-	}
-
-
-	public void writeToFile(File file)
-	{
-
-		if (expand)
-		{
-			ExtendedAutomataExpander.expandTransitions(module);
-		}
-
-		Logger.output("ExtendedAutomata.writeToFile(): Writing model file: " + file.getName());
-
-		try
-		{
-			JAXBModuleMarshaller marshaller = new JAXBModuleMarshaller(factory, CompilerOperatorTable.getInstance());	
-			marshaller.marshal(module, file);
-		}
-		catch (Exception e)
-		{
-			e.printStackTrace();
-		}
-	}
-
-
-    //######################################################################
-    //# Event Declarations
-    /**
-     * Checks whether the underlying module contains an event with the
-     * given name.
-     */
     boolean containsEvent(final String name)
     {
         for (final EventDeclProxy decl : module.getEventDeclList()) {
@@ -162,33 +142,40 @@ public class ExtendedAutomata
         return false;
     }
 
-    /**
-     * Adds an unobservable uncontrollable event with the given name to the
-     * underlying module if not yet present.
-     */
-    void includeEvent(final String name)
-    {
-        if (!containsEvent(name)) {
-            final SimpleIdentifierProxy ident =
-                factory.createSimpleIdentifierProxy(name);
-            final EventDeclSubject decl =
-                factory.createEventDeclProxy(ident, EventKind.UNCONTROLLABLE);
-            module.getEventDeclListModifiable().add(decl);
-        }
-    }
+//     void includeEvent(final String name)
+//     {
+//         if (!containsEvent(name)) {
+//             final SimpleIdentifierProxy ident =
+//                 factory.createSimpleIdentifierProxy(name);
+//             final EventDeclSubject decl =
+//                 factory.createEventDeclProxy(ident, EventKind.CONTROLLABLE,true,ScopeKind.LOCAL,null,null);
+//             module.getEventDeclListModifiable().add(decl);
+//         }
+//     }
 
-    /**
-     * Adds an controllable event with the given name to the underlying
-     * module if not yet present.
-     */
-    void includeControllableEvent(final String name)
-    {
-        if (!containsEvent(name)) {
-            final SimpleIdentifierProxy ident =
-                factory.createSimpleIdentifierProxy(name);
-            final EventDeclSubject decl =
-                factory.createEventDeclProxy(ident, EventKind.CONTROLLABLE);
-            module.getEventDeclListModifiable().add(decl);
-        }
-    }
+	public void addAutomaton(ExtendedAutomaton automaton)
+	{
+		module.getComponentListModifiable().add(automaton.getComponent());
+	}
+
+	public void writeToFile(File file)
+	{
+		
+		if (expand)
+		{
+			ExtendedAutomataExpander.expandTransitions(module);
+		}
+		
+		Logger.output("ExtendedAutomata.writeToFile(): Writing model file: " + file.getName());
+		
+		try
+		{
+			JAXBModuleMarshaller marshaller = new JAXBModuleMarshaller(factory, CompilerOperatorTable.getInstance());	
+			marshaller.marshal(module, file);
+		}
+		catch (Exception e)
+		{
+			e.printStackTrace();
+		}
+	}
 }

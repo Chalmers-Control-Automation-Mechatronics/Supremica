@@ -77,7 +77,7 @@ class ModelMaker
 					}
 					else if (args[i + 1].equals("f"))
 					{
-						arguments.put("execModel", "freeseq");
+						arguments.put("execModel", "free");
 					}
                 }
             }
