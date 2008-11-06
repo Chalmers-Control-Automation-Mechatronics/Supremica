@@ -43,7 +43,7 @@ public class DOPnative {
 	//-------------------------------------------------------------------------
 	public final static String RESOURCE = "RESOURCE";
 	public final static String BOOK = "b";				//booking of zones
-	public final static String FREE = "f";				//zone free
+	public final static String FREE = "u";				//zone free
 	
 	//-------------------------------------------------------------------------
 	//Attribute types used by algorithm

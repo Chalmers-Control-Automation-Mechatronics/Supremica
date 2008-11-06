@@ -106,12 +106,6 @@ public class ILInfoWindow
     	super( TITLE );
     	
     	setDefaultCloseOperation( JFrame.DISPOSE_ON_CLOSE );
-    	
-    	//SOC icon
-    	this.setIconImage(Toolkit.getDefaultToolkit().
-  			  getImage(SOCFrame.class.getClass().
-  				   getResource("/icons/processeditor/icon.gif")));
-    	
     	getContentPane().setLayout( new BorderLayout() );
     	
     	//display error message

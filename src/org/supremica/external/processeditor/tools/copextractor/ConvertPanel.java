@@ -37,25 +37,31 @@ import net.sourceforge.waters.subject.module.ModuleSubjectFactory;
 
 import javax.swing.SwingWorker;
 
+import org.supremica.external.processeditor.xgraph.Graph;
+import org.supremica.external.processeditor.xgraph.GraphScrollPane;
 import org.supremica.external.processeditor.xml.Loader;
+import org.supremica.external.processeditor.processgraph.eopcell.EOPInfoWindow;
+import org.supremica.external.processeditor.processgraph.ilcell.ILInfoWindow;
+import org.supremica.external.processeditor.processgraph.resrccell.ResourceCell;
 
 import org.supremica.external.avocades.COPBuilder;
 
 import org.supremica.gui.ide.IDE;
 import org.supremica.external.processeditor.SOCGraphContainer;
 import org.supremica.external.processeditor.SOCFileFilter;
+
+
 import javax.xml.bind.JAXBException;
 
 import org.xml.sax.SAXException;
 
-public class ConvertPanel 
-					extends 
-					    JPanel 
-							implements 
-							    ActionListener,
-							    MouseListener
+/**
+ * 
+ * @author David Millares
+ */
+public class ConvertPanel extends JPanel implements ActionListener,
+                                                    MouseListener
 {
-	
 	private static final String XML_EXTENSION = ".xml";
 	private static final String WATER_MODULE_EXTENSION = ".wmod";
 	
@@ -79,7 +85,9 @@ public class ConvertPanel
     
     private JFileChooser fcOutput;
     
-    //constructor
+    /**
+     * Default constructor
+     */
     public ConvertPanel() {
         super( new BorderLayout() );
         
@@ -682,12 +690,6 @@ public class ConvertPanel
 		}
 	}
     
-    
-    
-    
-    
-    
-    
     /*=========================================================================
 	/* MouseListenere
 	/*=======================================================================*/
@@ -707,7 +709,27 @@ public class ConvertPanel
 		    	
 		    	//Open file in SOC
 		    	if( null != filePath && 0 != filePath.length()){
-		    		container.insertResource(new File(filePath));
+		    		
+		    		Loader loader = new Loader();
+		    	    Object newObject = loader.open( new File(filePath) );
+		    		
+		    	    if (newObject instanceof ROP){
+		    	    	if (null != container){
+			    			container.insertResource(newObject,
+			    					                 new File(filePath));
+			    		} else {
+			    			JFrame newFrame = ROPInfoWindow( (ROP)newObject );
+			    			newFrame.setVisible(true);
+			    		}
+		    	    } else if ( newObject instanceof EOP) {
+		    	    	EOPInfoWindow eopFrame = new EOPInfoWindow( (EOP)newObject );
+		    	    	eopFrame.setFile(new File(filePath));
+		    	    	eopFrame.setVisible(true);
+		    	    } else if ( newObject instanceof IL) {
+		    	    	ILInfoWindow ilFrame = new ILInfoWindow( (IL)newObject );
+		    	    	ilFrame.setFile(new File(filePath));
+		    	    	ilFrame.setVisible(true);
+		    	    }
 		    	}
 		    }
 		}
@@ -716,5 +738,35 @@ public class ConvertPanel
     public void mouseExited(MouseEvent e){};
     public void mousePressed(MouseEvent e){};
     public void mouseReleased(MouseEvent e){};
+    
+    /**
+     * Creates a <code>JFrame</code> that displays a graphical representation
+     * of a <code>ROP</code>
+     *  
+     * @param rop the <code>ROP</code> to be displayed
+     * @return a <code>JFrame</code> with a graphical representation of the
+     *           <code>ROP</code>
+     */
+    private JFrame ROPInfoWindow(ROP rop){
+    	
+    	ResourceCell cell = new ResourceCell( rop );
+		Graph graph = new Graph();
+		JFrame newFrame = new JFrame( rop.getId() );
+		newFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+		
+		GraphScrollPane graphScroll = new GraphScrollPane(graph);
+
+		graph.insert(cell,0);
+		cell.setPos(new Point(10, 10));
+		
+		newFrame.getContentPane().add(graphScroll,
+				                      BorderLayout.CENTER);
+		newFrame.setVisible(true);
+	
+		graph.updateLargePreferredSize();
+		newFrame.setSize( graph.getSize() );
+		
+		return newFrame;
+    }
 }
 

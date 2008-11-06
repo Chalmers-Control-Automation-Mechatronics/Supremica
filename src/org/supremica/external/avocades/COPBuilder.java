@@ -202,7 +202,11 @@ public class COPBuilder {
      * Sets the synchronization options to be used by synchronizations.
      * @param synchronizationOptions
      */
-    public void setSynchronizationOptions(SynchronizationOptions synchronizationOptions){
+    public void setSynchronizationOptions
+    (
+    	SynchronizationOptions synchronizationOptions
+    )
+    {
     	this.synchronizationOptions = synchronizationOptions;
     }
     
@@ -224,7 +228,11 @@ public class COPBuilder {
      * @param synthesizerOptions
      * @return the synthesizer options
      */
-    public SynthesizerOptions getSynthesizerOptions(SynthesizerOptions synthesizerOptions){
+    public SynthesizerOptions getSynthesizerOptions
+    (
+        SynthesizerOptions synthesizerOptions
+    )
+    {
     	return synthesizerOptions;
     }
     
@@ -281,7 +289,6 @@ public class COPBuilder {
     	
     	convAut = new ConverterILtoAutomata();
 		convAut.convertILtoAutomata( builder.getDoc() );
-		
 /*		
 		//debug code
 		try{
@@ -1302,7 +1309,7 @@ public class COPBuilder {
         Project supremicaProject = null;
         
     	//Sanity check
-    	if(null == moduleList || 0 == moduleList.size() ){
+    	if(null == moduleList || 0 == moduleList.size()){
     		return module;
     	}
     	

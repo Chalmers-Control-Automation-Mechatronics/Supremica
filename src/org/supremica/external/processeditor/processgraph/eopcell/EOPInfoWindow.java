@@ -1,6 +1,5 @@
 package org.supremica.external.processeditor.processgraph.eopcell;
 
-
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
@@ -34,8 +33,6 @@ import org.supremica.manufacturingTables.xsd.eop.ObjectFactory;
 import org.supremica.manufacturingTables.xsd.eop.InitialStateCheck;
 import org.supremica.manufacturingTables.xsd.eop.ExternalComponentValue;
 
-
-import org.supremica.external.processeditor.SOCFrame;
 import org.supremica.external.processeditor.processgraph.table.TextInputPane;
 import org.supremica.external.processeditor.xml.Loader;
 
@@ -63,7 +60,6 @@ public class EOPInfoWindow
     private EOP eop = null;
     private ExecutionOfOperationCell eopCell = null;
     
-    
     private static final String EOP_ID = "Id:";
     private static final String COMMENT = "Comment:";
     private static final String ALARMDELAY = "Alarm delay:";
@@ -90,12 +86,6 @@ public class EOPInfoWindow
     	super(TITLE);
     	
     	setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-    	
-    	//SOC icon
-    	this.setIconImage(Toolkit.getDefaultToolkit().
-  			  getImage(SOCFrame.class.getClass().
-  				   getResource("/icons/processeditor/icon.gif")));	
-    	
     	getContentPane().setLayout(new BorderLayout());
     	
     	if(eop == null){

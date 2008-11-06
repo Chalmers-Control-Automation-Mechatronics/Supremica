@@ -17,14 +17,13 @@ import org.supremica.external.processeditor.processgraph.resrccell.ResourceCell;
 
 
 /**
- * @author millares
+ * @author David Millares
  *
  */
-public class COPExtractInterface
-                              extends
-						          JFrame 
-						              implements 
-									      ActionListener
+public class COPExtractInterface extends 
+                                     JFrame
+                                 implements 
+							         ActionListener
 {
 	
 	private static final String EXIT_BUTTON_LABEL = "Done";
