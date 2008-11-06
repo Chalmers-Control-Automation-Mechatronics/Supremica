@@ -163,7 +163,22 @@ public class ExtendedAutomata
     }
 
     /**
-     * Adds a controllable event with the given name to the underlying
+     * Adds an unobservable uncontrollable event with the given name to the
+     * underlying module if not yet present.
+     */
+    void includeEvent(final String name)
+    {
+        if (!containsEvent(name)) {
+            final SimpleIdentifierProxy ident =
+                factory.createSimpleIdentifierProxy(name);
+            final EventDeclSubject decl =
+                factory.createEventDeclProxy(ident, EventKind.UNCONTROLLABLE);
+            module.getEventDeclListModifiable().add(decl);
+        }
+    }
+
+    /**
+     * Adds an controllable event with the given name to the underlying
      * module if not yet present.
      */
     void includeControllableEvent(final String name)

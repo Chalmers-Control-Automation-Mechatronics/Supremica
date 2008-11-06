@@ -164,7 +164,7 @@ class ModelMaker
         {
 			Logger.output(Logger.ERROR, "ERROR: No system file specified!");
 			Logger.output(Logger.ERROR);
-            Logger.output(Logger.ERROR, "Usage: ModelMaker [-d (debug info)] [-q (quiet)] [-p (generate models as plants)] [-e (expand transitions (deprecated))] [-im int (int var min)] [-ix int (int var max)] [-m 'd' (dual exec model (deprecated)) |  -m 'f' (free seq exec model (default)) | -m 's' (seq exec model)] [-ip int (instance q places)] [-ep int (event q places)] [-jp int (job q places (deprecated))] [-o outputFileName] [-lb libraryPathBase] [-lp libraryDirectory]... systemFile");
+            Logger.output(Logger.ERROR, "Usage: ModelMaker [-d (debug info)] [-q (quiet)] [-p (generate models as plants)] [-e (expand transitions (deprecated))] [-im int (int var min)] [-ix int (int var max)] [-m 'd' (dual exec model (deprecated)) |  -m 'f' (free exec model (default)) | -m 's' (seq exec model)] [-ip int (instance q places)] [-ep int (event q places)] [-jp int (job q places (deprecated))] [-o outputFileName] [-lb libraryPathBase] [-lp libraryDirectory]... systemFile");
             return;
         }
 		
@@ -190,10 +190,10 @@ class ModelMaker
 	{
 		ModelBuilder theBuilder;
 
-		if(arguments.get("execModel") == null || arguments.get("execModel").equals("freeseq"))
+		if(arguments.get("execModel") == null || arguments.get("execModel").equals("free"))
 		{
-			Logger.output("ModelMaker.makeModel(): Making EFA model for the free sequential execution model.");
-			theBuilder = new FreeSequentialExecModelBuilder(arguments);
+			Logger.output("ModelMaker.makeModel(): Making EFA model for the free execution model.");
+			theBuilder = new FreeExecModelBuilder(arguments);
 		}
 		else if (arguments.get("execModel").equals("seq"))
 		{

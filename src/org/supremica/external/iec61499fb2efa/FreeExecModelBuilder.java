@@ -48,7 +48,7 @@ import net.sourceforge.fuber.model.interpreters.abstractsyntax.Identifier;
 
 import net.sourceforge.fuber.xsd.libraryelement.*;
 
-class FreeSequentialExecModelBuilder extends ModelBuilder
+class FreeExecModelBuilder extends ModelBuilder
 {
 
 	// input arguments
@@ -118,7 +118,7 @@ class FreeSequentialExecModelBuilder extends ModelBuilder
 	private boolean doneInitActions = false;
 	private boolean doneInitFinish = false;
 	
-	FreeSequentialExecModelBuilder(Map<String, String> arguments)
+	FreeExecModelBuilder(Map<String, String> arguments)
 	{
 		// get arguments
 		if (arguments.get("expandTransitions") != null)
