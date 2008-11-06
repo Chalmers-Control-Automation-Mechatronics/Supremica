@@ -322,7 +322,7 @@ public class ExtendedAutomaton
 			events.add(factory.createSimpleIdentifierProxy(curEvent));
 
 			// Add event declaration to the module if needed
-            automata.includeObservableControllableEvent(curEvent);
+            automata.includeControllableEvent(curEvent);
 		}
 		LabelBlockSubject labelBlock = factory.createLabelBlockProxy(events, null);
 			
