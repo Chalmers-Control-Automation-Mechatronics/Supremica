@@ -487,7 +487,9 @@ public class EFACompiler
       throws VisitorException
     {
       final LabelBlockProxy blocked = graph.getBlockedEvents();
-      visitLabelBlockProxy(blocked);
+      if (blocked != null) {
+        visitLabelBlockProxy(blocked);
+      }
       final Collection<EdgeProxy> edges = graph.getEdges();
       visitCollection(edges);
       return null;

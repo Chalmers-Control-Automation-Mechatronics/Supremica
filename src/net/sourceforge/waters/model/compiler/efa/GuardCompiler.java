@@ -135,7 +135,7 @@ class GuardCompiler
     final BinaryOperator op = mOperatorTable.getAssigningOperator(assignment);
     final BinaryOperator assop = mOperatorTable.getAssignmentOperator();
     final SimpleExpressionProxy newexpr;
-    if (op == assop) {
+    if (assignment == assop) {
       newexpr = expr;
     } else if (op != null) {
       newexpr = mFactory.createBinaryExpressionProxy(op, ident, expr);

@@ -83,7 +83,7 @@ class EFAVariableMap {
 
   int size()
   {
-    return mMap.size();
+    return mMap == null ? 0 : mMap.size();
   }
 
   EFAVariable getVariable(final SimpleExpressionProxy varname)

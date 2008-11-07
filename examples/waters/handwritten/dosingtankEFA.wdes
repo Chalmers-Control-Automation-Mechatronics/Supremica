@@ -3,282 +3,244 @@
 <ns2:Comment></ns2:Comment>
 <EventList>
 <Event Kind="PROPOSITION" Name=":accepting"/>
-<Event Kind="CONTROLLABLE" Name="close_in_1"/>
-<Event Kind="CONTROLLABLE" Name="close_out_2"/>
-<Event Kind="CONTROLLABLE" Name="open_in_3"/>
-<Event Kind="CONTROLLABLE" Name="open_out_4"/>
-<Event Kind="UNCONTROLLABLE" Name="req_start_5"/>
-<Event Kind="UNCONTROLLABLE" Name="req_stop_6"/>
-<Event Kind="UNCONTROLLABLE" Name="s1_off_7"/>
-<Event Kind="UNCONTROLLABLE" Name="s1_on_8"/>
-<Event Kind="UNCONTROLLABLE" Name="s2_off_9"/>
-<Event Kind="UNCONTROLLABLE" Name="s2_on_10"/>
+<Event Kind="CONTROLLABLE" Name="close_in"/>
+<Event Kind="CONTROLLABLE" Name="close_out"/>
+<Event Kind="CONTROLLABLE" Name="open_in"/>
+<Event Kind="CONTROLLABLE" Name="open_out"/>
+<Event Kind="UNCONTROLLABLE" Name="req_start"/>
+<Event Kind="UNCONTROLLABLE" Name="req_stop"/>
+<Event Kind="UNCONTROLLABLE" Name="s1_off"/>
+<Event Kind="UNCONTROLLABLE" Name="s1_on"/>
+<Event Kind="UNCONTROLLABLE" Name="s2_off"/>
+<Event Kind="UNCONTROLLABLE" Name="s2_on"/>
 </EventList>
 <AutomataList>
 <Automaton Kind="SPEC" Name="InletValve">
 <EventRefList>
 <EventRef Name=":accepting"/>
-<EventRef Name="close_in_1"/>
-<EventRef Name="open_in_3"/>
+<EventRef Name="close_in"/>
+<EventRef Name="open_in"/>
 </EventRefList>
 <StateList>
-<State Initial="true" Name="InletValve(S0)">
+<State Initial="true" Name="S0">
 <EventRefList>
 <EventRef Name=":accepting"/>
 </EventRefList>
 </State>
-<State Name="InletValve(S1)"/>
+<State Name="S1"/>
 </StateList>
 <TransitionList>
-<Transition Target="InletValve(S1)" Source="InletValve(S0)" Event="open_in_3"/>
-<Transition Target="InletValve(S0)" Source="InletValve(S1)" Event="close_in_1"/>
+<Transition Target="S1" Source="S0" Event="open_in"/>
+<Transition Target="S0" Source="S1" Event="close_in"/>
 </TransitionList>
 </Automaton>
 <Automaton Kind="SPEC" Name="OutletValve">
 <EventRefList>
 <EventRef Name=":accepting"/>
-<EventRef Name="close_out_2"/>
-<EventRef Name="open_out_4"/>
+<EventRef Name="close_out"/>
+<EventRef Name="open_out"/>
 </EventRefList>
 <StateList>
-<State Initial="true" Name="OutletValve(S0)">
+<State Initial="true" Name="S0">
 <EventRefList>
 <EventRef Name=":accepting"/>
 </EventRefList>
 </State>
-<State Name="OutletValve(S1)"/>
+<State Name="S1"/>
 </StateList>
 <TransitionList>
-<Transition Target="OutletValve(S1)" Source="OutletValve(S0)" Event="open_out_4"/>
-<Transition Target="OutletValve(S0)" Source="OutletValve(S1)" Event="close_out_2"/>
-</TransitionList>
-</Automaton>
-<Automaton Kind="PLANT" Name="Plant(InletValve)">
-<EventRefList>
-<EventRef Name=":accepting"/>
-<EventRef Name="close_in_1"/>
-<EventRef Name="open_in_3"/>
-</EventRefList>
-<StateList>
-<State Initial="true" Name="InletValve(S0)">
-<EventRefList>
-<EventRef Name=":accepting"/>
-</EventRefList>
-</State>
-<State Name="InletValve(S1)"/>
-</StateList>
-<TransitionList>
-<Transition Target="InletValve(S1)" Source="InletValve(S0)" Event="open_in_3"/>
-<Transition Target="InletValve(S0)" Source="InletValve(S1)" Event="close_in_1"/>
-</TransitionList>
-</Automaton>
-<Automaton Kind="PLANT" Name="Plant(OutletValve)">
-<EventRefList>
-<EventRef Name=":accepting"/>
-<EventRef Name="close_out_2"/>
-<EventRef Name="open_out_4"/>
-</EventRefList>
-<StateList>
-<State Initial="true" Name="OutletValve(S0)">
-<EventRefList>
-<EventRef Name=":accepting"/>
-</EventRefList>
-</State>
-<State Name="OutletValve(S1)"/>
-</StateList>
-<TransitionList>
-<Transition Target="OutletValve(S1)" Source="OutletValve(S0)" Event="open_out_4"/>
-<Transition Target="OutletValve(S0)" Source="OutletValve(S1)" Event="close_out_2"/>
+<Transition Target="S1" Source="S0" Event="open_out"/>
+<Transition Target="S0" Source="S1" Event="close_out"/>
 </TransitionList>
 </Automaton>
 <Automaton Kind="PLANT" Name="Request">
 <EventRefList>
 <EventRef Name=":accepting"/>
-<EventRef Name="req_start_5"/>
-<EventRef Name="req_stop_6"/>
+<EventRef Name="req_start"/>
+<EventRef Name="req_stop"/>
 </EventRefList>
 <StateList>
-<State Initial="true" Name="Request(S0)">
+<State Initial="true" Name="S0">
 <EventRefList>
 <EventRef Name=":accepting"/>
 </EventRefList>
 </State>
-<State Name="Request(S1)"/>
+<State Name="S1"/>
 </StateList>
 <TransitionList>
-<Transition Target="Request(S1)" Source="Request(S0)" Event="req_start_5"/>
-<Transition Target="Request(S0)" Source="Request(S1)" Event="req_stop_6"/>
+<Transition Target="S1" Source="S0" Event="req_start"/>
+<Transition Target="S0" Source="S1" Event="req_stop"/>
 </TransitionList>
 </Automaton>
 <Automaton Kind="PLANT" Name="Sensor1">
 <EventRefList>
 <EventRef Name=":accepting"/>
-<EventRef Name="s1_off_7"/>
-<EventRef Name="s1_on_8"/>
+<EventRef Name="s1_off"/>
+<EventRef Name="s1_on"/>
 </EventRefList>
 <StateList>
-<State Initial="true" Name="Sensor1(S0)">
+<State Initial="true" Name="S0">
 <EventRefList>
 <EventRef Name=":accepting"/>
 </EventRefList>
 </State>
-<State Name="Sensor1(S1)"/>
+<State Name="S1"/>
 </StateList>
 <TransitionList>
-<Transition Target="Sensor1(S1)" Source="Sensor1(S0)" Event="s1_on_8"/>
-<Transition Target="Sensor1(S0)" Source="Sensor1(S1)" Event="s1_off_7"/>
+<Transition Target="S1" Source="S0" Event="s1_on"/>
+<Transition Target="S0" Source="S1" Event="s1_off"/>
 </TransitionList>
 </Automaton>
 <Automaton Kind="PLANT" Name="Sensor2">
 <EventRefList>
 <EventRef Name=":accepting"/>
-<EventRef Name="s2_off_9"/>
-<EventRef Name="s2_on_10"/>
+<EventRef Name="s2_off"/>
+<EventRef Name="s2_on"/>
 </EventRefList>
 <StateList>
-<State Initial="true" Name="Sensor2(S0)">
+<State Initial="true" Name="S0">
 <EventRefList>
 <EventRef Name=":accepting"/>
 </EventRefList>
 </State>
-<State Name="Sensor2(S1)"/>
+<State Name="S1"/>
 </StateList>
 <TransitionList>
-<Transition Target="Sensor2(S1)" Source="Sensor2(S0)" Event="s2_on_10"/>
-<Transition Target="Sensor2(S0)" Source="Sensor2(S1)" Event="s2_off_9"/>
+<Transition Target="S1" Source="S0" Event="s2_on"/>
+<Transition Target="S0" Source="S1" Event="s2_off"/>
 </TransitionList>
 </Automaton>
 <Automaton Kind="PLANT" Name="v_in">
 <EventRefList>
 <EventRef Name=":accepting"/>
-<EventRef Name="close_in_1"/>
-<EventRef Name="open_in_3"/>
-<EventRef Name="open_out_4"/>
-<EventRef Name="s1_on_8"/>
-<EventRef Name="s2_on_10"/>
+<EventRef Name="close_in"/>
+<EventRef Name="open_in"/>
+<EventRef Name="open_out"/>
+<EventRef Name="s1_on"/>
+<EventRef Name="s2_on"/>
 </EventRefList>
 <StateList>
-<State Initial="true" Name="v_in=0">
+<State Initial="true" Name="0">
 <EventRefList>
 <EventRef Name=":accepting"/>
 </EventRefList>
 </State>
-<State Name="v_in=1"/>
+<State Name="1"/>
 </StateList>
 <TransitionList>
-<Transition Target="v_in=0" Source="v_in=0" Event="close_in_1"/>
-<Transition Target="v_in=1" Source="v_in=0" Event="open_in_3"/>
-<Transition Target="v_in=0" Source="v_in=0" Event="open_out_4"/>
-<Transition Target="v_in=0" Source="v_in=1" Event="close_in_1"/>
-<Transition Target="v_in=1" Source="v_in=1" Event="open_in_3"/>
-<Transition Target="v_in=1" Source="v_in=1" Event="s1_on_8"/>
-<Transition Target="v_in=1" Source="v_in=1" Event="s2_on_10"/>
+<Transition Target="0" Source="0" Event="close_in"/>
+<Transition Target="1" Source="0" Event="open_in"/>
+<Transition Target="0" Source="0" Event="open_out"/>
+<Transition Target="0" Source="1" Event="close_in"/>
+<Transition Target="1" Source="1" Event="open_in"/>
+<Transition Target="1" Source="1" Event="s1_on"/>
+<Transition Target="1" Source="1" Event="s2_on"/>
 </TransitionList>
 </Automaton>
 <Automaton Kind="PLANT" Name="v_out">
 <EventRefList>
 <EventRef Name=":accepting"/>
-<EventRef Name="close_out_2"/>
-<EventRef Name="open_in_3"/>
-<EventRef Name="open_out_4"/>
-<EventRef Name="s1_off_7"/>
-<EventRef Name="s2_off_9"/>
+<EventRef Name="close_out"/>
+<EventRef Name="open_in"/>
+<EventRef Name="open_out"/>
+<EventRef Name="s1_off"/>
+<EventRef Name="s2_off"/>
 </EventRefList>
 <StateList>
-<State Initial="true" Name="v_out=0">
+<State Initial="true" Name="0">
 <EventRefList>
 <EventRef Name=":accepting"/>
 </EventRefList>
 </State>
-<State Name="v_out=1"/>
+<State Name="1"/>
 </StateList>
 <TransitionList>
-<Transition Target="v_out=0" Source="v_out=0" Event="close_out_2"/>
-<Transition Target="v_out=0" Source="v_out=0" Event="open_in_3"/>
-<Transition Target="v_out=1" Source="v_out=0" Event="open_out_4"/>
-<Transition Target="v_out=0" Source="v_out=1" Event="close_out_2"/>
-<Transition Target="v_out=1" Source="v_out=1" Event="open_out_4"/>
-<Transition Target="v_out=1" Source="v_out=1" Event="s1_off_7"/>
-<Transition Target="v_out=1" Source="v_out=1" Event="s2_off_9"/>
+<Transition Target="0" Source="0" Event="close_out"/>
+<Transition Target="0" Source="0" Event="open_in"/>
+<Transition Target="1" Source="0" Event="open_out"/>
+<Transition Target="0" Source="1" Event="close_out"/>
+<Transition Target="1" Source="1" Event="open_out"/>
+<Transition Target="1" Source="1" Event="s1_off"/>
+<Transition Target="1" Source="1" Event="s2_off"/>
 </TransitionList>
 </Automaton>
 <Automaton Kind="PLANT" Name="v_req">
 <EventRefList>
 <EventRef Name=":accepting"/>
-<EventRef Name="open_in_3"/>
-<EventRef Name="open_out_4"/>
-<EventRef Name="req_start_5"/>
-<EventRef Name="req_stop_6"/>
+<EventRef Name="open_in"/>
+<EventRef Name="open_out"/>
+<EventRef Name="req_start"/>
+<EventRef Name="req_stop"/>
 </EventRefList>
 <StateList>
-<State Initial="true" Name="v_req=0">
+<State Initial="true" Name="0">
 <EventRefList>
 <EventRef Name=":accepting"/>
 </EventRefList>
 </State>
-<State Name="v_req=1"/>
+<State Name="1"/>
 </StateList>
 <TransitionList>
-<Transition Target="v_req=1" Source="v_req=0" Event="req_start_5"/>
-<Transition Target="v_req=0" Source="v_req=0" Event="req_stop_6"/>
-<Transition Target="v_req=1" Source="v_req=1" Event="open_in_3"/>
-<Transition Target="v_req=1" Source="v_req=1" Event="open_out_4"/>
-<Transition Target="v_req=1" Source="v_req=1" Event="req_start_5"/>
-<Transition Target="v_req=0" Source="v_req=1" Event="req_stop_6"/>
+<Transition Target="1" Source="0" Event="req_start"/>
+<Transition Target="0" Source="0" Event="req_stop"/>
+<Transition Target="1" Source="1" Event="open_in"/>
+<Transition Target="1" Source="1" Event="open_out"/>
+<Transition Target="1" Source="1" Event="req_start"/>
+<Transition Target="0" Source="1" Event="req_stop"/>
 </TransitionList>
 </Automaton>
 <Automaton Kind="PLANT" Name="v_s1">
 <EventRefList>
 <EventRef Name=":accepting"/>
-<EventRef Name="close_out_2"/>
-<EventRef Name="open_in_3"/>
-<EventRef Name="s1_off_7"/>
-<EventRef Name="s1_on_8"/>
-<EventRef Name="s2_on_10"/>
+<EventRef Name="close_out"/>
+<EventRef Name="open_in"/>
+<EventRef Name="s1_off"/>
+<EventRef Name="s1_on"/>
+<EventRef Name="s2_on"/>
 </EventRefList>
 <StateList>
-<State Initial="true" Name="v_s1=0">
+<State Initial="true" Name="0">
 <EventRefList>
 <EventRef Name=":accepting"/>
 </EventRefList>
 </State>
-<State Name="v_s1=1"/>
+<State Name="1"/>
 </StateList>
 <TransitionList>
-<Transition Target="v_s1=0" Source="v_s1=0" Event="close_out_2"/>
-<Transition Target="v_s1=0" Source="v_s1=0" Event="open_in_3"/>
-<Transition Target="v_s1=0" Source="v_s1=0" Event="s1_off_7"/>
-<Transition Target="v_s1=1" Source="v_s1=0" Event="s1_on_8"/>
-<Transition Target="v_s1=0" Source="v_s1=1" Event="s1_off_7"/>
-<Transition Target="v_s1=1" Source="v_s1=1" Event="s1_on_8"/>
-<Transition Target="v_s1=1" Source="v_s1=1" Event="s2_on_10"/>
+<Transition Target="0" Source="0" Event="close_out"/>
+<Transition Target="0" Source="0" Event="open_in"/>
+<Transition Target="0" Source="0" Event="s1_off"/>
+<Transition Target="1" Source="0" Event="s1_on"/>
+<Transition Target="0" Source="1" Event="s1_off"/>
+<Transition Target="1" Source="1" Event="s1_on"/>
+<Transition Target="1" Source="1" Event="s2_on"/>
 </TransitionList>
 </Automaton>
 <Automaton Kind="PLANT" Name="v_s2">
 <EventRefList>
 <EventRef Name=":accepting"/>
-<EventRef Name="close_in_1"/>
-<EventRef Name="open_out_4"/>
-<EventRef Name="s1_off_7"/>
-<EventRef Name="s2_off_9"/>
-<EventRef Name="s2_on_10"/>
+<EventRef Name="close_in"/>
+<EventRef Name="open_out"/>
+<EventRef Name="s1_off"/>
+<EventRef Name="s2_off"/>
+<EventRef Name="s2_on"/>
 </EventRefList>
 <StateList>
-<State Initial="true" Name="v_s2=0">
+<State Initial="true" Name="0">
 <EventRefList>
 <EventRef Name=":accepting"/>
 </EventRefList>
 </State>
-<State Name="v_s2=1"/>
+<State Name="1"/>
 </StateList>
 <TransitionList>
-<Transition Target="v_s2=0" Source="v_s2=0" Event="s1_off_7"/>
-<Transition Target="v_s2=0" Source="v_s2=0" Event="s2_off_9"/>
-<Transition Target="v_s2=1" Source="v_s2=0" Event="s2_on_10"/>
-<Transition Target="v_s2=1" Source="v_s2=1" Event="close_in_1"/>
-<Transition Target="v_s2=1" Source="v_s2=1" Event="open_out_4"/>
-<Transition Target="v_s2=0" Source="v_s2=1" Event="s2_off_9"/>
-<Transition Target="v_s2=1" Source="v_s2=1" Event="s2_on_10"/>
+<Transition Target="0" Source="0" Event="s1_off"/>
+<Transition Target="0" Source="0" Event="s2_off"/>
+<Transition Target="1" Source="0" Event="s2_on"/>
+<Transition Target="1" Source="1" Event="close_in"/>
+<Transition Target="1" Source="1" Event="open_out"/>
+<Transition Target="0" Source="1" Event="s2_off"/>
+<Transition Target="1" Source="1" Event="s2_on"/>
 </TransitionList>
 </Automaton>
 </AutomataList>

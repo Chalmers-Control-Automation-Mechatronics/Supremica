@@ -5,69 +5,69 @@
 <ns2:Comment>A model of a simple nim game. Five sticks are on the table, and two players take it in turn to pick up one or two sticks.</ns2:Comment>
 <EventList>
 <Event Kind="PROPOSITION" Name=":accepting"/>
-<Event Kind="CONTROLLABLE" Name="player1_remove_one_1"/>
-<Event Kind="CONTROLLABLE" Name="player1_remove_two_2"/>
-<Event Kind="UNCONTROLLABLE" Name="player2_remove_one_3"/>
-<Event Kind="UNCONTROLLABLE" Name="player2_remove_two_4"/>
+<Event Kind="CONTROLLABLE" Name="player1_remove_one"/>
+<Event Kind="CONTROLLABLE" Name="player1_remove_two"/>
+<Event Kind="UNCONTROLLABLE" Name="player2_remove_one"/>
+<Event Kind="UNCONTROLLABLE" Name="player2_remove_two"/>
 </EventList>
 <AutomataList>
 <Automaton Kind="PLANT" Name="Two_players">
 <EventRefList>
 <EventRef Name=":accepting"/>
-<EventRef Name="player1_remove_one_1"/>
-<EventRef Name="player1_remove_two_2"/>
-<EventRef Name="player2_remove_one_3"/>
-<EventRef Name="player2_remove_two_4"/>
+<EventRef Name="player1_remove_one"/>
+<EventRef Name="player1_remove_two"/>
+<EventRef Name="player2_remove_one"/>
+<EventRef Name="player2_remove_two"/>
 </EventRefList>
 <StateList>
-<State Initial="true" Name="Two_players(player1)"/>
-<State Name="Two_players(player2)">
+<State Initial="true" Name="player1"/>
+<State Name="player2">
 <EventRefList>
 <EventRef Name=":accepting"/>
 </EventRefList>
 </State>
 </StateList>
 <TransitionList>
-<Transition Target="Two_players(player2)" Source="Two_players(player1)" Event="player1_remove_one_1"/>
-<Transition Target="Two_players(player2)" Source="Two_players(player1)" Event="player1_remove_two_2"/>
-<Transition Target="Two_players(player1)" Source="Two_players(player2)" Event="player2_remove_one_3"/>
-<Transition Target="Two_players(player1)" Source="Two_players(player2)" Event="player2_remove_two_4"/>
+<Transition Target="player2" Source="player1" Event="player1_remove_one"/>
+<Transition Target="player2" Source="player1" Event="player1_remove_two"/>
+<Transition Target="player1" Source="player2" Event="player2_remove_one"/>
+<Transition Target="player1" Source="player2" Event="player2_remove_two"/>
 </TransitionList>
 </Automaton>
 <Automaton Kind="PLANT" Name="sticks">
 <EventRefList>
-<EventRef Name="player1_remove_one_1"/>
-<EventRef Name="player1_remove_two_2"/>
-<EventRef Name="player2_remove_one_3"/>
-<EventRef Name="player2_remove_two_4"/>
+<EventRef Name="player1_remove_one"/>
+<EventRef Name="player1_remove_two"/>
+<EventRef Name="player2_remove_one"/>
+<EventRef Name="player2_remove_two"/>
 </EventRefList>
 <StateList>
-<State Name="sticks=0"/>
-<State Name="sticks=1"/>
-<State Name="sticks=2"/>
-<State Name="sticks=3"/>
-<State Name="sticks=4"/>
-<State Initial="true" Name="sticks=5"/>
+<State Name="0"/>
+<State Name="1"/>
+<State Name="2"/>
+<State Name="3"/>
+<State Name="4"/>
+<State Initial="true" Name="5"/>
 </StateList>
 <TransitionList>
-<Transition Target="sticks=0" Source="sticks=1" Event="player1_remove_one_1"/>
-<Transition Target="sticks=0" Source="sticks=1" Event="player2_remove_one_3"/>
-<Transition Target="sticks=1" Source="sticks=2" Event="player1_remove_one_1"/>
-<Transition Target="sticks=0" Source="sticks=2" Event="player1_remove_two_2"/>
-<Transition Target="sticks=1" Source="sticks=2" Event="player2_remove_one_3"/>
-<Transition Target="sticks=0" Source="sticks=2" Event="player2_remove_two_4"/>
-<Transition Target="sticks=2" Source="sticks=3" Event="player1_remove_one_1"/>
-<Transition Target="sticks=1" Source="sticks=3" Event="player1_remove_two_2"/>
-<Transition Target="sticks=2" Source="sticks=3" Event="player2_remove_one_3"/>
-<Transition Target="sticks=1" Source="sticks=3" Event="player2_remove_two_4"/>
-<Transition Target="sticks=3" Source="sticks=4" Event="player1_remove_one_1"/>
-<Transition Target="sticks=2" Source="sticks=4" Event="player1_remove_two_2"/>
-<Transition Target="sticks=3" Source="sticks=4" Event="player2_remove_one_3"/>
-<Transition Target="sticks=2" Source="sticks=4" Event="player2_remove_two_4"/>
-<Transition Target="sticks=4" Source="sticks=5" Event="player1_remove_one_1"/>
-<Transition Target="sticks=3" Source="sticks=5" Event="player1_remove_two_2"/>
-<Transition Target="sticks=4" Source="sticks=5" Event="player2_remove_one_3"/>
-<Transition Target="sticks=3" Source="sticks=5" Event="player2_remove_two_4"/>
+<Transition Target="0" Source="1" Event="player1_remove_one"/>
+<Transition Target="0" Source="1" Event="player2_remove_one"/>
+<Transition Target="1" Source="2" Event="player1_remove_one"/>
+<Transition Target="0" Source="2" Event="player1_remove_two"/>
+<Transition Target="1" Source="2" Event="player2_remove_one"/>
+<Transition Target="0" Source="2" Event="player2_remove_two"/>
+<Transition Target="2" Source="3" Event="player1_remove_one"/>
+<Transition Target="1" Source="3" Event="player1_remove_two"/>
+<Transition Target="2" Source="3" Event="player2_remove_one"/>
+<Transition Target="1" Source="3" Event="player2_remove_two"/>
+<Transition Target="3" Source="4" Event="player1_remove_one"/>
+<Transition Target="2" Source="4" Event="player1_remove_two"/>
+<Transition Target="3" Source="4" Event="player2_remove_one"/>
+<Transition Target="2" Source="4" Event="player2_remove_two"/>
+<Transition Target="4" Source="5" Event="player1_remove_one"/>
+<Transition Target="3" Source="5" Event="player1_remove_two"/>
+<Transition Target="4" Source="5" Event="player2_remove_one"/>
+<Transition Target="3" Source="5" Event="player2_remove_two"/>
 </TransitionList>
 </Automaton>
 </AutomataList>
