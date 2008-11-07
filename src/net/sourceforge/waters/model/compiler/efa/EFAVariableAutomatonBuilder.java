@@ -238,6 +238,7 @@ class EFAVariableAutomatonBuilder
       curvalues = values;
     }
     boolean hastrans = false;
+    int selfloops = 0;
     if (edecl.isEventVariable(mVariable)) { 
       // In event alphabet --- transitions depend on current and next state.
       final UnaryOperator nextop = mOperatorTable.getNextOperator();
@@ -260,6 +261,13 @@ class EFAVariableAutomatonBuilder
 	  if (evalGuards(guards, nextcontext)) {
 	    createTransition(curvalue, nextvalue, event);
 	    hastrans = true;
+            if (selfloops >= 0) {
+              if (curvalue.equalsByContents(nextvalue)) {
+                selfloops++;
+              } else {
+                selfloops = -1;
+              }
+            }
 	  }
 	}
       }
@@ -271,6 +279,7 @@ class EFAVariableAutomatonBuilder
 	if (evalGuards(guards, curcontext)) {
 	  createTransition(curvalue, curvalue, event);
 	  hastrans = true;
+          selfloops++;
 	}
       }
     }
@@ -278,6 +287,10 @@ class EFAVariableAutomatonBuilder
     if (!hastrans) {
       final IdentifierProxy ident = event.createIdentifier(mFactory);
       mBlockedEvents.add(ident);
+    } else if (selfloops == range.size()) {
+      for (final SimpleExpressionProxy value : values) {
+        removeLastSelfloop(value);
+      }
     }
   }
 
@@ -343,6 +356,15 @@ class EFAVariableAutomatonBuilder
     trans.addLabel(ident);
   }
 
+  private void removeLastSelfloop(final SimpleExpressionProxy state)
+  {
+    final EFAVariableTransition trans =
+      new EFAVariableTransition(state, state);
+    final EFAVariableTransition found = mTransitions.get(trans);
+    found.removeLastTransition();
+  }
+
+
 
   //#########################################################################
   //# Inner Class EFAVariableTransition
@@ -402,6 +424,12 @@ class EFAVariableAutomatonBuilder
 	mLabels = new LinkedList<IdentifierProxy>();
       }
       mLabels.add(label);
+    }
+
+    private void removeLastTransition()
+    {
+      final int index = mLabels.size() - 1;
+      mLabels.remove(index);
     }
 
     private EdgeProxy createEdgeProxy()
