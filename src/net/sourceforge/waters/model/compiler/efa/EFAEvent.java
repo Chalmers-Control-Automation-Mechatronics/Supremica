@@ -42,6 +42,11 @@ class EFAEvent {
 
   //#########################################################################
   //# Simple Access
+  final CompiledClause getConditions()
+  {
+    return mConditions;
+  }
+
   IdentifierProxy createIdentifier(final ModuleProxyFactory factory)
   {
     final EventDeclProxy decl = mEFAEventDecl.getEventDecl();

@@ -99,6 +99,17 @@ class EFAVariableMap {
     return mMap.get(accessor);
   }
 
+  EFAVariable findVariable(final SimpleExpressionProxy varname)
+    throws UndefinedIdentifierException
+  {
+    final EFAVariable var = getVariable(varname);
+    if (var == null) {
+      throw new UndefinedIdentifierException(varname, "variable");
+    } else {
+      return var;
+    }
+  }
+
   void createVariables(final ComponentProxy comp, final CompiledRange range)
   {
     init();
@@ -114,17 +125,6 @@ class EFAVariableMap {
     final ProxyAccessor<SimpleExpressionProxy> nextaccessor =
       new ProxyAccessorByContents<SimpleExpressionProxy>(nextvarname);
     mMap.put(nextaccessor, nextvar);
-  }
-
-  void checkIdentifier(final IdentifierProxy ident)
-    throws UndefinedIdentifierException
-  {
-    init();
-    final ProxyAccessor<SimpleExpressionProxy> accessor =
-      new ProxyAccessorByContents<SimpleExpressionProxy>(ident);
-    if (!mMap.containsKey(accessor)) {
-      throw new UndefinedIdentifierException(ident, "variable");
-    }
   }
 
   Comparator<SimpleExpressionProxy> getExpressionComparator()

@@ -109,6 +109,12 @@ import net.sourceforge.waters.xsd.module.ScopeKind;
  *     event is the set of all the variables updated in some guard/action
  *     block whose edge includes the event.</LI>
  * <LI>Compute event partitionings.</LI>
+ * <LI>Assign events to variables.<BR>
+ *     The actual event alphabets of the variable automata to be generated
+ *     are computed as follows. Each variable&nbsp;<I>v</I> automaton
+ *     depends on all instances of any event whose event variable set
+ *     contains&nbsp;<I>v</I>, and furthermore on all event instances
+ *     whose associated guard mentions&nbsp;<I>v</I>.</LI>
  * <LI>Build output automata.</LI>
  * </OL>
  *
@@ -151,16 +157,19 @@ public class EFACompiler
     try {
       mRootContext = new ModuleBindingContext(mInputModule);
       // Pass 1 ...
-      final ModuleProxyVisitor pass1 = new Pass1Visitor();
+      final Pass1Visitor pass1 = new Pass1Visitor();
       mInputModule.acceptVisitor(pass1);
       // Pass 2 ...
-      final ModuleProxyVisitor pass2 = new Pass2Visitor();
+      final Pass2Visitor pass2 = new Pass2Visitor();
       mInputModule.acceptVisitor(pass2);
       // Pass 3 ...
       computeEventPartitions();
       // Pass 4 ...
-      final ModuleProxyVisitor pass4 = new Pass4Visitor();
-      return (ModuleProxy) pass4.visitModuleProxy(mInputModule);
+      final Pass4Visitor pass4 = new Pass4Visitor();
+      pass4.assignEventsToVariables();
+      // Pass 5 ...
+      final Pass5Visitor pass5 = new Pass5Visitor();
+      return (ModuleProxy) pass5.visitModuleProxy(mInputModule);
     } catch (final VisitorException exception) {
       final Throwable cause = exception.getCause();
       if (cause instanceof EvalException) {
@@ -427,9 +436,8 @@ public class EFACompiler
       try {
         final SimpleExpressionProxy left = expr.getLeft();
         if (left instanceof IdentifierProxy) {
-          final IdentifierProxy ident = (IdentifierProxy) left;
-          mVariableMap.checkIdentifier(ident);
-          mCollectedVariables.addProxy(ident);
+          final EFAVariable var = mVariableMap.findVariable(left);
+          mCollectedVariables.add(var);
           return null;
         } else {
           throw new ActionSyntaxException(expr);
@@ -448,8 +456,7 @@ public class EFACompiler
           mCurrentGuard = mTrueGuard;
         } else {
           if (mIsUsingEventAlphabet) {
-            mCollectedVariables =
-              new ProxyAccessorHashMapByContents<IdentifierProxy>();
+            mCollectedVariables = new HashSet<EFAVariable>();
           }
           visitGuardActionBlockProxy(ga);
         }
@@ -509,7 +516,7 @@ public class EFACompiler
         if (!edecl.isBlocked()) {
           mCollectedEvents.add(edecl);
           if (mIsUsingEventAlphabet && mCollectedVariables != null) {
-            edecl.addVariables(mCollectedVariables.values());
+            edecl.addVariables(mCollectedVariables);
           }
           if (mCurrentGuard != null) {
             edecl.addTransitions(mCurrentComponent, mCurrentGuard, ident);
@@ -550,15 +557,14 @@ public class EFACompiler
         mCurrentComponent = comp;
         mCollectedEvents = new HashSet<EFAEventDecl>(size);
         if (!mIsUsingEventAlphabet) {
-          mCollectedVariables =
-            new ProxyAccessorHashMapByContents<IdentifierProxy>();
+          mCollectedVariables = new HashSet<EFAVariable>();
         }
         final ComponentKind ckind = comp.getKind();
         final GraphProxy graph = comp.getGraph();
         visitGraphProxy(graph);
         for (final EFAEventDecl edecl : mCollectedEvents) {
           if (!mIsUsingEventAlphabet) {
-            edecl.addVariables(mCollectedVariables.values());
+            edecl.addVariables(mCollectedVariables);
           }
           final EventKind ekind = edecl.getKind();
           final EFATransitionGroup trans = edecl.getTransitionGroup(comp);
@@ -600,7 +606,7 @@ public class EFACompiler
     //#######################################################################
     //# Data Members
     private SimpleComponentProxy mCurrentComponent;
-    private ProxyAccessorMap<IdentifierProxy> mCollectedVariables;
+    private Set<EFAVariable> mCollectedVariables;
     private Set<EFAEventDecl> mCollectedEvents;
     private CompiledGuard mCurrentGuard;
   }
@@ -615,8 +621,83 @@ public class EFACompiler
   {
 
     //#######################################################################
+    //# Invocation
+    private void assignEventsToVariables()
+    {
+      try {
+        final Collection<EFAEventDecl> edecls = mEFAEventDeclMap.values();
+        for (final EFAEventDecl edecl : edecls) {
+          for (final EFAVariable var : edecl.getVariables()) {
+            var.addEvents(edecl);
+          }
+        }
+        for (final EFAEventDecl edecl : edecls) {
+          for (final EFAEvent event : edecl.getEvents()) {
+            mCurrentEvent = event;
+            final CompiledClause conditions = event.getConditions();
+            for (final SimpleExpressionProxy cond : conditions.getLiterals()) {
+              cond.acceptVisitor(this);
+            }
+          }
+        }
+      } catch (final VisitorException exception) {
+        throw exception.getRuntimeException();
+      } finally {
+        mCurrentEvent = null;
+      }
+    }
+
+    //#######################################################################
+    //# Interface net.sourceforge.waters.model.module.ModuleProxyVisitor
+    public Object visitBinaryExpressionProxy
+      (final BinaryExpressionProxy expr)
+      throws VisitorException
+    {
+      final SimpleExpressionProxy lhs = expr.getLeft();
+      lhs.acceptVisitor(this);
+      final SimpleExpressionProxy rhs = expr.getRight();
+      return rhs.acceptVisitor(this);
+    }
+
+    public Object visitIdentifierProxy(final IdentifierProxy ident)
+    {
+      final EFAVariable var = mVariableMap.getVariable(ident);
+      if (var != null) {
+        var.addEvent(mCurrentEvent);
+      }
+      return null;
+    }
+
+    public Object visitSimpleExpressionProxy(final SimpleExpressionProxy expr)
+    {
+      return null;
+    }
+
+    public Object visitUnaryExpressionProxy(final UnaryExpressionProxy expr)
+      throws VisitorException
+    {
+      final SimpleExpressionProxy subterm = expr.getSubTerm();
+      return subterm.acceptVisitor(this);
+    }
+
+    //#######################################################################
+    //# Data Members
+    private EFAEvent mCurrentEvent;
+
+  }
+
+
+  //#########################################################################
+  //# Inner Class Pass5Visitor
+  /**
+   * The visitor implementing the fifth pass of EFA compilation.
+   */
+  private class Pass5Visitor extends AbstractModuleProxyVisitor
+  {
+
+    //#######################################################################
     //# Constructor
-    private Pass4Visitor()
+    private Pass5Visitor()
     {
       mCloner = mFactory.getCloner();
     }

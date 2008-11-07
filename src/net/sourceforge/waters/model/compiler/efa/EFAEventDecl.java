@@ -11,10 +11,10 @@ package net.sourceforge.waters.model.compiler.efa;
 
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
-import net.sourceforge.waters.model.base.ProxyAccessorMap;
-import net.sourceforge.waters.model.base.ProxyAccessorHashMapByContents;
 import net.sourceforge.waters.model.compiler.dnf.CompiledClause;
 import net.sourceforge.waters.model.module.EventDeclProxy;
 import net.sourceforge.waters.model.module.IdentifierProxy;
@@ -44,7 +44,7 @@ class EFAEventDecl {
   EFAEventDecl(final EventDeclProxy decl)
   {
     mEventDecl = decl;
-    mVariables = new ProxyAccessorHashMapByContents<IdentifierProxy>();
+    mVariables = new HashSet<EFAVariable>();
     mTransitionMap = new HashMap<SimpleComponentProxy,EFATransitionGroup>();
     mEventMap = new HashMap<CompiledClause,EFAEvent>();
   }
@@ -90,6 +90,21 @@ class EFAEventDecl {
     return mTransitionMap.values();
   }
 
+  Collection<EFAVariable> getVariables()
+  {
+    return mVariables;
+  }
+
+  void addVariable(final EFAVariable var)
+  {
+    mVariables.add(var);
+  }
+
+  void addVariables(final Collection<EFAVariable> vars)
+  {
+    mVariables.addAll(vars);
+  }
+
   EFAEvent getEvent(final CompiledClause cond)
   {
     return mEventMap.get(cond);
@@ -103,16 +118,6 @@ class EFAEventDecl {
   Collection<EFAEvent> getEvents()
   {
     return mEventMap.values();
-  }
-
-  void addVariable(final IdentifierProxy ident)
-  {
-    mVariables.addProxy(ident);
-  }
-
-  void addVariables(final Collection<? extends IdentifierProxy> idents)
-  {
-    mVariables.addAll(idents);
   }
 
   void addTransitions(final SimpleComponentProxy comp,
@@ -147,10 +152,12 @@ class EFAEventDecl {
   private final EventDeclProxy mEventDecl;
   /**
    * The <I>event variable set</I>, consisting of all the variables
-   * whose value may change when this event occurs.
+   * whose value may change when this event occurs. This set contains
+   * only the EFA variable objects for the current state of the
+   * concerned variables.
    * @see {@link EFACompiler}.
    */
-  private final ProxyAccessorMap<IdentifierProxy> mVariables;
+  private final Set<EFAVariable> mVariables;
   /**
    * The map that assigns to each automaton ({@link SimpleComponentProxy})
    * the collection of transitions of this event that are to be associated

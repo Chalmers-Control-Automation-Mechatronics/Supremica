@@ -9,6 +9,11 @@
 
 package net.sourceforge.waters.model.compiler.efa;
 
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Set;
+
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
 import net.sourceforge.waters.model.compiler.context.CompiledRange;
 import net.sourceforge.waters.model.expr.UnaryOperator;
@@ -44,6 +49,13 @@ class EFAVariable implements Comparable<EFAVariable> {
       mVariableName = factory.createUnaryExpressionProxy(nextop, ident);
     } else {
       mVariableName = ident;
+    }
+    if (mIsNext) {
+      mEventList = null;
+      mEventSet = null;
+    } else {
+      mEventList = new LinkedList<EFAEvent>();
+      mEventSet = new HashSet<EFAEvent>();
     }
   }
 
@@ -87,6 +99,25 @@ class EFAVariable implements Comparable<EFAVariable> {
     return mRange;
   }
 
+  List<EFAEvent> getEFAEvents()
+  {
+    return mEventList;
+  }
+
+  void addEvents(final EFAEventDecl edecl)
+  {
+    for (final EFAEvent event : edecl.getEvents()) {
+      addEvent(event);
+    }
+  }
+
+  void addEvent(final EFAEvent event)
+  {
+    if (mEventSet.add(event)) {
+      mEventList.add(event);
+    }
+  }
+    
 
   //#########################################################################
   //# Data Members
@@ -94,5 +125,7 @@ class EFAVariable implements Comparable<EFAVariable> {
   private final ComponentProxy mComponent;
   private final CompiledRange mRange;
   private final SimpleExpressionProxy mVariableName;
+  private final List<EFAEvent> mEventList;
+  private final Set<EFAEvent> mEventSet;
 
 }
