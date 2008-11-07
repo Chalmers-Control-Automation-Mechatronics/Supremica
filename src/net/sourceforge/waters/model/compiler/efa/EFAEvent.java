@@ -42,7 +42,12 @@ class EFAEvent {
 
   //#########################################################################
   //# Simple Access
-  final CompiledClause getConditions()
+  EFAEventDecl getEFAEventDecl()
+  {
+    return mEFAEventDecl;
+  }
+
+  CompiledClause getConditions()
   {
     return mConditions;
   }

@@ -95,6 +95,11 @@ class EFAEventDecl {
     return mVariables;
   }
 
+  boolean isEventVariable(final EFAVariable var)
+  {
+    return mVariables.contains(var);
+  }
+
   void addVariable(final EFAVariable var)
   {
     mVariables.add(var);

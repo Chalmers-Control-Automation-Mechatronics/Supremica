@@ -18,6 +18,7 @@ import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 import net.sourceforge.waters.model.compiler.context.SourceInfo;
 import net.sourceforge.waters.model.compiler.context.SourceInfoBuilder;
+import net.sourceforge.waters.model.compiler.efa.EFACompiler;
 import net.sourceforge.waters.model.compiler.graph.ModuleGraphCompiler;
 import net.sourceforge.waters.model.compiler.instance.ModuleInstanceCompiler;
 import net.sourceforge.waters.model.expr.EvalException;
@@ -64,7 +65,9 @@ public class ThreePassCompiler
     final boolean efa = pass1.getHasGuardActionBlocks();
     final ModuleProxy step2;
     if (efa && mIsExpandingEFATransitions) {
-      throw new EvalException("EFA compilation not yet implemented!");
+      final EFACompiler pass2 =
+        new EFACompiler(modfactory, mSourceInfoBuilder, step1);
+      step2 = pass2.compile();
     } else {
       step2 = step1;
     }

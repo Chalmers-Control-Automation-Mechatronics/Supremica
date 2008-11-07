@@ -27,7 +27,6 @@ import net.sourceforge.waters.model.base.ProxyAccessorHashMapByContents;
 import net.sourceforge.waters.model.base.ProxyAccessorMap;
 import net.sourceforge.waters.model.base.VisitorException;
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
-import net.sourceforge.waters.model.compiler.context.BindingContext;
 import net.sourceforge.waters.model.compiler.context.CompiledEnumRange;
 import net.sourceforge.waters.model.compiler.context.CompiledRange;
 import net.sourceforge.waters.model.compiler.context.
@@ -36,7 +35,6 @@ import net.sourceforge.waters.model.compiler.context.
   UndefinedIdentifierException;
 import net.sourceforge.waters.model.compiler.context.ModuleBindingContext;
 import net.sourceforge.waters.model.compiler.context.SimpleExpressionCompiler;
-import net.sourceforge.waters.model.compiler.context.SingleBindingContext;
 import net.sourceforge.waters.model.compiler.context.SourceInfoBuilder;
 import net.sourceforge.waters.model.compiler.dnf.CompiledClause;
 import net.sourceforge.waters.model.expr.BinaryOperator;
@@ -65,7 +63,6 @@ import net.sourceforge.waters.model.module.SimpleIdentifierProxy;
 import net.sourceforge.waters.model.module.SimpleNodeProxy;
 import net.sourceforge.waters.model.module.UnaryExpressionProxy;
 import net.sourceforge.waters.model.module.VariableComponentProxy;
-import net.sourceforge.waters.model.module.VariableMarkingProxy;
 
 import net.sourceforge.waters.xsd.base.ComponentKind;
 import net.sourceforge.waters.xsd.base.EventKind;
@@ -702,6 +699,10 @@ public class EFACompiler
     private Pass5Visitor()
     {
       mCloner = mFactory.getCloner();
+      mVariableAutomatonBuilder =
+        new EFAVariableAutomatonBuilder(mFactory, mOperatorTable,
+                                        mSimpleExpressionCompiler,
+                                        mRootContext);
     }
 
     //#######################################################################
@@ -909,90 +910,24 @@ public class EFACompiler
       throws VisitorException
     {
       try {
-        final IdentifierProxy ident0 = comp.getIdentifier();
-        final IdentifierProxy ident1 =
-          (IdentifierProxy) mCloner.getClone(ident0);
-        final EFAVariable var = mVariableMap.getVariable(ident0);
-        mBlockedEvents = new LinkedList<IdentifierProxy>();
-        constructVariableRange(comp, var);
-        return null;
+        final IdentifierProxy ident = comp.getIdentifier();
+        final EFAVariable var = mVariableMap.getVariable(ident);
+        final SimpleComponentProxy result =
+          mVariableAutomatonBuilder.constructSimpleComponent(comp, var);
+        mComponents.add(result);
+        return result;
       } catch (final EvalException exception) {
         throw wrap(exception);
-      } finally {
-        mBlockedEvents = null;
-        mNodeList = null;
-        mVariableNodeMap = null;
       }
     }
 
-    //#######################################################################
-    //# Construction of Variable Automata
-    private void constructVariableRange(final VariableComponentProxy comp,
-                                        final EFAVariable var)
-      throws EvalException
-    {
-      final IdentifierProxy varname = comp.getIdentifier();
-      final SimpleExpressionProxy initpred = comp.getInitialStatePredicate();
-      final List<VariableMarkingProxy> markings = comp.getVariableMarkings();
-      final int nummarkings = markings.size();
-      final Set<IdentifierProxy> blocked =
-        new HashSet<IdentifierProxy>(nummarkings);
-      for (final VariableMarkingProxy marking : markings) {
-        final IdentifierProxy prop = marking.getProposition();
-        blocked.add(prop);
-      }
-      final List<IdentifierProxy> props =
-        new ArrayList<IdentifierProxy>(nummarkings);
-      final CompiledRange range = var.getRange();
-      final int rangesize = range.size();
-      mNodeList = new ArrayList<NodeProxy>(rangesize);
-      mVariableNodeMap =
-        new HashMap<ProxyAccessor<SimpleExpressionProxy>,SimpleNodeProxy>
-        (rangesize);
-      for (final SimpleExpressionProxy value : range.getValues()) {
-        final String name = value.toString();
-        final BindingContext context =
-          new SingleBindingContext(varname, value, mRootContext);
-        final SimpleExpressionProxy initval =
-          mSimpleExpressionCompiler.eval(initpred, context);
-        final boolean initial =
-          mSimpleExpressionCompiler.getBooleanValue(initval);
-        for (final VariableMarkingProxy marking : markings) {
-          final SimpleExpressionProxy pred = marking.getPredicate();
-          final SimpleExpressionProxy predval =
-            mSimpleExpressionCompiler.eval(pred, context);
-          if (mSimpleExpressionCompiler.getBooleanValue(predval)) {
-            final IdentifierProxy prop = marking.getProposition();
-            props.add(prop);
-            blocked.remove(prop);
-          }
-        }
-        final PlainEventListProxy elist =
-          props.isEmpty() ? null : mFactory.createPlainEventListProxy(props);
-        final SimpleNodeProxy node = mFactory.createSimpleNodeProxy
-          (name, elist, initial, null, null, null);
-        mNodeList.add(node);
-        final ProxyAccessor<SimpleExpressionProxy> accessor =
-          new ProxyAccessorByContents<SimpleExpressionProxy>(value);
-        mVariableNodeMap.put(accessor, node);
-        props.clear();
-      }
-      if (!blocked.isEmpty()) {
-        for (final VariableMarkingProxy marking : markings) {
-          final IdentifierProxy prop = marking.getProposition();
-          if (blocked.contains(prop)) {
-            mBlockedEvents.add(prop);
-          }
-        }
-      }        
-    }
 
     //#######################################################################
     //# Data Members
     private final ModuleProxyCloner mCloner;
+    private final EFAVariableAutomatonBuilder mVariableAutomatonBuilder;
 
     private List<EventDeclProxy> mEventDeclarations;
-
     private List<SimpleComponentProxy> mComponents;
     private SimpleComponentProxy mCurrentComponent;
     private Set<EFAEvent> mEFAAlphabet;
@@ -1002,9 +937,6 @@ public class EFACompiler
     private List<IdentifierProxy> mLabelList;
     private boolean mInBlockedEventsList;
 
-    private List<IdentifierProxy> mBlockedEvents;
-    private Map<ProxyAccessor<SimpleExpressionProxy>,SimpleNodeProxy>
-      mVariableNodeMap;
   }
 
 
