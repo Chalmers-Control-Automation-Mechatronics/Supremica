@@ -307,8 +307,8 @@ public class EFACompiler
 
   //#########################################################################
   //# Auxiliary Methods
-  private void insertEvent(final IdentifierProxy ident,
-                           final EFAEventDecl edecl)
+  private void insertEventDecl(final IdentifierProxy ident,
+                               final EFAEventDecl edecl)
     throws DuplicateIdentifierException
   {
     final ProxyAccessor<IdentifierProxy> accessor =
@@ -320,12 +320,17 @@ public class EFACompiler
     }
   }
 
-  private EFAEventDecl findEvent(final IdentifierProxy ident)
-    throws UndefinedIdentifierException
+  private EFAEventDecl getEventDecl(final IdentifierProxy ident)
   {
     final ProxyAccessor<IdentifierProxy> accessor =
       new ProxyAccessorByContents<IdentifierProxy>(ident);
-    final EFAEventDecl edecl = mEFAEventDeclMap.get(accessor);
+    return mEFAEventDeclMap.get(accessor);
+  }
+
+  private EFAEventDecl findEventDecl(final IdentifierProxy ident)
+    throws UndefinedIdentifierException
+  {
+    final EFAEventDecl edecl = getEventDecl(ident);
     if (edecl == null) {
       throw new UndefinedIdentifierException(ident, "event");
     } else {
@@ -476,7 +481,7 @@ public class EFACompiler
       try {
         final IdentifierProxy ident = decl.getIdentifier();
         final EFAEventDecl edecl = new EFAEventDecl(decl);
-        insertEvent(ident, edecl);
+        insertEventDecl(ident, edecl);
         return edecl;
       } catch (final DuplicateIdentifierException exception) {
         throw wrap(exception);
@@ -513,7 +518,7 @@ public class EFACompiler
       throws VisitorException
     {
       try {
-        final EFAEventDecl edecl = findEvent(ident);
+        final EFAEventDecl edecl = findEventDecl(ident);
         if (!edecl.isBlocked()) {
           mCollectedEvents.add(edecl);
           if (mIsUsingEventAlphabet && mCollectedVariables != null) {
@@ -714,7 +719,7 @@ public class EFACompiler
     {
       try {
         final IdentifierProxy ident = decl.getIdentifier();
-        final EFAEventDecl edecl = findEvent(ident);
+        final EFAEventDecl edecl = findEventDecl(ident);
         final EventKind kind = edecl.getKind();
         final boolean observable = edecl.isObservable();
         for (final EFAEvent event : edecl.getEvents()) {
@@ -818,7 +823,7 @@ public class EFACompiler
     {
       Collection<EFAEvent> events = mEFAEventMap.get(ident);
       if (events == null) {
-        final EFAEventDecl edecl = mEFAEventDeclMap.get(ident);
+        final EFAEventDecl edecl = getEventDecl(ident);
         events = edecl.getEvents();
       }
       for (final EFAEvent event : events) {

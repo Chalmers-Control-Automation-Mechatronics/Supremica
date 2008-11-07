@@ -4,149 +4,149 @@
   xmlns="http://waters.sourceforge.net/xsd/des">
 <ns2:Comment></ns2:Comment>
 <EventList>
-<Event Kind="CONTROLLABLE" Name="a_2"/>
-<Event Kind="CONTROLLABLE" Name="a_1"/>
-<Event Kind="CONTROLLABLE" Name="b_3"/>
-<Event Kind="CONTROLLABLE" Name="b_5"/>
-<Event Kind="CONTROLLABLE" Name="b_4"/>
+<Event Kind="CONTROLLABLE" Name="a.{x==2}"/>
+<Event Kind="CONTROLLABLE" Name="a.{X==0}"/>
+<Event Kind="CONTROLLABLE" Name="b.{X==2}"/>
+<Event Kind="CONTROLLABLE" Name="b.{y==0}"/>
+<Event Kind="CONTROLLABLE" Name="b.{Y==2}"/>
 </EventList>
 <AutomataList>
 <Automaton Kind="PLANT" Name="C1">
 <EventRefList>
-<EventRef Name="a_2"/>
-<EventRef Name="a_1"/>
-<EventRef Name="b_3"/>
-<EventRef Name="b_5"/>
-<EventRef Name="b_4"/>
+<EventRef Name="a.{x==2}"/>
+<EventRef Name="a.{X==0}"/>
+<EventRef Name="b.{X==2}"/>
+<EventRef Name="b.{y==0}"/>
+<EventRef Name="b.{Y==2}"/>
 </EventRefList>
 <StateList>
-<State Initial="true" Name="C1(s0)"/>
-<State Name="C1(s1)"/>
-<State Name="C1(s2)"/>
+<State Initial="true" Name="s0"/>
+<State Name="s1"/>
+<State Name="s2"/>
 </StateList>
 <TransitionList>
-<Transition Target="C1(s1)" Source="C1(s0)" Event="a_2"/>
-<Transition Target="C1(s1)" Source="C1(s0)" Event="a_1"/>
-<Transition Target="C1(s2)" Source="C1(s1)" Event="b_3"/>
-<Transition Target="C1(s2)" Source="C1(s1)" Event="b_5"/>
-<Transition Target="C1(s2)" Source="C1(s1)" Event="b_4"/>
+<Transition Target="s1" Source="s0" Event="a.{x==2}"/>
+<Transition Target="s1" Source="s0" Event="a.{X==0}"/>
+<Transition Target="s2" Source="s1" Event="b.{X==2}"/>
+<Transition Target="s2" Source="s1" Event="b.{y==0}"/>
+<Transition Target="s2" Source="s1" Event="b.{Y==2}"/>
 </TransitionList>
 </Automaton>
 <Automaton Kind="PLANT" Name="C2">
 <EventRefList>
-<EventRef Name="b_3"/>
-<EventRef Name="b_5"/>
-<EventRef Name="b_4"/>
+<EventRef Name="b.{X==2}"/>
+<EventRef Name="b.{y==0}"/>
+<EventRef Name="b.{Y==2}"/>
 </EventRefList>
 <StateList>
-<State Initial="true" Name="C2(s0)"/>
-<State Name="C2(s1)"/>
+<State Initial="true" Name="s0"/>
+<State Name="s1"/>
 </StateList>
 <TransitionList>
-<Transition Target="C2(s1)" Source="C2(s0)" Event="b_3"/>
-<Transition Target="C2(s1)" Source="C2(s0)" Event="b_5"/>
-<Transition Target="C2(s1)" Source="C2(s0)" Event="b_4"/>
+<Transition Target="s1" Source="s0" Event="b.{X==2}"/>
+<Transition Target="s1" Source="s0" Event="b.{y==0}"/>
+<Transition Target="s1" Source="s0" Event="b.{Y==2}"/>
 </TransitionList>
 </Automaton>
 <Automaton Kind="PLANT" Name="GlobalVariables">
 <EventRefList>
-<EventRef Name="a_2"/>
-<EventRef Name="a_1"/>
-<EventRef Name="b_3"/>
-<EventRef Name="b_5"/>
-<EventRef Name="b_4"/>
+<EventRef Name="a.{x==2}"/>
+<EventRef Name="a.{X==0}"/>
+<EventRef Name="b.{X==2}"/>
+<EventRef Name="b.{y==0}"/>
+<EventRef Name="b.{Y==2}"/>
 </EventRefList>
 <StateList>
-<State Initial="true" Name="GlobalVariables(IDLE)"/>
+<State Initial="true" Name="IDLE"/>
 </StateList>
 <TransitionList>
-<Transition Target="GlobalVariables(IDLE)" Source="GlobalVariables(IDLE)" Event="a_2"/>
-<Transition Target="GlobalVariables(IDLE)" Source="GlobalVariables(IDLE)" Event="a_1"/>
-<Transition Target="GlobalVariables(IDLE)" Source="GlobalVariables(IDLE)" Event="b_3"/>
-<Transition Target="GlobalVariables(IDLE)" Source="GlobalVariables(IDLE)" Event="b_5"/>
-<Transition Target="GlobalVariables(IDLE)" Source="GlobalVariables(IDLE)" Event="b_4"/>
+<Transition Target="IDLE" Source="IDLE" Event="a.{x==2}"/>
+<Transition Target="IDLE" Source="IDLE" Event="a.{X==0}"/>
+<Transition Target="IDLE" Source="IDLE" Event="b.{X==2}"/>
+<Transition Target="IDLE" Source="IDLE" Event="b.{y==0}"/>
+<Transition Target="IDLE" Source="IDLE" Event="b.{Y==2}"/>
 </TransitionList>
 </Automaton>
 <Automaton Kind="PLANT" Name="X">
 <EventRefList>
-<EventRef Name="a_1"/>
-<EventRef Name="b_3"/>
-<EventRef Name="b_5"/>
-<EventRef Name="b_4"/>
+<EventRef Name="a.{X==0}"/>
+<EventRef Name="b.{X==2}"/>
+<EventRef Name="b.{y==0}"/>
+<EventRef Name="b.{Y==2}"/>
 </EventRefList>
 <StateList>
-<State Initial="true" Name="X=0"/>
-<State Name="X=1"/>
-<State Name="X=2"/>
+<State Initial="true" Name="0"/>
+<State Name="1"/>
+<State Name="2"/>
 </StateList>
 <TransitionList>
-<Transition Target="X=0" Source="X=0" Event="a_1"/>
-<Transition Target="X=2" Source="X=0" Event="b_5"/>
-<Transition Target="X=2" Source="X=0" Event="b_4"/>
-<Transition Target="X=2" Source="X=1" Event="b_5"/>
-<Transition Target="X=2" Source="X=1" Event="b_4"/>
-<Transition Target="X=2" Source="X=2" Event="b_3"/>
-<Transition Target="X=2" Source="X=2" Event="b_5"/>
-<Transition Target="X=2" Source="X=2" Event="b_4"/>
+<Transition Target="0" Source="0" Event="a.{X==0}"/>
+<Transition Target="2" Source="0" Event="b.{y==0}"/>
+<Transition Target="2" Source="0" Event="b.{Y==2}"/>
+<Transition Target="2" Source="1" Event="b.{y==0}"/>
+<Transition Target="2" Source="1" Event="b.{Y==2}"/>
+<Transition Target="2" Source="2" Event="b.{X==2}"/>
+<Transition Target="2" Source="2" Event="b.{y==0}"/>
+<Transition Target="2" Source="2" Event="b.{Y==2}"/>
 </TransitionList>
 </Automaton>
 <Automaton Kind="PLANT" Name="Y">
 <EventRefList>
-<EventRef Name="a_2"/>
-<EventRef Name="a_1"/>
-<EventRef Name="b_4"/>
+<EventRef Name="a.{x==2}"/>
+<EventRef Name="a.{X==0}"/>
+<EventRef Name="b.{Y==2}"/>
 </EventRefList>
 <StateList>
-<State Initial="true" Name="Y=0"/>
-<State Name="Y=1"/>
-<State Name="Y=2"/>
+<State Initial="true" Name="0"/>
+<State Name="1"/>
+<State Name="2"/>
 </StateList>
 <TransitionList>
-<Transition Target="Y=1" Source="Y=0" Event="a_2"/>
-<Transition Target="Y=1" Source="Y=0" Event="a_1"/>
-<Transition Target="Y=1" Source="Y=1" Event="a_2"/>
-<Transition Target="Y=1" Source="Y=1" Event="a_1"/>
-<Transition Target="Y=1" Source="Y=2" Event="a_2"/>
-<Transition Target="Y=1" Source="Y=2" Event="a_1"/>
-<Transition Target="Y=2" Source="Y=2" Event="b_4"/>
+<Transition Target="1" Source="0" Event="a.{x==2}"/>
+<Transition Target="1" Source="0" Event="a.{X==0}"/>
+<Transition Target="1" Source="1" Event="a.{x==2}"/>
+<Transition Target="1" Source="1" Event="a.{X==0}"/>
+<Transition Target="1" Source="2" Event="a.{x==2}"/>
+<Transition Target="1" Source="2" Event="a.{X==0}"/>
+<Transition Target="2" Source="2" Event="b.{Y==2}"/>
 </TransitionList>
 </Automaton>
 <Automaton Kind="PLANT" Name="x">
 <EventRefList>
-<EventRef Name="a_2"/>
-<EventRef Name="a_1"/>
+<EventRef Name="a.{x==2}"/>
+<EventRef Name="a.{X==0}"/>
 </EventRefList>
 <StateList>
-<State Initial="true" Name="x=0"/>
-<State Name="x=1"/>
-<State Name="x=2"/>
+<State Initial="true" Name="0"/>
+<State Name="1"/>
+<State Name="2"/>
 </StateList>
 <TransitionList>
-<Transition Target="x=1" Source="x=0" Event="a_1"/>
-<Transition Target="x=1" Source="x=1" Event="a_1"/>
-<Transition Target="x=1" Source="x=2" Event="a_2"/>
-<Transition Target="x=1" Source="x=2" Event="a_1"/>
+<Transition Target="1" Source="0" Event="a.{X==0}"/>
+<Transition Target="1" Source="1" Event="a.{X==0}"/>
+<Transition Target="1" Source="2" Event="a.{x==2}"/>
+<Transition Target="1" Source="2" Event="a.{X==0}"/>
 </TransitionList>
 </Automaton>
 <Automaton Kind="PLANT" Name="y">
 <EventRefList>
-<EventRef Name="b_3"/>
-<EventRef Name="b_5"/>
-<EventRef Name="b_4"/>
+<EventRef Name="b.{X==2}"/>
+<EventRef Name="b.{y==0}"/>
+<EventRef Name="b.{Y==2}"/>
 </EventRefList>
 <StateList>
-<State Initial="true" Name="y=0"/>
-<State Name="y=1"/>
-<State Name="y=2"/>
+<State Initial="true" Name="0"/>
+<State Name="1"/>
+<State Name="2"/>
 </StateList>
 <TransitionList>
-<Transition Target="y=2" Source="y=0" Event="b_3"/>
-<Transition Target="y=2" Source="y=0" Event="b_5"/>
-<Transition Target="y=2" Source="y=0" Event="b_4"/>
-<Transition Target="y=2" Source="y=1" Event="b_3"/>
-<Transition Target="y=2" Source="y=1" Event="b_4"/>
-<Transition Target="y=2" Source="y=2" Event="b_3"/>
-<Transition Target="y=2" Source="y=2" Event="b_4"/>
+<Transition Target="2" Source="0" Event="b.{X==2}"/>
+<Transition Target="2" Source="0" Event="b.{y==0}"/>
+<Transition Target="2" Source="0" Event="b.{Y==2}"/>
+<Transition Target="2" Source="1" Event="b.{X==2}"/>
+<Transition Target="2" Source="1" Event="b.{Y==2}"/>
+<Transition Target="2" Source="2" Event="b.{X==2}"/>
+<Transition Target="2" Source="2" Event="b.{Y==2}"/>
 </TransitionList>
 </Automaton>
 </AutomataList>
