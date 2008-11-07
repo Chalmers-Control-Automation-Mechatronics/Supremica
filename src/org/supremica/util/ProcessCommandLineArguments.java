@@ -118,9 +118,10 @@ import org.xml.sax.SAXException;
 public class ProcessCommandLineArguments
 {
     /**
-     * Processes an array of arguments. Returns a list of files to be opened on startup.
+     * Processes an array of arguments. Returns a list of files to be
+     * opened on startup.
      */
-    public static List<File> process(String[] args) throws GeometryAbsentException
+    public static List<File> process(String[] args)
     {
         boolean quit = false;
         boolean verbose = false;
@@ -428,14 +429,15 @@ public class ProcessCommandLineArguments
                     {
                         System.err.println("Problem unmarshalling: " + ex);
                     }
+                    catch (final GeometryAbsentException ex)
+                    {
+                        System.err.println
+                            ("Trying to print component without geometry!");
+                    }
                     catch (ClassCastException ex)
                     {
                         System.err.println("Only import of modules is supported: " + ex);
                     }                   
-                    //catch (VisitorException ex)
-                    //{
-                    //    System.err.println("Problems when visiting module: " + ex);
-                    //}                   
                 }
 
                 // Quit after this (even if there were no files)
