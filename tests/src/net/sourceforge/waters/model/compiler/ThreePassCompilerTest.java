@@ -246,6 +246,12 @@ public class ThreePassCompilerTest
     compile("handwritten", "sensoractuator1");
   }
 
+  public void testCompile_sensoractuator2()
+    throws IOException, WatersException
+  {
+    compile("handwritten", "sensoractuator1");
+  }
+
   public void testCompile_sensoractuator_nondet()
     throws IOException, WatersException
   {
