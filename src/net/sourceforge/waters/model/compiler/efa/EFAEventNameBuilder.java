@@ -14,10 +14,11 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.TreeMap;
 
 import net.sourceforge.waters.model.base.VisitorException;
 import net.sourceforge.waters.model.compiler.dnf.CompiledClause;
@@ -47,6 +48,8 @@ class EFAEventNameBuilder {
                       final Comparator<SimpleExpressionProxy> comparator)
   {
     mComparator = comparator;
+    mAllLiterals = null;
+    mAllClauses = null;
     mRoot = null;
   }
 
@@ -55,20 +58,34 @@ class EFAEventNameBuilder {
   //# Invocation
   void restart()
   {
-    mRoot = new NameTreeNode();
+    mAllLiterals = new HashMap<CountedLiteral,CountedLiteral>();
+    mAllClauses = new LinkedList<List<CountedLiteral>>();
+    mRoot = null;
   }
 
   void addClause(final CompiledClause clause)
   {
-    final List<SimpleExpressionProxy> list = getSortedList(clause);
-    final Iterator<SimpleExpressionProxy> iter = list.iterator();
-    mRoot.add(iter);
+    final int size = clause.size();
+    final List<CountedLiteral> cclause = new ArrayList<CountedLiteral>(size);
+    for (final SimpleExpressionProxy literal : clause.getLiterals()) {
+      final CountedLiteral counted = createCountedLiteral(literal);
+      counted.addOccurrence();
+      cclause.add(counted);
+    }
+    mAllClauses.add(cclause);
   }
 
   String getNameSuffix(final CompiledClause clause)
   {
-    final List<SimpleExpressionProxy> list = getSortedList(clause);
-    final Iterator<SimpleExpressionProxy> iter = list.iterator();
+    buildTree();
+    final int size = clause.size();
+    final List<CountedLiteral> cclause = new ArrayList<CountedLiteral>(size);
+    for (final SimpleExpressionProxy literal : clause.getLiterals()) {
+      final CountedLiteral counted = getCountedLiteral(literal);
+      cclause.add(counted);
+    }
+    Collections.sort(cclause);
+    final Iterator<CountedLiteral> iter = cclause.iterator();
     final StringWriter writer = new StringWriter();
     final ModuleProxyPrinter printer = new ModuleProxyPrinter(writer);
     mRoot.print(printer, iter, true);
@@ -81,20 +98,122 @@ class EFAEventNameBuilder {
 
   void clear()
   {
+    mAllLiterals = null;
+    mAllClauses = null;
     mRoot = null;
+    mScratch = null;
   }
 
 
   //#########################################################################
   //# Auxiliary Methods
-  private List<SimpleExpressionProxy> getSortedList
-    (final CompiledClause clause)
+  private void buildTree()
   {
-    final Collection<SimpleExpressionProxy> collection = clause.getLiterals();
-    final List<SimpleExpressionProxy> list =
-      new ArrayList<SimpleExpressionProxy>(collection);
-    Collections.sort(list, mComparator);
-    return list;
+    if (mRoot == null) {
+      mRoot = new NameTreeNode();
+      for (final List<CountedLiteral> cclause : mAllClauses) {
+        Collections.sort(cclause);
+        final Iterator<CountedLiteral> iter = cclause.iterator();
+        mRoot.add(iter);
+      }
+      mAllClauses = null;
+    }
+  }
+
+  private CountedLiteral createCountedLiteral
+    (final SimpleExpressionProxy literal)
+  {
+    final CountedLiteral test = createTempLiteral(literal);
+    final CountedLiteral found = mAllLiterals.get(test);
+    if (found == null) {
+      mScratch = null;
+      mAllLiterals.put(test, test);
+      return test;
+    } else {
+      return found;
+    }    
+  }
+
+  private CountedLiteral getCountedLiteral(final SimpleExpressionProxy literal)
+  {
+    final CountedLiteral test = createTempLiteral(literal);
+    return mAllLiterals.get(test);
+  }
+
+  private CountedLiteral createTempLiteral(final SimpleExpressionProxy literal)
+  {
+    if (mScratch == null) {
+      mScratch = new CountedLiteral(literal);
+    } else {
+      mScratch.init(literal);
+    }
+    return mScratch;
+  }
+
+
+  //#########################################################################
+  //# Inner Class CountedLiteral
+  private class CountedLiteral implements Comparable<CountedLiteral>
+  {
+
+    //#######################################################################
+    //# Constructor
+    private CountedLiteral(final SimpleExpressionProxy literal)
+    {
+      mLiteral = literal;
+      mOccurrences = 0;
+    }
+
+    //#######################################################################
+    //# Hashing and Comparing
+    public int compareTo(final CountedLiteral counted)
+    {
+      final int result = mOccurrences - counted.mOccurrences;
+      if (result != 0) {
+        return result;
+      } else {
+        return mComparator.compare(mLiteral, counted.mLiteral);
+      }
+    }
+
+    public boolean equals(final Object other)
+    {
+      if (other != null && getClass() == other.getClass()) {
+        final CountedLiteral counted = (CountedLiteral) other;
+        return mLiteral.equalsByContents(counted.mLiteral);
+      } else {
+        return false;
+      }
+    }
+
+    public int hashCode()
+    {
+      return mLiteral.hashCodeByContents();
+    }
+
+    //#######################################################################
+    //# Simple Access
+    private void init(final SimpleExpressionProxy literal)
+    {
+      mLiteral = literal;
+      mOccurrences = 0;
+    }
+
+    private SimpleExpressionProxy getLiteral()
+    {
+      return mLiteral;
+    }
+
+    private void addOccurrence()
+    {
+      mOccurrences++;
+    }
+
+    //#######################################################################
+    //# Data Members
+    private SimpleExpressionProxy mLiteral;
+    private int mOccurrences;
+
   }
 
 
@@ -107,7 +226,7 @@ class EFAEventNameBuilder {
     //# Constructor
     private NameTreeNode()
     {
-      mChildren = new TreeMap<SimpleExpressionProxy,NameTreeNode>(mComparator);
+      mChildren = new HashMap<CountedLiteral,NameTreeNode>();
       mIsEndOfClause = 0;
     }
 
@@ -120,10 +239,10 @@ class EFAEventNameBuilder {
 
     //#######################################################################
     //# Algorithm
-    private void add(final Iterator<SimpleExpressionProxy> iter)
+    private void add(final Iterator<CountedLiteral> iter)
     {
       if (iter.hasNext()) {
-        final SimpleExpressionProxy literal = iter.next();
+        final CountedLiteral literal = iter.next();
         NameTreeNode child = mChildren.get(literal);
         if (child == null) {
           child = new NameTreeNode();
@@ -136,12 +255,13 @@ class EFAEventNameBuilder {
     }
 
     private void print(final ModuleProxyPrinter printer,
-                       final Iterator<SimpleExpressionProxy> iter,
+                       final Iterator<CountedLiteral> iter,
                        final boolean first)
     {
       if (iter.hasNext()) {
-        final SimpleExpressionProxy literal = iter.next();
-        final NameTreeNode child = mChildren.get(literal);
+        final CountedLiteral counted = iter.next();
+        final SimpleExpressionProxy literal = counted.getLiteral();
+        final NameTreeNode child = mChildren.get(counted);
         final boolean nextfirst;
         if (size() == 1) {
           nextfirst = first;
@@ -160,7 +280,7 @@ class EFAEventNameBuilder {
 
     //#######################################################################
     //# Data Members
-    private final Map<SimpleExpressionProxy,NameTreeNode> mChildren;
+    private final Map<CountedLiteral,NameTreeNode> mChildren;
     private int mIsEndOfClause;
 
   }
@@ -170,6 +290,9 @@ class EFAEventNameBuilder {
   //# Data Members
   private final Comparator<SimpleExpressionProxy> mComparator;
 
+  private Map<CountedLiteral,CountedLiteral> mAllLiterals;
+  private Collection<List<CountedLiteral>> mAllClauses;
   private NameTreeNode mRoot;
+  private CountedLiteral mScratch;
 
 }
