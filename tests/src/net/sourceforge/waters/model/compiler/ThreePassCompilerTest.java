@@ -240,10 +240,16 @@ public class ThreePassCompilerTest
     compile("handwritten", "GlobalAndLocalVariables");
   }
 
-  public void testCompile_sensoractuator()
+  public void testCompile_sensoractuator1()
     throws IOException, WatersException
   {
-    compile("handwritten", "sensoractuator");
+    compile("handwritten", "sensoractuator1");
+  }
+
+  public void testCompile_sensoractuator_nondet()
+    throws IOException, WatersException
+  {
+    compile("handwritten", "sensoractuator_nondet");
   }
 
   public void testCompile_stick_picking_game()

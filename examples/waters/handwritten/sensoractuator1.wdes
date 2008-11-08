@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<ProductDES Name="sensoractuator"
+<ProductDES Name="sensoractuator1"
             xmlns:ns2="http://waters.sourceforge.net/xsd/base"
             xmlns="http://waters.sourceforge.net/xsd/des">
 <ns2:Comment>This is a modified version of the original sensor-actuator example. The guards have been strengthened to ensure that sensors remain unchanged under new EFA semantics.</ns2:Comment>
@@ -82,18 +82,10 @@
 </StateList>
 <TransitionList>
 <Transition Target="1" Source="0" Event="change_direction.{!forward}"/>
-<Transition Target="1" Source="0" Event="change_direction.{!forward}"/>
-<Transition Target="1" Source="0" Event="change_direction.{!forward}"/>
-<Transition Target="1" Source="0" Event="change_direction.{!forward}"/>
-<Transition Target="1" Source="0" Event="change_direction.{!forward}"/>
 <Transition Target="0" Source="0" Event="move_left.{sensor1'==0}"/>
 <Transition Target="0" Source="0" Event="move_left.{sensor1'==1}"/>
 <Transition Target="0" Source="0" Event="move_left.{sensor2'==0}"/>
 <Transition Target="0" Source="0" Event="move_left.{sensor2'==1}"/>
-<Transition Target="0" Source="1" Event="change_direction.{forward}"/>
-<Transition Target="0" Source="1" Event="change_direction.{forward}"/>
-<Transition Target="0" Source="1" Event="change_direction.{forward}"/>
-<Transition Target="0" Source="1" Event="change_direction.{forward}"/>
 <Transition Target="0" Source="1" Event="change_direction.{forward}"/>
 <Transition Target="1" Source="1" Event="move_right.{sensor1'==1}"/>
 <Transition Target="1" Source="1" Event="move_right.{sensor1'==0}"/>

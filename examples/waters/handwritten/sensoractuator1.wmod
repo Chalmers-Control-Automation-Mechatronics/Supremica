@@ -1,0 +1,609 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Module Name="sensoractuator1" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
+<ns2:Comment>This is a modified version of the original sensor-actuator example. The guards have been strengthened to ensure that sensors remain unchanged under new EFA semantics.</ns2:Comment>
+<ConstantAliasList>
+<ConstantAlias Name="boolean">
+<ConstantAliasExpression>
+<BinaryExpression Operator="..">
+<IntConstant Value="0"/>
+<IntConstant Value="1"/>
+</BinaryExpression>
+</ConstantAliasExpression>
+</ConstantAlias>
+</ConstantAliasList>
+<EventDeclList>
+<EventDecl Kind="UNCONTROLLABLE" Name="move_right"/>
+<EventDecl Kind="UNCONTROLLABLE" Name="move_left"/>
+<EventDecl Kind="CONTROLLABLE" Name="change_direction"/>
+<EventDecl Kind="PROPOSITION" Name=":accepting"/>
+</EventDeclList>
+<ComponentList>
+<VariableComponent Name="forward">
+<VariableRange>
+<SimpleIdentifier Name="boolean"/>
+</VariableRange>
+<VariableInitial>
+<BinaryExpression Operator="==">
+<SimpleIdentifier Name="forward"/>
+<IntConstant Value="0"/>
+</BinaryExpression>
+</VariableInitial>
+</VariableComponent>
+<VariableComponent Name="sensor1">
+<VariableRange>
+<SimpleIdentifier Name="boolean"/>
+</VariableRange>
+<VariableInitial>
+<BinaryExpression Operator="==">
+<SimpleIdentifier Name="sensor1"/>
+<IntConstant Value="0"/>
+</BinaryExpression>
+</VariableInitial>
+</VariableComponent>
+<VariableComponent Name="sensor2">
+<VariableRange>
+<SimpleIdentifier Name="boolean"/>
+</VariableRange>
+<VariableInitial>
+<BinaryExpression Operator="==">
+<SimpleIdentifier Name="sensor2"/>
+<IntConstant Value="0"/>
+</BinaryExpression>
+</VariableInitial>
+</VariableComponent>
+<SimpleComponent Kind="PLANT" Name="SensorActuator">
+<Graph>
+<NodeList>
+<SimpleNode Initial="true" Name="A">
+<EventList>
+<SimpleIdentifier Name=":accepting"/>
+</EventList>
+<PointGeometry>
+<Point Y="160" X="128"/>
+</PointGeometry>
+<InitialArrowGeometry>
+<Point Y="-25" X="0"/>
+</InitialArrowGeometry>
+<LabelGeometry Anchor="NW">
+<Point Y="10" X="-7"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="B">
+<PointGeometry>
+<Point Y="160" X="272"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point Y="12" X="-5"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="C">
+<PointGeometry>
+<Point Y="160" X="416"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point Y="11" X="-5"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="D">
+<PointGeometry>
+<Point Y="160" X="560"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point Y="10" X="-6"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="E">
+<PointGeometry>
+<Point Y="160" X="704"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point Y="10" X="-7"/>
+</LabelGeometry>
+</SimpleNode>
+</NodeList>
+<EdgeList>
+<Edge Target="B" Source="A">
+<LabelBlock>
+<SimpleIdentifier Name="move_right"/>
+<LabelGeometry Anchor="NW">
+<Point Y="-57" X="-45"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point Y="145" X="200"/>
+</SplineGeometry>
+<GuardActionBlock>
+<Guards>
+<SimpleIdentifier Name="forward"/>
+</Guards>
+<Actions>
+<BinaryExpression Operator="=">
+<SimpleIdentifier Name="sensor1"/>
+<IntConstant Value="1"/>
+</BinaryExpression>
+<BinaryExpression Operator="=">
+<SimpleIdentifier Name="sensor2"/>
+<SimpleIdentifier Name="sensor2"/>
+</BinaryExpression>
+</Actions>
+<LabelGeometry Anchor="NW">
+<Point Y="-44" X="-42"/>
+</LabelGeometry>
+</GuardActionBlock>
+</Edge>
+<Edge Target="C" Source="B">
+<LabelBlock>
+<SimpleIdentifier Name="move_right"/>
+<LabelGeometry Anchor="NW">
+<Point Y="-60" X="-45"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point Y="144" X="346"/>
+</SplineGeometry>
+<GuardActionBlock>
+<Guards>
+<SimpleIdentifier Name="forward"/>
+</Guards>
+<Actions>
+<BinaryExpression Operator="=">
+<SimpleIdentifier Name="sensor1"/>
+<IntConstant Value="0"/>
+</BinaryExpression>
+<BinaryExpression Operator="=">
+<SimpleIdentifier Name="sensor2"/>
+<SimpleIdentifier Name="sensor2"/>
+</BinaryExpression>
+</Actions>
+<LabelGeometry Anchor="NW">
+<Point Y="-46" X="-43"/>
+</LabelGeometry>
+</GuardActionBlock>
+</Edge>
+<Edge Target="D" Source="C">
+<LabelBlock>
+<SimpleIdentifier Name="move_right"/>
+<LabelGeometry Anchor="NW">
+<Point Y="-61" X="-38"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point Y="146" X="489"/>
+</SplineGeometry>
+<GuardActionBlock>
+<Guards>
+<SimpleIdentifier Name="forward"/>
+</Guards>
+<Actions>
+<BinaryExpression Operator="=">
+<SimpleIdentifier Name="sensor1"/>
+<SimpleIdentifier Name="sensor1"/>
+</BinaryExpression>
+<BinaryExpression Operator="=">
+<SimpleIdentifier Name="sensor2"/>
+<IntConstant Value="1"/>
+</BinaryExpression>
+</Actions>
+<LabelGeometry Anchor="NW">
+<Point Y="-48" X="-40"/>
+</LabelGeometry>
+</GuardActionBlock>
+</Edge>
+<Edge Target="E" Source="D">
+<LabelBlock>
+<SimpleIdentifier Name="move_right"/>
+<LabelGeometry Anchor="NW">
+<Point Y="-60" X="-35"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point Y="144" X="633"/>
+</SplineGeometry>
+<GuardActionBlock>
+<Guards>
+<SimpleIdentifier Name="forward"/>
+</Guards>
+<Actions>
+<BinaryExpression Operator="=">
+<SimpleIdentifier Name="sensor1"/>
+<SimpleIdentifier Name="sensor1"/>
+</BinaryExpression>
+<BinaryExpression Operator="=">
+<SimpleIdentifier Name="sensor2"/>
+<IntConstant Value="0"/>
+</BinaryExpression>
+</Actions>
+<LabelGeometry Anchor="NW">
+<Point Y="-46" X="-33"/>
+</LabelGeometry>
+</GuardActionBlock>
+</Edge>
+<Edge Target="D" Source="E">
+<LabelBlock>
+<SimpleIdentifier Name="move_left"/>
+<LabelGeometry Anchor="NW">
+<Point Y="3" X="-42"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point Y="176" X="634"/>
+</SplineGeometry>
+<GuardActionBlock>
+<Guards>
+<UnaryExpression Operator="!">
+<SimpleIdentifier Name="forward"/>
+</UnaryExpression>
+</Guards>
+<Actions>
+<BinaryExpression Operator="=">
+<SimpleIdentifier Name="sensor1"/>
+<SimpleIdentifier Name="sensor1"/>
+</BinaryExpression>
+<BinaryExpression Operator="=">
+<SimpleIdentifier Name="sensor2"/>
+<IntConstant Value="1"/>
+</BinaryExpression>
+</Actions>
+<LabelGeometry Anchor="NW">
+<Point Y="17" X="-40"/>
+</LabelGeometry>
+</GuardActionBlock>
+</Edge>
+<Edge Target="C" Source="D">
+<LabelBlock>
+<SimpleIdentifier Name="move_left"/>
+<LabelGeometry Anchor="NW">
+<Point Y="3" X="-43"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point Y="175" X="491"/>
+</SplineGeometry>
+<GuardActionBlock>
+<Guards>
+<UnaryExpression Operator="!">
+<SimpleIdentifier Name="forward"/>
+</UnaryExpression>
+</Guards>
+<Actions>
+<BinaryExpression Operator="=">
+<SimpleIdentifier Name="sensor1"/>
+<SimpleIdentifier Name="sensor1"/>
+</BinaryExpression>
+<BinaryExpression Operator="=">
+<SimpleIdentifier Name="sensor2"/>
+<IntConstant Value="0"/>
+</BinaryExpression>
+</Actions>
+<LabelGeometry Anchor="NW">
+<Point Y="18" X="-44"/>
+</LabelGeometry>
+</GuardActionBlock>
+</Edge>
+<Edge Target="B" Source="C">
+<LabelBlock>
+<SimpleIdentifier Name="move_left"/>
+<LabelGeometry Anchor="NW">
+<Point Y="0" X="-37"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point Y="178" X="342"/>
+</SplineGeometry>
+<GuardActionBlock>
+<Guards>
+<UnaryExpression Operator="!">
+<SimpleIdentifier Name="forward"/>
+</UnaryExpression>
+</Guards>
+<Actions>
+<BinaryExpression Operator="=">
+<SimpleIdentifier Name="sensor1"/>
+<IntConstant Value="1"/>
+</BinaryExpression>
+<BinaryExpression Operator="=">
+<SimpleIdentifier Name="sensor2"/>
+<SimpleIdentifier Name="sensor2"/>
+</BinaryExpression>
+</Actions>
+<LabelGeometry Anchor="NW">
+<Point Y="13" X="-36"/>
+</LabelGeometry>
+</GuardActionBlock>
+</Edge>
+<Edge Target="A" Source="B">
+<LabelBlock>
+<SimpleIdentifier Name="move_left"/>
+<LabelGeometry Anchor="NW">
+<Point Y="1" X="-39"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point Y="176" X="196"/>
+</SplineGeometry>
+<GuardActionBlock>
+<Guards>
+<UnaryExpression Operator="!">
+<SimpleIdentifier Name="forward"/>
+</UnaryExpression>
+</Guards>
+<Actions>
+<BinaryExpression Operator="=">
+<SimpleIdentifier Name="sensor1"/>
+<IntConstant Value="0"/>
+</BinaryExpression>
+<BinaryExpression Operator="=">
+<SimpleIdentifier Name="sensor2"/>
+<SimpleIdentifier Name="sensor2"/>
+</BinaryExpression>
+</Actions>
+<LabelGeometry Anchor="NW">
+<Point Y="15" X="-39"/>
+</LabelGeometry>
+</GuardActionBlock>
+</Edge>
+<Edge Target="A" Source="A">
+<LabelBlock>
+<SimpleIdentifier Name="change_direction"/>
+<LabelGeometry Anchor="NW">
+<Point Y="-13" X="-121"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point Y="113" X="128"/>
+</SplineGeometry>
+<GuardActionBlock>
+<Guards>
+<SimpleIdentifier Name="forward"/>
+</Guards>
+<Actions>
+<BinaryExpression Operator="=">
+<SimpleIdentifier Name="forward"/>
+<IntConstant Value="0"/>
+</BinaryExpression>
+</Actions>
+<LabelGeometry Anchor="NW">
+<Point Y="1" X="-91"/>
+</LabelGeometry>
+</GuardActionBlock>
+</Edge>
+<Edge Target="A" Source="A">
+<LabelBlock>
+<SimpleIdentifier Name="change_direction"/>
+<LabelGeometry Anchor="NW">
+<Point Y="-22" X="-124"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point Y="208" X="129"/>
+</SplineGeometry>
+<GuardActionBlock>
+<Guards>
+<UnaryExpression Operator="!">
+<SimpleIdentifier Name="forward"/>
+</UnaryExpression>
+</Guards>
+<Actions>
+<BinaryExpression Operator="=">
+<SimpleIdentifier Name="forward"/>
+<IntConstant Value="1"/>
+</BinaryExpression>
+</Actions>
+<LabelGeometry Anchor="NW">
+<Point Y="-3" X="-86"/>
+</LabelGeometry>
+</GuardActionBlock>
+</Edge>
+<Edge Target="B" Source="B">
+<LabelBlock>
+<SimpleIdentifier Name="change_direction"/>
+<LabelGeometry Anchor="NW">
+<Point Y="-55" X="-41"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point Y="112" X="270"/>
+</SplineGeometry>
+<GuardActionBlock>
+<Guards>
+<SimpleIdentifier Name="forward"/>
+</Guards>
+<Actions>
+<BinaryExpression Operator="=">
+<SimpleIdentifier Name="forward"/>
+<IntConstant Value="0"/>
+</BinaryExpression>
+</Actions>
+<LabelGeometry Anchor="NW">
+<Point Y="-40" X="-38"/>
+</LabelGeometry>
+</GuardActionBlock>
+</Edge>
+<Edge Target="B" Source="B">
+<LabelBlock>
+<SimpleIdentifier Name="change_direction"/>
+<LabelGeometry Anchor="NW">
+<Point Y="32" X="-40"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point Y="209" X="272"/>
+</SplineGeometry>
+<GuardActionBlock>
+<Guards>
+<UnaryExpression Operator="!">
+<SimpleIdentifier Name="forward"/>
+</UnaryExpression>
+</Guards>
+<Actions>
+<BinaryExpression Operator="=">
+<SimpleIdentifier Name="forward"/>
+<IntConstant Value="1"/>
+</BinaryExpression>
+</Actions>
+<LabelGeometry Anchor="NW">
+<Point Y="47" X="-39"/>
+</LabelGeometry>
+</GuardActionBlock>
+</Edge>
+<Edge Target="C" Source="C">
+<LabelBlock>
+<SimpleIdentifier Name="change_direction"/>
+<LabelGeometry Anchor="NW">
+<Point Y="-56" X="-33"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point Y="113" X="414"/>
+</SplineGeometry>
+<GuardActionBlock>
+<Guards>
+<SimpleIdentifier Name="forward"/>
+</Guards>
+<Actions>
+<BinaryExpression Operator="=">
+<SimpleIdentifier Name="forward"/>
+<IntConstant Value="0"/>
+</BinaryExpression>
+</Actions>
+<LabelGeometry Anchor="NW">
+<Point Y="-43" X="-32"/>
+</LabelGeometry>
+</GuardActionBlock>
+</Edge>
+<Edge Target="C" Source="C">
+<LabelBlock>
+<SimpleIdentifier Name="change_direction"/>
+<LabelGeometry Anchor="NW">
+<Point Y="32" X="-28"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point Y="208" X="418"/>
+</SplineGeometry>
+<GuardActionBlock>
+<Guards>
+<UnaryExpression Operator="!">
+<SimpleIdentifier Name="forward"/>
+</UnaryExpression>
+</Guards>
+<Actions>
+<BinaryExpression Operator="=">
+<SimpleIdentifier Name="forward"/>
+<IntConstant Value="1"/>
+</BinaryExpression>
+</Actions>
+<LabelGeometry Anchor="NW">
+<Point Y="48" X="-27"/>
+</LabelGeometry>
+</GuardActionBlock>
+</Edge>
+<Edge Target="D" Source="D">
+<LabelBlock>
+<SimpleIdentifier Name="change_direction"/>
+<LabelGeometry Anchor="NW">
+<Point Y="-57" X="-35"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point Y="111" X="562"/>
+</SplineGeometry>
+<GuardActionBlock>
+<Guards>
+<SimpleIdentifier Name="forward"/>
+</Guards>
+<Actions>
+<BinaryExpression Operator="=">
+<SimpleIdentifier Name="forward"/>
+<IntConstant Value="0"/>
+</BinaryExpression>
+</Actions>
+<LabelGeometry Anchor="NW">
+<Point Y="-42" X="-35"/>
+</LabelGeometry>
+</GuardActionBlock>
+</Edge>
+<Edge Target="D" Source="D">
+<LabelBlock>
+<SimpleIdentifier Name="change_direction"/>
+<LabelGeometry Anchor="NW">
+<Point Y="33" X="-20"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point Y="211" X="559"/>
+</SplineGeometry>
+<GuardActionBlock>
+<Guards>
+<UnaryExpression Operator="!">
+<SimpleIdentifier Name="forward"/>
+</UnaryExpression>
+</Guards>
+<Actions>
+<BinaryExpression Operator="=">
+<SimpleIdentifier Name="forward"/>
+<IntConstant Value="1"/>
+</BinaryExpression>
+</Actions>
+<LabelGeometry Anchor="NW">
+<Point Y="47" X="-18"/>
+</LabelGeometry>
+</GuardActionBlock>
+</Edge>
+<Edge Target="E" Source="E">
+<LabelBlock>
+<SimpleIdentifier Name="change_direction"/>
+<LabelGeometry Anchor="NW">
+<Point Y="-23" X="17"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point Y="112" X="704"/>
+</SplineGeometry>
+<GuardActionBlock>
+<Guards>
+<SimpleIdentifier Name="forward"/>
+</Guards>
+<Actions>
+<BinaryExpression Operator="=">
+<SimpleIdentifier Name="forward"/>
+<IntConstant Value="0"/>
+</BinaryExpression>
+</Actions>
+<LabelGeometry Anchor="NW">
+<Point Y="-8" X="20"/>
+</LabelGeometry>
+</GuardActionBlock>
+</Edge>
+<Edge Target="E" Source="E">
+<LabelBlock>
+<SimpleIdentifier Name="change_direction"/>
+<LabelGeometry Anchor="NW">
+<Point Y="-37" X="19"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point Y="210" X="705"/>
+</SplineGeometry>
+<GuardActionBlock>
+<Guards>
+<UnaryExpression Operator="!">
+<SimpleIdentifier Name="forward"/>
+</UnaryExpression>
+</Guards>
+<Actions>
+<BinaryExpression Operator="=">
+<SimpleIdentifier Name="forward"/>
+<IntConstant Value="1"/>
+</BinaryExpression>
+</Actions>
+<LabelGeometry Anchor="NW">
+<Point Y="-21" X="22"/>
+</LabelGeometry>
+</GuardActionBlock>
+</Edge>
+</EdgeList>
+</Graph>
+</SimpleComponent>
+</ComponentList>
+</Module>
