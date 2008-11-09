@@ -136,48 +136,9 @@ public class CompilerOperatorTable extends AbstractOperatorTable {
     return mAndOperator;
   }
 
-  public BinaryOperator getOrOperator()
-  {
-    return mOrOperator;
-  }
-
-  public UnaryOperator getNotOperator()
-  {
-    return mNotOperator;
-  }
-
-  public BinaryOperator getEqualsOperator() {
-    return mEqualsOperator;
-  }
-
-  public BinaryOperator getNotEqualsOperator() {
-    return mNotEqualsOperator;
-  }
-
-  public BinaryOperator getGreaterThanOperator() {
-    return mGreaterThanOperator;
-  }
-
-  public BinaryOperator getGreaterEqualsOperator() {
-    return mGreaterEqualsOperator;
-  }
-
-  public BinaryOperator getLessThanOperator() {
-    return mLessThanOperator;
-  }
-
-  public BinaryOperator getLessEqualsOperator() {
-    return mLessEqualsOperator;
-  }
-
   public BinaryOperator getAssignmentOperator()
   {
     return mAssignmentOperator;
-  }
-
-  public BinaryOperator getIncrementOperator()
-  {
-    return mIncrementOperator;
   }
 
   public BinaryOperator getDecrementOperator()
@@ -185,15 +146,76 @@ public class CompilerOperatorTable extends AbstractOperatorTable {
     return mDecrementOperator;
   }
 
-  public BinaryOperator getRangeOperator()
+  public BinaryOperator getEqualsOperator()
   {
-    return mRangeOperator;
+    return mEqualsOperator;
+  }
+
+  public BinaryOperator getGreaterEqualsOperator()
+  {
+    return mGreaterEqualsOperator;
+  }
+
+  public BinaryOperator getGreaterThanOperator()
+  {
+    return mGreaterThanOperator;
+  }
+
+  public BinaryOperator getLessEqualsOperator()
+  {
+    return mLessEqualsOperator;
+  }
+
+  public BinaryOperator getIncrementOperator()
+  {
+    return mIncrementOperator;
+  }
+
+  public BinaryOperator getLessThanOperator()
+  {
+    return mLessThanOperator;
+  }
+
+  public BinaryOperator getMinusOperator()
+  {
+    return mMinusOperator;
   }
 
   public UnaryOperator getNextOperator()
   {
     return mUnaryNextOperator;
   }
+
+  public UnaryOperator getNotOperator()
+  {
+    return mNotOperator;
+  }
+
+  public BinaryOperator getNotEqualsOperator()
+  {
+    return mNotEqualsOperator;
+  }
+
+  public BinaryOperator getOrOperator()
+  {
+    return mOrOperator;
+  }
+
+  public BinaryOperator getPlusOperator()
+  {
+    return mPlusOperator;
+  }
+
+  public BinaryOperator getRangeOperator()
+  {
+    return mRangeOperator;
+  }
+
+  public UnaryOperator getUnaryMinusOperator()
+  {
+    return mUnaryMinusOperator;
+  }
+
 
   public BinaryOperator getComplementaryOperator(final BinaryOperator op)
   {

@@ -30,17 +30,16 @@ public class CompiledIntRange implements CompiledRange
 
 
   //#########################################################################
-  //# Getters
-  int getLower()
+  //# Simple Access
+  public int getLower()
   {
     return mLower;
   }
 
-  int getUpper()
+  public int getUpper()
   {
     return mUpper;
   }
-
 
   //#########################################################################
   //# Overrides for java.lang.Object
@@ -90,6 +89,18 @@ public class CompiledIntRange implements CompiledRange
   public boolean contains(final SimpleExpressionProxy value)
   {
     return indexOf(value) >= 0;
+  }
+
+  public boolean intersects(final CompiledRange range)
+  {
+    if (range instanceof CompiledIntRange) {
+      final CompiledIntRange intrange = (CompiledIntRange) range;
+      return
+        getUpper() >= intrange.getLower() &&
+        intrange.getUpper() >= getLower();
+    } else {
+      return false;
+    }
   }
 
   public List<IntConstantProxy> getValues()

@@ -18,9 +18,11 @@ public interface CompiledRange {
 
   public int size();
 
-  public int indexOf(final SimpleExpressionProxy value);
+  public int indexOf(SimpleExpressionProxy value);
 
-  public boolean contains(final SimpleExpressionProxy value);
+  public boolean contains(SimpleExpressionProxy value);
+
+  public boolean intersects(CompiledRange range);
 
   public List<? extends SimpleExpressionProxy> getValues();
 
