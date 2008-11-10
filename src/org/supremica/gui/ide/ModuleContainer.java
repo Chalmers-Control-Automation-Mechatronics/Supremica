@@ -60,6 +60,8 @@ import net.sourceforge.waters.subject.module.ModuleSubjectFactory;
 import net.sourceforge.waters.subject.module.SimpleComponentSubject;
 import net.sourceforge.waters.xsd.base.EventKind;
 
+import org.supremica.properties.SupremicaPropertyChangeEvent;
+
 
 public class ModuleContainer 
     extends DocumentContainer
@@ -150,6 +152,18 @@ public class ModuleContainer
     {
         return TYPE_STRING;
     }
+
+
+	//#######################################################################
+	//# Interface org.supremica.properties.SupremicaPropertyChangeListener
+	public void propertyChanged(final SupremicaPropertyChangeEvent event)
+	{
+        final Collection<ComponentEditorPanel> panels =
+            mComponentToPanelMap.values();
+        for (final ComponentEditorPanel panel : panels) {
+            panel.propertyChanged(event);
+        }
+	}
 
 
     //#######################################################################

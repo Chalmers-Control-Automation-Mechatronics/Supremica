@@ -155,9 +155,6 @@ public class ControlledSurface
       final UndoInterface undoer = root.getUndoInterface();
       undoer.attach(this);
     }
-    Config.GUI_EDITOR_LAYOUT_MODE.addPropertyChangeListener(this);
-    Config.GUI_EDITOR_EDGEARROW_AT_END.addPropertyChangeListener(this);
-    Config.GUI_EDITOR_NODE_RADIUS.addPropertyChangeListener(this);
   }
 
   /**

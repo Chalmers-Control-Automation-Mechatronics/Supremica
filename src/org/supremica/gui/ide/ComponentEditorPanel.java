@@ -58,6 +58,8 @@ import net.sourceforge.waters.subject.module.SimpleIdentifierSubject;
 import org.supremica.log.Logger;
 import org.supremica.log.LoggerFactory;
 import org.supremica.gui.GraphicsToClipboard;
+import org.supremica.properties.SupremicaPropertyChangeEvent;
+import org.supremica.properties.SupremicaPropertyChangeListener;
 
 
 /**
@@ -72,7 +74,7 @@ import org.supremica.gui.GraphicsToClipboard;
 
 public class ComponentEditorPanel
     extends JPanel
-    implements EditorWindowInterface
+    implements EditorWindowInterface, SupremicaPropertyChangeListener
 {
     
     //########################################################################
@@ -363,6 +365,14 @@ public class ComponentEditorPanel
             System.err.println(ex.getStackTrace());
         }
     }
+
+
+	//#######################################################################
+	//# Interface org.supremica.properties.SupremicaPropertyChangeListener
+	public void propertyChanged(final SupremicaPropertyChangeEvent event)
+	{
+		mSurface.propertyChanged(event);
+	}
 
 
     //########################################################################

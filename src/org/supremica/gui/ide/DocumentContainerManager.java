@@ -13,6 +13,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URI;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -151,6 +152,11 @@ public class DocumentContainerManager
         } else {
             return mRecentList.iterator().next();
         }
+    }
+
+    public Collection<DocumentContainer> getOpenContainers()
+    {
+        return mAllContainers;
     }
 
 
