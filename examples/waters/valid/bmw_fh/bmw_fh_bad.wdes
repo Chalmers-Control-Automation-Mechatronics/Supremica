@@ -1,0 +1,703 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<ProductDES Name="bmw_fh_bad" xmlns="http://waters.sourceforge.net/xsd/des">
+<EventList>
+<Event Kind="PROPOSITION" Name=":accepting"/>
+<Event Kind="UNCONTROLLABLE" Name="CLOSE[DRD]"/>
+<Event Kind="UNCONTROLLABLE" Name="CLOSE[PSD]"/>
+<Event Kind="CONTROLLABLE" Name="CMFT_BACK[CLOSE]"/>
+<Event Kind="CONTROLLABLE" Name="CMFT_BACK[OPEN]"/>
+<Event Kind="CONTROLLABLE" Name="cmft_cond_doors"/>
+<Event Kind="CONTROLLABLE" Name="cmft_cond_key"/>
+<Event Kind="CONTROLLABLE" Name="CMFT_FRONT[CLOSE]"/>
+<Event Kind="CONTROLLABLE" Name="CMFT_FRONT[OPEN]"/>
+<Event Kind="CONTROLLABLE" Name="CMFT_ROOF[CLOSE]"/>
+<Event Kind="CONTROLLABLE" Name="CMFT_ROOF[OPEN]"/>
+<Event Kind="CONTROLLABLE" Name="cmft_start"/>
+<Event Kind="CONTROLLABLE" Name="CMFT_STOP"/>
+<Event Kind="UNCONTROLLABLE" Name="ecefin"/>
+<Event Kind="CONTROLLABLE" Name="fh_cond_door_open"/>
+<Event Kind="CONTROLLABLE" Name="fh_cond_doors_closed"/>
+<Event Kind="CONTROLLABLE" Name="fh_cond_ecefin"/>
+<Event Kind="CONTROLLABLE" Name="fh_cond_kl_r"/>
+<Event Kind="CONTROLLABLE" Name="FH_LOCK"/>
+<Event Kind="CONTROLLABLE" Name="FH_UNLOCK"/>
+<Event Kind="UNCONTROLLABLE" Name="KEY_PLUG"/>
+<Event Kind="UNCONTROLLABLE" Name="KEY_UNPLUG"/>
+<Event Kind="UNCONTROLLABLE" Name="KL_50_OFF"/>
+<Event Kind="UNCONTROLLABLE" Name="KL_50_ON"/>
+<Event Kind="UNCONTROLLABLE" Name="KL_R_OFF"/>
+<Event Kind="UNCONTROLLABLE" Name="KL_R_ON"/>
+<Event Kind="UNCONTROLLABLE" Name="nocountry"/>
+<Event Kind="UNCONTROLLABLE" Name="OPEN[DRD]"/>
+<Event Kind="UNCONTROLLABLE" Name="OPEN[PSD]"/>
+<Event Kind="CONTROLLABLE" Name="read_country"/>
+<Event Kind="UNCONTROLLABLE" Name="REQ[CLOSE]"/>
+<Event Kind="UNCONTROLLABLE" Name="REQ[OPEN]"/>
+<Event Kind="UNCONTROLLABLE" Name="REQ[STOP]"/>
+<Event Kind="CONTROLLABLE" Name="reset"/>
+<Event Kind="UNCONTROLLABLE" Name="timeout"/>
+<Event Kind="CONTROLLABLE" Name="timer"/>
+<Event Kind="UNCONTROLLABLE" Name="usaus"/>
+</EventList>
+<AutomataList>
+<Automaton Kind="SPEC" Name="comfort[CLOSE]">
+<EventRefList>
+<EventRef Name=":accepting"/>
+<EventRef Name="CMFT_BACK[CLOSE]"/>
+<EventRef Name="cmft_cond_doors"/>
+<EventRef Name="cmft_cond_key"/>
+<EventRef Name="CMFT_FRONT[CLOSE]"/>
+<EventRef Name="CMFT_ROOF[CLOSE]"/>
+<EventRef Name="cmft_start"/>
+<EventRef Name="REQ[CLOSE]"/>
+<EventRef Name="REQ[STOP]"/>
+<EventRef Name="reset"/>
+<EventRef Name="timeout"/>
+<EventRef Name="timer"/>
+</EventRefList>
+<StateList>
+<State Name="back"/>
+<State Name="front"/>
+<State Initial="true" Name="init">
+<EventRefList>
+<EventRef Name=":accepting"/>
+</EventRefList>
+</State>
+<State Name="request"/>
+<State Name="roof"/>
+<State Name="start"/>
+<State Name="timeout"/>
+<State Name="timeout_front"/>
+<State Name="timeout_roof"/>
+<State Name="timer"/>
+<State Name="timer_front"/>
+<State Name="timer_roof"/>
+</StateList>
+<TransitionList>
+<Transition Event="REQ[STOP]" Source="timeout" Target="init"/>
+<Transition Event="cmft_cond_doors" Source="timeout" Target="init"/>
+<Transition Event="cmft_cond_key" Source="timeout" Target="init"/>
+<Transition Event="cmft_start" Source="timeout" Target="start"/>
+<Transition Event="CMFT_BACK[CLOSE]" Source="start" Target="back"/>
+<Transition Event="REQ[STOP]" Source="start" Target="init"/>
+<Transition Event="cmft_cond_doors" Source="start" Target="init"/>
+<Transition Event="cmft_cond_key" Source="start" Target="init"/>
+<Transition Event="REQ[STOP]" Source="front" Target="init"/>
+<Transition Event="cmft_cond_doors" Source="front" Target="init"/>
+<Transition Event="cmft_cond_key" Source="front" Target="init"/>
+<Transition Event="timer" Source="front" Target="timer_roof"/>
+<Transition Event="timer" Source="back" Target="timer_front"/>
+<Transition Event="REQ[STOP]" Source="back" Target="init"/>
+<Transition Event="cmft_cond_doors" Source="back" Target="init"/>
+<Transition Event="cmft_cond_key" Source="back" Target="init"/>
+<Transition Event="timeout" Source="timer_roof" Target="timeout_roof"/>
+<Transition Event="REQ[STOP]" Source="timer_roof" Target="init"/>
+<Transition Event="cmft_cond_doors" Source="timer_roof" Target="init"/>
+<Transition Event="cmft_cond_key" Source="timer_roof" Target="init"/>
+<Transition Event="REQ[STOP]" Source="timer" Target="init"/>
+<Transition Event="cmft_cond_doors" Source="timer" Target="init"/>
+<Transition Event="cmft_cond_key" Source="timer" Target="init"/>
+<Transition Event="timeout" Source="timer" Target="timeout"/>
+<Transition Event="REQ[STOP]" Source="roof" Target="init"/>
+<Transition Event="cmft_cond_doors" Source="roof" Target="init"/>
+<Transition Event="cmft_cond_key" Source="roof" Target="init"/>
+<Transition Event="REQ[STOP]" Source="timeout_front" Target="init"/>
+<Transition Event="cmft_cond_doors" Source="timeout_front" Target="init"/>
+<Transition Event="cmft_cond_key" Source="timeout_front" Target="init"/>
+<Transition Event="CMFT_FRONT[CLOSE]" Source="timeout_front" Target="front"/>
+<Transition Event="REQ[STOP]" Source="timer_front" Target="init"/>
+<Transition Event="cmft_cond_doors" Source="timer_front" Target="init"/>
+<Transition Event="cmft_cond_key" Source="timer_front" Target="init"/>
+<Transition Event="timeout" Source="timer_front" Target="timeout_front"/>
+<Transition Event="REQ[STOP]" Source="timeout_roof" Target="init"/>
+<Transition Event="cmft_cond_doors" Source="timeout_roof" Target="init"/>
+<Transition Event="cmft_cond_key" Source="timeout_roof" Target="init"/>
+<Transition Event="CMFT_ROOF[CLOSE]" Source="timeout_roof" Target="roof"/>
+<Transition Event="timeout" Source="init" Target="init"/>
+<Transition Event="reset" Source="init" Target="init"/>
+<Transition Event="timer" Source="init" Target="init"/>
+<Transition Event="REQ[STOP]" Source="init" Target="init"/>
+<Transition Event="cmft_cond_doors" Source="init" Target="init"/>
+<Transition Event="cmft_cond_key" Source="init" Target="init"/>
+<Transition Event="cmft_start" Source="init" Target="init"/>
+<Transition Event="REQ[CLOSE]" Source="init" Target="request"/>
+<Transition Event="REQ[STOP]" Source="request" Target="init"/>
+<Transition Event="cmft_cond_doors" Source="request" Target="init"/>
+<Transition Event="cmft_cond_key" Source="request" Target="init"/>
+<Transition Event="timeout" Source="request" Target="request"/>
+<Transition Event="reset" Source="request" Target="request"/>
+<Transition Event="timer" Source="request" Target="timer"/>
+</TransitionList>
+</Automaton>
+<Automaton Kind="SPEC" Name="comfort[OPEN]">
+<EventRefList>
+<EventRef Name=":accepting"/>
+<EventRef Name="CMFT_BACK[OPEN]"/>
+<EventRef Name="cmft_cond_doors"/>
+<EventRef Name="cmft_cond_key"/>
+<EventRef Name="CMFT_FRONT[OPEN]"/>
+<EventRef Name="CMFT_ROOF[OPEN]"/>
+<EventRef Name="cmft_start"/>
+<EventRef Name="REQ[OPEN]"/>
+<EventRef Name="REQ[STOP]"/>
+<EventRef Name="reset"/>
+<EventRef Name="timeout"/>
+<EventRef Name="timer"/>
+</EventRefList>
+<StateList>
+<State Name="back"/>
+<State Name="front"/>
+<State Initial="true" Name="init">
+<EventRefList>
+<EventRef Name=":accepting"/>
+</EventRefList>
+</State>
+<State Name="request"/>
+<State Name="roof"/>
+<State Name="start"/>
+<State Name="timeout"/>
+<State Name="timeout_front"/>
+<State Name="timeout_roof"/>
+<State Name="timer"/>
+<State Name="timer_front"/>
+<State Name="timer_roof"/>
+</StateList>
+<TransitionList>
+<Transition Event="REQ[STOP]" Source="timeout" Target="init"/>
+<Transition Event="cmft_cond_doors" Source="timeout" Target="init"/>
+<Transition Event="cmft_cond_key" Source="timeout" Target="init"/>
+<Transition Event="cmft_start" Source="timeout" Target="start"/>
+<Transition Event="CMFT_BACK[OPEN]" Source="start" Target="back"/>
+<Transition Event="REQ[STOP]" Source="start" Target="init"/>
+<Transition Event="cmft_cond_doors" Source="start" Target="init"/>
+<Transition Event="cmft_cond_key" Source="start" Target="init"/>
+<Transition Event="REQ[STOP]" Source="front" Target="init"/>
+<Transition Event="cmft_cond_doors" Source="front" Target="init"/>
+<Transition Event="cmft_cond_key" Source="front" Target="init"/>
+<Transition Event="timer" Source="front" Target="timer_roof"/>
+<Transition Event="timer" Source="back" Target="timer_front"/>
+<Transition Event="REQ[STOP]" Source="back" Target="init"/>
+<Transition Event="cmft_cond_doors" Source="back" Target="init"/>
+<Transition Event="cmft_cond_key" Source="back" Target="init"/>
+<Transition Event="timeout" Source="timer_roof" Target="timeout_roof"/>
+<Transition Event="REQ[STOP]" Source="timer_roof" Target="init"/>
+<Transition Event="cmft_cond_doors" Source="timer_roof" Target="init"/>
+<Transition Event="cmft_cond_key" Source="timer_roof" Target="init"/>
+<Transition Event="REQ[STOP]" Source="timer" Target="init"/>
+<Transition Event="cmft_cond_doors" Source="timer" Target="init"/>
+<Transition Event="cmft_cond_key" Source="timer" Target="init"/>
+<Transition Event="timeout" Source="timer" Target="timeout"/>
+<Transition Event="REQ[STOP]" Source="roof" Target="init"/>
+<Transition Event="cmft_cond_doors" Source="roof" Target="init"/>
+<Transition Event="cmft_cond_key" Source="roof" Target="init"/>
+<Transition Event="REQ[STOP]" Source="timeout_front" Target="init"/>
+<Transition Event="cmft_cond_doors" Source="timeout_front" Target="init"/>
+<Transition Event="cmft_cond_key" Source="timeout_front" Target="init"/>
+<Transition Event="CMFT_FRONT[OPEN]" Source="timeout_front" Target="front"/>
+<Transition Event="REQ[STOP]" Source="timer_front" Target="init"/>
+<Transition Event="cmft_cond_doors" Source="timer_front" Target="init"/>
+<Transition Event="cmft_cond_key" Source="timer_front" Target="init"/>
+<Transition Event="timeout" Source="timer_front" Target="timeout_front"/>
+<Transition Event="REQ[STOP]" Source="timeout_roof" Target="init"/>
+<Transition Event="cmft_cond_doors" Source="timeout_roof" Target="init"/>
+<Transition Event="cmft_cond_key" Source="timeout_roof" Target="init"/>
+<Transition Event="CMFT_ROOF[OPEN]" Source="timeout_roof" Target="roof"/>
+<Transition Event="timeout" Source="init" Target="init"/>
+<Transition Event="reset" Source="init" Target="init"/>
+<Transition Event="timer" Source="init" Target="init"/>
+<Transition Event="REQ[STOP]" Source="init" Target="init"/>
+<Transition Event="cmft_cond_doors" Source="init" Target="init"/>
+<Transition Event="cmft_cond_key" Source="init" Target="init"/>
+<Transition Event="cmft_start" Source="init" Target="init"/>
+<Transition Event="REQ[OPEN]" Source="init" Target="request"/>
+<Transition Event="REQ[STOP]" Source="request" Target="init"/>
+<Transition Event="cmft_cond_doors" Source="request" Target="init"/>
+<Transition Event="cmft_cond_key" Source="request" Target="init"/>
+<Transition Event="timeout" Source="request" Target="request"/>
+<Transition Event="reset" Source="request" Target="request"/>
+<Transition Event="timer" Source="request" Target="timer"/>
+</TransitionList>
+</Automaton>
+<Automaton Kind="SPEC" Name="comfort_condition_doors_bad">
+<EventRefList>
+<EventRef Name=":accepting"/>
+<EventRef Name="CLOSE[DRD]"/>
+<EventRef Name="CLOSE[PSD]"/>
+<EventRef Name="CMFT_BACK[CLOSE]"/>
+<EventRef Name="CMFT_BACK[OPEN]"/>
+<EventRef Name="cmft_cond_doors"/>
+<EventRef Name="CMFT_FRONT[CLOSE]"/>
+<EventRef Name="CMFT_FRONT[OPEN]"/>
+<EventRef Name="CMFT_ROOF[CLOSE]"/>
+<EventRef Name="CMFT_ROOF[OPEN]"/>
+<EventRef Name="cmft_start"/>
+<EventRef Name="OPEN[DRD]"/>
+<EventRef Name="OPEN[PSD]"/>
+<EventRef Name="timer"/>
+</EventRefList>
+<StateList>
+<State Name="door_open"/>
+<State Initial="true" Name="doors_closed">
+<EventRefList>
+<EventRef Name=":accepting"/>
+</EventRefList>
+</State>
+<State Name="doors_open"/>
+</StateList>
+<TransitionList>
+<Transition Event="cmft_start" Source="doors_closed" Target="doors_closed"/>
+<Transition Event="CMFT_BACK[OPEN]" Source="doors_closed" Target="doors_closed"/>
+<Transition Event="CMFT_ROOF[OPEN]" Source="doors_closed" Target="doors_closed"/>
+<Transition Event="CMFT_FRONT[OPEN]" Source="doors_closed" Target="doors_closed"/>
+<Transition Event="CMFT_BACK[CLOSE]" Source="doors_closed" Target="doors_closed"/>
+<Transition Event="CMFT_ROOF[CLOSE]" Source="doors_closed" Target="doors_closed"/>
+<Transition Event="CMFT_FRONT[CLOSE]" Source="doors_closed" Target="doors_closed"/>
+<Transition Event="timer" Source="doors_closed" Target="doors_closed"/>
+<Transition Event="OPEN[DRD]" Source="doors_closed" Target="door_open"/>
+<Transition Event="OPEN[PSD]" Source="doors_closed" Target="door_open"/>
+<Transition Event="CLOSE[DRD]" Source="doors_open" Target="door_open"/>
+<Transition Event="CLOSE[PSD]" Source="doors_open" Target="door_open"/>
+<Transition Event="cmft_cond_doors" Source="doors_open" Target="doors_open"/>
+<Transition Event="CLOSE[DRD]" Source="door_open" Target="doors_closed"/>
+<Transition Event="CLOSE[PSD]" Source="door_open" Target="doors_closed"/>
+<Transition Event="cmft_cond_doors" Source="door_open" Target="door_open"/>
+<Transition Event="OPEN[DRD]" Source="door_open" Target="doors_open"/>
+<Transition Event="OPEN[PSD]" Source="door_open" Target="doors_open"/>
+</TransitionList>
+</Automaton>
+<Automaton Kind="SPEC" Name="comfort_condition_key">
+<EventRefList>
+<EventRef Name=":accepting"/>
+<EventRef Name="CMFT_BACK[CLOSE]"/>
+<EventRef Name="CMFT_BACK[OPEN]"/>
+<EventRef Name="cmft_cond_key"/>
+<EventRef Name="CMFT_FRONT[CLOSE]"/>
+<EventRef Name="CMFT_FRONT[OPEN]"/>
+<EventRef Name="CMFT_ROOF[CLOSE]"/>
+<EventRef Name="CMFT_ROOF[OPEN]"/>
+<EventRef Name="cmft_start"/>
+<EventRef Name="KEY_PLUG"/>
+<EventRef Name="KEY_UNPLUG"/>
+<EventRef Name="timer"/>
+</EventRefList>
+<StateList>
+<State Name="key"/>
+<State Initial="true" Name="no_key">
+<EventRefList>
+<EventRef Name=":accepting"/>
+</EventRefList>
+</State>
+</StateList>
+<TransitionList>
+<Transition Event="cmft_cond_key" Source="key" Target="key"/>
+<Transition Event="KEY_UNPLUG" Source="key" Target="no_key"/>
+<Transition Event="KEY_PLUG" Source="no_key" Target="key"/>
+<Transition Event="cmft_start" Source="no_key" Target="no_key"/>
+<Transition Event="CMFT_BACK[OPEN]" Source="no_key" Target="no_key"/>
+<Transition Event="CMFT_ROOF[OPEN]" Source="no_key" Target="no_key"/>
+<Transition Event="CMFT_FRONT[OPEN]" Source="no_key" Target="no_key"/>
+<Transition Event="CMFT_BACK[CLOSE]" Source="no_key" Target="no_key"/>
+<Transition Event="CMFT_ROOF[CLOSE]" Source="no_key" Target="no_key"/>
+<Transition Event="CMFT_FRONT[CLOSE]" Source="no_key" Target="no_key"/>
+<Transition Event="timer" Source="no_key" Target="no_key"/>
+</TransitionList>
+</Automaton>
+<Automaton Kind="SPEC" Name="comfort_control">
+<EventRefList>
+<EventRef Name=":accepting"/>
+<EventRef Name="CMFT_BACK[CLOSE]"/>
+<EventRef Name="CMFT_BACK[OPEN]"/>
+<EventRef Name="cmft_cond_doors"/>
+<EventRef Name="cmft_cond_key"/>
+<EventRef Name="cmft_start"/>
+<EventRef Name="CMFT_STOP"/>
+<EventRef Name="FH_UNLOCK"/>
+<EventRef Name="REQ[CLOSE]"/>
+<EventRef Name="REQ[OPEN]"/>
+<EventRef Name="REQ[STOP]"/>
+<EventRef Name="timer"/>
+</EventRefList>
+<StateList>
+<State Name="cmft"/>
+<State Name="esc"/>
+<State Name="esc_req"/>
+<State Initial="true" Name="off">
+<EventRefList>
+<EventRef Name=":accepting"/>
+</EventRefList>
+</State>
+<State Name="request"/>
+</StateList>
+<TransitionList>
+<Transition Event="CMFT_STOP" Source="esc_req" Target="request"/>
+<Transition Event="REQ[STOP]" Source="esc_req" Target="esc"/>
+<Transition Event="cmft_cond_doors" Source="esc_req" Target="esc"/>
+<Transition Event="cmft_cond_key" Source="esc_req" Target="esc"/>
+<Transition Event="CMFT_STOP" Source="esc" Target="off"/>
+<Transition Event="REQ[OPEN]" Source="esc" Target="esc_req"/>
+<Transition Event="REQ[CLOSE]" Source="esc" Target="esc_req"/>
+<Transition Event="REQ[STOP]" Source="esc" Target="esc"/>
+<Transition Event="REQ[CLOSE]" Source="off" Target="request"/>
+<Transition Event="REQ[OPEN]" Source="off" Target="request"/>
+<Transition Event="REQ[STOP]" Source="off" Target="off"/>
+<Transition Event="FH_UNLOCK" Source="off" Target="off"/>
+<Transition Event="timer" Source="cmft" Target="cmft"/>
+<Transition Event="REQ[STOP]" Source="cmft" Target="esc"/>
+<Transition Event="cmft_cond_doors" Source="cmft" Target="esc"/>
+<Transition Event="cmft_cond_key" Source="cmft" Target="esc"/>
+<Transition Event="CMFT_BACK[OPEN]" Source="request" Target="cmft"/>
+<Transition Event="CMFT_BACK[CLOSE]" Source="request" Target="cmft"/>
+<Transition Event="timer" Source="request" Target="request"/>
+<Transition Event="cmft_start" Source="request" Target="request"/>
+<Transition Event="REQ[STOP]" Source="request" Target="off"/>
+<Transition Event="cmft_cond_doors" Source="request" Target="off"/>
+<Transition Event="cmft_cond_key" Source="request" Target="off"/>
+</TransitionList>
+</Automaton>
+<Automaton Kind="PLANT" Name="comfort_function">
+<EventRefList>
+<EventRef Name=":accepting"/>
+<EventRef Name="REQ[CLOSE]"/>
+<EventRef Name="REQ[OPEN]"/>
+<EventRef Name="REQ[STOP]"/>
+</EventRefList>
+<StateList>
+<State Initial="true" Name="no_request">
+<EventRefList>
+<EventRef Name=":accepting"/>
+</EventRefList>
+</State>
+<State Name="request"/>
+</StateList>
+<TransitionList>
+<Transition Event="REQ[CLOSE]" Source="no_request" Target="request"/>
+<Transition Event="REQ[OPEN]" Source="no_request" Target="request"/>
+<Transition Event="REQ[STOP]" Source="request" Target="no_request"/>
+</TransitionList>
+</Automaton>
+<Automaton Kind="PLANT" Name="doors_bad[DRD]">
+<EventRefList>
+<EventRef Name=":accepting"/>
+<EventRef Name="CLOSE[DRD]"/>
+<EventRef Name="OPEN[DRD]"/>
+</EventRefList>
+<StateList>
+<State Initial="true" Name="closed">
+<EventRefList>
+<EventRef Name=":accepting"/>
+</EventRefList>
+</State>
+<State Name="open"/>
+</StateList>
+<TransitionList>
+<Transition Event="OPEN[DRD]" Source="closed" Target="open"/>
+<Transition Event="CLOSE[DRD]" Source="open" Target="closed"/>
+</TransitionList>
+</Automaton>
+<Automaton Kind="PLANT" Name="doors_bad[PSD]">
+<EventRefList>
+<EventRef Name=":accepting"/>
+<EventRef Name="CLOSE[PSD]"/>
+<EventRef Name="OPEN[PSD]"/>
+</EventRefList>
+<StateList>
+<State Initial="true" Name="closed">
+<EventRefList>
+<EventRef Name=":accepting"/>
+</EventRefList>
+</State>
+<State Name="open"/>
+</StateList>
+<TransitionList>
+<Transition Event="OPEN[PSD]" Source="closed" Target="open"/>
+<Transition Event="CLOSE[PSD]" Source="open" Target="closed"/>
+</TransitionList>
+</Automaton>
+<Automaton Kind="SPEC" Name="fh">
+<EventRefList>
+<EventRef Name=":accepting"/>
+<EventRef Name="cmft_start"/>
+<EventRef Name="ecefin"/>
+<EventRef Name="fh_cond_door_open"/>
+<EventRef Name="fh_cond_doors_closed"/>
+<EventRef Name="fh_cond_ecefin"/>
+<EventRef Name="fh_cond_kl_r"/>
+<EventRef Name="FH_LOCK"/>
+<EventRef Name="FH_UNLOCK"/>
+<EventRef Name="KL_50_ON"/>
+<EventRef Name="nocountry"/>
+<EventRef Name="read_country"/>
+<EventRef Name="usaus"/>
+</EventRefList>
+<StateList>
+<State Initial="true" Name="s"/>
+<State Name="s0">
+<EventRefList>
+<EventRef Name=":accepting"/>
+</EventRefList>
+</State>
+<State Name="s1"/>
+<State Name="s2">
+<EventRefList>
+<EventRef Name=":accepting"/>
+</EventRefList>
+</State>
+<State Name="s3"/>
+<State Name="s5">
+<EventRefList>
+<EventRef Name=":accepting"/>
+</EventRefList>
+</State>
+<State Name="s6"/>
+<State Name="s7"/>
+</StateList>
+<TransitionList>
+<Transition Event="usaus" Source="s" Target="s5"/>
+<Transition Event="ecefin" Source="s" Target="s2"/>
+<Transition Event="KL_50_ON" Source="s" Target="s"/>
+<Transition Event="read_country" Source="s" Target="s"/>
+<Transition Event="nocountry" Source="s" Target="s0"/>
+<Transition Event="fh_cond_kl_r" Source="s0" Target="s1"/>
+<Transition Event="FH_LOCK" Source="s0" Target="s0"/>
+<Transition Event="cmft_start" Source="s0" Target="s0"/>
+<Transition Event="KL_50_ON" Source="s0" Target="s0"/>
+<Transition Event="FH_UNLOCK" Source="s1" Target="s1"/>
+<Transition Event="KL_50_ON" Source="s1" Target="s0"/>
+<Transition Event="cmft_start" Source="s1" Target="s0"/>
+<Transition Event="fh_cond_kl_r" Source="s2" Target="s3"/>
+<Transition Event="FH_LOCK" Source="s2" Target="s2"/>
+<Transition Event="KL_50_ON" Source="s2" Target="s2"/>
+<Transition Event="cmft_start" Source="s2" Target="s2"/>
+<Transition Event="FH_UNLOCK" Source="s3" Target="s3"/>
+<Transition Event="KL_50_ON" Source="s3" Target="s2"/>
+<Transition Event="cmft_start" Source="s3" Target="s2"/>
+<Transition Event="fh_cond_ecefin" Source="s3" Target="s2"/>
+<Transition Event="fh_cond_kl_r" Source="s5" Target="s6"/>
+<Transition Event="FH_LOCK" Source="s5" Target="s5"/>
+<Transition Event="KL_50_ON" Source="s5" Target="s5"/>
+<Transition Event="cmft_start" Source="s5" Target="s5"/>
+<Transition Event="FH_UNLOCK" Source="s6" Target="s6"/>
+<Transition Event="KL_50_ON" Source="s6" Target="s5"/>
+<Transition Event="cmft_start" Source="s6" Target="s5"/>
+<Transition Event="fh_cond_door_open" Source="s6" Target="s7"/>
+<Transition Event="fh_cond_doors_closed" Source="s7" Target="s6"/>
+<Transition Event="KL_50_ON" Source="s7" Target="s5"/>
+<Transition Event="cmft_start" Source="s7" Target="s5"/>
+<Transition Event="FH_LOCK" Source="s7" Target="s7"/>
+</TransitionList>
+</Automaton>
+<Automaton Kind="SPEC" Name="fh_condition_doors_bad">
+<EventRefList>
+<EventRef Name=":accepting"/>
+<EventRef Name="CLOSE[DRD]"/>
+<EventRef Name="CLOSE[PSD]"/>
+<EventRef Name="fh_cond_door_open"/>
+<EventRef Name="fh_cond_doors_closed"/>
+<EventRef Name="OPEN[DRD]"/>
+<EventRef Name="OPEN[PSD]"/>
+</EventRefList>
+<StateList>
+<State Name="door_open"/>
+<State Initial="true" Name="doors_closed">
+<EventRefList>
+<EventRef Name=":accepting"/>
+</EventRefList>
+</State>
+<State Name="doors_open"/>
+</StateList>
+<TransitionList>
+<Transition Event="fh_cond_doors_closed" Source="doors_closed" Target="doors_closed"/>
+<Transition Event="OPEN[PSD]" Source="doors_closed" Target="door_open"/>
+<Transition Event="OPEN[DRD]" Source="doors_closed" Target="door_open"/>
+<Transition Event="fh_cond_door_open" Source="doors_open" Target="doors_open"/>
+<Transition Event="CLOSE[PSD]" Source="doors_open" Target="door_open"/>
+<Transition Event="CLOSE[DRD]" Source="doors_open" Target="door_open"/>
+<Transition Event="OPEN[PSD]" Source="door_open" Target="doors_open"/>
+<Transition Event="OPEN[DRD]" Source="door_open" Target="doors_open"/>
+<Transition Event="CLOSE[PSD]" Source="door_open" Target="doors_closed"/>
+<Transition Event="CLOSE[DRD]" Source="door_open" Target="doors_closed"/>
+<Transition Event="fh_cond_door_open" Source="door_open" Target="door_open"/>
+</TransitionList>
+</Automaton>
+<Automaton Kind="SPEC" Name="fh_condition_ecefin_bad">
+<EventRefList>
+<EventRef Name=":accepting"/>
+<EventRef Name="CLOSE[DRD]"/>
+<EventRef Name="CLOSE[PSD]"/>
+<EventRef Name="fh_cond_ecefin"/>
+<EventRef Name="KL_R_OFF"/>
+<EventRef Name="KL_R_ON"/>
+<EventRef Name="OPEN[DRD]"/>
+<EventRef Name="OPEN[PSD]"/>
+</EventRefList>
+<StateList>
+<State Name="ecefin"/>
+<State Name="no_radio_door_open"/>
+<State Initial="true" Name="no_radio_doors_closed">
+<EventRefList>
+<EventRef Name=":accepting"/>
+</EventRefList>
+</State>
+<State Name="no_radio_doors_open"/>
+<State Name="radio_door_open"/>
+<State Name="radio_doors_closed"/>
+<State Name="radio_doors_open"/>
+</StateList>
+<TransitionList>
+<Transition Event="KL_R_OFF" Source="radio_door_open" Target="no_radio_door_open"/>
+<Transition Event="CLOSE[DRD]" Source="radio_door_open" Target="radio_doors_closed"/>
+<Transition Event="CLOSE[PSD]" Source="radio_door_open" Target="radio_doors_closed"/>
+<Transition Event="OPEN[DRD]" Source="radio_door_open" Target="radio_doors_open"/>
+<Transition Event="OPEN[PSD]" Source="radio_door_open" Target="radio_doors_open"/>
+<Transition Event="OPEN[DRD]" Source="no_radio_door_open" Target="no_radio_doors_open"/>
+<Transition Event="OPEN[PSD]" Source="no_radio_door_open" Target="no_radio_doors_open"/>
+<Transition Event="CLOSE[DRD]" Source="no_radio_door_open" Target="ecefin"/>
+<Transition Event="CLOSE[PSD]" Source="no_radio_door_open" Target="ecefin"/>
+<Transition Event="KL_R_ON" Source="no_radio_door_open" Target="radio_door_open"/>
+<Transition Event="OPEN[DRD]" Source="ecefin" Target="no_radio_door_open"/>
+<Transition Event="OPEN[PSD]" Source="ecefin" Target="no_radio_door_open"/>
+<Transition Event="KL_R_ON" Source="ecefin" Target="radio_doors_closed"/>
+<Transition Event="fh_cond_ecefin" Source="ecefin" Target="ecefin"/>
+<Transition Event="KL_R_OFF" Source="radio_doors_closed" Target="no_radio_doors_closed"/>
+<Transition Event="OPEN[DRD]" Source="radio_doors_closed" Target="radio_door_open"/>
+<Transition Event="OPEN[PSD]" Source="radio_doors_closed" Target="radio_door_open"/>
+<Transition Event="KL_R_OFF" Source="radio_doors_open" Target="no_radio_doors_open"/>
+<Transition Event="CLOSE[DRD]" Source="radio_doors_open" Target="radio_door_open"/>
+<Transition Event="CLOSE[PSD]" Source="radio_doors_open" Target="radio_door_open"/>
+<Transition Event="OPEN[DRD]" Source="no_radio_doors_closed" Target="no_radio_door_open"/>
+<Transition Event="OPEN[PSD]" Source="no_radio_doors_closed" Target="no_radio_door_open"/>
+<Transition Event="KL_R_ON" Source="no_radio_doors_closed" Target="radio_doors_closed"/>
+<Transition Event="CLOSE[DRD]" Source="no_radio_doors_open" Target="no_radio_door_open"/>
+<Transition Event="CLOSE[PSD]" Source="no_radio_doors_open" Target="no_radio_door_open"/>
+<Transition Event="KL_R_ON" Source="no_radio_doors_open" Target="radio_doors_open"/>
+</TransitionList>
+</Automaton>
+<Automaton Kind="SPEC" Name="fh_condition_kl_r">
+<EventRefList>
+<EventRef Name=":accepting"/>
+<EventRef Name="cmft_start"/>
+<EventRef Name="fh_cond_ecefin"/>
+<EventRef Name="fh_cond_kl_r"/>
+<EventRef Name="KL_50_OFF"/>
+<EventRef Name="KL_50_ON"/>
+<EventRef Name="KL_R_ON"/>
+</EventRefList>
+<StateList>
+<State Initial="true" Name="no_radio">
+<EventRefList>
+<EventRef Name=":accepting"/>
+</EventRefList>
+</State>
+<State Name="radio"/>
+<State Name="starter"/>
+</StateList>
+<TransitionList>
+<Transition Event="KL_50_ON" Source="radio" Target="starter"/>
+<Transition Event="cmft_start" Source="radio" Target="no_radio"/>
+<Transition Event="fh_cond_ecefin" Source="radio" Target="no_radio"/>
+<Transition Event="fh_cond_kl_r" Source="radio" Target="radio"/>
+<Transition Event="KL_R_ON" Source="radio" Target="radio"/>
+<Transition Event="cmft_start" Source="no_radio" Target="no_radio"/>
+<Transition Event="KL_R_ON" Source="no_radio" Target="radio"/>
+<Transition Event="KL_50_OFF" Source="starter" Target="radio"/>
+</TransitionList>
+</Automaton>
+<Automaton Kind="SPEC" Name="fh_sync_cmft">
+<EventRefList>
+<EventRef Name=":accepting"/>
+<EventRef Name="CMFT_BACK[CLOSE]"/>
+<EventRef Name="CMFT_BACK[OPEN]"/>
+<EventRef Name="FH_LOCK"/>
+<EventRef Name="FH_UNLOCK"/>
+</EventRefList>
+<StateList>
+<State Initial="true" Name="locked">
+<EventRefList>
+<EventRef Name=":accepting"/>
+</EventRefList>
+</State>
+<State Name="unlocked"/>
+</StateList>
+<TransitionList>
+<Transition Event="FH_UNLOCK" Source="locked" Target="unlocked"/>
+<Transition Event="CMFT_BACK[CLOSE]" Source="locked" Target="locked"/>
+<Transition Event="CMFT_BACK[OPEN]" Source="locked" Target="locked"/>
+<Transition Event="FH_LOCK" Source="unlocked" Target="locked"/>
+</TransitionList>
+</Automaton>
+<Automaton Kind="PLANT" Name="lock">
+<EventRefList>
+<EventRef Name=":accepting"/>
+<EventRef Name="KEY_PLUG"/>
+<EventRef Name="KEY_UNPLUG"/>
+<EventRef Name="KL_50_OFF"/>
+<EventRef Name="KL_50_ON"/>
+<EventRef Name="KL_R_OFF"/>
+<EventRef Name="KL_R_ON"/>
+</EventRefList>
+<StateList>
+<State Name="key"/>
+<State Initial="true" Name="no_key">
+<EventRefList>
+<EventRef Name=":accepting"/>
+</EventRefList>
+</State>
+<State Name="radio"/>
+<State Name="starter"/>
+</StateList>
+<TransitionList>
+<Transition Event="KL_50_ON" Source="radio" Target="starter"/>
+<Transition Event="KL_R_OFF" Source="radio" Target="key"/>
+<Transition Event="KL_50_OFF" Source="starter" Target="radio"/>
+<Transition Event="KEY_UNPLUG" Source="key" Target="no_key"/>
+<Transition Event="KL_R_ON" Source="key" Target="radio"/>
+<Transition Event="KEY_PLUG" Source="no_key" Target="key"/>
+</TransitionList>
+</Automaton>
+<Automaton Kind="PLANT" Name="readcountry">
+<EventRefList>
+<EventRef Name=":accepting"/>
+<EventRef Name="ecefin"/>
+<EventRef Name="nocountry"/>
+<EventRef Name="read_country"/>
+<EventRef Name="usaus"/>
+</EventRefList>
+<StateList>
+<State Initial="true" Name="s0">
+<EventRefList>
+<EventRef Name=":accepting"/>
+</EventRefList>
+</State>
+<State Name="s1"/>
+</StateList>
+<TransitionList>
+<Transition Event="read_country" Source="s0" Target="s1"/>
+<Transition Event="ecefin" Source="s1" Target="s0"/>
+<Transition Event="nocountry" Source="s1" Target="s0"/>
+<Transition Event="usaus" Source="s1" Target="s0"/>
+</TransitionList>
+</Automaton>
+<Automaton Kind="PLANT" Name="timer">
+<EventRefList>
+<EventRef Name=":accepting"/>
+<EventRef Name="reset"/>
+<EventRef Name="timeout"/>
+<EventRef Name="timer"/>
+</EventRefList>
+<StateList>
+<State Initial="true" Name="off">
+<EventRefList>
+<EventRef Name=":accepting"/>
+</EventRefList>
+</State>
+<State Name="on"/>
+</StateList>
+<TransitionList>
+<Transition Event="reset" Source="on" Target="off"/>
+<Transition Event="timeout" Source="on" Target="off"/>
+<Transition Event="timer" Source="off" Target="on"/>
+</TransitionList>
+</Automaton>
+</AutomataList>
+</ProductDES>
+

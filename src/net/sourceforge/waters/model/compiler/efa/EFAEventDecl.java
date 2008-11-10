@@ -85,6 +85,16 @@ class EFAEventDecl {
     return mTransitionMap.get(comp);
   }
 
+  EFATransitionGroup createTransitionGroup(final SimpleComponentProxy comp)
+  {
+    EFATransitionGroup trans = mTransitionMap.get(comp);
+    if (trans == null) {
+      trans = new EFATransitionGroup(comp);
+      mTransitionMap.put(comp, trans);
+    }
+    return trans;
+  }
+
   Collection<EFATransitionGroup> getTransitionGroups()
   {
     return mTransitionMap.values();
@@ -123,18 +133,6 @@ class EFAEventDecl {
   Collection<EFAEvent> getEvents()
   {
     return mEventMap.values();
-  }
-
-  void addTransitions(final SimpleComponentProxy comp,
-                      final CompiledGuard guard,
-                      final IdentifierProxy label)
-  {
-    EFATransitionGroup trans = mTransitionMap.get(comp);
-    if (trans == null) {
-      trans = new EFATransitionGroup(comp);
-      mTransitionMap.put(comp, trans);
-    }
-    trans.addTransitions(guard, label);
   }
 
   EFAEvent createEvent(final CompiledClause conditions)

@@ -12,11 +12,7 @@
   <property name="supremica.testsrc" location="${supremica.root}/tests/src"/>
 
   <property name="activation.jar" location="${supremica.lib}/activation.jar"/>
-  <property name="fuber.jar" location="${supremica.lib}/fuber.jar"/>
-  <property name="groovy.jar"
-            location="${supremica.lib}/groovy-all-1.6-beta-1.jar"/>
   <property name="javabdd.jar" location="${supremica.lib}/javabdd-2.0.jar"/>
-  <property name="java_cup.jar" location="${supremica.lib}/java_cup.jar"/>
   <property name="jaxb-api.jar" location="${supremica.lib}/jaxb-api.jar"/>
   <property name="jaxb-impl.jar" location="${supremica.lib}/jaxb-impl.jar"/>
   <property name="jaxb-xjc.jar" location="${supremica.lib}/jaxb-xjc.jar"/>
@@ -64,20 +60,12 @@
   <property name="javadoc552" location="java/docs552"/>
   <property name="waters552.jar" location="${jar}/waters552.jar"/>
 
-  <path id="supremica.efa.classpath">
-    <pathelement location="${fuber.jar}"/>
-    <pathelement location="${groovy.jar}"/>
-    <pathelement location="${java_cup.jar}"/>
-    <!-- Cannot depend on Supremica/build !!! -->
-  </path>
-
   <path id="waters.compile.classpath">
     <path refid="jaxb.classpath"/>
     <pathelement location="${jaxb.jar}"/>
     <pathelement location="${javabdd.jar}"/>
     <pathelement location="${log4j.jar}"/>
     <pathelement location="${trove.jar}"/>
-    <path refid="supremica.efa.classpath"/>
   </path>
 
   <path id="waters.test.classpath">
@@ -150,13 +138,11 @@
       <compilerarg value="-Xlint:unchecked"/>
       <compilerarg value="-Xlint:deprecation"/>
       <include name="net/sourceforge/waters/**/*.java"/>
-       <exclude name="net/sourceforge/waters/gui/**/*.java"/>
+      <exclude name="net/sourceforge/waters/gui/**/*.java"/>
       <exclude name="net/sourceforge/waters/mbt/**/*.java"/>
+      <exclude name="net/sourceforge/waters/model/compiler/old/**/Old*.java"/>
       <exclude name="net/sourceforge/waters/model/unchecked/**/*.java"/>
       <include name="org/supremica/log/**/*.java"/>
-      <!-- Don't really want to depend on org.supremica.automata -->
-      <include name="org/supremica/automata/ExtendedAutomataExpander.java"/>
-      <include name="org/supremica/automata/VariableHelper.java"/>
    </javac>
   </target>
 
@@ -318,7 +304,8 @@
       <formatter type="xml"/>
       <batchtest todir="${logs.results}">
         <fileset dir="${supremica.testsrc}">
-          <include name="net/sourceforge/waters/**/ThreePass*Test.java"/>
+          <include name="net/sourceforge/waters/**/CompilerTest.java"/>
+          <include name="net/sourceforge/waters/**/ValidTest.java"/>
           <exclude name="**/Abstract*.java"/>
         </fileset>
       </batchtest>

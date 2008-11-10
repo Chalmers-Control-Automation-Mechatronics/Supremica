@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<Module Name=" " xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
+<Module Name="EFAJournalExample" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
     <ns2:Comment></ns2:Comment>
     <EventDeclList>
         <EventDecl Kind="CONTROLLABLE" Name="c"/>
@@ -7,8 +7,7 @@
         <EventDecl Kind="UNCONTROLLABLE" Name="a"/>
     </EventDeclList>
     <ComponentList>
-        <VariableComponent Deterministic="false">
-            <SimpleIdentifier Name="v"/>
+        <VariableComponent Deterministic="false" Name="v">
             <VariableRange>
                 <BinaryExpression Operator="..">
                     <IntConstant Value="0"/>
@@ -22,8 +21,7 @@
                 </BinaryExpression>
             </VariableInitial>
         </VariableComponent>
-        <SimpleComponent Kind="SPEC">
-            <SimpleIdentifier Name="K"/>
+        <SimpleComponent Kind="SPEC" Name="K">
             <Graph>
                 <NodeList>
                     <SimpleNode Initial="true" Name="S0">
@@ -105,8 +103,7 @@
                 </EdgeList>
             </Graph>
         </SimpleComponent>
-        <SimpleComponent Kind="PLANT">
-            <SimpleIdentifier Name="G"/>
+        <SimpleComponent Kind="PLANT" Name="G">
             <Graph>
                 <NodeList>
                     <SimpleNode Initial="true" Name="S0">

@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<ProductDES Name="ControllableTestModelEFA"
+  xmlns:ns2="http://waters.sourceforge.net/xsd/base"
+  xmlns="http://waters.sourceforge.net/xsd/des">
+<ns2:Comment>Strange EFA model. The guard (x &lt;= 3) in S1 is always true due to the range of variable x.</ns2:Comment>
+<EventList>
+<Event Kind="CONTROLLABLE" Name="a"/>
+<Event Kind="UNCONTROLLABLE" Name="u"/>
+</EventList>
+<AutomataList>
+<Automaton Kind="PLANT" Name="P1">
+<EventRefList>
+<EventRef Name="u"/>
+</EventRefList>
+<StateList>
+<State Initial="true" Name="S0"/>
+<State Name="S1"/>
+</StateList>
+<TransitionList>
+<Transition Source="S0" Target="S1" Event="u"/>
+<Transition Source="S1" Target="S0" Event="u"/>
+</TransitionList>
+</Automaton>
+<Automaton Kind="PLANT" Name="P2">
+<EventRefList>
+<EventRef Name="a"/>
+</EventRefList>
+<StateList>
+<State Initial="true" Name="S0"/>
+</StateList>
+<TransitionList>
+<Transition Source="S0" Target="S0" Event="a"/>
+</TransitionList>
+</Automaton>
+<Automaton Kind="SPEC" Name="S1">
+<EventRefList>
+<EventRef Name="a"/>
+<EventRef Name="u"/>
+</EventRefList>
+<StateList>
+<State Initial="true" Name="S0"/>
+<State Name="S1"/>
+<State Name="S2"/>
+<State Name="S3"/>
+</StateList>
+<TransitionList>
+<Transition Source="S0" Target="S1" Event="u"/>
+<Transition Source="S1" Target="S0" Event="u"/>
+<Transition Source="S1" Target="S2" Event="a"/>
+<Transition Source="S2" Target="S3" Event="u"/>
+<Transition Source="S3" Target="S0" Event="u"/>
+</TransitionList>
+</Automaton>
+<Automaton Kind="PLANT" Name="x">
+<EventRefList>
+<EventRef Name="a"/>
+</EventRefList>
+<StateList>
+<State Initial="true" Name="0"/>
+<State Name="1"/>
+<State Name="2"/>
+<State Name="3"/>
+</StateList>
+<TransitionList>
+<Transition Source="0" Target="1" Event="a"/>
+<Transition Source="1" Target="2" Event="a"/>
+<Transition Source="2" Target="3" Event="a"/>
+</TransitionList>
+</Automaton>
+</AutomataList>
+</ProductDES>
+

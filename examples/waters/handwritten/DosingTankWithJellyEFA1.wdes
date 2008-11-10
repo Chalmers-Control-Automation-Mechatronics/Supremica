@@ -1,0 +1,249 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<ProductDES Name="DosingTankWithJellyEFA1"
+  xmlns:ns2="http://waters.sourceforge.net/xsd/base"
+  xmlns="http://waters.sourceforge.net/xsd/des">
+<ns2:Comment>Uncontrollable.</ns2:Comment>
+<EventList>
+<Event Kind="PROPOSITION" Name=":accepting"/>
+<Event Kind="CONTROLLABLE" Name="close_in"/>
+<Event Kind="CONTROLLABLE" Name="close_out"/>
+<Event Kind="CONTROLLABLE" Name="open_in"/>
+<Event Kind="CONTROLLABLE" Name="open_out"/>
+<Event Kind="UNCONTROLLABLE" Name="req_start"/>
+<Event Kind="UNCONTROLLABLE" Name="req_stop"/>
+<Event Kind="UNCONTROLLABLE" Name="s1_on"/>
+<Event Kind="UNCONTROLLABLE" Name="s1_off"/>
+<Event Kind="UNCONTROLLABLE" Name="s2_on"/>
+<Event Kind="UNCONTROLLABLE" Name="s2_off"/>
+<Event Kind="UNCONTROLLABLE" Name="jelly"/>
+</EventList>
+<AutomataList>
+<Automaton Kind="SPEC" Name="OutletValve">
+<EventRefList>
+<EventRef Name=":accepting"/>
+<EventRef Name="open_out"/>
+<EventRef Name="close_out"/>
+</EventRefList>
+<StateList>
+<State Initial="true" Name="CLOSED">
+<EventRefList>
+<EventRef Name=":accepting"/>
+</EventRefList>
+</State>
+<State Name="OPEN"/>
+</StateList>
+<TransitionList>
+<Transition Source="CLOSED" Target="OPEN" Event="open_out"/>
+<Transition Source="OPEN" Target="CLOSED" Event="close_out"/>
+</TransitionList>
+</Automaton>
+<Automaton Kind="SPEC" Name="InletValve">
+<EventRefList>
+<EventRef Name=":accepting"/>
+<EventRef Name="open_in"/>
+<EventRef Name="close_in"/>
+</EventRefList>
+<StateList>
+<State Initial="true" Name="CLOSED">
+<EventRefList>
+<EventRef Name=":accepting"/>
+</EventRefList>
+</State>
+<State Name="OPEN"/>
+</StateList>
+<TransitionList>
+<Transition Source="CLOSED" Target="OPEN" Event="open_in"/>
+<Transition Source="OPEN" Target="CLOSED" Event="close_in"/>
+</TransitionList>
+</Automaton>
+<Automaton Kind="PLANT" Name="Requests">
+<EventRefList>
+<EventRef Name=":accepting"/>
+<EventRef Name="req_start"/>
+<EventRef Name="req_stop"/>
+</EventRefList>
+<StateList>
+<State Initial="true" Name="NOREQ">
+<EventRefList>
+<EventRef Name=":accepting"/>
+</EventRefList>
+</State>
+<State Name="REQ"/>
+</StateList>
+<TransitionList>
+<Transition Source="NOREQ" Target="REQ" Event="req_start"/>
+<Transition Source="REQ" Target="NOREQ" Event="req_stop"/>
+</TransitionList>
+</Automaton>
+<Automaton Kind="PLANT" Name="S1">
+<EventRefList>
+<EventRef Name=":accepting"/>
+<EventRef Name="s1_on"/>
+<EventRef Name="s1_off"/>
+</EventRefList>
+<StateList>
+<State Initial="true" Name="OFF">
+<EventRefList>
+<EventRef Name=":accepting"/>
+</EventRefList>
+</State>
+<State Name="ON"/>
+</StateList>
+<TransitionList>
+<Transition Source="OFF" Target="ON" Event="s1_on"/>
+<Transition Source="ON" Target="OFF" Event="s1_off"/>
+</TransitionList>
+</Automaton>
+<Automaton Kind="PLANT" Name="S2">
+<EventRefList>
+<EventRef Name=":accepting"/>
+<EventRef Name="s2_on"/>
+<EventRef Name="s2_off"/>
+</EventRefList>
+<StateList>
+<State Initial="true" Name="OFF">
+<EventRefList>
+<EventRef Name=":accepting"/>
+</EventRefList>
+</State>
+<State Name="ON"/>
+</StateList>
+<TransitionList>
+<Transition Source="OFF" Target="ON" Event="s2_on"/>
+<Transition Source="ON" Target="OFF" Event="s2_off"/>
+</TransitionList>
+</Automaton>
+<Automaton Kind="SPEC" Name="NeverJelly">
+<EventRefList>
+<EventRef Name="jelly"/>
+</EventRefList>
+<StateList>
+<State Initial="true" Name="JELLY"/>
+</StateList>
+</Automaton>
+<Automaton Kind="PLANT" Name="Jelly">
+<EventRefList>
+<EventRef Name="jelly"/>
+</EventRefList>
+<StateList>
+<State Initial="true" Name="JELLY"/>
+</StateList>
+<TransitionList>
+<Transition Source="JELLY" Target="JELLY" Event="jelly"/>
+</TransitionList>
+</Automaton>
+<Automaton Kind="PLANT" Name="vout">
+<EventRefList>
+<EventRef Name="open_in"/>
+<EventRef Name="open_out"/>
+<EventRef Name="close_out"/>
+<EventRef Name="s1_off"/>
+<EventRef Name="s2_off"/>
+<EventRef Name="jelly"/>
+</EventRefList>
+<StateList>
+<State Initial="true" Name="0"/>
+<State Name="1"/>
+</StateList>
+<TransitionList>
+<Transition Source="0" Target="0" Event="open_in"/>
+<Transition Source="0" Target="1" Event="open_out"/>
+<Transition Source="1" Target="1" Event="open_out"/>
+<Transition Source="0" Target="0" Event="close_out"/>
+<Transition Source="1" Target="0" Event="close_out"/>
+<Transition Source="1" Target="1" Event="s1_off"/>
+<Transition Source="1" Target="1" Event="s2_off"/>
+<Transition Source="0" Target="0" Event="jelly"/>
+</TransitionList>
+</Automaton>
+<Automaton Kind="PLANT" Name="vin">
+<EventRefList>
+<EventRef Name="open_out"/>
+<EventRef Name="open_in"/>
+<EventRef Name="close_in"/>
+<EventRef Name="s1_on"/>
+<EventRef Name="s2_on"/>
+<EventRef Name="jelly"/>
+</EventRefList>
+<StateList>
+<State Initial="true" Name="0"/>
+<State Name="1"/>
+</StateList>
+<TransitionList>
+<Transition Source="0" Target="0" Event="open_out"/>
+<Transition Source="0" Target="1" Event="open_in"/>
+<Transition Source="1" Target="1" Event="open_in"/>
+<Transition Source="0" Target="0" Event="close_in"/>
+<Transition Source="1" Target="0" Event="close_in"/>
+<Transition Source="1" Target="1" Event="s1_on"/>
+<Transition Source="1" Target="1" Event="s2_on"/>
+<Transition Source="0" Target="0" Event="jelly"/>
+</TransitionList>
+</Automaton>
+<Automaton Kind="PLANT" Name="vreq">
+<EventRefList>
+<EventRef Name="req_start"/>
+<EventRef Name="req_stop"/>
+<EventRef Name="open_in"/>
+<EventRef Name="open_out"/>
+</EventRefList>
+<StateList>
+<State Initial="true" Name="0"/>
+<State Name="1"/>
+</StateList>
+<TransitionList>
+<Transition Source="0" Target="1" Event="req_start"/>
+<Transition Source="1" Target="1" Event="req_start"/>
+<Transition Source="0" Target="0" Event="req_stop"/>
+<Transition Source="1" Target="0" Event="req_stop"/>
+<Transition Source="1" Target="1" Event="open_in"/>
+<Transition Source="1" Target="1" Event="open_out"/>
+</TransitionList>
+</Automaton>
+<Automaton Kind="PLANT" Name="vs1">
+<EventRefList>
+<EventRef Name="open_in"/>
+<EventRef Name="s1_on"/>
+<EventRef Name="s1_off"/>
+<EventRef Name="s2_on"/>
+<EventRef Name="jelly"/>
+</EventRefList>
+<StateList>
+<State Initial="true" Name="0"/>
+<State Name="1"/>
+</StateList>
+<TransitionList>
+<Transition Source="0" Target="0" Event="open_in"/>
+<Transition Source="0" Target="1" Event="s1_on"/>
+<Transition Source="1" Target="1" Event="s1_on"/>
+<Transition Source="0" Target="0" Event="s1_off"/>
+<Transition Source="1" Target="0" Event="s1_off"/>
+<Transition Source="1" Target="1" Event="s2_on"/>
+<Transition Source="1" Target="1" Event="jelly"/>
+</TransitionList>
+</Automaton>
+<Automaton Kind="PLANT" Name="vs2">
+<EventRefList>
+<EventRef Name="open_out"/>
+<EventRef Name="s2_on"/>
+<EventRef Name="s2_off"/>
+<EventRef Name="s1_off"/>
+<EventRef Name="jelly"/>
+</EventRefList>
+<StateList>
+<State Initial="true" Name="0"/>
+<State Name="1"/>
+</StateList>
+<TransitionList>
+<Transition Source="1" Target="1" Event="open_out"/>
+<Transition Source="0" Target="1" Event="s2_on"/>
+<Transition Source="1" Target="1" Event="s2_on"/>
+<Transition Source="0" Target="0" Event="s2_off"/>
+<Transition Source="1" Target="0" Event="s2_off"/>
+<Transition Source="0" Target="0" Event="s1_off"/>
+<Transition Source="0" Target="0" Event="jelly"/>
+</TransitionList>
+</Automaton>
+</AutomataList>
+</ProductDES>
+

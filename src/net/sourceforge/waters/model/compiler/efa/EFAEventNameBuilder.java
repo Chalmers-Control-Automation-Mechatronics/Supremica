@@ -50,6 +50,7 @@ class EFAEventNameBuilder {
     mComparator = comparator;
     mAllLiterals = null;
     mAllClauses = null;
+    mNumClauses = 0;
     mRoot = null;
   }
 
@@ -60,6 +61,7 @@ class EFAEventNameBuilder {
   {
     mAllLiterals = new HashMap<CountedLiteral,CountedLiteral>();
     mAllClauses = new LinkedList<List<CountedLiteral>>();
+    mNumClauses = 0;
     mRoot = null;
   }
 
@@ -100,6 +102,7 @@ class EFAEventNameBuilder {
   {
     mAllLiterals = null;
     mAllClauses = null;
+    mNumClauses = 0;
     mRoot = null;
     mScratch = null;
   }
@@ -110,6 +113,7 @@ class EFAEventNameBuilder {
   private void buildTree()
   {
     if (mRoot == null) {
+      mNumClauses = mAllClauses.size();
       mRoot = new NameTreeNode();
       for (final List<CountedLiteral> cclause : mAllClauses) {
         Collections.sort(cclause);
@@ -209,6 +213,11 @@ class EFAEventNameBuilder {
       mOccurrences++;
     }
 
+    private boolean isSignificant()
+    {
+      return mOccurrences < mNumClauses;
+    }
+
     //#######################################################################
     //# Data Members
     private SimpleExpressionProxy mLiteral;
@@ -242,13 +251,17 @@ class EFAEventNameBuilder {
     private void add(final Iterator<CountedLiteral> iter)
     {
       if (iter.hasNext()) {
-        final CountedLiteral literal = iter.next();
-        NameTreeNode child = mChildren.get(literal);
-        if (child == null) {
-          child = new NameTreeNode();
-          mChildren.put(literal, child);
+        final CountedLiteral counted = iter.next();
+        if (counted.isSignificant()) {
+          NameTreeNode child = mChildren.get(counted);
+          if (child == null) {
+            child = new NameTreeNode();
+            mChildren.put(counted, child);
+          }
+          child.add(iter);
+        } else {
+          add(iter);
         }
-        child.add(iter);
       } else {
         mIsEndOfClause = 1;
       }
@@ -260,21 +273,25 @@ class EFAEventNameBuilder {
     {
       if (iter.hasNext()) {
         final CountedLiteral counted = iter.next();
-        final SimpleExpressionProxy literal = counted.getLiteral();
-        final NameTreeNode child = mChildren.get(counted);
-        final boolean nextfirst;
-        if (size() == 1) {
-          nextfirst = first;
-        } else {
-          try {
-            printer.print(first ? '{' : ',');
-            printer.printProxy(literal);
-            nextfirst = false;
-          } catch (final VisitorException exception) {
-            throw exception.getRuntimeException();
+        if (counted.isSignificant()) {
+          final SimpleExpressionProxy literal = counted.getLiteral();
+          final NameTreeNode child = mChildren.get(counted);
+          final boolean nextfirst;
+          if (size() == 1) {
+            nextfirst = first;
+          } else {
+            try {
+              printer.print(first ? '{' : ',');
+              printer.printProxy(literal);
+              nextfirst = false;
+            } catch (final VisitorException exception) {
+              throw exception.getRuntimeException();
+            }
           }
+          child.print(printer, iter, nextfirst);
+        } else {
+          print(printer, iter, first);
         }
-        child.print(printer, iter, nextfirst);
       }
     }
 
@@ -292,7 +309,7 @@ class EFAEventNameBuilder {
 
   private Map<CountedLiteral,CountedLiteral> mAllLiterals;
   private Collection<List<CountedLiteral>> mAllClauses;
+  private int mNumClauses;
   private NameTreeNode mRoot;
   private CountedLiteral mScratch;
-
 }

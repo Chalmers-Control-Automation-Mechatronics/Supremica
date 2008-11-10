@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<ProductDES Name="AmbiguousVariableStatus"
+  xmlns:ns2="http://waters.sourceforge.net/xsd/base"
+  xmlns="http://waters.sourceforge.net/xsd/des">
+<ns2:Comment></ns2:Comment>
+<EventList>
+<Event Kind="UNCONTROLLABLE" Name="a"/>
+<Event Kind="UNCONTROLLABLE" Name="b.{x==0}"/>
+<Event Kind="UNCONTROLLABLE" Name="b.{x!=0}"/>
+</EventList>
+<AutomataList>
+<Automaton Kind="PLANT" Name="Plant">
+<EventRefList>
+<EventRef Name="a"/>
+<EventRef Name="b.{x==0}"/>
+<EventRef Name="b.{x!=0}"/>
+</EventRefList>
+<StateList>
+<State Initial="true" Name="G0"/>
+</StateList>
+<TransitionList>
+<Transition Source="G0" Target="G0" Event="a"/>
+<Transition Source="G0" Target="G0" Event="b.{x==0}"/>
+<Transition Source="G0" Target="G0" Event="b.{x!=0}"/>
+</TransitionList>
+</Automaton>
+<Automaton Kind="SPEC" Name="Spec">
+<EventRefList>
+<EventRef Name="a"/>
+<EventRef Name="b.{x==0}"/>
+<EventRef Name="b.{x!=0}"/>
+</EventRefList>
+<StateList>
+<State Initial="true" Name="K0"/>
+<State Name="K1"/>
+</StateList>
+<TransitionList>
+<Transition Source="K0" Target="K1" Event="b.{x==0}"/>
+<Transition Source="K1" Target="K0" Event="a"/>
+</TransitionList>
+</Automaton>
+<Automaton Kind="PLANT" Name="x">
+<EventRefList>
+<EventRef Name="a"/>
+<EventRef Name="b.{x==0}"/>
+<EventRef Name="b.{x!=0}"/>
+</EventRefList>
+<StateList>
+<State Initial="true" Name="0"/>
+<State Name="1"/>
+</StateList>
+<TransitionList>
+<Transition Source="0" Target="1" Event="b.{x==0}"/>
+<Transition Source="1" Target="1" Event="b.{x!=0}"/>
+<Transition Source="1" Target="0" Event="a"/>
+</TransitionList>
+</Automaton>
+</AutomataList>
+</ProductDES>
+

@@ -1,0 +1,225 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<ProductDES Name="DosingTankControllerEFA"
+   xmlns:ns2="http://waters.sourceforge.net/xsd/base"
+   xmlns="http://waters.sourceforge.net/xsd/des">
+<ns2:Comment></ns2:Comment>
+<EventList>
+<Event Kind="PROPOSITION" Name=":accepting"/>
+<Event Kind="CONTROLLABLE" Name="close_in"/>
+<Event Kind="CONTROLLABLE" Name="close_out"/>
+<Event Kind="CONTROLLABLE" Name="open_in"/>
+<Event Kind="CONTROLLABLE" Name="open_out"/>
+<Event Kind="UNCONTROLLABLE" Name="req_start"/>
+<Event Kind="UNCONTROLLABLE" Name="req_stop"/>
+<Event Kind="UNCONTROLLABLE" Name="s1_off"/>
+<Event Kind="UNCONTROLLABLE" Name="s1_on"/>
+<Event Kind="UNCONTROLLABLE" Name="s2_off"/>
+<Event Kind="UNCONTROLLABLE" Name="s2_on"/>
+</EventList>
+<AutomataList>
+<Automaton Kind="SPEC" Name="InletValve">
+<EventRefList>
+<EventRef Name=":accepting"/>
+<EventRef Name="close_in"/>
+<EventRef Name="open_in"/>
+</EventRefList>
+<StateList>
+<State Initial="true" Name="CLOSED">
+<EventRefList>
+<EventRef Name=":accepting"/>
+</EventRefList>
+</State>
+<State Name="OPEN"/>
+</StateList>
+<TransitionList>
+<Transition Target="OPEN" Source="CLOSED" Event="open_in"/>
+<Transition Target="CLOSED" Source="OPEN" Event="close_in"/>
+</TransitionList>
+</Automaton>
+<Automaton Kind="SPEC" Name="OutletValve">
+<EventRefList>
+<EventRef Name=":accepting"/>
+<EventRef Name="close_out"/>
+<EventRef Name="open_out"/>
+</EventRefList>
+<StateList>
+<State Initial="true" Name="CLOSED">
+<EventRefList>
+<EventRef Name=":accepting"/>
+</EventRefList>
+</State>
+<State Name="OPEN"/>
+</StateList>
+<TransitionList>
+<Transition Target="OPEN" Source="CLOSED" Event="open_out"/>
+<Transition Target="CLOSED" Source="OPEN" Event="close_out"/>
+</TransitionList>
+</Automaton>
+<Automaton Kind="PLANT" Name="Requests">
+<EventRefList>
+<EventRef Name=":accepting"/>
+<EventRef Name="req_start"/>
+<EventRef Name="req_stop"/>
+</EventRefList>
+<StateList>
+<State Initial="true" Name="NOREQ">
+<EventRefList>
+<EventRef Name=":accepting"/>
+</EventRefList>
+</State>
+<State Name="REQ"/>
+</StateList>
+<TransitionList>
+<Transition Target="REQ" Source="NOREQ" Event="req_start"/>
+<Transition Target="NOREQ" Source="REQ" Event="req_stop"/>
+</TransitionList>
+</Automaton>
+<Automaton Kind="PLANT" Name="S1">
+<EventRefList>
+<EventRef Name=":accepting"/>
+<EventRef Name="s1_off"/>
+<EventRef Name="s1_on"/>
+</EventRefList>
+<StateList>
+<State Initial="true" Name="OFF">
+<EventRefList>
+<EventRef Name=":accepting"/>
+</EventRefList>
+</State>
+<State Name="ON"/>
+</StateList>
+<TransitionList>
+<Transition Target="ON" Source="OFF" Event="s1_on"/>
+<Transition Target="OFF" Source="ON" Event="s1_off"/>
+</TransitionList>
+</Automaton>
+<Automaton Kind="PLANT" Name="S2">
+<EventRefList>
+<EventRef Name=":accepting"/>
+<EventRef Name="s2_off"/>
+<EventRef Name="s2_on"/>
+</EventRefList>
+<StateList>
+<State Initial="true" Name="OFF">
+<EventRefList>
+<EventRef Name=":accepting"/>
+</EventRefList>
+</State>
+<State Name="ON"/>
+</StateList>
+<TransitionList>
+<Transition Target="ON" Source="OFF" Event="s2_on"/>
+<Transition Target="OFF" Source="ON" Event="s2_off"/>
+</TransitionList>
+</Automaton>
+<Automaton Kind="PLANT" Name="vin">
+<EventRefList>
+<EventRef Name="close_in"/>
+<EventRef Name="open_in"/>
+<EventRef Name="open_out"/>
+<EventRef Name="s1_on"/>
+<EventRef Name="s2_on"/>
+</EventRefList>
+<StateList>
+<State Initial="true" Name="0"/>
+<State Name="1"/>
+</StateList>
+<TransitionList>
+<Transition Target="0" Source="0" Event="close_in"/>
+<Transition Target="1" Source="0" Event="open_in"/>
+<Transition Target="0" Source="0" Event="open_out"/>
+<Transition Target="0" Source="1" Event="close_in"/>
+<Transition Target="1" Source="1" Event="open_in"/>
+<Transition Target="1" Source="1" Event="s1_on"/>
+<Transition Target="1" Source="1" Event="s2_on"/>
+</TransitionList>
+</Automaton>
+<Automaton Kind="PLANT" Name="vout">
+<EventRefList>
+<EventRef Name="close_out"/>
+<EventRef Name="open_in"/>
+<EventRef Name="open_out"/>
+<EventRef Name="s1_off"/>
+<EventRef Name="s2_off"/>
+</EventRefList>
+<StateList>
+<State Initial="true" Name="0"/>
+<State Name="1"/>
+</StateList>
+<TransitionList>
+<Transition Target="0" Source="0" Event="close_out"/>
+<Transition Target="0" Source="0" Event="open_in"/>
+<Transition Target="1" Source="0" Event="open_out"/>
+<Transition Target="0" Source="1" Event="close_out"/>
+<Transition Target="1" Source="1" Event="open_out"/>
+<Transition Target="1" Source="1" Event="s1_off"/>
+<Transition Target="1" Source="1" Event="s2_off"/>
+</TransitionList>
+</Automaton>
+<Automaton Kind="PLANT" Name="vreq">
+<EventRefList>
+<EventRef Name="open_in"/>
+<EventRef Name="open_out"/>
+<EventRef Name="req_start"/>
+<EventRef Name="req_stop"/>
+</EventRefList>
+<StateList>
+<State Initial="true" Name="0"/>
+<State Name="1"/>
+</StateList>
+<TransitionList>
+<Transition Target="1" Source="0" Event="req_start"/>
+<Transition Target="0" Source="0" Event="req_stop"/>
+<Transition Target="1" Source="1" Event="open_in"/>
+<Transition Target="1" Source="1" Event="open_out"/>
+<Transition Target="1" Source="1" Event="req_start"/>
+<Transition Target="0" Source="1" Event="req_stop"/>
+</TransitionList>
+</Automaton>
+<Automaton Kind="PLANT" Name="vs1">
+<EventRefList>
+<EventRef Name="close_out"/>
+<EventRef Name="open_in"/>
+<EventRef Name="s1_off"/>
+<EventRef Name="s1_on"/>
+<EventRef Name="s2_on"/>
+</EventRefList>
+<StateList>
+<State Initial="true" Name="0"/>
+<State Name="1"/>
+</StateList>
+<TransitionList>
+<Transition Target="0" Source="0" Event="close_out"/>
+<Transition Target="0" Source="0" Event="open_in"/>
+<Transition Target="0" Source="0" Event="s1_off"/>
+<Transition Target="1" Source="0" Event="s1_on"/>
+<Transition Target="0" Source="1" Event="s1_off"/>
+<Transition Target="1" Source="1" Event="s1_on"/>
+<Transition Target="1" Source="1" Event="s2_on"/>
+</TransitionList>
+</Automaton>
+<Automaton Kind="PLANT" Name="vs2">
+<EventRefList>
+<EventRef Name="close_in"/>
+<EventRef Name="open_out"/>
+<EventRef Name="s1_off"/>
+<EventRef Name="s2_off"/>
+<EventRef Name="s2_on"/>
+</EventRefList>
+<StateList>
+<State Initial="true" Name="0"/>
+<State Name="1"/>
+</StateList>
+<TransitionList>
+<Transition Target="0" Source="0" Event="s1_off"/>
+<Transition Target="0" Source="0" Event="s2_off"/>
+<Transition Target="1" Source="0" Event="s2_on"/>
+<Transition Target="1" Source="1" Event="close_in"/>
+<Transition Target="1" Source="1" Event="open_out"/>
+<Transition Target="0" Source="1" Event="s2_off"/>
+<Transition Target="1" Source="1" Event="s2_on"/>
+</TransitionList>
+</Automaton>
+</AutomataList>
+</ProductDES>
+

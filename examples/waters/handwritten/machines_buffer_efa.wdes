@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<ProductDES Name="machines_buffer_efa"
+  xmlns:ns2="http://waters.sourceforge.net/xsd/base"
+  xmlns="http://waters.sourceforge.net/xsd/des">
+<ns2:Comment>An EFA version of Wonham's classical small factory. This model has a buffer capacity of 2 and is controllable, because the action items += 1 in Machine1 contains an implicit guard items &lt; 2, so the plant prevents buffer overflow.</ns2:Comment>
+<EventList>
+<Event Kind="PROPOSITION" Name=":accepting"/>
+<Event Kind="CONTROLLABLE" Name="start1"/>
+<Event Kind="CONTROLLABLE" Name="start2"/>
+<Event Kind="UNCONTROLLABLE" Name="finish1.{items&lt;2}"/>
+<Event Kind="UNCONTROLLABLE" Name="finish1.{2&lt;=items}"/>
+<Event Kind="UNCONTROLLABLE" Name="finish2"/>
+</EventList>
+<AutomataList>
+<Automaton Kind="PLANT" Name="Machine1">
+<EventRefList>
+<EventRef Name=":accepting"/>
+<EventRef Name="start1"/>
+<EventRef Name="finish1.{items&lt;2}"/>
+<EventRef Name="finish1.{2&lt;=items}"/>
+</EventRefList>
+<StateList>
+<State Initial="true" Name="S0">
+<EventRefList>
+<EventRef Name=":accepting"/>
+</EventRefList>
+</State>
+<State Name="S1"/>
+</StateList>
+<TransitionList>
+<Transition Source="S0" Target="S1" Event="start1"/>
+<Transition Source="S1" Target="S0" Event="finish1.{items&lt;2}"/>
+<Transition Source="S1" Target="S0" Event="finish1.{2&lt;=items}"/>
+</TransitionList>
+</Automaton>
+<Automaton Kind="PLANT" Name="Machine2">
+<EventRefList>
+<EventRef Name=":accepting"/>
+<EventRef Name="start2"/>
+<EventRef Name="finish2"/>
+</EventRefList>
+<StateList>
+<State Initial="true" Name="S0">
+<EventRefList>
+<EventRef Name=":accepting"/>
+</EventRefList>
+</State>
+<State Name="S1"/>
+</StateList>
+<TransitionList>
+<Transition Source="S0" Target="S1" Event="start2"/>
+<Transition Source="S1" Target="S0" Event="finish2"/>
+</TransitionList>
+</Automaton>
+<Automaton Kind="SPEC" Name="BufferSize">
+<EventRefList>
+<EventRef Name=":accepting"/>
+<EventRef Name="finish1.{items&lt;2}"/>
+<EventRef Name="finish1.{2&lt;=items}"/>
+<EventRef Name="start2"/>
+</EventRefList>
+<StateList>
+<State Initial="true" Name="S0">
+<EventRefList>
+<EventRef Name=":accepting"/>
+</EventRefList>
+</State>
+</StateList>
+<TransitionList>
+<Transition Source="S0" Target="S0" Event="finish1.{items&lt;2}"/>
+<Transition Source="S0" Target="S0" Event="start2"/>
+</TransitionList>
+</Automaton>
+<Automaton Kind="PLANT" Name="items">
+<EventRefList>
+<EventRef Name=":accepting"/>
+<EventRef Name="finish1.{items&lt;2}"/>
+<EventRef Name="finish1.{2&lt;=items}"/>
+<EventRef Name="start2"/>
+</EventRefList>
+<StateList>
+<State Initial="true" Name="0">
+<EventRefList>
+<EventRef Name=":accepting"/>
+</EventRefList>
+</State>
+<State Name="1"/>
+<State Name="2"/>
+</StateList>
+<TransitionList>
+<Transition Source="0" Target="1" Event="finish1.{items&lt;2}"/>
+<Transition Source="1" Target="2" Event="finish1.{items&lt;2}"/>
+<Transition Source="1" Target="0" Event="start2"/>
+<Transition Source="2" Target="1" Event="start2"/>
+</TransitionList>
+</Automaton>
+</AutomataList>
+</ProductDES>
+

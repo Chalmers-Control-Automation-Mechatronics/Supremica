@@ -138,7 +138,6 @@ public class EFACompiler
       mVariableMap.getExpressionComparator();
     mSimpleExpressionCompiler =
       new SimpleExpressionCompiler(mFactory, mOperatorTable, comparator);
-    mGuardCompiler = new GuardCompiler(mFactory, mOperatorTable, comparator);
     mConstraintPropagator =
       new ConstraintPropagator(mFactory, mOperatorTable,
                                mSimpleExpressionCompiler, mVariableMap);
@@ -433,6 +432,19 @@ public class EFACompiler
   {
 
     //#######################################################################
+    //# Constructor
+    private Pass2Visitor()
+    {
+      final Comparator<SimpleExpressionProxy> comparator =
+        mVariableMap.getExpressionComparator();
+      final EFASimpleExpressionEvaluator evaluator =
+        new EFASimpleExpressionEvaluator
+        (mOperatorTable, mRootContext, mVariableMap);
+      mGuardCompiler =
+        new GuardCompiler(mFactory, mOperatorTable, comparator, evaluator);
+    }
+
+    //#######################################################################
     //# Interface net.sourceforge.waters.model.module.ModuleProxyVisitor
     public Object visitBinaryExpressionProxy(final BinaryExpressionProxy expr)
       throws VisitorException
@@ -525,7 +537,9 @@ public class EFACompiler
             edecl.addVariables(mCollectedVariables);
           }
           if (mCurrentGuard != null) {
-            edecl.addTransitions(mCurrentComponent, mCurrentGuard, ident);
+            final EFATransitionGroup trans =
+              edecl.createTransitionGroup(mCurrentComponent);
+            trans.addTransitions(mCurrentGuard, ident);
           }
         }
         return edecl;
@@ -573,7 +587,7 @@ public class EFACompiler
             edecl.addVariables(mCollectedVariables);
           }
           final EventKind ekind = edecl.getKind();
-          final EFATransitionGroup trans = edecl.getTransitionGroup(comp);
+          final EFATransitionGroup trans = edecl.createTransitionGroup(comp);
           if (ekind == EventKind.CONTROLLABLE &&
               ckind == ComponentKind.PROPERTY ||
               ekind == EventKind.UNCONTROLLABLE &&
@@ -585,7 +599,7 @@ public class EFACompiler
               final CompiledGuard complement =
                 mGuardCompiler.getComplementaryGuard(guards);
               if (complement != null) {
-                trans.addTransitions(complement, null);
+                trans.addTransitions(complement, comp);
               }
             }
           } else {
@@ -611,6 +625,8 @@ public class EFACompiler
 
     //#######################################################################
     //# Data Members
+    private final GuardCompiler mGuardCompiler;
+
     private SimpleComponentProxy mCurrentComponent;
     private Set<EFAVariable> mCollectedVariables;
     private Set<EFAEventDecl> mCollectedEvents;
@@ -954,7 +970,6 @@ public class EFACompiler
   private final CompilerOperatorTable mOperatorTable;
   private final CompiledGuard mTrueGuard;
   private final SimpleExpressionCompiler mSimpleExpressionCompiler;
-  private final GuardCompiler mGuardCompiler;
   private final ConstraintPropagator mConstraintPropagator;
   private final SplitComputer mSplitComputer;
   private final EFAEventNameBuilder mEventNameBuilder;

@@ -12,15 +12,19 @@ package net.sourceforge.waters.model.compiler.efa;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import net.sourceforge.waters.model.base.ProxyAccessor;
 import net.sourceforge.waters.model.base.ProxyAccessorByContents;
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
+import net.sourceforge.waters.model.compiler.context.CompiledIntRange;
+import net.sourceforge.waters.model.compiler.context.CompiledRange;
 import net.sourceforge.waters.model.compiler.dnf.CompiledNormalForm;
 import net.sourceforge.waters.model.compiler.dnf.DNFConverter;
 import net.sourceforge.waters.model.expr.BinaryOperator;
 import net.sourceforge.waters.model.expr.EvalException;
+import net.sourceforge.waters.model.expr.TypeMismatchException;
 import net.sourceforge.waters.model.expr.UnaryOperator;
 import net.sourceforge.waters.model.module.BinaryExpressionProxy;
 import net.sourceforge.waters.model.module.GuardActionBlockProxy;
@@ -37,11 +41,13 @@ class GuardCompiler
   //# Constructors
   GuardCompiler(final ModuleProxyFactory factory,
                 final CompilerOperatorTable optable,
-                final Comparator<SimpleExpressionProxy> comparator)
+                final Comparator<SimpleExpressionProxy> comparator,
+                final EFASimpleExpressionEvaluator evaluator)
   {
     mFactory = factory;
     mOperatorTable = optable;
     mDNFConverter = new DNFConverter(factory, optable, comparator);
+    mEvaluator = evaluator;
     mCache =
       new HashMap<ProxyAccessor<GuardActionBlockProxy>,CompiledGuard>();
   }
@@ -74,15 +80,16 @@ class GuardCompiler
         mFactory.createUnaryExpressionProxy(notop, guard);
       expr = combine(expr, notguard);
     }
+    final CompiledNormalForm dnf;
     if (expr == null) {
-      return null;
-    }
-    final CompiledNormalForm dnf = mDNFConverter.convertToDNF(expr);
-    if (dnf.isFalse()) {
-      return null;
+      dnf = CompiledNormalForm.getTrueDNF();
     } else {
-      return new CompiledGuard(expr, dnf);
+      dnf = mDNFConverter.convertToDNF(expr);
+      if (dnf.isFalse()) {
+        return null;
+      }
     }
+    return new CompiledGuard(expr, dnf);
   }
 
 
@@ -92,19 +99,34 @@ class GuardCompiler
     (final GuardActionBlockProxy block)
     throws EvalException
   {
-    SimpleExpressionProxy expr = null;
-    for (final SimpleExpressionProxy guard : block.getGuards()) {
-      expr = combine(expr, guard);
-    }
-    for (final BinaryExpressionProxy action : block.getActions()) {
-      final SimpleExpressionProxy norm = convertAction(action);
-      expr = combine(expr, norm);
-    }
-    if (expr == null) {
+    final List<SimpleExpressionProxy> guards = block.getGuards();
+    final List<BinaryExpressionProxy> actions = block.getActions();
+    if (guards.isEmpty() && actions.isEmpty()) {
       throw new ActionSyntaxException("Empty guard/action block encountered!",
                                       block);
     }
-    final CompiledNormalForm dnf = mDNFConverter.convertToDNF(expr);
+    SimpleExpressionProxy expr = null;
+    for (final SimpleExpressionProxy guard : guards) {
+      final CompiledIntRange range = mEvaluator.evalBooleanRange(guard);
+      if (range.getLower() == 1) {
+        continue;
+      } else if (range.getUpper() == 0) {
+        final CompiledNormalForm dnf = CompiledNormalForm.getFalseDNF();
+        return new CompiledGuard(expr, dnf);
+      } else {
+        expr = combine(expr, guard);
+      }
+    }
+    for (final BinaryExpressionProxy action : actions) {
+      final SimpleExpressionProxy norm = convertAction(action);
+      expr = combine(expr, norm);
+    }
+    final CompiledNormalForm dnf;
+    if (expr == null) {
+      dnf = CompiledNormalForm.getTrueDNF();
+    } else {
+      dnf = mDNFConverter.convertToDNF(expr);
+    }
     return new CompiledGuard(expr, dnf);
   }
 
@@ -123,21 +145,28 @@ class GuardCompiler
 
   private SimpleExpressionProxy convertAction
     (final BinaryExpressionProxy action)
-    throws ActionSyntaxException
+    throws EvalException
   {
     final SimpleExpressionProxy lhs = action.getLeft();
     if (!(lhs instanceof IdentifierProxy)) {
       throw new ActionSyntaxException(action, lhs);
     }
     final IdentifierProxy ident = (IdentifierProxy) lhs;
+    final CompiledRange irange = mEvaluator.evalRange(ident);
     final SimpleExpressionProxy expr = action.getRight();
     final BinaryOperator assignment = action.getOperator();
     final BinaryOperator op = mOperatorTable.getAssigningOperator(assignment);
     final BinaryOperator assop = mOperatorTable.getAssignmentOperator();
     final SimpleExpressionProxy newexpr;
     if (assignment == assop) {
-      newexpr = expr;
+      final CompiledRange erange = mEvaluator.evalRange(expr);
+      if (irange.intersects(erange)) {
+        newexpr = expr;
+      } else {
+        throw new TypeMismatchException(expr, erange.toString());
+      }
     } else if (op != null) {
+      mEvaluator.evalIntRange(expr);
       newexpr = mFactory.createBinaryExpressionProxy(op, ident, expr);
     } else {
       throw new ActionSyntaxException(action);
@@ -155,6 +184,7 @@ class GuardCompiler
   private final ModuleProxyFactory mFactory;
   private final CompilerOperatorTable mOperatorTable;
   private final DNFConverter mDNFConverter;
+  private final EFASimpleExpressionEvaluator mEvaluator;
 
   private final Map<ProxyAccessor<GuardActionBlockProxy>,CompiledGuard> mCache;
 

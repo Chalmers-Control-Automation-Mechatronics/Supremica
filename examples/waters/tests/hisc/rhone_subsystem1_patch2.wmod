@@ -2,8 +2,7 @@
 <Module Name="rhone_subsystem1_patch2" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
 <ns2:Comment></ns2:Comment>
 <ConstantAliasList>
-<ConstantAlias>
-<SimpleIdentifier Name="AS1_2"/>
+<ConstantAlias Name="AS1_2">
 <ConstantAliasExpression>
 <EnumSetExpression>
 <SimpleIdentifier Name="AS1"/>
@@ -11,8 +10,7 @@
 </EnumSetExpression>
 </ConstantAliasExpression>
 </ConstantAlias>
-<ConstantAlias>
-<SimpleIdentifier Name="TU1_2"/>
+<ConstantAlias Name="TU1_2">
 <ConstantAliasExpression>
 <EnumSetExpression>
 <SimpleIdentifier Name="TU1"/>
@@ -20,8 +18,7 @@
 </EnumSetExpression>
 </ConstantAliasExpression>
 </ConstantAlias>
-<ConstantAlias>
-<SimpleIdentifier Name="TU1_2_4"/>
+<ConstantAlias Name="TU1_2_4">
 <ConstantAliasExpression>
 <EnumSetExpression>
 <SimpleIdentifier Name="TU1"/>
@@ -30,8 +27,7 @@
 </EnumSetExpression>
 </ConstantAliasExpression>
 </ConstantAlias>
-<ConstantAlias>
-<SimpleIdentifier Name="TUall"/>
+<ConstantAlias Name="TUall">
 <ConstantAliasExpression>
 <EnumSetExpression>
 <SimpleIdentifier Name="TU1"/>
@@ -41,8 +37,7 @@
 </EnumSetExpression>
 </ConstantAliasExpression>
 </ConstantAlias>
-<ConstantAlias>
-<SimpleIdentifier Name="TU3_4"/>
+<ConstantAlias Name="TU3_4">
 <ConstantAliasExpression>
 <EnumSetExpression>
 <SimpleIdentifier Name="TU3"/>
@@ -50,8 +45,7 @@
 </EnumSetExpression>
 </ConstantAliasExpression>
 </ConstantAlias>
-<ConstantAlias>
-<SimpleIdentifier Name="AS1to3"/>
+<ConstantAlias Name="AS1to3">
 <ConstantAliasExpression>
 <EnumSetExpression>
 <SimpleIdentifier Name="AS1"/>
@@ -780,11 +774,6 @@
 <SimpleIdentifier Name="r"/>
 </IndexedIdentifier>
 <Graph>
-<LabelBlock>
-<LabelGeometry Anchor="NW">
-<Point Y="5" X="5"/>
-</LabelGeometry>
-</LabelBlock>
 <NodeList>
 <SimpleNode Name="s9">
 <PointGeometry>
@@ -3169,8 +3158,7 @@
 </SimpleComponent>
 </ComponentList>
 </ForeachComponent>
-<SimpleComponent Kind="SPEC">
-<SimpleIdentifier Name="l_DoRobotTasks1"/>
+<SimpleComponent Kind="SPEC" Name="l_DoRobotTasks1">
 <Graph>
 <LabelBlock>
 <IndexedIdentifier Name="AError1A">
@@ -8813,8 +8801,7 @@
 </SimpleComponent>
 </ComponentList>
 </ForeachComponent>
-<SimpleComponent Kind="PLANT">
-<SimpleIdentifier Name="l_Robot1"/>
+<SimpleComponent Kind="PLANT" Name="l_Robot1">
 <Graph>
 <LabelBlock>
 <IndexedIdentifier Name="AError1A">
@@ -9173,8 +9160,7 @@
 </SimpleComponent>
 </ComponentList>
 </ForeachComponent>
-<SimpleComponent Kind="PLANT">
-<SimpleIdentifier Name="l_RWDeviceAS1"/>
+<SimpleComponent Kind="PLANT" Name="l_RWDeviceAS1">
 <Graph>
 <LabelBlock>
 <IndexedIdentifier Name="DoneRead">

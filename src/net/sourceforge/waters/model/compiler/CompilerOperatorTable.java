@@ -13,6 +13,8 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
 
+import net.sourceforge.waters.model.compiler.old.CompiledIntValue;
+import net.sourceforge.waters.model.compiler.old.CompiledIntRangeValue;
 import net.sourceforge.waters.model.expr.AbstractOperatorTable;
 import net.sourceforge.waters.model.expr.AbstractSimpleExpressionSimplifier;
 import net.sourceforge.waters.model.expr.BinaryOperator;

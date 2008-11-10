@@ -17,6 +17,7 @@ import java.util.Map;
 import net.sourceforge.waters.model.base.VisitorException;
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
 import net.sourceforge.waters.model.compiler.context.BindingContext;
+import net.sourceforge.waters.model.compiler.context.ModuleBindingContext;
 import net.sourceforge.waters.model.compiler.context.CompiledEnumRange;
 import net.sourceforge.waters.model.compiler.context.CompiledRange;
 import net.sourceforge.waters.model.compiler.context.CompiledIntRange;
@@ -45,8 +46,10 @@ class EFASimpleExpressionEvaluator
   //#########################################################################
   //# Constructors
   EFASimpleExpressionEvaluator(final CompilerOperatorTable optable,
+                               final ModuleBindingContext root,
                                final EFAVariableMap varmap)
   {
+    mRootContext = root;
     mVariableMap = varmap;
 
     mBinaryEvaluatorMap = new HashMap<BinaryOperator,BinaryEvaluator>(32);
@@ -62,10 +65,14 @@ class EFASimpleExpressionEvaluator
                             new BinaryLessEqualsEvaluator());
     mBinaryEvaluatorMap.put(optable.getLessThanOperator(),
                             new BinaryLessThanEvaluator());
+    mBinaryEvaluatorMap.put(optable.getMinusOperator(),
+                            new BinaryMinusEvaluator());
     mBinaryEvaluatorMap.put(optable.getNotEqualsOperator(),
                             new BinaryNotEqualsEvaluator());
     mBinaryEvaluatorMap.put(optable.getOrOperator(),
                             new BinaryOrEvaluator());
+    mBinaryEvaluatorMap.put(optable.getPlusOperator(),
+                            new BinaryPlusEvaluator());
 
     mUnaryEvaluatorMap = new HashMap<UnaryOperator,UnaryEvaluator>(8);
     mUnaryEvaluatorMap.put(optable.getNotOperator(),
@@ -79,13 +86,50 @@ class EFASimpleExpressionEvaluator
 
   //#########################################################################
   //# Invocation
+  /**
+   * Computes the estimated range of an expression in the root context
+   * of this evaluator.
+   * @param  expr     The expression to be evaluated.
+   * @param  context  The context that provides bindings to identifiers.
+   * @return The range of possible values of the given expression.
+   *         The result may be an over-approximation, meaning that not
+   *         all values in the returned range can actually be obtained
+   *         by assignment of values to EFA variables.
+   * @throws EvalException to indicate a problem while evaluation the
+   *                  expression. Exceptions may be thrown even for values
+   *                  that cannot actually be obtained, e.g., when
+   *                  a Boolean operator is given an integer argument
+   *                  whose estimated range contains values other than
+   *                  0 or&nbsp;1.
+   */
+  CompiledRange evalRange(final SimpleExpressionProxy expr)
+    throws EvalException
+  {
+    return evalRange(expr, mRootContext);
+  }
+
+  /**
+   * Computes the estimated range of an expression in a given context.
+   * @param  expr     The expression to be evaluated.
+   * @param  context  The context that provides bindings to identifiers.
+   * @return The range of possible values of the given expression.
+   *         The result may be an over-approximation, meaning that not
+   *         all values in the returned range can actually be obtained
+   *         by assignment of values to EFA variables.
+   * @throws EvalException to indicate a problem while evaluation the
+   *                  expression. Exceptions may be thrown even for values
+   *                  that cannot actually be obtained, e.g., when
+   *                  a Boolean operator is given an integer argument
+   *                  whose estimated range contains values other than
+   *                  0 or&nbsp;1.
+   */
   CompiledRange evalRange(final SimpleExpressionProxy expr,
                           final BindingContext context)
     throws EvalException
   {
     try {
       mContext = context;
-      return evalRange(expr);
+      return process(expr);
     } catch (final VisitorException exception) {
       final Throwable cause = exception.getCause();
       if (cause instanceof EvalException) {
@@ -98,12 +142,24 @@ class EFASimpleExpressionEvaluator
     }
   }
 
+  CompiledIntRange evalIntRange(final SimpleExpressionProxy expr)
+    throws EvalException
+  {
+    return evalIntRange(expr, mRootContext);
+  }
+
   CompiledIntRange evalIntRange(final SimpleExpressionProxy expr,
                                 final BindingContext context)
     throws EvalException
   {
     final CompiledRange range = evalRange(expr, context);
     return checkIntRange(expr, range);
+  }
+
+  CompiledIntRange evalBooleanRange(final SimpleExpressionProxy expr)
+    throws EvalException
+  {
+    return evalBooleanRange(expr, mRootContext);
   }
 
   CompiledIntRange evalBooleanRange(final SimpleExpressionProxy expr,
@@ -117,14 +173,14 @@ class EFASimpleExpressionEvaluator
 
   //#########################################################################
   //# Auxiliary Methods
-  private CompiledRange evalRange(final SimpleExpressionProxy expr)
+  private CompiledRange process(final SimpleExpressionProxy expr)
     throws VisitorException
   {
     final SimpleExpressionProxy bound = mContext.getBoundExpression(expr);
     if (bound == null) {
       return (CompiledRange) expr.acceptVisitor(this);
     } else {
-      return evalRange(bound);
+      return process(bound);
     }
   }
 
@@ -186,9 +242,9 @@ class EFASimpleExpressionEvaluator
   {
     try {
       final SimpleExpressionProxy leftexpr = expr.getLeft();
-      final CompiledRange leftrange = evalRange(leftexpr);
+      final CompiledRange leftrange = process(leftexpr);
       final SimpleExpressionProxy rightexpr = expr.getRight();
-      final CompiledRange rightrange = evalRange(rightexpr);
+      final CompiledRange rightrange = process(rightexpr);
       final BinaryOperator op = expr.getOperator();
       final BinaryEvaluator evaluator = getEvaluator(op);
       return evaluator.eval(leftexpr, leftrange, rightexpr, rightrange);
@@ -228,7 +284,7 @@ class EFASimpleExpressionEvaluator
   {
     try {
       final SimpleExpressionProxy subterm = expr.getSubTerm();
-      final CompiledRange subrange = evalRange(subterm);
+      final CompiledRange subrange = process(subterm);
       final UnaryOperator op = expr.getOperator();
       final UnaryEvaluator evaluator = getEvaluator(op);
       return evaluator.eval(subterm, subrange);
@@ -517,7 +573,7 @@ class EFASimpleExpressionEvaluator
     {
       final int lower = leftrange.getLower() - rightrange.getUpper();
       final int upper = leftrange.getUpper() - rightrange.getLower();
-      return new CompiledIntRange(lower, upper);      
+      return new CompiledIntRange(lower, upper);
     }
 
   }
@@ -586,7 +642,7 @@ class EFASimpleExpressionEvaluator
     {
       final int lower = leftrange.getLower() + rightrange.getLower();
       final int upper = leftrange.getUpper() + rightrange.getUpper();
-      return new CompiledIntRange(lower, upper);      
+      return new CompiledIntRange(lower, upper);
     }
 
   }
@@ -652,6 +708,7 @@ class EFASimpleExpressionEvaluator
 
   //#########################################################################
   //# Data Members
+  private final ModuleBindingContext mRootContext;
   private final EFAVariableMap mVariableMap;
   private final Map<BinaryOperator,BinaryEvaluator> mBinaryEvaluatorMap;
   private final Map<UnaryOperator,UnaryEvaluator> mUnaryEvaluatorMap;

@@ -64,11 +64,12 @@ import java.util.Collection;
 import java.util.Iterator;
 
 import net.sourceforge.waters.model.compiler.ModuleCompiler;
-import net.sourceforge.waters.model.expr.EvalException;
+import net.sourceforge.waters.model.compiler.old.OldModuleCompiler;
 import net.sourceforge.waters.model.des.*;
+import net.sourceforge.waters.model.expr.EvalException;
 import net.sourceforge.waters.model.marshaller.DocumentManager;
-import net.sourceforge.waters.model.module.ModuleProxy;
 import net.sourceforge.waters.model.module.EventDeclProxy;
+import net.sourceforge.waters.model.module.ModuleProxy;
 import net.sourceforge.waters.plain.des.ProductDESElementFactory;
 import net.sourceforge.waters.xsd.base.EventKind;
 
@@ -145,13 +146,24 @@ public class ProjectBuildFromWaters
         {
             throw new NullPointerException("argument must be non null");
         }
+		final boolean expand = Config.EXPAND_EXTENDED_AUTOMATA.isTrue();
+		final boolean ealpha = Config.USE_EVENT_ALPHABET.isTrue();
         final ProductDESProxyFactory factory =
             ProductDESElementFactory.getInstance();
-        ModuleCompiler compiler =
-            new ModuleCompiler(mDocumentManager, factory, module);
-		final boolean expand = Config.EXPAND_EXTENDED_AUTOMATA.isTrue();
-        compiler.setExpandingEFATransitions(expand);
-        return build(compiler.compile());
+		final ProductDESProxy des;
+		if (Config.USE_OLD_COMPILER.isTrue()) {
+			final OldModuleCompiler compiler =
+				new OldModuleCompiler(mDocumentManager, factory, module);
+			compiler.setExpandingEFATransitions(expand);
+			des = compiler.compile();
+		} else {
+			final ModuleCompiler compiler =
+				new ModuleCompiler(mDocumentManager, factory, module);
+			compiler.setExpandingEFATransitions(expand);
+			compiler.setUsingEventAlphabet(ealpha);
+			des = compiler.compile();
+		}
+        return build(des);
     }
     
     /**

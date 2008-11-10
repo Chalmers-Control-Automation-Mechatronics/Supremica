@@ -17,8 +17,8 @@ import net.sourceforge.waters.model.base.DocumentProxy;
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.base.WatersException;
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
-import net.sourceforge.waters.model.compiler.IndexOutOfRangeException;
 import net.sourceforge.waters.model.compiler.ModuleCompiler;
+import net.sourceforge.waters.model.compiler.instance.IndexOutOfRangeException;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 import net.sourceforge.waters.model.expr.EvalException;
@@ -58,8 +58,7 @@ public class ValidTest extends AbstractWatersTest
   public void testImport_bmw_fh_bad()
     throws IOException, WatersException
   {
-    testImport("bmw_fh", "bmw_fh_bad",
-               TypeMismatchException.class, "'CLOSE'");
+    testImport("bmw_fh", "bmw_fh_bad");
   }
 
   public void testImport_debounce()
@@ -90,7 +89,7 @@ public class ValidTest extends AbstractWatersTest
     throws IOException, WatersException
   {
     testImport("fischertechnik", "fischertechnik_bad",
-               IndexOutOfRangeException.class, "'ST'");
+               IndexOutOfRangeException.class, "{:1, :2, :3, :4, S}");
   }
 
   public void testImport_ftuer()

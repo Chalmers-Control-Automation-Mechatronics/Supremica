@@ -1,0 +1,2398 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Module Name="bmw_fh_bad"
+        xmlns:ns2="http://waters.sourceforge.net/xsd/base"
+        xmlns="http://waters.sourceforge.net/xsd/module">
+<EventDeclList>
+<EventDecl Kind="UNCONTROLLABLE" Name="usaus"/>
+<EventDecl Kind="UNCONTROLLABLE" Name="nocountry"/>
+<EventDecl Kind="UNCONTROLLABLE" Name="OPEN">
+<RangeList>
+<EnumSetExpression>
+<SimpleIdentifier Name="PSD"/>
+<SimpleIdentifier Name="DRD"/>
+</EnumSetExpression>
+</RangeList>
+</EventDecl>
+<EventDecl Kind="CONTROLLABLE" Name="cmft_start"/>
+<EventDecl Kind="UNCONTROLLABLE" Name="CLOSE">
+<RangeList>
+<EnumSetExpression>
+<SimpleIdentifier Name="DRD"/>
+<SimpleIdentifier Name="PSD"/>
+</EnumSetExpression>
+</RangeList>
+</EventDecl>
+<EventDecl Kind="CONTROLLABLE" Name="reset"/>
+<EventDecl Kind="CONTROLLABLE" Name="fh_cond_ecefin"/>
+<EventDecl Kind="CONTROLLABLE" Name="cmft_cond_doors"/>
+<EventDecl Kind="CONTROLLABLE" Name="read_country"/>
+<EventDecl Kind="UNCONTROLLABLE" Name="ecefin"/>
+<EventDecl Kind="CONTROLLABLE" Name="CMFT_BACK">
+<RangeList>
+<EnumSetExpression>
+<SimpleIdentifier Name="CLOSE"/>
+<SimpleIdentifier Name="OPEN"/>
+</EnumSetExpression>
+</RangeList>
+</EventDecl>
+<EventDecl Kind="UNCONTROLLABLE" Name="KEY_PLUG"/>
+<EventDecl Kind="CONTROLLABLE" Name="cmft_cond_key"/>
+<EventDecl Kind="UNCONTROLLABLE" Name="KL_R_OFF"/>
+<EventDecl Kind="UNCONTROLLABLE" Name="KL_R_ON"/>
+<EventDecl Kind="CONTROLLABLE" Name="fh_cond_door_open"/>
+<EventDecl Kind="UNCONTROLLABLE" Name="KL_50_ON"/>
+<EventDecl Kind="CONTROLLABLE" Name="fh_cond_doors_closed"/>
+<EventDecl Kind="UNCONTROLLABLE" Name="KL_50_OFF"/>
+<EventDecl Kind="CONTROLLABLE" Name="timer"/>
+<EventDecl Kind="CONTROLLABLE" Name="CMFT_FRONT">
+<RangeList>
+<EnumSetExpression>
+<SimpleIdentifier Name="CLOSE"/>
+<SimpleIdentifier Name="OPEN"/>
+</EnumSetExpression>
+</RangeList>
+</EventDecl>
+<EventDecl Kind="UNCONTROLLABLE" Name="KEY_UNPLUG"/>
+<EventDecl Kind="UNCONTROLLABLE" Name="REQ">
+<RangeList>
+<EnumSetExpression>
+<SimpleIdentifier Name="OPEN"/>
+<SimpleIdentifier Name="STOP"/>
+<SimpleIdentifier Name="CLOSE"/>
+</EnumSetExpression>
+</RangeList>
+</EventDecl>
+<EventDecl Kind="CONTROLLABLE" Name="FH_LOCK"/>
+<EventDecl Kind="CONTROLLABLE" Name="CMFT_ROOF">
+<RangeList>
+<EnumSetExpression>
+<SimpleIdentifier Name="CLOSE"/>
+<SimpleIdentifier Name="OPEN"/>
+</EnumSetExpression>
+</RangeList>
+</EventDecl>
+<EventDecl Kind="CONTROLLABLE" Name="CMFT_STOP"/>
+<EventDecl Kind="CONTROLLABLE" Name="fh_cond_kl_r"/>
+<EventDecl Kind="UNCONTROLLABLE" Name="timeout"/>
+<EventDecl Kind="CONTROLLABLE" Name="FH_UNLOCK"/>
+<EventDecl Kind="PROPOSITION" Name=":accepting"/>
+</EventDeclList>
+<ComponentList>
+<SimpleComponent Kind="SPEC">
+<SimpleIdentifier Name="comfort_condition_doors_bad"/>
+<Graph Deterministic="true">
+<LabelBlock>
+<IndexedIdentifier Name="CLOSE">
+<SimpleIdentifier Name="DRD"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="CLOSE">
+<SimpleIdentifier Name="PSD"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="CMFT_BACK">
+<SimpleIdentifier Name="CLOSE"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="CMFT_BACK">
+<SimpleIdentifier Name="OPEN"/>
+</IndexedIdentifier>
+<SimpleIdentifier Name="cmft_cond_doors"/>
+<IndexedIdentifier Name="CMFT_FRONT">
+<SimpleIdentifier Name="CLOSE"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="CMFT_FRONT">
+<SimpleIdentifier Name="OPEN"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="CMFT_ROOF">
+<SimpleIdentifier Name="CLOSE"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="CMFT_ROOF">
+<SimpleIdentifier Name="OPEN"/>
+</IndexedIdentifier>
+<SimpleIdentifier Name="cmft_start"/>
+<IndexedIdentifier Name="OPEN">
+<SimpleIdentifier Name="DRD"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="OPEN">
+<SimpleIdentifier Name="PSD"/>
+</IndexedIdentifier>
+<SimpleIdentifier Name="timer"/>
+</LabelBlock>
+<NodeList>
+<SimpleNode Initial="true" Name="doors_closed">
+<EventList>
+<SimpleIdentifier Name=":accepting"/>
+</EventList>
+<PointGeometry>
+<Point X="208" Y="128"/>
+</PointGeometry>
+<LabelGeometry Anchor="SW">
+<Point X="13" Y="3"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="doors_open">
+<PointGeometry>
+<Point X="208" Y="320"/>
+</PointGeometry>
+<LabelGeometry Anchor="SW">
+<Point X="21" Y="9"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="door_open">
+<PointGeometry>
+<Point X="208" Y="224"/>
+</PointGeometry>
+<LabelGeometry Anchor="SW">
+<Point X="17" Y="4"/>
+</LabelGeometry>
+</SimpleNode>
+</NodeList>
+<EdgeList>
+<Edge Source="doors_closed" Target="doors_closed">
+<LabelBlock>
+<SimpleIdentifier Name="cmft_start"/>
+<IndexedIdentifier Name="CMFT_BACK">
+<SimpleIdentifier Name="OPEN"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="CMFT_ROOF">
+<SimpleIdentifier Name="OPEN"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="CMFT_FRONT">
+<SimpleIdentifier Name="OPEN"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="CMFT_BACK">
+<SimpleIdentifier Name="CLOSE"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="CMFT_ROOF">
+<SimpleIdentifier Name="CLOSE"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="CMFT_FRONT">
+<SimpleIdentifier Name="CLOSE"/>
+</IndexedIdentifier>
+<SimpleIdentifier Name="timer"/>
+<LabelGeometry Anchor="NW">
+<Point X="-134" Y="-81"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry Kind="INTERPOLATING">
+<Point X="174" Y="104"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="doors_closed" Target="door_open">
+<LabelBlock>
+<IndexedIdentifier Name="OPEN">
+<SimpleIdentifier Name="DRD"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="OPEN">
+<SimpleIdentifier Name="PSD"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point X="-75" Y="-15"/>
+</LabelGeometry>
+</LabelBlock>
+</Edge>
+<Edge Source="door_open" Target="doors_closed">
+<LabelBlock>
+<IndexedIdentifier Name="CLOSE">
+<SimpleIdentifier Name="DRD"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="CLOSE">
+<SimpleIdentifier Name="PSD"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point X="6" Y="-18"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry Kind="INTERPOLATING">
+<Point X="240" Y="176"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="door_open" Target="door_open">
+<LabelBlock>
+<SimpleIdentifier Name="cmft_cond_doors"/>
+<LabelGeometry Anchor="NW">
+<Point X="-103" Y="-6"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry Kind="INTERPOLATING">
+<Point X="173" Y="222"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="door_open" Target="doors_open">
+<LabelBlock>
+<IndexedIdentifier Name="OPEN">
+<SimpleIdentifier Name="DRD"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="OPEN">
+<SimpleIdentifier Name="PSD"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point X="-77" Y="-12"/>
+</LabelGeometry>
+</LabelBlock>
+</Edge>
+<Edge Source="doors_open" Target="door_open">
+<LabelBlock>
+<IndexedIdentifier Name="CLOSE">
+<SimpleIdentifier Name="DRD"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="CLOSE">
+<SimpleIdentifier Name="PSD"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point X="6" Y="-13"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry Kind="INTERPOLATING">
+<Point X="241" Y="271"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="doors_open" Target="doors_open">
+<LabelBlock>
+<SimpleIdentifier Name="cmft_cond_doors"/>
+<LabelGeometry Anchor="NW">
+<Point X="-107" Y="-14"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry Kind="INTERPOLATING">
+<Point X="182" Y="346"/>
+</SplineGeometry>
+</Edge>
+</EdgeList>
+</Graph>
+</SimpleComponent>
+<SimpleComponent Kind="SPEC">
+<SimpleIdentifier Name="comfort_condition_key"/>
+<Graph Deterministic="true">
+<LabelBlock>
+<IndexedIdentifier Name="CMFT_BACK">
+<SimpleIdentifier Name="CLOSE"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="CMFT_BACK">
+<SimpleIdentifier Name="OPEN"/>
+</IndexedIdentifier>
+<SimpleIdentifier Name="cmft_cond_key"/>
+<IndexedIdentifier Name="CMFT_FRONT">
+<SimpleIdentifier Name="CLOSE"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="CMFT_FRONT">
+<SimpleIdentifier Name="OPEN"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="CMFT_ROOF">
+<SimpleIdentifier Name="CLOSE"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="CMFT_ROOF">
+<SimpleIdentifier Name="OPEN"/>
+</IndexedIdentifier>
+<SimpleIdentifier Name="cmft_start"/>
+<SimpleIdentifier Name="KEY_PLUG"/>
+<SimpleIdentifier Name="KEY_UNPLUG"/>
+<SimpleIdentifier Name="timer"/>
+</LabelBlock>
+<NodeList>
+<SimpleNode Name="key">
+<PointGeometry>
+<Point X="208" Y="240"/>
+</PointGeometry>
+<LabelGeometry Anchor="SW">
+<Point X="17" Y="6"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Initial="true" Name="no_key">
+<EventList>
+<SimpleIdentifier Name=":accepting"/>
+</EventList>
+<PointGeometry>
+<Point X="208" Y="160"/>
+</PointGeometry>
+<LabelGeometry Anchor="SW">
+<Point X="16" Y="1"/>
+</LabelGeometry>
+</SimpleNode>
+</NodeList>
+<EdgeList>
+<Edge Source="key" Target="key">
+<LabelBlock>
+<SimpleIdentifier Name="cmft_cond_key"/>
+<LabelGeometry Anchor="NW">
+<Point X="-97" Y="-8"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry Kind="INTERPOLATING">
+<Point X="175" Y="258"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="key" Target="no_key">
+<LabelBlock>
+<SimpleIdentifier Name="KEY_UNPLUG"/>
+<LabelGeometry Anchor="NW">
+<Point X="9" Y="-5"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry Kind="INTERPOLATING">
+<Point X="226" Y="200"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="no_key" Target="key">
+<LabelBlock>
+<SimpleIdentifier Name="KEY_PLUG"/>
+<LabelGeometry Anchor="NW">
+<Point X="-74" Y="-7"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry Kind="INTERPOLATING">
+<Point X="192" Y="201"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="no_key" Target="no_key">
+<LabelBlock>
+<SimpleIdentifier Name="cmft_start"/>
+<IndexedIdentifier Name="CMFT_BACK">
+<SimpleIdentifier Name="OPEN"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="CMFT_ROOF">
+<SimpleIdentifier Name="OPEN"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="CMFT_FRONT">
+<SimpleIdentifier Name="OPEN"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="CMFT_BACK">
+<SimpleIdentifier Name="CLOSE"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="CMFT_ROOF">
+<SimpleIdentifier Name="CLOSE"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="CMFT_FRONT">
+<SimpleIdentifier Name="CLOSE"/>
+</IndexedIdentifier>
+<SimpleIdentifier Name="timer"/>
+<LabelGeometry Anchor="NW">
+<Point X="-131" Y="-76"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry Kind="INTERPOLATING">
+<Point X="176" Y="134"/>
+</SplineGeometry>
+</Edge>
+</EdgeList>
+</Graph>
+</SimpleComponent>
+<SimpleComponent Kind="SPEC">
+<SimpleIdentifier Name="comfort_control"/>
+<Graph Deterministic="true">
+<LabelBlock>
+<IndexedIdentifier Name="CMFT_BACK">
+<SimpleIdentifier Name="CLOSE"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="CMFT_BACK">
+<SimpleIdentifier Name="OPEN"/>
+</IndexedIdentifier>
+<SimpleIdentifier Name="cmft_cond_doors"/>
+<SimpleIdentifier Name="cmft_cond_key"/>
+<SimpleIdentifier Name="cmft_start"/>
+<SimpleIdentifier Name="CMFT_STOP"/>
+<SimpleIdentifier Name="FH_UNLOCK"/>
+<IndexedIdentifier Name="REQ">
+<SimpleIdentifier Name="CLOSE"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="REQ">
+<SimpleIdentifier Name="OPEN"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="REQ">
+<SimpleIdentifier Name="STOP"/>
+</IndexedIdentifier>
+<SimpleIdentifier Name="timer"/>
+</LabelBlock>
+<NodeList>
+<SimpleNode Name="esc_req">
+<PointGeometry>
+<Point X="384" Y="320"/>
+</PointGeometry>
+<LabelGeometry Anchor="SW">
+<Point X="15" Y="5"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="esc">
+<PointGeometry>
+<Point X="256" Y="320"/>
+</PointGeometry>
+<LabelGeometry Anchor="SW">
+<Point X="19" Y="4"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Initial="true" Name="off">
+<EventList>
+<SimpleIdentifier Name=":accepting"/>
+</EventList>
+<PointGeometry>
+<Point X="112" Y="144"/>
+</PointGeometry>
+<LabelGeometry Anchor="SW">
+<Point X="-32" Y="11"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="cmft">
+<PointGeometry>
+<Point X="256" Y="224"/>
+</PointGeometry>
+<LabelGeometry Anchor="SW">
+<Point X="-38" Y="4"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="request">
+<PointGeometry>
+<Point X="256" Y="144"/>
+</PointGeometry>
+<LabelGeometry Anchor="SW">
+<Point X="29" Y="-6"/>
+</LabelGeometry>
+</SimpleNode>
+</NodeList>
+<EdgeList>
+<Edge Source="cmft" Target="cmft">
+<LabelBlock>
+<SimpleIdentifier Name="timer"/>
+<LabelGeometry Anchor="NW">
+<Point X="5" Y="-7"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry Kind="INTERPOLATING">
+<Point X="295" Y="227"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="cmft" Target="esc">
+<LabelBlock>
+<IndexedIdentifier Name="REQ">
+<SimpleIdentifier Name="STOP"/>
+</IndexedIdentifier>
+<SimpleIdentifier Name="cmft_cond_doors"/>
+<SimpleIdentifier Name="cmft_cond_key"/>
+<LabelGeometry Anchor="NW">
+<Point X="-66" Y="-22"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry Kind="INTERPOLATING">
+<Point X="256" Y="271"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="request" Target="cmft">
+<LabelBlock>
+<IndexedIdentifier Name="CMFT_BACK">
+<SimpleIdentifier Name="OPEN"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="CMFT_BACK">
+<SimpleIdentifier Name="CLOSE"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point X="-16" Y="-7"/>
+</LabelGeometry>
+</LabelBlock>
+</Edge>
+<Edge Source="request" Target="request">
+<LabelBlock>
+<SimpleIdentifier Name="timer"/>
+<SimpleIdentifier Name="cmft_start"/>
+<LabelGeometry Anchor="NW">
+<Point X="11" Y="-25"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry Kind="INTERPOLATING">
+<Point X="276" Y="113"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="request" Target="off">
+<LabelBlock>
+<IndexedIdentifier Name="REQ">
+<SimpleIdentifier Name="STOP"/>
+</IndexedIdentifier>
+<SimpleIdentifier Name="cmft_cond_doors"/>
+<SimpleIdentifier Name="cmft_cond_key"/>
+<LabelGeometry Anchor="NW">
+<Point X="-51" Y="2"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry Kind="INTERPOLATING">
+<Point X="185" Y="160"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="off" Target="request">
+<LabelBlock>
+<IndexedIdentifier Name="REQ">
+<SimpleIdentifier Name="CLOSE"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="REQ">
+<SimpleIdentifier Name="OPEN"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point X="-29" Y="-32"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry Kind="INTERPOLATING">
+<Point X="182" Y="127"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="off" Target="off">
+<LabelBlock>
+<IndexedIdentifier Name="REQ">
+<SimpleIdentifier Name="STOP"/>
+</IndexedIdentifier>
+<SimpleIdentifier Name="FH_UNLOCK"/>
+<LabelGeometry Anchor="NW">
+<Point X="-63" Y="-37"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry Kind="INTERPOLATING">
+<Point X="90" Y="116"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="esc_req" Target="request">
+<LabelBlock>
+<SimpleIdentifier Name="CMFT_STOP"/>
+<LabelGeometry Anchor="NW">
+<Point X="18" Y="3"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry Kind="INTERPOLATING">
+<Point X="358" Y="176"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="esc_req" Target="esc">
+<LabelBlock>
+<IndexedIdentifier Name="REQ">
+<SimpleIdentifier Name="STOP"/>
+</IndexedIdentifier>
+<SimpleIdentifier Name="cmft_cond_doors"/>
+<SimpleIdentifier Name="cmft_cond_key"/>
+<LabelGeometry Anchor="NW">
+<Point X="-29" Y="7"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry Kind="INTERPOLATING">
+<Point X="319" Y="340"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="esc" Target="off">
+<LabelBlock>
+<SimpleIdentifier Name="CMFT_STOP"/>
+<LabelGeometry Anchor="NW">
+<Point X="-80" Y="-7"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry Kind="INTERPOLATING">
+<Point X="164" Y="296"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="esc" Target="esc_req">
+<LabelBlock>
+<IndexedIdentifier Name="REQ">
+<SimpleIdentifier Name="OPEN"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="REQ">
+<SimpleIdentifier Name="CLOSE"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point X="-18" Y="-32"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry Kind="INTERPOLATING">
+<Point X="317" Y="303"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="esc" Target="esc">
+<LabelBlock>
+<IndexedIdentifier Name="REQ">
+<SimpleIdentifier Name="STOP"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point X="-43" Y="7"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry Kind="INTERPOLATING">
+<Point X="239" Y="347"/>
+</SplineGeometry>
+</Edge>
+</EdgeList>
+</Graph>
+</SimpleComponent>
+<SimpleComponent Kind="PLANT">
+<SimpleIdentifier Name="comfort_function"/>
+<Graph Deterministic="true">
+<LabelBlock>
+<IndexedIdentifier Name="REQ">
+<SimpleIdentifier Name="CLOSE"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="REQ">
+<SimpleIdentifier Name="OPEN"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="REQ">
+<SimpleIdentifier Name="STOP"/>
+</IndexedIdentifier>
+</LabelBlock>
+<NodeList>
+<SimpleNode Initial="true" Name="no_request">
+<EventList>
+<SimpleIdentifier Name=":accepting"/>
+</EventList>
+<PointGeometry>
+<Point X="96" Y="48"/>
+</PointGeometry>
+<LabelGeometry Anchor="SW">
+<Point X="17" Y="1"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="request">
+<PointGeometry>
+<Point X="96" Y="128"/>
+</PointGeometry>
+<LabelGeometry Anchor="SW">
+<Point X="18" Y="6"/>
+</LabelGeometry>
+</SimpleNode>
+</NodeList>
+<EdgeList>
+<Edge Source="request" Target="no_request">
+<LabelBlock>
+<IndexedIdentifier Name="REQ">
+<SimpleIdentifier Name="STOP"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point X="5" Y="-8"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry Kind="INTERPOLATING">
+<Point X="134" Y="86"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="no_request" Target="request">
+<LabelBlock>
+<IndexedIdentifier Name="REQ">
+<SimpleIdentifier Name="CLOSE"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="REQ">
+<SimpleIdentifier Name="OPEN"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point X="-77" Y="-20"/>
+</LabelGeometry>
+</LabelBlock>
+</Edge>
+</EdgeList>
+</Graph>
+</SimpleComponent>
+<ForeachComponent Name="FUNC">
+<EnumSetExpression>
+<SimpleIdentifier Name="OPEN"/>
+<SimpleIdentifier Name="CLOSE"/>
+</EnumSetExpression>
+<ComponentList>
+<SimpleComponent Kind="SPEC">
+<IndexedIdentifier Name="comfort">
+<SimpleIdentifier Name="FUNC"/>
+</IndexedIdentifier>
+<Graph Deterministic="true">
+<LabelBlock>
+<IndexedIdentifier Name="CMFT_BACK">
+<SimpleIdentifier Name="FUNC"/>
+</IndexedIdentifier>
+<SimpleIdentifier Name="cmft_cond_doors"/>
+<SimpleIdentifier Name="cmft_cond_key"/>
+<IndexedIdentifier Name="CMFT_FRONT">
+<SimpleIdentifier Name="FUNC"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="CMFT_ROOF">
+<SimpleIdentifier Name="FUNC"/>
+</IndexedIdentifier>
+<SimpleIdentifier Name="cmft_start"/>
+<IndexedIdentifier Name="REQ">
+<SimpleIdentifier Name="FUNC"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="REQ">
+<SimpleIdentifier Name="STOP"/>
+</IndexedIdentifier>
+<SimpleIdentifier Name="reset"/>
+<SimpleIdentifier Name="timeout"/>
+<SimpleIdentifier Name="timer"/>
+</LabelBlock>
+<NodeList>
+<SimpleNode Name="timeout">
+<PointGeometry>
+<Point X="544" Y="432"/>
+</PointGeometry>
+<LabelGeometry Anchor="SW">
+<Point X="15" Y="3"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="start">
+<PointGeometry>
+<Point X="464" Y="512"/>
+</PointGeometry>
+<LabelGeometry Anchor="SW">
+<Point X="13" Y="4"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="front">
+<PointGeometry>
+<Point X="96" Y="400"/>
+</PointGeometry>
+<LabelGeometry Anchor="SW">
+<Point X="-40" Y="4"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="back">
+<PointGeometry>
+<Point X="336" Y="544"/>
+</PointGeometry>
+<LabelGeometry Anchor="SW">
+<Point X="-12" Y="20"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="timer_roof">
+<PointGeometry>
+<Point X="80" Y="304"/>
+</PointGeometry>
+<LabelGeometry Anchor="SW">
+<Point X="-69" Y="4"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="timer">
+<PointGeometry>
+<Point X="560" Y="304"/>
+</PointGeometry>
+<LabelGeometry Anchor="SW">
+<Point X="13" Y="7"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="roof">
+<PointGeometry>
+<Point X="160" Y="112"/>
+</PointGeometry>
+<LabelGeometry Anchor="SW">
+<Point X="-44" Y="0"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="timeout_front">
+<PointGeometry>
+<Point X="144" Y="480"/>
+</PointGeometry>
+<LabelGeometry Anchor="SW">
+<Point X="-82" Y="16"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="timer_front">
+<PointGeometry>
+<Point X="224" Y="528"/>
+</PointGeometry>
+<LabelGeometry Anchor="SW">
+<Point X="-37" Y="24"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="timeout_roof">
+<PointGeometry>
+<Point X="96" Y="208"/>
+</PointGeometry>
+<LabelGeometry Anchor="SW">
+<Point X="-84" Y="1"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Initial="true" Name="init">
+<EventList>
+<SimpleIdentifier Name=":accepting"/>
+</EventList>
+<PointGeometry>
+<Point X="336" Y="288"/>
+</PointGeometry>
+<LabelGeometry Anchor="SW">
+<Point X="-4" Y="-21"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="request">
+<PointGeometry>
+<Point X="528" Y="176"/>
+</PointGeometry>
+<LabelGeometry Anchor="SW">
+<Point X="14" Y="9"/>
+</LabelGeometry>
+</SimpleNode>
+</NodeList>
+<EdgeList>
+<Edge Source="timeout_roof" Target="init">
+<LabelBlock>
+<IndexedIdentifier Name="REQ">
+<SimpleIdentifier Name="STOP"/>
+</IndexedIdentifier>
+<SimpleIdentifier Name="cmft_cond_doors"/>
+<SimpleIdentifier Name="cmft_cond_key"/>
+<LabelGeometry Anchor="NW">
+<Point X="-52" Y="-27"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry Kind="INTERPOLATING">
+<Point X="203" Y="225"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="timeout_roof" Target="roof">
+<LabelBlock>
+<IndexedIdentifier Name="CMFT_ROOF">
+<SimpleIdentifier Name="FUNC"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point X="-107" Y="-24"/>
+</LabelGeometry>
+</LabelBlock>
+</Edge>
+<Edge Source="back" Target="timer_front">
+<LabelBlock>
+<SimpleIdentifier Name="timer"/>
+<LabelGeometry Anchor="NW">
+<Point X="-12" Y="10"/>
+</LabelGeometry>
+</LabelBlock>
+</Edge>
+<Edge Source="back" Target="init">
+<LabelBlock>
+<IndexedIdentifier Name="REQ">
+<SimpleIdentifier Name="STOP"/>
+</IndexedIdentifier>
+<SimpleIdentifier Name="cmft_cond_doors"/>
+<SimpleIdentifier Name="cmft_cond_key"/>
+<LabelGeometry Anchor="NW">
+<Point X="-8" Y="45"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry Kind="INTERPOLATING">
+<Point X="301" Y="432"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="front" Target="init">
+<LabelBlock>
+<IndexedIdentifier Name="REQ">
+<SimpleIdentifier Name="STOP"/>
+</IndexedIdentifier>
+<SimpleIdentifier Name="cmft_cond_doors"/>
+<SimpleIdentifier Name="cmft_cond_key"/>
+<LabelGeometry Anchor="NW">
+<Point X="-48" Y="-11"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry Kind="INTERPOLATING">
+<Point X="183" Y="332"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="front" Target="timer_roof">
+<LabelBlock>
+<SimpleIdentifier Name="timer"/>
+<LabelGeometry Anchor="NW">
+<Point X="-39" Y="0"/>
+</LabelGeometry>
+</LabelBlock>
+</Edge>
+<Edge Source="roof" Target="init">
+<LabelBlock>
+<IndexedIdentifier Name="REQ">
+<SimpleIdentifier Name="STOP"/>
+</IndexedIdentifier>
+<SimpleIdentifier Name="cmft_cond_doors"/>
+<SimpleIdentifier Name="cmft_cond_key"/>
+<LabelGeometry Anchor="NW">
+<Point X="-68" Y="-35"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry Kind="INTERPOLATING">
+<Point X="254" Y="157"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="start" Target="back">
+<LabelBlock>
+<IndexedIdentifier Name="CMFT_BACK">
+<SimpleIdentifier Name="FUNC"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point X="0" Y="14"/>
+</LabelGeometry>
+</LabelBlock>
+</Edge>
+<Edge Source="start" Target="init">
+<LabelBlock>
+<IndexedIdentifier Name="REQ">
+<SimpleIdentifier Name="STOP"/>
+</IndexedIdentifier>
+<SimpleIdentifier Name="cmft_cond_doors"/>
+<SimpleIdentifier Name="cmft_cond_key"/>
+<LabelGeometry Anchor="NW">
+<Point X="-5" Y="7"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry Kind="INTERPOLATING">
+<Point X="378" Y="423"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="timer" Target="init">
+<LabelBlock>
+<IndexedIdentifier Name="REQ">
+<SimpleIdentifier Name="STOP"/>
+</IndexedIdentifier>
+<SimpleIdentifier Name="cmft_cond_doors"/>
+<SimpleIdentifier Name="cmft_cond_key"/>
+<LabelGeometry Anchor="NW">
+<Point X="-12" Y="-24"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry Kind="INTERPOLATING">
+<Point X="442" Y="333"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="timer" Target="timeout">
+<LabelBlock>
+<SimpleIdentifier Name="timeout"/>
+<LabelGeometry Anchor="NW">
+<Point X="9" Y="-9"/>
+</LabelGeometry>
+</LabelBlock>
+</Edge>
+<Edge Source="request" Target="init">
+<LabelBlock>
+<IndexedIdentifier Name="REQ">
+<SimpleIdentifier Name="STOP"/>
+</IndexedIdentifier>
+<SimpleIdentifier Name="cmft_cond_doors"/>
+<SimpleIdentifier Name="cmft_cond_key"/>
+<LabelGeometry Anchor="NW">
+<Point X="-34" Y="-10"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry Kind="INTERPOLATING">
+<Point X="445" Y="257"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="request" Target="request">
+<LabelBlock>
+<SimpleIdentifier Name="timeout"/>
+<SimpleIdentifier Name="reset"/>
+<LabelGeometry Anchor="NW">
+<Point X="-67" Y="-28"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry Kind="INTERPOLATING">
+<Point X="546" Y="142"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="request" Target="timer">
+<LabelBlock>
+<SimpleIdentifier Name="timer"/>
+<LabelGeometry Anchor="NW">
+<Point X="9" Y="-8"/>
+</LabelGeometry>
+</LabelBlock>
+</Edge>
+<Edge Source="timer_front" Target="init">
+<LabelBlock>
+<IndexedIdentifier Name="REQ">
+<SimpleIdentifier Name="STOP"/>
+</IndexedIdentifier>
+<SimpleIdentifier Name="cmft_cond_doors"/>
+<SimpleIdentifier Name="cmft_cond_key"/>
+<LabelGeometry Anchor="NW">
+<Point X="-50" Y="32"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry Kind="INTERPOLATING">
+<Point X="251" Y="405"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="timer_front" Target="timeout_front">
+<LabelBlock>
+<SimpleIdentifier Name="timeout"/>
+<LabelGeometry Anchor="NW">
+<Point X="-40" Y="10"/>
+</LabelGeometry>
+</LabelBlock>
+</Edge>
+<Edge Source="timer_roof" Target="timeout_roof">
+<LabelBlock>
+<SimpleIdentifier Name="timeout"/>
+<LabelGeometry Anchor="NW">
+<Point X="-58" Y="-14"/>
+</LabelGeometry>
+</LabelBlock>
+</Edge>
+<Edge Source="timer_roof" Target="init">
+<LabelBlock>
+<IndexedIdentifier Name="REQ">
+<SimpleIdentifier Name="STOP"/>
+</IndexedIdentifier>
+<SimpleIdentifier Name="cmft_cond_doors"/>
+<SimpleIdentifier Name="cmft_cond_key"/>
+<LabelGeometry Anchor="NW">
+<Point X="-53" Y="-18"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry Kind="INTERPOLATING">
+<Point X="185" Y="280"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="init" Target="init">
+<LabelBlock>
+<SimpleIdentifier Name="timeout"/>
+<SimpleIdentifier Name="reset"/>
+<SimpleIdentifier Name="timer"/>
+<IndexedIdentifier Name="REQ">
+<SimpleIdentifier Name="STOP"/>
+</IndexedIdentifier>
+<SimpleIdentifier Name="cmft_cond_doors"/>
+<SimpleIdentifier Name="cmft_cond_key"/>
+<SimpleIdentifier Name="cmft_start"/>
+<LabelGeometry Anchor="NW">
+<Point X="-17" Y="-116"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry Kind="INTERPOLATING">
+<Point X="337" Y="249"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="init" Target="request">
+<LabelBlock>
+<IndexedIdentifier Name="REQ">
+<SimpleIdentifier Name="FUNC"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point X="-21" Y="-41"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry Kind="INTERPOLATING">
+<Point X="430" Y="230"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="timeout" Target="init">
+<LabelBlock>
+<IndexedIdentifier Name="REQ">
+<SimpleIdentifier Name="STOP"/>
+</IndexedIdentifier>
+<SimpleIdentifier Name="cmft_cond_doors"/>
+<SimpleIdentifier Name="cmft_cond_key"/>
+<LabelGeometry Anchor="NW">
+<Point X="6" Y="-17"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry Kind="INTERPOLATING">
+<Point X="420" Y="391"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="timeout" Target="start">
+<LabelBlock>
+<SimpleIdentifier Name="cmft_start"/>
+<LabelGeometry Anchor="NW">
+<Point X="9" Y="3"/>
+</LabelGeometry>
+</LabelBlock>
+</Edge>
+<Edge Source="timeout_front" Target="init">
+<LabelBlock>
+<IndexedIdentifier Name="REQ">
+<SimpleIdentifier Name="STOP"/>
+</IndexedIdentifier>
+<SimpleIdentifier Name="cmft_cond_doors"/>
+<SimpleIdentifier Name="cmft_cond_key"/>
+<LabelGeometry Anchor="NW">
+<Point X="-43" Y="-1"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry Kind="INTERPOLATING">
+<Point X="207" Y="380"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="timeout_front" Target="front">
+<LabelBlock>
+<IndexedIdentifier Name="CMFT_FRONT">
+<SimpleIdentifier Name="FUNC"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point X="-108" Y="13"/>
+</LabelGeometry>
+</LabelBlock>
+</Edge>
+</EdgeList>
+</Graph>
+</SimpleComponent>
+</ComponentList>
+</ForeachComponent>
+<ForeachComponent Name="DOOR">
+<EnumSetExpression>
+<SimpleIdentifier Name="DRD"/>
+<SimpleIdentifier Name="PSD"/>
+</EnumSetExpression>
+<ComponentList>
+<SimpleComponent Kind="PLANT">
+<IndexedIdentifier Name="doors_bad">
+<SimpleIdentifier Name="DOOR"/>
+</IndexedIdentifier>
+<Graph Deterministic="true">
+<LabelBlock>
+<IndexedIdentifier Name="CLOSE">
+<SimpleIdentifier Name="DOOR"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="OPEN">
+<SimpleIdentifier Name="DOOR"/>
+</IndexedIdentifier>
+</LabelBlock>
+<NodeList>
+<SimpleNode Initial="true" Name="closed">
+<EventList>
+<SimpleIdentifier Name=":accepting"/>
+</EventList>
+<PointGeometry>
+<Point X="112" Y="80"/>
+</PointGeometry>
+<LabelGeometry Anchor="SW">
+<Point X="-54" Y="6"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="open">
+<PointGeometry>
+<Point X="208" Y="80"/>
+</PointGeometry>
+<LabelGeometry Anchor="SW">
+<Point X="14" Y="4"/>
+</LabelGeometry>
+</SimpleNode>
+</NodeList>
+<EdgeList>
+<Edge Source="open" Target="closed">
+<LabelBlock>
+<IndexedIdentifier Name="CLOSE">
+<SimpleIdentifier Name="DOOR"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point X="-43" Y="-17"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry Kind="INTERPOLATING">
+<Point X="159" Y="63"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="closed" Target="open">
+<LabelBlock>
+<IndexedIdentifier Name="OPEN">
+<SimpleIdentifier Name="DOOR"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point X="-40" Y="9"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry Kind="INTERPOLATING">
+<Point X="159" Y="96"/>
+</SplineGeometry>
+</Edge>
+</EdgeList>
+</Graph>
+</SimpleComponent>
+</ComponentList>
+</ForeachComponent>
+<SimpleComponent Kind="SPEC">
+<SimpleIdentifier Name="fh"/>
+<Graph Deterministic="true">
+<LabelBlock>
+<SimpleIdentifier Name="cmft_start"/>
+<SimpleIdentifier Name="ecefin"/>
+<SimpleIdentifier Name="fh_cond_door_open"/>
+<SimpleIdentifier Name="fh_cond_doors_closed"/>
+<SimpleIdentifier Name="fh_cond_ecefin"/>
+<SimpleIdentifier Name="fh_cond_kl_r"/>
+<SimpleIdentifier Name="FH_LOCK"/>
+<SimpleIdentifier Name="FH_UNLOCK"/>
+<SimpleIdentifier Name="KL_50_ON"/>
+<SimpleIdentifier Name="nocountry"/>
+<SimpleIdentifier Name="read_country"/>
+<SimpleIdentifier Name="usaus"/>
+</LabelBlock>
+<NodeList>
+<SimpleNode Initial="true" Name="s">
+<PointGeometry>
+<Point X="112" Y="256"/>
+</PointGeometry>
+<LabelGeometry Anchor="SW">
+<Point X="5" Y="-9"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="s0">
+<EventList>
+<SimpleIdentifier Name=":accepting"/>
+</EventList>
+<PointGeometry>
+<Point X="208" Y="112"/>
+</PointGeometry>
+<LabelGeometry Anchor="SW">
+<Point X="-17" Y="19"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="s1">
+<PointGeometry>
+<Point X="336" Y="112"/>
+</PointGeometry>
+<LabelGeometry Anchor="SW">
+<Point X="4" Y="18"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="s2">
+<EventList>
+<SimpleIdentifier Name=":accepting"/>
+</EventList>
+<PointGeometry>
+<Point X="208" Y="256"/>
+</PointGeometry>
+<LabelGeometry Anchor="SW">
+<Point X="-18" Y="20"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="s3">
+<PointGeometry>
+<Point X="336" Y="256"/>
+</PointGeometry>
+<LabelGeometry Anchor="SW">
+<Point X="6" Y="15"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="s5">
+<EventList>
+<SimpleIdentifier Name=":accepting"/>
+</EventList>
+<PointGeometry>
+<Point X="208" Y="432"/>
+</PointGeometry>
+<LabelGeometry Anchor="SW">
+<Point X="-27" Y="16"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="s6">
+<PointGeometry>
+<Point X="336" Y="432"/>
+</PointGeometry>
+<LabelGeometry Anchor="SW">
+<Point X="13" Y="10"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="s7">
+<PointGeometry>
+<Point X="336" Y="544"/>
+</PointGeometry>
+<LabelGeometry Anchor="SW">
+<Point X="14" Y="0"/>
+</LabelGeometry>
+</SimpleNode>
+</NodeList>
+<EdgeList>
+<Edge Source="s6" Target="s6">
+<LabelBlock>
+<SimpleIdentifier Name="FH_UNLOCK"/>
+<LabelGeometry Anchor="NW">
+<Point X="2" Y="-13"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry Kind="INTERPOLATING">
+<Point X="345" Y="401"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="s6" Target="s5">
+<LabelBlock>
+<SimpleIdentifier Name="KL_50_ON"/>
+<SimpleIdentifier Name="cmft_start"/>
+<LabelGeometry Anchor="NW">
+<Point X="-41" Y="2"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry Kind="INTERPOLATING">
+<Point X="272" Y="445"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="s6" Target="s7">
+<LabelBlock>
+<SimpleIdentifier Name="fh_cond_door_open"/>
+<LabelGeometry Anchor="NW">
+<Point X="-33" Y="14"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry Kind="INTERPOLATING">
+<Point X="320" Y="488"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="s5" Target="s6">
+<LabelBlock>
+<SimpleIdentifier Name="fh_cond_kl_r"/>
+<LabelGeometry Anchor="NW">
+<Point X="-30" Y="-17"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry Kind="INTERPOLATING">
+<Point X="271" Y="416"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="s5" Target="s5">
+<LabelBlock>
+<SimpleIdentifier Name="FH_LOCK"/>
+<SimpleIdentifier Name="KL_50_ON"/>
+<SimpleIdentifier Name="cmft_start"/>
+<LabelGeometry Anchor="NW">
+<Point X="-31" Y="-51"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry Kind="INTERPOLATING">
+<Point X="207" Y="400"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="s1" Target="s1">
+<LabelBlock>
+<SimpleIdentifier Name="FH_UNLOCK"/>
+<LabelGeometry Anchor="NW">
+<Point X="-4" Y="-25"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry Kind="INTERPOLATING">
+<Point X="363" Y="83"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="s1" Target="s0">
+<LabelBlock>
+<SimpleIdentifier Name="KL_50_ON"/>
+<SimpleIdentifier Name="cmft_start"/>
+<LabelGeometry Anchor="NW">
+<Point X="-35" Y="5"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry Kind="INTERPOLATING">
+<Point X="272" Y="128"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="s7" Target="s6">
+<LabelBlock>
+<SimpleIdentifier Name="fh_cond_doors_closed"/>
+<LabelGeometry Anchor="NW">
+<Point X="-11" Y="-12"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry Kind="INTERPOLATING">
+<Point X="354" Y="490"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="s7" Target="s5">
+<LabelBlock>
+<SimpleIdentifier Name="KL_50_ON"/>
+<SimpleIdentifier Name="cmft_start"/>
+<LabelGeometry Anchor="NW">
+<Point X="-52" Y="-4"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry Kind="INTERPOLATING">
+<Point X="230" Y="525"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="s7" Target="s7">
+<LabelBlock>
+<SimpleIdentifier Name="FH_LOCK"/>
+<LabelGeometry Anchor="NW">
+<Point X="23" Y="-5"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry Kind="INTERPOLATING">
+<Point X="342" Y="576"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="s3" Target="s3">
+<LabelBlock>
+<SimpleIdentifier Name="FH_UNLOCK"/>
+<LabelGeometry Anchor="NW">
+<Point X="0" Y="-20"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry Kind="INTERPOLATING">
+<Point X="343" Y="225"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="s3" Target="s2">
+<LabelBlock>
+<SimpleIdentifier Name="KL_50_ON"/>
+<SimpleIdentifier Name="cmft_start"/>
+<SimpleIdentifier Name="fh_cond_ecefin"/>
+<LabelGeometry Anchor="NW">
+<Point X="-36" Y="7"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry Kind="INTERPOLATING">
+<Point X="270" Y="273"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="s2" Target="s3">
+<LabelBlock>
+<SimpleIdentifier Name="fh_cond_kl_r"/>
+<LabelGeometry Anchor="NW">
+<Point X="-32" Y="-15"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry Kind="INTERPOLATING">
+<Point X="271" Y="241"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="s2" Target="s2">
+<LabelBlock>
+<SimpleIdentifier Name="FH_LOCK"/>
+<SimpleIdentifier Name="KL_50_ON"/>
+<SimpleIdentifier Name="cmft_start"/>
+<LabelGeometry Anchor="NW">
+<Point X="-29" Y="-47"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry Kind="INTERPOLATING">
+<Point X="199" Y="225"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="s" Target="s5">
+<LabelBlock>
+<SimpleIdentifier Name="usaus"/>
+<LabelGeometry Anchor="NW">
+<Point X="-49" Y="-27"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry Kind="INTERPOLATING">
+<Point X="143" Y="379"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="s" Target="s2">
+<LabelBlock>
+<SimpleIdentifier Name="ecefin"/>
+<LabelGeometry Anchor="NW">
+<Point X="-22" Y="-14"/>
+</LabelGeometry>
+</LabelBlock>
+</Edge>
+<Edge Source="s" Target="s">
+<LabelBlock>
+<SimpleIdentifier Name="KL_50_ON"/>
+<SimpleIdentifier Name="read_country"/>
+<LabelGeometry Anchor="NW">
+<Point X="-61" Y="25"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry Kind="INTERPOLATING">
+<Point X="76" Y="256"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="s" Target="s0">
+<LabelBlock>
+<SimpleIdentifier Name="nocountry"/>
+<LabelGeometry Anchor="NW">
+<Point X="-57" Y="-14"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry Kind="INTERPOLATING">
+<Point X="131" Y="158"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="s0" Target="s1">
+<LabelBlock>
+<SimpleIdentifier Name="fh_cond_kl_r"/>
+<LabelGeometry Anchor="NW">
+<Point X="-27" Y="-17"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry Kind="INTERPOLATING">
+<Point X="272" Y="96"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="s0" Target="s0">
+<LabelBlock>
+<SimpleIdentifier Name="FH_LOCK"/>
+<SimpleIdentifier Name="cmft_start"/>
+<SimpleIdentifier Name="KL_50_ON"/>
+<LabelGeometry Anchor="NW">
+<Point X="-44" Y="-50"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry Kind="INTERPOLATING">
+<Point X="195" Y="81"/>
+</SplineGeometry>
+</Edge>
+</EdgeList>
+</Graph>
+</SimpleComponent>
+<SimpleComponent Kind="SPEC">
+<SimpleIdentifier Name="fh_condition_doors_bad"/>
+<Graph Deterministic="true">
+<LabelBlock>
+<IndexedIdentifier Name="CLOSE">
+<SimpleIdentifier Name="DRD"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="CLOSE">
+<SimpleIdentifier Name="PSD"/>
+</IndexedIdentifier>
+<SimpleIdentifier Name="fh_cond_door_open"/>
+<SimpleIdentifier Name="fh_cond_doors_closed"/>
+<IndexedIdentifier Name="OPEN">
+<SimpleIdentifier Name="DRD"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="OPEN">
+<SimpleIdentifier Name="PSD"/>
+</IndexedIdentifier>
+</LabelBlock>
+<NodeList>
+<SimpleNode Initial="true" Name="doors_closed">
+<EventList>
+<SimpleIdentifier Name=":accepting"/>
+</EventList>
+<PointGeometry>
+<Point X="224" Y="48"/>
+</PointGeometry>
+<LabelGeometry Anchor="SW">
+<Point X="13" Y="3"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="doors_open">
+<PointGeometry>
+<Point X="224" Y="208"/>
+</PointGeometry>
+<LabelGeometry Anchor="SW">
+<Point X="13" Y="5"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="door_open">
+<PointGeometry>
+<Point X="224" Y="128"/>
+</PointGeometry>
+<LabelGeometry Anchor="SW">
+<Point X="14" Y="5"/>
+</LabelGeometry>
+</SimpleNode>
+</NodeList>
+<EdgeList>
+<Edge Source="doors_open" Target="doors_open">
+<LabelBlock>
+<SimpleIdentifier Name="fh_cond_door_open"/>
+<LabelGeometry Anchor="NW">
+<Point X="-118" Y="-6"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry Kind="INTERPOLATING">
+<Point X="192" Y="209"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="doors_open" Target="door_open">
+<LabelBlock>
+<IndexedIdentifier Name="CLOSE">
+<SimpleIdentifier Name="PSD"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="CLOSE">
+<SimpleIdentifier Name="DRD"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point X="-78" Y="-12"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry Kind="INTERPOLATING">
+<Point X="209" Y="168"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="doors_closed" Target="doors_closed">
+<LabelBlock>
+<SimpleIdentifier Name="fh_cond_doors_closed"/>
+<LabelGeometry Anchor="NW">
+<Point X="-133" Y="-9"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry Kind="INTERPOLATING">
+<Point X="192" Y="48"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="doors_closed" Target="door_open">
+<LabelBlock>
+<IndexedIdentifier Name="OPEN">
+<SimpleIdentifier Name="PSD"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="OPEN">
+<SimpleIdentifier Name="DRD"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point X="7" Y="-12"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry Kind="INTERPOLATING">
+<Point X="240" Y="88"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="door_open" Target="doors_open">
+<LabelBlock>
+<IndexedIdentifier Name="OPEN">
+<SimpleIdentifier Name="PSD"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="OPEN">
+<SimpleIdentifier Name="DRD"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point X="8" Y="-13"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry Kind="INTERPOLATING">
+<Point X="240" Y="168"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="door_open" Target="doors_closed">
+<LabelBlock>
+<IndexedIdentifier Name="CLOSE">
+<SimpleIdentifier Name="PSD"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="CLOSE">
+<SimpleIdentifier Name="DRD"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point X="-81" Y="-11"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry Kind="INTERPOLATING">
+<Point X="209" Y="88"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="door_open" Target="door_open">
+<LabelBlock>
+<SimpleIdentifier Name="fh_cond_door_open"/>
+<LabelGeometry Anchor="NW">
+<Point X="-118" Y="-7"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry Kind="INTERPOLATING">
+<Point X="192" Y="129"/>
+</SplineGeometry>
+</Edge>
+</EdgeList>
+</Graph>
+</SimpleComponent>
+<SimpleComponent Kind="SPEC">
+<SimpleIdentifier Name="fh_condition_ecefin_bad"/>
+<Graph Deterministic="true">
+<LabelBlock>
+<IndexedIdentifier Name="CLOSE">
+<SimpleIdentifier Name="DRD"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="CLOSE">
+<SimpleIdentifier Name="PSD"/>
+</IndexedIdentifier>
+<SimpleIdentifier Name="fh_cond_ecefin"/>
+<SimpleIdentifier Name="KL_R_OFF"/>
+<SimpleIdentifier Name="KL_R_ON"/>
+<IndexedIdentifier Name="OPEN">
+<SimpleIdentifier Name="DRD"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="OPEN">
+<SimpleIdentifier Name="PSD"/>
+</IndexedIdentifier>
+</LabelBlock>
+<NodeList>
+<SimpleNode Name="radio_door_open">
+<PointGeometry>
+<Point X="368" Y="192"/>
+</PointGeometry>
+<LabelGeometry Anchor="SW">
+<Point X="11" Y="5"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="no_radio_door_open">
+<PointGeometry>
+<Point X="144" Y="192"/>
+</PointGeometry>
+<LabelGeometry Anchor="SW">
+<Point X="-132" Y="5"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="ecefin">
+<PointGeometry>
+<Point X="256" Y="288"/>
+</PointGeometry>
+<LabelGeometry Anchor="SW">
+<Point X="-7" Y="-12"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="radio_doors_closed">
+<PointGeometry>
+<Point X="368" Y="352"/>
+</PointGeometry>
+<LabelGeometry Anchor="SW">
+<Point X="13" Y="4"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="radio_doors_open">
+<PointGeometry>
+<Point X="368" Y="64"/>
+</PointGeometry>
+<LabelGeometry Anchor="SW">
+<Point X="11" Y="3"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Initial="true" Name="no_radio_doors_closed">
+<EventList>
+<SimpleIdentifier Name=":accepting"/>
+</EventList>
+<PointGeometry>
+<Point X="144" Y="352"/>
+</PointGeometry>
+<LabelGeometry Anchor="SW">
+<Point X="-146" Y="4"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="no_radio_doors_open">
+<PointGeometry>
+<Point X="144" Y="64"/>
+</PointGeometry>
+<LabelGeometry Anchor="SW">
+<Point X="-136" Y="3"/>
+</LabelGeometry>
+</SimpleNode>
+</NodeList>
+<EdgeList>
+<Edge Source="no_radio_door_open" Target="no_radio_doors_open">
+<LabelBlock>
+<IndexedIdentifier Name="OPEN">
+<SimpleIdentifier Name="DRD"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="OPEN">
+<SimpleIdentifier Name="PSD"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point X="-74" Y="-12"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry Kind="INTERPOLATING">
+<Point X="128" Y="129"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="no_radio_door_open" Target="ecefin">
+<LabelBlock>
+<IndexedIdentifier Name="CLOSE">
+<SimpleIdentifier Name="DRD"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="CLOSE">
+<SimpleIdentifier Name="PSD"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point X="10" Y="-4"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry Kind="INTERPOLATING">
+<Point X="205" Y="229"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="no_radio_door_open" Target="radio_door_open">
+<LabelBlock>
+<SimpleIdentifier Name="KL_R_ON"/>
+<LabelGeometry Anchor="NW">
+<Point X="-46" Y="-14"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry Kind="INTERPOLATING">
+<Point X="257" Y="174"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="radio_doors_closed" Target="no_radio_doors_closed">
+<LabelBlock>
+<SimpleIdentifier Name="KL_R_OFF"/>
+<LabelGeometry Anchor="NW">
+<Point X="-45" Y="0"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry Kind="INTERPOLATING">
+<Point X="257" Y="370"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="radio_doors_closed" Target="radio_door_open">
+<LabelBlock>
+<IndexedIdentifier Name="OPEN">
+<SimpleIdentifier Name="DRD"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="OPEN">
+<SimpleIdentifier Name="PSD"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point X="-46" Y="-26"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry Kind="INTERPOLATING">
+<Point X="349" Y="273"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="no_radio_doors_open" Target="no_radio_door_open">
+<LabelBlock>
+<IndexedIdentifier Name="CLOSE">
+<SimpleIdentifier Name="DRD"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="CLOSE">
+<SimpleIdentifier Name="PSD"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point X="4" Y="-12"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry Kind="INTERPOLATING">
+<Point X="161" Y="128"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="no_radio_doors_open" Target="radio_doors_open">
+<LabelBlock>
+<SimpleIdentifier Name="KL_R_ON"/>
+<LabelGeometry Anchor="NW">
+<Point X="-50" Y="-14"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry Kind="INTERPOLATING">
+<Point X="257" Y="46"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="radio_doors_open" Target="no_radio_doors_open">
+<LabelBlock>
+<SimpleIdentifier Name="KL_R_OFF"/>
+<LabelGeometry Anchor="NW">
+<Point X="-48" Y="-15"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry Kind="INTERPOLATING">
+<Point X="255" Y="82"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="radio_doors_open" Target="radio_door_open">
+<LabelBlock>
+<IndexedIdentifier Name="CLOSE">
+<SimpleIdentifier Name="DRD"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="CLOSE">
+<SimpleIdentifier Name="PSD"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point X="7" Y="-13"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry Kind="INTERPOLATING">
+<Point X="384" Y="129"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="ecefin" Target="no_radio_door_open">
+<LabelBlock>
+<IndexedIdentifier Name="OPEN">
+<SimpleIdentifier Name="DRD"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="OPEN">
+<SimpleIdentifier Name="PSD"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point X="-48" Y="-14"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry Kind="INTERPOLATING">
+<Point X="189" Y="257"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="ecefin" Target="radio_doors_closed">
+<LabelBlock>
+<SimpleIdentifier Name="KL_R_ON"/>
+<LabelGeometry Anchor="NW">
+<Point X="-50" Y="-9"/>
+</LabelGeometry>
+</LabelBlock>
+</Edge>
+<Edge Source="ecefin" Target="ecefin">
+<LabelBlock>
+<SimpleIdentifier Name="fh_cond_ecefin"/>
+<LabelGeometry Anchor="NW">
+<Point X="-77" Y="4"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry Kind="INTERPOLATING">
+<Point X="228" Y="303"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="no_radio_doors_closed" Target="no_radio_door_open">
+<LabelBlock>
+<IndexedIdentifier Name="OPEN">
+<SimpleIdentifier Name="DRD"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="OPEN">
+<SimpleIdentifier Name="PSD"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point X="-75" Y="-16"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry Kind="INTERPOLATING">
+<Point X="129" Y="273"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="no_radio_doors_closed" Target="radio_doors_closed">
+<LabelBlock>
+<SimpleIdentifier Name="KL_R_ON"/>
+<LabelGeometry Anchor="NW">
+<Point X="-46" Y="2"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry Kind="INTERPOLATING">
+<Point X="257" Y="334"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="radio_door_open" Target="no_radio_door_open">
+<LabelBlock>
+<SimpleIdentifier Name="KL_R_OFF"/>
+<LabelGeometry Anchor="NW">
+<Point X="-45" Y="-13"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry Kind="INTERPOLATING">
+<Point X="255" Y="200"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="radio_door_open" Target="radio_doors_closed">
+<LabelBlock>
+<IndexedIdentifier Name="CLOSE">
+<SimpleIdentifier Name="DRD"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="CLOSE">
+<SimpleIdentifier Name="PSD"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point X="11" Y="-12"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry Kind="INTERPOLATING">
+<Point X="383" Y="272"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="radio_door_open" Target="radio_doors_open">
+<LabelBlock>
+<IndexedIdentifier Name="OPEN">
+<SimpleIdentifier Name="DRD"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="OPEN">
+<SimpleIdentifier Name="PSD"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point X="-73" Y="-14"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry Kind="INTERPOLATING">
+<Point X="352" Y="129"/>
+</SplineGeometry>
+</Edge>
+</EdgeList>
+</Graph>
+</SimpleComponent>
+<SimpleComponent Kind="SPEC">
+<SimpleIdentifier Name="fh_condition_kl_r"/>
+<Graph Deterministic="true">
+<LabelBlock>
+<SimpleIdentifier Name="cmft_start"/>
+<SimpleIdentifier Name="fh_cond_ecefin"/>
+<SimpleIdentifier Name="fh_cond_kl_r"/>
+<SimpleIdentifier Name="KL_50_OFF"/>
+<SimpleIdentifier Name="KL_50_ON"/>
+<SimpleIdentifier Name="KL_R_ON"/>
+</LabelBlock>
+<NodeList>
+<SimpleNode Name="radio">
+<PointGeometry>
+<Point X="160" Y="128"/>
+</PointGeometry>
+<LabelGeometry Anchor="SW">
+<Point X="20" Y="4"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Initial="true" Name="no_radio">
+<EventList>
+<SimpleIdentifier Name=":accepting"/>
+</EventList>
+<PointGeometry>
+<Point X="160" Y="48"/>
+</PointGeometry>
+<LabelGeometry Anchor="SW">
+<Point X="17" Y="5"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="starter">
+<PointGeometry>
+<Point X="160" Y="208"/>
+</PointGeometry>
+<LabelGeometry Anchor="SW">
+<Point X="18" Y="5"/>
+</LabelGeometry>
+</SimpleNode>
+</NodeList>
+<EdgeList>
+<Edge Source="starter" Target="radio">
+<LabelBlock>
+<SimpleIdentifier Name="KL_50_OFF"/>
+<LabelGeometry Anchor="NW">
+<Point X="-75" Y="-5"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry Kind="INTERPOLATING">
+<Point X="145" Y="168"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="no_radio" Target="no_radio">
+<LabelBlock>
+<SimpleIdentifier Name="cmft_start"/>
+<LabelGeometry Anchor="NW">
+<Point X="-70" Y="-5"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry Kind="INTERPOLATING">
+<Point X="129" Y="40"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="no_radio" Target="radio">
+<LabelBlock>
+<SimpleIdentifier Name="KL_R_ON"/>
+<LabelGeometry Anchor="NW">
+<Point X="4" Y="-8"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry Kind="INTERPOLATING">
+<Point X="176" Y="87"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="radio" Target="starter">
+<LabelBlock>
+<SimpleIdentifier Name="KL_50_ON"/>
+<LabelGeometry Anchor="NW">
+<Point X="5" Y="-5"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry Kind="INTERPOLATING">
+<Point X="177" Y="168"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="radio" Target="no_radio">
+<LabelBlock>
+<SimpleIdentifier Name="cmft_start"/>
+<SimpleIdentifier Name="fh_cond_ecefin"/>
+<LabelGeometry Anchor="NW">
+<Point X="-88" Y="-18"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry Kind="INTERPOLATING">
+<Point X="145" Y="88"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="radio" Target="radio">
+<LabelBlock>
+<SimpleIdentifier Name="fh_cond_kl_r"/>
+<SimpleIdentifier Name="KL_R_ON"/>
+<LabelGeometry Anchor="NW">
+<Point X="-77" Y="-6"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry Kind="INTERPOLATING">
+<Point X="126" Y="125"/>
+</SplineGeometry>
+</Edge>
+</EdgeList>
+</Graph>
+</SimpleComponent>
+<SimpleComponent Kind="SPEC">
+<SimpleIdentifier Name="fh_sync_cmft"/>
+<Graph Deterministic="true">
+<LabelBlock>
+<IndexedIdentifier Name="CMFT_BACK">
+<SimpleIdentifier Name="CLOSE"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="CMFT_BACK">
+<SimpleIdentifier Name="OPEN"/>
+</IndexedIdentifier>
+<SimpleIdentifier Name="FH_LOCK"/>
+<SimpleIdentifier Name="FH_UNLOCK"/>
+</LabelBlock>
+<NodeList>
+<SimpleNode Initial="true" Name="locked">
+<EventList>
+<SimpleIdentifier Name=":accepting"/>
+</EventList>
+<PointGeometry>
+<Point X="176" Y="80"/>
+</PointGeometry>
+<LabelGeometry Anchor="SW">
+<Point X="-42" Y="22"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="unlocked">
+<PointGeometry>
+<Point X="272" Y="80"/>
+</PointGeometry>
+<LabelGeometry Anchor="SW">
+<Point X="-9" Y="21"/>
+</LabelGeometry>
+</SimpleNode>
+</NodeList>
+<EdgeList>
+<Edge Source="unlocked" Target="locked">
+<LabelBlock>
+<SimpleIdentifier Name="FH_LOCK"/>
+<LabelGeometry Anchor="NW">
+<Point X="-28" Y="8"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry Kind="INTERPOLATING">
+<Point X="222" Y="94"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="locked" Target="unlocked">
+<LabelBlock>
+<SimpleIdentifier Name="FH_UNLOCK"/>
+<LabelGeometry Anchor="NW">
+<Point X="-39" Y="-19"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry Kind="INTERPOLATING">
+<Point X="223" Y="66"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="locked" Target="locked">
+<LabelBlock>
+<IndexedIdentifier Name="CMFT_BACK">
+<SimpleIdentifier Name="CLOSE"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="CMFT_BACK">
+<SimpleIdentifier Name="OPEN"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point X="-126" Y="-15"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry Kind="INTERPOLATING">
+<Point X="146" Y="68"/>
+</SplineGeometry>
+</Edge>
+</EdgeList>
+</Graph>
+</SimpleComponent>
+<SimpleComponent Kind="PLANT">
+<SimpleIdentifier Name="lock"/>
+<Graph Deterministic="true">
+<LabelBlock>
+<SimpleIdentifier Name="KEY_PLUG"/>
+<SimpleIdentifier Name="KEY_UNPLUG"/>
+<SimpleIdentifier Name="KL_50_OFF"/>
+<SimpleIdentifier Name="KL_50_ON"/>
+<SimpleIdentifier Name="KL_R_OFF"/>
+<SimpleIdentifier Name="KL_R_ON"/>
+</LabelBlock>
+<NodeList>
+<SimpleNode Name="radio">
+<PointGeometry>
+<Point X="176" Y="176"/>
+</PointGeometry>
+<LabelGeometry Anchor="SW">
+<Point X="-42" Y="5"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="starter">
+<PointGeometry>
+<Point X="176" Y="240"/>
+</PointGeometry>
+<LabelGeometry Anchor="SW">
+<Point X="-50" Y="4"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="key">
+<PointGeometry>
+<Point X="176" Y="112"/>
+</PointGeometry>
+<LabelGeometry Anchor="SW">
+<Point X="-36" Y="3"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Initial="true" Name="no_key">
+<EventList>
+<SimpleIdentifier Name=":accepting"/>
+</EventList>
+<PointGeometry>
+<Point X="176" Y="48"/>
+</PointGeometry>
+<LabelGeometry Anchor="SW">
+<Point X="-54" Y="4"/>
+</LabelGeometry>
+</SimpleNode>
+</NodeList>
+<EdgeList>
+<Edge Source="starter" Target="radio">
+<LabelBlock>
+<SimpleIdentifier Name="KL_50_OFF"/>
+<LabelGeometry Anchor="NW">
+<Point X="-76" Y="-6"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry Kind="INTERPOLATING">
+<Point X="160" Y="208"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="no_key" Target="key">
+<LabelBlock>
+<SimpleIdentifier Name="KEY_PLUG"/>
+<LabelGeometry Anchor="NW">
+<Point X="8" Y="-6"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry Kind="INTERPOLATING">
+<Point X="188" Y="78"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="radio" Target="starter">
+<LabelBlock>
+<SimpleIdentifier Name="KL_50_ON"/>
+<LabelGeometry Anchor="NW">
+<Point X="7" Y="-8"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry Kind="INTERPOLATING">
+<Point X="192" Y="209"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="radio" Target="key">
+<LabelBlock>
+<SimpleIdentifier Name="KL_R_OFF"/>
+<LabelGeometry Anchor="NW">
+<Point X="-68" Y="-6"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry Kind="INTERPOLATING">
+<Point X="160" Y="144"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="key" Target="no_key">
+<LabelBlock>
+<SimpleIdentifier Name="KEY_UNPLUG"/>
+<LabelGeometry Anchor="NW">
+<Point X="-92" Y="-6"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry Kind="INTERPOLATING">
+<Point X="162" Y="80"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="key" Target="radio">
+<LabelBlock>
+<SimpleIdentifier Name="KL_R_ON"/>
+<LabelGeometry Anchor="NW">
+<Point X="3" Y="-7"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry Kind="INTERPOLATING">
+<Point X="193" Y="142"/>
+</SplineGeometry>
+</Edge>
+</EdgeList>
+</Graph>
+</SimpleComponent>
+<SimpleComponent Kind="PLANT">
+<SimpleIdentifier Name="readcountry"/>
+<Graph Deterministic="true">
+<LabelBlock>
+<SimpleIdentifier Name="ecefin"/>
+<SimpleIdentifier Name="nocountry"/>
+<SimpleIdentifier Name="read_country"/>
+<SimpleIdentifier Name="usaus"/>
+</LabelBlock>
+<NodeList>
+<SimpleNode Initial="true" Name="s0">
+<EventList>
+<SimpleIdentifier Name=":accepting"/>
+</EventList>
+<PointGeometry>
+<Point X="64" Y="64"/>
+</PointGeometry>
+<LabelGeometry Anchor="SW">
+<Point X="-21" Y="-6"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="s1">
+<PointGeometry>
+<Point X="176" Y="64"/>
+</PointGeometry>
+<LabelGeometry Anchor="SW">
+<Point X="14" Y="-6"/>
+</LabelGeometry>
+</SimpleNode>
+</NodeList>
+<EdgeList>
+<Edge Source="s0" Target="s1">
+<LabelBlock>
+<SimpleIdentifier Name="read_country"/>
+<LabelGeometry Anchor="NW">
+<Point X="-33" Y="-17"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry Kind="INTERPOLATING">
+<Point X="120" Y="48"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="s1" Target="s0">
+<LabelBlock>
+<SimpleIdentifier Name="ecefin"/>
+<SimpleIdentifier Name="nocountry"/>
+<SimpleIdentifier Name="usaus"/>
+<LabelGeometry Anchor="NW">
+<Point X="-25" Y="7"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry Kind="INTERPOLATING">
+<Point X="121" Y="79"/>
+</SplineGeometry>
+</Edge>
+</EdgeList>
+</Graph>
+</SimpleComponent>
+<SimpleComponent Kind="PLANT">
+<SimpleIdentifier Name="timer"/>
+<Graph Deterministic="true">
+<LabelBlock>
+<SimpleIdentifier Name="reset"/>
+<SimpleIdentifier Name="timeout"/>
+<SimpleIdentifier Name="timer"/>
+</LabelBlock>
+<NodeList>
+<SimpleNode Name="on">
+<PointGeometry>
+<Point X="160" Y="80"/>
+</PointGeometry>
+<LabelGeometry Anchor="SW">
+<Point X="13" Y="17"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Initial="true" Name="off">
+<EventList>
+<SimpleIdentifier Name=":accepting"/>
+</EventList>
+<PointGeometry>
+<Point X="48" Y="80"/>
+</PointGeometry>
+<LabelGeometry Anchor="SW">
+<Point X="-29" Y="16"/>
+</LabelGeometry>
+</SimpleNode>
+</NodeList>
+<EdgeList>
+<Edge Source="off" Target="on">
+<LabelBlock>
+<SimpleIdentifier Name="timer"/>
+<LabelGeometry Anchor="NW">
+<Point X="-15" Y="-16"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry Kind="INTERPOLATING">
+<Point X="103" Y="63"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="on" Target="off">
+<LabelBlock>
+<SimpleIdentifier Name="reset"/>
+<SimpleIdentifier Name="timeout"/>
+<LabelGeometry Anchor="NW">
+<Point X="-17" Y="6"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry Kind="INTERPOLATING">
+<Point X="100" Y="98"/>
+</SplineGeometry>
+</Edge>
+</EdgeList>
+</Graph>
+</SimpleComponent>
+</ComponentList>
+</Module>
+

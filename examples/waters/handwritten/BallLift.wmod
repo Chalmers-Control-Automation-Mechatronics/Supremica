@@ -1,0 +1,552 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Module Name="BallLift" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
+<ns2:Comment>Tord Alenjung's ball lift example. A serious test for EFA compilation.</ns2:Comment>
+<ConstantAliasList>
+<ConstantAlias Scope="REQUIRED_PARAMETER">
+<SimpleIdentifier Name="NUM_BALLS"/>
+<ConstantAliasExpression>
+<IntConstant Value="2"/>
+</ConstantAliasExpression>
+</ConstantAlias>
+</ConstantAliasList>
+<EventDeclList>
+<EventDecl Kind="CONTROLLABLE" Name="controller"/>
+<EventDecl Kind="UNCONTROLLABLE" Name="lift"/>
+<EventDecl Kind="UNCONTROLLABLE" Name="ball_start">
+<RangeList>
+<BinaryExpression Operator="..">
+<IntConstant Value="1"/>
+<SimpleIdentifier Name="NUM_BALLS"/>
+</BinaryExpression>
+</RangeList>
+</EventDecl>
+<EventDecl Kind="UNCONTROLLABLE" Name="ball_down">
+<RangeList>
+<BinaryExpression Operator="..">
+<IntConstant Value="1"/>
+<SimpleIdentifier Name="NUM_BALLS"/>
+</BinaryExpression>
+</RangeList>
+</EventDecl>
+<EventDecl Kind="UNCONTROLLABLE" Name="ball_up">
+<RangeList>
+<BinaryExpression Operator="..">
+<IntConstant Value="1"/>
+<SimpleIdentifier Name="NUM_BALLS"/>
+</BinaryExpression>
+</RangeList>
+</EventDecl>
+<EventDecl Kind="UNCONTROLLABLE" Name="ball_finish">
+<RangeList>
+<BinaryExpression Operator="..">
+<IntConstant Value="1"/>
+<SimpleIdentifier Name="NUM_BALLS"/>
+</BinaryExpression>
+</RangeList>
+</EventDecl>
+</EventDeclList>
+<ComponentList>
+<VariableComponent Name="iBallUp">
+<VariableRange>
+<BinaryExpression Operator="..">
+<IntConstant Value="0"/>
+<IntConstant Value="1"/>
+</BinaryExpression>
+</VariableRange>
+<VariableInitial>
+<BinaryExpression Operator="==">
+<SimpleIdentifier Name="iBallUp"/>
+<IntConstant Value="0"/>
+</BinaryExpression>
+</VariableInitial>
+</VariableComponent>
+<VariableComponent Name="iBallDn">
+<VariableRange>
+<BinaryExpression Operator="..">
+<IntConstant Value="0"/>
+<IntConstant Value="1"/>
+</BinaryExpression>
+</VariableRange>
+<VariableInitial>
+<BinaryExpression Operator="==">
+<SimpleIdentifier Name="iBallDn"/>
+<IntConstant Value="0"/>
+</BinaryExpression>
+</VariableInitial>
+</VariableComponent>
+<VariableComponent Name="iLiftDn">
+<VariableRange>
+<BinaryExpression Operator="..">
+<IntConstant Value="0"/>
+<IntConstant Value="1"/>
+</BinaryExpression>
+</VariableRange>
+<VariableInitial>
+<BinaryExpression Operator="==">
+<SimpleIdentifier Name="iLiftDn"/>
+<IntConstant Value="1"/>
+</BinaryExpression>
+</VariableInitial>
+</VariableComponent>
+<VariableComponent Name="c_iBallUp">
+<VariableRange>
+<BinaryExpression Operator="..">
+<IntConstant Value="0"/>
+<IntConstant Value="1"/>
+</BinaryExpression>
+</VariableRange>
+<VariableInitial>
+<BinaryExpression Operator="==">
+<SimpleIdentifier Name="c_iBallUp"/>
+<IntConstant Value="0"/>
+</BinaryExpression>
+</VariableInitial>
+</VariableComponent>
+<VariableComponent Name="c_iBallDn">
+<VariableRange>
+<BinaryExpression Operator="..">
+<IntConstant Value="0"/>
+<IntConstant Value="1"/>
+</BinaryExpression>
+</VariableRange>
+<VariableInitial>
+<BinaryExpression Operator="==">
+<SimpleIdentifier Name="c_iBallDn"/>
+<IntConstant Value="0"/>
+</BinaryExpression>
+</VariableInitial>
+</VariableComponent>
+<VariableComponent Name="c_iLiftDn">
+<VariableRange>
+<BinaryExpression Operator="..">
+<IntConstant Value="0"/>
+<IntConstant Value="1"/>
+</BinaryExpression>
+</VariableRange>
+<VariableInitial>
+<BinaryExpression Operator="==">
+<SimpleIdentifier Name="c_iLiftDn"/>
+<IntConstant Value="1"/>
+</BinaryExpression>
+</VariableInitial>
+</VariableComponent>
+<VariableComponent Name="qUp">
+<VariableRange>
+<BinaryExpression Operator="..">
+<IntConstant Value="0"/>
+<IntConstant Value="1"/>
+</BinaryExpression>
+</VariableRange>
+<VariableInitial>
+<BinaryExpression Operator="==">
+<SimpleIdentifier Name="qUp"/>
+<IntConstant Value="0"/>
+</BinaryExpression>
+</VariableInitial>
+</VariableComponent>
+<VariableComponent Name="qOut">
+<VariableRange>
+<BinaryExpression Operator="..">
+<IntConstant Value="0"/>
+<IntConstant Value="1"/>
+</BinaryExpression>
+</VariableRange>
+<VariableInitial>
+<BinaryExpression Operator="==">
+<SimpleIdentifier Name="qOut"/>
+<IntConstant Value="0"/>
+</BinaryExpression>
+</VariableInitial>
+</VariableComponent>
+<VariableComponent Name="liftBusy">
+<VariableRange>
+<BinaryExpression Operator="..">
+<IntConstant Value="0"/>
+<IntConstant Value="1"/>
+</BinaryExpression>
+</VariableRange>
+<VariableInitial>
+<BinaryExpression Operator="==">
+<SimpleIdentifier Name="liftBusy"/>
+<IntConstant Value="0"/>
+</BinaryExpression>
+</VariableInitial>
+</VariableComponent>
+<SimpleComponent Kind="PLANT" Name="lift">
+<Graph Deterministic="false">
+<NodeList>
+<SimpleNode Initial="true" Name="dn">
+<PointGeometry>
+<Point Y="48" X="144"/>
+</PointGeometry>
+<InitialArrowGeometry>
+<Point Y="-5" X="-5"/>
+</InitialArrowGeometry>
+<LabelGeometry Anchor="NW">
+<Point Y="-9" X="11"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="up">
+<PointGeometry>
+<Point Y="160" X="144"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point Y="-7" X="12"/>
+</LabelGeometry>
+</SimpleNode>
+</NodeList>
+<EdgeList>
+<Edge Target="up" Source="dn">
+<LabelBlock>
+<SimpleIdentifier Name="lift"/>
+<LabelGeometry Anchor="NW">
+<Point Y="-30" X="-87"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point Y="104" X="130"/>
+</SplineGeometry>
+<GuardActionBlock>
+<Guards>
+<BinaryExpression Operator="&amp;" Text="qUp &amp; !iBallUp">
+<SimpleIdentifier Name="qUp"/>
+<UnaryExpression Operator="!">
+<SimpleIdentifier Name="iBallUp"/>
+</UnaryExpression>
+</BinaryExpression>
+</Guards>
+<Actions>
+<BinaryExpression Operator="=" Text="iLiftDn = 0">
+<SimpleIdentifier Name="iLiftDn"/>
+<IntConstant Value="0"/>
+</BinaryExpression>
+</Actions>
+<LabelGeometry Anchor="NW">
+<Point Y="-13" X="-88"/>
+</LabelGeometry>
+</GuardActionBlock>
+</Edge>
+<Edge Target="dn" Source="up">
+<LabelBlock>
+<SimpleIdentifier Name="lift"/>
+<LabelGeometry Anchor="NW">
+<Point Y="-33" X="7"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point Y="104" X="159"/>
+</SplineGeometry>
+<GuardActionBlock>
+<Guards>
+<BinaryExpression Operator="&amp;" Text="qUp &amp; !iBallUp">
+<SimpleIdentifier Name="qUp"/>
+<UnaryExpression Operator="!">
+<SimpleIdentifier Name="iBallUp"/>
+</UnaryExpression>
+</BinaryExpression>
+</Guards>
+<Actions>
+<BinaryExpression Operator="=" Text="iLiftDn = 1">
+<SimpleIdentifier Name="iLiftDn"/>
+<IntConstant Value="1"/>
+</BinaryExpression>
+</Actions>
+<LabelGeometry Anchor="NW">
+<Point Y="-16" X="8"/>
+</LabelGeometry>
+</GuardActionBlock>
+</Edge>
+</EdgeList>
+</Graph>
+</SimpleComponent>
+<ForeachComponent Name="i">
+<BinaryExpression Operator="..">
+<IntConstant Value="1"/>
+<SimpleIdentifier Name="NUM_BALLS"/>
+</BinaryExpression>
+<ComponentList>
+<SimpleComponent Kind="PLANT">
+<IndexedIdentifier Name="ball">
+<SimpleIdentifier Name="i"/>
+</IndexedIdentifier>
+<Graph Deterministic="false">
+<NodeList>
+<SimpleNode Initial="true" Name="out">
+<PointGeometry>
+<Point Y="112" X="112"/>
+</PointGeometry>
+<InitialArrowGeometry>
+<Point Y="-5" X="-5"/>
+</InitialArrowGeometry>
+<LabelGeometry Anchor="NW">
+<Point Y="-7" X="-34"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="dn">
+<PointGeometry>
+<Point Y="240" X="112"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point Y="4" X="-26"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="mdl">
+<PointGeometry>
+<Point Y="240" X="240"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point Y="5" X="5"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="up">
+<PointGeometry>
+<Point Y="112" X="240"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point Y="-20" X="8"/>
+</LabelGeometry>
+</SimpleNode>
+</NodeList>
+<EdgeList>
+<Edge Target="dn" Source="out">
+<LabelBlock>
+<IndexedIdentifier Name="ball_start">
+<SimpleIdentifier Name="i"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point Y="-40" X="-78"/>
+</LabelGeometry>
+</LabelBlock>
+<GuardActionBlock>
+<Guards>
+<BinaryExpression Operator="&amp;" Text="!liftBusy &amp; iLiftDn">
+<UnaryExpression Operator="!">
+<SimpleIdentifier Name="liftBusy"/>
+</UnaryExpression>
+<SimpleIdentifier Name="iLiftDn"/>
+</BinaryExpression>
+</Guards>
+<Actions>
+<BinaryExpression Operator="=" Text="liftBusy = 1">
+<SimpleIdentifier Name="liftBusy"/>
+<IntConstant Value="1"/>
+</BinaryExpression>
+<BinaryExpression Operator="=" Text="iBallDn = 1">
+<SimpleIdentifier Name="iBallDn"/>
+<IntConstant Value="1"/>
+</BinaryExpression>
+</Actions>
+<LabelGeometry Anchor="NW">
+<Point Y="-22" X="-75"/>
+</LabelGeometry>
+</GuardActionBlock>
+</Edge>
+<Edge Target="dn" Source="mdl">
+<LabelBlock>
+<IndexedIdentifier Name="ball_down">
+<SimpleIdentifier Name="i"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point Y="3" X="-15"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point Y="271" X="176"/>
+</SplineGeometry>
+<GuardActionBlock>
+<Guards>
+<UnaryExpression Operator="!">
+<SimpleIdentifier Name="qUp"/>
+</UnaryExpression>
+</Guards>
+<Actions>
+<BinaryExpression Operator="=" Text="iBallDn = 1">
+<SimpleIdentifier Name="iBallDn"/>
+<IntConstant Value="1"/>
+</BinaryExpression>
+</Actions>
+<LabelGeometry Anchor="NW">
+<Point Y="18" X="-12"/>
+</LabelGeometry>
+</GuardActionBlock>
+</Edge>
+<Edge Target="mdl" Source="dn">
+<LabelBlock>
+<IndexedIdentifier Name="ball_down">
+<SimpleIdentifier Name="i"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point Y="-33" X="-25"/>
+</LabelGeometry>
+</LabelBlock>
+<GuardActionBlock>
+<Guards>
+<SimpleIdentifier Name="qUp"/>
+</Guards>
+<Actions>
+<BinaryExpression Operator="=" Text="iBallDn = 0">
+<SimpleIdentifier Name="iBallDn"/>
+<IntConstant Value="0"/>
+</BinaryExpression>
+</Actions>
+<LabelGeometry Anchor="NW">
+<Point Y="-19" X="-24"/>
+</LabelGeometry>
+</GuardActionBlock>
+</Edge>
+<Edge Target="up" Source="mdl">
+<LabelBlock>
+<IndexedIdentifier Name="ball_up">
+<SimpleIdentifier Name="i"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point Y="-33" X="3"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point Y="176" X="271"/>
+</SplineGeometry>
+<GuardActionBlock>
+<Guards>
+<BinaryExpression Operator="&amp;" Text="qUp &amp; !iLiftDn">
+<SimpleIdentifier Name="qUp"/>
+<UnaryExpression Operator="!">
+<SimpleIdentifier Name="iLiftDn"/>
+</UnaryExpression>
+</BinaryExpression>
+</Guards>
+<Actions>
+<BinaryExpression Operator="=" Text="iBallUp = 1">
+<SimpleIdentifier Name="iBallUp"/>
+<IntConstant Value="1"/>
+</BinaryExpression>
+</Actions>
+<LabelGeometry Anchor="NW">
+<Point Y="-15" X="3"/>
+</LabelGeometry>
+</GuardActionBlock>
+</Edge>
+<Edge Target="mdl" Source="up">
+<LabelBlock>
+<IndexedIdentifier Name="ball_up">
+<SimpleIdentifier Name="i"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point Y="-35" X="-65"/>
+</LabelGeometry>
+</LabelBlock>
+<GuardActionBlock>
+<Guards>
+<UnaryExpression Operator="!">
+<SimpleIdentifier Name="qUp"/>
+</UnaryExpression>
+</Guards>
+<Actions>
+<BinaryExpression Operator="=" Text="iBallUp = 0">
+<SimpleIdentifier Name="iBallUp"/>
+<IntConstant Value="0"/>
+</BinaryExpression>
+</Actions>
+<LabelGeometry Anchor="NW">
+<Point Y="-20" X="-62"/>
+</LabelGeometry>
+</GuardActionBlock>
+</Edge>
+<Edge Target="out" Source="up">
+<LabelBlock>
+<IndexedIdentifier Name="ball_finish">
+<SimpleIdentifier Name="i"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point Y="-71" X="-40"/>
+</LabelGeometry>
+</LabelBlock>
+<GuardActionBlock>
+<Guards>
+<SimpleIdentifier Name="qOut"/>
+</Guards>
+<Actions>
+<BinaryExpression Operator="=" Text="liftBusy = 0">
+<SimpleIdentifier Name="liftBusy"/>
+<IntConstant Value="0"/>
+</BinaryExpression>
+<BinaryExpression Operator="=" Text="iBallUp = 0">
+<SimpleIdentifier Name="iBallUp"/>
+<IntConstant Value="0"/>
+</BinaryExpression>
+</Actions>
+<LabelGeometry Anchor="NW">
+<Point Y="-56" X="-39"/>
+</LabelGeometry>
+</GuardActionBlock>
+</Edge>
+</EdgeList>
+</Graph>
+</SimpleComponent>
+</ComponentList>
+</ForeachComponent>
+<SimpleComponent Kind="SPEC" Name="controller">
+<Graph Deterministic="false">
+<NodeList>
+<SimpleNode Initial="true" Name="q0">
+<PointGeometry>
+<Point Y="100" X="90"/>
+</PointGeometry>
+<InitialArrowGeometry>
+<Point Y="-5" X="-5"/>
+</InitialArrowGeometry>
+<LabelGeometry Anchor="NW">
+<Point Y="4" X="-26"/>
+</LabelGeometry>
+</SimpleNode>
+</NodeList>
+<EdgeList>
+<Edge Target="q0" Source="q0">
+<LabelBlock>
+<SimpleIdentifier Name="controller"/>
+<LabelGeometry Anchor="NW">
+<Point Y="-40" X="7"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point Y="99" X="137"/>
+</SplineGeometry>
+<GuardActionBlock>
+<Actions>
+<BinaryExpression Operator="=" Text="qUp = (qUp | c_iBallDn) &amp; c_iBallUp">
+<SimpleIdentifier Name="qUp"/>
+<BinaryExpression Operator="&amp;">
+<BinaryExpression Operator="|">
+<SimpleIdentifier Name="qUp"/>
+<SimpleIdentifier Name="c_iBallDn"/>
+</BinaryExpression>
+<SimpleIdentifier Name="c_iBallUp"/>
+</BinaryExpression>
+</BinaryExpression>
+<BinaryExpression Operator="=" Text="qOut = c_iBallUp">
+<SimpleIdentifier Name="qOut"/>
+<SimpleIdentifier Name="c_iBallUp"/>
+</BinaryExpression>
+<BinaryExpression Operator="=" Text="c_iBallUp = iBallUp">
+<SimpleIdentifier Name="c_iBallUp"/>
+<SimpleIdentifier Name="iBallUp"/>
+</BinaryExpression>
+<BinaryExpression Operator="=" Text="c_iBallDn = iBallDn">
+<SimpleIdentifier Name="c_iBallDn"/>
+<SimpleIdentifier Name="iBallDn"/>
+</BinaryExpression>
+<BinaryExpression Operator="=" Text="c_iLiftDn = iLiftDn">
+<SimpleIdentifier Name="c_iLiftDn"/>
+<SimpleIdentifier Name="iLiftDn"/>
+</BinaryExpression>
+</Actions>
+<LabelGeometry Anchor="NW">
+<Point Y="-21" X="7"/>
+</LabelGeometry>
+</GuardActionBlock>
+</Edge>
+</EdgeList>
+</Graph>
+</SimpleComponent>
+</ComponentList>
+</Module>

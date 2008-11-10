@@ -233,7 +233,11 @@ class EFAVariableAutomatonBuilder
     if (curexpr != null) {
       final SimpleExpressionProxy curvalue =
 	mSimpleExpressionCompiler.eval(curexpr, mRootContext);
-      curvalues = Collections.singletonList(curvalue);
+      if (range.contains(curvalue)) {
+        curvalues = Collections.singletonList(curvalue);
+      } else {
+        curvalues = Collections.emptyList();
+      }
     } else {
       curvalues = values;
     }
@@ -251,6 +255,9 @@ class EFAVariableAutomatonBuilder
 	if (nextexpr != null) {
 	  final SimpleExpressionProxy nextvalue =
 	    mSimpleExpressionCompiler.eval(nextexpr, curcontext);
+          if (!range.contains(nextvalue)) {
+            continue;
+          }
 	  nextvalues = Collections.singletonList(nextvalue);
 	} else {
 	  nextvalues = values;

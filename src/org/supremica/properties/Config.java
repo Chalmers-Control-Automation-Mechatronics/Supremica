@@ -176,6 +176,12 @@ public final class Config
     public static final BooleanProperty INCLUDE_INSTANTION =
       new BooleanProperty(PropertyType.GUI, "includeInstantiation", true,
 			  "Enable instantiation and other advanced features");
+    public static final BooleanProperty USE_EVENT_ALPHABET =
+      new BooleanProperty(PropertyType.GUI, "useEventAlphabet", true,
+			  "Use per-event alphabet when compiling EFA");
+    public static final BooleanProperty USE_OLD_COMPILER =
+      new BooleanProperty(PropertyType.GUI, "useOldCompiler", false,
+			  "Downgrade to use old Waters compiler");
 
     // GUI_EDITOR
     //public static final BooleanProperty GUI_EDITOR_USE_SPRING_EMBEDDER = new BooleanProperty(PropertyType.GUI_EDITOR, "useSpringEmbedder", true, "Use spring embedder for automatic graph layout");

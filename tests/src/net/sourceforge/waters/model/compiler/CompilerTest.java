@@ -2,7 +2,7 @@
 //###########################################################################
 //# PROJECT: Waters
 //# PACKAGE: net.sourceforge.waters.model.compiler
-//# CLASS:   CompilerTest
+//# CLASS:   ModuleCompilerTest
 //###########################################################################
 //# $Id$
 //###########################################################################
@@ -21,14 +21,16 @@ import net.sourceforge.waters.model.base.DocumentProxy;
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.base.WatersException;
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
-import net.sourceforge.waters.model.compiler.EmptyLabelBlockException;
-import net.sourceforge.waters.model.compiler.InstantiationException;
 import net.sourceforge.waters.model.compiler.ModuleCompiler;
-import net.sourceforge.waters.model.compiler.NondeterministicModuleException;
 import net.sourceforge.waters.model.compiler.context.
   DuplicateIdentifierException;
 import net.sourceforge.waters.model.compiler.context.
   UndefinedIdentifierException;
+import net.sourceforge.waters.model.compiler.graph.
+  NondeterministicModuleException;
+import net.sourceforge.waters.model.compiler.instance.EmptyLabelBlockException;
+import net.sourceforge.waters.model.compiler.instance.EventKindException;
+import net.sourceforge.waters.model.compiler.instance.InstantiationException;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 import net.sourceforge.waters.model.expr.EvalException;
@@ -220,10 +222,46 @@ public class CompilerTest
 
   //#########################################################################
   //# Successful Test Cases using EFA
+  public void testCompile_AmbiguousVariableStatus()
+    throws IOException, WatersException
+  {
+    compile("handwritten", "AmbiguousVariableStatus");
+  }
+
+  public void testCompile_BallLift()
+    throws IOException, WatersException
+  {
+    compile("handwritten", "BallLift");
+  }
+
+  public void testCompile_ControllableTestModelEFA()
+    throws IOException, WatersException
+  {
+    compile("handwritten", "ControllableTestModelEFA");
+  }
+
   public void testCompile_dosingtankEFA()
     throws IOException, WatersException
   {
     compile("handwritten", "dosingtankEFA");
+  }
+
+  public void testCompile_DosingTankControllerEFA()
+    throws IOException, WatersException
+  {
+    compile("handwritten", "DosingTankControllerEFA");
+  }
+
+  public void testCompile_DosingTankWithJelly1()
+    throws IOException, WatersException
+  {
+    compile("handwritten", "DosingTankWithJellyEFA1");
+  }
+
+  public void testCompile_DosingTankWithJelly2()
+    throws IOException, WatersException
+  {
+    compile("handwritten", "DosingTankWithJellyEFA2");
   }
 
   public void testCompile_EFA0()
@@ -232,16 +270,40 @@ public class CompilerTest
     compile("handwritten", "EFA0");
   }
 
+  public void testCompile_EFAJournalExample()
+    throws IOException, WatersException
+  {
+    compile("handwritten", "EFAJournalExample");
+  }
+
   public void testCompile_GlobalAndLocalVariables()
     throws IOException, WatersException
   {
     compile("handwritten", "GlobalAndLocalVariables");
   }
 
-  public void testCompile_sensoractuator()
+  public void testCompile_machines_buffer_efa()
     throws IOException, WatersException
   {
-    compile("handwritten", "sensoractuator");
+    compile("handwritten", "machines_buffer_efa");
+  }
+
+  public void testCompile_sensoractuator1()
+    throws IOException, WatersException
+  {
+    compile("handwritten", "sensoractuator1");
+  }
+
+  public void testCompile_sensoractuator2()
+    throws IOException, WatersException
+  {
+    compile("handwritten", "sensoractuator1");
+  }
+
+  public void testCompile_sensoractuator_nondet()
+    throws IOException, WatersException
+  {
+    compile("handwritten", "sensoractuator_nondet");
   }
 
   public void testCompile_stick_picking_game()
@@ -321,6 +383,13 @@ public class CompilerTest
   {
     compileError("handwritten", "twoinit", null,
                  NondeterministicModuleException.class, "'comp'");
+  }
+
+  public void testCompile_undefvar()
+    throws IOException, WatersException
+  {
+    compileError("handwritten", "undefvar", null,
+                 UndefinedIdentifierException.class, "'undefvar'");
   }
 
 

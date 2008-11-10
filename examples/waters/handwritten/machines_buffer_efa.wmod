@@ -1,16 +1,15 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<Module Name="Module1" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
+<Module Name="machines_buffer_efa" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
+    <ns2:Comment>An EFA version of Wonham's classical small factory. This model has a buffer capacity of 2 and is controllable, because the action items += 1 in Machine1 contains an implicit guard items &lt; 2, so the plant prevents buffer overflow.</ns2:Comment>
     <EventDeclList>
         <EventDecl Kind="PROPOSITION" Name=":accepting"/>
-        <EventDecl Kind="PROPOSITION" Name=":forbidden"/>
         <EventDecl Kind="CONTROLLABLE" Name="start1"/>
         <EventDecl Kind="UNCONTROLLABLE" Name="finish1"/>
         <EventDecl Kind="CONTROLLABLE" Name="start2"/>
         <EventDecl Kind="UNCONTROLLABLE" Name="finish2"/>
     </EventDeclList>
     <ComponentList>
-        <SimpleComponent Kind="PLANT">
-            <SimpleIdentifier Name="Machine1"/>
+        <SimpleComponent Kind="PLANT" Name="Machine1">
             <Graph>
                 <NodeList>
                     <SimpleNode Initial="true" Name="S0">
@@ -24,7 +23,7 @@
                             <Point Y="-5" X="-5"/>
                         </InitialArrowGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point Y="10" X="0"/>
+                            <Point Y="-8" X="10"/>
                         </LabelGeometry>
                     </SimpleNode>
                     <SimpleNode Name="S1">
@@ -32,7 +31,7 @@
                             <Point Y="192" X="144"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point Y="10" X="0"/>
+                            <Point Y="-6" X="13"/>
                         </LabelGeometry>
                     </SimpleNode>
                 </NodeList>
@@ -41,18 +40,12 @@
                         <LabelBlock>
                             <SimpleIdentifier Name="start1"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-4" X="14"/>
+                                <Point Y="-8" X="8"/>
                             </LabelGeometry>
                         </LabelBlock>
-                        <StartPointGeometry>
-                            <Point Y="80" X="144"/>
-                        </StartPointGeometry>
                         <SplineGeometry>
-                            <Point Y="139" X="190"/>
+                            <Point Y="134" X="164"/>
                         </SplineGeometry>
-                        <EndPointGeometry>
-                            <Point Y="192" X="144"/>
-                        </EndPointGeometry>
                         <GuardActionBlock>
                             <LabelGeometry Anchor="NW">
                                 <Point Y="12" X="0"/>
@@ -66,15 +59,9 @@
                                 <Point Y="-15" X="-76"/>
                             </LabelGeometry>
                         </LabelBlock>
-                        <StartPointGeometry>
-                            <Point Y="192" X="144"/>
-                        </StartPointGeometry>
                         <SplineGeometry>
-                            <Point Y="137" X="112"/>
+                            <Point Y="136" X="124"/>
                         </SplineGeometry>
-                        <EndPointGeometry>
-                            <Point Y="80" X="144"/>
-                        </EndPointGeometry>
                         <GuardActionBlock>
                             <Actions>
                                 <BinaryExpression Operator="=">
@@ -86,15 +73,14 @@
                                 </BinaryExpression>
                             </Actions>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="1" X="0"/>
+                                <Point Y="0" X="-74"/>
                             </LabelGeometry>
                         </GuardActionBlock>
                     </Edge>
                 </EdgeList>
             </Graph>
         </SimpleComponent>
-        <SimpleComponent Kind="PLANT">
-            <SimpleIdentifier Name="Machine2"/>
+        <SimpleComponent Kind="PLANT" Name="Machine2">
             <Graph>
                 <NodeList>
                     <SimpleNode Initial="true" Name="S0">
@@ -108,15 +94,15 @@
                             <Point Y="-5" X="-5"/>
                         </InitialArrowGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point Y="10" X="0"/>
+                            <Point Y="-11" X="12"/>
                         </LabelGeometry>
                     </SimpleNode>
                     <SimpleNode Name="S1">
                         <PointGeometry>
-                            <Point Y="192" X="112"/>
+                            <Point Y="176" X="128"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point Y="10" X="0"/>
+                            <Point Y="4" X="9"/>
                         </LabelGeometry>
                     </SimpleNode>
                 </NodeList>
@@ -125,18 +111,12 @@
                         <LabelBlock>
                             <SimpleIdentifier Name="start2"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="10" X="0"/>
+                                <Point Y="-17" X="6"/>
                             </LabelGeometry>
                         </LabelBlock>
-                        <StartPointGeometry>
-                            <Point Y="80" X="128"/>
-                        </StartPointGeometry>
                         <SplineGeometry>
-                            <Point Y="139" X="148"/>
+                            <Point Y="131" X="144"/>
                         </SplineGeometry>
-                        <EndPointGeometry>
-                            <Point Y="192" X="112"/>
-                        </EndPointGeometry>
                         <GuardActionBlock>
                             <Actions>
                                 <BinaryExpression Operator="=">
@@ -148,7 +128,7 @@
                                 </BinaryExpression>
                             </Actions>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="26" X="0"/>
+                                <Point Y="-3" X="7"/>
                             </LabelGeometry>
                         </GuardActionBlock>
                     </Edge>
@@ -156,24 +136,17 @@
                         <LabelBlock>
                             <SimpleIdentifier Name="finish2"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="10" X="0"/>
+                                <Point Y="-12" X="-49"/>
                             </LabelGeometry>
                         </LabelBlock>
-                        <StartPointGeometry>
-                            <Point Y="192" X="112"/>
-                        </StartPointGeometry>
                         <SplineGeometry>
-                            <Point Y="134" X="97"/>
+                            <Point Y="129" X="112"/>
                         </SplineGeometry>
-                        <EndPointGeometry>
-                            <Point Y="80" X="128"/>
-                        </EndPointGeometry>
                     </Edge>
                 </EdgeList>
             </Graph>
         </SimpleComponent>
-        <SimpleComponent Kind="SPEC">
-            <SimpleIdentifier Name="BufferSize"/>
+        <SimpleComponent Kind="SPEC" Name="BufferSize">
             <Graph>
                 <NodeList>
                     <SimpleNode Initial="true" Name="S0">
@@ -196,18 +169,12 @@
                         <LabelBlock>
                             <SimpleIdentifier Name="finish1"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="10" X="0"/>
+                                <Point Y="-8" X="5"/>
                             </LabelGeometry>
                         </LabelBlock>
-                        <StartPointGeometry>
-                            <Point Y="128" X="112"/>
-                        </StartPointGeometry>
                         <SplineGeometry>
                             <Point Y="80" X="183"/>
                         </SplineGeometry>
-                        <EndPointGeometry>
-                            <Point Y="128" X="112"/>
-                        </EndPointGeometry>
                         <GuardActionBlock>
                             <Guards>
                                 <BinaryExpression Operator="&lt;">
@@ -216,7 +183,7 @@
                                 </BinaryExpression>
                             </Guards>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="26" X="0"/>
+                                <Point Y="8" X="6"/>
                             </LabelGeometry>
                         </GuardActionBlock>
                     </Edge>
@@ -224,18 +191,12 @@
                         <LabelBlock>
                             <SimpleIdentifier Name="start2"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="10" X="0"/>
+                                <Point Y="18" X="6"/>
                             </LabelGeometry>
                         </LabelBlock>
-                        <StartPointGeometry>
-                            <Point Y="128" X="112"/>
-                        </StartPointGeometry>
                         <SplineGeometry>
                             <Point Y="171" X="44"/>
                         </SplineGeometry>
-                        <EndPointGeometry>
-                            <Point Y="128" X="112"/>
-                        </EndPointGeometry>
                         <GuardActionBlock>
                             <Guards>
                                 <BinaryExpression Operator="&gt;">
@@ -244,7 +205,7 @@
                                 </BinaryExpression>
                             </Guards>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="26" X="0"/>
+                                <Point Y="36" X="7"/>
                             </LabelGeometry>
                         </GuardActionBlock>
                     </Edge>
@@ -252,26 +213,25 @@
             </Graph>
         </SimpleComponent>
         <VariableComponent Name="items">
-          <VariableRange>
-            <BinaryExpression Operator="..">
-              <IntConstant Value="0"/>
-              <IntConstant Value="2"/>
-            </BinaryExpression>
-          </VariableRange>
-          <VariableInitial>
-            <BinaryExpression Operator="==">
-              <SimpleIdentifier Name="items"/>
-              <IntConstant Value="0"/>
-            </BinaryExpression>
-          </VariableInitial>
-          <VariableMarking>
-            <SimpleIdentifier Name=":accepting"/>
-            <BinaryExpression Operator="==">
-              <SimpleIdentifier Name="items"/>
-              <IntConstant Value="0"/>
-            </BinaryExpression>
-          </VariableMarking>
+            <VariableRange>
+                <BinaryExpression Operator="..">
+                    <IntConstant Value="0"/>
+                    <IntConstant Value="2"/>
+                </BinaryExpression>
+            </VariableRange>
+            <VariableInitial>
+                <BinaryExpression Operator="==">
+                    <SimpleIdentifier Name="items"/>
+                    <IntConstant Value="0"/>
+                </BinaryExpression>
+            </VariableInitial>
+            <VariableMarking>
+                <SimpleIdentifier Name=":accepting"/>
+                <BinaryExpression Operator="==">
+                    <SimpleIdentifier Name="items"/>
+                    <IntConstant Value="0"/>
+                </BinaryExpression>
+            </VariableMarking>
         </VariableComponent>
     </ComponentList>
 </Module>
-

@@ -1,0 +1,66 @@
+//# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
+//###########################################################################
+//# PROJECT: Waters
+//# PACKAGE: net.sourceforge.waters.model.compiler
+//# CLASS:   CompiledIntValue
+//###########################################################################
+//# $Id$
+//###########################################################################
+
+package net.sourceforge.waters.model.compiler.old;
+
+import net.sourceforge.waters.model.expr.IntValue;
+
+
+public class CompiledIntValue implements IntValue
+{
+
+  //#########################################################################
+  //# Constructors
+  public CompiledIntValue(final int value)
+  {
+    mValue = value;
+  }
+
+  public CompiledIntValue(final boolean value)
+  {
+    this(value ? 1 : 0);
+  }
+
+
+  //#########################################################################
+  //# Interface net.sourceforge.waters.model.expr.IntValue
+  public int getValue()
+  {
+    return mValue;
+  }
+
+
+  //#########################################################################
+  //# Overrides for java.lang.Object
+  public String toString()
+  {
+    return Integer.toString(mValue);
+  }
+
+  public int hashCode()
+  {
+    return mValue;
+  }
+
+  public boolean equals(final Object partner)
+  {
+    if (partner != null && getClass() == partner.getClass()) {
+      final CompiledIntValue value = (CompiledIntValue) partner;
+      return mValue == value.mValue;
+    } else {
+      return false;
+    }    
+  }
+
+
+  //#########################################################################
+  //# Data Members
+  private final int mValue;
+
+}

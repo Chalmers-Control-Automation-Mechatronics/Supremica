@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<ProductDES Name="EFAJournalExample"
+  xmlns:ns2="http://waters.sourceforge.net/xsd/base"
+  xmlns="http://waters.sourceforge.net/xsd/des">
+<ns2:Comment></ns2:Comment>
+<EventList>
+<Event Kind="UNCONTROLLABLE" Name="a"/>
+<Event Kind="UNCONTROLLABLE" Name="a.{v&lt;=1}"/>
+<Event Kind="UNCONTROLLABLE" Name="b"/>
+<Event Kind="CONTROLLABLE" Name="c"/>
+</EventList>
+<AutomataList>
+<Automaton Kind="SPEC" Name="K">
+<EventRefList>
+<EventRef Name="a.{v&lt;=1}"/>
+<EventRef Name="a"/>
+<EventRef Name="c"/>
+</EventRefList>
+<StateList>
+<State Initial="true" Name="S0"/>
+<State Name="S1"/>
+</StateList>
+<TransitionList>
+<Transition Source="S0" Target="S1" Event="a"/>
+<Transition Source="S0" Target="S1" Event="a.{v&lt;=1}"/>
+<Transition Source="S0" Target="S1" Event="c"/>
+<Transition Source="S1" Target="S0" Event="a.{v&lt;=1}"/>
+</TransitionList>
+</Automaton>
+<Automaton Kind="PLANT" Name="G">
+<EventRefList>
+<EventRef Name="a.{v&lt;=1}"/>
+<EventRef Name="a"/>
+<EventRef Name="b"/>
+</EventRefList>
+<StateList>
+<State Initial="true" Name="S0"/>
+</StateList>
+<TransitionList>
+<Transition Source="S0" Target="S0" Event="a"/>
+<Transition Source="S0" Target="S0" Event="a.{v&lt;=1}"/>
+<Transition Source="S0" Target="S0" Event="b"/>
+</TransitionList>
+</Automaton>
+<Automaton Kind="PLANT" Name="v">
+<EventRefList>
+<EventRef Name="a.{v&lt;=1}"/>
+<EventRef Name="a"/>
+<EventRef Name="b"/>
+<EventRef Name="c"/>
+</EventRefList>
+<StateList>
+<State Initial="true" Name="0"/>
+<State Name="1"/>
+<State Name="2"/>
+</StateList>
+<TransitionList>
+<Transition Source="0" Target="0" Event="b"/>
+<Transition Source="0" Target="1" Event="a"/>
+<Transition Source="0" Target="1" Event="a.{v&lt;=1}"/>
+<Transition Source="0" Target="2" Event="c"/>
+<Transition Source="1" Target="1" Event="a"/>
+<Transition Source="1" Target="1" Event="a.{v&lt;=1}"/>
+<Transition Source="1" Target="2" Event="c"/>
+<Transition Source="2" Target="1" Event="a"/>
+<Transition Source="2" Target="2" Event="c"/>
+</TransitionList>
+</Automaton>
+</AutomataList>
+</ProductDES>
+
