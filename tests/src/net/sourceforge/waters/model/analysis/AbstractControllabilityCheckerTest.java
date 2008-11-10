@@ -82,6 +82,13 @@ public abstract class AbstractControllabilityCheckerTest
 
   //#########################################################################
   //# Test Cases --- handwritten
+  public void testDosingTankWithJellyEFA1() throws Exception
+  {
+    final String group = "handwritten";
+    final String name = "DosingTankWithJellyEFA1.wmod";
+    runModelVerifier(group, name, false);
+  }
+
   public void testSmallFactory2() throws Exception
   {
     final String group = "handwritten";
