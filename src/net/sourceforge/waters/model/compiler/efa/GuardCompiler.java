@@ -42,7 +42,7 @@ class GuardCompiler
   GuardCompiler(final ModuleProxyFactory factory,
                 final CompilerOperatorTable optable,
                 final Comparator<SimpleExpressionProxy> comparator,
-                final EFASimpleExpressionEvaluator evaluator)
+                final EFARangeEvaluator evaluator)
   {
     mFactory = factory;
     mOperatorTable = optable;
@@ -184,7 +184,7 @@ class GuardCompiler
   private final ModuleProxyFactory mFactory;
   private final CompilerOperatorTable mOperatorTable;
   private final DNFConverter mDNFConverter;
-  private final EFASimpleExpressionEvaluator mEvaluator;
+  private final EFARangeEvaluator mEvaluator;
 
   private final Map<ProxyAccessor<GuardActionBlockProxy>,CompiledGuard> mCache;
 

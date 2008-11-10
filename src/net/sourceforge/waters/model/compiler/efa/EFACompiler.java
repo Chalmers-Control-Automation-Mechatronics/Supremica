@@ -437,9 +437,8 @@ public class EFACompiler
     {
       final Comparator<SimpleExpressionProxy> comparator =
         mVariableMap.getExpressionComparator();
-      final EFASimpleExpressionEvaluator evaluator =
-        new EFASimpleExpressionEvaluator
-        (mOperatorTable, mRootContext, mVariableMap);
+      final EFARangeEvaluator evaluator =
+        new EFARangeEvaluator(mOperatorTable, mRootContext, mVariableMap);
       mGuardCompiler =
         new GuardCompiler(mFactory, mOperatorTable, comparator, evaluator);
     }

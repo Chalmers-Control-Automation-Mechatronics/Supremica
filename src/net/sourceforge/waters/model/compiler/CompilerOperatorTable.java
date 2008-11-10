@@ -78,6 +78,9 @@ public class CompilerOperatorTable extends AbstractOperatorTable {
     mUnaryMinusOperator = new UnaryMinusOperator();
     mPlusOperator = new BinaryPlusOperator();
     mMinusOperator = new BinaryMinusOperator();
+    mTimesOperator = new BinaryTimesOperator();
+    mDivideOperator = new BinaryDivideOperator();
+    mModuloOperator = new BinaryModuloOperator();
     mRangeOperator = new BinaryRangeOperator();
 
     // store(mUnaryNextOperator, 0);
@@ -97,9 +100,9 @@ public class CompilerOperatorTable extends AbstractOperatorTable {
     store(mUnaryMinusOperator, 2);
     store(mPlusOperator, 13);
     store(mMinusOperator, 14);
-    store(new BinaryTimesOperator(), 15);
-    store(new BinaryDivideOperator(), 16);
-    store(new BinaryModuloOperator(), 17);
+    store(mTimesOperator, 15);
+    store(mDivideOperator, 16);
+    store(mModuloOperator, 17);
     store(mRangeOperator, 18);
 
     storeComplements(mEqualsOperator, mNotEqualsOperator);
@@ -206,6 +209,21 @@ public class CompilerOperatorTable extends AbstractOperatorTable {
   public BinaryOperator getPlusOperator()
   {
     return mPlusOperator;
+  }
+
+  public BinaryOperator getTimesOperator()
+  {
+    return mTimesOperator;
+  }
+
+  public BinaryOperator getDivideOperator()
+  {
+    return mDivideOperator;
+  }
+
+  public BinaryOperator getModuloOperator()
+  {
+    return mModuloOperator;
   }
 
   public BinaryOperator getRangeOperator()
@@ -1824,6 +1842,9 @@ public class CompilerOperatorTable extends AbstractOperatorTable {
   private final BinaryOperator mPlusOperator;
   private final BinaryOperator mMinusOperator;
   private final UnaryOperator mUnaryMinusOperator;
+  private final BinaryOperator mTimesOperator;
+  private final BinaryOperator mDivideOperator;
+  private final BinaryOperator mModuloOperator;
   private final BinaryOperator mRangeOperator;
   private final UnaryOperator mUnaryNextOperator;
   private final Map<BinaryOperator,BinaryOperator> mComplementMap;

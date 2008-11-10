@@ -2,7 +2,7 @@
 //###########################################################################
 //# PROJECT: Waters
 //# PACKAGE: net.sourceforge.waters.model.compiler.efa
-//# CLASS:   EFASimpleExpressionEvaluator
+//# CLASS:   EFARangeEvaluator
 //###########################################################################
 //# $Id$
 //###########################################################################
@@ -39,15 +39,15 @@ import net.sourceforge.waters.model.module.UnaryExpressionProxy;
  * @author Robi Malik
  */
 
-class EFASimpleExpressionEvaluator
+class EFARangeEvaluator
   extends AbstractModuleProxyVisitor
 {
 
   //#########################################################################
   //# Constructors
-  EFASimpleExpressionEvaluator(final CompilerOperatorTable optable,
-                               final ModuleBindingContext root,
-                               final EFAVariableMap varmap)
+  EFARangeEvaluator(final CompilerOperatorTable optable,
+                    final ModuleBindingContext root,
+                    final EFAVariableMap varmap)
   {
     mRootContext = root;
     mVariableMap = varmap;
@@ -55,6 +55,8 @@ class EFASimpleExpressionEvaluator
     mBinaryEvaluatorMap = new HashMap<BinaryOperator,BinaryEvaluator>(32);
     mBinaryEvaluatorMap.put(optable.getAndOperator(),
                             new BinaryAndEvaluator());
+    mBinaryEvaluatorMap.put(optable.getDivideOperator(),
+                            new BinaryDivideEvaluator());
     mBinaryEvaluatorMap.put(optable.getEqualsOperator(),
                             new BinaryEqualsEvaluator());
     mBinaryEvaluatorMap.put(optable.getGreaterEqualsOperator(),
@@ -67,12 +69,16 @@ class EFASimpleExpressionEvaluator
                             new BinaryLessThanEvaluator());
     mBinaryEvaluatorMap.put(optable.getMinusOperator(),
                             new BinaryMinusEvaluator());
+    mBinaryEvaluatorMap.put(optable.getModuloOperator(),
+                            new BinaryModuloEvaluator());
     mBinaryEvaluatorMap.put(optable.getNotEqualsOperator(),
                             new BinaryNotEqualsEvaluator());
     mBinaryEvaluatorMap.put(optable.getOrOperator(),
                             new BinaryOrEvaluator());
     mBinaryEvaluatorMap.put(optable.getPlusOperator(),
                             new BinaryPlusEvaluator());
+    mBinaryEvaluatorMap.put(optable.getTimesOperator(),
+                            new BinaryTimesEvaluator());
 
     mUnaryEvaluatorMap = new HashMap<UnaryOperator,UnaryEvaluator>(8);
     mUnaryEvaluatorMap.put(optable.getNotOperator(),
@@ -444,6 +450,67 @@ class EFASimpleExpressionEvaluator
 
 
   //#########################################################################
+  //# Inner Class BinaryDivideEvaluator
+  private class BinaryDivideEvaluator extends BinaryIntEvaluator {
+
+    //#######################################################################
+    //# Evaluation
+    CompiledIntRange eval(final SimpleExpressionProxy leftexpr,
+                          final CompiledIntRange leftrange,
+                          final SimpleExpressionProxy rightexpr,
+                          final CompiledIntRange rightrange)
+    {
+      int leftlower = leftrange.getLower();
+      int leftupper = leftrange.getUpper();
+      int rightlower = rightrange.getLower();
+      int rightupper = rightrange.getUpper();
+      if (rightlower == 0) {
+        rightlower = 1;
+      }
+      if (rightupper == 0) {
+        rightupper = -1;
+      }
+      if (leftlower > leftupper || rightlower > rightupper) {
+        return EMPTY_RANGE;
+      }
+      if (leftupper < 0 ||
+          rightupper < 0 && leftlower < 0 && leftupper > 0) {
+        int aux = leftlower;
+        leftupper = -leftlower;
+        leftlower = -aux;
+        aux = rightlower;
+        rightupper = -rightlower;
+        rightlower = -aux;
+      }
+      final int lower;
+      final int upper;
+      if (leftlower >= 0) {
+        if (rightlower > 0) {
+          lower = leftlower / rightupper;
+          upper = leftupper /rightlower;
+        } else if (rightupper < 0) {
+          lower = leftupper / rightupper;
+          upper = leftlower / rightlower;
+        } else {
+          lower = -leftupper;
+          upper = leftupper;
+        }
+      } else { // leftlower < 0 && leftupper > 0
+        if (rightlower > 0) {
+          lower = leftlower / rightlower;
+          upper = leftupper /rightlower;
+        } else { // rightlower < 0 && rightupper > 0
+          upper = -leftlower > leftupper ? -leftlower : leftupper;
+          lower = -upper;
+        }        
+      }
+      return new CompiledIntRange(lower, upper);
+    }
+
+  }
+
+
+  //#########################################################################
   //# Inner Class BinaryEqualsEvaluator
   private class BinaryEqualsEvaluator extends BinaryEvaluator {
 
@@ -580,6 +647,73 @@ class EFASimpleExpressionEvaluator
 
 
   //#########################################################################
+  //# Inner Class BinaryModuloEvaluator
+  private class BinaryModuloEvaluator extends BinaryIntEvaluator {
+
+    //#######################################################################
+    //# Evaluation
+    CompiledIntRange eval(final SimpleExpressionProxy leftexpr,
+                          final CompiledIntRange leftrange,
+                          final SimpleExpressionProxy rightexpr,
+                          final CompiledIntRange rightrange)
+    {
+      int leftlower = leftrange.getLower();
+      int leftupper = leftrange.getUpper();
+      int rightlower = rightrange.getLower();
+      int rightupper = rightrange.getUpper();
+      if (rightlower == 0) {
+        rightlower = 1;
+      }
+      if (rightupper == 0) {
+        rightupper = -1;
+      }
+      if (leftlower > leftupper || rightlower > rightupper) {
+        return EMPTY_RANGE;
+      }
+      if (rightlower < 0) {
+        if (rightupper < 0) {
+          final int aux = rightlower;
+          rightupper = -rightlower;
+          rightlower = -aux;
+        } else {
+          if (-rightlower > rightupper) {
+            rightupper = -rightlower;
+          }
+          rightlower = 1;
+        }
+      }
+      if (leftlower >= 0) {
+        if (leftupper < rightupper) {
+          return leftrange;
+        } else if (leftupper - leftlower + 1 >= rightupper) {
+          return new CompiledIntRange(0, rightupper - 1);
+        }
+      } else if (leftupper <= 0) {
+        if (-leftlower < rightupper) {
+          return leftrange;
+        } else if (leftupper - leftlower + 1 >= rightupper) {
+          return new CompiledIntRange(1 - rightupper, 0);
+        }
+      }
+      int lower = leftlower % rightlower;
+      int upper = lower;
+      for (int dividend = leftlower; dividend <= leftupper; dividend++) {
+        for (int divisor = rightlower; divisor <= rightupper; divisor++) {
+          final int mod = dividend % divisor;
+          if (mod < lower) {
+            lower = mod;
+          } else if (mod > upper) {
+            upper = mod;
+          }
+        }
+      }
+      return new CompiledIntRange(lower, upper);
+    }
+
+  }
+
+
+  //#########################################################################
   //# Inner Class BinaryNotEqualsEvaluator
   private class BinaryNotEqualsEvaluator extends BinaryEvaluator {
 
@@ -642,6 +776,50 @@ class EFASimpleExpressionEvaluator
     {
       final int lower = leftrange.getLower() + rightrange.getLower();
       final int upper = leftrange.getUpper() + rightrange.getUpper();
+      return new CompiledIntRange(lower, upper);
+    }
+
+  }
+
+
+  //#########################################################################
+  //# Inner Class BinaryTimesEvaluator
+  private class BinaryTimesEvaluator extends BinaryIntEvaluator {
+
+    //#######################################################################
+    //# Evaluation
+    CompiledIntRange eval(final SimpleExpressionProxy leftexpr,
+                          final CompiledIntRange leftrange,
+                          final SimpleExpressionProxy rightexpr,
+                          final CompiledIntRange rightrange)
+    {
+      final int leftlower = leftrange.getLower();
+      final int leftupper = leftrange.getUpper();
+      final int rightlower = rightrange.getLower();
+      final int rightupper = rightrange.getUpper();
+      if (leftlower > leftupper || rightlower > rightupper) {
+        return EMPTY_RANGE;
+      }
+      int lower = leftlower * rightlower;
+      int upper = lower;
+      final int lu = leftlower * rightupper;
+      if (lu < lower) {
+        lower = lu;
+      } else if (lu > upper) {
+        upper = lu;
+      }
+      final int ul = leftupper * rightlower;
+      if (ul < lower) {
+        lower = ul;
+      } else if (ul > upper) {
+        upper = ul;
+      }
+      final int uu = leftupper * rightupper;
+      if (uu < lower) {
+        lower = uu;
+      } else if (uu > upper) {
+        upper = uu;
+      }
       return new CompiledIntRange(lower, upper);
     }
 
@@ -724,5 +902,7 @@ class EFASimpleExpressionEvaluator
     new CompiledIntRange(0, 0);
   private static final CompiledIntRange TRUE_RANGE =
     new CompiledIntRange(1, 1);
+  private static final CompiledIntRange EMPTY_RANGE =
+    new CompiledIntRange(0, -1);
 
 }
