@@ -30,8 +30,6 @@ import net.sourceforge.waters.model.module.AbstractModuleProxyVisitor;
 import net.sourceforge.waters.model.module.BinaryExpressionProxy;
 import net.sourceforge.waters.model.module.IdentifierProxy;
 import net.sourceforge.waters.model.module.IntConstantProxy;
-import net.sourceforge.waters.model.module.ModuleProxyFactory;
-import net.sourceforge.waters.model.module.ModuleProxyVisitor;
 import net.sourceforge.waters.model.module.SimpleExpressionProxy;
 import net.sourceforge.waters.model.module.UnaryExpressionProxy;
 
@@ -46,12 +44,9 @@ class EFASimpleExpressionEvaluator
 
   //#########################################################################
   //# Constructors
-  EFASimpleExpressionEvaluator(final ModuleProxyFactory factory,
-                               final CompilerOperatorTable optable,
+  EFASimpleExpressionEvaluator(final CompilerOperatorTable optable,
                                final EFAVariableMap varmap)
   {
-    mFactory = factory;
-    mOperatorTable = optable;
     mVariableMap = varmap;
 
     mBinaryEvaluatorMap = new HashMap<BinaryOperator,BinaryEvaluator>(32);
@@ -657,8 +652,6 @@ class EFASimpleExpressionEvaluator
 
   //#########################################################################
   //# Data Members
-  private final ModuleProxyFactory mFactory;
-  private final CompilerOperatorTable mOperatorTable;
   private final EFAVariableMap mVariableMap;
   private final Map<BinaryOperator,BinaryEvaluator> mBinaryEvaluatorMap;
   private final Map<UnaryOperator,UnaryEvaluator> mUnaryEvaluatorMap;
