@@ -1,0 +1,8 @@
+org.supremica.automata
+org.supremica.automata.BDD
+org.supremica.automata.IO
+org.supremica.automata.SAT
+org.supremica.automata.actions
+org.supremica.automata.execution
+org.supremica.automata.execution.expressions
+org.supremica.automata.templates
