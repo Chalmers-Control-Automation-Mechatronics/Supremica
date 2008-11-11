@@ -93,8 +93,8 @@ public class ComposingSafetyVerifier
   public boolean run() throws AnalysisException {        
     final Composing composing =
       new Composing(getConvertedModel(),
-		    getConvertedKindTranslator(),
-		    getFactory());
+		                getConvertedKindTranslator(),
+		                getFactory());
     composing.setNodeLimit(getProjectionNodeLimit());     
     ProductDESProxy des = composing.run(); 
     System.out.println("Composing is done!"); 
@@ -102,7 +102,7 @@ public class ComposingSafetyVerifier
     saveIntoFile(des);
     
     ArrayList<Candidate> candidates = new ArrayList<Candidate>(composing.getCandidates());
-    /*
+    
     //Display the composing infomation
     System.out.println(candidates.size()+" candidates:");
     for (int i=0; i<candidates.size(); i++) {
@@ -112,8 +112,8 @@ public class ComposingSafetyVerifier
       for (EventProxy e : candidates.get(i).getLocalEvents()) {
         System.out.print(e.getName()+",");
       }
-      System.out.println("\nAutomata: "+candidates.get(i).getName());
-    }*/
+      System.out.println("\nAutomata: "+candidates.get(i).getName()+",");
+    }
     
      
     final SafetyVerifier checker =

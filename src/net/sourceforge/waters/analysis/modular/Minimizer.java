@@ -30,6 +30,7 @@ import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.base.ProxyVisitor;
 import net.sourceforge.waters.model.base.VisitorException;
 import net.sourceforge.waters.model.des.AutomatonProxy;
+import net.sourceforge.waters.model.analysis.OverflowException;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 import net.sourceforge.waters.model.des.ProductDESProxyVisitor;
@@ -45,6 +46,7 @@ public class Minimizer
   @SuppressWarnings("unchecked")
   public Minimizer(final AutomatonProxy automaton,
                    final ProductDESProxyFactory factory)
+    throws OverflowException
   {
     mAutomaton = automaton;
     mFactory = factory;
@@ -80,7 +82,9 @@ public class Minimizer
         = stateMap.get(t.getTarget());
       mTransitionsPred[stateMap.get(t.getTarget())][mEventMap.get(t.getEvent())]
         .add(stateMap.get(t.getSource()));
-      assert(mTransitionsSucc[stateMap.get(t.getSource())][mEventMap.get(t.getEvent())] < 60000);
+      if (mTransitionsSucc[stateMap.get(t.getSource())][mEventMap.get(t.getEvent())] >= 60000) {
+      	throw new OverflowException("Too many transitions in Minimizer!");
+      }
     }
   }
   

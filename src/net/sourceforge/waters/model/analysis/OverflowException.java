@@ -26,7 +26,15 @@ public class OverflowException extends AnalysisException {
    */
   public OverflowException()
   {
-    super("State limit exceeded!");
+    this("State limit exceeded!");
+  }
+
+  /**
+   * Constructs a new overflow exception with a given message.
+   */
+  public OverflowException(final String msg)
+  {
+    super(msg);
     mLimit = -1;
   }
 
