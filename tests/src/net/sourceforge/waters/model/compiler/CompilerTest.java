@@ -519,10 +519,12 @@ public class CompilerTest
         for (int i = 0; i < culprits.length; i++) {
           final String culprit = culprits[i];
           final String msg = exception.getMessage();
+          assertNotNull("Caught " + exclass.getName() +
+                        " as expected, but no error message found!", msg);
           assertTrue("Caught " + exclass.getName() +
                      " as expected, but message '" + msg +
                      "' does not mention culprit: " + culprit + "!",
-                     msg != null && msg.indexOf(culprit) >= 0);
+                     msg.indexOf(culprit) >= 0);
         }
         if (exception instanceof EvalException) {
           final EvalException evalException = (EvalException) exception;
