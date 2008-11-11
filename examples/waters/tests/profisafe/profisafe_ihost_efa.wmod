@@ -1696,7 +1696,7 @@
             <VariableMarking>
                 <SimpleIdentifier Name=":accepting"/>
                 <BinaryExpression Operator="==">
-                    <SimpleIdentifier Name="in_ps_status_bit2_CRCNO"/>
+                    <SimpleIdentifier Name="fs_master_bit2_CRCNO"/>
                     <IntConstant Value="0"/>
                 </BinaryExpression>
             </VariableMarking>
@@ -1756,7 +1756,7 @@
             <VariableMarking>
                 <SimpleIdentifier Name=":accepting"/>
                 <BinaryExpression Operator="==">
-                    <SimpleIdentifier Name="fs_slave_bit2_TO"/>
+                    <SimpleIdentifier Name="fs_slave_bit3_TO"/>
                     <IntConstant Value="0"/>
                 </BinaryExpression>
             </VariableMarking>
