@@ -62,7 +62,7 @@ public class ModuleCompiler
     final ModuleInstanceCompiler pass1 = new ModuleInstanceCompiler
       (mDocumentManager, modfactory, mSourceInfoBuilder, mInputModule);
     final ModuleProxy step1 = pass1.compile(bindings);
-    final boolean efa = pass1.getHasGuardActionBlocks();
+    final boolean efa = pass1.getHasEFAElements();
     final ModuleProxy step2;
     if (efa && mIsExpandingEFATransitions) {
       final EFACompiler pass2 =

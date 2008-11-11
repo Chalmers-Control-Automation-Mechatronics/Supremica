@@ -43,6 +43,38 @@
         <SimpleComponent Kind="SPEC" Name="main">
             <Graph>
                 <NodeList>
+                    <SimpleNode Name="s8_message_prepare">
+                        <PointGeometry>
+                            <Point Y="224" X="336"/>
+                        </PointGeometry>
+                        <LabelGeometry>
+                            <Point Y="-9" X="-138"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="s9_await_slave_ack">
+                        <PointGeometry>
+                            <Point Y="352" X="336"/>
+                        </PointGeometry>
+                        <LabelGeometry>
+                            <Point Y="5" X="-55"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="s10_slave_ack_check">
+                        <PointGeometry>
+                            <Point Y="480" X="336"/>
+                        </PointGeometry>
+                        <LabelGeometry>
+                            <Point Y="2" X="-107"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="s7_slave_ack_check">
+                        <PointGeometry>
+                            <Point Y="352" X="512"/>
+                        </PointGeometry>
+                        <LabelGeometry>
+                            <Point Y="5" X="-15"/>
+                        </LabelGeometry>
+                    </SimpleNode>
                     <SimpleNode Name="s6_await_slave_ack">
                         <EventList>
                             <SimpleIdentifier Name=":accepting"/>
@@ -76,38 +108,6 @@
                         </PointGeometry>
                         <LabelGeometry>
                             <Point Y="-2" X="5"/>
-                        </LabelGeometry>
-                    </SimpleNode>
-                    <SimpleNode Name="s7_slave_ack_check">
-                        <PointGeometry>
-                            <Point Y="352" X="512"/>
-                        </PointGeometry>
-                        <LabelGeometry>
-                            <Point Y="5" X="-15"/>
-                        </LabelGeometry>
-                    </SimpleNode>
-                    <SimpleNode Name="s8_message_prepare">
-                        <PointGeometry>
-                            <Point Y="224" X="336"/>
-                        </PointGeometry>
-                        <LabelGeometry>
-                            <Point Y="-9" X="-138"/>
-                        </LabelGeometry>
-                    </SimpleNode>
-                    <SimpleNode Name="s9_await_slave_ack">
-                        <PointGeometry>
-                            <Point Y="352" X="336"/>
-                        </PointGeometry>
-                        <LabelGeometry>
-                            <Point Y="5" X="-55"/>
-                        </LabelGeometry>
-                    </SimpleNode>
-                    <SimpleNode Name="s10_slave_ack_check">
-                        <PointGeometry>
-                            <Point Y="480" X="336"/>
-                        </PointGeometry>
-                        <LabelGeometry>
-                            <Point Y="2" X="-107"/>
                         </LabelGeometry>
                     </SimpleNode>
                     <SimpleNode Name="s3_await_slave_ack">
@@ -147,6 +147,253 @@
                     </SimpleNode>
                 </NodeList>
                 <EdgeList>
+                    <Edge Target="s8_message_prepare" Source="s10_slave_ack_check">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="step">
+                                <IntConstant Value="2"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="1" X="-236"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="419" X="248"/>
+                        </SplineGeometry>
+                        <GuardActionBlock>
+                            <Guards>
+                                <BinaryExpression Operator="|" Text="in_CRC==nok | in_ps_status_bit2_CRCNO==1 | in_ps_status_bit3_TO==1 | !got_operator_ack">
+                                    <BinaryExpression Operator="|">
+                                        <BinaryExpression Operator="|">
+                                            <BinaryExpression Operator="==">
+                                                <SimpleIdentifier Name="in_CRC"/>
+                                                <SimpleIdentifier Name="nok"/>
+                                            </BinaryExpression>
+                                            <BinaryExpression Operator="==">
+                                                <SimpleIdentifier Name="in_ps_status_bit2_CRCNO"/>
+                                                <IntConstant Value="1"/>
+                                            </BinaryExpression>
+                                        </BinaryExpression>
+                                        <BinaryExpression Operator="==">
+                                            <SimpleIdentifier Name="in_ps_status_bit3_TO"/>
+                                            <IntConstant Value="1"/>
+                                        </BinaryExpression>
+                                    </BinaryExpression>
+                                    <UnaryExpression Operator="!">
+                                        <SimpleIdentifier Name="got_operator_ack"/>
+                                    </UnaryExpression>
+                                </BinaryExpression>
+                            </Guards>
+                            <Actions>
+                                <BinaryExpression Operator="|=" Text="fs_master_bit2_CRCNO |= (in_CRC == nok)">
+                                    <SimpleIdentifier Name="fs_master_bit2_CRCNO"/>
+                                    <BinaryExpression Operator="==">
+                                        <SimpleIdentifier Name="in_CRC"/>
+                                        <SimpleIdentifier Name="nok"/>
+                                    </BinaryExpression>
+                                </BinaryExpression>
+                                <BinaryExpression Operator="=" Text="fs_master_bit3_TO = fs_master_bit3_TO">
+                                    <SimpleIdentifier Name="fs_master_bit3_TO"/>
+                                    <SimpleIdentifier Name="fs_master_bit3_TO"/>
+                                </BinaryExpression>
+                                <BinaryExpression Operator="|=" Text="fs_slave_bit2_CRCNO |= in_ps_status_bit2_CRCNO">
+                                    <SimpleIdentifier Name="fs_slave_bit2_CRCNO"/>
+                                    <SimpleIdentifier Name="in_ps_status_bit2_CRCNO"/>
+                                </BinaryExpression>
+                                <BinaryExpression Operator="|=" Text="fs_slave_bit3_TO |= in_ps_status_bit3_TO">
+                                    <SimpleIdentifier Name="fs_slave_bit3_TO"/>
+                                    <SimpleIdentifier Name="in_ps_status_bit3_TO"/>
+                                </BinaryExpression>
+                                <BinaryExpression Operator="=" Text="old_cons_num = old_cons_num">
+                                    <SimpleIdentifier Name="old_cons_num"/>
+                                    <SimpleIdentifier Name="old_cons_num"/>
+                                </BinaryExpression>
+                                <BinaryExpression Operator="=" Text="out_cons_num = 1 + out_cons_num % MAXSEQNO">
+                                    <SimpleIdentifier Name="out_cons_num"/>
+                                    <BinaryExpression Operator="+">
+                                        <IntConstant Value="1"/>
+                                        <BinaryExpression Operator="%">
+                                            <SimpleIdentifier Name="out_cons_num"/>
+                                            <SimpleIdentifier Name="MAXSEQNO"/>
+                                        </BinaryExpression>
+                                    </BinaryExpression>
+                                </BinaryExpression>
+                                <BinaryExpression Operator="=" Text="app_process_data = FV">
+                                    <SimpleIdentifier Name="app_process_data"/>
+                                    <SimpleIdentifier Name="FV"/>
+                                </BinaryExpression>
+                                <BinaryExpression Operator="=" Text="app_FV_active = 1">
+                                    <SimpleIdentifier Name="app_FV_active"/>
+                                    <IntConstant Value="1"/>
+                                </BinaryExpression>
+                            </Actions>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="19" X="-239"/>
+                            </LabelGeometry>
+                        </GuardActionBlock>
+                    </Edge>
+                    <Edge Target="s10_slave_ack_check" Source="s9_await_slave_ack">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="restart_host_timer">
+                                <IntConstant Value="0"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-40" X="-71"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <GuardActionBlock>
+                            <Guards>
+                                <BinaryExpression Operator="&amp;" Text="in_cons_num==out_cons_num &amp; !got_host_timeout">
+                                    <BinaryExpression Operator="==">
+                                        <SimpleIdentifier Name="in_cons_num"/>
+                                        <SimpleIdentifier Name="out_cons_num"/>
+                                    </BinaryExpression>
+                                    <UnaryExpression Operator="!">
+                                        <SimpleIdentifier Name="got_host_timeout"/>
+                                    </UnaryExpression>
+                                </BinaryExpression>
+                            </Guards>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-27" X="-249"/>
+                            </LabelGeometry>
+                        </GuardActionBlock>
+                    </Edge>
+                    <Edge Target="s8_message_prepare" Source="s9_await_slave_ack">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="restart_host_timer">
+                                <IntConstant Value="1"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-65" X="-189"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="287" X="243"/>
+                        </SplineGeometry>
+                        <GuardActionBlock>
+                            <Guards>
+                                <SimpleIdentifier Name="got_host_timeout"/>
+                            </Guards>
+                            <Actions>
+                                <BinaryExpression Operator="=">
+                                    <SimpleIdentifier Name="fs_master_bit3_TO"/>
+                                    <IntConstant Value="1"/>
+                                </BinaryExpression>
+                                <BinaryExpression Operator="=" Text="out_cons_num = 1 + out_cons_num % MAXSEQNO">
+                                    <SimpleIdentifier Name="out_cons_num"/>
+                                    <BinaryExpression Operator="+">
+                                        <IntConstant Value="1"/>
+                                        <BinaryExpression Operator="%">
+                                            <SimpleIdentifier Name="out_cons_num"/>
+                                            <SimpleIdentifier Name="MAXSEQNO"/>
+                                        </BinaryExpression>
+                                    </BinaryExpression>
+                                </BinaryExpression>
+                                <BinaryExpression Operator="=">
+                                    <SimpleIdentifier Name="app_process_data"/>
+                                    <SimpleIdentifier Name="FV"/>
+                                </BinaryExpression>
+                                <BinaryExpression Operator="=">
+                                    <SimpleIdentifier Name="app_FV_active"/>
+                                    <IntConstant Value="1"/>
+                                </BinaryExpression>
+                            </Actions>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-52" X="-188"/>
+                            </LabelGeometry>
+                        </GuardActionBlock>
+                    </Edge>
+                    <Edge Target="s9_await_slave_ack" Source="s8_message_prepare">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="yield">
+                                <IntConstant Value="1"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="24" X="-47"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <GuardActionBlock>
+                            <Actions>
+                                <BinaryExpression Operator="=">
+                                    <SimpleIdentifier Name="got_operator_ack"/>
+                                    <IntConstant Value="0"/>
+                                </BinaryExpression>
+                            </Actions>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="37" X="-123"/>
+                            </LabelGeometry>
+                        </GuardActionBlock>
+                    </Edge>
+                    <Edge Target="s8_message_prepare" Source="s7_slave_ack_check">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="restart_host_timer">
+                                <IntConstant Value="2"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-32" X="-94"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="265" X="443"/>
+                        </SplineGeometry>
+                        <GuardActionBlock>
+                            <Guards>
+                                <BinaryExpression Operator="|" Text="in_CRC==nok | in_ps_status_bit2_CRCNO==1 | in_ps_status_bit3_TO==1">
+                                    <BinaryExpression Operator="|">
+                                        <BinaryExpression Operator="==">
+                                            <SimpleIdentifier Name="in_CRC"/>
+                                            <SimpleIdentifier Name="nok"/>
+                                        </BinaryExpression>
+                                        <BinaryExpression Operator="==">
+                                            <SimpleIdentifier Name="in_ps_status_bit2_CRCNO"/>
+                                            <IntConstant Value="1"/>
+                                        </BinaryExpression>
+                                    </BinaryExpression>
+                                    <BinaryExpression Operator="==">
+                                        <SimpleIdentifier Name="in_ps_status_bit3_TO"/>
+                                        <IntConstant Value="1"/>
+                                    </BinaryExpression>
+                                </BinaryExpression>
+                            </Guards>
+                            <Actions>
+                                <BinaryExpression Operator="=" Text="fs_master_bit2_CRCNO = (in_CRC==nok)">
+                                    <SimpleIdentifier Name="fs_master_bit2_CRCNO"/>
+                                    <BinaryExpression Operator="==">
+                                        <SimpleIdentifier Name="in_CRC"/>
+                                        <SimpleIdentifier Name="nok"/>
+                                    </BinaryExpression>
+                                </BinaryExpression>
+                                <BinaryExpression Operator="=">
+                                    <SimpleIdentifier Name="fs_slave_bit2_CRCNO"/>
+                                    <SimpleIdentifier Name="in_ps_status_bit2_CRCNO"/>
+                                </BinaryExpression>
+                                <BinaryExpression Operator="=">
+                                    <SimpleIdentifier Name="fs_slave_bit3_TO"/>
+                                    <SimpleIdentifier Name="in_ps_status_bit3_TO"/>
+                                </BinaryExpression>
+                                <BinaryExpression Operator="=" Text="out_cons_num = 1 + out_cons_num % MAXSEQNO">
+                                    <SimpleIdentifier Name="out_cons_num"/>
+                                    <BinaryExpression Operator="+">
+                                        <IntConstant Value="1"/>
+                                        <BinaryExpression Operator="%">
+                                            <SimpleIdentifier Name="out_cons_num"/>
+                                            <SimpleIdentifier Name="MAXSEQNO"/>
+                                        </BinaryExpression>
+                                    </BinaryExpression>
+                                </BinaryExpression>
+                                <BinaryExpression Operator="=">
+                                    <SimpleIdentifier Name="app_process_data"/>
+                                    <SimpleIdentifier Name="FV"/>
+                                </BinaryExpression>
+                                <BinaryExpression Operator="=">
+                                    <SimpleIdentifier Name="app_FV_active"/>
+                                    <IntConstant Value="1"/>
+                                </BinaryExpression>
+                            </Actions>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-22" X="-95"/>
+                            </LabelGeometry>
+                        </GuardActionBlock>
+                    </Edge>
                     <Edge Target="s7_slave_ack_check" Source="s6_await_slave_ack">
                         <LabelBlock>
                             <IndexedIdentifier Name="step">
@@ -307,97 +554,6 @@
                             </LabelGeometry>
                         </GuardActionBlock>
                     </Edge>
-                    <Edge Target="s8_message_prepare" Source="s4_slave_ack_check">
-                        <LabelBlock>
-                            <IndexedIdentifier Name="step">
-                                <IntConstant Value="2"/>
-                            </IndexedIdentifier>
-                            <LabelGeometry Anchor="NW">
-                                <Point Y="11" X="-62"/>
-                            </LabelGeometry>
-                        </LabelBlock>
-                        <SplineGeometry>
-                            <Point Y="723" X="175"/>
-                        </SplineGeometry>
-                        <GuardActionBlock>
-                            <Guards>
-                                <BinaryExpression Operator="|" Text="in_cons_num!=out_cons_num | in_CRC==nok | in_ps_status_bit2_CRCNO==1 | in_ps_status_bit3_TO==1">
-                                    <BinaryExpression Operator="|">
-                                        <BinaryExpression Operator="|">
-                                            <BinaryExpression Operator="!=">
-                                                <SimpleIdentifier Name="in_cons_num"/>
-                                                <SimpleIdentifier Name="out_cons_num"/>
-                                            </BinaryExpression>
-                                            <BinaryExpression Operator="==">
-                                                <SimpleIdentifier Name="in_CRC"/>
-                                                <SimpleIdentifier Name="nok"/>
-                                            </BinaryExpression>
-                                        </BinaryExpression>
-                                        <BinaryExpression Operator="==">
-                                            <SimpleIdentifier Name="in_ps_status_bit2_CRCNO"/>
-                                            <IntConstant Value="1"/>
-                                        </BinaryExpression>
-                                    </BinaryExpression>
-                                    <BinaryExpression Operator="==">
-                                        <SimpleIdentifier Name="in_ps_status_bit3_TO"/>
-                                        <IntConstant Value="1"/>
-                                    </BinaryExpression>
-                                </BinaryExpression>
-                            </Guards>
-                            <Actions>
-                                <BinaryExpression Operator="=" Text="fs_master_bit2_CRCNO = (in_cons_num != out_cons_num) | (in_CRC == nok)">
-                                    <SimpleIdentifier Name="fs_master_bit2_CRCNO"/>
-                                    <BinaryExpression Operator="|">
-                                        <BinaryExpression Operator="!=">
-                                            <SimpleIdentifier Name="in_cons_num"/>
-                                            <SimpleIdentifier Name="out_cons_num"/>
-                                        </BinaryExpression>
-                                        <BinaryExpression Operator="==">
-                                            <SimpleIdentifier Name="in_CRC"/>
-                                            <SimpleIdentifier Name="nok"/>
-                                        </BinaryExpression>
-                                    </BinaryExpression>
-                                </BinaryExpression>
-                                <BinaryExpression Operator="=">
-                                    <SimpleIdentifier Name="fs_master_bit3_TO"/>
-                                    <SimpleIdentifier Name="fs_master_bit3_TO"/>
-                                </BinaryExpression>
-                                <BinaryExpression Operator="=">
-                                    <SimpleIdentifier Name="fs_slave_bit2_CRCNO"/>
-                                    <SimpleIdentifier Name="in_ps_status_bit2_CRCNO"/>
-                                </BinaryExpression>
-                                <BinaryExpression Operator="=">
-                                    <SimpleIdentifier Name="fs_slave_bit3_TO"/>
-                                    <SimpleIdentifier Name="in_ps_status_bit3_TO"/>
-                                </BinaryExpression>
-                                <BinaryExpression Operator="=">
-                                    <SimpleIdentifier Name="old_cons_num"/>
-                                    <SimpleIdentifier Name="old_cons_num"/>
-                                </BinaryExpression>
-                                <BinaryExpression Operator="=" Text="out_cons_num=1 + out_cons_num % MAXSEQNO">
-                                    <SimpleIdentifier Name="out_cons_num"/>
-                                    <BinaryExpression Operator="+">
-                                        <IntConstant Value="1"/>
-                                        <BinaryExpression Operator="%">
-                                            <SimpleIdentifier Name="out_cons_num"/>
-                                            <SimpleIdentifier Name="MAXSEQNO"/>
-                                        </BinaryExpression>
-                                    </BinaryExpression>
-                                </BinaryExpression>
-                                <BinaryExpression Operator="=">
-                                    <SimpleIdentifier Name="app_process_data"/>
-                                    <SimpleIdentifier Name="FV"/>
-                                </BinaryExpression>
-                                <BinaryExpression Operator="=">
-                                    <SimpleIdentifier Name="app_FV_active"/>
-                                    <IntConstant Value="1"/>
-                                </BinaryExpression>
-                            </Actions>
-                            <LabelGeometry Anchor="NW">
-                                <Point Y="25" X="-62"/>
-                            </LabelGeometry>
-                        </GuardActionBlock>
-                    </Edge>
                     <Edge Target="s6_await_slave_ack" Source="s5_message_prepare">
                         <LabelBlock>
                             <IndexedIdentifier Name="yield">
@@ -468,111 +624,6 @@
                             </LabelGeometry>
                         </GuardActionBlock>
                     </Edge>
-                    <Edge Target="s8_message_prepare" Source="s1_system_start">
-                        <LabelBlock>
-                            <IndexedIdentifier Name="step">
-                                <IntConstant Value="1"/>
-                            </IndexedIdentifier>
-                            <LabelGeometry Anchor="NW">
-                                <Point Y="-84" X="-176"/>
-                            </LabelGeometry>
-                        </LabelBlock>
-                        <SplineGeometry>
-                            <Point Y="145" X="412"/>
-                        </SplineGeometry>
-                        <GuardActionBlock>
-                            <Guards>
-                                <BinaryExpression Operator="|" Text="fs_master_bit2_CRCNO==1 |  fs_master_bit3_TO==1 |  fs_slave_bit2_CRCNO==1 |  fs_slave_bit3_TO==1">
-                                    <BinaryExpression Operator="|">
-                                        <BinaryExpression Operator="|">
-                                            <BinaryExpression Operator="==">
-                                                <SimpleIdentifier Name="fs_master_bit2_CRCNO"/>
-                                                <IntConstant Value="1"/>
-                                            </BinaryExpression>
-                                            <BinaryExpression Operator="==">
-                                                <SimpleIdentifier Name="fs_master_bit3_TO"/>
-                                                <IntConstant Value="1"/>
-                                            </BinaryExpression>
-                                        </BinaryExpression>
-                                        <BinaryExpression Operator="==">
-                                            <SimpleIdentifier Name="fs_slave_bit2_CRCNO"/>
-                                            <IntConstant Value="1"/>
-                                        </BinaryExpression>
-                                    </BinaryExpression>
-                                    <BinaryExpression Operator="==">
-                                        <SimpleIdentifier Name="fs_slave_bit3_TO"/>
-                                        <IntConstant Value="1"/>
-                                    </BinaryExpression>
-                                </BinaryExpression>
-                            </Guards>
-                            <Actions>
-                                <BinaryExpression Operator="=">
-                                    <SimpleIdentifier Name="old_cons_num"/>
-                                    <SimpleIdentifier Name="old_cons_num"/>
-                                </BinaryExpression>
-                                <BinaryExpression Operator="=">
-                                    <SimpleIdentifier Name="out_cons_num"/>
-                                    <IntConstant Value="1"/>
-                                </BinaryExpression>
-                                <BinaryExpression Operator="=">
-                                    <SimpleIdentifier Name="app_process_data"/>
-                                    <SimpleIdentifier Name="FV"/>
-                                </BinaryExpression>
-                                <BinaryExpression Operator="=">
-                                    <SimpleIdentifier Name="app_FV_active"/>
-                                    <IntConstant Value="1"/>
-                                </BinaryExpression>
-                            </Actions>
-                            <LabelGeometry Anchor="NW">
-                                <Point Y="-67" X="-176"/>
-                            </LabelGeometry>
-                        </GuardActionBlock>
-                    </Edge>
-                    <Edge Target="s8_message_prepare" Source="s3_await_slave_ack">
-                        <LabelBlock>
-                            <IndexedIdentifier Name="restart_host_timer">
-                                <IntConstant Value="1"/>
-                            </IndexedIdentifier>
-                            <LabelGeometry Anchor="NW">
-                                <Point Y="9" X="72"/>
-                            </LabelGeometry>
-                        </LabelBlock>
-                        <SplineGeometry>
-                            <Point Y="177" X="712"/>
-                        </SplineGeometry>
-                        <GuardActionBlock>
-                            <Guards>
-                                <SimpleIdentifier Name="got_host_timeout"/>
-                            </Guards>
-                            <Actions>
-                                <BinaryExpression Operator="=">
-                                    <SimpleIdentifier Name="fs_master_bit3_TO"/>
-                                    <IntConstant Value="1"/>
-                                </BinaryExpression>
-                                <BinaryExpression Operator="=" Text="out_cons_num=1 + out_cons_num % MAXSEQNO">
-                                    <SimpleIdentifier Name="out_cons_num"/>
-                                    <BinaryExpression Operator="+">
-                                        <IntConstant Value="1"/>
-                                        <BinaryExpression Operator="%">
-                                            <SimpleIdentifier Name="out_cons_num"/>
-                                            <SimpleIdentifier Name="MAXSEQNO"/>
-                                        </BinaryExpression>
-                                    </BinaryExpression>
-                                </BinaryExpression>
-                                <BinaryExpression Operator="=">
-                                    <SimpleIdentifier Name="app_process_data"/>
-                                    <SimpleIdentifier Name="FV"/>
-                                </BinaryExpression>
-                                <BinaryExpression Operator="=">
-                                    <SimpleIdentifier Name="app_FV_active"/>
-                                    <IntConstant Value="1"/>
-                                </BinaryExpression>
-                            </Actions>
-                            <LabelGeometry Anchor="NW">
-                                <Point Y="23" X="76"/>
-                            </LabelGeometry>
-                        </GuardActionBlock>
-                    </Edge>
                     <Edge Target="s4_slave_ack_check" Source="s3_await_slave_ack">
                         <LabelBlock>
                             <IndexedIdentifier Name="restart_host_timer">
@@ -602,243 +653,6 @@
                             </LabelGeometry>
                         </GuardActionBlock>
                     </Edge>
-                    <Edge Target="s5_message_prepare" Source="s10_slave_ack_check">
-                        <LabelBlock>
-                            <IndexedIdentifier Name="step">
-                                <IntConstant Value="2"/>
-                            </IndexedIdentifier>
-                            <LabelGeometry Anchor="NW">
-                                <Point Y="-27" X="-155"/>
-                            </LabelGeometry>
-                        </LabelBlock>
-                        <GuardActionBlock>
-                            <Guards>
-                                <BinaryExpression Operator="&amp;" Text="in_CRC==ok &amp; in_ps_status_bit2_CRCNO==0 &amp; in_ps_status_bit3_TO==0 &amp; in_ps_status_bit4_FV==0 &amp; got_operator_ack">
-                                    <BinaryExpression Operator="&amp;">
-                                        <BinaryExpression Operator="&amp;">
-                                            <BinaryExpression Operator="&amp;">
-                                                <BinaryExpression Operator="==">
-                                                    <SimpleIdentifier Name="in_CRC"/>
-                                                    <SimpleIdentifier Name="ok"/>
-                                                </BinaryExpression>
-                                                <BinaryExpression Operator="==">
-                                                    <SimpleIdentifier Name="in_ps_status_bit2_CRCNO"/>
-                                                    <IntConstant Value="0"/>
-                                                </BinaryExpression>
-                                            </BinaryExpression>
-                                            <BinaryExpression Operator="==">
-                                                <SimpleIdentifier Name="in_ps_status_bit3_TO"/>
-                                                <IntConstant Value="0"/>
-                                            </BinaryExpression>
-                                        </BinaryExpression>
-                                        <BinaryExpression Operator="==">
-                                            <SimpleIdentifier Name="in_ps_status_bit4_FV"/>
-                                            <IntConstant Value="0"/>
-                                        </BinaryExpression>
-                                    </BinaryExpression>
-                                    <SimpleIdentifier Name="got_operator_ack"/>
-                                </BinaryExpression>
-                            </Guards>
-                            <Actions>
-                                <BinaryExpression Operator="=">
-                                    <SimpleIdentifier Name="fs_master_bit2_CRCNO"/>
-                                    <IntConstant Value="0"/>
-                                </BinaryExpression>
-                                <BinaryExpression Operator="=">
-                                    <SimpleIdentifier Name="fs_master_bit3_TO"/>
-                                    <IntConstant Value="0"/>
-                                </BinaryExpression>
-                                <BinaryExpression Operator="=">
-                                    <SimpleIdentifier Name="fs_slave_bit2_CRCNO"/>
-                                    <IntConstant Value="0"/>
-                                </BinaryExpression>
-                                <BinaryExpression Operator="=">
-                                    <SimpleIdentifier Name="fs_slave_bit3_TO"/>
-                                    <IntConstant Value="0"/>
-                                </BinaryExpression>
-                                <BinaryExpression Operator="=">
-                                    <SimpleIdentifier Name="old_cons_num"/>
-                                    <SimpleIdentifier Name="out_cons_num"/>
-                                </BinaryExpression>
-                                <BinaryExpression Operator="=" Text="out_cons_num = 1 + out_cons_num % MAXSEQNO">
-                                    <SimpleIdentifier Name="out_cons_num"/>
-                                    <BinaryExpression Operator="+">
-                                        <IntConstant Value="1"/>
-                                        <BinaryExpression Operator="%">
-                                            <SimpleIdentifier Name="out_cons_num"/>
-                                            <SimpleIdentifier Name="MAXSEQNO"/>
-                                        </BinaryExpression>
-                                    </BinaryExpression>
-                                </BinaryExpression>
-                                <BinaryExpression Operator="=">
-                                    <SimpleIdentifier Name="app_process_data"/>
-                                    <SimpleIdentifier Name="in_ps_f_process_data"/>
-                                </BinaryExpression>
-                                <BinaryExpression Operator="=">
-                                    <SimpleIdentifier Name="app_FV_active"/>
-                                    <IntConstant Value="0"/>
-                                </BinaryExpression>
-                            </Actions>
-                            <LabelGeometry Anchor="NW">
-                                <Point Y="-17" X="-156"/>
-                            </LabelGeometry>
-                        </GuardActionBlock>
-                    </Edge>
-                    <Edge Target="s8_message_prepare" Source="s10_slave_ack_check">
-                        <LabelBlock>
-                            <IndexedIdentifier Name="step">
-                                <IntConstant Value="2"/>
-                            </IndexedIdentifier>
-                            <LabelGeometry Anchor="NW">
-                                <Point Y="1" X="-236"/>
-                            </LabelGeometry>
-                        </LabelBlock>
-                        <SplineGeometry>
-                            <Point Y="419" X="248"/>
-                        </SplineGeometry>
-                        <GuardActionBlock>
-                            <Guards>
-                                <BinaryExpression Operator="|" Text="in_CRC==nok | in_ps_status_bit2_CRCNO==1 | in_ps_status_bit3_TO==1 | !got_operator_ack">
-                                    <BinaryExpression Operator="|">
-                                        <BinaryExpression Operator="|">
-                                            <BinaryExpression Operator="==">
-                                                <SimpleIdentifier Name="in_CRC"/>
-                                                <SimpleIdentifier Name="nok"/>
-                                            </BinaryExpression>
-                                            <BinaryExpression Operator="==">
-                                                <SimpleIdentifier Name="in_ps_status_bit2_CRCNO"/>
-                                                <IntConstant Value="1"/>
-                                            </BinaryExpression>
-                                        </BinaryExpression>
-                                        <BinaryExpression Operator="==">
-                                            <SimpleIdentifier Name="in_ps_status_bit3_TO"/>
-                                            <IntConstant Value="1"/>
-                                        </BinaryExpression>
-                                    </BinaryExpression>
-                                    <UnaryExpression Operator="!">
-                                        <SimpleIdentifier Name="got_operator_ack"/>
-                                    </UnaryExpression>
-                                </BinaryExpression>
-                            </Guards>
-                            <Actions>
-                                <BinaryExpression Operator="|=" Text="fs_master_bit2_CRCNO |= (in_CRC == nok)">
-                                    <SimpleIdentifier Name="fs_master_bit2_CRCNO"/>
-                                    <BinaryExpression Operator="==">
-                                        <SimpleIdentifier Name="in_CRC"/>
-                                        <SimpleIdentifier Name="nok"/>
-                                    </BinaryExpression>
-                                </BinaryExpression>
-                                <BinaryExpression Operator="=" Text="fs_master_bit3_TO = fs_master_bit3_TO">
-                                    <SimpleIdentifier Name="fs_master_bit3_TO"/>
-                                    <SimpleIdentifier Name="fs_master_bit3_TO"/>
-                                </BinaryExpression>
-                                <BinaryExpression Operator="|=" Text="fs_slave_bit2_CRCNO |= in_ps_status_bit2_CRCNO">
-                                    <SimpleIdentifier Name="fs_slave_bit2_CRCNO"/>
-                                    <SimpleIdentifier Name="in_ps_status_bit2_CRCNO"/>
-                                </BinaryExpression>
-                                <BinaryExpression Operator="|=" Text="fs_slave_bit3_TO |= in_ps_status_bit3_TO">
-                                    <SimpleIdentifier Name="fs_slave_bit3_TO"/>
-                                    <SimpleIdentifier Name="in_ps_status_bit3_TO"/>
-                                </BinaryExpression>
-                                <BinaryExpression Operator="=" Text="old_cons_num = old_cons_num">
-                                    <SimpleIdentifier Name="old_cons_num"/>
-                                    <SimpleIdentifier Name="old_cons_num"/>
-                                </BinaryExpression>
-                                <BinaryExpression Operator="=" Text="out_cons_num = 1 + out_cons_num % MAXSEQNO">
-                                    <SimpleIdentifier Name="out_cons_num"/>
-                                    <BinaryExpression Operator="+">
-                                        <IntConstant Value="1"/>
-                                        <BinaryExpression Operator="%">
-                                            <SimpleIdentifier Name="out_cons_num"/>
-                                            <SimpleIdentifier Name="MAXSEQNO"/>
-                                        </BinaryExpression>
-                                    </BinaryExpression>
-                                </BinaryExpression>
-                                <BinaryExpression Operator="=" Text="app_process_data = FV">
-                                    <SimpleIdentifier Name="app_process_data"/>
-                                    <SimpleIdentifier Name="FV"/>
-                                </BinaryExpression>
-                                <BinaryExpression Operator="=" Text="app_FV_active = 1">
-                                    <SimpleIdentifier Name="app_FV_active"/>
-                                    <IntConstant Value="1"/>
-                                </BinaryExpression>
-                            </Actions>
-                            <LabelGeometry Anchor="NW">
-                                <Point Y="19" X="-239"/>
-                            </LabelGeometry>
-                        </GuardActionBlock>
-                    </Edge>
-                    <Edge Target="s10_slave_ack_check" Source="s9_await_slave_ack">
-                        <LabelBlock>
-                            <IndexedIdentifier Name="restart_host_timer">
-                                <IntConstant Value="0"/>
-                            </IndexedIdentifier>
-                            <LabelGeometry Anchor="NW">
-                                <Point Y="-40" X="-71"/>
-                            </LabelGeometry>
-                        </LabelBlock>
-                        <GuardActionBlock>
-                            <Guards>
-                                <BinaryExpression Operator="&amp;" Text="in_cons_num==out_cons_num &amp; !got_host_timeout">
-                                    <BinaryExpression Operator="==">
-                                        <SimpleIdentifier Name="in_cons_num"/>
-                                        <SimpleIdentifier Name="out_cons_num"/>
-                                    </BinaryExpression>
-                                    <UnaryExpression Operator="!">
-                                        <SimpleIdentifier Name="got_host_timeout"/>
-                                    </UnaryExpression>
-                                </BinaryExpression>
-                            </Guards>
-                            <LabelGeometry Anchor="NW">
-                                <Point Y="-27" X="-249"/>
-                            </LabelGeometry>
-                        </GuardActionBlock>
-                    </Edge>
-                    <Edge Target="s8_message_prepare" Source="s9_await_slave_ack">
-                        <LabelBlock>
-                            <IndexedIdentifier Name="restart_host_timer">
-                                <IntConstant Value="1"/>
-                            </IndexedIdentifier>
-                            <LabelGeometry Anchor="NW">
-                                <Point Y="-65" X="-189"/>
-                            </LabelGeometry>
-                        </LabelBlock>
-                        <SplineGeometry>
-                            <Point Y="287" X="243"/>
-                        </SplineGeometry>
-                        <GuardActionBlock>
-                            <Guards>
-                                <SimpleIdentifier Name="got_host_timeout"/>
-                            </Guards>
-                            <Actions>
-                                <BinaryExpression Operator="=">
-                                    <SimpleIdentifier Name="fs_master_bit3_TO"/>
-                                    <IntConstant Value="1"/>
-                                </BinaryExpression>
-                                <BinaryExpression Operator="=" Text="out_cons_num = 1 + out_cons_num % MAXSEQNO">
-                                    <SimpleIdentifier Name="out_cons_num"/>
-                                    <BinaryExpression Operator="+">
-                                        <IntConstant Value="1"/>
-                                        <BinaryExpression Operator="%">
-                                            <SimpleIdentifier Name="out_cons_num"/>
-                                            <SimpleIdentifier Name="MAXSEQNO"/>
-                                        </BinaryExpression>
-                                    </BinaryExpression>
-                                </BinaryExpression>
-                                <BinaryExpression Operator="=">
-                                    <SimpleIdentifier Name="app_process_data"/>
-                                    <SimpleIdentifier Name="FV"/>
-                                </BinaryExpression>
-                                <BinaryExpression Operator="=">
-                                    <SimpleIdentifier Name="app_FV_active"/>
-                                    <IntConstant Value="1"/>
-                                </BinaryExpression>
-                            </Actions>
-                            <LabelGeometry Anchor="NW">
-                                <Point Y="-52" X="-188"/>
-                            </LabelGeometry>
-                        </GuardActionBlock>
-                    </Edge>
                     <Edge Target="s3_await_slave_ack" Source="s2_message_prepare">
                         <LabelBlock>
                             <IndexedIdentifier Name="yield">
@@ -848,63 +662,6 @@
                                 <Point Y="-21" X="5"/>
                             </LabelGeometry>
                         </LabelBlock>
-                    </Edge>
-                    <Edge Target="s8_message_prepare" Source="s11_wait_delay_time">
-                        <LabelBlock>
-                            <IndexedIdentifier Name="restart_host_timer">
-                                <IntConstant Value="1"/>
-                            </IndexedIdentifier>
-                            <LabelGeometry Anchor="NW">
-                                <Point Y="-86" X="-67"/>
-                            </LabelGeometry>
-                        </LabelBlock>
-                        <GuardActionBlock>
-                            <Guards>
-                                <SimpleIdentifier Name="got_delay_timeout"/>
-                            </Guards>
-                            <Actions>
-                                <BinaryExpression Operator="=">
-                                    <SimpleIdentifier Name="fs_master_bit3_TO"/>
-                                    <IntConstant Value="1"/>
-                                </BinaryExpression>
-                                <BinaryExpression Operator="=">
-                                    <SimpleIdentifier Name="out_cons_num"/>
-                                    <SimpleIdentifier Name="out_cons_num"/>
-                                </BinaryExpression>
-                                <BinaryExpression Operator="=">
-                                    <SimpleIdentifier Name="app_process_data"/>
-                                    <SimpleIdentifier Name="app_process_data"/>
-                                </BinaryExpression>
-                                <BinaryExpression Operator="=">
-                                    <SimpleIdentifier Name="app_FV_active"/>
-                                    <SimpleIdentifier Name="app_FV_active"/>
-                                </BinaryExpression>
-                            </Actions>
-                            <LabelGeometry Anchor="NW">
-                                <Point Y="-76" X="-67"/>
-                            </LabelGeometry>
-                        </GuardActionBlock>
-                    </Edge>
-                    <Edge Target="s9_await_slave_ack" Source="s8_message_prepare">
-                        <LabelBlock>
-                            <IndexedIdentifier Name="yield">
-                                <IntConstant Value="1"/>
-                            </IndexedIdentifier>
-                            <LabelGeometry Anchor="NW">
-                                <Point Y="24" X="-47"/>
-                            </LabelGeometry>
-                        </LabelBlock>
-                        <GuardActionBlock>
-                            <Actions>
-                                <BinaryExpression Operator="=">
-                                    <SimpleIdentifier Name="got_operator_ack"/>
-                                    <IntConstant Value="0"/>
-                                </BinaryExpression>
-                            </Actions>
-                            <LabelGeometry Anchor="NW">
-                                <Point Y="37" X="-123"/>
-                            </LabelGeometry>
-                        </GuardActionBlock>
                     </Edge>
                     <Edge Target="s5_message_prepare" Source="s7_slave_ack_check">
                         <LabelBlock>
@@ -963,77 +720,6 @@
                             </Actions>
                             <LabelGeometry Anchor="NW">
                                 <Point Y="-73" X="-163"/>
-                            </LabelGeometry>
-                        </GuardActionBlock>
-                    </Edge>
-                    <Edge Target="s8_message_prepare" Source="s7_slave_ack_check">
-                        <LabelBlock>
-                            <IndexedIdentifier Name="restart_host_timer">
-                                <IntConstant Value="2"/>
-                            </IndexedIdentifier>
-                            <LabelGeometry Anchor="NW">
-                                <Point Y="-32" X="-94"/>
-                            </LabelGeometry>
-                        </LabelBlock>
-                        <SplineGeometry>
-                            <Point Y="265" X="443"/>
-                        </SplineGeometry>
-                        <GuardActionBlock>
-                            <Guards>
-                                <BinaryExpression Operator="|" Text="in_CRC==nok | in_ps_status_bit2_CRCNO==1 | in_ps_status_bit3_TO==1">
-                                    <BinaryExpression Operator="|">
-                                        <BinaryExpression Operator="==">
-                                            <SimpleIdentifier Name="in_CRC"/>
-                                            <SimpleIdentifier Name="nok"/>
-                                        </BinaryExpression>
-                                        <BinaryExpression Operator="==">
-                                            <SimpleIdentifier Name="in_ps_status_bit2_CRCNO"/>
-                                            <IntConstant Value="1"/>
-                                        </BinaryExpression>
-                                    </BinaryExpression>
-                                    <BinaryExpression Operator="==">
-                                        <SimpleIdentifier Name="in_ps_status_bit3_TO"/>
-                                        <IntConstant Value="1"/>
-                                    </BinaryExpression>
-                                </BinaryExpression>
-                            </Guards>
-                            <Actions>
-                                <BinaryExpression Operator="=" Text="fs_master_bit2_CRCNO = (IN_CRC=nok)">
-                                    <SimpleIdentifier Name="fs_master_bit2_CRCNO"/>
-                                    <BinaryExpression Operator="=">
-                                        <SimpleIdentifier Name="IN_CRC"/>
-                                        <SimpleIdentifier Name="nok"/>
-                                    </BinaryExpression>
-                                </BinaryExpression>
-                                <BinaryExpression Operator="=">
-                                    <SimpleIdentifier Name="fs_slave_bit2_CRCNO"/>
-                                    <SimpleIdentifier Name="in_ps_status_bit2_CRCNO"/>
-                                </BinaryExpression>
-                                <BinaryExpression Operator="=">
-                                    <SimpleIdentifier Name="fs_slave_bit3_TO"/>
-                                    <SimpleIdentifier Name="in_ps_status_bit3_TO"/>
-                                </BinaryExpression>
-                                <BinaryExpression Operator="=" Text="out_cons_num = 1 + out_cons_num % MAXSEQNO">
-                                    <SimpleIdentifier Name="out_cons_num"/>
-                                    <BinaryExpression Operator="+">
-                                        <IntConstant Value="1"/>
-                                        <BinaryExpression Operator="%">
-                                            <SimpleIdentifier Name="out_cons_num"/>
-                                            <SimpleIdentifier Name="MAXSEQNO"/>
-                                        </BinaryExpression>
-                                    </BinaryExpression>
-                                </BinaryExpression>
-                                <BinaryExpression Operator="=">
-                                    <SimpleIdentifier Name="app_process_data"/>
-                                    <SimpleIdentifier Name="FV"/>
-                                </BinaryExpression>
-                                <BinaryExpression Operator="=">
-                                    <SimpleIdentifier Name="app_FV_active"/>
-                                    <IntConstant Value="1"/>
-                                </BinaryExpression>
-                            </Actions>
-                            <LabelGeometry Anchor="NW">
-                                <Point Y="-22" X="-95"/>
                             </LabelGeometry>
                         </GuardActionBlock>
                     </Edge>
@@ -1179,6 +865,320 @@
                             </LabelGeometry>
                         </GuardActionBlock>
                     </Edge>
+                    <Edge Target="s8_message_prepare" Source="s4_slave_ack_check">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="step">
+                                <IntConstant Value="2"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="11" X="-62"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="723" X="175"/>
+                        </SplineGeometry>
+                        <GuardActionBlock>
+                            <Guards>
+                                <BinaryExpression Operator="|" Text="in_cons_num!=out_cons_num | in_CRC==nok | in_ps_status_bit2_CRCNO==1 | in_ps_status_bit3_TO==1">
+                                    <BinaryExpression Operator="|">
+                                        <BinaryExpression Operator="|">
+                                            <BinaryExpression Operator="!=">
+                                                <SimpleIdentifier Name="in_cons_num"/>
+                                                <SimpleIdentifier Name="out_cons_num"/>
+                                            </BinaryExpression>
+                                            <BinaryExpression Operator="==">
+                                                <SimpleIdentifier Name="in_CRC"/>
+                                                <SimpleIdentifier Name="nok"/>
+                                            </BinaryExpression>
+                                        </BinaryExpression>
+                                        <BinaryExpression Operator="==">
+                                            <SimpleIdentifier Name="in_ps_status_bit2_CRCNO"/>
+                                            <IntConstant Value="1"/>
+                                        </BinaryExpression>
+                                    </BinaryExpression>
+                                    <BinaryExpression Operator="==">
+                                        <SimpleIdentifier Name="in_ps_status_bit3_TO"/>
+                                        <IntConstant Value="1"/>
+                                    </BinaryExpression>
+                                </BinaryExpression>
+                            </Guards>
+                            <Actions>
+                                <BinaryExpression Operator="=" Text="fs_master_bit2_CRCNO = (in_cons_num != out_cons_num) | (in_CRC == nok)">
+                                    <SimpleIdentifier Name="fs_master_bit2_CRCNO"/>
+                                    <BinaryExpression Operator="|">
+                                        <BinaryExpression Operator="!=">
+                                            <SimpleIdentifier Name="in_cons_num"/>
+                                            <SimpleIdentifier Name="out_cons_num"/>
+                                        </BinaryExpression>
+                                        <BinaryExpression Operator="==">
+                                            <SimpleIdentifier Name="in_CRC"/>
+                                            <SimpleIdentifier Name="nok"/>
+                                        </BinaryExpression>
+                                    </BinaryExpression>
+                                </BinaryExpression>
+                                <BinaryExpression Operator="=">
+                                    <SimpleIdentifier Name="fs_master_bit3_TO"/>
+                                    <SimpleIdentifier Name="fs_master_bit3_TO"/>
+                                </BinaryExpression>
+                                <BinaryExpression Operator="=">
+                                    <SimpleIdentifier Name="fs_slave_bit2_CRCNO"/>
+                                    <SimpleIdentifier Name="in_ps_status_bit2_CRCNO"/>
+                                </BinaryExpression>
+                                <BinaryExpression Operator="=">
+                                    <SimpleIdentifier Name="fs_slave_bit3_TO"/>
+                                    <SimpleIdentifier Name="in_ps_status_bit3_TO"/>
+                                </BinaryExpression>
+                                <BinaryExpression Operator="=">
+                                    <SimpleIdentifier Name="old_cons_num"/>
+                                    <SimpleIdentifier Name="old_cons_num"/>
+                                </BinaryExpression>
+                                <BinaryExpression Operator="=" Text="out_cons_num=1 + out_cons_num % MAXSEQNO">
+                                    <SimpleIdentifier Name="out_cons_num"/>
+                                    <BinaryExpression Operator="+">
+                                        <IntConstant Value="1"/>
+                                        <BinaryExpression Operator="%">
+                                            <SimpleIdentifier Name="out_cons_num"/>
+                                            <SimpleIdentifier Name="MAXSEQNO"/>
+                                        </BinaryExpression>
+                                    </BinaryExpression>
+                                </BinaryExpression>
+                                <BinaryExpression Operator="=">
+                                    <SimpleIdentifier Name="app_process_data"/>
+                                    <SimpleIdentifier Name="FV"/>
+                                </BinaryExpression>
+                                <BinaryExpression Operator="=">
+                                    <SimpleIdentifier Name="app_FV_active"/>
+                                    <IntConstant Value="1"/>
+                                </BinaryExpression>
+                            </Actions>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="25" X="-62"/>
+                            </LabelGeometry>
+                        </GuardActionBlock>
+                    </Edge>
+                    <Edge Target="s8_message_prepare" Source="s1_system_start">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="step">
+                                <IntConstant Value="1"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-84" X="-176"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="145" X="412"/>
+                        </SplineGeometry>
+                        <GuardActionBlock>
+                            <Guards>
+                                <BinaryExpression Operator="|" Text="fs_master_bit2_CRCNO==1 |  fs_master_bit3_TO==1 |  fs_slave_bit2_CRCNO==1 |  fs_slave_bit3_TO==1">
+                                    <BinaryExpression Operator="|">
+                                        <BinaryExpression Operator="|">
+                                            <BinaryExpression Operator="==">
+                                                <SimpleIdentifier Name="fs_master_bit2_CRCNO"/>
+                                                <IntConstant Value="1"/>
+                                            </BinaryExpression>
+                                            <BinaryExpression Operator="==">
+                                                <SimpleIdentifier Name="fs_master_bit3_TO"/>
+                                                <IntConstant Value="1"/>
+                                            </BinaryExpression>
+                                        </BinaryExpression>
+                                        <BinaryExpression Operator="==">
+                                            <SimpleIdentifier Name="fs_slave_bit2_CRCNO"/>
+                                            <IntConstant Value="1"/>
+                                        </BinaryExpression>
+                                    </BinaryExpression>
+                                    <BinaryExpression Operator="==">
+                                        <SimpleIdentifier Name="fs_slave_bit3_TO"/>
+                                        <IntConstant Value="1"/>
+                                    </BinaryExpression>
+                                </BinaryExpression>
+                            </Guards>
+                            <Actions>
+                                <BinaryExpression Operator="=">
+                                    <SimpleIdentifier Name="old_cons_num"/>
+                                    <SimpleIdentifier Name="old_cons_num"/>
+                                </BinaryExpression>
+                                <BinaryExpression Operator="=">
+                                    <SimpleIdentifier Name="out_cons_num"/>
+                                    <IntConstant Value="1"/>
+                                </BinaryExpression>
+                                <BinaryExpression Operator="=">
+                                    <SimpleIdentifier Name="app_process_data"/>
+                                    <SimpleIdentifier Name="FV"/>
+                                </BinaryExpression>
+                                <BinaryExpression Operator="=">
+                                    <SimpleIdentifier Name="app_FV_active"/>
+                                    <IntConstant Value="1"/>
+                                </BinaryExpression>
+                            </Actions>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-67" X="-176"/>
+                            </LabelGeometry>
+                        </GuardActionBlock>
+                    </Edge>
+                    <Edge Target="s8_message_prepare" Source="s3_await_slave_ack">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="restart_host_timer">
+                                <IntConstant Value="1"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="9" X="72"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="177" X="712"/>
+                        </SplineGeometry>
+                        <GuardActionBlock>
+                            <Guards>
+                                <SimpleIdentifier Name="got_host_timeout"/>
+                            </Guards>
+                            <Actions>
+                                <BinaryExpression Operator="=">
+                                    <SimpleIdentifier Name="fs_master_bit3_TO"/>
+                                    <IntConstant Value="1"/>
+                                </BinaryExpression>
+                                <BinaryExpression Operator="=" Text="out_cons_num=1 + out_cons_num % MAXSEQNO">
+                                    <SimpleIdentifier Name="out_cons_num"/>
+                                    <BinaryExpression Operator="+">
+                                        <IntConstant Value="1"/>
+                                        <BinaryExpression Operator="%">
+                                            <SimpleIdentifier Name="out_cons_num"/>
+                                            <SimpleIdentifier Name="MAXSEQNO"/>
+                                        </BinaryExpression>
+                                    </BinaryExpression>
+                                </BinaryExpression>
+                                <BinaryExpression Operator="=">
+                                    <SimpleIdentifier Name="app_process_data"/>
+                                    <SimpleIdentifier Name="FV"/>
+                                </BinaryExpression>
+                                <BinaryExpression Operator="=">
+                                    <SimpleIdentifier Name="app_FV_active"/>
+                                    <IntConstant Value="1"/>
+                                </BinaryExpression>
+                            </Actions>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="23" X="76"/>
+                            </LabelGeometry>
+                        </GuardActionBlock>
+                    </Edge>
+                    <Edge Target="s5_message_prepare" Source="s10_slave_ack_check">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="step">
+                                <IntConstant Value="2"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-27" X="-155"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <GuardActionBlock>
+                            <Guards>
+                                <BinaryExpression Operator="&amp;" Text="in_CRC==ok &amp; in_ps_status_bit2_CRCNO==0 &amp; in_ps_status_bit3_TO==0 &amp; in_ps_status_bit4_FV==0 &amp; got_operator_ack">
+                                    <BinaryExpression Operator="&amp;">
+                                        <BinaryExpression Operator="&amp;">
+                                            <BinaryExpression Operator="&amp;">
+                                                <BinaryExpression Operator="==">
+                                                    <SimpleIdentifier Name="in_CRC"/>
+                                                    <SimpleIdentifier Name="ok"/>
+                                                </BinaryExpression>
+                                                <BinaryExpression Operator="==">
+                                                    <SimpleIdentifier Name="in_ps_status_bit2_CRCNO"/>
+                                                    <IntConstant Value="0"/>
+                                                </BinaryExpression>
+                                            </BinaryExpression>
+                                            <BinaryExpression Operator="==">
+                                                <SimpleIdentifier Name="in_ps_status_bit3_TO"/>
+                                                <IntConstant Value="0"/>
+                                            </BinaryExpression>
+                                        </BinaryExpression>
+                                        <BinaryExpression Operator="==">
+                                            <SimpleIdentifier Name="in_ps_status_bit4_FV"/>
+                                            <IntConstant Value="0"/>
+                                        </BinaryExpression>
+                                    </BinaryExpression>
+                                    <SimpleIdentifier Name="got_operator_ack"/>
+                                </BinaryExpression>
+                            </Guards>
+                            <Actions>
+                                <BinaryExpression Operator="=">
+                                    <SimpleIdentifier Name="fs_master_bit2_CRCNO"/>
+                                    <IntConstant Value="0"/>
+                                </BinaryExpression>
+                                <BinaryExpression Operator="=">
+                                    <SimpleIdentifier Name="fs_master_bit3_TO"/>
+                                    <IntConstant Value="0"/>
+                                </BinaryExpression>
+                                <BinaryExpression Operator="=">
+                                    <SimpleIdentifier Name="fs_slave_bit2_CRCNO"/>
+                                    <IntConstant Value="0"/>
+                                </BinaryExpression>
+                                <BinaryExpression Operator="=">
+                                    <SimpleIdentifier Name="fs_slave_bit3_TO"/>
+                                    <IntConstant Value="0"/>
+                                </BinaryExpression>
+                                <BinaryExpression Operator="=">
+                                    <SimpleIdentifier Name="old_cons_num"/>
+                                    <SimpleIdentifier Name="out_cons_num"/>
+                                </BinaryExpression>
+                                <BinaryExpression Operator="=" Text="out_cons_num = 1 + out_cons_num % MAXSEQNO">
+                                    <SimpleIdentifier Name="out_cons_num"/>
+                                    <BinaryExpression Operator="+">
+                                        <IntConstant Value="1"/>
+                                        <BinaryExpression Operator="%">
+                                            <SimpleIdentifier Name="out_cons_num"/>
+                                            <SimpleIdentifier Name="MAXSEQNO"/>
+                                        </BinaryExpression>
+                                    </BinaryExpression>
+                                </BinaryExpression>
+                                <BinaryExpression Operator="=">
+                                    <SimpleIdentifier Name="app_process_data"/>
+                                    <SimpleIdentifier Name="in_ps_f_process_data"/>
+                                </BinaryExpression>
+                                <BinaryExpression Operator="=">
+                                    <SimpleIdentifier Name="app_FV_active"/>
+                                    <IntConstant Value="0"/>
+                                </BinaryExpression>
+                            </Actions>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-17" X="-156"/>
+                            </LabelGeometry>
+                        </GuardActionBlock>
+                    </Edge>
+                    <Edge Target="s8_message_prepare" Source="s11_wait_delay_time">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="restart_host_timer">
+                                <IntConstant Value="1"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-86" X="-67"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <GuardActionBlock>
+                            <Guards>
+                                <SimpleIdentifier Name="got_delay_timeout"/>
+                            </Guards>
+                            <Actions>
+                                <BinaryExpression Operator="=">
+                                    <SimpleIdentifier Name="fs_master_bit3_TO"/>
+                                    <IntConstant Value="1"/>
+                                </BinaryExpression>
+                                <BinaryExpression Operator="=">
+                                    <SimpleIdentifier Name="out_cons_num"/>
+                                    <SimpleIdentifier Name="out_cons_num"/>
+                                </BinaryExpression>
+                                <BinaryExpression Operator="=">
+                                    <SimpleIdentifier Name="app_process_data"/>
+                                    <SimpleIdentifier Name="app_process_data"/>
+                                </BinaryExpression>
+                                <BinaryExpression Operator="=">
+                                    <SimpleIdentifier Name="app_FV_active"/>
+                                    <SimpleIdentifier Name="app_FV_active"/>
+                                </BinaryExpression>
+                            </Actions>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-76" X="-67"/>
+                            </LabelGeometry>
+                        </GuardActionBlock>
+                    </Edge>
                     <Edge Target="s5_message_prepare" Source="s10_slave_ack_check">
                         <LabelBlock>
                             <IndexedIdentifier Name="step">
@@ -1301,9 +1301,6 @@
                         <SplineGeometry>
                             <Point Y="162" X="162"/>
                         </SplineGeometry>
-                        <EndPointGeometry>
-                            <Point Y="208" X="176"/>
-                        </EndPointGeometry>
                         <GuardActionBlock>
                             <Actions>
                                 <BinaryExpression Operator="=">

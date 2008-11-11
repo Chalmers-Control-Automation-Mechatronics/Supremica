@@ -294,6 +294,12 @@ public class CompilerTest
     compile("handwritten", "machines_buffer_efa");
   }
 
+  public void testCompile_markedvar()
+    throws IOException, WatersException
+  {
+    compile("handwritten", "markedvar");
+  }
+
   /*
   public void testCompile_profisafe_ihost_efa()
     throws IOException, WatersException

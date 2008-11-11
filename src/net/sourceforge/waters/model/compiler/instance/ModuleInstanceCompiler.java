@@ -127,7 +127,7 @@ public class ModuleInstanceCompiler extends AbstractModuleProxyVisitor
     throws EvalException
   {
     try {
-      mHasGuardActionBlocks = false;
+      mHasEFAElements = false;
       mContext = new ModuleBindingContext(mInputModule);
       mNameSpace = new CompiledNameSpace();
       mCompiledEvents = new TreeSet<EventDeclProxy>();
@@ -158,9 +158,9 @@ public class ModuleInstanceCompiler extends AbstractModuleProxyVisitor
     }
   }
 
-  public boolean getHasGuardActionBlocks()
+  public boolean getHasEFAElements()
   {
-    return mHasGuardActionBlocks;
+    return mHasEFAElements;
   }
 
   //#########################################################################
@@ -225,7 +225,7 @@ public class ModuleInstanceCompiler extends AbstractModuleProxyVisitor
           }
         }
       }
-      mHasGuardActionBlocks |= ga1 != null;
+      mHasEFAElements |= ga1 != null;
       final NodeProxy source0 = edge.getSource();
       final NodeProxy source1 = mNodeMap.get(source0);
       final NodeProxy target0 = edge.getTarget();
@@ -687,6 +687,7 @@ public class ModuleInstanceCompiler extends AbstractModuleProxyVisitor
     throws VisitorException
   {
     try {
+      mHasEFAElements = true;
       final IdentifierProxy ident = var.getIdentifier();
       final IdentifierProxy suffix = mNameCompiler.compileName(ident);
       final IdentifierProxy fullname =
@@ -1087,7 +1088,7 @@ public class ModuleInstanceCompiler extends AbstractModuleProxyVisitor
   private final NameSpaceVariablesContext mNameSpaceVariablesContext;
   private final ModuleProxy mInputModule;
 
-  private boolean mHasGuardActionBlocks;
+  private boolean mHasEFAElements;
 
   private BindingContext mContext;
   private CompiledNameSpace mNameSpace;

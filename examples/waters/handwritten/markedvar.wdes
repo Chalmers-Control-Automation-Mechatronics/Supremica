@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<ProductDES Name="markedvar"
+  xmlns:ns2="http://waters.sourceforge.net/xsd/base"
+  xmlns="http://waters.sourceforge.net/xsd/des">
+<ns2:Comment>A test involving an EFA variable with marked states.</ns2:Comment>
+<EventList>
+<Event Kind="PROPOSITION" Name=":accepting"/>
+</EventList>
+<AutomataList>
+<Automaton Kind="PLANT" Name="markedvar">
+<EventRefList>
+<EventRef Name=":accepting"/>
+</EventRefList>
+<StateList>
+<State Name="0">
+<EventRefList>
+<EventRef Name=":accepting"/>
+</EventRefList>
+</State>
+<State Initial="true" Name="1"/>
+</StateList>
+</Automaton>
+</AutomataList>
+</ProductDES>
+
