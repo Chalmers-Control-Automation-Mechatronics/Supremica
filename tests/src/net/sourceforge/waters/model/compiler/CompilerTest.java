@@ -288,6 +288,14 @@ public class CompilerTest
     compile("handwritten", "machines_buffer_efa");
   }
 
+  /*
+  public void testCompile_profisafe_ihost_efa()
+    throws IOException, WatersException
+  {
+    compile("tests", "profisafe", "profisafe_ihost_efa");
+  }
+  */
+
   public void testCompile_sensoractuator1()
     throws IOException, WatersException
   {
@@ -318,7 +326,8 @@ public class CompilerTest
   public void testCompile_edge0()
     throws IOException, WatersException
   {
-    compileError("handwritten", "edge0", null, EmptyLabelBlockException.class);
+    compileError("handwritten", "edge0", null,
+                 EmptyLabelBlockException.class, "q0");
   }
 
   public void testCompile_error1_small()

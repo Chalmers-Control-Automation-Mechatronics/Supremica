@@ -195,6 +195,7 @@ public class ModuleInstanceCompiler extends AbstractModuleProxyVisitor
     throws VisitorException
   {
     try {
+      mCurrentEdge = edge;
       final LabelBlockProxy labels0 = edge.getLabelBlock();
       final CompiledEventList events = visitLabelBlockProxy
         (labels0, EventKindMask.TYPEMASK_EVENT);
@@ -225,7 +226,6 @@ public class ModuleInstanceCompiler extends AbstractModuleProxyVisitor
         }
       }
       mHasGuardActionBlocks |= ga1 != null;
-      mCurrentEdge = edge;
       final NodeProxy source0 = edge.getSource();
       final NodeProxy source1 = mNodeMap.get(source0);
       final NodeProxy target0 = edge.getTarget();
