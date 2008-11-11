@@ -183,7 +183,7 @@ class EFARangeEvaluator
     throws VisitorException
   {
     final SimpleExpressionProxy bound = mContext.getBoundExpression(expr);
-    if (bound == null) {
+    if (bound == null || bound == expr) {
       return (CompiledRange) expr.acceptVisitor(this);
     } else {
       return process(bound);

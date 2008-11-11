@@ -18,7 +18,14 @@
                 </BinaryExpression>
             </RangeList>
         </EventDecl>
-        <EventDecl Kind="CONTROLLABLE" Name="yield"/>
+        <EventDecl Kind="CONTROLLABLE" Name="yield">
+            <RangeList>
+                <BinaryExpression Operator="..">
+                    <IntConstant Value="0"/>
+                    <IntConstant Value="1"/>
+                </BinaryExpression>
+            </RangeList>
+        </EventDecl>
         <EventDecl Kind="UNCONTROLLABLE" Name="host_timeout"/>
         <EventDecl Kind="CONTROLLABLE" Name="step">
             <RangeList>
@@ -391,7 +398,16 @@
                             </LabelGeometry>
                         </GuardActionBlock>
                     </Edge>
-                    <Edge Target="s6_await_slave_ack" Source="s5_message_prepare"/>
+                    <Edge Target="s6_await_slave_ack" Source="s5_message_prepare">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="yield">
+                                <IntConstant Value="0"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="9" X="-24"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
                     <Edge Target="s2_message_prepare" Source="s1_system_start">
                         <LabelBlock>
                             <IndexedIdentifier Name="step">
@@ -1478,6 +1494,195 @@
                 </EdgeList>
             </Graph>
         </SimpleComponent>
+        <VariableComponent Name="out_cons_num">
+            <VariableRange>
+                <BinaryExpression Operator="..">
+                    <IntConstant Value="0"/>
+                    <SimpleIdentifier Name="MAXSEQNO"/>
+                </BinaryExpression>
+            </VariableRange>
+            <VariableInitial>
+                <BinaryExpression Operator="==">
+                    <SimpleIdentifier Name="out_cons_num"/>
+                    <IntConstant Value="0"/>
+                </BinaryExpression>
+            </VariableInitial>
+            <VariableMarking>
+                <SimpleIdentifier Name=":accepting"/>
+                <BinaryExpression Operator="&gt;">
+                    <SimpleIdentifier Name="out_cons_num"/>
+                    <IntConstant Value="0"/>
+                </BinaryExpression>
+            </VariableMarking>
+        </VariableComponent>
+        <VariableComponent Name="in_cons_num">
+            <VariableRange>
+                <BinaryExpression Operator="..">
+                    <IntConstant Value="0"/>
+                    <SimpleIdentifier Name="MAXSEQNO"/>
+                </BinaryExpression>
+            </VariableRange>
+            <VariableInitial>
+                <BinaryExpression Operator="==">
+                    <SimpleIdentifier Name="in_cons_num"/>
+                    <IntConstant Value="0"/>
+                </BinaryExpression>
+            </VariableInitial>
+            <VariableMarking>
+                <SimpleIdentifier Name=":accepting"/>
+                <BinaryExpression Operator="&gt;">
+                    <SimpleIdentifier Name="in_cons_num"/>
+                    <IntConstant Value="0"/>
+                </BinaryExpression>
+            </VariableMarking>
+        </VariableComponent>
+        <VariableComponent Name="in_ps_status_bit4_FV">
+            <VariableRange>
+                <BinaryExpression Operator="..">
+                    <IntConstant Value="0"/>
+                    <IntConstant Value="1"/>
+                </BinaryExpression>
+            </VariableRange>
+            <VariableInitial>
+                <BinaryExpression Operator="==">
+                    <SimpleIdentifier Name="in_ps_status_bit4_FV"/>
+                    <IntConstant Value="1"/>
+                </BinaryExpression>
+            </VariableInitial>
+            <VariableMarking>
+                <SimpleIdentifier Name=":accepting"/>
+                <BinaryExpression Operator="==">
+                    <SimpleIdentifier Name="in_ps_status_bit4_FV"/>
+                    <IntConstant Value="0"/>
+                </BinaryExpression>
+            </VariableMarking>
+        </VariableComponent>
+        <VariableComponent Name="in_ps_status_bit3_TO">
+            <VariableRange>
+                <BinaryExpression Operator="..">
+                    <IntConstant Value="0"/>
+                    <IntConstant Value="1"/>
+                </BinaryExpression>
+            </VariableRange>
+            <VariableInitial>
+                <BinaryExpression Operator="==">
+                    <SimpleIdentifier Name="in_ps_status_bit3_TO"/>
+                    <IntConstant Value="1"/>
+                </BinaryExpression>
+            </VariableInitial>
+            <VariableMarking>
+                <SimpleIdentifier Name=":accepting"/>
+                <BinaryExpression Operator="==">
+                    <SimpleIdentifier Name="in_ps_status_bit3_TO"/>
+                    <IntConstant Value="0"/>
+                </BinaryExpression>
+            </VariableMarking>
+        </VariableComponent>
+        <VariableComponent Name="in_ps_status_bit2_CRCNO">
+            <VariableRange>
+                <BinaryExpression Operator="..">
+                    <IntConstant Value="0"/>
+                    <IntConstant Value="1"/>
+                </BinaryExpression>
+            </VariableRange>
+            <VariableInitial>
+                <BinaryExpression Operator="==">
+                    <SimpleIdentifier Name="in_ps_status_bit2_CRCNO"/>
+                    <IntConstant Value="1"/>
+                </BinaryExpression>
+            </VariableInitial>
+            <VariableMarking>
+                <SimpleIdentifier Name=":accepting"/>
+                <BinaryExpression Operator="==">
+                    <SimpleIdentifier Name="in_ps_status_bit2_CRCNO"/>
+                    <IntConstant Value="0"/>
+                </BinaryExpression>
+            </VariableMarking>
+        </VariableComponent>
+        <VariableComponent Name="in_ps_f_process_data">
+            <VariableRange>
+                <EnumSetExpression Text="{PV,FV}">
+                    <SimpleIdentifier Name="PV"/>
+                    <SimpleIdentifier Name="FV"/>
+                </EnumSetExpression>
+            </VariableRange>
+            <VariableInitial>
+                <BinaryExpression Operator="==">
+                    <SimpleIdentifier Name="in_ps_f_process_data"/>
+                    <SimpleIdentifier Name="FV"/>
+                </BinaryExpression>
+            </VariableInitial>
+            <VariableMarking>
+                <SimpleIdentifier Name=":accepting"/>
+                <BinaryExpression Operator="==">
+                    <SimpleIdentifier Name="in_ps_f_process_data"/>
+                    <SimpleIdentifier Name="PV"/>
+                </BinaryExpression>
+            </VariableMarking>
+        </VariableComponent>
+        <VariableComponent Name="in_CRC">
+            <VariableRange>
+                <EnumSetExpression Text="{nok,ok}">
+                    <SimpleIdentifier Name="nok"/>
+                    <SimpleIdentifier Name="ok"/>
+                </EnumSetExpression>
+            </VariableRange>
+            <VariableInitial>
+                <BinaryExpression Operator="==">
+                    <SimpleIdentifier Name="in_CRC"/>
+                    <SimpleIdentifier Name="nok"/>
+                </BinaryExpression>
+            </VariableInitial>
+            <VariableMarking>
+                <SimpleIdentifier Name=":accepting"/>
+                <BinaryExpression Operator="==">
+                    <SimpleIdentifier Name="in_CRC"/>
+                    <SimpleIdentifier Name="ok"/>
+                </BinaryExpression>
+            </VariableMarking>
+        </VariableComponent>
+        <VariableComponent Name="app_process_data">
+            <VariableRange>
+                <EnumSetExpression Text="{PV,FV}">
+                    <SimpleIdentifier Name="PV"/>
+                    <SimpleIdentifier Name="FV"/>
+                </EnumSetExpression>
+            </VariableRange>
+            <VariableInitial>
+                <BinaryExpression Operator="==">
+                    <SimpleIdentifier Name="app_process_data"/>
+                    <SimpleIdentifier Name="FV"/>
+                </BinaryExpression>
+            </VariableInitial>
+            <VariableMarking>
+                <SimpleIdentifier Name=":accepting"/>
+                <BinaryExpression Operator="==">
+                    <SimpleIdentifier Name="app_process_data"/>
+                    <SimpleIdentifier Name="PV"/>
+                </BinaryExpression>
+            </VariableMarking>
+        </VariableComponent>
+        <VariableComponent Name="app_FV_active">
+            <VariableRange>
+                <BinaryExpression Operator="..">
+                    <IntConstant Value="0"/>
+                    <IntConstant Value="1"/>
+                </BinaryExpression>
+            </VariableRange>
+            <VariableInitial>
+                <BinaryExpression Operator="==">
+                    <SimpleIdentifier Name="app_FV_active"/>
+                    <IntConstant Value="1"/>
+                </BinaryExpression>
+            </VariableInitial>
+            <VariableMarking>
+                <SimpleIdentifier Name=":accepting"/>
+                <BinaryExpression Operator="==">
+                    <SimpleIdentifier Name="app_FV_active"/>
+                    <IntConstant Value="0"/>
+                </BinaryExpression>
+            </VariableMarking>
+        </VariableComponent>
         <VariableComponent Name="fs_master_bit2_CRCNO">
             <VariableRange>
                 <BinaryExpression Operator="..">
@@ -1559,216 +1764,6 @@
                 </BinaryExpression>
             </VariableMarking>
         </VariableComponent>
-        <VariableComponent Name="app_process_data">
-            <VariableRange>
-                <EnumSetExpression Text="{PV,FV}">
-                    <SimpleIdentifier Name="PV"/>
-                    <SimpleIdentifier Name="FV"/>
-                </EnumSetExpression>
-            </VariableRange>
-            <VariableInitial>
-                <BinaryExpression Operator="==">
-                    <SimpleIdentifier Name="app_process_data"/>
-                    <SimpleIdentifier Name="FV"/>
-                </BinaryExpression>
-            </VariableInitial>
-            <VariableMarking>
-                <SimpleIdentifier Name=":accepting"/>
-                <BinaryExpression Operator="==">
-                    <SimpleIdentifier Name="app_process_data"/>
-                    <SimpleIdentifier Name="PV"/>
-                </BinaryExpression>
-            </VariableMarking>
-        </VariableComponent>
-        <VariableComponent Name="app_FV_active">
-            <VariableRange>
-                <BinaryExpression Operator="..">
-                    <IntConstant Value="0"/>
-                    <IntConstant Value="1"/>
-                </BinaryExpression>
-            </VariableRange>
-            <VariableInitial>
-                <BinaryExpression Operator="==">
-                    <SimpleIdentifier Name="app_FV_active"/>
-                    <IntConstant Value="1"/>
-                </BinaryExpression>
-            </VariableInitial>
-            <VariableMarking>
-                <SimpleIdentifier Name=":accepting"/>
-                <BinaryExpression Operator="==">
-                    <SimpleIdentifier Name="app_FV_active"/>
-                    <IntConstant Value="0"/>
-                </BinaryExpression>
-            </VariableMarking>
-        </VariableComponent>
-        <VariableComponent Name="out_cons_num">
-            <VariableRange>
-                <BinaryExpression Operator="..">
-                    <IntConstant Value="0"/>
-                    <SimpleIdentifier Name="MAXSEQNO"/>
-                </BinaryExpression>
-            </VariableRange>
-            <VariableInitial>
-                <BinaryExpression Operator="==">
-                    <SimpleIdentifier Name="out_cons_num"/>
-                    <IntConstant Value="0"/>
-                </BinaryExpression>
-            </VariableInitial>
-            <VariableMarking>
-                <SimpleIdentifier Name=":accepting"/>
-                <BinaryExpression Operator="&gt;">
-                    <SimpleIdentifier Name="out_cons_num"/>
-                    <IntConstant Value="0"/>
-                </BinaryExpression>
-            </VariableMarking>
-        </VariableComponent>
-        <VariableComponent Name="old_cons_num">
-            <VariableRange>
-                <BinaryExpression Operator="..">
-                    <IntConstant Value="0"/>
-                    <SimpleIdentifier Name="MAXSEQNO"/>
-                </BinaryExpression>
-            </VariableRange>
-            <VariableInitial>
-                <BinaryExpression Operator="==">
-                    <SimpleIdentifier Name="old_cons_num"/>
-                    <IntConstant Value="0"/>
-                </BinaryExpression>
-            </VariableInitial>
-            <VariableMarking>
-                <SimpleIdentifier Name=":accepting"/>
-                <BinaryExpression Operator="&gt;">
-                    <SimpleIdentifier Name="old_cons_num"/>
-                    <IntConstant Value="0"/>
-                </BinaryExpression>
-            </VariableMarking>
-        </VariableComponent>
-        <VariableComponent Name="in_cons_num">
-            <VariableRange>
-                <BinaryExpression Operator="..">
-                    <IntConstant Value="0"/>
-                    <SimpleIdentifier Name="MAXSEQNO"/>
-                </BinaryExpression>
-            </VariableRange>
-            <VariableInitial>
-                <BinaryExpression Operator="==">
-                    <SimpleIdentifier Name="in_cons_num"/>
-                    <IntConstant Value="0"/>
-                </BinaryExpression>
-            </VariableInitial>
-            <VariableMarking>
-                <SimpleIdentifier Name=":accepting"/>
-                <BinaryExpression Operator="&gt;">
-                    <SimpleIdentifier Name="in_cons_num"/>
-                    <IntConstant Value="0"/>
-                </BinaryExpression>
-            </VariableMarking>
-        </VariableComponent>
-        <VariableComponent Name="in_ps_f_process_data">
-            <VariableRange>
-                <EnumSetExpression Text="{PV,FV}">
-                    <SimpleIdentifier Name="PV"/>
-                    <SimpleIdentifier Name="FV"/>
-                </EnumSetExpression>
-            </VariableRange>
-            <VariableInitial>
-                <BinaryExpression Operator="==">
-                    <SimpleIdentifier Name="in_ps_f_process_data"/>
-                    <SimpleIdentifier Name="FV"/>
-                </BinaryExpression>
-            </VariableInitial>
-            <VariableMarking>
-                <SimpleIdentifier Name=":accepting"/>
-                <BinaryExpression Operator="==">
-                    <SimpleIdentifier Name="in_ps_f_process_data"/>
-                    <SimpleIdentifier Name="PV"/>
-                </BinaryExpression>
-            </VariableMarking>
-        </VariableComponent>
-        <VariableComponent Name="in_ps_status_bit2_CRCNO">
-            <VariableRange>
-                <BinaryExpression Operator="..">
-                    <IntConstant Value="0"/>
-                    <IntConstant Value="1"/>
-                </BinaryExpression>
-            </VariableRange>
-            <VariableInitial>
-                <BinaryExpression Operator="==">
-                    <SimpleIdentifier Name="in_ps_status_bit2_CRCNO"/>
-                    <IntConstant Value="1"/>
-                </BinaryExpression>
-            </VariableInitial>
-            <VariableMarking>
-                <SimpleIdentifier Name=":accepting"/>
-                <BinaryExpression Operator="==">
-                    <SimpleIdentifier Name="in_ps_status_bit2_CRCNO"/>
-                    <IntConstant Value="0"/>
-                </BinaryExpression>
-            </VariableMarking>
-        </VariableComponent>
-        <VariableComponent Name="in_ps_status_bit3_TO">
-            <VariableRange>
-                <BinaryExpression Operator="..">
-                    <IntConstant Value="0"/>
-                    <IntConstant Value="1"/>
-                </BinaryExpression>
-            </VariableRange>
-            <VariableInitial>
-                <BinaryExpression Operator="==">
-                    <SimpleIdentifier Name="in_ps_status_bit3_TO"/>
-                    <IntConstant Value="1"/>
-                </BinaryExpression>
-            </VariableInitial>
-            <VariableMarking>
-                <SimpleIdentifier Name=":accepting"/>
-                <BinaryExpression Operator="==">
-                    <SimpleIdentifier Name="in_ps_status_bit3_TO"/>
-                    <IntConstant Value="0"/>
-                </BinaryExpression>
-            </VariableMarking>
-        </VariableComponent>
-        <VariableComponent Name="in_ps_status_bit4_FV">
-            <VariableRange>
-                <BinaryExpression Operator="..">
-                    <IntConstant Value="0"/>
-                    <IntConstant Value="1"/>
-                </BinaryExpression>
-            </VariableRange>
-            <VariableInitial>
-                <BinaryExpression Operator="==">
-                    <SimpleIdentifier Name="in_ps_status_bit4_FV"/>
-                    <IntConstant Value="1"/>
-                </BinaryExpression>
-            </VariableInitial>
-            <VariableMarking>
-                <SimpleIdentifier Name=":accepting"/>
-                <BinaryExpression Operator="==">
-                    <SimpleIdentifier Name="in_ps_status_bit4_FV"/>
-                    <IntConstant Value="0"/>
-                </BinaryExpression>
-            </VariableMarking>
-        </VariableComponent>
-        <VariableComponent Name="in_CRC">
-            <VariableRange>
-                <EnumSetExpression Text="{nok,ok}">
-                    <SimpleIdentifier Name="nok"/>
-                    <SimpleIdentifier Name="ok"/>
-                </EnumSetExpression>
-            </VariableRange>
-            <VariableInitial>
-                <BinaryExpression Operator="==">
-                    <SimpleIdentifier Name="in_CRC"/>
-                    <SimpleIdentifier Name="nok"/>
-                </BinaryExpression>
-            </VariableInitial>
-            <VariableMarking>
-                <SimpleIdentifier Name=":accepting"/>
-                <BinaryExpression Operator="==">
-                    <SimpleIdentifier Name="in_CRC"/>
-                    <SimpleIdentifier Name="ok"/>
-                </BinaryExpression>
-            </VariableMarking>
-        </VariableComponent>
         <VariableComponent Name="got_host_timeout">
             <VariableRange>
                 <BinaryExpression Operator="..">
@@ -1810,6 +1805,27 @@
                     <IntConstant Value="0"/>
                 </BinaryExpression>
             </VariableInitial>
+        </VariableComponent>
+        <VariableComponent Name="old_cons_num">
+            <VariableRange>
+                <BinaryExpression Operator="..">
+                    <IntConstant Value="0"/>
+                    <SimpleIdentifier Name="MAXSEQNO"/>
+                </BinaryExpression>
+            </VariableRange>
+            <VariableInitial>
+                <BinaryExpression Operator="==">
+                    <SimpleIdentifier Name="old_cons_num"/>
+                    <IntConstant Value="0"/>
+                </BinaryExpression>
+            </VariableInitial>
+            <VariableMarking>
+                <SimpleIdentifier Name=":accepting"/>
+                <BinaryExpression Operator="&gt;">
+                    <SimpleIdentifier Name="old_cons_num"/>
+                    <IntConstant Value="0"/>
+                </BinaryExpression>
+            </VariableMarking>
         </VariableComponent>
     </ComponentList>
 </Module>

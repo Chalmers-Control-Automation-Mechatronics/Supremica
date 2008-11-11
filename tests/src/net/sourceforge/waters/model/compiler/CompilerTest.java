@@ -276,6 +276,12 @@ public class CompilerTest
     compile("handwritten", "EFAJournalExample");
   }
 
+  public void testCompile_enumvar()
+    throws IOException, WatersException
+  {
+    compile("handwritten", "enumvar");
+  }
+
   public void testCompile_GlobalAndLocalVariables()
     throws IOException, WatersException
   {

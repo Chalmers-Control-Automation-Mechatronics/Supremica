@@ -408,8 +408,10 @@ public class EFACompiler
     {
       try {
         final SimpleExpressionProxy expr = var.getType();
+        final SimpleExpressionProxy value =
+          mSimpleExpressionCompiler.eval(expr, mRootContext);
         final CompiledRange range =
-          mSimpleExpressionCompiler.getRangeValue(expr);
+          mSimpleExpressionCompiler.getRangeValue(value);
         mVariableMap.createVariables(var, range);
         return range;
       } catch (final EvalException exception) {
