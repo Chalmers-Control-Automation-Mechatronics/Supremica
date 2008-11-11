@@ -75,6 +75,8 @@ public class CompilerOperatorTable extends AbstractOperatorTable {
     mAssignmentOperator = new BinaryAssignmentOperator();
     mIncrementOperator = new BinaryIncrementOperator();
     mDecrementOperator = new BinaryDecrementOperator();
+    mAndWithOperator = new BinaryAndWithOperator();
+    mOrWithOperator= new BinaryOrWithOperator();
     mUnaryMinusOperator = new UnaryMinusOperator();
     mPlusOperator = new BinaryPlusOperator();
     mMinusOperator = new BinaryMinusOperator();
@@ -97,13 +99,15 @@ public class CompilerOperatorTable extends AbstractOperatorTable {
     store(mAssignmentOperator, 10);
     store(mIncrementOperator, 11);
     store(mDecrementOperator, 12);
+    store(mAndWithOperator, 13);
+    store(mOrWithOperator, 14);
     store(mUnaryMinusOperator, 2);
-    store(mPlusOperator, 13);
-    store(mMinusOperator, 14);
-    store(mTimesOperator, 15);
-    store(mDivideOperator, 16);
-    store(mModuloOperator, 17);
-    store(mRangeOperator, 18);
+    store(mPlusOperator, 15);
+    store(mMinusOperator, 16);
+    store(mTimesOperator, 17);
+    store(mDivideOperator, 18);
+    store(mModuloOperator, 19);
+    store(mRangeOperator, 20);
 
     storeComplements(mEqualsOperator, mNotEqualsOperator);
     storeComplements(mLessThanOperator, mGreaterEqualsOperator);
@@ -112,6 +116,8 @@ public class CompilerOperatorTable extends AbstractOperatorTable {
     storeSwap(mGreaterEqualsOperator, mLessEqualsOperator);
     storeAssignment(mIncrementOperator, mPlusOperator);
     storeAssignment(mDecrementOperator, mMinusOperator);
+    storeAssignment(mAndWithOperator, mAndOperator);
+    storeAssignment(mOrWithOperator, mOrOperator);
   }
 
   private void storeComplements(final BinaryOperator op1,
@@ -1692,6 +1698,116 @@ public class CompilerOperatorTable extends AbstractOperatorTable {
 
 
   //#########################################################################
+  //# Inner Class BinaryAndWithOperator
+  private static class BinaryAndWithOperator
+    extends AbstractBinaryAssignmentOperator
+  {
+
+    //#######################################################################
+    //# Interface net.sourceforge.waters.model.expr.BinaryOperator
+    public int getRHSTypes()
+    {
+      return Operator.TYPE_BOOLEAN;
+    }
+
+    public int getReturnTypes(final int lhsType, final int rhsType)
+    {
+      if ((rhsType & Operator.TYPE_BOOLEAN) != 0) {
+        return super.getReturnTypes(lhsType, rhsType);
+      } else {
+        return 0;
+      }
+    }
+
+    //#######################################################################
+    //# Interface net.sourceforge.waters.model.expr.Operator
+    public String getName()
+    {
+      return OPNAME_ANDWITH;
+    }
+
+    public Value eval(final Value lhsValue, final Value rhsValue)
+      throws EvalException
+    {
+      if (!(lhsValue instanceof IntValue)) {
+        throw new TypeMismatchException(lhsValue, "BOOLEAN");
+      }
+      final IntValue lhsIntValue = (IntValue) lhsValue;
+      final int lhs = lhsIntValue.getValue();
+      if (lhs < 0 || lhs > 1) {
+        throw new TypeMismatchException(lhsValue, "BOOLEAN");
+      }
+      if (!(rhsValue instanceof IntValue)) {
+        throw new TypeMismatchException(rhsValue, "BOOLEAN");
+      }
+      final IntValue rhsIntValue = (IntValue) rhsValue;
+      final int rhs = rhsIntValue.getValue();
+      if (rhs < 0 || rhs > 1) {
+        throw new TypeMismatchException(rhsValue, "BOOLEAN");
+      }
+      final int result = lhs & rhs;
+      return new CompiledIntValue(result);
+    }
+
+  }
+
+
+  //#########################################################################
+  //# Inner Class BinaryAndWithOperator
+  private static class BinaryOrWithOperator
+    extends AbstractBinaryAssignmentOperator
+  {
+
+    //#######################################################################
+    //# Interface net.sourceforge.waters.model.expr.BinaryOperator
+    public int getRHSTypes()
+    {
+      return Operator.TYPE_BOOLEAN;
+    }
+
+    public int getReturnTypes(final int lhsType, final int rhsType)
+    {
+      if ((rhsType & Operator.TYPE_BOOLEAN) != 0) {
+        return super.getReturnTypes(lhsType, rhsType);
+      } else {
+        return 0;
+      }
+    }
+
+    //#######################################################################
+    //# Interface net.sourceforge.waters.model.expr.Operator
+    public String getName()
+    {
+      return OPNAME_ORWITH;
+    }
+
+    public Value eval(final Value lhsValue, final Value rhsValue)
+      throws EvalException
+    {
+      if (!(lhsValue instanceof IntValue)) {
+        throw new TypeMismatchException(lhsValue, "BOOLEAN");
+      }
+      final IntValue lhsIntValue = (IntValue) lhsValue;
+      final int lhs = lhsIntValue.getValue();
+      if (lhs < 0 || lhs > 1) {
+        throw new TypeMismatchException(lhsValue, "BOOLEAN");
+      }
+      if (!(rhsValue instanceof IntValue)) {
+        throw new TypeMismatchException(rhsValue, "BOOLEAN");
+      }
+      final IntValue rhsIntValue = (IntValue) rhsValue;
+      final int rhs = rhsIntValue.getValue();
+      if (rhs < 0 || rhs > 1) {
+        throw new TypeMismatchException(rhsValue, "BOOLEAN");
+      }
+      final int result = lhs | rhs;
+      return new CompiledIntValue(result);
+    }
+
+  }
+
+
+  //#########################################################################
   //# Inner Class BinaryQualificationOperator
   /**
    * The abstract type of all binary operators that combine two integer
@@ -1839,6 +1955,8 @@ public class CompilerOperatorTable extends AbstractOperatorTable {
   private final BinaryOperator mAssignmentOperator;
   private final BinaryOperator mIncrementOperator;
   private final BinaryOperator mDecrementOperator;
+  private final BinaryOperator mAndWithOperator;
+  private final BinaryOperator mOrWithOperator;
   private final BinaryOperator mPlusOperator;
   private final BinaryOperator mMinusOperator;
   private final UnaryOperator mUnaryMinusOperator;
@@ -1876,6 +1994,8 @@ public class CompilerOperatorTable extends AbstractOperatorTable {
   private static final String OPNAME_NEXT = "'";
   private static final String OPNAME_INCREMENT = "+=";
   private static final String OPNAME_DECREMENT = "-=";
+  private static final String OPNAME_ANDWITH = "&=";
+  private static final String OPNAME_ORWITH = "|=";
   private static final String OPNAME_ASSIGNMENT = "=";
 
   private static final int PRIORITY_QUAL = 100;

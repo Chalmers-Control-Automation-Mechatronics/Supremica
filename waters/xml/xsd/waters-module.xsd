@@ -957,6 +957,8 @@
     <xs:enumeration value="="/>
     <xs:enumeration value="+="/>
     <xs:enumeration value="-="/>
+    <xs:enumeration value="&amp;="/>
+    <xs:enumeration value="|="/>
   </xs:restriction>
 </xs:simpleType>
 
