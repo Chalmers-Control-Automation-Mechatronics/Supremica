@@ -895,7 +895,7 @@ class FreeExecModelBuilder extends ModelBuilder
 		
 		String from = "s0";
 		String to = "s1"; 
-		startup.addState(to);
+		startup.addState(to,false,false);
 		String event = "send_output_COLD_" + fbName + ";";
 		startup.addControllableTransition(from, to, event, null, null);
 
@@ -908,7 +908,7 @@ class FreeExecModelBuilder extends ModelBuilder
 
 			from = to;
 			to = "s2";
-			startup.addState(to);
+			startup.addState(to,false,false);
 			event = "receive_event_" + cntSignal + "_" + cntFB + ";";
 			startup.addTransition(from, to, event, null, null);
 
@@ -916,7 +916,7 @@ class FreeExecModelBuilder extends ModelBuilder
 			to = "s3";
 			if (stopInstance != null)
 			{
-				startup.addState(to);
+				startup.addState(to,false,false);
 			}
 			else
 			{
@@ -934,7 +934,7 @@ class FreeExecModelBuilder extends ModelBuilder
 			{
 				from = to;
 				to = "s4" ;
-				startup.addState(to);
+				startup.addState(to,false,false);
 				event = "receive_event_STOP_" + stopInstance + ";";
 				startup.addTransition(from, to, event, null, null);
 				
@@ -1038,9 +1038,7 @@ class FreeExecModelBuilder extends ModelBuilder
 		ExtendedAutomaton eventExecution = getNewAutomaton("Event Execution");
 
 		eventExecution.addInitialState("s0");
-		eventExecution.addState("s1");
-		// Operation Scheduler Freedom:
-		//eventExecution.addTransition("s0", "s0", "discard_fb;", null, null);	
+		eventExecution.addState("s1",false,false);
 		eventExecution.addTransition("s0", "s1", "remove_fb;", null, null);	
 
 		int nameCounter = 2;
@@ -1052,7 +1050,7 @@ class FreeExecModelBuilder extends ModelBuilder
 			String from = "s1";
 			String to = "s" + nameCounter;
 			nameCounter++;
-			eventExecution.addState(to);
+			eventExecution.addState(to,false,false);
 			String event = "handle_event_" + instanceName + ";";
 			// Operation Scheduler Freedom:
 			//String guard = "current_fb == " + (Integer) basicFunctionBlocksID.get(instanceName);
