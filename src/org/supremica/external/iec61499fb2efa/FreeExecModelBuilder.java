@@ -1729,7 +1729,15 @@ class FreeExecModelBuilder extends ModelBuilder
 		doneInitFinish = false;
 		JaxbECState firstECState = (JaxbECState) ecStates.get(0);
 		String firstECStateName = firstECState.getName();
-		ecc.addInitialState(firstECStateName);
+		if (firstECStateName.startsWith("m"))
+		{
+			ecc.addInitialState(firstECStateName);
+		}
+		else
+		{
+			ecc.addState(firstECStateName,false,true);
+		}
+
 		Logger.output(Logger.DEBUG, "Calling makeECStateBranch() from makeBasicFBExecutionControlChart()", 2);
 		makeECStateBranch(ecc, fbName, firstECStateName, firstECStateName, ecStates, ecTransitions, visitedECStates, 2, identifierMap);
 
@@ -1795,7 +1803,7 @@ class FreeExecModelBuilder extends ModelBuilder
 		to = "s" + nameCounter;
 		nameCounter++;
 		Logger.output(Logger.DEBUG, "Adding state: " + to, level);
-		ecc.addState(to);
+		ecc.addState(to,false,false);
 		event = "update_ECC_" + fbName + ";";
 		Logger.output(Logger.DEBUG, "Adding transition: from: " + from + ", to: " + to + ", event: " + event, level);
 		ecc.addTransition(from, to, event, null, null);
@@ -1834,7 +1842,7 @@ class FreeExecModelBuilder extends ModelBuilder
 			from = prevStateName;
 			to =  curECDestName + "_actions";
 			Logger.output(Logger.DEBUG, "Adding state: " + to, level);
-			ecc.addState(to);
+			ecc.addState(to,false,false);
 			if (curECTransition.getCondition().equals("1"))
 			{
 				oneTransitionFromECSource = true;
@@ -1884,7 +1892,7 @@ class FreeExecModelBuilder extends ModelBuilder
 								to = "s" + nameCounter;
 								nameCounter++;
 								Logger.output(Logger.DEBUG, "Adding state: " + to, level);
-								ecc.addState(to);
+								ecc.addState(to,false,false);
 								event = "event_input_" + curEventInputName + "_" + fbName + ";";
 								newGuard = "event_" + curEventInputName + "_" + fbName + " == 1 & (" + guard + ")";
 								Logger.output(Logger.DEBUG, "Adding transition: from: " + from + ", to: " + to + ", event: " + event, level);
@@ -1939,7 +1947,7 @@ class FreeExecModelBuilder extends ModelBuilder
 							to = "s" + nameCounter; 
 							nameCounter++;
 							Logger.output(Logger.DEBUG, "Adding state: " + to, level);
-							ecc.addState(to);
+							ecc.addState(to,false,false);
 							event = "execute_" + actionAlgorithm + "_" + fbName + ";";
 							Logger.output(Logger.DEBUG, "Adding transition: from " + from + ": to " + to + ": event " + event, level);
 							ecc.addTransition(from, to, event, null, null);
@@ -1951,7 +1959,7 @@ class FreeExecModelBuilder extends ModelBuilder
 								to = "s" + nameCounter; 
 								nameCounter++;
 								Logger.output(Logger.DEBUG, "Adding state: " + to, level);
-								ecc.addState(to);
+								ecc.addState(to,false,false);
 								event = "finished_execution_" + actionAlgorithm + "_" + fbName + ";";
 								Logger.output(Logger.DEBUG, "Adding transition: from: " + from + ", to: " + to + ", event: " + event, level);
 								ecc.addTransition(from, to, event, null, null);
@@ -1961,7 +1969,7 @@ class FreeExecModelBuilder extends ModelBuilder
 								to = "s" + nameCounter; 
 								nameCounter++;
 								Logger.output(Logger.DEBUG, "Adding state: " + to, level);
-								ecc.addState(to);
+								ecc.addState(to,false,false);
 								event = "send_output_" + curAction.getOutput() + "_" + fbName + ";";
 								Logger.output(Logger.DEBUG, "Adding transition: from: " + from + ", to: " + to + ", event: " + event, level);
 								ecc.addTransition(from, to, event, null, null);
@@ -1978,7 +1986,7 @@ class FreeExecModelBuilder extends ModelBuilder
 									to = "s" + nameCounter; 
 									nameCounter++;
 									Logger.output(Logger.DEBUG, "Adding state: " + to, level);
-									ecc.addState(to);
+									ecc.addState(to,false,false);
 									event = "receive_event_" + cntSignal + "_" + cntFB + ";";
 									Logger.output(Logger.DEBUG, "Adding transition: from: " + from + ", to: " + to + ", event: " + event, level);
 									ecc.addTransition(from, to, event, null, null);
@@ -1988,7 +1996,7 @@ class FreeExecModelBuilder extends ModelBuilder
 									to = "s" + nameCounter; 
 									nameCounter++;
 									Logger.output(Logger.DEBUG, "Adding state: " + to, level);
-									ecc.addState(to);
+									ecc.addState(to,false,false);
 									event = "received_event_" + cntSignal + "_" + cntFB + ";";
 									Logger.output(Logger.DEBUG, "Adding transition: from: " + from + ", to: " + to + ", event: " + event, level);
 									ecc.addTransition(from, to, event, null, null);
@@ -2001,7 +2009,7 @@ class FreeExecModelBuilder extends ModelBuilder
 								to = "s" + nameCounter; 
 								nameCounter++;
 								Logger.output(Logger.DEBUG, "Adding state: " + to, level);
-								ecc.addState(to);
+								ecc.addState(to,false,false);
 								event = "finished_execution_" + actionAlgorithm + "_" + fbName + ";";
 								Logger.output(Logger.DEBUG, "Adding transition: from: " + from + ", to: " + to + ", event: " + event, level);
 								ecc.addTransition(from, to, event, null, null);
@@ -2014,7 +2022,7 @@ class FreeExecModelBuilder extends ModelBuilder
 							to = "s" + nameCounter; 
 							nameCounter++;
 							Logger.output(Logger.DEBUG, "Adding state: " + to, level);
-							ecc.addState(to);
+							ecc.addState(to,false,false);
 							event = "send_output_" + curAction.getOutput() + "_" + fbName + ";";
 							Logger.output(Logger.DEBUG, "Adding transition: from: " + from + ", to: " + to + ", event: " + event, level);
 							ecc.addTransition(from, to, event, null, null);
@@ -2031,7 +2039,7 @@ class FreeExecModelBuilder extends ModelBuilder
 								to = "s" + nameCounter; 
 								nameCounter++;
 								Logger.output(Logger.DEBUG, "Adding state: " + to, level);
-								ecc.addState(to);
+								ecc.addState(to,false,false);
 								event = "receive_event_" + cntSignal + "_" + cntFB + ";";
 								Logger.output(Logger.DEBUG, "Adding transition: from: " + from + ", to: " + to + ", event: " + event, level);
 								ecc.addTransition(from, to, event, null, null);
@@ -2041,7 +2049,7 @@ class FreeExecModelBuilder extends ModelBuilder
 								to = "s" + nameCounter; 
 								nameCounter++;
 								Logger.output(Logger.DEBUG, "Adding state: " + to, level);
-								ecc.addState(to);
+								ecc.addState(to,false,false);
 								event = "received_event_" + cntSignal + "_" + cntFB + ";";
 								Logger.output(Logger.DEBUG, "Adding transition: from: " + from + ", to: " + to + ", event: " + event, level);
 								ecc.addTransition(from, to, event, null, null);
@@ -2081,7 +2089,14 @@ class FreeExecModelBuilder extends ModelBuilder
 					from = next;
 					to = curECDestName; 
 					Logger.output(Logger.DEBUG, "Adding state: " + to, level);
-					ecc.addState(to);
+					if(curECDestName.startsWith("m"))
+					{
+						ecc.addState(to);
+					}
+					else
+					{
+						ecc.addState(to,false,false);
+					}
 					event = "no_more_actions_" + fbName + ";";
 					Logger.output(Logger.DEBUG, "Adding transition: from: " + from + ", to: " + to + ", event: " + event, level);
 					ecc.addTransition(from, to, event, null, null);
@@ -2097,7 +2112,14 @@ class FreeExecModelBuilder extends ModelBuilder
 					from = next;
 					to = curECDestName; 
 					Logger.output(Logger.DEBUG, "Adding state: " + to, level);
-					ecc.addState(to);
+					if(curECDestName.startsWith("m"))
+					{
+						ecc.addState(to);
+					}
+					else
+					{
+						ecc.addState(to,false,false);
+					}
 					event = "no_more_actions_" + fbName + ";";
 					Logger.output(Logger.DEBUG, "Adding transition: from: " + from + ", to: " + to + ", event: " + event, level);
 					ecc.addTransition(from, to, event, null, null);
@@ -2113,7 +2135,7 @@ class FreeExecModelBuilder extends ModelBuilder
 					to = "s" + nameCounter;
 					nameCounter++;
 					Logger.output(Logger.DEBUG, "Adding state: " + to, level);
-					ecc.addState(to);
+					ecc.addState(to,false,false);
 					event = "no_more_actions_" + fbName + ";";
 					Logger.output(Logger.DEBUG, "Adding transition: from: " + from + ", to: " + to + ", event: " + event, level);
 					ecc.addTransition(from, to, event, null, null);
@@ -2124,7 +2146,7 @@ class FreeExecModelBuilder extends ModelBuilder
 					to = "s" + nameCounter;
 					nameCounter++;
 					Logger.output(Logger.DEBUG, "Adding state: " + to, level);
-					ecc.addState(to);
+					ecc.addState(to,false,false);
 					event = "update_ECC_" + fbName + ";";
 					Logger.output(Logger.DEBUG, "Adding transition: from: " + from + ", to: " + to + ", event: " + event, level);
 					ecc.addTransition(from, to, event, null, null);
@@ -2134,7 +2156,14 @@ class FreeExecModelBuilder extends ModelBuilder
 					from = next;
 					to = curECDestName;
 					Logger.output(Logger.DEBUG, "Adding state: " + to, level);
-					ecc.addState(to);
+					if(curECDestName.startsWith("m"))
+					{
+						ecc.addState(to);
+					}
+					else
+					{
+						ecc.addState(to,false,false);
+					}
 					event = "handling_event_done_" + fbName + ";";
 					Logger.output(Logger.DEBUG, "Adding transition: from: " + from + ", to: " + to + ", event: " + event, level);
 					ecc.addTransition(from, to, event, null, null);
@@ -2151,7 +2180,7 @@ class FreeExecModelBuilder extends ModelBuilder
 					to = "s" + nameCounter;
 					nameCounter++;
 					Logger.output(Logger.DEBUG, "Adding state: " + to, level);
-					ecc.addState(to);
+					ecc.addState(to,false,false);
 					event = "no_more_actions_" + fbName + ";";
 					Logger.output(Logger.DEBUG, "Adding transition: from: " + from + ", to: " + to + ", event: " + event, level);
 					ecc.addTransition(from, to, event, null, null);
@@ -2162,7 +2191,7 @@ class FreeExecModelBuilder extends ModelBuilder
 					to = "s" + nameCounter;
 					nameCounter++;
 					Logger.output(Logger.DEBUG, "Adding state: " + to, level);
-					ecc.addState(to);
+					ecc.addState(to,false,false);
 					event = "update_ECC_" + fbName + ";";
 					Logger.output(Logger.DEBUG, "Adding transition: from: " + from + ", to: " + to + ", event: " + event, level);
 					ecc.addTransition(from, to, event, null, null);
@@ -2171,8 +2200,15 @@ class FreeExecModelBuilder extends ModelBuilder
 					// handling_event_done model transition
 					from = next;
 					to = curECDestName;
+					if(curECDestName.startsWith("m"))
+					{
+						ecc.addState(to);
+					}
+					else
+					{
+						ecc.addState(to,false,false);
+					}
 					Logger.output(Logger.DEBUG, "Adding state: " + to, level);
-					ecc.addState(to);
 					event = "handling_event_done_" + fbName + ";";
 					Logger.output(Logger.DEBUG, "Adding transition: from: " + from + ", to: " + to + ", event: " + event, level);
 					ecc.addTransition(from, to, event, null, null);
@@ -2187,7 +2223,7 @@ class FreeExecModelBuilder extends ModelBuilder
 			from = noTransitionFrom;
 			to = "s" + nameCounter;
 			nameCounter++;
-			ecc.addState(to);
+			ecc.addState(to,false,false);
 			event = "no_transition_" + fbName + ";";
 			Logger.output(Logger.DEBUG, "Adding transition: from: " + from + ", to: " + to + ", event: " + event, level);
 			ecc.addTransition(from, to, event, noTransitionGuard, null);
@@ -2195,7 +2231,7 @@ class FreeExecModelBuilder extends ModelBuilder
 			from = to;
 			to = "s" + nameCounter;
 			nameCounter++;
-			ecc.addState(to);
+			ecc.addState(to,false,false);
 			// reset active event
 			for (Iterator iter = eventInputs.iterator();iter.hasNext();)
 			{
