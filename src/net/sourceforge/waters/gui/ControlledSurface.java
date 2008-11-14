@@ -1276,10 +1276,9 @@ public class ControlledSurface
     final GraphSubject graph = getGraph();
     final Set<NodeSubject> nodes = graph.getNodesModifiable();
     final Subject source = event.getSource();
-    final Subject parent = source.getParent();
     switch (event.getKind()) {
       case ModelChangeEvent.ITEM_ADDED:
-        if (parent == nodes) {
+        if (source == nodes) {
           final Object value = event.getValue();
           if (mHasGroupNodes || value instanceof GroupNodeSubject) {
             mNeedsHierarchyUpdate = true;
@@ -1287,7 +1286,7 @@ public class ControlledSurface
         }
         break;
       case ModelChangeEvent.ITEM_REMOVED:
-        if (parent == nodes) {
+        if (source == nodes) {
           mNeedsHierarchyUpdate |= mHasGroupNodes;
         }
         break;
@@ -1298,7 +1297,7 @@ public class ControlledSurface
         break;
     default:
       break;
-    }      
+    }    
   }
 
   private void updateGroupNodeHierarchy()
