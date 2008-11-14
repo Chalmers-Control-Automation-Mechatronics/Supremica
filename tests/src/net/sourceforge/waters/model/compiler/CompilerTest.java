@@ -300,6 +300,12 @@ public class CompilerTest
     compile("handwritten", "markedvar");
   }
 
+  public void testCompile_nodegroup_efa()
+    throws IOException, WatersException
+  {
+    compile("handwritten", "nodegroup_efa");
+  }
+
   /*
   public void testCompile_profisafe_ihost_efa()
     throws IOException, WatersException

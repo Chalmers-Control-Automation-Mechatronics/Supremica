@@ -291,13 +291,16 @@ public class EFACompiler
   {
     final EFAEvent event = edecl.createEvent(cond);
     for (final EFATransition part : parts) {
-      for (final Proxy location : part.getSourceLocations()) {
-        Collection<EFAEvent> collection = mEFAEventMap.get(location);
-        if (collection == null) {
-          collection = new LinkedList<EFAEvent>();
-          mEFAEventMap.put(location, collection);
+      final CompiledClause pcond = part.getConditions();
+      if (!pcond.isEmpty()) {
+        for (final Proxy location : part.getSourceLocations()) {
+          Collection<EFAEvent> collection = mEFAEventMap.get(location);
+          if (collection == null) {
+            collection = new LinkedList<EFAEvent>();
+            mEFAEventMap.put(location, collection);
+          }
+          collection.add(event);
         }
-        collection.add(event);
       }
     }
     mEventNameBuilder.addClause(cond);
@@ -468,6 +471,7 @@ public class EFACompiler
       throws VisitorException
     {
       try {
+        mCurrentSource = edge.getSource();
         final GuardActionBlockProxy ga = edge.getGuardActionBlock();
         if (ga == null) {
           mCurrentGuard = mTrueGuard;
@@ -481,6 +485,7 @@ public class EFACompiler
         visitLabelBlockProxy(block);
         return null;
       } finally {
+        mCurrentSource = null;
         mCurrentGuard = null;
         if (mIsUsingEventAlphabet) {
           mCollectedVariables = null;
@@ -540,7 +545,7 @@ public class EFACompiler
           if (mCurrentGuard != null) {
             final EFATransitionGroup trans =
               edecl.createTransitionGroup(mCurrentComponent);
-            trans.addTransitions(mCurrentGuard, ident);
+            trans.addTransitions(mCurrentGuard, mCurrentSource, ident);
           }
         }
         return edecl;
@@ -593,6 +598,7 @@ public class EFACompiler
               ckind == ComponentKind.PROPERTY ||
               ekind == EventKind.UNCONTROLLABLE &&
               ckind != ComponentKind.PLANT) {
+            mGuardCompiler.makeDisjoint(trans);
             // Include a catch-all event to be blocked ...
             if (!trans.hasTrueGuard()) {
               final Collection<SimpleExpressionProxy> guards =
@@ -631,6 +637,7 @@ public class EFACompiler
     private SimpleComponentProxy mCurrentComponent;
     private Set<EFAVariable> mCollectedVariables;
     private Set<EFAEventDecl> mCollectedEvents;
+    private NodeProxy mCurrentSource;
     private CompiledGuard mCurrentGuard;
   }
 

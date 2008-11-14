@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<ProductDES Name="nodegroup_efa"
+  xmlns:ns2="http://waters.sourceforge.net/xsd/base"
+  xmlns="http://waters.sourceforge.net/xsd/des">
+<ns2:Comment>A test that involves some nodegroups in combination with EFA actions.</ns2:Comment>
+<EventList>
+<Event Kind="UNCONTROLLABLE" Name="delay_timeout"/>
+<Event Kind="UNCONTROLLABLE" Name="host_timeout"/>
+<Event Kind="CONTROLLABLE" Name="restart_delay_timer"/>
+<Event Kind="CONTROLLABLE" Name="restart_host_timer"/>
+</EventList>
+<AutomataList>
+<Automaton Kind="PLANT" Name="timers">
+<EventRefList>
+<EventRef Name="delay_timeout"/>
+<EventRef Name="host_timeout"/>
+<EventRef Name="restart_delay_timer"/>
+<EventRef Name="restart_host_timer"/>
+</EventRefList>
+<StateList>
+<State Initial="true" Name="OFF"/>
+<State Name="DELAY"/>
+<State Name="HOST"/>
+</StateList>
+<TransitionList>
+<Transition Source="OFF" Target="HOST" Event="restart_host_timer"/>
+<Transition Source="HOST" Target="HOST" Event="restart_host_timer"/>
+<Transition Source="DELAY" Target="HOST" Event="restart_host_timer"/>
+<Transition Source="OFF" Target="DELAY" Event="restart_delay_timer"/>
+<Transition Source="HOST" Target="DELAY" Event="restart_delay_timer"/>
+<Transition Source="DELAY" Target="DELAY" Event="restart_delay_timer"/>
+<Transition Source="HOST" Target="OFF" Event="host_timeout"/>
+<Transition Source="DELAY" Target="OFF" Event="delay_timeout"/>
+</TransitionList>
+</Automaton>
+<Automaton Kind="PLANT" Name="got_host_timeout">
+<EventRefList>
+<EventRef Name="host_timeout"/>
+<EventRef Name="restart_delay_timer"/>
+<EventRef Name="restart_host_timer"/>
+</EventRefList>
+<StateList>
+<State Initial="true" Name="0"/>
+<State Name="1"/>
+</StateList>
+<TransitionList>
+<Transition Source="0" Target="1" Event="host_timeout"/>
+<Transition Source="1" Target="1" Event="host_timeout"/>
+<Transition Source="0" Target="0" Event="restart_host_timer"/>
+<Transition Source="1" Target="0" Event="restart_host_timer"/>
+<Transition Source="0" Target="0" Event="restart_delay_timer"/>
+<Transition Source="1" Target="0" Event="restart_delay_timer"/>
+</TransitionList>
+</Automaton>
+<Automaton Kind="PLANT" Name="got_delay_timeout">
+<EventRefList>
+<EventRef Name="delay_timeout"/>
+<EventRef Name="restart_delay_timer"/>
+<EventRef Name="restart_host_timer"/>
+</EventRefList>
+<StateList>
+<State Initial="true" Name="0"/>
+<State Name="1"/>
+</StateList>
+<TransitionList>
+<Transition Source="0" Target="1" Event="delay_timeout"/>
+<Transition Source="1" Target="1" Event="delay_timeout"/>
+<Transition Source="0" Target="0" Event="restart_host_timer"/>
+<Transition Source="1" Target="0" Event="restart_host_timer"/>
+<Transition Source="0" Target="0" Event="restart_delay_timer"/>
+<Transition Source="1" Target="0" Event="restart_delay_timer"/>
+</TransitionList>
+</Automaton>
+</AutomataList>
+</ProductDES>
+

@@ -10,10 +10,13 @@
 package net.sourceforge.waters.model.compiler.efa;
 
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.LinkedList;
+import java.util.Set;
 
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.compiler.dnf.CompiledClause;
+import net.sourceforge.waters.model.module.NodeProxy;
 import net.sourceforge.waters.model.module.SimpleComponentProxy;
 
 
@@ -34,8 +37,10 @@ class EFATransition
   EFATransition(final SimpleComponentProxy comp,
                 final CompiledClause conditions)
   {
+    final int numnodes = comp.getGraph().getNodes().size();
     mComponent = comp;
     mConditions = conditions;
+    mSourceNodes = new HashSet<NodeProxy>(numnodes);
     mSourceLocations = new LinkedList<Proxy>();
   }
 
@@ -52,16 +57,26 @@ class EFATransition
     return mConditions;
   }
 
+  Set<NodeProxy> getSourceNodes()
+  {
+    return mSourceNodes;
+  }
+
   Collection<Proxy> getSourceLocations()
   {
     return mSourceLocations;
   }
 
-  void addSourceLocation(final Proxy location)
+  void addSource(final NodeProxy node, final Proxy location)
   {
-    if (!mConditions.isEmpty()) {
-      mSourceLocations.add(location);
-    }
+    mSourceNodes.add(node);
+    mSourceLocations.add(location);
+  }
+
+  void addSources(final EFATransition trans)
+  {
+    mSourceNodes.addAll(trans.mSourceNodes);
+    mSourceLocations.addAll(trans.mSourceLocations);
   }
 
 
@@ -69,6 +84,7 @@ class EFATransition
   //# Data Members
   private final SimpleComponentProxy mComponent;
   private final CompiledClause mConditions;
+  private final Set<NodeProxy> mSourceNodes;
   private final Collection<Proxy> mSourceLocations;
 
 }
