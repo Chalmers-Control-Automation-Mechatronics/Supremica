@@ -2,6 +2,7 @@
 <Module xmlns="http://waters.sourceforge.net/xsd/module" Name="nodegroup1">
 <EventDeclList>
 <EventDecl Name="e" Kind="CONTROLLABLE"/>
+<EventDecl Name="f" Kind="CONTROLLABLE"/>
 </EventDeclList>
 <ComponentList>
 <SimpleComponent Kind="SPEC">
@@ -9,6 +10,7 @@
 <Graph>
 <LabelBlock>
 <SimpleIdentifier Name="e"/>
+<SimpleIdentifier Name="f"/>
 </LabelBlock>
 <NodeList>
 <SimpleNode Initial="true" Name="q0"/>
@@ -29,6 +31,11 @@
 <Edge Source="q2" Target="q2">
 <LabelBlock>
 <SimpleIdentifier Name="e"/>
+</LabelBlock>
+</Edge>
+<Edge Source="q0" Target="q2">
+<LabelBlock>
+<SimpleIdentifier Name="f"/>
 </LabelBlock>
 </Edge>
 </EdgeList>

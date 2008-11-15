@@ -213,6 +213,12 @@ public class CompilerTest
     compile(dir, "transferline", bindings, true);
   }
 
+  public void testCompile_unused_prop()
+    throws IOException, WatersException
+  {
+    compile("tests", "nasty", "unused_prop");
+  }
+
   public void testCompile_winemerchant()
     throws IOException, WatersException
   {

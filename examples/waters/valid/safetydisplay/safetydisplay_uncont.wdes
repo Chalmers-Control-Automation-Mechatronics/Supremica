@@ -44,7 +44,6 @@
         <Automaton Kind="SPEC" Name="displaypriorityuncontrollable">
             <EventRefList>
                 <EventRef Name=":accepting"/>
-                <EventRef Name="displayoff"/>
                 <EventRef Name="displayon[1]"/>
                 <EventRef Name="displayon[2]"/>
                 <EventRef Name="displayon[3]"/>
@@ -73,26 +72,22 @@
                 <Transition Event="displayon[1]" Source="on23" Target="on23"/>
                 <Transition Event="switchon[2]" Source="on23" Target="on23"/>
                 <Transition Event="switchon[3]" Source="on23" Target="on23"/>
-                <Transition Event="displayoff" Source="on23" Target="on23"/>
                 <Transition Event="switchoff[3]" Source="on23" Target="on2"/>
                 <Transition Event="switchoff[2]" Source="on23" Target="on3"/>
                 <Transition Event="switchon[1]" Source="on23" Target="on123"/>
                 <Transition Event="displayon[3]" Source="on12" Target="on12"/>
                 <Transition Event="switchon[1]" Source="on12" Target="on12"/>
                 <Transition Event="switchon[2]" Source="on12" Target="on12"/>
-                <Transition Event="displayoff" Source="on12" Target="on12"/>
                 <Transition Event="switchoff[1]" Source="on12" Target="on2"/>
                 <Transition Event="switchoff[2]" Source="on12" Target="on1"/>
                 <Transition Event="switchon[3]" Source="on12" Target="on123"/>
                 <Transition Event="displayon[2]" Source="on13" Target="on13"/>
                 <Transition Event="switchon[3]" Source="on13" Target="on13"/>
                 <Transition Event="switchon[1]" Source="on13" Target="on13"/>
-                <Transition Event="displayoff" Source="on13" Target="on13"/>
                 <Transition Event="switchoff[1]" Source="on13" Target="on3"/>
                 <Transition Event="switchoff[3]" Source="on13" Target="on1"/>
                 <Transition Event="switchon[2]" Source="on13" Target="on123"/>
                 <Transition Event="displayon[1]" Source="off" Target="off"/>
-                <Transition Event="displayoff" Source="off" Target="off"/>
                 <Transition Event="switchon[2]" Source="off" Target="on2"/>
                 <Transition Event="switchon[3]" Source="off" Target="on3"/>
                 <Transition Event="switchon[1]" Source="off" Target="on1"/>
@@ -100,22 +95,18 @@
                 <Transition Event="switchon[1]" Source="on2" Target="on12"/>
                 <Transition Event="switchoff[2]" Source="on2" Target="off"/>
                 <Transition Event="displayon[1]" Source="on2" Target="on2"/>
-                <Transition Event="displayoff" Source="on2" Target="on2"/>
                 <Transition Event="switchon[2]" Source="on3" Target="on23"/>
                 <Transition Event="switchoff[3]" Source="on3" Target="off"/>
                 <Transition Event="displayon[1]" Source="on3" Target="on3"/>
                 <Transition Event="switchon[3]" Source="on3" Target="on3"/>
-                <Transition Event="displayoff" Source="on3" Target="on3"/>
                 <Transition Event="switchon[2]" Source="on1" Target="on12"/>
                 <Transition Event="switchon[3]" Source="on1" Target="on13"/>
                 <Transition Event="switchoff[1]" Source="on1" Target="off"/>
                 <Transition Event="displayon[2]" Source="on1" Target="on1"/>
                 <Transition Event="switchon[1]" Source="on1" Target="on1"/>
-                <Transition Event="displayoff" Source="on1" Target="on1"/>
                 <Transition Event="switchoff[1]" Source="on123" Target="on23"/>
                 <Transition Event="switchoff[3]" Source="on123" Target="on12"/>
                 <Transition Event="switchoff[2]" Source="on123" Target="on13"/>
-                <Transition Event="displayoff" Source="on123" Target="on123"/>
                 <Transition Event="switchon[2]" Source="on123" Target="on123"/>
                 <Transition Event="switchon[3]" Source="on123" Target="on123"/>
                 <Transition Event="switchon[1]" Source="on123" Target="on123"/>

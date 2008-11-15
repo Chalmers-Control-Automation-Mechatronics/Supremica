@@ -20,8 +20,6 @@
 <Automaton Kind="PLANT" Name="SensorActuator">
 <EventRefList>
 <EventRef Name=":accepting"/>
-<EventRef Name="change_direction.{forward}"/>
-<EventRef Name="change_direction.{!forward}"/>
 <EventRef Name="move_left.{sensor1'==0}"/>
 <EventRef Name="move_left.{sensor1'==1}"/>
 <EventRef Name="move_left.{sensor2'==0}"/>
@@ -43,23 +41,13 @@
 <State Name="E"/>
 </StateList>
 <TransitionList>
-<Transition Target="A" Source="A" Event="change_direction.{forward}"/>
-<Transition Target="A" Source="A" Event="change_direction.{!forward}"/>
 <Transition Target="B" Source="A" Event="move_right.{sensor1'==1}"/>
-<Transition Target="B" Source="B" Event="change_direction.{forward}"/>
-<Transition Target="B" Source="B" Event="change_direction.{!forward}"/>
 <Transition Target="A" Source="B" Event="move_left.{sensor1'==0}"/>
 <Transition Target="C" Source="B" Event="move_right.{sensor1'==0}"/>
-<Transition Target="C" Source="C" Event="change_direction.{forward}"/>
-<Transition Target="C" Source="C" Event="change_direction.{!forward}"/>
 <Transition Target="B" Source="C" Event="move_left.{sensor1'==1}"/>
 <Transition Target="D" Source="C" Event="move_right.{sensor2'==1}"/>
-<Transition Target="D" Source="D" Event="change_direction.{forward}"/>
-<Transition Target="D" Source="D" Event="change_direction.{!forward}"/>
 <Transition Target="C" Source="D" Event="move_left.{sensor2'==0}"/>
 <Transition Target="E" Source="D" Event="move_right.{sensor2'==0}"/>
-<Transition Target="E" Source="E" Event="change_direction.{forward}"/>
-<Transition Target="E" Source="E" Event="change_direction.{!forward}"/>
 <Transition Target="D" Source="E" Event="move_left.{sensor2'==1}"/>
 </TransitionList>
 </Automaton>

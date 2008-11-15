@@ -26,15 +26,26 @@
                             <Point Y="10" X="0"/>
                         </LabelGeometry>
                     </SimpleNode>
+                    <SimpleNode Name="S1">
+                        <PointGeometry>
+                            <Point Y="96" X="208"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="10" X="0"/>
+                        </LabelGeometry>
+                    </SimpleNode>
                 </NodeList>
                 <EdgeList>
-                    <Edge Target="S0" Source="S0">
+                    <Edge Target="S1" Source="S0">
                         <LabelBlock>
                             <SimpleIdentifier Name="ar"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-2" X="10"/>
+                                <Point Y="-17" X="-9"/>
                             </LabelGeometry>
                         </LabelBlock>
+                        <EndPointGeometry>
+                            <Point Y="96" X="208"/>
+                        </EndPointGeometry>
                     </Edge>
                 </EdgeList>
             </Graph>

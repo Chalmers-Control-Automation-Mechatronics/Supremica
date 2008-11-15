@@ -773,15 +773,10 @@
         </Automaton>
         <Automaton Kind="SPEC" Name="noreset[WSP]">
             <EventRefList>
-                <EventRef Name=":accepting"/>
                 <EventRef Name="reset[WSP]"/>
             </EventRefList>
             <StateList>
-                <State Initial="true" Name="s0">
-                    <EventRefList>
-                        <EventRef Name=":accepting"/>
-                    </EventRefList>
-                </State>
+                <State Initial="true" Name="s0"/>
             </StateList>
         </Automaton>
         <Automaton Kind="PLANT" Name="timer[FS]">

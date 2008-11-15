@@ -4,7 +4,6 @@
     <EventDeclList>
         <EventDecl Kind="UNCONTROLLABLE" Name="u"/>
         <EventDecl Kind="CONTROLLABLE" Name="a"/>
-        <EventDecl Kind="CONTROLLABLE" Name="b"/>
     </EventDeclList>
     <ComponentList>
         <VariableComponent Deterministic="false" Name="x">

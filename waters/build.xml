@@ -305,6 +305,7 @@
       <batchtest todir="${logs.results}">
         <fileset dir="${supremica.testsrc}">
           <include name="net/sourceforge/waters/**/CompilerTest.java"/>
+          <include name="net/sourceforge/waters/**/ValidTest.java"/>
           <exclude name="**/Abstract*.java"/>
         </fileset>
       </batchtest>
@@ -447,6 +448,7 @@
         <include name="net/sourceforge/waters/**"/>
         <exclude name="net/sourceforge/waters/analysis/modular/supremica/**"/>
         <exclude name="net/sourceforge/waters/build/**"/>
+        <exclude name="net/sourceforge/waters/model/compiler/old/**"/>
         <exclude name="net/sourceforge/waters/gui/**"/>
         <exclude name="net/sourceforge/waters/mbt/**"/>
       </packageset>

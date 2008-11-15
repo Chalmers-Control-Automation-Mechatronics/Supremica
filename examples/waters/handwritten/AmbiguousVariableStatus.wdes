@@ -9,21 +9,6 @@
 <Event Kind="UNCONTROLLABLE" Name="b.{x!=0}"/>
 </EventList>
 <AutomataList>
-<Automaton Kind="PLANT" Name="Plant">
-<EventRefList>
-<EventRef Name="a"/>
-<EventRef Name="b.{x==0}"/>
-<EventRef Name="b.{x!=0}"/>
-</EventRefList>
-<StateList>
-<State Initial="true" Name="G0"/>
-</StateList>
-<TransitionList>
-<Transition Source="G0" Target="G0" Event="a"/>
-<Transition Source="G0" Target="G0" Event="b.{x==0}"/>
-<Transition Source="G0" Target="G0" Event="b.{x!=0}"/>
-</TransitionList>
-</Automaton>
 <Automaton Kind="SPEC" Name="Spec">
 <EventRefList>
 <EventRef Name="a"/>

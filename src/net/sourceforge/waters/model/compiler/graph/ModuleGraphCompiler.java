@@ -43,8 +43,10 @@ import net.sourceforge.waters.model.module.EventListExpressionProxy;
 import net.sourceforge.waters.model.module.GraphProxy;
 import net.sourceforge.waters.model.module.GroupNodeProxy;
 import net.sourceforge.waters.model.module.IdentifierProxy;
+import net.sourceforge.waters.model.module.LabelBlockProxy;
 import net.sourceforge.waters.model.module.ModuleProxy;
 import net.sourceforge.waters.model.module.NodeProxy;
+import net.sourceforge.waters.model.module.PlainEventListProxy;
 import net.sourceforge.waters.model.module.SimpleComponentProxy;
 import net.sourceforge.waters.model.module.SimpleNodeProxy;
 import net.sourceforge.waters.xsd.base.ComponentKind;
@@ -87,12 +89,29 @@ public class ModuleGraphCompiler extends AbstractModuleProxyVisitor
   //##########################################################################
   //# Interface net.sourceforge.waters.model.module.ModuleProxyVisitor
   public Object visitEdgeProxy(final EdgeProxy edge)
+  {
+    // Edges must be processed in the proper order: 
+    // innermost source nodes in group node hierarchy first.
+    // Therefore, this following two-pass process ...
+    final NodeProxy source = edge.getSource();
+    final CompiledNode csource = mPrecompiledNodesMap.get(source);
+    csource.addEdge(edge);
+    return null;
+  }
+
+  private void visitEdgeProxy(final EdgeProxy edge, final CompiledNode source)
     throws VisitorException
   {
-    final NodeProxy source = edge.getSource();
-    final CompiledNode entry = mPrecompiledNodesMap.get(source);
-    entry.addEdge(edge);
-    return null;
+    try {
+      final NodeProxy target = edge.getTarget();
+      final LabelBlockProxy block = edge.getLabelBlock();
+      mCurrentSource = source;
+      mCurrentTarget = mPrecompiledNodesMap.get(target);
+      visitLabelBlockProxy(block);
+    } finally {
+      mCurrentSource = null;
+      mCurrentTarget = null;
+    }
   }
 
   public EventProxy visitEventDeclProxy(final EventDeclProxy decl)
@@ -108,37 +127,56 @@ public class ModuleGraphCompiler extends AbstractModuleProxyVisitor
     return event;
   }
 
-  public List<EventProxy> visitEventListExpressionProxy
-    (final EventListExpressionProxy proxy)
+  public Object visitEventListExpressionProxy
+    (final EventListExpressionProxy elist)
+    throws VisitorException
+  {
+    final List<Proxy> list = elist.getEventList();
+    visitCollection(list);
+    return null;
+  }
+
+  public CompiledNode visitGroupNodeProxy(final GroupNodeProxy group)
     throws VisitorException
   {
     try {
-      final List<Proxy> list = proxy.getEventList();
-      final int size = list.size();
-      mCurrentEventsList = new ArrayList<EventProxy>(size);
-      visitCollection(list);
-      return mCurrentEventsList;
+      final CompiledGroupNode cgroup = new CompiledGroupNode(group);
+      mPrecompiledNodesMap.put(group, cgroup);
+      for (final NodeProxy child : group.getImmediateChildNodes()) {
+        final CompiledNode cchild = mPrecompiledNodesMap.get(child);
+        cgroup.addImmediateChildNode(cchild);
+      }
+      final PlainEventListProxy elist = group.getPropositions();
+      mCurrentSource = cgroup;
+      visitPlainEventListProxy(elist);
+      return mCurrentSource;
     } finally {
-      mCurrentEventsList = null;
+      mCurrentSource = null;
     }
-  }
-
-  public CompiledNode visitGroupNodeProxy(final GroupNodeProxy proxy)
-    throws VisitorException
-  {
-    final CompiledNode compiled = new CompiledNode(proxy);
-    mPrecompiledNodesMap.put(proxy, compiled);
-    return compiled;
   }
 
   public EventProxy visitIdentifierProxy(final IdentifierProxy ident)
     throws VisitorException
   {
-    final EventProxy event = findGlobalEvent(ident);
-    // Check type? Again?
-    addLocalEvent(event);
-    mCurrentEventsList.add(event);
-    return event;
+    try {
+      final EventProxy event = findGlobalEvent(ident);
+      addLocalEvent(event);
+      if (mCurrentSource == null) {
+        // nothing --- blocked events list
+      } else if (mCurrentTarget == null) {
+        // propositions of a state
+        mCurrentSource.addProposition(event);
+      } else {
+        // label block of an edge
+        mCurrentTarget.addTransitionFrom(mCurrentSource,
+                                         event,
+                                         mCurrentSource,
+                                         ident);
+      }
+      return event;
+    } catch (final NondeterministicModuleException exception) {
+      throw wrap(exception);
+    } 
   }
 
   public ProductDESProxy visitModuleProxy(final ModuleProxy module)
@@ -176,7 +214,7 @@ public class ModuleGraphCompiler extends AbstractModuleProxyVisitor
     try {
       mCurrentComponent = comp;
       // Prepare alphabet ...
-      mLocalEventsSet = new HashSet<EventProxy>();
+      mLocalEventsMap = new HashMap<EventProxy,SelfloopInfo>();
       mLocalEventsList = new LinkedList<EventProxy>();
       final GraphProxy graph = comp.getGraph();
       final EventListExpressionProxy blocked = graph.getBlockedEvents();
@@ -184,30 +222,52 @@ public class ModuleGraphCompiler extends AbstractModuleProxyVisitor
         visitEventListExpressionProxy(blocked);
       }
       // Precompile states ...
-      final boolean deterministic = graph.isDeterministic();
-      mMaxInitialStates = deterministic ? 1 : -1;
+      mCurrentComponentIsDetermistic = graph.isDeterministic();
+      mMaxInitialStates = mCurrentComponentIsDetermistic ? 1 : -1;
       final Collection<NodeProxy> nodes = graph.getNodes();
       final int numnodes = nodes.size();
       mPrecompiledNodesMap = new HashMap<NodeProxy,CompiledNode>(numnodes);
-      mLocalStatesMap = new HashMap<String,StateProxy>(numnodes);
-      mLocalStatesList = new ArrayList<StateProxy>(numnodes);
+      mLocalStateNames = new HashSet<String>(numnodes);
+      mLocalTransitionsList = new LinkedList<CompiledTransition>();
       visitCollection(nodes);
+      // Precompile transitions ...
       final Collection<EdgeProxy> edges = graph.getEdges();
       visitCollection(edges);
-      // Build transitions ...
-      mLocalTransitionsList = new LinkedList<TransitionProxy>();
-      for (final NodeProxy source : nodes) {
-        final CompiledNode sourceEntry = mPrecompiledNodesMap.get(source);
-        for (final EdgeProxy edge : sourceEntry.getEdges()) {
-          final NodeProxy target = edge.getTarget();
-          final EventListExpressionProxy labels = edge.getLabelBlock();
-          final List<EventProxy> events =
-            visitEventListExpressionProxy(labels);
-          final List<Proxy> sources = labels.getEventList();
-          createTransitions(source, events, target, sourceEntry,
-                            deterministic, sources);
+      for (final NodeProxy node : nodes) {
+        final CompiledNode cnode = mPrecompiledNodesMap.get(node);
+        for (final EdgeProxy edge : cnode.getEdges()) {
+          visitEdgeProxy(edge, cnode);
         }
-        sourceEntry.clearProperChildNodes();
+      }
+      // Reachability ...
+      mNumReachableStates = 0;
+      mNumReachableTransitions = 0;
+      for (final CompiledNode node : mPrecompiledNodesMap.values()) {
+        if (node.isInitial()) {
+          node.explore();
+        }
+      }
+      // Build alphabet, states, and transitions ...
+      removeSelfloopedEvents(mLocalEventsList);
+      if (mLocalEventsList.isEmpty()) {
+        return null;
+      }
+      final List<StateProxy> states =
+        new ArrayList<StateProxy>(mNumReachableStates);
+      for (final NodeProxy node : nodes) {
+        final CompiledNode cnode = mPrecompiledNodesMap.get(node);
+        final StateProxy state = cnode.createStateProxy();
+        if (state != null) {
+          states.add(state);
+        }
+      }
+      final List<TransitionProxy> transitions =
+        new ArrayList<TransitionProxy>(mNumReachableTransitions);
+      for (final CompiledTransition ctrans : mLocalTransitionsList) {
+        final TransitionProxy trans = ctrans.createTransitionProxy();
+        if (trans != null) {
+          transitions.add(trans);
+        }
       }
       // Create automaton ...
       final IdentifierProxy ident = comp.getIdentifier();
@@ -215,46 +275,52 @@ public class ModuleGraphCompiler extends AbstractModuleProxyVisitor
       final ComponentKind kind = comp.getKind();
       final AutomatonProxy aut =
         mFactory.createAutomatonProxy(name, kind, mLocalEventsList,
-                                      mLocalStatesList, mLocalTransitionsList);
+                                      states, transitions);
       addAutomaton(ident, aut);
       mSourceInfoBuilder.add(aut, comp);
       return aut;
     } finally {
       mCurrentComponent = null;
-      mPrecompiledNodesMap = null;
-      mLocalStatesMap = null;
-      mLocalStatesList = null;
-      mLocalEventsSet = null;
+      mLocalEventsMap = null;
       mLocalEventsList = null;
+      mPrecompiledNodesMap = null;
+      mLocalStateNames = null;
       mLocalTransitionsList = null;
+      mMaxInitialStates = 0;
+      mNumReachableStates = 0;
+      mNumReachableTransitions = 0;
     }
   }
 
   public CompiledNode visitSimpleNodeProxy(final SimpleNodeProxy node)
     throws VisitorException
   {
-    final String name = node.getName();
-    final boolean initial = node.isInitial();
-    final EventListExpressionProxy nodeprops = node.getPropositions();
-    final List<EventProxy> stateprops =
-      visitEventListExpressionProxy(nodeprops);
-    if (initial) {
-      switch (mMaxInitialStates) {
-      case 1:
-        mMaxInitialStates = 0;
-        break;
-      case 0:
-        final NondeterministicModuleException exception =
-          new NondeterministicModuleException(mCurrentComponent, node);
-        throw wrap(exception);
-      default:
-        break;
+    try {
+      final String name = node.getName();
+      if (!mLocalStateNames.add(name)) {
+        throw new DuplicateIdentifierException(name, "state", node);
       }
+      if (node.isInitial()) {
+        switch (mMaxInitialStates) {
+        case 1:
+          mMaxInitialStates = 0;
+          break;
+        case 0:
+          throw new NondeterministicModuleException(mCurrentComponent, node);
+        default:
+          break;
+        }
+      }
+      mCurrentSource = new CompiledSimpleNode(node);
+      mPrecompiledNodesMap.put(node, mCurrentSource);
+      final PlainEventListProxy elist = node.getPropositions();
+      visitPlainEventListProxy(elist);
+      return mCurrentSource;
+    } catch (final EvalException exception) {
+      throw wrap(exception);
+    } finally {
+      mCurrentSource = null;
     }
-    final StateProxy state =
-      mFactory.createStateProxy(name, initial, stateprops);
-    mSourceInfoBuilder.add(state, node);
-    return addLocalState(state, node);
   }
 
 
@@ -309,117 +375,453 @@ public class ModuleGraphCompiler extends AbstractModuleProxyVisitor
 
   private void addLocalEvent(final EventProxy event)
   {
-    if (mLocalEventsSet.add(event)) {
+    if (!mLocalEventsMap.containsKey(event)) {
+      final SelfloopInfo info = new SelfloopInfo();
+      mLocalEventsMap.put(event, info);
       mLocalEventsList.add(event);
     }
   }
 
-  private CompiledNode addLocalState(final StateProxy state,
-                                     final SimpleNodeProxy node)
-    throws VisitorException
+  private SelfloopInfo getSelfloopInfo(final EventProxy event)
   {
-    final String name = state.getName();
-    if (mLocalStatesMap.containsKey(name)) {
-      final DuplicateIdentifierException exception =
-        new DuplicateIdentifierException(name, "state", node);
-      throw wrap(exception);
-    }
-    mLocalStatesMap.put(name, state);
-    mLocalStatesList.add(state);
-    final CompiledNode compiled = new CompiledNode(node, state);
-    mPrecompiledNodesMap.put(node, compiled);
-    return compiled;
+    return mLocalEventsMap.get(event);
   }
 
-  private void createTransitions(final NodeProxy source,
-                                 final List<EventProxy> events,
-                                 final NodeProxy target,
-                                 final CompiledNode groupEntry,
-                                 final boolean deterministic,
-                                 final List<Proxy> origs)
-    throws VisitorException
+  private void removeSelfloopedEvents(final List<EventProxy> list)
   {
-    if (source instanceof SimpleNodeProxy) {
-      final SimpleNodeProxy simpleSource = (SimpleNodeProxy) source;
-      createTransitions(simpleSource, events, target,
-                        groupEntry, deterministic, origs);
-    } else {
-      for (final NodeProxy child : source.getImmediateChildNodes()) {
-        createTransitions(child, events, target,
-                          groupEntry, deterministic, origs);
-      }
-    }
-  }
-
-  private void createTransitions(final SimpleNodeProxy source,
-                                 final List<EventProxy> events,
-                                 final NodeProxy target,
-                                 final CompiledNode groupEntry,
-                                 final boolean deterministic,
-                                 final List<Proxy> origs)
-    throws VisitorException
-  {
-    if (target instanceof SimpleNodeProxy) {
-      final SimpleNodeProxy simpleTarget = (SimpleNodeProxy) target;
-      createTransitions(source, events, simpleTarget,
-                        groupEntry, deterministic, origs);
-    } else {
-      for (final NodeProxy child : target.getImmediateChildNodes()) {
-        createTransitions(source, events, child,
-                          groupEntry, deterministic, origs);
-      }
-    }
-  }
-
-  private void createTransitions(final SimpleNodeProxy source,
-                                 final List<EventProxy> events,
-                                 final SimpleNodeProxy target,
-                                 final CompiledNode groupEntry,
-                                 final boolean deterministic,
-                                 final List<Proxy> origs)
-    throws VisitorException
-  {
-    final CompiledNode sourceEntry = mPrecompiledNodesMap.get(source);
-    final CompiledNode targetEntry = mPrecompiledNodesMap.get(target);
-    final StateProxy sourceState = sourceEntry.getState();
-    final StateProxy targetState = targetEntry.getState();
-    final Iterator<Proxy> origIter = origs.iterator();
-    for (final EventProxy event : events) {
-      final Proxy orig = origIter.next();
-      CompiledTransition duplicate = null;
-      boolean create = true;
-      final Collection<CompiledTransition> compiledTransitions =
-        sourceEntry.getCompiledTransitions(event);
-      for (final CompiledTransition ctrans : compiledTransitions) {
-        if (ctrans.getTarget() == targetEntry.getState()) {
-          duplicate = ctrans;
-          continue;
-        }
-        final NodeProxy cause = ctrans.getGroup();
-        if (groupEntry.hasProperChildNode(cause)) {
-          create = false;
-          break;
-        } else if (deterministic) {
-          final NondeterministicModuleException exception =
-            new NondeterministicModuleException
-            (mCurrentComponent, source, event);
-          throw wrap(exception);
+    if (list != null) {
+      final Iterator<EventProxy> iter = list.iterator();
+      while (iter.hasNext()) {
+        final EventProxy event = iter.next();
+        final SelfloopInfo info = getSelfloopInfo(event);
+        if (info.isAllSelfloops()) {
+          iter.remove();
         }
       }
-      if (create) {
-        final NodeProxy group = groupEntry.getNode();
-        final TransitionProxy trans;
-        if (duplicate == null) {
-          trans = mFactory.createTransitionProxy
-            (sourceState, event, targetState);
-          mLocalTransitionsList.add(trans);
+    }
+  }
+
+
+  //#########################################################################
+  //# Inner Class CompiledNode
+  private abstract class CompiledNode {
+
+    //#######################################################################
+    //# Constructors
+    CompiledNode(final NodeProxy node)
+    {
+      mNode = node;
+      mEdges = new LinkedList<EdgeProxy>();
+    }
+
+    //#######################################################################
+    //# Simple Access
+    NodeProxy getNode()
+    {
+      return mNode;
+    }
+
+    void addEdge(final EdgeProxy edge)
+    {
+      mEdges.add(edge);
+    }
+
+    List<EdgeProxy> getEdges()
+    {
+      return mEdges;
+    }
+
+    abstract boolean isInitial();
+
+    abstract boolean isReachable();
+
+    //#######################################################################
+    //# Algorithms
+    abstract void addProposition(EventProxy event);
+
+    abstract void addTransitionFrom(CompiledNode source,
+                                    EventProxy event,
+                                    CompiledNode cause,
+                                    Proxy orig)
+      throws NondeterministicModuleException;
+
+    abstract void addTransitionTo(CompiledSimpleNode target,
+                                  EventProxy event,
+                                  CompiledNode cause,
+                                  Proxy orig)
+      throws NondeterministicModuleException;
+
+    abstract boolean hasProperChildNode(CompiledNode node);
+
+    abstract void explore();
+
+    abstract StateProxy createStateProxy();
+
+    //#######################################################################
+    //# Data Members
+    private final NodeProxy mNode;
+    private final List<EdgeProxy> mEdges;
+
+  }
+
+
+  //#########################################################################
+  //# Inner Class CompiledSimpleNode
+  private class CompiledSimpleNode extends CompiledNode {
+
+    //#######################################################################
+    //# Constructors
+    CompiledSimpleNode(final SimpleNodeProxy node)
+    {
+      super(node);
+      mPropositions = null;
+      mOutgoingTransitions =
+        new HashMap<EventProxy,List<CompiledTransition>>();
+      mState = null;
+    }
+
+    //#######################################################################
+    //# Simple Access
+    SimpleNodeProxy getNode()
+    {
+      return (SimpleNodeProxy) super.getNode();
+    }
+
+    boolean isInitial()
+    {
+      return getNode().isInitial();
+    }
+
+    boolean isReachable()
+    {
+      return mIsReachable;
+    }
+
+    //#######################################################################
+    //# Specific Access
+    StateProxy getState()
+    {
+      return mState;
+    }
+
+    //#######################################################################
+    //# Algorithms
+    void addProposition(final EventProxy event)
+    {
+      if (mPropositions == null) {
+        mPropositions = new LinkedList<EventProxy>();
+      }
+      if (!mPropositions.contains(event)) {
+        mPropositions.add(event);
+      }
+    }
+
+    void addTransitionFrom(final CompiledNode source,
+                           final EventProxy event,
+                           final CompiledNode cause,
+                           final Proxy loc)
+      throws NondeterministicModuleException
+    {
+      source.addTransitionTo(this, event, cause, loc);
+    }
+
+    void addTransitionTo(final CompiledSimpleNode target,
+                         final EventProxy event,
+                         final CompiledNode cause,
+                         final Proxy loc)
+      throws NondeterministicModuleException
+    {
+      List<CompiledTransition> transitions = mOutgoingTransitions.get(event);
+      if (transitions == null) {
+        transitions = new LinkedList<CompiledTransition>();
+        mOutgoingTransitions.put(event, transitions);
+      } else {
+        for (final CompiledTransition trans : transitions) {
+          if (trans.getTarget() == target) {
+            return;
+          } else if (mCurrentComponentIsDetermistic) {
+            final CompiledNode othercause = trans.getCause();
+            if (cause.hasProperChildNode(othercause)) {
+              return;
+            } else {
+              throw new NondeterministicModuleException
+                (mCurrentComponent, getNode(), event);
+            }
+          }
+        }
+      }
+      final CompiledTransition trans =
+        new CompiledTransition(this, event, target, cause, loc);
+      transitions.add(trans);
+      mLocalTransitionsList.add(trans);
+    }
+
+    boolean hasProperChildNode(final CompiledNode node)
+    {
+      return false;
+    }
+    
+    void explore()
+    {
+      if (!mIsReachable) {
+        mIsReachable = true;
+        mNumReachableStates++;
+        if (mPropositions != null) {
+          for (final EventProxy prop : mPropositions) {
+            final SelfloopInfo info = getSelfloopInfo(prop);
+            info.addSelfloop();
+          }
+        }
+        final Collection<List<CompiledTransition>> outgoing =
+          mOutgoingTransitions.values();
+        for (final List<CompiledTransition> list : outgoing) {
+          for (final CompiledTransition trans : list) {
+            final CompiledSimpleNode target = trans.getTarget();
+            target.explore();
+            trans.explore();
+          }
+        }
+      }
+    }
+
+    //#######################################################################
+    //# Specific Algorithms
+    StateProxy createStateProxy()
+    {
+      if (mState == null && mIsReachable) {
+        final SimpleNodeProxy node = getNode();
+        final String name = node.getName();
+        final boolean initial = node.isInitial();
+        removeSelfloopedEvents(mPropositions);
+        mState = mFactory.createStateProxy(name, initial, mPropositions);
+        mSourceInfoBuilder.add(mState, node);
+      }
+      return mState;
+    }
+
+    //#######################################################################
+    //# Data Members
+    private List<EventProxy> mPropositions;
+    private Map<EventProxy,List<CompiledTransition>> mOutgoingTransitions;
+    private boolean mIsReachable;
+    private StateProxy mState;
+
+  }
+
+
+  //#########################################################################
+  //# Inner Class CompiledGroupNode
+  private class CompiledGroupNode extends CompiledNode {
+
+    //#######################################################################
+    //# Constructors
+    CompiledGroupNode(final GroupNodeProxy group)
+    {
+      super(group);
+      final int numchildren = group.getImmediateChildNodes().size();
+      mImmediateChildNodes = new ArrayList<CompiledNode>(numchildren);
+    }
+
+    //#######################################################################
+    //# Simple Access
+    GroupNodeProxy getNode()
+    {
+      return (GroupNodeProxy) super.getNode();
+    }
+
+    boolean isInitial()
+    {
+      return false;
+    }
+
+    boolean isReachable()
+    {
+      return false;
+    }
+
+    //#######################################################################
+    //# Specific Access
+    void addImmediateChildNode(final CompiledNode child)
+    {
+      mImmediateChildNodes.add(child);
+    }
+
+    //#######################################################################
+    //# Algorithms
+    void addProposition(final EventProxy event)
+    {
+      for (final CompiledNode child : mImmediateChildNodes) {
+        child.addProposition(event);
+      }
+    }
+
+    void addTransitionFrom(final CompiledNode source,
+                           final EventProxy event,
+                           final CompiledNode cause,
+                           final Proxy loc)
+      throws NondeterministicModuleException
+    {
+      for (final CompiledNode child : mImmediateChildNodes) {
+        child.addTransitionFrom(source, event, cause, loc);
+      }
+    }
+
+    void addTransitionTo(final CompiledSimpleNode target,
+                         final EventProxy event,
+                         final CompiledNode cause,
+                         final Proxy loc)
+      throws NondeterministicModuleException
+    {
+      for (final CompiledNode child : mImmediateChildNodes) {
+        child.addTransitionTo(target, event, cause, loc);
+      }
+    }
+
+    boolean hasProperChildNode(final CompiledNode node)
+    {
+      for (final CompiledNode child : mImmediateChildNodes) {
+        if (child == node || child.hasProperChildNode(node)) {
+          return true;
+        }
+      }
+      return false;
+    }
+
+    void explore()
+    {
+    }
+
+    StateProxy createStateProxy()
+    {
+      return null;
+    }
+
+    //#######################################################################
+    //# Data Members
+    private final List<CompiledNode> mImmediateChildNodes;
+
+  }
+
+
+  //#########################################################################
+  //# Inner Class CompiledTransition
+  private class CompiledTransition {
+
+    //#######################################################################
+    //# Constructor
+    CompiledTransition(final CompiledSimpleNode source,
+                       final EventProxy event,
+                       final CompiledSimpleNode target,
+                       final CompiledNode cause,
+                       final Proxy loc)
+    {
+      mSource = source;
+      mEvent = event;
+      mTarget = target;
+      mCause = cause;
+      mLocation = loc;
+    }
+
+    //#######################################################################
+    //# Simple Access
+    CompiledSimpleNode getSource()
+    {
+      return mSource;
+    }
+
+    EventProxy getEvent()
+    {
+      return mEvent;
+    }
+
+    CompiledSimpleNode getTarget()
+    {
+      return mTarget;
+    }
+
+    CompiledNode getCause()
+    {
+      return mCause;
+    }
+
+    Proxy getLocation() 
+    {
+      return mLocation;
+    }
+
+    //#######################################################################
+    //# Algorithms
+    void explore()
+    {
+      final SelfloopInfo info = getSelfloopInfo(mEvent);
+      info.addTransition(mSource == mTarget);
+      mNumReachableTransitions++;
+    }
+
+    TransitionProxy createTransitionProxy()
+    {
+      final SelfloopInfo info = getSelfloopInfo(mEvent);
+      if (info.isAllSelfloops() || !mSource.isReachable()) {
+        return null;
+      } else {
+        final StateProxy sourcestate = mSource.getState();
+        final StateProxy targetstate = mTarget.getState();
+        final TransitionProxy trans =
+          mFactory.createTransitionProxy(sourcestate, mEvent, targetstate);
+        mSourceInfoBuilder.add(trans, mLocation);
+        return trans;
+      }
+    }
+
+    //#######################################################################
+    //# Data Members
+    private final CompiledSimpleNode mSource;
+    private final EventProxy mEvent;
+    private final CompiledSimpleNode mTarget;
+    private final CompiledNode mCause;
+    private final Proxy mLocation;
+
+  }
+
+
+  //#########################################################################
+  //# Inner Class SelfloopInfo
+  private class SelfloopInfo {
+
+    //#######################################################################
+    //# Constructor
+    private SelfloopInfo()
+    {
+      mNumSelfloops = 0;
+    }
+
+    //#######################################################################
+    //# Simple Access
+    void addSelfloop()
+    {
+      addTransition(true);
+    }
+
+    void addTransition(final boolean selfloop)
+    {
+      if (mNumSelfloops >= 0) {
+        if (selfloop) {
+          mNumSelfloops++;
         } else {
-          trans = duplicate.getTransition();
+          mNumSelfloops = -1;
         }
-        sourceEntry.addTransition(trans, group);
-        mSourceInfoBuilder.add(trans, orig);
       }
     }
+
+    boolean isAllSelfloops()
+    {
+      return mNumSelfloops == mNumReachableStates;
+    }
+
+    //#######################################################################
+    //# Data Members
+    private int mNumSelfloops;
+
   }
 
 
@@ -435,14 +837,17 @@ public class ModuleGraphCompiler extends AbstractModuleProxyVisitor
   private List<AutomatonProxy> mAutomataList;
 
   private SimpleComponentProxy mCurrentComponent;
-  private Set<EventProxy> mLocalEventsSet;
+  private boolean mCurrentComponentIsDetermistic;
+  private Map<EventProxy,SelfloopInfo> mLocalEventsMap;
   private List<EventProxy> mLocalEventsList;
   private Map<NodeProxy,CompiledNode> mPrecompiledNodesMap;
-  private Map<String,StateProxy> mLocalStatesMap;
-  private List<StateProxy> mLocalStatesList;
+  private Set<String> mLocalStateNames;
+  private List<CompiledTransition> mLocalTransitionsList;
   private int mMaxInitialStates;
-  private List<TransitionProxy> mLocalTransitionsList;
+  private int mNumReachableStates;
+  private int mNumReachableTransitions;
 
-  private List<EventProxy> mCurrentEventsList;
+  private CompiledNode mCurrentSource;
+  private CompiledNode mCurrentTarget;
 
 }

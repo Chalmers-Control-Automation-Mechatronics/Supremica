@@ -2,21 +2,25 @@
 <ProductDES Name="nodegroup2" xmlns="http://waters.sourceforge.net/xsd/des">
 <EventList>
 <Event Kind="CONTROLLABLE" Name="e"/>
+<Event Kind="CONTROLLABLE" Name="f"/>
 </EventList>
 <AutomataList>
 <Automaton Kind="SPEC" Name="nodegroup2">
 <EventRefList>
 <EventRef Name="e"/>
+<EventRef Name="f"/>
 </EventRefList>
 <StateList>
 <State Initial="true" Name="q0"/>
-<State Initial="false" Name="q1"/>
-<State Initial="false" Name="q2"/>
+<State Name="q1"/>
+<State Name="q2"/>
 </StateList>
 <TransitionList>
 <Transition Event="e" Source="q1" Target="q0"/>
 <Transition Event="e" Source="q0" Target="q0"/>
 <Transition Event="e" Source="q2" Target="q0"/>
+<Transition Event="f" Source="q0" Target="q1"/>
+<Transition Event="f" Source="q1" Target="q2"/>
 </TransitionList>
 </Automaton>
 </AutomataList>

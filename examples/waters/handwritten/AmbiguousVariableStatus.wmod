@@ -2,8 +2,6 @@
 <Module Name="AmbiguousVariableStatus" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
     <ns2:Comment></ns2:Comment>
     <EventDeclList>
-        <EventDecl Kind="PROPOSITION" Name=":accepting"/>
-        <EventDecl Kind="PROPOSITION" Name=":forbidden"/>
         <EventDecl Kind="UNCONTROLLABLE" Name="a"/>
         <EventDecl Kind="UNCONTROLLABLE" Name="b"/>
     </EventDeclList>

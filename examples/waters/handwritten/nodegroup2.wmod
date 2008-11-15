@@ -2,6 +2,7 @@
 <Module xmlns="http://waters.sourceforge.net/xsd/module" Name="nodegroup2">
 <EventDeclList>
 <EventDecl Name="e" Kind="CONTROLLABLE"/>
+<EventDecl Name="f" Kind="CONTROLLABLE"/>
 </EventDeclList>
 <ComponentList>
 <SimpleComponent Kind="SPEC">
@@ -32,6 +33,16 @@
 <Edge Source=":group2" Target="q0">
 <LabelBlock>
 <SimpleIdentifier Name="e"/>
+</LabelBlock>
+</Edge>
+<Edge Source="q0" Target="q1">
+<LabelBlock>
+<SimpleIdentifier Name="f"/>
+</LabelBlock>
+</Edge>
+<Edge Source="q1" Target="q2">
+<LabelBlock>
+<SimpleIdentifier Name="f"/>
 </LabelBlock>
 </Edge>
 </EdgeList>

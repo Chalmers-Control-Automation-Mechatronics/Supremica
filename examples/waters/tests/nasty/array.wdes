@@ -13,10 +13,11 @@
 </EventRefList>
 <StateList>
 <State Initial="true" Name="S0"/>
+<State Name="S1"/>
 </StateList>
 <TransitionList>
-<Transition Target="S0" Source="S0" Event="ar[0]"/>
-<Transition Target="S0" Source="S0" Event="ar[1]"/>
+<Transition Target="S1" Source="S0" Event="ar[0]"/>
+<Transition Target="S1" Source="S0" Event="ar[1]"/>
 </TransitionList>
 </Automaton>
 </AutomataList>

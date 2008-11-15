@@ -7,15 +7,10 @@
 <AutomataList>
 <Automaton Kind="SPEC" Name="never_blow_up">
 <EventRefList>
-<EventRef Name=":accepting"/>
 <EventRef Name="blow_up"/>
 </EventRefList>
 <StateList>
-<State Initial="true" Name="never">
-<EventRefList>
-<EventRef Name=":accepting"/>
-</EventRefList>
-</State>
+<State Initial="true" Name="never"/>
 </StateList>
 </Automaton>
 </AutomataList>

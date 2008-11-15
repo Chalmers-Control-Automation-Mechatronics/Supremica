@@ -12,11 +12,6 @@
 <EventRef Name=":accepting"/>
 </EventRefList>
 <StateList>
-<State Name="0">
-<EventRefList>
-<EventRef Name=":accepting"/>
-</EventRefList>
-</State>
 <State Initial="true" Name="1"/>
 </StateList>
 </Automaton>

@@ -42,22 +42,6 @@
                 <Transition Event="timeout[1]" Source="FLIP" Target="FLIP"/>
             </TransitionList>
         </Automaton>
-        <Automaton Kind="PLANT" Name="sensor_and_filter[1]">
-            <EventRefList>
-                <EventRef Name=":accepting"/>
-                <EventRef Name="new_value[1]"/>
-            </EventRefList>
-            <StateList>
-                <State Initial="true" Name="s0">
-                    <EventRefList>
-                        <EventRef Name=":accepting"/>
-                    </EventRefList>
-                </State>
-            </StateList>
-            <TransitionList>
-                <Transition Event="new_value[1]" Source="s0" Target="s0"/>
-            </TransitionList>
-        </Automaton>
         <Automaton Kind="PLANT" Name="timer[1]">
             <EventRefList>
                 <EventRef Name=":accepting"/>

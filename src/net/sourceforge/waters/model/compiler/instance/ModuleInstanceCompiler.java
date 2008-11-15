@@ -272,8 +272,9 @@ public class ModuleInstanceCompiler extends AbstractModuleProxyVisitor
       final List<SimpleExpressionProxy> declRanges = decl.getRanges();
       CompiledEvent event = binding == null ? null : binding.getEventValue();
       if (event == null) {
+        final int numranges = declRanges.size();
         final List<CompiledRange> ranges =
-          new ArrayList<CompiledRange>(declRanges.size());
+          new ArrayList<CompiledRange>(numranges);
         for (final SimpleExpressionProxy expr : declRanges) {
           final SimpleExpressionProxy value =
             mSimpleExpressionCompiler.eval(expr, mContext);
@@ -284,6 +285,10 @@ public class ModuleInstanceCompiler extends AbstractModuleProxyVisitor
         final CompiledEventDecl entry =
           new CompiledEventDecl(mNameSpace, decl, ranges);
         event = entry.getCompiledEvent();
+        if (numranges == 0) {
+          final CompiledSingleEvent single = (CompiledSingleEvent) event;
+          createEventDecl(single);
+        }
       } else {
         final EventKind kind = decl.getKind();
         final int mask = event.getKindMask();
@@ -800,8 +805,7 @@ public class ModuleInstanceCompiler extends AbstractModuleProxyVisitor
     IdentifierProxy ident = event.getIdentifier();
     if (ident == null) {
       final EventDeclProxy decl = createEventDecl(event);
-      ident = decl.getIdentifier();
-      event.setIdentifier(ident);
+      ident = event.getIdentifier();
     }
     final IdentifierProxy iclone = ident.clone();
     addSourceInfo(iclone, output);
@@ -824,6 +828,7 @@ public class ModuleInstanceCompiler extends AbstractModuleProxyVisitor
       (ident, kind, observable, ScopeKind.LOCAL, null, null);
     mCompiledEvents.add(decl);
     addSourceInfo(decl, edecl);
+    event.setIdentifier(ident);
     return decl;
   }
 

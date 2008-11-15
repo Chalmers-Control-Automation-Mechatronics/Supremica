@@ -13,7 +13,6 @@
 <StateList>
 <State Initial="true" Name="s0"/>
 <State Name="s1"/>
-<State Name="s2"/>
 </StateList>
 <TransitionList>
 <Transition Target="s1" Source="s0" Event="e1"/>

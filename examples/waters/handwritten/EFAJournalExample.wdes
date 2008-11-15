@@ -27,21 +27,6 @@
 <Transition Source="S1" Target="S0" Event="a.{v&lt;=1}"/>
 </TransitionList>
 </Automaton>
-<Automaton Kind="PLANT" Name="G">
-<EventRefList>
-<EventRef Name="a.{1&lt;v}"/>
-<EventRef Name="a.{v&lt;=1}"/>
-<EventRef Name="b"/>
-</EventRefList>
-<StateList>
-<State Initial="true" Name="S0"/>
-</StateList>
-<TransitionList>
-<Transition Source="S0" Target="S0" Event="a.{1&lt;v}"/>
-<Transition Source="S0" Target="S0" Event="a.{v&lt;=1}"/>
-<Transition Source="S0" Target="S0" Event="b"/>
-</TransitionList>
-</Automaton>
 <Automaton Kind="PLANT" Name="v">
 <EventRefList>
 <EventRef Name="a.{1&lt;v}"/>

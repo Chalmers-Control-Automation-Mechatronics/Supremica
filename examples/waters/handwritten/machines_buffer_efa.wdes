@@ -54,22 +54,11 @@
 </Automaton>
 <Automaton Kind="SPEC" Name="BufferSize">
 <EventRefList>
-<EventRef Name=":accepting"/>
-<EventRef Name="finish1.{items&lt;2}"/>
 <EventRef Name="finish1.{2&lt;=items}"/>
-<EventRef Name="start2"/>
 </EventRefList>
 <StateList>
-<State Initial="true" Name="S0">
-<EventRefList>
-<EventRef Name=":accepting"/>
-</EventRefList>
-</State>
+<State Initial="true" Name="S0"/>
 </StateList>
-<TransitionList>
-<Transition Source="S0" Target="S0" Event="finish1.{items&lt;2}"/>
-<Transition Source="S0" Target="S0" Event="start2"/>
-</TransitionList>
 </Automaton>
 <Automaton Kind="PLANT" Name="items">
 <EventRefList>

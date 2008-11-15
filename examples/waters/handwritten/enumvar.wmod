@@ -46,6 +46,34 @@
                             </LabelGeometry>
                         </GuardActionBlock>
                     </Edge>
+                    <Edge Target="S0" Source="S0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="e"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-8" X="-28"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="152" X="170"/>
+                        </SplineGeometry>
+                        <GuardActionBlock>
+                            <Guards>
+                                <BinaryExpression Operator="==">
+                                    <SimpleIdentifier Name="enumvar"/>
+                                    <SimpleIdentifier Name="b"/>
+                                </BinaryExpression>
+                            </Guards>
+                            <Actions>
+                                <BinaryExpression Operator="=">
+                                    <SimpleIdentifier Name="enumvar"/>
+                                    <SimpleIdentifier Name="c"/>
+                                </BinaryExpression>
+                            </Actions>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="6" X="-26"/>
+                            </LabelGeometry>
+                        </GuardActionBlock>
+                    </Edge>
                 </EdgeList>
             </Graph>
         </SimpleComponent>

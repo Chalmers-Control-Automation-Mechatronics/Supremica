@@ -252,22 +252,13 @@
         </Automaton>
         <Automaton Kind="PLANT" Name="planhalt">
             <EventRefList>
-                <EventRef Name=":accepting"/>
                 <EventRef Name="bereitFahrt"/>
                 <EventRef Name="zugAn[PH]"/>
                 <EventRef Name="zugAn[WH]"/>
             </EventRefList>
             <StateList>
-                <State Name="inPlanhalt">
-                    <EventRefList>
-                        <EventRef Name=":accepting"/>
-                    </EventRefList>
-                </State>
-                <State Initial="true" Name="notInPlanhalt">
-                    <EventRefList>
-                        <EventRef Name=":accepting"/>
-                    </EventRefList>
-                </State>
+                <State Name="inPlanhalt"/>
+                <State Initial="true" Name="notInPlanhalt"/>
             </StateList>
             <TransitionList>
                 <Transition Event="zugAn[PH]" Source="notInPlanhalt" Target="inPlanhalt"/>

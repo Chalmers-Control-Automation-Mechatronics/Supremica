@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<ProductDES Name="colours" xmlns="http://waters.sourceforge.net/xsd/des">
+<ProductDES Name="colours"
+   xmlns:ns2="http://waters.sourceforge.net/xsd/base"
+   xmlns="http://waters.sourceforge.net/xsd/des">
+<ns2:Comment>A simple test to see whether coloured markings are displayed and compiled correctly.</ns2:Comment>
 <EventList>
 <Event Kind="PROPOSITION" Name="blue"/>
 <Event Kind="PROPOSITION" Name="cyan"/>
@@ -19,12 +22,12 @@
 <EventRef Name="yellow"/>
 </EventRefList>
 <StateList>
-<State Name="default">
+<State Name="default" Initial="true">
 <EventRefList>
 <EventRef Name="default"/>
 </EventRefList>
 </State>
-<State Name="more_than_four">
+<State Name="more_than_four" Initial="true">
 <EventRefList>
 <EventRef Name="blue"/>
 <EventRef Name="cyan"/>
@@ -33,25 +36,25 @@
 <EventRef Name="yellow"/>
 </EventRefList>
 </State>
-<State Name="red">
+<State Name="red" Initial="true">
 <EventRefList>
 <EventRef Name="red"/>
 </EventRefList>
 </State>
-<State Name="red_green">
+<State Name="red_green" Initial="true">
 <EventRefList>
 <EventRef Name="green"/>
 <EventRef Name="red"/>
 </EventRefList>
 </State>
-<State Name="red_green_blue">
+<State Name="red_green_blue" Initial="true">
 <EventRefList>
 <EventRef Name="blue"/>
 <EventRef Name="green"/>
 <EventRef Name="red"/>
 </EventRefList>
 </State>
-<State Name="red_green_blue_default">
+<State Name="red_green_blue_default" Initial="true">
 <EventRefList>
 <EventRef Name="blue"/>
 <EventRef Name="default"/>

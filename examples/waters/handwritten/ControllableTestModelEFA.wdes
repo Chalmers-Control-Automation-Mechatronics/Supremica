@@ -21,17 +21,6 @@
 <Transition Source="S1" Target="S0" Event="u"/>
 </TransitionList>
 </Automaton>
-<Automaton Kind="PLANT" Name="P2">
-<EventRefList>
-<EventRef Name="a"/>
-</EventRefList>
-<StateList>
-<State Initial="true" Name="S0"/>
-</StateList>
-<TransitionList>
-<Transition Source="S0" Target="S0" Event="a"/>
-</TransitionList>
-</Automaton>
 <Automaton Kind="SPEC" Name="S1">
 <EventRefList>
 <EventRef Name="a"/>

@@ -121,17 +121,6 @@
 <State Initial="true" Name="JELLY"/>
 </StateList>
 </Automaton>
-<Automaton Kind="PLANT" Name="Jelly">
-<EventRefList>
-<EventRef Name="jelly"/>
-</EventRefList>
-<StateList>
-<State Initial="true" Name="JELLY"/>
-</StateList>
-<TransitionList>
-<Transition Source="JELLY" Target="JELLY" Event="jelly"/>
-</TransitionList>
-</Automaton>
 <Automaton Kind="PLANT" Name="vout">
 <EventRefList>
 <EventRef Name="open_in"/>
