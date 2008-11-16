@@ -8,7 +8,6 @@
 <Event Kind="CONTROLLABLE" Name="exit"/>
 <Event Kind="CONTROLLABLE" Name="pickup"/>
 <Event Kind="CONTROLLABLE" Name="unlock"/>
-<Event Kind="PROPOSITION" Name=":accepting"/>
 </EventList>
 <AutomataList>
 <Automaton Kind="PLANT" Name="door_norock">

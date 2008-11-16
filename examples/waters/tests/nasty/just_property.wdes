@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<ProductDES Name="just_property"
+  xmlns:ns2="http://waters.sourceforge.net/xsd/base"
+  xmlns="http://waters.sourceforge.net/xsd/des">
+<ns2:Comment>A simple test involving a blocked-events list in a property automaton.</ns2:Comment>
+<EventList>
+<Event Kind="UNCONTROLLABLE" Name="bad"/>
+<Event Kind="CONTROLLABLE" Name="loop"/>
+</EventList>
+<AutomataList>
+<Automaton Kind="PROPERTY" Name="the_property">
+<EventRefList>
+<EventRef Name="bad"/>
+<EventRef Name="loop"/>
+</EventRefList>
+<StateList>
+<State Initial="true" Name="S0"/>
+</StateList>
+</Automaton>
+</AutomataList>
+</ProductDES>

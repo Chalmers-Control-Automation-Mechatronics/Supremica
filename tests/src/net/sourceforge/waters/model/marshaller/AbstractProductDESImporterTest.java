@@ -62,6 +62,12 @@ public abstract class AbstractProductDESImporterTest
     testImport("handwritten", "transferline-2.wdes");
   }
 
+  public void testJustProperty()
+    throws Exception
+  {
+    testImport("tests", "nasty", "just_property.wdes");
+  }
+
   public void testProfisafeI4Slave()
     throws Exception
   {
@@ -72,12 +78,6 @@ public abstract class AbstractProductDESImporterTest
     throws Exception
   {
     testImport("tests", "profisafe", "profisafe_o4_host.wdes");
-  }
-
-  public void testNever()
-    throws Exception
-  {
-    testImport("valid", "border_cases", "never_blow_up.wdes");
   }
 
   public void testDebounce()

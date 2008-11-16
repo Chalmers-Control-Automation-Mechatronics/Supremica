@@ -176,6 +176,10 @@ public final class Config
     public static final BooleanProperty INCLUDE_INSTANTION =
       new BooleanProperty(PropertyType.GUI, "includeInstantiation", true,
 			  "Enable instantiation and other advanced features");
+    public static final BooleanProperty OPTIMIZING_COMPILER =
+      new BooleanProperty(PropertyType.GUI, "optimizingCompiler", true,
+			  "Remove redundant events, transitions, and components " +
+              "when compiling");
     public static final BooleanProperty USE_EVENT_ALPHABET =
       new BooleanProperty(PropertyType.GUI, "useEventAlphabet", true,
 			  "Use per-event alphabet when compiling EFA");

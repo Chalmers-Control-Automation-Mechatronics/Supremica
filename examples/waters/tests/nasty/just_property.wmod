@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<Module Name="just_property" xmlns="http://waters.sourceforge.net/xsd/module">
+<Module Name="just_property"
+  xmlns:ns2="http://waters.sourceforge.net/xsd/base"
+  xmlns="http://waters.sourceforge.net/xsd/module">
+<ns2:Comment>A simple test involving a blocked-events list in a property automaton.</ns2:Comment>
 <EventDeclList>
 <EventDecl Kind="UNCONTROLLABLE" Name="bad"/>
 <EventDecl Kind="CONTROLLABLE" Name="loop"/>

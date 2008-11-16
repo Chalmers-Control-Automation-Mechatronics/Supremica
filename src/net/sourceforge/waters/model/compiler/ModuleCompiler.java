@@ -61,6 +61,7 @@ public class ModuleCompiler
     final ModuleProxyFactory modfactory = ModuleElementFactory.getInstance();
     final ModuleInstanceCompiler pass1 = new ModuleInstanceCompiler
       (mDocumentManager, modfactory, mSourceInfoBuilder, mInputModule);
+    pass1.setOptimizationEnabled(mIsOptimizationEnabled);
     final ModuleProxy step1 = pass1.compile(bindings);
     final boolean efa = pass1.getHasEFAElements();
     final ModuleProxy step2;
@@ -74,6 +75,7 @@ public class ModuleCompiler
     mSourceInfoBuilder.shift();
     final ModuleGraphCompiler pass3 =
       new ModuleGraphCompiler(mFactory, mSourceInfoBuilder, step2);
+    pass3.setOptimizationEnabled(mIsOptimizationEnabled);
     final ProductDESProxy des = pass3.compile();
     setLocation(des);
     return des;
@@ -87,6 +89,16 @@ public class ModuleCompiler
 
   //##########################################################################
   //# Configuration
+  public boolean isOptimizationEnabled()
+  {
+    return mIsOptimizationEnabled;
+  }
+
+  public void setOptimizationEnabled(final boolean enable)
+  {
+    mIsOptimizationEnabled = enable;
+  }
+
   public boolean isExpandingEFATransitions()
   {
     return mIsExpandingEFATransitions;
@@ -135,6 +147,7 @@ public class ModuleCompiler
   private final SourceInfoBuilder mSourceInfoBuilder;
   private final ModuleProxy mInputModule;
 
+  private boolean mIsOptimizationEnabled = true;
   private boolean mIsExpandingEFATransitions = true;
   private boolean mIsUsingEventAlphabet = true;
 

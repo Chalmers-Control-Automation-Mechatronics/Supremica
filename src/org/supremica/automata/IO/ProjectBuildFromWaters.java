@@ -89,10 +89,10 @@ public class ProjectBuildFromWaters
     //# Data Members
     private final ProjectFactory mProjectFactory;
     private final DocumentManager mDocumentManager;
-    
+
     private static final Logger logger =
         LoggerFactory.createLogger(ProjectBuildFromWaters.class);
-    
+
     //# Constructors
     /**
      * Creates a WATERS-to-Supremica converter using a default project
@@ -108,7 +108,7 @@ public class ProjectBuildFromWaters
     {
         this(manager, new DefaultProjectFactory());
     }
-    
+
     /**
      * Creates a WATERS-to-Supremica converter.
      * @param  manager  The document manager used when compiling WATERS
@@ -126,8 +126,8 @@ public class ProjectBuildFromWaters
         mDocumentManager = manager;
         mProjectFactory = factory;
     }
-    
-    
+
+
     //#######################################################################
     //# Invocation
     /**
@@ -139,15 +139,13 @@ public class ProjectBuildFromWaters
      * @throws EvalException to indicate that compilation of the module
      *                  has failed.
      */
-    public Project build(ModuleProxy module)
-    throws EvalException
+    public Project build(final ModuleProxy module)
+		throws EvalException
     {
-        if (module == null)
-        {
+        if (module == null) {
             throw new NullPointerException("argument must be non null");
         }
 		final boolean expand = Config.EXPAND_EXTENDED_AUTOMATA.isTrue();
-		final boolean ealpha = Config.USE_EVENT_ALPHABET.isTrue();
         final ProductDESProxyFactory factory =
             ProductDESElementFactory.getInstance();
 		final ProductDESProxy des;
@@ -157,15 +155,18 @@ public class ProjectBuildFromWaters
 			compiler.setExpandingEFATransitions(expand);
 			des = compiler.compile();
 		} else {
+			final boolean optimize = Config.OPTIMIZING_COMPILER.isTrue();
+			final boolean ealpha = Config.USE_EVENT_ALPHABET.isTrue();
 			final ModuleCompiler compiler =
 				new ModuleCompiler(mDocumentManager, factory, module);
+			compiler.setOptimizationEnabled(optimize);
 			compiler.setExpandingEFATransitions(expand);
 			compiler.setUsingEventAlphabet(ealpha);
 			des = compiler.compile();
 		}
         return build(des);
     }
-    
+
     /**
      * Converts a WATERS product DES to a Supremica project.
      * @param  des      The WATERS product DES to be converted.
@@ -180,7 +181,7 @@ public class ProjectBuildFromWaters
         final Project currProject = mProjectFactory.getProject();
         currProject.setName(des.getName());
         currProject.setComment(des.getComment());
-        
+
         for (final AutomatonProxy aut : des.getAutomata())
         {
             final Automaton supaut = build(aut);
@@ -188,7 +189,7 @@ public class ProjectBuildFromWaters
         }
         return currProject;
     }
-    
+
     /**
      * Converts a WATERS automaton to a Supremica automaton.
      * @param  aut      The WATERS automaton to be converted.
@@ -202,10 +203,10 @@ public class ProjectBuildFromWaters
     {
         final Automaton supaut = new Automaton(aut.getName());
         supaut.setCorrespondingAutomatonProxy(aut);
-        
+
         //System.err.println("Automaton: " + aut.getName());
         supaut.setType(AutomatonType.toType(aut.getKind()));
-        
+
         // Create the alphabet
         EventProxy marking = null;
         EventProxy forbidden = null;
@@ -237,7 +238,7 @@ public class ProjectBuildFromWaters
                     break;
             }
         }
-        
+
         // Create states
         for (final StateProxy currWatersState : aut.getStates())
         {
@@ -265,7 +266,7 @@ public class ProjectBuildFromWaters
             // Add to automaton
             supaut.addState(currSupremicaState);
         }
-        
+
         // Create transitions
         for (final TransitionProxy currWatersTransition :
             aut.getTransitions())
@@ -284,13 +285,13 @@ public class ProjectBuildFromWaters
                 supremicaEvent);
             supaut.addArc(currSupremicaArc);
         }
-            
+
         addCostToStates(supaut);
-        addProbabilityToTransitions(supaut);    
-            
+        addProbabilityToTransitions(supaut);
+
         return supaut;
     }
-    
+
     /**
      * Converts a collection of WATERS events to a Supremica alphabet.
      * @param  events   The WATERS events to be converted.
@@ -311,33 +312,33 @@ public class ProjectBuildFromWaters
         }
         return alphabet;
     }
-    
+
     /**
-     * Goes through the states of the supplied automaton and adds costs if the 
+     * Goes through the states of the supplied automaton and adds costs if the
      * code name, "cost", is found in the WATERS product DES.
      *
      * @param   aut The automaton that may need addition of cost to its states
-     */ 
+     */
     private void addCostToStates(Automaton aut)
         throws EvalException
-    {       
+    {
         for (Iterator<State> stateIt = aut.iterator(); stateIt.hasNext();)
         {
             State state = stateIt.next();
-            String stateName = state.getName();           
+            String stateName = state.getName();
             if (stateName.contains("cost") && stateName.contains("="))
             {
                 int pivotIndex = stateName.indexOf("cost");
                 String prefixStr = stateName.substring(0, pivotIndex);
                 String suffixStr = stateName.substring(pivotIndex);
                 double costValue = -1;
-                
+
                 // Find the first numerical value, following the 'cost'-keyword (that is our state cost)
                 try
                 {
                     StreamTokenizer tokenizer = new StreamTokenizer(new StringReader(suffixStr));
                     tokenizer.parseNumbers();
-                    
+
                     int type = tokenizer.nextToken();
                     while (type != tokenizer.TT_EOF)
                     {
@@ -345,7 +346,7 @@ public class ProjectBuildFromWaters
                         {
                             costValue = tokenizer.nval;
                         }
-                        
+
                         type = tokenizer.nextToken();
                     }
                 }
@@ -365,14 +366,14 @@ public class ProjectBuildFromWaters
                     {
                         prefixStr = prefixStr.substring(0, prefixStr.lastIndexOf(","));
                     }
-                    
+
                     // Find the actual cost string (note that integer cost values must be re-casted into int.
                     String costStr = "cost=" + costValue;
                     if (!suffixStr.startsWith(costStr))
                     {
                         costStr = "cost=" + (int)costValue;
                     }
-                    
+
                     // Remove the cost string from the suffix and construct the state name
                     suffixStr = suffixStr.substring(costStr.length());
                     state.setName(prefixStr + suffixStr);
@@ -382,12 +383,12 @@ public class ProjectBuildFromWaters
             }
         }
     }
-    
+
     private void addProbabilityToTransitions(Automaton aut)
     {
         ArrayList<Arc> arcsToBeRemoved = new ArrayList<Arc>();
         ArrayList<Arc> arcsToBeAdded = new ArrayList<Arc>();
-        
+
         for (Iterator<Arc> arcIt = aut.arcIterator(); arcIt.hasNext();)
         {
             Arc arc = arcIt.next();
@@ -399,32 +400,32 @@ public class ProjectBuildFromWaters
                 {
                     percentage = new Double(label.substring(label.lastIndexOf("prob_") + 5).trim());
                 }
-                catch (NumberFormatException e) 
+                catch (NumberFormatException e)
                 {
                     logger.error("Parsing of transition named " + label + " failed.");
                 }
-                
+
                 if (percentage != null)
                 {
                     label = label.substring(0, label.indexOf("prob_")).trim();
-                    if (label.endsWith("_")) 
+                    if (label.endsWith("_"))
                     {
                         label = label.substring(0, label.length()-1);
-                    } 
-                    
+                    }
+
                     LabeledEvent newEvent = new LabeledEvent(label);
                     Arc newArc = new Arc(arc.getSource(), arc.getTarget(), newEvent, percentage/100);
                     if (! aut.getAlphabet().contains(newEvent))
                     {
                         aut.getAlphabet().addEvent(newEvent);
                     }
-                    
+
                     arcsToBeAdded.add(newArc);
                     arcsToBeRemoved.add(arc);
                 }
             }
         }
-        
+
         for (int i=0; i<arcsToBeRemoved.size(); i++)
         {
             aut.removeArc(arcsToBeRemoved.get(i));

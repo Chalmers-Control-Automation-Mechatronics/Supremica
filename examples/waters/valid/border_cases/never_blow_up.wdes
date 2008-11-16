@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <ProductDES Name="never_blow_up" xmlns="http://waters.sourceforge.net/xsd/des">
 <EventList>
-<Event Kind="PROPOSITION" Name=":accepting"/>
 <Event Kind="UNCONTROLLABLE" Name="blow_up"/>
 </EventList>
 <AutomataList>

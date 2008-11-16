@@ -1,0 +1,1904 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<ProductDES Name="Passenger Land-Transportation System" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/des">
+<ns2:Comment>Adapted from 'Supervising Passenger Land-Transportation Systems' by K.T. Seow and M. Pasquier. The system is controllable and nonblocking. This is a model of a traffic system where a number of vehicles are serving a number of travelers. The parameters n and m represent the number of vehicles and travellers respectively. The parametrisation does not work here however, since the models 'FleetServiceDiligence' and 'VehicleAssignmentQueueCapacity' (maybe others too?) needs to have a parametrisable number of states which is currently not supported. So n is fixed at 3 and m is fixed at 4. Plant size: 559872 states, specification size: 9720000 states, plant||specification size: 4907968 states.</ns2:Comment>
+<EventList>
+<Event Kind="CONTROLLABLE" Name="ad[1]"/>
+<Event Kind="CONTROLLABLE" Name="ad[2]"/>
+<Event Kind="CONTROLLABLE" Name="ad[3]"/>
+<Event Kind="CONTROLLABLE" Name="ad[4]"/>
+<Event Kind="CONTROLLABLE" Name="as[1][1]"/>
+<Event Kind="CONTROLLABLE" Name="as[1][2]"/>
+<Event Kind="CONTROLLABLE" Name="as[1][3]"/>
+<Event Kind="CONTROLLABLE" Name="as[2][1]"/>
+<Event Kind="CONTROLLABLE" Name="as[2][2]"/>
+<Event Kind="CONTROLLABLE" Name="as[2][3]"/>
+<Event Kind="CONTROLLABLE" Name="as[3][1]"/>
+<Event Kind="CONTROLLABLE" Name="as[3][2]"/>
+<Event Kind="CONTROLLABLE" Name="as[3][3]"/>
+<Event Kind="CONTROLLABLE" Name="as[4][1]"/>
+<Event Kind="CONTROLLABLE" Name="as[4][2]"/>
+<Event Kind="CONTROLLABLE" Name="as[4][3]"/>
+<Event Kind="UNCONTROLLABLE" Name="dwn[1]"/>
+<Event Kind="UNCONTROLLABLE" Name="dwn[2]"/>
+<Event Kind="UNCONTROLLABLE" Name="dwn[3]"/>
+<Event Kind="CONTROLLABLE" Name="ecall[1][1]"/>
+<Event Kind="CONTROLLABLE" Name="ecall[1][2]"/>
+<Event Kind="CONTROLLABLE" Name="ecall[1][3]"/>
+<Event Kind="CONTROLLABLE" Name="ecall[2][1]"/>
+<Event Kind="CONTROLLABLE" Name="ecall[2][2]"/>
+<Event Kind="CONTROLLABLE" Name="ecall[2][3]"/>
+<Event Kind="CONTROLLABLE" Name="ecall[3][1]"/>
+<Event Kind="CONTROLLABLE" Name="ecall[3][2]"/>
+<Event Kind="CONTROLLABLE" Name="ecall[3][3]"/>
+<Event Kind="CONTROLLABLE" Name="ecall[4][1]"/>
+<Event Kind="CONTROLLABLE" Name="ecall[4][2]"/>
+<Event Kind="CONTROLLABLE" Name="ecall[4][3]"/>
+<Event Kind="CONTROLLABLE" Name="end[1]"/>
+<Event Kind="CONTROLLABLE" Name="end[2]"/>
+<Event Kind="CONTROLLABLE" Name="end[3]"/>
+<Event Kind="CONTROLLABLE" Name="enter[1][1]"/>
+<Event Kind="CONTROLLABLE" Name="enter[1][2]"/>
+<Event Kind="CONTROLLABLE" Name="enter[1][3]"/>
+<Event Kind="CONTROLLABLE" Name="enter[2][1]"/>
+<Event Kind="CONTROLLABLE" Name="enter[2][2]"/>
+<Event Kind="CONTROLLABLE" Name="enter[2][3]"/>
+<Event Kind="CONTROLLABLE" Name="enter[3][1]"/>
+<Event Kind="CONTROLLABLE" Name="enter[3][2]"/>
+<Event Kind="CONTROLLABLE" Name="enter[3][3]"/>
+<Event Kind="CONTROLLABLE" Name="enter[4][1]"/>
+<Event Kind="CONTROLLABLE" Name="enter[4][2]"/>
+<Event Kind="CONTROLLABLE" Name="enter[4][3]"/>
+<Event Kind="UNCONTROLLABLE" Name="inj[1]"/>
+<Event Kind="UNCONTROLLABLE" Name="inj[2]"/>
+<Event Kind="UNCONTROLLABLE" Name="inj[3]"/>
+<Event Kind="UNCONTROLLABLE" Name="leave[1][1]"/>
+<Event Kind="UNCONTROLLABLE" Name="leave[1][2]"/>
+<Event Kind="UNCONTROLLABLE" Name="leave[1][3]"/>
+<Event Kind="UNCONTROLLABLE" Name="leave[2][1]"/>
+<Event Kind="UNCONTROLLABLE" Name="leave[2][2]"/>
+<Event Kind="UNCONTROLLABLE" Name="leave[2][3]"/>
+<Event Kind="UNCONTROLLABLE" Name="leave[3][1]"/>
+<Event Kind="UNCONTROLLABLE" Name="leave[3][2]"/>
+<Event Kind="UNCONTROLLABLE" Name="leave[3][3]"/>
+<Event Kind="UNCONTROLLABLE" Name="leave[4][1]"/>
+<Event Kind="UNCONTROLLABLE" Name="leave[4][2]"/>
+<Event Kind="UNCONTROLLABLE" Name="leave[4][3]"/>
+<Event Kind="PROPOSITION" Name=":accepting"/>
+<Event Kind="UNCONTROLLABLE" Name="outj[1]"/>
+<Event Kind="UNCONTROLLABLE" Name="outj[2]"/>
+<Event Kind="UNCONTROLLABLE" Name="outj[3]"/>
+<Event Kind="CONTROLLABLE" Name="ras[1][1]"/>
+<Event Kind="CONTROLLABLE" Name="ras[1][2]"/>
+<Event Kind="CONTROLLABLE" Name="ras[1][3]"/>
+<Event Kind="CONTROLLABLE" Name="ras[2][1]"/>
+<Event Kind="CONTROLLABLE" Name="ras[2][2]"/>
+<Event Kind="CONTROLLABLE" Name="ras[2][3]"/>
+<Event Kind="CONTROLLABLE" Name="ras[3][1]"/>
+<Event Kind="CONTROLLABLE" Name="ras[3][2]"/>
+<Event Kind="CONTROLLABLE" Name="ras[3][3]"/>
+<Event Kind="CONTROLLABLE" Name="ras[4][1]"/>
+<Event Kind="CONTROLLABLE" Name="ras[4][2]"/>
+<Event Kind="CONTROLLABLE" Name="ras[4][3]"/>
+<Event Kind="UNCONTROLLABLE" Name="ret[1]"/>
+<Event Kind="UNCONTROLLABLE" Name="ret[2]"/>
+<Event Kind="UNCONTROLLABLE" Name="ret[3]"/>
+<Event Kind="CONTROLLABLE" Name="st[1]"/>
+<Event Kind="CONTROLLABLE" Name="st[2]"/>
+<Event Kind="CONTROLLABLE" Name="st[3]"/>
+<Event Kind="UNCONTROLLABLE" Name="tout[1]"/>
+<Event Kind="UNCONTROLLABLE" Name="tout[2]"/>
+<Event Kind="UNCONTROLLABLE" Name="tout[3]"/>
+<Event Kind="UNCONTROLLABLE" Name="tout[4]"/>
+<Event Kind="CONTROLLABLE" Name="tstart"/>
+<Event Kind="CONTROLLABLE" Name="tstop"/>
+<Event Kind="UNCONTROLLABLE" Name="xx[1]"/>
+<Event Kind="UNCONTROLLABLE" Name="xx[2]"/>
+<Event Kind="UNCONTROLLABLE" Name="xx[3]"/>
+<Event Kind="UNCONTROLLABLE" Name="xx[4]"/>
+</EventList>
+<AutomataList>
+<Automaton Kind="SPEC" Name="EmergencyRequests[1]">
+<EventRefList>
+<EventRef Name="dwn[1]"/>
+<EventRef Name="ecall[1][1]"/>
+<EventRef Name="ecall[2][1]"/>
+<EventRef Name="ecall[3][1]"/>
+<EventRef Name="ecall[4][1]"/>
+<EventRef Name=":accepting"/>
+<EventRef Name="st[1]"/>
+</EventRefList>
+<StateList>
+<State Initial="true" Name="j0">
+<EventRefList>
+<EventRef Name=":accepting"/>
+</EventRefList>
+</State>
+<State Name="j1">
+<EventRefList>
+<EventRef Name=":accepting"/>
+</EventRefList>
+</State>
+</StateList>
+<TransitionList>
+<Transition Event="dwn[1]" Source="j0" Target="j1"/>
+<Transition Event="st[1]" Source="j0" Target="j0"/>
+<Transition Event="ecall[1][1]" Source="j1" Target="j1"/>
+<Transition Event="ecall[2][1]" Source="j1" Target="j1"/>
+<Transition Event="ecall[3][1]" Source="j1" Target="j1"/>
+<Transition Event="ecall[4][1]" Source="j1" Target="j1"/>
+<Transition Event="st[1]" Source="j1" Target="j0"/>
+</TransitionList>
+</Automaton>
+<Automaton Kind="SPEC" Name="EmergencyRequests[2]">
+<EventRefList>
+<EventRef Name="dwn[2]"/>
+<EventRef Name="ecall[1][2]"/>
+<EventRef Name="ecall[2][2]"/>
+<EventRef Name="ecall[3][2]"/>
+<EventRef Name="ecall[4][2]"/>
+<EventRef Name=":accepting"/>
+<EventRef Name="st[2]"/>
+</EventRefList>
+<StateList>
+<State Initial="true" Name="j0">
+<EventRefList>
+<EventRef Name=":accepting"/>
+</EventRefList>
+</State>
+<State Name="j1">
+<EventRefList>
+<EventRef Name=":accepting"/>
+</EventRefList>
+</State>
+</StateList>
+<TransitionList>
+<Transition Event="dwn[2]" Source="j0" Target="j1"/>
+<Transition Event="st[2]" Source="j0" Target="j0"/>
+<Transition Event="ecall[1][2]" Source="j1" Target="j1"/>
+<Transition Event="ecall[2][2]" Source="j1" Target="j1"/>
+<Transition Event="ecall[3][2]" Source="j1" Target="j1"/>
+<Transition Event="ecall[4][2]" Source="j1" Target="j1"/>
+<Transition Event="st[2]" Source="j1" Target="j0"/>
+</TransitionList>
+</Automaton>
+<Automaton Kind="SPEC" Name="EmergencyRequests[3]">
+<EventRefList>
+<EventRef Name="dwn[3]"/>
+<EventRef Name="ecall[1][3]"/>
+<EventRef Name="ecall[2][3]"/>
+<EventRef Name="ecall[3][3]"/>
+<EventRef Name="ecall[4][3]"/>
+<EventRef Name=":accepting"/>
+<EventRef Name="st[3]"/>
+</EventRefList>
+<StateList>
+<State Initial="true" Name="j0">
+<EventRefList>
+<EventRef Name=":accepting"/>
+</EventRefList>
+</State>
+<State Name="j1">
+<EventRefList>
+<EventRef Name=":accepting"/>
+</EventRefList>
+</State>
+</StateList>
+<TransitionList>
+<Transition Event="dwn[3]" Source="j0" Target="j1"/>
+<Transition Event="st[3]" Source="j0" Target="j0"/>
+<Transition Event="ecall[1][3]" Source="j1" Target="j1"/>
+<Transition Event="ecall[2][3]" Source="j1" Target="j1"/>
+<Transition Event="ecall[3][3]" Source="j1" Target="j1"/>
+<Transition Event="ecall[4][3]" Source="j1" Target="j1"/>
+<Transition Event="st[3]" Source="j1" Target="j0"/>
+</TransitionList>
+</Automaton>
+<Automaton Kind="SPEC" Name="FleetServiceDiligence">
+<EventRefList>
+<EventRef Name="ad[1]"/>
+<EventRef Name="ad[2]"/>
+<EventRef Name="ad[3]"/>
+<EventRef Name="ad[4]"/>
+<EventRef Name="end[1]"/>
+<EventRef Name="end[2]"/>
+<EventRef Name="end[3]"/>
+<EventRef Name="leave[1][1]"/>
+<EventRef Name="leave[1][2]"/>
+<EventRef Name="leave[1][3]"/>
+<EventRef Name="leave[2][1]"/>
+<EventRef Name="leave[2][2]"/>
+<EventRef Name="leave[2][3]"/>
+<EventRef Name="leave[3][1]"/>
+<EventRef Name="leave[3][2]"/>
+<EventRef Name="leave[3][3]"/>
+<EventRef Name="leave[4][1]"/>
+<EventRef Name="leave[4][2]"/>
+<EventRef Name="leave[4][3]"/>
+<EventRef Name=":accepting"/>
+<EventRef Name="xx[1]"/>
+<EventRef Name="xx[2]"/>
+<EventRef Name="xx[3]"/>
+<EventRef Name="xx[4]"/>
+</EventRefList>
+<StateList>
+<State Initial="true" Name="l0">
+<EventRefList>
+<EventRef Name=":accepting"/>
+</EventRefList>
+</State>
+<State Name="l1"/>
+<State Name="l2"/>
+<State Name="l3"/>
+<State Name="l4"/>
+</StateList>
+<TransitionList>
+<Transition Event="ad[1]" Source="l0" Target="l1"/>
+<Transition Event="ad[2]" Source="l0" Target="l1"/>
+<Transition Event="ad[3]" Source="l0" Target="l1"/>
+<Transition Event="ad[4]" Source="l0" Target="l1"/>
+<Transition Event="end[1]" Source="l0" Target="l0"/>
+<Transition Event="end[2]" Source="l0" Target="l0"/>
+<Transition Event="end[3]" Source="l0" Target="l0"/>
+<Transition Event="leave[1][1]" Source="l0" Target="l0"/>
+<Transition Event="leave[1][2]" Source="l0" Target="l0"/>
+<Transition Event="leave[1][3]" Source="l0" Target="l0"/>
+<Transition Event="leave[2][1]" Source="l0" Target="l0"/>
+<Transition Event="leave[2][2]" Source="l0" Target="l0"/>
+<Transition Event="leave[2][3]" Source="l0" Target="l0"/>
+<Transition Event="leave[3][1]" Source="l0" Target="l0"/>
+<Transition Event="leave[3][2]" Source="l0" Target="l0"/>
+<Transition Event="leave[3][3]" Source="l0" Target="l0"/>
+<Transition Event="leave[4][1]" Source="l0" Target="l0"/>
+<Transition Event="leave[4][2]" Source="l0" Target="l0"/>
+<Transition Event="leave[4][3]" Source="l0" Target="l0"/>
+<Transition Event="xx[1]" Source="l0" Target="l0"/>
+<Transition Event="xx[2]" Source="l0" Target="l0"/>
+<Transition Event="xx[3]" Source="l0" Target="l0"/>
+<Transition Event="xx[4]" Source="l0" Target="l0"/>
+<Transition Event="ad[1]" Source="l1" Target="l2"/>
+<Transition Event="ad[2]" Source="l1" Target="l2"/>
+<Transition Event="ad[3]" Source="l1" Target="l2"/>
+<Transition Event="ad[4]" Source="l1" Target="l2"/>
+<Transition Event="leave[1][1]" Source="l1" Target="l0"/>
+<Transition Event="leave[1][2]" Source="l1" Target="l0"/>
+<Transition Event="leave[1][3]" Source="l1" Target="l0"/>
+<Transition Event="leave[2][1]" Source="l1" Target="l0"/>
+<Transition Event="leave[2][2]" Source="l1" Target="l0"/>
+<Transition Event="leave[2][3]" Source="l1" Target="l0"/>
+<Transition Event="leave[3][1]" Source="l1" Target="l0"/>
+<Transition Event="leave[3][2]" Source="l1" Target="l0"/>
+<Transition Event="leave[3][3]" Source="l1" Target="l0"/>
+<Transition Event="leave[4][1]" Source="l1" Target="l0"/>
+<Transition Event="leave[4][2]" Source="l1" Target="l0"/>
+<Transition Event="leave[4][3]" Source="l1" Target="l0"/>
+<Transition Event="xx[1]" Source="l1" Target="l0"/>
+<Transition Event="xx[2]" Source="l1" Target="l0"/>
+<Transition Event="xx[3]" Source="l1" Target="l0"/>
+<Transition Event="xx[4]" Source="l1" Target="l0"/>
+<Transition Event="ad[1]" Source="l2" Target="l3"/>
+<Transition Event="ad[2]" Source="l2" Target="l3"/>
+<Transition Event="ad[3]" Source="l2" Target="l3"/>
+<Transition Event="ad[4]" Source="l2" Target="l3"/>
+<Transition Event="leave[1][1]" Source="l2" Target="l1"/>
+<Transition Event="leave[1][2]" Source="l2" Target="l1"/>
+<Transition Event="leave[1][3]" Source="l2" Target="l1"/>
+<Transition Event="leave[2][1]" Source="l2" Target="l1"/>
+<Transition Event="leave[2][2]" Source="l2" Target="l1"/>
+<Transition Event="leave[2][3]" Source="l2" Target="l1"/>
+<Transition Event="leave[3][1]" Source="l2" Target="l1"/>
+<Transition Event="leave[3][2]" Source="l2" Target="l1"/>
+<Transition Event="leave[3][3]" Source="l2" Target="l1"/>
+<Transition Event="leave[4][1]" Source="l2" Target="l1"/>
+<Transition Event="leave[4][2]" Source="l2" Target="l1"/>
+<Transition Event="leave[4][3]" Source="l2" Target="l1"/>
+<Transition Event="xx[1]" Source="l2" Target="l1"/>
+<Transition Event="xx[2]" Source="l2" Target="l1"/>
+<Transition Event="xx[3]" Source="l2" Target="l1"/>
+<Transition Event="xx[4]" Source="l2" Target="l1"/>
+<Transition Event="ad[1]" Source="l3" Target="l4"/>
+<Transition Event="ad[2]" Source="l3" Target="l4"/>
+<Transition Event="ad[3]" Source="l3" Target="l4"/>
+<Transition Event="ad[4]" Source="l3" Target="l4"/>
+<Transition Event="leave[1][1]" Source="l3" Target="l2"/>
+<Transition Event="leave[1][2]" Source="l3" Target="l2"/>
+<Transition Event="leave[1][3]" Source="l3" Target="l2"/>
+<Transition Event="leave[2][1]" Source="l3" Target="l2"/>
+<Transition Event="leave[2][2]" Source="l3" Target="l2"/>
+<Transition Event="leave[2][3]" Source="l3" Target="l2"/>
+<Transition Event="leave[3][1]" Source="l3" Target="l2"/>
+<Transition Event="leave[3][2]" Source="l3" Target="l2"/>
+<Transition Event="leave[3][3]" Source="l3" Target="l2"/>
+<Transition Event="leave[4][1]" Source="l3" Target="l2"/>
+<Transition Event="leave[4][2]" Source="l3" Target="l2"/>
+<Transition Event="leave[4][3]" Source="l3" Target="l2"/>
+<Transition Event="xx[1]" Source="l3" Target="l2"/>
+<Transition Event="xx[2]" Source="l3" Target="l2"/>
+<Transition Event="xx[3]" Source="l3" Target="l2"/>
+<Transition Event="xx[4]" Source="l3" Target="l2"/>
+<Transition Event="leave[1][1]" Source="l4" Target="l3"/>
+<Transition Event="leave[1][2]" Source="l4" Target="l3"/>
+<Transition Event="leave[1][3]" Source="l4" Target="l3"/>
+<Transition Event="leave[2][1]" Source="l4" Target="l3"/>
+<Transition Event="leave[2][2]" Source="l4" Target="l3"/>
+<Transition Event="leave[2][3]" Source="l4" Target="l3"/>
+<Transition Event="leave[3][1]" Source="l4" Target="l3"/>
+<Transition Event="leave[3][2]" Source="l4" Target="l3"/>
+<Transition Event="leave[3][3]" Source="l4" Target="l3"/>
+<Transition Event="leave[4][1]" Source="l4" Target="l3"/>
+<Transition Event="leave[4][2]" Source="l4" Target="l3"/>
+<Transition Event="leave[4][3]" Source="l4" Target="l3"/>
+<Transition Event="xx[1]" Source="l4" Target="l3"/>
+<Transition Event="xx[2]" Source="l4" Target="l3"/>
+<Transition Event="xx[3]" Source="l4" Target="l3"/>
+<Transition Event="xx[4]" Source="l4" Target="l3"/>
+</TransitionList>
+</Automaton>
+<Automaton Kind="SPEC" Name="ServiceStartupShutdown[1]">
+<EventRefList>
+<EventRef Name="ad[1]"/>
+<EventRef Name="ad[2]"/>
+<EventRef Name="ad[3]"/>
+<EventRef Name="ad[4]"/>
+<EventRef Name="end[1]"/>
+<EventRef Name=":accepting"/>
+<EventRef Name="st[1]"/>
+<EventRef Name="tstart"/>
+<EventRef Name="tstop"/>
+</EventRefList>
+<StateList>
+<State Initial="true" Name="f0">
+<EventRefList>
+<EventRef Name=":accepting"/>
+</EventRefList>
+</State>
+<State Name="f1"/>
+<State Name="f2"/>
+</StateList>
+<TransitionList>
+<Transition Event="end[1]" Source="f0" Target="f0"/>
+<Transition Event="tstart" Source="f0" Target="f1"/>
+<Transition Event="st[1]" Source="f1" Target="f2"/>
+<Transition Event="ad[1]" Source="f2" Target="f2"/>
+<Transition Event="ad[2]" Source="f2" Target="f2"/>
+<Transition Event="ad[3]" Source="f2" Target="f2"/>
+<Transition Event="ad[4]" Source="f2" Target="f2"/>
+<Transition Event="st[1]" Source="f2" Target="f2"/>
+<Transition Event="tstop" Source="f2" Target="f0"/>
+</TransitionList>
+</Automaton>
+<Automaton Kind="SPEC" Name="ServiceStartupShutdown[2]">
+<EventRefList>
+<EventRef Name="ad[1]"/>
+<EventRef Name="ad[2]"/>
+<EventRef Name="ad[3]"/>
+<EventRef Name="ad[4]"/>
+<EventRef Name="end[2]"/>
+<EventRef Name=":accepting"/>
+<EventRef Name="st[2]"/>
+<EventRef Name="tstart"/>
+<EventRef Name="tstop"/>
+</EventRefList>
+<StateList>
+<State Initial="true" Name="f0">
+<EventRefList>
+<EventRef Name=":accepting"/>
+</EventRefList>
+</State>
+<State Name="f1"/>
+<State Name="f2"/>
+</StateList>
+<TransitionList>
+<Transition Event="end[2]" Source="f0" Target="f0"/>
+<Transition Event="tstart" Source="f0" Target="f1"/>
+<Transition Event="st[2]" Source="f1" Target="f2"/>
+<Transition Event="ad[1]" Source="f2" Target="f2"/>
+<Transition Event="ad[2]" Source="f2" Target="f2"/>
+<Transition Event="ad[3]" Source="f2" Target="f2"/>
+<Transition Event="ad[4]" Source="f2" Target="f2"/>
+<Transition Event="st[2]" Source="f2" Target="f2"/>
+<Transition Event="tstop" Source="f2" Target="f0"/>
+</TransitionList>
+</Automaton>
+<Automaton Kind="SPEC" Name="ServiceStartupShutdown[3]">
+<EventRefList>
+<EventRef Name="ad[1]"/>
+<EventRef Name="ad[2]"/>
+<EventRef Name="ad[3]"/>
+<EventRef Name="ad[4]"/>
+<EventRef Name="end[3]"/>
+<EventRef Name=":accepting"/>
+<EventRef Name="st[3]"/>
+<EventRef Name="tstart"/>
+<EventRef Name="tstop"/>
+</EventRefList>
+<StateList>
+<State Initial="true" Name="f0">
+<EventRefList>
+<EventRef Name=":accepting"/>
+</EventRefList>
+</State>
+<State Name="f1"/>
+<State Name="f2"/>
+</StateList>
+<TransitionList>
+<Transition Event="end[3]" Source="f0" Target="f0"/>
+<Transition Event="tstart" Source="f0" Target="f1"/>
+<Transition Event="st[3]" Source="f1" Target="f2"/>
+<Transition Event="ad[1]" Source="f2" Target="f2"/>
+<Transition Event="ad[2]" Source="f2" Target="f2"/>
+<Transition Event="ad[3]" Source="f2" Target="f2"/>
+<Transition Event="ad[4]" Source="f2" Target="f2"/>
+<Transition Event="st[3]" Source="f2" Target="f2"/>
+<Transition Event="tstop" Source="f2" Target="f0"/>
+</TransitionList>
+</Automaton>
+<Automaton Kind="PLANT" Name="SystemInitiator">
+<EventRefList>
+<EventRef Name=":accepting"/>
+<EventRef Name="tstart"/>
+<EventRef Name="tstop"/>
+</EventRefList>
+<StateList>
+<State Initial="true" Name="a0">
+<EventRefList>
+<EventRef Name=":accepting"/>
+</EventRefList>
+</State>
+<State Name="a1"/>
+</StateList>
+<TransitionList>
+<Transition Event="tstart" Source="a0" Target="a1"/>
+<Transition Event="tstop" Source="a1" Target="a0"/>
+</TransitionList>
+</Automaton>
+<Automaton Kind="SPEC" Name="TrafficJam[1]">
+<EventRefList>
+<EventRef Name="inj[1]"/>
+<EventRef Name=":accepting"/>
+<EventRef Name="outj[1]"/>
+<EventRef Name="ras[1][1]"/>
+<EventRef Name="ras[2][1]"/>
+<EventRef Name="ras[3][1]"/>
+<EventRef Name="ras[4][1]"/>
+</EventRefList>
+<StateList>
+<State Initial="true" Name="g0">
+<EventRefList>
+<EventRef Name=":accepting"/>
+</EventRefList>
+</State>
+<State Name="g1"/>
+</StateList>
+<TransitionList>
+<Transition Event="inj[1]" Source="g0" Target="g1"/>
+<Transition Event="ras[1][1]" Source="g0" Target="g0"/>
+<Transition Event="ras[2][1]" Source="g0" Target="g0"/>
+<Transition Event="ras[3][1]" Source="g0" Target="g0"/>
+<Transition Event="ras[4][1]" Source="g0" Target="g0"/>
+<Transition Event="outj[1]" Source="g1" Target="g0"/>
+</TransitionList>
+</Automaton>
+<Automaton Kind="SPEC" Name="TrafficJam[2]">
+<EventRefList>
+<EventRef Name="inj[2]"/>
+<EventRef Name=":accepting"/>
+<EventRef Name="outj[2]"/>
+<EventRef Name="ras[1][2]"/>
+<EventRef Name="ras[2][2]"/>
+<EventRef Name="ras[3][2]"/>
+<EventRef Name="ras[4][2]"/>
+</EventRefList>
+<StateList>
+<State Initial="true" Name="g0">
+<EventRefList>
+<EventRef Name=":accepting"/>
+</EventRefList>
+</State>
+<State Name="g1"/>
+</StateList>
+<TransitionList>
+<Transition Event="inj[2]" Source="g0" Target="g1"/>
+<Transition Event="ras[1][2]" Source="g0" Target="g0"/>
+<Transition Event="ras[2][2]" Source="g0" Target="g0"/>
+<Transition Event="ras[3][2]" Source="g0" Target="g0"/>
+<Transition Event="ras[4][2]" Source="g0" Target="g0"/>
+<Transition Event="outj[2]" Source="g1" Target="g0"/>
+</TransitionList>
+</Automaton>
+<Automaton Kind="SPEC" Name="TrafficJam[3]">
+<EventRefList>
+<EventRef Name="inj[3]"/>
+<EventRef Name=":accepting"/>
+<EventRef Name="outj[3]"/>
+<EventRef Name="ras[1][3]"/>
+<EventRef Name="ras[2][3]"/>
+<EventRef Name="ras[3][3]"/>
+<EventRef Name="ras[4][3]"/>
+</EventRefList>
+<StateList>
+<State Initial="true" Name="g0">
+<EventRefList>
+<EventRef Name=":accepting"/>
+</EventRefList>
+</State>
+<State Name="g1"/>
+</StateList>
+<TransitionList>
+<Transition Event="inj[3]" Source="g0" Target="g1"/>
+<Transition Event="ras[1][3]" Source="g0" Target="g0"/>
+<Transition Event="ras[2][3]" Source="g0" Target="g0"/>
+<Transition Event="ras[3][3]" Source="g0" Target="g0"/>
+<Transition Event="ras[4][3]" Source="g0" Target="g0"/>
+<Transition Event="outj[3]" Source="g1" Target="g0"/>
+</TransitionList>
+</Automaton>
+<Automaton Kind="PLANT" Name="TravellerMechanism[1][1]">
+<EventRefList>
+<EventRef Name="ecall[1][1]"/>
+<EventRef Name="enter[1][1]"/>
+<EventRef Name="leave[1][1]"/>
+<EventRef Name=":accepting"/>
+</EventRefList>
+<StateList>
+<State Initial="true" Name="e0">
+<EventRefList>
+<EventRef Name=":accepting"/>
+</EventRefList>
+</State>
+<State Name="e1"/>
+</StateList>
+<TransitionList>
+<Transition Event="enter[1][1]" Source="e0" Target="e1"/>
+<Transition Event="ecall[1][1]" Source="e1" Target="e0"/>
+<Transition Event="leave[1][1]" Source="e1" Target="e0"/>
+</TransitionList>
+</Automaton>
+<Automaton Kind="PLANT" Name="TravellerMechanism[1][2]">
+<EventRefList>
+<EventRef Name="ecall[1][2]"/>
+<EventRef Name="enter[1][2]"/>
+<EventRef Name="leave[1][2]"/>
+<EventRef Name=":accepting"/>
+</EventRefList>
+<StateList>
+<State Initial="true" Name="e0">
+<EventRefList>
+<EventRef Name=":accepting"/>
+</EventRefList>
+</State>
+<State Name="e1"/>
+</StateList>
+<TransitionList>
+<Transition Event="enter[1][2]" Source="e0" Target="e1"/>
+<Transition Event="ecall[1][2]" Source="e1" Target="e0"/>
+<Transition Event="leave[1][2]" Source="e1" Target="e0"/>
+</TransitionList>
+</Automaton>
+<Automaton Kind="PLANT" Name="TravellerMechanism[1][3]">
+<EventRefList>
+<EventRef Name="ecall[1][3]"/>
+<EventRef Name="enter[1][3]"/>
+<EventRef Name="leave[1][3]"/>
+<EventRef Name=":accepting"/>
+</EventRefList>
+<StateList>
+<State Initial="true" Name="e0">
+<EventRefList>
+<EventRef Name=":accepting"/>
+</EventRefList>
+</State>
+<State Name="e1"/>
+</StateList>
+<TransitionList>
+<Transition Event="enter[1][3]" Source="e0" Target="e1"/>
+<Transition Event="ecall[1][3]" Source="e1" Target="e0"/>
+<Transition Event="leave[1][3]" Source="e1" Target="e0"/>
+</TransitionList>
+</Automaton>
+<Automaton Kind="PLANT" Name="TravellerMechanism[2][1]">
+<EventRefList>
+<EventRef Name="ecall[2][1]"/>
+<EventRef Name="enter[2][1]"/>
+<EventRef Name="leave[2][1]"/>
+<EventRef Name=":accepting"/>
+</EventRefList>
+<StateList>
+<State Initial="true" Name="e0">
+<EventRefList>
+<EventRef Name=":accepting"/>
+</EventRefList>
+</State>
+<State Name="e1"/>
+</StateList>
+<TransitionList>
+<Transition Event="enter[2][1]" Source="e0" Target="e1"/>
+<Transition Event="ecall[2][1]" Source="e1" Target="e0"/>
+<Transition Event="leave[2][1]" Source="e1" Target="e0"/>
+</TransitionList>
+</Automaton>
+<Automaton Kind="PLANT" Name="TravellerMechanism[2][2]">
+<EventRefList>
+<EventRef Name="ecall[2][2]"/>
+<EventRef Name="enter[2][2]"/>
+<EventRef Name="leave[2][2]"/>
+<EventRef Name=":accepting"/>
+</EventRefList>
+<StateList>
+<State Initial="true" Name="e0">
+<EventRefList>
+<EventRef Name=":accepting"/>
+</EventRefList>
+</State>
+<State Name="e1"/>
+</StateList>
+<TransitionList>
+<Transition Event="enter[2][2]" Source="e0" Target="e1"/>
+<Transition Event="ecall[2][2]" Source="e1" Target="e0"/>
+<Transition Event="leave[2][2]" Source="e1" Target="e0"/>
+</TransitionList>
+</Automaton>
+<Automaton Kind="PLANT" Name="TravellerMechanism[2][3]">
+<EventRefList>
+<EventRef Name="ecall[2][3]"/>
+<EventRef Name="enter[2][3]"/>
+<EventRef Name="leave[2][3]"/>
+<EventRef Name=":accepting"/>
+</EventRefList>
+<StateList>
+<State Initial="true" Name="e0">
+<EventRefList>
+<EventRef Name=":accepting"/>
+</EventRefList>
+</State>
+<State Name="e1"/>
+</StateList>
+<TransitionList>
+<Transition Event="enter[2][3]" Source="e0" Target="e1"/>
+<Transition Event="ecall[2][3]" Source="e1" Target="e0"/>
+<Transition Event="leave[2][3]" Source="e1" Target="e0"/>
+</TransitionList>
+</Automaton>
+<Automaton Kind="PLANT" Name="TravellerMechanism[3][1]">
+<EventRefList>
+<EventRef Name="ecall[3][1]"/>
+<EventRef Name="enter[3][1]"/>
+<EventRef Name="leave[3][1]"/>
+<EventRef Name=":accepting"/>
+</EventRefList>
+<StateList>
+<State Initial="true" Name="e0">
+<EventRefList>
+<EventRef Name=":accepting"/>
+</EventRefList>
+</State>
+<State Name="e1"/>
+</StateList>
+<TransitionList>
+<Transition Event="enter[3][1]" Source="e0" Target="e1"/>
+<Transition Event="ecall[3][1]" Source="e1" Target="e0"/>
+<Transition Event="leave[3][1]" Source="e1" Target="e0"/>
+</TransitionList>
+</Automaton>
+<Automaton Kind="PLANT" Name="TravellerMechanism[3][2]">
+<EventRefList>
+<EventRef Name="ecall[3][2]"/>
+<EventRef Name="enter[3][2]"/>
+<EventRef Name="leave[3][2]"/>
+<EventRef Name=":accepting"/>
+</EventRefList>
+<StateList>
+<State Initial="true" Name="e0">
+<EventRefList>
+<EventRef Name=":accepting"/>
+</EventRefList>
+</State>
+<State Name="e1"/>
+</StateList>
+<TransitionList>
+<Transition Event="enter[3][2]" Source="e0" Target="e1"/>
+<Transition Event="ecall[3][2]" Source="e1" Target="e0"/>
+<Transition Event="leave[3][2]" Source="e1" Target="e0"/>
+</TransitionList>
+</Automaton>
+<Automaton Kind="PLANT" Name="TravellerMechanism[3][3]">
+<EventRefList>
+<EventRef Name="ecall[3][3]"/>
+<EventRef Name="enter[3][3]"/>
+<EventRef Name="leave[3][3]"/>
+<EventRef Name=":accepting"/>
+</EventRefList>
+<StateList>
+<State Initial="true" Name="e0">
+<EventRefList>
+<EventRef Name=":accepting"/>
+</EventRefList>
+</State>
+<State Name="e1"/>
+</StateList>
+<TransitionList>
+<Transition Event="enter[3][3]" Source="e0" Target="e1"/>
+<Transition Event="ecall[3][3]" Source="e1" Target="e0"/>
+<Transition Event="leave[3][3]" Source="e1" Target="e0"/>
+</TransitionList>
+</Automaton>
+<Automaton Kind="PLANT" Name="TravellerMechanism[4][1]">
+<EventRefList>
+<EventRef Name="ecall[4][1]"/>
+<EventRef Name="enter[4][1]"/>
+<EventRef Name="leave[4][1]"/>
+<EventRef Name=":accepting"/>
+</EventRefList>
+<StateList>
+<State Initial="true" Name="e0">
+<EventRefList>
+<EventRef Name=":accepting"/>
+</EventRefList>
+</State>
+<State Name="e1"/>
+</StateList>
+<TransitionList>
+<Transition Event="enter[4][1]" Source="e0" Target="e1"/>
+<Transition Event="ecall[4][1]" Source="e1" Target="e0"/>
+<Transition Event="leave[4][1]" Source="e1" Target="e0"/>
+</TransitionList>
+</Automaton>
+<Automaton Kind="PLANT" Name="TravellerMechanism[4][2]">
+<EventRefList>
+<EventRef Name="ecall[4][2]"/>
+<EventRef Name="enter[4][2]"/>
+<EventRef Name="leave[4][2]"/>
+<EventRef Name=":accepting"/>
+</EventRefList>
+<StateList>
+<State Initial="true" Name="e0">
+<EventRefList>
+<EventRef Name=":accepting"/>
+</EventRefList>
+</State>
+<State Name="e1"/>
+</StateList>
+<TransitionList>
+<Transition Event="enter[4][2]" Source="e0" Target="e1"/>
+<Transition Event="ecall[4][2]" Source="e1" Target="e0"/>
+<Transition Event="leave[4][2]" Source="e1" Target="e0"/>
+</TransitionList>
+</Automaton>
+<Automaton Kind="PLANT" Name="TravellerMechanism[4][3]">
+<EventRefList>
+<EventRef Name="ecall[4][3]"/>
+<EventRef Name="enter[4][3]"/>
+<EventRef Name="leave[4][3]"/>
+<EventRef Name=":accepting"/>
+</EventRefList>
+<StateList>
+<State Initial="true" Name="e0">
+<EventRefList>
+<EventRef Name=":accepting"/>
+</EventRefList>
+</State>
+<State Name="e1"/>
+</StateList>
+<TransitionList>
+<Transition Event="enter[4][3]" Source="e0" Target="e1"/>
+<Transition Event="ecall[4][3]" Source="e1" Target="e0"/>
+<Transition Event="leave[4][3]" Source="e1" Target="e0"/>
+</TransitionList>
+</Automaton>
+<Automaton Kind="PLANT" Name="Traveller[1]">
+<EventRefList>
+<EventRef Name="ad[1]"/>
+<EventRef Name="as[1][1]"/>
+<EventRef Name="as[1][2]"/>
+<EventRef Name="as[1][3]"/>
+<EventRef Name="ecall[1][1]"/>
+<EventRef Name="ecall[1][2]"/>
+<EventRef Name="ecall[1][3]"/>
+<EventRef Name="enter[1][1]"/>
+<EventRef Name="enter[1][2]"/>
+<EventRef Name="enter[1][3]"/>
+<EventRef Name="leave[1][1]"/>
+<EventRef Name="leave[1][2]"/>
+<EventRef Name="leave[1][3]"/>
+<EventRef Name=":accepting"/>
+<EventRef Name="ras[1][1]"/>
+<EventRef Name="ras[1][2]"/>
+<EventRef Name="ras[1][3]"/>
+<EventRef Name="tout[1]"/>
+<EventRef Name="xx[1]"/>
+</EventRefList>
+<StateList>
+<State Initial="true" Name="d0">
+<EventRefList>
+<EventRef Name=":accepting"/>
+</EventRefList>
+</State>
+<State Name="d1"/>
+<State Name="d2"/>
+<State Name="d3"/>
+</StateList>
+<TransitionList>
+<Transition Event="ad[1]" Source="d0" Target="d1"/>
+<Transition Event="as[1][1]" Source="d1" Target="d2"/>
+<Transition Event="as[1][2]" Source="d1" Target="d2"/>
+<Transition Event="as[1][3]" Source="d1" Target="d2"/>
+<Transition Event="xx[1]" Source="d1" Target="d0"/>
+<Transition Event="enter[1][1]" Source="d2" Target="d3"/>
+<Transition Event="enter[1][2]" Source="d2" Target="d3"/>
+<Transition Event="enter[1][3]" Source="d2" Target="d3"/>
+<Transition Event="ras[1][1]" Source="d2" Target="d2"/>
+<Transition Event="ras[1][2]" Source="d2" Target="d2"/>
+<Transition Event="ras[1][3]" Source="d2" Target="d2"/>
+<Transition Event="tout[1]" Source="d2" Target="d1"/>
+<Transition Event="ecall[1][1]" Source="d3" Target="d1"/>
+<Transition Event="ecall[1][2]" Source="d3" Target="d1"/>
+<Transition Event="ecall[1][3]" Source="d3" Target="d1"/>
+<Transition Event="leave[1][1]" Source="d3" Target="d0"/>
+<Transition Event="leave[1][2]" Source="d3" Target="d0"/>
+<Transition Event="leave[1][3]" Source="d3" Target="d0"/>
+</TransitionList>
+</Automaton>
+<Automaton Kind="PLANT" Name="Traveller[2]">
+<EventRefList>
+<EventRef Name="ad[2]"/>
+<EventRef Name="as[2][1]"/>
+<EventRef Name="as[2][2]"/>
+<EventRef Name="as[2][3]"/>
+<EventRef Name="ecall[2][1]"/>
+<EventRef Name="ecall[2][2]"/>
+<EventRef Name="ecall[2][3]"/>
+<EventRef Name="enter[2][1]"/>
+<EventRef Name="enter[2][2]"/>
+<EventRef Name="enter[2][3]"/>
+<EventRef Name="leave[2][1]"/>
+<EventRef Name="leave[2][2]"/>
+<EventRef Name="leave[2][3]"/>
+<EventRef Name=":accepting"/>
+<EventRef Name="ras[2][1]"/>
+<EventRef Name="ras[2][2]"/>
+<EventRef Name="ras[2][3]"/>
+<EventRef Name="tout[2]"/>
+<EventRef Name="xx[2]"/>
+</EventRefList>
+<StateList>
+<State Initial="true" Name="d0">
+<EventRefList>
+<EventRef Name=":accepting"/>
+</EventRefList>
+</State>
+<State Name="d1"/>
+<State Name="d2"/>
+<State Name="d3"/>
+</StateList>
+<TransitionList>
+<Transition Event="ad[2]" Source="d0" Target="d1"/>
+<Transition Event="as[2][1]" Source="d1" Target="d2"/>
+<Transition Event="as[2][2]" Source="d1" Target="d2"/>
+<Transition Event="as[2][3]" Source="d1" Target="d2"/>
+<Transition Event="xx[2]" Source="d1" Target="d0"/>
+<Transition Event="enter[2][1]" Source="d2" Target="d3"/>
+<Transition Event="enter[2][2]" Source="d2" Target="d3"/>
+<Transition Event="enter[2][3]" Source="d2" Target="d3"/>
+<Transition Event="ras[2][1]" Source="d2" Target="d2"/>
+<Transition Event="ras[2][2]" Source="d2" Target="d2"/>
+<Transition Event="ras[2][3]" Source="d2" Target="d2"/>
+<Transition Event="tout[2]" Source="d2" Target="d1"/>
+<Transition Event="ecall[2][1]" Source="d3" Target="d1"/>
+<Transition Event="ecall[2][2]" Source="d3" Target="d1"/>
+<Transition Event="ecall[2][3]" Source="d3" Target="d1"/>
+<Transition Event="leave[2][1]" Source="d3" Target="d0"/>
+<Transition Event="leave[2][2]" Source="d3" Target="d0"/>
+<Transition Event="leave[2][3]" Source="d3" Target="d0"/>
+</TransitionList>
+</Automaton>
+<Automaton Kind="PLANT" Name="Traveller[3]">
+<EventRefList>
+<EventRef Name="ad[3]"/>
+<EventRef Name="as[3][1]"/>
+<EventRef Name="as[3][2]"/>
+<EventRef Name="as[3][3]"/>
+<EventRef Name="ecall[3][1]"/>
+<EventRef Name="ecall[3][2]"/>
+<EventRef Name="ecall[3][3]"/>
+<EventRef Name="enter[3][1]"/>
+<EventRef Name="enter[3][2]"/>
+<EventRef Name="enter[3][3]"/>
+<EventRef Name="leave[3][1]"/>
+<EventRef Name="leave[3][2]"/>
+<EventRef Name="leave[3][3]"/>
+<EventRef Name=":accepting"/>
+<EventRef Name="ras[3][1]"/>
+<EventRef Name="ras[3][2]"/>
+<EventRef Name="ras[3][3]"/>
+<EventRef Name="tout[3]"/>
+<EventRef Name="xx[3]"/>
+</EventRefList>
+<StateList>
+<State Initial="true" Name="d0">
+<EventRefList>
+<EventRef Name=":accepting"/>
+</EventRefList>
+</State>
+<State Name="d1"/>
+<State Name="d2"/>
+<State Name="d3"/>
+</StateList>
+<TransitionList>
+<Transition Event="ad[3]" Source="d0" Target="d1"/>
+<Transition Event="as[3][1]" Source="d1" Target="d2"/>
+<Transition Event="as[3][2]" Source="d1" Target="d2"/>
+<Transition Event="as[3][3]" Source="d1" Target="d2"/>
+<Transition Event="xx[3]" Source="d1" Target="d0"/>
+<Transition Event="enter[3][1]" Source="d2" Target="d3"/>
+<Transition Event="enter[3][2]" Source="d2" Target="d3"/>
+<Transition Event="enter[3][3]" Source="d2" Target="d3"/>
+<Transition Event="ras[3][1]" Source="d2" Target="d2"/>
+<Transition Event="ras[3][2]" Source="d2" Target="d2"/>
+<Transition Event="ras[3][3]" Source="d2" Target="d2"/>
+<Transition Event="tout[3]" Source="d2" Target="d1"/>
+<Transition Event="ecall[3][1]" Source="d3" Target="d1"/>
+<Transition Event="ecall[3][2]" Source="d3" Target="d1"/>
+<Transition Event="ecall[3][3]" Source="d3" Target="d1"/>
+<Transition Event="leave[3][1]" Source="d3" Target="d0"/>
+<Transition Event="leave[3][2]" Source="d3" Target="d0"/>
+<Transition Event="leave[3][3]" Source="d3" Target="d0"/>
+</TransitionList>
+</Automaton>
+<Automaton Kind="PLANT" Name="Traveller[4]">
+<EventRefList>
+<EventRef Name="ad[4]"/>
+<EventRef Name="as[4][1]"/>
+<EventRef Name="as[4][2]"/>
+<EventRef Name="as[4][3]"/>
+<EventRef Name="ecall[4][1]"/>
+<EventRef Name="ecall[4][2]"/>
+<EventRef Name="ecall[4][3]"/>
+<EventRef Name="enter[4][1]"/>
+<EventRef Name="enter[4][2]"/>
+<EventRef Name="enter[4][3]"/>
+<EventRef Name="leave[4][1]"/>
+<EventRef Name="leave[4][2]"/>
+<EventRef Name="leave[4][3]"/>
+<EventRef Name=":accepting"/>
+<EventRef Name="ras[4][1]"/>
+<EventRef Name="ras[4][2]"/>
+<EventRef Name="ras[4][3]"/>
+<EventRef Name="tout[4]"/>
+<EventRef Name="xx[4]"/>
+</EventRefList>
+<StateList>
+<State Initial="true" Name="d0">
+<EventRefList>
+<EventRef Name=":accepting"/>
+</EventRefList>
+</State>
+<State Name="d1"/>
+<State Name="d2"/>
+<State Name="d3"/>
+</StateList>
+<TransitionList>
+<Transition Event="ad[4]" Source="d0" Target="d1"/>
+<Transition Event="as[4][1]" Source="d1" Target="d2"/>
+<Transition Event="as[4][2]" Source="d1" Target="d2"/>
+<Transition Event="as[4][3]" Source="d1" Target="d2"/>
+<Transition Event="xx[4]" Source="d1" Target="d0"/>
+<Transition Event="enter[4][1]" Source="d2" Target="d3"/>
+<Transition Event="enter[4][2]" Source="d2" Target="d3"/>
+<Transition Event="enter[4][3]" Source="d2" Target="d3"/>
+<Transition Event="ras[4][1]" Source="d2" Target="d2"/>
+<Transition Event="ras[4][2]" Source="d2" Target="d2"/>
+<Transition Event="ras[4][3]" Source="d2" Target="d2"/>
+<Transition Event="tout[4]" Source="d2" Target="d1"/>
+<Transition Event="ecall[4][1]" Source="d3" Target="d1"/>
+<Transition Event="ecall[4][2]" Source="d3" Target="d1"/>
+<Transition Event="ecall[4][3]" Source="d3" Target="d1"/>
+<Transition Event="leave[4][1]" Source="d3" Target="d0"/>
+<Transition Event="leave[4][2]" Source="d3" Target="d0"/>
+<Transition Event="leave[4][3]" Source="d3" Target="d0"/>
+</TransitionList>
+</Automaton>
+<Automaton Kind="SPEC" Name="VehicleAssignmentQueueCapacity[1]">
+<EventRefList>
+<EventRef Name="as[1][1]"/>
+<EventRef Name="as[2][1]"/>
+<EventRef Name="as[3][1]"/>
+<EventRef Name="as[4][1]"/>
+<EventRef Name="end[1]"/>
+<EventRef Name="enter[1][1]"/>
+<EventRef Name="enter[1][2]"/>
+<EventRef Name="enter[1][3]"/>
+<EventRef Name="enter[2][1]"/>
+<EventRef Name="enter[2][2]"/>
+<EventRef Name="enter[2][3]"/>
+<EventRef Name="enter[3][1]"/>
+<EventRef Name="enter[3][2]"/>
+<EventRef Name="enter[3][3]"/>
+<EventRef Name="enter[4][1]"/>
+<EventRef Name="enter[4][2]"/>
+<EventRef Name="enter[4][3]"/>
+<EventRef Name=":accepting"/>
+<EventRef Name="ras[1][1]"/>
+<EventRef Name="ras[1][2]"/>
+<EventRef Name="ras[1][3]"/>
+<EventRef Name="ras[2][1]"/>
+<EventRef Name="ras[2][2]"/>
+<EventRef Name="ras[2][3]"/>
+<EventRef Name="ras[3][1]"/>
+<EventRef Name="ras[3][2]"/>
+<EventRef Name="ras[3][3]"/>
+<EventRef Name="ras[4][1]"/>
+<EventRef Name="ras[4][2]"/>
+<EventRef Name="ras[4][3]"/>
+<EventRef Name="tout[1]"/>
+<EventRef Name="tout[2]"/>
+<EventRef Name="tout[3]"/>
+<EventRef Name="tout[4]"/>
+</EventRefList>
+<StateList>
+<State Initial="true" Name="i0">
+<EventRefList>
+<EventRef Name=":accepting"/>
+</EventRefList>
+</State>
+<State Name="i1"/>
+<State Name="i2"/>
+<State Name="i3"/>
+<State Name="i4"/>
+</StateList>
+<TransitionList>
+<Transition Event="as[1][1]" Source="i0" Target="i1"/>
+<Transition Event="as[2][1]" Source="i0" Target="i2"/>
+<Transition Event="as[3][1]" Source="i0" Target="i3"/>
+<Transition Event="as[4][1]" Source="i0" Target="i4"/>
+<Transition Event="end[1]" Source="i0" Target="i0"/>
+<Transition Event="ras[1][1]" Source="i0" Target="i1"/>
+<Transition Event="ras[2][1]" Source="i0" Target="i2"/>
+<Transition Event="ras[3][1]" Source="i0" Target="i3"/>
+<Transition Event="ras[4][1]" Source="i0" Target="i4"/>
+<Transition Event="tout[1]" Source="i0" Target="i0"/>
+<Transition Event="tout[2]" Source="i0" Target="i0"/>
+<Transition Event="tout[3]" Source="i0" Target="i0"/>
+<Transition Event="tout[4]" Source="i0" Target="i0"/>
+<Transition Event="enter[1][1]" Source="i1" Target="i0"/>
+<Transition Event="enter[2][1]" Source="i1" Target="i1"/>
+<Transition Event="enter[2][2]" Source="i1" Target="i1"/>
+<Transition Event="enter[2][3]" Source="i1" Target="i1"/>
+<Transition Event="enter[3][1]" Source="i1" Target="i1"/>
+<Transition Event="enter[3][2]" Source="i1" Target="i1"/>
+<Transition Event="enter[3][3]" Source="i1" Target="i1"/>
+<Transition Event="enter[4][1]" Source="i1" Target="i1"/>
+<Transition Event="enter[4][2]" Source="i1" Target="i1"/>
+<Transition Event="enter[4][3]" Source="i1" Target="i1"/>
+<Transition Event="ras[1][2]" Source="i1" Target="i0"/>
+<Transition Event="ras[1][3]" Source="i1" Target="i0"/>
+<Transition Event="ras[2][2]" Source="i1" Target="i1"/>
+<Transition Event="ras[2][3]" Source="i1" Target="i1"/>
+<Transition Event="ras[3][2]" Source="i1" Target="i1"/>
+<Transition Event="ras[3][3]" Source="i1" Target="i1"/>
+<Transition Event="ras[4][2]" Source="i1" Target="i1"/>
+<Transition Event="ras[4][3]" Source="i1" Target="i1"/>
+<Transition Event="tout[1]" Source="i1" Target="i0"/>
+<Transition Event="tout[2]" Source="i1" Target="i1"/>
+<Transition Event="tout[3]" Source="i1" Target="i1"/>
+<Transition Event="tout[4]" Source="i1" Target="i1"/>
+<Transition Event="enter[1][1]" Source="i2" Target="i2"/>
+<Transition Event="enter[1][2]" Source="i2" Target="i2"/>
+<Transition Event="enter[1][3]" Source="i2" Target="i2"/>
+<Transition Event="enter[2][1]" Source="i2" Target="i0"/>
+<Transition Event="enter[3][1]" Source="i2" Target="i2"/>
+<Transition Event="enter[3][2]" Source="i2" Target="i2"/>
+<Transition Event="enter[3][3]" Source="i2" Target="i2"/>
+<Transition Event="enter[4][1]" Source="i2" Target="i2"/>
+<Transition Event="enter[4][2]" Source="i2" Target="i2"/>
+<Transition Event="enter[4][3]" Source="i2" Target="i2"/>
+<Transition Event="ras[1][2]" Source="i2" Target="i2"/>
+<Transition Event="ras[1][3]" Source="i2" Target="i2"/>
+<Transition Event="ras[2][2]" Source="i2" Target="i0"/>
+<Transition Event="ras[2][3]" Source="i2" Target="i0"/>
+<Transition Event="ras[3][2]" Source="i2" Target="i2"/>
+<Transition Event="ras[3][3]" Source="i2" Target="i2"/>
+<Transition Event="ras[4][2]" Source="i2" Target="i2"/>
+<Transition Event="ras[4][3]" Source="i2" Target="i2"/>
+<Transition Event="tout[1]" Source="i2" Target="i2"/>
+<Transition Event="tout[2]" Source="i2" Target="i0"/>
+<Transition Event="tout[3]" Source="i2" Target="i2"/>
+<Transition Event="tout[4]" Source="i2" Target="i2"/>
+<Transition Event="enter[1][1]" Source="i3" Target="i3"/>
+<Transition Event="enter[1][2]" Source="i3" Target="i3"/>
+<Transition Event="enter[1][3]" Source="i3" Target="i3"/>
+<Transition Event="enter[2][1]" Source="i3" Target="i3"/>
+<Transition Event="enter[2][2]" Source="i3" Target="i3"/>
+<Transition Event="enter[2][3]" Source="i3" Target="i3"/>
+<Transition Event="enter[3][1]" Source="i3" Target="i0"/>
+<Transition Event="enter[4][1]" Source="i3" Target="i3"/>
+<Transition Event="enter[4][2]" Source="i3" Target="i3"/>
+<Transition Event="enter[4][3]" Source="i3" Target="i3"/>
+<Transition Event="ras[1][2]" Source="i3" Target="i3"/>
+<Transition Event="ras[1][3]" Source="i3" Target="i3"/>
+<Transition Event="ras[2][2]" Source="i3" Target="i3"/>
+<Transition Event="ras[2][3]" Source="i3" Target="i3"/>
+<Transition Event="ras[3][2]" Source="i3" Target="i0"/>
+<Transition Event="ras[3][3]" Source="i3" Target="i0"/>
+<Transition Event="ras[4][2]" Source="i3" Target="i3"/>
+<Transition Event="ras[4][3]" Source="i3" Target="i3"/>
+<Transition Event="tout[1]" Source="i3" Target="i3"/>
+<Transition Event="tout[2]" Source="i3" Target="i3"/>
+<Transition Event="tout[3]" Source="i3" Target="i0"/>
+<Transition Event="tout[4]" Source="i3" Target="i3"/>
+<Transition Event="enter[1][1]" Source="i4" Target="i4"/>
+<Transition Event="enter[1][2]" Source="i4" Target="i4"/>
+<Transition Event="enter[1][3]" Source="i4" Target="i4"/>
+<Transition Event="enter[2][1]" Source="i4" Target="i4"/>
+<Transition Event="enter[2][2]" Source="i4" Target="i4"/>
+<Transition Event="enter[2][3]" Source="i4" Target="i4"/>
+<Transition Event="enter[3][1]" Source="i4" Target="i4"/>
+<Transition Event="enter[3][2]" Source="i4" Target="i4"/>
+<Transition Event="enter[3][3]" Source="i4" Target="i4"/>
+<Transition Event="enter[4][1]" Source="i4" Target="i0"/>
+<Transition Event="ras[1][2]" Source="i4" Target="i4"/>
+<Transition Event="ras[1][3]" Source="i4" Target="i4"/>
+<Transition Event="ras[2][2]" Source="i4" Target="i4"/>
+<Transition Event="ras[2][3]" Source="i4" Target="i4"/>
+<Transition Event="ras[3][2]" Source="i4" Target="i4"/>
+<Transition Event="ras[3][3]" Source="i4" Target="i4"/>
+<Transition Event="ras[4][2]" Source="i4" Target="i0"/>
+<Transition Event="ras[4][3]" Source="i4" Target="i0"/>
+<Transition Event="tout[1]" Source="i4" Target="i4"/>
+<Transition Event="tout[2]" Source="i4" Target="i4"/>
+<Transition Event="tout[3]" Source="i4" Target="i4"/>
+<Transition Event="tout[4]" Source="i4" Target="i0"/>
+</TransitionList>
+</Automaton>
+<Automaton Kind="SPEC" Name="VehicleAssignmentQueueCapacity[2]">
+<EventRefList>
+<EventRef Name="as[1][2]"/>
+<EventRef Name="as[2][2]"/>
+<EventRef Name="as[3][2]"/>
+<EventRef Name="as[4][2]"/>
+<EventRef Name="end[2]"/>
+<EventRef Name="enter[1][1]"/>
+<EventRef Name="enter[1][2]"/>
+<EventRef Name="enter[1][3]"/>
+<EventRef Name="enter[2][1]"/>
+<EventRef Name="enter[2][2]"/>
+<EventRef Name="enter[2][3]"/>
+<EventRef Name="enter[3][1]"/>
+<EventRef Name="enter[3][2]"/>
+<EventRef Name="enter[3][3]"/>
+<EventRef Name="enter[4][1]"/>
+<EventRef Name="enter[4][2]"/>
+<EventRef Name="enter[4][3]"/>
+<EventRef Name=":accepting"/>
+<EventRef Name="ras[1][1]"/>
+<EventRef Name="ras[1][2]"/>
+<EventRef Name="ras[1][3]"/>
+<EventRef Name="ras[2][1]"/>
+<EventRef Name="ras[2][2]"/>
+<EventRef Name="ras[2][3]"/>
+<EventRef Name="ras[3][1]"/>
+<EventRef Name="ras[3][2]"/>
+<EventRef Name="ras[3][3]"/>
+<EventRef Name="ras[4][1]"/>
+<EventRef Name="ras[4][2]"/>
+<EventRef Name="ras[4][3]"/>
+<EventRef Name="tout[1]"/>
+<EventRef Name="tout[2]"/>
+<EventRef Name="tout[3]"/>
+<EventRef Name="tout[4]"/>
+</EventRefList>
+<StateList>
+<State Initial="true" Name="i0">
+<EventRefList>
+<EventRef Name=":accepting"/>
+</EventRefList>
+</State>
+<State Name="i1"/>
+<State Name="i2"/>
+<State Name="i3"/>
+<State Name="i4"/>
+</StateList>
+<TransitionList>
+<Transition Event="as[1][2]" Source="i0" Target="i1"/>
+<Transition Event="as[2][2]" Source="i0" Target="i2"/>
+<Transition Event="as[3][2]" Source="i0" Target="i3"/>
+<Transition Event="as[4][2]" Source="i0" Target="i4"/>
+<Transition Event="end[2]" Source="i0" Target="i0"/>
+<Transition Event="ras[1][2]" Source="i0" Target="i1"/>
+<Transition Event="ras[2][2]" Source="i0" Target="i2"/>
+<Transition Event="ras[3][2]" Source="i0" Target="i3"/>
+<Transition Event="ras[4][2]" Source="i0" Target="i4"/>
+<Transition Event="tout[1]" Source="i0" Target="i0"/>
+<Transition Event="tout[2]" Source="i0" Target="i0"/>
+<Transition Event="tout[3]" Source="i0" Target="i0"/>
+<Transition Event="tout[4]" Source="i0" Target="i0"/>
+<Transition Event="enter[1][2]" Source="i1" Target="i0"/>
+<Transition Event="enter[2][1]" Source="i1" Target="i1"/>
+<Transition Event="enter[2][2]" Source="i1" Target="i1"/>
+<Transition Event="enter[2][3]" Source="i1" Target="i1"/>
+<Transition Event="enter[3][1]" Source="i1" Target="i1"/>
+<Transition Event="enter[3][2]" Source="i1" Target="i1"/>
+<Transition Event="enter[3][3]" Source="i1" Target="i1"/>
+<Transition Event="enter[4][1]" Source="i1" Target="i1"/>
+<Transition Event="enter[4][2]" Source="i1" Target="i1"/>
+<Transition Event="enter[4][3]" Source="i1" Target="i1"/>
+<Transition Event="ras[1][1]" Source="i1" Target="i0"/>
+<Transition Event="ras[1][3]" Source="i1" Target="i0"/>
+<Transition Event="ras[2][1]" Source="i1" Target="i1"/>
+<Transition Event="ras[2][3]" Source="i1" Target="i1"/>
+<Transition Event="ras[3][1]" Source="i1" Target="i1"/>
+<Transition Event="ras[3][3]" Source="i1" Target="i1"/>
+<Transition Event="ras[4][1]" Source="i1" Target="i1"/>
+<Transition Event="ras[4][3]" Source="i1" Target="i1"/>
+<Transition Event="tout[1]" Source="i1" Target="i0"/>
+<Transition Event="tout[2]" Source="i1" Target="i1"/>
+<Transition Event="tout[3]" Source="i1" Target="i1"/>
+<Transition Event="tout[4]" Source="i1" Target="i1"/>
+<Transition Event="enter[1][1]" Source="i2" Target="i2"/>
+<Transition Event="enter[1][2]" Source="i2" Target="i2"/>
+<Transition Event="enter[1][3]" Source="i2" Target="i2"/>
+<Transition Event="enter[2][2]" Source="i2" Target="i0"/>
+<Transition Event="enter[3][1]" Source="i2" Target="i2"/>
+<Transition Event="enter[3][2]" Source="i2" Target="i2"/>
+<Transition Event="enter[3][3]" Source="i2" Target="i2"/>
+<Transition Event="enter[4][1]" Source="i2" Target="i2"/>
+<Transition Event="enter[4][2]" Source="i2" Target="i2"/>
+<Transition Event="enter[4][3]" Source="i2" Target="i2"/>
+<Transition Event="ras[1][1]" Source="i2" Target="i2"/>
+<Transition Event="ras[1][3]" Source="i2" Target="i2"/>
+<Transition Event="ras[2][1]" Source="i2" Target="i0"/>
+<Transition Event="ras[2][3]" Source="i2" Target="i0"/>
+<Transition Event="ras[3][1]" Source="i2" Target="i2"/>
+<Transition Event="ras[3][3]" Source="i2" Target="i2"/>
+<Transition Event="ras[4][1]" Source="i2" Target="i2"/>
+<Transition Event="ras[4][3]" Source="i2" Target="i2"/>
+<Transition Event="tout[1]" Source="i2" Target="i2"/>
+<Transition Event="tout[2]" Source="i2" Target="i0"/>
+<Transition Event="tout[3]" Source="i2" Target="i2"/>
+<Transition Event="tout[4]" Source="i2" Target="i2"/>
+<Transition Event="enter[1][1]" Source="i3" Target="i3"/>
+<Transition Event="enter[1][2]" Source="i3" Target="i3"/>
+<Transition Event="enter[1][3]" Source="i3" Target="i3"/>
+<Transition Event="enter[2][1]" Source="i3" Target="i3"/>
+<Transition Event="enter[2][2]" Source="i3" Target="i3"/>
+<Transition Event="enter[2][3]" Source="i3" Target="i3"/>
+<Transition Event="enter[3][2]" Source="i3" Target="i0"/>
+<Transition Event="enter[4][1]" Source="i3" Target="i3"/>
+<Transition Event="enter[4][2]" Source="i3" Target="i3"/>
+<Transition Event="enter[4][3]" Source="i3" Target="i3"/>
+<Transition Event="ras[1][1]" Source="i3" Target="i3"/>
+<Transition Event="ras[1][3]" Source="i3" Target="i3"/>
+<Transition Event="ras[2][1]" Source="i3" Target="i3"/>
+<Transition Event="ras[2][3]" Source="i3" Target="i3"/>
+<Transition Event="ras[3][1]" Source="i3" Target="i0"/>
+<Transition Event="ras[3][3]" Source="i3" Target="i0"/>
+<Transition Event="ras[4][1]" Source="i3" Target="i3"/>
+<Transition Event="ras[4][3]" Source="i3" Target="i3"/>
+<Transition Event="tout[1]" Source="i3" Target="i3"/>
+<Transition Event="tout[2]" Source="i3" Target="i3"/>
+<Transition Event="tout[3]" Source="i3" Target="i0"/>
+<Transition Event="tout[4]" Source="i3" Target="i3"/>
+<Transition Event="enter[1][1]" Source="i4" Target="i4"/>
+<Transition Event="enter[1][2]" Source="i4" Target="i4"/>
+<Transition Event="enter[1][3]" Source="i4" Target="i4"/>
+<Transition Event="enter[2][1]" Source="i4" Target="i4"/>
+<Transition Event="enter[2][2]" Source="i4" Target="i4"/>
+<Transition Event="enter[2][3]" Source="i4" Target="i4"/>
+<Transition Event="enter[3][1]" Source="i4" Target="i4"/>
+<Transition Event="enter[3][2]" Source="i4" Target="i4"/>
+<Transition Event="enter[3][3]" Source="i4" Target="i4"/>
+<Transition Event="enter[4][2]" Source="i4" Target="i0"/>
+<Transition Event="ras[1][1]" Source="i4" Target="i4"/>
+<Transition Event="ras[1][3]" Source="i4" Target="i4"/>
+<Transition Event="ras[2][1]" Source="i4" Target="i4"/>
+<Transition Event="ras[2][3]" Source="i4" Target="i4"/>
+<Transition Event="ras[3][1]" Source="i4" Target="i4"/>
+<Transition Event="ras[3][3]" Source="i4" Target="i4"/>
+<Transition Event="ras[4][1]" Source="i4" Target="i0"/>
+<Transition Event="ras[4][3]" Source="i4" Target="i0"/>
+<Transition Event="tout[1]" Source="i4" Target="i4"/>
+<Transition Event="tout[2]" Source="i4" Target="i4"/>
+<Transition Event="tout[3]" Source="i4" Target="i4"/>
+<Transition Event="tout[4]" Source="i4" Target="i0"/>
+</TransitionList>
+</Automaton>
+<Automaton Kind="SPEC" Name="VehicleAssignmentQueueCapacity[3]">
+<EventRefList>
+<EventRef Name="as[1][3]"/>
+<EventRef Name="as[2][3]"/>
+<EventRef Name="as[3][3]"/>
+<EventRef Name="as[4][3]"/>
+<EventRef Name="end[3]"/>
+<EventRef Name="enter[1][1]"/>
+<EventRef Name="enter[1][2]"/>
+<EventRef Name="enter[1][3]"/>
+<EventRef Name="enter[2][1]"/>
+<EventRef Name="enter[2][2]"/>
+<EventRef Name="enter[2][3]"/>
+<EventRef Name="enter[3][1]"/>
+<EventRef Name="enter[3][2]"/>
+<EventRef Name="enter[3][3]"/>
+<EventRef Name="enter[4][1]"/>
+<EventRef Name="enter[4][2]"/>
+<EventRef Name="enter[4][3]"/>
+<EventRef Name=":accepting"/>
+<EventRef Name="ras[1][1]"/>
+<EventRef Name="ras[1][2]"/>
+<EventRef Name="ras[1][3]"/>
+<EventRef Name="ras[2][1]"/>
+<EventRef Name="ras[2][2]"/>
+<EventRef Name="ras[2][3]"/>
+<EventRef Name="ras[3][1]"/>
+<EventRef Name="ras[3][2]"/>
+<EventRef Name="ras[3][3]"/>
+<EventRef Name="ras[4][1]"/>
+<EventRef Name="ras[4][2]"/>
+<EventRef Name="ras[4][3]"/>
+<EventRef Name="tout[1]"/>
+<EventRef Name="tout[2]"/>
+<EventRef Name="tout[3]"/>
+<EventRef Name="tout[4]"/>
+</EventRefList>
+<StateList>
+<State Initial="true" Name="i0">
+<EventRefList>
+<EventRef Name=":accepting"/>
+</EventRefList>
+</State>
+<State Name="i1"/>
+<State Name="i2"/>
+<State Name="i3"/>
+<State Name="i4"/>
+</StateList>
+<TransitionList>
+<Transition Event="as[1][3]" Source="i0" Target="i1"/>
+<Transition Event="as[2][3]" Source="i0" Target="i2"/>
+<Transition Event="as[3][3]" Source="i0" Target="i3"/>
+<Transition Event="as[4][3]" Source="i0" Target="i4"/>
+<Transition Event="end[3]" Source="i0" Target="i0"/>
+<Transition Event="ras[1][3]" Source="i0" Target="i1"/>
+<Transition Event="ras[2][3]" Source="i0" Target="i2"/>
+<Transition Event="ras[3][3]" Source="i0" Target="i3"/>
+<Transition Event="ras[4][3]" Source="i0" Target="i4"/>
+<Transition Event="tout[1]" Source="i0" Target="i0"/>
+<Transition Event="tout[2]" Source="i0" Target="i0"/>
+<Transition Event="tout[3]" Source="i0" Target="i0"/>
+<Transition Event="tout[4]" Source="i0" Target="i0"/>
+<Transition Event="enter[1][3]" Source="i1" Target="i0"/>
+<Transition Event="enter[2][1]" Source="i1" Target="i1"/>
+<Transition Event="enter[2][2]" Source="i1" Target="i1"/>
+<Transition Event="enter[2][3]" Source="i1" Target="i1"/>
+<Transition Event="enter[3][1]" Source="i1" Target="i1"/>
+<Transition Event="enter[3][2]" Source="i1" Target="i1"/>
+<Transition Event="enter[3][3]" Source="i1" Target="i1"/>
+<Transition Event="enter[4][1]" Source="i1" Target="i1"/>
+<Transition Event="enter[4][2]" Source="i1" Target="i1"/>
+<Transition Event="enter[4][3]" Source="i1" Target="i1"/>
+<Transition Event="ras[1][1]" Source="i1" Target="i0"/>
+<Transition Event="ras[1][2]" Source="i1" Target="i0"/>
+<Transition Event="ras[2][1]" Source="i1" Target="i1"/>
+<Transition Event="ras[2][2]" Source="i1" Target="i1"/>
+<Transition Event="ras[3][1]" Source="i1" Target="i1"/>
+<Transition Event="ras[3][2]" Source="i1" Target="i1"/>
+<Transition Event="ras[4][1]" Source="i1" Target="i1"/>
+<Transition Event="ras[4][2]" Source="i1" Target="i1"/>
+<Transition Event="tout[1]" Source="i1" Target="i0"/>
+<Transition Event="tout[2]" Source="i1" Target="i1"/>
+<Transition Event="tout[3]" Source="i1" Target="i1"/>
+<Transition Event="tout[4]" Source="i1" Target="i1"/>
+<Transition Event="enter[1][1]" Source="i2" Target="i2"/>
+<Transition Event="enter[1][2]" Source="i2" Target="i2"/>
+<Transition Event="enter[1][3]" Source="i2" Target="i2"/>
+<Transition Event="enter[2][3]" Source="i2" Target="i0"/>
+<Transition Event="enter[3][1]" Source="i2" Target="i2"/>
+<Transition Event="enter[3][2]" Source="i2" Target="i2"/>
+<Transition Event="enter[3][3]" Source="i2" Target="i2"/>
+<Transition Event="enter[4][1]" Source="i2" Target="i2"/>
+<Transition Event="enter[4][2]" Source="i2" Target="i2"/>
+<Transition Event="enter[4][3]" Source="i2" Target="i2"/>
+<Transition Event="ras[1][1]" Source="i2" Target="i2"/>
+<Transition Event="ras[1][2]" Source="i2" Target="i2"/>
+<Transition Event="ras[2][1]" Source="i2" Target="i0"/>
+<Transition Event="ras[2][2]" Source="i2" Target="i0"/>
+<Transition Event="ras[3][1]" Source="i2" Target="i2"/>
+<Transition Event="ras[3][2]" Source="i2" Target="i2"/>
+<Transition Event="ras[4][1]" Source="i2" Target="i2"/>
+<Transition Event="ras[4][2]" Source="i2" Target="i2"/>
+<Transition Event="tout[1]" Source="i2" Target="i2"/>
+<Transition Event="tout[2]" Source="i2" Target="i0"/>
+<Transition Event="tout[3]" Source="i2" Target="i2"/>
+<Transition Event="tout[4]" Source="i2" Target="i2"/>
+<Transition Event="enter[1][1]" Source="i3" Target="i3"/>
+<Transition Event="enter[1][2]" Source="i3" Target="i3"/>
+<Transition Event="enter[1][3]" Source="i3" Target="i3"/>
+<Transition Event="enter[2][1]" Source="i3" Target="i3"/>
+<Transition Event="enter[2][2]" Source="i3" Target="i3"/>
+<Transition Event="enter[2][3]" Source="i3" Target="i3"/>
+<Transition Event="enter[3][3]" Source="i3" Target="i0"/>
+<Transition Event="enter[4][1]" Source="i3" Target="i3"/>
+<Transition Event="enter[4][2]" Source="i3" Target="i3"/>
+<Transition Event="enter[4][3]" Source="i3" Target="i3"/>
+<Transition Event="ras[1][1]" Source="i3" Target="i3"/>
+<Transition Event="ras[1][2]" Source="i3" Target="i3"/>
+<Transition Event="ras[2][1]" Source="i3" Target="i3"/>
+<Transition Event="ras[2][2]" Source="i3" Target="i3"/>
+<Transition Event="ras[3][1]" Source="i3" Target="i0"/>
+<Transition Event="ras[3][2]" Source="i3" Target="i0"/>
+<Transition Event="ras[4][1]" Source="i3" Target="i3"/>
+<Transition Event="ras[4][2]" Source="i3" Target="i3"/>
+<Transition Event="tout[1]" Source="i3" Target="i3"/>
+<Transition Event="tout[2]" Source="i3" Target="i3"/>
+<Transition Event="tout[3]" Source="i3" Target="i0"/>
+<Transition Event="tout[4]" Source="i3" Target="i3"/>
+<Transition Event="enter[1][1]" Source="i4" Target="i4"/>
+<Transition Event="enter[1][2]" Source="i4" Target="i4"/>
+<Transition Event="enter[1][3]" Source="i4" Target="i4"/>
+<Transition Event="enter[2][1]" Source="i4" Target="i4"/>
+<Transition Event="enter[2][2]" Source="i4" Target="i4"/>
+<Transition Event="enter[2][3]" Source="i4" Target="i4"/>
+<Transition Event="enter[3][1]" Source="i4" Target="i4"/>
+<Transition Event="enter[3][2]" Source="i4" Target="i4"/>
+<Transition Event="enter[3][3]" Source="i4" Target="i4"/>
+<Transition Event="enter[4][3]" Source="i4" Target="i0"/>
+<Transition Event="ras[1][1]" Source="i4" Target="i4"/>
+<Transition Event="ras[1][2]" Source="i4" Target="i4"/>
+<Transition Event="ras[2][1]" Source="i4" Target="i4"/>
+<Transition Event="ras[2][2]" Source="i4" Target="i4"/>
+<Transition Event="ras[3][1]" Source="i4" Target="i4"/>
+<Transition Event="ras[3][2]" Source="i4" Target="i4"/>
+<Transition Event="ras[4][1]" Source="i4" Target="i0"/>
+<Transition Event="ras[4][2]" Source="i4" Target="i0"/>
+<Transition Event="tout[1]" Source="i4" Target="i4"/>
+<Transition Event="tout[2]" Source="i4" Target="i4"/>
+<Transition Event="tout[3]" Source="i4" Target="i4"/>
+<Transition Event="tout[4]" Source="i4" Target="i0"/>
+</TransitionList>
+</Automaton>
+<Automaton Kind="SPEC" Name="VehicleBreakdown[1]">
+<EventRefList>
+<EventRef Name="as[1][1]"/>
+<EventRef Name="as[2][1]"/>
+<EventRef Name="as[3][1]"/>
+<EventRef Name="as[4][1]"/>
+<EventRef Name="dwn[1]"/>
+<EventRef Name="enter[1][1]"/>
+<EventRef Name="enter[2][1]"/>
+<EventRef Name="enter[3][1]"/>
+<EventRef Name="enter[4][1]"/>
+<EventRef Name=":accepting"/>
+<EventRef Name="ras[1][1]"/>
+<EventRef Name="ras[2][1]"/>
+<EventRef Name="ras[3][1]"/>
+<EventRef Name="ras[4][1]"/>
+<EventRef Name="st[1]"/>
+</EventRefList>
+<StateList>
+<State Initial="true" Name="k0">
+<EventRefList>
+<EventRef Name=":accepting"/>
+</EventRefList>
+</State>
+<State Name="k1">
+<EventRefList>
+<EventRef Name=":accepting"/>
+</EventRefList>
+</State>
+</StateList>
+<TransitionList>
+<Transition Event="as[1][1]" Source="k0" Target="k0"/>
+<Transition Event="as[2][1]" Source="k0" Target="k0"/>
+<Transition Event="as[3][1]" Source="k0" Target="k0"/>
+<Transition Event="as[4][1]" Source="k0" Target="k0"/>
+<Transition Event="dwn[1]" Source="k0" Target="k1"/>
+<Transition Event="enter[1][1]" Source="k0" Target="k0"/>
+<Transition Event="enter[2][1]" Source="k0" Target="k0"/>
+<Transition Event="enter[3][1]" Source="k0" Target="k0"/>
+<Transition Event="enter[4][1]" Source="k0" Target="k0"/>
+<Transition Event="ras[1][1]" Source="k0" Target="k0"/>
+<Transition Event="ras[2][1]" Source="k0" Target="k0"/>
+<Transition Event="ras[3][1]" Source="k0" Target="k0"/>
+<Transition Event="ras[4][1]" Source="k0" Target="k0"/>
+<Transition Event="st[1]" Source="k0" Target="k0"/>
+<Transition Event="st[1]" Source="k1" Target="k0"/>
+</TransitionList>
+</Automaton>
+<Automaton Kind="SPEC" Name="VehicleBreakdown[2]">
+<EventRefList>
+<EventRef Name="as[1][2]"/>
+<EventRef Name="as[2][2]"/>
+<EventRef Name="as[3][2]"/>
+<EventRef Name="as[4][2]"/>
+<EventRef Name="dwn[2]"/>
+<EventRef Name="enter[1][2]"/>
+<EventRef Name="enter[2][2]"/>
+<EventRef Name="enter[3][2]"/>
+<EventRef Name="enter[4][2]"/>
+<EventRef Name=":accepting"/>
+<EventRef Name="ras[1][2]"/>
+<EventRef Name="ras[2][2]"/>
+<EventRef Name="ras[3][2]"/>
+<EventRef Name="ras[4][2]"/>
+<EventRef Name="st[2]"/>
+</EventRefList>
+<StateList>
+<State Initial="true" Name="k0">
+<EventRefList>
+<EventRef Name=":accepting"/>
+</EventRefList>
+</State>
+<State Name="k1">
+<EventRefList>
+<EventRef Name=":accepting"/>
+</EventRefList>
+</State>
+</StateList>
+<TransitionList>
+<Transition Event="as[1][2]" Source="k0" Target="k0"/>
+<Transition Event="as[2][2]" Source="k0" Target="k0"/>
+<Transition Event="as[3][2]" Source="k0" Target="k0"/>
+<Transition Event="as[4][2]" Source="k0" Target="k0"/>
+<Transition Event="dwn[2]" Source="k0" Target="k1"/>
+<Transition Event="enter[1][2]" Source="k0" Target="k0"/>
+<Transition Event="enter[2][2]" Source="k0" Target="k0"/>
+<Transition Event="enter[3][2]" Source="k0" Target="k0"/>
+<Transition Event="enter[4][2]" Source="k0" Target="k0"/>
+<Transition Event="ras[1][2]" Source="k0" Target="k0"/>
+<Transition Event="ras[2][2]" Source="k0" Target="k0"/>
+<Transition Event="ras[3][2]" Source="k0" Target="k0"/>
+<Transition Event="ras[4][2]" Source="k0" Target="k0"/>
+<Transition Event="st[2]" Source="k0" Target="k0"/>
+<Transition Event="st[2]" Source="k1" Target="k0"/>
+</TransitionList>
+</Automaton>
+<Automaton Kind="SPEC" Name="VehicleBreakdown[3]">
+<EventRefList>
+<EventRef Name="as[1][3]"/>
+<EventRef Name="as[2][3]"/>
+<EventRef Name="as[3][3]"/>
+<EventRef Name="as[4][3]"/>
+<EventRef Name="dwn[3]"/>
+<EventRef Name="enter[1][3]"/>
+<EventRef Name="enter[2][3]"/>
+<EventRef Name="enter[3][3]"/>
+<EventRef Name="enter[4][3]"/>
+<EventRef Name=":accepting"/>
+<EventRef Name="ras[1][3]"/>
+<EventRef Name="ras[2][3]"/>
+<EventRef Name="ras[3][3]"/>
+<EventRef Name="ras[4][3]"/>
+<EventRef Name="st[3]"/>
+</EventRefList>
+<StateList>
+<State Initial="true" Name="k0">
+<EventRefList>
+<EventRef Name=":accepting"/>
+</EventRefList>
+</State>
+<State Name="k1">
+<EventRefList>
+<EventRef Name=":accepting"/>
+</EventRefList>
+</State>
+</StateList>
+<TransitionList>
+<Transition Event="as[1][3]" Source="k0" Target="k0"/>
+<Transition Event="as[2][3]" Source="k0" Target="k0"/>
+<Transition Event="as[3][3]" Source="k0" Target="k0"/>
+<Transition Event="as[4][3]" Source="k0" Target="k0"/>
+<Transition Event="dwn[3]" Source="k0" Target="k1"/>
+<Transition Event="enter[1][3]" Source="k0" Target="k0"/>
+<Transition Event="enter[2][3]" Source="k0" Target="k0"/>
+<Transition Event="enter[3][3]" Source="k0" Target="k0"/>
+<Transition Event="enter[4][3]" Source="k0" Target="k0"/>
+<Transition Event="ras[1][3]" Source="k0" Target="k0"/>
+<Transition Event="ras[2][3]" Source="k0" Target="k0"/>
+<Transition Event="ras[3][3]" Source="k0" Target="k0"/>
+<Transition Event="ras[4][3]" Source="k0" Target="k0"/>
+<Transition Event="st[3]" Source="k0" Target="k0"/>
+<Transition Event="st[3]" Source="k1" Target="k0"/>
+</TransitionList>
+</Automaton>
+<Automaton Kind="PLANT" Name="VehicleJamming[1]">
+<EventRefList>
+<EventRef Name="inj[1]"/>
+<EventRef Name=":accepting"/>
+<EventRef Name="outj[1]"/>
+</EventRefList>
+<StateList>
+<State Initial="true" Name="c0">
+<EventRefList>
+<EventRef Name=":accepting"/>
+</EventRefList>
+</State>
+<State Name="c1"/>
+</StateList>
+<TransitionList>
+<Transition Event="inj[1]" Source="c0" Target="c1"/>
+<Transition Event="outj[1]" Source="c1" Target="c0"/>
+</TransitionList>
+</Automaton>
+<Automaton Kind="PLANT" Name="VehicleJamming[2]">
+<EventRefList>
+<EventRef Name="inj[2]"/>
+<EventRef Name=":accepting"/>
+<EventRef Name="outj[2]"/>
+</EventRefList>
+<StateList>
+<State Initial="true" Name="c0">
+<EventRefList>
+<EventRef Name=":accepting"/>
+</EventRefList>
+</State>
+<State Name="c1"/>
+</StateList>
+<TransitionList>
+<Transition Event="inj[2]" Source="c0" Target="c1"/>
+<Transition Event="outj[2]" Source="c1" Target="c0"/>
+</TransitionList>
+</Automaton>
+<Automaton Kind="PLANT" Name="VehicleJamming[3]">
+<EventRefList>
+<EventRef Name="inj[3]"/>
+<EventRef Name=":accepting"/>
+<EventRef Name="outj[3]"/>
+</EventRefList>
+<StateList>
+<State Initial="true" Name="c0">
+<EventRefList>
+<EventRef Name=":accepting"/>
+</EventRefList>
+</State>
+<State Name="c1"/>
+</StateList>
+<TransitionList>
+<Transition Event="inj[3]" Source="c0" Target="c1"/>
+<Transition Event="outj[3]" Source="c1" Target="c0"/>
+</TransitionList>
+</Automaton>
+<Automaton Kind="SPEC" Name="VehicleSeatCapacity[1]">
+<EventRefList>
+<EventRef Name="ecall[1][1]"/>
+<EventRef Name="ecall[2][1]"/>
+<EventRef Name="ecall[3][1]"/>
+<EventRef Name="ecall[4][1]"/>
+<EventRef Name="end[1]"/>
+<EventRef Name="enter[1][1]"/>
+<EventRef Name="enter[2][1]"/>
+<EventRef Name="enter[3][1]"/>
+<EventRef Name="enter[4][1]"/>
+<EventRef Name="leave[1][1]"/>
+<EventRef Name="leave[2][1]"/>
+<EventRef Name="leave[3][1]"/>
+<EventRef Name="leave[4][1]"/>
+<EventRef Name=":accepting"/>
+</EventRefList>
+<StateList>
+<State Initial="true" Name="h0">
+<EventRefList>
+<EventRef Name=":accepting"/>
+</EventRefList>
+</State>
+<State Name="h1"/>
+<State Name="h2"/>
+</StateList>
+<TransitionList>
+<Transition Event="end[1]" Source="h0" Target="h0"/>
+<Transition Event="enter[1][1]" Source="h0" Target="h1"/>
+<Transition Event="enter[2][1]" Source="h0" Target="h1"/>
+<Transition Event="enter[3][1]" Source="h0" Target="h1"/>
+<Transition Event="enter[4][1]" Source="h0" Target="h1"/>
+<Transition Event="leave[1][1]" Source="h0" Target="h0"/>
+<Transition Event="leave[2][1]" Source="h0" Target="h0"/>
+<Transition Event="leave[3][1]" Source="h0" Target="h0"/>
+<Transition Event="leave[4][1]" Source="h0" Target="h0"/>
+<Transition Event="ecall[1][1]" Source="h1" Target="h0"/>
+<Transition Event="ecall[2][1]" Source="h1" Target="h0"/>
+<Transition Event="ecall[3][1]" Source="h1" Target="h0"/>
+<Transition Event="ecall[4][1]" Source="h1" Target="h0"/>
+<Transition Event="enter[1][1]" Source="h1" Target="h2"/>
+<Transition Event="enter[2][1]" Source="h1" Target="h2"/>
+<Transition Event="enter[3][1]" Source="h1" Target="h2"/>
+<Transition Event="enter[4][1]" Source="h1" Target="h2"/>
+<Transition Event="leave[1][1]" Source="h1" Target="h0"/>
+<Transition Event="leave[2][1]" Source="h1" Target="h0"/>
+<Transition Event="leave[3][1]" Source="h1" Target="h0"/>
+<Transition Event="leave[4][1]" Source="h1" Target="h0"/>
+<Transition Event="ecall[1][1]" Source="h2" Target="h1"/>
+<Transition Event="ecall[2][1]" Source="h2" Target="h1"/>
+<Transition Event="ecall[3][1]" Source="h2" Target="h1"/>
+<Transition Event="ecall[4][1]" Source="h2" Target="h1"/>
+<Transition Event="leave[1][1]" Source="h2" Target="h1"/>
+<Transition Event="leave[2][1]" Source="h2" Target="h1"/>
+<Transition Event="leave[3][1]" Source="h2" Target="h1"/>
+<Transition Event="leave[4][1]" Source="h2" Target="h1"/>
+</TransitionList>
+</Automaton>
+<Automaton Kind="SPEC" Name="VehicleSeatCapacity[2]">
+<EventRefList>
+<EventRef Name="ecall[1][2]"/>
+<EventRef Name="ecall[2][2]"/>
+<EventRef Name="ecall[3][2]"/>
+<EventRef Name="ecall[4][2]"/>
+<EventRef Name="end[2]"/>
+<EventRef Name="enter[1][2]"/>
+<EventRef Name="enter[2][2]"/>
+<EventRef Name="enter[3][2]"/>
+<EventRef Name="enter[4][2]"/>
+<EventRef Name="leave[1][2]"/>
+<EventRef Name="leave[2][2]"/>
+<EventRef Name="leave[3][2]"/>
+<EventRef Name="leave[4][2]"/>
+<EventRef Name=":accepting"/>
+</EventRefList>
+<StateList>
+<State Initial="true" Name="h0">
+<EventRefList>
+<EventRef Name=":accepting"/>
+</EventRefList>
+</State>
+<State Name="h1"/>
+<State Name="h2"/>
+</StateList>
+<TransitionList>
+<Transition Event="end[2]" Source="h0" Target="h0"/>
+<Transition Event="enter[1][2]" Source="h0" Target="h1"/>
+<Transition Event="enter[2][2]" Source="h0" Target="h1"/>
+<Transition Event="enter[3][2]" Source="h0" Target="h1"/>
+<Transition Event="enter[4][2]" Source="h0" Target="h1"/>
+<Transition Event="leave[1][2]" Source="h0" Target="h0"/>
+<Transition Event="leave[2][2]" Source="h0" Target="h0"/>
+<Transition Event="leave[3][2]" Source="h0" Target="h0"/>
+<Transition Event="leave[4][2]" Source="h0" Target="h0"/>
+<Transition Event="ecall[1][2]" Source="h1" Target="h0"/>
+<Transition Event="ecall[2][2]" Source="h1" Target="h0"/>
+<Transition Event="ecall[3][2]" Source="h1" Target="h0"/>
+<Transition Event="ecall[4][2]" Source="h1" Target="h0"/>
+<Transition Event="enter[1][2]" Source="h1" Target="h2"/>
+<Transition Event="enter[2][2]" Source="h1" Target="h2"/>
+<Transition Event="enter[3][2]" Source="h1" Target="h2"/>
+<Transition Event="enter[4][2]" Source="h1" Target="h2"/>
+<Transition Event="leave[1][2]" Source="h1" Target="h0"/>
+<Transition Event="leave[2][2]" Source="h1" Target="h0"/>
+<Transition Event="leave[3][2]" Source="h1" Target="h0"/>
+<Transition Event="leave[4][2]" Source="h1" Target="h0"/>
+<Transition Event="ecall[1][2]" Source="h2" Target="h1"/>
+<Transition Event="ecall[2][2]" Source="h2" Target="h1"/>
+<Transition Event="ecall[3][2]" Source="h2" Target="h1"/>
+<Transition Event="ecall[4][2]" Source="h2" Target="h1"/>
+<Transition Event="leave[1][2]" Source="h2" Target="h1"/>
+<Transition Event="leave[2][2]" Source="h2" Target="h1"/>
+<Transition Event="leave[3][2]" Source="h2" Target="h1"/>
+<Transition Event="leave[4][2]" Source="h2" Target="h1"/>
+</TransitionList>
+</Automaton>
+<Automaton Kind="SPEC" Name="VehicleSeatCapacity[3]">
+<EventRefList>
+<EventRef Name="ecall[1][3]"/>
+<EventRef Name="ecall[2][3]"/>
+<EventRef Name="ecall[3][3]"/>
+<EventRef Name="ecall[4][3]"/>
+<EventRef Name="end[3]"/>
+<EventRef Name="enter[1][3]"/>
+<EventRef Name="enter[2][3]"/>
+<EventRef Name="enter[3][3]"/>
+<EventRef Name="enter[4][3]"/>
+<EventRef Name="leave[1][3]"/>
+<EventRef Name="leave[2][3]"/>
+<EventRef Name="leave[3][3]"/>
+<EventRef Name="leave[4][3]"/>
+<EventRef Name=":accepting"/>
+</EventRefList>
+<StateList>
+<State Initial="true" Name="h0">
+<EventRefList>
+<EventRef Name=":accepting"/>
+</EventRefList>
+</State>
+<State Name="h1"/>
+<State Name="h2"/>
+</StateList>
+<TransitionList>
+<Transition Event="end[3]" Source="h0" Target="h0"/>
+<Transition Event="enter[1][3]" Source="h0" Target="h1"/>
+<Transition Event="enter[2][3]" Source="h0" Target="h1"/>
+<Transition Event="enter[3][3]" Source="h0" Target="h1"/>
+<Transition Event="enter[4][3]" Source="h0" Target="h1"/>
+<Transition Event="leave[1][3]" Source="h0" Target="h0"/>
+<Transition Event="leave[2][3]" Source="h0" Target="h0"/>
+<Transition Event="leave[3][3]" Source="h0" Target="h0"/>
+<Transition Event="leave[4][3]" Source="h0" Target="h0"/>
+<Transition Event="ecall[1][3]" Source="h1" Target="h0"/>
+<Transition Event="ecall[2][3]" Source="h1" Target="h0"/>
+<Transition Event="ecall[3][3]" Source="h1" Target="h0"/>
+<Transition Event="ecall[4][3]" Source="h1" Target="h0"/>
+<Transition Event="enter[1][3]" Source="h1" Target="h2"/>
+<Transition Event="enter[2][3]" Source="h1" Target="h2"/>
+<Transition Event="enter[3][3]" Source="h1" Target="h2"/>
+<Transition Event="enter[4][3]" Source="h1" Target="h2"/>
+<Transition Event="leave[1][3]" Source="h1" Target="h0"/>
+<Transition Event="leave[2][3]" Source="h1" Target="h0"/>
+<Transition Event="leave[3][3]" Source="h1" Target="h0"/>
+<Transition Event="leave[4][3]" Source="h1" Target="h0"/>
+<Transition Event="ecall[1][3]" Source="h2" Target="h1"/>
+<Transition Event="ecall[2][3]" Source="h2" Target="h1"/>
+<Transition Event="ecall[3][3]" Source="h2" Target="h1"/>
+<Transition Event="ecall[4][3]" Source="h2" Target="h1"/>
+<Transition Event="leave[1][3]" Source="h2" Target="h1"/>
+<Transition Event="leave[2][3]" Source="h2" Target="h1"/>
+<Transition Event="leave[3][3]" Source="h2" Target="h1"/>
+<Transition Event="leave[4][3]" Source="h2" Target="h1"/>
+</TransitionList>
+</Automaton>
+<Automaton Kind="PLANT" Name="Vehicle[1]">
+<EventRefList>
+<EventRef Name="dwn[1]"/>
+<EventRef Name="end[1]"/>
+<EventRef Name=":accepting"/>
+<EventRef Name="ret[1]"/>
+<EventRef Name="st[1]"/>
+</EventRefList>
+<StateList>
+<State Initial="true" Name="b0">
+<EventRefList>
+<EventRef Name=":accepting"/>
+</EventRefList>
+</State>
+<State Name="b1"/>
+<State Name="b2"/>
+</StateList>
+<TransitionList>
+<Transition Event="st[1]" Source="b0" Target="b1"/>
+<Transition Event="dwn[1]" Source="b1" Target="b2"/>
+<Transition Event="end[1]" Source="b1" Target="b0"/>
+<Transition Event="ret[1]" Source="b2" Target="b0"/>
+</TransitionList>
+</Automaton>
+<Automaton Kind="PLANT" Name="Vehicle[2]">
+<EventRefList>
+<EventRef Name="dwn[2]"/>
+<EventRef Name="end[2]"/>
+<EventRef Name=":accepting"/>
+<EventRef Name="ret[2]"/>
+<EventRef Name="st[2]"/>
+</EventRefList>
+<StateList>
+<State Initial="true" Name="b0">
+<EventRefList>
+<EventRef Name=":accepting"/>
+</EventRefList>
+</State>
+<State Name="b1"/>
+<State Name="b2"/>
+</StateList>
+<TransitionList>
+<Transition Event="st[2]" Source="b0" Target="b1"/>
+<Transition Event="dwn[2]" Source="b1" Target="b2"/>
+<Transition Event="end[2]" Source="b1" Target="b0"/>
+<Transition Event="ret[2]" Source="b2" Target="b0"/>
+</TransitionList>
+</Automaton>
+<Automaton Kind="PLANT" Name="Vehicle[3]">
+<EventRefList>
+<EventRef Name="dwn[3]"/>
+<EventRef Name="end[3]"/>
+<EventRef Name=":accepting"/>
+<EventRef Name="ret[3]"/>
+<EventRef Name="st[3]"/>
+</EventRefList>
+<StateList>
+<State Initial="true" Name="b0">
+<EventRefList>
+<EventRef Name=":accepting"/>
+</EventRefList>
+</State>
+<State Name="b1"/>
+<State Name="b2"/>
+</StateList>
+<TransitionList>
+<Transition Event="st[3]" Source="b0" Target="b1"/>
+<Transition Event="dwn[3]" Source="b1" Target="b2"/>
+<Transition Event="end[3]" Source="b1" Target="b0"/>
+<Transition Event="ret[3]" Source="b2" Target="b0"/>
+</TransitionList>
+</Automaton>
+</AutomataList>
+</ProductDES>
+

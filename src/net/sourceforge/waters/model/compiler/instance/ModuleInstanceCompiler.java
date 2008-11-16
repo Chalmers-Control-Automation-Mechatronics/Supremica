@@ -163,6 +163,20 @@ public class ModuleInstanceCompiler extends AbstractModuleProxyVisitor
     return mHasEFAElements;
   }
 
+
+  //##########################################################################
+  //# Configuration
+  public boolean isOptimizationEnabled()
+  {
+    return mIsOptimizationEnabled;
+  }
+
+  public void setOptimizationEnabled(final boolean enable)
+  {
+    mIsOptimizationEnabled = enable;
+  }
+
+
   //#########################################################################
   //# Interface net.sourceforge.waters.model.module.ModuleProxyVisitor
   public SimpleExpressionProxy visitConstantAliasProxy
@@ -285,9 +299,13 @@ public class ModuleInstanceCompiler extends AbstractModuleProxyVisitor
         final CompiledEventDecl entry =
           new CompiledEventDecl(mNameSpace, decl, ranges);
         event = entry.getCompiledEvent();
-        if (numranges == 0) {
-          final CompiledSingleEvent single = (CompiledSingleEvent) event;
-          createEventDecl(single);
+        if (!mIsOptimizationEnabled) {
+          final Iterable<SingleEventOutput> outputs =
+            new EventOutputIterable(event);
+          for (final SingleEventOutput output : outputs) {
+            final CompiledSingleEvent single = output.getEvent();
+            createEventDecl(single);
+          }
         }
       } else {
         final EventKind kind = decl.getKind();
@@ -1092,6 +1110,8 @@ public class ModuleInstanceCompiler extends AbstractModuleProxyVisitor
   private final IndexAdder mIndexAdder;
   private final NameSpaceVariablesContext mNameSpaceVariablesContext;
   private final ModuleProxy mInputModule;
+
+  private boolean mIsOptimizationEnabled = true;
 
   private boolean mHasEFAElements;
 

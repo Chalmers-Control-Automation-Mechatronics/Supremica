@@ -87,6 +87,19 @@ public class ModuleGraphCompiler extends AbstractModuleProxyVisitor
 
 
   //##########################################################################
+  //# Configuration
+  public boolean isOptimizationEnabled()
+  {
+    return mIsOptimizationEnabled;
+  }
+
+  public void setOptimizationEnabled(final boolean enable)
+  {
+    mIsOptimizationEnabled = enable;
+  }
+
+
+  //##########################################################################
   //# Interface net.sourceforge.waters.model.module.ModuleProxyVisitor
   public Object visitEdgeProxy(final EdgeProxy edge)
   {
@@ -190,6 +203,9 @@ public class ModuleGraphCompiler extends AbstractModuleProxyVisitor
       mGlobalEventsMap =
         new HashMap<ProxyAccessor<IdentifierProxy>,EventProxy>(numevents);
       mGlobalEventsList = new ArrayList<EventProxy>(numevents);
+      if (mIsOptimizationEnabled) {
+        mGloballyUsedEvents = new HashSet<EventProxy>(numevents);
+      }
       visitCollection(decls);
       final List<Proxy> components = mInputModule.getComponentList();
       final int numaut = components.size();
@@ -197,11 +213,15 @@ public class ModuleGraphCompiler extends AbstractModuleProxyVisitor
         new HashMap<ProxyAccessor<IdentifierProxy>,AutomatonProxy>(numaut);
       mAutomataList = new ArrayList<AutomatonProxy>(numaut);
       visitCollection(components);
+      if (mIsOptimizationEnabled) {
+        mGlobalEventsList.retainAll(mGloballyUsedEvents);
+      }
       return mFactory.createProductDESProxy
         (name, comment, null, mGlobalEventsList, mAutomataList);
     } finally {
       mGlobalEventsMap = null;
       mGlobalEventsList = null;
+      mGloballyUsedEvents = null;
       mAutomataMap = null;
       mAutomataList = null;
     }
@@ -240,18 +260,24 @@ public class ModuleGraphCompiler extends AbstractModuleProxyVisitor
         }
       }
       // Reachability ...
-      mNumReachableStates = 0;
-      mNumReachableTransitions = 0;
-      for (final CompiledNode node : mPrecompiledNodesMap.values()) {
-        if (node.isInitial()) {
-          node.explore();
+      if (mIsOptimizationEnabled) {
+        mNumReachableStates = 0;
+        mNumReachableTransitions = 0;
+        for (final CompiledNode node : mPrecompiledNodesMap.values()) {
+          if (node.isInitial()) {
+            node.explore();
+          }
         }
+        removeSelfloopedEvents(mLocalEventsList);
+        if (mLocalEventsList.isEmpty()) {
+          return null;
+        }
+        mGloballyUsedEvents.addAll(mLocalEventsList);
+      } else {
+        mNumReachableStates = nodes.size();
+        mNumReachableTransitions = mLocalTransitionsList.size();
       }
       // Build alphabet, states, and transitions ...
-      removeSelfloopedEvents(mLocalEventsList);
-      if (mLocalEventsList.isEmpty()) {
-        return null;
-      }
       final List<StateProxy> states =
         new ArrayList<StateProxy>(mNumReachableStates);
       for (final NodeProxy node : nodes) {
@@ -389,7 +415,7 @@ public class ModuleGraphCompiler extends AbstractModuleProxyVisitor
 
   private void removeSelfloopedEvents(final List<EventProxy> list)
   {
-    if (list != null) {
+    if (list != null && mIsOptimizationEnabled) {
       final Iterator<EventProxy> iter = list.iterator();
       while (iter.hasNext()) {
         final EventProxy event = iter.next();
@@ -588,13 +614,15 @@ public class ModuleGraphCompiler extends AbstractModuleProxyVisitor
     //# Specific Algorithms
     StateProxy createStateProxy()
     {
-      if (mState == null && mIsReachable) {
-        final SimpleNodeProxy node = getNode();
-        final String name = node.getName();
-        final boolean initial = node.isInitial();
-        removeSelfloopedEvents(mPropositions);
-        mState = mFactory.createStateProxy(name, initial, mPropositions);
-        mSourceInfoBuilder.add(mState, node);
+      if (mState == null) {
+        if (!mIsOptimizationEnabled || mIsReachable) {
+          final SimpleNodeProxy node = getNode();
+          final String name = node.getName();
+          final boolean initial = node.isInitial();
+          removeSelfloopedEvents(mPropositions);
+          mState = mFactory.createStateProxy(name, initial, mPropositions);
+          mSourceInfoBuilder.add(mState, node);
+        }
       }
       return mState;
     }
@@ -761,7 +789,8 @@ public class ModuleGraphCompiler extends AbstractModuleProxyVisitor
     TransitionProxy createTransitionProxy()
     {
       final SelfloopInfo info = getSelfloopInfo(mEvent);
-      if (info.isAllSelfloops() || !mSource.isReachable()) {
+      if (mIsOptimizationEnabled &&
+          (info.isAllSelfloops() || !mSource.isReachable())) {
         return null;
       } else {
         final StateProxy sourcestate = mSource.getState();
@@ -831,8 +860,11 @@ public class ModuleGraphCompiler extends AbstractModuleProxyVisitor
   private final SourceInfoBuilder mSourceInfoBuilder;
   private final ModuleProxy mInputModule;
 
+  private boolean mIsOptimizationEnabled = true;
+
   private Map<ProxyAccessor<IdentifierProxy>,EventProxy> mGlobalEventsMap;
   private List<EventProxy> mGlobalEventsList;
+  private Set<EventProxy> mGloballyUsedEvents;
   private Map<ProxyAccessor<IdentifierProxy>,AutomatonProxy> mAutomataMap;
   private List<AutomatonProxy> mAutomataList;
 

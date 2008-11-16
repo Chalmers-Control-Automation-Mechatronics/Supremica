@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<ProductDES Name="GlobalAndLocalVariables"
+  xmlns:ns2="http://waters.sourceforge.net/xsd/base"
+  xmlns="http://waters.sourceforge.net/xsd/des">
+<ns2:Comment></ns2:Comment>
+<EventList>
+<Event Kind="CONTROLLABLE" Name="a.{x==2}"/>
+<Event Kind="CONTROLLABLE" Name="a.{X==0}"/>
+<Event Kind="CONTROLLABLE" Name="b.{X==2}"/>
+<Event Kind="CONTROLLABLE" Name="b.{y==0}"/>
+<Event Kind="CONTROLLABLE" Name="b.{Y==2}"/>
+</EventList>
+<AutomataList>
+<Automaton Kind="PLANT" Name="C1">
+<EventRefList>
+<EventRef Name="a.{x==2}"/>
+<EventRef Name="a.{X==0}"/>
+<EventRef Name="b.{X==2}"/>
+<EventRef Name="b.{y==0}"/>
+<EventRef Name="b.{Y==2}"/>
+</EventRefList>
+<StateList>
+<State Initial="true" Name="s0"/>
+<State Name="s1"/>
+<State Name="s2"/>
+</StateList>
+<TransitionList>
+<Transition Target="s1" Source="s0" Event="a.{x==2}"/>
+<Transition Target="s1" Source="s0" Event="a.{X==0}"/>
+<Transition Target="s2" Source="s1" Event="b.{X==2}"/>
+<Transition Target="s2" Source="s1" Event="b.{y==0}"/>
+<Transition Target="s2" Source="s1" Event="b.{Y==2}"/>
+</TransitionList>
+</Automaton>
+<Automaton Kind="PLANT" Name="C2">
+<EventRefList>
+<EventRef Name="b.{X==2}"/>
+<EventRef Name="b.{y==0}"/>
+<EventRef Name="b.{Y==2}"/>
+</EventRefList>
+<StateList>
+<State Initial="true" Name="s0"/>
+<State Name="s1"/>
+</StateList>
+<TransitionList>
+<Transition Target="s1" Source="s0" Event="b.{X==2}"/>
+<Transition Target="s1" Source="s0" Event="b.{y==0}"/>
+<Transition Target="s1" Source="s0" Event="b.{Y==2}"/>
+</TransitionList>
+</Automaton>
+<Automaton Kind="PLANT" Name="GlobalVariables">
+<EventRefList>
+<EventRef Name="a.{x==2}"/>
+<EventRef Name="a.{X==0}"/>
+<EventRef Name="b.{X==2}"/>
+<EventRef Name="b.{y==0}"/>
+<EventRef Name="b.{Y==2}"/>
+</EventRefList>
+<StateList>
+<State Initial="true" Name="IDLE"/>
+</StateList>
+<TransitionList>
+<Transition Target="IDLE" Source="IDLE" Event="a.{x==2}"/>
+<Transition Target="IDLE" Source="IDLE" Event="a.{X==0}"/>
+<Transition Target="IDLE" Source="IDLE" Event="b.{X==2}"/>
+<Transition Target="IDLE" Source="IDLE" Event="b.{y==0}"/>
+<Transition Target="IDLE" Source="IDLE" Event="b.{Y==2}"/>
+</TransitionList>
+</Automaton>
+<Automaton Kind="PLANT" Name="X">
+<EventRefList>
+<EventRef Name="a.{X==0}"/>
+<EventRef Name="b.{X==2}"/>
+<EventRef Name="b.{y==0}"/>
+<EventRef Name="b.{Y==2}"/>
+</EventRefList>
+<StateList>
+<State Initial="true" Name="0"/>
+<State Name="1"/>
+<State Name="2"/>
+</StateList>
+<TransitionList>
+<Transition Target="0" Source="0" Event="a.{X==0}"/>
+<Transition Target="2" Source="0" Event="b.{y==0}"/>
+<Transition Target="2" Source="0" Event="b.{Y==2}"/>
+<Transition Target="2" Source="1" Event="b.{y==0}"/>
+<Transition Target="2" Source="1" Event="b.{Y==2}"/>
+<Transition Target="2" Source="2" Event="b.{X==2}"/>
+<Transition Target="2" Source="2" Event="b.{y==0}"/>
+<Transition Target="2" Source="2" Event="b.{Y==2}"/>
+</TransitionList>
+</Automaton>
+<Automaton Kind="PLANT" Name="Y">
+<EventRefList>
+<EventRef Name="a.{x==2}"/>
+<EventRef Name="a.{X==0}"/>
+<EventRef Name="b.{Y==2}"/>
+</EventRefList>
+<StateList>
+<State Initial="true" Name="0"/>
+<State Name="1"/>
+<State Name="2"/>
+</StateList>
+<TransitionList>
+<Transition Target="1" Source="0" Event="a.{x==2}"/>
+<Transition Target="1" Source="0" Event="a.{X==0}"/>
+<Transition Target="1" Source="1" Event="a.{x==2}"/>
+<Transition Target="1" Source="1" Event="a.{X==0}"/>
+<Transition Target="1" Source="2" Event="a.{x==2}"/>
+<Transition Target="1" Source="2" Event="a.{X==0}"/>
+<Transition Target="2" Source="2" Event="b.{Y==2}"/>
+</TransitionList>
+</Automaton>
+<Automaton Kind="PLANT" Name="x">
+<EventRefList>
+<EventRef Name="a.{x==2}"/>
+<EventRef Name="a.{X==0}"/>
+</EventRefList>
+<StateList>
+<State Initial="true" Name="0"/>
+<State Name="1"/>
+<State Name="2"/>
+</StateList>
+<TransitionList>
+<Transition Target="1" Source="0" Event="a.{X==0}"/>
+<Transition Target="1" Source="1" Event="a.{X==0}"/>
+<Transition Target="1" Source="2" Event="a.{x==2}"/>
+<Transition Target="1" Source="2" Event="a.{X==0}"/>
+</TransitionList>
+</Automaton>
+<Automaton Kind="PLANT" Name="y">
+<EventRefList>
+<EventRef Name="b.{X==2}"/>
+<EventRef Name="b.{y==0}"/>
+<EventRef Name="b.{Y==2}"/>
+</EventRefList>
+<StateList>
+<State Initial="true" Name="0"/>
+<State Name="1"/>
+<State Name="2"/>
+</StateList>
+<TransitionList>
+<Transition Target="2" Source="0" Event="b.{X==2}"/>
+<Transition Target="2" Source="0" Event="b.{y==0}"/>
+<Transition Target="2" Source="0" Event="b.{Y==2}"/>
+<Transition Target="2" Source="1" Event="b.{X==2}"/>
+<Transition Target="2" Source="1" Event="b.{Y==2}"/>
+<Transition Target="2" Source="2" Event="b.{X==2}"/>
+<Transition Target="2" Source="2" Event="b.{Y==2}"/>
+</TransitionList>
+</Automaton>
+</AutomataList>
+</ProductDES>
+

@@ -2,7 +2,7 @@
 //###########################################################################
 //# PROJECT: Waters
 //# PACKAGE: net.sourceforge.waters.model.compiler
-//# CLASS:   ModuleCompilerTest
+//# CLASS:   AbstractCompilerTest
 //###########################################################################
 //# $Id$
 //###########################################################################
@@ -53,7 +53,7 @@ import net.sourceforge.waters.junit.AbstractWatersTest;
 import org.xml.sax.SAXException;
 
 
-public class CompilerTest
+public abstract class AbstractCompilerTest
   extends AbstractWatersTest
 {
 
@@ -427,6 +427,15 @@ public class CompilerTest
 
 
   //#########################################################################
+  //# Customisation
+  void configure(final ModuleCompiler compiler)
+  {
+  }
+
+  abstract String getTestSuffix();
+
+
+  //#########################################################################
   //# Utilities
   private void compileError(final String dirname,
                             final String name,
@@ -597,12 +606,25 @@ public class CompilerTest
         buffer.append(binding.getExpression().toString());
       }
     }
-    buffer.append(mProductDESMarshaller.getDefaultExtension());
+    final String ext = mProductDESMarshaller.getDefaultExtension();
+    final int pos = buffer.length();
+    buffer.append(ext);
     final String outextname = buffer.toString();
     final File outfilename = new File(mOutputDirectory, outextname);
     compile(infilename, outfilename, bindings);
-    final File compfilename = new File(dir, outextname);
-    compare(outfilename, compfilename);
+    final String suffix = getTestSuffix();
+    buffer.setLength(pos);
+    buffer.append('-');
+    buffer.append(suffix);
+    buffer.append(ext);
+    final String suffixedname = buffer.toString();
+    final File suffixedfilename = new File(dir, suffixedname);
+    if (suffixedfilename.exists()) {
+      compare(outfilename, suffixedfilename);
+    } else {
+      final File compfilename = new File(dir, outextname);
+      compare(outfilename, compfilename);
+    }
   }
 
   private void compile(final File infilename,
@@ -629,6 +651,7 @@ public class CompilerTest
   {
     final ModuleCompiler compiler =
       new ModuleCompiler(mDocumentManager, mProductDESFactory, module);
+    configure(compiler);
     return compiler.compile(bindings);
   }
 

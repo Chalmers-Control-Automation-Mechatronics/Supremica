@@ -1,0 +1,46 @@
+//# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
+//###########################################################################
+//# PROJECT: Waters
+//# PACKAGE: net.sourceforge.waters.model.compiler
+//# CLASS:   OptimizingCompilerTest
+//###########################################################################
+//# $Id$
+//###########################################################################
+
+package net.sourceforge.waters.model.compiler;
+
+import junit.framework.Test;
+import junit.framework.TestSuite;
+
+
+public class OptimizingCompilerTest
+  extends AbstractCompilerTest
+{
+
+  //#########################################################################
+  //# Entry points in junit.framework.TestCase
+  public static Test suite()
+  {
+    return new TestSuite(OptimizingCompilerTest.class);
+  }
+
+  public static void main(final String[] args)
+  {
+    junit.textui.TestRunner.run(suite());
+  }
+
+
+  //#########################################################################
+  //# Overrides for abstract base class
+  //# net.sourceforge.waters.model.compiler.AbstractCompilerTest
+  void configure(final ModuleCompiler compiler)
+  {
+    compiler.setOptimizationEnabled(true);
+  }
+
+  String getTestSuffix()
+  {
+    return "opt";
+  }
+
+}
