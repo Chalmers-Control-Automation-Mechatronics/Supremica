@@ -41,7 +41,6 @@ public class ModuleCompiler
   {
     mDocumentManager = manager;
     mFactory = factory;
-    mSourceInfoBuilder = new SourceInfoBuilder();
     mInputModule = module;
   }
 
@@ -57,25 +56,24 @@ public class ModuleCompiler
   public ProductDESProxy compile(final List<ParameterBindingProxy> bindings)
     throws EvalException
   {
-    mSourceInfoBuilder.reset();
+    initSourceInfo();
     final ModuleProxyFactory modfactory = ModuleElementFactory.getInstance();
-    final ModuleInstanceCompiler pass1 = new ModuleInstanceCompiler
+    ModuleInstanceCompiler pass1 = new ModuleInstanceCompiler
       (mDocumentManager, modfactory, mSourceInfoBuilder, mInputModule);
     pass1.setOptimizationEnabled(mIsOptimizationEnabled);
-    final ModuleProxy step1 = pass1.compile(bindings);
+    ModuleProxy intermediate = pass1.compile(bindings);
     final boolean efa = pass1.getHasEFAElements();
-    final ModuleProxy step2;
+    pass1 = null;
     if (efa && mIsExpandingEFATransitions) {
-      mSourceInfoBuilder.shift();
-      final EFACompiler pass2 =
-        new EFACompiler(modfactory, mSourceInfoBuilder, step1);
-      step2 = pass2.compile();
-    } else {
-      step2 = step1;
+      shiftSourceInfo();
+      EFACompiler pass2 =
+        new EFACompiler(modfactory, mSourceInfoBuilder, intermediate);
+      intermediate = pass2.compile();
+      pass2 = null;
     }
-    mSourceInfoBuilder.shift();
+    shiftSourceInfo();
     final ModuleGraphCompiler pass3 =
-      new ModuleGraphCompiler(mFactory, mSourceInfoBuilder, step2);
+      new ModuleGraphCompiler(mFactory, mSourceInfoBuilder, intermediate);
     pass3.setOptimizationEnabled(mIsOptimizationEnabled);
     final ProductDESProxy des = pass3.compile();
     setLocation(des);
@@ -84,7 +82,11 @@ public class ModuleCompiler
 
   public Map<Proxy,SourceInfo> getSourceInfoMap()
   {
-    return mSourceInfoBuilder.getResultMap();
+    if (mIsSourceInfoEnabled) {
+      return mSourceInfoBuilder.getResultMap();
+    } else {
+      return null;
+    }
   }
 
 
@@ -120,6 +122,16 @@ public class ModuleCompiler
     mIsUsingEventAlphabet = using;
   }
 
+  public boolean isSourceInfoEnabled()
+  {
+    return mIsSourceInfoEnabled;
+  }
+
+  public void setSourceInfoEnabled(final boolean enable)
+  {
+    mIsSourceInfoEnabled = enable;
+  }
+
 
   //#########################################################################
   //# Auxiliary Methods
@@ -140,16 +152,32 @@ public class ModuleCompiler
     }
   }
 
+  private void initSourceInfo()
+  {
+    if (mIsSourceInfoEnabled) {
+      mSourceInfoBuilder = new SourceInfoBuilder();
+    }
+  }
+
+  private void shiftSourceInfo()
+  {
+    if (mIsSourceInfoEnabled) {
+      mSourceInfoBuilder.shift();
+    }
+  }
+
 
   //#########################################################################
   //# Data Members
   private final DocumentManager mDocumentManager;
   private final ProductDESProxyFactory mFactory;
-  private final SourceInfoBuilder mSourceInfoBuilder;
   private final ModuleProxy mInputModule;
+
+  private SourceInfoBuilder mSourceInfoBuilder;
 
   private boolean mIsOptimizationEnabled = true;
   private boolean mIsExpandingEFATransitions = true;
   private boolean mIsUsingEventAlphabet = true;
+  private boolean mIsSourceInfoEnabled = false;
 
 }

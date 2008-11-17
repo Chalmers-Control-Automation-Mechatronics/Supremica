@@ -136,7 +136,7 @@ public class ModuleGraphCompiler extends AbstractModuleProxyVisitor
     final boolean observable = decl.isObservable();
     final EventProxy event = mFactory.createEventProxy(name, kind, observable);
     addGlobalEvent(ident, event);
-    mSourceInfoBuilder.add(event, decl);
+    addSourceInfo(event, decl);
     return event;
   }
 
@@ -303,7 +303,7 @@ public class ModuleGraphCompiler extends AbstractModuleProxyVisitor
         mFactory.createAutomatonProxy(name, kind, mLocalEventsList,
                                       states, transitions);
       addAutomaton(ident, aut);
-      mSourceInfoBuilder.add(aut, comp);
+      addSourceInfo(aut, comp);
       return aut;
     } finally {
       mCurrentComponent = null;
@@ -424,6 +424,13 @@ public class ModuleGraphCompiler extends AbstractModuleProxyVisitor
           iter.remove();
         }
       }
+    }
+  }
+
+  private void addSourceInfo(final Proxy target, final Proxy source)
+  {
+    if (mSourceInfoBuilder != null) {
+      mSourceInfoBuilder.add(target, source);
     }
   }
 
@@ -621,7 +628,7 @@ public class ModuleGraphCompiler extends AbstractModuleProxyVisitor
           final boolean initial = node.isInitial();
           removeSelfloopedEvents(mPropositions);
           mState = mFactory.createStateProxy(name, initial, mPropositions);
-          mSourceInfoBuilder.add(mState, node);
+          addSourceInfo(mState, node);
         }
       }
       return mState;
@@ -797,7 +804,7 @@ public class ModuleGraphCompiler extends AbstractModuleProxyVisitor
         final StateProxy targetstate = mTarget.getState();
         final TransitionProxy trans =
           mFactory.createTransitionProxy(sourcestate, mEvent, targetstate);
-        mSourceInfoBuilder.add(trans, mLocation);
+        addSourceInfo(trans, mLocation);
         return trans;
       }
     }

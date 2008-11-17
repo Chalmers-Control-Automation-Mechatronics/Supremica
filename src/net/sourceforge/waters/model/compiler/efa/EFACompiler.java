@@ -340,6 +340,13 @@ public class EFACompiler
     }
   }
 
+  private void addSourceInfo(final Proxy target, final Proxy source)
+  {
+    if (mSourceInfoBuilder != null) {
+      mSourceInfoBuilder.add(target, source);
+    }
+  }
+
 
   //#########################################################################
   //# Inner Class Pass1Visitor
@@ -751,7 +758,7 @@ public class EFACompiler
           final EventDeclProxy subdecl = mFactory.createEventDeclProxy
             (subident, kind, observable, ScopeKind.LOCAL, null, null);
           mEventDeclarations.add(subdecl);
-          mSourceInfoBuilder.add(subdecl, decl);
+          addSourceInfo(subdecl, decl);
         }
         return null;
       } catch (final UndefinedIdentifierException exception) {
@@ -841,7 +848,7 @@ public class EFACompiler
         mFactory.createGroupNodeProxy(name, props1, children1, null);
       mNodeList.add(result);
       mNodeMap.put(group, result);
-      mSourceInfoBuilder.add(result, group);
+      addSourceInfo(result, group);
       return result;
     }
 
@@ -857,13 +864,13 @@ public class EFACompiler
           if (mEFAAlphabet.add(event)) {
             final IdentifierProxy subident = event.createIdentifier(mFactory);
             mLabelList.add(subident);
-            mSourceInfoBuilder.add(subident, ident);
+            addSourceInfo(subident, ident);
           }
         } else {
           mEFAAlphabet.add(event);
           final IdentifierProxy subident = event.createIdentifier(mFactory);
           mLabelList.add(subident);
-          mSourceInfoBuilder.add(subident, ident);
+          addSourceInfo(subident, ident);
         }
       }
       return null;
@@ -918,7 +925,7 @@ public class EFACompiler
         final GraphProxy graph1 = visitGraphProxy(graph0);
         final SimpleComponentProxy result =
           mFactory.createSimpleComponentProxy(ident1, kind, graph1);
-        mSourceInfoBuilder.add(result, comp);
+        addSourceInfo(result, comp);
         mComponents.add(result);
         return result;
       } finally {
@@ -938,7 +945,7 @@ public class EFACompiler
         (name, props1, initial, null, null, null);
       mNodeList.add(result);
       mNodeMap.put(node, result);
-      mSourceInfoBuilder.add(result, node);
+      addSourceInfo(result, node);
       return result;
     }
 
@@ -951,7 +958,7 @@ public class EFACompiler
         final EFAVariable var = mVariableMap.getVariable(ident);
         final SimpleComponentProxy result =
           mVariableAutomatonBuilder.constructSimpleComponent(comp, var);
-        mSourceInfoBuilder.add(result, comp);
+        addSourceInfo(result, comp);
         mComponents.add(result);
         return result;
       } catch (final EvalException exception) {

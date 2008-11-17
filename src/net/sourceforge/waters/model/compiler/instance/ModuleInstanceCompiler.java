@@ -859,16 +859,20 @@ public class ModuleInstanceCompiler extends AbstractModuleProxyVisitor
     mCurrentBlockedEvents.addEvent(event);
   }
 
-  private SourceInfo addSourceInfo(final IdentifierProxy target,
-                                   final SingleEventOutput output)
+  private void addSourceInfo(final IdentifierProxy target,
+                             final SingleEventOutput output)
   {
-    final SourceInfo info = output.getSourceInfo();
-    return mSourceInfoBuilder.add(target, info);
+    if (mSourceInfoBuilder != null) {
+      final SourceInfo info = output.getSourceInfo();
+      mSourceInfoBuilder.add(target, info);
+    }
   }
 
-  private SourceInfo addSourceInfo(final Proxy target, final Proxy source)
+  private void addSourceInfo(final Proxy target, final Proxy source)
   {
-    return mSourceInfoBuilder.add(target, source, mContext);
+    if (mSourceInfoBuilder != null) {
+      mSourceInfoBuilder.add(target, source, mContext);
+    }
   }
 
 

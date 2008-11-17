@@ -36,6 +36,7 @@ public class NonOptimizingCompilerTest
   void configure(final ModuleCompiler compiler)
   {
     compiler.setOptimizationEnabled(false);
+    compiler.setSourceInfoEnabled(true);
   }
 
   String getTestSuffix()

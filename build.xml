@@ -85,10 +85,10 @@
     </patternset>
     
     <!-- Put this in TextPad to get clickable error messages
-	Expression = ^[ \t]+\[javac\] \([A-Z]:[^:]+\):\([0-9]+\):\([0-9]+\):\([0-9]+\):
-	File Register = 1
-	Line Register = 2
-	Column Register = 3
+        Expression = ^[ \t]+\[javac\] \([A-Z]:[^:]+\):\([0-9]+\):\([0-9]+\):\([0-9]+\):
+        File Register = 1
+        Line Register = 2
+        Column Register = 3
     -->
     <!-- Enables emacs warning and error mesages. This is equal to calling jikes +E -->
     <property name="build.compiler.emacs" value="true"/>
@@ -97,35 +97,35 @@
 -->
     
     <!-- 
-*	Build this target after checking out the sources for the
-*	first time. 
-*	You should also run it every time one of the jar files below
-*	has been updated.
+*       Build this target after checking out the sources for the
+*       first time. 
+*       You should also run it every time one of the jar files below
+*       has been updated.
     -->
     <target name="initialize" depends="clean,initialize_jars,build,jar_supremica_lib,cpp_waters"
             description="Rebuilds the project from scratch."/>
 
     <!--
 <target name="eclipse_initialize">
-	<delete dir="${eclipselib}"/>
- 	<mkdir dir="${eclipselib}"/>
+        <delete dir="${eclipselib}"/>
+        <mkdir dir="${eclipselib}"/>
 </target>
 -->
     
-    <target name="initialize_jars" depends="-jar_waters_jaxb">	
+    <target name="initialize_jars" depends="-jar_waters_jaxb">  
         <!-- PLEASE ADD COMMENTS DESCRIBING THE DIFFERENT LIBRARIES. -->
-    	
-    	<!-- Library for handling db in SOC -->
-    	<unjar src="${lib}/sqljdbc.jar" dest="${lib}/${unjared}"/>
-    	
-    	<!-- Library used by SOC -->
-    	<unjar src="${lib}/jniwrap-3.1.jar" dest="${lib}/${unjared}"/>
-    	<unjar src="${lib}/jexcel-1.0.jar" dest="${lib}/${unjared}"/>
-    	
-    	<!-- Create multisplit pane without nesting -->
-    	<unjar src="${lib}/multisplit.jar" dest="${lib}/${unjared}"/>
-    	
-    	<unjar src="${lib}/JGo.jar" dest="${lib}/${unjared}"/>	
+        
+        <!-- Library for handling db in SOC -->
+        <unjar src="${lib}/sqljdbc.jar" dest="${lib}/${unjared}"/>
+        
+        <!-- Library used by SOC -->
+        <unjar src="${lib}/jniwrap-3.1.jar" dest="${lib}/${unjared}"/>
+        <unjar src="${lib}/jexcel-1.0.jar" dest="${lib}/${unjared}"/>
+        
+        <!-- Create multisplit pane without nesting -->
+        <unjar src="${lib}/multisplit.jar" dest="${lib}/${unjared}"/>
+        
+        <unjar src="${lib}/JGo.jar" dest="${lib}/${unjared}"/>  
         <unjar src="${lib}/JGoLayout.jar" dest="${lib}/${unjared}"/>
         <unjar src="${lib}/antlr.jar" dest="${lib}/${unjared}"/>
         <unjar src="${lib}/grappa.jar" dest="${lib}/${unjared}"/>
@@ -133,7 +133,7 @@
         <unjar src="${lib}/jdom.jar" dest="${lib}/${unjared}"/>
         <unjar src="${lib}/jhall.jar" dest="${lib}/${unjared}"/>
         <unjar src="${lib}/jlfgr-1_0.jar" dest="${lib}/${unjared}"/>
-        <unjar src="${lib}/junit-4.4.jar" dest="${lib}/${unjared}"/>	
+        <unjar src="${lib}/junit-4.4.jar" dest="${lib}/${unjared}"/>    
         <unjar src="${lib}/log4j.jar" dest="${lib}/${unjared}"/>
         <unjar src="${lib}/regler.jar" dest="${lib}/${unjared}"/>
         <unjar src="${lib}/jel.jar" dest="${lib}/${unjared}"/>
@@ -142,17 +142,17 @@
         <unjar src="${lib}/scenebeansXmlCompability.jar" dest="${lib}/${unjared}"/>
         <unjar src="${lib}/BCEL.jar" dest="${lib}/${unjared}"/>
         <unjar src="${lib}/jgl3.1.0.jar" dest="${lib}/${unjared}"/>
-        <!--	<unjar src="${lib}/izmcomjni.jar" dest="${lib}/${unjared}"/>--> <!-- JacoZoom -->
-        <unjar src="${lib}/ctrlmngr.jar" dest="${lib}/${unjared}"/>	
-        <unjar src="${lib}/CCOM.jar" dest="${lib}/${unjared}"/>	
-        <unjar src="${lib}/jacorb.jar" dest="${lib}/${unjared}"/>	
-        <unjar src="${lib}/jutils.jar" dest="${lib}/${unjared}"/>	
-        <!--	<unjar src="${lib}/xalan.jar" dest="${lib}/${unjared}"/>-->
-        <unjar src="${lib}/xmlBlaster.jar" dest="${lib}/${unjared}"/>	
-        <unjar src="${lib}/xtdash.jar" dest="${lib}/${unjared}"/>	
-        <unjar src="${lib}/jgrafchart.jar" dest="${lib}/${unjared}"/>	
-        <unjar src="${lib}/WMFWriter2D.jar" dest="${lib}/${unjared}"/>	
-        <unjar src="${lib}/sysutils.jar" dest="${lib}/${unjared}"/>	
+        <!--    <unjar src="${lib}/izmcomjni.jar" dest="${lib}/${unjared}"/>--> <!-- JacoZoom -->
+        <unjar src="${lib}/ctrlmngr.jar" dest="${lib}/${unjared}"/>     
+        <unjar src="${lib}/CCOM.jar" dest="${lib}/${unjared}"/> 
+        <unjar src="${lib}/jacorb.jar" dest="${lib}/${unjared}"/>       
+        <unjar src="${lib}/jutils.jar" dest="${lib}/${unjared}"/>       
+        <!--    <unjar src="${lib}/xalan.jar" dest="${lib}/${unjared}"/>-->
+        <unjar src="${lib}/xmlBlaster.jar" dest="${lib}/${unjared}"/>   
+        <unjar src="${lib}/xtdash.jar" dest="${lib}/${unjared}"/>       
+        <unjar src="${lib}/jgrafchart.jar" dest="${lib}/${unjared}"/>   
+        <unjar src="${lib}/WMFWriter2D.jar" dest="${lib}/${unjared}"/>  
+        <unjar src="${lib}/sysutils.jar" dest="${lib}/${unjared}"/>     
         <!-- Libraries for IEC61499 Fuber runtime support in Supremica. -->
         <!--   Maintained by: cengic@chalmers.se -->
         <unjar src="${lib}/fcc_demo.jar" dest="${lib}/${unjared}"/>
@@ -177,10 +177,10 @@
         <unjar src="${lib}/xml-apis.jar" dest="${lib}/${unjared}"/>               
         <unjar src="${lib}/batik-xml.jar" dest="${lib}/${unjared}"/>               
         <!-- unjar src="${lib}/java_cup.jar" dest="${lib}/${unjared}"/-->
-	<!-- unjar src="${lib}/bsh.jar" dest="${lib}/${unjared}"/-->
-	<!-- Tools for Adobe PostScript. -->
+        <!-- unjar src="${lib}/bsh.jar" dest="${lib}/${unjared}"/-->
+        <!-- Tools for Adobe PostScript. -->
         <unjar src="${lib}/xmlgraphics-commons-1.2.jar"
-	       dest="${lib}/${unjared}"/>
+               dest="${lib}/${unjared}"/>
 
         <unjar src="${lib}/jgrafchartresources.jar" dest="${resources}"/>
         <unjar src="${lib}/swing-worker.jar" dest="${resources}"/>
@@ -188,13 +188,13 @@
 
         <!-- Ant 1.6.0 is not able to unjar empty jar files -->
         <!--
-	<mkdir dir="${lib}/licensed"/>
-	<touch file="${lib}/licensed/JGo.jar"/>	
-	<touch file="${lib}/licensed/JGoLayout.jar"/>
-	<unjar src="${lib}/licensed/JGo.jar" dest="${lib}/${unjared}"/>	
-	<unjar src="${lib}/licensed/JGoLayout.jar" dest="${lib}/${unjared}"/>
-	-->
-        <unjar src="${activation.jar}" dest="${lib}/${unjared}"/>	
+        <mkdir dir="${lib}/licensed"/>
+        <touch file="${lib}/licensed/JGo.jar"/> 
+        <touch file="${lib}/licensed/JGoLayout.jar"/>
+        <unjar src="${lib}/licensed/JGo.jar" dest="${lib}/${unjared}"/> 
+        <unjar src="${lib}/licensed/JGoLayout.jar" dest="${lib}/${unjared}"/>
+        -->
+        <unjar src="${activation.jar}" dest="${lib}/${unjared}"/>       
         <unjar src="${jaxb-api.jar}" dest="${lib}/${unjared}"/>
         <unjar src="${jaxb-impl.jar}" dest="${lib}/${unjared}"/>
         <unjar src="${jaxb1-impl.jar}" dest="${lib}/${unjared}"/>
@@ -213,11 +213,11 @@
     
     <target name="clean" depends="clean_build">
         <delete dir="${dist}"/>
-        <mkdir dir="${dist}"/>	        
+        <mkdir dir="${dist}"/>          
         <delete dir="${src}/org/w3"/>
         <mkdir dir="${src}/org/w3"/>        
         <delete dir="${doc}/api"/>
-        <mkdir dir="${doc}/api"/>	        
+        <mkdir dir="${doc}/api"/>               
         <delete dir="${lib}/${unjared}"/>
         <mkdir dir="${lib}/${unjared}"/>        
         <delete dir="${resources}"/>
@@ -257,16 +257,16 @@
     
     <target name="version" depends="-init">
         <delete quiet="true" file="${src}/${supremica_basedir}/Version.java"/>
-        <copy file="${templates}/Version.tmpl" tofile="${src}/${supremica_basedir}/Version.java"/>	
+        <copy file="${templates}/Version.tmpl" tofile="${src}/${supremica_basedir}/Version.java"/>      
         <replace file="${src}/${supremica_basedir}/Version.java" token="@BUILDDATE" value="${DSTAMP}${TSTAMP}"/>
         <delete quiet="true" file="${dist}/SupremicaVersion.txt"/>
-        <copy file="${templates}/SupremicaVersion.txt" tofile="${dist}/SupremicaVersion.txt"/>	
+        <copy file="${templates}/SupremicaVersion.txt" tofile="${dist}/SupremicaVersion.txt"/>  
         <replace file="${dist}/SupremicaVersion.txt" token="@BUILDDATE" value="${DSTAMP}${TSTAMP}"/>
     </target>
     
     <!-- Compile:
-*	Reuses existing class files, but recompiles those
-*	source files that have changed.
+*       Reuses existing class files, but recompiles those
+*       source files that have changed.
     -->
     <target name="compileAndRun" depends="compile,runLocal"/>
     
@@ -321,8 +321,8 @@
     </target>
     
     <!-- Compile:
-*	Reuses existing class files, but recompiles those
-*	source files that have changed.
+*       Reuses existing class files, but recompiles those
+*       source files that have changed.
     -->
     <target name="compile_manufacturingTables_jaxb" depends="build_rop_processeditor">
         <javac
@@ -333,7 +333,7 @@
             deprecation="false"
             verbose="false"
             nowarn="true"
-            includes="${supremica_basedir}/manufacturingTables/xsd/**"		
+            includes="${supremica_basedir}/manufacturingTables/xsd/**"          
             source="1.5"
         />
     </target>
@@ -347,15 +347,15 @@
             deprecation="false"
             verbose="false"
             nowarn="true"
-            includes="${supremica_basedir}/external/genericPLCProgramDescription/xsd/**"		
+            includes="${supremica_basedir}/external/genericPLCProgramDescription/xsd/**"                
             source="1.5"
         />
     </target>
 
     
     <!-- Compile:
-*	Reuses existing class files, but recompiles those
-*	source files that have changed.
+*       Reuses existing class files, but recompiles those
+*       source files that have changed.
     -->
     <target name="compile_scheduling">
         <javac
@@ -368,14 +368,14 @@
             deprecation="false"
             verbose="false"
             nowarn="true"
-            includes="${supremica_basedir}/automata/algorithms/scheduling/**"		
+            includes="${supremica_basedir}/automata/algorithms/scheduling/**"           
             source="1.5"
         />
     </target>
     
     <!-- Compile Supremica Tests
-*	Reuses existing class files, but recompiles those
-*	source files that have changed.
+*       Reuses existing class files, but recompiles those
+*       source files that have changed.
     -->
     <target name="compile_supremica_tests">
         <javac debug="on"
@@ -402,8 +402,8 @@
         </groovyc>
     </target>
     <!-- Compile Supremica Benchmarks
-*	Reuses existing class files, but recompiles those
-*	source files that have changed.
+*       Reuses existing class files, but recompiles those
+*       source files that have changed.
     -->
     <target name="compile_benchmarks_supremica">
         <groovyc
@@ -413,45 +413,45 @@
             includeJavaRuntime="yes"
             verbose="false"
         >
-            <classpath>	
+            <classpath> 
                 <pathelement location="${build}" />
                 <pathelement path="${lib}/${unjared}" />
             </classpath>
-        	<javac
-				debug="on"        	            
-        		source="1.5"
-        		debuglevel="lines,source"
-				/>
+                <javac
+                                debug="on"                          
+                        source="1.5"
+                        debuglevel="lines,source"
+                                />
         </groovyc>
     </target>
     
     <!-- Compile:
-*	Reuses existing class files, but recompiles those
-*	source files that have changed.
+*       Reuses existing class files, but recompiles those
+*       source files that have changed.
     -->
     <!-- 
 <target name="compile_jgrafchart">
-	<javac
-		debug="on"
-		debuglevel="source"
-		srcdir="${src}"
-		destdir="${build}"
-		classpath="${lib}/${unjared}"
-		includeJavaRuntime="yes"
-		deprecation="false"
-		verbose="false"
-		excludes="${supremica_basedir}/**,
-			${jgrafchart_basedir}/external/**,		
-			${jgrafchart_basedir}/io/**,
-			${xmlrpc_basedir}/**"	
-	/>
+        <javac
+                debug="on"
+                debuglevel="source"
+                srcdir="${src}"
+                destdir="${build}"
+                classpath="${lib}/${unjared}"
+                includeJavaRuntime="yes"
+                deprecation="false"
+                verbose="false"
+                excludes="${supremica_basedir}/**,
+                        ${jgrafchart_basedir}/external/**,              
+                        ${jgrafchart_basedir}/io/**,
+                        ${xmlrpc_basedir}/**"   
+        />
 
 </target>
 -->
     
     <!-- Compile Runtime
-*	Reuses existing class files, but recompiles those
-*	source files that have changed.
+*       Reuses existing class files, but recompiles those
+*       source files that have changed.
     -->
     <target name="compile_runtime_softplc">
         <javac
@@ -475,7 +475,7 @@
     <target name="jar_supremica_lib" depends="initialize_jars">
         <delete dir="${javalibs.dir}/META-INF"/>
         <jar jarfile="${dist}/SupremicaLib.jar"> 
-            <fileset dir="${javalibs.dir}"/>		
+            <fileset dir="${javalibs.dir}"/>            
         </jar>
     </target>
     
@@ -522,7 +522,7 @@ Class-Path: ${manifest.pathlist}</echo>
             <fileset dir="${build}">
                 <!--patternset-->
                 <include name="org/supremica/automata/**/*"/>
-                <!--/patternset-->			
+                <!--/patternset-->                      
             </fileset>
         </jar>
     </target>
@@ -534,10 +534,10 @@ Class-Path: ${manifest.pathlist}</echo>
     
     <target name="build_rop_processeditor" description="builds rop processeditor">
         <ant dir="schema/" target="gen_manufacturingtables_rop_processeditor" inheritAll="false"/>
-    	<ant dir="schema/" target="gen_manufacturingtables_il" inheritAll="false"/>
-    	<ant dir="schema/" target="gen_manufacturingtables_pr" inheritAll="false"/>
-    	<ant dir="schema/" target="gen_manufacturingtables_vr" inheritAll="false"/>
-    	<ant dir="schema/" target="gen_manufacturingtables_eop" inheritAll="false"/>
+        <ant dir="schema/" target="gen_manufacturingtables_il" inheritAll="false"/>
+        <ant dir="schema/" target="gen_manufacturingtables_pr" inheritAll="false"/>
+        <ant dir="schema/" target="gen_manufacturingtables_vr" inheritAll="false"/>
+        <ant dir="schema/" target="gen_manufacturingtables_eop" inheritAll="false"/>
     </target>
     
     <target name="cpp_waters">
@@ -577,10 +577,10 @@ Class-Path: ${manifest.pathlist}</echo>
     
     <target name="-startfiles_local_supremica">
         <!--
-	<copy file="${templates}/SupremicaJGrafchartLocal" todir="${dist}"/>
-	<chmod file="${dist}/SupremicaJGrafchartLocal" perm="644"/>
-	<copy file="${templates}/SupremicaJGrafchartLocal.cmd" todir="${dist}"/>
-	<chmod file="${dist}/SupremicaJGrafchartLocal.cmd" perm="644"/>
+        <copy file="${templates}/SupremicaJGrafchartLocal" todir="${dist}"/>
+        <chmod file="${dist}/SupremicaJGrafchartLocal" perm="644"/>
+        <copy file="${templates}/SupremicaJGrafchartLocal.cmd" todir="${dist}"/>
+        <chmod file="${dist}/SupremicaJGrafchartLocal.cmd" perm="644"/>
 -->
 
         <copy file="${templates}/verifyRACLocal.cmd" todir="${dist}"/>
@@ -596,40 +596,40 @@ Class-Path: ${manifest.pathlist}</echo>
         <copy file="${templates}/manufacturingTablesTestLocal.cmd" todir="${dist}"/>
         <chmod file="${dist}/manufacturingTablesTestLocal.cmd" perm="644"/>
         <!--
-	<copy file="${templates}/IDELocal.cmd" todir="${dist}"/>
-	<chmod file="${dist}/IDELocal.cmd" perm="644"/>
-	<copy file="${templates}/IDELocal" todir="${dist}"/>	
-	<chmod file="${dist}/IDELocal" perm="755"/>
-	<copy file="${templates}/SupremicaLocal.cmd" todir="${dist}"/>
-	<chmod file="${dist}/SupremicaLocal.cmd" perm="644"/>
-	<copy file="${templates}/SupremicaLocalMoreMem.cmd" todir="${dist}"/>
-	<chmod file="${dist}/SupremicaLocalMoreMem.cmd" perm="644"/>
-	<copy file="${templates}/SupremicaLocal" todir="${dist}"/>	
-	<chmod file="${dist}/SupremicaLocal" perm="755"/>
+        <copy file="${templates}/IDELocal.cmd" todir="${dist}"/>
+        <chmod file="${dist}/IDELocal.cmd" perm="644"/>
+        <copy file="${templates}/IDELocal" todir="${dist}"/>    
+        <chmod file="${dist}/IDELocal" perm="755"/>
+        <copy file="${templates}/SupremicaLocal.cmd" todir="${dist}"/>
+        <chmod file="${dist}/SupremicaLocal.cmd" perm="644"/>
+        <copy file="${templates}/SupremicaLocalMoreMem.cmd" todir="${dist}"/>
+        <chmod file="${dist}/SupremicaLocalMoreMem.cmd" perm="644"/>
+        <copy file="${templates}/SupremicaLocal" todir="${dist}"/>      
+        <chmod file="${dist}/SupremicaLocal" perm="755"/>
 -->
-        <copy file="${templates}/SFCtoSMV.cmd" todir="${dist}"/>	
+        <copy file="${templates}/SFCtoSMV.cmd" todir="${dist}"/>        
         <chmod file="${dist}/SFCtoSMV.cmd" perm="644"/>
         <!--
-	<copy file="${templates}/SupremicaBDD.cmd" todir="${dist}"/>	
-	<chmod file="${dist}/SupremicaBDD.cmd" perm="644"/>
+        <copy file="${templates}/SupremicaBDD.cmd" todir="${dist}"/>    
+        <chmod file="${dist}/SupremicaBDD.cmd" perm="644"/>
 -->
-        <copy file="${templates}/RelationExtraction.cmd" todir="${dist}"/>	
+        <copy file="${templates}/RelationExtraction.cmd" todir="${dist}"/>      
         <chmod file="${dist}/RelationExtraction.cmd" perm="644"/>
     </target>
     
     <target name="-startfiles_supremica" depends="-startfiles_local_supremica">
-        <copy file="${templates}/StepToPPN.cmd" todir="${dist}"/>	
+        <copy file="${templates}/StepToPPN.cmd" todir="${dist}"/>       
         <chmod file="${dist}/StepToPPN.cmd" perm="644"/>
-        <copy file="${templates}/IDE.cmd" todir="${dist}"/>	
+        <copy file="${templates}/IDE.cmd" todir="${dist}"/>     
         <chmod file="${dist}/IDE.cmd" perm="644"/>
-        <copy file="${templates}/IDE" todir="${dist}"/>	
+        <copy file="${templates}/IDE" todir="${dist}"/> 
         <chmod file="${dist}/IDE" perm="755"/>
-        <copy file="${templates}/vw" todir="${dist}"/>	
-        <chmod file="${dist}/vw" perm="755"/>	
-        <copy file="${templates}/wcheck" todir="${dist}"/>	
-        <chmod file="${dist}/wcheck" perm="755"/>	
-        <copy file="${templates}/MBTTranslate" todir="${dist}"/>	
-        <chmod file="${dist}/MBTTranslate" perm="755"/>		
+        <copy file="${templates}/vw" todir="${dist}"/>  
+        <chmod file="${dist}/vw" perm="755"/>   
+        <copy file="${templates}/wcheck" todir="${dist}"/>      
+        <chmod file="${dist}/wcheck" perm="755"/>       
+        <copy file="${templates}/MBTTranslate" todir="${dist}"/>        
+        <chmod file="${dist}/MBTTranslate" perm="755"/>         
         <copy file="${templates}/demo" todir="${dist}"/>
         <chmod file="${dist}/demo" perm="755"/>
         <copy file="${templates}/demo.cmd" todir="${dist}"/>
@@ -643,22 +643,22 @@ Class-Path: ${manifest.pathlist}</echo>
         <copy file="${templates}/manufacturingTablesTest.cmd" todir="${dist}"/>
         <chmod file="${dist}/manufacturingTablesTest.cmd" perm="755"/>
         <!--
-	<copy file="${templates}/SupremicaProfiling.cmd" todir="${dist}"/>
-	<chmod file="${dist}/SupremicaProfiling.cmd" perm="644"/>
-	<copy file="${templates}/SupremicaProfiling" todir="${dist}"/>	
-	<chmod file="${dist}/SupremicaProfiling" perm="755"/>
-	<copy file="${templates}/SupremicaStandard.cmd" todir="${dist}"/>
-	<chmod file="${dist}/SupremicaStandard.cmd" perm="644"/>
+        <copy file="${templates}/SupremicaProfiling.cmd" todir="${dist}"/>
+        <chmod file="${dist}/SupremicaProfiling.cmd" perm="644"/>
+        <copy file="${templates}/SupremicaProfiling" todir="${dist}"/>  
+        <chmod file="${dist}/SupremicaProfiling" perm="755"/>
+        <copy file="${templates}/SupremicaStandard.cmd" todir="${dist}"/>
+        <chmod file="${dist}/SupremicaStandard.cmd" perm="644"/>
 -->
         <copy file="${templates}/SupremicaApplet.html" todir="${dist}"/>
-        <chmod file="${dist}/SupremicaApplet.html" perm="644"/>	
+        <chmod file="${dist}/SupremicaApplet.html" perm="644"/> 
         <copy file="${templates}/SupremicaAppletViewer.html" todir="${dist}"/>
-        <chmod file="${dist}/SupremicaAppletViewer.html" perm="644"/>	
+        <chmod file="${dist}/SupremicaAppletViewer.html" perm="644"/>   
         <!--
-	<copy file="${templates}/SupremicaProperties.cfg" todir="${dist}"/>
-	<chmod file="${dist}/SupremicaProperties.cfg" perm="644"/>	
-	<copy file="${templates}/SupremicaPropertiesStandard.cfg" todir="${dist}"/>
-	<chmod file="${dist}/SupremicaPropertiesStandard.cfg" perm="644"/>
+        <copy file="${templates}/SupremicaProperties.cfg" todir="${dist}"/>
+        <chmod file="${dist}/SupremicaProperties.cfg" perm="644"/>      
+        <copy file="${templates}/SupremicaPropertiesStandard.cfg" todir="${dist}"/>
+        <chmod file="${dist}/SupremicaPropertiesStandard.cfg" perm="644"/>
 -->
         <copy file="${platform}/win.x86/lib/buddy.dll" todir="${dist}"/>
         <chmod file="${dist}/buddy.dll" perm="644"/> 
@@ -686,10 +686,10 @@ Class-Path: ${manifest.pathlist}</echo>
     
     <!--
 <target name="-startfiles_jgrafchart">
-	<copy file="${templates}/JGrafChart" todir="${dist}"/>	
-	<chmod file="${dist}/JGrafChart" perm="755"/>	
-	<copy file="${templates}/JGrafChart.cmd" todir="${dist}"/>	
-	<chmod file="${dist}/JGrafChart.cmd" perm="644"/>
+        <copy file="${templates}/JGrafChart" todir="${dist}"/>  
+        <chmod file="${dist}/JGrafChart" perm="755"/>   
+        <copy file="${templates}/JGrafChart.cmd" todir="${dist}"/>      
+        <chmod file="${dist}/JGrafChart.cmd" perm="644"/>
 </target>
 -->
     
@@ -700,7 +700,7 @@ Class-Path: ${manifest.pathlist}</echo>
             <jvmarg value="-Xmx100m"/>
             <jvmarg value="-Xms100m"/>
             <jvmarg value="-Djava.library.path=${dist}"/>
-            <classpath>	
+            <classpath> 
                 <pathelement location="${build}" />
                 <pathelement location="${benchmarksbuild}" />
                 <pathelement path="${lib}/${unjared}" />
@@ -766,6 +766,7 @@ Class-Path: ${manifest.pathlist}</echo>
             <sysproperty key="waters.test.inputdir" value="${examples}"/>
             <sysproperty key="waters.test.outputdir" value="${logs.results}"/>
             <sysproperty key="java.library.path" value="${dist}"/>
+            <jvmarg value="-enableassertions"/>
         </junit>
     </target>
     
@@ -791,6 +792,7 @@ Class-Path: ${manifest.pathlist}</echo>
             <sysproperty key="waters.test.inputdir" value="${examples}"/>
             <sysproperty key="waters.test.outputdir" value="${logs.results}"/>
             <sysproperty key="java.library.path" value="${dist}"/>
+            <jvmarg value="-enableassertions"/>
         </junit>
     </target>
     
@@ -829,18 +831,18 @@ Class-Path: ${manifest.pathlist}</echo>
      
     <target name="test_bdd" depends="compile_supremica,-startfiles_supremica" 
             description="Run BDD specific tests, requires the BDD library for your architecture to be accessible">
-        <java dir="${dist}" fork="yes" classname="org.supremica.util.BDD.test.TestAlgo" taskname="bdd_tests" failonerror="true">		
+        <java dir="${dist}" fork="yes" classname="org.supremica.util.BDD.test.TestAlgo" taskname="bdd_tests" failonerror="true">                
             <!-- ok, this is funny. if fork is "yes", we do start in ${dist}, otherwise in the Supremica-root -->
-            <classpath>	
+            <classpath> 
                 <pathelement location="${build}" />
                 <pathelement location="${testsbuild}" />
                 <pathelement path="${lib}/${unjared}" />
                 <pathelement path="${java.class.path}" />
-            </classpath>	
+            </classpath>        
         </java>
     </target>
     <!--
-		packagenames="${supremica_basepackage}.automata.*,${supremica_basepackage}.gui.*,${supremica_basepackage}.util.*,${supremica_basepackage}.apps.*"
+                packagenames="${supremica_basepackage}.automata.*,${supremica_basepackage}.gui.*,${supremica_basepackage}.util.*,${supremica_basepackage}.apps.*"
 -->
     
     <target name="doc" depends="doc_supremica" description="Generate Javadoc documentation."/>
@@ -867,7 +869,7 @@ Class-Path: ${manifest.pathlist}</echo>
                 <exclude name="net/sourceforge/waters/xsd/*/impl/**"/>
                 <exclude name="org/supremica/softplc/**"/>
                 <exclude name="org/supremica/external/robotCoordination/**"/>
-            </packageset>	
+            </packageset>       
             <link href="${java14.api.url}"
                   offline="true" packagelistLoc="${docsrc}/offline/j2sdk1.4.2"/>
             <link href="${jaxme.api.url}"
@@ -876,8 +878,8 @@ Class-Path: ${manifest.pathlist}</echo>
                   offline="true" packagelistLoc="${docsrc}/offline/junit"/>
         </javadoc>
     </target>
-    <!--	THIS ONE WAS PREVIOUSLY INCLUDED ABOVE...  -->
-    <!--	overview="${templates}/Overview.html"      -->
+    <!--        THIS ONE WAS PREVIOUSLY INCLUDED ABOVE...  -->
+    <!--        overview="${templates}/Overview.html"      -->
     
     <target name="doc_waters">
         <mkdir dir="${javadoc}"/>
@@ -981,20 +983,20 @@ Class-Path: ${manifest.pathlist}</echo>
     </target>
     
     <target name="deployLocal">
-        <copy file="${dist}/Supremica.jar" todir="C:\Supremica Installer\Input\Runtime\NoArch"/>	
-        <copy file="${dist}/SupremicaLib.jar" todir="C:\Supremica Installer\Input\Runtime\NoArch"/>	
-        <copy file="${dist}/SupremicaVersion.txt" todir="C:\Supremica Installer\Input\Runtime\NoArch"/>	
-        <copy file="${platform}/win.x86/lib/buddy.dll" todir="${installer.dir}\Input"/>	
+        <copy file="${dist}/Supremica.jar" todir="C:\Supremica Installer\Input\Runtime\NoArch"/>        
+        <copy file="${dist}/SupremicaLib.jar" todir="C:\Supremica Installer\Input\Runtime\NoArch"/>     
+        <copy file="${dist}/SupremicaVersion.txt" todir="C:\Supremica Installer\Input\Runtime\NoArch"/> 
+        <copy file="${platform}/win.x86/lib/buddy.dll" todir="${installer.dir}\Input"/> 
         <chmod file="${installer.dir}\Input\buddy.dll" perm="644"/>
-        <copy file="${platform}/win.x86/lib/BisimulationEquivalence.dll" todir="${installer.dir}\Input"/>	
+        <copy file="${platform}/win.x86/lib/BisimulationEquivalence.dll" todir="${installer.dir}\Input"/>       
         <chmod file="${installer.dir}\Input\BisimulationEquivalence.dll" perm="644"/>
-        <copy file="${platform}/win.x86/lib/izmjnicom.dll" todir="${installer.dir}\Input"/>	
+        <copy file="${platform}/win.x86/lib/izmjnicom.dll" todir="${installer.dir}\Input"/>     
         <chmod file="${installer.dir}\Input\izmjnicom.dll" perm="644"/>
-        <copy file="${platform}/win.x86/lib/21100280.LIC" todir="${installer.dir}\Input"/>	
+        <copy file="${platform}/win.x86/lib/21100280.LIC" todir="${installer.dir}\Input"/>      
         <chmod file="${installer.dir}\Input\21100280.LIC" perm="644"/>
-        <copy file="${platform}/linux.x86/lib/libbuddy.so" todir="${installer.dir}\Input"/>	
+        <copy file="${platform}/linux.x86/lib/libbuddy.so" todir="${installer.dir}\Input"/>     
         <chmod file="${installer.dir}\Input\libbuddy.so" perm="644"/>
-        <copy file="${platform}/linux.x86/lib/libBisimulationEquivalence.so" todir="${installer.dir}\Input"/>	
+        <copy file="${platform}/linux.x86/lib/libBisimulationEquivalence.so" todir="${installer.dir}\Input"/>   
         <chmod file="${installer.dir}\Input\libBisimulationEquivalence.so" perm="644"/>
         <exec executable="C:\Progra~1\INNOSE~1\iscc.exe">
             <arg value="C:\Supremica Installer\SupremicaDist.iss"/>
@@ -1002,28 +1004,28 @@ Class-Path: ${manifest.pathlist}</echo>
     </target>
     
     <target name="deployWeb">
-        <copy file="${dist}/Supremica.jar" todir="W:\public_html\Supremica\updates\noarch"/>	
-        <copy file="${dist}/SupremicaLib.jar" todir="W:\public_html\Supremica\updates\noarch"/>	
+        <copy file="${dist}/Supremica.jar" todir="W:\public_html\Supremica\updates\noarch"/>    
+        <copy file="${dist}/SupremicaLib.jar" todir="W:\public_html\Supremica\updates\noarch"/> 
         <copy file="${dist}/SupremicaVersion.txt" todir="W:\public_html\Supremica\updates\noarch"/>
-        <copy file="${dist}/Supremica.jar" todir="C:\Supremica Installer\Input\Runtime\NoArch"/>	
-        <copy file="${dist}/SupremicaLib.jar" todir="C:\Supremica Installer\Input\Runtime\NoArch"/>	
-        <copy file="${dist}/SupremicaVersion.txt" todir="C:\Supremica Installer\Input\Runtime\NoArch"/>	
-        <copy file="${platform}/win.x86/lib/buddy.dll" todir="${installer.dir}\Input"/>	
+        <copy file="${dist}/Supremica.jar" todir="C:\Supremica Installer\Input\Runtime\NoArch"/>        
+        <copy file="${dist}/SupremicaLib.jar" todir="C:\Supremica Installer\Input\Runtime\NoArch"/>     
+        <copy file="${dist}/SupremicaVersion.txt" todir="C:\Supremica Installer\Input\Runtime\NoArch"/> 
+        <copy file="${platform}/win.x86/lib/buddy.dll" todir="${installer.dir}\Input"/> 
         <chmod file="${installer.dir}\Input\buddy.dll" perm="644"/>
-        <copy file="${platform}/win.x86/lib/BisimulationEquivalence.dll" todir="${installer.dir}\Input"/>	
+        <copy file="${platform}/win.x86/lib/BisimulationEquivalence.dll" todir="${installer.dir}\Input"/>       
         <chmod file="${installer.dir}\Input\BisimulationEquivalence.dll" perm="644"/>
-        <copy file="${platform}/win.x86/lib/izmjnicom.dll" todir="${installer.dir}\Input"/>	
+        <copy file="${platform}/win.x86/lib/izmjnicom.dll" todir="${installer.dir}\Input"/>     
         <chmod file="${installer.dir}\Input\izmjnicom.dll" perm="644"/>
-        <copy file="${platform}/win.x86/lib/21100280.LIC" todir="${installer.dir}\Input"/>	
+        <copy file="${platform}/win.x86/lib/21100280.LIC" todir="${installer.dir}\Input"/>      
         <chmod file="${installer.dir}\Input\21100280.LIC" perm="644"/>
-        <copy file="${platform}/linux.x86/lib/libbuddy.so" todir="${installer.dir}\Input"/>	
+        <copy file="${platform}/linux.x86/lib/libbuddy.so" todir="${installer.dir}\Input"/>     
         <chmod file="${installer.dir}\Input\libbuddy.so" perm="644"/>
-        <copy file="${platform}/linux.x86/lib/libBisimulationEquivalence.so" todir="${installer.dir}\Input"/>	
+        <copy file="${platform}/linux.x86/lib/libBisimulationEquivalence.so" todir="${installer.dir}\Input"/>   
         <chmod file="${installer.dir}\Input\libBisimulationEquivalence.so" perm="644"/>
         <exec executable="C:\Progra~1\INNOSE~1\iscc.exe">
             <arg value="C:\Supremica Installer\SupremicaDist.iss"/>
         </exec>
-        <copy file="C:\Supremica Installer\Output\setup.exe" todir="W:\public_html\Supremica\distributions\windows"/>	
+        <copy file="C:\Supremica Installer\Output\setup.exe" todir="W:\public_html\Supremica\distributions\windows"/>   
     </target>
     
     <!-- Don't use this. This is used by the automated builder at supremica.s2.chalmers.se to

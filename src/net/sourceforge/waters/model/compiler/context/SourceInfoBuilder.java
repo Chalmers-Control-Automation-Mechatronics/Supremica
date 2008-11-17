@@ -50,7 +50,12 @@ public class SourceInfoBuilder
   public void reset(final Map<Proxy,SourceInfo> parentmap)
   {
     mParentMap = parentmap;
-    mResultMap = new HashMap<Proxy,SourceInfo>();
+    if (parentmap == null) {
+      mResultMap = new HashMap<Proxy,SourceInfo>();
+    } else {
+      final int size = parentmap.size();
+      mResultMap = new HashMap<Proxy,SourceInfo>(size);
+    }
   }
 
   public void shift()
@@ -60,41 +65,33 @@ public class SourceInfoBuilder
 
   public SourceInfo add(final Proxy target, final Proxy source)
   {
-    SourceInfo info = getParentInfo(source);
-    if (info == null) {
-      info = new SourceInfo(source, null);
-    }
-    return add(target, info);
+    return add(target, source, null);
   }
 
   public SourceInfo add(final Proxy target,
                         final Proxy source,
                         final BindingContext context)
   {
-    final SourceInfo pinfo = getParentInfo(source);
-    final SourceInfo info;
+    if (mParentMap == null) {
+      final SourceInfo info = new SourceInfo(source, context);
+      return add(target, info);
+    }
+    final SourceInfo pinfo = mParentMap.get(source);
     if (pinfo == null) {
-      info = new SourceInfo(source, context);
+      return null;
+    } else if (context == null) {
+      return add(target, pinfo);
     } else {
       final Proxy psource = pinfo.getSourceObject();
-      info = new SourceInfo(psource, context);
+      final SourceInfo info = new SourceInfo(psource, context);
+      return add(target, info);
     }
-    return add(target, info);
   }
 
   public SourceInfo add(final Proxy target, final SourceInfo info)
   {
     mResultMap.put(target, info);
     return info;
-  }
-
-  public SourceInfo getParentInfo(final Proxy target)
-  {
-    if (mParentMap == null) {
-      return null;
-    } else {
-      return mParentMap.get(target);
-    }
   }
 
   public Map<Proxy,SourceInfo> getResultMap()

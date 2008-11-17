@@ -295,6 +295,7 @@
       <sysproperty key="waters.test.inputdir" value="${supremica.examples}"/>
       <sysproperty key="waters.test.outputdir" value="${logs.results}"/>
       <sysproperty key="java.library.path" value="${waters.library.path}"/>
+      <jvmarg value="-enableassertion"/>
     </junit>
   </target>
 
@@ -313,6 +314,7 @@
       <sysproperty key="waters.test.inputdir" value="${supremica.examples}"/>
       <sysproperty key="waters.test.outputdir" value="${logs.results}"/>
       <sysproperty key="java.library.path" value="${waters.library.path}"/>
+      <jvmarg value="-enableassertions"/>
     </junit>
   </target>
 
@@ -330,6 +332,7 @@
       <sysproperty key="waters.test.inputdir" value="${supremica.examples}"/>
       <sysproperty key="waters.test.outputdir" value="${logs.results}"/>
       <sysproperty key="java.library.path" value="${waters.library.path}"/>
+      <jvmarg value="-enableassertions"/>
     </junit>
   </target>
   
@@ -347,6 +350,7 @@
       <sysproperty key="waters.test.inputdir" value="${supremica.examples}"/>
       <sysproperty key="waters.test.outputdir" value="${logs.results}"/>
       <sysproperty key="java.library.path" value="${waters.library.path}"/>
+      <jvmarg value="-enableassertions"/>
     </junit>
   </target>
   
@@ -362,6 +366,7 @@
       <classpath refid="waters.test.classpath"/>
       <sysproperty key="waters.test.inputdir" value="${supremica.examples}"/>
       <sysproperty key="waters.test.outputdir" value="${logs.results}"/>
+      <jvmarg value="-enableassertions"/>
     </junit>
   </target>
   
@@ -379,6 +384,7 @@
       <sysproperty key="waters.test.inputdir" value="${supremica.examples}"/>
       <sysproperty key="waters.test.outputdir" value="${logs.results}"/>
       <sysproperty key="java.library.path" value="${waters.library.path}"/>
+      <jvmarg value="-enableassertions"/>
     </junit>
   </target>
   
@@ -388,6 +394,7 @@
       <sysproperty key="waters.test.inputdir" value="${supremica.examples}"/>
       <sysproperty key="waters.test.outputdir" value="${logs.results}"/>
       <sysproperty key="java.library.path" value="${waters.library.path}"/>
+      <jvmarg value="-enableassertions"/>
     </java>
   </target>
   
@@ -404,6 +411,7 @@
       <sysproperty key="waters.test.inputdir" value="${supremica.examples}"/>
       <sysproperty key="waters.test.outputdir" value="${logs.results}"/>
       <sysproperty key="java.library.path" value="${waters.library.path}"/>
+      <jvmarg value="-enableassertions"/>
     </junit>
   </target>
 
