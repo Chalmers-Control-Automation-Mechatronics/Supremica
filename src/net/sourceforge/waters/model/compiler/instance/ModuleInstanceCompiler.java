@@ -176,6 +176,26 @@ public class ModuleInstanceCompiler extends AbstractModuleProxyVisitor
     mIsOptimizationEnabled = enable;
   }
 
+  public Collection<String> getEnabledPropertyNames()
+  {
+    return mEnabledPropertyNames;
+  }
+
+  public void setEnabledPropertyNames(final Collection<String> names)
+  {
+    mEnabledPropertyNames = names;
+  }
+
+  public Collection<String> getEnabledPropositionNames()
+  {
+    return mEnabledPropositionNames;
+  }
+
+  public void setEnabledPropositionNames(final Collection<String> names)
+  {
+    mEnabledPropositionNames = names;
+  }
+
 
   //#########################################################################
   //# Interface net.sourceforge.waters.model.module.ModuleProxyVisitor
@@ -524,6 +544,9 @@ public class ModuleInstanceCompiler extends AbstractModuleProxyVisitor
         }
       } else {
         event = mNameSpace.findEvent(newident);
+        if (isDisabledProposition(event)) {
+          return null;
+        }
       }
       final SourceInfo info = new SourceInfo(ident, mContext);
       final CompiledEvent occ = new CompiledEventOccurrence(event, info);
@@ -661,6 +684,9 @@ public class ModuleInstanceCompiler extends AbstractModuleProxyVisitor
       final IdentifierProxy fullname =
         mNameSpace.getPrefixedIdentifier(suffix, mFactory);
       final ComponentKind kind = comp.getKind();
+      if (isDisabledProperty(kind, fullname)) {
+        return null;
+      }
       final GraphProxy graph = comp.getGraph();
       final GraphProxy newgraph = visitGraphProxy(graph);
       final SimpleComponentProxy newcomp =
@@ -872,6 +898,33 @@ public class ModuleInstanceCompiler extends AbstractModuleProxyVisitor
   {
     if (mSourceInfoBuilder != null) {
       mSourceInfoBuilder.add(target, source, mContext);
+    }
+  }
+
+  private boolean isDisabledProposition(final CompiledEvent event)
+  {
+    if (mEnabledPropositionNames == null) {
+      return false;
+    } else if (event instanceof CompiledSingleEvent) {
+      final CompiledSingleEvent single = (CompiledSingleEvent) event;
+      return
+        single.getKind() == EventKind.PROPOSITION &&
+        !mEnabledPropositionNames.contains(single.toString());
+    } else {
+      return false;
+    }
+  }
+
+  private boolean isDisabledProperty(final ComponentKind kind,
+                                     final IdentifierProxy ident)
+  {
+    if (mEnabledPropertyNames == null) {
+      return false;
+    } else if (kind == ComponentKind.PROPERTY) {
+      final String name = ident.toString();
+      return !mEnabledPropertyNames.contains(name);
+    } else {
+      return false;
     }
   }
 
@@ -1116,6 +1169,8 @@ public class ModuleInstanceCompiler extends AbstractModuleProxyVisitor
   private final ModuleProxy mInputModule;
 
   private boolean mIsOptimizationEnabled = true;
+  private Collection<String> mEnabledPropertyNames = null;
+  private Collection<String> mEnabledPropositionNames = null;
 
   private boolean mHasEFAElements;
 

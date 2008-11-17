@@ -11,10 +11,11 @@ package net.sourceforge.waters.model.analysis;
 
 import java.io.File;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.LinkedList;
 
-import net.sourceforge.waters.model.analysis.AbstractModelVerifierTest;
+import net.sourceforge.waters.model.compiler.ModuleCompiler;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
@@ -260,7 +261,7 @@ public abstract class AbstractLanguageInclusionCheckerTest
                                   final String propname)
     throws Exception
   {
-    final ProductDESProxy des = getCompiledDES(filename);
+    final ProductDESProxy des = getCompiledDES(filename, bindings, propname);
     final String name = des.getName() + ":" + propname;
     final Collection<EventProxy> events = des.getEvents();
     final Collection<AutomatonProxy> automata =
@@ -288,6 +289,34 @@ public abstract class AbstractLanguageInclusionCheckerTest
     final ProductDESProxy propdes =
       factory.createProductDESProxy(name, events, automata);
     runModelVerifier(propdes, bindings, expect);
+  }
+
+
+  //#########################################################################
+  //# Overrides for abstract base class
+  //# net.sourceforge.waters.analysis.AbstractAnalysisTest
+  protected ProductDESProxy getCompiledDES
+    (final File filename,
+     final List<ParameterBindingProxy> bindings,
+     final String propname)
+    throws Exception
+  {
+    try {
+      mPropertyName = propname;
+      return getCompiledDES(filename, bindings);
+    } finally {
+      mPropertyName = null;
+    }
+  }
+
+  protected void configure(final ModuleCompiler compiler)
+  {
+    final Collection<String> empty = Collections.emptyList();
+    compiler.setEnabledPropositionNames(empty);
+    if (mPropertyName != null) {
+      final Collection<String> prop = Collections.singletonList(mPropertyName);
+      compiler.setEnabledPropertyNames(prop);
+    }
   }
 
 
@@ -364,5 +393,10 @@ public abstract class AbstractLanguageInclusionCheckerTest
     }
     return steps + 1;
   }
+
+
+  //#########################################################################
+  //# Data Members
+  private String mPropertyName;
 
 }

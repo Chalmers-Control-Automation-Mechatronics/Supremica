@@ -88,7 +88,7 @@ public class ComposingModelVerifierFactory
     //#######################################################################
     //# Overrides for Abstract Base Class
     //# net.sourceforge.waters.model.analysis.CommandLineArgument
-    protected void assign(final ModelVerifier verifier)
+    protected void configure(final ModelVerifier verifier)
     {
       final ComposingSafetyVerifier composing =
         (ComposingSafetyVerifier) verifier;

@@ -10,20 +10,16 @@
 package net.sourceforge.waters.model.analysis;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
-import net.sourceforge.waters.model.des.AutomatonProxy;
-import net.sourceforge.waters.model.des.EventProxy;
+import net.sourceforge.waters.model.compiler.ModuleCompiler;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
-import net.sourceforge.waters.xsd.base.ComponentKind;
-import net.sourceforge.waters.xsd.base.EventKind;
 
 
 /**
@@ -85,7 +81,7 @@ public abstract class AbstractModelVerifierFactory
     throw createUnsupportedOperationException("language inclusion");
   }
 
-  public List<String> loadArguments(final ModelVerifier verifier)
+  public List<String> configure(final ModelVerifier verifier)
   {
     if (mArgumentList != null && mArgumentMap != null) {
       final List<String> filenames = new LinkedList<String>();
@@ -95,7 +91,7 @@ public abstract class AbstractModelVerifierFactory
         final CommandLineArgument arg = mArgumentMap.get(name);
         if (arg != null) {
           arg.parse(iter);
-          arg.assign(verifier);
+          arg.configure(verifier);
         } else if (name.equals("--")) {
           while (iter.hasNext()) {
             final String nextname = iter.next();
@@ -108,6 +104,23 @@ public abstract class AbstractModelVerifierFactory
       return filenames;
     } else {
       return null;
+    }
+  }
+
+  public void configure(final ModuleCompiler compiler)
+  {
+    if (mArgumentList != null && mArgumentMap != null) {
+      final Iterator<String> iter = mArgumentList.iterator();
+      while (iter.hasNext()) {
+        final String name = iter.next();
+        final CommandLineArgument arg = mArgumentMap.get(name);
+        if (arg != null) {
+          arg.parse(iter);
+          arg.configure(compiler);
+        } else if (name.equals("--")) {
+          break;
+        }
+      }
     }
   }
 
@@ -127,7 +140,7 @@ public abstract class AbstractModelVerifierFactory
 
 
   //#########################################################################
-  //# Inner Class LimitArgument
+  //# Inner Class HelpArgument
   private class HelpArgument extends CommandLineArgument
   {
     //#######################################################################
@@ -149,7 +162,6 @@ public abstract class AbstractModelVerifierFactory
       final String name = fullname.substring(dotpos + 1);
       System.err.println
         (name + " supports the following command line options:");
-
       final List<CommandLineArgument> args =
         new ArrayList<CommandLineArgument>(mArgumentMap.values());
       Collections.sort(args);
@@ -159,7 +171,7 @@ public abstract class AbstractModelVerifierFactory
       System.exit(0);
     }
 
-    protected void assign(final ModelVerifier verifier)
+    protected void configure(final ModelVerifier verifier)
     {
     }
   }
@@ -180,7 +192,7 @@ public abstract class AbstractModelVerifierFactory
     //#######################################################################
     //# Overrides for Abstract Base Class
     //# net.sourceforge.waters.model.analysis.CommandLineArgument
-    protected void assign(final ModelVerifier verifier)
+    protected void configure(final ModelVerifier verifier)
     {
       final int limit = getValue();
       verifier.setNodeLimit(limit);
@@ -193,7 +205,6 @@ public abstract class AbstractModelVerifierFactory
   //# Inner Class PropArgument
   private static class PropArgument
     extends CommandLineArgumentString
-    implements KindTranslator
   {
     //#######################################################################
     //# Constructors
@@ -207,60 +218,21 @@ public abstract class AbstractModelVerifierFactory
     //#######################################################################
     //# Overrides for Abstract Base Class
     //# net.sourceforge.waters.model.analysis.CommandLineArgument
-    protected void assign(final ModelVerifier verifier)
+    protected void configure(final ModuleCompiler compiler)
     {
-      if (verifier instanceof LanguageInclusionChecker) {
-        final LanguageInclusionChecker checker =
-          (LanguageInclusionChecker) verifier;
-        final String name = getValue();
-        if (mNames == null) {
-          mNames = new HashSet<String>();
-          checker.setKindTranslator(this);
-        }
-        mNames.add(name);
-      } else {
+      final Collection<String> props = compiler.getEnabledPropertyNames();
+      final String name = getValue();
+      props.add(name);
+    }
+
+    protected void configure(final ModelVerifier verifier)
+    {
+      if (!(verifier instanceof LanguageInclusionChecker)) {
         fail("Command line option " + getName() +
              " is only supported for language inclusion!");
       }
     }
 
-    //#######################################################################
-    //# Interface net.sourceforge.waters.model.analysis.KindTranslator
-    public ComponentKind getComponentKind(final AutomatonProxy aut)
-    {
-      final ComponentKind kind = aut.getKind();
-      switch (kind) {
-      case PLANT:
-      case SPEC:
-      case SUPERVISOR:
-        return ComponentKind.PLANT;
-      case PROPERTY:
-        final String name = aut.getName();
-        if (mNames.contains(name)) {
-          return ComponentKind.SPEC;
-        } else {
-          return kind;
-        }
-      default:
-        return kind;
-      }
-    }
-
-    public EventKind getEventKind(final EventProxy event)
-    {
-      final EventKind kind = event.getKind();
-      switch (kind) {
-      case CONTROLLABLE:
-      case UNCONTROLLABLE:
-        return EventKind.UNCONTROLLABLE;
-      default:
-        return kind;
-      }
-    }
-
-    //#######################################################################
-    //# Data Members
-    private Set<String> mNames;
   }
 
 

@@ -12,6 +12,8 @@ package net.sourceforge.waters.model.analysis;
 import java.lang.reflect.Method;
 import java.io.File;
 import java.io.PrintStream;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.Formatter;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -154,7 +156,11 @@ public class CommandLineTool
         fclazz.getMethod(createname, ProductDESProxyFactory.class);
       final ModelVerifier checker =
         (ModelVerifier) getcheck.invoke(factory, desFactory);
-      final List<String> filenames = factory.loadArguments(checker);
+      final boolean useProperties =
+        checker instanceof LanguageInclusionChecker;
+      final boolean usePropositions = false;
+      final Collection<String> empty = Collections.emptyList();
+      final List<String> filenames = factory.configure(checker);
 
       final Formatter formatter = new Formatter(System.out);
       for (final String name : filenames) {
@@ -167,6 +173,13 @@ public class CommandLineTool
           final ModuleProxy module = (ModuleProxy) doc;
           final ModuleCompiler compiler =
             new ModuleCompiler(docManager, desFactory, module);
+          final Collection<String> propertyList =
+            useProperties ? new LinkedList<String>() : empty;
+          final Collection<String> propositionList =
+            usePropositions ? new LinkedList<String>() : empty;
+          compiler.setEnabledPropertyNames(propertyList);
+          compiler.setEnabledPropositionNames(propositionList);
+          factory.configure(compiler);
           des = compiler.compile(bindings);
         }
         System.out.print(des.getName() + " ... ");

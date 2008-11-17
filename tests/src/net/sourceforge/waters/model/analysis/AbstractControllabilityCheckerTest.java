@@ -10,12 +10,11 @@
 package net.sourceforge.waters.model.analysis;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.LinkedList;
 
-import net.sourceforge.waters.model.analysis.AbstractModelVerifierTest;
-import net.sourceforge.waters.model.analysis.ModelVerifier;
-import net.sourceforge.waters.model.analysis.OverflowException;
+import net.sourceforge.waters.model.compiler.ModuleCompiler;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
@@ -388,7 +387,7 @@ public abstract class AbstractControllabilityCheckerTest
   {
     final String group = "tests";
     final String dir = "nasty";
-    final String name = "just_property.wmod";
+    final String name = "just_property.wdes";
     runModelVerifier(group, dir, name, true);
   }
 
@@ -796,6 +795,17 @@ public abstract class AbstractControllabilityCheckerTest
     final ParameterBindingProxy binding = createBinding("N", n);
     bindings.add(binding);
     runModelVerifier(group, name, bindings, true);
+  }
+
+
+  //#########################################################################
+  //# Overrides for abstract base class
+  //# net.sourceforge.waters.analysis.AbstractAnalysisTest
+  protected void configure(final ModuleCompiler compiler)
+  {
+    final Collection<String> empty = Collections.emptyList();
+    compiler.setEnabledPropositionNames(empty);
+    compiler.setEnabledPropertyNames(empty);
   }
 
 

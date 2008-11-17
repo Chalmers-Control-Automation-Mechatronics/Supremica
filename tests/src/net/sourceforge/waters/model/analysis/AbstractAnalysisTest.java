@@ -86,11 +86,16 @@ public abstract class AbstractAnalysisTest extends AbstractWatersTest
       final ModuleProxy module = (ModuleProxy) doc;
       final ModuleCompiler compiler =
         new ModuleCompiler(mDocumentManager, mProductDESProxyFactory, module);
+      configure(compiler);
       return compiler.compile(bindings);
     } else {
       fail("Unknown document type " + doc.getClass().getName() + "!");
       return null;
     }
+  }
+
+  protected void configure(final ModuleCompiler compiler)
+  {
   }
 
   protected DocumentManager getDocumentManager()

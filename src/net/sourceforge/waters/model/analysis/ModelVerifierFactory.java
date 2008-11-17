@@ -11,6 +11,7 @@ package net.sourceforge.waters.model.analysis;
 
 import java.util.List;
 
+import net.sourceforge.waters.model.compiler.ModuleCompiler;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 
 
@@ -53,6 +54,12 @@ public interface ModelVerifierFactory
    *         be processed. These arguments are to be considered as
    *         file names by the command line tool.
    */
-  public List<String> loadArguments(ModelVerifier verifier);
+  public List<String> configure(ModelVerifier verifier);
+
+  /**
+   * Configures the given compiler according to any command line
+   * arguments passed to this factory.
+   */
+  public void configure(ModuleCompiler compiler);
 
 }

@@ -10,6 +10,7 @@
 package net.sourceforge.waters.model.compiler;
 
 import java.net.URI;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
@@ -61,6 +62,8 @@ public class ModuleCompiler
     ModuleInstanceCompiler pass1 = new ModuleInstanceCompiler
       (mDocumentManager, modfactory, mSourceInfoBuilder, mInputModule);
     pass1.setOptimizationEnabled(mIsOptimizationEnabled);
+    pass1.setEnabledPropertyNames(mEnabledPropertyNames);
+    pass1.setEnabledPropositionNames(mEnabledPropositionNames);
     ModuleProxy intermediate = pass1.compile(bindings);
     final boolean efa = pass1.getHasEFAElements();
     pass1 = null;
@@ -132,6 +135,26 @@ public class ModuleCompiler
     mIsSourceInfoEnabled = enable;
   }
 
+  public Collection<String> getEnabledPropertyNames()
+  {
+    return mEnabledPropertyNames;
+  }
+
+  public void setEnabledPropertyNames(final Collection<String> names)
+  {
+    mEnabledPropertyNames = names;
+  }
+
+  public Collection<String> getEnabledPropositionNames()
+  {
+    return mEnabledPropositionNames;
+  }
+
+  public void setEnabledPropositionNames(final Collection<String> names)
+  {
+    mEnabledPropositionNames = names;
+  }
+
 
   //#########################################################################
   //# Auxiliary Methods
@@ -179,5 +202,7 @@ public class ModuleCompiler
   private boolean mIsExpandingEFATransitions = true;
   private boolean mIsUsingEventAlphabet = true;
   private boolean mIsSourceInfoEnabled = false;
+  private Collection<String> mEnabledPropertyNames = null;
+  private Collection<String> mEnabledPropositionNames = null;
 
 }

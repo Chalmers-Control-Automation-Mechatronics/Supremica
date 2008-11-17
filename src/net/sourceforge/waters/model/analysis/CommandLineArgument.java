@@ -12,6 +12,8 @@ package net.sourceforge.waters.model.analysis;
 import java.io.PrintStream;
 import java.util.Iterator;
 
+import net.sourceforge.waters.model.compiler.ModuleCompiler;
+
 
 /**
  * A command line argument passed to a {@link ModelVerifierFactory}.
@@ -63,7 +65,13 @@ public abstract class CommandLineArgument
   //# Parsing
   protected abstract void parse(Iterator<String> iter);
 
-  protected abstract void assign(ModelVerifier verifier);
+  protected void configure(final ModuleCompiler compiler)
+  {
+  }
+
+  protected void configure(final ModelVerifier verifier)
+  {
+  }
 
 
   //#########################################################################
