@@ -66,6 +66,7 @@ public class ModuleCompiler
     final boolean efa = pass1.getHasEFAElements();
     final ModuleProxy step2;
     if (efa && mIsExpandingEFATransitions) {
+      mSourceInfoBuilder.shift();
       final EFACompiler pass2 =
         new EFACompiler(modfactory, mSourceInfoBuilder, step1);
       step2 = pass2.compile();
