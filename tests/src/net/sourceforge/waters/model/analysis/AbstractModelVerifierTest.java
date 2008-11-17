@@ -169,6 +169,7 @@ public abstract class AbstractModelVerifierTest extends AbstractAnalysisTest
     TraceProxy counterexample = null;
     if (!result) {
       counterexample = mModelVerifier.getCounterExample();
+      precheckCounterExample(counterexample);
       saveCounterExample(counterexample, bindings);
     }
     assertEquals("Wrong result from model checker: got " +
@@ -187,10 +188,19 @@ public abstract class AbstractModelVerifierTest extends AbstractAnalysisTest
 
   //#########################################################################
   //# To be Overridden by Subclasses
+  protected void precheckCounterExample(final TraceProxy trace)
+  {
+    assertNotNull("Counterexample is NULL!", trace); 
+    assertNotNull("NULL product DES in trace!", trace.getProductDES()); 
+    assertFalse("NULL automaton in trace!",
+                trace.getAutomata().contains(null));
+    assertFalse("NULL event in trace!",
+                trace.getEvents().contains(null));
+  }
+
   protected void checkCounterExample(final ProductDESProxy des,
                                      final TraceProxy trace)
   {
-    assertNotNull("Counterexample is NULL!", trace);
     assertSame("Product DES in trace is not the original model!",
                des, trace.getProductDES());
     final Collection<AutomatonProxy> automata = des.getAutomata();

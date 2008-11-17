@@ -23,6 +23,8 @@ import net.sourceforge.waters.model.des.SafetyTraceProxy;
 import net.sourceforge.waters.model.des.StateProxy;
 import net.sourceforge.waters.model.des.TraceProxy;
 import net.sourceforge.waters.model.des.TransitionProxy;
+import net.sourceforge.waters.model.module.ParameterBindingProxy;
+
 import net.sourceforge.waters.xsd.base.ComponentKind;
 
 
@@ -91,6 +93,59 @@ public abstract class AbstractLanguageInclusionCheckerTest
 
   //#########################################################################
   //# Test Cases --- ProfiSAFE
+  public void testProfisafeI3HostEFA__neversend0() throws Exception
+  {
+    testProfisafeI3HostEFA("never_send[0]", false);
+  }
+
+  public void testProfisafeI3HostEFA__neversend1() throws Exception
+  {
+    testProfisafeI3HostEFA("never_send[1]", false);
+  }
+
+  public void testProfisafeI3HostEFA__neversend2() throws Exception
+  {
+    testProfisafeI3HostEFA("never_send[2]", false);
+  }
+
+  public void testProfisafeI3HostEFA__neversend3() throws Exception
+  {
+    testProfisafeI3HostEFA("never_send[3]", false);
+  }
+
+  public void testProfisafeI3HostEFA__host_sets_fv_after_host_timeout()
+    throws Exception
+  {
+    testProfisafeI3HostEFA("host_sets_fv_after_host_timeout", true);
+  }
+
+  public void testProfisafeI3HostEFA__host_sets_fv_after_host_crc_fault()
+    throws Exception
+  {
+    testProfisafeI3HostEFA("host_sets_fv_after_host_crc_fault", false);
+  }
+
+  public void
+    testProfisafeI3HostEFA__host_sets_fv_after_host_crc_fault_notinit()
+    throws Exception
+  {
+    testProfisafeI3HostEFA("host_sets_fv_after_host_crc_fault_notinit", true);
+  }
+
+  private void testProfisafeI3HostEFA(final String propname,
+                                      final boolean expect)
+    throws Exception
+  {
+    final String group = "tests";
+    final String dir = "profisafe";
+    final String name = "profisafe_ihost_efa.wmod";
+    final List<ParameterBindingProxy> bindings =
+      new LinkedList<ParameterBindingProxy>();
+    final ParameterBindingProxy binding = createBinding("MAXSEQNO", 3);
+    bindings.add(binding);
+    runModelVerifier(group, dir, name, bindings, expect, propname);
+  }
+
   public void testProfisafeI4Host__fv_crc() throws Exception
   {
     final String group = "tests";
@@ -138,9 +193,7 @@ public abstract class AbstractLanguageInclusionCheckerTest
                                   final String propname)
     throws Exception
   {
-    final File rootdir = getWatersInputRoot();
-    final File groupdir = new File(rootdir, group);
-    runModelVerifier(groupdir, name, expect, propname);
+    runModelVerifier(group, name, null, expect, propname);
   }
 
   protected void runModelVerifier(final String group,
@@ -150,33 +203,59 @@ public abstract class AbstractLanguageInclusionCheckerTest
                                   final String propname)
     throws Exception
   {
+    runModelVerifier(group, subdir, name, null, expect, propname);
+  }
+
+  protected void runModelVerifier(final String group,
+                                  final String name,
+                                  final boolean expect,
+                                  final List<ParameterBindingProxy> bindings,
+                                  final String propname)
+    throws Exception
+  {
     final File rootdir = getWatersInputRoot();
     final File groupdir = new File(rootdir, group);
-    runModelVerifier(groupdir, subdir, name, expect, propname);
+    runModelVerifier(groupdir, name, bindings, expect, propname);
+  }
+
+  protected void runModelVerifier(final String group,
+                                  final String subdir,
+                                  final String name,
+                                  final List<ParameterBindingProxy> bindings,
+                                  final boolean expect,
+                                  final String propname)
+    throws Exception
+  {
+    final File rootdir = getWatersInputRoot();
+    final File groupdir = new File(rootdir, group);
+    runModelVerifier(groupdir, subdir, name, bindings, expect, propname);
   }
 
   protected void runModelVerifier(final File groupdir,
                                   final String subdir,
                                   final String name,
+                                  final List<ParameterBindingProxy> bindings,
                                   final boolean expect,
                                   final String propname)
     throws Exception
   {
     final File dir = new File(groupdir, subdir);
-    runModelVerifier(dir, name, expect, propname);
+    runModelVerifier(dir, name, bindings, expect, propname);
   }
 
   protected void runModelVerifier(final File dir,
                                   final String name,
+                                  final List<ParameterBindingProxy> bindings,
                                   final boolean expect,
                                   final String propname)
     throws Exception
   {
     final File filename = new File(dir, name);
-    runModelVerifier(filename, expect, propname);
+    runModelVerifier(filename, bindings, expect, propname);
   }
-    
+
   protected void runModelVerifier(final File filename,
+                                  final List<ParameterBindingProxy> bindings,
                                   final boolean expect,
                                   final String propname)
     throws Exception
@@ -208,7 +287,7 @@ public abstract class AbstractLanguageInclusionCheckerTest
     final ProductDESProxyFactory factory = getProductDESProxyFactory();
     final ProductDESProxy propdes =
       factory.createProductDESProxy(name, events, automata);
-    runModelVerifier(propdes, expect);
+    runModelVerifier(propdes, bindings, expect);
   }
 
 
@@ -227,7 +306,7 @@ public abstract class AbstractLanguageInclusionCheckerTest
   	  	
     final Collection<AutomatonProxy> automata = des.getAutomata();
     boolean rejected = false;
-    for (final AutomatonProxy aut : automata){
+    for (final AutomatonProxy aut : automata) {
       final ComponentKind kind = aut.getKind();
       final int accepted = checkCounterExample(aut, eventlist);
       switch (kind) {
@@ -258,27 +337,27 @@ public abstract class AbstractLanguageInclusionCheckerTest
 
     int steps = -1;
     StateProxy current = null;
-    for (final StateProxy state : states){
-      if (state.isInitial()){
+    for (final StateProxy state : states) {
+      if (state.isInitial()) {
         current = state;
         break;
       }
     }
-    if (current == null){
+    if (current == null) {
       return steps;
     }
-    for (final EventProxy event : counterexample){
+    for (final EventProxy event : counterexample) {
       steps++;
-      if (events.contains(event)){
+      if (events.contains(event)) {
         boolean found = false;
-        for(final TransitionProxy trans : transitions){
-          if (trans.getSource()== current && trans.getEvent() == event){
+        for (final TransitionProxy trans : transitions) {
+          if (trans.getSource()== current && trans.getEvent() == event) {
             current = trans.getTarget();
             found = true;
             break;
           }
         }
-        if(!found){        	
+        if (!found) {        	
           return steps;
         }
       }

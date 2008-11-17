@@ -53,6 +53,17 @@ public abstract class AbstractControlLoopCheckerTest
     runModelVerifier(des, true);
   }
 
+  public void testReentrant()
+    throws Exception
+  {
+    testEmpty();
+    testSmallFactory2();
+    test_Batchtank2005_cjn5();
+    testSmallFactory2();
+    test_Batchtank2005_cjn5();
+    test_Batchtank2005_ez1();
+  }
+
 
   //#########################################################################
   //# Test Cases --- handwritten
@@ -303,6 +314,18 @@ public abstract class AbstractControlLoopCheckerTest
     final String dir = "nasty";
     final String name = "the_vicious_loop2.wdes";
     runModelVerifier(group, dir, name, false);
+  }
+
+  public void testProfisafeI3HostEFA() throws Exception
+  {
+    final String group = "tests";
+    final String dir = "profisafe";
+    final String name = "profisafe_ihost_efa.wmod";
+    final List<ParameterBindingProxy> bindings =
+      new LinkedList<ParameterBindingProxy>();
+    final ParameterBindingProxy binding = createBinding("MAXSEQNO", 3);
+    bindings.add(binding);
+    runModelVerifier(group, dir, name, bindings, true);
   }
 
   public void testProfisafeI4Host() throws Exception

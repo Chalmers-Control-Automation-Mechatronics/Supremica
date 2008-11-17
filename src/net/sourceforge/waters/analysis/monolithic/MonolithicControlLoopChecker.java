@@ -186,6 +186,7 @@ public class MonolithicControlLoopChecker
 
     // create Event list: order controllable first, uncontrollable last
     // list only controllable and uncontrollable events
+    mNumConEvent = 0;
     for (final EventProxy eProxy: des.getEvents()) {
       final EventKind kind = mKindTranslator.getEventKind(eProxy);
       switch (kind) {
