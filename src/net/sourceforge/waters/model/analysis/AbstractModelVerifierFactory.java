@@ -21,6 +21,7 @@ import java.util.Set;
 
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.EventProxy;
+import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 import net.sourceforge.waters.xsd.base.ComponentKind;
 import net.sourceforge.waters.xsd.base.EventKind;
 
@@ -66,6 +67,24 @@ public abstract class AbstractModelVerifierFactory
 
   //#########################################################################
   //# Interface net.sourceforge.waters.model.analysis.ModelVerifierFactory
+  public ControllabilityChecker createControllabilityChecker
+    (final ProductDESProxyFactory factory)
+  {
+    throw createUnsupportedOperationException("controllability");
+  }
+
+  public ControlLoopChecker createControlLoopChecker
+    (final ProductDESProxyFactory factory)
+  {
+    throw createUnsupportedOperationException("control-loop");
+  }
+
+  public LanguageInclusionChecker createLanguageInclusionChecker
+    (final ProductDESProxyFactory factory)
+  {
+    throw createUnsupportedOperationException("language inclusion");
+  }
+
   public List<String> loadArguments(final ModelVerifier verifier)
   {
     if (mArgumentList != null && mArgumentMap != null) {
@@ -90,6 +109,20 @@ public abstract class AbstractModelVerifierFactory
     } else {
       return null;
     }
+  }
+
+
+  //#########################################################################
+  //# Auxiliary Methods
+  private UnsupportedOperationException createUnsupportedOperationException
+    (final String checkname)
+  {
+    final String clsname = getClass().getName();
+    final int dotpos = clsname.lastIndexOf('.');
+    final String msg =
+      clsname.substring(dotpos + 1) + " does not support " + 
+      checkname + " check!";
+    return new UnsupportedOperationException(msg);
   }
 
 

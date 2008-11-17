@@ -1,21 +1,22 @@
+//# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
 //# PROJECT: Waters
-//# PACKAGE: net.sourceforge.waters.analysis
+//# PACKAGE: net.sourceforge.waters.analysis.monolithic
 //# CLASS:   StateEncoding
 //###########################################################################
 //# $Id$
 //###########################################################################
 
-package net.sourceforge.waters.analysis;
+package net.sourceforge.waters.analysis.monolithic;
 
 
 /**
- * <P>Encoded synchronized state tuple</P>
+ * <P>Encoded synchronized state tuple.</P>
  *
  * @author Peter Yunil Park
  */
 
-public class EncodedStateTuple
+class EncodedStateTuple
 {
     /** Encoded state tuple */
     private int mEncodedStateCodes[];
@@ -32,13 +33,13 @@ public class EncodedStateTuple
     /**
      * It creates an empty state tuple.
      */
-    public EncodedStateTuple(){}
+    EncodedStateTuple(){}
 
     /**
      * It creates an empty state tuple.
      * @param size number of integers used to store encoded state
      */
-    public EncodedStateTuple(int size)
+    EncodedStateTuple(int size)
     {
 	mEncodedStateCodes = new int[size];
     }
@@ -46,7 +47,7 @@ public class EncodedStateTuple
     /**
      * Creates a state tuple with given encoded state tuple (integer array).
      */
-    public EncodedStateTuple(int[] encodedStateCodes)
+    EncodedStateTuple(int[] encodedStateCodes)
     {
 	mEncodedStateCodes = encodedStateCodes;
     }
@@ -56,7 +57,7 @@ public class EncodedStateTuple
      * It returns current encoded state tuple codes.
      * @return current encoded state tuple codes
      */
-    public int[] getCodes()
+    int[] getCodes()
     {
 	return mEncodedStateCodes;
     }
@@ -65,7 +66,7 @@ public class EncodedStateTuple
      * It checks if the state tuple has been visited.
      * @return true if the state tuple has been visited, false otherwise
      */
-    public boolean getVisited()
+    boolean getVisited()
     {
 	return mVisited;
     }
@@ -74,7 +75,7 @@ public class EncodedStateTuple
      * It sets the state is visited or not visited.
      * @param visited true if it needs to be set to visited, false otherwise
      */
-    public void setVisited(boolean visited)
+    void setVisited(boolean visited)
     {
 	mVisited = visited;
     }
@@ -83,7 +84,7 @@ public class EncodedStateTuple
      * It checks if the state tuple is in component.
      * @return true if the state tuple is in component, false otherwise
      */
-    public boolean getInComponent()
+    boolean getInComponent()
     {
 	return mInComponent;
     }
@@ -92,7 +93,7 @@ public class EncodedStateTuple
      * It sets the state is in component or not in component.
      * @param inComponent true if it needs to be set to in component, false otherwise
      */
-    public void setInComponent(boolean inComponent)
+    void setInComponent(boolean inComponent)
     {
 	mInComponent = inComponent;
     }
@@ -102,7 +103,7 @@ public class EncodedStateTuple
      * @param index index of state in the automata
      * @return index of state
      */
-    public int get(int index)
+    int get(int index)
     {
 	return mEncodedStateCodes[index];
     }

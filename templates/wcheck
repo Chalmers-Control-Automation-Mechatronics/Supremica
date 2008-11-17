@@ -35,6 +35,9 @@ for F in $@; do
 	-lang)
 	    CHECK="LanguageInclusion"
 	    ;;
+	-loop)
+	    CHECK="ControlLoop"
+	    ;;
 	*)
 	    ARGS="$ARGS \"$F\""
 	    ;;

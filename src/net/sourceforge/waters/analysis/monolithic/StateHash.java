@@ -1,4 +1,13 @@
-///////////////////////////////////////////////////////////////////////////////
+//# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
+//###########################################################################
+//# PROJECT: Waters
+//# PACKAGE: net.sourceforge.waters.analysis.monolithic
+//# CLASS:   StateHash
+//###########################################################################
+//# $Id$
+//###########################################################################
+
+/////////////////////////////////////////////////////////////////////////////
 // Copyright (c) 2001, Eric D. Friedman All Rights Reserved.
 //
 // This library is free software; you can redistribute it and/or
@@ -14,9 +23,9 @@
 // You should have received a copy of the GNU Lesser General Public
 // License along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
-///////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////
 
-package net.sourceforge.waters.analysis;
+package net.sourceforge.waters.analysis.monolithic;
 
 /**
  * Base class for hashtables that use open addressing to resolve
@@ -28,7 +37,7 @@ package net.sourceforge.waters.analysis;
  * @version $Id$
  */
 
-abstract public class StateHash implements Cloneable {
+abstract class StateHash implements Cloneable {
     /** the current number of occupied slots in the hash. */
     protected transient int _size;
 

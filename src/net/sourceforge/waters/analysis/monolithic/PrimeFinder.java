@@ -1,3 +1,12 @@
+//# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
+//###########################################################################
+//# PROJECT: Waters
+//# PACKAGE: net.sourceforge.waters.analysis.monolithic
+//# CLASS:   PrimeFinder
+//###########################################################################
+//# $Id$
+//###########################################################################
+
 //   Copyright (c) 1999 CERN - European Organization for Nuclear Research.
 
 //   Permission to use, copy, modify, distribute and sell this software
@@ -7,7 +16,9 @@
 //   supporting documentation. CERN makes no representations about the
 //   suitability of this software for any purpose. It is provided "as is"
 //   without expressed or implied warranty.
-package net.sourceforge.waters.analysis;
+
+
+package net.sourceforge.waters.analysis.monolithic;
 
 import java.util.Arrays;
 
@@ -34,7 +45,8 @@ import java.util.Arrays;
  * @author wolfgang.hoschek@cern.ch
  * @version 1.0, 09/24/99
  */
-public final class PrimeFinder {
+
+final class PrimeFinder {
     /**
      * The largest prime this class can generate; currently equal to
      * <tt>Integer.MAX_VALUE</tt>.

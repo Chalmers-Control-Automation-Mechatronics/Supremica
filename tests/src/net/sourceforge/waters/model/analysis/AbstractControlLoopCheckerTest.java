@@ -1,19 +1,17 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
 //# PROJECT: Waters
-//# PACKAGE: net.sourceforge.waters.analysis
-//# CLASS:   ControlLoopCheckerTest
+//# PACKAGE: net.sourceforge.waters.model.analysis
+//# CLASS:   AbstractControlLoopCheckerTest
 //###########################################################################
 //# $Id$
 //###########################################################################
 
-package net.sourceforge.waters.analysis;
+package net.sourceforge.waters.model.analysis;
 
 import java.util.Collection;
 import java.util.List;
 import java.util.LinkedList;
-import junit.framework.Test;
-import junit.framework.TestSuite;
 
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.EventProxy;
@@ -29,19 +27,19 @@ import net.sourceforge.waters.xsd.base.ComponentKind;
 import net.sourceforge.waters.xsd.base.EventKind;
 
 
-public class ControlLoopCheckerTest extends AbstractModelCheckerTest
+public abstract class AbstractControlLoopCheckerTest
+  extends AbstractModelVerifierTest
 {
 
   //#########################################################################
-  //# Overrides for base class junit.framework.TestCase
-  public static Test suite() { 
-    TestSuite testSuite = new TestSuite(ControlLoopCheckerTest.class);     
-    return testSuite;
+  //# Entry points in junit.framework.TestCase
+  public AbstractControlLoopCheckerTest()
+  {
   }
 
-  public static void main(final String[] args)
+  public AbstractControlLoopCheckerTest(final String name)
   {
-    junit.textui.TestRunner.run(suite()); 
+    super(name);
   }
 
 
@@ -52,7 +50,7 @@ public class ControlLoopCheckerTest extends AbstractModelCheckerTest
   {
     final ProductDESProxyFactory factory = getProductDESProxyFactory();
     final ProductDESProxy des = factory.createProductDESProxy("empty");
-    runModelChecker(des, true);
+    runModelVerifier(des, true);
   }
 
 
@@ -62,14 +60,14 @@ public class ControlLoopCheckerTest extends AbstractModelCheckerTest
   {
     final String group = "handwritten";
     final String name = "small_factory_2.wdes";
-    runModelChecker(group, name, true);
+    runModelVerifier(group, name, true);
   }
 
   public void testTictactoe() throws Exception
   {
     final String group = "handwritten";
     final String name = "tictactoe.wdes";
-    runModelChecker(group, name, true);
+    runModelVerifier(group, name, true);
   }
 
 
@@ -80,7 +78,7 @@ public class ControlLoopCheckerTest extends AbstractModelCheckerTest
     final String group = "tests";
     final String dir = "batchtank2005";
     final String name = "amk14.wdes";
-    runModelChecker(group, dir, name, true);
+    runModelVerifier(group, dir, name, true);
   }
 
   public void test_Batchtank2005_cjn5() throws Exception
@@ -88,7 +86,7 @@ public class ControlLoopCheckerTest extends AbstractModelCheckerTest
     final String group = "tests";
     final String dir = "batchtank2005";
     final String name = "cjn5.wdes";
-    runModelChecker(group, dir, name, false);
+    runModelVerifier(group, dir, name, false);
   }
 
   public void test_Batchtank2005_cs37() throws Exception
@@ -96,7 +94,7 @@ public class ControlLoopCheckerTest extends AbstractModelCheckerTest
     final String group = "tests";
     final String dir = "batchtank2005";
     final String name = "cs37.wdes";
-    runModelChecker(group, dir, name, false);
+    runModelVerifier(group, dir, name, false);
   }
 
   public void test_Batchtank2005_ez1() throws Exception
@@ -104,7 +102,7 @@ public class ControlLoopCheckerTest extends AbstractModelCheckerTest
     final String group = "tests";
     final String dir = "batchtank2005";
     final String name = "ez1.wdes";
-    runModelChecker(group, dir, name, false);
+    runModelVerifier(group, dir, name, false);
   }
 
   public void test_Batchtank2005_gb20() throws Exception
@@ -112,7 +110,7 @@ public class ControlLoopCheckerTest extends AbstractModelCheckerTest
     final String group = "tests";
     final String dir = "batchtank2005";
     final String name = "gb20.wdes";
-    runModelChecker(group, dir, name, false);
+    runModelVerifier(group, dir, name, false);
   }
 
   public void test_Batchtank2005_gb21() throws Exception
@@ -120,7 +118,7 @@ public class ControlLoopCheckerTest extends AbstractModelCheckerTest
     final String group = "tests";
     final String dir = "batchtank2005";
     final String name = "gb21.wdes";
-    runModelChecker(group, dir, name, true);
+    runModelVerifier(group, dir, name, true);
   }
 
   public void test_Batchtank2005_gjr5() throws Exception
@@ -128,7 +126,7 @@ public class ControlLoopCheckerTest extends AbstractModelCheckerTest
     final String group = "tests";
     final String dir = "batchtank2005";
     final String name = "gjr5.wdes";
-    runModelChecker(group, dir, name, false);
+    runModelVerifier(group, dir, name, false);
   }
 
   public void test_Batchtank2005_grj3() throws Exception
@@ -136,7 +134,7 @@ public class ControlLoopCheckerTest extends AbstractModelCheckerTest
     final String group = "tests";
     final String dir = "batchtank2005";
     final String name = "grj3.wdes";
-    runModelChecker(group, dir, name, false);
+    runModelVerifier(group, dir, name, false);
   }
 
   public void test_Batchtank2005_imr1() throws Exception
@@ -144,7 +142,7 @@ public class ControlLoopCheckerTest extends AbstractModelCheckerTest
     final String group = "tests";
     final String dir = "batchtank2005";
     final String name = "imr1.wdes";
-    runModelChecker(group, dir, name, false);
+    runModelVerifier(group, dir, name, false);
   }
 
   public void test_Batchtank2005_jbr2() throws Exception
@@ -152,7 +150,7 @@ public class ControlLoopCheckerTest extends AbstractModelCheckerTest
     final String group = "tests";
     final String dir = "batchtank2005";
     final String name = "jbr2.wdes";
-    runModelChecker(group, dir, name, true);
+    runModelVerifier(group, dir, name, true);
   }
 
   public void test_Batchtank2005_jmr30() throws Exception
@@ -160,7 +158,7 @@ public class ControlLoopCheckerTest extends AbstractModelCheckerTest
     final String group = "tests";
     final String dir = "batchtank2005";
     final String name = "jmr30.wdes";
-    runModelChecker(group, dir, name, false);
+    runModelVerifier(group, dir, name, false);
   }
 
   public void test_Batchtank2005_jpt10() throws Exception
@@ -168,7 +166,7 @@ public class ControlLoopCheckerTest extends AbstractModelCheckerTest
     final String group = "tests";
     final String dir = "batchtank2005";
     final String name = "jpt10.wdes";
-    runModelChecker(group, dir, name, false);
+    runModelVerifier(group, dir, name, false);
   }
 
   public void test_Batchtank2005_kah18() throws Exception
@@ -176,7 +174,7 @@ public class ControlLoopCheckerTest extends AbstractModelCheckerTest
     final String group = "tests";
     final String dir = "batchtank2005";
     final String name = "kah18.wdes";
-    runModelChecker(group, dir, name, false);
+    runModelVerifier(group, dir, name, false);
   }
 
   public void test_Batchtank2005_lsr1_1() throws Exception
@@ -184,7 +182,7 @@ public class ControlLoopCheckerTest extends AbstractModelCheckerTest
     final String group = "tests";
     final String dir = "batchtank2005";
     final String name = "lsr1_1.wdes";
-    runModelChecker(group, dir, name, false);
+    runModelVerifier(group, dir, name, false);
   }
 
   public void test_Batchtank2005_lsr1_2() throws Exception
@@ -192,7 +190,7 @@ public class ControlLoopCheckerTest extends AbstractModelCheckerTest
     final String group = "tests";
     final String dir = "batchtank2005";
     final String name = "lsr1_2.wdes";
-    runModelChecker(group, dir, name, false);
+    runModelVerifier(group, dir, name, false);
   }
 
   public void test_Batchtank2005_lz136_1() throws Exception
@@ -200,7 +198,7 @@ public class ControlLoopCheckerTest extends AbstractModelCheckerTest
     final String group = "tests";
     final String dir = "batchtank2005";
     final String name = "lz136_1.wdes";
-    runModelChecker(group, dir, name, true);
+    runModelVerifier(group, dir, name, true);
   }
 
   public void test_Batchtank2005_lz136_2() throws Exception
@@ -208,7 +206,7 @@ public class ControlLoopCheckerTest extends AbstractModelCheckerTest
     final String group = "tests";
     final String dir = "batchtank2005";
     final String name = "lz136_2.wdes";
-    runModelChecker(group, dir, name, true);
+    runModelVerifier(group, dir, name, true);
   }
 
   public void test_Batchtank2005_rch11() throws Exception
@@ -216,7 +214,7 @@ public class ControlLoopCheckerTest extends AbstractModelCheckerTest
     final String group = "tests";
     final String dir = "batchtank2005";
     final String name = "rch11.wdes";
-    runModelChecker(group, dir, name, false);
+    runModelVerifier(group, dir, name, false);
   }
 
   public void test_Batchtank2005_ry27() throws Exception
@@ -224,7 +222,7 @@ public class ControlLoopCheckerTest extends AbstractModelCheckerTest
     final String group = "tests";
     final String dir = "batchtank2005";
     final String name = "ry27.wdes";
-    runModelChecker(group, dir, name, true);
+    runModelVerifier(group, dir, name, true);
   }
 
   public void test_Batchtank2005_scs10() throws Exception
@@ -232,7 +230,7 @@ public class ControlLoopCheckerTest extends AbstractModelCheckerTest
     final String group = "tests";
     final String dir = "batchtank2005";
     final String name = "scs10.wdes";
-    runModelChecker(group, dir, name, false);
+    runModelVerifier(group, dir, name, false);
   }
 
   public void test_Batchtank2005_sjw41() throws Exception
@@ -240,7 +238,7 @@ public class ControlLoopCheckerTest extends AbstractModelCheckerTest
     final String group = "tests";
     final String dir = "batchtank2005";
     final String name = "sjw41.wdes";
-    runModelChecker(group, dir, name, false);
+    runModelVerifier(group, dir, name, false);
   }
 
   public void test_Batchtank2005_smr26() throws Exception
@@ -248,7 +246,7 @@ public class ControlLoopCheckerTest extends AbstractModelCheckerTest
     final String group = "tests";
     final String dir = "batchtank2005";
     final String name = "smr26.wdes";
-    runModelChecker(group, dir, name, false);
+    runModelVerifier(group, dir, name, false);
   }
 
   public void test_Batchtank2005_tk27() throws Exception
@@ -256,7 +254,7 @@ public class ControlLoopCheckerTest extends AbstractModelCheckerTest
     final String group = "tests";
     final String dir = "batchtank2005";
     final String name = "tk27.wdes";
-    runModelChecker(group, dir, name, true); 
+    runModelVerifier(group, dir, name, true); 
   }
 
   public void test_Batchtank2005_tp20() throws Exception
@@ -264,7 +262,7 @@ public class ControlLoopCheckerTest extends AbstractModelCheckerTest
     final String group = "tests";
     final String dir = "batchtank2005";
     final String name = "tp20.wdes";
-    runModelChecker(group, dir, name, false);
+    runModelVerifier(group, dir, name, false);
   }
 
   public void test_Batchtank2005_vl6() throws Exception
@@ -272,7 +270,7 @@ public class ControlLoopCheckerTest extends AbstractModelCheckerTest
     final String group = "tests";
     final String dir = "batchtank2005";
     final String name = "vl6.wdes";
-    runModelChecker(group, dir, name, false);
+    runModelVerifier(group, dir, name, false);
   }
 
   public void testHISCRhoneSubsystem1Patch2() throws Exception
@@ -280,7 +278,7 @@ public class ControlLoopCheckerTest extends AbstractModelCheckerTest
     final String group = "tests";
     final String dir = "hisc";
     final String name = "rhone_subsystem1_patch2.wmod";
-    runModelChecker(group, dir, name, false);
+    runModelVerifier(group, dir, name, false);
   }
 
   public void test_Nasty_JustProperty() throws Exception
@@ -288,7 +286,7 @@ public class ControlLoopCheckerTest extends AbstractModelCheckerTest
     final String group = "tests";
     final String dir = "nasty";
     final String name = "just_property.wmod";
-    runModelChecker(group, dir, name, false);
+    runModelVerifier(group, dir, name, false);
   }
 
   public void test_Nasty_TheVicousLoop1() throws Exception
@@ -296,7 +294,7 @@ public class ControlLoopCheckerTest extends AbstractModelCheckerTest
     final String group = "tests";
     final String dir = "nasty";
     final String name = "the_vicious_loop1.wdes";
-    runModelChecker(group, dir, name, false);
+    runModelVerifier(group, dir, name, false);
   }
 
   public void test_Nasty_TheVicousLoop2() throws Exception
@@ -304,7 +302,7 @@ public class ControlLoopCheckerTest extends AbstractModelCheckerTest
     final String group = "tests";
     final String dir = "nasty";
     final String name = "the_vicious_loop2.wdes";
-    runModelChecker(group, dir, name, false);
+    runModelVerifier(group, dir, name, false);
   }
 
   public void testProfisafeI4Host() throws Exception
@@ -312,7 +310,7 @@ public class ControlLoopCheckerTest extends AbstractModelCheckerTest
     final String group = "tests";
     final String dir = "profisafe";
     final String name = "profisafe_i4_host.wmod";
-    runModelChecker(group, dir, name, true);
+    runModelVerifier(group, dir, name, true);
   }
 
   public void testProfisafeI4Slave() throws Exception
@@ -320,7 +318,7 @@ public class ControlLoopCheckerTest extends AbstractModelCheckerTest
     final String group = "tests";
     final String dir = "profisafe";
     final String name = "profisafe_i4_slave.wmod";
-    runModelChecker(group, dir, name, true);
+    runModelVerifier(group, dir, name, true);
   }
 
   public void testProfisafeO4Host() throws Exception
@@ -328,7 +326,7 @@ public class ControlLoopCheckerTest extends AbstractModelCheckerTest
     final String group = "tests";
     final String dir = "profisafe";
     final String name = "profisafe_o4_host.wmod";
-    runModelChecker(group, dir, name, true);
+    runModelVerifier(group, dir, name, true);
   }
 
   public void testProfisafeO4Slave() throws Exception
@@ -336,7 +334,7 @@ public class ControlLoopCheckerTest extends AbstractModelCheckerTest
     final String group = "tests";
     final String dir = "profisafe";
     final String name = "profisafe_o4_slave.wmod";
-    runModelChecker(group, dir, name, true);
+    runModelVerifier(group, dir, name, true);
   }
 
   public void test_TrafficLights2006_ac61() throws Exception
@@ -344,7 +342,7 @@ public class ControlLoopCheckerTest extends AbstractModelCheckerTest
     final String group = "tests";
     final String dir = "trafficlights2006";
     final String name = "ac61.wdes";
-    runModelChecker(group, dir, name, true);
+    runModelVerifier(group, dir, name, true);
   }
 
   public void test_TrafficLights2006_plants() throws Exception
@@ -352,7 +350,7 @@ public class ControlLoopCheckerTest extends AbstractModelCheckerTest
     final String group = "tests";
     final String dir = "trafficlights2006";
     final String name = "plants.wdes";
-    runModelChecker(group, dir, name, false);
+    runModelVerifier(group, dir, name, false);
   }
 
 
@@ -363,7 +361,7 @@ public class ControlLoopCheckerTest extends AbstractModelCheckerTest
     final String group = "valid";
     final String dir  = "big_factory";
     final String name = "bfactory.wdes";
-    runModelChecker(group, dir, name, true);
+    runModelVerifier(group, dir, name, true);
   }
   
   public void testBmw_fh() throws Exception
@@ -371,7 +369,7 @@ public class ControlLoopCheckerTest extends AbstractModelCheckerTest
     final String group = "valid";
     final String dir  = "bmw_fh";
     final String name = "bmw_fh.wdes";
-    runModelChecker(group, dir, name, true);
+    runModelVerifier(group, dir, name, true);
   }
 
   public void testBorder_cases() throws Exception
@@ -379,7 +377,7 @@ public class ControlLoopCheckerTest extends AbstractModelCheckerTest
     final String group = "valid";
     final String dir  = "border_cases";
     final String name = "never_blow_up.wdes";
-    runModelChecker(group, dir, name, true);
+    runModelVerifier(group, dir, name, true);
   }
 
   public void testDebounce() throws Exception
@@ -387,7 +385,7 @@ public class ControlLoopCheckerTest extends AbstractModelCheckerTest
     final String group = "valid";
     final String dir = "debounce";
     final String name = "debounce.wdes";
-    runModelChecker(group, dir, name, true);
+    runModelVerifier(group, dir, name, true);
   }
   
   public void testFalko() throws Exception
@@ -395,7 +393,7 @@ public class ControlLoopCheckerTest extends AbstractModelCheckerTest
     final String group = "valid";
     final String dir = "falko";
     final String name = "falko.wdes";
-    runModelChecker(group, dir, name, true);
+    runModelVerifier(group, dir, name, true);
   }
   
   public void testFtuer() throws Exception
@@ -403,7 +401,7 @@ public class ControlLoopCheckerTest extends AbstractModelCheckerTest
     final String group = "valid";
     final String dir  = "central_locking";
     final String name = "ftuer.wdes";
-    runModelChecker(group, dir, name, false);
+    runModelVerifier(group, dir, name, false);
   } 
 
   public void testKoordwsp() throws Exception
@@ -411,7 +409,7 @@ public class ControlLoopCheckerTest extends AbstractModelCheckerTest
     final String group = "valid";
     final String dir  = "central_locking";
     final String name = "koordwsp.wdes";
-    runModelChecker(group, dir, name, true);
+    runModelVerifier(group, dir, name, true);
   }
   
   public void testSafetydisplay() throws Exception
@@ -419,7 +417,7 @@ public class ControlLoopCheckerTest extends AbstractModelCheckerTest
     final String group = "valid";
     final String dir = "safetydisplay";
     final String name = "safetydisplay.wdes";
-    runModelChecker(group, dir, name, true);
+    runModelVerifier(group, dir, name, true);
   }
   
   public void testSmallFactory() throws Exception
@@ -427,7 +425,7 @@ public class ControlLoopCheckerTest extends AbstractModelCheckerTest
     final String group = "valid";
     final String dir = "small";
     final String name = "small.wdes";
-    runModelChecker(group, dir, name, true);
+    runModelVerifier(group, dir, name, true);
   }
   
   public void testSmallFactoryUncont() throws Exception
@@ -435,7 +433,7 @@ public class ControlLoopCheckerTest extends AbstractModelCheckerTest
     final String group = "valid";
     final String dir = "small";
     final String name = "small_uncont.wdes";
-    runModelChecker(group, dir, name, true);
+    runModelVerifier(group, dir, name, true);
   }
   
   public void testSmd() throws Exception
@@ -443,7 +441,7 @@ public class ControlLoopCheckerTest extends AbstractModelCheckerTest
     final String group = "valid";
     final String dir = "smd";
     final String name = "smdreset.wdes";
-    runModelChecker(group, dir, name, true);
+    runModelVerifier(group, dir, name, true);
   }
 
   public void testTline_0() throws Exception
@@ -451,7 +449,7 @@ public class ControlLoopCheckerTest extends AbstractModelCheckerTest
     final String group = "valid";
     final String dir = "tline_0";
     final String name = "transferline_templ.wdes";
-    runModelChecker(group, dir, name, true);
+    runModelVerifier(group, dir, name, true);
   }
   
   public void testTline_1() throws Exception
@@ -459,7 +457,7 @@ public class ControlLoopCheckerTest extends AbstractModelCheckerTest
     final String group = "valid";
     final String dir = "tline_1";
     final String name = "tline_1.wdes";
-    runModelChecker(group, dir, name, true);
+    runModelVerifier(group, dir, name, true);
   }
 
   public void testWeiche() throws Exception
@@ -467,7 +465,7 @@ public class ControlLoopCheckerTest extends AbstractModelCheckerTest
     final String group = "valid";
     final String dir = "vt";
     final String name = "weiche.wdes";
-    runModelChecker(group, dir, name, true);
+    runModelVerifier(group, dir, name, true);
   }
 
 
@@ -506,21 +504,15 @@ public class ControlLoopCheckerTest extends AbstractModelCheckerTest
       new LinkedList<ParameterBindingProxy>();
     final ParameterBindingProxy binding = createBinding("N", n);
     bindings.add(binding);
-    runModelChecker(group, name, bindings, true);
+    runModelVerifier(group, name, bindings, true);
   }
 
 
   //#########################################################################
   //# Overrides for abstract base class
-  //# net.sourceforge.waters.analysis.AbstractModelCheckerTest
-  ModelChecker createModelChecker(final ProductDESProxy des,
-                                  final ProductDESProxyFactory factory)
-  {
-    return new ControlLoopChecker(des, factory);
-  }
-
-  void checkCounterExample(final ProductDESProxy des,
-                           final TraceProxy trace)
+  //# net.sourceforge.waters.analysis.AbstractModelVerifierTest
+  protected void checkCounterExample(final ProductDESProxy des,
+                                     final TraceProxy trace)
   {
     final LoopTraceProxy counterexample = (LoopTraceProxy) trace;
     final Collection<AutomatonProxy> automata = des.getAutomata();

@@ -1,23 +1,24 @@
+//# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
 //# PROJECT: Waters
-//# PACKAGE: net.sourceforge.waters.analysis
+//# PACKAGE: net.sourceforge.waters.analysis.monolithic
 //# CLASS:   TransitionProperty
 //###########################################################################
 //# $Id$
 //###########################################################################
 
-package net.sourceforge.waters.analysis;
+package net.sourceforge.waters.analysis.monolithic;
 
 
 /**
- * <P>Transition between two state tuples</P>
+ * <P>Transition between two state tuples.</P>
  *
  * <P>It contains the property of transition between two state tuples</P>
  *
  * @author Peter Yunil Park
  */
 
-public class TransitionProperty
+class TransitionProperty
 {
     /** Source tuple of transition */
     private EncodedStateTuple sourceTuple;

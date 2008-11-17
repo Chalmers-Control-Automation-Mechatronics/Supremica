@@ -32,6 +32,12 @@ public interface ModelVerifierFactory
     (ProductDESProxyFactory factory);
 
   /**
+   * Creates a control-loop checker.
+   */
+  public ControlLoopChecker createControlLoopChecker
+    (ProductDESProxyFactory factory);
+
+  /**
    * Creates a language inclusion checker.
    */
   public LanguageInclusionChecker createLanguageInclusionChecker

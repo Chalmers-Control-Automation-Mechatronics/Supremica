@@ -16,11 +16,11 @@ import java.util.List;
 import net.sourceforge.waters.model.unchecked.Casting;
 
 
-public class BlockedArrayList<T> extends AbstractList<T> {
+class BlockedArrayList<T> extends AbstractList<T> {
 
   //#########################################################################
   //# Constructors
-  public BlockedArrayList(final Class<T> clazz)
+  BlockedArrayList(final Class<T> clazz)
   {
     clazz_ = clazz;
     size_ = 0;

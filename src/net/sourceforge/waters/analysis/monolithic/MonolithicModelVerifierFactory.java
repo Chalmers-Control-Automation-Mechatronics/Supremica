@@ -45,6 +45,12 @@ public class MonolithicModelVerifierFactory
     return new MonolithicControllabilityChecker(factory);
   }
 
+  public MonolithicControlLoopChecker createControlLoopChecker
+    (final ProductDESProxyFactory factory)
+  {
+    return new MonolithicControlLoopChecker(factory);
+  }
+
   public MonolithicLanguageInclusionChecker createLanguageInclusionChecker
     (final ProductDESProxyFactory factory)
   {

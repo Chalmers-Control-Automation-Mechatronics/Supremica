@@ -16,7 +16,7 @@ package net.sourceforge.waters.analysis.monolithic;
  * @author Peter Yunil Park
  */
 
-public class StateTuple
+class StateTuple
 {
 
   //#########################################################################
@@ -25,7 +25,7 @@ public class StateTuple
    * Creates an empty state tuple.
    * @param size number of integers used to store encoded state.
    */
-  public StateTuple(final int size)
+  StateTuple(final int size)
   {
     mStateCodes = new int[size];
   }
@@ -33,7 +33,7 @@ public class StateTuple
   /**
    * Creates a state tuple with given encoded state tuple (integer array).
    */
-  public StateTuple(final int[] codes)
+  StateTuple(final int[] codes)
   {
     mStateCodes = codes;
   }
@@ -44,7 +44,7 @@ public class StateTuple
   /**
    * Returns current encoded state tuple codes.
    */
-  public int[] getCodes()
+  int[] getCodes()
   {
     return mStateCodes;
   }
@@ -54,7 +54,7 @@ public class StateTuple
    * @param index index of state in the automata
    * @return index of state
    */
-  public int get(int index)
+  int get(int index)
   {
     return mStateCodes[index];
   }
