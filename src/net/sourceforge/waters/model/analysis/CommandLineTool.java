@@ -23,12 +23,15 @@ import net.sourceforge.waters.model.compiler.ModuleCompiler;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 import net.sourceforge.waters.model.des.TraceProxy;
+import net.sourceforge.waters.model.expr.ExpressionParser;
 import net.sourceforge.waters.model.expr.OperatorTable;
 import net.sourceforge.waters.model.marshaller.DocumentManager;
 import net.sourceforge.waters.model.marshaller.JAXBModuleMarshaller;
 import net.sourceforge.waters.model.marshaller.JAXBProductDESMarshaller;
 import net.sourceforge.waters.model.module.ModuleProxy;
 import net.sourceforge.waters.model.module.ModuleProxyFactory;
+import net.sourceforge.waters.model.module.ParameterBindingProxy;
+import net.sourceforge.waters.model.module.SimpleExpressionProxy;
 import net.sourceforge.waters.valid.ValidUnmarshaller;
 import net.sourceforge.waters.plain.des.ProductDESElementFactory;
 import net.sourceforge.waters.plain.module.ModuleElementFactory;
@@ -65,10 +68,21 @@ public class CommandLineTool
     try {
       if (args.length < 2) {
         System.err.println
-          ("USAGE: java CommandLineTool <factory> [options] <checker> <file> ...");
+          ("USAGE: java CommandLineTool <factory> " +
+           "[options] <checker> <file> ...");
         System.exit(1);
       }
       
+      final ModuleProxyFactory moduleFactory =
+        ModuleElementFactory.getInstance();
+      final ProductDESProxyFactory desFactory =
+        ProductDESElementFactory.getInstance();
+      final OperatorTable optable = CompilerOperatorTable.getInstance();
+      final ExpressionParser parser =
+        new ExpressionParser(moduleFactory, optable);
+      final List<ParameterBindingProxy> bindings =
+        new LinkedList<ParameterBindingProxy>();
+
       boolean verbose = true;
       boolean noargs = false;
       final String factoryname = args[0];
@@ -79,6 +93,18 @@ public class CommandLineTool
           arglist.add(arg);
         } else if (arg.equals("-q") || arg.equals("-quiet")) {
           verbose = false;
+        } else if (arg.startsWith("-D")) {
+          final int eqpos = arg.indexOf('=', 2);
+          if (eqpos > 2) {
+            final String name = arg.substring(2, eqpos);
+            final String text = arg.substring(eqpos + 1);
+            final SimpleExpressionProxy expr = parser.parse(text);
+            final ParameterBindingProxy binding =
+              moduleFactory.createParameterBindingProxy(name, expr);
+            bindings.add(binding);              
+          } else {
+            arglist.add(arg);
+          }
         } else if (arg.equals("--")) {
           noargs = true;
           arglist.add(arg);
@@ -104,11 +130,6 @@ public class CommandLineTool
         // No loggers---no trouble ...
       }
 
-      final ModuleProxyFactory moduleFactory =
-        ModuleElementFactory.getInstance();
-      final ProductDESProxyFactory desFactory =
-        ProductDESElementFactory.getInstance();
-      final OperatorTable optable = CompilerOperatorTable.getInstance();
       final ValidUnmarshaller importer =
         new ValidUnmarshaller(moduleFactory, optable);
       final JAXBModuleMarshaller moduleMarshaller =
@@ -146,7 +167,7 @@ public class CommandLineTool
           final ModuleProxy module = (ModuleProxy) doc;
           final ModuleCompiler compiler =
             new ModuleCompiler(docManager, desFactory, module);
-          des = compiler.compile();
+          des = compiler.compile(bindings);
         }
         System.out.print(des.getName() + " ... ");
         System.out.flush();
