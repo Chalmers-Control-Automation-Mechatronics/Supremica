@@ -1417,10 +1417,6 @@ class FreeExecModelBuilder extends ModelBuilder
 		
 		eventQueue.addInitialState("s0");
 
-		// Operation Scheduler Freedom
-		//event = "discard_fb;";
-		//eventQueue.addTransition("s0", "s0", event, null, null);
-
 		for (int i = 1; i <= places; i++)
 		{
 			Integer numEvents = (Integer) eventsMaxID.get(fbName);
@@ -1469,7 +1465,7 @@ class FreeExecModelBuilder extends ModelBuilder
 				}
 			}
 			
-			eventQueue.addState("s" + i);
+			eventQueue.addState("s" + i,false,false);
 
 			for (Iterator evIter = eventInputList.iterator(); evIter.hasNext();)
 			{
@@ -1484,14 +1480,14 @@ class FreeExecModelBuilder extends ModelBuilder
 					from = "s" + (i-1);
 					to = "s" + (places + nameCounter);
 					nameCounter++;
-					eventQueue.addState(to);
+					eventQueue.addState(to,false,false);
 					event = "receive_event_" + eventName + "_" + fbName + ";";
 					eventQueue.addTransition(from, to, event, null, null);
 					
 					from = to;
 					to = "s" + (places + nameCounter);
 					nameCounter++;
-					eventQueue.addState(to);
+					eventQueue.addState(to,false,false);
 					event = "queue_event_" + eventName + "_" + fbName + ";";
 					for (int j = 1; j <= places; j++)
 					{
@@ -1527,13 +1523,6 @@ class FreeExecModelBuilder extends ModelBuilder
 						}
 						eventQueue.addTransition(from, to, event, guard, action);
 					}
-
-					//from = to;
-					//to = "s" + (places + nameCounter);
-					//nameCounter++;
-					//eventQueue.addState(to);
-					//event = "queue_fb_" + fbName + ";";
-					//eventQueue.addTransition(from, to, event, null, null);
 					
 					from = to;
 					to = "s" + i;
@@ -1543,10 +1532,6 @@ class FreeExecModelBuilder extends ModelBuilder
 				}
 				
 			}
-
-			// Operation Scheduler Freedom
-			//event = "discard_fb;";
-			//eventQueue.addTransition(to, to, event, null, null);
 
 			// Transitions when dequeuing event
 			for (Iterator evIter = eventInputList.iterator(); evIter.hasNext();)
@@ -1560,7 +1545,7 @@ class FreeExecModelBuilder extends ModelBuilder
 					from = "s" + i;
 					to = "s" + (places + nameCounter);
 					nameCounter++;
-					eventQueue.addState(to);
+					eventQueue.addState(to,false,false);
 					event = "remove_event_" + fbName + ";";
 					for (int j = 1; j <= places; j++)
 					{
