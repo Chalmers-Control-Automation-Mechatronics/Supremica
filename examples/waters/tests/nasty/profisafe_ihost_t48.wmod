@@ -1,0 +1,169 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Module Name="profisafe_ihost_t48" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
+    <ns2:Comment>Part of PROFIsafe i-Host model. Contains the part of the transition from state 4 to state 8 that is particularly hard for the EFA contraint propagator.</ns2:Comment>
+    <ConstantAliasList>
+        <ConstantAlias Scope="REQUIRED_PARAMETER" Name="MAXSEQNO">
+            <ConstantAliasExpression>
+                <IntConstant Value="4"/>
+            </ConstantAliasExpression>
+        </ConstantAlias>
+    </ConstantAliasList>
+    <EventDeclList>
+        <EventDecl Kind="CONTROLLABLE" Name="step"/>
+    </EventDeclList>
+    <ComponentList>
+        <SimpleComponent Kind="SPEC" Name="main">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Name="s8_message_prepare">
+                        <PointGeometry>
+                            <Point Y="160" X="240"/>
+                        </PointGeometry>
+                        <LabelGeometry>
+                            <Point Y="-9" X="-138"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Initial="true" Name="s4_slave_ack_check">
+                        <PointGeometry>
+                            <Point Y="48" X="240"/>
+                        </PointGeometry>
+                        <InitialArrowGeometry>
+                            <Point Y="-5" X="-5"/>
+                        </InitialArrowGeometry>
+                        <LabelGeometry>
+                            <Point Y="-9" X="-136"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="s8_message_prepare" Source="s4_slave_ack_check">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="step"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-36" X="13"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <GuardActionBlock>
+                            <Guards>
+                                <BinaryExpression Operator="|" Text="in_cons_num!=out_cons_num | in_CRC==nok | in_ps_status_bit2_CRCNO==1">
+                                    <BinaryExpression Operator="|">
+                                        <BinaryExpression Operator="!=">
+                                            <SimpleIdentifier Name="in_cons_num"/>
+                                            <SimpleIdentifier Name="out_cons_num"/>
+                                        </BinaryExpression>
+                                        <BinaryExpression Operator="==">
+                                            <SimpleIdentifier Name="in_CRC"/>
+                                            <SimpleIdentifier Name="nok"/>
+                                        </BinaryExpression>
+                                    </BinaryExpression>
+                                    <BinaryExpression Operator="==">
+                                        <SimpleIdentifier Name="in_ps_status_bit2_CRCNO"/>
+                                        <IntConstant Value="1"/>
+                                    </BinaryExpression>
+                                </BinaryExpression>
+                            </Guards>
+                            <Actions>
+                                <BinaryExpression Operator="=" Text="fs_master_bit2_CRCNO = (in_cons_num != out_cons_num) | (in_CRC == nok)">
+                                    <SimpleIdentifier Name="fs_master_bit2_CRCNO"/>
+                                    <BinaryExpression Operator="|">
+                                        <BinaryExpression Operator="!=">
+                                            <SimpleIdentifier Name="in_cons_num"/>
+                                            <SimpleIdentifier Name="out_cons_num"/>
+                                        </BinaryExpression>
+                                        <BinaryExpression Operator="==">
+                                            <SimpleIdentifier Name="in_CRC"/>
+                                            <SimpleIdentifier Name="nok"/>
+                                        </BinaryExpression>
+                                    </BinaryExpression>
+                                </BinaryExpression>
+                                <BinaryExpression Operator="=" Text="out_cons_num=1 + out_cons_num % MAXSEQNO">
+                                    <SimpleIdentifier Name="out_cons_num"/>
+                                    <BinaryExpression Operator="+">
+                                        <IntConstant Value="1"/>
+                                        <BinaryExpression Operator="%">
+                                            <SimpleIdentifier Name="out_cons_num"/>
+                                            <SimpleIdentifier Name="MAXSEQNO"/>
+                                        </BinaryExpression>
+                                    </BinaryExpression>
+                                </BinaryExpression>
+                            </Actions>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-14" X="13"/>
+                            </LabelGeometry>
+                        </GuardActionBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <VariableComponent Name="out_cons_num">
+            <VariableRange>
+                <BinaryExpression Operator="..">
+                    <IntConstant Value="0"/>
+                    <SimpleIdentifier Name="MAXSEQNO"/>
+                </BinaryExpression>
+            </VariableRange>
+            <VariableInitial>
+                <BinaryExpression Operator="==">
+                    <SimpleIdentifier Name="out_cons_num"/>
+                    <IntConstant Value="0"/>
+                </BinaryExpression>
+            </VariableInitial>
+        </VariableComponent>
+        <VariableComponent Name="in_cons_num">
+            <VariableRange>
+                <BinaryExpression Operator="..">
+                    <IntConstant Value="0"/>
+                    <SimpleIdentifier Name="MAXSEQNO"/>
+                </BinaryExpression>
+            </VariableRange>
+            <VariableInitial>
+                <BinaryExpression Operator="==">
+                    <SimpleIdentifier Name="in_cons_num"/>
+                    <IntConstant Value="0"/>
+                </BinaryExpression>
+            </VariableInitial>
+        </VariableComponent>
+        <VariableComponent Name="in_CRC">
+            <VariableRange>
+                <EnumSetExpression Text="{ok,nok}">
+                    <SimpleIdentifier Name="ok"/>
+                    <SimpleIdentifier Name="nok"/>
+                </EnumSetExpression>
+            </VariableRange>
+            <VariableInitial>
+                <BinaryExpression Operator="==">
+                    <SimpleIdentifier Name="in_CRC"/>
+                    <SimpleIdentifier Name="nok"/>
+                </BinaryExpression>
+            </VariableInitial>
+        </VariableComponent>
+        <VariableComponent Name="in_ps_status_bit2_CRCNO">
+            <VariableRange>
+                <BinaryExpression Operator="..">
+                    <IntConstant Value="0"/>
+                    <IntConstant Value="1"/>
+                </BinaryExpression>
+            </VariableRange>
+            <VariableInitial>
+                <BinaryExpression Operator="==">
+                    <SimpleIdentifier Name="in_ps_status_bit2_CRCNO"/>
+                    <IntConstant Value="1"/>
+                </BinaryExpression>
+            </VariableInitial>
+        </VariableComponent>
+        <VariableComponent Name="fs_master_bit2_CRCNO">
+            <VariableRange>
+                <BinaryExpression Operator="..">
+                    <IntConstant Value="0"/>
+                    <IntConstant Value="1"/>
+                </BinaryExpression>
+            </VariableRange>
+            <VariableInitial>
+                <BinaryExpression Operator="==">
+                    <SimpleIdentifier Name="fs_master_bit2_CRCNO"/>
+                    <IntConstant Value="0"/>
+                </BinaryExpression>
+            </VariableInitial>
+        </VariableComponent>
+    </ComponentList>
+</Module>

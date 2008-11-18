@@ -875,7 +875,7 @@ class EFARangeEvaluator
       if (range.equals(FALSE_RANGE)) {
         return TRUE_RANGE;
       } else if (range.equals(TRUE_RANGE)) {
-        return TRUE_RANGE;
+        return FALSE_RANGE;
       } else {
         return BOOLEAN_RANGE;
       }

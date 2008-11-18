@@ -154,6 +154,10 @@ public class EFACompiler
   {
     try {
       mRootContext = new ModuleBindingContext(mInputModule);
+      mVariableAutomatonBuilder =
+        new EFAVariableAutomatonBuilder(mFactory, mOperatorTable,
+                                        mSimpleExpressionCompiler,
+                                        mRootContext);
       // Pass 1 ...
       final Pass1Visitor pass1 = new Pass1Visitor();
       mInputModule.acceptVisitor(pass1);
@@ -177,6 +181,7 @@ public class EFACompiler
       }
     } finally {
       mRootContext = null;
+      mVariableAutomatonBuilder = null;
       mVariableMap.clear();
     }
   }
@@ -288,22 +293,25 @@ public class EFACompiler
   private void createEvent(final EFAEventDecl edecl,
                            final List<EFATransition> parts,
                            final CompiledClause cond)
+    throws EvalException
   {
-    final EFAEvent event = edecl.createEvent(cond);
-    for (final EFATransition part : parts) {
-      final CompiledClause pcond = part.getConditions();
-      if (!pcond.isEmpty()) {
-        for (final Proxy location : part.getSourceLocations()) {
-          Collection<EFAEvent> collection = mEFAEventMap.get(location);
-          if (collection == null) {
-            collection = new LinkedList<EFAEvent>();
-            mEFAEventMap.put(location, collection);
+    if (mVariableAutomatonBuilder.isSatisfiable(edecl, cond)) {
+      final EFAEvent event = edecl.createEvent(cond);
+      for (final EFATransition part : parts) {
+        final CompiledClause pcond = part.getConditions();
+        if (!pcond.isEmpty()) {
+          for (final Proxy location : part.getSourceLocations()) {
+            Collection<EFAEvent> collection = mEFAEventMap.get(location);
+            if (collection == null) {
+              collection = new LinkedList<EFAEvent>();
+              mEFAEventMap.put(location, collection);
+            }
+            collection.add(event);
           }
-          collection.add(event);
         }
       }
+      mEventNameBuilder.addClause(cond);
     }
-    mEventNameBuilder.addClause(cond);
   }
 
 
@@ -737,10 +745,6 @@ public class EFACompiler
     private Pass5Visitor()
     {
       mCloner = mFactory.getCloner();
-      mVariableAutomatonBuilder =
-        new EFAVariableAutomatonBuilder(mFactory, mOperatorTable,
-                                        mSimpleExpressionCompiler,
-                                        mRootContext);
     }
 
     //#######################################################################
@@ -957,7 +961,7 @@ public class EFACompiler
         final IdentifierProxy ident = comp.getIdentifier();
         final EFAVariable var = mVariableMap.getVariable(ident);
         final SimpleComponentProxy result =
-          mVariableAutomatonBuilder.constructSimpleComponent(comp, var);
+          mVariableAutomatonBuilder.constructSimpleComponent(var);
         addSourceInfo(result, comp);
         mComponents.add(result);
         return result;
@@ -970,7 +974,6 @@ public class EFACompiler
     //#######################################################################
     //# Data Members
     private final ModuleProxyCloner mCloner;
-    private final EFAVariableAutomatonBuilder mVariableAutomatonBuilder;
 
     private List<EventDeclProxy> mEventDeclarations;
     private List<SimpleComponentProxy> mComponents;
@@ -1000,6 +1003,8 @@ public class EFACompiler
   private boolean mIsUsingEventAlphabet = true;
 
   private ModuleBindingContext mRootContext;
+  private EFAVariableAutomatonBuilder mVariableAutomatonBuilder;
+
   // Pass 1
   /**
    * A map that assigns to each expression that refers to a variable

@@ -82,8 +82,7 @@ public class CommandLineTool
       final OperatorTable optable = CompilerOperatorTable.getInstance();
       final ExpressionParser parser =
         new ExpressionParser(moduleFactory, optable);
-      final List<ParameterBindingProxy> bindings =
-        new LinkedList<ParameterBindingProxy>();
+      List<ParameterBindingProxy> bindings = null;
 
       boolean verbose = true;
       boolean noargs = false;
@@ -103,6 +102,9 @@ public class CommandLineTool
             final SimpleExpressionProxy expr = parser.parse(text);
             final ParameterBindingProxy binding =
               moduleFactory.createParameterBindingProxy(name, expr);
+            if (bindings == null) {
+              bindings = new LinkedList<ParameterBindingProxy>();
+            }
             bindings.add(binding);              
           } else {
             arglist.add(arg);

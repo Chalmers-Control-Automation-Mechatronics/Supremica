@@ -7,8 +7,7 @@
 <Event Kind="PROPOSITION" Name=":accepting"/>
 <Event Kind="CONTROLLABLE" Name="start1"/>
 <Event Kind="CONTROLLABLE" Name="start2"/>
-<Event Kind="UNCONTROLLABLE" Name="finish1.{items&lt;2}"/>
-<Event Kind="UNCONTROLLABLE" Name="finish1.{2&lt;=items}"/>
+<Event Kind="UNCONTROLLABLE" Name="finish1"/>
 <Event Kind="UNCONTROLLABLE" Name="finish2"/>
 </EventList>
 <AutomataList>
@@ -16,8 +15,7 @@
 <EventRefList>
 <EventRef Name=":accepting"/>
 <EventRef Name="start1"/>
-<EventRef Name="finish1.{items&lt;2}"/>
-<EventRef Name="finish1.{2&lt;=items}"/>
+<EventRef Name="finish1"/>
 </EventRefList>
 <StateList>
 <State Initial="true" Name="S0">
@@ -29,8 +27,7 @@
 </StateList>
 <TransitionList>
 <Transition Source="S0" Target="S1" Event="start1"/>
-<Transition Source="S1" Target="S0" Event="finish1.{items&lt;2}"/>
-<Transition Source="S1" Target="S0" Event="finish1.{2&lt;=items}"/>
+<Transition Source="S1" Target="S0" Event="finish1"/>
 </TransitionList>
 </Automaton>
 <Automaton Kind="PLANT" Name="Machine2">
@@ -55,8 +52,7 @@
 <Automaton Kind="SPEC" Name="BufferSize">
 <EventRefList>
 <EventRef Name=":accepting"/>
-<EventRef Name="finish1.{items&lt;2}"/>
-<EventRef Name="finish1.{2&lt;=items}"/>
+<EventRef Name="finish1"/>
 <EventRef Name="start2"/>
 </EventRefList>
 <StateList>
@@ -67,15 +63,14 @@
 </State>
 </StateList>
 <TransitionList>
-<Transition Source="S0" Target="S0" Event="finish1.{items&lt;2}"/>
+<Transition Source="S0" Target="S0" Event="finish1"/>
 <Transition Source="S0" Target="S0" Event="start2"/>
 </TransitionList>
 </Automaton>
 <Automaton Kind="PLANT" Name="items">
 <EventRefList>
 <EventRef Name=":accepting"/>
-<EventRef Name="finish1.{items&lt;2}"/>
-<EventRef Name="finish1.{2&lt;=items}"/>
+<EventRef Name="finish1"/>
 <EventRef Name="start2"/>
 </EventRefList>
 <StateList>
@@ -88,8 +83,8 @@
 <State Name="2"/>
 </StateList>
 <TransitionList>
-<Transition Source="0" Target="1" Event="finish1.{items&lt;2}"/>
-<Transition Source="1" Target="2" Event="finish1.{items&lt;2}"/>
+<Transition Source="0" Target="1" Event="finish1"/>
+<Transition Source="1" Target="2" Event="finish1"/>
 <Transition Source="1" Target="0" Event="start2"/>
 <Transition Source="2" Target="1" Event="start2"/>
 </TransitionList>
