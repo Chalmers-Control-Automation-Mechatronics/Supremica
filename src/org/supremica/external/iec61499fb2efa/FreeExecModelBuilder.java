@@ -1348,8 +1348,8 @@ class FreeExecModelBuilder extends ModelBuilder
 				}
 			}
 			
- 			eventQueue.addState("s" + i,false,false);
-// 			eventQueue.addState("s" + i);
+// 			eventQueue.addState("s" + i,false,false);
+ 			eventQueue.addState("s" + i);
 
 			for (Iterator evIter = eventInputList.iterator(); evIter.hasNext();)
 			{
@@ -1364,16 +1364,16 @@ class FreeExecModelBuilder extends ModelBuilder
 					from = "s" + (i-1);
 					to = "s" + (places + nameCounter);
 					nameCounter++;
- 					eventQueue.addState(to,false,false);
-// 					eventQueue.addState(to);
+// 					eventQueue.addState(to,false,false);
+ 					eventQueue.addState(to);
 					event = "receive_event_" + eventName + "_" + fbName + ";";
 					eventQueue.addTransition(from, to, event, null, null);
 					
 					from = to;
 					to = "s" + (places + nameCounter);
 					nameCounter++;
- 					eventQueue.addState(to,false,false);
-// 					eventQueue.addState(to);
+//					eventQueue.addState(to,false,false);
+ 					eventQueue.addState(to);
 					event = "queue_event_" + eventName + "_" + fbName + ";";
 					for (int j = 1; j <= places; j++)
 					{
@@ -1431,8 +1431,8 @@ class FreeExecModelBuilder extends ModelBuilder
 					from = "s" + i;
 					to = "s" + (places + nameCounter);
 					nameCounter++;
- 					eventQueue.addState(to,false,false);
-// 					eventQueue.addState(to);
+// 					eventQueue.addState(to,false,false);
+ 					eventQueue.addState(to);
 					event = "remove_event_" + fbName + ";";
 					for (int j = 1; j <= places; j++)
 					{
