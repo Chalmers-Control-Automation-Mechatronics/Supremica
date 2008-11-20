@@ -1012,21 +1012,6 @@ class FreeExecModelBuilder extends ModelBuilder
 				instanceQueue.addTransition(from, to, event, guard, action);
 			}
 
-			// Operation Scheduler Freedom:
-			// introduced to add a degree of freedom to scheduler
-			// to see what will happlen during synthesis
-			// Transiton when discarding instance
-			from = "s" + (i+1);
-			to = "s" + i;
-			event = "discard_fb;";      
-			for (int j = 1; j<=places; j++)
-			{
-				guard = "fb_first == " + j;
-				//action = "current_fb = fb_place_" + j + ";";
-				action = "fb_first = " + ((j % places) + 1) + ";";
-				action = action + "fb_place_" + j + " = 0;";
-				instanceQueue.addTransition(from, to, event, guard, action);
-			}
 		}
 		automata.addAutomaton(instanceQueue);
 	}
@@ -1052,8 +1037,6 @@ class FreeExecModelBuilder extends ModelBuilder
 			nameCounter++;
 			eventExecution.addState(to,false,false);
 			String event = "handle_event_" + instanceName + ";";
-			// Operation Scheduler Freedom:
-			//String guard = "current_fb == " + (Integer) basicFunctionBlocksID.get(instanceName);
 			eventExecution.addControllableTransition(from, to, event, null, null);
 
 			from = to;
@@ -1108,112 +1091,12 @@ class FreeExecModelBuilder extends ModelBuilder
 							from = "s0";
 							to = "s" + nameCounter;
 							nameCounter++;
-							algorithmExecution.addState(to);
+							algorithmExecution.addState(to,false,false);
 							event = "execute_" + algName + "_" + instanceName + ";";
 							//guard = "current_job_fb == " + instanceID;
 							//guard = guard + " & current_job_alg == " + algID;
 							algorithmExecution.addTransition(from, to, event, null, null);
 							from = to;
-
-// 							to = "s" + nameCounter;
-// 							nameCounter++;
-// 							algorithmExecution.addState(to);
-// 							event = "copy_variables_" + algName + "_" + instanceName + ";";
-// 							algorithmExecution.addTransition(from, to, event, null, null);
-// 							from = to;
-												
-// 							// get the variables and make identifier map for translation
-// 							Map identifierMap = new HashMap();
-// 							Map reverseIdentifierMap = new HashMap();
-// 							if (theType.getInterfaceList().isSetInputVars())
-// 							{
-// 								List inputVars = theType.getInterfaceList().getInputVars().getVarDeclaration();
-// 								for (Iterator iter = inputVars.iterator(); iter.hasNext();)
-// 								{
-// 									VarDeclaration curVar = (VarDeclaration) iter.next();
-// 									String curVarName = curVar.getName();
-// 									identifierMap.put(curVarName, "alg_data_" + curVarName + "_" + algName + "_" + instanceName);
-// 									reverseIdentifierMap.put(curVarName, "data_" + curVarName + "_" + instanceName);
-// 								}
-// 							}		
-// 							if (theType.getInterfaceList().isSetOutputVars())
-// 							{
-// 								List outputVars = theType.getInterfaceList().getOutputVars().getVarDeclaration();
-// 								for (Iterator iter = outputVars.iterator(); iter.hasNext();)
-// 								{
-// 									VarDeclaration curVar = (VarDeclaration) iter.next();
-// 									String curVarName = curVar.getName();
-// 									identifierMap.put(curVarName, "alg_data_" + curVarName + "_" + algName + "_" + instanceName);
-// 									reverseIdentifierMap.put(curVarName, "data_" + curVarName + "_" + instanceName);
-// 								}
-// 							}
-// 							if (theType.getBasicFB().isSetInternalVars())
-// 							{
-// 								List internalVars = theType.getBasicFB().getInternalVars().getVarDeclaration();
-// 								for (Iterator iter = internalVars.iterator(); iter.hasNext();)
-// 								{
-// 									VarDeclaration curVar = (VarDeclaration) iter.next();
-// 									String curVarName = curVar.getName();
-// 									identifierMap.put(curVarName, "alg_internal_" + curVarName + "_" + algName + "_" + instanceName);
-// 									reverseIdentifierMap.put(curVarName, "internal_" + curVarName + "_" + instanceName);
-// 								}
-// 							}
-
-// 							// parse the Java algorithm
-// 							StringReader reader = new StringReader(algText);
-// 							net.sourceforge.fuber.model.interpreters.java.Lexer javaLexer = new net.sourceforge.fuber.model.interpreters.java.Lexer((Reader) reader);
-// 							net.sourceforge.fuber.model.interpreters.java.Parser javaParser = new net.sourceforge.fuber.model.interpreters.java.Parser((Scanner) javaLexer);
-// 							Goal algSyntaxTree = null;
-// 							try
-// 							{
-// 								algSyntaxTree = (Goal) javaParser.parse().value;
-// 							}
-// 							catch(Exception e)
-// 							{
-// 								Logger.output(Logger.ERROR, "Error!: Parsing of the Java algorithm failed:");
-// 								Logger.output(Logger.ERROR, "Algorithm: " + algName, 1);
-// 								Logger.output(Logger.ERROR, "Text: " + algText, 1);
-// 								exit(1);
-// 							}	
-						
-// 							// get all identifiers			
-// 							Finder finder = new Finder(algSyntaxTree);
-// 							Set assignmentIdents = finder.getAssignmentIdentifiers();
-// 							Set expressionIdents = finder.getExpressionIdentifiers();
-// 							// put all identifiers into single set
-// 							Set algorithmIdents = new LinkedHashSet();
-// 							for (Iterator iter = assignmentIdents.iterator(); iter.hasNext();)
-// 							{
-// 								String curIdent = ((Identifier) iter.next()).a;
-// 								if (!algorithmIdents.contains(curIdent))
-// 								{
-// 									algorithmIdents.add(curIdent);
-// 								}
-// 							}
-// 							for (Iterator iter = expressionIdents.iterator(); iter.hasNext();)
-// 							{
-// 								String curIdent = ((Identifier) iter.next()).a;
-// 								if (!algorithmIdents.contains(curIdent))
-// 								{
-// 									algorithmIdents.add(curIdent);
-// 								}
-// 							}
-						
-// 							//get the local alg vars
-// 							to = "s" + nameCounter;
-// 							nameCounter++;
-// 							algorithmExecution.addState(to);					
-// 							event = "get_variables_" + algName + "_" + instanceName + ";";
-// 							action = "";
-// 							for (Iterator iter = algorithmIdents.iterator(); iter.hasNext();)
-// 							{
-// 								String curIdent = (String) iter.next();
-// 								String algVar = (String) identifierMap.get(curIdent);
-// 								String blockVar = (String) reverseIdentifierMap.get(curIdent);
-// 								action = action + blockVar + " = " + algVar + ";";
-// 							}
-// 							algorithmExecution.addTransition(from, to, event, null, action);
-// 							from = to;
 
 							to = "s0";
 							event = "finished_execution_" + algName + "_" + instanceName + ";";
@@ -1465,7 +1348,8 @@ class FreeExecModelBuilder extends ModelBuilder
 				}
 			}
 			
-			eventQueue.addState("s" + i,false,false);
+ 			eventQueue.addState("s" + i,false,false);
+// 			eventQueue.addState("s" + i);
 
 			for (Iterator evIter = eventInputList.iterator(); evIter.hasNext();)
 			{
@@ -1480,14 +1364,16 @@ class FreeExecModelBuilder extends ModelBuilder
 					from = "s" + (i-1);
 					to = "s" + (places + nameCounter);
 					nameCounter++;
-					eventQueue.addState(to,false,false);
+ 					eventQueue.addState(to,false,false);
+// 					eventQueue.addState(to);
 					event = "receive_event_" + eventName + "_" + fbName + ";";
 					eventQueue.addTransition(from, to, event, null, null);
 					
 					from = to;
 					to = "s" + (places + nameCounter);
 					nameCounter++;
-					eventQueue.addState(to,false,false);
+ 					eventQueue.addState(to,false,false);
+// 					eventQueue.addState(to);
 					event = "queue_event_" + eventName + "_" + fbName + ";";
 					for (int j = 1; j <= places; j++)
 					{
@@ -1545,7 +1431,8 @@ class FreeExecModelBuilder extends ModelBuilder
 					from = "s" + i;
 					to = "s" + (places + nameCounter);
 					nameCounter++;
-					eventQueue.addState(to,false,false);
+ 					eventQueue.addState(to,false,false);
+// 					eventQueue.addState(to);
 					event = "remove_event_" + fbName + ";";
 					for (int j = 1; j <= places; j++)
 					{
