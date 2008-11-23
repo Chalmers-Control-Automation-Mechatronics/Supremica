@@ -147,6 +147,11 @@ public class CompilerOperatorTable extends AbstractOperatorTable {
     return mAndOperator;
   }
 
+  public BinaryOperator getAndWithOperator()
+  {
+    return mAndWithOperator;
+  }
+
   public BinaryOperator getAssignmentOperator()
   {
     return mAssignmentOperator;
@@ -210,6 +215,11 @@ public class CompilerOperatorTable extends AbstractOperatorTable {
   public BinaryOperator getOrOperator()
   {
     return mOrOperator;
+  }
+
+  public BinaryOperator getOrWithOperator()
+  {
+    return mOrWithOperator;
   }
 
   public BinaryOperator getPlusOperator()

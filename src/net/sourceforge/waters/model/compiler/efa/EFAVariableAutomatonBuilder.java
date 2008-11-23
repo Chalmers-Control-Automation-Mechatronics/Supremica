@@ -65,13 +65,16 @@ class EFAVariableAutomatonBuilder
 
   //#########################################################################
   //# Constructor
-  EFAVariableAutomatonBuilder(final ModuleProxyFactory factory,
-			      final CompilerOperatorTable optable,
-			      final SimpleExpressionCompiler compiler,
-			      final BindingContext context)
+  EFAVariableAutomatonBuilder
+    (final ModuleProxyFactory factory,
+     final CompilerOperatorTable optable,
+     final Comparator<SimpleExpressionProxy> comparator,
+     final SimpleExpressionCompiler compiler,
+     final BindingContext context)
   {
     mFactory = factory;
     mOperatorTable = optable;
+    mComparator = comparator;
     mSimpleExpressionCompiler = compiler;
     mRootContext = context;
   }
@@ -434,14 +437,12 @@ class EFAVariableAutomatonBuilder
     //# Hashing and Comparing
     public int compareTo(final EFAVariableTransition trans)
     {
-      final Comparator<SimpleExpressionProxy> comparator =
-	mOperatorTable.getExpressionComparator();
       final int sourcecomp =
-	comparator.compare(mSourceValue, trans.mSourceValue);
+	mComparator.compare(mSourceValue, trans.mSourceValue);
       if (sourcecomp != 0) {
 	return sourcecomp;
       } else {
-	return comparator.compare(mTargetValue, trans.mTargetValue);
+	return mComparator.compare(mTargetValue, trans.mTargetValue);
       }
     }
 
@@ -503,6 +504,7 @@ class EFAVariableAutomatonBuilder
   //# Data Members
   private final ModuleProxyFactory mFactory;
   private final CompilerOperatorTable mOperatorTable;
+  private final Comparator<SimpleExpressionProxy> mComparator;
   private final SimpleExpressionCompiler mSimpleExpressionCompiler;
   private final BindingContext mRootContext;
 

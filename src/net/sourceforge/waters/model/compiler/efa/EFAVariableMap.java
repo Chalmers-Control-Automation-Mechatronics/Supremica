@@ -63,7 +63,6 @@ class EFAVariableMap {
   {
     mFactory = factory;
     mOperatorTable = optable;
-    mComparator = new EFAExpressionComparator();
     mCollector = new EFAVariableCollector();
     mMap = null;
   }
@@ -125,11 +124,6 @@ class EFAVariableMap {
     final ProxyAccessor<SimpleExpressionProxy> nextaccessor =
       new ProxyAccessorByContents<SimpleExpressionProxy>(nextvarname);
     mMap.put(nextaccessor, nextvar);
-  }
-
-  Comparator<SimpleExpressionProxy> getExpressionComparator()
-  {
-    return mComparator;
   }
 
   Collection<EFAVariable> collectVariables(final SimpleExpressionProxy expr)
@@ -249,43 +243,9 @@ class EFAVariableMap {
 
 
   //#########################################################################
-  //# Inner Class EFAExpressionComparator
-  private class EFAExpressionComparator
-    implements Comparator<SimpleExpressionProxy>
-  {
-
-    //#######################################################################
-    //# Interface java.util.Comparator
-    public int compare(final SimpleExpressionProxy expr1,
-                       final SimpleExpressionProxy expr2)
-    {
-      final EFAVariable var1 = getVariable(expr1);
-      final EFAVariable var2 = getVariable(expr2);
-      if (var1 == null) {
-        if (var2 == null) {
-          final Comparator<SimpleExpressionProxy> comparator =
-            mOperatorTable.getExpressionComparator();
-          return comparator.compare(expr1, expr2);
-        } else {
-          return 1;
-        }
-      } else {
-        if (var2 == null) {
-          return -1;
-        } else {
-          return var1.compareTo(var2);
-        }
-      }
-    }
-
-  }
-
-
-  //#########################################################################
   //# Data Members
   private final ModuleProxyFactory mFactory;
   private final CompilerOperatorTable mOperatorTable;
-  private final EFAExpressionComparator mComparator;
   private final EFAVariableCollector mCollector;
 
   private Map<ProxyAccessor<SimpleExpressionProxy>,EFAVariable> mMap;

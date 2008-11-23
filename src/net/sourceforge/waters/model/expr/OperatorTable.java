@@ -35,7 +35,8 @@ public interface OperatorTable {
 
   public boolean isOperatorCharacter(final char ch);
 
-  public Comparator<SimpleExpressionProxy> getExpressionComparator();
+  public int getOperatorValue(final Operator op);
+
 
   //#########################################################################
   //# Class Constants

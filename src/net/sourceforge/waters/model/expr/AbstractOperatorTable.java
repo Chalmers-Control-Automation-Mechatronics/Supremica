@@ -9,7 +9,6 @@
 
 package net.sourceforge.waters.model.expr;
 
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -71,12 +70,9 @@ public abstract class AbstractOperatorTable implements OperatorTable {
       ch >= mMinOpChar && ch < mMaxOpChar && mOperatorChar[ch - mMinOpChar];
   }
 
-  public Comparator<SimpleExpressionProxy> getExpressionComparator()
+  public int getOperatorValue(final Operator op)
   {
-    if (mComparator == null) {
-      mComparator = new ExpressionComparator(mOperatorOrdering);
-    }
-    return mComparator;
+    return mOperatorOrdering.get(op);
   }
 
 
@@ -169,7 +165,5 @@ public abstract class AbstractOperatorTable implements OperatorTable {
   private final boolean mOperatorChar[];
   private final int mMinOpChar;
   private final int mMaxOpChar;
-
-  private Comparator<SimpleExpressionProxy> mComparator;
 
 }

@@ -40,13 +40,13 @@ class ConstraintPropagator
   ConstraintPropagator
     (final ModuleProxyFactory factory,
      final CompilerOperatorTable optable,
+     final Comparator<SimpleExpressionProxy> comparator,
      final SimpleExpressionCompiler compiler,
      final EFAVariableMap varmap)
   {
-    final Comparator<SimpleExpressionProxy> comparator =
-      varmap.getExpressionComparator();
     mFactory = factory;
     mOperatorTable = optable;
+    mComparator = comparator;
     mSimpleExpressionCompiler = compiler;
     mDNFConverter = new DNFConverter(factory, optable, comparator);
     mVariableMap = varmap;
@@ -117,9 +117,7 @@ class ConstraintPropagator
   {
     mRootContext = context;
     mIsFalse = false;
-    final Comparator<SimpleExpressionProxy> comparator =
-      mVariableMap.getExpressionComparator();
-    mOpenLiterals = new TreeSet<SimpleExpressionProxy>(comparator);
+    mOpenLiterals = new TreeSet<SimpleExpressionProxy>(mComparator);
     mProcessedEquations = new ArrayList<BinaryExpressionProxy>(size);
   }
 
@@ -225,9 +223,7 @@ class ConstraintPropagator
      final SimpleExpressionProxy expr2)
   {
     final BinaryOperator eqop = mOperatorTable.getEqualsOperator();
-    final Comparator<SimpleExpressionProxy> comparator =
-      mVariableMap.getExpressionComparator();
-    if (comparator.compare(expr1, expr2) < 0) {
+    if (mComparator.compare(expr1, expr2) < 0) {
       return mFactory.createBinaryExpressionProxy(eqop, expr1, expr2);
     } else {
       return mFactory.createBinaryExpressionProxy(eqop, expr2, expr1);
@@ -275,6 +271,7 @@ class ConstraintPropagator
   //# Data Members
   private final ModuleProxyFactory mFactory;
   private final CompilerOperatorTable mOperatorTable;
+  private final Comparator<SimpleExpressionProxy> mComparator;
   private final SimpleExpressionCompiler mSimpleExpressionCompiler;
   private final DNFConverter mDNFConverter;
   private final EFAVariableMap mVariableMap;

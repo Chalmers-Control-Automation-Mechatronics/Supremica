@@ -30,6 +30,8 @@ import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
 import net.sourceforge.waters.model.compiler.context.CompiledEnumRange;
 import net.sourceforge.waters.model.compiler.context.CompiledRange;
 import net.sourceforge.waters.model.compiler.context.
+  CompilerExpressionComparator;
+import net.sourceforge.waters.model.compiler.context.
   DuplicateIdentifierException;
 import net.sourceforge.waters.model.compiler.context.
   UndefinedIdentifierException;
@@ -134,15 +136,9 @@ public class EFACompiler
     mOperatorTable = CompilerOperatorTable.getInstance();
     mTrueGuard = new CompiledGuard();
     mVariableMap = new EFAVariableMap(mFactory, mOperatorTable);
-    final Comparator<SimpleExpressionProxy> comparator =
-      mVariableMap.getExpressionComparator();
     mSimpleExpressionCompiler =
-      new SimpleExpressionCompiler(mFactory, mOperatorTable, comparator);
-    mConstraintPropagator =
-      new ConstraintPropagator(mFactory, mOperatorTable,
-                               mSimpleExpressionCompiler, mVariableMap);
+      new SimpleExpressionCompiler(mFactory, mOperatorTable);
     mSplitComputer = new SplitComputer(mVariableMap);
-    mEventNameBuilder = new EFAEventNameBuilder(factory, comparator);
     mInputModule = module;
   }
 
@@ -154,8 +150,14 @@ public class EFACompiler
   {
     try {
       mRootContext = new ModuleBindingContext(mInputModule);
+      mComparator =
+        new CompilerExpressionComparator(mOperatorTable, mRootContext);
+      mConstraintPropagator =
+        new ConstraintPropagator(mFactory, mOperatorTable, mComparator,
+                                 mSimpleExpressionCompiler, mVariableMap);
+      mEventNameBuilder = new EFAEventNameBuilder(mFactory, mComparator);
       mVariableAutomatonBuilder =
-        new EFAVariableAutomatonBuilder(mFactory, mOperatorTable,
+        new EFAVariableAutomatonBuilder(mFactory, mOperatorTable, mComparator,
                                         mSimpleExpressionCompiler,
                                         mRootContext);
       // Pass 1 ...
@@ -181,6 +183,9 @@ public class EFACompiler
       }
     } finally {
       mRootContext = null;
+      mComparator = null;
+      mConstraintPropagator = null;
+      mEventNameBuilder = null;
       mVariableAutomatonBuilder = null;
       mVariableMap.clear();
     }
@@ -455,12 +460,10 @@ public class EFACompiler
     //# Constructor
     private Pass2Visitor()
     {
-      final Comparator<SimpleExpressionProxy> comparator =
-        mVariableMap.getExpressionComparator();
       final EFARangeEvaluator evaluator =
         new EFARangeEvaluator(mOperatorTable, mRootContext, mVariableMap);
       mGuardCompiler =
-        new GuardCompiler(mFactory, mOperatorTable, comparator, evaluator);
+        new GuardCompiler(mFactory, mOperatorTable, mComparator, evaluator);
     }
 
     //#######################################################################
@@ -995,14 +998,15 @@ public class EFACompiler
   private final CompilerOperatorTable mOperatorTable;
   private final CompiledGuard mTrueGuard;
   private final SimpleExpressionCompiler mSimpleExpressionCompiler;
-  private final ConstraintPropagator mConstraintPropagator;
   private final SplitComputer mSplitComputer;
-  private final EFAEventNameBuilder mEventNameBuilder;
   private final ModuleProxy mInputModule;
 
   private boolean mIsUsingEventAlphabet = true;
 
   private ModuleBindingContext mRootContext;
+  private Comparator<SimpleExpressionProxy> mComparator;
+  private ConstraintPropagator mConstraintPropagator;
+  private EFAEventNameBuilder mEventNameBuilder;
   private EFAVariableAutomatonBuilder mVariableAutomatonBuilder;
 
   // Pass 1
