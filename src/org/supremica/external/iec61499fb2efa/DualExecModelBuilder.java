@@ -963,7 +963,7 @@ class DualExecModelBuilder implements ModelBuilder
 		automata.addAutomaton(startup);
 	}
 
-	void makeInstanceQueue()
+	private void makeInstanceQueue()
 	{
 		Logger.output(builderName() + ".makeInstanceQueue():");
 
@@ -1046,7 +1046,7 @@ class DualExecModelBuilder implements ModelBuilder
 		automata.addAutomaton(eventExecution);
 	}
 
-	void makeJobQueue()
+	private void makeJobQueue()
 	{
 		if (algMaxID > 0)
 		{
@@ -1515,7 +1515,7 @@ class DualExecModelBuilder implements ModelBuilder
 				}
 			}
 			
-			// 			eventQueue.addState("s" + i,false,false);
+// 			eventQueue.addState("s" + i,false,false);
 			eventQueue.addState("s" + i);
 
 			for (Iterator evIter = eventInputList.iterator(); evIter.hasNext();)
@@ -1531,7 +1531,7 @@ class DualExecModelBuilder implements ModelBuilder
 					from = "s" + (i-1);
 					to = "s" + (places + nameCounter);
 					nameCounter++;
-					// 					eventQueue.addState(to,false,false);
+// 					eventQueue.addState(to,false,false);
 					eventQueue.addState(to);
 					event = "receive_event_" + eventName + "_" + fbName + ";";
 					eventQueue.addTransition(from, to, event, null, null);
@@ -1539,7 +1539,7 @@ class DualExecModelBuilder implements ModelBuilder
 					from = to;
 					to = "s" + (places + nameCounter);
 					nameCounter++;
-					//					eventQueue.addState(to,false,false);
+//					eventQueue.addState(to,false,false);
  					eventQueue.addState(to);
 					event = "queue_event_" + eventName + "_" + fbName + ";";
 					guard = null;
@@ -1602,7 +1602,7 @@ class DualExecModelBuilder implements ModelBuilder
 					from = "s" + i;
 					to = "s" + (places + nameCounter);
 					nameCounter++;
-					//					eventQueue.addState(to,false,false);
+//					eventQueue.addState(to,false,false);
  					eventQueue.addState(to);
 					event = "remove_event_" + fbName + ";";
 					guard = "event_place_1_" + fbName + " == " + eventID;
@@ -1650,11 +1650,6 @@ class DualExecModelBuilder implements ModelBuilder
 					event = "reset_event_" + eventName + "_" + fbName + ";";
 					action = "event_" + eventName + "_" + fbName + " = 0;";
 					eventQueue.addTransition(from, to, event, null, action);
-
-					//from = to;
-					//to = "s" + (i-1);
-					//event = "update_ECC_" + fbName + ";";
-					//eventQueue.addTransition(from, to, event, null, null);
 				}
 			}
 		}		
