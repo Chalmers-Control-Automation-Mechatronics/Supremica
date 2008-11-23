@@ -23,6 +23,8 @@ import net.sourceforge.waters.model.base.ProxyAccessor;
 import net.sourceforge.waters.model.base.ProxyAccessorByContents;
 import net.sourceforge.waters.model.base.VisitorException;
 import net.sourceforge.waters.model.compiler.context.CompiledRange;
+import net.sourceforge.waters.model.compiler.context.
+  UndefinedIdentifierException;
 import net.sourceforge.waters.model.compiler.dnf.CompiledClause;
 import net.sourceforge.waters.model.module.AbstractModuleProxyVisitor;
 import net.sourceforge.waters.model.module.BinaryExpressionProxy;
@@ -30,6 +32,7 @@ import net.sourceforge.waters.model.module.IdentifierProxy;
 import net.sourceforge.waters.model.module.IndexedIdentifierProxy;
 import net.sourceforge.waters.model.module.QualifiedIdentifierProxy;
 import net.sourceforge.waters.model.module.SimpleExpressionProxy;
+import net.sourceforge.waters.model.module.SimpleIdentifierProxy;
 import net.sourceforge.waters.model.module.UnaryExpressionProxy;
 
 
@@ -52,6 +55,7 @@ class SplitComputer
   //#########################################################################
   //# Invocation
   List<EFAVariable> computeSplitList(final CompiledClause clause)
+    throws UndefinedIdentifierException
   {
     final EFAVariable isplit = computeIndexSplit(clause);
     if (isplit != null) {
@@ -62,11 +66,13 @@ class SplitComputer
   }
 
   EFAVariable computeIndexSplit(final CompiledClause clause)
+    throws UndefinedIdentifierException
   {
     return mIndexSplitVisitor.getIndexSplit(clause);
   }
 
   List<EFAVariable> computeProperSplit(final CompiledClause clause)
+    throws UndefinedIdentifierException
   {
     final Collection<SimpleExpressionProxy> literals = clause.getLiterals();
     final int size = literals.size();
@@ -253,6 +259,7 @@ class SplitComputer
     //#######################################################################
     //# Invocation
     EFAVariable getIndexSplit(final CompiledClause clause)
+      throws UndefinedIdentifierException
     {
       try {
         mResult = null;
@@ -262,7 +269,12 @@ class SplitComputer
         }
         return mResult;
       } catch (final VisitorException exception) {
-        throw exception.getRuntimeException();
+        final Throwable cause = exception.getCause();
+        if (cause instanceof UndefinedIdentifierException) {
+          throw (UndefinedIdentifierException) cause;
+        } else {
+          throw exception.getRuntimeException();
+        }
       }
     }
 
@@ -330,6 +342,19 @@ class SplitComputer
       return null;
     }
 
+    public Object visitSimpleIdentifierProxy(final SimpleIdentifierProxy ident)
+      throws VisitorException
+    {
+      if (mContext.isEnumAtom(ident) ||
+          mContext.getVariableRange(ident) != null) {
+        return null;
+      } else {
+        final UndefinedIdentifierException exception =
+          new UndefinedIdentifierException(ident);
+        throw wrap(exception);
+      }
+    }
+
     public Object visitUnaryExpressionProxy
       (final UnaryExpressionProxy expr)
       throws VisitorException
@@ -363,13 +388,19 @@ class SplitComputer
     //#######################################################################
     //# Invocation
     Collection<EFAVariable> collect(final SimpleExpressionProxy expr)
+      throws UndefinedIdentifierException
     {
       try {
         process(expr);
         final Collection<EFAVariable> values = mMap.values();
         return new ArrayList<EFAVariable>(values);
       } catch (final VisitorException exception) {
-        throw exception.getRuntimeException();
+        final Throwable cause = exception.getCause();
+        if (cause instanceof UndefinedIdentifierException) {
+          throw (UndefinedIdentifierException) cause;
+        } else {
+          throw exception.getRuntimeException();
+        }
       } finally {
         mMap.clear();
       }
@@ -404,31 +435,28 @@ class SplitComputer
       return null;
     }
 
-    public Object visitIndexedIdentifierProxy
-      (final IndexedIdentifierProxy ident)
+    public Object visitIdentifierProxy(final IdentifierProxy ident)
       throws VisitorException
     {
-      final List<SimpleExpressionProxy> indexes = ident.getIndexes();
-      for (final SimpleExpressionProxy index : indexes) {
-        process(index);
-      }
-      return null;
-    }
-
-    public Object visitQualifiedIdentifierProxy
-      (final QualifiedIdentifierProxy ident)
-      throws VisitorException
-    {
-      final IdentifierProxy base = ident.getBaseIdentifier();
-      base.acceptVisitor(this);
-      final IdentifierProxy comp = ident.getComponentIdentifier();
-      return comp.acceptVisitor(this);
+      final UndefinedIdentifierException exception =
+        new UndefinedIdentifierException(ident);
+      throw wrap(exception);
     }
 
     public Object visitSimpleExpressionProxy
       (final SimpleExpressionProxy expr)
     {
       return null;
+    }
+
+    public Object visitSimpleIdentifierProxy(final SimpleIdentifierProxy ident)
+      throws VisitorException
+    {
+      if (mContext.isEnumAtom(ident)) {
+        return null;
+      } else {
+        return visitIdentifierProxy(ident);
+      }
     }
 
     public Object visitUnaryExpressionProxy

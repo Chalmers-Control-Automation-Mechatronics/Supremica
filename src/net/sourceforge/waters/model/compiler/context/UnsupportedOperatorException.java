@@ -20,12 +20,25 @@ public class UnsupportedOperatorException extends EvalException {
   //# Constructors
   UnsupportedOperatorException(final Operator op)
   {
-    this(op, null);
+    this(op, (Proxy) null);
   }
 
   UnsupportedOperatorException(final Operator op, final Proxy location)
   {
     super("Operator " + op.getName() + " not supported!", location);
+  }
+
+  UnsupportedOperatorException(final Operator op, final String explanation)
+  {
+    this(op, explanation, null);
+  }
+
+  UnsupportedOperatorException(final Operator op,
+                               final String explanation,
+                               final Proxy location)
+  {
+    super("Operator " + op.getName() + " is not supported " +
+          explanation + "!", location);
   }
 
 }

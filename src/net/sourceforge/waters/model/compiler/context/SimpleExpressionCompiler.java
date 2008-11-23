@@ -103,6 +103,7 @@ public class SimpleExpressionCompiler
     mUnaryEvaluatorMap.put(optable.getUnaryMinusOperator(),
                            new UnaryMinusEvaluator());
 
+    mRangeEstimator = new RangeEstimator(optable);
     mSimplificationVisitor = new SimplificationVisitor();
     mAtomicVisitor = new AtomicVisitor();
     mRangeVisitor = new RangeVisitor();
@@ -111,6 +112,18 @@ public class SimpleExpressionCompiler
 
   //#########################################################################
   //# Invocation
+  public SimpleExpressionProxy simplify(final SimpleExpressionProxy expr,
+                                        final VariableContext context)
+    throws EvalException
+  {
+    try {
+      mVariableContext = context;
+      return simplify(expr, context);
+    } finally {
+      mVariableContext = null;
+    }
+  }
+
   public SimpleExpressionProxy simplify(final SimpleExpressionProxy expr,
                                         final BindingContext context)
     throws EvalException
@@ -122,6 +135,18 @@ public class SimpleExpressionCompiler
       return mSimplificationVisitor.simplify(expr);
     } finally {
       mContext = null;
+    }
+  }
+
+  public SimpleExpressionProxy eval(final SimpleExpressionProxy expr,
+                                    final VariableContext context)
+    throws EvalException
+  {
+    try {
+      mVariableContext = context;
+      return eval(expr, context);
+    } finally {
+      mVariableContext = null;
     }
   }
 
@@ -657,9 +682,21 @@ public class SimpleExpressionCompiler
         return createBooleanConstantProxy(result);
       } else if (includesEquality() && simpLHS.equalsByContents(simpRHS)) {
         return createBooleanConstantProxy(true);
-      } else {
-        return createExpression(expr, simpLHS, simpRHS);
+      } else if (mVariableContext != null) {
+        final CompiledIntRange rangeLHS =
+          mRangeEstimator.estimateIntRange(simpLHS, mVariableContext);
+        if (rangeLHS != null) {
+          final CompiledIntRange rangeRHS =
+            mRangeEstimator.estimateIntRange(simpRHS, mVariableContext);
+          if (rangeRHS != null) {
+            final Boolean result = eval(rangeLHS, rangeRHS);
+            if (result != null) {
+              return createBooleanConstantProxy(result);
+            }
+          }
+        }
       }
+      return createExpression(expr, simpLHS, simpRHS);
     }
 
     //#######################################################################
@@ -667,6 +704,8 @@ public class SimpleExpressionCompiler
     abstract boolean includesEquality();
 
     abstract boolean eval(int lhs, int rhs);
+
+    abstract Boolean eval(CompiledIntRange lhs, CompiledIntRange rhs);
 
   }
 
@@ -694,9 +733,18 @@ public class SimpleExpressionCompiler
         return createBooleanConstantProxy(eresult);
       } else if (isAtomicValue(simpLHS) && isAtomicValue(simpRHS)) {
         return createBooleanConstantProxy(!eresult);
-      } else {
-        return createExpression(expr, simpLHS, simpRHS);
+      } else if (mVariableContext != null) {
+        final CompiledRange rangeLHS =
+          mRangeEstimator.estimateRange(simpLHS, mVariableContext);
+        if (rangeLHS != null) {
+          final CompiledRange rangeRHS =
+            mRangeEstimator.estimateRange(simpRHS, mVariableContext);
+          if (rangeRHS != null && !rangeLHS.intersects(rangeRHS)) {
+            return createBooleanConstantProxy(!eresult);
+          }
+        }
       }
+      return createExpression(expr, simpLHS, simpRHS);
     }
 
     //#######################################################################
@@ -829,6 +877,17 @@ public class SimpleExpressionCompiler
       return lhs >= rhs;
     }
 
+    Boolean eval(final CompiledIntRange lhs, final CompiledIntRange rhs)
+    {
+      if (lhs.getLower() >= rhs.getUpper()) {
+        return true;
+      } else if (lhs.getUpper() < rhs.getLower()) {
+        return false;
+      } else {
+        return null;
+      }
+    }
+
   }
 
 
@@ -848,6 +907,17 @@ public class SimpleExpressionCompiler
     boolean eval(final int lhs, final int rhs)
     {
       return lhs > rhs;
+    }
+
+    Boolean eval(final CompiledIntRange lhs, final CompiledIntRange rhs)
+    {
+      if (lhs.getLower() > rhs.getUpper()) {
+        return true;
+      } else if (lhs.getUpper() <= rhs.getLower()) {
+        return false;
+      } else {
+        return null;
+      }
     }
 
   }
@@ -871,6 +941,17 @@ public class SimpleExpressionCompiler
       return lhs <= rhs;
     }
 
+    Boolean eval(final CompiledIntRange lhs, final CompiledIntRange rhs)
+    {
+      if (lhs.getUpper() <= rhs.getLower()) {
+        return true;
+      } else if (lhs.getLower() > rhs.getUpper()) {
+        return false;
+      } else {
+        return null;
+      }
+    }
+
   }
 
 
@@ -890,6 +971,17 @@ public class SimpleExpressionCompiler
     boolean eval(final int lhs, final int rhs)
     {
       return lhs < rhs;
+    }
+
+    Boolean eval(final CompiledIntRange lhs, final CompiledIntRange rhs)
+    {
+      if (lhs.getUpper() < rhs.getLower()) {
+        return true;
+      } else if (lhs.getLower() >= rhs.getUpper()) {
+        return false;
+      } else {
+        return null;
+      }
     }
 
   }
@@ -1206,7 +1298,7 @@ public class SimpleExpressionCompiler
   private final boolean mIsCloning;
   private final Map<BinaryOperator,BinaryEvaluator> mBinaryEvaluatorMap;
   private final Map<UnaryOperator,UnaryEvaluator> mUnaryEvaluatorMap;
-
+  private final RangeEstimator mRangeEstimator;
   private final SimplificationVisitor mSimplificationVisitor;
   private final AtomicVisitor mAtomicVisitor;
   private final RangeVisitor mRangeVisitor;
@@ -1214,5 +1306,6 @@ public class SimpleExpressionCompiler
   private boolean mIsEvaluating;
   private int mNumPrimes;
   private BindingContext mContext;
+  private VariableContext mVariableContext;
 
 }

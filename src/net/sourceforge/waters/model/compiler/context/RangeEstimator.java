@@ -1,13 +1,13 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
 //# PROJECT: Waters
-//# PACKAGE: net.sourceforge.waters.model.compiler.efa
-//# CLASS:   EFARangeEvaluator
+//# PACKAGE: net.sourceforge.waters.model.compiler.context
+//# CLASS:   RangeEstimator
 //###########################################################################
 //# $Id$
 //###########################################################################
 
-package net.sourceforge.waters.model.compiler.efa;
+package net.sourceforge.waters.model.compiler.context;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -16,13 +16,6 @@ import java.util.Map;
 
 import net.sourceforge.waters.model.base.VisitorException;
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
-import net.sourceforge.waters.model.compiler.context.BindingContext;
-import net.sourceforge.waters.model.compiler.context.ModuleBindingContext;
-import net.sourceforge.waters.model.compiler.context.CompiledEnumRange;
-import net.sourceforge.waters.model.compiler.context.CompiledRange;
-import net.sourceforge.waters.model.compiler.context.CompiledIntRange;
-import net.sourceforge.waters.model.compiler.context.
-  UndefinedIdentifierException;
 import net.sourceforge.waters.model.expr.BinaryOperator;
 import net.sourceforge.waters.model.expr.EvalException;
 import net.sourceforge.waters.model.expr.TypeMismatchException;
@@ -39,17 +32,14 @@ import net.sourceforge.waters.model.module.UnaryExpressionProxy;
  * @author Robi Malik
  */
 
-class EFARangeEvaluator
+public class RangeEstimator
   extends AbstractModuleProxyVisitor
 {
 
   //#########################################################################
   //# Constructors
-  EFARangeEvaluator(final CompilerOperatorTable optable,
-                    final EFAModuleContext root)
+  public RangeEstimator(final CompilerOperatorTable optable)
   {
-    mRootContext = root;
-
     mBinaryEvaluatorMap = new HashMap<BinaryOperator,BinaryEvaluator>(32);
     mBinaryEvaluatorMap.put(optable.getAndOperator(),
                             new BinaryAndEvaluator());
@@ -91,32 +81,12 @@ class EFARangeEvaluator
   //#########################################################################
   //# Invocation
   /**
-   * Computes the estimated range of an expression in the root context
-   * of this evaluator.
-   * @param  expr     The expression to be evaluated.
-   * @param  context  The context that provides bindings to identifiers.
-   * @return The range of possible values of the given expression.
-   *         The result may be an over-approximation, meaning that not
-   *         all values in the returned range can actually be obtained
-   *         by assignment of values to EFA variables.
-   * @throws EvalException to indicate a problem while evaluation the
-   *                  expression. Exceptions may be thrown even for values
-   *                  that cannot actually be obtained, e.g., when
-   *                  a Boolean operator is given an integer argument
-   *                  whose estimated range contains values other than
-   *                  0 or&nbsp;1.
-   */
-  CompiledRange evalRange(final SimpleExpressionProxy expr)
-    throws EvalException
-  {
-    return evalRange(expr, mRootContext);
-  }
-
-  /**
    * Computes the estimated range of an expression in a given context.
    * @param  expr     The expression to be evaluated.
    * @param  context  The context that provides bindings to identifiers.
-   * @return The range of possible values of the given expression.
+   * @return The range of possible values of the given expression,
+   *         or <CODE>null</CODE> if the range cannot be estimated due
+   *         to undefined identifiers.
    *         The result may be an over-approximation, meaning that not
    *         all values in the returned range can actually be obtained
    *         by assignment of values to EFA variables.
@@ -127,8 +97,9 @@ class EFARangeEvaluator
    *                  whose estimated range contains values other than
    *                  0 or&nbsp;1.
    */
-  CompiledRange evalRange(final SimpleExpressionProxy expr,
-                          final BindingContext context)
+  public CompiledRange estimateRange
+    (final SimpleExpressionProxy expr,
+     final VariableContext context)
     throws EvalException
   {
     try {
@@ -146,31 +117,21 @@ class EFARangeEvaluator
     }
   }
 
-  CompiledIntRange evalIntRange(final SimpleExpressionProxy expr)
+  public CompiledIntRange estimateIntRange
+    (final SimpleExpressionProxy expr,
+     final VariableContext context)
     throws EvalException
   {
-    return evalIntRange(expr, mRootContext);
-  }
-
-  CompiledIntRange evalIntRange(final SimpleExpressionProxy expr,
-                                final BindingContext context)
-    throws EvalException
-  {
-    final CompiledRange range = evalRange(expr, context);
+    final CompiledRange range = estimateRange(expr, context);
     return checkIntRange(expr, range);
   }
 
-  CompiledIntRange evalBooleanRange(final SimpleExpressionProxy expr)
+  public CompiledIntRange estimateBooleanRange
+    (final SimpleExpressionProxy expr,
+     final VariableContext context)
     throws EvalException
   {
-    return evalBooleanRange(expr, mRootContext);
-  }
-
-  CompiledIntRange evalBooleanRange(final SimpleExpressionProxy expr,
-                                    final BindingContext context)
-    throws EvalException
-  {
-    final CompiledRange range = evalRange(expr, context);
+    final CompiledRange range = estimateRange(expr, context);
     return checkBooleanRange(expr, range);
   }
 
@@ -195,7 +156,7 @@ class EFARangeEvaluator
     if (evaluator != null) {
       return evaluator;
     } else {
-      throw new UnsupportedOperatorException(op);
+      throw new UnsupportedOperatorException(op, " in guard expressions");
     }
   }
 
@@ -206,7 +167,7 @@ class EFARangeEvaluator
     if (evaluator != null) {
       return evaluator;
     } else {
-      throw new UnsupportedOperatorException(op);
+      throw new UnsupportedOperatorException(op, " in guard expressions");
     }
   }
 
@@ -228,7 +189,9 @@ class EFARangeEvaluator
                                              final CompiledRange range)
     throws TypeMismatchException
   {
-    if (range instanceof CompiledIntRange) {
+    if (range == null) {
+      return null;
+    } else if (range instanceof CompiledIntRange) {
       final CompiledIntRange intrange = (CompiledIntRange) range;
       if (intrange.getLower() >= 0 && intrange.getUpper() <= 1) {
         return intrange;
@@ -247,8 +210,14 @@ class EFARangeEvaluator
     try {
       final SimpleExpressionProxy leftexpr = expr.getLeft();
       final CompiledRange leftrange = process(leftexpr);
+      if (leftrange == null) {
+        return null;
+      }
       final SimpleExpressionProxy rightexpr = expr.getRight();
       final CompiledRange rightrange = process(rightexpr);
+      if (rightrange == null) {
+        return null;
+      }
       final BinaryOperator op = expr.getOperator();
       final BinaryEvaluator evaluator = getEvaluator(op);
       return evaluator.eval(leftexpr, leftrange, rightexpr, rightrange);
@@ -260,18 +229,12 @@ class EFARangeEvaluator
 
 
   public CompiledRange visitIdentifierProxy(final IdentifierProxy ident)
-    throws VisitorException
   {
-    // TODO: Evaluate indexes in qualified and indexed identifiers!
-    final EFAVariable var = mRootContext.getVariable(ident);
-    if (var != null) {
-      return var.getRange();
-    } else if (mContext.isEnumAtom(ident)) {
+    if (mContext.isEnumAtom(ident)) {
       final List<IdentifierProxy> list = Collections.singletonList(ident);
       return new CompiledEnumRange(list);
     } else {
-      final Throwable exception = new UndefinedIdentifierException(ident);
-      throw wrap(exception);
+      return mContext.getVariableRange(ident);
     }
   }
 
@@ -289,6 +252,9 @@ class EFARangeEvaluator
     try {
       final SimpleExpressionProxy subterm = expr.getSubTerm();
       final CompiledRange subrange = process(subterm);
+      if (subrange == null) {
+        return null;
+      }
       final UnaryOperator op = expr.getOperator();
       final UnaryEvaluator evaluator = getEvaluator(op);
       return evaluator.eval(subterm, subrange);
@@ -849,13 +815,8 @@ class EFARangeEvaluator
     //# Evaluation
     CompiledRange eval(final SimpleExpressionProxy expr,
                        final CompiledRange range)
-      throws TypeMismatchException
     {
-      if (mRootContext.getVariable(expr) != null) {
-        return range;
-      } else {
-        throw new TypeMismatchException(expr, "VARIABLE");
-      }
+      return range;
     }
 
   }
@@ -884,11 +845,10 @@ class EFARangeEvaluator
 
   //#########################################################################
   //# Data Members
-  private final EFAModuleContext mRootContext;
   private final Map<BinaryOperator,BinaryEvaluator> mBinaryEvaluatorMap;
   private final Map<UnaryOperator,UnaryEvaluator> mUnaryEvaluatorMap;
 
-  private BindingContext mContext;
+  private VariableContext mContext;
 
 
   //#########################################################################

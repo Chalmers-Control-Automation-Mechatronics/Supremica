@@ -457,10 +457,8 @@ public class EFACompiler
     //# Constructor
     private Pass2Visitor()
     {
-      final EFARangeEvaluator evaluator =
-        new EFARangeEvaluator(mOperatorTable, mRootContext);
       mGuardCompiler =
-        new GuardCompiler(mFactory, mOperatorTable, mComparator, evaluator);
+        new GuardCompiler(mFactory, mOperatorTable, mComparator, mRootContext);
     }
 
     //#######################################################################

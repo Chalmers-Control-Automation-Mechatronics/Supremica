@@ -24,6 +24,8 @@ import net.sourceforge.waters.model.base.ProxyAccessorByContents;
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
 import net.sourceforge.waters.model.compiler.context.CompiledIntRange;
 import net.sourceforge.waters.model.compiler.context.CompiledRange;
+import net.sourceforge.waters.model.compiler.context.RangeEstimator;
+import net.sourceforge.waters.model.compiler.context.VariableContext;
 import net.sourceforge.waters.model.compiler.dnf.CompiledClause;
 import net.sourceforge.waters.model.compiler.dnf.CompiledNormalForm;
 import net.sourceforge.waters.model.compiler.dnf.DNFConverter;
@@ -48,12 +50,13 @@ class GuardCompiler
   GuardCompiler(final ModuleProxyFactory factory,
                 final CompilerOperatorTable optable,
                 final Comparator<SimpleExpressionProxy> comparator,
-                final EFARangeEvaluator evaluator)
+                final VariableContext context)
   {
     mFactory = factory;
     mOperatorTable = optable;
     mDNFConverter = new DNFConverter(factory, optable, comparator);
-    mEvaluator = evaluator;
+    mEstimator = new RangeEstimator(optable);
+    mRootContext = context;
     mCache =
       new HashMap<ProxyAccessor<GuardActionBlockProxy>,CompiledGuard>();
   }
@@ -162,8 +165,11 @@ class GuardCompiler
     }
     SimpleExpressionProxy expr = null;
     for (final SimpleExpressionProxy guard : guards) {
-      final CompiledIntRange range = mEvaluator.evalBooleanRange(guard);
-      if (range.getLower() == 1) {
+      final CompiledIntRange range =
+        mEstimator.estimateBooleanRange(guard, mRootContext);
+      if (range == null) {
+        expr = combine(expr, guard);
+      } else if (range.getLower() == 1) {
         continue;
       } else if (range.getUpper() == 0) {
         final CompiledNormalForm dnf = CompiledNormalForm.getFalseDNF();
@@ -207,21 +213,22 @@ class GuardCompiler
       throw new ActionSyntaxException(action, lhs);
     }
     final IdentifierProxy ident = (IdentifierProxy) lhs;
-    final CompiledRange irange = mEvaluator.evalRange(ident);
+    final CompiledRange irange = mEstimator.estimateRange(ident, mRootContext);
     final SimpleExpressionProxy expr = action.getRight();
     final BinaryOperator assignment = action.getOperator();
     final BinaryOperator op = mOperatorTable.getAssigningOperator(assignment);
     final BinaryOperator assop = mOperatorTable.getAssignmentOperator();
     final SimpleExpressionProxy newexpr;
     if (assignment == assop) {
-      final CompiledRange erange = mEvaluator.evalRange(expr);
-      if (irange.intersects(erange)) {
+      final CompiledRange erange = 
+        mEstimator.estimateRange(expr, mRootContext);
+      if (irange == null || erange == null || irange.intersects(erange)) {
         newexpr = expr;
       } else {
         throw new TypeMismatchException(expr, erange.toString());
       }
     } else if (op != null) {
-      mEvaluator.evalIntRange(expr);
+      mEstimator.estimateIntRange(expr, mRootContext);
       newexpr = mFactory.createBinaryExpressionProxy(op, ident, expr);
     } else {
       throw new ActionSyntaxException(action);
@@ -327,7 +334,8 @@ class GuardCompiler
   private final ModuleProxyFactory mFactory;
   private final CompilerOperatorTable mOperatorTable;
   private final DNFConverter mDNFConverter;
-  private final EFARangeEvaluator mEvaluator;
+  private final RangeEstimator mEstimator;
+  private final VariableContext mRootContext;
 
   private final Map<ProxyAccessor<GuardActionBlockProxy>,CompiledGuard> mCache;
 
