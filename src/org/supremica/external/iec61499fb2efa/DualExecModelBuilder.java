@@ -52,72 +52,74 @@ class DualExecModelBuilder implements ModelBuilder
 {
 
 	// input arguments
-	private boolean expandTransitions = false;
-	private boolean generatePlantModels = false;
+	boolean expandTransitions = false;
+	boolean generatePlantModels = false;
 
-	private Integer eventQueuePlaces = 0;
-	private Integer instanceQueuePlaces = 0;
-	private Integer jobQueuePlaces = 0;
+	Integer eventQueuePlaces = 0;
+	Integer instanceQueuePlaces = 0;
+	Integer jobQueuePlaces = 0;
 
-	private int intVarMinValue = 0;
-	private int intVarMaxValue = 2;
+	int intVarMinValue = 0;
+	int intVarMaxValue = 2;
 
-	private String systemFileName;
-	private String outputFileName;
-    private List<File> libraryPathList = new LinkedList();
+	String systemFileName;
+	String outputFileName;
+	List<File> libraryPathList = new LinkedList();
 	// end input arguments
 
-    private JAXBContext iecContext;
-    private Unmarshaller iecUnmarshaller;
+	JAXBContext iecContext;
+	Unmarshaller iecUnmarshaller;
 
-	private JaxbSystem theSystem;
-	private JaxbFBNetwork systemFBNetwork;
-
-	// String name, String type name
-	private Map functionBlocks = new HashMap();
+	JaxbSystem theSystem;
+	JaxbFBNetwork systemFBNetwork;
 
 	// String name, String type name
-	private Map basicFunctionBlocks = new HashMap();
+	Map functionBlocks = new HashMap();
+
+	// String name, String type name
+	Map basicFunctionBlocks = new HashMap();
 	// String name, Integer ID
-	private Map basicFunctionBlocksID = new HashMap();
+	Map basicFunctionBlocksID = new HashMap();
 	// list to order the blocks with algorithms first
 	// used to assign lowest block ids to blocks with algorithms
-	private List basicFunctionBlocksList = new ArrayList();
-	private int fbMaxID = 1;
+	List basicFunctionBlocksList = new ArrayList();
+	int fbMaxID = 1;
 
 	// String fb name, Map event input name -> event ID
-	private Map events = new HashMap();
+	Map events = new HashMap();
 	// String fb name, max event ID
-	private Map eventsMaxID = new HashMap();
+	Map eventsMaxID = new HashMap();
 
 	// String fb name, Map alg name -> alg ID
-	private Map algorithms = new HashMap();
-	private int algIDCounter = 1;
-	private int algMaxID = 0;
+	Map algorithms = new HashMap();
+	int algIDCounter = 1;
+	int algMaxID = 0;
 	// number of blocks containing the algorithms
-	private int algFB = 0;
+	int algFB = 0;
 	// String fb name, Map alg name -> JaxbAlgorithm
-	private Map algorithmTexts = new HashMap();
+	Map algorithmTexts = new HashMap();
 
 	// String name, JaxbFBType type object
-	private Map fbTypes = new HashMap();
+	Map fbTypes = new HashMap();
 
 	// String fb name, Map event conn map eo->ei
-	private Map eventConnections = new HashMap();
+	Map eventConnections = new HashMap();
 	// String fb name, Map data conn map do->di
-	private Map dataConnections = new HashMap();
+	Map dataConnections = new HashMap();
 
-	private String restartInstance = null;
-	private String stopInstance = null;
+	String restartInstance = null;
+	String stopInstance = null;
 
-	private ExtendedAutomata automata;
+	ExtendedAutomata automata;
 
 	// attributes used for ECC generation only
-	private Map operatorMap = null;
-	private int nameCounter = 0;
-	private boolean doneInitActions = false;
-	private boolean doneInitFinish = false;
+	Map operatorMap = null;
+	int nameCounter = 0;
+	boolean doneInitActions = false;
+	boolean doneInitFinish = false;
 	
+	DualExecModelBuilder(){}
+
 	DualExecModelBuilder(Map<String, String> arguments)
 	{
 		// get arguments
@@ -308,7 +310,7 @@ class DualExecModelBuilder implements ModelBuilder
 		automata.writeToFile(new File(outputFileName));
 	}
 
-    private void loadSystem(String fileName)
+	void loadSystem(String fileName)
     {
 	
 		Logger.output(builderName() + ".loadSystem(" + fileName + "):");		
@@ -361,7 +363,7 @@ class DualExecModelBuilder implements ModelBuilder
 		fbMaxID = counter-1;
 	}
 
-    private void loadFB(FB fb, FB parent, String parentName)
+	void loadFB(FB fb, FB parent, String parentName)
     {
 		
 		String instanceName = null;
@@ -520,7 +522,7 @@ class DualExecModelBuilder implements ModelBuilder
 		}
 	}
 
-    private File getFile(String fileName)
+	File getFile(String fileName)
     {
 		File theFile = new File(fileName);
 
@@ -559,7 +561,7 @@ class DualExecModelBuilder implements ModelBuilder
 
 
 	
-	private void makeEventConnectionsMap(JaxbFBNetwork fbNetwork, String parentInstance, int level)
+	void makeEventConnectionsMap(JaxbFBNetwork fbNetwork, String parentInstance, int level)
 	{
 		if (parentInstance == null)
 		{
@@ -643,7 +645,7 @@ class DualExecModelBuilder implements ModelBuilder
 		}
 	}		
 
-	private String getInternalEventInputConnection(String externalConnection)
+	String getInternalEventInputConnection(String externalConnection)
 	{
 		String instanceName = getInstanceName(externalConnection);
 		String signalName = getSignalName(externalConnection);
@@ -676,7 +678,7 @@ class DualExecModelBuilder implements ModelBuilder
 		return externalConnection;
 	}
 
-	private String getInternalEventOutputConnection(String externalConnection)
+	String getInternalEventOutputConnection(String externalConnection)
 	{
 		String instanceName = getInstanceName(externalConnection);
 		String signalName = getSignalName(externalConnection);
@@ -709,7 +711,7 @@ class DualExecModelBuilder implements ModelBuilder
 		return externalConnection;
 	}
 
-	private void makeDataConnectionsMap(JaxbFBNetwork fbNetwork, String parentInstance, int level)
+	void makeDataConnectionsMap(JaxbFBNetwork fbNetwork, String parentInstance, int level)
 	{
 		if (parentInstance == null)
 		{
@@ -798,7 +800,7 @@ class DualExecModelBuilder implements ModelBuilder
 		}
 	}
 	
-	private String getInternalDataInputConnection(String externalConnection)
+	String getInternalDataInputConnection(String externalConnection)
 	{
 		String instanceName = getInstanceName(externalConnection);
 		String signalName = getSignalName(externalConnection);
@@ -831,7 +833,7 @@ class DualExecModelBuilder implements ModelBuilder
 		return externalConnection;
 	}
 
-	private String getInternalDataOutputConnection(String externalConnection)
+	String getInternalDataOutputConnection(String externalConnection)
 	{
 		String instanceName = getInstanceName(externalConnection);
 		String signalName = getSignalName(externalConnection);
@@ -864,7 +866,7 @@ class DualExecModelBuilder implements ModelBuilder
 		return externalConnection;
 	}
 
-	private String getInstanceName(String cntSpec)
+	String getInstanceName(String cntSpec)
 	{
 		if (cntSpec.indexOf("_") < 0)
 		{
@@ -873,7 +875,7 @@ class DualExecModelBuilder implements ModelBuilder
 		return cntSpec.substring(0,cntSpec.lastIndexOf("_"));
 	}
 
-	private String getSignalName(String cntSpec)
+	String getSignalName(String cntSpec)
 	{
 		if (cntSpec.indexOf("_") < 0)
 		{
@@ -882,7 +884,7 @@ class DualExecModelBuilder implements ModelBuilder
 		return cntSpec.substring(cntSpec.lastIndexOf("_")+1,cntSpec.length());
 	}
 
-	private void makeStartup()
+	void makeStartup()
 	{
 		Logger.output(builderName() + ".makeStartup():");
 
@@ -961,7 +963,7 @@ class DualExecModelBuilder implements ModelBuilder
 		automata.addAutomaton(startup);
 	}
 
-	private void makeInstanceQueue()
+	void makeInstanceQueue()
 	{
 		Logger.output(builderName() + ".makeInstanceQueue():");
 
@@ -1012,7 +1014,7 @@ class DualExecModelBuilder implements ModelBuilder
 		automata.addAutomaton(instanceQueue);
 	}
 
-	private void makeEventExecution()
+	void makeEventExecution()
 	{
 		Logger.output(builderName() + ".makeEventExecution():");
 
@@ -1044,7 +1046,7 @@ class DualExecModelBuilder implements ModelBuilder
 		automata.addAutomaton(eventExecution);
 	}
 
-	private void makeJobQueue()
+	void makeJobQueue()
 	{
 		if (algMaxID > 0)
 		{
@@ -1114,7 +1116,7 @@ class DualExecModelBuilder implements ModelBuilder
 		}
 	}
 
-	private void makeAlgorithmExecution()
+	void makeAlgorithmExecution()
 	{
 		if (algMaxID > 0)
 		{
@@ -1277,7 +1279,7 @@ class DualExecModelBuilder implements ModelBuilder
 		}
 	}
 
-	private void makeBasicFB(String fbName)
+	void makeBasicFB(String fbName)
 	{	
 		Logger.output(builderName() + ".makeBasicFB(" + fbName + "):");
 	
@@ -1287,7 +1289,7 @@ class DualExecModelBuilder implements ModelBuilder
 		makeBasicFBAlgorithms(fbName);
 	}
 
-	private void makeBasicFBEventHandling(String fbName)
+	void makeBasicFBEventHandling(String fbName)
 	{
 		Logger.output("Event Handling", 1);
 		
@@ -1331,7 +1333,7 @@ class DualExecModelBuilder implements ModelBuilder
 		automata.addAutomaton(eventHandling);
 	}
 
-	private void makeBasicFBEventQueue(String fbName)
+	void makeBasicFBEventQueue(String fbName)
 	{
 		Logger.output("Event Queue", 1);
 
@@ -1513,7 +1515,7 @@ class DualExecModelBuilder implements ModelBuilder
 				}
 			}
 			
-// 			eventQueue.addState("s" + i,false,false);
+			// 			eventQueue.addState("s" + i,false,false);
 			eventQueue.addState("s" + i);
 
 			for (Iterator evIter = eventInputList.iterator(); evIter.hasNext();)
@@ -1529,7 +1531,7 @@ class DualExecModelBuilder implements ModelBuilder
 					from = "s" + (i-1);
 					to = "s" + (places + nameCounter);
 					nameCounter++;
-// 					eventQueue.addState(to,false,false);
+					// 					eventQueue.addState(to,false,false);
 					eventQueue.addState(to);
 					event = "receive_event_" + eventName + "_" + fbName + ";";
 					eventQueue.addTransition(from, to, event, null, null);
@@ -1537,7 +1539,7 @@ class DualExecModelBuilder implements ModelBuilder
 					from = to;
 					to = "s" + (places + nameCounter);
 					nameCounter++;
-//					eventQueue.addState(to,false,false);
+					//					eventQueue.addState(to,false,false);
  					eventQueue.addState(to);
 					event = "queue_event_" + eventName + "_" + fbName + ";";
 					guard = null;
@@ -1600,7 +1602,7 @@ class DualExecModelBuilder implements ModelBuilder
 					from = "s" + i;
 					to = "s" + (places + nameCounter);
 					nameCounter++;
-//					eventQueue.addState(to,false,false);
+					//					eventQueue.addState(to,false,false);
  					eventQueue.addState(to);
 					event = "remove_event_" + fbName + ";";
 					guard = "event_place_1_" + fbName + " == " + eventID;
@@ -1659,7 +1661,7 @@ class DualExecModelBuilder implements ModelBuilder
 		automata.addAutomaton(eventQueue);	
 	}
 	
-	private void makeBasicFBExecutionControlChart(String fbName)
+	void makeBasicFBExecutionControlChart(String fbName)
 	{
 		Logger.output("Execution Control Chart", 1);
 		
@@ -1796,7 +1798,7 @@ class DualExecModelBuilder implements ModelBuilder
 		automata.addAutomaton(ecc);	
 	}
 
-	private void makeECStateBranch(ExtendedAutomaton ecc, String fbName, String ecStateName, String prevStateName, List ecStates, List ecTransitions, Set visitedECStates, int level, Map identifierMap)
+	void makeECStateBranch(ExtendedAutomaton ecc, String fbName, String ecStateName, String prevStateName, List ecStates, List ecTransitions, Set visitedECStates, int level, Map identifierMap)
 	{
 		Logger.output(Logger.DEBUG, "Entering makeECStateBranch(): ecStateName = " + ecStateName + ": prevStateName = " + prevStateName, level);
 
@@ -1872,7 +1874,7 @@ class DualExecModelBuilder implements ModelBuilder
 			String curECCondition = curECTransition.getCondition();			
 
 			Logger.output(Logger.DEBUG, "Analyzing EC transition: from: " + curECSourceName +
-				   ", to: " + curECDestName + ", cond: " + curECCondition, level);
+						  ", to: " + curECDestName + ", cond: " + curECCondition, level);
 
 			// loop temporary vars
 			boolean oneTransitionFromECSource = false;
@@ -2303,7 +2305,7 @@ class DualExecModelBuilder implements ModelBuilder
 		}
 	}
 	
-	private void makeBasicFBAlgorithms(String fbName)
+	void makeBasicFBAlgorithms(String fbName)
 	{
 		String typeName = (String) basicFunctionBlocks.get(fbName);
 		JaxbFBType theType = (JaxbFBType) fbTypes.get(typeName);
@@ -2501,7 +2503,7 @@ class DualExecModelBuilder implements ModelBuilder
 		}
 	}
 	
-	private boolean isEventConnected(String fbName, String signal)
+	boolean isEventConnected(String fbName, String signal)
 	{
 		Map fbEventCons = (Map) eventConnections.get(fbName);
 		if (fbEventCons != null)
@@ -2515,7 +2517,7 @@ class DualExecModelBuilder implements ModelBuilder
 		return false;
 	}
 
-	private boolean isDataConnected(String fbName, String signal)
+	boolean isDataConnected(String fbName, String signal)
 	{
 		Map fbDataCons = (Map) dataConnections.get(fbName);
 		if (fbDataCons != null)
@@ -2529,7 +2531,7 @@ class DualExecModelBuilder implements ModelBuilder
 		return false;
 	}
 
-	private String getEventConnection(String fbName, String signal)
+	String getEventConnection(String fbName, String signal)
 	{
 		Map fbEventCons = (Map) eventConnections.get(fbName);
 		if (fbEventCons != null)
@@ -2543,7 +2545,7 @@ class DualExecModelBuilder implements ModelBuilder
 		return null;
 	}
 
-	private String getDataConnection(String fbName, String signal)
+	String getDataConnection(String fbName, String signal)
 	{
 		Map fbDataCons = (Map) dataConnections.get(fbName);
 		if (fbDataCons != null)
@@ -2557,7 +2559,7 @@ class DualExecModelBuilder implements ModelBuilder
 		return null;
 	}
 
-	private ExtendedAutomaton getNewAutomaton(String name)
+	ExtendedAutomaton getNewAutomaton(String name)
 	{
 		if (generatePlantModels)
 		{
@@ -2569,7 +2571,7 @@ class DualExecModelBuilder implements ModelBuilder
 		}
 	}
 
-	private void printFunctionBlocksMap()
+	void printFunctionBlocksMap()
 	{
 		Logger.output(Logger.DEBUG, builderName() + ".printFunctionBlocksMap():");
 		for (Iterator iter = functionBlocks.keySet().iterator(); iter.hasNext();)
@@ -2580,7 +2582,7 @@ class DualExecModelBuilder implements ModelBuilder
 		}
 	}
 
-	private void printBasicFunctionBlocksMap()
+	void printBasicFunctionBlocksMap()
 	{
 		Logger.output(Logger.DEBUG, builderName() + ".printBasicFunctionBlocksMap():");
 		for (Iterator iter = basicFunctionBlocks.keySet().iterator(); iter.hasNext();)
@@ -2593,7 +2595,7 @@ class DualExecModelBuilder implements ModelBuilder
 		Logger.output(Logger.DEBUG, "Maximal block ID: " + fbMaxID, 1);			
 	}	
 
-	private void printEventsMap()
+	void printEventsMap()
 	{
 		Logger.output(Logger.DEBUG, builderName() + ".printEventsMap():");
 		for (Iterator iter = events.keySet().iterator(); iter.hasNext();)
@@ -2612,7 +2614,7 @@ class DualExecModelBuilder implements ModelBuilder
 		}
 	}	
 
-	private void printAlgorithmsMap()
+	void printAlgorithmsMap()
 	{
 		Logger.output(Logger.DEBUG, builderName() + ".printAlgorithmsMap():");
 		for (Iterator iter = algorithms.keySet().iterator(); iter.hasNext();)
@@ -2630,7 +2632,7 @@ class DualExecModelBuilder implements ModelBuilder
 		Logger.output(Logger.DEBUG, "Maximal algorithm ID: " + algMaxID, 1);
 	}	
 
-	private void printAlgorithmTextsMap()
+	void printAlgorithmTextsMap()
 	{
 		Logger.output(Logger.DEBUG, builderName() + ".printAlgorithmTextsMap():");
 		for (Iterator iter = algorithmTexts.keySet().iterator(); iter.hasNext();)
@@ -2647,7 +2649,7 @@ class DualExecModelBuilder implements ModelBuilder
 		}
 	}	
 	
-	private void printFBTypesMap()
+	void printFBTypesMap()
 	{
 		Logger.output(Logger.DEBUG, builderName() + ".printFBTypesMap():");
 		for (Iterator iter = fbTypes.keySet().iterator(); iter.hasNext();)
@@ -2658,7 +2660,7 @@ class DualExecModelBuilder implements ModelBuilder
 		}
 	}
 	
-	private void printEventConnectionsMap()
+	void printEventConnectionsMap()
 	{
 		Logger.output(Logger.DEBUG, builderName() + ".printEventConnectionsMap():");
 		for (Iterator fbIter = eventConnections.keySet().iterator(); fbIter.hasNext();)
@@ -2675,7 +2677,7 @@ class DualExecModelBuilder implements ModelBuilder
 		}
 	}
 	
-	private void printDataConnectionsMap()
+	void printDataConnectionsMap()
 	{
 		Logger.output(Logger.DEBUG, builderName() + ".printDataConnectionsMap():");
 		for (Iterator fbIter = dataConnections.keySet().iterator(); fbIter.hasNext();)
@@ -2692,7 +2694,7 @@ class DualExecModelBuilder implements ModelBuilder
 		}
 	}
 	
-	private void exit(int status)
+	void exit(int status)
 	{
 		System.exit(status);
 	}
