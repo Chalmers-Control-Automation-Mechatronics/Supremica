@@ -19,6 +19,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import net.sourceforge.waters.model.base.ProxyAccessor;
+import net.sourceforge.waters.model.base.ProxyAccessorByContents;
 import net.sourceforge.waters.model.base.VisitorException;
 import net.sourceforge.waters.model.compiler.context.CompiledRange;
 import net.sourceforge.waters.model.compiler.dnf.CompiledClause;
@@ -36,11 +38,12 @@ class SplitComputer
 
   //#########################################################################
   //# Constructors
-  SplitComputer(final EFAVariableMap varmap)
+  SplitComputer(final EFAModuleContext context)
   {
-    final int size = varmap.size();
+    final int size = context.getVariableNames().size();
     mIndexSplitVisitor = new IndexSplitVisitor();
-    mVariableMap = varmap;
+    mVariableCollector = new EFAVariableCollector();
+    mContext = context;
     mCandidateMap = new HashMap<EFAVariable,SplitCandidate>(size);
     mCandidateList = new ArrayList<SplitCandidate>(size);
   }
@@ -70,8 +73,7 @@ class SplitComputer
     final Collection<EFAVariableCombination> combinations =
       new HashSet<EFAVariableCombination>(size);
     for (final SimpleExpressionProxy literal : literals) {
-      final Collection<EFAVariable> vars =
-        mVariableMap.collectVariables(literal);
+      final Collection<EFAVariable> vars = mVariableCollector.collect(literal);
       final EFAVariableCombination combination =
         EFAVariableCombination.create(vars);
       if (combination != null) {
@@ -271,7 +273,7 @@ class SplitComputer
       throws VisitorException
     {
       if (mInIndex) {
-        final EFAVariable var = mVariableMap.getVariable(expr);
+        final EFAVariable var = mContext.getVariable(expr);
         if (var != null) {
           if (mResult == null || var.compareTo(mResult) < 0) {
             mResult = var;
@@ -346,9 +348,110 @@ class SplitComputer
 
 
   //#########################################################################
+  //# Inner Class EFAVariableCollector
+  private class EFAVariableCollector
+    extends AbstractModuleProxyVisitor
+  {
+
+    //#######################################################################
+    //# Constructor
+    private EFAVariableCollector()
+    {
+      mMap = new HashMap<ProxyAccessor<SimpleExpressionProxy>,EFAVariable>();
+    }
+
+    //#######################################################################
+    //# Invocation
+    Collection<EFAVariable> collect(final SimpleExpressionProxy expr)
+    {
+      try {
+        process(expr);
+        final Collection<EFAVariable> values = mMap.values();
+        return new ArrayList<EFAVariable>(values);
+      } catch (final VisitorException exception) {
+        throw exception.getRuntimeException();
+      } finally {
+        mMap.clear();
+      }
+    }
+
+
+    //#######################################################################
+    //# Auxiliary Methods
+    void process(final SimpleExpressionProxy expr)
+      throws VisitorException
+    {
+      final ProxyAccessor<SimpleExpressionProxy> accessor =
+        new ProxyAccessorByContents<SimpleExpressionProxy>(expr);
+      final EFAVariable var = mContext.getVariable(accessor);
+      if (var == null) {
+        expr.acceptVisitor(this);
+      } else {
+        mMap.put(accessor, var);
+      }
+    }
+
+
+    //#######################################################################
+    //# Interface net.sourceforge.waters.model.module.ModuleProxyVisitor
+    public Object visitBinaryExpressionProxy(final BinaryExpressionProxy expr)
+      throws VisitorException
+    {
+      final SimpleExpressionProxy lhs = expr.getLeft();
+      process(lhs);
+      final SimpleExpressionProxy rhs = expr.getRight();
+      process(rhs);
+      return null;
+    }
+
+    public Object visitIndexedIdentifierProxy
+      (final IndexedIdentifierProxy ident)
+      throws VisitorException
+    {
+      final List<SimpleExpressionProxy> indexes = ident.getIndexes();
+      for (final SimpleExpressionProxy index : indexes) {
+        process(index);
+      }
+      return null;
+    }
+
+    public Object visitQualifiedIdentifierProxy
+      (final QualifiedIdentifierProxy ident)
+      throws VisitorException
+    {
+      final IdentifierProxy base = ident.getBaseIdentifier();
+      base.acceptVisitor(this);
+      final IdentifierProxy comp = ident.getComponentIdentifier();
+      return comp.acceptVisitor(this);
+    }
+
+    public Object visitSimpleExpressionProxy
+      (final SimpleExpressionProxy expr)
+    {
+      return null;
+    }
+
+    public Object visitUnaryExpressionProxy
+      (final UnaryExpressionProxy expr)
+      throws VisitorException
+    {
+      final SimpleExpressionProxy subterm = expr.getSubTerm();
+      process(subterm);
+      return null;
+    }
+
+    //#######################################################################
+    //# Data Members
+    private final Map<ProxyAccessor<SimpleExpressionProxy>,EFAVariable> mMap;
+
+  }
+
+
+  //#########################################################################
   //# Data Members
   private final IndexSplitVisitor mIndexSplitVisitor;
-  private final EFAVariableMap mVariableMap;
+  private final EFAVariableCollector mVariableCollector;
+  private final EFAModuleContext mContext;
   private final Map<EFAVariable,SplitCandidate> mCandidateMap;
   private final List<SplitCandidate> mCandidateList;
 

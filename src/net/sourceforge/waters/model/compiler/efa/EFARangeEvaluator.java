@@ -46,11 +46,9 @@ class EFARangeEvaluator
   //#########################################################################
   //# Constructors
   EFARangeEvaluator(final CompilerOperatorTable optable,
-                    final ModuleBindingContext root,
-                    final EFAVariableMap varmap)
+                    final EFAModuleContext root)
   {
     mRootContext = root;
-    mVariableMap = varmap;
 
     mBinaryEvaluatorMap = new HashMap<BinaryOperator,BinaryEvaluator>(32);
     mBinaryEvaluatorMap.put(optable.getAndOperator(),
@@ -265,7 +263,7 @@ class EFARangeEvaluator
     throws VisitorException
   {
     // TODO: Evaluate indexes in qualified and indexed identifiers!
-    final EFAVariable var = mVariableMap.getVariable(ident);
+    final EFAVariable var = mRootContext.getVariable(ident);
     if (var != null) {
       return var.getRange();
     } else if (mContext.isEnumAtom(ident)) {
@@ -853,7 +851,7 @@ class EFARangeEvaluator
                        final CompiledRange range)
       throws TypeMismatchException
     {
-      if (mVariableMap.getVariable(expr) != null) {
+      if (mRootContext.getVariable(expr) != null) {
         return range;
       } else {
         throw new TypeMismatchException(expr, "VARIABLE");
@@ -886,8 +884,7 @@ class EFARangeEvaluator
 
   //#########################################################################
   //# Data Members
-  private final ModuleBindingContext mRootContext;
-  private final EFAVariableMap mVariableMap;
+  private final EFAModuleContext mRootContext;
   private final Map<BinaryOperator,BinaryEvaluator> mBinaryEvaluatorMap;
   private final Map<UnaryOperator,UnaryEvaluator> mUnaryEvaluatorMap;
 

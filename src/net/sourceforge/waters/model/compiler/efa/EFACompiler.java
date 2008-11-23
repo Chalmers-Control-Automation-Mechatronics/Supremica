@@ -135,10 +135,8 @@ public class EFACompiler
     mSourceInfoBuilder = builder;
     mOperatorTable = CompilerOperatorTable.getInstance();
     mTrueGuard = new CompiledGuard();
-    mVariableMap = new EFAVariableMap(mFactory, mOperatorTable);
     mSimpleExpressionCompiler =
       new SimpleExpressionCompiler(mFactory, mOperatorTable);
-    mSplitComputer = new SplitComputer(mVariableMap);
     mInputModule = module;
   }
 
@@ -149,12 +147,13 @@ public class EFACompiler
     throws EvalException
   {
     try {
-      mRootContext = new ModuleBindingContext(mInputModule);
+      mRootContext = new EFAModuleContext(mInputModule);
       mComparator =
         new CompilerExpressionComparator(mOperatorTable, mRootContext);
       mConstraintPropagator =
         new ConstraintPropagator(mFactory, mOperatorTable, mComparator,
-                                 mSimpleExpressionCompiler, mVariableMap);
+                                 mSimpleExpressionCompiler);
+      mSplitComputer = new SplitComputer(mRootContext);
       mEventNameBuilder = new EFAEventNameBuilder(mFactory, mComparator);
       mVariableAutomatonBuilder =
         new EFAVariableAutomatonBuilder(mFactory, mOperatorTable, mComparator,
@@ -185,9 +184,9 @@ public class EFACompiler
       mRootContext = null;
       mComparator = null;
       mConstraintPropagator = null;
+      mSplitComputer = null;
       mEventNameBuilder = null;
       mVariableAutomatonBuilder = null;
-      mVariableMap.clear();
     }
   }
 
@@ -365,7 +364,7 @@ public class EFACompiler
   //# Inner Class Pass1Visitor
   /**
    * The visitor implementing the first pass of EFA compilation. It
-   * initialises the variables map {@link #mVariableMap} and associates
+   * initialises the variables map {@link #mRootContext} and associates
    * the identifier of each simple or variable component with a {@link
    * EFAVariable} object that contains the range of possible state values
    * of that component.
@@ -393,8 +392,6 @@ public class EFACompiler
       throws VisitorException
     {
       final List<Proxy> components = module.getComponentList();
-      final int size = 2 * components.size();
-      mVariableMap.reset(size);
       visitCollection(components);
       return null;
     }
@@ -411,7 +408,7 @@ public class EFACompiler
       final GraphProxy graph = comp.getGraph();
       final List<SimpleIdentifierProxy> list = visitGraphProxy(graph);
       final CompiledRange range = new CompiledEnumRange(list);
-      mVariableMap.createVariables(comp, range);
+      mRootContext.createVariables(comp, range, mFactory, mOperatorTable);
       return range;
     }
 
@@ -435,7 +432,7 @@ public class EFACompiler
           mSimpleExpressionCompiler.eval(expr, mRootContext);
         final CompiledRange range =
           mSimpleExpressionCompiler.getRangeValue(value);
-        mVariableMap.createVariables(var, range);
+        mRootContext.createVariables(var, range, mFactory, mOperatorTable);
         return range;
       } catch (final EvalException exception) {
         throw wrap(exception);
@@ -461,7 +458,7 @@ public class EFACompiler
     private Pass2Visitor()
     {
       final EFARangeEvaluator evaluator =
-        new EFARangeEvaluator(mOperatorTable, mRootContext, mVariableMap);
+        new EFARangeEvaluator(mOperatorTable, mRootContext);
       mGuardCompiler =
         new GuardCompiler(mFactory, mOperatorTable, mComparator, evaluator);
     }
@@ -474,7 +471,7 @@ public class EFACompiler
       try {
         final SimpleExpressionProxy left = expr.getLeft();
         if (left instanceof IdentifierProxy) {
-          final EFAVariable var = mVariableMap.findVariable(left);
+          final EFAVariable var = mRootContext.findVariable(left);
           mCollectedVariables.add(var);
           return null;
         } else {
@@ -709,7 +706,7 @@ public class EFACompiler
 
     public Object visitIdentifierProxy(final IdentifierProxy ident)
     {
-      final EFAVariable var = mVariableMap.getVariable(ident);
+      final EFAVariable var = mRootContext.getVariable(ident);
       if (var != null) {
         var.addEvent(mCurrentEvent);
       }
@@ -962,7 +959,7 @@ public class EFACompiler
     {
       try {
         final IdentifierProxy ident = comp.getIdentifier();
-        final EFAVariable var = mVariableMap.getVariable(ident);
+        final EFAVariable var = mRootContext.getVariable(ident);
         final SimpleComponentProxy result =
           mVariableAutomatonBuilder.constructSimpleComponent(var);
         addSourceInfo(result, comp);
@@ -998,25 +995,17 @@ public class EFACompiler
   private final CompilerOperatorTable mOperatorTable;
   private final CompiledGuard mTrueGuard;
   private final SimpleExpressionCompiler mSimpleExpressionCompiler;
-  private final SplitComputer mSplitComputer;
   private final ModuleProxy mInputModule;
 
   private boolean mIsUsingEventAlphabet = true;
 
-  private ModuleBindingContext mRootContext;
+  private EFAModuleContext mRootContext;
   private Comparator<SimpleExpressionProxy> mComparator;
   private ConstraintPropagator mConstraintPropagator;
+  private SplitComputer mSplitComputer;
   private EFAEventNameBuilder mEventNameBuilder;
   private EFAVariableAutomatonBuilder mVariableAutomatonBuilder;
 
-  // Pass 1
-  /**
-   * A map that assigns to each expression that refers to a variable
-   * component {@link VariableComponentProxy} or simple component {@link
-   * SimpleComponentProxy} an EFA variable object that contains the
-   * computed range of its state space.
-   */
-  private final EFAVariableMap mVariableMap;
   // Pass 2
   /**
    * A map that assigns to each identifier of an event declaration {@link

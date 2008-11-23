@@ -41,22 +41,20 @@ class ConstraintPropagator
     (final ModuleProxyFactory factory,
      final CompilerOperatorTable optable,
      final Comparator<SimpleExpressionProxy> comparator,
-     final SimpleExpressionCompiler compiler,
-     final EFAVariableMap varmap)
+     final SimpleExpressionCompiler compiler)
   {
     mFactory = factory;
     mOperatorTable = optable;
     mComparator = comparator;
     mSimpleExpressionCompiler = compiler;
     mDNFConverter = new DNFConverter(factory, optable, comparator);
-    mVariableMap = varmap;
   }
 
 
   //#########################################################################
   //# Invocation
   CompiledClause propagate(final CompiledClause clause,
-                           final BindingContext context)
+                           final EFAModuleContext context)
     throws EvalException
   {
     try {
@@ -72,7 +70,7 @@ class ConstraintPropagator
 
   CompiledClause propagate(final CompiledClause clause1,
                            final CompiledClause clause2,
-                           final BindingContext context)
+                           final EFAModuleContext context)
     throws EvalException
   {
     try {
@@ -93,7 +91,7 @@ class ConstraintPropagator
   CompiledClause propagate(final CompiledClause clause,
                            final SimpleExpressionProxy varname,
                            final SimpleExpressionProxy value,
-                           final BindingContext context)
+                           final EFAModuleContext context)
     throws EvalException
   {
     try {
@@ -113,9 +111,9 @@ class ConstraintPropagator
 
   //#########################################################################
   //# Algorithm
-  private void setup(final BindingContext context, final int size)
+  private void setup(final EFAModuleContext context, final int size)
   {
-    mRootContext = context;
+    mContext = context;
     mIsFalse = false;
     mOpenLiterals = new TreeSet<SimpleExpressionProxy>(mComparator);
     mProcessedEquations = new ArrayList<BinaryExpressionProxy>(size);
@@ -123,7 +121,7 @@ class ConstraintPropagator
 
   private void cleanup()
   {
-    mRootContext = null;
+    mContext = null;
     mOpenLiterals = null;
     mProcessedEquations = null;
   }
@@ -162,7 +160,7 @@ class ConstraintPropagator
         continue;
       }
       final SimpleExpressionProxy lhs = equation.getLeft();
-      final EFAVariable var = mVariableMap.getVariable(lhs);
+      final EFAVariable var = mContext.getVariable(lhs);
       if (var == null) {
         continue;
       }
@@ -184,7 +182,7 @@ class ConstraintPropagator
     throws EvalException
   {
     final BindingContext context =
-      new SingleBindingContext(varname, replacement, mRootContext);
+      new SingleBindingContext(varname, replacement, mContext);
     final List<SimpleExpressionProxy> literals =
       new ArrayList<SimpleExpressionProxy>(mOpenLiterals);
     mOpenLiterals.clear();
@@ -274,9 +272,8 @@ class ConstraintPropagator
   private final Comparator<SimpleExpressionProxy> mComparator;
   private final SimpleExpressionCompiler mSimpleExpressionCompiler;
   private final DNFConverter mDNFConverter;
-  private final EFAVariableMap mVariableMap;
 
-  private BindingContext mRootContext;
+  private EFAModuleContext mContext;
   private boolean mIsFalse;
   private Collection<SimpleExpressionProxy> mOpenLiterals;
   private List<BinaryExpressionProxy> mProcessedEquations;
