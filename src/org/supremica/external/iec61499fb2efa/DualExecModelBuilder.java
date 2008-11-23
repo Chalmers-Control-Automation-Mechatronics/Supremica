@@ -1125,7 +1125,7 @@ class DualExecModelBuilder implements ModelBuilder
 			ExtendedAutomaton algorithmExecution = getNewAutomaton("Algorithm Execution");
 				
 			algorithmExecution.addInitialState("s0");
-			algorithmExecution.addState("s1");
+			algorithmExecution.addState("s1",false,false);
 		
 			algorithmExecution.addTransition("s0", "s1", "remove_job;", null, null);	
 
@@ -1161,7 +1161,7 @@ class DualExecModelBuilder implements ModelBuilder
 							from = "s1";
 							to = "s" + nameCounter;
 							nameCounter++;
-							algorithmExecution.addState(to);
+							algorithmExecution.addState(to,false,false);
 							event = "execute_" + algName + "_" + instanceName + ";";
 							guard = "current_job_fb == " + instanceID;
 							guard = guard + " & current_job_alg == " + algID;
@@ -1170,7 +1170,7 @@ class DualExecModelBuilder implements ModelBuilder
 
 							to = "s" + nameCounter;
 							nameCounter++;
-							algorithmExecution.addState(to);
+							algorithmExecution.addState(to,false,false);
 							event = "copy_variables_" + algName + "_" + instanceName + ";";
 							algorithmExecution.addTransition(from, to, event, null, null);
 							from = to;
@@ -1255,7 +1255,7 @@ class DualExecModelBuilder implements ModelBuilder
 							//get the local alg vars
 							to = "s" + nameCounter;
 							nameCounter++;
-							algorithmExecution.addState(to);					
+							algorithmExecution.addState(to,false,false);					
 							event = "get_variables_" + algName + "_" + instanceName + ";";
 							action = "";
 							for (Iterator iter = algorithmIdents.iterator(); iter.hasNext();)
@@ -1515,7 +1515,6 @@ class DualExecModelBuilder implements ModelBuilder
 				}
 			}
 			
-// 			eventQueue.addState("s" + i,false,false);
 			eventQueue.addState("s" + i);
 
 			for (Iterator evIter = eventInputList.iterator(); evIter.hasNext();)
@@ -1531,16 +1530,14 @@ class DualExecModelBuilder implements ModelBuilder
 					from = "s" + (i-1);
 					to = "s" + (places + nameCounter);
 					nameCounter++;
-// 					eventQueue.addState(to,false,false);
-					eventQueue.addState(to);
+ 					eventQueue.addState(to,false,false);
 					event = "receive_event_" + eventName + "_" + fbName + ";";
 					eventQueue.addTransition(from, to, event, null, null);
 					
 					from = to;
 					to = "s" + (places + nameCounter);
 					nameCounter++;
-//					eventQueue.addState(to,false,false);
- 					eventQueue.addState(to);
+					eventQueue.addState(to,false,false);
 					event = "queue_event_" + eventName + "_" + fbName + ";";
 					guard = null;
 					action = "event_place_" + i + "_" + fbName + " = " + eventID + ";";
@@ -1577,7 +1574,7 @@ class DualExecModelBuilder implements ModelBuilder
 					from = to;
 					to = "s" + (places + nameCounter);
 					nameCounter++;
-					eventQueue.addState(to);
+					eventQueue.addState(to,false,false);
 					event = "queue_fb_" + fbName + ";";
 					eventQueue.addTransition(from, to, event, null, null);
 					
@@ -1602,8 +1599,7 @@ class DualExecModelBuilder implements ModelBuilder
 					from = "s" + i;
 					to = "s" + (places + nameCounter);
 					nameCounter++;
-//					eventQueue.addState(to,false,false);
- 					eventQueue.addState(to);
+					eventQueue.addState(to,false,false);
 					event = "remove_event_" + fbName + ";";
 					guard = "event_place_1_" + fbName + " == " + eventID;
 					action = "event_" + eventName + "_" + fbName + " = 1;";
