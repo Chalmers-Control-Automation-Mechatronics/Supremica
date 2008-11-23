@@ -48,12 +48,12 @@ import net.sourceforge.fuber.model.interpreters.abstractsyntax.Identifier;
 
 import net.sourceforge.fuber.xsd.libraryelement.*;
 
-class DualExecModelBuilder extends ModelBuilder
+class DualExecModelBuilder implements ModelBuilder
 {
 
 	// input arguments
 	private boolean expandTransitions = false;
-	private boolean generatePlantModels = true;
+	private boolean generatePlantModels = false;
 
 	private Integer eventQueuePlaces = 0;
 	private Integer instanceQueuePlaces = 0;
@@ -171,11 +171,11 @@ class DualExecModelBuilder extends ModelBuilder
 
 				if (!libraryPathBaseFile.isDirectory())
 				{
-					Logger.output(Logger.ERROR, "DualExecModelBuilder(): Specified library base is not a directory!: " + libraryPathBaseFile.getName());
+					Logger.output(Logger.ERROR, builderName() + "(): Specified library base is not a directory!: " + libraryPathBaseFile.getName());
 				}
 				else if (!libraryPathBaseFile.exists())
 				{
-					Logger.output(Logger.ERROR, "DualExecModelBuilder(): Specified library base does not exist!: " + libraryPathBaseFile.getName());
+					Logger.output(Logger.ERROR, builderName() + "(): Specified library base does not exist!: " + libraryPathBaseFile.getName());
 				}
 				else
 				{
@@ -202,11 +202,11 @@ class DualExecModelBuilder extends ModelBuilder
 
 				if (!curLibraryDir.isDirectory())
 				{
-					Logger.output(Logger.ERROR, "DualExecModelBuilder(): Specified library path element " + curLibraryDir.getAbsolutePath() + " is not a directory!");
+					Logger.output(Logger.ERROR, builderName() + "(): Specified library path element " + curLibraryDir.getAbsolutePath() + " is not a directory!");
 				}
 				else if (!curLibraryDir.exists())
 				{
-					Logger.output(Logger.ERROR, "DualExecModelBuilder(): Specified library path element " + curLibraryDir.getAbsolutePath() + " does not exist!");
+					Logger.output(Logger.ERROR, builderName() + "(): Specified library path element " + curLibraryDir.getAbsolutePath() + " does not exist!");
 				}
 				else
 				{
@@ -244,16 +244,21 @@ class DualExecModelBuilder extends ModelBuilder
 		}
 	}
 
-	void loadSystem()
+	String builderName()
 	{
-		Logger.output("DualExecModelBuilder.loadSystem()");
+		return this.getClass().getName().substring(this.getClass().getName().lastIndexOf(".")+1);
+	}
+
+	public void loadSystem()
+	{
+		Logger.output(builderName() + ".loadSystem()");
 
 		loadSystem(systemFileName);
 	}
 
-	void analyzeSystem()
+	public void analyzeSystem()
 	{
-		Logger.output("DualExecModelBuilder.analyzeSystem()");
+		Logger.output(builderName() + ".analyzeSystem()");
 
 		makeEventConnectionsMap(systemFBNetwork, null, 0);
 		
@@ -272,9 +277,9 @@ class DualExecModelBuilder extends ModelBuilder
 		}
 	}
 	
-	void buildModels()
+	public void buildModels()
 	{
-		Logger.output("DualExecModelBuilder.buildModels()");
+		Logger.output(builderName() + ".buildModels()");
 
  		automata = new ExtendedAutomata(theSystem.getName(), expandTransitions);
 		
@@ -297,19 +302,19 @@ class DualExecModelBuilder extends ModelBuilder
 		}
 	}
 	
-	void writeResult()
+	public void writeResult()
 	{
-		Logger.output("DualExecModelBuilder.writeResult()");
+		Logger.output(builderName() + ".writeResult()");
 		automata.writeToFile(new File(outputFileName));
 	}
 
     private void loadSystem(String fileName)
     {
 	
-		Logger.output("DualExecModelBuilder.loadSystem(" + fileName + "):");
-		Logger.output("Loading file " + fileName, 1);
-		
+		Logger.output(builderName() + ".loadSystem(" + fileName + "):");		
 		File file = getFile(fileName);
+
+		Logger.output("Loading file " + file.getName() + " from " + file.getParent(), 1);
 		
 		try
 		{
@@ -373,7 +378,7 @@ class DualExecModelBuilder extends ModelBuilder
 		String typeName = fb.getType();
 		String fileName = typeName + ".fbt";
 	
-		Logger.output("DualExecModelBuilder.loadFB(" + instanceName + ", " + fileName + "):");
+		Logger.output(builderName() + ".loadFB(" + instanceName + ", " + fileName + "):");
 				
 		if (typeName.equals("E_RESTART"))
 		{
@@ -394,6 +399,8 @@ class DualExecModelBuilder extends ModelBuilder
 			
 			File file = getFile(fileName);
 			
+			Logger.output("Loading file " + file.getName() + " from " + file.getParent(), 1);
+
 			Object unmarshalledObject = null;
 			
 			try
@@ -505,7 +512,7 @@ class DualExecModelBuilder extends ModelBuilder
 				}
 				else
 				{
-					Logger.output(Logger.ERROR, "Error!: DualExecModelBuilder.loadFB(" + instanceName + ", " + fileName + "): Unsupported FB type: " + typeName);
+					Logger.output(Logger.ERROR, builderName() + ".loadFB(" + instanceName + ", " + fileName + "): Unsupported FB type: " + typeName);
 					Logger.output(Logger.ERROR, "Neither a Basic FB nor a Composite FB.", 1);
 					exit(1);
 				}
@@ -523,7 +530,7 @@ class DualExecModelBuilder extends ModelBuilder
 			{
 				File curLibraryDir = (File) iter.next();
 				theFile = new File(curLibraryDir, fileName);
-				Logger.output(Logger.DEBUG, "DualExecModelBuilder.getFile(): Looking for file " + theFile.toString());
+				Logger.output(Logger.DEBUG, builderName() + ".getFile(): Looking for file " + theFile.toString());
 				if (theFile.exists())
 				{
 					break;
@@ -533,7 +540,7 @@ class DualExecModelBuilder extends ModelBuilder
 
 		if (!theFile.exists())
 		{
-			Logger.output(Logger.ERROR, "DualExecModelBuilder.getFile(" + fileName + "): The file " + fileName + " does not exist in the specified libraries...");
+			Logger.output(Logger.ERROR, builderName() + ".getFile(" + fileName + "): The file " + fileName + " does not exist in the specified libraries...");
 			if (libraryPathList != null)
 			{
 				for (Iterator iter = libraryPathList.iterator();iter.hasNext();)
@@ -545,23 +552,22 @@ class DualExecModelBuilder extends ModelBuilder
 			{
 				Logger.output(Logger.ERROR, ". (current directory)", 1);
 			}
-			Logger.output(Logger.ERROR, "");
-			Logger.output(Logger.ERROR, "Usage: DualExecModelBuilder [-o outputFile] [-lb libraryPathBase] [-lp libraryDirectory]... file.sys");
 			exit(1);
 		}
 		return theFile;
     }
+
 
 	
 	private void makeEventConnectionsMap(JaxbFBNetwork fbNetwork, String parentInstance, int level)
 	{
 		if (parentInstance == null)
 		{
-			Logger.output("DualExecModelBuilder.makeEventConnectionMap(System):");
+			Logger.output(builderName() + ".makeEventConnectionMap(System):");
 		}
 		else
 		{
-			Logger.output("DualExecModelBuilder.makeEventConnectionMap(" + parentInstance + "):");
+			Logger.output(builderName() + ".makeEventConnectionMap(" + parentInstance + "):");
 		}
 		
 		for (Iterator connIter = fbNetwork.getEventConnections().getConnection().iterator();
@@ -707,11 +713,11 @@ class DualExecModelBuilder extends ModelBuilder
 	{
 		if (parentInstance == null)
 		{
-			Logger.output("DualExecModelBuilder.makeDataConnectionMap(System):");
+			Logger.output(builderName() + ".makeDataConnectionMap(System):");
 		}
 		else
 		{
-			Logger.output("DualExecModelBuilder.makeDataConnectionMap(" + parentInstance + "):");
+			Logger.output(builderName() + ".makeDataConnectionMap(" + parentInstance + "):");
 		}
 		if (fbNetwork.isSetDataConnections())
 		{
@@ -878,7 +884,7 @@ class DualExecModelBuilder extends ModelBuilder
 
 	private void makeStartup()
 	{
-		Logger.output("DualExecModelBuilder.makeStartup():");
+		Logger.output(builderName() + ".makeStartup():");
 
 		String fbName = restartInstance;
 		
@@ -896,7 +902,7 @@ class DualExecModelBuilder extends ModelBuilder
 		
 		String from = "s0";
 		String to = "s1"; 
-		startup.addState(to);
+		startup.addState(to,false,false);
 		String event = "send_output_COLD_" + fbName + ";";
 		startup.addTransition(from, to, event, null, null);
 
@@ -909,7 +915,7 @@ class DualExecModelBuilder extends ModelBuilder
 
 			from = to;
 			to = "s2";
-			startup.addState(to);
+			startup.addState(to,false,false);
 			event = "receive_event_" + cntSignal + "_" + cntFB + ";";
 			startup.addTransition(from, to, event, null, null);
 
@@ -917,7 +923,7 @@ class DualExecModelBuilder extends ModelBuilder
 			to = "s3";
 			if (stopInstance != null)
 			{
-				startup.addState(to);
+				startup.addState(to,false,false);
 			}
 			else
 			{
@@ -935,7 +941,7 @@ class DualExecModelBuilder extends ModelBuilder
 			{
 				from = to;
 				to = "s4" ;
-				startup.addState(to);
+				startup.addState(to,false,false);
 				event = "receive_event_STOP_" + stopInstance + ";";
 				startup.addTransition(from, to, event, null, null);
 				
@@ -957,13 +963,13 @@ class DualExecModelBuilder extends ModelBuilder
 
 	private void makeInstanceQueue()
 	{
-		Logger.output("DualExecModelBuilder.makeInstanceQueue():");
+		Logger.output(builderName() + ".makeInstanceQueue():");
 
 		ExtendedAutomaton instanceQueue = getNewAutomaton("Instance Queue");
 		
 		// the maximum number of FB instances in the queue at the same time
 		int places = basicFunctionBlocks.keySet().size();
-		if (instanceQueuePlaces != 0)
+		if (instanceQueuePlaces > 0 && instanceQueuePlaces <= places)
 		{
 			places = instanceQueuePlaces.intValue();
 		}
@@ -1008,12 +1014,12 @@ class DualExecModelBuilder extends ModelBuilder
 
 	private void makeEventExecution()
 	{
-		Logger.output("DualExecModelBuilder.makeEventExecution():");
+		Logger.output(builderName() + ".makeEventExecution():");
 
 		ExtendedAutomaton eventExecution = getNewAutomaton("Event Execution");
 
 		eventExecution.addInitialState("s0");
-		eventExecution.addState("s1");		
+		eventExecution.addState("s1",false,false);
 		eventExecution.addTransition("s0", "s1", "remove_fb;", null, null);	
 
 		int nameCounter = 2;
@@ -1025,7 +1031,7 @@ class DualExecModelBuilder extends ModelBuilder
 			String from = "s1";
 			String to = "s" + nameCounter;
 			nameCounter++;
-			eventExecution.addState(to);
+			eventExecution.addState(to,false,false);
 			String event = "handle_event_" + instanceName + ";";
 			String guard = "current_fb == " + (Integer) basicFunctionBlocksID.get(instanceName);
 			eventExecution.addTransition(from, to, event, guard, null);
@@ -1112,7 +1118,7 @@ class DualExecModelBuilder extends ModelBuilder
 	{
 		if (algMaxID > 0)
 		{
-			Logger.output("DualExecModelBuilder.makeAlgorithmExecution():");
+			Logger.output(builderName() + ".makeAlgorithmExecution():");
 			
 			ExtendedAutomaton algorithmExecution = getNewAutomaton("Algorithm Execution");
 				
@@ -1273,7 +1279,7 @@ class DualExecModelBuilder extends ModelBuilder
 
 	private void makeBasicFB(String fbName)
 	{	
-		Logger.output("DualExecModelBuilder.makeBasicFB(" + fbName + "):");
+		Logger.output(builderName() + ".makeBasicFB(" + fbName + "):");
 	
 		makeBasicFBEventHandling(fbName);
 		makeBasicFBEventQueue(fbName);
@@ -1337,7 +1343,7 @@ class DualExecModelBuilder extends ModelBuilder
 		
 		// the maximum number of events in the queue at the same time
 		int places = ((Integer) eventsMaxID.get(fbName)).intValue();	
-		if (eventQueuePlaces != 0)
+		if (eventQueuePlaces > 0 && eventQueuePlaces <= places )
 		{
 			places = eventQueuePlaces.intValue();
 		}
@@ -1507,6 +1513,7 @@ class DualExecModelBuilder extends ModelBuilder
 				}
 			}
 			
+// 			eventQueue.addState("s" + i,false,false);
 			eventQueue.addState("s" + i);
 
 			for (Iterator evIter = eventInputList.iterator(); evIter.hasNext();)
@@ -1522,6 +1529,7 @@ class DualExecModelBuilder extends ModelBuilder
 					from = "s" + (i-1);
 					to = "s" + (places + nameCounter);
 					nameCounter++;
+// 					eventQueue.addState(to,false,false);
 					eventQueue.addState(to);
 					event = "receive_event_" + eventName + "_" + fbName + ";";
 					eventQueue.addTransition(from, to, event, null, null);
@@ -1529,7 +1537,8 @@ class DualExecModelBuilder extends ModelBuilder
 					from = to;
 					to = "s" + (places + nameCounter);
 					nameCounter++;
-					eventQueue.addState(to);
+//					eventQueue.addState(to,false,false);
+ 					eventQueue.addState(to);
 					event = "queue_event_" + eventName + "_" + fbName + ";";
 					guard = null;
 					action = "event_place_" + i + "_" + fbName + " = " + eventID + ";";
@@ -1591,7 +1600,8 @@ class DualExecModelBuilder extends ModelBuilder
 					from = "s" + i;
 					to = "s" + (places + nameCounter);
 					nameCounter++;
-					eventQueue.addState(to);
+//					eventQueue.addState(to,false,false);
+ 					eventQueue.addState(to);
 					event = "remove_event_" + fbName + ";";
 					guard = "event_place_1_" + fbName + " == " + eventID;
 					action = "event_" + eventName + "_" + fbName + " = 1;";
@@ -1771,7 +1781,15 @@ class DualExecModelBuilder extends ModelBuilder
 		doneInitFinish = false;
 		JaxbECState firstECState = (JaxbECState) ecStates.get(0);
 		String firstECStateName = firstECState.getName();
-		ecc.addInitialState(firstECStateName);
+		if (firstECStateName.startsWith("m"))
+		{
+			ecc.addInitialState(firstECStateName);
+		}
+		else
+		{
+			ecc.addState(firstECStateName,false,true);
+		}
+
 		Logger.output(Logger.DEBUG, "Calling makeECStateBranch() from makeBasicFBExecutionControlChart()", 2);
 		makeECStateBranch(ecc, fbName, firstECStateName, firstECStateName, ecStates, ecTransitions, visitedECStates, 2, identifierMap);
 
@@ -1837,7 +1855,7 @@ class DualExecModelBuilder extends ModelBuilder
 		to = "s" + nameCounter;
 		nameCounter++;
 		Logger.output(Logger.DEBUG, "Adding state: " + to, level);
-		ecc.addState(to);
+		ecc.addState(to,false,false);
 		event = "update_ECC_" + fbName + ";";
 		Logger.output(Logger.DEBUG, "Adding transition: from: " + from + ", to: " + to + ", event: " + event, level);
 		ecc.addTransition(from, to, event, null, null);
@@ -1876,7 +1894,7 @@ class DualExecModelBuilder extends ModelBuilder
 			from = prevStateName;
 			to =  curECDestName + "_actions";
 			Logger.output(Logger.DEBUG, "Adding state: " + to, level);
-			ecc.addState(to);
+			ecc.addState(to,false,false);
 			if (curECTransition.getCondition().equals("1"))
 			{
 				oneTransitionFromECSource = true;
@@ -1926,7 +1944,7 @@ class DualExecModelBuilder extends ModelBuilder
 								to = "s" + nameCounter;
 								nameCounter++;
 								Logger.output(Logger.DEBUG, "Adding state: " + to, level);
-								ecc.addState(to);
+								ecc.addState(to,false,false);
 								event = "event_input_" + curEventInputName + "_" + fbName + ";";
 								newGuard = "event_" + curEventInputName + "_" + fbName + " == 1 & (" + guard + ")";
 								Logger.output(Logger.DEBUG, "Adding transition: from: " + from + ", to: " + to + ", event: " + event, level);
@@ -1981,7 +1999,7 @@ class DualExecModelBuilder extends ModelBuilder
 							to = "s" + nameCounter; 
 							nameCounter++;
 							Logger.output(Logger.DEBUG, "Adding state: " + to, level);
-							ecc.addState(to);
+							ecc.addState(to,false,false);
 							event = "queue_job_" + actionAlgorithm + "_" + fbName + ";";
 							Logger.output(Logger.DEBUG, "Adding transition: from " + from + ": to " + to + ": event " + event, level);
 							ecc.addTransition(from, to, event, null, null);
@@ -1993,7 +2011,7 @@ class DualExecModelBuilder extends ModelBuilder
 								to = "s" + nameCounter; 
 								nameCounter++;
 								Logger.output(Logger.DEBUG, "Adding state: " + to, level);
-								ecc.addState(to);
+								ecc.addState(to,false,false);
 								event = "finished_execution_" + actionAlgorithm + "_" + fbName + ";";
 								Logger.output(Logger.DEBUG, "Adding transition: from: " + from + ", to: " + to + ", event: " + event, level);
 								ecc.addTransition(from, to, event, null, null);
@@ -2003,7 +2021,7 @@ class DualExecModelBuilder extends ModelBuilder
 								to = "s" + nameCounter; 
 								nameCounter++;
 								Logger.output(Logger.DEBUG, "Adding state: " + to, level);
-								ecc.addState(to);
+								ecc.addState(to,false,false);
 								event = "send_output_" + curAction.getOutput() + "_" + fbName + ";";
 								Logger.output(Logger.DEBUG, "Adding transition: from: " + from + ", to: " + to + ", event: " + event, level);
 								ecc.addTransition(from, to, event, null, null);
@@ -2020,7 +2038,7 @@ class DualExecModelBuilder extends ModelBuilder
 									to = "s" + nameCounter; 
 									nameCounter++;
 									Logger.output(Logger.DEBUG, "Adding state: " + to, level);
-									ecc.addState(to);
+									ecc.addState(to,false,false);
 									event = "receive_event_" + cntSignal + "_" + cntFB + ";";
 									Logger.output(Logger.DEBUG, "Adding transition: from: " + from + ", to: " + to + ", event: " + event, level);
 									ecc.addTransition(from, to, event, null, null);
@@ -2030,7 +2048,7 @@ class DualExecModelBuilder extends ModelBuilder
 									to = "s" + nameCounter; 
 									nameCounter++;
 									Logger.output(Logger.DEBUG, "Adding state: " + to, level);
-									ecc.addState(to);
+									ecc.addState(to,false,false);
 									event = "received_event_" + cntSignal + "_" + cntFB + ";";
 									Logger.output(Logger.DEBUG, "Adding transition: from: " + from + ", to: " + to + ", event: " + event, level);
 									ecc.addTransition(from, to, event, null, null);
@@ -2043,7 +2061,7 @@ class DualExecModelBuilder extends ModelBuilder
 								to = "s" + nameCounter; 
 								nameCounter++;
 								Logger.output(Logger.DEBUG, "Adding state: " + to, level);
-								ecc.addState(to);
+								ecc.addState(to,false,false);
 								event = "finished_execution_" + actionAlgorithm + "_" + fbName + ";";
 								Logger.output(Logger.DEBUG, "Adding transition: from: " + from + ", to: " + to + ", event: " + event, level);
 								ecc.addTransition(from, to, event, null, null);
@@ -2056,7 +2074,7 @@ class DualExecModelBuilder extends ModelBuilder
 							to = "s" + nameCounter; 
 							nameCounter++;
 							Logger.output(Logger.DEBUG, "Adding state: " + to, level);
-							ecc.addState(to);
+							ecc.addState(to,false,false);
 							event = "send_output_" + curAction.getOutput() + "_" + fbName + ";";
 							Logger.output(Logger.DEBUG, "Adding transition: from: " + from + ", to: " + to + ", event: " + event, level);
 							ecc.addTransition(from, to, event, null, null);
@@ -2073,7 +2091,7 @@ class DualExecModelBuilder extends ModelBuilder
 								to = "s" + nameCounter; 
 								nameCounter++;
 								Logger.output(Logger.DEBUG, "Adding state: " + to, level);
-								ecc.addState(to);
+								ecc.addState(to,false,false);
 								event = "receive_event_" + cntSignal + "_" + cntFB + ";";
 								Logger.output(Logger.DEBUG, "Adding transition: from: " + from + ", to: " + to + ", event: " + event, level);
 								ecc.addTransition(from, to, event, null, null);
@@ -2083,7 +2101,7 @@ class DualExecModelBuilder extends ModelBuilder
 								to = "s" + nameCounter; 
 								nameCounter++;
 								Logger.output(Logger.DEBUG, "Adding state: " + to, level);
-								ecc.addState(to);
+								ecc.addState(to,false,false);
 								event = "received_event_" + cntSignal + "_" + cntFB + ";";
 								Logger.output(Logger.DEBUG, "Adding transition: from: " + from + ", to: " + to + ", event: " + event, level);
 								ecc.addTransition(from, to, event, null, null);
@@ -2123,7 +2141,14 @@ class DualExecModelBuilder extends ModelBuilder
 					from = next;
 					to = curECDestName; 
 					Logger.output(Logger.DEBUG, "Adding state: " + to, level);
-					ecc.addState(to);
+					if(curECDestName.startsWith("m"))
+					{
+						ecc.addState(to);
+					}
+					else
+					{
+						ecc.addState(to,false,false);
+					}
 					event = "no_more_actions_" + fbName + ";";
 					Logger.output(Logger.DEBUG, "Adding transition: from: " + from + ", to: " + to + ", event: " + event, level);
 					ecc.addTransition(from, to, event, null, null);
@@ -2139,7 +2164,14 @@ class DualExecModelBuilder extends ModelBuilder
 					from = next;
 					to = curECDestName; 
 					Logger.output(Logger.DEBUG, "Adding state: " + to, level);
-					ecc.addState(to);
+					if(curECDestName.startsWith("m"))
+					{
+						ecc.addState(to);
+					}
+					else
+					{
+						ecc.addState(to,false,false);
+					}
 					event = "no_more_actions_" + fbName + ";";
 					Logger.output(Logger.DEBUG, "Adding transition: from: " + from + ", to: " + to + ", event: " + event, level);
 					ecc.addTransition(from, to, event, null, null);
@@ -2155,7 +2187,7 @@ class DualExecModelBuilder extends ModelBuilder
 					to = "s" + nameCounter;
 					nameCounter++;
 					Logger.output(Logger.DEBUG, "Adding state: " + to, level);
-					ecc.addState(to);
+					ecc.addState(to,false,false);
 					event = "no_more_actions_" + fbName + ";";
 					Logger.output(Logger.DEBUG, "Adding transition: from: " + from + ", to: " + to + ", event: " + event, level);
 					ecc.addTransition(from, to, event, null, null);
@@ -2166,7 +2198,7 @@ class DualExecModelBuilder extends ModelBuilder
 					to = "s" + nameCounter;
 					nameCounter++;
 					Logger.output(Logger.DEBUG, "Adding state: " + to, level);
-					ecc.addState(to);
+					ecc.addState(to,false,false);
 					event = "update_ECC_" + fbName + ";";
 					Logger.output(Logger.DEBUG, "Adding transition: from: " + from + ", to: " + to + ", event: " + event, level);
 					ecc.addTransition(from, to, event, null, null);
@@ -2176,7 +2208,14 @@ class DualExecModelBuilder extends ModelBuilder
 					from = next;
 					to = curECDestName;
 					Logger.output(Logger.DEBUG, "Adding state: " + to, level);
-					ecc.addState(to);
+					if(curECDestName.startsWith("m"))
+					{
+						ecc.addState(to);
+					}
+					else
+					{
+						ecc.addState(to,false,false);
+					}
 					event = "handling_event_done_" + fbName + ";";
 					Logger.output(Logger.DEBUG, "Adding transition: from: " + from + ", to: " + to + ", event: " + event, level);
 					ecc.addTransition(from, to, event, null, null);
@@ -2193,7 +2232,7 @@ class DualExecModelBuilder extends ModelBuilder
 					to = "s" + nameCounter;
 					nameCounter++;
 					Logger.output(Logger.DEBUG, "Adding state: " + to, level);
-					ecc.addState(to);
+					ecc.addState(to,false,false);
 					event = "no_more_actions_" + fbName + ";";
 					Logger.output(Logger.DEBUG, "Adding transition: from: " + from + ", to: " + to + ", event: " + event, level);
 					ecc.addTransition(from, to, event, null, null);
@@ -2204,7 +2243,7 @@ class DualExecModelBuilder extends ModelBuilder
 					to = "s" + nameCounter;
 					nameCounter++;
 					Logger.output(Logger.DEBUG, "Adding state: " + to, level);
-					ecc.addState(to);
+					ecc.addState(to,false,false);
 					event = "update_ECC_" + fbName + ";";
 					Logger.output(Logger.DEBUG, "Adding transition: from: " + from + ", to: " + to + ", event: " + event, level);
 					ecc.addTransition(from, to, event, null, null);
@@ -2213,8 +2252,15 @@ class DualExecModelBuilder extends ModelBuilder
 					// handling_event_done model transition
 					from = next;
 					to = curECDestName;
+					if(curECDestName.startsWith("m"))
+					{
+						ecc.addState(to);
+					}
+					else
+					{
+						ecc.addState(to,false,false);
+					}
 					Logger.output(Logger.DEBUG, "Adding state: " + to, level);
-					ecc.addState(to);
 					event = "handling_event_done_" + fbName + ";";
 					Logger.output(Logger.DEBUG, "Adding transition: from: " + from + ", to: " + to + ", event: " + event, level);
 					ecc.addTransition(from, to, event, null, null);
@@ -2229,7 +2275,7 @@ class DualExecModelBuilder extends ModelBuilder
 			from = noTransitionFrom;
 			to = "s" + nameCounter;
 			nameCounter++;
-			ecc.addState(to);
+			ecc.addState(to,false,false);
 			event = "no_transition_" + fbName + ";";
 			Logger.output(Logger.DEBUG, "Adding transition: from: " + from + ", to: " + to + ", event: " + event, level);
 			ecc.addTransition(from, to, event, noTransitionGuard, null);
@@ -2237,7 +2283,7 @@ class DualExecModelBuilder extends ModelBuilder
 			from = to;
 			to = "s" + nameCounter;
 			nameCounter++;
-			ecc.addState(to);
+			ecc.addState(to,false,false);
 			// reset active event
 			for (Iterator iter = eventInputs.iterator();iter.hasNext();)
 			{
@@ -2525,7 +2571,7 @@ class DualExecModelBuilder extends ModelBuilder
 
 	private void printFunctionBlocksMap()
 	{
-		Logger.output(Logger.DEBUG, "DualExecModelBuilder.printFunctionBlocksMap():");
+		Logger.output(Logger.DEBUG, builderName() + ".printFunctionBlocksMap():");
 		for (Iterator iter = functionBlocks.keySet().iterator(); iter.hasNext();)
 		{
 			String curBlock = (String) iter.next();
@@ -2536,7 +2582,7 @@ class DualExecModelBuilder extends ModelBuilder
 
 	private void printBasicFunctionBlocksMap()
 	{
-		Logger.output(Logger.DEBUG, "DualExecModelBuilder.printBasicFunctionBlocksMap():");
+		Logger.output(Logger.DEBUG, builderName() + ".printBasicFunctionBlocksMap():");
 		for (Iterator iter = basicFunctionBlocks.keySet().iterator(); iter.hasNext();)
 		{
 			String curBlock = (String) iter.next();
@@ -2549,7 +2595,7 @@ class DualExecModelBuilder extends ModelBuilder
 
 	private void printEventsMap()
 	{
-		Logger.output(Logger.DEBUG, "DualExecModelBuilder.printEventsMap():");
+		Logger.output(Logger.DEBUG, builderName() + ".printEventsMap():");
 		for (Iterator iter = events.keySet().iterator(); iter.hasNext();)
 		{
 			String curBlock = (String) iter.next();
@@ -2568,7 +2614,7 @@ class DualExecModelBuilder extends ModelBuilder
 
 	private void printAlgorithmsMap()
 	{
-		Logger.output(Logger.DEBUG, "DualExecModelBuilder.printAlgorithmsMap():");
+		Logger.output(Logger.DEBUG, builderName() + ".printAlgorithmsMap():");
 		for (Iterator iter = algorithms.keySet().iterator(); iter.hasNext();)
 		{
 			String curBlock = (String) iter.next();
@@ -2586,7 +2632,7 @@ class DualExecModelBuilder extends ModelBuilder
 
 	private void printAlgorithmTextsMap()
 	{
-		Logger.output(Logger.DEBUG, "DualExecModelBuilder.printAlgorithmTextsMap():");
+		Logger.output(Logger.DEBUG, builderName() + ".printAlgorithmTextsMap():");
 		for (Iterator iter = algorithmTexts.keySet().iterator(); iter.hasNext();)
 		{
 			String curBlock = (String) iter.next();
@@ -2603,7 +2649,7 @@ class DualExecModelBuilder extends ModelBuilder
 	
 	private void printFBTypesMap()
 	{
-		Logger.output(Logger.DEBUG, "DualExecModelBuilder.printFBTypesMap():");
+		Logger.output(Logger.DEBUG, builderName() + ".printFBTypesMap():");
 		for (Iterator iter = fbTypes.keySet().iterator(); iter.hasNext();)
 		{
 			String curBlock = (String) iter.next();
@@ -2614,7 +2660,7 @@ class DualExecModelBuilder extends ModelBuilder
 	
 	private void printEventConnectionsMap()
 	{
-		Logger.output(Logger.DEBUG, "DualExecModelBuilder.printEventConnectionsMap():");
+		Logger.output(Logger.DEBUG, builderName() + ".printEventConnectionsMap():");
 		for (Iterator fbIter = eventConnections.keySet().iterator(); fbIter.hasNext();)
 		{
 			String curBlock = (String) fbIter.next();
@@ -2631,7 +2677,7 @@ class DualExecModelBuilder extends ModelBuilder
 	
 	private void printDataConnectionsMap()
 	{
-		Logger.output(Logger.DEBUG, "DualExecModelBuilder.printDataConnectionsMap():");
+		Logger.output(Logger.DEBUG, builderName() + ".printDataConnectionsMap():");
 		for (Iterator fbIter = dataConnections.keySet().iterator(); fbIter.hasNext();)
 		{
 			String curBlock = (String) fbIter.next();

@@ -48,12 +48,12 @@ import net.sourceforge.fuber.model.interpreters.abstractsyntax.Identifier;
 
 import net.sourceforge.fuber.xsd.libraryelement.*;
 
-class SequentialExecModelBuilder extends ModelBuilder
+class SequentialExecModelBuilder implements ModelBuilder
 {
 
 	// input arguments
 	private boolean expandTransitions = false;
-	private boolean generatePlantModels = true;
+	private boolean generatePlantModels = false;
 
 	private Integer eventQueuePlaces = 0;
 	private Integer instanceQueuePlaces = 0;
@@ -118,6 +118,8 @@ class SequentialExecModelBuilder extends ModelBuilder
 	private boolean doneInitActions = false;
 	private boolean doneInitFinish = false;
 	
+	SequentialExecModelBuilder() {}
+
 	SequentialExecModelBuilder(Map<String, String> arguments)
 	{
 		// get arguments
@@ -171,11 +173,11 @@ class SequentialExecModelBuilder extends ModelBuilder
 
 				if (!libraryPathBaseFile.isDirectory())
 				{
-					Logger.output(Logger.ERROR, "SequentialExecModelBuilder(): Specified library base is not a directory!: " + libraryPathBaseFile.getName());
+					Logger.output(Logger.ERROR, builderName() + "(): Specified library base is not a directory!: " + libraryPathBaseFile.getName());
 				}
 				else if (!libraryPathBaseFile.exists())
 				{
-					Logger.output(Logger.ERROR, "SequentialExecModelBuilder(): Specified library base does not exist!: " + libraryPathBaseFile.getName());
+					Logger.output(Logger.ERROR, builderName() + "(): Specified library base does not exist!: " + libraryPathBaseFile.getName());
 				}
 				else
 				{
@@ -202,11 +204,11 @@ class SequentialExecModelBuilder extends ModelBuilder
 
 				if (!curLibraryDir.isDirectory())
 				{
-					Logger.output(Logger.ERROR, "SequentialExecModelBuilder(): Specified library path element " + curLibraryDir.getAbsolutePath() + " is not a directory!");
+					Logger.output(Logger.ERROR, builderName() + "(): Specified library path element " + curLibraryDir.getAbsolutePath() + " is not a directory!");
 				}
 				else if (!curLibraryDir.exists())
 				{
-					Logger.output(Logger.ERROR, "SequentialExecModelBuilder(): Specified library path element " + curLibraryDir.getAbsolutePath() + " does not exist!");
+					Logger.output(Logger.ERROR, builderName() + "(): Specified library path element " + curLibraryDir.getAbsolutePath() + " does not exist!");
 				}
 				else
 				{
@@ -244,16 +246,21 @@ class SequentialExecModelBuilder extends ModelBuilder
 		}
 	}
 
-	void loadSystem()
+	String builderName()
 	{
-		Logger.output("SequentialExecModelBuilder.loadSystem()");
+		return this.getClass().getName().substring(this.getClass().getName().lastIndexOf(".")+1);
+	}
+
+	public void loadSystem()
+	{
+		Logger.output(builderName() + ".loadSystem()");
 
 		loadSystem(systemFileName);
 	}
 
-	void analyzeSystem()
+	public void analyzeSystem()
 	{
-		Logger.output("SequentialExecModelBuilder.analyzeSystem()");
+		Logger.output(builderName() + ".analyzeSystem()");
 
 		makeEventConnectionsMap(systemFBNetwork, null, 0);
 		
@@ -272,9 +279,9 @@ class SequentialExecModelBuilder extends ModelBuilder
 		}
 	}
 	
-	void buildModels()
+	public void buildModels()
 	{
-		Logger.output("SequentialExecModelBuilder.buildModels()");
+		Logger.output(builderName() + ".buildModels()");
 
  		automata = new ExtendedAutomata(theSystem.getName(), expandTransitions);
 		
@@ -295,16 +302,16 @@ class SequentialExecModelBuilder extends ModelBuilder
 		}
 	}
 	
-	void writeResult()
+	public void writeResult()
 	{
-		Logger.output("SequentialExecModelBuilder.writeResult()");
+		Logger.output(builderName() + ".writeResult()");
 		automata.writeToFile(new File(outputFileName));
 	}
 
     private void loadSystem(String fileName)
     {
 	
-		Logger.output("SequentialExecModelBuilder.loadSystem(" + fileName + "):");		
+		Logger.output(builderName() + ".loadSystem(" + fileName + "):");		
 		File file = getFile(fileName);
 
 		Logger.output("Loading file " + file.getName() + " from " + file.getParent(), 1);
@@ -371,7 +378,7 @@ class SequentialExecModelBuilder extends ModelBuilder
 		String typeName = fb.getType();
 		String fileName = typeName + ".fbt";
 	
-		Logger.output("SequentialExecModelBuilder.loadFB(" + instanceName + ", " + fileName + "):");
+		Logger.output(builderName() + ".loadFB(" + instanceName + ", " + fileName + "):");
 				
 		if (typeName.equals("E_RESTART"))
 		{
@@ -505,7 +512,7 @@ class SequentialExecModelBuilder extends ModelBuilder
 				}
 				else
 				{
-					Logger.output(Logger.ERROR, "Error!: SequentialExecModelBuilder.loadFB(" + instanceName + ", " + fileName + "): Unsupported FB type: " + typeName);
+					Logger.output(Logger.ERROR, builderName() + ".loadFB(" + instanceName + ", " + fileName + "): Unsupported FB type: " + typeName);
 					Logger.output(Logger.ERROR, "Neither a Basic FB nor a Composite FB.", 1);
 					exit(1);
 				}
@@ -523,7 +530,7 @@ class SequentialExecModelBuilder extends ModelBuilder
 			{
 				File curLibraryDir = (File) iter.next();
 				theFile = new File(curLibraryDir, fileName);
-				Logger.output(Logger.DEBUG, "SequentialExecModelBuilder.getFile(): Looking for file " + theFile.toString());
+				Logger.output(Logger.DEBUG, builderName() + ".getFile(): Looking for file " + theFile.toString());
 				if (theFile.exists())
 				{
 					break;
@@ -533,7 +540,7 @@ class SequentialExecModelBuilder extends ModelBuilder
 
 		if (!theFile.exists())
 		{
-			Logger.output(Logger.ERROR, "SequentialExecModelBuilder.getFile(" + fileName + "): The file " + fileName + " does not exist in the specified libraries...");
+			Logger.output(Logger.ERROR, builderName() + ".getFile(" + fileName + "): The file " + fileName + " does not exist in the specified libraries...");
 			if (libraryPathList != null)
 			{
 				for (Iterator iter = libraryPathList.iterator();iter.hasNext();)
@@ -556,11 +563,11 @@ class SequentialExecModelBuilder extends ModelBuilder
 	{
 		if (parentInstance == null)
 		{
-			Logger.output("SequentialExecModelBuilder.makeEventConnectionMap(System):");
+			Logger.output(builderName() + ".makeEventConnectionMap(System):");
 		}
 		else
 		{
-			Logger.output("SequentialExecModelBuilder.makeEventConnectionMap(" + parentInstance + "):");
+			Logger.output(builderName() + ".makeEventConnectionMap(" + parentInstance + "):");
 		}
 		
 		for (Iterator connIter = fbNetwork.getEventConnections().getConnection().iterator();
@@ -706,11 +713,11 @@ class SequentialExecModelBuilder extends ModelBuilder
 	{
 		if (parentInstance == null)
 		{
-			Logger.output("SequentialExecModelBuilder.makeDataConnectionMap(System):");
+			Logger.output(builderName() + ".makeDataConnectionMap(System):");
 		}
 		else
 		{
-			Logger.output("SequentialExecModelBuilder.makeDataConnectionMap(" + parentInstance + "):");
+			Logger.output(builderName() + ".makeDataConnectionMap(" + parentInstance + "):");
 		}
 		if (fbNetwork.isSetDataConnections())
 		{
@@ -877,7 +884,7 @@ class SequentialExecModelBuilder extends ModelBuilder
 
 	private void makeStartup()
 	{
-		Logger.output("SequentialExecModelBuilder.makeStartup():");
+		Logger.output(builderName() + ".makeStartup():");
 
 		String fbName = restartInstance;
 		
@@ -895,7 +902,7 @@ class SequentialExecModelBuilder extends ModelBuilder
 		
 		String from = "s0";
 		String to = "s1"; 
-		startup.addState(to);
+		startup.addState(to,false,false);
 		String event = "send_output_COLD_" + fbName + ";";
 		startup.addTransition(from, to, event, null, null);
 
@@ -908,7 +915,7 @@ class SequentialExecModelBuilder extends ModelBuilder
 
 			from = to;
 			to = "s2";
-			startup.addState(to);
+			startup.addState(to,false,false);
 			event = "receive_event_" + cntSignal + "_" + cntFB + ";";
 			startup.addTransition(from, to, event, null, null);
 
@@ -916,7 +923,7 @@ class SequentialExecModelBuilder extends ModelBuilder
 			to = "s3";
 			if (stopInstance != null)
 			{
-				startup.addState(to);
+				startup.addState(to,false,false);
 			}
 			else
 			{
@@ -934,7 +941,7 @@ class SequentialExecModelBuilder extends ModelBuilder
 			{
 				from = to;
 				to = "s4" ;
-				startup.addState(to);
+				startup.addState(to,false,false);
 				event = "receive_event_STOP_" + stopInstance + ";";
 				startup.addTransition(from, to, event, null, null);
 				
@@ -956,7 +963,7 @@ class SequentialExecModelBuilder extends ModelBuilder
 
 	private void makeInstanceQueue()
 	{
-		Logger.output("SequentialExecModelBuilder.makeInstanceQueue():");
+		Logger.output(builderName() + ".makeInstanceQueue():");
 
 		ExtendedAutomaton instanceQueue = getNewAutomaton("Instance Queue");
 		
@@ -1017,12 +1024,12 @@ class SequentialExecModelBuilder extends ModelBuilder
 
 	private void makeEventExecution()
 	{
-		Logger.output("SequentialExecModelBuilder.makeEventExecution():");
+		Logger.output(builderName() + ".makeEventExecution():");
 
 		ExtendedAutomaton eventExecution = getNewAutomaton("Event Execution");
 
 		eventExecution.addInitialState("s0");
-		eventExecution.addState("s1");		
+		eventExecution.addState("s1",false,false);
 		eventExecution.addTransition("s0", "s1", "remove_fb;", null, null);	
 
 		int nameCounter = 2;
@@ -1034,7 +1041,7 @@ class SequentialExecModelBuilder extends ModelBuilder
 			String from = "s1";
 			String to = "s" + nameCounter;
 			nameCounter++;
-			eventExecution.addState(to);
+			eventExecution.addState(to,false,false);
 			String event = "handle_event_" + instanceName + ";";
 			String guard = "current_fb == " + (Integer) basicFunctionBlocksID.get(instanceName);
 			eventExecution.addTransition(from, to, event, guard, null);
@@ -1051,7 +1058,7 @@ class SequentialExecModelBuilder extends ModelBuilder
 	{
 		if (algMaxID > 0)
 		{
-			Logger.output("SequentialExecModelBuilder.makeAlgorithmExecution():");
+			Logger.output(builderName() + ".makeAlgorithmExecution():");
 			
 			ExtendedAutomaton algorithmExecution = getNewAutomaton("Algorithm Execution");
 				
@@ -1091,7 +1098,7 @@ class SequentialExecModelBuilder extends ModelBuilder
 							from = "s0";
 							to = "s" + nameCounter;
 							nameCounter++;
-							algorithmExecution.addState(to);
+							algorithmExecution.addState(to,false,false);
 							event = "execute_" + algName + "_" + instanceName + ";";
 							//guard = "current_job_fb == " + instanceID;
 							//guard = guard + " & current_job_alg == " + algID;
@@ -1211,7 +1218,7 @@ class SequentialExecModelBuilder extends ModelBuilder
 
 	private void makeBasicFB(String fbName)
 	{	
-		Logger.output("SequentialExecModelBuilder.makeBasicFB(" + fbName + "):");
+		Logger.output(builderName() + ".makeBasicFB(" + fbName + "):");
 	
 		makeBasicFBEventHandling(fbName);
 		makeBasicFBEventQueue(fbName);
@@ -1448,6 +1455,7 @@ class SequentialExecModelBuilder extends ModelBuilder
 				}
 			}
 			
+// 			eventQueue.addState("s" + i,false,false);
 			eventQueue.addState("s" + i);
 
 			for (Iterator evIter = eventInputList.iterator(); evIter.hasNext();)
@@ -1463,6 +1471,7 @@ class SequentialExecModelBuilder extends ModelBuilder
 					from = "s" + (i-1);
 					to = "s" + (places + nameCounter);
 					nameCounter++;
+// 					eventQueue.addState(to,false,false);
 					eventQueue.addState(to);
 					event = "receive_event_" + eventName + "_" + fbName + ";";
 					eventQueue.addTransition(from, to, event, null, null);
@@ -1470,7 +1479,8 @@ class SequentialExecModelBuilder extends ModelBuilder
 					from = to;
 					to = "s" + (places + nameCounter);
 					nameCounter++;
-					eventQueue.addState(to);
+//					eventQueue.addState(to,false,false);
+ 					eventQueue.addState(to);
 					event = "queue_event_" + eventName + "_" + fbName + ";";
 					for (int j = 1; j <= places; j++)
 					{
@@ -1535,7 +1545,8 @@ class SequentialExecModelBuilder extends ModelBuilder
 					from = "s" + i;
 					to = "s" + (places + nameCounter);
 					nameCounter++;
-					eventQueue.addState(to);
+//					eventQueue.addState(to,false,false);
+ 					eventQueue.addState(to);
 					event = "remove_event_" + fbName + ";";
 					for (int j = 1; j <= places; j++)
 					{
@@ -1702,7 +1713,15 @@ class SequentialExecModelBuilder extends ModelBuilder
 		doneInitFinish = false;
 		JaxbECState firstECState = (JaxbECState) ecStates.get(0);
 		String firstECStateName = firstECState.getName();
-		ecc.addInitialState(firstECStateName);
+		if (firstECStateName.startsWith("m"))
+		{
+			ecc.addInitialState(firstECStateName);
+		}
+		else
+		{
+			ecc.addState(firstECStateName,false,true);
+		}
+
 		Logger.output(Logger.DEBUG, "Calling makeECStateBranch() from makeBasicFBExecutionControlChart()", 2);
 		makeECStateBranch(ecc, fbName, firstECStateName, firstECStateName, ecStates, ecTransitions, visitedECStates, 2, identifierMap);
 
@@ -1768,7 +1787,7 @@ class SequentialExecModelBuilder extends ModelBuilder
 		to = "s" + nameCounter;
 		nameCounter++;
 		Logger.output(Logger.DEBUG, "Adding state: " + to, level);
-		ecc.addState(to);
+		ecc.addState(to,false,false);
 		event = "update_ECC_" + fbName + ";";
 		Logger.output(Logger.DEBUG, "Adding transition: from: " + from + ", to: " + to + ", event: " + event, level);
 		ecc.addTransition(from, to, event, null, null);
@@ -1807,7 +1826,7 @@ class SequentialExecModelBuilder extends ModelBuilder
 			from = prevStateName;
 			to =  curECDestName + "_actions";
 			Logger.output(Logger.DEBUG, "Adding state: " + to, level);
-			ecc.addState(to);
+			ecc.addState(to,false,false);
 			if (curECTransition.getCondition().equals("1"))
 			{
 				oneTransitionFromECSource = true;
@@ -1857,7 +1876,7 @@ class SequentialExecModelBuilder extends ModelBuilder
 								to = "s" + nameCounter;
 								nameCounter++;
 								Logger.output(Logger.DEBUG, "Adding state: " + to, level);
-								ecc.addState(to);
+								ecc.addState(to,false,false);
 								event = "event_input_" + curEventInputName + "_" + fbName + ";";
 								newGuard = "event_" + curEventInputName + "_" + fbName + " == 1 & (" + guard + ")";
 								Logger.output(Logger.DEBUG, "Adding transition: from: " + from + ", to: " + to + ", event: " + event, level);
@@ -1912,7 +1931,7 @@ class SequentialExecModelBuilder extends ModelBuilder
 							to = "s" + nameCounter; 
 							nameCounter++;
 							Logger.output(Logger.DEBUG, "Adding state: " + to, level);
-							ecc.addState(to);
+							ecc.addState(to,false,false);
 							event = "execute_" + actionAlgorithm + "_" + fbName + ";";
 							Logger.output(Logger.DEBUG, "Adding transition: from " + from + ": to " + to + ": event " + event, level);
 							ecc.addTransition(from, to, event, null, null);
@@ -1924,7 +1943,7 @@ class SequentialExecModelBuilder extends ModelBuilder
 								to = "s" + nameCounter; 
 								nameCounter++;
 								Logger.output(Logger.DEBUG, "Adding state: " + to, level);
-								ecc.addState(to);
+								ecc.addState(to,false,false);
 								event = "finished_execution_" + actionAlgorithm + "_" + fbName + ";";
 								Logger.output(Logger.DEBUG, "Adding transition: from: " + from + ", to: " + to + ", event: " + event, level);
 								ecc.addTransition(from, to, event, null, null);
@@ -1934,7 +1953,7 @@ class SequentialExecModelBuilder extends ModelBuilder
 								to = "s" + nameCounter; 
 								nameCounter++;
 								Logger.output(Logger.DEBUG, "Adding state: " + to, level);
-								ecc.addState(to);
+								ecc.addState(to,false,false);
 								event = "send_output_" + curAction.getOutput() + "_" + fbName + ";";
 								Logger.output(Logger.DEBUG, "Adding transition: from: " + from + ", to: " + to + ", event: " + event, level);
 								ecc.addTransition(from, to, event, null, null);
@@ -1951,7 +1970,7 @@ class SequentialExecModelBuilder extends ModelBuilder
 									to = "s" + nameCounter; 
 									nameCounter++;
 									Logger.output(Logger.DEBUG, "Adding state: " + to, level);
-									ecc.addState(to);
+									ecc.addState(to,false,false);
 									event = "receive_event_" + cntSignal + "_" + cntFB + ";";
 									Logger.output(Logger.DEBUG, "Adding transition: from: " + from + ", to: " + to + ", event: " + event, level);
 									ecc.addTransition(from, to, event, null, null);
@@ -1961,7 +1980,7 @@ class SequentialExecModelBuilder extends ModelBuilder
 									to = "s" + nameCounter; 
 									nameCounter++;
 									Logger.output(Logger.DEBUG, "Adding state: " + to, level);
-									ecc.addState(to);
+									ecc.addState(to,false,false);
 									event = "received_event_" + cntSignal + "_" + cntFB + ";";
 									Logger.output(Logger.DEBUG, "Adding transition: from: " + from + ", to: " + to + ", event: " + event, level);
 									ecc.addTransition(from, to, event, null, null);
@@ -1974,7 +1993,7 @@ class SequentialExecModelBuilder extends ModelBuilder
 								to = "s" + nameCounter; 
 								nameCounter++;
 								Logger.output(Logger.DEBUG, "Adding state: " + to, level);
-								ecc.addState(to);
+								ecc.addState(to,false,false);
 								event = "finished_execution_" + actionAlgorithm + "_" + fbName + ";";
 								Logger.output(Logger.DEBUG, "Adding transition: from: " + from + ", to: " + to + ", event: " + event, level);
 								ecc.addTransition(from, to, event, null, null);
@@ -1987,7 +2006,7 @@ class SequentialExecModelBuilder extends ModelBuilder
 							to = "s" + nameCounter; 
 							nameCounter++;
 							Logger.output(Logger.DEBUG, "Adding state: " + to, level);
-							ecc.addState(to);
+							ecc.addState(to,false,false);
 							event = "send_output_" + curAction.getOutput() + "_" + fbName + ";";
 							Logger.output(Logger.DEBUG, "Adding transition: from: " + from + ", to: " + to + ", event: " + event, level);
 							ecc.addTransition(from, to, event, null, null);
@@ -2004,7 +2023,7 @@ class SequentialExecModelBuilder extends ModelBuilder
 								to = "s" + nameCounter; 
 								nameCounter++;
 								Logger.output(Logger.DEBUG, "Adding state: " + to, level);
-								ecc.addState(to);
+								ecc.addState(to,false,false);
 								event = "receive_event_" + cntSignal + "_" + cntFB + ";";
 								Logger.output(Logger.DEBUG, "Adding transition: from: " + from + ", to: " + to + ", event: " + event, level);
 								ecc.addTransition(from, to, event, null, null);
@@ -2014,7 +2033,7 @@ class SequentialExecModelBuilder extends ModelBuilder
 								to = "s" + nameCounter; 
 								nameCounter++;
 								Logger.output(Logger.DEBUG, "Adding state: " + to, level);
-								ecc.addState(to);
+								ecc.addState(to,false,false);
 								event = "received_event_" + cntSignal + "_" + cntFB + ";";
 								Logger.output(Logger.DEBUG, "Adding transition: from: " + from + ", to: " + to + ", event: " + event, level);
 								ecc.addTransition(from, to, event, null, null);
@@ -2054,7 +2073,14 @@ class SequentialExecModelBuilder extends ModelBuilder
 					from = next;
 					to = curECDestName; 
 					Logger.output(Logger.DEBUG, "Adding state: " + to, level);
-					ecc.addState(to);
+					if(curECDestName.startsWith("m"))
+					{
+						ecc.addState(to);
+					}
+					else
+					{
+						ecc.addState(to,false,false);
+					}
 					event = "no_more_actions_" + fbName + ";";
 					Logger.output(Logger.DEBUG, "Adding transition: from: " + from + ", to: " + to + ", event: " + event, level);
 					ecc.addTransition(from, to, event, null, null);
@@ -2070,7 +2096,14 @@ class SequentialExecModelBuilder extends ModelBuilder
 					from = next;
 					to = curECDestName; 
 					Logger.output(Logger.DEBUG, "Adding state: " + to, level);
-					ecc.addState(to);
+					if(curECDestName.startsWith("m"))
+					{
+						ecc.addState(to);
+					}
+					else
+					{
+						ecc.addState(to,false,false);
+					}
 					event = "no_more_actions_" + fbName + ";";
 					Logger.output(Logger.DEBUG, "Adding transition: from: " + from + ", to: " + to + ", event: " + event, level);
 					ecc.addTransition(from, to, event, null, null);
@@ -2086,7 +2119,7 @@ class SequentialExecModelBuilder extends ModelBuilder
 					to = "s" + nameCounter;
 					nameCounter++;
 					Logger.output(Logger.DEBUG, "Adding state: " + to, level);
-					ecc.addState(to);
+					ecc.addState(to,false,false);
 					event = "no_more_actions_" + fbName + ";";
 					Logger.output(Logger.DEBUG, "Adding transition: from: " + from + ", to: " + to + ", event: " + event, level);
 					ecc.addTransition(from, to, event, null, null);
@@ -2097,7 +2130,7 @@ class SequentialExecModelBuilder extends ModelBuilder
 					to = "s" + nameCounter;
 					nameCounter++;
 					Logger.output(Logger.DEBUG, "Adding state: " + to, level);
-					ecc.addState(to);
+					ecc.addState(to,false,false);
 					event = "update_ECC_" + fbName + ";";
 					Logger.output(Logger.DEBUG, "Adding transition: from: " + from + ", to: " + to + ", event: " + event, level);
 					ecc.addTransition(from, to, event, null, null);
@@ -2107,7 +2140,14 @@ class SequentialExecModelBuilder extends ModelBuilder
 					from = next;
 					to = curECDestName;
 					Logger.output(Logger.DEBUG, "Adding state: " + to, level);
-					ecc.addState(to);
+					if(curECDestName.startsWith("m"))
+					{
+						ecc.addState(to);
+					}
+					else
+					{
+						ecc.addState(to,false,false);
+					}
 					event = "handling_event_done_" + fbName + ";";
 					Logger.output(Logger.DEBUG, "Adding transition: from: " + from + ", to: " + to + ", event: " + event, level);
 					ecc.addTransition(from, to, event, null, null);
@@ -2124,7 +2164,7 @@ class SequentialExecModelBuilder extends ModelBuilder
 					to = "s" + nameCounter;
 					nameCounter++;
 					Logger.output(Logger.DEBUG, "Adding state: " + to, level);
-					ecc.addState(to);
+					ecc.addState(to,false,false);
 					event = "no_more_actions_" + fbName + ";";
 					Logger.output(Logger.DEBUG, "Adding transition: from: " + from + ", to: " + to + ", event: " + event, level);
 					ecc.addTransition(from, to, event, null, null);
@@ -2135,7 +2175,7 @@ class SequentialExecModelBuilder extends ModelBuilder
 					to = "s" + nameCounter;
 					nameCounter++;
 					Logger.output(Logger.DEBUG, "Adding state: " + to, level);
-					ecc.addState(to);
+					ecc.addState(to,false,false);
 					event = "update_ECC_" + fbName + ";";
 					Logger.output(Logger.DEBUG, "Adding transition: from: " + from + ", to: " + to + ", event: " + event, level);
 					ecc.addTransition(from, to, event, null, null);
@@ -2144,8 +2184,15 @@ class SequentialExecModelBuilder extends ModelBuilder
 					// handling_event_done model transition
 					from = next;
 					to = curECDestName;
+					if(curECDestName.startsWith("m"))
+					{
+						ecc.addState(to);
+					}
+					else
+					{
+						ecc.addState(to,false,false);
+					}
 					Logger.output(Logger.DEBUG, "Adding state: " + to, level);
-					ecc.addState(to);
 					event = "handling_event_done_" + fbName + ";";
 					Logger.output(Logger.DEBUG, "Adding transition: from: " + from + ", to: " + to + ", event: " + event, level);
 					ecc.addTransition(from, to, event, null, null);
@@ -2160,7 +2207,7 @@ class SequentialExecModelBuilder extends ModelBuilder
 			from = noTransitionFrom;
 			to = "s" + nameCounter;
 			nameCounter++;
-			ecc.addState(to);
+			ecc.addState(to,false,false);
 			event = "no_transition_" + fbName + ";";
 			Logger.output(Logger.DEBUG, "Adding transition: from: " + from + ", to: " + to + ", event: " + event, level);
 			ecc.addTransition(from, to, event, noTransitionGuard, null);
@@ -2168,7 +2215,7 @@ class SequentialExecModelBuilder extends ModelBuilder
 			from = to;
 			to = "s" + nameCounter;
 			nameCounter++;
-			ecc.addState(to);
+			ecc.addState(to,false,false);
 			// reset active event
 			for (Iterator iter = eventInputs.iterator();iter.hasNext();)
 			{
@@ -2456,7 +2503,7 @@ class SequentialExecModelBuilder extends ModelBuilder
 
 	private void printFunctionBlocksMap()
 	{
-		Logger.output(Logger.DEBUG, "SequentialExecModelBuilder.printFunctionBlocksMap():");
+		Logger.output(Logger.DEBUG, builderName() + ".printFunctionBlocksMap():");
 		for (Iterator iter = functionBlocks.keySet().iterator(); iter.hasNext();)
 		{
 			String curBlock = (String) iter.next();
@@ -2467,7 +2514,7 @@ class SequentialExecModelBuilder extends ModelBuilder
 
 	private void printBasicFunctionBlocksMap()
 	{
-		Logger.output(Logger.DEBUG, "SequentialExecModelBuilder.printBasicFunctionBlocksMap():");
+		Logger.output(Logger.DEBUG, builderName() + ".printBasicFunctionBlocksMap():");
 		for (Iterator iter = basicFunctionBlocks.keySet().iterator(); iter.hasNext();)
 		{
 			String curBlock = (String) iter.next();
@@ -2480,7 +2527,7 @@ class SequentialExecModelBuilder extends ModelBuilder
 
 	private void printEventsMap()
 	{
-		Logger.output(Logger.DEBUG, "SequentialExecModelBuilder.printEventsMap():");
+		Logger.output(Logger.DEBUG, builderName() + ".printEventsMap():");
 		for (Iterator iter = events.keySet().iterator(); iter.hasNext();)
 		{
 			String curBlock = (String) iter.next();
@@ -2499,7 +2546,7 @@ class SequentialExecModelBuilder extends ModelBuilder
 
 	private void printAlgorithmsMap()
 	{
-		Logger.output(Logger.DEBUG, "SequentialExecModelBuilder.printAlgorithmsMap():");
+		Logger.output(Logger.DEBUG, builderName() + ".printAlgorithmsMap():");
 		for (Iterator iter = algorithms.keySet().iterator(); iter.hasNext();)
 		{
 			String curBlock = (String) iter.next();
@@ -2517,7 +2564,7 @@ class SequentialExecModelBuilder extends ModelBuilder
 
 	private void printAlgorithmTextsMap()
 	{
-		Logger.output(Logger.DEBUG, "SequentialExecModelBuilder.printAlgorithmTextsMap():");
+		Logger.output(Logger.DEBUG, builderName() + ".printAlgorithmTextsMap():");
 		for (Iterator iter = algorithmTexts.keySet().iterator(); iter.hasNext();)
 		{
 			String curBlock = (String) iter.next();
@@ -2534,7 +2581,7 @@ class SequentialExecModelBuilder extends ModelBuilder
 	
 	private void printFBTypesMap()
 	{
-		Logger.output(Logger.DEBUG, "SequentialExecModelBuilder.printFBTypesMap():");
+		Logger.output(Logger.DEBUG, builderName() + ".printFBTypesMap():");
 		for (Iterator iter = fbTypes.keySet().iterator(); iter.hasNext();)
 		{
 			String curBlock = (String) iter.next();
@@ -2545,7 +2592,7 @@ class SequentialExecModelBuilder extends ModelBuilder
 	
 	private void printEventConnectionsMap()
 	{
-		Logger.output(Logger.DEBUG, "SequentialExecModelBuilder.printEventConnectionsMap():");
+		Logger.output(Logger.DEBUG, builderName() + ".printEventConnectionsMap():");
 		for (Iterator fbIter = eventConnections.keySet().iterator(); fbIter.hasNext();)
 		{
 			String curBlock = (String) fbIter.next();
@@ -2562,7 +2609,7 @@ class SequentialExecModelBuilder extends ModelBuilder
 	
 	private void printDataConnectionsMap()
 	{
-		Logger.output(Logger.DEBUG, "SequentialExecModelBuilder.printDataConnectionsMap():");
+		Logger.output(Logger.DEBUG, builderName() + ".printDataConnectionsMap():");
 		for (Iterator fbIter = dataConnections.keySet().iterator(); fbIter.hasNext();)
 		{
 			String curBlock = (String) fbIter.next();

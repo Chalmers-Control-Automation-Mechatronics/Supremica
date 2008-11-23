@@ -22,15 +22,15 @@
 
 package org.supremica.external.iec61499fb2efa;
 
-abstract class ModelBuilder
+interface ModelBuilder
 {
 
-	abstract void loadSystem();
+	public void loadSystem();
 
-	abstract void analyzeSystem();
+	public void analyzeSystem();
 
-	abstract void buildModels();
+	public void buildModels();
 
-	abstract void writeResult();
+	public void writeResult();
 
 }

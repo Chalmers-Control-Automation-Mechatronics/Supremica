@@ -61,7 +61,7 @@ class ModelMaker
             }
             else if (args[i].equals("-p"))
             {
-				arguments.put("generatePlantModels","false");
+				arguments.put("generatePlantModels","true");
             }
             else if (args[i].equals("-m"))
             {
@@ -192,17 +192,17 @@ class ModelMaker
 
 		if(arguments.get("execModel") == null || arguments.get("execModel").equals("free"))
 		{
-			Logger.output("ModelMaker.makeModel(): Making EFA model for the free execution model.");
+			Logger.output("ModelMaker.makeModel(): Making EFA model for the FREE execution model.");
 			theBuilder = new FreeExecModelBuilder(arguments);
 		}
 		else if (arguments.get("execModel").equals("seq"))
 		{
-			Logger.output("ModelMaker.makeModel(): Making EFA model for the sequential execution model.");
+			Logger.output("ModelMaker.makeModel(): Making EFA model for the SEQUENTIAL execution model.");
 			theBuilder = new SequentialExecModelBuilder(arguments);
 		}
 		else
 		{
-			Logger.output("ModelMaker.makeModel(): Making EFA model for the dual execution model.");
+			Logger.output("ModelMaker.makeModel(): Making EFA model for the DUAL execution model.");
 			theBuilder = new DualExecModelBuilder(arguments);
 		}
 			
