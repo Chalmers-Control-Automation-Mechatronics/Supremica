@@ -1129,6 +1129,13 @@ class DualExecModelBuilder implements ModelBuilder
 		
 			algorithmExecution.addTransition("s0", "s1", "remove_job;", null, null);	
 
+			String from = "";
+			String to = "";
+			String event = "";
+			String guard = "";
+			String action = "";
+			int nameCounter = 2;
+			
 			for (Iterator fbIter = basicFunctionBlocks.keySet().iterator(); fbIter.hasNext();)
 			{
 				String instanceName = (String) fbIter.next();
@@ -1138,13 +1145,6 @@ class DualExecModelBuilder implements ModelBuilder
 				Map algorithmMap = (Map) algorithms.get(instanceName);
 				// localy re-defining class attribute
 				List algorithms = theType.getBasicFB().getAlgorithm();
-
-				String from = "";
-				String to = "";
-				String event = "";
-				String guard = "";
-				String action = "";
-				int nameCounter = 2;
 
 				if (algorithmMap != null)
 				{

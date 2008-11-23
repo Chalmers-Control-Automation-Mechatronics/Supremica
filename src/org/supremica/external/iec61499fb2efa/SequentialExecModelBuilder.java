@@ -274,6 +274,13 @@ class SequentialExecModelBuilder
 			ExtendedAutomaton algorithmExecution = getNewAutomaton("Algorithm Execution");
 				
 			algorithmExecution.addInitialState("s0");
+			
+			String from = "";
+			String to = "";
+			String event = "";
+			String guard = "";
+			String action = "";
+			int nameCounter = 1;
 
 			for (Iterator fbIter = basicFunctionBlocks.keySet().iterator(); fbIter.hasNext();)
 			{
@@ -284,13 +291,6 @@ class SequentialExecModelBuilder
 				Map algorithmMap = (Map) algorithms.get(instanceName);
 				// localy re-defining class attribute
 				List algorithms = theType.getBasicFB().getAlgorithm();
-
-				String from = "";
-				String to = "";
-				String event = "";
-				String guard = "";
-				String action = "";
-				int nameCounter = 1;
 
 				if (algorithmMap != null)
 				{
