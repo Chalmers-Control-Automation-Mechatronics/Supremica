@@ -64,7 +64,7 @@ class NpmtrExecModelBuilder
 
  		automata = new ExtendedAutomata(theSystem.getName(), expandTransitions);
 
-		//makeStartup();
+		makeStartup();
 
 		for (Iterator fbIter = basicFunctionBlocks.keySet().iterator(); fbIter.hasNext();)
 		{
@@ -332,22 +332,22 @@ class NpmtrExecModelBuilder
 				from = to;
 				to = "s" + nameCounter;
 				nameCounter++;
-				eventQueue.addState(to,false,false);
+ 				eventQueue.addState(to,false,false);
 				event = "reset_event_" + eventName + "_" + fbName + ";";
 				action = "event_" + eventName + "_" + fbName + " = 0;";
 				eventQueue.addTransition(from, to, event, null, action);
 
-				from = to;
-				to = "s" + nameCounter;
-				nameCounter++;
-				eventQueue.addState(to,false,false);
-				event = "handling_event_done_" + fbName + ";";
-				eventQueue.addTransition(from, to, event, null, null);
+ 				from = to;
+ 				to = "s" + nameCounter;
+ 				nameCounter++;
+ 				eventQueue.addState(to,false,false);
+ 				event = "handling_event_done_" + fbName + ";";
+ 				eventQueue.addTransition(from, to, event, null, null);
 
-				from = to;
-				to = "s0";
-				event = "received_event_" + eventName + "_" + fbName + ";";
-				eventQueue.addTransition(from, to, event, null, null);
+ 				from = to;
+ 				to = "s0";
+ 				event = "received_event_" + eventName + "_" + fbName + ";";
+ 				eventQueue.addTransition(from, to, event, null, null);
 			}
 		}		
 		automata.addAutomaton(eventQueue);	
@@ -601,15 +601,15 @@ class NpmtrExecModelBuilder
 									ecc.addTransition(from, to, event, null, null);
 									next = to;						
 
-									from = next;
-									to = "s" + nameCounter; 
-									nameCounter++;
-									Logger.output(Logger.DEBUG, "Adding state: " + to, level);
-									ecc.addState(to,false,false);
-									event = "received_event_" + cntSignal + "_" + cntFB + ";";
-									Logger.output(Logger.DEBUG, "Adding transition: from: " + from + ", to: " + to + ", event: " + event, level);
-									ecc.addTransition(from, to, event, null, null);
-									next = to;						
+ 									from = next;
+ 									to = "s" + nameCounter; 
+ 									nameCounter++;
+ 									Logger.output(Logger.DEBUG, "Adding state: " + to, level);
+ 									ecc.addState(to,false,false);
+ 									event = "received_event_" + cntSignal + "_" + cntFB + ";";
+ 									Logger.output(Logger.DEBUG, "Adding transition: from: " + from + ", to: " + to + ", event: " + event, level);
+ 									ecc.addTransition(from, to, event, null, null);
+ 									next = to;						
 								}
 							}
 							else
@@ -654,15 +654,15 @@ class NpmtrExecModelBuilder
 								ecc.addTransition(from, to, event, null, null);
 								next = to;						
 
-								from = next;
-								to = "s" + nameCounter; 
-								nameCounter++;
-								Logger.output(Logger.DEBUG, "Adding state: " + to, level);
-								ecc.addState(to,false,false);
-								event = "received_event_" + cntSignal + "_" + cntFB + ";";
-								Logger.output(Logger.DEBUG, "Adding transition: from: " + from + ", to: " + to + ", event: " + event, level);
-								ecc.addTransition(from, to, event, null, null);
-								next = to;						
+ 								from = next;
+ 								to = "s" + nameCounter; 
+ 								nameCounter++;
+ 								Logger.output(Logger.DEBUG, "Adding state: " + to, level);
+ 								ecc.addState(to,false,false);
+ 								event = "received_event_" + cntSignal + "_" + cntFB + ";";
+ 								Logger.output(Logger.DEBUG, "Adding transition: from: " + from + ", to: " + to + ", event: " + event, level);
+ 								ecc.addTransition(from, to, event, null, null);
+ 								next = to;						
 							}
 						}
 					}
