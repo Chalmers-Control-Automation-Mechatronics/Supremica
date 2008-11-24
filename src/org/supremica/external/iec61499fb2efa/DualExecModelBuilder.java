@@ -1024,11 +1024,11 @@ class DualExecModelBuilder implements ModelBuilder
 		eventExecution.addState("s1",false,false);
 		eventExecution.addTransition("s0", "s1", "remove_fb;", null, null);	
 
-		int nameCounter = 2;
-
 		for (Iterator iter = basicFunctionBlocks.keySet().iterator(); iter.hasNext();)
 		{
 			String instanceName = (String) iter.next();
+
+			int nameCounter = 2;
 			
 			String from = "s1";
 			String to = "s" + nameCounter;
@@ -1116,7 +1116,7 @@ class DualExecModelBuilder implements ModelBuilder
 		}
 	}
 
-	void makeAlgorithmExecution()
+	private void makeAlgorithmExecution()
 	{
 		if (algMaxID > 0)
 		{
@@ -1125,17 +1125,10 @@ class DualExecModelBuilder implements ModelBuilder
 			ExtendedAutomaton algorithmExecution = getNewAutomaton("Algorithm Execution");
 				
 			algorithmExecution.addInitialState("s0");
-			algorithmExecution.addState("s1",false,false);
+			algorithmExecution.addState("s1");
 		
 			algorithmExecution.addTransition("s0", "s1", "remove_job;", null, null);	
 
-			String from = "";
-			String to = "";
-			String event = "";
-			String guard = "";
-			String action = "";
-			int nameCounter = 2;
-			
 			for (Iterator fbIter = basicFunctionBlocks.keySet().iterator(); fbIter.hasNext();)
 			{
 				String instanceName = (String) fbIter.next();
@@ -1155,13 +1148,20 @@ class DualExecModelBuilder implements ModelBuilder
 						String algLang = curAlg.getOther().getLanguage();
 						String algText = curAlg.getOther().getText();
 						Integer algID = (Integer) algorithmMap.get(algName);
-					
+						
+						String from = "";
+						String to = "";
+						String event = "";
+						String guard = "";
+						String action = "";
+						int nameCounter = 2;	
+						
 						if (algLang.toLowerCase().equals("java"))
 						{
 							from = "s1";
 							to = "s" + nameCounter;
 							nameCounter++;
-							algorithmExecution.addState(to,false,false);
+							algorithmExecution.addState(to);
 							event = "execute_" + algName + "_" + instanceName + ";";
 							guard = "current_job_fb == " + instanceID;
 							guard = guard + " & current_job_alg == " + algID;
@@ -1170,7 +1170,7 @@ class DualExecModelBuilder implements ModelBuilder
 
 							to = "s" + nameCounter;
 							nameCounter++;
-							algorithmExecution.addState(to,false,false);
+							algorithmExecution.addState(to);
 							event = "copy_variables_" + algName + "_" + instanceName + ";";
 							algorithmExecution.addTransition(from, to, event, null, null);
 							from = to;
@@ -1255,7 +1255,7 @@ class DualExecModelBuilder implements ModelBuilder
 							//get the local alg vars
 							to = "s" + nameCounter;
 							nameCounter++;
-							algorithmExecution.addState(to,false,false);					
+							algorithmExecution.addState(to);					
 							event = "get_variables_" + algName + "_" + instanceName + ";";
 							action = "";
 							for (Iterator iter = algorithmIdents.iterator(); iter.hasNext();)

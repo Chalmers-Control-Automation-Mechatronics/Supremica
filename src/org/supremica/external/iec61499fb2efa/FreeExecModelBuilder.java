@@ -191,8 +191,6 @@ class FreeExecModelBuilder
 		
 		makeEventExecution();
 		
-		makeAlgorithmExecution();
-		
 		for (Iterator fbIter = basicFunctionBlocks.keySet().iterator(); fbIter.hasNext();)
 		{
 			String fbName = (String) fbIter.next();
@@ -212,11 +210,12 @@ class FreeExecModelBuilder
 		eventExecution.addState("s1",false,false);
 		eventExecution.addTransition("s0", "s1", "remove_fb;", null, null);	
 
-		int nameCounter = 2;
 
 		for (Iterator iter = basicFunctionBlocks.keySet().iterator(); iter.hasNext();)
 		{
 			String instanceName = (String) iter.next();
+
+			int nameCounter = 2;
 			
 			String from = "s1";
 			String to = "s" + nameCounter;

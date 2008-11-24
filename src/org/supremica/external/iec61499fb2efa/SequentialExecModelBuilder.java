@@ -193,8 +193,6 @@ class SequentialExecModelBuilder
 		
 		makeEventExecution();
 		
-		makeAlgorithmExecution();
-		
 		for (Iterator fbIter = basicFunctionBlocks.keySet().iterator(); fbIter.hasNext();)
 		{
 			String fbName = (String) fbIter.next();
@@ -263,64 +261,6 @@ class SequentialExecModelBuilder
 			}
 		}
 		automata.addAutomaton(instanceQueue);
-	}
-
-	void makeAlgorithmExecution()
-	{
-		if (algMaxID > 0)
-		{
-			Logger.output(builderName() + ".makeAlgorithmExecution():");
-			
-			ExtendedAutomaton algorithmExecution = getNewAutomaton("Algorithm Execution");
-				
-			algorithmExecution.addInitialState("s0");
-			
-			String from = "";
-			String to = "";
-			String event = "";
-			String guard = "";
-			String action = "";
-			int nameCounter = 1;
-
-			for (Iterator fbIter = basicFunctionBlocks.keySet().iterator(); fbIter.hasNext();)
-			{
-				String instanceName = (String) fbIter.next();
-				Integer instanceID = (Integer) basicFunctionBlocksID.get(instanceName);
-				String typeName = (String) basicFunctionBlocks.get(instanceName);
-				JaxbFBType theType = (JaxbFBType) fbTypes.get(typeName);
-				Map algorithmMap = (Map) algorithms.get(instanceName);
-				// localy re-defining class attribute
-				List algorithms = theType.getBasicFB().getAlgorithm();
-
-				if (algorithmMap != null)
-				{
-					for (Iterator algIter = algorithms.iterator(); algIter.hasNext();)
-					{
-						JaxbAlgorithm curAlg = (JaxbAlgorithm) algIter.next();
-						String algName = curAlg.getName();
-						String algLang = curAlg.getOther().getLanguage();
-						String algText = curAlg.getOther().getText();
-						Integer algID = (Integer) algorithmMap.get(algName);
-					
-						if (algLang.toLowerCase().equals("java"))
-						{
-							from = "s0";
-							to = "s" + nameCounter;
-							nameCounter++;
-							algorithmExecution.addState(to,false,false);
-							event = "execute_" + algName + "_" + instanceName + ";";
-							algorithmExecution.addTransition(from, to, event, null, null);
-							from = to;
-
-							to = "s0";
-							event = "finished_execution_" + algName + "_" + instanceName + ";";
-							algorithmExecution.addTransition(from, to, event, null, null);
-						}
-					}
-				}
-			}
-			automata.addAutomaton(algorithmExecution);
-		}
 	}
 
 	void makeBasicFBEventQueue(String fbName)
