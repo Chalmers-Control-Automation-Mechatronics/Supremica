@@ -24,6 +24,10 @@ public interface CompiledRange {
 
   public boolean intersects(CompiledRange range);
 
+  public CompiledRange intersection(CompiledRange range);
+
+  public CompiledRange remove(SimpleExpressionProxy value);
+
   public List<? extends SimpleExpressionProxy> getValues();
 
 }

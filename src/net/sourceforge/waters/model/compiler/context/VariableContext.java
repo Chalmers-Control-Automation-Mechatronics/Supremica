@@ -11,6 +11,7 @@ package net.sourceforge.waters.model.compiler.context;
 
 import java.util.Collection;
 
+import net.sourceforge.waters.model.base.ProxyAccessor;
 import net.sourceforge.waters.model.module.SimpleExpressionProxy;
 
 
@@ -26,16 +27,27 @@ public interface VariableContext extends BindingContext {
   
   /**
    * Gets the range associated with the given variable.
-   * @param  varname An expression representing the name of the variable
-   *                 to be looked up.
-   *                 It can be identifier, simple or indexed, (to support
-   *                 array lookups), or a unary expression (to support
-   *                 next-state value of EFA variables.
+   * @param  varname   An expression representing the name of the variable
+   *                   to be looked up.
+   *                   It can be identifier, simple or indexed, (to support
+   *                   array lookups), or a unary expression (to support
+   *                   next-state value of EFA variables.
    * @return The evaluated range determined for the variable with the given
    *         name, or <CODE>null</CODE> if the name is not associated with
    *         ant variable, or the range has not yet been determined.
    */
   public CompiledRange getVariableRange(SimpleExpressionProxy varname);
+
+  /**
+   * Gets the range associated with the given variable.
+   * @param  accessor  An accessor to an expression that represents the
+   *                   name of the variable to be looked up.
+   * @return The evaluated range determined for the variable with the given
+   *         name, or <CODE>null</CODE> if the name is not associated with
+   *         ant variable, or the range has not yet been determined.
+   */
+  public CompiledRange getVariableRange
+    (ProxyAccessor<SimpleExpressionProxy> accessor);
 
   /**
    * Gets a read-only collection containing the names of all EFA variables

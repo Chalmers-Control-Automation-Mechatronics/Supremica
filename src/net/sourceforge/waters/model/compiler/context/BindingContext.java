@@ -46,7 +46,7 @@ public interface BindingContext
    * Determines whether the given identifier represents an enumeration atom
    * in this context.
    */
-  public boolean isEnumAtom(final IdentifierProxy ident);
+  public boolean isEnumAtom(IdentifierProxy ident);
 
   /**
    * Gets the module context of this binding.

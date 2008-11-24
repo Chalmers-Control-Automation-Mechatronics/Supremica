@@ -9,6 +9,7 @@
 
 package net.sourceforge.waters.model.compiler.context;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
@@ -109,21 +110,41 @@ public class CompiledEnumRange implements CompiledRange
   {
     if (range instanceof CompiledEnumRange) {
       if (size() < range.size()) {
-        for (final IdentifierProxy value : mAtoms) {
-          if (range.contains(value)) {
+        for (final IdentifierProxy atom : mAtoms) {
+          if (range.contains(atom)) {
             return true;
           }
         }
       } else {
         final CompiledEnumRange enumrange = (CompiledEnumRange) range;
-        for (final IdentifierProxy value : enumrange.mAtoms) {
-          if (contains(value)) {
+        for (final IdentifierProxy atom : enumrange.mAtoms) {
+          if (contains(atom)) {
             return true;
           }
         }
       }
     }
     return false;
+  }
+
+  public CompiledEnumRange intersection(final CompiledRange range)
+  {
+    if (range instanceof CompiledEnumRange) {
+      final CompiledEnumRange enumrange = (CompiledEnumRange) range;
+      return intersection(enumrange);
+    } else {
+      return this;
+    }
+  }
+
+  public CompiledEnumRange remove(final SimpleExpressionProxy value)
+  {
+    if (value instanceof IdentifierProxy) {
+      final IdentifierProxy atom = (IdentifierProxy) value;
+      return remove(atom);
+    } else {
+      return this;
+    }
   }
 
   public List<IdentifierProxy> getValues()
@@ -134,12 +155,12 @@ public class CompiledEnumRange implements CompiledRange
 
   //#########################################################################
   //# More Specific Access
-  boolean contains(final IdentifierProxy value)
+  public boolean contains(final IdentifierProxy atom)
   {
-    return indexOf(value) >= 0;
+    return indexOf(atom) >= 0;
   }
 
-  int indexOf(final IdentifierProxy value)
+  public int indexOf(final IdentifierProxy value)
   {
     int i = 0;
     for (final IdentifierProxy atom : mAtoms) {
@@ -149,6 +170,47 @@ public class CompiledEnumRange implements CompiledRange
       i++;
     }
     return -1;
+  }
+
+  public CompiledEnumRange intersection(final CompiledEnumRange range)
+  {
+    boolean change = false;
+    for (final IdentifierProxy atom : mAtoms) {
+      if (!range.contains(atom)) {
+        change = true;
+        break;
+      }
+    }
+    if (change) {
+      final int newsize = size() - 1;
+      final List<IdentifierProxy> newlist =
+        new ArrayList<IdentifierProxy>(newsize);
+      for (final IdentifierProxy atom : mAtoms) {
+        if (range.contains(atom)) {
+          newlist.add(atom);
+        }
+      }
+      return new CompiledEnumRange(newlist);
+    } else {
+      return this;
+    }
+  }
+
+  public CompiledEnumRange remove(final IdentifierProxy value)
+  {
+    if (contains(value)) {
+      final int newsize = size() - 1;
+      final List<IdentifierProxy> newlist =
+        new ArrayList<IdentifierProxy>(newsize);
+      for (final IdentifierProxy atom : mAtoms) {
+        if (!atom.equalsByContents(value)) {
+          newlist.add(atom);
+        }
+      }
+      return new CompiledEnumRange(newlist);
+    } else {
+      return this;
+    }
   }
 
 

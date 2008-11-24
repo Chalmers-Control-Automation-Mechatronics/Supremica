@@ -77,6 +77,17 @@ class EFAModuleContext
     }
   }
 
+  public CompiledRange getVariableRange
+    (final ProxyAccessor<SimpleExpressionProxy> accessor)
+  {
+    final EFAVariable var = getVariable(accessor);
+    if (var == null) {
+      return null;
+    } else {
+      return var.getRange();
+    }
+  }
+
   public Set<SimpleExpressionProxy> getVariableNames()
   {
     return mVariableNameSet;

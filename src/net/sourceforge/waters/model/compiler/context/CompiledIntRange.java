@@ -103,6 +103,26 @@ public class CompiledIntRange implements CompiledRange
     }
   }
 
+  public CompiledIntRange intersection(final CompiledRange range)
+  {
+    if (range instanceof CompiledIntRange) {
+      final CompiledIntRange intrange = (CompiledIntRange) range;
+      return intersection(intrange);
+    } else {
+      return this;
+    }
+  }
+
+  public CompiledIntRange remove(final SimpleExpressionProxy value)
+  {
+    if (value instanceof IntConstantProxy) {
+      final IntConstantProxy intconst = (IntConstantProxy) value;
+      return remove(intconst);
+    } else {
+      return this;
+    }
+  }
+
   public List<IntConstantProxy> getValues()
   {
     return new IntRangeList();
@@ -111,10 +131,35 @@ public class CompiledIntRange implements CompiledRange
 
   //#########################################################################
   //# More Specific Access
-  int indexOf(final IntConstantProxy intconst)
+  public int indexOf(final IntConstantProxy intconst)
   {
     final int value = intconst.getValue();
     return mLower <= value && value <= mUpper ? value - mLower : -1;
+  }
+
+  public CompiledIntRange intersection(final CompiledIntRange range)
+  {
+    if (range.mLower <= mLower && mUpper <= range.mUpper) {
+      return this;
+    } else if (mLower <= range.mLower && range.mUpper <= mUpper) {
+      return range;
+    } else if (mLower < range.mLower) {
+      return new CompiledIntRange(range.mLower, mUpper);
+    } else {
+      return new CompiledIntRange(mLower, range.mUpper);
+    }
+  }
+
+  public CompiledIntRange remove(final IntConstantProxy intconst)
+  {
+    final int value = intconst.getValue();
+    if (mLower == value) {
+      return new CompiledIntRange(mLower + 1, mUpper);
+    } else if (mUpper == value) {
+      return new CompiledIntRange(mLower, mUpper - 1);
+    } else {
+      return this;
+    }      
   }
 
 

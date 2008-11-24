@@ -113,18 +113,6 @@ public class SimpleExpressionCompiler
   //#########################################################################
   //# Invocation
   public SimpleExpressionProxy simplify(final SimpleExpressionProxy expr,
-                                        final VariableContext context)
-    throws EvalException
-  {
-    try {
-      mVariableContext = context;
-      return simplify(expr, context);
-    } finally {
-      mVariableContext = null;
-    }
-  }
-
-  public SimpleExpressionProxy simplify(final SimpleExpressionProxy expr,
                                         final BindingContext context)
     throws EvalException
   {
@@ -132,20 +120,12 @@ public class SimpleExpressionCompiler
       mIsEvaluating = false;
       mNumPrimes = 0;
       mContext = context;
+      if (context instanceof VariableContext) {
+        mVariableContext = (VariableContext) context;
+      }
       return mSimplificationVisitor.simplify(expr);
     } finally {
       mContext = null;
-    }
-  }
-
-  public SimpleExpressionProxy eval(final SimpleExpressionProxy expr,
-                                    final VariableContext context)
-    throws EvalException
-  {
-    try {
-      mVariableContext = context;
-      return eval(expr, context);
-    } finally {
       mVariableContext = null;
     }
   }
@@ -158,10 +138,14 @@ public class SimpleExpressionCompiler
       mIsEvaluating = true;
       mNumPrimes = 0;
       mContext = context;
+      if (context instanceof VariableContext) {
+        mVariableContext = (VariableContext) context;
+      }
       return mSimplificationVisitor.simplify(expr);
     } finally {
       mIsEvaluating = false;
       mContext = null;
+      mVariableContext = null;
     }
   }
 
@@ -178,6 +162,14 @@ public class SimpleExpressionCompiler
     throws EvalException
   {
     return mRangeVisitor.getRangeValue(expr);
+  }
+
+
+  public CompiledRange estimateRange(final SimpleExpressionProxy expr,
+                                         final VariableContext context)
+    throws EvalException
+  {
+    return mRangeEstimator.estimateRange(expr, context);
   }
 
 
@@ -735,10 +727,10 @@ public class SimpleExpressionCompiler
         return createBooleanConstantProxy(!eresult);
       } else if (mVariableContext != null) {
         final CompiledRange rangeLHS =
-          mRangeEstimator.estimateRange(simpLHS, mVariableContext);
+          estimateRange(simpLHS, mVariableContext);
         if (rangeLHS != null) {
           final CompiledRange rangeRHS =
-            mRangeEstimator.estimateRange(simpRHS, mVariableContext);
+            estimateRange(simpRHS, mVariableContext);
           if (rangeRHS != null && !rangeLHS.intersects(rangeRHS)) {
             return createBooleanConstantProxy(!eresult);
           }
