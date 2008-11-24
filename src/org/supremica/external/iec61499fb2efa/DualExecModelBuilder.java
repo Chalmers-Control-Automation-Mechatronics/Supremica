@@ -118,8 +118,6 @@ class DualExecModelBuilder implements ModelBuilder
 	boolean doneInitActions = false;
 	boolean doneInitFinish = false;
 	
-	DualExecModelBuilder(){}
-
 	DualExecModelBuilder(Map<String, String> arguments)
 	{
 		// get arguments
@@ -936,7 +934,7 @@ class DualExecModelBuilder implements ModelBuilder
 
 			from = to;
 			to = to;
-			event = "remove_fb;";
+			event = "select_fb;";
 			startup.addTransition(from, to, event, null, null);
 
 			if (stopInstance != null)
@@ -994,7 +992,7 @@ class DualExecModelBuilder implements ModelBuilder
 				String fbName = (String) fbIter.next();		
 				Integer fbID = (Integer) basicFunctionBlocksID.get(fbName);
 
-				event = "queue_fb_" + fbName + ";";
+				event = "submitt_fb_" + fbName + ";";
 				action = "fb_place_" + i + " = " + fbID + ";";
 				instanceQueue.addTransition(from, to, event, null, action);
 			}
@@ -1002,7 +1000,7 @@ class DualExecModelBuilder implements ModelBuilder
 			// Transiton when dequeuing instance
 			from = "s" + i;
 			to = "s" + (i-1);
-			event = "remove_fb;";      
+			event = "select_fb;";      
 			action = "current_fb = fb_place_1;";
 			for (int j = 1; j <= i-1; j++)
 			{
@@ -1022,7 +1020,7 @@ class DualExecModelBuilder implements ModelBuilder
 
 		eventExecution.addInitialState("s0");
 		eventExecution.addState("s1",false,false);
-		eventExecution.addTransition("s0", "s1", "remove_fb;", null, null);	
+		eventExecution.addTransition("s0", "s1", "select_fb;", null, null);	
 
 		for (Iterator iter = basicFunctionBlocks.keySet().iterator(); iter.hasNext();)
 		{
@@ -1307,7 +1305,7 @@ class DualExecModelBuilder implements ModelBuilder
 
 		from = "s1";
 		to = "s2";
-		event = "remove_event_" + fbName + ";";
+		event = "select_event_" + fbName + ";";
 		eventHandling.addTransition(from, to, event, null, null);
 
 		from = "s2";
@@ -1575,7 +1573,7 @@ class DualExecModelBuilder implements ModelBuilder
 					to = "s" + (places + nameCounter);
 					nameCounter++;
 					eventQueue.addState(to,false,false);
-					event = "queue_fb_" + fbName + ";";
+					event = "submitt_fb_" + fbName + ";";
 					eventQueue.addTransition(from, to, event, null, null);
 					
 					from = to;
@@ -1600,7 +1598,7 @@ class DualExecModelBuilder implements ModelBuilder
 					to = "s" + (places + nameCounter);
 					nameCounter++;
 					eventQueue.addState(to,false,false);
-					event = "remove_event_" + fbName + ";";
+					event = "select_event_" + fbName + ";";
 					guard = "event_place_1_" + fbName + " == " + eventID;
 					action = "event_" + eventName + "_" + fbName + " = 1;";
 					// move events in the queue

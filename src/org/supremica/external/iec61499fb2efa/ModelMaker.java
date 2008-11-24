@@ -33,6 +33,24 @@ import java.util.Calendar;
 class ModelMaker
 {
 
+	private static final String helpString = "Usage: ModelMaker \n" + 
+		"\t[-d (debug info)] \n" +
+		"\t[-q (quiet)] \n" +
+		"\t[-p (generate models as plants)] \n" +
+		"\t[-im int (int var min)] \n" +
+		"\t[-ix int (int var max)] \n" + 
+		"\t[-m f (free exec model (default)) | \n" +
+		"\t-m d (dual exec model | \n" +
+		"\t-m s (seqequential exec model)] \n" +
+		"\t-m n (npmtr exec model)] \n" +
+		"\t-m c (cyclic exec model)] \n" +
+		"\t[-ip int (instance q places)] \n" +
+		"\t[-ep int (event q places)] \n" +
+		"\t[-jp int (job q places (deprecated))] \n" +
+		"\t[-o outputFileName] \n" +
+		"\t[-lb libraryPathBase] \n" +
+		"\t[-lp libraryDirectory]... systemFile";
+
     public static void main(String args[])
     {
         String outputFileName = null;
@@ -78,6 +96,14 @@ class ModelMaker
 					else if (args[i + 1].equals("f"))
 					{
 						arguments.put("execModel", "free");
+					}
+					else if (args[i + 1].equals("n"))
+					{
+						arguments.put("execModel", "npmtr");
+					}
+					else if (args[i + 1].equals("c"))
+					{
+						arguments.put("execModel", "cyclic");
 					}
                 }
             }
@@ -164,7 +190,7 @@ class ModelMaker
         {
 			Logger.output(Logger.ERROR, "ERROR: No system file specified!");
 			Logger.output(Logger.ERROR);
-            Logger.output(Logger.ERROR, "Usage: ModelMaker [-d (debug info)] [-q (quiet)] [-p (generate models as plants)] [-e (expand transitions (deprecated))] [-im int (int var min)] [-ix int (int var max)] [-m 'd' (dual exec model (deprecated)) |  -m 'f' (free exec model (default)) | -m 's' (seq exec model)] [-ip int (instance q places)] [-ep int (event q places)] [-jp int (job q places (deprecated))] [-o outputFileName] [-lb libraryPathBase] [-lp libraryDirectory]... systemFile");
+            Logger.output(Logger.ERROR, helpString);
             return;
         }
 		
@@ -188,7 +214,7 @@ class ModelMaker
 
 	void makeModel(Map<String,String> arguments)
 	{
-		ModelBuilder theBuilder;
+		ModelBuilder theBuilder = null;
 
 		if(arguments.get("execModel") == null || arguments.get("execModel").equals("free"))
 		{
@@ -200,10 +226,27 @@ class ModelMaker
 			Logger.output("ModelMaker.makeModel(): Making EFA model for the SEQUENTIAL execution model.");
 			theBuilder = new SequentialExecModelBuilder(arguments);
 		}
-		else
+		else if (arguments.get("execModel").equals("dual"))
 		{
 			Logger.output("ModelMaker.makeModel(): Making EFA model for the DUAL execution model.");
 			theBuilder = new DualExecModelBuilder(arguments);
+		}
+		else if (arguments.get("execModel").equals("npmtr"))
+		{
+			Logger.output("ModelMaker.makeModel(): Making EFA model for the NPMTR execution model.");
+			theBuilder = new NpmtrExecModelBuilder(arguments);
+		}
+		else if (arguments.get("execModel").equals("cyclic"))
+		{
+			Logger.output("ModelMaker.makeModel(): Making EFA model for the CYCLIC execution model.");
+			theBuilder = new CyclicExecModelBuilder(arguments);
+		}
+		else
+		{
+			Logger.output(Logger.ERROR, "ERROR: Unsupported execution model specified!");
+			Logger.output(Logger.ERROR);
+            Logger.output(Logger.ERROR, helpString);
+			System.exit(1);
 		}
 			
 		Logger.output("ModelMaker.makeModel(): Loading the System -------------------------------------");
@@ -221,5 +264,5 @@ class ModelMaker
 		Logger.output("ModelMaker.makeModel(): Done ---------------------------------------------------");
 		
 	}
-
+	
 }

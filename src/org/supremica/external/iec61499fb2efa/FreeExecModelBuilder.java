@@ -53,132 +53,9 @@ class FreeExecModelBuilder
 	implements ModelBuilder
 {
 
-	FreeExecModelBuilder(){}
-
 	FreeExecModelBuilder(Map<String, String> arguments)
 	{
-		// get arguments
-		if (arguments.get("expandTransitions") != null)
-		{
-			expandTransitions = (new Boolean(arguments.get("expandTransitions"))).booleanValue();
-		}
-		if (arguments.get("generatePlantModels") != null)
-		{
-			generatePlantModels = (new Boolean(arguments.get("generatePlantModels"))).booleanValue();
-		}
-
-		if (arguments.get("eventQueuePlaces") != null)
-		{
-			eventQueuePlaces = new Integer(arguments.get("eventQueuePlaces"));
-		}	
-		if (arguments.get("instanceQueuePlaces") != null)
-		{
-			instanceQueuePlaces = new Integer(arguments.get("instanceQueuePlaces"));
-		}	
-		if (arguments.get("jobQueuePlaces") != null)
-		{
-			jobQueuePlaces = new Integer(arguments.get("jobQueuePlaces"));
-		}	
-
-		if (arguments.get("intVarMinValue") != null)
-		{
-			intVarMinValue = (new Integer(arguments.get("intVarMinValue"))).intValue();
-		}
-		if (arguments.get("intVarMaxValue") != null)
-		{
-			intVarMaxValue = (new Integer(arguments.get("intVarMaxValue"))).intValue();
-		}
-		
-		this.systemFileName = arguments.get("systemFileName");
-		this.outputFileName = arguments.get("outputFileName");
-
-		String libraryPathBase = arguments.get("libraryPathBase");
-		String libraryPath = arguments.get("libraryPath");
-
-		// convert libraryPath string into a list of Files
-		if (libraryPath == null) // libraryPath is not specified
-		{
-			if (libraryPathBase == null)
-			{
-				libraryPathList = null;
-			}
-			else
-			{
-				File libraryPathBaseFile = new File(libraryPathBase);
-
-				if (!libraryPathBaseFile.isDirectory())
-				{
-					Logger.output(Logger.ERROR, builderName() + "(): Specified library base is not a directory!: " + libraryPathBaseFile.getName());
-				}
-				else if (!libraryPathBaseFile.exists())
-				{
-					Logger.output(Logger.ERROR, builderName() + "(): Specified library base does not exist!: " + libraryPathBaseFile.getName());
-				}
-				else
-				{
-					libraryPathList.add(libraryPathBaseFile);
-				}
-			}
-		}
-		else // libraryPath is specified by the user
-		{
-		
-			while (true)
-			{
-				
-				File curLibraryDir;
-
-				if (libraryPath.indexOf(File.pathSeparatorChar) == -1)
-				{
-					curLibraryDir = new File(libraryPathBase, libraryPath);
-				}
-				else
-				{
-					curLibraryDir = new File(libraryPathBase, libraryPath.substring(0,libraryPath.indexOf(File.pathSeparatorChar)));
-				}
-
-				if (!curLibraryDir.isDirectory())
-				{
-					Logger.output(Logger.ERROR, builderName() + "(): Specified library path element " + curLibraryDir.getAbsolutePath() + " is not a directory!");
-				}
-				else if (!curLibraryDir.exists())
-				{
-					Logger.output(Logger.ERROR, builderName() + "(): Specified library path element " + curLibraryDir.getAbsolutePath() + " does not exist!");
-				}
-				else
-				{
-					libraryPathList.add(curLibraryDir);
-				}
-
-				if (libraryPath.indexOf(File.pathSeparatorChar) == -1)
-				{
-					break;
-				}
-
-				libraryPath = libraryPath.substring(libraryPath.indexOf(File.pathSeparatorChar)+1);
-			}
-		}
-
-		// make operator map for ST to EFA translation
-		operatorMap = new HashMap();
-		operatorMap.put("AND", "&");
-		operatorMap.put("OR", "|");
-		operatorMap.put("NOT", "!");
-		operatorMap.put("=", "==");
-		operatorMap.put("<>", "!=");
-		operatorMap.put("MOD", "%");				
-
-		// get unmarshaller for XML reading
-		try
-		{
-			iecContext = JAXBContext.newInstance("net.sourceforge.fuber.xsd.libraryelement");
-			iecUnmarshaller = iecContext.createUnmarshaller();
-		}
-		catch (Exception e)
-		{
-			Logger.output(Logger.ERROR, e.toString());
-			exit(1);
-		}
+		super(arguments);
 	}
 
 	public void buildModels()
@@ -208,7 +85,7 @@ class FreeExecModelBuilder
 
 		eventExecution.addInitialState("s0");
 		eventExecution.addState("s1",false,false);
-		eventExecution.addTransition("s0", "s1", "remove_fb;", null, null);	
+		eventExecution.addTransition("s0", "s1", "select_fb;", null, null);	
 
 
 		for (Iterator iter = basicFunctionBlocks.keySet().iterator(); iter.hasNext();)
@@ -498,7 +375,7 @@ class FreeExecModelBuilder
 					to = "s" + (places + nameCounter);
 					nameCounter++;
 					eventQueue.addState(to,false,false);
-					event = "remove_event_" + fbName + ";";
+					event = "select_event_" + fbName + ";";
 					for (int j = 1; j <= places; j++)
 					{
 						guard = "(event_" + fbName + "_first == " + j + ") & ";

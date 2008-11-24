@@ -48,12 +48,12 @@ import net.sourceforge.fuber.model.interpreters.abstractsyntax.Identifier;
 
 import net.sourceforge.fuber.xsd.libraryelement.*;
 
-class SequentialExecModelBuilder 
-	extends DualExecModelBuilder
+class NpmtrExecModelBuilder 
+	extends FreeExecModelBuilder
 	implements ModelBuilder
 {
-
-	SequentialExecModelBuilder(Map<String, String> arguments)
+	
+	NpmtrExecModelBuilder(Map<String, String> arguments)
 	{
 		super(arguments);
 	}
@@ -63,13 +63,9 @@ class SequentialExecModelBuilder
 		Logger.output(builderName() + ".buildModels()");
 
  		automata = new ExtendedAutomata(theSystem.getName(), expandTransitions);
-		
-		makeStartup();
-		
-		makeInstanceQueue();
-		
-		makeEventExecution();
-		
+
+		//makeStartup();
+
 		for (Iterator fbIter = basicFunctionBlocks.keySet().iterator(); fbIter.hasNext();)
 		{
 			String fbName = (String) fbIter.next();
@@ -79,83 +75,77 @@ class SequentialExecModelBuilder
 		}
 	}
 
-	private void makeInstanceQueue()
+	void makeStartup()
 	{
-		Logger.output(builderName() + ".makeInstanceQueue():");
+		Logger.output(builderName() + ".makeStartup():");
 
-		ExtendedAutomaton instanceQueue = getNewAutomaton("Instance Queue");
+		String fbName = restartInstance;
 		
-		// the maximum number of FB instances in the queue at the same time
-		int places = basicFunctionBlocks.keySet().size();
-		if (instanceQueuePlaces > 0 && instanceQueuePlaces <= places)
+		ExtendedAutomaton startup;
+		if (stopInstance != null)
 		{
-			places = instanceQueuePlaces.intValue();
+			startup = getNewAutomaton("Startup and Finish");
+		}
+		else
+		{
+			startup = getNewAutomaton("Startup");
 		}
 
-		instanceQueue.addIntegerVariable("current_fb", 0, fbMaxID, 0, 0);
-		instanceQueue.addIntegerVariable("fb_first", 1, places, 1, 0);
+		startup.addInitialState("s0");
 		
-		instanceQueue.addInitialState("s0");
-		for (int i = 0; i <= (places - 1); i++)
+		String from = "s0";
+		String to = "s1"; 
+		startup.addState(to,false,false);
+		String event = "send_output_COLD_" + fbName + ";";
+		startup.addTransition(from, to, event, null, null);
+
+		if (isEventConnected(fbName,"COLD"))
 		{			
-			instanceQueue.addIntegerVariable("fb_place_" + (i+1), 0, fbMaxID, 0, 0);
+			// get connection data for the action
+			String cntName = getEventConnection(fbName, "COLD");
+			String cntFB = getInstanceName(cntName);
+			String cntSignal = getSignalName(cntName);
 
-			instanceQueue.addState("s" + (i+1));
-
-			String from = "s" + i;
-			String to = "s" + (i+1);
-			String event = "";
-			String guard = "";
-			String action = "";
-			
-			//Transiton when queuing instance
-			// i is number of blocks in queue when making the transition
-			for (Iterator fbIter = basicFunctionBlocks.keySet().iterator(); fbIter.hasNext();)
+			from = to;
+			to = "s2";
+			if (stopInstance != null)
 			{
-				String fbName = (String) fbIter.next();		
-				Integer fbID = (Integer) basicFunctionBlocksID.get(fbName);
-				
-				event = "submitt_fb_" + fbName + ";";
-				for (int j = 1; j<=places; j++)
-				{
-					guard = "fb_first == " + j;
-					action = "fb_place_" + ((((j-1)+i) % places) + 1) + " = " + fbID + ";";
-					instanceQueue.addTransition(from, to, event, guard, action);
-				}
+				startup.addState(to,false,false);
 			}
-			
-			// Transiton when dequeuing instance
-			from = "s" + (i+1);
-			to = "s" + i;
-			event = "select_fb;";      
-			for (int j = 1; j<=places; j++)
+			else
 			{
-				guard = "fb_first == " + j;
-				action = "current_fb = fb_place_" + j + ";";
-				action = action + "fb_first = " + ((j % places) + 1) + ";";
-				action = action + "fb_place_" + j + " = 0;";
-				instanceQueue.addTransition(from, to, event, guard, action);
+				startup.addAcceptingState(to);				
+			}
+			event = "receive_event_" + cntSignal + "_" + cntFB + ";";
+			startup.addTransition(from, to, event, null, null);
+
+			if (stopInstance != null)
+			{
+				from = to;
+				to = "s3" ;
+				startup.addState(to,false,false);
+				event = "receive_event_STOP_" + stopInstance + ";";
+				startup.addTransition(from, to, event, null, null);
 			}
 		}
-		automata.addAutomaton(instanceQueue);
+		else
+		{
+			Logger.output(Logger.ERROR, "The E_RESTART.COLD is not connected!");
+			Logger.output(Logger.ERROR, "The application can not start.", 1);
+			exit(1);
+		}
+		automata.addAutomaton(startup);
 	}
 
 	void makeBasicFBEventQueue(String fbName)
 	{
-		Logger.output("Event Queue", 1);
+		Logger.output("Event Receiving", 1);
 
 		String typeName = (String) basicFunctionBlocks.get(fbName);
 		JaxbFBType theType = (JaxbFBType) fbTypes.get(typeName);
 		List eventInputList = (List) ((EventInputs) ((InterfaceList) theType.getInterfaceList()).getEventInputs()).getEvent();
 		
-		ExtendedAutomaton eventQueue = getNewAutomaton(fbName + ": Event Queue");
-		
-		// the maximum number of events in the queue at the same time
-		int places = ((Integer) eventsMaxID.get(fbName)).intValue();	
-		if (eventQueuePlaces > 0 && eventQueuePlaces <= places )
-		{
-			places = eventQueuePlaces.intValue();
-		}
+		ExtendedAutomaton eventQueue = getNewAutomaton(fbName + ": Event Receiving");
 		
 		// event input variables
 		if (theType.getInterfaceList().isSetEventInputs())
@@ -265,9 +255,6 @@ class SequentialExecModelBuilder
 			}
 		}
 
-		// first queue element pointer
-		eventQueue.addIntegerVariable("event_" + fbName + "_first", 1, places, 1, 0);
-		
 		String from = "";
 		String to = "";
 		String event = "";
@@ -277,181 +264,95 @@ class SequentialExecModelBuilder
 		
 		eventQueue.addInitialState("s0");
 
-		for (int i = 1; i <= places; i++)
+		for (Iterator evIter = eventInputList.iterator(); evIter.hasNext();)
 		{
-			Integer numEvents = (Integer) eventsMaxID.get(fbName);
-			eventQueue.addIntegerVariable("event_place_" + i + "_" + fbName, 0, numEvents, 0, 0);
 			
-			// data input variables for each queue place
-			if (theType.getInterfaceList().isSetInputVars())
-			{
-				final List dataInputs = theType.getInterfaceList().getInputVars().getVarDeclaration();
-				for (Iterator dataInputsIter = dataInputs.iterator(); dataInputsIter.hasNext();)
+			JaxbEvent curEvent = (JaxbEvent) evIter.next();
+			String eventName = curEvent.getName();
+			int eventID = ((Integer) ((Map) events.get(fbName)).get(eventName)).intValue();
+				
+			// Transitons when receiving event
+			if (isEventConnected(fbName, eventName))
+			{					
+				from = "s0";
+				to = "s" + nameCounter;
+				nameCounter++;
+				eventQueue.addState(to,false,false);
+				event = "receive_event_" + eventName + "_" + fbName + ";";
+				eventQueue.addTransition(from, to, event, null, null);
+					
+				from = to;
+				to = "s" + nameCounter;
+				nameCounter++;
+				eventQueue.addState(to,false,false);
+				event = "set_event_" + eventName + "_" + fbName + ";";
+				action = "event_" + eventName + "_" + fbName + " = 1;";
+				if (curEvent.isSetWith())
 				{
-					VarDeclaration curDeclaration = (VarDeclaration) dataInputsIter.next();
-					String curDataInputName = curDeclaration.getName();
-					if (isDataConnected(fbName, curDataInputName))
+					List withData = curEvent.getWith();
+					for (Iterator withIter = withData.iterator(); withIter.hasNext();)
 					{
-						String curDataType =  curDeclaration.getType();
-						if (curDataType.toLowerCase().equals("int"))
-						{
-							eventQueue.addIntegerVariable("data_place_" + i + "_" + curDataInputName + "_" + fbName, intVarMinValue, intVarMaxValue, 0, 0);
-						}
-						else if (curDataType.toLowerCase().equals("bool"))
-						{
-							Logger.output(Logger.ERROR, "Error: Unsupported input data variable type: BOOL", 1);
-							Logger.output(Logger.ERROR, "Variable name: " + fbName + "_" + curDataInputName, 2);
-							exit(1);
-						}
-						else if (curDataType.toLowerCase().equals("real"))
-						{
-							Logger.output(Logger.ERROR, "Error: Unsupported input data variable type: REAL", 1);
-							Logger.output(Logger.ERROR, "Variable name: " + fbName + "_" + curDataInputName, 2);
-							exit(1);
-						}
-						else if (curDataType.toLowerCase().equals("string"))
-						{
-							Logger.output(Logger.ERROR, "Error: Unsupported input data variable type: STRING", 1);
-							Logger.output(Logger.ERROR, "Variable name: " + fbName + "_" + curDataInputName, 2);
-							exit(1);
-						}
-						else if (curDataType.toLowerCase().equals("object"))
-						{
-							Logger.output(Logger.ERROR, "Error: Unsupported input data variable type: OBJECT", 1);
-							Logger.output(Logger.ERROR, "Variable name: " + fbName + "_" + curDataInputName, 2);
-							exit(1);
+						String curWith = ((With) withIter.next()).getVar();
+						if (isDataConnected(fbName, curWith))
+						{														
+							String cntFrom = (String) ((Map) dataConnections.get(fbName)).get(curWith);
+							String fromInstance = getInstanceName(cntFrom);
+							String fromSignal = getSignalName(cntFrom);				
+							if (fromInstance.equals(""))
+							{
+								// constant data connection
+								action = action + 
+									"data_" + curWith + "_" + fbName + " = " + new Integer(fromSignal) + ";";
+							}
+							else
+							{
+								// instance data connection
+								action = action + 
+									"data_" + curWith + "_" + fbName + " = data_" + fromSignal + "_" + fromInstance + ";";
+							}
 						}
 					}
 				}
-			}
-			
-			eventQueue.addState("s" + i);
+				eventQueue.addTransition(from, to, event, guard, action);
 
-			for (Iterator evIter = eventInputList.iterator(); evIter.hasNext();)
-			{
-
-				JaxbEvent curEvent = (JaxbEvent) evIter.next();
-				String eventName = curEvent.getName();
-				int eventID = ((Integer) ((Map) events.get(fbName)).get(eventName)).intValue();
+				from = to;
+				to = "s" + nameCounter;
+				nameCounter++;
+				eventQueue.addState(to,false,false);
+				event = "handle_event_" + fbName + ";";
+				eventQueue.addTransition(from, to, event, null, null);
 				
-				// Transitons when queuing event
-				if (isEventConnected(fbName, eventName))
-				{					
-					from = "s" + (i-1);
-					to = "s" + (places + nameCounter);
-					nameCounter++;
- 					eventQueue.addState(to,false,false);
-					event = "receive_event_" + eventName + "_" + fbName + ";";
-					eventQueue.addTransition(from, to, event, null, null);
-					
-					from = to;
-					to = "s" + (places + nameCounter);
-					nameCounter++;
-					eventQueue.addState(to,false,false);
-					event = "queue_event_" + eventName + "_" + fbName + ";";
-					for (int j = 1; j <= places; j++)
-					{
-						guard = "event_" + fbName + "_first == " + j;
-						action = "event_place_" + ((((j-1)+(i-1)) % places) + 1) + "_" + fbName + " = " + eventID + ";";
-						if (curEvent.isSetWith())
-						{
-							List withData = curEvent.getWith();
-							for (Iterator withIter = withData.iterator(); withIter.hasNext();)
-							{
-								String curWith = ((With) withIter.next()).getVar();
-								if (isDataConnected(fbName, curWith))
-								{														
-									String cntFrom = (String) ((Map) dataConnections.get(fbName)).get(curWith);
-									String fromInstance = getInstanceName(cntFrom);
-									String fromSignal = getSignalName(cntFrom);				
-									if (fromInstance.equals(""))
-									{
-										// constant data connection
-										action = action + 
-											"data_place_" + ((((j-1)+(i-1)) % places) + 1) + "_" + curWith + "_" + fbName + 
-											" = " + new Integer(fromSignal) + ";";
-									}
-									else
-									{
-										// instance data connection
-										action = action + 
-											"data_place_" + ((((j-1)+(i-1)) % places) + 1) + "_" + curWith + "_" + fbName + 
-											" = data_" + fromSignal + "_" + fromInstance + ";";
-									}
-								}
-							}
-						}
-						eventQueue.addTransition(from, to, event, guard, action);
-					}
+				from = to;
+				to = "s" + nameCounter;
+				nameCounter++;
+				eventQueue.addState(to,false,false);
+				event = "select_event_" + fbName + ";";
+				eventQueue.addTransition(from, to, event, null, null);
 
-					from = to;
-					to = "s" + (places + nameCounter);
-					nameCounter++;
-					eventQueue.addState(to,false,false);
-					event = "submitt_fb_" + fbName + ";";
-					eventQueue.addTransition(from, to, event, null, null);
-					
-					from = to;
-					to = "s" + i;
-					event = "received_event_" + eventName + "_" + fbName + ";";
-					eventQueue.addTransition(from, to, event, null, null);
-				}
-				
-			}
+				from = to;
+				to = "s" + nameCounter;
+				nameCounter++;
+				eventQueue.addState(to,false,false);
+				event = "reset_event_" + eventName + "_" + fbName + ";";
+				action = "event_" + eventName + "_" + fbName + " = 0;";
+				eventQueue.addTransition(from, to, event, null, action);
 
+				from = to;
+				to = "s" + nameCounter;
+				nameCounter++;
+				eventQueue.addState(to,false,false);
+				event = "handling_event_done_" + fbName + ";";
+				eventQueue.addTransition(from, to, event, null, null);
 
-			// Transitions when dequeuing event
-			for (Iterator evIter = eventInputList.iterator(); evIter.hasNext();)
-			{
-				JaxbEvent curEvent = (JaxbEvent) evIter.next();
-				String eventName = curEvent.getName();
-				int eventID = ((Integer) ((Map) events.get(fbName)).get(eventName)).intValue();
-
-				if (isEventConnected(fbName, eventName))
-				{					
-					from = "s" + i;
-					to = "s" + (places + nameCounter);
-					nameCounter++;
-					eventQueue.addState(to,false,false);
-					event = "select_event_" + fbName + ";";
-					for (int j = 1; j <= places; j++)
-					{
-						guard = "(event_" + fbName + "_first == " + j + ") & ";
-						guard = guard + "(event_place_" + j + "_" + fbName + " == " + eventID + ")";
-						action = "event_" + eventName + "_" + fbName + " = 1;";
-						action = action + "event_" + fbName + "_first = " + ((j % places) + 1) + ";";				
-						action = action + "event_place_" + j + "_" + fbName +  " = 0;";
-						if (curEvent.isSetWith())
-						{
-							List withData = curEvent.getWith();
-						
-							// get first data in the queue
-							for (Iterator withIter = withData.iterator(); withIter.hasNext();)
-							{
-								String curWith = ((With) withIter.next()).getVar();
-								if (isDataConnected(fbName, curWith))
-								{														
-									action = action + 
-										"data_" + curWith + "_" + fbName + " = data_place_" + j + "_" + curWith + "_" + fbName + ";";
-									action = action + 
-										"data_place_" + j + "_" + curWith + "_" + fbName + " = 0;";
-								}
-							}
-						}
-						eventQueue.addTransition(from, to, event, guard, action);
-					}					
-
-					from = to;
-					to = "s" + (i-1);
-					event = "reset_event_" + eventName + "_" + fbName + ";";
-					action = "event_" + eventName + "_" + fbName + " = 0;";
-					eventQueue.addTransition(from, to, event, null, action);
-				}
+				from = to;
+				to = "s0";
+				event = "received_event_" + eventName + "_" + fbName + ";";
+				eventQueue.addTransition(from, to, event, null, null);
 			}
 		}		
 		automata.addAutomaton(eventQueue);	
 	}
-	
+
 	void makeECStateBranch(ExtendedAutomaton ecc, String fbName, String ecStateName, String prevStateName, List ecStates, List ecTransitions, Set visitedECStates, int level, Map identifierMap)
 	{
 		Logger.output(Logger.DEBUG, "Entering makeECStateBranch(): ecStateName = " + ecStateName + ": prevStateName = " + prevStateName, level);
@@ -956,169 +857,6 @@ class SequentialExecModelBuilder
 			event = "handling_event_done_" + fbName + ";";
 			Logger.output(Logger.DEBUG, "Adding transition: from: " + from + ", to: " + to + ", event: " + event, level);
 			ecc.addTransition(from, to, event, null, null);
-		}
-	}
-	
-	void makeBasicFBAlgorithms(String fbName)
-	{
-		String typeName = (String) basicFunctionBlocks.get(fbName);
-		JaxbFBType theType = (JaxbFBType) fbTypes.get(typeName);
-		List algorithms = theType.getBasicFB().getAlgorithm();
-
-		if (algorithms.size() > 0)
-		{
-			Logger.output("Algorithms", 1);
-		}
-
-		// temporary variables
-		String from = null;
-		String to = null;
-		String event = null;
-		String action = null;
-
-		// for all algorithms
-		for (Iterator algIter = algorithms.iterator(); algIter.hasNext();)
-		{
-			JaxbAlgorithm curAlg = (JaxbAlgorithm) algIter.next();
-			String algName = curAlg.getName();
-			String algLang = curAlg.getOther().getLanguage();
-			String algText = curAlg.getOther().getText();
-			ExtendedAutomaton curAlgModel = getNewAutomaton(fbName + " " + algName + ": Algorithm");
-			int nameCounter = 0;
-
-			if (algLang.toLowerCase().equals("java"))
-			{
-				// get the variables and make identifier map for translation
-				Map identifierMap = new HashMap();
-				if (theType.getInterfaceList().isSetInputVars())
-				{
-					List inputVars = theType.getInterfaceList().getInputVars().getVarDeclaration();
-					for (Iterator iter = inputVars.iterator(); iter.hasNext();)
-					{
-						VarDeclaration curVar = (VarDeclaration) iter.next();
-						String curVarName = curVar.getName();
-						identifierMap.put(curVarName, "data_" + curVarName + "_" + fbName);
-					}
-				}		
-				if (theType.getInterfaceList().isSetOutputVars())
-				{
-					List outputVars = theType.getInterfaceList().getOutputVars().getVarDeclaration();
-					for (Iterator iter = outputVars.iterator(); iter.hasNext();)
-					{
-						VarDeclaration curVar = (VarDeclaration) iter.next();
-						String curVarName = curVar.getName();
-						identifierMap.put(curVarName, "data_" + curVarName + "_" + fbName);
-					}
-				}
-				if (theType.getBasicFB().isSetInternalVars())
-				{
-					List internalVars = theType.getBasicFB().getInternalVars().getVarDeclaration();
-					for (Iterator iter = internalVars.iterator(); iter.hasNext();)
-					{
-						VarDeclaration curVar = (VarDeclaration) iter.next();
-						String curVarName = curVar.getName();
-						identifierMap.put(curVarName, "internal_" + curVarName + "_" + fbName);
-					}
-				}
-				
-				// parse the Java algorithm
-				StringReader reader = new StringReader(algText);
-				net.sourceforge.fuber.model.interpreters.java.Lexer javaLexer = new net.sourceforge.fuber.model.interpreters.java.Lexer((Reader) reader);
-				net.sourceforge.fuber.model.interpreters.java.Parser javaParser = new net.sourceforge.fuber.model.interpreters.java.Parser((Scanner) javaLexer);
-				Goal algSyntaxTree = null;
-				try
-				{
-					algSyntaxTree = (Goal) javaParser.parse().value;
-				}
-				catch(Exception e)
-				{
-					Logger.output(Logger.ERROR, "Error!: Parsing of the Java algorithm failed:");
-					Logger.output(Logger.ERROR, "Algorithm: " + algName, 1);
-					Logger.output(Logger.ERROR, "Text: " + algText, 1);
-					exit(1);
-				}	
-				
-				// translate algorithm idents and expressions to efa
-				net.sourceforge.fuber.model.interpreters.java.Translator translator = new net.sourceforge.fuber.model.interpreters.java.Translator(algSyntaxTree, identifierMap, null);
-				String efaAlgText = translator.translate();
-				
-				// parse the efa algorithm
-				reader = new StringReader(efaAlgText);
-				net.sourceforge.fuber.model.interpreters.efa.Lexer efaLexer = new net.sourceforge.fuber.model.interpreters.efa.Lexer((Reader) reader);
-				net.sourceforge.fuber.model.interpreters.efa.Parser efaParser = new net.sourceforge.fuber.model.interpreters.efa.Parser((Scanner) efaLexer);
-				Goal efaAlgSyntaxTree = null;
-				try
-				{
-					efaAlgSyntaxTree = (Goal) efaParser.parse().value;
-				}
-				catch(Exception e)
-				{
-					Logger.output(Logger.ERROR, "Error!: Parsing of the EFA algorithm failed:");
-					Logger.output(Logger.ERROR, "Algorithm: " + algName, 1);
-					Logger.output(Logger.ERROR, "Text: " + efaAlgText, 1);
-					exit(1);
-				}	
-				
-				// get all identifiers			
-				Finder finder = new Finder(efaAlgSyntaxTree);
-				Set assignmentIdents = finder.getAssignmentIdentifiers();
-				Set expressionIdents = finder.getExpressionIdentifiers();
-				// put all identifiers into single set
-				Set algorithmIdents = new LinkedHashSet();
-				for (Iterator iter = assignmentIdents.iterator(); iter.hasNext();)
-				{
-					String curIdent = ((Identifier) iter.next()).a;
-					if (!algorithmIdents.contains(curIdent))
-					{
-						algorithmIdents.add(curIdent);
-					}
-				}
-				for (Iterator iter = expressionIdents.iterator(); iter.hasNext();)
-				{
-					String curIdent = ((Identifier) iter.next()).a;
-					if (!algorithmIdents.contains(curIdent))
-					{
-						algorithmIdents.add(curIdent);
-					}
-				}
-				
-				String[] efaAlgTextLines = efaAlgText.split(";");
-				
-				// make execution model
-				from = "s" + nameCounter;
-				nameCounter++;	
-				curAlgModel.addInitialState(from);
-				to = "s" + nameCounter;
-				curAlgModel.addState(to);
-				nameCounter++;
-				event = "execute_" + algName + "_" + fbName + ";";
-				curAlgModel.addTransition(from, to, event, null, null);
-				from = to;
-
-				// for all lines in the algorithm text
-				for (int i = 0; i < efaAlgTextLines.length; i++)
-				{
-					String statement = efaAlgTextLines[i];
-					Logger.output(Logger.DEBUG, "Making statement: " + statement, 2);
-					
-					to = "s" + nameCounter;
-					nameCounter++;
-					curAlgModel.addState(to);
-					event = "statement_" + (i+1) + "_" + algName + "_" + fbName + ";";
-					action = statement;
-					
-					Logger.output(Logger.DEBUG, "Made model action: " + action, 2);
-					// make model transition
-					curAlgModel.addTransition(from, to, event, null, action);
-					from = to;
-				}
-
-				to = "s0";
-				event = "finished_execution_" + algName + "_" + fbName + ";";
-				curAlgModel.addTransition(from, to, event, null, null);
-				
-				automata.addAutomaton(curAlgModel);	
-			}
 		}
 	}
 }
