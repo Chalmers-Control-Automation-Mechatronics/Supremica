@@ -53,7 +53,6 @@ class ConstraintContext implements VariableContext
       case 1:
         final List<? extends SimpleExpressionProxy> values = range.getValues();
         final SimpleExpressionProxy value = values.iterator().next();
-        mPropagator.addProcessedEquation(ident, value);
         return value;
       default:
         break;
@@ -120,7 +119,7 @@ class ConstraintContext implements VariableContext
   }
 
   boolean restrictRange(final SimpleExpressionProxy varname,
-                              final CompiledRange restriction)
+                        final CompiledRange restriction)
   {
     final ProxyAccessor<SimpleExpressionProxy> accessor =
       new ProxyAccessorByContents<SimpleExpressionProxy>(varname);
@@ -129,10 +128,22 @@ class ConstraintContext implements VariableContext
       "Attempting to restrict undefined range for " + varname + "!";
     final CompiledRange intersection = current.intersection(restriction);
     if (current != intersection) {
+      // System.err.println
+      //   ("RESTRICT " + varname + ": " + current + " >> " + intersection);
       mRestrictions.put(accessor, intersection);
       return true;
     } else {
       return false;
+    }
+  }
+
+  CompiledRange getOriginalRange(final SimpleExpressionProxy varname)
+  {
+    if (mParent instanceof ConstraintContext) {
+      final ConstraintContext parent = (ConstraintContext) mParent;
+      return parent.getOriginalRange(varname);
+    } else {
+      return mParent.getVariableRange(varname);
     }
   }
 

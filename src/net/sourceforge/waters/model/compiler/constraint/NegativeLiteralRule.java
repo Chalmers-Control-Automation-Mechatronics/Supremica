@@ -45,7 +45,7 @@ class NegativeLiteralRule extends SimplificationRule
     final SimpleIdentifierProxy ident = VARNAME.getIdentifier();
     final SimpleExpressionProxy template =
       factory.createUnaryExpressionProxy(op, ident);
-    final IntConstantProxy value = factory.createIntConstantProxy(1);
+    final IntConstantProxy value = factory.createIntConstantProxy(0);
     return new NegativeLiteralRule(template, VARNAME, value);
   }
 

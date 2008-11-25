@@ -19,6 +19,8 @@ import java.util.TreeSet;
 
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
 import net.sourceforge.waters.model.compiler.context.CompiledRange;
+import net.sourceforge.waters.model.compiler.context.CompiledEnumRange;
+import net.sourceforge.waters.model.compiler.context.CompiledIntRange;
 import net.sourceforge.waters.model.compiler.context.
   CompilerExpressionComparator;
 import net.sourceforge.waters.model.compiler.context.SimpleExpressionCompiler;
@@ -29,6 +31,7 @@ import net.sourceforge.waters.model.expr.BinaryOperator;
 import net.sourceforge.waters.model.expr.EvalException;
 import net.sourceforge.waters.model.expr.UnaryOperator;
 import net.sourceforge.waters.model.module.BinaryExpressionProxy;
+import net.sourceforge.waters.model.module.IntConstantProxy;
 import net.sourceforge.waters.model.module.ModuleProxyFactory;
 import net.sourceforge.waters.model.module.SimpleExpressionProxy;
 import net.sourceforge.waters.model.module.UnaryExpressionProxy;
@@ -144,6 +147,9 @@ public class ConstraintPropagator
         new ArrayList<SimpleExpressionProxy>(size);
       result.addAll(mProcessedEquations);
       result.addAll(mNormalizedConstraints);
+      for (final SimpleExpressionProxy varname : mContext.getVariableNames()) {
+        addRangeConstraints(varname, result);
+      }
       return result;
     }
   }
@@ -181,6 +187,8 @@ public class ConstraintPropagator
         for (final SimpleExpressionProxy constraint : mNormalizedConstraints) {
           for (final SimplificationRule rule : mRewriteRules) {
             if (rule.match(constraint, this)) {
+              // System.err.println
+              //   ("MATCH: " + rule.getClass().getName() + " " + constraint);
               if (rule.isMakingReplacement()) {
                 mNormalizedConstraints.remove(constraint);
               }
@@ -338,6 +346,65 @@ public class ConstraintPropagator
     final BinaryOperator op = binary.getOperator();
     final SimpleExpressionProxy lhs = binary.getLeft();
     return mFactory.createBinaryExpressionProxy(op, lhs, simp);
+  }
+
+  private void addRangeConstraints
+    (final SimpleExpressionProxy varname,
+     final Collection<SimpleExpressionProxy> constraints)
+  {
+    final CompiledRange restricted = mContext.getVariableRange(varname);
+    final CompiledRange original = mContext.getOriginalRange(varname);
+    if (restricted != original) {
+      if (restricted instanceof CompiledIntRange) {
+        final CompiledIntRange intrestricted = (CompiledIntRange) restricted;
+        final CompiledIntRange intoriginal = (CompiledIntRange) original;
+        final int lower = intrestricted.getLower();
+        final int upper = intrestricted.getUpper();
+        if (lower == upper) {
+          final BinaryOperator op = mOperatorTable.getEqualsOperator();
+          final IntConstantProxy intconst =
+            mFactory.createIntConstantProxy(lower);
+          final BinaryExpressionProxy constraint =
+            mFactory.createBinaryExpressionProxy(op, varname, intconst);
+          constraints.add(constraint);
+        } else {
+          final BinaryOperator op = mOperatorTable.getLessEqualsOperator();
+          if (lower > intoriginal.getLower()) {
+            final IntConstantProxy intconst =
+              mFactory.createIntConstantProxy(lower);
+            final BinaryExpressionProxy constraint =
+              mFactory.createBinaryExpressionProxy(op, intconst, varname);
+            constraints.add(constraint);
+          }
+          if (upper < intoriginal.getUpper()) {
+            final IntConstantProxy intconst =
+              mFactory.createIntConstantProxy(upper);
+            final BinaryExpressionProxy constraint =
+              mFactory.createBinaryExpressionProxy(op, varname, intconst);
+            constraints.add(constraint);
+          }
+        }
+      } else if (restricted instanceof CompiledEnumRange) {
+        final BinaryOperator eqop = mOperatorTable.getEqualsOperator();
+        final BinaryOperator orop = mOperatorTable.getOrOperator();
+        final Iterator<? extends SimpleExpressionProxy> iter =
+          restricted.getValues().iterator();
+        final SimpleExpressionProxy first = iter.next();
+        SimpleExpressionProxy constraint =
+          mFactory.createBinaryExpressionProxy(eqop, varname, first);
+        while (iter.hasNext()) {
+          final SimpleExpressionProxy next = iter.next();
+          final SimpleExpressionProxy eqn =
+            mFactory.createBinaryExpressionProxy(eqop, varname, next);
+          constraint =
+            mFactory.createBinaryExpressionProxy(orop, constraint, eqn);
+        }
+        constraints.add(constraint);
+      } else {
+        throw new ClassCastException
+          ("Unknown type of range: " + restricted.getClass().getName() + "!");
+      }
+    }
   }
 
 

@@ -100,7 +100,7 @@ public class ConstraintPropagatorTest extends TestCase
     testPropagate(constraints, expected);
   }
 
-  public void testPropagate__not_a_or_b()
+  public void testPropagate_not_a_or_b()
     throws EvalException, ParseException
   {
     String[] constraints = {"!(a | b)"};
@@ -108,7 +108,7 @@ public class ConstraintPropagatorTest extends TestCase
     testPropagate(constraints, expected);
   }
 
-  public void testPropagate__not_a_or_not_b()
+  public void testPropagate_not_a_or_not_b()
     throws EvalException, ParseException
   {
     String[] constraints = {"!(a | !b)"};
@@ -116,7 +116,15 @@ public class ConstraintPropagatorTest extends TestCase
     testPropagate(constraints, expected);
   }
 
-  public void testPropagate__crc_1()
+  public void testPropagate_not_a_and_b()
+    throws EvalException, ParseException
+  {
+    String[] constraints = {"!(a & b)"};
+    String[] expected = {"!a | !b"};
+    testPropagate(constraints, expected);
+  }
+
+  public void testPropagate_crc_1()
     throws EvalException, ParseException
   {
     final CompiledEnumRange range =
@@ -127,7 +135,7 @@ public class ConstraintPropagatorTest extends TestCase
     testPropagate(constraints, expected);
   }
 
-  public void testPropagate__crc_2()
+  public void testPropagate_crc_2()
     throws EvalException, ParseException
   {
     final CompiledEnumRange range =
@@ -138,6 +146,101 @@ public class ConstraintPropagatorTest extends TestCase
     testPropagate(constraints, expected);
   }
 
+  public void testPropagate_intrange_1()
+    throws EvalException, ParseException
+  {
+    final CompiledIntRange range = createIntRange(0, 5);
+    addVariable("x", range);
+    String[] constraints = {"x<=5"};
+    String[] expected = {};
+    testPropagate(constraints, expected);
+  }
+
+  public void testPropagate_intrange_2()
+    throws EvalException, ParseException
+  {
+    final CompiledIntRange range = createIntRange(0, 5);
+    addVariable("x", range);
+    String[] constraints = {"x>5"};
+    testPropagate(constraints, null);
+  }
+
+  public void testPropagate_intrange_3()
+    throws EvalException, ParseException
+  {
+    final CompiledIntRange range = createIntRange(0, 5);
+    addVariable("x", range);
+    String[] constraints = {"x>=2 & x<3"};
+    String[] expected = {"x==2"};
+    testPropagate(constraints, expected);
+  }
+
+  public void testPropagate_intrange_4()
+    throws EvalException, ParseException
+  {
+    final CompiledIntRange range = createIntRange(0, 5);
+    addVariable("x", range);
+    String[] constraints = {"x>1 & x<3"};
+    String[] expected = {"x==2"};
+    testPropagate(constraints, expected);
+  }
+
+  public void testPropagate_intrange_5()
+    throws EvalException, ParseException
+  {
+    final CompiledIntRange range = createIntRange(0, 5);
+    addVariable("x", range);
+    String[] constraints = {"x>1 & x<1"};
+    testPropagate(constraints, null);
+  }
+
+  public void testPropagate_intrange_6()
+    throws EvalException, ParseException
+  {
+    final CompiledIntRange range = createIntRange(0, 5);
+    addVariable("x", range);
+    String[] constraints = {"x<4 & x<2"};
+    String[] expected = {"x<=1"};
+    testPropagate(constraints, expected);
+  }
+
+  public void testPropagate_intrange_7()
+    throws EvalException, ParseException
+  {
+    final CompiledIntRange range = createIntRange(0, 5);
+    addVariable("x", range);
+    addVariable("y", range);
+    String[] constraints = {"x>1 & x==y & y<=2"};
+    String[] expected = {"x==2", "y==2"};
+    testPropagate(constraints, expected);
+  }
+
+  public void testPropagate_balllift_1()
+    throws EvalException, ParseException
+  {
+    addBooleanVariable("qUp");
+    addBooleanVariable("next_qUp");
+    addBooleanVariable("c_iBallDn");
+    addBooleanVariable("c_iBallUp");
+    String[] constraints = {"next_qUp",
+                            "next_qUp == ((qUp | c_iBallDn) & c_iBallUp)"};
+    String[] expected = {"next_qUp", "c_iBallDn | qUp", "c_iBallUp"};
+    testPropagate(constraints, expected);
+  }
+
+  public void testPropagate_balllift_2()
+    throws EvalException, ParseException
+  {
+    addBooleanVariable("qUp");
+    addBooleanVariable("next_qUp");
+    addBooleanVariable("c_iBallDn");
+    addBooleanVariable("c_iBallUp");
+    String[] constraints = {"!next_qUp",
+                            "next_qUp == ((qUp | c_iBallDn) & c_iBallUp)"};
+    String[] expected = {"!next_qUp", "!c_iBallUp | !(qUp | c_iBallDn)"};
+    testPropagate(constraints, expected);
+  }
+
   public void testReentrant()
     throws EvalException, ParseException
   {
@@ -145,7 +248,8 @@ public class ConstraintPropagatorTest extends TestCase
     testPropagate_not_not_a();
     testPropagate_a_and_b();
     testPropagate_b_or_c_or_a();
-    testPropagate__crc_1();
+    testPropagate_crc_1();
+    testPropagate_intrange_3();
   }
 
 
@@ -162,6 +266,11 @@ public class ConstraintPropagatorTest extends TestCase
     throws ParseException
   {
     addVariable(name, BOOLEAN_RANGE);
+  }
+
+  private CompiledIntRange createIntRange(final int lower, final int upper)
+  {
+    return new CompiledIntRange(lower, upper);
   }
 
   private CompiledEnumRange createEnumRange(final String[] names)
@@ -188,6 +297,7 @@ public class ConstraintPropagatorTest extends TestCase
     throws EvalException, ParseException
   {
     final List<SimpleExpressionProxy> constraints = parse(inputs);
+    // System.err.println(constraints);
     final List<SimpleExpressionProxy> expected = parse(outputs);
     final boolean unchanged = isEqualList(constraints, expected);
     mPropagator.init(constraints);
@@ -195,8 +305,12 @@ public class ConstraintPropagatorTest extends TestCase
     final List<SimpleExpressionProxy> result = mPropagator.getConstraints();
     final Comparator<SimpleExpressionProxy> comparator =
       mPropagator.getExpressionComparator();
-    Collections.sort(result, comparator);
-    Collections.sort(expected, comparator);
+    if (result != null) {
+      Collections.sort(result, comparator);
+    }
+    if (expected != null) {
+      Collections.sort(expected, comparator);
+    }
     assertTrue("Wrong output from constraint propagator: got " +
                result + " but should have been " + expected + "!",
                isEqualList(result, expected));
@@ -226,6 +340,8 @@ public class ConstraintPropagatorTest extends TestCase
   {
     if (list1 == null) {
       return list2 == null;
+    } else if (list2 == null) {
+      return false;
     } else if (list1.size() == list2.size()) {
       final Iterator<SimpleExpressionProxy> iter1 = list1.iterator();
       final Iterator<SimpleExpressionProxy> iter2 = list2.iterator();
