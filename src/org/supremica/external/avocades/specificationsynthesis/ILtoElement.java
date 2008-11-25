@@ -4,6 +4,7 @@
  * This class is an small step toward the input to the 
  * specification synthes algorithm made by Kristin Andersson
  *  
+ * David Millares
  */
 
 package org.supremica.external.avocades.specificationsynthesis;
