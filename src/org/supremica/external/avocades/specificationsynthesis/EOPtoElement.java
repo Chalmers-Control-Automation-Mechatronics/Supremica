@@ -104,6 +104,7 @@ class EOPtoElement
 	private static Element createElement(final InitialState initialState, final String id){
 	
 		final String ID_PREFIX = "init";
+		final String noMachineNameId;
 		
 		Element element = null;
 		
@@ -114,10 +115,16 @@ class EOPtoElement
 		
 		init();
 		
+		/*
+		 * Machine name is removed.
+		 * This is done in order for "Robot IL" to work.
+		 */
+		noMachineNameId = removeMachineName(id);
+		
 		//add attributes
 		if( isValidString( ID_PREFIX + id ) ){
-		    process.setAttribute( ID , ID_PREFIX + id );
-		    event.setAttribute( ID , ID_PREFIX + id );
+		    process.setAttribute( ID , ID_PREFIX + noMachineNameId );
+		    event.setAttribute( ID , ID_PREFIX + noMachineNameId );
 		}
 		
 		//Create structure
@@ -148,18 +155,6 @@ class EOPtoElement
 		return process;
 	}
 	
-	/**
-	 * If a <code>String</code> contains <code>EVENT_MACHINE_SEPARATOR</code>
-	 * the substring before is returned, otherwise the same <code>String</code>
-	 *  is returned.
-	 *  <p>
-	 *  
-	 *  Ex.<br>
-	 *  String eventEVENT_MACHINE_SEPARATORmachine returns event.
-	 * 
-	 * @param str <code>String</code> to be parsed 
-	 * @return a substring from start to <code>EVENT_MACHINE_SEPARATOR</code>
-	 */
 	private static String removeMachineName(String str){
 		
 		if (!str.contains( EVENT_MACHINE_SEPARATOR )){
