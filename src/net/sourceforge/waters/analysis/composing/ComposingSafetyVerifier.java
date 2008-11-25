@@ -112,14 +112,13 @@ public class ComposingSafetyVerifier
       for (EventProxy e : candidates.get(i).getLocalEvents()) {
         System.out.print(e.getName()+",");
       }
-      System.out.println("\nAutomata: "+candidates.get(i).getName()+",");
+      System.out.println("\nAutomata: "+candidates.get(i).getName());
     }
     
      
     final SafetyVerifier checker =
-      new NativeSafetyVerifier(des, getConvertedKindTranslator(),
-			       getFactory());
-      //new BDDSafetyVerifier(des, mTranslator, getFactory());
+      new NativeSafetyVerifier(des, getConvertedKindTranslator(),getFactory());
+      //new BDDSafetyVerifier(des, getConvertedKindTranslator(), getFactory());
     checker.setNodeLimit(getNodeLimit());        
     final boolean result = checker.run(); 
     mStates = (int)checker.getAnalysisResult().getTotalNumberOfStates();
@@ -131,6 +130,8 @@ public class ComposingSafetyVerifier
     } else {
       final String tracename = getModel().getName() + ":uncontrollable";
       final SafetyTraceProxy counterexample = checker.getCounterExample();
+      //return setFailedResult(counterexample);
+      
       List<EventProxy> composedTrace = new LinkedList<EventProxy>(counterexample.getEvents());
       if (candidates.isEmpty()) {   
         return setFailedResult(counterexample);
