@@ -149,12 +149,14 @@ public class SimpleExpressionCompiler
     }
   }
 
-  public boolean isAtomicValue(final SimpleExpressionProxy expr)
+  public boolean isAtomicValue(final SimpleExpressionProxy expr,
+                               final BindingContext context)
   {
     try {
-      return (Boolean) expr.acceptVisitor(mAtomicVisitor);
-    } catch (final VisitorException exception) {
-      throw exception.getRuntimeException();
+      mContext = context;
+      return isAtomicValue(expr);
+    } finally {
+      mContext = null;
     }
   }
 
@@ -241,6 +243,15 @@ public class SimpleExpressionCompiler
     throws EvalException
   {
     return mSimplificationVisitor.simplify(expr);
+  }
+
+  private boolean isAtomicValue(final SimpleExpressionProxy expr)
+  {
+    try {
+      return (Boolean) expr.acceptVisitor(mAtomicVisitor);
+    } catch (final VisitorException exception) {
+      throw exception.getRuntimeException();
+    }
   }
 
   private SimpleExpressionProxy processIdentifier

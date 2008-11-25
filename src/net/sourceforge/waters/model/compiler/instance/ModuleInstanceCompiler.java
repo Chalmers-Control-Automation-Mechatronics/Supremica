@@ -247,7 +247,7 @@ public class ModuleInstanceCompiler extends AbstractModuleProxyVisitor
           final Iterator<SimpleExpressionProxy> iter = guards.iterator();
           final SimpleExpressionProxy guard = iter.next();
           if (!iter.hasNext() &&
-              mSimpleExpressionCompiler.isAtomicValue(guard)) {
+              mSimpleExpressionCompiler.isAtomicValue(guard, mContext)) {
             final boolean value =
               mSimpleExpressionCompiler.getBooleanValue(guard);
             if (!value) {
@@ -489,7 +489,7 @@ public class ModuleInstanceCompiler extends AbstractModuleProxyVisitor
         final SimpleExpressionProxy newguard =
           mSimpleExpressionCompiler.simplify
           (oldguard, mNameSpaceVariablesContext);
-        if (!mSimpleExpressionCompiler.isAtomicValue(newguard)) {
+        if (!mSimpleExpressionCompiler.isAtomicValue(newguard, mContext)) {
           newguards.add(newguard);
         } else if (mSimpleExpressionCompiler.getBooleanValue(newguard)) {
           // Don't bother to add true guards ...
@@ -533,7 +533,7 @@ public class ModuleInstanceCompiler extends AbstractModuleProxyVisitor
       if (mCurrentEventList == null) {
         final SimpleExpressionProxy value =
           mSimpleExpressionCompiler.simplify(newident, mContext);
-        if (mSimpleExpressionCompiler.isAtomicValue(value)) {
+        if (mSimpleExpressionCompiler.isAtomicValue(value, mContext)) {
           return value;
         }
         final IdentifierProxy ivalue =

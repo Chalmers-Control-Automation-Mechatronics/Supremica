@@ -305,8 +305,11 @@
       <formatter type="xml"/>
       <batchtest todir="${logs.results}">
         <fileset dir="${supremica.testsrc}">
+          <include name="net/sourceforge/waters/**/*PropagatorTest.java"/>
+          <!--
           <include name="net/sourceforge/waters/**/*CompilerTest.java"/>
           <include name="net/sourceforge/waters/**/ValidTest.java"/>
+          -->
           <exclude name="**/Abstract*.java"/>
         </fileset>
       </batchtest>
