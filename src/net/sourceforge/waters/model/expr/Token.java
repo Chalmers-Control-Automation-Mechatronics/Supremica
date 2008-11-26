@@ -92,6 +92,16 @@ class Token {
     return null;
   }
 
+  Operator getPostfixOperator()
+  {
+    final UnaryOperator unop = getUnaryOperator();
+    if (unop != null && !unop.isPrefix()) {
+      return unop;
+    } else {
+      return getBinaryOperator();
+    }
+  }
+
 
   //#########################################################################
   //# Token Type Constants

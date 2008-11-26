@@ -218,6 +218,24 @@ public abstract class AbstractExpressionTest extends TestCase
     testExpression("-a", mExpr_m_a, Operator.TYPE_INT);
   }
 
+  public void testExpression_aprime()
+    throws ParseException
+  {
+    testExpression("a'", mExpr_aprime, Operator.TYPE_INT);
+  }
+
+  public void testExpression_aprimeplus1()
+    throws ParseException
+  {
+    testExpression("a'+1", mExpr_aprimeplus1, Operator.TYPE_INT);
+  }
+
+  public void testExpression_notaprime()
+    throws ParseException
+  {
+    testExpression("!a'", mExpr_notaprime, Operator.TYPE_BOOLEAN);
+  }
+
   public void testExpression_a_b_c_nospace()
     throws ParseException
   {
@@ -387,6 +405,8 @@ public abstract class AbstractExpressionTest extends TestCase
     final BinaryOperator times = optable.getBinaryOperator("*");
     final BinaryOperator equals = optable.getBinaryOperator("==");
     final BinaryOperator range = optable.getBinaryOperator("..");
+    final UnaryOperator not = optable.getUnaryOperator("!");
+    final UnaryOperator prime = optable.getUnaryOperator("'");
     final UnaryOperator uminus = optable.getUnaryOperator("-");
 
     final List<SimpleIdentifierProxy> idlist =
@@ -442,6 +462,11 @@ public abstract class AbstractExpressionTest extends TestCase
     mExpr_m_a = factory.createUnaryExpressionProxy(uminus, mExpr_a.clone());
     mExpr_aminus1 = factory.createBinaryExpressionProxy
       (minus, mExpr_a.clone(), mExpr_1.clone());
+    mExpr_aprime = factory.createUnaryExpressionProxy(prime, mExpr_a.clone());
+    mExpr_aprimeplus1 = factory.createBinaryExpressionProxy
+      (plus, mExpr_aprime.clone(), mExpr_1.clone());
+    mExpr_notaprime = factory.createUnaryExpressionProxy
+      (not, mExpr_aprime.clone());
     idlist.add(mExpr_a.clone());
     idlist.add(mExpr_b.clone());
     idlist.add(mExpr_c.clone());
@@ -495,6 +520,9 @@ public abstract class AbstractExpressionTest extends TestCase
     mExpr_m100tom2 = null;
     mExpr_m_a = null;
     mExpr_aminus1 = null;
+    mExpr_aprime = null;
+    mExpr_aprimeplus1 = null;
+    mExpr_notaprime = null;
     mExpr_a_b_c = null;
     mExpr_event_1 = null;
     mExpr_event_1_1plus1 = null;
@@ -536,7 +564,10 @@ public abstract class AbstractExpressionTest extends TestCase
   private SimpleIdentifierProxy mExpr_c;
   private SimpleExpressionProxy mExpr_m100tom2;
   private SimpleExpressionProxy mExpr_m_a;
+  private SimpleExpressionProxy mExpr_aprime;
+  private SimpleExpressionProxy mExpr_aprimeplus1;
   private SimpleExpressionProxy mExpr_aminus1;
+  private SimpleExpressionProxy mExpr_notaprime;
   private SimpleExpressionProxy mExpr_a_b_c;
   private IndexedIdentifierProxy mExpr_event_1;
   private SimpleExpressionProxy mExpr_event_1_1plus1;

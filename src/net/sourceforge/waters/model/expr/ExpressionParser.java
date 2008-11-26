@@ -47,7 +47,7 @@ import net.sourceforge.waters.model.module.SimpleIdentifierProxy;
  *
  * <P>The parser includes simple type checking functionality, which works
  * correctly as long as the evaluation context is not required. For
- * example, the type of an expression <CODE>1&nbsp;+&nbsp;+3</CODE> can be
+ * example, the type of an expression <CODE>1&nbsp;+&nbsp;3</CODE> can be
  * accurately identified as integer. The type of an identifier such as
  * <CODE>ev2</CODE>, however, remains unknown because names may be bound to
  * different values depending on the context in which they are
@@ -59,7 +59,7 @@ import net.sourceforge.waters.model.module.SimpleIdentifierProxy;
  * check the expected type of an expression to be parsed by passing it a
  * type mask. To check whether an expression may be an <I>integer</I> or an
  * <I>atom</I>, e.g., the following code can be used.</P>
- * 
+ *
  * <PRE>
  *   expr = parser.{@link #parse(String,int) parse}
  *     (text, {@link Operator#TYPE_INT} | {@link Operator#TYPE_ATOM});
@@ -90,7 +90,7 @@ public class ExpressionParser {
     mFactory = factory;
     mScanner = scanner;
   }
-    
+
 
   //#########################################################################
   //# High-Level Methods for Parsing
@@ -407,7 +407,7 @@ public class ExpressionParser {
         final int types = result.getTypeMask();
         if (types == 0) {
           final SimpleExpressionProxy subterm =
-            subresult.createProxy(mFactory); 
+            subresult.createProxy(mFactory);
           final int subtypes = subresult.getTypeMask();
           final String subtypesname = getTypeName(subtypes);
           throw createParseException
@@ -447,20 +447,26 @@ public class ExpressionParser {
     throws IOException, ParseException
   {
     final Token token = mScanner.peek(false);
-    if (token.getType() == Token.OPERATOR) {
-      final BinaryOperator op = token.getBinaryOperator();
-      if (op == null) {
-        throw createUnexpectedTokenException(token);
-      } 
-      final int innerpri = op.getPriority();
-      if (innerpri < outerpri ||
-          innerpri == outerpri && outerassoc != BinaryOperator.ASSOC_RIGHT) {
+    if (token.getType() != Token.OPERATOR) {
+      return lhs;
+    }
+    final Operator op = token.getPostfixOperator();
+    if (op == null) {
+      throw createUnexpectedTokenException(token);
+    }
+    final int innerpri = op.getPriority();
+    if (innerpri < outerpri) {
+      return lhs;
+    }
+    if (op instanceof BinaryOperator) {
+      if (innerpri == outerpri && outerassoc != BinaryOperator.ASSOC_RIGHT) {
         return lhs;
       }
       mScanner.next();
-      final int innerassoc = op.getAssociativity();
+      final BinaryOperator binop = (BinaryOperator) op;
+      final int innerassoc = binop.getAssociativity();
       final ParseResult rhs = parseResult(innerpri, innerassoc);
-      final ParseResult result = new BinaryExpressionResult(op, lhs, rhs);
+      final ParseResult result = new BinaryExpressionResult(binop, lhs, rhs);
       final int resultTypes = result.getTypeMask();
       if (resultTypes == 0) {
         final SimpleExpressionProxy lhsExpr = lhs.createProxy(mFactory);
@@ -474,9 +480,22 @@ public class ExpressionParser {
            " cannot be applied to '" + lhsExpr + "' of type " + lhsTypesName +
            " and '" + rhsExpr + "' of type " + rhsTypesName, lhstoken);
       }
-      return parseResult(result, token, outerpri, outerassoc);      
+      return parseResult(result, token, outerpri, outerassoc);
     } else {
-      return lhs;
+      mScanner.next();
+      final UnaryOperator unop = (UnaryOperator) op;
+      final ParseResult result = new UnaryExpressionResult(unop, lhs);
+      final int resultTypes = result.getTypeMask();
+      if (resultTypes == 0) {
+        final SimpleExpressionProxy lhsExpr = lhs.createProxy(mFactory);
+        final int lhsTypes = lhs.getTypeMask();
+        final String lhsTypesName = getTypeName(lhsTypes);
+        throw createParseException
+          ("Operator " + op.getName() +
+           " cannot be applied to '" + lhsExpr + "' of type " + lhsTypesName,
+           lhstoken);
+      }
+      return parseResult(result, lhstoken, outerpri, outerassoc);
     }
   }
 

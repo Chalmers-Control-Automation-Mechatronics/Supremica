@@ -219,12 +219,12 @@ public class ConstraintPropagatorTest extends TestCase
     throws EvalException, ParseException
   {
     addBooleanVariable("qUp");
-    addBooleanVariable("next_qUp");
+    addBooleanVariable("qUp'");
     addBooleanVariable("c_iBallDn");
     addBooleanVariable("c_iBallUp");
-    String[] constraints = {"next_qUp",
-                            "next_qUp == ((qUp | c_iBallDn) & c_iBallUp)"};
-    String[] expected = {"next_qUp", "c_iBallDn | qUp", "c_iBallUp"};
+    String[] constraints = {"qUp'",
+                            "qUp' == ((qUp | c_iBallDn) & c_iBallUp)"};
+    String[] expected = {"qUp'", "c_iBallDn | qUp", "c_iBallUp"};
     testPropagate(constraints, expected);
   }
 
@@ -232,12 +232,12 @@ public class ConstraintPropagatorTest extends TestCase
     throws EvalException, ParseException
   {
     addBooleanVariable("qUp");
-    addBooleanVariable("next_qUp");
+    addBooleanVariable("qUp'");
     addBooleanVariable("c_iBallDn");
     addBooleanVariable("c_iBallUp");
-    String[] constraints = {"!next_qUp",
-                            "next_qUp == ((qUp | c_iBallDn) & c_iBallUp)"};
-    String[] expected = {"!next_qUp", "!c_iBallUp | !(qUp | c_iBallDn)"};
+    String[] constraints = {"!qUp'",
+                            "qUp' == ((qUp | c_iBallDn) & c_iBallUp)"};
+    String[] expected = {"!qUp'", "!c_iBallUp | !(qUp | c_iBallDn)"};
     testPropagate(constraints, expected);
   }
 

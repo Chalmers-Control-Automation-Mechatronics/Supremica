@@ -85,7 +85,7 @@ public class CompilerOperatorTable extends AbstractOperatorTable {
     mModuloOperator = new BinaryModuloOperator();
     mRangeOperator = new BinaryRangeOperator();
 
-    // store(mUnaryNextOperator, 0);
+    store(mUnaryNextOperator, 0);
     store(new BinaryQualificationOperator(), 1);
     store(mEqualsOperator, 2);
     store(mNotEqualsOperator, 3);
@@ -1939,7 +1939,7 @@ public class CompilerOperatorTable extends AbstractOperatorTable {
 
     public int getReturnTypes(final int argType)
     {
-      return argType & Operator.TYPE_NAME;
+      return argType & Operator.TYPE_INDEX;
     }
 
     public Value eval(final Value argValue)

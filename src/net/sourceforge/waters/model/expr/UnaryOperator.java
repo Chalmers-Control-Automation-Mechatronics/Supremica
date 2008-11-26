@@ -26,8 +26,18 @@ public interface UnaryOperator extends Operator {
 
   //#########################################################################
   //# Simple Access Methods
+  /**
+   * Returns whether this operator is to be parsed as a prefix or postfix
+   * operator.
+   * @return <CODE>true</CODE> for prefix operators,
+   *         <CODE>false</CODE> for postfix operators.
+   */
   public boolean isPrefix();
 
+  /**
+   * Gets the type mask for acceptable argument types of this operator.
+   * @see ExpressionParser
+   */
   public int getArgTypes();
 
 
