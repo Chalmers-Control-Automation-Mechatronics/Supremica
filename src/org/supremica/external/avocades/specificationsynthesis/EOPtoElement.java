@@ -4,6 +4,7 @@
  * This class is an small step toward the input to the 
  * specification synthes algorithm made by Kristin Andersson
  * 
+ * David Millares
  */
 
 package org.supremica.external.avocades.specificationsynthesis;
@@ -72,9 +73,6 @@ class EOPtoElement
 		return element;
 	}
 	
-	
-	
-	
 	/**
 	 * 
 	 * Function to initialize and create elements. Should
@@ -91,9 +89,6 @@ class EOPtoElement
 		and = new Element( AND );
 	}
 	
-	
-	
-	
 	/**
 	 * 
 	 * Creates an Process element from an InitialState object
@@ -101,7 +96,9 @@ class EOPtoElement
 	 * @param initialState
 	 * @return the initial state represented in a Element
 	 */
-	private static Element createElement(final InitialState initialState, final String id){
+	private static Element createElement(final InitialState initialState,
+			                             final String id)
+	{
 	
 		final String ID_PREFIX = "init";
 		final String noMachineNameId;
@@ -117,7 +114,8 @@ class EOPtoElement
 		
 		/*
 		 * Machine name is removed.
-		 * This is done in order for "Robot IL" to work.
+		 * This is done in order for "Robot IL" to work
+		 * in specification synthesis
 		 */
 		noMachineNameId = removeMachineName(id);
 		
@@ -151,10 +149,15 @@ class EOPtoElement
 			}
 		}
 		
-		
 		return process;
 	}
 	
+	/**
+	 * 
+	 * @param str
+	 * @return a substring from index 0 to the first occurrence of
+	 *         EVENT_MACHINE_SEPARATOR in str.
+	 */
 	private static String removeMachineName(String str){
 		
 		if (!str.contains( EVENT_MACHINE_SEPARATOR )){
@@ -162,9 +165,7 @@ class EOPtoElement
 		}
 		
 		return str.substring(0, str.indexOf( EVENT_MACHINE_SEPARATOR ));
-		
 	}
-	
 	
 	/**
 	 * 
@@ -221,7 +222,6 @@ class EOPtoElement
 		return process;
 	}
 	
-	
 	/**
 	 * 
 	 * Creates an Element from an instance of ActuatorValue
@@ -257,8 +257,6 @@ class EOPtoElement
 		return state;
 	}
 	
-	
-	
 	/**
 	 * 
 	 * Creates an Element from an instance of an SensorValue
@@ -292,11 +290,4 @@ class EOPtoElement
 		
 		return state;
 	}
-	
-	
-	
-	
-	
-	
-	
 }

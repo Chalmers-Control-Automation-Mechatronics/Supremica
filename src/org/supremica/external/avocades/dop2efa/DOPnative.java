@@ -42,8 +42,8 @@ public class DOPnative {
 	//Attribute types used by user
 	//-------------------------------------------------------------------------
 	public final static String RESOURCE = "RESOURCE";
-	public final static String BOOK = "b";				//booking of zones
-	public final static String FREE = "u";				//zone free
+	public final static String BOOK = "b";				//book zone
+	public final static String FREE = "f";				//free zone
 	
 	//-------------------------------------------------------------------------
 	//Attribute types used by algorithm
