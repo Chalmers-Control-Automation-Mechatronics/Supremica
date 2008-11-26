@@ -36,7 +36,7 @@ public class SpecificationSynthesXML {
 	
 	
 	//This array contains strings who can be treated as empty
-	public static final String[] NOT_VALID_STRINGS = new String[]{ "-", "", "*" };
+	public static final String[] NOT_VALID_STRINGS = new String[]{ "-", "","*" };
 	
 	/*-----------------------------------------------------------------------*/
 	/*

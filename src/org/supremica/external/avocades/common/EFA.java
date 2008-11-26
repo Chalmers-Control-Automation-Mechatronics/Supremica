@@ -57,6 +57,10 @@ public class EFA extends ExtendedAutomaton{
 	   this.addState(name, false, true);
    }
    
+   public void addInitialState(String name, boolean accepting){
+	   this.addState(name, accepting, true);
+   }
+   
    public void addAcceptingState(String name){
 	   this.addState(name, true, false);
    }

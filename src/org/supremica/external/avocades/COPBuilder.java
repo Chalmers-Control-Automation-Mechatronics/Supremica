@@ -289,8 +289,8 @@ public class COPBuilder {
     	
     	convAut = new ConverterILtoAutomata();
 		convAut.convertILtoAutomata( builder.getDoc() );
-/*		
-		//debug code
+		
+/*		//debug code
 		try{
     		//create debug file
             tmpFile = new File("eopsils.xml");

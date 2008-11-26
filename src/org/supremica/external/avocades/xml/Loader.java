@@ -27,6 +27,12 @@ public class Loader {
         m = null;
     }
     
+    /**
+     * Creates JAXB object from a <code>String</code>
+     * @param xmlStr XML <code>String</code> to be parsed
+     * @return JAXB object <code>ROP</code>, <code>EOP</code>, <code>IL</code>.
+     *         <code>null</code> 
+     */
     public Object open( String xmlStr ) {	
     	Object o = null;
     	
@@ -34,24 +40,21 @@ public class Loader {
     	
     	//ROP
         o = open( xmlStr, PKGS_ROP );
-    	if( null != o){
-    		
+    	if (o instanceof ROP){
     		printDebugInfo = true;
     		return o;
     	}
     	
     	//EOP
     	o = open( xmlStr, PKGS_EOP );
-    	if( null != o){
-    		
+    	if(o instanceof EOP){
     		printDebugInfo = true;
     		return o;
     	}
     	
     	//IL
     	o = open( xmlStr, PKGS_IL );
-    	if( null != o){
-    		
+    	if (o instanceof IL){
     		printDebugInfo = true;
     		return o;
     	}

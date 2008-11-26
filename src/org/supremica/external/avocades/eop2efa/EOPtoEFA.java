@@ -16,13 +16,20 @@ public class EOPtoEFA {
 	protected final static String INITIAL_STATE_POSTFIX = "_init";
 	protected final static String EXECUTION_STATE_POSTFIX = "_exec";
 	protected final static String END_STATE_POSTFIX = "_comp";
-	
+
 	private Module module = null;
 	
+	/**
+	 * Constructor
+	 */
 	public EOPtoEFA(){
 		module = new Module("EOPs", false);
 	}
 	
+	/**
+	 * Adds an EOP
+	 * @param eop
+	 */
 	public void add(EOP eop){
 	    EFA	efa = null;
 	    
@@ -46,10 +53,14 @@ public class EOPtoEFA {
 	    efa = new EFA( eop.getId(), module );
 	    module.addAutomaton(efa);
 	    
-	    //Add states
-	    efa.addInitialState( initialState );
+	    /*
+	     * Add states
+	     * First and last state is accepting, to avoid a trivially
+	     * blocking system.
+	     */
+	    efa.addInitialState( initialState, true );
 	    efa.addState( executionState );
-	    efa.addState( endState );
+	    efa.addAcceptingState( endState );
 	    
 		//Build event
 		start = new EGA(); //stop event
@@ -70,6 +81,10 @@ public class EOPtoEFA {
 					       stop.getAction()); 
 	}
 	
+	/**
+	 * 
+	 * @return a <code>Module</code> whit all added EOP:s
+	 */
 	public Module getModule(){
 		return module;
 	}
