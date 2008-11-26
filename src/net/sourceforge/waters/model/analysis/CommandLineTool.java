@@ -158,9 +158,9 @@ public class CommandLineTool
         fclazz.getMethod(createname, ProductDESProxyFactory.class);
       final ModelVerifier checker =
         (ModelVerifier) getcheck.invoke(factory, desFactory);
-      final boolean useProperties =
-        checker instanceof LanguageInclusionChecker;
-      final boolean usePropositions = false;
+      final boolean noProperties =
+        !(checker instanceof LanguageInclusionChecker);
+      final boolean noPropositions = true;
       final Collection<String> empty = Collections.emptyList();
       final List<String> filenames = factory.configure(checker);
 
@@ -175,12 +175,12 @@ public class CommandLineTool
           final ModuleProxy module = (ModuleProxy) doc;
           final ModuleCompiler compiler =
             new ModuleCompiler(docManager, desFactory, module);
-          final Collection<String> propertyList =
-            useProperties ? new LinkedList<String>() : empty;
-          final Collection<String> propositionList =
-            usePropositions ? new LinkedList<String>() : empty;
-          compiler.setEnabledPropertyNames(propertyList);
-          compiler.setEnabledPropositionNames(propositionList);
+          if (noProperties) {
+            compiler.setEnabledPropertyNames(empty);
+          }
+          if (noPropositions) {
+            compiler.setEnabledPropositionNames(empty);
+          }
           factory.configure(compiler);
           des = compiler.compile(bindings);
         }

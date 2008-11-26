@@ -46,7 +46,7 @@ public abstract class AbstractModelVerifierFactory
     mArgumentMap = new HashMap<String,CommandLineArgument>(16);
     addArgument(new HelpArgument());
     addArgument(new LimitArgument());
-    addArgument(new PropArgument());
+    addArgument(new PropertyArgument());
   }
 
 
@@ -202,13 +202,13 @@ public abstract class AbstractModelVerifierFactory
 
 
   //#########################################################################
-  //# Inner Class PropArgument
-  private static class PropArgument
+  //# Inner Class PropertyArgument
+  private static class PropertyArgument
     extends CommandLineArgumentString
   {
     //#######################################################################
     //# Constructors
-    private PropArgument()
+    private PropertyArgument()
     {
       super("-property",
             "Property for language inclusion check\n" +
@@ -220,7 +220,11 @@ public abstract class AbstractModelVerifierFactory
     //# net.sourceforge.waters.model.analysis.CommandLineArgument
     protected void configure(final ModuleCompiler compiler)
     {
-      final Collection<String> props = compiler.getEnabledPropertyNames();
+      Collection<String> props = compiler.getEnabledPropertyNames();
+      if (props == null) {
+        props = new LinkedList<String>();
+        compiler.setEnabledPropertyNames(props);
+      }
       final String name = getValue();
       props.add(name);
     }
