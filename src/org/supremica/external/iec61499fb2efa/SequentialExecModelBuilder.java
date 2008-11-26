@@ -49,7 +49,7 @@ import net.sourceforge.fuber.model.interpreters.abstractsyntax.Identifier;
 import net.sourceforge.fuber.xsd.libraryelement.*;
 
 class SequentialExecModelBuilder 
-	extends DualExecModelBuilder
+	extends ExecModelBuilder
 	implements ModelBuilder
 {
 
