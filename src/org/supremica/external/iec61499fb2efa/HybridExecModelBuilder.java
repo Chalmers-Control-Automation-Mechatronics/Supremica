@@ -48,65 +48,46 @@ import net.sourceforge.fuber.model.interpreters.abstractsyntax.Identifier;
 
 import net.sourceforge.fuber.xsd.libraryelement.*;
 
-class DualExecModelBuilder 
-	extends ExecModelBuilder 
+class HybridExecModelBuilder 
+	extends SequentialExecModelBuilder
 	implements ModelBuilder
 {
 
-	DualExecModelBuilder(Map<String, String> arguments)
+	HybridExecModelBuilder(Map<String, String> arguments)
 	{
 		super(arguments);
 	}
 
-	void makeInstanceQueue()
+	void makeEventExecution()
 	{
-		Logger.output(builderName() + ".makeInstanceQueue():");
+		Logger.output(builderName() + ".makeEventExecution():");
 
-		ExtendedAutomaton instanceQueue = getNewAutomaton("Instance Queue");
-		
-		// the maximum number of FB instances in the queue at the same time
-		int places = basicFunctionBlocks.keySet().size();
-		if (instanceQueuePlaces > 0 && instanceQueuePlaces <= places)
+		ExtendedAutomaton eventExecution = getNewAutomaton("Event Execution");
+
+		eventExecution.addInitialState("s0");
+		eventExecution.addState("s1",false,false);
+		eventExecution.addTransition("s0", "s1", "select_fb;", null, null);	
+
+		for (Iterator iter = basicFunctionBlocks.keySet().iterator(); iter.hasNext();)
 		{
-			places = instanceQueuePlaces.intValue();
+			String instanceName = (String) iter.next();
+
+			int nameCounter = 2;
+			
+			String from = "s1";
+			String to = "s" + nameCounter;
+			nameCounter++;
+			eventExecution.addState(to,false,false);
+			String event = "handle_event_" + instanceName + ";";
+			String guard = "current_fb == " + (Integer) basicFunctionBlocksID.get(instanceName);
+			eventExecution.addTransition(from, to, event, guard, null);
+
+			from = to;
+			to = "s0";
+			event = "no_event_" + instanceName + ";";
+			eventExecution.addTransition(from, to, event, null, null);
 		}
-
-		instanceQueue.addIntegerVariable("current_fb", 0, fbMaxID, 0, 0);
-		
-		instanceQueue.addInitialState("s0");
-		for (int i = 1; i <= places; i++)
-		{
-			instanceQueue.addIntegerVariable("fb_place_" + i, 0, fbMaxID, 0, 0);
-
-			instanceQueue.addState("s" + i);
-			//Transiton when queuing instance
-			String from = "s" + (i-1);
-			String to = "s" + i;
-			String event = "";
-			String action = "";
-			for (Iterator fbIter = basicFunctionBlocks.keySet().iterator(); fbIter.hasNext();)
-			{
-				String fbName = (String) fbIter.next();		
-				Integer fbID = (Integer) basicFunctionBlocksID.get(fbName);
-
-				event = "submitt_fb_" + fbName + ";";
-				action = "fb_place_" + i + " = " + fbID + ";";
-				instanceQueue.addTransition(from, to, event, null, action);
-			}
-
-			// Transiton when dequeuing instance
-			from = "s" + i;
-			to = "s" + (i-1);
-			event = "select_fb;";      
-			action = "current_fb = fb_place_1;";
-			for (int j = 1; j <= i-1; j++)
-			{
-				action = action + "fb_place_" + j + " = fb_place_" + (j+1) + ";";
-			}
-			action = action + "fb_place_" + i + " = 0;";
-			instanceQueue.addTransition(from, to, event, null, action);      
-		}
-		automata.addAutomaton(instanceQueue);
+		automata.addAutomaton(eventExecution);
 	}
 
 	void makeBasicFBEventHandling(String fbName)
@@ -124,11 +105,6 @@ class DualExecModelBuilder
 		String from = "s0";
 		String to = "s1";
 		String event = "handle_event_" + fbName + ";";
-		eventHandling.addTransition(from, to, event, null, null);
-
-		from = "s1";
-		to = "s0";
-		event = "no_event_" + fbName + ";";
 		eventHandling.addTransition(from, to, event, null, null);
 
 		from = "s1";
@@ -293,6 +269,9 @@ class DualExecModelBuilder
 				}
 			}
 		}
+
+		// first queue element pointer
+		eventQueue.addIntegerVariable("event_" + fbName + "_first", 1, places, 1, 0);
 		
 		String from = "";
 		String to = "";
@@ -302,6 +281,11 @@ class DualExecModelBuilder
 		int nameCounter = 1;
 		
 		eventQueue.addInitialState("s0");
+
+		from = "s0";
+		to = "s0";
+		event = "no_event_" + fbName + ";";
+		eventQueue.addTransition(from, to, event, null, null);
 
 		for (int i = 1; i <= places; i++)
 		{
@@ -375,45 +359,51 @@ class DualExecModelBuilder
 					nameCounter++;
 					eventQueue.addState(to,false,false);
 					event = "queue_event_" + eventName + "_" + fbName + ";";
-					guard = null;
-					action = "event_place_" + i + "_" + fbName + " = " + eventID + ";";
-					if (curEvent.isSetWith())
+					for (int j = 1; j <= places; j++)
 					{
-						List withData = curEvent.getWith();
-						for (Iterator withIter = withData.iterator(); withIter.hasNext();)
+						guard = "event_" + fbName + "_first == " + j;
+						action = "event_place_" + ((((j-1)+(i-1)) % places) + 1) + "_" + fbName + " = " + eventID + ";";
+						if (curEvent.isSetWith())
 						{
-							String curWith = ((With) withIter.next()).getVar();
-							if (isDataConnected(fbName, curWith))
-							{														
-								String cntFrom = (String) ((Map) dataConnections.get(fbName)).get(curWith);
-								String fromInstance = getInstanceName(cntFrom);
-								String fromSignal = getSignalName(cntFrom);				
-								if (fromInstance.equals(""))
-								{
-									// constant data connection
-									action = action + 
-										"data_place_" + i + "_" + curWith + "_" + fbName + 
-										" = " + new Integer(fromSignal) + ";";
-								}
-								else
-								{
-									// instance data connection
-									action = action + 
-										"data_place_" + i + "_" + curWith + "_" + fbName + 
-										" = data_" + fromSignal + "_" + fromInstance + ";";
+							List withData = curEvent.getWith();
+							for (Iterator withIter = withData.iterator(); withIter.hasNext();)
+							{
+								String curWith = ((With) withIter.next()).getVar();
+								if (isDataConnected(fbName, curWith))
+								{														
+									String cntFrom = (String) ((Map) dataConnections.get(fbName)).get(curWith);
+									String fromInstance = getInstanceName(cntFrom);
+									String fromSignal = getSignalName(cntFrom);				
+									if (fromInstance.equals(""))
+									{
+										// constant data connection
+										action = action + 
+											"data_place_" + ((((j-1)+(i-1)) % places) + 1) + "_" + curWith + "_" + fbName + 
+											" = " + new Integer(fromSignal) + ";";
+									}
+									else
+									{
+										// instance data connection
+										action = action + 
+											"data_place_" + ((((j-1)+(i-1)) % places) + 1) + "_" + curWith + "_" + fbName + 
+											" = data_" + fromSignal + "_" + fromInstance + ";";
+									}
 								}
 							}
 						}
+						eventQueue.addTransition(from, to, event, guard, action);
 					}
-					eventQueue.addTransition(from, to, event, guard, action);
-					
-					from = to;
-					to = "s" + (places + nameCounter);
-					nameCounter++;
-					eventQueue.addState(to,false,false);
-					event = "submitt_fb_" + fbName + ";";
-					eventQueue.addTransition(from, to, event, null, null);
-					
+
+					if (i == 1)
+					{
+						from = to;
+						to = "s" + (places + nameCounter);
+						nameCounter++;
+						eventQueue.addState(to,false,false);
+						event = "submitt_fb_" + fbName + ";";
+						eventQueue.addTransition(from, to, event, null, null);
+					}
+
 					from = to;
 					to = "s" + i;
 					event = "received_event_" + eventName + "_" + fbName + ";";
@@ -421,7 +411,6 @@ class DualExecModelBuilder
 				}
 				
 			}
-
 
 			// Transitions when dequeuing event
 			for (Iterator evIter = eventInputList.iterator(); evIter.hasNext();)
@@ -437,46 +426,33 @@ class DualExecModelBuilder
 					nameCounter++;
 					eventQueue.addState(to,false,false);
 					event = "select_event_" + fbName + ";";
-					guard = "event_place_1_" + fbName + " == " + eventID;
-					action = "event_" + eventName + "_" + fbName + " = 1;";
-					// move events in the queue
-					for (int j = 1; j <= i-1; j++)
+					for (int j = 1; j <= places; j++)
 					{
-						action = action + "event_place_" + j + "_" + fbName +  " = event_place_" + (j+1) + "_" + fbName + ";";
-					}
-					action = action + "event_place_" + i + "_" + fbName +  " = 0;";
-					if (curEvent.isSetWith())
-					{
-						List withData = curEvent.getWith();
+						guard = "(event_" + fbName + "_first == " + j + ") & ";
+						guard = guard + "(event_place_" + j + "_" + fbName + " == " + eventID + ")";
+						action = "event_" + eventName + "_" + fbName + " = 1;";
+						action = action + "event_" + fbName + "_first = " + ((j % places) + 1) + ";";				
+						action = action + "event_place_" + j + "_" + fbName +  " = 0;";
+						if (curEvent.isSetWith())
+						{
+							List withData = curEvent.getWith();
 						
-						// get first data in the queue
-						for (Iterator withIter = withData.iterator(); withIter.hasNext();)
-						{
-							String curWith = ((With) withIter.next()).getVar();
-							if (isDataConnected(fbName, curWith))
-							{														
-								action = action + 
-									"data_" + curWith + "_" + fbName + " = data_place_" + i + "_" + curWith + "_" + fbName + ";";
-							}
-						}
-						// move the queue
-						for (Iterator withIter = withData.iterator(); withIter.hasNext();)
-						{
-							String curWith = ((With) withIter.next()).getVar();
-							if (isDataConnected(fbName, curWith))
-							{														
-								for (int j = 1; j <= i-1; j++)
-								{
+							// get first data in the queue
+							for (Iterator withIter = withData.iterator(); withIter.hasNext();)
+							{
+								String curWith = ((With) withIter.next()).getVar();
+								if (isDataConnected(fbName, curWith))
+								{														
 									action = action + 
-										"data_place_" + j + "_" + curWith + "_" + fbName + " = data_place_" + (j+1) + "_" + curWith + "_" + fbName + ";";						
+										"data_" + curWith + "_" + fbName + " = data_place_" + j + "_" + curWith + "_" + fbName + ";";
+									action = action + 
+										"data_place_" + j + "_" + curWith + "_" + fbName + " = 0;";
 								}
-								action = action + 
-									"data_place_" + i + "_" + curWith + "_" + fbName + " = 0;";
 							}
 						}
-					}
-					eventQueue.addTransition(from, to, event, guard, action);
-					
+						eventQueue.addTransition(from, to, event, guard, action);
+					}					
+
 					from = to;
 					to = "s" + (i-1);
 					event = "reset_event_" + eventName + "_" + fbName + ";";
@@ -487,5 +463,6 @@ class DualExecModelBuilder
 		}		
 		automata.addAutomaton(eventQueue);	
 	}
+
 
 }

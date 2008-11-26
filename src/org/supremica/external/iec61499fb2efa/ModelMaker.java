@@ -44,6 +44,7 @@ class ModelMaker
 		"\t-m s (seqequential exec model)] \n" +
 		"\t-m n (npmtr exec model)] \n" +
 		"\t-m c (cyclic exec model)] \n" +
+		"\t-m h (hybrid exec model)] \n" +
 		"\t[-ip int (instance q places)] \n" +
 		"\t[-ep int (event q places)] \n" +
 		"\t[-jp int (job q places (deprecated))] \n" +
@@ -97,13 +98,17 @@ class ModelMaker
 					{
 						arguments.put("execModel", "free");
 					}
-					else if (args[i + 1].equals("n"))
-					{
-						arguments.put("execModel", "npmtr");
-					}
 					else if (args[i + 1].equals("c"))
 					{
 						arguments.put("execModel", "cyclic");
+					}
+					else if (args[i + 1].equals("h"))
+					{
+						arguments.put("execModel", "hybrid");
+					}
+					else if (args[i + 1].equals("n"))
+					{
+						arguments.put("execModel", "npmtr");
 					}
                 }
             }
@@ -221,25 +226,35 @@ class ModelMaker
 			Logger.output("ModelMaker.makeModel(): Making EFA model for the FREE execution model.");
 			theBuilder = new FreeExecModelBuilder(arguments);
 		}
-		else if (arguments.get("execModel").equals("seq"))
-		{
-			Logger.output("ModelMaker.makeModel(): Making EFA model for the SEQUENTIAL execution model.");
-			theBuilder = new SequentialExecModelBuilder(arguments);
-		}
+        // Dual exec model  
 		else if (arguments.get("execModel").equals("dual"))
 		{
 			Logger.output("ModelMaker.makeModel(): Making EFA model for the DUAL execution model.");
 			theBuilder = new DualExecModelBuilder(arguments);
 		}
-		else if (arguments.get("execModel").equals("npmtr"))
+        // Sequential exec model (default): one place in scheduler per fb event received
+		else if (arguments.get("execModel").equals("seq"))
 		{
-			Logger.output("ModelMaker.makeModel(): Making EFA model for the NPMTR execution model.");
-			theBuilder = new NpmtrExecModelBuilder(arguments);
+			Logger.output("ModelMaker.makeModel(): Making EFA model for the SEQUENTIAL execution model.");
+			theBuilder = new SequentialExecModelBuilder(arguments);
 		}
+        // Cyclic exec model: fb handles all fb events each run
 		else if (arguments.get("execModel").equals("cyclic"))
 		{
 			Logger.output("ModelMaker.makeModel(): Making EFA model for the CYCLIC execution model.");
 			theBuilder = new CyclicExecModelBuilder(arguments);
+		}
+        // Hybrid exec model: one place in scheduler per all fb events received, handle all fb events per run
+		else if (arguments.get("execModel").equals("hybrid"))
+		{
+			Logger.output("ModelMaker.makeModel(): Making EFA model for the HYBRID execution model.");
+			theBuilder = new HybridExecModelBuilder(arguments);
+		}
+        // NPMTR exec model
+		else if (arguments.get("execModel").equals("npmtr"))
+		{
+			Logger.output("ModelMaker.makeModel(): Making EFA model for the NPMTR execution model.");
+			theBuilder = new NpmtrExecModelBuilder(arguments);
 		}
 		else
 		{
