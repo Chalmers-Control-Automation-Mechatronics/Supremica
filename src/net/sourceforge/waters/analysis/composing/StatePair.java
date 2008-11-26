@@ -1,14 +1,9 @@
 package net.sourceforge.waters.analysis.composing;
 
-import java.lang.Object;
-
 import net.sourceforge.waters.model.des.StateProxy;
 
-public class StatePair extends Object{
-	
-	public StatePair(){
-	}
-	
+public class StatePair {
+
 	public StatePair(StateProxy source,
 	                 StateProxy target){
 		mSource = source;
@@ -36,7 +31,7 @@ public class StatePair extends Object{
 	}
 	
 	public int hashCode(){
-		return (mSource.getName()+mTarget.getName()).hashCode();
+		return mSource.hashCode()+5*mTarget.hashCode();
 	}
 	
 	private StateProxy mSource;

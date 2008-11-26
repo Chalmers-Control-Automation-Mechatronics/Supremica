@@ -39,6 +39,7 @@ public class Composing {
     nodelimit = 3000;
     plants = new HashSet<AutomatonProxy>(); 
     specs  = new HashSet<AutomatonProxy>();
+    commonSP = new HashSet<StatePair>();
   }
   
   public ProductDESProxy run() throws AnalysisException {    
@@ -188,11 +189,11 @@ public class Composing {
       if (events.isEmpty()) break;           
 		}
 		
-		//Create new model
+	 //Create new model
 		
-		//remove all events which supposed to be hidden but not.
-		hiddenEvents.removeAll(events);
-	  newAutomata.addAll(plants);
+	 //remove all events which supposed to be hidden but not.
+	 hiddenEvents.removeAll(events);
+	 newAutomata.addAll(plants);
     newAutomata.addAll(specs);
 
     newEvents.addAll(mEvents);
@@ -212,23 +213,23 @@ public class Composing {
   
   private void project (Candidate can) throws AnalysisException {
     ProductDESProxy newP = 
-		            mFactory.createProductDESProxy(can.getName(),can.getAllEvents(),can.getAllAutomata());
+	 	mFactory.createProductDESProxy(can.getName(),can.getAllEvents(),can.getAllAutomata());
     Set<EventProxy> eForbidden = new HashSet<EventProxy>();    
-		Projection2 proj = new Projection2(newP, mFactory, can.getLocalEvents(), eForbidden);		       
-	  proj.setNodeLimit(nodelimit);
-	  AutomatonProxy newAutomaton = proj.project();
-	  //System.out.println(newAutomaton.getName()+" has "+newAutomaton.getTransitions().size()+" transitions!");
-	  newAutomaton=selfloopCheck(newAutomaton);
+	 Projection2 proj = new Projection2(newP, mFactory, can.getLocalEvents(), eForbidden);		       
+	 proj.setNodeLimit(nodelimit);
+	 AutomatonProxy newAutomaton = proj.project();
+	 //System.out.println(newAutomaton.getName()+" has "+newAutomaton.getTransitions().size()+" transitions!");
+	 newAutomaton=selfloopCheck(newAutomaton);
 	  
-	  mCandidate.add(can);
+	 mCandidate.add(can);
                        
-	  plants.removeAll((HashSet)can.getAllAutomata());
-	  plants.add(newAutomaton);
+	 plants.removeAll((HashSet)can.getAllAutomata());
+	 plants.add(newAutomaton);
 	  
-	  moreSelfloopCheck();
-	  sameTransCheck();
+	 moreSelfloopCheck();
+	 sameTransCheck();
 
-	  events.removeAll((HashSet)can.getLocalEvents());
+	 events.removeAll((HashSet)can.getLocalEvents());
   }
   
   //remove the selfloop events which occur at all states
@@ -325,10 +326,10 @@ public class Composing {
   // If events a and b always appear on the same transitoin,
   // one of them can be removed
   private void sameTransCheck() {
+    ArrayList<EventRecord> erList = 
+    	new ArrayList<EventRecord>();
     ArrayList<EventProxy> esList = 
-      new ArrayList<EventProxy>();
-    ArrayList<ArrayList<TransitionRecord>> transList =
-      new ArrayList<ArrayList<TransitionRecord>>();
+      new ArrayList<EventProxy>();    
     Set<EventProxy> usedEvents = 
       new HashSet<EventProxy>();    
     Set<EventProxy> removableEvents = 
@@ -378,21 +379,24 @@ public class Composing {
           }
       }
       for (int i=0;i<eList.size();i++) {
+        Map<AutomatonProxy,TransitionRecord> tempMap= 
+          new HashMap<AutomatonProxy,TransitionRecord>();
         if (esList.contains(eList.get(i))) {
-        	transList.get(esList.indexOf(eList.get(i))).add(
-        	  new TransitionRecord(aut,spList.get(i)));
+          tempMap.clear();
+          tempMap.put(aut,new TransitionRecord(aut,spList.get(i)));
+          erList.get(esList.indexOf(eList.get(i))).addMap(tempMap);        	
         } else {
-            esList.add(eList.get(i));
-            ArrayList<TransitionRecord> temp = 
-              new ArrayList<TransitionRecord>();
-            temp.add(new TransitionRecord(aut,spList.get(i)));
-            transList.add(temp);
+            tempMap.clear();
+            esList.add(eList.get(i));            
+            tempMap.put(aut,new TransitionRecord(aut,spList.get(i)));
+            EventRecord temp = new EventRecord(eList.get(i),tempMap);
+            erList.add(temp);
           }
       }
       autEvents.removeAll(enabledEvents);
       forbiddenEvents.addAll(autEvents);
     }
-    assert(esList.size() == transList.size());
+    assert(esList.size() == erList.size());
     
     for (int i=0;i<esList.size();i++) {
       /*
@@ -405,7 +409,7 @@ public class Composing {
       }
       System.out.println();*/
       if (forbiddenEvents.contains(esList.get(i))) {
-        transList.set(i,null);
+        erList.set(i,null);
       }
     }
     
@@ -413,17 +417,17 @@ public class Composing {
     for (int i=0;i<esList.size()-1;i++) {
       //System.out.println("new turn");
       if (usedEvents.contains(esList.get(i))
-        ||transList.get(i) == null
-        ||transList.get(i).size()<2) continue;
+        ||erList.get(i) == null
+        ||erList.get(i).getMap().size()<2) continue;
       ArrayList<EventProxy> goodEvents = 
         new ArrayList<EventProxy>();
       ArrayList<EventProxy> almostsameEvents = 
         new ArrayList<EventProxy>();      
       for (int j=i+1;j<esList.size();j++) {        
         if (usedEvents.contains(esList.get(j))
-          ||transList.get(j) == null
-          ||transList.get(j).size()<2) continue;
-        same = compareTrans(transList.get(i),transList.get(j));
+          ||erList.get(j) == null
+          ||erList.get(j).getMap().size()<2) continue;
+        same = compareTrans(erList.get(i).getMap(),erList.get(j).getMap());
         if (same == 1) {
           //System.out.println("same: "+esList.get(j).getName());  
           usedEvents.add(esList.get(i));
@@ -539,19 +543,21 @@ public class Composing {
 	                                     ArrayList<Collection<EventProxy>> replaceableesList) {
 	  
 	  if (replaceesList.isEmpty()) return aut;
-    Set<EventProxy> newEvents = new HashSet<EventProxy>(aut.getEvents()); 
-    Set<TransitionProxy> newTrans = new HashSet<TransitionProxy>(aut.getTransitions());    
-    for (Collection<EventProxy> es : replaceableesList) {      
-      newEvents.removeAll(es);      
-      for (EventProxy e : es) {        
+     Set<EventProxy> newEvents = new HashSet<EventProxy>(aut.getEvents()); 
+     Set<TransitionProxy> newTrans = new HashSet<TransitionProxy>(aut.getTransitions());    
+     for (Collection<EventProxy> es : replaceableesList) {      
+       newEvents.removeAll(es);      
+       for (EventProxy e : es) {        
 	      for (TransitionProxy trans : aut.getTransitions()) {
 	        if (trans.getEvent() == e) {
 	          newTrans.remove(trans);
-	          TransitionProxy newTran = 
-	            mFactory.createTransitionProxy(trans.getSource(),
-														                 replaceesList.get(replaceableesList.indexOf(es)),
-														                 trans.getTarget());
-	          newTrans.add(newTran);
+	          if (!commonSP.contains(new StatePair(trans.getSource(),trans.getTarget()))) {
+		          TransitionProxy newTran = 
+		            mFactory.createTransitionProxy(trans.getSource(),
+															    replaceesList.get(replaceableesList.indexOf(es)),
+															    trans.getTarget());
+		          newTrans.add(newTran);
+	          }
 	        }
 	      }
       }
@@ -566,6 +572,59 @@ public class Composing {
 	//return 1 : same transition with different events
 	//       0 : not same transiton
 	//      -1 : almost same except one
+	private int compareTrans(Map<AutomatonProxy,TransitionRecord> trans1,
+	                         Map<AutomatonProxy,TransitionRecord> trans2) {
+	                         
+	  //if (trans1.equals(trans2)) return 1;
+	  int s1 = trans1.size();
+	  int s2 = trans2.size();
+	  if (s1<s2) {
+	    return compareTrans(trans2,trans1);
+	  } 
+	  else if (s1>s2+1) {
+	    return 0;
+	  } 
+	  else {
+	    AutomatonProxy diffAut = null;
+	    for (TransitionRecord tr : trans1.values()) {
+	      if (!trans2.values().contains(tr)) {
+	        if (diffAut == null) {
+	          diffAut = tr.getAutomaton();
+	        } else {
+	            return 0;
+	          }
+	      }
+	    }
+	    if (diffAut == null) {
+	      return 1;
+	    } else {
+	        if (!trans2.keySet().contains(diffAut)) {
+	          almostsameAut = diffAut;
+	          return -1;
+	        } else {
+	            Set<StatePair> t1 = 
+	              new HashSet<StatePair>(trans1.get(diffAut).getTrans());
+	            Set<StatePair> t2 = 
+	              new HashSet<StatePair>(trans2.get(diffAut).getTrans());
+	            Set<StatePair> t1t2 = new HashSet<StatePair>(t1);	            
+		  			  t1t2.retainAll(t2);
+		  			  commonSP.addAll(t1t2);
+		  				t1.removeAll(t1t2);
+		  				t2.removeAll(t1t2);
+		  				for (StatePair sp1 : t1) {
+		    		  	for (StatePair sp2 : t2) {
+		              if (sp1.getSource()==sp2.getSource()) {
+		                return 0;
+		              }
+		            }
+		          }
+		          almostsameAut = diffAut;
+		          return -1;
+	          }
+	      }
+	  }
+	}
+	/*
 	private int compareTrans(ArrayList<TransitionRecord> trans1,
 	                         ArrayList<TransitionRecord> trans2) {
 	  int s1 = trans1.size();
@@ -622,7 +681,7 @@ public class Composing {
 	    return -1;
 	  }
 	  else return 0;	  
-	}
+	}*/
   
   private ArrayList<Candidate> maxL(ArrayList<Candidate> composition) {
 	  //Sort the composition list
@@ -756,5 +815,6 @@ public class Composing {
   private int                        nodelimit;  
   private Set<AutomatonProxy>        plants; 
   private Set<AutomatonProxy>        specs;
-  private AutomatonProxy             almostsameAut;       
+  private AutomatonProxy             almostsameAut; 
+  private Set<StatePair>             commonSP;      
 }

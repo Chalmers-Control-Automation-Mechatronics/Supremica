@@ -117,8 +117,8 @@ public class ComposingSafetyVerifier
     
      
     final SafetyVerifier checker =
-      new NativeSafetyVerifier(des, getConvertedKindTranslator(),getFactory());
-      //new BDDSafetyVerifier(des, getConvertedKindTranslator(), getFactory());
+      //new NativeSafetyVerifier(des, getConvertedKindTranslator(),getFactory());
+      new BDDSafetyVerifier(des, getConvertedKindTranslator(), getFactory());
     checker.setNodeLimit(getNodeLimit());        
     final boolean result = checker.run(); 
     mStates = (int)checker.getAnalysisResult().getTotalNumberOfStates();

@@ -2,15 +2,11 @@ package net.sourceforge.waters.analysis.composing;
 
 import java.util.Set;
 import java.util.HashSet;
-import java.lang.Object;
 
 import net.sourceforge.waters.model.des.TransitionProxy;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 
-public class TransitionRecord extends Object{
-	
-	public TransitionRecord(){
-	}
+public class TransitionRecord {
 	
 	public TransitionRecord(AutomatonProxy automaton,
 	                        Set<StatePair> transitions){
@@ -18,7 +14,7 @@ public class TransitionRecord extends Object{
 		mTransitions = new HashSet<StatePair>(transitions);
 	}
 	
-	public AutomatonProxy getAut() {
+	public AutomatonProxy getAutomaton() {
 	  return mAutomaton;
 	}
 	
@@ -29,7 +25,7 @@ public class TransitionRecord extends Object{
 	public boolean equals(Object obj){
 		if(obj != null && obj.getClass() == getClass()){
 		  TransitionRecord temp = (TransitionRecord)obj;
-		  if (mAutomaton == temp.getAut()
+		  if (mAutomaton == temp.getAutomaton()
 		    &&mTransitions.equals(temp.getTrans())) {
 		    return true;
 			} else return false;
@@ -39,7 +35,7 @@ public class TransitionRecord extends Object{
 	}
 	
 	public int hashCode(){
-		return mTransitions.hashCode();
+		return mAutomaton.hashCode()+5*mTransitions.hashCode();
 	}
 	
 	private AutomatonProxy mAutomaton;
