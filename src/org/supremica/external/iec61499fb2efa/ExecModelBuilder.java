@@ -34,6 +34,7 @@ import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.ArrayList;
+import java.util.Properties;
 import java.lang.Exception;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Unmarshaller;
@@ -118,45 +119,45 @@ abstract class ExecModelBuilder
 	boolean doneInitActions = false;
 	boolean doneInitFinish = false;
 	
-	ExecModelBuilder(Map<String, String> arguments)
+	ExecModelBuilder(Properties properties)
 	{
 		// get arguments
-		if (arguments.get("expandTransitions") != null)
+		if (properties.getProperty("expandTransitions") != null)
 		{
-			expandTransitions = (new Boolean(arguments.get("expandTransitions"))).booleanValue();
+			expandTransitions = (new Boolean(properties.getProperty("expandTransitions"))).booleanValue();
 		}
-		if (arguments.get("generatePlantModels") != null)
+		if (properties.getProperty("generatePlantModels") != null)
 		{
-			generatePlantModels = (new Boolean(arguments.get("generatePlantModels"))).booleanValue();
+			generatePlantModels = (new Boolean(properties.getProperty("generatePlantModels"))).booleanValue();
 		}
 
-		if (arguments.get("eventQueuePlaces") != null)
+		if (properties.getProperty("eventQueuePlaces") != null)
 		{
-			eventQueuePlaces = new Integer(arguments.get("eventQueuePlaces"));
+			eventQueuePlaces = new Integer(properties.getProperty("eventQueuePlaces"));
 		}	
-		if (arguments.get("instanceQueuePlaces") != null)
+		if (properties.getProperty("instanceQueuePlaces") != null)
 		{
-			instanceQueuePlaces = new Integer(arguments.get("instanceQueuePlaces"));
+			instanceQueuePlaces = new Integer(properties.getProperty("instanceQueuePlaces"));
 		}	
-		if (arguments.get("jobQueuePlaces") != null)
+		if (properties.getProperty("jobQueuePlaces") != null)
 		{
-			jobQueuePlaces = new Integer(arguments.get("jobQueuePlaces"));
+			jobQueuePlaces = new Integer(properties.getProperty("jobQueuePlaces"));
 		}	
 
-		if (arguments.get("intVarMinValue") != null)
+		if (properties.getProperty("intVarMinValue") != null)
 		{
-			intVarMinValue = (new Integer(arguments.get("intVarMinValue"))).intValue();
+			intVarMinValue = (new Integer(properties.getProperty("intVarMinValue"))).intValue();
 		}
-		if (arguments.get("intVarMaxValue") != null)
+		if (properties.getProperty("intVarMaxValue") != null)
 		{
-			intVarMaxValue = (new Integer(arguments.get("intVarMaxValue"))).intValue();
+			intVarMaxValue = (new Integer(properties.getProperty("intVarMaxValue"))).intValue();
 		}
 		
-		this.systemFileName = arguments.get("systemFileName");
-		this.outputFileName = arguments.get("outputFileName");
+		this.systemFileName = properties.getProperty("systemFileName");
+		this.outputFileName = properties.getProperty("outputFileName");
 
-		String libraryPathBase = arguments.get("libraryPathBase");
-		String libraryPath = arguments.get("libraryPath");
+		String libraryPathBase = properties.getProperty("libraryPathBase");
+		String libraryPath = properties.getProperty("libraryPath");
 
 		// convert libraryPath string into a list of Files
 		if (libraryPath == null) // libraryPath is not specified

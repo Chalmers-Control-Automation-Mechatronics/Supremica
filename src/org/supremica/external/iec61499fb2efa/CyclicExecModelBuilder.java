@@ -34,6 +34,7 @@ import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.ArrayList;
+import java.util.Properties;
 import java.lang.Exception;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Unmarshaller;
@@ -53,7 +54,7 @@ class CyclicExecModelBuilder
 	implements ModelBuilder
 {
 
-	CyclicExecModelBuilder(Map<String, String> arguments)
+	CyclicExecModelBuilder(Properties arguments)
 	{
 		super(arguments);
 	}

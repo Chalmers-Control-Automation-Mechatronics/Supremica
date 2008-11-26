@@ -29,9 +29,11 @@ import java.util.Map;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Calendar;
+import java.util.Properties;
 
 class ModelMaker
 {
+    private static Properties properties;
 
 	private static final String helpString = "Usage: ModelMaker \n" + 
 		"\t[-d (debug info)] \n" +
@@ -39,12 +41,12 @@ class ModelMaker
 		"\t[-p (generate models as plants)] \n" +
 		"\t[-im int (int var min)] \n" +
 		"\t[-ix int (int var max)] \n" + 
-		"\t[-m f (free exec model (default)) | \n" +
-		"\t-m d (dual exec model | \n" +
-		"\t-m s (seqequential exec model)] \n" +
-		"\t-m n (npmtr exec model)] \n" +
-		"\t-m c (cyclic exec model)] \n" +
-		"\t-m h (hybrid exec model)] \n" +
+		"\t[-m free (free buffered exec model (default)) | \n" +
+		"\t-m dual (dual buffered exec model) | \n" +
+		"\t-m seq (sequential buffered exec model) |\n" +
+		"\t-m cycl (cyclic buffered exec model) |\n" +
+		"\t-m hybrid (hybrid buffered exec model) |\n" +
+		"\t-m npmtr (npmtr exec model)] \n" +
 		"\t[-ip int (instance q places)] \n" +
 		"\t[-ep int (event q places)] \n" +
 		"\t[-jp int (job q places (deprecated))] \n" +
@@ -54,17 +56,21 @@ class ModelMaker
 
     public static void main(String args[])
     {
-        String outputFileName = null;
-        String systemFileName = null;
-        List<File> libraryPathList = new LinkedList<File>();
-        Map<String,String> arguments = new HashMap<String,String>();
-        String libraryPathBase = null;
-        String libraryPath = null;
+        properties = new Properties();
+        new ModelMaker(args);
+    }
 
-        Logger.output("ModelMaker  Copyright (C) " + Calendar.getInstance().get(Calendar.YEAR) + " Goran Cengic");
-        Logger.output("");
-
-        for (int i = 0; i < args.length; i++)
+    public static Properties getProperties()
+    {
+        return properties;
+    }
+	
+	private ModelMaker(String[] args)
+	{
+		properties.setProperty("execModel", "free"); // default exec model
+		
+		// argument parsing ===================================================
+		for (int i = 0; i < args.length; i++)
         {
             if (args[i].equals("-d"))
             {
@@ -76,102 +82,79 @@ class ModelMaker
             }
             else if (args[i].equals("-e"))
             {
-				arguments.put("expandTransitions","true");
+				properties.setProperty("expandTransitions","true");
             }
             else if (args[i].equals("-p"))
             {
-				arguments.put("generatePlantModels","false");
+				properties.setProperty("generatePlantModels","false");
             }
             else if (args[i].equals("-m"))
             {
                 if (i + 1 < args.length)
                 {
-					if (args[i + 1].equals("d"))
-					{
-						arguments.put("execModel", "dual");
-					}
-					else if (args[i + 1].equals("s"))
-					{
-						arguments.put("execModel", "seq");
-					}
-					else if (args[i + 1].equals("f"))
-					{
-						arguments.put("execModel", "free");
-					}
-					else if (args[i + 1].equals("c"))
-					{
-						arguments.put("execModel", "cyclic");
-					}
-					else if (args[i + 1].equals("h"))
-					{
-						arguments.put("execModel", "hybrid");
-					}
-					else if (args[i + 1].equals("n"))
-					{
-						arguments.put("execModel", "npmtr");
-					}
+                    properties.setProperty("execModel", args[i + 1]);
                 }
             }
             else if (args[i].equals("-im"))
             {
                 if (i + 1 < args.length)
                 {
-					arguments.put("intVarMinValue", args[i + 1]);
+					properties.setProperty("intVarMinValue", args[i + 1]);
                 }
             }
             else if (args[i].equals("-ix"))
             {
                 if (i + 1 < args.length)
                 {
-					arguments.put("intVarMaxValue", args[i + 1]);
+					properties.setProperty("intVarMaxValue", args[i + 1]);
                 }
             }
             else if (args[i].equals("-ip"))
             {
                 if (i + 1 < args.length)
                 {
-					arguments.put("instanceQueuePlaces", args[i + 1]);
+					properties.setProperty("instanceQueuePlaces", args[i + 1]);
                 }
             }
             else if (args[i].equals("-jp"))
             {
                 if (i + 1 < args.length)
                 {
-					arguments.put("jobQueuePlaces", args[i + 1]);
+					properties.setProperty("jobQueuePlaces", args[i + 1]);
                 }
             }
             else if (args[i].equals("-ep"))
             {
                 if (i + 1 < args.length)
                 {
-					arguments.put("eventQueuePlaces", args[i + 1]);
+					properties.setProperty("eventQueuePlaces", args[i + 1]);
                 }
             }
             else if (args[i].equals("-o"))
             {
                 if (i + 1 < args.length)
                 {
-					arguments.put("outputFileName", args[i + 1]);
+					properties.setProperty("outputFileName", args[i + 1]);
                 }
             }
             else if (args[i].equals("-lb"))
             {
                 if (i + 1 < args.length)
                 {
-                    arguments.put("libraryPathBase", args[i + 1]);
+                    properties.setProperty("libraryPathBase", args[i + 1]);
                 }
             }
             else if (args[i].equals("-lp"))
             {
                 if (i + 1 < args.length)
                 {
-                    if (arguments.get("libraryPath") == null)
+                    if (properties.getProperty("libraryPath") == null)
                     {
-                        arguments.put("libraryPath", args[i + 1]);
+                        properties.setProperty("libraryPath", args[i + 1]);
                     }
                     else
                     {
-                        arguments.put("libraryPath", arguments.get("libraryPath") + File.pathSeparator + args[i + 1]);
+                        properties.setProperty("libraryPath", properties.getProperty("libraryPath") + File.pathSeparator + args[i + 1]);
                     }
                 }
             }
@@ -182,86 +165,84 @@ class ModelMaker
             }
             else if (i+1 == args.length)
             {
-                arguments.put("systemFileName", args[i]);
-                if (arguments.get("outputFileName") == null)
+                properties.setProperty("systemFileName", args[i]);
+                if (properties.getProperty("outputFileName") == null)
                 {
-                    arguments.put("outputFileName", arguments.get("systemFileName") + ".wmod");
+                    properties.setProperty("outputFileName", properties.getProperty("systemFileName") + ".wmod");
                 }
             }
-
         }
+
+        // startup ============================================================
+        String outputFileName = null;
+        String systemFileName = null;
+        String libraryPathBase = null;
+        String libraryPath = null;
+        List<File> libraryPathList = new LinkedList<File>();
+
+		ModelBuilder theBuilder = null;
+
+		Logger.output("ModelMaker  Copyright (C) " + Calendar.getInstance().get(Calendar.YEAR) + " Goran Cengic");
+        Logger.output("");
 		
-        if (arguments.get("systemFileName") == null)
+        if (properties.getProperty("systemFileName") == null)
         {
 			Logger.output(Logger.ERROR, "ERROR: No system file specified!");
 			Logger.output(Logger.ERROR);
             Logger.output(Logger.ERROR, helpString);
-            return;
+			System.exit(1);;
         }
 		
         Logger.output(Logger.DEBUG, "ModelMaker.main(): Input arguments:");
-		for (Iterator iter = arguments.keySet().iterator(); iter.hasNext();)
+		for (Iterator iter = properties.keySet().iterator(); iter.hasNext();)
 		{
 			String curKey = (String) iter.next();
-			String curValue = arguments.get(curKey);
+			String curValue = properties.getProperty(curKey);
 			Logger.output(Logger.DEBUG, curKey + " = " + curValue, 1);
 		}
 		Logger.output(Logger.DEBUG);
 
-		new ModelMaker(arguments);
-
-    }
-
-	ModelMaker(Map<String,String> arguments)
-	{
-		makeModel(arguments);
-	}
-
-	void makeModel(Map<String,String> arguments)
-	{
-		ModelBuilder theBuilder = null;
-
-		if(arguments.get("execModel") == null || arguments.get("execModel").equals("free"))
+		if(properties.getProperty("execModel") == null || properties.getProperty("execModel").equals("free"))
 		{
 			Logger.output("ModelMaker.makeModel(): Making EFA model for the FREE execution model.");
-			theBuilder = new FreeExecModelBuilder(arguments);
+			theBuilder = new FreeExecModelBuilder(properties);
 		}
         // Dual exec model  
-		else if (arguments.get("execModel").equals("dual"))
+		else if (properties.getProperty("execModel").equals("dual"))
 		{
 			Logger.output("ModelMaker.makeModel(): Making EFA model for the DUAL execution model.");
-			theBuilder = new DualExecModelBuilder(arguments);
+			theBuilder = new DualExecModelBuilder(properties);
 		}
         // Sequential exec model (default): one place in scheduler per fb event received
-		else if (arguments.get("execModel").equals("seq"))
+		else if (properties.getProperty("execModel").equals("seq"))
 		{
 			Logger.output("ModelMaker.makeModel(): Making EFA model for the SEQUENTIAL execution model.");
-			theBuilder = new SequentialExecModelBuilder(arguments);
+			theBuilder = new SequentialExecModelBuilder(properties);
 		}
         // Cyclic exec model: fb handles all fb events each run
-		else if (arguments.get("execModel").equals("cyclic"))
+		else if (properties.getProperty("execModel").equals("cycl"))
 		{
 			Logger.output("ModelMaker.makeModel(): Making EFA model for the CYCLIC execution model.");
-			theBuilder = new CyclicExecModelBuilder(arguments);
+			theBuilder = new CyclicExecModelBuilder(properties);
 		}
         // Hybrid exec model: one place in scheduler per all fb events received, handle all fb events per run
-		else if (arguments.get("execModel").equals("hybrid"))
+		else if (properties.getProperty("execModel").equals("hybrid"))
 		{
 			Logger.output("ModelMaker.makeModel(): Making EFA model for the HYBRID execution model.");
-			theBuilder = new HybridExecModelBuilder(arguments);
+			theBuilder = new HybridExecModelBuilder(properties);
 		}
         // NPMTR exec model
-		else if (arguments.get("execModel").equals("npmtr"))
+		else if (properties.getProperty("execModel").equals("npmtr"))
 		{
 			Logger.output("ModelMaker.makeModel(): Making EFA model for the NPMTR execution model.");
-			theBuilder = new NpmtrExecModelBuilder(arguments);
+			theBuilder = new NpmtrExecModelBuilder(properties);
 		}
 		else
 		{
 			Logger.output(Logger.ERROR, "ERROR: Unsupported execution model specified!");
 			Logger.output(Logger.ERROR);
             Logger.output(Logger.ERROR, helpString);
-			System.exit(1);
+			System.exit(1);;
 		}
 			
 		Logger.output("ModelMaker.makeModel(): Loading the System -------------------------------------");
@@ -277,7 +258,6 @@ class ModelMaker
 		theBuilder.writeResult();
 
 		Logger.output("ModelMaker.makeModel(): Done ---------------------------------------------------");
-		
+
 	}
-	
 }
