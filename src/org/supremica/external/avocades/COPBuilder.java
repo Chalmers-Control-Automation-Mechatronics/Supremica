@@ -404,6 +404,11 @@ public class COPBuilder {
     	for(ROP rop : ropList){
     		ROP tmpROP = Converter.copy( rop );
     		
+    	    tmpROP.setRelation( DOPtoEFA.
+    	    		removeEmtyRelations( tmpROP.getRelation() ) );  	
+    		tmpROP.setRelation( DOPtoEFA.
+    				collapseRelationTree( tmpROP.getRelation() ) );
+    		
     		addZoneBookingFromEOP( tmpROP );
     		
     		tmpROPList.add( tmpROP );
@@ -425,6 +430,13 @@ public class COPBuilder {
     }
     
     private List<String> addZoneBookingFromEOP(Relation relation, List<String> preBookedZones){
+    	
+    	//Sanity check
+    	if ( null == relation.getActivityRelationGroup() ||
+    		 0 == relation.getActivityRelationGroup().size() )
+    	{
+    		return preBookedZones;
+    	}
     	
     	if (RelationType.SEQUENCE.equals( relation.getType() )){
     		

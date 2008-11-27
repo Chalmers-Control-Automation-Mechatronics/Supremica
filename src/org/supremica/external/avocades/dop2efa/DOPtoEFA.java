@@ -413,7 +413,7 @@ public class DOPtoEFA
 	 * @param relation
 	 * @return
 	 */
-	private static Relation removeEmtyRelations(Relation relation){
+	public static Relation removeEmtyRelations(Relation relation){
 		
 		List<Object> objList;
 		Object o;

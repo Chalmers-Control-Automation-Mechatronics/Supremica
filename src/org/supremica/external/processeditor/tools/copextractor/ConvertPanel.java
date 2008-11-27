@@ -447,6 +447,11 @@ public class ConvertPanel extends JPanel implements ActionListener,
     	
     	module = builder.createSupervisor( moduleList );
     	
+    	if (null == module){
+    		System.out.println("Unable to create supervisor");
+    		return;
+    	}
+    	
     	module.setName("Synthes");
     	module.setComment("DOP to EFA output\n" + 
     			          "DOP to EFA output\n" + 

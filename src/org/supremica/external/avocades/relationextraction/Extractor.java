@@ -1766,24 +1766,69 @@ public ArrayList getOpMachMatching(ArrayList ROPList)
 		String machName = mach.getText();
 		temp.add(machName);
 
-		Element rel = root.getChild("Relation");
-		List activities = rel.getChildren("Activity");
-
-		int j = 0;
-		for( Iterator actIter = activities.iterator(); actIter.hasNext(); )
-		{
-			Element act = (Element) actIter.next();
-			Element operation = act.getChild("Operation");
-			String opName = operation.getText();
-			temp.add(opName);
-			j++;
-		}
+		Element relation = root.getChild("Relation");
+		temp.addAll( getOperationsFromActivities( getActivitiesFromRelation( relation ) ) );
+		
 		opsMachs.add(i, temp);
 		i++;
 	}
 	return opsMachs;
 }
 
+/**
+ * Returns all activities in a relation. 
+ * @param relation
+ * @return
+ */
+public List<Element> getActivitiesFromRelation(Element relation){
+	
+	final ArrayList<Element> actList = new ArrayList<Element>();
+	
+	//Sanity check
+	if (null == relation){
+		return actList; 
+	}
+	
+	//Add all Operations from activities 
+	List<Element> tmpElementList = relation.getChildren("Activity");
+	actList.addAll( tmpElementList );
+	
+	//Add all Operations from Relations recursivly
+	tmpElementList = relation.getChildren("Relation");
+	for ( Iterator<Element> relIter = tmpElementList.iterator(); relIter.hasNext(); ){
+		actList.addAll( getActivitiesFromRelation( relIter.next()) );
+	}
+	
+	return actList;
+}
+
+/**
+ * 
+ * Create a list of operation names from a list of activities.
+ * 
+ * @param activities - list of activities
+ * @return A string list with operation names from the activity list
+ */
+public List<String> getOperationsFromActivities(final List<Element> activities){
+	
+	final ArrayList<String> actList = new ArrayList<String>();
+	
+	//Sanity check
+	if (null == activities || 0 == activities.size()){
+		return actList;
+	}
+	
+	
+	for( Iterator actIter = activities.iterator(); actIter.hasNext(); )
+	{
+		Element act = (Element) actIter.next();
+		Element operation = act.getChild("Operation");
+		String opName = operation.getText();
+		actList.add(opName);
+	}
+	
+	return actList;
+}
 
 /*****************************************************
 *
@@ -1850,7 +1895,7 @@ public void buildCOPDocs(ArrayList restr, ArrayList ROPs)
 		Document rop = (Document) COPiter.next();
 		Element root = rop.getRootElement();
 		Element rel = root.getChild("Relation");
-		List activities = rel.getChildren("Activity");
+		List activities = getActivitiesFromRelation( rel );
 
 		for( Iterator actIter = activities.iterator(); actIter.hasNext(); )
 		{
