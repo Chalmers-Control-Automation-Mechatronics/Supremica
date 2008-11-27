@@ -27,7 +27,7 @@ import net.sourceforge.waters.model.module.SimpleIdentifierProxy;
  *
  * <P><CODE>VARNAME</CODE> must be a variable, and <CODE>EXPR</CODE> must
  * be an expression that does not contain <CODE>VARNAME</CODE>. Substitutes
- * <CODE>VARNAME</CODE> with <CODE>EXPR</CODE>.</P>
+ * <CODE>VARNAME</CODE> by&nbsp;<CODE>EXPR</CODE>.</P>
  *
  * @author Robi Malik
  */
@@ -91,8 +91,7 @@ class EqualitySubstitutionRule extends SimplificationRule
   {
     final SimpleExpressionProxy varname = mVARNAME.getBoundExpression();
     final SimpleExpressionProxy expr = mEXPR.getBoundExpression();
-    final SimpleExpressionProxy eqn = getMatchedExpression();
-    propagator.processEquation(varname, expr, eqn);
+    propagator.processEquation(varname, expr);
   }
 
 

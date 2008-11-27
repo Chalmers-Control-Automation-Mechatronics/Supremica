@@ -86,6 +86,11 @@ public class CompiledEnumRange implements CompiledRange
     return mAtoms.size();
   }
 
+  public boolean isEmpty()
+  {
+    return mAtoms.isEmpty();
+  }
+
   public int indexOf(final SimpleExpressionProxy value)
   {
     if (value instanceof IdentifierProxy) {

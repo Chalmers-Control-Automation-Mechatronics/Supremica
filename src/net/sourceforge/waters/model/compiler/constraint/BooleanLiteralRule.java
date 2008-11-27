@@ -2,7 +2,7 @@
 //###########################################################################
 //# PROJECT: Waters
 //# PACKAGE: net.sourceforge.waters.model.compiler.constraint
-//# CLASS:   NegativeLiteralRule
+//# CLASS:   BooleanLiteralRule
 //###########################################################################
 //# $Id$
 //###########################################################################
@@ -20,22 +20,38 @@ import net.sourceforge.waters.model.module.UnaryExpressionProxy;
 
 
 /**
- * <P>A simplification to perform substitution for a positive literal.</P>
+ * <P>A simplification to perform substitution for a positive or negative
+ * literal.</P>
  *
- * <PRE>!VARNAME</PRE>
+ * <PRE>!VARNAME    VARNAME</PRE>
  *
- * <P><CODE>VARNAME</CODE> must be a Boolean variable.
- * Substitutes <CODE>VARNAME</CODE> with <CODE>0</CODE>.</P>
+ * <P>There are two versions of this rule. The <I>positive</I> rule
+ * substitutes <CODE>VARNAME</CODE> by&nbsp;<CODE>1</CODE> in the presence
+ * of a positive literal&nbsp;<CODE>VARNAME</CODE>. The <I>negative</I>
+ * rule substitutes <CODE>VARNAME</CODE> by&nbsp;<CODE>0</CODE> in the
+ * presence of a negative literal&nbsp;<CODE>!VARNAME</CODE>.</P>
  *
  * @author Robi Malik
  */
 
-class NegativeLiteralRule extends SimplificationRule
+class BooleanLiteralRule extends SimplificationRule
 {
 
   //#########################################################################
   //# Construction
-  static NegativeLiteralRule createRule
+  static BooleanLiteralRule createPositiveLiteralRule
+    (final ModuleProxyFactory factory,
+     final CompilerOperatorTable optable)
+  {
+    final UnaryOperator op = optable.getNotOperator();
+    final BooleanVariablePlaceHolder VARNAME =
+      new BooleanVariablePlaceHolder(factory, "VARNAME");
+    final SimpleIdentifierProxy ident = VARNAME.getIdentifier();
+    final IntConstantProxy value = factory.createIntConstantProxy(1);
+    return new BooleanLiteralRule(ident, VARNAME, value);
+  }
+
+  static BooleanLiteralRule createNegativeLiteralRule
     (final ModuleProxyFactory factory,
      final CompilerOperatorTable optable)
   {
@@ -46,15 +62,15 @@ class NegativeLiteralRule extends SimplificationRule
     final SimpleExpressionProxy template =
       factory.createUnaryExpressionProxy(op, ident);
     final IntConstantProxy value = factory.createIntConstantProxy(0);
-    return new NegativeLiteralRule(template, VARNAME, value);
+    return new BooleanLiteralRule(template, VARNAME, value);
   }
 
 
   //#########################################################################
   //# Constructor
-  private NegativeLiteralRule(final SimpleExpressionProxy template,
-                              final BooleanVariablePlaceHolder placeholder,
-                              final IntConstantProxy value)
+  private BooleanLiteralRule(final SimpleExpressionProxy template,
+                             final BooleanVariablePlaceHolder placeholder,
+                             final IntConstantProxy value)
   {
     super(template, placeholder);
     mPlaceHolder = placeholder;
@@ -73,8 +89,7 @@ class NegativeLiteralRule extends SimplificationRule
     throws EvalException
   {
     final SimpleExpressionProxy varname = mPlaceHolder.getBoundExpression();
-    final SimpleExpressionProxy eqn = getMatchedExpression();
-    propagator.processEquation(varname, mValue, eqn);
+    propagator.processEquation(varname, mValue);
   }
 
 

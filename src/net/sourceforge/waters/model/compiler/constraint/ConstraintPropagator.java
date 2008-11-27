@@ -11,26 +11,31 @@ package net.sourceforge.waters.model.compiler.constraint;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.TreeSet;
 
+import net.sourceforge.waters.model.base.ProxyAccessor;
+import net.sourceforge.waters.model.base.ProxyAccessorByContents;
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
 import net.sourceforge.waters.model.compiler.context.CompiledRange;
 import net.sourceforge.waters.model.compiler.context.CompiledEnumRange;
 import net.sourceforge.waters.model.compiler.context.CompiledIntRange;
 import net.sourceforge.waters.model.compiler.context.
   CompilerExpressionComparator;
+import net.sourceforge.waters.model.compiler.context.ModuleBindingContext;
 import net.sourceforge.waters.model.compiler.context.SimpleExpressionCompiler;
-import net.sourceforge.waters.model.compiler.context.
-  SingleBindingVariableContext;
 import net.sourceforge.waters.model.compiler.context.VariableContext;
 import net.sourceforge.waters.model.expr.BinaryOperator;
 import net.sourceforge.waters.model.expr.EvalException;
 import net.sourceforge.waters.model.expr.UnaryOperator;
 import net.sourceforge.waters.model.module.BinaryExpressionProxy;
+import net.sourceforge.waters.model.module.IdentifierProxy;
 import net.sourceforge.waters.model.module.IntConstantProxy;
 import net.sourceforge.waters.model.module.ModuleProxyFactory;
 import net.sourceforge.waters.model.module.SimpleExpressionProxy;
@@ -49,7 +54,7 @@ public class ConstraintPropagator
   {
     mFactory = factory;
     mOperatorTable = optable;
-    mContext = new ConstraintContext(root, this);
+    mContext = new ConstraintContext(root);
     mComparator = new CompilerExpressionComparator(optable, root);
     mSimpleExpressionCompiler =
       new SimpleExpressionCompiler(factory, optable, false);
@@ -69,8 +74,8 @@ public class ConstraintPropagator
       DisjunctionNormalizationRule.createNegativeRule(factory, optable)
     };
     mRewriteRules = new SimplificationRule[] {
-      PositiveLiteralRule.createRule(factory, optable),
-      NegativeLiteralRule.createRule(factory, optable),
+      BooleanLiteralRule.createPositiveLiteralRule(factory, optable),
+      BooleanLiteralRule.createNegativeLiteralRule(factory, optable),
       EqualitySubstitutionRule.createRule(factory, optable),
       LeftNotEqualsRestrictionRule.createRule(factory, optable),
       LeftLessThanRestrictionRule.createRule(factory, optable),
@@ -80,7 +85,6 @@ public class ConstraintPropagator
     };
     mUnprocessedConstraints = new LinkedList<SimpleExpressionProxy>();
     mNormalizedConstraints = new TreeSet<SimpleExpressionProxy>(mComparator);
-    mProcessedEquations = new TreeSet<SimpleExpressionProxy>(mComparator);
     mIsFalse = false;
   }
 
@@ -118,8 +122,8 @@ public class ConstraintPropagator
 
   public void reset()
   {
+    mContext.reset();
     mNormalizedConstraints.clear();
-    mProcessedEquations.clear();
     mIsFalse = false;
   }
 
@@ -136,20 +140,16 @@ public class ConstraintPropagator
     mUnprocessedConstraints.add(constraint);
   }
 
-  public List<SimpleExpressionProxy> getConstraints()
+  public List<SimpleExpressionProxy> getAllConstraints()
+    throws EvalException
   {
     if (mIsFalse) {
       return null;
     } else {
-      final int size =
-        mProcessedEquations.size() + mNormalizedConstraints.size();
       final List<SimpleExpressionProxy> result =
-        new ArrayList<SimpleExpressionProxy>(size);
-      result.addAll(mProcessedEquations);
-      result.addAll(mNormalizedConstraints);
-      for (final SimpleExpressionProxy varname : mContext.getVariableNames()) {
-        addRangeConstraints(varname, result);
-      }
+        new ArrayList<SimpleExpressionProxy>(mNormalizedConstraints);
+      mContext.addAllConstraints(result);
+      Collections.sort(result, mComparator);
       return result;
     }
   }
@@ -175,8 +175,7 @@ public class ConstraintPropagator
           }
         }
         final SimpleExpressionProxy negation = getNegatedLiteral(simplified);
-        if (mNormalizedConstraints.contains(negation) ||
-            mProcessedEquations.contains(negation)) {
+        if (mNormalizedConstraints.contains(negation)) {
           setFalse();
           change = true;
           break;
@@ -208,35 +207,12 @@ public class ConstraintPropagator
   //#########################################################################
   //# Callbacks from Rules
   void processEquation(final SimpleExpressionProxy varname,
-                       final SimpleExpressionProxy replacement,
-                       final SimpleExpressionProxy eqn)
+                       final SimpleExpressionProxy replacement)
     throws EvalException
   {
-    final VariableContext context =
-      new SingleBindingVariableContext(varname, replacement, mContext);
-      rewriteProcessedEquations(mContext);
-    final Iterator<SimpleExpressionProxy> iter =
-      mNormalizedConstraints.iterator();
-    while (iter.hasNext()) {
-      final SimpleExpressionProxy constraint = iter.next();
-      final SimpleExpressionProxy simp =
-        mSimpleExpressionCompiler.simplify(constraint, context);
-      if (simp != constraint) {
-        iter.remove();
-        addConstraint(simp);
-      }
+    if (mContext.addBinding(varname, replacement)) {
+      reevaluate();
     }
-    rewriteProcessedEquations(context);
-    mProcessedEquations.add(eqn);
-  }
-
-  void addProcessedEquation(final SimpleExpressionProxy varname,
-                            final SimpleExpressionProxy value)
-  {
-    final BinaryOperator op = mOperatorTable.getEqualsOperator();
-    final BinaryExpressionProxy eqn =
-      mFactory.createBinaryExpressionProxy(op, varname, value);
-    mProcessedEquations.add(eqn);
   }
 
   void restrictRange(final SimpleExpressionProxy varname,
@@ -244,9 +220,23 @@ public class ConstraintPropagator
     throws EvalException
   {
     if (mContext.restrictRange(varname, range)) {
-      addConstraints(mNormalizedConstraints);
-      mNormalizedConstraints.clear();
-      rewriteProcessedEquations(mContext);
+      reevaluate();
+    }
+  }
+
+  void reevaluate()
+    throws EvalException
+  {
+    final Iterator<SimpleExpressionProxy> iter =
+      mNormalizedConstraints.iterator();
+    while (iter.hasNext()) {
+      final SimpleExpressionProxy constraint = iter.next();
+      final SimpleExpressionProxy simp =
+        mSimpleExpressionCompiler.simplify(constraint, mContext);
+      if (simp != constraint) {
+        iter.remove();
+        addConstraint(simp);
+      }
     }
   }
 
@@ -255,7 +245,6 @@ public class ConstraintPropagator
     mIsFalse = true;
     mUnprocessedConstraints.clear();
     mNormalizedConstraints.clear();
-    mProcessedEquations.clear();
   }
 
   SimpleExpressionProxy getNormalisedLiteral
@@ -308,87 +297,494 @@ public class ConstraintPropagator
 
 
   //#########################################################################
-  //# Auxiliary Methods
-  private void rewriteProcessedEquations(final VariableContext context)
-    throws EvalException
+  //# Inner Class ConstraintContext
+  private class ConstraintContext implements VariableContext
   {
-    final int size = mProcessedEquations.size();
-    final List<SimpleExpressionProxy> rewritten =
-      new ArrayList<SimpleExpressionProxy>(size);
-    final Iterator<SimpleExpressionProxy> iter =
-      mProcessedEquations.iterator();
-    while (iter.hasNext()) {
-      final SimpleExpressionProxy constraint = iter.next();
-      final SimpleExpressionProxy simp =
-        rewriteProcessedEquation(constraint, context);
-      if (simp != constraint) {
-        iter.remove();
-        rewritten.add(simp);
+
+    //#######################################################################
+    //# Constructor
+    ConstraintContext(final VariableContext root)
+    {
+      final int size = root.getVariableNames().size();
+      mRootContext = root;
+      mBindings = new HashMap<ProxyAccessor<SimpleExpressionProxy>,
+                              AbstractBinding>(size);
+    }
+
+
+    //#######################################################################
+    //# Interface net.sourceforge.waters.model.compiler.context.BindingContext
+    public SimpleExpressionProxy getBoundExpression
+      (final SimpleExpressionProxy ident)
+    {
+      final ProxyAccessor<SimpleExpressionProxy> accessor =
+        new ProxyAccessorByContents<SimpleExpressionProxy>(ident);
+      final AbstractBinding binding = mBindings.get(accessor);
+      if (binding != null) {
+        final SimpleExpressionProxy expr = binding.getBoundExpression();
+        if (expr != null) {
+          return expr;
+        }
+      }
+      return mRootContext.getBoundExpression(ident);
+    }
+
+    public boolean isEnumAtom(final IdentifierProxy ident)
+    {
+      return mRootContext.isEnumAtom(ident);
+    }
+
+    public ModuleBindingContext getModuleBindingContext()
+    {
+      return mRootContext.getModuleBindingContext();
+    }
+
+
+    //#######################################################################
+    //# Interface net.sourceforge.waters.model.compiler.context.VariableContext
+    public CompiledRange getVariableRange(final SimpleExpressionProxy varname)
+    {
+      final ProxyAccessor<SimpleExpressionProxy> accessor =
+        new ProxyAccessorByContents<SimpleExpressionProxy>(varname);
+      return getVariableRange(accessor);
+    }
+
+    public CompiledRange getVariableRange
+      (final ProxyAccessor<SimpleExpressionProxy> accessor)
+    {
+      final AbstractBinding binding = mBindings.get(accessor);
+      if (binding != null) {
+        return binding.getContrainedRange();
+      } else {
+        return mRootContext.getVariableRange(accessor);
       }
     }
-    mProcessedEquations.addAll(rewritten);
-  }
 
-  private SimpleExpressionProxy rewriteProcessedEquation
-    (final SimpleExpressionProxy expr, final VariableContext context)
-    throws EvalException
-  {
-    if (!(expr instanceof BinaryExpressionProxy)) {
-      return expr;
+    public Collection<SimpleExpressionProxy> getVariableNames()
+    {
+      return mRootContext.getVariableNames();
     }
-    final BinaryExpressionProxy binary = (BinaryExpressionProxy) expr;
-    final SimpleExpressionProxy rhs = binary.getRight();
-    final SimpleExpressionProxy simp =
-      mSimpleExpressionCompiler.simplify(rhs, context);
-    if (simp == rhs) {
-      return expr;
-    }
-    final BinaryOperator op = binary.getOperator();
-    final SimpleExpressionProxy lhs = binary.getLeft();
-    return mFactory.createBinaryExpressionProxy(op, lhs, simp);
-  }
 
-  private void addRangeConstraints
-    (final SimpleExpressionProxy varname,
-     final Collection<SimpleExpressionProxy> constraints)
-  {
-    final CompiledRange restricted = mContext.getVariableRange(varname);
-    final CompiledRange original = mContext.getOriginalRange(varname);
-    if (restricted != original) {
-      if (restricted instanceof CompiledIntRange) {
-        final CompiledIntRange intrestricted = (CompiledIntRange) restricted;
-        final CompiledIntRange intoriginal = (CompiledIntRange) original;
-        final int lower = intrestricted.getLower();
-        final int upper = intrestricted.getUpper();
-        if (lower == upper) {
-          final BinaryOperator op = mOperatorTable.getEqualsOperator();
-          final IntConstantProxy intconst =
-            mFactory.createIntConstantProxy(lower);
-          final BinaryExpressionProxy constraint =
-            mFactory.createBinaryExpressionProxy(op, varname, intconst);
-          constraints.add(constraint);
+
+    //#######################################################################
+    //# Specific Access
+    CompiledRange getOriginalRange(final SimpleExpressionProxy varname)
+    {
+      return mRootContext.getVariableRange(varname);
+    }
+
+
+    //#######################################################################
+    //# Range Modifications
+    void reset()
+    {
+      mBindings.clear();
+    }
+
+    boolean addBinding(final SimpleExpressionProxy varname,
+                       final SimpleExpressionProxy expr)
+      throws EvalException
+    {
+      final ProxyAccessor<SimpleExpressionProxy> accessor =
+        new ProxyAccessorByContents<SimpleExpressionProxy>(varname);
+      AbstractBinding binding = mBindings.get(accessor);
+      if (binding == null) {
+        final CompiledRange current = mRootContext.getVariableRange(accessor);
+        final CompiledRange estimate = estimateRange(expr);
+        final CompiledRange intersection = current.intersection(estimate);
+        if (intersection.isEmpty()) {
+          setFalse();
+        } else if (intersection instanceof CompiledIntRange) {
+          final CompiledIntRange intrange = (CompiledIntRange) intersection;
+          binding = new IntBinding(varname, intrange, expr);
+        } else if (intersection instanceof CompiledEnumRange) {
+          final CompiledEnumRange enumrange = (CompiledEnumRange) intersection;
+          binding = new EnumBinding(varname, enumrange, expr);
         } else {
-          final BinaryOperator op = mOperatorTable.getLessEqualsOperator();
-          if (lower > intoriginal.getLower()) {
-            final IntConstantProxy intconst =
-              mFactory.createIntConstantProxy(lower);
-            final BinaryExpressionProxy constraint =
-              mFactory.createBinaryExpressionProxy(op, intconst, varname);
-            constraints.add(constraint);
-          }
-          if (upper < intoriginal.getUpper()) {
-            final IntConstantProxy intconst =
-              mFactory.createIntConstantProxy(upper);
-            final BinaryExpressionProxy constraint =
-              mFactory.createBinaryExpressionProxy(op, varname, intconst);
-            constraints.add(constraint);
+          throw new ClassCastException
+            ("Unknown range type " + intersection.getClass().getName());
+        }
+        mBindings.put(accessor, binding);
+        reevaluate();
+        return true;
+      } else if (binding.restrictRange(expr)) {
+        reevaluate();
+        return true;
+      } else {
+        return false;
+      }
+    }
+
+    boolean restrictRange(final SimpleExpressionProxy varname,
+                          final CompiledRange restriction)
+      throws EvalException
+    {
+      final ProxyAccessor<SimpleExpressionProxy> accessor =
+        new ProxyAccessorByContents<SimpleExpressionProxy>(varname);
+      AbstractBinding binding = mBindings.get(accessor);
+      if (binding == null) {
+        final CompiledRange current = mRootContext.getVariableRange(accessor);
+        assert current != null :
+        "Attempting to restrict undefined range for " + varname + "!";
+        final CompiledRange intersection = current.intersection(restriction);
+        if (current == intersection) {
+          return false;
+        } else if (intersection.isEmpty()) {
+          setFalse();
+          return true;
+        } else if (intersection instanceof CompiledIntRange) {
+          final CompiledIntRange intrange = (CompiledIntRange) intersection;
+          binding = new IntBinding(varname, intrange);
+        } else if (intersection instanceof CompiledEnumRange) {
+          final CompiledEnumRange enumrange = (CompiledEnumRange) intersection;
+          binding = new EnumBinding(varname, enumrange);
+        } else {
+          throw new ClassCastException
+            ("Unknown range type " + intersection.getClass().getName());
+        }
+        mBindings.put(accessor, binding);
+        reevaluate();
+        return true;
+      } else if (binding.restrictRange(restriction)) {
+        reevaluate();
+        return true;
+      } else {
+        return false;
+      }
+    }
+
+    void reevaluate()
+      throws EvalException
+    {
+      AbstractBinding changed = null;
+      do {
+        for (final AbstractBinding binding : mBindings.values()) {
+          if (binding.reevaluate()) {
+            if (mIsFalse) {
+              return;
+            } else {
+              changed = binding;
+            }
+          } else if (binding == changed) {
+            return;
           }
         }
-      } else if (restricted instanceof CompiledEnumRange) {
+      } while (changed != null);
+    }
+
+
+    //#######################################################################
+    //# Constraint Retrieval
+    void addAllConstraints(final Collection<SimpleExpressionProxy> result)
+      throws EvalException
+    {
+      for (final AbstractBinding binding : mBindings.values()) {
+        binding.addAllConstraints(result);
+      }
+    }
+
+
+    //#######################################################################
+    //# Data Members
+    private final VariableContext mRootContext;
+    private final Map<ProxyAccessor<SimpleExpressionProxy>,AbstractBinding>
+      mBindings;
+
+  }
+
+
+  //#########################################################################
+  //# Inner Class AbstractBinding
+  private abstract class AbstractBinding
+  {
+
+    //#######################################################################
+    //# Constructor
+    AbstractBinding(final SimpleExpressionProxy varname,
+                    final CompiledRange range,
+                    final SimpleExpressionProxy expr)
+    {
+      mVariableName = varname;
+      setBoundExpression(expr);
+      setConstrainedRange(range);
+    }
+
+
+    //#######################################################################
+    //# Simple Access
+    SimpleExpressionProxy getVariableName()
+    {
+      return mVariableName;
+    }
+
+    boolean isAtomic()
+    {
+      return mIsAtomic;
+    }
+
+    SimpleExpressionProxy getBoundExpression()
+    {
+      return mBoundExpression;
+    }
+
+    CompiledRange getContrainedRange()
+    {
+      return mConstrainedRange;
+    }
+
+    void setBoundExpression(final SimpleExpressionProxy expr)
+    {
+      if (expr == null) {
+        mIsAtomic = false;
+      } else {
+        mIsAtomic = mSimpleExpressionCompiler.isAtomicValue(expr, mContext);
+      }
+      mBoundExpression = expr;
+    }
+
+    void setConstrainedRange(final CompiledRange range)
+    {
+      mConstrainedRange = range;
+      switch (range.size()) {
+      case 0:
+        setFalse();
+        break;
+      case 1:
+        mIsAtomic = true;
+        mBoundExpression = range.getValues().iterator().next();
+        break;
+      default:
+        break;
+      }
+    }
+
+    CompiledRange getOriginalRange()
+    {
+      return mContext.getOriginalRange(mVariableName);
+    }
+
+
+    //#######################################################################
+    //# Modifications
+    boolean restrictRange(final CompiledRange restriction)
+    {
+      final CompiledRange intersection =
+        mConstrainedRange.intersection(restriction);
+      if (mConstrainedRange == intersection) {
+        return false;
+      } else {
+        setConstrainedRange(intersection);
+        return true;
+      }
+    }
+
+    boolean restrictRange(final SimpleExpressionProxy expr)
+      throws EvalException
+    {
+      if (expr.equalsByContents(mBoundExpression)) {
+        return false;
+      } else {
+        mBoundExpression = expr;
+        final CompiledRange range = estimateRange(expr);
+        restrictRange(range);
+        return true;
+      }
+    }
+
+    boolean reevaluate()
+      throws EvalException
+    {
+      if (mBoundExpression == null) {
+        return false;
+      }
+      final SimpleExpressionProxy simp =
+        mSimpleExpressionCompiler.simplify(mBoundExpression, mContext);
+      if (mBoundExpression == simp) {
+        final CompiledRange range = estimateRange(mBoundExpression);
+        return restrictRange(range);
+      } else {
+        mBoundExpression = simp;
+        final CompiledRange range = estimateRange(simp);
+        restrictRange(range);
+        return true;
+      }
+    }
+
+
+    //#######################################################################
+    //# Constraint Retrieval
+    void addAllConstraints(final Collection<SimpleExpressionProxy> result)
+      throws EvalException
+    {
+      if (mBoundExpression == null) {
+        final CompiledRange orig = getOriginalRange();
+        addRangeConstraints(result, orig);
+      } else {
+        addEquationConstraint(result);
+        if (!mIsAtomic) {
+          final CompiledRange estimate = estimateRange(mBoundExpression);
+          final CompiledRange orig = getOriginalRange();
+          final CompiledRange intersection = orig.intersection(estimate);
+          addRangeConstraints(result, intersection);
+        }
+      }
+    }
+
+    void addEquationConstraint(final Collection<SimpleExpressionProxy> result)
+    {
+      final BinaryOperator op = mOperatorTable.getEqualsOperator();
+      final BinaryExpressionProxy eqn = mFactory.createBinaryExpressionProxy
+        (op, mVariableName, mBoundExpression);
+      result.add(eqn);
+    }
+
+    abstract void addRangeConstraints(Collection<SimpleExpressionProxy> result,
+                                      CompiledRange orig);
+
+    //#######################################################################
+    //# Data Members
+    private final SimpleExpressionProxy mVariableName;
+    private boolean mIsAtomic;
+    private SimpleExpressionProxy mBoundExpression;
+    private CompiledRange mConstrainedRange;
+
+  }
+
+
+  //#########################################################################
+  //# Inner Class IntBinding
+  private class IntBinding extends AbstractBinding
+  {
+
+    //#######################################################################
+    //# Constructor
+    IntBinding(final SimpleExpressionProxy varname,
+               final CompiledIntRange range)
+    {
+      super(varname, range, null);
+    }
+
+    IntBinding(final SimpleExpressionProxy varname,
+               final CompiledIntRange range,
+               final SimpleExpressionProxy expr)
+    {
+      super(varname, range, expr);
+    }
+
+    //#######################################################################
+    //# Simple Access
+    CompiledIntRange getIntRange()
+    {
+      return (CompiledIntRange) getContrainedRange();
+    }
+
+    CompiledIntRange getOriginalIntRange()
+    {
+      return (CompiledIntRange) getOriginalRange();
+    }
+
+    //#######################################################################
+    //# Constraint Retrieval
+    void addEquationConstraint(final Collection<SimpleExpressionProxy> result)
+    {
+      if (isAtomic()) {
+        final CompiledIntRange range = getIntRange();
+        if (range.isBooleanRange()) {
+          final SimpleExpressionProxy varname = getVariableName();
+          final IntConstantProxy intconst =
+            (IntConstantProxy) getBoundExpression();
+          switch (intconst.getValue()) {
+          case 0:
+            final UnaryOperator op = mOperatorTable.getNotOperator();
+            final UnaryExpressionProxy expr =
+              mFactory.createUnaryExpressionProxy(op, varname);
+            result.add(expr);
+            return;
+          case 1:
+            result.add(varname);
+            return;
+          default:
+            throw new IllegalStateException
+              ("Constant value " + intconst + " unexpected in Boolean range!");
+          }
+        }
+      }
+      super.addEquationConstraint(result);
+    }
+
+    void addRangeConstraints(final Collection<SimpleExpressionProxy> result,
+                             final CompiledRange orig)
+    {
+      final BinaryOperator op = mOperatorTable.getLessEqualsOperator();
+      final SimpleExpressionProxy varname = getVariableName();
+      final CompiledIntRange intrange = getIntRange();
+      final CompiledIntRange intorig = (CompiledIntRange) orig;
+      final int lower = intrange.getLower();
+      final int upper = intrange.getUpper();
+      if (lower > intorig.getLower()) {
+        final IntConstantProxy intconst =
+          mFactory.createIntConstantProxy(lower);
+        final BinaryExpressionProxy constraint =
+          mFactory.createBinaryExpressionProxy(op, intconst, varname);
+        result.add(constraint);
+      }
+      if (upper < intorig.getUpper()) {
+        final IntConstantProxy intconst =
+          mFactory.createIntConstantProxy(upper);
+        final BinaryExpressionProxy constraint =
+          mFactory.createBinaryExpressionProxy(op, varname, intconst);
+        result.add(constraint);
+      }
+    }
+
+  }
+
+
+  //#########################################################################
+  //# Inner Class EnumBinding
+  private class EnumBinding extends AbstractBinding
+  {
+
+    //#######################################################################
+    //# Constructor
+    EnumBinding(final SimpleExpressionProxy varname,
+                final CompiledEnumRange range)
+    {
+      super(varname, range, null);
+    }
+
+    EnumBinding(final SimpleExpressionProxy varname,
+                final CompiledEnumRange range,
+                final SimpleExpressionProxy expr)
+    {
+      super(varname, range, expr);
+    }
+
+    //#######################################################################
+    //# Simple Access
+    CompiledEnumRange getEnumRange()
+    {
+      return (CompiledEnumRange) getContrainedRange();
+    }
+
+    CompiledEnumRange getOriginalEnumRange()
+    {
+      return (CompiledEnumRange) getOriginalRange();
+    }
+
+    //#######################################################################
+    //# Constraint Retrieval
+    void addRangeConstraints(final Collection<SimpleExpressionProxy> result,
+                             final CompiledRange orig)
+    {
+      final SimpleExpressionProxy varname = getVariableName();
+      final CompiledEnumRange enumrange = getEnumRange();
+      final CompiledEnumRange enumorig = (CompiledEnumRange) orig;
+      if (enumrange.size() < enumorig.size() / 2) {
         final BinaryOperator eqop = mOperatorTable.getEqualsOperator();
         final BinaryOperator orop = mOperatorTable.getOrOperator();
         final Iterator<? extends SimpleExpressionProxy> iter =
-          restricted.getValues().iterator();
+          enumrange.getValues().iterator();
         final SimpleExpressionProxy first = iter.next();
         SimpleExpressionProxy constraint =
           mFactory.createBinaryExpressionProxy(eqop, varname, first);
@@ -399,12 +795,19 @@ public class ConstraintPropagator
           constraint =
             mFactory.createBinaryExpressionProxy(orop, constraint, eqn);
         }
-        constraints.add(constraint);
+        result.add(constraint);
       } else {
-        throw new ClassCastException
-          ("Unknown type of range: " + restricted.getClass().getName() + "!");
+        final BinaryOperator neqop = mOperatorTable.getNotEqualsOperator();
+        for (final SimpleExpressionProxy value : enumorig.getValues()) {
+          if (!enumrange.contains(value)) {
+            SimpleExpressionProxy constraint =
+              mFactory.createBinaryExpressionProxy(neqop, varname, value);
+            result.add(constraint);
+          }
+        }
       }
     }
+
   }
 
 

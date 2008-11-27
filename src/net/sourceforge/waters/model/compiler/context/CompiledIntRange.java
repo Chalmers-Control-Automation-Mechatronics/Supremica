@@ -76,6 +76,11 @@ public class CompiledIntRange implements CompiledRange
     return mUpper - mLower + 1;
   }
 
+  public boolean isEmpty()
+  {
+    return mLower > mUpper;
+  }
+
   public int indexOf(final SimpleExpressionProxy value)
   {
     if (value instanceof IntConstantProxy) {
@@ -131,6 +136,11 @@ public class CompiledIntRange implements CompiledRange
 
   //#########################################################################
   //# More Specific Access
+  public boolean isBooleanRange()
+  {
+    return mLower >= 0 && mUpper <= 1;
+  }
+
   public int indexOf(final IntConstantProxy intconst)
   {
     final int value = intconst.getValue();

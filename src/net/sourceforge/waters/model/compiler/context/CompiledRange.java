@@ -18,6 +18,8 @@ public interface CompiledRange {
 
   public int size();
 
+  public boolean isEmpty();
+
   public int indexOf(SimpleExpressionProxy value);
 
   public boolean contains(SimpleExpressionProxy value);
