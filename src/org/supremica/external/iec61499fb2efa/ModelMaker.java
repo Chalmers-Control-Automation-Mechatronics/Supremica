@@ -202,41 +202,47 @@ class ModelMaker
 		}
 		Logger.output(Logger.DEBUG);
 
-		if(properties.getProperty("execModel") == null || properties.getProperty("execModel").equals("free"))
+		// Free event exec model (default), see above
+		// events are chosen freely from all first events in the queus of all blocks
+		if(properties.getProperty("execModel").equals("free"))
 		{
 			Logger.output("ModelMaker.makeModel(): Making EFA model for the FREE EVENT execution model.");
 			theBuilder = new FreeEventExecModelBuilder(properties);
 		}
+		// Free block exec model
+		// blocks are chosen freely, all events are handled in a single run
 		else if(properties.getProperty("execModel").equals("freeb"))
 		{
 			Logger.output("ModelMaker.makeModel(): Making EFA model for the FREE BLOCK execution model.");
 			theBuilder = new FreeBlockExecModelBuilder(properties);
 		}
-        // Dual exec model  
-		else if (properties.getProperty("execModel").equals("dual"))
-		{
-			Logger.output("ModelMaker.makeModel(): Making EFA model for the DUAL execution model.");
-			theBuilder = new DualExecModelBuilder(properties);
-		}
-        // Sequential exec model (default): one place in scheduler per fb event received
+        // Sequential event exec model
+		// one place in scheduler per fb event received
 		else if (properties.getProperty("execModel").equals("seqe"))
 		{
-			Logger.output("ModelMaker.makeModel(): Making EFA model for the SEQUENTIAL execution model.");
+			Logger.output("ModelMaker.makeModel(): Making EFA model for the SEQUENTIAL EVENT execution model.");
 			theBuilder = new SequentialEventExecModelBuilder(properties);
 		}
-        // Cyclic exec model: fb handles all fb events each run
+        // Sequential block exec model
+		// one place in scheduler per all fb events received, all events are handled in a single run
+		else if (properties.getProperty("execModel").equals("seqb"))
+		{
+			Logger.output("ModelMaker.makeModel(): Making EFA model for the SEQUENTIAL BLOCK execution model.");
+			theBuilder = new SequentialBlockExecModelBuilder(properties);
+		}
+        // Cyclic exec model: block are run cyclicaly, all events are handled in a single run
 		else if (properties.getProperty("execModel").equals("cycl"))
 		{
 			Logger.output("ModelMaker.makeModel(): Making EFA model for the CYCLIC execution model.");
 			theBuilder = new CyclicExecModelBuilder(properties);
 		}
-        // Hybrid exec model: one place in scheduler per all fb events received, handle all fb events per run
-		else if (properties.getProperty("execModel").equals("seqb"))
+        // Dual exec model, not fully working
+		else if (properties.getProperty("execModel").equals("dual"))
 		{
-			Logger.output("ModelMaker.makeModel(): Making EFA model for the HYBRID execution model.");
-			theBuilder = new SequentialBlockExecModelBuilder(properties);
+			Logger.output("ModelMaker.makeModel(): Making EFA model for the DUAL execution model.");
+			theBuilder = new DualExecModelBuilder(properties);
 		}
-        // NPMTR exec model
+        // NPMTR exec model, not working
 		else if (properties.getProperty("execModel").equals("npmtr"))
 		{
 			Logger.output("ModelMaker.makeModel(): Making EFA model for the NPMTR execution model.");
