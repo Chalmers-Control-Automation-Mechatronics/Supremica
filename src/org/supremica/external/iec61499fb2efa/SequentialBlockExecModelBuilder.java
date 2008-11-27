@@ -49,12 +49,12 @@ import net.sourceforge.fuber.model.interpreters.abstractsyntax.Identifier;
 
 import net.sourceforge.fuber.xsd.libraryelement.*;
 
-class HybridExecModelBuilder 
-	extends SequentialExecModelBuilder
+class SequentialBlockExecModelBuilder 
+	extends SequentialEventExecModelBuilder
 	implements ModelBuilder
 {
 
-	HybridExecModelBuilder(Properties arguments)
+	SequentialBlockExecModelBuilder(Properties arguments)
 	{
 		super(arguments);
 	}
@@ -89,61 +89,6 @@ class HybridExecModelBuilder
 			eventExecution.addTransition(from, to, event, null, null);
 		}
 		automata.addAutomaton(eventExecution);
-	}
-
-	void makeBasicFBEventHandling(String fbName)
-	{
-		Logger.output("Event Handling", 1);
-		
-		ExtendedAutomaton eventHandling = getNewAutomaton(fbName + ": Event Handling");
-
-		eventHandling.addInitialState("s0");
-		eventHandling.addState("s1");
-		eventHandling.addState("s2");
-		eventHandling.addState("s3");
-		eventHandling.addState("s4");
-
-		String from = "s0";
-		String to = "s1";
-		String event = "handle_event_" + fbName + ";";
-		eventHandling.addTransition(from, to, event, null, null);
-
-		from = "s1";
-		to = "s2";
-		event = "select_event_" + fbName + ";";
-		eventHandling.addTransition(from, to, event, null, null);
-
-		from = "s2";
-		to = "s3";
-		event = "update_ECC_" + fbName + ";";
-		eventHandling.addTransition(from, to, event, null, null);
-
-		from = "s3";
-		to = "s2";
-		event = "no_more_actions_" + fbName + ";";
-		eventHandling.addTransition(from, to, event, null, null);
-		
-		from = "s3";
-		to = "s3";
-		event = "no_transition_" + fbName + ";";
-		eventHandling.addTransition(from, to, event, null, null);
-
-		from = "s3";
-		to = "s4";
-		event = "handling_event_done_" + fbName + ";";
-		eventHandling.addTransition(from, to, event, null, null);
-
-		from = "s4";
-		to = "s2";
-		event = "select_event_" + fbName + ";";
-		eventHandling.addTransition(from, to, event, null, null);
-
-		from = "s4";
-		to = "s0";
-		event = "no_event_" + fbName + ";";
-		eventHandling.addTransition(from, to, event, null, null);
-
-		automata.addAutomaton(eventHandling);
 	}
 
 	void makeBasicFBEventQueue(String fbName)

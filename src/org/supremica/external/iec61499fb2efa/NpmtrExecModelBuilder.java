@@ -50,7 +50,7 @@ import net.sourceforge.fuber.model.interpreters.abstractsyntax.Identifier;
 import net.sourceforge.fuber.xsd.libraryelement.*;
 
 class NpmtrExecModelBuilder 
-	extends FreeExecModelBuilder
+	extends FreeEventExecModelBuilder
 	implements ModelBuilder
 {
 	

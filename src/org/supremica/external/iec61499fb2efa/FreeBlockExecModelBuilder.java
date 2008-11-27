@@ -1,0 +1,111 @@
+/*
+ *   Copyright (C) 2008 Goran Cengic
+ *
+ *   This library is free software; you can redistribute it and/or
+ *   modify it under the terms of the GNU Lesser General Public
+ *   License as published by the Free Software Foundation; either
+ *   version 3 of the License, or (at your option) any later version.
+ *
+ *   This library is distributed in the hope that it will be useful,
+ *   but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ *   Lesser General Public License for more details.
+ *
+ *   You should have received a copy of the GNU General Public License
+ *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ */
+
+/*
+ * @author Goran Cengic (cengic@chalmers.se)
+ */
+
+package org.supremica.external.iec61499fb2efa;
+
+import java.io.File;
+import java.io.Reader;
+import java.io.StringReader;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.HashMap;
+import java.util.Set;
+import java.util.HashSet;
+import java.util.LinkedHashSet;
+import java.util.LinkedList;
+import java.util.ArrayList;
+import java.util.Properties;
+import java.lang.Exception;
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.Unmarshaller;
+
+import java_cup.runtime.Scanner;
+import net.sourceforge.fuber.model.interpreters.st.Lexer;
+import net.sourceforge.fuber.model.interpreters.st.Parser;
+import net.sourceforge.fuber.model.interpreters.Finder;
+import net.sourceforge.fuber.model.interpreters.st.Translator;
+import net.sourceforge.fuber.model.interpreters.abstractsyntax.Goal;
+import net.sourceforge.fuber.model.interpreters.abstractsyntax.Identifier;
+
+import net.sourceforge.fuber.xsd.libraryelement.*;
+
+class FreeBlockExecModelBuilder 
+	extends SequentialBlockExecModelBuilder
+	implements ModelBuilder
+{
+
+	FreeBlockExecModelBuilder(Properties arguments)
+	{
+		super(arguments);
+	}
+
+	public void buildModels()
+	{
+		Logger.output(builderName() + ".buildModels()");
+
+ 		automata = new ExtendedAutomata(theSystem.getName(), expandTransitions);
+		
+		makeStartup();
+		
+		makeEventExecution();
+		
+		for (Iterator fbIter = basicFunctionBlocks.keySet().iterator(); fbIter.hasNext();)
+		{
+			String fbName = (String) fbIter.next();
+			String typeName = (String) basicFunctionBlocks.get(fbName);
+			
+			makeBasicFB(fbName);
+		}
+	}
+
+	void makeEventExecution()
+	{
+		Logger.output(builderName() + ".makeEventExecution():");
+
+		ExtendedAutomaton eventExecution = getNewAutomaton("Event Execution");
+
+		eventExecution.addInitialState("s0");
+		eventExecution.addState("s1",false,false);
+		eventExecution.addTransition("s0", "s1", "select_fb;", null, null);	
+
+		for (Iterator iter = basicFunctionBlocks.keySet().iterator(); iter.hasNext();)
+		{
+			String instanceName = (String) iter.next();
+
+			int nameCounter = 2;
+			
+			String from = "s1";
+			String to = "s" + nameCounter;
+			nameCounter++;
+			eventExecution.addState(to,false,false);
+			String event = "handle_event_" + instanceName + ";";
+			eventExecution.addTransition(from, to, event, null, null);
+
+			from = to;
+			to = "s0";
+			event = "no_event_" + instanceName + ";";
+			eventExecution.addTransition(from, to, event, null, null);
+		}
+		automata.addAutomaton(eventExecution);
+	}
+}

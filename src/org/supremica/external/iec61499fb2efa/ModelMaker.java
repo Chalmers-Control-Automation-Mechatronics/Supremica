@@ -204,8 +204,13 @@ class ModelMaker
 
 		if(properties.getProperty("execModel") == null || properties.getProperty("execModel").equals("free"))
 		{
-			Logger.output("ModelMaker.makeModel(): Making EFA model for the FREE execution model.");
-			theBuilder = new FreeExecModelBuilder(properties);
+			Logger.output("ModelMaker.makeModel(): Making EFA model for the FREE EVENT execution model.");
+			theBuilder = new FreeEventExecModelBuilder(properties);
+		}
+		else if(properties.getProperty("execModel").equals("freeb"))
+		{
+			Logger.output("ModelMaker.makeModel(): Making EFA model for the FREE BLOCK execution model.");
+			theBuilder = new FreeBlockExecModelBuilder(properties);
 		}
         // Dual exec model  
 		else if (properties.getProperty("execModel").equals("dual"))
@@ -214,10 +219,10 @@ class ModelMaker
 			theBuilder = new DualExecModelBuilder(properties);
 		}
         // Sequential exec model (default): one place in scheduler per fb event received
-		else if (properties.getProperty("execModel").equals("seq"))
+		else if (properties.getProperty("execModel").equals("seqe"))
 		{
 			Logger.output("ModelMaker.makeModel(): Making EFA model for the SEQUENTIAL execution model.");
-			theBuilder = new SequentialExecModelBuilder(properties);
+			theBuilder = new SequentialEventExecModelBuilder(properties);
 		}
         // Cyclic exec model: fb handles all fb events each run
 		else if (properties.getProperty("execModel").equals("cycl"))
@@ -226,10 +231,10 @@ class ModelMaker
 			theBuilder = new CyclicExecModelBuilder(properties);
 		}
         // Hybrid exec model: one place in scheduler per all fb events received, handle all fb events per run
-		else if (properties.getProperty("execModel").equals("hybrid"))
+		else if (properties.getProperty("execModel").equals("seqb"))
 		{
 			Logger.output("ModelMaker.makeModel(): Making EFA model for the HYBRID execution model.");
-			theBuilder = new HybridExecModelBuilder(properties);
+			theBuilder = new SequentialBlockExecModelBuilder(properties);
 		}
         // NPMTR exec model
 		else if (properties.getProperty("execModel").equals("npmtr"))

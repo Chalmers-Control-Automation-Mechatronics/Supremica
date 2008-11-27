@@ -277,7 +277,7 @@ abstract class ExecModelBuilder
 			printDataConnectionsMap();
 		}
 	}
-	
+
 	public void buildModels()
 	{
 		Logger.output(builderName() + ".buildModels()");
@@ -289,10 +289,6 @@ abstract class ExecModelBuilder
 		makeInstanceQueue();
 		
 		makeEventExecution();
-		
-		makeJobQueue();
-		
-		makeAlgorithmExecution();
 		
 		for (Iterator fbIter = basicFunctionBlocks.keySet().iterator(); fbIter.hasNext();)
 		{
@@ -1056,239 +1052,6 @@ abstract class ExecModelBuilder
 		automata.addAutomaton(eventExecution);
 	}
 
-	private void makeJobQueue()
-	{
-		if (algMaxID > 0)
-		{
-			Logger.output("DualExecModelBuilder.makeJobQueue():");
-
-			ExtendedAutomaton jobQueue = getNewAutomaton("Job Queue");
-		
-			// the maximum number of jobs in the queue at the same time
-			int places = algMaxID;	
-			if (jobQueuePlaces != 0)
-			{
-				places = jobQueuePlaces.intValue();
-			}
-		
-			jobQueue.addIntegerVariable("current_job_fb", 0, algFB, 0, 0);
-			jobQueue.addIntegerVariable("current_job_alg", 0, algMaxID, 0, 0);
-
-			jobQueue.addInitialState("s0");
-			for (int i = 1; i <= places; i++)
-			{
-				jobQueue.addIntegerVariable("job_fb_place_" + i, 0, algFB, 0, 0);
-				jobQueue.addIntegerVariable("job_alg_place_" + i, 0, algMaxID, 0, 0);
-	
-				jobQueue.addState("s" + i);
-				//Transiton when queuing job
-				String from = "s" + (i-1);
-				String to = "s" + i;
-				String event = "";
-				String guard = "";
-				String action = "";
-				for (Iterator fbIter = basicFunctionBlocks.keySet().iterator(); fbIter.hasNext();)
-				{
-					String fbName = (String) fbIter.next();
-					Integer fbID = (Integer) basicFunctionBlocksID.get(fbName);
-					Map fbAlgorithms = (Map) algorithms.get(fbName);
-					if (fbAlgorithms != null)
-					{
-						for (Iterator algIter = fbAlgorithms.keySet().iterator(); algIter.hasNext();)
-						{
-							String curAlg = (String) algIter.next();
-							Integer algID = (Integer) fbAlgorithms.get(curAlg);
-					
-							event = "queue_job_" + curAlg + "_" + fbName +";";
-							action = "job_fb_place_" + i + " = " + fbID + ";";
-							action = action + "job_alg_place_" + i + " = " + algID + ";";
-							jobQueue.addTransition(from, to, event, null, action);
-						}
-					}
-				}
-
-				// Transiton when dequeuing job
-				from = "s" + i;
-				to = "s" + (i-1);
-				event = "remove_job;";      
-				action = "current_job_fb = job_fb_place_1;";
-				action = action + "current_job_alg = job_alg_place_1;";
-				for (int j = 1; j <= i-1; j++)
-				{
-					action = action + "job_fb_place_" + j + " = job_fb_place_" + (j+1) + ";";
-					action = action + "job_alg_place_" + j + " = job_alg_place_" + (j+1) + ";";
-				}
-				action = action + "job_fb_place_" + i + " = 0;";
-				action = action + "job_alg_place_" + i + " = 0;";
-				jobQueue.addTransition(from, to, event, null, action);      
-			}
-			automata.addAutomaton(jobQueue);	
-		}
-	}
-
-	private void makeAlgorithmExecution()
-	{
-		if (algMaxID > 0)
-		{
-			Logger.output(builderName() + ".makeAlgorithmExecution():");
-			
-			ExtendedAutomaton algorithmExecution = getNewAutomaton("Algorithm Execution");
-				
-			algorithmExecution.addInitialState("s0");
-			algorithmExecution.addState("s1");
-		
-			algorithmExecution.addTransition("s0", "s1", "remove_job;", null, null);	
-
-			for (Iterator fbIter = basicFunctionBlocks.keySet().iterator(); fbIter.hasNext();)
-			{
-				String instanceName = (String) fbIter.next();
-				Integer instanceID = (Integer) basicFunctionBlocksID.get(instanceName);
-				String typeName = (String) basicFunctionBlocks.get(instanceName);
-				JaxbFBType theType = (JaxbFBType) fbTypes.get(typeName);
-				Map algorithmMap = (Map) algorithms.get(instanceName);
-				// localy re-defining class attribute
-				List algorithms = theType.getBasicFB().getAlgorithm();
-
-				if (algorithmMap != null)
-				{
-					for (Iterator algIter = algorithms.iterator(); algIter.hasNext();)
-					{
-						JaxbAlgorithm curAlg = (JaxbAlgorithm) algIter.next();
-						String algName = curAlg.getName();
-						String algLang = curAlg.getOther().getLanguage();
-						String algText = curAlg.getOther().getText();
-						Integer algID = (Integer) algorithmMap.get(algName);
-						
-						String from = "";
-						String to = "";
-						String event = "";
-						String guard = "";
-						String action = "";
-						int nameCounter = 2;	
-						
-						if (algLang.toLowerCase().equals("java"))
-						{
-							from = "s1";
-							to = "s" + nameCounter;
-							nameCounter++;
-							algorithmExecution.addState(to);
-							event = "execute_" + algName + "_" + instanceName + ";";
-							guard = "current_job_fb == " + instanceID;
-							guard = guard + " & current_job_alg == " + algID;
-							algorithmExecution.addTransition(from, to, event, guard, null);
-							from = to;
-
-							to = "s" + nameCounter;
-							nameCounter++;
-							algorithmExecution.addState(to);
-							event = "copy_variables_" + algName + "_" + instanceName + ";";
-							algorithmExecution.addTransition(from, to, event, null, null);
-							from = to;
-												
-							// get the variables and make identifier map for translation
-							Map identifierMap = new HashMap();
-							Map reverseIdentifierMap = new HashMap();
-							if (theType.getInterfaceList().isSetInputVars())
-							{
-								List inputVars = theType.getInterfaceList().getInputVars().getVarDeclaration();
-								for (Iterator iter = inputVars.iterator(); iter.hasNext();)
-								{
-									VarDeclaration curVar = (VarDeclaration) iter.next();
-									String curVarName = curVar.getName();
-									identifierMap.put(curVarName, "alg_data_" + curVarName + "_" + algName + "_" + instanceName);
-									reverseIdentifierMap.put(curVarName, "data_" + curVarName + "_" + instanceName);
-								}
-							}		
-							if (theType.getInterfaceList().isSetOutputVars())
-							{
-								List outputVars = theType.getInterfaceList().getOutputVars().getVarDeclaration();
-								for (Iterator iter = outputVars.iterator(); iter.hasNext();)
-								{
-									VarDeclaration curVar = (VarDeclaration) iter.next();
-									String curVarName = curVar.getName();
-									identifierMap.put(curVarName, "alg_data_" + curVarName + "_" + algName + "_" + instanceName);
-									reverseIdentifierMap.put(curVarName, "data_" + curVarName + "_" + instanceName);
-								}
-							}
-							if (theType.getBasicFB().isSetInternalVars())
-							{
-								List internalVars = theType.getBasicFB().getInternalVars().getVarDeclaration();
-								for (Iterator iter = internalVars.iterator(); iter.hasNext();)
-								{
-									VarDeclaration curVar = (VarDeclaration) iter.next();
-									String curVarName = curVar.getName();
-									identifierMap.put(curVarName, "alg_internal_" + curVarName + "_" + algName + "_" + instanceName);
-									reverseIdentifierMap.put(curVarName, "internal_" + curVarName + "_" + instanceName);
-								}
-							}
-
-							// parse the Java algorithm
-							StringReader reader = new StringReader(algText);
-							net.sourceforge.fuber.model.interpreters.java.Lexer javaLexer = new net.sourceforge.fuber.model.interpreters.java.Lexer((Reader) reader);
-							net.sourceforge.fuber.model.interpreters.java.Parser javaParser = new net.sourceforge.fuber.model.interpreters.java.Parser((Scanner) javaLexer);
-							Goal algSyntaxTree = null;
-							try
-							{
-								algSyntaxTree = (Goal) javaParser.parse().value;
-							}
-							catch(Exception e)
-							{
-								Logger.output(Logger.ERROR, "Error!: Parsing of the Java algorithm failed:");
-								Logger.output(Logger.ERROR, "Algorithm: " + algName, 1);
-								Logger.output(Logger.ERROR, "Text: " + algText, 1);
-								exit(1);
-							}	
-						
-							// get all identifiers			
-							Finder finder = new Finder(algSyntaxTree);
-							Set assignmentIdents = finder.getAssignmentIdentifiers();
-							Set expressionIdents = finder.getExpressionIdentifiers();
-							// put all identifiers into single set
-							Set algorithmIdents = new LinkedHashSet();
-							for (Iterator iter = assignmentIdents.iterator(); iter.hasNext();)
-							{
-								String curIdent = ((Identifier) iter.next()).a;
-								if (!algorithmIdents.contains(curIdent))
-								{
-									algorithmIdents.add(curIdent);
-								}
-							}
-							for (Iterator iter = expressionIdents.iterator(); iter.hasNext();)
-							{
-								String curIdent = ((Identifier) iter.next()).a;
-								if (!algorithmIdents.contains(curIdent))
-								{
-									algorithmIdents.add(curIdent);
-								}
-							}
-						
-							//get the local alg vars
-							to = "s" + nameCounter;
-							nameCounter++;
-							algorithmExecution.addState(to);					
-							event = "get_variables_" + algName + "_" + instanceName + ";";
-							action = "";
-							for (Iterator iter = algorithmIdents.iterator(); iter.hasNext();)
-							{
-								String curIdent = (String) iter.next();
-								String algVar = (String) identifierMap.get(curIdent);
-								String blockVar = (String) reverseIdentifierMap.get(curIdent);
-								action = action + blockVar + " = " + algVar + ";";
-							}
-							algorithmExecution.addTransition(from, to, event, null, action);
-							from = to;
-
-							to = "s0";
-							event = "finished_execution_" + algName + "_" + instanceName + ";";
-							algorithmExecution.addTransition(from, to, event, null, null);
-						}
-					}
-				}
-			}
-			automata.addAutomaton(algorithmExecution);
-		}
-	}
-
 	void makeBasicFB(String fbName)
 	{	
 		Logger.output(builderName() + ".makeBasicFB(" + fbName + "):");
@@ -1868,7 +1631,7 @@ abstract class ExecModelBuilder
 			String curECCondition = curECTransition.getCondition();			
 
 			Logger.output(Logger.DEBUG, "Analyzing EC transition: from: " + curECSourceName +
-						  ", to: " + curECDestName + ", cond: " + curECCondition, level);
+				   ", to: " + curECDestName + ", cond: " + curECCondition, level);
 
 			// loop temporary vars
 			boolean oneTransitionFromECSource = false;
@@ -1996,7 +1759,7 @@ abstract class ExecModelBuilder
 							nameCounter++;
 							Logger.output(Logger.DEBUG, "Adding state: " + to, level);
 							ecc.addState(to,false,false);
-							event = "queue_job_" + actionAlgorithm + "_" + fbName + ";";
+							event = "execute_" + actionAlgorithm + "_" + fbName + ";";
 							Logger.output(Logger.DEBUG, "Adding transition: from " + from + ": to " + to + ": event " + event, level);
 							ecc.addTransition(from, to, event, null, null);
 							next = to;						
@@ -2298,7 +2061,7 @@ abstract class ExecModelBuilder
 			ecc.addTransition(from, to, event, null, null);
 		}
 	}
-	
+
 	void makeBasicFBAlgorithms(String fbName)
 	{
 		String typeName = (String) basicFunctionBlocks.get(fbName);
@@ -2330,7 +2093,6 @@ abstract class ExecModelBuilder
 			{
 				// get the variables and make identifier map for translation
 				Map identifierMap = new HashMap();
-				Map reverseIdentifierMap = new HashMap();
 				if (theType.getInterfaceList().isSetInputVars())
 				{
 					List inputVars = theType.getInterfaceList().getInputVars().getVarDeclaration();
@@ -2338,8 +2100,7 @@ abstract class ExecModelBuilder
 					{
 						VarDeclaration curVar = (VarDeclaration) iter.next();
 						String curVarName = curVar.getName();
-						identifierMap.put(curVarName, "alg_data_" + curVarName + "_" + algName + "_" + fbName);
-						reverseIdentifierMap.put("alg_data_" + curVarName + "_" + algName + "_" + fbName, "data_" + curVarName + "_" + fbName);
+						identifierMap.put(curVarName, "data_" + curVarName + "_" + fbName);
 					}
 				}		
 				if (theType.getInterfaceList().isSetOutputVars())
@@ -2349,8 +2110,7 @@ abstract class ExecModelBuilder
 					{
 						VarDeclaration curVar = (VarDeclaration) iter.next();
 						String curVarName = curVar.getName();
-						identifierMap.put(curVarName, "alg_data_" + curVarName + "_" + algName + "_" + fbName);
-						reverseIdentifierMap.put("alg_data_" + curVarName + "_" + algName + "_" + fbName, "data_" + curVarName + "_" + fbName);
+						identifierMap.put(curVarName, "data_" + curVarName + "_" + fbName);
 					}
 				}
 				if (theType.getBasicFB().isSetInternalVars())
@@ -2360,8 +2120,7 @@ abstract class ExecModelBuilder
 					{
 						VarDeclaration curVar = (VarDeclaration) iter.next();
 						String curVarName = curVar.getName();
-						identifierMap.put(curVarName, "alg_internal_" + curVarName + "_" + algName + "_" + fbName);
-						reverseIdentifierMap.put("alg_internal_" + curVarName + "_" + algName + "_" + fbName, "internal_" + curVarName + "_" + fbName);
+						identifierMap.put(curVarName, "internal_" + curVarName + "_" + fbName);
 					}
 				}
 				
@@ -2426,13 +2185,6 @@ abstract class ExecModelBuilder
 					}
 				}
 				
-				// make alg local model variables
-				for (Iterator iter = algorithmIdents.iterator(); iter.hasNext();)
-				{
-					String curIdent = (String) iter.next();
-					curAlgModel.addIntegerVariable(curIdent, intVarMinValue, intVarMaxValue, 0, 0);
-				}
-				
 				String[] efaAlgTextLines = efaAlgText.split(";");
 				
 				// make execution model
@@ -2446,22 +2198,6 @@ abstract class ExecModelBuilder
 				curAlgModel.addTransition(from, to, event, null, null);
 				from = to;
 
-				//get the block vars
-				to = "s" + nameCounter;
-				nameCounter++;
-				curAlgModel.addState(to);
-				event = "copy_variables_" + algName + "_" + fbName + ";";
-				// for each assignment var
-				action = "";
-				for (Iterator iter = algorithmIdents.iterator(); iter.hasNext();)
-				{
-					String curIdent = (String) iter.next();
-					String blockVar = (String) reverseIdentifierMap.get(curIdent);
-					action = action + curIdent + " = " + blockVar + ";";
-				}
-				curAlgModel.addTransition(from, to, event, null, action);
-				from = to;
-				
 				// for all lines in the algorithm text
 				for (int i = 0; i < efaAlgTextLines.length; i++)
 				{
@@ -2480,14 +2216,6 @@ abstract class ExecModelBuilder
 					from = to;
 				}
 
-				to = "s" + nameCounter;
-				curAlgModel.addState(to);
-				nameCounter++;
-				event = "get_variables_" + algName + "_" + fbName + ";";
-				curAlgModel.addTransition(from, to, event, null, null);
-				from = to;
-
-				
 				to = "s0";
 				event = "finished_execution_" + algName + "_" + fbName + ";";
 				curAlgModel.addTransition(from, to, event, null, null);
