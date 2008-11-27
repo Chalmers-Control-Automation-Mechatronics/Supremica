@@ -37,14 +37,28 @@ public class CompilerExpressionComparator
   //# Constructors
   public CompilerExpressionComparator(final CompilerOperatorTable optable)
   {
-    this(optable, null);
+    this(optable, null, true);
   }
 
   public CompilerExpressionComparator(final CompilerOperatorTable optable,
                                       final BindingContext context)
   {
+    this(optable, context, true);
+  }
+
+  public CompilerExpressionComparator(final CompilerOperatorTable optable,
+                                      final boolean negliterals)
+  {
+    this(optable, null, negliterals);
+  }
+
+  public CompilerExpressionComparator(final CompilerOperatorTable optable,
+                                      final BindingContext context,
+                                      final boolean negliterals)
+  {
     mOperatorTable = optable;
     mContext = context;
+    mSupportsNegativeLiterals = negliterals;
   }
 
 
@@ -130,7 +144,7 @@ public class CompilerExpressionComparator
     throws VisitorException
   {
     final UnaryOperator op = expr.getOperator();
-    if (op == mOperatorTable.getNotOperator()) {
+    if (op == mOperatorTable.getNotOperator() && mSupportsNegativeLiterals) {
       final SimpleExpressionProxy subterm = expr.getSubTerm();
       final ComparatorInfo subinfo =
         (ComparatorInfo) subterm.acceptVisitor(this);
@@ -527,6 +541,7 @@ public class CompilerExpressionComparator
   //# Data Members
   private final CompilerOperatorTable mOperatorTable;
   private final BindingContext mContext;
+  private final boolean mSupportsNegativeLiterals;
 
 
   //#########################################################################

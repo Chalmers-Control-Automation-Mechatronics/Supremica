@@ -69,8 +69,8 @@ public class ExpressionComparator
     mInterfaceValues.put(IndexedIdentifierProxy.class, 2);
     mInterfaceValues.put(QualifiedIdentifierProxy.class, 3);
     mInterfaceValues.put(EnumSetExpressionProxy.class, 4);
-    mInterfaceValues.put(BinaryExpressionProxy.class, 5);
-    mInterfaceValues.put(UnaryExpressionProxy.class, 6);
+    mInterfaceValues.put(UnaryExpressionProxy.class, 5);
+    mInterfaceValues.put(BinaryExpressionProxy.class, 6);
     mOperatorValues = opvalues;
   }
 

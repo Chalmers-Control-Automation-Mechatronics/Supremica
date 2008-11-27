@@ -147,7 +147,7 @@ class RelationNormalizationRule extends SimplificationRule
     }
     if (op.isSymmetric()) {
       final Comparator<SimpleExpressionProxy> comparator =
-        propagator.getExpressionComparator();
+        propagator.getEquationComparator();
       swap = comparator.compare(lhs, rhs) > 0;
     } else {
       final BinaryOperator swapop = optable.getSwappedNormalOperator(op);
@@ -221,7 +221,7 @@ class RelationNormalizationRule extends SimplificationRule
           return false;
         } else if (op.isSymmetric()) {
           final Comparator<SimpleExpressionProxy> comparator =
-            propagator.getExpressionComparator();
+            propagator.getEquationComparator();
           final SimpleExpressionProxy lhs = binary.getLeft();
           final SimpleExpressionProxy rhs = binary.getRight();
           return comparator.compare(lhs, rhs) > 0;

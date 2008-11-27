@@ -55,7 +55,9 @@ public class ConstraintPropagator
     mFactory = factory;
     mOperatorTable = optable;
     mContext = new ConstraintContext(root);
-    mComparator = new CompilerExpressionComparator(optable, root);
+    mListComparator = new CompilerExpressionComparator(optable, root, true);
+    mEquationComparator =
+      new CompilerExpressionComparator(optable, root, false);
     mSimpleExpressionCompiler =
       new SimpleExpressionCompiler(factory, optable, false);
     mNormalizer = RelationNormalizationRule.createNormalRule(factory, optable);
@@ -84,7 +86,8 @@ public class ConstraintPropagator
       RightLessEqualsRestrictionRule.createRule(factory, optable)
     };
     mUnprocessedConstraints = new LinkedList<SimpleExpressionProxy>();
-    mNormalizedConstraints = new TreeSet<SimpleExpressionProxy>(mComparator);
+    mNormalizedConstraints =
+      new TreeSet<SimpleExpressionProxy>(mListComparator);
     mIsFalse = false;
   }
 
@@ -106,9 +109,14 @@ public class ConstraintPropagator
     return mContext;
   }
 
-  Comparator<SimpleExpressionProxy> getExpressionComparator()
+  Comparator<SimpleExpressionProxy> getListComparator()
   {
-    return mComparator;
+    return mListComparator;
+  }
+
+  Comparator<SimpleExpressionProxy> getEquationComparator()
+  {
+    return mEquationComparator;
   }
 
 
@@ -149,7 +157,7 @@ public class ConstraintPropagator
       final List<SimpleExpressionProxy> result =
         new ArrayList<SimpleExpressionProxy>(mNormalizedConstraints);
       mContext.addAllConstraints(result);
-      Collections.sort(result, mComparator);
+      Collections.sort(result, mListComparator);
       return result;
     }
   }
@@ -816,7 +824,8 @@ public class ConstraintPropagator
   private final ModuleProxyFactory mFactory;
   private final CompilerOperatorTable mOperatorTable;
   private final ConstraintContext mContext;
-  private final Comparator<SimpleExpressionProxy> mComparator;
+  private final Comparator<SimpleExpressionProxy> mListComparator;
+  private final Comparator<SimpleExpressionProxy> mEquationComparator;
   private final SimpleExpressionCompiler mSimpleExpressionCompiler;
   private final RelationNormalizationRule mNormalizer;
   private final RelationNormalizationRule mNegator;

@@ -128,7 +128,7 @@ class DisjunctionNormalizationRule extends SimplificationRule
   void execute(final ConstraintPropagator propagator)
   {
     final Comparator<SimpleExpressionProxy> comparator =
-      propagator.getExpressionComparator();
+      propagator.getListComparator();
     Collections.sort(mList, comparator);
     final ModuleProxyFactory factory = propagator.getFactory();
     final CompilerOperatorTable optable = propagator.getOperatorTable();
@@ -225,7 +225,7 @@ class DisjunctionNormalizationRule extends SimplificationRule
         if (mLiterals.addProxy(norm)) {
           if (mPrevious != null) {
             final Comparator<SimpleExpressionProxy> comparator =
-              mPropagator.getExpressionComparator();
+              mPropagator.getListComparator();
             mHasModifications |= comparator.compare(mPrevious, norm) > 0;
           }
           mPrevious = norm;

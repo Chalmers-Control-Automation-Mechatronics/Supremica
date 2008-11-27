@@ -392,7 +392,7 @@ public class ConstraintPropagatorTest extends TestCase
     final boolean retval = mPropagator.propagate();
     final List<SimpleExpressionProxy> result = mPropagator.getAllConstraints();
     final Comparator<SimpleExpressionProxy> comparator =
-      mPropagator.getExpressionComparator();
+      mPropagator.getEquationComparator();
     if (result != null) {
       Collections.sort(result, comparator);
     }
