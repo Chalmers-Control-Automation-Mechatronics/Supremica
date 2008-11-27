@@ -335,7 +335,7 @@ abstract class ExecModelBuilder
 				String fbName = (String) fbIter.next();		
 				Integer fbID = (Integer) basicFunctionBlocksID.get(fbName);
 				
-				event = "submitt_fb_" + fbName + ";";
+				event = "submit_fb_" + fbName + ";";
 				for (int j = 1; j<=places; j++)
 				{
 					guard = "fb_first == " + j;
@@ -1354,7 +1354,7 @@ abstract class ExecModelBuilder
 					to = "s" + (places + nameCounter);
 					nameCounter++;
 					eventQueue.addState(to,false,false);
-					event = "submitt_fb_" + fbName + ";";
+					event = "submit_fb_" + fbName + ";";
 					eventQueue.addTransition(from, to, event, null, null);
 					
 					from = to;

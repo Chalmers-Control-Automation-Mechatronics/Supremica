@@ -346,7 +346,7 @@ class SequentialBlockExecModelBuilder
 						to = "s" + (places + nameCounter);
 						nameCounter++;
 						eventQueue.addState(to,false,false);
-						event = "submitt_fb_" + fbName + ";";
+						event = "submit_fb_" + fbName + ";";
 						eventQueue.addTransition(from, to, event, null, null);
 					}
 

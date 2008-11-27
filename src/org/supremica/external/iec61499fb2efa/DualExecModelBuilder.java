@@ -115,7 +115,7 @@ class DualExecModelBuilder
 				String fbName = (String) fbIter.next();		
 				Integer fbID = (Integer) basicFunctionBlocksID.get(fbName);
 
-				event = "submitt_fb_" + fbName + ";";
+				event = "submit_fb_" + fbName + ";";
 				action = "fb_place_" + i + " = " + fbID + ";";
 				instanceQueue.addTransition(from, to, event, null, action);
 			}
@@ -670,7 +670,7 @@ class DualExecModelBuilder
 					to = "s" + (places + nameCounter);
 					nameCounter++;
 					eventQueue.addState(to,false,false);
-					event = "submitt_fb_" + fbName + ";";
+					event = "submit_fb_" + fbName + ";";
 					eventQueue.addTransition(from, to, event, null, null);
 					
 					from = to;
