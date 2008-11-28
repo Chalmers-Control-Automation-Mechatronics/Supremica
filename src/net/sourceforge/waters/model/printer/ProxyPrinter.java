@@ -97,6 +97,29 @@ public class ProxyPrinter
     }
   }
 
+  public void pprint(final Collection<? extends Proxy> list,
+                     final String opening,
+                     final String separator,
+                     final String closing)
+    throws IOException
+  {
+    try {
+      boolean first = true;
+      print(opening);
+      for (final Proxy proxy : list) {
+	if (first) {
+	  first = false;
+	} else {
+	  print(separator);
+        }
+        printProxy(proxy);
+      }
+      print(closing);
+    } catch (final VisitorException exception) {
+      unwrap(exception);
+    }
+  }
+
   public String toString(final Proxy proxy)
   {
     if (mWriter instanceof StringWriter) {

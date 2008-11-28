@@ -384,67 +384,39 @@ public class ConstraintPropagatorTest extends TestCase
   private void testPropagate(final String[] inputs, final String[] outputs)
     throws EvalException, ParseException
   {
-    final List<SimpleExpressionProxy> constraints = parse(inputs);
+    final ConstraintList constraints = parse(inputs);
     // System.err.println(constraints);
-    final List<SimpleExpressionProxy> expected = parse(outputs);
-    final boolean unchanged = isEqualList(constraints, expected);
+    final ConstraintList expected = parse(outputs);
+    final boolean changed = !constraints.equals(expected);
     mPropagator.init(constraints);
     final boolean retval = mPropagator.propagate();
-    final List<SimpleExpressionProxy> result = mPropagator.getAllConstraints();
-    final Comparator<SimpleExpressionProxy> comparator =
-      mPropagator.getEquationComparator();
-    if (result != null) {
-      Collections.sort(result, comparator);
-    }
-    if (expected != null) {
-      Collections.sort(expected, comparator);
-    }
-    assertTrue("Wrong output from constraint propagator: got " +
-               result + " but should have been " + expected + "!",
-               isEqualList(result, expected));
+    final ConstraintList result = mPropagator.getAllConstraints();
+    assertEquals("Wrong output from constraint propagator: got " +
+                 result + " but should have been " + expected + "!",
+                 result, expected);
     assertEquals("Wrong return value from constraint propagator: got " +
-                 retval + " but should have been " + (!unchanged) + "!",
-                 !unchanged, retval);
+                 retval + " but should have been " + changed + "!",
+                 changed, retval);
   }
 
-  private List<SimpleExpressionProxy> parse(final String[] inputs)
+  private ConstraintList parse(final String[] inputs)
     throws ParseException
   {
     if (inputs == null) {
       return null;
     } else {
+      final Comparator<SimpleExpressionProxy> comparator =
+        mPropagator.getListComparator();
       final List<SimpleExpressionProxy> list =
         new ArrayList<SimpleExpressionProxy>(inputs.length);
       for (final String input : inputs) {
         final SimpleExpressionProxy expr = mParser.parse(input);
         list.add(expr);
       }
-      return list;
+      Collections.sort(list, comparator);
+      return new ConstraintList(list);
     }
   }
-
-  private boolean isEqualList(final List<SimpleExpressionProxy> list1,
-                              final List<SimpleExpressionProxy> list2)
-  {
-    if (list1 == null) {
-      return list2 == null;
-    } else if (list2 == null) {
-      return false;
-    } else if (list1.size() == list2.size()) {
-      final Iterator<SimpleExpressionProxy> iter1 = list1.iterator();
-      final Iterator<SimpleExpressionProxy> iter2 = list2.iterator();
-      while (iter1.hasNext()) {
-        final SimpleExpressionProxy expr1 = iter1.next();
-        final SimpleExpressionProxy expr2 = iter2.next();
-        if (!expr1.equalsByContents(expr2)) {
-          return false;
-        }
-      }
-      return true;
-    } else {
-      return false;
-    }
-  }      
 
 
   //#########################################################################

@@ -9,12 +9,16 @@
 
 package net.sourceforge.waters.model.compiler.dnf;
 
+import java.io.IOException;
 import java.util.Collection;
 
 import net.sourceforge.waters.model.base.ProxyAccessorHashMapByContents;
 import net.sourceforge.waters.model.base.ProxyAccessorMap;
+import net.sourceforge.waters.model.base.WatersRuntimeException;
 import net.sourceforge.waters.model.expr.BinaryOperator;
 import net.sourceforge.waters.model.module.SimpleExpressionProxy;
+import net.sourceforge.waters.model.printer.ModuleProxyPrinter;
+import net.sourceforge.waters.model.printer.ProxyPrinter;
 
 
 public class CompiledClause implements Cloneable
@@ -129,19 +133,13 @@ public class CompiledClause implements Cloneable
 
   public String toString()
   {
-    final StringBuffer buffer = new StringBuffer();
-    boolean first = true;
-    buffer.append('{');
-    for (final SimpleExpressionProxy literal : getLiterals()) {
-      if (first) {
-        first = false;
-      } else {
-        buffer.append(", ");
-      }
-      buffer.append(literal.toString());
+    try {
+      final ProxyPrinter printer = new ModuleProxyPrinter();
+      printer.pprint(getLiterals(), "{", ", ", "}");
+      return printer.toString();
+    } catch (final IOException exception) {
+      throw new WatersRuntimeException(exception);
     }
-    buffer.append('}');
-    return buffer.toString();
   }
 
 

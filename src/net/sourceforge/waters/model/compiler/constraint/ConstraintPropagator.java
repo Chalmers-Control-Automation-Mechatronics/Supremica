@@ -122,10 +122,10 @@ public class ConstraintPropagator
 
   //#########################################################################
   //# Invocation
-  public void init(final List<SimpleExpressionProxy> constraints)
+  public void init(final ConstraintList clist)
   {
     reset();
-    addConstraints(constraints);
+    addConstraints(clist);
   }
 
   public void reset()
@@ -133,6 +133,11 @@ public class ConstraintPropagator
     mContext.reset();
     mNormalizedConstraints.clear();
     mIsFalse = false;
+  }
+
+  public void addConstraints(final ConstraintList clist)
+  {
+    addConstraints(clist.getConstraints());
   }
 
   public void addConstraints
@@ -148,17 +153,17 @@ public class ConstraintPropagator
     mUnprocessedConstraints.add(constraint);
   }
 
-  public List<SimpleExpressionProxy> getAllConstraints()
+  public ConstraintList getAllConstraints()
     throws EvalException
   {
     if (mIsFalse) {
       return null;
     } else {
-      final List<SimpleExpressionProxy> result =
+      final List<SimpleExpressionProxy> list =
         new ArrayList<SimpleExpressionProxy>(mNormalizedConstraints);
-      mContext.addAllConstraints(result);
-      Collections.sort(result, mListComparator);
-      return result;
+      mContext.addAllConstraints(list);
+      Collections.sort(list, mListComparator);
+      return new ConstraintList(list);
     }
   }
 
