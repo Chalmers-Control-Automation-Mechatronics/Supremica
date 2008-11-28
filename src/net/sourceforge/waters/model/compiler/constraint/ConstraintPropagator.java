@@ -22,6 +22,7 @@ import java.util.TreeSet;
 
 import net.sourceforge.waters.model.base.ProxyAccessor;
 import net.sourceforge.waters.model.base.ProxyAccessorByContents;
+import net.sourceforge.waters.model.base.WatersRuntimeException;
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
 import net.sourceforge.waters.model.compiler.context.CompiledRange;
 import net.sourceforge.waters.model.compiler.context.CompiledEnumRange;
@@ -89,6 +90,25 @@ public class ConstraintPropagator
     mNormalizedConstraints =
       new TreeSet<SimpleExpressionProxy>(mListComparator);
     mIsFalse = false;
+  }
+
+  public ConstraintPropagator(final ConstraintPropagator propagator)
+  {
+    mFactory = propagator.mFactory;
+    mOperatorTable = propagator.mOperatorTable;
+    mContext = new ConstraintContext(propagator.mContext);
+    mListComparator = propagator.mListComparator;
+    mEquationComparator = propagator.mEquationComparator;
+    mSimpleExpressionCompiler = propagator.mSimpleExpressionCompiler;
+    mNormalizer = propagator.mNormalizer;
+    mNegator = propagator.mNegator;
+    mNormalizationRules = propagator.mNormalizationRules;
+    mRewriteRules = propagator.mRewriteRules;
+    mUnprocessedConstraints = new LinkedList<SimpleExpressionProxy>
+      (propagator.mUnprocessedConstraints);
+    mNormalizedConstraints = new TreeSet<SimpleExpressionProxy>
+      (propagator.mNormalizedConstraints);
+    mIsFalse = propagator.mIsFalse;
   }
 
 
@@ -316,6 +336,21 @@ public class ConstraintPropagator
 
     //#######################################################################
     //# Constructor
+    ConstraintContext(final ConstraintContext context)
+    {
+      mRootContext = context.mRootContext;
+      final int size = mRootContext.getVariableNames().size();
+      mBindings = new HashMap<ProxyAccessor<SimpleExpressionProxy>,
+                              AbstractBinding>(size);
+      for (final Map.Entry<ProxyAccessor<SimpleExpressionProxy>,
+                           AbstractBinding> entry :
+             context.mBindings.entrySet()) {
+        final ProxyAccessor<SimpleExpressionProxy> accessor = entry.getKey();
+        final AbstractBinding binding = entry.getValue().clone();
+        mBindings.put(accessor, binding);
+      }
+    }
+
     ConstraintContext(final VariableContext root)
     {
       final int size = root.getVariableNames().size();
@@ -323,7 +358,6 @@ public class ConstraintPropagator
       mBindings = new HashMap<ProxyAccessor<SimpleExpressionProxy>,
                               AbstractBinding>(size);
     }
-
 
     //#######################################################################
     //# Interface net.sourceforge.waters.model.compiler.context.BindingContext
@@ -352,7 +386,6 @@ public class ConstraintPropagator
       return mRootContext.getModuleBindingContext();
     }
 
-
     //#######################################################################
     //# Interface net.sourceforge.waters.model.compiler.context.VariableContext
     public CompiledRange getVariableRange(final SimpleExpressionProxy varname)
@@ -378,14 +411,12 @@ public class ConstraintPropagator
       return mRootContext.getVariableNames();
     }
 
-
     //#######################################################################
     //# Specific Access
     CompiledRange getOriginalRange(final SimpleExpressionProxy varname)
     {
       return mRootContext.getVariableRange(varname);
     }
-
 
     //#######################################################################
     //# Range Modifications
@@ -485,7 +516,6 @@ public class ConstraintPropagator
       } while (changed != null);
     }
 
-
     //#######################################################################
     //# Constraint Retrieval
     void addAllConstraints(final Collection<SimpleExpressionProxy> result)
@@ -495,7 +525,6 @@ public class ConstraintPropagator
         binding.addAllConstraints(result);
       }
     }
-
 
     //#######################################################################
     //# Data Members
@@ -509,6 +538,7 @@ public class ConstraintPropagator
   //#########################################################################
   //# Inner Class AbstractBinding
   private abstract class AbstractBinding
+    implements Cloneable
   {
 
     //#######################################################################
@@ -522,6 +552,16 @@ public class ConstraintPropagator
       setConstrainedRange(range);
     }
 
+    //#######################################################################
+    //# Interface java.lang.Cloneable
+    public AbstractBinding clone()
+    {
+      try {
+        return (AbstractBinding) super.clone();
+      } catch (final CloneNotSupportedException exception) {
+        throw new WatersRuntimeException(exception);
+      }
+    }
 
     //#######################################################################
     //# Simple Access
@@ -576,7 +616,6 @@ public class ConstraintPropagator
       return mContext.getOriginalRange(mVariableName);
     }
 
-
     //#######################################################################
     //# Modifications
     boolean restrictRange(final CompiledRange restriction)
@@ -622,7 +661,6 @@ public class ConstraintPropagator
         return true;
       }
     }
-
 
     //#######################################################################
     //# Constraint Retrieval
