@@ -88,6 +88,36 @@ public class SplitComputerTest extends TestCase
     testPropose(constraints, expected);
   }
 
+  public void testPropose_disjunction_1()
+    throws EvalException, ParseException
+  {
+    final CompiledIntRange range = createIntRange(0, 5);
+    addVariable("a", range);
+    addVariable("a'", range);
+    addVariable("b", range);
+    addVariable("b'", range);
+    addVariable("c", range);
+    final String[] constraints = {"a==a' | b==b'", "a==b+c"};
+    final String[] expected = {"a==a'", "b==b'"};
+    testPropose(constraints, expected);
+  }
+
+  public void testPropose_disjunction_2()
+    throws EvalException, ParseException
+  {
+    final CompiledIntRange range = createIntRange(0, 5);
+    addVariable("a", range);
+    addVariable("a'", range);
+    addVariable("b", range);
+    addVariable("b'", range);
+    addVariable("c", range);
+    addVariable("c'", range);
+    addVariable("d", range);
+    final String[] constraints = {"a==a' | b==b' | c>c'", "d==a+b+c"};
+    final String[] expected = {"a==a'", "b==b'", "c>c'"};
+    testPropose(constraints, expected);
+  }
+
   public void testPropose_crc_1()
     throws EvalException, ParseException
   {
