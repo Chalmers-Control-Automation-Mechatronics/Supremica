@@ -100,7 +100,7 @@ class FreeEventExecModelBuilder
 			nameCounter++;
 			eventExecution.addState(to,false,false);
 			String event = "handle_event_" + instanceName + ";";
-			eventExecution.addTransition(from, to, event, null, null);
+			eventExecution.addControllableTransition(from, to, event, null, null);
 
 			from = to;
 			to = "s0";

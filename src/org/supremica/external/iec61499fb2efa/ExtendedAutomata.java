@@ -102,7 +102,7 @@ public class ExtendedAutomata
 
 	public void addEvent(final String name)
 	{
-		addEvent(name,"co");
+		addEvent(name,"uo");
 	}
 	
 	public void addEvent(final String name, final String kind)
