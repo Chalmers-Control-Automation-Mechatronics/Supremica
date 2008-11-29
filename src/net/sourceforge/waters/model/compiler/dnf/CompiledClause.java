@@ -10,6 +10,7 @@
 package net.sourceforge.waters.model.compiler.dnf;
 
 import java.io.IOException;
+import java.io.StringWriter;
 import java.util.Collection;
 
 import net.sourceforge.waters.model.base.ProxyAccessorHashMapByContents;
@@ -134,9 +135,10 @@ public class CompiledClause implements Cloneable
   public String toString()
   {
     try {
-      final ProxyPrinter printer = new ModuleProxyPrinter();
+      final StringWriter writer = new StringWriter();
+      final ProxyPrinter printer = new ModuleProxyPrinter(writer);
       printer.pprint(getLiterals(), "{", ", ", "}");
-      return printer.toString();
+      return writer.getBuffer().toString();
     } catch (final IOException exception) {
       throw new WatersRuntimeException(exception);
     }

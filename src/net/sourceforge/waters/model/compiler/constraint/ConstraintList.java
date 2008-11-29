@@ -10,11 +10,12 @@
 package net.sourceforge.waters.model.compiler.constraint;
 
 import java.io.IOException;
+import java.io.StringWriter;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.Iterator;
 import java.util.List;
 
+import net.sourceforge.waters.model.base.ProxyTools;
 import net.sourceforge.waters.model.base.WatersRuntimeException;
 import net.sourceforge.waters.model.printer.ModuleProxyPrinter;
 import net.sourceforge.waters.model.printer.ProxyPrinter;
@@ -45,9 +46,10 @@ public class ConstraintList
   public String toString()
   {
     try {
-      final ProxyPrinter printer = new ModuleProxyPrinter();
+      final StringWriter writer = new StringWriter();
+      final ProxyPrinter printer = new ModuleProxyPrinter(writer);
       printer.pprint(mConstraints, "{", ", ", "}");
-      return printer.toString();
+      return writer.getBuffer().toString();
     } catch (final IOException exception) {
       throw new WatersRuntimeException(exception);
     }
@@ -57,20 +59,8 @@ public class ConstraintList
   {
     if (other != null && other.getClass() == getClass()) {
       final ConstraintList clist = (ConstraintList) other;
-      if (mConstraints.size() != clist.mConstraints.size()) {
-	return false;
-      }
-      final Iterator<SimpleExpressionProxy> iter1 = mConstraints.iterator();
-      final Iterator<SimpleExpressionProxy> iter2 =
-	clist.mConstraints.iterator();
-      while (iter1.hasNext()) {
-	final SimpleExpressionProxy constraint1 = iter1.next();
-	final SimpleExpressionProxy constraint2 = iter2.next();
-	if (!constraint1.equalsByContents(constraint2)) {
-	  return false;
-	}
-      }
-      return true;
+      return ProxyTools.isEqualListByContents
+        (mConstraints, clist.mConstraints);
     } else {
       return false;
     }
@@ -78,12 +68,7 @@ public class ConstraintList
 
   public int hashCode()
   {
-    int result = 0;
-    for (final SimpleExpressionProxy constraint : mConstraints) {
-      result *= 5;
-      result += constraint.hashCodeByContents();
-    }
-    return result;
+    return ProxyTools.getListHashCodeByContents(mConstraints);
   }
 
 

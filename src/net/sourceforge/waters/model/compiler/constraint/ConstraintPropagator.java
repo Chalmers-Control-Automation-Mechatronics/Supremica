@@ -176,12 +176,18 @@ public class ConstraintPropagator
   public ConstraintList getAllConstraints()
     throws EvalException
   {
+    return getAllConstraints(true);
+  }
+
+  public ConstraintList getAllConstraints(final boolean pretty)
+    throws EvalException
+  {
     if (mIsFalse) {
       return null;
     } else {
       final List<SimpleExpressionProxy> list =
         new ArrayList<SimpleExpressionProxy>(mNormalizedConstraints);
-      mContext.addAllConstraints(list);
+      mContext.addAllConstraints(list, pretty);
       Collections.sort(list, mListComparator);
       return new ConstraintList(list);
     }
@@ -207,22 +213,26 @@ public class ConstraintPropagator
             continue outer;
           }
         }
-        final SimpleExpressionProxy negation = getNegatedLiteral(simplified);
-        if (mNormalizedConstraints.contains(negation)) {
-          setFalse();
-          change = true;
-          break;
+        if (mNormalizedConstraints.add(simplified)) {
+          final SimpleExpressionProxy negation = getNegatedLiteral(simplified);
+          if (mNormalizedConstraints.contains(negation)) {
+            setFalse();
+            change = true;
+            break;
+          }
         }
-        mNormalizedConstraints.add(simplified);
       } else {
         // all constraints normalised ...
-        for (final SimpleExpressionProxy constraint : mNormalizedConstraints) {
+        final Iterator<SimpleExpressionProxy> iter =
+          mNormalizedConstraints.iterator();
+        while (iter.hasNext()) {
+          final SimpleExpressionProxy constraint = iter.next();
           for (final SimplificationRule rule : mRewriteRules) {
             if (rule.match(constraint, this)) {
               // System.err.println
               //   ("MATCH: " + rule.getClass().getName() + " " + constraint);
               if (rule.isMakingReplacement()) {
-                mNormalizedConstraints.remove(constraint);
+                iter.remove();
               }
               rule.execute(this);
               change = true;
@@ -518,11 +528,12 @@ public class ConstraintPropagator
 
     //#######################################################################
     //# Constraint Retrieval
-    void addAllConstraints(final Collection<SimpleExpressionProxy> result)
+    void addAllConstraints(final Collection<SimpleExpressionProxy> result,
+                           final boolean pretty)
       throws EvalException
     {
       for (final AbstractBinding binding : mBindings.values()) {
-        binding.addAllConstraints(result);
+        binding.addAllConstraints(result, pretty);
       }
     }
 
@@ -664,19 +675,20 @@ public class ConstraintPropagator
 
     //#######################################################################
     //# Constraint Retrieval
-    void addAllConstraints(final Collection<SimpleExpressionProxy> result)
+    void addAllConstraints(final Collection<SimpleExpressionProxy> result,
+                           final boolean pretty)
       throws EvalException
     {
       if (mBoundExpression == null) {
         final CompiledRange orig = getOriginalRange();
-        addRangeConstraints(result, orig);
+        addRangeConstraints(result, orig, pretty);
       } else {
         addEquationConstraint(result);
         if (!mIsAtomic) {
           final CompiledRange estimate = estimateRange(mBoundExpression);
           final CompiledRange orig = getOriginalRange();
           final CompiledRange intersection = orig.intersection(estimate);
-          addRangeConstraints(result, intersection);
+          addRangeConstraints(result, intersection, pretty);
         }
       }
     }
@@ -690,7 +702,8 @@ public class ConstraintPropagator
     }
 
     abstract void addRangeConstraints(Collection<SimpleExpressionProxy> result,
-                                      CompiledRange orig);
+                                      CompiledRange orig,
+                                      boolean pretty);
 
     //#######################################################################
     //# Data Members
@@ -764,7 +777,8 @@ public class ConstraintPropagator
     }
 
     void addRangeConstraints(final Collection<SimpleExpressionProxy> result,
-                             final CompiledRange orig)
+                             final CompiledRange orig,
+                             final boolean pretty)
     {
       final BinaryOperator op = mOperatorTable.getLessEqualsOperator();
       final SimpleExpressionProxy varname = getVariableName();
@@ -826,12 +840,13 @@ public class ConstraintPropagator
     //#######################################################################
     //# Constraint Retrieval
     void addRangeConstraints(final Collection<SimpleExpressionProxy> result,
-                             final CompiledRange orig)
+                             final CompiledRange orig,
+                             final boolean pretty)
     {
       final SimpleExpressionProxy varname = getVariableName();
       final CompiledEnumRange enumrange = getEnumRange();
       final CompiledEnumRange enumorig = (CompiledEnumRange) orig;
-      if (enumrange.size() < enumorig.size() / 2) {
+      if (pretty && enumrange.size() < enumorig.size() / 2) {
         final BinaryOperator eqop = mOperatorTable.getEqualsOperator();
         final BinaryOperator orop = mOperatorTable.getOrOperator();
         final Iterator<? extends SimpleExpressionProxy> iter =
