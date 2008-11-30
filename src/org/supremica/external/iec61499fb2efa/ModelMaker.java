@@ -41,11 +41,12 @@ class ModelMaker
 		"\t[-p (generate models as plants)] \n" +
 		"\t[-im int (int var min)] \n" +
 		"\t[-ix int (int var max)] \n" + 
-		"\t[-m free (free buffered exec model (default)) | \n" +
-		"\t-m dual (dual buffered exec model) | \n" +
-		"\t-m seq (sequential buffered exec model) |\n" +
+		"\t[-m free (free event buffered exec model (default)) | \n" +
+		"\t-m freeb (free block buffered exec model) | \n" +
+		"\t-m seqe (sequential event buffered exec model) |\n" +
+		"\t-m seqb (sequential block buffered exec model) |\n" +
 		"\t-m cycl (cyclic buffered exec model) |\n" +
-		"\t-m hybrid (hybrid buffered exec model) |\n" +
+		"\t-m dual (dual buffered exec model) | \n" +
 		"\t-m npmtr (npmtr exec model)] \n" +
 		"\t[-ip int (instance q places)] \n" +
 		"\t[-ep int (event q places)] \n" +

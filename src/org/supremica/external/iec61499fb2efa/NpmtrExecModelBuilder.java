@@ -124,7 +124,7 @@ class NpmtrExecModelBuilder
 			{
 				from = to;
 				to = "s3" ;
-				startup.addState(to,false,false);
+				startup.addState(to,true,false);
 				event = "receive_event_STOP_" + stopInstance + ";";
 				startup.addTransition(from, to, event, null, null);
 			}
