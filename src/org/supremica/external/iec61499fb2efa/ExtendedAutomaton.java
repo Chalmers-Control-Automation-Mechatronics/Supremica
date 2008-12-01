@@ -293,11 +293,25 @@ public class ExtendedAutomaton
 		if (fromNode == null)
 		{
 			System.out.println("ExtendedAutomaton.addTransition(): From node " + from + " does not exist!");
+            System.out.println("ExtendedAutomaton.addTransition(): Type mismatch error in action!");
+            System.out.println("\t automaton: " + name);
+            System.out.print("\t from: " + from);
+            System.out.println(" to: " + to);
+            System.out.println("\t label: " + label);
+            System.out.println("\t guard: " + guardIn);
+            System.out.println("\t action: " + actionIn);
 		}
 		SimpleNodeSubject toNode = (SimpleNodeSubject) graph.getNodesModifiable().get(to);
 		if (toNode == null)
 		{
 			System.out.println("ExtendedAutomaton.addTransition(): To node " + to + " does not exist!");
+            System.out.println("ExtendedAutomaton.addTransition(): Type mismatch error in action!");
+            System.out.println("\t automaton: " + name);
+            System.out.print("\t from: " + from);
+            System.out.println(" to: " + to);
+            System.out.println("\t label: " + label);
+            System.out.println("\t guard: " + guardIn);
+            System.out.println("\t action: " + actionIn);
 		}
 			
 		// parse label into event name list and make LabelBlockSubject 
