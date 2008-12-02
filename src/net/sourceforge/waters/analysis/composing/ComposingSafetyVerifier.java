@@ -24,6 +24,7 @@ import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 import net.sourceforge.waters.model.des.SafetyTraceProxy;
 import net.sourceforge.waters.model.des.TransitionProxy;
+import net.sourceforge.waters.model.des.TraceStepProxy;
 import net.sourceforge.waters.model.analysis.KindTranslator;
 import net.sourceforge.waters.model.analysis.SafetyVerifier;
 import net.sourceforge.waters.model.analysis.VerificationResult;
@@ -102,7 +103,8 @@ public class ComposingSafetyVerifier
     saveIntoFile(des);
     
     ArrayList<Candidate> candidates = new ArrayList<Candidate>(composing.getCandidates());
-    
+    ArrayList<Set<ASTAutomaton>> astautomata = new ArrayList<Set<ASTAutomaton>>(composing.getASTAutomata());
+    /*
     //Display the composing infomation
     System.out.println(candidates.size()+" candidates:");
     for (int i=0; i<candidates.size(); i++) {
@@ -113,8 +115,25 @@ public class ComposingSafetyVerifier
         System.out.print(e.getName()+",");
       }
       System.out.println("\nAutomata: "+candidates.get(i).getName());
+    }*/
+    for (int i=0; i<astautomata.size(); i++) {
+      System.out.println("Step "+(i+1)+": ");
+      if (!astautomata.get(i).isEmpty()){
+        for (ASTAutomaton a : astautomata.get(i)) {
+        System.out.println("Automaton: "+a.getAutomaton().getName());
+        Map<EventProxy,Set<EventProxy>> map = 
+        	new HashMap<EventProxy,Set<EventProxy>>(a.getRevents());
+        for (EventProxy e : map.keySet()) {
+          System.out.println(e.getName()+" replaces:");
+          for (EventProxy e2 : map.get(e)) {
+            System.out.println(e2.getName()+", ");
+          }
+        }
+        }
+      } else {
+      	System.out.println("no ASTAutomaton!!!");
+      }      
     }
-    
      
     final SafetyVerifier checker =
       //new NativeSafetyVerifier(des, getConvertedKindTranslator(),getFactory());
@@ -130,15 +149,23 @@ public class ComposingSafetyVerifier
     } else {
       final String tracename = getModel().getName() + ":uncontrollable";
       final SafetyTraceProxy counterexample = checker.getCounterExample();
-      //return setFailedResult(counterexample);
-      
+            
       List<EventProxy> composedTrace = new LinkedList<EventProxy>(counterexample.getEvents());
+      
+      System.out.println("old counter example: ");
+		  for (int i=0; i<composedTrace.size(); i++){
+		    System.out.print(composedTrace.get(i).getName()+" --> ");
+		  }
+		  System.out.println();
+    
       if (candidates.isEmpty()) {   
         return setFailedResult(counterexample);
       }
       for (int i=candidates.size()-1;i>=0;i--) {
-        List<EventProxy> newTrace = extendTrace(composedTrace,candidates.get(i));
-        composedTrace = newTrace;
+        for (ASTAutomaton astaut : astautomata.get(i)) {
+          composedTrace = renovateTrace(composedTrace,astaut);
+        }
+        composedTrace = extendTrace(composedTrace,candidates.get(i));        
       }
       
       //decode the manmade event only if model is converted
@@ -148,6 +175,136 @@ public class ComposingSafetyVerifier
                getFactory().createSafetyTraceProxy(tracename, getModel(), composedTrace); 
       return setFailedResult(extendCounterexample);
     }
+  }
+  
+  private List<EventProxy> renovateTrace(List<EventProxy> oldlist,
+                                         ASTAutomaton astaut) {
+    Map<StateProxy, Set<EventProxy>> stateEvents = 
+      new HashMap<StateProxy, Set<EventProxy>>();
+    Map<Key, StateProxy> trans = 
+      new HashMap<Key, StateProxy>();
+    StateProxy currstate = null;
+    for (StateProxy s : astaut.getAutomaton().getStates()) {
+      if (s.isInitial()) {          
+        currstate = s;
+      }
+      stateEvents.put(s, new HashSet<EventProxy>());
+    }
+    for (TransitionProxy t : astaut.getAutomaton().getTransitions()) {
+      stateEvents.get(t.getSource()).add(t.getEvent());
+      trans.put(new Key(t.getSource(), t.getEvent()), t.getTarget());
+    }
+    
+    System.out.println("old list: ");
+    for (int i=0; i<oldlist.size(); i++){
+      System.out.print(oldlist.get(i).getName()+" --> ");
+    }
+    System.out.println();
+    
+    return rTrace(oldlist,
+                  currstate,
+                  stateEvents,
+                  trans,
+                  astaut);
+  }
+  
+  private List<EventProxy> rTrace(List<EventProxy> oldlist,
+                                  StateProxy cState,
+                                  Map<StateProxy, Set<EventProxy>> stateEvents,
+                                  Map<Key, StateProxy> trans,
+                                  ASTAutomaton astaut) {
+    if (oldlist.isEmpty()) return null;
+    EventProxy currEvent = oldlist.get(0);
+    if (oldlist.size() == 1) {
+      //if this automaton contains the current event
+      if (astaut.getAutomaton().getEvents().contains(currEvent)) {
+        if (stateEvents.get(cState)!=null 
+          &&stateEvents.get(cState).contains(currEvent)) {
+          return oldlist;
+        } 
+        //if the current event is replaced
+        else if (astaut.getRevents().keySet().contains(currEvent)) {
+          List<EventProxy> newTrace = new LinkedList<EventProxy>();
+          newTrace.add(astaut.getRevents().get(currEvent).iterator().next());
+          return newTrace;
+        } else {
+          return null;
+        }
+      } else {
+        return oldlist;
+      }
+    } else {
+      //if this automaton contains the current event
+      if (astaut.getAutomaton().getEvents().contains(currEvent)) {
+        if (stateEvents.get(cState)!=null 
+          &&stateEvents.get(cState).contains(currEvent)) {
+            List<EventProxy> newTrace = new LinkedList<EventProxy>(oldlist);        
+			      newTrace.remove(currEvent);
+			      StateProxy target = trans.get(new Key(cState,currEvent));
+			      newTrace = rTrace(newTrace,
+			                        target,
+			                        stateEvents,
+			                        trans,
+			                        astaut);
+			      if (newTrace != null
+			        &&newTrace.size() == oldlist.size()-1) {
+				      List<EventProxy> newlist = new LinkedList<EventProxy>();
+		          newlist.add(currEvent);
+		          newlist.addAll(newTrace);
+			        return newlist;
+		        } else {
+		          return null;
+		        }
+        }
+        //if the current event is replaced
+        else if (astaut.getRevents().keySet().contains(currEvent)) {
+          for (EventProxy e : astaut.getRevents().get(currEvent)) {
+            List<EventProxy> newTrace = new LinkedList<EventProxy>(oldlist);
+            newTrace.remove(currEvent);
+            Key key = new Key(cState,e);
+            if (trans.keySet().contains(key)) {
+              StateProxy target = trans.get(key);
+              newTrace = rTrace(newTrace,
+			                          target,
+			                          stateEvents,
+			                          trans,
+			                          astaut);
+			        if (newTrace != null
+			          &&newTrace.size() == oldlist.size()-1) {
+			          List<EventProxy> newlist = new LinkedList<EventProxy>();
+			          newlist.add(e);
+			          newlist.addAll(newTrace);
+				        return newlist;
+			        } else {
+			          return null;
+			        }
+            } else {
+              continue;
+            }
+          }
+        } else {
+        	return null;
+        }
+      } else {
+        List<EventProxy> newTrace = new LinkedList<EventProxy>(oldlist);        
+        newTrace.remove(currEvent);        
+        newTrace = rTrace(newTrace,
+                          cState,
+                          stateEvents,
+                          trans,
+                          astaut);
+        if (newTrace != null
+			    &&newTrace.size() == oldlist.size()-1) {
+	        List<EventProxy> newlist = new LinkedList<EventProxy>();
+	        newlist.add(currEvent);
+	        newlist.addAll(newTrace);
+	        return newlist;
+        } else {
+          return null;
+        }
+      }
+    }
+    return null;
   }
 
   private List<EventProxy> extendTrace(List<EventProxy> eventlist,                                       
