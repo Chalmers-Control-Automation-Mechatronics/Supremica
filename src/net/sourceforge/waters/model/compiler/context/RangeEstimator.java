@@ -29,6 +29,25 @@ import net.sourceforge.waters.model.module.UnaryExpressionProxy;
 
 
 /**
+ * <P>An evaluation component to estimate the range of simple expressions.</P>
+ *
+ * <P>Given the ranges of variables in a {@link VariableContext}, the range
+ * evaluator propagates these range through all operators to give an
+ * estimate of the range of an expression. For example, if <CODE>x</CODE>
+ * and&nbsp;<CODE>y</CODE> are variables with range&nbsp;<CODE>1..3</CODE>,
+ * then the estimated range of <CODE>x+y</CODE>
+ * is&nbsp;<CODE>2..6</CODE>.</P>
+ *
+ * <P>The range estimator does not make any attempt to evaluate array
+ * indexes. The range of an indexed expression such
+ * as&nbsp;<CODE>a[2]</CODE> is looked up in the context, by no attempt is
+ * made to evaluate <CODE>i</CODE> in&nbsp;<CODE>a[i]</CODE>. Likewise,
+ * primed (next-state) subexpressions are not evaluated.</P>
+ *
+ * <P>The range estimate of an expression with undefined or
+ * variable-indexed identifiers is returned as&nbsp;<CODE>null</CODE>,
+ * i.e., unknown.</P>
+ *
  * @author Robi Malik
  */
 
@@ -89,7 +108,7 @@ public class RangeEstimator
    *         to undefined identifiers.
    *         The result may be an over-approximation, meaning that not
    *         all values in the returned range can actually be obtained
-   *         by assignment of values to EFA variables.
+   *         by assignment of values to variables.
    * @throws EvalException to indicate a problem while evaluation the
    *                  expression. Exceptions may be thrown even for values
    *                  that cannot actually be obtained, e.g., when
@@ -200,6 +219,16 @@ public class RangeEstimator
     throw new TypeMismatchException(expr, "BOOLEAN");
   }
 
+  private IdentifierProxy checkIdentifier(final SimpleExpressionProxy expr)
+    throws TypeMismatchException
+  {
+    if (expr instanceof IdentifierProxy) {
+      return (IdentifierProxy) expr;
+    } else {
+      throw new TypeMismatchException(expr, "IDENTIFIER");
+    }
+  }
+
 
   //#########################################################################
   //# Interface net.sourceforge.waters.model.module.ModuleProxyVisitor
@@ -250,14 +279,9 @@ public class RangeEstimator
     throws VisitorException
   {
     try {
-      final SimpleExpressionProxy subterm = expr.getSubTerm();
-      final CompiledRange subrange = process(subterm);
-      if (subrange == null) {
-        return null;
-      }
       final UnaryOperator op = expr.getOperator();
       final UnaryEvaluator evaluator = getEvaluator(op);
-      return evaluator.eval(subterm, subrange);
+      return evaluator.eval(expr);
     } catch (final EvalException exception) {
       exception.provideLocation(expr);
       throw wrap(exception);
@@ -339,7 +363,35 @@ public class RangeEstimator
 
     //#######################################################################
     //# Evaluation
-    abstract CompiledRange eval(SimpleExpressionProxy expr,
+    abstract CompiledRange eval(UnaryExpressionProxy expr)
+      throws VisitorException;
+
+  }
+
+
+  //#########################################################################
+  //# Inner Class UnaryRangeEvaluator
+  private abstract class UnaryRangeEvaluator extends UnaryEvaluator {
+
+    //#######################################################################
+    //# Evaluation
+    CompiledRange eval(UnaryExpressionProxy expr)
+      throws VisitorException
+    {
+      try {
+        final SimpleExpressionProxy subterm = expr.getSubTerm();
+        final CompiledRange subrange = process(subterm);
+        if (subrange == null) {
+          return null;
+        }
+        return eval(subterm, subrange);
+      } catch (final EvalException exception) {
+        exception.provideLocation(expr);
+        throw wrap(exception);
+      }
+    }
+
+    abstract CompiledRange eval(SimpleExpressionProxy subterm,
                                 CompiledRange range)
       throws EvalException;
 
@@ -348,19 +400,19 @@ public class RangeEstimator
 
   //#########################################################################
   //# Inner Class UnaryIntEvaluator
-  private abstract class UnaryIntEvaluator extends UnaryEvaluator {
+  private abstract class UnaryIntEvaluator extends UnaryRangeEvaluator {
 
     //#######################################################################
     //# Evaluation
-    CompiledIntRange eval(final SimpleExpressionProxy expr,
+    CompiledIntRange eval(final SimpleExpressionProxy subterm,
                           final CompiledRange range)
       throws EvalException
     {
-      final CompiledIntRange intrange = checkIntRange(expr, range);
-      return eval(expr, intrange);
+      final CompiledIntRange intrange = checkIntRange(subterm, range);
+      return eval(subterm, intrange);
     }
 
-    abstract CompiledIntRange eval(SimpleExpressionProxy expr,
+    abstract CompiledIntRange eval(SimpleExpressionProxy subterm,
                                    CompiledIntRange range)
       throws EvalException;
 
@@ -369,19 +421,19 @@ public class RangeEstimator
 
   //#########################################################################
   //# Inner Class UnaryBooleanEvaluator
-  private abstract class UnaryBooleanEvaluator extends UnaryEvaluator {
+  private abstract class UnaryBooleanEvaluator extends UnaryRangeEvaluator {
 
     //#######################################################################
     //# Evaluation
-    CompiledIntRange eval(final SimpleExpressionProxy expr,
+    CompiledIntRange eval(final SimpleExpressionProxy subterm,
                           final CompiledRange range)
       throws EvalException
     {
-      final CompiledIntRange intrange = checkBooleanRange(expr, range);
-      return eval(expr, intrange);
+      final CompiledIntRange intrange = checkBooleanRange(subterm, range);
+      return eval(subterm, intrange);
     }
 
-    abstract CompiledIntRange eval(SimpleExpressionProxy expr,
+    abstract CompiledIntRange eval(SimpleExpressionProxy subterm,
                                    CompiledIntRange range)
       throws EvalException;
 
@@ -796,7 +848,7 @@ public class RangeEstimator
 
     //#######################################################################
     //# Evaluation
-    CompiledIntRange eval(final SimpleExpressionProxy expr,
+    CompiledIntRange eval(final SimpleExpressionProxy subterm,
                           final CompiledIntRange range)
     {
       final int lower = -range.getUpper();
@@ -813,10 +865,22 @@ public class RangeEstimator
 
     //#######################################################################
     //# Evaluation
-    CompiledRange eval(final SimpleExpressionProxy expr,
-                       final CompiledRange range)
+    CompiledRange eval(final UnaryExpressionProxy expr)
+      throws VisitorException
     {
-      return range;
+      try {
+        final SimpleExpressionProxy subterm = expr.getSubTerm();
+        final IdentifierProxy ident = checkIdentifier(subterm);
+        if (mContext.isEnumAtom(ident)) {
+          final List<IdentifierProxy> list = Collections.singletonList(ident);
+          return new CompiledEnumRange(list);
+        } else {
+          return mContext.getVariableRange(expr);
+        }
+      } catch (final EvalException exception) {
+        exception.provideLocation(expr);
+        throw wrap(exception);
+      }
     }
 
   }
@@ -828,7 +892,7 @@ public class RangeEstimator
 
     //#######################################################################
     //# Evaluation
-    CompiledIntRange eval(final SimpleExpressionProxy expr,
+    CompiledIntRange eval(final SimpleExpressionProxy subterm,
                           final CompiledIntRange range)
     {
       if (range.equals(FALSE_RANGE)) {

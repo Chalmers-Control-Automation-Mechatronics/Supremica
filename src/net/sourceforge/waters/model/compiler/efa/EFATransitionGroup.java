@@ -14,10 +14,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import net.sourceforge.waters.model.base.Proxy;
-import net.sourceforge.waters.model.base.ProxyAccessorHashMapByContents;
-import net.sourceforge.waters.model.base.ProxyAccessorMap;
-import net.sourceforge.waters.model.compiler.dnf.CompiledClause;
-import net.sourceforge.waters.model.compiler.dnf.CompiledNormalForm;
+import net.sourceforge.waters.model.compiler.constraint.ConstraintList;
 import net.sourceforge.waters.model.module.IdentifierProxy;
 import net.sourceforge.waters.model.module.NodeProxy;
 import net.sourceforge.waters.model.module.SimpleComponentProxy;
@@ -41,17 +38,16 @@ class EFATransitionGroup implements Comparable<EFATransitionGroup>
   EFATransitionGroup(final SimpleComponentProxy comp)
   {
     mComponent = comp;
-    mPartialTransitions = new HashMap<CompiledClause,EFATransition>();
-    mGuards = new ProxyAccessorHashMapByContents<SimpleExpressionProxy>();
+    mPartialTransitions = new HashMap<ConstraintList,EFATransition>();
     mHasTrueGuard = false;
   }
 
 
   //#########################################################################
   //# Simple Access
-  Collection<SimpleExpressionProxy> getGuards()
+  Collection<ConstraintList> getGuards()
   {
-    return mGuards == null ? null : mGuards.values();
+    return mPartialTransitions.keySet();
   }
 
   Collection<EFATransition> getPartialTransitions()
@@ -59,9 +55,9 @@ class EFATransitionGroup implements Comparable<EFATransitionGroup>
     return mPartialTransitions.values();
   }
 
-  EFATransition getPartialTransition(final CompiledClause cond)
+  EFATransition getPartialTransition(final ConstraintList guard)
   {
-    return mPartialTransitions.get(cond);
+    return mPartialTransitions.get(guard);
   }
 
   boolean isEmpty()
@@ -71,13 +67,7 @@ class EFATransitionGroup implements Comparable<EFATransitionGroup>
 
   boolean isTrivial()
   {
-    if (mPartialTransitions.size() == 1) {
-      final CompiledClause clause =
-        mPartialTransitions.keySet().iterator().next();
-      return clause.isEmpty();
-    } else {
-      return false;
-    }
+    return mPartialTransitions.size() == 1 && mHasTrueGuard;
   }
 
   boolean hasTrueGuard()
@@ -85,39 +75,36 @@ class EFATransitionGroup implements Comparable<EFATransitionGroup>
     return mHasTrueGuard;
   }
 
-  void addTransitions(final CompiledGuard guard,
-                      final Proxy location)
+  void addTransition(final ConstraintList guard,
+                     final Proxy location)
   {
-    addTransitions(guard, null, location);
+    addTransition(guard, null, location);
   }
 
-  void addTransitions(final CompiledGuard guard,
-                      final NodeProxy node,
-                      final Proxy location)
-  {
-    final CompiledNormalForm dnf = guard.getDNF();
-    final SimpleExpressionProxy expr = guard.getExpression();
-    for (final CompiledClause cond : dnf.getClauses()) {
-      addTransition(cond, node, location);
-    }
-    mGuards.addProxy(expr);
-    mHasTrueGuard |= dnf.isTrue();
-  }
-
-  void addTransition(final CompiledClause cond,
+  void addTransition(final ConstraintList guard,
                      final NodeProxy node,
                      final Proxy location)
   {
-    final EFATransition trans = createTransition(cond);
+    final EFATransition trans = createTransition(guard);
     trans.addSource(node, location);
+    mHasTrueGuard |= guard.isTrue();
   }
 
-  void replaceTransitions(final CompiledClause victim,
-                          final Collection<CompiledClause> replacements)
+  void replaceTransition(final ConstraintList victim,
+                         final ConstraintList replacement)
   {
     final EFATransition oldtrans = mPartialTransitions.get(victim);
     mPartialTransitions.remove(victim);
-    for (final CompiledClause replacement : replacements) {
+    final EFATransition newtrans = createTransition(replacement);
+    newtrans.addSources(oldtrans);
+  }
+
+  void replaceTransition(final ConstraintList victim,
+                         final Collection<ConstraintList> replacements)
+  {
+    final EFATransition oldtrans = mPartialTransitions.get(victim);
+    mPartialTransitions.remove(victim);
+    for (final ConstraintList replacement : replacements) {
       final EFATransition newtrans = createTransition(replacement);
       newtrans.addSources(oldtrans);
     }
@@ -146,12 +133,12 @@ class EFATransitionGroup implements Comparable<EFATransitionGroup>
 
   //#########################################################################
   //# Auxiliary Methods
-  private EFATransition createTransition(final CompiledClause cond)
+  private EFATransition createTransition(final ConstraintList guard)
   {
-    EFATransition trans = mPartialTransitions.get(cond);
+    EFATransition trans = mPartialTransitions.get(guard);
     if (trans == null) {
-      trans = new EFATransition(mComponent, cond);
-      mPartialTransitions.put(cond, trans);
+      trans = new EFATransition(mComponent, guard);
+      mPartialTransitions.put(guard, trans);
     }
     return trans;
   }
@@ -160,8 +147,7 @@ class EFATransitionGroup implements Comparable<EFATransitionGroup>
   //#########################################################################
   //# Data Members
   private final SimpleComponentProxy mComponent;
-  private final Map<CompiledClause,EFATransition> mPartialTransitions;
-  private final ProxyAccessorMap<SimpleExpressionProxy> mGuards;
+  private final Map<ConstraintList,EFATransition> mPartialTransitions;
   private boolean mHasTrueGuard;
 
 }

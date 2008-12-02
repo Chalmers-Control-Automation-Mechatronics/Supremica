@@ -21,18 +21,26 @@ import java.util.List;
 import java.util.Map;
 
 import net.sourceforge.waters.model.base.VisitorException;
-import net.sourceforge.waters.model.compiler.dnf.CompiledClause;
+import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
+import net.sourceforge.waters.model.compiler.constraint.ConstraintList;
+import net.sourceforge.waters.model.compiler.context.VariableContext;
+import net.sourceforge.waters.model.expr.UnaryOperator;
+import net.sourceforge.waters.model.expr.ExpressionComparator;
+import net.sourceforge.waters.model.module.AbstractModuleProxyVisitor;
+import net.sourceforge.waters.model.module.BinaryExpressionProxy;
+import net.sourceforge.waters.model.module.IdentifierProxy;
 import net.sourceforge.waters.model.module.ModuleProxyFactory;
 import net.sourceforge.waters.model.module.SimpleExpressionProxy;
+import net.sourceforge.waters.model.module.UnaryExpressionProxy;
 import net.sourceforge.waters.model.printer.ModuleProxyPrinter;
 
 
 /**
  * A simple algorithm to determine reasonably short name suffixes for
  * EFA events. EFA event names are suffixed by a string representing
- * the guard conditions for each event. This class transforms clauses
+ * the guard conditions for each event. This class transforms guards
  * representing guard conditions into canonical names, by sorting the
- * literals, and by removing literals that are not needed to distinguish
+ * constraints, and by removing constraints that are not needed to distinguish
  * an event name suffix from others.
  *
  * @see EFAEvent
@@ -45,12 +53,14 @@ class EFAEventNameBuilder {
   //#########################################################################
   //# Constructor
   EFAEventNameBuilder(final ModuleProxyFactory factory,
-                      final Comparator<SimpleExpressionProxy> comparator)
+                      final CompilerOperatorTable optable,
+                      final VariableContext context)
   {
-    mComparator = comparator;
+    mComparator = new ExpressionComparator(optable);
+    mCollector = new VariableCollectVisitor(optable, context);
     mAllLiterals = null;
-    mAllClauses = null;
-    mNumClauses = 0;
+    mAllGuards = null;
+    mNumGuards = 0;
     mRoot = null;
   }
 
@@ -60,34 +70,34 @@ class EFAEventNameBuilder {
   void restart()
   {
     mAllLiterals = new HashMap<CountedLiteral,CountedLiteral>();
-    mAllClauses = new LinkedList<List<CountedLiteral>>();
-    mNumClauses = 0;
+    mAllGuards = new LinkedList<List<CountedLiteral>>();
+    mNumGuards = 0;
     mRoot = null;
   }
 
-  void addClause(final CompiledClause clause)
+  void addGuard(final ConstraintList guard)
   {
-    final int size = clause.size();
-    final List<CountedLiteral> cclause = new ArrayList<CountedLiteral>(size);
-    for (final SimpleExpressionProxy literal : clause.getLiterals()) {
+    final int size = guard.size();
+    final List<CountedLiteral> cguard = new ArrayList<CountedLiteral>(size);
+    for (final SimpleExpressionProxy literal : guard.getConstraints()) {
       final CountedLiteral counted = createCountedLiteral(literal);
       counted.addOccurrence();
-      cclause.add(counted);
+      cguard.add(counted);
     }
-    mAllClauses.add(cclause);
+    mAllGuards.add(cguard);
   }
 
-  String getNameSuffix(final CompiledClause clause)
+  String getNameSuffix(final ConstraintList guard)
   {
     buildTree();
-    final int size = clause.size();
-    final List<CountedLiteral> cclause = new ArrayList<CountedLiteral>(size);
-    for (final SimpleExpressionProxy literal : clause.getLiterals()) {
+    final int size = guard.size();
+    final List<CountedLiteral> cguard = new ArrayList<CountedLiteral>(size);
+    for (final SimpleExpressionProxy literal : guard.getConstraints()) {
       final CountedLiteral counted = getCountedLiteral(literal);
-      cclause.add(counted);
+      cguard.add(counted);
     }
-    Collections.sort(cclause);
-    final Iterator<CountedLiteral> iter = cclause.iterator();
+    Collections.sort(cguard);
+    final Iterator<CountedLiteral> iter = cguard.iterator();
     final StringWriter writer = new StringWriter();
     final ModuleProxyPrinter printer = new ModuleProxyPrinter(writer);
     mRoot.print(printer, iter, true);
@@ -101,8 +111,8 @@ class EFAEventNameBuilder {
   void clear()
   {
     mAllLiterals = null;
-    mAllClauses = null;
-    mNumClauses = 0;
+    mAllGuards = null;
+    mNumGuards = 0;
     mRoot = null;
     mScratch = null;
   }
@@ -113,14 +123,14 @@ class EFAEventNameBuilder {
   private void buildTree()
   {
     if (mRoot == null) {
-      mNumClauses = mAllClauses.size();
+      mNumGuards = mAllGuards.size();
       mRoot = new NameTreeNode();
-      for (final List<CountedLiteral> cclause : mAllClauses) {
-        Collections.sort(cclause);
-        final Iterator<CountedLiteral> iter = cclause.iterator();
+      for (final List<CountedLiteral> cguard : mAllGuards) {
+        Collections.sort(cguard);
+        final Iterator<CountedLiteral> iter = cguard.iterator();
         mRoot.add(iter);
       }
-      mAllClauses = null;
+      mAllGuards = null;
     }
   }
 
@@ -172,12 +182,26 @@ class EFAEventNameBuilder {
     //# Hashing and Comparing
     public int compareTo(final CountedLiteral counted)
     {
-      final int result = mOccurrences - counted.mOccurrences;
-      if (result != 0) {
-        return result;
-      } else {
-        return mComparator.compare(mLiteral, counted.mLiteral);
+      final int oresult = mOccurrences - counted.mOccurrences;
+      if (oresult != 0) {
+        return oresult;
       }
+      final OccurrenceKind kind1 = mCollector.collect(mLiteral);
+      final boolean literal1 = mCollector.isLiteral();
+      final IdentifierProxy ident1 = mCollector.getIdentifier();
+      final OccurrenceKind kind2 = mCollector.collect(counted.mLiteral);
+      final boolean literal2 = mCollector.isLiteral();
+      final IdentifierProxy ident2 = mCollector.getIdentifier();
+      if (kind1 != kind2) {
+        return kind1.compareTo(kind2);
+      } else if (literal1 != literal2) {
+        return literal1 ? -1 : 1;
+      }
+      final int iresult = mComparator.compare(ident1, ident2);
+      if (iresult != 0) {
+        return iresult;
+      }
+      return mComparator.compare(mLiteral, counted.mLiteral);
     }
 
     public boolean equals(final Object other)
@@ -215,7 +239,7 @@ class EFAEventNameBuilder {
 
     private boolean isSignificant()
     {
-      return mOccurrences < mNumClauses;
+      return mOccurrences < mNumGuards;
     }
 
     //#######################################################################
@@ -236,14 +260,14 @@ class EFAEventNameBuilder {
     private NameTreeNode()
     {
       mChildren = new HashMap<CountedLiteral,NameTreeNode>();
-      mIsEndOfClause = 0;
+      mIsEndOfList = 0;
     }
 
     //#######################################################################
     //# Simple Access
     private int size()
     {
-      return mChildren.size() + mIsEndOfClause;
+      return mChildren.size() + mIsEndOfList;
     }
 
     //#######################################################################
@@ -263,7 +287,7 @@ class EFAEventNameBuilder {
           add(iter);
         }
       } else {
-        mIsEndOfClause = 1;
+        mIsEndOfList = 1;
       }
     }
 
@@ -298,18 +322,147 @@ class EFAEventNameBuilder {
     //#######################################################################
     //# Data Members
     private final Map<CountedLiteral,NameTreeNode> mChildren;
-    private int mIsEndOfClause;
+    private int mIsEndOfList;
 
   }
 
 
   //#########################################################################
+  //# Inner Class VariableCollectVisitor
+  private class VariableCollectVisitor
+    extends AbstractModuleProxyVisitor
+  {
+
+    //#######################################################################
+    //# Constructor
+    private VariableCollectVisitor(final CompilerOperatorTable optable,
+                                   final VariableContext context)
+    {
+      mOperatorTable = optable;
+      mContext = context;
+    }
+
+    //#######################################################################
+    //# Invocation
+    private OccurrenceKind collect(final SimpleExpressionProxy expr)
+    {
+      try {
+        mOccurrenceKind = OccurrenceKind.NONE;
+        mIdentifier = null;
+        mIsLiteral = (Boolean) expr.acceptVisitor(this);
+        return mOccurrenceKind;
+      } catch (final VisitorException exception) {
+        throw exception.getRuntimeException();
+      }
+    }
+
+    //#######################################################################
+    //# Result Retrieval
+    private OccurrenceKind getOccurrenceKind()
+    {
+      return mOccurrenceKind;
+    }
+
+    private boolean isLiteral()
+    {
+      return mIsLiteral;
+    }
+
+    private IdentifierProxy getIdentifier()
+    {
+      return mIdentifier;
+    }
+
+    //#######################################################################
+    //# Interface net.sourceforge.waters.model.module.ModuleProxyVisitor
+    public Boolean visitIdentifierProxy(final IdentifierProxy ident)
+    {
+      if (mContext.getVariableRange(ident) != null) {
+        if (mIdentifier == null) {
+          mIdentifier = ident;
+          mOccurrenceKind = OccurrenceKind.CURRENT;
+        } else if (mIdentifier.equalsByContents(ident)) {
+          if (mOccurrenceKind == OccurrenceKind.NEXT) {
+            mOccurrenceKind = OccurrenceKind.BOTH;
+          }
+        } else {
+          throw new IllegalArgumentException
+            ("Multiple variable identifiers in expression!");
+        }
+      }
+      return true;
+    }
+
+    public Boolean visitBinaryExpressionProxy(final BinaryExpressionProxy expr)
+      throws VisitorException
+    {
+      final SimpleExpressionProxy lhs = expr.getLeft();
+      lhs.acceptVisitor(this);
+      if (mOccurrenceKind != OccurrenceKind.BOTH) {
+        final SimpleExpressionProxy rhs = expr.getRight();
+        rhs.acceptVisitor(this);
+      }
+      return false;
+    }
+
+    public Boolean visitSimpleExpressionProxy(final SimpleExpressionProxy expr)
+    {
+      return false;
+    }
+
+    public Boolean visitUnaryExpressionProxy(final UnaryExpressionProxy expr)
+      throws VisitorException
+    {
+      final UnaryOperator op = expr.getOperator();
+      final SimpleExpressionProxy subterm = expr.getSubTerm();
+      if (op == mOperatorTable.getNotOperator()) {
+        return (Boolean) subterm.acceptVisitor(this);
+      } else if (op == mOperatorTable.getNextOperator()) {
+        final IdentifierProxy ident = (IdentifierProxy) subterm;
+        if (mIdentifier == null) {
+          mIdentifier = ident;
+          mOccurrenceKind = OccurrenceKind.NEXT;
+        } else if (mIdentifier.equalsByContents(ident)) {
+          if (mOccurrenceKind == OccurrenceKind.CURRENT) {
+            mOccurrenceKind = OccurrenceKind.BOTH;
+          }
+        } else {
+          throw new IllegalArgumentException
+            ("Multiple variable identifiers in expression!");
+        }
+        return true;
+      } else {
+        subterm.acceptVisitor(this);
+        return false;
+      }
+    }
+
+    //#######################################################################
+    //# Data Members
+    private final CompilerOperatorTable mOperatorTable;
+    private final VariableContext mContext;
+
+    private OccurrenceKind mOccurrenceKind;
+    private boolean mIsLiteral;
+    private IdentifierProxy mIdentifier;
+
+  }
+
+  //#########################################################################
+  //# Inner Class OccurrenceKind
+  private static enum OccurrenceKind {
+    NONE, CURRENT, NEXT, BOTH
+  };
+
+
+  //#########################################################################
   //# Data Members
+  private final VariableCollectVisitor mCollector;
   private final Comparator<SimpleExpressionProxy> mComparator;
 
   private Map<CountedLiteral,CountedLiteral> mAllLiterals;
-  private Collection<List<CountedLiteral>> mAllClauses;
-  private int mNumClauses;
+  private Collection<List<CountedLiteral>> mAllGuards;
+  private int mNumGuards;
   private NameTreeNode mRoot;
   private CountedLiteral mScratch;
 }

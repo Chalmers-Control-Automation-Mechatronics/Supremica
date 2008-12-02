@@ -15,16 +15,15 @@ import java.util.LinkedList;
 import java.util.Set;
 
 import net.sourceforge.waters.model.base.Proxy;
-import net.sourceforge.waters.model.compiler.dnf.CompiledClause;
+import net.sourceforge.waters.model.compiler.constraint.ConstraintList;
 import net.sourceforge.waters.model.module.NodeProxy;
 import net.sourceforge.waters.model.module.SimpleComponentProxy;
 
 
 /**
  * A compiler-internal representation of a partial transition of an EFA.
- * Each guard/action block is converted into disjunctive normal form (DNF),
- * and each minterm of the DNF (conjunction of literals) gives rise to
- * a partial transition.
+ * Each guard/action block is converted into a constraint list ({@link
+ * ConstraintList}) and gives rise to a partial transition.
  *
  * @author Robi Malik
  */
@@ -35,11 +34,11 @@ class EFATransition
   //#########################################################################
   //# Constructors
   EFATransition(final SimpleComponentProxy comp,
-                final CompiledClause conditions)
+                final ConstraintList conditions)
   {
     final int numnodes = comp.getGraph().getNodes().size();
     mComponent = comp;
-    mConditions = conditions;
+    mGuard = conditions;
     mSourceNodes = new HashSet<NodeProxy>(numnodes);
     mSourceLocations = new LinkedList<Proxy>();
   }
@@ -52,9 +51,9 @@ class EFATransition
     return mComponent;
   }
 
-  CompiledClause getConditions()
+  ConstraintList getGuard()
   {
-    return mConditions;
+    return mGuard;
   }
 
   Set<NodeProxy> getSourceNodes()
@@ -83,7 +82,7 @@ class EFATransition
   //#########################################################################
   //# Data Members
   private final SimpleComponentProxy mComponent;
-  private final CompiledClause mConditions;
+  private final ConstraintList mGuard;
   private final Set<NodeProxy> mSourceNodes;
   private final Collection<Proxy> mSourceLocations;
 

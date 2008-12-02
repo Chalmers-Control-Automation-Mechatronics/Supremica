@@ -15,7 +15,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import net.sourceforge.waters.model.compiler.dnf.CompiledClause;
+import net.sourceforge.waters.model.compiler.constraint.ConstraintList;
 import net.sourceforge.waters.model.module.EventDeclProxy;
 import net.sourceforge.waters.model.module.IdentifierProxy;
 import net.sourceforge.waters.model.module.SimpleComponentProxy;
@@ -46,7 +46,7 @@ class EFAEventDecl {
     mEventDecl = decl;
     mVariables = new HashSet<EFAVariable>();
     mTransitionMap = new HashMap<SimpleComponentProxy,EFATransitionGroup>();
-    mEventMap = new HashMap<CompiledClause,EFAEvent>();
+    mEventMap = new HashMap<ConstraintList,EFAEvent>();
   }
 
 
@@ -120,12 +120,12 @@ class EFAEventDecl {
     mVariables.addAll(vars);
   }
 
-  EFAEvent getEvent(final CompiledClause cond)
+  EFAEvent getEvent(final ConstraintList cond)
   {
     return mEventMap.get(cond);
   }
 
-  Collection<CompiledClause> getEventKeys()
+  Collection<ConstraintList> getGuards()
   {
     return mEventMap.keySet();
   }
@@ -135,12 +135,12 @@ class EFAEventDecl {
     return mEventMap.values();
   }
 
-  EFAEvent createEvent(final CompiledClause conditions)
+  EFAEvent createEvent(final ConstraintList guard)
   {
-    EFAEvent event = mEventMap.get(conditions);
+    EFAEvent event = mEventMap.get(guard);
     if (event == null) {
-      event = new EFAEvent(this, conditions);
-      mEventMap.put(conditions, event);
+      event = new EFAEvent(this, guard);
+      mEventMap.put(guard, event);
     }
     return event;
   }
@@ -173,10 +173,9 @@ class EFAEventDecl {
    * The map of individual events to generated from this event group.  For
    * each guard condition, representing a set of possible combination of
    * variable values, an event may be generated. The map is needed since
-   * the compiler may come up with the same set of guard conditions more
-   * than once.
+   * the compiler may come up with the same guard more than once.
    */
-  private final Map<CompiledClause,EFAEvent> mEventMap;
+  private final Map<ConstraintList,EFAEvent> mEventMap;
   /**
    * A flag indicating that the event has been recognised as globally blocked.
    * In some cases, the EFA compiler can identify that an event is globally

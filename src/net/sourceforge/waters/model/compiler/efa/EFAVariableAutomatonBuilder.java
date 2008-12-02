@@ -12,7 +12,6 @@ package net.sourceforge.waters.model.compiler.efa;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -24,12 +23,12 @@ import java.util.TreeMap;
 import net.sourceforge.waters.model.base.ProxyAccessor;
 import net.sourceforge.waters.model.base.ProxyAccessorByContents;
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
+import net.sourceforge.waters.model.compiler.constraint.ConstraintList;
 import net.sourceforge.waters.model.compiler.context.BindingContext;
 import net.sourceforge.waters.model.compiler.context.CompiledRange;
 import net.sourceforge.waters.model.compiler.context.OccursChecker;
 import net.sourceforge.waters.model.compiler.context.SimpleExpressionCompiler;
 import net.sourceforge.waters.model.compiler.context.SingleBindingContext;
-import net.sourceforge.waters.model.compiler.dnf.CompiledClause;
 import net.sourceforge.waters.model.expr.BinaryOperator;
 import net.sourceforge.waters.model.expr.EvalException;
 import net.sourceforge.waters.model.expr.UnaryOperator;
@@ -68,13 +67,11 @@ class EFAVariableAutomatonBuilder
   EFAVariableAutomatonBuilder
     (final ModuleProxyFactory factory,
      final CompilerOperatorTable optable,
-     final Comparator<SimpleExpressionProxy> comparator,
      final SimpleExpressionCompiler compiler,
      final BindingContext context)
   {
     mFactory = factory;
     mOperatorTable = optable;
-    mComparator = comparator;
     mSimpleExpressionCompiler = compiler;
     mRootContext = context;
   }
@@ -92,8 +89,8 @@ class EFAVariableAutomatonBuilder
       for (final EFAEvent event : var.getEFAEvents()) {
         mEvent = event;
         final EFAEventDecl edecl = event.getEFAEventDecl();
-        final CompiledClause conditions = event.getConditions();
-	constructEventTransitions(edecl, conditions);
+        final ConstraintList guard = event.getGuard();
+	constructEventTransitions(edecl, guard);
       }
       constructEdges();
       final VariableComponentProxy comp =
@@ -121,11 +118,11 @@ class EFAVariableAutomatonBuilder
   }
 
   boolean isSatisfiable(final EFAEventDecl edecl,
-                        final CompiledClause conditions)
+                        final ConstraintList guard)
     throws EvalException
   {
     for (final EFAVariable var : edecl.getVariables()) {
-      if (!isSatisfiable(var, edecl, conditions)) {
+      if (!isSatisfiable(var, edecl, guard)) {
         return false;
       }
     }
@@ -134,13 +131,13 @@ class EFAVariableAutomatonBuilder
 
   boolean isSatisfiable(final EFAVariable var,
                         final EFAEventDecl edecl,
-                        final CompiledClause conditions)
+                        final ConstraintList guard)
     throws EvalException
   {
     try {
       mVariable = var;
       mEvent = null;
-      return constructEventTransitions(edecl, conditions);
+      return constructEventTransitions(edecl, guard);
     } finally {
       mVariable = null;
     }
@@ -212,23 +209,22 @@ class EFAVariableAutomatonBuilder
   }
 
   private boolean constructEventTransitions(final EFAEventDecl edecl,
-                                            final CompiledClause conditions)
+                                            final ConstraintList guard)
     throws EvalException
   {
     final OccursChecker checker = OccursChecker.getInstance();
     final BinaryOperator eqop = mOperatorTable.getEqualsOperator();
     final IdentifierProxy varname = mVariable.getComponent().getIdentifier();
-    final Collection<SimpleExpressionProxy> literals =
-      conditions.getLiterals();
+    final Collection<SimpleExpressionProxy> literals = guard.getConstraints();
     final int numliterals = literals.size();
-    final List<SimpleExpressionProxy> guards =
+    final List<SimpleExpressionProxy> tests =
       new ArrayList<SimpleExpressionProxy>(numliterals);
     SimpleExpressionProxy curexpr = null;
     SimpleExpressionProxy nextexpr = null;
-    for (final SimpleExpressionProxy cond : conditions.getLiterals()) {
-      if (checker.occurs(varname, cond)) {
-	if (cond instanceof BinaryExpressionProxy) {
-	  final BinaryExpressionProxy binary = (BinaryExpressionProxy) cond;
+    for (final SimpleExpressionProxy literal : literals) {
+      if (checker.occurs(varname, literal)) {
+	if (literal instanceof BinaryExpressionProxy) {
+	  final BinaryExpressionProxy binary = (BinaryExpressionProxy) literal;
 	  final BinaryOperator op = binary.getOperator();
 	  if (op == eqop) {
 	    final SimpleExpressionProxy lhs = binary.getLeft();
@@ -256,7 +252,7 @@ class EFAVariableAutomatonBuilder
 	    }
 	  }
 	}
-	guards.add(cond);
+	tests.add(literal);
       }
     }
 
@@ -298,7 +294,7 @@ class EFAVariableAutomatonBuilder
 	for (final SimpleExpressionProxy nextvalue : nextvalues) {
 	  final BindingContext nextcontext =
 	    new SingleBindingContext(nextvarname, nextvalue, curcontext);
-	  if (evalGuards(guards, nextcontext)) {
+	  if (evalGuards(tests, nextcontext)) {
             if (mEvent == null) {
               return true;
             } else {
@@ -320,7 +316,7 @@ class EFAVariableAutomatonBuilder
       for (final SimpleExpressionProxy curvalue : curvalues) {
 	final BindingContext curcontext =
 	  new SingleBindingContext(varname, curvalue, mRootContext);
-	if (evalGuards(guards, curcontext)) {
+	if (evalGuards(tests, curcontext)) {
           if (mEvent == null) {
             return true;
           } else {
@@ -437,13 +433,15 @@ class EFAVariableAutomatonBuilder
     //# Hashing and Comparing
     public int compareTo(final EFAVariableTransition trans)
     {
-      final int sourcecomp =
-	mComparator.compare(mSourceValue, trans.mSourceValue);
-      if (sourcecomp != 0) {
-	return sourcecomp;
-      } else {
-	return mComparator.compare(mTargetValue, trans.mTargetValue);
+      final CompiledRange range = mVariable.getRange();
+      final int source1 = range.indexOf(mSourceValue);
+      final int source2 = range.indexOf(trans.mSourceValue);
+      if (source1 != source2) {
+        return source1 - source2;
       }
+      final int target1 = range.indexOf(mTargetValue);
+      final int target2 = range.indexOf(trans.mTargetValue);
+      return target1 - target2;
     }
 
     public boolean equals(final Object other)
@@ -504,7 +502,6 @@ class EFAVariableAutomatonBuilder
   //# Data Members
   private final ModuleProxyFactory mFactory;
   private final CompilerOperatorTable mOperatorTable;
-  private final Comparator<SimpleExpressionProxy> mComparator;
   private final SimpleExpressionCompiler mSimpleExpressionCompiler;
   private final BindingContext mRootContext;
 

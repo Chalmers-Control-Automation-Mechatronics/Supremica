@@ -7,27 +7,27 @@
 <Event Kind="PROPOSITION" Name=":accepting"/>
 <Event Kind="CONTROLLABLE" Name="change_direction.{forward}"/>
 <Event Kind="CONTROLLABLE" Name="change_direction.{!forward}"/>
-<Event Kind="UNCONTROLLABLE" Name="move_left.{sensor1'==0}"/>
-<Event Kind="UNCONTROLLABLE" Name="move_left.{sensor1'==1}"/>
-<Event Kind="UNCONTROLLABLE" Name="move_left.{sensor2'==0}"/>
-<Event Kind="UNCONTROLLABLE" Name="move_left.{sensor2'==1}"/>
-<Event Kind="UNCONTROLLABLE" Name="move_right.{sensor1'==1}"/>
-<Event Kind="UNCONTROLLABLE" Name="move_right.{sensor1'==0}"/>
-<Event Kind="UNCONTROLLABLE" Name="move_right.{sensor2'==1}"/>
-<Event Kind="UNCONTROLLABLE" Name="move_right.{sensor2'==0}"/>
+<Event Kind="UNCONTROLLABLE" Name="move_left.{!sensor1'}"/>
+<Event Kind="UNCONTROLLABLE" Name="move_left.{sensor1'}"/>
+<Event Kind="UNCONTROLLABLE" Name="move_left.{!sensor2'}"/>
+<Event Kind="UNCONTROLLABLE" Name="move_left.{sensor2'}"/>
+<Event Kind="UNCONTROLLABLE" Name="move_right.{sensor1'}"/>
+<Event Kind="UNCONTROLLABLE" Name="move_right.{!sensor1'}"/>
+<Event Kind="UNCONTROLLABLE" Name="move_right.{sensor2'}"/>
+<Event Kind="UNCONTROLLABLE" Name="move_right.{!sensor2'}"/>
 </EventList>
 <AutomataList>
 <Automaton Kind="PLANT" Name="SensorActuator">
 <EventRefList>
 <EventRef Name=":accepting"/>
-<EventRef Name="move_left.{sensor1'==0}"/>
-<EventRef Name="move_left.{sensor1'==1}"/>
-<EventRef Name="move_left.{sensor2'==0}"/>
-<EventRef Name="move_left.{sensor2'==1}"/>
-<EventRef Name="move_right.{sensor1'==1}"/>
-<EventRef Name="move_right.{sensor1'==0}"/>
-<EventRef Name="move_right.{sensor2'==1}"/>
-<EventRef Name="move_right.{sensor2'==0}"/>
+<EventRef Name="move_left.{!sensor1'}"/>
+<EventRef Name="move_left.{sensor1'}"/>
+<EventRef Name="move_left.{!sensor2'}"/>
+<EventRef Name="move_left.{sensor2'}"/>
+<EventRef Name="move_right.{sensor1'}"/>
+<EventRef Name="move_right.{!sensor1'}"/>
+<EventRef Name="move_right.{sensor2'}"/>
+<EventRef Name="move_right.{!sensor2'}"/>
 </EventRefList>
 <StateList>
 <State Initial="true" Name="A">
@@ -41,28 +41,28 @@
 <State Name="E"/>
 </StateList>
 <TransitionList>
-<Transition Target="B" Source="A" Event="move_right.{sensor1'==1}"/>
-<Transition Target="A" Source="B" Event="move_left.{sensor1'==0}"/>
-<Transition Target="C" Source="B" Event="move_right.{sensor1'==0}"/>
-<Transition Target="B" Source="C" Event="move_left.{sensor1'==1}"/>
-<Transition Target="D" Source="C" Event="move_right.{sensor2'==1}"/>
-<Transition Target="C" Source="D" Event="move_left.{sensor2'==0}"/>
-<Transition Target="E" Source="D" Event="move_right.{sensor2'==0}"/>
-<Transition Target="D" Source="E" Event="move_left.{sensor2'==1}"/>
+<Transition Target="B" Source="A" Event="move_right.{sensor1'}"/>
+<Transition Target="A" Source="B" Event="move_left.{!sensor1'}"/>
+<Transition Target="C" Source="B" Event="move_right.{!sensor1'}"/>
+<Transition Target="B" Source="C" Event="move_left.{sensor1'}"/>
+<Transition Target="D" Source="C" Event="move_right.{sensor2'}"/>
+<Transition Target="C" Source="D" Event="move_left.{!sensor2'}"/>
+<Transition Target="E" Source="D" Event="move_right.{!sensor2'}"/>
+<Transition Target="D" Source="E" Event="move_left.{sensor2'}"/>
 </TransitionList>
 </Automaton>
 <Automaton Kind="PLANT" Name="forward">
 <EventRefList>
 <EventRef Name="change_direction.{forward}"/>
 <EventRef Name="change_direction.{!forward}"/>
-<EventRef Name="move_left.{sensor1'==0}"/>
-<EventRef Name="move_left.{sensor1'==1}"/>
-<EventRef Name="move_left.{sensor2'==0}"/>
-<EventRef Name="move_left.{sensor2'==1}"/>
-<EventRef Name="move_right.{sensor1'==1}"/>
-<EventRef Name="move_right.{sensor1'==0}"/>
-<EventRef Name="move_right.{sensor2'==1}"/>
-<EventRef Name="move_right.{sensor2'==0}"/>
+<EventRef Name="move_left.{!sensor1'}"/>
+<EventRef Name="move_left.{sensor1'}"/>
+<EventRef Name="move_left.{!sensor2'}"/>
+<EventRef Name="move_left.{sensor2'}"/>
+<EventRef Name="move_right.{sensor1'}"/>
+<EventRef Name="move_right.{!sensor1'}"/>
+<EventRef Name="move_right.{sensor2'}"/>
+<EventRef Name="move_right.{!sensor2'}"/>
 </EventRefList>
 <StateList>
 <State Initial="true" Name="0"/>
@@ -70,59 +70,59 @@
 </StateList>
 <TransitionList>
 <Transition Target="1" Source="0" Event="change_direction.{!forward}"/>
-<Transition Target="0" Source="0" Event="move_left.{sensor1'==0}"/>
-<Transition Target="0" Source="0" Event="move_left.{sensor1'==1}"/>
-<Transition Target="0" Source="0" Event="move_left.{sensor2'==0}"/>
-<Transition Target="0" Source="0" Event="move_left.{sensor2'==1}"/>
+<Transition Target="0" Source="0" Event="move_left.{!sensor1'}"/>
+<Transition Target="0" Source="0" Event="move_left.{sensor1'}"/>
+<Transition Target="0" Source="0" Event="move_left.{!sensor2'}"/>
+<Transition Target="0" Source="0" Event="move_left.{sensor2'}"/>
 <Transition Target="0" Source="1" Event="change_direction.{forward}"/>
-<Transition Target="1" Source="1" Event="move_right.{sensor1'==1}"/>
-<Transition Target="1" Source="1" Event="move_right.{sensor1'==0}"/>
-<Transition Target="1" Source="1" Event="move_right.{sensor2'==1}"/>
-<Transition Target="1" Source="1" Event="move_right.{sensor2'==0}"/>
+<Transition Target="1" Source="1" Event="move_right.{sensor1'}"/>
+<Transition Target="1" Source="1" Event="move_right.{!sensor1'}"/>
+<Transition Target="1" Source="1" Event="move_right.{sensor2'}"/>
+<Transition Target="1" Source="1" Event="move_right.{!sensor2'}"/>
 </TransitionList>
 </Automaton>
 <Automaton Kind="PLANT" Name="sensor1">
 <EventRefList>
-<EventRef Name="move_left.{sensor1'==0}"/>
-<EventRef Name="move_left.{sensor1'==1}"/>
-<EventRef Name="move_right.{sensor1'==1}"/>
-<EventRef Name="move_right.{sensor1'==0}"/>
+<EventRef Name="move_left.{!sensor1'}"/>
+<EventRef Name="move_left.{sensor1'}"/>
+<EventRef Name="move_right.{sensor1'}"/>
+<EventRef Name="move_right.{!sensor1'}"/>
 </EventRefList>
 <StateList>
 <State Initial="true" Name="0"/>
 <State Name="1"/>
 </StateList>
 <TransitionList>
-<Transition Target="0" Source="0" Event="move_left.{sensor1'==0}"/>
-<Transition Target="1" Source="0" Event="move_left.{sensor1'==1}"/>
-<Transition Target="1" Source="0" Event="move_right.{sensor1'==1}"/>
-<Transition Target="0" Source="0" Event="move_right.{sensor1'==0}"/>
-<Transition Target="0" Source="1" Event="move_left.{sensor1'==0}"/>
-<Transition Target="1" Source="1" Event="move_left.{sensor1'==1}"/>
-<Transition Target="1" Source="1" Event="move_right.{sensor1'==1}"/>
-<Transition Target="0" Source="1" Event="move_right.{sensor1'==0}"/>
+<Transition Target="0" Source="0" Event="move_left.{!sensor1'}"/>
+<Transition Target="1" Source="0" Event="move_left.{sensor1'}"/>
+<Transition Target="1" Source="0" Event="move_right.{sensor1'}"/>
+<Transition Target="0" Source="0" Event="move_right.{!sensor1'}"/>
+<Transition Target="0" Source="1" Event="move_left.{!sensor1'}"/>
+<Transition Target="1" Source="1" Event="move_left.{sensor1'}"/>
+<Transition Target="1" Source="1" Event="move_right.{sensor1'}"/>
+<Transition Target="0" Source="1" Event="move_right.{!sensor1'}"/>
 </TransitionList>
 </Automaton>
 <Automaton Kind="PLANT" Name="sensor2">
 <EventRefList>
-<EventRef Name="move_left.{sensor2'==0}"/>
-<EventRef Name="move_left.{sensor2'==1}"/>
-<EventRef Name="move_right.{sensor2'==1}"/>
-<EventRef Name="move_right.{sensor2'==0}"/>
+<EventRef Name="move_left.{!sensor2'}"/>
+<EventRef Name="move_left.{sensor2'}"/>
+<EventRef Name="move_right.{sensor2'}"/>
+<EventRef Name="move_right.{!sensor2'}"/>
 </EventRefList>
 <StateList>
 <State Initial="true" Name="0"/>
 <State Name="1"/>
 </StateList>
 <TransitionList>
-<Transition Target="0" Source="0" Event="move_left.{sensor2'==0}"/>
-<Transition Target="1" Source="0" Event="move_left.{sensor2'==1}"/>
-<Transition Target="1" Source="0" Event="move_right.{sensor2'==1}"/>
-<Transition Target="0" Source="0" Event="move_right.{sensor2'==0}"/>
-<Transition Target="0" Source="1" Event="move_left.{sensor2'==0}"/>
-<Transition Target="1" Source="1" Event="move_left.{sensor2'==1}"/>
-<Transition Target="1" Source="1" Event="move_right.{sensor2'==1}"/>
-<Transition Target="0" Source="1" Event="move_right.{sensor2'==0}"/>
+<Transition Target="0" Source="0" Event="move_left.{!sensor2'}"/>
+<Transition Target="1" Source="0" Event="move_left.{sensor2'}"/>
+<Transition Target="1" Source="0" Event="move_right.{sensor2'}"/>
+<Transition Target="0" Source="0" Event="move_right.{!sensor2'}"/>
+<Transition Target="0" Source="1" Event="move_left.{!sensor2'}"/>
+<Transition Target="1" Source="1" Event="move_left.{sensor2'}"/>
+<Transition Target="1" Source="1" Event="move_right.{sensor2'}"/>
+<Transition Target="0" Source="1" Event="move_right.{!sensor2'}"/>
 </TransitionList>
 </Automaton>
 </AutomataList>

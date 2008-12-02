@@ -63,7 +63,7 @@ public class SplitComputerTest extends TestCase
     addBooleanVariable("a");
     addBooleanVariable("b");
     final String[] constraints = {"a | b"};
-    final String[] expected = {"!a", "a"};
+    final String[] expected = {"a", "b"};
     testPropose(constraints, expected);
   }
 
@@ -73,7 +73,7 @@ public class SplitComputerTest extends TestCase
     addBooleanVariable("a");
     addBooleanVariable("b");
     final String[] constraints = {"b | a"};
-    final String[] expected = {"!a", "a"};
+    final String[] expected = {"b", "a"};
     testPropose(constraints, expected);
   }
 
@@ -84,7 +84,7 @@ public class SplitComputerTest extends TestCase
     addBooleanVariable("c");
     addBooleanVariable("d");
     final String[] constraints = {"c | d | b"};
-    final String[] expected = {"!b", "b"};
+    final String[] expected = {"c", "d", "b"};
     testPropose(constraints, expected);
   }
 
@@ -125,7 +125,7 @@ public class SplitComputerTest extends TestCase
       createEnumRange(new String[] {"ok", "nok"});
     addVariable("crc", range);
     addBooleanVariable("trouble");
-    final String[] constraints = {"crc==nok", "crc==ok | trouble"};
+    final String[] constraints = {"crc==nok", "crc==ok & trouble"};
     final String[] expected = {"crc==ok", "crc==nok"};
     testPropose(constraints, expected);
   }
@@ -149,7 +149,7 @@ public class SplitComputerTest extends TestCase
     addBooleanVariable("c_iBallDn");
     addBooleanVariable("c_iBallUp");
     final String[] constraints = {"qUp'", "c_iBallDn | qUp", "c_iBallUp"};
-    final String[] expected = {"!c_iBallDn", "c_iBallDn"};
+    final String[] expected = {"c_iBallDn", "qUp"};
     testPropose(constraints, expected);
   }
 
@@ -160,8 +160,34 @@ public class SplitComputerTest extends TestCase
     addBooleanVariable("qUp'");
     addBooleanVariable("c_iBallDn");
     addBooleanVariable("c_iBallUp");
-    final String[] constraints = {"!qUp'", "!c_iBallUp | !(qUp | c_iBallDn)"};
+    final String[] constraints = {"!qUp'", "!c_iBallUp & !(qUp | c_iBallDn)"};
     final String[] expected = {"!c_iBallDn", "c_iBallDn"};
+    testPropose(constraints, expected);
+  }
+
+  public void testPropose_balllift_3()
+    throws EvalException, ParseException
+  {
+    addBooleanVariable("c_iBallDn");
+    addBooleanVariable("c_iBallDn'");
+    addBooleanVariable("c_iBallUp");
+    addBooleanVariable("c_iBallUp'");
+    addBooleanVariable("c_iLiftDn");
+    addBooleanVariable("c_iLiftDn'");
+    addBooleanVariable("iBallDn");
+    addBooleanVariable("iBallUp");
+    addBooleanVariable("iLiftDn");
+    addBooleanVariable("iLiftDn'");
+    addBooleanVariable("qOut");
+    addBooleanVariable("qOut'");
+    addBooleanVariable("qUp");
+    addBooleanVariable("qUp'");
+    final String[] constraints = {"c_iBallUp==qOut'",
+                                  "iBallDn==c_iBallDn'",
+                                  "iBallUp==c_iBallUp'",
+                                  "iLiftDn==c_iLiftDn'",
+                                  "qUp'==((qUp|c_iBallDn)&qOut')"};
+    final String[] expected = {"!qOut'", "qOut'"};
     testPropose(constraints, expected);
   }
 

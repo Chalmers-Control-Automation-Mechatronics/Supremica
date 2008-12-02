@@ -113,6 +113,53 @@ public class ConstraintPropagatorTest extends TestCase
     testPropagate(constraints, expected);
   }
 
+  public void testPropagate_a_and_aprime()
+    throws EvalException, ParseException
+  {
+    addBooleanVariable("a");
+    final String[] constraints = {"a", "a'"};
+    testPropagate(constraints, constraints);
+  }
+
+  public void testPropagate_a_and_notaprime()
+    throws EvalException, ParseException
+  {
+    addBooleanVariable("a");
+    final String[] constraints = {"a", "!a'"};
+    testPropagate(constraints, constraints);
+  }
+
+  public void testPropagate_negliteral_1()
+    throws EvalException, ParseException
+  {
+    addBooleanVariable("a");
+    addBooleanVariable("b");
+    final String[] constraints = {"!a", "a==b"};
+    final String[] expected = {"!a", "!b"};
+    testPropagate(constraints, expected);
+  }
+
+  public void testPropagate_negliteral_2()
+    throws EvalException, ParseException
+  {
+    addBooleanVariable("a");
+    addBooleanVariable("b'");
+    final String[] constraints = {"!b'", "a==b'"};
+    final String[] expected = {"!a", "!b'"};
+    testPropagate(constraints, expected);
+  }
+
+  public void testPropagate_enumvar()
+    throws EvalException, ParseException
+  {
+    final CompiledEnumRange range =
+      createEnumRange(new String[] {"a", "b", "c"});
+    addVariable("enumvar", range);
+    final String[] constraints = {"a==enumvar"};
+    final String[] expected = {"enumvar==a"};
+    testPropagate(constraints, expected);
+  }
+
   public void testPropagate_crc_1()
     throws EvalException, ParseException
   {
@@ -214,6 +261,42 @@ public class ConstraintPropagatorTest extends TestCase
     testPropagate(constraints, expected);
   }
 
+  public void testPropagate_boolrange_1()
+    throws EvalException, ParseException
+  {
+    addBooleanVariable("x'");
+    final String[] constraints = {"x'==0"};
+    final String[] expected = {"!x'"};
+    testPropagate(constraints, expected);
+  }
+
+  public void testPropagate_boolrange_2()
+    throws EvalException, ParseException
+  {
+    addBooleanVariable("x'");
+    final String[] constraints = {"x'==1"};
+    final String[] expected = {"x'"};
+    testPropagate(constraints, expected);
+  }
+
+  public void testPropagate_boolrange_3()
+    throws EvalException, ParseException
+  {
+    final CompiledIntRange range = createIntRange(0, 2);
+    addVariable("x'", range);
+    final String[] constraints = {"x'==1"};
+    final String[] expected = {"x'==1"};
+    testPropagate(constraints, expected);
+  }
+
+  public void testPropagate_boolrange_4()
+    throws EvalException, ParseException
+  {
+    final String[] constraints = {"xx'==0"};
+    final String[] expected = {"xx'==0"};
+    testPropagate(constraints, expected);
+  }
+
   public void testPropagate_balllift_1()
     throws EvalException, ParseException
   {
@@ -238,6 +321,91 @@ public class ConstraintPropagatorTest extends TestCase
                                   "qUp' == ((qUp | c_iBallDn) & c_iBallUp)"};
     final String[] expected = {"!qUp'", "!c_iBallUp | !(qUp | c_iBallDn)"};
     testPropagate(constraints, expected);
+  }
+
+  public void testPropagate_balllift_3()
+    throws EvalException, ParseException
+  {
+    addBooleanVariable("qOut");
+    addBooleanVariable("qOut'");
+    addBooleanVariable("qUp");
+    addBooleanVariable("qUp'");
+    addBooleanVariable("c_iBallDn");
+    final String[] constraints = {"!c_iBallDn",
+                                  "qUp' == ((qUp|c_iBallDn) & qOut')"};
+    final String[] expected = {"!c_iBallDn", "qUp' == (qUp & qOut')"};
+    testPropagate(constraints, expected);
+  }
+
+  public void testPropagate_balllift_4()
+    throws EvalException, ParseException
+  {
+    addBooleanVariable("qOut");
+    addBooleanVariable("qOut'");
+    addBooleanVariable("qUp");
+    addBooleanVariable("qUp'");
+    addBooleanVariable("c_iBallDn");
+    addBooleanVariable("c_iBallDn'");
+    addBooleanVariable("iBallDn");
+    final String[] constraints = {"!c_iBallDn",
+                                  "iBallDn == c_iBallDn'",
+                                  "qUp' == ((qUp|c_iBallDn) & qOut')"};
+    final String[] expected = {"!c_iBallDn",
+                               "c_iBallDn' == iBallDn",
+                               "qUp' == (qUp & qOut')"};
+    testPropagate(constraints, expected);
+  }
+
+  public void testPropagate_balllift_5()
+    throws EvalException, ParseException
+  {
+    addBooleanVariable("qOut");
+    addBooleanVariable("qOut'");
+    addBooleanVariable("qUp");
+    addBooleanVariable("qUp'");
+    addBooleanVariable("c_iBallDn");
+    addBooleanVariable("c_iBallDn'");
+    addBooleanVariable("c_iBallUp");
+    addBooleanVariable("c_iBallUp'");
+    addBooleanVariable("iBallDn");
+    addBooleanVariable("iBallUp");
+    final String[] constraints = {"c_iBallUp==qOut'",
+                                  "iBallDn==c_iBallDn'",
+                                  "iBallUp==c_iBallUp'",
+                                  "qUp'==((qUp|c_iBallDn)&qOut')",
+                                  "!c_iBallDn'"};
+    final String[] expected = {"qOut'==c_iBallUp",
+                               "!iBallDn",
+                               "c_iBallUp'==iBallUp",
+                               "qUp'==((qUp|c_iBallDn)&c_iBallUp)",
+                               "!c_iBallDn'"};
+    testPropagate(constraints, expected);
+  }
+
+  public void testPropagate_balllift_5a()
+    throws EvalException, ParseException
+  {
+    addBooleanVariable("qOut");
+    addBooleanVariable("qOut'");
+    addBooleanVariable("qUp");
+    addBooleanVariable("qUp'");
+    addBooleanVariable("c_iBallDn");
+    addBooleanVariable("c_iBallDn'");
+    addBooleanVariable("c_iBallUp");
+    addBooleanVariable("c_iBallUp'");
+    addBooleanVariable("iBallDn");
+    addBooleanVariable("iBallUp");
+    final String[] constraints1 = {"c_iBallUp==qOut'",
+                                   "iBallDn==c_iBallDn'",
+                                   "iBallUp==c_iBallUp'",
+                                   "qUp'==((qUp|c_iBallDn)&qOut')"};
+    final String[] constraints2 = {"!c_iBallDn'"};
+    final String[] expected = {"qOut'==c_iBallUp",
+                               "!iBallDn",
+                               "c_iBallUp'==iBallUp",
+                               "qUp'==((qUp|c_iBallDn)&c_iBallUp)",
+                               "!c_iBallDn'"};
+    testPropagate(constraints1, constraints2, expected);
   }
 
   public void testPropagate_profisafe_1()
@@ -318,6 +486,79 @@ public class ConstraintPropagatorTest extends TestCase
     testPropagate(constraints, expected);
   }
 
+  public void testPropagate_profisafe_5()
+    throws EvalException, ParseException
+  {
+    final CompiledIntRange seqno = createIntRange(0, 5);
+    addVariable("in_cons_num", seqno);
+    addVariable("out_cons_num", seqno);
+    final CompiledEnumRange crc = createEnumRange(new String[] {"ok", "nok"});
+    addVariable("in_CRC", crc);
+    addBooleanVariable("fs_master_bit2_CRCNO'");
+    final String[] constraints =
+      {"fs_master_bit2_CRCNO' == (1!=out_cons_num)",
+       "out_cons_num!=1",
+       "fs_master_bit2_CRCNO'"};
+    final String[] expected =
+      {"out_cons_num!=1",
+       "fs_master_bit2_CRCNO'"};
+    testPropagate(constraints, expected);
+  }
+
+  public void testPropagate_profisafe_6()
+    throws EvalException, ParseException
+  {
+    final CompiledIntRange seqno = createIntRange(0, 5);
+    addVariable("in_cons_num", seqno);
+    addVariable("out_cons_num", seqno);
+    final CompiledEnumRange crc = createEnumRange(new String[] {"ok", "nok"});
+    addVariable("in_CRC", crc);
+    addBooleanVariable("fs_master_bit2_CRCNO'");
+    final String[] constraints =
+      {"fs_master_bit2_CRCNO' == (1!=out_cons_num)",
+       "out_cons_num!=1",
+       "!fs_master_bit2_CRCNO'"};
+    testPropagate(constraints, null);
+  }
+
+  public void testPropagate_profisafe_7()
+    throws EvalException, ParseException
+  {
+    final CompiledIntRange seqno = createIntRange(0, 5);
+    addVariable("in_cons_num", seqno);
+    addVariable("out_cons_num", seqno);
+    final CompiledEnumRange crc = createEnumRange(new String[] {"ok", "nok"});
+    addVariable("in_CRC", crc);
+    addBooleanVariable("fs_master_bit2_CRCNO'");
+    final String[] constraints1 =
+      {"fs_master_bit2_CRCNO' == (1!=out_cons_num)",
+       "out_cons_num!=1"};
+    final String[] constraints2 =
+      {"fs_master_bit2_CRCNO'"};
+    final String[] expected =
+      {"out_cons_num!=1",
+       "fs_master_bit2_CRCNO'"};
+    testPropagate(constraints1, constraints2,
+                  expected, "fs_master_bit2_CRCNO'");
+  }
+
+  public void testPropagate_profisafe_8()
+    throws EvalException, ParseException
+  {
+    final CompiledIntRange seqno = createIntRange(0, 5);
+    addVariable("in_cons_num", seqno);
+    addVariable("out_cons_num", seqno);
+    final CompiledEnumRange crc = createEnumRange(new String[] {"ok", "nok"});
+    addVariable("in_CRC", crc);
+    addBooleanVariable("fs_master_bit2_CRCNO'");
+    final String[] constraints1 =
+      {"fs_master_bit2_CRCNO' == (1!=out_cons_num)",
+       "out_cons_num!=1"};
+    final String[] constraints2 =
+      {"!fs_master_bit2_CRCNO'"};
+    testPropagate(constraints1, constraints2, null, "fs_master_bit2_CRCNO'");
+  }
+
   public void testReentrant()
     throws EvalException, ParseException
   {
@@ -376,16 +617,41 @@ public class ConstraintPropagatorTest extends TestCase
     final ConstraintList constraints = parse(inputs);
     // System.err.println(constraints);
     final ConstraintList expected = parse(outputs);
-    final boolean changed = !constraints.equals(expected);
     mPropagator.init(constraints);
-    final boolean retval = mPropagator.propagate();
+    mPropagator.propagate();
     final ConstraintList result = mPropagator.getAllConstraints();
-    assertEquals("Wrong output from constraint propagator: got " +
-                 result + " but should have been " + expected + "!",
-                 result, expected);
-    assertEquals("Wrong return value from constraint propagator: got " +
-                 retval + " but should have been " + changed + "!",
-                 changed, retval);
+    assertEquals("Wrong output from constraint propagator!", expected, result);
+  }
+
+  private void testPropagate(final String[] inputs1,
+                             final String[] inputs2,
+                             final String[] outputs)
+    throws EvalException, ParseException
+  {
+    testPropagate(inputs1, inputs2, outputs, null);
+  }
+
+  private void testPropagate(final String[] inputs1,
+                             final String[] inputs2,
+                             final String[] outputs,
+                             final String recall)
+    throws EvalException, ParseException
+  {
+    final ConstraintList constraints1 = parse(inputs1);
+    final ConstraintList constraints2 = parse(inputs2);
+    final ConstraintList expected = parse(outputs);
+    mPropagator.init(constraints1);
+    mPropagator.propagate();
+    final ConstraintPropagator propagator2 =
+      new ConstraintPropagator(mPropagator);
+    if (recall != null) {
+      final SimpleExpressionProxy varname = mParser.parse(recall);
+      final SimpleExpressionProxy eqn = propagator2.recallBinding(varname);
+    }
+    propagator2.addConstraints(constraints2);
+    propagator2.propagate();
+    final ConstraintList result = propagator2.getAllConstraints();
+    assertEquals("Wrong output from constraint propagator!", expected, result);
   }
 
   private ConstraintList parse(final String[] inputs)

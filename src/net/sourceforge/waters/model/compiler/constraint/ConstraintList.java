@@ -34,6 +34,11 @@ public class ConstraintList
 
   //#########################################################################
   //# Constructors
+  public ConstraintList()
+  {
+    mConstraints = mUnmodifiableConstraints = Collections.emptyList();
+  }
+
   public ConstraintList(final List<SimpleExpressionProxy> constraints)
   {
     mConstraints = constraints;
@@ -75,11 +80,27 @@ public class ConstraintList
   //#########################################################################
   //# Simple Access
   /**
-   * Retrieves the list of constraints. Unmodifiable.
+   * Retrieves the list of elementary constraints. Unmodifiable.
    */
   public List<SimpleExpressionProxy> getConstraints()
   {
     return mUnmodifiableConstraints;
+  }
+
+  /**
+   * Checks whether this constraint is always true.
+   */
+  public boolean isTrue()
+  {
+    return mConstraints.isEmpty();
+  }
+
+  /**
+   * Gets the number of elementary constraints in this list.
+   */
+  public int size()
+  {
+    return mConstraints.size();
   }
 
 

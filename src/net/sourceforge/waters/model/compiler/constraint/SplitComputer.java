@@ -28,12 +28,11 @@ import net.sourceforge.waters.model.base.VisitorException;
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
 import net.sourceforge.waters.model.compiler.context.CompiledRange;
 import net.sourceforge.waters.model.compiler.context.
-  CompilerExpressionComparator;
-import net.sourceforge.waters.model.compiler.context.
   UndefinedIdentifierException;
 import net.sourceforge.waters.model.compiler.context.VariableContext;
 import net.sourceforge.waters.model.expr.BinaryOperator;
 import net.sourceforge.waters.model.expr.EvalException;
+import net.sourceforge.waters.model.expr.ExpressionComparator;
 import net.sourceforge.waters.model.expr.UnaryOperator;
 import net.sourceforge.waters.model.module.AbstractModuleProxyVisitor;
 import net.sourceforge.waters.model.module.BinaryExpressionProxy;
@@ -59,8 +58,7 @@ public class SplitComputer
     mOperatorTable = optable;
     mDisjunctionCollectVisitor = new DisjunctionCollectVisitor();
     mCollectVisitor = new CollectVisitor();
-    mExpressionComparator =
-      new CompilerExpressionComparator(optable, root, true);
+    mExpressionComparator = new ExpressionComparator(optable);
     mCandidateComparator = new CandidateComparator();
     mCombinations = new HashSet<VariableCombination>();
     mCandidateMap = new HashMap<ProxyAccessor<SimpleExpressionProxy>,
@@ -200,11 +198,13 @@ public class SplitComputer
     final UnaryOperator nextop = mOperatorTable.getNextOperator();
     for (final SimpleExpressionProxy varname : comb.getVariables()) {
       final VariableSplitCandidate vcand;
-      final AbstractSplitCandidate cand = mCandidateMap.get(varname);
+      final ProxyAccessor<SimpleExpressionProxy> accessor =
+        new ProxyAccessorByContents<SimpleExpressionProxy>(varname);
+      final AbstractSplitCandidate cand = mCandidateMap.get(accessor);
       if (cand == null) {
         final CompiledRange range = mContext.getVariableRange(varname);
         vcand = new VariableSplitCandidate(varname, range);
-        addCandidate(varname, vcand);
+        mCandidateMap.put(accessor, vcand);
       } else {
         vcand = (VariableSplitCandidate) cand;
       }
@@ -261,7 +261,7 @@ public class SplitComputer
       final int numocc1 = cand1.getNumberOfOccurrences();
       final int numocc2 = cand2.getNumberOfOccurrences();
       if (numocc1 != numocc2) {
-        return numocc1 - numocc2;
+        return numocc2 - numocc1;
       }
       final int size1 = cand1.getSplitSize();
       final int size2 = cand2.getSplitSize();
@@ -505,15 +505,19 @@ public class SplitComputer
     public Boolean visitUnaryExpressionProxy(final UnaryExpressionProxy expr)
       throws VisitorException
     {
+      final ProxyAccessorMap<SimpleExpressionProxy> save = mCollection;
+      final boolean isnext =
+        (expr.getOperator() == mOperatorTable.getNextOperator());
+      if (isnext) {
+        mCollection = null;
+      }
       final SimpleExpressionProxy subterm = expr.getSubTerm();
       final boolean result = process(subterm);
-      if (result) {
+      if (result || !isnext) {
         return result;
       }
-      final UnaryOperator op = expr.getOperator();
-      if (op != mOperatorTable.getNextOperator()) {
-        return result;
-      } else if (mContext.getVariableRange(expr) != null) {
+      mCollection = save;
+      if (mContext.getVariableRange(expr) != null) {
         return recordCandidate(expr);
       } else {
         final UndefinedIdentifierException exception =
@@ -602,7 +606,12 @@ public class SplitComputer
     }
 
     //#######################################################################
-    //# Equals & Hashcode
+    //# Overrides for Baseclass java.lang.Object
+    public String toString()
+    {
+      return mContents.values().toString();
+    }
+
     public boolean equals(final Object other)
     {
       if (other != null && other.getClass() == getClass()) {

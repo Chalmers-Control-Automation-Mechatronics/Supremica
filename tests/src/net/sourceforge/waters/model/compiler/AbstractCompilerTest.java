@@ -329,7 +329,7 @@ public abstract class AbstractCompilerTest
   public void testCompile_sensoractuator2()
     throws IOException, WatersException
   {
-    compile("handwritten", "sensoractuator1");
+    compile("handwritten", "sensoractuator2");
   }
 
   public void testCompile_sensoractuator_nondet()

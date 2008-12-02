@@ -4,7 +4,7 @@
   xmlns="http://waters.sourceforge.net/xsd/des">
 <ns2:Comment></ns2:Comment>
 <EventList>
-<Event Kind="UNCONTROLLABLE" Name="a.{1&lt;v}"/>
+<Event Kind="UNCONTROLLABLE" Name="a.{v==2}"/>
 <Event Kind="UNCONTROLLABLE" Name="a.{v&lt;=1}"/>
 <Event Kind="UNCONTROLLABLE" Name="b"/>
 <Event Kind="CONTROLLABLE" Name="c"/>
@@ -13,7 +13,7 @@
 <Automaton Kind="SPEC" Name="K">
 <EventRefList>
 <EventRef Name="a.{v&lt;=1}"/>
-<EventRef Name="a.{1&lt;v}"/>
+<EventRef Name="a.{v==2}"/>
 <EventRef Name="c"/>
 </EventRefList>
 <StateList>
@@ -21,7 +21,7 @@
 <State Name="S1"/>
 </StateList>
 <TransitionList>
-<Transition Source="S0" Target="S1" Event="a.{1&lt;v}"/>
+<Transition Source="S0" Target="S1" Event="a.{v==2}"/>
 <Transition Source="S0" Target="S1" Event="a.{v&lt;=1}"/>
 <Transition Source="S0" Target="S1" Event="c"/>
 <Transition Source="S1" Target="S0" Event="a.{v&lt;=1}"/>
@@ -29,7 +29,7 @@
 </Automaton>
 <Automaton Kind="PLANT" Name="G">
 <EventRefList>
-<EventRef Name="a.{1&lt;v}"/>
+<EventRef Name="a.{v==2}"/>
 <EventRef Name="a.{v&lt;=1}"/>
 <EventRef Name="b"/>
 </EventRefList>
@@ -37,14 +37,14 @@
 <State Initial="true" Name="S0"/>
 </StateList>
 <TransitionList>
-<Transition Source="S0" Target="S0" Event="a.{1&lt;v}"/>
+<Transition Source="S0" Target="S0" Event="a.{v==2}"/>
 <Transition Source="S0" Target="S0" Event="a.{v&lt;=1}"/>
 <Transition Source="S0" Target="S0" Event="b"/>
 </TransitionList>
 </Automaton>
 <Automaton Kind="PLANT" Name="v">
 <EventRefList>
-<EventRef Name="a.{1&lt;v}"/>
+<EventRef Name="a.{v==2}"/>
 <EventRef Name="a.{v&lt;=1}"/>
 <EventRef Name="b"/>
 <EventRef Name="c"/>
@@ -60,7 +60,7 @@
 <Transition Source="0" Target="2" Event="c"/>
 <Transition Source="1" Target="1" Event="a.{v&lt;=1}"/>
 <Transition Source="1" Target="2" Event="c"/>
-<Transition Source="2" Target="1" Event="a.{1&lt;v}"/>
+<Transition Source="2" Target="1" Event="a.{v==2}"/>
 <Transition Source="2" Target="2" Event="c"/>
 </TransitionList>
 </Automaton>

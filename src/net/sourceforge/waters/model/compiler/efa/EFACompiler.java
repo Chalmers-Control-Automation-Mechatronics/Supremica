@@ -12,9 +12,9 @@ package net.sourceforge.waters.model.compiler.efa;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -27,10 +27,12 @@ import net.sourceforge.waters.model.base.ProxyAccessorHashMapByContents;
 import net.sourceforge.waters.model.base.ProxyAccessorMap;
 import net.sourceforge.waters.model.base.VisitorException;
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
+import net.sourceforge.waters.model.compiler.constraint.ConstraintList;
+import net.sourceforge.waters.model.compiler.constraint.ConstraintPropagator;
+import net.sourceforge.waters.model.compiler.constraint.SplitCandidate;
+import net.sourceforge.waters.model.compiler.constraint.SplitComputer;
 import net.sourceforge.waters.model.compiler.context.CompiledEnumRange;
 import net.sourceforge.waters.model.compiler.context.CompiledRange;
-import net.sourceforge.waters.model.compiler.context.
-  CompilerExpressionComparator;
 import net.sourceforge.waters.model.compiler.context.
   DuplicateIdentifierException;
 import net.sourceforge.waters.model.compiler.context.
@@ -38,7 +40,7 @@ import net.sourceforge.waters.model.compiler.context.
 import net.sourceforge.waters.model.compiler.context.ModuleBindingContext;
 import net.sourceforge.waters.model.compiler.context.SimpleExpressionCompiler;
 import net.sourceforge.waters.model.compiler.context.SourceInfoBuilder;
-import net.sourceforge.waters.model.compiler.dnf.CompiledClause;
+import net.sourceforge.waters.model.compiler.context.VariableContext;
 import net.sourceforge.waters.model.expr.BinaryOperator;
 import net.sourceforge.waters.model.expr.EvalException;
 import net.sourceforge.waters.model.expr.UnaryOperator;
@@ -134,7 +136,7 @@ public class EFACompiler
     mFactory = factory;
     mSourceInfoBuilder = builder;
     mOperatorTable = CompilerOperatorTable.getInstance();
-    mTrueGuard = new CompiledGuard();
+    mTrueGuard = new ConstraintList();
     mSimpleExpressionCompiler =
       new SimpleExpressionCompiler(mFactory, mOperatorTable);
     mInputModule = module;
@@ -148,15 +150,12 @@ public class EFACompiler
   {
     try {
       mRootContext = new EFAModuleContext(mInputModule);
-      mComparator =
-        new CompilerExpressionComparator(mOperatorTable, mRootContext);
-      mConstraintPropagator =
-        new ConstraintPropagator(mFactory, mOperatorTable, mComparator,
-                                 mSimpleExpressionCompiler);
-      mSplitComputer = new SplitComputer(mRootContext);
-      mEventNameBuilder = new EFAEventNameBuilder(mFactory, mComparator);
+      mSplitComputer =
+        new SplitComputer(mFactory, mOperatorTable, mRootContext);
+      mEventNameBuilder =
+        new EFAEventNameBuilder(mFactory, mOperatorTable, mRootContext);
       mVariableAutomatonBuilder =
-        new EFAVariableAutomatonBuilder(mFactory, mOperatorTable, mComparator,
+        new EFAVariableAutomatonBuilder(mFactory, mOperatorTable,
                                         mSimpleExpressionCompiler,
                                         mRootContext);
       // Pass 1 ...
@@ -182,8 +181,6 @@ public class EFACompiler
       }
     } finally {
       mRootContext = null;
-      mComparator = null;
-      mConstraintPropagator = null;
       mSplitComputer = null;
       mEventNameBuilder = null;
       mVariableAutomatonBuilder = null;
@@ -205,7 +202,8 @@ public class EFACompiler
     throws EvalException
   {
     final BinaryOperator andop = mOperatorTable.getAndOperator();
-    final CompiledClause startcond = new CompiledClause(andop);
+    final ConstraintPropagator propagator =
+      new ConstraintPropagator(mFactory, mOperatorTable, mRootContext);
     mEFAEventMap = new HashMap<Proxy,Collection<EFAEvent>>();
     for (final EFAEventDecl edecl : mEFAEventDeclMap.values()) {
       if (!edecl.isBlocked()) {
@@ -223,10 +221,10 @@ public class EFACompiler
         final int size = groups.size();
         final List<EFATransition> parts = new ArrayList<EFATransition>(size);
         Collections.sort(groups);
-        collectEventPartition(edecl, groups, parts, 0, startcond);
-        for (final CompiledClause cond : edecl.getEventKeys()) {
-          final EFAEvent event = edecl.getEvent(cond);
-          final String suffix = mEventNameBuilder.getNameSuffix(cond);
+        collectEventPartition(edecl, groups, parts, 0, propagator);
+        for (final ConstraintList guard : edecl.getGuards()) {
+          final EFAEvent event = edecl.getEvent(guard);
+          final String suffix = mEventNameBuilder.getNameSuffix(guard);
           event.setSuffix(suffix);
         }
         mEventNameBuilder.clear();
@@ -238,72 +236,70 @@ public class EFACompiler
                                      final List<EFATransitionGroup> groups,
                                      final List<EFATransition> parts,
                                      final int index,
-                                     final CompiledClause prevcond)
+                                     final ConstraintPropagator parent)
     throws EvalException
   {
     if (index < groups.size()) {
       final EFATransitionGroup group = groups.get(index);
       for (final EFATransition part : group.getPartialTransitions()) {
-        final CompiledClause cond = part.getConditions();
-        final CompiledClause nextcond =
-          mConstraintPropagator.propagate(prevcond, cond, mRootContext);
-        if (nextcond != null) {
+        final ConstraintPropagator propagator =
+          new ConstraintPropagator(parent);
+        final ConstraintList guard = part.getGuard();
+        propagator.addConstraints(guard);
+        propagator.propagate();
+        if (!propagator.isUnsatisfiable()) {
           parts.add(part);
-          collectEventPartition(edecl, groups, parts, index + 1, nextcond);
+          collectEventPartition(edecl, groups, parts, index + 1, propagator);
           parts.remove(index);
         }
       }
     } else {
-      splitEventPartition(edecl, parts, prevcond);
+      splitEventPartition(edecl, parts, parent);
     }
   }
 
   private void splitEventPartition(final EFAEventDecl edecl,
                                    final List<EFATransition> parts,
-                                   final CompiledClause cond)
+                                   final ConstraintPropagator parent)
     throws EvalException
   {
-    final List<EFAVariable> splitlist = mSplitComputer.computeSplitList(cond);
-    if (splitlist.isEmpty()) {
-      createEvent(edecl, parts, cond);
+    final ConstraintList guard = parent.getAllConstraints();
+    // System.err.println(guard);
+    final VariableContext context = parent.getContext();
+    final SplitCandidate split = mSplitComputer.proposeSplit(guard, context);
+    if (split == null) {
+      createEvent(edecl, parts, parent);
     } else {
-      splitEventPartition(edecl, parts, cond, splitlist, 0);
-    }
-  }
-
-  private void splitEventPartition(final EFAEventDecl edecl,
-                                   final List<EFATransition> parts,
-                                   final CompiledClause cond,
-                                   final List<EFAVariable> splitlist,
-                                   final int index)
-    throws EvalException
-  {
-    if (index < splitlist.size()) {
-      final EFAVariable var = splitlist.get(index);
-      final SimpleExpressionProxy varname = var.getVariableName();
-      final CompiledRange range = var.getRange();
-      for (final SimpleExpressionProxy value : range.getValues()) {
-        final CompiledClause nextcond =
-          mConstraintPropagator.propagate(cond, varname, value, mRootContext);
-        if (nextcond != null) {
-          splitEventPartition(edecl, parts, nextcond, splitlist, index + 1);
+      final SimpleExpressionProxy recall = split.getRecallable();
+      for (final SimpleExpressionProxy expr :
+             split.getSplitExpressions(mFactory, mOperatorTable)) {
+        // System.err.println(" + " + expr);
+        final ConstraintPropagator propagator =
+          new ConstraintPropagator(parent);
+        if (recall != null) {
+          propagator.recallBinding(recall);
+        }
+        propagator.addConstraint(expr);
+        propagator.propagate();
+        // System.err.println(" = " + propagator.getAllConstraints());
+        if (!propagator.isUnsatisfiable()) {
+          splitEventPartition(edecl, parts, propagator);
         }
       }
-    } else {
-      splitEventPartition(edecl, parts, cond);
     }
   }
 
   private void createEvent(final EFAEventDecl edecl,
                            final List<EFATransition> parts,
-                           final CompiledClause cond)
+                           final ConstraintPropagator propagator)
     throws EvalException
   {
-    if (mVariableAutomatonBuilder.isSatisfiable(edecl, cond)) {
-      final EFAEvent event = edecl.createEvent(cond);
+    final ConstraintList guard = propagator.getAllConstraints();
+    if (mVariableAutomatonBuilder.isSatisfiable(edecl, guard)) {
+      final EFAEvent event = edecl.createEvent(guard);
       for (final EFATransition part : parts) {
-        final CompiledClause pcond = part.getConditions();
-        if (!pcond.isEmpty()) {
+        final ConstraintList pguard = part.getGuard();
+        if (!pguard.isTrue()) {
           for (final Proxy location : part.getSourceLocations()) {
             Collection<EFAEvent> collection = mEFAEventMap.get(location);
             if (collection == null) {
@@ -314,7 +310,7 @@ public class EFACompiler
           }
         }
       }
-      mEventNameBuilder.addClause(cond);
+      mEventNameBuilder.addGuard(guard);
     }
   }
 
@@ -457,8 +453,9 @@ public class EFACompiler
     //# Constructor
     private Pass2Visitor()
     {
-      mGuardCompiler =
-        new GuardCompiler(mFactory, mOperatorTable, mComparator, mRootContext);
+      mGuardCompiler = new GuardCompiler(mFactory, mOperatorTable);
+      mPropagator =
+        new ConstraintPropagator(mFactory, mOperatorTable, mRootContext);
     }
 
     //#######################################################################
@@ -531,7 +528,7 @@ public class EFACompiler
       return null;
     }
 
-    public CompiledGuard visitGuardActionBlockProxy
+    public ConstraintList visitGuardActionBlockProxy
       (final GuardActionBlockProxy ga)
       throws VisitorException
     {
@@ -558,7 +555,7 @@ public class EFACompiler
           if (mCurrentGuard != null) {
             final EFATransitionGroup trans =
               edecl.createTransitionGroup(mCurrentComponent);
-            trans.addTransitions(mCurrentGuard, mCurrentSource, ident);
+            trans.addTransition(mCurrentGuard, mCurrentSource, ident);
           }
         }
         return edecl;
@@ -611,15 +608,13 @@ public class EFACompiler
               ckind == ComponentKind.PROPERTY ||
               ekind == EventKind.UNCONTROLLABLE &&
               ckind != ComponentKind.PLANT) {
-            mGuardCompiler.makeDisjoint(trans);
+            makeDisjoint(trans);
             // Include a catch-all event to be blocked ...
             if (!trans.hasTrueGuard()) {
-              final Collection<SimpleExpressionProxy> guards =
-                trans.getGuards();
-              final CompiledGuard complement =
-                mGuardCompiler.getComplementaryGuard(guards);
+              final Collection<ConstraintList> guards = trans.getGuards();
+              final ConstraintList complement = buildComplement(guards);
               if (complement != null) {
-                trans.addTransitions(complement, comp);
+                trans.addTransition(complement, comp);
               }
             }
           } else {
@@ -644,14 +639,164 @@ public class EFACompiler
     }
 
     //#######################################################################
+    //# Auxiliary Methods
+    private void makeDisjoint(final EFATransitionGroup group)
+      throws EvalException
+    {
+      final List<EFATransition> list =
+        new ArrayList<EFATransition>(group.getPartialTransitions());
+      for (int i = 0; i < list.size(); i++) {
+        for (int j = i + 1; j < list.size(); j++) {
+          final EFATransition trans1 = list.get(i);
+          final ConstraintList guard1 = trans1.getGuard();
+          final Set<NodeProxy> nodes1 = trans1.getSourceNodes();
+          final EFATransition trans2 = list.get(j);
+          final ConstraintList guard2 = trans2.getGuard();
+          final Set<NodeProxy> nodes2 = trans2.getSourceNodes();
+          final ConstraintList conjunction = buildConjunction(guard1, guard2);
+          if (conjunction == null || nodes1.equals(nodes2)) {
+            continue;
+          } else if (nodes1.containsAll(nodes2)) {
+            // strengthen : guard2 >> !guard1 & guard2
+            final ConstraintList strengthened = 
+              strengthenByNegation(guard2, guard1);
+            if (strengthened == null) {
+              list.remove(j--);
+            } else {
+              group.replaceTransition(guard2, strengthened);
+              replaceInList(list, j, group, strengthened);
+            }
+          } else if (nodes2.containsAll(nodes1)) {
+            // strengthen : guard1 >> guard1 & !guard2
+            final ConstraintList strengthened = 
+              strengthenByNegation(guard1, guard2);
+            if (strengthened == null) {
+              list.remove(i--);
+              break;
+            } else {
+              group.replaceTransition(guard1, strengthened);
+              replaceInList(list, i, group, strengthened);
+            }
+          } else {
+            // split : guard1 >> guard1 & guard2, guard1 & !guard2
+            // split : guard2 >> guard1 & guard2, !guard1 & guard2
+            final Collection<ConstraintList> replacements =
+              new ArrayList<ConstraintList>(2);
+            replacements.add(conjunction);
+            final ConstraintList strengthened2 = 
+              strengthenByNegation(guard2, guard1);
+            if (strengthened2 != null) {
+              replacements.add(strengthened2);
+            }
+            group.replaceTransition(guard2, replacements);
+            replaceInList(list, j, group, replacements);
+            replacements.clear();
+            replacements.add(conjunction);
+            final ConstraintList strengthened1 = 
+              strengthenByNegation(guard1, guard2);
+            if (strengthened1 != null) {
+              replacements.add(strengthened1);
+            }
+            group.replaceTransition(guard1, replacements);
+            replaceInList(list, i, group, replacements);
+          }
+        }
+      }
+    }
+
+    private ConstraintList buildComplement
+      (final Collection<ConstraintList> guards)
+      throws EvalException
+    {
+      try {
+        for (final ConstraintList guard : guards) {
+          mPropagator.addNegation(guard);
+        }
+        mPropagator.propagate();
+        return mPropagator.getAllConstraints(false);
+      } finally {
+        mPropagator.reset();
+      }
+    }
+
+    private ConstraintList buildConjunction(final ConstraintList guard1,
+                                            final ConstraintList guard2)
+      throws EvalException
+    {
+      try {
+        mPropagator.addConstraints(guard1);
+        mPropagator.addConstraints(guard2);
+        mPropagator.propagate();
+        return mPropagator.getAllConstraints(false);
+      } finally {
+        mPropagator.reset();
+      }
+    }
+
+    private ConstraintList strengthenByNegation(final ConstraintList guard1,
+                                                final ConstraintList guard2)
+      throws EvalException
+    {
+      try {
+        mPropagator.addConstraints(guard1);
+        mPropagator.addNegation(guard2);
+        mPropagator.propagate();
+        return mPropagator.getAllConstraints(false);
+      } finally {
+        mPropagator.reset();
+      }
+    }
+
+    private void replaceInList(final List<EFATransition> list,
+                               final int index,
+                               final EFATransitionGroup group,
+                               final ConstraintList guard)
+    {
+      final EFATransition trans = group.getPartialTransition(guard);
+      list.set(index, trans);
+    }
+
+    private void replaceInList(final List<EFATransition> list,
+                               final int index,
+                               final EFATransitionGroup group,
+                               final Collection<ConstraintList> guards)
+    {
+      final Iterator<ConstraintList> iter = guards.iterator();
+      final ConstraintList guard1 = iter.next();
+      final EFATransition trans1 = group.getPartialTransition(guard1);
+      list.set(index, trans1);
+      if (iter.hasNext()) {
+        final int listsize = list.size();
+        final int tailsize = listsize - index - 1;
+        final List<EFATransition> tail = 
+          tailsize == 0 ? null : new ArrayList<EFATransition>(tailsize);
+        for (int i = index + 1; i < listsize; i++) {
+          tail.add(list.get(i));
+        }
+        for (int i = listsize - 1; i > index; i--) {
+          list.remove(i);
+        }
+        while (iter.hasNext()) {
+          final ConstraintList guard = iter.next();
+          final EFATransition trans = group.getPartialTransition(guard);
+          list.add(trans);
+        }
+        if (tail != null) {
+          list.addAll(tail);
+        }
+      }
+    }
+
+    //#######################################################################
     //# Data Members
     private final GuardCompiler mGuardCompiler;
+    private final ConstraintPropagator mPropagator;
 
     private SimpleComponentProxy mCurrentComponent;
     private Set<EFAVariable> mCollectedVariables;
     private Set<EFAEventDecl> mCollectedEvents;
     private NodeProxy mCurrentSource;
-    private CompiledGuard mCurrentGuard;
+    private ConstraintList mCurrentGuard;
   }
 
 
@@ -677,9 +822,9 @@ public class EFACompiler
         for (final EFAEventDecl edecl : edecls) {
           for (final EFAEvent event : edecl.getEvents()) {
             mCurrentEvent = event;
-            final CompiledClause conditions = event.getConditions();
-            for (final SimpleExpressionProxy cond : conditions.getLiterals()) {
-              cond.acceptVisitor(this);
+            final ConstraintList guard = event.getGuard();
+            for (final SimpleExpressionProxy expr : guard.getConstraints()) {
+              expr.acceptVisitor(this);
             }
           }
         }
@@ -991,15 +1136,13 @@ public class EFACompiler
   private final ModuleProxyFactory mFactory;
   private final SourceInfoBuilder mSourceInfoBuilder;
   private final CompilerOperatorTable mOperatorTable;
-  private final CompiledGuard mTrueGuard;
+  private final ConstraintList mTrueGuard;
   private final SimpleExpressionCompiler mSimpleExpressionCompiler;
   private final ModuleProxy mInputModule;
 
   private boolean mIsUsingEventAlphabet = true;
 
   private EFAModuleContext mRootContext;
-  private Comparator<SimpleExpressionProxy> mComparator;
-  private ConstraintPropagator mConstraintPropagator;
   private SplitComputer mSplitComputer;
   private EFAEventNameBuilder mEventNameBuilder;
   private EFAVariableAutomatonBuilder mVariableAutomatonBuilder;

@@ -23,12 +23,11 @@ import java.util.TreeSet;
 import net.sourceforge.waters.model.base.ProxyAccessor;
 import net.sourceforge.waters.model.base.ProxyAccessorByContents;
 import net.sourceforge.waters.model.base.WatersRuntimeException;
+import net.sourceforge.waters.model.expr.ExpressionComparator;
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
 import net.sourceforge.waters.model.compiler.context.CompiledRange;
 import net.sourceforge.waters.model.compiler.context.CompiledEnumRange;
 import net.sourceforge.waters.model.compiler.context.CompiledIntRange;
-import net.sourceforge.waters.model.compiler.context.
-  CompilerExpressionComparator;
 import net.sourceforge.waters.model.compiler.context.ModuleBindingContext;
 import net.sourceforge.waters.model.compiler.context.SimpleExpressionCompiler;
 import net.sourceforge.waters.model.compiler.context.VariableContext;
@@ -56,9 +55,9 @@ public class ConstraintPropagator
     mFactory = factory;
     mOperatorTable = optable;
     mContext = new ConstraintContext(root);
-    mListComparator = new CompilerExpressionComparator(optable, root, true);
+    mListComparator = new ExpressionComparator(optable);
     mEquationComparator =
-      new CompilerExpressionComparator(optable, root, false);
+      new RelationNormalizationComparator(optable, mContext);
     mSimpleExpressionCompiler =
       new SimpleExpressionCompiler(factory, optable, false);
     mNormalizer = RelationNormalizationRule.createNormalRule(factory, optable);
@@ -89,7 +88,7 @@ public class ConstraintPropagator
     mUnprocessedConstraints = new LinkedList<SimpleExpressionProxy>();
     mNormalizedConstraints =
       new TreeSet<SimpleExpressionProxy>(mListComparator);
-    mIsFalse = false;
+    mIsUnsatisfiable = false;
   }
 
   public ConstraintPropagator(final ConstraintPropagator propagator)
@@ -106,9 +105,10 @@ public class ConstraintPropagator
     mRewriteRules = propagator.mRewriteRules;
     mUnprocessedConstraints = new LinkedList<SimpleExpressionProxy>
       (propagator.mUnprocessedConstraints);
-    mNormalizedConstraints = new TreeSet<SimpleExpressionProxy>
-      (propagator.mNormalizedConstraints);
-    mIsFalse = propagator.mIsFalse;
+    mNormalizedConstraints =
+      new TreeSet<SimpleExpressionProxy>(mListComparator);
+    mNormalizedConstraints.addAll(propagator.mNormalizedConstraints);
+    mIsUnsatisfiable = propagator.mIsUnsatisfiable;
   }
 
 
@@ -124,11 +124,6 @@ public class ConstraintPropagator
     return mOperatorTable;
   }
 
-  ConstraintContext getContext()
-  {
-    return mContext;
-  }
-
   Comparator<SimpleExpressionProxy> getListComparator()
   {
     return mListComparator;
@@ -141,7 +136,7 @@ public class ConstraintPropagator
 
 
   //#########################################################################
-  //# Invocation
+  //# Loading
   public void init(final ConstraintList clist)
   {
     reset();
@@ -151,8 +146,9 @@ public class ConstraintPropagator
   public void reset()
   {
     mContext.reset();
+    mUnprocessedConstraints.clear();
     mNormalizedConstraints.clear();
-    mIsFalse = false;
+    mIsUnsatisfiable = false;
   }
 
   public void addConstraints(final ConstraintList clist)
@@ -170,7 +166,103 @@ public class ConstraintPropagator
 
   public void addConstraint(final SimpleExpressionProxy constraint)
   {
-    mUnprocessedConstraints.add(constraint);
+    assert constraint != null;
+    if (!mIsUnsatisfiable) {
+      mUnprocessedConstraints.add(constraint);
+    }
+  }
+
+  public void addNegation(final ConstraintList clist)
+    throws EvalException
+  {
+    if (clist.isTrue()) {
+      setFalse();
+    } else if (!mIsUnsatisfiable) {
+      final BinaryOperator op = mOperatorTable.getOrOperator();
+      SimpleExpressionProxy expr = null;
+      for (final SimpleExpressionProxy constraint : clist.getConstraints()) {
+        final SimpleExpressionProxy negation = getNegatedLiteral(constraint);
+        if (expr == null) {
+          expr = negation;
+        } else {
+          expr = mFactory.createBinaryExpressionProxy(op, expr, negation);
+        }
+      }
+      addConstraint(expr);
+    }
+  }
+
+  public BinaryExpressionProxy recallBinding
+    (final SimpleExpressionProxy varname)
+  {
+    final BinaryExpressionProxy eqn = mContext.recallBinding(varname);
+    if (eqn != null) {
+      addConstraint(eqn);
+    }
+    return eqn;
+  }
+
+
+  //#########################################################################
+  //# Invocation
+  public void propagate()
+    throws EvalException
+  {
+    int i = 0;
+    outer:
+    while (!mIsUnsatisfiable) {
+      if (!mUnprocessedConstraints.isEmpty()) {
+        // normalise unprocessed constraints first ...
+        // System.err.println("UNPROC: " + mUnprocessedConstraints);
+        final SimpleExpressionProxy constraint =
+          mUnprocessedConstraints.remove(0);
+        final SimpleExpressionProxy simplified =
+          mSimpleExpressionCompiler.simplify(constraint, mContext);
+        for (final SimplificationRule rule : mNormalizationRules) {
+          if (rule.match(simplified, this)) {
+            // System.err.println
+            //  ("NORM: " + rule.getClass().getName() + " " + simplified);
+            rule.execute(this);
+            continue outer;
+          }
+        }
+        if (mNormalizedConstraints.add(simplified)) {
+          final SimpleExpressionProxy negation = getNegatedLiteral(simplified);
+          if (mNormalizedConstraints.contains(negation)) {
+            setFalse();
+            break;
+          }
+        }
+      } else {
+        // all constraints normalised ...
+        // System.err.println("NORM: " + mNormalizedConstraints);
+        final Iterator<SimpleExpressionProxy> iter =
+          mNormalizedConstraints.iterator();
+        while (iter.hasNext()) {
+          final SimpleExpressionProxy constraint = iter.next();
+          for (final SimplificationRule rule : mRewriteRules) {
+            if (rule.match(constraint, this)) {
+              // System.err.println
+              //  ("MATCH: " + rule.getClass().getName() + " " + constraint);
+              if (rule.isMakingReplacement()) {
+                iter.remove();
+              }
+              rule.execute(this);
+              continue outer;
+            }
+          }
+        }
+        break;
+      }
+    }
+  }
+
+
+  //#########################################################################
+  //# Result Retrieval
+  public boolean isUnsatisfiable()
+  {
+    return mIsUnsatisfiable;
   }
 
   public ConstraintList getAllConstraints()
@@ -182,7 +274,7 @@ public class ConstraintPropagator
   public ConstraintList getAllConstraints(final boolean pretty)
     throws EvalException
   {
-    if (mIsFalse) {
+    if (mIsUnsatisfiable) {
       return null;
     } else {
       final List<SimpleExpressionProxy> list =
@@ -193,57 +285,9 @@ public class ConstraintPropagator
     }
   }
 
-  public boolean propagate()
-    throws EvalException
+  public VariableContext getContext()
   {
-    int i = 0;
-    boolean change = false;
-    outer:
-    while (!mIsFalse) {
-      if (!mUnprocessedConstraints.isEmpty()) {
-        // normalise unprocessed constraints first ...
-        final SimpleExpressionProxy constraint =
-          mUnprocessedConstraints.remove(0);
-        final SimpleExpressionProxy simplified =
-          mSimpleExpressionCompiler.simplify(constraint, mContext);
-        for (final SimplificationRule rule : mNormalizationRules) {
-          if (rule.match(simplified, this)) {
-            rule.execute(this);
-            change = true;
-            continue outer;
-          }
-        }
-        if (mNormalizedConstraints.add(simplified)) {
-          final SimpleExpressionProxy negation = getNegatedLiteral(simplified);
-          if (mNormalizedConstraints.contains(negation)) {
-            setFalse();
-            change = true;
-            break;
-          }
-        }
-      } else {
-        // all constraints normalised ...
-        final Iterator<SimpleExpressionProxy> iter =
-          mNormalizedConstraints.iterator();
-        while (iter.hasNext()) {
-          final SimpleExpressionProxy constraint = iter.next();
-          for (final SimplificationRule rule : mRewriteRules) {
-            if (rule.match(constraint, this)) {
-              // System.err.println
-              //   ("MATCH: " + rule.getClass().getName() + " " + constraint);
-              if (rule.isMakingReplacement()) {
-                iter.remove();
-              }
-              rule.execute(this);
-              change = true;
-              continue outer;
-            }
-          }
-        }
-        break;
-      }
-    }
-    return change;
+    return mContext;
   }
 
 
@@ -285,7 +329,7 @@ public class ConstraintPropagator
 
   void setFalse()
   {
-    mIsFalse = true;
+    mIsUnsatisfiable = true;
     mUnprocessedConstraints.clear();
     mNormalizedConstraints.clear();
   }
@@ -356,8 +400,19 @@ public class ConstraintPropagator
                            AbstractBinding> entry :
              context.mBindings.entrySet()) {
         final ProxyAccessor<SimpleExpressionProxy> accessor = entry.getKey();
-        final AbstractBinding binding = entry.getValue().clone();
-        mBindings.put(accessor, binding);
+        final AbstractBinding binding = entry.getValue();
+        final AbstractBinding clone;
+        if (binding instanceof IntBinding) {
+          final IntBinding intbinding = (IntBinding) binding;
+          clone = new IntBinding(intbinding);
+        } else if (binding instanceof EnumBinding) {
+          final EnumBinding enumbinding = (EnumBinding) binding;
+          clone = new EnumBinding(enumbinding);
+        } else {
+          throw new ClassCastException
+            ("Unknown binding type " + binding.getClass().getName() + "!");
+        }
+        mBindings.put(accessor, clone);
       }
     }
 
@@ -514,7 +569,7 @@ public class ConstraintPropagator
       do {
         for (final AbstractBinding binding : mBindings.values()) {
           if (binding.reevaluate()) {
-            if (mIsFalse) {
+            if (mIsUnsatisfiable) {
               return;
             } else {
               changed = binding;
@@ -524,6 +579,18 @@ public class ConstraintPropagator
           }
         }
       } while (changed != null);
+    }
+
+    BinaryExpressionProxy recallBinding(final SimpleExpressionProxy varname)
+    {
+      final ProxyAccessor<SimpleExpressionProxy> accessor =
+        new ProxyAccessorByContents<SimpleExpressionProxy>(varname);
+      AbstractBinding binding = mBindings.get(accessor);
+      if (binding == null) {
+        return null;
+      } else {
+        return binding.recall();
+      }
     }
 
     //#######################################################################
@@ -549,7 +616,6 @@ public class ConstraintPropagator
   //#########################################################################
   //# Inner Class AbstractBinding
   private abstract class AbstractBinding
-    implements Cloneable
   {
 
     //#######################################################################
@@ -563,15 +629,29 @@ public class ConstraintPropagator
       setConstrainedRange(range);
     }
 
-    //#######################################################################
-    //# Interface java.lang.Cloneable
-    public AbstractBinding clone()
+    AbstractBinding(final AbstractBinding binding)
     {
-      try {
-        return (AbstractBinding) super.clone();
-      } catch (final CloneNotSupportedException exception) {
-        throw new WatersRuntimeException(exception);
+      mVariableName = binding.mVariableName;
+      mIsAtomic = binding.mIsAtomic;
+      mBoundExpression = binding.mBoundExpression;
+      mConstrainedRange = binding.mConstrainedRange;
+    }
+
+    //#######################################################################
+    //# Overrides for Base Class java.lang.Object
+    public String toString()
+    {
+      final StringBuffer buffer = new StringBuffer();
+      buffer.append(mVariableName.toString());
+      buffer.append("=");
+      if (mBoundExpression == null) {
+        buffer.append("?");
+      } else {
+        buffer.append(mBoundExpression.toString());
       }
+      buffer.append(" : ");
+      buffer.append(mConstrainedRange.toString());
+      return buffer.toString();
     }
 
     //#######################################################################
@@ -673,6 +753,19 @@ public class ConstraintPropagator
       }
     }
 
+    BinaryExpressionProxy recall()
+    {
+      if (mBoundExpression == null) {
+        return null;
+      } else {
+        final BinaryOperator op = mOperatorTable.getEqualsOperator();
+        final BinaryExpressionProxy eqn = mFactory.createBinaryExpressionProxy
+          (op, mVariableName, mBoundExpression);
+        mBoundExpression = null;
+        return eqn;
+      }
+    }
+
     //#######################################################################
     //# Constraint Retrieval
     void addAllConstraints(final Collection<SimpleExpressionProxy> result,
@@ -735,6 +828,11 @@ public class ConstraintPropagator
       super(varname, range, expr);
     }
 
+    IntBinding(final IntBinding binding)
+    {
+      super(binding);
+    }
+
     //#######################################################################
     //# Simple Access
     CompiledIntRange getIntRange()
@@ -752,7 +850,7 @@ public class ConstraintPropagator
     void addEquationConstraint(final Collection<SimpleExpressionProxy> result)
     {
       if (isAtomic()) {
-        final CompiledIntRange range = getIntRange();
+        final CompiledIntRange range = getOriginalIntRange();
         if (range.isBooleanRange()) {
           final SimpleExpressionProxy varname = getVariableName();
           final IntConstantProxy intconst =
@@ -825,6 +923,11 @@ public class ConstraintPropagator
       super(varname, range, expr);
     }
 
+    EnumBinding(final EnumBinding binding)
+    {
+      super(binding);
+    }
+
     //#######################################################################
     //# Simple Access
     CompiledEnumRange getEnumRange()
@@ -892,7 +995,6 @@ public class ConstraintPropagator
 
   private List<SimpleExpressionProxy> mUnprocessedConstraints;
   private Collection<SimpleExpressionProxy> mNormalizedConstraints;
-  private Collection<SimpleExpressionProxy> mProcessedEquations;
-  private boolean mIsFalse;
+  private boolean mIsUnsatisfiable;
 
 }

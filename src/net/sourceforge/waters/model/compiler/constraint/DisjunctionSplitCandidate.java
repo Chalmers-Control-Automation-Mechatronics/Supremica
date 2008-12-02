@@ -49,6 +49,11 @@ class DisjunctionSplitCandidate
 
   //#########################################################################
   //# Interface net.sourceforge.waters.model.compiler.constraint.SplitCandidate
+  public SimpleExpressionProxy getRecallable()
+  {
+    return null;
+  }
+
   public List<SimpleExpressionProxy> getSplitExpressions
     (final ModuleProxyFactory factory, final CompilerOperatorTable optable)
   {
@@ -63,7 +68,7 @@ class DisjunctionSplitCandidate
   //# net.sourceforge.waters.model.compiler.constraint.AbstractSplitCandidate
   int getNumberOfOccurrences()
   {
-    return 1;
+    return 2;
   }
 
   int getSplitSize()

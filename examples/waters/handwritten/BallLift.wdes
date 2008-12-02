@@ -11,35 +11,35 @@
 <Event Kind="UNCONTROLLABLE" Name="ball_start[1]"/>
 <Event Kind="UNCONTROLLABLE" Name="ball_start[2]"/>
 <Event Kind="UNCONTROLLABLE" Name="ball_up[1].{!qUp}"/>
-<Event Kind="UNCONTROLLABLE" Name="ball_up[1].{qUp}"/>
+<Event Kind="UNCONTROLLABLE" Name="ball_up[1].{!iLiftDn}"/>
 <Event Kind="UNCONTROLLABLE" Name="ball_up[2].{!qUp}"/>
-<Event Kind="UNCONTROLLABLE" Name="ball_up[2].{qUp}"/>
-<Event Kind="CONTROLLABLE" Name="controller.{c_iBallDn==0,iBallDn==0,iBallUp==0,iLiftDn==0}"/>
-<Event Kind="CONTROLLABLE" Name="controller.{c_iBallDn==0,iBallDn==0,iBallUp==0,iLiftDn==1}"/>
-<Event Kind="CONTROLLABLE" Name="controller.{c_iBallDn==0,iBallDn==0,iBallUp==1,iLiftDn==0}"/>
-<Event Kind="CONTROLLABLE" Name="controller.{c_iBallDn==0,iBallDn==0,iBallUp==1,iLiftDn==1}"/>
-<Event Kind="CONTROLLABLE" Name="controller.{c_iBallDn==0,iBallDn==1,iBallUp==0,iLiftDn==0}"/>
-<Event Kind="CONTROLLABLE" Name="controller.{c_iBallDn==0,iBallDn==1,iBallUp==0,iLiftDn==1}"/>
-<Event Kind="CONTROLLABLE" Name="controller.{c_iBallDn==0,iBallDn==1,iBallUp==1,iLiftDn==0}"/>
-<Event Kind="CONTROLLABLE" Name="controller.{c_iBallDn==0,iBallDn==1,iBallUp==1,iLiftDn==1}"/>
-<Event Kind="CONTROLLABLE" Name="controller.{c_iBallDn==1,iBallDn==0,iBallUp==0,iLiftDn==0}"/>
-<Event Kind="CONTROLLABLE" Name="controller.{c_iBallDn==1,iBallDn==0,iBallUp==0,iLiftDn==1}"/>
-<Event Kind="CONTROLLABLE" Name="controller.{c_iBallDn==1,iBallDn==0,iBallUp==1,iLiftDn==0}"/>
-<Event Kind="CONTROLLABLE" Name="controller.{c_iBallDn==1,iBallDn==0,iBallUp==1,iLiftDn==1}"/>
-<Event Kind="CONTROLLABLE" Name="controller.{c_iBallDn==1,iBallDn==1,iBallUp==0,iLiftDn==0}"/>
-<Event Kind="CONTROLLABLE" Name="controller.{c_iBallDn==1,iBallDn==1,iBallUp==0,iLiftDn==1}"/>
-<Event Kind="CONTROLLABLE" Name="controller.{c_iBallDn==1,iBallDn==1,iBallUp==1,iLiftDn==0}"/>
-<Event Kind="CONTROLLABLE" Name="controller.{c_iBallDn==1,iBallDn==1,iBallUp==1,iLiftDn==1}"/>
-<Event Kind="CONTROLLABLE" Name="controller.{c_iBallUp==0,iBallDn==0,iBallUp==0,iLiftDn==0}"/>
-<Event Kind="CONTROLLABLE" Name="controller.{c_iBallUp==0,iBallDn==0,iBallUp==0,iLiftDn==1}"/>
-<Event Kind="CONTROLLABLE" Name="controller.{c_iBallUp==0,iBallDn==0,iBallUp==1,iLiftDn==0}"/>
-<Event Kind="CONTROLLABLE" Name="controller.{c_iBallUp==0,iBallDn==0,iBallUp==1,iLiftDn==1}"/>
-<Event Kind="CONTROLLABLE" Name="controller.{c_iBallUp==0,iBallDn==1,iBallUp==0,iLiftDn==0}"/>
-<Event Kind="CONTROLLABLE" Name="controller.{c_iBallUp==0,iBallDn==1,iBallUp==0,iLiftDn==1}"/>
-<Event Kind="CONTROLLABLE" Name="controller.{c_iBallUp==0,iBallDn==1,iBallUp==1,iLiftDn==0}"/>
-<Event Kind="CONTROLLABLE" Name="controller.{c_iBallUp==0,iBallDn==1,iBallUp==1,iLiftDn==1}"/>
-<Event Kind="UNCONTROLLABLE" Name="lift.{iLiftDn'==0}"/>
-<Event Kind="UNCONTROLLABLE" Name="lift.{iLiftDn'==1}"/>
+<Event Kind="UNCONTROLLABLE" Name="ball_up[2].{!iLiftDn}"/>
+<Event Kind="CONTROLLABLE" Name="controller.{!c_iBallDn,!iBallDn,!iBallUp,!iLiftDn}"/>
+<Event Kind="CONTROLLABLE" Name="controller.{!c_iBallDn,!iBallDn,!iBallUp,iLiftDn}"/>
+<Event Kind="CONTROLLABLE" Name="controller.{!c_iBallDn,!iBallDn,iBallUp,!iLiftDn}"/>
+<Event Kind="CONTROLLABLE" Name="controller.{!c_iBallDn,!iBallDn,iBallUp,iLiftDn}"/>
+<Event Kind="CONTROLLABLE" Name="controller.{!c_iBallDn,iBallDn,!iBallUp,!iLiftDn}"/>
+<Event Kind="CONTROLLABLE" Name="controller.{!c_iBallDn,iBallDn,!iBallUp,iLiftDn}"/>
+<Event Kind="CONTROLLABLE" Name="controller.{!c_iBallDn,iBallDn,iBallUp,!iLiftDn}"/>
+<Event Kind="CONTROLLABLE" Name="controller.{!c_iBallDn,iBallDn,iBallUp,iLiftDn}"/>
+<Event Kind="CONTROLLABLE" Name="controller.{c_iBallDn,!iBallDn,!iBallUp,!iLiftDn}"/>
+<Event Kind="CONTROLLABLE" Name="controller.{c_iBallDn,!iBallDn,!iBallUp,iLiftDn}"/>
+<Event Kind="CONTROLLABLE" Name="controller.{c_iBallDn,!iBallDn,iBallUp,!iLiftDn}"/>
+<Event Kind="CONTROLLABLE" Name="controller.{c_iBallDn,!iBallDn,iBallUp,iLiftDn}"/>
+<Event Kind="CONTROLLABLE" Name="controller.{c_iBallDn,iBallDn,!iBallUp,!iLiftDn}"/>
+<Event Kind="CONTROLLABLE" Name="controller.{c_iBallDn,iBallDn,!iBallUp,iLiftDn}"/>
+<Event Kind="CONTROLLABLE" Name="controller.{c_iBallDn,iBallDn,iBallUp,!iLiftDn}"/>
+<Event Kind="CONTROLLABLE" Name="controller.{c_iBallDn,iBallDn,iBallUp,iLiftDn}"/>
+<Event Kind="CONTROLLABLE" Name="controller.{!c_iBallUp,!iBallDn,!iBallUp,!iLiftDn}"/>
+<Event Kind="CONTROLLABLE" Name="controller.{!c_iBallUp,!iBallDn,!iBallUp,iLiftDn}"/>
+<Event Kind="CONTROLLABLE" Name="controller.{!c_iBallUp,!iBallDn,iBallUp,!iLiftDn}"/>
+<Event Kind="CONTROLLABLE" Name="controller.{!c_iBallUp,!iBallDn,iBallUp,iLiftDn}"/>
+<Event Kind="CONTROLLABLE" Name="controller.{!c_iBallUp,iBallDn,!iBallUp,!iLiftDn}"/>
+<Event Kind="CONTROLLABLE" Name="controller.{!c_iBallUp,iBallDn,!iBallUp,iLiftDn}"/>
+<Event Kind="CONTROLLABLE" Name="controller.{!c_iBallUp,iBallDn,iBallUp,!iLiftDn}"/>
+<Event Kind="CONTROLLABLE" Name="controller.{!c_iBallUp,iBallDn,iBallUp,iLiftDn}"/>
+<Event Kind="UNCONTROLLABLE" Name="lift.{!iLiftDn'}"/>
+<Event Kind="UNCONTROLLABLE" Name="lift.{iLiftDn'}"/>
 </EventList>
 <AutomataList>
 <Automaton Kind="PLANT" Name="ball[1]">
@@ -49,7 +49,7 @@
 <EventRef Name="ball_finish[1]"/>
 <EventRef Name="ball_start[1]"/>
 <EventRef Name="ball_up[1].{!qUp}"/>
-<EventRef Name="ball_up[1].{qUp}"/>
+<EventRef Name="ball_up[1].{!iLiftDn}"/>
 </EventRefList>
 <StateList>
 <State Name="dn"/>
@@ -60,7 +60,7 @@
 <TransitionList>
 <Transition Target="mdl" Source="dn" Event="ball_down[1].{qUp}"/>
 <Transition Target="dn" Source="mdl" Event="ball_down[1].{!qUp}"/>
-<Transition Target="up" Source="mdl" Event="ball_up[1].{qUp}"/>
+<Transition Target="up" Source="mdl" Event="ball_up[1].{!iLiftDn}"/>
 <Transition Target="dn" Source="out" Event="ball_start[1]"/>
 <Transition Target="out" Source="up" Event="ball_finish[1]"/>
 <Transition Target="mdl" Source="up" Event="ball_up[1].{!qUp}"/>
@@ -73,7 +73,7 @@
 <EventRef Name="ball_finish[2]"/>
 <EventRef Name="ball_start[2]"/>
 <EventRef Name="ball_up[2].{!qUp}"/>
-<EventRef Name="ball_up[2].{qUp}"/>
+<EventRef Name="ball_up[2].{!iLiftDn}"/>
 </EventRefList>
 <StateList>
 <State Name="dn"/>
@@ -84,7 +84,7 @@
 <TransitionList>
 <Transition Target="mdl" Source="dn" Event="ball_down[2].{qUp}"/>
 <Transition Target="dn" Source="mdl" Event="ball_down[2].{!qUp}"/>
-<Transition Target="up" Source="mdl" Event="ball_up[2].{qUp}"/>
+<Transition Target="up" Source="mdl" Event="ball_up[2].{!iLiftDn}"/>
 <Transition Target="dn" Source="out" Event="ball_start[2]"/>
 <Transition Target="out" Source="up" Event="ball_finish[2]"/>
 <Transition Target="mdl" Source="up" Event="ball_up[2].{!qUp}"/>
@@ -92,208 +92,208 @@
 </Automaton>
 <Automaton Kind="PLANT" Name="c_iBallDn">
 <EventRefList>
-<EventRef Name="controller.{c_iBallDn==0,iBallDn==0,iBallUp==0,iLiftDn==0}"/>
-<EventRef Name="controller.{c_iBallDn==0,iBallDn==0,iBallUp==0,iLiftDn==1}"/>
-<EventRef Name="controller.{c_iBallDn==0,iBallDn==0,iBallUp==1,iLiftDn==0}"/>
-<EventRef Name="controller.{c_iBallDn==0,iBallDn==0,iBallUp==1,iLiftDn==1}"/>
-<EventRef Name="controller.{c_iBallDn==0,iBallDn==1,iBallUp==0,iLiftDn==0}"/>
-<EventRef Name="controller.{c_iBallDn==0,iBallDn==1,iBallUp==0,iLiftDn==1}"/>
-<EventRef Name="controller.{c_iBallDn==0,iBallDn==1,iBallUp==1,iLiftDn==0}"/>
-<EventRef Name="controller.{c_iBallDn==0,iBallDn==1,iBallUp==1,iLiftDn==1}"/>
-<EventRef Name="controller.{c_iBallDn==1,iBallDn==0,iBallUp==0,iLiftDn==0}"/>
-<EventRef Name="controller.{c_iBallDn==1,iBallDn==0,iBallUp==0,iLiftDn==1}"/>
-<EventRef Name="controller.{c_iBallDn==1,iBallDn==0,iBallUp==1,iLiftDn==0}"/>
-<EventRef Name="controller.{c_iBallDn==1,iBallDn==0,iBallUp==1,iLiftDn==1}"/>
-<EventRef Name="controller.{c_iBallDn==1,iBallDn==1,iBallUp==0,iLiftDn==0}"/>
-<EventRef Name="controller.{c_iBallDn==1,iBallDn==1,iBallUp==0,iLiftDn==1}"/>
-<EventRef Name="controller.{c_iBallDn==1,iBallDn==1,iBallUp==1,iLiftDn==0}"/>
-<EventRef Name="controller.{c_iBallDn==1,iBallDn==1,iBallUp==1,iLiftDn==1}"/>
-<EventRef Name="controller.{c_iBallUp==0,iBallDn==0,iBallUp==0,iLiftDn==0}"/>
-<EventRef Name="controller.{c_iBallUp==0,iBallDn==0,iBallUp==0,iLiftDn==1}"/>
-<EventRef Name="controller.{c_iBallUp==0,iBallDn==0,iBallUp==1,iLiftDn==0}"/>
-<EventRef Name="controller.{c_iBallUp==0,iBallDn==0,iBallUp==1,iLiftDn==1}"/>
-<EventRef Name="controller.{c_iBallUp==0,iBallDn==1,iBallUp==0,iLiftDn==0}"/>
-<EventRef Name="controller.{c_iBallUp==0,iBallDn==1,iBallUp==0,iLiftDn==1}"/>
-<EventRef Name="controller.{c_iBallUp==0,iBallDn==1,iBallUp==1,iLiftDn==0}"/>
-<EventRef Name="controller.{c_iBallUp==0,iBallDn==1,iBallUp==1,iLiftDn==1}"/>
+<EventRef Name="controller.{!c_iBallDn,!iBallDn,!iBallUp,!iLiftDn}"/>
+<EventRef Name="controller.{!c_iBallDn,!iBallDn,!iBallUp,iLiftDn}"/>
+<EventRef Name="controller.{!c_iBallDn,!iBallDn,iBallUp,!iLiftDn}"/>
+<EventRef Name="controller.{!c_iBallDn,!iBallDn,iBallUp,iLiftDn}"/>
+<EventRef Name="controller.{!c_iBallDn,iBallDn,!iBallUp,!iLiftDn}"/>
+<EventRef Name="controller.{!c_iBallDn,iBallDn,!iBallUp,iLiftDn}"/>
+<EventRef Name="controller.{!c_iBallDn,iBallDn,iBallUp,!iLiftDn}"/>
+<EventRef Name="controller.{!c_iBallDn,iBallDn,iBallUp,iLiftDn}"/>
+<EventRef Name="controller.{c_iBallDn,!iBallDn,!iBallUp,!iLiftDn}"/>
+<EventRef Name="controller.{c_iBallDn,!iBallDn,!iBallUp,iLiftDn}"/>
+<EventRef Name="controller.{c_iBallDn,!iBallDn,iBallUp,!iLiftDn}"/>
+<EventRef Name="controller.{c_iBallDn,!iBallDn,iBallUp,iLiftDn}"/>
+<EventRef Name="controller.{c_iBallDn,iBallDn,!iBallUp,!iLiftDn}"/>
+<EventRef Name="controller.{c_iBallDn,iBallDn,!iBallUp,iLiftDn}"/>
+<EventRef Name="controller.{c_iBallDn,iBallDn,iBallUp,!iLiftDn}"/>
+<EventRef Name="controller.{c_iBallDn,iBallDn,iBallUp,iLiftDn}"/>
+<EventRef Name="controller.{!c_iBallUp,!iBallDn,!iBallUp,!iLiftDn}"/>
+<EventRef Name="controller.{!c_iBallUp,!iBallDn,!iBallUp,iLiftDn}"/>
+<EventRef Name="controller.{!c_iBallUp,!iBallDn,iBallUp,!iLiftDn}"/>
+<EventRef Name="controller.{!c_iBallUp,!iBallDn,iBallUp,iLiftDn}"/>
+<EventRef Name="controller.{!c_iBallUp,iBallDn,!iBallUp,!iLiftDn}"/>
+<EventRef Name="controller.{!c_iBallUp,iBallDn,!iBallUp,iLiftDn}"/>
+<EventRef Name="controller.{!c_iBallUp,iBallDn,iBallUp,!iLiftDn}"/>
+<EventRef Name="controller.{!c_iBallUp,iBallDn,iBallUp,iLiftDn}"/>
 </EventRefList>
 <StateList>
 <State Initial="true" Name="0"/>
 <State Name="1"/>
 </StateList>
 <TransitionList>
-<Transition Target="0" Source="0" Event="controller.{c_iBallDn==0,iBallDn==0,iBallUp==0,iLiftDn==0}"/>
-<Transition Target="0" Source="0" Event="controller.{c_iBallDn==0,iBallDn==0,iBallUp==0,iLiftDn==1}"/>
-<Transition Target="0" Source="0" Event="controller.{c_iBallDn==0,iBallDn==0,iBallUp==1,iLiftDn==0}"/>
-<Transition Target="0" Source="0" Event="controller.{c_iBallDn==0,iBallDn==0,iBallUp==1,iLiftDn==1}"/>
-<Transition Target="1" Source="0" Event="controller.{c_iBallDn==0,iBallDn==1,iBallUp==0,iLiftDn==0}"/>
-<Transition Target="1" Source="0" Event="controller.{c_iBallDn==0,iBallDn==1,iBallUp==0,iLiftDn==1}"/>
-<Transition Target="1" Source="0" Event="controller.{c_iBallDn==0,iBallDn==1,iBallUp==1,iLiftDn==0}"/>
-<Transition Target="1" Source="0" Event="controller.{c_iBallDn==0,iBallDn==1,iBallUp==1,iLiftDn==1}"/>
-<Transition Target="0" Source="0" Event="controller.{c_iBallUp==0,iBallDn==0,iBallUp==0,iLiftDn==0}"/>
-<Transition Target="0" Source="0" Event="controller.{c_iBallUp==0,iBallDn==0,iBallUp==0,iLiftDn==1}"/>
-<Transition Target="0" Source="0" Event="controller.{c_iBallUp==0,iBallDn==0,iBallUp==1,iLiftDn==0}"/>
-<Transition Target="0" Source="0" Event="controller.{c_iBallUp==0,iBallDn==0,iBallUp==1,iLiftDn==1}"/>
-<Transition Target="1" Source="0" Event="controller.{c_iBallUp==0,iBallDn==1,iBallUp==0,iLiftDn==0}"/>
-<Transition Target="1" Source="0" Event="controller.{c_iBallUp==0,iBallDn==1,iBallUp==0,iLiftDn==1}"/>
-<Transition Target="1" Source="0" Event="controller.{c_iBallUp==0,iBallDn==1,iBallUp==1,iLiftDn==0}"/>
-<Transition Target="1" Source="0" Event="controller.{c_iBallUp==0,iBallDn==1,iBallUp==1,iLiftDn==1}"/>
-<Transition Target="0" Source="1" Event="controller.{c_iBallDn==1,iBallDn==0,iBallUp==0,iLiftDn==0}"/>
-<Transition Target="0" Source="1" Event="controller.{c_iBallDn==1,iBallDn==0,iBallUp==0,iLiftDn==1}"/>
-<Transition Target="0" Source="1" Event="controller.{c_iBallDn==1,iBallDn==0,iBallUp==1,iLiftDn==0}"/>
-<Transition Target="0" Source="1" Event="controller.{c_iBallDn==1,iBallDn==0,iBallUp==1,iLiftDn==1}"/>
-<Transition Target="1" Source="1" Event="controller.{c_iBallDn==1,iBallDn==1,iBallUp==0,iLiftDn==0}"/>
-<Transition Target="1" Source="1" Event="controller.{c_iBallDn==1,iBallDn==1,iBallUp==0,iLiftDn==1}"/>
-<Transition Target="1" Source="1" Event="controller.{c_iBallDn==1,iBallDn==1,iBallUp==1,iLiftDn==0}"/>
-<Transition Target="1" Source="1" Event="controller.{c_iBallDn==1,iBallDn==1,iBallUp==1,iLiftDn==1}"/>
-<Transition Target="0" Source="1" Event="controller.{c_iBallUp==0,iBallDn==0,iBallUp==0,iLiftDn==0}"/>
-<Transition Target="0" Source="1" Event="controller.{c_iBallUp==0,iBallDn==0,iBallUp==0,iLiftDn==1}"/>
-<Transition Target="0" Source="1" Event="controller.{c_iBallUp==0,iBallDn==0,iBallUp==1,iLiftDn==0}"/>
-<Transition Target="0" Source="1" Event="controller.{c_iBallUp==0,iBallDn==0,iBallUp==1,iLiftDn==1}"/>
-<Transition Target="1" Source="1" Event="controller.{c_iBallUp==0,iBallDn==1,iBallUp==0,iLiftDn==0}"/>
-<Transition Target="1" Source="1" Event="controller.{c_iBallUp==0,iBallDn==1,iBallUp==0,iLiftDn==1}"/>
-<Transition Target="1" Source="1" Event="controller.{c_iBallUp==0,iBallDn==1,iBallUp==1,iLiftDn==0}"/>
-<Transition Target="1" Source="1" Event="controller.{c_iBallUp==0,iBallDn==1,iBallUp==1,iLiftDn==1}"/>
+<Transition Target="0" Source="0" Event="controller.{!c_iBallDn,!iBallDn,!iBallUp,!iLiftDn}"/>
+<Transition Target="0" Source="0" Event="controller.{!c_iBallDn,!iBallDn,!iBallUp,iLiftDn}"/>
+<Transition Target="0" Source="0" Event="controller.{!c_iBallDn,!iBallDn,iBallUp,!iLiftDn}"/>
+<Transition Target="0" Source="0" Event="controller.{!c_iBallDn,!iBallDn,iBallUp,iLiftDn}"/>
+<Transition Target="1" Source="0" Event="controller.{!c_iBallDn,iBallDn,!iBallUp,!iLiftDn}"/>
+<Transition Target="1" Source="0" Event="controller.{!c_iBallDn,iBallDn,!iBallUp,iLiftDn}"/>
+<Transition Target="1" Source="0" Event="controller.{!c_iBallDn,iBallDn,iBallUp,!iLiftDn}"/>
+<Transition Target="1" Source="0" Event="controller.{!c_iBallDn,iBallDn,iBallUp,iLiftDn}"/>
+<Transition Target="0" Source="0" Event="controller.{!c_iBallUp,!iBallDn,!iBallUp,!iLiftDn}"/>
+<Transition Target="0" Source="0" Event="controller.{!c_iBallUp,!iBallDn,!iBallUp,iLiftDn}"/>
+<Transition Target="0" Source="0" Event="controller.{!c_iBallUp,!iBallDn,iBallUp,!iLiftDn}"/>
+<Transition Target="0" Source="0" Event="controller.{!c_iBallUp,!iBallDn,iBallUp,iLiftDn}"/>
+<Transition Target="1" Source="0" Event="controller.{!c_iBallUp,iBallDn,!iBallUp,!iLiftDn}"/>
+<Transition Target="1" Source="0" Event="controller.{!c_iBallUp,iBallDn,!iBallUp,iLiftDn}"/>
+<Transition Target="1" Source="0" Event="controller.{!c_iBallUp,iBallDn,iBallUp,!iLiftDn}"/>
+<Transition Target="1" Source="0" Event="controller.{!c_iBallUp,iBallDn,iBallUp,iLiftDn}"/>
+<Transition Target="0" Source="1" Event="controller.{c_iBallDn,!iBallDn,!iBallUp,!iLiftDn}"/>
+<Transition Target="0" Source="1" Event="controller.{c_iBallDn,!iBallDn,!iBallUp,iLiftDn}"/>
+<Transition Target="0" Source="1" Event="controller.{c_iBallDn,!iBallDn,iBallUp,!iLiftDn}"/>
+<Transition Target="0" Source="1" Event="controller.{c_iBallDn,!iBallDn,iBallUp,iLiftDn}"/>
+<Transition Target="1" Source="1" Event="controller.{c_iBallDn,iBallDn,!iBallUp,!iLiftDn}"/>
+<Transition Target="1" Source="1" Event="controller.{c_iBallDn,iBallDn,!iBallUp,iLiftDn}"/>
+<Transition Target="1" Source="1" Event="controller.{c_iBallDn,iBallDn,iBallUp,!iLiftDn}"/>
+<Transition Target="1" Source="1" Event="controller.{c_iBallDn,iBallDn,iBallUp,iLiftDn}"/>
+<Transition Target="0" Source="1" Event="controller.{!c_iBallUp,!iBallDn,!iBallUp,!iLiftDn}"/>
+<Transition Target="0" Source="1" Event="controller.{!c_iBallUp,!iBallDn,!iBallUp,iLiftDn}"/>
+<Transition Target="0" Source="1" Event="controller.{!c_iBallUp,!iBallDn,iBallUp,!iLiftDn}"/>
+<Transition Target="0" Source="1" Event="controller.{!c_iBallUp,!iBallDn,iBallUp,iLiftDn}"/>
+<Transition Target="1" Source="1" Event="controller.{!c_iBallUp,iBallDn,!iBallUp,!iLiftDn}"/>
+<Transition Target="1" Source="1" Event="controller.{!c_iBallUp,iBallDn,!iBallUp,iLiftDn}"/>
+<Transition Target="1" Source="1" Event="controller.{!c_iBallUp,iBallDn,iBallUp,!iLiftDn}"/>
+<Transition Target="1" Source="1" Event="controller.{!c_iBallUp,iBallDn,iBallUp,iLiftDn}"/>
 </TransitionList>
 </Automaton>
 <Automaton Kind="PLANT" Name="c_iBallUp">
 <EventRefList>
-<EventRef Name="controller.{c_iBallDn==0,iBallDn==0,iBallUp==0,iLiftDn==0}"/>
-<EventRef Name="controller.{c_iBallDn==0,iBallDn==0,iBallUp==0,iLiftDn==1}"/>
-<EventRef Name="controller.{c_iBallDn==0,iBallDn==0,iBallUp==1,iLiftDn==0}"/>
-<EventRef Name="controller.{c_iBallDn==0,iBallDn==0,iBallUp==1,iLiftDn==1}"/>
-<EventRef Name="controller.{c_iBallDn==0,iBallDn==1,iBallUp==0,iLiftDn==0}"/>
-<EventRef Name="controller.{c_iBallDn==0,iBallDn==1,iBallUp==0,iLiftDn==1}"/>
-<EventRef Name="controller.{c_iBallDn==0,iBallDn==1,iBallUp==1,iLiftDn==0}"/>
-<EventRef Name="controller.{c_iBallDn==0,iBallDn==1,iBallUp==1,iLiftDn==1}"/>
-<EventRef Name="controller.{c_iBallDn==1,iBallDn==0,iBallUp==0,iLiftDn==0}"/>
-<EventRef Name="controller.{c_iBallDn==1,iBallDn==0,iBallUp==0,iLiftDn==1}"/>
-<EventRef Name="controller.{c_iBallDn==1,iBallDn==0,iBallUp==1,iLiftDn==0}"/>
-<EventRef Name="controller.{c_iBallDn==1,iBallDn==0,iBallUp==1,iLiftDn==1}"/>
-<EventRef Name="controller.{c_iBallDn==1,iBallDn==1,iBallUp==0,iLiftDn==0}"/>
-<EventRef Name="controller.{c_iBallDn==1,iBallDn==1,iBallUp==0,iLiftDn==1}"/>
-<EventRef Name="controller.{c_iBallDn==1,iBallDn==1,iBallUp==1,iLiftDn==0}"/>
-<EventRef Name="controller.{c_iBallDn==1,iBallDn==1,iBallUp==1,iLiftDn==1}"/>
-<EventRef Name="controller.{c_iBallUp==0,iBallDn==0,iBallUp==0,iLiftDn==0}"/>
-<EventRef Name="controller.{c_iBallUp==0,iBallDn==0,iBallUp==0,iLiftDn==1}"/>
-<EventRef Name="controller.{c_iBallUp==0,iBallDn==0,iBallUp==1,iLiftDn==0}"/>
-<EventRef Name="controller.{c_iBallUp==0,iBallDn==0,iBallUp==1,iLiftDn==1}"/>
-<EventRef Name="controller.{c_iBallUp==0,iBallDn==1,iBallUp==0,iLiftDn==0}"/>
-<EventRef Name="controller.{c_iBallUp==0,iBallDn==1,iBallUp==0,iLiftDn==1}"/>
-<EventRef Name="controller.{c_iBallUp==0,iBallDn==1,iBallUp==1,iLiftDn==0}"/>
-<EventRef Name="controller.{c_iBallUp==0,iBallDn==1,iBallUp==1,iLiftDn==1}"/>
+<EventRef Name="controller.{!c_iBallDn,!iBallDn,!iBallUp,!iLiftDn}"/>
+<EventRef Name="controller.{!c_iBallDn,!iBallDn,!iBallUp,iLiftDn}"/>
+<EventRef Name="controller.{!c_iBallDn,!iBallDn,iBallUp,!iLiftDn}"/>
+<EventRef Name="controller.{!c_iBallDn,!iBallDn,iBallUp,iLiftDn}"/>
+<EventRef Name="controller.{!c_iBallDn,iBallDn,!iBallUp,!iLiftDn}"/>
+<EventRef Name="controller.{!c_iBallDn,iBallDn,!iBallUp,iLiftDn}"/>
+<EventRef Name="controller.{!c_iBallDn,iBallDn,iBallUp,!iLiftDn}"/>
+<EventRef Name="controller.{!c_iBallDn,iBallDn,iBallUp,iLiftDn}"/>
+<EventRef Name="controller.{c_iBallDn,!iBallDn,!iBallUp,!iLiftDn}"/>
+<EventRef Name="controller.{c_iBallDn,!iBallDn,!iBallUp,iLiftDn}"/>
+<EventRef Name="controller.{c_iBallDn,!iBallDn,iBallUp,!iLiftDn}"/>
+<EventRef Name="controller.{c_iBallDn,!iBallDn,iBallUp,iLiftDn}"/>
+<EventRef Name="controller.{c_iBallDn,iBallDn,!iBallUp,!iLiftDn}"/>
+<EventRef Name="controller.{c_iBallDn,iBallDn,!iBallUp,iLiftDn}"/>
+<EventRef Name="controller.{c_iBallDn,iBallDn,iBallUp,!iLiftDn}"/>
+<EventRef Name="controller.{c_iBallDn,iBallDn,iBallUp,iLiftDn}"/>
+<EventRef Name="controller.{!c_iBallUp,!iBallDn,!iBallUp,!iLiftDn}"/>
+<EventRef Name="controller.{!c_iBallUp,!iBallDn,!iBallUp,iLiftDn}"/>
+<EventRef Name="controller.{!c_iBallUp,!iBallDn,iBallUp,!iLiftDn}"/>
+<EventRef Name="controller.{!c_iBallUp,!iBallDn,iBallUp,iLiftDn}"/>
+<EventRef Name="controller.{!c_iBallUp,iBallDn,!iBallUp,!iLiftDn}"/>
+<EventRef Name="controller.{!c_iBallUp,iBallDn,!iBallUp,iLiftDn}"/>
+<EventRef Name="controller.{!c_iBallUp,iBallDn,iBallUp,!iLiftDn}"/>
+<EventRef Name="controller.{!c_iBallUp,iBallDn,iBallUp,iLiftDn}"/>
 </EventRefList>
 <StateList>
 <State Initial="true" Name="0"/>
 <State Name="1"/>
 </StateList>
 <TransitionList>
-<Transition Target="0" Source="0" Event="controller.{c_iBallUp==0,iBallDn==0,iBallUp==0,iLiftDn==0}"/>
-<Transition Target="0" Source="0" Event="controller.{c_iBallUp==0,iBallDn==0,iBallUp==0,iLiftDn==1}"/>
-<Transition Target="1" Source="0" Event="controller.{c_iBallUp==0,iBallDn==0,iBallUp==1,iLiftDn==0}"/>
-<Transition Target="1" Source="0" Event="controller.{c_iBallUp==0,iBallDn==0,iBallUp==1,iLiftDn==1}"/>
-<Transition Target="0" Source="0" Event="controller.{c_iBallUp==0,iBallDn==1,iBallUp==0,iLiftDn==0}"/>
-<Transition Target="0" Source="0" Event="controller.{c_iBallUp==0,iBallDn==1,iBallUp==0,iLiftDn==1}"/>
-<Transition Target="1" Source="0" Event="controller.{c_iBallUp==0,iBallDn==1,iBallUp==1,iLiftDn==0}"/>
-<Transition Target="1" Source="0" Event="controller.{c_iBallUp==0,iBallDn==1,iBallUp==1,iLiftDn==1}"/>
-<Transition Target="0" Source="1" Event="controller.{c_iBallDn==0,iBallDn==0,iBallUp==0,iLiftDn==0}"/>
-<Transition Target="0" Source="1" Event="controller.{c_iBallDn==0,iBallDn==0,iBallUp==0,iLiftDn==1}"/>
-<Transition Target="1" Source="1" Event="controller.{c_iBallDn==0,iBallDn==0,iBallUp==1,iLiftDn==0}"/>
-<Transition Target="1" Source="1" Event="controller.{c_iBallDn==0,iBallDn==0,iBallUp==1,iLiftDn==1}"/>
-<Transition Target="0" Source="1" Event="controller.{c_iBallDn==0,iBallDn==1,iBallUp==0,iLiftDn==0}"/>
-<Transition Target="0" Source="1" Event="controller.{c_iBallDn==0,iBallDn==1,iBallUp==0,iLiftDn==1}"/>
-<Transition Target="1" Source="1" Event="controller.{c_iBallDn==0,iBallDn==1,iBallUp==1,iLiftDn==0}"/>
-<Transition Target="1" Source="1" Event="controller.{c_iBallDn==0,iBallDn==1,iBallUp==1,iLiftDn==1}"/>
-<Transition Target="0" Source="1" Event="controller.{c_iBallDn==1,iBallDn==0,iBallUp==0,iLiftDn==0}"/>
-<Transition Target="0" Source="1" Event="controller.{c_iBallDn==1,iBallDn==0,iBallUp==0,iLiftDn==1}"/>
-<Transition Target="1" Source="1" Event="controller.{c_iBallDn==1,iBallDn==0,iBallUp==1,iLiftDn==0}"/>
-<Transition Target="1" Source="1" Event="controller.{c_iBallDn==1,iBallDn==0,iBallUp==1,iLiftDn==1}"/>
-<Transition Target="0" Source="1" Event="controller.{c_iBallDn==1,iBallDn==1,iBallUp==0,iLiftDn==0}"/>
-<Transition Target="0" Source="1" Event="controller.{c_iBallDn==1,iBallDn==1,iBallUp==0,iLiftDn==1}"/>
-<Transition Target="1" Source="1" Event="controller.{c_iBallDn==1,iBallDn==1,iBallUp==1,iLiftDn==0}"/>
-<Transition Target="1" Source="1" Event="controller.{c_iBallDn==1,iBallDn==1,iBallUp==1,iLiftDn==1}"/>
+<Transition Target="0" Source="0" Event="controller.{!c_iBallUp,!iBallDn,!iBallUp,!iLiftDn}"/>
+<Transition Target="0" Source="0" Event="controller.{!c_iBallUp,!iBallDn,!iBallUp,iLiftDn}"/>
+<Transition Target="1" Source="0" Event="controller.{!c_iBallUp,!iBallDn,iBallUp,!iLiftDn}"/>
+<Transition Target="1" Source="0" Event="controller.{!c_iBallUp,!iBallDn,iBallUp,iLiftDn}"/>
+<Transition Target="0" Source="0" Event="controller.{!c_iBallUp,iBallDn,!iBallUp,!iLiftDn}"/>
+<Transition Target="0" Source="0" Event="controller.{!c_iBallUp,iBallDn,!iBallUp,iLiftDn}"/>
+<Transition Target="1" Source="0" Event="controller.{!c_iBallUp,iBallDn,iBallUp,!iLiftDn}"/>
+<Transition Target="1" Source="0" Event="controller.{!c_iBallUp,iBallDn,iBallUp,iLiftDn}"/>
+<Transition Target="0" Source="1" Event="controller.{!c_iBallDn,!iBallDn,!iBallUp,!iLiftDn}"/>
+<Transition Target="0" Source="1" Event="controller.{!c_iBallDn,!iBallDn,!iBallUp,iLiftDn}"/>
+<Transition Target="1" Source="1" Event="controller.{!c_iBallDn,!iBallDn,iBallUp,!iLiftDn}"/>
+<Transition Target="1" Source="1" Event="controller.{!c_iBallDn,!iBallDn,iBallUp,iLiftDn}"/>
+<Transition Target="0" Source="1" Event="controller.{!c_iBallDn,iBallDn,!iBallUp,!iLiftDn}"/>
+<Transition Target="0" Source="1" Event="controller.{!c_iBallDn,iBallDn,!iBallUp,iLiftDn}"/>
+<Transition Target="1" Source="1" Event="controller.{!c_iBallDn,iBallDn,iBallUp,!iLiftDn}"/>
+<Transition Target="1" Source="1" Event="controller.{!c_iBallDn,iBallDn,iBallUp,iLiftDn}"/>
+<Transition Target="0" Source="1" Event="controller.{c_iBallDn,!iBallDn,!iBallUp,!iLiftDn}"/>
+<Transition Target="0" Source="1" Event="controller.{c_iBallDn,!iBallDn,!iBallUp,iLiftDn}"/>
+<Transition Target="1" Source="1" Event="controller.{c_iBallDn,!iBallDn,iBallUp,!iLiftDn}"/>
+<Transition Target="1" Source="1" Event="controller.{c_iBallDn,!iBallDn,iBallUp,iLiftDn}"/>
+<Transition Target="0" Source="1" Event="controller.{c_iBallDn,iBallDn,!iBallUp,!iLiftDn}"/>
+<Transition Target="0" Source="1" Event="controller.{c_iBallDn,iBallDn,!iBallUp,iLiftDn}"/>
+<Transition Target="1" Source="1" Event="controller.{c_iBallDn,iBallDn,iBallUp,!iLiftDn}"/>
+<Transition Target="1" Source="1" Event="controller.{c_iBallDn,iBallDn,iBallUp,iLiftDn}"/>
 </TransitionList>
 </Automaton>
 <Automaton Kind="PLANT" Name="c_iLiftDn">
 <EventRefList>
-<EventRef Name="controller.{c_iBallDn==0,iBallDn==0,iBallUp==0,iLiftDn==0}"/>
-<EventRef Name="controller.{c_iBallDn==0,iBallDn==0,iBallUp==0,iLiftDn==1}"/>
-<EventRef Name="controller.{c_iBallDn==0,iBallDn==0,iBallUp==1,iLiftDn==0}"/>
-<EventRef Name="controller.{c_iBallDn==0,iBallDn==0,iBallUp==1,iLiftDn==1}"/>
-<EventRef Name="controller.{c_iBallDn==0,iBallDn==1,iBallUp==0,iLiftDn==0}"/>
-<EventRef Name="controller.{c_iBallDn==0,iBallDn==1,iBallUp==0,iLiftDn==1}"/>
-<EventRef Name="controller.{c_iBallDn==0,iBallDn==1,iBallUp==1,iLiftDn==0}"/>
-<EventRef Name="controller.{c_iBallDn==0,iBallDn==1,iBallUp==1,iLiftDn==1}"/>
-<EventRef Name="controller.{c_iBallDn==1,iBallDn==0,iBallUp==0,iLiftDn==0}"/>
-<EventRef Name="controller.{c_iBallDn==1,iBallDn==0,iBallUp==0,iLiftDn==1}"/>
-<EventRef Name="controller.{c_iBallDn==1,iBallDn==0,iBallUp==1,iLiftDn==0}"/>
-<EventRef Name="controller.{c_iBallDn==1,iBallDn==0,iBallUp==1,iLiftDn==1}"/>
-<EventRef Name="controller.{c_iBallDn==1,iBallDn==1,iBallUp==0,iLiftDn==0}"/>
-<EventRef Name="controller.{c_iBallDn==1,iBallDn==1,iBallUp==0,iLiftDn==1}"/>
-<EventRef Name="controller.{c_iBallDn==1,iBallDn==1,iBallUp==1,iLiftDn==0}"/>
-<EventRef Name="controller.{c_iBallDn==1,iBallDn==1,iBallUp==1,iLiftDn==1}"/>
-<EventRef Name="controller.{c_iBallUp==0,iBallDn==0,iBallUp==0,iLiftDn==0}"/>
-<EventRef Name="controller.{c_iBallUp==0,iBallDn==0,iBallUp==0,iLiftDn==1}"/>
-<EventRef Name="controller.{c_iBallUp==0,iBallDn==0,iBallUp==1,iLiftDn==0}"/>
-<EventRef Name="controller.{c_iBallUp==0,iBallDn==0,iBallUp==1,iLiftDn==1}"/>
-<EventRef Name="controller.{c_iBallUp==0,iBallDn==1,iBallUp==0,iLiftDn==0}"/>
-<EventRef Name="controller.{c_iBallUp==0,iBallDn==1,iBallUp==0,iLiftDn==1}"/>
-<EventRef Name="controller.{c_iBallUp==0,iBallDn==1,iBallUp==1,iLiftDn==0}"/>
-<EventRef Name="controller.{c_iBallUp==0,iBallDn==1,iBallUp==1,iLiftDn==1}"/>
+<EventRef Name="controller.{!c_iBallDn,!iBallDn,!iBallUp,!iLiftDn}"/>
+<EventRef Name="controller.{!c_iBallDn,!iBallDn,!iBallUp,iLiftDn}"/>
+<EventRef Name="controller.{!c_iBallDn,!iBallDn,iBallUp,!iLiftDn}"/>
+<EventRef Name="controller.{!c_iBallDn,!iBallDn,iBallUp,iLiftDn}"/>
+<EventRef Name="controller.{!c_iBallDn,iBallDn,!iBallUp,!iLiftDn}"/>
+<EventRef Name="controller.{!c_iBallDn,iBallDn,!iBallUp,iLiftDn}"/>
+<EventRef Name="controller.{!c_iBallDn,iBallDn,iBallUp,!iLiftDn}"/>
+<EventRef Name="controller.{!c_iBallDn,iBallDn,iBallUp,iLiftDn}"/>
+<EventRef Name="controller.{c_iBallDn,!iBallDn,!iBallUp,!iLiftDn}"/>
+<EventRef Name="controller.{c_iBallDn,!iBallDn,!iBallUp,iLiftDn}"/>
+<EventRef Name="controller.{c_iBallDn,!iBallDn,iBallUp,!iLiftDn}"/>
+<EventRef Name="controller.{c_iBallDn,!iBallDn,iBallUp,iLiftDn}"/>
+<EventRef Name="controller.{c_iBallDn,iBallDn,!iBallUp,!iLiftDn}"/>
+<EventRef Name="controller.{c_iBallDn,iBallDn,!iBallUp,iLiftDn}"/>
+<EventRef Name="controller.{c_iBallDn,iBallDn,iBallUp,!iLiftDn}"/>
+<EventRef Name="controller.{c_iBallDn,iBallDn,iBallUp,iLiftDn}"/>
+<EventRef Name="controller.{!c_iBallUp,!iBallDn,!iBallUp,!iLiftDn}"/>
+<EventRef Name="controller.{!c_iBallUp,!iBallDn,!iBallUp,iLiftDn}"/>
+<EventRef Name="controller.{!c_iBallUp,!iBallDn,iBallUp,!iLiftDn}"/>
+<EventRef Name="controller.{!c_iBallUp,!iBallDn,iBallUp,iLiftDn}"/>
+<EventRef Name="controller.{!c_iBallUp,iBallDn,!iBallUp,!iLiftDn}"/>
+<EventRef Name="controller.{!c_iBallUp,iBallDn,!iBallUp,iLiftDn}"/>
+<EventRef Name="controller.{!c_iBallUp,iBallDn,iBallUp,!iLiftDn}"/>
+<EventRef Name="controller.{!c_iBallUp,iBallDn,iBallUp,iLiftDn}"/>
 </EventRefList>
 <StateList>
 <State Name="0"/>
 <State Initial="true" Name="1"/>
 </StateList>
 <TransitionList>
-<Transition Target="0" Source="0" Event="controller.{c_iBallDn==0,iBallDn==0,iBallUp==0,iLiftDn==0}"/>
-<Transition Target="1" Source="0" Event="controller.{c_iBallDn==0,iBallDn==0,iBallUp==0,iLiftDn==1}"/>
-<Transition Target="0" Source="0" Event="controller.{c_iBallDn==0,iBallDn==0,iBallUp==1,iLiftDn==0}"/>
-<Transition Target="1" Source="0" Event="controller.{c_iBallDn==0,iBallDn==0,iBallUp==1,iLiftDn==1}"/>
-<Transition Target="0" Source="0" Event="controller.{c_iBallDn==0,iBallDn==1,iBallUp==0,iLiftDn==0}"/>
-<Transition Target="1" Source="0" Event="controller.{c_iBallDn==0,iBallDn==1,iBallUp==0,iLiftDn==1}"/>
-<Transition Target="0" Source="0" Event="controller.{c_iBallDn==0,iBallDn==1,iBallUp==1,iLiftDn==0}"/>
-<Transition Target="1" Source="0" Event="controller.{c_iBallDn==0,iBallDn==1,iBallUp==1,iLiftDn==1}"/>
-<Transition Target="0" Source="0" Event="controller.{c_iBallDn==1,iBallDn==0,iBallUp==0,iLiftDn==0}"/>
-<Transition Target="1" Source="0" Event="controller.{c_iBallDn==1,iBallDn==0,iBallUp==0,iLiftDn==1}"/>
-<Transition Target="0" Source="0" Event="controller.{c_iBallDn==1,iBallDn==0,iBallUp==1,iLiftDn==0}"/>
-<Transition Target="1" Source="0" Event="controller.{c_iBallDn==1,iBallDn==0,iBallUp==1,iLiftDn==1}"/>
-<Transition Target="0" Source="0" Event="controller.{c_iBallDn==1,iBallDn==1,iBallUp==0,iLiftDn==0}"/>
-<Transition Target="1" Source="0" Event="controller.{c_iBallDn==1,iBallDn==1,iBallUp==0,iLiftDn==1}"/>
-<Transition Target="0" Source="0" Event="controller.{c_iBallDn==1,iBallDn==1,iBallUp==1,iLiftDn==0}"/>
-<Transition Target="1" Source="0" Event="controller.{c_iBallDn==1,iBallDn==1,iBallUp==1,iLiftDn==1}"/>
-<Transition Target="0" Source="0" Event="controller.{c_iBallUp==0,iBallDn==0,iBallUp==0,iLiftDn==0}"/>
-<Transition Target="1" Source="0" Event="controller.{c_iBallUp==0,iBallDn==0,iBallUp==0,iLiftDn==1}"/>
-<Transition Target="0" Source="0" Event="controller.{c_iBallUp==0,iBallDn==0,iBallUp==1,iLiftDn==0}"/>
-<Transition Target="1" Source="0" Event="controller.{c_iBallUp==0,iBallDn==0,iBallUp==1,iLiftDn==1}"/>
-<Transition Target="0" Source="0" Event="controller.{c_iBallUp==0,iBallDn==1,iBallUp==0,iLiftDn==0}"/>
-<Transition Target="1" Source="0" Event="controller.{c_iBallUp==0,iBallDn==1,iBallUp==0,iLiftDn==1}"/>
-<Transition Target="0" Source="0" Event="controller.{c_iBallUp==0,iBallDn==1,iBallUp==1,iLiftDn==0}"/>
-<Transition Target="1" Source="0" Event="controller.{c_iBallUp==0,iBallDn==1,iBallUp==1,iLiftDn==1}"/>
-<Transition Target="0" Source="1" Event="controller.{c_iBallDn==0,iBallDn==0,iBallUp==0,iLiftDn==0}"/>
-<Transition Target="1" Source="1" Event="controller.{c_iBallDn==0,iBallDn==0,iBallUp==0,iLiftDn==1}"/>
-<Transition Target="0" Source="1" Event="controller.{c_iBallDn==0,iBallDn==0,iBallUp==1,iLiftDn==0}"/>
-<Transition Target="1" Source="1" Event="controller.{c_iBallDn==0,iBallDn==0,iBallUp==1,iLiftDn==1}"/>
-<Transition Target="0" Source="1" Event="controller.{c_iBallDn==0,iBallDn==1,iBallUp==0,iLiftDn==0}"/>
-<Transition Target="1" Source="1" Event="controller.{c_iBallDn==0,iBallDn==1,iBallUp==0,iLiftDn==1}"/>
-<Transition Target="0" Source="1" Event="controller.{c_iBallDn==0,iBallDn==1,iBallUp==1,iLiftDn==0}"/>
-<Transition Target="1" Source="1" Event="controller.{c_iBallDn==0,iBallDn==1,iBallUp==1,iLiftDn==1}"/>
-<Transition Target="0" Source="1" Event="controller.{c_iBallDn==1,iBallDn==0,iBallUp==0,iLiftDn==0}"/>
-<Transition Target="1" Source="1" Event="controller.{c_iBallDn==1,iBallDn==0,iBallUp==0,iLiftDn==1}"/>
-<Transition Target="0" Source="1" Event="controller.{c_iBallDn==1,iBallDn==0,iBallUp==1,iLiftDn==0}"/>
-<Transition Target="1" Source="1" Event="controller.{c_iBallDn==1,iBallDn==0,iBallUp==1,iLiftDn==1}"/>
-<Transition Target="0" Source="1" Event="controller.{c_iBallDn==1,iBallDn==1,iBallUp==0,iLiftDn==0}"/>
-<Transition Target="1" Source="1" Event="controller.{c_iBallDn==1,iBallDn==1,iBallUp==0,iLiftDn==1}"/>
-<Transition Target="0" Source="1" Event="controller.{c_iBallDn==1,iBallDn==1,iBallUp==1,iLiftDn==0}"/>
-<Transition Target="1" Source="1" Event="controller.{c_iBallDn==1,iBallDn==1,iBallUp==1,iLiftDn==1}"/>
-<Transition Target="0" Source="1" Event="controller.{c_iBallUp==0,iBallDn==0,iBallUp==0,iLiftDn==0}"/>
-<Transition Target="1" Source="1" Event="controller.{c_iBallUp==0,iBallDn==0,iBallUp==0,iLiftDn==1}"/>
-<Transition Target="0" Source="1" Event="controller.{c_iBallUp==0,iBallDn==0,iBallUp==1,iLiftDn==0}"/>
-<Transition Target="1" Source="1" Event="controller.{c_iBallUp==0,iBallDn==0,iBallUp==1,iLiftDn==1}"/>
-<Transition Target="0" Source="1" Event="controller.{c_iBallUp==0,iBallDn==1,iBallUp==0,iLiftDn==0}"/>
-<Transition Target="1" Source="1" Event="controller.{c_iBallUp==0,iBallDn==1,iBallUp==0,iLiftDn==1}"/>
-<Transition Target="0" Source="1" Event="controller.{c_iBallUp==0,iBallDn==1,iBallUp==1,iLiftDn==0}"/>
-<Transition Target="1" Source="1" Event="controller.{c_iBallUp==0,iBallDn==1,iBallUp==1,iLiftDn==1}"/>
+<Transition Target="0" Source="0" Event="controller.{!c_iBallDn,!iBallDn,!iBallUp,!iLiftDn}"/>
+<Transition Target="1" Source="0" Event="controller.{!c_iBallDn,!iBallDn,!iBallUp,iLiftDn}"/>
+<Transition Target="0" Source="0" Event="controller.{!c_iBallDn,!iBallDn,iBallUp,!iLiftDn}"/>
+<Transition Target="1" Source="0" Event="controller.{!c_iBallDn,!iBallDn,iBallUp,iLiftDn}"/>
+<Transition Target="0" Source="0" Event="controller.{!c_iBallDn,iBallDn,!iBallUp,!iLiftDn}"/>
+<Transition Target="1" Source="0" Event="controller.{!c_iBallDn,iBallDn,!iBallUp,iLiftDn}"/>
+<Transition Target="0" Source="0" Event="controller.{!c_iBallDn,iBallDn,iBallUp,!iLiftDn}"/>
+<Transition Target="1" Source="0" Event="controller.{!c_iBallDn,iBallDn,iBallUp,iLiftDn}"/>
+<Transition Target="0" Source="0" Event="controller.{c_iBallDn,!iBallDn,!iBallUp,!iLiftDn}"/>
+<Transition Target="1" Source="0" Event="controller.{c_iBallDn,!iBallDn,!iBallUp,iLiftDn}"/>
+<Transition Target="0" Source="0" Event="controller.{c_iBallDn,!iBallDn,iBallUp,!iLiftDn}"/>
+<Transition Target="1" Source="0" Event="controller.{c_iBallDn,!iBallDn,iBallUp,iLiftDn}"/>
+<Transition Target="0" Source="0" Event="controller.{c_iBallDn,iBallDn,!iBallUp,!iLiftDn}"/>
+<Transition Target="1" Source="0" Event="controller.{c_iBallDn,iBallDn,!iBallUp,iLiftDn}"/>
+<Transition Target="0" Source="0" Event="controller.{c_iBallDn,iBallDn,iBallUp,!iLiftDn}"/>
+<Transition Target="1" Source="0" Event="controller.{c_iBallDn,iBallDn,iBallUp,iLiftDn}"/>
+<Transition Target="0" Source="0" Event="controller.{!c_iBallUp,!iBallDn,!iBallUp,!iLiftDn}"/>
+<Transition Target="1" Source="0" Event="controller.{!c_iBallUp,!iBallDn,!iBallUp,iLiftDn}"/>
+<Transition Target="0" Source="0" Event="controller.{!c_iBallUp,!iBallDn,iBallUp,!iLiftDn}"/>
+<Transition Target="1" Source="0" Event="controller.{!c_iBallUp,!iBallDn,iBallUp,iLiftDn}"/>
+<Transition Target="0" Source="0" Event="controller.{!c_iBallUp,iBallDn,!iBallUp,!iLiftDn}"/>
+<Transition Target="1" Source="0" Event="controller.{!c_iBallUp,iBallDn,!iBallUp,iLiftDn}"/>
+<Transition Target="0" Source="0" Event="controller.{!c_iBallUp,iBallDn,iBallUp,!iLiftDn}"/>
+<Transition Target="1" Source="0" Event="controller.{!c_iBallUp,iBallDn,iBallUp,iLiftDn}"/>
+<Transition Target="0" Source="1" Event="controller.{!c_iBallDn,!iBallDn,!iBallUp,!iLiftDn}"/>
+<Transition Target="1" Source="1" Event="controller.{!c_iBallDn,!iBallDn,!iBallUp,iLiftDn}"/>
+<Transition Target="0" Source="1" Event="controller.{!c_iBallDn,!iBallDn,iBallUp,!iLiftDn}"/>
+<Transition Target="1" Source="1" Event="controller.{!c_iBallDn,!iBallDn,iBallUp,iLiftDn}"/>
+<Transition Target="0" Source="1" Event="controller.{!c_iBallDn,iBallDn,!iBallUp,!iLiftDn}"/>
+<Transition Target="1" Source="1" Event="controller.{!c_iBallDn,iBallDn,!iBallUp,iLiftDn}"/>
+<Transition Target="0" Source="1" Event="controller.{!c_iBallDn,iBallDn,iBallUp,!iLiftDn}"/>
+<Transition Target="1" Source="1" Event="controller.{!c_iBallDn,iBallDn,iBallUp,iLiftDn}"/>
+<Transition Target="0" Source="1" Event="controller.{c_iBallDn,!iBallDn,!iBallUp,!iLiftDn}"/>
+<Transition Target="1" Source="1" Event="controller.{c_iBallDn,!iBallDn,!iBallUp,iLiftDn}"/>
+<Transition Target="0" Source="1" Event="controller.{c_iBallDn,!iBallDn,iBallUp,!iLiftDn}"/>
+<Transition Target="1" Source="1" Event="controller.{c_iBallDn,!iBallDn,iBallUp,iLiftDn}"/>
+<Transition Target="0" Source="1" Event="controller.{c_iBallDn,iBallDn,!iBallUp,!iLiftDn}"/>
+<Transition Target="1" Source="1" Event="controller.{c_iBallDn,iBallDn,!iBallUp,iLiftDn}"/>
+<Transition Target="0" Source="1" Event="controller.{c_iBallDn,iBallDn,iBallUp,!iLiftDn}"/>
+<Transition Target="1" Source="1" Event="controller.{c_iBallDn,iBallDn,iBallUp,iLiftDn}"/>
+<Transition Target="0" Source="1" Event="controller.{!c_iBallUp,!iBallDn,!iBallUp,!iLiftDn}"/>
+<Transition Target="1" Source="1" Event="controller.{!c_iBallUp,!iBallDn,!iBallUp,iLiftDn}"/>
+<Transition Target="0" Source="1" Event="controller.{!c_iBallUp,!iBallDn,iBallUp,!iLiftDn}"/>
+<Transition Target="1" Source="1" Event="controller.{!c_iBallUp,!iBallDn,iBallUp,iLiftDn}"/>
+<Transition Target="0" Source="1" Event="controller.{!c_iBallUp,iBallDn,!iBallUp,!iLiftDn}"/>
+<Transition Target="1" Source="1" Event="controller.{!c_iBallUp,iBallDn,!iBallUp,iLiftDn}"/>
+<Transition Target="0" Source="1" Event="controller.{!c_iBallUp,iBallDn,iBallUp,!iLiftDn}"/>
+<Transition Target="1" Source="1" Event="controller.{!c_iBallUp,iBallDn,iBallUp,iLiftDn}"/>
 </TransitionList>
 </Automaton>
 <Automaton Kind="PLANT" Name="iBallDn">
@@ -304,30 +304,30 @@
 <EventRef Name="ball_down[2].{qUp}"/>
 <EventRef Name="ball_start[1]"/>
 <EventRef Name="ball_start[2]"/>
-<EventRef Name="controller.{c_iBallDn==0,iBallDn==0,iBallUp==0,iLiftDn==0}"/>
-<EventRef Name="controller.{c_iBallDn==0,iBallDn==0,iBallUp==0,iLiftDn==1}"/>
-<EventRef Name="controller.{c_iBallDn==0,iBallDn==0,iBallUp==1,iLiftDn==0}"/>
-<EventRef Name="controller.{c_iBallDn==0,iBallDn==0,iBallUp==1,iLiftDn==1}"/>
-<EventRef Name="controller.{c_iBallDn==0,iBallDn==1,iBallUp==0,iLiftDn==0}"/>
-<EventRef Name="controller.{c_iBallDn==0,iBallDn==1,iBallUp==0,iLiftDn==1}"/>
-<EventRef Name="controller.{c_iBallDn==0,iBallDn==1,iBallUp==1,iLiftDn==0}"/>
-<EventRef Name="controller.{c_iBallDn==0,iBallDn==1,iBallUp==1,iLiftDn==1}"/>
-<EventRef Name="controller.{c_iBallDn==1,iBallDn==0,iBallUp==0,iLiftDn==0}"/>
-<EventRef Name="controller.{c_iBallDn==1,iBallDn==0,iBallUp==0,iLiftDn==1}"/>
-<EventRef Name="controller.{c_iBallDn==1,iBallDn==0,iBallUp==1,iLiftDn==0}"/>
-<EventRef Name="controller.{c_iBallDn==1,iBallDn==0,iBallUp==1,iLiftDn==1}"/>
-<EventRef Name="controller.{c_iBallDn==1,iBallDn==1,iBallUp==0,iLiftDn==0}"/>
-<EventRef Name="controller.{c_iBallDn==1,iBallDn==1,iBallUp==0,iLiftDn==1}"/>
-<EventRef Name="controller.{c_iBallDn==1,iBallDn==1,iBallUp==1,iLiftDn==0}"/>
-<EventRef Name="controller.{c_iBallDn==1,iBallDn==1,iBallUp==1,iLiftDn==1}"/>
-<EventRef Name="controller.{c_iBallUp==0,iBallDn==0,iBallUp==0,iLiftDn==0}"/>
-<EventRef Name="controller.{c_iBallUp==0,iBallDn==0,iBallUp==0,iLiftDn==1}"/>
-<EventRef Name="controller.{c_iBallUp==0,iBallDn==0,iBallUp==1,iLiftDn==0}"/>
-<EventRef Name="controller.{c_iBallUp==0,iBallDn==0,iBallUp==1,iLiftDn==1}"/>
-<EventRef Name="controller.{c_iBallUp==0,iBallDn==1,iBallUp==0,iLiftDn==0}"/>
-<EventRef Name="controller.{c_iBallUp==0,iBallDn==1,iBallUp==0,iLiftDn==1}"/>
-<EventRef Name="controller.{c_iBallUp==0,iBallDn==1,iBallUp==1,iLiftDn==0}"/>
-<EventRef Name="controller.{c_iBallUp==0,iBallDn==1,iBallUp==1,iLiftDn==1}"/>
+<EventRef Name="controller.{!c_iBallDn,!iBallDn,!iBallUp,!iLiftDn}"/>
+<EventRef Name="controller.{!c_iBallDn,!iBallDn,!iBallUp,iLiftDn}"/>
+<EventRef Name="controller.{!c_iBallDn,!iBallDn,iBallUp,!iLiftDn}"/>
+<EventRef Name="controller.{!c_iBallDn,!iBallDn,iBallUp,iLiftDn}"/>
+<EventRef Name="controller.{!c_iBallDn,iBallDn,!iBallUp,!iLiftDn}"/>
+<EventRef Name="controller.{!c_iBallDn,iBallDn,!iBallUp,iLiftDn}"/>
+<EventRef Name="controller.{!c_iBallDn,iBallDn,iBallUp,!iLiftDn}"/>
+<EventRef Name="controller.{!c_iBallDn,iBallDn,iBallUp,iLiftDn}"/>
+<EventRef Name="controller.{c_iBallDn,!iBallDn,!iBallUp,!iLiftDn}"/>
+<EventRef Name="controller.{c_iBallDn,!iBallDn,!iBallUp,iLiftDn}"/>
+<EventRef Name="controller.{c_iBallDn,!iBallDn,iBallUp,!iLiftDn}"/>
+<EventRef Name="controller.{c_iBallDn,!iBallDn,iBallUp,iLiftDn}"/>
+<EventRef Name="controller.{c_iBallDn,iBallDn,!iBallUp,!iLiftDn}"/>
+<EventRef Name="controller.{c_iBallDn,iBallDn,!iBallUp,iLiftDn}"/>
+<EventRef Name="controller.{c_iBallDn,iBallDn,iBallUp,!iLiftDn}"/>
+<EventRef Name="controller.{c_iBallDn,iBallDn,iBallUp,iLiftDn}"/>
+<EventRef Name="controller.{!c_iBallUp,!iBallDn,!iBallUp,!iLiftDn}"/>
+<EventRef Name="controller.{!c_iBallUp,!iBallDn,!iBallUp,iLiftDn}"/>
+<EventRef Name="controller.{!c_iBallUp,!iBallDn,iBallUp,!iLiftDn}"/>
+<EventRef Name="controller.{!c_iBallUp,!iBallDn,iBallUp,iLiftDn}"/>
+<EventRef Name="controller.{!c_iBallUp,iBallDn,!iBallUp,!iLiftDn}"/>
+<EventRef Name="controller.{!c_iBallUp,iBallDn,!iBallUp,iLiftDn}"/>
+<EventRef Name="controller.{!c_iBallUp,iBallDn,iBallUp,!iLiftDn}"/>
+<EventRef Name="controller.{!c_iBallUp,iBallDn,iBallUp,iLiftDn}"/>
 </EventRefList>
 <StateList>
 <State Initial="true" Name="0"/>
@@ -340,36 +340,36 @@
 <Transition Target="0" Source="0" Event="ball_down[2].{qUp}"/>
 <Transition Target="1" Source="0" Event="ball_start[1]"/>
 <Transition Target="1" Source="0" Event="ball_start[2]"/>
-<Transition Target="0" Source="0" Event="controller.{c_iBallDn==0,iBallDn==0,iBallUp==0,iLiftDn==0}"/>
-<Transition Target="0" Source="0" Event="controller.{c_iBallDn==0,iBallDn==0,iBallUp==0,iLiftDn==1}"/>
-<Transition Target="0" Source="0" Event="controller.{c_iBallDn==0,iBallDn==0,iBallUp==1,iLiftDn==0}"/>
-<Transition Target="0" Source="0" Event="controller.{c_iBallDn==0,iBallDn==0,iBallUp==1,iLiftDn==1}"/>
-<Transition Target="0" Source="0" Event="controller.{c_iBallDn==1,iBallDn==0,iBallUp==0,iLiftDn==0}"/>
-<Transition Target="0" Source="0" Event="controller.{c_iBallDn==1,iBallDn==0,iBallUp==0,iLiftDn==1}"/>
-<Transition Target="0" Source="0" Event="controller.{c_iBallDn==1,iBallDn==0,iBallUp==1,iLiftDn==0}"/>
-<Transition Target="0" Source="0" Event="controller.{c_iBallDn==1,iBallDn==0,iBallUp==1,iLiftDn==1}"/>
-<Transition Target="0" Source="0" Event="controller.{c_iBallUp==0,iBallDn==0,iBallUp==0,iLiftDn==0}"/>
-<Transition Target="0" Source="0" Event="controller.{c_iBallUp==0,iBallDn==0,iBallUp==0,iLiftDn==1}"/>
-<Transition Target="0" Source="0" Event="controller.{c_iBallUp==0,iBallDn==0,iBallUp==1,iLiftDn==0}"/>
-<Transition Target="0" Source="0" Event="controller.{c_iBallUp==0,iBallDn==0,iBallUp==1,iLiftDn==1}"/>
+<Transition Target="0" Source="0" Event="controller.{!c_iBallDn,!iBallDn,!iBallUp,!iLiftDn}"/>
+<Transition Target="0" Source="0" Event="controller.{!c_iBallDn,!iBallDn,!iBallUp,iLiftDn}"/>
+<Transition Target="0" Source="0" Event="controller.{!c_iBallDn,!iBallDn,iBallUp,!iLiftDn}"/>
+<Transition Target="0" Source="0" Event="controller.{!c_iBallDn,!iBallDn,iBallUp,iLiftDn}"/>
+<Transition Target="0" Source="0" Event="controller.{c_iBallDn,!iBallDn,!iBallUp,!iLiftDn}"/>
+<Transition Target="0" Source="0" Event="controller.{c_iBallDn,!iBallDn,!iBallUp,iLiftDn}"/>
+<Transition Target="0" Source="0" Event="controller.{c_iBallDn,!iBallDn,iBallUp,!iLiftDn}"/>
+<Transition Target="0" Source="0" Event="controller.{c_iBallDn,!iBallDn,iBallUp,iLiftDn}"/>
+<Transition Target="0" Source="0" Event="controller.{!c_iBallUp,!iBallDn,!iBallUp,!iLiftDn}"/>
+<Transition Target="0" Source="0" Event="controller.{!c_iBallUp,!iBallDn,!iBallUp,iLiftDn}"/>
+<Transition Target="0" Source="0" Event="controller.{!c_iBallUp,!iBallDn,iBallUp,!iLiftDn}"/>
+<Transition Target="0" Source="0" Event="controller.{!c_iBallUp,!iBallDn,iBallUp,iLiftDn}"/>
 <Transition Target="1" Source="1" Event="ball_down[1].{!qUp}"/>
 <Transition Target="0" Source="1" Event="ball_down[1].{qUp}"/>
 <Transition Target="1" Source="1" Event="ball_down[2].{!qUp}"/>
 <Transition Target="0" Source="1" Event="ball_down[2].{qUp}"/>
 <Transition Target="1" Source="1" Event="ball_start[1]"/>
 <Transition Target="1" Source="1" Event="ball_start[2]"/>
-<Transition Target="1" Source="1" Event="controller.{c_iBallDn==0,iBallDn==1,iBallUp==0,iLiftDn==0}"/>
-<Transition Target="1" Source="1" Event="controller.{c_iBallDn==0,iBallDn==1,iBallUp==0,iLiftDn==1}"/>
-<Transition Target="1" Source="1" Event="controller.{c_iBallDn==0,iBallDn==1,iBallUp==1,iLiftDn==0}"/>
-<Transition Target="1" Source="1" Event="controller.{c_iBallDn==0,iBallDn==1,iBallUp==1,iLiftDn==1}"/>
-<Transition Target="1" Source="1" Event="controller.{c_iBallDn==1,iBallDn==1,iBallUp==0,iLiftDn==0}"/>
-<Transition Target="1" Source="1" Event="controller.{c_iBallDn==1,iBallDn==1,iBallUp==0,iLiftDn==1}"/>
-<Transition Target="1" Source="1" Event="controller.{c_iBallDn==1,iBallDn==1,iBallUp==1,iLiftDn==0}"/>
-<Transition Target="1" Source="1" Event="controller.{c_iBallDn==1,iBallDn==1,iBallUp==1,iLiftDn==1}"/>
-<Transition Target="1" Source="1" Event="controller.{c_iBallUp==0,iBallDn==1,iBallUp==0,iLiftDn==0}"/>
-<Transition Target="1" Source="1" Event="controller.{c_iBallUp==0,iBallDn==1,iBallUp==0,iLiftDn==1}"/>
-<Transition Target="1" Source="1" Event="controller.{c_iBallUp==0,iBallDn==1,iBallUp==1,iLiftDn==0}"/>
-<Transition Target="1" Source="1" Event="controller.{c_iBallUp==0,iBallDn==1,iBallUp==1,iLiftDn==1}"/>
+<Transition Target="1" Source="1" Event="controller.{!c_iBallDn,iBallDn,!iBallUp,!iLiftDn}"/>
+<Transition Target="1" Source="1" Event="controller.{!c_iBallDn,iBallDn,!iBallUp,iLiftDn}"/>
+<Transition Target="1" Source="1" Event="controller.{!c_iBallDn,iBallDn,iBallUp,!iLiftDn}"/>
+<Transition Target="1" Source="1" Event="controller.{!c_iBallDn,iBallDn,iBallUp,iLiftDn}"/>
+<Transition Target="1" Source="1" Event="controller.{c_iBallDn,iBallDn,!iBallUp,!iLiftDn}"/>
+<Transition Target="1" Source="1" Event="controller.{c_iBallDn,iBallDn,!iBallUp,iLiftDn}"/>
+<Transition Target="1" Source="1" Event="controller.{c_iBallDn,iBallDn,iBallUp,!iLiftDn}"/>
+<Transition Target="1" Source="1" Event="controller.{c_iBallDn,iBallDn,iBallUp,iLiftDn}"/>
+<Transition Target="1" Source="1" Event="controller.{!c_iBallUp,iBallDn,!iBallUp,!iLiftDn}"/>
+<Transition Target="1" Source="1" Event="controller.{!c_iBallUp,iBallDn,!iBallUp,iLiftDn}"/>
+<Transition Target="1" Source="1" Event="controller.{!c_iBallUp,iBallDn,iBallUp,!iLiftDn}"/>
+<Transition Target="1" Source="1" Event="controller.{!c_iBallUp,iBallDn,iBallUp,iLiftDn}"/>
 </TransitionList>
 </Automaton>
 <Automaton Kind="PLANT" Name="iBallUp">
@@ -377,35 +377,35 @@
 <EventRef Name="ball_finish[1]"/>
 <EventRef Name="ball_finish[2]"/>
 <EventRef Name="ball_up[1].{!qUp}"/>
-<EventRef Name="ball_up[1].{qUp}"/>
+<EventRef Name="ball_up[1].{!iLiftDn}"/>
 <EventRef Name="ball_up[2].{!qUp}"/>
-<EventRef Name="ball_up[2].{qUp}"/>
-<EventRef Name="controller.{c_iBallDn==0,iBallDn==0,iBallUp==0,iLiftDn==0}"/>
-<EventRef Name="controller.{c_iBallDn==0,iBallDn==0,iBallUp==0,iLiftDn==1}"/>
-<EventRef Name="controller.{c_iBallDn==0,iBallDn==0,iBallUp==1,iLiftDn==0}"/>
-<EventRef Name="controller.{c_iBallDn==0,iBallDn==0,iBallUp==1,iLiftDn==1}"/>
-<EventRef Name="controller.{c_iBallDn==0,iBallDn==1,iBallUp==0,iLiftDn==0}"/>
-<EventRef Name="controller.{c_iBallDn==0,iBallDn==1,iBallUp==0,iLiftDn==1}"/>
-<EventRef Name="controller.{c_iBallDn==0,iBallDn==1,iBallUp==1,iLiftDn==0}"/>
-<EventRef Name="controller.{c_iBallDn==0,iBallDn==1,iBallUp==1,iLiftDn==1}"/>
-<EventRef Name="controller.{c_iBallDn==1,iBallDn==0,iBallUp==0,iLiftDn==0}"/>
-<EventRef Name="controller.{c_iBallDn==1,iBallDn==0,iBallUp==0,iLiftDn==1}"/>
-<EventRef Name="controller.{c_iBallDn==1,iBallDn==0,iBallUp==1,iLiftDn==0}"/>
-<EventRef Name="controller.{c_iBallDn==1,iBallDn==0,iBallUp==1,iLiftDn==1}"/>
-<EventRef Name="controller.{c_iBallDn==1,iBallDn==1,iBallUp==0,iLiftDn==0}"/>
-<EventRef Name="controller.{c_iBallDn==1,iBallDn==1,iBallUp==0,iLiftDn==1}"/>
-<EventRef Name="controller.{c_iBallDn==1,iBallDn==1,iBallUp==1,iLiftDn==0}"/>
-<EventRef Name="controller.{c_iBallDn==1,iBallDn==1,iBallUp==1,iLiftDn==1}"/>
-<EventRef Name="controller.{c_iBallUp==0,iBallDn==0,iBallUp==0,iLiftDn==0}"/>
-<EventRef Name="controller.{c_iBallUp==0,iBallDn==0,iBallUp==0,iLiftDn==1}"/>
-<EventRef Name="controller.{c_iBallUp==0,iBallDn==0,iBallUp==1,iLiftDn==0}"/>
-<EventRef Name="controller.{c_iBallUp==0,iBallDn==0,iBallUp==1,iLiftDn==1}"/>
-<EventRef Name="controller.{c_iBallUp==0,iBallDn==1,iBallUp==0,iLiftDn==0}"/>
-<EventRef Name="controller.{c_iBallUp==0,iBallDn==1,iBallUp==0,iLiftDn==1}"/>
-<EventRef Name="controller.{c_iBallUp==0,iBallDn==1,iBallUp==1,iLiftDn==0}"/>
-<EventRef Name="controller.{c_iBallUp==0,iBallDn==1,iBallUp==1,iLiftDn==1}"/>
-<EventRef Name="lift.{iLiftDn'==0}"/>
-<EventRef Name="lift.{iLiftDn'==1}"/>
+<EventRef Name="ball_up[2].{!iLiftDn}"/>
+<EventRef Name="controller.{!c_iBallDn,!iBallDn,!iBallUp,!iLiftDn}"/>
+<EventRef Name="controller.{!c_iBallDn,!iBallDn,!iBallUp,iLiftDn}"/>
+<EventRef Name="controller.{!c_iBallDn,!iBallDn,iBallUp,!iLiftDn}"/>
+<EventRef Name="controller.{!c_iBallDn,!iBallDn,iBallUp,iLiftDn}"/>
+<EventRef Name="controller.{!c_iBallDn,iBallDn,!iBallUp,!iLiftDn}"/>
+<EventRef Name="controller.{!c_iBallDn,iBallDn,!iBallUp,iLiftDn}"/>
+<EventRef Name="controller.{!c_iBallDn,iBallDn,iBallUp,!iLiftDn}"/>
+<EventRef Name="controller.{!c_iBallDn,iBallDn,iBallUp,iLiftDn}"/>
+<EventRef Name="controller.{c_iBallDn,!iBallDn,!iBallUp,!iLiftDn}"/>
+<EventRef Name="controller.{c_iBallDn,!iBallDn,!iBallUp,iLiftDn}"/>
+<EventRef Name="controller.{c_iBallDn,!iBallDn,iBallUp,!iLiftDn}"/>
+<EventRef Name="controller.{c_iBallDn,!iBallDn,iBallUp,iLiftDn}"/>
+<EventRef Name="controller.{c_iBallDn,iBallDn,!iBallUp,!iLiftDn}"/>
+<EventRef Name="controller.{c_iBallDn,iBallDn,!iBallUp,iLiftDn}"/>
+<EventRef Name="controller.{c_iBallDn,iBallDn,iBallUp,!iLiftDn}"/>
+<EventRef Name="controller.{c_iBallDn,iBallDn,iBallUp,iLiftDn}"/>
+<EventRef Name="controller.{!c_iBallUp,!iBallDn,!iBallUp,!iLiftDn}"/>
+<EventRef Name="controller.{!c_iBallUp,!iBallDn,!iBallUp,iLiftDn}"/>
+<EventRef Name="controller.{!c_iBallUp,!iBallDn,iBallUp,!iLiftDn}"/>
+<EventRef Name="controller.{!c_iBallUp,!iBallDn,iBallUp,iLiftDn}"/>
+<EventRef Name="controller.{!c_iBallUp,iBallDn,!iBallUp,!iLiftDn}"/>
+<EventRef Name="controller.{!c_iBallUp,iBallDn,!iBallUp,iLiftDn}"/>
+<EventRef Name="controller.{!c_iBallUp,iBallDn,iBallUp,!iLiftDn}"/>
+<EventRef Name="controller.{!c_iBallUp,iBallDn,iBallUp,iLiftDn}"/>
+<EventRef Name="lift.{!iLiftDn'}"/>
+<EventRef Name="lift.{iLiftDn'}"/>
 </EventRefList>
 <StateList>
 <State Initial="true" Name="0"/>
@@ -415,127 +415,127 @@
 <Transition Target="0" Source="0" Event="ball_finish[1]"/>
 <Transition Target="0" Source="0" Event="ball_finish[2]"/>
 <Transition Target="0" Source="0" Event="ball_up[1].{!qUp}"/>
-<Transition Target="1" Source="0" Event="ball_up[1].{qUp}"/>
+<Transition Target="1" Source="0" Event="ball_up[1].{!iLiftDn}"/>
 <Transition Target="0" Source="0" Event="ball_up[2].{!qUp}"/>
-<Transition Target="1" Source="0" Event="ball_up[2].{qUp}"/>
-<Transition Target="0" Source="0" Event="controller.{c_iBallDn==0,iBallDn==0,iBallUp==0,iLiftDn==0}"/>
-<Transition Target="0" Source="0" Event="controller.{c_iBallDn==0,iBallDn==0,iBallUp==0,iLiftDn==1}"/>
-<Transition Target="0" Source="0" Event="controller.{c_iBallDn==0,iBallDn==1,iBallUp==0,iLiftDn==0}"/>
-<Transition Target="0" Source="0" Event="controller.{c_iBallDn==0,iBallDn==1,iBallUp==0,iLiftDn==1}"/>
-<Transition Target="0" Source="0" Event="controller.{c_iBallDn==1,iBallDn==0,iBallUp==0,iLiftDn==0}"/>
-<Transition Target="0" Source="0" Event="controller.{c_iBallDn==1,iBallDn==0,iBallUp==0,iLiftDn==1}"/>
-<Transition Target="0" Source="0" Event="controller.{c_iBallDn==1,iBallDn==1,iBallUp==0,iLiftDn==0}"/>
-<Transition Target="0" Source="0" Event="controller.{c_iBallDn==1,iBallDn==1,iBallUp==0,iLiftDn==1}"/>
-<Transition Target="0" Source="0" Event="controller.{c_iBallUp==0,iBallDn==0,iBallUp==0,iLiftDn==0}"/>
-<Transition Target="0" Source="0" Event="controller.{c_iBallUp==0,iBallDn==0,iBallUp==0,iLiftDn==1}"/>
-<Transition Target="0" Source="0" Event="controller.{c_iBallUp==0,iBallDn==1,iBallUp==0,iLiftDn==0}"/>
-<Transition Target="0" Source="0" Event="controller.{c_iBallUp==0,iBallDn==1,iBallUp==0,iLiftDn==1}"/>
-<Transition Target="0" Source="0" Event="lift.{iLiftDn'==0}"/>
-<Transition Target="0" Source="0" Event="lift.{iLiftDn'==1}"/>
+<Transition Target="1" Source="0" Event="ball_up[2].{!iLiftDn}"/>
+<Transition Target="0" Source="0" Event="controller.{!c_iBallDn,!iBallDn,!iBallUp,!iLiftDn}"/>
+<Transition Target="0" Source="0" Event="controller.{!c_iBallDn,!iBallDn,!iBallUp,iLiftDn}"/>
+<Transition Target="0" Source="0" Event="controller.{!c_iBallDn,iBallDn,!iBallUp,!iLiftDn}"/>
+<Transition Target="0" Source="0" Event="controller.{!c_iBallDn,iBallDn,!iBallUp,iLiftDn}"/>
+<Transition Target="0" Source="0" Event="controller.{c_iBallDn,!iBallDn,!iBallUp,!iLiftDn}"/>
+<Transition Target="0" Source="0" Event="controller.{c_iBallDn,!iBallDn,!iBallUp,iLiftDn}"/>
+<Transition Target="0" Source="0" Event="controller.{c_iBallDn,iBallDn,!iBallUp,!iLiftDn}"/>
+<Transition Target="0" Source="0" Event="controller.{c_iBallDn,iBallDn,!iBallUp,iLiftDn}"/>
+<Transition Target="0" Source="0" Event="controller.{!c_iBallUp,!iBallDn,!iBallUp,!iLiftDn}"/>
+<Transition Target="0" Source="0" Event="controller.{!c_iBallUp,!iBallDn,!iBallUp,iLiftDn}"/>
+<Transition Target="0" Source="0" Event="controller.{!c_iBallUp,iBallDn,!iBallUp,!iLiftDn}"/>
+<Transition Target="0" Source="0" Event="controller.{!c_iBallUp,iBallDn,!iBallUp,iLiftDn}"/>
+<Transition Target="0" Source="0" Event="lift.{!iLiftDn'}"/>
+<Transition Target="0" Source="0" Event="lift.{iLiftDn'}"/>
 <Transition Target="0" Source="1" Event="ball_finish[1]"/>
 <Transition Target="0" Source="1" Event="ball_finish[2]"/>
 <Transition Target="0" Source="1" Event="ball_up[1].{!qUp}"/>
-<Transition Target="1" Source="1" Event="ball_up[1].{qUp}"/>
+<Transition Target="1" Source="1" Event="ball_up[1].{!iLiftDn}"/>
 <Transition Target="0" Source="1" Event="ball_up[2].{!qUp}"/>
-<Transition Target="1" Source="1" Event="ball_up[2].{qUp}"/>
-<Transition Target="1" Source="1" Event="controller.{c_iBallDn==0,iBallDn==0,iBallUp==1,iLiftDn==0}"/>
-<Transition Target="1" Source="1" Event="controller.{c_iBallDn==0,iBallDn==0,iBallUp==1,iLiftDn==1}"/>
-<Transition Target="1" Source="1" Event="controller.{c_iBallDn==0,iBallDn==1,iBallUp==1,iLiftDn==0}"/>
-<Transition Target="1" Source="1" Event="controller.{c_iBallDn==0,iBallDn==1,iBallUp==1,iLiftDn==1}"/>
-<Transition Target="1" Source="1" Event="controller.{c_iBallDn==1,iBallDn==0,iBallUp==1,iLiftDn==0}"/>
-<Transition Target="1" Source="1" Event="controller.{c_iBallDn==1,iBallDn==0,iBallUp==1,iLiftDn==1}"/>
-<Transition Target="1" Source="1" Event="controller.{c_iBallDn==1,iBallDn==1,iBallUp==1,iLiftDn==0}"/>
-<Transition Target="1" Source="1" Event="controller.{c_iBallDn==1,iBallDn==1,iBallUp==1,iLiftDn==1}"/>
-<Transition Target="1" Source="1" Event="controller.{c_iBallUp==0,iBallDn==0,iBallUp==1,iLiftDn==0}"/>
-<Transition Target="1" Source="1" Event="controller.{c_iBallUp==0,iBallDn==0,iBallUp==1,iLiftDn==1}"/>
-<Transition Target="1" Source="1" Event="controller.{c_iBallUp==0,iBallDn==1,iBallUp==1,iLiftDn==0}"/>
-<Transition Target="1" Source="1" Event="controller.{c_iBallUp==0,iBallDn==1,iBallUp==1,iLiftDn==1}"/>
+<Transition Target="1" Source="1" Event="ball_up[2].{!iLiftDn}"/>
+<Transition Target="1" Source="1" Event="controller.{!c_iBallDn,!iBallDn,iBallUp,!iLiftDn}"/>
+<Transition Target="1" Source="1" Event="controller.{!c_iBallDn,!iBallDn,iBallUp,iLiftDn}"/>
+<Transition Target="1" Source="1" Event="controller.{!c_iBallDn,iBallDn,iBallUp,!iLiftDn}"/>
+<Transition Target="1" Source="1" Event="controller.{!c_iBallDn,iBallDn,iBallUp,iLiftDn}"/>
+<Transition Target="1" Source="1" Event="controller.{c_iBallDn,!iBallDn,iBallUp,!iLiftDn}"/>
+<Transition Target="1" Source="1" Event="controller.{c_iBallDn,!iBallDn,iBallUp,iLiftDn}"/>
+<Transition Target="1" Source="1" Event="controller.{c_iBallDn,iBallDn,iBallUp,!iLiftDn}"/>
+<Transition Target="1" Source="1" Event="controller.{c_iBallDn,iBallDn,iBallUp,iLiftDn}"/>
+<Transition Target="1" Source="1" Event="controller.{!c_iBallUp,!iBallDn,iBallUp,!iLiftDn}"/>
+<Transition Target="1" Source="1" Event="controller.{!c_iBallUp,!iBallDn,iBallUp,iLiftDn}"/>
+<Transition Target="1" Source="1" Event="controller.{!c_iBallUp,iBallDn,iBallUp,!iLiftDn}"/>
+<Transition Target="1" Source="1" Event="controller.{!c_iBallUp,iBallDn,iBallUp,iLiftDn}"/>
 </TransitionList>
 </Automaton>
 <Automaton Kind="PLANT" Name="iLiftDn">
 <EventRefList>
 <EventRef Name="ball_start[1]"/>
 <EventRef Name="ball_start[2]"/>
-<EventRef Name="ball_up[1].{qUp}"/>
-<EventRef Name="ball_up[2].{qUp}"/>
-<EventRef Name="controller.{c_iBallDn==0,iBallDn==0,iBallUp==0,iLiftDn==0}"/>
-<EventRef Name="controller.{c_iBallDn==0,iBallDn==0,iBallUp==0,iLiftDn==1}"/>
-<EventRef Name="controller.{c_iBallDn==0,iBallDn==0,iBallUp==1,iLiftDn==0}"/>
-<EventRef Name="controller.{c_iBallDn==0,iBallDn==0,iBallUp==1,iLiftDn==1}"/>
-<EventRef Name="controller.{c_iBallDn==0,iBallDn==1,iBallUp==0,iLiftDn==0}"/>
-<EventRef Name="controller.{c_iBallDn==0,iBallDn==1,iBallUp==0,iLiftDn==1}"/>
-<EventRef Name="controller.{c_iBallDn==0,iBallDn==1,iBallUp==1,iLiftDn==0}"/>
-<EventRef Name="controller.{c_iBallDn==0,iBallDn==1,iBallUp==1,iLiftDn==1}"/>
-<EventRef Name="controller.{c_iBallDn==1,iBallDn==0,iBallUp==0,iLiftDn==0}"/>
-<EventRef Name="controller.{c_iBallDn==1,iBallDn==0,iBallUp==0,iLiftDn==1}"/>
-<EventRef Name="controller.{c_iBallDn==1,iBallDn==0,iBallUp==1,iLiftDn==0}"/>
-<EventRef Name="controller.{c_iBallDn==1,iBallDn==0,iBallUp==1,iLiftDn==1}"/>
-<EventRef Name="controller.{c_iBallDn==1,iBallDn==1,iBallUp==0,iLiftDn==0}"/>
-<EventRef Name="controller.{c_iBallDn==1,iBallDn==1,iBallUp==0,iLiftDn==1}"/>
-<EventRef Name="controller.{c_iBallDn==1,iBallDn==1,iBallUp==1,iLiftDn==0}"/>
-<EventRef Name="controller.{c_iBallDn==1,iBallDn==1,iBallUp==1,iLiftDn==1}"/>
-<EventRef Name="controller.{c_iBallUp==0,iBallDn==0,iBallUp==0,iLiftDn==0}"/>
-<EventRef Name="controller.{c_iBallUp==0,iBallDn==0,iBallUp==0,iLiftDn==1}"/>
-<EventRef Name="controller.{c_iBallUp==0,iBallDn==0,iBallUp==1,iLiftDn==0}"/>
-<EventRef Name="controller.{c_iBallUp==0,iBallDn==0,iBallUp==1,iLiftDn==1}"/>
-<EventRef Name="controller.{c_iBallUp==0,iBallDn==1,iBallUp==0,iLiftDn==0}"/>
-<EventRef Name="controller.{c_iBallUp==0,iBallDn==1,iBallUp==0,iLiftDn==1}"/>
-<EventRef Name="controller.{c_iBallUp==0,iBallDn==1,iBallUp==1,iLiftDn==0}"/>
-<EventRef Name="controller.{c_iBallUp==0,iBallDn==1,iBallUp==1,iLiftDn==1}"/>
-<EventRef Name="lift.{iLiftDn'==0}"/>
-<EventRef Name="lift.{iLiftDn'==1}"/>
+<EventRef Name="ball_up[1].{!iLiftDn}"/>
+<EventRef Name="ball_up[2].{!iLiftDn}"/>
+<EventRef Name="controller.{!c_iBallDn,!iBallDn,!iBallUp,!iLiftDn}"/>
+<EventRef Name="controller.{!c_iBallDn,!iBallDn,!iBallUp,iLiftDn}"/>
+<EventRef Name="controller.{!c_iBallDn,!iBallDn,iBallUp,!iLiftDn}"/>
+<EventRef Name="controller.{!c_iBallDn,!iBallDn,iBallUp,iLiftDn}"/>
+<EventRef Name="controller.{!c_iBallDn,iBallDn,!iBallUp,!iLiftDn}"/>
+<EventRef Name="controller.{!c_iBallDn,iBallDn,!iBallUp,iLiftDn}"/>
+<EventRef Name="controller.{!c_iBallDn,iBallDn,iBallUp,!iLiftDn}"/>
+<EventRef Name="controller.{!c_iBallDn,iBallDn,iBallUp,iLiftDn}"/>
+<EventRef Name="controller.{c_iBallDn,!iBallDn,!iBallUp,!iLiftDn}"/>
+<EventRef Name="controller.{c_iBallDn,!iBallDn,!iBallUp,iLiftDn}"/>
+<EventRef Name="controller.{c_iBallDn,!iBallDn,iBallUp,!iLiftDn}"/>
+<EventRef Name="controller.{c_iBallDn,!iBallDn,iBallUp,iLiftDn}"/>
+<EventRef Name="controller.{c_iBallDn,iBallDn,!iBallUp,!iLiftDn}"/>
+<EventRef Name="controller.{c_iBallDn,iBallDn,!iBallUp,iLiftDn}"/>
+<EventRef Name="controller.{c_iBallDn,iBallDn,iBallUp,!iLiftDn}"/>
+<EventRef Name="controller.{c_iBallDn,iBallDn,iBallUp,iLiftDn}"/>
+<EventRef Name="controller.{!c_iBallUp,!iBallDn,!iBallUp,!iLiftDn}"/>
+<EventRef Name="controller.{!c_iBallUp,!iBallDn,!iBallUp,iLiftDn}"/>
+<EventRef Name="controller.{!c_iBallUp,!iBallDn,iBallUp,!iLiftDn}"/>
+<EventRef Name="controller.{!c_iBallUp,!iBallDn,iBallUp,iLiftDn}"/>
+<EventRef Name="controller.{!c_iBallUp,iBallDn,!iBallUp,!iLiftDn}"/>
+<EventRef Name="controller.{!c_iBallUp,iBallDn,!iBallUp,iLiftDn}"/>
+<EventRef Name="controller.{!c_iBallUp,iBallDn,iBallUp,!iLiftDn}"/>
+<EventRef Name="controller.{!c_iBallUp,iBallDn,iBallUp,iLiftDn}"/>
+<EventRef Name="lift.{!iLiftDn'}"/>
+<EventRef Name="lift.{iLiftDn'}"/>
 </EventRefList>
 <StateList>
 <State Name="0"/>
 <State Initial="true" Name="1"/>
 </StateList>
 <TransitionList>
-<Transition Target="0" Source="0" Event="ball_up[1].{qUp}"/>
-<Transition Target="0" Source="0" Event="ball_up[2].{qUp}"/>
-<Transition Target="0" Source="0" Event="controller.{c_iBallDn==0,iBallDn==0,iBallUp==0,iLiftDn==0}"/>
-<Transition Target="0" Source="0" Event="controller.{c_iBallDn==0,iBallDn==0,iBallUp==1,iLiftDn==0}"/>
-<Transition Target="0" Source="0" Event="controller.{c_iBallDn==0,iBallDn==1,iBallUp==0,iLiftDn==0}"/>
-<Transition Target="0" Source="0" Event="controller.{c_iBallDn==0,iBallDn==1,iBallUp==1,iLiftDn==0}"/>
-<Transition Target="0" Source="0" Event="controller.{c_iBallDn==1,iBallDn==0,iBallUp==0,iLiftDn==0}"/>
-<Transition Target="0" Source="0" Event="controller.{c_iBallDn==1,iBallDn==0,iBallUp==1,iLiftDn==0}"/>
-<Transition Target="0" Source="0" Event="controller.{c_iBallDn==1,iBallDn==1,iBallUp==0,iLiftDn==0}"/>
-<Transition Target="0" Source="0" Event="controller.{c_iBallDn==1,iBallDn==1,iBallUp==1,iLiftDn==0}"/>
-<Transition Target="0" Source="0" Event="controller.{c_iBallUp==0,iBallDn==0,iBallUp==0,iLiftDn==0}"/>
-<Transition Target="0" Source="0" Event="controller.{c_iBallUp==0,iBallDn==0,iBallUp==1,iLiftDn==0}"/>
-<Transition Target="0" Source="0" Event="controller.{c_iBallUp==0,iBallDn==1,iBallUp==0,iLiftDn==0}"/>
-<Transition Target="0" Source="0" Event="controller.{c_iBallUp==0,iBallDn==1,iBallUp==1,iLiftDn==0}"/>
-<Transition Target="0" Source="0" Event="lift.{iLiftDn'==0}"/>
-<Transition Target="1" Source="0" Event="lift.{iLiftDn'==1}"/>
+<Transition Target="0" Source="0" Event="ball_up[1].{!iLiftDn}"/>
+<Transition Target="0" Source="0" Event="ball_up[2].{!iLiftDn}"/>
+<Transition Target="0" Source="0" Event="controller.{!c_iBallDn,!iBallDn,!iBallUp,!iLiftDn}"/>
+<Transition Target="0" Source="0" Event="controller.{!c_iBallDn,!iBallDn,iBallUp,!iLiftDn}"/>
+<Transition Target="0" Source="0" Event="controller.{!c_iBallDn,iBallDn,!iBallUp,!iLiftDn}"/>
+<Transition Target="0" Source="0" Event="controller.{!c_iBallDn,iBallDn,iBallUp,!iLiftDn}"/>
+<Transition Target="0" Source="0" Event="controller.{c_iBallDn,!iBallDn,!iBallUp,!iLiftDn}"/>
+<Transition Target="0" Source="0" Event="controller.{c_iBallDn,!iBallDn,iBallUp,!iLiftDn}"/>
+<Transition Target="0" Source="0" Event="controller.{c_iBallDn,iBallDn,!iBallUp,!iLiftDn}"/>
+<Transition Target="0" Source="0" Event="controller.{c_iBallDn,iBallDn,iBallUp,!iLiftDn}"/>
+<Transition Target="0" Source="0" Event="controller.{!c_iBallUp,!iBallDn,!iBallUp,!iLiftDn}"/>
+<Transition Target="0" Source="0" Event="controller.{!c_iBallUp,!iBallDn,iBallUp,!iLiftDn}"/>
+<Transition Target="0" Source="0" Event="controller.{!c_iBallUp,iBallDn,!iBallUp,!iLiftDn}"/>
+<Transition Target="0" Source="0" Event="controller.{!c_iBallUp,iBallDn,iBallUp,!iLiftDn}"/>
+<Transition Target="0" Source="0" Event="lift.{!iLiftDn'}"/>
+<Transition Target="1" Source="0" Event="lift.{iLiftDn'}"/>
 <Transition Target="1" Source="1" Event="ball_start[1]"/>
 <Transition Target="1" Source="1" Event="ball_start[2]"/>
-<Transition Target="1" Source="1" Event="controller.{c_iBallDn==0,iBallDn==0,iBallUp==0,iLiftDn==1}"/>
-<Transition Target="1" Source="1" Event="controller.{c_iBallDn==0,iBallDn==0,iBallUp==1,iLiftDn==1}"/>
-<Transition Target="1" Source="1" Event="controller.{c_iBallDn==0,iBallDn==1,iBallUp==0,iLiftDn==1}"/>
-<Transition Target="1" Source="1" Event="controller.{c_iBallDn==0,iBallDn==1,iBallUp==1,iLiftDn==1}"/>
-<Transition Target="1" Source="1" Event="controller.{c_iBallDn==1,iBallDn==0,iBallUp==0,iLiftDn==1}"/>
-<Transition Target="1" Source="1" Event="controller.{c_iBallDn==1,iBallDn==0,iBallUp==1,iLiftDn==1}"/>
-<Transition Target="1" Source="1" Event="controller.{c_iBallDn==1,iBallDn==1,iBallUp==0,iLiftDn==1}"/>
-<Transition Target="1" Source="1" Event="controller.{c_iBallDn==1,iBallDn==1,iBallUp==1,iLiftDn==1}"/>
-<Transition Target="1" Source="1" Event="controller.{c_iBallUp==0,iBallDn==0,iBallUp==0,iLiftDn==1}"/>
-<Transition Target="1" Source="1" Event="controller.{c_iBallUp==0,iBallDn==0,iBallUp==1,iLiftDn==1}"/>
-<Transition Target="1" Source="1" Event="controller.{c_iBallUp==0,iBallDn==1,iBallUp==0,iLiftDn==1}"/>
-<Transition Target="1" Source="1" Event="controller.{c_iBallUp==0,iBallDn==1,iBallUp==1,iLiftDn==1}"/>
-<Transition Target="0" Source="1" Event="lift.{iLiftDn'==0}"/>
-<Transition Target="1" Source="1" Event="lift.{iLiftDn'==1}"/>
+<Transition Target="1" Source="1" Event="controller.{!c_iBallDn,!iBallDn,!iBallUp,iLiftDn}"/>
+<Transition Target="1" Source="1" Event="controller.{!c_iBallDn,!iBallDn,iBallUp,iLiftDn}"/>
+<Transition Target="1" Source="1" Event="controller.{!c_iBallDn,iBallDn,!iBallUp,iLiftDn}"/>
+<Transition Target="1" Source="1" Event="controller.{!c_iBallDn,iBallDn,iBallUp,iLiftDn}"/>
+<Transition Target="1" Source="1" Event="controller.{c_iBallDn,!iBallDn,!iBallUp,iLiftDn}"/>
+<Transition Target="1" Source="1" Event="controller.{c_iBallDn,!iBallDn,iBallUp,iLiftDn}"/>
+<Transition Target="1" Source="1" Event="controller.{c_iBallDn,iBallDn,!iBallUp,iLiftDn}"/>
+<Transition Target="1" Source="1" Event="controller.{c_iBallDn,iBallDn,iBallUp,iLiftDn}"/>
+<Transition Target="1" Source="1" Event="controller.{!c_iBallUp,!iBallDn,!iBallUp,iLiftDn}"/>
+<Transition Target="1" Source="1" Event="controller.{!c_iBallUp,!iBallDn,iBallUp,iLiftDn}"/>
+<Transition Target="1" Source="1" Event="controller.{!c_iBallUp,iBallDn,!iBallUp,iLiftDn}"/>
+<Transition Target="1" Source="1" Event="controller.{!c_iBallUp,iBallDn,iBallUp,iLiftDn}"/>
+<Transition Target="0" Source="1" Event="lift.{!iLiftDn'}"/>
+<Transition Target="1" Source="1" Event="lift.{iLiftDn'}"/>
 </TransitionList>
 </Automaton>
 <Automaton Kind="PLANT" Name="lift">
 <EventRefList>
-<EventRef Name="lift.{iLiftDn'==0}"/>
-<EventRef Name="lift.{iLiftDn'==1}"/>
+<EventRef Name="lift.{!iLiftDn'}"/>
+<EventRef Name="lift.{iLiftDn'}"/>
 </EventRefList>
 <StateList>
 <State Initial="true" Name="dn"/>
 <State Name="up"/>
 </StateList>
 <TransitionList>
-<Transition Target="up" Source="dn" Event="lift.{iLiftDn'==0}"/>
-<Transition Target="dn" Source="up" Event="lift.{iLiftDn'==1}"/>
+<Transition Target="up" Source="dn" Event="lift.{!iLiftDn'}"/>
+<Transition Target="dn" Source="up" Event="lift.{iLiftDn'}"/>
 </TransitionList>
 </Automaton>
 <Automaton Kind="PLANT" Name="liftBusy">
@@ -562,86 +562,86 @@
 <EventRefList>
 <EventRef Name="ball_finish[1]"/>
 <EventRef Name="ball_finish[2]"/>
-<EventRef Name="controller.{c_iBallDn==0,iBallDn==0,iBallUp==0,iLiftDn==0}"/>
-<EventRef Name="controller.{c_iBallDn==0,iBallDn==0,iBallUp==0,iLiftDn==1}"/>
-<EventRef Name="controller.{c_iBallDn==0,iBallDn==0,iBallUp==1,iLiftDn==0}"/>
-<EventRef Name="controller.{c_iBallDn==0,iBallDn==0,iBallUp==1,iLiftDn==1}"/>
-<EventRef Name="controller.{c_iBallDn==0,iBallDn==1,iBallUp==0,iLiftDn==0}"/>
-<EventRef Name="controller.{c_iBallDn==0,iBallDn==1,iBallUp==0,iLiftDn==1}"/>
-<EventRef Name="controller.{c_iBallDn==0,iBallDn==1,iBallUp==1,iLiftDn==0}"/>
-<EventRef Name="controller.{c_iBallDn==0,iBallDn==1,iBallUp==1,iLiftDn==1}"/>
-<EventRef Name="controller.{c_iBallDn==1,iBallDn==0,iBallUp==0,iLiftDn==0}"/>
-<EventRef Name="controller.{c_iBallDn==1,iBallDn==0,iBallUp==0,iLiftDn==1}"/>
-<EventRef Name="controller.{c_iBallDn==1,iBallDn==0,iBallUp==1,iLiftDn==0}"/>
-<EventRef Name="controller.{c_iBallDn==1,iBallDn==0,iBallUp==1,iLiftDn==1}"/>
-<EventRef Name="controller.{c_iBallDn==1,iBallDn==1,iBallUp==0,iLiftDn==0}"/>
-<EventRef Name="controller.{c_iBallDn==1,iBallDn==1,iBallUp==0,iLiftDn==1}"/>
-<EventRef Name="controller.{c_iBallDn==1,iBallDn==1,iBallUp==1,iLiftDn==0}"/>
-<EventRef Name="controller.{c_iBallDn==1,iBallDn==1,iBallUp==1,iLiftDn==1}"/>
-<EventRef Name="controller.{c_iBallUp==0,iBallDn==0,iBallUp==0,iLiftDn==0}"/>
-<EventRef Name="controller.{c_iBallUp==0,iBallDn==0,iBallUp==0,iLiftDn==1}"/>
-<EventRef Name="controller.{c_iBallUp==0,iBallDn==0,iBallUp==1,iLiftDn==0}"/>
-<EventRef Name="controller.{c_iBallUp==0,iBallDn==0,iBallUp==1,iLiftDn==1}"/>
-<EventRef Name="controller.{c_iBallUp==0,iBallDn==1,iBallUp==0,iLiftDn==0}"/>
-<EventRef Name="controller.{c_iBallUp==0,iBallDn==1,iBallUp==0,iLiftDn==1}"/>
-<EventRef Name="controller.{c_iBallUp==0,iBallDn==1,iBallUp==1,iLiftDn==0}"/>
-<EventRef Name="controller.{c_iBallUp==0,iBallDn==1,iBallUp==1,iLiftDn==1}"/>
+<EventRef Name="controller.{!c_iBallDn,!iBallDn,!iBallUp,!iLiftDn}"/>
+<EventRef Name="controller.{!c_iBallDn,!iBallDn,!iBallUp,iLiftDn}"/>
+<EventRef Name="controller.{!c_iBallDn,!iBallDn,iBallUp,!iLiftDn}"/>
+<EventRef Name="controller.{!c_iBallDn,!iBallDn,iBallUp,iLiftDn}"/>
+<EventRef Name="controller.{!c_iBallDn,iBallDn,!iBallUp,!iLiftDn}"/>
+<EventRef Name="controller.{!c_iBallDn,iBallDn,!iBallUp,iLiftDn}"/>
+<EventRef Name="controller.{!c_iBallDn,iBallDn,iBallUp,!iLiftDn}"/>
+<EventRef Name="controller.{!c_iBallDn,iBallDn,iBallUp,iLiftDn}"/>
+<EventRef Name="controller.{c_iBallDn,!iBallDn,!iBallUp,!iLiftDn}"/>
+<EventRef Name="controller.{c_iBallDn,!iBallDn,!iBallUp,iLiftDn}"/>
+<EventRef Name="controller.{c_iBallDn,!iBallDn,iBallUp,!iLiftDn}"/>
+<EventRef Name="controller.{c_iBallDn,!iBallDn,iBallUp,iLiftDn}"/>
+<EventRef Name="controller.{c_iBallDn,iBallDn,!iBallUp,!iLiftDn}"/>
+<EventRef Name="controller.{c_iBallDn,iBallDn,!iBallUp,iLiftDn}"/>
+<EventRef Name="controller.{c_iBallDn,iBallDn,iBallUp,!iLiftDn}"/>
+<EventRef Name="controller.{c_iBallDn,iBallDn,iBallUp,iLiftDn}"/>
+<EventRef Name="controller.{!c_iBallUp,!iBallDn,!iBallUp,!iLiftDn}"/>
+<EventRef Name="controller.{!c_iBallUp,!iBallDn,!iBallUp,iLiftDn}"/>
+<EventRef Name="controller.{!c_iBallUp,!iBallDn,iBallUp,!iLiftDn}"/>
+<EventRef Name="controller.{!c_iBallUp,!iBallDn,iBallUp,iLiftDn}"/>
+<EventRef Name="controller.{!c_iBallUp,iBallDn,!iBallUp,!iLiftDn}"/>
+<EventRef Name="controller.{!c_iBallUp,iBallDn,!iBallUp,iLiftDn}"/>
+<EventRef Name="controller.{!c_iBallUp,iBallDn,iBallUp,!iLiftDn}"/>
+<EventRef Name="controller.{!c_iBallUp,iBallDn,iBallUp,iLiftDn}"/>
 </EventRefList>
 <StateList>
 <State Initial="true" Name="0"/>
 <State Name="1"/>
 </StateList>
 <TransitionList>
-<Transition Target="1" Source="0" Event="controller.{c_iBallDn==0,iBallDn==0,iBallUp==0,iLiftDn==0}"/>
-<Transition Target="1" Source="0" Event="controller.{c_iBallDn==0,iBallDn==0,iBallUp==0,iLiftDn==1}"/>
-<Transition Target="1" Source="0" Event="controller.{c_iBallDn==0,iBallDn==0,iBallUp==1,iLiftDn==0}"/>
-<Transition Target="1" Source="0" Event="controller.{c_iBallDn==0,iBallDn==0,iBallUp==1,iLiftDn==1}"/>
-<Transition Target="1" Source="0" Event="controller.{c_iBallDn==0,iBallDn==1,iBallUp==0,iLiftDn==0}"/>
-<Transition Target="1" Source="0" Event="controller.{c_iBallDn==0,iBallDn==1,iBallUp==0,iLiftDn==1}"/>
-<Transition Target="1" Source="0" Event="controller.{c_iBallDn==0,iBallDn==1,iBallUp==1,iLiftDn==0}"/>
-<Transition Target="1" Source="0" Event="controller.{c_iBallDn==0,iBallDn==1,iBallUp==1,iLiftDn==1}"/>
-<Transition Target="1" Source="0" Event="controller.{c_iBallDn==1,iBallDn==0,iBallUp==0,iLiftDn==0}"/>
-<Transition Target="1" Source="0" Event="controller.{c_iBallDn==1,iBallDn==0,iBallUp==0,iLiftDn==1}"/>
-<Transition Target="1" Source="0" Event="controller.{c_iBallDn==1,iBallDn==0,iBallUp==1,iLiftDn==0}"/>
-<Transition Target="1" Source="0" Event="controller.{c_iBallDn==1,iBallDn==0,iBallUp==1,iLiftDn==1}"/>
-<Transition Target="1" Source="0" Event="controller.{c_iBallDn==1,iBallDn==1,iBallUp==0,iLiftDn==0}"/>
-<Transition Target="1" Source="0" Event="controller.{c_iBallDn==1,iBallDn==1,iBallUp==0,iLiftDn==1}"/>
-<Transition Target="1" Source="0" Event="controller.{c_iBallDn==1,iBallDn==1,iBallUp==1,iLiftDn==0}"/>
-<Transition Target="1" Source="0" Event="controller.{c_iBallDn==1,iBallDn==1,iBallUp==1,iLiftDn==1}"/>
-<Transition Target="0" Source="0" Event="controller.{c_iBallUp==0,iBallDn==0,iBallUp==0,iLiftDn==0}"/>
-<Transition Target="0" Source="0" Event="controller.{c_iBallUp==0,iBallDn==0,iBallUp==0,iLiftDn==1}"/>
-<Transition Target="0" Source="0" Event="controller.{c_iBallUp==0,iBallDn==0,iBallUp==1,iLiftDn==0}"/>
-<Transition Target="0" Source="0" Event="controller.{c_iBallUp==0,iBallDn==0,iBallUp==1,iLiftDn==1}"/>
-<Transition Target="0" Source="0" Event="controller.{c_iBallUp==0,iBallDn==1,iBallUp==0,iLiftDn==0}"/>
-<Transition Target="0" Source="0" Event="controller.{c_iBallUp==0,iBallDn==1,iBallUp==0,iLiftDn==1}"/>
-<Transition Target="0" Source="0" Event="controller.{c_iBallUp==0,iBallDn==1,iBallUp==1,iLiftDn==0}"/>
-<Transition Target="0" Source="0" Event="controller.{c_iBallUp==0,iBallDn==1,iBallUp==1,iLiftDn==1}"/>
+<Transition Target="1" Source="0" Event="controller.{!c_iBallDn,!iBallDn,!iBallUp,!iLiftDn}"/>
+<Transition Target="1" Source="0" Event="controller.{!c_iBallDn,!iBallDn,!iBallUp,iLiftDn}"/>
+<Transition Target="1" Source="0" Event="controller.{!c_iBallDn,!iBallDn,iBallUp,!iLiftDn}"/>
+<Transition Target="1" Source="0" Event="controller.{!c_iBallDn,!iBallDn,iBallUp,iLiftDn}"/>
+<Transition Target="1" Source="0" Event="controller.{!c_iBallDn,iBallDn,!iBallUp,!iLiftDn}"/>
+<Transition Target="1" Source="0" Event="controller.{!c_iBallDn,iBallDn,!iBallUp,iLiftDn}"/>
+<Transition Target="1" Source="0" Event="controller.{!c_iBallDn,iBallDn,iBallUp,!iLiftDn}"/>
+<Transition Target="1" Source="0" Event="controller.{!c_iBallDn,iBallDn,iBallUp,iLiftDn}"/>
+<Transition Target="1" Source="0" Event="controller.{c_iBallDn,!iBallDn,!iBallUp,!iLiftDn}"/>
+<Transition Target="1" Source="0" Event="controller.{c_iBallDn,!iBallDn,!iBallUp,iLiftDn}"/>
+<Transition Target="1" Source="0" Event="controller.{c_iBallDn,!iBallDn,iBallUp,!iLiftDn}"/>
+<Transition Target="1" Source="0" Event="controller.{c_iBallDn,!iBallDn,iBallUp,iLiftDn}"/>
+<Transition Target="1" Source="0" Event="controller.{c_iBallDn,iBallDn,!iBallUp,!iLiftDn}"/>
+<Transition Target="1" Source="0" Event="controller.{c_iBallDn,iBallDn,!iBallUp,iLiftDn}"/>
+<Transition Target="1" Source="0" Event="controller.{c_iBallDn,iBallDn,iBallUp,!iLiftDn}"/>
+<Transition Target="1" Source="0" Event="controller.{c_iBallDn,iBallDn,iBallUp,iLiftDn}"/>
+<Transition Target="0" Source="0" Event="controller.{!c_iBallUp,!iBallDn,!iBallUp,!iLiftDn}"/>
+<Transition Target="0" Source="0" Event="controller.{!c_iBallUp,!iBallDn,!iBallUp,iLiftDn}"/>
+<Transition Target="0" Source="0" Event="controller.{!c_iBallUp,!iBallDn,iBallUp,!iLiftDn}"/>
+<Transition Target="0" Source="0" Event="controller.{!c_iBallUp,!iBallDn,iBallUp,iLiftDn}"/>
+<Transition Target="0" Source="0" Event="controller.{!c_iBallUp,iBallDn,!iBallUp,!iLiftDn}"/>
+<Transition Target="0" Source="0" Event="controller.{!c_iBallUp,iBallDn,!iBallUp,iLiftDn}"/>
+<Transition Target="0" Source="0" Event="controller.{!c_iBallUp,iBallDn,iBallUp,!iLiftDn}"/>
+<Transition Target="0" Source="0" Event="controller.{!c_iBallUp,iBallDn,iBallUp,iLiftDn}"/>
 <Transition Target="1" Source="1" Event="ball_finish[1]"/>
 <Transition Target="1" Source="1" Event="ball_finish[2]"/>
-<Transition Target="1" Source="1" Event="controller.{c_iBallDn==0,iBallDn==0,iBallUp==0,iLiftDn==0}"/>
-<Transition Target="1" Source="1" Event="controller.{c_iBallDn==0,iBallDn==0,iBallUp==0,iLiftDn==1}"/>
-<Transition Target="1" Source="1" Event="controller.{c_iBallDn==0,iBallDn==0,iBallUp==1,iLiftDn==0}"/>
-<Transition Target="1" Source="1" Event="controller.{c_iBallDn==0,iBallDn==0,iBallUp==1,iLiftDn==1}"/>
-<Transition Target="1" Source="1" Event="controller.{c_iBallDn==0,iBallDn==1,iBallUp==0,iLiftDn==0}"/>
-<Transition Target="1" Source="1" Event="controller.{c_iBallDn==0,iBallDn==1,iBallUp==0,iLiftDn==1}"/>
-<Transition Target="1" Source="1" Event="controller.{c_iBallDn==0,iBallDn==1,iBallUp==1,iLiftDn==0}"/>
-<Transition Target="1" Source="1" Event="controller.{c_iBallDn==0,iBallDn==1,iBallUp==1,iLiftDn==1}"/>
-<Transition Target="1" Source="1" Event="controller.{c_iBallDn==1,iBallDn==0,iBallUp==0,iLiftDn==0}"/>
-<Transition Target="1" Source="1" Event="controller.{c_iBallDn==1,iBallDn==0,iBallUp==0,iLiftDn==1}"/>
-<Transition Target="1" Source="1" Event="controller.{c_iBallDn==1,iBallDn==0,iBallUp==1,iLiftDn==0}"/>
-<Transition Target="1" Source="1" Event="controller.{c_iBallDn==1,iBallDn==0,iBallUp==1,iLiftDn==1}"/>
-<Transition Target="1" Source="1" Event="controller.{c_iBallDn==1,iBallDn==1,iBallUp==0,iLiftDn==0}"/>
-<Transition Target="1" Source="1" Event="controller.{c_iBallDn==1,iBallDn==1,iBallUp==0,iLiftDn==1}"/>
-<Transition Target="1" Source="1" Event="controller.{c_iBallDn==1,iBallDn==1,iBallUp==1,iLiftDn==0}"/>
-<Transition Target="1" Source="1" Event="controller.{c_iBallDn==1,iBallDn==1,iBallUp==1,iLiftDn==1}"/>
-<Transition Target="0" Source="1" Event="controller.{c_iBallUp==0,iBallDn==0,iBallUp==0,iLiftDn==0}"/>
-<Transition Target="0" Source="1" Event="controller.{c_iBallUp==0,iBallDn==0,iBallUp==0,iLiftDn==1}"/>
-<Transition Target="0" Source="1" Event="controller.{c_iBallUp==0,iBallDn==0,iBallUp==1,iLiftDn==0}"/>
-<Transition Target="0" Source="1" Event="controller.{c_iBallUp==0,iBallDn==0,iBallUp==1,iLiftDn==1}"/>
-<Transition Target="0" Source="1" Event="controller.{c_iBallUp==0,iBallDn==1,iBallUp==0,iLiftDn==0}"/>
-<Transition Target="0" Source="1" Event="controller.{c_iBallUp==0,iBallDn==1,iBallUp==0,iLiftDn==1}"/>
-<Transition Target="0" Source="1" Event="controller.{c_iBallUp==0,iBallDn==1,iBallUp==1,iLiftDn==0}"/>
-<Transition Target="0" Source="1" Event="controller.{c_iBallUp==0,iBallDn==1,iBallUp==1,iLiftDn==1}"/>
+<Transition Target="1" Source="1" Event="controller.{!c_iBallDn,!iBallDn,!iBallUp,!iLiftDn}"/>
+<Transition Target="1" Source="1" Event="controller.{!c_iBallDn,!iBallDn,!iBallUp,iLiftDn}"/>
+<Transition Target="1" Source="1" Event="controller.{!c_iBallDn,!iBallDn,iBallUp,!iLiftDn}"/>
+<Transition Target="1" Source="1" Event="controller.{!c_iBallDn,!iBallDn,iBallUp,iLiftDn}"/>
+<Transition Target="1" Source="1" Event="controller.{!c_iBallDn,iBallDn,!iBallUp,!iLiftDn}"/>
+<Transition Target="1" Source="1" Event="controller.{!c_iBallDn,iBallDn,!iBallUp,iLiftDn}"/>
+<Transition Target="1" Source="1" Event="controller.{!c_iBallDn,iBallDn,iBallUp,!iLiftDn}"/>
+<Transition Target="1" Source="1" Event="controller.{!c_iBallDn,iBallDn,iBallUp,iLiftDn}"/>
+<Transition Target="1" Source="1" Event="controller.{c_iBallDn,!iBallDn,!iBallUp,!iLiftDn}"/>
+<Transition Target="1" Source="1" Event="controller.{c_iBallDn,!iBallDn,!iBallUp,iLiftDn}"/>
+<Transition Target="1" Source="1" Event="controller.{c_iBallDn,!iBallDn,iBallUp,!iLiftDn}"/>
+<Transition Target="1" Source="1" Event="controller.{c_iBallDn,!iBallDn,iBallUp,iLiftDn}"/>
+<Transition Target="1" Source="1" Event="controller.{c_iBallDn,iBallDn,!iBallUp,!iLiftDn}"/>
+<Transition Target="1" Source="1" Event="controller.{c_iBallDn,iBallDn,!iBallUp,iLiftDn}"/>
+<Transition Target="1" Source="1" Event="controller.{c_iBallDn,iBallDn,iBallUp,!iLiftDn}"/>
+<Transition Target="1" Source="1" Event="controller.{c_iBallDn,iBallDn,iBallUp,iLiftDn}"/>
+<Transition Target="0" Source="1" Event="controller.{!c_iBallUp,!iBallDn,!iBallUp,!iLiftDn}"/>
+<Transition Target="0" Source="1" Event="controller.{!c_iBallUp,!iBallDn,!iBallUp,iLiftDn}"/>
+<Transition Target="0" Source="1" Event="controller.{!c_iBallUp,!iBallDn,iBallUp,!iLiftDn}"/>
+<Transition Target="0" Source="1" Event="controller.{!c_iBallUp,!iBallDn,iBallUp,iLiftDn}"/>
+<Transition Target="0" Source="1" Event="controller.{!c_iBallUp,iBallDn,!iBallUp,!iLiftDn}"/>
+<Transition Target="0" Source="1" Event="controller.{!c_iBallUp,iBallDn,!iBallUp,iLiftDn}"/>
+<Transition Target="0" Source="1" Event="controller.{!c_iBallUp,iBallDn,iBallUp,!iLiftDn}"/>
+<Transition Target="0" Source="1" Event="controller.{!c_iBallUp,iBallDn,iBallUp,iLiftDn}"/>
 </TransitionList>
 </Automaton>
 <Automaton Kind="PLANT" Name="qUp">
@@ -651,27 +651,27 @@
 <EventRef Name="ball_down[2].{!qUp}"/>
 <EventRef Name="ball_down[2].{qUp}"/>
 <EventRef Name="ball_up[1].{!qUp}"/>
-<EventRef Name="ball_up[1].{qUp}"/>
+<EventRef Name="ball_up[1].{!iLiftDn}"/>
 <EventRef Name="ball_up[2].{!qUp}"/>
-<EventRef Name="ball_up[2].{qUp}"/>
-<EventRef Name="controller.{c_iBallDn==1,iBallDn==0,iBallUp==0,iLiftDn==0}"/>
-<EventRef Name="controller.{c_iBallDn==1,iBallDn==0,iBallUp==0,iLiftDn==1}"/>
-<EventRef Name="controller.{c_iBallDn==1,iBallDn==0,iBallUp==1,iLiftDn==0}"/>
-<EventRef Name="controller.{c_iBallDn==1,iBallDn==0,iBallUp==1,iLiftDn==1}"/>
-<EventRef Name="controller.{c_iBallDn==1,iBallDn==1,iBallUp==0,iLiftDn==0}"/>
-<EventRef Name="controller.{c_iBallDn==1,iBallDn==1,iBallUp==0,iLiftDn==1}"/>
-<EventRef Name="controller.{c_iBallDn==1,iBallDn==1,iBallUp==1,iLiftDn==0}"/>
-<EventRef Name="controller.{c_iBallDn==1,iBallDn==1,iBallUp==1,iLiftDn==1}"/>
-<EventRef Name="controller.{c_iBallUp==0,iBallDn==0,iBallUp==0,iLiftDn==0}"/>
-<EventRef Name="controller.{c_iBallUp==0,iBallDn==0,iBallUp==0,iLiftDn==1}"/>
-<EventRef Name="controller.{c_iBallUp==0,iBallDn==0,iBallUp==1,iLiftDn==0}"/>
-<EventRef Name="controller.{c_iBallUp==0,iBallDn==0,iBallUp==1,iLiftDn==1}"/>
-<EventRef Name="controller.{c_iBallUp==0,iBallDn==1,iBallUp==0,iLiftDn==0}"/>
-<EventRef Name="controller.{c_iBallUp==0,iBallDn==1,iBallUp==0,iLiftDn==1}"/>
-<EventRef Name="controller.{c_iBallUp==0,iBallDn==1,iBallUp==1,iLiftDn==0}"/>
-<EventRef Name="controller.{c_iBallUp==0,iBallDn==1,iBallUp==1,iLiftDn==1}"/>
-<EventRef Name="lift.{iLiftDn'==0}"/>
-<EventRef Name="lift.{iLiftDn'==1}"/>
+<EventRef Name="ball_up[2].{!iLiftDn}"/>
+<EventRef Name="controller.{c_iBallDn,!iBallDn,!iBallUp,!iLiftDn}"/>
+<EventRef Name="controller.{c_iBallDn,!iBallDn,!iBallUp,iLiftDn}"/>
+<EventRef Name="controller.{c_iBallDn,!iBallDn,iBallUp,!iLiftDn}"/>
+<EventRef Name="controller.{c_iBallDn,!iBallDn,iBallUp,iLiftDn}"/>
+<EventRef Name="controller.{c_iBallDn,iBallDn,!iBallUp,!iLiftDn}"/>
+<EventRef Name="controller.{c_iBallDn,iBallDn,!iBallUp,iLiftDn}"/>
+<EventRef Name="controller.{c_iBallDn,iBallDn,iBallUp,!iLiftDn}"/>
+<EventRef Name="controller.{c_iBallDn,iBallDn,iBallUp,iLiftDn}"/>
+<EventRef Name="controller.{!c_iBallUp,!iBallDn,!iBallUp,!iLiftDn}"/>
+<EventRef Name="controller.{!c_iBallUp,!iBallDn,!iBallUp,iLiftDn}"/>
+<EventRef Name="controller.{!c_iBallUp,!iBallDn,iBallUp,!iLiftDn}"/>
+<EventRef Name="controller.{!c_iBallUp,!iBallDn,iBallUp,iLiftDn}"/>
+<EventRef Name="controller.{!c_iBallUp,iBallDn,!iBallUp,!iLiftDn}"/>
+<EventRef Name="controller.{!c_iBallUp,iBallDn,!iBallUp,iLiftDn}"/>
+<EventRef Name="controller.{!c_iBallUp,iBallDn,iBallUp,!iLiftDn}"/>
+<EventRef Name="controller.{!c_iBallUp,iBallDn,iBallUp,iLiftDn}"/>
+<EventRef Name="lift.{!iLiftDn'}"/>
+<EventRef Name="lift.{iLiftDn'}"/>
 </EventRefList>
 <StateList>
 <State Initial="true" Name="0"/>
@@ -682,44 +682,44 @@
 <Transition Target="0" Source="0" Event="ball_down[2].{!qUp}"/>
 <Transition Target="0" Source="0" Event="ball_up[1].{!qUp}"/>
 <Transition Target="0" Source="0" Event="ball_up[2].{!qUp}"/>
-<Transition Target="1" Source="0" Event="controller.{c_iBallDn==1,iBallDn==0,iBallUp==0,iLiftDn==0}"/>
-<Transition Target="1" Source="0" Event="controller.{c_iBallDn==1,iBallDn==0,iBallUp==0,iLiftDn==1}"/>
-<Transition Target="1" Source="0" Event="controller.{c_iBallDn==1,iBallDn==0,iBallUp==1,iLiftDn==0}"/>
-<Transition Target="1" Source="0" Event="controller.{c_iBallDn==1,iBallDn==0,iBallUp==1,iLiftDn==1}"/>
-<Transition Target="1" Source="0" Event="controller.{c_iBallDn==1,iBallDn==1,iBallUp==0,iLiftDn==0}"/>
-<Transition Target="1" Source="0" Event="controller.{c_iBallDn==1,iBallDn==1,iBallUp==0,iLiftDn==1}"/>
-<Transition Target="1" Source="0" Event="controller.{c_iBallDn==1,iBallDn==1,iBallUp==1,iLiftDn==0}"/>
-<Transition Target="1" Source="0" Event="controller.{c_iBallDn==1,iBallDn==1,iBallUp==1,iLiftDn==1}"/>
-<Transition Target="0" Source="0" Event="controller.{c_iBallUp==0,iBallDn==0,iBallUp==0,iLiftDn==0}"/>
-<Transition Target="0" Source="0" Event="controller.{c_iBallUp==0,iBallDn==0,iBallUp==0,iLiftDn==1}"/>
-<Transition Target="0" Source="0" Event="controller.{c_iBallUp==0,iBallDn==0,iBallUp==1,iLiftDn==0}"/>
-<Transition Target="0" Source="0" Event="controller.{c_iBallUp==0,iBallDn==0,iBallUp==1,iLiftDn==1}"/>
-<Transition Target="0" Source="0" Event="controller.{c_iBallUp==0,iBallDn==1,iBallUp==0,iLiftDn==0}"/>
-<Transition Target="0" Source="0" Event="controller.{c_iBallUp==0,iBallDn==1,iBallUp==0,iLiftDn==1}"/>
-<Transition Target="0" Source="0" Event="controller.{c_iBallUp==0,iBallDn==1,iBallUp==1,iLiftDn==0}"/>
-<Transition Target="0" Source="0" Event="controller.{c_iBallUp==0,iBallDn==1,iBallUp==1,iLiftDn==1}"/>
+<Transition Target="1" Source="0" Event="controller.{c_iBallDn,!iBallDn,!iBallUp,!iLiftDn}"/>
+<Transition Target="1" Source="0" Event="controller.{c_iBallDn,!iBallDn,!iBallUp,iLiftDn}"/>
+<Transition Target="1" Source="0" Event="controller.{c_iBallDn,!iBallDn,iBallUp,!iLiftDn}"/>
+<Transition Target="1" Source="0" Event="controller.{c_iBallDn,!iBallDn,iBallUp,iLiftDn}"/>
+<Transition Target="1" Source="0" Event="controller.{c_iBallDn,iBallDn,!iBallUp,!iLiftDn}"/>
+<Transition Target="1" Source="0" Event="controller.{c_iBallDn,iBallDn,!iBallUp,iLiftDn}"/>
+<Transition Target="1" Source="0" Event="controller.{c_iBallDn,iBallDn,iBallUp,!iLiftDn}"/>
+<Transition Target="1" Source="0" Event="controller.{c_iBallDn,iBallDn,iBallUp,iLiftDn}"/>
+<Transition Target="0" Source="0" Event="controller.{!c_iBallUp,!iBallDn,!iBallUp,!iLiftDn}"/>
+<Transition Target="0" Source="0" Event="controller.{!c_iBallUp,!iBallDn,!iBallUp,iLiftDn}"/>
+<Transition Target="0" Source="0" Event="controller.{!c_iBallUp,!iBallDn,iBallUp,!iLiftDn}"/>
+<Transition Target="0" Source="0" Event="controller.{!c_iBallUp,!iBallDn,iBallUp,iLiftDn}"/>
+<Transition Target="0" Source="0" Event="controller.{!c_iBallUp,iBallDn,!iBallUp,!iLiftDn}"/>
+<Transition Target="0" Source="0" Event="controller.{!c_iBallUp,iBallDn,!iBallUp,iLiftDn}"/>
+<Transition Target="0" Source="0" Event="controller.{!c_iBallUp,iBallDn,iBallUp,!iLiftDn}"/>
+<Transition Target="0" Source="0" Event="controller.{!c_iBallUp,iBallDn,iBallUp,iLiftDn}"/>
 <Transition Target="1" Source="1" Event="ball_down[1].{qUp}"/>
 <Transition Target="1" Source="1" Event="ball_down[2].{qUp}"/>
-<Transition Target="1" Source="1" Event="ball_up[1].{qUp}"/>
-<Transition Target="1" Source="1" Event="ball_up[2].{qUp}"/>
-<Transition Target="1" Source="1" Event="controller.{c_iBallDn==1,iBallDn==0,iBallUp==0,iLiftDn==0}"/>
-<Transition Target="1" Source="1" Event="controller.{c_iBallDn==1,iBallDn==0,iBallUp==0,iLiftDn==1}"/>
-<Transition Target="1" Source="1" Event="controller.{c_iBallDn==1,iBallDn==0,iBallUp==1,iLiftDn==0}"/>
-<Transition Target="1" Source="1" Event="controller.{c_iBallDn==1,iBallDn==0,iBallUp==1,iLiftDn==1}"/>
-<Transition Target="1" Source="1" Event="controller.{c_iBallDn==1,iBallDn==1,iBallUp==0,iLiftDn==0}"/>
-<Transition Target="1" Source="1" Event="controller.{c_iBallDn==1,iBallDn==1,iBallUp==0,iLiftDn==1}"/>
-<Transition Target="1" Source="1" Event="controller.{c_iBallDn==1,iBallDn==1,iBallUp==1,iLiftDn==0}"/>
-<Transition Target="1" Source="1" Event="controller.{c_iBallDn==1,iBallDn==1,iBallUp==1,iLiftDn==1}"/>
-<Transition Target="0" Source="1" Event="controller.{c_iBallUp==0,iBallDn==0,iBallUp==0,iLiftDn==0}"/>
-<Transition Target="0" Source="1" Event="controller.{c_iBallUp==0,iBallDn==0,iBallUp==0,iLiftDn==1}"/>
-<Transition Target="0" Source="1" Event="controller.{c_iBallUp==0,iBallDn==0,iBallUp==1,iLiftDn==0}"/>
-<Transition Target="0" Source="1" Event="controller.{c_iBallUp==0,iBallDn==0,iBallUp==1,iLiftDn==1}"/>
-<Transition Target="0" Source="1" Event="controller.{c_iBallUp==0,iBallDn==1,iBallUp==0,iLiftDn==0}"/>
-<Transition Target="0" Source="1" Event="controller.{c_iBallUp==0,iBallDn==1,iBallUp==0,iLiftDn==1}"/>
-<Transition Target="0" Source="1" Event="controller.{c_iBallUp==0,iBallDn==1,iBallUp==1,iLiftDn==0}"/>
-<Transition Target="0" Source="1" Event="controller.{c_iBallUp==0,iBallDn==1,iBallUp==1,iLiftDn==1}"/>
-<Transition Target="1" Source="1" Event="lift.{iLiftDn'==0}"/>
-<Transition Target="1" Source="1" Event="lift.{iLiftDn'==1}"/>
+<Transition Target="1" Source="1" Event="ball_up[1].{!iLiftDn}"/>
+<Transition Target="1" Source="1" Event="ball_up[2].{!iLiftDn}"/>
+<Transition Target="1" Source="1" Event="controller.{c_iBallDn,!iBallDn,!iBallUp,!iLiftDn}"/>
+<Transition Target="1" Source="1" Event="controller.{c_iBallDn,!iBallDn,!iBallUp,iLiftDn}"/>
+<Transition Target="1" Source="1" Event="controller.{c_iBallDn,!iBallDn,iBallUp,!iLiftDn}"/>
+<Transition Target="1" Source="1" Event="controller.{c_iBallDn,!iBallDn,iBallUp,iLiftDn}"/>
+<Transition Target="1" Source="1" Event="controller.{c_iBallDn,iBallDn,!iBallUp,!iLiftDn}"/>
+<Transition Target="1" Source="1" Event="controller.{c_iBallDn,iBallDn,!iBallUp,iLiftDn}"/>
+<Transition Target="1" Source="1" Event="controller.{c_iBallDn,iBallDn,iBallUp,!iLiftDn}"/>
+<Transition Target="1" Source="1" Event="controller.{c_iBallDn,iBallDn,iBallUp,iLiftDn}"/>
+<Transition Target="0" Source="1" Event="controller.{!c_iBallUp,!iBallDn,!iBallUp,!iLiftDn}"/>
+<Transition Target="0" Source="1" Event="controller.{!c_iBallUp,!iBallDn,!iBallUp,iLiftDn}"/>
+<Transition Target="0" Source="1" Event="controller.{!c_iBallUp,!iBallDn,iBallUp,!iLiftDn}"/>
+<Transition Target="0" Source="1" Event="controller.{!c_iBallUp,!iBallDn,iBallUp,iLiftDn}"/>
+<Transition Target="0" Source="1" Event="controller.{!c_iBallUp,iBallDn,!iBallUp,!iLiftDn}"/>
+<Transition Target="0" Source="1" Event="controller.{!c_iBallUp,iBallDn,!iBallUp,iLiftDn}"/>
+<Transition Target="0" Source="1" Event="controller.{!c_iBallUp,iBallDn,iBallUp,!iLiftDn}"/>
+<Transition Target="0" Source="1" Event="controller.{!c_iBallUp,iBallDn,iBallUp,iLiftDn}"/>
+<Transition Target="1" Source="1" Event="lift.{!iLiftDn'}"/>
+<Transition Target="1" Source="1" Event="lift.{iLiftDn'}"/>
 </TransitionList>
 </Automaton>
 </AutomataList>

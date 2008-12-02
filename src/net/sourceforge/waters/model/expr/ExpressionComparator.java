@@ -35,8 +35,14 @@ import net.sourceforge.waters.model.module.UnaryExpressionProxy;
  *
  * <P>This comparator imposes an ordering on objects of all subtypes of
  * {@link SimpleExpressionProxy} and can be used to ensure deterministic
- * compiler output. The ordering is first based on proxy types according to
- * the following list:</P>
+ * compiler output. The ordering is first based on proxy types; if the type
+ * is the same, the contents are examined. Identifiers are compared based
+ * on their names. Unary and binary expressions are compared first by their
+ * operators, followed by the subterms.</P>
+ *
+ * <P>The ordering of the proxy types and the operators can be customised,
+ * where the default for the class type ordering is given by the following
+ * list:</P>
  * <OL>
  * <LI>{@link IntConstantProxy}</LI>
  * <LI>{@link SimpleIdentifierProxy}</LI>
@@ -46,10 +52,9 @@ import net.sourceforge.waters.model.module.UnaryExpressionProxy;
  * <LI>{@link BinaryExpressionProxy}</LI>
  * <LI>{@link UnaryExpressionProxy}</LI>
  * </OL>
- * <P>If the type is the same, the contents are examined. Identifiers are
- * compared based on their names. Unary and binary expressions are compared
- * first by their operators (whose ordering can be customised with names
- * being the default), followed by the subterms.</P>
+ * <P>The operator ordering can be given using an {@link OperatorTable}, or
+ * the the alphabetic ordering by the operator names will be used as
+ * default.</P>
  *
  * @author Robi Malik
  */
@@ -60,18 +65,33 @@ public class ExpressionComparator
 {
 
   //#########################################################################
-  //# Constructors
-  ExpressionComparator(final Map<? extends Operator,Integer> opvalues)
+  //# Singleton Pattern
+  public static Comparator<SimpleExpressionProxy> getInstance()
   {
-    mInterfaceValues = new HashMap<Class<? extends Proxy>,Integer>(32);
-    mInterfaceValues.put(IntConstantProxy.class, 0);
-    mInterfaceValues.put(SimpleIdentifierProxy.class, 1);
-    mInterfaceValues.put(IndexedIdentifierProxy.class, 2);
-    mInterfaceValues.put(QualifiedIdentifierProxy.class, 3);
-    mInterfaceValues.put(EnumSetExpressionProxy.class, 4);
-    mInterfaceValues.put(UnaryExpressionProxy.class, 5);
-    mInterfaceValues.put(BinaryExpressionProxy.class, 6);
-    mOperatorValues = opvalues;
+    return SingletonHolder.INSTANCE;
+  }
+
+
+  //#########################################################################
+  //# Constructors
+  public ExpressionComparator
+    (final Map<Class<? extends Proxy>,Integer> ifacevalues)
+  {
+    this(ifacevalues, null);
+  }
+
+  public ExpressionComparator
+    (final OperatorTable optable)
+  {
+    this(SingletonHolder.DEFAULTMAP, optable);
+  }
+
+  public ExpressionComparator
+    (final Map<Class<? extends Proxy>,Integer> ifacevalues,
+     final OperatorTable optable)
+  {
+    mInterfaceValues = ifacevalues;
+    mOperatorTable = optable;
   }
 
 
@@ -89,14 +109,14 @@ public class ExpressionComparator
         return classval1 - classval2;
       }
     }
+    final SimpleExpressionProxy old2 = mExpr2;
     try {
-      final SimpleExpressionProxy old2 = mExpr2;
       mExpr2 = expr2;
-      final int result = (Integer) expr1.acceptVisitor(this);
-      mExpr2 = old2;
-      return result;
+      return (Integer) expr1.acceptVisitor(this);
     } catch (final VisitorException exception) {
       throw exception.getRuntimeException();
+    } finally {
+      mExpr2 = old2;
     }
   }
 
@@ -240,16 +260,11 @@ public class ExpressionComparator
 
   private int compareOperators(final Operator op1, final Operator op2)
   {
-    if (mOperatorValues != null) {
-      final Integer value1 = mOperatorValues.get(op1);
-      final Integer value2 = mOperatorValues.get(op2);
-      if (value1 != null && value2 != null) {
-        final int diff = value1 - value2;
-        if (diff != 0) {
-          return diff;
-        }
-      } else if (value1 != value2) {
-        return value1 == null ? 1 : -1;
+    if (mOperatorTable != null) {
+      final int value1 = mOperatorTable.getOperatorValue(op1);
+      final int value2 = mOperatorTable.getOperatorValue(op2);
+      if (value1 != value2) {
+        return value1 - value2;
       }
     }
     final String opname1 = op1.getName();
@@ -259,22 +274,31 @@ public class ExpressionComparator
 
 
   //#########################################################################
-  //# Singleton Pattern
-  public static Comparator<SimpleExpressionProxy> getInstance()
-  {
-    return SingletonHolder.INSTANCE;
-  }
-
-  private static class SingletonHolder {
-    private static final Comparator<SimpleExpressionProxy> INSTANCE =
-      new ExpressionComparator(null);
-  }
+  //# Data Members
+  private final Map<Class<? extends Proxy>,Integer> mInterfaceValues;
+  private final OperatorTable mOperatorTable;
+  private SimpleExpressionProxy mExpr2;
 
 
   //#########################################################################
-  //# Data Members
-  private final Map<Class<? extends Proxy>,Integer> mInterfaceValues;
-  private final Map<? extends Operator,Integer> mOperatorValues;
-  private SimpleExpressionProxy mExpr2;
+  //# Static Class Constants
+  private static class SingletonHolder {
+
+    private static final Comparator<SimpleExpressionProxy> INSTANCE;
+    private static final Map<Class<? extends Proxy>,Integer> DEFAULTMAP;
+
+    static {
+      DEFAULTMAP = new HashMap<Class<? extends Proxy>,Integer>(32);
+      DEFAULTMAP.put(IntConstantProxy.class, 0);
+      DEFAULTMAP.put(SimpleIdentifierProxy.class, 1);
+      DEFAULTMAP.put(IndexedIdentifierProxy.class, 2);
+      DEFAULTMAP.put(QualifiedIdentifierProxy.class, 3);
+      DEFAULTMAP.put(EnumSetExpressionProxy.class, 4);
+      DEFAULTMAP.put(UnaryExpressionProxy.class, 5);
+      DEFAULTMAP.put(BinaryExpressionProxy.class, 6);
+      INSTANCE = new ExpressionComparator(DEFAULTMAP, null);
+    }
+
+  }
 
 }

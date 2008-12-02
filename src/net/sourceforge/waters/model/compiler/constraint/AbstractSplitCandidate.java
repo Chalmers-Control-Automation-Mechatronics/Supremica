@@ -17,6 +17,23 @@ abstract class AbstractSplitCandidate
 {
 
   //#########################################################################
+  //# Overrides for Base Class java.lang.Object
+  public String toString()
+  {
+    final StringBuffer buffer = new StringBuffer();
+    buffer.append(getSplitExpression().toString());
+    buffer.append(": occ=");
+    buffer.append(getNumberOfOccurrences());
+    buffer.append(", size=");
+    buffer.append(getSplitSize());
+    buffer.append(", occnext=");
+    buffer.append(getOccursWithNext());
+    buffer.append(", kind=");
+    buffer.append(getKindValue());
+    return buffer.toString();
+  }
+
+  //#########################################################################
   //# Simple Access
   abstract int getNumberOfOccurrences();
 

@@ -54,6 +54,11 @@ class VariableSplitCandidate
 
   //#########################################################################
   //# net.sourceforge.waters.model.compiler.constraint.SplitCandidate
+  public SimpleExpressionProxy getRecallable()
+  {
+    return mVariableName;
+  }
+
   public List<SimpleExpressionProxy> getSplitExpressions
     (final ModuleProxyFactory factory, final CompilerOperatorTable optable)
   {

@@ -18,8 +18,6 @@ import java.util.List;
 
 import net.sourceforge.waters.model.base.VisitorException;
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
-import net.sourceforge.waters.model.compiler.context.
-  CompilerExpressionComparator;
 import net.sourceforge.waters.model.expr.BinaryOperator;
 import net.sourceforge.waters.model.expr.EvalException;
 import net.sourceforge.waters.model.expr.ExpressionComparator;
@@ -45,7 +43,7 @@ public class DNFConverter extends AbstractModuleProxyVisitor {
   public DNFConverter(final ModuleProxyFactory factory,
                       final CompilerOperatorTable optable)
   {
-    this(factory, optable, new CompilerExpressionComparator(optable));
+    this(factory, optable, new ExpressionComparator(optable));
   }
 
   public DNFConverter(final ModuleProxyFactory factory,
