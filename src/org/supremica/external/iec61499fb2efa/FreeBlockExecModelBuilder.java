@@ -246,6 +246,11 @@ class FreeBlockExecModelBuilder
 		
 		eventQueue.addInitialState("s0");
 
+		from = "s0";
+		to = "s0";
+		event = "no_event_" + fbName + ";";
+		eventQueue.addTransition(from, to, event, null, null);
+
 		for (int i = 1; i <= places; i++)
 		{
 			Integer numEvents = (Integer) eventsMaxID.get(fbName);
@@ -414,3 +419,4 @@ class FreeBlockExecModelBuilder
 		automata.addAutomaton(eventQueue);	
 	}
 }
+
