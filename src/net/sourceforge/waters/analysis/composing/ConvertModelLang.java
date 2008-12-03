@@ -180,7 +180,7 @@ public class ConvertModelLang {
     for (EventProxy e : madeEvents.keySet()) {
       if (madeEvents.get(e).contains(newevent)) return e;
     }
-    return null;
+    return newevent;
   }
 
   

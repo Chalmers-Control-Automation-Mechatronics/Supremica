@@ -493,7 +493,7 @@ public class Composing {
     if (ges.isEmpty() && ases.isEmpty()) {    	
     	return false;
     }
-    
+    /*
     System.out.println(ases.size()); 
     for (ArrayList<EventProxy> al : ases.keySet()) {
       System.out.println(ases.get(al).getName()+" ## "+al.size());
@@ -501,7 +501,7 @@ public class Composing {
         System.out.print(el.getName()+",");
       }
       System.out.println();
-    } 
+    } */
     
     for (AutomatonProxy a : checkAutomata) {
       for (ArrayList<EventProxy> es : ges) {

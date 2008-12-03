@@ -136,8 +136,8 @@ public class ComposingSafetyVerifier
     }
      
     final SafetyVerifier checker =
-      //new NativeSafetyVerifier(des, getConvertedKindTranslator(),getFactory());
-      new BDDSafetyVerifier(des, getConvertedKindTranslator(), getFactory());
+      new NativeSafetyVerifier(des, getConvertedKindTranslator(),getFactory());
+      //new BDDSafetyVerifier(des, getConvertedKindTranslator(), getFactory());
     checker.setNodeLimit(getNodeLimit());        
     final boolean result = checker.run(); 
     mStates = (int)checker.getAnalysisResult().getTotalNumberOfStates();
@@ -163,14 +163,14 @@ public class ComposingSafetyVerifier
       }
       for (int i=candidates.size()-1;i>=0;i--) {
         for (ASTAutomaton astaut : astautomata.get(i)) {
-          composedTrace = renovateTrace(composedTrace,astaut);
+          composedTrace = renovateTrace(composedTrace,astaut);          
         }
         composedTrace = extendTrace(composedTrace,candidates.get(i));        
       }
       
       //decode the manmade event only if model is converted
       composedTrace=convertTrace(composedTrace);
-      
+            
       final SafetyTraceProxy extendCounterexample =
                getFactory().createSafetyTraceProxy(tracename, getModel(), composedTrace); 
       return setFailedResult(extendCounterexample);
@@ -194,12 +194,12 @@ public class ComposingSafetyVerifier
       stateEvents.get(t.getSource()).add(t.getEvent());
       trans.put(new Key(t.getSource(), t.getEvent()), t.getTarget());
     }
-    
+    /*
     System.out.println("old list: ");
     for (int i=0; i<oldlist.size(); i++){
       System.out.print(oldlist.get(i).getName()+" --> ");
     }
-    System.out.println();
+    System.out.println();*/
     
     return rTrace(oldlist,
                   currstate,
@@ -213,13 +213,12 @@ public class ComposingSafetyVerifier
                                   Map<StateProxy, Set<EventProxy>> stateEvents,
                                   Map<Key, StateProxy> trans,
                                   ASTAutomaton astaut) {
-    if (oldlist.isEmpty()) return null;
+    if (oldlist.isEmpty()) return new LinkedList<EventProxy>();
     EventProxy currEvent = oldlist.get(0);
     if (oldlist.size() == 1) {
       //if this automaton contains the current event
       if (astaut.getAutomaton().getEvents().contains(currEvent)) {
-        if (stateEvents.get(cState)!=null 
-          &&stateEvents.get(cState).contains(currEvent)) {
+        if (stateEvents.get(cState).contains(currEvent)) {          
           return oldlist;
         } 
         //if the current event is replaced
@@ -228,7 +227,7 @@ public class ComposingSafetyVerifier
           newTrace.add(astaut.getRevents().get(currEvent).iterator().next());
           return newTrace;
         } else {
-          return null;
+          return new LinkedList<EventProxy>();
         }
       } else {
         return oldlist;
@@ -236,8 +235,7 @@ public class ComposingSafetyVerifier
     } else {
       //if this automaton contains the current event
       if (astaut.getAutomaton().getEvents().contains(currEvent)) {
-        if (stateEvents.get(cState)!=null 
-          &&stateEvents.get(cState).contains(currEvent)) {
+        if (stateEvents.get(cState).contains(currEvent)) {
             List<EventProxy> newTrace = new LinkedList<EventProxy>(oldlist);        
 			      newTrace.remove(currEvent);
 			      StateProxy target = trans.get(new Key(cState,currEvent));
@@ -246,14 +244,14 @@ public class ComposingSafetyVerifier
 			                        stateEvents,
 			                        trans,
 			                        astaut);
-			      if (newTrace != null
+			      if (!newTrace.isEmpty()
 			        &&newTrace.size() == oldlist.size()-1) {
 				      List<EventProxy> newlist = new LinkedList<EventProxy>();
 		          newlist.add(currEvent);
 		          newlist.addAll(newTrace);
 			        return newlist;
 		        } else {
-		          return null;
+		          return new LinkedList<EventProxy>();
 		        }
         }
         //if the current event is replaced
@@ -269,21 +267,21 @@ public class ComposingSafetyVerifier
 			                          stateEvents,
 			                          trans,
 			                          astaut);
-			        if (newTrace != null
+			        if (!newTrace.isEmpty()
 			          &&newTrace.size() == oldlist.size()-1) {
 			          List<EventProxy> newlist = new LinkedList<EventProxy>();
 			          newlist.add(e);
 			          newlist.addAll(newTrace);
 				        return newlist;
 			        } else {
-			          return null;
+			          return new LinkedList<EventProxy>();
 			        }
             } else {
               continue;
             }
           }
         } else {
-        	return null;
+        	return new LinkedList<EventProxy>();
         }
       } else {
         List<EventProxy> newTrace = new LinkedList<EventProxy>(oldlist);        
@@ -293,18 +291,18 @@ public class ComposingSafetyVerifier
                           stateEvents,
                           trans,
                           astaut);
-        if (newTrace != null
+        if (!newTrace.isEmpty()
 			    &&newTrace.size() == oldlist.size()-1) {
 	        List<EventProxy> newlist = new LinkedList<EventProxy>();
 	        newlist.add(currEvent);
 	        newlist.addAll(newTrace);
 	        return newlist;
         } else {
-          return null;
+          return new LinkedList<EventProxy>();
         }
       }
     }
-    return null;
+    return oldlist;
   }
 
   private List<EventProxy> extendTrace(List<EventProxy> eventlist,                                       
