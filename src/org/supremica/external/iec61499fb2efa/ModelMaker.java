@@ -208,46 +208,46 @@ class ModelMaker
 		if(properties.getProperty("execModel").equals("free"))
 		{
 			Logger.output("ModelMaker.makeModel(): Making EFA model for the FREE EVENT execution model.");
-			theBuilder = new FreeEventExecModelBuilder(properties);
+			theBuilder = new FreeEventBufferedBuilder(properties);
 		}
 		// Free block exec model
 		// blocks are chosen freely, all events are handled in a single run
 		else if(properties.getProperty("execModel").equals("freeb"))
 		{
 			Logger.output("ModelMaker.makeModel(): Making EFA model for the FREE BLOCK execution model.");
-			theBuilder = new FreeBlockExecModelBuilder(properties);
+			theBuilder = new FreeBlockBufferedBuilder(properties);
 		}
         // Sequential event exec model
 		// one place in scheduler per fb event received
 		else if (properties.getProperty("execModel").equals("seqe"))
 		{
 			Logger.output("ModelMaker.makeModel(): Making EFA model for the SEQUENTIAL EVENT execution model.");
-			theBuilder = new SequentialEventExecModelBuilder(properties);
+			theBuilder = new SequentialEventBufferedBuilder(properties);
 		}
         // Sequential block exec model
 		// one place in scheduler per all fb events received, all events are handled in a single run
 		else if (properties.getProperty("execModel").equals("seqb"))
 		{
 			Logger.output("ModelMaker.makeModel(): Making EFA model for the SEQUENTIAL BLOCK execution model.");
-			theBuilder = new SequentialBlockExecModelBuilder(properties);
+			theBuilder = new SequentialBlockBufferedBuilder(properties);
 		}
         // Cyclic exec model: block are run cyclicaly, all events are handled in a single run
 		else if (properties.getProperty("execModel").equals("cycl"))
 		{
 			Logger.output("ModelMaker.makeModel(): Making EFA model for the CYCLIC execution model.");
-			theBuilder = new CyclicExecModelBuilder(properties);
+			theBuilder = new CyclicBlockBufferedBuilder(properties);
 		}
         // Dual exec model, not fully working
 		else if (properties.getProperty("execModel").equals("dual"))
 		{
 			Logger.output("ModelMaker.makeModel(): Making EFA model for the DUAL execution model.");
-			theBuilder = new DualExecModelBuilder(properties);
+			theBuilder = new DualBufferedBuilder(properties);
 		}
         // NPMTR exec model, not working
 		else if (properties.getProperty("execModel").equals("npmtr"))
 		{
 			Logger.output("ModelMaker.makeModel(): Making EFA model for the NPMTR execution model.");
-			theBuilder = new NpmtrExecModelBuilder(properties);
+			theBuilder = new NpmtrBufferedBuilder(properties);
 		}
 		else
 		{

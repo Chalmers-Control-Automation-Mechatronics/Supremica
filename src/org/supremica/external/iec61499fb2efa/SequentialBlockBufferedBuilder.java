@@ -49,12 +49,12 @@ import net.sourceforge.fuber.model.interpreters.abstractsyntax.Identifier;
 
 import net.sourceforge.fuber.xsd.libraryelement.*;
 
-class SequentialBlockExecModelBuilder 
+class SequentialBlockBufferedBuilder 
 	extends ExecModelBuilder
 	implements ModelBuilder
 {
 
-	SequentialBlockExecModelBuilder(Properties arguments)
+	SequentialBlockBufferedBuilder(Properties arguments)
 	{
 		super(arguments);
 	}

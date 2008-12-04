@@ -50,7 +50,7 @@ import net.sourceforge.fuber.model.interpreters.abstractsyntax.Identifier;
 import net.sourceforge.fuber.xsd.libraryelement.*;
 
 class FreeBlockUnbufferedBuilder
-	extends FreeBlockExecModelBuilder
+	extends FreeBlockBufferedBuilder
 	implements ModelBuilder
 {
 

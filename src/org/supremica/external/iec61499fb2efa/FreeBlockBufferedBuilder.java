@@ -49,12 +49,12 @@ import net.sourceforge.fuber.model.interpreters.abstractsyntax.Identifier;
 
 import net.sourceforge.fuber.xsd.libraryelement.*;
 
-class FreeEventExecModelBuilder 
-	extends SequentialEventExecModelBuilder
+class FreeBlockBufferedBuilder 
+	extends SequentialBlockBufferedBuilder
 	implements ModelBuilder
 {
 
-	FreeEventExecModelBuilder(Properties arguments)
+	FreeBlockBufferedBuilder(Properties arguments)
 	{
 		super(arguments);
 	}
@@ -88,7 +88,6 @@ class FreeEventExecModelBuilder
 		eventExecution.addState("s1",false,false);
 		eventExecution.addTransition("s0", "s1", "select_fb;", null, null);	
 
-
 		for (Iterator iter = basicFunctionBlocks.keySet().iterator(); iter.hasNext();)
 		{
 			String instanceName = (String) iter.next();
@@ -104,7 +103,7 @@ class FreeEventExecModelBuilder
 
 			from = to;
 			to = "s0";
-			event = "handling_event_done_" + instanceName + ";";
+			event = "no_event_" + instanceName + ";";
 			eventExecution.addTransition(from, to, event, null, null);
 		}
 		automata.addAutomaton(eventExecution);
@@ -246,6 +245,11 @@ class FreeEventExecModelBuilder
 		int nameCounter = 1;
 		
 		eventQueue.addInitialState("s0");
+
+		from = "s0";
+		to = "s0";
+		event = "no_event_" + fbName + ";";
+		eventQueue.addTransition(from, to, event, null, null);
 
 		for (int i = 1; i <= places; i++)
 		{
@@ -415,3 +419,4 @@ class FreeEventExecModelBuilder
 		automata.addAutomaton(eventQueue);	
 	}
 }
+

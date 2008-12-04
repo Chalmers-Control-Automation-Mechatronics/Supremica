@@ -49,12 +49,12 @@ import net.sourceforge.fuber.model.interpreters.abstractsyntax.Identifier;
 
 import net.sourceforge.fuber.xsd.libraryelement.*;
 
-class FreeBlockExecModelBuilder 
-	extends SequentialBlockExecModelBuilder
+class CyclicBlockBufferedBuilder 
+	extends ExecModelBuilder
 	implements ModelBuilder
 {
 
-	FreeBlockExecModelBuilder(Properties arguments)
+	CyclicBlockBufferedBuilder(Properties arguments)
 	{
 		super(arguments);
 	}
@@ -85,28 +85,107 @@ class FreeBlockExecModelBuilder
 		ExtendedAutomaton eventExecution = getNewAutomaton("Event Execution");
 
 		eventExecution.addInitialState("s0");
-		eventExecution.addState("s1",false,false);
-		eventExecution.addTransition("s0", "s1", "select_fb;", null, null);	
-
+		
+		String from = "";
+		String to = "s0";
+		String event = ""; 
+		
+		int nameCounter = 1;
+		
 		for (Iterator iter = basicFunctionBlocks.keySet().iterator(); iter.hasNext();)
 		{
 			String instanceName = (String) iter.next();
-
-			int nameCounter = 2;
 			
-			String from = "s1";
-			String to = "s" + nameCounter;
+			from = to;
+			to = "s" + nameCounter;
 			nameCounter++;
 			eventExecution.addState(to,false,false);
-			String event = "handle_event_" + instanceName + ";";
+			event = "select_fb;";
+			eventExecution.addTransition(from, to, event, null, null);
+			
+			from = to;
+			to = "s" + nameCounter;
+			nameCounter++;
+			eventExecution.addState(to,false,false);
+			event = "handle_event_" + instanceName + ";";
 			eventExecution.addControllableTransition(from, to, event, null, null);
 
 			from = to;
-			to = "s0";
+			if (iter.hasNext())
+			{
+				to = "s" + nameCounter;
+				nameCounter++;
+				eventExecution.addState(to);
+			}
+			else
+			{
+				to = "s0";
+			}
+			
 			event = "no_event_" + instanceName + ";";
 			eventExecution.addTransition(from, to, event, null, null);
 		}
 		automata.addAutomaton(eventExecution);
+	}
+
+	void makeBasicFBEventHandling(String fbName)
+	{
+		Logger.output("Event Handling", 1);
+		
+		ExtendedAutomaton eventHandling = getNewAutomaton(fbName + ": Event Handling");
+
+		eventHandling.addInitialState("s0");
+		eventHandling.addState("s1");
+		eventHandling.addState("s2");
+		eventHandling.addState("s3");
+		eventHandling.addState("s4");
+
+		String from = "s0";
+		String to = "s1";
+		String event = "handle_event_" + fbName + ";";
+		eventHandling.addTransition(from, to, event, null, null);
+
+		from = "s1";
+		to = "s0";
+		event = "no_event_" + fbName + ";";
+		eventHandling.addTransition(from, to, event, null, null);
+
+		from = "s1";
+		to = "s2";
+		event = "select_event_" + fbName + ";";
+		eventHandling.addTransition(from, to, event, null, null);
+
+		from = "s2";
+		to = "s3";
+		event = "update_ECC_" + fbName + ";";
+		eventHandling.addTransition(from, to, event, null, null);
+
+		from = "s3";
+		to = "s2";
+		event = "no_more_actions_" + fbName + ";";
+		eventHandling.addTransition(from, to, event, null, null);
+		
+		from = "s3";
+		to = "s3";
+		event = "no_transition_" + fbName + ";";
+		eventHandling.addTransition(from, to, event, null, null);
+
+		from = "s3";
+		to = "s4";
+		event = "handling_event_done_" + fbName + ";";
+		eventHandling.addTransition(from, to, event, null, null);
+
+		from = "s4";
+		to = "s2";
+		event = "select_event_" + fbName + ";";
+		eventHandling.addTransition(from, to, event, null, null);
+
+		from = "s4";
+		to = "s0";
+		event = "no_event_" + fbName + ";";
+		eventHandling.addTransition(from, to, event, null, null);
+
+		automata.addAutomaton(eventHandling);
 	}
 
 	void makeBasicFBEventQueue(String fbName)
@@ -419,4 +498,3 @@ class FreeBlockExecModelBuilder
 		automata.addAutomaton(eventQueue);	
 	}
 }
-

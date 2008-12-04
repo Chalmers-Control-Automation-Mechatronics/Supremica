@@ -49,12 +49,12 @@ import net.sourceforge.fuber.model.interpreters.abstractsyntax.Identifier;
 
 import net.sourceforge.fuber.xsd.libraryelement.*;
 
-class DualExecModelBuilder 
+class DualBufferedBuilder 
 	extends ExecModelBuilder 
 	implements ModelBuilder
 {
 
-	DualExecModelBuilder(Properties arguments)
+	DualBufferedBuilder(Properties arguments)
 	{
 		super(arguments);
 	}

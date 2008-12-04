@@ -49,12 +49,12 @@ import net.sourceforge.fuber.model.interpreters.abstractsyntax.Identifier;
 
 import net.sourceforge.fuber.xsd.libraryelement.*;
 
-class NpmtrExecModelBuilder 
-	extends FreeEventExecModelBuilder
+class NpmtrBufferedBuilder 
+	extends FreeEventBufferedBuilder
 	implements ModelBuilder
 {
 	
-	NpmtrExecModelBuilder(Properties arguments)
+	NpmtrBufferedBuilder(Properties arguments)
 	{
 		super(arguments);
 	}

@@ -49,12 +49,12 @@ import net.sourceforge.fuber.model.interpreters.abstractsyntax.Identifier;
 
 import net.sourceforge.fuber.xsd.libraryelement.*;
 
-class SequentialEventExecModelBuilder 
+class SequentialEventBufferedBuilder 
 	extends ExecModelBuilder
 	implements ModelBuilder
 {
 
-	SequentialEventExecModelBuilder(Properties arguments)
+	SequentialEventBufferedBuilder(Properties arguments)
 	{
 		super(arguments);
 	}
