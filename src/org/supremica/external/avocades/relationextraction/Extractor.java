@@ -66,7 +66,7 @@ public class Extractor
 public ArrayList extractRestrictions(Document sup, ArrayList ROPs)
 {
 	COPList = new ArrayList(ROPs);
-	//relationsDoc = new Document(relations);
+	
 	Element root = sup.getRootElement();
 	List automaton = root.getChildren("Automaton");
 	Iterator autIter = automaton.iterator();
@@ -93,12 +93,11 @@ public ArrayList extractRestrictions(Document sup, ArrayList ROPs)
 		String eventLabel = event.getAttributeValue("label");
 		if(eventLabel.length() > OPERATION_START_PREFIX.length())
 		{
-			if( eventLabel.substring(0, OPERATION_START_PREFIX.length()).equals(OPERATION_START_PREFIX) )
+			if( eventLabel.substring(0, OPERATION_START_PREFIX.length()).
+					equals(OPERATION_START_PREFIX) )
 			{
-
 				String eventId = event.getAttributeValue("id");
 				String opName = eventLabel.substring(OPERATION_START_PREFIX.length());
-				
 				
 				if( opName.contains("_") ){
 					//EFA fix
@@ -111,8 +110,10 @@ public ArrayList extractRestrictions(Document sup, ArrayList ROPs)
 				
 				i++;
 			}
-			else if(!eventLabel.substring(0,OPERATION_STOP_PREFIX.length()).equals(OPERATION_STOP_PREFIX))
+			else if( !eventLabel.substring(0,OPERATION_STOP_PREFIX.length()).
+					equals(OPERATION_STOP_PREFIX) )
 			{
+				;//do nothing
 			}
 		}
 	}
@@ -125,16 +126,12 @@ public ArrayList extractRestrictions(Document sup, ArrayList ROPs)
 		restr.opName = matchIter.next();
 		restr.opId = opMatch.get( restr.opName ); // Get id of the operation
 		
-		//debug
-		//System.out.println("OpId: " + restr.opId);
-		//System.out.println("OpName: " + restr.opName);
-		//System.out.println("--");
-		//debug
-
 		/* Get the supervisor states where eventId is enabled, e.g. q0 and q2 */
 		List<String> enabledInSupStates = getSupervisorStates(theSupervisor, restr.opId);
 
-		List enabledInModelStates = getModelStates(enabledInSupStates, restr.opId, opMatch);
+		List enabledInModelStates = getModelStates(enabledInSupStates,
+				                                   restr.opId,
+				                                   opMatch);
 
 		restr.restrictions = enabledInModelStates;
 		//printList(enabledInModelStates);
@@ -233,13 +230,6 @@ public ArrayList getModelStates(List supStates, String eventId, Hashtable<String
 	{
 		ArrayList operationStates = new ArrayList();
 		
-		/*
-		ArrayList m = (ArrayList) matchIter.next();
-		Object dummy = m.get(1);
-		
-		dummy = m.get(0);
-		*/
-		
 		String opName = matchIter.next();
 		String opId = match.get( opName ); // Get id of the operation
 		
@@ -256,11 +246,6 @@ public ArrayList getModelStates(List supStates, String eventId, Hashtable<String
 			int index = supStateName.indexOf(opName + STATE_INDICATOR);
 			int indexSeparator = supStateName.indexOf(STATE_SEPARATOR, index);
 			
-			//debug
-			//System.out.println("opName = " + opName + " at index = " + index);
-			//System.out.println("Enabled in sup state "+ supStateName);
-			//debug
-			
 			if ( indexSeparator > index )
 			{
 				opStateName = supStateName.substring( index, indexSeparator );
@@ -271,12 +256,17 @@ public ArrayList getModelStates(List supStates, String eventId, Hashtable<String
 				opStateName = supStateName.substring( index );
 			}
 			
-			//EFA fix
-			if ( opStateName.contains(opName + INITIAL_STATE_POSTFIX) ){
+			//EFA fix by David
+			if ( opStateName.contains(opName + INITIAL_STATE_POSTFIX) )
+			{
 				opStateName = opName + INITIAL_STATE_POSTFIX;
-			} else if ( opStateName.contains(opName + EXECUTION_STATE_POSTFIX) ) {
+			} 
+			else if ( opStateName.contains(opName + EXECUTION_STATE_POSTFIX) ) 
+			{
 				opStateName = opName + EXECUTION_STATE_POSTFIX;
-			} else if ( opStateName.contains(opName + END_STATE_POSTFIX) ) {
+			} 
+			else if ( opStateName.contains(opName + END_STATE_POSTFIX) ) 
+			{
 				opStateName = opName + END_STATE_POSTFIX;
 			}else{
 				//Something is wrong
@@ -388,8 +378,6 @@ public ArrayList simplify(ArrayList operationList)
 			i0++;
 		} while( compareRestrictions(simpleRestrOld2, simpleRestr) == -1);
 
-
-
 		/* Step 5: If Oi -> Oj -> Ok, Ok[Oi_comp AND Oj_comp] is reduced to Ok[Oj_comp] */
 		simpleRestr = removeCompSequences(simpleRestr, predSucc);
 
@@ -415,8 +403,6 @@ public ArrayList simplify(ArrayList operationList)
 			simpleRestr = removeDontCareOperations(simpleRestr);
 			i2++;
 		} while( compareRestrictions(simpleRestrOld3, simpleRestr) == -1);
-
-
 
 		/* Step 7: If Oi -> Oj, Ok[Oi_init AND Oj_init] is reduced to Ok[Oi_init] */
 		simpleRestr = removeInitInitSequences(simpleRestr, predSucc);
@@ -532,7 +518,6 @@ public ArrayList replaceIECpredSucc(ArrayList restr, ArrayList ps)
 									String state3 = (String) states.get(i3);
 									if(state3.equals(op.concat(INITIAL_STATE_POSTFIX)))
 									{
-
 										allOpStatesFirst = getRestrString(rList, i3);
 										allOpStatesFirst = allOpStatesFirst.replaceAll(op.concat(INITIAL_STATE_POSTFIX), "");
 
@@ -626,9 +611,15 @@ public ArrayList replaceIECpredSucc(ArrayList restr, ArrayList ps)
 * that needs to be set to init.
 *
 ******************************************************/
-public boolean findPredSucc(String si, String se, String sc, ArrayList predsSuccs, HashSet thePreds, HashSet theSuccs, int noPreds, int noSuccs)
+public boolean findPredSucc
+(
+	String si, String se, String sc,
+	ArrayList predsSuccs,
+	HashSet thePreds,
+	HashSet theSuccs,
+	int noPreds, int noSuccs
+)
 {
-
 	boolean ans = false;
 	
 	if(si.equals(se) && si.equals(sc))
@@ -683,7 +674,10 @@ public boolean findPredSucc(String si, String se, String sc, ArrayList predsSucc
 
 			}
 
-			ans = findPredSucc(si2, se2, sc2, remPS, thePreds, theSuccs, noPredsNew, noSuccsNew);
+			ans = findPredSucc(si2, se2, sc2, remPS, thePreds,
+					                                 theSuccs,
+					                                 noPredsNew,
+					                                 noSuccsNew);
 
 			if(!ans && i<noPreds)
 			{
@@ -825,7 +819,8 @@ public Restriction replaceIEC(Restriction restr)
 
 
 		int noOfRestrEntrys = states.size();
-		String rem = "rem", keep = "keep";
+		String rem = "rem";
+		String keep = "keep";
 		ArrayList treated = new ArrayList();
 		ArrayList remove = new ArrayList();
 		for(int ii=0; ii<noOfRestrEntrys; ii++)
@@ -1001,10 +996,9 @@ public ArrayList removeEqualAlternatives(ArrayList restr)
 					j++;
 				}
 				i++;
-			}
+			}//end while
 		}
 	}
-
 	return restr;
 }
 
@@ -1041,7 +1035,6 @@ public ArrayList removeRestrString(ArrayList l, int i)
 		ArrayList states = (ArrayList) lIter.next();
 		states.remove(i);
 	}
-
 	return l;
 }
 
@@ -1054,7 +1047,6 @@ public ArrayList removeRestrString(ArrayList l, int i)
 ******************************************************/
 public ArrayList replaceState(ArrayList l, String op, String s, int i)
 {
-
 	Iterator lIter = l.iterator();
 	boolean ready = false;
 	while(lIter.hasNext() && !ready )
@@ -1067,7 +1059,6 @@ public ArrayList replaceState(ArrayList l, String op, String s, int i)
 			ready = true;
 		}
 	}
-
 	return l;
 }
 
@@ -1086,7 +1077,6 @@ public ArrayList replaceState(ArrayList l, String op, String s, int i)
 
 public ArrayList removeCompSequences(ArrayList restr, ArrayList ps)
 {
-
 	// For each predecessor-successor pair
 	for(Iterator psIter = ps.iterator(); psIter.hasNext(); )
 	{
@@ -1133,10 +1123,9 @@ public ArrayList removeCompSequences(ArrayList restr, ArrayList ps)
 					}
 
 				}
-			}
+			}//end for
 		}
-
-	}
+	}//end for
 
 	return restr;
 }
@@ -1196,7 +1185,7 @@ public ArrayList removeCompExecSequences(ArrayList restr, ArrayList ps)
 					}
 				}
 			}
-		}
+		}//end for
 	}
 
 	return restr;
@@ -1251,9 +1240,9 @@ public ArrayList removeInitInitSequences(ArrayList restr, ArrayList ps)
 						i++;
 					}
 				}
-			}
+			}//end for
 		}
-	}
+	}//end for
 
 	return restr;
 }
@@ -1304,12 +1293,11 @@ public ArrayList removeExecInitSequences(ArrayList restr, ArrayList ps)
 							rList = replaceState(rList, succ, succ.concat(DONT_CARE_STATE_POSTFIX), i);
 						}
 						i++;
-					}
+					}//end while
 				}
-			}
+			}//end for
 		}
-	}
-
+	}//end for
 	return restr;
 }
 
@@ -1361,7 +1349,6 @@ public ArrayList removeSuccessors(ArrayList restr , ArrayList ps)
 			rList.remove(remStates);
 		}
 	}
-
 	return restr;
 }
 
@@ -1411,7 +1398,6 @@ public ArrayList removeSequences(ArrayList restr, ArrayList ps)
 			}
 		}
 	}
-
 	return restr;
 }
 
@@ -1469,7 +1455,6 @@ public ArrayList removeDontCareOperations(ArrayList restr)
 
 		ArrayList remove = new ArrayList();
 
-
 		for(Iterator rListIter = rList.iterator(); rListIter.hasNext(); )
 		{
 			ArrayList states = (ArrayList) rListIter.next();
@@ -1505,7 +1490,6 @@ public ArrayList removeDontCareOperations(ArrayList restr)
 			rList.remove(remStates);
 		}
 	}
-
 	return restr;
 }
 
@@ -1545,7 +1529,6 @@ public ArrayList removeDontCareStates(ArrayList restr)
 				String state = (String) states.get(j);
 				if(state.equals(opName.concat(DONT_CARE_STATE_POSTFIX)) )
 				{
-
 					allOpStates = getRestrString(rList, j);
 					allButOp = allOpStates.replaceAll(state, "");
 
@@ -1558,7 +1541,6 @@ public ArrayList removeDontCareStates(ArrayList restr)
 
 							allOpStates2 = getRestrString(rList, jj);
 							allButOp2 = allOpStates2.replaceAll(state2, "");
-
 						}
 						jj++;
 					}
@@ -1576,7 +1558,6 @@ public ArrayList removeDontCareStates(ArrayList restr)
 			}
 		}
 	}
-
 	return restr;
 }
 
@@ -1735,10 +1716,8 @@ public int compareRestrictions(ArrayList r1, ArrayList r2)
 						//System.out.println("Not equal states");
 						return -1;
 					}
-
 				}
 			}
-
 		}
 	}
 	return 1;

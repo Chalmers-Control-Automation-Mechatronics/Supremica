@@ -328,9 +328,12 @@ public class COPBuilder {
         	tmpFile.delete();
         }
         
-        //Debug info
-        module.setName( "SpecificationSynthes" );
-        module.setComment( comment );
+        if ( null != module ){
+        	module.setName( "SpecificationSynthes" );
+        	module.setComment( comment );
+        } else {
+        	System.out.println("Unable to create SpecificationSynthes");
+        }
         
         return module;
     }
