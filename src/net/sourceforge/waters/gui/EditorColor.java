@@ -97,6 +97,9 @@ public class EditorColor
 
   //#########################################################################
   //# Public Colour Constants
+  /** The default color of text. */
+  public static final Color TEXTCOLOR = Color.BLACK;
+    
   /** The default color of disabled text. */
   public static final Color DISABLEDCOLOR = Color.GRAY;
     

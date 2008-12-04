@@ -100,6 +100,8 @@ public class EventDeclListView
     setModel(mModel);
     setCellRenderer(new EventListCell(context));
 
+    setBackground(EditorColor.BACKGROUNDCOLOR);
+    setSelectionForeground(EditorColor.TEXTCOLOR);
     setSelectionBackground(EditorColor.BACKGROUND_NOTFOCUSSED);
     addFocusListener(this);
     setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);

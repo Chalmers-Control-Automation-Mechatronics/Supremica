@@ -587,12 +587,28 @@ public class ComponentsTree
   {
 
     //#######################################################################
+    //# Constructor
+    private ComponentsTreeCellRenderer()
+    {
+      setTextSelectionColor(EditorColor.TEXTCOLOR);
+    }
+
+    //#######################################################################
     //# Interface javax.swing.tree.TreeCellRenderer
     public Component getTreeCellRendererComponent
       (final JTree tree, final Object value, final boolean sel,
        final boolean expanded, final boolean leaf,
        final int row, final boolean hasFocus)
     {
+      if (sel) {
+        if (mIsPermanentFocusOwner) {
+          setBackgroundSelectionColor(EditorColor.BACKGROUND_FOCUSSED);
+          setBorderSelectionColor(EditorColor.BACKGROUND_FOCUSSED);
+        } else {
+          setBackgroundSelectionColor(EditorColor.BACKGROUND_NOTFOCUSSED);
+          setBorderSelectionColor(EditorColor.BACKGROUND_NOTFOCUSSED);
+        }
+      }
       super.getTreeCellRendererComponent
 	(tree, value, sel, expanded, leaf, row, hasFocus);
       final Proxy proxy = (Proxy) value;
@@ -602,14 +618,6 @@ public class ComponentsTree
       setIcon(icon);
       final String tooltip = mModuleContext.getToolTipText(proxy);
       setToolTipText(tooltip);
-      setOpaque(sel);
-      if (sel) {
-        if (mIsPermanentFocusOwner) {
-          setBackground(EditorColor.BACKGROUND_FOCUSSED);
-        } else {
-          setBackground(EditorColor.BACKGROUND_NOTFOCUSSED);
-        }
-      }
       return this;
     }
 

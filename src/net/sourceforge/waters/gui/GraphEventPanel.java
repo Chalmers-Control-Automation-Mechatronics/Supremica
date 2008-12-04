@@ -48,6 +48,7 @@ import javax.swing.SwingUtilities;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.event.TableModelEvent;
+import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableModel;
@@ -150,11 +151,8 @@ public class GraphEventPanel
     setSurrendersFocusOnKeystroke(true);
     setRowSelectionAllowed(true);
 
-    final TableCellRenderer iconrenderer0 =
-      getDefaultRenderer(Icon.class);
-    final TableCellRenderer iconrenderer1 =
-      new RendererNoFocus(iconrenderer0, false);
-    setDefaultRenderer(Icon.class, iconrenderer1);
+    final TableCellRenderer iconrenderer = new IconRenderer(false);
+    setDefaultRenderer(Icon.class, iconrenderer);
     final TableCellRenderer textrenderer0 =
       getDefaultRenderer(Object.class);
     final TableCellRenderer textrenderer1 =
@@ -168,6 +166,8 @@ public class GraphEventPanel
 
     setPreferredSizes();
 
+    setBackground(EditorColor.BACKGROUNDCOLOR);
+    setSelectionForeground(EditorColor.TEXTCOLOR);
     setSelectionBackground(EditorColor.BACKGROUND_NOTFOCUSSED);
     addFocusListener(this);
     final MouseListener mouser = new MouseHandler();
@@ -832,6 +832,7 @@ public class GraphEventPanel
     private RendererNoFocus(final TableCellRenderer renderer,
 			    final boolean focusable)
     {
+      assert renderer != null;
       mRenderer = renderer;
       mFocusable = focusable;
     }
@@ -852,6 +853,40 @@ public class GraphEventPanel
     //#######################################################################
     //# Data Members
     private final TableCellRenderer mRenderer;
+    private final boolean mFocusable;
+
+  }
+
+
+  //#########################################################################
+  //# Local Class IconRenderer
+  private static class IconRenderer
+    extends DefaultTableCellRenderer
+  {
+
+    //#######################################################################
+    //# Constructors
+    private IconRenderer(final boolean focusable)
+    {
+      mFocusable = focusable;
+    }
+
+    //#######################################################################
+    //# Interface javax.swing.table.TableCellRenderer
+    public Component getTableCellRendererComponent
+      (final JTable table, final Object value, final boolean isSelected,
+       final boolean hasFocus, final int row, final int column)
+    {
+      super.getTableCellRendererComponent
+        (table, value, isSelected, hasFocus, row, column);
+      final Icon icon = (Icon) value;
+      setIcon(icon);
+      setFocusable(mFocusable);
+      return this;
+    }
+
+    //#######################################################################
+    //# Data Members
     private final boolean mFocusable;
 
   }
