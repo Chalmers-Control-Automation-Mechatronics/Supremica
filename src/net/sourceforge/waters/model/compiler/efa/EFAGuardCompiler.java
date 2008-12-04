@@ -2,7 +2,7 @@
 //###########################################################################
 //# PROJECT: Waters
 //# PACKAGE: net.sourceforge.waters.model.compiler.efa
-//# CLASS:   GuardCompiler
+//# CLASS:   EFAGuardCompiler
 //###########################################################################
 //# $Id$
 //###########################################################################
@@ -30,13 +30,13 @@ import net.sourceforge.waters.model.module.SimpleExpressionProxy;
 import net.sourceforge.waters.model.module.UnaryExpressionProxy;
 
 
-class GuardCompiler
+class EFAGuardCompiler
 {
 
   //#########################################################################
   //# Constructors
-  GuardCompiler(final ModuleProxyFactory factory,
-                final CompilerOperatorTable optable)
+  EFAGuardCompiler(final ModuleProxyFactory factory,
+                   final CompilerOperatorTable optable)
   {
     mFactory = factory;
     mOperatorTable = optable;

@@ -37,6 +37,7 @@ import net.sourceforge.waters.model.compiler.context.SourceInfoBuilder;
 import net.sourceforge.waters.model.compiler.context.
   UndefinedIdentifierException;
 import net.sourceforge.waters.model.expr.EvalException;
+import net.sourceforge.waters.model.expr.UnaryOperator;
 import net.sourceforge.waters.model.expr.TypeMismatchException;
 import net.sourceforge.waters.model.marshaller.DocumentManager;
 import net.sourceforge.waters.model.marshaller.WatersUnmarshalException;
@@ -68,6 +69,7 @@ import net.sourceforge.waters.model.module.SimpleComponentProxy;
 import net.sourceforge.waters.model.module.SimpleExpressionProxy;
 import net.sourceforge.waters.model.module.SimpleIdentifierProxy;
 import net.sourceforge.waters.model.module.SimpleNodeProxy;
+import net.sourceforge.waters.model.module.UnaryExpressionProxy;
 import net.sourceforge.waters.model.module.VariableComponentProxy;
 import net.sourceforge.waters.model.module.VariableMarkingProxy;
 
@@ -114,6 +116,7 @@ public class ModuleInstanceCompiler extends AbstractModuleProxyVisitor
     mOperatorTable = CompilerOperatorTable.getInstance();
     mSimpleExpressionCompiler =
       new SimpleExpressionCompiler(mFactory, mOperatorTable);
+    mPrimeSearcher = new PrimeSearcher();
     mNameCompiler = new NameCompiler();
     mIndexAdder = new IndexAdder();
     mNameSpaceVariablesContext = new NameSpaceVariablesContext();
@@ -486,18 +489,27 @@ public class ModuleInstanceCompiler extends AbstractModuleProxyVisitor
       final List<SimpleExpressionProxy> newguards =
         new ArrayList<SimpleExpressionProxy>(numguards);
       for (final SimpleExpressionProxy oldguard : oldguards) {
-        final SimpleExpressionProxy newguard =
-          mSimpleExpressionCompiler.simplify
-          (oldguard, mNameSpaceVariablesContext);
-        if (!mSimpleExpressionCompiler.isAtomicValue(newguard, mContext)) {
+        if (mPrimeSearcher.containsPrime(oldguard)) {
+          // Don't simplify guards with primes ---
+          // they are needed to determine the variable alphabet!
+          final ModuleProxyCloner cloner = mFactory.getCloner();
+          final SimpleExpressionProxy newguard =
+            (SimpleExpressionProxy) cloner.getClone(oldguard);
           newguards.add(newguard);
-        } else if (mSimpleExpressionCompiler.getBooleanValue(newguard)) {
-          // Don't bother to add true guards ...
         } else {
-          // If a guard is false, no need for any other guards ...
-          newguards.clear();
-          newguards.add(newguard);
-          break;
+          final SimpleExpressionProxy newguard =
+            mSimpleExpressionCompiler.simplify
+            (oldguard, mNameSpaceVariablesContext);
+          if (!mSimpleExpressionCompiler.isAtomicValue(newguard, mContext)) {
+            newguards.add(newguard);
+          } else if (mSimpleExpressionCompiler.getBooleanValue(newguard)) {
+            // Don't bother to add true guards ...
+          } else {
+            // If a guard is false, no need for any other guards ...
+            newguards.clear();
+            newguards.add(newguard);
+            break;
+          }
         }
       }
       final List<BinaryExpressionProxy> oldactions = ga.getActions();
@@ -930,6 +942,70 @@ public class ModuleInstanceCompiler extends AbstractModuleProxyVisitor
 
 
   //#########################################################################
+  //# Inner Class PrimeSearcher
+  private class PrimeSearcher extends AbstractModuleProxyVisitor {
+
+    //#######################################################################
+    //# Invocation
+    private boolean containsPrime(final SimpleExpressionProxy expr)
+      throws VisitorException
+    {
+      return (Boolean) expr.acceptVisitor(this);
+    }
+
+    //#######################################################################
+    //# Interface net.sourceforge.waters.model.module.ModuleProxyVisitor
+    public Boolean visitBinaryExpressionProxy(final BinaryExpressionProxy expr)
+      throws VisitorException
+    {
+      final SimpleExpressionProxy lhs = expr.getLeft();
+      final SimpleExpressionProxy rhs = expr.getRight();
+      return containsPrime(lhs) || containsPrime(rhs);
+    }
+
+    public Boolean visitIndexedIdentifierProxy
+      (final IndexedIdentifierProxy ident)
+      throws VisitorException
+    {
+      final List<SimpleExpressionProxy> indexes = ident.getIndexes();
+      for (final SimpleExpressionProxy index : indexes) {
+        if (containsPrime(index)) {
+          return true;
+        }
+      }
+      return false;
+    }
+
+    public Boolean visitQualifiedIdentifierProxy
+      (final QualifiedIdentifierProxy ident)
+      throws VisitorException
+    {
+      final IdentifierProxy base = ident.getBaseIdentifier();
+      final IdentifierProxy comp = ident.getComponentIdentifier();
+      return containsPrime(base) || containsPrime(comp);
+    }
+
+    public Boolean visitSimpleExpressionProxy(final SimpleExpressionProxy expr)
+    {
+      return false;
+    }
+
+    public Boolean visitUnaryExpressionProxy(final UnaryExpressionProxy expr)
+      throws VisitorException
+    {
+      final UnaryOperator op = expr.getOperator();
+      if (op == mOperatorTable.getNextOperator()) {
+        return true;
+      } else {
+        final SimpleExpressionProxy subterm = expr.getSubTerm();
+        return containsPrime(subterm);
+      }
+    }
+
+  }
+
+
+  //#########################################################################
   //# Inner Class NameCompiler
   private class NameCompiler extends AbstractModuleProxyVisitor {
 
@@ -1016,7 +1092,7 @@ public class ModuleInstanceCompiler extends AbstractModuleProxyVisitor
 
 
   //#########################################################################
-  //# Inner Class NameCompiler
+  //# Inner Class IndexAdder
   private class IndexAdder extends AbstractModuleProxyVisitor {
 
     //#######################################################################
@@ -1163,6 +1239,7 @@ public class ModuleInstanceCompiler extends AbstractModuleProxyVisitor
   private final SourceInfoBuilder mSourceInfoBuilder;
   private final CompilerOperatorTable mOperatorTable;
   private final SimpleExpressionCompiler mSimpleExpressionCompiler;
+  private final PrimeSearcher mPrimeSearcher;
   private final NameCompiler mNameCompiler;
   private final IndexAdder mIndexAdder;
   private final NameSpaceVariablesContext mNameSpaceVariablesContext;

@@ -453,30 +453,15 @@ public class EFACompiler
     //# Constructor
     private Pass2Visitor()
     {
-      mGuardCompiler = new GuardCompiler(mFactory, mOperatorTable);
+      mGuardCompiler = new EFAGuardCompiler(mFactory, mOperatorTable);
+      mVariableCollector =
+        new EFAVariableCollector(mOperatorTable,mRootContext);
       mPropagator =
         new ConstraintPropagator(mFactory, mOperatorTable, mRootContext);
     }
 
     //#######################################################################
     //# Interface net.sourceforge.waters.model.module.ModuleProxyVisitor
-    public Object visitBinaryExpressionProxy(final BinaryExpressionProxy expr)
-      throws VisitorException
-    {
-      try {
-        final SimpleExpressionProxy left = expr.getLeft();
-        if (left instanceof IdentifierProxy) {
-          final EFAVariable var = mRootContext.findVariable(left);
-          mCollectedVariables.add(var);
-          return null;
-        } else {
-          throw new ActionSyntaxException(expr);
-        }
-      } catch (final EvalException exception) {
-        throw wrap(exception);
-      }
-    }
-
     public Object visitEdgeProxy(final EdgeProxy edge)
       throws VisitorException
     {
@@ -534,8 +519,11 @@ public class EFACompiler
     {
       try {
         mCurrentGuard = mGuardCompiler.getCompiledGuard(ga);
-        final List<BinaryExpressionProxy> actions = ga.getActions();
-        visitCollection(actions);
+        for (final SimpleExpressionProxy guard :
+               mCurrentGuard.getConstraints()) {
+          mVariableCollector.collectPrimedVariables
+            (guard, mCollectedVariables);
+        }
         return mCurrentGuard;
       } catch (final EvalException exception) {
         throw wrap(exception);
@@ -789,7 +777,8 @@ public class EFACompiler
 
     //#######################################################################
     //# Data Members
-    private final GuardCompiler mGuardCompiler;
+    private final EFAGuardCompiler mGuardCompiler;
+    private final EFAVariableCollector mVariableCollector;
     private final ConstraintPropagator mPropagator;
 
     private SimpleComponentProxy mCurrentComponent;

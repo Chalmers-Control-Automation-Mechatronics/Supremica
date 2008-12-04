@@ -934,6 +934,7 @@
   <xs:restriction base="xs:string">
     <xs:enumeration value="-"/>
     <xs:enumeration value="!"/>
+    <xs:enumeration value="'"/>
   </xs:restriction>
 </xs:simpleType>
 

@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<ProductDES Name="nondetvar"
+  xmlns:ns2="http://waters.sourceforge.net/xsd/base"
+  xmlns="http://waters.sourceforge.net/xsd/des">
+<ns2:Comment>A test that involves an EFA variable that is explicitly specified to change nondeterministically on a transition.</ns2:Comment>
+<EventList>
+<Event Kind="CONTROLLABLE" Name="e"/>
+</EventList>
+<AutomataList>
+<Automaton Kind="SPEC" Name="spec">
+<EventRefList>
+<EventRef Name="e"/>
+</EventRefList>
+<StateList>
+<State Initial="true" Name="S0"/>
+</StateList>
+<TransitionList>
+<Transition Source="S0" Target="S0" Event="e"/>
+</TransitionList>
+</Automaton>
+<Automaton Kind="PLANT" Name="x">
+<EventRefList>
+<EventRef Name="e"/>
+</EventRefList>
+<StateList>
+<State Initial="true" Name="0"/>
+<State Name="1"/>
+<State Name="2"/>
+</StateList>
+<TransitionList>
+<Transition Source="0" Target="0" Event="e"/>
+<Transition Source="0" Target="1" Event="e"/>
+<Transition Source="0" Target="2" Event="e"/>
+<Transition Source="1" Target="0" Event="e"/>
+<Transition Source="1" Target="1" Event="e"/>
+<Transition Source="1" Target="2" Event="e"/>
+<Transition Source="2" Target="0" Event="e"/>
+<Transition Source="2" Target="1" Event="e"/>
+<Transition Source="2" Target="2" Event="e"/>
+</TransitionList>
+</Automaton>
+</AutomataList>
+</ProductDES>
+

@@ -312,6 +312,12 @@ public abstract class AbstractCompilerTest
     compile("handwritten", "nodegroup_efa");
   }
 
+  public void testCompile_nondetvar()
+    throws IOException, WatersException
+  {
+    compile("handwritten", "nondetvar");
+  }
+
   /*
   public void testCompile_profisafe_ihost_efa()
     throws IOException, WatersException
