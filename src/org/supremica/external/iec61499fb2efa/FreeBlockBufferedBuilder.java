@@ -363,7 +363,6 @@ class FreeBlockBufferedBuilder
 					event = "received_event_" + eventName + "_" + fbName + ";";
 					eventQueue.addTransition(from, to, event, null, null);
 				}
-				
 			}
 
 

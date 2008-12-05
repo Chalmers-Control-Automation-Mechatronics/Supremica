@@ -250,60 +250,17 @@ class FreeBlockUnbufferedBuilder
 		to = "s0";
 		event = "no_event_" + fbName + ";";
 		eventQueue.addTransition(from, to, event, null, null);
-
+        
 		for (int i = 1; i <= places; i++)
 		{
 			Integer numEvents = (Integer) eventsMaxID.get(fbName);
 			eventQueue.addIntegerVariable("event_place_" + i + "_" + fbName, 0, numEvents, 0, 0);
 			
-			// data input variables for each queue place
-			if (theType.getInterfaceList().isSetInputVars())
-			{
-				final List dataInputs = theType.getInterfaceList().getInputVars().getVarDeclaration();
-				for (Iterator dataInputsIter = dataInputs.iterator(); dataInputsIter.hasNext();)
-				{
-					VarDeclaration curDeclaration = (VarDeclaration) dataInputsIter.next();
-					String curDataInputName = curDeclaration.getName();
-					if (isDataConnected(fbName, curDataInputName))
-					{
-						String curDataType =  curDeclaration.getType();
-						if (curDataType.toLowerCase().equals("int"))
-						{
-							eventQueue.addIntegerVariable("data_place_" + i + "_" + curDataInputName + "_" + fbName, intVarMinValue, intVarMaxValue, 0, 0);
-						}
-						else if (curDataType.toLowerCase().equals("bool"))
-						{
-							Logger.output(Logger.ERROR, "Error: Unsupported input data variable type: BOOL", 1);
-							Logger.output(Logger.ERROR, "Variable name: " + fbName + "_" + curDataInputName, 2);
-							exit(1);
-						}
-						else if (curDataType.toLowerCase().equals("real"))
-						{
-							Logger.output(Logger.ERROR, "Error: Unsupported input data variable type: REAL", 1);
-							Logger.output(Logger.ERROR, "Variable name: " + fbName + "_" + curDataInputName, 2);
-							exit(1);
-						}
-						else if (curDataType.toLowerCase().equals("string"))
-						{
-							Logger.output(Logger.ERROR, "Error: Unsupported input data variable type: STRING", 1);
-							Logger.output(Logger.ERROR, "Variable name: " + fbName + "_" + curDataInputName, 2);
-							exit(1);
-						}
-						else if (curDataType.toLowerCase().equals("object"))
-						{
-							Logger.output(Logger.ERROR, "Error: Unsupported input data variable type: OBJECT", 1);
-							Logger.output(Logger.ERROR, "Variable name: " + fbName + "_" + curDataInputName, 2);
-							exit(1);
-						}
-					}
-				}
-			}
-			
 			eventQueue.addState("s" + i);
-
+            
 			for (Iterator evIter = eventInputList.iterator(); evIter.hasNext();)
 			{
-
+                
 				JaxbEvent curEvent = (JaxbEvent) evIter.next();
 				String eventName = curEvent.getName();
 				int eventID = ((Integer) ((Map) events.get(fbName)).get(eventName)).intValue();
@@ -327,96 +284,78 @@ class FreeBlockUnbufferedBuilder
 					{
 						guard = "event_" + fbName + "_first == " + j;
 						action = "event_place_" + ((((j-1)+(i-1)) % places) + 1) + "_" + fbName + " = " + eventID + ";";
-						if (curEvent.isSetWith())
-						{
-							List withData = curEvent.getWith();
-							for (Iterator withIter = withData.iterator(); withIter.hasNext();)
-							{
-								String curWith = ((With) withIter.next()).getVar();
-								if (isDataConnected(fbName, curWith))
-								{														
-									String cntFrom = (String) ((Map) dataConnections.get(fbName)).get(curWith);
-									String fromInstance = getInstanceName(cntFrom);
-									String fromSignal = getSignalName(cntFrom);				
-									if (fromInstance.equals(""))
-									{
-										// constant data connection
-										action = action + 
-											"data_place_" + ((((j-1)+(i-1)) % places) + 1) + "_" + curWith + "_" + fbName + 
-											" = " + new Integer(fromSignal) + ";";
-									}
-									else
-									{
-										// instance data connection
-										action = action + 
-											"data_place_" + ((((j-1)+(i-1)) % places) + 1) + "_" + curWith + "_" + fbName + 
-											" = data_" + fromSignal + "_" + fromInstance + ";";
-									}
-								}
-							}
-						}
-						eventQueue.addTransition(from, to, event, guard, action);
-					}
+                        eventQueue.addTransition(from, to, event, guard, action);
+                    }
+                    
+                    from = to;
+                    to = "s" + i;
+                    event = "received_event_" + eventName + "_" + fbName + ";";
+                    eventQueue.addTransition(from, to, event, null, null);
+                }
+            }        
+            
+            // Transitions when dequeuing event
+            for (Iterator evIter = eventInputList.iterator(); evIter.hasNext();)
+            {
+                JaxbEvent curEvent = (JaxbEvent) evIter.next();
+                String eventName = curEvent.getName();
+                int eventID = ((Integer) ((Map) events.get(fbName)).get(eventName)).intValue();
+                
+                if (isEventConnected(fbName, eventName))
+                {					
+                    from = "s" + i;
+                    to = "s" + (places + nameCounter);
+                    nameCounter++;
+                    eventQueue.addState(to,false,false);
+                    event = "select_event_" + fbName + ";";
+                    for (int j = 1; j <= places; j++)
+                    {
+                        guard = "(event_" + fbName + "_first == " + j + ") & ";
+                        guard = guard + "(event_place_" + j + "_" + fbName + " == " + eventID + ")";
+                        action = "event_" + eventName + "_" + fbName + " = 1;";
+                        action = action + "event_" + fbName + "_first = " + ((j % places) + 1) + ";";				
+                        action = action + "event_place_" + j + "_" + fbName +  " = 0;";
 
-					from = to;
-					to = "s" + i;
-					event = "received_event_" + eventName + "_" + fbName + ";";
-					eventQueue.addTransition(from, to, event, null, null);
-				}
-				
-			}
-
-
-			// Transitions when dequeuing event
-			for (Iterator evIter = eventInputList.iterator(); evIter.hasNext();)
-			{
-				JaxbEvent curEvent = (JaxbEvent) evIter.next();
-				String eventName = curEvent.getName();
-				int eventID = ((Integer) ((Map) events.get(fbName)).get(eventName)).intValue();
-
-				if (isEventConnected(fbName, eventName))
-				{					
-					from = "s" + i;
-					to = "s" + (places + nameCounter);
-					nameCounter++;
-					eventQueue.addState(to,false,false);
-					event = "select_event_" + fbName + ";";
-					for (int j = 1; j <= places; j++)
-					{
-						guard = "(event_" + fbName + "_first == " + j + ") & ";
-						guard = guard + "(event_place_" + j + "_" + fbName + " == " + eventID + ")";
-						action = "event_" + eventName + "_" + fbName + " = 1;";
-						action = action + "event_" + fbName + "_first = " + ((j % places) + 1) + ";";				
-						action = action + "event_place_" + j + "_" + fbName +  " = 0;";
-						if (curEvent.isSetWith())
-						{
-							List withData = curEvent.getWith();
-						
-							// get first data in the queue
-							for (Iterator withIter = withData.iterator(); withIter.hasNext();)
-							{
-								String curWith = ((With) withIter.next()).getVar();
-								if (isDataConnected(fbName, curWith))
-								{														
-									action = action + 
-										"data_" + curWith + "_" + fbName + " = data_place_" + j + "_" + curWith + "_" + fbName + ";";
-									action = action + 
-										"data_place_" + j + "_" + curWith + "_" + fbName + " = 0;";
-								}
-							}
-						}
-						eventQueue.addTransition(from, to, event, guard, action);
-					}					
-
-					from = to;
-					to = "s" + (i-1);
-					event = "reset_event_" + eventName + "_" + fbName + ";";
-					action = "event_" + eventName + "_" + fbName + " = 0;";
-					eventQueue.addTransition(from, to, event, null, action);
-				}
-			}
-		}		
-		automata.addAutomaton(eventQueue);	
-	}
+                        if (curEvent.isSetWith())
+                        {
+                            List withData = curEvent.getWith();
+                            for (Iterator withIter = withData.iterator(); withIter.hasNext();)
+                            {
+                                String curWith = ((With) withIter.next()).getVar();
+                                if (isDataConnected(fbName, curWith))
+                                {														
+                                    String cntFrom = (String) ((Map) dataConnections.get(fbName)).get(curWith);
+                                    String fromInstance = getInstanceName(cntFrom);
+                                    String fromSignal = getSignalName(cntFrom);				
+                                    if (fromInstance.equals(""))
+                                    {
+                                        // constant data connection
+                                        action = action + 
+                                            "data_" + curWith + "_" + fbName +
+                                            " = " + new Integer(fromSignal) + ";";
+                                    }
+                                    else
+                                    {
+                                        // instance data connection
+                                        action = action + 
+                                            "data_" + curWith + "_" + fbName + 
+                                            " = data_" + fromSignal + "_" + fromInstance + ";";
+                                    }
+                                }
+                            }
+                        }
+                        eventQueue.addTransition(from, to, event, guard, action);
+                    }					
+                    
+                    from = to;
+                    to = "s" + (i-1);
+                    event = "reset_event_" + eventName + "_" + fbName + ";";
+                    action = "event_" + eventName + "_" + fbName + " = 0;";
+                    eventQueue.addTransition(from, to, event, null, action);
+                }
+            }
+        }
+        automata.addAutomaton(eventQueue);	
+    }
 }
 

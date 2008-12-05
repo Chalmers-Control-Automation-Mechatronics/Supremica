@@ -217,6 +217,13 @@ class ModelMaker
 			Logger.output("ModelMaker.makeModel(): Making EFA model for the FREE BLOCK execution model.");
 			theBuilder = new FreeBlockBufferedBuilder(properties);
 		}
+		// Free block unbuffered exec model
+		// blocks are chosen freely, all events are handled in a single run
+		else if(properties.getProperty("execModel").equals("freebu"))
+		{
+			Logger.output("ModelMaker.makeModel(): Making EFA model for the FREE BLOCK UNBUFFERED execution model.");
+			theBuilder = new FreeBlockUnbufferedBuilder(properties);
+		}
         // Sequential event exec model
 		// one place in scheduler per fb event received
 		else if (properties.getProperty("execModel").equals("seqe"))
