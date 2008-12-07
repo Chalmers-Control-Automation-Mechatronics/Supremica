@@ -2,7 +2,7 @@
 //###########################################################################
 //# PROJECT: Waters
 //# PACKAGE: net.sourceforge.waters.model.compiler.efa
-//# CLASS:   EFATransitionGroup
+//# CLASS:   EFAAutomatonTransitionGroup
 //###########################################################################
 //# $Id$
 //###########################################################################
@@ -24,21 +24,22 @@ import net.sourceforge.waters.model.module.SimpleExpressionProxy;
 /**
  * A compiler-internal representation of the set of all the transitions
  * associated with a given event in one particular automaton. More than one
- * partial transition ({@link EFATransition}) may be associated to the same
- * event, for different values of the EFA variables.
+ * partial transition ({@link EFAAutomatonTransition}) may be associated to
+ * the same event, for different values of the EFA variables.
  *
  * @author Robi Malik
  */
 
-class EFATransitionGroup implements Comparable<EFATransitionGroup>
+class EFAAutomatonTransitionGroup
+  implements Comparable<EFAAutomatonTransitionGroup>
 {
 
   //#########################################################################
   //# Constructors
-  EFATransitionGroup(final SimpleComponentProxy comp)
+  EFAAutomatonTransitionGroup(final SimpleComponentProxy comp)
   {
     mComponent = comp;
-    mPartialTransitions = new HashMap<ConstraintList,EFATransition>();
+    mPartialTransitions = new HashMap<ConstraintList,EFAAutomatonTransition>();
     mHasTrueGuard = false;
   }
 
@@ -50,12 +51,12 @@ class EFATransitionGroup implements Comparable<EFATransitionGroup>
     return mPartialTransitions.keySet();
   }
 
-  Collection<EFATransition> getPartialTransitions()
+  Collection<EFAAutomatonTransition> getPartialTransitions()
   {
     return mPartialTransitions.values();
   }
 
-  EFATransition getPartialTransition(final ConstraintList guard)
+  EFAAutomatonTransition getPartialTransition(final ConstraintList guard)
   {
     return mPartialTransitions.get(guard);
   }
@@ -85,7 +86,7 @@ class EFATransitionGroup implements Comparable<EFATransitionGroup>
                      final NodeProxy node,
                      final Proxy location)
   {
-    final EFATransition trans = createTransition(guard);
+    final EFAAutomatonTransition trans = createTransition(guard);
     trans.addSource(node, location);
     mHasTrueGuard |= guard.isTrue();
   }
@@ -93,19 +94,19 @@ class EFATransitionGroup implements Comparable<EFATransitionGroup>
   void replaceTransition(final ConstraintList victim,
                          final ConstraintList replacement)
   {
-    final EFATransition oldtrans = mPartialTransitions.get(victim);
+    final EFAAutomatonTransition oldtrans = mPartialTransitions.get(victim);
     mPartialTransitions.remove(victim);
-    final EFATransition newtrans = createTransition(replacement);
+    final EFAAutomatonTransition newtrans = createTransition(replacement);
     newtrans.addSources(oldtrans);
   }
 
   void replaceTransition(final ConstraintList victim,
                          final Collection<ConstraintList> replacements)
   {
-    final EFATransition oldtrans = mPartialTransitions.get(victim);
+    final EFAAutomatonTransition oldtrans = mPartialTransitions.get(victim);
     mPartialTransitions.remove(victim);
     for (final ConstraintList replacement : replacements) {
-      final EFATransition newtrans = createTransition(replacement);
+      final EFAAutomatonTransition newtrans = createTransition(replacement);
       newtrans.addSources(oldtrans);
     }
   }
@@ -113,7 +114,7 @@ class EFATransitionGroup implements Comparable<EFATransitionGroup>
 
   //#########################################################################
   //# Interface java.lang.Comparable
-  public int compareTo(final EFATransitionGroup group)
+  public int compareTo(final EFAAutomatonTransitionGroup group)
   {
     final int numclauses1 = mPartialTransitions.size();
     final int numclauses2 = group.mPartialTransitions.size();
@@ -133,11 +134,11 @@ class EFATransitionGroup implements Comparable<EFATransitionGroup>
 
   //#########################################################################
   //# Auxiliary Methods
-  private EFATransition createTransition(final ConstraintList guard)
+  private EFAAutomatonTransition createTransition(final ConstraintList guard)
   {
-    EFATransition trans = mPartialTransitions.get(guard);
+    EFAAutomatonTransition trans = mPartialTransitions.get(guard);
     if (trans == null) {
-      trans = new EFATransition(mComponent, guard);
+      trans = new EFAAutomatonTransition(mComponent, guard);
       mPartialTransitions.put(guard, trans);
     }
     return trans;
@@ -147,7 +148,7 @@ class EFATransitionGroup implements Comparable<EFATransitionGroup>
   //#########################################################################
   //# Data Members
   private final SimpleComponentProxy mComponent;
-  private final Map<ConstraintList,EFATransition> mPartialTransitions;
+  private final Map<ConstraintList,EFAAutomatonTransition> mPartialTransitions;
   private boolean mHasTrueGuard;
 
 }

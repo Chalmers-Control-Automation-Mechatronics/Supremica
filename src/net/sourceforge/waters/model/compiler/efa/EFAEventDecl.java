@@ -45,7 +45,8 @@ class EFAEventDecl {
   {
     mEventDecl = decl;
     mVariables = new HashSet<EFAVariable>();
-    mTransitionMap = new HashMap<SimpleComponentProxy,EFATransitionGroup>();
+    mTransitionMap =
+      new HashMap<SimpleComponentProxy,EFAAutomatonTransitionGroup>();
     mEventMap = new HashMap<ConstraintList,EFAEvent>();
   }
 
@@ -80,22 +81,24 @@ class EFAEventDecl {
     mIsBlocked = true;
   }
 
-  EFATransitionGroup getTransitionGroup(final SimpleComponentProxy comp)
+  EFAAutomatonTransitionGroup getTransitionGroup
+    (final SimpleComponentProxy comp)
   {
     return mTransitionMap.get(comp);
   }
 
-  EFATransitionGroup createTransitionGroup(final SimpleComponentProxy comp)
+  EFAAutomatonTransitionGroup createTransitionGroup
+    (final SimpleComponentProxy comp)
   {
-    EFATransitionGroup trans = mTransitionMap.get(comp);
+    EFAAutomatonTransitionGroup trans = mTransitionMap.get(comp);
     if (trans == null) {
-      trans = new EFATransitionGroup(comp);
+      trans = new EFAAutomatonTransitionGroup(comp);
       mTransitionMap.put(comp, trans);
     }
     return trans;
   }
 
-  Collection<EFATransitionGroup> getTransitionGroups()
+  Collection<EFAAutomatonTransitionGroup> getTransitionGroups()
   {
     return mTransitionMap.values();
   }
@@ -168,7 +171,8 @@ class EFAEventDecl {
    * not listed. Automata that block the event are listed with an empty
    * transition group.
    */
-  private final Map<SimpleComponentProxy,EFATransitionGroup> mTransitionMap;
+  private final Map<SimpleComponentProxy,EFAAutomatonTransitionGroup>
+    mTransitionMap;
   /**
    * The map of individual events to generated from this event group.  For
    * each guard condition, representing a set of possible combination of

@@ -208,18 +208,19 @@ public class EFACompiler
     for (final EFAEventDecl edecl : mEFAEventDeclMap.values()) {
       if (!edecl.isBlocked()) {
         mEventNameBuilder.restart();
-        final Collection<EFATransitionGroup> allgroups =
+        final Collection<EFAAutomatonTransitionGroup> allgroups =
           edecl.getTransitionGroups();
         final int allsize = allgroups.size();
-        final List<EFATransitionGroup> groups =
-          new ArrayList<EFATransitionGroup>(allsize);
-        for (final EFATransitionGroup group : allgroups) {
+        final List<EFAAutomatonTransitionGroup> groups =
+          new ArrayList<EFAAutomatonTransitionGroup>(allsize);
+        for (final EFAAutomatonTransitionGroup group : allgroups) {
           if (!group.isTrivial()) {
             groups.add(group);
           }
         }
         final int size = groups.size();
-        final List<EFATransition> parts = new ArrayList<EFATransition>(size);
+        final List<EFAAutomatonTransition> parts =
+          new ArrayList<EFAAutomatonTransition>(size);
         Collections.sort(groups);
         collectEventPartition(edecl, groups, parts, 0, propagator);
         for (final ConstraintList guard : edecl.getGuards()) {
@@ -232,16 +233,17 @@ public class EFACompiler
     }
   }
 
-  private void collectEventPartition(final EFAEventDecl edecl,
-                                     final List<EFATransitionGroup> groups,
-                                     final List<EFATransition> parts,
-                                     final int index,
-                                     final ConstraintPropagator parent)
+  private void collectEventPartition
+    (final EFAEventDecl edecl,
+     final List<EFAAutomatonTransitionGroup> groups,
+     final List<EFAAutomatonTransition> parts,
+     final int index,
+     final ConstraintPropagator parent)
     throws EvalException
   {
     if (index < groups.size()) {
-      final EFATransitionGroup group = groups.get(index);
-      for (final EFATransition part : group.getPartialTransitions()) {
+      final EFAAutomatonTransitionGroup group = groups.get(index);
+      for (final EFAAutomatonTransition part : group.getPartialTransitions()) {
         final ConstraintPropagator propagator =
           new ConstraintPropagator(parent);
         final ConstraintList guard = part.getGuard();
@@ -259,7 +261,7 @@ public class EFACompiler
   }
 
   private void splitEventPartition(final EFAEventDecl edecl,
-                                   final List<EFATransition> parts,
+                                   final List<EFAAutomatonTransition> parts,
                                    final ConstraintPropagator parent)
     throws EvalException
   {
@@ -290,14 +292,14 @@ public class EFACompiler
   }
 
   private void createEvent(final EFAEventDecl edecl,
-                           final List<EFATransition> parts,
+                           final List<EFAAutomatonTransition> parts,
                            final ConstraintPropagator propagator)
     throws EvalException
   {
     final ConstraintList guard = propagator.getAllConstraints();
     if (mVariableAutomatonBuilder.isSatisfiable(edecl, guard)) {
       final EFAEvent event = edecl.createEvent(guard);
-      for (final EFATransition part : parts) {
+      for (final EFAAutomatonTransition part : parts) {
         final ConstraintList pguard = part.getGuard();
         if (!pguard.isTrue()) {
           for (final Proxy location : part.getSourceLocations()) {
@@ -541,7 +543,7 @@ public class EFACompiler
             edecl.addVariables(mCollectedVariables);
           }
           if (mCurrentGuard != null) {
-            final EFATransitionGroup trans =
+            final EFAAutomatonTransitionGroup trans =
               edecl.createTransitionGroup(mCurrentComponent);
             trans.addTransition(mCurrentGuard, mCurrentSource, ident);
           }
@@ -591,7 +593,8 @@ public class EFACompiler
             edecl.addVariables(mCollectedVariables);
           }
           final EventKind ekind = edecl.getKind();
-          final EFATransitionGroup trans = edecl.createTransitionGroup(comp);
+          final EFAAutomatonTransitionGroup trans =
+            edecl.createTransitionGroup(comp);
           if (ekind == EventKind.CONTROLLABLE &&
               ckind == ComponentKind.PROPERTY ||
               ekind == EventKind.UNCONTROLLABLE &&
@@ -628,17 +631,17 @@ public class EFACompiler
 
     //#######################################################################
     //# Auxiliary Methods
-    private void makeDisjoint(final EFATransitionGroup group)
+    private void makeDisjoint(final EFAAutomatonTransitionGroup group)
       throws EvalException
     {
-      final List<EFATransition> list =
-        new ArrayList<EFATransition>(group.getPartialTransitions());
+      final List<EFAAutomatonTransition> list =
+        new ArrayList<EFAAutomatonTransition>(group.getPartialTransitions());
       for (int i = 0; i < list.size(); i++) {
         for (int j = i + 1; j < list.size(); j++) {
-          final EFATransition trans1 = list.get(i);
+          final EFAAutomatonTransition trans1 = list.get(i);
           final ConstraintList guard1 = trans1.getGuard();
           final Set<NodeProxy> nodes1 = trans1.getSourceNodes();
-          final EFATransition trans2 = list.get(j);
+          final EFAAutomatonTransition trans2 = list.get(j);
           final ConstraintList guard2 = trans2.getGuard();
           final Set<NodeProxy> nodes2 = trans2.getSourceNodes();
           final ConstraintList conjunction = buildConjunction(guard1, guard2);
@@ -735,29 +738,30 @@ public class EFACompiler
       }
     }
 
-    private void replaceInList(final List<EFATransition> list,
+    private void replaceInList(final List<EFAAutomatonTransition> list,
                                final int index,
-                               final EFATransitionGroup group,
+                               final EFAAutomatonTransitionGroup group,
                                final ConstraintList guard)
     {
-      final EFATransition trans = group.getPartialTransition(guard);
+      final EFAAutomatonTransition trans = group.getPartialTransition(guard);
       list.set(index, trans);
     }
 
-    private void replaceInList(final List<EFATransition> list,
+    private void replaceInList(final List<EFAAutomatonTransition> list,
                                final int index,
-                               final EFATransitionGroup group,
+                               final EFAAutomatonTransitionGroup group,
                                final Collection<ConstraintList> guards)
     {
       final Iterator<ConstraintList> iter = guards.iterator();
       final ConstraintList guard1 = iter.next();
-      final EFATransition trans1 = group.getPartialTransition(guard1);
+      final EFAAutomatonTransition trans1 = group.getPartialTransition(guard1);
       list.set(index, trans1);
       if (iter.hasNext()) {
         final int listsize = list.size();
         final int tailsize = listsize - index - 1;
-        final List<EFATransition> tail = 
-          tailsize == 0 ? null : new ArrayList<EFATransition>(tailsize);
+        final List<EFAAutomatonTransition> tail = 
+          tailsize == 0 ? null :
+          new ArrayList<EFAAutomatonTransition>(tailsize);
         for (int i = index + 1; i < listsize; i++) {
           tail.add(list.get(i));
         }
@@ -766,7 +770,8 @@ public class EFACompiler
         }
         while (iter.hasNext()) {
           final ConstraintList guard = iter.next();
-          final EFATransition trans = group.getPartialTransition(guard);
+          final EFAAutomatonTransition trans =
+            group.getPartialTransition(guard);
           list.add(trans);
         }
         if (tail != null) {

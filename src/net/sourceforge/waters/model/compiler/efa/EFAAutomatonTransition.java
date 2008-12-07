@@ -2,7 +2,7 @@
 //###########################################################################
 //# PROJECT: Waters
 //# PACKAGE: net.sourceforge.waters.model.compiler.efa
-//# CLASS:   EFATransition
+//# CLASS:   EFAAutomatonTransition
 //###########################################################################
 //# $Id$
 //###########################################################################
@@ -28,16 +28,15 @@ import net.sourceforge.waters.model.module.SimpleComponentProxy;
  * @author Robi Malik
  */
 
-class EFATransition
+class EFAAutomatonTransition
 {
 
   //#########################################################################
   //# Constructors
-  EFATransition(final SimpleComponentProxy comp,
-                final ConstraintList conditions)
+  EFAAutomatonTransition(final SimpleComponentProxy comp,
+                         final ConstraintList conditions)
   {
     final int numnodes = comp.getGraph().getNodes().size();
-    mComponent = comp;
     mGuard = conditions;
     mSourceNodes = new HashSet<NodeProxy>(numnodes);
     mSourceLocations = new LinkedList<Proxy>();
@@ -46,11 +45,6 @@ class EFATransition
 
   //#########################################################################
   //# Simple Access
-  SimpleComponentProxy getComponent()
-  {
-    return mComponent;
-  }
-
   ConstraintList getGuard()
   {
     return mGuard;
@@ -72,7 +66,7 @@ class EFATransition
     mSourceLocations.add(location);
   }
 
-  void addSources(final EFATransition trans)
+  void addSources(final EFAAutomatonTransition trans)
   {
     mSourceNodes.addAll(trans.mSourceNodes);
     mSourceLocations.addAll(trans.mSourceLocations);
@@ -81,7 +75,6 @@ class EFATransition
 
   //#########################################################################
   //# Data Members
-  private final SimpleComponentProxy mComponent;
   private final ConstraintList mGuard;
   private final Set<NodeProxy> mSourceNodes;
   private final Collection<Proxy> mSourceLocations;
