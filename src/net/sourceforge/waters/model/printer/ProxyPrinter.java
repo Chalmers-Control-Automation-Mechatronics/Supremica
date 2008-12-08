@@ -97,6 +97,16 @@ public class ProxyPrinter
     }
   }
 
+  public void pprint(final String msg)
+    throws IOException
+  {
+    try {
+      print(msg);
+    } catch (final VisitorException exception) {
+      unwrap(exception);
+    }
+  }
+
   public void pprint(final Collection<? extends Proxy> list,
                      final String opening,
                      final String separator,
