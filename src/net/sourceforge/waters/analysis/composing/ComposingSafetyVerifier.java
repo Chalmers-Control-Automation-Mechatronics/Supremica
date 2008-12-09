@@ -177,6 +177,7 @@ public class ComposingSafetyVerifier
     }
   }
   
+  //Works only for determinstic model
   private List<EventProxy> renovateTrace(List<EventProxy> oldlist,
                                          ASTAutomaton astaut) {
     Map<StateProxy, Set<EventProxy>> stateEvents = 
@@ -199,15 +200,29 @@ public class ComposingSafetyVerifier
     for (int i=0; i<oldlist.size(); i++){
       System.out.print(oldlist.get(i).getName()+" --> ");
     }
-    System.out.println();*/
-    
-    return rTrace(oldlist,
-                  currstate,
-                  stateEvents,
-                  trans,
-                  astaut);
+    System.out.println();*/    
+    List<EventProxy> newlist = new LinkedList<EventProxy>();
+    for (int i=0;i<oldlist.size();i++) {
+      EventProxy currevent = oldlist.get(i);
+      //If the current event is included in this automaton
+      if (astaut.getAutomaton().getEvents().contains(currevent)){
+        //If the current event is not enabled at the current state
+        if (!stateEvents.get(currstate).contains(currevent)) {
+          for (EventProxy e : astaut.getRevents().get(currevent)) {
+		        if (stateEvents.get(currstate).contains(e)) {
+		          currevent = e;
+		        }
+		      }
+	      }
+        currstate = trans.get(new Key(currstate,currevent));
+      }
+      newlist.add(currevent);
+    }
+    return newlist;
   }
   
+  //Works for both determinstic and nondeterminstic
+  /*
   private List<EventProxy> rTrace(List<EventProxy> oldlist,
                                   StateProxy cState,
                                   Map<StateProxy, Set<EventProxy>> stateEvents,
@@ -303,7 +318,7 @@ public class ComposingSafetyVerifier
       }
     }
     return oldlist;
-  }
+  }*/
 
   private List<EventProxy> extendTrace(List<EventProxy> eventlist,                                       
                                        Candidate candidate) {
