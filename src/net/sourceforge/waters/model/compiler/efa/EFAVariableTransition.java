@@ -35,8 +35,12 @@ class EFAVariableTransition
   EFAVariableTransition(final SimpleExpressionProxy source,
                         final SimpleExpressionProxy target)
   {
-    mSource = source;
-    mTarget = target;
+    if (source.equalsByContents(target)) {
+      mSource = mTarget = source;
+    } else {
+      mSource = source;
+      mTarget = target;
+    }
   }
 
 
@@ -50,6 +54,11 @@ class EFAVariableTransition
   SimpleExpressionProxy getTarget()
   {
     return mTarget;
+  }
+
+  boolean isSelfloop()
+  {
+    return mSource == mTarget;
   }
 
 

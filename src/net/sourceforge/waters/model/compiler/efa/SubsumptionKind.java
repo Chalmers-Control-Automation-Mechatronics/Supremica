@@ -14,7 +14,6 @@ enum SubsumptionKind {
 
   //#########################################################################
   //# Enumeration Definition
-  DISJOINT,
   EQUALS,
   SUBSUMED_BY,
   SUBSUMES,
@@ -26,14 +25,10 @@ enum SubsumptionKind {
   SubsumptionKind combine(final SubsumptionKind kind)
   {
     switch (this) {
-    case DISJOINT:
-      return DISJOINT;
     case EQUALS:
       return kind;
     case SUBSUMED_BY:
       switch (kind) {
-      case DISJOINT:
-	return DISJOINT;
       case SUBSUMES:
       case INTERSECTS:
 	return INTERSECTS;
@@ -42,8 +37,6 @@ enum SubsumptionKind {
       }
     case SUBSUMES:
       switch (kind) {
-      case DISJOINT:
-	return DISJOINT;
       case SUBSUMED_BY:
       case INTERSECTS:
 	return INTERSECTS;
@@ -51,11 +44,7 @@ enum SubsumptionKind {
 	return SUBSUMES;
       }
     case INTERSECTS:
-      if (kind == DISJOINT) {
-	return DISJOINT;
-      } else {
-	return INTERSECTS;
-      }
+      return INTERSECTS;
     default:
       throw new IllegalArgumentException
 	("Unknown subsumption kind '" + this + "'!");

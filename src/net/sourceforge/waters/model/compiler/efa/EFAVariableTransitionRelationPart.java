@@ -11,9 +11,14 @@ package net.sourceforge.waters.model.compiler.efa;
 
 import java.io.IOException;
 import java.io.StringWriter;
+import java.util.Collection;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
+import net.sourceforge.waters.model.base.ProxyAccessor;
+import net.sourceforge.waters.model.base.ProxyAccessorMap;
+import net.sourceforge.waters.model.base.ProxyAccessorHashMapByContents;
 import net.sourceforge.waters.model.base.WatersRuntimeException;
 import net.sourceforge.waters.model.compiler.context.CompiledRange;
 import net.sourceforge.waters.model.module.SimpleExpressionProxy;
@@ -35,29 +40,61 @@ class EFAVariableTransitionRelationPart
 {
 
   //#########################################################################
+  //# Factory Methods
+  static EFAVariableTransitionRelationPart createComplementaryPart
+    (final CompiledRange range, final EFAVariableTransitionRelationPart part)
+  {
+    assert part.isAllSelfloops();
+    final List<? extends SimpleExpressionProxy> allvalues = range.getValues();
+    final ProxyAccessorMap<SimpleExpressionProxy> sources = part.mSourceValues;
+    final int size = allvalues.size() - sources.size();
+    final EFAVariableTransitionRelationPart result =
+      new EFAVariableTransitionRelationPart(size);
+    for (final SimpleExpressionProxy value : allvalues) {
+      if (!sources.containsProxy(value)) {
+        result.addTransition(value, value);
+      }
+    }
+    return result;      
+  }
+
+
+  //#########################################################################
   //# Constructors
   EFAVariableTransitionRelationPart()
   {
+    mSourceValues =
+      new ProxyAccessorHashMapByContents<SimpleExpressionProxy>();
     mTransitions = new HashSet<EFAVariableTransition>();
+    mIsAllSelfloops = true;
   }
 
   EFAVariableTransitionRelationPart(final int size)
   {
+    mSourceValues =
+      new ProxyAccessorHashMapByContents<SimpleExpressionProxy>(size);
     mTransitions = new HashSet<EFAVariableTransition>(size);
+    mIsAllSelfloops = true;
   }
 
   EFAVariableTransitionRelationPart
     (final Set<EFAVariableTransition> transitions)
   {
-    mTransitions = transitions;
+    this(transitions.size());
+    addTransitions(transitions);
   }
 
 
   //#########################################################################
   //# Simple Access
-  int size()
+  boolean isEmpty()
   {
-    return mTransitions.size();
+    return mTransitions.isEmpty();
+  }
+
+  boolean isAllSelfloops()
+  {
+    return mIsAllSelfloops;
   }
 
   Set<EFAVariableTransition> getTransitions()
@@ -70,7 +107,22 @@ class EFAVariableTransitionRelationPart
   {
     final EFAVariableTransition trans =
       new EFAVariableTransition(source, target);
+    addTransition(trans);
+  }
+
+  void addTransitions(final Collection<EFAVariableTransition> transitions)
+  {
+    for (final EFAVariableTransition trans : transitions) {
+      addTransition(trans);
+    }
+  }
+
+  void addTransition(final EFAVariableTransition trans)
+  {
+    final SimpleExpressionProxy source = trans.getSource();
+    mSourceValues.addProxy(source);
     mTransitions.add(trans);
+    mIsAllSelfloops &= trans.isSelfloop();
   }
 
 
@@ -108,30 +160,34 @@ class EFAVariableTransitionRelationPart
 
   //#########################################################################
   //# Subsumption Testing
-  SubsumptionKind subsumptionTest(final EFAVariableTransitionRelationPart part)
+  boolean isDisjoint(final EFAVariableTransitionRelationPart part)
   {
-    if (size() <= part.size()) {
-      boolean maybeDisjoint = true;
-      boolean maySubsume = true;
-      for (final EFAVariableTransition trans : mTransitions) {
-        if (part.mTransitions.contains(trans)) {
-          maybeDisjoint = false;
-          if (!maySubsume) {
-            return SubsumptionKind.INTERSECTS;
-          }
-        } else {
-          maySubsume = false;
-          if (!maybeDisjoint) {
-            return SubsumptionKind.INTERSECTS;
-          }
+    final ProxyAccessorMap<SimpleExpressionProxy> sources1 = mSourceValues;
+    final ProxyAccessorMap<SimpleExpressionProxy> sources2 =
+      part.mSourceValues;
+    if (sources1.size() < sources2.size()) {
+      for (final ProxyAccessor<SimpleExpressionProxy> accessor :
+             sources1.keySet()) {
+        if (sources2.containsKey(accessor)) {
+          return false;
         }
       }
-      if (maySubsume && size() == part.size()) {
+      return true;
+    } else {
+      return part.isDisjoint(this);
+    }
+  }
+
+  SubsumptionKind subsumptionTest(final EFAVariableTransitionRelationPart part)
+  {
+    final Set<EFAVariableTransition> transitions1 = mTransitions;
+    final Set<EFAVariableTransition> transitions2 = part.mTransitions;
+    if (transitions1.size() <= transitions2.size()) {
+      if (!transitions2.containsAll(transitions1)) {
+        return SubsumptionKind.INTERSECTS;
+      } else if (transitions1.size() == transitions2.size()) {
         return SubsumptionKind.EQUALS;
-      } else if (maybeDisjoint) {
-        return SubsumptionKind.DISJOINT;
-      } else  {
-        assert maySubsume;
+      } else {
         return SubsumptionKind.SUBSUMES;
       }
     } else {
@@ -147,11 +203,13 @@ class EFAVariableTransitionRelationPart
   EFAVariableTransitionRelationPart intersection
     (final EFAVariableTransitionRelationPart part)
   {
-    if (size() <= part.size()) {
+    final Set<EFAVariableTransition> transitions1 = mTransitions;
+    final Set<EFAVariableTransition> transitions2 = part.mTransitions;
+    if (transitions1.size() <= transitions2.size()) {
       final Set<EFAVariableTransition> transitions =
-        new HashSet<EFAVariableTransition>(size());
-      for (final EFAVariableTransition trans : mTransitions) {
-        if (part.mTransitions.contains(trans)) {
+        new HashSet<EFAVariableTransition>(transitions1.size());
+      for (final EFAVariableTransition trans : transitions1) {
+        if (transitions2.contains(trans)) {
           transitions.add(trans);
         }
       }
@@ -165,7 +223,7 @@ class EFAVariableTransitionRelationPart
     (final EFAVariableTransitionRelationPart part)
   {
     final Set<EFAVariableTransition> transitions =
-      new HashSet<EFAVariableTransition>(size());
+      new HashSet<EFAVariableTransition>(mTransitions.size());
     for (final EFAVariableTransition trans : mTransitions) {
       if (!part.mTransitions.contains(trans)) {
         transitions.add(trans);
@@ -196,6 +254,8 @@ class EFAVariableTransitionRelationPart
 
   //#########################################################################
   //# Data Members
+  private final ProxyAccessorMap<SimpleExpressionProxy> mSourceValues;
   private final Set<EFAVariableTransition> mTransitions;
+  private boolean mIsAllSelfloops;
 
 }
