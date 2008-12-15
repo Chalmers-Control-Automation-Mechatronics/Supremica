@@ -38,7 +38,7 @@ public class ConvertModelLang {
   public ProductDESProxy run() {
     final Set<AutomatonProxy>  plants      = new HashSet<AutomatonProxy>();    
     final Set<AutomatonProxy>  specs       = new HashSet<AutomatonProxy>();
-    Set<AutomatonProxy>  newAutomata = new HashSet<AutomatonProxy>(mModel.getAutomata());
+    Set<AutomatonProxy>  newAutomata = new HashSet<AutomatonProxy>();
     Set<EventProxy>      newEvents   = new HashSet<EventProxy>(mModel.getEvents());    
     
     for (AutomatonProxy automaton : mModel.getAutomata()) { 
@@ -50,10 +50,7 @@ public class ConvertModelLang {
         default : break;
       }
     } 
-    
-    newAutomata.removeAll(plants);
-    newAutomata.removeAll(specs);
-    
+        
     for (AutomatonProxy spec : specs) {      
       AutomatonProxy newSpec = convertSpec(spec);
       if (newSpec == spec) return mModel;

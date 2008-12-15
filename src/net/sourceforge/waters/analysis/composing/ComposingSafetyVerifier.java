@@ -104,7 +104,7 @@ public class ComposingSafetyVerifier
     
     ArrayList<Candidate> candidates = new ArrayList<Candidate>(composing.getCandidates());
     ArrayList<Set<ASTAutomaton>> astautomata = new ArrayList<Set<ASTAutomaton>>(composing.getASTAutomata());
-    /*
+    
     //Display the composing infomation
     System.out.println(candidates.size()+" candidates:");
     for (int i=0; i<candidates.size(); i++) {
@@ -115,7 +115,8 @@ public class ComposingSafetyVerifier
         System.out.print(e.getName()+",");
       }
       System.out.println("\nAutomata: "+candidates.get(i).getName());
-    }*/
+    }
+    
     for (int i=0; i<astautomata.size(); i++) {
       System.out.println("Step "+(i+1)+": ");
       if (!astautomata.get(i).isEmpty()){
@@ -136,8 +137,8 @@ public class ComposingSafetyVerifier
     }
      
     final SafetyVerifier checker =
-      new NativeSafetyVerifier(des, getConvertedKindTranslator(),getFactory());
-      //new BDDSafetyVerifier(des, getConvertedKindTranslator(), getFactory());
+      //new NativeSafetyVerifier(des, getConvertedKindTranslator(),getFactory());
+      new BDDSafetyVerifier(des, getConvertedKindTranslator(), getFactory());
     checker.setNodeLimit(getNodeLimit());        
     final boolean result = checker.run(); 
     mStates = (int)checker.getAnalysisResult().getTotalNumberOfStates();
@@ -162,10 +163,14 @@ public class ComposingSafetyVerifier
         return setFailedResult(counterexample);
       }
       for (int i=candidates.size()-1;i>=0;i--) {
-        for (ASTAutomaton astaut : astautomata.get(i)) {
+        for (ASTAutomaton astaut : astautomata.get(i+1)) {
           composedTrace = renovateTrace(composedTrace,astaut);          
         }
         composedTrace = extendTrace(composedTrace,candidates.get(i));        
+      }
+      
+      for (ASTAutomaton astaut : astautomata.get(0)) {
+        composedTrace = renovateTrace(composedTrace,astaut);          
       }
       
       //decode the manmade event only if model is converted
@@ -218,6 +223,7 @@ public class ComposingSafetyVerifier
       }
       newlist.add(currevent);
     }
+    assert(newlist.size() == oldlist.size());
     return newlist;
   }
   

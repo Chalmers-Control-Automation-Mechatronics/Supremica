@@ -22,7 +22,7 @@ public class ASTAutomaton {
 	public Map<EventProxy,Set<EventProxy>> getRevents(){
 	  return mRevents;
 	}
-	
+		
 	public boolean equals(Object obj){
 		if(obj != null && obj.getClass() == getClass()){
 		  ASTAutomaton temp = (ASTAutomaton)obj;

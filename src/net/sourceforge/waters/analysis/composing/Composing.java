@@ -4,6 +4,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.HashMap;
 import java.util.Map;
@@ -43,7 +44,6 @@ public class Composing {
     nodelimit = 3000;
     plants = new HashSet<AutomatonProxy>(); 
     specs  = new HashSet<AutomatonProxy>();
-    //commonSP = new HashSet<StatePair>();
   }
   
   public ProductDESProxy run() throws AnalysisException {    
@@ -66,7 +66,9 @@ public class Composing {
     //Case: no removable events  
     if (hiddenEvents.isEmpty()) return mModel;
     
-    //sameTransCheck();
+    if(!sameTransCheck()){
+	    mASTAutomata.add(new HashSet<ASTAutomaton>());
+	  }
     
     //Assumption: All events which are not related with specs will be removed.    
     int loop = 0; 
@@ -343,12 +345,6 @@ public class Composing {
       new ArrayList<EventProxy>();    
     Set<EventProxy> usedEvents = 
       new HashSet<EventProxy>();
-    Set<ArrayList<EventProxy>> ges = 
-      new HashSet<ArrayList<EventProxy>>();
-    Map<ArrayList<EventProxy>,AutomatonProxy> ases = 
-      new HashMap<ArrayList<EventProxy>,AutomatonProxy>();
-    Set<AutomatonProxy> alsAutomata = 
-      new HashSet<AutomatonProxy>(); 
     Set<AutomatonProxy> newAutomata = 
       new HashSet<AutomatonProxy>();
     Set<AutomatonProxy> modifiedAutomata = 
@@ -359,11 +355,10 @@ public class Composing {
     Set<EventProxy> forbiddenEvents = 
     	new HashSet<EventProxy>();
     Set<ASTAutomaton> astAutomata =
-      new HashSet<ASTAutomaton>();
-    int same = 0;
+      new HashSet<ASTAutomaton>();   
     
     for (AutomatonProxy aut : checkAutomata) {
-      //System.out.println(aut.getName());
+      
       Set<EventProxy> autEvents = new HashSet<EventProxy>(aut.getEvents());
       Set<EventProxy> enabledEvents = new HashSet<EventProxy>(); 
       
@@ -405,145 +400,118 @@ public class Composing {
     }
     assert(esList.size() == erList.size());
     
+    List<EventRecord> forbiddenEventRecords
+      = new ArrayList<EventRecord>();
     for (int i=0;i<esList.size();i++) {
-      /*
-      System.out.println(esList.get(i).getName()+": ####");
-      for (TransitionRecord tr : transList.get(i)) {
-        System.out.print(tr.getAut().getName()+"--");
-        for (StatePair sp : tr.getTrans()) {
-          System.out.println("    "+sp.getSource().getName()+"->"+sp.getTarget().getName());
-        }
-      }
-      System.out.println();*/
       if (forbiddenEvents.contains(esList.get(i))) {
-        erList.set(i,null);
+        forbiddenEventRecords.add(erList.get(i));
       }
     }
+    erList.removeAll(forbiddenEventRecords);
     
-    if (esList.size()<2) {    	
-    	return false;
-    }
-    for (int i=0;i<esList.size()-1;i++) {
-      //System.out.println("new turn");
-      if (usedEvents.contains(esList.get(i))
-        ||erList.get(i) == null
-        ||erList.get(i).getMap().size()<2) continue;
-      ArrayList<EventProxy> goodEvents = 
-        new ArrayList<EventProxy>();
-      ArrayList<EventProxy> almostsameEvents = 
-        new ArrayList<EventProxy>();      
-      for (int j=i+1;j<esList.size();j++) {        
-        if (usedEvents.contains(esList.get(j))
-          ||erList.get(j) == null
-          ||erList.get(j).getMap().size()<2) continue;
-        same = compareTrans(erList.get(i).getMap(),erList.get(j).getMap());
-        if (same == 1) {
-          //System.out.println("same: "+esList.get(j).getName());  
-          usedEvents.add(esList.get(i));
-          usedEvents.add(esList.get(j));
-          if (!goodEvents.contains(esList.get(i))) goodEvents.add(esList.get(i));                    
-          if (!goodEvents.contains(esList.get(j))) goodEvents.add(esList.get(j));
-        } else if (same == -1) {
-            //System.out.println("almost same: "+esList.get(i).getName()+" # "+esList.get(j).getName());
-            alsAutomata.add(almostsameAut);
-            //System.out.println("found one "+almostsameAut.getName());
-            /*
-            for (AutomatonProxy a : erList.get(i).getMap().keySet()) {
-              System.out.println("Automaton: "+a.getName());
-              System.out.println("Transitions: ");
-              for (StatePair sp : erList.get(i).getMap().get(a).getTrans()) {
-                System.out.print(sp.getSource()+"->"+sp.getTarget()+", ");
-              }
-              System.out.println();
-            }
-            for (AutomatonProxy a : erList.get(j).getMap().keySet()) {
-              System.out.println("Automaton: "+a.getName());
-              System.out.println("Transitions: ");
-              for (StatePair sp : erList.get(j).getMap().get(a).getTrans()) {
-                System.out.print(sp.getSource()+"->"+sp.getTarget()+", ");
-              }
-              System.out.println();
-            }*/
-            if (alsAutomata.size()>1) {
-              //If the new almostsameAut is different from 
-              //the first one, then drop it.
-              alsAutomata.remove(almostsameAut);              
-            } else {
-		            usedEvents.add(esList.get(i));
-		            usedEvents.add(esList.get(j));
-		            if (!almostsameEvents.contains(esList.get(i))) almostsameEvents.add(esList.get(i));
-		            if (!almostsameEvents.contains(esList.get(j))) almostsameEvents.add(esList.get(j));
-              }
-          }
-      }
-      if (goodEvents.size()>1) {        
-        ges.add(new ArrayList<EventProxy>(goodEvents));
-      }
-      if (almostsameEvents.size()>1) {
-        //System.out.println(almostsameAut.getName());
-        AutomatonProxy temp = alsAutomata.iterator().next();
-        ases.put(new ArrayList<EventProxy>(almostsameEvents),temp);
-      }          
-    }
-    
-    if (ges.isEmpty() && ases.isEmpty()) {    	
+    if (erList.size()<2) {    	
     	return false;
     }
     
-    System.out.println(ases.size()); 
-    for (ArrayList<EventProxy> al : ases.keySet()) {
-      System.out.println(ases.get(al).getName()+" ## "+al.size());
-      for (EventProxy el : al) {
-        System.out.print(el.getName()+",");
-      }
-      System.out.println();
-    } 
+    List<EventRecord> almostSameEventRecords =
+    	new ArrayList<EventRecord>(erList.size());
+    Set<EventProxy> eventsToBeRemoved =
+      new HashSet<EventProxy>();
+    Map<EventProxy,EventProxy> replacements =
+      new HashMap<EventProxy,EventProxy>();
+   	Collections.sort(erList);
+   	for (EventRecord er1 : erList) {
+   	  EventProxy event1 = er1.getEvent();
+   	  Map<AutomatonProxy,TransitionRecord> map1= er1.getMap();
+   	  if (usedEvents.contains(event1)
+   	    ||map1.size()<2) continue;
+   	  AutomatonProxy alsAutomaton = null;
+   	  
+   	  inner_loop:
+   	  for (EventRecord er2 : erList) {
+   	    if (er2 == er1) continue;
+   	    EventProxy event2 = er2.getEvent();
+   	  	Map<AutomatonProxy,TransitionRecord> map2= er2.getMap();
+   	  	if (usedEvents.contains(event2)
+   	  	  ||map2.size()<2) continue;
+   	  	int same = compareTrans(map1,map2);
+   	  	if (same == 1) {   	  	    	  	  
+   	  	  usedEvents.add(event2);
+   	  	  eventsToBeRemoved.add(event2);
+   	  	} else if (same == -1) {   	  	  
+   	  	  if (alsAutomaton == null) {
+   	  	    if (determinismCheck(map1,map2,mAlmostSameAutomaton)) {
+   	  	      alsAutomaton = mAlmostSameAutomaton;
+   	  	      almostSameEventRecords.add(er1);
+   	  	      almostSameEventRecords.add(er2);
+   	  	      usedEvents.add(event1);
+   	  	      usedEvents.add(event2);
+   	  	    }
+   	  	  } else if (alsAutomaton == mAlmostSameAutomaton)  {
+   	  	    for (EventRecord er : almostSameEventRecords) {
+   	  	      Map<AutomatonProxy,TransitionRecord> map= er.getMap();
+   	  	      if (!determinismCheck(map,map2,alsAutomaton)) {
+   	  	      	continue inner_loop;
+   	  	      }
+   	  	    }
+   	  	    almostSameEventRecords.add(er2);
+   	  	    usedEvents.add(event2);
+   	  	  }
+   	  	}
+   	  }
+   	  
+   	  if (!almostSameEventRecords.isEmpty()) {
+   	    EventRecord smallest = Collections.min(almostSameEventRecords);
+   	    almostSameEventRecords.remove(smallest);
+   	    Set<EventProxy> eventsToBeReplaced = 
+   	      new HashSet<EventProxy>();
+   	    for (EventRecord er : almostSameEventRecords) {
+   	      replacements.put(er.getEvent(),smallest.getEvent());
+   	      eventsToBeReplaced.add(er.getEvent());
+   	    } 
+   	    
+   	    boolean astaContains = false;
+   	    for (ASTAutomaton asta : astAutomata) {
+   	      if (asta.getAutomaton() == alsAutomaton) {
+   	      	astaContains = true;
+   	        asta.getRevents().put(smallest.getEvent(),eventsToBeReplaced);
+   	      }
+   	    } 
+   	    if (!astaContains) {
+   	    	Map<EventProxy,Set<EventProxy>> revents =
+   	        new HashMap<EventProxy,Set<EventProxy>>();
+   	      revents.put(smallest.getEvent(),eventsToBeReplaced);
+   	    	astAutomata.add(new ASTAutomaton(alsAutomaton,revents));
+   	    }    
+   	    almostSameEventRecords.clear();
+   	  }
+   	}
+   	
+    if (eventsToBeRemoved.isEmpty() && replacements.isEmpty()) {    	
+    	return false;
+    }
     
     for (AutomatonProxy a : checkAutomata) {
       Set<EventProxy> removableEvents =
-        new HashSet<EventProxy>();
-      for (ArrayList<EventProxy> es : ges) {
-        if (a.getEvents().containsAll(es)) {
-          ArrayList<EventProxy> temp = new ArrayList<EventProxy>(es);
-          temp.remove(0);
-          removableEvents.addAll(temp);          
-        }
-      }      
+        new HashSet<EventProxy>(a.getEvents());
+      removableEvents.retainAll(eventsToBeRemoved);
       
-      Map<EventProxy,Set<EventProxy>> revents =
-			  new HashMap<EventProxy,Set<EventProxy>>();
-			Map<EventProxy,EventProxy> replacements =
-        new HashMap<EventProxy,EventProxy>();
-      for (ArrayList<EventProxy> es : ases.keySet()) {
-        if (a == ases.get(es)) {          
-          for (int i=1;i<es.size();i++) {
-            replacements.put(es.get(i),es.get(0));
-          }
-          ArrayList<EventProxy> temp = new ArrayList<EventProxy>(es);
-          EventProxy e = temp.get(0);
-          temp.remove(e);
-          revents.put(e,new HashSet<EventProxy>(temp));                       
-        } else {
-	          if (a.getEvents().containsAll(es)) {
-		          ArrayList<EventProxy> temp = new ArrayList<EventProxy>(es);
-		          temp.remove(0);
-		          removableEvents.addAll(temp);          
-		        }
-		      }
-		  }
-		  
-		  if (revents.size()>0) {
-			  ASTAutomaton astaut = new ASTAutomaton(a,revents);
-			  astAutomata.add(astaut);		  
-		  }
 		  AutomatonProxy newaut1 = removeEvents(a,removableEvents);
       if (newaut1 != a) {    
 	      newAutomata.add(newaut1);
 	      modifiedAutomata.add(a);
       }
-      removableEvents.clear();
-		  
-		  AutomatonProxy newaut2 = replaceEvents(newaut1,replacements);
+      
+      
+		  Map<EventProxy,EventProxy> replaceableEvents =
+        new HashMap<EventProxy,EventProxy>();
+      for (EventProxy e : a.getEvents()) {
+        if (replacements.get(e) != null) {
+          replaceableEvents.put(e,replacements.get(e));          
+        }
+      }
+   	  
+		  AutomatonProxy newaut2 = replaceEvents(newaut1,replaceableEvents);
       if (newaut2 != newaut1) {
         newAutomata.remove(newaut1);
         newAutomata.add(newaut2);
@@ -552,8 +520,24 @@ public class Composing {
     }
     
     mASTAutomata.add(astAutomata);
-    plants.removeAll(modifiedAutomata);
-    plants.addAll(newAutomata);
+    for (AutomatonProxy a : modifiedAutomata) {
+      switch (mTranslator.getComponentKind(a)) {
+        case PLANT :  plants.remove(a);
+                      break;
+        case SPEC  :  specs.remove(a);     
+                      break;
+        default : break;
+      }
+    }
+    for (AutomatonProxy a : newAutomata) {
+      switch (mTranslator.getComponentKind(a)) {
+        case PLANT :  plants.add(a);
+                      break;
+        case SPEC  :  specs.add(a);     
+                      break;
+        default : break;
+      }
+    }
     return true;
   }
   
@@ -631,7 +615,7 @@ public class Composing {
 	  //if (trans1.equals(trans2)) return 1;
 	  int s1 = trans1.size();
 	  int s2 = trans2.size();
-	  
+	    
 	  if (s1<s2) {
 	    return compareTrans(trans2,trans1);
 	  } else if (s1>s2+1) {
@@ -662,31 +646,42 @@ public class Composing {
 	    if (diffAut == null) {
 	      return 1;
 	    } else {
-	        if (!trans2.keySet().contains(diffAut)) {
-	          almostsameAut = diffAut;
-	          return -1;
-	        } else {
-	            Set<StatePair> t1 = 
-	              new HashSet<StatePair>(trans1.get(diffAut).getTrans());
-	            Set<StatePair> t2 = 
-	              new HashSet<StatePair>(trans2.get(diffAut).getTrans());
-	            Set<StatePair> t1t2 = new HashSet<StatePair>(t1);	            
-		  			  t1t2.retainAll(t2);
-		  			  //commonSP.addAll(t1t2);
-		  				t1.removeAll(t1t2);
-		  				t2.removeAll(t1t2);
-		  				for (StatePair sp1 : t1) {
-		    		  	for (StatePair sp2 : t2) {
-		              if (sp1.getSource()==sp2.getSource()) {
-		                return 0;
-		              }
-		            }
-		          }
-		          almostsameAut = diffAut;
-		          return -1;
-	          }
+	    /*
+	      System.out.println("trans1: ");
+	      for (AutomatonProxy a : trans1.keySet()) {
+	        System.out.println(a.getName());
+	        for (StatePair sp : trans1.get(a).getTrans()) {
+	          System.out.println("-- "+sp.getSource()+" --> "+sp.getTarget());
+	        }
 	      }
+	      System.out.println("trans2: ");
+	      for (AutomatonProxy a : trans2.keySet()) {
+	        System.out.println(a.getName());
+	        for (StatePair sp : trans2.get(a).getTrans()) {
+	          System.out.println("-- "+sp.getSource()+" --> "+sp.getTarget());
+	        }
+	      }*/
+	      
+	      mAlmostSameAutomaton = diffAut;
+	      return -1;
+	    }
 	  }
+	}
+	
+	private boolean determinismCheck(Map<AutomatonProxy,TransitionRecord> map1,
+	                                 Map<AutomatonProxy,TransitionRecord> map2,
+	                                 AutomatonProxy alsAut) {
+	  if (map1.get(alsAut) == null) return true;
+	  for (StatePair sp1 : map1.get(alsAut).getTrans()) {
+	    if (map2.get(alsAut) == null) return true;
+	    for (StatePair sp2 : map2.get(alsAut).getTrans()) {
+	      if (sp1.getSource() == sp2.getSource()
+	        &&sp1.getTarget() != sp2.getTarget()) {
+	        return false;
+	      }
+	    }
+	  } 
+	  return true;                          
 	}
   
   private ArrayList<Candidate> maxL(ArrayList<Candidate> composition) {
@@ -822,6 +817,5 @@ public class Composing {
   private int                           nodelimit;  
   private Set<AutomatonProxy>           plants; 
   private Set<AutomatonProxy>           specs;
-  private AutomatonProxy                almostsameAut; 
-  //private Set<StatePair>                commonSP;      
+  private AutomatonProxy                mAlmostSameAutomaton;      
 }

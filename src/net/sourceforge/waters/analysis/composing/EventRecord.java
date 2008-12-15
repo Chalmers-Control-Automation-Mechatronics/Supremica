@@ -2,16 +2,21 @@ package net.sourceforge.waters.analysis.composing;
 
 import java.util.Map;
 import java.util.HashMap;
+import java.lang.Comparable;
 
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 
-public class EventRecord {
+public class EventRecord implements Comparable<EventRecord> {
 	
 	public EventRecord(EventProxy event,
 	                   Map<AutomatonProxy,TransitionRecord> transmap){
 		mEvent = event;
-	   mMap = new HashMap<AutomatonProxy,TransitionRecord>(transmap);
+	  mMap = new HashMap<AutomatonProxy,TransitionRecord>(transmap);
+	}
+	
+	public int compareTo(EventRecord record) {
+		return mEvent.compareTo(record.mEvent);
 	}
 	
 	public EventProxy getEvent() {
