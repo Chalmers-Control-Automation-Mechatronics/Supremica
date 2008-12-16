@@ -92,7 +92,7 @@ class NpmtrBufferedBuilder
 			startup = getNewAutomaton("Startup");
 		}
 
-		startup.addInitialState("s0");
+		startup.addState("s0",false,true);
 		
 		String from = "s0";
 		String to = "s1"; 
