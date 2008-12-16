@@ -550,10 +550,7 @@ public class ModuleInstanceCompiler extends AbstractModuleProxyVisitor
         }
         final IdentifierProxy ivalue =
           mSimpleExpressionCompiler.getIdentifierValue(value);
-        event = mNameSpace.getEvent(ivalue);
-        if (event == null) {
-          throw new UndefinedIdentifierException(ident);
-        }
+        event = mNameSpace.findEvent(ivalue);
       } else {
         event = mNameSpace.findEvent(newident);
         if (isDisabledProposition(event)) {

@@ -360,6 +360,13 @@ public abstract class AbstractCompilerTest
                  EmptyLabelBlockException.class, "q0");
   }
 
+  public void testCompile_error_ims()
+    throws IOException, WatersException
+  {
+    compileError("tests", "ims", "error_ims", null,
+                 UndefinedIdentifierException.class, "'finishLathe'");
+  }
+
   public void testCompile_error1_small()
     throws IOException, WatersException
   {
@@ -535,7 +542,7 @@ public abstract class AbstractCompilerTest
     final File root = getWatersInputRoot();
     final File dir = new File(root, dirname);
     final File subdir = new File(dir, subdirname);
-    compileError(dir, name, bindings, exclass, culprits);
+    compileError(subdir, name, bindings, exclass, culprits);
   }
 
   private void compileError(final File dir,

@@ -1,0 +1,580 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Module Name="IMS" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
+    <ns2:Comment>Integrated manufacturing system [Pena, Cury, Lafortune].
+This is a model with handcrafted controllable specifications that are likely to be equivalent to those in the paper, but not least restrictive.</ns2:Comment>
+    <EventDeclList>
+        <EventDecl Kind="PROPOSITION" Name=":accepting"/>
+        <EventDecl Kind="CONTROLLABLE" Name="startLathe">
+            <RangeList>
+                <BinaryExpression Operator="..">
+                    <IntConstant Value="1"/>
+                    <IntConstant Value="2"/>
+                </BinaryExpression>
+            </RangeList>
+        </EventDecl>
+        <EventDecl Kind="UNCONTROLLABLE" Name="finishLathe">
+            <RangeList>
+                <BinaryExpression Operator="..">
+                    <IntConstant Value="1"/>
+                    <IntConstant Value="2"/>
+                </BinaryExpression>
+            </RangeList>
+        </EventDecl>
+        <EventDecl Kind="CONTROLLABLE" Name="startAM">
+            <RangeList>
+                <BinaryExpression Operator="..">
+                    <IntConstant Value="1"/>
+                    <IntConstant Value="2"/>
+                </BinaryExpression>
+            </RangeList>
+        </EventDecl>
+        <EventDecl Kind="UNCONTROLLABLE" Name="finishPD">
+            <RangeList>
+                <BinaryExpression Operator="..">
+                    <IntConstant Value="1"/>
+                    <IntConstant Value="2"/>
+                </BinaryExpression>
+            </RangeList>
+        </EventDecl>
+        <EventDecl Kind="CONTROLLABLE" Name="startPD">
+            <RangeList>
+                <BinaryExpression Operator="..">
+                    <IntConstant Value="1"/>
+                    <IntConstant Value="2"/>
+                </BinaryExpression>
+            </RangeList>
+        </EventDecl>
+        <EventDecl Kind="CONTROLLABLE" Name="drive">
+            <RangeList>
+                <BinaryExpression Operator="..">
+                    <IntConstant Value="1"/>
+                    <IntConstant Value="2"/>
+                </BinaryExpression>
+            </RangeList>
+        </EventDecl>
+        <EventDecl Kind="UNCONTROLLABLE" Name="finishAM"/>
+        <EventDecl Kind="CONTROLLABLE" Name="loadAGV">
+            <RangeList>
+                <BinaryExpression Operator="..">
+                    <IntConstant Value="1"/>
+                    <IntConstant Value="2"/>
+                </BinaryExpression>
+            </RangeList>
+        </EventDecl>
+        <EventDecl Kind="UNCONTROLLABLE" Name="unloadAGV">
+            <RangeList>
+                <BinaryExpression Operator="..">
+                    <IntConstant Value="1"/>
+                    <IntConstant Value="2"/>
+                </BinaryExpression>
+            </RangeList>
+        </EventDecl>
+    </EventDeclList>
+    <ComponentList>
+        <ForeachComponent Name="i">
+            <BinaryExpression Operator="..">
+                <IntConstant Value="1"/>
+                <IntConstant Value="2"/>
+            </BinaryExpression>
+            <ComponentList>
+                <Instance ModuleName="machine_nobreak">
+                    <IndexedIdentifier Name="Lathe">
+                        <SimpleIdentifier Name="i"/>
+                    </IndexedIdentifier>
+                    <ParameterBinding Name="start">
+                        <IndexedIdentifier Name="startLathe">
+                            <SimpleIdentifier Name="i"/>
+                        </IndexedIdentifier>
+                    </ParameterBinding>
+                    <ParameterBinding Name="finish">
+                        <IndexedIdentifier Name="finishLathe">
+                            <SimpleIdentifier Name="i"/>
+                        </IndexedIdentifier>
+                    </ParameterBinding>
+                    <ParameterBinding Name=":accepting">
+                        <SimpleIdentifier Name=":accepting"/>
+                    </ParameterBinding>
+                </Instance>
+                <Instance ModuleName="buffer_sf1">
+                    <IndexedIdentifier Name="buffer_Lathe_PD">
+                        <SimpleIdentifier Name="i"/>
+                    </IndexedIdentifier>
+                    <ParameterBinding Name="start_before">
+                        <IndexedIdentifier Name="startLathe">
+                            <SimpleIdentifier Name="i"/>
+                        </IndexedIdentifier>
+                    </ParameterBinding>
+                    <ParameterBinding Name="finish_before">
+                        <IndexedIdentifier Name="finishLathe">
+                            <SimpleIdentifier Name="i"/>
+                        </IndexedIdentifier>
+                    </ParameterBinding>
+                    <ParameterBinding Name="start_after">
+                        <IndexedIdentifier Name="startPD">
+                            <SimpleIdentifier Name="i"/>
+                        </IndexedIdentifier>
+                    </ParameterBinding>
+                    <ParameterBinding Name=":accepting">
+                        <SimpleIdentifier Name=":accepting"/>
+                    </ParameterBinding>
+                </Instance>
+                <Instance ModuleName="machine_nobreak">
+                    <IndexedIdentifier Name="PD">
+                        <SimpleIdentifier Name="i"/>
+                    </IndexedIdentifier>
+                    <ParameterBinding Name="start">
+                        <IndexedIdentifier Name="startPD">
+                            <SimpleIdentifier Name="i"/>
+                        </IndexedIdentifier>
+                    </ParameterBinding>
+                    <ParameterBinding Name="finish">
+                        <IndexedIdentifier Name="finishPD">
+                            <SimpleIdentifier Name="i"/>
+                        </IndexedIdentifier>
+                    </ParameterBinding>
+                    <ParameterBinding Name=":accepting">
+                        <SimpleIdentifier Name=":accepting"/>
+                    </ParameterBinding>
+                </Instance>
+                <Instance ModuleName="buffer_sf1">
+                    <IndexedIdentifier Name="buffer_PD_AGV">
+                        <SimpleIdentifier Name="i"/>
+                    </IndexedIdentifier>
+                    <ParameterBinding Name="start_before">
+                        <IndexedIdentifier Name="startPD">
+                            <SimpleIdentifier Name="i"/>
+                        </IndexedIdentifier>
+                    </ParameterBinding>
+                    <ParameterBinding Name="finish_before">
+                        <IndexedIdentifier Name="finishPD">
+                            <SimpleIdentifier Name="i"/>
+                        </IndexedIdentifier>
+                    </ParameterBinding>
+                    <ParameterBinding Name="start_after">
+                        <IndexedIdentifier Name="loadAGV">
+                            <SimpleIdentifier Name="i"/>
+                        </IndexedIdentifier>
+                    </ParameterBinding>
+                    <ParameterBinding Name=":accepting">
+                        <SimpleIdentifier Name=":accepting"/>
+                    </ParameterBinding>
+                </Instance>
+            </ComponentList>
+        </ForeachComponent>
+        <SimpleComponent Kind="PLANT">
+            <IndexedIdentifier Name="AGV">
+                <IntConstant Value="1"/>
+            </IndexedIdentifier>
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="S0">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                        <PointGeometry>
+                            <Point Y="128" X="48"/>
+                        </PointGeometry>
+                        <InitialArrowGeometry>
+                            <Point Y="-5" X="-5"/>
+                        </InitialArrowGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="10" X="0"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="S1">
+                        <PointGeometry>
+                            <Point Y="96" X="128"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="10" X="0"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="S2">
+                        <PointGeometry>
+                            <Point Y="96" X="208"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="10" X="0"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="S3">
+                        <PointGeometry>
+                            <Point Y="128" X="288"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="10" X="0"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="S1" Source="S0">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="loadAGV">
+                                <IntConstant Value="1"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-25" X="-56"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="S2" Source="S1">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="drive">
+                                <IntConstant Value="1"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-23" X="-24"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="S3" Source="S2">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="unloadAGV">
+                                <IntConstant Value="1"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-20" X="1"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="S0" Source="S3">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="drive">
+                                <IntConstant Value="1"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="2" X="-24"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="PLANT">
+            <IndexedIdentifier Name="AGV">
+                <IntConstant Value="2"/>
+            </IndexedIdentifier>
+            <Graph>
+                <NodeList>
+                    <SimpleNode Name="S0">
+                        <PointGeometry>
+                            <Point Y="128" X="48"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="10" X="0"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="S1">
+                        <PointGeometry>
+                            <Point Y="96" X="128"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="10" X="0"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="S2">
+                        <PointGeometry>
+                            <Point Y="96" X="208"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="10" X="0"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Initial="true" Name="S3">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                        <PointGeometry>
+                            <Point Y="128" X="288"/>
+                        </PointGeometry>
+                        <InitialArrowGeometry>
+                            <Point Y="-14" X="15"/>
+                        </InitialArrowGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="10" X="0"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="S1" Source="S0">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="loadAGV">
+                                <IntConstant Value="2"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-25" X="-56"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="S2" Source="S1">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="drive">
+                                <IntConstant Value="2"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-23" X="-24"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="S3" Source="S2">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="unloadAGV">
+                                <IntConstant Value="2"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-20" X="1"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="S0" Source="S3">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="drive">
+                                <IntConstant Value="2"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="2" X="-24"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="SPEC" Name="Track">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="occupied">
+                        <PointGeometry>
+                            <Point Y="144" X="64"/>
+                        </PointGeometry>
+                        <InitialArrowGeometry>
+                            <Point Y="-5" X="-5"/>
+                        </InitialArrowGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="9" X="-44"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="empty">
+                        <PointGeometry>
+                            <Point Y="144" X="160"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="8" X="-8"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="empty" Source="occupied">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="loadAGV"/>
+                            <SimpleIdentifier Name="unloadAGV"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="6" X="-35"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="160" X="114"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Target="occupied" Source="empty">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="drive"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-25" X="-16"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="129" X="112"/>
+                        </SplineGeometry>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <ForeachComponent Name="i">
+            <BinaryExpression Operator="..">
+                <IntConstant Value="1"/>
+                <IntConstant Value="2"/>
+            </BinaryExpression>
+            <ComponentList>
+                <SimpleComponent Kind="SPEC">
+                    <IndexedIdentifier Name="Buffer_AGV_AM">
+                        <SimpleIdentifier Name="i"/>
+                    </IndexedIdentifier>
+                    <Graph>
+                        <NodeList>
+                            <SimpleNode Initial="true" Name="loaded">
+                                <EventList>
+                                    <SimpleIdentifier Name=":accepting"/>
+                                </EventList>
+                                <PointGeometry>
+                                    <Point Y="112" X="96"/>
+                                </PointGeometry>
+                                <InitialArrowGeometry>
+                                    <Point Y="-5" X="-5"/>
+                                </InitialArrowGeometry>
+                                <LabelGeometry Anchor="NW">
+                                    <Point Y="2" X="-50"/>
+                                </LabelGeometry>
+                            </SimpleNode>
+                            <SimpleNode Name="unloaded">
+                                <EventList>
+                                    <SimpleIdentifier Name=":accepting"/>
+                                </EventList>
+                                <PointGeometry>
+                                    <Point Y="112" X="192"/>
+                                </PointGeometry>
+                                <LabelGeometry Anchor="NW">
+                                    <Point Y="4" X="5"/>
+                                </LabelGeometry>
+                            </SimpleNode>
+                            <SimpleNode Name="at_PD">
+                                <PointGeometry>
+                                    <Point Y="208" X="192"/>
+                                </PointGeometry>
+                                <LabelGeometry Anchor="NW">
+                                    <Point Y="3" X="5"/>
+                                </LabelGeometry>
+                            </SimpleNode>
+                        </NodeList>
+                        <EdgeList>
+                            <Edge Target="unloaded" Source="loaded">
+                                <LabelBlock>
+                                    <IndexedIdentifier Name="unloadAGV">
+                                        <SimpleIdentifier Name="i"/>
+                                    </IndexedIdentifier>
+                                    <LabelGeometry Anchor="NW">
+                                        <Point Y="-28" X="-43"/>
+                                    </LabelGeometry>
+                                </LabelBlock>
+                                <SplineGeometry>
+                                    <Point Y="99" X="146"/>
+                                </SplineGeometry>
+                            </Edge>
+                            <Edge Target="loaded" Source="unloaded">
+                                <LabelBlock>
+                                    <IndexedIdentifier Name="startAM">
+                                        <SimpleIdentifier Name="i"/>
+                                    </IndexedIdentifier>
+                                    <LabelGeometry Anchor="NW">
+                                        <Point Y="3" X="-30"/>
+                                    </LabelGeometry>
+                                </LabelBlock>
+                                <SplineGeometry>
+                                    <Point Y="127" X="144"/>
+                                </SplineGeometry>
+                            </Edge>
+                            <Edge Target="at_PD" Source="unloaded">
+                                <LabelBlock>
+                                    <IndexedIdentifier Name="loadAGV">
+                                        <SimpleIdentifier Name="i"/>
+                                    </IndexedIdentifier>
+                                    <LabelGeometry Anchor="NW">
+                                        <Point Y="-2" X="3"/>
+                                    </LabelGeometry>
+                                </LabelBlock>
+                            </Edge>
+                            <Edge Target="loaded" Source="loaded">
+                                <LabelBlock>
+                                    <IndexedIdentifier Name="loadAGV">
+                                        <SimpleIdentifier Name="i"/>
+                                    </IndexedIdentifier>
+                                    <IndexedIdentifier Name="drive">
+                                        <SimpleIdentifier Name="i"/>
+                                    </IndexedIdentifier>
+                                    <LabelGeometry Anchor="NW">
+                                        <Point Y="-39" X="-17"/>
+                                    </LabelGeometry>
+                                </LabelBlock>
+                                <SplineGeometry>
+                                    <Point Y="71" X="60"/>
+                                </SplineGeometry>
+                            </Edge>
+                            <Edge Target="unloaded" Source="unloaded">
+                                <LabelBlock>
+                                    <IndexedIdentifier Name="drive">
+                                        <SimpleIdentifier Name="i"/>
+                                    </IndexedIdentifier>
+                                    <LabelGeometry Anchor="NW">
+                                        <Point Y="-23" X="-35"/>
+                                    </LabelGeometry>
+                                </LabelBlock>
+                                <SplineGeometry>
+                                    <Point Y="74" X="234"/>
+                                </SplineGeometry>
+                            </Edge>
+                            <Edge Target="loaded" Source="at_PD">
+                                <LabelBlock>
+                                    <IndexedIdentifier Name="startAM">
+                                        <SimpleIdentifier Name="i"/>
+                                    </IndexedIdentifier>
+                                    <LabelGeometry Anchor="NW">
+                                        <Point Y="4" X="-56"/>
+                                    </LabelGeometry>
+                                </LabelBlock>
+                                <SplineGeometry>
+                                    <Point Y="174" X="131"/>
+                                </SplineGeometry>
+                            </Edge>
+                        </EdgeList>
+                    </Graph>
+                </SimpleComponent>
+                <SimpleComponent Kind="PLANT">
+                    <IndexedIdentifier Name="AM">
+                        <SimpleIdentifier Name="i"/>
+                    </IndexedIdentifier>
+                    <Graph>
+                        <NodeList>
+                            <SimpleNode Initial="true" Name="nopart">
+                                <EventList>
+                                    <SimpleIdentifier Name=":accepting"/>
+                                </EventList>
+                                <PointGeometry>
+                                    <Point Y="128" X="96"/>
+                                </PointGeometry>
+                                <InitialArrowGeometry>
+                                    <Point Y="-5" X="-5"/>
+                                </InitialArrowGeometry>
+                                <LabelGeometry Anchor="NW">
+                                    <Point Y="8" X="-34"/>
+                                </LabelGeometry>
+                            </SimpleNode>
+                            <SimpleNode Name="part">
+                                <PointGeometry>
+                                    <Point Y="128" X="192"/>
+                                </PointGeometry>
+                                <LabelGeometry Anchor="NW">
+                                    <Point Y="6" X="-1"/>
+                                </LabelGeometry>
+                            </SimpleNode>
+                        </NodeList>
+                        <EdgeList>
+                            <Edge Target="part" Source="nopart">
+                                <LabelBlock>
+                                    <IndexedIdentifier Name="startAM">
+                                        <SimpleIdentifier Name="i"/>
+                                    </IndexedIdentifier>
+                                    <LabelGeometry Anchor="NW">
+                                        <Point Y="-21" X="-34"/>
+                                    </LabelGeometry>
+                                </LabelBlock>
+                                <SplineGeometry>
+                                    <Point Y="113" X="146"/>
+                                </SplineGeometry>
+                            </Edge>
+                            <Edge Target="nopart" Source="part">
+                                <LabelBlock>
+                                    <SimpleIdentifier Name="finishAM"/>
+                                    <LabelGeometry Anchor="NW">
+                                        <Point Y="1" X="-26"/>
+                                    </LabelGeometry>
+                                </LabelBlock>
+                                <SplineGeometry>
+                                    <Point Y="144" X="144"/>
+                                </SplineGeometry>
+                            </Edge>
+                        </EdgeList>
+                    </Graph>
+                </SimpleComponent>
+            </ComponentList>
+        </ForeachComponent>
+    </ComponentList>
+</Module>

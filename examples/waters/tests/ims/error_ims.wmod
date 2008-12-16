@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Module Name="error_IMS" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
+    <ns2:Comment>A buggy module that uses an undefined event in a parameter binding of an instance. Used to test whether UndefinedIdentifierException is signalled.</ns2:Comment>
+    <EventDeclList>
+        <EventDecl Kind="PROPOSITION" Name=":accepting"/>
+        <EventDecl Kind="CONTROLLABLE" Name="startLathe">
+            <RangeList>
+                <BinaryExpression Operator="..">
+                    <IntConstant Value="1"/>
+                    <IntConstant Value="2"/>
+                </BinaryExpression>
+            </RangeList>
+        </EventDecl>
+    </EventDeclList>
+    <ComponentList>
+        <ForeachComponent Name="i">
+            <BinaryExpression Operator="..">
+                <IntConstant Value="1"/>
+                <IntConstant Value="2"/>
+            </BinaryExpression>
+            <ComponentList>
+                <Instance ModuleName="machine_nobreak">
+                    <IndexedIdentifier Name="Lathe">
+                        <SimpleIdentifier Name="i"/>
+                    </IndexedIdentifier>
+                    <ParameterBinding Name="start">
+                        <IndexedIdentifier Name="startLathe">
+                            <SimpleIdentifier Name="i"/>
+                        </IndexedIdentifier>
+                    </ParameterBinding>
+                    <ParameterBinding Name="finish">
+                        <IndexedIdentifier Name="finishLathe">
+                            <SimpleIdentifier Name="i"/>
+                        </IndexedIdentifier>
+                    </ParameterBinding>
+                    <ParameterBinding Name=":accepting">
+                        <SimpleIdentifier Name=":accepting"/>
+                    </ParameterBinding>
+                </Instance>
+            </ComponentList>
+        </ForeachComponent>
+    </ComponentList>
+</Module>

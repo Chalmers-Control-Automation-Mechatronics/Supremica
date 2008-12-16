@@ -383,6 +383,14 @@ public abstract class AbstractControllabilityCheckerTest
     runModelVerifier(group, dir, name, true);
   }
 
+  public void test_IMS_ims() throws Exception
+  {
+    final String group = "tests";
+    final String dir = "ims";
+    final String name = "ims.wmod";
+    runModelVerifier(group, dir, name, true);
+  }
+
   public void test_Nasty_JustProperty() throws Exception
   {
     final String group = "tests";
