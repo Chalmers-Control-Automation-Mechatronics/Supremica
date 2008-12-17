@@ -192,16 +192,6 @@ public class ConstraintPropagator
     }
   }
 
-  public BinaryExpressionProxy recallBinding
-    (final SimpleExpressionProxy varname)
-  {
-    final BinaryExpressionProxy eqn = mContext.recallBinding(varname);
-    if (eqn != null) {
-      addConstraint(eqn);
-    }
-    return eqn;
-  }
-
 
   //#########################################################################
   //# Invocation
@@ -288,6 +278,23 @@ public class ConstraintPropagator
   public VariableContext getContext()
   {
     return mContext;
+  }
+
+
+  //#########################################################################
+  //# Restricted Access
+  void removeConstraint(final SimpleExpressionProxy constraint)
+  {
+    mNormalizedConstraints.remove(constraint);
+  }
+
+  BinaryExpressionProxy recallBinding(final SimpleExpressionProxy varname)
+  {
+    final BinaryExpressionProxy eqn = mContext.recallBinding(varname);
+    if (eqn != null) {
+      addConstraint(eqn);
+    }
+    return eqn;
   }
 
 

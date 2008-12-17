@@ -19,7 +19,7 @@ import net.sourceforge.waters.model.module.SimpleExpressionProxy;
 public interface SplitCandidate
 {
 
-  public SimpleExpressionProxy getRecallable();
+  public void recall(ConstraintPropagator propagator);
 
   public List<SimpleExpressionProxy> getSplitExpressions
     (ModuleProxyFactory factory, CompilerOperatorTable optable);

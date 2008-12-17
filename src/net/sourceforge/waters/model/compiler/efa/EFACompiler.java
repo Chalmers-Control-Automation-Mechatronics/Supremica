@@ -272,15 +272,12 @@ public class EFACompiler
     if (split == null) {
       createEvent(edecl, parts, parent);
     } else {
-      final SimpleExpressionProxy recall = split.getRecallable();
       for (final SimpleExpressionProxy expr :
              split.getSplitExpressions(mFactory, mOperatorTable)) {
         // System.err.println(" + " + expr);
         final ConstraintPropagator propagator =
           new ConstraintPropagator(parent);
-        if (recall != null) {
-          propagator.recallBinding(recall);
-        }
+        split.recall(propagator);
         propagator.addConstraint(expr);
         propagator.propagate();
         // System.err.println(" = " + propagator.getAllConstraints());

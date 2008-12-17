@@ -49,9 +49,9 @@ class DisjunctionSplitCandidate
 
   //#########################################################################
   //# Interface net.sourceforge.waters.model.compiler.constraint.SplitCandidate
-  public SimpleExpressionProxy getRecallable()
+  public void recall(final ConstraintPropagator propagator)
   {
-    return null;
+    propagator.removeConstraint(mDisjunction);
   }
 
   public List<SimpleExpressionProxy> getSplitExpressions

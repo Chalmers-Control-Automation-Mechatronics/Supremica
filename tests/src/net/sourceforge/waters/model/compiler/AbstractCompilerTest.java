@@ -324,6 +324,12 @@ public abstract class AbstractCompilerTest
   {
     compile("tests", "profisafe", "profisafe_ihost_efa");
   }
+
+  public void testCompile_profisafe_islave()
+    throws IOException, WatersException
+  {
+    compile("tests", "profisafe", "profisafe_islave_efa");
+  }
   */
 
   public void testCompile_sensoractuator1()
