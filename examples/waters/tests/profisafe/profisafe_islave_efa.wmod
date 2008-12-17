@@ -1,0 +1,1793 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Module Name="New Module" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
+    <ns2:Comment></ns2:Comment>
+    <ConstantAliasList>
+        <ConstantAlias Scope="REQUIRED_PARAMETER" Name="MAXSEQNO">
+            <ConstantAliasExpression>
+                <IntConstant Value="4"/>
+            </ConstantAliasExpression>
+        </ConstantAlias>
+    </ConstantAliasList>
+    <EventDeclList>
+        <EventDecl Kind="PROPOSITION" Name=":accepting"/>
+        <EventDecl Kind="CONTROLLABLE" Name="step_idle"/>
+        <EventDecl Kind="CONTROLLABLE" Name="yield"/>
+        <EventDecl Kind="CONTROLLABLE" Name="step_idle_restart"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="slave_timeout"/>
+        <EventDecl Kind="CONTROLLABLE" Name="step_inc"/>
+        <EventDecl Kind="CONTROLLABLE" Name="step_notinc"/>
+        <EventDecl Kind="CONTROLLABLE" Name="step_inc_restart"/>
+        <EventDecl Kind="CONTROLLABLE" Name="step_notinc_restart"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="resume"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="send">
+            <RangeList>
+                <EnumSetExpression Text="{PV,FV}">
+                    <SimpleIdentifier Name="PV"/>
+                    <SimpleIdentifier Name="FV"/>
+                </EnumSetExpression>
+                <BinaryExpression Operator="..">
+                    <IntConstant Value="0"/>
+                    <IntConstant Value="1"/>
+                </BinaryExpression>
+                <BinaryExpression Operator="..">
+                    <IntConstant Value="0"/>
+                    <IntConstant Value="1"/>
+                </BinaryExpression>
+                <BinaryExpression Operator="..">
+                    <IntConstant Value="0"/>
+                    <IntConstant Value="1"/>
+                </BinaryExpression>
+                <BinaryExpression Operator="..">
+                    <IntConstant Value="0"/>
+                    <SimpleIdentifier Name="MAXSEQNO"/>
+                </BinaryExpression>
+            </RangeList>
+        </EventDecl>
+        <EventDecl Kind="UNCONTROLLABLE" Name="rcv">
+            <RangeList>
+                <BinaryExpression Operator="..">
+                    <IntConstant Value="0"/>
+                    <SimpleIdentifier Name="MAXSEQNO"/>
+                </BinaryExpression>
+                <EnumSetExpression Text="{ok,nok}">
+                    <SimpleIdentifier Name="ok"/>
+                    <SimpleIdentifier Name="nok"/>
+                </EnumSetExpression>
+            </RangeList>
+        </EventDecl>
+    </EventDeclList>
+    <ComponentList>
+        <SimpleComponent Kind="SPEC" Name="main">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="s20_system_start">
+                        <PointGeometry>
+                            <Point Y="112" X="96"/>
+                        </PointGeometry>
+                        <InitialArrowGeometry>
+                            <Point Y="-5" X="-5"/>
+                        </InitialArrowGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="10" X="0"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="s21_await_message">
+                        <PointGeometry>
+                            <Point Y="272" X="96"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="10" X="0"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="s22_message_check">
+                        <PointGeometry>
+                            <Point Y="432" X="96"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="4" X="5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="s23_ack_prepare">
+                        <PointGeometry>
+                            <Point Y="752" X="480"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="9" X="-19"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="s28_message_check">
+                        <PointGeometry>
+                            <Point Y="624" X="272"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="-21" X="-125"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="s27_await_message">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                        <PointGeometry>
+                            <Point Y="240" X="272"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="-22" X="-117"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="s24_await_message">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                        <PointGeometry>
+                            <Point Y="624" X="688"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="6" X="-74"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="s26_ack_prepare">
+                        <PointGeometry>
+                            <Point Y="240" X="688"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="-26" X="2"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="s25_message_check">
+                        <PointGeometry>
+                            <Point Y="624" X="944"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="5" X="-35"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="s21_await_message" Source="s20_system_start">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="yield"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-16" X="7"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s22_message_check" Source="s21_await_message">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="step_idle"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-16" X="8"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s23_ack_prepare" Source="s22_message_check">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="step_notinc_restart"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-339" X="-209"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="797" X="211"/>
+                        </SplineGeometry>
+                        <GuardActionBlock>
+                            <Actions>
+                                <BinaryExpression Operator="=">
+                                    <SimpleIdentifier Name="out_ps_f_process_data"/>
+                                    <SimpleIdentifier Name="app_process_data"/>
+                                </BinaryExpression>
+                                <BinaryExpression Operator="=" Text="out_ps_status_bit4_FV=(app_process_data==FV)">
+                                    <SimpleIdentifier Name="out_ps_status_bit4_FV"/>
+                                    <BinaryExpression Operator="==">
+                                        <SimpleIdentifier Name="app_process_data"/>
+                                        <SimpleIdentifier Name="FV"/>
+                                    </BinaryExpression>
+                                </BinaryExpression>
+                                <BinaryExpression Operator="=">
+                                    <SimpleIdentifier Name="out_ps_status_bit3_TO"/>
+                                    <IntConstant Value="0"/>
+                                </BinaryExpression>
+                                <BinaryExpression Operator="=">
+                                    <SimpleIdentifier Name="number_cycles_TO"/>
+                                    <SimpleIdentifier Name="number_cycles_TO"/>
+                                </BinaryExpression>
+                                <BinaryExpression Operator="=">
+                                    <SimpleIdentifier Name="out_ps_status_bit2_CRCNO"/>
+                                    <IntConstant Value="0"/>
+                                </BinaryExpression>
+                                <BinaryExpression Operator="=">
+                                    <SimpleIdentifier Name="number_cycles_CRCNO"/>
+                                    <SimpleIdentifier Name="number_cycles_CRCNO"/>
+                                </BinaryExpression>
+                                <BinaryExpression Operator="=">
+                                    <SimpleIdentifier Name="out_cons_num"/>
+                                    <SimpleIdentifier Name="in_cons_num"/>
+                                </BinaryExpression>
+                                <BinaryExpression Operator="=">
+                                    <SimpleIdentifier Name="number_ok_cycles"/>
+                                    <SimpleIdentifier Name="number_ok_cycles"/>
+                                </BinaryExpression>
+                            </Actions>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-325" X="-209"/>
+                            </LabelGeometry>
+                        </GuardActionBlock>
+                    </Edge>
+                    <Edge Target="s24_await_message" Source="s23_ack_prepare">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="yield"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="7" X="-23"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s26_ack_prepare" Source="s24_await_message">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="step_notinc_restart"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-91" X="-60"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <GuardActionBlock>
+                            <Guards>
+                                <SimpleIdentifier Name="got_slave_timeout"/>
+                            </Guards>
+                            <Actions>
+                                <BinaryExpression Operator="=">
+                                    <SimpleIdentifier Name="out_ps_f_process_data"/>
+                                    <SimpleIdentifier Name="FV"/>
+                                </BinaryExpression>
+                                <BinaryExpression Operator="=">
+                                    <SimpleIdentifier Name="out_ps_status_bit4_FV"/>
+                                    <IntConstant Value="1"/>
+                                </BinaryExpression>
+                                <BinaryExpression Operator="=">
+                                    <SimpleIdentifier Name="out_ps_status_bit3_TO"/>
+                                    <IntConstant Value="1"/>
+                                </BinaryExpression>
+                                <BinaryExpression Operator="=">
+                                    <SimpleIdentifier Name="number_cycles_TO"/>
+                                    <IntConstant Value="3"/>
+                                </BinaryExpression>
+                                <BinaryExpression Operator="=">
+                                    <SimpleIdentifier Name="out_ps_status_bit2_CRCNO"/>
+                                    <SimpleIdentifier Name="out_status_bit2_CRCNO"/>
+                                </BinaryExpression>
+                                <BinaryExpression Operator="=">
+                                    <SimpleIdentifier Name="number_cycles_CRCNO"/>
+                                    <SimpleIdentifier Name="number_cycles_CRCNO"/>
+                                </BinaryExpression>
+                                <BinaryExpression Operator="=">
+                                    <SimpleIdentifier Name="out_cons_num"/>
+                                    <SimpleIdentifier Name="out_cons_num"/>
+                                </BinaryExpression>
+                                <BinaryExpression Operator="=">
+                                    <SimpleIdentifier Name="number_ok_cycles"/>
+                                    <IntConstant Value="0"/>
+                                </BinaryExpression>
+                            </Actions>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-78" X="-60"/>
+                            </LabelGeometry>
+                        </GuardActionBlock>
+                    </Edge>
+                    <Edge Target="s27_await_message" Source="s26_ack_prepare">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="yield"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-20" X="-17"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="220" X="480"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Target="s28_message_check" Source="s27_await_message">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="step_idle"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-40" X="-79"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <GuardActionBlock>
+                            <Guards>
+                                <UnaryExpression Operator="!">
+                                    <SimpleIdentifier Name="got_slave_timeout"/>
+                                </UnaryExpression>
+                            </Guards>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-26" X="-81"/>
+                            </LabelGeometry>
+                        </GuardActionBlock>
+                    </Edge>
+                    <Edge Target="s23_ack_prepare" Source="s28_message_check">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="step_notinc_restart"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-40" X="-236"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <GuardActionBlock>
+                            <Guards>
+                                <BinaryExpression Operator="&amp;" Text="in_cons_num==out_cons_num%MAXSEQNO+1 &amp; in_CRC==ok &amp; number_ok_cycles&gt;=2">
+                                    <BinaryExpression Operator="&amp;">
+                                        <BinaryExpression Operator="==">
+                                            <SimpleIdentifier Name="in_cons_num"/>
+                                            <BinaryExpression Operator="+">
+                                                <BinaryExpression Operator="%">
+                                                    <SimpleIdentifier Name="out_cons_num"/>
+                                                    <SimpleIdentifier Name="MAXSEQNO"/>
+                                                </BinaryExpression>
+                                                <IntConstant Value="1"/>
+                                            </BinaryExpression>
+                                        </BinaryExpression>
+                                        <BinaryExpression Operator="==">
+                                            <SimpleIdentifier Name="in_CRC"/>
+                                            <SimpleIdentifier Name="ok"/>
+                                        </BinaryExpression>
+                                    </BinaryExpression>
+                                    <BinaryExpression Operator="&gt;=">
+                                        <SimpleIdentifier Name="number_ok_cycles"/>
+                                        <IntConstant Value="2"/>
+                                    </BinaryExpression>
+                                </BinaryExpression>
+                            </Guards>
+                            <Actions>
+                                <BinaryExpression Operator="=">
+                                    <SimpleIdentifier Name="out_ps_f_process_data"/>
+                                    <SimpleIdentifier Name="app_process_data"/>
+                                </BinaryExpression>
+                                <BinaryExpression Operator="=" Text="out_ps_status_bit4_FV=(app_process_data==FV)">
+                                    <SimpleIdentifier Name="out_ps_status_bit4_FV"/>
+                                    <BinaryExpression Operator="==">
+                                        <SimpleIdentifier Name="app_process_data"/>
+                                        <SimpleIdentifier Name="FV"/>
+                                    </BinaryExpression>
+                                </BinaryExpression>
+                                <BinaryExpression Operator="=">
+                                    <SimpleIdentifier Name="out_ps_status_bit3_TO"/>
+                                    <IntConstant Value="0"/>
+                                </BinaryExpression>
+                                <BinaryExpression Operator="=">
+                                    <SimpleIdentifier Name="number_cycles_TO"/>
+                                    <SimpleIdentifier Name="number_cycles_TO"/>
+                                </BinaryExpression>
+                                <BinaryExpression Operator="=">
+                                    <SimpleIdentifier Name="out_ps_status_bit2_CRCNO"/>
+                                    <IntConstant Value="0"/>
+                                </BinaryExpression>
+                                <BinaryExpression Operator="=">
+                                    <SimpleIdentifier Name="number_cycles_CRCNO"/>
+                                    <SimpleIdentifier Name="number_cycles_CRCNO"/>
+                                </BinaryExpression>
+                                <BinaryExpression Operator="=">
+                                    <SimpleIdentifier Name="out_cons_num"/>
+                                    <SimpleIdentifier Name="in_cons_num"/>
+                                </BinaryExpression>
+                                <BinaryExpression Operator="=">
+                                    <SimpleIdentifier Name="number_ok_cycles"/>
+                                    <IntConstant Value="3"/>
+                                </BinaryExpression>
+                            </Actions>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-28" X="-236"/>
+                            </LabelGeometry>
+                        </GuardActionBlock>
+                    </Edge>
+                    <Edge Target="s26_ack_prepare" Source="s28_message_check">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="step_idle"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-177" X="-168"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="411" X="457"/>
+                        </SplineGeometry>
+                        <GuardActionBlock>
+                            <Guards>
+                                <BinaryExpression Operator="&amp;" Text="in_cons_num==out_cons_num &amp; in_CRC==ok">
+                                    <BinaryExpression Operator="==">
+                                        <SimpleIdentifier Name="in_cons_num"/>
+                                        <SimpleIdentifier Name="out_cons_num"/>
+                                    </BinaryExpression>
+                                    <BinaryExpression Operator="==">
+                                        <SimpleIdentifier Name="in_CRC"/>
+                                        <SimpleIdentifier Name="ok"/>
+                                    </BinaryExpression>
+                                </BinaryExpression>
+                            </Guards>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-165" X="-166"/>
+                            </LabelGeometry>
+                        </GuardActionBlock>
+                    </Edge>
+                    <Edge Target="s26_ack_prepare" Source="s22_message_check">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="step_notinc_restart"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-82" X="-105"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="141" X="353"/>
+                        </SplineGeometry>
+                        <GuardActionBlock>
+                            <Actions>
+                                <BinaryExpression Operator="=">
+                                    <SimpleIdentifier Name="out_ps_f_process_data"/>
+                                    <SimpleIdentifier Name="FV"/>
+                                </BinaryExpression>
+                                <BinaryExpression Operator="=">
+                                    <SimpleIdentifier Name="out_ps_status_bit4_FV"/>
+                                    <IntConstant Value="1"/>
+                                </BinaryExpression>
+                                <BinaryExpression Operator="=">
+                                    <SimpleIdentifier Name="out_ps_status_bit3_TO"/>
+                                    <IntConstant Value="0"/>
+                                </BinaryExpression>
+                                <BinaryExpression Operator="=">
+                                    <SimpleIdentifier Name="number_cycles_TO"/>
+                                    <SimpleIdentifier Name="number_cycles_TO"/>
+                                </BinaryExpression>
+                                <BinaryExpression Operator="=">
+                                    <SimpleIdentifier Name="out_ps_status_bit2_CRCNO"/>
+                                    <IntConstant Value="1"/>
+                                </BinaryExpression>
+                                <BinaryExpression Operator="=">
+                                    <SimpleIdentifier Name="number_cycles_CRCNO"/>
+                                    <IntConstant Value="3"/>
+                                </BinaryExpression>
+                                <BinaryExpression Operator="=">
+                                    <SimpleIdentifier Name="out_cons_num"/>
+                                    <SimpleIdentifier Name="in_cons_num"/>
+                                </BinaryExpression>
+                                <BinaryExpression Operator="=">
+                                    <SimpleIdentifier Name="number_ok_cycles"/>
+                                    <SimpleIdentifier Name="number_ok_cycles"/>
+                                </BinaryExpression>
+                            </Actions>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-68" X="-103"/>
+                            </LabelGeometry>
+                        </GuardActionBlock>
+                    </Edge>
+                    <Edge Target="s26_ack_prepare" Source="s27_await_message">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="step_notinc_restart"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-86" X="-29"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="132" X="521"/>
+                        </SplineGeometry>
+                        <GuardActionBlock>
+                            <Guards>
+                                <SimpleIdentifier Name="got_slave_timeout"/>
+                            </Guards>
+                            <Actions>
+                                <BinaryExpression Operator="=">
+                                    <SimpleIdentifier Name="out_ps_f_process_data"/>
+                                    <SimpleIdentifier Name="out_ps_f_process_data"/>
+                                </BinaryExpression>
+                                <BinaryExpression Operator="=">
+                                    <SimpleIdentifier Name="out_ps_status_bit4_FV"/>
+                                    <SimpleIdentifier Name="out_ps_status_bit4_FV"/>
+                                </BinaryExpression>
+                                <BinaryExpression Operator="=">
+                                    <SimpleIdentifier Name="out_ps_status_bit3_TO"/>
+                                    <IntConstant Value="1"/>
+                                </BinaryExpression>
+                                <BinaryExpression Operator="=">
+                                    <SimpleIdentifier Name="number_cycles_TO"/>
+                                    <IntConstant Value="3"/>
+                                </BinaryExpression>
+                                <BinaryExpression Operator="=">
+                                    <SimpleIdentifier Name="out_ps_status_bit2_CRCNO"/>
+                                    <SimpleIdentifier Name="out_ps_status_bit2_CRCNO"/>
+                                </BinaryExpression>
+                                <BinaryExpression Operator="=">
+                                    <SimpleIdentifier Name="number_cycles_CRCNO"/>
+                                    <SimpleIdentifier Name="number_cycles_CRCNO"/>
+                                </BinaryExpression>
+                                <BinaryExpression Operator="=">
+                                    <SimpleIdentifier Name="out_cons_num"/>
+                                    <SimpleIdentifier Name="out_cons_num"/>
+                                </BinaryExpression>
+                                <BinaryExpression Operator="=">
+                                    <SimpleIdentifier Name="number_ok_cycles"/>
+                                    <SimpleIdentifier Name="number_ok_cycles"/>
+                                </BinaryExpression>
+                            </Actions>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-72" X="-30"/>
+                            </LabelGeometry>
+                        </GuardActionBlock>
+                    </Edge>
+                    <Edge Target="s25_message_check" Source="s24_await_message">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="step_idle_restart"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="1" X="-102"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="640" X="816"/>
+                        </SplineGeometry>
+                        <GuardActionBlock>
+                            <Guards>
+                                <BinaryExpression Operator="&amp;" Text="!got_slave_timeout &amp; in_cons_num!=out_cons_num">
+                                    <UnaryExpression Operator="!">
+                                        <SimpleIdentifier Name="got_slave_timeout"/>
+                                    </UnaryExpression>
+                                    <BinaryExpression Operator="!=">
+                                        <SimpleIdentifier Name="in_cons_num"/>
+                                        <SimpleIdentifier Name="out_cons_num"/>
+                                    </BinaryExpression>
+                                </BinaryExpression>
+                            </Guards>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="15" X="-100"/>
+                            </LabelGeometry>
+                        </GuardActionBlock>
+                    </Edge>
+                    <Edge Target="s26_ack_prepare" Source="s25_message_check">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="step_notinc_restart"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-80" X="-84"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="336" X="880"/>
+                        </SplineGeometry>
+                        <GuardActionBlock>
+                            <Guards>
+                                <BinaryExpression Operator="|" Text="(in_cons_num!=out_cons_num &amp; in_cons_num!=out_cons_num%MAXSEQNO+1) | in_CRC==nok">
+                                    <BinaryExpression Operator="&amp;">
+                                        <BinaryExpression Operator="!=">
+                                            <SimpleIdentifier Name="in_cons_num"/>
+                                            <SimpleIdentifier Name="out_cons_num"/>
+                                        </BinaryExpression>
+                                        <BinaryExpression Operator="!=">
+                                            <SimpleIdentifier Name="in_cons_num"/>
+                                            <BinaryExpression Operator="+">
+                                                <BinaryExpression Operator="%">
+                                                    <SimpleIdentifier Name="out_cons_num"/>
+                                                    <SimpleIdentifier Name="MAXSEQNO"/>
+                                                </BinaryExpression>
+                                                <IntConstant Value="1"/>
+                                            </BinaryExpression>
+                                        </BinaryExpression>
+                                    </BinaryExpression>
+                                    <BinaryExpression Operator="==">
+                                        <SimpleIdentifier Name="in_CRC"/>
+                                        <SimpleIdentifier Name="nok"/>
+                                    </BinaryExpression>
+                                </BinaryExpression>
+                            </Guards>
+                            <Actions>
+                                <BinaryExpression Operator="=">
+                                    <SimpleIdentifier Name="out_ps_f_process_data"/>
+                                    <SimpleIdentifier Name="FV"/>
+                                </BinaryExpression>
+                                <BinaryExpression Operator="=">
+                                    <SimpleIdentifier Name="out_ps_status_bit4_FV"/>
+                                    <IntConstant Value="1"/>
+                                </BinaryExpression>
+                                <BinaryExpression Operator="=">
+                                    <SimpleIdentifier Name="out_ps_status_bit3_TO"/>
+                                    <SimpleIdentifier Name="out_ps_status_bit3_TO"/>
+                                </BinaryExpression>
+                                <BinaryExpression Operator="=">
+                                    <SimpleIdentifier Name="number_cycles_TO"/>
+                                    <SimpleIdentifier Name="number_cycles_TO"/>
+                                </BinaryExpression>
+                                <BinaryExpression Operator="=">
+                                    <SimpleIdentifier Name="out_ps_status_bit2_CRCNO"/>
+                                    <IntConstant Value="1"/>
+                                </BinaryExpression>
+                                <BinaryExpression Operator="=">
+                                    <SimpleIdentifier Name="number_cycles_CRCNO"/>
+                                    <IntConstant Value="3"/>
+                                </BinaryExpression>
+                                <BinaryExpression Operator="=">
+                                    <SimpleIdentifier Name="out_cons_num"/>
+                                    <SimpleIdentifier Name="in_cons_num"/>
+                                </BinaryExpression>
+                                <BinaryExpression Operator="=">
+                                    <SimpleIdentifier Name="number_ok_cycles"/>
+                                    <IntConstant Value="0"/>
+                                </BinaryExpression>
+                            </Actions>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-66" X="-84"/>
+                            </LabelGeometry>
+                        </GuardActionBlock>
+                    </Edge>
+                    <Edge Target="s23_ack_prepare" Source="s25_message_check">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="step_inc"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-47" X="-166"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="724" X="796"/>
+                        </SplineGeometry>
+                        <GuardActionBlock>
+                            <Guards>
+                                <BinaryExpression Operator="&amp;" Text="in_cons_num==out_cons_num%MAXSEQNO+1 &amp; in_CRC==ok">
+                                    <BinaryExpression Operator="==">
+                                        <SimpleIdentifier Name="in_cons_num"/>
+                                        <BinaryExpression Operator="+">
+                                            <BinaryExpression Operator="%">
+                                                <SimpleIdentifier Name="out_cons_num"/>
+                                                <SimpleIdentifier Name="MAXSEQNO"/>
+                                            </BinaryExpression>
+                                            <IntConstant Value="1"/>
+                                        </BinaryExpression>
+                                    </BinaryExpression>
+                                    <BinaryExpression Operator="==">
+                                        <SimpleIdentifier Name="in_CRC"/>
+                                        <SimpleIdentifier Name="ok"/>
+                                    </BinaryExpression>
+                                </BinaryExpression>
+                            </Guards>
+                            <Actions>
+                                <BinaryExpression Operator="=">
+                                    <SimpleIdentifier Name="out_ps_f_process_data"/>
+                                    <SimpleIdentifier Name="app_process_data"/>
+                                </BinaryExpression>
+                                <BinaryExpression Operator="=" Text="out_ps_status_bit4_FV=(app_process_data==FV)">
+                                    <SimpleIdentifier Name="out_ps_status_bit4_FV"/>
+                                    <BinaryExpression Operator="==">
+                                        <SimpleIdentifier Name="app_process_data"/>
+                                        <SimpleIdentifier Name="FV"/>
+                                    </BinaryExpression>
+                                </BinaryExpression>
+                                <BinaryExpression Operator="=">
+                                    <SimpleIdentifier Name="out_cons_num"/>
+                                    <SimpleIdentifier Name="in_cons_num"/>
+                                </BinaryExpression>
+                            </Actions>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-34" X="-164"/>
+                            </LabelGeometry>
+                        </GuardActionBlock>
+                    </Edge>
+                    <Edge Target="s25_message_check" Source="s24_await_message">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="step_idle"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-30" X="-99"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="608" X="815"/>
+                        </SplineGeometry>
+                        <GuardActionBlock>
+                            <Guards>
+                                <BinaryExpression Operator="&amp;" Text="!got_slave_timeout &amp; in_cons_num==out_cons_num">
+                                    <UnaryExpression Operator="!">
+                                        <SimpleIdentifier Name="got_slave_timeout"/>
+                                    </UnaryExpression>
+                                    <BinaryExpression Operator="==">
+                                        <SimpleIdentifier Name="in_cons_num"/>
+                                        <SimpleIdentifier Name="out_cons_num"/>
+                                    </BinaryExpression>
+                                </BinaryExpression>
+                            </Guards>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-15" X="-99"/>
+                            </LabelGeometry>
+                        </GuardActionBlock>
+                    </Edge>
+                    <Edge Target="s23_ack_prepare" Source="s25_message_check">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="step_notinc"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-25" X="-140"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="787" X="793"/>
+                        </SplineGeometry>
+                        <GuardActionBlock>
+                            <Guards>
+                                <BinaryExpression Operator="&amp;" Text="in_cons_num==out_cons_num &amp; in_CRC==ok">
+                                    <BinaryExpression Operator="==">
+                                        <SimpleIdentifier Name="in_cons_num"/>
+                                        <SimpleIdentifier Name="out_cons_num"/>
+                                    </BinaryExpression>
+                                    <BinaryExpression Operator="==">
+                                        <SimpleIdentifier Name="in_CRC"/>
+                                        <SimpleIdentifier Name="ok"/>
+                                    </BinaryExpression>
+                                </BinaryExpression>
+                            </Guards>
+                            <Actions>
+                                <BinaryExpression Operator="=">
+                                    <SimpleIdentifier Name="out_ps_f_process_data"/>
+                                    <SimpleIdentifier Name="app_process_data"/>
+                                </BinaryExpression>
+                                <BinaryExpression Operator="=" Text="out_ps_status_bit4_FV=(app_process_data==FV)">
+                                    <SimpleIdentifier Name="out_ps_status_bit4_FV"/>
+                                    <BinaryExpression Operator="==">
+                                        <SimpleIdentifier Name="app_process_data"/>
+                                        <SimpleIdentifier Name="FV"/>
+                                    </BinaryExpression>
+                                </BinaryExpression>
+                            </Actions>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-12" X="-140"/>
+                            </LabelGeometry>
+                        </GuardActionBlock>
+                    </Edge>
+                    <Edge Target="s26_ack_prepare" Source="s28_message_check">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="step_notinc_restart"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="47" X="-211"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="452" X="499"/>
+                        </SplineGeometry>
+                        <GuardActionBlock>
+                            <Guards>
+                                <BinaryExpression Operator="&amp;" Text="in_cons_num!=out_cons_num &amp; (in_cons_num!=out_cons_num%MAXSEQNO+1 | in_CRC==nok)">
+                                    <BinaryExpression Operator="!=">
+                                        <SimpleIdentifier Name="in_cons_num"/>
+                                        <SimpleIdentifier Name="out_cons_num"/>
+                                    </BinaryExpression>
+                                    <BinaryExpression Operator="|">
+                                        <BinaryExpression Operator="!=">
+                                            <SimpleIdentifier Name="in_cons_num"/>
+                                            <BinaryExpression Operator="+">
+                                                <BinaryExpression Operator="%">
+                                                    <SimpleIdentifier Name="out_cons_num"/>
+                                                    <SimpleIdentifier Name="MAXSEQNO"/>
+                                                </BinaryExpression>
+                                                <IntConstant Value="1"/>
+                                            </BinaryExpression>
+                                        </BinaryExpression>
+                                        <BinaryExpression Operator="==">
+                                            <SimpleIdentifier Name="in_CRC"/>
+                                            <SimpleIdentifier Name="nok"/>
+                                        </BinaryExpression>
+                                    </BinaryExpression>
+                                </BinaryExpression>
+                            </Guards>
+                            <Actions>
+                                <BinaryExpression Operator="=">
+                                    <SimpleIdentifier Name="out_ps_f_process_data"/>
+                                    <SimpleIdentifier Name="out_ps_f_process_data"/>
+                                </BinaryExpression>
+                                <BinaryExpression Operator="=">
+                                    <SimpleIdentifier Name="out_ps_status_bit4_FV"/>
+                                    <SimpleIdentifier Name="out_ps_status_bit4_FV"/>
+                                </BinaryExpression>
+                                <BinaryExpression Operator="=">
+                                    <SimpleIdentifier Name="out_ps_status_bit3_TO"/>
+                                    <SimpleIdentifier Name="out_ps_status_bit3_TO"/>
+                                </BinaryExpression>
+                                <BinaryExpression Operator="=">
+                                    <SimpleIdentifier Name="number_cycles_TO"/>
+                                    <SimpleIdentifier Name="number_cycles_TO"/>
+                                </BinaryExpression>
+                                <BinaryExpression Operator="=">
+                                    <SimpleIdentifier Name="out_ps_status_bit2_CRCNO"/>
+                                    <IntConstant Value="1"/>
+                                </BinaryExpression>
+                                <BinaryExpression Operator="=">
+                                    <SimpleIdentifier Name="number_cycles_CRCNO"/>
+                                    <IntConstant Value="3"/>
+                                </BinaryExpression>
+                                <BinaryExpression Operator="=">
+                                    <SimpleIdentifier Name="out_cons_num"/>
+                                    <SimpleIdentifier Name="in_cons_num"/>
+                                </BinaryExpression>
+                                <BinaryExpression Operator="=">
+                                    <SimpleIdentifier Name="number_ok_cycles"/>
+                                    <IntConstant Value="0"/>
+                                </BinaryExpression>
+                            </Actions>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="59" X="-210"/>
+                            </LabelGeometry>
+                        </GuardActionBlock>
+                    </Edge>
+                    <Edge Target="s26_ack_prepare" Source="s28_message_check">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="step_notinc"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-93" X="-197"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="437" X="486"/>
+                        </SplineGeometry>
+                        <GuardActionBlock>
+                            <Guards>
+                                <BinaryExpression Operator="&amp;" Text="in_cons_num==out_cons_num &amp; in_CRC==nok">
+                                    <BinaryExpression Operator="==">
+                                        <SimpleIdentifier Name="in_cons_num"/>
+                                        <SimpleIdentifier Name="out_cons_num"/>
+                                    </BinaryExpression>
+                                    <BinaryExpression Operator="==">
+                                        <SimpleIdentifier Name="in_CRC"/>
+                                        <SimpleIdentifier Name="nok"/>
+                                    </BinaryExpression>
+                                </BinaryExpression>
+                            </Guards>
+                            <Actions>
+                                <BinaryExpression Operator="=">
+                                    <SimpleIdentifier Name="out_ps_f_process_data"/>
+                                    <SimpleIdentifier Name="out_ps_f_process_data"/>
+                                </BinaryExpression>
+                                <BinaryExpression Operator="=">
+                                    <SimpleIdentifier Name="out_ps_status_bit4_FV"/>
+                                    <SimpleIdentifier Name="out_ps_status_bit4_FV"/>
+                                </BinaryExpression>
+                                <BinaryExpression Operator="=">
+                                    <SimpleIdentifier Name="out_ps_status_bit3_TO"/>
+                                    <SimpleIdentifier Name="out_ps_status_bit3_TO"/>
+                                </BinaryExpression>
+                                <BinaryExpression Operator="=">
+                                    <SimpleIdentifier Name="number_cycles_TO"/>
+                                    <SimpleIdentifier Name="number_cycles_TO"/>
+                                </BinaryExpression>
+                                <BinaryExpression Operator="=">
+                                    <SimpleIdentifier Name="out_ps_status_bit2_CRCNO"/>
+                                    <IntConstant Value="1"/>
+                                </BinaryExpression>
+                                <BinaryExpression Operator="=">
+                                    <SimpleIdentifier Name="number_cycles_CRCNO"/>
+                                    <IntConstant Value="3"/>
+                                </BinaryExpression>
+                                <BinaryExpression Operator="=">
+                                    <SimpleIdentifier Name="out_cons_num"/>
+                                    <SimpleIdentifier Name="out_cons_num"/>
+                                </BinaryExpression>
+                                <BinaryExpression Operator="=">
+                                    <SimpleIdentifier Name="number_ok_cycles"/>
+                                    <IntConstant Value="0"/>
+                                </BinaryExpression>
+                            </Actions>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-80" X="-196"/>
+                            </LabelGeometry>
+                        </GuardActionBlock>
+                    </Edge>
+                    <Edge Target="s26_ack_prepare" Source="s28_message_check">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="step_inc_restart"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-159" X="-180"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="421" X="470"/>
+                        </SplineGeometry>
+                        <GuardActionBlock>
+                            <Guards>
+                                <BinaryExpression Operator="&amp;" Text="in_cons_num==out_cons_num%MAXSEQNO+1 &amp; in_CRC==ok &amp; number_ok_cycles&lt;2">
+                                    <BinaryExpression Operator="&amp;">
+                                        <BinaryExpression Operator="==">
+                                            <SimpleIdentifier Name="in_cons_num"/>
+                                            <BinaryExpression Operator="+">
+                                                <BinaryExpression Operator="%">
+                                                    <SimpleIdentifier Name="out_cons_num"/>
+                                                    <SimpleIdentifier Name="MAXSEQNO"/>
+                                                </BinaryExpression>
+                                                <IntConstant Value="1"/>
+                                            </BinaryExpression>
+                                        </BinaryExpression>
+                                        <BinaryExpression Operator="==">
+                                            <SimpleIdentifier Name="in_CRC"/>
+                                            <SimpleIdentifier Name="ok"/>
+                                        </BinaryExpression>
+                                    </BinaryExpression>
+                                    <BinaryExpression Operator="&lt;">
+                                        <SimpleIdentifier Name="number_ok_cycles"/>
+                                        <IntConstant Value="2"/>
+                                    </BinaryExpression>
+                                </BinaryExpression>
+                            </Guards>
+                            <Actions>
+                                <BinaryExpression Operator="=">
+                                    <SimpleIdentifier Name="out_ps_f_process_data"/>
+                                    <SimpleIdentifier Name="out_ps_f_process_data"/>
+                                </BinaryExpression>
+                                <BinaryExpression Operator="=">
+                                    <SimpleIdentifier Name="out_ps_status_bit4_FV"/>
+                                    <SimpleIdentifier Name="out_ps_status_bit4_FV"/>
+                                </BinaryExpression>
+                                <BinaryExpression Operator="=">
+                                    <SimpleIdentifier Name="out_cons_num"/>
+                                    <SimpleIdentifier Name="in_cons_num"/>
+                                </BinaryExpression>
+                            </Actions>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-146" X="-179"/>
+                            </LabelGeometry>
+                        </GuardActionBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="SPEC" Name="inc_number_ok_cycles">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="inc">
+                        <PointGeometry>
+                            <Point Y="160" X="160"/>
+                        </PointGeometry>
+                        <InitialArrowGeometry>
+                            <Point Y="-5" X="-5"/>
+                        </InitialArrowGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="4" X="6"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="inc" Source="inc">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="step_inc"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-28" X="10"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="120" X="204"/>
+                        </SplineGeometry>
+                        <GuardActionBlock>
+                            <Guards>
+                                <BinaryExpression Operator="&lt;">
+                                    <SimpleIdentifier Name="number_ok_cyles"/>
+                                    <IntConstant Value="3"/>
+                                </BinaryExpression>
+                            </Guards>
+                            <Actions>
+                                <BinaryExpression Operator="+=">
+                                    <SimpleIdentifier Name="number_ok_cycles"/>
+                                    <IntConstant Value="1"/>
+                                </BinaryExpression>
+                            </Actions>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-15" X="12"/>
+                            </LabelGeometry>
+                        </GuardActionBlock>
+                    </Edge>
+                    <Edge Target="inc" Source="inc">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="step_inc"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="10" X="-12"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="198" X="120"/>
+                        </SplineGeometry>
+                        <GuardActionBlock>
+                            <Guards>
+                                <BinaryExpression Operator="==">
+                                    <SimpleIdentifier Name="number_ok_cycles"/>
+                                    <IntConstant Value="3"/>
+                                </BinaryExpression>
+                            </Guards>
+                            <Actions>
+                                <BinaryExpression Operator="=">
+                                    <SimpleIdentifier Name="number_ok_cycles"/>
+                                    <SimpleIdentifier Name="number_ok_cycles"/>
+                                </BinaryExpression>
+                            </Actions>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="26" X="-12"/>
+                            </LabelGeometry>
+                        </GuardActionBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="SPEC" Name="inc_number_cycles_TO">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="inc">
+                        <PointGeometry>
+                            <Point Y="160" X="160"/>
+                        </PointGeometry>
+                        <InitialArrowGeometry>
+                            <Point Y="-5" X="-5"/>
+                        </InitialArrowGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="4" X="6"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="inc" Source="inc">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="step_inc"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-28" X="10"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="120" X="204"/>
+                        </SplineGeometry>
+                        <GuardActionBlock>
+                            <Guards>
+                                <BinaryExpression Operator="&gt;">
+                                    <SimpleIdentifier Name="number_cyles_TO"/>
+                                    <IntConstant Value="0"/>
+                                </BinaryExpression>
+                            </Guards>
+                            <Actions>
+                                <BinaryExpression Operator="-=">
+                                    <SimpleIdentifier Name="number_cycles_TO"/>
+                                    <IntConstant Value="1"/>
+                                </BinaryExpression>
+                                <BinaryExpression Operator="=" Text="out_ps_status_bit3_TO=(number_cycles_TO==1)">
+                                    <SimpleIdentifier Name="out_ps_status_bit3_TO"/>
+                                    <BinaryExpression Operator="==">
+                                        <SimpleIdentifier Name="number_cycles_TO"/>
+                                        <IntConstant Value="1"/>
+                                    </BinaryExpression>
+                                </BinaryExpression>
+                            </Actions>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-15" X="12"/>
+                            </LabelGeometry>
+                        </GuardActionBlock>
+                    </Edge>
+                    <Edge Target="inc" Source="inc">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="step_inc"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="10" X="-12"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="198" X="120"/>
+                        </SplineGeometry>
+                        <GuardActionBlock>
+                            <Guards>
+                                <BinaryExpression Operator="==">
+                                    <SimpleIdentifier Name="number_cycles_TO"/>
+                                    <IntConstant Value="0"/>
+                                </BinaryExpression>
+                            </Guards>
+                            <Actions>
+                                <BinaryExpression Operator="=">
+                                    <SimpleIdentifier Name="number_cycles_TO"/>
+                                    <SimpleIdentifier Name="number_cycles_TO"/>
+                                </BinaryExpression>
+                                <BinaryExpression Operator="=">
+                                    <SimpleIdentifier Name="out_ps_status_bit3_TO"/>
+                                    <IntConstant Value="0"/>
+                                </BinaryExpression>
+                            </Actions>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="26" X="-12"/>
+                            </LabelGeometry>
+                        </GuardActionBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="SPEC" Name="inc_number_cycles_CRCNO">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="inc">
+                        <PointGeometry>
+                            <Point Y="160" X="160"/>
+                        </PointGeometry>
+                        <InitialArrowGeometry>
+                            <Point Y="-5" X="-5"/>
+                        </InitialArrowGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="4" X="6"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="inc" Source="inc">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="step_inc"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-28" X="10"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="120" X="204"/>
+                        </SplineGeometry>
+                        <GuardActionBlock>
+                            <Guards>
+                                <BinaryExpression Operator="&gt;">
+                                    <SimpleIdentifier Name="number_cyles_CRCNO"/>
+                                    <IntConstant Value="0"/>
+                                </BinaryExpression>
+                            </Guards>
+                            <Actions>
+                                <BinaryExpression Operator="-=">
+                                    <SimpleIdentifier Name="number_cycles_CRCNO"/>
+                                    <IntConstant Value="1"/>
+                                </BinaryExpression>
+                                <BinaryExpression Operator="=" Text="out_ps_status_bit3_CRCNO=(number_cycles_CRCNO==1)">
+                                    <SimpleIdentifier Name="out_ps_status_bit3_CRCNO"/>
+                                    <BinaryExpression Operator="==">
+                                        <SimpleIdentifier Name="number_cycles_CRCNO"/>
+                                        <IntConstant Value="1"/>
+                                    </BinaryExpression>
+                                </BinaryExpression>
+                            </Actions>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-15" X="12"/>
+                            </LabelGeometry>
+                        </GuardActionBlock>
+                    </Edge>
+                    <Edge Target="inc" Source="inc">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="step_inc"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="10" X="-12"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="198" X="120"/>
+                        </SplineGeometry>
+                        <GuardActionBlock>
+                            <Guards>
+                                <BinaryExpression Operator="==">
+                                    <SimpleIdentifier Name="number_cycles_CRCNO"/>
+                                    <IntConstant Value="0"/>
+                                </BinaryExpression>
+                            </Guards>
+                            <Actions>
+                                <BinaryExpression Operator="=">
+                                    <SimpleIdentifier Name="number_cycles_CRCNO"/>
+                                    <SimpleIdentifier Name="number_cycles_CRCNO"/>
+                                </BinaryExpression>
+                                <BinaryExpression Operator="=">
+                                    <SimpleIdentifier Name="out_ps_status_bit3_CRCNO"/>
+                                    <IntConstant Value="0"/>
+                                </BinaryExpression>
+                            </Actions>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="26" X="-12"/>
+                            </LabelGeometry>
+                        </GuardActionBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="PLANT" Name="timer">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="idle">
+                        <PointGeometry>
+                            <Point Y="80" X="288"/>
+                        </PointGeometry>
+                        <InitialArrowGeometry>
+                            <Point Y="-5" X="-5"/>
+                        </InitialArrowGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="-11" X="9"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="running">
+                        <PointGeometry>
+                            <Point Y="192" X="288"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="-4" X="10"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="running" Source="idle">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="step_idle_restart"/>
+                            <SimpleIdentifier Name="step_notinc_restart"/>
+                            <SimpleIdentifier Name="step_inc_restart"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-50" X="-125"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="136" X="273"/>
+                        </SplineGeometry>
+                        <GuardActionBlock>
+                            <Actions>
+                                <BinaryExpression Operator="=">
+                                    <SimpleIdentifier Name="got_slave_timeout"/>
+                                    <IntConstant Value="0"/>
+                                </BinaryExpression>
+                            </Actions>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-3" X="-124"/>
+                            </LabelGeometry>
+                        </GuardActionBlock>
+                    </Edge>
+                    <Edge Target="idle" Source="running">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="slave_timeout"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-20" X="10"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="135" X="304"/>
+                        </SplineGeometry>
+                        <GuardActionBlock>
+                            <Actions>
+                                <BinaryExpression Operator="=">
+                                    <SimpleIdentifier Name="got_slave_timeout"/>
+                                    <IntConstant Value="1"/>
+                                </BinaryExpression>
+                            </Actions>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-4" X="11"/>
+                            </LabelGeometry>
+                        </GuardActionBlock>
+                    </Edge>
+                    <Edge Target="running" Source="running">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="step_idle_restart"/>
+                            <SimpleIdentifier Name="step_notinc_restart"/>
+                            <SimpleIdentifier Name="step_inc_restart"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-22" X="-118"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="194" X="241"/>
+                        </SplineGeometry>
+                        <GuardActionBlock>
+                            <Actions>
+                                <BinaryExpression Operator="=">
+                                    <SimpleIdentifier Name="got_slave_timeout"/>
+                                    <SimpleIdentifier Name="got_slave_timeout"/>
+                                </BinaryExpression>
+                            </Actions>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="26" X="-117"/>
+                            </LabelGeometry>
+                        </GuardActionBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="PLANT" Name="plc_cycle">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="idle">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                        <PointGeometry>
+                            <Point Y="176" X="256"/>
+                        </PointGeometry>
+                        <InitialArrowGeometry>
+                            <Point Y="-5" X="-5"/>
+                        </InitialArrowGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="-8" X="-33"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="running">
+                        <PointGeometry>
+                            <Point Y="272" X="256"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="-3" X="-57"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="running" Source="idle">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="resume"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-18" X="3"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="226" X="279"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Target="idle" Source="running">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="yield"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-18" X="-40"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="224" X="234"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Target="idle" Source="idle">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="slave_timeout"/>
+                            <SimpleIdentifier Name="rcv"/>
+                            <SimpleIdentifier Name="send"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-39" X="8"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="177" X="306"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Target="running" Source="running">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="step_idle"/>
+                            <SimpleIdentifier Name="step_idle_restart"/>
+                            <SimpleIdentifier Name="step_notinc"/>
+                            <SimpleIdentifier Name="step_notinc_restart"/>
+                            <SimpleIdentifier Name="step_inc"/>
+                            <SimpleIdentifier Name="step_inc_restart"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-34" X="4"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="273" X="308"/>
+                        </SplineGeometry>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <ForeachComponent Name="data">
+            <EnumSetExpression Text="{PV,FV}">
+                <SimpleIdentifier Name="PV"/>
+                <SimpleIdentifier Name="FV"/>
+            </EnumSetExpression>
+            <ComponentList>
+                <ForeachComponent Name="s4">
+                    <BinaryExpression Operator="..">
+                        <IntConstant Value="0"/>
+                        <IntConstant Value="1"/>
+                    </BinaryExpression>
+                    <ComponentList>
+                        <ForeachComponent Name="s3">
+                            <BinaryExpression Operator="..">
+                                <IntConstant Value="0"/>
+                                <IntConstant Value="1"/>
+                            </BinaryExpression>
+                            <ComponentList>
+                                <ForeachComponent Name="s2">
+                                    <BinaryExpression Operator="..">
+                                        <IntConstant Value="0"/>
+                                        <IntConstant Value="1"/>
+                                    </BinaryExpression>
+                                    <ComponentList>
+                                        <ForeachComponent Name="seq">
+                                            <BinaryExpression Operator="..">
+                                                <IntConstant Value="0"/>
+                                                <SimpleIdentifier Name="MAXSEQNO"/>
+                                            </BinaryExpression>
+                                            <ComponentList>
+                                                <SimpleComponent Kind="PLANT">
+                                                    <IndexedIdentifier Name="send">
+                                                        <SimpleIdentifier Name="data"/>
+                                                        <SimpleIdentifier Name="s4"/>
+                                                        <SimpleIdentifier Name="s3"/>
+                                                        <SimpleIdentifier Name="s2"/>
+                                                        <SimpleIdentifier Name="seq"/>
+                                                    </IndexedIdentifier>
+                                                    <Graph>
+                                                        <NodeList>
+                                                            <SimpleNode Initial="true" Name="send">
+                                                                <PointGeometry>
+                                                                    <Point Y="160" X="176"/>
+                                                                </PointGeometry>
+                                                                <InitialArrowGeometry>
+                                                                    <Point Y="-5" X="-5"/>
+                                                                </InitialArrowGeometry>
+                                                                <LabelGeometry Anchor="NW">
+                                                                    <Point Y="5" X="-25"/>
+                                                                </LabelGeometry>
+                                                            </SimpleNode>
+                                                        </NodeList>
+                                                        <EdgeList>
+                                                            <Edge Target="send" Source="send">
+                                                                <LabelBlock>
+                                                                    <IndexedIdentifier Name="send">
+                                                                        <SimpleIdentifier Name="data"/>
+                                                                        <SimpleIdentifier Name="s4"/>
+                                                                        <SimpleIdentifier Name="s3"/>
+                                                                        <SimpleIdentifier Name="s2"/>
+                                                                        <SimpleIdentifier Name="seq"/>
+                                                                    </IndexedIdentifier>
+                                                                    <LabelGeometry Anchor="NW">
+                                                                        <Point Y="-57" X="-175"/>
+                                                                    </LabelGeometry>
+                                                                </LabelBlock>
+                                                                <SplineGeometry>
+                                                                    <Point Y="161" X="227"/>
+                                                                </SplineGeometry>
+                                                                <GuardActionBlock>
+                                                                    <Guards>
+                                                                        <BinaryExpression Operator="&amp;" Text="out_ps_f_process_data==data &amp; out_ps_status_bit4_FV==s4 &amp; out_ps_status_bit3_TO==s3 &amp; out_ps_status_bit2_CRCNO==s2">
+                                                                            <BinaryExpression Operator="&amp;">
+                                                                                <BinaryExpression Operator="&amp;">
+                                                                                    <BinaryExpression Operator="==">
+                                                                                        <SimpleIdentifier Name="out_ps_f_process_data"/>
+                                                                                        <SimpleIdentifier Name="data"/>
+                                                                                    </BinaryExpression>
+                                                                                    <BinaryExpression Operator="==">
+                                                                                        <SimpleIdentifier Name="out_ps_status_bit4_FV"/>
+                                                                                        <SimpleIdentifier Name="s4"/>
+                                                                                    </BinaryExpression>
+                                                                                </BinaryExpression>
+                                                                                <BinaryExpression Operator="==">
+                                                                                    <SimpleIdentifier Name="out_ps_status_bit3_TO"/>
+                                                                                    <SimpleIdentifier Name="s3"/>
+                                                                                </BinaryExpression>
+                                                                            </BinaryExpression>
+                                                                            <BinaryExpression Operator="==">
+                                                                                <SimpleIdentifier Name="out_ps_status_bit2_CRCNO"/>
+                                                                                <SimpleIdentifier Name="s2"/>
+                                                                            </BinaryExpression>
+                                                                        </BinaryExpression>
+                                                                    </Guards>
+                                                                    <LabelGeometry Anchor="NW">
+                                                                        <Point Y="-41" X="-176"/>
+                                                                    </LabelGeometry>
+                                                                </GuardActionBlock>
+                                                            </Edge>
+                                                        </EdgeList>
+                                                    </Graph>
+                                                </SimpleComponent>
+                                                <SimpleComponent Kind="PROPERTY">
+                                                    <IndexedIdentifier Name="never_send">
+                                                        <SimpleIdentifier Name="data"/>
+                                                        <SimpleIdentifier Name="s4"/>
+                                                        <SimpleIdentifier Name="s3"/>
+                                                        <SimpleIdentifier Name="s2"/>
+                                                        <SimpleIdentifier Name="seq"/>
+                                                    </IndexedIdentifier>
+                                                    <Graph>
+                                                        <LabelBlock>
+                                                            <IndexedIdentifier Name="send">
+                                                                <SimpleIdentifier Name="data"/>
+                                                                <SimpleIdentifier Name="s4"/>
+                                                                <SimpleIdentifier Name="s3"/>
+                                                                <SimpleIdentifier Name="s2"/>
+                                                                <SimpleIdentifier Name="seq"/>
+                                                            </IndexedIdentifier>
+                                                            <LabelGeometry Anchor="NW">
+                                                                <Point Y="102" X="193"/>
+                                                            </LabelGeometry>
+                                                        </LabelBlock>
+                                                        <NodeList>
+                                                            <SimpleNode Initial="true" Name="never">
+                                                                <PointGeometry>
+                                                                    <Point Y="144" X="192"/>
+                                                                </PointGeometry>
+                                                                <InitialArrowGeometry>
+                                                                    <Point Y="-5" X="-5"/>
+                                                                </InitialArrowGeometry>
+                                                                <LabelGeometry Anchor="NW">
+                                                                    <Point Y="10" X="0"/>
+                                                                </LabelGeometry>
+                                                            </SimpleNode>
+                                                        </NodeList>
+                                                    </Graph>
+                                                </SimpleComponent>
+                                            </ComponentList>
+                                        </ForeachComponent>
+                                    </ComponentList>
+                                </ForeachComponent>
+                            </ComponentList>
+                        </ForeachComponent>
+                    </ComponentList>
+                </ForeachComponent>
+            </ComponentList>
+        </ForeachComponent>
+        <ForeachComponent Name="seq">
+            <BinaryExpression Operator="..">
+                <IntConstant Value="0"/>
+                <SimpleIdentifier Name="MAXSEQNO"/>
+            </BinaryExpression>
+            <ComponentList>
+                <ForeachComponent Name="crc">
+                    <EnumSetExpression Text="{ok,nok}">
+                        <SimpleIdentifier Name="ok"/>
+                        <SimpleIdentifier Name="nok"/>
+                    </EnumSetExpression>
+                    <ComponentList>
+                        <SimpleComponent Kind="PLANT">
+                            <IndexedIdentifier Name="rcv">
+                                <SimpleIdentifier Name="seq"/>
+                                <SimpleIdentifier Name="crc"/>
+                            </IndexedIdentifier>
+                            <Graph>
+                                <NodeList>
+                                    <SimpleNode Initial="true" Name="rcv">
+                                        <PointGeometry>
+                                            <Point Y="144" X="160"/>
+                                        </PointGeometry>
+                                        <InitialArrowGeometry>
+                                            <Point Y="-5" X="-5"/>
+                                        </InitialArrowGeometry>
+                                        <LabelGeometry Anchor="NW">
+                                            <Point Y="9" X="-24"/>
+                                        </LabelGeometry>
+                                    </SimpleNode>
+                                </NodeList>
+                                <EdgeList>
+                                    <Edge Target="rcv" Source="rcv">
+                                        <LabelBlock>
+                                            <IndexedIdentifier Name="rcv">
+                                                <SimpleIdentifier Name="seq"/>
+                                                <SimpleIdentifier Name="crc"/>
+                                            </IndexedIdentifier>
+                                            <LabelGeometry Anchor="NW">
+                                                <Point Y="-19" X="3"/>
+                                            </LabelGeometry>
+                                        </LabelBlock>
+                                        <SplineGeometry>
+                                            <Point Y="144" X="212"/>
+                                        </SplineGeometry>
+                                        <GuardActionBlock>
+                                            <Actions>
+                                                <BinaryExpression Operator="=">
+                                                    <SimpleIdentifier Name="in_cons_num"/>
+                                                    <SimpleIdentifier Name="seq"/>
+                                                </BinaryExpression>
+                                                <BinaryExpression Operator="=">
+                                                    <SimpleIdentifier Name="in_CRC"/>
+                                                    <SimpleIdentifier Name="crc"/>
+                                                </BinaryExpression>
+                                            </Actions>
+                                            <LabelGeometry Anchor="NW">
+                                                <Point Y="-3" X="4"/>
+                                            </LabelGeometry>
+                                        </GuardActionBlock>
+                                    </Edge>
+                                </EdgeList>
+                            </Graph>
+                        </SimpleComponent>
+                    </ComponentList>
+                </ForeachComponent>
+            </ComponentList>
+        </ForeachComponent>
+        <VariableComponent Name="in_cons_num">
+            <VariableRange>
+                <BinaryExpression Operator="..">
+                    <IntConstant Value="0"/>
+                    <SimpleIdentifier Name="MAXSEQNO"/>
+                </BinaryExpression>
+            </VariableRange>
+            <VariableInitial>
+                <BinaryExpression Operator="==">
+                    <SimpleIdentifier Name="in_cons_num"/>
+                    <IntConstant Value="0"/>
+                </BinaryExpression>
+            </VariableInitial>
+            <VariableMarking>
+                <SimpleIdentifier Name=":accepting"/>
+                <BinaryExpression Operator="&gt;">
+                    <SimpleIdentifier Name="in_cons_num"/>
+                    <IntConstant Value="0"/>
+                </BinaryExpression>
+            </VariableMarking>
+        </VariableComponent>
+        <VariableComponent Name="in_CRC">
+            <VariableRange>
+                <EnumSetExpression Text="{ok,nok}">
+                    <SimpleIdentifier Name="ok"/>
+                    <SimpleIdentifier Name="nok"/>
+                </EnumSetExpression>
+            </VariableRange>
+            <VariableInitial>
+                <BinaryExpression Operator="==">
+                    <SimpleIdentifier Name="in_CRC"/>
+                    <SimpleIdentifier Name="nok"/>
+                </BinaryExpression>
+            </VariableInitial>
+            <VariableMarking>
+                <SimpleIdentifier Name=":accepting"/>
+                <BinaryExpression Operator="==">
+                    <SimpleIdentifier Name="in_CRC"/>
+                    <SimpleIdentifier Name="ok"/>
+                </BinaryExpression>
+            </VariableMarking>
+        </VariableComponent>
+        <VariableComponent Name="out_cons_num">
+            <VariableRange>
+                <BinaryExpression Operator="..">
+                    <IntConstant Value="0"/>
+                    <SimpleIdentifier Name="MAXSEQNO"/>
+                </BinaryExpression>
+            </VariableRange>
+            <VariableInitial>
+                <BinaryExpression Operator="==">
+                    <SimpleIdentifier Name="out_cons_num"/>
+                    <SimpleIdentifier Name="MAXSEQNO"/>
+                </BinaryExpression>
+            </VariableInitial>
+            <VariableMarking>
+                <SimpleIdentifier Name=":accepting"/>
+                <BinaryExpression Operator="&gt;">
+                    <SimpleIdentifier Name="out_cons_num"/>
+                    <IntConstant Value="0"/>
+                </BinaryExpression>
+            </VariableMarking>
+        </VariableComponent>
+        <VariableComponent Name="out_ps_status_bit4_FV">
+            <VariableRange>
+                <BinaryExpression Operator="..">
+                    <IntConstant Value="0"/>
+                    <IntConstant Value="1"/>
+                </BinaryExpression>
+            </VariableRange>
+            <VariableInitial>
+                <BinaryExpression Operator="==">
+                    <SimpleIdentifier Name="out_ps_status_bit4_FV"/>
+                    <IntConstant Value="1"/>
+                </BinaryExpression>
+            </VariableInitial>
+            <VariableMarking>
+                <SimpleIdentifier Name=":accepting"/>
+                <BinaryExpression Operator="==">
+                    <SimpleIdentifier Name="in_ps_status_bit4_FV"/>
+                    <IntConstant Value="0"/>
+                </BinaryExpression>
+            </VariableMarking>
+        </VariableComponent>
+        <VariableComponent Name="out_ps_status_bit3_TO">
+            <VariableRange>
+                <BinaryExpression Operator="..">
+                    <IntConstant Value="0"/>
+                    <IntConstant Value="1"/>
+                </BinaryExpression>
+            </VariableRange>
+            <VariableInitial>
+                <BinaryExpression Operator="==">
+                    <SimpleIdentifier Name="out_ps_status_bit3_TO"/>
+                    <IntConstant Value="1"/>
+                </BinaryExpression>
+            </VariableInitial>
+            <VariableMarking>
+                <SimpleIdentifier Name=":accepting"/>
+                <BinaryExpression Operator="==">
+                    <SimpleIdentifier Name="in_ps_status_bit3_TO"/>
+                    <IntConstant Value="0"/>
+                </BinaryExpression>
+            </VariableMarking>
+        </VariableComponent>
+        <VariableComponent Name="out_ps_status_bit2_CRCNO">
+            <VariableRange>
+                <BinaryExpression Operator="..">
+                    <IntConstant Value="0"/>
+                    <IntConstant Value="1"/>
+                </BinaryExpression>
+            </VariableRange>
+            <VariableInitial>
+                <BinaryExpression Operator="==">
+                    <SimpleIdentifier Name="out_ps_status_bit2_CRCNO"/>
+                    <IntConstant Value="0"/>
+                </BinaryExpression>
+            </VariableInitial>
+            <VariableMarking>
+                <SimpleIdentifier Name=":accepting"/>
+                <BinaryExpression Operator="==">
+                    <SimpleIdentifier Name="in_ps_status_bit2_CRCNO"/>
+                    <IntConstant Value="0"/>
+                </BinaryExpression>
+            </VariableMarking>
+        </VariableComponent>
+        <VariableComponent Name="out_ps_f_process_data">
+            <VariableRange>
+                <EnumSetExpression Text="{PV,FV}">
+                    <SimpleIdentifier Name="PV"/>
+                    <SimpleIdentifier Name="FV"/>
+                </EnumSetExpression>
+            </VariableRange>
+            <VariableInitial>
+                <BinaryExpression Operator="==">
+                    <SimpleIdentifier Name="out_ps_f_process_data"/>
+                    <SimpleIdentifier Name="FV"/>
+                </BinaryExpression>
+            </VariableInitial>
+            <VariableMarking>
+                <SimpleIdentifier Name=":accepting"/>
+                <BinaryExpression Operator="==">
+                    <SimpleIdentifier Name="in_ps_f_process_data"/>
+                    <SimpleIdentifier Name="PV"/>
+                </BinaryExpression>
+            </VariableMarking>
+        </VariableComponent>
+        <VariableComponent Name="app_process_data">
+            <VariableRange>
+                <EnumSetExpression Text="{PV,FV}">
+                    <SimpleIdentifier Name="PV"/>
+                    <SimpleIdentifier Name="FV"/>
+                </EnumSetExpression>
+            </VariableRange>
+            <VariableInitial>
+                <BinaryExpression Operator="==">
+                    <SimpleIdentifier Name="app_process_data"/>
+                    <SimpleIdentifier Name="FV"/>
+                </BinaryExpression>
+            </VariableInitial>
+            <VariableMarking>
+                <SimpleIdentifier Name=":accepting"/>
+                <BinaryExpression Operator="==">
+                    <SimpleIdentifier Name="app_process_data"/>
+                    <SimpleIdentifier Name="PV"/>
+                </BinaryExpression>
+            </VariableMarking>
+        </VariableComponent>
+        <VariableComponent Name="number_ok_cycles">
+            <VariableRange>
+                <BinaryExpression Operator="..">
+                    <IntConstant Value="0"/>
+                    <IntConstant Value="3"/>
+                </BinaryExpression>
+            </VariableRange>
+            <VariableInitial>
+                <BinaryExpression Operator="==">
+                    <SimpleIdentifier Name="number_ok_cycles"/>
+                    <IntConstant Value="0"/>
+                </BinaryExpression>
+            </VariableInitial>
+        </VariableComponent>
+        <VariableComponent Name="number_cycles_TO">
+            <VariableRange>
+                <BinaryExpression Operator="..">
+                    <IntConstant Value="0"/>
+                    <IntConstant Value="3"/>
+                </BinaryExpression>
+            </VariableRange>
+            <VariableInitial>
+                <BinaryExpression Operator="==">
+                    <SimpleIdentifier Name="number_cycles_TO"/>
+                    <IntConstant Value="0"/>
+                </BinaryExpression>
+            </VariableInitial>
+        </VariableComponent>
+        <VariableComponent Name="number_cycles_CRCNO">
+            <VariableRange>
+                <BinaryExpression Operator="..">
+                    <IntConstant Value="0"/>
+                    <IntConstant Value="3"/>
+                </BinaryExpression>
+            </VariableRange>
+            <VariableInitial>
+                <BinaryExpression Operator="==">
+                    <SimpleIdentifier Name="number_cycles_CRCNO"/>
+                    <IntConstant Value="0"/>
+                </BinaryExpression>
+            </VariableInitial>
+        </VariableComponent>
+        <VariableComponent Name="got_slave_timeout">
+            <VariableRange>
+                <BinaryExpression Operator="..">
+                    <IntConstant Value="0"/>
+                    <IntConstant Value="1"/>
+                </BinaryExpression>
+            </VariableRange>
+            <VariableInitial>
+                <BinaryExpression Operator="==">
+                    <SimpleIdentifier Name="got_slave_timeout"/>
+                    <IntConstant Value="0"/>
+                </BinaryExpression>
+            </VariableInitial>
+            <VariableMarking>
+                <SimpleIdentifier Name=":accepting"/>
+                <BinaryExpression Operator="==">
+                    <SimpleIdentifier Name="got_slave_timeout"/>
+                    <IntConstant Value="0"/>
+                </BinaryExpression>
+            </VariableMarking>
+        </VariableComponent>
+    </ComponentList>
+</Module>
