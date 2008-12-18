@@ -147,6 +147,68 @@ public abstract class AbstractLanguageInclusionCheckerTest
     runModelVerifier(group, dir, name, bindings, expect, propname);
   }
 
+  public void testProfisafeI4SlaveEFA__neversend0000()
+    throws Exception
+  {
+    testProfisafeI4SlaveEFA("never_send[PV][0][0][0][0]", false);
+  }
+
+  public void testProfisafeI4SlaveEFA__neversend0001()
+    throws Exception
+  {
+    testProfisafeI4SlaveEFA("never_send[PV][0][0][0][1]", false);
+  }
+
+  public void testProfisafeI4SlaveEFA__neversend0010()
+    throws Exception
+  {
+    testProfisafeI4SlaveEFA("never_send[PV][0][0][1][0]", true);
+  }
+
+  public void testProfisafeI4SlaveEFA__neversend0101()
+    throws Exception
+  {
+    testProfisafeI4SlaveEFA("never_send[PV][0][1][0][1]", true);
+  }
+
+  public void testProfisafeI4SlaveEFA__neversend1000()
+    throws Exception
+  {
+    testProfisafeI4SlaveEFA("never_send[FV][1][0][0][0]", false);
+  }
+
+  public void testProfisafeI4SlaveEFA__neversend1011()
+    throws Exception
+  {
+    testProfisafeI4SlaveEFA("never_send[FV][1][0][1][1]", false);
+  }
+
+  public void testProfisafeI4SlaveEFA__neversend1102()
+    throws Exception
+  {
+    testProfisafeI4SlaveEFA("never_send[FV][1][1][0][2]", false);
+  }
+
+  public void testProfisafeI4SlaveEFA__neversend1113()
+    throws Exception
+  {
+    testProfisafeI4SlaveEFA("never_send[FV][1][1][1][3]", false);
+  }
+
+  private void testProfisafeI4SlaveEFA(final String propname,
+                                       final boolean expect)
+    throws Exception
+  {
+    final String group = "tests";
+    final String dir = "profisafe";
+    final String name = "profisafe_islave_efa.wmod";
+    final List<ParameterBindingProxy> bindings =
+      new LinkedList<ParameterBindingProxy>();
+    final ParameterBindingProxy binding = createBinding("MAXSEQNO", 4);
+    bindings.add(binding);
+    runModelVerifier(group, dir, name, bindings, expect, propname);
+  }
+
   public void testProfisafeI4Host__fv_crc() throws Exception
   {
     final String group = "tests";

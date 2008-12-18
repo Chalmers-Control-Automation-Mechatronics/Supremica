@@ -435,6 +435,18 @@ public abstract class AbstractControllabilityCheckerTest
     runModelVerifier(group, dir, name, bindings, true);
   }
 
+  public void testProfisafeI4SlaveEFA() throws Exception
+  {
+    final String group = "tests";
+    final String dir = "profisafe";
+    final String name = "profisafe_islave_efa.wmod";
+    final List<ParameterBindingProxy> bindings =
+      new LinkedList<ParameterBindingProxy>();
+    final ParameterBindingProxy binding = createBinding("MAXSEQNO", 4);
+    bindings.add(binding);
+    runModelVerifier(group, dir, name, bindings, true);
+  }
+
   public void testProfisafeI4Host() throws Exception
   {
     final String group = "tests";
