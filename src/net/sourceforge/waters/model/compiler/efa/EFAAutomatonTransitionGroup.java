@@ -94,20 +94,22 @@ class EFAAutomatonTransitionGroup
   void replaceTransition(final ConstraintList victim,
                          final ConstraintList replacement)
   {
-    final EFAAutomatonTransition oldtrans = mPartialTransitions.get(victim);
-    mPartialTransitions.remove(victim);
+    final EFAAutomatonTransition oldtrans = mPartialTransitions.remove(victim);
     final EFAAutomatonTransition newtrans = createTransition(replacement);
-    newtrans.addSources(oldtrans);
+    if (oldtrans != null) {
+      newtrans.addSources(oldtrans);
+    }
   }
 
   void replaceTransition(final ConstraintList victim,
                          final Collection<ConstraintList> replacements)
   {
-    final EFAAutomatonTransition oldtrans = mPartialTransitions.get(victim);
-    mPartialTransitions.remove(victim);
+    final EFAAutomatonTransition oldtrans = mPartialTransitions.remove(victim);
     for (final ConstraintList replacement : replacements) {
       final EFAAutomatonTransition newtrans = createTransition(replacement);
-      newtrans.addSources(oldtrans);
+      if (oldtrans != null) {
+        newtrans.addSources(oldtrans);
+      }
     }
   }
 

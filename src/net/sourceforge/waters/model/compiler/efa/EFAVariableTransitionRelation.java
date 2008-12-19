@@ -27,11 +27,11 @@ import net.sourceforge.waters.model.printer.ProxyPrinter;
 
 
 /**
- * A compiler-internal representation of the set of all the transitions
- * associated with a given event in one particular variable automaton to be
- * generated. More than one partial transition ({@link
- * EFAVariableTransition}) may be associated to the same event, for
- * different values of the EFA variables.
+ * A compiler-internal representation the transition relation for the EFA
+ * variables associated with a given event. This is basically a collection
+ * of {@link EFAVariableTransitionRelation} items, each representing the
+ * transitions for a different variable. The overall transition relation
+ * then is the Cartesian product of the individual parts.
  *
  * @author Robi Malik
  */
@@ -78,6 +78,14 @@ class EFAVariableTransitionRelation
 
   //#########################################################################
   //# Simple Access
+  /**
+   * Checks whether this transition relation is empty.
+   * An empty transition relation means that the event associated with it
+   * is never enabled. A transition relation is recognised as empty as soon
+   * as one of its parts is empty.
+   * @return <CODE>true</CODE> if this transition relation is known
+   *                           to be empty.
+   */
   boolean isEmpty()
   {
     return mIsEmpty;
@@ -117,7 +125,7 @@ class EFAVariableTransitionRelation
     if (other != null && getClass() == other.getClass()) {
       final EFAVariableTransitionRelation rel =
         (EFAVariableTransitionRelation) other;
-      return mParts.equals(rel.mParts);
+      return mIsEmpty ? rel.mIsEmpty : mParts.equals(rel.mParts);
     } else {
       return false;
     }
@@ -133,7 +141,7 @@ class EFAVariableTransitionRelation
   //# Subsumption Testing
   boolean isDisjoint(final EFAVariableTransitionRelation rel)
   {
-    if (mIsEmpty) {
+    if (mIsEmpty || rel.mIsEmpty) {
       return true;
     } else {
       final Map<EFAVariable,EFAVariableTransitionRelationPart> parts1 = mParts;
@@ -162,6 +170,8 @@ class EFAVariableTransitionRelation
   {
     if (mIsEmpty) {
       return rel.mIsEmpty ? SubsumptionKind.EQUALS : SubsumptionKind.SUBSUMES;
+    } else if (rel.mIsEmpty) {
+      return SubsumptionKind.SUBSUMED_BY;
     } else {
       final Map<EFAVariable,EFAVariableTransitionRelationPart> parts1 = mParts;
       final Map<EFAVariable,EFAVariableTransitionRelationPart> parts2 =
