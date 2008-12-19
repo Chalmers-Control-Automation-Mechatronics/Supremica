@@ -146,49 +146,50 @@ class FreeBlockUnbufferedBuilder
 			{
 				VarDeclaration curDeclaration = (VarDeclaration) dataInputsIter.next();
 				String curDataInputName = curDeclaration.getName();
-				if (isDataConnected(fbName, curDataInputName))
+				String curDataType =  curDeclaration.getType();
+				if (curDataType.toLowerCase().equals("int"))
 				{
-					String curDataType =  curDeclaration.getType();
-					if (curDataType.toLowerCase().equals("int"))
-					{
-						// get possible constant data value
-						String dataCnt = (String) ((Map) dataConnections.get(fbName)).get(curDataInputName);
-						if (!getInstanceName(dataCnt).equals(""))
-						{
-							Logger.output(Logger.DEBUG, "Making non constant data variable", 2);
-							eventQueue.addIntegerVariable("data_" + curDataInputName + "_" + fbName, intVarMinValue, intVarMaxValue, 0, 0);
-						}
-						else
-						{
-							Integer dataValue = new Integer(getSignalName(dataCnt));
-							Logger.output(Logger.DEBUG, "Making constant data variable data_" + curDataInputName + "_" + fbName + " with value " + dataValue, 2);
-							eventQueue.addIntegerVariable("data_" + curDataInputName + "_" + fbName, intVarMinValue, intVarMaxValue, dataValue.intValue(), 0);
-						}
+					String dataCnt = null;
+					if (isDataConnected(fbName, curDataInputName))
+					{					
+						dataCnt = (String) ((Map) dataConnections.get(fbName)).get(curDataInputName);
 					}
-					else if (curDataType.toLowerCase().equals("bool"))
+					// get possible constant data value
+					if (dataCnt != null && getInstanceName(dataCnt).equals(""))
 					{
-						Logger.output(Logger.ERROR, "Error: Unsupported input data variable type: BOOL", 1);
-						Logger.output(Logger.ERROR, "Variable name: " + fbName + "_" + curDataInputName, 2);
-						exit(1);
+						Integer dataValue = new Integer(getSignalName(dataCnt));
+						Logger.output(Logger.DEBUG, "Making constant data variable data_" + curDataInputName + "_" + fbName + " with value " + dataValue, 2);
+						eventQueue.addIntegerVariable("data_" + curDataInputName + "_" + fbName, intVarMinValue, intVarMaxValue, dataValue.intValue(), 0);
 					}
-					else if (curDataType.toLowerCase().equals("real"))
+					else
 					{
-						Logger.output(Logger.ERROR, "Error: Unsupported input data variable type: REAL", 1);
-						Logger.output(Logger.ERROR, "Variable name: " + fbName + "_" + curDataInputName, 2);
-						exit(1);
+						Logger.output(Logger.DEBUG, "Making non constant data variable", 2);
+						eventQueue.addIntegerVariable("data_" + curDataInputName + "_" + fbName, intVarMinValue, intVarMaxValue, 0, 0);
 					}
-					else if (curDataType.toLowerCase().equals("string"))
-					{
-						Logger.output(Logger.ERROR, "Error: Unsupported input data variable type: STRING", 1);
-						Logger.output(Logger.ERROR, "Variable name: " + fbName + "_" + curDataInputName, 2);
-						exit(1);
-					}
-					else if (curDataType.toLowerCase().equals("object"))
-					{
-						Logger.output(Logger.ERROR, "Error: Unsupported input data variable type: OBJECT", 1);
-						Logger.output(Logger.ERROR, "Variable name: " + fbName + "_" + curDataInputName, 2);
-						exit(1);
-					}
+				}
+				else if (curDataType.toLowerCase().equals("bool"))
+				{
+					Logger.output(Logger.ERROR, "Error: Unsupported input data variable type: BOOL", 1);
+					Logger.output(Logger.ERROR, "Variable name: " + fbName + "_" + curDataInputName, 2);
+					exit(1);
+				}
+				else if (curDataType.toLowerCase().equals("real"))
+				{
+					Logger.output(Logger.ERROR, "Error: Unsupported input data variable type: REAL", 1);
+					Logger.output(Logger.ERROR, "Variable name: " + fbName + "_" + curDataInputName, 2);
+					exit(1);
+				}
+				else if (curDataType.toLowerCase().equals("string"))
+				{
+					Logger.output(Logger.ERROR, "Error: Unsupported input data variable type: STRING", 1);
+					Logger.output(Logger.ERROR, "Variable name: " + fbName + "_" + curDataInputName, 2);
+					exit(1);
+				}
+				else if (curDataType.toLowerCase().equals("object"))
+				{
+					Logger.output(Logger.ERROR, "Error: Unsupported input data variable type: OBJECT", 1);
+					Logger.output(Logger.ERROR, "Variable name: " + fbName + "_" + curDataInputName, 2);
+					exit(1);
 				}
 			}
 		}
