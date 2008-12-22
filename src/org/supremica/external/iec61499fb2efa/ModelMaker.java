@@ -31,6 +31,8 @@ import java.util.Iterator;
 import java.util.Calendar;
 import java.util.Properties;
 
+import org.supremica.Version;
+
 class ModelMaker
 {
     private static Properties properties;
@@ -184,6 +186,7 @@ class ModelMaker
 		ModelBuilder theBuilder = null;
 
 		Logger.output("ModelMaker  Copyright (C) " + Calendar.getInstance().get(Calendar.YEAR) + " Goran Cengic");
+		Logger.output("Build time: " + Version.version());
         Logger.output("");
 		
         if (properties.getProperty("systemFileName") == null)
