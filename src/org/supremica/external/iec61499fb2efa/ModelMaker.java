@@ -20,6 +20,14 @@
  * @author Goran Cengic (cengic@chalmers.se)
  */
 
+/* 
+   TODO: make the automata and automaton classes abstract so that their
+   implementation can build different representations of EFA (Waters classes,
+   straight XML and text)
+
+   TODO: release the code using GPL within the Fuber
+ */
+
 package org.supremica.external.iec61499fb2efa;
 
 import java.io.File;
