@@ -6,8 +6,8 @@
  * However, it is freely available without fee for education,
  * research, and non-profit purposes.  By obtaining copies of
  * this and other files that comprise the Supremica software,
- * you, the Licensee, agree to abide by the following
- * conditions and understandings with respect to the
+ *  you, the Licensee, agree to abide by the following
+* conditions and understandings with respect to the
  * copyrighted software:
  *
  * The software is copyrighted in the name of Supremica,

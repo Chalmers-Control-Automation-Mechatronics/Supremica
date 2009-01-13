@@ -102,7 +102,7 @@ public class BDDAutomata
     double nbrOfReachableAndCoreachableStates = -1;
     double nbrOfBlockingStates = -1;
     
-    BDDAutomata(Automata orgAutomata)
+    public BDDAutomata(Automata orgAutomata)
     {
         AutomataSorter automataSorter = new PCGAutomataSorter();
         theAutomata = automataSorter.sortAutomata(orgAutomata);
@@ -125,21 +125,6 @@ public class BDDAutomata
         initialize();
     }
  
-    BDDManager getBDDManager()
-    {
-        return manager;
-    }
-    
-    public Automata getAutomata()
-    {
-        return theAutomata;
-    }
-    
-    public BDDAutomaton getBDDAutomaton(Automaton theAutomaton)
-    {
-        return automatonToBDDAutomatonMap.get(theAutomaton);
-    }
-    
     void initialize()
     {
         unionAlphabet = theAutomata.getUnionAlphabet();
@@ -179,7 +164,32 @@ public class BDDAutomata
         destToSourceStatePairing = manager.makePairing(destStateDomains, sourceStateDomains);       
   
         bddTransitions = new BDDTransitionFactory(this).createTransitions();
-    }   
+    }
+ 
+    public BDDManager getBDDManager()
+    {
+        return manager;
+    }
+    
+    public Automata getAutomata()
+    {
+        return theAutomata;
+    }
+    
+    public BDDAutomaton getBDDAutomaton(Automaton theAutomaton)
+    {
+        return automatonToBDDAutomatonMap.get(theAutomaton);
+    }
+    
+    public BDDVarSet getSourceStateVariables()
+    {
+        return sourceStateVariables;
+    }
+    
+    public BDDVarSet getDestStateVariables()
+    {
+        return destStateVariables;
+    }
     
     public void done()
     {
@@ -234,7 +244,7 @@ public class BDDAutomata
         return theIndexMap.getEventIndex(theEvent);
     }
  
-        public void addInitialStates(BDD initialStates)
+    public void addInitialStates(BDD initialStates)
     {
         initialStatesBDD = initialStatesBDD.and(initialStates);
     }
@@ -298,7 +308,7 @@ public class BDDAutomata
         return impBDD.equals(manager.getOneBDD());
     }
     
-    BDD getReachableStates()
+    public BDD getReachableStates()
     {
         if (reachableStatesBDD == null)
         {
@@ -318,7 +328,7 @@ public class BDDAutomata
         return coreachableStatesBDD;
     }  
     
-    BDD getReachableAndCoreachableStates()
+    public BDD getReachableAndCoreachableStates()
     {
         if (reachableAndCoreachableStatesBDD == null)
         {
@@ -391,6 +401,21 @@ public class BDDAutomata
     boolean isNonblockingAndControllable()
     {
         return false;
+    }
+    
+    public BDDDomain[] getSourceStateDomains()
+    {
+        return sourceStateDomains;
+    }
+    
+    public BDDDomain[] getDestStateDomains()
+    {
+        return destStateDomains;
+    }
+    
+    public BDD getForbiddenStates()
+    {
+        return forbiddenStatesBDD;
     }
     
 }

@@ -17,14 +17,10 @@ import javax.swing.JTabbedPane;
 
 import net.sourceforge.waters.model.base.DocumentProxy;
 
-import org.supremica.properties.SupremicaPropertyChangeEvent;
-import org.supremica.properties.SupremicaPropertyChangeListener;
-
 
 public abstract class DocumentContainer
-	implements SupremicaPropertyChangeListener
 {
-
+    
     //#######################################################################
     //# Constructor
     public DocumentContainer(final IDE ide, final DocumentProxy document)
@@ -32,25 +28,25 @@ public abstract class DocumentContainer
         mIDE = ide;
         mDocument = document;
     }
-
-
+    
+    
     //#######################################################################
     //# Simple Access
     public IDE getIDE()
     {
         return mIDE;
     }
-
+    
     public String getName()
     {
         return mDocument.getName();
     }
-
+    
     public DocumentProxy getDocument()
     {
         return mDocument;
     }
-
+    
 
     //#######################################################################
     //# To be Overriden by Subclasses
@@ -73,20 +69,20 @@ public abstract class DocumentContainer
 	public void close()
 	{
 	}
-
+    
     public abstract Component getPanel();
-
+    
     public abstract EditorPanel getEditorPanel();
-
+    
     public abstract AnalyzerPanel getAnalyzerPanel();
-
+    
     public abstract boolean isEditorActive();
-
+    
     public abstract boolean isAnalyzerActive();
+    
+    public abstract String getTypeString();    
 
-    public abstract String getTypeString();
-
-
+    
     //#######################################################################
     //# Titling
     public File getFileLocation()
@@ -94,7 +90,7 @@ public abstract class DocumentContainer
         final DocumentProxy doc = getDocument();
         return getFileLocation(doc);
     }
-
+    
     public String getWindowTitle()
     {
         final String type = getTypeString();
@@ -115,15 +111,8 @@ public abstract class DocumentContainer
         }
         return buffer.toString();
     }
-
-
-	//#######################################################################
-	//# Interface org.supremica.properties.SupremicaPropertyChangeListener
-	public void propertyChanged(final SupremicaPropertyChangeEvent event)
-	{
-	}
-
-
+    
+    
     //#######################################################################
     //# Auxiliary Static Access
     static File getFileLocation(final DocumentProxy doc)
@@ -137,11 +126,11 @@ public abstract class DocumentContainer
             return null;
         }
     }
-
-
+    
+    
     //#######################################################################
     //# Data Members
     private final DocumentProxy mDocument;
     private final IDE mIDE;
-
+    
 }

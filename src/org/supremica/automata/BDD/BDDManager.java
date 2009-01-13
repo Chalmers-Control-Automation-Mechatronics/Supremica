@@ -49,10 +49,13 @@
  */
 package org.supremica.automata.BDD;
 
+import java.math.BigInteger;
 import net.sf.javabdd.*;
+import org.supremica.automata.*;
 import org.supremica.log.*;
 import java.util.*;
 import org.supremica.properties.Config;
+import org.supremica.util.ArrayHelper;
 
 public class BDDManager
 {
@@ -78,7 +81,13 @@ public class BDDManager
             factory.setMaxIncrease(Config.BDD2_MAXINCREASENODES.get());
             factory.setIncreaseFactor(Config.BDD2_INCREASEFACTOR.get());
             factory.setCacheRatio(Config.BDD2_CACHERATIO.get());
+            
         }
+    }
+    
+    public BDDFactory getFactory()
+    {
+        return factory;
     }
     
     public void done()
@@ -129,13 +138,13 @@ public class BDDManager
     public static void addState(BDD bdd, int stateIndex,  BDDDomain domain)
     {
         BDD newStateBDD = factory.buildCube(stateIndex, domain.vars());
-        bdd.orWith(newStateBDD);
+        bdd.orWith(newStateBDD);                 
     }
     
     public static void addTransition(BDD bdd, int sourceStateIndex, BDDDomain sourceDomain, int destStateIndex, BDDDomain destDomain, int eventIndex, BDDDomain eventDomain)
     {
         // Create a BDD representing the source state
-        BDD sourceBDD = factory.buildCube(sourceStateIndex, sourceDomain.vars());
+        BDD sourceBDD = factory.buildCube(sourceStateIndex, sourceDomain.vars());  
         
         // Create a BDD representing the dest state
         BDD destBDD = factory.buildCube(destStateIndex, destDomain.vars());
@@ -282,4 +291,23 @@ public class BDDManager
         
         return coreachableStatesBDD;
     }
+    
+    public HashMap<BDD,String> getBDDState2StateMap(BDDAutomata bdda)
+    {
+        HashMap<BDD,String> BDDState2StateMap = new HashMap<BDD,String>();
+        
+        int stateIndex;
+        for(Automaton aut: bdda.getAutomata())
+        {
+            for(State state: aut.getStateSet())
+            {
+                stateIndex = bdda.getStateIndex(aut, state);
+                BDD stateBDD = factory.buildCube(stateIndex, bdda.getSourceStateDomains()[bdda.getAutomatonIndex(aut)].vars());
+                BDDState2StateMap.put(stateBDD, state.getName());
+            }
+        }
+        
+        return BDDState2StateMap;
+    }     
+    
 }

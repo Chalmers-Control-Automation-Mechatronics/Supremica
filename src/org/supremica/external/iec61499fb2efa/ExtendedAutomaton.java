@@ -89,7 +89,7 @@ public class ExtendedAutomaton
 
 		parser = new ExpressionParser(factory, CompilerOperatorTable.getInstance());
 
-		allAcceptingStates = acceptingStates;
+                allAcceptingStates = acceptingStates;
 	}
 
 // 	public ExtendedAutomaton(String name, ComponentKind kind, ExtendedAutomata automata) 

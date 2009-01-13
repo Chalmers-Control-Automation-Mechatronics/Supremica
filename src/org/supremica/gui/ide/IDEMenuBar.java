@@ -121,7 +121,6 @@ public class IDEMenuBar
 		final Action epsprint = actions.getAction(GraphSaveEPSAction.class);
         menu.add(epsprint);
         menu.add(ide.getActions().editorSavePDFAction.getMenuItem());
-        menu.add(ide.getActions().editorSaveSVGAction.getMenuItem());
         menu.addSeparator();
         final Action exit = actions.getAction(ExitAction.class);
         menu.add(exit);
@@ -213,6 +212,7 @@ public class IDEMenuBar
         menu.add(ide.getActions().analyzerDeleteAllAction.getMenuItem());
         menu.add(ide.getActions().analyzerRenameAction.getMenuItem());
         menu.add(ide.getActions().analyzerSendToEditorAction.getMenuItem());
+        menu.add(ide.getActions().analyzerGuardAction.getMenuItem());
         analyzerMenu = menu;
         analyzerMenu.setEnabled(false);
         add(menu);

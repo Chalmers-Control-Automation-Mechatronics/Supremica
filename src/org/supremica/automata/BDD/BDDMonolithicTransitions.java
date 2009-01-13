@@ -63,6 +63,9 @@ public class BDDMonolithicTransitions
     BDD transitionForwardBDD = null;    
     BDD transitionBackwardBDD = null;    
     
+    BDD myTransitionForwardBDD = null;    
+    BDD myTransitionBackwardBDD = null;    
+    
     /** Creates a new instance of BDDMonolithicTransitions */
     public BDDMonolithicTransitions(BDDAutomata bddAutomata)
     {
@@ -70,13 +73,17 @@ public class BDDMonolithicTransitions
         manager = bddAutomata.getBDDManager();
         
         transitionForwardBDD = manager.getOneBDD();
-        transitionBackwardBDD = manager.getOneBDD();       
+        transitionBackwardBDD = manager.getOneBDD();            
         
         for (BDDAutomaton currAutomaton : bddAutomata)
         {
             transitionForwardBDD = transitionForwardBDD.and(currAutomaton.getTransitionForwardConjunctiveBDD());
             transitionBackwardBDD = transitionBackwardBDD.and(currAutomaton.getTransitionBackwardConjunctiveBDD());
         }
+        
+        myTransitionForwardBDD = transitionForwardBDD;
+        myTransitionBackwardBDD = transitionBackwardBDD;  
+        
         transitionForwardBDD = transitionForwardBDD.exist(bddAutomata.getEventVarSet());        
         transitionBackwardBDD = transitionBackwardBDD.exist(bddAutomata.getEventVarSet());
     }
@@ -89,5 +96,15 @@ public class BDDMonolithicTransitions
     public BDD getMonolithicTransitionBackwardBDD()
     {
         return transitionBackwardBDD;
+    }
+    
+    public BDD getMyMonolithicTransitionForwardBDD()
+    {
+        return myTransitionForwardBDD;
+    }
+    
+    public BDD getMyMonolithicTransitionBackwardBDD()
+    {
+        return myTransitionBackwardBDD;
     }
 }

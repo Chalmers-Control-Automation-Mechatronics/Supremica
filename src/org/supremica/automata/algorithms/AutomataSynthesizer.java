@@ -216,6 +216,7 @@ public class AutomataSynthesizer
                		doNonblockingSynth, doControllabilitySynth);
             try {
             	BDDAutomata bdda = bddSynthesizer.getBDDAutomata();
+
             	int safeStates = bddSynthesizer.computeSafeStates();
             
 /*            
@@ -228,29 +229,35 @@ public class AutomataSynthesizer
             System.err.println("number of reachable states: "+bdda.count_states(reach_int));
             System.err.println("number of uncontrollable states: "+bdda.count_states(uc_int));
 */            
-            	System.err.println("Computing number of states and nodes...");
+ //           	System.err.println("Computing number of states and nodes...");
 /*            
             bdda.show_states(reach_int);
             bdda.show_states(coreach_int);
             bdda.show_states(dead_int);
 */            
-            	numberOfStatesBDD = bdda.count_states(safeStates);
+
+//            numberOfStatesBDD = bdda.count_states(bdd_int);
+//            bddSynthesizer.extractOnlineSupervisor();
+
+//            	numberOfStatesBDD = bdda.count_states(safeStates);
+
 //            bdda.show_states(bdd_int);
  
 //            numberOfNodesBDD = bdda.nodeCount(bdd_int);
             
 //            System.err.println("number of nodes (BDD): "+numberOfNodesBDD);
 
-            	System.err.println("number of states (BDD): "+numberOfStatesBDD);
+//            	System.err.println("number of states (BDD): "+numberOfStatesBDD);
 
             	if (synthesizerOptions.doExtractSupervisor())
             	{
             		//Perform BDD synthesis
+
             		OnlineBDDSupervisor supervisor = bddSynthesizer.extractOnlineSupervisor();
                     //result.addAutomaton(sup);
                 	try
                     {
-                		Automaton supAutomaton = supervisor.createAutomaton();
+                	Automaton supAutomaton = supervisor.createAutomaton();
                         result.addAutomaton(supAutomaton);
                     }
                     finally

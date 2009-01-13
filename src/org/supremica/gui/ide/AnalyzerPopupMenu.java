@@ -14,15 +14,15 @@ class AnalyzerPopupMenu
     extends VPopupMenu
 {
     private static Logger logger = LoggerFactory.createLogger(AnalyzerPopupMenu.class);
-
+    
     private static final long serialVersionUID = 1L;
     private IDEActionInterface ide;
-
+    
     public AnalyzerPopupMenu(Frame parent, IDEActionInterface ide)
     {
         setInvoker(parent);
         this.ide = ide;
-
+        
         try
         {
             initPopups();
@@ -32,7 +32,7 @@ class AnalyzerPopupMenu
             logger.error(ex);
         }
     }
-
+    
     private void initPopups()
     throws Exception
     {
@@ -49,6 +49,7 @@ class AnalyzerPopupMenu
         add(ide.getActions().analyzerSynthesizerAction.getMenuItem());
         add(ide.getActions().analyzerVerifierAction.getMenuItem());
         add(ide.getActions().analyzerMinimizeAction.getMenuItem());
+        add(ide.getActions().analyzerGuardAction.getMenuItem());
         addSeparator();
         add(ide.getActions().analyzerPlantifyAction.getMenuItem());
         add(ide.getActions().analyzerEventHiderAction.getMenuItem());
@@ -78,7 +79,7 @@ class AnalyzerPopupMenu
             experimentMenu.add(ide.getActions().analyzerScheduleAction.getMenuItem());
 
             experimentMenu.addSeparator();
-
+            
             experimentMenu.add(ide.getActions().analyzerDeadEventsDetectorAction.getMenuItem());
 
             experimentMenu.addSeparator();

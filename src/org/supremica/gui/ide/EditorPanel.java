@@ -231,12 +231,10 @@ public class EditorPanel
             if (newComponent instanceof ComponentEditorPanel) {
                 getActions().editorSavePostscriptAction.setEnabled(true);
                 getActions().editorSavePDFAction.setEnabled(true);
-                getActions().editorSaveSVGAction.setEnabled(true);
                 getActions().editorPrintAction.setEnabled(true);
             } else {
                 getActions().editorSavePostscriptAction.setEnabled(false);
                 getActions().editorSavePDFAction.setEnabled(false);
-                getActions().editorSaveSVGAction.setEnabled(false);
                 getActions().editorPrintAction.setEnabled(false);
             }
             return true;

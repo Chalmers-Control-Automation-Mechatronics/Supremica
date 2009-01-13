@@ -501,6 +501,9 @@ public class SynthesizerDialog
             {
                 JOptionPane.showMessageDialog(parentFrame, "Invalid combination of type and algorithm", "Alert", JOptionPane.ERROR_MESSAGE);
             }
+            //////////////
+            
+            //////////////
         }
         else if (source == cancelButton)
         {

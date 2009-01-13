@@ -49,8 +49,6 @@ import org.supremica.gui.ide.actions.ExitAction;
 import org.supremica.gui.ide.actions.IDEActionInterface;
 import org.supremica.log.Logger;
 import org.supremica.properties.Config;
-import org.supremica.properties.SupremicaPropertyChangeEvent;
-import org.supremica.properties.SupremicaPropertyChangeListener;
 import org.supremica.util.ProcessCommandLineArguments;
 import org.xml.sax.SAXException;
 
@@ -65,8 +63,7 @@ import org.xml.sax.SAXException;
  */
 public class IDE
     extends JFrame
-    implements IDEActionInterface, Observer, Subject,
-               SupremicaPropertyChangeListener
+    implements IDEActionInterface, Observer, Subject
 {
     //#######################################################################
     //# Constructor
@@ -100,18 +97,13 @@ public class IDE
         mSplitPaneVertical.setDividerLocation(0.8);
         mSplitPaneVertical.setResizeWeight(1.0);
         contents.add(mSplitPaneVertical, BorderLayout.CENTER);
-
+        
         final File startdir = new File(Config.FILE_OPEN_PATH.getAsString());
         mFileChooser = new JFileChooser(startdir);
-
+        
         // Initialise document managers
         mDocumentContainerManager = new DocumentContainerManager(this);
         mDocumentContainerManager.attach(this);
-
-        // Setup property change listeners
-        Config.GUI_EDITOR_LAYOUT_MODE.addPropertyChangeListener(this);
-        Config.GUI_EDITOR_EDGEARROW_AT_END.addPropertyChangeListener(this);
-        Config.GUI_EDITOR_NODE_RADIUS.addPropertyChangeListener(this);
 
         // Show Version number
         info("Supremica version: " + (new Version()));
@@ -134,29 +126,29 @@ public class IDE
         }
     }
 
-
+    
     //#######################################################################
     //# Simple Access
     public String getName()
     {
         return IDENAME;
     }
-
+    
     public JFrame getFrame()
     {
         return this;
     }
-
+    
     public IDE getIDE()
     {
         return this;
     }
-
+    
     public IDEToolBar getToolBar()
     {
         return mToolBar;
     }
-
+    
     public Actions getActions()
     {
         return mActions;
@@ -186,8 +178,8 @@ public class IDE
     {
         return mFileChooser;
     }
-
-
+    
+    
     //#######################################################################
     //# Listeners
     /**
@@ -207,8 +199,8 @@ public class IDE
             super.processWindowEvent(event);
         }
     }
-
-
+    
+    
     //#######################################################################
     //# Interface net.sourceforge.waters.gui.observer.Observer
     public void update(final EditorChangedEvent event)
@@ -234,7 +226,7 @@ public class IDE
         }
         fireEditorChangedEvent(event);
     }
-
+    
 
     //#######################################################################
     //# Interface net.sourceforge.waters.gui.observer.Subject
@@ -242,14 +234,18 @@ public class IDE
     {
         mObservers.add(observer);
     }
-
+    
     public void detach(final Observer observer)
     {
         mObservers.remove(observer);
     }
-
+    
     public void fireEditorChangedEvent(final EditorChangedEvent event)
     {
+        /*
+        System.err.println("fireEditorChangedEvent " + event.getKind() + " " +
+                           event.getSource().getClass().getName());
+        */
         // Just in case they try to register or deregister observers
         // in response to the update ...
         final List<Observer> copy = new LinkedList<Observer>(mObservers);
@@ -258,19 +254,8 @@ public class IDE
             observer.update(event);
         }
     }
-
-
-    //#######################################################################
-    //# Interface org.supremica.properties.SupremicaPropertyChangeListener
-    public void propertyChanged(final SupremicaPropertyChangeEvent event)
-    {
-        for (final DocumentContainer container :
-                 mDocumentContainerManager.getOpenContainers()) {
-            container.propertyChanged(event);
-        }
-    }
-
-
+    
+    
     //#######################################################################
     //# Public Shortcuts
     //# (use with caution --- these should be considered as deprecated)
@@ -278,12 +263,12 @@ public class IDE
     {
         return mDocumentContainerManager.getActiveContainer();
     }
-
+    
     public EditorWindowInterface getActiveEditorWindowInterface()
     {
         return getActiveDocumentContainer().getEditorPanel().getActiveEditorWindowInterface();
     }
-
+    
     public boolean editorActive()
     {
         if (mDocumentContainerManager == null) {
@@ -294,7 +279,7 @@ public class IDE
             return active != null && active.isEditorActive();
         }
     }
-
+    
     public boolean analyzerActive()
     {
         if (mDocumentContainerManager == null) {
@@ -305,24 +290,24 @@ public class IDE
             return active != null && active.isAnalyzerActive();
         }
     }
-
+    
     public Project getActiveProject()
     {
         final DocumentContainer active =
             mDocumentContainerManager.getActiveContainer();
         return active.getAnalyzerPanel().getVisualProject();
     }
-
+    
     private boolean openFiles(final List<File> filesToOpen)
     {
         return mDocumentContainerManager.openContainers(filesToOpen);
     }
-
+    
     private void openEmptyDocument()
     {
         mDocumentContainerManager.newModuleContainer();
     }
-
+    
     public String getWindowTitle()
     {
         final DocumentContainer container =
@@ -336,8 +321,7 @@ public class IDE
             final DocumentProxy doc = container.getDocument();
             final String name = doc.getName();
             final File file = container.getFileLocation();
-            final StringBuffer buffer =
-                new StringBuffer(IDENAME + " - Module");
+            final StringBuffer buffer = new StringBuffer(IDENAME + " - Module");
             if (name != null && !name.equals(""))
             {
                 buffer.append(": ");
@@ -351,38 +335,38 @@ public class IDE
             }
             return buffer.toString();
         }
-
+        
     }
-
-
+    
+    
     //#######################################################################
     //# Interface org.supremica.gui.ide.IDEReportInterface
     public void error(String msg)
     {
         logger.error(msg);
     }
-
+    
     public void error(String msg, Throwable t)
     {
         logger.error(msg, t);
     }
-
+    
     public void info(String msg)
     {
         logger.info(msg);
     }
-
+    
     public void warn(String msg)
     {
         logger.warn(msg);
     }
-
+    
     public void debug(String msg)
     {
         logger.debug(msg);
     }
-
-
+    
+    
     //#######################################################################
     //# Main Program
     public static void main(String args[])
@@ -390,7 +374,7 @@ public class IDE
     {
         // Process command line arguments
         final List<File> files = ProcessCommandLineArguments.process(args);
-
+        
         // Initialise logging
         SupremicaLoggerFactory.initialiseSupremicaLoggerFactory();
         logger = SupremicaLoggerFactory.createLogger(IDE.class);
@@ -409,12 +393,12 @@ public class IDE
         {
             ide.openEmptyDocument();
         }
-
+        
         // Show!
         ide.setVisible(true);
     }
-
-
+    
+    
     //#######################################################################
     //# Data Members
     // GUI Components
@@ -440,12 +424,13 @@ public class IDE
     public static void setLogger(Logger aLogger) {
     	logger = aLogger;
     }
-
+    
     //#######################################################################
     //# Static Class Constants
     private static final long serialVersionUID = 1L;
     private static final String IDENAME = "Supremica";
-
+    //private static final InterfaceManager manager;
+    
     static
     {
         Locale.setDefault(Locale.ENGLISH);
