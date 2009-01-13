@@ -1,9 +1,0 @@
-build
-dist
-resources
-logs
-JDE_Project.el
-.project
-.classpath
-SupremicaProperties.cfg
-*.properties
