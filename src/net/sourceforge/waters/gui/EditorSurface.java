@@ -130,31 +130,72 @@ public class EditorSurface
     {
         return getGraph();
     }
-    
+
+    /**
+     * Paints the background and a grid on it.
+     *
+     * The extent of the background and the grid is
+     * 10 grid cells bigger in each direction than the
+     * bounding rectangle of all the shapes
+     */
     protected void paintGrid(Graphics g)
     {
-        g.setColor(EditorColor.BACKGROUNDCOLOR);
-        g.fillRect(0, 0, getWidth(), getHeight());
-        g.setColor(EditorColor.GRIDCOLOR);
+        Graphics2D g2 = (Graphics2D) g;
+        final Rectangle2D boundingRect =
+          getShapeProducer().getMinimumBoundingRectangle();
+          
+        final double gridSize = Config.GUI_EDITOR_GRID_SIZE.get();
+        final double extra = 10 * gridSize;
         
-        // Draw grid iff showGrid is true
+        final double x = boundingRect.getMinX() - extra;
+        final double y = boundingRect.getMinY() - extra;
+        final double w = boundingRect.getWidth() + 2 * extra;
+        final double h = boundingRect.getHeight() + 2 * extra;
+
+        final Rectangle2D boundingRectExt =
+          new Rectangle2D.Double(x,y,w,h);          
+
+        g2.setColor(EditorColor.BACKGROUNDCOLOR);
+        g2.fill(boundingRectExt);
+        
+        // Draw grid iff showGrid is true        
         if (Config.GUI_EDITOR_SHOW_GRID.get())
         {
-            int x = -(int)getLocation().getX();
-            int y = -(int)getLocation().getY();
+            final double x0 = boundingRectExt.getMinX();
+            final double x1 = boundingRectExt.getMaxX();
+            final double y0 = boundingRectExt.getMinY();
+            final double y1 = boundingRectExt.getMaxY();
+
+            final double lineWidth = 1;
+
+            g2.setColor(EditorColor.GRIDCOLOR);
+
+            // grid disappears sometime without antialiasing, that's why
+            // we turn it on. Afterwards, we turn it back to whatever it was
+            final Object oldAntialias = g2.getRenderingHint(
+              java.awt.RenderingHints.KEY_ANTIALIASING);
+              
+            g2.setRenderingHint(java.awt.RenderingHints.KEY_ANTIALIASING,
+              java.awt.RenderingHints.VALUE_ANTIALIAS_ON);
             
-            for (int i = 0; i < getWidth(); i += Config.GUI_EDITOR_GRID_SIZE.get())
+            for (double xi = findGridForward(x0, gridSize); xi < x1; xi += gridSize)
             {
-                g.drawLine(i, y, i, getHeight());
+                // there are no lines, we have to draw a very thin rectangle instead
+                g2.fill(new Rectangle2D.Double(xi, y0, lineWidth, y1-y0));
             }
             
-            for (int i = 0; i < getHeight(); i += Config.GUI_EDITOR_GRID_SIZE.get())
+            for (double yi = findGridForward(y0, gridSize); yi < y1; yi += gridSize)
             {
-                g.drawLine(x, i, getWidth(), i);
+                g2.fill(new Rectangle2D.Double(x0, yi, x1-x0, lineWidth));
             }
+            
+            g2.setRenderingHint(java.awt.RenderingHints.KEY_ANTIALIASING, oldAntialias);
         }
     }
-    
+    private double findGridForward(final double x, final double gridSize)
+    {      
+      return gridSize * Math.ceil(x / gridSize);
+    }    
     /**
      * Called when printing.
      */
