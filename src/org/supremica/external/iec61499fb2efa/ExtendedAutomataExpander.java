@@ -69,13 +69,13 @@ import net.sourceforge.waters.xsd.base.EventKind;
 
 import org.supremica.automata.VariableHelper;
 
-public class ExtendedAutomataExpander
+class ExtendedAutomataExpander
 {
 
 	private static ModuleSubjectFactory factory = ModuleSubjectFactory.getInstance();
 	private static ExpressionParser parser = new ExpressionParser(factory, CompilerOperatorTable.getInstance());
 
-	public static void expandTransitions(final ModuleSubject module)
+	static void expandTransitions(final ModuleSubject module)
 	{
 		
 		Logger.output("ExtendedAutomataExpander.expandTransitions(): Expanding transitions.");

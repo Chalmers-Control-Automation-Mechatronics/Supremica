@@ -58,7 +58,7 @@ import net.sourceforge.waters.model.expr.TypeMismatchException;
 
 import org.supremica.automata.VariableHelper;
 
-public class ExtendedAutomaton
+class ExtendedAutomaton
 {
 
 	private boolean allAcceptingStates = false;
@@ -73,7 +73,7 @@ public class ExtendedAutomaton
 
 	private ExpressionParser parser;
 
-	public ExtendedAutomaton(String name, ExtendedAutomata automata, boolean acceptingStates)
+	ExtendedAutomaton(String name, ExtendedAutomata automata, boolean acceptingStates)
 	{
 		this.name = name;
 
@@ -88,48 +88,48 @@ public class ExtendedAutomaton
 		component = factory.createSimpleComponentProxy(identifier, ComponentKind.PLANT, graph);
 
 		parser = new ExpressionParser(factory, CompilerOperatorTable.getInstance());
-
-                allAcceptingStates = acceptingStates;
+        
+        allAcceptingStates = acceptingStates;
 	}
 
-// 	public ExtendedAutomaton(String name, ComponentKind kind, ExtendedAutomata automata) 
-// 	{
-// 		this.name = name;
+    // 	 ExtendedAutomaton(String name, ComponentKind kind, ExtendedAutomata automata) 
+    // 	{
+    // 		this.name = name;
 
-// 		factory = ModuleSubjectFactory.getInstance();
+    // 		factory = ModuleSubjectFactory.getInstance();
 		
-// 		this.automata = automata;
+    // 		this.automata = automata;
 		
-// 		module = automata.getModule();
+    // 		module = automata.getModule();
 
-// 		identifier = factory.createSimpleIdentifierProxy(name);
-// 		graph = factory.createGraphProxy();
-// 		component = factory.createSimpleComponentProxy(identifier, kind, graph);
+    // 		identifier = factory.createSimpleIdentifierProxy(name);
+    // 		graph = factory.createGraphProxy();
+    // 		component = factory.createSimpleComponentProxy(identifier, kind, graph);
 
-// 		parser = new ExpressionParser(factory, CompilerOperatorTable.getInstance());
-// 	}
+    // 		parser = new ExpressionParser(factory, CompilerOperatorTable.getInstance());
+    // 	}
 
-	protected SimpleComponentSubject getComponent()
+	SimpleComponentSubject getComponent()
 	{
 		return component;
 	}
 
-	public void addInitialState(String name)
+    void addInitialState(String name)
 	{
 		addState(name, true, true);
 	}
 
-	public void addAcceptingState(String name)
+    void addAcceptingState(String name)
 	{
 		addState(name, true, false);
 	}
 
-	public void addState(String name)
+    void addState(String name)
 	{
-			addState(name, true, false);
+        addState(name, true, false);
 	}
 
-	public void addState(String name, boolean accepting, boolean initial)
+    void addState(String name, boolean accepting, boolean initial)
 	{
 		if (allAcceptingStates)
 		{
@@ -143,7 +143,7 @@ public class ExtendedAutomaton
 			{
 				final List<Proxy> propList = new LinkedList<Proxy>();
 				propList.add(factory.createSimpleIdentifierProxy
-                               (EventDeclProxy.DEFAULT_MARKING_NAME));
+                             (EventDeclProxy.DEFAULT_MARKING_NAME));
 				PlainEventListSubject acceptingProposition =
                     factory.createPlainEventListProxy(propList);
 				graph.getNodesModifiable().add
@@ -157,7 +157,7 @@ public class ExtendedAutomaton
 		}
 	}
 
-	public void addIntegerVariable(String name, int lowerBound, int upperBound, int initialValue, Integer markedValue)
+    void addIntegerVariable(String name, int lowerBound, int upperBound, int initialValue, Integer markedValue)
 	{
 		module.getComponentListModifiable().add(VariableHelper.createIntegerVariable(name, lowerBound, upperBound, initialValue, null));
 	}
@@ -171,7 +171,7 @@ public class ExtendedAutomaton
 	 * @param guardIn guard expression for the transition
 	 * @param actionIn action expression for the transition
 	 */
-	public void addControllableTransition(String from, String to, String label, String guardIn, String actionIn)
+    void addControllableTransition(String from, String to, String label, String guardIn, String actionIn)
 	{
 		SimpleNodeSubject fromNode = (SimpleNodeSubject) graph.getNodesModifiable().get(from);
 		if (fromNode == null)
@@ -287,7 +287,7 @@ public class ExtendedAutomaton
 		graph.getEdgesModifiable().add(newEdge);	
 	}
 
-	public void addTransition(String from, String to, String label, String guardIn, String actionIn)
+    void addTransition(String from, String to, String label, String guardIn, String actionIn)
 	{
 		SimpleNodeSubject fromNode = (SimpleNodeSubject) graph.getNodesModifiable().get(from);
 		if (fromNode == null)

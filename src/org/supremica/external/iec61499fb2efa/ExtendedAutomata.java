@@ -68,7 +68,7 @@ import net.sourceforge.waters.xsd.base.EventKind;
 import net.sourceforge.waters.xsd.module.ScopeKind;
 
 
-public class ExtendedAutomata
+class ExtendedAutomata
 {
 
 	private ModuleSubjectFactory factory;
@@ -77,7 +77,7 @@ public class ExtendedAutomata
 	private ModuleSubject module;
 	private boolean expand;
 
-	public ExtendedAutomata(String name, boolean expand) 
+	ExtendedAutomata(String name, boolean expand) 
 	{
 		factory = ModuleSubjectFactory.getInstance();
 
@@ -100,12 +100,12 @@ public class ExtendedAutomata
 		return module;
 	}
 
-	public void addEvent(final String name)
+    void addEvent(final String name)
 	{
 		addEvent(name,"uo");
 	}
 	
-	public void addEvent(final String name, final String kind)
+    void addEvent(final String name, final String kind)
 	{
         if (!containsEvent(name)) {
 			final SimpleIdentifierProxy ident =
@@ -142,12 +142,12 @@ public class ExtendedAutomata
         return false;
     }
 
-	public void addAutomaton(ExtendedAutomaton automaton)
+    void addAutomaton(ExtendedAutomaton automaton)
 	{
 		module.getComponentListModifiable().add(automaton.getComponent());
 	}
 
-	public void writeToFile(File file)
+    void writeToFile(File file)
 	{
 		
 		if (expand)
