@@ -109,8 +109,6 @@ import org.supremica.properties.SupremicaPropertyChangeEvent;
 import org.supremica.properties.SupremicaPropertyChangeListener;
 
 
-import java.awt.geom.AffineTransform;
-
 public class ControlledSurface
   extends EditorSurface
   implements SelectionOwner, Observer, EmbedderObserver,
@@ -157,7 +155,6 @@ public class ControlledSurface
       final UndoInterface undoer = root.getUndoInterface();
       undoer.attach(this);
     }
-    setAutoscrolls(false);
   }
 
   /**
@@ -706,10 +703,16 @@ public class ControlledSurface
           scrollable.add(proxy);
         }
       }
-      final Rectangle2D bounds = 
+      final Rectangle2D bounds =
         getShapeProducer().getMinimumBoundingRectangle(scrollable);
-              
-      scrollRectToVisible(userToVDevInt(bounds));
+      final int x = (int) Math.floor(bounds.getX());
+      final int width =
+        (int) Math.ceil(bounds.getX() + bounds.getWidth()) - x;
+      final int y = (int) Math.floor(bounds.getY());
+      final int height =
+        (int) Math.ceil(bounds.getY() + bounds.getHeight()) - y;
+      final Rectangle rect = new Rectangle(x, y, width, height);
+      scrollRectToVisible(rect);
     }
   }
 
@@ -887,18 +890,7 @@ public class ControlledSurface
   //# Repainting
   protected void paintComponent(final Graphics graphics)
   {
-    Graphics2D g2 = (Graphics2D) graphics;
-    
-    // transform to zoom-in and zoom-out
-    g2.transform(mZoomPanTransform); 
-
-    super.paintComponent(g2);
-
-    // unapply transform. It is necessary because there could be other
-    // actions that can require original scale, for example Text Boxes
-    // for names input that are placed just above the state circles.
-    g2.transform(mInvZoomPanTransform); 
-
+    super.paintComponent(graphics);
     if (mInternalDragAction == null) {
       adjustSize();
     }
@@ -906,11 +898,27 @@ public class ControlledSurface
 
   void adjustSize()
   {
-   if (mSizeMayHaveChanged) {
+    if (mSizeMayHaveChanged) {
       mSizeMayHaveChanged = false;
-      updateUserBound();
+      final Dimension dim = calculatePreferredSize();
+      if (!dim.equals(getPreferredSize())) {
+        setPreferredSize(dim);
+        revalidate();
+      }
     }
   }
+
+  Dimension calculatePreferredSize()
+  {
+    final Rectangle2D area = getShapeProducer().getMinimumBoundingRectangle();
+    final int width = (int) Math.ceil(area.getWidth());
+    final int height = (int) Math.ceil(area.getHeight());
+    final int extra = Config.GUI_EDITOR_GRID_SIZE.get() * 10;
+    final int x = width + extra;
+    final int y = height + extra;
+    return new Dimension(x, y);
+  }
+
 
   //#########################################################################
   //# Toolbar
@@ -959,8 +967,6 @@ public class ControlledSurface
       mController = controller;
       addMouseListener(mController);
       addMouseMotionListener(mController);
-      addMouseWheelListener(new ZoomHandler());
-      addMouseListener(new PanStartEndHandler());
       final DragSource source = DragSource.getDefaultDragSource();
       source.createDefaultDragGestureRecognizer
         (this, DnDConstants.ACTION_COPY, this);
@@ -1477,7 +1483,7 @@ public class ControlledSurface
       return null;
     } else if (item instanceof LabelBlockSubject && isSelected(item)) {
       final LabelBlockSubject block = (LabelBlockSubject) item;
-      final Point point = devToUserInt(event.getPoint());
+      final Point point = event.getPoint();
       final ProxySubject label = getLabelToBeSelected(block, point);
       return label == null ? item : label;
     } else {
@@ -1727,7 +1733,7 @@ public class ControlledSurface
     {
       if (mInternalDragAction != null &&
           mInternalDragAction instanceof InternalDragActionDND) {
-        final Point point = devToUserInt(event.getPoint());
+        final Point point = event.getPoint();
         mInternalDragAction.cancelDrag(point);
         mInternalDragAction = null;
         repaint();
@@ -1763,7 +1769,7 @@ public class ControlledSurface
       mPopupFactory.maybeShowPopup
         (ControlledSurface.this, event, mFocusedObject);
       if (mInternalDragAction != null) {
-        final Point point = devToUserInt(event.getPoint());
+        final Point point = event.getPoint();
         if (mInternalDragAction.hasDragged()) {
           mInternalDragAction.commitDrag(point);
         } else {
@@ -1782,7 +1788,7 @@ public class ControlledSurface
 
     public void mouseDragged(final MouseEvent event)
     {
-      final Point point = devToUserInt(event.getPoint());
+      final Point point = event.getPoint();
       updateHighlighting(point);
       if (mInternalDragAction != null) {
         mInternalDragAction.continueDrag(point);
@@ -1792,7 +1798,7 @@ public class ControlledSurface
     public void mouseEntered(final MouseEvent event)
     {
       abortExternalDrag(event);
-      final Point point = devToUserInt(event.getPoint());
+      final Point point = event.getPoint();
       updateHighlighting(point);
     }
 
@@ -1800,7 +1806,7 @@ public class ControlledSurface
     {
       if (mInternalDragAction != null) {
         abortExternalDrag(event);
-        final Point point = devToUserInt(event.getPoint());
+        final Point point = event.getPoint();
         updateHighlighting(point);
       } else {
         updateHighlighting(null);
@@ -1813,7 +1819,7 @@ public class ControlledSurface
     public void mouseMoved(final MouseEvent event)
     {
       abortExternalDrag(event);
-      final Point point = devToUserInt(event.getPoint());
+      final Point point = event.getPoint();
       updateHighlighting(point);
     }
 
@@ -1900,7 +1906,7 @@ public class ControlledSurface
     {
       super.mousePressed(event);
       if (event.getButton() == MouseEvent.BUTTON1) {
-        final Point point = devToUserInt(event.getPoint());
+        final Point point = event.getPoint();
         final ProxySubject item = getItemToBeSelected(event);
          if (item == null || event.isControlDown()) {
           // Clicking on whitespace --- drag select.
@@ -2009,7 +2015,7 @@ public class ControlledSurface
       if (event.getButton() == MouseEvent.BUTTON1) {
         if (event.getClickCount() == 1 && mFocusedObject == null) {
           // Create node.
-          final Point point = devToUserInt(event.getPoint());
+          final Point point = event.getPoint();
           final Point snapped;
           if (Config.GUI_EDITOR_NODES_SNAP_TO_GRID.get()) {
             snapped = findGrid(point);
@@ -2032,7 +2038,7 @@ public class ControlledSurface
     {
       super.mousePressed(event);
       if (event.getButton() == MouseEvent.BUTTON1) {
-        final Point point = devToUserInt(event.getPoint());
+        final Point point = event.getPoint();
         if (event.isControlDown() || mFocusedObject == null) {
           // Clicking on whitespace --- drag select.
           mInternalDragAction = new InternalDragActionSelect(event);
@@ -2076,7 +2082,7 @@ public class ControlledSurface
       mPopupFactory.maybeShowPopup
         (ControlledSurface.this, event, mFocusedObject);
       if (event.getButton() == MouseEvent.BUTTON1) {
-        final Point point = devToUserInt(event.getPoint());
+        final Point point = event.getPoint();
         if (event.isControlDown()) {
           mInternalDragAction = new InternalDragActionSelect(event);
         } else if (mFocusedObject == null) {
@@ -2160,7 +2166,7 @@ public class ControlledSurface
       mPopupFactory.maybeShowPopup
         (ControlledSurface.this, event, mFocusedObject);
       if (event.getButton() == MouseEvent.BUTTON1) {
-        final Point point = devToUserInt(event.getPoint());
+        final Point point = event.getPoint();
         final ProxySubject item = getItemToBeSelected(event);
         if (item == null || event.isControlDown()) {
           mInternalDragAction = new InternalDragActionSelect(event);
@@ -2209,12 +2215,12 @@ public class ControlledSurface
     //# Constructors
     private InternalDragAction(final MouseEvent event)
     {
-      this(event, devToUserInt(event.getPoint()));
+      this(event, event.getPoint());
     }
 
     private InternalDragAction(final MouseEvent event, final Point snapped)
     {
-      this(devToUserInt(event.getPoint()), snapped, event.isControlDown());
+      this(event.getPoint(), snapped, event.isControlDown());
     }
 
     private InternalDragAction(final Point point,
@@ -3029,7 +3035,7 @@ public class ControlledSurface
     {
       super(event,
             Config.GUI_EDITOR_NODES_SNAP_TO_GRID.get() ?
-            findGrid(devToUserInt(event.getPoint())) : devToUserInt(event.getPoint()));
+            findGrid(event.getPoint()) : event.getPoint());
       clearSelection();
     }
 
@@ -3858,7 +3864,7 @@ public class ControlledSurface
       if (x + width > xmax) {
         x = xmax - width;
       }
-      final Point pos = point2dToPoint(userToVDev(new Point(x,y)));
+      final Point pos = new Point(x, y);
       final Dimension size = new Dimension(width, height);
       setLocation(pos);
       setSize(size);
@@ -4512,275 +4518,6 @@ public class ControlledSurface
   }
 
 
-  //#######################################################################
-  //# Zoom- and pan- related methods of the ControlledSurface
-  //#
-  //# Three coordinate spaces are used. User space, Device space, and
-  //# Virtual Device space.
-  //#
-  //# User space is the model space, in which all
-  //# the shapes are created. It is double precision unbounded space.
-  //#
-  //# Virtual Device space is a big non-negative integer space of this 
-  //# JComponent (ControlledSurface), where all actual drawing occurs,
-  //# and all mouse click coordinates are in this space.
-  //#
-  //# Device space is a small integer non-negative space with is just a limited
-  //# view (with exactly the same scale) of the Virtual Device space.
-  //#
-  //# ControlledSurface is a child of JViewport, which is a child of 
-  //# JScrollPane. ControlledSurface has a big Virtual Device space, while
-  //# JViewport provides mapping between Virtual Device space and Device
-  //# space, and JScrollPane controlls this mapping with scroll bars.
-  //# JScrollPane (or JViewport) controls only a position of an upper-left
-  //# corner of the small (real) Extent on the big (virtual) View.
-  //# 
-  //# In order to implement zoom, it was necessary to define a new mapping
-  //# from User space to Virtual Device space, that will zoom in and out,
-  //# but will not control the pan, which is left to scroll bars.
-  //# This mapping is straightforward with Java2D. Graphics2D supports 
-  //# arbitrary affine transforms to be applied just before the painting, 
-  //# to convert between User and (Virtual) Device spaces. This is  
-  //# the way zoom is implemented - just a scaling affine transform.
-  //#
-  //# Virtual Device space is non-negative, so it is necessary to move
-  //# all the objects so that when they are mapped into Virtual Device
-  //# space, all of them have positive coordinates. This move was
-  //# also added into affine transform.
-  //#
-  //# To simplify determination of Scroll Position, two Reference Points were used,
-  //# one in User space, and one in Device space. Scroll Position is recalculated 
-  //# so that User space Ref Point appears exactly at the Device space Ref Point.
-  //#
-  //# Summary of dependencies of data is as follows: 
-  //#
-  //# Shapes Geometry depends on user actions (move, add)
-  //# Zoom Level depends on user actions (wheel movement)
-  //# User Space Bound depends on Shapes Geometry
-  //# Virtual Device Bound (PreferredSize, ViewSize) depend on 
-  //#     Zoom Level and
-  //#     User Space Bound (width, height)
-  //# Zoom and Pan transform (from user space to Virtual Device space) depends on
-  //#     Zoom Level and
-  //#     User Space Bound (position of the upper-left-most point)
-  //# Scroll Position depends on
-  //#     Zoom and Pan transform (userToVDev) 
-  //#     Reference Point in User space
-  //#     Refernece Point in Device space
-  //# Reference Point in UserSpace depends on
-  //#     user actions (mouse position at the time of scroll or click)
-  //#     previous Zoom and Pan transformation (vdevToUser)
-  //# Reference Point in Device Space depends on
-  //#     user actions (mouse position at the time of scroll or click)
-  //#     previous value of the Scroll Position (vdevToDev)
-  //#
-  
-  /** Sets zoom level and calls updates for influenced data
-   * (preferred size and transform)
-   */
-  private void setZoomLevel(double z){
-    mZoomLevel = z;
-    updatePreferredSize();
-    updateZoomPanTransform();    
-  }
-  /** Returns current zoom level */
-  private double getZoomLevel(){
-    return mZoomLevel;
-  }
-  /** Sets reference points and calls update of scroll position */
-  private void setRefs(Point2D up, Point2D dp){
-    mRefPointUser = up;
-    mRefPointDevice = dp;
-    updateScrollPosition();
-  }
-  /** Sets reference points without updating scroll position
-   * To be used before some other operation that will update scroll
-   * position itself
-   */
-  private void setRefsWithoutScrollUpdate(Point2D up, Point2D dp){
-    mRefPointUser = up;
-    mRefPointDevice = dp;
-  }
-  /** Sets device reference point and calls update of scroll position */
-  private void setRefDevice(Point2D dp){
-    mRefPointDevice = dp;
-    updateScrollPosition();
-  }
-  private void setUserSpaceBound(Rectangle2D bnd){
-    mUserSpaceBound = bnd;
-  }
-  private Rectangle2D getUserSpaceBound(){
-    return mUserSpaceBound;
-  }
-
-  /** Populates transform and inverse transform with the input*/
-  private void setZoomPanTransform(AffineTransform at){
-    mZoomPanTransform = at;
-    try{
-      mInvZoomPanTransform = at.createInverse();
-    } catch(java.awt.geom.NoninvertibleTransformException ex) {
-      mInvZoomPanTransform = new AffineTransform();
-      throw new IllegalArgumentException("can't inverse transform: " + ex.toString());
-    }    
-  }
-  /** Converts coordinates of the input point from device-space coordinates
-   * to user-space coordinates and rounds them to return Point */
-  private Point devToUserInt(Point pt){
-    return point2dToPoint(vdevToUser(pt));
-  }
-  /** Converts coordinates from virtual device space to user space */
-  private Point2D vdevToUser(Point2D pt){
-    return mInvZoomPanTransform.transform(pt, null);
-  }
-  /** converts coordinates from user space to virtual device space */
-  private Point2D userToVDev(Point2D pt){
-    return mZoomPanTransform.transform(pt, null);
-  }
-  /** converts coordinates from virtual device space to device space */
-  private Point2D vdevToDev(Point2D p){
-    Point2D r = minus(p, getScrollULPosition());
-    return r;
-  }
-  /** converts rectangle from user space to virtual device space and
-   * rounds them to return Rectangle */
-  private Rectangle userToVDevInt(Rectangle2D r){
-    Point2D p0 = userToVDev(new Point2D.Double(r.getMinX(), r.getMinY()));
-    Point2D p1 = userToVDev(new Point2D.Double(r.getMaxX(), r.getMaxY()));
-    return new Rectangle(
-      (int)p0.getX(),        (int)   p0.getY(),
-      (int)(p1.getX()-p0.getX()), (int)(p1.getY()-p0.getY()));
-  }
-  /** Extends the rectangle by ext in each direction */
-  private Rectangle2D extend(Rectangle2D r, double ext){
-    return new Rectangle2D.Double(r.getMinX()-ext, r.getMinY()-ext,
-      r.getWidth()+2*ext, r.getHeight() + 2*ext);
-  }
-  /** Rounds Point2D to Point */
-  private Point point2dToPoint(Point2D pt){
-    return new Point(
-      (int)java.lang.Math.round(pt.getX()),
-      (int)java.lang.Math.round(pt.getY()));
-  }
-  /** Returns vector c = a-b */
-  private Point2D minus(Point2D a, Point2D b){
-    return new Point2D.Double(a.getX()-b.getX(), a.getY()-b.getY());
-  }
-
-  // Updates
-  private void updateUserBound(){
-    final Rectangle2D bound = getShapeProducer().getMinimumBoundingRectangle();
-    final double extra = Config.GUI_EDITOR_GRID_SIZE.get() * 10;
-    if(!bound.equals(getUserSpaceBound())){
-      setUserSpaceBound(extend(bound, extra));
-      updatePreferredSize();
-      updateZoomPanTransform();
-    }
-  }
-
-  private void updatePreferredSize(){
-    double z = getZoomLevel();
-    Rectangle2D bnd = getUserSpaceBound();
-    int w = (int) Math.ceil(bnd.getWidth()*z);
-    int h = (int) Math.ceil(bnd.getHeight()*z);
-    Dimension size = new Dimension(w,h);
-    setPreferredSize(size);
-    ((JViewport)getParent()).setViewSize(size);
-    invalidate();   
-  }
-
-  private void updateZoomPanTransform(){
-    AffineTransform at = new AffineTransform();
-    at.scale(mZoomLevel, mZoomLevel);
-    at.translate(-mUserSpaceBound.getMinX(), -mUserSpaceBound.getMinY());
-
-    setZoomPanTransform(at);
-    updateScrollPosition();
-    repaint();
-  }
-
-  private void updateScrollPosition(){
-    Point2D rpvd = userToVDev(mRefPointUser);
-    setScrollULPosition(minus(rpvd, mRefPointDevice));
-  }
-  
-  private Point getScrollULPosition(){
-    return ((JViewport)getParent()).getViewPosition();
-  }
-  
-  private void setScrollULPosition(Point2D p){   
-    int x = (int) Math.round(p.getX());
-    int y = (int) Math.round(p.getY());
-    if(x<0) x = 0;
-    if(y<0) y = 0;
-    ((JViewport)getParent()).setViewPosition(new Point(x,y));    
-    revalidate();
-  }
-
-  /** Converts mouse wheel movements into changes of the zoom level */
-  public class ZoomHandler implements MouseWheelListener {  
-    public void mouseWheelMoved(MouseWheelEvent e){
-
-      Point2D rpd = vdevToDev(e.getPoint()); 
-      Point2D rpu = vdevToUser(e.getPoint());
-      setRefsWithoutScrollUpdate(rpu, rpd);        
-
-      double z = 1 + Math.abs(e.getWheelRotation())/10.0;
-
-      double zoom = getZoomLevel();
-      if(e.getWheelRotation()<0){
-        zoom *= z;
-        if(zoom>MAX_ZOOM)
-          zoom = MAX_ZOOM;
-      }
-      else if (e.getWheelRotation()>0){  // sometime wheel rotation can be 0
-        zoom /= z;
-        // limit the zoom so that object is at least
-        // of MIN_ZOOMED_SIZE on the screen
-        final Rectangle2D bound = getUserSpaceBound();
-        final double w = bound.getWidth()*zoom;
-        final double h = bound.getHeight()*zoom;        
-        if(w < MIN_ZOOMED_SIZE || h < MIN_ZOOMED_SIZE){
-          final double z1 = (double)MIN_ZOOMED_SIZE / bound.getWidth();
-          final double z2 = (double)MIN_ZOOMED_SIZE / bound.getHeight();
-          zoom = z1>z2 ? z1 : z2;
-        }
-      }        
-
-      setZoomLevel(zoom);
-    }
-  }
-  /** Converts middle mouse button presses into start and end of panning */
-  private class PanStartEndHandler extends MouseAdapter {
-    PanMovementHandler panMovementHandler = new PanMovementHandler();
-    
-    public void mousePressed(MouseEvent e){
-      // middle button turned out to be number 2, not number 3.
-      if((e.getModifiersEx() & java.awt.event.InputEvent.BUTTON2_DOWN_MASK) != 0 && !mPanning){
-        Point2D rpd = vdevToDev(e.getPoint());
-        Point2D rpu = vdevToUser(e.getPoint());
-        setRefsWithoutScrollUpdate(rpu, rpd);        
-        addMouseMotionListener(panMovementHandler);
-        mPanning = true;
-      }
-    }
-    public void mouseReleased(MouseEvent e){
-      if((e.getModifiersEx() & java.awt.event.InputEvent.BUTTON2_DOWN_MASK) == 0 && mPanning) {
-        mPanning = false;
-        removeMouseMotionListener(panMovementHandler);
-      }
-    }
-  }
-
-  /** If currently panning, sets the device reference point to the mouse position */
-  private class PanMovementHandler extends MouseMotionAdapter {
-    public void mouseDragged(MouseEvent e){
-      if(mPanning){
-        setRefDevice(vdevToDev(e.getPoint()));
-      }
-    }
-  }
-  
-
   //#########################################################################
   //# Data Members
   private final EditorWindowInterface mRoot;
@@ -4886,31 +4623,9 @@ public class ControlledSurface
   private final HighlightComparator mComparator = new HighlightComparator();
   private List<Observer> mObservers;
 
-  //######################################
-  // Zoom and pan data. See comments above
-  /** zoom level, 1.0 is one-to-one */
-  private double  mZoomLevel      = 1.0;
-  /** device-space coordinates of reference point */
-  private Point2D mRefPointDevice = new Point2D.Double(0,0);
-  /** user-space coordinates of reference point */
-  private Point2D mRefPointUser   = new Point2D.Double(0,0);  
-  /** indicates that currently panning, and mouse motion should move canvas */
-  private boolean mPanning        = false; 
-  /** affine transform applied to all object before painting them */
-  private AffineTransform mZoomPanTransform    = new AffineTransform();
-  /** inverse transform. Allows to convert mouse click point to user space */
-  private AffineTransform mInvZoomPanTransform = new AffineTransform();
-  /** bounds of the model in user space (model) coordinates
-   * Are used to determine preferred size of the canvas (view) */
-  private Rectangle2D mUserSpaceBound = new Rectangle2D.Double(0,0,100,100);
-  
+
   //#########################################################################
   //# Class Constants
   private static final int STATE_INPUT_WIDTH = 128;
-
-  /** Maximum zoom level, in times (*100%) */
-  private static final double MAX_ZOOM = 5;   
-  /** Minimum size of the model on the screen, in pixels */
-  private static final int MIN_ZOOMED_SIZE = 40; 
 
 }
