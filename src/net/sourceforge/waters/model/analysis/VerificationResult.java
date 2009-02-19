@@ -58,6 +58,7 @@ public class VerificationResult extends AnalysisResult
     mCounterExample = counterexample;
     mTotalNumberOfAutomata = -1;
     mTotalNumberOfStates = -1.0;
+    mPeakNumberOfStates = -1.0;
     mPeakNumberOfNodes = -1;
   }
 
@@ -84,7 +85,7 @@ public class VerificationResult extends AnalysisResult
 
   /**
    * Gets the total number of states constructed by the analysis.
-   * @return The number of states, or <CODE>-1</CODE> if unknown.
+   * @return The total number of states, or <CODE>-1</CODE> if unknown.
    */
   public double getTotalNumberOfStates()
   {
@@ -92,9 +93,26 @@ public class VerificationResult extends AnalysisResult
   }
 
   /**
-   * Gets the maximum number of states nodes used during analysis.
-   * A 'node' here represents a basic unit of memory such as a state
-   * in a synchronous product or a BDD node.
+   * Gets the maximum number of states constructed by the analysis.
+   * The peak number of states should identify the size of the largest
+   * automaton constructed. For monolithic algorithms, it will be
+   * equal to the total number of states, but for compositional algorithms
+   * it may be different.
+   * @return The peak number of states, or <CODE>-1</CODE> if unknown.
+   */
+  public double getPeakNumberOfStates()
+  {
+    return mPeakNumberOfStates;
+  }
+
+  /**
+   * <P>Gets the maximum number of nodes used during analysis.</P>
+   * <P>A 'node' here represents a basic unit of memory such as a state
+   * in a synchronous product or a BDD node.</P>
+   * <P><I>Note.</I> It does not make much sense to speak of the total number
+   * of nodes in BDD-based algorithms, as the final number of nodes
+   * often is much smaller than the size of interim BDDs. Therefore,
+   * no total number of nodes will be computed.</P>
    * @return The peak number of nodes, or <CODE>-1</CODE> if unknown.
    */
   public int getPeakNumberOfNodes()
@@ -123,12 +141,24 @@ public class VerificationResult extends AnalysisResult
   }
 
   /**
+   * Specifies a value for both the peak and total number of states constructed
+   * by the analysis.
+   * @throws IllegalStateException if the total number of states has been
+   *         set by a previous call to this method.
+   */
+  public void setNumberOfStates(final double numstates)
+  {
+    setTotalNumberOfStates(numstates);
+    setPeakNumberOfStates(numstates);
+  }
+
+  /**
    * Specifies a value for the total number of states constructed by the
    * analysis.
    * @throws IllegalStateException if the total number of states has been
    *         set by a previous call to this method.
    */
-  public void setNumberOfStates(final double numstates)
+  public void setTotalNumberOfStates(final double numstates)
   {
     if (mTotalNumberOfStates < 0) {
       mTotalNumberOfStates = numstates;
@@ -140,7 +170,24 @@ public class VerificationResult extends AnalysisResult
   }
 
   /**
-   * Specifies the maximum number of states nodes used during analysis.
+   * Specifies a value for the peak number of states constructed by the
+   * analysis.
+   * @throws IllegalStateException if the total number of states has been
+   *         set by a previous call to this method.
+   */
+  public void setPeakNumberOfStates(final double numstates)
+  {
+    if (mPeakNumberOfStates < 0) {
+      mPeakNumberOfStates = numstates;
+    } else {
+      throw new IllegalStateException
+	("Trying to overwrite previously set peak number of states " +
+	 "in verification result!");
+    }
+  }
+
+  /**
+   * Specifies the maximum number of nodes used during analysis.
    * A 'node' here represents a basic unit of memory such as a state
    * in a synchronous product or a BDD node.
    * @throws IllegalStateException if the peak number of nodes has been
@@ -164,6 +211,7 @@ public class VerificationResult extends AnalysisResult
 
   private int mTotalNumberOfAutomata;
   private double mTotalNumberOfStates;
+  private double mPeakNumberOfStates;
   private int mPeakNumberOfNodes;
 
 }
