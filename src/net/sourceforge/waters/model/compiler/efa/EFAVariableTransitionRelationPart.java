@@ -87,6 +87,14 @@ class EFAVariableTransitionRelationPart
 
   //#########################################################################
   //# Simple Access
+  /**
+   * Gets the number of transitions in this part of the transition relation.
+   */
+  int size()
+  {
+    return mTransitions.size();
+  }
+
   boolean isEmpty()
   {
     return mTransitions.isEmpty();

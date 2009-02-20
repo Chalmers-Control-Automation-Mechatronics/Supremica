@@ -29,7 +29,7 @@ import net.sourceforge.waters.model.printer.ProxyPrinter;
 /**
  * A compiler-internal representation the transition relation for the EFA
  * variables associated with a given event. This is basically a collection
- * of {@link EFAVariableTransitionRelation} items, each representing the
+ * of {@link EFAVariableTransitionRelationPart} items, each representing the
  * transitions for a different variable. The overall transition relation
  * then is the Cartesian product of the individual parts.
  *
@@ -78,6 +78,24 @@ class EFAVariableTransitionRelation
 
   //#########################################################################
   //# Simple Access
+  /**
+   * Gets the number of transitions in this transition relation.
+   * This method calculates the total number of transitions needed to
+   * represent this transition relation as the sum of the transitions
+   * needed by each variable automaton. The number of synchronous product
+   * transitions is not considered.
+   */
+  int size()
+  {
+    int result = 0;
+    if (!mIsEmpty) {
+      for (final EFAVariableTransitionRelationPart part : mParts.values()) {
+        result += part.size();
+      }
+    }
+    return result;
+  }
+
   /**
    * Checks whether this transition relation is empty.
    * An empty transition relation means that the event associated with it
@@ -241,10 +259,11 @@ class EFAVariableTransitionRelation
         rel.mParts;
       final int size = parts1.size() + parts2.size();
       final Set<EFAVariable> vars = new HashSet<EFAVariable>(size);
-      final Map<EFAVariable,EFAVariableTransitionRelationPart> map =
-        new HashMap<EFAVariable,EFAVariableTransitionRelationPart>(size);
       vars.addAll(parts1.keySet());
       vars.addAll(parts2.keySet());
+      final int vsize = vars.size();
+      final Map<EFAVariable,EFAVariableTransitionRelationPart> map =
+        new HashMap<EFAVariable,EFAVariableTransitionRelationPart>(vsize);
       for (final EFAVariable var : vars) {
         final EFAVariableTransitionRelationPart part1 = parts1.get(var);
         final EFAVariableTransitionRelationPart part2 = parts2.get(var);
