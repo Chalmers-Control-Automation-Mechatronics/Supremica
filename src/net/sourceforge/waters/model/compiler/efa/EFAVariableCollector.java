@@ -10,6 +10,7 @@
 package net.sourceforge.waters.model.compiler.efa;
 
 import java.util.Collection;
+import java.util.HashSet;
 
 import net.sourceforge.waters.model.base.VisitorException;
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
@@ -79,6 +80,28 @@ class EFAVariableCollector
       mUnprimedVariables = null;
       mPrimedVariables = null;
     }
+  }
+
+  EFAVariable collectOneVariable(final SimpleExpressionProxy expr)
+  {
+    final Collection<EFAVariable> unprimed = new HashSet<EFAVariable>(1);
+    final Collection<EFAVariable> primed = new HashSet<EFAVariable>(1);
+    collectAllVariables(expr, unprimed, primed);
+    assert unprimed.size() <= 1;
+    assert primed.size() <= 1;
+    if (primed.isEmpty()) {
+      return unprimed.iterator().next();
+    } else if (unprimed.isEmpty()) {
+      final EFAVariable primedvar = primed.iterator().next();
+      final UnaryExpressionProxy primedname =
+        (UnaryExpressionProxy) primedvar.getVariableName();
+      final SimpleExpressionProxy varname = primedname.getSubTerm();
+      return mContext.getVariable(varname);
+    } else {
+      final EFAVariable var = unprimed.iterator().next();
+      assert var.isPartnerOf(primed.iterator().next());
+      return var;
+    }      
   }
 
 

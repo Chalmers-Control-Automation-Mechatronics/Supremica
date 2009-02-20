@@ -60,7 +60,7 @@ class EFATransitionRelationBuilder
     (final ConstraintList constraints)
   {
     for (final SimpleExpressionProxy literal : constraints.getConstraints()) {
-      //final EFAVariable var = mCollector.collectOneVariable(literal);
+      final EFAVariable var = mCollector.collectOneVariable(literal);
     }
     return null;
   }
