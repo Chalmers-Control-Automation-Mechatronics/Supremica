@@ -17,8 +17,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import net.sourceforge.waters.model.base.ProxyAccessor;
-import net.sourceforge.waters.model.base.ProxyAccessorByContents;
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
 import net.sourceforge.waters.model.compiler.constraint.ConstraintList;
 import net.sourceforge.waters.model.compiler.context.BindingContext;
@@ -65,12 +63,6 @@ class EFATransitionRelationBuilder
                   EFAVariableTransitionRelation>();
     mUniqueTransitionRelationParts =
       new HashMap<EFAVariableTransitionRelationPart,
-                  EFAVariableTransitionRelationPart>();
-    mCachedModifyingParts =
-      new HashMap<ProxyAccessor<SimpleExpressionProxy>,
-                  EFAVariableTransitionRelationPart>();
-    mCachedNonModifyingParts =
-      new HashMap<ProxyAccessor<SimpleExpressionProxy>,
                   EFAVariableTransitionRelationPart>();
   }
 
@@ -271,11 +263,6 @@ class EFATransitionRelationBuilder
 
     //#######################################################################
     //# Overrides
-    abstract EFAVariableTransitionRelationPart getCachedPart
-      (ProxyAccessor<SimpleExpressionProxy> accessor);
-    abstract void setCachedPart
-      (ProxyAccessor<SimpleExpressionProxy> accessor,
-       EFAVariableTransitionRelationPart part);
     abstract EFAVariableTransitionRelationPart createTransitionRelationPart()
       throws EvalException;
 
@@ -302,19 +289,6 @@ class EFATransitionRelationBuilder
 
     //#######################################################################
     //# Overrides
-    EFAVariableTransitionRelationPart getCachedPart
-      (final ProxyAccessor<SimpleExpressionProxy> accessor)
-    {
-      return mCachedNonModifyingParts.get(accessor);
-    }
-
-    void setCachedPart
-      (final ProxyAccessor<SimpleExpressionProxy> accessor,
-       final EFAVariableTransitionRelationPart part)
-    {
-      mCachedNonModifyingParts.put(accessor, part);
-    }
-   
     EFAVariableTransitionRelationPart createTransitionRelationPart()
       throws EvalException
     {
@@ -364,22 +338,50 @@ class EFATransitionRelationBuilder
 
     //#######################################################################
     //# Overrides
-    EFAVariableTransitionRelationPart getCachedPart
-      (final ProxyAccessor<SimpleExpressionProxy> accessor)
-    {
-      return mCachedModifyingParts.get(accessor);
-    }
-
-    void setCachedPart
-      (final ProxyAccessor<SimpleExpressionProxy> accessor,
-       final EFAVariableTransitionRelationPart part)
-    {
-      mCachedModifyingParts.put(accessor, part);
-    }
-    
     EFAVariableTransitionRelationPart createTransitionRelationPart()
+      throws EvalException
     {
-      return null;
+      final List<? extends SimpleExpressionProxy> values =
+        getRange().getValues();
+      final BinaryExpressionProxy eqn = getEquation();
+      final SimpleExpressionProxy unprimed = getUnprimed().getVariableName();
+      final SimpleExpressionProxy primed = getPrimed().getVariableName();
+      final EFAVariableTransitionRelationPart result =
+        new EFAVariableTransitionRelationPart();
+      if (eqn == null) {
+        for (final SimpleExpressionProxy curvalue : values) {
+          final BindingContext curcontext =
+            new SingleBindingContext(unprimed, curvalue, mContext);
+          for (final SimpleExpressionProxy nextvalue : values) {
+            final BindingContext nextcontext =
+              new SingleBindingContext(primed, nextvalue, curcontext);
+            if (evalOtherLiterals(nextcontext)) {
+              result.addTransition(curvalue, nextvalue);
+            }
+          }
+        }
+      } else {
+        final SimpleExpressionProxy innervar = eqn.getLeft();
+        final boolean forward = innervar.equalsByContents(primed);
+        final SimpleExpressionProxy outervar = forward ? unprimed : primed;
+        final SimpleExpressionProxy expr = eqn.getRight();
+        for (final SimpleExpressionProxy outervalue : values) {
+          final BindingContext outercontext =
+            new SingleBindingContext(outervar, outervalue, mContext);
+          final SimpleExpressionProxy innervalue =
+            mSimpleExpressionCompiler.eval(expr, outercontext);
+          final BindingContext innercontext =
+            new SingleBindingContext(innervar, innervalue, outercontext);
+          if (evalOtherLiterals(innercontext)) {
+            if (forward) {
+              result.addTransition(outervalue, innervalue);
+            } else {
+              result.addTransition(innervalue, outervalue);
+            }
+          }
+        }
+      }
+      return result;
     }
 
   }
@@ -399,12 +401,6 @@ class EFATransitionRelationBuilder
   private final
     Map<EFAVariableTransitionRelationPart,EFAVariableTransitionRelationPart>
     mUniqueTransitionRelationParts;
-  private final
-    Map<ProxyAccessor<SimpleExpressionProxy>,EFAVariableTransitionRelationPart>
-    mCachedNonModifyingParts;
-  private final
-    Map<ProxyAccessor<SimpleExpressionProxy>,EFAVariableTransitionRelationPart>
-    mCachedModifyingParts;
 
   private Map<EFAVariable,VariableRecord> mVariableRecords;
 
