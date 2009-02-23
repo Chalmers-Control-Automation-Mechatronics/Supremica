@@ -221,7 +221,11 @@ class EFAVariableTransitionRelationPart
           transitions.add(trans);
         }
       }
-      return new EFAVariableTransitionRelationPart(transitions);
+      if (transitions.size() == transitions1.size()) {
+        return this;
+      } else {
+        return new EFAVariableTransitionRelationPart(transitions);
+      }
     } else {
       return part.intersection(this);
     }

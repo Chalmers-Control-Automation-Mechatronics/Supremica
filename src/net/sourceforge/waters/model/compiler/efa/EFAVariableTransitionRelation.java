@@ -109,7 +109,25 @@ class EFAVariableTransitionRelation
     return mIsEmpty;
   }
 
-  void addPart(final EFAVariable var,
+  /**
+   * Returns the partial transition relation associated with a given
+   * variable or&nbsp;<CODE>null</CODE>.
+   */ 
+  EFAVariableTransitionRelationPart getPart(final EFAVariable var)
+  {
+    return mParts.get(var);
+  }
+
+  /**
+   * Adds a new part to this transition relation.
+   * @param var     The variable to which the new transition relation part
+   *                is to be associated. If the transition relation already
+   *                contains a partial relation for this variable, the old
+   *                contents will be overwritten.
+   * @param part    The new partial transition relation to be associated
+   *                to the variable.
+   */
+  void setPart(final EFAVariable var,
                final EFAVariableTransitionRelationPart part)
   {
     if (!mIsEmpty) {
