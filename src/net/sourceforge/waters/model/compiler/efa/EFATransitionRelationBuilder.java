@@ -9,6 +9,7 @@
 
 package net.sourceforge.waters.model.compiler.efa;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -64,6 +65,8 @@ class EFATransitionRelationBuilder
     mUniqueTransitionRelationParts =
       new HashMap<EFAVariableTransitionRelationPart,
                   EFAVariableTransitionRelationPart>();
+    mSubsumptionCache =
+      new HashMap<SubsumptionTestPair,SubsumptionResult>(256);
   }
 
 
@@ -84,6 +87,7 @@ class EFATransitionRelationBuilder
       int numRecords = mVariableRecords.size();
       final EFAVariableTransitionRelation result =
         new EFAVariableTransitionRelation(numRecords);
+      result.provideFormula(constraints);
       for (final VariableRecord record : mVariableRecords.values()) {
         final EFAVariable var = record.getUnprimed();
         final EFAVariableTransitionRelationPart part =
@@ -98,6 +102,53 @@ class EFATransitionRelationBuilder
     } finally {
       mVariableRecords = null;
     }
+  }
+
+  SubsumptionResult subsumptionTest(final EFAVariableTransitionRelation rel1,
+                                    final EFAVariableTransitionRelation rel2)
+  {
+    if (rel1 == rel2) {
+      return SubsumptionResult.create(SubsumptionResult.Kind.EQUALS);
+    }
+    final SubsumptionTestPair pair = new SubsumptionTestPair(rel1, rel2);
+    final SubsumptionResult cached = mSubsumptionCache.get(pair);
+    if (cached != null) {
+      return cached;
+    }
+    final SubsumptionTestPair revpair = new SubsumptionTestPair(rel2, rel1);
+    final SubsumptionResult revcached = mSubsumptionCache.get(revpair);
+    if (revcached != null) {
+      return revcached.reverse();
+    }
+    final SubsumptionResult.Kind kind = rel1.subsumptionTest(rel2);
+    final SubsumptionResult result = SubsumptionResult.create(kind);
+    EFAVariableTransitionRelation delta;
+    switch (kind) {
+    case SUBSUMES:
+      delta = rel2.difference(rel1);
+      break;
+    case SUBSUMED_BY:
+      delta = rel1.difference(rel2);
+      break;
+    default:
+      delta = null;
+      break;
+    }
+    if (delta != null) {
+      delta = getUnique(delta);
+      if (delta.getFormula() == null) {
+        if (kind == SubsumptionResult.Kind.SUBSUMES) {
+          final ConstraintList formula = buildDifferenceFormula(rel2, rel1);
+          delta.provideFormula(formula);
+        } else {
+          final ConstraintList formula = buildDifferenceFormula(rel1, rel2);
+          delta.provideFormula(formula);
+        }
+      }
+      result.setTransitionRelation(delta);
+    }
+    mSubsumptionCache.put(pair, result);
+    return result;
   }
 
 
@@ -151,6 +202,36 @@ class EFATransitionRelationBuilder
     return record;
   }
 
+  private ConstraintList buildDifferenceFormula
+    (final EFAVariableTransitionRelation rel1,
+     final EFAVariableTransitionRelation rel2)
+  {
+    final ConstraintList formula1 = rel1.getFormula();
+    final ConstraintList formula2 = rel2.getFormula();
+    final BinaryOperator andop = mOperatorTable.getAndOperator();
+    SimpleExpressionProxy conjunction = null;
+    for (final SimpleExpressionProxy literal : formula2.getConstraints()) {
+      if (!formula1.contains(literal)) {
+        if (conjunction == null) {
+          conjunction = literal;
+        } else {
+          conjunction =
+            mFactory.createBinaryExpressionProxy(andop, conjunction, literal);
+        }
+      }
+    }
+    final List<SimpleExpressionProxy> list =
+      new ArrayList<SimpleExpressionProxy>(formula1.size() + 1);
+    list.addAll(formula1.getConstraints());
+    if (conjunction != null) {
+      final UnaryOperator notop = mOperatorTable.getNotOperator();
+      final UnaryExpressionProxy negexpr =
+        mFactory.createUnaryExpressionProxy(notop, conjunction);
+      list.add(negexpr);
+    }
+    return new ConstraintList(list);
+  }
+
   private EFAVariableTransitionRelationPart getUnique
     (final EFAVariableTransitionRelationPart part)
   {
@@ -173,6 +254,7 @@ class EFATransitionRelationBuilder
       mUniqueTransitionRelations.put(rel, rel);
       return rel;
     } else {
+      unique.provideFormula(rel);
       return unique;
     }
   }
@@ -183,7 +265,7 @@ class EFATransitionRelationBuilder
   private abstract class VariableRecord {
 
     //#######################################################################
-    //# Constructors
+    //# Constructor
     VariableRecord(final EFAVariable unprimed, final EFAVariable primed)
     {
       mUnprimed = unprimed;
@@ -281,7 +363,7 @@ class EFATransitionRelationBuilder
   private class NonModifyingVariableRecord extends VariableRecord {
 
     //#######################################################################
-    //# Constructors
+    //# Constructor
     NonModifyingVariableRecord(final EFAVariable unprimed)
     {
       super(unprimed, null);
@@ -329,7 +411,7 @@ class EFATransitionRelationBuilder
   private class ModifyingVariableRecord extends VariableRecord {
 
     //#######################################################################
-    //# Constructors
+    //# Constructor
     ModifyingVariableRecord(final EFAVariable unprimed,
                             final EFAVariable primed)
     {
@@ -388,6 +470,45 @@ class EFATransitionRelationBuilder
 
 
   //#########################################################################
+  //# Inner Class SubsumptionTestPair
+  private static class SubsumptionTestPair
+  {
+
+    //#######################################################################
+    //# Constructor
+    private SubsumptionTestPair(final EFAVariableTransitionRelation rel1,
+                                final EFAVariableTransitionRelation rel2)
+    {
+      mRelation1 = rel1;
+      mRelation2 = rel2;
+    }
+
+    //#######################################################################
+    //# Overrides for Base Class java.lang.Object
+    public boolean equals(final Object other)
+    {
+      if (other != null && getClass() == other.getClass()) {
+        final SubsumptionTestPair pair = (SubsumptionTestPair) other;
+        return mRelation1 == pair.mRelation1 && mRelation2 == pair.mRelation2;
+      } else {
+        return false;
+      }
+    }
+
+    public int hashCode()
+    {
+      return mRelation1.objectHashCode() + 5 * mRelation2.objectHashCode();
+    }
+
+    //#######################################################################
+    //# Data Members
+    private final EFAVariableTransitionRelation mRelation1;
+    private final EFAVariableTransitionRelation mRelation2;
+
+  }
+
+
+  //#########################################################################
   //# Data Members
   private final ModuleProxyFactory mFactory;
   private final CompilerOperatorTable mOperatorTable;
@@ -401,6 +522,7 @@ class EFATransitionRelationBuilder
   private final
     Map<EFAVariableTransitionRelationPart,EFAVariableTransitionRelationPart>
     mUniqueTransitionRelationParts;
+  private final Map<SubsumptionTestPair,SubsumptionResult> mSubsumptionCache;
 
   private Map<EFAVariable,VariableRecord> mVariableRecords;
 

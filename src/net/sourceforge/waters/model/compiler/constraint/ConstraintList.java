@@ -103,6 +103,22 @@ public class ConstraintList
     return mConstraints.size();
   }
 
+  /**
+   * Checks whether this constraints list contains an elementary constraint
+   * equal to the given formula (using {@link
+   * net.sourceforge.waters.model.base.Proxy#equalsByContents(Proxy)
+   * equalsByContents()}).
+   */
+  public boolean contains(final SimpleExpressionProxy constraint)
+  {
+    for (final SimpleExpressionProxy current : mConstraints) {
+      if (current.equalsByContents(constraint)) {
+        return true;
+      }
+    }
+    return false;
+  }
+
 
   //#########################################################################
   //# Sorting

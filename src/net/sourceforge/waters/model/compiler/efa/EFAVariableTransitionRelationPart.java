@@ -186,22 +186,23 @@ class EFAVariableTransitionRelationPart
     }
   }
 
-  SubsumptionKind subsumptionTest(final EFAVariableTransitionRelationPart part)
+  SubsumptionResult.Kind subsumptionTest
+    (final EFAVariableTransitionRelationPart part)
   {
     final Set<EFAVariableTransition> transitions1 = mTransitions;
     final Set<EFAVariableTransition> transitions2 = part.mTransitions;
     if (transitions1.size() <= transitions2.size()) {
       if (!transitions2.containsAll(transitions1)) {
-        return SubsumptionKind.INTERSECTS;
+        return SubsumptionResult.Kind.INTERSECTS;
       } else if (transitions1.size() == transitions2.size()) {
-        return SubsumptionKind.EQUALS;
+        return SubsumptionResult.Kind.EQUALS;
       } else {
-        return SubsumptionKind.SUBSUMES;
+        return SubsumptionResult.Kind.SUBSUMES;
       }
     } else {
-      final SubsumptionKind kind = part.subsumptionTest(this);
-      if (kind == SubsumptionKind.SUBSUMES) {
-        return SubsumptionKind.SUBSUMED_BY;
+      final SubsumptionResult.Kind kind = part.subsumptionTest(this);
+      if (kind == SubsumptionResult.Kind.SUBSUMES) {
+        return SubsumptionResult.Kind.SUBSUMED_BY;
       } else {
         return kind;
       }

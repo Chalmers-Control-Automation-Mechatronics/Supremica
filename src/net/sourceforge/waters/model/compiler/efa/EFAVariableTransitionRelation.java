@@ -20,6 +20,7 @@ import java.util.Map;
 import java.util.Set;
 
 import net.sourceforge.waters.model.base.WatersRuntimeException;
+import net.sourceforge.waters.model.compiler.constraint.ConstraintList;
 import net.sourceforge.waters.model.compiler.context.CompiledRange;
 import net.sourceforge.waters.model.module.SimpleExpressionProxy;
 import net.sourceforge.waters.model.printer.ModuleProxyPrinter;
@@ -120,12 +121,12 @@ class EFAVariableTransitionRelation
 
   /**
    * Adds a new part to this transition relation.
-   * @param var     The variable to which the new transition relation part
-   *                is to be associated. If the transition relation already
-   *                contains a partial relation for this variable, the old
-   *                contents will be overwritten.
-   * @param part    The new partial transition relation to be associated
-   *                to the variable.
+   * @param var       The variable to which the new transition relation part
+   *                  is to be associated. If the transition relation already
+   *                  contains a partial relation for this variable, the old
+   *                  contents will be overwritten.
+   * @param part      The new partial transition relation to be associated
+   *                  to the variable.
    */
   void setPart(final EFAVariable var,
                final EFAVariableTransitionRelationPart part)
@@ -138,6 +139,52 @@ class EFAVariableTransitionRelation
         mParts.put(var, part);
       }
     }
+  }
+
+  /**
+   * Gets the formula associated with this transition relation.
+   * Each transition relation needs to be associated with the constraint list
+   * from which it was created. This information is used to create event names.
+   * @return A constraint list, or <CODE>null</CODE> if no formula has been
+   *         provided yet.
+   */
+  ConstraintList getFormula()
+  {
+    return mFormula;
+  }
+
+  /**
+   * Provides a new formula for this transition relation.
+   * This method overwrites the formula stored on the transition relation
+   * if the new formula is shorter than the current one, or if there is
+   * no formula stored yet.
+   * @param  formula  The new formula.
+   */
+  void provideFormula(final ConstraintList formula)
+  {
+    if (mFormula == null || formula.size() < mFormula.size()) {
+      mFormula = formula;
+    }
+  }
+
+  /**
+   * Provides a new formula for this transition relation by sharing
+   * with another transition relation.
+   * This method overwrites the formula stored on this transition relation
+   * with the formula of the given transition relation if present and shorter
+   * than the existing one.
+   */
+  void provideFormula(final EFAVariableTransitionRelation source)
+  {
+    final ConstraintList formula = source.getFormula();
+    if (formula != null) {
+      provideFormula(formula);
+    }
+  }
+
+  int objectHashCode()
+  {
+    return super.hashCode();
   }
 
 
@@ -202,20 +249,25 @@ class EFAVariableTransitionRelation
     }
   }
 
-  SubsumptionKind subsumptionTest(final EFAVariableTransitionRelation rel)
+  SubsumptionResult.Kind subsumptionTest
+    (final EFAVariableTransitionRelation rel)
   {
     if (mIsEmpty) {
-      return rel.mIsEmpty ? SubsumptionKind.EQUALS : SubsumptionKind.SUBSUMES;
+      if (rel.mIsEmpty) {
+        return SubsumptionResult.Kind.EQUALS;
+      } else {
+        return SubsumptionResult.Kind.SUBSUMES;
+      }
     } else if (rel.mIsEmpty) {
-      return SubsumptionKind.SUBSUMED_BY;
+      return SubsumptionResult.Kind.SUBSUMED_BY;
     } else {
       final Map<EFAVariable,EFAVariableTransitionRelationPart> parts1 = mParts;
       final Map<EFAVariable,EFAVariableTransitionRelationPart> parts2 =
         rel.mParts;
       int visited = 0;
-      SubsumptionKind result;
+      SubsumptionResult.Kind result;
       if (parts1.size() >= parts2.size()) {
-        result = SubsumptionKind.EQUALS;
+        result = SubsumptionResult.Kind.EQUALS;
         for (final Map.Entry<EFAVariable,EFAVariableTransitionRelationPart>
                entry : parts1.entrySet()) {
           final EFAVariable var = entry.getKey();
@@ -224,14 +276,14 @@ class EFAVariableTransitionRelation
           if (part2 == null) {
             assert part1.isAllSelfloops();
             if (part1.getTransitions().size() < var.getRange().size()) {
-              result = SubsumptionKind.SUBSUMES;
+              result = SubsumptionResult.Kind.SUBSUMES;
             }
           } else {
             visited++;
-            final SubsumptionKind kind = part1.subsumptionTest(part2);
-            result = result.combine(kind);
-            if (result == SubsumptionKind.INTERSECTS) {
-              return SubsumptionKind.INTERSECTS;
+            final SubsumptionResult.Kind kind = part1.subsumptionTest(part2);
+            result = SubsumptionResult.combine(result, kind);
+            if (result == SubsumptionResult.Kind.INTERSECTS) {
+              return SubsumptionResult.Kind.INTERSECTS;
             }
           }
         }
@@ -243,9 +295,10 @@ class EFAVariableTransitionRelation
               final EFAVariableTransitionRelationPart part2 = entry.getValue();
               assert part2.isAllSelfloops();
               if (part2.getTransitions().size() < var.getRange().size()) {
-                result = result.combine(SubsumptionKind.SUBSUMED_BY);
-                if (result == SubsumptionKind.INTERSECTS) {
-                  return SubsumptionKind.INTERSECTS;
+                result = SubsumptionResult.combine
+                  (result, SubsumptionResult.Kind.SUBSUMED_BY);
+                if (result == SubsumptionResult.Kind.INTERSECTS) {
+                  return SubsumptionResult.Kind.INTERSECTS;
                 }
               }
               if (++visited == parts2.size()) {
@@ -256,8 +309,8 @@ class EFAVariableTransitionRelation
         }
       } else {
         result = rel.subsumptionTest(this);
-        if (result == SubsumptionKind.SUBSUMES) {
-          result = SubsumptionKind.SUBSUMED_BY;
+        if (result == SubsumptionResult.Kind.SUBSUMES) {
+          result = SubsumptionResult.Kind.SUBSUMED_BY;
         }
       }
       return result;
@@ -374,5 +427,6 @@ class EFAVariableTransitionRelation
   //# Data Members
   private final Map<EFAVariable,EFAVariableTransitionRelationPart> mParts;
   private boolean mIsEmpty;
+  private ConstraintList mFormula;
 
 }
