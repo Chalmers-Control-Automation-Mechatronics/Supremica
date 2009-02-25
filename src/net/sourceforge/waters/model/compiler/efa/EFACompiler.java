@@ -218,10 +218,10 @@ public class EFACompiler
             groups.add(group);
           }
         }
+        Collections.sort(groups);
         final int size = groups.size();
         final List<EFAAutomatonTransition> parts =
           new ArrayList<EFAAutomatonTransition>(size);
-        Collections.sort(groups);
         collectEventPartition(edecl, groups, parts, 0, propagator);
         for (final ConstraintList guard : edecl.getGuards()) {
           final EFAEvent event = edecl.getEvent(guard);

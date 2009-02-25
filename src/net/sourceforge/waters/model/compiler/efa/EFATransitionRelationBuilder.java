@@ -12,12 +12,14 @@ package net.sourceforge.waters.model.compiler.efa;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.IdentityHashMap;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
 import net.sourceforge.waters.model.compiler.constraint.ConstraintList;
 import net.sourceforge.waters.model.compiler.context.BindingContext;
@@ -71,8 +73,87 @@ class EFATransitionRelationBuilder
 
 
   //#########################################################################
-  //# Invocation
-  EFAVariableTransitionRelation buildTransitionRelation
+  //# Building Events
+  void initEventRecords()
+  {
+    mEventRecords =
+      new IdentityHashMap<EFAVariableTransitionRelation,EventRecord>();
+  }
+
+  void addEventRecord(final EFAEventDecl edecl,
+                      final ConstraintList constraints,
+                      final Collection<Proxy> locations)
+    throws EvalException
+  {
+    final EFAVariableTransitionRelation rel =
+      buildTransitionRelation(edecl, constraints);
+    final EventRecord found = mEventRecords.get(rel);
+    if (found != null) {
+      found.addSourceLocations(locations);
+    } else {
+      final EventRecord record = new EventRecord(rel, locations);
+      final List<EFAVariableTransitionRelation> victims =
+        new LinkedList<EFAVariableTransitionRelation>();
+      final List<EventRecord> open = new LinkedList<EventRecord>();
+      open.add(record);
+      while (!open.isEmpty()) {
+        EventRecord record1 = open.remove(0);
+        final EFAVariableTransitionRelation rel1 =
+          record1.getTransitionRelation();
+        final Collection<Proxy> locations1 = record1.getSourceLocations();
+        loop:
+        for (final Map.Entry<EFAVariableTransitionRelation,EventRecord> entry :
+               mEventRecords.entrySet()) {
+          final EFAVariableTransitionRelation rel2 = entry.getKey();
+          final EventRecord record2 = entry.getValue();
+          final SubsumptionResult subsumption = subsumptionTest(rel1, rel2);
+          switch (subsumption.getKind()) {
+          case SUBSUMES:
+            victims.add(rel2);
+            final Collection<Proxy> locations2 = record2.getSourceLocations();
+            record1.addSourceLocations(locations2);
+            final EFAVariableTransitionRelation rel3 =
+              subsumption.getTransitionRelation();
+            final EventRecord record3 = new EventRecord(rel3, locations2);
+            open.add(record3);
+            break;
+          case SUBSUMED_BY:
+            record2.addSourceLocations(locations1);
+            final EFAVariableTransitionRelation rel4 =
+              subsumption.getTransitionRelation();
+            final EventRecord record4 = new EventRecord(rel4, locations1);
+            open.add(record4);
+            record1 = null;
+            break loop;
+          default:
+            break;
+          }
+        }
+        for (final EFAVariableTransitionRelation victim : victims) {
+          mEventRecords.remove(victim);
+        }
+        victims.clear();
+        if (record1 != null) {
+          mEventRecords.put(rel, record1);
+        }
+      }
+    }
+  }
+
+  Collection<EventRecord> getEventRecords()
+  {
+    return mEventRecords.values();
+  }
+
+  void clearEventRecords()
+  {
+    mEventRecords = null;
+  }
+
+
+  //#########################################################################
+  //# Building Transition Relations
+  private EFAVariableTransitionRelation buildTransitionRelation
     (final EFAEventDecl edecl, final ConstraintList constraints)
     throws EvalException
   {
@@ -104,12 +185,10 @@ class EFATransitionRelationBuilder
     }
   }
 
-  SubsumptionResult subsumptionTest(final EFAVariableTransitionRelation rel1,
-                                    final EFAVariableTransitionRelation rel2)
+  private SubsumptionResult subsumptionTest
+    (final EFAVariableTransitionRelation rel1,
+     final EFAVariableTransitionRelation rel2)
   {
-    if (rel1 == rel2) {
-      return SubsumptionResult.create(SubsumptionResult.Kind.EQUALS);
-    }
     final SubsumptionTestPair pair = new SubsumptionTestPair(rel1, rel2);
     final SubsumptionResult cached = mSubsumptionCache.get(pair);
     if (cached != null) {
@@ -122,6 +201,7 @@ class EFATransitionRelationBuilder
     }
     final SubsumptionResult.Kind kind = rel1.subsumptionTest(rel2);
     final SubsumptionResult result = SubsumptionResult.create(kind);
+    mSubsumptionCache.put(pair, result);
     EFAVariableTransitionRelation delta;
     switch (kind) {
     case SUBSUMES:
@@ -131,23 +211,19 @@ class EFATransitionRelationBuilder
       delta = rel1.difference(rel2);
       break;
     default:
-      delta = null;
-      break;
+      return result;
     }
-    if (delta != null) {
-      delta = getUnique(delta);
-      if (delta.getFormula() == null) {
-        if (kind == SubsumptionResult.Kind.SUBSUMES) {
-          final ConstraintList formula = buildDifferenceFormula(rel2, rel1);
-          delta.provideFormula(formula);
-        } else {
-          final ConstraintList formula = buildDifferenceFormula(rel1, rel2);
-          delta.provideFormula(formula);
-        }
+    delta = getUnique(delta);
+    if (delta.getFormula() == null) {
+      if (kind == SubsumptionResult.Kind.SUBSUMES) {
+        final ConstraintList formula = buildDifferenceFormula(rel2, rel1);
+        delta.provideFormula(formula);
+      } else {
+        final ConstraintList formula = buildDifferenceFormula(rel1, rel2);
+        delta.provideFormula(formula);
       }
-      result.setTransitionRelation(delta);
     }
-    mSubsumptionCache.put(pair, result);
+    result.setTransitionRelation(delta);
     return result;
   }
 
@@ -257,6 +333,44 @@ class EFATransitionRelationBuilder
       unique.provideFormula(rel);
       return unique;
     }
+  }
+
+
+  //#########################################################################
+  //# Inner Class EventRecord
+  static class EventRecord {
+
+    //#######################################################################
+    //# Constructor
+    private EventRecord(final EFAVariableTransitionRelation rel,
+                        final Collection<Proxy> locations)
+    {
+      mTransitionRelation = rel;
+      mSourceLocations = new HashSet<Proxy>(locations);
+    }
+
+    //#######################################################################
+    //# Simple Access
+    EFAVariableTransitionRelation getTransitionRelation()
+    {
+      return mTransitionRelation;
+    }
+
+    Collection<Proxy> getSourceLocations()
+    {
+      return mSourceLocations;
+    }
+
+    void addSourceLocations(final Collection<Proxy> locations)
+    {
+      mSourceLocations.addAll(locations);
+    }
+
+    //#######################################################################
+    //# Data Members
+    private final EFAVariableTransitionRelation mTransitionRelation;
+    private final Collection<Proxy> mSourceLocations;
+
   }
 
 
@@ -524,6 +638,7 @@ class EFATransitionRelationBuilder
     mUniqueTransitionRelationParts;
   private final Map<SubsumptionTestPair,SubsumptionResult> mSubsumptionCache;
 
+  private Map<EFAVariableTransitionRelation,EventRecord> mEventRecords;
   private Map<EFAVariable,VariableRecord> mVariableRecords;
 
 }
