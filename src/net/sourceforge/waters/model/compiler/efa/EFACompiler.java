@@ -222,7 +222,8 @@ public class EFACompiler
         final int size = groups.size();
         final List<EFAAutomatonTransition> parts =
           new ArrayList<EFAAutomatonTransition>(size);
-        collectEventPartition(edecl, groups, parts, 0, propagator);
+        final List<Proxy> locations = new ArrayList<Proxy>(size);
+        collectEventPartition(edecl, groups, parts, 0, propagator, locations);
         for (final ConstraintList guard : edecl.getGuards()) {
           final EFAEvent event = edecl.getEvent(guard);
           final String suffix = mEventNameBuilder.getNameSuffix(guard);
@@ -238,10 +239,12 @@ public class EFACompiler
      final List<EFAAutomatonTransitionGroup> groups,
      final List<EFAAutomatonTransition> parts,
      final int index,
-     final ConstraintPropagator parent)
+     final ConstraintPropagator parent,
+     final List<Proxy> locations)
     throws EvalException
   {
     if (index < groups.size()) {
+      final int numlocs = locations.size();
       final EFAAutomatonTransitionGroup group = groups.get(index);
       for (final EFAAutomatonTransition part : group.getPartialTransitions()) {
         final ConstraintPropagator propagator =
@@ -251,18 +254,25 @@ public class EFACompiler
         propagator.propagate();
         if (!propagator.isUnsatisfiable()) {
           parts.add(part);
-          collectEventPartition(edecl, groups, parts, index + 1, propagator);
+          if (!guard.isTrue()) {
+            locations.addAll(part.getSourceLocations());
+          }
+          collectEventPartition
+            (edecl, groups, parts, index + 1, propagator, locations);
           parts.remove(index);
+          for (int i = locations.size() - 1; i >= numlocs; i--) {
+            locations.remove(i);
+          }
         }
       }
     } else {
-      splitEventPartition(edecl, parts, parent);
+      splitEventPartition(edecl, parent, locations);
     }
   }
 
   private void splitEventPartition(final EFAEventDecl edecl,
-                                   final List<EFAAutomatonTransition> parts,
-                                   final ConstraintPropagator parent)
+                                   final ConstraintPropagator parent,
+                                   final Collection<Proxy> locations)
     throws EvalException
   {
     final ConstraintList guard = parent.getAllConstraints();
@@ -270,7 +280,7 @@ public class EFACompiler
     final VariableContext context = parent.getContext();
     final SplitCandidate split = mSplitComputer.proposeSplit(guard, context);
     if (split == null) {
-      createEvent(edecl, parts, parent);
+      createEvent(edecl, parent, locations);
     } else {
       for (final SimpleExpressionProxy expr :
              split.getSplitExpressions(mFactory, mOperatorTable)) {
@@ -282,32 +292,27 @@ public class EFACompiler
         propagator.propagate();
         // System.err.println(" = " + propagator.getAllConstraints());
         if (!propagator.isUnsatisfiable()) {
-          splitEventPartition(edecl, parts, propagator);
+          splitEventPartition(edecl, propagator, locations);
         }
       }
     }
   }
 
   private void createEvent(final EFAEventDecl edecl,
-                           final List<EFAAutomatonTransition> parts,
-                           final ConstraintPropagator propagator)
+                           final ConstraintPropagator propagator,
+                           final Collection<Proxy> locations)
     throws EvalException
   {
     final ConstraintList guard = propagator.getAllConstraints();
     if (mVariableAutomatonBuilder.isSatisfiable(edecl, guard)) {
       final EFAEvent event = edecl.createEvent(guard);
-      for (final EFAAutomatonTransition part : parts) {
-        final ConstraintList pguard = part.getGuard();
-        if (!pguard.isTrue()) {
-          for (final Proxy location : part.getSourceLocations()) {
-            Collection<EFAEvent> collection = mEFAEventMap.get(location);
-            if (collection == null) {
-              collection = new LinkedList<EFAEvent>();
-              mEFAEventMap.put(location, collection);
-            }
-            collection.add(event);
-          }
+      for (final Proxy location : locations) {
+        Collection<EFAEvent> collection = mEFAEventMap.get(location);
+        if (collection == null) {
+          collection = new LinkedList<EFAEvent>();
+          mEFAEventMap.put(location, collection);
         }
+        collection.add(event);
       }
       mEventNameBuilder.addGuard(guard);
     }

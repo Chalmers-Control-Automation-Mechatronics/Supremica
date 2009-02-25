@@ -87,6 +87,9 @@ class EFATransitionRelationBuilder
   {
     final EFAVariableTransitionRelation rel =
       buildTransitionRelation(edecl, constraints);
+    if (rel.isEmpty()) {
+      return;
+    }
     final EventRecord found = mEventRecords.get(rel);
     if (found != null) {
       found.addSourceLocations(locations);
@@ -96,12 +99,12 @@ class EFATransitionRelationBuilder
         new LinkedList<EFAVariableTransitionRelation>();
       final List<EventRecord> open = new LinkedList<EventRecord>();
       open.add(record);
+      outer:
       while (!open.isEmpty()) {
-        EventRecord record1 = open.remove(0);
+        final EventRecord record1 = open.remove(0);
         final EFAVariableTransitionRelation rel1 =
           record1.getTransitionRelation();
         final Collection<Proxy> locations1 = record1.getSourceLocations();
-        loop:
         for (final Map.Entry<EFAVariableTransitionRelation,EventRecord> entry :
                mEventRecords.entrySet()) {
           final EFAVariableTransitionRelation rel2 = entry.getKey();
@@ -123,8 +126,8 @@ class EFATransitionRelationBuilder
               subsumption.getTransitionRelation();
             final EventRecord record4 = new EventRecord(rel4, locations1);
             open.add(record4);
-            record1 = null;
-            break loop;
+            assert victims.isEmpty();
+            continue outer;
           default:
             break;
           }
@@ -133,9 +136,7 @@ class EFATransitionRelationBuilder
           mEventRecords.remove(victim);
         }
         victims.clear();
-        if (record1 != null) {
-          mEventRecords.put(rel, record1);
-        }
+        mEventRecords.put(rel, record1);
       }
     }
   }
