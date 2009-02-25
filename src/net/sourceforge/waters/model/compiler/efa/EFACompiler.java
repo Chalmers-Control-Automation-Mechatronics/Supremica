@@ -152,6 +152,10 @@ public class EFACompiler
       mRootContext = new EFAModuleContext(mInputModule);
       mSplitComputer =
         new SplitComputer(mFactory, mOperatorTable, mRootContext);
+      mTransitionRelationBuilder =
+        new EFATransitionRelationBuilder(mFactory, mOperatorTable, 
+                                         mRootContext,
+                                         mSimpleExpressionCompiler);
       mEventNameBuilder =
         new EFAEventNameBuilder(mFactory, mOperatorTable, mRootContext);
       mVariableAutomatonBuilder =
@@ -182,6 +186,7 @@ public class EFACompiler
     } finally {
       mRootContext = null;
       mSplitComputer = null;
+      mTransitionRelationBuilder = null;
       mEventNameBuilder = null;
       mVariableAutomatonBuilder = null;
     }
@@ -207,6 +212,7 @@ public class EFACompiler
     mEFAEventMap = new HashMap<Proxy,Collection<EFAEvent>>();
     for (final EFAEventDecl edecl : mEFAEventDeclMap.values()) {
       if (!edecl.isBlocked()) {
+        mTransitionRelationBuilder.initEventRecords();
         mEventNameBuilder.restart();
         final Collection<EFAAutomatonTransitionGroup> allgroups =
           edecl.getTransitionGroups();
@@ -229,6 +235,7 @@ public class EFACompiler
           final String suffix = mEventNameBuilder.getNameSuffix(guard);
           event.setSuffix(suffix);
         }
+        mTransitionRelationBuilder.clearEventRecords();
         mEventNameBuilder.clear();
       }
     }
@@ -302,8 +309,9 @@ public class EFACompiler
                            final ConstraintPropagator propagator,
                            final Collection<Proxy> locations)
     throws EvalException
-  {
+  {      
     final ConstraintList guard = propagator.getAllConstraints();
+    //mTransitionRelationBuilder.addEventRecord(edecl, guard, locations);
     if (mVariableAutomatonBuilder.isSatisfiable(edecl, guard)) {
       final EFAEvent event = edecl.createEvent(guard);
       for (final Proxy location : locations) {
@@ -1140,6 +1148,7 @@ public class EFACompiler
 
   private EFAModuleContext mRootContext;
   private SplitComputer mSplitComputer;
+  private EFATransitionRelationBuilder mTransitionRelationBuilder;
   private EFAEventNameBuilder mEventNameBuilder;
   private EFAVariableAutomatonBuilder mVariableAutomatonBuilder;
 

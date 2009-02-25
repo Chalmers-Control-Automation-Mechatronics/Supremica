@@ -174,10 +174,12 @@ class EFATransitionRelationBuilder
         final EFAVariable var = record.getUnprimed();
         final EFAVariableTransitionRelationPart part =
           record.createTransitionRelationPart();
-        final EFAVariableTransitionRelationPart unique = getUnique(part);
-        result.setPart(var, unique);
-        if (result.isEmpty()) {
-          break;
+        if (part != null) {
+          final EFAVariableTransitionRelationPart unique = getUnique(part);
+          result.setPart(var, unique);
+          if (result.isEmpty()) {
+            break;
+          }
         }
       }
       return getUnique(result);
@@ -237,43 +239,29 @@ class EFATransitionRelationBuilder
     final Collection<EFAVariable> unprimedSet = new HashSet<EFAVariable>(1);
     final Collection<EFAVariable> primedSet = new HashSet<EFAVariable>(1);
     mCollector.collectAllVariables(literal, unprimedSet, primedSet);
+    // Note: 'primed' is the unprimed version of the primed variable!
     assert unprimedSet.size() <= 1;
     assert primedSet.size() <= 1;
-    EFAVariable unprimed;
-    EFAVariable primed;
+    final EFAVariable var;
     if (primedSet.isEmpty()) {
-      unprimed = unprimedSet.iterator().next();
-      primed = null;
-    } else if (unprimedSet.isEmpty()) {
-      primed = primedSet.iterator().next();
-      final UnaryExpressionProxy primedname =
-        (UnaryExpressionProxy) primed.getVariableName();
-      final SimpleExpressionProxy varname = primedname.getSubTerm();
-      unprimed = mContext.getVariable(varname);
+      var = unprimedSet.iterator().next();
     } else {
-      unprimed = unprimedSet.iterator().next();
-      primed = primedSet.iterator().next();
-      assert primed.isPartnerOf(unprimed);
+      var = primedSet.iterator().next();
     }
-    VariableRecord record = mVariableRecords.get(unprimed);
+    VariableRecord record = mVariableRecords.get(var);
     if (record == null) {
-      if (edecl.isEventVariable(unprimed)) {
-        if (primed == null) {
-          final UnaryOperator nextop = mOperatorTable.getNextOperator();
-          final SimpleIdentifierProxy varname =
-            (SimpleIdentifierProxy) unprimed.getVariableName();
-          final UnaryExpressionProxy nextvarname =
-            mFactory.createUnaryExpressionProxy(nextop, varname);
-          primed = mContext.getVariable(nextvarname);
-        }
-        record = new ModifyingVariableRecord(unprimed, primed);
+      if (edecl.isEventVariable(var)) {
+        final UnaryOperator nextop = mOperatorTable.getNextOperator();
+        final SimpleIdentifierProxy varname =
+          (SimpleIdentifierProxy) var.getVariableName();
+        final UnaryExpressionProxy nextvarname =
+          mFactory.createUnaryExpressionProxy(nextop, varname);
+        final EFAVariable primedvar = mContext.getVariable(nextvarname);
+        record = new ModifyingVariableRecord(var, primedvar);
       } else {
-        assert primed == null;
-        record = new NonModifyingVariableRecord(unprimed);
+        record = new NonModifyingVariableRecord(var);
       }
-      mVariableRecords.put(unprimed, record);
-    } else {
-      assert primed == record.getPrimed();
+      mVariableRecords.put(var, record);
     }
     record.addLiteral(literal);
     return record;
@@ -515,7 +503,11 @@ class EFATransitionRelationBuilder
           result.addTransition(value, value);
         }
       }
-      return result;
+      if (result.size() == range.size()) {
+        return null;
+      } else {
+        return result;
+      }
     }
 
   }
@@ -538,8 +530,8 @@ class EFATransitionRelationBuilder
     EFAVariableTransitionRelationPart createTransitionRelationPart()
       throws EvalException
     {
-      final List<? extends SimpleExpressionProxy> values =
-        getRange().getValues();
+      final CompiledRange range = getRange();
+      final List<? extends SimpleExpressionProxy> values = range.getValues();
       final BinaryExpressionProxy eqn = getEquation();
       final SimpleExpressionProxy unprimed = getUnprimed().getVariableName();
       final SimpleExpressionProxy primed = getPrimed().getVariableName();
@@ -578,7 +570,12 @@ class EFATransitionRelationBuilder
           }
         }
       }
-      return result;
+      final int rangesize = range.size();
+      if (result.size() == rangesize * rangesize) {
+        return null;
+      } else {
+        return result;
+      }
     }
 
   }

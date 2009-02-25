@@ -216,7 +216,7 @@ class EFAVariableTransitionRelation
 
   public int hashCode()
   {
-    return mParts.hashCode();
+    return mIsEmpty ? 0 : mParts.hashCode();
   }
 
 
@@ -274,10 +274,7 @@ class EFAVariableTransitionRelation
           final EFAVariableTransitionRelationPart part1 = entry.getValue();
           final EFAVariableTransitionRelationPart part2 = parts2.get(var);
           if (part2 == null) {
-            assert part1.isAllSelfloops();
-            if (part1.getTransitions().size() < var.getRange().size()) {
-              result = SubsumptionResult.Kind.SUBSUMES;
-            }
+            result = SubsumptionResult.Kind.SUBSUMES;
           } else {
             visited++;
             final SubsumptionResult.Kind kind = part1.subsumptionTest(part2);
@@ -293,13 +290,10 @@ class EFAVariableTransitionRelation
             final EFAVariable var = entry.getKey();
             if (parts1.get(var) == null) {
               final EFAVariableTransitionRelationPart part2 = entry.getValue();
-              assert part2.isAllSelfloops();
-              if (part2.getTransitions().size() < var.getRange().size()) {
-                result = SubsumptionResult.combine
-                  (result, SubsumptionResult.Kind.SUBSUMED_BY);
-                if (result == SubsumptionResult.Kind.INTERSECTS) {
-                  return SubsumptionResult.Kind.INTERSECTS;
-                }
+              result = SubsumptionResult.combine
+                (result, SubsumptionResult.Kind.SUBSUMED_BY);
+              if (result == SubsumptionResult.Kind.INTERSECTS) {
+                return SubsumptionResult.Kind.INTERSECTS;
               }
               if (++visited == parts2.size()) {
                 break;

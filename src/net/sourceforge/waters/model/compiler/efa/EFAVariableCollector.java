@@ -45,6 +45,11 @@ class EFAVariableCollector
 
   //#########################################################################
   //# Invocation
+  /**
+   * Collects all unprimed variables in the given expression.
+   * @param  expr     The expression to be searched.
+   * @param  vars     Found variables will be added to this collection.
+   */
   void collectUnprimedVariables(final SimpleExpressionProxy expr,
                                 final Collection<EFAVariable> vars)
   {
@@ -56,6 +61,12 @@ class EFAVariableCollector
     }
   }
 
+  /**
+   * Collects all primed variables in the given expression.
+   * @param  expr     The expression to be searched.
+   * @param  vars     Found variables will be added in their non-primed form
+   *                  to this collection.
+   */
   void collectPrimedVariables(final SimpleExpressionProxy expr,
                               final Collection<EFAVariable> vars)
   {
@@ -67,6 +78,13 @@ class EFAVariableCollector
     }
   }
 
+  /**
+   * Collects all variables in the given expression.
+   * @param  expr     The expression to be searched.
+   * @param  unprimed Unprimed variables will be added to this collection.
+   * @param  primed   Primed variables will be added in their non-primed form
+   *                  to this collection.
+   */
   void collectAllVariables(final SimpleExpressionProxy expr,
                            final Collection<EFAVariable> unprimed,
                            final Collection<EFAVariable> primed)
