@@ -104,13 +104,6 @@ class EFAVariable implements Comparable<EFAVariable> {
     return mEventList;
   }
 
-  void addEvents(final EFAEventDecl edecl)
-  {
-    for (final EFAEvent event : edecl.getEvents()) {
-      addEvent(event);
-    }
-  }
-
   void addEvent(final EFAEvent event)
   {
     if (mEventSet.add(event)) {

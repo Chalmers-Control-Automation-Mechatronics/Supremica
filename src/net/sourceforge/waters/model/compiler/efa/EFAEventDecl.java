@@ -12,6 +12,7 @@ package net.sourceforge.waters.model.compiler.efa;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.Map;
 import java.util.Set;
 
@@ -47,7 +48,7 @@ class EFAEventDecl {
     mVariables = new HashSet<EFAVariable>();
     mTransitionMap =
       new HashMap<SimpleComponentProxy,EFAAutomatonTransitionGroup>();
-    mEventMap = new HashMap<ConstraintList,EFAEvent>();
+    mEvents = new LinkedList<EFAEvent>();
   }
 
 
@@ -77,7 +78,7 @@ class EFAEventDecl {
   {
     mVariables.clear();
     mTransitionMap.clear();
-    mEventMap.clear();
+    mEvents.clear();
     mIsBlocked = true;
   }
 
@@ -123,29 +124,14 @@ class EFAEventDecl {
     mVariables.addAll(vars);
   }
 
-  EFAEvent getEvent(final ConstraintList cond)
+  void addEvent(final EFAEvent event)
   {
-    return mEventMap.get(cond);
-  }
-
-  Collection<ConstraintList> getGuards()
-  {
-    return mEventMap.keySet();
+    mEvents.add(event);
   }
 
   Collection<EFAEvent> getEvents()
   {
-    return mEventMap.values();
-  }
-
-  EFAEvent createEvent(final ConstraintList guard)
-  {
-    EFAEvent event = mEventMap.get(guard);
-    if (event == null) {
-      event = new EFAEvent(this, guard);
-      mEventMap.put(guard, event);
-    }
-    return event;
+    return mEvents;
   }
 
 
@@ -174,12 +160,11 @@ class EFAEventDecl {
   private final Map<SimpleComponentProxy,EFAAutomatonTransitionGroup>
     mTransitionMap;
   /**
-   * The map of individual events to generated from this event group.  For
+   * The set of individual events to be generated from this event group. For
    * each guard condition, representing a set of possible combination of
-   * variable values, an event may be generated. The map is needed since
-   * the compiler may come up with the same guard more than once.
+   * variable values, an event may be generated.
    */
-  private final Map<ConstraintList,EFAEvent> mEventMap;
+  private final Collection<EFAEvent> mEvents;
   /**
    * A flag indicating that the event has been recognised as globally blocked.
    * In some cases, the EFA compiler can identify that an event is globally

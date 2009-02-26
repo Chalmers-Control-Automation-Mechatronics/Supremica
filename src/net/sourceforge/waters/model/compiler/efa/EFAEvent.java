@@ -33,10 +33,10 @@ class EFAEvent {
 
   //#########################################################################
   //# Constructor
-  EFAEvent(final EFAEventDecl edecl, final ConstraintList guards)
+  EFAEvent(final EFAEventDecl edecl, final EFAVariableTransitionRelation rel)
   {
     mEFAEventDecl = edecl;
-    mGuard = guards;
+    mTransitionRelation = rel;
   }
 
 
@@ -47,9 +47,9 @@ class EFAEvent {
     return mEFAEventDecl;
   }
 
-  ConstraintList getGuard()
+  EFAVariableTransitionRelation getTransitionRelation()
   {
-    return mGuard;
+    return mTransitionRelation;
   }
 
   IdentifierProxy createIdentifier(final ModuleProxyFactory factory)
@@ -93,7 +93,7 @@ class EFAEvent {
   //#########################################################################
   //# Data Members
   private final EFAEventDecl mEFAEventDecl;
-  private final ConstraintList mGuard;
+  private final EFAVariableTransitionRelation mTransitionRelation;
   private String mSuffix;
 
 }

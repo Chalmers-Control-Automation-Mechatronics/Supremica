@@ -11,7 +11,6 @@ package net.sourceforge.waters.model.compiler.efa;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -22,17 +21,11 @@ import java.util.TreeMap;
 
 import net.sourceforge.waters.model.base.ProxyAccessor;
 import net.sourceforge.waters.model.base.ProxyAccessorByContents;
-import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
-import net.sourceforge.waters.model.compiler.constraint.ConstraintList;
 import net.sourceforge.waters.model.compiler.context.BindingContext;
 import net.sourceforge.waters.model.compiler.context.CompiledRange;
-import net.sourceforge.waters.model.compiler.context.OccursChecker;
 import net.sourceforge.waters.model.compiler.context.SimpleExpressionCompiler;
 import net.sourceforge.waters.model.compiler.context.SingleBindingContext;
-import net.sourceforge.waters.model.expr.BinaryOperator;
 import net.sourceforge.waters.model.expr.EvalException;
-import net.sourceforge.waters.model.expr.UnaryOperator;
-import net.sourceforge.waters.model.module.BinaryExpressionProxy;
 import net.sourceforge.waters.model.module.EdgeProxy;
 import net.sourceforge.waters.model.module.GraphProxy;
 import net.sourceforge.waters.model.module.IdentifierProxy;
@@ -43,7 +36,6 @@ import net.sourceforge.waters.model.module.PlainEventListProxy;
 import net.sourceforge.waters.model.module.SimpleComponentProxy;
 import net.sourceforge.waters.model.module.SimpleExpressionProxy;
 import net.sourceforge.waters.model.module.SimpleNodeProxy;
-import net.sourceforge.waters.model.module.UnaryExpressionProxy;
 import net.sourceforge.waters.model.module.VariableComponentProxy;
 import net.sourceforge.waters.model.module.VariableMarkingProxy;
 
@@ -66,12 +58,10 @@ class EFAVariableAutomatonBuilder
   //# Constructor
   EFAVariableAutomatonBuilder
     (final ModuleProxyFactory factory,
-     final CompilerOperatorTable optable,
      final SimpleExpressionCompiler compiler,
      final BindingContext context)
   {
     mFactory = factory;
-    mOperatorTable = optable;
     mSimpleExpressionCompiler = compiler;
     mRootContext = context;
   }
@@ -87,10 +77,7 @@ class EFAVariableAutomatonBuilder
       mBlockedEvents = new LinkedList<IdentifierProxy>();
       constructVariableRange();
       for (final EFAEvent event : var.getEFAEvents()) {
-        mEvent = event;
-        final EFAEventDecl edecl = event.getEFAEventDecl();
-        final ConstraintList guard = event.getGuard();
-	constructEventTransitions(edecl, guard);
+	constructEventTransitions(event);
       }
       constructEdges();
       final VariableComponentProxy comp =
@@ -111,35 +98,8 @@ class EFAVariableAutomatonBuilder
       mBlockedEvents = null;
       mNodeList = null;
       mNodeMap = null;
-      mTransitions = null;
+      mEdgeMap = null;
       mEdgeList = null;
-      mEvent = null;
-    }
-  }
-
-  boolean isSatisfiable(final EFAEventDecl edecl,
-                        final ConstraintList guard)
-    throws EvalException
-  {
-    for (final EFAVariable var : edecl.getVariables()) {
-      if (!isSatisfiable(var, edecl, guard)) {
-        return false;
-      }
-    }
-    return true;
-  }
-
-  boolean isSatisfiable(final EFAVariable var,
-                        final EFAEventDecl edecl,
-                        final ConstraintList guard)
-    throws EvalException
-  {
-    try {
-      mVariable = var;
-      mEvent = null;
-      return constructEventTransitions(edecl, guard);
-    } finally {
-      mVariable = null;
     }
   }
 
@@ -169,7 +129,7 @@ class EFAVariableAutomatonBuilder
     mNodeMap =
       new HashMap<ProxyAccessor<SimpleExpressionProxy>,SimpleNodeProxy>
       (rangesize);
-    mTransitions = new TreeMap<EFAVariableTransition,EFAVariableTransition>();
+    mEdgeMap = new TreeMap<EFAVariableEdge,EFAVariableEdge>();
     for (final SimpleExpressionProxy value : range.getValues()) {
       final String name = value.toString();
       final BindingContext context =
@@ -208,145 +168,32 @@ class EFAVariableAutomatonBuilder
     }
   }
 
-  private boolean constructEventTransitions(final EFAEventDecl edecl,
-                                            final ConstraintList guard)
+  private void constructEventTransitions(final EFAEvent event)
     throws EvalException
   {
-    final OccursChecker checker = OccursChecker.getInstance();
-    final BinaryOperator eqop = mOperatorTable.getEqualsOperator();
-    final IdentifierProxy varname = mVariable.getComponent().getIdentifier();
-    final Collection<SimpleExpressionProxy> literals = guard.getConstraints();
-    final int numliterals = literals.size();
-    final List<SimpleExpressionProxy> tests =
-      new ArrayList<SimpleExpressionProxy>(numliterals);
-    SimpleExpressionProxy curexpr = null;
-    SimpleExpressionProxy nextexpr = null;
-    for (final SimpleExpressionProxy literal : literals) {
-      if (checker.occurs(varname, literal)) {
-	if (literal instanceof BinaryExpressionProxy) {
-	  final BinaryExpressionProxy binary = (BinaryExpressionProxy) literal;
-	  final BinaryOperator op = binary.getOperator();
-	  if (op == eqop) {
-	    final SimpleExpressionProxy lhs = binary.getLeft();
-	    final SimpleExpressionProxy rhs = binary.getRight();
-	    if (isNextVarName(lhs, varname)) {
-	      if (nextexpr == null && !checker.occurs(lhs, rhs)) {
-		nextexpr = rhs;
-		continue;
-	      }
-	    } else if (isNextVarName(rhs, varname)) {
-	      if (nextexpr == null && !checker.occurs(rhs, lhs)) {
-		nextexpr = lhs;
-		continue;
-	      }
-	    } else if (lhs.equalsByContents(varname)) {
-	      if (curexpr == null && !checker.occurs(varname, rhs)) {
-		curexpr = rhs;
-		continue;
-	      }
-	    } else if (rhs.equalsByContents(varname)) {
-	      if (curexpr == null && !checker.occurs(varname, lhs)) {
-		curexpr = lhs;
-		continue;
-	      }
-	    }
-	  }
-	}
-	tests.add(literal);
+    final EFAVariableTransitionRelation rel = event.getTransitionRelation();
+    final EFAVariableTransitionRelationPart part = rel.getPart(mVariable);
+    if (part != null) {
+      boolean hastrans = false;
+      for (final EFAVariableTransition trans : part.getTransitions()) {
+        final SimpleExpressionProxy source = trans.getSource();
+        final SimpleExpressionProxy target = trans.getTarget();
+        createTransition(source, target, event);
+        hastrans = true;
+      }
+      if (!hastrans) {
+        final IdentifierProxy ident = event.createIdentifier(mFactory);
+        mBlockedEvents.add(ident);
       }
     }
-
-    final CompiledRange range = mVariable.getRange();
-    final List<? extends SimpleExpressionProxy> values = range.getValues();
-    final List<? extends SimpleExpressionProxy> curvalues;
-    if (curexpr != null) {
-      final SimpleExpressionProxy curvalue =
-	mSimpleExpressionCompiler.eval(curexpr, mRootContext);
-      if (range.contains(curvalue)) {
-        curvalues = Collections.singletonList(curvalue);
-      } else {
-        curvalues = Collections.emptyList();
-      }
-    } else {
-      curvalues = values;
-    }
-    boolean hastrans = false;
-    int selfloops = 0;
-    if (edecl.isEventVariable(mVariable)) {
-      // In event alphabet --- transitions depend on current and next state.
-      final UnaryOperator nextop = mOperatorTable.getNextOperator();
-      final UnaryExpressionProxy nextvarname =
-	mFactory.createUnaryExpressionProxy(nextop, varname);
-      for (final SimpleExpressionProxy curvalue : curvalues) {
-	final BindingContext curcontext =
-	  new SingleBindingContext(varname, curvalue, mRootContext);
-	final List<? extends SimpleExpressionProxy> nextvalues;
-	if (nextexpr != null) {
-	  final SimpleExpressionProxy nextvalue =
-	    mSimpleExpressionCompiler.eval(nextexpr, curcontext);
-          if (!range.contains(nextvalue)) {
-            continue;
-          }
-	  nextvalues = Collections.singletonList(nextvalue);
-	} else {
-	  nextvalues = values;
-	}
-	for (final SimpleExpressionProxy nextvalue : nextvalues) {
-	  final BindingContext nextcontext =
-	    new SingleBindingContext(nextvarname, nextvalue, curcontext);
-	  if (evalGuards(tests, nextcontext)) {
-            if (mEvent == null) {
-              return true;
-            } else {
-              createTransition(curvalue, nextvalue, mEvent);
-              hastrans = true;
-              if (selfloops >= 0) {
-                if (curvalue.equalsByContents(nextvalue)) {
-                  selfloops++;
-                } else {
-                  selfloops = -1;
-                }
-              }
-            }
-	  }
-	}
-      }
-    } else {
-      // Not in event alphabet --- transitions depend on current state only.
-      for (final SimpleExpressionProxy curvalue : curvalues) {
-	final BindingContext curcontext =
-	  new SingleBindingContext(varname, curvalue, mRootContext);
-	if (evalGuards(tests, curcontext)) {
-          if (mEvent == null) {
-            return true;
-          } else {
-            createTransition(curvalue, curvalue, mEvent);
-            hastrans = true;
-            selfloops++;
-          }
-	}
-      }
-    }
-
-    if (mEvent == null) {
-      // nothing
-    } else if (!hastrans) {
-      final IdentifierProxy ident = mEvent.createIdentifier(mFactory);
-      mBlockedEvents.add(ident);
-    } else if (selfloops == range.size()) {
-      for (final SimpleExpressionProxy value : values) {
-        removeLastSelfloop(value);
-      }
-    }
-    return hastrans;
   }
 
   private void constructEdges()
   {
-    final int numedges = mTransitions.size();
+    final int numedges = mEdgeMap.size();
     mEdgeList = new ArrayList<EdgeProxy>(numedges);
-    for (final EFAVariableTransition trans : mTransitions.keySet()) {
-      final EdgeProxy edge = trans.createEdgeProxy();
+    for (final EFAVariableEdge vedge : mEdgeMap.keySet()) {
+      final EdgeProxy edge = vedge.createEdgeProxy();
       mEdgeList.add(edge);
     }
   }
@@ -361,67 +208,31 @@ class EFAVariableAutomatonBuilder
     return mNodeMap.get(accessor);
   }
 
-  private boolean isNextVarName(final SimpleExpressionProxy expr,
-				final IdentifierProxy varname)
-  {
-    if (expr instanceof UnaryExpressionProxy) {
-      final UnaryExpressionProxy unary = (UnaryExpressionProxy) expr;
-      return
-	unary.getOperator() == mOperatorTable.getNextOperator() &&
-	unary.getSubTerm().equalsByContents(varname);
-    } else {
-      return false;
-    }
-  }
-
-  private boolean evalGuards(final List<SimpleExpressionProxy> guards,
-			     final BindingContext context)
-    throws EvalException
-  {
-    for (final SimpleExpressionProxy guard : guards) {
-      final SimpleExpressionProxy gvalue =
-	mSimpleExpressionCompiler.eval(guard, context);
-      if (!mSimpleExpressionCompiler.getBooleanValue(gvalue)) {
-	return false;
-      }
-    }
-    return true;
-  }
-
   private void createTransition(final SimpleExpressionProxy source,
 				final SimpleExpressionProxy target,
 				final EFAEvent event)
   {
-    EFAVariableTransition trans = new EFAVariableTransition(source, target);
-    final EFAVariableTransition found = mTransitions.get(trans);
+    EFAVariableEdge edge = new EFAVariableEdge(source, target);
+    final EFAVariableEdge found = mEdgeMap.get(edge);
     if (found == null) {
-      mTransitions.put(trans, trans);
+      mEdgeMap.put(edge, edge);
     } else {
-      trans = found;
+      edge = found;
     }
     final IdentifierProxy ident = event.createIdentifier(mFactory);
-    trans.addLabel(ident);
+    edge.addLabel(ident);
   }
-
-  private void removeLastSelfloop(final SimpleExpressionProxy state)
-  {
-    final EFAVariableTransition trans =
-      new EFAVariableTransition(state, state);
-    final EFAVariableTransition found = mTransitions.get(trans);
-    found.removeLastTransition();
-  }
-
 
 
   //#########################################################################
-  //# Inner Class EFAVariableTransition
-  private class EFAVariableTransition
-    implements Comparable<EFAVariableTransition>
+  //# Inner Class EFAVariableEdge
+  private class EFAVariableEdge
+    implements Comparable<EFAVariableEdge>
   {
 
     //#######################################################################
     //# Constructor
-    private EFAVariableTransition(final SimpleExpressionProxy source,
+    private EFAVariableEdge(final SimpleExpressionProxy source,
 				  final SimpleExpressionProxy target)
     {
       mSourceValue = source;
@@ -431,26 +242,26 @@ class EFAVariableAutomatonBuilder
 
     //#######################################################################
     //# Hashing and Comparing
-    public int compareTo(final EFAVariableTransition trans)
+    public int compareTo(final EFAVariableEdge edge)
     {
       final CompiledRange range = mVariable.getRange();
       final int source1 = range.indexOf(mSourceValue);
-      final int source2 = range.indexOf(trans.mSourceValue);
+      final int source2 = range.indexOf(edge.mSourceValue);
       if (source1 != source2) {
         return source1 - source2;
       }
       final int target1 = range.indexOf(mTargetValue);
-      final int target2 = range.indexOf(trans.mTargetValue);
+      final int target2 = range.indexOf(edge.mTargetValue);
       return target1 - target2;
     }
 
     public boolean equals(final Object other)
     {
       if (other.getClass() == getClass()) {
-	final EFAVariableTransition trans = (EFAVariableTransition) other;
+	final EFAVariableEdge edge = (EFAVariableEdge) other;
 	return
-	  mSourceValue.equalsByContents(trans.mSourceValue) &&
-	  mTargetValue.equalsByContents(trans.mTargetValue);
+	  mSourceValue.equalsByContents(edge.mSourceValue) &&
+	  mTargetValue.equalsByContents(edge.mTargetValue);
       } else {
 	return false;
       }
@@ -471,12 +282,6 @@ class EFAVariableAutomatonBuilder
 	mLabels = new LinkedList<IdentifierProxy>();
       }
       mLabels.add(label);
-    }
-
-    private void removeLastTransition()
-    {
-      final int index = mLabels.size() - 1;
-      mLabels.remove(index);
     }
 
     private EdgeProxy createEdgeProxy()
@@ -501,7 +306,6 @@ class EFAVariableAutomatonBuilder
   //#########################################################################
   //# Data Members
   private final ModuleProxyFactory mFactory;
-  private final CompilerOperatorTable mOperatorTable;
   private final SimpleExpressionCompiler mSimpleExpressionCompiler;
   private final BindingContext mRootContext;
 
@@ -510,7 +314,6 @@ class EFAVariableAutomatonBuilder
   private List<SimpleNodeProxy> mNodeList;
   private List<EdgeProxy> mEdgeList;
   private Map<ProxyAccessor<SimpleExpressionProxy>,SimpleNodeProxy> mNodeMap;
-  private Map<EFAVariableTransition,EFAVariableTransition> mTransitions;
-  private EFAEvent mEvent;
+  private Map<EFAVariableEdge,EFAVariableEdge> mEdgeMap;
 
 }

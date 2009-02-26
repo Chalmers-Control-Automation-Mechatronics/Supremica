@@ -112,12 +112,6 @@ import net.sourceforge.waters.xsd.module.ScopeKind;
  *     event is the set of all the variables updated in some guard/action
  *     block whose edge includes the event.</LI>
  * <LI>Compute event partitionings.</LI>
- * <LI>Assign events to variables.<BR>
- *     The actual event alphabets of the variable automata to be generated
- *     are computed as follows. Each variable&nbsp;<I>v</I> automaton
- *     depends on all instances of any event whose event variable set
- *     contains&nbsp;<I>v</I>, and furthermore on all event instances
- *     whose associated guard mentions&nbsp;<I>v</I>.</LI>
  * <LI>Build output automata.</LI>
  * </OL>
  *
@@ -156,10 +150,8 @@ public class EFACompiler
         new EFATransitionRelationBuilder(mFactory, mOperatorTable, 
                                          mRootContext,
                                          mSimpleExpressionCompiler);
-      mEventNameBuilder =
-        new EFAEventNameBuilder(mFactory, mOperatorTable, mRootContext);
       mVariableAutomatonBuilder =
-        new EFAVariableAutomatonBuilder(mFactory, mOperatorTable,
+        new EFAVariableAutomatonBuilder(mFactory,
                                         mSimpleExpressionCompiler,
                                         mRootContext);
       // Pass 1 ...
@@ -172,10 +164,7 @@ public class EFACompiler
       computeEventPartitions();
       // Pass 4 ...
       final Pass4Visitor pass4 = new Pass4Visitor();
-      pass4.assignEventsToVariables();
-      // Pass 5 ...
-      final Pass5Visitor pass5 = new Pass5Visitor();
-      return (ModuleProxy) pass5.visitModuleProxy(mInputModule);
+      return (ModuleProxy) pass4.visitModuleProxy(mInputModule);
     } catch (final VisitorException exception) {
       final Throwable cause = exception.getCause();
       if (cause instanceof EvalException) {
@@ -187,8 +176,8 @@ public class EFACompiler
       mRootContext = null;
       mSplitComputer = null;
       mTransitionRelationBuilder = null;
-      mEventNameBuilder = null;
       mVariableAutomatonBuilder = null;
+      mEFAEventMap = null;
     }
   }
 
@@ -209,11 +198,12 @@ public class EFACompiler
     final BinaryOperator andop = mOperatorTable.getAndOperator();
     final ConstraintPropagator propagator =
       new ConstraintPropagator(mFactory, mOperatorTable, mRootContext);
+    final EFAEventNameBuilder namer =
+      new EFAEventNameBuilder(mFactory, mOperatorTable, mRootContext);
     mEFAEventMap = new HashMap<Proxy,Collection<EFAEvent>>();
     for (final EFAEventDecl edecl : mEFAEventDeclMap.values()) {
       if (!edecl.isBlocked()) {
         mTransitionRelationBuilder.initEventRecords();
-        mEventNameBuilder.restart();
         final Collection<EFAAutomatonTransitionGroup> allgroups =
           edecl.getTransitionGroups();
         final int allsize = allgroups.size();
@@ -225,20 +215,52 @@ public class EFACompiler
           }
         }
         Collections.sort(groups);
-        final int size = groups.size();
-        final List<EFAAutomatonTransition> parts =
-          new ArrayList<EFAAutomatonTransition>(size);
-        final List<Proxy> locations = new ArrayList<Proxy>(size);
-        collectEventPartition(edecl, groups, parts, 0, propagator, locations);
-        for (final ConstraintList guard : edecl.getGuards()) {
-          final EFAEvent event = edecl.getEvent(guard);
-          final String suffix = mEventNameBuilder.getNameSuffix(guard);
-          event.setSuffix(suffix);
+        collectEventPartition(edecl, groups, propagator);
+        namer.restart();
+        for (final EFATransitionRelationBuilder.EventRecord record :
+               mTransitionRelationBuilder.getEventRecords()) {
+          final EFAVariableTransitionRelation rel =
+            record.getTransitionRelation();
+          final EFAEvent event = new EFAEvent(edecl, rel);
+          edecl.addEvent(event);
+          for (final Proxy location : record.getSourceLocations()) {
+            Collection<EFAEvent> collection = mEFAEventMap.get(location);
+            if (collection == null) {
+              collection = new LinkedList<EFAEvent>();
+              mEFAEventMap.put(location, collection);
+            }
+            collection.add(event);
+          }
+          for (final EFAVariable var : rel.getVariables()) {
+            var.addEvent(event);
+          }
+          final ConstraintList formula = rel.getFormula();
+          namer.addGuard(formula);
         }
         mTransitionRelationBuilder.clearEventRecords();
-        mEventNameBuilder.clear();
+        for (final EFAEvent event : edecl.getEvents()) {
+          final EFAVariableTransitionRelation rel =
+            event.getTransitionRelation();
+          final ConstraintList formula = rel.getFormula();
+          final String suffix = namer.getNameSuffix(formula);
+          event.setSuffix(suffix);
+        }
+        namer.clear();
       }
     }
+  }
+
+  private void collectEventPartition
+    (final EFAEventDecl edecl,
+     final List<EFAAutomatonTransitionGroup> groups,
+     final ConstraintPropagator propagator)
+    throws EvalException
+  {
+    final int size = groups.size();
+    final List<EFAAutomatonTransition> parts =
+      new ArrayList<EFAAutomatonTransition>(size);
+    final List<Proxy> locations = new ArrayList<Proxy>(size);
+    collectEventPartition(edecl, groups, parts, 0, propagator, locations);
   }
 
   private void collectEventPartition
@@ -311,19 +333,7 @@ public class EFACompiler
     throws EvalException
   {      
     final ConstraintList guard = propagator.getAllConstraints();
-    //mTransitionRelationBuilder.addEventRecord(edecl, guard, locations);
-    if (mVariableAutomatonBuilder.isSatisfiable(edecl, guard)) {
-      final EFAEvent event = edecl.createEvent(guard);
-      for (final Proxy location : locations) {
-        Collection<EFAEvent> collection = mEFAEventMap.get(location);
-        if (collection == null) {
-          collection = new LinkedList<EFAEvent>();
-          mEFAEventMap.put(location, collection);
-        }
-        collection.add(event);
-      }
-      mEventNameBuilder.addGuard(guard);
-    }
+    mTransitionRelationBuilder.addEventRecord(edecl, guard, locations);
   }
 
 
@@ -813,83 +823,8 @@ public class EFACompiler
   {
 
     //#######################################################################
-    //# Invocation
-    private void assignEventsToVariables()
-    {
-      try {
-        final Collection<EFAEventDecl> edecls = mEFAEventDeclMap.values();
-        for (final EFAEventDecl edecl : edecls) {
-          for (final EFAVariable var : edecl.getVariables()) {
-            var.addEvents(edecl);
-          }
-        }
-        for (final EFAEventDecl edecl : edecls) {
-          for (final EFAEvent event : edecl.getEvents()) {
-            mCurrentEvent = event;
-            final ConstraintList guard = event.getGuard();
-            for (final SimpleExpressionProxy expr : guard.getConstraints()) {
-              expr.acceptVisitor(this);
-            }
-          }
-        }
-      } catch (final VisitorException exception) {
-        throw exception.getRuntimeException();
-      } finally {
-        mCurrentEvent = null;
-      }
-    }
-
-    //#######################################################################
-    //# Interface net.sourceforge.waters.model.module.ModuleProxyVisitor
-    public Object visitBinaryExpressionProxy
-      (final BinaryExpressionProxy expr)
-      throws VisitorException
-    {
-      final SimpleExpressionProxy lhs = expr.getLeft();
-      lhs.acceptVisitor(this);
-      final SimpleExpressionProxy rhs = expr.getRight();
-      return rhs.acceptVisitor(this);
-    }
-
-    public Object visitIdentifierProxy(final IdentifierProxy ident)
-    {
-      final EFAVariable var = mRootContext.getVariable(ident);
-      if (var != null) {
-        var.addEvent(mCurrentEvent);
-      }
-      return null;
-    }
-
-    public Object visitSimpleExpressionProxy(final SimpleExpressionProxy expr)
-    {
-      return null;
-    }
-
-    public Object visitUnaryExpressionProxy(final UnaryExpressionProxy expr)
-      throws VisitorException
-    {
-      final SimpleExpressionProxy subterm = expr.getSubTerm();
-      return subterm.acceptVisitor(this);
-    }
-
-    //#######################################################################
-    //# Data Members
-    private EFAEvent mCurrentEvent;
-
-  }
-
-
-  //#########################################################################
-  //# Inner Class Pass5Visitor
-  /**
-   * The visitor implementing the fifth pass of EFA compilation.
-   */
-  private class Pass5Visitor extends AbstractModuleProxyVisitor
-  {
-
-    //#######################################################################
     //# Constructor
-    private Pass5Visitor()
+    private Pass4Visitor()
     {
       mCloner = mFactory.getCloner();
     }
@@ -1149,7 +1084,6 @@ public class EFACompiler
   private EFAModuleContext mRootContext;
   private SplitComputer mSplitComputer;
   private EFATransitionRelationBuilder mTransitionRelationBuilder;
-  private EFAEventNameBuilder mEventNameBuilder;
   private EFAVariableAutomatonBuilder mVariableAutomatonBuilder;
 
   // Pass 2

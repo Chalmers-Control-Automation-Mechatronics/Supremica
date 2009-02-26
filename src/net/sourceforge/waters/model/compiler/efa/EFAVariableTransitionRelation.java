@@ -111,6 +111,18 @@ class EFAVariableTransitionRelation
   }
 
   /**
+   * Returns the set of variables affected by this event.
+   * @return The set of all variables changed by this event, or
+   *         on whose value the enablement of this event depends.
+   *         This represents exactly the variable automata in whose
+   *         alphabet the event is to appear.
+   */
+  Set<EFAVariable> getVariables()
+  {
+    return mParts.keySet();
+  }
+
+  /**
    * Returns the partial transition relation associated with a given
    * variable.
    * @return The partial transition relation associated with the given
