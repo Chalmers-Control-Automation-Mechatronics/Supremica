@@ -189,22 +189,26 @@ class EFAVariableTransitionRelationPart
   SubsumptionResult.Kind subsumptionTest
     (final EFAVariableTransitionRelationPart part)
   {
-    final Set<EFAVariableTransition> transitions1 = mTransitions;
-    final Set<EFAVariableTransition> transitions2 = part.mTransitions;
-    if (transitions1.size() <= transitions2.size()) {
-      if (!transitions2.containsAll(transitions1)) {
-        return SubsumptionResult.Kind.INTERSECTS;
-      } else if (transitions1.size() == transitions2.size()) {
-        return SubsumptionResult.Kind.EQUALS;
-      } else {
+    if (part == null) {
+      if (isAllSelfloops()) {
         return SubsumptionResult.Kind.SUBSUMES;
+      } else {
+        return SubsumptionResult.Kind.INTERSECTS;
       }
     } else {
-      final SubsumptionResult.Kind kind = part.subsumptionTest(this);
-      if (kind == SubsumptionResult.Kind.SUBSUMES) {
-        return SubsumptionResult.Kind.SUBSUMED_BY;
+      final Set<EFAVariableTransition> transitions1 = mTransitions;
+      final Set<EFAVariableTransition> transitions2 = part.mTransitions;
+      if (transitions1.size() <= transitions2.size()) {
+        if (!transitions2.containsAll(transitions1)) {
+          return SubsumptionResult.Kind.INTERSECTS;
+        } else if (transitions1.size() == transitions2.size()) {
+          return SubsumptionResult.Kind.EQUALS;
+        } else {
+          return SubsumptionResult.Kind.SUBSUMES;
+        }
       } else {
-        return kind;
+        final SubsumptionResult.Kind kind = part.subsumptionTest(this);
+        return SubsumptionResult.reverse(kind);
       }
     }
   }

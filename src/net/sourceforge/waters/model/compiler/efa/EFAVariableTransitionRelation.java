@@ -112,7 +112,10 @@ class EFAVariableTransitionRelation
 
   /**
    * Returns the partial transition relation associated with a given
-   * variable or&nbsp;<CODE>null</CODE>.
+   * variable.
+   * @return The partial transition relation associated with the given
+   *         variable, or <CODE>null</CODE> to indicate that the variable
+   *         is left unchanged by this transition.
    */ 
   EFAVariableTransitionRelationPart getPart(final EFAVariable var)
   {
@@ -123,12 +126,12 @@ class EFAVariableTransitionRelation
    * Adds a new part to this transition relation.
    * @param var       The variable to which the new transition relation part
    *                  is to be associated. If the transition relation already
-   *                  contains a partial relation for this variable, the old
-   *                  contents will be overwritten.
+   *                  contains a partial relation for this variable, the 
+   *                  behaviour is undefined.
    * @param part      The new partial transition relation to be associated
    *                  to the variable.
    */
-  void setPart(final EFAVariable var,
+  void addPart(final EFAVariable var,
                final EFAVariableTransitionRelationPart part)
   {
     if (!mIsEmpty) {
@@ -265,23 +268,20 @@ class EFAVariableTransitionRelation
       final Map<EFAVariable,EFAVariableTransitionRelationPart> parts2 =
         rel.mParts;
       int visited = 0;
-      SubsumptionResult.Kind result;
       if (parts1.size() >= parts2.size()) {
-        result = SubsumptionResult.Kind.EQUALS;
+        SubsumptionResult.Kind result = SubsumptionResult.Kind.EQUALS;
         for (final Map.Entry<EFAVariable,EFAVariableTransitionRelationPart>
                entry : parts1.entrySet()) {
           final EFAVariable var = entry.getKey();
           final EFAVariableTransitionRelationPart part1 = entry.getValue();
           final EFAVariableTransitionRelationPart part2 = parts2.get(var);
-          if (part2 == null) {
-            result = SubsumptionResult.Kind.SUBSUMES;
-          } else {
+          final SubsumptionResult.Kind kind = part1.subsumptionTest(part2);
+          result = SubsumptionResult.combine(result, kind);
+          if (result == SubsumptionResult.Kind.INTERSECTS) {
+            return SubsumptionResult.Kind.INTERSECTS;
+          }
+          if (part2 != null) {
             visited++;
-            final SubsumptionResult.Kind kind = part1.subsumptionTest(part2);
-            result = SubsumptionResult.combine(result, kind);
-            if (result == SubsumptionResult.Kind.INTERSECTS) {
-              return SubsumptionResult.Kind.INTERSECTS;
-            }
           }
         }
         if (visited < parts2.size()) {
@@ -290,8 +290,10 @@ class EFAVariableTransitionRelation
             final EFAVariable var = entry.getKey();
             if (parts1.get(var) == null) {
               final EFAVariableTransitionRelationPart part2 = entry.getValue();
-              result = SubsumptionResult.combine
-                (result, SubsumptionResult.Kind.SUBSUMED_BY);
+              final SubsumptionResult.Kind rkind = part2.subsumptionTest(null);
+              final SubsumptionResult.Kind kind =
+                SubsumptionResult.reverse(rkind);
+              result = SubsumptionResult.combine(result, kind);
               if (result == SubsumptionResult.Kind.INTERSECTS) {
                 return SubsumptionResult.Kind.INTERSECTS;
               }
@@ -301,13 +303,11 @@ class EFAVariableTransitionRelation
             }
           }
         }
+        return result;
       } else {
-        result = rel.subsumptionTest(this);
-        if (result == SubsumptionResult.Kind.SUBSUMES) {
-          result = SubsumptionResult.Kind.SUBSUMED_BY;
-        }
+        final SubsumptionResult.Kind result = rel.subsumptionTest(this);
+        return SubsumptionResult.reverse(result);
       }
-      return result;
     }
   }
 

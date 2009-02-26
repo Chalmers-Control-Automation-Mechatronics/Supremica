@@ -62,13 +62,11 @@ class SubsumptionResult {
 
   SubsumptionResult reverse()
   {
-    switch (mKind) {
-    case SUBSUMED_BY:
-      return new SubsumptionResult(Kind.SUBSUMES, mTransitionRelation);
-    case SUBSUMES:
-      return new SubsumptionResult(Kind.SUBSUMED_BY, mTransitionRelation);
-    default:
+    final Kind kind = reverse(mKind);
+    if (kind == mKind) {
       return this;
+    } else {
+      return new SubsumptionResult(kind, mTransitionRelation);
     }
   }
 
@@ -101,6 +99,18 @@ class SubsumptionResult {
     default:
       throw new IllegalArgumentException
 	("Unknown subsumption kind '" + kind1 + "'!");
+    }
+  }
+
+  static Kind reverse(final Kind kind)
+  {
+    switch (kind) {
+    case SUBSUMED_BY:
+      return Kind.SUBSUMES;
+    case SUBSUMES:
+      return Kind.SUBSUMED_BY;
+    default:
+      return kind;
     }
   }
 

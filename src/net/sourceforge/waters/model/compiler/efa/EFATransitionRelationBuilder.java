@@ -171,15 +171,26 @@ class EFATransitionRelationBuilder
         new EFAVariableTransitionRelation(numRecords);
       result.provideFormula(constraints);
       for (final VariableRecord record : mVariableRecords.values()) {
-        final EFAVariable var = record.getUnprimed();
         final EFAVariableTransitionRelationPart part =
           record.createTransitionRelationPart();
         if (part != null) {
           final EFAVariableTransitionRelationPart unique = getUnique(part);
-          result.setPart(var, unique);
+          final EFAVariable var = record.getUnprimed();
+          result.addPart(var, unique);
           if (result.isEmpty()) {
             break;
           }
+        }
+      }
+      for (final EFAVariable var : edecl.getVariables()) {
+        if (!mVariableRecords.containsKey(var)) {
+          final EFAVariable primedvar = getPrimedVariable(var);
+          final VariableRecord record =
+            new ModifyingVariableRecord(var, primedvar);
+          final EFAVariableTransitionRelationPart part =
+            record.createTransitionRelationPart();
+          final EFAVariableTransitionRelationPart unique = getUnique(part);
+          result.addPart(var, unique);
         }
       }
       return getUnique(result);
@@ -251,12 +262,7 @@ class EFATransitionRelationBuilder
     VariableRecord record = mVariableRecords.get(var);
     if (record == null) {
       if (edecl.isEventVariable(var)) {
-        final UnaryOperator nextop = mOperatorTable.getNextOperator();
-        final SimpleIdentifierProxy varname =
-          (SimpleIdentifierProxy) var.getVariableName();
-        final UnaryExpressionProxy nextvarname =
-          mFactory.createUnaryExpressionProxy(nextop, varname);
-        final EFAVariable primedvar = mContext.getVariable(nextvarname);
+        final EFAVariable primedvar = getPrimedVariable(var);
         record = new ModifyingVariableRecord(var, primedvar);
       } else {
         record = new NonModifyingVariableRecord(var);
@@ -295,6 +301,16 @@ class EFATransitionRelationBuilder
       list.add(negexpr);
     }
     return new ConstraintList(list);
+  }
+
+  private EFAVariable getPrimedVariable(final EFAVariable var)
+  {
+    final UnaryOperator nextop = mOperatorTable.getNextOperator();
+    final SimpleIdentifierProxy varname =
+      (SimpleIdentifierProxy) var.getVariableName();
+    final UnaryExpressionProxy nextvarname =
+      mFactory.createUnaryExpressionProxy(nextop, varname);
+    return mContext.getVariable(nextvarname);
   }
 
   private EFAVariableTransitionRelationPart getUnique
@@ -570,8 +586,7 @@ class EFATransitionRelationBuilder
           }
         }
       }
-      final int rangesize = range.size();
-      if (result.size() == rangesize * rangesize) {
+      if (result.isAllSelfloops() && result.size() == range.size()) {
         return null;
       } else {
         return result;
