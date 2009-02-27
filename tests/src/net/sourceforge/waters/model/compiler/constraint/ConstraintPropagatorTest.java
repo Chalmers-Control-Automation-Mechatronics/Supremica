@@ -129,6 +129,13 @@ public class ConstraintPropagatorTest extends TestCase
     testPropagate(constraints, constraints);
   }
 
+  public void testPropagate_a_and_a_or_b()
+    throws EvalException, ParseException
+  {
+    final String[] constraints = {"a", "a | b"};
+    testPropagate(constraints, constraints);
+  }
+
   public void testPropagate_negliteral_1()
     throws EvalException, ParseException
   {

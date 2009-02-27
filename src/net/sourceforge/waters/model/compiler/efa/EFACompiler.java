@@ -14,9 +14,9 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.Map;
 import java.util.Set;
 
@@ -212,6 +212,7 @@ public class EFACompiler
         for (final EFAAutomatonTransitionGroup group : allgroups) {
           if (!group.isTrivial()) {
             groups.add(group);
+            //System.err.println(edecl.getEventDecl().getName() + " < " + group);
           }
         }
         Collections.sort(groups);
@@ -221,6 +222,7 @@ public class EFACompiler
                mTransitionRelationBuilder.getSortedEventRecords()) {
           final EFAVariableTransitionRelation rel =
             record.getTransitionRelation();
+          //System.err.println(edecl.getEventDecl().getName() + " > " + rel);
           final EFAEvent event = new EFAEvent(edecl, rel);
           edecl.addEvent(event);
           for (final Proxy location : record.getSourceLocations()) {
@@ -305,7 +307,7 @@ public class EFACompiler
     throws EvalException
   {
     final ConstraintList guard = parent.getAllConstraints();
-    // System.err.println(guard);
+    //System.err.println(guard);
     final VariableContext context = parent.getContext();
     final SplitCandidate split = mSplitComputer.proposeSplit(guard, context);
     if (split == null) {
@@ -313,13 +315,13 @@ public class EFACompiler
     } else {
       for (final SimpleExpressionProxy expr :
              split.getSplitExpressions(mFactory, mOperatorTable)) {
-        // System.err.println(" + " + expr);
+        //System.err.println(" + " + expr);
         final ConstraintPropagator propagator =
           new ConstraintPropagator(parent);
         split.recall(propagator);
         propagator.addConstraint(expr);
         propagator.propagate();
-        // System.err.println(" = " + propagator.getAllConstraints());
+        //System.err.println(" = " + propagator.getAllConstraints());
         if (!propagator.isUnsatisfiable()) {
           splitEventPartition(edecl, propagator, locations);
         }
@@ -333,6 +335,7 @@ public class EFACompiler
     throws EvalException
   {      
     final ConstraintList guard = propagator.getAllConstraints();
+    //System.err.println(edecl.getEventDecl().getName() + " . " + guard);
     mTransitionRelationBuilder.addEventRecord(edecl, guard, locations);
   }
 
@@ -645,10 +648,10 @@ public class EFACompiler
                               final boolean catchAll)
       throws EvalException
     {
-      final Collection<EFAAutomatonTransition> parts =
-        group.getPartialTransitions();
+      final List<EFAAutomatonTransition> parts =
+        new ArrayList<EFAAutomatonTransition>(group.getPartialTransitions());
       final int size = parts.size();
-      final Iterator<EFAAutomatonTransition> iter = parts.iterator();
+      final ListIterator<EFAAutomatonTransition> iter = parts.listIterator();
       final List<EFAAutomatonTransition> selected =
         new ArrayList<EFAAutomatonTransition>(size);
       final Collection<EFAAutomatonTransition> result =
@@ -661,7 +664,7 @@ public class EFACompiler
       group.setPartialTransitions(result);
     }
 
-    private void makeDisjoint(final Iterator<EFAAutomatonTransition> iter,
+    private void makeDisjoint(final ListIterator<EFAAutomatonTransition> iter,
                               final List<EFAAutomatonTransition> selected,
                               final Collection<EFAAutomatonTransition> result,
                               final ConstraintPropagator parent,
@@ -686,6 +689,7 @@ public class EFACompiler
         if (!propagator.isUnsatisfiable()) {
           makeDisjoint(iter, selected, result, propagator, catchAll);
         }
+        iter.previous();
       } else if (catchAll != null || !selected.isEmpty()) {
         final ConstraintList guard = parent.getAllConstraints(false);
         final EFAAutomatonTransition trans = new EFAAutomatonTransition(guard);

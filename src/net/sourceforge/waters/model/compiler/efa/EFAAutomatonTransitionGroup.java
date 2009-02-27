@@ -11,6 +11,7 @@ package net.sourceforge.waters.model.compiler.efa;
 
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 
 import net.sourceforge.waters.model.base.Proxy;
@@ -96,6 +97,25 @@ class EFAAutomatonTransitionGroup
       final ConstraintList guard = trans.getGuard();
       mPartialTransitions.put(guard, trans);
     }
+  }
+
+
+  //#########################################################################
+  //# Overrides for java.lang.Object
+  public String toString()
+  {
+    final StringBuffer buffer = new StringBuffer("{");
+    final Iterator<ConstraintList> iter =
+      mPartialTransitions.keySet().iterator();
+    while (iter.hasNext()) {
+      final ConstraintList guard = iter.next();
+      buffer.append(guard.toString());
+      if (iter.hasNext()) {
+        buffer.append("; ");
+      }
+    }
+    buffer.append("}");
+    return buffer.toString();
   }
 
 
