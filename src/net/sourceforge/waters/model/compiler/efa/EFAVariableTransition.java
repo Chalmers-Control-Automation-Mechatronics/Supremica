@@ -11,8 +11,10 @@ package net.sourceforge.waters.model.compiler.efa;
 
 import java.io.IOException;
 import java.io.StringWriter;
+import java.util.Comparator;
 
 import net.sourceforge.waters.model.base.WatersRuntimeException;
+import net.sourceforge.waters.model.expr.ExpressionComparator;
 import net.sourceforge.waters.model.module.SimpleExpressionProxy;
 import net.sourceforge.waters.model.printer.ModuleProxyPrinter;
 import net.sourceforge.waters.model.printer.ProxyPrinter;
@@ -27,7 +29,7 @@ import net.sourceforge.waters.model.printer.ProxyPrinter;
  * @author Robi Malik
  */
 
-class EFAVariableTransition
+class EFAVariableTransition implements Comparable<EFAVariableTransition>
 {
 
   //#########################################################################
@@ -92,6 +94,21 @@ class EFAVariableTransition
   public int hashCode()
   {
     return 5 * mSource.hashCodeByContents() + mTarget.hashCodeByContents();
+  }
+
+
+  //#########################################################################
+  //# Interface java.lang.Comparable
+  public int compareTo(final EFAVariableTransition trans)
+  {
+    final Comparator<SimpleExpressionProxy> comparator =
+      ExpressionComparator.getInstance();
+    final int result = comparator.compare(mSource, trans.mSource);
+    if (result != 0) {
+      return result;
+    } else {
+      return comparator.compare(mTarget, trans.mTarget);
+    }
   }
 
 

@@ -13,8 +13,10 @@ import java.io.IOException;
 import java.io.StringWriter;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
+import java.util.TreeSet;
 
 import net.sourceforge.waters.model.base.ProxyAccessor;
 import net.sourceforge.waters.model.base.ProxyAccessorMap;
@@ -37,6 +39,7 @@ import net.sourceforge.waters.model.printer.ProxyPrinter;
  */
 
 class EFAVariableTransitionRelationPart
+  implements Comparable<EFAVariableTransitionRelationPart>
 {
 
   //#########################################################################
@@ -65,7 +68,7 @@ class EFAVariableTransitionRelationPart
   {
     mSourceValues =
       new ProxyAccessorHashMapByContents<SimpleExpressionProxy>();
-    mTransitions = new HashSet<EFAVariableTransition>();
+    mTransitions = new TreeSet<EFAVariableTransition>();
     mIsAllSelfloops = true;
   }
 
@@ -73,7 +76,7 @@ class EFAVariableTransitionRelationPart
   {
     mSourceValues =
       new ProxyAccessorHashMapByContents<SimpleExpressionProxy>(size);
-    mTransitions = new HashSet<EFAVariableTransition>(size);
+    mTransitions = new TreeSet<EFAVariableTransition>();
     mIsAllSelfloops = true;
   }
 
@@ -163,6 +166,30 @@ class EFAVariableTransitionRelationPart
   public int hashCode()
   {
     return mTransitions.hashCode();
+  }
+
+
+  //#########################################################################
+  //# Interface java.lang.Comparable
+  public int compareTo(final EFAVariableTransitionRelationPart part)
+  {
+    final Iterator<EFAVariableTransition> iter1 = mTransitions.iterator();
+    final Iterator<EFAVariableTransition> iter2 = part.mTransitions.iterator();
+    EFAVariableTransition trans1 = iter1.hasNext() ? iter1.next() : null;
+    EFAVariableTransition trans2 = iter2.hasNext() ? iter2.next() : null;
+    while (trans1 != null && trans2 != null) {
+      final int result = trans1.compareTo(trans2);
+      if (result != 0) {
+        return result;
+      }
+      trans1 = iter1.hasNext() ? iter1.next() : null;
+      trans2 = iter2.hasNext() ? iter2.next() : null;
+    }
+    if (trans1 == null) {
+      return trans2 == null ? 0 : -1;
+    } else {
+      return 1;
+    }
   }
 
 

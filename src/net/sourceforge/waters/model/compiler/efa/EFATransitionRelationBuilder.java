@@ -141,9 +141,12 @@ class EFATransitionRelationBuilder
     }
   }
 
-  Collection<EventRecord> getEventRecords()
+  List<EventRecord> getSortedEventRecords()
   {
-    return mEventRecords.values();
+    final List<EventRecord> result =
+      new ArrayList<EventRecord>(mEventRecords.values());
+    Collections.sort(result);
+    return result;
   }
 
   void clearEventRecords()
@@ -343,7 +346,7 @@ class EFATransitionRelationBuilder
 
   //#########################################################################
   //# Inner Class EventRecord
-  static class EventRecord {
+  static class EventRecord implements Comparable<EventRecord> {
 
     //#######################################################################
     //# Constructor
@@ -369,6 +372,13 @@ class EFATransitionRelationBuilder
     void addSourceLocations(final Collection<Proxy> locations)
     {
       mSourceLocations.addAll(locations);
+    }
+
+    //#######################################################################
+    //# Interface java.lang.Comparable
+    public int compareTo(final EventRecord record)
+    {
+      return mTransitionRelation.compareTo(record.mTransitionRelation);
     }
 
     //#######################################################################

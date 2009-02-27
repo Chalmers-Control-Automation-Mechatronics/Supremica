@@ -218,7 +218,7 @@ public class EFACompiler
         collectEventPartition(edecl, groups, propagator);
         namer.restart();
         for (final EFATransitionRelationBuilder.EventRecord record :
-               mTransitionRelationBuilder.getEventRecords()) {
+               mTransitionRelationBuilder.getSortedEventRecords()) {
           final EFAVariableTransitionRelation rel =
             record.getTransitionRelation();
           final EFAEvent event = new EFAEvent(edecl, rel);
@@ -488,7 +488,6 @@ public class EFACompiler
       throws VisitorException
     {
       try {
-        mCurrentSource = edge.getSource();
         final GuardActionBlockProxy ga = edge.getGuardActionBlock();
         if (ga == null) {
           mCurrentGuard = mTrueGuard;
@@ -502,7 +501,6 @@ public class EFACompiler
         visitLabelBlockProxy(block);
         return null;
       } finally {
-        mCurrentSource = null;
         mCurrentGuard = null;
         if (mIsUsingEventAlphabet) {
           mCollectedVariables = null;
@@ -565,7 +563,7 @@ public class EFACompiler
           if (mCurrentGuard != null) {
             final EFAAutomatonTransitionGroup trans =
               edecl.createTransitionGroup(mCurrentComponent);
-            trans.addTransition(mCurrentGuard, mCurrentSource, ident);
+            trans.addPartialTransition(mCurrentGuard, ident);
           }
         }
         return edecl;
@@ -613,25 +611,17 @@ public class EFACompiler
             edecl.addVariables(mCollectedVariables);
           }
           final EventKind ekind = edecl.getKind();
-          final EFAAutomatonTransitionGroup trans =
+          final EFAAutomatonTransitionGroup group =
             edecl.createTransitionGroup(comp);
           if (ekind == EventKind.CONTROLLABLE &&
               ckind == ComponentKind.PROPERTY ||
               ekind == EventKind.UNCONTROLLABLE &&
               ckind != ComponentKind.PLANT) {
-            makeDisjoint(trans);
-            // Include a catch-all event to be blocked ...
-            if (!trans.hasTrueGuard()) {
-              final Collection<ConstraintList> guards = trans.getGuards();
-              final ConstraintList complement = buildComplement(guards);
-              if (complement != null) {
-                trans.addTransition(complement, comp);
-              }
-            }
-          } else {
-            if (trans.isEmpty()) {
-              edecl.setBlocked();
-            }
+            makeDisjoint(group, true);
+          } else if (group.isEmpty()) {
+            edecl.setBlocked();
+          } else if (graph.isDeterministic()) {
+            // makeDisjoint(group, false);
           }
         }
         return null;
@@ -651,152 +641,62 @@ public class EFACompiler
 
     //#######################################################################
     //# Auxiliary Methods
-    private void makeDisjoint(final EFAAutomatonTransitionGroup group)
+    private void makeDisjoint(final EFAAutomatonTransitionGroup group,
+                              final boolean catchAll)
       throws EvalException
     {
-      final List<EFAAutomatonTransition> list =
-        new ArrayList<EFAAutomatonTransition>(group.getPartialTransitions());
-      for (int i = 0; i < list.size(); i++) {
-        for (int j = i + 1; j < list.size(); j++) {
-          final EFAAutomatonTransition trans1 = list.get(i);
-          final ConstraintList guard1 = trans1.getGuard();
-          final Set<NodeProxy> nodes1 = trans1.getSourceNodes();
-          final EFAAutomatonTransition trans2 = list.get(j);
-          final ConstraintList guard2 = trans2.getGuard();
-          final Set<NodeProxy> nodes2 = trans2.getSourceNodes();
-          final ConstraintList conjunction = buildConjunction(guard1, guard2);
-          if (conjunction == null || nodes1.equals(nodes2)) {
-            continue;
-          } else if (nodes1.containsAll(nodes2)) {
-            // strengthen : guard2 >> !guard1 & guard2
-            final ConstraintList strengthened = 
-              strengthenByNegation(guard2, guard1);
-            if (strengthened == null) {
-              list.remove(j--);
-            } else {
-              group.replaceTransition(guard2, strengthened);
-              replaceInList(list, j, group, strengthened);
-            }
-          } else if (nodes2.containsAll(nodes1)) {
-            // strengthen : guard1 >> guard1 & !guard2
-            final ConstraintList strengthened = 
-              strengthenByNegation(guard1, guard2);
-            if (strengthened == null) {
-              list.remove(i--);
-              break;
-            } else {
-              group.replaceTransition(guard1, strengthened);
-              replaceInList(list, i, group, strengthened);
-            }
-          } else {
-            // split : guard1 >> guard1 & guard2, guard1 & !guard2
-            // split : guard2 >> guard1 & guard2, !guard1 & guard2
-            final Collection<ConstraintList> replacements =
-              new ArrayList<ConstraintList>(2);
-            replacements.add(conjunction);
-            final ConstraintList strengthened2 = 
-              strengthenByNegation(guard2, guard1);
-            if (strengthened2 != null) {
-              replacements.add(strengthened2);
-            }
-            group.replaceTransition(guard2, replacements);
-            replaceInList(list, j, group, replacements);
-            replacements.clear();
-            replacements.add(conjunction);
-            final ConstraintList strengthened1 = 
-              strengthenByNegation(guard1, guard2);
-            if (strengthened1 != null) {
-              replacements.add(strengthened1);
-            }
-            group.replaceTransition(guard1, replacements);
-            replaceInList(list, i, group, replacements);
+      final Collection<EFAAutomatonTransition> parts =
+        group.getPartialTransitions();
+      final int size = parts.size();
+      final Iterator<EFAAutomatonTransition> iter = parts.iterator();
+      final List<EFAAutomatonTransition> selected =
+        new ArrayList<EFAAutomatonTransition>(size);
+      final Collection<EFAAutomatonTransition> result =
+        new LinkedList<EFAAutomatonTransition>();
+      final ConstraintPropagator propagator =
+        new ConstraintPropagator(mFactory, mOperatorTable, mRootContext);
+      final SimpleComponentProxy comp =
+        catchAll ? group.getSimpleComponent() : null;
+      makeDisjoint(iter, selected, result, propagator, comp);
+      group.setPartialTransitions(result);
+    }
+
+    private void makeDisjoint(final Iterator<EFAAutomatonTransition> iter,
+                              final List<EFAAutomatonTransition> selected,
+                              final Collection<EFAAutomatonTransition> result,
+                              final ConstraintPropagator parent,
+                              final SimpleComponentProxy catchAll)
+      throws EvalException
+    {
+      if (iter.hasNext()) {
+        final EFAAutomatonTransition trans = iter.next();
+        final ConstraintList guard = trans.getGuard();
+        ConstraintPropagator propagator = new ConstraintPropagator(parent);
+        propagator.addConstraints(guard);
+        propagator.propagate();
+        if (!propagator.isUnsatisfiable()) {
+          final int end = selected.size();
+          selected.add(trans);
+          makeDisjoint(iter, selected, result, propagator, catchAll);
+          selected.remove(end);
+        }
+        propagator = new ConstraintPropagator(parent);
+        propagator.addNegation(guard);
+        propagator.propagate();
+        if (!propagator.isUnsatisfiable()) {
+          makeDisjoint(iter, selected, result, propagator, catchAll);
+        }
+      } else if (catchAll != null || !selected.isEmpty()) {
+        final ConstraintList guard = parent.getAllConstraints(false);
+        final EFAAutomatonTransition trans = new EFAAutomatonTransition(guard);
+        if (selected.isEmpty()) {
+          trans.addSource(catchAll);
+        } else {
+          for (final EFAAutomatonTransition old : selected) {
+            trans.addSources(old);
           }
         }
-      }
-    }
-
-    private ConstraintList buildComplement
-      (final Collection<ConstraintList> guards)
-      throws EvalException
-    {
-      try {
-        for (final ConstraintList guard : guards) {
-          mPropagator.addNegation(guard);
-        }
-        mPropagator.propagate();
-        return mPropagator.getAllConstraints(false);
-      } finally {
-        mPropagator.reset();
-      }
-    }
-
-    private ConstraintList buildConjunction(final ConstraintList guard1,
-                                            final ConstraintList guard2)
-      throws EvalException
-    {
-      try {
-        mPropagator.addConstraints(guard1);
-        mPropagator.addConstraints(guard2);
-        mPropagator.propagate();
-        return mPropagator.getAllConstraints(false);
-      } finally {
-        mPropagator.reset();
-      }
-    }
-
-    private ConstraintList strengthenByNegation(final ConstraintList guard1,
-                                                final ConstraintList guard2)
-      throws EvalException
-    {
-      try {
-        mPropagator.addConstraints(guard1);
-        mPropagator.addNegation(guard2);
-        mPropagator.propagate();
-        return mPropagator.getAllConstraints(false);
-      } finally {
-        mPropagator.reset();
-      }
-    }
-
-    private void replaceInList(final List<EFAAutomatonTransition> list,
-                               final int index,
-                               final EFAAutomatonTransitionGroup group,
-                               final ConstraintList guard)
-    {
-      final EFAAutomatonTransition trans = group.getPartialTransition(guard);
-      list.set(index, trans);
-    }
-
-    private void replaceInList(final List<EFAAutomatonTransition> list,
-                               final int index,
-                               final EFAAutomatonTransitionGroup group,
-                               final Collection<ConstraintList> guards)
-    {
-      final Iterator<ConstraintList> iter = guards.iterator();
-      final ConstraintList guard1 = iter.next();
-      final EFAAutomatonTransition trans1 = group.getPartialTransition(guard1);
-      list.set(index, trans1);
-      if (iter.hasNext()) {
-        final int listsize = list.size();
-        final int tailsize = listsize - index - 1;
-        final List<EFAAutomatonTransition> tail = 
-          tailsize == 0 ? null :
-          new ArrayList<EFAAutomatonTransition>(tailsize);
-        for (int i = index + 1; i < listsize; i++) {
-          tail.add(list.get(i));
-        }
-        for (int i = listsize - 1; i > index; i--) {
-          list.remove(i);
-        }
-        while (iter.hasNext()) {
-          final ConstraintList guard = iter.next();
-          final EFAAutomatonTransition trans =
-            group.getPartialTransition(guard);
-          list.add(trans);
-        }
-        if (tail != null) {
-          list.addAll(tail);
-        }
+        result.add(trans);
       }
     }
 
@@ -809,7 +709,6 @@ public class EFACompiler
     private SimpleComponentProxy mCurrentComponent;
     private Set<EFAVariable> mCollectedVariables;
     private Set<EFAEventDecl> mCollectedEvents;
-    private NodeProxy mCurrentSource;
     private ConstraintList mCurrentGuard;
   }
 

@@ -46,6 +46,11 @@ class EFAAutomatonTransitionGroup
 
   //#########################################################################
   //# Simple Access
+  SimpleComponentProxy getSimpleComponent()
+  {
+    return mComponent;
+  }
+
   Collection<ConstraintList> getGuards()
   {
     return mPartialTransitions.keySet();
@@ -76,40 +81,20 @@ class EFAAutomatonTransitionGroup
     return mHasTrueGuard;
   }
 
-  void addTransition(final ConstraintList guard,
-                     final Proxy location)
-  {
-    addTransition(guard, null, location);
-  }
-
-  void addTransition(final ConstraintList guard,
-                     final NodeProxy node,
-                     final Proxy location)
+  void addPartialTransition(final ConstraintList guard,
+                            final Proxy location)
   {
     final EFAAutomatonTransition trans = createTransition(guard);
-    trans.addSource(node, location);
+    trans.addSource(location);
     mHasTrueGuard |= guard.isTrue();
   }
 
-  void replaceTransition(final ConstraintList victim,
-                         final ConstraintList replacement)
+  void setPartialTransitions(final Collection<EFAAutomatonTransition> parts)
   {
-    final EFAAutomatonTransition oldtrans = mPartialTransitions.remove(victim);
-    final EFAAutomatonTransition newtrans = createTransition(replacement);
-    if (oldtrans != null) {
-      newtrans.addSources(oldtrans);
-    }
-  }
-
-  void replaceTransition(final ConstraintList victim,
-                         final Collection<ConstraintList> replacements)
-  {
-    final EFAAutomatonTransition oldtrans = mPartialTransitions.remove(victim);
-    for (final ConstraintList replacement : replacements) {
-      final EFAAutomatonTransition newtrans = createTransition(replacement);
-      if (oldtrans != null) {
-        newtrans.addSources(oldtrans);
-      }
+    mPartialTransitions.clear();
+    for (final EFAAutomatonTransition trans : parts) {
+      final ConstraintList guard = trans.getGuard();
+      mPartialTransitions.put(guard, trans);
     }
   }
 
@@ -140,7 +125,7 @@ class EFAAutomatonTransitionGroup
   {
     EFAAutomatonTransition trans = mPartialTransitions.get(guard);
     if (trans == null) {
-      trans = new EFAAutomatonTransition(mComponent, guard);
+      trans = new EFAAutomatonTransition(guard);
       mPartialTransitions.put(guard, trans);
     }
     return trans;

@@ -12,12 +12,9 @@ package net.sourceforge.waters.model.compiler.efa;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.LinkedList;
-import java.util.Set;
 
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.compiler.constraint.ConstraintList;
-import net.sourceforge.waters.model.module.NodeProxy;
-import net.sourceforge.waters.model.module.SimpleComponentProxy;
 
 
 /**
@@ -33,12 +30,9 @@ class EFAAutomatonTransition
 
   //#########################################################################
   //# Constructors
-  EFAAutomatonTransition(final SimpleComponentProxy comp,
-                         final ConstraintList conditions)
+  EFAAutomatonTransition(final ConstraintList conditions)
   {
-    final int numnodes = comp.getGraph().getNodes().size();
     mGuard = conditions;
-    mSourceNodes = new HashSet<NodeProxy>(numnodes);
     mSourceLocations = new LinkedList<Proxy>();
   }
 
@@ -50,25 +44,18 @@ class EFAAutomatonTransition
     return mGuard;
   }
 
-  Set<NodeProxy> getSourceNodes()
-  {
-    return mSourceNodes;
-  }
-
   Collection<Proxy> getSourceLocations()
   {
     return mSourceLocations;
   }
 
-  void addSource(final NodeProxy node, final Proxy location)
+  void addSource(final Proxy location)
   {
-    mSourceNodes.add(node);
     mSourceLocations.add(location);
   }
 
   void addSources(final EFAAutomatonTransition trans)
   {
-    mSourceNodes.addAll(trans.mSourceNodes);
     mSourceLocations.addAll(trans.mSourceLocations);
   }
 
@@ -76,7 +63,6 @@ class EFAAutomatonTransition
   //#########################################################################
   //# Data Members
   private final ConstraintList mGuard;
-  private final Set<NodeProxy> mSourceNodes;
   private final Collection<Proxy> mSourceLocations;
 
 }

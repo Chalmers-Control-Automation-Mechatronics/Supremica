@@ -15,9 +15,11 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeMap;
 
 import net.sourceforge.waters.model.base.WatersRuntimeException;
 import net.sourceforge.waters.model.compiler.constraint.ConstraintList;
@@ -38,6 +40,7 @@ import net.sourceforge.waters.model.printer.ProxyPrinter;
  */
 
 class EFAVariableTransitionRelation
+  implements Comparable<EFAVariableTransitionRelation>
 {
 
   //#########################################################################
@@ -52,28 +55,29 @@ class EFAVariableTransitionRelation
     if (empty) {
       mParts = null;
     } else {
-      mParts = new HashMap<EFAVariable,EFAVariableTransitionRelationPart>();
+      mParts = new TreeMap<EFAVariable,EFAVariableTransitionRelationPart>();
     }
     mIsEmpty = empty;
   }
 
   EFAVariableTransitionRelation(final int size)
   {
-    mParts = new HashMap<EFAVariable,EFAVariableTransitionRelationPart>(size);
+    mParts = new TreeMap<EFAVariable,EFAVariableTransitionRelationPart>();
     mIsEmpty = false;
   }
 
   EFAVariableTransitionRelation
     (final Map<EFAVariable,EFAVariableTransitionRelationPart> parts)
   {
-    mIsEmpty = false;
     for (final EFAVariableTransitionRelationPart part : parts.values()) {
       if (part.isEmpty()) {
         mIsEmpty = true;
-        break;
+        mParts = null;
+        return;
       }
     }
-    mParts = mIsEmpty ? null : parts;
+    mIsEmpty = false;
+    mParts = new TreeMap<EFAVariable,EFAVariableTransitionRelationPart>(parts);
   }
 
 
@@ -232,6 +236,41 @@ class EFAVariableTransitionRelation
   public int hashCode()
   {
     return mIsEmpty ? 0 : mParts.hashCode();
+  }
+
+
+  //#########################################################################
+  //# Interface java.lang.Comparable
+  public int compareTo(final EFAVariableTransitionRelation rel)
+  {
+    if (mIsEmpty) {
+      return rel.mIsEmpty ? 0 : -1;
+    } else if (rel.mIsEmpty) {
+      return 1;
+    }
+    final Iterator<EFAVariable> iter1 = mParts.keySet().iterator();
+    final Iterator<EFAVariable> iter2 = rel.mParts.keySet().iterator();
+    EFAVariable var1 = iter1.hasNext() ? iter1.next() : null;
+    EFAVariable var2 = iter2.hasNext() ? iter2.next() : null;
+    while (var1 != null && var2 != null) {
+      int result = var1.compareTo(var2);
+      if (result != 0) {
+        return result;
+      }
+      final EFAVariableTransitionRelationPart part1 = mParts.get(var1);
+      final EFAVariableTransitionRelationPart part2 = rel.mParts.get(var2);
+      result = part1.compareTo(part2);
+      if (result != 0) {
+        return result;
+      }
+      var1 = iter1.hasNext() ? iter1.next() : null;
+      var2 = iter2.hasNext() ? iter2.next() : null;
+    }
+    if (var1 == null) {
+      return var2 == null ? 0 : -1;
+    } else {
+      return 1;
+    }
   }
 
 
