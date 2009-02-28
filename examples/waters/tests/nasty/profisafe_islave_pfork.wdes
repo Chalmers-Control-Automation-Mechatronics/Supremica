@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<ProductDES Name="profisafe_islave_pfork"
+            xmlns:ns2="http://waters.sourceforge.net/xsd/base" 
+            xmlns="http://waters.sourceforge.net/xsd/des">
+<ns2:Comment/>
+<EventList>
+<Event Observable="true" Kind="UNCONTROLLABLE" Name="resume.{in_cons_num}"/>
+<Event Observable="true" Kind="UNCONTROLLABLE" Name="resume.{!in_cons_num}"/>
+<Event Observable="true" Kind="UNCONTROLLABLE" Name="resume.{in_CRC==nok}"/>
+</EventList>
+<AutomataList>
+<Automaton Kind="PLANT" Name="in_CRC">
+<EventRefList>
+<EventRef Name="resume.{in_cons_num}"/>
+<EventRef Name="resume.{!in_cons_num}"/>
+</EventRefList>
+<StateList>
+<State Initial="true" Name="nok"/>
+</StateList>
+</Automaton>
+<Automaton Kind="PLANT" Name="in_cons_num">
+<EventRefList>
+<EventRef Name="resume.{in_cons_num}"/>
+</EventRefList>
+<StateList>
+<State Initial="true" Name="0"/>
+</StateList>
+</Automaton>
+<Automaton Kind="PROPERTY" Name="slave_sets_fv_after_slave_crc_fault[0]">
+<EventRefList>
+<EventRef Name="resume.{in_cons_num}"/>
+<EventRef Name="resume.{!in_cons_num}"/>
+<EventRef Name="resume.{in_CRC==nok}"/>
+</EventRefList>
+<StateList>
+<State Initial="true" Name="init"/>
+<State Name="q0"/>
+<State Name="q1"/>
+</StateList>
+<TransitionList>
+<Transition Source="init" Target="q0" Event="resume.{!in_cons_num}"/>
+<Transition Source="init" Target="q1" Event="resume.{in_cons_num}"/>
+</TransitionList>
+</Automaton>
+</AutomataList>
+</ProductDES>
+

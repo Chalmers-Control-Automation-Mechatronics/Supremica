@@ -43,26 +43,6 @@ class EFAVariableTransitionRelationPart
 {
 
   //#########################################################################
-  //# Factory Methods
-  static EFAVariableTransitionRelationPart createComplementaryPart
-    (final CompiledRange range, final EFAVariableTransitionRelationPart part)
-  {
-    assert part.isAllSelfloops();
-    final List<? extends SimpleExpressionProxy> allvalues = range.getValues();
-    final ProxyAccessorMap<SimpleExpressionProxy> sources = part.mSourceValues;
-    final int size = allvalues.size() - sources.size();
-    final EFAVariableTransitionRelationPart result =
-      new EFAVariableTransitionRelationPart(size);
-    for (final SimpleExpressionProxy value : allvalues) {
-      if (!sources.containsProxy(value)) {
-        result.addTransition(value, value);
-      }
-    }
-    return result;      
-  }
-
-
-  //#########################################################################
   //# Constructors
   EFAVariableTransitionRelationPart()
   {
@@ -274,6 +254,41 @@ class EFAVariableTransitionRelationPart
       }
     }
     return new EFAVariableTransitionRelationPart(transitions);
+  }
+
+  EFAVariableTransitionRelationPart complement(final CompiledRange range)
+  {
+    final List<? extends SimpleExpressionProxy> allvalues = range.getValues();
+    final int allsize = allvalues.size();
+    final ProxyAccessorMap<SimpleExpressionProxy> selfloops =
+      new ProxyAccessorHashMapByContents<SimpleExpressionProxy>(allsize);
+    for (final EFAVariableTransition trans : mTransitions) {
+      if (trans.isSelfloop()) {
+        final SimpleExpressionProxy source = trans.getSource();
+        selfloops.addProxy(source);
+      }
+    }
+    final int ressize = allsize - selfloops.size();
+    final EFAVariableTransitionRelationPart result =
+      new EFAVariableTransitionRelationPart(ressize);
+    for (final SimpleExpressionProxy value : allvalues) {
+      if (!selfloops.containsProxy(value)) {
+        result.addTransition(value, value);
+      }
+    }
+    return result;      
+  }
+
+  EFAVariableTransitionRelationPart stripSelfloops()
+  {
+    final EFAVariableTransitionRelationPart result =
+      new EFAVariableTransitionRelationPart(size());
+    for (final EFAVariableTransition trans : mTransitions) {
+      if (!trans.isSelfloop()) {
+        result.addTransition(trans);
+      }
+    }
+    return result;      
   }
 
 

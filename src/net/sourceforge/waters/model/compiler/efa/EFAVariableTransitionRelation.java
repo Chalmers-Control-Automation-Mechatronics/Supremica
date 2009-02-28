@@ -362,43 +362,6 @@ class EFAVariableTransitionRelation
     }
   }
 
-  EFAVariableTransitionRelation intersection
-    (final EFAVariableTransitionRelation rel)
-  {
-    if (mIsEmpty) {
-      return this;
-    } else if (rel.mIsEmpty) {
-      return rel;
-    } else {
-      final Map<EFAVariable,EFAVariableTransitionRelationPart> parts1 = mParts;
-      final Map<EFAVariable,EFAVariableTransitionRelationPart> parts2 =
-        rel.mParts;
-      final int size = parts1.size() + parts2.size();
-      final Set<EFAVariable> vars = new HashSet<EFAVariable>(size);
-      vars.addAll(parts1.keySet());
-      vars.addAll(parts2.keySet());
-      final int vsize = vars.size();
-      final Map<EFAVariable,EFAVariableTransitionRelationPart> map =
-        new HashMap<EFAVariable,EFAVariableTransitionRelationPart>(vsize);
-      for (final EFAVariable var : vars) {
-        final EFAVariableTransitionRelationPart part1 = parts1.get(var);
-        final EFAVariableTransitionRelationPart part2 = parts2.get(var);
-        if (part1 == null) {
-          assert part2.isAllSelfloops();
-          map.put(var, part2);
-        } else if (part2 == null) {
-          assert part1.isAllSelfloops();
-          map.put(var, part1);
-        } else {
-          final EFAVariableTransitionRelationPart part =
-            part1.intersection(part2);
-          map.put(var, part);
-        }
-      }
-      return new EFAVariableTransitionRelation(map);
-    }
-  }
-
   EFAVariableTransitionRelation difference
     (final EFAVariableTransitionRelation rel)
   {
@@ -421,12 +384,12 @@ class EFAVariableTransitionRelation
         if (part1 == null) {
           final CompiledRange range = var.getRange();
           final EFAVariableTransitionRelationPart complement =
-            EFAVariableTransitionRelationPart.createComplementaryPart
-              (range, part2);
+            part2.complement(range);
           map.put(var, complement);
         } else if (part2 == null) {
-          assert part1.isAllSelfloops();
-          return new EFAVariableTransitionRelation(true);
+          final EFAVariableTransitionRelationPart complement =
+            part1.stripSelfloops();
+          map.put(var, complement);
         } else {
           final EFAVariableTransitionRelationPart part =
             part1.difference(part2);

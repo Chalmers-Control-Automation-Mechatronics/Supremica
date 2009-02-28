@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.Map;
 
 import net.sourceforge.waters.model.base.Proxy;
+import net.sourceforge.waters.model.base.ProxyTools;
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
 import net.sourceforge.waters.model.compiler.constraint.ConstraintList;
 import net.sourceforge.waters.model.compiler.context.BindingContext;
@@ -105,15 +106,34 @@ class EFATransitionRelationBuilder
         final EFAVariableTransitionRelation rel1 =
           record1.getTransitionRelation();
         final Collection<Proxy> locations1 = record1.getSourceLocations();
+        inner:
         for (final Map.Entry<EFAVariableTransitionRelation,EventRecord> entry :
                mEventRecords.entrySet()) {
           final EFAVariableTransitionRelation rel2 = entry.getKey();
           final EventRecord record2 = entry.getValue();
+          final Collection<Proxy> locations2 = record2.getSourceLocations();
           final SubsumptionResult subsumption = subsumptionTest(rel1, rel2);
           switch (subsumption.getKind()) {
           case SUBSUMES:
+            if (ProxyTools.isEqualSetByContents(locations1, locations2)) {
+              assert victims.isEmpty();
+              continue outer;
+            }
+            break;
+          case SUBSUMED_BY:
+            if (ProxyTools.isEqualSetByContents(locations1, locations2)) {
+              victims.add(rel2);
+              continue inner;
+            }
+            break;
+          default:
+            break;
+          }
+          /*
+          switch (subsumption.getKind()) {
+          case SUBSUMES:
+            System.err.println(rel1 + " subsumes " + rel2);
             victims.add(rel2);
-            final Collection<Proxy> locations2 = record2.getSourceLocations();
             record1.addSourceLocations(locations2);
             final EFAVariableTransitionRelation rel3 =
               subsumption.getTransitionRelation();
@@ -121,6 +141,7 @@ class EFATransitionRelationBuilder
             open.add(record3);
             break;
           case SUBSUMED_BY:
+            System.err.println(rel1 + " subsumed by " + rel2);
             record2.addSourceLocations(locations1);
             final EFAVariableTransitionRelation rel4 =
               subsumption.getTransitionRelation();
@@ -131,6 +152,7 @@ class EFATransitionRelationBuilder
           default:
             break;
           }
+          */
         }
         for (final EFAVariableTransitionRelation victim : victims) {
           mEventRecords.remove(victim);

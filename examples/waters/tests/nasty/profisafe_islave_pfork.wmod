@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Module Name="profisafe_islave_pfork" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
+    <ns2:Comment></ns2:Comment>
+    <EventDeclList>
+        <EventDecl Kind="UNCONTROLLABLE" Name="resume"/>
+    </EventDeclList>
+    <ComponentList>
+        <VariableComponent Name="in_cons_num">
+            <VariableRange>
+                <BinaryExpression Operator="..">
+                    <IntConstant Value="0"/>
+                    <IntConstant Value="1"/>
+                </BinaryExpression>
+            </VariableRange>
+            <VariableInitial>
+                <BinaryExpression Operator="==">
+                    <SimpleIdentifier Name="in_cons_num"/>
+                    <IntConstant Value="0"/>
+                </BinaryExpression>
+            </VariableInitial>
+        </VariableComponent>
+        <VariableComponent Name="in_CRC">
+            <VariableRange>
+                <EnumSetExpression Text="{ok,nok}">
+                    <SimpleIdentifier Name="ok"/>
+                    <SimpleIdentifier Name="nok"/>
+                </EnumSetExpression>
+            </VariableRange>
+            <VariableInitial>
+                <BinaryExpression Operator="==">
+                    <SimpleIdentifier Name="in_CRC"/>
+                    <SimpleIdentifier Name="nok"/>
+                </BinaryExpression>
+            </VariableInitial>
+        </VariableComponent>
+        <ForeachComponent Name="seq">
+            <BinaryExpression Operator="..">
+                <IntConstant Value="0"/>
+                <IntConstant Value="0"/>
+            </BinaryExpression>
+            <ComponentList>
+                <SimpleComponent Kind="PROPERTY">
+                    <IndexedIdentifier Name="slave_sets_fv_after_slave_crc_fault">
+                        <SimpleIdentifier Name="seq"/>
+                    </IndexedIdentifier>
+                    <Graph>
+                        <NodeList>
+                            <SimpleNode Initial="true" Name="init">
+                                <PointGeometry>
+                                    <Point Y="144" X="176"/>
+                                </PointGeometry>
+                                <InitialArrowGeometry>
+                                    <Point Y="-5" X="-5"/>
+                                </InitialArrowGeometry>
+                                <LabelGeometry Anchor="NW">
+                                    <Point Y="-7" X="10"/>
+                                </LabelGeometry>
+                            </SimpleNode>
+                            <SimpleNode Name="q1">
+                                <PointGeometry>
+                                    <Point Y="240" X="128"/>
+                                </PointGeometry>
+                                <LabelGeometry Anchor="NW">
+                                    <Point Y="-6" X="11"/>
+                                </LabelGeometry>
+                            </SimpleNode>
+                            <SimpleNode Name="q0">
+                                <PointGeometry>
+                                    <Point Y="240" X="224"/>
+                                </PointGeometry>
+                                <LabelGeometry Anchor="NW">
+                                    <Point Y="-6" X="10"/>
+                                </LabelGeometry>
+                            </SimpleNode>
+                        </NodeList>
+                        <EdgeList>
+                            <Edge Target="q1" Source="init">
+                                <LabelBlock>
+                                    <SimpleIdentifier Name="resume"/>
+                                    <LabelGeometry Anchor="NW">
+                                        <Point Y="-9" X="-138"/>
+                                    </LabelGeometry>
+                                </LabelBlock>
+                                <GuardActionBlock>
+                                    <Guards>
+                                        <BinaryExpression Operator="&amp;" Text="in_cons_num==1 &amp; in_CRC==ok">
+                                            <BinaryExpression Operator="==">
+                                                <SimpleIdentifier Name="in_cons_num"/>
+                                                <IntConstant Value="1"/>
+                                            </BinaryExpression>
+                                            <BinaryExpression Operator="==">
+                                                <SimpleIdentifier Name="in_CRC"/>
+                                                <SimpleIdentifier Name="ok"/>
+                                            </BinaryExpression>
+                                        </BinaryExpression>
+                                    </Guards>
+                                    <LabelGeometry Anchor="NW">
+                                        <Point Y="-26" X="-136"/>
+                                    </LabelGeometry>
+                                </GuardActionBlock>
+                            </Edge>
+                            <Edge Target="q0" Source="init">
+                                <LabelBlock>
+                                    <SimpleIdentifier Name="resume"/>
+                                    <LabelGeometry Anchor="NW">
+                                        <Point Y="9" X="19"/>
+                                    </LabelGeometry>
+                                </LabelBlock>
+                                <GuardActionBlock>
+                                    <Guards>
+                                        <BinaryExpression Operator="&amp;" Text="in_cons_num==0 &amp; in_CRC==ok">
+                                            <BinaryExpression Operator="==">
+                                                <SimpleIdentifier Name="in_cons_num"/>
+                                                <IntConstant Value="0"/>
+                                            </BinaryExpression>
+                                            <BinaryExpression Operator="==">
+                                                <SimpleIdentifier Name="in_CRC"/>
+                                                <SimpleIdentifier Name="ok"/>
+                                            </BinaryExpression>
+                                        </BinaryExpression>
+                                    </Guards>
+                                    <LabelGeometry Anchor="NW">
+                                        <Point Y="-8" X="19"/>
+                                    </LabelGeometry>
+                                </GuardActionBlock>
+                            </Edge>
+                        </EdgeList>
+                    </Graph>
+                </SimpleComponent>
+            </ComponentList>
+        </ForeachComponent>
+    </ComponentList>
+</Module>

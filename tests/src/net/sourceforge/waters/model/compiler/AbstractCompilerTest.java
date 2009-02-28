@@ -340,6 +340,12 @@ public abstract class AbstractCompilerTest
   }
   */
 
+  public void testCompile_profisafe_islave_pfork()
+    throws IOException, WatersException
+  {
+    compile("tests", "nasty", "profisafe_islave_pfork");
+  }
+
   public void testCompile_sensoractuator1()
     throws IOException, WatersException
   {
