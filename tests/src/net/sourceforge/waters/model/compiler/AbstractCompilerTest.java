@@ -332,6 +332,12 @@ public abstract class AbstractCompilerTest
   }
   */
 
+  public void testCompile_profisafe_ihost_nonsubsumptions()
+    throws IOException, WatersException
+  {
+    compile("tests", "nasty", "profisafe_ihost_nonsubsumptions");
+  }
+
   /*
   public void testCompile_profisafe_islave_property()
     throws IOException, WatersException

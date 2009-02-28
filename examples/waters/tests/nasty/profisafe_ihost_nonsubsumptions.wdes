@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<ProductDES Name="profisafe_ihost_nonsubsumptions"
+            xmlns:ns2="http://waters.sourceforge.net/xsd/base" 
+            xmlns="http://waters.sourceforge.net/xsd/des">
+<ns2:Comment/>
+<EventList>
+<Event Observable="true" Kind="UNCONTROLLABLE" Name="host_timeout"/>
+<Event Observable="true" Kind="CONTROLLABLE" Name="restart_host_timer"/>
+<Event Observable="true" Kind="CONTROLLABLE"
+                         Name="restart_host_timer.{!got_host_timeout}"/>
+<Event Observable="true" Kind="CONTROLLABLE" Name="yield"/>
+<Event Observable="true" Kind="CONTROLLABLE"
+                         Name="yield.{!got_host_timeout}"/>
+</EventList>
+<AutomataList>
+<Automaton Kind="SPEC" Name="main">
+<EventRefList>
+<EventRef Name="restart_host_timer"/>
+<EventRef Name="restart_host_timer.{!got_host_timeout}"/>
+<EventRef Name="yield"/>
+<EventRef Name="yield.{!got_host_timeout}"/>
+</EventRefList>
+<StateList>
+<State Initial="true" Name="s0"/>
+<State Name="s1"/>
+<State Name="s2"/>
+<State Name="s3"/>
+</StateList>
+<TransitionList>
+<Transition Source="s0" Target="s1" Event="restart_host_timer"/>
+<Transition Source="s0" Target="s1"
+            Event="restart_host_timer.{!got_host_timeout}"/>
+<Transition Source="s1" Target="s2" Event="yield"/>
+<Transition Source="s1" Target="s2" Event="yield.{!got_host_timeout}"/>
+<Transition Source="s2" Target="s2" Event="yield.{!got_host_timeout}"/>
+<Transition Source="s2" Target="s3"
+            Event="restart_host_timer.{!got_host_timeout}"/>
+</TransitionList>
+</Automaton>
+<Automaton Kind="PLANT" Name="timers">
+<EventRefList>
+<EventRef Name="host_timeout"/>
+<EventRef Name="restart_host_timer"/>
+<EventRef Name="restart_host_timer.{!got_host_timeout}"/>
+</EventRefList>
+<StateList>
+<State Initial="true" Name="OFF"/>
+<State Name="HOST"/>
+</StateList>
+<TransitionList>
+<Transition Source="OFF" Target="HOST" Event="restart_host_timer"/>
+<Transition Source="OFF" Target="HOST"
+            Event="restart_host_timer.{!got_host_timeout}"/>
+<Transition Source="HOST" Target="HOST" Event="restart_host_timer"/>
+<Transition Source="HOST" Target="HOST"
+            Event="restart_host_timer.{!got_host_timeout}"/>
+<Transition Source="HOST" Target="OFF" Event="host_timeout"/>
+</TransitionList>
+</Automaton>
+<Automaton Kind="PLANT" Name="in_cons_num">
+<EventRefList>
+<EventRef Name="yield.{!got_host_timeout}"/>
+</EventRefList>
+<StateList>
+<State Initial="true" Name="0"/>
+</StateList>
+</Automaton>
+<Automaton Kind="PLANT" Name="got_host_timeout">
+<EventRefList>
+<EventRef Name="host_timeout"/>
+<EventRef Name="restart_host_timer"/>
+<EventRef Name="restart_host_timer.{!got_host_timeout}"/>
+<EventRef Name="yield.{!got_host_timeout}"/>
+</EventRefList>
+<StateList>
+<State Initial="true" Name="0"/>
+<State Name="1"/>
+</StateList>
+<TransitionList>
+<Transition Source="0" Target="0"
+            Event="restart_host_timer"/>
+<Transition Source="0" Target="0"
+            Event="restart_host_timer.{!got_host_timeout}"/>
+<Transition Source="0" Target="0"
+            Event="yield.{!got_host_timeout}"/>
+<Transition Source="0" Target="1" Event="host_timeout"/>
+<Transition Source="1" Target="1" Event="host_timeout"/>
+<Transition Source="1" Target="0"
+            Event="restart_host_timer"/>
+</TransitionList>
+</Automaton>
+</AutomataList>
+</ProductDES>
+

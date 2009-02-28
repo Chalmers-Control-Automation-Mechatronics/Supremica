@@ -20,7 +20,6 @@ import java.util.List;
 import java.util.Map;
 
 import net.sourceforge.waters.model.base.Proxy;
-import net.sourceforge.waters.model.base.ProxyTools;
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
 import net.sourceforge.waters.model.compiler.constraint.ConstraintList;
 import net.sourceforge.waters.model.compiler.context.BindingContext;
@@ -115,13 +114,13 @@ class EFATransitionRelationBuilder
           final SubsumptionResult subsumption = subsumptionTest(rel1, rel2);
           switch (subsumption.getKind()) {
           case SUBSUMES:
-            if (ProxyTools.isEqualSetByContents(locations1, locations2)) {
+            if (locations1.equals(locations2)) {
               assert victims.isEmpty();
               continue outer;
             }
             break;
           case SUBSUMED_BY:
-            if (ProxyTools.isEqualSetByContents(locations1, locations2)) {
+            if (locations1.equals(locations2)) {
               victims.add(rel2);
               continue inner;
             }
