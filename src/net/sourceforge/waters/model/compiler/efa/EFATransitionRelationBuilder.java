@@ -94,71 +94,35 @@ class EFATransitionRelationBuilder
     if (found != null) {
       found.addSourceLocations(locations);
     } else {
-      final EventRecord record = new EventRecord(rel, locations);
       final List<EFAVariableTransitionRelation> victims =
         new LinkedList<EFAVariableTransitionRelation>();
-      final List<EventRecord> open = new LinkedList<EventRecord>();
-      open.add(record);
-      outer:
-      while (!open.isEmpty()) {
-        final EventRecord record1 = open.remove(0);
-        final EFAVariableTransitionRelation rel1 =
-          record1.getTransitionRelation();
-        final Collection<Proxy> locations1 = record1.getSourceLocations();
-        inner:
-        for (final Map.Entry<EFAVariableTransitionRelation,EventRecord> entry :
-               mEventRecords.entrySet()) {
-          final EFAVariableTransitionRelation rel2 = entry.getKey();
-          final EventRecord record2 = entry.getValue();
-          final Collection<Proxy> locations2 = record2.getSourceLocations();
-          final SubsumptionResult subsumption = subsumptionTest(rel1, rel2);
-          switch (subsumption.getKind()) {
-          case SUBSUMES:
-            if (locations1.equals(locations2)) {
-              assert victims.isEmpty();
-              continue outer;
-            }
-            break;
-          case SUBSUMED_BY:
-            if (locations1.equals(locations2)) {
-              victims.add(rel2);
-              continue inner;
-            }
-            break;
-          default:
-            break;
-          }
-          /*
-          switch (subsumption.getKind()) {
-          case SUBSUMES:
-            System.err.println(rel1 + " subsumes " + rel2);
-            victims.add(rel2);
-            record1.addSourceLocations(locations2);
-            final EFAVariableTransitionRelation rel3 =
-              subsumption.getTransitionRelation();
-            final EventRecord record3 = new EventRecord(rel3, locations2);
-            open.add(record3);
-            break;
-          case SUBSUMED_BY:
-            System.err.println(rel1 + " subsumed by " + rel2);
-            record2.addSourceLocations(locations1);
-            final EFAVariableTransitionRelation rel4 =
-              subsumption.getTransitionRelation();
-            final EventRecord record4 = new EventRecord(rel4, locations1);
-            open.add(record4);
+      for (final Map.Entry<EFAVariableTransitionRelation,EventRecord> entry :
+             mEventRecords.entrySet()) {
+        final EFAVariableTransitionRelation rel2 = entry.getKey();
+        final EventRecord record2 = entry.getValue();
+        final Collection<Proxy> locations2 = record2.getSourceLocations();
+        final SubsumptionResult subsumption = subsumptionTest(rel, rel2);
+        switch (subsumption.getKind()) {
+        case SUBSUMES:
+          if (locations2.containsAll(locations)) {
             assert victims.isEmpty();
-            continue outer;
-          default:
-            break;
+            return;
           }
-          */
+          break;
+        case SUBSUMED_BY:
+          if (locations.containsAll(locations2)) {
+            victims.add(rel2);
+          }
+          break;
+        default:
+          break;
         }
-        for (final EFAVariableTransitionRelation victim : victims) {
-          mEventRecords.remove(victim);
-        }
-        victims.clear();
-        mEventRecords.put(rel, record1);
       }
+      for (final EFAVariableTransitionRelation victim : victims) {
+        mEventRecords.remove(victim);
+      }
+      final EventRecord record = new EventRecord(rel, locations);
+      mEventRecords.put(rel, record);
     }
   }
 
@@ -240,6 +204,7 @@ class EFATransitionRelationBuilder
     final SubsumptionResult.Kind kind = rel1.subsumptionTest(rel2);
     final SubsumptionResult result = SubsumptionResult.create(kind);
     mSubsumptionCache.put(pair, result);
+    /*
     EFAVariableTransitionRelation delta;
     switch (kind) {
     case SUBSUMES:
@@ -262,6 +227,7 @@ class EFATransitionRelationBuilder
       }
     }
     result.setTransitionRelation(delta);
+    */
     return result;
   }
 
