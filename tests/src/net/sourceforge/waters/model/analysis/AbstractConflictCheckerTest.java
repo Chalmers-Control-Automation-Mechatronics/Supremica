@@ -18,6 +18,9 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import net.sourceforge.waters.analysis.monolithic.
+  MonolithicLanguageInclusionChecker;
+import net.sourceforge.waters.cpp.analysis.NativeLanguageInclusionChecker;
 import net.sourceforge.waters.model.compiler.ModuleCompiler;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.EventProxy;
@@ -47,13 +50,6 @@ public abstract class AbstractConflictCheckerTest
   {
     super(name);
   }
-
-
-  //#########################################################################
-  //# To be Provided by Subclasses
-  protected abstract LanguageInclusionChecker
-    createLanguageInclusionChecker(ProductDESProxy des,
-                                   ProductDESProxyFactory factory);
 
 
   //#########################################################################
@@ -720,6 +716,14 @@ public abstract class AbstractConflictCheckerTest
     runModelVerifier(group, dir, name, true);
   }
 
+  public void testKoordwspBlock() throws Exception
+  {
+    final String group = "valid";
+    final String dir  = "central_locking";
+    final String name = "koordwsp_block.wdes";
+    runModelVerifier(group, dir, name, false);
+  }
+
   public void testMazes() throws Exception
   {
     final String group = "valid";
@@ -853,6 +857,29 @@ public abstract class AbstractConflictCheckerTest
     }
   }
 
+
+  //#########################################################################
+  //# May be Overridden by Subclasses
+  protected LanguageInclusionChecker
+    createLanguageInclusionChecker(ProductDESProxy des,
+                                   ProductDESProxyFactory factory)
+  {
+    if (mLanguageInclusionChecker == null) {
+      try {
+        mLanguageInclusionChecker =
+          new NativeLanguageInclusionChecker(des, factory);
+      } catch (final UnsatisfiedLinkError exception) {
+        mLanguageInclusionChecker =
+          new MonolithicLanguageInclusionChecker(des, factory);
+      }
+    }
+    mLanguageInclusionChecker.setModel(des);
+    return mLanguageInclusionChecker;      
+  }
+
+
+  //#########################################################################
+  //# Auxiliary Methods
   private StateProxy checkCounterExample(final AutomatonProxy aut,
 					 final ConflictTraceProxy trace)
   {
@@ -1000,5 +1027,10 @@ public abstract class AbstractConflictCheckerTest
     return factory.createAutomatonProxy
       (name, ComponentKind.PROPERTY, events, states, null);
   }
+
+
+  //#########################################################################
+  //# Data Members
+  private LanguageInclusionChecker mLanguageInclusionChecker;
 
 }
