@@ -148,8 +148,9 @@ public abstract class AbstractModelVerifierTest extends AbstractAnalysisTest
                                   final boolean expect)
     throws Exception
   {
+    mBindings = bindings;
     final ProductDESProxy des = getCompiledDES(filename, bindings);
-    runModelVerifier(des, bindings, expect);
+    runModelVerifierWithBindings(des, expect);
   }
 
   protected void runModelVerifier(final ProductDESProxy des,
@@ -164,20 +165,8 @@ public abstract class AbstractModelVerifierTest extends AbstractAnalysisTest
                                   final boolean expect)
     throws Exception
   {
-    mModelVerifier.setModel(des);
-    final boolean result = mModelVerifier.run();
-    TraceProxy counterexample = null;
-    if (!result) {
-      counterexample = mModelVerifier.getCounterExample();
-      precheckCounterExample(counterexample);
-      saveCounterExample(counterexample, bindings);
-    }
-    assertEquals("Wrong result from model checker: got " +
-                 result + " but should have been " + expect + "!",
-                 expect, result);
-    if (!expect) {
-      checkCounterExample(des, counterexample);
-    }
+    mBindings = bindings;
+    runModelVerifierWithBindings(des, expect);
   }
 
   protected ModelVerifier getModelVerifier()
@@ -187,7 +176,7 @@ public abstract class AbstractModelVerifierTest extends AbstractAnalysisTest
 
 
   //#########################################################################
-  //# To be Overridden by Subclasses
+  //# To be Overridden/Used by Subclasses
   protected void precheckCounterExample(final TraceProxy trace)
   {
     assertNotNull("Counterexample is NULL!", trace); 
@@ -200,6 +189,7 @@ public abstract class AbstractModelVerifierTest extends AbstractAnalysisTest
 
   protected void checkCounterExample(final ProductDESProxy des,
                                      final TraceProxy trace)
+    throws Exception
   {
     assertSame("Product DES in trace is not the original model!",
                des, trace.getProductDES());
@@ -219,6 +209,28 @@ public abstract class AbstractModelVerifierTest extends AbstractAnalysisTest
     }
   }
 
+  protected File saveCounterExample(final TraceProxy counterexample)
+    throws Exception
+  {
+    assertNotNull(counterexample);
+    final String name = counterexample.getName();
+    final String ext = mTraceMarshaller.getDefaultExtension();
+    final StringBuffer buffer = new StringBuffer(name);
+    if (mBindings != null) {
+      for (final ParameterBindingProxy binding : mBindings) {
+        buffer.append('-');
+        buffer.append(binding.getExpression().toString());
+      }
+    }
+    buffer.append(ext);
+    final String extname = buffer.toString();
+    final File dir = getOutputDirectory();
+    final File filename = new File(dir, extname);
+    ensureParentDirectoryExists(filename);
+    mTraceMarshaller.marshal(counterexample, filename);
+    return filename;
+  }
+
 
   //#########################################################################
   //# To be Provided by Subclasses
@@ -228,6 +240,26 @@ public abstract class AbstractModelVerifierTest extends AbstractAnalysisTest
 
   //#########################################################################
   //# Auxiliary Methods
+  protected void runModelVerifierWithBindings(final ProductDESProxy des,
+                                              final boolean expect)
+    throws Exception
+  {
+    mModelVerifier.setModel(des);
+    final boolean result = mModelVerifier.run();
+    TraceProxy counterexample = null;
+    if (!result) {
+      counterexample = mModelVerifier.getCounterExample();
+      precheckCounterExample(counterexample);
+      saveCounterExample(counterexample);
+    }
+    assertEquals("Wrong result from model checker: got " +
+                 result + " but should have been " + expect + "!",
+                 expect, result);
+    if (!expect) {
+      checkCounterExample(des, counterexample);
+    }
+  }
+
   private void setNodeLimit()
   {
     final String prop = System.getProperty("waters.analysis.statelimit");
@@ -237,35 +269,11 @@ public abstract class AbstractModelVerifierTest extends AbstractAnalysisTest
     }
   }
 
-  private void saveCounterExample(final TraceProxy counterexample,
-                                  final List<ParameterBindingProxy> bindings)
-    throws Exception
-  {
-    if (counterexample == null) {
-      System.err.println("WARNING: Got NULL counterexample");
-    } else {
-      final String name = counterexample.getName();
-      final String ext = mTraceMarshaller.getDefaultExtension();
-      final StringBuffer buffer = new StringBuffer(name);
-      if (bindings != null) {
-        for (final ParameterBindingProxy binding : bindings) {
-          buffer.append('-');
-          buffer.append(binding.getExpression().toString());
-        }
-      }
-      buffer.append(ext);
-      final String extname = buffer.toString();
-      final File dir = getOutputDirectory();
-      final File filename = new File(dir, extname);
-      ensureParentDirectoryExists(filename);
-      mTraceMarshaller.marshal(counterexample, filename);
-    }
-  }
-
 
   //#########################################################################
   //# Data Members
   private JAXBTraceMarshaller mTraceMarshaller;
   private ModelVerifier mModelVerifier;
+  private List<ParameterBindingProxy> mBindings;
 
 }

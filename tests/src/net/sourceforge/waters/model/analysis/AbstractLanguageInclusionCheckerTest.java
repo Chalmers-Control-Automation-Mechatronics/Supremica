@@ -387,6 +387,7 @@ public abstract class AbstractLanguageInclusionCheckerTest
   //# net.sourceforge.waters.analysis.AbstractModelVerifierTest
   protected void checkCounterExample(final ProductDESProxy des,
                                      final TraceProxy trace)
+    throws Exception
   {
     super.checkCounterExample(des, trace);
     final SafetyTraceProxy counterexample = (SafetyTraceProxy) trace;

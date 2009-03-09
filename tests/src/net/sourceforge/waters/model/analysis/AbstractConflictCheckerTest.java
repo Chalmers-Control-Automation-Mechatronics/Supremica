@@ -2,46 +2,58 @@
 //###########################################################################
 //# PROJECT: Waters
 //# PACKAGE: net.sourceforge.waters.model.analysis
-//# CLASS:   AbstractControllabilityCheckerTest
+//# CLASS:   AbstractConflictCheckerTest
 //###########################################################################
 //# $Id$
 //###########################################################################
 
 package net.sourceforge.waters.model.analysis;
 
+import java.io.File;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.List;
+import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 
 import net.sourceforge.waters.model.compiler.ModuleCompiler;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
-import net.sourceforge.waters.model.des.SafetyTraceProxy;
+import net.sourceforge.waters.model.des.ConflictTraceProxy;
 import net.sourceforge.waters.model.des.StateProxy;
 import net.sourceforge.waters.model.des.TraceProxy;
 import net.sourceforge.waters.model.des.TransitionProxy;
+import net.sourceforge.waters.model.module.EventDeclProxy;
 import net.sourceforge.waters.model.module.ParameterBindingProxy;
 import net.sourceforge.waters.xsd.base.ComponentKind;
 import net.sourceforge.waters.xsd.base.EventKind;
 
 
-public abstract class AbstractControllabilityCheckerTest
+public abstract class AbstractConflictCheckerTest
   extends AbstractModelVerifierTest
 {
 
   //#########################################################################
   //# Entry points in junit.framework.TestCase
-  public AbstractControllabilityCheckerTest()
+  public AbstractConflictCheckerTest()
   {
   }
 
-  public AbstractControllabilityCheckerTest(final String name)
+  public AbstractConflictCheckerTest(final String name)
   {
     super(name);
   }
+
+
+  //#########################################################################
+  //# To be Provided by Subclasses
+  protected abstract LanguageInclusionChecker
+    createLanguageInclusionChecker(ProductDESProxy des,
+                                   ProductDESProxyFactory factory);
 
 
   //#########################################################################
@@ -99,7 +111,7 @@ public abstract class AbstractControllabilityCheckerTest
   {
     final String group = "handwritten";
     final String name = "tictactoe.wdes";
-    runModelVerifier(group, name, false);
+    runModelVerifier(group, name, true);
   }
 
 
@@ -110,7 +122,7 @@ public abstract class AbstractControllabilityCheckerTest
     final String group = "tests";
     final String dir = "hisc";
     final String name = "rhone_subsystem1_patch0.wmod";
-    runModelVerifier(group, dir, name, true);
+    runModelVerifier(group, dir, name, false);
   }
 
   public void testHISCRhoneSubsystem1Patch1() throws Exception
@@ -118,7 +130,7 @@ public abstract class AbstractControllabilityCheckerTest
     final String group = "tests";
     final String dir = "hisc";
     final String name = "rhone_subsystem1_patch1.wmod";
-    runModelVerifier(group, dir, name, true);
+    runModelVerifier(group, dir, name, false);
   }
 
   public void testHISCRhoneSubsystem1Patch2() throws Exception
@@ -137,7 +149,7 @@ public abstract class AbstractControllabilityCheckerTest
     final String group = "tests";
     final String dir = "nasty";
     final String name = "jpt10counter.wmod";
-    runModelVerifier(group, dir, name, false);
+    runModelVerifier(group, dir, name, true);
   }
 
   public void testOrphanEvents() throws Exception
@@ -172,7 +184,7 @@ public abstract class AbstractControllabilityCheckerTest
     final String group = "tests";
     final String dir = "ball_sorter";
     final String name = "ball_timer_uncont.wmod";
-    runModelVerifier(group, dir, name, false);
+    runModelVerifier(group, dir, name, true);
   }
 
   public void test_BallTSorter1() throws Exception
@@ -196,7 +208,7 @@ public abstract class AbstractControllabilityCheckerTest
     final String group = "tests";
     final String dir = "batchtank2005";
     final String name = "cjn5.wdes";
-    runModelVerifier(group, dir, name, false);
+    runModelVerifier(group, dir, name, true);
   }
 
   public void test_Batchtank2005_cs37() throws Exception
@@ -260,7 +272,7 @@ public abstract class AbstractControllabilityCheckerTest
     final String group = "tests";
     final String dir = "batchtank2005";
     final String name = "jbr2.wdes";
-    runModelVerifier(group, dir, name, true);
+    runModelVerifier(group, dir, name, false);
   }
 
   public void test_Batchtank2005_jmr30() throws Exception
@@ -324,7 +336,7 @@ public abstract class AbstractControllabilityCheckerTest
     final String group = "tests";
     final String dir = "batchtank2005";
     final String name = "rch11.wdes";
-    runModelVerifier(group, dir, name, false);
+    runModelVerifier(group, dir, name, true);
   }
 
   public void test_Batchtank2005_ry27() throws Exception
@@ -340,7 +352,7 @@ public abstract class AbstractControllabilityCheckerTest
     final String group = "tests";
     final String dir = "batchtank2005";
     final String name = "scs10.wdes";
-    runModelVerifier(group, dir, name, false);
+    runModelVerifier(group, dir, name, true);
   }
 
   public void test_Batchtank2005_sjw41() throws Exception
@@ -364,7 +376,7 @@ public abstract class AbstractControllabilityCheckerTest
     final String group = "tests";
     final String dir = "batchtank2005";
     final String name = "tk27.wdes";
-    runModelVerifier(group, dir, name, false);
+    runModelVerifier(group, dir, name, true);
   }
 
   public void test_Batchtank2005_tp20() throws Exception
@@ -372,7 +384,7 @@ public abstract class AbstractControllabilityCheckerTest
     final String group = "tests";
     final String dir = "batchtank2005";
     final String name = "tp20.wdes";
-    runModelVerifier(group, dir, name, false);
+    runModelVerifier(group, dir, name, true);
   }
 
   public void test_Batchtank2005_vl6() throws Exception
@@ -396,30 +408,6 @@ public abstract class AbstractControllabilityCheckerTest
     final String group = "tests";
     final String dir = "nasty";
     final String name = "just_property.wdes";
-    runModelVerifier(group, dir, name, true);
-  }
-
-  public void test_Nasty_Mx27() throws Exception
-  {
-    final String group = "tests";
-    final String dir  = "nasty";
-    final String name = "mx27.wdes";
-    runModelVerifier(group, dir, name, false);
-  }
-
-  public void test_Nasty_OnlyInitBad() throws Exception
-  {
-    final String group = "tests";
-    final String dir  = "nasty";
-    final String name = "only_init_bad.wmod";
-    runModelVerifier(group, dir, name, false);
-  }
-
-  public void test_Nasty_ReleaseAndBlow() throws Exception
-  {
-    final String group = "tests";
-    final String dir  = "nasty";
-    final String name = "release_and_blow.wmod";
     runModelVerifier(group, dir, name, true);
   }
 
@@ -476,7 +464,7 @@ public abstract class AbstractControllabilityCheckerTest
     final String group = "tests";
     final String dir = "trafficlights2006";
     final String name = "ac61.wdes";
-    runModelVerifier(group, dir, name, false);
+    runModelVerifier(group, dir, name, true);
   }
 
   public void test_TrafficLights2006_al29() throws Exception
@@ -484,7 +472,7 @@ public abstract class AbstractControllabilityCheckerTest
     final String group = "tests";
     final String dir = "trafficlights2006";
     final String name = "al29.wdes";
-    runModelVerifier(group, dir, name, false);
+    runModelVerifier(group, dir, name, true);
   }
 
   public void test_TrafficLights2006_asjc1() throws Exception
@@ -492,7 +480,7 @@ public abstract class AbstractControllabilityCheckerTest
     final String group = "tests";
     final String dir = "trafficlights2006";
     final String name = "asjc1.wdes";
-    runModelVerifier(group, dir, name, false);
+    runModelVerifier(group, dir, name, true);
   }
 
   public void test_TrafficLights2006_dal9() throws Exception
@@ -516,7 +504,7 @@ public abstract class AbstractControllabilityCheckerTest
     final String group = "tests";
     final String dir = "trafficlights2006";
     final String name = "ejtrw1.wdes";
-    runModelVerifier(group, dir, name, false);
+    runModelVerifier(group, dir, name, true);
   }
 
   public void test_TrafficLights2006_ekb2() throws Exception
@@ -524,7 +512,7 @@ public abstract class AbstractControllabilityCheckerTest
     final String group = "tests";
     final String dir = "trafficlights2006";
     final String name = "ekb2.wdes";
-    runModelVerifier(group, dir, name, false);
+    runModelVerifier(group, dir, name, true);
   }
 
   public void test_TrafficLights2006_gat7() throws Exception
@@ -532,7 +520,7 @@ public abstract class AbstractControllabilityCheckerTest
     final String group = "tests";
     final String dir = "trafficlights2006";
     final String name = "gat7.wdes";
-    runModelVerifier(group, dir, name, false);
+    runModelVerifier(group, dir, name, true);
   }
 
   public void test_TrafficLights2006_jdm18() throws Exception
@@ -540,7 +528,7 @@ public abstract class AbstractControllabilityCheckerTest
     final String group = "tests";
     final String dir = "trafficlights2006";
     final String name = "jdm18.wdes";
-    runModelVerifier(group, dir, name, false);
+    runModelVerifier(group, dir, name, true);
   }
 
   public void test_TrafficLights2006_jlm39() throws Exception
@@ -556,7 +544,7 @@ public abstract class AbstractControllabilityCheckerTest
     final String group = "tests";
     final String dir = "trafficlights2006";
     final String name = "jpg7.wdes";
-    runModelVerifier(group, dir, name, false);
+    runModelVerifier(group, dir, name, true);
   }
 
   public void test_TrafficLights2006_jpm22() throws Exception
@@ -564,7 +552,7 @@ public abstract class AbstractControllabilityCheckerTest
     final String group = "tests";
     final String dir = "trafficlights2006";
     final String name = "jpm22.wdes";
-    runModelVerifier(group, dir, name, false);
+    runModelVerifier(group, dir, name, true);
   }
 
   public void test_TrafficLights2006_jrv2() throws Exception
@@ -572,7 +560,7 @@ public abstract class AbstractControllabilityCheckerTest
     final String group = "tests";
     final String dir = "trafficlights2006";
     final String name = "jrv2.wdes";
-    runModelVerifier(group, dir, name, false);
+    runModelVerifier(group, dir, name, true);
   }
 
   public void test_TrafficLights2006_js173() throws Exception
@@ -580,7 +568,7 @@ public abstract class AbstractControllabilityCheckerTest
     final String group = "tests";
     final String dir = "trafficlights2006";
     final String name = "js173.wdes";
-    runModelVerifier(group, dir, name, false);
+    runModelVerifier(group, dir, name, true);
   }
 
   public void test_TrafficLights2006_lz173() throws Exception
@@ -588,7 +576,7 @@ public abstract class AbstractControllabilityCheckerTest
     final String group = "tests";
     final String dir = "trafficlights2006";
     final String name = "lz173.wdes";
-    runModelVerifier(group, dir, name, false);
+    runModelVerifier(group, dir, name, true);
   }
 
   public void test_TrafficLights2006_meb16() throws Exception
@@ -596,7 +584,7 @@ public abstract class AbstractControllabilityCheckerTest
     final String group = "tests";
     final String dir = "trafficlights2006";
     final String name = "meb16.wdes";
-    runModelVerifier(group, dir, name, false);
+    runModelVerifier(group, dir, name, true);
   }
 
   public void test_TrafficLights2006_mjd29() throws Exception
@@ -620,7 +608,7 @@ public abstract class AbstractControllabilityCheckerTest
     final String group = "tests";
     final String dir = "trafficlights2006";
     final String name = "rjo6.wdes";
-    runModelVerifier(group, dir, name, false);
+    runModelVerifier(group, dir, name, true);
   }
 
   public void test_TrafficLights2006_rms33() throws Exception
@@ -636,7 +624,7 @@ public abstract class AbstractControllabilityCheckerTest
     final String group = "tests";
     final String dir = "trafficlights2006";
     final String name = "sdh7.wdes";
-    runModelVerifier(group, dir, name, true);
+    runModelVerifier(group, dir, name, false);
   }
 
   public void test_TrafficLights2006_sgc9_1() throws Exception
@@ -644,7 +632,7 @@ public abstract class AbstractControllabilityCheckerTest
     final String group = "tests";
     final String dir = "trafficlights2006";
     final String name = "sgc9_1.wdes";
-    runModelVerifier(group, dir, name, false);
+    runModelVerifier(group, dir, name, true);
   }
 
   public void test_TrafficLights2006_sgc9_2() throws Exception
@@ -652,7 +640,7 @@ public abstract class AbstractControllabilityCheckerTest
     final String group = "tests";
     final String dir = "trafficlights2006";
     final String name = "sgc9_2.wdes";
-    runModelVerifier(group, dir, name, false);
+    runModelVerifier(group, dir, name, true);
   }
 
   public void test_TrafficLights2006_yip1() throws Exception
@@ -671,7 +659,7 @@ public abstract class AbstractControllabilityCheckerTest
     final String group = "valid";
     final String dir  = "big_factory";
     final String name = "bfactory.wdes";
-    runModelVerifier(group, dir, name, false);
+    runModelVerifier(group, dir, name, true);
   }
 
   public void testBmw_fh() throws Exception
@@ -687,7 +675,7 @@ public abstract class AbstractControllabilityCheckerTest
     final String group = "valid";
     final String dir  = "border_cases";
     final String name = "never_blow_up.wdes";
-    runModelVerifier(group, dir, name, false);
+    runModelVerifier(group, dir, name, true);
   }
 
   public void testDebounce() throws Exception
@@ -706,6 +694,7 @@ public abstract class AbstractControllabilityCheckerTest
     runModelVerifier(group, dir, name, true);
   }
 
+  /*
   public void testFischertechnik() throws Exception
   {
     final String group = "tests";
@@ -713,6 +702,7 @@ public abstract class AbstractControllabilityCheckerTest
     final String name = "ftechnik.wmod";
     runModelVerifier(group, dir, name, false);
   }
+  */
 
   public void testFtuer() throws Exception
   {
@@ -735,7 +725,7 @@ public abstract class AbstractControllabilityCheckerTest
     final String group = "valid";
     final String dir = "mazes";
     final String name = "mazes.wdes";
-    runModelVerifier(group, dir, name, true);
+    runModelVerifier(group, dir, name, false);
   }
 
   public void testSafetydisplay() throws Exception
@@ -759,7 +749,7 @@ public abstract class AbstractControllabilityCheckerTest
     final String group = "valid";
     final String dir = "small";
     final String name = "small_uncont.wdes";
-    runModelVerifier(group, dir, name, false);
+    runModelVerifier(group, dir, name, true);
   }
 
   public void testSmd() throws Exception
@@ -823,8 +813,10 @@ public abstract class AbstractControllabilityCheckerTest
   //# net.sourceforge.waters.analysis.AbstractAnalysisTest
   protected void configure(final ModuleCompiler compiler)
   {
+    final Collection<String> marking =
+      Collections.singletonList(EventDeclProxy.DEFAULT_MARKING_NAME);
+    compiler.setEnabledPropositionNames(marking);
     final Collection<String> empty = Collections.emptyList();
-    compiler.setEnabledPropositionNames(empty);
     compiler.setEnabledPropertyNames(empty);
   }
 
@@ -837,69 +829,176 @@ public abstract class AbstractControllabilityCheckerTest
     throws Exception
   {
     super.checkCounterExample(des, trace);
-    final SafetyTraceProxy counterexample = (SafetyTraceProxy) trace;
-  	
-    final List<EventProxy> eventlist = counterexample.getEvents();
-    final int len = eventlist.size();
-    assertTrue("Empty Counterexample!", len > 0);
-  	  	
-    final EventProxy last = eventlist.get(len-1);
-    final EventKind ekind = last.getKind();
-    assertEquals(ekind, EventKind.UNCONTROLLABLE);
-  	
+    final ConflictTraceProxy counterexample = (ConflictTraceProxy) trace;
     final Collection<AutomatonProxy> automata = des.getAutomata();
-    boolean rejected = false;
-    for (final AutomatonProxy aut : automata){
-      final ComponentKind akind = aut.getKind();
-      final int accepted = checkCounterExample(aut, eventlist);
-      if (akind.equals(ComponentKind.PLANT)){
-	assertTrue("Counterexample not accepted by plant " +
-		   aut.getName() + "!", accepted == len);
-      } else if (akind.equals(ComponentKind.SPEC)) {
-	assertFalse("Counterexample rejected too early (step " + accepted +
-		    ") by spec " + aut.getName() + "!",
-		    accepted < len - 1);
-	rejected |= (accepted == len - 1);
-      }
+    final int size = automata.size();
+    final Map<AutomatonProxy,StateProxy> tuple =
+      new HashMap<AutomatonProxy,StateProxy>(size);
+    for (final AutomatonProxy aut : automata) {
+      final StateProxy state = checkCounterExample(aut, counterexample);
+      assertNotNull("Counterexample not accepted by automaton " +
+                    aut.getName() + "!", state);
+      tuple.put(aut, state);
     }
-    assertTrue("Counterexample not rejected by any spec!", rejected);
+    final ProductDESProxy ldes = createLanguageInclusionModel(des, tuple);
+    final ProductDESProxyFactory factory = getProductDESProxyFactory();
+    final LanguageInclusionChecker lchecker =
+      createLanguageInclusionChecker(ldes, factory);
+    final boolean blocking = lchecker.run();
+    if (!blocking) {
+      final TraceProxy ltrace = lchecker.getCounterExample(); 
+      final File filename = saveCounterExample(ltrace);
+      fail("Counterexample does not lead to blocking state (trace written to" +
+           filename + ")!");
+    }
   }
 
-  private int checkCounterExample(final AutomatonProxy aut,
-                                  final List<EventProxy> counterexample)
+  private StateProxy checkCounterExample(final AutomatonProxy aut,
+					 final ConflictTraceProxy trace)
   {
     final Collection<EventProxy> events = aut.getEvents();
     final Collection<StateProxy> states = aut.getStates();
     final Collection<TransitionProxy> transitions = aut.getTransitions();
-
-    int steps = -1;
     StateProxy current = null;
-    for (final StateProxy state : states){
-      if (state.isInitial()){
-        current = state;
-        break;
+    for (final StateProxy state : states) {
+      if (state.isInitial()) {
+	current = state;
+	break;
       }
     }
-    if (current == null){
-      return steps;
+    if (current == null) {
+      return null;
     }
-    for (final EventProxy event : counterexample){
-      steps++;
-      if (events.contains(event)){
-        boolean found = false;
-        for(final TransitionProxy trans : transitions){
-          if (trans.getSource()== current && trans.getEvent() == event){
-            current = trans.getTarget();
-            found = true;
-            break;
-          }
-        }
-        if(!found){        	
-          return steps;
-        }
+    for (final EventProxy event : trace.getEvents()) {
+      if (events.contains(event)) {
+	boolean found = false;
+	for (final TransitionProxy trans : transitions) {
+	  if (trans.getSource() == current && trans.getEvent() == event) {
+	    current = trans.getTarget();
+	    found = true;
+	    break;
+	  }
+	}
+	if (!found) {
+	  return null;
+	}
       }
     }
-    return steps + 1;
+    return current;
+  }
+
+
+  //#########################################################################
+  //# Coreachability Model
+  private ProductDESProxy createLanguageInclusionModel
+    (final ProductDESProxy des, final Map<AutomatonProxy,StateProxy> inittuple)
+  {
+    final ProductDESProxyFactory factory = getProductDESProxyFactory();
+    final Collection<EventProxy> oldevents = des.getEvents();
+    final int numevents = oldevents.size();
+    final Collection<EventProxy> newevents =
+      new ArrayList<EventProxy>(numevents);
+    EventProxy oldmarking = null;
+    EventProxy newmarking = null;
+    for (final EventProxy oldevent : oldevents) {
+      if (oldevent.getKind() == EventKind.PROPOSITION) {
+	final String eventname = oldevent.getName();
+	if (eventname.equals(EventDeclProxy.DEFAULT_MARKING_NAME)) {
+	  oldmarking = oldevent;
+	  newmarking =
+            factory.createEventProxy(eventname, EventKind.UNCONTROLLABLE);
+	  newevents.add(newmarking);
+	}
+      } else {
+	newevents.add(oldevent);
+      }
+    }
+    if (oldmarking == null) {
+      throw new IllegalArgumentException
+	("Default marking proposition not found in model!");
+    }
+    final Collection<AutomatonProxy> oldautomata = des.getAutomata();
+    final int numaut = oldautomata.size();
+    final Collection<AutomatonProxy> newautomata =
+      new ArrayList<AutomatonProxy>(numaut + 1);
+    for (final AutomatonProxy oldaut : oldautomata) {
+      final StateProxy init = inittuple.get(oldaut);
+      final AutomatonProxy newaut =
+	createLanguageInclusionAutomaton(oldaut, init, oldmarking, newmarking);
+      newautomata.add(newaut);
+    }
+    final AutomatonProxy prop = createPropertyAutomaton(newmarking);
+    newautomata.add(prop);
+    final String name = des.getName() + ":coreachability";
+    return factory.createProductDESProxy(name, newevents, newautomata);
+  }
+
+  private AutomatonProxy createLanguageInclusionAutomaton
+    (final AutomatonProxy aut,
+     final StateProxy newinit,
+     final EventProxy oldmarking,
+     final EventProxy newmarking)
+  {
+    final ProductDESProxyFactory factory = getProductDESProxyFactory();
+    final Collection<EventProxy> oldevents = aut.getEvents();
+    final int numevents = oldevents.size();
+    final Collection<EventProxy> newevents =
+      new ArrayList<EventProxy>(numevents);
+    for (final EventProxy oldevent : oldevents) {
+      if (oldevent == oldmarking) {
+	newevents.add(newmarking);
+      } else if (oldevent.getKind() != EventKind.PROPOSITION) {
+	newevents.add(oldevent);
+      }
+    }
+    final Collection<StateProxy> oldstates = aut.getStates();
+    final int numstates = oldstates.size();
+    final Collection<StateProxy> newstates =
+      new ArrayList<StateProxy>(numstates);
+    final Map<StateProxy,StateProxy> statemap =
+      new HashMap<StateProxy,StateProxy>(numstates);
+    final Collection<TransitionProxy> oldtransitions = aut.getTransitions();
+    final int numtrans = oldtransitions.size();
+    final Collection<TransitionProxy> newtransitions =
+      new ArrayList<TransitionProxy>(numstates + numtrans);
+    for (final StateProxy oldstate : oldstates) {
+      final String statename = oldstate.getName();
+      final StateProxy newstate =
+	factory.createStateProxy(statename, oldstate == newinit, null);
+      newstates.add(newstate);
+      statemap.put(oldstate, newstate);
+      if (oldstate.getPropositions().contains(oldmarking)) {
+	final TransitionProxy trans =
+	  factory.createTransitionProxy(newstate, newmarking, newstate);
+	newtransitions.add(trans);
+      }
+    }
+    for (final TransitionProxy oldtrans : oldtransitions) {
+      final StateProxy oldsource = oldtrans.getSource();
+      final StateProxy newsource = statemap.get(oldsource);
+      final StateProxy oldtarget = oldtrans.getTarget();
+      final StateProxy newtarget = statemap.get(oldtarget);
+      final EventProxy event = oldtrans.getEvent();
+      final TransitionProxy newtrans =
+	factory.createTransitionProxy(newsource, event, newtarget);
+      newtransitions.add(newtrans);
+    }
+    final String autname = aut.getName();
+    final ComponentKind kind = aut.getKind();
+    return factory.createAutomatonProxy
+      (autname, kind, newevents, newstates, newtransitions);
+  }
+
+  private AutomatonProxy createPropertyAutomaton(final EventProxy newmarking)
+  {
+    final ProductDESProxyFactory factory = getProductDESProxyFactory();
+    final String name = ":never:" + newmarking.getName();
+    final Collection<EventProxy> events =
+      Collections.singletonList(newmarking);
+    final StateProxy state = factory.createStateProxy("s0", true, null);
+    final Collection<StateProxy> states = Collections.singletonList(state);
+    return factory.createAutomatonProxy
+      (name, ComponentKind.PROPERTY, events, states, null);
   }
 
 }

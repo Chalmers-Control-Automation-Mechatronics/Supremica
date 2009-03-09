@@ -2,7 +2,7 @@
 <ProductDES Name="DosingTankWithJellyEFA1"
   xmlns:ns2="http://waters.sourceforge.net/xsd/base"
   xmlns="http://waters.sourceforge.net/xsd/des">
-<ns2:Comment>Uncontrollable.</ns2:Comment>
+<ns2:Comment>Uncontrollable and blocking.</ns2:Comment>
 <EventList>
 <Event Kind="PROPOSITION" Name=":accepting"/>
 <Event Kind="CONTROLLABLE" Name="close_in"/>
