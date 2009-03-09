@@ -1,1132 +1,1132 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <ProductDES Name="koordwsp" xmlns="http://waters.sourceforge.net/xsd/des">
-    <EventList>
-        <Event Kind="PROPOSITION" Observable="true" Name=":accepting"/>
-        <Event Kind="CONTROLLABLE" Observable="true" Name="autom_VR"/>
-        <Event Kind="UNCONTROLLABLE" Observable="true" Name="cod_er"/>
-        <Event Kind="UNCONTROLLABLE" Observable="true" Name="cod_ser"/>
-        <Event Kind="UNCONTROLLABLE" Observable="true" Name="CS"/>
-        <Event Kind="CONTROLLABLE" Observable="true" Name="CS_ok"/>
-        <Event Kind="UNCONTROLLABLE" Observable="true" Name="ctr_ge_max[WSP]"/>
-        <Event Kind="UNCONTROLLABLE" Observable="true" Name="ctr_lt_max[WSP]"/>
-        <Event Kind="CONTROLLABLE" Observable="true" Name="done_ER"/>
-        <Event Kind="CONTROLLABLE" Observable="true" Name="done_SER[FT]"/>
-        <Event Kind="CONTROLLABLE" Observable="true" Name="done_VR"/>
-        <Event Kind="CONTROLLABLE" Observable="true" Name="done_ZS"/>
-        <Event Kind="CONTROLLABLE" Observable="true" Name="ER"/>
-        <Event Kind="UNCONTROLLABLE" Observable="true" Name="ER_BT"/>
-        <Event Kind="UNCONTROLLABLE" Observable="true" Name="ER_FS"/>
-        <Event Kind="UNCONTROLLABLE" Observable="true" Name="ER_FT"/>
-        <Event Kind="UNCONTROLLABLE" Observable="true" Name="ER_HK"/>
-        <Event Kind="CONTROLLABLE" Observable="true" Name="inc_ctr[WSP]"/>
-        <Event Kind="CONTROLLABLE" Observable="true" Name="is_cod_er"/>
-        <Event Kind="CONTROLLABLE" Observable="true" Name="is_cod_ser"/>
-        <Event Kind="CONTROLLABLE" Observable="true" Name="kein_ZS"/>
-        <Event Kind="CONTROLLABLE" Observable="true" Name="reset[FS]"/>
-        <Event Kind="CONTROLLABLE" Observable="true" Name="reset[WSP]"/>
-        <Event Kind="CONTROLLABLE" Observable="true" Name="reset_ctr[WSP]"/>
-        <Event Kind="CONTROLLABLE" Observable="true" Name="SER"/>
-        <Event Kind="CONTROLLABLE" Observable="true" Name="SERFS"/>
-        <Event Kind="CONTROLLABLE" Observable="true" Name="soft_CS"/>
-        <Event Kind="CONTROLLABLE" Observable="true" Name="soft_ER"/>
-        <Event Kind="CONTROLLABLE" Observable="true" Name="soft_SER[FT]"/>
-        <Event Kind="CONTROLLABLE" Observable="true" Name="soft_VR"/>
-        <Event Kind="CONTROLLABLE" Observable="true" Name="soft_ZS"/>
-        <Event Kind="CONTROLLABLE" Observable="true" Name="TAST"/>
-        <Event Kind="UNCONTROLLABLE" Observable="true" Name="TASTVR"/>
-        <Event Kind="CONTROLLABLE" Observable="true" Name="time[FS]"/>
-        <Event Kind="CONTROLLABLE" Observable="true" Name="time[WSP]"/>
-        <Event Kind="UNCONTROLLABLE" Observable="true" Name="timeout[FS]"/>
-        <Event Kind="UNCONTROLLABLE" Observable="true" Name="timeout[WSP]"/>
-        <Event Kind="UNCONTROLLABLE" Observable="true" Name="tuer_auf[BT]"/>
-        <Event Kind="UNCONTROLLABLE" Observable="true" Name="tuer_auf[FT]"/>
-        <Event Kind="UNCONTROLLABLE" Observable="true" Name="tuer_auf[HT]"/>
-        <Event Kind="UNCONTROLLABLE" Observable="true" Name="tuer_zu[BT]"/>
-        <Event Kind="UNCONTROLLABLE" Observable="true" Name="tuer_zu[FT]"/>
-        <Event Kind="UNCONTROLLABLE" Observable="true" Name="tuer_zu[HT]"/>
-        <Event Kind="UNCONTROLLABLE" Observable="true" Name="VR_BT"/>
-        <Event Kind="UNCONTROLLABLE" Observable="true" Name="VR_FS"/>
-        <Event Kind="UNCONTROLLABLE" Observable="true" Name="VR_FT"/>
-        <Event Kind="UNCONTROLLABLE" Observable="true" Name="VR_HK"/>
-        <Event Kind="CONTROLLABLE" Observable="true" Name="wsp"/>
-        <Event Kind="CONTROLLABLE" Observable="true" Name="ZS"/>
-        <Event Kind="CONTROLLABLE" Observable="true" Name="ZSA"/>
-        <Event Kind="CONTROLLABLE" Observable="true" Name="ZSI"/>
-        <Event Kind="UNCONTROLLABLE" Observable="true" Name="zuendung_an"/>
-        <Event Kind="UNCONTROLLABLE" Observable="true" Name="zuendung_aus"/>
-    </EventList>
-    <AutomataList>
-        <Automaton Kind="SPEC" Name="automvr">
-            <EventRefList>
-                <EventRef Name=":accepting"/>
-                <EventRef Name="autom_VR"/>
-                <EventRef Name="ER"/>
-                <EventRef Name="reset[FS]"/>
-                <EventRef Name="SER"/>
-                <EventRef Name="SERFS"/>
-                <EventRef Name="soft_CS"/>
-                <EventRef Name="soft_ER"/>
-                <EventRef Name="soft_SER[FT]"/>
-                <EventRef Name="soft_VR"/>
-                <EventRef Name="soft_ZS"/>
-                <EventRef Name="TAST"/>
-                <EventRef Name="time[FS]"/>
-                <EventRef Name="timeout[FS]"/>
-                <EventRef Name="tuer_auf[BT]"/>
-                <EventRef Name="tuer_auf[FT]"/>
-                <EventRef Name="tuer_auf[HT]"/>
-                <EventRef Name="wsp"/>
-                <EventRef Name="ZS"/>
-            </EventRefList>
-            <StateList>
-                <State Initial="false" Name="AU1"/>
-                <State Initial="false" Name="AU2"/>
-                <State Initial="false" Name="AU3"/>
-                <State Initial="false" Name="ER">
-                    <EventRefList>
-                        <EventRef Name=":accepting"/>
-                    </EventRefList>
-                </State>
-                <State Initial="false" Name="FS"/>
-                <State Initial="true" Name="VR">
-                    <EventRefList>
-                        <EventRef Name=":accepting"/>
-                    </EventRefList>
-                </State>
-            </StateList>
-            <TransitionList>
-                <Transition Event="soft_VR" Source="ER" Target="VR"/>
-                <Transition Event="soft_ZS" Source="ER" Target="VR"/>
-                <Transition Event="ER" Source="ER" Target="ER"/>
-                <Transition Event="SER" Source="ER" Target="ER"/>
-                <Transition Event="ZS" Source="ER" Target="ER"/>
-                <Transition Event="TAST" Source="ER" Target="ER"/>
-                <Transition Event="wsp" Source="ER" Target="ER"/>
-                <Transition Event="soft_ER" Source="ER" Target="ER"/>
-                <Transition Event="soft_SER[FT]" Source="ER" Target="ER"/>
-                <Transition Event="reset[FS]" Source="ER" Target="ER"/>
-                <Transition Event="timeout[FS]" Source="ER" Target="ER"/>
-                <Transition Event="ER" Source="VR" Target="VR"/>
-                <Transition Event="SER" Source="VR" Target="VR"/>
-                <Transition Event="ZS" Source="VR" Target="VR"/>
-                <Transition Event="TAST" Source="VR" Target="VR"/>
-                <Transition Event="wsp" Source="VR" Target="VR"/>
-                <Transition Event="soft_VR" Source="VR" Target="VR"/>
-                <Transition Event="soft_ZS" Source="VR" Target="VR"/>
-                <Transition Event="reset[FS]" Source="VR" Target="VR"/>
-                <Transition Event="timeout[FS]" Source="VR" Target="VR"/>
-                <Transition Event="SERFS" Source="VR" Target="FS"/>
-                <Transition Event="soft_ER" Source="VR" Target="ER"/>
-                <Transition Event="soft_SER[FT]" Source="VR" Target="ER"/>
-                <Transition Event="wsp" Source="FS" Target="VR"/>
-                <Transition Event="ER" Source="FS" Target="VR"/>
-                <Transition Event="SER" Source="FS" Target="VR"/>
-                <Transition Event="ZS" Source="FS" Target="VR"/>
-                <Transition Event="TAST" Source="FS" Target="VR"/>
-                <Transition Event="reset[FS]" Source="FS" Target="FS"/>
-                <Transition Event="timeout[FS]" Source="FS" Target="FS"/>
-                <Transition Event="soft_ER" Source="FS" Target="AU1"/>
-                <Transition Event="soft_SER[FT]" Source="FS" Target="AU1"/>
-                <Transition Event="SERFS" Source="AU2" Target="AU2"/>
-                <Transition Event="timeout[FS]" Source="AU2" Target="AU3"/>
-                <Transition Event="autom_VR" Source="AU3" Target="VR"/>
-                <Transition Event="SERFS" Source="AU3" Target="AU3"/>
-                <Transition Event="SERFS" Source="AU1" Target="AU1"/>
-                <Transition Event="reset[FS]" Source="AU1" Target="AU1"/>
-                <Transition Event="timeout[FS]" Source="AU1" Target="AU1"/>
-                <Transition Event="time[FS]" Source="AU1" Target="AU2"/>
-                <Transition Event="ER" Source="AU3" Target="ER"/>
-                <Transition Event="SER" Source="AU3" Target="ER"/>
-                <Transition Event="ZS" Source="AU3" Target="ER"/>
-                <Transition Event="TAST" Source="AU3" Target="ER"/>
-                <Transition Event="ER" Source="AU2" Target="ER"/>
-                <Transition Event="SER" Source="AU2" Target="ER"/>
-                <Transition Event="ZS" Source="AU2" Target="ER"/>
-                <Transition Event="TAST" Source="AU2" Target="ER"/>
-                <Transition Event="ER" Source="AU1" Target="ER"/>
-                <Transition Event="SER" Source="AU1" Target="ER"/>
-                <Transition Event="ZS" Source="AU1" Target="ER"/>
-                <Transition Event="TAST" Source="AU1" Target="ER"/>
-                <Transition Event="soft_CS" Source="FS" Target="ER"/>
-                <Transition Event="tuer_auf[BT]" Source="FS" Target="ER"/>
-                <Transition Event="tuer_auf[FT]" Source="FS" Target="ER"/>
-                <Transition Event="tuer_auf[HT]" Source="FS" Target="ER"/>
-                <Transition Event="soft_CS" Source="ER" Target="ER"/>
-                <Transition Event="tuer_auf[BT]" Source="ER" Target="ER"/>
-                <Transition Event="tuer_auf[FT]" Source="ER" Target="ER"/>
-                <Transition Event="tuer_auf[HT]" Source="ER" Target="ER"/>
-                <Transition Event="soft_CS" Source="VR" Target="ER"/>
-                <Transition Event="tuer_auf[BT]" Source="VR" Target="ER"/>
-                <Transition Event="tuer_auf[FT]" Source="VR" Target="ER"/>
-                <Transition Event="tuer_auf[HT]" Source="VR" Target="ER"/>
-                <Transition Event="soft_CS" Source="AU3" Target="ER"/>
-                <Transition Event="tuer_auf[BT]" Source="AU3" Target="ER"/>
-                <Transition Event="tuer_auf[FT]" Source="AU3" Target="ER"/>
-                <Transition Event="tuer_auf[HT]" Source="AU3" Target="ER"/>
-                <Transition Event="soft_CS" Source="AU2" Target="ER"/>
-                <Transition Event="tuer_auf[BT]" Source="AU2" Target="ER"/>
-                <Transition Event="tuer_auf[FT]" Source="AU2" Target="ER"/>
-                <Transition Event="tuer_auf[HT]" Source="AU2" Target="ER"/>
-                <Transition Event="soft_CS" Source="AU1" Target="ER"/>
-                <Transition Event="tuer_auf[BT]" Source="AU1" Target="ER"/>
-                <Transition Event="tuer_auf[FT]" Source="AU1" Target="ER"/>
-                <Transition Event="tuer_auf[HT]" Source="AU1" Target="ER"/>
-            </TransitionList>
-        </Automaton>
-        <Automaton Kind="SPEC" Name="check_cod_ser">
-            <EventRefList>
-                <EventRef Name=":accepting"/>
-                <EventRef Name="cod_er"/>
-                <EventRef Name="cod_ser"/>
-                <EventRef Name="is_cod_er"/>
-                <EventRef Name="is_cod_ser"/>
-            </EventRefList>
-            <StateList>
-                <State Initial="true" Name="ER">
-                    <EventRefList>
-                        <EventRef Name=":accepting"/>
-                    </EventRefList>
-                </State>
-                <State Initial="false" Name="SER"/>
-            </StateList>
-            <TransitionList>
-                <Transition Event="is_cod_ser" Source="SER" Target="SER"/>
-                <Transition Event="cod_er" Source="SER" Target="ER"/>
-                <Transition Event="cod_ser" Source="ER" Target="SER"/>
-                <Transition Event="is_cod_er" Source="ER" Target="ER"/>
-            </TransitionList>
-        </Automaton>
-        <Automaton Kind="PLANT" Name="cod_ser">
-            <EventRefList>
-                <EventRef Name=":accepting"/>
-                <EventRef Name="cod_er"/>
-                <EventRef Name="cod_ser"/>
-            </EventRefList>
-            <StateList>
-                <State Initial="true" Name="ER">
-                    <EventRefList>
-                        <EventRef Name=":accepting"/>
-                    </EventRefList>
-                </State>
-                <State Initial="false" Name="SER"/>
-            </StateList>
-            <TransitionList>
-                <Transition Event="cod_er" Source="SER" Target="ER"/>
-                <Transition Event="cod_ser" Source="ER" Target="SER"/>
-            </TransitionList>
-        </Automaton>
-        <Automaton Kind="SPEC" Name="crash">
-            <EventRefList>
-                <EventRef Name=":accepting"/>
-                <EventRef Name="CS"/>
-                <EventRef Name="CS_ok"/>
-                <EventRef Name="done_ZS"/>
-                <EventRef Name="soft_CS"/>
-                <EventRef Name="soft_ER"/>
-                <EventRef Name="soft_SER[FT]"/>
-                <EventRef Name="soft_VR"/>
-                <EventRef Name="zuendung_an"/>
-                <EventRef Name="zuendung_aus"/>
-            </EventRefList>
-            <StateList>
-                <State Initial="false" Name="CS1"/>
-                <State Initial="false" Name="CS1a"/>
-                <State Initial="false" Name="CS2"/>
-                <State Initial="false" Name="CS2a"/>
-                <State Initial="true" Name="IN">
-                    <EventRefList>
-                        <EventRef Name=":accepting"/>
-                    </EventRefList>
-                </State>
-                <State Initial="false" Name="RUN"/>
-                <State Initial="false" Name="XX"/>
-                <State Initial="false" Name="ZS">
-                    <EventRefList>
-                        <EventRef Name=":accepting"/>
-                    </EventRefList>
-                </State>
-            </StateList>
-            <TransitionList>
-                <Transition Event="CS" Source="CS2a" Target="CS2a"/>
-                <Transition Event="zuendung_an" Source="CS2a" Target="CS2"/>
-                <Transition Event="CS_ok" Source="CS2a" Target="IN"/>
-                <Transition Event="zuendung_an" Source="ZS" Target="XX"/>
-                <Transition Event="soft_ER" Source="ZS" Target="IN"/>
-                <Transition Event="soft_SER[FT]" Source="ZS" Target="IN"/>
-                <Transition Event="soft_VR" Source="ZS" Target="IN"/>
-                <Transition Event="done_ZS" Source="ZS" Target="ZS"/>
-                <Transition Event="CS" Source="ZS" Target="ZS"/>
-                <Transition Event="zuendung_an" Source="IN" Target="RUN"/>
-                <Transition Event="soft_ER" Source="IN" Target="IN"/>
-                <Transition Event="soft_SER[FT]" Source="IN" Target="IN"/>
-                <Transition Event="soft_VR" Source="IN" Target="IN"/>
-                <Transition Event="CS" Source="IN" Target="IN"/>
-                <Transition Event="done_ZS" Source="IN" Target="ZS"/>
-                <Transition Event="soft_CS" Source="CS1a" Target="CS2a"/>
-                <Transition Event="CS" Source="CS1a" Target="CS1a"/>
-                <Transition Event="zuendung_an" Source="CS1a" Target="CS1"/>
-                <Transition Event="soft_ER" Source="RUN" Target="RUN"/>
-                <Transition Event="soft_SER[FT]" Source="RUN" Target="RUN"/>
-                <Transition Event="soft_VR" Source="RUN" Target="RUN"/>
-                <Transition Event="done_ZS" Source="RUN" Target="XX"/>
-                <Transition Event="zuendung_aus" Source="RUN" Target="IN"/>
-                <Transition Event="CS" Source="RUN" Target="CS1"/>
-                <Transition Event="soft_ER" Source="XX" Target="RUN"/>
-                <Transition Event="soft_SER[FT]" Source="XX" Target="RUN"/>
-                <Transition Event="soft_VR" Source="XX" Target="RUN"/>
-                <Transition Event="done_ZS" Source="XX" Target="XX"/>
-                <Transition Event="CS" Source="XX" Target="XX"/>
-                <Transition Event="zuendung_aus" Source="XX" Target="ZS"/>
-                <Transition Event="zuendung_aus" Source="CS2" Target="CS2a"/>
-                <Transition Event="CS_ok" Source="CS2" Target="RUN"/>
-                <Transition Event="CS" Source="CS2" Target="CS2"/>
-                <Transition Event="zuendung_aus" Source="CS1" Target="CS1a"/>
-                <Transition Event="soft_CS" Source="CS1" Target="CS2"/>
-                <Transition Event="CS" Source="CS1" Target="CS1"/>
-            </TransitionList>
-        </Automaton>
-        <Automaton Kind="SPEC" Name="decoder">
-            <EventRefList>
-                <EventRef Name=":accepting"/>
-                <EventRef Name="autom_VR"/>
-                <EventRef Name="ER"/>
-                <EventRef Name="is_cod_er"/>
-                <EventRef Name="is_cod_ser"/>
-                <EventRef Name="SER"/>
-                <EventRef Name="SERFS"/>
-                <EventRef Name="soft_CS"/>
-                <EventRef Name="soft_ER"/>
-                <EventRef Name="soft_SER[FT]"/>
-                <EventRef Name="soft_VR"/>
-                <EventRef Name="soft_ZS"/>
-                <EventRef Name="TAST"/>
-                <EventRef Name="ZS"/>
-                <EventRef Name="ZSA"/>
-                <EventRef Name="ZSI"/>
-            </EventRefList>
-            <StateList>
-                <State Initial="false" Name="COD"/>
-                <State Initial="false" Name="ER">
-                    <EventRefList>
-                        <EventRef Name=":accepting"/>
-                    </EventRefList>
-                </State>
-                <State Initial="true" Name="IN"/>
-                <State Initial="false" Name="RQER"/>
-                <State Initial="false" Name="RQSER"/>
-                <State Initial="false" Name="RQVR"/>
-                <State Initial="false" Name="RQZS"/>
-                <State Initial="false" Name="SER">
-                    <EventRefList>
-                        <EventRef Name=":accepting"/>
-                    </EventRefList>
-                </State>
-                <State Initial="false" Name="TSTZS"/>
-                <State Initial="false" Name="VR">
-                    <EventRefList>
-                        <EventRef Name=":accepting"/>
-                    </EventRefList>
-                </State>
-                <State Initial="false" Name="ZS">
-                    <EventRefList>
-                        <EventRef Name=":accepting"/>
-                    </EventRefList>
-                </State>
-            </StateList>
-            <TransitionList>
-                <Transition Event="soft_SER[FT]" Source="RQSER" Target="SER"/>
-                <Transition Event="soft_ER" Source="RQER" Target="ER"/>
-                <Transition Event="soft_VR" Source="RQVR" Target="VR"/>
-                <Transition Event="soft_ZS" Source="RQZS" Target="ZS"/>
-                <Transition Event="ZSA" Source="TSTZS" Target="RQZS"/>
-                <Transition Event="ZSI" Source="TSTZS" Target="RQVR"/>
-                <Transition Event="is_cod_ser" Source="COD" Target="RQSER"/>
-                <Transition Event="is_cod_er" Source="COD" Target="RQER"/>
-                <Transition Event="ZS" Source="ZS" Target="RQZS"/>
-                <Transition Event="TAST" Source="ZS" Target="RQZS"/>
-                <Transition Event="SER" Source="ZS" Target="COD"/>
-                <Transition Event="SERFS" Source="ZS" Target="COD"/>
-                <Transition Event="ER" Source="ZS" Target="RQER"/>
-                <Transition Event="SER" Source="VR" Target="COD"/>
-                <Transition Event="SERFS" Source="VR" Target="COD"/>
-                <Transition Event="ER" Source="VR" Target="RQER"/>
-                <Transition Event="TAST" Source="VR" Target="RQER"/>
-                <Transition Event="ZS" Source="VR" Target="TSTZS"/>
-                <Transition Event="autom_VR" Source="SER" Target="RQVR"/>
-                <Transition Event="ER" Source="SER" Target="RQER"/>
-                <Transition Event="SER" Source="SER" Target="RQER"/>
-                <Transition Event="SERFS" Source="SER" Target="RQER"/>
-                <Transition Event="TAST" Source="SER" Target="RQER"/>
-                <Transition Event="ZS" Source="SER" Target="TSTZS"/>
-                <Transition Event="TAST" Source="ER" Target="RQVR"/>
-                <Transition Event="autom_VR" Source="ER" Target="RQVR"/>
-                <Transition Event="ER" Source="ER" Target="RQER"/>
-                <Transition Event="SER" Source="ER" Target="RQER"/>
-                <Transition Event="SERFS" Source="ER" Target="RQER"/>
-                <Transition Event="ZS" Source="ER" Target="TSTZS"/>
-                <Transition Event="TAST" Source="IN" Target="RQVR"/>
-                <Transition Event="SER" Source="IN" Target="COD"/>
-                <Transition Event="SERFS" Source="IN" Target="COD"/>
-                <Transition Event="ER" Source="IN" Target="RQER"/>
-                <Transition Event="ZS" Source="IN" Target="TSTZS"/>
-                <Transition Event="soft_CS" Source="ER" Target="ER"/>
-                <Transition Event="soft_CS" Source="VR" Target="ER"/>
-                <Transition Event="soft_CS" Source="TSTZS" Target="ER"/>
-                <Transition Event="soft_CS" Source="COD" Target="ER"/>
-                <Transition Event="soft_CS" Source="SER" Target="ER"/>
-                <Transition Event="soft_CS" Source="ZS" Target="ER"/>
-                <Transition Event="soft_CS" Source="RQVR" Target="ER"/>
-                <Transition Event="soft_CS" Source="RQZS" Target="ER"/>
-                <Transition Event="soft_CS" Source="RQSER" Target="ER"/>
-                <Transition Event="soft_CS" Source="RQER" Target="ER"/>
-                <Transition Event="soft_CS" Source="IN" Target="ER"/>
-            </TransitionList>
-        </Automaton>
-        <Automaton Kind="SPEC" Name="eingabe_er">
-            <EventRefList>
-                <EventRef Name=":accepting"/>
-                <EventRef Name="CS_ok"/>
-                <EventRef Name="ER"/>
-                <EventRef Name="ER_BT"/>
-                <EventRef Name="ER_FS"/>
-                <EventRef Name="ER_FT"/>
-                <EventRef Name="ER_HK"/>
-                <EventRef Name="soft_CS"/>
-                <EventRef Name="TASTVR"/>
-                <EventRef Name="VR_BT"/>
-                <EventRef Name="VR_FS"/>
-                <EventRef Name="VR_FT"/>
-                <EventRef Name="VR_HK"/>
-                <EventRef Name="wsp"/>
-            </EventRefList>
-            <StateList>
-                <State Initial="false" Name="C1"/>
-                <State Initial="false" Name="C2"/>
-                <State Initial="false" Name="ER"/>
-                <State Initial="true" Name="IN">
-                    <EventRefList>
-                        <EventRef Name=":accepting"/>
-                    </EventRefList>
-                </State>
-            </StateList>
-            <TransitionList>
-                <Transition Event="ER_FT" Source="C1" Target="C2"/>
-                <Transition Event="ER_BT" Source="C1" Target="C2"/>
-                <Transition Event="ER_HK" Source="C1" Target="C2"/>
-                <Transition Event="ER_FS" Source="C1" Target="C1"/>
-                <Transition Event="VR_FT" Source="C1" Target="C1"/>
-                <Transition Event="VR_BT" Source="C1" Target="C1"/>
-                <Transition Event="VR_HK" Source="C1" Target="C1"/>
-                <Transition Event="VR_FS" Source="C1" Target="C1"/>
-                <Transition Event="TASTVR" Source="C1" Target="C1"/>
-                <Transition Event="ER_FT" Source="C2" Target="C2"/>
-                <Transition Event="ER_BT" Source="C2" Target="C2"/>
-                <Transition Event="ER_HK" Source="C2" Target="C2"/>
-                <Transition Event="ER_FS" Source="C2" Target="C2"/>
-                <Transition Event="VR_FT" Source="C2" Target="C2"/>
-                <Transition Event="VR_BT" Source="C2" Target="C2"/>
-                <Transition Event="VR_HK" Source="C2" Target="C2"/>
-                <Transition Event="VR_FS" Source="C2" Target="C2"/>
-                <Transition Event="TASTVR" Source="C2" Target="C2"/>
-                <Transition Event="CS_ok" Source="C2" Target="IN"/>
-                <Transition Event="ER_FT" Source="ER" Target="IN"/>
-                <Transition Event="ER_FS" Source="ER" Target="IN"/>
-                <Transition Event="VR_FT" Source="ER" Target="IN"/>
-                <Transition Event="VR_BT" Source="ER" Target="IN"/>
-                <Transition Event="VR_HK" Source="ER" Target="IN"/>
-                <Transition Event="VR_FS" Source="ER" Target="IN"/>
-                <Transition Event="TASTVR" Source="ER" Target="IN"/>
-                <Transition Event="ER" Source="ER" Target="IN"/>
-                <Transition Event="wsp" Source="ER" Target="IN"/>
-                <Transition Event="soft_CS" Source="ER" Target="C1"/>
-                <Transition Event="ER_BT" Source="ER" Target="ER"/>
-                <Transition Event="ER_HK" Source="ER" Target="ER"/>
-                <Transition Event="wsp" Source="IN" Target="IN"/>
-                <Transition Event="ER_FT" Source="IN" Target="IN"/>
-                <Transition Event="ER_FS" Source="IN" Target="IN"/>
-                <Transition Event="VR_FT" Source="IN" Target="IN"/>
-                <Transition Event="VR_BT" Source="IN" Target="IN"/>
-                <Transition Event="VR_HK" Source="IN" Target="IN"/>
-                <Transition Event="VR_FS" Source="IN" Target="IN"/>
-                <Transition Event="TASTVR" Source="IN" Target="IN"/>
-                <Transition Event="soft_CS" Source="IN" Target="C1"/>
-                <Transition Event="ER_BT" Source="IN" Target="ER"/>
-                <Transition Event="ER_HK" Source="IN" Target="ER"/>
-            </TransitionList>
-        </Automaton>
-        <Automaton Kind="SPEC" Name="eingabe_fs">
-            <EventRefList>
-                <EventRef Name=":accepting"/>
-                <EventRef Name="CS_ok"/>
-                <EventRef Name="ER_BT"/>
-                <EventRef Name="ER_FS"/>
-                <EventRef Name="ER_FT"/>
-                <EventRef Name="ER_HK"/>
-                <EventRef Name="SERFS"/>
-                <EventRef Name="soft_CS"/>
-                <EventRef Name="TASTVR"/>
-                <EventRef Name="VR_BT"/>
-                <EventRef Name="VR_FS"/>
-                <EventRef Name="VR_FT"/>
-                <EventRef Name="VR_HK"/>
-                <EventRef Name="wsp"/>
-            </EventRefList>
-            <StateList>
-                <State Initial="false" Name="FS"/>
-                <State Initial="true" Name="IN">
-                    <EventRefList>
-                        <EventRef Name=":accepting"/>
-                    </EventRefList>
-                </State>
-            </StateList>
-            <TransitionList>
-                <Transition Event="ER_FS" Source="FS" Target="FS"/>
-                <Transition Event="ER_FT" Source="FS" Target="IN"/>
-                <Transition Event="ER_BT" Source="FS" Target="IN"/>
-                <Transition Event="ER_HK" Source="FS" Target="IN"/>
-                <Transition Event="TASTVR" Source="FS" Target="IN"/>
-                <Transition Event="VR_FT" Source="FS" Target="IN"/>
-                <Transition Event="VR_BT" Source="FS" Target="IN"/>
-                <Transition Event="VR_HK" Source="FS" Target="IN"/>
-                <Transition Event="VR_FS" Source="FS" Target="IN"/>
-                <Transition Event="SERFS" Source="FS" Target="IN"/>
-                <Transition Event="wsp" Source="FS" Target="IN"/>
-                <Transition Event="soft_CS" Source="FS" Target="IN"/>
-                <Transition Event="CS_ok" Source="FS" Target="IN"/>
-                <Transition Event="ER_FS" Source="IN" Target="FS"/>
-                <Transition Event="wsp" Source="IN" Target="IN"/>
-                <Transition Event="soft_CS" Source="IN" Target="IN"/>
-                <Transition Event="CS_ok" Source="IN" Target="IN"/>
-                <Transition Event="ER_FT" Source="IN" Target="IN"/>
-                <Transition Event="ER_BT" Source="IN" Target="IN"/>
-                <Transition Event="ER_HK" Source="IN" Target="IN"/>
-                <Transition Event="TASTVR" Source="IN" Target="IN"/>
-                <Transition Event="VR_FT" Source="IN" Target="IN"/>
-                <Transition Event="VR_BT" Source="IN" Target="IN"/>
-                <Transition Event="VR_HK" Source="IN" Target="IN"/>
-                <Transition Event="VR_FS" Source="IN" Target="IN"/>
-            </TransitionList>
-        </Automaton>
-        <Automaton Kind="SPEC" Name="eingabe_ser">
-            <EventRefList>
-                <EventRef Name=":accepting"/>
-                <EventRef Name="CS_ok"/>
-                <EventRef Name="ER_BT"/>
-                <EventRef Name="ER_FS"/>
-                <EventRef Name="ER_FT"/>
-                <EventRef Name="ER_HK"/>
-                <EventRef Name="SER"/>
-                <EventRef Name="soft_CS"/>
-                <EventRef Name="TASTVR"/>
-                <EventRef Name="VR_BT"/>
-                <EventRef Name="VR_FS"/>
-                <EventRef Name="VR_FT"/>
-                <EventRef Name="VR_HK"/>
-                <EventRef Name="wsp"/>
-            </EventRefList>
-            <StateList>
-                <State Initial="true" Name="IN">
-                    <EventRefList>
-                        <EventRef Name=":accepting"/>
-                    </EventRefList>
-                </State>
-                <State Initial="false" Name="VR"/>
-            </StateList>
-            <TransitionList>
-                <Transition Event="ER_FT" Source="VR" Target="VR"/>
-                <Transition Event="SER" Source="VR" Target="IN"/>
-                <Transition Event="wsp" Source="VR" Target="IN"/>
-                <Transition Event="soft_CS" Source="VR" Target="IN"/>
-                <Transition Event="CS_ok" Source="VR" Target="IN"/>
-                <Transition Event="ER_BT" Source="VR" Target="IN"/>
-                <Transition Event="ER_HK" Source="VR" Target="IN"/>
-                <Transition Event="ER_FS" Source="VR" Target="IN"/>
-                <Transition Event="TASTVR" Source="VR" Target="IN"/>
-                <Transition Event="VR_FT" Source="VR" Target="IN"/>
-                <Transition Event="VR_BT" Source="VR" Target="IN"/>
-                <Transition Event="VR_HK" Source="VR" Target="IN"/>
-                <Transition Event="VR_FS" Source="VR" Target="IN"/>
-                <Transition Event="ER_FT" Source="IN" Target="VR"/>
-                <Transition Event="wsp" Source="IN" Target="IN"/>
-                <Transition Event="soft_CS" Source="IN" Target="IN"/>
-                <Transition Event="CS_ok" Source="IN" Target="IN"/>
-                <Transition Event="ER_BT" Source="IN" Target="IN"/>
-                <Transition Event="ER_HK" Source="IN" Target="IN"/>
-                <Transition Event="ER_FS" Source="IN" Target="IN"/>
-                <Transition Event="TASTVR" Source="IN" Target="IN"/>
-                <Transition Event="VR_FT" Source="IN" Target="IN"/>
-                <Transition Event="VR_BT" Source="IN" Target="IN"/>
-                <Transition Event="VR_HK" Source="IN" Target="IN"/>
-                <Transition Event="VR_FS" Source="IN" Target="IN"/>
-            </TransitionList>
-        </Automaton>
-        <Automaton Kind="SPEC" Name="eingabe_vr">
-            <EventRefList>
-                <EventRef Name=":accepting"/>
-                <EventRef Name="CS_ok"/>
-                <EventRef Name="ER_BT"/>
-                <EventRef Name="ER_FS"/>
-                <EventRef Name="ER_FT"/>
-                <EventRef Name="ER_HK"/>
-                <EventRef Name="soft_CS"/>
-                <EventRef Name="TAST"/>
-                <EventRef Name="TASTVR"/>
-                <EventRef Name="VR_BT"/>
-                <EventRef Name="VR_FS"/>
-                <EventRef Name="VR_FT"/>
-                <EventRef Name="VR_HK"/>
-                <EventRef Name="wsp"/>
-            </EventRefList>
-            <StateList>
-                <State Initial="true" Name="IN">
-                    <EventRefList>
-                        <EventRef Name=":accepting"/>
-                    </EventRefList>
-                </State>
-                <State Initial="false" Name="VR"/>
-            </StateList>
-            <TransitionList>
-                <Transition Event="TASTVR" Source="VR" Target="VR"/>
-                <Transition Event="ER_FT" Source="VR" Target="IN"/>
-                <Transition Event="ER_BT" Source="VR" Target="IN"/>
-                <Transition Event="ER_HK" Source="VR" Target="IN"/>
-                <Transition Event="ER_FS" Source="VR" Target="IN"/>
-                <Transition Event="VR_FT" Source="VR" Target="IN"/>
-                <Transition Event="VR_BT" Source="VR" Target="IN"/>
-                <Transition Event="VR_HK" Source="VR" Target="IN"/>
-                <Transition Event="VR_FS" Source="VR" Target="IN"/>
-                <Transition Event="TAST" Source="VR" Target="IN"/>
-                <Transition Event="wsp" Source="VR" Target="IN"/>
-                <Transition Event="soft_CS" Source="VR" Target="IN"/>
-                <Transition Event="CS_ok" Source="VR" Target="IN"/>
-                <Transition Event="TASTVR" Source="IN" Target="VR"/>
-                <Transition Event="wsp" Source="IN" Target="IN"/>
-                <Transition Event="soft_CS" Source="IN" Target="IN"/>
-                <Transition Event="CS_ok" Source="IN" Target="IN"/>
-                <Transition Event="ER_FT" Source="IN" Target="IN"/>
-                <Transition Event="ER_BT" Source="IN" Target="IN"/>
-                <Transition Event="ER_HK" Source="IN" Target="IN"/>
-                <Transition Event="ER_FS" Source="IN" Target="IN"/>
-                <Transition Event="VR_FT" Source="IN" Target="IN"/>
-                <Transition Event="VR_BT" Source="IN" Target="IN"/>
-                <Transition Event="VR_HK" Source="IN" Target="IN"/>
-                <Transition Event="VR_FS" Source="IN" Target="IN"/>
-            </TransitionList>
-        </Automaton>
-        <Automaton Kind="SPEC" Name="eingabe_zs">
-            <EventRefList>
-                <EventRef Name=":accepting"/>
-                <EventRef Name="CS_ok"/>
-                <EventRef Name="ER_BT"/>
-                <EventRef Name="ER_FS"/>
-                <EventRef Name="ER_FT"/>
-                <EventRef Name="ER_HK"/>
-                <EventRef Name="kein_ZS"/>
-                <EventRef Name="soft_CS"/>
-                <EventRef Name="TASTVR"/>
-                <EventRef Name="VR_BT"/>
-                <EventRef Name="VR_FS"/>
-                <EventRef Name="VR_FT"/>
-                <EventRef Name="VR_HK"/>
-                <EventRef Name="wsp"/>
-                <EventRef Name="ZS"/>
-            </EventRefList>
-            <StateList>
-                <State Initial="true" Name="IN">
-                    <EventRefList>
-                        <EventRef Name=":accepting"/>
-                    </EventRefList>
-                </State>
-                <State Initial="false" Name="VR"/>
-            </StateList>
-            <TransitionList>
-                <Transition Event="ZS" Source="VR" Target="IN"/>
-                <Transition Event="wsp" Source="VR" Target="IN"/>
-                <Transition Event="kein_ZS" Source="VR" Target="IN"/>
-                <Transition Event="soft_CS" Source="VR" Target="IN"/>
-                <Transition Event="CS_ok" Source="VR" Target="IN"/>
-                <Transition Event="ER_FT" Source="VR" Target="IN"/>
-                <Transition Event="ER_BT" Source="VR" Target="IN"/>
-                <Transition Event="ER_HK" Source="VR" Target="IN"/>
-                <Transition Event="ER_FS" Source="VR" Target="IN"/>
-                <Transition Event="TASTVR" Source="VR" Target="IN"/>
-                <Transition Event="VR_FT" Source="VR" Target="VR"/>
-                <Transition Event="VR_BT" Source="VR" Target="VR"/>
-                <Transition Event="VR_HK" Source="VR" Target="VR"/>
-                <Transition Event="VR_FS" Source="VR" Target="VR"/>
-                <Transition Event="wsp" Source="IN" Target="IN"/>
-                <Transition Event="soft_CS" Source="IN" Target="IN"/>
-                <Transition Event="CS_ok" Source="IN" Target="IN"/>
-                <Transition Event="ER_FT" Source="IN" Target="IN"/>
-                <Transition Event="ER_BT" Source="IN" Target="IN"/>
-                <Transition Event="ER_HK" Source="IN" Target="IN"/>
-                <Transition Event="ER_FS" Source="IN" Target="IN"/>
-                <Transition Event="TASTVR" Source="IN" Target="IN"/>
-                <Transition Event="VR_FT" Source="IN" Target="VR"/>
-                <Transition Event="VR_BT" Source="IN" Target="VR"/>
-                <Transition Event="VR_HK" Source="IN" Target="VR"/>
-                <Transition Event="VR_FS" Source="IN" Target="VR"/>
-            </TransitionList>
-        </Automaton>
-        <Automaton Kind="PLANT" Name="ircount[WSP]">
-            <EventRefList>
-                <EventRef Name=":accepting"/>
-                <EventRef Name="ctr_ge_max[WSP]"/>
-                <EventRef Name="ctr_lt_max[WSP]"/>
-                <EventRef Name="inc_ctr[WSP]"/>
-                <EventRef Name="reset_ctr[WSP]"/>
-            </EventRefList>
-            <StateList>
-                <State Initial="true" Name="IN">
-                    <EventRefList>
-                        <EventRef Name=":accepting"/>
-                    </EventRefList>
-                </State>
-                <State Initial="false" Name="RUN"/>
-            </StateList>
-            <TransitionList>
-                <Transition Event="inc_ctr[WSP]" Source="IN" Target="RUN"/>
-                <Transition Event="reset_ctr[WSP]" Source="IN" Target="IN"/>
-                <Transition Event="ctr_lt_max[WSP]" Source="RUN" Target="IN"/>
-                <Transition Event="ctr_ge_max[WSP]" Source="RUN" Target="IN"/>
-            </TransitionList>
-        </Automaton>
-        <Automaton Kind="SPEC" Name="kein_zs">
-            <EventRefList>
-                <EventRef Name=":accepting"/>
-                <EventRef Name="kein_ZS"/>
-                <EventRef Name="tuer_auf[FT]"/>
-                <EventRef Name="tuer_zu[FT]"/>
-                <EventRef Name="ZS"/>
-            </EventRefList>
-            <StateList>
-                <State Initial="true" Name="AUF"/>
-                <State Initial="false" Name="ZU">
-                    <EventRefList>
-                        <EventRef Name=":accepting"/>
-                    </EventRefList>
-                </State>
-            </StateList>
-            <TransitionList>
-                <Transition Event="kein_ZS" Source="AUF" Target="AUF"/>
-                <Transition Event="tuer_zu[FT]" Source="AUF" Target="ZU"/>
-                <Transition Event="tuer_auf[FT]" Source="ZU" Target="AUF"/>
-                <Transition Event="ZS" Source="ZU" Target="ZU"/>
-            </TransitionList>
-        </Automaton>
-        <Automaton Kind="SPEC" Name="keine_wsp">
-            <EventRefList>
-                <EventRef Name=":accepting"/>
-                <EventRef Name="ER"/>
-                <EventRef Name="ER_BT"/>
-                <EventRef Name="ER_FS"/>
-                <EventRef Name="ER_FT"/>
-                <EventRef Name="ER_HK"/>
-                <EventRef Name="SER"/>
-                <EventRef Name="SERFS"/>
-                <EventRef Name="soft_CS"/>
-                <EventRef Name="TAST"/>
-                <EventRef Name="TASTVR"/>
-                <EventRef Name="VR_BT"/>
-                <EventRef Name="VR_FS"/>
-                <EventRef Name="VR_FT"/>
-                <EventRef Name="VR_HK"/>
-                <EventRef Name="wsp"/>
-                <EventRef Name="ZS"/>
-            </EventRefList>
-            <StateList>
-                <State Initial="true" Name="IDLE">
-                    <EventRefList>
-                        <EventRef Name=":accepting"/>
-                    </EventRefList>
-                </State>
-                <State Initial="false" Name="WSP"/>
-            </StateList>
-            <TransitionList>
-                <Transition Event="ER_BT" Source="IDLE" Target="WSP"/>
-                <Transition Event="ER_FS" Source="IDLE" Target="WSP"/>
-                <Transition Event="ER_FT" Source="IDLE" Target="WSP"/>
-                <Transition Event="ER_HK" Source="IDLE" Target="WSP"/>
-                <Transition Event="VR_BT" Source="IDLE" Target="WSP"/>
-                <Transition Event="VR_FS" Source="IDLE" Target="WSP"/>
-                <Transition Event="VR_FT" Source="IDLE" Target="WSP"/>
-                <Transition Event="VR_HK" Source="IDLE" Target="WSP"/>
-                <Transition Event="TASTVR" Source="IDLE" Target="WSP"/>
-                <Transition Event="soft_CS" Source="IDLE" Target="IDLE"/>
-                <Transition Event="ER_BT" Source="WSP" Target="WSP"/>
-                <Transition Event="ER_FS" Source="WSP" Target="WSP"/>
-                <Transition Event="ER_FT" Source="WSP" Target="WSP"/>
-                <Transition Event="ER_HK" Source="WSP" Target="WSP"/>
-                <Transition Event="VR_BT" Source="WSP" Target="WSP"/>
-                <Transition Event="VR_FS" Source="WSP" Target="WSP"/>
-                <Transition Event="VR_FT" Source="WSP" Target="WSP"/>
-                <Transition Event="VR_HK" Source="WSP" Target="WSP"/>
-                <Transition Event="TASTVR" Source="WSP" Target="WSP"/>
-                <Transition Event="ER" Source="WSP" Target="IDLE"/>
-                <Transition Event="SER" Source="WSP" Target="IDLE"/>
-                <Transition Event="SERFS" Source="WSP" Target="IDLE"/>
-                <Transition Event="TAST" Source="WSP" Target="IDLE"/>
-                <Transition Event="ZS" Source="WSP" Target="IDLE"/>
-                <Transition Event="soft_CS" Source="WSP" Target="IDLE"/>
-                <Transition Event="wsp" Source="WSP" Target="IDLE"/>
-            </TransitionList>
-        </Automaton>
-        <Automaton Kind="PLANT" Name="timer[FS]">
-            <EventRefList>
-                <EventRef Name=":accepting"/>
-                <EventRef Name="reset[FS]"/>
-                <EventRef Name="time[FS]"/>
-                <EventRef Name="timeout[FS]"/>
-            </EventRefList>
-            <StateList>
-                <State Initial="true" Name="IDLE">
-                    <EventRefList>
-                        <EventRef Name=":accepting"/>
-                    </EventRefList>
-                </State>
-                <State Initial="false" Name="RUN"/>
-            </StateList>
-            <TransitionList>
-                <Transition Event="time[FS]" Source="IDLE" Target="RUN"/>
-                <Transition Event="timeout[FS]" Source="RUN" Target="IDLE"/>
-                <Transition Event="reset[FS]" Source="RUN" Target="IDLE"/>
-            </TransitionList>
-        </Automaton>
-        <Automaton Kind="PLANT" Name="timer[WSP]">
-            <EventRefList>
-                <EventRef Name=":accepting"/>
-                <EventRef Name="reset[WSP]"/>
-                <EventRef Name="time[WSP]"/>
-                <EventRef Name="timeout[WSP]"/>
-            </EventRefList>
-            <StateList>
-                <State Initial="true" Name="IDLE">
-                    <EventRefList>
-                        <EventRef Name=":accepting"/>
-                    </EventRefList>
-                </State>
-                <State Initial="false" Name="RUN"/>
-            </StateList>
-            <TransitionList>
-                <Transition Event="time[WSP]" Source="IDLE" Target="RUN"/>
-                <Transition Event="timeout[WSP]" Source="RUN" Target="IDLE"/>
-                <Transition Event="reset[WSP]" Source="RUN" Target="IDLE"/>
-            </TransitionList>
-        </Automaton>
-        <Automaton Kind="PLANT" Name="tklemme[BT]">
-            <EventRefList>
-                <EventRef Name=":accepting"/>
-                <EventRef Name="tuer_auf[BT]"/>
-                <EventRef Name="tuer_zu[BT]"/>
-            </EventRefList>
-            <StateList>
-                <State Initial="true" Name="AUF"/>
-                <State Initial="false" Name="ZU">
-                    <EventRefList>
-                        <EventRef Name=":accepting"/>
-                    </EventRefList>
-                </State>
-            </StateList>
-            <TransitionList>
-                <Transition Event="tuer_zu[BT]" Source="AUF" Target="ZU"/>
-                <Transition Event="tuer_auf[BT]" Source="ZU" Target="AUF"/>
-            </TransitionList>
-        </Automaton>
-        <Automaton Kind="PLANT" Name="tklemme[FT]">
-            <EventRefList>
-                <EventRef Name=":accepting"/>
-                <EventRef Name="tuer_auf[FT]"/>
-                <EventRef Name="tuer_zu[FT]"/>
-            </EventRefList>
-            <StateList>
-                <State Initial="true" Name="AUF"/>
-                <State Initial="false" Name="ZU">
-                    <EventRefList>
-                        <EventRef Name=":accepting"/>
-                    </EventRefList>
-                </State>
-            </StateList>
-            <TransitionList>
-                <Transition Event="tuer_zu[FT]" Source="AUF" Target="ZU"/>
-                <Transition Event="tuer_auf[FT]" Source="ZU" Target="AUF"/>
-            </TransitionList>
-        </Automaton>
-        <Automaton Kind="PLANT" Name="tklemme[HT]">
-            <EventRefList>
-                <EventRef Name=":accepting"/>
-                <EventRef Name="tuer_auf[HT]"/>
-                <EventRef Name="tuer_zu[HT]"/>
-            </EventRefList>
-            <StateList>
-                <State Initial="true" Name="AUF"/>
-                <State Initial="false" Name="ZU">
-                    <EventRefList>
-                        <EventRef Name=":accepting"/>
-                    </EventRefList>
-                </State>
-            </StateList>
-            <TransitionList>
-                <Transition Event="tuer_zu[HT]" Source="AUF" Target="ZU"/>
-                <Transition Event="tuer_auf[HT]" Source="ZU" Target="AUF"/>
-            </TransitionList>
-        </Automaton>
-        <Automaton Kind="SPEC" Name="tuermodell">
-            <EventRefList>
-                <EventRef Name=":accepting"/>
-                <EventRef Name="CS_ok"/>
-                <EventRef Name="done_ER"/>
-                <EventRef Name="done_SER[FT]"/>
-                <EventRef Name="done_VR"/>
-                <EventRef Name="done_ZS"/>
-                <EventRef Name="soft_CS"/>
-                <EventRef Name="soft_ER"/>
-                <EventRef Name="soft_SER[FT]"/>
-                <EventRef Name="soft_VR"/>
-                <EventRef Name="soft_ZS"/>
-            </EventRefList>
-            <StateList>
-                <State Initial="false" Name="CS"/>
-                <State Initial="false" Name="ER"/>
-                <State Initial="true" Name="IN">
-                    <EventRefList>
-                        <EventRef Name=":accepting"/>
-                    </EventRefList>
-                </State>
-                <State Initial="false" Name="SER"/>
-                <State Initial="false" Name="VR"/>
-                <State Initial="false" Name="ZS"/>
-            </StateList>
-            <TransitionList>
-                <Transition Event="CS_ok" Source="CS" Target="IN"/>
-                <Transition Event="soft_ZS" Source="IN" Target="ZS"/>
-                <Transition Event="soft_SER[FT]" Source="IN" Target="SER"/>
-                <Transition Event="soft_VR" Source="IN" Target="VR"/>
-                <Transition Event="soft_ER" Source="IN" Target="ER"/>
-                <Transition Event="done_VR" Source="VR" Target="IN"/>
-                <Transition Event="done_ZS" Source="ZS" Target="IN"/>
-                <Transition Event="done_SER[FT]" Source="SER" Target="IN"/>
-                <Transition Event="done_ER" Source="ER" Target="IN"/>
-                <Transition Event="soft_CS" Source="ER" Target="CS"/>
-                <Transition Event="soft_CS" Source="VR" Target="CS"/>
-                <Transition Event="soft_CS" Source="SER" Target="CS"/>
-                <Transition Event="soft_CS" Source="ZS" Target="CS"/>
-                <Transition Event="soft_CS" Source="IN" Target="CS"/>
-            </TransitionList>
-        </Automaton>
-        <Automaton Kind="SPEC" Name="warten">
-            <EventRefList>
-                <EventRef Name=":accepting"/>
-                <EventRef Name="autom_VR"/>
-                <EventRef Name="CS_ok"/>
-                <EventRef Name="done_ER"/>
-                <EventRef Name="done_SER[FT]"/>
-                <EventRef Name="done_VR"/>
-                <EventRef Name="done_ZS"/>
-                <EventRef Name="ER"/>
-                <EventRef Name="SER"/>
-                <EventRef Name="SERFS"/>
-                <EventRef Name="soft_CS"/>
-                <EventRef Name="soft_ER"/>
-                <EventRef Name="soft_SER[FT]"/>
-                <EventRef Name="soft_VR"/>
-                <EventRef Name="soft_ZS"/>
-                <EventRef Name="TAST"/>
-                <EventRef Name="ZS"/>
-            </EventRefList>
-            <StateList>
-                <State Initial="true" Name="IDLE">
-                    <EventRefList>
-                        <EventRef Name=":accepting"/>
-                    </EventRefList>
-                </State>
-                <State Initial="false" Name="RUN"/>
-            </StateList>
-            <TransitionList>
-                <Transition Event="soft_ER" Source="IDLE" Target="RUN"/>
-                <Transition Event="soft_SER[FT]" Source="IDLE" Target="RUN"/>
-                <Transition Event="soft_VR" Source="IDLE" Target="RUN"/>
-                <Transition Event="soft_ZS" Source="IDLE" Target="RUN"/>
-                <Transition Event="soft_CS" Source="IDLE" Target="RUN"/>
-                <Transition Event="ER" Source="IDLE" Target="IDLE"/>
-                <Transition Event="SER" Source="IDLE" Target="IDLE"/>
-                <Transition Event="SERFS" Source="IDLE" Target="IDLE"/>
-                <Transition Event="ZS" Source="IDLE" Target="IDLE"/>
-                <Transition Event="TAST" Source="IDLE" Target="IDLE"/>
-                <Transition Event="autom_VR" Source="IDLE" Target="IDLE"/>
-                <Transition Event="soft_CS" Source="RUN" Target="RUN"/>
-                <Transition Event="done_ER" Source="RUN" Target="IDLE"/>
-                <Transition Event="done_SER[FT]" Source="RUN" Target="IDLE"/>
-                <Transition Event="done_VR" Source="RUN" Target="IDLE"/>
-                <Transition Event="done_ZS" Source="RUN" Target="IDLE"/>
-                <Transition Event="CS_ok" Source="RUN" Target="IDLE"/>
-            </TransitionList>
-        </Automaton>
-        <Automaton Kind="SPEC" Name="wspcount">
-            <EventRefList>
-                <EventRef Name=":accepting"/>
-                <EventRef Name="autom_VR"/>
-                <EventRef Name="ctr_ge_max[WSP]"/>
-                <EventRef Name="ctr_lt_max[WSP]"/>
-                <EventRef Name="ER"/>
-                <EventRef Name="inc_ctr[WSP]"/>
-                <EventRef Name="SER"/>
-                <EventRef Name="SERFS"/>
-                <EventRef Name="TAST"/>
-                <EventRef Name="timeout[WSP]"/>
-                <EventRef Name="wsp"/>
-                <EventRef Name="ZS"/>
-            </EventRefList>
-            <StateList>
-                <State Initial="false" Name="CNT"/>
-                <State Initial="true" Name="COOL">
-                    <EventRefList>
-                        <EventRef Name=":accepting"/>
-                    </EventRefList>
-                </State>
-                <State Initial="false" Name="TST"/>
-                <State Initial="false" Name="WSP"/>
-            </StateList>
-            <TransitionList>
-                <Transition Event="timeout[WSP]" Source="WSP" Target="COOL"/>
-                <Transition Event="wsp" Source="WSP" Target="WSP"/>
-                <Transition Event="inc_ctr[WSP]" Source="CNT" Target="TST"/>
-                <Transition Event="timeout[WSP]" Source="CNT" Target="COOL"/>
-                <Transition Event="ctr_ge_max[WSP]" Source="CNT" Target="CNT"/>
-                <Transition Event="ctr_lt_max[WSP]" Source="CNT" Target="CNT"/>
-                <Transition Event="ctr_lt_max[WSP]" Source="TST" Target="COOL"/>
-                <Transition Event="timeout[WSP]" Source="TST" Target="COOL"/>
-                <Transition Event="ctr_ge_max[WSP]" Source="TST" Target="WSP"/>
-                <Transition Event="ctr_ge_max[WSP]" Source="COOL" Target="COOL"/>
-                <Transition Event="ctr_lt_max[WSP]" Source="COOL" Target="COOL"/>
-                <Transition Event="timeout[WSP]" Source="COOL" Target="COOL"/>
-                <Transition Event="ER" Source="COOL" Target="CNT"/>
-                <Transition Event="SER" Source="COOL" Target="CNT"/>
-                <Transition Event="SERFS" Source="COOL" Target="CNT"/>
-                <Transition Event="ZS" Source="COOL" Target="CNT"/>
-                <Transition Event="TAST" Source="COOL" Target="CNT"/>
-                <Transition Event="autom_VR" Source="COOL" Target="CNT"/>
-            </TransitionList>
-        </Automaton>
-        <Automaton Kind="SPEC" Name="wsptime">
-            <EventRefList>
-                <EventRef Name=":accepting"/>
-                <EventRef Name="autom_VR"/>
-                <EventRef Name="ER"/>
-                <EventRef Name="reset_ctr[WSP]"/>
-                <EventRef Name="SER"/>
-                <EventRef Name="SERFS"/>
-                <EventRef Name="TAST"/>
-                <EventRef Name="time[WSP]"/>
-                <EventRef Name="timeout[WSP]"/>
-                <EventRef Name="ZS"/>
-            </EventRefList>
-            <StateList>
-                <State Initial="true" Name="IN">
-                    <EventRefList>
-                        <EventRef Name=":accepting"/>
-                    </EventRefList>
-                </State>
-                <State Initial="false" Name="RESET"/>
-                <State Initial="false" Name="RUN"/>
-                <State Initial="false" Name="TIME"/>
-            </StateList>
-            <TransitionList>
-                <Transition Event="reset_ctr[WSP]" Source="RESET" Target="IN"/>
-                <Transition Event="time[WSP]" Source="TIME" Target="RUN"/>
-                <Transition Event="ER" Source="IN" Target="TIME"/>
-                <Transition Event="SER" Source="IN" Target="TIME"/>
-                <Transition Event="SERFS" Source="IN" Target="TIME"/>
-                <Transition Event="ZS" Source="IN" Target="TIME"/>
-                <Transition Event="TAST" Source="IN" Target="TIME"/>
-                <Transition Event="autom_VR" Source="IN" Target="TIME"/>
-                <Transition Event="timeout[WSP]" Source="RUN" Target="RESET"/>
-                <Transition Event="ER" Source="RUN" Target="RUN"/>
-                <Transition Event="SER" Source="RUN" Target="RUN"/>
-                <Transition Event="SERFS" Source="RUN" Target="RUN"/>
-                <Transition Event="TAST" Source="RUN" Target="RUN"/>
-                <Transition Event="ZS" Source="RUN" Target="RUN"/>
-                <Transition Event="autom_VR" Source="RUN" Target="RUN"/>
-            </TransitionList>
-        </Automaton>
-        <Automaton Kind="SPEC" Name="zsi">
-            <EventRefList>
-                <EventRef Name=":accepting"/>
-                <EventRef Name="tuer_auf[BT]"/>
-                <EventRef Name="tuer_auf[FT]"/>
-                <EventRef Name="tuer_zu[BT]"/>
-                <EventRef Name="tuer_zu[FT]"/>
-                <EventRef Name="ZSA"/>
-                <EventRef Name="ZSI"/>
-                <EventRef Name="zuendung_an"/>
-                <EventRef Name="zuendung_aus"/>
-            </EventRefList>
-            <StateList>
-                <State Initial="false" Name="AN0"/>
-                <State Initial="false" Name="AN1"/>
-                <State Initial="false" Name="AN2"/>
-                <State Initial="false" Name="AUS0">
-                    <EventRefList>
-                        <EventRef Name=":accepting"/>
-                    </EventRefList>
-                </State>
-                <State Initial="false" Name="AUS1"/>
-                <State Initial="true" Name="AUS2"/>
-                <State Initial="false" Name="ZU"/>
-            </StateList>
-            <TransitionList>
-                <Transition Event="zuendung_an" Source="ZU" Target="AN0"/>
-                <Transition Event="ZSI" Source="ZU" Target="ZU"/>
-                <Transition Event="tuer_auf[FT]" Source="ZU" Target="AUS1"/>
-                <Transition Event="tuer_auf[BT]" Source="ZU" Target="AUS1"/>
-                <Transition Event="tuer_zu[FT]" Source="AUS2" Target="AUS1"/>
-                <Transition Event="tuer_zu[BT]" Source="AUS2" Target="AUS1"/>
-                <Transition Event="zuendung_an" Source="AUS2" Target="AN2"/>
-                <Transition Event="ZSA" Source="AUS2" Target="AUS2"/>
-                <Transition Event="tuer_zu[FT]" Source="AUS1" Target="AUS0"/>
-                <Transition Event="tuer_zu[BT]" Source="AUS1" Target="AUS0"/>
-                <Transition Event="ZSA" Source="AUS1" Target="AUS1"/>
-                <Transition Event="zuendung_an" Source="AUS1" Target="AN1"/>
-                <Transition Event="tuer_auf[FT]" Source="AUS1" Target="AUS2"/>
-                <Transition Event="tuer_auf[BT]" Source="AUS1" Target="AUS2"/>
-                <Transition Event="ZSA" Source="AUS0" Target="AUS0"/>
-                <Transition Event="zuendung_an" Source="AUS0" Target="AN0"/>
-                <Transition Event="tuer_auf[FT]" Source="AUS0" Target="AUS1"/>
-                <Transition Event="tuer_auf[BT]" Source="AUS0" Target="AUS1"/>
-                <Transition Event="tuer_zu[FT]" Source="AN2" Target="AN1"/>
-                <Transition Event="tuer_zu[BT]" Source="AN2" Target="AN1"/>
-                <Transition Event="ZSI" Source="AN2" Target="AN2"/>
-                <Transition Event="zuendung_aus" Source="AN2" Target="AUS2"/>
-                <Transition Event="tuer_zu[FT]" Source="AN1" Target="AN0"/>
-                <Transition Event="tuer_zu[BT]" Source="AN1" Target="AN0"/>
-                <Transition Event="zuendung_aus" Source="AN1" Target="AUS1"/>
-                <Transition Event="ZSI" Source="AN1" Target="AN1"/>
-                <Transition Event="tuer_auf[FT]" Source="AN1" Target="AN2"/>
-                <Transition Event="tuer_auf[BT]" Source="AN1" Target="AN2"/>
-                <Transition Event="ZSI" Source="AN0" Target="AN0"/>
-                <Transition Event="zuendung_aus" Source="AN0" Target="ZU"/>
-                <Transition Event="tuer_auf[FT]" Source="AN0" Target="AN1"/>
-                <Transition Event="tuer_auf[BT]" Source="AN0" Target="AN1"/>
-            </TransitionList>
-        </Automaton>
-        <Automaton Kind="PLANT" Name="zuendung">
-            <EventRefList>
-                <EventRef Name=":accepting"/>
-                <EventRef Name="zuendung_an"/>
-                <EventRef Name="zuendung_aus"/>
-            </EventRefList>
-            <StateList>
-                <State Initial="false" Name="AN"/>
-                <State Initial="true" Name="AUS">
-                    <EventRefList>
-                        <EventRef Name=":accepting"/>
-                    </EventRefList>
-                </State>
-            </StateList>
-            <TransitionList>
-                <Transition Event="zuendung_aus" Source="AN" Target="AUS"/>
-                <Transition Event="zuendung_an" Source="AUS" Target="AN"/>
-            </TransitionList>
-        </Automaton>
-    </AutomataList>
+<EventList>
+<Event Kind="PROPOSITION" Observable="true" Name=":accepting"/>
+<Event Kind="CONTROLLABLE" Observable="true" Name="autom_VR"/>
+<Event Kind="UNCONTROLLABLE" Observable="true" Name="cod_er"/>
+<Event Kind="UNCONTROLLABLE" Observable="true" Name="cod_ser"/>
+<Event Kind="UNCONTROLLABLE" Observable="true" Name="CS"/>
+<Event Kind="CONTROLLABLE" Observable="true" Name="CS_ok"/>
+<Event Kind="UNCONTROLLABLE" Observable="true" Name="ctr_ge_max[WSP]"/>
+<Event Kind="UNCONTROLLABLE" Observable="true" Name="ctr_lt_max[WSP]"/>
+<Event Kind="CONTROLLABLE" Observable="true" Name="done_ER"/>
+<Event Kind="CONTROLLABLE" Observable="true" Name="done_SER[FT]"/>
+<Event Kind="CONTROLLABLE" Observable="true" Name="done_VR"/>
+<Event Kind="CONTROLLABLE" Observable="true" Name="done_ZS"/>
+<Event Kind="CONTROLLABLE" Observable="true" Name="ER"/>
+<Event Kind="UNCONTROLLABLE" Observable="true" Name="ER_BT"/>
+<Event Kind="UNCONTROLLABLE" Observable="true" Name="ER_FS"/>
+<Event Kind="UNCONTROLLABLE" Observable="true" Name="ER_FT"/>
+<Event Kind="UNCONTROLLABLE" Observable="true" Name="ER_HK"/>
+<Event Kind="CONTROLLABLE" Observable="true" Name="inc_ctr[WSP]"/>
+<Event Kind="CONTROLLABLE" Observable="true" Name="is_cod_er"/>
+<Event Kind="CONTROLLABLE" Observable="true" Name="is_cod_ser"/>
+<Event Kind="CONTROLLABLE" Observable="true" Name="kein_ZS"/>
+<Event Kind="CONTROLLABLE" Observable="true" Name="reset[FS]"/>
+<Event Kind="CONTROLLABLE" Observable="true" Name="reset[WSP]"/>
+<Event Kind="CONTROLLABLE" Observable="true" Name="reset_ctr[WSP]"/>
+<Event Kind="CONTROLLABLE" Observable="true" Name="SER"/>
+<Event Kind="CONTROLLABLE" Observable="true" Name="SERFS"/>
+<Event Kind="CONTROLLABLE" Observable="true" Name="soft_CS"/>
+<Event Kind="CONTROLLABLE" Observable="true" Name="soft_ER"/>
+<Event Kind="CONTROLLABLE" Observable="true" Name="soft_SER[FT]"/>
+<Event Kind="CONTROLLABLE" Observable="true" Name="soft_VR"/>
+<Event Kind="CONTROLLABLE" Observable="true" Name="soft_ZS"/>
+<Event Kind="CONTROLLABLE" Observable="true" Name="TAST"/>
+<Event Kind="UNCONTROLLABLE" Observable="true" Name="TASTVR"/>
+<Event Kind="CONTROLLABLE" Observable="true" Name="time[FS]"/>
+<Event Kind="CONTROLLABLE" Observable="true" Name="time[WSP]"/>
+<Event Kind="UNCONTROLLABLE" Observable="true" Name="timeout[FS]"/>
+<Event Kind="UNCONTROLLABLE" Observable="true" Name="timeout[WSP]"/>
+<Event Kind="UNCONTROLLABLE" Observable="true" Name="tuer_auf[BT]"/>
+<Event Kind="UNCONTROLLABLE" Observable="true" Name="tuer_auf[FT]"/>
+<Event Kind="UNCONTROLLABLE" Observable="true" Name="tuer_auf[HT]"/>
+<Event Kind="UNCONTROLLABLE" Observable="true" Name="tuer_zu[BT]"/>
+<Event Kind="UNCONTROLLABLE" Observable="true" Name="tuer_zu[FT]"/>
+<Event Kind="UNCONTROLLABLE" Observable="true" Name="tuer_zu[HT]"/>
+<Event Kind="UNCONTROLLABLE" Observable="true" Name="VR_BT"/>
+<Event Kind="UNCONTROLLABLE" Observable="true" Name="VR_FS"/>
+<Event Kind="UNCONTROLLABLE" Observable="true" Name="VR_FT"/>
+<Event Kind="UNCONTROLLABLE" Observable="true" Name="VR_HK"/>
+<Event Kind="CONTROLLABLE" Observable="true" Name="wsp"/>
+<Event Kind="CONTROLLABLE" Observable="true" Name="ZS"/>
+<Event Kind="CONTROLLABLE" Observable="true" Name="ZSA"/>
+<Event Kind="CONTROLLABLE" Observable="true" Name="ZSI"/>
+<Event Kind="UNCONTROLLABLE" Observable="true" Name="zuendung_an"/>
+<Event Kind="UNCONTROLLABLE" Observable="true" Name="zuendung_aus"/>
+</EventList>
+<AutomataList>
+<Automaton Kind="SPEC" Name="automvr">
+<EventRefList>
+<EventRef Name=":accepting"/>
+<EventRef Name="autom_VR"/>
+<EventRef Name="ER"/>
+<EventRef Name="reset[FS]"/>
+<EventRef Name="SER"/>
+<EventRef Name="SERFS"/>
+<EventRef Name="soft_CS"/>
+<EventRef Name="soft_ER"/>
+<EventRef Name="soft_SER[FT]"/>
+<EventRef Name="soft_VR"/>
+<EventRef Name="soft_ZS"/>
+<EventRef Name="TAST"/>
+<EventRef Name="time[FS]"/>
+<EventRef Name="timeout[FS]"/>
+<EventRef Name="tuer_auf[BT]"/>
+<EventRef Name="tuer_auf[FT]"/>
+<EventRef Name="tuer_auf[HT]"/>
+<EventRef Name="wsp"/>
+<EventRef Name="ZS"/>
+</EventRefList>
+<StateList>
+<State Initial="false" Name="AU1"/>
+<State Initial="false" Name="AU2"/>
+<State Initial="false" Name="AU3"/>
+<State Initial="false" Name="ER">
+<EventRefList>
+<EventRef Name=":accepting"/>
+</EventRefList>
+</State>
+<State Initial="false" Name="FS"/>
+<State Initial="true" Name="VR">
+<EventRefList>
+<EventRef Name=":accepting"/>
+</EventRefList>
+</State>
+</StateList>
+<TransitionList>
+<Transition Event="soft_VR" Source="ER" Target="VR"/>
+<Transition Event="soft_ZS" Source="ER" Target="VR"/>
+<Transition Event="ER" Source="ER" Target="ER"/>
+<Transition Event="SER" Source="ER" Target="ER"/>
+<Transition Event="ZS" Source="ER" Target="ER"/>
+<Transition Event="TAST" Source="ER" Target="ER"/>
+<Transition Event="wsp" Source="ER" Target="ER"/>
+<Transition Event="soft_ER" Source="ER" Target="ER"/>
+<Transition Event="soft_SER[FT]" Source="ER" Target="ER"/>
+<Transition Event="reset[FS]" Source="ER" Target="ER"/>
+<Transition Event="timeout[FS]" Source="ER" Target="ER"/>
+<Transition Event="ER" Source="VR" Target="VR"/>
+<Transition Event="SER" Source="VR" Target="VR"/>
+<Transition Event="ZS" Source="VR" Target="VR"/>
+<Transition Event="TAST" Source="VR" Target="VR"/>
+<Transition Event="wsp" Source="VR" Target="VR"/>
+<Transition Event="soft_VR" Source="VR" Target="VR"/>
+<Transition Event="soft_ZS" Source="VR" Target="VR"/>
+<Transition Event="reset[FS]" Source="VR" Target="VR"/>
+<Transition Event="timeout[FS]" Source="VR" Target="VR"/>
+<Transition Event="SERFS" Source="VR" Target="FS"/>
+<Transition Event="soft_ER" Source="VR" Target="ER"/>
+<Transition Event="soft_SER[FT]" Source="VR" Target="ER"/>
+<Transition Event="wsp" Source="FS" Target="VR"/>
+<Transition Event="ER" Source="FS" Target="VR"/>
+<Transition Event="SER" Source="FS" Target="VR"/>
+<Transition Event="ZS" Source="FS" Target="VR"/>
+<Transition Event="TAST" Source="FS" Target="VR"/>
+<Transition Event="reset[FS]" Source="FS" Target="FS"/>
+<Transition Event="timeout[FS]" Source="FS" Target="FS"/>
+<Transition Event="soft_ER" Source="FS" Target="AU1"/>
+<Transition Event="soft_SER[FT]" Source="FS" Target="AU1"/>
+<Transition Event="SERFS" Source="AU2" Target="AU2"/>
+<Transition Event="timeout[FS]" Source="AU2" Target="AU3"/>
+<Transition Event="autom_VR" Source="AU3" Target="VR"/>
+<Transition Event="SERFS" Source="AU3" Target="AU3"/>
+<Transition Event="SERFS" Source="AU1" Target="AU1"/>
+<Transition Event="reset[FS]" Source="AU1" Target="AU1"/>
+<Transition Event="timeout[FS]" Source="AU1" Target="AU1"/>
+<Transition Event="time[FS]" Source="AU1" Target="AU2"/>
+<Transition Event="ER" Source="AU3" Target="ER"/>
+<Transition Event="SER" Source="AU3" Target="ER"/>
+<Transition Event="ZS" Source="AU3" Target="ER"/>
+<Transition Event="TAST" Source="AU3" Target="ER"/>
+<Transition Event="ER" Source="AU2" Target="ER"/>
+<Transition Event="SER" Source="AU2" Target="ER"/>
+<Transition Event="ZS" Source="AU2" Target="ER"/>
+<Transition Event="TAST" Source="AU2" Target="ER"/>
+<Transition Event="ER" Source="AU1" Target="ER"/>
+<Transition Event="SER" Source="AU1" Target="ER"/>
+<Transition Event="ZS" Source="AU1" Target="ER"/>
+<Transition Event="TAST" Source="AU1" Target="ER"/>
+<Transition Event="soft_CS" Source="FS" Target="ER"/>
+<Transition Event="tuer_auf[BT]" Source="FS" Target="ER"/>
+<Transition Event="tuer_auf[FT]" Source="FS" Target="ER"/>
+<Transition Event="tuer_auf[HT]" Source="FS" Target="ER"/>
+<Transition Event="soft_CS" Source="ER" Target="ER"/>
+<Transition Event="tuer_auf[BT]" Source="ER" Target="ER"/>
+<Transition Event="tuer_auf[FT]" Source="ER" Target="ER"/>
+<Transition Event="tuer_auf[HT]" Source="ER" Target="ER"/>
+<Transition Event="soft_CS" Source="VR" Target="ER"/>
+<Transition Event="tuer_auf[BT]" Source="VR" Target="ER"/>
+<Transition Event="tuer_auf[FT]" Source="VR" Target="ER"/>
+<Transition Event="tuer_auf[HT]" Source="VR" Target="ER"/>
+<Transition Event="soft_CS" Source="AU3" Target="ER"/>
+<Transition Event="tuer_auf[BT]" Source="AU3" Target="ER"/>
+<Transition Event="tuer_auf[FT]" Source="AU3" Target="ER"/>
+<Transition Event="tuer_auf[HT]" Source="AU3" Target="ER"/>
+<Transition Event="soft_CS" Source="AU2" Target="ER"/>
+<Transition Event="tuer_auf[BT]" Source="AU2" Target="ER"/>
+<Transition Event="tuer_auf[FT]" Source="AU2" Target="ER"/>
+<Transition Event="tuer_auf[HT]" Source="AU2" Target="ER"/>
+<Transition Event="soft_CS" Source="AU1" Target="ER"/>
+<Transition Event="tuer_auf[BT]" Source="AU1" Target="ER"/>
+<Transition Event="tuer_auf[FT]" Source="AU1" Target="ER"/>
+<Transition Event="tuer_auf[HT]" Source="AU1" Target="ER"/>
+</TransitionList>
+</Automaton>
+<Automaton Kind="SPEC" Name="check_cod_ser">
+<EventRefList>
+<EventRef Name=":accepting"/>
+<EventRef Name="cod_er"/>
+<EventRef Name="cod_ser"/>
+<EventRef Name="is_cod_er"/>
+<EventRef Name="is_cod_ser"/>
+</EventRefList>
+<StateList>
+<State Initial="true" Name="ER">
+<EventRefList>
+<EventRef Name=":accepting"/>
+</EventRefList>
+</State>
+<State Initial="false" Name="SER"/>
+</StateList>
+<TransitionList>
+<Transition Event="is_cod_ser" Source="SER" Target="SER"/>
+<Transition Event="cod_er" Source="SER" Target="ER"/>
+<Transition Event="cod_ser" Source="ER" Target="SER"/>
+<Transition Event="is_cod_er" Source="ER" Target="ER"/>
+</TransitionList>
+</Automaton>
+<Automaton Kind="PLANT" Name="cod_ser">
+<EventRefList>
+<EventRef Name=":accepting"/>
+<EventRef Name="cod_er"/>
+<EventRef Name="cod_ser"/>
+</EventRefList>
+<StateList>
+<State Initial="true" Name="ER">
+<EventRefList>
+<EventRef Name=":accepting"/>
+</EventRefList>
+</State>
+<State Initial="false" Name="SER"/>
+</StateList>
+<TransitionList>
+<Transition Event="cod_er" Source="SER" Target="ER"/>
+<Transition Event="cod_ser" Source="ER" Target="SER"/>
+</TransitionList>
+</Automaton>
+<Automaton Kind="SPEC" Name="crash">
+<EventRefList>
+<EventRef Name=":accepting"/>
+<EventRef Name="CS"/>
+<EventRef Name="CS_ok"/>
+<EventRef Name="done_ZS"/>
+<EventRef Name="soft_CS"/>
+<EventRef Name="soft_ER"/>
+<EventRef Name="soft_SER[FT]"/>
+<EventRef Name="soft_VR"/>
+<EventRef Name="zuendung_an"/>
+<EventRef Name="zuendung_aus"/>
+</EventRefList>
+<StateList>
+<State Initial="false" Name="CS1"/>
+<State Initial="false" Name="CS1a"/>
+<State Initial="false" Name="CS2"/>
+<State Initial="false" Name="CS2a"/>
+<State Initial="true" Name="IN">
+<EventRefList>
+<EventRef Name=":accepting"/>
+</EventRefList>
+</State>
+<State Initial="false" Name="RUN"/>
+<State Initial="false" Name="XX"/>
+<State Initial="false" Name="ZS">
+<EventRefList>
+<EventRef Name=":accepting"/>
+</EventRefList>
+</State>
+</StateList>
+<TransitionList>
+<Transition Event="CS" Source="CS2a" Target="CS2a"/>
+<Transition Event="zuendung_an" Source="CS2a" Target="CS2"/>
+<Transition Event="CS_ok" Source="CS2a" Target="IN"/>
+<Transition Event="zuendung_an" Source="ZS" Target="XX"/>
+<Transition Event="soft_ER" Source="ZS" Target="IN"/>
+<Transition Event="soft_SER[FT]" Source="ZS" Target="IN"/>
+<Transition Event="soft_VR" Source="ZS" Target="IN"/>
+<Transition Event="done_ZS" Source="ZS" Target="ZS"/>
+<Transition Event="CS" Source="ZS" Target="ZS"/>
+<Transition Event="zuendung_an" Source="IN" Target="RUN"/>
+<Transition Event="soft_ER" Source="IN" Target="IN"/>
+<Transition Event="soft_SER[FT]" Source="IN" Target="IN"/>
+<Transition Event="soft_VR" Source="IN" Target="IN"/>
+<Transition Event="CS" Source="IN" Target="IN"/>
+<Transition Event="done_ZS" Source="IN" Target="ZS"/>
+<Transition Event="soft_CS" Source="CS1a" Target="CS2a"/>
+<Transition Event="CS" Source="CS1a" Target="CS1a"/>
+<Transition Event="zuendung_an" Source="CS1a" Target="CS1"/>
+<Transition Event="soft_ER" Source="RUN" Target="RUN"/>
+<Transition Event="soft_SER[FT]" Source="RUN" Target="RUN"/>
+<Transition Event="soft_VR" Source="RUN" Target="RUN"/>
+<Transition Event="done_ZS" Source="RUN" Target="XX"/>
+<Transition Event="zuendung_aus" Source="RUN" Target="IN"/>
+<Transition Event="CS" Source="RUN" Target="CS1"/>
+<Transition Event="soft_ER" Source="XX" Target="RUN"/>
+<Transition Event="soft_SER[FT]" Source="XX" Target="RUN"/>
+<Transition Event="soft_VR" Source="XX" Target="RUN"/>
+<Transition Event="done_ZS" Source="XX" Target="XX"/>
+<Transition Event="CS" Source="XX" Target="XX"/>
+<Transition Event="zuendung_aus" Source="XX" Target="ZS"/>
+<Transition Event="zuendung_aus" Source="CS2" Target="CS2a"/>
+<Transition Event="CS_ok" Source="CS2" Target="RUN"/>
+<Transition Event="CS" Source="CS2" Target="CS2"/>
+<Transition Event="zuendung_aus" Source="CS1" Target="CS1a"/>
+<Transition Event="soft_CS" Source="CS1" Target="CS2"/>
+<Transition Event="CS" Source="CS1" Target="CS1"/>
+</TransitionList>
+</Automaton>
+<Automaton Kind="SPEC" Name="decoder">
+<EventRefList>
+<EventRef Name=":accepting"/>
+<EventRef Name="autom_VR"/>
+<EventRef Name="ER"/>
+<EventRef Name="is_cod_er"/>
+<EventRef Name="is_cod_ser"/>
+<EventRef Name="SER"/>
+<EventRef Name="SERFS"/>
+<EventRef Name="soft_CS"/>
+<EventRef Name="soft_ER"/>
+<EventRef Name="soft_SER[FT]"/>
+<EventRef Name="soft_VR"/>
+<EventRef Name="soft_ZS"/>
+<EventRef Name="TAST"/>
+<EventRef Name="ZS"/>
+<EventRef Name="ZSA"/>
+<EventRef Name="ZSI"/>
+</EventRefList>
+<StateList>
+<State Initial="false" Name="COD"/>
+<State Initial="false" Name="ER">
+<EventRefList>
+<EventRef Name=":accepting"/>
+</EventRefList>
+</State>
+<State Initial="true" Name="IN"/>
+<State Initial="false" Name="RQER"/>
+<State Initial="false" Name="RQSER"/>
+<State Initial="false" Name="RQVR"/>
+<State Initial="false" Name="RQZS"/>
+<State Initial="false" Name="SER">
+<EventRefList>
+<EventRef Name=":accepting"/>
+</EventRefList>
+</State>
+<State Initial="false" Name="TSTZS"/>
+<State Initial="false" Name="VR">
+<EventRefList>
+<EventRef Name=":accepting"/>
+</EventRefList>
+</State>
+<State Initial="false" Name="ZS">
+<EventRefList>
+<EventRef Name=":accepting"/>
+</EventRefList>
+</State>
+</StateList>
+<TransitionList>
+<Transition Event="soft_SER[FT]" Source="RQSER" Target="SER"/>
+<Transition Event="soft_ER" Source="RQER" Target="ER"/>
+<Transition Event="soft_VR" Source="RQVR" Target="VR"/>
+<Transition Event="soft_ZS" Source="RQZS" Target="ZS"/>
+<Transition Event="ZSA" Source="TSTZS" Target="RQZS"/>
+<Transition Event="ZSI" Source="TSTZS" Target="RQVR"/>
+<Transition Event="is_cod_ser" Source="COD" Target="RQSER"/>
+<Transition Event="is_cod_er" Source="COD" Target="RQER"/>
+<Transition Event="ZS" Source="ZS" Target="RQZS"/>
+<Transition Event="TAST" Source="ZS" Target="RQZS"/>
+<Transition Event="SER" Source="ZS" Target="COD"/>
+<Transition Event="SERFS" Source="ZS" Target="COD"/>
+<Transition Event="ER" Source="ZS" Target="RQER"/>
+<Transition Event="SER" Source="VR" Target="COD"/>
+<Transition Event="SERFS" Source="VR" Target="COD"/>
+<Transition Event="ER" Source="VR" Target="RQER"/>
+<Transition Event="TAST" Source="VR" Target="RQER"/>
+<Transition Event="ZS" Source="VR" Target="TSTZS"/>
+<Transition Event="autom_VR" Source="SER" Target="RQVR"/>
+<Transition Event="ER" Source="SER" Target="RQER"/>
+<Transition Event="SER" Source="SER" Target="RQER"/>
+<Transition Event="SERFS" Source="SER" Target="RQER"/>
+<Transition Event="TAST" Source="SER" Target="RQER"/>
+<Transition Event="ZS" Source="SER" Target="TSTZS"/>
+<Transition Event="TAST" Source="ER" Target="RQVR"/>
+<Transition Event="autom_VR" Source="ER" Target="RQVR"/>
+<Transition Event="ER" Source="ER" Target="RQER"/>
+<Transition Event="SER" Source="ER" Target="RQER"/>
+<Transition Event="SERFS" Source="ER" Target="RQER"/>
+<Transition Event="ZS" Source="ER" Target="TSTZS"/>
+<Transition Event="TAST" Source="IN" Target="RQVR"/>
+<Transition Event="SER" Source="IN" Target="COD"/>
+<Transition Event="SERFS" Source="IN" Target="COD"/>
+<Transition Event="ER" Source="IN" Target="RQER"/>
+<Transition Event="ZS" Source="IN" Target="TSTZS"/>
+<Transition Event="soft_CS" Source="ER" Target="ER"/>
+<Transition Event="soft_CS" Source="VR" Target="ER"/>
+<Transition Event="soft_CS" Source="TSTZS" Target="ER"/>
+<Transition Event="soft_CS" Source="COD" Target="ER"/>
+<Transition Event="soft_CS" Source="SER" Target="ER"/>
+<Transition Event="soft_CS" Source="ZS" Target="ER"/>
+<Transition Event="soft_CS" Source="RQVR" Target="ER"/>
+<Transition Event="soft_CS" Source="RQZS" Target="ER"/>
+<Transition Event="soft_CS" Source="RQSER" Target="ER"/>
+<Transition Event="soft_CS" Source="RQER" Target="ER"/>
+<Transition Event="soft_CS" Source="IN" Target="ER"/>
+</TransitionList>
+</Automaton>
+<Automaton Kind="SPEC" Name="eingabe_er">
+<EventRefList>
+<EventRef Name=":accepting"/>
+<EventRef Name="CS_ok"/>
+<EventRef Name="ER"/>
+<EventRef Name="ER_BT"/>
+<EventRef Name="ER_FS"/>
+<EventRef Name="ER_FT"/>
+<EventRef Name="ER_HK"/>
+<EventRef Name="soft_CS"/>
+<EventRef Name="TASTVR"/>
+<EventRef Name="VR_BT"/>
+<EventRef Name="VR_FS"/>
+<EventRef Name="VR_FT"/>
+<EventRef Name="VR_HK"/>
+<EventRef Name="wsp"/>
+</EventRefList>
+<StateList>
+<State Initial="false" Name="C1"/>
+<State Initial="false" Name="C2"/>
+<State Initial="false" Name="ER"/>
+<State Initial="true" Name="IN">
+<EventRefList>
+<EventRef Name=":accepting"/>
+</EventRefList>
+</State>
+</StateList>
+<TransitionList>
+<Transition Event="ER_FT" Source="C1" Target="C2"/>
+<Transition Event="ER_BT" Source="C1" Target="C2"/>
+<Transition Event="ER_HK" Source="C1" Target="C2"/>
+<Transition Event="ER_FS" Source="C1" Target="C1"/>
+<Transition Event="VR_FT" Source="C1" Target="C1"/>
+<Transition Event="VR_BT" Source="C1" Target="C1"/>
+<Transition Event="VR_HK" Source="C1" Target="C1"/>
+<Transition Event="VR_FS" Source="C1" Target="C1"/>
+<Transition Event="TASTVR" Source="C1" Target="C1"/>
+<Transition Event="ER_FT" Source="C2" Target="C2"/>
+<Transition Event="ER_BT" Source="C2" Target="C2"/>
+<Transition Event="ER_HK" Source="C2" Target="C2"/>
+<Transition Event="ER_FS" Source="C2" Target="C2"/>
+<Transition Event="VR_FT" Source="C2" Target="C2"/>
+<Transition Event="VR_BT" Source="C2" Target="C2"/>
+<Transition Event="VR_HK" Source="C2" Target="C2"/>
+<Transition Event="VR_FS" Source="C2" Target="C2"/>
+<Transition Event="TASTVR" Source="C2" Target="C2"/>
+<Transition Event="CS_ok" Source="C2" Target="IN"/>
+<Transition Event="ER_FT" Source="ER" Target="IN"/>
+<Transition Event="ER_FS" Source="ER" Target="IN"/>
+<Transition Event="VR_FT" Source="ER" Target="IN"/>
+<Transition Event="VR_BT" Source="ER" Target="IN"/>
+<Transition Event="VR_HK" Source="ER" Target="IN"/>
+<Transition Event="VR_FS" Source="ER" Target="IN"/>
+<Transition Event="TASTVR" Source="ER" Target="IN"/>
+<Transition Event="ER" Source="ER" Target="IN"/>
+<Transition Event="wsp" Source="ER" Target="IN"/>
+<Transition Event="soft_CS" Source="ER" Target="C1"/>
+<Transition Event="ER_BT" Source="ER" Target="ER"/>
+<Transition Event="ER_HK" Source="ER" Target="ER"/>
+<Transition Event="wsp" Source="IN" Target="IN"/>
+<Transition Event="ER_FT" Source="IN" Target="IN"/>
+<Transition Event="ER_FS" Source="IN" Target="IN"/>
+<Transition Event="VR_FT" Source="IN" Target="IN"/>
+<Transition Event="VR_BT" Source="IN" Target="IN"/>
+<Transition Event="VR_HK" Source="IN" Target="IN"/>
+<Transition Event="VR_FS" Source="IN" Target="IN"/>
+<Transition Event="TASTVR" Source="IN" Target="IN"/>
+<Transition Event="soft_CS" Source="IN" Target="C1"/>
+<Transition Event="ER_BT" Source="IN" Target="ER"/>
+<Transition Event="ER_HK" Source="IN" Target="ER"/>
+</TransitionList>
+</Automaton>
+<Automaton Kind="SPEC" Name="eingabe_fs">
+<EventRefList>
+<EventRef Name=":accepting"/>
+<EventRef Name="CS_ok"/>
+<EventRef Name="ER_BT"/>
+<EventRef Name="ER_FS"/>
+<EventRef Name="ER_FT"/>
+<EventRef Name="ER_HK"/>
+<EventRef Name="SERFS"/>
+<EventRef Name="soft_CS"/>
+<EventRef Name="TASTVR"/>
+<EventRef Name="VR_BT"/>
+<EventRef Name="VR_FS"/>
+<EventRef Name="VR_FT"/>
+<EventRef Name="VR_HK"/>
+<EventRef Name="wsp"/>
+</EventRefList>
+<StateList>
+<State Initial="false" Name="FS"/>
+<State Initial="true" Name="IN">
+<EventRefList>
+<EventRef Name=":accepting"/>
+</EventRefList>
+</State>
+</StateList>
+<TransitionList>
+<Transition Event="ER_FS" Source="FS" Target="FS"/>
+<Transition Event="ER_FT" Source="FS" Target="IN"/>
+<Transition Event="ER_BT" Source="FS" Target="IN"/>
+<Transition Event="ER_HK" Source="FS" Target="IN"/>
+<Transition Event="TASTVR" Source="FS" Target="IN"/>
+<Transition Event="VR_FT" Source="FS" Target="IN"/>
+<Transition Event="VR_BT" Source="FS" Target="IN"/>
+<Transition Event="VR_HK" Source="FS" Target="IN"/>
+<Transition Event="VR_FS" Source="FS" Target="IN"/>
+<Transition Event="SERFS" Source="FS" Target="IN"/>
+<Transition Event="wsp" Source="FS" Target="IN"/>
+<Transition Event="soft_CS" Source="FS" Target="IN"/>
+<Transition Event="CS_ok" Source="FS" Target="IN"/>
+<Transition Event="ER_FS" Source="IN" Target="FS"/>
+<Transition Event="wsp" Source="IN" Target="IN"/>
+<Transition Event="soft_CS" Source="IN" Target="IN"/>
+<Transition Event="CS_ok" Source="IN" Target="IN"/>
+<Transition Event="ER_FT" Source="IN" Target="IN"/>
+<Transition Event="ER_BT" Source="IN" Target="IN"/>
+<Transition Event="ER_HK" Source="IN" Target="IN"/>
+<Transition Event="TASTVR" Source="IN" Target="IN"/>
+<Transition Event="VR_FT" Source="IN" Target="IN"/>
+<Transition Event="VR_BT" Source="IN" Target="IN"/>
+<Transition Event="VR_HK" Source="IN" Target="IN"/>
+<Transition Event="VR_FS" Source="IN" Target="IN"/>
+</TransitionList>
+</Automaton>
+<Automaton Kind="SPEC" Name="eingabe_ser">
+<EventRefList>
+<EventRef Name=":accepting"/>
+<EventRef Name="CS_ok"/>
+<EventRef Name="ER_BT"/>
+<EventRef Name="ER_FS"/>
+<EventRef Name="ER_FT"/>
+<EventRef Name="ER_HK"/>
+<EventRef Name="SER"/>
+<EventRef Name="soft_CS"/>
+<EventRef Name="TASTVR"/>
+<EventRef Name="VR_BT"/>
+<EventRef Name="VR_FS"/>
+<EventRef Name="VR_FT"/>
+<EventRef Name="VR_HK"/>
+<EventRef Name="wsp"/>
+</EventRefList>
+<StateList>
+<State Initial="true" Name="IN">
+<EventRefList>
+<EventRef Name=":accepting"/>
+</EventRefList>
+</State>
+<State Initial="false" Name="VR"/>
+</StateList>
+<TransitionList>
+<Transition Event="ER_FT" Source="VR" Target="VR"/>
+<Transition Event="SER" Source="VR" Target="IN"/>
+<Transition Event="wsp" Source="VR" Target="IN"/>
+<Transition Event="soft_CS" Source="VR" Target="IN"/>
+<Transition Event="CS_ok" Source="VR" Target="IN"/>
+<Transition Event="ER_BT" Source="VR" Target="IN"/>
+<Transition Event="ER_HK" Source="VR" Target="IN"/>
+<Transition Event="ER_FS" Source="VR" Target="IN"/>
+<Transition Event="TASTVR" Source="VR" Target="IN"/>
+<Transition Event="VR_FT" Source="VR" Target="IN"/>
+<Transition Event="VR_BT" Source="VR" Target="IN"/>
+<Transition Event="VR_HK" Source="VR" Target="IN"/>
+<Transition Event="VR_FS" Source="VR" Target="IN"/>
+<Transition Event="ER_FT" Source="IN" Target="VR"/>
+<Transition Event="wsp" Source="IN" Target="IN"/>
+<Transition Event="soft_CS" Source="IN" Target="IN"/>
+<Transition Event="CS_ok" Source="IN" Target="IN"/>
+<Transition Event="ER_BT" Source="IN" Target="IN"/>
+<Transition Event="ER_HK" Source="IN" Target="IN"/>
+<Transition Event="ER_FS" Source="IN" Target="IN"/>
+<Transition Event="TASTVR" Source="IN" Target="IN"/>
+<Transition Event="VR_FT" Source="IN" Target="IN"/>
+<Transition Event="VR_BT" Source="IN" Target="IN"/>
+<Transition Event="VR_HK" Source="IN" Target="IN"/>
+<Transition Event="VR_FS" Source="IN" Target="IN"/>
+</TransitionList>
+</Automaton>
+<Automaton Kind="SPEC" Name="eingabe_vr">
+<EventRefList>
+<EventRef Name=":accepting"/>
+<EventRef Name="CS_ok"/>
+<EventRef Name="ER_BT"/>
+<EventRef Name="ER_FS"/>
+<EventRef Name="ER_FT"/>
+<EventRef Name="ER_HK"/>
+<EventRef Name="soft_CS"/>
+<EventRef Name="TAST"/>
+<EventRef Name="TASTVR"/>
+<EventRef Name="VR_BT"/>
+<EventRef Name="VR_FS"/>
+<EventRef Name="VR_FT"/>
+<EventRef Name="VR_HK"/>
+<EventRef Name="wsp"/>
+</EventRefList>
+<StateList>
+<State Initial="true" Name="IN">
+<EventRefList>
+<EventRef Name=":accepting"/>
+</EventRefList>
+</State>
+<State Initial="false" Name="VR"/>
+</StateList>
+<TransitionList>
+<Transition Event="TASTVR" Source="VR" Target="VR"/>
+<Transition Event="ER_FT" Source="VR" Target="IN"/>
+<Transition Event="ER_BT" Source="VR" Target="IN"/>
+<Transition Event="ER_HK" Source="VR" Target="IN"/>
+<Transition Event="ER_FS" Source="VR" Target="IN"/>
+<Transition Event="VR_FT" Source="VR" Target="IN"/>
+<Transition Event="VR_BT" Source="VR" Target="IN"/>
+<Transition Event="VR_HK" Source="VR" Target="IN"/>
+<Transition Event="VR_FS" Source="VR" Target="IN"/>
+<Transition Event="TAST" Source="VR" Target="IN"/>
+<Transition Event="wsp" Source="VR" Target="IN"/>
+<Transition Event="soft_CS" Source="VR" Target="IN"/>
+<Transition Event="CS_ok" Source="VR" Target="IN"/>
+<Transition Event="TASTVR" Source="IN" Target="VR"/>
+<Transition Event="wsp" Source="IN" Target="IN"/>
+<Transition Event="soft_CS" Source="IN" Target="IN"/>
+<Transition Event="CS_ok" Source="IN" Target="IN"/>
+<Transition Event="ER_FT" Source="IN" Target="IN"/>
+<Transition Event="ER_BT" Source="IN" Target="IN"/>
+<Transition Event="ER_HK" Source="IN" Target="IN"/>
+<Transition Event="ER_FS" Source="IN" Target="IN"/>
+<Transition Event="VR_FT" Source="IN" Target="IN"/>
+<Transition Event="VR_BT" Source="IN" Target="IN"/>
+<Transition Event="VR_HK" Source="IN" Target="IN"/>
+<Transition Event="VR_FS" Source="IN" Target="IN"/>
+</TransitionList>
+</Automaton>
+<Automaton Kind="SPEC" Name="eingabe_zs">
+<EventRefList>
+<EventRef Name=":accepting"/>
+<EventRef Name="CS_ok"/>
+<EventRef Name="ER_BT"/>
+<EventRef Name="ER_FS"/>
+<EventRef Name="ER_FT"/>
+<EventRef Name="ER_HK"/>
+<EventRef Name="kein_ZS"/>
+<EventRef Name="soft_CS"/>
+<EventRef Name="TASTVR"/>
+<EventRef Name="VR_BT"/>
+<EventRef Name="VR_FS"/>
+<EventRef Name="VR_FT"/>
+<EventRef Name="VR_HK"/>
+<EventRef Name="wsp"/>
+<EventRef Name="ZS"/>
+</EventRefList>
+<StateList>
+<State Initial="true" Name="IN">
+<EventRefList>
+<EventRef Name=":accepting"/>
+</EventRefList>
+</State>
+<State Initial="false" Name="VR"/>
+</StateList>
+<TransitionList>
+<Transition Event="ZS" Source="VR" Target="IN"/>
+<Transition Event="wsp" Source="VR" Target="IN"/>
+<Transition Event="kein_ZS" Source="VR" Target="IN"/>
+<Transition Event="soft_CS" Source="VR" Target="IN"/>
+<Transition Event="CS_ok" Source="VR" Target="IN"/>
+<Transition Event="ER_FT" Source="VR" Target="IN"/>
+<Transition Event="ER_BT" Source="VR" Target="IN"/>
+<Transition Event="ER_HK" Source="VR" Target="IN"/>
+<Transition Event="ER_FS" Source="VR" Target="IN"/>
+<Transition Event="TASTVR" Source="VR" Target="IN"/>
+<Transition Event="VR_FT" Source="VR" Target="VR"/>
+<Transition Event="VR_BT" Source="VR" Target="VR"/>
+<Transition Event="VR_HK" Source="VR" Target="VR"/>
+<Transition Event="VR_FS" Source="VR" Target="VR"/>
+<Transition Event="wsp" Source="IN" Target="IN"/>
+<Transition Event="soft_CS" Source="IN" Target="IN"/>
+<Transition Event="CS_ok" Source="IN" Target="IN"/>
+<Transition Event="ER_FT" Source="IN" Target="IN"/>
+<Transition Event="ER_BT" Source="IN" Target="IN"/>
+<Transition Event="ER_HK" Source="IN" Target="IN"/>
+<Transition Event="ER_FS" Source="IN" Target="IN"/>
+<Transition Event="TASTVR" Source="IN" Target="IN"/>
+<Transition Event="VR_FT" Source="IN" Target="VR"/>
+<Transition Event="VR_BT" Source="IN" Target="VR"/>
+<Transition Event="VR_HK" Source="IN" Target="VR"/>
+<Transition Event="VR_FS" Source="IN" Target="VR"/>
+</TransitionList>
+</Automaton>
+<Automaton Kind="PLANT" Name="ircount[WSP]">
+<EventRefList>
+<EventRef Name=":accepting"/>
+<EventRef Name="ctr_ge_max[WSP]"/>
+<EventRef Name="ctr_lt_max[WSP]"/>
+<EventRef Name="inc_ctr[WSP]"/>
+<EventRef Name="reset_ctr[WSP]"/>
+</EventRefList>
+<StateList>
+<State Initial="true" Name="IN">
+<EventRefList>
+<EventRef Name=":accepting"/>
+</EventRefList>
+</State>
+<State Initial="false" Name="RUN"/>
+</StateList>
+<TransitionList>
+<Transition Event="inc_ctr[WSP]" Source="IN" Target="RUN"/>
+<Transition Event="reset_ctr[WSP]" Source="IN" Target="IN"/>
+<Transition Event="ctr_lt_max[WSP]" Source="RUN" Target="IN"/>
+<Transition Event="ctr_ge_max[WSP]" Source="RUN" Target="IN"/>
+</TransitionList>
+</Automaton>
+<Automaton Kind="SPEC" Name="kein_zs">
+<EventRefList>
+<EventRef Name=":accepting"/>
+<EventRef Name="kein_ZS"/>
+<EventRef Name="tuer_auf[FT]"/>
+<EventRef Name="tuer_zu[FT]"/>
+<EventRef Name="ZS"/>
+</EventRefList>
+<StateList>
+<State Initial="true" Name="AUF"/>
+<State Initial="false" Name="ZU">
+<EventRefList>
+<EventRef Name=":accepting"/>
+</EventRefList>
+</State>
+</StateList>
+<TransitionList>
+<Transition Event="kein_ZS" Source="AUF" Target="AUF"/>
+<Transition Event="tuer_zu[FT]" Source="AUF" Target="ZU"/>
+<Transition Event="tuer_auf[FT]" Source="ZU" Target="AUF"/>
+<Transition Event="ZS" Source="ZU" Target="ZU"/>
+</TransitionList>
+</Automaton>
+<Automaton Kind="SPEC" Name="keine_wsp">
+<EventRefList>
+<EventRef Name=":accepting"/>
+<EventRef Name="ER"/>
+<EventRef Name="ER_BT"/>
+<EventRef Name="ER_FS"/>
+<EventRef Name="ER_FT"/>
+<EventRef Name="ER_HK"/>
+<EventRef Name="SER"/>
+<EventRef Name="SERFS"/>
+<EventRef Name="soft_CS"/>
+<EventRef Name="TAST"/>
+<EventRef Name="TASTVR"/>
+<EventRef Name="VR_BT"/>
+<EventRef Name="VR_FS"/>
+<EventRef Name="VR_FT"/>
+<EventRef Name="VR_HK"/>
+<EventRef Name="wsp"/>
+<EventRef Name="ZS"/>
+</EventRefList>
+<StateList>
+<State Initial="true" Name="IDLE">
+<EventRefList>
+<EventRef Name=":accepting"/>
+</EventRefList>
+</State>
+<State Initial="false" Name="WSP"/>
+</StateList>
+<TransitionList>
+<Transition Event="ER_BT" Source="IDLE" Target="WSP"/>
+<Transition Event="ER_FS" Source="IDLE" Target="WSP"/>
+<Transition Event="ER_FT" Source="IDLE" Target="WSP"/>
+<Transition Event="ER_HK" Source="IDLE" Target="WSP"/>
+<Transition Event="VR_BT" Source="IDLE" Target="WSP"/>
+<Transition Event="VR_FS" Source="IDLE" Target="WSP"/>
+<Transition Event="VR_FT" Source="IDLE" Target="WSP"/>
+<Transition Event="VR_HK" Source="IDLE" Target="WSP"/>
+<Transition Event="TASTVR" Source="IDLE" Target="WSP"/>
+<Transition Event="soft_CS" Source="IDLE" Target="IDLE"/>
+<Transition Event="ER_BT" Source="WSP" Target="WSP"/>
+<Transition Event="ER_FS" Source="WSP" Target="WSP"/>
+<Transition Event="ER_FT" Source="WSP" Target="WSP"/>
+<Transition Event="ER_HK" Source="WSP" Target="WSP"/>
+<Transition Event="VR_BT" Source="WSP" Target="WSP"/>
+<Transition Event="VR_FS" Source="WSP" Target="WSP"/>
+<Transition Event="VR_FT" Source="WSP" Target="WSP"/>
+<Transition Event="VR_HK" Source="WSP" Target="WSP"/>
+<Transition Event="TASTVR" Source="WSP" Target="WSP"/>
+<Transition Event="ER" Source="WSP" Target="IDLE"/>
+<Transition Event="SER" Source="WSP" Target="IDLE"/>
+<Transition Event="SERFS" Source="WSP" Target="IDLE"/>
+<Transition Event="TAST" Source="WSP" Target="IDLE"/>
+<Transition Event="ZS" Source="WSP" Target="IDLE"/>
+<Transition Event="soft_CS" Source="WSP" Target="IDLE"/>
+<Transition Event="wsp" Source="WSP" Target="IDLE"/>
+</TransitionList>
+</Automaton>
+<Automaton Kind="PLANT" Name="timer[FS]">
+<EventRefList>
+<EventRef Name=":accepting"/>
+<EventRef Name="reset[FS]"/>
+<EventRef Name="time[FS]"/>
+<EventRef Name="timeout[FS]"/>
+</EventRefList>
+<StateList>
+<State Initial="true" Name="IDLE">
+<EventRefList>
+<EventRef Name=":accepting"/>
+</EventRefList>
+</State>
+<State Initial="false" Name="RUN"/>
+</StateList>
+<TransitionList>
+<Transition Event="time[FS]" Source="IDLE" Target="RUN"/>
+<Transition Event="timeout[FS]" Source="RUN" Target="IDLE"/>
+<Transition Event="reset[FS]" Source="RUN" Target="IDLE"/>
+</TransitionList>
+</Automaton>
+<Automaton Kind="PLANT" Name="timer[WSP]">
+<EventRefList>
+<EventRef Name=":accepting"/>
+<EventRef Name="reset[WSP]"/>
+<EventRef Name="time[WSP]"/>
+<EventRef Name="timeout[WSP]"/>
+</EventRefList>
+<StateList>
+<State Initial="true" Name="IDLE">
+<EventRefList>
+<EventRef Name=":accepting"/>
+</EventRefList>
+</State>
+<State Initial="false" Name="RUN"/>
+</StateList>
+<TransitionList>
+<Transition Event="time[WSP]" Source="IDLE" Target="RUN"/>
+<Transition Event="timeout[WSP]" Source="RUN" Target="IDLE"/>
+<Transition Event="reset[WSP]" Source="RUN" Target="IDLE"/>
+</TransitionList>
+</Automaton>
+<Automaton Kind="PLANT" Name="tklemme[BT]">
+<EventRefList>
+<EventRef Name=":accepting"/>
+<EventRef Name="tuer_auf[BT]"/>
+<EventRef Name="tuer_zu[BT]"/>
+</EventRefList>
+<StateList>
+<State Initial="true" Name="AUF"/>
+<State Initial="false" Name="ZU">
+<EventRefList>
+<EventRef Name=":accepting"/>
+</EventRefList>
+</State>
+</StateList>
+<TransitionList>
+<Transition Event="tuer_zu[BT]" Source="AUF" Target="ZU"/>
+<Transition Event="tuer_auf[BT]" Source="ZU" Target="AUF"/>
+</TransitionList>
+</Automaton>
+<Automaton Kind="PLANT" Name="tklemme[FT]">
+<EventRefList>
+<EventRef Name=":accepting"/>
+<EventRef Name="tuer_auf[FT]"/>
+<EventRef Name="tuer_zu[FT]"/>
+</EventRefList>
+<StateList>
+<State Initial="true" Name="AUF"/>
+<State Initial="false" Name="ZU">
+<EventRefList>
+<EventRef Name=":accepting"/>
+</EventRefList>
+</State>
+</StateList>
+<TransitionList>
+<Transition Event="tuer_zu[FT]" Source="AUF" Target="ZU"/>
+<Transition Event="tuer_auf[FT]" Source="ZU" Target="AUF"/>
+</TransitionList>
+</Automaton>
+<Automaton Kind="PLANT" Name="tklemme[HT]">
+<EventRefList>
+<EventRef Name=":accepting"/>
+<EventRef Name="tuer_auf[HT]"/>
+<EventRef Name="tuer_zu[HT]"/>
+</EventRefList>
+<StateList>
+<State Initial="true" Name="AUF"/>
+<State Initial="false" Name="ZU">
+<EventRefList>
+<EventRef Name=":accepting"/>
+</EventRefList>
+</State>
+</StateList>
+<TransitionList>
+<Transition Event="tuer_zu[HT]" Source="AUF" Target="ZU"/>
+<Transition Event="tuer_auf[HT]" Source="ZU" Target="AUF"/>
+</TransitionList>
+</Automaton>
+<Automaton Kind="SPEC" Name="tuermodell">
+<EventRefList>
+<EventRef Name=":accepting"/>
+<EventRef Name="CS_ok"/>
+<EventRef Name="done_ER"/>
+<EventRef Name="done_SER[FT]"/>
+<EventRef Name="done_VR"/>
+<EventRef Name="done_ZS"/>
+<EventRef Name="soft_CS"/>
+<EventRef Name="soft_ER"/>
+<EventRef Name="soft_SER[FT]"/>
+<EventRef Name="soft_VR"/>
+<EventRef Name="soft_ZS"/>
+</EventRefList>
+<StateList>
+<State Initial="false" Name="CS"/>
+<State Initial="false" Name="ER"/>
+<State Initial="true" Name="IN">
+<EventRefList>
+<EventRef Name=":accepting"/>
+</EventRefList>
+</State>
+<State Initial="false" Name="SER"/>
+<State Initial="false" Name="VR"/>
+<State Initial="false" Name="ZS"/>
+</StateList>
+<TransitionList>
+<Transition Event="CS_ok" Source="CS" Target="IN"/>
+<Transition Event="soft_ZS" Source="IN" Target="ZS"/>
+<Transition Event="soft_SER[FT]" Source="IN" Target="SER"/>
+<Transition Event="soft_VR" Source="IN" Target="VR"/>
+<Transition Event="soft_ER" Source="IN" Target="ER"/>
+<Transition Event="done_VR" Source="VR" Target="IN"/>
+<Transition Event="done_ZS" Source="ZS" Target="IN"/>
+<Transition Event="done_SER[FT]" Source="SER" Target="IN"/>
+<Transition Event="done_ER" Source="ER" Target="IN"/>
+<Transition Event="soft_CS" Source="ER" Target="CS"/>
+<Transition Event="soft_CS" Source="VR" Target="CS"/>
+<Transition Event="soft_CS" Source="SER" Target="CS"/>
+<Transition Event="soft_CS" Source="ZS" Target="CS"/>
+<Transition Event="soft_CS" Source="IN" Target="CS"/>
+</TransitionList>
+</Automaton>
+<Automaton Kind="SPEC" Name="warten">
+<EventRefList>
+<EventRef Name=":accepting"/>
+<EventRef Name="autom_VR"/>
+<EventRef Name="CS_ok"/>
+<EventRef Name="done_ER"/>
+<EventRef Name="done_SER[FT]"/>
+<EventRef Name="done_VR"/>
+<EventRef Name="done_ZS"/>
+<EventRef Name="ER"/>
+<EventRef Name="SER"/>
+<EventRef Name="SERFS"/>
+<EventRef Name="soft_CS"/>
+<EventRef Name="soft_ER"/>
+<EventRef Name="soft_SER[FT]"/>
+<EventRef Name="soft_VR"/>
+<EventRef Name="soft_ZS"/>
+<EventRef Name="TAST"/>
+<EventRef Name="ZS"/>
+</EventRefList>
+<StateList>
+<State Initial="true" Name="IDLE">
+<EventRefList>
+<EventRef Name=":accepting"/>
+</EventRefList>
+</State>
+<State Initial="false" Name="RUN"/>
+</StateList>
+<TransitionList>
+<Transition Event="soft_ER" Source="IDLE" Target="RUN"/>
+<Transition Event="soft_SER[FT]" Source="IDLE" Target="RUN"/>
+<Transition Event="soft_VR" Source="IDLE" Target="RUN"/>
+<Transition Event="soft_ZS" Source="IDLE" Target="RUN"/>
+<Transition Event="soft_CS" Source="IDLE" Target="RUN"/>
+<Transition Event="ER" Source="IDLE" Target="IDLE"/>
+<Transition Event="SER" Source="IDLE" Target="IDLE"/>
+<Transition Event="SERFS" Source="IDLE" Target="IDLE"/>
+<Transition Event="ZS" Source="IDLE" Target="IDLE"/>
+<Transition Event="TAST" Source="IDLE" Target="IDLE"/>
+<Transition Event="autom_VR" Source="IDLE" Target="IDLE"/>
+<Transition Event="soft_CS" Source="RUN" Target="RUN"/>
+<Transition Event="done_ER" Source="RUN" Target="IDLE"/>
+<Transition Event="done_SER[FT]" Source="RUN" Target="IDLE"/>
+<Transition Event="done_VR" Source="RUN" Target="IDLE"/>
+<Transition Event="done_ZS" Source="RUN" Target="IDLE"/>
+<Transition Event="CS_ok" Source="RUN" Target="IDLE"/>
+</TransitionList>
+</Automaton>
+<Automaton Kind="SPEC" Name="wspcount">
+<EventRefList>
+<EventRef Name=":accepting"/>
+<EventRef Name="autom_VR"/>
+<EventRef Name="ctr_ge_max[WSP]"/>
+<EventRef Name="ctr_lt_max[WSP]"/>
+<EventRef Name="ER"/>
+<EventRef Name="inc_ctr[WSP]"/>
+<EventRef Name="SER"/>
+<EventRef Name="SERFS"/>
+<EventRef Name="TAST"/>
+<EventRef Name="timeout[WSP]"/>
+<EventRef Name="wsp"/>
+<EventRef Name="ZS"/>
+</EventRefList>
+<StateList>
+<State Initial="false" Name="CNT"/>
+<State Initial="true" Name="COOL">
+<EventRefList>
+<EventRef Name=":accepting"/>
+</EventRefList>
+</State>
+<State Initial="false" Name="TST"/>
+<State Initial="false" Name="WSP"/>
+</StateList>
+<TransitionList>
+<Transition Event="timeout[WSP]" Source="WSP" Target="COOL"/>
+<Transition Event="wsp" Source="WSP" Target="WSP"/>
+<Transition Event="inc_ctr[WSP]" Source="CNT" Target="TST"/>
+<Transition Event="timeout[WSP]" Source="CNT" Target="COOL"/>
+<Transition Event="ctr_ge_max[WSP]" Source="CNT" Target="CNT"/>
+<Transition Event="ctr_lt_max[WSP]" Source="CNT" Target="CNT"/>
+<Transition Event="ctr_lt_max[WSP]" Source="TST" Target="COOL"/>
+<Transition Event="timeout[WSP]" Source="TST" Target="COOL"/>
+<Transition Event="ctr_ge_max[WSP]" Source="TST" Target="WSP"/>
+<Transition Event="ctr_ge_max[WSP]" Source="COOL" Target="COOL"/>
+<Transition Event="ctr_lt_max[WSP]" Source="COOL" Target="COOL"/>
+<Transition Event="timeout[WSP]" Source="COOL" Target="COOL"/>
+<Transition Event="ER" Source="COOL" Target="CNT"/>
+<Transition Event="SER" Source="COOL" Target="CNT"/>
+<Transition Event="SERFS" Source="COOL" Target="CNT"/>
+<Transition Event="ZS" Source="COOL" Target="CNT"/>
+<Transition Event="TAST" Source="COOL" Target="CNT"/>
+<Transition Event="autom_VR" Source="COOL" Target="CNT"/>
+</TransitionList>
+</Automaton>
+<Automaton Kind="SPEC" Name="wsptime">
+<EventRefList>
+<EventRef Name=":accepting"/>
+<EventRef Name="autom_VR"/>
+<EventRef Name="ER"/>
+<EventRef Name="reset_ctr[WSP]"/>
+<EventRef Name="SER"/>
+<EventRef Name="SERFS"/>
+<EventRef Name="TAST"/>
+<EventRef Name="time[WSP]"/>
+<EventRef Name="timeout[WSP]"/>
+<EventRef Name="ZS"/>
+</EventRefList>
+<StateList>
+<State Initial="true" Name="IN">
+<EventRefList>
+<EventRef Name=":accepting"/>
+</EventRefList>
+</State>
+<State Initial="false" Name="RESET"/>
+<State Initial="false" Name="RUN"/>
+<State Initial="false" Name="TIME"/>
+</StateList>
+<TransitionList>
+<Transition Event="reset_ctr[WSP]" Source="RESET" Target="IN"/>
+<Transition Event="time[WSP]" Source="TIME" Target="RUN"/>
+<Transition Event="ER" Source="IN" Target="TIME"/>
+<Transition Event="SER" Source="IN" Target="TIME"/>
+<Transition Event="SERFS" Source="IN" Target="TIME"/>
+<Transition Event="ZS" Source="IN" Target="TIME"/>
+<Transition Event="TAST" Source="IN" Target="TIME"/>
+<Transition Event="autom_VR" Source="IN" Target="TIME"/>
+<Transition Event="timeout[WSP]" Source="RUN" Target="RESET"/>
+<Transition Event="ER" Source="RUN" Target="RUN"/>
+<Transition Event="SER" Source="RUN" Target="RUN"/>
+<Transition Event="SERFS" Source="RUN" Target="RUN"/>
+<Transition Event="TAST" Source="RUN" Target="RUN"/>
+<Transition Event="ZS" Source="RUN" Target="RUN"/>
+<Transition Event="autom_VR" Source="RUN" Target="RUN"/>
+</TransitionList>
+</Automaton>
+<Automaton Kind="SPEC" Name="zsi">
+<EventRefList>
+<EventRef Name=":accepting"/>
+<EventRef Name="tuer_auf[BT]"/>
+<EventRef Name="tuer_auf[FT]"/>
+<EventRef Name="tuer_zu[BT]"/>
+<EventRef Name="tuer_zu[FT]"/>
+<EventRef Name="ZSA"/>
+<EventRef Name="ZSI"/>
+<EventRef Name="zuendung_an"/>
+<EventRef Name="zuendung_aus"/>
+</EventRefList>
+<StateList>
+<State Initial="false" Name="AN0"/>
+<State Initial="false" Name="AN1"/>
+<State Initial="false" Name="AN2"/>
+<State Initial="false" Name="AUS0">
+<EventRefList>
+<EventRef Name=":accepting"/>
+</EventRefList>
+</State>
+<State Initial="false" Name="AUS1"/>
+<State Initial="true" Name="AUS2"/>
+<State Initial="false" Name="ZU"/>
+</StateList>
+<TransitionList>
+<Transition Event="zuendung_an" Source="ZU" Target="AN0"/>
+<Transition Event="ZSI" Source="ZU" Target="ZU"/>
+<Transition Event="tuer_auf[FT]" Source="ZU" Target="AUS1"/>
+<Transition Event="tuer_auf[BT]" Source="ZU" Target="AUS1"/>
+<Transition Event="tuer_zu[FT]" Source="AUS2" Target="AUS1"/>
+<Transition Event="tuer_zu[BT]" Source="AUS2" Target="AUS1"/>
+<Transition Event="zuendung_an" Source="AUS2" Target="AN2"/>
+<Transition Event="ZSA" Source="AUS2" Target="AUS2"/>
+<Transition Event="tuer_zu[FT]" Source="AUS1" Target="AUS0"/>
+<Transition Event="tuer_zu[BT]" Source="AUS1" Target="AUS0"/>
+<Transition Event="ZSA" Source="AUS1" Target="AUS1"/>
+<Transition Event="zuendung_an" Source="AUS1" Target="AN1"/>
+<Transition Event="tuer_auf[FT]" Source="AUS1" Target="AUS2"/>
+<Transition Event="tuer_auf[BT]" Source="AUS1" Target="AUS2"/>
+<Transition Event="ZSA" Source="AUS0" Target="AUS0"/>
+<Transition Event="zuendung_an" Source="AUS0" Target="AN0"/>
+<Transition Event="tuer_auf[FT]" Source="AUS0" Target="AUS1"/>
+<Transition Event="tuer_auf[BT]" Source="AUS0" Target="AUS1"/>
+<Transition Event="tuer_zu[FT]" Source="AN2" Target="AN1"/>
+<Transition Event="tuer_zu[BT]" Source="AN2" Target="AN1"/>
+<Transition Event="ZSI" Source="AN2" Target="AN2"/>
+<Transition Event="zuendung_aus" Source="AN2" Target="AUS2"/>
+<Transition Event="tuer_zu[FT]" Source="AN1" Target="AN0"/>
+<Transition Event="tuer_zu[BT]" Source="AN1" Target="AN0"/>
+<Transition Event="zuendung_aus" Source="AN1" Target="AUS1"/>
+<Transition Event="ZSI" Source="AN1" Target="AN1"/>
+<Transition Event="tuer_auf[FT]" Source="AN1" Target="AN2"/>
+<Transition Event="tuer_auf[BT]" Source="AN1" Target="AN2"/>
+<Transition Event="ZSI" Source="AN0" Target="AN0"/>
+<Transition Event="zuendung_aus" Source="AN0" Target="ZU"/>
+<Transition Event="tuer_auf[FT]" Source="AN0" Target="AN1"/>
+<Transition Event="tuer_auf[BT]" Source="AN0" Target="AN1"/>
+</TransitionList>
+</Automaton>
+<Automaton Kind="PLANT" Name="zuendung">
+<EventRefList>
+<EventRef Name=":accepting"/>
+<EventRef Name="zuendung_an"/>
+<EventRef Name="zuendung_aus"/>
+</EventRefList>
+<StateList>
+<State Initial="false" Name="AN"/>
+<State Initial="true" Name="AUS">
+<EventRefList>
+<EventRef Name=":accepting"/>
+</EventRefList>
+</State>
+</StateList>
+<TransitionList>
+<Transition Event="zuendung_aus" Source="AN" Target="AUS"/>
+<Transition Event="zuendung_an" Source="AUS" Target="AN"/>
+</TransitionList>
+</Automaton>
+</AutomataList>
 </ProductDES>
 
