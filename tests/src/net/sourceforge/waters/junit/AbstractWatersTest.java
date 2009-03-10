@@ -119,6 +119,15 @@ public abstract class AbstractWatersTest
 
 
   //#########################################################################
+  //# Logging
+  protected Logger getLogger()
+  {
+    final Class clazz = getClass();
+    return Logger.getLogger(clazz);
+  }
+
+
+  //#########################################################################
   //# Data Members
   private final File mInputRoot;
   private final File mOutputRoot;

@@ -244,6 +244,7 @@ public abstract class AbstractModelVerifierTest extends AbstractAnalysisTest
                                               final boolean expect)
     throws Exception
   {
+    getLogger().info("Checking " + des.getName() + " ...");
     mModelVerifier.setModel(des);
     final boolean result = mModelVerifier.run();
     TraceProxy counterexample = null;
@@ -258,6 +259,7 @@ public abstract class AbstractModelVerifierTest extends AbstractAnalysisTest
     if (!expect) {
       checkCounterExample(des, counterexample);
     }
+    getLogger().info("Done " + des.getName());
   }
 
   private void setNodeLimit()

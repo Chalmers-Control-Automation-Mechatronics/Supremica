@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<ProductDES Name="koordwsp" xmlns="http://waters.sourceforge.net/xsd/des">
+<ProductDES Name="koordwsp_block" xmlns="http://waters.sourceforge.net/xsd/des">
 <EventList>
 <Event Kind="PROPOSITION" Observable="true" Name=":accepting"/>
 <Event Kind="CONTROLLABLE" Observable="true" Name="autom_VR"/>

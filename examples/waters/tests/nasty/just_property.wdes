@@ -6,12 +6,14 @@
 <EventList>
 <Event Kind="UNCONTROLLABLE" Name="bad"/>
 <Event Kind="CONTROLLABLE" Name="loop"/>
+<Event Kind="PROPOSITION" Name=":accepting"/>
 </EventList>
 <AutomataList>
 <Automaton Kind="PROPERTY" Name="the_property">
 <EventRefList>
 <EventRef Name="bad"/>
 <EventRef Name="loop"/>
+<EventRef Name=":accepting"/>
 </EventRefList>
 <StateList>
 <State Initial="true" Name="S0"/>

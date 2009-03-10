@@ -6,6 +6,7 @@
 <EventDeclList>
 <EventDecl Kind="UNCONTROLLABLE" Name="bad"/>
 <EventDecl Kind="CONTROLLABLE" Name="loop"/>
+<EventDecl Kind="PROPOSITION" Name=":accepting"/>
 </EventDeclList>
 <ComponentList>
 <SimpleComponent Kind="PROPERTY">
@@ -14,6 +15,7 @@
 <LabelBlock>
 <SimpleIdentifier Name="bad"/>
 <SimpleIdentifier Name="loop"/>
+<SimpleIdentifier Name=":accepting"/>
 </LabelBlock>
 <NodeList>
 <SimpleNode Initial="true" Name="S0"/>

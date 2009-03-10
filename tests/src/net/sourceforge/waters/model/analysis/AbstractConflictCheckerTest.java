@@ -58,7 +58,11 @@ public abstract class AbstractConflictCheckerTest
     throws Exception
   {
     final ProductDESProxyFactory factory = getProductDESProxyFactory();
-    final ProductDESProxy des = factory.createProductDESProxy("empty");
+    final EventProxy marking = factory.createEventProxy
+      (EventDeclProxy.DEFAULT_MARKING_NAME, EventKind.PROPOSITION);
+    final Collection<EventProxy> events = Collections.singletonList(marking);
+    final ProductDESProxy des =
+      factory.createProductDESProxy("empty", events, null);
     runModelVerifier(des, true);
   }
 
@@ -113,6 +117,7 @@ public abstract class AbstractConflictCheckerTest
 
   //#########################################################################
   //# Test Cases --- hisc
+  /*
   public void testHISCRhoneSubsystem1Patch0() throws Exception
   {
     final String group = "tests";
@@ -136,6 +141,7 @@ public abstract class AbstractConflictCheckerTest
     final String name = "rhone_subsystem1_patch2.wmod";
     runModelVerifier(group, dir, name, true);
   }
+  */
 
 
   //#########################################################################
@@ -183,6 +189,7 @@ public abstract class AbstractConflictCheckerTest
     runModelVerifier(group, dir, name, true);
   }
 
+  /*
   public void test_BallTSorter1() throws Exception
   {
     final String group = "tests";
@@ -190,6 +197,7 @@ public abstract class AbstractConflictCheckerTest
     final String name = "robis_ball_sorter_attempt1.wmod";
     runModelVerifier(group, dir, name, false);
   }
+  */
 
   public void test_Batchtank2005_amk14() throws Exception
   {
@@ -407,6 +415,7 @@ public abstract class AbstractConflictCheckerTest
     runModelVerifier(group, dir, name, true);
   }
 
+  /*
   public void testProfisafeI3HostEFA() throws Exception
   {
     final String group = "tests";
@@ -418,6 +427,7 @@ public abstract class AbstractConflictCheckerTest
     bindings.add(binding);
     runModelVerifier(group, dir, name, bindings, true);
   }
+  */
 
   public void testProfisafeI4SlaveEFA() throws Exception
   {
@@ -431,6 +441,7 @@ public abstract class AbstractConflictCheckerTest
     runModelVerifier(group, dir, name, bindings, true);
   }
 
+  /*
   public void testProfisafeI4Host() throws Exception
   {
     final String group = "tests";
@@ -438,6 +449,7 @@ public abstract class AbstractConflictCheckerTest
     final String name = "profisafe_i4_host.wmod";
     runModelVerifier(group, dir, name, true);
   }
+  */
 
   public void testProfisafeI4Slave() throws Exception
   {
@@ -666,14 +678,6 @@ public abstract class AbstractConflictCheckerTest
     runModelVerifier(group, dir, name, true);
   }
 
-  public void testBorder_cases() throws Exception
-  {
-    final String group = "valid";
-    final String dir  = "border_cases";
-    final String name = "never_blow_up.wdes";
-    runModelVerifier(group, dir, name, true);
-  }
-
   public void testDebounce() throws Exception
   {
     final String group = "valid";
@@ -721,14 +725,6 @@ public abstract class AbstractConflictCheckerTest
     final String group = "valid";
     final String dir  = "central_locking";
     final String name = "koordwsp_block.wdes";
-    runModelVerifier(group, dir, name, false);
-  }
-
-  public void testMazes() throws Exception
-  {
-    final String group = "valid";
-    final String dir = "mazes";
-    final String name = "mazes.wdes";
     runModelVerifier(group, dir, name, false);
   }
 
