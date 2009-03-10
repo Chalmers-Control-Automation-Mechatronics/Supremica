@@ -1108,7 +1108,7 @@
                             <Point Y="-5" X="-5"/>
                         </InitialArrowGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point Y="4" X="6"/>
+                            <Point Y="-19" X="-36"/>
                         </LabelGeometry>
                     </SimpleNode>
                 </NodeList>
@@ -1116,18 +1116,19 @@
                     <Edge Target="inc" Source="inc">
                         <LabelBlock>
                             <SimpleIdentifier Name="step_inc"/>
+                            <SimpleIdentifier Name="step_inc_restart"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-28" X="10"/>
+                                <Point Y="-64" X="10"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point Y="120" X="204"/>
+                            <Point Y="124" X="202"/>
                         </SplineGeometry>
                         <GuardActionBlock>
                             <Guards>
                                 <BinaryExpression Operator="&gt;">
                                     <SimpleIdentifier Name="number_cycles_TO"/>
-                                    <IntConstant Value="0"/>
+                                    <IntConstant Value="1"/>
                                 </BinaryExpression>
                             </Guards>
                             <Actions>
@@ -1135,24 +1136,22 @@
                                     <SimpleIdentifier Name="number_cycles_TO"/>
                                     <IntConstant Value="1"/>
                                 </BinaryExpression>
-                                <BinaryExpression Operator="=" Text="out_ps_status_bit3_TO=(number_cycles_TO==1)">
+                                <BinaryExpression Operator="=">
                                     <SimpleIdentifier Name="out_ps_status_bit3_TO"/>
-                                    <BinaryExpression Operator="==">
-                                        <SimpleIdentifier Name="number_cycles_TO"/>
-                                        <IntConstant Value="1"/>
-                                    </BinaryExpression>
+                                    <SimpleIdentifier Name="out_ps_status_bit3_TO"/>
                                 </BinaryExpression>
                             </Actions>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-15" X="12"/>
+                                <Point Y="-33" X="11"/>
                             </LabelGeometry>
                         </GuardActionBlock>
                     </Edge>
                     <Edge Target="inc" Source="inc">
                         <LabelBlock>
                             <SimpleIdentifier Name="step_inc"/>
+                            <SimpleIdentifier Name="step_inc_restart"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="10" X="-12"/>
+                                <Point Y="-24" X="41"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
@@ -1160,15 +1159,15 @@
                         </SplineGeometry>
                         <GuardActionBlock>
                             <Guards>
-                                <BinaryExpression Operator="==">
+                                <BinaryExpression Operator="&lt;=">
                                     <SimpleIdentifier Name="number_cycles_TO"/>
-                                    <IntConstant Value="0"/>
+                                    <IntConstant Value="1"/>
                                 </BinaryExpression>
                             </Guards>
                             <Actions>
                                 <BinaryExpression Operator="=">
                                     <SimpleIdentifier Name="number_cycles_TO"/>
-                                    <SimpleIdentifier Name="number_cycles_TO"/>
+                                    <IntConstant Value="0"/>
                                 </BinaryExpression>
                                 <BinaryExpression Operator="=">
                                     <SimpleIdentifier Name="out_ps_status_bit3_TO"/>
@@ -1176,7 +1175,7 @@
                                 </BinaryExpression>
                             </Actions>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="26" X="-12"/>
+                                <Point Y="9" X="41"/>
                             </LabelGeometry>
                         </GuardActionBlock>
                     </Edge>
@@ -1202,8 +1201,9 @@
                     <Edge Target="inc" Source="inc">
                         <LabelBlock>
                             <SimpleIdentifier Name="step_inc"/>
+                            <SimpleIdentifier Name="step_inc_restart"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-28" X="10"/>
+                                <Point Y="-45" X="9"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
@@ -1213,7 +1213,7 @@
                             <Guards>
                                 <BinaryExpression Operator="&gt;">
                                     <SimpleIdentifier Name="number_cycles_CRCNO"/>
-                                    <IntConstant Value="0"/>
+                                    <IntConstant Value="1"/>
                                 </BinaryExpression>
                             </Guards>
                             <Actions>
@@ -1221,12 +1221,9 @@
                                     <SimpleIdentifier Name="number_cycles_CRCNO"/>
                                     <IntConstant Value="1"/>
                                 </BinaryExpression>
-                                <BinaryExpression Operator="=" Text="out_ps_status_bit2_CRCNO=(number_cycles_CRCNO==1)">
+                                <BinaryExpression Operator="=">
                                     <SimpleIdentifier Name="out_ps_status_bit2_CRCNO"/>
-                                    <BinaryExpression Operator="==">
-                                        <SimpleIdentifier Name="number_cycles_CRCNO"/>
-                                        <IntConstant Value="1"/>
-                                    </BinaryExpression>
+                                    <SimpleIdentifier Name="out_ps_status_bit2_CRCNO"/>
                                 </BinaryExpression>
                             </Actions>
                             <LabelGeometry Anchor="NW">
@@ -1237,6 +1234,7 @@
                     <Edge Target="inc" Source="inc">
                         <LabelBlock>
                             <SimpleIdentifier Name="step_inc"/>
+                            <SimpleIdentifier Name="step_inc_restart"/>
                             <LabelGeometry Anchor="NW">
                                 <Point Y="10" X="-12"/>
                             </LabelGeometry>
@@ -1246,15 +1244,15 @@
                         </SplineGeometry>
                         <GuardActionBlock>
                             <Guards>
-                                <BinaryExpression Operator="==">
+                                <BinaryExpression Operator="&lt;=">
                                     <SimpleIdentifier Name="number_cycles_CRCNO"/>
-                                    <IntConstant Value="0"/>
+                                    <IntConstant Value="1"/>
                                 </BinaryExpression>
                             </Guards>
                             <Actions>
                                 <BinaryExpression Operator="=">
                                     <SimpleIdentifier Name="number_cycles_CRCNO"/>
-                                    <SimpleIdentifier Name="number_cycles_CRCNO"/>
+                                    <IntConstant Value="0"/>
                                 </BinaryExpression>
                                 <BinaryExpression Operator="=">
                                     <SimpleIdentifier Name="out_ps_status_bit2_CRCNO"/>
@@ -1262,7 +1260,7 @@
                                 </BinaryExpression>
                             </Actions>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="26" X="-12"/>
+                                <Point Y="40" X="-11"/>
                             </LabelGeometry>
                         </GuardActionBlock>
                     </Edge>
