@@ -1039,8 +1039,9 @@
                     <Edge Target="inc" Source="inc">
                         <LabelBlock>
                             <SimpleIdentifier Name="step_inc"/>
+                            <SimpleIdentifier Name="step_inc_restart"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-28" X="10"/>
+                                <Point Y="-48" X="13"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
@@ -1067,6 +1068,7 @@
                     <Edge Target="inc" Source="inc">
                         <LabelBlock>
                             <SimpleIdentifier Name="step_inc"/>
+                            <SimpleIdentifier Name="step_inc_restart"/>
                             <LabelGeometry Anchor="NW">
                                 <Point Y="10" X="-12"/>
                             </LabelGeometry>
@@ -1088,7 +1090,7 @@
                                 </BinaryExpression>
                             </Actions>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="26" X="-12"/>
+                                <Point Y="40" X="-12"/>
                             </LabelGeometry>
                         </GuardActionBlock>
                     </Edge>

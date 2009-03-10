@@ -429,7 +429,6 @@ public abstract class AbstractConflictCheckerTest
   }
   */
 
-  // Bug in the model --- this should be nonblocking but isn't ...
   public void testProfisafeI4SlaveEFA() throws Exception
   {
     final String group = "tests";
