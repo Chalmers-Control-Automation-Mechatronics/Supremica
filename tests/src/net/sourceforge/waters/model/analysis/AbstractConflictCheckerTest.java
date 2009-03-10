@@ -308,7 +308,7 @@ public abstract class AbstractConflictCheckerTest
     final String group = "tests";
     final String dir = "batchtank2005";
     final String name = "lsr1_1.wdes";
-    runModelVerifier(group, dir, name, true);
+    runModelVerifier(group, dir, name, false);
   }
 
   public void test_Batchtank2005_lsr1_2() throws Exception
@@ -429,6 +429,7 @@ public abstract class AbstractConflictCheckerTest
   }
   */
 
+  // Bug in the model --- this should be nonblocking but isn't ...
   public void testProfisafeI4SlaveEFA() throws Exception
   {
     final String group = "tests";
