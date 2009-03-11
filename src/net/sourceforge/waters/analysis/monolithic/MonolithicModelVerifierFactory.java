@@ -39,6 +39,12 @@ public class MonolithicModelVerifierFactory
 
   //#########################################################################
   //# Interface net.sourceforge.waters.model.analysis.ModelVerifierFactory
+  public MonolithicConflictChecker createConflictChecker
+    (final ProductDESProxyFactory factory)
+  {
+    return new MonolithicConflictChecker(factory);
+  }
+
   public MonolithicControllabilityChecker createControllabilityChecker
     (final ProductDESProxyFactory factory)
   {

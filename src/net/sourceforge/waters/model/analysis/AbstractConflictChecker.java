@@ -121,7 +121,8 @@ public abstract class AbstractConflictChecker
     if (mUsedMarking == null) {
       if (mMarking == null) {
         final ProductDESProxy model = getModel();
-        mUsedMarking = getDefaultMarkingProposition(model);
+        mUsedMarking = getMarkingProposition
+          (model, EventDeclProxy.DEFAULT_MARKING_NAME);
       } else {
         mUsedMarking = mMarking;
       }
@@ -136,19 +137,18 @@ public abstract class AbstractConflictChecker
    *         does not contain any proposition with the default marking
    *         name.
    */
-  protected static EventProxy getDefaultMarkingProposition
-    (final ProductDESProxy model)
+  protected static EventProxy getMarkingProposition
+    (final ProductDESProxy model, final String name)
   {
     for (final EventProxy event : model.getEvents()) {
       if (event.getKind() == EventKind.PROPOSITION &&
-          event.getName().equals(EventDeclProxy.DEFAULT_MARKING_NAME)) {
+          event.getName().equals(name)) {
         return event;
       }
     }
     throw new IllegalArgumentException
       ("ProductDESProxy '" + model.getName() +
-       "' does not contain any proposition called '" +
-       EventDeclProxy.DEFAULT_MARKING_NAME + "'!");
+       "' does not contain any proposition called '" + name + "'!");
   }
 
 

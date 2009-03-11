@@ -160,7 +160,8 @@ public class CommandLineTool
         (ModelVerifier) getcheck.invoke(factory, desFactory);
       final boolean noProperties =
         !(checker instanceof LanguageInclusionChecker);
-      final boolean noPropositions = true;
+      final boolean noPropositions =
+        !(checker instanceof ConflictChecker);
       final Collection<String> empty = Collections.emptyList();
       final List<String> filenames = factory.configure(checker);
 

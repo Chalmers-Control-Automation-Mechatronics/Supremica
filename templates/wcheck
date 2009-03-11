@@ -29,6 +29,9 @@ for F in $@; do
 	-proj)
 	    FACTORY="$WPACK.analysis.modular.ProjectingModelVerifierFactory"
 	    ;;
+	-conf)
+	    CHECK="Conflict"
+	    ;;
 	-cont)
 	    CHECK="Controllability"
 	    ;;

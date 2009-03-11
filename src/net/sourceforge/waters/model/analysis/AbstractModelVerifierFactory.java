@@ -19,6 +19,8 @@ import java.util.List;
 import java.util.Map;
 
 import net.sourceforge.waters.model.compiler.ModuleCompiler;
+import net.sourceforge.waters.model.des.EventProxy;
+import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 
 
@@ -46,6 +48,7 @@ public abstract class AbstractModelVerifierFactory
     mArgumentMap = new HashMap<String,CommandLineArgument>(16);
     addArgument(new HelpArgument());
     addArgument(new LimitArgument());
+    addArgument(new MarkingArgument());
     addArgument(new PropertyArgument());
   }
 
@@ -63,6 +66,12 @@ public abstract class AbstractModelVerifierFactory
 
   //#########################################################################
   //# Interface net.sourceforge.waters.model.analysis.ModelVerifierFactory
+  public ConflictChecker createConflictChecker
+    (final ProductDESProxyFactory factory)
+  {
+    throw createUnsupportedOperationException("conflict");
+  }
+
   public ControllabilityChecker createControllabilityChecker
     (final ProductDESProxyFactory factory)
   {
@@ -203,6 +212,46 @@ public abstract class AbstractModelVerifierFactory
 
   //#########################################################################
   //# Inner Class PropertyArgument
+  private static class MarkingArgument
+    extends CommandLineArgumentString
+  {
+    //#######################################################################
+    //# Constructors
+    private MarkingArgument()
+    {
+      super("-marking",
+            "Name of marking propsosition for conflict check");
+    }
+
+    //#######################################################################
+    //# Overrides for Abstract Base Class
+    //# net.sourceforge.waters.model.analysis.CommandLineArgument
+    protected void configure(final ModuleCompiler compiler)
+    {
+      final String name = getValue();
+      final Collection<String> props = Collections.singletonList(name);
+      compiler.setEnabledPropositionNames(props);
+    }
+
+    protected void configure(final ModelVerifier verifier)
+    {
+      if (verifier instanceof ConflictChecker) {
+        final ConflictChecker checker = (ConflictChecker) verifier;
+        final ProductDESProxy model = checker.getModel();
+        final String name = getValue();
+        final EventProxy event =
+          AbstractConflictChecker.getMarkingProposition(model, name);
+        checker.setMarkingProposition(event);
+      } else {
+        fail("Command line option " + getName() +
+             " is only supported for conflict check!");
+      }
+    }
+  }
+
+
+  //#########################################################################
+  //# Inner Class PropertyArgument
   private static class PropertyArgument
     extends CommandLineArgumentString
   {
@@ -236,7 +285,6 @@ public abstract class AbstractModelVerifierFactory
              " is only supported for language inclusion!");
       }
     }
-
   }
 
 

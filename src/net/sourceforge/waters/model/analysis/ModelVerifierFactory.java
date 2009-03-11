@@ -27,6 +27,12 @@ public interface ModelVerifierFactory
   //#########################################################################
   //# Object Construction
   /**
+   * Creates a conflict checker.
+   */
+  public ConflictChecker createConflictChecker
+    (ProductDESProxyFactory factory);
+
+  /**
    * Creates a controllability checker.
    */
   public ControllabilityChecker createControllabilityChecker
