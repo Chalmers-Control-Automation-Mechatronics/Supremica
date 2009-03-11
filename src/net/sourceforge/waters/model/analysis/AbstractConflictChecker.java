@@ -47,7 +47,7 @@ public abstract class AbstractConflictChecker
    * Creates a new conflict checker to check whether the given model
    * nonconflicting with respect to the default marking proposition.
    * @param  model      The model to be checked by this conflict checker.
-   * @param  desFactory Factory used for trace construction.
+   * @param  factory    Factory used for trace construction.
    */
   public AbstractConflictChecker(final ProductDESProxy model,
                                  final ProductDESProxyFactory factory)
@@ -65,7 +65,7 @@ public abstract class AbstractConflictChecker
    *                    <CODE>marking</CODE>, i.e., their list of
    *                    propositions must contain this event (exactly the
    *                    same object).
-   * @param  desFactory Factory used for trace construction.
+   * @param  factory    Factory used for trace construction.
    */
   public AbstractConflictChecker(final ProductDESProxy model,
                                  final EventProxy marking,
@@ -73,6 +73,16 @@ public abstract class AbstractConflictChecker
   {
     super(model, factory);
     mMarking = marking;
+    mUsedMarking = null;
+  }
+
+
+  //#########################################################################
+  //# Interface net.sourceforge.waters.model.analysis.ModelAnalyser
+  public void setModel(final ProductDESProxy model)
+  {
+    super.setModel(model);
+    mUsedMarking = null;
   }
 
 
@@ -81,6 +91,7 @@ public abstract class AbstractConflictChecker
   public void setMarkingProposition(EventProxy marking)
   {
     mMarking = marking;
+    mUsedMarking = null;
   }
 
   public EventProxy getMarkingProposition()
@@ -107,12 +118,15 @@ public abstract class AbstractConflictChecker
    */
   protected EventProxy getUsedMarkingProposition()
   {
-    if (mMarking == null) {
-      final ProductDESProxy model = getModel();
-      return getDefaultMarkingProposition(model);
-    } else {
-      return mMarking;
+    if (mUsedMarking == null) {
+      if (mMarking == null) {
+        final ProductDESProxy model = getModel();
+        mUsedMarking = getDefaultMarkingProposition(model);
+      } else {
+        mUsedMarking = mMarking;
+      }
     }
+    return mUsedMarking;
   }
 
   /**
@@ -141,5 +155,6 @@ public abstract class AbstractConflictChecker
   //#########################################################################
   //# Data Members
   private EventProxy mMarking;
+  private EventProxy mUsedMarking;
 
 }

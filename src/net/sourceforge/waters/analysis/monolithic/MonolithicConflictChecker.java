@@ -10,6 +10,7 @@
 package net.sourceforge.waters.analysis.monolithic;
 
 import java.util.ArrayList;
+import java.util.BitSet;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
@@ -96,58 +97,28 @@ public class MonolithicConflictChecker
       mSyncProduct = new SyncProduct();
       mSyncProduct.build();
 
-      // Get the marked states in the synchronous product.
-      TIntHashSet marked = mSyncProduct.mMarkedStates;
-
-      // Clone the visited states set. We will use this to
-      // check if we have visited states when reverse-exploring
-      // the transition relation. Remove states as they are visited.
-      TIntHashSet unchecked = (TIntHashSet) mSyncProduct.visitedStates.clone();
-
-      // Take a guess at the size of the fringe.
-      TIntArrayList fringe = new TIntArrayList(2 * unchecked.size() / 3);
-      int fp = 0;
-
-      // The start state is always going to be 0 in this
-      // implementation.
-      int startState = 0;
-
-      TransitionSchema trans = mSyncProduct.transitions;
-      TransitionData td = null;
-
-      // Add the marked states
-      fringe.add(marked.toArray());
-
-      while ((fringe.size() - fp) > 0) {
-        int stateid = fringe.getQuick(fp);
-        fp++;
-        // Already been here. This logic seems backwards
-        if (!unchecked.contains(stateid)) {
-          continue;
-        }
-        // Remove this state from the unvisited set.
-        unchecked.remove(stateid);
-        td = trans.getTransitions(stateid);
-        if (td == null) {
-          continue;   // Nothing to expand here
-        }
-        TIntHashSet incoming = td.in;
-        if (incoming == null) {
-          continue;
-        }
-        TIntIterator it = incoming.iterator();
-        while (it.hasNext()) {
-          int t = it.next();
-          int src = trans.store.getSource(t);
-          if (unchecked.contains(src)) {
-            fringe.add(src);
+      // Set the marked states coreachable and explore their predecessors.
+      final int numstates = mSyncProduct.getNumberOfStates();
+      final BitSet coreachable = new BitSet(numstates);
+      final TIntHashSet marked = mSyncProduct.mMarkedStates;
+      final TIntIterator it = marked.iterator();
+      // Use recursion, but be aware of stack overflow ...
+      boolean ok = true;
+      while (it.hasNext()) {
+        final int stateid = it.next();
+        ok &= exploreBackwards(stateid, coreachable, MAXDEPTH);
+      }
+      while (!ok) {
+        ok = true;
+        for (int stateid = 0; stateid < numstates; stateid++) {
+          if (coreachable.get(stateid)) {
+            ok &= exploreBackwards(stateid, coreachable, MAXDEPTH);
           }
         }
       }
 
-      result = unchecked.size() == 0;
-      if (result) {
-        setSatisfiedResult();
+      if (coreachable.cardinality() == numstates) {
+        return setSatisfiedResult();
       } else {
         // Generate a counter example. As each state is numbered in the
         // order it is encountered, and a breadth first exploration
@@ -158,16 +129,16 @@ public class MonolithicConflictChecker
         // Find the unchecked state with the lowest
         // id, as this should give the shortest counterexample.
         int trace_start = Integer.MAX_VALUE;
-        TIntIterator it = unchecked.iterator();
-        while (it.hasNext()) {
-          int v = it.next();
-          if (v < trace_start) {
+        for (int v = 0; v < numstates; v++) {
+          if (!coreachable.get(v)) {
             trace_start = v;
+            break;
           }
         }
         // Until we reach the start state...
+        final TransitionSchema trans = mSyncProduct.transitions;
         while (trace_start != 0) {
-          td = trans.getTransitions(trace_start);
+          final TransitionData td = trans.getTransitions(trace_start);
           assert td != null: "This is impossible, every state is reachable!";
           TIntHashSet incoming = td.in;
           assert incoming != null:
@@ -183,9 +154,8 @@ public class MonolithicConflictChecker
         final ConflictTraceProxy trace =
           desFactory.createConflictTraceProxy(tracename, model, countertrace,
                                               ConflictKind.CONFLICT);
-        setFailedResult(trace);
+        return setFailedResult(trace);
       }
-      return result;
 
     } finally {
       // So the garbage collector can clean up ...
@@ -209,6 +179,44 @@ public class MonolithicConflictChecker
   //#########################################################################
   //# Auxiliary Methods
   /**
+   * Performs backwards search to find coreachable states.
+   * @param  stateid     The index of a state to be marked as coreachable
+   *                     and explored further.
+   * @param  coreachable The bitset to contain the indexes of all
+   *                     coreachable states.
+   * @param  maxdepth    The maximum allowable recursion depth.
+   * @return <CODE>true</CODE> if exploration was successful within the
+   *         given depth, <CODE>false</CODE> otherwise.
+   */
+  private boolean exploreBackwards(final int stateid,
+                                   final BitSet coreachable,
+                                   int maxdepth)
+  {
+    if (maxdepth-- > 0) {
+      coreachable.set(stateid);
+      boolean result = true;
+      final TransitionSchema trans = mSyncProduct.transitions;
+      final TransitionData td = trans.getTransitions(stateid);
+      if (td != null) {
+        final TIntHashSet incoming = td.in;
+        if (incoming != null) {
+          final TIntIterator it = incoming.iterator();
+          while (it.hasNext()) {
+            final int t = it.next();
+            final int src = trans.store.getSource(t);
+            if (!coreachable.get(src)) {
+              result &= exploreBackwards(src, coreachable, maxdepth);
+            }
+          }
+        }
+      }
+      return result;
+    } else {
+      return false;
+    }
+  }
+
+  /**
    * Check the transition set for the state with the lowest
    * id, and return the id.
    */
@@ -227,6 +235,7 @@ public class MonolithicConflictChecker
     }
     return lowesttr;
   }
+
 
   //#########################################################################
   //# Auxiliary Static Methods
@@ -286,19 +295,14 @@ public class MonolithicConflictChecker
 
     //#######################################################################
     //# Accessing the Fringe
-    private void fringeAdd(int stateid)
-    {
-      fringe.add(stateid);
-    }
-
     private int fringeGet()
     {
-      return fringe.getQuick(fpointer++);
+      return mFringeIndex++;
     }
 
     private int fringeSize()
     {
-      return fringe.size() - fpointer;
+      return mNextStateIndex - mFringeIndex;
     }
 
 
@@ -315,8 +319,8 @@ public class MonolithicConflictChecker
       if (mStateMap.containsKey(state)) {
         return mStateMap.get(state);
       }
-      final int id = next_state_id++;
-      if (next_state_id > getNodeLimit()) {
+      final int id = mNextStateIndex++;
+      if (mNextStateIndex > getNodeLimit()) {
         throw new OverflowException(getNodeLimit());
       }
       mStateMap.put(state, id);
@@ -336,21 +340,16 @@ public class MonolithicConflictChecker
     private void build()
       throws OverflowException
     {
+      // Compose the initial state.
       AutomatonSchema[] automata = schema.getOrdering();
-
-      //Compose the initial state.
       StateProxy[] state = new StateProxy[automata.length];
       for (int i = 0; i < automata.length; i++) {
-        assert automata[i].getInitialState() != null:
-        "Every automaton must have an initial state";
         state[i] = automata[i].getInitialState();
+        assert state[i] != null : "Every automaton must have an initial state";
       }
-
       long init = schema.encodeState(state);
       // Register the initial state.
       int initid = registerState(init);
-      // Add the initial state to the fringe.
-      fringeAdd(initid);
 
       // Expand all the states in the fringe, until no more
       // are added. This implies we have explored the entire
@@ -358,13 +357,11 @@ public class MonolithicConflictChecker
       while (fringeSize() > 0) {
         expand();
       }
-      fringe = null;
     }
 
     /**
      * Expands the first available state in the fringe.
-     * It is invalid to call this method with an empty
-     * fringe.
+     * It is invalid to call this method with an empty fringe.
      */
     private void expand()
       throws OverflowException
@@ -372,27 +369,16 @@ public class MonolithicConflictChecker
       assert fringeSize() > 0:
         "expand should not be called on an empty fringe";
 
-      //Get the first unvisited state in the fringe.
-      int stateid = fringeGet();
+      // Get the first unvisited state in the fringe.
+      final int stateid = fringeGet();
+      final long state = getStateFromId(stateid);
+      // Decode the state.
+      final int[] dstate = schema.decodeState(state);
+      final int[] rstate = new int[dstate.length];
+      final AutomatonSchema[] automata = schema.getOrdering();
+      assert automata.length == dstate.length;
 
-      //If we have already visited this state, then there is nothing
-      //further to do here.
-      if (visitedStates.contains(stateid)) {
-        return;
-      }
-      //Add the current state to the set of visited states.
-      visitedStates.add(stateid);
-
-      long state = getStateFromId(stateid);
-
-      //Decode the state.
-      int[] dstate = schema.decodeState(state);
-      int[] rstate = new int[dstate.length];
-
-      AutomatonSchema[] automata = schema.getOrdering();
-      assert(automata.length == dstate.length);
-
-      //Does the current state need to be marked?
+      // Does the current state need to be marked?
       boolean need_marking = true;
       for (int i = 0; i < automata.length; i++) {
         if (!automata[i].isMarked(dstate[i])) {
@@ -400,10 +386,10 @@ public class MonolithicConflictChecker
           break;
         }
       }
-
       if (need_marking) {
         mMarkedStates.add(stateid);
       }
+
       // The strategy for creating the synchronous product is to find the
       // sets of enabled transitions for each automaton and group them
       // into sets by their event.
@@ -480,9 +466,6 @@ public class MonolithicConflictChecker
         int newid = registerState(newstate);
         transitions.addTransition
           (transitions.transitionFactory(stateid, newid, ev));
-        if (!visitedStates.contains(newid)) {
-          fringe.add(newid);
-        }
       }
     }
 
@@ -564,11 +547,6 @@ public class MonolithicConflictChecker
     private final TransitionSchema transitions =
       new TransitionSchema(false, true);
 
-    /**
-     * Set of visited states ids.
-     */
-    private final TIntHashSet visitedStates = new TIntHashSet();
-
     private final TIntHashSet mMarkedStates = new TIntHashSet();
 
     /**
@@ -578,14 +556,15 @@ public class MonolithicConflictChecker
      */
     private TLongIntHashMap mStateMap = new TLongIntHashMap();
     private TLongArrayList statelist = new TLongArrayList();
-    private int next_state_id = 0;
 
     /**
-     * Unvisited states, represents the fringe of the search
-     * graph.
+     * The index of the first open state of the fringe.
      */
-    private TIntArrayList fringe = new TIntArrayList(1400000);
-    private int fpointer = 0;
+    private int mFringeIndex = 0;
+    /**
+     * The index of the next state to be created.
+     */
+    private int mNextStateIndex = 0;
 
     /**
      * This is used when expanding states. (OutgoingEventThingy)
@@ -1333,5 +1312,10 @@ public class MonolithicConflictChecker
   //# Data Members
   private boolean result = false;
   private SyncProduct mSyncProduct;
+
+
+  //#########################################################################
+  //# Class Constants
+  private static final int MAXDEPTH = 1024;
 
 }
