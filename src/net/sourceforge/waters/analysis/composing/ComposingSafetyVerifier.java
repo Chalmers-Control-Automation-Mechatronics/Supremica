@@ -1,3 +1,13 @@
+//# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
+//###########################################################################
+//# PROJECT: Waters
+//# PACKAGE: net.sourceforge.waters.analysis.composing
+//# CLASS:   ComposingSafetyVerifier
+//###########################################################################
+//# $Id$
+//###########################################################################
+
+
 package net.sourceforge.waters.analysis.composing;
 
 import java.lang.Comparable;
@@ -50,6 +60,12 @@ public class ComposingSafetyVerifier
 
   //#########################################################################
   //# Constructors
+  public ComposingSafetyVerifier(final KindTranslator translator,
+                                 final ProductDESProxyFactory factory)
+  {
+    this(null, translator, factory); 
+  }
+
   public ComposingSafetyVerifier(final ProductDESProxy model,
                                  final KindTranslator translator,
                                  final ProductDESProxyFactory factory) {

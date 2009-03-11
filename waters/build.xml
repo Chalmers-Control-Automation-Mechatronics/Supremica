@@ -355,13 +355,13 @@
     </junit>
   </target>
   
-  <target name="run_test4" depends="test-jar">
+  <target name="runtest4" depends="test-jar">
     <mkdir dir="${logs.results}"/>
     <junit printsummary="on" fork="true" maxmemory="512m">
       <formatter type="xml"/>
       <batchtest todir="${logs.results}">
         <fileset dir="${supremica.testsrc}">
-          <include name="net/sourceforge/waters/analysis/modular/supremica/ProjectingControllabilityCheckerTest.java"/>
+          <include name="net/sourceforge/waters/analysis/composing/ComposingLanguageInclusionCheckerTest.java"/>
         </fileset>
       </batchtest>
       <classpath refid="waters.test.classpath"/>
@@ -371,7 +371,7 @@
     </junit>
   </target>
   
-  <target name="run_test5" depends="test-jar,cpp">
+  <target name="runtest5" depends="test-jar,cpp">
     <mkdir dir="${logs.results}"/>
     <junit printsummary="on" fork="true" maxmemory="512m">
       <formatter type="xml"/>
@@ -389,7 +389,7 @@
     </junit>
   </target>
   
-  <target name="run_test6">
+  <target name="runtest6">
     <java classname="net.sourceforge.waters.analysis.modular.SpeedComparison" fork="true" maxmemory="512m">
       <classpath refid="waters.test.classpath"/>
       <sysproperty key="waters.test.inputdir" value="${supremica.examples}"/>
@@ -399,7 +399,7 @@
     </java>
   </target>
   
-  <target name="run_test7" depends="test-jar,cpp">
+  <target name="runtest7" depends="test-jar,cpp">
     <mkdir dir="${logs.results}"/>
     <junit printsummary="on" fork="true" maxmemory="512m">
       <formatter type="xml"/>
@@ -435,13 +435,13 @@
   <target name="test3" depends="runtest3,test-report"
           description="Run some test cases."/>
 
-  <target name="test4" depends="run_test4,test-report"
+  <target name="test4" depends="runtest4,test-report"
           description="Run some test cases."/>
           
-  <target name="test5" depends="run_test5,test-report"
+  <target name="test5" depends="runtest5,test-report"
           description="Run some test cases."/>
     
-  <target name="test7" depends="run_test7,test-report"
+  <target name="test7" depends="runtest7,test-report"
      description="Run some test cases."/>
 
   <target name="doc" depends="jaxb-generate"

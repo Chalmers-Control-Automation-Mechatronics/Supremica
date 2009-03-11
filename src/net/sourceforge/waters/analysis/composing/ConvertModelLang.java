@@ -1,3 +1,13 @@
+//# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
+//###########################################################################
+//# PROJECT: Waters
+//# PACKAGE: net.sourceforge.waters.analysis.composing
+//# CLASS:   ConvertModelLang
+//###########################################################################
+//# $Id$
+//###########################################################################
+
+
 package net.sourceforge.waters.analysis.composing;
 
 import java.util.ArrayList;
@@ -31,43 +41,47 @@ public class ConvertModelLang {
                           final ProductDESProxyFactory factory) {
     mModel = model;
     mFactory = factory;
-    mTranslator = translator; 
-    madeEvents = new HashMap<EventProxy, Set<EventProxy>>();
+    mTranslator = translator;
+    mMadeEvents = new HashMap<EventProxy, Set<EventProxy>>();
   }
-  
-  public ProductDESProxy run() {
-    final Set<AutomatonProxy>  plants      = new HashSet<AutomatonProxy>();    
-    final Set<AutomatonProxy>  specs       = new HashSet<AutomatonProxy>();
-    Set<AutomatonProxy>  newAutomata = new HashSet<AutomatonProxy>();
-    Set<EventProxy>      newEvents   = new HashSet<EventProxy>(mModel.getEvents());    
-    
-    for (AutomatonProxy automaton : mModel.getAutomata()) { 
-      switch (mTranslator.getComponentKind(automaton)) {
-        case PLANT :  plants.add(automaton);
-                      break;
-        case SPEC  :  specs.add(automaton);                                            
-                      break;
-        default : break;
+
+
+  //#########################################################################
+  //# Invocation
+  public ProductDESProxy run()
+  {
+    final int numaut = mModel.getAutomata().size();
+    final int numevents = mModel.getEvents().size();
+    final Collection<AutomatonProxy> newAutomata =
+      new ArrayList<AutomatonProxy>(numaut + 1);
+    final Set<EventProxy> newEvents = new HashSet<EventProxy>(numevents);
+    mMadeEvents.clear();
+
+    for (final AutomatonProxy automaton : mModel.getAutomata()) {
+      if (mTranslator.getComponentKind(automaton) == ComponentKind.SPEC) {
+        final AutomatonProxy spec = convertSpec(automaton);
+        if (spec == automaton) {
+          return mModel;
+        }
+        newAutomata.add(spec);
+        newEvents.addAll(automaton.getEvents());
       }
-    } 
-        
-    for (AutomatonProxy spec : specs) {      
-      AutomatonProxy newSpec = convertSpec(spec);
-      if (newSpec == spec) return mModel;
-      newAutomata.add(newSpec);      
     }
-    for (AutomatonProxy plant : plants) {      
-      AutomatonProxy newPlant = convertPlant(plant,madeEvents);
-      newAutomata.add(newPlant);      
-    }    
-    StateProxy onestate =
-      mFactory.createStateProxy("one", true, new HashSet<EventProxy>());
+    for (final AutomatonProxy automaton : mModel.getAutomata()) {
+      if (mTranslator.getComponentKind(automaton) == ComponentKind.PLANT) {
+        final AutomatonProxy plant = convertPlant(automaton);
+        newAutomata.add(plant);
+        newEvents.addAll(automaton.getEvents());
+      }
+    }
+    final StateProxy onestate =
+      mFactory.createStateProxy("s0", true, new HashSet<EventProxy>());
     Set<EventProxy> onePropertyEvents = new HashSet<EventProxy>();
-    for(EventProxy e : madeEvents.keySet()) {
-      onePropertyEvents.addAll(madeEvents.get(e));
+    for (EventProxy e : mMadeEvents.keySet()) {
+      onePropertyEvents.addAll(mMadeEvents.get(e));
     }
     AutomatonProxy oneProperty =
-      mFactory.createAutomatonProxy("oneProperty" + ":Property",
+      mFactory.createAutomatonProxy(":never",
                                     ComponentKind.PROPERTY,
                                     onePropertyEvents,
                                     Collections.singleton(onestate),
@@ -111,13 +125,13 @@ public class ConvertModelLang {
       EventProxy newEvent = mFactory.createEventProxy(e.getName() + ":" + a.getName(),
                                                       EventKind.UNCONTROLLABLE);
       Set<EventProxy> temp = new HashSet<EventProxy>();
-      if (madeEvents.containsKey(e)) {          
-        temp = madeEvents.get(e);
+      if (mMadeEvents.containsKey(e)) {          
+        temp = mMadeEvents.get(e);
         temp.add(newEvent);
-        madeEvents.put(e,temp);
+        mMadeEvents.put(e,temp);
       } else {                    
           temp.add(newEvent);
-          madeEvents.put(e,temp);  
+          mMadeEvents.put(e,temp);  
       }  
       uncont.put(e, newEvent); 
     }
@@ -146,10 +160,10 @@ public class ConvertModelLang {
     return plant;
   }
 
-  private AutomatonProxy convertPlant(AutomatonProxy a,
-                                      Map<EventProxy, Set<EventProxy>> uncont) {
+  private AutomatonProxy convertPlant(AutomatonProxy a)
+  {
     Set<EventProxy> same = new HashSet<EventProxy>(a.getEvents());
-    same.retainAll(uncont.keySet());
+    same.retainAll(mMadeEvents.keySet());
     if (same.isEmpty()) {
       return a;
     }
@@ -157,11 +171,11 @@ public class ConvertModelLang {
       new ArrayList<TransitionProxy>(a.getTransitions());
     Collection<EventProxy> events = new ArrayList<EventProxy>(a.getEvents());
     for(EventProxy e : same) {
-      events.addAll(uncont.get(e));
+      events.addAll(mMadeEvents.get(e));
     }
     for (TransitionProxy t : a.getTransitions()) {
-      if (uncont.containsKey(t.getEvent())) {
-        for (EventProxy e : uncont.get(t.getEvent())) {
+      if (mMadeEvents.containsKey(t.getEvent())) {
+        for (EventProxy e : mMadeEvents.get(t.getEvent())) {
           trans.add(mFactory.createTransitionProxy(t.getSource(),
                                                    e,
                                                    t.getSource()));
@@ -174,8 +188,8 @@ public class ConvertModelLang {
   }
   
   public EventProxy getOriginalEvent(EventProxy newevent) {
-    for (EventProxy e : madeEvents.keySet()) {
-      if (madeEvents.get(e).contains(newevent)) return e;
+    for (EventProxy e : mMadeEvents.keySet()) {
+      if (mMadeEvents.get(e).contains(newevent)) return e;
     }
     return newevent;
   }
@@ -184,5 +198,5 @@ public class ConvertModelLang {
   private ProductDESProxy             mModel;
   private ProductDESProxyFactory      mFactory;
   private KindTranslator              mTranslator;
-  private Map<EventProxy, Set<EventProxy>> madeEvents;         
+  private Map<EventProxy, Set<EventProxy>> mMadeEvents;         
 }

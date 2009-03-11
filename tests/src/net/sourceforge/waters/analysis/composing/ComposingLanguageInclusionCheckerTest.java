@@ -1,7 +1,7 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
 //# PROJECT: Waters
-//# PACKAGE: net.sourceforge.waters.analysis.modular
+//# PACKAGE: net.sourceforge.waters.analysis.composing
 //# CLASS:   ComposingLanguageInclusionCheckerTest
 //###########################################################################
 //# $Id$
