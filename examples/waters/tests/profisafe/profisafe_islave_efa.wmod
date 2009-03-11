@@ -599,7 +599,7 @@
                                 </BinaryExpression>
                                 <BinaryExpression Operator="=">
                                     <SimpleIdentifier Name="number_ok_cycles"/>
-                                    <SimpleIdentifier Name="number_ok_cycles"/>
+                                    <IntConstant Value="0"/>
                                 </BinaryExpression>
                             </Actions>
                             <LabelGeometry Anchor="NW">

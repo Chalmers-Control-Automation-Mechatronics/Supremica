@@ -140,61 +140,59 @@ public abstract class AbstractLanguageInclusionCheckerTest
     final String group = "tests";
     final String dir = "profisafe";
     final String name = "profisafe_ihost_efa.wmod";
-    final List<ParameterBindingProxy> bindings =
-      new LinkedList<ParameterBindingProxy>();
     final ParameterBindingProxy binding = createBinding("MAXSEQNO", 3);
-    bindings.add(binding);
+    final List<ParameterBindingProxy> bindings =
+      Collections.singletonList(binding);
     runModelVerifier(group, dir, name, bindings, expect, propname);
   }
 
-  public void testProfisafeI4SlaveEFA__neversend0000()
+  public void testProfisafeI4SlaveEFA__neversend()
     throws Exception
   {
-    testProfisafeI4SlaveEFA("never_send[PV][0][0][0][0]", false);
+    final String group = "tests";
+    final String dir = "profisafe";
+    final String name = "profisafe_islave_efa.wmod";
+    final int maxseqno = 4;
+    final ParameterBindingProxy binding = createBinding("MAXSEQNO", maxseqno);
+    final List<ParameterBindingProxy> bindings =
+      Collections.singletonList(binding);
+    for (int isfv = 0; isfv <= 1; isfv++) {
+      final String vname = isfv == 0 ? "PV" : "FV";
+      for (int seqno = 0; seqno <= maxseqno; seqno++) {
+        for (int s4 = 0; s4 <= 1; s4++) {
+          for (int s3 = 0; s3 <= 1; s3++) {
+            for (int s2 = 0; s2 <= 1; s2++) {
+              final String propname =
+                String.format("never_send[%s][%d][%d][%d][%d]",
+                              vname, s4, s3, s2, seqno);
+              final boolean cansend =
+                (s4 == isfv) && (s4 == 1 || (s3 == 0 && s2 == 0));
+              runModelVerifier(group, dir, name, bindings, !cansend, propname);
+            }
+          }
+        }
+      }
+    }
   }
 
-  public void testProfisafeI4SlaveEFA__neversend0001()
+  public void testProfisafeI4SlaveEFA__slave_sets_fv_after_slave_crc_fault()
     throws Exception
   {
-    testProfisafeI4SlaveEFA("never_send[PV][0][0][0][1]", false);
+    final String group = "tests";
+    final String dir = "profisafe";
+    final String name = "profisafe_islave_efa.wmod";
+    final int maxseqno = 4;
+    final ParameterBindingProxy binding = createBinding("MAXSEQNO", maxseqno);
+    final List<ParameterBindingProxy> bindings =
+      Collections.singletonList(binding);
+    for (int seqno = 0; seqno <= maxseqno; seqno++) {
+      final String propname =
+        String.format("slave_sets_fv_after_slave_crc_fault[%d]", seqno);
+      runModelVerifier(group, dir, name, bindings, true, propname);
+    }
   }
 
-  public void testProfisafeI4SlaveEFA__neversend0010()
-    throws Exception
-  {
-    testProfisafeI4SlaveEFA("never_send[PV][0][0][1][0]", true);
-  }
-
-  public void testProfisafeI4SlaveEFA__neversend0101()
-    throws Exception
-  {
-    testProfisafeI4SlaveEFA("never_send[PV][0][1][0][1]", true);
-  }
-
-  public void testProfisafeI4SlaveEFA__neversend1000()
-    throws Exception
-  {
-    testProfisafeI4SlaveEFA("never_send[FV][1][0][0][0]", false);
-  }
-
-  public void testProfisafeI4SlaveEFA__neversend1011()
-    throws Exception
-  {
-    testProfisafeI4SlaveEFA("never_send[FV][1][0][1][1]", false);
-  }
-
-  public void testProfisafeI4SlaveEFA__neversend1102()
-    throws Exception
-  {
-    testProfisafeI4SlaveEFA("never_send[FV][1][1][0][2]", false);
-  }
-
-  public void testProfisafeI4SlaveEFA__neversend1113()
-    throws Exception
-  {
-    testProfisafeI4SlaveEFA("never_send[FV][1][1][1][3]", false);
-  }
-
+  /*
   private void testProfisafeI4SlaveEFA(final String propname,
                                        final boolean expect)
     throws Exception
@@ -202,12 +200,12 @@ public abstract class AbstractLanguageInclusionCheckerTest
     final String group = "tests";
     final String dir = "profisafe";
     final String name = "profisafe_islave_efa.wmod";
-    final List<ParameterBindingProxy> bindings =
-      new LinkedList<ParameterBindingProxy>();
     final ParameterBindingProxy binding = createBinding("MAXSEQNO", 4);
-    bindings.add(binding);
+    final List<ParameterBindingProxy> bindings =
+      Collections.singletonList(binding);
     runModelVerifier(group, dir, name, bindings, expect, propname);
   }
+  */
 
   public void testProfisafeI4Host__fv_crc() throws Exception
   {
