@@ -94,6 +94,7 @@ public class MonolithicConflictChecker
     try {
       // First get the model
       final ProductDESProxy model = getModel();
+      mEventMap = new EventMap();
       mSyncProduct = new SyncProduct();
       mSyncProduct.build();
 
@@ -125,7 +126,6 @@ public class MonolithicConflictChecker
         // strategy is used, and all states are reachable, following the
         // transition to a state with the lowest id wil give a counterexample.
         final List<EventProxy> countertrace = new LinkedList<EventProxy>();
-        final EventMap eventmap = mSyncProduct.eventmap;
         // Find the unchecked state with the lowest
         // id, as this should give the shortest counterexample.
         int trace_start = Integer.MAX_VALUE;
@@ -145,7 +145,7 @@ public class MonolithicConflictChecker
             "Impossible? every state should be reachable!";
           int lowtrans = select_lowest_transition(incoming, trans);
           countertrace.add(0,
-                           eventmap.getEvent(trans.store.getEvent(lowtrans)));
+                           mEventMap.getEvent(trans.store.getEvent(lowtrans)));
           trace_start = trans.store.getSource(lowtrans);
         }
         final ProductDESProxyFactory desFactory = getFactory();
@@ -159,6 +159,7 @@ public class MonolithicConflictChecker
 
     } finally {
       // So the garbage collector can clean up ...
+      mEventMap = null;
       mSyncProduct = null;
     }
   }
@@ -272,11 +273,8 @@ public class MonolithicConflictChecker
     {
       final ProductDESProxy model = getModel();
       final EventProxy marking = getUsedMarkingProposition();
-      // Create a mapping of events to integer IDs to use
-      // when generating the synchronous product.
-      eventmap = new EventMap(model);
       // Create a new state schema for the product.
-      schema = new SyncStateSchema(model, eventmap, marking);
+      mStateSchema = new SyncStateSchema(model, mEventMap, marking);
     }
 
 
@@ -284,7 +282,7 @@ public class MonolithicConflictChecker
     //# Simple Access
     private int getNumberOfAutomata()
     {
-      return schema.getNumberOfAutomata();
+      return mStateSchema.getNumberOfAutomata();
     }
 
     private int getNumberOfStates()
@@ -341,13 +339,13 @@ public class MonolithicConflictChecker
       throws OverflowException
     {
       // Compose the initial state.
-      AutomatonSchema[] automata = schema.getOrdering();
+      AutomatonSchema[] automata = mStateSchema.getOrdering();
       StateProxy[] state = new StateProxy[automata.length];
       for (int i = 0; i < automata.length; i++) {
         state[i] = automata[i].getInitialState();
         assert state[i] != null : "Every automaton must have an initial state";
       }
-      long init = schema.encodeState(state);
+      long init = mStateSchema.encodeState(state);
       // Register the initial state.
       int initid = registerState(init);
 
@@ -373,9 +371,9 @@ public class MonolithicConflictChecker
       final int stateid = fringeGet();
       final long state = getStateFromId(stateid);
       // Decode the state.
-      final int[] dstate = schema.decodeState(state);
+      final int[] dstate = mStateSchema.decodeState(state);
       final int[] rstate = new int[dstate.length];
-      final AutomatonSchema[] automata = schema.getOrdering();
+      final AutomatonSchema[] automata = mStateSchema.getOrdering();
       assert automata.length == dstate.length;
 
       // Does the current state need to be marked?
@@ -390,159 +388,31 @@ public class MonolithicConflictChecker
         mMarkedStates.add(stateid);
       }
 
-      // The strategy for creating the synchronous product is to find the
-      // sets of enabled transitions for each automaton and group them
-      // into sets by their event.
-      // We can then check only the events that are enabled, to see
-      // whether each automata has the event enabled in the current
-      // state, or does not list the event.
-      // If this does not hold for an automata, then the event cannot be
-      // enabled in the synchronous product, and the event is removed
-      // from the mapping(actually, the implementation is a little
-      // messier than this to try and save reallocating lots of sets; see
-      // OutgoingEventThingy for more details
-
-      // Clear existing outevent mappings.
-      clearEvents();
-
-      // Collect up possible transitions for all automata and
-      // map them to events.
-      for (int i = 0; i < automata.length; i++) {
-        // Get outgoing transitions.
-        TIntHashSet trs = automata[i].getOutgoingTransitions(dstate[i]);
-        if (trs == null) {
-          continue;
-        }
-        // Add the transitions to the map
-        addTransitions(i, trs);
-      }
-
-      // Go through each event that is enabled from the
-      // current combined state.
-      TIntIterator it = events.iterator();
-      events:
-      while (it.hasNext()) {
-        int ev = it.next();
-        // Check that every automata either does not list the event, or
-        // has the a transition on it from the current event.
-        for (int i = 0; i < automata.length; i++) {
-          // If the automaton does not have an outgoing transition
-          // for this transition, but it does list the event, then
-          // it will not be enabled in the synchronous product. Remove
-          // the event from the set of possible events.
-          if (!hasTransitionForEvent(i, ev) &&
-              automata[i].getEvents().contains(eventmap.getEvent(ev))) {
-            it.remove();
-            continue events;
+      // Explore transitions ...
+      nextevent:
+      for (int eventid = 0; eventid < mEventMap.size(); eventid++) {
+        for (int autid = 0; autid < automata.length; autid++) {
+          final AutomatonSchema schema = automata[autid];
+          final int src = dstate[autid];
+          final int target = schema.getSuccessorState(src, eventid);
+          if (target < 0) {
+            continue nextevent;
           }
+          rstate[autid] = target;
         }
-
-        // If we get here, then the event is present in the synchronous
-        // product. Construct a transition in the synchronous
-        // product. In order to do this we copy the current state, then
-        // loop through the available transitions and set the appropriate
-        // part of the destination state for the transition.
-        TLongHashSet trans = getTransitionSet(ev);
-        TLongIterator ti = trans.iterator();
-
-        // Copy the current state into the new state.
-        System.arraycopy(dstate, 0, rstate, 0, dstate.length);
-
-        while (ti.hasNext()) {
-          long val = ti.next();
-          int at = (int) (val >> 32);
-          int tr = (int) (val & 0xFFFFFFFF);
-          int tdest = automata[at].transitions.store.getDestination(tr);
-          rstate[at] = tdest;
+        // Hopefully we have a new state! Encode away ...
+        final long newstate = mStateSchema.encodeState(rstate);
+        final int newid = registerState(newstate);
+        if (stateid != newid) {
+          transitions.addTransition
+            (transitions.transitionFactory(stateid, newid, eventid));
         }
-
-        // Hopefully we have a new state! Encode away
-        long newstate = schema.encodeState(rstate);
-
-        // We should do some kind of thorough check for whether the
-        // state has already been encountered, but for now, check whether
-        // it has actually been expanded. This should save fringe
-        // space somewhat.
-        int newid = registerState(newstate);
-        transitions.addTransition
-          (transitions.transitionFactory(stateid, newid, ev));
-      }
-    }
-
-    /**
-     * Take an encoded source and destination state, and an event and
-     * create a transition. The event index will be looked up in the
-     * event map.
-     */
-    private int transitionFactory(int source, int dest, EventProxy e)
-    {
-      return transitions.transitionFactory(source, dest, eventmap.getId(e));
-    }
-
-    //#########################################################################
-    //# OutgoingEventThingy Methods
-    private TLongHashSet getTransitionSet(int event)
-    {
-      TLongHashSet hs = eventsets.get(event);
-      if (hs == null) {
-        hs = new TLongHashSet();
-        eventsets.put(event, hs);
-      }
-      return hs;
-    }
-
-    private TIntHashSet getEnabledSet(int event)
-    {
-      TIntHashSet hs = enabled.get(event);
-      if (hs == null) {
-        hs = new TIntHashSet();
-        enabled.put(event, hs);
-      }
-
-      return hs;
-    }
-
-    private void clearEvents()
-    {
-      events.clear();
-    }
-
-    private boolean hasTransitionForEvent(int automaton, int event)
-    {
-      TIntHashSet enset = getEnabledSet(event);
-      return enset.contains(automaton);
-    }
-
-    private void addTransition(int automaton, int trans)
-    {
-      AutomatonSchema[] automata = schema.getOrdering();
-      int event = automata[automaton].transitions.store.getEvent(trans);
-      long packed = ((long) automaton << 32) | trans;
-      //If this event is not in the set of events already then the set
-      //might need clearing. This will also create it if necessary.
-      TLongHashSet trset = getTransitionSet(event);
-      TIntHashSet enset = getEnabledSet(event);
-      if (!events.contains(event)) {
-        trset.clear();
-        enset.clear();
-      }
-      trset.add(packed);
-      enset.add(automaton);   //Cast should be safe.
-      events.add(event);
-    }
-
-    private void addTransitions(int automaton, TIntHashSet trs)
-    {
-      TIntIterator it = trs.iterator();
-      while (it.hasNext()) {
-        addTransition(automaton, it.next());
       }
     }
 
     //#########################################################################
     //# Data Members
-    private final SyncStateSchema schema;
-    private final EventMap eventmap;
+    private final SyncStateSchema mStateSchema;
 
     private final TransitionSchema transitions =
       new TransitionSchema(false, true);
@@ -566,15 +436,6 @@ public class MonolithicConflictChecker
      */
     private int mNextStateIndex = 0;
 
-    /**
-     * This is used when expanding states. (OutgoingEventThingy)
-     */
-    private TIntHashSet events = new TIntHashSet();
-    private TIntObjectHashMap<TLongHashSet> eventsets =
-      new TIntObjectHashMap<TLongHashSet>();
-    private TIntObjectHashMap<TIntHashSet> enabled =
-      new TIntObjectHashMap<TIntHashSet>();
-
   }
 
 
@@ -585,13 +446,14 @@ public class MonolithicConflictChecker
    * identifiers. These identifiers are used when
    * building the synchronous product.
    */
-  private static class EventMap
+  private class EventMap
   {
 
     //#######################################################################
     //# Constructor
-    EventMap(final ProductDESProxy model)
+    EventMap()
     {
+      final ProductDESProxy model = getModel();
       Set<EventProxy> eventset = model.getEvents();
       //Create an array of the events (arbitrarily)
       events = eventset.toArray (new EventProxy[]{});
@@ -603,6 +465,11 @@ public class MonolithicConflictChecker
 
     //#######################################################################
     //# Simple Access
+    int size()
+    {
+      return events.length;
+    }
+
     EventProxy getEvent(int id)
     {
       assert (id >= 0 && id < events.length);
@@ -613,11 +480,6 @@ public class MonolithicConflictChecker
     {
       assert eventmap.containsKey(e);
       return eventmap.get(e);
-    }
-
-    public int size()
-    {
-      return events.length;
     }
 
     //#######################################################################
@@ -783,7 +645,6 @@ public class MonolithicConflictChecker
                     final EventProxy marking)
     {
       mAutomaton = automaton;
-      mEventMap = eventmap;
       // Enumerate the state set for this automata.
       // This gives an ordering to the states.
       final Set<StateProxy> states = automaton.getStates();
@@ -800,8 +661,8 @@ public class MonolithicConflictChecker
         if (state.isInitial()) {
           initial = state;
         }
-        //If the state contains the marking proposition,
-        //add it to the set of marked states.
+        // If the state contains the marking proposition,
+        // add it to the set of marked states.
         if (mMarkedStates != null &&
             state.getPropositions().contains(marking)) {
           mMarkedStates.add(i);
@@ -811,13 +672,21 @@ public class MonolithicConflictChecker
         i++;
       }
       mInitialState = initial;
-      transitions = new TransitionSchema(true, false);
-      for (TransitionProxy t : automaton.getTransitions()) {
-        int src = getStateNumber (t.getSource());
-        int dest = getStateNumber (t.getTarget());
-        int event = eventmap.getId (t.getEvent());
-        int tt = transitions.transitionFactory (src,dest,event);
-        transitions.addTransition (tt);
+
+      final int numevents = eventmap.size();
+      mTransitionTable = new int[numevents][];
+      for (final EventProxy event : automaton.getEvents()) {
+        final int eventid = eventmap.getId(event);
+        mTransitionTable[eventid] = new int[numstates];
+        for (int srcid = 0; srcid < numstates; srcid++) {
+          mTransitionTable[eventid][srcid] = -1;
+        }
+      }
+      for (final TransitionProxy trans : automaton.getTransitions()) {
+        final int srcid = getStateNumber(trans.getSource());
+        final int destid = getStateNumber(trans.getTarget());
+        final int eventid = eventmap.getId(trans.getEvent());
+        mTransitionTable[eventid][srcid] = destid;
       }
     }
 
@@ -834,17 +703,11 @@ public class MonolithicConflictChecker
     }
 
     /**
-     * Get the state number, given a state. It is assumed
-     * that the state belongs to the automaton, but if it
-     * is not in the state mapping, this will return a
-     * negative number.
+     * Gets the state number, given a state.
      */
-    int getStateNumber(StateProxy state)
+    int getStateNumber(final StateProxy state)
     {
-      if (!mStateMap.containsKey (state)) {
-        return -1;
-      }
-      return mStateMap.get (state);
+      return mStateMap.get(state);
     }
 
     /**
@@ -869,35 +732,29 @@ public class MonolithicConflictChecker
     }
 
     /**
+     * Returns the successor state for the given source state and event,
+     * or -1 if the event is not enabled.
+     */
+    int getSuccessorState(final int src, final int event)
+    {
+      final int[] targets = mTransitionTable[event];
+      if (targets == null) {
+        return src;
+      } else {
+        return targets[src];
+      }
+    }
+
+    /**
      * A predicate to check whether an event is enabled
      * from a given state.
      */
-    boolean isEventEnabled(int state, int e)
+    boolean isEventEnabled(final int src, final int event)
     {
-      //If the automaton does not list the event, then
-      //it is enabled in this state (implicit self-loop)
-      if (!getEvents().contains(mEventMap.getEvent(e))) {
-        return true;
-      }
-      TIntHashSet outgoing = transitions.getTransitions(state).out;
-
-      //No outgoing states! The event isn't enabled.
-      if (outgoing == null) {
-        return false;
-      }
-      TIntIterator it = outgoing.iterator();
-
-      while (it.hasNext()) {
-        int trans = it.next();
-
-        if (transitions.store.getEvent(trans) == e) {
-          return true;
-        }
-      }
-
-      return false;
+      return getSuccessorState(src, event) >= 0;
     }
 
+    /*
     TIntHashSet getOutgoingTransitions(int state)
     {
       TransitionData td = transitions.getTransitions(state);
@@ -906,6 +763,7 @@ public class MonolithicConflictChecker
       }
       return td.out;
     }
+    */
 
     boolean isMarked(int state)
     {
@@ -935,12 +793,11 @@ public class MonolithicConflictChecker
     private final TObjectIntHashMap<StateProxy> mStateMap =
       new TObjectIntHashMap<StateProxy>();
     private final TIntHashSet mMarkedStates;
-    private final TransitionSchema transitions;
+    private final int[][] mTransitionTable;
     /**
      * The initial state of the automaton.
      */
     private final StateProxy mInitialState;
-    private final EventMap mEventMap;
 
   }
 
@@ -1311,6 +1168,7 @@ public class MonolithicConflictChecker
   //#########################################################################
   //# Data Members
   private boolean result = false;
+  private EventMap mEventMap;
   private SyncProduct mSyncProduct;
 
 
