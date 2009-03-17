@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.HashMap;
 import java.util.Map;
@@ -44,10 +45,12 @@ public class Composing {
     nodelimit = 3000;
     plants = new HashSet<AutomatonProxy>(); 
     specs  = new HashSet<AutomatonProxy>();
+    mTotalNumberOfStates = 0;
   }
   
   public ProductDESProxy run() throws AnalysisException {    
-   
+    
+    int projection_overflow = 0;
     for (AutomatonProxy automaton : mModel.getAutomata()) {      
       //Retain all events which are not mentioned in specs. This algorithm
       //only consider the events contained in the plants not in the specs.
@@ -71,8 +74,7 @@ public class Composing {
 	  }
     
     //Assumption: All events which are not related with specs will be removed.    
-    int loop = 0; 
-    //for (int k=0;k<hiddenEvents.size();k++) {  
+    int loop = 0;      
     while (true) {        
       loop++;
       ArrayList<Candidate> composition = new ArrayList<Candidate>();
@@ -104,21 +106,50 @@ public class Composing {
 	      	      
 	      if (!composition.contains(newCandidate)) {      
 	        //Check if the new candidate is a subset of another
-	        //or it includs some exist sets
-	        
+	        //or it includs some exist sets	 
+	        /*       
 	        boolean sub = false;	        
 	        for (int i=0; i<composition.size();i++) {
 	          //new candidate is a subset of another
 	          if (composition.get(i).getAllAutomata().containsAll(comp)) {
-	            composition.set(i,newCandidate);
-	            sub = true;
+	            badCandidate.add(composition.get(i));
+	            composition.set(i,newCandidate);	           
+	            //System.out.println("----!!!!!!----"+newCandidate.getName());
+	        		//System.out.println(newCandidate.getLocalEvents());
+	            sub = true;	            
 	          } 
 	          //it includs some exist sets	
 	          else if (comp.containsAll(composition.get(i).getAllAutomata())) {
-	            sub = true;
+	            badCandidate.add(newCandidate);
+	            sub = true;	            
+	          }
+	        }	        
+	        if (!sub) composition.add(newCandidate);*/
+	        
+	        Collection<Candidate> subCandidates = new ArrayList<Candidate>();
+	        boolean sub = false;	        
+	        for (int i=0; i<composition.size();i++) {
+	          //new candidate is a subset of another
+	          if (composition.get(i).getAllAutomata().containsAll(comp)) {
+	            badCandidate.add(composition.get(i));
+	            //composition.set(i,newCandidate);
+	            subCandidates.add(composition.get(i));
+	            //System.out.println("----!!!!!!----"+newCandidate.getName());
+	        		//System.out.println(newCandidate.getLocalEvents());
+	            sub = true;	            
+	          } 
+	          //it includs some exist sets	
+	          else if (comp.containsAll(composition.get(i).getAllAutomata())) {
+	            badCandidate.add(newCandidate);
+	            sub = true;	            
 	          }
 	        }
+	        if (sub & !subCandidates.isEmpty()) {
+	          composition.removeAll(subCandidates);	
+	          composition.add(newCandidate);          
+	        }
 	        if (!sub) composition.add(newCandidate);
+	        
 	        /*
 	        for (int i=0; i<composition.size();i++) {
 	          //new candidate is a subset of another
@@ -141,50 +172,167 @@ public class Composing {
 	        }      
 	    }
 	    events.removeAll(dependedEvents);
-	    
-	    //System.out.println("Step "+loop+": "+composition.size()+" candidates.");
 	    /*
-	    for (int i=0;i<composition.size();i++) {
-	      System.out.print(composition.get(i).getName()+",");
-	    }
-	    System.out.println();*/
+	    System.out.println("Step "+loop+": "+composition.size()+" candidates.");
+	    for(int i=0;i<composition.size();i++) {	
+			  Candidate can1 = composition.get(i);	
+			  System.out.print(can1.getName()+"#########");
+			  System.out.println(can1.getLocalEvents());
+			}*/
 	    
+	    boolean projectOK = true;
+	    if (mHeuristic == null) {
+	      System.out.println("No heuristic selected!!!Default heuristic minS is used!!!");
+	      mHeuristic = "minS";
+			  composition = minS(composition);
+				for(int i=0;i<composition.size();i++) {			  
+				  Candidate candidate = composition.get(i);			  		  
+				  try {
+				    project(candidate);
+				    projectOK = true;
+				    break;			    
+				  } catch (final OverflowException oe) {
+				      projectOK = false;
+				      badCandidate.add(candidate);
+				      projection_overflow++;
+				      System.out.println("projection_overflow "+projection_overflow); 
+		          continue;
+				  }
+	      }
+	    }
 	    //Step 2
 	    //###############################################################
 	    //maxL: Choose the candidate with the highest proportion of 
 	    //      local events(that can be hidden).
-	    //composition = maxL(composition);
+	    else if (mHeuristic.equals("maxL")) {
+	    	composition = maxL(composition);
+	    	for(int i=0;i<composition.size();i++) {			  
+				  Candidate candidate = composition.get(i);			  		  
+				  try {
+				    project(candidate);
+				    projectOK = true;
+				    break;			    
+				  } catch (final OverflowException oe) {
+				      projectOK = false;
+				      badCandidate.add(candidate);
+				      projection_overflow++;
+				      System.out.println("projection_overflow "+projection_overflow); 
+		          continue;
+				  }
+	      }
+	    }
 	    
 	    //###############################################################	       
 			//minS: Choose the candidate with the minimum synchronized product
 			//      states
-			composition = minS(composition);
+			else if (mHeuristic.equals("minS")) {
+				composition = minS(composition);
+				for(int i=0;i<composition.size();i++) {			  
+				  Candidate candidate = composition.get(i);			  		  
+				  try {
+				    project(candidate);
+				    projectOK = true;
+				    break;			    
+				  } catch (final OverflowException oe) {
+				      projectOK = false;
+				      badCandidate.add(candidate);
+				      projection_overflow++;
+				      System.out.println("projection_overflow "+projection_overflow); 
+		          continue;
+				  }
+	      }
+		  }
 			
 		  //###############################################################	       
 			//minT: Choose the candidate with the minimum synchronized product
 			//      transitions
 			//!!!!!useless for the converted model!!!!!
-			//composition = minT(composition);
+			else if (mHeuristic.equals("minT")) {
+				composition = minT(composition);
+				for(int i=0;i<composition.size();i++) {			  
+				  Candidate candidate = composition.get(i);			  		  
+				  try {
+				    project(candidate);
+				    projectOK = true;
+				    break;			    
+				  } catch (final OverflowException oe) {
+				      projectOK = false;
+				      badCandidate.add(candidate);
+				      projection_overflow++;
+				      System.out.println("projection_overflow "+projection_overflow); 
+		          continue;
+				  }
+	      }
+			}
 			
 			//###############################################################	       
 			//minCut: Choose the candidate with the minimum cut (graph theory)
-			//        
-			//composition = minCut(composition);
+			// 
+			else if (mHeuristic.equals("minCut")) { 		  
+			        
+				composition = minCut(composition);
+				/*
+				System.out.println("\nComposition Candidates$$$$$$$$$$$: "+composition.size());
+				for(int i=0;i<composition.size();i++) {	
+				  Candidate can2 = composition.get(i);	
+				  System.out.print(can2.getName()+"|");
+				  System.out.println(can2.getLocalEvents());
+				}*/
+				for(int i=0;i<composition.size();i++) {			  
+				  Candidate candidate = composition.get(i);			  		  
+				  try {
+				    project(candidate);
+				    projectOK = true;
+				    break;			    
+				  } catch (final OverflowException oe) {
+				      projectOK = false;
+				      badCandidate.add(candidate);
+				      projection_overflow++;
+				      System.out.println("\nprojection_overflow "+projection_overflow+
+				                         " Candidate: "+candidate.getName()); 
+		          continue;
+				  }
+	      }
+		  }
 			
-			//call projecter
-			boolean projectOK = true;
-			for(int i=0;i<composition.size();i++) {			  
-			  Candidate maxL = composition.get(i);			  
-			  try {
-			    project(maxL);
-			    projectOK = true;
-			    break;			    
-			  } catch (final OverflowException oe) {
-			      projectOK = false;
-			      badCandidate.add(maxL);
-	          continue;
+			else if (mHeuristic.equals("getMinCut")) { 
+			  Candidate candidate = new Candidate();			
+				while(!composition.isEmpty()){
+					candidate = getMinCut(composition);
+					try {
+				    project(candidate);			    
+				    projectOK = true;	
+				    break;	    		    
+				  } catch (final OverflowException oe) {
+				      projectOK = false;
+				      badCandidate.add(candidate);
+				      composition.remove(candidate);
+				      projection_overflow++;
+				      System.out.println("projection_overflow "+projection_overflow+
+				                         " Candidate: "+candidate.getName());          
+				  }
 			  }
-      }
+			}	
+			
+			else if (mHeuristic.equals("getMinS")) { 
+			  Candidate candidate = new Candidate();			
+				while(!composition.isEmpty()){
+					candidate = getMinS(composition);					
+					try {
+				    project(candidate);			    
+				    projectOK = true;	
+				    break;	    		    
+				  } catch (final OverflowException oe) {
+				      projectOK = false;
+				      badCandidate.add(candidate);
+				      composition.remove(candidate);
+				      projection_overflow++;
+				      System.out.println("projection_overflow "+projection_overflow);          
+				  }
+			  }
+			}	else {
+			  return mModel;
+			}
       
       if (!projectOK) {
         if (loop==1) {                           
@@ -192,7 +340,7 @@ public class Composing {
         }
         else break;
       }
-      if (events.isEmpty()) break;           
+      if (events.isEmpty()) break;         
 		}
 		
 	  //Create new model
@@ -209,6 +357,10 @@ public class Composing {
     return newModel;
   }
   
+  public int getTotalNumberOfStates() {
+    return mTotalNumberOfStates;
+  }
+  
   public Collection<Candidate> getCandidates() {
     return mCandidate;
   }
@@ -221,14 +373,23 @@ public class Composing {
     nodelimit = limit;
   }
   
-  private void project (Candidate can) throws AnalysisException {    
+  public void setHeuristic(final String heuristic) {
+    mHeuristic = heuristic;
+  }
+  
+  private void project (Candidate can) throws AnalysisException {   
+    
     ProductDESProxy newP = 
 	 	mFactory.createProductDESProxy(can.getName(),can.getAllEvents(),can.getAllAutomata());
     Set<EventProxy> eForbidden = new HashSet<EventProxy>();    
 	  Projection2 proj = new Projection2(newP, mFactory, can.getLocalEvents(), eForbidden);		       
 	  proj.setNodeLimit(nodelimit);
 	  AutomatonProxy newAutomaton = proj.project();
-	  //System.out.println(newAutomaton.getName()+" has "+newAutomaton.getTransitions().size()+" transitions!");
+	  //System.out.println("Candidate's name: "+can.getName());
+	  //System.out.println("New Automaton's name: "+newAutomaton.getName());
+	  //System.out.println(newAutomaton.getName()+" has "+newAutomaton.getTransitions().size()+" transitions!");	  
+    
+	  mTotalNumberOfStates += newAutomaton.getStates().size();
 	  newAutomaton=selfloopCheck(newAutomaton);
 	   
 	  mCandidate.add(can);
@@ -520,6 +681,10 @@ public class Composing {
     }
     
     mASTAutomata.add(astAutomata);
+    plants.removeAll(modifiedAutomata);
+    plants.addAll(newAutomata);
+    //works for the tests without model converted
+    /*
     for (AutomatonProxy a : modifiedAutomata) {
       switch (mTranslator.getComponentKind(a)) {
         case PLANT :  plants.remove(a);
@@ -537,7 +702,7 @@ public class Composing {
                       break;
         default : break;
       }
-    }
+    }*/
     return true;
   }
   
@@ -727,6 +892,22 @@ public class Composing {
     return composition;
   }
   
+  private Candidate getMinS(Collection<Candidate> composition) {
+    Comparator<Candidate> comparator = new Comparator<Candidate>() {
+	      public int compare(Candidate c1, Candidate c2) {	        
+	        if (c1.getSPSNumber() < c2.getSPSNumber()) {
+	          return -1;
+	        } else if (c1.getSPSNumber() > c2.getSPSNumber()) {
+	          return 1;
+	        } else {
+	          return c1.getName().compareTo(c2.getName());
+	        }
+	      }
+	    };
+    
+    return Collections.min(composition,comparator);
+  }
+  
   private ArrayList<Candidate> minT(ArrayList<Candidate> composition) {
 	  if (composition.size()>1) {
 	    for (int i=0; i<composition.size()-1; i++) {
@@ -755,11 +936,17 @@ public class Composing {
     Set<AutomatonProxy> source = new HashSet<AutomatonProxy>();
     Set<AutomatonProxy> target = new HashSet<AutomatonProxy>();
     int[] cn = new int[composition.size()];
+    //System.out.println("New round: ");
     for (int i=0;i<composition.size();i++) {
+      //System.out.print("\nCandidate"+i+1+": ");
+      //for (AutomatonProxy aut : composition.get(i).getAllAutomata()) {
+       // System.out.print(aut.getName()+";");
+      //}
+      
       source.addAll(composition.get(i).getAllAutomata());
       target.addAll(plants);
       target.removeAll(source);
-      cn[i] = getCutNumber(source,target);
+      cn[i] = getCutNumber2(source,target);
       source.clear();
       target.clear();
     }
@@ -783,20 +970,71 @@ public class Composing {
             }
           }
       }
-    }
+    }    
     return composition;
   }
   
-  private int getCutNumber(Set<AutomatonProxy> source,
-                           Set<AutomatonProxy> target) {
+  private Candidate getMinCut(Collection<Candidate> composition) {
+    /*
+    System.out.println("New round: ");
+    int i = 0;
+    for (Candidate can : composition) {
+      i++;
+      System.out.print("\nCandidate"+i+": ");
+      for (AutomatonProxy aut : can.getAllAutomata()) {
+        System.out.print(aut.getName()+";");
+      }
+    }*/
+    Comparator<Candidate> comparator = new Comparator<Candidate>() {
+	      public int compare(Candidate c1, Candidate c2) {
+	        Set<AutomatonProxy> source1 = new HashSet<AutomatonProxy>(c1.getAllAutomata());
+	        Set<AutomatonProxy> source2 = new HashSet<AutomatonProxy>(c2.getAllAutomata());
+	        Set<AutomatonProxy> target1 = new HashSet<AutomatonProxy>();
+	        Set<AutomatonProxy> target2 = new HashSet<AutomatonProxy>();
+	        target1.addAll(plants);
+	        target2.addAll(plants);
+	        target1.removeAll(source1);
+	        target2.removeAll(source2);
+	        int cn1 = getCutNumber2(source1,target1);
+	        int cn2 = getCutNumber2(source2,target2);
+	        if (cn1 < cn2) {
+	          return -1;
+	        } else if (cn1 > cn2) {
+	          return 1;
+	        } else {
+	          return c1.getName().compareTo(c2.getName());
+	        }
+	      }
+	    };
+    
+    return Collections.min(composition,comparator);
+  }
+  
+  private int getCutNumber1(Set<AutomatonProxy> source,
+                            Set<AutomatonProxy> target) {
     int cutnumber = 0;
-    Set<EventProxy> targetEvents = new HashSet<EventProxy>();     
+    Set<EventProxy> targetEvents = new HashSet<EventProxy>();
+    Set<EventProxy> sourceEvents = new HashSet<EventProxy>();     
     for (AutomatonProxy t : target) {
       targetEvents.addAll(t.getEvents());
     }
+    for (AutomatonProxy s : source) {
+      sourceEvents.addAll(s.getEvents());
+    }
+    for (EventProxy event : sourceEvents) {      
+      if (targetEvents.contains(event)) cutnumber++;            
+    }    
+  	return cutnumber;
+  }
+  
+  private int getCutNumber2(Set<AutomatonProxy> source,
+                            Set<AutomatonProxy> target) {
+    int cutnumber = 0;    
     for (AutomatonProxy s : source) {      
       for (EventProxy event : s.getEvents()){
-        if (targetEvents.contains(event)) cutnumber++; 
+        for (AutomatonProxy t : target) {
+        	if (t.getEvents().contains(event)) cutnumber++; 
+        }
       }      
     }    
   	return cutnumber;
@@ -814,8 +1052,10 @@ public class Composing {
   private Collection<Candidate>         mCandidate;
   private Collection<Set<ASTAutomaton>> mASTAutomata;
   private Set<Candidate>                badCandidate; 
-  private int                           nodelimit;  
+  private int                           nodelimit; 
+  private String                        mHeuristic; 
   private Set<AutomatonProxy>           plants; 
   private Set<AutomatonProxy>           specs;
-  private AutomatonProxy                mAlmostSameAutomaton;      
+  private AutomatonProxy                mAlmostSameAutomaton; 
+  private int                           mTotalNumberOfStates;     
 }

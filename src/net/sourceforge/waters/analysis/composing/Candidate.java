@@ -59,7 +59,7 @@ public class Candidate{
 	public String getName() {	  
 	  String newName = "";
 	  for(int i=0;i<name.size();i++) {
-	    newName += name.get(i);
+	    newName += name.get(i)+";";
 	  }
 	  return newName;
 	}

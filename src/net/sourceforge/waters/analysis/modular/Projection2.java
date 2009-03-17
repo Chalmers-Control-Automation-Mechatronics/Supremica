@@ -192,8 +192,15 @@ public class Projection2
     ev.removeAll(mHide);
 
     StringBuffer name = new StringBuffer();
+    ArrayList<String> names = new ArrayList<String>(mModel.getAutomata().size());
     for (AutomatonProxy a : mModel.getAutomata()) {
-      name.append(a.getName());
+      names.add(a.getName());
+    }
+    Collections.sort(names);
+    int namesize = names.size();
+    for (int i=0;i<namesize;i++) {
+      name.append(names.get(i));
+      if (i<namesize-1) name.append(",");
     }
     AutomatonProxy result =
       mFactory.createAutomatonProxy(name.toString(), ComponentKind.PLANT,

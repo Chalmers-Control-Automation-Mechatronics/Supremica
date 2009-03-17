@@ -103,6 +103,14 @@ public class ComposingSafetyVerifier
   {
     mProjectionNodeLimit = limit;
   }
+  
+  public String getHeuristic() {
+    return mHeuristic;
+  }
+  
+  public void setHeuristic(final String heuristic) {
+    mHeuristic = heuristic;
+  }
 
 
   //#########################################################################
@@ -112,6 +120,10 @@ public class ComposingSafetyVerifier
       new Composing(getConvertedModel(),
 		                getConvertedKindTranslator(),
 		                getFactory());
+		                System.out.println(mHeuristic);
+		                System.out.println(getHeuristic());
+		                System.out.println(getProjectionNodeLimit());
+		composing.setHeuristic(getHeuristic());
     composing.setNodeLimit(getProjectionNodeLimit());     
     ProductDESProxy des = composing.run(); 
     System.out.println("Composing is done!"); 
@@ -120,7 +132,7 @@ public class ComposingSafetyVerifier
     
     ArrayList<Candidate> candidates = new ArrayList<Candidate>(composing.getCandidates());
     ArrayList<Set<ASTAutomaton>> astautomata = new ArrayList<Set<ASTAutomaton>>(composing.getASTAutomata());
-    
+    /*
     //Display the composing infomation
     System.out.println(candidates.size()+" candidates:");
     for (int i=0; i<candidates.size(); i++) {
@@ -131,8 +143,8 @@ public class ComposingSafetyVerifier
         System.out.print(e.getName()+",");
       }
       System.out.println("\nAutomata: "+candidates.get(i).getName());
-    }
-    
+    }*/
+    /*
     for (int i=0; i<astautomata.size(); i++) {
       System.out.println("Step "+(i+1)+": ");
       if (!astautomata.get(i).isEmpty()){
@@ -150,14 +162,16 @@ public class ComposingSafetyVerifier
       } else {
       	System.out.println("no ASTAutomaton!!!");
       }      
-    }
+    }*/
      
     final SafetyVerifier checker =
       //new NativeSafetyVerifier(des, getConvertedKindTranslator(),getFactory());
       new BDDSafetyVerifier(des, getConvertedKindTranslator(), getFactory());
     checker.setNodeLimit(getNodeLimit());        
     final boolean result = checker.run(); 
-    mStates = (int)checker.getAnalysisResult().getTotalNumberOfStates();
+    //mStates = (int)checker.getAnalysisResult().getTotalNumberOfStates();
+    mStates = composing.getTotalNumberOfStates();
+    mNodes = (int)checker.getAnalysisResult().getPeakNumberOfNodes();
     
 
     
@@ -168,17 +182,19 @@ public class ComposingSafetyVerifier
       final SafetyTraceProxy counterexample = checker.getCounterExample();
             
       List<EventProxy> composedTrace = new LinkedList<EventProxy>(counterexample.getEvents());
-      
+      /*
       System.out.println("old counter example: ");
 		  for (int i=0; i<composedTrace.size(); i++){
 		    System.out.print(composedTrace.get(i).getName()+" --> ");
 		  }
-		  System.out.println();
+		  System.out.println();*/
     
       if (candidates.isEmpty()) {   
         return setFailedResult(counterexample);
       }
+      
       for (int i=candidates.size()-1;i>=0;i--) {
+                
         for (ASTAutomaton astaut : astautomata.get(i+1)) {
           composedTrace = renovateTrace(composedTrace,astaut);          
         }
@@ -519,6 +535,7 @@ public class ComposingSafetyVerifier
   
   protected void addStatistics(final VerificationResult result) {
     result.setNumberOfStates(mStates);
+    result.setPeakNumberOfNodes(mNodes);
   }
   
   public ProductDESProxy getConvertedModel() {
@@ -563,6 +580,8 @@ public class ComposingSafetyVerifier
   private KindTranslator mTranslator;
   private int mProjectionNodeLimit;
   private int mStates;
+  private int mNodes;
+  private String mHeuristic;
 
 
   //#########################################################################

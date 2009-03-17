@@ -13,6 +13,7 @@ import java.util.List;
 
 import net.sourceforge.waters.model.analysis.AbstractModelVerifierFactory;
 import net.sourceforge.waters.model.analysis.CommandLineArgumentInteger;
+import net.sourceforge.waters.model.analysis.CommandLineArgumentString;
 import net.sourceforge.waters.model.analysis.ModelVerifier;
 import net.sourceforge.waters.model.analysis.ModelVerifierFactory;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
@@ -38,6 +39,7 @@ public class ComposingModelVerifierFactory
   {
     super(arglist);
     addArgument(new LimitArgument());
+    addArgument(new HeuristicArgument());
   }
 
 
@@ -94,6 +96,33 @@ public class ComposingModelVerifierFactory
         (ComposingSafetyVerifier) verifier;
       final int limit = getValue();
       composing.setProjectionNodeLimit(limit);
+    }
+
+  }
+  
+  //#########################################################################
+  //# Inner Class HeuristicArgument
+  private static class HeuristicArgument extends CommandLineArgumentString
+  {
+    //#######################################################################
+    //# Constructors
+    private HeuristicArgument()
+    {
+      super("-heur",
+            "Heuristic adopted in composing candidate selection");
+    }
+
+    //#######################################################################
+    //# Overrides for Abstract Base Class
+    //# net.sourceforge.waters.model.analysis.CommandLineArgument
+    protected void configure(final ModelVerifier verifier)
+    {
+      final ComposingSafetyVerifier composing =
+        (ComposingSafetyVerifier) verifier;
+      final String heuristic = getValue();
+      System.out.println(heuristic);
+      composing.setHeuristic(heuristic);
+      System.out.println(composing.getHeuristic());
     }
 
   }
