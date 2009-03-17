@@ -66,6 +66,7 @@ public class ComposingLanguageInclusionChecker
       new ComposingSafetyVerifier(translator0, factory);
     verifier.setNodeLimit(getNodeLimit());
     verifier.setProjectionNodeLimit(getProjectionNodeLimit());
+    verifier.setHeuristic(getHeuristic());
     resetStatistics();
     for (final AutomatonProxy aut : model.getAutomata()) {
       if (translator0.getComponentKind(aut) == ComponentKind.SPEC) {
