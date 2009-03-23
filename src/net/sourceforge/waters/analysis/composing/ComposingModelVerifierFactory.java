@@ -120,9 +120,7 @@ public class ComposingModelVerifierFactory
       final ComposingSafetyVerifier composing =
         (ComposingSafetyVerifier) verifier;
       final String heuristic = getValue();
-      System.out.println(heuristic);
-      composing.setHeuristic(heuristic);
-      System.out.println(composing.getHeuristic());
+      composing.setHeuristic(heuristic);      
     }
 
   }

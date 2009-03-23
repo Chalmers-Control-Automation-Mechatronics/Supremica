@@ -718,8 +718,8 @@ Class-Path: ${manifest.pathlist}</echo>
             <formatter type="xml"/>
             <batchtest todir="${logs.results}">
                 <fileset dir="${testssrc}">
-                    <include name="**/*Test.java"/>
-                    <include name="**/Test*.java"/>
+                    <include name="**/ComposingControllabilityCheckerTest.java"/>
+                    <exclude name="**/Test*.java"/>
                     <exclude name="org/supremica/testhelpers/**/*.java"/>
                     <exclude name="**/TestPackage*.java"/>
                     <exclude name="**/Abstract*.java"/>
@@ -746,8 +746,8 @@ Class-Path: ${manifest.pathlist}</echo>
             <formatter type="xml"/>
             <batchtest todir="${logs.results}">
                 <fileset dir="${testssrc}">
-                    <include name="**/*Test.java"/>
-                    <include name="**/Test*.java"/>
+                    <exclude name="**/*Test.java"/>
+                    <exclude name="**/Test*.java"/>
                     <!--        <include name="**/*Test.groovy"/>
         <include name="**/Test*.groovy"/>-->
                     <exclude name="org/supremica/testhelpers/**/*.java"/>
@@ -779,8 +779,8 @@ Class-Path: ${manifest.pathlist}</echo>
             <formatter type="xml"/>
             <batchtest todir="${logs.results}">
                 <fileset dir="${testssrc}">
-                    <include name="**/ModularLanguageInclusionCheckerTest.java"/>
-                    <include name="**/ProjectingLanguageInclusionCheckerTest.java"/>
+                    <exclude name="**/ModularLanguageInclusionCheckerTest.java"/>
+                    <exclude name="**/ProjectingLanguageInclusionCheckerTest.java"/>
                 </fileset>
             </batchtest>
             <classpath>

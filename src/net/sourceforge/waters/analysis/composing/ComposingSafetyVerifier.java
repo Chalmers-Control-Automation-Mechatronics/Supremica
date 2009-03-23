@@ -72,7 +72,7 @@ public class ComposingSafetyVerifier
     super(model, factory); 
     mTranslator = translator; 
     setNodeLimit(10000000);    
-    setProjectionNodeLimit(3000);    
+    setProjectionNodeLimit(1000);    
   }
   
   
@@ -119,10 +119,7 @@ public class ComposingSafetyVerifier
     final Composing composing =
       new Composing(getConvertedModel(),
 		                getConvertedKindTranslator(),
-		                getFactory());
-		                System.out.println(mHeuristic);
-		                System.out.println(getHeuristic());
-		                System.out.println(getProjectionNodeLimit());
+		                getFactory());		                
 		composing.setHeuristic(getHeuristic());
     composing.setNodeLimit(getProjectionNodeLimit());     
     ProductDESProxy des = composing.run(); 
@@ -171,8 +168,7 @@ public class ComposingSafetyVerifier
     final boolean result = checker.run(); 
     //mStates = (int)checker.getAnalysisResult().getTotalNumberOfStates();
     mStates = composing.getTotalNumberOfStates();
-    mNodes = (int)checker.getAnalysisResult().getPeakNumberOfNodes();
-    
+    mNodes = (int)checker.getAnalysisResult().getPeakNumberOfNodes();    
 
     
     if (result) {     
@@ -536,6 +532,7 @@ public class ComposingSafetyVerifier
   protected void addStatistics(final VerificationResult result) {
     result.setNumberOfStates(mStates);
     result.setPeakNumberOfNodes(mNodes);
+    //result.setNumberOfAutomata(10);    
   }
   
   public ProductDESProxy getConvertedModel() {
