@@ -58,7 +58,7 @@ public class ComposingLanguageInclusionChecker
     final ProductDESProxy model = getModel();
     final KindTranslator translator0 = getKindTranslator();
     final SingleSpecKindTranslator translator1 =
-      new SingleSpecKindTranslator();
+      new SingleSpecKindTranslator(translator0);
     final ProductDESProxyFactory factory = getFactory();
     final ConvertModelLang converter =
       new ConvertModelLang(model, translator1, factory);
@@ -140,8 +140,15 @@ public class ComposingLanguageInclusionChecker
 
   //#########################################################################
   //# Inner Class SingleSpecKindTranslator
-  private class SingleSpecKindTranslator implements KindTranslator
+  private static class SingleSpecKindTranslator implements KindTranslator
   {
+
+    //#######################################################################
+    //# Constructor
+    private SingleSpecKindTranslator(final KindTranslator master)
+    {
+      mMaster = master;
+    }
 
     //#######################################################################
     //# Configuration
@@ -154,8 +161,7 @@ public class ComposingLanguageInclusionChecker
     //# Interface net.sourceforge.waters.model.analysis.KindTranslator
     public ComponentKind getComponentKind(final AutomatonProxy aut)
     {
-      final KindTranslator master = getKindTranslator();
-      final ComponentKind kind = master.getComponentKind(aut);
+      final ComponentKind kind = mMaster.getComponentKind(aut);
       if (kind == ComponentKind.SPEC && aut != mCurrentSpec) {
 	return ComponentKind.PROPERTY;
       } else {
@@ -165,12 +171,12 @@ public class ComposingLanguageInclusionChecker
 
     public EventKind getEventKind(final EventProxy event)
     { 
-      final KindTranslator master = getKindTranslator();
-      return master.getEventKind(event);
+      return mMaster.getEventKind(event);
     }
 
     //#######################################################################
     //# Data Members
+    private final KindTranslator mMaster;
     private AutomatonProxy mCurrentSpec;
   }
 

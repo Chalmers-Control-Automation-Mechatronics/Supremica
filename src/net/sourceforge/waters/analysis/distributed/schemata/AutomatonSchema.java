@@ -8,11 +8,11 @@ public class AutomatonSchema implements Serializable
   {
   }
 
-  public final String name;
-  public final int[] events;
-  public final StateSchema[] states;
-  public final int kind;
-  public final TransitionSchema[] transition;
+  public String name;
+  public int[] events;
+  public StateSchema[] states;
+  public int kind;
+  public TransitionSchema[] transitions;
 
   public static final int PLANT = 0;
   public static final int SPECIFICATION = 1;

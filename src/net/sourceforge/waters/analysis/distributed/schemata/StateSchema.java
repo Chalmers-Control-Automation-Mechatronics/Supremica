@@ -8,7 +8,7 @@ public class StateSchema implements Serializable
   {
   }
 
-  public final String name;
-  public final boolean initial;
-  public final int[] propositions;
+  public String name;
+  public boolean initial;
+  public int[] propositions;
 }

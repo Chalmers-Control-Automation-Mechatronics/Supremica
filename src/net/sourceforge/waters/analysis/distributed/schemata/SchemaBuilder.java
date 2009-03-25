@@ -1,13 +1,17 @@
 package net.sourceforge.waters.analysis.distributed.schemata;
 
+import java.util.Collection;
 import java.util.Map;
 import java.util.HashMap;
 import java.util.Set;
 
-import net.sourceforge.waters.model.des.ProductDESProxy;
+import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.EventProxy;
-import net.sourceforge.waters.xsd.base.EventKind;
+import net.sourceforge.waters.model.des.ProductDESProxy;
+import net.sourceforge.waters.model.des.StateProxy;
+import net.sourceforge.waters.model.des.TransitionProxy;
 import net.sourceforge.waters.xsd.base.ComponentKind;
+import net.sourceforge.waters.xsd.base.EventKind;
 
 
 public class SchemaBuilder
@@ -43,7 +47,7 @@ public class SchemaBuilder
     Map<EventProxy,Integer> emap = build_eventmap(events);
     schema.events = build_event_schemata(events);
     
-    schema.automata = build_automata(des.getAutomata, emap);
+    schema.automata = build_automata(des.getAutomata(), emap);
 
     return schema;
   }
@@ -55,7 +59,7 @@ public class SchemaBuilder
     int i = 0;
     for (AutomatonProxy automaton : automata)
       {
-	schemata[i] = build_automaton(automaton, emap)
+	schemata[i] = build_automaton(automaton, emap);
 	  i++;
       }
 
@@ -64,37 +68,36 @@ public class SchemaBuilder
 
 
   private static AutomatonSchema build_automaton(final AutomatonProxy aut, 
-						   Map<EventProxy,Integer> emap)
+						 Map<EventProxy,Integer> emap)
   {
     AutomatonSchema as = new AutomatonSchema();
     
-    as.name = au.getName();
-    as.events = map_events(au.getEvents(), emap);
-    as.kind = component_kind_convert(au.getKind());
+    as.name = aut.getName();
+    as.events = map_events(aut.getEvents(), emap);
+    as.kind = component_kind_convert(aut.getKind());
 
     //Like with events in the DES, build an array of states in the
     //model which will be used to give a definite ordering. Build a
     //map which will be used to look up states when building
     //transitions.
-    Set<StateProxy> au_state_set = au.getStates();
+    Set<StateProxy> au_state_set = aut.getStates();
     StateProxy[] au_states = new StateProxy[au_state_set.size()];
     int i = 0;
-    for (StateProxy s : au_state_set)
-      {
-	au_states[i] = s;
-	i++;
-      }
-
+    for (StateProxy s : au_state_set) {
+      au_states[i] = s;
+      i++;
+    }
     Map<StateProxy,Integer> smap = build_statemap(au_states);
     as.states = build_states(au_states, emap);
-    as.transitions = build_transitions(au.getTransitions(), smap, emap);
+    as.transitions = build_transitions(aut.getTransitions(), smap, emap);
 
     return as;
   }
 
-  private static TransitionSchema[] build_transitions(Collection<TransitionProxy> ts,
-						      Map<StateProxy,Integer> smap,
-						      Map<EventProxy,Integer> emap)
+  private static TransitionSchema[] build_transitions
+    (Collection<TransitionProxy> ts,
+     Map<StateProxy,Integer> smap,
+     Map<EventProxy,Integer> emap)
   {
     TransitionSchema[] transitions = new TransitionSchema[ts.size()];
     int i = 0;
@@ -132,11 +135,11 @@ public class SchemaBuilder
   private static StateSchema[] build_states(StateProxy[] states,
 					    Map<EventProxy,Integer> emap)
   {
-    StateSchema[] ss = new StateSchema[states.length()];
+    StateSchema[] ss = new StateSchema[states.length];
 
     for (int i = 0; i < states.length; i++)
       {
-	ss[i] = build_state(s, emap);
+	ss[i] = build_state(states[i], emap);
       }
 
     return ss;
@@ -148,7 +151,7 @@ public class SchemaBuilder
     StateSchema s = new StateSchema();
     
     s.name = state.getName();
-    s.initial = state.getInitial();
+    s.initial = state.isInitial();
     s.propositions = map_events(state.getPropositions(), emap);
 
     return s;
@@ -185,7 +188,7 @@ public class SchemaBuilder
   {
     EventSchema ev = new EventSchema();
     ev.name = event.getName();
-    ev.observable = event.getObservable();
+    ev.observable = event.isObservable();
     ev.kind = event_kind_convert(event.getKind());
 
     return ev;
@@ -195,11 +198,11 @@ public class SchemaBuilder
   {
     switch (kind)
       {
-      case EventKind.CONTROLLABLE:
+      case CONTROLLABLE:
 	return EventSchema.CONTROLLABLE;
-      case EventKind.UNCONTROLLABLE:
+      case UNCONTROLLABLE:
 	return EventSchema.UNCONTROLLABLE;
-      case EventKind.PROPOSITION:
+      case PROPOSITION:
 	return EventSchema.PROPOSITION;
       }
 
@@ -213,13 +216,13 @@ public class SchemaBuilder
   {
     switch (kind)
       {
-      case ComponentKind.PLANT:
+      case PLANT:
 	return AutomatonSchema.PLANT;
-      case ComponentKind.SPECIFICATION:
+      case SPEC:
 	return AutomatonSchema.SPECIFICATION;
-      case ComponentKind.PROPERTY:
+      case PROPERTY:
 	return AutomatonSchema.PROPERTY;
-      case ComponentKind.SUPERVISOR:
+      case SUPERVISOR:
 	return AutomatonSchema.SUPERVISOR;
       }
 

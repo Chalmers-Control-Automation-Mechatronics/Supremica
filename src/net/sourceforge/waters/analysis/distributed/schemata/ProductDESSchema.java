@@ -8,7 +8,7 @@ public class ProductDESSchema implements Serializable
   {
   }
 
-  public final String name;
-  public final AutomatonSchema[] automata;
-  public final EventSchema[] events;
+  public String name;
+  public AutomatonSchema[] automata;
+  public EventSchema[] events;
 }

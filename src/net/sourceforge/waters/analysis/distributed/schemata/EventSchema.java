@@ -8,9 +8,9 @@ public class EventSchema implements Serializable
   {
   }
 
-  public final String name;
-  public final int kind;
-  public final boolean observable;
+  public String name;
+  public int kind;
+  public boolean observable;
 
   public static final int CONTROLLABLE = 0;
   public static final int UNCONTROLLABLE = 1;

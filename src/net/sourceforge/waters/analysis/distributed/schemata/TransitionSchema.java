@@ -8,7 +8,7 @@ public class TransitionSchema implements Serializable
   {
   }
 
-  public final int source;
-  public final int target;
-  public final int event;
+  public int source;
+  public int target;
+  public int event;
 }
