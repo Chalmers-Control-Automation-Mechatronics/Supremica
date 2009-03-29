@@ -77,15 +77,18 @@ public class MonolithicControlLoopChecker
   //# Invocation
   /**
    * Runs this control loop checker.
+
    * This method starts the model checking process on the model given
    * as parameter to the constructor of this object. On termination,
    * the result of checking the property is known and can be queried
-   * using the {@link #getResult()} and {@link #getCounterExample()}
-   * methods.
+   * using the {@link
+   * net.sourceforge.waters.model.analysis.ModelVerifier#isSatisfied()
+   * isSatisfied()} and {@link #getCounterExample()} methods.
    * @return <CODE>true</CODE> if the model is control loop free, or
    *         <CODE>false</CODE> if it is not.
-   *         The same value can be queried using the {@link #getResult()}
-   *         method.
+   *         The same value can be queried using the {@link
+   *         net.sourceforge.waters.model.analysis.ModelVerifier#isSatisfied()
+   *         isSatisfied()} method.
    */
   public boolean run()
   {

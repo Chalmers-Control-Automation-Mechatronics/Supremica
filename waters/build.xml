@@ -343,7 +343,7 @@
       <formatter type="xml"/>
       <batchtest todir="${logs.results}">
         <fileset dir="${supremica.testsrc}">
-          <include name="net/sourceforge/waters/**/*Conflict*Test.java"/>
+          <include name="net/sourceforge/waters/**/*ProductDESTest.java"/>
           <exclude name="**/Abstract*.java"/>
         </fileset>
       </batchtest>

@@ -9,6 +9,8 @@
 
 package net.sourceforge.waters.model.base;
 
+import java.io.Serializable;
+
 import java.util.AbstractSet;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -38,7 +40,7 @@ import net.sourceforge.waters.model.unchecked.Casting;
 
 public class IndexedArraySet<P extends NamedProxy>
   extends AbstractSet<P>
-  implements IndexedSet<P>, Cloneable
+  implements IndexedSet<P>, Cloneable, Serializable
 {
 
   //#########################################################################

@@ -9,11 +9,16 @@
 
 package net.sourceforge.waters.model.marshaller;
 
-import java.net.URI;
-import java.net.URL;
 import java.io.File;
 import java.io.FileFilter;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.Serializable;
+import java.net.URI;
+import java.net.URL;
 import java.util.Arrays;
 
 import net.sourceforge.waters.model.base.DocumentProxy;
@@ -296,6 +301,69 @@ public abstract class AbstractJAXBTest<D extends DocumentProxy>
     assertTrue("Clone differs from original!",
                proxy.equalsWithGeometry(cloned));
     return cloned;
+  }
+
+  protected D testSerialize(final String name)
+    throws WatersUnmarshalException, IOException, ClassNotFoundException
+  {
+    return testSerialize(getWatersInputRoot(), name);
+  }
+
+  protected D testSerialize(final String dirname, final String name)
+    throws WatersUnmarshalException, IOException, ClassNotFoundException
+  {
+    final File dir = new File(getWatersInputRoot(), dirname);
+    return testSerialize(dir, name);
+  }
+
+  protected D testSerialize(final String dirname1,
+                            final String dirname2,
+                            final String name)
+    throws WatersUnmarshalException, IOException, ClassNotFoundException
+  {
+    final File dir1 = new File(getWatersInputRoot(), dirname1);
+    final File dir2 = new File(dir1, dirname2);
+    return testSerialize(dir2, name);
+  }
+
+  protected D testSerialize(final File dir, final String name)
+    throws WatersUnmarshalException, IOException, ClassNotFoundException
+  {
+    final ProxyMarshaller<D> marshaller = getProxyMarshaller();
+    final String extname = name + marshaller.getDefaultExtension();
+    final File infilename = new File(dir, extname);
+    final URI inuri = infilename.toURI();
+    final String sername = name + ".ser";
+    final File outfilename = new File(getOutputDirectory(), sername);
+    return testSerialize(inuri, outfilename);
+  }
+
+  protected D testSerialize(final URI inuri, final File outfilename)
+    throws WatersUnmarshalException, IOException, ClassNotFoundException
+  {
+    final DocumentManager manager = getDocumentManager();
+    final DocumentProxy doc1 = manager.load(inuri);
+    if (doc1 instanceof Serializable) {
+      ensureParentDirectoryExists(outfilename);
+      final FileOutputStream fos =  new FileOutputStream(outfilename);
+      final ObjectOutputStream out = new ObjectOutputStream(fos);
+      out.writeObject(doc1);
+      out.close();
+      final FileInputStream fis =  new FileInputStream(outfilename);
+      final ObjectInputStream in = new ObjectInputStream(fis);
+      final DocumentProxy doc2 = (DocumentProxy) in.readObject();
+      in.close();
+      assertTrue("Structure changed after serializing!",
+                 doc1.equalsByContents(doc2));
+      assertTrue("Structure changed after serializing!",
+                 doc2.equalsByContents(doc1));
+      assertTrue("Geometry information changed after serializing!",
+                 doc1.equalsWithGeometry(doc2));
+      assertTrue("Geometry information changed after serializing!",
+                 doc2.equalsWithGeometry(doc1));
+    }
+    final Class<D> clazz = Casting.toClass(doc1.getClass());
+    return clazz.cast(doc1);
   }
 
   protected void checkIntegrity(final D document)

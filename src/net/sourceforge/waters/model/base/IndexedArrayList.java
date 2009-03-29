@@ -9,6 +9,8 @@
 
 package net.sourceforge.waters.model.base;
 
+import java.io.Serializable;
+
 import java.util.AbstractList;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -33,7 +35,7 @@ import net.sourceforge.waters.model.unchecked.Casting;
 
 public class IndexedArrayList<P extends NamedProxy>
   extends AbstractList<P>
-  implements IndexedList<P>, Cloneable
+  implements IndexedList<P>, Cloneable, Serializable
 {
 
   //#########################################################################

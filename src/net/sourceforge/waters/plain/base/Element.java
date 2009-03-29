@@ -9,6 +9,8 @@
 
 package net.sourceforge.waters.plain.base;
 
+import java.io.Serializable;
+
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.base.WatersRuntimeException;
 import net.sourceforge.waters.model.printer.ProxyPrinter;
@@ -26,7 +28,7 @@ import net.sourceforge.waters.model.printer.ProxyPrinter;
  */
 
 public abstract class Element
-  implements Proxy, Cloneable
+  implements Proxy, Cloneable, Serializable
 {
 
   //#########################################################################

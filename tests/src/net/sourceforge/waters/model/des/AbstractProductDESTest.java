@@ -56,6 +56,18 @@ public abstract class AbstractProductDESTest
     testMarshal("valid", "central_locking", "koordwsp");
   }
 
+  public void testSerialize_small_factory_2()
+    throws WatersUnmarshalException, IOException, ClassNotFoundException
+  {
+    testSerialize("handwritten", "small_factory_2");
+  }
+
+  public void testSerialize_koordwsp()
+    throws WatersUnmarshalException, IOException, ClassNotFoundException
+  {
+    testSerialize("valid", "central_locking", "koordwsp");
+  }
+
 
   //#########################################################################
   //# Overrides for Abstract Base Class JAXBTestCase
