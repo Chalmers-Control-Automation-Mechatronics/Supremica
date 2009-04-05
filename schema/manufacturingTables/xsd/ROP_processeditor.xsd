@@ -27,6 +27,22 @@
 	</xs:restriction>
 </xs:simpleType>
 
+<xs:simpleType name="OperatorType">
+	<xs:restriction base="xs:string">
+		<xs:enumeration value="and" />
+		<xs:enumeration value="or" />
+		<xs:enumeration value="not" />
+	</xs:restriction>
+</xs:simpleType>
+
+<xs:simpleType name="StateType">
+	<xs:restriction base="xs:string">
+		<xs:enumeration value="init" />
+		<xs:enumeration value="exec" />
+		<xs:enumeration value="comp" />
+	</xs:restriction>
+</xs:simpleType>
+
 <xs:simpleType name="AttributeType">
 	<xs:restriction base="xs:string">
 	</xs:restriction>
@@ -46,7 +62,9 @@
 <xs:element name="Unextended" type="xs:boolean"/>
 <xs:element name="Compressed" type="xs:boolean"/>
 <xs:element name="XCoordinate" type="xs:int"/>
- <xs:element name="YCoordinate" type="xs:int"/>
+<xs:element name="YCoordinate" type="xs:int"/>
+<xs:element name="Predecessor" type="PredecessorType" />
+ 
 <!-- Definition of attributes _____________________________________-->
 
 <xs:attribute name="id" type="xs:string"/>
@@ -83,6 +101,13 @@
 	</xs:sequence>
 </xs:group>
 
+<xs:group name='PredecessorPreconditionGroup'>
+	<xs:sequence>
+		<xs:element ref='Predecessor' minOccurs='0' maxOccurs='unbounded' />
+		<xs:element ref='Precondition' minOccurs='0' maxOccurs='unbounded' />
+	</xs:sequence>
+</xs:group>
+
 <xs:element name='Activity'>
 	<xs:complexType>
 		<xs:sequence>
@@ -100,7 +125,9 @@
 	<xs:complexType>
 		<xs:sequence>
 			<xs:element name='Predecessor' type='OperationReferenceType' minOccurs='1' maxOccurs='unbounded'/>
+			<xs:group ref='PredecessorPreconditionGroup' minOccurs='0' maxOccurs='unbounded' />
 		</xs:sequence>
+		<xs:attribute name="Operator" type="OperatorType" />
 	</xs:complexType>
 </xs:element>
 
@@ -117,7 +144,15 @@
 		<xs:element ref='Machine' minOccurs='1' maxOccurs='1'/>
 		<xs:element ref='Operation' minOccurs='1' maxOccurs='1'/>
 	</xs:sequence>
-</xs:complexType> 
+</xs:complexType>
+
+<xs:complexType name='PredecessorType'>
+	<xs:sequence>
+		<xs:element ref='Machine' minOccurs='1' maxOccurs='1' />
+		<xs:element ref='Operation' minOccurs='1' maxOccurs='1' />
+		<xs:element name='State' type='StateType' minOccurs='0' maxOccurs='1' />
+	</xs:sequence>
+</xs:complexType>
 
 <xs:element name='Properties'>
 	<xs:complexType>
