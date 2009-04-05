@@ -4,11 +4,29 @@ import java.io.Serializable;
 
 public class TransitionSchema implements Serializable
 {
-  protected TransitionSchema()
+  TransitionSchema(int source, int target, int eventId)
   {
+    mSource = source;
+    mTarget = target;
+    mEventId = eventId;
   }
 
-  public int source;
-  public int target;
-  public int event;
+  public int getSource()
+  {
+    return mSource;
+  }
+
+  public int getTarget()
+  {
+    return mTarget;
+  }
+
+  public int getEventId()
+  {
+    return mEventId;
+  }
+
+  private final int mSource;
+  private final int mTarget;
+  private final int mEventId;
 }

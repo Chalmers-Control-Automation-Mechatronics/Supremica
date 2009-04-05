@@ -4,13 +4,31 @@ import java.io.Serializable;
 
 public class EventSchema implements Serializable
 {
-  protected EventSchema()
+  EventSchema(String name, int kind, boolean observable)
   {
+    mName = name;
+    mKind = kind;
+    mObservable = observable;
   }
 
-  public String name;
-  public int kind;
-  public boolean observable;
+  public String getName()
+  {
+    return mName;
+  }
+
+  public int getKind()
+  {
+    return mKind;
+  }
+
+  public boolean getObservable()
+  {
+    return mObservable;
+  }
+
+  private final String mName;
+  private final int mKind;
+  private final boolean mObservable;
 
   public static final int CONTROLLABLE = 0;
   public static final int UNCONTROLLABLE = 1;

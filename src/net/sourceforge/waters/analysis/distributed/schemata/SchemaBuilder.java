@@ -25,10 +25,6 @@ public class SchemaBuilder
    */
   public static ProductDESSchema build(final ProductDESProxy des)
   {
-    ProductDESSchema schema = new ProductDESSchema();
-
-    schema.name = des.getName();
-
     //From the set of events, build an array of EventProxy
     //instances, which gives them a consistent (arbitrary) ordering.
     //This is then used to build a map from EventProxy instance to
@@ -45,11 +41,10 @@ public class SchemaBuilder
       }
 
     Map<EventProxy,Integer> emap = build_eventmap(events);
-    schema.events = build_event_schemata(events);
-    
-    schema.automata = build_automata(des.getAutomata(), emap);
+    EventSchema[] des_events = build_event_schemata(events);
+    AutomatonSchema[] des_automata = build_automata(des.getAutomata(), emap);
 
-    return schema;
+    return new ProductDESSchema(des.getName(), des_automata, des_events);
   }
 
   private static AutomatonSchema[] build_automata(Set<AutomatonProxy> automata,
@@ -69,12 +64,10 @@ public class SchemaBuilder
 
   private static AutomatonSchema build_automaton(final AutomatonProxy aut, 
 						 Map<EventProxy,Integer> emap)
-  {
-    AutomatonSchema as = new AutomatonSchema();
-    
-    as.name = aut.getName();
-    as.events = map_events(aut.getEvents(), emap);
-    as.kind = component_kind_convert(aut.getKind());
+  { 
+    String name = aut.getName();
+    int[] events = map_events(aut.getEvents(), emap);
+    int kind = component_kind_convert(aut.getKind());
 
     //Like with events in the DES, build an array of states in the
     //model which will be used to give a definite ordering. Build a
@@ -88,10 +81,11 @@ public class SchemaBuilder
       i++;
     }
     Map<StateProxy,Integer> smap = build_statemap(au_states);
-    as.states = build_states(au_states, emap);
-    as.transitions = build_transitions(aut.getTransitions(), smap, emap);
+    StateSchema[] states = build_states(au_states, emap);
+    TransitionSchema[] transitions = build_transitions(aut.getTransitions(), 
+						       smap, emap);
 
-    return as;
+    return new AutomatonSchema(name, events, states, kind, transitions);
   }
 
   private static TransitionSchema[] build_transitions
@@ -113,12 +107,11 @@ public class SchemaBuilder
 						   Map<StateProxy,Integer> smap,
 						   Map<EventProxy,Integer> emap)
   {
-    TransitionSchema transition = new TransitionSchema();
-    transition.source = smap.get(t.getSource());
-    transition.target = smap.get(t.getTarget());
-    transition.event = emap.get(t.getEvent());
+    int source = smap.get(t.getSource());
+    int target = smap.get(t.getTarget());
+    int event = emap.get(t.getEvent());
 
-    return transition;
+    return new TransitionSchema(source, target, event);
   }
 
   private static Map<StateProxy,Integer> build_statemap(StateProxy[] states)
@@ -148,13 +141,11 @@ public class SchemaBuilder
   private static StateSchema build_state(StateProxy state,
 					 Map<EventProxy,Integer> emap)
   {
-    StateSchema s = new StateSchema();
-    
-    s.name = state.getName();
-    s.initial = state.isInitial();
-    s.propositions = map_events(state.getPropositions(), emap);
+    String name = state.getName();
+    boolean initial = state.isInitial();
+    int[] propositions = map_events(state.getPropositions(), emap);
 
-    return s;
+    return new StateSchema(name, initial, propositions);
   }
 
   private static int[] map_events(Collection<EventProxy> events,
@@ -186,12 +177,11 @@ public class SchemaBuilder
 
   private static EventSchema build_event(final EventProxy event)
   {
-    EventSchema ev = new EventSchema();
-    ev.name = event.getName();
-    ev.observable = event.isObservable();
-    ev.kind = event_kind_convert(event.getKind());
+    String name = event.getName();
+    boolean observable = event.isObservable();
+    int kind = event_kind_convert(event.getKind());
 
-    return ev;
+    return new EventSchema(name, kind, observable);
   }
 
   private static int event_kind_convert(EventKind kind)
