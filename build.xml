@@ -280,7 +280,8 @@
                verbose="false"
                nowarn="true"
                excludes="${supremica_basedir}/external/robotCoordination/**,
-                  net/sourceforge/waters/mbt/**"
+                  net/sourceforge/waters/mbt/**,
+				  ${supremica_basedir}/external/operationframeworkto61131/**"
                source="1.5"
                fork="true"
                memoryMaximumSize="128M">
