@@ -1,0 +1,321 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Created with Liquid XML Studio 1.0.8.0 (http://www.liquid-technologies.com) -->
+<FunctionBlocks  ID="haha" Vendor="cth" User="s2">
+	<Documentation>this is comment</Documentation>
+	<FunctionBlock Type="Two Position Movement">
+		<SystemInterface>
+			<SystemConnection StateID="1">
+				<FunctionType>RequestVar</FunctionType>
+				<IOType>Input</IOType>
+				<DataType>Boolean</DataType>
+				<Param>auto_backward</Param>
+				<InitValue>false</InitValue>
+			</SystemConnection>
+			<SystemConnection StateID="2">
+				<FunctionType>RequestVar</FunctionType>
+				<IOType>Input</IOType>
+				<DataType>Boolean</DataType>
+				<Param>auto_forward</Param>
+				<InitValue>false</InitValue>
+			</SystemConnection>
+			<SystemConnection StateID="1">
+				<FunctionType>Interlock</FunctionType>
+				<IOType>Input</IOType>
+				<DataType>Boolean</DataType>
+				<Param>interlock_backward</Param>
+				<InitValue>false</InitValue>
+			</SystemConnection>
+			<SystemConnection StateID="2">
+				<FunctionType>Interlock</FunctionType>
+				<IOType>Input</IOType>
+				<DataType>Boolean</DataType>
+				<Param>interlock_forward</Param>
+				<InitValue>false</InitValue>
+			</SystemConnection>
+			<SystemConnection StateID="1">
+				<FunctionType>IOVariable</FunctionType>
+				<IOType>Input</IOType>
+				<DataType>Boolean</DataType>
+				<Param>sensor_backward pos</Param>
+				<InitValue>false</InitValue>
+			</SystemConnection>
+			<SystemConnection StateID="2">
+				<FunctionType>IOVariable</FunctionType>
+				<IOType>Input</IOType>
+				<DataType>Boolean</DataType>
+				<Param>sensor_forward pos</Param>
+				<InitValue>false</InitValue>
+			</SystemConnection>
+			<SystemConnection StateID="1">
+				<FunctionType>FeedbackVar</FunctionType>
+				<IOType>Output</IOType>
+				<DataType>Boolean</DataType>
+				<Param>in_backward_pos</Param>
+				<InitValue>false</InitValue>
+			</SystemConnection>
+			<SystemConnection StateID="2">
+				<FunctionType>FeedbackVar</FunctionType>
+				<IOType>Output</IOType>
+				<DataType>Boolean</DataType>
+				<Param>in_forward_pos</Param>
+				<InitValue>false</InitValue>
+			</SystemConnection>
+			<SystemConnection StateID="2">
+				<FunctionType>Indicator</FunctionType>
+				<IOType>Output</IOType>
+				<DataType>Boolean</DataType>
+				<Param>forward_started</Param>
+				<InitValue>false</InitValue>
+			</SystemConnection>
+			<SystemConnection StateID="1">
+				<FunctionType>Indicator</FunctionType>
+				<IOType>Output</IOType>
+				<DataType>Boolean</DataType>
+				<Param>backward_started</Param>
+				<InitValue>false</InitValue>
+			</SystemConnection>
+			
+			<SystemConnection StateID="1">
+				<FunctionType>IOVariable</FunctionType>
+				<IOType>Output</IOType>
+				<DataType>Boolean</DataType>
+				<Param>output_backward</Param>
+				<InitValue>false</InitValue>
+			</SystemConnection>
+			<SystemConnection StateID="2">
+				<FunctionType>IOVariable</FunctionType>
+				<IOType>Output</IOType>
+				<DataType>Boolean</DataType>
+				<Param>output_forward</Param>
+				<InitValue>false</InitValue>
+			</SystemConnection>
+		</SystemInterface>
+		<UserInterface>
+			<UserConnection>
+				<IOType>Input</IOType>
+				<DataType>Boolean</DataType>
+				<Param>manual_reverse</Param>
+				<InitValue>false</InitValue>
+			</UserConnection>
+			<UserConnection>
+				<IOType>Input</IOType>
+				<DataType>Boolean</DataType>
+				<Param>manual_forward</Param>
+				<InitValue>false</InitValue>
+			</UserConnection>
+			<UserConnection>
+				<IOType>Input</IOType>
+				<DataType>Boolean</DataType>
+				<Param>operation_mode</Param>
+				<InitValue>false</InitValue>
+			</UserConnection>
+			<UserConnection>
+				<IOType>Input</IOType>
+				<DataType>Integer</DataType>
+				<Param>operation_time</Param>
+				<InitValue>false</InitValue>
+			</UserConnection>
+			<UserConnection>
+				<IOType>Output</IOType>
+				<DataType>Boolean</DataType>
+				<Param>alarm</Param>
+				<InitValue>false</InitValue>
+			</UserConnection>
+		</UserInterface>
+	</FunctionBlock>
+	
+	<FunctionBlock Type="Part Detection x2">
+		<SystemInterface>
+			<SystemConnection StateID="2">
+				<FunctionType>IOVariable</FunctionType>
+				<IOType>Input</IOType>
+				<DataType>Boolean</DataType>
+				<Param>part_sensor_1</Param>
+				<Param>part_sensor_2</Param>
+				<InitValue>false</InitValue>
+			</SystemConnection>
+			<SystemConnection StateID="1">
+				<FunctionType>FeedbackVar</FunctionType>
+				<IOType>Output</IOType>
+				<DataType>Boolean</DataType>
+				<Param>position_empty</Param>
+				<InitValue>false</InitValue>
+			</SystemConnection>
+			<SystemConnection StateID="2">
+				<FunctionType>FeedbackVar</FunctionType>
+				<IOType>Output</IOType>
+				<DataType>Boolean</DataType>
+				<Param>part_present</Param>
+				<InitValue>false</InitValue>
+			</SystemConnection>
+		</SystemInterface>
+		<UserInterface>
+			<UserConnection>
+				<IOType>Input</IOType>
+				<DataType>Boolean</DataType>
+				<Param>alarm_delay</Param>
+				<InitValue>false</InitValue>
+			</UserConnection>
+			<UserConnection>
+				<IOType>Output</IOType>
+				<DataType>Boolean</DataType>
+				<Param>alarm</Param>
+				<InitValue>false</InitValue>
+			</UserConnection>
+		</UserInterface>
+	</FunctionBlock>
+	<FunctionBlock Type="Belt Conveyor">
+		<SystemInterface>
+			<SystemConnection StateID="1">
+				<FunctionType>RequestVar</FunctionType>
+				<IOType>Input</IOType>
+				<DataType>Boolean</DataType>
+				<Param>part_to_position</Param>
+				<InitValue>false</InitValue>
+			</SystemConnection>
+			<SystemConnection StateID="2">
+				<FunctionType>RequestVar</FunctionType>
+				<IOType>Input</IOType>
+				<DataType>Boolean</DataType>
+				<Param>part_picked</Param>
+				<InitValue>false</InitValue>
+			</SystemConnection>
+			<SystemConnection StateID="1">
+				<FunctionType>FeedbackVar</FunctionType>
+				<IOType>Output</IOType>
+				<DataType>Boolean</DataType>
+				<Param>part_in_position</Param>
+				<InitValue>false</InitValue>
+			</SystemConnection>
+			<SystemConnection StateID="2">
+				<FunctionType>FeedbackVar</FunctionType>
+				<IOType>Output</IOType>
+				<DataType>Boolean</DataType>
+				<Param>position_empty</Param>
+				<InitValue>false</InitValue>
+			</SystemConnection>
+			<SystemConnection StateID="1">
+				<FunctionType>Indicator</FunctionType>
+				<IOType>Output</IOType>
+				<DataType>Boolean</DataType>
+				<Param>positioning_started</Param>
+				<InitValue>false</InitValue>
+			</SystemConnection>
+			<SystemConnection StateID="2">
+				<FunctionType>Indicator</FunctionType>
+				<IOType>Output</IOType>
+				<DataType>Boolean</DataType>
+				<Param>picking_started</Param>
+				<InitValue>false</InitValue>
+			</SystemConnection>
+			<SystemConnection StateID="1">
+				<FunctionType>IOVariable</FunctionType>
+				<IOType>Output</IOType>
+				<DataType>Boolean</DataType>
+				<Param>out_forward</Param>
+				<InitValue>false</InitValue>
+			</SystemConnection>
+			<SystemConnection StateID="2">
+				<FunctionType>IOVariable</FunctionType>
+				<IOType>Output</IOType>
+				<DataType>Boolean</DataType>
+				<Param>out_reverse</Param>
+				<InitValue>false</InitValue>
+			</SystemConnection>
+			
+			<SystemConnection StateID="1">
+				<FunctionType>Interlock</FunctionType>
+				<IOType>Input</IOType>
+				<DataType>Boolean</DataType>
+				<Param>IL_part_to_position</Param>
+				<InitValue>false</InitValue>
+			</SystemConnection>
+			<SystemConnection StateID="2">
+				<FunctionType>Interlock</FunctionType>
+				<IOType>Input</IOType>
+				<DataType>Boolean</DataType>
+				<Param>IL_part_picked</Param>
+				<InitValue>false</InitValue>
+			</SystemConnection>
+			
+		</SystemInterface>
+		<UserInterface>
+			<UserConnection>
+				<IOType>Input</IOType>
+				<DataType>Boolean</DataType>
+				<Param>part_sensor</Param>
+				<InitValue>false</InitValue>
+			</UserConnection>
+			
+			<UserConnection>
+				<IOType>Input</IOType>
+				<DataType>Boolean</DataType>
+				<Param>stop_sensor</Param>
+				<InitValue>false</InitValue>
+			</UserConnection>
+			
+			<UserConnection>
+				<IOType>Input</IOType>
+				<DataType>Boolean</DataType>
+				<Param>manual_belt_forward</Param>
+				<InitValue>false</InitValue>
+			</UserConnection>
+			<UserConnection>
+				<IOType>Input</IOType>
+				<DataType>Boolean</DataType>
+				<Param>manual_belt_reverse</Param>
+				<InitValue>false</InitValue>
+			</UserConnection>
+			
+			<UserConnection>
+				<IOType>Input</IOType>
+				<DataType>Boolean</DataType>
+				<Param>manual_part_in_pos</Param>
+				<InitValue>false</InitValue>
+			</UserConnection>
+			
+			
+			<UserConnection>
+				<IOType>Input</IOType>
+				<DataType>Boolean</DataType>
+				<Param>manual_part_picked</Param>
+				<InitValue>false</InitValue>
+			</UserConnection>
+			
+			<UserConnection>
+				<IOType>Input</IOType>
+				<DataType>Boolean</DataType>
+				<Param>overload_relay</Param>
+				<InitValue>false</InitValue>
+			</UserConnection>
+			
+			<UserConnection>
+				<IOType>Input</IOType>
+				<DataType>Boolean</DataType>
+				<Param>safety_braker</Param>
+				<InitValue>false</InitValue>
+			</UserConnection>
+			
+			<UserConnection>
+				<IOType>Input</IOType>
+				<DataType>Boolean</DataType>
+				<Param>operation_mode</Param>
+				<InitValue>false</InitValue>
+			</UserConnection>
+			
+			<UserConnection>
+				<IOType>Input</IOType>
+				<DataType>Boolean</DataType>
+				<Param>alarm_delay</Param>
+				<InitValue>false</InitValue>
+			</UserConnection>
+			
+			<UserConnection>
+				<IOType>Output</IOType>
+				<DataType>Boolean</DataType>
+				<Param>alarm</Param>
+				<InitValue>false</InitValue>
+			</UserConnection>
+		</UserInterface>
+	</FunctionBlock>
+</FunctionBlocks>

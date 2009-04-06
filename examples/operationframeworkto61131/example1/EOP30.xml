@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Created with Liquid XML Studio 6.1.15.0 - FREE Community Edition (http://www.liquid-technologies.com) -->
+<Operation opID="30">
+	<Type>basic</Type>
+	<Comment>Cycle start condition</Comment>
+	<Machine>C1F1</Machine>
+	<EOP>
+		<InternalComponents>
+			<Actuator>C1</Actuator>
+			<Actuator>C2</Actuator>
+			<Actuator>C3</Actuator>
+			<Sensor>C4</Sensor>
+		</InternalComponents>
+		<InitialState isInitial="true">
+			<ActuatorValue>
+				<Actuator>C1</Actuator>
+				<Value>home</Value>
+			</ActuatorValue>
+			<ActuatorValue>
+				<Actuator>C2</Actuator>
+				<Value>locked</Value>
+			</ActuatorValue>
+			<ActuatorValue>
+				<Actuator>C3</Actuator>
+				<Value>open</Value>
+			</ActuatorValue>
+			<SensorValue>
+				<Sensor>C4</Sensor>
+				<Value>off</Value>
+			</SensorValue>
+			<InitialStateCheck>
+				<AlarmType>1</AlarmType>
+				<AlarmDelay>0</AlarmDelay>
+			</InitialStateCheck>
+		</InitialState>
+	</EOP>
+</Operation>

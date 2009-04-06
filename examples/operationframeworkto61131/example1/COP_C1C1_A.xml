@@ -1,0 +1,27 @@
+﻿<ROP id="C1C1_A" type="COP">
+    <Machine>C1C1</Machine>
+	<CC>A</CC>
+    <Comment>pallet conveyor</Comment>
+    <Relation type ="Sequence">
+        <Activity>
+            <Operation>40</Operation> 	
+        </Activity>
+		<Activity>
+            <Operation>41</Operation> 	
+        </Activity>
+      
+		<Activity>
+            <Precondition>
+                <Predecessor>
+                     <Machine>C1F1</Machine>
+                     <Operation>34</Operation>
+                </Predecessor>	    
+            </Precondition>	
+            <Operation>42</Operation> 	
+        </Activity>
+    </Relation>
+</ROP>
+
+
+
+

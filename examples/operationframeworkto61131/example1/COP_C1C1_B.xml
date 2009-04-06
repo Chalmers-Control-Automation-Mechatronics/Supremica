@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Created with Liquid XML Studio 6.1.15.0 - FREE Community Edition (http://www.liquid-technologies.com) -->
+<ROP id="C1C1_B" type="COP">
+	<Machine>C1C1</Machine>
+	<CC>B</CC>
+	<Comment>pallet conveyor</Comment>
+	<Relation type="Sequence">
+		<Activity>
+			<Operation>40</Operation>
+		</Activity>
+		<Activity>
+			<Operation>43</Operation>
+		</Activity>
+	</Relation>
+</ROP>

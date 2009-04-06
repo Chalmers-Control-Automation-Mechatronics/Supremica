@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Created with Liquid XML Studio 6.1.15.0 - FREE Community Edition (http://www.liquid-technologies.com) -->
+<IL id="IL_C1C2C1_PART_IN_POSITION" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="C:\Project100\WorkSpace\PLC_OBJ\xml\xsd\IL_1.1.xsd" >
+  <Comment>IL for fixture C1, drive part to pick up position</Comment>
+  <Machine>C1C2</Machine>
+  <Operation>part in position</Operation>
+  <Actuator>C1</Actuator>
+  <ILStructure>
+    <InternalComponents>
+      <Actuator>C1</Actuator>
+    </InternalComponents>
+    <Zones>
+      <Zone>1</Zone>
+    </Zones>
+    <Operations>
+      <Operation>-</Operation>
+    </Operations>	
+	<Term row="1" mode="A">
+      <ActuatorValue>
+        <Actuator>C1</Actuator>
+        <Value>*</Value>
+      </ActuatorValue>
+      
+	  <ZoneCheck>
+        <BeforeZones>
+          <Zone>1</Zone>
+        </BeforeZones>
+        <AfterZones>
+          <Zone>-</Zone>
+        </AfterZones>
+      </ZoneCheck>
+    </Term>	 
+     
+    </ILStructure>
+</IL>

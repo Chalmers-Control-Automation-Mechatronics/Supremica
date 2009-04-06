@@ -1,0 +1,439 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Created with Liquid XML Studio 6.1.15.0 - FREE Community Edition (http://www.liquid-technologies.com) -->
+<Factory xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="C:\Project100\WorkSpace\PLC_OBJ\xml\xsd\ControlInfo.xsd" name="Example_Factory_v1.0">
+	<Description>This is a example cell with four equipment inside; One robot, one fixture, one conveyor on rail and one belt conveyor</Description>
+	<Areas>
+		<Area name="Example_Area_1">
+			<Description>This is example area</Description>
+			<Cells>
+				<Cell name="C1">
+					<Description>Example cell#1</Description>
+					<Machines>
+						<Machine type="Other" name="C1H1" hasOwnControlSystem="No">
+							<Description>Human machine interface</Description>
+							<Equipment>
+								<EquipmentEntity type="Sensor" name="C1H1C1">
+									<Description>conveyor</Description>
+									<States>
+										<State id="1" name="normal" />
+										<State id="2" name="empty" />
+									</States>
+								</EquipmentEntity>
+							</Equipment>
+						</Machine>
+						<Machine type="Robot" name="C1R1" hasOwnControlSystem="Yes">
+							<Description>Robot, material handling and spot welding</Description>
+							<Equipment>
+								<EquipmentEntity type="Actuator" name="C1R1C1">
+									<Description>Clamp</Description>
+									<States>
+										<State id="1" name="open" />
+										<State id="2" name="closed" />
+									</States>
+								</EquipmentEntity>
+								<EquipmentEntity type="Sensor" name="C1R1C2">
+									<Description>part sensor</Description>
+									<States>
+										<State id="1" name="off" />
+										<State id="2" name="on" />
+									</States>
+								</EquipmentEntity>
+								<EquipmentEntity type="Sensor" name="C1R1C3">
+									<Description>home position</Description>
+									<States>
+										<State id="1" name="on" />
+										<State id="2" name="off" />
+									</States>
+								</EquipmentEntity>
+								<EquipmentEntity type="Sensor" name="C1R1C4">
+									<Description>out of pallet</Description>
+									<States>
+										<State id="1" name="on" />
+										<State id="2" name="off" />
+									</States>
+								</EquipmentEntity>
+							</Equipment>
+						</Machine>
+						<Machine type="Conveyor" name="C1C1" hasOwnControlSystem="Yes">
+							<Description>Pallet conveyor, product carrier</Description>
+							<!-- Counld cause problem,  added for testing only-->
+							<Equipment>
+								<EquipmentEntity type="Sensor" name="C1C1C1">
+									<Description>Electric motor that drives the belt</Description>
+									<States>
+										<State id="1" name="empty" />
+										<State id="2" name="unprocessed" />
+										<State id="3" name="processed" />
+									</States>
+								</EquipmentEntity>
+							</Equipment>
+						</Machine>
+						<Machine type="Conveyor" name="C1C2" hasOwnControlSystem="No">
+							<Description>Belt conveyor</Description>
+							<Equipment>
+								<EquipmentEntity type="Actuator" name="C1C2C1">
+									<Description>Electric motor that drives the belt</Description>
+									<FunctionBlock>Belt Conveyor</FunctionBlock>
+									<States>
+										<State id="1" name="part in position" />
+										<State id="2" name="position empty" />
+									</States>
+									<Elements>
+										<Element name="C1C2C1">
+											<Description>The part of the virtual sensor that handles the communication with the real sensor</Description>
+											<IOConnectionMapping id="1">
+												<IOVariable>C1C2C1_QS1</IOVariable>
+												<IOAddress>string</IOAddress>
+											</IOConnectionMapping>
+											<IOConnectionMapping id="2">
+												<IOVariable>C1C2C1_QS2</IOVariable>
+												<IOAddress>string</IOAddress>
+											</IOConnectionMapping>
+										</Element>
+									</Elements>
+									<Equipment>
+										<EquipmentEntity type="Sensor" name="C1C2C1C1">
+											<Description>Part detection sensor</Description>
+											<States>
+												<State id="1" name="off" />
+												<State id="2" name="on" />
+											</States>
+											<Elements>
+												<Element name="C1C2C1C1">
+													<Description>Part detection sensor</Description>
+													<IOConnectionMapping id="1">
+														<IOVariable>C1C2C1_IS1</IOVariable>
+														<IOAddress>string</IOAddress>
+													</IOConnectionMapping>
+													<IOConnectionMapping id="2">
+														<IOVariable>C1C2C1_IS2</IOVariable>
+														<IOAddress>string</IOAddress>
+													</IOConnectionMapping>
+												</Element>
+											</Elements>
+										</EquipmentEntity>
+									</Equipment>
+								</EquipmentEntity>
+								<EquipmentEntity type="Sensor" name="C1C2C2">
+									<Description>Stop position sensor</Description>
+									<States>
+										<State id="1" name="off" />
+										<State id="2" name="on" />
+									</States>
+									<Elements>
+										<Element name="C1C2C2">
+											<Description>The part of the virtual sensor that handles the communication with the real sensor</Description>
+											<IOConnectionMapping id="1">
+												<IOVariable>C1C2C2_IS1</IOVariable>
+												<IOAddress>string</IOAddress>
+											</IOConnectionMapping>
+											<IOConnectionMapping id="2">
+												<IOVariable>C1C2C2_IS2</IOVariable>
+												<IOAddress>string</IOAddress>
+											</IOConnectionMapping>
+										</Element>
+									</Elements>
+								</EquipmentEntity>
+							</Equipment>
+						</Machine>
+						<Machine type="Fixture" name="C1F1" hasOwnControlSystem="No">
+							<Description>The fixture </Description>
+							<Equipment>
+								<EquipmentEntity type="Actuator" name="C1F1C1">
+									<Description>Fixture positioning</Description>
+									<FunctionBlock>Two Position Movement</FunctionBlock>
+									<States>
+										<State id="1" name="home" />
+										<State id="2" name="work pos" />
+									</States>
+									<Elements>
+										<Element name="C1F1C1">
+											<Description>Monostable pneumatic valve </Description>
+											<IOConnectionMapping id="1">
+												<IOVariable>C1F1C1_QS1</IOVariable>
+												<IOAddress>string</IOAddress>
+											</IOConnectionMapping>
+											<IOConnectionMapping id="2">
+												<IOVariable>C1F1C1_QS2</IOVariable>
+												<IOAddress>string</IOAddress>
+											</IOConnectionMapping>
+										</Element>
+									</Elements>
+									<Equipment>
+										<EquipmentEntity type="Actuator" name="C1F1C1C1">
+											<Description>Cylinder</Description>
+											<States>
+												<State id="1" name="home" />
+												<State id="2" name="work pos" />
+											</States>
+											<Equipment>
+												<EquipmentEntity type="Sensor" name="C1F1C1C1C1">
+													<Description>Fixture in home position</Description>
+													<States>
+														<State id="1" name="home" />
+														<State id="-1" name="not home" />
+													</States>
+													<Elements>
+														<Element name="C1F1C1C1C1">
+															<Description>The part of the virtual sensor that handles the communication with the real sensor</Description>
+															<IOConnectionMapping id="1">
+																<IOVariable>C1F1C1_IS1</IOVariable>
+																<IOAddress>string</IOAddress>
+															</IOConnectionMapping>
+														</Element>
+													</Elements>
+												</EquipmentEntity>
+												<EquipmentEntity type="Sensor" name="C1F1C1C1C2">
+													<Description>Fixture in work position</Description>
+													<States>
+														<State id="2" name="work pos" />
+														<State id="-2" name="not work pos" />
+													</States>
+													<Elements>
+														<Element name="C1F1C1C1C2">
+															<Description>The part of the virtual sensor that handles the communication with the real sensor</Description>
+															<IOConnectionMapping id="2">
+																<IOVariable>C1F1C1_IS2</IOVariable>
+																<IOAddress>string</IOAddress>
+															</IOConnectionMapping>
+														</Element>
+													</Elements>
+												</EquipmentEntity>
+											</Equipment>
+										</EquipmentEntity>
+									</Equipment>
+								</EquipmentEntity>
+								<EquipmentEntity type="Actuator" name="C1F1C2">
+									<Description>Fixation pin</Description>
+									<FunctionBlock>Two Position Movement</FunctionBlock>
+									<States>
+										<State id="1" name="locked" />
+										<State id="2" name="unlocked" />
+									</States>
+									<Elements>
+										<Element name="C1F1C2">
+											<Description>Monostable pneumatic valve </Description>
+											<IOConnectionMapping id="1">
+												<IOVariable>C1F1C2_QS1</IOVariable>
+												<IOAddress>string</IOAddress>
+											</IOConnectionMapping>
+											<IOConnectionMapping id="2">
+												<IOVariable>C1F1C2_QS2</IOVariable>
+												<IOAddress>string</IOAddress>
+											</IOConnectionMapping>
+										</Element>
+									</Elements>
+									<Equipment>
+										<EquipmentEntity type="Actuator" name="C1F1C2C1">
+											<Description>Cylinder</Description>
+											<States>
+												<State id="1" name="locked" />
+												<State id="2" name="unlocked" />
+											</States>
+											<Equipment>
+												<EquipmentEntity type="Sensor" name="C1F1C2C1C1">
+													<Description>Proximity sensor fixation pin unlocked</Description>
+													<States>
+														<State id="1" name="locked" />
+														<State id="-1" name="not locked" />
+													</States>
+													<Elements>
+														<Element name="C1F1C2C1C1">
+															<Description>The part of the virtual sensor that handles the communication with the real sensor</Description>
+															<IOConnectionMapping id="1">
+																<IOVariable>C1F1C2_IS1</IOVariable>
+																<IOAddress>string</IOAddress>
+															</IOConnectionMapping>
+														</Element>
+													</Elements>
+												</EquipmentEntity>
+												<EquipmentEntity type="Sensor" name="C1F1C2C1C2">
+													<Description>Proximity sensor fixation pin locked</Description>
+													<States>
+														<State id="1" name="locked" />
+														<State id="-1" name="not unlocked" />
+													</States>
+													<Elements>
+														<Element name="C1F1C2C1C2">
+															<Description>The part of the virtual sensor that handles the communication with the real sensor</Description>
+															<IOConnectionMapping id="2">
+																<IOVariable>C1F1C2_IS2</IOVariable>
+																<IOAddress>string</IOAddress>
+															</IOConnectionMapping>
+														</Element>
+													</Elements>
+												</EquipmentEntity>
+											</Equipment>
+										</EquipmentEntity>
+									</Equipment>
+								</EquipmentEntity>
+								<EquipmentEntity type="Actuator" name="C1F1C3">
+									<Description>ClampGroup</Description>
+									<FunctionBlock>Two Position Movement</FunctionBlock>
+									<States>
+										<State id="1" name="open" />
+										<State id="2" name="close" />
+									</States>
+									<Elements>
+										<Element name="C1F1C3">
+											<Description>Bistable pneumatic valve </Description>
+											<IOConnectionMapping id="1">
+												<IOVariable>C1F1C3_QS1</IOVariable>
+												<IOAddress>string</IOAddress>
+											</IOConnectionMapping>
+											<IOConnectionMapping id="2">
+												<IOVariable>C1F1C3_QS2</IOVariable>
+												<IOAddress>string</IOAddress>
+											</IOConnectionMapping>
+										</Element>
+									</Elements>
+									<Equipment>
+										<EquipmentEntity type="Actuator" name="C1F1C3C1">
+											<Description>Cylinder</Description>
+											<States>
+												<State id="1" name="open" />
+												<State id="2" name="close" />
+											</States>
+											<Equipment>
+												<EquipmentEntity type="Sensor" name="C1F1C3C1C1">
+													<Description>Proximity sensor clamp 1 open</Description>
+													<States>
+														<State id="1" name="open" />
+														<State id="-1" name="not open" />
+													</States>
+													<Elements>
+														<Element name="C1F1C3C1C1">
+															<Description>The part of the virtual sensor that handles the communication with the real sensor</Description>
+															<IOConnectionMapping id="1">
+																<IOVariable>C1F1C3_IS1A</IOVariable>
+																<IOAddress>string</IOAddress>
+															</IOConnectionMapping>
+														</Element>
+													</Elements>
+												</EquipmentEntity>
+												<EquipmentEntity type="Sensor" name="C1F1C3C1C2">
+													<Description>Proximity sensor clamp 1 closed</Description>
+													<States>
+														<State id="1" name="close" />
+														<State id="-1" name="not close" />
+													</States>
+													<Elements>
+														<Element name="C1F1C3C1C2">
+															<Description>The part of the virtual sensor that handles the communication with the real sensor</Description>
+															<IOConnectionMapping id="2">
+																<IOVariable>C1F1C3_IS2A</IOVariable>
+																<IOAddress>string</IOAddress>
+															</IOConnectionMapping>
+														</Element>
+													</Elements>
+												</EquipmentEntity>
+											</Equipment>
+										</EquipmentEntity>
+										<EquipmentEntity type="Actuator" name="C1F1C3C2">
+											<Description>Cylinder</Description>
+											<States>
+												<State id="1" name="open" />
+												<State id="2" name="close" />
+											</States>
+											<Equipment>
+												<EquipmentEntity type="Sensor" name="C1F1C3C2C1">
+													<Description>Proximity sensor clamp 2 open</Description>
+													<States>
+														<State id="1" name="open" />
+														<State id="-1" name="not open" />
+													</States>
+													<Elements>
+														<Element name="C1F1C3C2C1">
+															<Description>The part of the virtual sensor that handles the communication with the real sensor</Description>
+															<IOConnectionMapping id="1">
+																<IOVariable>C1F1C3_IS1B</IOVariable>
+																<IOAddress>string</IOAddress>
+															</IOConnectionMapping>
+														</Element>
+													</Elements>
+												</EquipmentEntity>
+												<EquipmentEntity type="Sensor" name="C1F1C3C2C2">
+													<Description>Proximity sensor clamp 2 closed</Description>
+													<States>
+														<State id="1" name="close" />
+														<State id="-1" name="not close" />
+													</States>
+													<Elements>
+														<Element name="C1F1C3C2C2">
+															<Description>The part of the virtual sensor that handles the communication with the real sensor</Description>
+															<IOConnectionMapping id="2">
+																<IOVariable>C1F1C3_IS2B</IOVariable>
+																<IOAddress>string</IOAddress>
+															</IOConnectionMapping>
+														</Element>
+													</Elements>
+												</EquipmentEntity>
+											</Equipment>
+										</EquipmentEntity>
+									</Equipment>
+								</EquipmentEntity>
+								<EquipmentEntity type="Sensor" name="C1F1C4">
+									<Description>Proximity sensor group of two sensors for part present on fixture </Description>
+									<FunctionBlock>Part Detection x2</FunctionBlock>
+									<States>
+										<State id="1" name="on" />
+										<State id="2" name="off" />
+									</States>
+									<Elements>
+										<Element name="C1F1C4">
+											<Description> The part of the virtual sensor that handles the communication with the real sensor</Description>
+											<IOConnectionMapping id="1">
+												<IOVariable>C1F1C4_IS1</IOVariable>
+												<IOAddress>string</IOAddress>
+											</IOConnectionMapping>
+											<IOConnectionMapping id="2">
+												<IOVariable>C1F1C4_IS2</IOVariable>
+												<IOAddress>string</IOAddress>
+											</IOConnectionMapping>
+										</Element>
+									</Elements>
+									<Equipment>
+										<EquipmentEntity type="Sensor" name="C1F1C4C1">
+											<Description>Proximity sensor part present on fixture </Description>
+											<FunctionBlock>Part Detection x2</FunctionBlock>
+											<States>
+												<State id="1" name="on" />
+												<State id="2" name="off" />
+											</States>
+											<!-- Elements describe (control of) the lowest level of the physical equipment, i.e. the level where communication with I/O cards / process take place-->
+											<Elements>
+												<Element name="C1F1C4C1">
+													<IOConnectionMapping id="2">
+														<IOVariable>C1F1C4_IS2A</IOVariable>
+														<IOAddress>string</IOAddress>
+													</IOConnectionMapping>
+												</Element>
+											</Elements>
+										</EquipmentEntity>
+										<EquipmentEntity type="Sensor" name="C1F1C4C2">
+											<Description>Proximity sensor part present on fixture </Description>
+											<FunctionBlock>Part Detection x2</FunctionBlock>
+											<States>
+												<State id="1" name="on" />
+												<State id="2" name="off" />
+											</States>
+											<Elements>
+												<Element name="C1F1C4C2">
+													<Description>The part of the virtual sensor that handles the communication with the real sensor</Description>
+													<IOConnectionMapping id="2">
+														<IOVariable>C1F1C4_IS2B</IOVariable>
+														<IOAddress>string</IOAddress>
+													</IOConnectionMapping>
+												</Element>
+											</Elements>
+										</EquipmentEntity>
+									</Equipment>
+								</EquipmentEntity>
+							</Equipment>
+						</Machine>
+					</Machines>
+				</Cell>
+			</Cells>
+		</Area>
+	</Areas>
+</Factory>

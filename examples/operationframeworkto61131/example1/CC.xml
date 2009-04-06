@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Created with Liquid XML Studio 6.1.15.0 - FREE Community Edition (http://www.liquid-technologies.com) -->
+<CycleStartConditions xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="C:\Project100\WorkSpace\PLC_OBJ\xml\xsd\CC.xsd">
+	<Documentation>CC B</Documentation>
+	<CC Name="A">
+		<Documentation>CC A</Documentation>
+		<Condition>
+			<Documentation>empty cell mode</Documentation>
+			<Machine>C1H1</Machine>
+			<Component>C1</Component>
+			<State>normal</State>
+		</Condition>
+		<Condition>
+			<Documentation>product in cell</Documentation>
+			<Machine>C1C1</Machine>
+			<Component>C1</Component>
+			<State>*</State>
+		</Condition>
+	</CC>
+	<CC Name="B">
+		<Documentation>CC B</Documentation>
+		<Condition>
+			<Documentation>empty cell mode</Documentation>
+			<Machine>C1H1</Machine>
+			<Component>C1</Component>
+			<State>empty</State>
+		</Condition>
+		<Condition>
+			<Documentation>product in cell</Documentation>
+			<Machine>C1C1</Machine>
+			<Component>C1</Component>
+			<State>processed</State>
+		</Condition>
+	</CC>
+</CycleStartConditions>

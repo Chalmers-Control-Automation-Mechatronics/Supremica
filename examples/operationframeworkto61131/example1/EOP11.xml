@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Created with Liquid XML Studio 6.1.15.0 - FREE Community Edition (http://www.liquid-technologies.com) -->
+<Operation opID="11">
+	<Type>basic</Type>
+	<Comment>drive part in position</Comment>
+	<Machine>C1C2</Machine>
+	<EOP>
+		<InternalComponents>
+			<Sensor>C1</Sensor>
+			<Sensor>C2</Sensor>
+		</InternalComponents>
+		<InitialState>
+			<InitialStateCheck>
+				<AlarmType>1</AlarmType>
+				<AlarmDelay>0</AlarmDelay>
+			</InitialStateCheck>
+		</InitialState>
+		<Action actionNbr="1">
+			<ZoneState>
+				<Zone>1</Zone>
+				<State>b</State>
+			</ZoneState>
+		</Action>
+		<Action actionNbr="2">
+			<SensorValue>
+				<Sensor>C1</Sensor>
+				<Value>part in position</Value>
+			</SensorValue>
+			<SensorValue>
+				<Sensor>C2</Sensor>
+				<Value>on</Value>
+			</SensorValue>
+			<ZoneState>
+				<Zone>1</Zone>
+				<State>b</State>
+			</ZoneState>
+		</Action>
+		<Action actionNbr="3">
+			<SensorValue>
+				<Sensor>C1</Sensor>
+				<Value>part in position</Value>
+			</SensorValue>
+			<SensorValue>
+				<Sensor>C2</Sensor>
+				<Value>on</Value>
+			</SensorValue>
+			<ZoneState>
+				<Zone>1</Zone>
+				<State>f</State>
+			</ZoneState>
+		</Action>
+	</EOP>
+</Operation>

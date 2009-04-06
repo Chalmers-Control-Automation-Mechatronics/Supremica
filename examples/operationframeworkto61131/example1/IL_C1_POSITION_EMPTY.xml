@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Created with Liquid XML Studio 6.1.15.0 - FREE Community Edition (http://www.liquid-technologies.com) -->
+<IL id="IL_C1C2C1_POSITION_EMPTY" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="C:\Project100\WorkSpace\PLC_OBJ\xml\xsd\IL_1.1.xsd">
+	<Comment>IL for Belt Conveyor C1, pick up position empty</Comment>
+	<Machine>C1C2</Machine>
+	<Operation>part in position</Operation>
+	<Actuator>C1</Actuator>
+	<ILStructure>
+		<InternalComponents>
+			<Actuator>C1</Actuator>
+		</InternalComponents>
+		<Term row="1" mode="A">
+			<ActuatorValue>
+				<Actuator>C1</Actuator>
+				<Value>*</Value>
+			</ActuatorValue>
+		</Term>
+	</ILStructure>
+</IL>

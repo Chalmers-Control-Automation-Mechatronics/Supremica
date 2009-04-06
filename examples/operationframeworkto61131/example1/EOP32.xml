@@ -1,0 +1,60 @@
+﻿<Operation opID="32">
+    <Type>basic</Type>
+    <Comment>move to home position</Comment>
+    <Machine>C1F1</Machine>
+    <EOP>
+    
+        <InternalComponents>
+            <Actuator>C1</Actuator>
+            <Actuator>C2</Actuator>
+            <Actuator>C3</Actuator>
+            <Sensor>C4</Sensor>
+        </InternalComponents>
+
+        <InitialState>
+            <ActuatorValue>
+                <Actuator>C1</Actuator>
+                <Value>home</Value>
+            </ActuatorValue>
+            <ActuatorValue>
+                <Actuator>C2</Actuator>
+                <Value>locked</Value>
+            </ActuatorValue>
+            <ActuatorValue>
+                <Actuator>C3</Actuator>
+                <Value>open</Value>
+            </ActuatorValue>
+            <SensorValue>
+                <Sensor>C4</Sensor>
+                <Value>on</Value>
+            </SensorValue>
+            <InitialStateCheck>
+                <AlarmType>1</AlarmType>
+                <AlarmDelay>0</AlarmDelay>
+            </InitialStateCheck>
+        </InitialState>
+
+        <Action actionNbr="1">
+            <ActuatorValue>
+                <Actuator>C1</Actuator>
+                <Value>home</Value>
+            </ActuatorValue>
+            <ActuatorValue>
+                <Actuator>C2</Actuator>
+                <Value>locked</Value>
+            </ActuatorValue>
+            <ActuatorValue>
+                <Actuator>C3</Actuator>
+                <Value>close</Value>
+            </ActuatorValue>
+            <SensorValue>
+                <Sensor>C4</Sensor>
+                <Value>on</Value>
+            </SensorValue>
+        </Action>
+
+    </EOP>
+</Operation>
+
+
+

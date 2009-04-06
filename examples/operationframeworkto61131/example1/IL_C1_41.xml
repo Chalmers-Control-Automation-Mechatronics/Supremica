@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Created with Liquid XML Studio 6.1.15.0 - FREE Community Edition (http://www.liquid-technologies.com) -->
+<IL id="IL_C1_41" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="C:\Project100\WorkSpace\PLC_OBJ\xml\xsd\IL_1.2.xsd">
+	<Comment>IL for fixture C1 41, move in/out product</Comment>
+	<Machine>C1C1</Machine>
+	<Operation>41</Operation>
+	<Actuator>C1</Actuator>
+	<ILStructure>
+		<InternalComponents>
+			<Actuator>C1</Actuator>
+		</InternalComponents>
+		<ExternalComponents>
+			<ExternalComponent>
+				<Component>C1</Component>
+				<Machine>C1F1</Machine>
+			</ExternalComponent>
+			<ExternalComponent>
+				<Component>C4</Component>
+				<Machine>C1R1</Machine>
+			</ExternalComponent>
+		</ExternalComponents>
+		<Zones>
+			<Zone>2</Zone>
+			<Zone>3</Zone>
+		</Zones>
+		<Operations>
+			<Operation>-</Operation>
+		</Operations>
+		<Term row="1" mode="A">
+			<ActuatorValue>
+				<Actuator>C1</Actuator>
+				<Value>*</Value>
+			</ActuatorValue>
+			<ExternalComponentValue>
+				<ExternalComponent>
+					<Component>C1</Component>
+					<Machine>C1F1</Machine>
+				</ExternalComponent>
+				<Value>home</Value>
+			</ExternalComponentValue>
+			<ExternalComponentValue>
+				<ExternalComponent>
+					<Component>C4</Component>
+					<Machine>C1R1</Machine>
+				</ExternalComponent>
+				<Value>on</Value>
+			</ExternalComponentValue>
+			<ZoneCheck>
+				<BeforeZones>
+					<Zone>2</Zone>
+					<Zone>3</Zone>
+				</BeforeZones>
+				<AfterZones>
+					<Zone>-</Zone>
+				</AfterZones>
+			</ZoneCheck>
+			<OperationCheck>
+				<NotStarted>
+					<Operation>-</Operation>
+				</NotStarted>
+				<NotOngoing>
+					<Operation>-</Operation>
+				</NotOngoing>
+			</OperationCheck>
+		</Term>
+	</ILStructure>
+</IL>

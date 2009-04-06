@@ -1,0 +1,35 @@
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xmlns="http://www.plcopen.org/xml/tc6.xsd"
+         xmlns:xhtml="http://www.w3.org/1999/xhtml"
+         xsi:schemaLocation="http://www.plcopen.org/xml/tc6.xsd">
+  <fileHeader companyName="CTH"
+              companyURL="www.chalmers.se"
+              productName="FIX1"
+              productVersion="1.0"
+              creationDateTime="2008-03-19T20:31:26"/>
+  <contentHeader name="Cell Example "
+                 version="1.0"
+                 modificationDateTime="2008-04-09T20:25:24"
+                 organization="SS2"
+                 author="CTH SS2"
+                 language="en-US">
+     <coordinateInfo>
+      <fbd>
+        <scaling x="0" y="0"/>
+      </fbd>
+      <ld>
+        <scaling x="0" y="0"/>
+      </ld>
+      <sfc>
+        <scaling x="0" y="0"/>
+      </sfc>
+    </coordinateInfo>
+  </contentHeader>
+  <types>
+    <dataTypes/>
+    <pous/>
+  </types>
+  <instances>
+    <configurations/>
+  </instances>
+</project>

@@ -1,0 +1,165 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Created with Liquid XML Studio 6.1.15.0 - FREE Community Edition (http://www.liquid-technologies.com) -->
+<IL id="IL_F1C1_HOME_POS" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="C:\Project100\WorkSpace\PLC_OBJ\xml\xsd\IL_1.1.xsd" >
+  <Comment>IL for fixture F1 home pos</Comment>
+  <Machine>C1F1</Machine>
+  <Operation>home</Operation>
+  <Actuator>C1</Actuator>
+  <ILStructure>
+    <InternalComponents>
+      <Actuator>C1</Actuator>
+      <Actuator>C2</Actuator>
+	  <Actuator>C3</Actuator>
+      <Sensor>C4</Sensor>
+    </InternalComponents>
+    <ExternalComponents>
+      <ExternalComponent>
+        <Component>C1</Component>
+        <Machine>C1C1</Machine>
+      </ExternalComponent>
+    </ExternalComponents>
+    <Zones>
+      <Zone>-</Zone>
+    </Zones>
+    <Operations>
+      <Operation>24</Operation>
+    </Operations>
+    <Term row="1" mode="M">
+      <ActuatorValue>
+        <Actuator>C1</Actuator>
+        <Value>*</Value>
+      </ActuatorValue>
+      <ActuatorValue>
+        <Actuator>C2</Actuator>
+        <Value>unlocked</Value>
+      </ActuatorValue>
+       <ActuatorValue>
+        <Actuator>C3</Actuator>
+        <Value>*</Value>
+      </ActuatorValue>
+      <SensorValue>
+        <Sensor>C4</Sensor>
+        <Value>off</Value>
+      </SensorValue>
+		  <ExternalComponentValue>
+        <ExternalComponent>
+          <Component>C1</Component>
+          <Machine>C1C1</Machine>
+        </ExternalComponent>
+        <Value>-</Value>
+      </ExternalComponentValue>
+	  <ZoneCheck>
+        <BeforeZones>
+          <Zone>-</Zone>
+        </BeforeZones>
+        <AfterZones>
+          <Zone>-</Zone>
+        </AfterZones>
+      </ZoneCheck>
+	   <OperationCheck>
+        <NotStarted>
+          <Operation>-</Operation>
+        </NotStarted>
+        <NotOngoing>
+          <Operation>-</Operation>
+        </NotOngoing>
+      </OperationCheck>
+      
+    
+    </Term>
+	
+	
+	    <Term row="2" mode="M">
+      <ActuatorValue>
+        <Actuator>C1</Actuator>
+        <Value>*</Value>
+      </ActuatorValue>
+      <ActuatorValue>
+        <Actuator>C2</Actuator>
+        <Value>unlocked</Value>
+      </ActuatorValue>
+       <ActuatorValue>
+        <Actuator>C3</Actuator>
+        <Value>close</Value>
+      </ActuatorValue>
+      <SensorValue>
+        <Sensor>C4</Sensor>
+        <Value>on</Value>
+      </SensorValue>
+			
+			 <ExternalComponentValue>
+        <ExternalComponent>
+          <Component>C1</Component>
+          <Machine>C1C1</Machine>
+        </ExternalComponent>
+        <Value>-</Value>
+      </ExternalComponentValue>
+	  <ZoneCheck>
+        <BeforeZones>
+          <Zone>-</Zone>
+        </BeforeZones>
+        <AfterZones>
+          <Zone>-</Zone>
+        </AfterZones>
+      </ZoneCheck>
+	   <OperationCheck>
+        <NotStarted>
+          <Operation>24</Operation>
+        </NotStarted>
+        <NotOngoing>
+          <Operation>-</Operation>
+        </NotOngoing>
+      </OperationCheck>
+      
+     
+    </Term>
+	
+	
+	    <Term row="3" mode="A">
+      <ActuatorValue>
+        <Actuator>C1</Actuator>
+        <Value>*</Value>
+      </ActuatorValue>
+      <ActuatorValue>
+        <Actuator>C2</Actuator>
+        <Value>unlocked</Value>
+      </ActuatorValue>
+       <ActuatorValue>
+        <Actuator>C3</Actuator>
+        <Value>open</Value>
+      </ActuatorValue>
+	  
+      <SensorValue>
+        <Sensor>C4</Sensor>
+        <Value>*</Value>
+      </SensorValue>
+			 <ExternalComponentValue>
+        <ExternalComponent>
+          <Component>C1</Component>
+          <Machine>C1C1</Machine>
+        </ExternalComponent>
+        <Value>-</Value>
+      </ExternalComponentValue>
+	  
+	  <ZoneCheck>
+        <BeforeZones>
+          <Zone>-</Zone>
+        </BeforeZones>
+        <AfterZones>
+          <Zone>-</Zone>
+        </AfterZones>
+      </ZoneCheck>
+	  
+	   <OperationCheck>
+        <NotStarted>
+          <Operation>-</Operation>
+        </NotStarted>
+        <NotOngoing>
+          <Operation>-</Operation>
+        </NotOngoing>
+      </OperationCheck>
+      
+     
+    </Term>
+    </ILStructure>
+</IL>

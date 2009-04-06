@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Created with Liquid XML Studio 6.1.15.0 - FREE Community Edition (http://www.liquid-technologies.com) -->
+<ROP id="C1R1_A" type="COP">
+	<Machine>C1R1</Machine>
+	<CC>A</CC>
+	<Comment>The robot</Comment>
+	<Relation type="Sequence">
+		<Activity>
+			<Operation>20</Operation>
+		</Activity>
+		<Activity>
+			<Precondition>
+				<Predecessor>
+					<Machine>C1C2</Machine>
+					<Operation>11</Operation>
+				</Predecessor>
+			</Precondition>
+			<Operation>21</Operation>
+		</Activity>
+		<Activity>
+			<Precondition>
+				<Predecessor>
+					<Machine>C1F1</Machine>
+					<Operation>31</Operation>
+				</Predecessor>
+			</Precondition>
+			<Operation>22</Operation>
+		</Activity>
+		<Activity>
+			<Precondition>
+				<Predecessor>
+					<Machine>C1F1</Machine>
+					<Operation>32</Operation>
+				</Predecessor>
+			</Precondition>
+			<Operation>23</Operation>
+		</Activity>
+		<Activity>
+			<Precondition>
+				<Predecessor>
+					<Machine>C1F1</Machine>
+					<Operation>33</Operation>
+				</Predecessor>
+			</Precondition>
+			<Operation>24</Operation>
+		</Activity>
+	</Relation>
+</ROP>
