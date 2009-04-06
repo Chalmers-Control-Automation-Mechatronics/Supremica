@@ -1,0 +1,72 @@
+
+-------------------------PLCopen XML code generation-------------------------------
+Run the program:
+This program can be started from class org.supremica.external.operationframeworkto61131.main.GUI. The location of the input/output files can be specified in the GUI. 
+It's also possible to run the program without the GUI at class org.supremica.external.operationframeworkto61131.main.PLCopenXMLConverter where the location of input/output files are specified by the configuration file config.xml.
+
+
+Things may need to be changed in configuration file to run the program:
+
+--Location and Initialization of config.xml
+The default location of this config.xml file is at "./" of the working directory. Its name and location can be changed in Class:
+
+org.supremica.external.operationframeworkto61131.main.PLCopenXMLConverter
+at line:
+private Boolean isInitialized = Constant.initialize("./", "config.xml");
+
+
+-- XML file binding context setting
+1.Implementation of EquipmentStateLookUp
+The entry with key="EQUIPMENT_STATE_LOOK_UP_IMPLEMENT"  defines the name of the implementation class of the interface EquipmentStateLookUp. The name of this implementation class has to be changed if the package name of the program has been changed.
+
+2. Package names of JAXB derived classes 
+The program also gets package names of the classes derived by JAXB from XML schema files from this section. The name of packages should be consistent with the location of the derived classes.
+
+
+
+-- Input and output file
+1.Names and locations of input files
+The location of input files will be override and specified by user from GUI when the program is running in GUI. The locations defined here works when the program is running directly in operationframeworkto61131.main.PLCopenXMLConverter without GUI.
+
+2.input001.xml
+It's a empty PLCopen XML project file. It will be loaded and works as an empty template. 
+
+3.output001.xml
+It's the name of the output file. The location of the output file can be overridden by the GUI.
+
+
+
+-------------------------RSLogix Ladder generation-------------------------------
+The main class is rslogix.RSLogixLadderBuilder. At the beginning of
+this class, the location of the input PLCopen xml file and the location of the
+output L5K file can be changed:
+
+The location of input PLCopen xml file:
+        private String manualInputFile = ".\\RSLogix5000\\ladderTest.xml";
+
+The location of output RSLogix 5000 L5K text file
+        private String outputFile = ".\\RSLogix5000\\test.L5K";
+
+		
+The default directory is at .\runtimeinformation\RSLogix5000, the header file
+and footer file which
+are copied from a default RSLogix project are also in this directory.
+
+
+You can do the covertion in the following steps:
+1. Open the ladderTest.xml with PLCopen Editor from beremiz, modify it/Creat a new Ladder.
+
+2. Change the value of the variable manualInputFile in
+converter.rslogix.RSLogixLadderBuilder
+to point to the file you created/modified.
+3. Run converter.rslogix.RSLogixLadderBuilder.main().
+4. Open the output L5K file with RSLogix 5000. The Routine is named
+IL_test in the main Program.
+
+
+The name of Pou to be converted is specified in method 
+List<Pou> getILPouList(org.plcopen.xml.tc6.Project plcopenProject)
+in class RSLogixLadderBuilder. By default one specified Ladder will be loaded and converted. A list of Ladder with the same prefix can be loaded by uncomment the line if (iPou.getName().startsWith(ILPrefix)) and specified the value of ILPrefix.
+
+
+config.xml is also needed to run this program.
