@@ -9,7 +9,7 @@
 <entry key="FB_REUSE">true</entry>
 
 <!-- XML file binding context setting-->
-<entry key="EQUIPMENT_STATE_LOOK_UP_IMPLEMENT">converter.controlinfo.ControlInformation</entry>
+<entry key="EQUIPMENT_STATE_LOOK_UP_IMPLEMENT">org.supremica.external.operationframeworkto61131.controlinfo.ControlInformation</entry>
 <!--<entry key="EQUIPMENT_STATE_LOOK_UP_IMPLEMENT">org.supremica.external.manufacturingtables2plcopen.controlinfo.ControlInformation</entry>-->
 
 <entry key="COP_XML_CONTEXT">org.supremica.manufacturingtables.xsd.rop</entry>
@@ -27,7 +27,7 @@
 <!-- Input and output file and path -->
 <!-- <entry key="XML_FILE_PATH">xml/manufacturingTables/</entry> -->
 
-<entry key="XML_FILE_PATH">xml/COPsEOPs/</entry>
+<entry key="XML_FILE_PATH">xml/COPsEOPs_ExampleCell/</entry>
 <entry key="VIRTUAL_RESOURCES_XML_FILE_NAME">Virtual_Resources_Example_Cell_v3.xml</entry>
 <entry key="PHYSICALRESOURCE_XML_FILE_NAME">Physical_Resources_Example_Cell.xml</entry>
 <entry key="CONTROL_INFO_XML_FILE_NAME">PhysicalResource_With_Control_infomation.xml</entry>
