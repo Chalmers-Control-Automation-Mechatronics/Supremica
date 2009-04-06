@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
+<properties>
+
+<comment>1234</comment>
+
+<entry key="CELL_NAME">C1</entry>
+
+<entry key="FB_REUSE">true</entry>
+
+<!-- XML file binding context setting-->
+<entry key="EQUIPMENT_STATE_LOOK_UP_IMPLEMENT">converter.controlinfo.ControlInformation</entry>
+<!--<entry key="EQUIPMENT_STATE_LOOK_UP_IMPLEMENT">org.supremica.external.manufacturingtables2plcopen.controlinfo.ControlInformation</entry>-->
+
+<entry key="COP_XML_CONTEXT">org.supremica.manufacturingtables.xsd.rop</entry>
+<entry key="EOP_XML_CONTEXT">org.supremica.manufacturingtables.xsd.eop</entry>
+<entry key="PLC_OPEN_TC6">org.plcopen.xml.tc6</entry>
+<entry key="VIRTUAL_RESOURCES_XML_CONTEXT">org.supremica.manufacturingtables.xsd.virtualResourcesV3</entry>
+<entry key="PHYSICALRESOURCE_XML_CONTEXT">org.supremica.manufacturingtables.xsd.physicalResource</entry>
+<entry key="CONTROL_INFO_XML_CONTEXT">org.supremica.manufacturingtables.xsd.controlInformation</entry>
+<entry key="FID_XML_CONTEXT">org.supremica.manufacturingtables.xsd.fid</entry>
+<entry key="INTERLOCK_XML_CONTEXT">org.supremica.manufacturingtables.xsd.interlock</entry>
+<entry key="CC_XML_CONTEXT">org.supremica.manufacturingtables.xsd.cc</entry>
+
+
+
+<!-- Input and output file and path -->
+<!-- <entry key="XML_FILE_PATH">xml/manufacturingTables/</entry> -->
+
+<entry key="XML_FILE_PATH">xml/COPsEOPs/</entry>
+<entry key="VIRTUAL_RESOURCES_XML_FILE_NAME">Virtual_Resources_Example_Cell_v3.xml</entry>
+<entry key="PHYSICALRESOURCE_XML_FILE_NAME">Physical_Resources_Example_Cell.xml</entry>
+<entry key="CONTROL_INFO_XML_FILE_NAME">PhysicalResource_With_Control_infomation.xml</entry>
+<entry key="FID_XML_FILE_NAME">fid.xml</entry>
+<entry key="CC_XML_FILE_NAME">CC.xml</entry>
+<entry key="PLCOPEN_IN_PUT_FILE">input001.xml</entry>
+<entry key="PLCOPEN_OUT_PUT_FILE">output001.xml</entry>
+<entry key="PLCOPEN_VARLIST_OUT_PUT_FILE">VariableList.txt</entry>
+<entry key="PLCOPEN_OUT_PUT_FILE_PATH">C:/</entry>
+
+<!--<entry key="PLCOPEN_OUT_PUT_FILE_PATH">C:/Project100/MyDocuments/Desktop/</entry>-->
+<!--<entry key="PLCOPEN_OUT_PUT_FILE_PATH">C:/Documents and Settings/HAHA/Desktop/</entry>-->
+
+
+
+
+<!-- Factory name and recource name-->
+<entry key="CONFIGURATION_NAME">Example_factory002</entry>
+<entry key="RESOURCE_NAME">Example_cell002</entry>
+
+
+
+<!-- Keywords prefix-->
+<!-- COP xml files prefix-->
+<entry key="COP_PREFIX">COP</entry>
+
+<!-- EOP xml files prefix-->
+<entry key="EOP_PREFIX">EOP</entry>
+
+<!-- Interlock xml files prefix-->
+<entry key="INTERLOCK_PREFIX">IL</entry>
+
+
+
+
+
+
+
+<!-- Physical Resource root element-->
+<entry key="FACTORY">Factory</entry>
+<entry key="VIRTUAL_RESOURCES">VirtualResources</entry>
+<entry key="STATE_IGNORE_SIGN">*</entry>
+<entry key="STATE_SKIP_SIGN">-</entry>
+<entry key="STATE_INITIAL_SIGN">-i</entry>
+<entry key="SFC_VAR_NAME_PREFIX_OP">Op</entry>
+<entry key="SFC_VAR_NAME_POSTFIX_START">_start</entry>
+<entry key="SFC_VAR_NAME_POSTFIX_END">_end</entry>
+<entry key="STEP_PREFIX">S</entry>
+<entry key="QUALIFIER_S">S</entry>
+<entry key="QUALIFIER_N">N</entry>
+<entry key="ZONE_STATE_BOOK">b</entry>
+<entry key="ZONE_STATE_UNBOOK">f</entry>
+<entry key="ERROR_VARIABLE_NAME">ERROR_VAR</entry>
+
+<!-- SFC graphic configuration-->
+<entry key="TransitionHeight">2</entry>
+<entry key="TransitionWidth">20</entry>
+<entry key="InVariableHeight">30</entry>
+<entry key="InVariableWidthUnit">10</entry>
+<entry key="BlockANDHeightUnit">45</entry>
+<entry key="BlockANDWidth">70</entry>
+<entry key="StepHeight">32</entry>
+<entry key="StepWidth">54</entry>
+<entry key="ActionBlockHeight">30</entry>
+<entry key="ActionBlockWidthExtendUnit">12</entry>
+<entry key="DistanceStepToTransition">80</entry>
+<entry key="DistanceConditionToTransition">60</entry>
+<entry key="DistanceActionBlockToStep">80</entry>
+<entry key="DistanceInVariableToBlock">20</entry>
+<entry key="DistanceStepToJumpStep">65</entry>
+<entry key="DistanceInVariableToFunctionBlock">60</entry>	
+<entry key="StepToTransitionExtendUnit">25</entry>
+<entry key="InitStepPositionX">509</entry>
+<entry key="InitStepPositionY">34</entry>
+<entry key="JumpStepHeight">13</entry>
+<entry key="JumpStepWidth">12</entry>
+<entry key="FunctionBlockPositionX">820</entry>	
+<entry key="FunctionBlockPositionY">50</entry>		
+<entry key="FunctionBlockANDDistance">5</entry>	
+<entry key="InitStepName">init</entry>
+
+
+
+
+
+</properties>
+
+ 
