@@ -1,0 +1,43 @@
+﻿(*********************************************
+
+  Import-Export
+  Version   := RSLogix 5000 v16.03
+  Owner     := VMWARE, Chalmers
+  Exported  := Thu Jan 29 14:50:36 2009
+**********************************************)
+IE_VER := 2.7;
+
+CONTROLLER Test_LD_001 (ProcessorType := "1756-L55",
+                        Major := 16,
+                        TimeSlice := 20,
+                        ShareUnusedTimeSlice := 1,
+                        RedundancyEnabled := 0,
+                        KeepTestEditsOnSwitchOver := 0,
+                        DataTablePadPercentage := 50,
+                        SecurityCode := 0,
+                        SFCExecutionControl := "CurrentActive",
+                        SFCRestartPosition := "MostRecent",
+                        SFCLastScan := "DontScan",
+                        SerialNumber := 16#0000_0000,
+                        MatchProjectToController := No,
+                        InhibitAutomaticFirmwareUpdate := 0)
+			
+			
+	MODULE Local (Parent := "Local",
+	              ParentModPortId := 1,
+	              CatalogNumber := "1756-L55",
+	              Vendor := 1,
+	              ProductType := 14,
+	              ProductCode := 51,
+	              Major := 16,
+	              Minor := 2,
+	              PortLabel := "RxBACKPLANE",
+	              ChassisSize := 10,
+	              Slot := 0,
+	              Mode := 2#0000_0000_0000_0000,
+	              CompatibleModule := 0,
+	              KeyMask := 2#0000_0000_0001_1111)
+	END_MODULE
+
+	TAG
+	END_TAG
