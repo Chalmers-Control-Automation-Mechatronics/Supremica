@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema 
+	xmlns:xs="http://www.w3.org/2001/XMLSchema"
+	xmlns:jaxb="http://java.sun.com/xml/ns/jaxb" jaxb:version="1.0"
+	elementFormDefault="qualified"
+	attributeFormDefault="unqualified"
+	version="1.0">  
+
+
+ <!-- Definition of simple types ___________________________________-->
+ <xs:simpleType name="nameType">
+  <xs:restriction base="xs:string">
+  </xs:restriction>
+ </xs:simpleType>
+
+ <xs:simpleType name="ownerType">
+  <xs:restriction base="xs:string">
+  </xs:restriction>
+ </xs:simpleType>
+ 
+
+ 
+
+ <!-- Definition of simple elements ________________________________-->
+ <xs:element name="InitialValue" type="xs:string"/>
+ <xs:element name="Zone" type="xs:string"/>
+
+
+ <xs:element name="FunctionBlock" type="xs:string"/> 
+ <xs:element name="ValueName" type="xs:string"/>
+ <xs:element name="OrderVar" type="xs:string"/>
+ <xs:element name="FeedbackVar" type="xs:string"/>
+ 
+  <xs:simpleType name="idType">
+  <xs:restriction base="xs:string">
+  </xs:restriction>
+ </xs:simpleType>
+
+
+ <!-- Definition of complex elements _______________________________-->
+ <xs:element name="VirtualResources">
+  <xs:complexType>
+   <xs:sequence>
+   <xs:element ref="Zones" minOccurs="0" maxOccurs="1"/>
+   <xs:element ref="Variables" minOccurs="0" maxOccurs="1"/>
+   </xs:sequence>  
+   <xs:attribute name="cellName" type="nameType" use="required"/>
+  </xs:complexType>
+ </xs:element>
+
+ <xs:element name="Zones">
+  <xs:complexType>
+   <xs:sequence>
+   <xs:element ref="Zone" minOccurs="1" maxOccurs="unbounded"/>
+   </xs:sequence>  
+  </xs:complexType>
+ </xs:element>
+
+ <xs:element name="Variables">
+  <xs:complexType>
+   <xs:sequence>
+   <xs:element ref="Variable" minOccurs="1" maxOccurs="unbounded"/>
+   </xs:sequence>  
+  </xs:complexType>
+ </xs:element>
+
+ <xs:element name="Variable">
+  <xs:complexType>
+   <xs:sequence>
+   <xs:element ref="FunctionBlock" minOccurs="0" maxOccurs="1"/>
+   <xs:element ref="Values" minOccurs="1" maxOccurs="1"/>
+   <xs:element ref="InitialValue" minOccurs="1" maxOccurs="1"/>
+   </xs:sequence>  
+   <xs:attribute name="name" type="nameType" use="required"/>
+   <xs:attribute name="owner" type="ownerType" use="required"/>
+  </xs:complexType>
+ </xs:element>
+
+ <xs:element name="Values">
+  <xs:complexType>
+   <xs:sequence>
+   <xs:element ref="Value" minOccurs="1" maxOccurs="unbounded"/>
+   </xs:sequence>  
+  </xs:complexType>
+ </xs:element>
+ 
+ 
+ 
+  <xs:element name="Value">
+  <xs:complexType>
+   <xs:sequence>
+   <xs:element ref="ValueName" minOccurs="1" maxOccurs="1"/>
+   <xs:element ref="OrderVar" minOccurs="0" maxOccurs="1"/>
+   <xs:element ref="FeedbackVar" minOccurs="0" maxOccurs="1"/>
+   </xs:sequence>  
+   <xs:attribute name="id" type="idType" use="required"/>
+  </xs:complexType>
+ </xs:element>
+
+
+</xs:schema>
+

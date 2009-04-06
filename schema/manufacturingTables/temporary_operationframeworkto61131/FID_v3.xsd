@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema 
+	xmlns:xs="http://www.w3.org/2001/XMLSchema"
+	xmlns:jaxb="http://java.sun.com/xml/ns/jaxb" jaxb:version="2.0"
+	elementFormDefault="qualified"
+	attributeFormDefault="unqualified"
+	version="1.0">  
+
+
+ <xs:element name="FunctionBlocks">
+  <xs:complexType>
+   <xs:sequence>
+   <xs:element name="Documentation" type="xs:string" minOccurs="0" maxOccurs="1"/>
+   <xs:element ref="FunctionBlock" minOccurs="1" maxOccurs="unbounded"/>
+   </xs:sequence>  
+   <xs:attribute name="ID" type="xs:string" use="required"/>
+   <xs:attribute name="Version" type="xs:string"/>
+   <xs:attribute name="Vendor" type="xs:string"/>
+   <xs:attribute name="User" type="xs:string"/>
+ </xs:complexType>
+ </xs:element>
+
+ 
+ <xs:element name="FunctionBlock">
+  <xs:complexType>
+   <xs:sequence>
+   <xs:element name="Documentation" type="xs:string" minOccurs="0" maxOccurs="1"/>
+   <xs:element ref="SystemInterface" minOccurs="0" maxOccurs="1"/>
+   <xs:element ref="UserInterface" minOccurs="0" maxOccurs="1"/>
+   </xs:sequence>  
+   <xs:attribute name="Type" type="xs:string" use="required"/>
+   <xs:attribute name="InstanceName" type="xs:string" />
+  </xs:complexType>
+ </xs:element>
+
+
+ <xs:element name="SystemInterface">
+  <xs:complexType>
+   <xs:sequence>
+   <xs:element ref="SystemConnection" minOccurs="0" maxOccurs="unbounded"/>
+   </xs:sequence>  
+  </xs:complexType>
+ </xs:element>
+ 
+ <xs:element name="UserInterface">
+  <xs:complexType>
+   <xs:sequence>
+   <xs:element ref="UserConnection" minOccurs="0" maxOccurs="unbounded"/>
+   </xs:sequence>  
+  </xs:complexType>
+ </xs:element>
+ 
+ 
+ 
+
+ <xs:element name="SystemConnection">
+  <xs:complexType>
+   <xs:sequence>
+   <xs:element name="FunctionType" type="functionType" minOccurs="0" maxOccurs="1"/>
+	<xs:element name="IOType" type="ioType" minOccurs="1" maxOccurs="1"/>
+	<xs:element name="DataType" type="dataType" minOccurs="1" maxOccurs="1"/>
+	<xs:element name="Param" type="xs:string" minOccurs="1" maxOccurs="unbounded"/>
+	<xs:element ref="Variable" minOccurs="0" maxOccurs="unbounded"/>
+	<xs:element name="InitValue" type="xs:string" minOccurs="0" maxOccurs="1"/>
+	</xs:sequence>  
+   <xs:attribute name="StateID" type="xs:integer" use="required"/>
+  </xs:complexType>
+ </xs:element>
+
+ 
+ 
+ <xs:element name="UserConnection">
+  <xs:complexType>
+   <xs:sequence>
+	<xs:element name="IOType" type="ioType" minOccurs="1" maxOccurs="1"/>
+	<xs:element name="DataType" type="dataType" minOccurs="1" maxOccurs="1"/>
+	<xs:element name="Param" type="xs:string" minOccurs="1" maxOccurs="unbounded"/>
+	<xs:element ref="Variable" minOccurs="0" maxOccurs="unbounded"/>
+	<xs:element name="InitValue" type="xs:string" minOccurs="0" maxOccurs="1"/>
+	</xs:sequence>  
+  </xs:complexType>
+ </xs:element>
+
+<xs:element name="Variable" type="xs:string"/>
+ 
+
+ <xs:simpleType name="functionType">
+  <xs:restriction base="xs:string">
+    <xs:enumeration value="RequestVar"/>
+    <xs:enumeration value="FeedbackVar"/>
+    <xs:enumeration value="IOVariable"/>
+    <xs:enumeration value="IOAddress"/>
+	<xs:enumeration value="Indicator"/>
+	<xs:enumeration value="Interlock"/>
+  </xs:restriction>
+ </xs:simpleType>
+
+ <xs:simpleType name="ioType">
+  <xs:restriction base="xs:string">
+    <xs:enumeration value="Input"/>
+    <xs:enumeration value="Output"/>
+  </xs:restriction>
+ </xs:simpleType>
+
+ <xs:simpleType name="dataType">
+  <xs:restriction base="xs:string">
+    <xs:enumeration value="String"/>
+    <xs:enumeration value="Integer"/>
+	<xs:enumeration value="Boolean"/>
+	<xs:enumeration value="Float"/>
+  </xs:restriction>
+ </xs:simpleType>
+
+
+</xs:schema>
+

@@ -1,0 +1,224 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema 
+	xmlns:xs="http://www.w3.org/2001/XMLSchema"
+	xmlns:jaxb="http://java.sun.com/xml/ns/jaxb" jaxb:version="2.0"
+	elementFormDefault="qualified"
+	attributeFormDefault="unqualified"
+	version="1.0">  
+
+
+ <!-- Definition of simple types ___________________________________-->
+ <xs:simpleType name="machineType">
+  <xs:restriction base="xs:string">
+    <xs:enumeration value="Conveyor"/>
+    <xs:enumeration value="Robot"/>
+    <xs:enumeration value="Memory"/>
+    <xs:enumeration value="Fixture"/>
+    <xs:enumeration value="TurnTable"/>
+    <xs:enumeration value="Other"/>
+  </xs:restriction>
+ </xs:simpleType>
+
+ <xs:simpleType name="controlSystemType">
+  <xs:restriction base="xs:string">
+    <xs:enumeration value="Yes"/>
+    <xs:enumeration value="No"/>
+  </xs:restriction>
+ </xs:simpleType>
+
+ <xs:simpleType name="equipmentType">
+  <xs:restriction base="xs:string">
+    <xs:enumeration value="Actuator"/>
+    <xs:enumeration value="Sensor"/>
+  </xs:restriction>
+ </xs:simpleType>
+
+ <xs:simpleType name="elementType">
+  <xs:restriction base="xs:string">
+    <xs:enumeration value="Actuator"/>
+    <xs:enumeration value="Sensor"/>
+  </xs:restriction>
+ </xs:simpleType>
+
+ <xs:simpleType name="nameType">
+  <xs:restriction base="xs:string">
+  </xs:restriction>
+ </xs:simpleType>
+ 
+
+
+
+
+ <!-- Definition of simple elements ________________________________-->
+ <xs:element name="Value" type="xs:string"/>
+ <xs:element name="InitialValue" type="xs:string"/>
+ <xs:element name="Description" type="xs:string"/>
+ <xs:element name="Zone" type="xs:string"/>
+ 
+  <xs:element name="StateName" type="xs:string"/>
+ <xs:element name="FunctionBlock" type="xs:string"/>
+ <xs:element name="IOVariable" type="xs:string"/>
+ <xs:element name="IOAddress" type="xs:string"/>
+  <xs:element name="Address" type="xs:string"/>
+ <!-- Definition of complex elements _______________________________-->
+ <xs:element name="Factory">
+  <xs:complexType>
+   <xs:sequence>
+   <xs:element ref="Description" minOccurs="0" maxOccurs="1"/>
+   <xs:element ref="Areas" minOccurs="1" maxOccurs="1"/>
+   </xs:sequence>  
+   <xs:attribute name="name" type="nameType" use="required"/>
+ </xs:complexType>
+ </xs:element>
+
+ <xs:element name="Areas">
+  <xs:complexType>
+   <xs:sequence>
+   <xs:element ref="Area" minOccurs="1" maxOccurs="unbounded"/>
+   </xs:sequence>  
+  </xs:complexType>
+ </xs:element>
+
+ <xs:element name="Area">
+  <xs:complexType>
+   <xs:sequence>
+   <xs:element ref="Description" minOccurs="0" maxOccurs="1"/>
+   <xs:element ref="Cells" minOccurs="1" maxOccurs="1"/>
+   </xs:sequence>  
+   <xs:attribute name="name" type="nameType" use="required"/>
+  </xs:complexType>
+ </xs:element>
+
+ <xs:element name="Cells">
+  <xs:complexType>
+   <xs:sequence>
+   <xs:element ref="Cell" minOccurs="1" maxOccurs="unbounded"/>
+   </xs:sequence>  
+  </xs:complexType>
+ </xs:element>
+
+ <xs:element name="Cell">
+  <xs:complexType>
+   <xs:sequence>
+   <xs:element ref="Description" minOccurs="0" maxOccurs="1"/>
+   <xs:element ref="Machines" minOccurs="1" maxOccurs="1"/>
+   </xs:sequence>  
+   <xs:attribute name="name" type="nameType" use="required"/>
+  </xs:complexType>
+ </xs:element>
+
+ <xs:element name="Machines">
+  <xs:complexType>
+   <xs:sequence>
+   <xs:element ref="Machine" minOccurs="1" maxOccurs="unbounded"/>
+   </xs:sequence>  
+  </xs:complexType>
+ </xs:element>
+
+ <xs:element name="Machine">
+  <xs:complexType>
+   <xs:sequence>
+   <xs:element ref="Description" minOccurs="0" maxOccurs="1"/>
+   <xs:element ref="Equipment" minOccurs="0" maxOccurs="1"/>
+   </xs:sequence>  
+   <xs:attribute name="type" type="machineType" use="required"/>
+   <xs:attribute name="name" type="nameType" use="required"/>
+   <xs:attribute name="hasOwnControlSystem" type="controlSystemType" use="required"/>
+  </xs:complexType>
+ </xs:element>
+
+ <xs:element name="Equipment">
+  <xs:complexType>
+   <xs:sequence>
+   <xs:element ref="EquipmentEntity" minOccurs="1" maxOccurs="unbounded"/>
+   </xs:sequence>  
+  </xs:complexType>
+ </xs:element>
+
+ <xs:element name="EquipmentEntity">
+  <xs:complexType>
+   <xs:sequence>
+   <xs:element ref="Description" minOccurs="0" maxOccurs="1"/>
+   <xs:element ref="FunctionBlock" minOccurs="0" maxOccurs="1"/>
+   <xs:element ref="States" minOccurs="1" maxOccurs="1"/>
+   <xs:element ref="Elements" minOccurs="0" maxOccurs="1"/>
+   <xs:element ref="Equipment" minOccurs="0" maxOccurs="1"/>
+   </xs:sequence>  
+   <xs:attribute name="type" type="equipmentType" use="required"/>
+   <xs:attribute name="name" type="nameType" use="required"/>
+  </xs:complexType>
+ </xs:element>
+
+ <xs:element name="States">
+  <xs:complexType>
+   <xs:sequence>
+   <xs:element ref="State" minOccurs="1" maxOccurs="unbounded"/>
+   </xs:sequence>  
+  </xs:complexType>
+ </xs:element>
+
+ <xs:element name="Elements">
+  <xs:complexType>
+   <xs:sequence>
+   <xs:element ref="Element" minOccurs="1" maxOccurs="unbounded"/>
+   </xs:sequence>  
+  </xs:complexType>
+ </xs:element>
+
+ <xs:element name="Element">
+  <xs:complexType>
+   <xs:sequence>
+   <xs:element ref="Description" minOccurs="0" maxOccurs="1"/>
+   <xs:element ref="IOConnectionMapping" minOccurs="0" maxOccurs="unbounded"/>
+   </xs:sequence>  
+   <!--xs:attribute name="type" type="elementType" use="required"/-->
+   <xs:attribute name="name" type="nameType" use="required"/>
+  </xs:complexType>
+ </xs:element>
+ 
+ 
+ <xs:element name="State">
+  <xs:complexType>
+   <xs:sequence>
+   <xs:element ref="RequestVar" minOccurs="0" maxOccurs="1"/>
+   <xs:element ref="FeedbackVar" minOccurs="0" maxOccurs="1"/>
+   </xs:sequence>  
+   <xs:attribute name="id" type="xs:integer" use="required"/>
+   <xs:attribute name="name" type="nameType" use="required"/>
+  </xs:complexType>
+ </xs:element>
+ 
+ 
+ 
+  <xs:element name="RequestVar">
+  <xs:complexType>
+   <xs:sequence>
+   <xs:element ref="Address" minOccurs="0" maxOccurs="1"/>
+   </xs:sequence>  
+   <xs:attribute name="name" type="nameType" use="required"/>
+  </xs:complexType>
+ </xs:element>
+ 
+ 
+   <xs:element name="FeedbackVar">
+  <xs:complexType>
+   <xs:sequence>
+   <xs:element ref="Address" minOccurs="0" maxOccurs="1"/>
+   </xs:sequence>  
+   <xs:attribute name="name" type="nameType" use="required"/>
+  </xs:complexType>
+ </xs:element>
+
+ 
+ <xs:element name="IOConnectionMapping">
+  <xs:complexType>
+   <xs:sequence>
+   <xs:element ref="IOVariable" minOccurs="0" maxOccurs="1"/>
+   <xs:element ref="IOAddress" minOccurs="0" maxOccurs="1"/>
+   </xs:sequence>  
+   <xs:attribute name="id" type="xs:integer" use="required"/>
+  </xs:complexType>
+</xs:element>
+
+</xs:schema>
+
