@@ -26,12 +26,16 @@ The program also gets package names of the classes derived by JAXB from XML sche
 
 -- Input and output file
 1.Names and locations of input files
-The location of input files will be override and specified by user from GUI when the program is running in GUI. The locations defined here works when the program is running directly in operationframeworkto61131.main.PLCopenXMLConverter without GUI.
+The location of input files will be overridden and specified by user from GUI when the program is running in GUI. The locations defined here works when the program is running directly in operationframeworkto61131.main.PLCopenXMLConverter without GUI. The input XML files for Johan's example cell are at supremica\examples\operationframeworkto61131\. In this directory, XML files describing COPs,EOPs, IL, CC, FID, Physical Resources, Virtual Resources are included. 
 
-2.input001.xml
+2.The prefix of names of the XML files for a COP, EOP and IL can be specified individually in this section. All prefixes are case insensitive. Files with the same name prefix will be loaded into a list for the program generation.
+
+3.The name of XML file for CC,FID , PhsicalResources, Virtual Resources can be specified individually at this section in config.xml.
+
+4.input001.xml
 It's a empty PLCopen XML project file. It will be loaded and works as an empty template. 
 
-3.output001.xml
+5.output001.xml
 It's the name of the output file. The location of the output file can be overridden by the GUI.
 
 
