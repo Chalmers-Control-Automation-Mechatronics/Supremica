@@ -485,23 +485,19 @@ public class ConvertPanel extends JPanel implements ActionListener,
     
     private void relationExtraction() {
     	
-    	SwingWorker<List<ROP>, Void> worker = null;
+    	SwingWorker<List<Document>, Void> worker = null;
+    	
+    	File directory = showFileChooser(JFileChooser.DIRECTORIES_ONLY);
     	
     	System.out.println("Load files");
     	loadFiles();
     	System.out.println("Done loading files");
     	
-    	if(null == container){
-    		container = new SOCGraphContainer();
-    		container.setVisible(false);
-    	}
-    	
     	//Create relation extraction swing worker thread
-    	worker = new RelationExtractionWorker(builder, container);
+    	worker = new RelationExtractionWorker(builder, directory);
     	
     	//Start relation extraction in the background
     	worker.execute();
-   
     }
     
     
@@ -511,6 +507,15 @@ public class ConvertPanel extends JPanel implements ActionListener,
      * @param document
      */
     private void saveDocument( Document document ){
+   
+    	File file = showFileChooser(JFileChooser.FILES_ONLY);
+        
+    	if(null != file && file.isFile() ){
+    		saveDocument( document, file );	
+    	}
+    }
+    
+    private File showFileChooser(int fileSelectionMode){
     	
     	int returnVal = JFileChooser.CANCEL_OPTION;
     	
@@ -518,20 +523,15 @@ public class ConvertPanel extends JPanel implements ActionListener,
 		JFileChooser fc = new JFileChooser();
         
 		//set selection mode
-        fc.setFileSelectionMode( JFileChooser.FILES_ONLY );
+        fc.setFileSelectionMode( fileSelectionMode );
         fc.setFileFilter( new SOCFileFilter( XML_EXTENSION ) );
 
     	returnVal = fc.showOpenDialog( this );
         if( returnVal == JFileChooser.APPROVE_OPTION ) {
-            
-        	File file = fc.getSelectedFile();
-            
-        	if(file.isFile()){
-        		saveDocument( document, file );	
-        	}
-        } else {
-        	;
+        	return fc.getSelectedFile();
         }
+        
+        return null;
     }
     
     private void saveAdaptedSpecifications(){

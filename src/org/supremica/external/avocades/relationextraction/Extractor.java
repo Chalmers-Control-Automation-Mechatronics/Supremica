@@ -31,7 +31,7 @@ import static org.supremica.external.avocades.AutomataNames.DONT_CARE_STATE_POST
 
 public class Extractor
 {
-	private ArrayList COPList;
+	private ArrayList<Document> COPList;
 	private Document relationsDoc; // Output xml document.
 	private Element relations = new Element("COP");
 
@@ -63,9 +63,9 @@ public class Extractor
 *
 ******************************************************/
 
-public ArrayList extractRestrictions(Document sup, ArrayList ROPs)
+public ArrayList<Document> extractRestrictions(Document sup, ArrayList<Document> ROPs)
 {
-	COPList = new ArrayList(ROPs);
+	COPList = new ArrayList<Document>(ROPs);
 	
 	Element root = sup.getRootElement();
 	List automaton = root.getChildren("Automaton");
@@ -1890,15 +1890,20 @@ public void buildCOPDocs(ArrayList restr, ArrayList ROPs)
 			{
 				act.removeChild("Operation");
 			}
+			// If a restriction exists
 			else if(rList.size() > 0)
 			{
-				Element precond = new Element("Precondition");
+				int noOfEntries = rList.size();
+				ArrayList preConds = new ArrayList();
+				
+				// Transform restriction into a number of preconditions
 
+				// Creates the "root"-precondition
+				Element precondOR = new Element("Precondition");
+				precondOR.setAttribute("Operator", "or");
 
-				// The following only handles restrictions consisting of only one
-				// alternative, and with only predecessors, e.g. Ox[Oy\da & Oz\da & ...].
-
-				// For all operations participating in the restriction
+				// A restriction contains one row for each operation, i.e. it is actually the columns that consitute a precondition. Build ArrayList "preConds" that contain one entry for each column.
+				int rowNo = 0;
 				for( Iterator rIter = rList.iterator(); rIter.hasNext(); )
 				{
 					// All states of the operation
@@ -1906,36 +1911,97 @@ public void buildCOPDocs(ArrayList restr, ArrayList ROPs)
 
 					int i = 0;
 					String temp = new String();
+					// Iterate within each "entry" (restriction) consisting of 1, O1, O1_-, O1_comp etc.
 					for( Iterator sIter = states.iterator(); sIter.hasNext(); )
 					{
 						String state = (String) sIter.next();
-						if(i==1)
+
+						if(i>1 )
 						{
-							temp = state;
-						}
-						else if(i>1 && state.equals(temp.concat(END_STATE_POSTFIX)))
-						{
-							Element predecessor = new Element("Predecessor");
-							String predName = temp;
+							ArrayList theEntry = new ArrayList();
 
-							String machName = getMachine(predName, opsMachs);
+							if(rowNo==0) // preConds is empty
+							{
+								theEntry.add(state);
+							}
+							else if(rowNo==1)
+							{
 
-							Element machine = new Element("Machine");
-							machine.setText(machName);
+								ArrayList oldState = (ArrayList) preConds.get(i-2);
+								oldState.add(state);
+								theEntry = (ArrayList) oldState.clone();
+							}
+							else if(rowNo>1)
+							{
+								theEntry = (ArrayList) preConds.get(i-2);
+								theEntry.add(state);
+							}
 
-							// Add the predecessor to the restrictions for opName
-							Element predOperation = new Element("Operation");
-							predOperation.setText(predName);
-
-							predecessor.addContent(machine);
-							predecessor.addContent(predOperation);
-							precond.addContent(predecessor);
+							if(preConds.size()>i-2)
+							{
+								preConds.set(i-2, theEntry);
+							}
+							else
+							{
+								preConds.add(i-2, theEntry);
+							}
 						}
 						i++;
 					}
+					rowNo++;
 				}
-				act.addContent(precond);
+				
+				
+				// Create the COP xml-document:
+
+				// For all alternative preconditions (e.g. (O1_comp AND O2_init) OR (O1_init))
+				for( Iterator pIter = preConds.iterator(); pIter.hasNext(); )
+				{
+					ArrayList states = (ArrayList) pIter.next();
+					Element precondAND = new Element("Precondition");
+					precondAND.setAttribute("Operator", "and");
+
+					// For all AND-conditions (e.g. O1_comp AND O2_init)
+					for( Iterator sIter = states.iterator(); sIter.hasNext(); )
+					{
+						String state = (String) sIter.next();
+						if( state.endsWith(INITIAL_STATE_POSTFIX)   ||
+						    state.endsWith(EXECUTION_STATE_POSTFIX) ||
+						    state.endsWith(END_STATE_POSTFIX) )
+						{
+							Element predecessor = new Element("Predecessor");
+							int index = state.indexOf(STATE_INDICATOR);
+							String predName = state.substring(0,index);
+							String machName = getMachine(predName, opsMachs);
+							String stateName = state.substring(index+1);
+
+							Element machine = new Element("Machine");
+							machine.setText(machName);
+							Element predOperation = new Element("Operation");
+							predOperation.setText(predName);
+							Element predState = new Element("State");
+							predState.setText(stateName);
+
+							predecessor.addContent(machine);
+							predecessor.addContent(predOperation);
+							predecessor.addContent(predState);
+							precondAND.addContent(predecessor);
+
+						}
+					}
+					
+					precondOR.addContent(precondAND);
+					
+				}
+
+				act.addContent(precondOR);
 			}
+			
+			act.removeChild("Operation");
+			
+			Element theOperation = new Element("Operation");
+			theOperation.setText(opName);
+			act.addContent(1,theOperation);
 		}
 	}
 }

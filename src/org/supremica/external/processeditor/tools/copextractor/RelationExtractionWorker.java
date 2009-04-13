@@ -1,36 +1,36 @@
 package org.supremica.external.processeditor.tools.copextractor;
 
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.List;
 
 import javax.swing.SwingWorker;
 
+import org.jdom.Document;
+import org.jdom.Element;
+import org.jdom.output.XMLOutputter;
 import org.supremica.external.avocades.COPBuilder;
-import org.supremica.external.processeditor.SOCGraphContainer;
-import org.supremica.external.processeditor.xml.Loader;
-import org.supremica.manufacturingTables.xsd.processeditor.ROP;
 
 class RelationExtractionWorker
                            extends
-                                SwingWorker<List<ROP>, Void>
+                                SwingWorker<List<Document>, Void>
 {
 
 	private COPBuilder builder;
-	private SOCGraphContainer container;
-	private Loader loader;
+	private File directory;
 
 	//constructors
-	RelationExtractionWorker(COPBuilder builder, SOCGraphContainer container){
-		this.loader = new Loader();
-		
+	RelationExtractionWorker(COPBuilder builder, File directory){
 		this.builder = builder;
-		this.container = container;
+		this.directory = directory;
 	}
 
 	@Override
-	public List<ROP> doInBackground() {
+	public List<Document> doInBackground() {
 		
-		List<ROP> list;
+		List<Document> list;
 		
 		System.out.println( "Relation extraction ..." );
 		list = builder.getRelationExtractionOutput(); 
@@ -42,7 +42,7 @@ class RelationExtractionWorker
 	@Override
 	public void done() {
 		
-		List<ROP> copList = null;
+		List<Document> copList = null;
 
 		try {
 			copList = get();
@@ -63,45 +63,54 @@ class RelationExtractionWorker
 
 
 		//Sanity check
-		if(null == copList || 0 == copList.size() ){
+		if (null == copList || 0 == copList.size() ){
 			System.out.println( "No COP:s" );
 			return;
 		}
 		
-		if ( null != container ){
-			saveToFolder(copList);
-			openInProcessEditor(copList);
-		} else {
-			System.out.println( "No SOC" );
-		}
+		saveToFolder(copList);
 	}
 	
-	private void openInProcessEditor(List<ROP> list){
+	private void saveToFolder(List<Document> ropList){
+		File file = null;
+		String fileName = "";
+		String path = "";
 		
 		//Sanity check
-		if ( null == container || null == list ){
+		if(null == directory || !directory.isDirectory() ){
 			return;
 		}
 		
-		for(ROP rop : list){
-			container.insertResource(rop, null);
-		}
-		
-		container.setVisible(true);
-	}
-	
-	
-	private void saveToFolder(List<ROP> ropList){
-		File file = null;
-		String fileName = "";
-		String PATH = "";
+		path = directory.getPath();
 		
 		for(int i = 0; i < ropList.size(); i++){	
-    		fileName = "rop_" + i + ".xml";
-    		file = new File(PATH + fileName);
-    		loader.save(ropList.get(i), file);
+    		fileName = "cop_" + i + ".xml";
+    		file = new File(path + File.separator +  fileName);
+    		saveDocument(ropList.get(i), file);
     	}
 	}
+	
+	private void saveDocument( Document document, File file ){
+    	
+		try{
+			XMLOutputter outp = new XMLOutputter();
+			outp.setFormat( org.jdom.output.Format.getPrettyFormat() );
+
+			FileOutputStream fileStream;
+			fileStream = new FileOutputStream( file.getAbsolutePath() );
+
+			outp.output( document, fileStream );
+		}
+		catch ( FileNotFoundException e ) {
+			System.out.println( "No file" );
+		}
+		catch ( IOException e ) {
+			e.printStackTrace();
+		}
+	}
+	
+	
+	
 	
 	
 	

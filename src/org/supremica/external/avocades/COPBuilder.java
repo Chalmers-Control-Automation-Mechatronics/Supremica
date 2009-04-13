@@ -21,6 +21,7 @@ import java.util.Date;
 import javax.xml.bind.JAXBException;
 
 import org.jdom.Document;
+import org.jdom.Element;
 import org.jdom.output.XMLOutputter;
 import org.jdom.input.SAXBuilder;
 import org.jdom.JDOMException;
@@ -958,7 +959,7 @@ public class COPBuilder {
     	return false;
     }
     
-    public List<ROP> getRelationExtractionOutput(){
+    public List<Document> getRelationExtractionOutput(){
     	
     	Date start;
     	Date stop;
@@ -979,7 +980,6 @@ public class COPBuilder {
     	
     	Document supDoc = null;
     	ArrayList<Document> tmpROPList = null;
-    	List<ROP> copList = null;
     	
     	ModuleSubject module = null;
     	List<ModuleSubject> moduleList = null;
@@ -1039,32 +1039,72 @@ public class COPBuilder {
     	diff =  stop.getTime() - start.getTime();
     	System.out.println("Done: Extract restrictions in " + diff + "ms");
     	
+    	if (null == tmpROPList || 0 == tmpROPList.size() ){
+    		System.out.println("Restriction list is empty");
+    		return null;
+    	}
+    	
 		/*
 		 * 3. Fill COP list
 		 */
-    	copList = new ArrayList<ROP>();
-    	
-    	System.out.println("Convert COPs");
+    	System.out.println("Fix COPs");
 		start = new Date();
 		
 		for( Iterator<Document> cIter = tmpROPList.iterator(); cIter.hasNext(); ){
 			Document cop = (Document) cIter.next();
-			
-			ROP rop = Converter.convertToROP( cop );
-			
-			if ( null != rop ){	
-				removeMachineNameFromActivitiesInROP( rop );
-				removeDuplicatesOfPreconditionsInOperations( rop.getRelation() );
-				copList.add( rop );
-			}
+			removeMachineNameFromActivitiesInROP( cop );
+			//removeDuplicatesOfPreconditionsInOperations( rop.getRelation() );
 		}
 		
 		stop = new Date();
     	diff =  stop.getTime() - start.getTime();
-    	System.out.println("Done: Convert " +copList.size() + 
+    	System.out.println("Done: Fixed " +tmpROPList.size() + 
     			           "st COP:s in " + diff + "ms");
     	
-		return copList;
+		return tmpROPList;
+    }
+    
+    private void removeMachineNameFromOperations(Element element){
+    	
+    	//Sanity check
+    	if (null == element){
+    		return;
+    	}
+    	
+    	List children = element.getChildren();
+    	for(Object o : children){
+    		
+    		if(o instanceof Element){
+    			Element e = (Element)o;
+    			
+    			if( "Operation".equals( e.getName() )){
+    				
+    				if (e.getTextTrim().contains(EVENT_MACHINE_SEPARATOR)){
+    	    			e.setText( removeMachineName(e.getTextTrim()) );
+    	    		}
+    				
+    			} else {
+    				removeMachineNameFromOperations( e );
+    			}
+    		}
+    		
+    	}
+    }
+    
+    private void removeMachineNameFromActivitiesInROP(final Document rop){
+    	
+    	//Sanity check
+    	if (null == rop){
+    		return;
+    	}
+    	
+    	Element relation = rop.getRootElement().getChild("Relation");
+    	removeMachineNameFromOperations(relation);
+    	
+    }
+    
+    private String removeMachineName(final String s){
+    	return s.substring(0, s.indexOf(EVENT_MACHINE_SEPARATOR));
     }
     
     private void removeMachineNameFromActivitiesInROP(final ROP rop){
