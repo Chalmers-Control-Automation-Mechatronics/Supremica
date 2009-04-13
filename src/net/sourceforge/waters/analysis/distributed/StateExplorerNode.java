@@ -134,11 +134,12 @@ public class StateExplorerNode implements Runnable
 	    int succ = table.getSuccessorState(decoded[aut], event);
 	    if (succ >= 0) {
 	      successor[aut] = succ;
-	    } else if (aut < mModel.getFirstSpecIndex()) {
-	      continue events;
-	    } else if (mModel.getEvent(event).getKind() ==
+	    } else if (aut < mModel.getFirstSpecIndex() &&
+	               mModel.getEvent(event).getKind() ==
 		       EventSchema.UNCONTROLLABLE) {
 	      // produceCounterExample(state, event);
+	    } else {
+	      continue events;
 	    }
 	  }
 	  // May have to send the state somewhere in distributed case ...
