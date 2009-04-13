@@ -12,7 +12,7 @@ import net.sourceforge.waters.analysis.distributed.schemata.TransitionSchema;
  * technique similar to the one uesd by Jinjian Shi in the Waters
  * monolithic controllability checker, where the transition relation
  * for an automaton is represented as 
- * <code>(source, event) -&lt; target</code>.  
+ * <code>(source, event) -&gt; target</code>.  
  * 
  * This allows fast lookups to check if an event is allowed from a
  * given state. 

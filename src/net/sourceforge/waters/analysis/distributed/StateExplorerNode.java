@@ -1,6 +1,8 @@
 package net.sourceforge.waters.analysis.distributed;
 
 import net.sourceforge.waters.analysis.distributed.schemata.ProductDESSchema;
+import net.sourceforge.waters.model.base.WatersRuntimeException;
+
 import java.util.List;
 import java.util.ArrayList;
 import gnu.trove.THashSet;
@@ -63,7 +65,7 @@ public class StateExplorerNode implements Runnable
    * @returns The next state, or null if there are no states to 
    *          process
    */
-  protected synchronized StateTuple getNextState()
+  private synchronized StateTuple getNextState()
   {
     if (noUnexploredStates())
       return null;
@@ -94,6 +96,7 @@ public class StateExplorerNode implements Runnable
 	      }
 	    catch (InterruptedException e)
 	      {
+		throw new WatersRuntimeException(e);
 		//Interruptions are unimportant. If interrupted but
 		//there is still nothing to do, just wait again.
 	      }
@@ -119,6 +122,30 @@ public class StateExplorerNode implements Runnable
 
 	//Decode the state
 	int[] decoded = mEncoding.decodeState(state);
+	int autCount = mModel.getAutomataCount();
+	int eventCount = mModel.getEventCount();
+	int[] successor = new int[autCount];
+
+	/*
+	events:
+	for (int event = 0; event < eventCount; event++) {
+	  for (int aut = 0; aut < autCount; aut++) {
+	    TransitionTable table = getTransitionTable(aut);
+	    int succ = table.getSuccessorState(decoded[aut], event);
+	    if (succ >= 0) {
+	      successor[aut] = succ;
+	    } else if (aut < mModel.getFirstSpecIndex()) {
+	      continue events;
+	    } else if (mModel.getEvent(event).getKind() ==
+		       EventSchema.UNCONTROLLABLE) {
+	      // produceCounterExample(state, event);
+	    }
+	  }
+	  // May have to send the state somewhere in distributed case ...
+	  StateTuple tuple = mEncoding.encode(successor);
+	  addState(tuple);
+	}
+	*/
       }
   }
 
