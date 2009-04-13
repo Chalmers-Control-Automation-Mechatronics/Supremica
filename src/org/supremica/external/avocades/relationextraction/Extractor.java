@@ -1882,6 +1882,7 @@ public void buildCOPDocs(ArrayList restr, ArrayList ROPs)
 			Element operation = act.getChild("Operation");
 			String opName = operation.getText();
 			act.removeChildren("Precondition");
+			act.removeChildren("Operation");
 
 			String found = new String();
 			ArrayList rList = getRestriction(opName, restr, found);
@@ -1916,7 +1917,7 @@ public void buildCOPDocs(ArrayList restr, ArrayList ROPs)
 					{
 						String state = (String) sIter.next();
 
-						if(i>1 )
+						if ( i > 1 )
 						{
 							ArrayList theEntry = new ArrayList();
 
@@ -1937,7 +1938,7 @@ public void buildCOPDocs(ArrayList restr, ArrayList ROPs)
 								theEntry.add(state);
 							}
 
-							if(preConds.size()>i-2)
+							if ( preConds.size() > i - 2 )
 							{
 								preConds.set(i-2, theEntry);
 							}
@@ -1996,8 +1997,6 @@ public void buildCOPDocs(ArrayList restr, ArrayList ROPs)
 
 				act.addContent(precondOR);
 			}
-			
-			act.removeChild("Operation");
 			
 			Element theOperation = new Element("Operation");
 			theOperation.setText(opName);

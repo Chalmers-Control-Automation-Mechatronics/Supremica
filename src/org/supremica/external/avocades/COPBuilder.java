@@ -291,23 +291,6 @@ public class COPBuilder {
     	convAut = new ConverterILtoAutomata();
 		convAut.convertILtoAutomata( builder.getDoc() );
 		
-/*		//debug code
-		try{
-    		//create debug file
-            tmpFile = new File("eopsils.xml");
-            
-            //save JDOM document to file
-            saveDocument( builder.getDoc(), tmpFile );
-            
-            System.out.println("Saved debug file: " +
-            		               tmpFile.getAbsolutePath());
-            
-        }catch( Exception e ){
-        	tmpFile.delete();
-        	return null;
-        }
-		//end debug code
-*/			
     	try{
     		//create temporary file
             tmpFile = File.createTempFile("tmpSpecificationSynthes", ".xml");
@@ -501,12 +484,9 @@ public class COPBuilder {
     				if ( !preBookedZones.contains( zone ) ){
     					preBookedZones.remove( zone );
     				}
-    			}
-    			
+    			}	
     		}
-    		
     	}
-    	
     	return preBookedZones;
     }
     
@@ -550,14 +530,13 @@ public class COPBuilder {
     							
     						}
 						}
-					}			
+					}
     			}
     			
     		}else if(FREE.equals( zoneState.getState() )){
     			//do nothing
     		}
     	}
-    	
     	
     	//Zone booking from action
     	for( Action action : eop.getAction() ){
@@ -619,17 +598,19 @@ public class COPBuilder {
     }
     
     
-    
-    private static EOP getFirstMatchingEOPfromList(Activity activity,
-    		                                       List<EOP> eopList)
-    {	
+    private static EOP getFirstMatchingEOPfromList(Activity activity, List<EOP> eopList){	
+    	
+    	//Sanity check
+    	if(null == activity || null == eopList){
+    		return null;
+    	}
+    	
     	//Find EOP
     	for(EOP eop : eopList){
     		if (eop.getId().trim().equals( activity.getOperation().trim() )){
     			return eop;
     		}
     	}
-    	
     	return null;
     }
     
@@ -663,9 +644,12 @@ public class COPBuilder {
     	}
     }
     
-    private static boolean contains(List<Attribute> attributeList,
-    		                                   Attribute attribute)
-    {
+    private static boolean contains(List<Attribute> attributeList, Attribute attribute){
+    	
+    	//Sanity check
+    	if (null == attribute || null == attributeList){
+    		return false;
+    	}
     	
     	for (Attribute att : attributeList){
     		
@@ -996,13 +980,16 @@ public class COPBuilder {
     	moduleList.add( getSpecificationSynthesisOutput(adaptedEOPList, adaptedILList) ); 
     	moduleList.add( getEOPtoEFAOutput( adaptedEOPList ) );
     	moduleList.add( getDOPtoEFAOutput( adaptedROPList ) );
+    	
     	stop = new Date();
     	diff =  stop.getTime() - start.getTime();
     	System.out.println("Done: Create automatas in " + diff + " ms");
     	
     	System.out.println("Create supervisor");
     	start = new Date();
+    	
     	module = createSupervisor( moduleList );
+    	
     	stop = new Date();
     	diff =  stop.getTime() - start.getTime();
     	System.out.println("Done: Create supervisor in " + diff + " ms");
@@ -1104,6 +1091,12 @@ public class COPBuilder {
     }
     
     private String removeMachineName(final String s){
+    	
+    	//Sanity check
+    	if (null == s || !s.contains(EVENT_MACHINE_SEPARATOR) ){
+    		return s;
+    	}
+    	
     	return s.substring(0, s.indexOf(EVENT_MACHINE_SEPARATOR));
     }
     

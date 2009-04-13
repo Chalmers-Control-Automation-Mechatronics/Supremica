@@ -60,7 +60,7 @@ public class Module extends ExtendedAutomata{
 		
 		nodeVariablesEFA = new EFA("Node_variables",this);
 		this.addAutomaton(nodeVariablesEFA);
-		nodeVariablesEFA.addInitialState("dummy_state_for_nod_variables");
+		nodeVariablesEFA.addInitialState("dummy_state_for_nod_variables", true);
 		
 	}
 	
@@ -71,7 +71,7 @@ public class Module extends ExtendedAutomata{
 		
 		resourceVariablesEFA = new EFA("Resource_variables",this);
 		this.addAutomaton(resourceVariablesEFA);
-		resourceVariablesEFA.addInitialState("dummy_state_for_resource_variables");
+		resourceVariablesEFA.addInitialState("dummy_state_for_resource_variables", true);
 	}
 	
 	public void initBlockedEvents(){
