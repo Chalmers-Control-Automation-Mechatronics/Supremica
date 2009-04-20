@@ -26,6 +26,9 @@ for F in $@; do
 	-mono)
 	    FACTORY="$WPACK.analysis.monolithic.MonolithicModelVerifierFactory"
 	    ;;
+	-dist)
+	    FACTORY="$WPACK.analysis.distributed.DistributedModelVerifierFactory"
+	    ;;
 	-proj)
 	    FACTORY="$WPACK.analysis.modular.ProjectingModelVerifierFactory"
 	    ;;

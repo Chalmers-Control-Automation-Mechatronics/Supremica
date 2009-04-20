@@ -46,7 +46,7 @@ public class DistributedSafetyVerifier
     StateExplorerNode explorer = new StateExplorerNode(modelSchema);
 
     //Start some processing threads
-    for (int i = 0; i < 2; i++)
+    for (int i = 0; i < 1; i++)
       explorer.runWorkerThread();
     
 
@@ -55,22 +55,25 @@ public class DistributedSafetyVerifier
     //had finished by making sure each node was empty a certain 
     //number of times.
     int emptycount = 0;
-    while (emptycount < 10)
-      {
+    while (true) {
 	if (explorer.noUnexploredStates())
 	  emptycount++;
 	else
+	  emptycount = 0;
+	
+	System.out.format("%s; Number of states: %d %d %d\n", 
+			  explorer.isUncontrollable() ? "Uncontrollable" : "Controllable",
+			  explorer.getExploredStateCount(),
+			  explorer.getWaitingStateCount(),
+			  explorer.getWaitingSetSize());
+	try
 	  {
-	    try
-	      {
-		Thread.sleep(500);
-	      }
-	    catch (InterruptedException e)
-	      { 
-		//So what?
-	      }
-	    emptycount = 0;
+	    Thread.sleep(100);
 	  }
+	catch (Exception e){}
+
+	if (emptycount > 10)
+	  break;
       }
 
     //Feign success! That way I can ignore countertraces for a while

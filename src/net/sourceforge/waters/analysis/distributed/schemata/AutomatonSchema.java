@@ -1,5 +1,7 @@
 package net.sourceforge.waters.analysis.distributed.schemata;
 
+import java.util.Arrays;
+import java.util.Formatter;
 import java.io.Serializable;
 
 public class AutomatonSchema implements Serializable
@@ -55,6 +57,18 @@ public class AutomatonSchema implements Serializable
   public int getTransitionCount()
   {
     return mTransitions.length;
+  }
+
+  public String toString()
+  {
+    Formatter fmt = new Formatter();
+    fmt.format("Name: %s\n", mName);
+    fmt.format("Events: %s\n", Arrays.toString(mEventIds));
+    fmt.format("Transitions: %s\n", Arrays.deepToString(mTransitions));
+    fmt.format("States: %s\n", Arrays.deepToString(mStates));
+    fmt.format("Kind: %d\n", mKind);
+
+    return fmt.toString();
   }
 
   private final String mName;

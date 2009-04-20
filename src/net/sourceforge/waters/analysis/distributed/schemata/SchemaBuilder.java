@@ -98,6 +98,7 @@ public class SchemaBuilder
     for (TransitionProxy t : ts)
       {
 	transitions[i] = build_transition(t, smap, emap);
+	i++;
       }
 
     return transitions;

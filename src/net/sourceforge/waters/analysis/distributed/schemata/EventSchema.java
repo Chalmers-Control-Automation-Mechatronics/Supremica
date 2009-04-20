@@ -1,5 +1,6 @@
 package net.sourceforge.waters.analysis.distributed.schemata;
 
+import java.util.Formatter;
 import java.io.Serializable;
 
 public class EventSchema implements Serializable
@@ -24,6 +25,12 @@ public class EventSchema implements Serializable
   public boolean getObservable()
   {
     return mObservable;
+  }
+
+  public String toString()
+  {
+    Formatter fmt = new Formatter();
+    return fmt.format("(%s, %d, %b)", mName, mKind, mObservable).toString();
   }
 
   private final String mName;

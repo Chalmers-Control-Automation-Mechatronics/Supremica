@@ -1,5 +1,7 @@
 package net.sourceforge.waters.analysis.distributed.schemata;
 
+import java.util.Formatter;
+import java.util.Arrays;
 import java.io.Serializable;
 
 public class ProductDESSchema implements Serializable
@@ -36,6 +38,22 @@ public class ProductDESSchema implements Serializable
   public int getEventCount()
   {
     return mEvents.length;
+  }
+
+  public String toString()
+  {
+    Formatter fmt = new Formatter();
+
+    fmt.format("Model name: %s\n", mName);
+    fmt.format("Events: %s\n", Arrays.deepToString(mEvents));
+    fmt.format(" - Automata -\n");
+
+    for (AutomatonSchema aut : mAutomata)
+      {
+	fmt.format(aut.toString());
+      }
+
+    return fmt.toString();
   }
   
   private final String mName;

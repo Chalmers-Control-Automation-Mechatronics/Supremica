@@ -1,5 +1,7 @@
 package net.sourceforge.waters.analysis.distributed.schemata;
 
+import java.util.Arrays;
+import java.util.Formatter;
 import java.io.Serializable;
 
 public class StateSchema implements Serializable
@@ -31,6 +33,12 @@ public class StateSchema implements Serializable
   public int getPropositionIdCount()
   {
     return mPropositionIds.length;
+  }
+
+  public String toString()
+  {
+    Formatter fmt = new Formatter();
+    return fmt.format("(%s, %b, %s)", mName, mInitial, Arrays.toString(mPropositionIds)).toString();
   }
 
   private final String mName;

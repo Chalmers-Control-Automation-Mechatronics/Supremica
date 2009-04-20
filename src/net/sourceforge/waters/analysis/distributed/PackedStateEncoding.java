@@ -36,7 +36,7 @@ public class PackedStateEncoding extends StateEncoding
    * indices. Each element in the input array corresponds to
    * an automaton in the product.
    * @param unpacked Unpacked state vector.
-   * @return Packed state vector.
+   * @return Packed state tuple.
    */
   public StateTuple encodeState(int[] unpacked)
   {
@@ -52,10 +52,10 @@ public class PackedStateEncoding extends StateEncoding
 
 
   /**
-   * Return an unpacked state vector from a packed vector.  Indices in
+   * Return an unpacked state vector from a packed tuple.  Indices in
    * the unpacked state vector correspond to automata in the product;
    * the value in each element a state index for that automaton.
-   * @param pstate The packed state vector.
+   * @param packed The packed state tuple.
    * @return An unpacked state vector.
    */
   public int[] decodeState(StateTuple packed)
