@@ -43,7 +43,8 @@ public class ActionBuilder {
 
 		SFCLiveList.add(actionBlock.getPLCOpenObject());
 
-		SFCLiveList.add(step.getPLCOpenObject());
+//		Add the Step object outside this function, not here.
+//		SFCLiveList.add(step.getPLCOpenObject());
 
 	}
 }
