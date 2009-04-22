@@ -1,6 +1,5 @@
 package org.supremica.external.operationframeworkto61131.builder.eop;
 
-
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -31,13 +30,11 @@ import org.supremica.manufacturingtables.xsd.eop.InitialState;
 import org.supremica.manufacturingtables.xsd.eop.Operation;
 import org.supremica.manufacturingtables.xsd.eop.TypeType;
 
-
-
 /**
  * EOPBuilder.java convert EOP to SFC
- *
+ * 
  * Created: Mar 31, 2009 5:13:23 PM
- *
+ * 
  * @author LC
  * @version 1.0
  */
@@ -376,6 +373,8 @@ public class EOPBuilder extends
 		Step lastStep = StepBuilder.generateStep(super.nextLocalId(),
 				transition, this.getNextStepName(),
 				getDistanceStepToTransitionY());
+
+		SFCLiveList.add(lastStep.getPLCOpenObject());
 
 		ActionBuilder.generateActions(SFCLiveList, callingVarsList,
 				ConditionBuilder.distanceActionBlockToStep, lastStep, this);
