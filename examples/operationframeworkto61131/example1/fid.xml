@@ -36,14 +36,14 @@
 				<FunctionType>IOVariable</FunctionType>
 				<IOType>Input</IOType>
 				<DataType>Boolean</DataType>
-				<Param>sensor_backward pos</Param>
+				<Param>sensor_backward_pos</Param>
 				<InitValue>false</InitValue>
 			</SystemConnection>
 			<SystemConnection StateID="2">
 				<FunctionType>IOVariable</FunctionType>
 				<IOType>Input</IOType>
 				<DataType>Boolean</DataType>
-				<Param>sensor_forward pos</Param>
+				<Param>sensor_forward_pos</Param>
 				<InitValue>false</InitValue>
 			</SystemConnection>
 			<SystemConnection StateID="1">
