@@ -424,7 +424,7 @@ public class POUBuilder {
 		}
 
 		// Letter index ,A:65 a:97
-		pouName = pouName + "-"
+		pouName = pouName + "_"
 				+ PLCopenUtil.getLetterFromInt(letterIndex.intValue(), 96);
 
 		return pouName;
