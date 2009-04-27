@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- Created with Liquid XML Studio 1.0.8.0 (http://www.liquid-technologies.com) -->
 <project xmlns="http://www.plcopen.org/xml/tc6.xsd">
-	<fileHeader creationDateTime="2009-04-22T13:18:15" productVersion="1.0" productName="FIX1" companyURL="www.chalmers.se" companyName="CTH" />
+	<fileHeader creationDateTime="2009-04-27T15:46:22" productVersion="1.0" productName="FIX1" companyURL="www.chalmers.se" companyName="CTH" />
 	<contentHeader language="en-US" author="CTH SS2" organization="SS2" modificationDateTime="2008-04-09T20:25:24" version="1.0" name="Cell Example ">
 		<coordinateInfo>
 			<fbd>
@@ -18,9 +18,17 @@
 	<types>
 		<dataTypes />
 		<pous>
-			<pou pouType="program" name="EOP10-a">
+			<pou pouType="program" name="EOP10_a">
 				<interface>
 					<externalVars>
+						<variable name="Op_10_start">
+							<type>
+								<BOOL />
+							</type>
+							<initialValue>
+								<simpleValue value="false" />
+							</initialValue>
+						</variable>
 						<variable name="C1C2C1_in_position_empty">
 							<type>
 								<BOOL />
@@ -254,9 +262,17 @@
 					</SFC>
 				</body>
 			</pou>
-			<pou pouType="program" name="EOP10-b">
+			<pou pouType="program" name="EOP10_b">
 				<interface>
 					<externalVars>
+						<variable name="Op_10_start">
+							<type>
+								<BOOL />
+							</type>
+							<initialValue>
+								<simpleValue value="false" />
+							</initialValue>
+						</variable>
 						<variable name="C1C2C1_in_part_in_position">
 							<type>
 								<BOOL />
@@ -501,7 +517,7 @@
 								<simpleValue value="false" />
 							</initialValue>
 						</variable>
-						<variable name="TRUE">
+						<variable name="TRUE_VAR">
 							<type>
 								<BOOL />
 							</type>
@@ -622,12 +638,12 @@
 								<relPosition y="32" x="27" />
 							</connectionPointOut>
 						</step>
-						<inVariable width="41" height="30" localId="6">
-							<position y="326" x="425" />
+						<inVariable width="81" height="30" localId="6">
+							<position y="326" x="385" />
 							<connectionPointOut>
-								<relPosition y="15" x="41" />
+								<relPosition y="15" x="81" />
 							</connectionPointOut>
-							<expression>TRUE</expression>
+							<expression>TRUE_VAR</expression>
 						</inVariable>
 						<transition width="20" height="2" localId="5">
 							<position y="340" x="526" />
@@ -977,7 +993,7 @@
 								<simpleValue value="false" />
 							</initialValue>
 						</variable>
-						<variable name="TRUE">
+						<variable name="TRUE_VAR">
 							<type>
 								<BOOL />
 							</type>
@@ -1074,12 +1090,12 @@
 								<relPosition y="32" x="27" />
 							</connectionPointOut>
 						</step>
-						<inVariable width="41" height="30" localId="6">
-							<position y="326" x="425" />
+						<inVariable width="81" height="30" localId="6">
+							<position y="326" x="385" />
 							<connectionPointOut>
-								<relPosition y="15" x="41" />
+								<relPosition y="15" x="81" />
 							</connectionPointOut>
-							<expression>TRUE</expression>
+							<expression>TRUE_VAR</expression>
 						</inVariable>
 						<transition width="20" height="2" localId="5">
 							<position y="340" x="526" />
@@ -1456,7 +1472,7 @@
 								<simpleValue value="false" />
 							</initialValue>
 						</variable>
-						<variable name="TRUE">
+						<variable name="TRUE_VAR">
 							<type>
 								<BOOL />
 							</type>
@@ -1553,12 +1569,12 @@
 								<relPosition y="32" x="27" />
 							</connectionPointOut>
 						</step>
-						<inVariable width="41" height="30" localId="6">
-							<position y="326" x="425" />
+						<inVariable width="81" height="30" localId="6">
+							<position y="326" x="385" />
 							<connectionPointOut>
-								<relPosition y="15" x="41" />
+								<relPosition y="15" x="81" />
 							</connectionPointOut>
-							<expression>TRUE</expression>
+							<expression>TRUE_VAR</expression>
 						</inVariable>
 						<transition width="20" height="2" localId="5">
 							<position y="340" x="526" />
@@ -1819,7 +1835,7 @@
 								<simpleValue value="false" />
 							</initialValue>
 						</variable>
-						<variable name="TRUE">
+						<variable name="TRUE_VAR">
 							<type>
 								<BOOL />
 							</type>
@@ -1908,12 +1924,12 @@
 								<relPosition y="32" x="27" />
 							</connectionPointOut>
 						</step>
-						<inVariable width="41" height="30" localId="6">
-							<position y="326" x="425" />
+						<inVariable width="81" height="30" localId="6">
+							<position y="326" x="385" />
 							<connectionPointOut>
-								<relPosition y="15" x="41" />
+								<relPosition y="15" x="81" />
 							</connectionPointOut>
-							<expression>TRUE</expression>
+							<expression>TRUE_VAR</expression>
 						</inVariable>
 						<transition width="20" height="2" localId="5">
 							<position y="340" x="526" />
@@ -2097,7 +2113,7 @@
 								<simpleValue value="false" />
 							</initialValue>
 						</variable>
-						<variable name="TRUE">
+						<variable name="TRUE_VAR">
 							<type>
 								<BOOL />
 							</type>
@@ -2194,12 +2210,12 @@
 								<relPosition y="32" x="27" />
 							</connectionPointOut>
 						</step>
-						<inVariable width="41" height="30" localId="6">
-							<position y="326" x="425" />
+						<inVariable width="81" height="30" localId="6">
+							<position y="326" x="385" />
 							<connectionPointOut>
-								<relPosition y="15" x="41" />
+								<relPosition y="15" x="81" />
 							</connectionPointOut>
-							<expression>TRUE</expression>
+							<expression>TRUE_VAR</expression>
 						</inVariable>
 						<transition width="20" height="2" localId="5">
 							<position y="340" x="526" />
@@ -2460,7 +2476,7 @@
 								<simpleValue value="false" />
 							</initialValue>
 						</variable>
-						<variable name="TRUE">
+						<variable name="TRUE_VAR">
 							<type>
 								<BOOL />
 							</type>
@@ -2557,12 +2573,12 @@
 								<relPosition y="32" x="27" />
 							</connectionPointOut>
 						</step>
-						<inVariable width="41" height="30" localId="6">
-							<position y="326" x="425" />
+						<inVariable width="81" height="30" localId="6">
+							<position y="326" x="385" />
 							<connectionPointOut>
-								<relPosition y="15" x="41" />
+								<relPosition y="15" x="81" />
 							</connectionPointOut>
-							<expression>TRUE</expression>
+							<expression>TRUE_VAR</expression>
 						</inVariable>
 						<transition width="20" height="2" localId="5">
 							<position y="340" x="526" />
@@ -3061,7 +3077,7 @@
 								<simpleValue value="false" />
 							</initialValue>
 						</variable>
-						<variable name="TRUE">
+						<variable name="TRUE_VAR">
 							<type>
 								<BOOL />
 							</type>
@@ -3126,12 +3142,12 @@
 								<relPosition y="32" x="27" />
 							</connectionPointOut>
 						</step>
-						<inVariable width="41" height="30" localId="6">
-							<position y="326" x="425" />
+						<inVariable width="81" height="30" localId="6">
+							<position y="326" x="385" />
 							<connectionPointOut>
-								<relPosition y="15" x="41" />
+								<relPosition y="15" x="81" />
 							</connectionPointOut>
-							<expression>TRUE</expression>
+							<expression>TRUE_VAR</expression>
 						</inVariable>
 						<transition width="20" height="2" localId="5">
 							<position y="340" x="526" />
@@ -3205,7 +3221,7 @@
 								<simpleValue value="false" />
 							</initialValue>
 						</variable>
-						<variable name="TRUE">
+						<variable name="TRUE_VAR">
 							<type>
 								<BOOL />
 							</type>
@@ -3334,12 +3350,12 @@
 								<relPosition y="32" x="27" />
 							</connectionPointOut>
 						</step>
-						<inVariable width="41" height="30" localId="6">
-							<position y="326" x="425" />
+						<inVariable width="81" height="30" localId="6">
+							<position y="326" x="385" />
 							<connectionPointOut>
-								<relPosition y="15" x="41" />
+								<relPosition y="15" x="81" />
 							</connectionPointOut>
-							<expression>TRUE</expression>
+							<expression>TRUE_VAR</expression>
 						</inVariable>
 						<transition width="20" height="2" localId="5">
 							<position y="340" x="526" />
@@ -3547,7 +3563,7 @@
 								<simpleValue value="false" />
 							</initialValue>
 						</variable>
-						<variable name="TRUE">
+						<variable name="TRUE_VAR">
 							<type>
 								<BOOL />
 							</type>
@@ -3748,12 +3764,12 @@
 								<relPosition y="32" x="27" />
 							</connectionPointOut>
 						</step>
-						<inVariable width="41" height="30" localId="6">
-							<position y="326" x="425" />
+						<inVariable width="81" height="30" localId="6">
+							<position y="326" x="385" />
 							<connectionPointOut>
-								<relPosition y="15" x="41" />
+								<relPosition y="15" x="81" />
 							</connectionPointOut>
-							<expression>TRUE</expression>
+							<expression>TRUE_VAR</expression>
 						</inVariable>
 						<transition width="20" height="2" localId="5">
 							<position y="340" x="526" />
@@ -4316,7 +4332,7 @@
 								<simpleValue value="false" />
 							</initialValue>
 						</variable>
-						<variable name="TRUE">
+						<variable name="TRUE_VAR">
 							<type>
 								<BOOL />
 							</type>
@@ -4517,12 +4533,12 @@
 								<relPosition y="32" x="27" />
 							</connectionPointOut>
 						</step>
-						<inVariable width="41" height="30" localId="6">
-							<position y="326" x="425" />
+						<inVariable width="81" height="30" localId="6">
+							<position y="326" x="385" />
 							<connectionPointOut>
-								<relPosition y="15" x="41" />
+								<relPosition y="15" x="81" />
 							</connectionPointOut>
-							<expression>TRUE</expression>
+							<expression>TRUE_VAR</expression>
 						</inVariable>
 						<transition width="20" height="2" localId="5">
 							<position y="340" x="526" />
@@ -5178,7 +5194,7 @@
 								<simpleValue value="false" />
 							</initialValue>
 						</variable>
-						<variable name="TRUE">
+						<variable name="TRUE_VAR">
 							<type>
 								<BOOL />
 							</type>
@@ -5243,12 +5259,12 @@
 								<relPosition y="32" x="27" />
 							</connectionPointOut>
 						</step>
-						<inVariable width="41" height="30" localId="6">
-							<position y="326" x="425" />
+						<inVariable width="81" height="30" localId="6">
+							<position y="326" x="385" />
 							<connectionPointOut>
-								<relPosition y="15" x="41" />
+								<relPosition y="15" x="81" />
 							</connectionPointOut>
-							<expression>TRUE</expression>
+							<expression>TRUE_VAR</expression>
 						</inVariable>
 						<transition width="20" height="2" localId="5">
 							<position y="340" x="526" />
@@ -5322,7 +5338,7 @@
 								<simpleValue value="false" />
 							</initialValue>
 						</variable>
-						<variable name="TRUE">
+						<variable name="TRUE_VAR">
 							<type>
 								<BOOL />
 							</type>
@@ -5451,12 +5467,12 @@
 								<relPosition y="32" x="27" />
 							</connectionPointOut>
 						</step>
-						<inVariable width="41" height="30" localId="6">
-							<position y="326" x="425" />
+						<inVariable width="81" height="30" localId="6">
+							<position y="326" x="385" />
 							<connectionPointOut>
-								<relPosition y="15" x="41" />
+								<relPosition y="15" x="81" />
 							</connectionPointOut>
-							<expression>TRUE</expression>
+							<expression>TRUE_VAR</expression>
 						</inVariable>
 						<transition width="20" height="2" localId="5">
 							<position y="340" x="526" />
@@ -5847,7 +5863,7 @@
 								<simpleValue value="false" />
 							</initialValue>
 						</variable>
-						<variable name="TRUE">
+						<variable name="TRUE_VAR">
 							<type>
 								<BOOL />
 							</type>
@@ -5928,12 +5944,12 @@
 								<relPosition y="32" x="27" />
 							</connectionPointOut>
 						</step>
-						<inVariable width="41" height="30" localId="6">
-							<position y="326" x="425" />
+						<inVariable width="81" height="30" localId="6">
+							<position y="326" x="385" />
 							<connectionPointOut>
-								<relPosition y="15" x="41" />
+								<relPosition y="15" x="81" />
 							</connectionPointOut>
-							<expression>TRUE</expression>
+							<expression>TRUE_VAR</expression>
 						</inVariable>
 						<transition width="20" height="2" localId="5">
 							<position y="340" x="526" />
@@ -11841,7 +11857,7 @@
 										</connection>
 									</connectionPointIn>
 								</variable>
-								<variable formalParameter="sensor_backward pos">
+								<variable formalParameter="sensor_backward_pos">
 									<connectionPointIn>
 										<relPosition y="135" x="0" />
 										<connection refLocalId="7">
@@ -11868,7 +11884,7 @@
 										</connection>
 									</connectionPointIn>
 								</variable>
-								<variable formalParameter="sensor_forward pos">
+								<variable formalParameter="sensor_forward_pos">
 									<connectionPointIn>
 										<relPosition y="270" x="0" />
 										<connection refLocalId="13">
@@ -12242,7 +12258,7 @@
 										</connection>
 									</connectionPointIn>
 								</variable>
-								<variable formalParameter="sensor_backward pos">
+								<variable formalParameter="sensor_backward_pos">
 									<connectionPointIn>
 										<relPosition y="135" x="0" />
 										<connection refLocalId="7">
@@ -12269,7 +12285,7 @@
 										</connection>
 									</connectionPointIn>
 								</variable>
-								<variable formalParameter="sensor_forward pos">
+								<variable formalParameter="sensor_forward_pos">
 									<connectionPointIn>
 										<relPosition y="270" x="0" />
 										<connection refLocalId="13">
@@ -12735,7 +12751,7 @@
 										</connection>
 									</connectionPointIn>
 								</variable>
-								<variable formalParameter="sensor_backward pos">
+								<variable formalParameter="sensor_backward_pos">
 									<connectionPointIn>
 										<relPosition y="135" x="0" />
 										<connection formalParameter="OUT" refLocalId="9">
@@ -12762,7 +12778,7 @@
 										</connection>
 									</connectionPointIn>
 								</variable>
-								<variable formalParameter="sensor_forward pos">
+								<variable formalParameter="sensor_forward_pos">
 									<connectionPointIn>
 										<relPosition y="270" x="0" />
 										<connection formalParameter="OUT" refLocalId="17">
@@ -17258,11 +17274,11 @@
 		<configurations>
 			<configuration name="Example_factory002">
 				<resource name="Example_cell002">
-					<task priority="0" name="Task_EOP10-a">
-						<pouInstance type="EOP10-a" name="InstanceOf_EOP10-a" />
+					<task priority="0" name="Task_EOP10_a">
+						<pouInstance type="EOP10_a" name="InstanceOf_EOP10_a" />
 					</task>
-					<task priority="0" name="Task_EOP10-b">
-						<pouInstance type="EOP10-b" name="InstanceOf_EOP10-b" />
+					<task priority="0" name="Task_EOP10_b">
+						<pouInstance type="EOP10_b" name="InstanceOf_EOP10_b" />
 					</task>
 					<task priority="0" name="Task_EOP11">
 						<pouInstance type="EOP11" name="InstanceOf_EOP11" />
@@ -17403,6 +17419,14 @@
 						<pouInstance type="CC" name="InstanceOf_CC" />
 					</task>
 					<globalVars>
+						<variable name="Op_10_start">
+							<type>
+								<BOOL />
+							</type>
+							<initialValue>
+								<simpleValue value="false" />
+							</initialValue>
+						</variable>
 						<variable name="C1C2C1_in_position_empty">
 							<type>
 								<BOOL />
@@ -17451,7 +17475,7 @@
 								<simpleValue value="false" />
 							</initialValue>
 						</variable>
-						<variable name="TRUE">
+						<variable name="TRUE_VAR">
 							<type>
 								<BOOL />
 							</type>
@@ -18188,14 +18212,6 @@
 							</initialValue>
 						</variable>
 						<variable name="All_COP_Done_CC_B">
-							<type>
-								<BOOL />
-							</type>
-							<initialValue>
-								<simpleValue value="false" />
-							</initialValue>
-						</variable>
-						<variable name="Op_10_start">
 							<type>
 								<BOOL />
 							</type>
