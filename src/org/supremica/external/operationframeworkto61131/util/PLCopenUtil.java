@@ -103,7 +103,7 @@ public class PLCopenUtil {
 	}
 
 	public static FBCallingVars getTRUECallingVar() {
-		String expression = "TRUE";
+		String expression = "TRUE_VAR";
 		Var TRUE_feedbackVar = new Var(expression, Boolean.TRUE);
 		FBCallingVars tRUE = new FBCallingVars();
 		tRUE.setRequestVar(TRUE_feedbackVar);
