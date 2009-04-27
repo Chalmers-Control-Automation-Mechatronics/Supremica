@@ -206,7 +206,7 @@ public class EOPBuilder extends
 			 * this is used to decide the length from transition to the next
 			 * step
 			 */
-
+			super.addToInterfaceVarList(op_start_var);
 			numOfLastTransitionInputs = preconditionVarsList
 					.getFBCallingVarsList().size() + 1;
 
