@@ -29,27 +29,54 @@ public class StateExplorerNode implements Runnable
     mEncoding = new NullStateEncoding(mModel);
     
     mStateList = new ArrayList<StateTuple>();
-    mVisitedSet = new THashSet<StateTuple>();
-    mWaitingSet = new THashSet<StateTuple>();
+    mObservedSet = new THashSet<StateTuple>();
 
     mPlantTransitions = generateTransitionTables(AutomatonSchema.PLANT);
     mSpecTransitions = generateTransitionTables(AutomatonSchema.SPECIFICATION);
 
     int[] initial = findInitialState();
     addState(mEncoding.encodeState(initial));
-
-
-    System.err.println(mModel);
   }
 
   /**
    * Start a worker thread processing this state explorer.  
    */
-  public void runWorkerThread()
+  public synchronized void runWorkerThread()
   {
     Thread t = new Thread(this);
     t.setDaemon(true);
+    mWorkerThreads.add(t);
     t.start();
+  }
+
+  /**
+   * Shut down the state explorer. This will pause the 
+   * system, interrupt each thread, then join them, to ensure
+   * they have terminated. This is necessary so the model checker
+   * is reusable.
+   * @return True if all worker threads terminated.
+   */
+  public boolean shutdown()
+  {
+    //All the threads will eventually be waiting
+    pause();
+    
+    for (Thread t : mWorkerThreads)
+      {
+	try
+	  {
+	    t.interrupt();
+	    t.join();
+	  }
+	catch (InterruptedException e)
+	  {
+	    //We were interrupted, not everything will
+	    //be shut down though
+	    return false;
+	  }
+      }
+    
+    return true;
   }
 
   /**
@@ -59,12 +86,22 @@ public class StateExplorerNode implements Runnable
    */
   public synchronized void addState(StateTuple state)
   {
-    if (!mVisitedSet.contains(state) && !mWaitingSet.contains(state))
+    if (!mObservedSet.contains(state))
       {
-	mWaitingSet.add(state);
+	mObservedSet.add(state);
 	mStateList.add(state);
 	this.notify();
       }
+  }
+
+  /**
+   * Check if the state explorer appears to be idle.
+   * This means that there are currently no jobs being
+   * processed, and the queue is empty.
+   */
+  public synchronized boolean isIdle()
+  {
+    return noUnexploredStates() && areJobsFinished();
   }
 
 
@@ -81,17 +118,12 @@ public class StateExplorerNode implements Runnable
    */
   public synchronized int getExploredStateCount()
   {
-    return mVisitedSet.size();
+    return mObservedSet.size();
   }
 
   public synchronized int getWaitingStateCount()
   {
     return mStateList.size() - mCurrentStateIndex;
-  }
-
-  public synchronized int getWaitingSetSize()
-  {
-    return mWaitingSet.size();
   }
 
   /**
@@ -109,10 +141,7 @@ public class StateExplorerNode implements Runnable
       return null;
     else
       {
-	StateTuple t = mStateList.get(mCurrentStateIndex++);    
-	mVisitedSet.add(t);
-	mWaitingSet.remove(t);
-	return t;
+	return mStateList.get(mCurrentStateIndex++);    
       }
   }
 
@@ -124,31 +153,30 @@ public class StateExplorerNode implements Runnable
    *
    * When a state is available to process, it will return it,
    * otherwise it will block indefinitely.
+   *
+   * When a state is acquired, it will indicate that a job is running,
+   * in order to preserve atomicity. The calling thread must ensure the
+   * job is finished in future.
    * 
    * @return A state for processing.
+   * @throws InterruptedException If the current thread is interrupted
+   *                              while waiting for a new state.
    */
-  protected synchronized StateTuple waitForNextState()
+  protected synchronized StateTuple waitForNextState() 
+    throws InterruptedException
   {
   waiting: while (true)
       {
-	while (noUnexploredStates())
+	while (noUnexploredStates() || isPaused())
 	  {
-	    try
-	      {
-		this.wait();
-	      }
-	    catch (InterruptedException e)
-	      {
-		throw new WatersRuntimeException(e);
-		//Interruptions are unimportant. If interrupted but
-		//there is still nothing to do, just wait again.
-	      }
+	    this.wait();
 	  }
 	
 	StateTuple state = getNextState();
 	if (state == null)
 	  continue waiting;
 	
+	jobStarted();
 	return state;
       }
   }
@@ -165,7 +193,16 @@ public class StateExplorerNode implements Runnable
 
     while (true)
       {
-	StateTuple state = waitForNextState();
+	StateTuple state = null;
+	try 
+	  {
+	    state = waitForNextState();
+	  }
+	catch (InterruptedException e)
+	  {
+	    //Terminate the thread.
+	    return;
+	  }
 
 	//Decode the state
 	int[] decoded = mEncoding.decodeState(state);
@@ -199,7 +236,9 @@ public class StateExplorerNode implements Runnable
 		int succ = tt.getSuccessorState(decoded[at], ev);
 
 		if (succ >= 0)
-		  successor[at] = succ;
+		  {
+		    successor[at] = succ;
+		  }
 		else if (mModel.getEvent(ev).getKind() == 
 			 EventSchema.UNCONTROLLABLE)
 		  {
@@ -207,9 +246,13 @@ public class StateExplorerNode implements Runnable
 		    //uncontrollable event. Produce a 
 		    //counterexample here.
 		    setUncontrollable();
-		    
-		    //This isn't the right thing to do,
-		    //but meh.
+
+		    //Here we should probably stop, but lets keep exploring
+		    //anyway.
+		    continue events;
+		  }
+		else
+		  {
 		    continue events;
 		  }
 	      }
@@ -218,27 +261,7 @@ public class StateExplorerNode implements Runnable
 	    addState(tuple);
 	  }
 
-	/*
-	events:
-	for (int event = 0; event < eventCount; event++) {
-	  for (int aut = 0; aut < autCount; aut++) {
-	    TransitionTable table = getTransitionTable(aut);
-	    int succ = table.getSuccessorState(decoded[aut], event);
-	    if (succ >= 0) {
-	      successor[aut] = succ;
-	    } else if (aut >= mModel.getFirstSpecIndex() &&
-	               mModel.getEvent(event).getKind() ==
-		       EventSchema.UNCONTROLLABLE) {
-	      // produceCounterExample(state, event);
-	    } else {
-	      continue events;
-	    }
-	  }
-	  // May have to send the state somewhere in distributed case ...
-	  StateTuple tuple = mEncoding.encodeState(successor);
-	  addState(tuple);
-	}
-	*/
+	jobFinished();
       }
   }
 
@@ -293,15 +316,72 @@ public class StateExplorerNode implements Runnable
     return mUncontrollable;
   }
 
+  /**
+   * Pause the state exploration. Pausing will prevent the
+   * waitForNextState method to block, until the state exploratation
+   * is unpaused. This will not prevent new states from being added,
+   * nor will it interrupt any states currently being processed.
+   */
+  public synchronized void pause()
+  {
+    mPaused = true;
+  }
+
+  /**
+   * Unpause the state exploration. This clears the paused flag and
+   * notifies all threads waiting on this object's monitor, so that
+   * they will start exploring states immediately.
+   */
+  public synchronized void unpause()
+  {
+    mPaused = false;
+    this.notifyAll();
+  }
+
+  /**
+   * Check if the current state exploration is paused.
+   */
+  public synchronized boolean isPaused()
+  {
+    return mPaused;
+  }
+
+  /**
+   * Call when a job is started. Increments a count of 
+   * running jobs.
+   */
+  private synchronized void jobStarted()
+  {
+    mRunningJobs++;
+  }
+
+
+  /**
+   * Call when a job is finished. Decrement a count of
+   * running jobs.
+   */
+  private synchronized void jobFinished()
+  {
+    assert mRunningJobs > 0: "Tried to decrement running job count too many times!";
+    mRunningJobs--;
+  }
+
+  /**
+   * Check if all jobs are finished.
+   */
+  public synchronized boolean areJobsFinished()
+  {
+    return mRunningJobs == 0;
+  }
+
   private final ProductDESSchema mModel;
   private final StateEncoding mEncoding;
 
   /**
-   * A set of the states that have been visited and 
-   * expanded by this state explorer.
+   * A set of the states that have been observed (expanded
+   * or queued for expansion) by this state explorer.
    */
-  private final THashSet<StateTuple> mVisitedSet;
-  private final THashSet<StateTuple> mWaitingSet;
+  private final THashSet<StateTuple> mObservedSet;
 
   /**
    * Stores a list of states that have been visited and
@@ -313,6 +393,10 @@ public class StateExplorerNode implements Runnable
   private final TransitionTable[] mPlantTransitions;
   private final TransitionTable[] mSpecTransitions;
 
+
+  private List<Thread> mWorkerThreads = new ArrayList<Thread>();
   private int mCurrentStateIndex = 0;
   private boolean mUncontrollable = false;
+  private boolean mPaused = false;
+  private int mRunningJobs = 0;
 }

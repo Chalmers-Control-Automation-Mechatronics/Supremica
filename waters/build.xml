@@ -416,6 +416,23 @@
     </junit>
   </target>
 
+  <target name="runtest8" depends="test-jar,cpp">
+    <mkdir dir="${logs.results}"/>
+    <junit printsummary="on" fork="true" maxmemory="512m">
+      <formatter type="xml"/>
+      <batchtest todir="${logs.results}">
+        <fileset dir="${supremica.testsrc}">
+          <include name="net/sourceforge/waters/analysis/distributed/*CheckerTest.java"/>
+        </fileset>
+      </batchtest>
+      <classpath refid="waters.test.classpath"/>
+      <sysproperty key="waters.test.inputdir" value="${supremica.examples}"/>
+      <sysproperty key="waters.test.outputdir" value="${logs.results}"/>
+      <sysproperty key="java.library.path" value="${waters.library.path}"/>
+      <jvmarg value="-enableassertions"/>
+    </junit>
+  </target>
+
   <target name="test-report">
     <mkdir dir="${logs.reports}"/>
     <junitreport todir="${logs.reports}">
@@ -442,6 +459,9 @@
           description="Run some test cases."/>
     
   <target name="test7" depends="runtest7,test-report"
+     description="Run some test cases."/>
+
+ <target name="test8" depends="runtest8,test-report"
      description="Run some test cases."/>
 
   <target name="doc" depends="jaxb-generate"

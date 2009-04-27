@@ -46,7 +46,7 @@ public class DistributedSafetyVerifier
     StateExplorerNode explorer = new StateExplorerNode(modelSchema);
 
     //Start some processing threads
-    for (int i = 0; i < 1; i++)
+    for (int i = 0; i < 2; i++)
       explorer.runWorkerThread();
     
 
@@ -54,30 +54,55 @@ public class DistributedSafetyVerifier
     //checker, you could be reasonably sure the model checker
     //had finished by making sure each node was empty a certain 
     //number of times.
-    int emptycount = 0;
-    while (true) {
-	if (explorer.noUnexploredStates())
-	  emptycount++;
-	else
-	  emptycount = 0;
+    while (true) 
+      {
+	//Check if the system appears to be finished.
+	if (explorer.isIdle())
+	  {
+	    //Pause the system, then check if it still 
+	    //appears to be idle
+	    explorer.pause();
+
+	    if (explorer.isIdle())
+	      break;
+	    else
+	      explorer.unpause();
+	  }
+
+	if (explorer.isUncontrollable())
+	  {
+	    explorer.pause();
+	    break;
+	  }
 	
-	System.out.format("%s; Number of states: %d %d %d\n", 
+	System.out.format("%s; Number of states: %d %d\n", 
 			  explorer.isUncontrollable() ? "Uncontrollable" : "Controllable",
 			  explorer.getExploredStateCount(),
-			  explorer.getWaitingStateCount(),
-			  explorer.getWaitingSetSize());
+			  explorer.getWaitingStateCount());
+	
 	try
 	  {
-	    Thread.sleep(100);
+	    Thread.sleep(200);
 	  }
-	catch (Exception e){}
-
-	if (emptycount > 10)
-	  break;
+	catch (InterruptedException e)
+	  {}
       }
-
+	
+    System.out.format("Finished! %s; Number of states: %d %d\n", 
+		      explorer.isUncontrollable() ? "Uncontrollable" : "Controllable",
+		      explorer.getExploredStateCount(),
+		      explorer.getWaitingStateCount());
+    
     //Feign success! That way I can ignore countertraces for a while
-    return setSatisfiedResult();
+    boolean controllable = !explorer.isUncontrollable();
+
+    //Clean up the state explorer.
+    explorer.shutdown();
+
+    if (controllable)
+      return setSatisfiedResult();
+    else
+      return setFailedResult(null);
   }
 
 
