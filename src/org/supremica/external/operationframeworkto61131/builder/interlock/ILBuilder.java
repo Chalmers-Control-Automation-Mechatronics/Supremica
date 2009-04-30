@@ -22,8 +22,6 @@ import org.supremica.external.operationframeworkto61131.util.ReflectionUtil;
 import org.supremica.external.operationframeworkto61131.util.log.LogUtil;
 import org.supremica.manufacturingtables.xsd.interlock.*;
 
-
-
 import java.util.List;
 import java.util.LinkedList;
 
@@ -40,40 +38,38 @@ import java.lang.reflect.Method;
  */
 public class ILBuilder extends Builder {
 
-	// private LogUtil log = LogUtil.getInstance();
-
 	private org.supremica.manufacturingtables.xsd.interlock.IL currentInterlock;
 
-	private int positionX = 30;
+	private static final int positionX = 30;
 
-	private int positionY = 80;
+	private static final int positionY = 80;
 
-	private int distanceUnit = 6;
+	private static final int distanceUnit = 6;
 
 	private Boolean isExtended = false;
 
 	private Boolean hasControlSystem = false;
 
 	/*
-	 * The variable list for machine with control system to communicate with PLC
-	 * It should contains variable that represent Zone, Operation and
-	 * ExteranlComponent State
+	 * The variable list for machine with control system to communicate with
+	 * PLC. It should contain variable that represent Zone, Operation and
+	 * ExteranlComponent State.
 	 */
 
 	private VarList externalVarList = VarList.getInstance();
 
 	/*
-	 * The list of contacts at the end of all rows. Elements in this list will
+	 * The list of Contacts at the end of all rows. Elements in this list will
 	 * be connected to Coil.
 	 */
 	private List<Contact> endOfLineContactList = new LinkedList<Contact>();
 
 	/*
 	 * 
-	 * This list store the contacts that are generate in previous step in one
+	 * This list stores the contacts that are generated in previous step in one
 	 * row. There could be one element when only one contact is generated in
 	 * previous step or several contacts when a divergence is generated in
-	 * previous step.
+	 * previous step. This list is shared by all rows.
 	 */
 	private List<Contact> lastContactList;
 
@@ -202,9 +198,12 @@ public class ILBuilder extends Builder {
 		// Get varialbe from equipmentStateLookUp, the same way as in FB where
 		// IL is needed.
 
-		Var coilVar = this.getStateFeedbackVar(il.getMachine(), il
-				.getActuator(), org.supremica.external.operationframeworkto61131.data.Interlock.class, il
-				.getOperation());
+		Var coilVar = this
+				.getStateFeedbackVar(
+						il.getMachine(),
+						il.getActuator(),
+						org.supremica.external.operationframeworkto61131.data.Interlock.class,
+						il.getOperation());
 
 		Coil coil = new Coil(super.nextLocalId());
 		coil.setVaraible(coilVar.getName());
@@ -451,7 +450,7 @@ public class ILBuilder extends Builder {
 
 	// FIXME will need to extract the divergence connection from a explicit
 	// attribute in the value
-	// Can handle simutanouns divergence with on combination
+	// Can handle simultaneous divergence with combination
 	private Contact generateExternalComponentValueAlternativeContact() {
 
 		// used to extend the LeftPowerRail ConnectionPointOut position
@@ -493,7 +492,8 @@ public class ILBuilder extends Builder {
 			stateQuery.setEquipmentEntityName(currentInterlock.getMachine()
 					+ currentInterlock.getActuator());
 
-			stateQuery.setEquipmentEntityType(org.supremica.external.operationframeworkto61131.data.Indicator.class);
+			stateQuery
+					.setEquipmentEntityType(org.supremica.external.operationframeworkto61131.data.Indicator.class);
 
 			fbCallingVars = equipmentStateLookUp.getFBCallingVars(stateQuery);
 
@@ -891,7 +891,8 @@ public class ILBuilder extends Builder {
 				int startingPointX = lastContactPosition.getX() + distance;
 				Position startingPoition = new Position(startingPointX,
 						startingPointY);
-				newContactList = setContactPosition(newContactList,
+				newContactList = setContactPosition(
+						newContactList,
 						startingPoition,
 						org.supremica.external.operationframeworkto61131.layout.ladder.LeftPowerRail.lineMargin);
 
@@ -924,7 +925,8 @@ public class ILBuilder extends Builder {
 						.getNextPosition(leftPowerRail, row, 0,
 								new Position(distance, 0));
 
-				newContactList = setContactPosition(newContactList,
+				newContactList = setContactPosition(
+						newContactList,
 						startingPoition,
 						org.supremica.external.operationframeworkto61131.layout.ladder.LeftPowerRail.lineMargin);
 
