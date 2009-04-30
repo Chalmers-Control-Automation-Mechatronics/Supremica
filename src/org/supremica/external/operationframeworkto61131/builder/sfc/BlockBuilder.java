@@ -12,8 +12,8 @@ import org.supremica.external.operationframeworkto61131.layout.common.*;
 import org.supremica.external.operationframeworkto61131.layout.sfc.block.Block;
 import org.supremica.external.operationframeworkto61131.main.Constant;
 import org.supremica.external.operationframeworkto61131.util.log.LogUtil;
-
-
+import org.supremica.external.operationframeworkto61131.layout.ladder.RightPowerRail;
+import org.supremica.external.operationframeworkto61131.layout.ladder.Coil;
 
 /**
  * BlockBuilder.java has the methods that is needed to connect to a block or
@@ -39,10 +39,13 @@ public class BlockBuilder {
 
 	private org.supremica.external.operationframeworkto61131.util.DebugUtil debuger = new org.supremica.external.operationframeworkto61131.util.DebugUtil();
 
-	public static org.supremica.external.operationframeworkto61131.layout.sfc.InVariable generateInVariable(Var var,
-			Position startingPosition, List<Object> commonConnector,
-			org.supremica.external.operationframeworkto61131.builder.Builder builder, Position distance,
-			String blockType, List<CommonLayoutObject> addtionObjList) {
+	public static org.supremica.external.operationframeworkto61131.layout.sfc.InVariable generateInVariable(
+			Var var,
+			Position startingPosition,
+			List<Object> commonConnector,
+			org.supremica.external.operationframeworkto61131.builder.Builder builder,
+			Position distance, String blockType,
+			List<CommonLayoutObject> addtionObjList) {
 
 		org.supremica.external.operationframeworkto61131.layout.sfc.InVariable inVariable = new org.supremica.external.operationframeworkto61131.layout.sfc.InVariable(
 				builder.nextLocalId(), var.getName());
@@ -70,8 +73,10 @@ public class BlockBuilder {
 	}
 
 	public static CommonLayoutObject generateVariablesWithBlock(
-			VarList varList, Position startingPosition,
-			List<Object> commonConnector, org.supremica.external.operationframeworkto61131.builder.Builder builder,
+			VarList varList,
+			Position startingPosition,
+			List<Object> commonConnector,
+			org.supremica.external.operationframeworkto61131.builder.Builder builder,
 			Position distance, String blockType,
 			List<CommonLayoutObject> addtionObjList) {
 
@@ -193,7 +198,8 @@ public class BlockBuilder {
 	// connect a list of CommenLayoutObject(InVariable or Block...) to a block,
 	public static void connectCommonLayoutObjectToBlock(
 			List<CommonLayoutObject> commonObjList,
-			org.supremica.external.operationframeworkto61131.layout.sfc.block.Block block, Position distance) {
+			org.supremica.external.operationframeworkto61131.layout.sfc.block.Block block,
+			Position distance) {
 
 		// log.info("connectCommonLayoutObjectToBlock");
 
@@ -229,10 +235,11 @@ public class BlockBuilder {
 		int indexOfYAlign = BigDecimal.valueOf(commonObjList.size())
 				.divideToIntegralValue(BigDecimal.valueOf(2)).intValue() - 1;
 
-		org.supremica.external.operationframeworkto61131.layout.common.Position blockPositonY = block.getNextPosition(
-				commonObjList.get(indexOfYAlign), 0, indexOfYAlign, distance);
-		org.supremica.external.operationframeworkto61131.layout.common.Position blockPositon = block.getNextPosition(
-				commonObjN, 0, indexOfLongestExp, distance);
+		org.supremica.external.operationframeworkto61131.layout.common.Position blockPositonY = block
+				.getNextPosition(commonObjList.get(indexOfYAlign), 0,
+						indexOfYAlign, distance);
+		org.supremica.external.operationframeworkto61131.layout.common.Position blockPositon = block
+				.getNextPosition(commonObjN, 0, indexOfLongestExp, distance);
 
 		blockPositon.setY(blockPositonY.getY());
 
@@ -266,9 +273,12 @@ public class BlockBuilder {
 
 	// Connect one variable to block's out
 
-	public static void generateOutVariableForBlock(Var outVar,
-			CommonLayoutObject block, List<Object> commonConnector,
-			org.supremica.external.operationframeworkto61131.builder.Builder builder, Position distance) {
+	public static void generateOutVariableForBlock(
+			Var outVar,
+			CommonLayoutObject block,
+			List<Object> commonConnector,
+			org.supremica.external.operationframeworkto61131.builder.Builder builder,
+			Position distance) {
 
 		VarList outVarList = VarList.getInstance();
 
@@ -280,9 +290,12 @@ public class BlockBuilder {
 
 	// Connect a list of variables to block's out
 
-	public static void generateOutVariablesForBlock(VarList outVarList,
-			CommonLayoutObject block, List<Object> commonConnector,
-			org.supremica.external.operationframeworkto61131.builder.Builder builder, Position distance) {
+	public static void generateOutVariablesForBlock(
+			VarList outVarList,
+			CommonLayoutObject block,
+			List<Object> commonConnector,
+			org.supremica.external.operationframeworkto61131.builder.Builder builder,
+			Position distance) {
 
 		// connect op_end variable to OR
 
@@ -317,21 +330,42 @@ public class BlockBuilder {
 	}
 
 	// Connect a list of Coil to block's out
-	public static void generateOutCoilForBlock(VarList outVarList,
-			CommonLayoutObject block, List<Object> commonConnector,
-			org.supremica.external.operationframeworkto61131.builder.Builder builder, Position distance,
+	public static void generateOutCoilForBlock(
+			VarList outVarList,
+			CommonLayoutObject block,
+			List<Object> commonConnector,
+			org.supremica.external.operationframeworkto61131.builder.Builder builder,
+			Position distance,
 			org.plcopen.xml.tc6.StorageModifierType storageModifier) {
 
 		// connect op_end variable to OR
 
 		// The distance will be changed, need a new object to avoid reference
 		Position distanceI = new Position(distance);
+
+		// The list of newly generated Coil, they will be connected to
+		// RightPowerRail
+		List<Coil> newCoilList = new LinkedList<Coil>();
+
+		int longestCoilNameLength = 0;
+		for (Var var : outVarList.getVars()) {
+			String coilName = var.getName();
+			// Find the longest Coil name to decide the position.X of
+			// RightPowerRail
+			if (coilName.length() > longestCoilNameLength) {
+
+				longestCoilNameLength = coilName.length();
+			}
+		}
+		int distanceExtendUnit = 7;
+		distanceI.addX(longestCoilNameLength * distanceExtendUnit);
+
 		for (Var var : outVarList.getVars()) {
 
-			org.supremica.external.operationframeworkto61131.layout.ladder.Coil coil = new org.supremica.external.operationframeworkto61131.layout.ladder.Coil(
-					builder.nextLocalId());
+			Coil coil = new Coil(builder.nextLocalId());
 
 			coil.setVaraible(var.getName());
+
 			if (storageModifier != null) {
 
 				coil.setStorage(storageModifier);
@@ -344,7 +378,8 @@ public class BlockBuilder {
 
 			distanceI.addY(lineMargin);
 
-			// If the Out variable is too many and exceed input variable, extend
+			// If the Out variable are too many and exceed input variable,
+			// extend
 			// the LastPositionY
 			if (coil.getPosition().getY() > builder.getLastPosition().getY()) {
 				builder.adjustLastPositionY(lineMargin);
@@ -354,43 +389,72 @@ public class BlockBuilder {
 			// add the var to local Pou interface
 			builder.addToInterfaceVarList(var);
 
+			newCoilList.add(coil);
+
 		}
+
+		// FIXME One rung on the RightPowerRail?Or one rung for each connecting
+		// in Coil.
+		int numOfRung = 1;
+
+		RightPowerRail rightPowerRail = new RightPowerRail(builder
+				.nextLocalId(), numOfRung);
+
+		Position distanceCoilToRightPowerRail = distance.add(
+				longestCoilNameLength * distanceExtendUnit, 0);
+
+		// Connect RightPowerRail to the first coil and fix the position of
+		// RightPowerRail
+		rightPowerRail.connectToOut(newCoilList.get(0),
+				distanceCoilToRightPowerRail);
+
+		// Connect RightPowerRail to the rest Coil in the list with its position
+		// fixed.
+		for (int i = 1; i < newCoilList.size(); i++) {
+
+			rightPowerRail.connectToOut(newCoilList.get(i));
+
+		}
+
+		commonConnector.add(rightPowerRail.getPLCOpenObject());
 
 	}
 
-	public static org.supremica.external.operationframeworkto61131.layout.sfc.block.Block getNOTBlock(int localId) {
+	public static org.supremica.external.operationframeworkto61131.layout.sfc.block.Block getNOTBlock(
+			int localId) {
 
 		String typeName = NOT;
 
-		org.supremica.external.operationframeworkto61131.layout.sfc.block.Block block = getBlock(localId, 1, typeName);
+		org.supremica.external.operationframeworkto61131.layout.sfc.block.Block block = getBlock(
+				localId, 1, typeName);
 
 		return block;
 	}
 
-	public static org.supremica.external.operationframeworkto61131.layout.sfc.block.Block getANDBlock(int localId,
-			int numberOfInputs) {
+	public static org.supremica.external.operationframeworkto61131.layout.sfc.block.Block getANDBlock(
+			int localId, int numberOfInputs) {
 
 		String typeName = AND;
 
-		org.supremica.external.operationframeworkto61131.layout.sfc.block.Block block = getBlock(localId,
-				numberOfInputs, typeName);
+		org.supremica.external.operationframeworkto61131.layout.sfc.block.Block block = getBlock(
+				localId, numberOfInputs, typeName);
 
 		return block;
 	}
 
-	public static org.supremica.external.operationframeworkto61131.layout.sfc.block.Block getORBlock(int localId,
-			int numberOfInputs) {
+	public static org.supremica.external.operationframeworkto61131.layout.sfc.block.Block getORBlock(
+			int localId, int numberOfInputs) {
 
 		String typeName = OR;
 
-		org.supremica.external.operationframeworkto61131.layout.sfc.block.Block block = getBlock(localId,
-				numberOfInputs, typeName);
+		org.supremica.external.operationframeworkto61131.layout.sfc.block.Block block = getBlock(
+				localId, numberOfInputs, typeName);
 
 		return block;
 	}
 
-	public static org.supremica.external.operationframeworkto61131.layout.sfc.block.Block getBlock(int localId,
-			int numberOfInputs, String typeName) {
+	public static org.supremica.external.operationframeworkto61131.layout.sfc.block.Block getBlock(
+			int localId, int numberOfInputs, String typeName) {
 
 		String[] inputs = new String[numberOfInputs];
 		String[] outputs = { "OUT" };
@@ -468,7 +532,8 @@ public class BlockBuilder {
 
 		log.info("Block or");
 
-		org.supremica.external.operationframeworkto61131.util.DebugUtil.printCommonLayoutObject(blockOR);
+		org.supremica.external.operationframeworkto61131.util.DebugUtil
+				.printCommonLayoutObject(blockOR);
 
 	}
 
