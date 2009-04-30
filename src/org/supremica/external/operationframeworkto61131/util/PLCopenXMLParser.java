@@ -9,14 +9,7 @@ import java.util.ArrayList;
 import java.lang.reflect.Method;
 import java.math.*;
 
-import org.plcopen.xml.tc6.Body;
-import org.plcopen.xml.tc6.Project;
-import org.supremica.external.operationframeworkto61131.builder.functionblock.DummyMachineFB;
-import org.supremica.external.operationframeworkto61131.layout.common.Connection;
-import org.supremica.external.operationframeworkto61131.layout.common.ConnectionPointIn;
-import org.supremica.external.operationframeworkto61131.layout.common.Position;
-import org.supremica.external.operationframeworkto61131.layout.sfc.block.Block;
-import org.supremica.external.operationframeworkto61131.layout.sfc.block.Variable;
+
 import org.supremica.external.operationframeworkto61131.main.Constant;
 import org.supremica.external.operationframeworkto61131.util.ReflectionUtil;
 
@@ -103,7 +96,7 @@ public class PLCopenXMLParser {
 		}
 
 		/*
-		 * When the refered target obj is a block, have to check if the found
+		 * When the refered target obj is a block, have to check if the founded
 		 * obj has the right formalParameter This is only needed for direct
 		 * connection
 		 */
