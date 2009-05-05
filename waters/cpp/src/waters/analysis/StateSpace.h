@@ -43,7 +43,7 @@ public:
 
   //##########################################################################
   //# Access
-  uint32 size() const {return mNumStates;}
+  inline uint32 size() const {return mNumStates;}
   uint32* get(const uint32 index) const;
   uint32* prepare();
   uint32* prepare(const uint32 index);

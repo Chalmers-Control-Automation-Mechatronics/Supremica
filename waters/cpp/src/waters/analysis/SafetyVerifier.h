@@ -37,7 +37,10 @@ namespace jni {
 
 namespace waters {
 
+class AutomatonRecord;
 class EventRecord;
+class NondeterministicTransitionIterator;
+class SafetyVerifier;
 class StateSpace;
 
 
@@ -71,9 +74,10 @@ private:
   //##########################################################################
   //# Auxiliary Methods
   void setup();
+  void teardown();
   bool checkProperty();
   void computeCounterExample();
-  void teardown();
+  bool checkTraceState();
 
   //##########################################################################
   //# Data Members
@@ -87,9 +91,11 @@ private:
   int mNumEventRecords;
   bool mIsTrivial;
   EventRecord** mEventRecords;
-  uint32* mCurrentTuple;
-  uint32 mBadState;
-  const EventRecord* mBadEvent;
+  int mNumNondetInitialStates;
+  NondeterministicTransitionIterator* mNondeterministicTransitionIterators;
+  uint32 mTraceState;
+  const EventRecord* mTraceEvent;
+  uint32 mTraceLimit;
   jni::ListGlue* mTraceList;
   int mNumAutomata;
   uint32 mNumStates;

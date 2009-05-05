@@ -83,9 +83,10 @@ EventRecord(jni::EventGlue event, bool controllable, int numwords)
     mIsGloballyDisabled(false),
     mIsOnlySelfloops(true),
     mIsDisabledInSpec(false),
+    mIsDeterministic(true),
     mNumberOfWords(numwords),
-    mSearchRecords(0),
-    mTraceSearchRecords(0)
+    mUsedSearchRecords(0),
+    mUnusedSearchRecords(0)
 {
   mUpdateRecords = new TransitionUpdateRecord*[numwords];
   for (int w = 0; w < numwords; w++) {
@@ -100,8 +101,8 @@ EventRecord::
     delete mUpdateRecords[w];
   }
   delete [] mUpdateRecords;
-  delete mSearchRecords;
-  delete mTraceSearchRecords;
+  delete mUsedSearchRecords;
+  delete mUnusedSearchRecords;
 }
 
 
@@ -114,7 +115,7 @@ isSkippable()
 {
   if (mIsGloballyDisabled) {
     return true;
-  } else if (mSearchRecords == 0 && mTraceSearchRecords == 0) {
+  } else if (mUsedSearchRecords == 0 && mUnusedSearchRecords == 0) {
     return true;
   } else if (mIsOnlySelfloops) {
     return mIsControllable ? true : !mIsDisabledInSpec;
@@ -138,7 +139,7 @@ getName()
 //# EventRecord: Comparing
 
 int EventRecord::
-compareTo(const EventRecord* partner)
+compareToForForwardSearch(const EventRecord* partner)
   const
 {
   const int cont1 = mIsControllable ? 1 : 0;
@@ -151,42 +152,76 @@ compareTo(const EventRecord* partner)
 }
 
 int EventRecord::
-compare(const void* elem1, const void* elem2)
+compareToForBackwardSearch(const EventRecord* partner)
+  const
+{
+  const float prob1 = mProbability;
+  const float prob2 = partner->mProbability;
+  if (prob1 < prob2) {
+    return 1;
+  } else if (prob2 < prob1) {
+    return -1;
+  } else {
+    return mJavaEvent.compareTo(&partner->mJavaEvent);
+  }
+}
+
+int EventRecord::
+compareForForwardSearch(const void* elem1, const void* elem2)
 {
   const EventRecord* val1 = *((const EventRecord**) elem1);
   const EventRecord* val2 = *((const EventRecord**) elem2);
-  return val1->compareTo(val2);
+  return val1->compareToForForwardSearch(val2);
+}
+
+int EventRecord::
+compareForBackwardSearch(const void* elem1, const void* elem2)
+{
+  const EventRecord* val1 = *((const EventRecord**) elem1);
+  const EventRecord* val2 = *((const EventRecord**) elem2);
+  return val1->compareToForBackwardSearch(val2);
 }
 
 
 //############################################################################
-//# Set up
+//# EventRecord: Set up
 
 bool EventRecord::
-addTransition(const AutomatonRecord* aut,
-              const StateRecord* source,
-              const StateRecord* target)
+addDeterministicTransition(const AutomatonRecord* aut,
+                           const StateRecord* source,
+                           const StateRecord* target)
 {
   if (mIsGloballyDisabled) {
     return true;
   } else {
-    if (mSearchRecords == 0 ||
-        mSearchRecords->getAutomaton() != aut) {
-      mSearchRecords = new TransitionRecord(aut, mSearchRecords);
+    if (mUsedSearchRecords == 0 ||
+        mUsedSearchRecords->getAutomaton() != aut) {
+      mUsedSearchRecords = new TransitionRecord(aut, mUsedSearchRecords);
     }
-    return mSearchRecords->addTransition(source, target);
+    return mUsedSearchRecords->addDeterministicTransition(source, target);
+  }
+}
+
+void EventRecord::
+addNondeterministicTransition(const AutomatonRecord* aut,
+                              const StateRecord* source,
+                              const StateRecord* target)
+{
+  if (mUsedSearchRecords != 0 && mUsedSearchRecords->getAutomaton() == aut) {
+    mUsedSearchRecords->addNondeterministicTransition(source, target);
   }
 }
 
 void EventRecord::
 normalize(const AutomatonRecord* aut)
 {
-  TransitionRecord* trans = mSearchRecords;
+  TransitionRecord* trans = mUsedSearchRecords;
   if (trans != 0 && trans->getAutomaton() == aut) {
     trans->normalize();
+    mIsDeterministic &= trans->isDeterministic();
     const bool unlinked = trans->isAlwaysEnabled();
     if (unlinked) {
-      mSearchRecords = trans->getNextInSearch();
+      mUsedSearchRecords = trans->getNextInSearch();
     } else {
       mIsDisabledInSpec |= !aut->isPlant();
     }
@@ -196,24 +231,23 @@ normalize(const AutomatonRecord* aut)
         delete trans;
       }
     } else {
-      const AutomatonRecord* aut = trans->getAutomaton();
       const int wordindex = aut->getWordIndex();
       TransitionUpdateRecord* update = createUpdateRecord(wordindex);
       update->addTransition(trans);
       if (unlinked) {
-        trans->setNextInSearch(mTraceSearchRecords);
-        mTraceSearchRecords = trans;
+        trans->setNextInSearch(mUnusedSearchRecords);
+        mUnusedSearchRecords = trans;
       }
       mIsOnlySelfloops = false;
     }
   } else if (!mIsGloballyDisabled) {
     if (mIsControllable || aut->isPlant()) {
-      delete mSearchRecords;
-      delete mTraceSearchRecords;
-      mSearchRecords = mTraceSearchRecords = 0;
+      delete mUsedSearchRecords;
+      delete mUnusedSearchRecords;
+      mUsedSearchRecords = mUnusedSearchRecords = 0;
       mIsGloballyDisabled = true;
     } else {
-      mSearchRecords = new TransitionRecord(aut, mSearchRecords);
+      mUsedSearchRecords = new TransitionRecord(aut, mUsedSearchRecords);
       mIsDisabledInSpec = true;
     }
   }
@@ -232,21 +266,116 @@ createUpdateRecord(int wordindex)
 void EventRecord::
 sortTransitionRecordsForSearch()
 {
-  TransitionRecordList list(mSearchRecords);
+  TransitionRecordList list(mUsedSearchRecords);
   list.qsort(TransitionRecord::compareForSearch);
-  mSearchRecords = list.getHead();
+  mUsedSearchRecords = list.getHead();
+}
+
+bool EventRecord::
+reverse()
+{
+  if (mIsGloballyDisabled) {
+    mProbability = 0.0;
+    return false;
+  } else {
+    TransitionRecord* used = mUsedSearchRecords;
+    TransitionRecord* unused = mUnusedSearchRecords;
+    clearSearchAndUpdateRecords();
+    mIsDeterministic = 1;
+    mProbability = 1.0;
+    addReversedList(used);
+    addReversedList(unused);
+    if (mIsGloballyDisabled) {
+      return false;
+    } else {
+      TransitionRecordList list(mUsedSearchRecords);
+      list.qsort(TransitionRecord::compareForTrace);
+      mUsedSearchRecords = list.getHead();
+      return true;
+    }
+  }
+}
+
+
+//############################################################################
+//# EventRecord: Set up
+
+void EventRecord::
+addReversedList(TransitionRecord* trans)
+{
+  if (mIsGloballyDisabled) {
+    delete trans;
+  } else {
+    while (trans != 0) {
+      TransitionRecord* next = trans->getNextInSearch();
+      if (trans->isAlwaysDisabled()) {
+        mIsGloballyDisabled = true;
+        mProbability = 0.0;
+        delete trans;
+        delete mUsedSearchRecords;
+        delete mUnusedSearchRecords;
+        clearSearchAndUpdateRecords();
+        return;
+      } else if (trans->isOnlySelfloops()) {
+        enqueueSearchRecord(trans);
+      } else {
+        const AutomatonRecord* aut = trans->getAutomaton();
+        const uint32 numstates = aut->getNumberOfStates();
+        const int shift = aut->getShift();
+        TransitionRecord* reversed = new TransitionRecord(aut, 0);
+        int maxpass = 1;
+        for (int pass = 1; pass <= maxpass; pass++) {
+          for (uint32 source = 0; source < numstates; source++) {
+            const uint32 numsucc = trans->getNumberOfSuccessors(source);
+            for (uint32 offset = 0; offset < numsucc; offset++) {
+              const uint32 shiftedtarget =
+                trans->getSuccessorShifted(source, offset);
+              const uint32 target = shiftedtarget >> shift;
+              if (pass == 1) {
+                if (!reversed->addDeterministicTransition(target, source)) {
+                  maxpass = 2;
+                }
+              } else {
+                reversed->addNondeterministicTransition(target, source);
+              }
+            }
+          }
+        }
+        trans->setNextInSearch(0);
+        delete trans;
+        reversed->normalize();
+        mIsDeterministic &= reversed->isDeterministic();
+        enqueueSearchRecord(reversed);
+        const int wordindex = aut->getWordIndex();
+        TransitionUpdateRecord* update = createUpdateRecord(wordindex);
+        update->addTransition(reversed);
+      }
+      trans = next;
+    }
+  }
 }
 
 void EventRecord::
-sortTransitionRecordsForTrace()
+enqueueSearchRecord(TransitionRecord* trans)
 {
-  if (mSearchRecords == 0) {
-    mSearchRecords = mTraceSearchRecords;
+  if (trans->isAlwaysEnabled()) {
+    trans->setNextInSearch(mUnusedSearchRecords);
+    mUnusedSearchRecords = trans;
   } else {
-    TransitionRecordList list(mSearchRecords);
-    list.append(mTraceSearchRecords);
+    trans->setNextInSearch(mUsedSearchRecords);
+    mUsedSearchRecords = trans;
   }
-  mTraceSearchRecords = 0;
+  mProbability *= trans->getProbability();
+}
+
+void EventRecord::
+clearSearchAndUpdateRecords()
+{
+  mUsedSearchRecords = mUnusedSearchRecords = 0;
+  for (int w = 0; w < mNumberOfWords; w++) {
+    delete mUpdateRecords[w];
+    mUpdateRecords[w] = 0;
+  }
 }
 
 

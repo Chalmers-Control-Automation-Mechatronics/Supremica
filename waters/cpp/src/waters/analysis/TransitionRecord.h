@@ -43,16 +43,26 @@ public:
 
   //##########################################################################
   //# Simple Access
-  const AutomatonRecord* getAutomaton() const {return mAutomaton;}
-  uint32 getShiftedSuccessor(uint32 source) const
-    {return mShiftedSuccessors[source];}
-  bool isAlwaysDisabled() const {return mWeight == 0;}
-  bool isAlwaysEnabled() const {return mWeight == PROBABILITY_1;}
-  bool isOnlySelfloops() const {return mIsOnlySelfloops;}
-  TransitionRecord* getNextInSearch() const {return mNextInSearch;}
-  void setNextInSearch(TransitionRecord* next) {mNextInSearch = next;}
-  TransitionRecord* getNextInUpdate() const {return mNextInUpdate;}
-  void setNextInUpdate(TransitionRecord* next) {mNextInUpdate = next;}
+  inline const AutomatonRecord* getAutomaton() const {return mAutomaton;}
+  inline uint32 getDeterministicSuccessorShifted(uint32 source) const
+    {return mDeterministicSuccessorsShifted[source];}
+  inline uint32 getNumberOfNondeterministicSuccessors(uint32 source) const
+    {return mNumNondeterministicSuccessors[source];} // unsafe
+  inline uint32 getNondeterministicSuccessorShifted
+    (uint32 source, uint32 index) const
+    {return mNondeterministicSuccessorsShifted[source][index];} // unsafe
+  uint32 getNumberOfSuccessors(uint32 source) const; // slow
+  uint32 getSuccessorShifted(uint32 source, uint32 index) const; // slow
+  inline bool isAlwaysDisabled() const {return mWeight == 0;}
+  inline bool isAlwaysEnabled() const {return mWeight == PROBABILITY_1;}
+  inline bool isOnlySelfloops() const {return mIsOnlySelfloops;}
+  inline bool isDeterministic() const
+    {return mNumNondeterministicSuccessors == 0;}
+  float getProbability() const;
+  inline TransitionRecord* getNextInSearch() const {return mNextInSearch;}
+  inline void setNextInSearch(TransitionRecord* next) {mNextInSearch = next;}
+  inline TransitionRecord* getNextInUpdate() const {return mNextInUpdate;}
+  inline void setNextInUpdate(TransitionRecord* next) {mNextInUpdate = next;}
 
   //##########################################################################
   //# Comparing and Hashing
@@ -65,23 +75,41 @@ public:
 
   //##########################################################################
   //# Set up
-  bool addTransition(const StateRecord* source, const StateRecord* target);
+  bool addDeterministicTransition(const StateRecord* source,
+				  const StateRecord* target);
+  bool addDeterministicTransition(const uint32 source, const uint32 target);
+  void addNondeterministicTransition(const StateRecord* source,
+				     const StateRecord* target);
+  void addNondeterministicTransition(const uint32 source, const uint32 target);
   void normalize();
   uint32 getCommonTarget() const;
 
+  //##########################################################################
+  //# Class Constants
+  static const uint32 NO_TRANSITION = 0xffffffff;
+  static const uint32 MULTIPLE_TRANSITIONS = 0xfffffffe;
+
 private:
+  //##########################################################################
+  //# Auxiliary Methods
+  void setupNondeterministicBuffers();
+
   //##########################################################################
   //# Data Members
   const AutomatonRecord* mAutomaton;
   int mWeight;
   bool mIsOnlySelfloops;
-  uint32* mShiftedSuccessors;
+  uint32* mDeterministicSuccessorsShifted;
+  uint32* mNumNondeterministicSuccessors;
+  uint32* mNondeterministicBuffer;
+  uint32** mNondeterministicSuccessorsShifted;
   TransitionRecord* mNextInSearch;
   TransitionRecord* mNextInUpdate;
 
   //##########################################################################
   //# Class Constants
-  static const int PROBABILITY_1 = 0x10000000;
+  static const int PROBABILITY_1 = 0x40000000;
+  static const float PROBABILITY_ADJUST = 1.0f / PROBABILITY_1;
 };
 
 typedef int (*TransitionRecordComparator)
@@ -121,6 +149,41 @@ private:
   //# Data Members
   TransitionRecord* mHead;
   TransitionRecord* mTail;
+};
+
+
+//############################################################################
+//# class NondeterministicTransitionIterator
+//############################################################################
+
+class NondeterministicTransitionIterator
+{
+public:
+  //##########################################################################
+  //# Constructors & Destructors
+  explicit NondeterministicTransitionIterator();
+  ~NondeterministicTransitionIterator() {}
+
+  //##########################################################################
+  //# Initial State Iteration
+  void setupInit(const AutomatonRecord* aut);
+  bool advanceInit(uint32* tuple);
+
+  //##########################################################################
+  //# Transition Iteration
+  uint32 setup(const TransitionRecord* trans, uint32 source);
+  bool advance(uint32* tuple);
+  uint32 reset();
+  uint32 next();
+  uint32 current();
+
+private:
+  //##########################################################################
+  //# Data Members
+  const AutomatonRecord* mAutomatonRecord;
+  const TransitionRecord* mTransitionRecord;
+  uint32 mSource;
+  int mIndex;  
 };
 
 

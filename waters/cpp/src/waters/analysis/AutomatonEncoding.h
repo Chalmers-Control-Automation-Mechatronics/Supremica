@@ -75,13 +75,14 @@ public:
   //##########################################################################
   //# Simple Access
   const jni::AutomatonGlue& getJavaAutomaton() const {return mJavaAutomaton;}
-  bool isPlant() const {return mIsPlant;}
-  int getNumberOfStates() const {return mNumStates;}
-  int getNumberOfBits() const {return mNumBits;}
-  int getAutomatonIndex() const {return mAutomatonIndex;}
-  int getWordIndex() const {return mWordIndex;}
-  int getShift() const {return mShift;}
-  int getBitMask() const {return mBitMask;}
+  inline bool isPlant() const {return mIsPlant;}
+  inline int getNumberOfStates() const {return mNumStates;}
+  inline uint32 getNumberOfInitialStates() const {return mNumInitialStates;}
+  inline int getNumberOfBits() const {return mNumBits;}
+  inline int getAutomatonIndex() const {return mAutomatonIndex;}
+  inline int getWordIndex() const {return mWordIndex;}
+  inline int getShift() const {return mShift;}
+  inline int getBitMask() const {return mBitMask;}
   jni::JavaString getName() const;
   jni::JavaString getStateName(uint32 code) const;
 
@@ -89,12 +90,15 @@ public:
   //# Comparing and Hashing
   int compareTo(const AutomatonRecord* partner) const;
   static int compare(const void* elem1, const void* elem2);
-  static const HashAccessor* getHashAccessor() {return &theHashAccessor;}
+  static inline const HashAccessor* getHashAccessor()
+    {return &theHashAccessor;}
 
   //##########################################################################
   //# Setting up
   void allocate(int wordindex, int shift);
-  void setAutomatonIndex(int index) {mAutomatonIndex = index;}
+  inline void setAutomatonIndex(int index) {mAutomatonIndex = index;}
+  inline void setNumberOfInitialStates(uint32 numinit)
+    {mNumInitialStates = numinit;}
 
 private:
   //##########################################################################
@@ -103,6 +107,7 @@ private:
   jni::StateGlue* mJavaStates;
   bool mIsPlant;
   int mNumStates;
+  uint32 mNumInitialStates;
   int mNumBits;
   int mAutomatonIndex;
   int mWordIndex;
@@ -132,10 +137,12 @@ public:
 
   //##########################################################################
   //# Simple Access
-  int getNumberOfWords() const {return mNumWords;}
-  int getNumberOfRecords() const {return mNumRecords;}
-  const AutomatonRecord* getRecord(int index) const
+  inline int getNumberOfWords() const {return mNumWords;}
+  inline int getNumberOfRecords() const {return mNumRecords;}
+  inline const AutomatonRecord* getRecord(int index) const
     {return mAutomatonRecords[index];}
+  inline void setNumberOfInitialStates(int index, uint32 numinit)
+    {mAutomatonRecords[index]->setNumberOfInitialStates(numinit);}
   bool hasSpecs() const;
 
   //##########################################################################

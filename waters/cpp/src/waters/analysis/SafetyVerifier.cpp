@@ -47,6 +47,19 @@
 namespace waters {
 
 //############################################################################
+//# exception TraceAbort
+//############################################################################
+
+class TraceAbort {
+public:
+  //##########################################################################
+  //# Constructors & Destructors
+  TraceAbort() {}
+  ~TraceAbort() {}
+};
+
+
+//############################################################################
 //# class SafetyVerifier
 //############################################################################
 
@@ -67,9 +80,9 @@ SafetyVerifier(const jni::ProductDESGlue des,
     mNumEventRecords(0),
     mIsTrivial(false),
     mEventRecords(0),
-    mCurrentTuple(0),
-    mBadState(UNDEF_UINT32),
-    mBadEvent(0),
+    mNondeterministicTransitionIterators(0),
+    mTraceState(UNDEF_UINT32),
+    mTraceEvent(0),
     mTraceList(0),
     mNumStates(0)
 {
@@ -86,7 +99,7 @@ SafetyVerifier::
     delete mEventRecords[i];
   }
   delete [] mEventRecords;
-  delete [] mCurrentTuple;
+  delete [] mNondeterministicTransitionIterators;
   delete mTraceList;
 }
 
@@ -98,6 +111,8 @@ bool SafetyVerifier::
 run()
 {
   try {
+    // const jni::JavaString name(mCache->getEnvironment(), mModel.getName());
+    // std::cerr << (const char*) name << std::endl;
     setup();
     bool result = checkProperty();
     if (!result) {
@@ -173,55 +188,75 @@ setup()
     eventmap.add(record);
   }
 
-  // Prepare initial state ...
-  mCurrentTuple = new uint32[mNumAutomata];
-  int a;
-  for (a = 0; a < mNumAutomata; a++) {
-    mCurrentTuple[a] = UNDEF_UINT32;
-  }    
-
-  // Collect transitions ...
+  // Collect initial states and transitions ...
+  mNumNondetInitialStates = 0;
+  mNondeterministicTransitionIterators =
+    new NondeterministicTransitionIterator[mNumAutomata];
   const HashAccessor* stateaccessor = StateRecord::getHashAccessor();
   HashTable<jni::StateGlue*,StateRecord*> statemap(stateaccessor, 256);
-  for (a = 0; a < mNumAutomata; a++) {
+  for (int a = 0; a < mNumAutomata; a++) {
     const AutomatonRecord* autrecord = mEncoding->getRecord(a);
     const jni::AutomatonGlue aut = autrecord->getJavaAutomaton();
     const jni::SetGlue states = aut.getStatesGlue(mCache);
     const jni::IteratorGlue stateiter = states.iteratorGlue(mCache);
-    uint32 code = 0;
+    uint32 nextinit = 0;
+    uint32 nextnoninit = states.size() - 1;
     while (stateiter.hasNext()) {
       jobject javaobject = stateiter.next();
       jni::StateGlue state(javaobject, mCache);
+      uint32 code;
+      if (!state.isInitial()) {
+        code = nextnoninit--;
+      } else if (nextinit == 0 || autrecord->isPlant()) {
+        code = nextinit++;
+      } else {
+        jni::NondeterministicDESExceptionGlue exception(&aut, &state, mCache);
+        throw mCache->throwJavaException(exception);
+      }
       StateRecord* staterecord = new StateRecord(state, code, mCache);
       statemap.add(staterecord);
-      if (state.isInitial()) {
-        if (mCurrentTuple[a] == UNDEF_UINT32) {
-          mCurrentTuple[a] = code;
-        } else {
-          jni::NondeterministicDESExceptionGlue
-            exception(&aut, &state, mCache);
-          throw mCache->throwJavaException(exception);
-        }
-      }
-      code++;
+    }
+    mEncoding->setNumberOfInitialStates(a, nextinit);
+    switch (nextinit) {
+    case 0:
+      mIsTrivial = true;
+      return;
+    case 1:
+      break;
+    default:
+      mNondeterministicTransitionIterators[mNumNondetInitialStates++].
+        setupInit(autrecord);
+      break;
     }
     const jni::CollectionGlue transitions = aut.getTransitionsGlue(mCache);
-    const jni::IteratorGlue transiter = transitions.iteratorGlue(mCache);
-    while (transiter.hasNext()) {
-      jobject javaobject = transiter.next();
-      jni::TransitionGlue trans(javaobject, mCache);
-      jni::EventGlue event = trans.getEventGlue(mCache);
-      EventRecord* eventrecord = eventmap.get(&event);
-      jni::StateGlue source = trans.getSourceGlue(mCache);
-      StateRecord* sourcerecord = statemap.get(&source);
-      jni::StateGlue target = trans.getTargetGlue(mCache);
-      StateRecord* targetrecord = statemap.get(&target);
-      bool det =
-        eventrecord->addTransition(autrecord, sourcerecord, targetrecord);
-      if (!det) {
-        jni::NondeterministicDESExceptionGlue
-          exception(&aut, &source, &event, mCache);
-        throw mCache->throwJavaException(exception);
+    int maxpass = 1;
+    for (int pass = 1; pass <= maxpass; pass++) {
+      const jni::IteratorGlue transiter = transitions.iteratorGlue(mCache);
+      while (transiter.hasNext()) {
+        jobject javaobject = transiter.next();
+        jni::TransitionGlue trans(javaobject, mCache);
+        jni::EventGlue event = trans.getEventGlue(mCache);
+        EventRecord* eventrecord = eventmap.get(&event);
+        jni::StateGlue source = trans.getSourceGlue(mCache);
+        StateRecord* sourcerecord = statemap.get(&source);
+        jni::StateGlue target = trans.getTargetGlue(mCache);
+        StateRecord* targetrecord = statemap.get(&target);
+        if (pass == 1) {
+          const bool det = eventrecord->addDeterministicTransition
+            (autrecord, sourcerecord, targetrecord);
+          if (!det) {
+            if (autrecord->isPlant()) {
+              maxpass = 2;
+            } else {
+              jni::NondeterministicDESExceptionGlue
+                exception(&aut, &source, &event, mCache);
+              throw mCache->throwJavaException(exception);
+            }
+          }
+        } else {
+          eventrecord->addNondeterministicTransition
+            (autrecord, sourcerecord, targetrecord);
+        }
       }
     }
     statemap.clear();
@@ -262,171 +297,7 @@ setup()
     }
   }
   qsort(mEventRecords, mNumEventRecords, sizeof(EventRecord*),
-        EventRecord::compare);
-}
-
-
-bool SafetyVerifier::
-checkProperty()
-{
-  // No interesting specs?
-  if (mIsTrivial) {
-    return true;
-  }
-
-  // Store initial state ...
-  const int numwords = mEncoding->getNumberOfWords();
-  for (int a = 0; a < mNumAutomata; a++) {
-    if (mCurrentTuple[a] == UNDEF_UINT32) {
-      return true;
-    }
-  }
-  uint32* packedcurrent = mStateSpace->prepare();
-  mEncoding->encode(mCurrentTuple, packedcurrent);
-  mStateSpace->add();
-  mNumStates = mStateSpace->size();
-
-  uint32 nextlevel = mNumStates;
-  mDepthMap->add(0);
-  mDepthMap->add(nextlevel);
-
-  // Main loop ...
-  uint32 current = 0;
-  uint32* packednext;
-  while (current < mNumStates) {
-    packedcurrent = mStateSpace->get(current);
-    mEncoding->decode(packedcurrent, mCurrentTuple);
-    for (int e = 0; e < mNumEventRecords; e++) {
-      EventRecord* event = mEventRecords[e];
-      for (TransitionRecord* trans = event->getTransitionRecord();
-           trans != 0;
-           trans = trans->getNextInSearch()) {
-        const AutomatonRecord* aut = trans->getAutomaton();
-        const int a = aut->getAutomatonIndex();
-        const uint32 source = mCurrentTuple[a];
-        const uint32 target = trans->getShiftedSuccessor(source);
-        if (target == UNDEF_UINT32) {
-          if (aut->isPlant() || event->isControllable()) {
-            goto nextevent;
-          } else {
-            mBadState = current;
-            mBadEvent = event;
-            return false;
-          }
-        }
-      }
-      packednext = mStateSpace->prepare();
-      for (int w = 0; w < numwords; w++) {
-        TransitionUpdateRecord* update = event->getTransitionUpdateRecord(w);
-        if (update == 0) {
-          packednext[w] = packedcurrent[w];
-        } else {
-          uint32 word = (packedcurrent[w] & update->getKeptMask()) |
-            update->getCommonTargets();
-          for (TransitionRecord* trans = update->getTransitionRecords();
-               trans != 0;
-               trans = trans->getNextInUpdate()) {
-            const AutomatonRecord* aut = trans->getAutomaton();
-            const int a = aut->getAutomatonIndex();
-            const uint32 source = mCurrentTuple[a];
-            word |= trans->getShiftedSuccessor(source);
-          }
-          packednext[w] = word;
-        }
-      }
-      if (mStateSpace->add() == mNumStates) {
-        mNumStates++;
-      }
-    nextevent:
-      ;
-    }
-    if (++current == nextlevel) {
-      nextlevel = mNumStates;
-      mDepthMap->add(nextlevel);
-    }
-  }
-  return true;
-}
-
-
-void SafetyVerifier::
-computeCounterExample()
-{
-  mTraceList = new jni::LinkedListGlue(mCache);
-  jni::EventGlue eventglue = mBadEvent->getJavaEvent();
-  mTraceList->add(0, &eventglue);
-
-  uint32 level = mDepthMap->size() - 2;
-  if (level > 0) {
-    for (int e = 0; e < mNumEventRecords; e++) {
-      EventRecord* event = mEventRecords[e];
-      event->sortTransitionRecordsForTrace();
-    }
-    const int numwords = mEncoding->getNumberOfWords();
-    uint32* packedtarget = mStateSpace->get(mBadState);
-    uint32* targettuple = new uint32[mNumAutomata];
-    mEncoding->decode(packedtarget, targettuple);
-    // mEncoding->dumpEncodedState(packedtarget);
-    
-    do {
-      uint32 current = mDepthMap->get(--level);
-      uint32* packedcurrent;
-      const EventRecord* event;
-      mEncoding->shift(targettuple);
-      do {
-        packedcurrent = mStateSpace->get(current++);
-        bool decoded = false;
-        for (int e = 0; e < mNumEventRecords; e++) {
-          event = mEventRecords[e];
-          for (int w = 0; w < numwords; w++) {
-            TransitionUpdateRecord* update =
-              event->getTransitionUpdateRecord(w);
-            if (update == 0) {
-              if (packedcurrent[w] != packedtarget[w]) {
-                goto notfound;
-              }
-            } else {
-              const uint32 kept = update->getKeptMask();
-              if ((packedcurrent[w] & kept) != (packedtarget[w] & kept)) {
-                goto notfound;
-              } else if ((packedtarget[w] & update->getCommonMask()) !=
-                         update->getCommonTargets()) {
-                goto notfound;
-              }
-            }
-          }
-          if (!decoded) {
-            mEncoding->decode(packedcurrent, mCurrentTuple);
-            decoded = true;
-          }
-          for (TransitionRecord* trans = event->getTransitionRecord();
-               trans != 0;
-               trans = trans->getNextInSearch()) {
-            const AutomatonRecord* aut = trans->getAutomaton();
-            const int a = aut->getAutomatonIndex();
-            const uint32 state = mCurrentTuple[a];
-            const uint32 succ = trans->getShiftedSuccessor(state);
-            if (succ != targettuple[a]) {
-              goto notfound;
-            }
-          }
-          goto found;
-        notfound:
-          ;
-        }
-      } while (true);
-    found:
-      // mEncoding->dumpEncodedState(packedcurrent);
-      jni::EventGlue eventglue = event->getJavaEvent();
-      mTraceList->add(0, &eventglue);
-      packedtarget = packedcurrent;
-      uint32* temp = mCurrentTuple;
-      mCurrentTuple = targettuple;
-      targettuple = temp;
-    } while (level > 0);
-
-    delete [] targettuple;
-  }
+        EventRecord::compareForForwardSearch);
 }
 
 
@@ -445,8 +316,227 @@ teardown()
   mNumEventRecords = 0;
   delete [] mEventRecords;
   mEventRecords = 0;
-  delete [] mCurrentTuple;
-  mCurrentTuple = 0;
+  delete [] mNondeterministicTransitionIterators;
+  mNondeterministicTransitionIterators = 0;
+}
+
+
+// I know this is really kludgy,
+// but inlining this code is 15% faster than using method calls.
+// ~~~Robi
+
+#define FIND_DISABLING_AUTOMATON(tuple, event, dis)                     \
+  {                                                                     \
+    for (TransitionRecord* trans = event->getTransitionRecord();        \
+         trans != 0;                                                    \
+         trans = trans->getNextInSearch()) {                            \
+      const AutomatonRecord* aut = trans->getAutomaton();               \
+      const int a = aut->getAutomatonIndex();                           \
+      const uint32 source = tuple[a];                                   \
+      const uint32 target = trans->getDeterministicSuccessorShifted(source); \
+      if (target == TransitionRecord::NO_TRANSITION) {                  \
+        dis = aut;                                                      \
+        break;                                                          \
+      }                                                                 \
+    }                                                                   \
+  }
+
+#define ADD_NEW_STATE (mStateSpace->add() == mNumStates)
+
+#define EXPAND_ENABLED_TRANSITIONS(numwords, tuple, packedtuple, event) \
+  {                                                                     \
+    uint32* packednext = mStateSpace->prepare();                        \
+    if (event->isDeterministic()) {                                     \
+      for (int w = 0; w < numwords; w++) {                              \
+        TransitionUpdateRecord* update = event->getTransitionUpdateRecord(w); \
+        if (update == 0) {                                              \
+          packednext[w] = packedtuple[w];                               \
+        } else {                                                        \
+          uint32 word = (packedtuple[w] & update->getKeptMask()) |      \
+            update->getCommonTargets();                                 \
+          for (TransitionRecord* trans = update->getTransitionRecords(); \
+               trans != 0;                                              \
+               trans = trans->getNextInUpdate()) {                      \
+            const AutomatonRecord* aut = trans->getAutomaton();         \
+            const int a = aut->getAutomatonIndex();                     \
+            const uint32 source = tuple[a];                             \
+            word |= trans->getDeterministicSuccessorShifted(source);    \
+          }                                                             \
+          packednext[w] = word;                                         \
+        }                                                               \
+      }                                                                 \
+      if (ADD_NEW_STATE) {                                              \
+        mNumStates++;                                                   \
+      }                                                                 \
+    } else {                                                            \
+      int ndcount = 0;                                                  \
+      for (int w = 0; w < numwords; w++) {                              \
+        TransitionUpdateRecord* update = event->getTransitionUpdateRecord(w); \
+        if (update == 0) {                                              \
+          packednext[w] = packedtuple[w];                               \
+        } else {                                                        \
+          uint32 word = (packedtuple[w] & update->getKeptMask()) |      \
+            update->getCommonTargets();                                 \
+          for (TransitionRecord* trans = update->getTransitionRecords(); \
+               trans != 0;                                              \
+               trans = trans->getNextInUpdate()) {                      \
+            const AutomatonRecord* aut = trans->getAutomaton();         \
+            const int a = aut->getAutomatonIndex();                     \
+            const uint32 source = tuple[a];                             \
+            uint32 succ = trans->getDeterministicSuccessorShifted(source); \
+            if (succ == TransitionRecord::MULTIPLE_TRANSITIONS) {       \
+              succ = mNondeterministicTransitionIterators[ndcount++].   \
+                setup(trans, source);                                   \
+            }                                                           \
+            word |= succ;                                               \
+          }                                                             \
+          packednext[w] = word;                                         \
+        }                                                               \
+      }                                                                 \
+      if (ndcount == 0) {                                               \
+        if (ADD_NEW_STATE) {                                            \
+          mNumStates++;                                                 \
+        }                                                               \
+      } else {                                                          \
+        int ndindex;                                                    \
+        do {                                                            \
+          if (ADD_NEW_STATE) {                                          \
+            packednext = mStateSpace->prepare(mNumStates++);            \
+          }                                                             \
+          for (ndindex = 0; ndindex < ndcount; ndindex++) {             \
+            if (!mNondeterministicTransitionIterators[ndindex].         \
+                advance(packednext)) {                                  \
+              break;                                                    \
+            }                                                           \
+          }                                                             \
+        } while (ndindex < ndcount);                                    \
+      }                                                                 \
+    }                                                                   \
+  }
+
+
+bool SafetyVerifier::
+checkProperty()
+{
+  // No interesting specs or no initial state?
+  if (mIsTrivial) {
+    return true;
+  }
+
+  // Store initial states ...
+  const int numwords = mEncoding->getNumberOfWords();
+  uint32* initpacked = mStateSpace->prepare();
+  for (int w = 0; w < numwords; w++) {
+    initpacked[w] = 0;
+  }
+  mNumStates = 0;
+  int ndindex;
+  do {
+    mStateSpace->add();
+    initpacked = mStateSpace->prepare(mNumStates++);
+    for (ndindex = 0; ndindex < mNumNondetInitialStates; ndindex++) {
+      if (!mNondeterministicTransitionIterators[ndindex].
+          advance(initpacked)) {
+        break;
+      }
+    }
+  } while (ndindex < mNumNondetInitialStates);
+
+  // Prepare depth map ...
+  uint32 nextlevel = mNumStates;
+  mDepthMap->add(0);
+  mDepthMap->add(nextlevel);
+
+  // Main loop ...
+  uint32 current = 0;
+  uint32* currenttuple = new uint32[mNumAutomata];
+  while (current < mNumStates) {
+    uint32* currentpacked = mStateSpace->get(current);
+    mEncoding->decode(currentpacked, currenttuple);
+    for (int e = 0; e < mNumEventRecords; e++) {
+      const EventRecord* event = mEventRecords[e];
+      const AutomatonRecord* dis = 0;
+      FIND_DISABLING_AUTOMATON(currenttuple, event, dis)
+      if (dis == 0) {
+        EXPAND_ENABLED_TRANSITIONS(numwords, currenttuple,
+                                   currentpacked, event);
+      } else if (!dis->isPlant() && !event->isControllable()) {
+        mTraceState = current;
+        mTraceEvent = event;
+        delete [] currenttuple;
+        return false;
+      }
+    }
+    if (++current == nextlevel) {
+      nextlevel = mNumStates;
+      mDepthMap->add(nextlevel);
+    }
+  }
+  delete [] currenttuple;
+  return true;
+}
+
+
+#undef ADD_NEW_STATE
+#define ADD_NEW_STATE checkTraceState()
+
+
+void SafetyVerifier::
+computeCounterExample()
+{
+  mTraceList = new jni::LinkedListGlue(mCache);
+  jni::EventGlue eventglue0 = mTraceEvent->getJavaEvent();
+  mTraceList->add(0, &eventglue0);
+  uint32 level = mDepthMap->size() - 2;
+  if (level > 0) {
+    int e;
+    int numreversed = 0;
+    EventRecord** reversed = new EventRecord*[mNumEventRecords];
+    for (e = 0; e < mNumEventRecords; e++) {
+      EventRecord* event = mEventRecords[e];
+      if (!event->isOnlySelfloops() && event->reverse()) {
+        reversed[numreversed++] = event;
+      }
+    }
+    qsort(reversed, numreversed, sizeof(EventRecord*),
+          EventRecord::compareForBackwardSearch);
+    const int numwords = mEncoding->getNumberOfWords();
+    uint32* targettuple = new uint32[mNumAutomata];
+    do {
+      mTraceLimit = mDepthMap->get(level);
+      uint32* packedtarget = mStateSpace->get(mTraceState);
+      mEncoding->decode(packedtarget, targettuple);
+      e = -1;
+      try {
+        do {
+          const EventRecord* event = reversed[++e];
+          const AutomatonRecord* dis = 0;
+          FIND_DISABLING_AUTOMATON(targettuple, event, dis);
+          if (dis == 0) {
+            EXPAND_ENABLED_TRANSITIONS(numwords, targettuple,
+                                       packedtarget, event);
+          }
+        } while (true);
+      } catch (const TraceAbort& abort) {
+        // OK. That's what we have been waiting for.
+      }
+      jni::EventGlue eventglue = reversed[e]->getJavaEvent();
+      mTraceList->add(0, &eventglue);
+    } while (level-- > 1);
+    delete [] targettuple;
+  }
+}
+
+bool SafetyVerifier::
+checkTraceState()
+{
+  uint32 found = mStateSpace->find();
+  if (found >= mTraceLimit) {
+    return false;
+  } else {
+    mTraceState = found;
+    throw TraceAbort();
+  }
 }
 
 

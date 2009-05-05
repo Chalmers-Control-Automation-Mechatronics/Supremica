@@ -41,11 +41,12 @@ public:
 
   //##########################################################################
   //# Simple Access
-  uint32 getWordIndex() const {return mWordIndex;}
-  uint32 getKeptMask() const {return mKeptMask;}
-  uint32 getCommonMask() const {return mCommonMask;}
-  uint32 getCommonTargets() const {return mCommonTargets;}
-  TransitionRecord* getTransitionRecords() const {return mTransitionRecords;}
+  inline uint32 getWordIndex() const {return mWordIndex;}
+  inline uint32 getKeptMask() const {return mKeptMask;}
+  inline uint32 getCommonMask() const {return mCommonMask;}
+  inline uint32 getCommonTargets() const {return mCommonTargets;}
+  inline TransitionRecord* getTransitionRecords() const
+    {return mTransitionRecords;}
 
   //##########################################################################
   //# Set up
