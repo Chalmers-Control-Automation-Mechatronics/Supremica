@@ -16,6 +16,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import net.sourceforge.waters.model.base.ProxyAccessor;
+import net.sourceforge.waters.model.base.ProxyAccessorByContents;
 import net.sourceforge.waters.model.compiler.context.CompiledRange;
 import net.sourceforge.waters.model.compiler.context.SourceInfo;
 import net.sourceforge.waters.model.compiler.context.
@@ -36,14 +38,14 @@ class CompiledArrayAlias implements CompiledEvent
   CompiledArrayAlias(final String name)
   {
     mParentInfo = new RootParentInfo(name);
-    mMap = new HashMap<SimpleExpressionProxy,CompiledEvent>();
+    mMap = new HashMap<ProxyAccessor<SimpleExpressionProxy>,CompiledEvent>();
   }
 
   CompiledArrayAlias(final CompiledArrayAlias parent,
                      final SimpleExpressionProxy index)
   {
     mParentInfo = new IndexedParentInfo(parent, index);
-    mMap = new HashMap<SimpleExpressionProxy,CompiledEvent>();
+    mMap = new HashMap<ProxyAccessor<SimpleExpressionProxy>,CompiledEvent>();
   }
 
 
@@ -112,14 +114,18 @@ class CompiledArrayAlias implements CompiledEvent
 
   CompiledEvent get(final SimpleExpressionProxy index)
   {
-    return mMap.get(index);
+    final ProxyAccessor<SimpleExpressionProxy> accessor =
+      new ProxyAccessorByContents<SimpleExpressionProxy>(index);
+    return mMap.get(accessor);
   }
 
   void set(final SimpleExpressionProxy index, final CompiledEvent value)
     throws DuplicateIdentifierException
   {
-    if (!mMap.containsKey(index)) {
-      mMap.put(index, value);
+    final ProxyAccessor<SimpleExpressionProxy> accessor =
+      new ProxyAccessorByContents<SimpleExpressionProxy>(index);
+    if (!mMap.containsKey(accessor)) {
+      mMap.put(accessor, value);
     } else {
       final ParentInfo info = new IndexedParentInfo(this, index);
       final String name = info.getName();
@@ -255,6 +261,6 @@ class CompiledArrayAlias implements CompiledEvent
   //#########################################################################
   //# Data Members
   private final ParentInfo mParentInfo;
-  private final Map<SimpleExpressionProxy,CompiledEvent> mMap;
+  private final Map<ProxyAccessor<SimpleExpressionProxy>,CompiledEvent> mMap;
 
 }

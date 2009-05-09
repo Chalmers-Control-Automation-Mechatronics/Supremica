@@ -309,11 +309,15 @@ class CompiledNameSpace
     {
       try {
 	final String name = ident.getName();
+        //System.err.println("name=" + name);
 	final List<SimpleExpressionProxy> indexes = ident.getIndexes();
 	CompiledEvent event = mNameSpace.lookupEvent(name, mThrowing);
+        //System.err.println("event=" + event);
         if (event != null) {
           for (final SimpleExpressionProxy index : indexes) {
+            //System.err.println("index=" + index);
             event = event.find(index);
+            //System.err.println("event=" + event);
           }
         }
 	return event;

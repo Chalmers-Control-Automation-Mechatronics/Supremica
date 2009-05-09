@@ -175,7 +175,7 @@ public abstract class AbstractLanguageInclusionCheckerTest
     }
   }
 
-  public void testProfisafeI4SlaveEFA__slave_sets_fv_after_slave_crc_fault()
+  public void testProfisafeI4SlaveEFA__slave_sets_fv_after_slave_crc_fault_2()
     throws Exception
   {
     final String group = "tests";
@@ -187,25 +187,105 @@ public abstract class AbstractLanguageInclusionCheckerTest
       Collections.singletonList(binding);
     for (int seqno = 0; seqno <= maxseqno; seqno++) {
       final String propname =
-        String.format("slave_sets_fv_after_slave_crc_fault[%d]", seqno);
+        String.format("slave_sets_fv_after_slave_crc_fault_2[%d]", seqno);
       runModelVerifier(group, dir, name, bindings, true, propname);
     }
   }
 
-  /*
-  private void testProfisafeI4SlaveEFA(final String propname,
-                                       final boolean expect)
+  public void testProfisafeI4SlaveEFA__slave_sets_fv_after_slave_crc_fault_3()
     throws Exception
   {
     final String group = "tests";
     final String dir = "profisafe";
     final String name = "profisafe_islave_efa.wmod";
-    final ParameterBindingProxy binding = createBinding("MAXSEQNO", 4);
+    final int maxseqno = 4;
+    final ParameterBindingProxy binding = createBinding("MAXSEQNO", maxseqno);
     final List<ParameterBindingProxy> bindings =
       Collections.singletonList(binding);
-    runModelVerifier(group, dir, name, bindings, expect, propname);
+    for (int seqno = 0; seqno <= maxseqno; seqno++) {
+      final String propname =
+        String.format("slave_sets_fv_after_slave_crc_fault_3[%d]", seqno);
+      runModelVerifier(group, dir, name, bindings, seqno == 0, propname);
+    }
   }
-  */
+
+  public void testProfisafeI4SlaveEFA__slave_sets_fv_after_slave_timeout_2()
+    throws Exception
+  {
+    final String group = "tests";
+    final String dir = "profisafe";
+    final String name = "profisafe_islave_efa.wmod";
+    final int maxseqno = 4;
+    final ParameterBindingProxy binding = createBinding("MAXSEQNO", maxseqno);
+    final List<ParameterBindingProxy> bindings =
+      Collections.singletonList(binding);
+    for (int seqno = 0; seqno <= maxseqno; seqno++) {
+      final String propname =
+        String.format("slave_sets_fv_after_slave_timeout_2[%d]", seqno);
+      runModelVerifier(group, dir, name, bindings, true, propname);
+    }
+  }
+
+  public void testProfisafeI4SlaveEFA__slave_sets_fv_after_slave_timeout_3()
+    throws Exception
+  {
+    final String group = "tests";
+    final String dir = "profisafe";
+    final String name = "profisafe_islave_efa.wmod";
+    final int maxseqno = 4;
+    final ParameterBindingProxy binding = createBinding("MAXSEQNO", maxseqno);
+    final List<ParameterBindingProxy> bindings =
+      Collections.singletonList(binding);
+    for (int seqno = 0; seqno <= maxseqno; seqno++) {
+      final String propname =
+        String.format("slave_sets_fv_after_slave_timeout_3[%d]", seqno);
+      runModelVerifier(group, dir, name, bindings, seqno == 0, propname);
+    }
+  }
+
+  public void testProfisafeI4SlaveEFA__slave_sets_fv_after_slave_seq_fault_2()
+    throws Exception
+  {
+    final String group = "tests";
+    final String dir = "profisafe";
+    final String name = "profisafe_islave_efa.wmod";
+    final int maxseqno = 4;
+    final ParameterBindingProxy binding = createBinding("MAXSEQNO", maxseqno);
+    final List<ParameterBindingProxy> bindings =
+      Collections.singletonList(binding);
+    for (int seqno1 = 0; seqno1 <= maxseqno; seqno1++) {
+      for (int seqno2 = 0; seqno2 <= maxseqno; seqno2++) {
+        if (seqno1 != seqno2 && seqno1 % maxseqno + 1 != seqno2) {
+          final String propname =
+            String.format("slave_sets_fv_after_slave_seq_fault_2[%d][%d]",
+                          seqno1, seqno2);
+          runModelVerifier(group, dir, name, bindings, true, propname);
+        }
+      }
+    }
+  }
+
+  public void testProfisafeI4SlaveEFA__slave_sets_fv_after_slave_seq_fault_3()
+    throws Exception
+  {
+    final String group = "tests";
+    final String dir = "profisafe";
+    final String name = "profisafe_islave_efa.wmod";
+    final int maxseqno = 4;
+    final ParameterBindingProxy binding = createBinding("MAXSEQNO", maxseqno);
+    final List<ParameterBindingProxy> bindings =
+      Collections.singletonList(binding);
+    for (int seqno1 = 0; seqno1 <= maxseqno; seqno1++) {
+      for (int seqno2 = 0; seqno2 <= maxseqno; seqno2++) {
+        if (seqno1 != seqno2 && seqno1 % maxseqno + 1 != seqno2) {
+          final String propname =
+            String.format("slave_sets_fv_after_slave_seq_fault_3[%d][%d]",
+                          seqno1, seqno2);
+          runModelVerifier(group, dir, name, bindings, seqno2 == 0, propname);
+        }
+      }
+    }
+  }
 
   public void testProfisafeI4Host__fv_crc() throws Exception
   {

@@ -19,6 +19,8 @@
 #pragma once
 #endif
 
+#include <ctime>
+
 #include "jni/glue/KindTranslatorGlue.h"
 #include "jni/glue/ProductDESProxyFactoryGlue.h"
 #include "jni/glue/SafetyTraceGlue.h"
@@ -99,6 +101,9 @@ private:
   jni::ListGlue* mTraceList;
   int mNumAutomata;
   uint32 mNumStates;
+  clock_t mStartTime;
+  clock_t mTraceStartTime;
+  clock_t mStopTime;
 };
 
 }   /* namespace waters */

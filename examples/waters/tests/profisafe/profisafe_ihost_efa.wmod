@@ -102,6 +102,65 @@
         </EventDecl>
         <EventDecl Kind="UNCONTROLLABLE" Name="read"/>
     </EventDeclList>
+    <EventAliasList>
+        <ForeachEventAlias Name="seq">
+            <BinaryExpression Operator="..">
+                <IntConstant Value="0"/>
+                <SimpleIdentifier Name="MAXSEQNO"/>
+            </BinaryExpression>
+            <EventAliasList>
+                <EventAlias>
+                    <IndexedIdentifier Name="rcv_seq">
+                        <SimpleIdentifier Name="seq"/>
+                    </IndexedIdentifier>
+                    <EventListExpression>
+                        <EventList>
+                            <ForeachEvent Name="data">
+                                <EnumSetExpression Text="{PV,FV}">
+                                    <SimpleIdentifier Name="PV"/>
+                                    <SimpleIdentifier Name="FV"/>
+                                </EnumSetExpression>
+                                <EventList>
+                                    <ForeachEvent Name="s4">
+                                        <BinaryExpression Operator="..">
+                                            <IntConstant Value="0"/>
+                                            <IntConstant Value="1"/>
+                                        </BinaryExpression>
+                                        <EventList>
+                                            <ForeachEvent Name="s3">
+                                                <BinaryExpression Operator="..">
+                                                    <IntConstant Value="0"/>
+                                                    <IntConstant Value="1"/>
+                                                </BinaryExpression>
+                                                <EventList>
+                                                    <ForeachEvent Name="s2">
+                                                        <BinaryExpression Operator="..">
+                                                            <IntConstant Value="0"/>
+                                                            <IntConstant Value="1"/>
+                                                        </BinaryExpression>
+                                                        <EventList>
+                                                            <IndexedIdentifier Name="rcv">
+                                                                <SimpleIdentifier Name="data"/>
+                                                                <SimpleIdentifier Name="s4"/>
+                                                                <SimpleIdentifier Name="s3"/>
+                                                                <SimpleIdentifier Name="s2"/>
+                                                                <SimpleIdentifier Name="seq"/>
+                                                                <SimpleIdentifier Name="ok"/>
+                                                            </IndexedIdentifier>
+                                                        </EventList>
+                                                    </ForeachEvent>
+                                                </EventList>
+                                            </ForeachEvent>
+                                        </EventList>
+                                    </ForeachEvent>
+                                </EventList>
+                            </ForeachEvent>
+                        </EventList>
+                    </EventListExpression>
+                </EventAlias>
+            </EventAliasList>
+        </ForeachEventAlias>
+    </EventAliasList>
     <ComponentList>
         <SimpleComponent Kind="SPEC" Name="main">
             <Graph>
@@ -3491,5 +3550,499 @@
                 </EdgeList>
             </Graph>
         </SimpleComponent>
+        <ForeachComponent Name="seq">
+            <BinaryExpression Operator="..">
+                <IntConstant Value="0"/>
+                <SimpleIdentifier Name="MAXSEQNO"/>
+            </BinaryExpression>
+            <ComponentList>
+                <SimpleComponent Kind="PROPERTY">
+                    <IndexedIdentifier Name="host_sets_fv_after_host_seq_fault_notinit">
+                        <SimpleIdentifier Name="seq"/>
+                    </IndexedIdentifier>
+                    <Graph>
+                        <NodeList>
+                            <SimpleNode Name="ok">
+                                <PointGeometry>
+                                    <Point Y="160" X="128"/>
+                                </PointGeometry>
+                                <LabelGeometry Anchor="NW">
+                                    <Point Y="-1" X="4"/>
+                                </LabelGeometry>
+                            </SimpleNode>
+                            <SimpleNode Name="seqfault">
+                                <PointGeometry>
+                                    <Point Y="160" X="224"/>
+                                </PointGeometry>
+                                <LabelGeometry Anchor="NW">
+                                    <Point Y="-1" X="-54"/>
+                                </LabelGeometry>
+                            </SimpleNode>
+                            <SimpleNode Initial="true" Name="init">
+                                <PointGeometry>
+                                    <Point Y="32" X="128"/>
+                                </PointGeometry>
+                                <InitialArrowGeometry>
+                                    <Point Y="-5" X="-5"/>
+                                </InitialArrowGeometry>
+                                <LabelGeometry Anchor="NW">
+                                    <Point Y="10" X="0"/>
+                                </LabelGeometry>
+                            </SimpleNode>
+                            <SimpleNode Name="fv_ok">
+                                <PointGeometry>
+                                    <Point Y="288" X="128"/>
+                                </PointGeometry>
+                                <LabelGeometry Anchor="NW">
+                                    <Point Y="-18" X="3"/>
+                                </LabelGeometry>
+                            </SimpleNode>
+                            <SimpleNode Name="fv_fault">
+                                <PointGeometry>
+                                    <Point Y="288" X="224"/>
+                                </PointGeometry>
+                                <LabelGeometry Anchor="NW">
+                                    <Point Y="-18" X="-45"/>
+                                </LabelGeometry>
+                            </SimpleNode>
+                            <SimpleNode Name="ack_fault">
+                                <PointGeometry>
+                                    <Point Y="448" X="224"/>
+                                </PointGeometry>
+                                <LabelGeometry Anchor="NW">
+                                    <Point Y="-20" X="-46"/>
+                                </LabelGeometry>
+                            </SimpleNode>
+                            <SimpleNode Name="ack_ok">
+                                <PointGeometry>
+                                    <Point Y="448" X="128"/>
+                                </PointGeometry>
+                                <LabelGeometry Anchor="NW">
+                                    <Point Y="-20" X="2"/>
+                                </LabelGeometry>
+                            </SimpleNode>
+                            <GroupNode Name="G0">
+                                <NodeRef Name="ok"/>
+                                <NodeRef Name="seqfault"/>
+                                <BoxGeometry>
+                                    <Box Y="96" X="32" Width="288" Height="80"/>
+                                </BoxGeometry>
+                            </GroupNode>
+                            <GroupNode Name="G1">
+                                <NodeRef Name="fv_fault"/>
+                                <NodeRef Name="fv_ok"/>
+                                <BoxGeometry>
+                                    <Box Y="240" X="32" Width="288" Height="96"/>
+                                </BoxGeometry>
+                            </GroupNode>
+                            <GroupNode Name="G2">
+                                <NodeRef Name="G0"/>
+                                <BoxGeometry>
+                                    <Box Y="80" X="16" Width="320" Height="112"/>
+                                </BoxGeometry>
+                            </GroupNode>
+                            <GroupNode Name="G3">
+                                <NodeRef Name="G1"/>
+                                <BoxGeometry>
+                                    <Box Y="224" X="16" Width="320" Height="128"/>
+                                </BoxGeometry>
+                            </GroupNode>
+                            <GroupNode Name="G4">
+                                <NodeRef Name="ack_fault"/>
+                                <NodeRef Name="ack_ok"/>
+                                <BoxGeometry>
+                                    <Box Y="400" X="32" Width="288" Height="96"/>
+                                </BoxGeometry>
+                            </GroupNode>
+                            <GroupNode Name="G5">
+                                <NodeRef Name="G4"/>
+                                <BoxGeometry>
+                                    <Box Y="384" X="16" Width="320" Height="128"/>
+                                </BoxGeometry>
+                            </GroupNode>
+                        </NodeList>
+                        <EdgeList>
+                            <Edge Target="fv_ok" Source="fv_ok">
+                                <LabelBlock>
+                                    <SimpleIdentifier Name="read"/>
+                                    <LabelGeometry Anchor="NW">
+                                        <Point Y="-16" X="-62"/>
+                                    </LabelGeometry>
+                                </LabelBlock>
+                                <StartPointGeometry>
+                                    <Point Y="288" X="128"/>
+                                </StartPointGeometry>
+                                <SplineGeometry>
+                                    <Point Y="320" X="129"/>
+                                </SplineGeometry>
+                                <EndPointGeometry>
+                                    <Point Y="288" X="128"/>
+                                </EndPointGeometry>
+                                <GuardActionBlock>
+                                    <Guards>
+                                        <BinaryExpression Operator="==">
+                                            <SimpleIdentifier Name="app_FV_active"/>
+                                            <IntConstant Value="1"/>
+                                        </BinaryExpression>
+                                    </Guards>
+                                    <LabelGeometry Anchor="NW">
+                                        <Point Y="-4" X="-62"/>
+                                    </LabelGeometry>
+                                </GuardActionBlock>
+                            </Edge>
+                            <Edge Target="fv_fault" Source="seqfault">
+                                <LabelBlock>
+                                    <SimpleIdentifier Name="resume"/>
+                                    <LabelGeometry Anchor="NW">
+                                        <Point Y="-28" X="3"/>
+                                    </LabelGeometry>
+                                </LabelBlock>
+                                <EndPointGeometry>
+                                    <Point Y="288" X="224"/>
+                                </EndPointGeometry>
+                            </Edge>
+                            <Edge Target="ok" Source="ok">
+                                <LabelBlock>
+                                    <SimpleIdentifier Name="resume"/>
+                                    <SimpleIdentifier Name="operator_ack"/>
+                                    <SimpleIdentifier Name="read"/>
+                                    <LabelGeometry Anchor="NW">
+                                        <Point Y="-28" X="-51"/>
+                                    </LabelGeometry>
+                                </LabelBlock>
+                                <SplineGeometry>
+                                    <Point Y="159" X="88"/>
+                                </SplineGeometry>
+                            </Edge>
+                            <Edge Target="seqfault" Source="seqfault">
+                                <LabelBlock>
+                                    <SimpleIdentifier Name="operator_ack"/>
+                                    <SimpleIdentifier Name="read"/>
+                                    <LabelGeometry Anchor="NW">
+                                        <Point Y="-31" X="-25"/>
+                                    </LabelGeometry>
+                                </LabelBlock>
+                                <SplineGeometry>
+                                    <Point Y="159" X="259"/>
+                                </SplineGeometry>
+                            </Edge>
+                            <Edge Target="ok" Source="init">
+                                <LabelBlock>
+                                    <SimpleIdentifier Name="resume"/>
+                                    <LabelGeometry Anchor="NW">
+                                        <Point Y="-37" X="-50"/>
+                                    </LabelGeometry>
+                                </LabelBlock>
+                            </Edge>
+                            <Edge Target="init" Source="init">
+                                <LabelBlock>
+                                    <SimpleIdentifier Name="rcv"/>
+                                    <SimpleIdentifier Name="operator_ack"/>
+                                    <SimpleIdentifier Name="read"/>
+                                    <LabelGeometry Anchor="NW">
+                                        <Point Y="-29" X="4"/>
+                                    </LabelGeometry>
+                                </LabelBlock>
+                                <SplineGeometry>
+                                    <Point Y="32" X="174"/>
+                                </SplineGeometry>
+                            </Edge>
+                            <Edge Target="ok" Source="G2">
+                                <LabelBlock>
+                                    <SimpleIdentifier Name="rcv"/>
+                                    <LabelGeometry Anchor="NW">
+                                        <Point Y="-14" X="5"/>
+                                    </LabelGeometry>
+                                </LabelBlock>
+                                <StartPointGeometry>
+                                    <Point Y="80" X="143"/>
+                                </StartPointGeometry>
+                            </Edge>
+                            <Edge Target="seqfault" Source="G0">
+                                <LabelBlock>
+                                    <IndexedIdentifier Name="rcv_seq">
+                                        <SimpleIdentifier Name="seq"/>
+                                    </IndexedIdentifier>
+                                    <LabelGeometry Anchor="NW">
+                                        <Point Y="-16" X="-23"/>
+                                    </LabelGeometry>
+                                </LabelBlock>
+                                <StartPointGeometry>
+                                    <Point Y="96" X="209"/>
+                                </StartPointGeometry>
+                                <GuardActionBlock>
+                                    <Guards>
+                                        <BinaryExpression Operator="&amp;" Text="seq!=out_cons_num &amp; seq!=old_cons_num">
+                                            <BinaryExpression Operator="!=">
+                                                <SimpleIdentifier Name="seq"/>
+                                                <SimpleIdentifier Name="out_cons_num"/>
+                                            </BinaryExpression>
+                                            <BinaryExpression Operator="!=">
+                                                <SimpleIdentifier Name="seq"/>
+                                                <SimpleIdentifier Name="old_cons_num"/>
+                                            </BinaryExpression>
+                                        </BinaryExpression>
+                                    </Guards>
+                                    <LabelGeometry Anchor="NW">
+                                        <Point Y="-29" X="-25"/>
+                                    </LabelGeometry>
+                                </GuardActionBlock>
+                            </Edge>
+                            <Edge Target="fv_fault" Source="G1">
+                                <LabelBlock>
+                                    <IndexedIdentifier Name="rcv_seq">
+                                        <SimpleIdentifier Name="seq"/>
+                                    </IndexedIdentifier>
+                                    <LabelGeometry Anchor="NW">
+                                        <Point Y="-6" X="1"/>
+                                    </LabelGeometry>
+                                </LabelBlock>
+                                <StartPointGeometry>
+                                    <Point Y="240" X="247"/>
+                                </StartPointGeometry>
+                                <GuardActionBlock>
+                                    <Guards>
+                                        <BinaryExpression Operator="&amp;" Text="seq!=out_cons_num &amp; seq!=old_cons_num">
+                                            <BinaryExpression Operator="!=">
+                                                <SimpleIdentifier Name="seq"/>
+                                                <SimpleIdentifier Name="out_cons_num"/>
+                                            </BinaryExpression>
+                                            <BinaryExpression Operator="!=">
+                                                <SimpleIdentifier Name="seq"/>
+                                                <SimpleIdentifier Name="old_cons_num"/>
+                                            </BinaryExpression>
+                                        </BinaryExpression>
+                                    </Guards>
+                                    <LabelGeometry Anchor="NW">
+                                        <Point Y="-22" X="2"/>
+                                    </LabelGeometry>
+                                </GuardActionBlock>
+                            </Edge>
+                            <Edge Target="fv_ok" Source="G3">
+                                <LabelBlock>
+                                    <SimpleIdentifier Name="rcv"/>
+                                    <LabelGeometry Anchor="NW">
+                                        <Point Y="-10" X="5"/>
+                                    </LabelGeometry>
+                                </LabelBlock>
+                                <StartPointGeometry>
+                                    <Point Y="224" X="144"/>
+                                </StartPointGeometry>
+                            </Edge>
+                            <Edge Target="fv_fault" Source="fv_fault">
+                                <LabelBlock>
+                                    <SimpleIdentifier Name="read"/>
+                                    <LabelGeometry Anchor="NW">
+                                        <Point Y="-16" X="-29"/>
+                                    </LabelGeometry>
+                                </LabelBlock>
+                                <SplineGeometry>
+                                    <Point Y="319" X="224"/>
+                                </SplineGeometry>
+                                <GuardActionBlock>
+                                    <Guards>
+                                        <BinaryExpression Operator="==">
+                                            <SimpleIdentifier Name="app_FV_active"/>
+                                            <IntConstant Value="1"/>
+                                        </BinaryExpression>
+                                    </Guards>
+                                    <LabelGeometry Anchor="NW">
+                                        <Point Y="-3" X="-28"/>
+                                    </LabelGeometry>
+                                </GuardActionBlock>
+                            </Edge>
+                            <Edge Target="ack_ok" Source="fv_ok">
+                                <LabelBlock>
+                                    <SimpleIdentifier Name="operator_ack"/>
+                                    <LabelGeometry Anchor="NW">
+                                        <Point Y="-15" X="-56"/>
+                                    </LabelGeometry>
+                                </LabelBlock>
+                                <EndPointGeometry>
+                                    <Point Y="448" X="128"/>
+                                </EndPointGeometry>
+                            </Edge>
+                            <Edge Target="ack_fault" Source="fv_fault">
+                                <LabelBlock>
+                                    <SimpleIdentifier Name="operator_ack"/>
+                                    <LabelGeometry Anchor="NW">
+                                        <Point Y="-4" X="-58"/>
+                                    </LabelGeometry>
+                                </LabelBlock>
+                                <SplineGeometry>
+                                    <Point Y="370" X="208"/>
+                                </SplineGeometry>
+                                <EndPointGeometry>
+                                    <Point Y="448" X="224"/>
+                                </EndPointGeometry>
+                            </Edge>
+                            <Edge Target="ack_ok" Source="ack_ok">
+                                <LabelBlock>
+                                    <SimpleIdentifier Name="read"/>
+                                    <LabelGeometry Anchor="NW">
+                                        <Point Y="-16" X="-62"/>
+                                    </LabelGeometry>
+                                </LabelBlock>
+                                <StartPointGeometry>
+                                    <Point Y="320" X="-176"/>
+                                </StartPointGeometry>
+                                <SplineGeometry>
+                                    <Point Y="480" X="129"/>
+                                </SplineGeometry>
+                                <EndPointGeometry>
+                                    <Point Y="320" X="-176"/>
+                                </EndPointGeometry>
+                                <GuardActionBlock>
+                                    <Guards>
+                                        <BinaryExpression Operator="==">
+                                            <SimpleIdentifier Name="app_FV_active"/>
+                                            <IntConstant Value="1"/>
+                                        </BinaryExpression>
+                                    </Guards>
+                                    <LabelGeometry Anchor="NW">
+                                        <Point Y="-4" X="-62"/>
+                                    </LabelGeometry>
+                                </GuardActionBlock>
+                            </Edge>
+                            <Edge Target="ack_fault" Source="ack_fault">
+                                <LabelBlock>
+                                    <SimpleIdentifier Name="read"/>
+                                    <LabelGeometry Anchor="NW">
+                                        <Point Y="-16" X="-29"/>
+                                    </LabelGeometry>
+                                </LabelBlock>
+                                <SplineGeometry>
+                                    <Point Y="479" X="224"/>
+                                </SplineGeometry>
+                                <GuardActionBlock>
+                                    <Guards>
+                                        <BinaryExpression Operator="==">
+                                            <SimpleIdentifier Name="app_FV_active"/>
+                                            <IntConstant Value="1"/>
+                                        </BinaryExpression>
+                                    </Guards>
+                                    <LabelGeometry Anchor="NW">
+                                        <Point Y="-3" X="-28"/>
+                                    </LabelGeometry>
+                                </GuardActionBlock>
+                            </Edge>
+                            <Edge Target="ok" Source="ack_ok">
+                                <LabelBlock>
+                                    <SimpleIdentifier Name="resume"/>
+                                    <LabelGeometry Anchor="NW">
+                                        <Point Y="58" X="-31"/>
+                                    </LabelGeometry>
+                                </LabelBlock>
+                                <SplineGeometry>
+                                    <Point Y="304" X="57"/>
+                                </SplineGeometry>
+                                <EndPointGeometry>
+                                    <Point Y="160" X="128"/>
+                                </EndPointGeometry>
+                            </Edge>
+                            <Edge Target="fv_fault" Source="ack_fault">
+                                <LabelBlock>
+                                    <SimpleIdentifier Name="resume"/>
+                                    <LabelGeometry Anchor="NW">
+                                        <Point Y="-13" X="0"/>
+                                    </LabelGeometry>
+                                </LabelBlock>
+                                <SplineGeometry>
+                                    <Point Y="367" X="237"/>
+                                </SplineGeometry>
+                                <EndPointGeometry>
+                                    <Point Y="288" X="224"/>
+                                </EndPointGeometry>
+                            </Edge>
+                            <Edge Target="fv_ok" Source="fv_ok">
+                                <LabelBlock>
+                                    <SimpleIdentifier Name="resume"/>
+                                    <LabelGeometry Anchor="NW">
+                                        <Point Y="-8" X="-30"/>
+                                    </LabelGeometry>
+                                </LabelBlock>
+                                <SplineGeometry>
+                                    <Point Y="287" X="94"/>
+                                </SplineGeometry>
+                            </Edge>
+                            <Edge Target="fv_fault" Source="fv_fault">
+                                <LabelBlock>
+                                    <SimpleIdentifier Name="resume"/>
+                                    <LabelGeometry Anchor="NW">
+                                        <Point Y="-8" X="-18"/>
+                                    </LabelGeometry>
+                                </LabelBlock>
+                                <SplineGeometry>
+                                    <Point Y="289" X="258"/>
+                                </SplineGeometry>
+                            </Edge>
+                            <Edge Target="ack_fault" Source="ack_fault">
+                                <LabelBlock>
+                                    <SimpleIdentifier Name="operator_ack"/>
+                                    <LabelGeometry Anchor="NW">
+                                        <Point Y="-12" X="-24"/>
+                                    </LabelGeometry>
+                                </LabelBlock>
+                                <SplineGeometry>
+                                    <Point Y="449" X="261"/>
+                                </SplineGeometry>
+                            </Edge>
+                            <Edge Target="ack_ok" Source="ack_ok">
+                                <LabelBlock>
+                                    <SimpleIdentifier Name="operator_ack"/>
+                                    <LabelGeometry Anchor="NW">
+                                        <Point Y="-7" X="-55"/>
+                                    </LabelGeometry>
+                                </LabelBlock>
+                                <SplineGeometry>
+                                    <Point Y="449" X="90"/>
+                                </SplineGeometry>
+                            </Edge>
+                            <Edge Target="ack_ok" Source="G5">
+                                <LabelBlock>
+                                    <SimpleIdentifier Name="rcv"/>
+                                    <LabelGeometry Anchor="NW">
+                                        <Point Y="-7" X="3"/>
+                                    </LabelGeometry>
+                                </LabelBlock>
+                                <StartPointGeometry>
+                                    <Point Y="384" X="142"/>
+                                </StartPointGeometry>
+                            </Edge>
+                            <Edge Target="ack_fault" Source="G4">
+                                <LabelBlock>
+                                    <IndexedIdentifier Name="rcv_seq">
+                                        <SimpleIdentifier Name="seq"/>
+                                    </IndexedIdentifier>
+                                    <LabelGeometry Anchor="NW">
+                                        <Point Y="-6" X="7"/>
+                                    </LabelGeometry>
+                                </LabelBlock>
+                                <StartPointGeometry>
+                                    <Point Y="400" X="257"/>
+                                </StartPointGeometry>
+                                <GuardActionBlock>
+                                    <Guards>
+                                        <BinaryExpression Operator="&amp;" Text="seq!=out_cons_num &amp; seq!=old_cons_num">
+                                            <BinaryExpression Operator="!=">
+                                                <SimpleIdentifier Name="seq"/>
+                                                <SimpleIdentifier Name="out_cons_num"/>
+                                            </BinaryExpression>
+                                            <BinaryExpression Operator="!=">
+                                                <SimpleIdentifier Name="seq"/>
+                                                <SimpleIdentifier Name="old_cons_num"/>
+                                            </BinaryExpression>
+                                        </BinaryExpression>
+                                    </Guards>
+                                    <LabelGeometry Anchor="NW">
+                                        <Point Y="-21" X="9"/>
+                                    </LabelGeometry>
+                                </GuardActionBlock>
+                            </Edge>
+                        </EdgeList>
+                    </Graph>
+                </SimpleComponent>
+            </ComponentList>
+        </ForeachComponent>
     </ComponentList>
 </Module>

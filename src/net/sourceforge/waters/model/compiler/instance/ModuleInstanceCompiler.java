@@ -284,13 +284,14 @@ public class ModuleInstanceCompiler extends AbstractModuleProxyVisitor
   {
     try {
       final IdentifierProxy ident = alias.getIdentifier();
+      final IdentifierProxy compiledname = mNameCompiler.compileName(ident);
       final ExpressionProxy expr = alias.getExpression();
       final Object value = expr.acceptVisitor(this);
       if (!(value instanceof CompiledEvent)) {
         throw new TypeMismatchException(expr, "event");
       }
       final CompiledEvent event = (CompiledEvent) value;
-      mNameSpace.addEvent(ident, event);
+      mNameSpace.addEvent(compiledname, event);
       return event;
     } catch (final EvalException exception) {
       exception.provideLocation(alias);

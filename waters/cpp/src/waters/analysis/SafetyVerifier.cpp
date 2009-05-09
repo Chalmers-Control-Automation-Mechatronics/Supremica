@@ -15,6 +15,7 @@
 #include <new>
 
 #include <jni.h>
+#include <time.h>
 #include <stdlib.h>
 
 #include "jni/cache/ClassCache.h"
@@ -113,12 +114,15 @@ run()
   try {
     // const jni::JavaString name(mCache->getEnvironment(), mModel.getName());
     // std::cerr << (const char*) name << std::endl;
+    mStartTime = clock();
     setup();
     bool result = checkProperty();
     if (!result) {
+      mTraceStartTime = clock();
       computeCounterExample();
     }
     teardown();
+    mStopTime = clock();
     return result;
   } catch (...) {
     teardown();
@@ -141,6 +145,19 @@ addStatistics(const jni::VerificationResultGlue& vresult)
   vresult.setNumberOfAutomata(mNumAutomata);
   vresult.setNumberOfStates(mNumStates);
   vresult.setPeakNumberOfNodes(mNumStates);
+  /*
+  char buffer[40];
+  double totaltime =
+    (double) (mStopTime - mStartTime) / (double) CLOCKS_PER_SEC;
+  sprintf(buffer, "%.3f", totaltime);
+  std::cerr << "Total time: " << buffer << "s" << std::endl;
+  if (mTraceList != 0) {
+    double tracetime =
+      (double) (mStopTime - mTraceStartTime) / (double) CLOCKS_PER_SEC;
+    sprintf(buffer, "%.3f", tracetime);
+    std::cerr << "Trace time: " << buffer << "s" << std::endl;
+  }
+  */
 }
 
 
