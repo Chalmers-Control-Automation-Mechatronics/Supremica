@@ -133,6 +133,20 @@ public abstract class AbstractLanguageInclusionCheckerTest
     testProfisafeI3HostEFA("host_sets_fv_after_host_crc_fault_notinit", true);
   }
 
+  public void
+    testProfisafeI3HostEFA__host_sets_fv_after_host_seq_fault_0()
+    throws Exception
+  {
+    testProfisafeI3HostEFA("host_sets_fv_after_host_seq_fault[0]", true);
+  }
+
+  public void
+    testProfisafeI3HostEFA__host_sets_fv_after_host_seq_fault_3()
+    throws Exception
+  {
+    testProfisafeI3HostEFA("host_sets_fv_after_host_seq_fault[3]", false);
+  }
+
   private void testProfisafeI3HostEFA(final String propname,
                                       final boolean expect)
     throws Exception

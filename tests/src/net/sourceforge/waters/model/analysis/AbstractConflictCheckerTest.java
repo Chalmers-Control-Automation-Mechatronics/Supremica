@@ -787,10 +787,12 @@ public abstract class AbstractConflictCheckerTest
     checkTransferline(4);
   }
 
+  /*
   public void testTransferline__5() throws Exception
   {
     checkTransferline(5);
   }
+  */
 
   public void checkTransferline(final int n) throws Exception
   {
