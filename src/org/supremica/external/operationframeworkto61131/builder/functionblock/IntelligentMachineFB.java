@@ -16,8 +16,6 @@ import org.supremica.external.operationframeworkto61131.util.JAXButil;
 import org.supremica.external.operationframeworkto61131.util.log.LogUtil;
 import org.supremica.manufacturingtables.xsd.rop.ROP;
 
-
-
 /**
  * IntelligentMachineFB.java generates the list of Function Block
  * variable-parameter connection pairs for machines with control system, like
@@ -46,7 +44,7 @@ public class IntelligentMachineFB {
 	 * ExteranlComponent State;
 	 * 
 	 * Caution: the external variable that are added to this list here could be
-	 * inconsistent accidently from the variables that are added to pou
+	 * inconsistent accidentally from the variables that are added to pou
 	 * interface external variable list.
 	 */
 
@@ -205,6 +203,10 @@ public class IntelligentMachineFB {
 
 		Var variable_machine_IL_ok_var = new Var(variable_machine_IL_ok, false);
 		externalVarList.append(variable_machine_IL_ok_var);
+
+//		Add the variable indicating machine in initial its state to VaraibleList.txt 
+		externalVarList.append(getMachineInInitialStateVar(machineName)
+				.getFeedbackVarList());
 
 		return fbConnectionList;
 	}
