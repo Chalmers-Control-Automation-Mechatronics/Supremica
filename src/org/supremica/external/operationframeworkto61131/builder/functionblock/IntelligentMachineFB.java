@@ -204,7 +204,7 @@ public class IntelligentMachineFB {
 		Var variable_machine_IL_ok_var = new Var(variable_machine_IL_ok, false);
 		externalVarList.append(variable_machine_IL_ok_var);
 
-//		Add the variable indicating machine in initial its state to VaraibleList.txt 
+//		Add the variable indicating machine is in its initial state to VaraibleList.txt 
 		externalVarList.append(getMachineInInitialStateVar(machineName)
 				.getFeedbackVarList());
 
