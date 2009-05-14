@@ -1,13 +1,14 @@
-package net.sourceforge.waters.analysis.distributed;
+package net.sourceforge.waters.analysis.distributed.application;
+
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 
-public class DistributedAnalysisNode
-  implements AnalysisNode
+public class DistributedNode
+  implements Node
 {
-  public DistributedAnalysisNode()
+  public DistributedNode()
   {
     super();
   }
@@ -22,25 +23,25 @@ public class DistributedAnalysisNode
     try
       {
 	//Create an analysis node object.
-	AnalysisNode realNode = new DistributedAnalysisNode();
-	AnalysisNode node = 
-	  (AnalysisNode) UnicastRemoteObject.exportObject(realNode, 0);
+	Node realNode = new DistributedNode();
+	Node node = 
+	  (Node) UnicastRemoteObject.exportObject(realNode, 0);
 
 	String host = args[0];
 	int port = Integer.parseInt(args[1]);
-	String service = DistributedAnalysisServer.DEFAULT_SERVICE_NAME;
+	String service = DistributedServer.DEFAULT_SERVICE_NAME;
 	if (args.length > 2)
 	  service = args[2];
 
 	Registry registry = LocateRegistry.getRegistry(host, port);
-	AnalysisServer server = (AnalysisServer) registry.lookup(service);
+	Server server = (Server) registry.lookup(service);
 
 	server.registerNode(node);
 
       }
     catch (Exception e)
       {
-	System.err.println("Analysis node exception:");
+	System.err.println("Node exception:");
 	e.printStackTrace();
       }
     

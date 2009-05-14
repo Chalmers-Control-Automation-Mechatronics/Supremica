@@ -1,9 +1,9 @@
-package net.sourceforge.waters.analysis.distributed;
+package net.sourceforge.waters.analysis.distributed.application;
 
 import java.rmi.Remote;
 import java.rmi.RemoteException;
 
-public interface AnalysisNode extends Remote
+public interface Node extends Remote
 {
   public String nodeHello() throws RemoteException;
 }

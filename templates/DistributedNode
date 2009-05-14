@@ -1,0 +1,13 @@
+#!/bin/sh
+
+THIS=`readlink -f $0`
+DIR=`dirname $THIS`
+
+export LD_LIBRARY_PATH=$DIR
+
+#  -agentlib:jdwp=transport=dt_socket,address=8000,server=y,suspend=n \
+java -Xms512m \
+	-Xmx1280m \
+  -cp "$DIR/Supremica.jar" -enableassertions \
+  net.sourceforge.waters.analysis.distributed.application.DistributedNode $@
+
