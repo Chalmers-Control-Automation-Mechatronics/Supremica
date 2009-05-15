@@ -40,7 +40,10 @@ import net.sourceforge.waters.model.analysis.SafetyVerifier;
 import net.sourceforge.waters.model.analysis.VerificationResult;
 import net.sourceforge.waters.xsd.base.EventKind;
 import net.sourceforge.waters.analysis.bdd.BDDSafetyVerifier;
+import net.sourceforge.waters.analysis.modular.ModularControllabilityChecker;
+import net.sourceforge.waters.analysis.modular.ModularLanguageInclusionChecker;
 import net.sourceforge.waters.cpp.analysis.NativeSafetyVerifier;
+import net.sourceforge.waters.cpp.analysis.NativeControllabilityChecker;
 
 import net.sourceforge.waters.model.expr.OperatorTable;
 import net.sourceforge.waters.model.marshaller.DocumentManager;
@@ -69,10 +72,10 @@ public class ComposingSafetyVerifier
   public ComposingSafetyVerifier(final ProductDESProxy model,
                                  final KindTranslator translator,
                                  final ProductDESProxyFactory factory) {
-    super(model, factory); 
+    super(model, factory);     
     mTranslator = translator; 
     setNodeLimit(10000000);    
-    setProjectionNodeLimit(1000);    
+    setProjectionNodeLimit(3000);    
   }
   
   
@@ -115,7 +118,10 @@ public class ComposingSafetyVerifier
 
   //#########################################################################
   //# Invocation
-  public boolean run() throws AnalysisException {        
+  public boolean run() throws AnalysisException {
+    TimeOut timer = new TimeOut(3600000); 
+    timer.start();
+    System.out.println("model events size: "+getModel().getEvents().size());          
     final Composing composing =
       new Composing(getConvertedModel(),
 		                getConvertedKindTranslator(),
@@ -123,7 +129,8 @@ public class ComposingSafetyVerifier
 		composing.setHeuristic(getHeuristic());
     composing.setNodeLimit(getProjectionNodeLimit());     
     ProductDESProxy des = composing.run(); 
-    System.out.println("Composing is done!"); 
+    System.out.println("Composing is done!");
+    System.out.println("events size: "+des.getEvents().size());
     
     saveIntoFile(des);
     
@@ -162,16 +169,19 @@ public class ComposingSafetyVerifier
     }*/
      
     final SafetyVerifier checker =
+      //new ModularLanguageInclusionChecker(des,getFactory(),
+          //new ModularControllabilityChecker(des,getFactory(),new NativeControllabilityChecker(getFactory()),false));
+      //new ModularControllabilityChecker(des,getFactory(),new NativeControllabilityChecker(getFactory()),false);
       //new NativeSafetyVerifier(des, getConvertedKindTranslator(),getFactory());
       new BDDSafetyVerifier(des, getConvertedKindTranslator(), getFactory());
     checker.setNodeLimit(getNodeLimit());        
     final boolean result = checker.run(); 
     //mStates = (int)checker.getAnalysisResult().getTotalNumberOfStates();
     mStates = composing.getTotalNumberOfStates();
-    mNodes = (int)checker.getAnalysisResult().getPeakNumberOfNodes();    
-
+    mNodes = (int)checker.getAnalysisResult().getPeakNumberOfNodes();     
+    timer.interrupt();
     
-    if (result) {     
+    if (result) {          
       return setSatisfiedResult();
     } else {
       final String tracename = getModel().getName() + ":uncontrollable";
@@ -190,7 +200,7 @@ public class ComposingSafetyVerifier
       }
       
       for (int i=candidates.size()-1;i>=0;i--) {
-                
+               
         for (ASTAutomaton astaut : astautomata.get(i+1)) {
           composedTrace = renovateTrace(composedTrace,astaut);          
         }
@@ -207,7 +217,7 @@ public class ComposingSafetyVerifier
       final SafetyTraceProxy extendCounterexample =
                getFactory().createSafetyTraceProxy(tracename, getModel(), composedTrace); 
       return setFailedResult(extendCounterexample);
-    }
+    }    
   }
   
   //Works only for determinstic model
@@ -532,7 +542,7 @@ public class ComposingSafetyVerifier
   protected void addStatistics(final VerificationResult result) {
     result.setNumberOfStates(mStates);
     result.setPeakNumberOfNodes(mNodes);
-    //result.setNumberOfAutomata(10);    
+    System.out.println("( "+mNodes+" nodes )");    
   }
   
   public ProductDESProxy getConvertedModel() {

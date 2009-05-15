@@ -56,6 +56,7 @@ public class ComposingLanguageInclusionChecker
     throws AnalysisException
   {
     final ProductDESProxy model = getModel();
+    System.out.println("Original Events: "+model.getEvents().size());
     final KindTranslator translator0 = getKindTranslator();
     final SingleSpecKindTranslator translator1 =
       new SingleSpecKindTranslator(translator0);

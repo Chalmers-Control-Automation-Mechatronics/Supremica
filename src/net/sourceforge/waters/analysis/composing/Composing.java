@@ -62,8 +62,10 @@ public class Composing {
                       break;
         default : break;
       }
-    }    
+    }
+   
     hiddenEvents = new ArrayList<EventProxy>(events);
+    System.out.println("R evetns: "+(mEvents.size()-events.size()));    
     //Case: no plant  
     if (plants.isEmpty()) return mModel;
     //Case: no removable events  
@@ -74,16 +76,17 @@ public class Composing {
 	  }
     
     //Assumption: All events which are not related with specs will be removed.    
-    int loop = 0;      
+    int loop = 0;
+    //Set<EventProxy> dependedEvents = new HashSet<EventProxy>();      
     while (true) {        
-      loop++;
+      loop++;      
       ArrayList<Candidate> composition = new ArrayList<Candidate>();
       Set<EventProxy> dependedEvents = new HashSet<EventProxy>();        
 		  //Step 1
 	    //mustL: A set of Automata using the particular event.	       
-	    for (EventProxy e : events) {
+	    for (EventProxy e : events) {	    
 	      if(mTranslator.getEventKind(e)==EventKind.PROPOSITION) {
-	        dependedEvents.add(e);
+	        dependedEvents.add(e);	        
 	        hiddenEvents.remove(e);
 	        continue;
 	      }
@@ -93,10 +96,10 @@ public class Composing {
 	        if (aut.getEvents().contains(e)) {
 	          comp.add(aut);	          
 	        }
-	      }	
-	      if (comp.size()==0) {
-	        dependedEvents.add(e);
-	        hiddenEvents.remove(e);
+	      }	      	
+	      if (comp.isEmpty()) {
+	        dependedEvents.add(e);	        
+	        //hiddenEvents.remove(e);
 	        continue;
 	      }
 	      eventHidden.add(e);
@@ -168,7 +171,7 @@ public class Composing {
 	        
 	      }	else {
 			      int i = composition.indexOf(newCandidate);
-			      composition.get(i).addLocalEvent(e);	
+			      composition.get(i).addLocalEvent(e);			      	
 	        }      
 	    }
 	    events.removeAll(dependedEvents);
@@ -346,13 +349,13 @@ public class Composing {
 	  //Create new model
 		
 	  //remove all events which supposed to be hidden but not.
-	  hiddenEvents.removeAll(events);
+	  hiddenEvents.removeAll(events);	  
 	  newAutomata.addAll(plants);
     newAutomata.addAll(specs);
 
     newEvents.addAll(mEvents);
-    newEvents.removeAll(hiddenEvents);   
-
+    newEvents.removeAll(hiddenEvents);    
+    //System.out.println(newEvents.size());
     newModel = mFactory.createProductDESProxy("composedModel", newEvents, newAutomata);    
     return newModel;
   }
@@ -393,17 +396,17 @@ public class Composing {
 	  newAutomaton=selfloopCheck(newAutomaton);
 	   
 	  mCandidate.add(can);
-                       
-	  plants.removeAll((HashSet)can.getAllAutomata());
+	            
+	  plants.removeAll((HashSet)can.getAllAutomata());	  
 	  plants.add(newAutomaton);
-	  
+	   
 	  moreSelfloopCheck();
 	  
 	  if(!sameTransCheck()){
 	    mASTAutomata.add(new HashSet<ASTAutomaton>());
 	  }
 
-	  events.removeAll((HashSet)can.getLocalEvents());
+	  events.removeAll((HashSet)can.getLocalEvents());	  
   }
   
   //remove the selfloop events which occur at all states
@@ -451,7 +454,7 @@ public class Composing {
     Set<EventProxy> specEvents = new HashSet<EventProxy>();
     Set<AutomatonProxy> checkAutomata = 
     	new HashSet<AutomatonProxy>(plants);
-    checkAutomata.addAll(specs);
+    checkAutomata.addAll(specs);    
     
     for (AutomatonProxy aut : checkAutomata) {      
       for (TransitionProxy tran : aut.getTransitions()) {
@@ -492,8 +495,13 @@ public class Composing {
     }
     for (AutomatonProxy aut : automatonEvents.keySet()) {
       AutomatonProxy newAut = removeEvents(aut,automatonEvents.get(aut));
-      plants.remove(aut);
-      plants.add(newAut);
+      if (plants.contains(aut)) {
+      	plants.remove(aut);      	
+      	plants.add(newAut);     	 
+      } else {
+        specs.remove(aut);
+        specs.add(newAut);
+      }
     }
   }
   

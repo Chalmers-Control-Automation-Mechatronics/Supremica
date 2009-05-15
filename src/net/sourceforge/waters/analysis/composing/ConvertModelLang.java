@@ -114,6 +114,7 @@ public class ConvertModelLang {
         enabledEvents.add(e);
       } 
     }
+    System.out.println(enabledEvents.size()+" enabled events!!!");
     if (enabledEvents.isEmpty()) return a;
     notEnabledEvents.removeAll(enabledEvents);
     Set<EventProxy> pe = new HashSet<EventProxy>();
@@ -136,6 +137,7 @@ public class ConvertModelLang {
       uncont.put(e, newEvent); 
     }
     notEnabledEvents.removeAll(pe);
+    System.out.println(notEnabledEvents.size()+" not enabled events!!!");
     Set<StateProxy> states = new HashSet<StateProxy>(a.getStates());
     Set<TransitionProxy> transitions =
       new HashSet<TransitionProxy>(a.getTransitions());

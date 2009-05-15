@@ -65,6 +65,7 @@ public class ConvertModel {
     for(EventProxy e : madeEvents.keySet()) {
       oneSpecEvents.addAll(madeEvents.get(e));
     }
+    System.out.println("gama Evetns: "+oneSpecEvents.size());
     AutomatonProxy oneSpec =
       mFactory.createAutomatonProxy("oneSpec" + ":spec",
                                     ComponentKind.SPEC,
