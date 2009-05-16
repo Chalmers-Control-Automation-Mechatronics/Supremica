@@ -13,8 +13,10 @@ public class Client
 	int port = Integer.parseInt(args[1]);
 	String service = DistributedServer.DEFAULT_SERVICE_NAME;
 
-	if (args.length > 2)
-	  service = args[2];
+	String controller = args[2];
+
+	if (args.length > 3)
+	  service = args[3];
 
 	Registry registry = LocateRegistry.getRegistry(host, port);
 	Server server = (Server) registry.lookup(service);
@@ -22,10 +24,19 @@ public class Client
 	
 	Job job = new Job();
 	job.setAttribute("name", "test-job");
+	job.setAttribute("controller", controller);
 
 	Job result = server.submitJob(job);
 
-	System.out.format("Result: %s\n", result.getAttribute("result"));
+	if (result.containsAttribute("exception"))
+	  {
+	    System.out.format("Job exception: %s\n",
+			      result.getAttribute("exception"));
+	  }
+	else if (result.containsAttribute("result"))
+	  {
+	    System.out.format("Job result: %s\n", result.getAttribute("result"));
+	  }
 
       }
     catch (Exception e)

@@ -27,8 +27,18 @@ public class DistributedNode
 	Node node = 
 	  (Node) UnicastRemoteObject.exportObject(realNode, 0);
 
+	if (args.length < 1)
+	  {
+	    System.err.format("DistributedNode: No server host specified\n");
+	    System.exit(1);
+	  }
+
 	String host = args[0];
-	int port = Integer.parseInt(args[1]);
+
+	int port = DistributedServer.DEFAULT_PORT;
+	if (args.length > 1)
+	  port = Integer.parseInt(args[1]);
+
 	String service = DistributedServer.DEFAULT_SERVICE_NAME;
 	if (args.length > 2)
 	  service = args[2];

@@ -11,6 +11,7 @@ public class TestController extends AbstractController
 
   protected void executeController() throws Exception
   {
-    Thread.sleep(10000);
+    Thread.sleep(3000);
+    throw new Exception("LALALALALA");
   }
 }
