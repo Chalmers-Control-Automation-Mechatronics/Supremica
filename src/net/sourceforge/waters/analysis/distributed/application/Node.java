@@ -5,5 +5,9 @@ import java.rmi.RemoteException;
 
 public interface Node extends Remote
 {
-  public String nodeHello() throws RemoteException;
+  /**
+   * An empty method that can be used to check if the 
+   * node is alive.
+   */
+  public void ping() throws RemoteException;
 }

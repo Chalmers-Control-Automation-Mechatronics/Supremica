@@ -7,6 +7,8 @@ import java.rmi.server.UnicastRemoteObject;
 
 import java.util.List;
 import java.util.ArrayList;
+import java.util.Iterator;
+
 
 public class DistributedServer 
   implements Server
@@ -15,16 +17,22 @@ public class DistributedServer
   {
     super();
     mNodes = new ArrayList<Node>();
+
+    Thread pruner = new NodePruner();
+    pruner.setDaemon(true);
+    pruner.start();
   }
 
-  public String hello()
+  public void ping()
   {
-    return "Hello world!";
+    //Pong
+    return;
   }
 
   public void registerNode(Node node) 
   {
-    mNodes.add(node);
+    System.out.format("Node %s connected", node);
+    addNode(node);
   }
 
   /**
@@ -58,40 +66,86 @@ public class DistributedServer
     return controller;
   }
 
+
   public Job submitJob(Job job)
   {
-    String controller_name = (String)job.getAttribute("controller");
+    Job result = job.clone();
 
-    System.out.println ("Processing job "+ job.getAttribute("name"));
-    System.out.format ("Using controller: %s\n",
-		       controller_name);
-    
-    //Create a controller for the job.
-    Controller control = null;
     try
       {
-	control = createController(controller_name);
+	if (!job.containsAttribute("controller"))
+	  throw new Exception("Job does not contain a controller attribute");
+
+	String controller_name = (String)job.getAttribute("controller");
+	
+	System.out.println ("Processing job "+ job.getAttribute("name"));
+	System.out.format ("Using controller: %s\n",
+			   controller_name);
+	
+	//Create a controller for the job.
+	Controller control = createController(controller_name);
+	
+	control.run();
+	
+	if (control.getState() == ControllerState.COMPLETED)
+	  {
+	    result.setComplete();
+	    return result;
+	  }
+	else if (control.getState() == ControllerState.EXCEPTION)
+	  throw control.getException();
+	else
+	  throw new Exception("Controller ended in bad state!");
       }
     catch (Exception e)
       {
-	job.setAttribute("exception", e);
-	return job;
+	result.setException(e);
       }
+	
+    return result;
+  }
 
-    assert(control != null);
-    
-    control.run();
+  private class NodePruner extends Thread
+  {
+    public void run()
+    {
+      while (true)
+	{
+	  try
+	    {
+	      Thread.sleep(10000);
+	      pruneNodes();
+	    }
+	  catch (InterruptedException e)
+	    {}
+	}
+    }
+  }
 
-    //This isn't really right, but works for testing
-    //the controller.
-    job.setAttribute
-      ("result", 
-       control.getState() == ControllerState.COMPLETED);
+  /**
+   * Removes nodes that are no longer alive.
+   */
+  private synchronized void pruneNodes()
+  {
+    Iterator<Node> it = mNodes.iterator();
+    while (it.hasNext())
+      {
+	Node n = it.next();
+	try
+	  {
+	    n.ping();
+	  }
+	catch (RemoteException e)
+	  {
+	    System.err.format("Pruning node %s\n", n);
+	    it.remove();
+	  }
+      }
+  }
 
-    if (control.getState() == ControllerState.EXCEPTION)
-      job.setAttribute("exception", control.getException());
-    
-    return job;
+  private synchronized void addNode(Node n)
+  {
+    mNodes.add(n);
   }
   
   private final List<Node> mNodes;

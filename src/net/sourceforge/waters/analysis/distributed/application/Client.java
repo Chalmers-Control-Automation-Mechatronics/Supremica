@@ -21,21 +21,19 @@ public class Client
 	Registry registry = LocateRegistry.getRegistry(host, port);
 	Server server = (Server) registry.lookup(service);
 	
-	
 	Job job = new Job();
 	job.setAttribute("name", "test-job");
 	job.setAttribute("controller", controller);
 
 	Job result = server.submitJob(job);
 
-	if (result.containsAttribute("exception"))
+	if (result.getJobStatus() == JobStatus.COMPLETE)
 	  {
-	    System.out.format("Job exception: %s\n",
-			      result.getAttribute("exception"));
+	    System.out.println("Job finished successfully!");
 	  }
-	else if (result.containsAttribute("result"))
+	else if (result.getJobStatus() == JobStatus.EXCEPTION)
 	  {
-	    System.out.format("Job result: %s\n", result.getAttribute("result"));
+	    System.out.format("Job exception: %s\n", result.getException());
 	  }
 
       }
