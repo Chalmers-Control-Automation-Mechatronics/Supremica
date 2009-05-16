@@ -276,6 +276,10 @@ setup()
         }
       }
     }
+    HashTableIterator hiter0 = statemap.iterator();
+    while (statemap.hasNext(hiter0)) {
+      delete statemap.next(hiter0);
+    }
     statemap.clear();
     const jni::SetGlue events = aut.getEventsGlue(mCache);
     const jni::IteratorGlue eventiter = events.iteratorGlue(mCache);
@@ -467,30 +471,35 @@ checkProperty()
   // Main loop ...
   uint32 current = 0;
   uint32* currenttuple = new uint32[mNumAutomata];
-  while (current < mNumStates) {
-    uint32* currentpacked = mStateSpace->get(current);
-    mEncoding->decode(currentpacked, currenttuple);
-    for (int e = 0; e < mNumEventRecords; e++) {
-      const EventRecord* event = mEventRecords[e];
-      const AutomatonRecord* dis = 0;
-      FIND_DISABLING_AUTOMATON(currenttuple, event, dis)
-      if (dis == 0) {
-        EXPAND_ENABLED_TRANSITIONS(numwords, currenttuple,
-                                   currentpacked, event);
-      } else if (!dis->isPlant() && !event->isControllable()) {
-        mTraceState = current;
-        mTraceEvent = event;
-        delete [] currenttuple;
-        return false;
+  try {
+    while (current < mNumStates) {
+      uint32* currentpacked = mStateSpace->get(current);
+      mEncoding->decode(currentpacked, currenttuple);
+      for (int e = 0; e < mNumEventRecords; e++) {
+        const EventRecord* event = mEventRecords[e];
+        const AutomatonRecord* dis = 0;
+        FIND_DISABLING_AUTOMATON(currenttuple, event, dis);
+        if (dis == 0) {
+          EXPAND_ENABLED_TRANSITIONS(numwords, currenttuple,
+                                     currentpacked, event);
+        } else if (!dis->isPlant() && !event->isControllable()) {
+          mTraceState = current;
+          mTraceEvent = event;
+          delete [] currenttuple;
+          return false;
+        }
+      }
+      if (++current == nextlevel) {
+        nextlevel = mNumStates;
+        mDepthMap->add(nextlevel);
       }
     }
-    if (++current == nextlevel) {
-      nextlevel = mNumStates;
-      mDepthMap->add(nextlevel);
-    }
+    delete [] currenttuple;
+    return true;
+  } catch (...) {
+    delete [] currenttuple;
+    throw;
   }
-  delete [] currenttuple;
-  return true;
 }
 
 
@@ -519,28 +528,33 @@ computeCounterExample()
           EventRecord::compareForBackwardSearch);
     const int numwords = mEncoding->getNumberOfWords();
     uint32* targettuple = new uint32[mNumAutomata];
-    do {
-      mTraceLimit = mDepthMap->get(level);
-      uint32* packedtarget = mStateSpace->get(mTraceState);
-      mEncoding->decode(packedtarget, targettuple);
-      e = -1;
-      try {
-        do {
-          const EventRecord* event = reversed[++e];
-          const AutomatonRecord* dis = 0;
-          FIND_DISABLING_AUTOMATON(targettuple, event, dis);
-          if (dis == 0) {
-            EXPAND_ENABLED_TRANSITIONS(numwords, targettuple,
-                                       packedtarget, event);
-          }
-        } while (true);
-      } catch (const TraceAbort& abort) {
-        // OK. That's what we have been waiting for.
-      }
-      jni::EventGlue eventglue = reversed[e]->getJavaEvent();
-      mTraceList->add(0, &eventglue);
-    } while (level-- > 1);
-    delete [] targettuple;
+    try {
+      do {
+        mTraceLimit = mDepthMap->get(level);
+        uint32* packedtarget = mStateSpace->get(mTraceState);
+        mEncoding->decode(packedtarget, targettuple);
+        e = -1;
+        try {
+          do {
+            const EventRecord* event = reversed[++e];
+            const AutomatonRecord* dis = 0;
+            FIND_DISABLING_AUTOMATON(targettuple, event, dis);
+            if (dis == 0) {
+              EXPAND_ENABLED_TRANSITIONS(numwords, targettuple,
+                                         packedtarget, event);
+            }
+          } while (true);
+        } catch (const TraceAbort& abort) {
+          // OK. That's what we have been waiting for.
+        }
+        jni::EventGlue eventglue = reversed[e]->getJavaEvent();
+        mTraceList->add(0, &eventglue);
+      } while (level-- > 1);
+      delete [] targettuple;
+    } catch (...) {
+      delete [] targettuple;
+      throw;
+    }
   }
 }
 
