@@ -2,9 +2,9 @@
 //###########################################################################
 //# PROJECT: Waters
 //# PACKAGE: waters.analysis
-//# CLASS:   EventRecord
+//# CLASS:   BroadEventRecord
 //###########################################################################
-//# $Id: EventRecord.cpp,v 1.12 2006-12-01 03:26:36 robi Exp $
+//# $Id: BroadEventRecord.cpp,v 1.12 2006-12-01 03:26:36 robi Exp $
 //###########################################################################
 
 #ifdef __GNUG__
@@ -21,7 +21,7 @@
 #include "jni/cache/JavaString.h"
 
 #include "waters/analysis/AutomatonEncoding.h"
-#include "waters/analysis/EventRecord.h"
+#include "waters/analysis/BroadEventRecord.h"
 #include "waters/analysis/TransitionRecord.h"
 #include "waters/analysis/TransitionUpdateRecord.h"
 
@@ -29,13 +29,13 @@
 namespace waters {
 
 //############################################################################
-//# class EventRecordHashAccessor
+//# class BroadEventRecordHashAccessor
 //############################################################################
 
 //############################################################################
-//# EventRecordHashAccessor: Hash Methods
+//# BroadEventRecordHashAccessor: Hash Methods
 
-uint32 EventRecordHashAccessor::
+uint32 BroadEventRecordHashAccessor::
 hash(const void* key)
   const
 {
@@ -44,7 +44,7 @@ hash(const void* key)
 }
 
 
-bool EventRecordHashAccessor::
+bool BroadEventRecordHashAccessor::
 equals(const void* key1, const void* key2)
   const
 {
@@ -54,30 +54,30 @@ equals(const void* key1, const void* key2)
 }
 
 
-const void* EventRecordHashAccessor::
+const void* BroadEventRecordHashAccessor::
 getKey(const void* value)
   const
 {
-  const EventRecord* record = (const EventRecord*) value;
+  const BroadEventRecord* record = (const BroadEventRecord*) value;
   return &record->getJavaEvent();
 }
 
 
 //############################################################################
-//# class EventRecord
+//# class BroadEventRecord
 //############################################################################
 
 //############################################################################
-//# EventRecord: Class Variables
+//# BroadEventRecord: Class Variables
 
-const EventRecordHashAccessor EventRecord::theHashAccessor;
+const BroadEventRecordHashAccessor BroadEventRecord::theHashAccessor;
 
 
 //############################################################################
-//# EventRecord: Constructors & Destructors
+//# BroadEventRecord: Constructors & Destructors
 
-EventRecord::
-EventRecord(jni::EventGlue event, bool controllable, int numwords)
+BroadEventRecord::
+BroadEventRecord(jni::EventGlue event, bool controllable, int numwords)
   : mJavaEvent(event),
     mIsControllable(controllable),
     mIsGloballyDisabled(false),
@@ -94,8 +94,8 @@ EventRecord(jni::EventGlue event, bool controllable, int numwords)
   }
 }
 
-EventRecord::
-~EventRecord()
+BroadEventRecord::
+~BroadEventRecord()
 {
   for (int w = 0; w < mNumberOfWords; w++) {
     delete mUpdateRecords[w];
@@ -107,9 +107,9 @@ EventRecord::
 
 
 //############################################################################
-//# EventRecord: Simple Access
+//# BroadEventRecord: Simple Access
 
-bool EventRecord::
+bool BroadEventRecord::
 isSkippable()
   const
 {
@@ -124,7 +124,7 @@ isSkippable()
   }
 }
 
-jni::JavaString EventRecord::
+jni::JavaString BroadEventRecord::
 getName()
   const
 {
@@ -136,10 +136,10 @@ getName()
 
 
 //############################################################################
-//# EventRecord: Comparing
+//# BroadEventRecord: Comparing
 
-int EventRecord::
-compareToForForwardSearch(const EventRecord* partner)
+int BroadEventRecord::
+compareToForForwardSearch(const BroadEventRecord* partner)
   const
 {
   const int cont1 = mIsControllable ? 1 : 0;
@@ -151,8 +151,8 @@ compareToForForwardSearch(const EventRecord* partner)
   }
 }
 
-int EventRecord::
-compareToForBackwardSearch(const EventRecord* partner)
+int BroadEventRecord::
+compareToForBackwardSearch(const BroadEventRecord* partner)
   const
 {
   const float prob1 = mProbability;
@@ -166,27 +166,27 @@ compareToForBackwardSearch(const EventRecord* partner)
   }
 }
 
-int EventRecord::
+int BroadEventRecord::
 compareForForwardSearch(const void* elem1, const void* elem2)
 {
-  const EventRecord* val1 = *((const EventRecord**) elem1);
-  const EventRecord* val2 = *((const EventRecord**) elem2);
+  const BroadEventRecord* val1 = *((const BroadEventRecord**) elem1);
+  const BroadEventRecord* val2 = *((const BroadEventRecord**) elem2);
   return val1->compareToForForwardSearch(val2);
 }
 
-int EventRecord::
+int BroadEventRecord::
 compareForBackwardSearch(const void* elem1, const void* elem2)
 {
-  const EventRecord* val1 = *((const EventRecord**) elem1);
-  const EventRecord* val2 = *((const EventRecord**) elem2);
+  const BroadEventRecord* val1 = *((const BroadEventRecord**) elem1);
+  const BroadEventRecord* val2 = *((const BroadEventRecord**) elem2);
   return val1->compareToForBackwardSearch(val2);
 }
 
 
 //############################################################################
-//# EventRecord: Set up
+//# BroadEventRecord: Set up
 
-bool EventRecord::
+bool BroadEventRecord::
 addDeterministicTransition(const AutomatonRecord* aut,
                            const StateRecord* source,
                            const StateRecord* target)
@@ -202,7 +202,7 @@ addDeterministicTransition(const AutomatonRecord* aut,
   }
 }
 
-void EventRecord::
+void BroadEventRecord::
 addNondeterministicTransition(const AutomatonRecord* aut,
                               const StateRecord* source,
                               const StateRecord* target)
@@ -212,7 +212,7 @@ addNondeterministicTransition(const AutomatonRecord* aut,
   }
 }
 
-void EventRecord::
+void BroadEventRecord::
 normalize(const AutomatonRecord* aut)
 {
   TransitionRecord* trans = mUsedSearchRecords;
@@ -253,7 +253,7 @@ normalize(const AutomatonRecord* aut)
   }
 }
 
-TransitionUpdateRecord* EventRecord::
+TransitionUpdateRecord* BroadEventRecord::
 createUpdateRecord(int wordindex)
 {
   TransitionUpdateRecord* update = mUpdateRecords[wordindex];
@@ -263,7 +263,7 @@ createUpdateRecord(int wordindex)
   return update;
 }
 
-void EventRecord::
+void BroadEventRecord::
 sortTransitionRecordsForSearch()
 {
   TransitionRecordList list(mUsedSearchRecords);
@@ -271,7 +271,7 @@ sortTransitionRecordsForSearch()
   mUsedSearchRecords = list.getHead();
 }
 
-bool EventRecord::
+bool BroadEventRecord::
 reverse()
 {
   if (mIsGloballyDisabled) {
@@ -298,9 +298,9 @@ reverse()
 
 
 //############################################################################
-//# EventRecord: Set up
+//# BroadEventRecord: Set up
 
-void EventRecord::
+void BroadEventRecord::
 addReversedList(TransitionRecord* trans)
 {
   if (mIsGloballyDisabled) {
@@ -355,7 +355,7 @@ addReversedList(TransitionRecord* trans)
   }
 }
 
-void EventRecord::
+void BroadEventRecord::
 enqueueSearchRecord(TransitionRecord* trans)
 {
   if (trans->isAlwaysEnabled()) {
@@ -368,7 +368,7 @@ enqueueSearchRecord(TransitionRecord* trans)
   mProbability *= trans->getProbability();
 }
 
-void EventRecord::
+void BroadEventRecord::
 clearSearchAndUpdateRecords()
 {
   mUsedSearchRecords = mUnusedSearchRecords = 0;

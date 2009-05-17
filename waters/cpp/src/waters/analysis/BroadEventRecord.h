@@ -2,14 +2,14 @@
 //###########################################################################
 //# PROJECT: Waters
 //# PACKAGE: waters.analysis
-//# CLASS:   EventRecord
+//# CLASS:   BroadEventRecord
 //###########################################################################
-//# $Id: EventRecord.h,v 1.9 2006-11-24 23:25:59 robi Exp $
+//# $Id: BroadEventRecord.h,v 1.9 2006-11-24 23:25:59 robi Exp $
 //###########################################################################
 
 
-#ifndef _EventRecord_h_
-#define _EventRecord_h_
+#ifndef _BroadEventRecord_h_
+#define _BroadEventRecord_h_
 
 #ifdef __GNUG__
 #pragma interface
@@ -38,16 +38,16 @@ class TransitionUpdateRecord;
 
 
 //###########################################################################
-//# Class EventRecordHashAccessor
+//# Class BroadEventRecordHashAccessor
 //###########################################################################
 
-class EventRecordHashAccessor : public PtrHashAccessor
+class BroadEventRecordHashAccessor : public PtrHashAccessor
 {
 private:
   //##########################################################################
   //# Constructors & Destructors
-  explicit EventRecordHashAccessor() {};
-  friend class EventRecord;
+  explicit BroadEventRecordHashAccessor() {};
+  friend class BroadEventRecord;
 
 public:
   //##########################################################################
@@ -60,16 +60,16 @@ public:
 
 
 //############################################################################
-//# class EventRecord
+//# class BroadEventRecord
 //############################################################################
 
-class EventRecord
+class BroadEventRecord
 {
 public:
   //##########################################################################
   //# Constructors & Destructors
-  explicit EventRecord(jni::EventGlue event, bool controllable, int numwords);
-  ~EventRecord();
+  explicit BroadEventRecord(jni::EventGlue event, bool controllable, int numwords);
+  ~BroadEventRecord();
 
   //##########################################################################
   //# Simple Access
@@ -88,8 +88,8 @@ public:
 
   //##########################################################################
   //# Comparing and Hashing
-  int compareToForForwardSearch(const EventRecord* partner) const;
-  int compareToForBackwardSearch(const EventRecord* partner) const;
+  int compareToForForwardSearch(const BroadEventRecord* partner) const;
+  int compareToForBackwardSearch(const BroadEventRecord* partner) const;
   static int compareForForwardSearch(const void* elem1, const void* elem2);
   static int compareForBackwardSearch(const void* elem1, const void* elem2);
   static const HashAccessor* getHashAccessor() {return &theHashAccessor;}
@@ -131,9 +131,9 @@ private:
 
   //##########################################################################
   //# Class Variables
-  static const EventRecordHashAccessor theHashAccessor;
+  static const BroadEventRecordHashAccessor theHashAccessor;
 };
 
 }   /* namespace waters */
 
-#endif  /* !_EventRecord_h_ */
+#endif  /* !_BroadEventRecord_h_ */
