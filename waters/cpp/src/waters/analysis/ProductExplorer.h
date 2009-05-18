@@ -88,7 +88,7 @@ protected:
   virtual void teardown();
   virtual bool doSafetySearch();
   virtual void computeCounterExample(const jni::ListGlue& list);
-  virtual void storeInitialStates() = 0;
+  virtual void storeInitialStates(bool initzero);
   virtual bool expandState(const uint32* currenttuple,
 			   const uint32* currentpacked) = 0;
   virtual const jni::EventGlue& getTraceEvent() = 0;

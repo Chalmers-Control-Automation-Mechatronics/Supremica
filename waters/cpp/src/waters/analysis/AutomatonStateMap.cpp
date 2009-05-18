@@ -17,6 +17,7 @@
 
 #include "jni/cache/ClassCache.h"
 #include "jni/glue/AutomatonGlue.h"
+#include "jni/glue/EventGlue.h"
 #include "jni/glue/IteratorGlue.h"
 #include "jni/glue/SetGlue.h"
 
@@ -63,7 +64,54 @@ AutomatonStateMap(jni::ClassCache* cache, AutomatonRecord* aut)
     new (&mStateArray[code]) StateRecord(state, code, cache);
     mStateMap->add(&mStateArray[code]);
   }
-  mAutomaton->setNumberOfInitialStates(nextinit); 
+  mAutomaton->setInitialStates(0, nextinit); 
+}
+
+
+AutomatonStateMap::
+AutomatonStateMap(jni::ClassCache* cache,
+                  AutomatonRecord* aut,
+                  const jni::EventGlue& marking)
+  : mAutomaton(aut),
+    mStateArray(0),
+    mStateMap(0)
+{
+  const HashAccessor* accessor = StateRecord::getHashAccessor();
+  const uint32 numstates =  mAutomaton->getNumberOfStates();
+  mStateArray = (StateRecord*) new char[numstates * sizeof(StateRecord)];
+  mStateMap =
+    new HashTable<const jni::StateGlue*,StateRecord*>(accessor, numstates);
+  const jni::AutomatonGlue& autglue = mAutomaton->getJavaAutomaton();
+  const jni::SetGlue states = autglue.getStatesGlue(cache);
+  int cat;
+  uint32 catindex[CAT_COUNT];
+  for (cat = 0; cat < CAT_COUNT; cat++) {
+    catindex[cat] = 0;
+  }
+  const jni::IteratorGlue iter1 = states.iteratorGlue(cache);
+  while (iter1.hasNext()) {
+    jobject javaobject = iter1.next();
+    jni::StateGlue state(javaobject, cache);
+    cat = getCategory(state, marking, cache);
+    catindex[cat++];
+  }
+  uint32 start = 0;
+  for (cat = 0; cat < CAT_COUNT; cat++) {
+    uint32 next = start + catindex[cat];
+    catindex[cat] = start;
+    start = next;
+  }
+  const jni::IteratorGlue iter2 = states.iteratorGlue(cache);
+  while (iter2.hasNext()) {
+    jobject javaobject = iter2.next();
+    jni::StateGlue state(javaobject, cache);
+    cat = getCategory(state, marking, cache);
+    const uint32 code = catindex[cat]++;
+    new (&mStateArray[code]) StateRecord(state, code, cache);
+    mStateMap->add(&mStateArray[code]);
+  }
+  mAutomaton->setInitialStates(catindex[0], catindex[2]);
+  mAutomaton->setMarkedStates(catindex[1]); 
 }
 
 
@@ -78,6 +126,21 @@ AutomatonStateMap::
     delete [] (char*) mStateArray;
     delete mStateMap;
   }
+}
+
+
+//############################################################################
+//# AutomatonStateMap: Auxiliary Methods
+
+int AutomatonStateMap::
+getCategory(const jni::StateGlue& state,
+            const jni::EventGlue& marking,
+            jni::ClassCache* cache)
+{
+  int init = state.isInitial() ? 0 : 1;
+  jni::CollectionGlue props = state.getPropositionsGlue(cache);
+  int marked = props.contains(&marking) ? 0 : 3;
+  return init ^ marked;
 }
 
 

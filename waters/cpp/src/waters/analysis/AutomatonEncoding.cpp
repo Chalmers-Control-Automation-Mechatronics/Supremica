@@ -103,6 +103,8 @@ AutomatonRecord(const jni::AutomatonGlue aut,
     jobject javaobject = iter.next();
     new (&mJavaStates[code++]) jni::StateGlue(javaobject, cache);
   }
+  mFirstInitialState = mEndInitialStates = 0;
+  mFirstMarkedState = mNumStates;
 }
 
 AutomatonRecord::
@@ -175,6 +177,12 @@ allocate(int wordindex, int shift)
   mBitMask = ((1 << mNumBits) - 1) << shift;
 }
 
+void AutomatonRecord::
+setInitialStates(uint32 firstinit, uint32 endinit)
+{
+  mFirstInitialState = firstinit;
+  mEndInitialStates = endinit;
+}
 
 
 //############################################################################
@@ -294,6 +302,21 @@ hasSpecs()
     }
   }
   return false;
+}
+
+
+int AutomatonEncoding::
+getNumberOfNondeterministicInitialAutomata()
+  const
+{
+  int ndcount = 0;
+  for (int a = 0; a < mNumRecords; a++) {
+    const AutomatonRecord* record = mAutomatonRecords[a];
+    if (record->getNumberOfInitialStates() > 1) {
+      ndcount++;
+    }
+  }
+  return ndcount;
 }
 
 

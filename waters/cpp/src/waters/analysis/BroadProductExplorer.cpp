@@ -61,7 +61,6 @@ BroadProductExplorer(const jni::ProductDESGlue des,
     mNumEventRecords(0),
     mEventRecords(0),
     mReversedEventRecords(0),
-    mNumNondetInitialStates(0),
     mNondeterministicTransitionIterators(0),
     mTraceEvent(0)
 {
@@ -120,14 +119,13 @@ setup()
 
   // Collect initial states and transitions ...
   const int numaut = getNumberOfAutomata();
-  mNumNondetInitialStates = 0;
   mNondeterministicTransitionIterators =
     new NondeterministicTransitionIterator[numaut];
   for (int a = 0; a < numaut; a++) {
     AutomatonRecord* autrecord = getAutomatonEncoding().getRecord(a);
     const jni::AutomatonGlue& aut = autrecord->getJavaAutomaton();
     AutomatonStateMap statemap(cache, autrecord);
-    const uint32 numinit = autrecord->getNumberOfInitialStates();
+    const uint32 numinit = autrecord->getEndOfInitialStates();
     switch (numinit) {
     case 0:
       setTrivial();
@@ -136,8 +134,6 @@ setup()
       break;
     default:
       if (autrecord->isPlant()) {
-        mNondeterministicTransitionIterators[mNumNondetInitialStates++].
-          setupInit(autrecord);
         break;
       } else {
         const jni::StateGlue& state = statemap.getJavaState(1);
@@ -237,26 +233,41 @@ teardown()
 }
 
 
+/*
 void BroadProductExplorer::
-storeInitialStates()
+storeInitialStates(bool initzero)
 {
-  const int numwords = getAutomatonEncoding().getNumberOfWords();
   uint32* initpacked = getStateSpace().prepare();
-  for (int w = 0; w < numwords; w++) {
-    initpacked[w] = 0;
+  if (initzero) {
+    const int numwords = getAutomatonEncoding().getNumberOfWords();
+    for (int w = 0; w < numwords; w++) {
+      initpacked[w] = 0;
+    }
+  } else {
+    const int numaut = getNumberOfAutomata();
+    uint32* inittuple = new uint32[numaut];
+    for (int a = 0; a < numaut; a++) {
+      const AutomatonRecord* aut = getAutomatonEncoding().getRecord(a);
+      inittuple[a] = aut->getFirstInitialState();
+    }
+    getAutomatonEncoding().encode(inittuple, initpacked);
+    delete [] inittuple;
   }
+  const int ndcount =
+    getAutomatonEncoding().getNumberOfNondeterministicInitialAutomata();
   int ndindex;
   do {
     getStateSpace().add();
     initpacked = getStateSpace().prepare(incNumberOfStates());
-    for (ndindex = 0; ndindex < mNumNondetInitialStates; ndindex++) {
+    for (ndindex = 0; ndindex < ndcount; ndindex++) {
       if (!mNondeterministicTransitionIterators[ndindex].
           advance(initpacked)) {
         break;
       }
     }
-  } while (ndindex < mNumNondetInitialStates);
+  } while (ndindex < ndcount);
 }
+*/
 
 
 // I know this is really kludgy,

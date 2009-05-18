@@ -32,6 +32,7 @@ glue class Iterator {
 
 glue class Collection {
   int size();
+  boolean contains(glue Object element);
   glue Iterator iterator();
 }
 
@@ -80,6 +81,7 @@ glue class EventProxy extends NamedProxy {
 
 glue class StateProxy extends NamedProxy {
   boolean isInitial();
+  glue Collection getPropositions();
 }
 
 glue class TransitionProxy {

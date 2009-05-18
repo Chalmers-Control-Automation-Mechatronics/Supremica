@@ -77,7 +77,11 @@ public:
   const jni::AutomatonGlue& getJavaAutomaton() const {return mJavaAutomaton;}
   inline bool isPlant() const {return mIsPlant;}
   inline int getNumberOfStates() const {return mNumStates;}
-  inline uint32 getNumberOfInitialStates() const {return mNumInitialStates;}
+  inline uint32 getFirstInitialState() const {return mFirstInitialState;}
+  inline uint32 getEndOfInitialStates() const {return mEndInitialStates;}
+  inline uint32 getNumberOfInitialStates() const
+    {return mEndInitialStates - mFirstInitialState;}
+  inline uint32 getFirstMarkedState() const {return mFirstMarkedState;}
   inline int getNumberOfBits() const {return mNumBits;}
   inline int getAutomatonIndex() const {return mAutomatonIndex;}
   inline int getWordIndex() const {return mWordIndex;}
@@ -97,8 +101,8 @@ public:
   //# Setting up
   void allocate(int wordindex, int shift);
   inline void setAutomatonIndex(int index) {mAutomatonIndex = index;}
-  inline void setNumberOfInitialStates(uint32 numinit)
-    {mNumInitialStates = numinit;}
+  void setInitialStates(uint32 firstinit, uint32 endinit);
+  void setMarkedStates(uint32 firstmarked) {mFirstMarkedState = firstmarked;}
 
 private:
   //##########################################################################
@@ -107,12 +111,14 @@ private:
   jni::StateGlue* mJavaStates;
   bool mIsPlant;
   int mNumStates;
-  uint32 mNumInitialStates;
   int mNumBits;
   int mAutomatonIndex;
   int mWordIndex;
   int mShift;
   uint32 mBitMask;
+  uint32 mFirstInitialState;
+  uint32 mEndInitialStates;
+  uint32 mFirstMarkedState;
 
   //##########################################################################
   //# Class Variables
@@ -142,6 +148,7 @@ public:
   inline AutomatonRecord* getRecord(int index) const
     {return mAutomatonRecords[index];}
   bool hasSpecs() const;
+  int getNumberOfNondeterministicInitialAutomata() const;
 
   //##########################################################################
   //# Encoding and Decoding

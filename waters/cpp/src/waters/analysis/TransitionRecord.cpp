@@ -301,7 +301,7 @@ void NondeterministicTransitionIterator::
 setupInit(const AutomatonRecord* aut)
 {
   mAutomatonRecord = aut;
-  mIndex = 0;
+  mIndex = aut->getFirstInitialState();
 }
 
 bool NondeterministicTransitionIterator::
@@ -310,12 +310,12 @@ advanceInit(uint32* tuple)
   const int w = mAutomatonRecord->getWordIndex();
   tuple[w] &= ~mAutomatonRecord->getBitMask();
   const uint32 next = mIndex + 1;
-  if (next < mAutomatonRecord->getNumberOfInitialStates()) {
+  if (next < mAutomatonRecord->getEndOfInitialStates()) {
     mIndex = next;
     tuple[w] |= next;
     return false;
   } else {
-    mIndex = 0;
+    mIndex = mAutomatonRecord->getFirstInitialState();
     return true;
   }
 }

@@ -59,7 +59,6 @@ protected:
   //# Auxiliary Methods
   virtual void setup();
   virtual void teardown();
-  virtual void storeInitialStates();
   virtual bool expandState(const uint32* currenttuple,
 			   const uint32* currentpacked);
   virtual const jni::EventGlue& getTraceEvent();
@@ -73,7 +72,6 @@ private:
   int mNumEventRecords;
   BroadEventRecord** mEventRecords;
   BroadEventRecord** mReversedEventRecords;
-  int mNumNondetInitialStates;
   NondeterministicTransitionIterator* mNondeterministicTransitionIterators;
   const BroadEventRecord* mTraceEvent;
   uint32 mTraceLimit;

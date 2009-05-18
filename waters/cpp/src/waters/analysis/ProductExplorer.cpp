@@ -29,6 +29,7 @@
 #include "waters/analysis/BroadProductExplorer.h"
 #include "waters/analysis/ProductExplorer.h"
 #include "waters/analysis/StateSpace.h"
+#include "waters/analysis/TransitionRecord.h"
 #include "waters/javah/Invocations.h"
 
 
@@ -143,13 +144,12 @@ setup()
   if (mEncoding->hasSpecs()) {
     mIsTrivial = false;
     mNumAutomata = mEncoding->getNumberOfRecords();
-    mNumStates = 0;
     mStateSpace = new StateSpace(mEncoding, mStateLimit);
     mDepthMap = new ArrayList<uint32>(128);
   } else {
     mIsTrivial = true;
-    mNumStates = 0;
   }
+  mNumStates = 0;
 }
 
 
@@ -169,7 +169,7 @@ bool ProductExplorer::
 doSafetySearch()
 {
   // Store initial states ...
-  storeInitialStates();
+  storeInitialStates(true);
 
   // Prepare depth map ...
   uint32 nextlevel = mNumStates;
@@ -223,6 +223,58 @@ computeCounterExample(const jni::ListGlue& list)
       throw;
     }
   }
+}
+
+
+void ProductExplorer::
+storeInitialStates(bool initzero)
+{
+  uint32* initpacked = mStateSpace->prepare();
+  if (initzero) {
+    const int numwords = getAutomatonEncoding().getNumberOfWords();
+    for (int w = 0; w < numwords; w++) {
+      initpacked[w] = 0;
+    }
+  } else {
+    uint32* inittuple = new uint32[mNumAutomata];
+    for (int a = 0; a < mNumAutomata; a++) {
+      const AutomatonRecord* aut = getAutomatonEncoding().getRecord(a);
+      inittuple[a] = aut->getFirstInitialState();
+    }
+    getAutomatonEncoding().encode(inittuple, initpacked);
+    delete [] inittuple;
+  }
+  mStateSpace->add();
+  const int ndcount = mEncoding->getNumberOfNondeterministicInitialAutomata();
+  if (ndcount > 0) {
+    NondeterministicTransitionIterator* iters =
+      new NondeterministicTransitionIterator[ndcount];
+    try {
+      int ndindex = 0;
+      for (int a = 0; a < mNumAutomata; a++) {
+        const AutomatonRecord* aut = getAutomatonEncoding().getRecord(a);
+        if (aut->getNumberOfInitialStates() > 1) {
+          iters[ndindex++].setupInit(aut);
+        }
+      }
+      do {
+        initpacked = mStateSpace->prepare();
+        for (ndindex = 0; ndindex < ndcount; ndindex++) {
+          if (!iters[ndindex].advanceInit(initpacked)) {
+            break;
+          }
+        }
+        if (ndindex < ndcount) {
+          mStateSpace->add();
+        }
+      } while (ndindex < ndcount);
+      delete [] iters;
+    } catch (...) {
+      delete [] iters;
+      throw;
+    }
+  }
+  mNumStates = mStateSpace->size();
 }
 
 

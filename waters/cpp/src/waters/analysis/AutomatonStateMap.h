@@ -28,6 +28,7 @@
 
 namespace jni {
   class ClassCache;
+  class EventGlue;
 }
 
 
@@ -45,6 +46,9 @@ public:
   //##########################################################################
   //# Constructors & Destructors
   explicit AutomatonStateMap(jni::ClassCache* cache, AutomatonRecord* aut);
+  explicit AutomatonStateMap(jni::ClassCache* cache,
+			     AutomatonRecord* aut,
+			     const jni::EventGlue& marking);
   ~AutomatonStateMap();
 
   //##########################################################################
@@ -60,10 +64,24 @@ public:
 
 private:
   //##########################################################################
+  //# Auxiliary Methods
+  static int getCategory(const jni::StateGlue& state,
+			 const jni::EventGlue& marking,
+			 jni::ClassCache* cache);
+
+  //##########################################################################
   //# Data Members
   AutomatonRecord* mAutomaton;
   StateRecord* mStateArray;
   HashTable<const jni::StateGlue*,StateRecord*>* mStateMap;
+
+  //##########################################################################
+  //# Class Constants
+  static const int CAT_NORMAL = 0;
+  static const int CAT_INIT = 1;
+  static const int CAT_MARKED = 2;
+  static const int CAT_INIT_MARKED = 3;
+  static const int CAT_COUNT = 4;
 };
 
 
