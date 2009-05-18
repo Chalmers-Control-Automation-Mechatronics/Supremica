@@ -376,12 +376,12 @@
 									<Description>Proximity sensor group of two sensors for part present on fixture </Description>
 									<FunctionBlock>Part Detection x2</FunctionBlock>
 									<States>
-										<State id="1" name="on" />
-										<State id="2" name="off" />
+										<State id="1" name="off" />
+										<State id="2" name="on" />
 									</States>
 									<Elements>
 										<Element name="C1F1C4">
-											<Description> The part of the virtual sensor that handles the communication with the real sensor</Description>
+										<!-- 	<Description> The part of the virtual sensor that handles the communication with the real sensor</Description>
 											<IOConnectionMapping id="1">
 												<IOVariable>C1F1C4_IS1</IOVariable>
 												<IOAddress>string</IOAddress>
@@ -389,16 +389,16 @@
 											<IOConnectionMapping id="2">
 												<IOVariable>C1F1C4_IS2</IOVariable>
 												<IOAddress>string</IOAddress>
-											</IOConnectionMapping>
+											</IOConnectionMapping>-->
 										</Element>
 									</Elements>
 									<Equipment>
 										<EquipmentEntity type="Sensor" name="C1F1C4C1">
 											<Description>Proximity sensor part present on fixture </Description>
-											<FunctionBlock>Part Detection x2</FunctionBlock>
+											<!-- <FunctionBlock>Part Detection x2</FunctionBlock>-->
 											<States>
-												<State id="1" name="on" />
-												<State id="2" name="off" />
+												<State id="1" name="off" />
+												<State id="2" name="on" />
 											</States>
 											<!-- Elements describe (control of) the lowest level of the physical equipment, i.e. the level where communication with I/O cards / process take place-->
 											<Elements>
@@ -412,10 +412,10 @@
 										</EquipmentEntity>
 										<EquipmentEntity type="Sensor" name="C1F1C4C2">
 											<Description>Proximity sensor part present on fixture </Description>
-											<FunctionBlock>Part Detection x2</FunctionBlock>
+											<!-- <FunctionBlock>Part Detection x2</FunctionBlock>-->
 											<States>
-												<State id="1" name="on" />
-												<State id="2" name="off" />
+												<State id="1" name="off" />
+												<State id="2" name="on" />
 											</States>
 											<Elements>
 												<Element name="C1F1C4C2">
