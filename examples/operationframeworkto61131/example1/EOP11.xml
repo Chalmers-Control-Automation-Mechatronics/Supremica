@@ -15,6 +15,9 @@
 				<AlarmDelay>0</AlarmDelay>
 			</InitialStateCheck>
 		</InitialState>
+		<Zones>
+			<Zone>1</Zone>
+		</Zones>
 		<Action actionNbr="1">
 			<ZoneState>
 				<Zone>1</Zone>
