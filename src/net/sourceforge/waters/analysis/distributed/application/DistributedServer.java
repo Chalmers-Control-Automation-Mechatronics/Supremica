@@ -42,8 +42,9 @@ public class DistributedServer
    * @param name the full name (package + class) to create.
    * @return new instance of the controller.
    * @throws ClassNotFoundException if the class loader could not
-   *                                find the class, or if it is not
-   *                                a Controller.
+   *                                find the class.
+   * @throws ClassCastException if the specified class does not implement
+   *                                the {@link Controller} interface.
    * @throws IllegalAccessException if the class is not accessible.
    * @throws InstantiationException if the class cannot be instantiated.
    */
@@ -59,7 +60,7 @@ public class DistributedServer
     //The loaded class /must/ implement the Controller 
     //interface.
     if (!Controller.class.isAssignableFrom(c))
-      throw new ClassNotFoundException
+      throw new ClassCastException
 	(name + " is not a valid Controller class");
 
     Controller controller = (Controller) c.newInstance();
@@ -74,7 +75,7 @@ public class DistributedServer
     try
       {
 	if (!job.containsAttribute("controller"))
-	  throw new Exception("Job does not contain a controller attribute");
+	  throw new IllegalArgumentException("Job does not contain a controller attribute");
 
 	String controller_name = (String)job.getAttribute("controller");
 	
@@ -95,7 +96,7 @@ public class DistributedServer
 	else if (control.getState() == ControllerState.EXCEPTION)
 	  throw control.getException();
 	else
-	  throw new Exception("Controller ended in bad state!");
+	  throw new IllegalStateException("Controller ended in bad state!");
       }
     catch (Exception e)
       {
