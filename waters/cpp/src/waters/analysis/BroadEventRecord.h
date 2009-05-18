@@ -20,12 +20,7 @@
 #endif
 
 #include "jni/glue/EventGlue.h"
-#include "waters/base/IntTypes.h"
-
-namespace jni {
-  class ClassCache;
-  class JavaString;
-}
+#include "waters/analysis/EventRecord.h"
 
 
 namespace waters {
@@ -37,49 +32,27 @@ class TransitionRecord;
 class TransitionUpdateRecord;
 
 
-//###########################################################################
-//# Class BroadEventRecordHashAccessor
-//###########################################################################
-
-class BroadEventRecordHashAccessor : public PtrHashAccessor
-{
-private:
-  //##########################################################################
-  //# Constructors & Destructors
-  explicit BroadEventRecordHashAccessor() {};
-  friend class BroadEventRecord;
-
-public:
-  //##########################################################################
-  //# Hash Methods
-  virtual uint32 hash(const void* key) const;
-  virtual bool equals(const void* key1, const void* key2) const;
-  virtual const void* getKey(const void* value) const;
-};
-
-
-
 //############################################################################
 //# class BroadEventRecord
 //############################################################################
 
-class BroadEventRecord
+class BroadEventRecord : public EventRecord
 {
 public:
   //##########################################################################
   //# Constructors & Destructors
-  explicit BroadEventRecord(jni::EventGlue event, bool controllable, int numwords);
-  ~BroadEventRecord();
+  explicit BroadEventRecord(jni::EventGlue event,
+			    bool controllable,
+			    int numwords);
+  virtual ~BroadEventRecord();
 
   //##########################################################################
   //# Simple Access
-  inline bool isControllable() const {return mIsControllable;}
   inline bool isGloballyDisabled() const {return mIsGloballyDisabled;}
   inline bool isDisabledInSpec() const {return mIsDisabledInSpec;}
   inline bool isOnlySelfloops() const {return mIsOnlySelfloops;}
   bool isSkippable() const;
   inline bool isDeterministic() const {return mIsDeterministic;}
-  const jni::EventGlue& getJavaEvent() const {return mJavaEvent;}
   jni::JavaString getName() const;
   inline TransitionRecord* getTransitionRecord() const
     {return mUsedSearchRecords;}
@@ -92,7 +65,6 @@ public:
   int compareToForBackwardSearch(const BroadEventRecord* partner) const;
   static int compareForForwardSearch(const void* elem1, const void* elem2);
   static int compareForBackwardSearch(const void* elem1, const void* elem2);
-  static const HashAccessor* getHashAccessor() {return &theHashAccessor;}
 
   //##########################################################################
   //# Set up
@@ -117,8 +89,6 @@ private:
 
   //##########################################################################
   //# Data Members
-  jni::EventGlue mJavaEvent;
-  bool mIsControllable;
   bool mIsGloballyDisabled;
   bool mIsOnlySelfloops;
   bool mIsDisabledInSpec;
@@ -128,10 +98,6 @@ private:
   TransitionRecord* mUnusedSearchRecords;
   TransitionUpdateRecord** mUpdateRecords;
   float mProbability;
-
-  //##########################################################################
-  //# Class Variables
-  static const BroadEventRecordHashAccessor theHashAccessor;
 };
 
 }   /* namespace waters */

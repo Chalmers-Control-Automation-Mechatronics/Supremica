@@ -73,7 +73,7 @@ const StateRecordHashAccessor StateRecord::theHashAccessor;
 //# StateRecord: Constructors & Destructors
 
 StateRecord::
-StateRecord(jni::StateGlue state,
+StateRecord(const jni::StateGlue& state,
             uint32 code,
             jni::ClassCache* /* cache */)
   : mJavaState(state),

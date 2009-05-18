@@ -11,14 +11,8 @@
 #pragma implementation
 #endif
 
-#include <iostream>
 #include <new>
-
-#include <jni.h>
-
-#include "jni/cache/ClassCache.h"
-#include "jni/cache/ClassGlue.h"
-#include "jni/cache/JavaString.h"
+#include <iostream>
 
 #include "waters/analysis/AutomatonEncoding.h"
 #include "waters/analysis/BroadEventRecord.h"
@@ -29,57 +23,15 @@
 namespace waters {
 
 //############################################################################
-//# class BroadEventRecordHashAccessor
-//############################################################################
-
-//############################################################################
-//# BroadEventRecordHashAccessor: Hash Methods
-
-uint32 BroadEventRecordHashAccessor::
-hash(const void* key)
-  const
-{
-  const jni::EventGlue* event = (const jni::EventGlue*) key;
-  return (uint32) event->hashCode();
-}
-
-
-bool BroadEventRecordHashAccessor::
-equals(const void* key1, const void* key2)
-  const
-{
-  const jni::EventGlue* event1 = (const jni::EventGlue*) key1;
-  const jni::EventGlue* event2 = (const jni::EventGlue*) key2;
-  return event1->equals(event2);
-}
-
-
-const void* BroadEventRecordHashAccessor::
-getKey(const void* value)
-  const
-{
-  const BroadEventRecord* record = (const BroadEventRecord*) value;
-  return &record->getJavaEvent();
-}
-
-
-//############################################################################
 //# class BroadEventRecord
 //############################################################################
-
-//############################################################################
-//# BroadEventRecord: Class Variables
-
-const BroadEventRecordHashAccessor BroadEventRecord::theHashAccessor;
-
 
 //############################################################################
 //# BroadEventRecord: Constructors & Destructors
 
 BroadEventRecord::
 BroadEventRecord(jni::EventGlue event, bool controllable, int numwords)
-  : mJavaEvent(event),
-    mIsControllable(controllable),
+  : EventRecord(event, controllable),
     mIsGloballyDisabled(false),
     mIsOnlySelfloops(true),
     mIsDisabledInSpec(false),
@@ -118,20 +70,10 @@ isSkippable()
   } else if (mUsedSearchRecords == 0 && mUnusedSearchRecords == 0) {
     return true;
   } else if (mIsOnlySelfloops) {
-    return mIsControllable ? true : !mIsDisabledInSpec;
+    return isControllable() ? true : !mIsDisabledInSpec;
   } else {
     return false;
   }
-}
-
-jni::JavaString BroadEventRecord::
-getName()
-  const
-{
-  const jni::ClassGlue* cls = mJavaEvent.getClass();
-  JNIEnv* env = cls->getEnvironment();
-  jstring jname = mJavaEvent.getName();
-  return jni::JavaString(env, jname);
 }
 
 
@@ -142,12 +84,12 @@ int BroadEventRecord::
 compareToForForwardSearch(const BroadEventRecord* partner)
   const
 {
-  const int cont1 = mIsControllable ? 1 : 0;
-  const int cont2 = partner->mIsControllable ? 1 : 0;
+  const int cont1 = isControllable() ? 1 : 0;
+  const int cont2 = partner->isControllable() ? 1 : 0;
   if (cont1 != cont2) {
     return cont1 - cont2;
   } else {
-    return mJavaEvent.compareTo(&partner->mJavaEvent);
+    return EventRecord::compareTo(partner);
   }
 }
 
@@ -162,7 +104,7 @@ compareToForBackwardSearch(const BroadEventRecord* partner)
   } else if (prob2 < prob1) {
     return -1;
   } else {
-    return mJavaEvent.compareTo(&partner->mJavaEvent);
+    return EventRecord::compareTo(partner);
   }
 }
 
@@ -241,7 +183,7 @@ normalize(const AutomatonRecord* aut)
       mIsOnlySelfloops = false;
     }
   } else if (!mIsGloballyDisabled) {
-    if (mIsControllable || aut->isPlant()) {
+    if (isControllable() || aut->isPlant()) {
       delete mUsedSearchRecords;
       delete mUnusedSearchRecords;
       mUsedSearchRecords = mUnusedSearchRecords = 0;
@@ -266,8 +208,10 @@ createUpdateRecord(int wordindex)
 void BroadEventRecord::
 sortTransitionRecordsForSearch()
 {
-  TransitionRecordList list(mUsedSearchRecords);
-  list.qsort(TransitionRecord::compareForSearch);
+  const LinkedRecordAccessor<TransitionRecord>* accessor =
+    TransitionRecord::getSearchAccessor();
+  LinkedRecordList<TransitionRecord> list(accessor, mUsedSearchRecords);
+  list.qsort();
   mUsedSearchRecords = list.getHead();
 }
 
@@ -288,8 +232,10 @@ reverse()
     if (mIsGloballyDisabled) {
       return false;
     } else {
-      TransitionRecordList list(mUsedSearchRecords);
-      list.qsort(TransitionRecord::compareForTrace);
+      const LinkedRecordAccessor<TransitionRecord>* accessor =
+        TransitionRecord::getTraceAccessor();
+      LinkedRecordList<TransitionRecord> list(accessor, mUsedSearchRecords);
+      list.qsort();
       mUsedSearchRecords = list.getHead();
       return true;
     }

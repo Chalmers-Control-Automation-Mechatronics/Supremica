@@ -26,6 +26,13 @@ namespace waters {
 //############################################################################
 
 //############################################################################
+//# TransitionRecord: Class Variables
+
+const TransitionRecordAccessorForSearch TransitionRecord::theSearchAccessor;
+const TransitionRecordAccessorForTrace TransitionRecord::theTraceAccessor;
+
+
+//############################################################################
 //# TransitionRecord: Constructors & Destructors
 
 TransitionRecord::
@@ -134,20 +141,6 @@ compareToForTrace(const TransitionRecord* partner)
     const AutomatonRecord* aut2 = partner->mAutomaton;
     return aut1->compareTo(aut2);
   }
-}
-
-int TransitionRecord::
-compareForSearch(const TransitionRecord* trans1,
-                 const TransitionRecord* trans2)
-{
-  return trans1->compareToForSearch(trans2);
-}
-
-int TransitionRecord::
-compareForTrace(const TransitionRecord* trans1,
-                const TransitionRecord* trans2)
-{
-  return trans1->compareToForTrace(trans2);
 }
 
 
@@ -282,103 +275,6 @@ setupNondeterministicBuffers()
         mNumNondeterministicSuccessors[state] = 1;
         break;
       }
-    }
-  }
-}
-
-
-//############################################################################
-//# class TransitionRecordList
-//############################################################################
-
-//############################################################################
-//# TransitionRecordList: Constructors & Destructors
-  
-TransitionRecordList::
-TransitionRecordList() :
-  mHead(0),
-  mTail(0)
-{
-}
-
-TransitionRecordList::
-TransitionRecordList(TransitionRecord* record) :
-  mHead(record),
-  mTail(record)
-{
-  seek();
-}
-
-
-//############################################################################
-//# TransitionRecordList: Access
-  
-void TransitionRecordList::
-append(TransitionRecord* record)
-{
-  if (mHead == 0) {
-    mHead = mTail = record;
-  } else {
-    mTail->setNextInSearch(record);
-    mTail = record;
-  }
-  seek();
-}
-
-void TransitionRecordList::
-append(const TransitionRecordList& list)
-{
-  TransitionRecord* head = list.mHead;
-  if (mHead == 0) {
-    mHead = head;
-  } else {
-    mTail->setNextInSearch(head);
-  }
-  if (TransitionRecord* tail = list.mTail) {
-    mTail = tail;
-  }
-}
-
-
-//############################################################################
-//# TransitionRecordList: Sorting
-
-void TransitionRecordList::
-qsort(TransitionRecordComparator comparator)
-{
-  TransitionRecord* pivot = mHead;
-  if (pivot != 0 && pivot->getNextInSearch() != 0) {
-    mHead = mTail = 0;
-    TransitionRecordList after;
-    TransitionRecord* next = pivot->getNextInSearch();
-    pivot->setNextInSearch(0);
-    do {
-      TransitionRecord* current = next;
-      next = current->getNextInSearch();
-      current->setNextInSearch(0);
-      if (comparator(pivot, current) > 0) {
-        append(current);
-      } else {
-        after.append(current);
-      }
-    } while (next);
-    qsort(comparator);
-    append(pivot);
-    after.qsort(comparator);
-    append(after);
-  }
-}
-
-
-//############################################################################
-//# TransitionRecordList: Auxiliary Methods
-  
-void TransitionRecordList::
-seek()
-{
-  if (mTail != 0) {
-    while (TransitionRecord* next = mTail->getNextInSearch()) {
-      mTail = next;
     }
   }
 }

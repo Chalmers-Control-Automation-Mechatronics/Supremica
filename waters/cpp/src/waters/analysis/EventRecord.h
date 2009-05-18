@@ -2,14 +2,14 @@
 //###########################################################################
 //# PROJECT: Waters
 //# PACKAGE: waters.analysis
-//# CLASS:   StateRecord
+//# CLASS:   EventRecord
 //###########################################################################
-//# $Id: StateRecord.h,v 1.3 2006-09-03 06:38:42 robi Exp $
+//# $Id$
 //###########################################################################
 
 
-#ifndef _StateRecord_h_
-#define _StateRecord_h_
+#ifndef _EventRecord_h_
+#define _EventRecord_h_
 
 #ifdef __GNUG__
 #pragma interface
@@ -19,7 +19,7 @@
 #pragma once
 #endif
 
-#include "jni/glue/StateGlue.h"
+#include "jni/glue/EventGlue.h"
 #include "waters/base/HashAccessor.h"
 #include "waters/base/IntTypes.h"
 
@@ -31,20 +31,18 @@ namespace jni {
 
 namespace waters {
 
-class HashAccessor;
-
 
 //###########################################################################
-//# Class StateRecordHashAccessor
+//# Class EventRecordHashAccessor
 //###########################################################################
 
-class StateRecordHashAccessor : public PtrHashAccessor
+class EventRecordHashAccessor : public PtrHashAccessor
 {
 private:
   //##########################################################################
   //# Constructors & Destructors
-  explicit StateRecordHashAccessor() {};
-  friend class StateRecord;
+  explicit EventRecordHashAccessor() {};
+  friend class EventRecord;
 
 public:
   //##########################################################################
@@ -57,42 +55,39 @@ public:
 
 
 //############################################################################
-//# class StateRecord
+//# class EventRecord
 //############################################################################
 
-class StateRecord
+class EventRecord
 {
 public:
   //##########################################################################
   //# Constructors & Destructors
-  explicit StateRecord(const jni::StateGlue& state,
-		       uint32 code,
-		       jni::ClassCache* cache);
+  explicit EventRecord(jni::EventGlue event, bool controllable);
+  virtual ~EventRecord() {}
 
   //##########################################################################
   //# Simple Access
-  uint32 getStateCode() const {return mStateCode;}
-  const jni::StateGlue& getJavaState() const {return mJavaState;}
+  inline bool isControllable() const {return mIsControllable;}
+  const jni::EventGlue& getJavaEvent() const {return mJavaEvent;}
   jni::JavaString getName() const;
 
   //##########################################################################
   //# Comparing and Hashing
-  int compareTo(const StateRecord* partner) const;
-  static int compare(const void* elem1, const void* elem2);
+  int compareTo(const EventRecord* partner) const;
   static const HashAccessor* getHashAccessor() {return &theHashAccessor;}
 
 private:
   //##########################################################################
   //# Data Members
-  jni::StateGlue mJavaState;
-  int mStateCode;
+  jni::EventGlue mJavaEvent;
+  bool mIsControllable;
 
   //##########################################################################
   //# Class Variables
-  static const StateRecordHashAccessor theHashAccessor;
+  static const EventRecordHashAccessor theHashAccessor;
 };
-
 
 }   /* namespace waters */
 
-#endif  /* !_StateRecord_h_ */
+#endif  /* !_EventRecord_h_ */

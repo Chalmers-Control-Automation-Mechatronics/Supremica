@@ -139,10 +139,8 @@ public:
   //# Simple Access
   inline int getNumberOfWords() const {return mNumWords;}
   inline int getNumberOfRecords() const {return mNumRecords;}
-  inline const AutomatonRecord* getRecord(int index) const
+  inline AutomatonRecord* getRecord(int index) const
     {return mAutomatonRecords[index];}
-  inline void setNumberOfInitialStates(int index, uint32 numinit)
-    {mAutomatonRecords[index]->setNumberOfInitialStates(numinit);}
   bool hasSpecs() const;
 
   //##########################################################################

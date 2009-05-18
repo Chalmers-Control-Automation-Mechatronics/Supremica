@@ -20,6 +20,7 @@
 #endif
 
 #include "waters/base/IntTypes.h"
+#include "waters/base/LinkedRecordList.h"
 
 
 namespace waters {
@@ -31,6 +32,10 @@ class StateRecord;
 //############################################################################
 //# class TransitionRecord
 //############################################################################
+
+class TransitionRecordAccessorForSearch;
+class TransitionRecordAccessorForTrace;
+
 
 class TransitionRecord
 {
@@ -68,10 +73,10 @@ public:
   //# Comparing and Hashing
   int compareToForSearch(const TransitionRecord* partner) const;
   int compareToForTrace(const TransitionRecord* partner) const;
-  static int compareForSearch(const TransitionRecord* trans1,
-			      const TransitionRecord* trans2);
-  static int compareForTrace(const TransitionRecord* trans1,
-			     const TransitionRecord* trans2);
+  static const TransitionRecordAccessorForSearch* getSearchAccessor()
+    {return &theSearchAccessor;}
+  static const TransitionRecordAccessorForTrace* getTraceAccessor()
+    {return &theTraceAccessor;}
 
   //##########################################################################
   //# Set up
@@ -110,49 +115,63 @@ private:
   //# Class Constants
   static const int PROBABILITY_1 = 0x40000000;
   static const float PROBABILITY_ADJUST = 1.0f / PROBABILITY_1;
+
+  static const TransitionRecordAccessorForSearch theSearchAccessor;
+  static const TransitionRecordAccessorForTrace theTraceAccessor;
 };
 
-typedef int (*TransitionRecordComparator)
-  (const TransitionRecord*, const TransitionRecord*);
-
 
 //############################################################################
-//# class TransitionRecordList
+//# class TransitionRecordAccessorForSearch
 //############################################################################
 
-class TransitionRecordList
+class TransitionRecordAccessorForSearch :
+  public LinkedRecordAccessor<TransitionRecord>
 {
 public:
   //##########################################################################
   //# Constructors & Destructors
-  explicit TransitionRecordList();
-  explicit TransitionRecordList(TransitionRecord* record);
+  TransitionRecordAccessorForSearch() {}
 
   //##########################################################################
-  //# List Access
-  bool isEmpty() const {return mHead == 0;}
-  TransitionRecord* getHead() const {return mHead;}
-  TransitionRecord* getTail() const {return mTail;}
-  void append(TransitionRecord* record);
-  void append(const TransitionRecordList& list);
-
-  //##########################################################################
-  //# Sorting
-  void qsort(TransitionRecordComparator comparator);
-
-private:
-  //##########################################################################
-  //# Auxiliary Methods
-  void seek();
-
-  //##########################################################################
-  //# Data Members
-  TransitionRecord* mHead;
-  TransitionRecord* mTail;
+  //# Override for LinkedRecordAccessor
+  virtual TransitionRecord* getNext(const TransitionRecord* record) const
+    {return record->getNextInSearch();}
+  virtual void setNext(TransitionRecord* record, TransitionRecord* next) const
+    {record->setNextInSearch(next);}
+  virtual int compare(const TransitionRecord* record1,
+		      const TransitionRecord* record2)
+    const
+    {return record1->compareToForSearch(record2);}
 };
 
 
 //############################################################################
+//# class TransitionRecordAccessorForTrace
+//############################################################################
+
+class TransitionRecordAccessorForTrace :
+  public LinkedRecordAccessor<TransitionRecord>
+{
+public:
+  //##########################################################################
+  //# Constructors & Destructors
+  TransitionRecordAccessorForTrace() {}
+
+  //##########################################################################
+  //# Override for LinkedRecordAccessor
+  virtual TransitionRecord* getNext(const TransitionRecord* record) const
+    {return record->getNextInSearch();}
+  virtual void setNext(TransitionRecord* record, TransitionRecord* next) const
+    {record->setNextInSearch(next);}
+  virtual int compare(const TransitionRecord* record1,
+		      const TransitionRecord* record2)
+    const
+    {return record1->compareToForTrace(record2);}
+};
+
+
+ //############################################################################
 //# class NondeterministicTransitionIterator
 //############################################################################
 

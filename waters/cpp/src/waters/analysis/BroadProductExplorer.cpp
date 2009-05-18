@@ -34,6 +34,7 @@
 #include "jni/glue/TransitionGlue.h"
 #include "jni/glue/VerificationResultGlue.h"
 
+#include "waters/analysis/AutomatonStateMap.h"
 #include "waters/analysis/BroadEventRecord.h"
 #include "waters/analysis/BroadProductExplorer.h"
 #include "waters/analysis/StateRecord.h"
@@ -94,7 +95,7 @@ setup()
   const int numevents = events.size();
   const jni::IteratorGlue iter = events.iteratorGlue(cache);
   const HashAccessor* eventaccessor = BroadEventRecord::getHashAccessor();
-  HashTable<jni::EventGlue*,BroadEventRecord*>
+  HashTable<const jni::EventGlue*,BroadEventRecord*>
     eventmap(eventaccessor, numevents);
   mEventRecords = new BroadEventRecord*[numevents];
   mNumEventRecords = 0;
@@ -122,44 +123,27 @@ setup()
   mNumNondetInitialStates = 0;
   mNondeterministicTransitionIterators =
     new NondeterministicTransitionIterator[numaut];
-  const HashAccessor* stateaccessor = StateRecord::getHashAccessor();
-  HashTable<jni::StateGlue*,StateRecord*> statemap(stateaccessor, 256);
   for (int a = 0; a < numaut; a++) {
-    const AutomatonRecord* autrecord = getAutomatonEncoding().getRecord(a);
-    const jni::AutomatonGlue aut = autrecord->getJavaAutomaton();
-    const jni::SetGlue states = aut.getStatesGlue(cache);
-    const jni::IteratorGlue stateiter = states.iteratorGlue(cache);
-    const uint32 numstates = states.size();
-    StateRecord* staterecords =
-      (StateRecord*) new char[numstates * sizeof(StateRecord)];
-    uint32 nextinit = 0;
-    uint32 nextnoninit = states.size() - 1;
-    while (stateiter.hasNext()) {
-      jobject javaobject = stateiter.next();
-      jni::StateGlue state(javaobject, cache);
-      uint32 code;
-      if (!state.isInitial()) {
-        code = nextnoninit--;
-      } else if (nextinit == 0 || autrecord->isPlant()) {
-        code = nextinit++;
-      } else {
-        jni::NondeterministicDESExceptionGlue exception(&aut, &state, cache);
-        throw cache->throwJavaException(exception);
-      }
-      new (&staterecords[code]) StateRecord(state, code, cache);
-      statemap.add(&staterecords[code]);
-    }
-    getAutomatonEncoding().setNumberOfInitialStates(a, nextinit);
-    switch (nextinit) {
+    AutomatonRecord* autrecord = getAutomatonEncoding().getRecord(a);
+    const jni::AutomatonGlue& aut = autrecord->getJavaAutomaton();
+    AutomatonStateMap statemap(cache, autrecord);
+    const uint32 numinit = autrecord->getNumberOfInitialStates();
+    switch (numinit) {
     case 0:
       setTrivial();
       return;
     case 1:
       break;
     default:
-      mNondeterministicTransitionIterators[mNumNondetInitialStates++].
-        setupInit(autrecord);
-      break;
+      if (autrecord->isPlant()) {
+        mNondeterministicTransitionIterators[mNumNondetInitialStates++].
+          setupInit(autrecord);
+        break;
+      } else {
+        const jni::StateGlue& state = statemap.getJavaState(1);
+        jni::NondeterministicDESExceptionGlue exception(&aut, &state, cache);
+        throw cache->throwJavaException(exception);
+      }
     }
     const jni::CollectionGlue transitions = aut.getTransitionsGlue(cache);
     int maxpass = 1;
@@ -168,12 +152,12 @@ setup()
       while (transiter.hasNext()) {
         jobject javaobject = transiter.next();
         jni::TransitionGlue trans(javaobject, cache);
-        jni::EventGlue event = trans.getEventGlue(cache);
+        const jni::EventGlue& event = trans.getEventGlue(cache);
         BroadEventRecord* eventrecord = eventmap.get(&event);
-        jni::StateGlue source = trans.getSourceGlue(cache);
-        StateRecord* sourcerecord = statemap.get(&source);
-        jni::StateGlue target = trans.getTargetGlue(cache);
-        StateRecord* targetrecord = statemap.get(&target);
+        const jni::StateGlue& source = trans.getSourceGlue(cache);
+        StateRecord* sourcerecord = statemap.getState(source);
+        const jni::StateGlue& target = trans.getTargetGlue(cache);
+        StateRecord* targetrecord = statemap.getState(target);
         if (pass == 1) {
           const bool det = eventrecord->addDeterministicTransition
             (autrecord, sourcerecord, targetrecord);
@@ -192,13 +176,8 @@ setup()
         }
       }
     }
-    statemap.clear();
-    for (uint32 code = 0; code < numstates; code++) {
-      staterecords[code].~StateRecord();
-    }
-    delete (char*) staterecords;
-    const jni::SetGlue events = aut.getEventsGlue(cache);
-    const jni::IteratorGlue eventiter = events.iteratorGlue(cache);
+    const jni::SetGlue& events = aut.getEventsGlue(cache);
+    const jni::IteratorGlue& eventiter = events.iteratorGlue(cache);
     while (eventiter.hasNext()) {
       jobject javaobject = eventiter.next();
       jni::EventGlue event(javaobject, cache);
