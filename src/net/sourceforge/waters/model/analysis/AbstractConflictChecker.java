@@ -110,7 +110,7 @@ public abstract class AbstractConflictChecker
   /**
    * Gets the marking proposition to be used.
    * This method returns the marking proposition specified by the {@link
-   * #setMarkingProposition(EventProxy) setMarkingProposition()} methid, if
+   * #setMarkingProposition(EventProxy) setMarkingProposition()} method, if
    * non-null, or the default marking propisition of the input model.
    * @throws IllegalArgumentException to indicate that the a
    *         <CODE>null</CODE> marking was specified, but input model does
@@ -121,8 +121,7 @@ public abstract class AbstractConflictChecker
     if (mUsedMarking == null) {
       if (mMarking == null) {
         final ProductDESProxy model = getModel();
-        mUsedMarking = getMarkingProposition
-          (model, EventDeclProxy.DEFAULT_MARKING_NAME);
+        mUsedMarking = getMarkingProposition(model);
       } else {
         mUsedMarking = mMarking;
       }
@@ -137,7 +136,19 @@ public abstract class AbstractConflictChecker
    *         does not contain any proposition with the default marking
    *         name.
    */
-  protected static EventProxy getMarkingProposition
+  public static EventProxy getMarkingProposition(final ProductDESProxy model)
+  {
+    return getMarkingProposition(model, EventDeclProxy.DEFAULT_MARKING_NAME);
+  }
+
+  /**
+   * Searches the given model for a proposition event with the given
+   * name and returns this event.
+   * @throws IllegalArgumentException to indicate that the given model
+   *         does not contain any proposition with the default marking
+   *         name.
+   */
+  public static EventProxy getMarkingProposition
     (final ProductDESProxy model, final String name)
   {
     for (final EventProxy event : model.getEvents()) {

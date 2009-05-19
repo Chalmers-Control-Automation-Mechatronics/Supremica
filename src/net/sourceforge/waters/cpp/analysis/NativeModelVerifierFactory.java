@@ -39,6 +39,12 @@ public class NativeModelVerifierFactory
 
   //#########################################################################
   //# Interface net.sourceforge.waters.model.analysis.ModelVerifierFactory
+  public NativeConflictChecker createConflictChecker
+    (final ProductDESProxyFactory factory)
+  {
+    return new NativeConflictChecker(factory);
+  }
+
   public NativeControllabilityChecker createControllabilityChecker
     (final ProductDESProxyFactory factory)
   {

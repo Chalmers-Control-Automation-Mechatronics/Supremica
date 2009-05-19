@@ -84,6 +84,17 @@ operator = (const ObjectBase& partner)
 //###########################################################################
 //# ObjectBase: Access
 
+bool ObjectBase::
+isSameObject(const ObjectBase& other, const ClassCache* cache)
+  const
+{
+  if (mObjectReference == 0) {
+    return other.mObjectReference == 0;
+  } else {
+    return cache->isSameObject(getJavaObject(), other.getJavaObject());
+  }
+}
+
 jobject ObjectBase::
 getJavaObject()
   const

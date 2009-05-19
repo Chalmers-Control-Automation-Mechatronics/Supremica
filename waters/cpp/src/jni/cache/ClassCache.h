@@ -81,6 +81,7 @@ public:
   ClassGlue* getClass(waters::uint32 classcode);
   ClassGlue* getClass(jclass javaclass, waters::uint32 classcode);
   ClassGlue* getClass(jclass javaclass, const ClassInfo* info);
+  bool isSameObject(jobject obj1, jobject obj2) const;
 
   //##########################################################################
   //# Exceptions

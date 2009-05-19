@@ -195,9 +195,11 @@ setInitialStates(uint32 firstinit, uint32 endinit)
 AutomatonEncoding::
 AutomatonEncoding(const jni::ProductDESGlue des,
                   const jni::KindTranslatorGlue translator,
-                  jni::ClassCache* cache)
+                  jni::ClassCache* cache,
+                  int numtags)
+  : mNumTags(numtags)
 {
-  int totalbits = 0;
+  int totalbits = numtags;
   int a, w;
 
   // create records ...
@@ -233,7 +235,8 @@ AutomatonEncoding(const jni::ProductDESGlue des,
   // allocate bits ...
   int maxwords = totalbits / 16 + 1;
   int* used = new int[maxwords];
-  for (w = 0; w < maxwords; w++) {
+  used[0] = numtags;
+  for (w = 1; w < maxwords; w++) {
     used[w] = 0;
   }
   mNumWords = 0;
@@ -291,6 +294,13 @@ AutomatonEncoding::
 //############################################################################
 //# AutomatonEncoding: Simple Access
 
+uint32 AutomatonEncoding::
+getInverseTagMask()
+  const
+{
+  return ~((1 << mNumTags) - 1);
+}
+
 bool AutomatonEncoding::
 hasSpecs()
   const
@@ -303,7 +313,6 @@ hasSpecs()
   }
   return false;
 }
-
 
 int AutomatonEncoding::
 getNumberOfNondeterministicInitialAutomata()
@@ -390,6 +399,22 @@ shift(uint32* decoded)
     const int shift = record->getShift();
     decoded[a] <<= shift;
   }
+}
+
+
+//############################################################################
+//# AutomatonEncoding: Marking
+
+bool AutomatonEncoding::
+isMarkedStateTuple(const uint32* decoded)
+  const
+{
+  for (int a = 0; a < mNumRecords; a++) {
+    if (!mAutomatonRecords[a]->isMarkedState(decoded[a])) {
+      return false;
+    }
+  }
+  return true;
 }
 
 

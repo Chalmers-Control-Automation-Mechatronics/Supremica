@@ -22,12 +22,15 @@
 #include "jni/glue/KindTranslatorGlue.h"
 #include "jni/glue/ProductDESGlue.h"
 #include "jni/glue/SafetyTraceGlue.h"
+#include "waters/base/HashTable.h"
 #include "waters/base/IntTypes.h"
 #include "waters/analysis/ProductExplorer.h"
 
 
 namespace jni {
+  class AutomatonGlue;
   class ClassCache;
+  class EventGlue;
   class ListGlue;
   class ProductDESGlue;
   class VerificationResultGlue;
@@ -36,6 +39,7 @@ namespace jni {
 
 namespace waters {
 
+class AutomatonStateMap;
 class BroadEventRecord;
 class NondeterministicTransitionIterator;
 
@@ -49,24 +53,43 @@ class BroadProductExplorer : public ProductExplorer
 public:
   //##########################################################################
   //# Constructors & Destructors
-  explicit BroadProductExplorer(jni::ProductDESGlue des,
-				jni::KindTranslatorGlue translator,
+  explicit BroadProductExplorer(const jni::ProductDESGlue& des,
+				const jni::KindTranslatorGlue& translator,
+				jni::ClassCache* cache);
+  explicit BroadProductExplorer(const jni::ProductDESGlue& des,
+				const jni::KindTranslatorGlue& translator,
+				const jni::EventGlue& marking,
 				jni::ClassCache* cache);
   virtual ~BroadProductExplorer();
 
 protected:
   //##########################################################################
-  //# Auxiliary Methods
-  virtual void setup();
+  //# Shared Auxiliary Methods
+  virtual void setupSafety();
+  virtual void setupNonblocking();
   virtual void teardown();
-  virtual bool expandState(const uint32* currenttuple,
-			   const uint32* currentpacked);
+  virtual bool expandSafetyState(const uint32* sourcetuple,
+				 const uint32* sourcepacked);
+  virtual bool expandNonblockingState(uint32 source,
+				      const uint32* sourcetuple,
+  				      const uint32* sourcepacked);
   virtual const jni::EventGlue& getTraceEvent();
   virtual void setupReverseTransitionRelations();
   virtual void expandTraceState(const uint32* targettuple,
 				const uint32* targetpacked);
 
 private:
+  //##########################################################################
+  //# Private Auxiliary Methods
+  void setupEventMap
+    (HashTable<const jni::EventGlue*,BroadEventRecord*>& eventmap);
+  void setupTransitions
+    (const AutomatonRecord* aut,
+     const jni::AutomatonGlue& autglue,
+     const HashTable<const jni::EventGlue*,BroadEventRecord*>& eventmap,
+     const AutomatonStateMap& statemap);
+
+
   //##########################################################################
   //# Data Members
   int mNumEventRecords;

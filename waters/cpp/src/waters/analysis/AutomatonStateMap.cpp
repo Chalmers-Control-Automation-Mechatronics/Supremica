@@ -11,6 +11,7 @@
 #pragma implementation
 #endif
 
+#include <iostream>
 #include <new>
 
 #include <jni.h>
@@ -93,7 +94,7 @@ AutomatonStateMap(jni::ClassCache* cache,
     jobject javaobject = iter1.next();
     jni::StateGlue state(javaobject, cache);
     cat = getCategory(state, marking, cache);
-    catindex[cat++];
+    catindex[cat]++;
   }
   uint32 start = 0;
   for (cat = 0; cat < CAT_COUNT; cat++) {
@@ -111,7 +112,7 @@ AutomatonStateMap(jni::ClassCache* cache,
     mStateMap->add(&mStateArray[code]);
   }
   mAutomaton->setInitialStates(catindex[0], catindex[2]);
-  mAutomaton->setMarkedStates(catindex[1]); 
+  mAutomaton->setMarkedStates(catindex[1]);
 }
 
 
@@ -137,9 +138,9 @@ getCategory(const jni::StateGlue& state,
             const jni::EventGlue& marking,
             jni::ClassCache* cache)
 {
-  int init = state.isInitial() ? 0 : 1;
+  int init = state.isInitial() ? 1 : 0;
   jni::CollectionGlue props = state.getPropositionsGlue(cache);
-  int marked = props.contains(&marking) ? 0 : 3;
+  int marked = props.contains(&marking) ? 3 : 0;
   return init ^ marked;
 }
 

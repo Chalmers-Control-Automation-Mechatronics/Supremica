@@ -21,9 +21,13 @@
 #include "jni/cache/ClassCache.h"
 #include "jni/cache/JavaString.h"
 #include "jni/cache/PreJavaException.h"
+#include "jni/glue/ConflictKindGlue.h"
+#include "jni/glue/ConflictTraceGlue.h"
 #include "jni/glue/EventGlue.h"
 #include "jni/glue/LinkedListGlue.h"
+#include "jni/glue/NativeConflictCheckerGlue.h"
 #include "jni/glue/NativeSafetyVerifierGlue.h"
+#include "jni/glue/SafetyTraceGlue.h"
 #include "jni/glue/VerificationResultGlue.h"
 
 #include "waters/analysis/BroadProductExplorer.h"
@@ -43,12 +47,13 @@ namespace waters {
 //# ProductExplorer: Constructors & Destructors
 
 ProductExplorer::
-ProductExplorer(const jni::ProductDESGlue des,
-		const jni::KindTranslatorGlue translator,
+ProductExplorer(const jni::ProductDESGlue& des,
+		const jni::KindTranslatorGlue& translator,
 		jni::ClassCache* cache)
   : mCache(cache),
     mModel(des),
     mKindTranslator(translator),
+    mMarking(0, cache),
     mStateLimit(UNDEF_UINT32),
     mEncoding(0),
     mStateSpace(0),
@@ -58,7 +63,32 @@ ProductExplorer(const jni::ProductDESGlue des,
     mNumStates(0),
     mTraceList(0),
     mTraceState(UNDEF_UINT32),
-    mTraceLimit(UNDEF_UINT32)
+    mTraceLimit(UNDEF_UINT32),
+    mConflictKind(jni::ConflictKind_CONFLICT)
+{
+}
+
+
+ProductExplorer::
+ProductExplorer(const jni::ProductDESGlue& des,
+		const jni::KindTranslatorGlue& translator,
+                const jni::EventGlue& marking,
+		jni::ClassCache* cache)
+  : mCache(cache),
+    mModel(des),
+    mKindTranslator(translator),
+    mMarking(marking),
+    mStateLimit(UNDEF_UINT32),
+    mEncoding(0),
+    mStateSpace(0),
+    mDepthMap(0),
+    mIsTrivial(false),
+    mNumAutomata(0),
+    mNumStates(0),
+    mTraceList(0),
+    mTraceState(UNDEF_UINT32),
+    mTraceLimit(UNDEF_UINT32),
+    mConflictKind(jni::ConflictKind_CONFLICT)
 {
 }
 
@@ -83,14 +113,57 @@ runSafetyCheck()
     // const jni::JavaString name(mCache->getEnvironment(), mModel.getName());
     // std::cerr << (const char*) name << std::endl;
     mStartTime = clock();
-    setup();
-    bool result = mIsTrivial || doSafetySearch();
-    if (!result) {
-      mTraceStartTime = clock();
-      mTraceList = new jni::LinkedListGlue(mCache);
-      const jni::EventGlue& eventglue = getTraceEvent();
-      mTraceList->add(0, &eventglue);
-      computeCounterExample(*mTraceList);
+    setupSafety();
+    bool result;
+    if (mIsTrivial) {
+      result = true;
+    } else {
+      storeInitialStates(true);
+      result = doSafetySearch();
+      if (!result) {
+        mTraceStartTime = clock();
+        mTraceList = new jni::LinkedListGlue(mCache);
+        const jni::EventGlue& eventglue = getTraceEvent();
+        mTraceList->add(0, &eventglue);
+        computeCounterExample(*mTraceList);
+      }
+    }
+    teardown();
+    mStopTime = clock();
+    return result;
+  } catch (...) {
+    teardown();
+    throw;
+  }
+}
+
+bool ProductExplorer::
+runNonblockingCheck()
+{
+  try {
+    // const jni::JavaString name(mCache->getEnvironment(), mModel.getName());
+    // std::cerr << (const char*) name << std::endl;
+    mStartTime = clock();
+    bool result = true;
+    setupNonblocking();
+    if (!mIsTrivial || mTraceState != UNDEF_UINT32) {
+      storeInitialStates(false);
+      if (mIsTrivial) {
+        result = false;
+        // mDeadlock = "transitions enabled in mBadState";
+      } else {
+        result = doNonblockingReachabilitySearch();
+        if (result) {
+          mConflictKind = jni::ConflictKind_LIVELOCK;
+          setupReverseTransitionRelations();
+          //   result = doNonblockingCoreachabilitySearch();
+        }
+      }
+      if (!result) {
+        mTraceStartTime = clock();
+        mTraceList = new jni::LinkedListGlue(mCache);
+        computeCounterExample(*mTraceList);
+      }
     }
     teardown();
     mStopTime = clock();
@@ -105,7 +178,22 @@ jni::SafetyTraceGlue ProductExplorer::
 getSafetyCounterExample(const jni::ProductDESProxyFactoryGlue& factory)
   const
 {
-  return factory.createSafetyTraceProxyGlue(&mModel, mTraceList, mCache);
+  jni::JavaString name(mCache->getEnvironment(), mModel.getName());
+  name += ":unsafe";
+  return factory.createSafetyTraceProxyGlue
+    (name.getJavaString(), &mModel, mTraceList, mCache);
+}
+
+
+jni::ConflictTraceGlue ProductExplorer::
+getConflictCounterExample(const jni::ProductDESProxyFactoryGlue& factory)
+  const
+{
+  jni::JavaString name(mCache->getEnvironment(), mModel.getName());
+  name += ":blocking";
+  jni::ConflictKindGlue kind(mConflictKind, mCache);
+  return factory.createConflictTraceProxyGlue
+    (name.getJavaString(), &mModel, mTraceList, &kind, mCache);
 }
 
 
@@ -136,7 +224,7 @@ addStatistics(const jni::VerificationResultGlue& vresult)
 //# ProductExplorer: Auxiliary Methods
 
 void ProductExplorer::
-setup()
+setupSafety()
 {
   // Establish automaton encoding ...
   mEncoding = new AutomatonEncoding(mModel, mKindTranslator, mCache);
@@ -150,6 +238,23 @@ setup()
     mIsTrivial = true;
   }
   mNumStates = 0;
+  mTraceState = UNDEF_UINT32;
+}
+
+void ProductExplorer::
+setupNonblocking()
+{
+  // Establish automaton encoding ...
+  mEncoding = new AutomatonEncoding(mModel, mKindTranslator, mCache, 1);
+  mNumAutomata = mEncoding->getNumberOfRecords();
+  mIsTrivial = (mNumAutomata == 0);
+  if (!mIsTrivial) {
+    mStateSpace = new TaggedStateSpace(mEncoding, mStateLimit);
+    mDepthMap = new ArrayList<uint32>(128);
+  }
+  mNumStates = 0;
+  mTraceState = UNDEF_UINT32;
+  mConflictKind = jni::ConflictKind_CONFLICT;
 }
 
 
@@ -165,40 +270,52 @@ teardown()
 }
 
 
+#define DO_REACHABILITY                                         \
+  {                                                             \
+    uint32 nextlevel = mNumStates;                              \
+    uint32 current = 0;                                         \
+    uint32* currenttuple = new uint32[mNumAutomata];            \
+    try {                                                       \
+      while (current < mNumStates) {                            \
+        uint32* currentpacked = mStateSpace->get(current);      \
+        mEncoding->decode(currentpacked, currenttuple);         \
+        if (!EXPAND(current, currenttuple, currentpacked)) {    \
+          mTraceState = current;                                \
+          delete [] currenttuple;                               \
+          return false;                                         \
+        } else if (++current == nextlevel) {                    \
+          nextlevel = mNumStates;                               \
+          mDepthMap->add(nextlevel);                            \
+        }                                                       \
+      }                                                         \
+      delete [] currenttuple;                                   \
+      return true;                                              \
+    } catch (...) {                                             \
+      delete [] currenttuple;                                   \
+      throw;                                                    \
+    }                                                           \
+  }
+
+#define EXPAND(source, sourcetuple, sourcepacked) \
+  expandSafetyState(sourcetuple, sourcepacked)
+
 bool ProductExplorer::
 doSafetySearch()
 {
-  // Store initial states ...
-  storeInitialStates(true);
-
-  // Prepare depth map ...
-  uint32 nextlevel = mNumStates;
-  mDepthMap->add(0);
-  mDepthMap->add(nextlevel);
-
-  // Main loop ...
-  uint32 current = 0;
-  uint32* currenttuple = new uint32[mNumAutomata];
-  try {
-    while (current < mNumStates) {
-      uint32* currentpacked = mStateSpace->get(current);
-      mEncoding->decode(currentpacked, currenttuple);
-      if (!expandState(currenttuple, currentpacked)) {
-        mTraceState = current;
-        delete [] currenttuple;
-        return false;
-      } else if (++current == nextlevel) {
-        nextlevel = mNumStates;
-        mDepthMap->add(nextlevel);
-      }
-    }
-    delete [] currenttuple;
-    return true;
-  } catch (...) {
-    delete [] currenttuple;
-    throw;
-  }
+  DO_REACHABILITY;
 }
+
+#undef EXPAND
+#define EXPAND(source, sourcetuple, sourcepacked) \
+  expandNonblockingState(source, sourcetuple, sourcepacked)
+
+bool ProductExplorer::
+doNonblockingReachabilitySearch()
+{
+  DO_REACHABILITY;
+}
+
+#undef EXPAND
 
 
 void ProductExplorer::
@@ -246,7 +363,9 @@ storeInitialStates(bool initzero)
   }
   mStateSpace->add();
   const int ndcount = mEncoding->getNumberOfNondeterministicInitialAutomata();
-  if (ndcount > 0) {
+  if (ndcount == 0) {
+    mNumStates++;
+  } else {
     NondeterministicTransitionIterator* iters =
       new NondeterministicTransitionIterator[ndcount];
     try {
@@ -258,7 +377,7 @@ storeInitialStates(bool initzero)
         }
       }
       do {
-        initpacked = mStateSpace->prepare();
+        initpacked = mStateSpace->prepare(mNumStates++);
         for (ndindex = 0; ndindex < ndcount; ndindex++) {
           if (!iters[ndindex].advanceInit(initpacked)) {
             break;
@@ -274,9 +393,20 @@ storeInitialStates(bool initzero)
       throw;
     }
   }
-  mNumStates = mStateSpace->size();
+  mDepthMap->add(0);
+  mDepthMap->add(mNumStates);
 }
 
+
+bool ProductExplorer::
+checkDeadlockState(const uint32 source)
+{
+  uint32 code = mStateSpace->add();
+  if (code != source) {
+    mConflictKind = jni::ConflictKind_CONFLICT;
+  }
+  return code == mNumStates;
+}
 
 bool ProductExplorer::
 checkTraceState()
@@ -323,6 +453,47 @@ Java_net_sourceforge_waters_cpp_analysis_NativeSafetyVerifier_runNativeAlgorithm
         jni::ProductDESProxyFactoryGlue factory =
           gchecker.getFactoryGlue(&cache);
         jni::SafetyTraceGlue trace = checker.getSafetyCounterExample(factory);
+        jni::VerificationResultGlue vresult(result, &trace, &cache);
+        checker.addStatistics(vresult);
+        return vresult.returnJavaObject();
+      }
+    } catch (const jni::PreJavaException& pre) {
+      cache.throwJavaException(pre);
+      return 0;
+    }
+  } catch (jthrowable exception) {
+    return 0;
+  }
+}
+
+
+JNIEXPORT jobject JNICALL
+Java_net_sourceforge_waters_cpp_analysis_NativeConflictChecker_runNativeAlgorithm
+  (JNIEnv* env, jobject jchecker)
+{
+  try {
+    jni::ClassCache cache(env);
+    try {
+      jni::NativeConflictCheckerGlue gchecker(jchecker, &cache);
+      jni::ProductDESGlue des = gchecker.getModelGlue(&cache);
+      jni::KindTranslatorGlue translator =
+        gchecker.getKindTranslatorGlue(&cache);
+      jni::EventGlue marking = gchecker.getUsedMarkingPropositionGlue(&cache);
+      waters::BroadProductExplorer checker(des, translator, marking, &cache);
+      const int limit = gchecker.getNodeLimit();
+      if (limit != UNDEF_INT32) {
+        checker.setStateLimit(limit);
+      }
+      bool result = checker.runNonblockingCheck();
+      if (result) {
+        jni::VerificationResultGlue vresult(result, 0, &cache);
+        checker.addStatistics(vresult);
+        return vresult.returnJavaObject();
+      } else {
+        jni::ProductDESProxyFactoryGlue factory =
+          gchecker.getFactoryGlue(&cache);
+        jni::ConflictTraceGlue trace =
+          checker.getConflictCounterExample(factory);
         jni::VerificationResultGlue vresult(result, &trace, &cache);
         checker.addStatistics(vresult);
         return vresult.returnJavaObject();

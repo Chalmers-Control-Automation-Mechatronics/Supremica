@@ -42,8 +42,12 @@ public:
   virtual ~StateSpace();
 
   //##########################################################################
-  //# Access
+  //# Simple Access
+  inline int getEncodingSize() const {return mEncodingSize;}
   inline uint32 size() const {return mNumStates;}
+
+  //##########################################################################
+  //# Access
   uint32* get(const uint32 index) const;
   uint32* prepare();
   uint32* prepare(const uint32 index);
@@ -72,6 +76,29 @@ private:
   static const uint32 BLOCKSHIFT = 10;
   static const uint32 BLOCKSIZE = 1 << BLOCKSHIFT;
   static const uint32 BLOCKMASK = BLOCKSIZE - 1;
+};
+
+
+//############################################################################
+//# class TaggedStateSpace
+//############################################################################
+
+class TaggedStateSpace : public StateSpace
+{
+public:
+  //##########################################################################
+  //# Constructors & Destructors
+  explicit TaggedStateSpace(const AutomatonEncoding* encoding, uint32 limit);
+
+  //##########################################################################
+  //# Hash Methods
+  virtual uint32 hash(const void* key) const;
+  virtual bool equals(const void* key1, const void* key2) const;
+
+private:
+  //##########################################################################
+  //# Data Members
+  int mMask0;
 };
 
 

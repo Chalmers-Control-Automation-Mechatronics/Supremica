@@ -142,6 +142,13 @@ getClass(jclass javaclass, const ClassInfo* info)
   return result;
 }
 
+bool ClassCache::
+isSameObject(jobject obj1, jobject obj2)
+  const
+{
+  return mEnvironment->IsSameObject(obj1, obj2) == JNI_TRUE;
+}
+
 
 //############################################################################
 //# ClassCache: Exceptions

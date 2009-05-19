@@ -117,6 +117,8 @@ uint32 hashInt(const void* key);
 
 uint32 hashIntArray(const uint32* key, const int len);
 
+uint32 hashIntArray(const uint32* key, const int len, const uint32 mask0);
+
 uint32 hashString(const char* key);
 
 

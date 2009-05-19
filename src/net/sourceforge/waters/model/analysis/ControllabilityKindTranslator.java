@@ -16,9 +16,9 @@ import net.sourceforge.waters.xsd.base.EventKind;
 
 
 /**
- * <P>A kind translator used for controllable inclusion checking.
- * This translator remaps supervisor automata as specifications,
- * and makes no other changes.</P>
+ * <P>A kind translator used for controllability checking.
+ * This translator returns all component and event types as they
+ * are in the original model.</P>
  *
  * @author Robi Malik
  */
@@ -27,13 +27,15 @@ public class ControllabilityKindTranslator implements KindTranslator
 {
 
   //#########################################################################
-  //# Singleton Implementation
+  //# Singleton Pattern
   public static ControllabilityKindTranslator getInstance()
   {
-    if (theInstance == null) {
-      theInstance = new ControllabilityKindTranslator();
-    }
-    return theInstance;
+    return SingletonHolder.theInstance;
+  }
+
+  private static class SingletonHolder {
+    private static final ControllabilityKindTranslator theInstance =
+      new ControllabilityKindTranslator();
   }
 
   private ControllabilityKindTranslator()
@@ -44,39 +46,19 @@ public class ControllabilityKindTranslator implements KindTranslator
   //#########################################################################
   //# Interface net.sourceforge.waters.model.analysis.KindTranslator
   /**
-   * Returns the component kind of the given automaton in a controllability
-   * check.
-   * @return {@link ComponentKind#PLANT}, if the given automaton is
-   *         a plant, or {@link ComponentKind#SPEC} if the
-   *         given automaton is a spec or supervisor.
+   * Returns the component kind of the given automaton.
    */
   public ComponentKind getComponentKind(final AutomatonProxy aut)
   {
-    final ComponentKind kind = aut.getKind();
-    switch (kind) {
-    case PLANT:
-      return ComponentKind.PLANT;
-    case SPEC:
-    case SUPERVISOR:
-      return ComponentKind.SPEC;
-    default:
-      return kind;
-    }
+    return aut.getKind();
   }
 
   /**
-   * Returns the event kind of the given event in a language
-   * inclusion check.
-   * @return {@link EventKind#UNCONTROLLABLE}.
+   * Returns the event kind of the given event.
    */
   public EventKind getEventKind(final EventProxy event)
   {
     return event.getKind();
   }
-
-
-  //#########################################################################
-  //# Static Class Variables
-  private static ControllabilityKindTranslator theInstance;
 
 }

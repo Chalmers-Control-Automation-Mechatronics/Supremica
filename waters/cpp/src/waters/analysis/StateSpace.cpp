@@ -148,4 +148,54 @@ equals(const void* key1, const void* key2)
 }
 
 
+//############################################################################
+//# class TaggedStateSpace
+//############################################################################
+
+//############################################################################
+//# TaggedStateSpace: Constructors & Destructors
+
+TaggedStateSpace::
+TaggedStateSpace(const AutomatonEncoding* encoding, uint32 limit)
+  : StateSpace(encoding, limit),
+    mMask0(encoding->getInverseTagMask())
+{
+}
+
+
+//############################################################################
+//# TaggedStateSpace: Hash Methods
+
+uint32 TaggedStateSpace::
+hash(const void* key)
+  const
+{
+  const uint32 index = (uint32) key;
+  const uint32* tuple = get(index);
+  return hashIntArray(tuple, getEncodingSize(), mMask0);
+}
+
+bool TaggedStateSpace::
+equals(const void* key1, const void* key2)
+  const
+{
+  const int esize = getEncodingSize();
+  if (esize > 0) {
+    const uint32 index1 = (uint32) key1;
+    const uint32* tuple1 = get(index1);
+    const uint32 index2 = (uint32) key2;
+    const uint32* tuple2 = get(index2);
+    if (((tuple1[0] ^ tuple2[0]) & mMask0) != 0) {
+      return false;
+    }
+    for (int i = 1; i < esize; i++) {
+      if (tuple1[i] != tuple2[i]) {
+        return false;
+      }
+    }
+  }
+  return true;
+}
+
+
 }  /* namespace waters */

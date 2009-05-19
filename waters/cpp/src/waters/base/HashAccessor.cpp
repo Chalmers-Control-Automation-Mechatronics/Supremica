@@ -99,6 +99,36 @@ uint32 hashIntArray(const uint32* key, const int len)
 }
 
 
+uint32 hashIntArray(const uint32* key, const int len, const uint32 mask0)
+{
+  register uint32 a = gold;
+  register uint32 b = gold;
+  register uint32 c = gold;
+  register int rest = len;
+
+  // Handle most of the key ...
+  while (rest >= 3) {
+    a += key[0];
+    b += key[1];
+    c += key[2];
+    mix(a,b,c);
+    key += 3;
+    rest -= 3;
+  }
+
+  // Handle the last 1 or 2 words ...
+  switch(rest) {
+    // all the case statements fall through ...
+  case 2: b += key[1];
+  case 1: a += key[0] & mask0;
+    // case 0: nothing left to add
+  }
+  mix(a,b,c);
+ 
+  return c;
+}
+
+
 uint32 hashString(const char* key)
 {
   int len = strlen(key);

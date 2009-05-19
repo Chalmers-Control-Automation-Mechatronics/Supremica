@@ -41,6 +41,7 @@ public:
   //##########################################################################
   //# Access
   bool isNull() const {return mObjectReference == 0;}
+  bool isSameObject(const ObjectBase& other, const ClassCache* cache) const;
   jobject getJavaObject() const;
   jobject returnJavaObject() const;
   ClassGlue* getClass() const;

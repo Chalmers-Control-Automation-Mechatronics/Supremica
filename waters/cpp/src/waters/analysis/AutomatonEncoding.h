@@ -82,6 +82,10 @@ public:
   inline uint32 getNumberOfInitialStates() const
     {return mEndInitialStates - mFirstInitialState;}
   inline uint32 getFirstMarkedState() const {return mFirstMarkedState;}
+  inline uint32 getNumberOfMarkedStates() const
+    {return mNumStates - mFirstMarkedState;}
+  inline bool isMarkedState(uint32 code) const
+    {return code >= mFirstMarkedState;}
   inline int getNumberOfBits() const {return mNumBits;}
   inline int getAutomatonIndex() const {return mAutomatonIndex;}
   inline int getWordIndex() const {return mWordIndex;}
@@ -138,15 +142,18 @@ public:
   //# Constructors & Destructors
   explicit AutomatonEncoding(jni::ProductDESGlue des,
 			     jni::KindTranslatorGlue translator,
-			     jni::ClassCache* cache);
+			     jni::ClassCache* cache,
+			     int numtags = 0);
   ~AutomatonEncoding();
 
   //##########################################################################
   //# Simple Access
+  inline int getNumberOfTagBits() const {return mNumTags;}
   inline int getNumberOfWords() const {return mNumWords;}
   inline int getNumberOfRecords() const {return mNumRecords;}
   inline AutomatonRecord* getRecord(int index) const
     {return mAutomatonRecords[index];}
+  uint32 getInverseTagMask() const;
   bool hasSpecs() const;
   int getNumberOfNondeterministicInitialAutomata() const;
 
@@ -159,12 +166,25 @@ public:
   void shift(uint32* decoded) const;
 
   //##########################################################################
+  //# Marking
+  bool isMarkedStateTuple(const uint32* decoded) const;
+
+  //##########################################################################
   //# Masking
   void initMask(uint32* mask) const;
   void addToMask(uint32* mask, int index) const;
   bool equals(const uint32* encoded1,
 	      const uint32* encoded2,
 	      const uint32* nmask) const;
+
+  //##########################################################################
+  //# Tagging
+  inline bool hasTag(const uint32* encoded, const uint32 tag) const
+    {return (encoded[0] & tag) != 0;}
+  inline void setTag(uint32* encoded, const uint32 tag) const
+    {encoded[0] |= tag;}
+  inline void clearTag(uint32* encoded, const uint32 tag) const
+    {encoded[0] &= ~tag;}
 
   //##########################################################################
   //# Debug Output
@@ -174,10 +194,18 @@ public:
   void dumpDecodedState(const uint32* decoded) const;
 #endif /* DEBUG */
 
+  //##########################################################################
+  //# Public Class Constants
+  static const uint32 TAG0 = 0x00000001;
+  static const uint32 TAG1 = 0x00000002;
+  static const uint32 TAG2 = 0x00000004;
+  static const uint32 TAG3 = 0x00000008;
+
 private:
   //##########################################################################
   //# Data Members
   AutomatonRecord** mAutomatonRecords;
+  int mNumTags;
   int mNumRecords;
   int mNumWords;
   int* mWordStop;

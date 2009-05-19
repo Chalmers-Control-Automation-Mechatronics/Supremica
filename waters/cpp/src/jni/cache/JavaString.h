@@ -44,8 +44,13 @@ public:
 
   //#########################################################################
   //# Simple Access
+  jstring getJavaString() const {return mJavaString;}
   int length() const;
   operator const char*() const;
+
+  //#########################################################################
+  //# Modifications
+  JavaString& operator+=(const char* utf);
 
 private:
   //#########################################################################
