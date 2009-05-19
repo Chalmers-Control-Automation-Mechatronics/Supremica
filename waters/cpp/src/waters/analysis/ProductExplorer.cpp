@@ -44,6 +44,12 @@ namespace waters {
 //############################################################################
 
 //############################################################################
+//# ProductExplorer: Class Constants
+
+const uint32 ProductExplorer::TAG_COREACHABLE = AutomatonEncoding::TAG0;
+
+
+//############################################################################
 //# ProductExplorer: Constructors & Destructors
 
 ProductExplorer::
@@ -61,6 +67,7 @@ ProductExplorer(const jni::ProductDESGlue& des,
     mIsTrivial(false),
     mNumAutomata(0),
     mNumStates(0),
+    mTupleStack(0),
     mTraceList(0),
     mTraceState(UNDEF_UINT32),
     mTraceLimit(UNDEF_UINT32),
@@ -85,6 +92,7 @@ ProductExplorer(const jni::ProductDESGlue& des,
     mIsTrivial(false),
     mNumAutomata(0),
     mNumStates(0),
+    mTupleStack(0),
     mTraceList(0),
     mTraceState(UNDEF_UINT32),
     mTraceLimit(UNDEF_UINT32),
@@ -99,6 +107,7 @@ ProductExplorer::
   delete mEncoding;
   delete mStateSpace;
   delete mDepthMap;
+  delete [] mTupleStack;
   delete mTraceList;
 }
 
@@ -156,7 +165,7 @@ runNonblockingCheck()
         if (result) {
           mConflictKind = jni::ConflictKind_LIVELOCK;
           setupReverseTransitionRelations();
-          //   result = doNonblockingCoreachabilitySearch();
+          result = doNonblockingCoreachabilitySearch();
         }
       }
       if (!result) {
@@ -228,7 +237,6 @@ setupSafety()
 {
   // Establish automaton encoding ...
   mEncoding = new AutomatonEncoding(mModel, mKindTranslator, mCache);
-  // mEncoding->dump();
   if (mEncoding->hasSpecs()) {
     mIsTrivial = false;
     mNumAutomata = mEncoding->getNumberOfRecords();
@@ -267,6 +275,8 @@ teardown()
   mStateSpace = 0;
   delete mDepthMap;
   mDepthMap = 0;
+  delete [] mTupleStack;
+  mTupleStack = 0;
 }
 
 
@@ -307,7 +317,7 @@ doSafetySearch()
 
 #undef EXPAND
 #define EXPAND(source, sourcetuple, sourcepacked) \
-  expandNonblockingState(source, sourcetuple, sourcepacked)
+  expandNonblockingReachabilityState(source, sourcetuple, sourcepacked)
 
 bool ProductExplorer::
 doNonblockingReachabilitySearch()
@@ -316,6 +326,60 @@ doNonblockingReachabilitySearch()
 }
 
 #undef EXPAND
+
+bool ProductExplorer::
+doNonblockingCoreachabilitySearch()
+{
+  try {
+    const int factor = mNumStates < 256 ? mNumStates : 256;
+    const int ndcount = allocateNondeterministicTransitionIterators(factor);
+    delete [] mTupleStack;
+    const int stacksize = STACK_SIZE <= mNumStates ? STACK_SIZE : mNumStates;
+    int stackpos = stacksize * mNumAutomata;
+    mTupleStack = new uint32[stackpos];
+    mStackOverflow = false;
+    mNumCoreachableStates = 0;
+    stackpos -= mNumAutomata;
+    uint32* currenttuple = &mTupleStack[stackpos];
+    uint32 current;
+    for (current = 0; current < mNumStates; current++) {
+      uint32* currentpacked = mStateSpace->get(current);
+      if (mEncoding->hasTag(currentpacked, TAG_COREACHABLE)) {
+        continue;
+      }
+      mEncoding->decode(currentpacked, currenttuple);
+      if (mEncoding->isMarkedStateTuple(currenttuple)) {
+        mEncoding->setTag(currentpacked, TAG_COREACHABLE);
+        if (++mNumCoreachableStates == mNumStates) {
+          return true;
+        }
+        expandNonblockingCoreachabilityState
+          (currentpacked, currenttuple, stackpos, ndcount);
+      }
+    }
+    while (mStackOverflow) {
+      mStackOverflow = false;
+      for (current = mNumStates - 1; current >= 0; current--) {
+        uint32* currentpacked = mStateSpace->get(current);
+        if (mEncoding->hasTag(currentpacked, TAG_COREACHABLE)) {
+          mEncoding->decode(currentpacked, currenttuple);
+          expandNonblockingCoreachabilityState
+            (currentpacked, currenttuple, stackpos, ndcount);
+        }
+      }
+    }
+    for (current = 0; current < mNumStates; current++) {
+      uint32* currentpacked = mStateSpace->get(current);
+      if (!mEncoding->hasTag(currentpacked, TAG_COREACHABLE)) {
+        mTraceState = current;
+        break;
+      }
+    }
+    return false;
+  } catch (const SearchAbort& abort) {
+    return true;
+  }
+}
 
 
 void ProductExplorer::
@@ -406,6 +470,33 @@ checkDeadlockState(const uint32 source)
     mConflictKind = jni::ConflictKind_CONFLICT;
   }
   return code == mNumStates;
+}
+
+bool ProductExplorer::
+checkCoreachabilityState(int stackpos, int ndcount)
+{
+  uint32 found = mStateSpace->find();
+  if (found == UNDEF_UINT32) {
+    return false;
+  }
+  uint32* foundpacked = mStateSpace->get(found);
+  if (mEncoding->hasTag(foundpacked, TAG_COREACHABLE)) {
+    return false;
+  }
+  mEncoding->setTag(foundpacked, TAG_COREACHABLE);
+  if (++mNumCoreachableStates == mNumStates) {
+    throw SearchAbort();
+  } else if (stackpos < 0 ||
+             ndcount < getMinimumNondeterministicTransitionIterators()) {
+    mStackOverflow = true;
+    return false;
+  } else {
+    uint32* foundtuple = &mTupleStack[stackpos];
+    mEncoding->decode(foundpacked, foundtuple);
+    expandNonblockingCoreachabilityState
+      (foundtuple, foundpacked, stackpos, ndcount);
+    return false;
+  }    
 }
 
 bool ProductExplorer::

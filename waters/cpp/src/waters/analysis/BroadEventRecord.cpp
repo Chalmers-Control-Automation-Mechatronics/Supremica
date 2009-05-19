@@ -37,6 +37,7 @@ BroadEventRecord(jni::EventGlue event, bool controllable, int numwords)
     mIsDisabledInSpec(false),
     mIsDeterministic(true),
     mNumberOfWords(numwords),
+    mNumberOfUpdates(0),
     mUsedSearchRecords(0),
     mUnusedSearchRecords(0)
 {
@@ -181,6 +182,7 @@ normalize(const AutomatonRecord* aut)
         mUnusedSearchRecords = trans;
       }
       mIsOnlySelfloops = false;
+      mNumberOfUpdates++;
     }
   } else if (!mIsGloballyDisabled) {
     if (isControllable() || aut->isPlant()) {

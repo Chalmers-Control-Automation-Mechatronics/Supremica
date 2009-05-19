@@ -68,15 +68,20 @@ protected:
   virtual void setupSafety();
   virtual void setupNonblocking();
   virtual void teardown();
-  virtual bool expandSafetyState(const uint32* sourcetuple,
-				 const uint32* sourcepacked);
-  virtual bool expandNonblockingState(uint32 source,
-				      const uint32* sourcetuple,
-  				      const uint32* sourcepacked);
+  virtual bool expandSafetyState
+    (const uint32* sourcetuple, const uint32* sourcepacked);
+  virtual bool expandNonblockingReachabilityState
+    (uint32 source, const uint32* sourcetuple, const uint32* sourcepacked);
+  virtual void expandNonblockingCoreachabilityState
+    (const uint32* targettuple, const uint32* targetpacked,
+     int stackpos, int ndindex);
   virtual const jni::EventGlue& getTraceEvent();
   virtual void setupReverseTransitionRelations();
-  virtual void expandTraceState(const uint32* targettuple,
-				const uint32* targetpacked);
+  virtual void expandTraceState
+    (const uint32* targettuple,	const uint32* targetpacked);
+
+  virtual int getMinimumNondeterministicTransitionIterators() const;
+  virtual int allocateNondeterministicTransitionIterators(int factor = 1);
 
 private:
   //##########################################################################
@@ -89,12 +94,13 @@ private:
      const HashTable<const jni::EventGlue*,BroadEventRecord*>& eventmap,
      const AutomatonStateMap& statemap);
 
-
   //##########################################################################
   //# Data Members
   int mNumEventRecords;
   BroadEventRecord** mEventRecords;
   BroadEventRecord** mReversedEventRecords;
+  int mMaxUpdates;
+  int mNumNondeterministicTransitionsIterators;
   NondeterministicTransitionIterator* mNondeterministicTransitionIterators;
   const BroadEventRecord* mTraceEvent;
   uint32 mTraceLimit;

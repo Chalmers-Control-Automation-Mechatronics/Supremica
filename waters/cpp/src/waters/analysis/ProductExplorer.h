@@ -98,20 +98,27 @@ protected:
   virtual void teardown();
   virtual bool doSafetySearch();
   virtual bool doNonblockingReachabilitySearch();
+  virtual bool doNonblockingCoreachabilitySearch();
   virtual void computeCounterExample(const jni::ListGlue& list);
   virtual void storeInitialStates(bool initzero);
-  virtual bool expandSafetyState(const uint32* sourcetuple,
-				 const uint32* sourcepacked) = 0;
-  virtual bool expandNonblockingState(uint32 source,
-				      const uint32* sourcetuple,
-  				      const uint32* sourcepacked) = 0;
+  virtual bool expandSafetyState
+    (const uint32* sourcetuple, const uint32* sourcepacked) = 0;
+  virtual bool expandNonblockingReachabilityState
+    (uint32 source, const uint32* sourcetuple, const uint32* sourcepacked) = 0;
+  virtual void expandNonblockingCoreachabilityState
+    (const uint32* targettuple, const uint32* targetpacked,
+     int stackpos, int ndindex) = 0;
   virtual const jni::EventGlue& getTraceEvent() = 0;
   virtual void setupReverseTransitionRelations() = 0;
   virtual void expandTraceState(const uint32* targettuple,
 				const uint32* targetpacked) = 0;
   
   bool checkDeadlockState(uint32 source);
+  bool checkCoreachabilityState(int stackpos, int ndcount);
   bool checkTraceState();
+
+  virtual int getMinimumNondeterministicTransitionIterators() const = 0;
+  virtual int allocateNondeterministicTransitionIterators(int factor) = 0;
 
   //##########################################################################
   //# Simple Access
@@ -130,6 +137,11 @@ protected:
   inline jni::ConflictKind getConflictKind() const {return mConflictKind;}
   inline void setConflictKind(jni::ConflictKind kind) {mConflictKind = kind;}
 
+  //##########################################################################
+  //# Class Constants
+  static const uint32 TAG_COREACHABLE;
+  static const int STACK_SIZE = 1024;
+
 private:
   //##########################################################################
   //# Data Members
@@ -144,6 +156,9 @@ private:
   bool mIsTrivial;
   int mNumAutomata;
   uint32 mNumStates;
+  uint32 mNumCoreachableStates;
+  uint32* mTupleStack;
+  bool mStackOverflow;
   jni::ListGlue* mTraceList;
   uint32 mTraceState;
   uint32 mTraceLimit;
@@ -151,6 +166,7 @@ private:
   clock_t mStartTime;
   clock_t mTraceStartTime;
   clock_t mStopTime;
+
 };
 
 }   /* namespace waters */

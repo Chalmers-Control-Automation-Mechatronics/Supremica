@@ -53,6 +53,7 @@ public:
   inline bool isOnlySelfloops() const {return mIsOnlySelfloops;}
   bool isSkippable() const;
   inline bool isDeterministic() const {return mIsDeterministic;}
+  inline int getNumberOfUpdates() const {return mNumberOfUpdates;}
   jni::JavaString getName() const;
   inline TransitionRecord* getTransitionRecord() const
     {return mUsedSearchRecords;}
@@ -94,6 +95,7 @@ private:
   bool mIsDisabledInSpec;
   bool mIsDeterministic;
   int mNumberOfWords;
+  int mNumberOfUpdates;
   TransitionRecord* mUsedSearchRecords;
   TransitionRecord* mUnusedSearchRecords;
   TransitionUpdateRecord** mUpdateRecords;
