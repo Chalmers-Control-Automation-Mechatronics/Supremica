@@ -311,12 +311,12 @@ doNonblockingCoreachabilitySearch()
       if (mEncoding->hasTag(currentpacked, TAG_COREACHABLE)) {
         continue;
       }
-      mEncoding->decode(currentpacked, currenttuple);
-      if (mEncoding->isMarkedStateTuple(currenttuple)) {
+      if (mEncoding->isMarkedStateTuplePacked(currentpacked)) {
         mEncoding->setTag(currentpacked, TAG_COREACHABLE);
         if (++mNumCoreachableStates == mNumStates) {
           return true;
         }
+        mEncoding->decode(currentpacked, currenttuple);
         expandNonblockingCoreachabilityState
           (currenttuple, currentpacked, 1, ndcount);
       }
@@ -331,6 +331,7 @@ doNonblockingCoreachabilitySearch()
             (currenttuple, currentpacked, 1, ndcount);
         }
       }
+      std::cerr << ".";
     }
     for (current = 0; current < mNumStates; current++) {
       uint32* currentpacked = mStateSpace->get(current);
@@ -341,6 +342,7 @@ doNonblockingCoreachabilitySearch()
     }
     return false;
   } catch (const SearchAbort& abort) {
+    std::cerr << "SearchAbort" << std::endl;
     return true;
   }
 }

@@ -171,6 +171,30 @@ compare(const void* elem1, const void* elem2)
   return val1->compareTo(val2);
 }
 
+int AutomatonRecord::
+compareToByMarking(const AutomatonRecord* partner)
+  const
+{
+  float prob1 = (float) getNumberOfMarkedStates() / (float) mNumStates;
+  float prob2 = (float) partner->getNumberOfMarkedStates() /
+                (float) partner->mNumStates;
+  if (prob1 < prob2) {
+    return -1;
+  } else if (prob1 > prob2) {
+    return 1;
+  } else {
+    return compareTo(partner);
+  }
+}
+
+int AutomatonRecord::
+compareByMarking(const void* elem1, const void* elem2)
+{
+  const AutomatonRecord* val1 = *((const AutomatonRecord**) elem1);
+  const AutomatonRecord* val2 = *((const AutomatonRecord**) elem2);
+  return val1->compareToByMarking(val2);
+}
+
 
 //############################################################################
 //# AutomatonRecord: Setting up
@@ -317,7 +341,9 @@ AutomatonEncoding(const jni::ProductDESGlue& des,
                   const jni::EventGlue& omega,
                   jni::ClassCache* cache,
                   int numtags)
-  : mNumTags(numtags)
+  : mNumTags(numtags),
+    mFastMarkingTestRecords(0),
+    mNumFastMarkingTestRecords(0)
 {
   int totalbits = numtags;
   int a, w;
@@ -393,7 +419,23 @@ AutomatonEncoding(const jni::ProductDESGlue& des,
     const int index = used[w]++;
     mAutomatonRecords[index] = record;
     record->setAutomatonIndex(index);
+    if (record->getFirstMarkedState() > 0) {
+      mNumFastMarkingTestRecords++;
+    }
   }
+
+  // set up fast marking test ...
+  mFastMarkingTestRecords =
+    new const AutomatonRecord*[mNumFastMarkingTestRecords];
+  mNumFastMarkingTestRecords = 0;
+  for (a = 0; a < mNumRecords; a++) {
+    const AutomatonRecord* record = mAutomatonRecords[a];
+    if (record->getFirstMarkedState() > 0) {
+      mFastMarkingTestRecords[mNumFastMarkingTestRecords++] = record;
+    }
+  }
+  qsort(mFastMarkingTestRecords, mNumFastMarkingTestRecords,
+        sizeof(AutomatonRecord*), AutomatonRecord::compareByMarking); 
 
   // clean up ...
   delete[] records;
@@ -408,6 +450,7 @@ AutomatonEncoding::
   }
   delete [] mAutomatonRecords;
   delete [] mWordStop;
+  delete [] mFastMarkingTestRecords;
 }
 
 
@@ -526,11 +569,28 @@ shift(uint32* decoded)
 //# AutomatonEncoding: Marking
 
 bool AutomatonEncoding::
+isMarkedStateTuplePacked(const uint32* encoded)
+  const
+{
+  for (int a = 0; a < mNumFastMarkingTestRecords; a++) {
+    const AutomatonRecord* record = mFastMarkingTestRecords[a];
+    const uint32 index = record->getAutomatonIndex();
+    const uint32 state = get(encoded, index);
+    if (!record->isMarkedState(state)) {
+      return false;
+    }
+  }
+  return true;
+}
+
+bool AutomatonEncoding::
 isMarkedStateTuple(const uint32* decoded)
   const
 {
-  for (int a = 0; a < mNumRecords; a++) {
-    if (!mAutomatonRecords[a]->isMarkedState(decoded[a])) {
+  for (int a = 0; a < mNumFastMarkingTestRecords; a++) {
+    const AutomatonRecord* record = mFastMarkingTestRecords[a];
+    const uint32 index = record->getAutomatonIndex();
+    if (!record->isMarkedState(decoded[index])) {
       return false;
     }
   }

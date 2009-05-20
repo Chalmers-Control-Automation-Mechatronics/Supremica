@@ -103,6 +103,8 @@ public:
   //# Comparing and Hashing
   int compareTo(const AutomatonRecord* partner) const;
   static int compare(const void* elem1, const void* elem2);
+  int compareToByMarking(const AutomatonRecord* partner) const;
+  static int compareByMarking(const void* elem1, const void* elem2);
   static inline const HashAccessor* getHashAccessor()
     {return &theHashAccessor;}
 
@@ -193,6 +195,7 @@ public:
 
   //##########################################################################
   //# Marking
+  bool isMarkedStateTuplePacked(const uint32* encoded) const;
   bool isMarkedStateTuple(const uint32* decoded) const;
 
   //##########################################################################
@@ -235,6 +238,8 @@ private:
   int mNumRecords;
   int mNumWords;
   int* mWordStop;
+  const AutomatonRecord** mFastMarkingTestRecords;
+  int mNumFastMarkingTestRecords;
 };
 
 
