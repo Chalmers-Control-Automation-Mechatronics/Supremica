@@ -68,9 +68,6 @@ public:
   //# Constructors & Destructors
   explicit ProductExplorer(const jni::ProductDESGlue& des,
 			   const jni::KindTranslatorGlue& translator,
-			   jni::ClassCache* cache);
-  explicit ProductExplorer(const jni::ProductDESGlue& des,
-			   const jni::KindTranslatorGlue& translator,
 			   const jni::EventGlue& marking,
 			   jni::ClassCache* cache);
   virtual ~ProductExplorer();
@@ -93,13 +90,12 @@ public:
 protected:
   //##########################################################################
   //# Auxiliary Methods
-  virtual void setupSafety();
-  virtual void setupNonblocking();
+  virtual void setup(bool safety);
   virtual void teardown();
   virtual bool doSafetySearch();
   virtual bool doNonblockingReachabilitySearch();
   virtual bool doNonblockingCoreachabilitySearch();
-  virtual void computeCounterExample(const jni::ListGlue& list);
+  virtual void computeCounterExample(const jni::ListGlue& list, uint32 level);
   virtual void storeInitialStates(bool initzero);
   virtual bool expandSafetyState
     (const uint32* sourcetuple, const uint32* sourcepacked) = 0;
@@ -107,15 +103,15 @@ protected:
     (uint32 source, const uint32* sourcetuple, const uint32* sourcepacked) = 0;
   virtual void expandNonblockingCoreachabilityState
     (const uint32* targettuple, const uint32* targetpacked,
-     int stackpos, int ndindex) = 0;
+     uint32 stackpos, int ndindex) = 0;
   virtual const jni::EventGlue& getTraceEvent() = 0;
   virtual void setupReverseTransitionRelations() = 0;
   virtual void expandTraceState(const uint32* targettuple,
 				const uint32* targetpacked) = 0;
   
-  bool checkDeadlockState(uint32 source);
-  bool checkCoreachabilityState(int stackpos, int ndcount);
-  bool checkTraceState();
+  void checkCoreachabilityState(uint32 stackpos, int ndcount);
+  void checkTraceState();
+  uint32 getDepth(uint32 state) const;
 
   virtual int getMinimumNondeterministicTransitionIterators() const = 0;
   virtual int allocateNondeterministicTransitionIterators(int factor) = 0;
@@ -140,7 +136,8 @@ protected:
   //##########################################################################
   //# Class Constants
   static const uint32 TAG_COREACHABLE;
-  static const int STACK_SIZE = 1024;
+  static const uint32 TUPLE_STACK_SIZE = 1024;
+  static const uint32 ITER_STACK_SIZE = TUPLE_STACK_SIZE >> 2;
 
 private:
   //##########################################################################
@@ -157,6 +154,7 @@ private:
   int mNumAutomata;
   uint32 mNumStates;
   uint32 mNumCoreachableStates;
+  uint32 mTupleStackSize;
   uint32* mTupleStack;
   bool mStackOverflow;
   jni::ListGlue* mTraceList;

@@ -26,7 +26,6 @@
 namespace waters {
 
 class AutomatonRecord;
-class StateRecord;
 
 
 //############################################################################
@@ -80,12 +79,8 @@ public:
 
   //##########################################################################
   //# Set up
-  bool addDeterministicTransition(const StateRecord* source,
-				  const StateRecord* target);
-  bool addDeterministicTransition(const uint32 source, const uint32 target);
-  void addNondeterministicTransition(const StateRecord* source,
-				     const StateRecord* target);
-  void addNondeterministicTransition(const uint32 source, const uint32 target);
+  bool addDeterministicTransition(uint32 source, uint32 target);
+  void addNondeterministicTransition(uint32 source, uint32 target);
   void normalize();
   uint32 getCommonTarget() const;
 

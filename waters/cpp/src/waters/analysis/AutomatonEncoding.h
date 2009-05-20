@@ -22,10 +22,12 @@
 #include "jni/glue/AutomatonGlue.h"
 
 #include "waters/base/HashAccessor.h"
+#include "waters/base/HashTable.h"
 #include "waters/base/IntTypes.h"
 
 namespace jni {
   class ClassCache;
+  class EventGlue;
   class JavaString;
   class KindTranslatorGlue;
   class ProductDESGlue;
@@ -45,8 +47,8 @@ class AutomatonRecordHashAccessor : public PtrHashAccessor
 private:
   //##########################################################################
   //# Constructors & Destructors
-  explicit AutomatonRecordHashAccessor() {};
   friend class AutomatonRecord;
+  explicit AutomatonRecordHashAccessor() {};
 
 public:
   //##########################################################################
@@ -62,13 +64,14 @@ public:
 //# class AutomatonRecord
 //############################################################################
 
-class AutomatonRecord
+class AutomatonRecord : public IntHashAccessor
 {
 public:
   //##########################################################################
   //# Constructors & Destructors
-  explicit AutomatonRecord(const jni::AutomatonGlue aut,
+  explicit AutomatonRecord(const jni::AutomatonGlue& aut,
 			   bool plant,
+			   const jni::EventGlue& omega,
 			   jni::ClassCache* cache);
   ~AutomatonRecord();
 
@@ -76,7 +79,7 @@ public:
   //# Simple Access
   const jni::AutomatonGlue& getJavaAutomaton() const {return mJavaAutomaton;}
   inline bool isPlant() const {return mIsPlant;}
-  inline int getNumberOfStates() const {return mNumStates;}
+  inline uint32 getNumberOfStates() const {return mNumStates;}
   inline uint32 getFirstInitialState() const {return mFirstInitialState;}
   inline uint32 getEndOfInitialStates() const {return mEndInitialStates;}
   inline uint32 getNumberOfInitialStates() const
@@ -86,6 +89,7 @@ public:
     {return mNumStates - mFirstMarkedState;}
   inline bool isMarkedState(uint32 code) const
     {return code >= mFirstMarkedState;}
+  inline void setAllMarked() {mFirstMarkedState = 0;}
   inline int getNumberOfBits() const {return mNumBits;}
   inline int getAutomatonIndex() const {return mAutomatonIndex;}
   inline int getWordIndex() const {return mWordIndex;}
@@ -93,6 +97,7 @@ public:
   inline int getBitMask() const {return mBitMask;}
   jni::JavaString getName() const;
   jni::JavaString getStateName(uint32 code) const;
+  const jni::StateGlue& getJavaState(uint32 code) const;
 
   //##########################################################################
   //# Comparing and Hashing
@@ -103,18 +108,32 @@ public:
 
   //##########################################################################
   //# Setting up
-  void allocate(int wordindex, int shift);
   inline void setAutomatonIndex(int index) {mAutomatonIndex = index;}
-  void setInitialStates(uint32 firstinit, uint32 endinit);
-  void setMarkedStates(uint32 firstmarked) {mFirstMarkedState = firstmarked;}
+  void allocate(int wordindex, int shift);
+  HashTable<const jni::StateGlue*,uint32>* createStateMap();
+  void deleteStateMap(HashTable<const jni::StateGlue*,uint32>* statemap);
+
+  //##########################################################################
+  //# Hash Methods (for states!!!)
+  virtual uint32 hash(const void* key) const;
+  virtual bool equals(const void* key1, const void* key2) const;
+  virtual const void* getKey(const void* value) const;
 
 private:
+  //##########################################################################
+  //# Auxiliary Methods
+  void initNonMarking(jni::ClassCache* cache);
+  void initMarking(const jni::EventGlue& omega, jni::ClassCache* cache);
+  static int getCategory(const jni::StateGlue& state,
+			 const jni::EventGlue& omega,
+			 jni::ClassCache* cache);
+
   //##########################################################################
   //# Data Members
   jni::AutomatonGlue mJavaAutomaton;
   jni::StateGlue* mJavaStates;
   bool mIsPlant;
-  int mNumStates;
+  uint32 mNumStates;
   int mNumBits;
   int mAutomatonIndex;
   int mWordIndex;
@@ -125,8 +144,14 @@ private:
   uint32 mFirstMarkedState;
 
   //##########################################################################
-  //# Class Variables
+  //# Class Constants
   static const AutomatonRecordHashAccessor theHashAccessor;
+
+  static const int CAT_NORMAL = 0;
+  static const int CAT_INIT = 1;
+  static const int CAT_MARKED = 2;
+  static const int CAT_INIT_MARKED = 3;
+  static const int CAT_COUNT = 4;
 };
 
 
@@ -140,8 +165,9 @@ class AutomatonEncoding
 public:
   //##########################################################################
   //# Constructors & Destructors
-  explicit AutomatonEncoding(jni::ProductDESGlue des,
-			     jni::KindTranslatorGlue translator,
+  explicit AutomatonEncoding(const jni::ProductDESGlue& des,
+			     const jni::KindTranslatorGlue& translator,
+			     const jni::EventGlue& omega,
 			     jni::ClassCache* cache,
 			     int numtags = 0);
   ~AutomatonEncoding();

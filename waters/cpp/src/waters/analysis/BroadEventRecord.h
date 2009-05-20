@@ -27,7 +27,6 @@ namespace waters {
 
 class AutomatonRecord;
 class HashAccessor;
-class StateRecord;
 class TransitionRecord;
 class TransitionUpdateRecord;
 
@@ -51,10 +50,9 @@ public:
   inline bool isGloballyDisabled() const {return mIsGloballyDisabled;}
   inline bool isDisabledInSpec() const {return mIsDisabledInSpec;}
   inline bool isOnlySelfloops() const {return mIsOnlySelfloops;}
-  bool isSkippable() const;
+  bool isSkippable(bool safety) const;
   inline bool isDeterministic() const {return mIsDeterministic;}
   inline int getNumberOfUpdates() const {return mNumberOfUpdates;}
-  jni::JavaString getName() const;
   inline TransitionRecord* getTransitionRecord() const
     {return mUsedSearchRecords;}
   inline TransitionUpdateRecord* getTransitionUpdateRecord(int w) const
@@ -70,12 +68,10 @@ public:
   //##########################################################################
   //# Set up
   bool addDeterministicTransition(const AutomatonRecord* aut,
-				  const StateRecord* source,
-				  const StateRecord* target);
+				  uint32 source, uint32 target);
   void setupNondeterministicBuffers(const AutomatonRecord* aut);
   void addNondeterministicTransition(const AutomatonRecord* aut,
-				     const StateRecord* source,
-				     const StateRecord* target);
+				     uint32 source, uint32 target);
   void normalize(const AutomatonRecord* aut);
   TransitionUpdateRecord* createUpdateRecord(int wordindex);
   void sortTransitionRecordsForSearch();

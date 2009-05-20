@@ -15,7 +15,6 @@
 #include <new>
 
 #include "waters/analysis/AutomatonEncoding.h"
-#include "waters/analysis/StateRecord.h"
 #include "waters/analysis/TransitionRecord.h"
 
 
@@ -148,61 +147,42 @@ compareToForTrace(const TransitionRecord* partner)
 //# TransitionRecord: Set up
 
 bool TransitionRecord::
-addDeterministicTransition(const StateRecord* source,
-                           const StateRecord* target)
+addDeterministicTransition(uint32 source, uint32 target)
 {
-  const uint32 sourcecode = source->getStateCode();
-  const uint32 targetcode = target->getStateCode();
-  return addDeterministicTransition(sourcecode, targetcode);
-}
-
-bool TransitionRecord::
-addDeterministicTransition(const uint32 sourcecode, const uint32 targetcode)
-{
-  const int shift = mAutomaton->getShift();
-  const uint32 shiftedtargetcode = targetcode << shift;
-  const uint32 lookup = mDeterministicSuccessorsShifted[sourcecode];
+  const uint32 lookup = mDeterministicSuccessorsShifted[source];
   if (lookup == NO_TRANSITION) {
-    mDeterministicSuccessorsShifted[sourcecode] = shiftedtargetcode;
+    const int shift = mAutomaton->getShift();
+    mDeterministicSuccessorsShifted[source] = target << shift;
     mWeight++;
-    if (sourcecode != targetcode) {
+    if (source != target) {
       mIsOnlySelfloops = false;
     }
     return true;
   } else if (lookup == MULTIPLE_TRANSITIONS) {
-    mNumNondeterministicSuccessors[sourcecode]++;
+    mNumNondeterministicSuccessors[source]++;
     return false;
   } else {
     if (mNumNondeterministicSuccessors == 0) {
       const uint32 numstates = mAutomaton->getNumberOfStates();
       mNumNondeterministicSuccessors = new uint32[numstates];
     }
-    mDeterministicSuccessorsShifted[sourcecode] = MULTIPLE_TRANSITIONS;
-    mNumNondeterministicSuccessors[sourcecode] = 2;
+    mDeterministicSuccessorsShifted[source] = MULTIPLE_TRANSITIONS;
+    mNumNondeterministicSuccessors[source] = 2;
     mIsOnlySelfloops = false;
     return false;
   }
 }
 
 void TransitionRecord::
-addNondeterministicTransition(const StateRecord* source,
-                              const StateRecord* target)
+addNondeterministicTransition(uint32 source, uint32 target)
 {
-  const uint32 sourcecode = source->getStateCode();
-  const uint32 targetcode = target->getStateCode();
-  addNondeterministicTransition(sourcecode, targetcode);
-}
-
-void TransitionRecord::
-addNondeterministicTransition(const uint32 sourcecode, const uint32 targetcode)
-{
-  if (mDeterministicSuccessorsShifted[sourcecode] == MULTIPLE_TRANSITIONS) {
+  if (mDeterministicSuccessorsShifted[source] == MULTIPLE_TRANSITIONS) {
     setupNondeterministicBuffers();
     const int shift = mAutomaton->getShift();
-    const uint32 shiftedtargetcode = targetcode << shift;
+    const uint32 shiftedtarget = target << shift;
     // Maybe add check for duplicates here ...
-    const uint32 offset = mNumNondeterministicSuccessors[sourcecode]++;
-    mNondeterministicSuccessorsShifted[sourcecode][offset] = shiftedtargetcode;
+    const uint32 offset = mNumNondeterministicSuccessors[source]++;
+    mNondeterministicSuccessorsShifted[source][offset] = shiftedtarget;
   }
 }
 

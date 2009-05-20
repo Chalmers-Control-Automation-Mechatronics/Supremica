@@ -34,10 +34,8 @@
 #include "jni/glue/TransitionGlue.h"
 #include "jni/glue/VerificationResultGlue.h"
 
-#include "waters/analysis/AutomatonStateMap.h"
 #include "waters/analysis/BroadEventRecord.h"
 #include "waters/analysis/BroadProductExplorer.h"
-#include "waters/analysis/StateRecord.h"
 #include "waters/analysis/StateSpace.h"
 #include "waters/analysis/TransitionRecord.h"
 #include "waters/analysis/TransitionUpdateRecord.h"
@@ -52,21 +50,6 @@ namespace waters {
 
 //############################################################################
 //# BroadProductExplorer: Constructors & Destructors
-
-BroadProductExplorer::
-BroadProductExplorer(const jni::ProductDESGlue& des,
-                     const jni::KindTranslatorGlue& translator,
-                     jni::ClassCache* cache)
-  : ProductExplorer(des, translator, cache),
-    mNumEventRecords(0),
-    mEventRecords(0),
-    mReversedEventRecords(0),
-    mMaxUpdates(0),
-    mNumNondeterministicTransitionsIterators(0),
-    mNondeterministicTransitionIterators(0),
-    mTraceEvent(0)
-{
-}
 
 BroadProductExplorer::
 BroadProductExplorer(const jni::ProductDESGlue& des,
@@ -99,191 +82,17 @@ BroadProductExplorer::
 //# BroadProductExplorer: Shared Auxiliary Methods
 
 void BroadProductExplorer::
-setupSafety()
+setup(bool safety)
 {
-  // Establish automaton encoding ...
-  ProductExplorer::setupSafety();
+  ProductExplorer::setup(safety);
   if (isTrivial()) {
     return;
+  } else if (safety) {
+    setupSafety();
+  } else {
+    setupNonblocking();
   }
-
-  // Establish initial event map ...
-  jni::ClassCache* cache = getCache();
-  const jni::SetGlue events = getModel().getEventsGlue(cache);
-  const int numevents = events.size();
-  const HashAccessor* eventaccessor = BroadEventRecord::getHashAccessor();
-  HashTable<const jni::EventGlue*,BroadEventRecord*>
-    eventmap(eventaccessor, numevents);
-  setupEventMap(eventmap);
-
-  // Collect transitions ...
-  const int numaut = getNumberOfAutomata();
-  for (int a = 0; a < numaut; a++) {
-    AutomatonRecord* aut = getAutomatonEncoding().getRecord(a);
-    const jni::AutomatonGlue& autglue = aut->getJavaAutomaton();
-    AutomatonStateMap statemap(cache, aut);
-    const uint32 numinit = aut->getEndOfInitialStates();
-    switch (numinit) {
-    case 0:
-      setTrivial();
-      return;
-    case 1:
-      break;
-    default:
-      if (aut->isPlant()) {
-        break;
-      } else {
-        const jni::StateGlue& state = statemap.getJavaState(1);
-        jni::NondeterministicDESExceptionGlue
-          exception(&autglue, &state, cache);
-        throw cache->throwJavaException(exception);
-      }
-    }
-    setupTransitions(aut, autglue, eventmap, statemap);
-    const jni::SetGlue& events = autglue.getEventsGlue(cache);
-    const jni::IteratorGlue& eventiter = events.iteratorGlue(cache);
-    while (eventiter.hasNext()) {
-      jobject javaobject = eventiter.next();
-      jni::EventGlue event(javaobject, cache);
-      jni::EventKind kind =
-        getKindTranslator().getEventKindGlue(&event, cache);
-      if (kind == jni::EventKind_UNCONTROLLABLE ||
-          kind == jni::EventKind_CONTROLLABLE) {
-        BroadEventRecord* eventrecord = eventmap.get(&event);
-        eventrecord->normalize(aut);
-      }
-    }
-  }
-
-  // Establish compact event list ...
-  mMaxUpdates = 0;
-  mNumEventRecords = eventmap.size();
-  HashTableIterator hiter1 = eventmap.iterator();
-  while (eventmap.hasNext(hiter1)) {
-    const BroadEventRecord* eventrecord = eventmap.next(hiter1);
-    if (eventrecord->isSkippable()) {
-      mNumEventRecords--;
-    }
-    const int numupdates = eventrecord->getNumberOfUpdates();
-    if (numupdates > mMaxUpdates) {
-      mMaxUpdates = numupdates;
-    }
-  }
-  mEventRecords = new BroadEventRecord*[mNumEventRecords];
-  HashTableIterator hiter2 = eventmap.iterator();
-  int i = 0;
-  bool trivial = true;
-  while (eventmap.hasNext(hiter2)) {
-    BroadEventRecord* eventrecord = eventmap.next(hiter2);
-    if (!eventrecord->isSkippable()) {
-      eventrecord->sortTransitionRecordsForSearch();
-      mEventRecords[i++] = eventrecord;
-      if (!eventrecord->isControllable() && eventrecord->isDisabledInSpec()) {
-        trivial = false;
-      }
-    }
-  }
-  if (trivial) {
-    setTrivial();
-    return;
-  }
-  qsort(mEventRecords, mNumEventRecords, sizeof(BroadEventRecord*),
-        BroadEventRecord::compareForForwardSearch);
-  allocateNondeterministicTransitionIterators();
 }
-
-
-void BroadProductExplorer::
-setupNonblocking()
-{
-  // Establish automaton encoding ...
-  ProductExplorer::setupNonblocking();
-  if (isTrivial()) {
-    return;
-  }
-
-  // Establish initial event map ...
-  jni::ClassCache* cache = getCache();
-  const jni::SetGlue events = getModel().getEventsGlue(cache);
-  const int numevents = events.size();
-  const HashAccessor* eventaccessor = BroadEventRecord::getHashAccessor();
-  HashTable<const jni::EventGlue*,BroadEventRecord*>
-    eventmap(eventaccessor, numevents);
-  setupEventMap(eventmap);
-
-  // Collect transitions ...
-  const jni::EventGlue& marking = getMarking();
-  const int numaut = getNumberOfAutomata();
-  for (int a = 0; a < numaut; a++) {
-    AutomatonRecord* aut = getAutomatonEncoding().getRecord(a);
-    const jni::AutomatonGlue& autglue = aut->getJavaAutomaton();
-    AutomatonStateMap statemap(cache, aut, marking);
-    if (aut->getNumberOfInitialStates() == 0) {
-      setTrivial();
-      return;
-    }
-    setupTransitions(aut, autglue, eventmap, statemap);
-    const jni::SetGlue& events = autglue.getEventsGlue(cache);
-    const jni::IteratorGlue& eventiter = events.iteratorGlue(cache);
-    bool usemarking = false;
-    while (eventiter.hasNext()) {
-      jobject javaobject = eventiter.next();
-      jni::EventGlue event(javaobject, cache);
-      switch (getKindTranslator().getEventKindGlue(&event, cache)) {
-      case jni::EventKind_UNCONTROLLABLE:
-      case jni::EventKind_CONTROLLABLE:
-        {
-          BroadEventRecord* eventrecord = eventmap.get(&event);
-          eventrecord->normalize(aut);
-        }
-        break;
-      case jni::EventKind_PROPOSITION:
-        if (!usemarking) {
-          usemarking = event.isSameObject(marking, cache);
-        }
-        break;
-      default:
-        break;
-      }
-    }
-    if (!usemarking) {
-      aut->setMarkedStates(0);
-    } else if (aut->getNumberOfMarkedStates() == 0) {
-      // we are blocking --- if there is an initial state ...
-      setTraceState(0);
-      setTrivial();
-    }
-  }
-
-  // Establish compact event list ...
-  mMaxUpdates = 0;
-  mNumEventRecords = eventmap.size();
-  HashTableIterator hiter1 = eventmap.iterator();
-  while (eventmap.hasNext(hiter1)) {
-    const BroadEventRecord* eventrecord = eventmap.next(hiter1);
-    if (eventrecord->isOnlySelfloops()) {
-      mNumEventRecords--;
-    }
-    const int numupdates = eventrecord->getNumberOfUpdates();
-    if (numupdates > mMaxUpdates) {
-      mMaxUpdates = numupdates;
-    }
-  }
-  mEventRecords = new BroadEventRecord*[mNumEventRecords];
-  HashTableIterator hiter2 = eventmap.iterator();
-  int i = 0;
-  while (eventmap.hasNext(hiter2)) {
-    BroadEventRecord* eventrecord = eventmap.next(hiter2);
-    if (!eventrecord->isOnlySelfloops()) {
-      eventrecord->sortTransitionRecordsForSearch();
-      mEventRecords[i++] = eventrecord;
-    }
-  }
-  qsort(mEventRecords, mNumEventRecords, sizeof(BroadEventRecord*),
-        BroadEventRecord::compareForForwardSearch);
-  allocateNondeterministicTransitionIterators();
-}
-
 
 void BroadProductExplorer::
 teardown()
@@ -322,14 +131,13 @@ teardown()
 
 #define EXPAND_ENABLED_TRANSITIONS(numwords, source,                    \
                                    sourcetuple, sourcepacked,           \
-                                   event, ndcount)                      \
+                                   bufferpacked, event, ndcount)        \
   {                                                                     \
-    uint32* packednext = getStateSpace().prepare();                     \
     if (event->isDeterministic()) {                                     \
       for (int w = 0; w < numwords; w++) {                              \
         TransitionUpdateRecord* update = event->getTransitionUpdateRecord(w); \
         if (update == 0) {                                              \
-          packednext[w] = sourcepacked[w];                              \
+          bufferpacked[w] = sourcepacked[w];                            \
         } else {                                                        \
           uint32 word = (sourcepacked[w] & update->getKeptMask()) |     \
             update->getCommonTargets();                                 \
@@ -341,19 +149,17 @@ teardown()
             const uint32 source = sourcetuple[a];                       \
             word |= trans->getDeterministicSuccessorShifted(source);    \
           }                                                             \
-          packednext[w] = word;                                         \
+          bufferpacked[w] = word;                                       \
         }                                                               \
       }                                                                 \
-      if (ADD_NEW_STATE(source, ndcount)) {                             \
-        incNumberOfStates();                                            \
-      }                                                                 \
+      ADD_NEW_STATE(source, ndcount);                                   \
     } else {                                                            \
       const int ndstart = ndcount - 1;                                  \
       int ndend = ndstart;                                              \
       for (int w = 0; w < numwords; w++) {                              \
         TransitionUpdateRecord* update = event->getTransitionUpdateRecord(w); \
         if (update == 0) {                                              \
-          packednext[w] = sourcepacked[w];                              \
+          bufferpacked[w] = sourcepacked[w];                            \
         } else {                                                        \
           uint32 word = (sourcepacked[w] & update->getKeptMask()) |     \
             update->getCommonTargets();                                 \
@@ -370,23 +176,19 @@ teardown()
             }                                                           \
             word |= succ;                                               \
           }                                                             \
-          packednext[w] = word;                                         \
+          bufferpacked[w] = word;                                       \
         }                                                               \
       }                                                                 \
       if (ndend == ndstart) {                                           \
-        if (ADD_NEW_STATE(source, ndcount)) {                           \
-          incNumberOfStates();                                          \
-        }                                                               \
+        ADD_NEW_STATE(source, ndcount);                                 \
       } else {                                                          \
         ndend++;                                                        \
         int ndindex;                                                    \
         do {                                                            \
-          if (ADD_NEW_STATE(source, ndend)) {                           \
-            packednext = getStateSpace().prepare(incNumberOfStates());  \
-          }                                                             \
+          ADD_NEW_STATE_ALLOC(source, ndend, bufferpacked);             \
           for (ndindex = ndstart; ndindex >= ndend; ndindex--) {        \
             if (!mNondeterministicTransitionIterators[ndindex].         \
-                advance(packednext)) {                                  \
+                advance(bufferpacked)) {                                \
               break;                                                    \
             }                                                           \
           }                                                             \
@@ -396,8 +198,19 @@ teardown()
   }
 
 
-#define ADD_NEW_STATE(source, ndcount) \
-  (getStateSpace().add() == getNumberOfStates())
+#define ADD_NEW_STATE(source, ndcount)                                  \
+  {                                                                     \
+    if (getStateSpace().add() == getNumberOfStates()) {                 \
+      incNumberOfStates();                                              \
+    }                                                                   \
+  } 
+
+#define ADD_NEW_STATE_ALLOC(source, ndcount, bufferpacked)              \
+  {                                                                     \
+    if (getStateSpace().add() == getNumberOfStates()) {                 \
+      bufferpacked = getStateSpace().prepare(incNumberOfStates());      \
+    }                                                                   \
+  } 
 
 bool BroadProductExplorer::
 expandSafetyState(const uint32* sourcetuple, const uint32* sourcepacked)
@@ -408,8 +221,9 @@ expandSafetyState(const uint32* sourcetuple, const uint32* sourcepacked)
     const AutomatonRecord* dis = 0;
     FIND_DISABLING_AUTOMATON(sourcetuple, event, dis);
     if (dis == 0) {
+      uint32* bufferpacked = getStateSpace().prepare();
       EXPAND_ENABLED_TRANSITIONS(numwords, SOURCE, sourcetuple,
-                                 sourcepacked, event,
+                                 sourcepacked, bufferpacked, event,
                                  mNumNondeterministicTransitionsIterators);
     } else if (!dis->isPlant() && !event->isControllable()) {
       mTraceEvent = event;
@@ -420,7 +234,28 @@ expandSafetyState(const uint32* sourcetuple, const uint32* sourcepacked)
 }
 
 #undef ADD_NEW_STATE
-#define ADD_NEW_STATE(source, ndcount) checkDeadlockState(source)
+#define ADD_NEW_STATE(source, ndcount)                                  \
+  {                                                                     \
+    uint32 code = getStateSpace().add();                                \
+    if (code != source) {                                               \
+      setConflictKind(jni::ConflictKind_CONFLICT);                      \
+      if (code == getNumberOfStates()) {                                \
+        incNumberOfStates();                                            \
+      }                                                                 \
+    }                                                                   \
+  }
+
+#undef ADD_NEW_STATE_ALLOC
+#define ADD_NEW_STATE_ALLOC(source, ndcount, bufferpacked)              \
+  {                                                                     \
+    uint32 code = getStateSpace().add();                                \
+    if (code != source) {                                               \
+      setConflictKind(jni::ConflictKind_CONFLICT);                      \
+      if (code == getNumberOfStates()) {                                \
+        bufferpacked = getStateSpace().prepare(incNumberOfStates());    \
+      }                                                                 \
+    }                                                                   \
+  }
 
 bool BroadProductExplorer::
 expandNonblockingReachabilityState(uint32 source,
@@ -434,8 +269,9 @@ expandNonblockingReachabilityState(uint32 source,
     const AutomatonRecord* dis = 0;
     FIND_DISABLING_AUTOMATON(sourcetuple, event, dis);
     if (dis == 0) {
+      uint32* bufferpacked = getStateSpace().prepare();
       EXPAND_ENABLED_TRANSITIONS(numwords, source, sourcetuple,
-                                 sourcepacked, event,
+                                 sourcepacked, bufferpacked, event,
                                  mNumNondeterministicTransitionsIterators);
     }
   }
@@ -452,23 +288,26 @@ expandNonblockingReachabilityState(uint32 source,
 #undef ADD_NEW_STATE
 #define ADD_NEW_STATE(source, ndcount) \
   checkCoreachabilityState(stackpos, ndcount)
+#undef ADD_NEW_STATE_ALLOC
+#define ADD_NEW_STATE_ALLOC(source, ndcount, bufferpacked) \
+  ADD_NEW_STATE(source, ndcount)
 
 void BroadProductExplorer::
 expandNonblockingCoreachabilityState(const uint32* targettuple,
                                      const uint32* targetpacked,
-                                     int stackpos,
+                                     uint32 stackpos,
                                      int ndcount)
 {
-  stackpos -= getNumberOfAutomata();
   const int numwords = getAutomatonEncoding().getNumberOfWords();
+  const int numstates = getNumberOfStates();
+  uint32* bufferpacked = getStateSpace().get(numstates + stackpos);
   for (int e = 0; e < mNumEventRecords; e++) {
     const BroadEventRecord* event = mReversedEventRecords[e];
     const AutomatonRecord* dis = 0;
     FIND_DISABLING_AUTOMATON(targettuple, event, dis);
     if (dis == 0) {
-      EXPAND_ENABLED_TRANSITIONS(numwords, TARGET, targettuple,
-                                 targetpacked, event,
-                                 mNumNondeterministicTransitionsIterators);
+      EXPAND_ENABLED_TRANSITIONS(numwords, TARGET, targettuple, targetpacked,
+                                 bufferpacked, event, ndcount);
     }
   }
 }
@@ -515,8 +354,9 @@ expandTraceState(const uint32* targettuple, const uint32* targetpacked)
       const AutomatonRecord* dis = 0;
       FIND_DISABLING_AUTOMATON(targettuple, event, dis);
       if (dis == 0) {
+        uint32* bufferpacked = getStateSpace().prepare();
         EXPAND_ENABLED_TRANSITIONS(numwords, TARGET, targettuple,
-                                   targetpacked, event,
+                                   targetpacked, bufferpacked, event,
                                    mNumNondeterministicTransitionsIterators);
       }
     } while (true);
@@ -552,6 +392,126 @@ allocateNondeterministicTransitionIterators(int factor)
 //# BroadProductExplorer: Private Auxiliary Methods
 
 void BroadProductExplorer::
+setupSafety()
+{
+  // Establish initial event map ...
+  jni::ClassCache* cache = getCache();
+  const jni::SetGlue events = getModel().getEventsGlue(cache);
+  const int numevents = events.size();
+  const HashAccessor* eventaccessor = BroadEventRecord::getHashAccessor();
+  HashTable<const jni::EventGlue*,BroadEventRecord*>
+    eventmap(eventaccessor, numevents);
+  setupEventMap(eventmap);
+
+  // Collect transitions ...
+  const int numaut = getNumberOfAutomata();
+  for (int a = 0; a < numaut; a++) {
+    AutomatonRecord* aut = getAutomatonEncoding().getRecord(a);
+    const jni::AutomatonGlue& autglue = aut->getJavaAutomaton();
+    const uint32 numinit = aut->getEndOfInitialStates();
+    switch (numinit) {
+    case 0:
+      setTrivial();
+      return;
+    case 1:
+      break;
+    default:
+      if (aut->isPlant()) {
+        break;
+      } else {
+        const jni::StateGlue& state = aut->getJavaState(1);
+        jni::NondeterministicDESExceptionGlue
+          exception(&autglue, &state, cache);
+        throw cache->throwJavaException(exception);
+      }
+    }
+    setupTransitions(aut, autglue, eventmap);
+    const jni::SetGlue& events = autglue.getEventsGlue(cache);
+    const jni::IteratorGlue& eventiter = events.iteratorGlue(cache);
+    while (eventiter.hasNext()) {
+      jobject javaobject = eventiter.next();
+      jni::EventGlue event(javaobject, cache);
+      jni::EventKind kind =
+        getKindTranslator().getEventKindGlue(&event, cache);
+      if (kind == jni::EventKind_UNCONTROLLABLE ||
+          kind == jni::EventKind_CONTROLLABLE) {
+        BroadEventRecord* eventrecord = eventmap.get(&event);
+        eventrecord->normalize(aut);
+      }
+    }
+  }
+
+  // Establish compact event list ...
+  setupCompactEventList(true, eventmap);
+  if (isTrivial()) {
+    return;
+  }
+
+  allocateNondeterministicTransitionIterators();
+}
+
+void BroadProductExplorer::
+setupNonblocking()
+{
+  // Establish initial event map ...
+  jni::ClassCache* cache = getCache();
+  const jni::SetGlue events = getModel().getEventsGlue(cache);
+  const int numevents = events.size();
+  const HashAccessor* eventaccessor = BroadEventRecord::getHashAccessor();
+  HashTable<const jni::EventGlue*,BroadEventRecord*>
+    eventmap(eventaccessor, numevents);
+  setupEventMap(eventmap);
+
+  // Collect transitions ...
+  const jni::EventGlue& marking = getMarking();
+  const int numaut = getNumberOfAutomata();
+  for (int a = 0; a < numaut; a++) {
+    AutomatonRecord* aut = getAutomatonEncoding().getRecord(a);
+    const jni::AutomatonGlue& autglue = aut->getJavaAutomaton();
+    if (aut->getNumberOfInitialStates() == 0) {
+      setTrivial();
+      return;
+    }
+    setupTransitions(aut, autglue, eventmap);
+    const jni::SetGlue& events = autglue.getEventsGlue(cache);
+    const jni::IteratorGlue& eventiter = events.iteratorGlue(cache);
+    bool usemarking = false;
+    while (eventiter.hasNext()) {
+      jobject javaobject = eventiter.next();
+      jni::EventGlue event(javaobject, cache);
+      switch (getKindTranslator().getEventKindGlue(&event, cache)) {
+      case jni::EventKind_UNCONTROLLABLE:
+      case jni::EventKind_CONTROLLABLE:
+        {
+          BroadEventRecord* eventrecord = eventmap.get(&event);
+          eventrecord->normalize(aut);
+        }
+        break;
+      case jni::EventKind_PROPOSITION:
+        if (!usemarking) {
+          usemarking = event.isSameObject(marking, cache);
+        }
+        break;
+      default:
+        break;
+      }
+    }
+    if (!usemarking) {
+      aut->setAllMarked();
+    } else if (aut->getNumberOfMarkedStates() == 0) {
+      // we are blocking --- if there is an initial state ...
+      setTraceState(0);
+      setTrivial();
+    }
+  }
+
+  // Establish compact event list ...
+  setupCompactEventList(false, eventmap);
+
+  allocateNondeterministicTransitionIterators();
+}
+
+void BroadProductExplorer::
 setupEventMap(HashTable<const jni::EventGlue*,BroadEventRecord*>& eventmap)
 {
   jni::ClassCache* cache = getCache();
@@ -580,12 +540,12 @@ setupEventMap(HashTable<const jni::EventGlue*,BroadEventRecord*>& eventmap)
 
 void BroadProductExplorer::
 setupTransitions
-  (const AutomatonRecord* aut,
+  (AutomatonRecord* aut,
    const jni::AutomatonGlue& autglue,
-   const HashTable<const jni::EventGlue*,BroadEventRecord*>& eventmap,
-   const AutomatonStateMap& statemap)
+   const HashTable<const jni::EventGlue*,BroadEventRecord*>& eventmap)
 {
   jni::ClassCache* cache = getCache();
+  HashTable<const jni::StateGlue*,uint32>* statemap = aut->createStateMap();
   const jni::CollectionGlue transitions = autglue.getTransitionsGlue(cache);
   int maxpass = 1;
   for (int pass = 1; pass <= maxpass; pass++) {
@@ -593,30 +553,71 @@ setupTransitions
     while (transiter.hasNext()) {
       jobject javaobject = transiter.next();
       jni::TransitionGlue trans(javaobject, cache);
-      const jni::EventGlue& event = trans.getEventGlue(cache);
-      BroadEventRecord* eventrecord = eventmap.get(&event);
-      const jni::StateGlue& source = trans.getSourceGlue(cache);
-      StateRecord* sourcerecord = statemap.getState(source);
-      const jni::StateGlue& target = trans.getTargetGlue(cache);
-      StateRecord* targetrecord = statemap.getState(target);
+      const jni::EventGlue& eventglue = trans.getEventGlue(cache);
+      BroadEventRecord* eventrecord = eventmap.get(&eventglue);
+      const jni::StateGlue& sourceglue = trans.getSourceGlue(cache);
+      const uint32 sourcecode = statemap->get(&sourceglue);
+      const jni::StateGlue& targetglue = trans.getTargetGlue(cache);
+      const uint32 targetcode = statemap->get(&targetglue);
       if (pass == 1) {
         const bool det = eventrecord->addDeterministicTransition
-          (aut, sourcerecord, targetrecord);
+          (aut, sourcecode, targetcode);
         if (!det) {
           if (aut->isPlant()) {
             maxpass = 2;
           } else {
             jni::NondeterministicDESExceptionGlue
-              exception(&autglue, &source, &event, cache);
+              exception(&autglue, &sourceglue, &eventglue, cache);
             throw cache->throwJavaException(exception);
           }
         }
       } else {
         eventrecord->addNondeterministicTransition
-          (aut, sourcerecord, targetrecord);
+          (aut, sourcecode, targetcode);
       }
     }
   }
+  aut->deleteStateMap(statemap);
+}
+
+void BroadProductExplorer::
+setupCompactEventList
+  (bool safety,
+   const HashTable<const jni::EventGlue*,BroadEventRecord*>& eventmap)
+{
+  mMaxUpdates = 0;
+  mNumEventRecords = eventmap.size();
+  HashTableIterator hiter1 = eventmap.iterator();
+  while (eventmap.hasNext(hiter1)) {
+    const BroadEventRecord* event = eventmap.next(hiter1);
+    if (event->isSkippable(safety)) {
+      mNumEventRecords--;
+    }
+    const int numupdates = event->getNumberOfUpdates();
+    if (numupdates > mMaxUpdates) {
+      mMaxUpdates = numupdates;
+    }
+  }
+  mEventRecords = new BroadEventRecord*[mNumEventRecords];
+  HashTableIterator hiter2 = eventmap.iterator();
+  int i = 0;
+  bool trivial = safety;
+  while (eventmap.hasNext(hiter2)) {
+    BroadEventRecord* event = eventmap.next(hiter2);
+    if (event->isSkippable(safety)) {
+      delete event;
+    } else {
+      event->sortTransitionRecordsForSearch();
+      mEventRecords[i++] = event;
+      trivial &= (event->isControllable() | !event->isDisabledInSpec());
+    }
+  }
+  if (trivial) {
+    setTrivial();
+    return;
+  }
+  qsort(mEventRecords, mNumEventRecords, sizeof(BroadEventRecord*),
+        BroadEventRecord::compareForForwardSearch);
 }
 
 

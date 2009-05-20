@@ -56,7 +56,7 @@ StateSpace::
 //# StateSpace: Access
 
 uint32* StateSpace::
-get(const uint32 index)
+get(uint32 index)
   const
 {
   uint32* block = mBlocks.get(index >> BLOCKSHIFT);
@@ -78,7 +78,7 @@ prepare()
 }
 
 uint32* StateSpace::
-prepare(const uint32 index)
+prepare(uint32 index)
 {
   uint32* source = get(index);
   uint32* target = prepare();
@@ -86,6 +86,16 @@ prepare(const uint32 index)
     target[i] = source[i];
   }
   return target;
+}
+
+void StateSpace::
+prepareStack(uint32 stacksize)
+{
+  uint32 blockno = (mNumStates + stacksize - 1) >> BLOCKSHIFT;
+  while (blockno >= mBlocks.size()) {
+    uint32* block = new uint32[mEncodingSize * BLOCKSIZE];
+    mBlocks.add(block);
+  }
 }
 
 uint32 StateSpace::
@@ -98,13 +108,6 @@ add()
     }
   }
   return added;
-}
-
-uint32 StateSpace::
-find()
-  const
-{
-  return mLookupTable.get(mNumStates);
 }
 
 void StateSpace::

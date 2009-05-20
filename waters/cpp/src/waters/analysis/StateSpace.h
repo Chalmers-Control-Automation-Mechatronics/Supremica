@@ -48,11 +48,13 @@ public:
 
   //##########################################################################
   //# Access
-  uint32* get(const uint32 index) const;
+  uint32* get(uint32 index) const;
   uint32* prepare();
-  uint32* prepare(const uint32 index);
+  uint32* prepare(uint32 index);
+  void prepareStack(uint32 stacksize);
   uint32 add();
-  uint32 find() const;
+  inline uint32 find() const {return mLookupTable.get(mNumStates);}
+  inline uint32 find(uint32 index) const {return mLookupTable.get(index);}
   void clear();
 
   //##########################################################################

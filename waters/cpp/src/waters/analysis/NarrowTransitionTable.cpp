@@ -21,10 +21,8 @@
 #include "jni/glue/TransitionGlue.h"
 
 #include "waters/analysis/AutomatonEncoding.h"
-#include "waters/analysis/AutomatonStateMap.h"
 #include "waters/analysis/NarrowEventRecord.h"
 #include "waters/analysis/NarrowTransitionTable.h"
-#include "waters/analysis/StateRecord.h"
 
 
 namespace waters {
@@ -123,14 +121,14 @@ const NarrowTransitionRecordHashAccessor
 //# class NarrowStateRecord (local)
 //############################################################################
 
-class NarrowStateRecord : public StateRecord
+class NarrowStateRecord // : public StateRecord
 {
 public:
   //##########################################################################
   //# Constructors & Destructors
   explicit NarrowStateRecord
       (const jni::StateGlue& state, uint32 code, jni::ClassCache* cache) :
-    StateRecord(state, code, cache),
+        //   StateRecord(state, code, cache),
     mNumEvents(0),
     mTransitionRecords(0)
   {}
@@ -188,13 +186,13 @@ void NarrowTransitionTable::
 setup(jni::ClassCache* cache,
       const HashTable<const jni::EventGlue*,NarrowEventRecord*>& eventmap)
 {
-  AutomatonStateMap statemap(cache, mAutomaton);
+  //AutomatonStateMap statemap(cache, mAutomaton);
 
   const uint32 numstates = mAutomaton->getNumberOfStates();
   NarrowStateRecord* narrowstates =
     (NarrowStateRecord*) new char[numstates * sizeof(NarrowStateRecord)];
   for (uint32 code = 0; code < numstates; code++) {
-    const jni::StateGlue& state = statemap.getJavaState(code);
+    const jni::StateGlue& state = mAutomaton->getJavaState(code);
     new (&narrowstates[code]) NarrowStateRecord(state, code, cache);
   }
 
@@ -216,7 +214,7 @@ setup(jni::ClassCache* cache,
     const NarrowEventRecord* eventrecord = eventmap.get(&event);
     const uint32 eventcode = eventrecord->getEventCode();
     const jni::StateGlue& source = trans.getSourceGlue(cache);
-    const uint32 sourcecode = statemap.getStateCode(source);
+    const uint32 sourcecode = 0; // statemap.getStateCode(source);
     if (newtrans == 0) {
       newtrans = new NarrowTransitionRecord(sourcecode, eventcode);
     } else {

@@ -39,7 +39,6 @@ namespace jni {
 
 namespace waters {
 
-class AutomatonStateMap;
 class BroadEventRecord;
 class NondeterministicTransitionIterator;
 
@@ -55,9 +54,6 @@ public:
   //# Constructors & Destructors
   explicit BroadProductExplorer(const jni::ProductDESGlue& des,
 				const jni::KindTranslatorGlue& translator,
-				jni::ClassCache* cache);
-  explicit BroadProductExplorer(const jni::ProductDESGlue& des,
-				const jni::KindTranslatorGlue& translator,
 				const jni::EventGlue& marking,
 				jni::ClassCache* cache);
   virtual ~BroadProductExplorer();
@@ -65,8 +61,7 @@ public:
 protected:
   //##########################################################################
   //# Shared Auxiliary Methods
-  virtual void setupSafety();
-  virtual void setupNonblocking();
+  virtual void setup(bool safety);
   virtual void teardown();
   virtual bool expandSafetyState
     (const uint32* sourcetuple, const uint32* sourcepacked);
@@ -74,7 +69,7 @@ protected:
     (uint32 source, const uint32* sourcetuple, const uint32* sourcepacked);
   virtual void expandNonblockingCoreachabilityState
     (const uint32* targettuple, const uint32* targetpacked,
-     int stackpos, int ndindex);
+     uint32 stackpos, int ndindex);
   virtual const jni::EventGlue& getTraceEvent();
   virtual void setupReverseTransitionRelations();
   virtual void expandTraceState
@@ -86,13 +81,17 @@ protected:
 private:
   //##########################################################################
   //# Private Auxiliary Methods
+  void setupSafety();
+  void setupNonblocking();
   void setupEventMap
     (HashTable<const jni::EventGlue*,BroadEventRecord*>& eventmap);
   void setupTransitions
-    (const AutomatonRecord* aut,
+    (AutomatonRecord* aut,
      const jni::AutomatonGlue& autglue,
-     const HashTable<const jni::EventGlue*,BroadEventRecord*>& eventmap,
-     const AutomatonStateMap& statemap);
+     const HashTable<const jni::EventGlue*,BroadEventRecord*>& eventmap);
+  void setupCompactEventList
+    (bool safety,
+     const HashTable<const jni::EventGlue*,BroadEventRecord*>& eventmap);
 
   //##########################################################################
   //# Data Members

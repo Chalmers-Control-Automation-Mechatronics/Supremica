@@ -55,30 +55,6 @@ const uint32 ProductExplorer::TAG_COREACHABLE = AutomatonEncoding::TAG0;
 ProductExplorer::
 ProductExplorer(const jni::ProductDESGlue& des,
 		const jni::KindTranslatorGlue& translator,
-		jni::ClassCache* cache)
-  : mCache(cache),
-    mModel(des),
-    mKindTranslator(translator),
-    mMarking(0, cache),
-    mStateLimit(UNDEF_UINT32),
-    mEncoding(0),
-    mStateSpace(0),
-    mDepthMap(0),
-    mIsTrivial(false),
-    mNumAutomata(0),
-    mNumStates(0),
-    mTupleStack(0),
-    mTraceList(0),
-    mTraceState(UNDEF_UINT32),
-    mTraceLimit(UNDEF_UINT32),
-    mConflictKind(jni::ConflictKind_CONFLICT)
-{
-}
-
-
-ProductExplorer::
-ProductExplorer(const jni::ProductDESGlue& des,
-		const jni::KindTranslatorGlue& translator,
                 const jni::EventGlue& marking,
 		jni::ClassCache* cache)
   : mCache(cache),
@@ -92,6 +68,7 @@ ProductExplorer(const jni::ProductDESGlue& des,
     mIsTrivial(false),
     mNumAutomata(0),
     mNumStates(0),
+    mTupleStackSize(0),
     mTupleStack(0),
     mTraceList(0),
     mTraceState(UNDEF_UINT32),
@@ -122,7 +99,7 @@ runSafetyCheck()
     // const jni::JavaString name(mCache->getEnvironment(), mModel.getName());
     // std::cerr << (const char*) name << std::endl;
     mStartTime = clock();
-    setupSafety();
+    setup(true);
     bool result;
     if (mIsTrivial) {
       result = true;
@@ -134,7 +111,8 @@ runSafetyCheck()
         mTraceList = new jni::LinkedListGlue(mCache);
         const jni::EventGlue& eventglue = getTraceEvent();
         mTraceList->add(0, &eventglue);
-        computeCounterExample(*mTraceList);
+        const uint32 level = mDepthMap->size() - 2;
+        computeCounterExample(*mTraceList, level);
       }
     }
     teardown();
@@ -154,7 +132,7 @@ runNonblockingCheck()
     // std::cerr << (const char*) name << std::endl;
     mStartTime = clock();
     bool result = true;
-    setupNonblocking();
+    setup(false);
     if (!mIsTrivial || mTraceState != UNDEF_UINT32) {
       storeInitialStates(false);
       if (mIsTrivial) {
@@ -171,7 +149,8 @@ runNonblockingCheck()
       if (!result) {
         mTraceStartTime = clock();
         mTraceList = new jni::LinkedListGlue(mCache);
-        computeCounterExample(*mTraceList);
+        const uint32 level = getDepth(mTraceState);
+        computeCounterExample(*mTraceList, level);
       }
     }
     teardown();
@@ -233,38 +212,25 @@ addStatistics(const jni::VerificationResultGlue& vresult)
 //# ProductExplorer: Auxiliary Methods
 
 void ProductExplorer::
-setupSafety()
+setup(bool safety)
 {
   // Establish automaton encoding ...
-  mEncoding = new AutomatonEncoding(mModel, mKindTranslator, mCache);
-  if (mEncoding->hasSpecs()) {
-    mIsTrivial = false;
-    mNumAutomata = mEncoding->getNumberOfRecords();
-    mStateSpace = new StateSpace(mEncoding, mStateLimit);
-    mDepthMap = new ArrayList<uint32>(128);
-  } else {
-    mIsTrivial = true;
-  }
-  mNumStates = 0;
-  mTraceState = UNDEF_UINT32;
-}
-
-void ProductExplorer::
-setupNonblocking()
-{
-  // Establish automaton encoding ...
-  mEncoding = new AutomatonEncoding(mModel, mKindTranslator, mCache, 1);
+  const int numtags = safety ? 0 : 1;
+  mEncoding =
+    new AutomatonEncoding(mModel, mKindTranslator, mMarking, mCache, numtags);
+  // mEncoding->dump();
   mNumAutomata = mEncoding->getNumberOfRecords();
-  mIsTrivial = (mNumAutomata == 0);
+  mIsTrivial = safety ? !mEncoding->hasSpecs() : mNumAutomata == 0;
   if (!mIsTrivial) {
-    mStateSpace = new TaggedStateSpace(mEncoding, mStateLimit);
+    mStateSpace = safety ?
+      new StateSpace(mEncoding, mStateLimit) :
+      new TaggedStateSpace(mEncoding, mStateLimit);
     mDepthMap = new ArrayList<uint32>(128);
   }
   mNumStates = 0;
   mTraceState = UNDEF_UINT32;
   mConflictKind = jni::ConflictKind_CONFLICT;
 }
-
 
 void ProductExplorer::
 teardown()
@@ -277,6 +243,7 @@ teardown()
   mDepthMap = 0;
   delete [] mTupleStack;
   mTupleStack = 0;
+  mTupleStackSize = 0;
 }
 
 
@@ -331,16 +298,17 @@ bool ProductExplorer::
 doNonblockingCoreachabilitySearch()
 {
   try {
-    const int factor = mNumStates < 256 ? mNumStates : 256;
+    const uint32 factor =
+      mNumStates < ITER_STACK_SIZE ? mNumStates : ITER_STACK_SIZE;
     const int ndcount = allocateNondeterministicTransitionIterators(factor);
     delete [] mTupleStack;
-    const int stacksize = STACK_SIZE <= mNumStates ? STACK_SIZE : mNumStates;
-    int stackpos = stacksize * mNumAutomata;
-    mTupleStack = new uint32[stackpos];
+    mTupleStackSize =
+      mNumStates < TUPLE_STACK_SIZE ? mNumStates : TUPLE_STACK_SIZE;
+    uint32* currenttuple = mTupleStack =
+      new uint32[mTupleStackSize * mNumAutomata];
+    mStateSpace->prepareStack(mTupleStackSize);
     mStackOverflow = false;
     mNumCoreachableStates = 0;
-    stackpos -= mNumAutomata;
-    uint32* currenttuple = &mTupleStack[stackpos];
     uint32 current;
     for (current = 0; current < mNumStates; current++) {
       uint32* currentpacked = mStateSpace->get(current);
@@ -354,17 +322,17 @@ doNonblockingCoreachabilitySearch()
           return true;
         }
         expandNonblockingCoreachabilityState
-          (currentpacked, currenttuple, stackpos, ndcount);
+          (currenttuple, currentpacked, 1, ndcount);
       }
     }
     while (mStackOverflow) {
       mStackOverflow = false;
-      for (current = mNumStates - 1; current >= 0; current--) {
+      for (current = mNumStates; current-- > 0;) {
         uint32* currentpacked = mStateSpace->get(current);
         if (mEncoding->hasTag(currentpacked, TAG_COREACHABLE)) {
           mEncoding->decode(currentpacked, currenttuple);
           expandNonblockingCoreachabilityState
-            (currentpacked, currenttuple, stackpos, ndcount);
+            (currenttuple, currentpacked, 1, ndcount);
         }
       }
     }
@@ -383,9 +351,8 @@ doNonblockingCoreachabilitySearch()
 
 
 void ProductExplorer::
-computeCounterExample(const jni::ListGlue& list)
+computeCounterExample(const jni::ListGlue& list, uint32 level)
 {
-  uint32 level = mDepthMap->size() - 2;
   if (level > 0) {
     setupReverseTransitionRelations();
     uint32* targettuple = new uint32[mNumAutomata];
@@ -462,53 +429,58 @@ storeInitialStates(bool initzero)
 }
 
 
-bool ProductExplorer::
-checkDeadlockState(const uint32 source)
+void ProductExplorer::
+checkCoreachabilityState(uint32 stackpos, int ndcount)
 {
-  uint32 code = mStateSpace->add();
-  if (code != source) {
-    mConflictKind = jni::ConflictKind_CONFLICT;
-  }
-  return code == mNumStates;
-}
-
-bool ProductExplorer::
-checkCoreachabilityState(int stackpos, int ndcount)
-{
-  uint32 found = mStateSpace->find();
+  uint32 found = mStateSpace->find(mNumStates + stackpos);
   if (found == UNDEF_UINT32) {
-    return false;
+    return;
   }
   uint32* foundpacked = mStateSpace->get(found);
   if (mEncoding->hasTag(foundpacked, TAG_COREACHABLE)) {
-    return false;
+    return;
   }
   mEncoding->setTag(foundpacked, TAG_COREACHABLE);
   if (++mNumCoreachableStates == mNumStates) {
     throw SearchAbort();
-  } else if (stackpos < 0 ||
-             ndcount < getMinimumNondeterministicTransitionIterators()) {
-    mStackOverflow = true;
-    return false;
-  } else {
-    uint32* foundtuple = &mTupleStack[stackpos];
+  } else if (stackpos < mTupleStackSize &&
+             ndcount >= getMinimumNondeterministicTransitionIterators()) {
+    uint32* foundtuple = &mTupleStack[stackpos++ * mNumAutomata];
     mEncoding->decode(foundpacked, foundtuple);
     expandNonblockingCoreachabilityState
       (foundtuple, foundpacked, stackpos, ndcount);
-    return false;
+  } else {
+    mStackOverflow = true;
   }    
 }
 
-bool ProductExplorer::
+void ProductExplorer::
 checkTraceState()
 {
   uint32 found = mStateSpace->find();
-  if (found >= mTraceLimit) {
-    return false;
-  } else {
+  if (found < mTraceLimit) {
     mTraceState = found;
     throw SearchAbort();
   }
+}
+
+uint32 ProductExplorer::
+getDepth(uint32 state)
+  const
+{
+  // return level such that depth[level] <= state < depth[level+1]
+  uint32 l = 0;
+  uint32 u = mDepthMap->size() - 1;
+  while (l < u) {
+    uint32 m = (l + u) >> 1;
+    uint32 m1 = m + 1;
+    if (state < mDepthMap->get(m1)) {
+      u = m;
+    } else {
+      l = m1;
+    }
+  }
+  return l;
 }
 
 
@@ -530,7 +502,8 @@ Java_net_sourceforge_waters_cpp_analysis_NativeSafetyVerifier_runNativeAlgorithm
       jni::ProductDESGlue des = gchecker.getModelGlue(&cache);
       jni::KindTranslatorGlue translator =
         gchecker.getKindTranslatorGlue(&cache);
-      waters::BroadProductExplorer checker(des, translator, &cache);
+      jni::EventGlue marking(0, &cache);
+      waters::BroadProductExplorer checker(des, translator, marking, &cache);
       const int limit = gchecker.getNodeLimit();
       if (limit != UNDEF_INT32) {
         checker.setStateLimit(limit);

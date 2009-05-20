@@ -63,17 +63,19 @@ BroadEventRecord::
 //# BroadEventRecord: Simple Access
 
 bool BroadEventRecord::
-isSkippable()
+isSkippable(bool safety)
   const
 {
   if (mIsGloballyDisabled) {
     return true;
   } else if (mUsedSearchRecords == 0 && mUnusedSearchRecords == 0) {
     return true;
-  } else if (mIsOnlySelfloops) {
+  } else if (!mIsOnlySelfloops) {
+    return false;
+  } else if (safety) {
     return isControllable() ? true : !mIsDisabledInSpec;
   } else {
-    return false;
+    return true;
   }
 }
 
@@ -131,8 +133,7 @@ compareForBackwardSearch(const void* elem1, const void* elem2)
 
 bool BroadEventRecord::
 addDeterministicTransition(const AutomatonRecord* aut,
-                           const StateRecord* source,
-                           const StateRecord* target)
+                           uint32 source, uint32 target)
 {
   if (mIsGloballyDisabled) {
     return true;
@@ -147,8 +148,7 @@ addDeterministicTransition(const AutomatonRecord* aut,
 
 void BroadEventRecord::
 addNondeterministicTransition(const AutomatonRecord* aut,
-                              const StateRecord* source,
-                              const StateRecord* target)
+                              uint32 source, uint32 target)
 {
   if (mUsedSearchRecords != 0 && mUsedSearchRecords->getAutomaton() == aut) {
     mUsedSearchRecords->addNondeterministicTransition(source, target);
@@ -227,7 +227,7 @@ reverse()
     TransitionRecord* used = mUsedSearchRecords;
     TransitionRecord* unused = mUnusedSearchRecords;
     clearSearchAndUpdateRecords();
-    mIsDeterministic = 1;
+    mIsDeterministic = true;
     mProbability = 1.0;
     addReversedList(used);
     addReversedList(unused);

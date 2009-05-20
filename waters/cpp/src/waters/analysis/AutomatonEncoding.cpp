@@ -23,6 +23,7 @@
 #include "jni/cache/ClassCache.h"
 #include "jni/cache/ClassGlue.h"
 #include "jni/cache/JavaString.h"
+#include "jni/glue/EventGlue.h"
 #include "jni/glue/IteratorGlue.h"
 #include "jni/glue/KindTranslatorGlue.h"
 #include "jni/glue/ProductDESGlue.h"
@@ -84,8 +85,9 @@ const AutomatonRecordHashAccessor AutomatonRecord::theHashAccessor;
 //# AutomatonRecord: Constructors & Destructors
 
 AutomatonRecord::
-AutomatonRecord(const jni::AutomatonGlue aut,
+AutomatonRecord(const jni::AutomatonGlue& aut,
                 bool plant,
+                const jni::EventGlue& omega,
                 jni::ClassCache* cache)
   : mJavaAutomaton(aut),
     mIsPlant(plant),
@@ -94,24 +96,21 @@ AutomatonRecord(const jni::AutomatonGlue aut,
     mBitMask(0)
 {
   const jni::SetGlue states = aut.getStatesGlue(cache);
-  const jni::IteratorGlue iter = states.iteratorGlue(cache);
   mNumStates = states.size();
   mNumBits = log2(mNumStates);
   mJavaStates = (jni::StateGlue*) malloc(mNumStates * sizeof(jni::StateGlue));
-  uint32 code = 0;
-  while (iter.hasNext()) {
-    jobject javaobject = iter.next();
-    new (&mJavaStates[code++]) jni::StateGlue(javaobject, cache);
+  if (omega.isNull()) {
+    initNonMarking(cache);
+  } else {
+    initMarking(omega, cache);
   }
-  mFirstInitialState = mEndInitialStates = 0;
-  mFirstMarkedState = mNumStates;
 }
 
 AutomatonRecord::
 ~AutomatonRecord()
 {
-  for (int i = 0; i < mNumStates; i++) {
-    mJavaStates[i].jni::StateGlue::~StateGlue();
+  for (uint32 code = 0; code < mNumStates; code++) {
+    mJavaStates[code].jni::StateGlue::~StateGlue();
   }
   free(mJavaStates);
 }
@@ -139,6 +138,13 @@ getStateName(uint32 code)
   JNIEnv* env = cls->getEnvironment();
   jstring jname = state.getName();
   return jni::JavaString(env, jname);
+}
+
+const jni::StateGlue& AutomatonRecord::
+getJavaState(uint32 code)
+  const
+{
+  return mJavaStates[code];
 }
 
 
@@ -177,11 +183,124 @@ allocate(int wordindex, int shift)
   mBitMask = ((1 << mNumBits) - 1) << shift;
 }
 
-void AutomatonRecord::
-setInitialStates(uint32 firstinit, uint32 endinit)
+HashTable<const jni::StateGlue*,uint32>* AutomatonRecord::
+createStateMap()
 {
-  mFirstInitialState = firstinit;
-  mEndInitialStates = endinit;
+  HashTable<const jni::StateGlue*,uint32>* statemap =
+    new HashTable<const jni::StateGlue*,uint32>(this, mNumStates);
+  for (uint32 code = 0; code < mNumStates; code++) {
+    statemap->add(code);
+  }
+  return statemap;
+}
+
+void AutomatonRecord::
+deleteStateMap(HashTable<const jni::StateGlue*,uint32>* statemap)
+{
+  delete statemap;
+}
+
+
+//############################################################################
+//# AutomatonRecord: Auxiliary Methods
+
+void AutomatonRecord::
+initNonMarking(jni::ClassCache* cache)
+{
+  const jni::SetGlue states = mJavaAutomaton.getStatesGlue(cache);
+  const jni::IteratorGlue iter = states.iteratorGlue(cache);
+  uint32 nextinit = 0;
+  uint32 nextnoninit = mNumStates - 1;
+  while (iter.hasNext()) {
+    jobject javaobject = iter.next();
+    jni::StateGlue state(javaobject, cache);
+    uint32 code;
+    if (state.isInitial()) {
+      code = nextinit++;
+    } else {
+      code = nextnoninit--;
+    }
+    new (&mJavaStates[code]) jni::StateGlue(state);
+  }
+  mFirstInitialState = 0;
+  mEndInitialStates = nextinit;
+  mFirstMarkedState = mNumStates;
+}
+
+void AutomatonRecord::
+initMarking(const jni::EventGlue& omega, jni::ClassCache* cache)
+{
+  int cat;
+  uint32 catindex[CAT_COUNT];
+  for (cat = 0; cat < CAT_COUNT; cat++) {
+    catindex[cat] = 0;
+  }
+  const jni::SetGlue states = mJavaAutomaton.getStatesGlue(cache);
+  const jni::IteratorGlue iter1 = states.iteratorGlue(cache);
+  while (iter1.hasNext()) {
+    jobject javaobject = iter1.next();
+    jni::StateGlue state(javaobject, cache);
+    cat = getCategory(state, omega, cache);
+    catindex[cat]++;
+  }
+  uint32 start = 0;
+  for (cat = 0; cat < CAT_COUNT; cat++) {
+    uint32 next = start + catindex[cat];
+    catindex[cat] = start;
+    start = next;
+  }
+  const jni::IteratorGlue iter2 = states.iteratorGlue(cache);
+  while (iter2.hasNext()) {
+    jobject javaobject = iter2.next();
+    jni::StateGlue state(javaobject, cache);
+    cat = getCategory(state, omega, cache);
+    const uint32 code = catindex[cat]++;
+    new (&mJavaStates[code]) jni::StateGlue(state);
+  }
+  mFirstInitialState = catindex[0];
+  mEndInitialStates = catindex[2];
+  mFirstMarkedState = catindex[1];
+}
+
+int AutomatonRecord::
+getCategory(const jni::StateGlue& state,
+            const jni::EventGlue& omega,
+            jni::ClassCache* cache)
+{
+  int init = state.isInitial() ? 1 : 0;
+  jni::CollectionGlue props = state.getPropositionsGlue(cache);
+  int marked = props.contains(&omega) ? 3 : 0;
+  return init ^ marked;
+}
+
+
+//############################################################################
+//# AutomatonRecord: Hash Methods (for states!!!)
+
+uint32 AutomatonRecord::
+hash(const void* key)
+  const
+{
+  const jni::StateGlue* state = (const jni::StateGlue*) key;
+  const int javahash = state->hashCode();
+  return waters::hashInt(javahash);
+}
+
+bool AutomatonRecord::
+equals(const void* key1, const void* key2)
+  const
+{
+  const jni::StateGlue* state1 = (const jni::StateGlue*) key1;
+  const jni::StateGlue* state2 = (const jni::StateGlue*) key2;
+  return state1->equals(state2);
+}
+
+const void* AutomatonRecord::
+getKey(const void* value)
+  const
+{
+  const uint32 code = (uint32) value;
+  return &mJavaStates[code];
 }
 
 
@@ -193,8 +312,9 @@ setInitialStates(uint32 firstinit, uint32 endinit)
 //# AutomatonEncoding: Constructors & Destructors
 
 AutomatonEncoding::
-AutomatonEncoding(const jni::ProductDESGlue des,
-                  const jni::KindTranslatorGlue translator,
+AutomatonEncoding(const jni::ProductDESGlue& des,
+                  const jni::KindTranslatorGlue& translator,
+                  const jni::EventGlue& omega,
                   jni::ClassCache* cache,
                   int numtags)
   : mNumTags(numtags)
@@ -222,7 +342,7 @@ AutomatonEncoding(const jni::ProductDESGlue des,
     default:
       continue;
     }
-    AutomatonRecord* record = new AutomatonRecord(aut, plant, cache);
+    AutomatonRecord* record = new AutomatonRecord(aut, plant, omega, cache);
     totalbits += record->getNumberOfBits();
     records[a++] = record;
   }
