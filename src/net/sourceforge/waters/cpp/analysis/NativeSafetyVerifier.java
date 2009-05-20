@@ -21,7 +21,7 @@ import net.sourceforge.waters.model.des.SafetyTraceProxy;
  * @author Robi Malik
  */
 
-public class NativeSafetyVerifier
+public abstract class NativeSafetyVerifier
   extends NativeModelVerifier
   implements SafetyVerifier
 {

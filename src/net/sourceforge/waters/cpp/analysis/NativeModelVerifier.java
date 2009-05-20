@@ -91,6 +91,8 @@ public abstract class NativeModelVerifier
   //# Native Methods
   abstract VerificationResult runNativeAlgorithm() throws AnalysisException;
 
+  public abstract String getTraceName();
+
 
   //#########################################################################
   //# Auxiliary Methods

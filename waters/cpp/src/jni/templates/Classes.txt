@@ -184,11 +184,15 @@ glue class NativeModelAnalyser {
   int getNodeLimit();
 }
 
-glue class NativeSafetyVerifier extends NativeModelAnalyser {
+glue class NativeModelVerifier extends NativeModelAnalyser {
+  String getTraceName();
+}
+
+glue class NativeSafetyVerifier extends NativeModelVerifier {
   glue KindTranslator getKindTranslator();
 }
 
-glue class NativeConflictChecker extends NativeModelAnalyser {
+glue class NativeConflictChecker extends NativeModelVerifier {
   glue EventProxy getUsedMarkingProposition();
   glue KindTranslator getKindTranslator();
 }

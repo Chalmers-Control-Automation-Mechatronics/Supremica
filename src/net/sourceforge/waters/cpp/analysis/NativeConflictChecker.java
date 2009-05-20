@@ -105,7 +105,12 @@ public class NativeConflictChecker
   //# Native Methods
   native VerificationResult runNativeAlgorithm();
 
+  public String getTraceName()
+  {
+    return getModel().getName() + ":conflicting";
+  }
 
+    
   //#########################################################################
   //# Data Members
   private EventProxy mMarking;

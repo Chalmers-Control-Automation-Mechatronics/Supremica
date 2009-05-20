@@ -21,6 +21,8 @@
 
 #include <ctime>
 
+#include <jni.h>
+
 #include "jni/glue/ConflictKindGlue.h"
 #include "jni/glue/KindTranslatorGlue.h"
 #include "jni/glue/ProductDESProxyFactoryGlue.h"
@@ -78,9 +80,9 @@ public:
   virtual bool runSafetyCheck();
   virtual bool runNonblockingCheck();
   virtual jni::SafetyTraceGlue getSafetyCounterExample
-    (const jni::ProductDESProxyFactoryGlue& factory) const;
+    (const jni::ProductDESProxyFactoryGlue& factory, jstring name) const;
   virtual jni::ConflictTraceGlue getConflictCounterExample
-    (const jni::ProductDESProxyFactoryGlue& factory) const;
+    (const jni::ProductDESProxyFactoryGlue& factory, jstring name) const;
   virtual void addStatistics(const jni::VerificationResultGlue& vresult) const;
 
   //##########################################################################

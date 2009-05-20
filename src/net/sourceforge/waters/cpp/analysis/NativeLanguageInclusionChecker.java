@@ -37,4 +37,13 @@ public class NativeLanguageInclusionChecker
     super(model, LanguageInclusionKindTranslator.getInstance(), factory);
   }
 
+
+  //#########################################################################
+  //# Overrides for Base Class
+  //# net.sourceforge.waters.cpp.analysis.NativeModelVerifier
+  public String getTraceName()
+  {
+    return getModel().getName() + ":unsafe";
+  }
+
 }

@@ -14,7 +14,6 @@
 #include <iostream>
 #include <new>
 
-#include <jni.h>
 #include <time.h>
 #include <stdlib.h>
 
@@ -163,25 +162,22 @@ runNonblockingCheck()
 }
 
 jni::SafetyTraceGlue ProductExplorer::
-getSafetyCounterExample(const jni::ProductDESProxyFactoryGlue& factory)
+getSafetyCounterExample(const jni::ProductDESProxyFactoryGlue& factory,
+                        jstring name)
   const
 {
-  jni::JavaString name(mCache->getEnvironment(), mModel.getName());
-  name += ":unsafe";
-  return factory.createSafetyTraceProxyGlue
-    (name.getJavaString(), &mModel, mTraceList, mCache);
+  return factory.createSafetyTraceProxyGlue(name, &mModel, mTraceList, mCache);
 }
 
 
 jni::ConflictTraceGlue ProductExplorer::
-getConflictCounterExample(const jni::ProductDESProxyFactoryGlue& factory)
+getConflictCounterExample(const jni::ProductDESProxyFactoryGlue& factory,
+                          jstring name)
   const
 {
-  jni::JavaString name(mCache->getEnvironment(), mModel.getName());
-  name += ":blocking";
   jni::ConflictKindGlue kind(mConflictKind, mCache);
-  return factory.createConflictTraceProxyGlue
-    (name.getJavaString(), &mModel, mTraceList, &kind, mCache);
+  return factory.createConflictTraceProxyGlue(name, &mModel,
+                                              mTraceList, &kind, mCache);
 }
 
 
@@ -516,7 +512,9 @@ Java_net_sourceforge_waters_cpp_analysis_NativeSafetyVerifier_runNativeAlgorithm
       } else {
         jni::ProductDESProxyFactoryGlue factory =
           gchecker.getFactoryGlue(&cache);
-        jni::SafetyTraceGlue trace = checker.getSafetyCounterExample(factory);
+        jstring name = gchecker.getTraceName();
+        jni::SafetyTraceGlue trace =
+          checker.getSafetyCounterExample(factory, name);
         jni::VerificationResultGlue vresult(result, &trace, &cache);
         checker.addStatistics(vresult);
         return vresult.returnJavaObject();
@@ -556,8 +554,9 @@ Java_net_sourceforge_waters_cpp_analysis_NativeConflictChecker_runNativeAlgorith
       } else {
         jni::ProductDESProxyFactoryGlue factory =
           gchecker.getFactoryGlue(&cache);
+        jstring name = gchecker.getTraceName();
         jni::ConflictTraceGlue trace =
-          checker.getConflictCounterExample(factory);
+          checker.getConflictCounterExample(factory, name);
         jni::VerificationResultGlue vresult(result, &trace, &cache);
         checker.addStatistics(vresult);
         return vresult.returnJavaObject();

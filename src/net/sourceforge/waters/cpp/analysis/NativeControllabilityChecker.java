@@ -37,4 +37,13 @@ public class NativeControllabilityChecker
     super(model, ControllabilityKindTranslator.getInstance(), factory);
   }
 
+
+  //#########################################################################
+  //# Overrides for Base Class
+  //# net.sourceforge.waters.cpp.analysis.NativeModelVerifier
+  public String getTraceName()
+  {
+    return getModel().getName() + ":uncontrollable";
+  }
+
 }
