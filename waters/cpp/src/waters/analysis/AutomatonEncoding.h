@@ -89,6 +89,7 @@ public:
     {return mNumStates - mFirstMarkedState;}
   inline bool isMarkedState(uint32 code) const
     {return code >= mFirstMarkedState;}
+  inline bool isAllMarked() const {return mFirstMarkedState == 0;}
   inline void setAllMarked() {mFirstMarkedState = 0;}
   inline int getNumberOfBits() const {return mNumBits;}
   inline int getAutomatonIndex() const {return mAutomatonIndex;}
@@ -195,6 +196,7 @@ public:
 
   //##########################################################################
   //# Marking
+  void setupMarkingTest();
   bool isMarkedStateTuplePacked(const uint32* encoded) const;
   bool isMarkedStateTuple(const uint32* decoded) const;
 
@@ -238,8 +240,8 @@ private:
   int mNumRecords;
   int mNumWords;
   int* mWordStop;
-  const AutomatonRecord** mFastMarkingTestRecords;
-  int mNumFastMarkingTestRecords;
+  const AutomatonRecord** mMarkingTestRecords;
+  int mNumMarkingTestRecords;
 };
 
 

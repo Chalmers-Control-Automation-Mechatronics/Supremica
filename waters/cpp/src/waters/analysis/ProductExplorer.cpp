@@ -331,7 +331,6 @@ doNonblockingCoreachabilitySearch()
             (currenttuple, currentpacked, 1, ndcount);
         }
       }
-      std::cerr << ".";
     }
     for (current = 0; current < mNumStates; current++) {
       uint32* currentpacked = mStateSpace->get(current);
@@ -342,7 +341,6 @@ doNonblockingCoreachabilitySearch()
     }
     return false;
   } catch (const SearchAbort& abort) {
-    std::cerr << "SearchAbort" << std::endl;
     return true;
   }
 }

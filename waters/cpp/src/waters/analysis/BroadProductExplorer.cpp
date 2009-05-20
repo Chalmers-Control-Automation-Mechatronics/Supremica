@@ -465,6 +465,7 @@ setupNonblocking()
   // Collect transitions ...
   const jni::EventGlue& marking = getMarking();
   const int numaut = getNumberOfAutomata();
+  bool allmarked = true;
   for (int a = 0; a < numaut; a++) {
     AutomatonRecord* aut = getAutomatonEncoding().getRecord(a);
     const jni::AutomatonGlue& autglue = aut->getJavaAutomaton();
@@ -502,8 +503,16 @@ setupNonblocking()
       // we are blocking --- if there is an initial state ...
       setTraceState(0);
       setTrivial();
+      allmarked = false;
+    } else {
+      allmarked &= aut->isAllMarked();
     }
   }
+  if (allmarked) {
+    setTrivial();
+    return;
+  }
+  getAutomatonEncoding().setupMarkingTest();
 
   // Establish compact event list ...
   setupCompactEventList(false, eventmap);
