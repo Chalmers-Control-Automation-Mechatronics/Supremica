@@ -415,7 +415,6 @@ public abstract class AbstractConflictCheckerTest
     runModelVerifier(group, dir, name, true);
   }
 
-  /*
   public void testProfisafeI3HostEFA() throws Exception
   {
     final String group = "tests";
@@ -427,6 +426,18 @@ public abstract class AbstractConflictCheckerTest
     runModelVerifier(group, dir, name, bindings, true);
   }
 
+  public void testProfisafeI3HostEFABlock() throws Exception
+  {
+    final String group = "tests";
+    final String dir = "profisafe";
+    final String name = "profisafe_ihost_efa_block.wmod";
+    final ParameterBindingProxy binding = createBinding("MAXSEQNO", 3);
+    final List<ParameterBindingProxy> bindings =
+      Collections.singletonList(binding);
+    runModelVerifier(group, dir, name, bindings, false);
+  }
+
+  /*
   public void testProfisafeI4Host() throws Exception
   {
     final String group = "tests";

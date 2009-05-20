@@ -4,7 +4,7 @@
 //# PACKAGE: waters.analysis
 //# CLASS:   TransitionUpdateRecord
 //###########################################################################
-//# $Id: TransitionUpdateRecord.cpp,v 1.2 2006-12-01 02:06:30 robi Exp $
+//# $Id$
 //###########################################################################
 
 #ifdef __GNUG__

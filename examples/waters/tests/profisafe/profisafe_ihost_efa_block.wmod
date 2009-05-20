@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<Module Name="profisafe_ihost_efa" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
-    <ns2:Comment></ns2:Comment>
+<Module Name="profisafe_ihost_efa_block" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
+    <ns2:Comment>Faulty model of PROFIsafe f-Host (input configuration).
+The model is blocking because the transition from state 10 to 5 contains the incorrect condition 'in_ps_status_bit4_FV==0' in its guard.</ns2:Comment>
     <ConstantAliasList>
         <ConstantAlias Scope="REQUIRED_PARAMETER" Name="MAXSEQNO">
             <ConstantAliasExpression>
@@ -1334,20 +1335,26 @@
                         </LabelBlock>
                         <GuardActionBlock>
                             <Guards>
-                                <BinaryExpression Operator="&amp;" Text="in_CRC==ok &amp; in_ps_status_bit2_CRCNO==0 &amp; in_ps_status_bit3_TO==0 &amp; got_operator_ack">
+                                <BinaryExpression Operator="&amp;" Text="in_CRC==ok &amp; in_ps_status_bit2_CRCNO==0 &amp; in_ps_status_bit3_TO==0 &amp; in_ps_status_bit4_FV==0 &amp; got_operator_ack">
                                     <BinaryExpression Operator="&amp;">
                                         <BinaryExpression Operator="&amp;">
-                                            <BinaryExpression Operator="==">
-                                                <SimpleIdentifier Name="in_CRC"/>
-                                                <SimpleIdentifier Name="ok"/>
+                                            <BinaryExpression Operator="&amp;">
+                                                <BinaryExpression Operator="==">
+                                                    <SimpleIdentifier Name="in_CRC"/>
+                                                    <SimpleIdentifier Name="ok"/>
+                                                </BinaryExpression>
+                                                <BinaryExpression Operator="==">
+                                                    <SimpleIdentifier Name="in_ps_status_bit2_CRCNO"/>
+                                                    <IntConstant Value="0"/>
+                                                </BinaryExpression>
                                             </BinaryExpression>
                                             <BinaryExpression Operator="==">
-                                                <SimpleIdentifier Name="in_ps_status_bit2_CRCNO"/>
+                                                <SimpleIdentifier Name="in_ps_status_bit3_TO"/>
                                                 <IntConstant Value="0"/>
                                             </BinaryExpression>
                                         </BinaryExpression>
                                         <BinaryExpression Operator="==">
-                                            <SimpleIdentifier Name="in_ps_status_bit3_TO"/>
+                                            <SimpleIdentifier Name="in_ps_status_bit4_FV"/>
                                             <IntConstant Value="0"/>
                                         </BinaryExpression>
                                     </BinaryExpression>
@@ -1568,27 +1575,6 @@
                             </Guards>
                             <LabelGeometry Anchor="NW">
                                 <Point Y="10" X="9"/>
-                            </LabelGeometry>
-                        </GuardActionBlock>
-                    </Edge>
-                    <Edge Target="s11_wait_delay_time" Source="s11_wait_delay_time">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="yield"/>
-                            <LabelGeometry Anchor="NW">
-                                <Point Y="-8" X="-45"/>
-                            </LabelGeometry>
-                        </LabelBlock>
-                        <SplineGeometry>
-                            <Point Y="194" X="721"/>
-                        </SplineGeometry>
-                        <GuardActionBlock>
-                            <Guards>
-                                <UnaryExpression Operator="!">
-                                    <SimpleIdentifier Name="got_delay_timeout"/>
-                                </UnaryExpression>
-                            </Guards>
-                            <LabelGeometry Anchor="NW">
-                                <Point Y="3" X="-46"/>
                             </LabelGeometry>
                         </GuardActionBlock>
                     </Edge>
