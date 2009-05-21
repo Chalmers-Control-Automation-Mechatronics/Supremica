@@ -67,8 +67,8 @@ ProductExplorer(const jni::ProductDESGlue& des,
     mIsTrivial(false),
     mNumAutomata(0),
     mNumStates(0),
-    mTupleStackSize(0),
-    mTupleStack(0),
+    mDFSStack(0),
+    mDFSStackSize(0),
     mTraceList(0),
     mTraceState(UNDEF_UINT32),
     mTraceLimit(UNDEF_UINT32),
@@ -83,7 +83,7 @@ ProductExplorer::
   delete mEncoding;
   delete mStateSpace;
   delete mDepthMap;
-  delete [] mTupleStack;
+  delete [] mDFSStack;
   delete mTraceList;
 }
 
@@ -237,9 +237,9 @@ teardown()
   mStateSpace = 0;
   delete mDepthMap;
   mDepthMap = 0;
-  delete [] mTupleStack;
-  mTupleStack = 0;
-  mTupleStackSize = 0;
+  delete [] mDFSStack;
+  mDFSStack = 0;
+  mDFSStackSize = 0;
 }
 
 
@@ -293,20 +293,15 @@ doNonblockingReachabilitySearch()
 bool ProductExplorer::
 doNonblockingCoreachabilitySearch()
 {
+  delete [] mDFSStack;
+  mDFSStackSize = mNumStates < DFS_STACK_SIZE ? mNumStates : DFS_STACK_SIZE;
+  mDFSStack = new uint32[mDFSStackSize];
+  mDFSStackPos = 0;
+  mNumCoreachableStates = 0;
+  uint32* currenttuple = new uint32[mNumAutomata];
+  bool overflow = false;
   try {
-    const uint32 factor =
-      mNumStates < ITER_STACK_SIZE ? mNumStates : ITER_STACK_SIZE;
-    const int ndcount = allocateNondeterministicTransitionIterators(factor);
-    delete [] mTupleStack;
-    mTupleStackSize =
-      mNumStates < TUPLE_STACK_SIZE ? mNumStates : TUPLE_STACK_SIZE;
-    uint32* currenttuple = mTupleStack =
-      new uint32[mTupleStackSize * mNumAutomata];
-    mStateSpace->prepareStack(mTupleStackSize);
-    mStackOverflow = false;
-    mNumCoreachableStates = 0;
-    uint32 current;
-    for (current = 0; current < mNumStates; current++) {
+    for (uint32 current = 0; current < mNumStates; current++) {
       uint32* currentpacked = mStateSpace->get(current);
       if (mEncoding->hasTag(currentpacked, TAG_COREACHABLE)) {
         continue;
@@ -316,35 +311,42 @@ doNonblockingCoreachabilitySearch()
         if (++mNumCoreachableStates == mNumStates) {
           return true;
         }
-        mEncoding->decode(currentpacked, currenttuple);
-        expandNonblockingCoreachabilityState
-          (currenttuple, currentpacked, 1, ndcount);
+        exploreNonblockingCoreachabilityStateDFS(currenttuple, currentpacked);
       }
     }
-    while (mStackOverflow) {
-      mStackOverflow = false;
-      for (current = mNumStates; current-- > 0;) {
+  } catch (const SearchAbort& abort) {
+    delete [] currenttuple;
+    return true;
+  } catch (const DFSStackOverflow& abort) {
+    overflow = true;
+  }
+  while (overflow) {
+    overflow = false;
+    try {
+      for (uint32 current = mNumStates; current-- > 0;) {
         uint32* currentpacked = mStateSpace->get(current);
         if (mEncoding->hasTag(currentpacked, TAG_COREACHABLE)) {
-          mEncoding->decode(currentpacked, currenttuple);
-          expandNonblockingCoreachabilityState
-            (currenttuple, currentpacked, 1, ndcount);
+          exploreNonblockingCoreachabilityStateDFS
+            (currenttuple, currentpacked);
         }
       }
+    } catch (const SearchAbort& abort) {
+      delete [] currenttuple;
+      return true;
+    } catch (const DFSStackOverflow& abort) {
+      overflow = true;
     }
-    for (current = 0; current < mNumStates; current++) {
-      uint32* currentpacked = mStateSpace->get(current);
-      if (!mEncoding->hasTag(currentpacked, TAG_COREACHABLE)) {
-        mTraceState = current;
-        break;
-      }
-    }
-    return false;
-  } catch (const SearchAbort& abort) {
-    return true;
   }
+  delete [] currenttuple;
+  for (uint32 current = 0; current < mNumStates; current++) {
+    uint32* currentpacked = mStateSpace->get(current);
+    if (!mEncoding->hasTag(currentpacked, TAG_COREACHABLE)) {
+      mTraceState = current;
+      break;
+    }
+  }
+  return false;
 }
-
 
 void ProductExplorer::
 computeCounterExample(const jni::ListGlue& list, uint32 level)
@@ -426,9 +428,23 @@ storeInitialStates(bool initzero)
 
 
 void ProductExplorer::
-checkCoreachabilityState(uint32 stackpos, int ndcount)
+exploreNonblockingCoreachabilityStateDFS(uint32* currenttuple,
+                                         uint32* currentpacked)
 {
-  uint32 found = mStateSpace->find(mNumStates + stackpos);
+  mEncoding->decode(currentpacked, currenttuple);
+  expandNonblockingCoreachabilityState(currenttuple, currentpacked);
+  while (mDFSStackPos > 0) {
+    uint32 popped = mDFSStack[--mDFSStackPos];
+    currentpacked = mStateSpace->get(popped);
+    mEncoding->decode(currentpacked, currenttuple);
+    expandNonblockingCoreachabilityState(currenttuple, currentpacked);
+  }
+}
+
+void ProductExplorer::
+checkCoreachabilityState()
+{
+  uint32 found = mStateSpace->find();
   if (found == UNDEF_UINT32) {
     return;
   }
@@ -439,14 +455,10 @@ checkCoreachabilityState(uint32 stackpos, int ndcount)
   mEncoding->setTag(foundpacked, TAG_COREACHABLE);
   if (++mNumCoreachableStates == mNumStates) {
     throw SearchAbort();
-  } else if (stackpos < mTupleStackSize &&
-             ndcount >= getMinimumNondeterministicTransitionIterators()) {
-    uint32* foundtuple = &mTupleStack[stackpos++ * mNumAutomata];
-    mEncoding->decode(foundpacked, foundtuple);
-    expandNonblockingCoreachabilityState
-      (foundtuple, foundpacked, stackpos, ndcount);
+  } else if (mDFSStackPos < mDFSStackSize) {
+    mDFSStack[mDFSStackPos++] = found;
   } else {
-    mStackOverflow = true;
+    throw DFSStackOverflow();
   }    
 }
 

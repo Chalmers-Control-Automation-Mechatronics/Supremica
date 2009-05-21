@@ -60,6 +60,19 @@ public:
 
 
 //############################################################################
+//# exception DFSStackOverflow
+//############################################################################
+
+class DFSStackOverflow {
+public:
+  //##########################################################################
+  //# Constructors & Destructors
+  DFSStackOverflow() {}
+  ~DFSStackOverflow() {}
+};
+
+
+//############################################################################
 //# class ProductExplorer
 //############################################################################
 
@@ -104,19 +117,17 @@ protected:
   virtual bool expandNonblockingReachabilityState
     (uint32 source, const uint32* sourcetuple, const uint32* sourcepacked) = 0;
   virtual void expandNonblockingCoreachabilityState
-    (const uint32* targettuple, const uint32* targetpacked,
-     uint32 stackpos, int ndindex) = 0;
+    (const uint32* targettuple, const uint32* targetpacked) = 0;
   virtual const jni::EventGlue& getTraceEvent() = 0;
   virtual void setupReverseTransitionRelations() = 0;
-  virtual void expandTraceState(const uint32* targettuple,
-				const uint32* targetpacked) = 0;
+  virtual void expandTraceState
+    (const uint32* targettuple, const uint32* targetpacked) = 0;
   
-  void checkCoreachabilityState(uint32 stackpos, int ndcount);
+  void exploreNonblockingCoreachabilityStateDFS
+    (uint32* targettuple, uint32* targetpacked);
+  void checkCoreachabilityState();
   void checkTraceState();
   uint32 getDepth(uint32 state) const;
-
-  virtual int getMinimumNondeterministicTransitionIterators() const = 0;
-  virtual int allocateNondeterministicTransitionIterators(int factor) = 0;
 
   //##########################################################################
   //# Simple Access
@@ -138,8 +149,7 @@ protected:
   //##########################################################################
   //# Class Constants
   static const uint32 TAG_COREACHABLE;
-  static const uint32 TUPLE_STACK_SIZE = 1024;
-  static const uint32 ITER_STACK_SIZE = TUPLE_STACK_SIZE >> 2;
+  static const uint32 DFS_STACK_SIZE = 0x00100000;
 
 private:
   //##########################################################################
@@ -156,9 +166,9 @@ private:
   int mNumAutomata;
   uint32 mNumStates;
   uint32 mNumCoreachableStates;
-  uint32 mTupleStackSize;
-  uint32* mTupleStack;
-  bool mStackOverflow;
+  uint32* mDFSStack;
+  uint32 mDFSStackSize;
+  uint32 mDFSStackPos;
   jni::ListGlue* mTraceList;
   uint32 mTraceState;
   uint32 mTraceLimit;

@@ -88,16 +88,6 @@ prepare(uint32 index)
   return target;
 }
 
-void StateSpace::
-prepareStack(uint32 stacksize)
-{
-  uint32 blockno = (mNumStates + stacksize - 1) >> BLOCKSHIFT;
-  while (blockno >= mBlocks.size()) {
-    uint32* block = new uint32[mEncodingSize * BLOCKSIZE];
-    mBlocks.add(block);
-  }
-}
-
 uint32 StateSpace::
 add()
 {

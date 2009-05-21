@@ -68,15 +68,11 @@ protected:
   virtual bool expandNonblockingReachabilityState
     (uint32 source, const uint32* sourcetuple, const uint32* sourcepacked);
   virtual void expandNonblockingCoreachabilityState
-    (const uint32* targettuple, const uint32* targetpacked,
-     uint32 stackpos, int ndindex);
+    (const uint32* targettuple, const uint32* targetpacked);
   virtual const jni::EventGlue& getTraceEvent();
   virtual void setupReverseTransitionRelations();
   virtual void expandTraceState
     (const uint32* targettuple,	const uint32* targetpacked);
-
-  virtual int getMinimumNondeterministicTransitionIterators() const;
-  virtual int allocateNondeterministicTransitionIterators(int factor = 1);
 
 private:
   //##########################################################################
@@ -99,7 +95,6 @@ private:
   BroadEventRecord** mEventRecords;
   BroadEventRecord** mReversedEventRecords;
   int mMaxUpdates;
-  int mNumNondeterministicTransitionsIterators;
   NondeterministicTransitionIterator* mNondeterministicTransitionIterators;
   const BroadEventRecord* mTraceEvent;
   uint32 mTraceLimit;
