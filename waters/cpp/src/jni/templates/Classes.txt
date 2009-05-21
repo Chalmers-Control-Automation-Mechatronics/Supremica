@@ -56,7 +56,7 @@ glue class LinkedList extends List {
 package net.sourceforge.waters.xsd.base;
 //###########################################################################
 
-enum class ComponentKind {PLANT, SPEC, PROPERTY}
+enum class ComponentKind {PLANT, SPEC, PROPERTY, SUPERVISOR}
 
 enum class EventKind {PROPOSITION, UNCONTROLLABLE, CONTROLLABLE}
 
