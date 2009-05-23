@@ -105,7 +105,9 @@ addTransition(uint32 source, uint32 target)
 
   // allocate and populate new node
   if (mNumTransitions >= mTransitionLimit) {
-    throw jni::PreJavaException(jni::CLASS_OverflowException);
+    throw jni::PreJavaException(jni::CLASS_OverflowException,
+                                "Transition limit exceeded!",
+                                true);
   }
   mNumTransitions++;
   if (mNextLocalIndex == BLOCKSIZE) {
@@ -137,7 +139,7 @@ uint32 ReverseTransitionStore::
 hasNext(uint32 iterator)
   const
 {
-  return iterator == UNDEF_UINT32;
+  return iterator != UNDEF_UINT32;
 }
 
 uint32 ReverseTransitionStore::

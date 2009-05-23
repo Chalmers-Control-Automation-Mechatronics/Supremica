@@ -27,7 +27,10 @@ namespace waters {
 //############################################################################
 //# TransitionRecord: Class Variables
 
-const TransitionRecordAccessorForSearch TransitionRecord::theSearchAccessor;
+const TransitionRecordAccessorForSearch
+  TransitionRecord::theControllableSearchAccessor(true);
+const TransitionRecordAccessorForSearch
+  TransitionRecord::theUncontrollableSearchAccessor(false);
 const TransitionRecordAccessorForTrace TransitionRecord::theTraceAccessor;
 
 
@@ -106,17 +109,19 @@ getProbability()
 //# TransitionRecord: Comparing
 
 int TransitionRecord::
-compareToForSearch(const TransitionRecord* partner)
+compareToForSearch(const TransitionRecord* partner, bool controllable)
   const
 {
   const AutomatonRecord* aut1 = mAutomaton;
-  const bool isplant1 = aut1->isPlant();
   const AutomatonRecord* aut2 = partner->mAutomaton;
-  const bool isplant2 = aut2->isPlant();
-  if (isplant1 && !isplant2) {
-    return -1;
-  } else if (!isplant1 && isplant2) {
-    return 1;
+  if (!controllable) {
+    const bool isplant1 = aut1->isPlant();
+    const bool isplant2 = aut2->isPlant();
+    if (isplant1 && !isplant2) {
+      return -1;
+    } else if (!isplant1 && isplant2) {
+      return 1;
+    }
   }
   const int weight1 = mWeight;
   const int weight2 = partner->mWeight;
@@ -139,6 +144,16 @@ compareToForTrace(const TransitionRecord* partner)
     const AutomatonRecord* aut1 = mAutomaton;
     const AutomatonRecord* aut2 = partner->mAutomaton;
     return aut1->compareTo(aut2);
+  }
+}
+
+const TransitionRecordAccessorForSearch* TransitionRecord::
+getSearchAccessor(bool controllable)
+{
+  if (controllable) {
+    return &theControllableSearchAccessor;
+  } else {
+    return &theUncontrollableSearchAccessor;
   }
 }
 

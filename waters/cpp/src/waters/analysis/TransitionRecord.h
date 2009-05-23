@@ -70,10 +70,11 @@ public:
 
   //##########################################################################
   //# Comparing and Hashing
-  int compareToForSearch(const TransitionRecord* partner) const;
+  int compareToForSearch
+    (const TransitionRecord* partner, bool controllable) const;
   int compareToForTrace(const TransitionRecord* partner) const;
-  static const TransitionRecordAccessorForSearch* getSearchAccessor()
-    {return &theSearchAccessor;}
+  static const TransitionRecordAccessorForSearch* getSearchAccessor
+    (bool controllable);
   static const TransitionRecordAccessorForTrace* getTraceAccessor()
     {return &theTraceAccessor;}
 
@@ -111,7 +112,9 @@ private:
   static const int PROBABILITY_1 = 0x40000000;
   static const float PROBABILITY_ADJUST = 1.0f / PROBABILITY_1;
 
-  static const TransitionRecordAccessorForSearch theSearchAccessor;
+  static const TransitionRecordAccessorForSearch theControllableSearchAccessor;
+  static const TransitionRecordAccessorForSearch
+    theUncontrollableSearchAccessor;
   static const TransitionRecordAccessorForTrace theTraceAccessor;
 };
 
@@ -126,7 +129,8 @@ class TransitionRecordAccessorForSearch :
 public:
   //##########################################################################
   //# Constructors & Destructors
-  TransitionRecordAccessorForSearch() {}
+  TransitionRecordAccessorForSearch(bool controllable) :
+    mControllable(controllable) {}
 
   //##########################################################################
   //# Override for LinkedRecordAccessor
@@ -137,7 +141,12 @@ public:
   virtual int compare(const TransitionRecord* record1,
 		      const TransitionRecord* record2)
     const
-    {return record1->compareToForSearch(record2);}
+    {return record1->compareToForSearch(record2, mControllable);}
+
+private:
+  //##########################################################################
+  //# Data Members
+  bool mControllable;
 };
 
 

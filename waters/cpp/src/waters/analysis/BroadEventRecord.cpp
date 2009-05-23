@@ -210,8 +210,9 @@ createUpdateRecord(int wordindex)
 void BroadEventRecord::
 sortTransitionRecordsForSearch()
 {
+  const bool controllable = isControllable();
   const LinkedRecordAccessor<TransitionRecord>* accessor =
-    TransitionRecord::getSearchAccessor();
+    TransitionRecord::getSearchAccessor(controllable);
   LinkedRecordList<TransitionRecord> list(accessor, mUsedSearchRecords);
   list.qsort();
   mUsedSearchRecords = list.getHead();
