@@ -112,6 +112,19 @@ teardown()
 // but inlining this code is 15% faster than using method calls.
 // ~~~Robi
 
+#define EXPAND(numwords, source, sourcetuple, sourcepacked)             \
+  {                                                                     \
+    for (int e = 0; e < mNumEventRecords; e++) {                        \
+      const BroadEventRecord* event = mEventRecords[e];                 \
+      const AutomatonRecord* dis = 0;                                   \
+      FIND_DISABLING_AUTOMATON(sourcetuple, event, dis);                \
+      if (dis == 0) {                                                   \
+        EXPAND_ENABLED_TRANSITIONS                                      \
+          (numwords, source, sourcetuple, sourcepacked, event);         \
+      }                                                                 \
+    }                                                                   \
+  }
+
 #define FIND_DISABLING_AUTOMATON(sourcetuple, event, dis)               \
   {                                                                     \
     for (TransitionRecord* trans = event->getTransitionRecord();        \
@@ -209,6 +222,7 @@ teardown()
     }                                                                   \
   } 
 
+
 bool BroadProductExplorer::
 expandSafetyState(const uint32* sourcetuple, const uint32* sourcepacked)
 {
@@ -237,6 +251,7 @@ expandSafetyState(const uint32* sourcetuple, const uint32* sourcepacked)
       if (code == getNumberOfStates()) {                                \
         incNumberOfStates();                                            \
       }                                                                 \
+      ADD_TRANSITION(source, code);                                     \
     }                                                                   \
   }
 
@@ -249,6 +264,7 @@ expandSafetyState(const uint32* sourcetuple, const uint32* sourcepacked)
       if (code == getNumberOfStates()) {                                \
         bufferpacked = getStateSpace().prepare(incNumberOfStates());    \
       }                                                                 \
+      ADD_TRANSITION(source, code);                                     \
     }                                                                   \
   }
 
@@ -259,14 +275,15 @@ expandNonblockingReachabilityState(uint32 source,
 {
   const int numwords = getAutomatonEncoding().getNumberOfWords();
   setConflictKind(jni::ConflictKind_DEADLOCK);
-  for (int e = 0; e < mNumEventRecords; e++) {
-    const BroadEventRecord* event = mEventRecords[e];
-    const AutomatonRecord* dis = 0;
-    FIND_DISABLING_AUTOMATON(sourcetuple, event, dis);
-    if (dis == 0) {
-      EXPAND_ENABLED_TRANSITIONS
-        (numwords, source, sourcetuple, sourcepacked, event);
-    }
+  if (getTransitionLimit() > 0) {
+#   define ADD_TRANSITION(source, target) \
+      addCoreachabilityTransition(source, target)
+    EXPAND(numwords, source, sourcetuple, sourcepacked);
+#   undef ADD_TRANSITION
+  } else {
+#   define ADD_TRANSITION(source, target)
+    EXPAND(numwords, source, sourcetuple, sourcepacked);
+#   undef ADD_TRANSITION
   }
   if (getConflictKind() != jni::ConflictKind_DEADLOCK) {
     return true;
@@ -288,15 +305,7 @@ expandNonblockingCoreachabilityState(const uint32* targettuple,
                                      const uint32* targetpacked)
 {
   const int numwords = getAutomatonEncoding().getNumberOfWords();
-  for (int e = 0; e < mNumEventRecords; e++) {
-    const BroadEventRecord* event = mReversedEventRecords[e];
-    const AutomatonRecord* dis = 0;
-    FIND_DISABLING_AUTOMATON(targettuple, event, dis);
-    if (dis == 0) {
-      EXPAND_ENABLED_TRANSITIONS
-        (numwords, TARGET, targettuple, targetpacked, event);
-    }
-  }
+  EXPAND(numwords, TARGET, targettuple, targetpacked);
 }
 
 #undef ADD_NEW_STATE
@@ -352,6 +361,8 @@ expandTraceState(const uint32* targettuple, const uint32* targetpacked)
 }
 
 #undef ADD_NEW_STATE
+#undef ADD_NEW_STATE_ALLOC
+#undef EXPAND
 
 
 //############################################################################

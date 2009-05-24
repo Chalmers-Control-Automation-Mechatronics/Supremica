@@ -29,6 +29,7 @@
 #include "waters/base/ArrayList.h"
 #include "waters/base/IntTypes.h"
 #include "waters/analysis/AutomatonEncoding.h"
+#include "waters/analysis/ReverseTransitionStore.h"
 
 
 namespace jni {
@@ -100,7 +101,10 @@ public:
 
   //##########################################################################
   //# Parameters
-  void setStateLimit(uint32 limit) {mStateLimit = limit;}
+  inline uint32 getStateLimit() const {return mStateLimit;}
+  inline void setStateLimit(uint32 limit) {mStateLimit = limit;}
+  inline uint32 getTransitionLimit() const {return mTransitionLimit;}
+  inline void setTransitionLimit(uint32 limit) {mTransitionLimit = limit;}
 
 protected:
   //##########################################################################
@@ -123,6 +127,7 @@ protected:
   virtual void expandTraceState
     (const uint32* targettuple, const uint32* targetpacked) = 0;
   
+  void exploreNonblockingCoreachabilityStateDFS(uint32 target);
   void exploreNonblockingCoreachabilityStateDFS
     (uint32* targettuple, uint32* targetpacked);
   void checkCoreachabilityState();
@@ -142,6 +147,8 @@ protected:
   inline int getNumberOfAutomata() const {return mNumAutomata;}
   inline uint32 getNumberOfStates() const {return mNumStates;}
   inline uint32 incNumberOfStates() {return mNumStates++;}
+  inline void addCoreachabilityTransition(uint32 source, uint32 target)
+    {mReverseTransitionStore->addTransition(source, target);}
   inline void setTraceState(uint32 state) {mTraceState = state;}
   inline jni::ConflictKind getConflictKind() const {return mConflictKind;}
   inline void setConflictKind(jni::ConflictKind kind) {mConflictKind = kind;}
@@ -159,9 +166,11 @@ private:
   jni::KindTranslatorGlue mKindTranslator;
   jni::EventGlue mMarking;
   uint32 mStateLimit;
+  uint32 mTransitionLimit;
   AutomatonEncoding* mEncoding;
   StateSpace* mStateSpace;
   ArrayList<uint32>* mDepthMap;
+  ReverseTransitionStore* mReverseTransitionStore;
   bool mIsTrivial;
   int mNumAutomata;
   uint32 mNumStates;

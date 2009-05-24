@@ -50,6 +50,12 @@ public:
   uint32 hasNext(uint32 iterator) const;
   uint32 next(uint32& iterator) const;
 
+  //##########################################################################
+  //# Debug Output
+#ifdef DEBUG
+  void dump(uint32 numstates) const;
+#endif /* DEBUG */
+
 private:
   //##########################################################################
   //# Data Members
@@ -63,10 +69,14 @@ private:
 
   //##########################################################################
   //# Class Constants
-  static const uint32 INITBLOCKS = 256;
-  static const uint32 BLOCKSHIFT = 10;
-  static const uint32 BLOCKSIZE = 1 << BLOCKSHIFT;
-  static const uint32 BLOCKMASK = BLOCKSIZE - 1;
+  static const uint32 INIT_BLOCKS = 256;
+  static const uint32 BLOCK_SHIFT = 10;
+  static const uint32 BLOCK_SIZE = 1 << BLOCK_SHIFT;
+  static const uint32 BLOCK_MASK = BLOCK_SIZE - 1;
+
+  static const uint32 NODE_SIZE = 4;
+  static const uint32 NODE_MASK = NODE_SIZE - 1;
+
   static const uint32 TAG_DATA = 0x80000000;
 };
 

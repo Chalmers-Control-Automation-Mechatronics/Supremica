@@ -33,11 +33,11 @@ ReverseTransitionStore::
 ReverseTransitionStore(uint32 limit)
   : mTransitionLimit(limit),
     mNumTransitions(0),
-    mNextLocalIndex(BLOCKSIZE),
+    mNextLocalIndex(BLOCK_SIZE),
     mNextGlobalIndex(0),
     mCurrentNodeBlock(0),
-    mHeadBlocks(INITBLOCKS),
-    mNodeBlocks(INITBLOCKS)
+    mHeadBlocks(INIT_BLOCKS),
+    mNodeBlocks(INIT_BLOCKS)
 {
 }
 
@@ -61,14 +61,13 @@ ReverseTransitionStore::
 void ReverseTransitionStore::
 addTransition(uint32 source, uint32 target)
 {
-  // suppress selflloops
+  // suppress selfloops
   if (source == target) {
     return;
   }
-
   // find or allocate block
-  const uint32 headblockno = target >> BLOCKSHIFT;
-  const uint32 headindex = target & BLOCKMASK;
+  const uint32 headblockno = target >> BLOCK_SHIFT;
+  const uint32 headindex = target & BLOCK_MASK;
   uint32* headblock;
   uint32 head;
   if (headblockno < mHeadBlocks.size()) {
@@ -76,8 +75,8 @@ addTransition(uint32 source, uint32 target)
     head = headblock[headindex];
   } else {
     do {
-      headblock = new uint32[BLOCKSIZE];
-      for (uint32 i = 0; i < BLOCKSIZE; i++) {
+      headblock = new uint32[BLOCK_SIZE];
+      for (uint32 i = 0; i < BLOCK_SIZE; i++) {
         headblock[i] = UNDEF_UINT32;
       }
       mHeadBlocks.add(headblock);
@@ -86,49 +85,67 @@ addTransition(uint32 source, uint32 target)
   }
 
   // suppress duplicate transitions
-  if (head & TAG_DATA) {
-    if (head == UNDEF_UINT32) {
-      headblock[headindex] = TAG_DATA | source;
-      mNumTransitions++;
-      return;
-    } else if ((head & ~TAG_DATA) == source) {
-      return;
-    }
-  } else {
-    const uint32 nodeblockno = head >> BLOCKSHIFT;
-    const uint32* nodeblock = mNodeBlocks.get(nodeblockno);
-    const uint32 nodeindex = head & BLOCKMASK;
+  bool alloc;
+  uint32 nodeindex;
+  uint32* nodeblock;
+  if ((head & TAG_DATA) == 0) {
+    const uint32 nodeblockno = head >> BLOCK_SHIFT;
+    nodeblock = mNodeBlocks.get(nodeblockno);
+    nodeindex = head & BLOCK_MASK;
     if (nodeblock[nodeindex] == source) {
       return;
     }
+    if ((nodeindex & NODE_MASK) != 0) {
+      if (mNumTransitions >= mTransitionLimit) {
+        throw jni::PreJavaException(jni::CLASS_OverflowException,
+                                    "Transition limit exceeded!",
+                                    true);
+      }
+      mNumTransitions++;
+      headblock[headindex] = head - 1;
+      nodeblock[nodeindex - 1] = source;
+      return;
+    }
+  } else if (head == UNDEF_UINT32) {
+    headblock[headindex] = TAG_DATA | source;
+    mNumTransitions++;
+    return;
+  } else if ((head & ~TAG_DATA) == source) {
+    return;
+  } else {
+    nodeindex = UNDEF_UINT32;
+    nodeblock = 0;
+    alloc = true;
   }
 
-  // allocate and populate new node
+  // allocate and/or populate node
   if (mNumTransitions >= mTransitionLimit) {
     throw jni::PreJavaException(jni::CLASS_OverflowException,
                                 "Transition limit exceeded!",
                                 true);
   }
   mNumTransitions++;
-  if (mNextLocalIndex == BLOCKSIZE) {
-    mCurrentNodeBlock = new uint32[BLOCKSIZE];
+  if (mNextLocalIndex == BLOCK_SIZE) {
+    mCurrentNodeBlock = new uint32[BLOCK_SIZE];
     mNodeBlocks.add(mCurrentNodeBlock);
     mNextLocalIndex = 0;
   }
-  headblock[headindex] = mNextGlobalIndex;
-  mNextGlobalIndex += 2;
-  mCurrentNodeBlock[mNextLocalIndex++] = source;
-  mCurrentNodeBlock[mNextLocalIndex++] = head;
+  headblock[headindex] = mNextGlobalIndex + NODE_SIZE - 2;
+  mNextGlobalIndex += NODE_SIZE;
+  nodeindex = mNextLocalIndex + NODE_SIZE - 2; 
+  mCurrentNodeBlock[nodeindex++] = source;
+  mCurrentNodeBlock[nodeindex++] = head;
+  mNextLocalIndex = nodeindex;
 }
 
 uint32 ReverseTransitionStore::
 iterator(uint32 target)
   const
 {
-  const uint32 headblockno = target >> BLOCKSHIFT;
+  const uint32 headblockno = target >> BLOCK_SHIFT;
   if (headblockno < mHeadBlocks.size()) {
     const uint32* headblock = mHeadBlocks.get(headblockno);
-    const uint32 headindex = target & BLOCKMASK;
+    const uint32 headindex = target & BLOCK_MASK;
     return headblock[headindex];
   } else {
     return UNDEF_UINT32;
@@ -151,13 +168,49 @@ next(uint32& iterator)
     iterator = UNDEF_UINT32;
     return data;
   } else {
-    const uint32 blockno = iterator >> BLOCKSHIFT;
+    const uint32 blockno = iterator >> BLOCK_SHIFT;
     const uint32* block = mNodeBlocks.get(blockno);
-    const uint32 index = iterator & BLOCKMASK;
-    iterator = block[index + 1];
+    const uint32 index = iterator & BLOCK_MASK;
+    if ((index & NODE_MASK) == NODE_SIZE - 2) {
+      iterator = block[index + 1];
+    } else {
+      iterator++;
+    }
     return block[index];
   }
 }
+
+
+//############################################################################
+//# ReverseTransitionStore: Debug Output
+
+#ifdef DEBUG
+
+#define DUMPING(code) \
+  (code & TAG_DATA ? "+" : "") << (code & ~TAG_DATA)
+
+void ReverseTransitionStore::
+dump(uint32 numstates)
+  const
+{
+  std::cerr << "HEADS:" << std::endl;
+  for (uint32 hindex = 0; hindex < numstates; hindex++) {
+    const uint32 headblockno = hindex >> BLOCK_SHIFT;
+    const uint32 headindex = hindex & BLOCK_MASK;
+    const uint32* headblock = mHeadBlocks.get(headblockno);
+    const uint32 head = headblock[headindex];
+    std::cerr << "H" << hindex << ": " << DUMPING(head) << std::endl;
+  }
+  for (uint32 bindex = 0; bindex < mNextGlobalIndex; bindex++) {
+    const uint32 blockno = bindex >> BLOCK_SHIFT;
+    const uint32 index = bindex & BLOCK_MASK;
+    const uint32* block = mNodeBlocks.get(blockno);
+    const uint32 data = block[index];
+    std::cerr << "N" << bindex << ": " << DUMPING(data) << std::endl;
+  }
+}
+    
+#endif /* DEBUG */
 
 
 }  /* namespace waters */
