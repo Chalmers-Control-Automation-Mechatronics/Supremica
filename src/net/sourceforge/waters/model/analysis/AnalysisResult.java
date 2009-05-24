@@ -8,6 +8,8 @@
 
 package net.sourceforge.waters.model.analysis;
 
+import java.io.PrintStream;
+
 
 public class AnalysisResult
 {
@@ -25,6 +27,14 @@ public class AnalysisResult
   public boolean isSatisfied()
   {
     return mSatisfied;
+  }
+
+
+  //#########################################################################
+  //# Printing
+  public void print(PrintStream stream)
+  {
+    stream.println("Verification: " + mSatisfied);
   }
 
 

@@ -37,6 +37,7 @@ public abstract class AbstractModelAnalyser implements ModelAnalyser
     mFactory = factory;
     mModel = model;
     mNodeLimit = Integer.MAX_VALUE;
+    mTransitionLimit = Integer.MAX_VALUE;
   }
 
 
@@ -68,6 +69,16 @@ public abstract class AbstractModelAnalyser implements ModelAnalyser
     return mNodeLimit;
   }
 
+  public void setTransitionLimit(final int limit)
+  {
+    mTransitionLimit = limit;
+  }
+
+  public int getTransitionLimit()
+  {
+    return mTransitionLimit;
+  }
+
 
 
   //#########################################################################
@@ -75,5 +86,6 @@ public abstract class AbstractModelAnalyser implements ModelAnalyser
   private final ProductDESProxyFactory mFactory;
   private ProductDESProxy mModel;
   private int mNodeLimit;
+  private int mTransitionLimit;
 
 }

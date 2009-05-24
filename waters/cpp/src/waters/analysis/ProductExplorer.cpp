@@ -190,6 +190,7 @@ addStatistics(const jni::VerificationResultGlue& vresult)
 {
   vresult.setNumberOfAutomata(mNumAutomata);
   vresult.setNumberOfStates(mNumStates);
+  vresult.setNumberOfTransitions(mNumTransitions);
   vresult.setPeakNumberOfNodes(mNumStates);
   /*
   char buffer[40];
@@ -245,8 +246,11 @@ teardown()
   mStateSpace = 0;
   delete mDepthMap;
   mDepthMap = 0;
-  delete mReverseTransitionStore;
-  mReverseTransitionStore = 0;
+  if (mReverseTransitionStore) {
+    mNumTransitions = mReverseTransitionStore->getNumberOfTransitions();
+    delete mReverseTransitionStore;
+    mReverseTransitionStore = 0;
+  }
   delete [] mDFSStack;
   mDFSStack = 0;
   mDFSStackSize = 0;
@@ -621,9 +625,13 @@ Java_net_sourceforge_waters_cpp_analysis_NativeConflictChecker_runNativeAlgorith
         gchecker.getKindTranslatorGlue(&cache);
       jni::EventGlue marking = gchecker.getUsedMarkingPropositionGlue(&cache);
       waters::BroadProductExplorer checker(des, translator, marking, &cache);
-      const int limit = gchecker.getNodeLimit();
-      if (limit != UNDEF_INT32) {
-        checker.setStateLimit(limit);
+      const int slimit = gchecker.getNodeLimit();
+      if (slimit != UNDEF_INT32) {
+        checker.setStateLimit(slimit);
+      }
+      const int tlimit = gchecker.getTransitionLimit();
+      if (tlimit != UNDEF_INT32) {
+        checker.setTransitionLimit(tlimit);
       }
       bool result = checker.runNonblockingCheck();
       if (result) {

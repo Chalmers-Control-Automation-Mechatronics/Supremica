@@ -48,6 +48,7 @@ public abstract class AbstractModelVerifierFactory
     mArgumentMap = new HashMap<String,CommandLineArgument>(16);
     addArgument(new HelpArgument());
     addArgument(new LimitArgument());
+    addArgument(new TransitionLimitArgument());
     addArgument(new MarkingArgument());
     addArgument(new PropertyArgument());
   }
@@ -205,6 +206,31 @@ public abstract class AbstractModelVerifierFactory
     {
       final int limit = getValue();
       verifier.setNodeLimit(limit);
+    }
+
+  }
+
+
+  //#########################################################################
+  //# Inner Class TransitionLimitArgument
+  private static class TransitionLimitArgument
+    extends CommandLineArgumentInteger
+  {
+    //#######################################################################
+    //# Constructors
+    private TransitionLimitArgument()
+    {
+      super("-tlimit",
+            "Maximum number of transitions stored");
+    }
+
+    //#######################################################################
+    //# Overrides for Abstract Base Class
+    //# net.sourceforge.waters.model.analysis.CommandLineArgument
+    protected void configure(final ModelVerifier verifier)
+    {
+      final int limit = getValue();
+      verifier.setTransitionLimit(limit);
     }
 
   }

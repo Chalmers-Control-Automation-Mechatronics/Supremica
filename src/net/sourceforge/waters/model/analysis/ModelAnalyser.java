@@ -85,6 +85,28 @@ public interface ModelAnalyser
    */
   public int getNodeLimit();
 
+  /**
+   * Sets the transition limit for this model verifier.
+   * If set, the transition limit is the maximum number of transitions the
+   * verifier is allowed to keep in memory at any one time. If this number
+   * is exceeded, an {@link OverflowException} is thrown.
+   * Many algorithms do not explicitly store any transitions and can ignore
+   * this parameter.
+   * @param  limit  The new transition limit, or {@link Integer#MAX_VALUE} to
+   *                indicate that no transition limit is to be used. A value
+   *                of&nbsp;0 can be used to request that transitions should
+   *                not be stored explicitly.
+   */
+  public void setTransitionLimit(final int limit);
+
+  /**
+   * Gets the transition limit for this model verifier.
+   * @return The current transition limit, or {@link Integer#MAX_VALUE} to
+   *         indicate that no transition limit is used.
+   * @see    #setTransitionLimit(int)
+   */
+  public int getTransitionLimit();
+
 
   //#########################################################################
   //# Accessing the Result

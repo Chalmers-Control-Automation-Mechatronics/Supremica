@@ -9,6 +9,9 @@
 
 package net.sourceforge.waters.model.analysis;
 
+import java.io.PrintStream;
+import java.util.Formatter;
+
 import net.sourceforge.waters.model.des.TraceProxy;
 
 
@@ -59,6 +62,8 @@ public class VerificationResult extends AnalysisResult
     mTotalNumberOfAutomata = -1;
     mTotalNumberOfStates = -1.0;
     mPeakNumberOfStates = -1.0;
+    mTotalNumberOfTransitions = -1.0;
+    mPeakNumberOfTransitions = -1.0;
     mPeakNumberOfNodes = -1;
   }
 
@@ -120,6 +125,28 @@ public class VerificationResult extends AnalysisResult
     return mPeakNumberOfNodes;
   }
   
+  /**
+   * Gets the total number of transitions constructed by the analysis.
+   * @return The total number of transitions, or <CODE>-1</CODE> if unknown.
+   */
+  public double getTotalNumberOfTransitions()
+  {
+    return mTotalNumberOfTransitions;
+  }
+
+  /**
+   * Gets the maximum number of transitions constructed by the analysis.
+   * The peak number of transitions should identify the size of the largest
+   * automaton constructed. For monolithic algorithms, it will be
+   * equal to the total number of transitions, but for compositional algorithms
+   * it may be different.
+   * @return The peak number of transitions, or <CODE>-1</CODE> if unknown.
+   */
+  public double getPeakNumberOfTransitions()
+  {
+    return mPeakNumberOfTransitions;
+  }
+
 
   //#########################################################################
   //# Providing Statistics
@@ -187,6 +214,52 @@ public class VerificationResult extends AnalysisResult
   }
 
   /**
+   * Specifies a value for both the peak and total number of transitions
+   * constructed by the analysis.
+   * @throws IllegalStateException if the total number of transitions has been
+   *         set by a previous call to this method.
+   */
+  public void setNumberOfTransitions(final double numtrans)
+  {
+    setTotalNumberOfTransitions(numtrans);
+    setPeakNumberOfTransitions(numtrans);
+  }
+
+  /**
+   * Specifies a value for the total number of transitions constructed by the
+   * analysis.
+   * @throws IllegalStateException if the total number of transitions has been
+   *         set by a previous call to this method.
+   */
+  public void setTotalNumberOfTransitions(final double numtrans)
+  {
+    if (mTotalNumberOfTransitions < 0) {
+      mTotalNumberOfTransitions = numtrans;
+    } else {
+      throw new IllegalStateException
+	("Trying to overwrite previously set total number of transitions " +
+	 "in verification result!");
+    }
+  }
+
+  /**
+   * Specifies a value for the peak number of transitions constructed by the
+   * analysis.
+   * @throws IllegalStateException if the total number of transitions has been
+   *         set by a previous call to this method.
+   */
+  public void setPeakNumberOfTransitions(final double numtrans)
+  {
+    if (mPeakNumberOfTransitions < 0) {
+      mPeakNumberOfTransitions = numtrans;
+    } else {
+      throw new IllegalStateException
+	("Trying to overwrite previously set peak number of transitions " +
+	 "in verification result!");
+    }
+  }
+
+  /**
    * Specifies the maximum number of nodes used during analysis.
    * A 'node' here represents a basic unit of memory such as a state
    * in a synchronous product or a BDD node.
@@ -206,12 +279,42 @@ public class VerificationResult extends AnalysisResult
 
 
   //#########################################################################
+  //# Printing
+  public void print(PrintStream stream)
+  {
+    super.print(stream);
+    final Formatter formatter = new Formatter(stream);
+    if (mTotalNumberOfAutomata >= 0) {
+      stream.println("Total number of automata: " + mTotalNumberOfAutomata);
+    }
+    if (mTotalNumberOfStates >= 0) {
+      formatter.format("Total number of states/nodes: %.0f\n",
+                       mTotalNumberOfStates);
+    }
+    if (mTotalNumberOfTransitions >= 0) {
+      formatter.format("Total number of transitions: %.0f\n",
+                       mTotalNumberOfTransitions);
+    }
+    if (mPeakNumberOfStates >= 0) {
+      formatter.format("Peak number of states/nodes: %.0f\n",
+                       mPeakNumberOfStates);
+    }
+    if (mPeakNumberOfTransitions >= 0) {
+      formatter.format("Peak number of transitions: %.0f\n",
+                       mPeakNumberOfTransitions);
+    }
+  }
+
+
+  //#########################################################################
   //# Data Members
   private final TraceProxy mCounterExample;
 
   private int mTotalNumberOfAutomata;
   private double mTotalNumberOfStates;
   private double mPeakNumberOfStates;
+  private double mTotalNumberOfTransitions;
+  private double mPeakNumberOfTransitions;
   private int mPeakNumberOfNodes;
 
 }

@@ -210,6 +210,7 @@ teardown()
 
 #define ADD_NEW_STATE(source)                                           \
   {                                                                     \
+    incNumberOfTransitions();                                           \
     if (getStateSpace().add() == getNumberOfStates()) {                 \
       incNumberOfStates();                                              \
     }                                                                   \
@@ -217,6 +218,7 @@ teardown()
 
 #define ADD_NEW_STATE_ALLOC(source, bufferpacked)                       \
   {                                                                     \
+    incNumberOfTransitions();                                           \
     if (getStateSpace().add() == getNumberOfStates()) {                 \
       bufferpacked = getStateSpace().prepare(incNumberOfStates());      \
     }                                                                   \
@@ -281,7 +283,7 @@ expandNonblockingReachabilityState(uint32 source,
     EXPAND(numwords, source, sourcetuple, sourcepacked);
 #   undef ADD_TRANSITION
   } else {
-#   define ADD_TRANSITION(source, target)
+#   define ADD_TRANSITION(source, target) incNumberOfTransitions()
     EXPAND(numwords, source, sourcetuple, sourcepacked);
 #   undef ADD_TRANSITION
   }

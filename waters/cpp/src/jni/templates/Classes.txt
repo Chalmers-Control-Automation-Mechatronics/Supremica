@@ -153,6 +153,7 @@ glue class VerificationResult {
   VerificationResult(boolean satisfied, glue TraceProxy trace);
   void setNumberOfAutomata(int numaut);
   void setNumberOfStates(double numstates);
+  void setNumberOfTransitions(double numtrans);
   void setPeakNumberOfNodes(int numnodes);
 }
 
@@ -182,6 +183,7 @@ glue class NativeModelAnalyser {
   glue ProductDESProxyFactory getFactory();
   glue ProductDESProxy getModel();
   int getNodeLimit();
+  int getTransitionLimit();
 }
 
 glue class NativeModelVerifier extends NativeModelAnalyser {

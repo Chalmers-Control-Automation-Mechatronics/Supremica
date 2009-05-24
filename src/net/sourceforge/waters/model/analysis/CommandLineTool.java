@@ -85,6 +85,7 @@ public class CommandLineTool
       List<ParameterBindingProxy> bindings = null;
 
       boolean verbose = true;
+      boolean stats = false;
       boolean noargs = false;
       final String factoryname = args[0];
       final List<String> arglist = new LinkedList<String>();
@@ -94,6 +95,8 @@ public class CommandLineTool
           arglist.add(arg);
         } else if (arg.equals("-q") || arg.equals("-quiet")) {
           verbose = false;
+        } else if (arg.equals("-stats")) {
+          stats = true;
         } else if (arg.startsWith("-D")) {
           final int eqpos = arg.indexOf('=', 2);
           if (eqpos > 2) {
@@ -218,6 +221,10 @@ public class CommandLineTool
               System.out.println();
             }
           }
+          if (stats) {
+            System.out.println("Statistics:");
+            result.print(System.out);
+          }            
         } catch (final OverflowException overflow) {
           final long stop = System.currentTimeMillis();
           final float difftime = 0.001f * (stop - start);

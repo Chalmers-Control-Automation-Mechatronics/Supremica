@@ -147,6 +147,7 @@ protected:
   inline int getNumberOfAutomata() const {return mNumAutomata;}
   inline uint32 getNumberOfStates() const {return mNumStates;}
   inline uint32 incNumberOfStates() {return mNumStates++;}
+  inline uint32 incNumberOfTransitions() {return mNumTransitions++;}
   inline void addCoreachabilityTransition(uint32 source, uint32 target)
     {mReverseTransitionStore->addTransition(source, target);}
   inline void setTraceState(uint32 state) {mTraceState = state;}
@@ -175,6 +176,7 @@ private:
   int mNumAutomata;
   uint32 mNumStates;
   uint32 mNumCoreachableStates;
+  uint32 mNumTransitions;
   uint32* mDFSStack;
   uint32 mDFSStackSize;
   uint32 mDFSStackPos;
