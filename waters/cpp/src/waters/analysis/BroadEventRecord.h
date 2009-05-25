@@ -49,9 +49,10 @@ public:
   //# Simple Access
   inline bool isGloballyDisabled() const {return mIsGloballyDisabled;}
   inline bool isDisabledInSpec() const {return mIsDisabledInSpec;}
-  inline bool isOnlySelfloops() const {return mIsOnlySelfloops;}
+  inline bool isOnlySelfloops() const {return mNumNonSelfloopingRecords == 0;}
   bool isSkippable(bool safety) const;
-  inline bool isDeterministic() const {return mIsDeterministic;}
+  inline bool isDeterministic() const
+    {return mNumNondeterministicRecords == 0;}
   inline int getNumberOfUpdates() const {return mNumberOfUpdates;}
   inline TransitionRecord* getTransitionRecord() const
     {return mUsedSearchRecords;}
@@ -74,12 +75,13 @@ public:
 				     uint32 source, uint32 target);
   void normalize(const AutomatonRecord* aut);
   TransitionUpdateRecord* createUpdateRecord(int wordindex);
-  void sortTransitionRecordsForSearch();
+  void optimizeTransitionRecordsForSearch(bool safety);
   bool reverse();
 
 private:
   //##########################################################################
   //# Auxiliary Methods
+  void relink(TransitionRecord* trans);
   void addReversedList(TransitionRecord* trans);
   void enqueueSearchRecord(TransitionRecord* trans);
   void clearSearchAndUpdateRecords();
@@ -87,13 +89,14 @@ private:
   //##########################################################################
   //# Data Members
   bool mIsGloballyDisabled;
-  bool mIsOnlySelfloops;
   bool mIsDisabledInSpec;
-  bool mIsDeterministic;
+  int mNumNonSelfloopingRecords;
+  int mNumNondeterministicRecords;
   int mNumberOfWords;
   int mNumberOfUpdates;
   TransitionRecord* mUsedSearchRecords;
   TransitionRecord* mUnusedSearchRecords;
+  TransitionRecord* mNonSelfloopingRecord;
   TransitionUpdateRecord** mUpdateRecords;
   float mProbability;
 };

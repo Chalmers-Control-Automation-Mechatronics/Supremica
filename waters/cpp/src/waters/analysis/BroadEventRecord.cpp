@@ -33,13 +33,14 @@ BroadEventRecord::
 BroadEventRecord(jni::EventGlue event, bool controllable, int numwords)
   : EventRecord(event, controllable),
     mIsGloballyDisabled(false),
-    mIsOnlySelfloops(true),
     mIsDisabledInSpec(false),
-    mIsDeterministic(true),
+    mNumNonSelfloopingRecords(0),
+    mNumNondeterministicRecords(0),
     mNumberOfWords(numwords),
     mNumberOfUpdates(0),
     mUsedSearchRecords(0),
-    mUnusedSearchRecords(0)
+    mUnusedSearchRecords(0),
+    mNonSelfloopingRecord(0)
 {
   mUpdateRecords = new TransitionUpdateRecord*[numwords];
   for (int w = 0; w < numwords; w++) {
@@ -70,7 +71,7 @@ isSkippable(bool safety)
     return true;
   } else if (mUsedSearchRecords == 0 && mUnusedSearchRecords == 0) {
     return true;
-  } else if (!mIsOnlySelfloops) {
+  } else if (mNumNonSelfloopingRecords) {
     return false;
   } else if (safety) {
     return isControllable() ? true : !mIsDisabledInSpec;
@@ -161,7 +162,9 @@ normalize(const AutomatonRecord* aut)
   TransitionRecord* trans = mUsedSearchRecords;
   if (trans != 0 && trans->getAutomaton() == aut) {
     trans->normalize();
-    mIsDeterministic &= trans->isDeterministic();
+    if (!trans->isDeterministic()) {
+      mNumNondeterministicRecords++;
+    }
     const bool unlinked = trans->isAlwaysEnabled();
     if (unlinked) {
       mUsedSearchRecords = trans->getNextInSearch();
@@ -181,7 +184,8 @@ normalize(const AutomatonRecord* aut)
         trans->setNextInSearch(mUnusedSearchRecords);
         mUnusedSearchRecords = trans;
       }
-      mIsOnlySelfloops = false;
+      mNonSelfloopingRecord = trans;
+      mNumNonSelfloopingRecords++;
       mNumberOfUpdates++;
     }
   } else if (!mIsGloballyDisabled) {
@@ -208,9 +212,24 @@ createUpdateRecord(int wordindex)
 }
 
 void BroadEventRecord::
-sortTransitionRecordsForSearch()
+optimizeTransitionRecordsForSearch(bool safety)
 {
   const bool controllable = isControllable();
+  if (mNumNonSelfloopingRecords == 1) {
+    const bool plant = mNonSelfloopingRecord->getAutomaton()->isPlant();
+    if (!safety || controllable || !mIsDisabledInSpec && plant) {
+      const bool unlinked = mNonSelfloopingRecord->isAlwaysEnabled();
+      const bool det = mNonSelfloopingRecord->isDeterministic();
+      mNonSelfloopingRecord->removeSelfloops();
+      if (unlinked && !mNonSelfloopingRecord->isAlwaysEnabled()) {
+        relink(mNonSelfloopingRecord);
+        mIsDisabledInSpec &= !plant;
+      }
+      if (!det && mNonSelfloopingRecord->isDeterministic()) {
+        mNumNondeterministicRecords--;
+      }
+    }
+  }
   const LinkedRecordAccessor<TransitionRecord>* accessor =
     TransitionRecord::getSearchAccessor(controllable);
   LinkedRecordList<TransitionRecord> list(accessor, mUsedSearchRecords);
@@ -228,7 +247,7 @@ reverse()
     TransitionRecord* used = mUsedSearchRecords;
     TransitionRecord* unused = mUnusedSearchRecords;
     clearSearchAndUpdateRecords();
-    mIsDeterministic = true;
+    mNumNondeterministicRecords = 0;
     mProbability = 1.0;
     addReversedList(used);
     addReversedList(unused);
@@ -248,6 +267,25 @@ reverse()
 
 //############################################################################
 //# BroadEventRecord: Set up
+
+void BroadEventRecord::
+relink(TransitionRecord* trans)
+{
+  TransitionRecord* newnext = trans->getNextInSearch();
+  if (mUnusedSearchRecords == trans) {
+    mUnusedSearchRecords = newnext;
+  } else {
+    TransitionRecord* prev = mUnusedSearchRecords;
+    TransitionRecord* next = prev->getNextInSearch();
+    while (next != trans) {
+      prev = next;
+      next = prev->getNextInSearch();
+    }
+    prev->setNextInSearch(newnext);
+  }
+  trans->setNextInSearch(mUsedSearchRecords);
+  mUsedSearchRecords = trans;
+}
 
 void BroadEventRecord::
 addReversedList(TransitionRecord* trans)
@@ -293,7 +331,9 @@ addReversedList(TransitionRecord* trans)
         trans->setNextInSearch(0);
         delete trans;
         reversed->normalize();
-        mIsDeterministic &= reversed->isDeterministic();
+        if (!reversed->isDeterministic()) {
+          mNumNondeterministicRecords++;
+        }
         enqueueSearchRecord(reversed);
         const int wordindex = aut->getWordIndex();
         TransitionUpdateRecord* update = createUpdateRecord(wordindex);

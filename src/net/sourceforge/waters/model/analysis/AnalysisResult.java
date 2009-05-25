@@ -34,7 +34,7 @@ public class AnalysisResult
   //# Printing
   public void print(PrintStream stream)
   {
-    stream.println("Verification: " + mSatisfied);
+    stream.println("Verification result: " + mSatisfied);
   }
 
 

@@ -588,7 +588,7 @@ setupCompactEventList
     if (event->isSkippable(safety)) {
       delete event;
     } else {
-      event->sortTransitionRecordsForSearch();
+      event->optimizeTransitionRecordsForSearch(safety);
       mEventRecords[i++] = event;
       trivial &= (event->isControllable() | !event->isDisabledInSpec());
     }

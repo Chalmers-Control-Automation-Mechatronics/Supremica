@@ -212,6 +212,67 @@ normalize()
   }
 }
 
+void TransitionRecord::
+removeSelfloops()
+{
+  uint32 numstates = mAutomaton->getNumberOfStates();
+  int shift = mAutomaton->getShift();
+  bool keepnd = false;
+  bool renorm = false;
+  int newweight = 0;
+  for (uint32 source = 0; source < numstates; source++) {
+    uint32 shiftedsource = source << shift;
+    uint32 succ = mDeterministicSuccessorsShifted[source];
+    if (succ == shiftedsource) {
+      mDeterministicSuccessorsShifted[source] = NO_TRANSITION;
+      renorm = true;
+    } else if (succ == MULTIPLE_TRANSITIONS) {
+      uint32* ndlist = mNondeterministicSuccessorsShifted[source];
+      uint32 ndcount = mNumNondeterministicSuccessors[source];
+      uint32 writeindex = UNDEF_UINT32;
+      for (uint32 readindex = 0; readindex < ndcount; readindex++) {
+        succ = ndlist[readindex];
+        if (succ == shiftedsource) {
+          if (writeindex == UNDEF_UINT32) {
+            writeindex = readindex;
+          }
+        } else if (writeindex != UNDEF_UINT32) {
+          ndlist[writeindex++] = succ;
+        }
+      }
+      switch (writeindex) {
+      case 0:
+        mDeterministicSuccessorsShifted[source] = NO_TRANSITION;
+        renorm = true;
+        break;
+      case 1:
+        mDeterministicSuccessorsShifted[source] = ndlist[0];
+        newweight++;
+        break;
+      default:
+        mNumNondeterministicSuccessors[source] = writeindex;
+        // fall through ...
+      case UNDEF_UINT32:
+        keepnd = true;
+        newweight++;
+        break;
+      }
+    } else if (succ != NO_TRANSITION) {
+      newweight++;
+    }
+  }
+  if (renorm) {
+    mWeight = newweight;
+    normalize();
+  }
+  if (!keepnd) {
+    delete [] mNondeterministicBuffer;
+    delete [] mNondeterministicSuccessorsShifted;
+    mNumNondeterministicSuccessors = mNondeterministicBuffer = 0;
+    mNondeterministicSuccessorsShifted = 0;
+  }
+}
+
 uint32 TransitionRecord::
 getCommonTarget()
   const

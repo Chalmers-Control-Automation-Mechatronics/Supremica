@@ -87,23 +87,4 @@ operator const char* ()
 }
 
 
-//###########################################################################
-//# JavaString: Modifications
-
-JavaString& JavaString::
-operator+=(const char* utf)
-{
-  int len = length();
-  int bufsize = len + strlen(utf) + 1;
-  char* buffer = new char[bufsize];
-  strcpy(buffer, (const char*) this);
-  strcpy(buffer + len, utf);
-  mEnvironment->ReleaseStringUTFChars(mJavaString, mChars);
-  mJavaString = mEnvironment->NewStringUTF(buffer);
-  mChars = 0;
-  delete [] buffer;
-  return *this;
-}
-
-
 }  /* namespace jni */

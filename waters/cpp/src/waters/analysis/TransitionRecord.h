@@ -83,6 +83,7 @@ public:
   bool addDeterministicTransition(uint32 source, uint32 target);
   void addNondeterministicTransition(uint32 source, uint32 target);
   void normalize();
+  void removeSelfloops();
   uint32 getCommonTarget() const;
 
   //##########################################################################

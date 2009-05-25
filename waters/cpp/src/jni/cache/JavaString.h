@@ -48,10 +48,6 @@ public:
   int length() const;
   operator const char*() const;
 
-  //#########################################################################
-  //# Modifications
-  JavaString& operator+=(const char* utf);
-
 private:
   //#########################################################################
   //# Data Members

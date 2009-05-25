@@ -53,7 +53,7 @@ done
 OK=1
 if [ "" = "$CHECK" ]; then
     echo "No check specified!"
-    echo "Available options are: -cont -lang"
+    echo "Available options are: -conf -cont -lang -loop"
     OK=0
 fi
 

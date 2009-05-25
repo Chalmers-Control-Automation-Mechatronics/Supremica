@@ -213,18 +213,25 @@ public class CommandLineTool
             formatter.format("%b (%.0f states, %d nodes, %.3f s)\n",
                              satisfied, numstates, numnodes, difftime);
           }
+          boolean additions = false;
           if (verbose && !satisfied) {
             final TraceProxy counterex = result.getCounterExample();
             if (counterex != null) {
+              System.out.println(SEPARATOR);
               System.out.println("Counterexample:");
-              System.out.println(counterex.toString());
-              System.out.println();
+              System.out.print(counterex.toString());
+              additions = true;
             }
           }
           if (stats) {
+            System.out.println(SEPARATOR);
             System.out.println("Statistics:");
             result.print(System.out);
-          }            
+            additions = true;
+          }
+          if (additions) {
+            System.out.println(SEPARATOR);
+          }
         } catch (final OverflowException overflow) {
           final long stop = System.currentTimeMillis();
           final float difftime = 0.001f * (stop - start);
@@ -245,5 +252,7 @@ public class CommandLineTool
   //# Class Constants
   private static final String LOGGERFACTORY =
     "org.supremica.log.LoggerFactory";
+  private static final String SEPARATOR =
+    "------------------------------------------------------------";
 
 }
