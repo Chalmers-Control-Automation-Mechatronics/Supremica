@@ -214,15 +214,21 @@ createUpdateRecord(int wordindex)
 void BroadEventRecord::
 optimizeTransitionRecordsForSearch(bool safety)
 {
-  const bool controllable = isControllable();
+  bool controllable;
+  if (safety && !mIsDisabledInSpec) {
+    setControllable(true);
+    controllable = true;
+  } else {
+    controllable = isControllable();
+  }
   if (mNumNonSelfloopingRecords == 1) {
-    const bool plant = mNonSelfloopingRecord->getAutomaton()->isPlant();
-    if (!safety || controllable || !mIsDisabledInSpec && plant) {
+    if (!safety || controllable) {
       const bool unlinked = mNonSelfloopingRecord->isAlwaysEnabled();
       const bool det = mNonSelfloopingRecord->isDeterministic();
       mNonSelfloopingRecord->removeSelfloops();
       if (unlinked && !mNonSelfloopingRecord->isAlwaysEnabled()) {
         relink(mNonSelfloopingRecord);
+        const bool plant = mNonSelfloopingRecord->getAutomaton()->isPlant();
         mIsDisabledInSpec &= !plant;
       }
       if (!det && mNonSelfloopingRecord->isDeterministic()) {

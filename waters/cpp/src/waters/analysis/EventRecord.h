@@ -69,6 +69,8 @@ public:
   //##########################################################################
   //# Simple Access
   inline bool isControllable() const {return mIsControllable;}
+  inline void setControllable(bool controllable)
+    {mIsControllable = controllable;}
   const jni::EventGlue& getJavaEvent() const {return mJavaEvent;}
   jni::JavaString getName() const;
 
