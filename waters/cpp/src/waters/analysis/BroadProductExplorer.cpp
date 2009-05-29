@@ -81,15 +81,20 @@ BroadProductExplorer::
 //# BroadProductExplorer: Shared Auxiliary Methods
 
 void BroadProductExplorer::
-setup(bool safety)
+setup()
 {
-  ProductExplorer::setup(safety);
-  if (isTrivial()) {
-    return;
-  } else if (safety) {
-    setupSafety();
-  } else {
-    setupNonblocking();
+  ProductExplorer::setup();
+  if (!isTrivial()) {
+    switch (getMode()) {
+    case EXPLORER_MODE_SAFETY:
+      setupSafety();
+      break;
+    case EXPLORER_MODE_NONBLOCKING:
+      setupNonblocking();
+      break;
+    default:
+      break;
+    }
   }
 }
 
@@ -115,7 +120,7 @@ teardown()
 #define EXPAND(numwords, source, sourcetuple, sourcepacked)             \
   {                                                                     \
     for (int e = 0; e < mNumEventRecords; e++) {                        \
-      const BroadEventRecord* event = mEventRecords[e];                 \
+      BroadEventRecord* event = mEventRecords[e];                       \
       const AutomatonRecord* dis = 0;                                   \
       FIND_DISABLING_AUTOMATON(sourcetuple, event, dis);                \
       if (dis == 0) {                                                   \
@@ -283,7 +288,8 @@ expandNonblockingReachabilityState(uint32 source,
     EXPAND(numwords, source, sourcetuple, sourcepacked);
 #   undef ADD_TRANSITION
   } else {
-#   define ADD_TRANSITION(source, target) incNumberOfTransitions()
+#   define ADD_TRANSITION(source, target) \
+      incNumberOfTransitions(); event->markTransitionsTakenFast(sourcetuple)
     EXPAND(numwords, source, sourcetuple, sourcepacked);
 #   undef ADD_TRANSITION
   }
@@ -317,12 +323,20 @@ void BroadProductExplorer::
 setupReverseTransitionRelations()
 {
   if (mReversedEventRecords == 0) {
+    bool removing =
+      getMode() == EXPLORER_MODE_NONBLOCKING && getTransitionLimit() == 0;
+    int numremoved = 0;
     int numreversed = 0;
     mReversedEventRecords = new BroadEventRecord*[mNumEventRecords];
     for (int e = 0; e < mNumEventRecords; e++) {
       BroadEventRecord* event = mEventRecords[e];
-      if (!event->isOnlySelfloops() && event->reverse()) {
-        mReversedEventRecords[numreversed++] = event;
+      if (removing) {
+        numremoved += event->removeTransitionsNotTaken();
+      }
+      if (!event->isGloballyDisabled() && !event->isOnlySelfloops()) {
+        if (event->reverse()) {
+          mReversedEventRecords[numreversed++] = event;
+        }
       }
     }
     qsort(mReversedEventRecords, numreversed, sizeof(BroadEventRecord*),
@@ -414,7 +428,7 @@ setupSafety()
   }
 
   // Establish compact event list ...
-  setupCompactEventList(true, eventmap);
+  setupCompactEventList(eventmap);
 }
 
 void BroadProductExplorer::
@@ -482,7 +496,7 @@ setupNonblocking()
   getAutomatonEncoding().setupMarkingTest();
 
   // Establish compact event list ...
-  setupCompactEventList(false, eventmap);
+  setupCompactEventList(eventmap);
 }
 
 void BroadProductExplorer::
@@ -556,15 +570,15 @@ setupTransitions
 
 void BroadProductExplorer::
 setupCompactEventList
-  (bool safety,
-   const HashTable<const jni::EventGlue*,BroadEventRecord*>& eventmap)
+  (const HashTable<const jni::EventGlue*,BroadEventRecord*>& eventmap)
 {
   mMaxUpdates = 0;
   mNumEventRecords = eventmap.size();
+  ExplorerMode mode = getMode();
   HashTableIterator hiter1 = eventmap.iterator();
   while (eventmap.hasNext(hiter1)) {
     const BroadEventRecord* event = eventmap.next(hiter1);
-    if (event->isSkippable(safety)) {
+    if (event->isSkippable(mode)) {
       mNumEventRecords--;
     }
     const int numupdates = event->getNumberOfUpdates();
@@ -575,13 +589,16 @@ setupCompactEventList
   mEventRecords = new BroadEventRecord*[mNumEventRecords];
   HashTableIterator hiter2 = eventmap.iterator();
   int i = 0;
-  bool trivial = safety;
+  bool trivial = mode == EXPLORER_MODE_SAFETY;
   while (eventmap.hasNext(hiter2)) {
     BroadEventRecord* event = eventmap.next(hiter2);
-    if (event->isSkippable(safety)) {
+    if (event->isSkippable(mode)) {
       delete event;
     } else {
-      event->optimizeTransitionRecordsForSearch(safety);
+      event->optimizeTransitionRecordsForSearch(mode);
+      if (mode == EXPLORER_MODE_NONBLOCKING && getTransitionLimit() == 0) {
+        event->setupNotTakenSearchRecords();
+      }
       mEventRecords[i++] = event;
       trivial &= (event->isControllable() | !event->isDisabledInSpec());
     }

@@ -71,6 +71,10 @@ public:
   inline void setNextInSearch(TransitionRecord* next) {mNextInSearch = next;}
   inline TransitionRecord* getNextInUpdate() const {return mNextInUpdate;}
   inline void setNextInUpdate(TransitionRecord* next) {mNextInUpdate = next;}
+  inline TransitionRecord* getNextInNotTaken() const {return mNextInNotTaken;}
+  inline void setNextInNotTaken(TransitionRecord* next)
+    {mNextInNotTaken = next;}
+
   void copyFlags(const TransitionRecord* trans);
 
   //##########################################################################
@@ -89,8 +93,8 @@ public:
   void addNondeterministicTransition(uint32 source, uint32 target);
   void normalize();
   uint32 getCommonTarget() const;
-  void markTransitionTaken(const uint32* tuple) const;
-  void removeTransitionsNotTaken();
+  bool markTransitionTaken(const uint32* tuple);
+  int removeTransitionsNotTaken();
   void removeSelfloops();
 
   //##########################################################################
@@ -119,8 +123,10 @@ private:
   uint32* mNumNondeterministicSuccessors;
   uint32* mNondeterministicBuffer;
   uint32** mNondeterministicSuccessorsShifted;
+  uint32 mNumNotTaken;
   TransitionRecord* mNextInSearch;
   TransitionRecord* mNextInUpdate;
+  TransitionRecord* mNextInNotTaken;
 
   //##########################################################################
   //# Class Constants

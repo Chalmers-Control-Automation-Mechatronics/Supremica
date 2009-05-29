@@ -62,7 +62,7 @@ public:
 protected:
   //##########################################################################
   //# Shared Auxiliary Methods
-  virtual void setup(bool safety);
+  virtual void setup();
   virtual void teardown();
   virtual bool expandSafetyState
     (const uint32* sourcetuple, const uint32* sourcepacked);
@@ -86,8 +86,7 @@ private:
      const jni::AutomatonGlue& autglue,
      const HashTable<const jni::EventGlue*,BroadEventRecord*>& eventmap);
   void setupCompactEventList
-    (bool safety,
-     const HashTable<const jni::EventGlue*,BroadEventRecord*>& eventmap);
+    (const HashTable<const jni::EventGlue*,BroadEventRecord*>& eventmap);
 
   //##########################################################################
   //# Data Members

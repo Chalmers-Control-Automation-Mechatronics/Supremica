@@ -108,7 +108,8 @@ runSafetyCheck()
     // const jni::JavaString name(mCache->getEnvironment(), mModel.getName());
     // std::cerr << (const char*) name << std::endl;
     mStartTime = clock();
-    setup(true);
+    mMode = EXPLORER_MODE_SAFETY;
+    setup();
     bool result;
     if (mIsTrivial) {
       result = true;
@@ -143,7 +144,8 @@ runNonblockingCheck()
     // std::cerr << (const char*) name << std::endl;
     mStartTime = clock();
     bool result = true;
-    setup(false);
+    mMode = EXPLORER_MODE_NONBLOCKING;
+    setup();
     if (!mIsTrivial || mTraceState != UNDEF_UINT32) {
       storeInitialStates(false);
       if (mIsTrivial) {
@@ -222,23 +224,30 @@ addStatistics(const jni::VerificationResultGlue& vresult)
 //# ProductExplorer: Auxiliary Methods
 
 void ProductExplorer::
-setup(bool safety)
+setup()
 {
   // Establish automaton encoding ...
-  const int numtags = safety ? 0 : 1;
+  const int numtags = mMode == EXPLORER_MODE_SAFETY ? 0 : 1;
   mEncoding =
     new AutomatonEncoding(mModel, mKindTranslator, mMarking, mCache, numtags);
   // mEncoding->dump();
   mNumAutomata = mEncoding->getNumberOfRecords();
-  mIsTrivial = safety ? !mEncoding->hasSpecs() : mNumAutomata == 0;
+  mIsTrivial =
+    mMode == EXPLORER_MODE_SAFETY ? !mEncoding->hasSpecs() : mNumAutomata == 0;
   if (!mIsTrivial) {
-    if (safety) {
+    switch (mMode) {
+    case EXPLORER_MODE_SAFETY:
       mStateSpace = new StateSpace(mEncoding, mStateLimit);
-    } else {
+      break;
+    case EXPLORER_MODE_NONBLOCKING:
       mStateSpace = new TaggedStateSpace(mEncoding, mStateLimit);
       if (mTransitionLimit > 0) {
         mReverseTransitionStore = new ReverseTransitionStore(mTransitionLimit);
       }
+      break;
+    default:
+      // throw exception ?
+      break;
     }
     mDepthMap = new ArrayList<uint32>(128);
   }

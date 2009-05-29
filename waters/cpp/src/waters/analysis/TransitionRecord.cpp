@@ -49,8 +49,10 @@ TransitionRecord(const AutomatonRecord* aut, TransitionRecord* next)
     mNumNondeterministicSuccessors(0),
     mNondeterministicBuffer(0),
     mNondeterministicSuccessorsShifted(0),
+    mNumNotTaken(0),
     mNextInSearch(next),
-    mNextInUpdate(0)
+    mNextInUpdate(0),
+    mNextInNotTaken(0)
 {
   const uint32 numstates = aut->getNumberOfStates();
   mFlags = new uint32[numstates];
@@ -222,6 +224,7 @@ void TransitionRecord::
 normalize()
 {
   const int numstates = mAutomaton->getNumberOfStates();
+  mNumNotTaken = mWeight;
   if (mWeight == numstates) {
     mWeight = PROBABILITY_1;
   } else {
@@ -251,56 +254,63 @@ getCommonTarget()
   return result;
 }
 
-void TransitionRecord::
+bool TransitionRecord::
 markTransitionTaken(const uint32* tuple)
-  const
 {
   uint32 index = mAutomaton->getAutomatonIndex();
   uint32 code = tuple[index];
-  mFlags[code] |= FLAG_TAKEN;
+  uint32 flags = mFlags[code];
+  if ((flags & FLAG_TAKEN) == 0) {
+    mFlags[code] = flags | FLAG_TAKEN;
+    return --mNumNotTaken == 0;
+  } else {
+    return false;
+  }
 }
 
-void TransitionRecord::
+int TransitionRecord::
 removeTransitionsNotTaken()
 {
-  uint32 numstates = mAutomaton->getNumberOfStates();
-  int shift = mAutomaton->getShift();
-  bool keepnd = false;
-  bool renorm = false;
-  bool onlyself = true;
-  int newweight = 0;
-  for (uint32 source = 0; source < numstates; source++) {
-    if (mFlags[source] & FLAG_TAKEN) {
-      uint32 succ = mDeterministicSuccessorsShifted[source];
-      switch (succ) {
-      case NO_TRANSITION:
-        break;
-      case MULTIPLE_TRANSITIONS:
-        keepnd = true;
-        onlyself = false;
-        newweight++;
-        break;
-      default:
-        onlyself &= (succ == (source << shift));
-        newweight++;
-        break;
-      }      
-    } else {
-      mDeterministicSuccessorsShifted[source] = NO_TRANSITION;
-      renorm = true;
+  if (mNumNotTaken) {
+    uint32 numstates = mAutomaton->getNumberOfStates();
+    int shift = mAutomaton->getShift();
+    bool keepnd = false;
+    bool onlyself = true;
+    int newweight = 0;
+    for (uint32 source = 0; source < numstates; source++) {
+      if (mFlags[source] & FLAG_TAKEN) {
+        uint32 succ = mDeterministicSuccessorsShifted[source];
+        switch (succ) {
+        case NO_TRANSITION:
+          break;
+        case MULTIPLE_TRANSITIONS:
+          keepnd = true;
+          onlyself = false;
+          newweight++;
+          break;
+        default:
+          onlyself &= (succ == (source << shift));
+          newweight++;
+          break;
+        }      
+      } else {
+        mDeterministicSuccessorsShifted[source] = NO_TRANSITION;
+      }
     }
-  }
-  if (renorm) {
+    int removed = mNumNotTaken;
     mWeight = newweight;
     mIsOnlySelfloops = onlyself;
     normalize();
-  }
-  if (!keepnd) {
-    delete [] mNondeterministicBuffer;
-    delete [] mNondeterministicSuccessorsShifted;
-    mNumNondeterministicSuccessors = mNondeterministicBuffer = 0;
-    mNondeterministicBuffer = 0;
-    mNondeterministicSuccessorsShifted = 0;
+    if (!keepnd) {
+      delete [] mNondeterministicBuffer;
+      delete [] mNondeterministicSuccessorsShifted;
+      mNumNondeterministicSuccessors = mNondeterministicBuffer = 0;
+      mNondeterministicBuffer = 0;
+      mNondeterministicSuccessorsShifted = 0;
+    }
+    return removed;
+  } else {
+    return 0;
   }
 }
 

@@ -40,6 +40,7 @@ BroadEventRecord(jni::EventGlue event, bool controllable, int numwords)
     mNumberOfUpdates(0),
     mUsedSearchRecords(0),
     mUnusedSearchRecords(0),
+    mNotTakenSearchRecords(0),
     mNonSelfloopingRecord(0)
 {
   mUpdateRecords = new TransitionUpdateRecord*[numwords];
@@ -64,7 +65,7 @@ BroadEventRecord::
 //# BroadEventRecord: Simple Access
 
 bool BroadEventRecord::
-isSkippable(bool safety)
+isSkippable(ExplorerMode mode)
   const
 {
   if (mIsGloballyDisabled) {
@@ -73,7 +74,7 @@ isSkippable(bool safety)
     return true;
   } else if (mNumNonSelfloopingRecords) {
     return false;
-  } else if (safety) {
+  } else if (mode == EXPLORER_MODE_SAFETY) {
     return isControllable() ? true : !mIsDisabledInSpec;
   } else {
     return true;
@@ -212,8 +213,9 @@ createUpdateRecord(int wordindex)
 }
 
 void BroadEventRecord::
-optimizeTransitionRecordsForSearch(bool safety)
+optimizeTransitionRecordsForSearch(ExplorerMode mode)
 {
+  bool safety = mode == EXPLORER_MODE_SAFETY;
   bool controllable;
   if (safety && !mIsDisabledInSpec) {
     setControllable(true);
@@ -244,11 +246,69 @@ optimizeTransitionRecordsForSearch(bool safety)
 }
 
 void BroadEventRecord::
-markTransitionsTaken(const uint32* tuple)
-  const
+setupNotTakenSearchRecords()
 {
-  markTransitionsTaken(mUsedSearchRecords, tuple);
-  markTransitionsTaken(mUnusedSearchRecords, tuple);
+  TransitionRecord* list = 0;
+  for (TransitionRecord* trans = mUsedSearchRecords;
+       trans != 0;
+       trans = trans->getNextInSearch()) {
+    if (!trans->isOnlySelfloops()) {
+      trans->setNextInNotTaken(list);
+      list = trans;
+    }
+  }
+  for (TransitionRecord* trans = mUnusedSearchRecords;
+       trans != 0;
+       trans = trans->getNextInSearch()) {
+    if (!trans->isOnlySelfloops()) {
+      trans->setNextInNotTaken(list);
+      list = trans;
+    }
+  }
+  mNotTakenSearchRecords = list;
+}
+
+void BroadEventRecord::
+markTransitionsTaken(const uint32* tuple)
+{
+  TransitionRecord* prev = 0;
+  TransitionRecord* trans = mNotTakenSearchRecords;
+  while (trans != 0) {
+    bool alltaken = trans->markTransitionTaken(tuple);
+    if (!alltaken) {
+      prev = trans;
+      trans = trans->getNextInNotTaken();
+    } else if (prev) {
+      trans = trans->getNextInNotTaken();
+      prev->setNextInNotTaken(trans);
+    } else {
+      mNotTakenSearchRecords = trans = trans->getNextInNotTaken();
+    }
+  }
+}
+
+int BroadEventRecord::
+removeTransitionsNotTaken()
+{
+  int result = 0;
+  for (TransitionRecord* trans = mNotTakenSearchRecords;
+       trans != 0;
+       trans = trans->getNextInNotTaken()) {
+    bool det = trans->isDeterministic();
+    result += trans->removeTransitionsNotTaken();
+    if (trans->isAlwaysDisabled()) {
+      mIsGloballyDisabled = true;
+      return result;
+    }
+    if (!mIsDisabledInSpec && !trans->isAlwaysEnabled()) {
+      const AutomatonRecord* aut = trans->getAutomaton();
+      mIsDisabledInSpec = !aut->isPlant();
+    }
+    if (!det && trans->isDeterministic()) {
+      mNumNondeterministicRecords--;
+    }
+  }
+  return result;
 }
 
 bool BroadEventRecord::
@@ -395,16 +455,6 @@ clearSearchAndUpdateRecords()
   for (int w = 0; w < mNumberOfWords; w++) {
     delete mUpdateRecords[w];
     mUpdateRecords[w] = 0;
-  }
-}
-
-void BroadEventRecord::
-markTransitionsTaken(TransitionRecord* trans, const uint32* tuple)
-  const
-{
-  while (trans != 0) {
-    trans->markTransitionTaken(tuple);
-    trans = trans->getNextInSearch();
   }
 }
 

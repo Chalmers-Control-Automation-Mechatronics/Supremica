@@ -21,6 +21,7 @@
 
 #include "jni/glue/EventGlue.h"
 #include "waters/analysis/EventRecord.h"
+#include "waters/analysis/ExplorerMode.h"
 
 
 namespace waters {
@@ -50,7 +51,7 @@ public:
   inline bool isGloballyDisabled() const {return mIsGloballyDisabled;}
   inline bool isDisabledInSpec() const {return mIsDisabledInSpec;}
   inline bool isOnlySelfloops() const {return mNumNonSelfloopingRecords == 0;}
-  bool isSkippable(bool safety) const;
+  bool isSkippable(ExplorerMode mode) const;
   inline bool isDeterministic() const
     {return mNumNondeterministicRecords == 0;}
   inline int getNumberOfUpdates() const {return mNumberOfUpdates;}
@@ -75,9 +76,14 @@ public:
 				     uint32 source, uint32 target);
   void normalize(const AutomatonRecord* aut);
   TransitionUpdateRecord* createUpdateRecord(int wordindex);
-  void optimizeTransitionRecordsForSearch(bool safety);
-  void markTransitionsTaken(const uint32* tuple) const;
+  void optimizeTransitionRecordsForSearch(ExplorerMode mode);
+  void setupNotTakenSearchRecords();
+  void markTransitionsTaken(const uint32* tuple);
+  int removeTransitionsNotTaken();
   bool reverse();
+
+  inline void markTransitionsTakenFast(const uint32* tuple)
+    {if (mNotTakenSearchRecords) markTransitionsTaken(tuple);}
 
   //##########################################################################
   //# Trace Computation
@@ -92,8 +98,6 @@ private:
   void addReversedList(TransitionRecord* trans);
   void enqueueSearchRecord(TransitionRecord* trans);
   void clearSearchAndUpdateRecords();
-  void markTransitionsTaken(TransitionRecord* trans, const uint32* tuple)
-    const;
   void storeNondeterministicTargets(TransitionRecord* trans,
 				    const uint32* sourcetuple,
 				    const uint32* targettuple,
@@ -109,6 +113,7 @@ private:
   int mNumberOfUpdates;
   TransitionRecord* mUsedSearchRecords;
   TransitionRecord* mUnusedSearchRecords;
+  TransitionRecord* mNotTakenSearchRecords;
   TransitionRecord* mNonSelfloopingRecord;
   TransitionUpdateRecord** mUpdateRecords;
   float mProbability;

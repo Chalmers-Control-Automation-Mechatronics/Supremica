@@ -29,6 +29,7 @@
 #include "waters/base/ArrayList.h"
 #include "waters/base/IntTypes.h"
 #include "waters/analysis/AutomatonEncoding.h"
+#include "waters/analysis/ExplorerMode.h"
 #include "waters/analysis/ReverseTransitionStore.h"
 
 
@@ -106,10 +107,16 @@ public:
   inline uint32 getTransitionLimit() const {return mTransitionLimit;}
   inline void setTransitionLimit(uint32 limit) {mTransitionLimit = limit;}
 
+  //##########################################################################
+  //# Simple Access
+  inline ExplorerMode getMode() const {return mMode;}
+  inline const EventRecord* getTraceEvent() const {return mTraceEvent;}
+  inline void setTraceEvent(const EventRecord* event) {mTraceEvent = event;}
+
 protected:
   //##########################################################################
   //# Auxiliary Methods
-  virtual void setup(bool safety);
+  virtual void setup();
   virtual void teardown();
   virtual bool doSafetySearch();
   virtual bool doNonblockingReachabilitySearch();
@@ -125,9 +132,6 @@ protected:
   virtual void setupReverseTransitionRelations() = 0;
   virtual void expandTraceState
     (const uint32* targettuple, const uint32* targetpacked) = 0;
-
-  inline const EventRecord* getTraceEvent() const {return mTraceEvent;}
-  inline void setTraceEvent(const EventRecord* event) {mTraceEvent = event;}
   
   void exploreNonblockingCoreachabilityStateDFS(uint32 target);
   void exploreNonblockingCoreachabilityStateDFS
@@ -171,6 +175,7 @@ private:
   jni::EventGlue mMarking;
   uint32 mStateLimit;
   uint32 mTransitionLimit;
+  ExplorerMode mMode;
   AutomatonEncoding* mEncoding;
   StateSpace* mStateSpace;
   ArrayList<uint32>* mDepthMap;
