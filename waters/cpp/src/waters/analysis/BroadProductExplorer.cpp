@@ -52,17 +52,17 @@ namespace waters {
 //# BroadProductExplorer: Constructors & Destructors
 
 BroadProductExplorer::
-BroadProductExplorer(const jni::ProductDESGlue& des,
+BroadProductExplorer(const jni::ProductDESProxyFactoryGlue& factory,
+                     const jni::ProductDESGlue& des,
                      const jni::KindTranslatorGlue& translator,
                      const jni::EventGlue& marking,
                      jni::ClassCache* cache)
-  : ProductExplorer(des, translator, marking, cache),
+  : ProductExplorer(factory, des, translator, marking, cache),
     mNumEventRecords(0),
     mEventRecords(0),
     mReversedEventRecords(0),
     mMaxUpdates(0),
-    mNondeterministicTransitionIterators(0),
-    mTraceEvent(0)
+    mNondeterministicTransitionIterators(0)
 {
 }
 
@@ -237,7 +237,7 @@ expandSafetyState(const uint32* sourcetuple, const uint32* sourcepacked)
       EXPAND_ENABLED_TRANSITIONS
         (numwords, SOURCE, sourcetuple, sourcepacked, event);
     } else if (!dis->isPlant() && !event->isControllable()) {
-      mTraceEvent = event;
+      setTraceEvent(event);
       return false;
     }
   }
@@ -313,13 +313,6 @@ expandNonblockingCoreachabilityState(const uint32* targettuple,
 #undef ADD_NEW_STATE
 
 
-const jni::EventGlue& BroadProductExplorer::
-getTraceEvent()
-{
-  return mTraceEvent->getJavaEvent();
-}
-
-
 void BroadProductExplorer::
 setupReverseTransitionRelations()
 {
@@ -358,7 +351,7 @@ expandTraceState(const uint32* targettuple, const uint32* targetpacked)
     } while (true);
   } catch (const SearchAbort& abort) {
     // OK. That's what we have been waiting for.
-    mTraceEvent = event;
+    setTraceEvent(event);
   }
 }
 

@@ -23,9 +23,11 @@
 #include "jni/cache/ClassCache.h"
 #include "jni/cache/ClassGlue.h"
 #include "jni/cache/JavaString.h"
+#include "jni/glue/AutomatonGlue.h"
 #include "jni/glue/EventGlue.h"
 #include "jni/glue/IteratorGlue.h"
 #include "jni/glue/KindTranslatorGlue.h"
+#include "jni/glue/MapGlue.h"
 #include "jni/glue/ProductDESGlue.h"
 #include "jni/glue/SetGlue.h"
 #include "jni/glue/StateGlue.h"
@@ -639,6 +641,26 @@ equals(const uint32* encoded1, const uint32* encoded2, const uint32* nmask)
     }
   }
   return true;
+}
+
+
+//############################################################################
+//# AutomatonEncoding: Trace Computation
+
+void AutomatonEncoding::
+storeNondeterministicInitialStates(const uint32* tuple,
+                                   const jni::MapGlue& statemap)
+const
+{
+  for (int a = 0; a < mNumRecords; a++) {
+    const AutomatonRecord* aut = mAutomatonRecords[a];
+    if (aut->getNumberOfInitialStates() > 1) {
+      const uint32 code = tuple[a];
+      const jni::StateGlue& stateglue = aut->getJavaState(code);
+      const jni::AutomatonGlue& autglue = aut->getJavaAutomaton();
+      statemap.put(&autglue, &stateglue);
+    }
+  }
 }
 
 

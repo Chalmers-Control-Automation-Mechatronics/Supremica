@@ -76,7 +76,14 @@ public:
   void normalize(const AutomatonRecord* aut);
   TransitionUpdateRecord* createUpdateRecord(int wordindex);
   void optimizeTransitionRecordsForSearch(bool safety);
+  void markTransitionsTaken(const uint32* tuple) const;
   bool reverse();
+
+  //##########################################################################
+  //# Trace Computation
+  void storeNondeterministicTargets(const uint32* sourcetuple,
+				    const uint32* targettuple,
+				    const jni::MapGlue& map) const;
 
 private:
   //##########################################################################
@@ -85,6 +92,12 @@ private:
   void addReversedList(TransitionRecord* trans);
   void enqueueSearchRecord(TransitionRecord* trans);
   void clearSearchAndUpdateRecords();
+  void markTransitionsTaken(TransitionRecord* trans, const uint32* tuple)
+    const;
+  void storeNondeterministicTargets(TransitionRecord* trans,
+				    const uint32* sourcetuple,
+				    const uint32* targettuple,
+				    const jni::MapGlue& map) const;
 
   //##########################################################################
   //# Data Members

@@ -23,6 +23,10 @@
 #include "waters/base/LinkedRecordList.h"
 
 
+namespace jni {
+  class MapGlue;
+}
+
 namespace waters {
 
 class AutomatonRecord;
@@ -67,6 +71,7 @@ public:
   inline void setNextInSearch(TransitionRecord* next) {mNextInSearch = next;}
   inline TransitionRecord* getNextInUpdate() const {return mNextInUpdate;}
   inline void setNextInUpdate(TransitionRecord* next) {mNextInUpdate = next;}
+  void copyFlags(const TransitionRecord* trans);
 
   //##########################################################################
   //# Comparing and Hashing
@@ -83,8 +88,16 @@ public:
   bool addDeterministicTransition(uint32 source, uint32 target);
   void addNondeterministicTransition(uint32 source, uint32 target);
   void normalize();
-  void removeSelfloops();
   uint32 getCommonTarget() const;
+  void markTransitionTaken(const uint32* tuple) const;
+  void removeTransitionsNotTaken();
+  void removeSelfloops();
+
+  //##########################################################################
+  //# Trace Computation
+  void storeNondeterministicTarget(const uint32* sourcetuple,
+				   const uint32* targettuple,
+				   const jni::MapGlue& statemap) const;
 
   //##########################################################################
   //# Class Constants
@@ -101,6 +114,7 @@ private:
   const AutomatonRecord* mAutomaton;
   int mWeight;
   bool mIsOnlySelfloops;
+  uint32* mFlags;
   uint32* mDeterministicSuccessorsShifted;
   uint32* mNumNondeterministicSuccessors;
   uint32* mNondeterministicBuffer;
@@ -110,6 +124,9 @@ private:
 
   //##########################################################################
   //# Class Constants
+  static const uint32 FLAG_NONDET = 0x00000001;
+  static const uint32 FLAG_TAKEN = 0x00000002;
+
   static const int PROBABILITY_1 = 0x40000000;
   static const float PROBABILITY_ADJUST = 1.0f / PROBABILITY_1;
 

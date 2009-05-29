@@ -243,6 +243,14 @@ optimizeTransitionRecordsForSearch(bool safety)
   mUsedSearchRecords = list.getHead();
 }
 
+void BroadEventRecord::
+markTransitionsTaken(const uint32* tuple)
+  const
+{
+  markTransitionsTaken(mUsedSearchRecords, tuple);
+  markTransitionsTaken(mUnusedSearchRecords, tuple);
+}
+
 bool BroadEventRecord::
 reverse()
 {
@@ -272,7 +280,23 @@ reverse()
 
 
 //############################################################################
-//# BroadEventRecord: Set up
+//# BroadEventRecord: Trace Computation
+
+void BroadEventRecord::
+storeNondeterministicTargets(const uint32* sourcetuple,
+                             const uint32* targettuple,
+                             const jni::MapGlue& map)
+  const
+{
+  storeNondeterministicTargets
+    (mUsedSearchRecords, sourcetuple, targettuple, map);
+  storeNondeterministicTargets
+    (mUnusedSearchRecords, sourcetuple, targettuple, map);
+}
+
+
+//############################################################################
+//# BroadEventRecord: Auxiliary Methods
 
 void BroadEventRecord::
 relink(TransitionRecord* trans)
@@ -316,6 +340,7 @@ addReversedList(TransitionRecord* trans)
         const uint32 numstates = aut->getNumberOfStates();
         const int shift = aut->getShift();
         TransitionRecord* reversed = new TransitionRecord(aut, 0);
+        reversed->copyFlags(trans);
         int maxpass = 1;
         for (int pass = 1; pass <= maxpass; pass++) {
           for (uint32 source = 0; source < numstates; source++) {
@@ -370,6 +395,29 @@ clearSearchAndUpdateRecords()
   for (int w = 0; w < mNumberOfWords; w++) {
     delete mUpdateRecords[w];
     mUpdateRecords[w] = 0;
+  }
+}
+
+void BroadEventRecord::
+markTransitionsTaken(TransitionRecord* trans, const uint32* tuple)
+  const
+{
+  while (trans != 0) {
+    trans->markTransitionTaken(tuple);
+    trans = trans->getNextInSearch();
+  }
+}
+
+void BroadEventRecord::
+storeNondeterministicTargets(TransitionRecord* trans,
+                             const uint32* sourcetuple,
+                             const uint32* targettuple,
+                             const jni::MapGlue& map)
+  const
+{
+  while (trans != 0) {
+    trans->storeNondeterministicTarget(sourcetuple, targettuple, map);
+    trans = trans->getNextInSearch();
   }
 }
 

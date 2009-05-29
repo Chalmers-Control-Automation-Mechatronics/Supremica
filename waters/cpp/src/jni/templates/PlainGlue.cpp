@@ -189,7 +189,7 @@ $MSPC     $ $ENDIF $ENDFOR)
   jobject javaobject = getJavaObject();
 $FOREACH-ARG
 $IF-GLUE
-  jobject obj_$ARGNAME = arg_$ARGNAME->getJavaObject();
+  jobject obj_$ARGNAME$ = arg_$ARGNAME$ ? arg_$ARGNAME->getJavaObject() : 0;
 $ENDIF
 $ENDFOR
   $IF-NONVOID $JNITYPENAME$ result = $IF-STRING(jstring) $ENDIF $ENDIF $=

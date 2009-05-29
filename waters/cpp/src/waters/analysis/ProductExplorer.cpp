@@ -23,13 +23,17 @@
 #include "jni/glue/ConflictKindGlue.h"
 #include "jni/glue/ConflictTraceGlue.h"
 #include "jni/glue/EventGlue.h"
+#include "jni/glue/HashMapGlue.h"
 #include "jni/glue/LinkedListGlue.h"
 #include "jni/glue/NativeConflictCheckerGlue.h"
 #include "jni/glue/NativeSafetyVerifierGlue.h"
 #include "jni/glue/SafetyTraceGlue.h"
+#include "jni/glue/SetGlue.h"
+#include "jni/glue/TraceStepGlue.h"
 #include "jni/glue/VerificationResultGlue.h"
 
 #include "waters/analysis/BroadProductExplorer.h"
+#include "waters/analysis/EventRecord.h"
 #include "waters/analysis/ProductExplorer.h"
 #include "waters/analysis/StateSpace.h"
 #include "waters/analysis/TransitionRecord.h"
@@ -52,11 +56,13 @@ const uint32 ProductExplorer::TAG_COREACHABLE = AutomatonEncoding::TAG0;
 //# ProductExplorer: Constructors & Destructors
 
 ProductExplorer::
-ProductExplorer(const jni::ProductDESGlue& des,
+ProductExplorer(const jni::ProductDESProxyFactoryGlue& factory,
+                const jni::ProductDESGlue& des,
 		const jni::KindTranslatorGlue& translator,
                 const jni::EventGlue& marking,
 		jni::ClassCache* cache)
   : mCache(cache),
+    mFactory(factory),
     mModel(des),
     mKindTranslator(translator),
     mMarking(marking),
@@ -72,6 +78,7 @@ ProductExplorer(const jni::ProductDESGlue& des,
     mDFSStack(0),
     mDFSStackSize(0),
     mTraceList(0),
+    mTraceEvent(0),
     mTraceState(UNDEF_UINT32),
     mTraceLimit(UNDEF_UINT32),
     mConflictKind(jni::ConflictKind_CONFLICT)
@@ -111,8 +118,10 @@ runSafetyCheck()
       if (!result) {
         mTraceStartTime = clock();
         mTraceList = new jni::LinkedListGlue(mCache);
-        const jni::EventGlue& eventglue = getTraceEvent();
-        mTraceList->add(0, &eventglue);
+        const jni::EventGlue& event = mTraceEvent->getJavaEvent();
+        jni::TraceStepGlue step =
+          mFactory.createTraceStepProxyGlue(&event, mCache);
+        mTraceList->add(0, &step);
         const uint32 level = mDepthMap->size() - 2;
         computeCounterExample(*mTraceList, level);
       }
@@ -165,22 +174,23 @@ runNonblockingCheck()
 }
 
 jni::SafetyTraceGlue ProductExplorer::
-getSafetyCounterExample(const jni::ProductDESProxyFactoryGlue& factory,
-                        jstring name)
+getSafetyCounterExample(jstring name)
   const
 {
-  return factory.createSafetyTraceProxyGlue(name, &mModel, mTraceList, mCache);
+  const jni::SetGlue automata = mModel.getAutomataGlue(mCache);
+  return mFactory.createSafetyTraceProxyGlue
+    (name, 0, 0, &mModel, &automata, mTraceList, mCache);
 }
 
 
 jni::ConflictTraceGlue ProductExplorer::
-getConflictCounterExample(const jni::ProductDESProxyFactoryGlue& factory,
-                          jstring name)
+getConflictCounterExample(jstring name)
   const
 {
-  jni::ConflictKindGlue kind(mConflictKind, mCache);
-  return factory.createConflictTraceProxyGlue(name, &mModel,
-                                              mTraceList, &kind, mCache);
+  const jni::SetGlue automata = mModel.getAutomataGlue(mCache);
+  const jni::ConflictKindGlue kind(mConflictKind, mCache);
+  return mFactory.createConflictTraceProxyGlue
+    (name, 0, 0, &mModel, &automata, mTraceList, &kind, mCache);
 }
 
 
@@ -233,6 +243,7 @@ setup(bool safety)
     mDepthMap = new ArrayList<uint32>(128);
   }
   mNumStates = 0;
+  mTraceEvent = 0;
   mTraceState = UNDEF_UINT32;
   mConflictKind = jni::ConflictKind_CONFLICT;
 }
@@ -254,6 +265,7 @@ teardown()
   delete [] mDFSStack;
   mDFSStack = 0;
   mDFSStackSize = 0;
+  mTraceEvent = 0;
 }
 
 
@@ -381,21 +393,40 @@ computeCounterExample(const jni::ListGlue& list, uint32 level)
 {
   if (level > 0) {
     setupReverseTransitionRelations();
-    uint32* targettuple = new uint32[mNumAutomata];
-    try {
-      do {
-        mTraceLimit = mDepthMap->get(level);
-        const uint32* targetpacked = mStateSpace->get(mTraceState);
-        mEncoding->decode(targetpacked, targettuple);
-        expandTraceState(targettuple, targetpacked);
-        const jni::EventGlue& eventglue = getTraceEvent();
-        list.add(0, &eventglue);
-      } while (level-- > 1);
-      delete [] targettuple;
-    } catch (...) {
-      delete [] targettuple;
-      throw;
+  }
+  uint32* buffers = new uint32[2 * mNumAutomata];
+  try {
+    jni::HashMapGlue statemap(mNumAutomata, mCache);
+    uint32* sourcetuple = buffers;
+    uint32* targettuple = &buffers[mNumAutomata];
+    uint32* targetpacked = mStateSpace->get(mTraceState);
+    mEncoding->decode(targetpacked, targettuple);
+    while (level > 0) {
+      mTraceLimit = mDepthMap->get(level);
+      expandTraceState(targettuple, targetpacked);
+      uint32* sourcepacked = mStateSpace->get(mTraceState);
+      mEncoding->decode(sourcepacked, sourcetuple);
+      mTraceEvent->storeNondeterministicTargets
+        (sourcetuple, targettuple, statemap);
+      const jni::EventGlue& event = mTraceEvent->getJavaEvent();
+      jni::TraceStepGlue step =
+        mFactory.createTraceStepProxyGlue(&event, &statemap, mCache);
+      statemap.clear();
+      list.add(0, &step);
+      uint32* tmp = sourcetuple;
+      sourcetuple = targettuple;
+      targettuple = tmp;
+      targetpacked = sourcepacked;
+      level--;
     }
+    mEncoding->storeNondeterministicInitialStates(targettuple, statemap);
+    jni::TraceStepGlue step =
+      mFactory.createTraceStepProxyGlue(0, &statemap, mCache);
+    list.add(0, &step);
+    delete[] buffers;
+  } catch (...) {
+    delete[] buffers;
+    throw;
   }
 }
 
@@ -578,11 +609,14 @@ Java_net_sourceforge_waters_cpp_analysis_NativeSafetyVerifier_runNativeAlgorithm
     jni::ClassCache cache(env);
     try {
       jni::NativeSafetyVerifierGlue gchecker(jchecker, &cache);
+      jni::ProductDESProxyFactoryGlue factory =
+        gchecker.getFactoryGlue(&cache);
       jni::ProductDESGlue des = gchecker.getModelGlue(&cache);
       jni::KindTranslatorGlue translator =
         gchecker.getKindTranslatorGlue(&cache);
       jni::EventGlue marking(0, &cache);
-      waters::BroadProductExplorer checker(des, translator, marking, &cache);
+      waters::BroadProductExplorer checker(factory, des, translator, marking,
+                                           &cache);
       const int limit = gchecker.getNodeLimit();
       if (limit != UNDEF_INT32) {
         checker.setStateLimit(limit);
@@ -593,11 +627,8 @@ Java_net_sourceforge_waters_cpp_analysis_NativeSafetyVerifier_runNativeAlgorithm
         checker.addStatistics(vresult);
         return vresult.returnJavaObject();
       } else {
-        jni::ProductDESProxyFactoryGlue factory =
-          gchecker.getFactoryGlue(&cache);
         jstring name = gchecker.getTraceName();
-        jni::SafetyTraceGlue trace =
-          checker.getSafetyCounterExample(factory, name);
+        jni::SafetyTraceGlue trace = checker.getSafetyCounterExample(name);
         jni::VerificationResultGlue vresult(result, &trace, &cache);
         checker.addStatistics(vresult);
         return vresult.returnJavaObject();
@@ -620,11 +651,14 @@ Java_net_sourceforge_waters_cpp_analysis_NativeConflictChecker_runNativeAlgorith
     jni::ClassCache cache(env);
     try {
       jni::NativeConflictCheckerGlue gchecker(jchecker, &cache);
+      jni::ProductDESProxyFactoryGlue factory =
+        gchecker.getFactoryGlue(&cache);
       jni::ProductDESGlue des = gchecker.getModelGlue(&cache);
       jni::KindTranslatorGlue translator =
         gchecker.getKindTranslatorGlue(&cache);
       jni::EventGlue marking = gchecker.getUsedMarkingPropositionGlue(&cache);
-      waters::BroadProductExplorer checker(des, translator, marking, &cache);
+      waters::BroadProductExplorer checker(factory, des, translator, marking,
+                                           &cache);
       const int slimit = gchecker.getNodeLimit();
       if (slimit != UNDEF_INT32) {
         checker.setStateLimit(slimit);
@@ -639,11 +673,8 @@ Java_net_sourceforge_waters_cpp_analysis_NativeConflictChecker_runNativeAlgorith
         checker.addStatistics(vresult);
         return vresult.returnJavaObject();
       } else {
-        jni::ProductDESProxyFactoryGlue factory =
-          gchecker.getFactoryGlue(&cache);
         jstring name = gchecker.getTraceName();
-        jni::ConflictTraceGlue trace =
-          checker.getConflictCounterExample(factory, name);
+        jni::ConflictTraceGlue trace = checker.getConflictCounterExample(name);
         jni::VerificationResultGlue vresult(result, &trace, &cache);
         checker.addStatistics(vresult);
         return vresult.returnJavaObject();

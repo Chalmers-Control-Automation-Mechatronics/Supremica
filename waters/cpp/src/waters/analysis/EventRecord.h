@@ -26,6 +26,7 @@
 namespace jni {
   class ClassCache;
   class JavaString;
+  class MapGlue;
 }
 
 
@@ -78,6 +79,12 @@ public:
   //# Comparing and Hashing
   int compareTo(const EventRecord* partner) const;
   static const HashAccessor* getHashAccessor() {return &theHashAccessor;}
+
+  //##########################################################################
+  //# Trace Computation
+  virtual void storeNondeterministicTargets(const uint32* sourcetuple,
+					    const uint32* targettuple,
+					    const jni::MapGlue& map) const = 0;
 
 private:
   //##########################################################################

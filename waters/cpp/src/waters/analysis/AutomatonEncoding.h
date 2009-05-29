@@ -30,6 +30,7 @@ namespace jni {
   class EventGlue;
   class JavaString;
   class KindTranslatorGlue;
+  class MapGlue;
   class ProductDESGlue;
   class StateGlue;
 }
@@ -216,6 +217,11 @@ public:
     {encoded[0] |= tag;}
   inline void clearTag(uint32* encoded, const uint32 tag) const
     {encoded[0] &= ~tag;}
+
+  //##########################################################################
+  //# Trace Computation
+  void storeNondeterministicInitialStates
+    (const uint32* tuple, const jni::MapGlue& statemap) const;
 
   //##########################################################################
   //# Debug Output

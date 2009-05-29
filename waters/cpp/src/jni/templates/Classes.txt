@@ -22,6 +22,13 @@ glue class Exception {}
 
 
 //###########################################################################
+package java.net;
+//###########################################################################
+
+ref class URI {}
+
+
+//###########################################################################
 package java.util;
 //###########################################################################
 
@@ -42,6 +49,11 @@ glue class List extends Collection {
 
 glue class Set extends Collection {}
 
+glue class Map {
+  void clear();
+  Object put(glue Object key, glue Object value);
+}
+
 glue class Collections {
   static glue List emptyList();
   static glue Set emptySet();
@@ -51,6 +63,10 @@ glue class LinkedList extends List {
   LinkedList();
 }
 
+glue class HashMap extends Map {
+  HashMap();
+  HashMap(int initialCapacity);
+}
 
 //###########################################################################
 package net.sourceforge.waters.xsd.base;
@@ -112,6 +128,9 @@ glue class ProductDESProxy extends NamedProxy {
 glue class TraceProxy {
 }
 
+glue class TraceStepProxy {
+}
+
 glue class SafetyTraceProxy extends TraceProxy {
 }
 
@@ -124,6 +143,17 @@ glue class ProductDESProxyFactory {
 					   glue Collection events,
 					   glue Collection states,
 					   glue Collection transitions);
+  glue ConflictTraceProxy createConflictTraceProxy(String name,
+						   glue ProductDESProxy des,
+						   glue List events,
+						   glue ConflictKind kind);
+  glue ConflictTraceProxy createConflictTraceProxy(String name,
+						   String comment,
+						   URI location,
+						   glue ProductDESProxy des,
+						   glue Collection automata,
+						   glue List steps,
+						   glue ConflictKind kind);
   glue EventProxy createEventProxy(String name, glue EventKind kind);
   glue ProductDESProxy createProductDESProxy(String name,
 					     glue Collection events,
@@ -132,10 +162,15 @@ glue class ProductDESProxyFactory {
   glue SafetyTraceProxy createSafetyTraceProxy(String name,
 					       glue ProductDESProxy des,
 					       glue List events);
-  glue ConflictTraceProxy createConflictTraceProxy(String name,
-						   glue ProductDESProxy des,
-						   glue List events,
-						   glue ConflictKind kind);
+  glue SafetyTraceProxy createSafetyTraceProxy(String name,
+					       String comment,
+					       URI location,
+					       glue ProductDESProxy des,
+					       glue Collection automata,
+					       glue List steps);
+  glue TraceStepProxy createTraceStepProxy(glue EventProxy event);
+  glue TraceStepProxy createTraceStepProxy(glue EventProxy event,
+					   glue Map statemap);
 }
 
 

@@ -44,6 +44,7 @@ namespace jni {
 
 namespace waters {
 
+class EventRecord;
 class StateSpace;
 
 
@@ -82,7 +83,8 @@ class ProductExplorer
 public:
   //##########################################################################
   //# Constructors & Destructors
-  explicit ProductExplorer(const jni::ProductDESGlue& des,
+  explicit ProductExplorer(const jni::ProductDESProxyFactoryGlue& factory,
+			   const jni::ProductDESGlue& des,
 			   const jni::KindTranslatorGlue& translator,
 			   const jni::EventGlue& marking,
 			   jni::ClassCache* cache);
@@ -93,10 +95,8 @@ public:
   //# Invocation
   virtual bool runSafetyCheck();
   virtual bool runNonblockingCheck();
-  virtual jni::SafetyTraceGlue getSafetyCounterExample
-    (const jni::ProductDESProxyFactoryGlue& factory, jstring name) const;
-  virtual jni::ConflictTraceGlue getConflictCounterExample
-    (const jni::ProductDESProxyFactoryGlue& factory, jstring name) const;
+  virtual jni::SafetyTraceGlue getSafetyCounterExample(jstring name) const;
+  virtual jni::ConflictTraceGlue getConflictCounterExample(jstring name) const;
   virtual void addStatistics(const jni::VerificationResultGlue& vresult) const;
 
   //##########################################################################
@@ -122,10 +122,12 @@ protected:
     (uint32 source, const uint32* sourcetuple, const uint32* sourcepacked) = 0;
   virtual void expandNonblockingCoreachabilityState
     (const uint32* targettuple, const uint32* targetpacked) = 0;
-  virtual const jni::EventGlue& getTraceEvent() = 0;
   virtual void setupReverseTransitionRelations() = 0;
   virtual void expandTraceState
     (const uint32* targettuple, const uint32* targetpacked) = 0;
+
+  inline const EventRecord* getTraceEvent() const {return mTraceEvent;}
+  inline void setTraceEvent(const EventRecord* event) {mTraceEvent = event;}
   
   void exploreNonblockingCoreachabilityStateDFS(uint32 target);
   void exploreNonblockingCoreachabilityStateDFS
@@ -163,6 +165,7 @@ private:
   //##########################################################################
   //# Data Members
   jni::ClassCache* mCache;
+  jni::ProductDESProxyFactoryGlue mFactory;
   jni::ProductDESGlue mModel;
   jni::KindTranslatorGlue mKindTranslator;
   jni::EventGlue mMarking;
@@ -181,6 +184,7 @@ private:
   uint32 mDFSStackSize;
   uint32 mDFSStackPos;
   jni::ListGlue* mTraceList;
+  const EventRecord* mTraceEvent;
   uint32 mTraceState;
   uint32 mTraceLimit;
   jni::ConflictKind mConflictKind;

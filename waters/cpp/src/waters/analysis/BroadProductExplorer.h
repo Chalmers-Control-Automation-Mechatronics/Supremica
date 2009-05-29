@@ -52,7 +52,8 @@ class BroadProductExplorer : public ProductExplorer
 public:
   //##########################################################################
   //# Constructors & Destructors
-  explicit BroadProductExplorer(const jni::ProductDESGlue& des,
+  explicit BroadProductExplorer(const jni::ProductDESProxyFactoryGlue& factory,
+				const jni::ProductDESGlue& des,
 				const jni::KindTranslatorGlue& translator,
 				const jni::EventGlue& marking,
 				jni::ClassCache* cache);
@@ -69,7 +70,6 @@ protected:
     (uint32 source, const uint32* sourcetuple, const uint32* sourcepacked);
   virtual void expandNonblockingCoreachabilityState
     (const uint32* targettuple, const uint32* targetpacked);
-  virtual const jni::EventGlue& getTraceEvent();
   virtual void setupReverseTransitionRelations();
   virtual void expandTraceState
     (const uint32* targettuple,	const uint32* targetpacked);
@@ -96,7 +96,6 @@ private:
   BroadEventRecord** mReversedEventRecords;
   int mMaxUpdates;
   NondeterministicTransitionIterator* mNondeterministicTransitionIterators;
-  const BroadEventRecord* mTraceEvent;
   uint32 mTraceLimit;
 };
 
