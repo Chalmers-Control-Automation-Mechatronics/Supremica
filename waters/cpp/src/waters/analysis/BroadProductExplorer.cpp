@@ -271,7 +271,7 @@ expandSafetyState(const uint32* sourcetuple, const uint32* sourcepacked)
       if (code == getNumberOfStates()) {                                \
         bufferpacked = getStateSpace().prepare(incNumberOfStates());    \
       }                                                                 \
-      ADD_TRANSITION(source, code);                                     \
+      ADD_TRANSITION_ALLOC(source, code);                                     \
     }                                                                   \
   }
 
@@ -285,13 +285,26 @@ expandNonblockingReachabilityState(uint32 source,
   if (getTransitionLimit() > 0) {
 #   define ADD_TRANSITION(source, target) \
       addCoreachabilityTransition(source, target)
+#   define ADD_TRANSITION_ALLOC ADD_TRANSITION
     EXPAND(numwords, source, sourcetuple, sourcepacked);
 #   undef ADD_TRANSITION
+#   undef ADD_TRANSITION_ALLOC
   } else {
-#   define ADD_TRANSITION(source, target) \
-      incNumberOfTransitions(); event->markTransitionsTakenFast(sourcetuple)
+    bool markedoff = false;
+#   define ADD_TRANSITION(source, target) {                             \
+      incNumberOfTransitions();                                         \
+      event->markTransitionsTakenFast(sourcetuple);                     \
+    }
+#   define ADD_TRANSITION_ALLOC(source, target) {                       \
+      incNumberOfTransitions();                                         \
+      if (!markedoff) {                                                 \
+        event->markTransitionsTakenFast(sourcetuple);                   \
+        markedoff = true;                                               \
+      }                                                                 \
+    }
     EXPAND(numwords, source, sourcetuple, sourcepacked);
 #   undef ADD_TRANSITION
+#   undef ADD_TRANSITION_ALLOC
   }
   if (getConflictKind() != jni::ConflictKind_DEADLOCK) {
     return true;

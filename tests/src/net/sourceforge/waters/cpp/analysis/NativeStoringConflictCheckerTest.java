@@ -2,7 +2,7 @@
 //###########################################################################
 //# PROJECT: Waters
 //# PACKAGE: net.sourceforge.waters.cpp.analysis
-//# CLASS:   NativeConflictCheckerTest
+//# CLASS:   NativeStoringConflictCheckerTest
 //###########################################################################
 //# $Id$
 //###########################################################################
@@ -17,7 +17,7 @@ import net.sourceforge.waters.model.analysis.ConflictChecker;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 
 
-public class NativeConflictCheckerTest
+public class NativeStoringConflictCheckerTest
   extends AbstractConflictCheckerTest
 {
 
@@ -25,7 +25,8 @@ public class NativeConflictCheckerTest
   //# Entry points in junit.framework.TestCase
   public static Test suite()
   {
-    final TestSuite suite = new TestSuite(NativeConflictCheckerTest.class);
+    final TestSuite suite =
+      new TestSuite(NativeStoringConflictCheckerTest.class);
     return suite;
   }
 
