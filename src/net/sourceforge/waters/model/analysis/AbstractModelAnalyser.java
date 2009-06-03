@@ -9,6 +9,11 @@
 
 package net.sourceforge.waters.model.analysis;
 
+import java.util.Collection;
+import java.util.Collections;
+
+import net.sourceforge.waters.model.des.AutomatonProxy;
+import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 
@@ -42,7 +47,7 @@ public abstract class AbstractModelAnalyser implements ModelAnalyser
 
 
   //#########################################################################
-  //# Simple Acess Methods
+  //# Simple Access Methods
   public ProductDESProxyFactory getFactory()
   {
     return mFactory;
@@ -57,6 +62,12 @@ public abstract class AbstractModelAnalyser implements ModelAnalyser
   {
     mModel = model;
     clearAnalysisResult();
+  }
+
+  public void setModel(final AutomatonProxy aut)
+  {
+    ProductDESProxy des = createProductDESProxy(aut, mFactory);
+    setModel(des);
   }
 
   public void setNodeLimit(final int limit)
@@ -79,6 +90,17 @@ public abstract class AbstractModelAnalyser implements ModelAnalyser
     return mTransitionLimit;
   }
 
+
+  //#########################################################################
+  //# Auxiliary Static Methods
+  public static ProductDESProxy createProductDESProxy
+    (final AutomatonProxy aut, final ProductDESProxyFactory factory)
+  {
+    final String name = aut.getName();
+    final Collection<EventProxy> events = aut.getEvents();
+    final Collection<AutomatonProxy> automata = Collections.singletonList(aut);
+    return factory.createProductDESProxy(name, events, automata);
+  }
 
 
   //#########################################################################

@@ -9,6 +9,7 @@
 
 package net.sourceforge.waters.model.analysis;
 
+import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 
@@ -22,6 +23,9 @@ import net.sourceforge.waters.model.des.ProductDESProxyFactory;
  * satisfied, or a synthesis operation that computes some new automaton
  * from the input model.</P>
  *
+ * <P>The input model may contain several automata, in which case the
+ * system to be analysed is their synchronous product.</P>
+ *
  * @author Robi Malik
  */
 
@@ -33,7 +37,7 @@ public interface ModelAnalyser
   /**
    * Runs the analysis operation associated with this model analyser.
    * @return <CODE>true</CODE> if analysis was completed with successful
-   *         result, <CODE>false</CODE> if alaysis was completed with
+   *         result, <CODE>false</CODE> if analysis was completed with
    *         unsuccessful result,
    * @throws NullPointerException to indicate that no model has been
    *         specified.
@@ -61,6 +65,13 @@ public interface ModelAnalyser
    * Sets a new model to be investigated by this model analyser.
    */
   public void setModel(ProductDESProxy model);
+
+  /**
+   * Sets a new automaton to be investigated by this model analyser.
+   * This method creates initialises the model analyser to check a model
+   * consisting of a single automaton.
+   */
+  public void setModel(AutomatonProxy aut);
 
 
   //#########################################################################

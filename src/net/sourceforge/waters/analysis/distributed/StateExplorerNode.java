@@ -269,7 +269,7 @@ public class StateExplorerNode implements Runnable
    * Generate transition tables for a kind of automaton in a model.
    * This allows you to build a list of the transition relation for
    * all the plants or specifications in the model.
-   * @param The kind of automaton to generate transition tables for.
+   * @param  kind    The kind of automaton to generate transition tables for.
    * @return An array of transition tables.
    */
   protected TransitionTable[] generateTransitionTables(int kind)
