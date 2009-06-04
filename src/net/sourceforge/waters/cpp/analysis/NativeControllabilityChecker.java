@@ -16,6 +16,8 @@ import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 
 
 /**
+ * <P>A monolithic controllability checker implementation, written in C++.</P>
+ *
  * @author Robi Malik
  */
 

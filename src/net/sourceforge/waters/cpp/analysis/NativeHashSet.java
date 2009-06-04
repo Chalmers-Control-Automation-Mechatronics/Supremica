@@ -14,8 +14,6 @@ import java.util.Iterator;
 
 
 /**
- * <P>The abstract base class of all native model analysers.</P>
- *
  * @author Robi Malik
  */
 

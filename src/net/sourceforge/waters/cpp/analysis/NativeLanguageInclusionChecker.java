@@ -16,6 +16,9 @@ import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 
 
 /**
+ * <P>A monolithic language inclusion checker implementation, written in
+ * C++.</P>
+ *
  * @author Robi Malik
  */
 

@@ -16,7 +16,7 @@ import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 
 
 /**
- * A factory interface for all types of model verifiers.
+ * A model verifier factory that produces model verifiers implemented in C++.
  *
  * @author Robi Malik
  */

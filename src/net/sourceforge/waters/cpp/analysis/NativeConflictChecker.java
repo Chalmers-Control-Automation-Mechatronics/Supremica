@@ -21,12 +21,17 @@ import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 
 
 /**
- * <P>A monolithic conflict checker implementation, written in C++.</P>
+ * <P>A monolithic conflict checker implementation, written in C++. The
+ * native conflict checker implements the standard {@link ConflictChecker}
+ * interface and determines whether a given input model is <I>blocking</I>
+ * or <I>nonblocking</I>.</P>
  *
- * <P><STRONG>Supported Featues.</STRONG></P>
+ * <P><STRONG>Supported Features.</STRONG></P>
  *
  * <P>This implementation supports both deterministic and nondeterministic
- * models. Counterexamples are computed for all blocking models, and
+ * models.</P>
+ *
+ * <P>Counterexamples are computed for all blocking models, and
  * efforts are made to distinguish between deadlock and livelock. If a
  * blocking model contains a state without any outgoing transitions, or
  * with only selfloops outgoing, a trace marked {@link
@@ -75,7 +80,7 @@ import net.sourceforge.waters.model.des.ProductDESProxyFactory;
  *     and an {@link net.sourceforge.waters.model.analysis.OverflowException
  *     OverflowException} is thrown.</LI>
  * <LI>If the transition limit is specified ({@link #setTransitionLimit(int)
- *     setTransitionLimit()}, it defines the maximum number of transitions
+ *     setTransitionLimit()}), it defines the maximum number of transitions
  *     that can be stored. If the transition limit is set to&nbsp;0, no
  *     transitions will be stored during the first pass, and the reverse
  *     transition relation will be computed from the component transitions
