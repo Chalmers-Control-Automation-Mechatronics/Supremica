@@ -468,7 +468,7 @@ public class ControlInformation implements EquipmentStateLookUp {
 		String robot_operation_request_var = machineName + "_Op"
 				+ stateQuery.getState() + "_exe";
 		String robot_operation_feedback_var = machineName + "_Op"
-				+ stateQuery.getState() + "_done";
+				+ stateQuery.getState() + "_exe_done";
 
 		callingVars.setRequestVar(new Var(robot_operation_request_var,
 				Boolean.FALSE));

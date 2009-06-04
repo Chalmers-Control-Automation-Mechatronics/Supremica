@@ -31,6 +31,8 @@ public interface EquipmentStateLookUp {
 //	public convertor.xsd.controlInformation.State getState(
 //			String targetStateName, EquipmentEntity equipmentEntity);
 //	
+	
+//	Still needed?
 	public Object getMachine(String machineName);
 //	public convertor.data. getFBCallingVars(convertor.xsd.physicalResource.Machine machine, convertor.xsd.physicalResource.EquipmentEntity equipmentEntity, convertor.xsd.physicalResource.Element element);
 	
