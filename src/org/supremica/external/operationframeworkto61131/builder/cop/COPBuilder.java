@@ -19,8 +19,6 @@ import org.supremica.external.operationframeworkto61131.main.Constant;
 import org.supremica.manufacturingtables.xsd.rop.Activity;
 import org.supremica.manufacturingtables.xsd.rop.ROP;
 
-
-
 /**
  * COPBuilder.java convert COP to SFC
  * 
@@ -29,7 +27,8 @@ import org.supremica.manufacturingtables.xsd.rop.ROP;
  * @author LC
  * @version 1.0
  */
-public class COPBuilder extends org.supremica.external.operationframeworkto61131.builder.Builder {
+public class COPBuilder extends
+		org.supremica.external.operationframeworkto61131.builder.Builder {
 
 	private COPFBCallingVarsListBuilder copCallingVarListBuilder;
 
@@ -325,16 +324,29 @@ public class COPBuilder extends org.supremica.external.operationframeworkto61131
 		inVar2.connectToIn(blockAND, blockAND.getConnectionPointIn(1),
 				new Position(30, 0));
 
-		org.supremica.external.operationframeworkto61131.util.DebugUtil.printCommonLayoutObject(initStep);
-		org.supremica.external.operationframeworkto61131.util.DebugUtil.printCommonLayoutObject(transition);
+		org.supremica.external.operationframeworkto61131.util.DebugUtil
+				.printCommonLayoutObject(initStep);
+		org.supremica.external.operationframeworkto61131.util.DebugUtil
+				.printCommonLayoutObject(transition);
 
-		org.supremica.external.operationframeworkto61131.util.DebugUtil.printCommonLayoutObject(blockAND);
+		org.supremica.external.operationframeworkto61131.util.DebugUtil
+				.printCommonLayoutObject(blockAND);
 
-		org.supremica.external.operationframeworkto61131.util.DebugUtil.printCommentConnectionIn(transition
-				.getCondition());
+		org.supremica.external.operationframeworkto61131.util.DebugUtil
+				.printCommentConnectionIn(transition.getCondition());
 
-		org.supremica.external.operationframeworkto61131.util.DebugUtil.printCommonLayoutObject(inVar);
-		org.supremica.external.operationframeworkto61131.util.DebugUtil.printCommonLayoutObject(inVar2);
+		org.supremica.external.operationframeworkto61131.util.DebugUtil
+				.printCommonLayoutObject(inVar);
+		org.supremica.external.operationframeworkto61131.util.DebugUtil
+				.printCommonLayoutObject(inVar2);
+	}
+
+	private void testDivergenceNConvergence(List<Object> SFCLiveList) {
+
+		
+		
+		
+		
 	}
 
 	public static void main(String[] args) {

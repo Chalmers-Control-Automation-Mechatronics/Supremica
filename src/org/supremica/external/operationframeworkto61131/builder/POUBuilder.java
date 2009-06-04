@@ -12,13 +12,12 @@ import org.supremica.external.operationframeworkto61131.builder.functionblock.FB
 import org.supremica.external.operationframeworkto61131.builder.interlock.ILBuilder;
 import org.supremica.external.operationframeworkto61131.controlinfo.EquipmentStateLookUp;
 import org.supremica.external.operationframeworkto61131.main.Constant;
+import org.supremica.external.operationframeworkto61131.test.TestDivergenceNConvergence;
 import org.supremica.external.operationframeworkto61131.util.PLCopenUtil;
 import org.supremica.external.operationframeworkto61131.util.log.LogUtil;
 import org.supremica.manufacturingtables.xsd.eop.*;
 import org.supremica.manufacturingtables.xsd.fid.FunctionBlock;
 import org.supremica.manufacturingtables.xsd.rop.ROP;
-
-
 
 //import convertor.xsd.physicalResource.Factory;
 
@@ -54,7 +53,8 @@ public class POUBuilder {
 
 		this.plcopenProject = plcopenProject;
 		plcopenObjectFactory = new org.plcopen.xml.tc6.ObjectFactory();
-		allPouInterfaceVarList = org.supremica.external.operationframeworkto61131.data.VarList.getInstance();
+		allPouInterfaceVarList = org.supremica.external.operationframeworkto61131.data.VarList
+				.getInstance();
 		pouNameList = new LinkedList<String>();
 	}
 
@@ -181,6 +181,13 @@ public class POUBuilder {
 			addToPouInterfaceVarList(copBuilder.getInterfaceVarList());
 			addToPouNameList(pouName);
 		}
+
+		// test divergence
+
+//		org.supremica.external.operationframeworkto61131.test.TestDivergenceNConvergence tt = new TestDivergenceNConvergence();
+//		pous.getPou().add(tt.test(this.getPou("1234", pous)));
+
+		// test end
 
 		types.setPous(pous);
 		plcopenProject.setTypes(types);
@@ -435,7 +442,8 @@ public class POUBuilder {
 	 * communicate with PLC. Existing value pair is updated. New value pair is
 	 * inserted as new pair.
 	 */
-	private void addToIntelligentMachineVariableList(String machineName,
+	private void addToIntelligentMachineVariableList(
+			String machineName,
 			org.supremica.external.operationframeworkto61131.data.VarList exteranlVarList) {
 
 		if (exteranlVarList.getVars().size() > 0) {

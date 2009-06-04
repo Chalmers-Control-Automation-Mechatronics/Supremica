@@ -7,9 +7,8 @@ import org.supremica.external.operationframeworkto61131.data.FBCallingVars;
 import org.supremica.external.operationframeworkto61131.data.FBCallingVarsList;
 import org.supremica.external.operationframeworkto61131.data.StateQuery;
 import org.supremica.external.operationframeworkto61131.data.Var;
+import org.supremica.external.operationframeworkto61131.main.Constant;
 import org.supremica.manufacturingtables.xsd.rop.*;
-
-
 
 /**
  * COPFBCallingVarsListBuilder.java Build the FBCallingVarsList from COP'a
@@ -130,7 +129,9 @@ public class COPFBCallingVarsListBuilder {
 		// For machine with operating system, the expected value is a
 		// operation start variable
 
-		if (equipmentStateLookUp.hasOwnSystem(machine)) {
+		// if (equipmentStateLookUp.hasOwnSystem(machine)) {
+		// FIXME: Need a different name for action of one step of COP ?
+		if (false) {
 
 			StateQuery stateQuery = new StateQuery();
 
@@ -163,7 +164,10 @@ public class COPFBCallingVarsListBuilder {
 			// SFC.Transition
 			// operationCallingVars.setFeedbackVar(null);
 			// Set operation's name to orderVar
-			Var operationRequestVar = new Var("Op_" + opId + "_start",
+
+			String op_action_expression = Constant.SFC_VAR_NAME_PREFIX_OP
+					+ opId + Constant.SFC_VAR_NAME_POSTFIX_START;
+			Var operationRequestVar = new Var(op_action_expression,
 					Boolean.FALSE);
 
 			operationCallingVars.setFeedbackVar(operationRequestVar);
@@ -187,7 +191,9 @@ public class COPFBCallingVarsListBuilder {
 		// FIXME move 'Op' and '_end' to Constant and config.xml
 		FBCallingVars preconditionCallingVars = new FBCallingVars();
 
-		if (equipmentStateLookUp.hasOwnSystem(machine)) {
+		// if (equipmentStateLookUp.hasOwnSystem(machine)) {
+		// FIXME: Need a different name for transition of one step of COP?
+		if (false) {
 
 			StateQuery stateQuery = new StateQuery();
 
@@ -204,8 +210,12 @@ public class COPFBCallingVarsListBuilder {
 					.getFBCallingVars(stateQuery);
 
 		} else {
-			Var preconditoinFeedbackVar = new Var("Op_" + opId + "_end",
+
+			String op_end_expression = Constant.SFC_VAR_NAME_PREFIX_OP + opId
+					+ Constant.SFC_VAR_NAME_POSTFIX_END;
+			Var preconditoinFeedbackVar = new Var(op_end_expression,
 					Boolean.FALSE);
+
 			preconditionCallingVars.setFeedbackVar(preconditoinFeedbackVar);
 			preconditionCallingVars.setRequestVar(preconditoinFeedbackVar);
 			preconditionCallingVars.setTargetState(Boolean.TRUE.toString());

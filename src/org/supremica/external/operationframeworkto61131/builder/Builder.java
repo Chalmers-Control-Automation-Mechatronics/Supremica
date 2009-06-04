@@ -11,8 +11,6 @@ import org.supremica.external.operationframeworkto61131.layout.common.Position;
 import org.supremica.external.operationframeworkto61131.main.Constant;
 import org.supremica.external.operationframeworkto61131.util.log.LogUtil;
 
-
-
 /**
  * Builder.java is the super class of other builder classes. It contains
  * functions that all type of builders have in common: 1. Handle variable list
@@ -59,9 +57,9 @@ public class Builder {
 						.newInstance();
 				//			 
 			} catch (Exception e) {
-
+				// TODO change log level to error
 				log
-						.error("Can not build equipment state look up implement from class:"
+						.debug("Can not build equipment state look up implement from class:"
 								+ Constant.EQUIPMENT_STATE_LOOK_UP_IMPLEMENT);
 
 				return;
@@ -78,13 +76,15 @@ public class Builder {
 	}
 
 	// Duplicate element will be ignored
-	public void addToInterfaceVarList(org.supremica.external.operationframeworkto61131.data.Var var) {
+	public void addToInterfaceVarList(
+			org.supremica.external.operationframeworkto61131.data.Var var) {
 
 		localAllPouInterfaceVarList.append(var);
 	}
 
 	// add a list of var to InterfaceVarList
-	public void addToInterfaceVarList(org.supremica.external.operationframeworkto61131.data.VarList varList) {
+	public void addToInterfaceVarList(
+			org.supremica.external.operationframeworkto61131.data.VarList varList) {
 
 		localAllPouInterfaceVarList.append(varList);
 	}

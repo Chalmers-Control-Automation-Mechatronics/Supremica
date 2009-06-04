@@ -216,7 +216,7 @@ public class FBTypeBuilder extends Builder {
 		pouNameList.add(functionBlockInsanceName);
 
 		List<org.supremica.external.operationframeworkto61131.data.FBConnection> fbConnectionList = ingelligentMachineFB
-				.getFBConnectionList(machineName, listOfCOP, null);
+				.getFBConnectionList(machineName, listOfCOP, null,equipmentStateLookUp);
 		/*
 		 * Only machine with control system needs to communicate with PLC via
 		 * the same variable .The externalVarList here contains variables that

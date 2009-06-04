@@ -6,9 +6,11 @@ import java.util.LinkedList;
 import java.math.BigInteger;
 
 import org.plcopen.xml.tc6.Project;
+import org.supremica.external.operationframeworkto61131.controlinfo.EquipmentStateLookUp;
 import org.supremica.external.operationframeworkto61131.data.FBCallingVars;
 import org.supremica.external.operationframeworkto61131.data.FBCallingVarsList;
 import org.supremica.external.operationframeworkto61131.data.FBConnection;
+import org.supremica.external.operationframeworkto61131.data.StateQuery;
 import org.supremica.external.operationframeworkto61131.data.Var;
 import org.supremica.external.operationframeworkto61131.data.VarList;
 import org.supremica.external.operationframeworkto61131.main.Constant;
@@ -56,7 +58,8 @@ public class IntelligentMachineFB {
 
 	public List<org.supremica.external.operationframeworkto61131.data.FBConnection> getFBConnectionList(
 			String machineName, List<Object> listOfCOP,
-			Project.Types.Pous.Pou pou) {
+			Project.Types.Pous.Pou pou,
+			EquipmentStateLookUp equipmentStateLookUp) {
 
 		// The input pou is used to check if there is manually connected user
 		// connection
@@ -82,15 +85,32 @@ public class IntelligentMachineFB {
 			// inIOType,Class inDataType,String inInitValue){
 
 			// A:65 a:97
+
 			int op_letter_int = 64 + i;
 			char[] op_letterChar = Character.toChars(op_letter_int);
 			String opLetter = String.valueOf(op_letterChar[0]);
 			String opId = listOfOperations.get(i - 1).toString();
 
+			// The variables connected to FB's request and feedback parameters
+			// should be the same as variables in EOP's action and transition.
+			FBCallingVars operationCallingVars = new FBCallingVars();
+			StateQuery stateQuery = new StateQuery();
+			stateQuery.setMachine(machineName);
+			stateQuery.setState(opId);
+			// FIXME in the interlock xml file, the equipment name is not
+			// unique yet. Need to put machine name at the beginning.
+			stateQuery.setEquipmentEntityName(machineName);
+			stateQuery.setEquipmentEntityType(null);
+			operationCallingVars = equipmentStateLookUp
+					.getFBCallingVars(stateQuery);
+
 			// Variable name:C1R1_Op20_exe
 			// Param: op_A_execute
 			// Input
-			String variable_op_number_exe = machineName + "_Op" + opId + "_exe";
+			// String variable_op_number_exe = machineName + "_Op" + opId +
+			// "_exe";
+			String variable_op_number_exe = operationCallingVars
+					.getRequestVar().getName();
 			String param_op_letter_execute = "Op_" + opLetter + "_execute";
 			fbConnectionList.add(new FBConnection(param_op_letter_execute,
 					variable_op_number_exe, this.IOTYPE_INPUT, Boolean.class,
@@ -123,7 +143,9 @@ public class IntelligentMachineFB {
 			// Variable:C1R1_Op20_done
 			// Param: Op_A_done
 			// Output
-			String variable_op_done = machineName + "_Op" + opId + "_done";
+			// String variable_op_done = machineName + "_Op" + opId + "_done";
+			String variable_op_done = operationCallingVars.getFeedbackVar()
+					.getName();
 			String param_op_done = "Op_" + opLetter + "_done";
 			fbConnectionList.add(new FBConnection(param_op_done,
 					variable_op_done, this.IOTYPE_OUTPUT, Boolean.class,
@@ -204,7 +226,8 @@ public class IntelligentMachineFB {
 		Var variable_machine_IL_ok_var = new Var(variable_machine_IL_ok, false);
 		externalVarList.append(variable_machine_IL_ok_var);
 
-//		Add the variable indicating machine is in its initial state to VaraibleList.txt 
+		// Add the variable indicating machine is in its initial state to
+		// VaraibleList.txt
 		externalVarList.append(getMachineInInitialStateVar(machineName)
 				.getFeedbackVarList());
 

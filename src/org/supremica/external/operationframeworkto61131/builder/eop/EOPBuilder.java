@@ -8,6 +8,7 @@ import java.util.List;
 import org.plcopen.xml.tc6.Body;
 import org.plcopen.xml.tc6.PouType;
 import org.plcopen.xml.tc6.Project;
+import org.supremica.external.operationframeworkto61131.builder.Builder;
 import org.supremica.external.operationframeworkto61131.builder.FBCallingQueryBuilder;
 import org.supremica.external.operationframeworkto61131.builder.PouInterfaceBuilder;
 import org.supremica.external.operationframeworkto61131.builder.cop.COPFBCallingVarsListBuilder;
@@ -28,6 +29,7 @@ import org.supremica.manufacturingtables.xsd.eop.Action;
 import org.supremica.manufacturingtables.xsd.eop.EOP;
 import org.supremica.manufacturingtables.xsd.eop.InitialState;
 import org.supremica.manufacturingtables.xsd.eop.Operation;
+import org.supremica.manufacturingtables.xsd.eop.SensorValue;
 import org.supremica.manufacturingtables.xsd.eop.TypeType;
 
 /**
@@ -361,8 +363,11 @@ public class EOPBuilder extends
 
 		FBCallingVarsList callingVarsList = new FBCallingVarsList();
 
-		Var op_end_var = getOPEndCallingVar(operation.getOpID().toString());
-
+//		The name of then EOP end variable is the same as that of the precondition variable of COP 
+		Var op_end_var = COPFBCallingVarsListBuilder
+				.generateCopPreconditionVar(operation.getOpID().toString(),
+						operation.getMachine(), equipmentStateLookUp)
+				.getFeedbackVar();
 		FBCallingVars op_end = new FBCallingVars();
 		op_end.setRequestVar(op_end_var);
 		op_end.setFeedbackVar(op_end_var);
@@ -406,22 +411,23 @@ public class EOPBuilder extends
 		return op_start_var;
 	}
 
-	private Var getOPEndCallingVar(String opId) {
-
-		Var op_end_var = COPFBCallingVarsListBuilder
-				.generateCopPreconditionVar(opId, operation.getMachine(),
-						equipmentStateLookUp).getFeedbackVar();
-
-		String op_end_expression = Constant.SFC_VAR_NAME_PREFIX_OP
-				+ operation.getOpID() + Constant.SFC_VAR_NAME_POSTFIX_END;
-		Var op_end_feedbackVar = new Var(op_end_expression, Boolean.FALSE);
-		FBCallingVars op_end = new FBCallingVars();
-		op_end.setRequestVar(op_end_feedbackVar);
-		op_end.setFeedbackVar(op_end_feedbackVar);
-		op_end.setTargetState(Boolean.TRUE.toString());
-
-		return op_end_var;
-	}
+//	private Var getOPEndCallingVar(String opId) {
+//
+//		Var op_end_var = COPFBCallingVarsListBuilder
+//				.generateCopPreconditionVar(opId, operation.getMachine(),
+//						equipmentStateLookUp).getFeedbackVar();
+//
+//		 String op_end_expression = Constant.SFC_VAR_NAME_PREFIX_OP
+//		 + operation.getOpID() + Constant.SFC_VAR_NAME_POSTFIX_END;
+//		 Var op_end_feedbackVar = new Var(op_end_expression, Boolean.FALSE);
+//		 FBCallingVars op_end = new FBCallingVars();
+//				
+//		 op_end.setRequestVar(op_end_feedbackVar);
+//		 op_end.setFeedbackVar(op_end_feedbackVar);
+//		 op_end.setTargetState(Boolean.TRUE.toString());
+//
+//		return op_end_var;
+//	}
 
 	public static FBCallingVarsList getEOPInitalStateFBCallingVarsList(
 			Operation operation, EquipmentStateLookUp equipmentStateLookUp) {
@@ -528,10 +534,26 @@ public class EOPBuilder extends
 
 		for (FBCallingVars callingVars : callingVarsList.getFBCallingVarsList()) {
 
+			// FIXME remove Sensor state from action step
+			// if (!this.isDuplicateEquipState(callingVars)) {
+			//
+			// if (callingVars.getOwnerType() == null) {
+			//
+			// reducedList.append(callingVars);
+			// } else if (!callingVars.getOwnerType()
+			// .equals(SensorValue.class)) {
+			//
+			// reducedList.append(callingVars);
+			// }
+			//
+			// }
+
 			if (!this.isDuplicateEquipState(callingVars)) {
 
 				reducedList.append(callingVars);
+
 			}
+
 		}
 
 		return reducedList;
