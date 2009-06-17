@@ -27,11 +27,35 @@ public abstract class CommandLineArgument
 
   //#########################################################################
   //# Constructors
+  /**
+   * Creates an optional command line argument.
+   * @param  name          The name of the argument,
+   *                       for example <CODE>&quot;-marking&quot;</CODE>.
+   * @param  description   A textual description of the argument.
+   */
   protected CommandLineArgument(final String name,
                                 final String description)
   {
+    this(name, description, false);
+  }
+
+  /**
+   * Creates a command line argument.
+   * @param  name          The name of the argument,
+   *                       for example <CODE>&quot;-marking&quot;</CODE>.
+   * @param  description   A textual description of the argument.
+   * @param  required      A flag indicating whether this is a required
+   *                       command line argument. The command line tool
+   *                       will not accept command lines that fail to
+   *                       specify all required arguments.
+   */
+  protected CommandLineArgument(final String name,
+                                final String description,
+                                final boolean required)
+  {
     mName = name;
     mDescription = description;
+    mIsRequired = required;
   }
 
 
@@ -58,6 +82,22 @@ public abstract class CommandLineArgument
   protected String getDescription()
   {
     return mDescription;
+  }
+
+  /**
+   * <P>Determines whether this is a required command line argument.</P>
+   * <P>An argument must be required or optional for all model verifiers
+   * of its factory; if more elaborate conditions on arguments are
+   * needed, they have to be implemented by the individual model verifiers.</P>
+   * <P>After parsing all command line arguments, the {@link
+   * ModelVerifierFactory} checks whether all required arguments have been
+   * specified, and if this is not the case, it causes configuration to
+   * fail by calling the {@link #fail(String) fail()} method of the
+   * unspecified required argument.</P>
+   */
+  protected boolean isRequired()
+  {
+    return mIsRequired;
   }
 
 
@@ -132,6 +172,7 @@ public abstract class CommandLineArgument
   //# Data Members
   private final String mName;
   private final String mDescription;
+  private final boolean mIsRequired;
 
 
   //#########################################################################

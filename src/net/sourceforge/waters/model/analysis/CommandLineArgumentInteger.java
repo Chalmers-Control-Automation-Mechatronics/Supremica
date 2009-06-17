@@ -14,6 +14,10 @@ import java.util.Iterator;
 
 /**
  * An integer command line argument passed to a {@link ModelVerifierFactory}.
+ * Integer command line arguments are specified on the command line by their
+ * name followed by an integer value, e.g.,
+ * <CODE>-limit 500000</CODE>. The parsed value is stored
+ * in the <CODE>CommandLineArgumentInteger</CODE> object for retrieval.
  *
  * @author Robi Malik
  */
@@ -24,10 +28,33 @@ public abstract class CommandLineArgumentInteger
 
   //#########################################################################
   //# Constructors
+  /**
+   * Creates an optional command line argument of integer type.
+   * @param  name          The name of the argument,
+   *                       for example <CODE>&quot;-limit&quot;</CODE>.
+   * @param  description   A textual description of the argument.
+   */
   protected CommandLineArgumentInteger(final String name,
                                        final String description)
   {
     super(name, description);
+  }
+
+  /**
+   * Creates a command line argument of integer type.
+   * @param  name          The name of the argument,
+   *                       for example <CODE>&quot;limit&quot;</CODE>.
+   * @param  description   A textual description of the argument.
+   * @param  required      A flag indicating whether this is a required
+   *                       command line argument. The command line tool
+   *                       will not accept command lines that fail to
+   *                       specify all required arguments.
+   */
+  protected CommandLineArgumentInteger(final String name,
+                                       final String description,
+                                      final boolean required)
+  {
+    super(name, description, required);
   }
 
 

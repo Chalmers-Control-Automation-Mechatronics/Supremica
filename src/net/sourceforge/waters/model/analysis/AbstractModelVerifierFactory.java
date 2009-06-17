@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -94,12 +95,15 @@ public abstract class AbstractModelVerifierFactory
   public List<String> configure(final ModelVerifier verifier)
   {
     if (mArgumentList != null && mArgumentMap != null) {
+      Collection<CommandLineArgument> used =
+        new HashSet<CommandLineArgument>();
       final List<String> filenames = new LinkedList<String>();
       final Iterator<String> iter = mArgumentList.iterator();
       while (iter.hasNext()) {
         final String name = iter.next();
         final CommandLineArgument arg = mArgumentMap.get(name);
         if (arg != null) {
+          used.add(arg);
           arg.parse(iter);
           arg.configure(verifier);
         } else if (name.equals("--")) {
@@ -111,6 +115,7 @@ public abstract class AbstractModelVerifierFactory
           filenames.add(name);
         }
       }
+      checkRequiredArguments(used);
       return filenames;
     } else {
       return null;
@@ -120,17 +125,21 @@ public abstract class AbstractModelVerifierFactory
   public void configure(final ModuleCompiler compiler)
   {
     if (mArgumentList != null && mArgumentMap != null) {
+      Collection<CommandLineArgument> used =
+        new HashSet<CommandLineArgument>();
       final Iterator<String> iter = mArgumentList.iterator();
       while (iter.hasNext()) {
         final String name = iter.next();
         final CommandLineArgument arg = mArgumentMap.get(name);
         if (arg != null) {
+          used.add(arg);
           arg.parse(iter);
           arg.configure(compiler);
         } else if (name.equals("--")) {
           break;
         }
       }
+      checkRequiredArguments(used);
     }
   }
 
@@ -146,6 +155,21 @@ public abstract class AbstractModelVerifierFactory
       clsname.substring(dotpos + 1) + " does not support " + 
       checkname + " check!";
     return new UnsupportedOperationException(msg);
+  }
+
+  private void checkRequiredArguments
+    (final Collection<CommandLineArgument> used)
+  {
+    for (final CommandLineArgument arg : mArgumentMap.values()) {
+      if (arg.isRequired() && !used.contains(arg)) {
+        final String clsname = getClass().getName();
+        final int dotpos = clsname.lastIndexOf('.');
+        final String msg =
+          "Required argument " + arg.getName() + " for " +
+          clsname.substring(dotpos + 1) + " not specified!";
+        arg.fail(msg);
+      }
+    }
   }
 
 
