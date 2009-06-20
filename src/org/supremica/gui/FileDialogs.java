@@ -79,6 +79,7 @@ public class FileDialogs
     
     private FileFilter rcpFilter = null;
     private FileFilter xmlFilter = null;
+    private FileFilter stsFilter = null;
     private FileFilter spFilter = null;
     private FileFilter vprjFilter = null;
     private FileFilter vmodFilter = null;
@@ -283,6 +284,16 @@ public class FileDialogs
         fileExporter.resetChoosableFileFilters();
         fileExporter.setFileFilter(fd.getXMLFilter());
         
+        return fileExporter;
+    }
+
+    public static JFileChooser getSTSFileExporter()
+    {
+        JFileChooser fileExporter = fd.getFileExporter();
+
+        fileExporter.resetChoosableFileFilters();
+        fileExporter.setFileFilter(fd.getSTSFilter());
+
         return fileExporter;
     }
     
@@ -508,6 +519,16 @@ public class FileDialogs
         }
         
         return xmlFilter;
+    }
+
+    private FileFilter getSTSFilter()
+    {
+        if (stsFilter == null)
+        {
+            stsFilter = makeFileFilter("", "STS files (*)");
+        }
+
+        return stsFilter;
     }
     
     private FileFilter getSPFilter()

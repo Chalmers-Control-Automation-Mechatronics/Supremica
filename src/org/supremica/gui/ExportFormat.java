@@ -8,5 +8,6 @@ public enum ExportFormat
 	DOT_DEBUG, DSX_DEBUG, SP_DEBUG,
 	HTML_DEBUG, FSM, FSM_DEBUG,
 	PCG, PCG_DEBUG,    // ARASH: process communication graphs
-	SSPC    // ARASH: Sanchez SSPC tool
+	SSPC,    // ARASH: Sanchez SSPC tool
+    STS, STS_DEBUG //Sajed: State Tree Structure introduced by Chuan Ma and Wonham
 }

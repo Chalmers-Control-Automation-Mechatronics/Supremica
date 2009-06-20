@@ -772,7 +772,7 @@ public class ActionMan
                                                 return;
                                                 }
                  */
-        if ((exportMode == ExportFormat.DOT) || (exportMode == ExportFormat.DSX) || (exportMode == ExportFormat.FSM) || (exportMode == ExportFormat.PCG))
+        if ((exportMode == ExportFormat.DOT) || (exportMode == ExportFormat.DSX) || (exportMode == ExportFormat.FSM) || (exportMode == ExportFormat.PCG) || (exportMode == ExportFormat.STS))
         {
             for (Iterator autIt = selectedAutomata.iterator();
             autIt.hasNext(); )
@@ -817,6 +817,10 @@ public class ActionMan
         {
             fileExporter = FileDialogs.getExportFileChooser(FileFormats.FSM);
         }
+        else if (exportMode == ExportFormat.STS)
+        {
+            fileExporter = FileDialogs.getExportFileChooser(FileFormats.STS);
+        }
 //        else if (exportMode == ExportFormat.SP)
 //        {
 //            fileExporter = FileDialogs.getExportFileChooser(FileFormats.SP);
@@ -860,6 +864,13 @@ public class ActionMan
                         {
                             AutomatonToFSM exporter = new AutomatonToFSM(currAutomaton);
                             exporter.serialize(currFile.getAbsolutePath());
+                        }
+                        else if (exportMode == ExportFormat.STS)
+                        {
+                            Automata currAutomata = new Automata();
+                            currAutomata.addAutomaton(currAutomaton);
+                            AutomataToSTS exporter = new AutomataToSTS(currAutomata);
+                            exporter.serialize(currFile);
                         }
 //                        else if (exportMode == ExportFormat.SP)
 //                        {

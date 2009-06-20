@@ -73,10 +73,15 @@ public class BDDAutomata
     Automata theAutomata;
     List<BDDAutomaton> theBDDAutomataList = new LinkedList<BDDAutomaton>();
     Map<Automaton, BDDAutomaton> automatonToBDDAutomatonMap = new HashMap<Automaton, BDDAutomaton>();
+    public Map<Integer, String> bddVar2AutName = new HashMap<Integer, String>();
+    public  Map<Integer, Integer> bddVar2bitValue = new HashMap<Integer, Integer>();
+    public Map<String, Integer> aut2nbrOfBits = new HashMap<String, Integer>();
+    public HashMap<String,HashSet<Integer>> enablingSigmaMap;
+
     AutomataIndexMap theIndexMap;
     Alphabet unionAlphabet;
  
-    BDDTransitions bddTransitions = null; 
+    BDDTransitions bddTransitions = null;
                
     BDDDomain eventDomain;
     BDDDomain[] sourceStateDomains = null;
@@ -96,18 +101,43 @@ public class BDDAutomata
     BDD reachableStatesBDD = null;
     BDD coreachableStatesBDD = null;
     BDD reachableAndCoreachableStatesBDD = null;
+    BDD safeStatesBDD = null;
+
+    BDD uncontrollableEventsBDD = null;
+
+    BDD plantsForwardTransitions = null;
+    BDD specsForwardTransitions = null;
+
+    BDD plantsBackwardTransitions = null;
+    BDD specsBackwardTransitions = null;
+
+    BDD plantsUncontrollableEvents = null;
+    BDD specsUncontrollableEvents = null;
+
+    BDDVarSet plantsDestStateVariables = null;
+    BDDVarSet specsDestStateVariables = null;
+
+    BDDVarSet plantsSourceStateVariables = null;
+    BDDVarSet specsSourceStateVariables = null;
     
     double nbrOfReachableStates = -1;
     double nbrOfCoreachableStates = -1;
     double nbrOfReachableAndCoreachableStates = -1;
     double nbrOfBlockingStates = -1;
-    
+    double nbrOfSafeStates = -1;
+
+//    BDD selfLoopsBDD;
+    BDD plantsSelfLoopsBDD;
+    BDD specsSelfLoopsBDD;
+
     public BDDAutomata(Automata orgAutomata)
     {
         AutomataSorter automataSorter = new PCGAutomataSorter();
+
         theAutomata = automataSorter.sortAutomata(orgAutomata);
         manager = new BDDManager();
-  
+        enablingSigmaMap = new HashMap<String, HashSet<Integer>>();
+
         try
         {
             theIndexMap = new AutomataIndexMap(theAutomata);
@@ -120,8 +150,23 @@ public class BDDAutomata
         initialStatesBDD = manager.getOneBDD();
         markedStatesBDD = manager.getOneBDD();
         forbiddenStatesBDD = manager.getZeroBDD();
+
         uncontrollableStatesBDD = manager.getZeroBDD();
-        
+        uncontrollableEventsBDD = manager.getZeroBDD();
+
+        plantsUncontrollableEvents = manager.getZeroBDD();
+        specsUncontrollableEvents = manager.getZeroBDD();
+
+        plantsForwardTransitions = manager.getZeroBDD();
+        specsForwardTransitions = manager.getZeroBDD();
+
+        plantsBackwardTransitions = manager.getZeroBDD();
+        specsBackwardTransitions = manager.getZeroBDD();
+
+//        selfLoopsBDD = manager.getZeroBDD();
+        plantsSelfLoopsBDD = manager.getZeroBDD();
+        specsSelfLoopsBDD = manager.getZeroBDD();
+
         initialize();
     }
  
@@ -133,11 +178,18 @@ public class BDDAutomata
         
         sourceStateVariables = manager.createEmptyVarSet();
         destStateVariables = manager.createEmptyVarSet();
+
+        plantsDestStateVariables = manager.createEmptyVarSet();
+        specsDestStateVariables = manager.createEmptyVarSet();
+
+        plantsSourceStateVariables = manager.createEmptyVarSet();
+        specsSourceStateVariables = manager.createEmptyVarSet();
         
         sourceStateDomains = new BDDDomain[theAutomata.size()];
         destStateDomains = new BDDDomain[theAutomata.size()];
         
         int i = 0;
+        BDD currUnconEvents = null;
         for (Automaton automaton : theAutomata)
         {
             int nbrOfStates = automaton.nbrOfStates();
@@ -145,27 +197,80 @@ public class BDDAutomata
             BDDDomain sourceStateDomain = manager.createDomain(nbrOfStates);
             BDDDomain destStateDomain = manager.createDomain(nbrOfStates);
             BDDAutomaton bddAutomaton = new BDDAutomaton(this, automaton, sourceStateDomain, destStateDomain);
+
+            int[] vars = sourceStateDomain.vars();
+            int nbrOfVars = vars.length;
+            aut2nbrOfBits.put(automaton.getName(), nbrOfVars);
+            for(int h=0;h<nbrOfVars;h++)
+            {
+                bddVar2AutName.put(vars[h], automaton.getName());
+                bddVar2bitValue.put(vars[h], h);
+//                System.out.println(""+vars[h]);
+            }
+
             bddAutomaton.initialize();
- 
-            sourceStateVariables.unionWith(sourceStateDomain.set());
-            destStateVariables.unionWith(destStateDomain.set());
             
+/*            vars = destStateDomain.vars();
+            for(int h=0;h<vars.length;h++)
+            {
+                bddVar2AutName.put(vars[h], automaton.getName());
+            }
+*/
+            sourceStateVariables.unionWith(sourceStateDomain.set());
+            destStateVariables.unionWith(destStateDomain.set());          
             sourceStateDomains[i] = sourceStateDomain;
             sourceStateDomains[i].setName(automaton.getName());
             destStateDomains[i] = destStateDomain;
-            destStateDomains[i].setName(automaton.getName());           
-            
+            destStateDomains[i].setName(automaton.getName());
+
+            currUnconEvents = bddAutomaton.getUncontrollableEvents();
+            uncontrollableEventsBDD = uncontrollableEventsBDD.or(currUnconEvents);
+
+//            selfLoopsBDD = selfLoopsBDD.or(bddAutomaton.getSelfLoopsBDD());
+
+            if(automaton.isPlant())
+            {
+//                bddAutomaton.getTransitionForwardBDD().exist(bddAutomaton.getDestStateDomain().set()).printDot();
+                plantsForwardTransitions = plantsForwardTransitions.or(bddAutomaton.getTransitionForwardBDD());
+                plantsBackwardTransitions = plantsBackwardTransitions.or(bddAutomaton.getTransitionBackwardBDD());
+                plantsUncontrollableEvents = plantsUncontrollableEvents.or(currUnconEvents);
+                
+                plantsSourceStateVariables.unionWith(sourceStateDomain.set());
+                plantsDestStateVariables.unionWith(destStateDomain.set());
+
+                plantsSelfLoopsBDD = plantsSelfLoopsBDD.or(bddAutomaton.getSelfLoopsBDD());
+//                bddAutomaton.getTransitionForwardBDD().and(bddAutomaton.getSelfLoopsBDD().not()).printDot();
+            }
+            else if(automaton.isSpecification())
+            {
+                specsForwardTransitions = specsForwardTransitions.or(bddAutomaton.getTransitionForwardBDD());
+                specsBackwardTransitions = specsBackwardTransitions.or(bddAutomaton.getTransitionBackwardBDD());
+                specsUncontrollableEvents = specsUncontrollableEvents.or(currUnconEvents);
+                
+                specsSourceStateVariables.unionWith(sourceStateDomain.set());
+                specsDestStateVariables.unionWith(destStateDomain.set());
+
+                specsSelfLoopsBDD = specsSelfLoopsBDD.or(bddAutomaton.getSelfLoopsBDD());
+            }
+
             add(bddAutomaton);
                         
             i++;
         }
-      
+       
         //sourceToDestStatePairing = manager.makePairing(sourceStateDomains, destStateDomains);
         destToSourceStatePairing = manager.makePairing(destStateDomains, sourceStateDomains);       
   
         bddTransitions = new BDDTransitionFactory(this).createTransitions();
+
+//        System.out.println("number of transitions: "+((BDDMonolithicTransitions)bddTransitions).transitionForwardBDD.pathCount());
     }
- 
+    
+    public BDD getMonolithicStates()
+    {
+        return ((BDDMonolithicTransitions)bddTransitions).getMonolithicTransitionForwardBDD().exist(destStateVariables).exist(eventDomain.set());
+    }
+
     public BDDManager getBDDManager()
     {
         return manager;
@@ -180,7 +285,20 @@ public class BDDAutomata
     {
         return automatonToBDDAutomatonMap.get(theAutomaton);
     }
-    
+
+    public BDDAutomaton getBDDAutomaton(String autName)
+    {
+        for(Automaton aut: theAutomata)
+            if(aut.getName().equals(autName))
+                return automatonToBDDAutomatonMap.get(aut);
+        return null;
+    }
+
+    public BDDPairing getDest2SourcePairing()
+    {
+        return destToSourceStatePairing;
+    }
+
     public BDDVarSet getSourceStateVariables()
     {
         return sourceStateVariables;
@@ -190,7 +308,82 @@ public class BDDAutomata
     {
         return destStateVariables;
     }
-    
+
+    public BDD getUncontrollableEvents()
+    {
+        return uncontrollableEventsBDD;
+    }
+
+    public BDD getPlantsForwardTransitions()
+    {
+        return plantsForwardTransitions;
+    }
+
+    public BDD getSpecsForwardTransitions()
+    {
+        return specsForwardTransitions;
+    }
+
+    public BDD getPlantsBackwardTransitions()
+    {
+        return plantsBackwardTransitions;
+    }
+
+    public BDD getSpecsBackwardTransitions()
+    {
+        return specsBackwardTransitions;
+    }
+
+    public BDD getPlantsUncontrollableEvents()
+    {
+        return plantsUncontrollableEvents;
+    }
+
+    public BDD getSpecsUncontrollableEvents()
+    {
+        return specsUncontrollableEvents;
+    }
+
+    public BDDVarSet getPlantsSourceStateVars()
+    {
+        return plantsSourceStateVariables;
+    }
+
+    public BDDVarSet getSpecsSourceStateVars()
+    {
+        return specsSourceStateVariables;
+    }
+
+    public BDDVarSet getPlantsDestStateVars()
+    {
+        return plantsDestStateVariables;
+    }
+
+    public BDDVarSet getSpecsDestStateVars()
+    {
+        return specsDestStateVariables;
+    }
+
+    public BDDTransitions getBDDTransitions()
+    {
+        return bddTransitions;
+    }
+
+/*    public BDD getSelfLoopsBDD()
+    {
+        return selfLoopsBDD;
+    }
+*/
+    public BDD getPlantsSelfLoopsBDD()
+    {
+        return plantsSelfLoopsBDD;
+    }
+
+    public BDD getSpecsSelfLoopsBDD()
+    {
+        return specsSelfLoopsBDD;
+    }
+
     public void done()
     {
         if (manager != null)
@@ -207,6 +400,34 @@ public class BDDAutomata
     public Alphabet getInverseAlphabet(Automaton currAutomaton)
     {
         return theAutomata.getInverseAlphabet(currAutomaton);
+    }
+
+    public BDDVarSet getInverseSourceStateVars(Automaton aut)
+    {
+        BDDVarSet bddvarset = null;
+        boolean flag = true;
+        int i = 0;
+
+        //Buld a variable set including all variables in the automata except 'aut'
+        for(Automaton inAut: theAutomata)
+        {
+            if(flag)
+            {
+                if(!aut.equals(inAut))
+                {
+                    bddvarset = sourceStateDomains[i].set();
+                    flag = false;
+                }
+            }
+            else
+            {
+                if(!aut.equals(inAut))
+                    bddvarset = bddvarset.union(sourceStateDomains[i].set());
+            }
+            i++;
+        }
+
+        return bddvarset;
     }
         
     void add(BDDAutomaton bddAutomaton)
@@ -252,6 +473,11 @@ public class BDDAutomata
     public void addMarkedStates(BDD markedStates)
     {
         markedStatesBDD = markedStatesBDD.and(markedStates);
+    }
+
+    public BDD getMarkedStates()
+    {
+        return markedStatesBDD;
     }
     
     public void addForbiddenStates(BDD forbiddenStates)
@@ -326,8 +552,8 @@ public class BDDAutomata
             nbrOfCoreachableStates = coreachableStatesBDD.satCount(sourceStateVariables);
         }
         return coreachableStatesBDD;
-    }  
-    
+    }
+
     public BDD getReachableAndCoreachableStates()
     {
         if (reachableAndCoreachableStatesBDD == null)

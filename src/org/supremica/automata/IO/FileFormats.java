@@ -84,6 +84,7 @@ public class FileFormats
 	public static final FileFormats JAVA = new FileFormats(false, true, "JAVA", ".java", "Java files (*.java)");
 	public static final FileFormats SMV = new FileFormats(false, true, "SMV", ".smv", "SMV files (*.smv)");
 	public static final FileFormats FSM = new FileFormats(false, true, "FSM", ".fsm", "UMDES files (*.fsm)");
+    public static final FileFormats STS = new FileFormats(false, true, "", "", "STS files (*)");
 
 	// Input only
 	public static final FileFormats VPRJ = new FileFormats(true, false, "VPRJ", ".vprj", "Valid Project files (*.vprj)");

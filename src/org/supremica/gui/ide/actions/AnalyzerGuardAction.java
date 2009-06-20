@@ -13,12 +13,18 @@ import javax.swing.Action;
 import javax.swing.ImageIcon;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import org.supremica.automata.algorithms.Guard.*;
 import org.supremica.gui.ide.IDE;
 import org.supremica.gui.GuardDialog;
 import java.util.List;
+import java.util.Set;
+import java.util.StringTokenizer;
 import org.supremica.automata.*;
 import org.supremica.log.*;
 
@@ -30,7 +36,13 @@ import net.sourceforge.waters.model.module.ConstantAliasProxy;
 import net.sourceforge.waters.subject.base.AbstractSubject;
 import net.sourceforge.waters.subject.module.*;
 import net.sourceforge.waters.xsd.base.EventKind;
+import org.supremica.automata.BDD.BDDAutomata;
+import org.supremica.automata.BDD.BDDManager;
 import org.supremica.gui.ide.EditorPanel;
+import net.sf.javabdd.*;
+import net.sourceforge.waters.model.des.StateProxy;
+import net.sourceforge.waters.model.module.NodeProxy;
+import net.sourceforge.waters.subject.base.ListSubject;
 
 /**
  *
@@ -44,6 +56,13 @@ public class AnalyzerGuardAction
 
     private static final long serialVersionUID = 1L;
     private Logger logger = LoggerFactory.createLogger(IDE.class);
+
+    HashMap<String,String> aut2type;
+    HashMap<String,String> aut2initState;
+
+    EditorPanel editorPanel;
+    ExpressionParser parser;
+    HashSet<String> addedVariables;
     
     public AnalyzerGuardAction(List<IDEAction> actionList)
     {
@@ -91,63 +110,130 @@ public class AnalyzerGuardAction
         }
  */       
  //       GuardGenerator gg = new GuardGenerator(selectedAutomata.getAutomatonAt(0),guardOptions.getExpressionType());
-        EditorPanel editorPanel = ide.getActiveDocumentContainer().getEditorPanel();
+        editorPanel = ide.getActiveDocumentContainer().getEditorPanel();
         LabeledEvent sigma = new LabeledEvent(guardOptions.getEvent());
-        BDDGuardGenerator bddgg;
-        for(EventDeclSubject sigmaS:  editorPanel.getModuleSubject().getEventDeclListModifiable())
+        BDDGuardGenerator bddgg = null;
+        
+        //Compute safe states
+        BDDAutomata automataBDD = new BDDAutomata(selectedAutomata);
+        BDDManager manager = automataBDD.getBDDManager();
+
+        long time1 = System.currentTimeMillis();
+
+        BDD prelUnconStates = manager.prelimUncontrollableStates(automataBDD);
+        BDD forbiddenStates = prelUnconStates.or(automataBDD.getForbiddenStates());
+//        forbiddenStates.printDot();
+        BDD safeStatesBDD = manager.safeStateSynthesis(automataBDD, forbiddenStates).and(automataBDD.getReachableStates());
+
+        long synthesisTime = System.currentTimeMillis()-time1;
+
+        BufferedWriter out = null;
+        try
         {
-            if(sigmaS.getKind() == EventKind.CONTROLLABLE || sigmaS.getKind() == EventKind.UNCONTROLLABLE)
+            out = new BufferedWriter(new FileWriter("C:/Users/sajed/Desktop/STS/examples/ResultsWithMyAlg/"+editorPanel.getModuleSubject().getName()+".doc"));
+            out.write("Synthesis time: "+synthesisTime+" ms");
+            out.newLine();
+            out.newLine();
+            out.write("Event \t BDD-size \t #terms \t guardGenTime(ms)");
+            out.newLine();
+        }
+        catch (IOException e) {}
+
+        HashMap<String,BDDGuardGenerator> event2guard = new HashMap<String,BDDGuardGenerator>();
+        boolean singleEventSelected = false;
+
+        long time2 = System.currentTimeMillis();
+
+        if(sigma.getName().equals(""))
+        {
+            for(EventDeclSubject sigmaS:  editorPanel.getModuleSubject().getEventDeclListModifiable())
             {
-                System.out.println("Generating guard for event "+ sigmaS.getName()+"...");
-                bddgg = new BDDGuardGenerator(selectedAutomata, sigmaS.getName(), guardOptions.getExpressionType());
+                if(sigmaS.getKind() == EventKind.CONTROLLABLE)
+                {
+    //                System.out.println("Generating guard for event "+ sigmaS.getName()+"...");
+                    bddgg = new BDDGuardGenerator(automataBDD, sigmaS.getName(), safeStatesBDD, guardOptions.getExpressionType());
+                    try
+                    {
+                        out.write(sigmaS.getName()+"\t"+bddgg.getBDDSize()+"\t"+bddgg.getNbrOfTerms()+"\t"+bddgg.getRunTime());
+                        out.newLine();
+                    }
+                    catch (IOException e) {}
+
+                    event2guard.put(sigmaS.getName(), bddgg);
+                }
             }
         }
-        bddgg = new BDDGuardGenerator(selectedAutomata, sigma.getName(), guardOptions.getExpressionType());
-        
+        else
+        {
+            singleEventSelected = true;
+            bddgg = new BDDGuardGenerator(automataBDD, sigma.getName(), safeStatesBDD, guardOptions.getExpressionType());
+        }
+
+        long totalGuardGenTime = System.currentTimeMillis()-time2;
+
+        try
+        {
+            out.newLine();
+            out.write("Total time of generating guards for all events: "+totalGuardGenTime+" ms");
+            out.close();
+        }
+        catch (IOException e) {}
         //Add the guard to the automata
         ModuleSubjectFactory factory = ModuleSubjectFactory.getInstance();
-        ExpressionParser parser = new ExpressionParser(factory, CompilerOperatorTable.getInstance());
-        
+        parser = new ExpressionParser(factory, CompilerOperatorTable.getInstance());
+
         SimpleComponentSubject tempSubj =null;
         HashSet<SimpleComponentSubject> subjects = new HashSet();
-
-
-
+        
+        
+        HashMap<String,String> tempAut2initState = new HashMap<String,String>();
+        
+        for(Automaton aut:selectedAutomata)
+        {
+            tempAut2initState.put(aut.getName(), aut.getInitialState().getName());
+        }
+        
+        aut2type = new HashMap<String,String>();
+        aut2initState = new HashMap<String,String>();
+        String autName = "";
         for(AbstractSubject as: editorPanel.getModuleSubject().getComponentListModifiable())
         {
-            
             tempSubj = ((SimpleComponentSubject)(as)).clone();
+            autName = tempSubj.getName();
             tempSubj.setIdentifier(new SimpleIdentifierSubject (tempSubj.getName()+"_SUP"));
+            aut2type.put(tempSubj.getName(), createType(tempSubj.getGraph().getNodes()));
+            aut2initState.put(tempSubj.getName(), tempAut2initState.get(autName));
             subjects.add(tempSubj);
-            
-        }       
+        }
+
         
         boolean changed = false;
+        String guard = "";
+        BDDGuardGenerator currBDDGG = null;
+        addedVariables = new HashSet<String>();
+
         for(SimpleComponentSubject simSubj:subjects)
         {
             changed = false;
             for(EdgeSubject ep:simSubj.getGraph().getEdgesModifiable())
             {
                 SimpleExpressionSubject ses = null;
-                if(ep.getLabelBlock().getEventList().iterator().next().toString().equals(sigma.getName()) && simSubj.getKind().name().equals("SPEC") && !bddgg.guardIsTRUE())
+                //&& simSubj.getKind().name().equals("SPEC")
+                String currEvent = ep.getLabelBlock().getEventList().iterator().next().toString();
+                currBDDGG = singleEventSelected ? bddgg : event2guard.get(currEvent);
+                if( ((singleEventSelected && currEvent.equals(sigma.getName()) && !currBDDGG.guardIsTrueOrFalse()) ||
+                        (!singleEventSelected && currBDDGG != null && !currBDDGG.guardIsTrueOrFalse())))
                 {
                     try
                     {
-                        ses = (SimpleExpressionSubject)(parser.parse(bddgg.getGuard(),Operator.TYPE_BOOLEAN));
-                        
-                        SimpleExpressionSubject variable = ((BinaryExpressionSubject)ses).getLeft();
-                        VariableComponentSubject vcs = new  VariableComponentSubject(
-                        new SimpleIdentifierSubject(variable.toString())
-                        , parser.parse("{q0,q1,q2}",Operator.TYPE_RANGE)
-                        ,true
-                        ,parser.parse(variable.toString()+"==0",Operator.TYPE_BOOLEAN));
-        
-                        editorPanel.getModuleSubject().getComponentListModifiable().add(vcs);                        
-                        
+                        guard = currBDDGG.getGuard();
+//                        guard = "Q_R2 == 0 & Q_R2 == 1 | Q_P2 == 1";
+                        ses = (SimpleExpressionSubject)(parser.parse(guard,Operator.TYPE_BOOLEAN));
+                        addVariablesToModel((BinaryExpressionSubject)ses, simSubj);
                     }
                     catch(ParseException pe)
                     {
-                        System.out.println("Parse error!");
+                        System.out.println(pe);
                         break;
                     }
                     GuardActionBlockSubject gab = new GuardActionBlockSubject();
@@ -161,6 +247,55 @@ public class AnalyzerGuardAction
                 editorPanel.addComponent(simSubj);
         }
         
+    }
+
+    public int addVariablesToModel(BinaryExpressionSubject bes, SimpleComponentSubject simSubj)
+    {
+        try{
+            if(bes.getOperator().getName().equals("==") || bes.getOperator().getName().equals("!="))
+            {
+                String currAutomaton = new StringTokenizer(bes.getLeft().toString(),"Q_").nextToken()+"_SUP";
+                VariableComponentSubject vcs = new  VariableComponentSubject(
+                new SimpleIdentifierSubject(bes.getLeft().toString())
+                , parser.parse(aut2type.get(currAutomaton),Operator.TYPE_RANGE)
+                ,true
+                ,parser.parse(bes.getLeft().toString()+"=="+aut2initState.get(currAutomaton),Operator.TYPE_BOOLEAN));
+
+                if(!addedVariables.contains(vcs.getName()))
+                {
+                    editorPanel.getModuleSubject().getComponentListModifiable().add(vcs);
+                    addedVariables.add(vcs.getName());
+                }
+
+                return 0;
+            }
+        }
+        catch(ParseException pe)
+        {
+            System.out.println(pe);
+            return 1;
+        }
+
+        addVariablesToModel((BinaryExpressionSubject)(bes.getLeft()), simSubj);
+        addVariablesToModel((BinaryExpressionSubject)(bes.getRight()), simSubj);
+
+        return 1;
+
+    }
+
+    public String createType(Set<NodeProxy> states)
+    {
+        String output = "{";
+        for(NodeProxy state:states)
+        {
+            output += (state.getName()+",");
+        }
+
+        output = output.substring(0, output.length()-1);
+
+        output += "}";
+
+        return output;
     }
     
 }

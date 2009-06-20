@@ -336,7 +336,7 @@ class JBDD
 	/** create a positive cube of the variables in vars.
 			@param vars list of considered BDD variables
 			@param size the size of the list
-			@return vars[o] & vars[1] & ... & vars[offset+size]
+			@return vars[0] & vars[1] & ... & vars[size]
 			*/
 	public native int makeSet(int[] vars, int size);    // conjuction (cube)
 

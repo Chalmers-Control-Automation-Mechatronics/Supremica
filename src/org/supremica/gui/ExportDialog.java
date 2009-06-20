@@ -17,12 +17,14 @@ public class ExportDialog
 	private static final String fsmString = "fsm";
 	private static final String pcgString = "pcg";
 	private static final String sspcString = "sspc";
+    private static final String stsString = "sts";
 	private static final Object[] possibleValues = { xmlString, spString,
 	dotString, dsxString,
 	fsmString,
 	htmlString,
 	pcgString,
-	sspcString };
+	sspcString,
+    stsString};
 	private JOptionPane pane = null;
 	private JDialog dialog = null;
 	private JCheckBox checkbox = null;
@@ -112,6 +114,15 @@ public class ExportDialog
 
 			return ExportFormat.FSM;    // Should return a FsmExporter object
 		}
+        else if (selectedValue == stsString)
+		{
+			if (checkbox.isSelected())
+			{
+				return ExportFormat.STS_DEBUG;
+			}
+
+			return ExportFormat.STS;    // Should return an XmlExporter object
+		}
 //		else if (selectedValue == spString)
 //		{
 //			if (checkbox.isSelected())
@@ -140,6 +151,7 @@ public class ExportDialog
 		{
 			return ExportFormat.SSPC;    // no debugview here (multiple files)
 		}
+
 		else
 		{
 			return ExportFormat.UNKNOWN;

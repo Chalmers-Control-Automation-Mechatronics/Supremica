@@ -11,6 +11,12 @@ import org.supremica.automata.IO.*;
 import org.supremica.automata.Automata;
 import org.supremica.automata.Automaton;
 import org.supremica.automata.Project;
+import org.supremica.automata.algorithms.AutomataSynthesizer;
+import org.supremica.automata.algorithms.SynchronizationOptions;
+import org.supremica.automata.algorithms.SynthesisAlgorithm;
+import org.supremica.automata.algorithms.SynthesisType;
+import org.supremica.automata.algorithms.SynthesizerOptions;
+import org.supremica.automata.algorithms.minimization.MinimizationHelper;
 import org.supremica.gui.ExportDialog;
 import org.supremica.gui.ExportFormat;
 import org.supremica.gui.FileDialogs;
@@ -286,6 +292,10 @@ public class AnalyzerExportAction
 
                 //return;
             }
+            else if(exportMode == ExportFormat.STS)
+            {
+                fileExporter = FileDialogs.getSTSFileExporter();
+            }
  /*           
             else if (exportMode == ExportFormat.SP)
             {
@@ -313,6 +323,35 @@ public class AnalyzerExportAction
                             {
                                 AutomataToXML exporter = new AutomataToXML(selectedAutomata);
                                 exporter.serialize(currFile);
+                            }
+                            else if (exportMode == ExportFormat.STS)
+                            {
+                                Automata automata = selectedAutomata;
+                                MinimizationHelper.plantify(automata);
+                                AutomataToSTS exporter = new AutomataToSTS(automata);
+                                exporter.serialize(currFile);
+
+                                fileExporter = FileDialogs.getSTSFileExporter();
+                                fileExporter.setDialogTitle("Save spec as ...");
+                                if (fileExporter.showSaveDialog(ide.getIDE()) == JFileChooser.APPROVE_OPTION)
+                                {
+                                    File currFileSpec = fileExporter.getSelectedFile();
+                                    if (currFileSpec != null)
+                                    {
+                                        if (!currFileSpec.isDirectory())
+                                        {
+                                            try
+                                            {
+                                                exporter.createSpec(currFileSpec);
+                                            }
+                                            catch (Exception ex)
+                                            {
+                                                logger.error("Exception while exporting " + currFileSpec.getAbsolutePath(), ex);
+                                                logger.debug(ex.getStackTrace());
+                                            }
+                                        }
+                                    }
+                                }
                             }
                             /*
                             else if (exportMode == ExportFormat.SP)
@@ -355,6 +394,10 @@ public class AnalyzerExportAction
         else if (exportMode == ExportFormat.FSM)
         {
             fileExporter = FileDialogs.getExportFileChooser(FileFormats.FSM);
+        }
+        else if (exportMode == ExportFormat.STS)
+        {
+            fileExporter = FileDialogs.getExportFileChooser(FileFormats.STS);
         }
 /*        
         else if (exportMode == ExportFormat.SP)
@@ -401,6 +444,13 @@ public class AnalyzerExportAction
                         {
                             AutomatonToFSM exporter = new AutomatonToFSM(currAutomaton);
                             exporter.serialize(currFile.getAbsolutePath());
+                        }
+                        else if (exportMode == ExportFormat.STS)
+                        {
+                            Automata currAutomata = new Automata();
+                            currAutomata.addAutomaton(currAutomaton);
+                            AutomataToSTS exporter = new AutomataToSTS(currAutomata);
+                            exporter.serialize(currFile);
                         }
 /*                        
                         else if (exportMode == ExportFormat.SP)

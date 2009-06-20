@@ -19,8 +19,7 @@ Task
         <EventDecl Kind="UNCONTROLLABLE" Name="clonk"/>
     </EventDeclList>
     <ComponentList>
-        <SimpleComponent Kind="PLANT">
-            <SimpleIdentifier Name="drinks"/>
+        <SimpleComponent Kind="PLANT" Name="drinks">
             <Graph>
                 <NodeList>
                     <SimpleNode Initial="true" Name="waiting">
@@ -192,8 +191,7 @@ Task
                 </EdgeList>
             </Graph>
         </SimpleComponent>
-        <SimpleComponent Kind="PLANT">
-            <SimpleIdentifier Name="mugs"/>
+        <SimpleComponent Kind="PLANT" Name="mugs">
             <Graph>
                 <NodeList>
                     <SimpleNode Initial="true" Name="waiting">
@@ -259,8 +257,7 @@ Task
                 </EdgeList>
             </Graph>
         </SimpleComponent>
-        <SimpleComponent Kind="SPEC">
-            <SimpleIdentifier Name="right drink"/>
+        <SimpleComponent Kind="SPEC" Name="right drink">
             <Graph>
                 <NodeList>
                     <SimpleNode Initial="true" Name="no order">
@@ -370,8 +367,7 @@ Task
                 </EdgeList>
             </Graph>
         </SimpleComponent>
-        <SimpleComponent Kind="SPEC">
-            <SimpleIdentifier Name="mug before drink"/>
+        <SimpleComponent Kind="SPEC" Name="mug before drink">
             <Graph>
                 <NodeList>
                     <SimpleNode Initial="true" Name="no mug">
@@ -440,4 +436,3 @@ Task
         </SimpleComponent>
     </ComponentList>
 </Module>
-
