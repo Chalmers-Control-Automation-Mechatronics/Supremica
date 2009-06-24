@@ -9,6 +9,7 @@
 
 package net.sourceforge.waters.plain.des;
 
+import java.io.Serializable;
 import java.net.URI;
 import java.util.Collection;
 import java.util.List;
@@ -34,7 +35,7 @@ import net.sourceforge.waters.xsd.des.ConflictKind;
  */
 
 public class ProductDESElementFactory
-  implements ProductDESProxyFactory
+  implements ProductDESProxyFactory, Serializable
 {
 
   //#########################################################################

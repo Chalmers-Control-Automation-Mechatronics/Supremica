@@ -9,6 +9,8 @@
 
 package net.sourceforge.waters.model.analysis;
 
+import java.io.Serializable;
+
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.xsd.base.ComponentKind;
@@ -26,17 +28,20 @@ import net.sourceforge.waters.xsd.base.EventKind;
  * @author Robi Malik
  */
 
-public class LanguageInclusionKindTranslator implements KindTranslator
+public class LanguageInclusionKindTranslator
+  implements KindTranslator, Serializable
 {
 
   //#########################################################################
   //# Singleton Implementation
   public static LanguageInclusionKindTranslator getInstance()
   {
-    if (theInstance == null) {
-      theInstance = new LanguageInclusionKindTranslator();
-    }
-    return theInstance;
+    return SingletonHolder.theInstance;
+  }
+
+  private static class SingletonHolder {
+    private static final LanguageInclusionKindTranslator theInstance =
+      new LanguageInclusionKindTranslator();
   }
 
   private LanguageInclusionKindTranslator()

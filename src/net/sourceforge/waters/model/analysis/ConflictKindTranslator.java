@@ -9,6 +9,8 @@
 
 package net.sourceforge.waters.model.analysis;
 
+import java.io.Serializable;
+
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.xsd.base.ComponentKind;
@@ -26,7 +28,8 @@ import net.sourceforge.waters.xsd.base.EventKind;
  * @author Robi Malik
  */
 
-public class ConflictKindTranslator implements KindTranslator
+public class ConflictKindTranslator
+  implements KindTranslator, Serializable
 {
 
   //#########################################################################
