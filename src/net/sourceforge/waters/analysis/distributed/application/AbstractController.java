@@ -1,5 +1,7 @@
 package net.sourceforge.waters.analysis.distributed.application;
 
+import java.util.Collection;
+
 /**
  * An abstract implementation of the controller 
  * interface. Handles controller state and catching
@@ -8,10 +10,11 @@ package net.sourceforge.waters.analysis.distributed.application;
  */
 public abstract class AbstractController implements Controller
 {
-  public ControllerState getState()
+  public final ControllerState getState()
   {
     return mControllerState;
   }
+
 
   public final Exception getException() throws IllegalStateException
   {
@@ -27,6 +30,7 @@ public abstract class AbstractController implements Controller
       }
   }
 
+
   /**
    * Store an exception and set the current state to EXCEPTION.
    * The exception must not be null.
@@ -41,9 +45,76 @@ public abstract class AbstractController implements Controller
     setState(ControllerState.EXCEPTION);
   }
 
+
   private void setState(ControllerState state)
   {
     mControllerState = state;
+  }
+
+  
+  public final void setJob(Job job) throws IllegalStateException
+  {
+    if (getState() != ControllerState.NOT_RUN)
+      throw new IllegalStateException("Setting input job is only" +
+				      " valid before controller is run");
+    else
+      mJob = job;
+  }
+
+
+  public final Job getJob()
+  {
+    return mJob;
+  }
+
+  public final JobResult getResult() throws IllegalStateException
+  {
+    if (getState() != ControllerState.COMPLETED)
+      {
+	throw new IllegalStateException("Getting result before job "+
+					"has completed successfully is " +
+					"invalid");
+      }
+    else
+      {
+	return mResult;
+      }
+  }
+
+  /**
+   * Sets the job result for this controller. The result is allowed to
+   * be null.
+   * @param result the job result
+   */
+  protected void setResult(JobResult result)
+  {
+    mResult = result;
+  }
+
+  public final void setNodes(Collection<Node> nodes)
+    throws IllegalStateException
+  {
+    if (getState() != ControllerState.NOT_RUN)
+      throw new IllegalStateException("Cannot set nodes in state " + getState());
+    else
+      mNodes = nodes;
+  }
+
+
+  public final Collection<Node> getNodes()
+  {
+    return mNodes;
+  }
+
+  
+  public final void setControllerID(ControllerID id)
+  {
+    mControllerID = id;
+  }
+
+  public final ControllerID getControllerID()
+  {
+    return mControllerID;
   }
 
   public final void run()
@@ -91,4 +162,8 @@ public abstract class AbstractController implements Controller
     ControllerState.NOT_RUN;
 
   private Exception mException = null;
+  private Job mJob = null;
+  private JobResult mResult = null;
+  private Collection<Node> mNodes = null;
+  private ControllerID mControllerID;
 }

@@ -1,4 +1,4 @@
-package net.sourceforge.waters.analysis.distributed;
+package net.sourceforge.waters.analysis.distributed.safetyverifier;
 
 public abstract class StateEncoding
 {

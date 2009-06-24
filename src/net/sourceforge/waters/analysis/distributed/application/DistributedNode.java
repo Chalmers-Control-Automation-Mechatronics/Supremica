@@ -14,6 +14,7 @@ public class DistributedNode
     mServerHost = host;
     mServerPort = port;
     mServerService = service;
+    mWorkerCleanup = new WorkerCleanup();
   }
 
   /**
@@ -25,6 +26,51 @@ public class DistributedNode
     Thread t = new ConnectionThread();
     t.setDaemon(true);
     t.start();
+  }
+
+
+  public Worker createWorker(ControllerID id, String classname) 
+    throws 
+    ClassNotFoundException,
+    IllegalAccessException,
+    IllegalArgumentException,
+    InstantiationException,
+    UnsupportedOperationException,
+    RemoteException
+  {
+    if (id == null)
+      throw new IllegalArgumentException("Controller ID cannot be null");
+
+    Class c = Class.forName(classname);
+
+    if (!Worker.class.isAssignableFrom(c))
+      throw new ClassCastException
+	(classname + " is not a valid Worker class");
+
+    Worker w = (Worker) c.newInstance();
+    mWorkerCleanup.registerWorker(id, (WorkerLocal)w);
+
+    //Export the worker as a remote object.
+    Worker stub = (Worker) UnicastRemoteObject.exportObject(w, 0);
+    
+    //Call the create method on the worker. If something goes wrong, chain
+    //an unsupported operation exception.
+    try
+      {
+	((WorkerLocal)w).created();
+      }
+    catch (Exception e)
+      {
+	throw new UnsupportedOperationException("Could not run created() method on worker", e);
+      }
+
+    return stub;
+  }
+
+  public void cleanup(ControllerID id) throws RemoteException
+  {
+    System.err.format("Cleaning up for %s\n", id);
+    mWorkerCleanup.cleanup(id);
   }
 
   private class ConnectionThread extends Thread
@@ -97,7 +143,8 @@ public class DistributedNode
   {
     return;
   }
-						
+				
+  private final WorkerCleanup mWorkerCleanup;
   private final String mServerHost;
   private final int mServerPort;
   private final String mServerService;

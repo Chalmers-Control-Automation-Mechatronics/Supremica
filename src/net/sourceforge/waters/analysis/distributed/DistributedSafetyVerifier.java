@@ -1,17 +1,25 @@
 package net.sourceforge.waters.analysis.distributed;
 
+import java.io.Serializable;
+
+import java.rmi.registry.LocateRegistry;
+import java.rmi.registry.Registry;
+
+import java.util.UUID;
 
 import net.sourceforge.waters.model.analysis.AbstractModelVerifier;
 import net.sourceforge.waters.model.analysis.KindTranslator;
-import net.sourceforge.waters.model.analysis.OverflowException;
+import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.SafetyVerifier;
 import net.sourceforge.waters.model.analysis.VerificationResult;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
+import net.sourceforge.waters.model.des.TraceProxy;
 import net.sourceforge.waters.model.des.SafetyTraceProxy;
 
-import net.sourceforge.waters.analysis.distributed.schemata.SchemaBuilder;
-import net.sourceforge.waters.analysis.distributed.schemata.ProductDESSchema;
+import net.sourceforge.waters.analysis.distributed.application.Job;
+import net.sourceforge.waters.analysis.distributed.application.JobResult;
+import net.sourceforge.waters.analysis.distributed.application.Server;
 
 /**
  * Some day this will be a distributed, multi-threaded implementation
@@ -38,71 +46,77 @@ public class DistributedSafetyVerifier
     mKindTranslator = translator;
   }
 
-  public boolean run() throws OverflowException
+  public boolean run() throws AnalysisException
   {
+    //These arguments should be mandatory.
+    assert(getHostname() != null);
+    assert(getPort() > 0);
+    final String controller = "net.sourceforge.waters.analysis.distributed.safetyverifier.SafetyVerifierController";
     final ProductDESProxy model = getModel();
-    final ProductDESSchema modelSchema = SchemaBuilder.build(model);
-    
-    StateExplorerNode explorer = new StateExplorerNode(modelSchema);
 
-    //Start some processing threads
-    for (int i = 0; i < 2; i++)
-      explorer.runWorkerThread();
-    
-
-    //Decide if the explorer is finished. In a distributed
-    //checker, you could be reasonably sure the model checker
-    //had finished by making sure each node was empty a certain 
-    //number of times.
-    while (true) 
+    try
       {
-	//Check if the system appears to be finished.
-	if (explorer.isIdle())
-	  {
-	    //Pause the system, then check if it still 
-	    //appears to be idle
-	    explorer.pause();
+	Server server = connectToServer(getHostname(), getPort());
+	
+	System.out.println("Connected to server: " + server);
 
-	    if (explorer.isIdle())
-	      break;
-	    else
-	      explorer.unpause();
+	VerificationJob job = new VerificationJob();
+	job.setName("safety-" + UUID.randomUUID().toString());
+	job.setController(controller);
+
+	//The cast to Serializable is necessary because the interfaces
+	//don't implement Serializable, but the object itself probably
+	//does. The setAttribute method uses a generic type wildcard to
+	//only allow Serializable objects to be added, but this fails at
+	//compile time.
+	job.setModel(model);
+	
+	VerificationJobResult result = new VerificationJobResult(server.submitJob(job));
+
+	//Check for exceptions that might have occurred
+	if (result.getException() != null)
+	  throw new AnalysisException(result.getException());
+
+
+	Boolean b = result.getResult();
+	if (b == null)
+	  {
+	    throw new AnalysisException("Verification result was undefined!");
 	  }
 
-	if (explorer.isUncontrollable())
+	if (b == true)
 	  {
-	    explorer.pause();
-	    break;
+	    return setSatisfiedResult();
+	  }
+	else
+	  {
+	    //Get a counter-example from the job result
+	    TraceProxy counterexample = null;
+	    if (result.getTrace() != null)
+	      {
+		counterexample = result.getTrace();
+	      }
+	    return setFailedResult(counterexample);
 	  }
 	
-	System.out.format("%s; Number of states: %d %d\n", 
-			  explorer.isUncontrollable() ? "Uncontrollable" : "Controllable",
-			  explorer.getExploredStateCount(),
-			  explorer.getWaitingStateCount());
 	
-	try
-	  {
-	    Thread.sleep(200);
-	  }
-	catch (InterruptedException e)
-	  {}
       }
-	
-    System.out.format("Finished! %s; Number of states: %d %d\n", 
-		      explorer.isUncontrollable() ? "Uncontrollable" : "Controllable",
-		      explorer.getExploredStateCount(),
-		      explorer.getWaitingStateCount());
+    catch (Exception e)
+      {
+	throw new AnalysisException(e);
+      }
+  }
+
+  private Server connectToServer(String host, int port) throws Exception
+  {
+    //This should probably be replaced with a common constants
+    //class or something. For now this will do
+    String service = net.sourceforge.waters.analysis.distributed.application.DistributedServer.DEFAULT_SERVICE_NAME;
+
+    Registry registry = LocateRegistry.getRegistry(host, port);
+    Server server = (Server) registry.lookup(service);
     
-    //Feign success! That way I can ignore countertraces for a while
-    boolean controllable = !explorer.isUncontrollable();
-
-    //Clean up the state explorer.
-    explorer.shutdown();
-
-    if (controllable)
-      return setSatisfiedResult();
-    else
-      return setFailedResult(null);
+    return server;
   }
 
 
@@ -124,5 +138,27 @@ public class DistributedSafetyVerifier
     return (SafetyTraceProxy) super.getCounterExample();
   }
 
+  public void setHostname(String hostname)
+  {
+    mHostname = hostname;
+  }
+
+  public void setPort(int port)
+  {
+    mPort = port;
+  }
+
+  public String getHostname()
+  {
+    return mHostname;
+  }
+
+  public int getPort()
+  {
+    return mPort;
+  }
+  
+  private String mHostname = null;
+  private int mPort = 0;
   private KindTranslator mKindTranslator;
 }

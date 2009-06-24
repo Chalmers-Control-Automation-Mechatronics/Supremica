@@ -14,27 +14,25 @@ public class Client
 	String service = DistributedServer.DEFAULT_SERVICE_NAME;
 
 	String controller = args[2];
-
-	if (args.length > 3)
-	  service = args[3];
+	  
 
 	Registry registry = LocateRegistry.getRegistry(host, port);
 	Server server = (Server) registry.lookup(service);
 	
 	Job job = new Job();
-	job.setAttribute("name", "test-job");
-	job.setAttribute("controller", controller);
+	job.setName("test-job");
+	job.setController(controller);
 
-	Job result = server.submitJob(job);
+	if (args.length > 3)
+	  {
+	    Integer nodes = Integer.parseInt(args[3]);
+	    job.setNodeCount(nodes);
+	  }
 
-	if (result.getJobStatus() == JobStatus.COMPLETE)
-	  {
-	    System.out.println("Job finished successfully!");
-	  }
-	else if (result.getJobStatus() == JobStatus.EXCEPTION)
-	  {
-	    System.out.format("Job exception: %s\n", result.getException());
-	  }
+	JobResult result = server.submitJob(job);
+
+	if (result.getException() != null)
+	  System.out.format("Job exception: %s\n", result.getException());
 
       }
     catch (Exception e)

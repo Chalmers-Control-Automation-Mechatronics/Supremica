@@ -24,5 +24,5 @@ public interface Server extends Remote
    * @param job The job description
    * @return A job containing the original job, and results.
    */
-  public Job submitJob(Job job) throws RemoteException;
+  public JobResult submitJob(Job job) throws RemoteException;
 } 

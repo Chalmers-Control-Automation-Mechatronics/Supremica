@@ -1,4 +1,4 @@
-package net.sourceforge.waters.analysis.distributed;
+package net.sourceforge.waters.analysis.distributed.safetyverifier;
 
 import java.util.Arrays;
 import java.util.Set;

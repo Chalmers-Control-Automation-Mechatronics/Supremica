@@ -7,7 +7,11 @@ import java.rmi.server.UnicastRemoteObject;
 
 import java.util.List;
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.Iterator;
+import java.util.Collection;
+import java.util.Collections;
 
 
 public class DistributedServer 
@@ -33,6 +37,41 @@ public class DistributedServer
   {
     System.out.format("Node %s connected", node);
     addNode(node);
+  }
+
+  private ControllerID createControllerID(Controller c)
+  {
+    return new ControllerID(java.util.UUID.randomUUID().toString());
+  }
+  
+  private synchronized Collection<Node> selectNodes(int count)
+  {
+    Set<Node> nodes = new HashSet<Node>();
+
+    //Duplicate and shuffle the list of nodes. This way the
+    //distribution of work should be more even amongst nodes
+    List<Node> shuffled = new ArrayList<Node>(mNodes);
+    Collections.shuffle(shuffled);
+
+    for (Node n : shuffled)
+      {
+	if (nodes.size() >= count)
+	  break;
+
+	//Attempt to ping the node. Avoid giving out 
+	//nodes that do not respond to pings.
+	try
+	  {
+	    n.ping();
+	    nodes.add(n);
+	  }
+	catch (RemoteException e)
+	  {
+	    continue;
+	  }
+      }
+ 
+    return nodes;
   }
 
   /**
@@ -68,29 +107,66 @@ public class DistributedServer
   }
 
 
-  public Job submitJob(Job job)
+  public JobResult submitJob(Job job)
   {
-    Job result = job.clone();
-
     try
       {
-	if (!job.containsAttribute("controller"))
+	if (!job.contains("controller"))
 	  throw new IllegalArgumentException("Job does not contain a controller attribute");
 
-	String controller_name = (String)job.getAttribute("controller");
+	String controller_name = (String)job.get("controller");
 	
-	System.out.println ("Processing job "+ job.getAttribute("name"));
+	//If the job doesn't specify how many nodes it wants
+	//then we just give out a default number
+	int preferred_nodes = 10;
+
+	if (job.contains("preferred-nodes"))
+	  {
+	    try
+	      {
+		preferred_nodes = (Integer)job.get("preferred-nodes");
+	      }
+	    catch (ClassCastException e) 
+	      {
+		throw new IllegalArgumentException("Could not parse 'preferred-nodes', not an Integer");
+	      }
+	  }
+
 	System.out.format ("Using controller: %s\n",
 			   controller_name);
-	
+
 	//Create a controller for the job.
 	Controller control = createController(controller_name);
 	
+	Collection<Node> nodes = selectNodes(preferred_nodes);
+	System.out.println ("Processing job "+ job.get("name"));		
+	System.out.format("Preferred %d, and got %d nodes\n",
+			  preferred_nodes, nodes.size());
+
+
+	ControllerID id = createControllerID(control);
+	control.setControllerID(id);
+	control.setJob(job);
+	control.setNodes(nodes);
+
 	control.run();
+
+	//Clean up after the controller.
+	for (Node n : nodes)
+	  {
+	    try
+	      {
+		n.cleanup(id);
+	      }
+	    catch (Exception e)
+	      {
+		e.printStackTrace();
+	      }
+	  }
 	
 	if (control.getState() == ControllerState.COMPLETED)
 	  {
-	    result.setComplete();
+	    JobResult result = control.getResult();
 	    return result;
 	  }
 	else if (control.getState() == ControllerState.EXCEPTION)
@@ -100,10 +176,10 @@ public class DistributedServer
       }
     catch (Exception e)
       {
+	JobResult result = new JobResult();
 	result.setException(e);
+	return result;
       }
-	
-    return result;
   }
 
   private class NodePruner extends Thread

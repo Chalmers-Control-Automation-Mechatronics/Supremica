@@ -10,4 +10,28 @@ public interface Node extends Remote
    * node is alive.
    */
   public void ping() throws RemoteException;
+
+  /**
+   * A factory method to create workers given a class name.
+   * The class name should be the full name for a class, and the
+   * class must be assignable to the Worker interface.
+   * 
+   * Exceptions will be thrown if the worker cannot be created... 
+   * somehow through the remote exception
+   *
+   * @param classname name of the class to load.
+   * @return remote instance of a worker. 
+   * @throws IllegalArgumentException if the controller ID or classname
+   *                                  is null.
+   */
+  public Worker createWorker(ControllerID id, String classname) 
+    throws 
+    ClassNotFoundException,
+    IllegalAccessException,
+    IllegalArgumentException,
+    InstantiationException,
+    RemoteException;
+
+
+  public void cleanup(ControllerID id) throws RemoteException;
 }
