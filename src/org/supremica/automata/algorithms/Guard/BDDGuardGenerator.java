@@ -73,7 +73,6 @@ public class BDDGuardGenerator {
     HashSet<String> independentStates;
     boolean isSigmaBDD;
     BufferedWriter ETout;
-    boolean goodFlag;
 
     /** Creates a new instance of BDDGuardGenerator */
     public BDDGuardGenerator(BDDAutomata bddAutomata, String eventLabel, BDD safeStates, boolean allowedForbidden) {
@@ -362,34 +361,7 @@ public class BDDGuardGenerator {
                 isSigmaBDD = false;
 //                MDD2DOT(safeStatesEnablingSigmaMDD, "C:/Users/sajed/Desktop/MDD_files/mddSigma_"+event.getName()+".dot");
                 
-//                toOneStatesSigmaMap = statesInWayToNode(safeStatesEnablingSigmaMDD, safeStatesEnablingSigmaMDD.getNode(1), toOneStatesSigmaMap);
-
-
-/*                System.out.println("************************");
-                for(String aut:toOneStatesSigmaMap.keySet())
-                {
-                    if(aut.equals("Philo:1"))
-                    {
-                        System.out.println(aut+": ");
-                        for(String st:toOneStatesSigmaMap.get(aut))
-                            System.out.print(st+" , ");
-                        System.out.println("");
-                        System.out.println("########");
-                    }
-                }
- */
-                goodFlag = true;
                 MDD goodMDD = generateMBDD(goodBDD);
-                goodFlag = false;
-                MDD otherMDD;
-                if(allowedForbidden)
-                    otherMDD = generateMBDD(mustForbiddenStatesBDD);
-                else
-                    otherMDD = generateMBDD(mustAllowedStatesBDD);
-
-//                computeToOneStates(otherMDD, otherMDD.getNode(1));
-
-                toOneStatesMap = statesInWayToNode(otherMDD, otherMDD.getNode(1), toOneStatesMap);
 
 /*                //generate expression tree
                 try
@@ -714,7 +686,6 @@ public class BDDGuardGenerator {
                     BDD stateBDD = manager.getFactory().buildCube(stateIndex, bddAut.getSourceStateDomain().vars());
 //                    if(isSigmaBDD && aut.getName().equals("MACH1"))
 //                    {}
-//                    if(isSigmaBDD || bddHashCode == 0 || toOneStatesSigmaMap.get(aut.getName()).contains(map.get(i)))
                     if((isSigmaBDD || bddHashCode == 0 || stateBDD.and(safeStatesEnablingSigmaBDD).nodeCount() > 0))
                     {
                         output.add(i);
@@ -727,7 +698,6 @@ public class BDDGuardGenerator {
                     int stateIndex = automataBDD.getStateIndex(aut, aut.getStateWithName(map.get(element)));
                     BDD stateBDD = manager.getFactory().buildCube(stateIndex, bddAut.getSourceStateDomain().vars());
 
-//                    if(isSigmaBDD || bddHashCode == 0 || toOneStatesSigmaMap.get(aut.getName()).contains(map.get(element)))
                     if((isSigmaBDD || bddHashCode == 0 || stateBDD.and(safeStatesEnablingSigmaBDD).nodeCount() > 0))
                     {
                         output.add(element);
@@ -747,7 +717,6 @@ public class BDDGuardGenerator {
                         int stateIndex = automataBDD.getStateIndex(aut, aut.getStateWithName(map.get(element)));
                         BDD stateBDD = manager.getFactory().buildCube(stateIndex, bddAut.getSourceStateDomain().vars());
 
-//                        if(isSigmaBDD || bddHashCode == 0 || toOneStatesSigmaMap.get(aut.getName()).contains(map.get(element)))
                         if((isSigmaBDD || bddHashCode == 0 || stateBDD.and(safeStatesEnablingSigmaBDD).nodeCount() > 0))
                         {
                             output.add(element);
@@ -766,7 +735,6 @@ public class BDDGuardGenerator {
                     int stateIndex = automataBDD.getStateIndex(aut, aut.getStateWithName(map.get(i)));
                     BDD stateBDD = manager.getFactory().buildCube(stateIndex, bddAut.getSourceStateDomain().vars());
 
-//                    if((isSigmaBDD || bddHashCode == 0 || toOneStatesSigmaMap.get(aut.getName()).contains(map.get(i))))
                     if((isSigmaBDD || bddHashCode == 0 || stateBDD.and(safeStatesEnablingSigmaBDD).nodeCount() > 0))
                     {
                         output.add(i);
@@ -881,7 +849,7 @@ public class BDDGuardGenerator {
                 String stateName = bddAut.myIndex2stateName.get(i);
                 int stateIndex = automataBDD.getStateIndex(bddAut.getAutomaton(), bddAut.getAutomaton().getStateWithName(stateName));
                 BDD stateBDD = manager.getFactory().buildCube(stateIndex, bddAut.getSourceStateDomain().vars());
-//                if(!toOneStatesMap.get(autName).contains(stateName))
+
                 if((allowedForbidden?mustForbiddenStatesBDD:mustAllowedStatesBDD).and(stateBDD).nodeCount() == 0)
                     indpStates.add(("Q_"+autName+(allowedForbidden?" = ":" != ")+stateName));
             }
@@ -957,7 +925,7 @@ public class BDDGuardGenerator {
                     String stateName = bddAut.myIndex2stateName.get(i);
                     int stateIndex = automataBDD.getStateIndex(bddAut.getAutomaton(), bddAut.getAutomaton().getStateWithName(stateName));
                     BDD stateBDD = manager.getFactory().buildCube(stateIndex, bddAut.getSourceStateDomain().vars());
-//                    if(!toOneStatesMap.get(autName).contains(stateName))
+
                     if((allowedForbidden?mustForbiddenStatesBDD:mustAllowedStatesBDD).and(stateBDD).nodeCount() == 0)
                         indpStates.add(("Q_"+autName+(allowedForbidden?" = ":" != ")+stateName));
                 }
@@ -1016,77 +984,6 @@ public class BDDGuardGenerator {
         }
         else
             return "";
-    }
-
-    public HashMap<String, HashSet<String>> statesInWayToNode(MDD mdd, MDDNode node, HashMap<String, HashSet<String>> map)
-    {
-        if(!node.isRoot())
-        {
-            HashSet<MDDEdge> conEdges = mdd.toNode2edges(node);
-            for(MDDEdge e: conEdges)
-            {
-               String fNodeName = e.getFromNode().getName();
-
-               NEWskippedAutomata(automaton2MBDDLevel.get(node.getName()),automaton2MBDDLevel.get(fNodeName), map);
-
-               BDDAutomaton bddAut = automataBDD.getBDDAutomaton(e.getFromNode().getName());
-               if(!map.containsKey(fNodeName))
-               {
-                   HashSet<String> s = new HashSet<String>();
-                   for(Integer i:e.getLabel())
-                       s.add(bddAut.myIndex2stateName.get(i));
-                   map.put(fNodeName, s);
-               }
-               else
-               {
-                   for(Integer i:e.getLabel())
-                       map.get(fNodeName).add(bddAut.myIndex2stateName.get(i));
-               }
-
-               statesInWayToNode(mdd, e.getFromNode(),map);
-            }
-
-        }
-        for(Automaton a:automataBDD.getAutomata())
-        {
-            if(!map.keySet().contains(a.getName()))
-            {
-               HashSet<String> s = new HashSet<String>();
-               for(State state:a.getStateSet())
-                   s.add(state.getName());
-               map.put(a.getName(), s);
-            }
-        }
-
-        return map;
-
-    }
-
-    public void NEWskippedAutomata(int fromAutomatonLevel,int toAutomatonLevel, HashMap<String, HashSet<String>> map)
-    {
-        for(Integer level : MBDDLevel2automaton.keySet())
-        {
-            if((level < fromAutomatonLevel) && (level > toAutomatonLevel))
-            {
-               String autName = MBDDLevel2automaton.get(level);
-
-               Automaton aut = automataBDD.getAutomata().getAutomaton(autName);
-
-               if(!map.containsKey(autName))
-               {
-                   HashSet<String> s = new HashSet<String>();
-                   for(State st:aut.getStateSet())
-                       s.add(st.getName());
-                   map.put(autName, s);
-               }
-               else
-               {
-                   for(State st:aut.getStateSet())
-                       map.get(autName).add(st.getName());
-               }
-
-            }
-        }
     }
 
     public void printStates(BDD states)
