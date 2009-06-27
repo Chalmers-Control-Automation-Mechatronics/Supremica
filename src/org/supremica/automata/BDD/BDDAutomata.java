@@ -253,6 +253,9 @@ public class BDDAutomata
                 specsSelfLoopsBDD = specsSelfLoopsBDD.or(bddAutomaton.getSelfLoopsBDD());
             }
 
+//            if(bddAutomaton.getAutomaton().getName().equals("P1"))
+//                    bddAutomaton.getTransitionForwardBDD().printDot();
+
             add(bddAutomaton);
                         
             i++;
