@@ -111,25 +111,17 @@ public class DistributedServer
   {
     try
       {
-	if (!job.contains("controller"))
+	if (job.getController() == null)
 	  throw new IllegalArgumentException("Job does not contain a controller attribute");
 
-	String controller_name = (String)job.get("controller");
+	String controller_name = job.getController();
 	
 	//If the job doesn't specify how many nodes it wants
 	//then we just give out a default number
 	int preferred_nodes = 10;
-
-	if (job.contains("preferred-nodes"))
+	if (job.getNodeCount() != null)
 	  {
-	    try
-	      {
-		preferred_nodes = (Integer)job.get("preferred-nodes");
-	      }
-	    catch (ClassCastException e) 
-	      {
-		throw new IllegalArgumentException("Could not parse 'preferred-nodes', not an Integer");
-	      }
+	    preferred_nodes = job.getNodeCount();
 	  }
 
 	System.out.format ("Using controller: %s\n",
@@ -238,7 +230,7 @@ public class DistributedServer
       {
 	Server server = new DistributedServer();
 	Server stub = 
-	  (Server) UnicastRemoteObject.exportObject(server, 23232);
+	  (Server) UnicastRemoteObject.exportObject(server, 0);
 	Registry registry = LocateRegistry.createRegistry(DEFAULT_PORT);
 	registry.rebind(DEFAULT_SERVICE_NAME, stub);
       }

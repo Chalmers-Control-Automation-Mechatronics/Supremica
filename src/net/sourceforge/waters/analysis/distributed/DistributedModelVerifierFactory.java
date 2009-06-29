@@ -31,6 +31,7 @@ public class DistributedModelVerifierFactory
     super(arglist);
     addArgument(new HostArgument());
     addArgument(new PortArgument());
+    addArgument(new NodeCountArgument());
   }
 
   public DistributedControllabilityChecker 
@@ -56,14 +57,15 @@ public class DistributedModelVerifierFactory
 
 
   /**
-   * Process the host-name command line argument
+   * Process the host-name command line argument. This
+   * argument is required for the distributed checkers.
    */
   private static class HostArgument extends CommandLineArgumentString
   {
     private HostArgument()
     {
       super("-host",
-	    "Server to submit job to");
+	    "Server to submit job to", true);
     }
 
     protected void configure(final ModelVerifier verifier)
@@ -91,6 +93,24 @@ public class DistributedModelVerifierFactory
 
       int value = getValue();
       dsv.setPort(value);
+    }
+  }
+  
+  private static class NodeCountArgument extends CommandLineArgumentInteger
+  {
+    private NodeCountArgument()
+    {
+      super("-nodes",
+	    "Preferred number of nodes for the job");
+    }
+
+    protected void configure(final ModelVerifier verifier)
+    {
+      DistributedSafetyVerifier dsv = 
+	(DistributedSafetyVerifier) verifier;
+
+      int value = getValue();
+      dsv.setNodeCount(value);
     }
   }
 

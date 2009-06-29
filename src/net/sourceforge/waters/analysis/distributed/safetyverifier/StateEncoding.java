@@ -1,6 +1,8 @@
 package net.sourceforge.waters.analysis.distributed.safetyverifier;
 
-public abstract class StateEncoding
+import java.io.Serializable;
+
+public abstract class StateEncoding implements Serializable
 {
   /**
    * From an array of state indices, create an encoded

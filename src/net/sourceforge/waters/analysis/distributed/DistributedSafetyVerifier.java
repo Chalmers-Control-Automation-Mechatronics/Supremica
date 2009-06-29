@@ -63,6 +63,7 @@ public class DistributedSafetyVerifier
 	VerificationJob job = new VerificationJob();
 	job.setName("safety-" + UUID.randomUUID().toString());
 	job.setController(controller);
+	job.setNodeCount(getNodeCount());
 
 	//The cast to Serializable is necessary because the interfaces
 	//don't implement Serializable, but the object itself probably
@@ -157,8 +158,19 @@ public class DistributedSafetyVerifier
   {
     return mPort;
   }
+
+  public void setNodeCount(int count)
+  {
+    mNodeCount = count;
+  }
+
+  public int getNodeCount()
+  {
+    return mNodeCount;
+  }
   
   private String mHostname = null;
-  private int mPort = 0;
+  private int mPort = 23232;
+  private int mNodeCount = 10;
   private KindTranslator mKindTranslator;
 }
