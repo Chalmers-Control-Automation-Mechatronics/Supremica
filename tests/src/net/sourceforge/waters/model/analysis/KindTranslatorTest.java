@@ -76,6 +76,7 @@ public class KindTranslatorTest
     final ObjectInputStream in = new ObjectInputStream(fis);
     final KindTranslator trans1 = (KindTranslator) in.readObject();
     in.close();
+    assertFalse(trans0 == trans1);
     assertEquals(trans1.getEventKind(event), EventKind.CONTROLLABLE);
   }
 

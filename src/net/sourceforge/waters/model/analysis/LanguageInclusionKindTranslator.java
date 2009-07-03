@@ -64,7 +64,6 @@ public class LanguageInclusionKindTranslator
     switch (kind) {
     case PLANT:
     case SPEC:
-    case SUPERVISOR:
       return ComponentKind.PLANT;
     case PROPERTY:
       return ComponentKind.SPEC;

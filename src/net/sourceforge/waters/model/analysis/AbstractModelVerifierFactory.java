@@ -9,6 +9,7 @@
 
 package net.sourceforge.waters.model.analysis;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -20,13 +21,18 @@ import java.util.List;
 import java.util.Map;
 
 import net.sourceforge.waters.model.compiler.ModuleCompiler;
+import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
+import net.sourceforge.waters.xsd.base.ComponentKind;
+import net.sourceforge.waters.xsd.base.EventKind;
 
 
 /**
- * A factory interface for all types of model verifiers.
+ * A default implementation of the {@link ModelVerifierFactory} interface.
+ * This class is extended for different flavours of model checking
+ * algorithms.
  *
  * @author Robi Malik
  */
@@ -302,7 +308,7 @@ public abstract class AbstractModelVerifierFactory
 
   //#########################################################################
   //# Inner Class PropertyArgument
-  private static class PropertyArgument
+  private class PropertyArgument
     extends CommandLineArgumentString
   {
     //#######################################################################
@@ -330,11 +336,83 @@ public abstract class AbstractModelVerifierFactory
 
     protected void configure(final ModelVerifier verifier)
     {
-      if (!(verifier instanceof LanguageInclusionChecker)) {
+      if (verifier instanceof LanguageInclusionChecker) {
+        final String name = getValue();
+        final LanguageInclusionChecker lchecker =
+          (LanguageInclusionChecker) verifier;
+        final KindTranslator trans = lchecker.getKindTranslator();
+        if (trans instanceof PropertyKindTranslator) {
+          final PropertyKindTranslator ptrans = (PropertyKindTranslator) trans;
+          ptrans.addPropertyName(name);
+        } else {
+          final PropertyKindTranslator ptrans =
+            new PropertyKindTranslator(name);
+          lchecker.setKindTranslator(ptrans);
+        }
+      } else {
         fail("Command line option " + getName() +
              " is only supported for language inclusion!");
       }
     }
+  }
+
+
+  //#########################################################################
+  //# Inner Class PropertyKindTranslator
+  private static class PropertyKindTranslator
+    implements KindTranslator, Serializable
+  {
+    //#######################################################################
+    //# Constructor
+    PropertyKindTranslator(final String name)
+    {
+      mUsedPropertyNames = new HashSet<String>();
+      mUsedPropertyNames.add(name);
+    }
+
+    //#######################################################################
+    //# Interface net.sourceforge.waters.model.analysis.KindTranslator
+    public ComponentKind getComponentKind(final AutomatonProxy aut)
+    {
+      final ComponentKind kind = aut.getKind();
+      switch (kind) {
+      case PLANT:
+      case SPEC:
+        return ComponentKind.PLANT;
+      case PROPERTY:
+        final String name = aut.getName();
+        if (mUsedPropertyNames.contains(name)) {
+          return ComponentKind.SPEC;
+        } else {
+          return kind;
+        }
+      default:
+        return kind;
+      }
+    }
+
+    public EventKind getEventKind(final EventProxy event)
+    {
+      final EventKind kind = event.getKind();
+      switch (kind) {
+      case CONTROLLABLE:
+      case UNCONTROLLABLE:
+        return EventKind.UNCONTROLLABLE;
+      default:
+        return kind;
+      }
+    }
+
+    //#######################################################################
+    //# Simple Access
+    void addPropertyName(final String name)
+    {
+      mUsedPropertyNames.add(name);
+    }
+
+    //#######################################################################
+    //# Data Members
+    private final Collection<String> mUsedPropertyNames;
   }
 
 

@@ -306,7 +306,7 @@
       <formatter type="xml"/>
       <batchtest todir="${logs.results}">
         <fileset dir="${supremica.testsrc}">
-          <include name="**/Native*.java"/>
+          <include name="**/Kind*.java"/>
           <exclude name="**/Abstract*.java"/>
         </fileset>
       </batchtest>
