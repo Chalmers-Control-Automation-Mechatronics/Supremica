@@ -57,8 +57,6 @@ public class DistributedSafetyVerifier
     try
       {
 	Server server = connectToServer(getHostname(), getPort());
-	
-	System.out.println("Connected to server: " + server);
 
 	VerificationJob job = new VerificationJob();
 	job.setName("safety-" + UUID.randomUUID().toString());

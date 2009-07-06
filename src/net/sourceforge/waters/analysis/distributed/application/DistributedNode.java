@@ -71,6 +71,10 @@ public class DistributedNode
   {
     System.err.format("Cleaning up for %s\n", id);
     mWorkerCleanup.cleanup(id);
+    
+    //Probably unnecessary with modern JVMs, but hint that now is a
+    //good time to run the garbage collector.
+    System.gc();
   }
 
   private class ConnectionThread extends Thread
@@ -113,6 +117,7 @@ public class DistributedNode
 		  mServerProxy = null;
 		}
 	    }
+			   
 
 	  //Wait a bit
 	  dosleep(2000);

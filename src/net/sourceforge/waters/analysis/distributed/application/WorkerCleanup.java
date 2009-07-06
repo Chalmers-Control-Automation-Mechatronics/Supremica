@@ -73,21 +73,28 @@ class WorkerCleanup
 	try
 	  {
 	    Worker remote = (Worker)w;
-	    UnicastRemoteObject.unexportObject(remote, true);
+	    boolean b = UnicastRemoteObject.unexportObject(remote, true);
+
+	    System.err.format("Worker cleanup: %b\n", b);
 	  }
 	catch (ClassCastException e)
 	  {
 	    //The worker is a bit messed up, not remote.
 	    //This probably shouldn't be able to happen.
+	    System.err.println(e);
 	  }
 	catch (NoSuchObjectException e)
 	  {
 	    //The worker wasn't exported. This is no big 
 	    //deal. We will just ignore it and continue
+	    System.err.println(e);
 	  }
 
 	w.deleted();    
       }
+
+    //Empty the set
+    wset.clear();
   }
 
   //Map of controller id to set of workers. This really assumes

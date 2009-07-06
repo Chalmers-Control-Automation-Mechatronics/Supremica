@@ -2,9 +2,14 @@ package net.sourceforge.waters.analysis.distributed.safetyverifier;
 
 import gnu.trove.THashSet;
 
+import java.rmi.RemoteException;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.BlockingQueue;
 
 import net.sourceforge.waters.analysis.distributed.application.AbstractWorker;
 import net.sourceforge.waters.analysis.distributed.application.Worker;
@@ -76,12 +81,27 @@ public class SafetyVerifierWorkerImpl extends AbstractWorker implements SafetyVe
 
   public void startProcessingThreads(int n, int buffersize)
   {
-    for (int i = 0; i < n; i++)
+    final String ExceptionText = "Cannot add new processing threads after "+
+      "worker has been killed";
+      
+    //Check for kill state before and after entering the synchronized
+    //region, as the kill state could be set while the thread is
+    //waiting on mThreads.
+    if (mKillState)
+      throw new IllegalStateException(ExceptionText);
+
+    synchronized (mThreads)
       {
-	ProcessingThread t = new ProcessingThread(buffersize);
-	t.setDaemon(true);
-	t.start();
-	mProcessingThreads.add(t);
+	if (mKillState)
+	  throw new IllegalStateException(ExceptionText);
+	
+	for (int i = 0; i < n; i++)
+	  {
+	    ProcessingThread t = new ProcessingThread(buffersize);
+	    t.setDaemon(true);
+	    t.start();
+	    mThreads.add(t);
+	  }
       }
   }
 
@@ -135,10 +155,20 @@ public class SafetyVerifierWorkerImpl extends AbstractWorker implements SafetyVe
 	      //to do.
 	      bufLen = fillBuffer(buffer, alreadyRunning);
 	      alreadyRunning = true;
-	      
+
 	      //Process items in the buffer
 	      for (int i = 0; i < bufLen; i++)
 		{
+		  //Pause the thread if necessary, while checking for
+		  //the kill flag. If this method returns true then the 
+		  //processing thread should terminate.
+		  if (pauseOrDie())
+		    {
+		      //XXX: Should the remaining work buffer be returned to
+		      //     the incoming queue here... perhaps it should.
+		      return;
+		    }
+
 		  //Process the state.
 		  StateTuple state = buffer[i];
 		  processState(state);
@@ -168,7 +198,9 @@ public class SafetyVerifierWorkerImpl extends AbstractWorker implements SafetyVe
      *
      * The thread count will only be decremented if the alreadyRunning
      * parameter is true. This is used to prevent the the counter being 
-     * decremented on threads that are not yet running.     * 
+     * decremented on threads that are not yet running.
+     * @throws InterruptedException if the thread is interrupted or if 
+     *                              the kill state is set.
      */ 
     private int fillBuffer(StateTuple[] buffer, boolean alreadyRunning) 
       throws InterruptedException
@@ -184,12 +216,16 @@ public class SafetyVerifierWorkerImpl extends AbstractWorker implements SafetyVe
 	  if (alreadyRunning)
 	    {
 	      mRunningProcessingThreads--;
+	      killCanary();
 	    }
 
 	waiting: while (true)
 	    {
-	      while (unprocessedStates() == 0)
+	      while (unprocessedStates() == 0 || mPausedState)
 		{
+		  if (mKillState)
+		    throw new InterruptedException("Thread should be killed");
+
 		  mStateList.wait();
 		}
 	      
@@ -209,6 +245,7 @@ public class SafetyVerifierWorkerImpl extends AbstractWorker implements SafetyVe
 
 	      //After returning with states, the thread is considered
 	      //to be running.
+	      killCanary();
 	      mRunningProcessingThreads++;
 	      return nstates;
 	    }
@@ -279,9 +316,9 @@ public class SafetyVerifierWorkerImpl extends AbstractWorker implements SafetyVe
 
 	try
 	  {
+	    mStateDistribution.addState(packed);
 	    synchronized (mOutgoingLock)
 	      {
-		mStateDistribution.addState(packed);
 		mOutgoingStateCounter++;
 	      }
 	  }
@@ -316,12 +353,26 @@ public class SafetyVerifierWorkerImpl extends AbstractWorker implements SafetyVe
 
   private void setBadState(StateTuple bad)
   {
-    mBadState = bad;
+    synchronized (mBadStateLock)
+      {
+	//While this could have a concurrent update problem, it shouldn't
+	//matter because the assignment will be atomic.
+	if (mBadState == null)
+	  mBadState = bad;
+	
+	//The bad state should not be null after this call.
+	assert(mBadState != null);
+
+	System.out.println("Set bad state");
+      }
   }
 
   public StateTuple getBadState()
   {
-    return mBadState;
+    synchronized (mBadStateLock)
+      {
+	return mBadState;
+      }
   }
 
   /**
@@ -367,12 +418,62 @@ public class SafetyVerifierWorkerImpl extends AbstractWorker implements SafetyVe
       }
   }
 
-  public boolean appearsFinished()
+  public void pause()
   {
+    //It's not strictly necessary to notify all here, but it means
+    //that threads waiting on the worker state monitor get notified
+    //when the state changes.
+    synchronized (mWorkerState)
+      {
+	mPausedState = true;
+	mWorkerState.notifyAll();
+      }
+
+    //Hack? Also wake up threads waiting on the incoming state list.
+    //This is necessary so that any processing threads that are waiting
+    //on states can check the pause/kill status too.
     synchronized (mStateList)
       {
-	return getWaitingStateCount() == 0 && 
-	  mRunningProcessingThreads == 0;
+	mStateList.notifyAll();
+      }
+  }
+
+  public void resume()
+  {
+    synchronized (mWorkerState)
+      {
+	mPausedState = false;
+	mWorkerState.notifyAll();
+      }    
+    
+    //Hack? Also wake up threads waiting on the incoming state list.
+    //This is necessary so that any processing threads that are waiting
+    //on states can check the pause/kill status too.
+    synchronized (mStateList)
+      {
+	mStateList.notifyAll();
+      }
+  }
+
+  public boolean isPaused()
+  {
+    return mPausedState;
+  }
+  
+  public void kill()
+  {
+    synchronized (mWorkerState)
+      {
+	mKillState = true;
+	mWorkerState.notifyAll();
+      }    
+
+    //Hack? Also wake up threads waiting on the incoming state list.
+    //This is necessary so that any processing threads that are waiting
+    //on states can check the pause/kill status too.
+    synchronized (mStateList)
+      {
+	mStateList.notifyAll();
       }
   }
   
@@ -388,13 +489,196 @@ public class SafetyVerifierWorkerImpl extends AbstractWorker implements SafetyVe
   {
     super.deleted();
     System.err.format("deleted() called on safety verifier worker\n");
+
+    //Clean up running threads so the object can be garbage collected.
+    kill();
+
+    //Now wait for the threads to die. This might be a long critical
+    //section, but it prevents new threads from being added.
+    synchronized (mThreads)
+      {
+	for (Thread t : mThreads)
+	  {
+	    try
+	      {
+		t.join();
+	      }
+	    catch (InterruptedException e)
+	      {
+		//Ignore the interrupt, continue waiting for the other
+		//threads to die.
+	      }
+	  }
+      }
+    
+    System.err.format("Safety verifier worker: all threads terminated\n");
   }
+
+  /**
+   * Checks for the kill and pause state, blocking if
+   * appropriate. This tries to minimise the amount of synchronisation
+   * needed between threads. If the kill flag is set then this method
+   * will return true, and the calling thread should probably
+   * terminate. this also 
+   */
+  private boolean pauseOrDie() throws InterruptedException
+  {
+    //If the kill flag is set, then the caller should be informed it
+    //should terminate.
+    if (mKillState)
+      return true;
+
+    //If the thread isn't paused, then there is no need to synchronise
+    //or wait.
+    if (!mPausedState)
+      {
+	return false;
+      }
+    else
+      {
+	//The thread is paused, we need to wait on the state sync
+	//object until notified.
+	synchronized (mWorkerState)
+	  {
+	    while (true)
+	      {
+		if (mKillState)
+		  return true;
+
+		if (!mPausedState)
+		  return false;
+
+		//Wait on the state sync object
+		mWorkerState.wait();
+	      }
+	  }
+      }
+  }
+
+  public void predecessorSearch(StateTuple original, PredecessorCallback callback) throws RemoteException
+  {
+    callback.takePredecessor(original, null, 42);
+  }
+
+  public void startIdleTest()
+  {
+    synchronized (mStateList)
+      {
+	//We initialise the idle flag to whether the system appears to
+	//be idle now. If it is idle then any changes to the state will
+	//hopefully be detected by the idle canary.
+	mIdleCanaryFlag = appearsIdle();
+      }
+  }
+
+  public boolean finishIdleTest()
+  {
+    synchronized (mStateList)
+      {
+	//Store the current/old value of the idle flag.
+	boolean canary = mIdleCanaryFlag;
+	mIdleCanaryFlag = false;
+
+	//Return true if the state appears to have been idle for the
+	//duration of the test, and additionally is idle now. The second
+	//test is perhaps unnecessary.
+	return canary && appearsIdle();
+      }
+  }
+
+  private boolean appearsIdle()
+  {
+    synchronized (mStateList)
+      {
+	return getWaitingStateCount() == 0 && mRunningProcessingThreads == 0;
+      }
+  }
+
+  private void killCanary()
+  {
+    synchronized (mStateList)
+      {
+	mIdleCanaryFlag = false;
+      }
+  }
+
+  /**
+   * A class to encapsulate searching for a predecessor state.
+   */
+  private class PredecessorSearch
+  {
+    public PredecessorSearch()
+    {
+
+    }
+
+    public void setSearchTarget(StateTuple state, PredecessorCallback cb)
+    {
+      //Set the search running to find predecessors to the given state
+      //that are available on this worker. If the predecessor search is 
+      //not currently running, then this should be set as the new target. 
+    }
+
+    /**
+     * An immutable predecessor class. Stores the located predecessor
+     * state and the state it is a predecessor to.
+     */
+    private class Predecessor
+    {
+      public Predecessor(StateTuple original, StateTuple predecessor)
+      {
+	mOriginalState = original;
+	mPredecessorState = predecessor;
+      }
+      
+      private final StateTuple mOriginalState;
+      private final StateTuple mPredecessorState;
+    }
+    
+    private class PredecessorProducer extends Thread
+    {
+      public PredecessorProducer(BlockingQueue<Predecessor> dataqueue)
+      {
+	mQueue = dataqueue;
+      }
+      
+      public void run()
+      {
+	while (true)
+	  {
+	    
+	  }
+      }
+      
+      private final BlockingQueue<Predecessor> mQueue;
+    }
+    
+    
+    private class PredecessorConsumer extends Thread
+    {
+      public PredecessorConsumer(BlockingQueue<Predecessor> dataqueue)
+      {
+	mQueue = dataqueue;
+      }
+      
+      public void run()
+      {
+	while (true)
+	  {
+	    
+	  }
+      }
+      
+      private final BlockingQueue<Predecessor> mQueue;
+    }
+  }
+
 
   private String mWorkerID = null;
   private StateDistribution mStateDistribution = null;
   private StateEncoding mStateEncoding = null;
   private Job mJob = null;
-  private List<Thread> mProcessingThreads = new ArrayList<Thread>();
+  private List<Thread> mThreads = new ArrayList<Thread>();
 
   private ProductDESSchema mModel = null;
   
@@ -418,6 +702,7 @@ public class SafetyVerifierWorkerImpl extends AbstractWorker implements SafetyVe
   private int mRunningProcessingThreads = 0;
   private long mIncomingStateCounter = 0;
   private long mOutgoingStateCounter = 0;
+  private boolean mIdleCanaryFlag = false;
   
   //An object, for the purpose of synchronisation
   private final Object mOutgoingLock = new Object();
@@ -425,5 +710,10 @@ public class SafetyVerifierWorkerImpl extends AbstractWorker implements SafetyVe
   private TransitionTable[] mPlantTransitions;
   private TransitionTable[] mSpecTransitions;
 
+  private final Object mBadStateLock = new Object();
   private StateTuple mBadState = null;
+
+  private final Object mWorkerState = new Object();
+  private boolean mPausedState = false;
+  private boolean mKillState = false;
 }
