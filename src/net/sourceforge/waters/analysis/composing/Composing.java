@@ -55,9 +55,9 @@ public class Composing {
       //Retain all events which are not mentioned in specs. This algorithm
       //only consider the events contained in the plants not in the specs.
       switch (mTranslator.getComponentKind(automaton)) {
-        case PLANT :  plants.add(selfloopCheck(automaton));
+        case PLANT :  plants.add(automaton);//selfloopCheck(automaton));
                       break;
-        case SPEC  :  specs.add(selfloopCheck(automaton));
+        case SPEC  :  specs.add(automaton);//selfloopCheck(automaton));
                       events.removeAll(automaton.getEvents());                      
                       break;
         default : break;
@@ -71,9 +71,11 @@ public class Composing {
     //Case: no removable events  
     if (hiddenEvents.isEmpty()) return mModel;
     
-    if(!sameTransCheck()){
+    long timeTemp = System.currentTimeMillis();
+    if(!sameTransCheck()){      
 	    mASTAutomata.add(new HashSet<ASTAutomaton>());
 	  }
+	  simplificationTime += System.currentTimeMillis()-timeTemp;
     
     //Assumption: All events which are not related with specs will be removed.    
     int loop = 0;
@@ -83,7 +85,7 @@ public class Composing {
       ArrayList<Candidate> composition = new ArrayList<Candidate>();
       Set<EventProxy> dependedEvents = new HashSet<EventProxy>();        
 		  //Step 1
-	    //mustL: A set of Automata using the particular event.	       
+	    //mustL: A set of Automata using the particular event.	         
 	    for (EventProxy e : events) {	    
 	      if(mTranslator.getEventKind(e)==EventKind.PROPOSITION) {
 	        dependedEvents.add(e);	        
@@ -173,7 +175,8 @@ public class Composing {
 			      int i = composition.indexOf(newCandidate);
 			      composition.get(i).addLocalEvent(e);			      	
 	        }      
-	    }
+	    }	    
+			
 	    events.removeAll(dependedEvents);
 	    /*
 	    System.out.println("Step "+loop+": "+composition.size()+" candidates.");
@@ -228,14 +231,17 @@ public class Composing {
 	    //###############################################################	       
 			//minS: Choose the candidate with the minimum synchronized product
 			//      states
-			else if (mHeuristic.equals("minS")) {
+			else if (mHeuristic.equals("minS")) {			  
 				composition = minS(composition);
+				//System.out.println("Candidates size: "+composition.size());				
 				for(int i=0;i<composition.size();i++) {			  
-				  Candidate candidate = composition.get(i);			  		  
+				  Candidate candidate = composition.get(i);
+				  //System.out.println("Candidates "+i+" :"+candidate.getName());
+				  //System.out.println("Predicted State size: "+candidate.getSPSNumber());			  		  
 				  try {
 				    project(candidate);
 				    projectOK = true;
-				    break;			    
+				    break;				    			    
 				  } catch (final OverflowException oe) {
 				      projectOK = false;
 				      badCandidate.add(candidate);
@@ -252,8 +258,11 @@ public class Composing {
 			//!!!!!useless for the converted model!!!!!
 			else if (mHeuristic.equals("minT")) {
 				composition = minT(composition);
+				//System.out.println("Candidates size: "+composition.size());
 				for(int i=0;i<composition.size();i++) {			  
-				  Candidate candidate = composition.get(i);			  		  
+				  Candidate candidate = composition.get(i);	
+				  //System.out.println("Candidates "+i+" :"+candidate.getName());
+				  //System.out.println("Predicted Transition size: "+candidate.getSPTNumber());		  		  
 				  try {
 				    project(candidate);
 				    projectOK = true;
@@ -291,8 +300,8 @@ public class Composing {
 				      projectOK = false;
 				      badCandidate.add(candidate);
 				      projection_overflow++;
-				      System.out.println("\nprojection_overflow "+projection_overflow+
-				                         " Candidate: "+candidate.getName()); 
+				      //System.out.println("\nprojection_overflow "+projection_overflow+
+				      //                   " Candidate: "+candidate.getName()); 
 		          continue;
 				  }
 	      }
@@ -311,8 +320,8 @@ public class Composing {
 				      badCandidate.add(candidate);
 				      composition.remove(candidate);
 				      projection_overflow++;
-				      System.out.println("projection_overflow "+projection_overflow+
-				                         " Candidate: "+candidate.getName());          
+				      //System.out.println("projection_overflow "+projection_overflow+
+				      //                   " Candidate: "+candidate.getName());          
 				  }
 			  }
 			}	
@@ -330,7 +339,7 @@ public class Composing {
 				      badCandidate.add(candidate);
 				      composition.remove(candidate);
 				      projection_overflow++;
-				      System.out.println("projection_overflow "+projection_overflow);          
+				      //System.out.println("projection_overflow "+projection_overflow);          
 				  }
 			  }
 			}	else {
@@ -360,6 +369,14 @@ public class Composing {
     return newModel;
   }
   
+  public long getSimplificationTime() {
+    return simplificationTime;
+  }
+  
+  public long getProjectionTime() {
+    return projectionTime;
+  }
+  
   public int getTotalNumberOfStates() {
     return mTotalNumberOfStates;
   }
@@ -387,26 +404,36 @@ public class Composing {
     Set<EventProxy> eForbidden = new HashSet<EventProxy>();    
 	  Projection2 proj = new Projection2(newP, mFactory, can.getLocalEvents(), eForbidden);		       
 	  proj.setNodeLimit(nodelimit);
-	  AutomatonProxy newAutomaton = proj.project();
+	  long timeTemp = System.currentTimeMillis();
+	  AutomatonProxy newAutomaton = proj.project();	  
+	  projectionTime += System.currentTimeMillis()-timeTemp;
+	  //System.out.println("One Projection Time: "+projectionTime);
+	  //System.out.println("Real State Size: "+newAutomaton.getStates().size());
+	  //System.out.println("Real Transition Size: "+newAutomaton.getTransitions().size());
 	  //System.out.println("Candidate's name: "+can.getName());
 	  //System.out.println("New Automaton's name: "+newAutomaton.getName());
 	  //System.out.println(newAutomaton.getName()+" has "+newAutomaton.getTransitions().size()+" transitions!");	  
     
 	  mTotalNumberOfStates += newAutomaton.getStates().size();
+	  //timeTemp = System.currentTimeMillis();
 	  newAutomaton=selfloopCheck(newAutomaton);
+	  //simplificationTime += System.currentTimeMillis()-timeTemp;
 	   
 	  mCandidate.add(can);
 	            
-	  plants.removeAll((HashSet)can.getAllAutomata());	  
-	  plants.add(newAutomaton);
-	   
+	  //plants.removeAll((HashSet)can.getAllAutomata());	  
+	  //plants.add(newAutomaton);
+	  
+	  //timeTemp = System.currentTimeMillis(); 
 	  moreSelfloopCheck();
 	  
-	  if(!sameTransCheck()){
+	  timeTemp = System.currentTimeMillis();
+	  if(!sameTransCheck()){	  	
 	    mASTAutomata.add(new HashSet<ASTAutomaton>());
 	  }
+	  simplificationTime += System.currentTimeMillis()-timeTemp;
 
-	  events.removeAll((HashSet)can.getLocalEvents());	  
+	  //events.removeAll((HashSet)can.getLocalEvents());	  
   }
   
   //remove the selfloop events which occur at all states
@@ -1065,5 +1092,7 @@ public class Composing {
   private Set<AutomatonProxy>           plants; 
   private Set<AutomatonProxy>           specs;
   private AutomatonProxy                mAlmostSameAutomaton; 
-  private int                           mTotalNumberOfStates;     
+  private int                           mTotalNumberOfStates;  
+  private long                          simplificationTime;
+  private long                          projectionTime;   
 }

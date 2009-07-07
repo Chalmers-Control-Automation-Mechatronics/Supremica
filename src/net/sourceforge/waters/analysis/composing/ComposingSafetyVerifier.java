@@ -121,16 +121,19 @@ public class ComposingSafetyVerifier
   public boolean run() throws AnalysisException {
     TimeOut timer = new TimeOut(3600000); 
     timer.start();
-    System.out.println("model events size: "+getModel().getEvents().size());          
+    //System.out.println("model events size: "+getModel().getEvents().size());          
     final Composing composing =
       new Composing(getConvertedModel(),
 		                getConvertedKindTranslator(),
 		                getFactory());		                
 		composing.setHeuristic(getHeuristic());
-    composing.setNodeLimit(getProjectionNodeLimit());     
+    composing.setNodeLimit(getProjectionNodeLimit());
+    long timeTemp = System.currentTimeMillis();				   
     ProductDESProxy des = composing.run(); 
-    System.out.println("Composing is done!");
-    System.out.println("events size: "+des.getEvents().size());
+    System.out.println("Composing is done! Process Time: "+(System.currentTimeMillis()-timeTemp));
+    //System.out.println("events size: "+des.getEvents().size());
+    //System.out.println("Simplification Time: "+composing.getSimplificationTime());
+    //System.out.println("Projection Time: "+composing.getProjectionTime());
     
     saveIntoFile(des);
     
@@ -200,15 +203,18 @@ public class ComposingSafetyVerifier
       }
       
       for (int i=candidates.size()-1;i>=0;i--) {
-               
-        for (ASTAutomaton astaut : astautomata.get(i+1)) {
-          composedTrace = renovateTrace(composedTrace,astaut);          
+        if (!astautomata.isEmpty()) {      
+	        for (ASTAutomaton astaut : astautomata.get(i+1)) {
+	          composedTrace = renovateTrace(composedTrace,astaut);          
+	        }
         }
         composedTrace = extendTrace(composedTrace,candidates.get(i));        
       }
       
-      for (ASTAutomaton astaut : astautomata.get(0)) {
-        composedTrace = renovateTrace(composedTrace,astaut);          
+      if (!astautomata.isEmpty()) {
+	      for (ASTAutomaton astaut : astautomata.get(0)) {
+	        composedTrace = renovateTrace(composedTrace,astaut);          
+	      }
       }
       
       //decode the manmade event only if model is converted
