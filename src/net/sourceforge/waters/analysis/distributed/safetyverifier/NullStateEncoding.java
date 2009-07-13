@@ -9,9 +9,9 @@ public class NullStateEncoding extends StateEncoding
     mModel = des;
   }
 
-  public StateTuple encodeState(int[] unpacked)
+  public StateTuple encodeState(int[] unpacked, int depth)
   {
-    return new StateTuple(unpacked.clone());
+    return new StateTuple(unpacked.clone(), depth);
   }
 
   public int[] decodeState(StateTuple packed)

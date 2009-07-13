@@ -1,6 +1,6 @@
 package net.sourceforge.waters.analysis.distributed.safetyverifier;
 
-import gnu.trove.THashSet;
+import gnu.trove.THashMap;
 
 import java.rmi.RemoteException;
 
@@ -112,9 +112,9 @@ public class SafetyVerifierWorkerImpl extends AbstractWorker implements SafetyVe
     //maintain the hashtable of visited states etc.
     synchronized (mStateList)
       {
-	if (!mObservedSet.contains(state))
+	if (!mObservedSet.containsKey(state))
 	  {
-	    mObservedSet.add(state);
+	    mObservedSet.put(state, state);
 	    mStateList.add(state);
 	  }
 	mIncomingStateCounter++;
@@ -313,7 +313,7 @@ public class SafetyVerifierWorkerImpl extends AbstractWorker implements SafetyVe
 	  }
 
 	//Dispatch state
-	StateTuple packed = mStateEncoding.encodeState(successor);
+	StateTuple packed = mStateEncoding.encodeState(successor, state.getDepthHint() + 1);
 
 	try
 	  {
@@ -508,7 +508,7 @@ public class SafetyVerifierWorkerImpl extends AbstractWorker implements SafetyVe
     super.created();
     
     mStateList = new ArrayList<StateTuple>();
-    mObservedSet = new THashSet<StateTuple>();
+    mObservedSet = new THashMap<StateTuple,StateTuple>();
   }
 
   public void deleted()
@@ -809,11 +809,24 @@ public class SafetyVerifierWorkerImpl extends AbstractWorker implements SafetyVe
 	    //A potentially reachable predecessor state has been
 	    //found. We now need to check if it is in the visited
 	    //state set. If it is, then add it to the queue to be
-	    //sent back to the controller and continue
-	    
-	    //XXX: make sure the state is reachable and get actual state
+	    //sent back to the controller and continue.
 
-	    StateTuple pred_state = mStateEncoding.encodeState(pre);
+	    StateTuple pred_state = mStateEncoding.encodeState(pre, Integer.MAX_VALUE);
+	    StateTuple t = null;
+	    synchronized (mStateList)
+	      {
+		t = mObservedSet.get(pred_state);
+	      }
+
+	    
+	    //If the state is not in our local observed set, then
+	    //we cannot tell if the state is reachable... if it is, some other
+	    //worker will take care of it
+	    if (t == null)
+	      return;
+	    else
+	      pred_state = t;
+
 	    Predecessor p = new Predecessor(packedCurrent, pred_state, event);
 	    System.out.format("Generated predecessor %s for event %d\n", 
 			      mStateEncoding.interpret(pred_state),
@@ -905,7 +918,11 @@ public class SafetyVerifierWorkerImpl extends AbstractWorker implements SafetyVe
    * method.
    */
   private List<StateTuple> mStateList;
-  private THashSet<StateTuple> mObservedSet;
+  
+  //This is used like a set but is actually a map because 
+  //we need to be able to retrieve the actual state tuple from
+  //the set, which isn't possible in the standard set interface.
+  private THashMap<StateTuple,StateTuple> mObservedSet;
   private int mCurrentStateIndex = 0;
 
   /**

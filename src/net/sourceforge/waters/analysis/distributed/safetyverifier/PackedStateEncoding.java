@@ -38,7 +38,7 @@ public class PackedStateEncoding extends StateEncoding
    * @param unpacked Unpacked state vector.
    * @return Packed state tuple.
    */
-  public StateTuple encodeState(int[] unpacked)
+  public StateTuple encodeState(int[] unpacked, int depth)
   {
     int[] pstate = new int[mStateArrayLength];
 
@@ -47,7 +47,7 @@ public class PackedStateEncoding extends StateEncoding
 	encodeAutomatonState(pstate, i, unpacked[i]);
       }
 
-    return new StateTuple(pstate);
+    return new StateTuple(pstate, depth);
   }
 
 

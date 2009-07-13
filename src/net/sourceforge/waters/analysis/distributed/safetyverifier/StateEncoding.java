@@ -8,7 +8,7 @@ public abstract class StateEncoding implements Serializable
    * From an array of state indices, create an encoded
    * state.
    */
-  public abstract StateTuple encodeState (int[] unpacked);
+  public abstract StateTuple encodeState (int[] unpacked, int depth);
 
   /**
    * From a state tuple, decode it into an array of state

@@ -250,14 +250,15 @@ public class SafetyVerifierController extends AbstractController implements Pred
 	  }
       }
 
-    return mStateEncoding.encodeState(start);
+    return mStateEncoding.encodeState(start, 0);
   }
 
   public int takePredecessor(StateTuple original, StateTuple predecessor, int event)
   {
-    System.out.format("Given predecessor %s of %s, event %d\n",
+    System.out.format("Given predecessor %s of %s (depth: %d), event %d\n",
 		      mStateEncoding.interpret(predecessor), 
 		      mStateEncoding.interpret(original), 
+		      predecessor.getDepthHint(),
 		      event);
 
     return Integer.MAX_VALUE;
