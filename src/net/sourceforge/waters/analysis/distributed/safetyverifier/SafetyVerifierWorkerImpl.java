@@ -37,8 +37,9 @@ public class SafetyVerifierWorkerImpl extends AbstractWorker implements SafetyVe
     mModel = des;
 
     //Calculate plant and spec transition tables
-    mPlantTransitions = generateTransitionTables(AutomatonSchema.PLANT);
-    mSpecTransitions = generateTransitionTables(AutomatonSchema.SPECIFICATION);
+    mTransitionTables = generateTransitionTables();
+    mPlantTransitions = selectTransitionTables(mTransitionTables, AutomatonSchema.PLANT);
+    mSpecTransitions = selectTransitionTables(mTransitionTables, AutomatonSchema.SPECIFICATION);
   }
 
   public void setWorkerID(String id)
@@ -375,25 +376,50 @@ public class SafetyVerifierWorkerImpl extends AbstractWorker implements SafetyVe
       }
   }
 
+
   /**
-   * Generate transition tables for a kind of automaton in a model.
-   * This allows you to build a list of the transition relation for
-   * all the plants or specifications in the model.
-   * @param  kind    The kind of automaton to generate transition tables for.
+   * Generates transition tables for automata in the model. The
+   * transition tables will have the same ordering as automata in the
+   * model.
    * @return An array of transition tables.
    */
-  protected TransitionTable[] generateTransitionTables(int kind)
+  protected TransitionTable[] generateTransitionTables()
   {
     List<TransitionTable> tts = new ArrayList<TransitionTable>();
     
     for (int i = 0; i < mModel.getAutomataCount(); i++)
       {
-	if (mModel.getAutomaton(i).getKind() == kind)
-	  tts.add(new TransitionTable(mModel, i));
+	tts.add(new TransitionTable(mModel, i));
       }
 
     return tts.toArray(new TransitionTable[0]);
   }
+
+
+  /**
+   * Selects transition tables from an array based on kind.  This
+   * makes no assumptions about the ordering of the tables array, it
+   * uses the automaton id from the transition table.
+   * @param tables Transition tables to select from
+   * @param kind the automaton kind to select
+   * @return an array containing the transition tables corresponding
+   *         to the automaton kind. This could be empty.
+   */
+  protected TransitionTable[] selectTransitionTables(TransitionTable[] tables,
+						     int kind)
+  {
+    List<TransitionTable> tts = new ArrayList<TransitionTable>();
+
+    for (int i = 0; i < tables.length; i++)
+      {
+	int at = tables[i].getAutomatonIndex();
+	if (mModel.getAutomaton(at).getKind() == kind)
+	  tts.add(tables[i]);
+      }
+
+    return tts.toArray(new TransitionTable[0]);
+  }
+
 
   public int getStateCount()
   {
@@ -557,7 +583,7 @@ public class SafetyVerifierWorkerImpl extends AbstractWorker implements SafetyVe
 
   public void predecessorSearch(StateTuple original, PredecessorCallback callback) throws RemoteException
   {
-    callback.takePredecessor(original, null, 42);
+    mPredecessorSearch.setSearchTarget(original, callback);
   }
 
   public void startIdleTest()
@@ -602,6 +628,9 @@ public class SafetyVerifierWorkerImpl extends AbstractWorker implements SafetyVe
       }
   }
 
+  //####################################################################
+  // Predecessor Searching
+
   /**
    * A class to encapsulate searching for a predecessor state.
    */
@@ -609,14 +638,29 @@ public class SafetyVerifierWorkerImpl extends AbstractWorker implements SafetyVe
   {
     public PredecessorSearch()
     {
+      //Use a fixed size array blocking queue. A capacity of 1024 should
+      //be enough in most situations. It might fill up on very complex models.
+      mDataQueue = new ArrayBlockingQueue<Predecessor>(1024);
+      mProducer = new PredecessorProducer(mDataQueue);
+      mConsumer = new PredecessorConsumer(mDataQueue);
 
+      mProducer.setDaemon(true);
+      mConsumer.setDaemon(true);
+      mProducer.start();
+      mConsumer.start();
     }
 
     public void setSearchTarget(StateTuple state, PredecessorCallback cb)
     {
-      //Set the search running to find predecessors to the given state
-      //that are available on this worker. If the predecessor search is 
-      //not currently running, then this should be set as the new target. 
+      synchronized (mSearchMonitor)
+	{
+	  mSearchState = state;
+	  mCallback = cb;
+	  mSearchMonitor.notifyAll();
+	}
+
+      //Is interrupting the producer thread necessary here? Perhaps if
+      //it includes numerous blocking calls?
     }
 
     /**
@@ -625,32 +669,160 @@ public class SafetyVerifierWorkerImpl extends AbstractWorker implements SafetyVe
      */
     private class Predecessor
     {
-      public Predecessor(StateTuple original, StateTuple predecessor)
+      public Predecessor(StateTuple original, StateTuple predecessor, int event)
       {
 	mOriginalState = original;
 	mPredecessorState = predecessor;
+	mEvent = event;
       }
-      
+
+      public StateTuple getOriginal()
+      {
+	return mOriginalState;
+      }
+
+      public StateTuple getPredecessor()
+      {
+	return mPredecessorState;
+      }
+
+      public int getEvent()
+      {
+	return mEvent;
+      }
+       
       private final StateTuple mOriginalState;
       private final StateTuple mPredecessorState;
+      private final int mEvent;
     }
     
     private class PredecessorProducer extends Thread
     {
       public PredecessorProducer(BlockingQueue<Predecessor> dataqueue)
       {
-	mQueue = dataqueue;
+	tQueue = dataqueue;
       }
       
       public void run()
       {
 	while (true)
 	  {
-	    
+	    try
+	      {
+		//Get the state we want to search for predecessors
+		//to. This will block the thread until we get a state.
+		StateTuple state = null;
+		synchronized (mSearchMonitor)
+		  {
+		    while (mSearchState == null)
+		      {
+			mSearchMonitor.wait();
+		      }
+		    state = mSearchState;
+		  }
+		
+		try
+		  {
+		    produce(state);
+		  }
+		catch (InterruptedException e)
+		  {
+		    //If interrupted, the thread should continue
+		    //processing the current search state, which may have
+		    //changed. This will prevent the search state from
+		    //being cleared further down in the loop
+		    continue;
+		  }
+		
+		//Clear the search state if we have finished. This is only
+		//done if the search state differs from the state we just
+		//searched.
+		synchronized (mSearchMonitor)
+		  {
+		    
+		    if (mSearchState == state)
+		  mSearchState = null;
+		  }
+		
+	      }
+	    catch (InterruptedException e)
+	      {
+		//XXXXXXXXXXXXXXXXXXXX FIX ME XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+		System.err.println("Fixme: Predecessor producer interrupted. Terminating thread.");
+		return;
+	      }
 	  }
       }
-      
-      private final BlockingQueue<Predecessor> mQueue;
+
+      private void produce(StateTuple state) throws InterruptedException
+      {
+	int[] pre = new int[mModel.getAutomataCount()];
+	int[] current = mStateEncoding.decodeState(state);
+	
+	for (int ev = 0; ev < mModel.getEventCount(); ev++)
+	  {
+	    //Expand the predecessor states for the current event.
+	    expandReverse(ev, pre, state, current, 0);
+	  }
+      }
+
+      private void expandReverse(int event, 
+				 int[] pre, 
+				 StateTuple packedCurrent, 
+				 int[] current, 
+				 int automaton) 
+	throws InterruptedException
+      {
+	System.out.format("expandReverse: event: %d, %s %d\n",
+			  event, 
+			  mStateEncoding.interpret(packedCurrent),
+			  automaton);
+
+	if (automaton < current.length)
+	  {
+	    //Recursively call this method for each predecessor in the
+	    //current automaton. This will explore all combinations of
+	    //predecessors.
+	    TransitionTable tt = mTransitionTables[automaton];
+	    
+	    if (tt.isInAlphabet(event))
+	      {
+		//Expand, using each possible predecessor for the current 
+		//automaton.
+		for (int state : tt.getPredecessorStates(current[automaton], event))
+		  {
+		    pre[automaton] = state;
+		    expandReverse(event, pre, packedCurrent, current, automaton + 1);
+		  }
+	      }
+	    else
+	      {
+		//As the event is not in the automaton's alphabet, the
+		//current automaton will not have changed state on this
+		//event so use the current state's value and expand.
+		pre[automaton] = current[automaton];
+		expandReverse(event, pre, packedCurrent, current, automaton + 1);
+	      }
+	  }
+	else
+	  {
+	    //A potentially reachable predecessor state has been
+	    //found. We now need to check if it is in the visited
+	    //state set. If it is, then add it to the queue to be
+	    //sent back to the controller and continue
+	    
+	    //XXX: make sure the state is reachable and get actual state
+
+	    StateTuple pred_state = mStateEncoding.encodeState(pre);
+	    Predecessor p = new Predecessor(packedCurrent, pred_state, event);
+	    System.out.format("Generated predecessor %s for event %d\n", 
+			      mStateEncoding.interpret(pred_state),
+			      event);
+	    tQueue.put(p);
+	  }
+      }
+
+      private final BlockingQueue<Predecessor> tQueue;
     }
     
     
@@ -658,21 +830,64 @@ public class SafetyVerifierWorkerImpl extends AbstractWorker implements SafetyVe
     {
       public PredecessorConsumer(BlockingQueue<Predecessor> dataqueue)
       {
-	mQueue = dataqueue;
+	tQueue = dataqueue;
       }
       
       public void run()
       {
 	while (true)
 	  {
-	    
+	    //A simple implementation is to just send back all states
+	    //in the data queue.
+
+	    try 
+	      {
+		//Store the callback. This means if it changes during the
+		//operation we won't care
+		PredecessorCallback cb = null;
+		synchronized (mSearchMonitor)
+		  {
+		    while (mCallback == null)
+		      {
+			mSearchMonitor.wait();
+		      }
+		    cb = mCallback;
+		  }
+		
+
+		Predecessor p = tQueue.take();
+		cb.takePredecessor(p.getOriginal(), 
+				   p.getPredecessor(),
+				   p.getEvent());
+	      }
+	    catch (InterruptedException e)
+	      {
+		//XXXXXXXXXXXXXXXXXXXX FIX ME XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+		System.err.println("Fixme: Predecessor consumer interrupted. Terminating thread.");
+		return;
+	      }
+	    catch (RemoteException e)
+	      {
+		System.err.println("Remote exception:");
+		e.printStackTrace();
+	      }
 	  }
       }
       
-      private final BlockingQueue<Predecessor> mQueue;
+      private final BlockingQueue<Predecessor> tQueue;
     }
+
+          
+    private final BlockingQueue<Predecessor> mDataQueue;
+    private final PredecessorProducer mProducer;
+    private final PredecessorConsumer mConsumer;
+    
+    private final Object mSearchMonitor = new Object();
+    private StateTuple mSearchState = null;
+    private PredecessorCallback mCallback = null;
   }
 
+  //####################################################################
 
   private String mWorkerID = null;
   private StateDistribution mStateDistribution = null;
@@ -709,6 +924,9 @@ public class SafetyVerifierWorkerImpl extends AbstractWorker implements SafetyVe
 
   private TransitionTable[] mPlantTransitions;
   private TransitionTable[] mSpecTransitions;
+ 
+  //An array of transition tables, indexed by automaton id.
+  private TransitionTable[] mTransitionTables;
 
   private final Object mBadStateLock = new Object();
   private StateTuple mBadState = null;
@@ -716,4 +934,6 @@ public class SafetyVerifierWorkerImpl extends AbstractWorker implements SafetyVe
   private final Object mWorkerState = new Object();
   private boolean mPausedState = false;
   private boolean mKillState = false;
+
+  private final PredecessorSearch mPredecessorSearch = new PredecessorSearch();
 }

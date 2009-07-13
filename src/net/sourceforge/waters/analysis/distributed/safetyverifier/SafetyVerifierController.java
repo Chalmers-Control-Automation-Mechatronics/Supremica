@@ -204,7 +204,6 @@ public class SafetyVerifierController extends AbstractController implements Pred
   {
     try
       {
-	
 	//Just kick off a search for now and see what happens.  
 	
 	//First, export the controller as a remote object to receive
@@ -216,6 +215,10 @@ public class SafetyVerifierController extends AbstractController implements Pred
 	  {
 	    w.predecessorSearch(bad, cb);
 	  }
+
+	//Here we should be waiting for results... sleeping
+	//is good for now.
+	Thread.sleep(10000);
 
 	//Unexport the controller.
 	UnicastRemoteObject.unexportObject(this, true);
@@ -253,7 +256,9 @@ public class SafetyVerifierController extends AbstractController implements Pred
   public int takePredecessor(StateTuple original, StateTuple predecessor, int event)
   {
     System.out.format("Given predecessor %s of %s, event %d\n",
-		      predecessor, original, event);
+		      mStateEncoding.interpret(predecessor), 
+		      mStateEncoding.interpret(original), 
+		      event);
 
     return Integer.MAX_VALUE;
   }

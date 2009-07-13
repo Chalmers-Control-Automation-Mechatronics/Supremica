@@ -1,5 +1,7 @@
 package net.sourceforge.waters.analysis.distributed.safetyverifier;
 
+import gnu.trove.TIntArrayList;
+
 import java.util.Arrays;
 import java.util.Set;
 import java.util.HashSet;
@@ -99,6 +101,33 @@ class TransitionTable
 	System.err.println(mModel.getAutomaton(mAutomatonIndex));
 	System.err.println(this);
 	throw e;
+      }
+  }
+
+  /**
+   * Gets the predecessors to a given state for a specified event. If
+   * there are no predecessors, or the event is not in the alphabet
+   * for this automaton, an empty array will be returned.
+   * @param target state to search for predecessors
+   * @param event event to return predecessors for
+   * @return a possibly empty array of predecessor states
+   */
+  public int[] getPredecessorStates(int target, int event)
+  {
+    if (!isInAlphabet(event))
+      {
+	return new int[0];
+      }
+    else
+      {
+	TIntArrayList list = new TIntArrayList();
+	for (int i = 0; i < mTransitions[event].length; i++)
+	  {
+	    if (mTransitions[event][i] == target)
+	      list.add(i);
+	  }
+
+	return list.toNativeArray();
       }
   }
 
