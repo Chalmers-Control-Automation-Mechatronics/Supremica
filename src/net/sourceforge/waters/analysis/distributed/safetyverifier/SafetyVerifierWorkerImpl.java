@@ -300,7 +300,7 @@ public class SafetyVerifierWorkerImpl extends AbstractWorker implements SafetyVe
 		//The specification disallows this 
 		//uncontrollable event. Produce a 
 		//counterexample here.
-		setBadState(state);
+		setBadState(state, ev);
 		
 		//Here we should probably stop, but lets keep exploring
 		//anyway.
@@ -352,19 +352,15 @@ public class SafetyVerifierWorkerImpl extends AbstractWorker implements SafetyVe
   }
   
 
-  private void setBadState(StateTuple bad)
+  private void setBadState(StateTuple bad, int event)
   {
     synchronized (mBadStateLock)
       {
-	//While this could have a concurrent update problem, it shouldn't
-	//matter because the assignment will be atomic.
 	if (mBadState == null)
-	  mBadState = bad;
-	
-	//The bad state should not be null after this call.
-	assert(mBadState != null);
-
-	System.out.println("Set bad state");
+	  {
+	    mBadState = bad;
+	    mBadEvent = event;
+	  }
       }
   }
 
@@ -373,6 +369,14 @@ public class SafetyVerifierWorkerImpl extends AbstractWorker implements SafetyVe
     synchronized (mBadStateLock)
       {
 	return mBadState;
+      }
+  }
+
+  public int getBadEvent()
+  {
+    synchronized (mBadStateLock)
+      {
+	return mBadEvent;
       }
   }
 
@@ -656,6 +660,9 @@ public class SafetyVerifierWorkerImpl extends AbstractWorker implements SafetyVe
 	{
 	  mSearchState = state;
 	  mCallback = cb;
+	  
+	  mConsumer.resetDepth();
+	  
 	  mSearchMonitor.notifyAll();
 	}
 
@@ -764,6 +771,11 @@ public class SafetyVerifierWorkerImpl extends AbstractWorker implements SafetyVe
 	    //Expand the predecessor states for the current event.
 	    expandReverse(ev, pre, state, current, 0);
 	  }
+
+	//Add an 'end of search' element to the queue. This will
+	//cause the consumer to report the search is complete if
+	//it gets to that point.
+	tQueue.put(new Predecessor(state, null, -1));
       }
 
       private void expandReverse(int event, 
@@ -845,6 +857,11 @@ public class SafetyVerifierWorkerImpl extends AbstractWorker implements SafetyVe
       {
 	tQueue = dataqueue;
       }
+
+      public synchronized void resetDepth()
+      {
+	tBestDepth = Integer.MAX_VALUE;
+      }
       
       public void run()
       {
@@ -867,11 +884,35 @@ public class SafetyVerifierWorkerImpl extends AbstractWorker implements SafetyVe
 		    cb = mCallback;
 		  }
 		
-
+		
 		Predecessor p = tQueue.take();
-		cb.takePredecessor(p.getOriginal(), 
-				   p.getPredecessor(),
-				   p.getEvent());
+		
+		if (p.getPredecessor() == null)
+		  {
+		    cb.searchCompleted(p.getOriginal(),
+				       getWorkerID());
+		  }
+		else
+		  {
+		    int depth = p.getPredecessor().getDepthHint();
+		    boolean goodPredecessor = false;
+		    synchronized (this)
+		      {
+			goodPredecessor = depth < tBestDepth;
+		      }
+		    
+		    if (goodPredecessor)
+		      {
+			depth = cb.takePredecessor(p.getOriginal(), 
+						   p.getPredecessor(),
+						   p.getEvent());
+			
+			synchronized (this)
+			  {
+			    tBestDepth = depth;
+			  }
+		      }
+		  }
 	      }
 	    catch (InterruptedException e)
 	      {
@@ -887,6 +928,7 @@ public class SafetyVerifierWorkerImpl extends AbstractWorker implements SafetyVe
 	  }
       }
       
+      private int tBestDepth = Integer.MAX_VALUE;
       private final BlockingQueue<Predecessor> tQueue;
     }
 
@@ -947,6 +989,7 @@ public class SafetyVerifierWorkerImpl extends AbstractWorker implements SafetyVe
 
   private final Object mBadStateLock = new Object();
   private StateTuple mBadState = null;
+  private int mBadEvent = -1;
 
   private final Object mWorkerState = new Object();
   private boolean mPausedState = false;

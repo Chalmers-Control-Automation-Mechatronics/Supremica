@@ -29,5 +29,5 @@ public class VerificationJob extends Job
     set(MODEL_ATTR, (Serializable)model);
   }
 
-  public static String MODEL_ATTR = "waters-model";
+  public static final String MODEL_ATTR = "waters-model";
 }

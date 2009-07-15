@@ -16,4 +16,14 @@ interface PredecessorCallback extends Remote
    * @return The current best distance.
    */
   public int takePredecessor(StateTuple original, StateTuple predecessor, int event) throws RemoteException;
+
+  /**
+   * Reports that a worker has completed searching for predecessors to
+   * the given state. The worker id is provided to help keep track of
+   * which workers have finished, although it is possible that a
+   * simple counting method could be used.
+   * @param original state that the search completed for
+   * @param worker unique identifier
+   */
+  public void searchCompleted(StateTuple original, String worker) throws RemoteException;
 }

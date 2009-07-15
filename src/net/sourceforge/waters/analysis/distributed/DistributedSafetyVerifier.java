@@ -5,6 +5,8 @@ import java.io.Serializable;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 import net.sourceforge.waters.model.analysis.AbstractModelVerifier;
@@ -12,6 +14,7 @@ import net.sourceforge.waters.model.analysis.KindTranslator;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.SafetyVerifier;
 import net.sourceforge.waters.model.analysis.VerificationResult;
+import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 import net.sourceforge.waters.model.des.TraceProxy;
@@ -53,6 +56,7 @@ public class DistributedSafetyVerifier
     assert(getPort() > 0);
     final String controller = "net.sourceforge.waters.analysis.distributed.safetyverifier.SafetyVerifierController";
     final ProductDESProxy model = getModel();
+    final ProductDESProxyFactory factory = getFactory();
 
     try
       {
@@ -62,12 +66,6 @@ public class DistributedSafetyVerifier
 	job.setName("safety-" + UUID.randomUUID().toString());
 	job.setController(controller);
 	job.setNodeCount(getNodeCount());
-
-	//The cast to Serializable is necessary because the interfaces
-	//don't implement Serializable, but the object itself probably
-	//does. The setAttribute method uses a generic type wildcard to
-	//only allow Serializable objects to be added, but this fails at
-	//compile time.
 	job.setModel(model);
 	
 	VerificationJobResult result = new VerificationJobResult(server.submitJob(job));
@@ -90,10 +88,19 @@ public class DistributedSafetyVerifier
 	else
 	  {
 	    //Get a counter-example from the job result
-	    TraceProxy counterexample = null;
+	    EventProxy[] trace  = null;
+	    SafetyTraceProxy counterexample = null;
 	    if (result.getTrace() != null)
 	      {
-		counterexample = result.getTrace();
+		trace = result.getTrace();
+		
+		//'Sanitise' the trace. This ensures the EventProxy
+		//objects that are in the trace are the same objects
+		//as the ones in the original model, as is expected
+		//for Waters verifiers.
+		List<EventProxy> tracelist = sanitiseTrace(trace);
+		
+		counterexample = factory.createSafetyTraceProxy(model, tracelist);
 	      }
 	    return setFailedResult(counterexample);
 	  }
@@ -104,6 +111,38 @@ public class DistributedSafetyVerifier
       {
 	throw new AnalysisException(e);
       }
+  }
+
+
+  private List<EventProxy> sanitiseTrace(EventProxy[] trace) throws AnalysisException
+  {
+    List<EventProxy> nt = new ArrayList<EventProxy>();
+    
+    for (EventProxy ev : trace)
+      {
+	nt.add(sanitiseEvent(ev));
+      }
+
+    return nt;
+  }
+
+
+  /**
+   * Returns the event proxy instance from the actual model that is
+   * equal by contents to the supplied event proxy.
+   * @param event event to sanitise
+   * @return event considered equal from the model
+   * @throws AnalysisException if no events were equal
+   */
+  private EventProxy sanitiseEvent(EventProxy event) throws AnalysisException
+  {
+    for (EventProxy ev : getModel().getEvents())
+      {
+	if (ev.equalsByContents(event))
+	  return ev;
+      }
+
+    throw new AnalysisException("EventProxy could not be sanitised: not in model?"); 
   }
 
   private Server connectToServer(String host, int port) throws Exception

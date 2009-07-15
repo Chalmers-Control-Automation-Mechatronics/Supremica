@@ -5,6 +5,8 @@ import java.rmi.server.UnicastRemoteObject;
 
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
@@ -19,7 +21,10 @@ import net.sourceforge.waters.analysis.distributed.VerificationJobResult;
 
 import net.sourceforge.waters.analysis.distributed.schemata.*;
 
-public class SafetyVerifierController extends AbstractController implements PredecessorCallback
+import net.sourceforge.waters.model.des.EventProxy;
+import net.sourceforge.waters.model.des.ProductDESProxy;
+
+public class SafetyVerifierController extends AbstractController
 {
   public SafetyVerifierController()
   {
@@ -41,7 +46,8 @@ public class SafetyVerifierController extends AbstractController implements Pred
 
     //Build a schematic of the model, on which the model checking will
     //be done.
-    mModel = SchemaBuilder.build(job.getModel());
+    mActualModel = job.getModel();
+    mModel = SchemaBuilder.build(mActualModel);
     mStateEncoding = new NullStateEncoding(mModel);
     
     
@@ -169,15 +175,23 @@ public class SafetyVerifierController extends AbstractController implements Pred
   
     //Pausing the workers would be a good idea. Also check
     //the bad state now.
+    int bestdepth = Integer.MAX_VALUE;
+    badState = null;
+    int badEvent = -1;
     for (SafetyVerifierWorker w : workers)
       {
 	w.pause();
 	
-	if (badState != null)
+	StateTuple s = w.getBadState();
+	if (s != null)
 	  {
-	    StateTuple s = w.getBadState();
-	    if (s != null)
-	      badState = s;
+	    if (bestdepth >= s.getDepthHint())
+	      {
+		badState = s;
+		badEvent = w.getBadEvent();
+		bestdepth = s.getDepthHint();
+		
+	      }
 	  }
       }
  
@@ -192,44 +206,54 @@ public class SafetyVerifierController extends AbstractController implements Pred
       }
     else
       {
-	findCounterExample(badState, workers);
+	int[] trace = findCounterExample(badState, badEvent, initial, workers);
+	System.out.format("Counter-example:\n");
+	for (int q = 0; q < trace.length; q++)
+	  {
+	    System.out.format(" > event %s\n", mModel.getEvent(trace[q]).getName());
+	  }
+
+	//Convert trace into event objects
+	EventProxy[] ntrace = translateTraceToEvents(trace);
 
 	result.setResult(false);
-	result.setTrace(null);
+	result.setTrace(ntrace);
       }
     setResult(result);
   }
 
-  private int[] findCounterExample(StateTuple bad, SafetyVerifierWorker[] workers) throws Exception
+  /**
+   * Translates event ids into EventProxy objects. This is used to get
+   * a trace into a form that can be sent back to the client and then 
+   * used to build a real safety trace object.
+   */
+  private EventProxy[] translateTraceToEvents(int[] trace)
   {
-    try
+    Map<String,EventProxy> eventmap = createEventNameMap(mActualModel);
+    EventProxy[] ntrace = new EventProxy[trace.length];
+
+    for (int i = 0; i < trace.length; i++)
       {
-	//Just kick off a search for now and see what happens.  
-	
-	//First, export the controller as a remote object to receive
-	//predecessors.
-	PredecessorCallback cb = (PredecessorCallback) 
-	  UnicastRemoteObject.exportObject(this, 0);
-
-	for (SafetyVerifierWorker w : workers)
-	  {
-	    w.predecessorSearch(bad, cb);
-	  }
-
-	//Here we should be waiting for results... sleeping
-	//is good for now.
-	Thread.sleep(10000);
-
-	//Unexport the controller.
-	UnicastRemoteObject.unexportObject(this, true);
+	ntrace[i] = eventmap.get(mModel.getEvent(trace[i]).getName());
       }
-    catch (Exception e)
+
+    return ntrace;
+  }
+
+  /**
+   * Creates a map of event names to EventProxy objects. This method
+   * assumes that event names are unique.
+   */
+  private Map<String,EventProxy> createEventNameMap(ProductDESProxy model)
+  {
+    Map<String,EventProxy> events = new HashMap<String,EventProxy>();
+
+    for (EventProxy ep : model.getEvents())
       {
-	System.err.format("Counterexample Exception: %s\n", e);
-	e.printStackTrace();
-	throw e;
+	events.put(ep.getName(), ep);
       }
-    return new int[0];
+
+    return events;
   }
 
   private StateTuple findInitialState()
@@ -253,18 +277,21 @@ public class SafetyVerifierController extends AbstractController implements Pred
     return mStateEncoding.encodeState(start, 0);
   }
 
-  public int takePredecessor(StateTuple original, StateTuple predecessor, int event)
-  {
-    System.out.format("Given predecessor %s of %s (depth: %d), event %d\n",
-		      mStateEncoding.interpret(predecessor), 
-		      mStateEncoding.interpret(original), 
-		      predecessor.getDepthHint(),
-		      event);
 
-    return Integer.MAX_VALUE;
+  private int[] findCounterExample(StateTuple bad, 
+				   int badevent, 
+				   StateTuple initial, 
+				   SafetyVerifierWorker[] workers) 
+    throws Exception
+  {
+    TraceFinder tf = new TraceFinder(mModel, mStateEncoding, workers);
+    return tf.findTrace(bad, badevent, initial);
   }
 
+
+  private ProductDESProxy mActualModel;
   private ProductDESSchema mModel;
   private StateEncoding mStateEncoding;
+
   private static final String WORKER_CLASS = "net.sourceforge.waters.analysis.distributed.safetyverifier.SafetyVerifierWorkerImpl";
 }

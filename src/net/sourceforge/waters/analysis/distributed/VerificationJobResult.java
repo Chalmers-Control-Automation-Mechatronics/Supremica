@@ -3,7 +3,7 @@ package net.sourceforge.waters.analysis.distributed;
 import java.io.Serializable;
 
 import net.sourceforge.waters.analysis.distributed.application.JobResult;
-import net.sourceforge.waters.model.des.TraceProxy;
+import net.sourceforge.waters.model.des.EventProxy;
 
 public class VerificationJobResult extends JobResult
 {
@@ -27,14 +27,14 @@ public class VerificationJobResult extends JobResult
     set(RESULT_ATTR, result);
   }
 
-  public TraceProxy getTrace()
+  public EventProxy[] getTrace()
   {
-    return (TraceProxy)get(TRACE_ATTR);
+    return (EventProxy[])get(TRACE_ATTR);
   }
 
-  public void setTrace(TraceProxy trace)
+  public void setTrace(EventProxy[] trace)
   {
-    set(TRACE_ATTR, (Serializable)trace);
+    set(TRACE_ATTR, trace);
   }
 
   public static final String TRACE_ATTR = "trace";

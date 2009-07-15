@@ -69,6 +69,14 @@ public interface SafetyVerifierWorker extends Remote, StateHandler
   public StateTuple getBadState() throws RemoteException;
 
   /**
+   * Returns the event id that caused the bad state to occur. If no
+   * bad state has been found, this will return a number less than
+   * zero.
+   * @return event id that caused bad state, or less than 0 if not set.
+   */
+  public int getBadEvent() throws RemoteException;
+
+  /**
    * Starts 'n' processing threads running on the worker. The
    * buffersize parameter sets how many states each thread should
    * buffer up (to avoid constantly hitting the state list monitor)
