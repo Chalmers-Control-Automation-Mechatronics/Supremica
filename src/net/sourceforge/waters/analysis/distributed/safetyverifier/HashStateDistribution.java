@@ -9,7 +9,7 @@ public class HashStateDistribution extends StateDistribution
     mHandlerCache = new StateHandler[handlers.length];
   }
 
-  protected StateHandler lookupStateHandler(StateTuple state)
+  public StateHandler lookupStateHandler(StateTuple state)
   {
     int hashcode = state.hashCode();
     return mHandlerCache[Math.abs(hashcode % mHandlerCache.length)];

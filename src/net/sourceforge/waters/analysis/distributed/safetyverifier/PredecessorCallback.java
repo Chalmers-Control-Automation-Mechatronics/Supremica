@@ -3,7 +3,7 @@ package net.sourceforge.waters.analysis.distributed.safetyverifier;
 import java.rmi.Remote;
 import java.rmi.RemoteException;
 
-interface PredecessorCallback extends Remote
+public interface PredecessorCallback extends Remote
 {
   /**
    * Takes a predecessor state for consideration in a counterexample.

@@ -35,9 +35,16 @@ public class DistributedModelVerifierFactory
   }
 
   public DistributedControllabilityChecker 
-    createControllabilityChecker (final ProductDESProxyFactory factory)
+  createControllabilityChecker (final ProductDESProxyFactory factory)
   {
     return new DistributedControllabilityChecker(factory);
+  }
+
+
+  public DistributedLanguageInclusionChecker
+  createLanguageInclusionChecker(final ProductDESProxyFactory factory)
+  {
+    return new DistributedLanguageInclusionChecker(factory);
   }
 
 

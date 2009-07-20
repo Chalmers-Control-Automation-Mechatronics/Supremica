@@ -21,6 +21,7 @@ import net.sourceforge.waters.analysis.distributed.VerificationJobResult;
 
 import net.sourceforge.waters.analysis.distributed.schemata.*;
 
+import net.sourceforge.waters.model.analysis.KindTranslator;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 
@@ -47,7 +48,8 @@ public class SafetyVerifierController extends AbstractController
     //Build a schematic of the model, on which the model checking will
     //be done.
     mActualModel = job.getModel();
-    mModel = SchemaBuilder.build(mActualModel);
+    KindTranslator translator = job.getKindTranslator();
+    mModel = SchemaBuilder.build(mActualModel, translator);
     mStateEncoding = new NullStateEncoding(mModel);
     
     
@@ -93,7 +95,7 @@ public class SafetyVerifierController extends AbstractController
     //Start some processing threads
     for (SafetyVerifierWorker w : workers)
       {
-	w.startProcessingThreads(8, 2048);
+	w.startProcessingThreads(2, 8192);
       }
 
     //Wowza! Add the first state!

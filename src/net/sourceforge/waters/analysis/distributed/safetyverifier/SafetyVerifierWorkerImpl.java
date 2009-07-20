@@ -63,6 +63,8 @@ public class SafetyVerifierWorkerImpl extends AbstractWorker implements SafetyVe
     //prevent calls from going through the RMI system for 
     //local states.
     mStateDistribution.setHandler(getWorkerID(), this);
+
+    mOutputDispatcher = new ThreadedOutputDispatcher(mStateDistribution, 16);
   }
 
   public StateDistribution getStateDistribution()
@@ -134,6 +136,7 @@ public class SafetyVerifierWorkerImpl extends AbstractWorker implements SafetyVe
     {
       super();
       mBufferSize = bufferSize;
+      mOutgoingBuffer = new StateTuple[bufferSize];
     }
 
     public void run()
@@ -174,6 +177,9 @@ public class SafetyVerifierWorkerImpl extends AbstractWorker implements SafetyVe
 		  StateTuple state = buffer[i];
 		  processState(state);
 		}
+
+	      //May as well flush the buffer now.
+	      flushOutputBuffer();
 	    }
 	}
       catch (InterruptedException e)
@@ -253,82 +259,114 @@ public class SafetyVerifierWorkerImpl extends AbstractWorker implements SafetyVe
 	}
     }
 
+
+    private void processState(StateTuple state)
+    {    
+      int[] decoded = mStateEncoding.decodeState(state);
+      int autCount = mModel.getAutomataCount();
+      int eventCount = mModel.getEventCount();
+      int[] successor = new int[autCount];    
+      
+    events:for (int ev = 0; ev < eventCount; ev++)
+	{
+	  //Calculate successor states by first checking
+	  //if an event is enabled by all the plants, and
+	  //if it is, whether the event is enabled by
+	  //the specifications.
+	  for (int p = 0; p < mPlantTransitions.length; p++)
+	    {
+	      TransitionTable tt = mPlantTransitions[p];
+	      int at = tt.getAutomatonIndex();
+	      int succ = tt.getSuccessorState(decoded[at], ev);
+	      
+	      //If the transition is disallowed, then continue
+	      //with the next event.
+	      if (succ >= 0)
+		successor[at] = succ;
+	      else
+		continue events;
+	    }
+	  
+	  for (int s = 0; s < mSpecTransitions.length; s++)
+	    {
+	      TransitionTable tt = mSpecTransitions[s];
+	      int at = tt.getAutomatonIndex();
+	      int succ = tt.getSuccessorState(decoded[at], ev);
+	      
+	      if (succ >= 0)
+		{
+		  successor[at] = succ;
+		}
+	      else if (mModel.getEvent(ev).getKind() == 
+		       EventSchema.UNCONTROLLABLE)
+		{
+		  //The specification disallows this 
+		  //uncontrollable event. Produce a 
+		  //counterexample here.
+		  setBadState(state, ev);
+		  
+		  //Here we should probably stop, but lets keep exploring
+		  //anyway.
+		  continue events;
+		}
+	      else
+		{
+		  continue events;
+		}
+	    }
+	  
+	  //Eventually dispatch the state.
+	  StateTuple packed = mStateEncoding.encodeState(successor, state.getDepthHint() + 1);
+	  outputState(packed);
+	  
+	}
+    }
+    
+    
+    //Queue a state to be dispatched in the outgoing buffer, and send 
+    //if the buffer is full.
+    private void outputState(StateTuple state)
+    {
+      mOutgoingBuffer[mOutgoingBufferIndex++] = state;
+
+      if (mOutgoingBufferIndex >= mOutgoingBuffer.length)
+	{
+	  flushOutputBuffer();
+	}
+    }
+
+    private void flushOutputBuffer()
+    {
+      try
+	{
+	  //Send the state to the output dispatcher and
+	  //increment the outgoing counter. This means that
+	  //once the state `leaves' the processing thread, it is
+	  //considered in transit, even if it is sitting in a queue
+	  //waiting to be sent. This distinction isn't important to
+	  //the application as the network traffic could be sitting
+	  //in operating system buffers or something anyway.
+	  mOutputDispatcher.addStates(mOutgoingBuffer, 0, mOutgoingBufferIndex);
+	  synchronized (mOutgoingLock)
+	    {
+	      mOutgoingStateCounter += mOutgoingBufferIndex;
+	    }
+	}
+      catch (Exception e)
+	{
+	  throw new RuntimeException(e);
+	}
+
+      mOutgoingBufferIndex = 0;
+    }
+
+      
+
+    private final StateTuple[] mOutgoingBuffer;
+    private int mOutgoingBufferIndex = 0;
     private final int mBufferSize;
   }
 
-
-  private void processState(StateTuple state)
-  {    
-    int[] decoded = mStateEncoding.decodeState(state);
-    int autCount = mModel.getAutomataCount();
-    int eventCount = mModel.getEventCount();
-    int[] successor = new int[autCount];    
-
-  events:for (int ev = 0; ev < eventCount; ev++)
-      {
-	//Calculate successor states by first checking
-	//if an event is enabled by all the plants, and
-	//if it is, whether the event is enabled by
-	//the specifications.
-	for (int p = 0; p < mPlantTransitions.length; p++)
-	  {
-	    TransitionTable tt = mPlantTransitions[p];
-	    int at = tt.getAutomatonIndex();
-	    int succ = tt.getSuccessorState(decoded[at], ev);
-	    
-	    //If the transition is disallowed, then continue
-	    //with the next event.
-	    if (succ >= 0)
-	      successor[at] = succ;
-	    else
-	      continue events;
-	  }
-	
-	for (int s = 0; s < mSpecTransitions.length; s++)
-	  {
-	    TransitionTable tt = mSpecTransitions[s];
-	    int at = tt.getAutomatonIndex();
-	    int succ = tt.getSuccessorState(decoded[at], ev);
-	    
-	    if (succ >= 0)
-	      {
-		successor[at] = succ;
-	      }
-	    else if (mModel.getEvent(ev).getKind() == 
-		     EventSchema.UNCONTROLLABLE)
-	      {
-		//The specification disallows this 
-		//uncontrollable event. Produce a 
-		//counterexample here.
-		setBadState(state, ev);
-		
-		//Here we should probably stop, but lets keep exploring
-		//anyway.
-		continue events;
-	      }
-	    else
-	      {
-		continue events;
-	      }
-	  }
-
-	//Dispatch state
-	StateTuple packed = mStateEncoding.encodeState(successor, state.getDepthHint() + 1);
-
-	try
-	  {
-	    mStateDistribution.addState(packed);
-	    synchronized (mOutgoingLock)
-	      {
-		mOutgoingStateCounter++;
-	      }
-	  }
-	catch (Exception e)
-	  {
-	    throw new RuntimeException(e);
-	  }
-      }
-  }
     
   /**
    * Gets the number of unprocessed states. This method synchronises on
@@ -522,6 +560,9 @@ public class SafetyVerifierWorkerImpl extends AbstractWorker implements SafetyVe
 
     //Clean up running threads so the object can be garbage collected.
     kill();
+
+    if (mOutputDispatcher != null)
+      mOutputDispatcher.shutdown();
 
     //Now wait for the threads to die. This might be a long critical
     //section, but it prevents new threads from being added.
@@ -785,11 +826,6 @@ public class SafetyVerifierWorkerImpl extends AbstractWorker implements SafetyVe
 				 int automaton) 
 	throws InterruptedException
       {
-	System.out.format("expandReverse: event: %d, %s %d\n",
-			  event, 
-			  mStateEncoding.interpret(packedCurrent),
-			  automaton);
-
 	if (automaton < current.length)
 	  {
 	    //Recursively call this method for each predecessor in the
@@ -840,9 +876,6 @@ public class SafetyVerifierWorkerImpl extends AbstractWorker implements SafetyVe
 	      pred_state = t;
 
 	    Predecessor p = new Predecessor(packedCurrent, pred_state, event);
-	    System.out.format("Generated predecessor %s for event %d\n", 
-			      mStateEncoding.interpret(pred_state),
-			      event);
 	    tQueue.put(p);
 	  }
       }
@@ -996,4 +1029,6 @@ public class SafetyVerifierWorkerImpl extends AbstractWorker implements SafetyVe
   private boolean mKillState = false;
 
   private final PredecessorSearch mPredecessorSearch = new PredecessorSearch();
+
+  private OutputDispatcher mOutputDispatcher = null;
 }

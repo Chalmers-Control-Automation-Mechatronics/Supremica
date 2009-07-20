@@ -11,6 +11,7 @@ import java.util.UUID;
 
 import net.sourceforge.waters.model.analysis.AbstractModelVerifier;
 import net.sourceforge.waters.model.analysis.KindTranslator;
+import net.sourceforge.waters.model.analysis.SerializableKindTranslator;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.SafetyVerifier;
 import net.sourceforge.waters.model.analysis.VerificationResult;
@@ -25,8 +26,7 @@ import net.sourceforge.waters.analysis.distributed.application.JobResult;
 import net.sourceforge.waters.analysis.distributed.application.Server;
 
 /**
- * Some day this will be a distributed, multi-threaded implementation
- * of a controllability checker. For now it is just a test bench.
+ * XXX
  * 
  * @author Sam Douglas
  */
@@ -57,6 +57,7 @@ public class DistributedSafetyVerifier
     final String controller = "net.sourceforge.waters.analysis.distributed.safetyverifier.SafetyVerifierController";
     final ProductDESProxy model = getModel();
     final ProductDESProxyFactory factory = getFactory();
+    final KindTranslator translator = mKindTranslator;
 
     try
       {
@@ -67,6 +68,11 @@ public class DistributedSafetyVerifier
 	job.setController(controller);
 	job.setNodeCount(getNodeCount());
 	job.setModel(model);
+
+	//Set the kind translator for the job by serialising
+	//the current translator, regardless of the type.
+	SerializableKindTranslator kx = new SerializableKindTranslator(translator, model);
+	job.setKindTranslator(kx);
 	
 	VerificationJobResult result = new VerificationJobResult(server.submitJob(job));
 

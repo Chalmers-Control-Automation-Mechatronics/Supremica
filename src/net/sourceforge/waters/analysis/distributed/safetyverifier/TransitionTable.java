@@ -26,7 +26,7 @@ import net.sourceforge.waters.analysis.distributed.schemata.TransitionSchema;
  * This allows fast lookups to check if an event is allowed from a
  * given state. 
  */
-class TransitionTable
+public class TransitionTable
 {
   /**
    * Build a transition table for a given automaton from a model schematic.

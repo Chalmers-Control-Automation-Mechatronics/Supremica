@@ -54,11 +54,21 @@ public abstract class StateDistribution implements StateHandler, Serializable
   }
 
   /**
+   * Gets an array of state handlers that are associated
+   * with this distribution.
+   * @return An array of state handlers.
+   */
+  public StateHandler[] getHandlers()
+  {
+    return mHandlers.values().toArray(new StateHandler[0]);
+  }
+
+  /**
    * Finds a handler for the specified state.
    * @param state to get handler for.
    * @return a state handler.
    */
-  protected abstract StateHandler lookupStateHandler(StateTuple state);
+  public abstract StateHandler lookupStateHandler(StateTuple state);
 
   /**
    * A template method to allow subclasses to update any 

@@ -5,6 +5,7 @@ import java.util.Map;
 import java.util.HashMap;
 import java.util.Set;
 
+import net.sourceforge.waters.model.analysis.KindTranslator;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
@@ -23,7 +24,7 @@ public class SchemaBuilder
   /**
    * Build a schema for a Waters ProductDESProxy.
    */
-  public static ProductDESSchema build(final ProductDESProxy des)
+  public static ProductDESSchema build(final ProductDESProxy des, KindTranslator translator)
   {
     //From the set of events, build an array of EventProxy
     //instances, which gives them a consistent (arbitrary) ordering.
@@ -41,20 +42,21 @@ public class SchemaBuilder
       }
 
     Map<EventProxy,Integer> emap = build_eventmap(events);
-    EventSchema[] des_events = build_event_schemata(events);
-    AutomatonSchema[] des_automata = build_automata(des.getAutomata(), emap);
+    EventSchema[] des_events = build_event_schemata(events, translator);
+    AutomatonSchema[] des_automata = build_automata(des.getAutomata(), emap, translator);
 
     return new ProductDESSchema(des.getName(), des_automata, des_events);
   }
 
   private static AutomatonSchema[] build_automata(Set<AutomatonProxy> automata,
-						  Map<EventProxy,Integer> emap)
+						  Map<EventProxy,Integer> emap,
+						  KindTranslator translator)
   {
     AutomatonSchema[] schemata = new AutomatonSchema[automata.size()];
     int i = 0;
     for (AutomatonProxy automaton : automata)
       {
-	schemata[i] = build_automaton(automaton, emap);
+	schemata[i] = build_automaton(automaton, emap, translator);
 	  i++;
       }
 
@@ -63,11 +65,12 @@ public class SchemaBuilder
 
 
   private static AutomatonSchema build_automaton(final AutomatonProxy aut, 
-						 Map<EventProxy,Integer> emap)
+						 Map<EventProxy,Integer> emap,
+						 KindTranslator translator)
   { 
     String name = aut.getName();
     int[] events = map_events(aut.getEvents(), emap);
-    int kind = component_kind_convert(aut.getKind());
+    int kind = component_kind_convert(translator.getComponentKind(aut));
 
     //Like with events in the DES, build an array of states in the
     //model which will be used to give a definite ordering. Build a
@@ -164,23 +167,25 @@ public class SchemaBuilder
     return evs;
   }
 
-  private static EventSchema[] build_event_schemata(final EventProxy[] events)
+  private static EventSchema[] build_event_schemata(final EventProxy[] events, 
+						    KindTranslator translator)
   {
     EventSchema[] evs = new EventSchema[events.length];
 
     for (int i = 0; i < events.length; i++)
       {
-	evs[i] = build_event(events[i]);
+	evs[i] = build_event(events[i], translator);
       }
 
     return evs;
   }
 
-  private static EventSchema build_event(final EventProxy event)
+  private static EventSchema build_event(final EventProxy event, 
+					 KindTranslator translator)
   {
     String name = event.getName();
     boolean observable = event.isObservable();
-    int kind = event_kind_convert(event.getKind());
+    int kind = event_kind_convert(translator.getEventKind(event));
 
     return new EventSchema(name, kind, observable);
   }
