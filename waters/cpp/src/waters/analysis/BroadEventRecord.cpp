@@ -399,8 +399,8 @@ addReversedList(TransitionRecord* trans)
         const AutomatonRecord* aut = trans->getAutomaton();
         const uint32 numstates = aut->getNumberOfStates();
         const int shift = aut->getShift();
-        TransitionRecord* reversed = new TransitionRecord(aut, 0);
-        reversed->copyFlags(trans);
+        trans->setNextInSearch(0);
+        TransitionRecord* reversed = new TransitionRecord(aut, 0, trans);
         int maxpass = 1;
         for (int pass = 1; pass <= maxpass; pass++) {
           for (uint32 source = 0; source < numstates; source++) {
@@ -419,8 +419,6 @@ addReversedList(TransitionRecord* trans)
             }
           }
         }
-        trans->setNextInSearch(0);
-        delete trans;
         reversed->normalize();
         if (!reversed->isDeterministic()) {
           mNumNondeterministicRecords++;

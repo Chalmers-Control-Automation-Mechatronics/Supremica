@@ -304,10 +304,9 @@
     <mkdir dir="${logs.results}"/>
     <junit printsummary="on" fork="true" maxmemory="512m">
       <formatter type="xml"/>
-      <batchtest todir="${logs.results}">
+      <batchtest todir="${logs.results}" if="native.make">
         <fileset dir="${supremica.testsrc}">
-          <include name="**/Kind*.java"/>
-          <exclude name="**/Abstract*.java"/>
+          <include name="**/Native*.java"/>
         </fileset>
       </batchtest>
       <classpath refid="waters.test.classpath"/>

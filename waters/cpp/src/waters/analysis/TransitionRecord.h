@@ -46,7 +46,8 @@ public:
   //##########################################################################
   //# Constructors & Destructors
   explicit TransitionRecord(const AutomatonRecord* aut,
-			    TransitionRecord* next = 0);
+			    TransitionRecord* next = 0,
+			    TransitionRecord* fwd = 0);
   ~TransitionRecord();
 
   //##########################################################################
@@ -74,8 +75,6 @@ public:
   inline TransitionRecord* getNextInNotTaken() const {return mNextInNotTaken;}
   inline void setNextInNotTaken(TransitionRecord* next)
     {mNextInNotTaken = next;}
-
-  void copyFlags(const TransitionRecord* trans);
 
   //##########################################################################
   //# Comparing and Hashing
@@ -127,6 +126,7 @@ private:
   TransitionRecord* mNextInSearch;
   TransitionRecord* mNextInUpdate;
   TransitionRecord* mNextInNotTaken;
+  TransitionRecord* mForwardRecord;
 
   //##########################################################################
   //# Class Constants

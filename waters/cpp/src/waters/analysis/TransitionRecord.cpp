@@ -42,7 +42,9 @@ const TransitionRecordAccessorForTrace TransitionRecord::theTraceAccessor;
 //# TransitionRecord: Constructors & Destructors
 
 TransitionRecord::
-TransitionRecord(const AutomatonRecord* aut, TransitionRecord* next)
+TransitionRecord(const AutomatonRecord* aut,
+                 TransitionRecord* next,
+                 TransitionRecord* fwd)
   : mAutomaton(aut),
     mWeight(0),
     mIsOnlySelfloops(true),
@@ -57,9 +59,18 @@ TransitionRecord(const AutomatonRecord* aut, TransitionRecord* next)
   const uint32 numstates = aut->getNumberOfStates();
   mFlags = new uint32[numstates];
   mDeterministicSuccessorsShifted = new uint32[numstates];
-  for (uint32 code = 0; code < numstates; code++) {
-    mFlags[code] = 0;
-    mDeterministicSuccessorsShifted[code] = NO_TRANSITION;
+  if (fwd == 0) {
+    mForwardRecord = this;
+    for (uint32 code = 0; code < numstates; code++) {
+      mFlags[code] = 0;
+      mDeterministicSuccessorsShifted[code] = NO_TRANSITION;
+    }
+  } else {
+    mForwardRecord = fwd;
+    for (uint32 code = 0; code < numstates; code++) {
+      mFlags[code] = fwd->mFlags[code];
+      mDeterministicSuccessorsShifted[code] = NO_TRANSITION;
+    }
   }
 }
 
@@ -71,6 +82,9 @@ TransitionRecord::
   delete[] mNumNondeterministicSuccessors;
   delete[] mNondeterministicBuffer;
   delete[] mNondeterministicSuccessorsShifted;
+  if (mForwardRecord != this) {
+    delete mForwardRecord;
+  }
   delete mNextInSearch;
 }
 
@@ -111,15 +125,6 @@ getProbability()
   const
 {
   return PROBABILITY_ADJUST * mWeight;
-}
-
-void TransitionRecord::
-copyFlags(const TransitionRecord* trans)
-{
-  const uint32 numstates = mAutomaton->getNumberOfStates();
-  for (uint32 code = 0; code < numstates; code++) {
-    mFlags[code] = trans->mFlags[code];
-  }
 }
 
 
@@ -386,13 +391,18 @@ storeNondeterministicTarget(const uint32* sourcetuple,
                             const jni::MapGlue& statemap)
   const
 {
-  const uint32 index = mAutomaton->getAutomatonIndex();
-  const uint32 source = sourcetuple[index];
-  if (mFlags[source] & FLAG_NONDET) {
-    const uint32 target = targettuple[index];
-    const jni::StateGlue& state = mAutomaton->getJavaState(target);
-    const jni::AutomatonGlue& aut = mAutomaton->getJavaAutomaton();
-    statemap.put(&aut, &state);
+  if (mForwardRecord != this) {
+    mForwardRecord->storeNondeterministicTarget
+      (sourcetuple, targettuple, statemap);
+  } else {
+    const uint32 index = mAutomaton->getAutomatonIndex();
+    const uint32 source = sourcetuple[index];
+    if (mFlags[source] & FLAG_NONDET) {
+      const uint32 target = targettuple[index];
+      const jni::StateGlue& state = mAutomaton->getJavaState(target);
+      const jni::AutomatonGlue& aut = mAutomaton->getJavaAutomaton();
+      statemap.put(&aut, &state);
+    }
   }
 }
 
