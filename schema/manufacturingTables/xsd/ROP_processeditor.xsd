@@ -103,7 +103,16 @@
 
 <xs:group name='PredecessorPreconditionGroup'>
 	<xs:sequence>
+<!--
+  Element Precondition no longer compiles, because it also contains 
+  a Predecessor member, which conflicts with the Predecessor in this
+  group. To make the schema compile, I have commented out Predecessor here.
+  This is unlikely to work as expected, but a proper fix requires
+  structural changes to the schema and the associated XML file format.
+  I have to leave it to the experts to make the necessary changes.
+    ~~~Robi
 		<xs:element ref='Predecessor' minOccurs='0' maxOccurs='unbounded' />
+-->
 		<xs:element ref='Precondition' minOccurs='0' maxOccurs='unbounded' />
 	</xs:sequence>
 </xs:group>
