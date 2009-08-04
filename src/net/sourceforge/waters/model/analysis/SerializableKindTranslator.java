@@ -53,10 +53,9 @@ public class SerializableKindTranslator
    *         for the given model is created and returned.
    * @throws DuplicateNameException to indicate that an event or component
    *                      name is used more than once in the given model.
-   * @see {@link #SerializableKindTranslator(KindTranslator,ProductDESProxy)
-   *      SerializableKindTranslator()} 
+   * @see #SerializableKindTranslator(KindTranslator,ProductDESProxy)
    */
-  public static KindTranslator getSerialiasableKindTranslator
+  public static KindTranslator getSerializableKindTranslator
     (final KindTranslator translator, final ProductDESProxy des)
   {
     if (translator instanceof Serializable) {
