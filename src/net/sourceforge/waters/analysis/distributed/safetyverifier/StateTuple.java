@@ -1,5 +1,7 @@
 package net.sourceforge.waters.analysis.distributed.safetyverifier;
 
+import java.io.IOException;
+import java.io.ObjectStreamException;
 import java.io.Serializable;
 
 /**
@@ -13,6 +15,11 @@ import java.io.Serializable;
  * two state tuples could be considerd `equal' by the equals method
  * and yet have different depth values. This is because they represent
  * the same state, they were just found by different paths.
+ *
+ * This class uses a custom serialisation protocol. The data fields
+ * are marked as transient and not final. This class is still
+ * immutable.
+ *
  * @author Sam Douglas
  */
 public class StateTuple implements Serializable
@@ -78,7 +85,64 @@ public class StateTuple implements Serializable
     return mDepth;
   }
 
+  /*
+   * Serialisation protocol for state tuple:
+   *   [ depth ][N][state][data0]...[dataN] 
+   *      int  short        ints
+   *
+   * The length is sent as a short. This means that there can be at
+   * most 65536 words of data per tuple. This is more than enough and
+   * will hopefully save a small amount of space.
+   *
+   * After the length, it reads the appropriate number of data
+   * values as integer words.
+   */
 
-  private final int[] mState;
-  private final int mDepth;
+  
+  private void writeObject(java.io.ObjectOutputStream out) 
+    throws IOException
+  {
+    //This should write the object header, but nothing else because
+    //the other fields are marked as transient
+    out.defaultWriteObject();
+
+    //Length of the state as a short.
+    int len = mState.length & 0xFFFF;
+
+    out.writeInt(mDepth);
+    out.writeShort(len);
+    for (int i = 0; i < len; i++)
+      {
+	out.writeInt(mState[i]);
+      }
+  }
+
+  private void readObject(java.io.ObjectInputStream in)
+    throws IOException, ClassNotFoundException
+  {
+    in.defaultReadObject();
+
+    mDepth = in.readInt();
+    int len = in.readShort();
+
+    mState = new int[len];
+
+    for (int i = 0; i < len; i++)
+      {
+	mState[i] = in.readInt();
+      }
+  }
+
+  private void readObjectNoData() 
+    throws ObjectStreamException
+  {
+
+  }
+  
+
+  //These fields should be final, but to avoid further reflection when
+  //deserialising, they are marked as transient-volatile to keep them 
+  //threadsafe
+  private transient int[] mState;
+  private transient int mDepth;
 }

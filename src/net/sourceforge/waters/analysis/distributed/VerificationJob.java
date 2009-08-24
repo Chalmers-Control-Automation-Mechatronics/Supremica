@@ -40,6 +40,17 @@ public class VerificationJob extends Job
     set(KIND_XLATOR_ATTR, translator);
   }
 
+  public Integer getWalltimeLimit()
+  {
+    return (Integer)get(WALLTIME_LIMIT_ATTR);
+  }
+
+  public void setWalltimeLimit(Integer limit)
+  {
+    set(WALLTIME_LIMIT_ATTR, limit);
+  }
+
   public static final String MODEL_ATTR = "waters-model";
   public static final String KIND_XLATOR_ATTR = "waters-kindtranslator";
+  public static final String WALLTIME_LIMIT_ATTR = "job-walltime-limit";
 }

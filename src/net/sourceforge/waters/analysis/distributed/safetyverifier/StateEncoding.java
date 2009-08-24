@@ -17,6 +17,22 @@ public abstract class StateEncoding implements Serializable
   public abstract int[] decodeState(StateTuple packed);
 
   /**
+   * Decode the state for a specified automaton from the 
+   * packed state tuple. The default implementation of 
+   * this decodes the full state tuple and returns the 
+   * appropriate element. State encodings should override
+   * this method if a more efficient technique exists.
+   * @param packed tuple to extract state from
+   * @param automaton to get state for
+   * @return state of the given automaton
+   */
+  public int decodeAutomatonState(StateTuple packed, int automaton)
+  {
+    int[] unpacked = decodeState(packed);
+    return unpacked[automaton];
+  }
+
+  /**
    * Interpret the state tuple according to this encoding
    * and return a human readable string representation.
    */

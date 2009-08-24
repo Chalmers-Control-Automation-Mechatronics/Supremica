@@ -77,6 +77,13 @@ public class DistributedNode
     System.gc();
   }
 
+  public void shutdown()
+  {
+    //No warning necessary. This should kill all non-daemon mode threads?
+    System.out.println("Shutting down node");
+    System.exit(0);
+  }
+
   private class ConnectionThread extends Thread
   {
     public void run()
@@ -95,10 +102,12 @@ public class DistributedNode
 		  System.out.format("Attempting to get server proxy\n");
 		  mServerProxy = getServerProxy();
 		  mServerProxy.registerNode(mNodeProxy);
+		  failcount = 0;
 		}
 	      catch (Exception e)
 		{
 		  mServerProxy = null;
+		  failcount++;
 		}
 	    }
 
@@ -109,6 +118,7 @@ public class DistributedNode
 		{
 		  System.out.format("Pinging server\n");
 		  mServerProxy.ping();
+		  failcount = 0;
 		}
 	      catch (RemoteException e)
 		{
@@ -116,6 +126,14 @@ public class DistributedNode
 		  System.out.format("Ping failed!\n");
 		  mServerProxy = null;
 		}
+	    }
+
+	  if (failcount > SUICIDE_FAIL_COUNT)
+	    {
+	      //We are the Judean People's Front crack
+	      //suicide squad! Suicide squad, attack!
+	      System.err.format("DistributedNode: server seems gone, exiting\n");
+	      System.exit(1);
 	    }
 			   
 
@@ -148,7 +166,13 @@ public class DistributedNode
   {
     return;
   }
-				
+  
+
+  /**
+   * The number of times a ping fails before the node gives up and exits.
+   * This should be made a command line option.
+   */
+  private static final int SUICIDE_FAIL_COUNT = 20; 
   private final WorkerCleanup mWorkerCleanup;
   private final String mServerHost;
   private final int mServerPort;

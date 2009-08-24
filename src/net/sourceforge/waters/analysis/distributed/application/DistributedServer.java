@@ -216,6 +216,37 @@ public class DistributedServer
   {
     mNodes.add(n);
   }
+
+  public synchronized void shutdown()
+  {
+    for (Node n : mNodes)
+      {
+	
+	//Try a ping first... nodes that respond to pings should 
+	//shutdown properly. Shutting down means the RMI call probably 
+	//won't return happily, so this gives some idea of nodes that may
+	//be borked.
+	try
+	  {
+	    n.ping();
+	  }
+	catch (Exception e)
+	  {
+	    System.err.println("Node failed ping, proper shutdown seems unlikely."); 
+	  }
+
+	try
+	  {
+	    n.shutdown();
+	  }
+	catch (Exception e)
+	  {
+	    //Maybe a better way to shutdown servers is necessary.
+	  }
+      }
+
+    System.exit(0);
+  }
   
   private final List<Node> mNodes;
   

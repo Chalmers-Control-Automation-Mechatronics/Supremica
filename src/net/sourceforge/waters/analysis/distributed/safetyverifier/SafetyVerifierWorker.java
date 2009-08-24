@@ -17,6 +17,7 @@ public interface SafetyVerifierWorker extends Remote, StateHandler
   public void setJob(Job job) throws RemoteException;
 
   public void setModelSchema(ProductDESSchema des) throws RemoteException;
+  public ProductDESSchema getModelSchema() throws RemoteException;
 
   /**
    * Sets a (hopefully) unique ID for the worker. This should uniquely
@@ -149,4 +150,12 @@ public interface SafetyVerifierWorker extends Remote, StateHandler
    *         since the flag was set.
    */
   public boolean finishIdleTest() throws RemoteException;
+
+
+  /**
+   * Collects a bunch of statistics about this worker's execution so far.
+   * It is intended that this is called at the end of the model verification
+   * process so that stats can be returned to the client. 
+   */
+  public JobStats getWorkerStats() throws RemoteException;
 }

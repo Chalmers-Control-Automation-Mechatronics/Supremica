@@ -1,7 +1,12 @@
 package net.sourceforge.waters.analysis.distributed;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectOutputStream;
 import java.io.Serializable;
 
+import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 
@@ -24,6 +29,7 @@ import net.sourceforge.waters.model.des.SafetyTraceProxy;
 import net.sourceforge.waters.analysis.distributed.application.Job;
 import net.sourceforge.waters.analysis.distributed.application.JobResult;
 import net.sourceforge.waters.analysis.distributed.application.Server;
+import net.sourceforge.waters.analysis.distributed.safetyverifier.SafetyVerificationJob;
 
 /**
  * XXX
@@ -63,18 +69,66 @@ public class DistributedSafetyVerifier
       {
 	Server server = connectToServer(getHostname(), getPort());
 
-	VerificationJob job = new VerificationJob();
+	SafetyVerificationJob job = new SafetyVerificationJob();
 	job.setName("safety-" + UUID.randomUUID().toString());
 	job.setController(controller);
 	job.setNodeCount(getNodeCount());
 	job.setModel(model);
+	job.setProcessingThreadCount(getProcessingThreadCount());
+
+	//The controller shouldn't care if there isn't a 
+	//walltime limit. 
+	if (getWalltimeLimit() >= 0)
+	  {
+	    job.setWalltimeLimit(getWalltimeLimit());
+	  }
 
 	//Set the kind translator for the job by serialising
 	//the current translator, regardless of the type.
 	SerializableKindTranslator kx = new SerializableKindTranslator(translator, model);
 	job.setKindTranslator(kx);
+
+	job.setStateDistribution(getStateDistribution());
 	
+	//Submit the job to the server and wait for it to run.
+	//Interpret the results as a verification job result.
 	VerificationJobResult result = new VerificationJobResult(server.submitJob(job));
+
+	if (getShutdownAfter())
+	  {
+	    //This ping probes if the server is alive. This should give some indication
+	    //of whether the shutdown will happen cleanly.
+	    try
+	      {
+		server.ping();
+	      }
+	    catch (RemoteException e)
+	      {
+		System.err.println("Ping to server failed. Chances of shutting down cleanly are slim");
+	      }
+
+	    try
+	      {
+		server.shutdown();
+	      }
+	    catch (RemoteException e)
+	      {
+		//Ignore. Shutdown calls generally appear to fail because
+		//the remote shutdown methods do a System.exit
+		//It is possible the server isn't available though.
+	      }
+	  }
+
+	
+	try
+	  {
+	    dumpJobResult(result);
+	  }
+	catch (IOException e)
+	  {
+	    //Chain an analysis exception...
+	    throw new AnalysisException(e.getMessage(), e);
+	  }
 
 	//Check for exceptions that might have occurred
 	if (result.getException() != null)
@@ -163,6 +217,35 @@ public class DistributedSafetyVerifier
     return server;
   }
 
+  
+  private void dumpJobResult(JobResult result) throws IOException
+  {
+    File dumpfile = getResultsDumpFile();
+    if (dumpfile != null)
+      {
+	ObjectOutputStream oos = null;
+	FileOutputStream fos = null;
+	try
+	  {
+	    fos = new FileOutputStream(dumpfile);
+	    oos = new ObjectOutputStream(fos);
+	    oos.writeObject(result);
+	    oos.close();
+	    fos.close();
+	  }
+	catch (IOException e)
+	  {
+	    if (oos != null)
+	      oos.close();
+	    
+	    if (fos != null)
+	      fos.close();
+
+	    throw e;
+	  }
+      }
+  }
+
 
   //#########################################################################
   //# Interface net.sourceforge.waters.model.analysis.SafetyVerifier
@@ -182,6 +265,9 @@ public class DistributedSafetyVerifier
     return (SafetyTraceProxy) super.getCounterExample();
   }
 
+
+  //########################################################################
+  //# Option methods
   public void setHostname(String hostname)
   {
     mHostname = hostname;
@@ -202,6 +288,16 @@ public class DistributedSafetyVerifier
     return mPort;
   }
 
+  public void setResultsDumpFile(File dumpFile)
+  {
+    mDumpFile = dumpFile;
+  }
+
+  public File getResultsDumpFile()
+  {
+    return mDumpFile;
+  }
+
   public void setNodeCount(int count)
   {
     mNodeCount = count;
@@ -211,9 +307,54 @@ public class DistributedSafetyVerifier
   {
     return mNodeCount;
   }
+
+  public void setShutdownAfter(boolean value)
+  {
+    mShutdownAfter = value;
+  }
+
+  public boolean getShutdownAfter()
+  {
+    return mShutdownAfter;
+  }
+
+  public void setWalltimeLimit(int seconds)
+  {
+    mWalltimeLimit = seconds;
+  }
+
+  public int getWalltimeLimit()
+  {
+    return mWalltimeLimit;
+  }
+
+  public void setProcessingThreadCount(int threads)
+  {
+    mProcessingThreads = threads;
+  }
+
+  public int getProcessingThreadCount()
+  {
+    return mProcessingThreads;
+  }
+
+  public void setStateDistribution(String dist)
+  {
+    mStateDistribution = dist;
+  }
+
+  public String getStateDistribution()
+  {
+    return mStateDistribution;
+  }
   
   private String mHostname = null;
   private int mPort = 23232;
   private int mNodeCount = 10;
   private KindTranslator mKindTranslator;
+  private File mDumpFile = null;
+  private boolean mShutdownAfter = false;
+  private int mWalltimeLimit = -1;
+  private int mProcessingThreads = 2;
+  private String mStateDistribution = "hash";
 }

@@ -31,6 +31,31 @@ public class PackedStateEncoding extends StateEncoding
     mStateArrayLength = (int)Math.ceil(c_bit / 32.0);
   }
 
+  public void outputDebugging()
+  {
+    int[] bits = new int[mStateArrayLength * 32];
+
+    for (int i = 0; i < mStartBit.length; i++)
+      {
+	for (int k = 0; k < mLength[i]; k++)
+	  {
+	    bits[mStartBit[i] + k]++;
+	  }
+      }
+
+    for (int i = 0; i < bits.length; i++)
+      {
+	System.out.print(bits[i]);
+      }
+    System.out.println();
+
+    for (int i = 0; i < mStartBit.length; i++)
+      {
+	System.out.format("aut: %d, startbit: %d, length: %d\n",
+			  i, mStartBit[i], mLength[i]);
+      }
+  }
+
   /**
    * Encode a product state from a vector of unpacked state
    * indices. Each element in the input array corresponds to
@@ -42,12 +67,27 @@ public class PackedStateEncoding extends StateEncoding
   {
     int[] pstate = new int[mStateArrayLength];
 
-    for (int i = 0; i < unpacked.length; i++)
+    for (int i = unpacked.length - 1; i >=0; i--)
       {
 	encodeAutomatonState(pstate, i, unpacked[i]);
       }
 
-    return new StateTuple(pstate, depth);
+    StateTuple t = new StateTuple(pstate, depth);
+  
+    /*
+    int[] unpacked2 = decodeState(t);
+   
+      //Check if the state encodes/decodes correctly. 
+      if (!java.util.Arrays.equals(unpacked, unpacked2))
+	{
+	  System.err.format("Encoder fail:\n%s\n%s\n",
+			    java.util.Arrays.toString(unpacked),
+			    java.util.Arrays.toString(unpacked2));
+	  throw new RuntimeException("State encoder fail");
+      }
+    */
+
+    return t;
   }
 
 
@@ -98,10 +138,17 @@ public class PackedStateEncoding extends StateEncoding
     int index = mStartBit[aut] / 32;
     int sbit = mStartBit[aut] % 32;
     int length = mLength[aut];
-    
+
     //Lengths greater than 32 bits are silly, no automaton could have
     //that many states, nor could it be stored in an integer.
     assert (length < 32);
+
+    //If the length is 0 bits, we must handle this as a special case
+    //(otherwise the vmask calculation becomes ~0 >>> 32, which is ~0
+    //and undesirable.  If the length is 0, then 0 is the only posible
+    //state. This encodes to nothing, so just return.
+    if (length == 0)
+      return;
 
     //Calculate the length that needs to be stored in the
     //current element.
@@ -116,16 +163,21 @@ public class PackedStateEncoding extends StateEncoding
     //  ----     --------  (shift right by 12 bits to get this)
     int vmask = ~(0) >>> (32 - ce_length);
 
-    pstate[index] = (pstate[index] & ~(vmask << sbit)) | (value & vmask) << sbit;
+    pstate[index] = (pstate[index] & ~(vmask << sbit)) | ((value & vmask) << sbit);
 
     //If there is still more data to pack, do this now.
     if (ce_length < length)
       {
 	length = length - ce_length;
-	value = value >> ce_length;
+	value = value >>> ce_length;
 	vmask = ~(0) >>> (32 - length);
 	pstate[index+1] = (pstate[index+1] & ~(vmask)) | (value & vmask);
       }
+  }
+
+  public int decodeAutomatonState(StateTuple state, int automaton)
+  {
+    return decodeAutomatonState(state.getStateArray(), automaton);
   }
 
   private int decodeAutomatonState(int[] pstate, int aut)
@@ -134,7 +186,14 @@ public class PackedStateEncoding extends StateEncoding
     int index = mStartBit[aut] / 32;
     int sbit = mStartBit[aut] % 32;
     int length = mLength[aut];
+
     assert (length < 32); 
+
+    //If this automaton encodes into 0 bits, the only possible state
+    //is 0. This must be handled as a special case to prevent the
+    //mask being incorrectly calculated.
+    if (length == 0)
+      return 0;
 
     int ce_length = Math.min(length, 32 - sbit);
     int vmask = ~(0) >>> (32 - ce_length);
@@ -144,9 +203,8 @@ public class PackedStateEncoding extends StateEncoding
     if (ce_length < length)
       {
 	length = length - ce_length;
-	value = value << length;
 	vmask = ~(0) >>> (32 - length);
-	value = value | (pstate[index+1] & vmask);
+	value = value | ((pstate[index+1] & vmask) << length);
       }
 
     return value;

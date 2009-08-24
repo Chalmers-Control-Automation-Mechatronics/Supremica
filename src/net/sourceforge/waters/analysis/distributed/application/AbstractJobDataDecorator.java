@@ -3,8 +3,7 @@ package net.sourceforge.waters.analysis.distributed.application;
 import java.io.Serializable;
 import java.util.Map;
 
-public abstract class AbstractJobDataDecorator implements JobData, Serializable
-{
+public abstract class AbstractJobDataDecorator implements JobData, Serializable{
   protected AbstractJobDataDecorator(JobData jobdata)
   {
     mJobData = jobdata;

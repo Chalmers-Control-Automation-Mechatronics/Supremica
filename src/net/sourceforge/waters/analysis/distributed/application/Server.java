@@ -25,4 +25,6 @@ public interface Server extends Remote
    * @return A job containing the original job, and results.
    */
   public JobResult submitJob(Job job) throws RemoteException;
+
+  public void shutdown() throws RemoteException;
 } 

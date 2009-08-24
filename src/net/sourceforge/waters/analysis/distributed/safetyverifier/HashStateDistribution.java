@@ -12,7 +12,28 @@ public class HashStateDistribution extends StateDistribution
   public StateHandler lookupStateHandler(StateTuple state)
   {
     int hashcode = state.hashCode();
-    return mHandlerCache[Math.abs(hashcode % mHandlerCache.length)];
+    return hashLookupStateHandler(hashcode);
+  }
+
+  protected StateHandler hashLookupStateHandler(int hash)
+  {
+    return mHandlerCache[Math.abs(rehash(hash) % mHandlerCache.length)];
+  }
+
+  protected int getStateHandlerCount()
+  {
+    return mHandlerCache.length;
+  }
+
+  /**
+   * A supplemental hash function. This will hopefully increase the
+   * quality of hash codes. This technique is borrowed from Java HashMap 
+   * class.
+   */
+  private static int rehash(int h)
+  {
+    h ^= (h >>> 20) ^ (h >>> 12);
+    return h ^ (h >>> 7) ^ (h >>> 4);
   }
 
   protected void handlersUpdated()

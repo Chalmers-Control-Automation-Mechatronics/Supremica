@@ -647,6 +647,8 @@ Class-Path: ${manifest.pathlist}</echo>
 	<chmod file="${dist}/DistributedServer" perm="755"/>
 	<copy file="${templates}/DistributedNode" todir="${dist}"/>
 	<chmod file="${dist}/DistributedNode" perm="755"/>
+	<copy file="${templates}/DistributedShutdown" todir="${dist}"/>
+	<chmod file="${dist}/DistributedShutdown" perm="755"/>
         <!--
         <copy file="${templates}/SupremicaProfiling.cmd" todir="${dist}"/>
         <chmod file="${dist}/SupremicaProfiling.cmd" perm="644"/>

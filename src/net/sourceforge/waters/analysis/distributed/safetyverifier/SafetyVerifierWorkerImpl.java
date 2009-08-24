@@ -27,10 +27,12 @@ public class SafetyVerifierWorkerImpl extends AbstractWorker implements SafetyVe
     System.out.format("Constructed safety verifier worker\n");
   }
 
+
   public void setJob(Job job)
   {
     mJob = job;
   }
+
 
   public void setModelSchema(ProductDESSchema des)
   {
@@ -42,15 +44,23 @@ public class SafetyVerifierWorkerImpl extends AbstractWorker implements SafetyVe
     mSpecTransitions = selectTransitionTables(mTransitionTables, AutomatonSchema.SPECIFICATION);
   }
 
+  public ProductDESSchema getModelSchema()
+  {
+    return mModel;
+  }
+
+
   public void setWorkerID(String id)
   {
     mWorkerID = id;
   }
 
+
   public String getWorkerID()
   {
     return mWorkerID;
   }
+
 
   public void setStateDistribution(StateDistribution stateDist)
   {
@@ -62,25 +72,31 @@ public class SafetyVerifierWorkerImpl extends AbstractWorker implements SafetyVe
     //Set the state handler to the local object. This will
     //prevent calls from going through the RMI system for 
     //local states.
-    mStateDistribution.setHandler(getWorkerID(), this);
+    mLocalHandler = new CountingStateHandler(this);
+    mStateDistribution.setHandler(getWorkerID(), mLocalHandler);
 
-    mOutputDispatcher = new ThreadedOutputDispatcher(mStateDistribution, 16);
+    //mOutputDispatcher = new SynchronousOutputDispatcher(mStateDistribution);
+    mOutputDispatcher = new ThreadedOutputDispatcher(mStateDistribution, 4);
   }
+
 
   public StateDistribution getStateDistribution()
   {
     return mStateDistribution;
   }
 
+
   public void setStateEncoding(StateEncoding encoding)
   {
     mStateEncoding = encoding;
   }
 
+
   public StateEncoding getStateEncoding()
   {
     return mStateEncoding;
   }
+
 
   public void startProcessingThreads(int n, int buffersize)
   {
@@ -108,6 +124,7 @@ public class SafetyVerifierWorkerImpl extends AbstractWorker implements SafetyVe
       }
   }
 
+
   public void addState(StateTuple state)
   {
     //This method will add states to be checked, and will 
@@ -125,6 +142,7 @@ public class SafetyVerifierWorkerImpl extends AbstractWorker implements SafetyVe
 	mStateList.notifyAll();
       }
   }
+
 
   /**
    * A thread for processing states. Each processing thread has a 
@@ -188,6 +206,7 @@ public class SafetyVerifierWorkerImpl extends AbstractWorker implements SafetyVe
 	  //probably happened because the thread was waiting for more states.
 	}
     }
+
 
     /**
      * Fill the thread's buffer from the list of unprocessed states. 
@@ -327,16 +346,35 @@ public class SafetyVerifierWorkerImpl extends AbstractWorker implements SafetyVe
     //if the buffer is full.
     private void outputState(StateTuple state)
     {
+      
+      try
+	{
+	  mOutputDispatcher.addState(state);
+	  synchronized (mOutgoingLock)
+	    {	  
+	      mOutgoingStateCounter++;
+	    }
+	}
+      catch (Exception e)
+	{
+	  throw new RuntimeException(e);
+	}
+      
+      /*
       mOutgoingBuffer[mOutgoingBufferIndex++] = state;
 
       if (mOutgoingBufferIndex >= mOutgoingBuffer.length)
 	{
 	  flushOutputBuffer();
 	}
+      */
+      
     }
+
 
     private void flushOutputBuffer()
     {
+      /* 
       try
 	{
 	  //Send the state to the output dispatcher and
@@ -358,6 +396,7 @@ public class SafetyVerifierWorkerImpl extends AbstractWorker implements SafetyVe
 	}
 
       mOutgoingBufferIndex = 0;
+      */
     }
 
       
@@ -381,6 +420,7 @@ public class SafetyVerifierWorkerImpl extends AbstractWorker implements SafetyVe
       }
   }
 
+
   private StateTuple getNextState()
   {
     synchronized (mStateList)
@@ -402,6 +442,7 @@ public class SafetyVerifierWorkerImpl extends AbstractWorker implements SafetyVe
       }
   }
 
+
   public StateTuple getBadState()
   {
     synchronized (mBadStateLock)
@@ -409,6 +450,7 @@ public class SafetyVerifierWorkerImpl extends AbstractWorker implements SafetyVe
 	return mBadState;
       }
   }
+
 
   public int getBadEvent()
   {
@@ -468,15 +510,18 @@ public class SafetyVerifierWorkerImpl extends AbstractWorker implements SafetyVe
     return mCurrentStateIndex;
   }
 
+
   public long getIncomingStateCount()
   {
     return mIncomingStateCounter;
   }
 
+
   public long getOutgoingStateCount()
   {
     return mOutgoingStateCounter;
   }
+
 
   public int getWaitingStateCount()
   {
@@ -485,6 +530,7 @@ public class SafetyVerifierWorkerImpl extends AbstractWorker implements SafetyVe
 	return mStateList.size() - mCurrentStateIndex;
       }
   }
+
 
   public void pause()
   {
@@ -506,6 +552,7 @@ public class SafetyVerifierWorkerImpl extends AbstractWorker implements SafetyVe
       }
   }
 
+
   public void resume()
   {
     synchronized (mWorkerState)
@@ -523,10 +570,12 @@ public class SafetyVerifierWorkerImpl extends AbstractWorker implements SafetyVe
       }
   }
 
+
   public boolean isPaused()
   {
     return mPausedState;
   }
+
   
   public void kill()
   {
@@ -544,6 +593,7 @@ public class SafetyVerifierWorkerImpl extends AbstractWorker implements SafetyVe
 	mStateList.notifyAll();
       }
   }
+
   
   public void created() throws Exception
   {
@@ -552,6 +602,7 @@ public class SafetyVerifierWorkerImpl extends AbstractWorker implements SafetyVe
     mStateList = new ArrayList<StateTuple>();
     mObservedSet = new THashMap<StateTuple,StateTuple>();
   }
+
 
   public void deleted()
   {
@@ -562,7 +613,16 @@ public class SafetyVerifierWorkerImpl extends AbstractWorker implements SafetyVe
     kill();
 
     if (mOutputDispatcher != null)
-      mOutputDispatcher.shutdown();
+      {
+	mOutputDispatcher.shutdown();
+	mOutputDispatcher = null;
+      }
+
+    if (mPredecessorSearch != null)
+      {
+	mPredecessorSearch.shutdown();
+	mPredecessorSearch = null;
+      }
 
     //Now wait for the threads to die. This might be a long critical
     //section, but it prevents new threads from being added.
@@ -584,6 +644,7 @@ public class SafetyVerifierWorkerImpl extends AbstractWorker implements SafetyVe
     
     System.err.format("Safety verifier worker: all threads terminated\n");
   }
+
 
   /**
    * Checks for the kill and pause state, blocking if
@@ -626,10 +687,17 @@ public class SafetyVerifierWorkerImpl extends AbstractWorker implements SafetyVe
       }
   }
 
+
   public void predecessorSearch(StateTuple original, PredecessorCallback callback) throws RemoteException
   {
+    if (mPredecessorSearch == null)
+      {
+	mPredecessorSearch = new PredecessorSearch(this);
+      }
+
     mPredecessorSearch.setSearchTarget(original, callback);
   }
+
 
   public void startIdleTest()
   {
@@ -641,6 +709,7 @@ public class SafetyVerifierWorkerImpl extends AbstractWorker implements SafetyVe
 	mIdleCanaryFlag = appearsIdle();
       }
   }
+
 
   public boolean finishIdleTest()
   {
@@ -657,6 +726,39 @@ public class SafetyVerifierWorkerImpl extends AbstractWorker implements SafetyVe
       }
   }
 
+
+  public JobStats getWorkerStats()
+  {
+    JobStats stats = new JobStats();
+    
+    stats.set("worker-id", getWorkerID());
+    stats.set("bad-state", getBadState());
+    stats.set("bad-event", getBadEvent());
+    stats.set("processing-threads", mThreads.size());
+    stats.set("job-name", mJob.getName());
+
+    if (mLocalHandler != null)
+      {
+	stats.set("local-added-states", mLocalHandler.getCount());
+      }
+    
+    synchronized (mStateList)
+      {
+	stats.set("state-count", mStateList.size());
+	stats.set("processed-states", getStateCount());
+	stats.set("unprocessed-states", mStateList.size() - mCurrentStateIndex);
+	stats.set("incoming-state-count", mIncomingStateCounter);
+      }
+
+    synchronized (mOutgoingLock)
+      {
+	stats.set("outgoing-state-count", mOutgoingStateCounter);
+      }
+
+    return stats;
+  }
+
+
   private boolean appearsIdle()
   {
     synchronized (mStateList)
@@ -664,6 +766,7 @@ public class SafetyVerifierWorkerImpl extends AbstractWorker implements SafetyVe
 	return getWaitingStateCount() == 0 && mRunningProcessingThreads == 0;
       }
   }
+
 
   private void killCanary()
   {
@@ -673,309 +776,28 @@ public class SafetyVerifierWorkerImpl extends AbstractWorker implements SafetyVe
       }
   }
 
-  //####################################################################
-  // Predecessor Searching
-
   /**
-   * A class to encapsulate searching for a predecessor state.
+   * Gets the state equivalent to the given state, except the 
+   * object that is actually stored in the worker. This state 
+   * should have the correct depth hint, etc.
+   * @param state State to get
+   * @return StateTuple from the worker, or null if it doesn't exist.
    */
-  private class PredecessorSearch
+  public StateTuple getExploredState(StateTuple state)
   {
-    public PredecessorSearch()
-    {
-      //Use a fixed size array blocking queue. A capacity of 1024 should
-      //be enough in most situations. It might fill up on very complex models.
-      mDataQueue = new ArrayBlockingQueue<Predecessor>(1024);
-      mProducer = new PredecessorProducer(mDataQueue);
-      mConsumer = new PredecessorConsumer(mDataQueue);
-
-      mProducer.setDaemon(true);
-      mConsumer.setDaemon(true);
-      mProducer.start();
-      mConsumer.start();
-    }
-
-    public void setSearchTarget(StateTuple state, PredecessorCallback cb)
-    {
-      synchronized (mSearchMonitor)
-	{
-	  mSearchState = state;
-	  mCallback = cb;
-	  
-	  mConsumer.resetDepth();
-	  
-	  mSearchMonitor.notifyAll();
-	}
-
-      //Is interrupting the producer thread necessary here? Perhaps if
-      //it includes numerous blocking calls?
-    }
-
-    /**
-     * An immutable predecessor class. Stores the located predecessor
-     * state and the state it is a predecessor to.
-     */
-    private class Predecessor
-    {
-      public Predecessor(StateTuple original, StateTuple predecessor, int event)
+    synchronized (mStateList)
       {
-	mOriginalState = original;
-	mPredecessorState = predecessor;
-	mEvent = event;
+	return mObservedSet.get(state);
       }
-
-      public StateTuple getOriginal()
-      {
-	return mOriginalState;
-      }
-
-      public StateTuple getPredecessor()
-      {
-	return mPredecessorState;
-      }
-
-      public int getEvent()
-      {
-	return mEvent;
-      }
-       
-      private final StateTuple mOriginalState;
-      private final StateTuple mPredecessorState;
-      private final int mEvent;
-    }
-    
-    private class PredecessorProducer extends Thread
-    {
-      public PredecessorProducer(BlockingQueue<Predecessor> dataqueue)
-      {
-	tQueue = dataqueue;
-      }
-      
-      public void run()
-      {
-	while (true)
-	  {
-	    try
-	      {
-		//Get the state we want to search for predecessors
-		//to. This will block the thread until we get a state.
-		StateTuple state = null;
-		synchronized (mSearchMonitor)
-		  {
-		    while (mSearchState == null)
-		      {
-			mSearchMonitor.wait();
-		      }
-		    state = mSearchState;
-		  }
-		
-		try
-		  {
-		    produce(state);
-		  }
-		catch (InterruptedException e)
-		  {
-		    //If interrupted, the thread should continue
-		    //processing the current search state, which may have
-		    //changed. This will prevent the search state from
-		    //being cleared further down in the loop
-		    continue;
-		  }
-		
-		//Clear the search state if we have finished. This is only
-		//done if the search state differs from the state we just
-		//searched.
-		synchronized (mSearchMonitor)
-		  {
-		    
-		    if (mSearchState == state)
-		  mSearchState = null;
-		  }
-		
-	      }
-	    catch (InterruptedException e)
-	      {
-		//XXXXXXXXXXXXXXXXXXXX FIX ME XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
-		System.err.println("Fixme: Predecessor producer interrupted. Terminating thread.");
-		return;
-	      }
-	  }
-      }
-
-      private void produce(StateTuple state) throws InterruptedException
-      {
-	int[] pre = new int[mModel.getAutomataCount()];
-	int[] current = mStateEncoding.decodeState(state);
-	
-	for (int ev = 0; ev < mModel.getEventCount(); ev++)
-	  {
-	    //Expand the predecessor states for the current event.
-	    expandReverse(ev, pre, state, current, 0);
-	  }
-
-	//Add an 'end of search' element to the queue. This will
-	//cause the consumer to report the search is complete if
-	//it gets to that point.
-	tQueue.put(new Predecessor(state, null, -1));
-      }
-
-      private void expandReverse(int event, 
-				 int[] pre, 
-				 StateTuple packedCurrent, 
-				 int[] current, 
-				 int automaton) 
-	throws InterruptedException
-      {
-	if (automaton < current.length)
-	  {
-	    //Recursively call this method for each predecessor in the
-	    //current automaton. This will explore all combinations of
-	    //predecessors.
-	    TransitionTable tt = mTransitionTables[automaton];
-	    
-	    if (tt.isInAlphabet(event))
-	      {
-		//Expand, using each possible predecessor for the current 
-		//automaton.
-		for (int state : tt.getPredecessorStates(current[automaton], event))
-		  {
-		    pre[automaton] = state;
-		    expandReverse(event, pre, packedCurrent, current, automaton + 1);
-		  }
-	      }
-	    else
-	      {
-		//As the event is not in the automaton's alphabet, the
-		//current automaton will not have changed state on this
-		//event so use the current state's value and expand.
-		pre[automaton] = current[automaton];
-		expandReverse(event, pre, packedCurrent, current, automaton + 1);
-	      }
-	  }
-	else
-	  {
-	    //A potentially reachable predecessor state has been
-	    //found. We now need to check if it is in the visited
-	    //state set. If it is, then add it to the queue to be
-	    //sent back to the controller and continue.
-
-	    StateTuple pred_state = mStateEncoding.encodeState(pre, Integer.MAX_VALUE);
-	    StateTuple t = null;
-	    synchronized (mStateList)
-	      {
-		t = mObservedSet.get(pred_state);
-	      }
-
-	    
-	    //If the state is not in our local observed set, then
-	    //we cannot tell if the state is reachable... if it is, some other
-	    //worker will take care of it
-	    if (t == null)
-	      return;
-	    else
-	      pred_state = t;
-
-	    Predecessor p = new Predecessor(packedCurrent, pred_state, event);
-	    tQueue.put(p);
-	  }
-      }
-
-      private final BlockingQueue<Predecessor> tQueue;
-    }
-    
-    
-    private class PredecessorConsumer extends Thread
-    {
-      public PredecessorConsumer(BlockingQueue<Predecessor> dataqueue)
-      {
-	tQueue = dataqueue;
-      }
-
-      public synchronized void resetDepth()
-      {
-	tBestDepth = Integer.MAX_VALUE;
-      }
-      
-      public void run()
-      {
-	while (true)
-	  {
-	    //A simple implementation is to just send back all states
-	    //in the data queue.
-
-	    try 
-	      {
-		//Store the callback. This means if it changes during the
-		//operation we won't care
-		PredecessorCallback cb = null;
-		synchronized (mSearchMonitor)
-		  {
-		    while (mCallback == null)
-		      {
-			mSearchMonitor.wait();
-		      }
-		    cb = mCallback;
-		  }
-		
-		
-		Predecessor p = tQueue.take();
-		
-		if (p.getPredecessor() == null)
-		  {
-		    cb.searchCompleted(p.getOriginal(),
-				       getWorkerID());
-		  }
-		else
-		  {
-		    int depth = p.getPredecessor().getDepthHint();
-		    boolean goodPredecessor = false;
-		    synchronized (this)
-		      {
-			goodPredecessor = depth < tBestDepth;
-		      }
-		    
-		    if (goodPredecessor)
-		      {
-			depth = cb.takePredecessor(p.getOriginal(), 
-						   p.getPredecessor(),
-						   p.getEvent());
-			
-			synchronized (this)
-			  {
-			    tBestDepth = depth;
-			  }
-		      }
-		  }
-	      }
-	    catch (InterruptedException e)
-	      {
-		//XXXXXXXXXXXXXXXXXXXX FIX ME XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
-		System.err.println("Fixme: Predecessor consumer interrupted. Terminating thread.");
-		return;
-	      }
-	    catch (RemoteException e)
-	      {
-		System.err.println("Remote exception:");
-		e.printStackTrace();
-	      }
-	  }
-      }
-      
-      private int tBestDepth = Integer.MAX_VALUE;
-      private final BlockingQueue<Predecessor> tQueue;
-    }
-
-          
-    private final BlockingQueue<Predecessor> mDataQueue;
-    private final PredecessorProducer mProducer;
-    private final PredecessorConsumer mConsumer;
-    
-    private final Object mSearchMonitor = new Object();
-    private StateTuple mSearchState = null;
-    private PredecessorCallback mCallback = null;
   }
 
-  //####################################################################
+  /**
+   * Get the transition table for an automaton
+   */
+  public TransitionTable getTransitionTable(int automaton)
+  {
+    return mTransitionTables[automaton];
+  }
 
   private String mWorkerID = null;
   private StateDistribution mStateDistribution = null;
@@ -1028,7 +850,11 @@ public class SafetyVerifierWorkerImpl extends AbstractWorker implements SafetyVe
   private boolean mPausedState = false;
   private boolean mKillState = false;
 
-  private final PredecessorSearch mPredecessorSearch = new PredecessorSearch();
+  private volatile PredecessorSearch mPredecessorSearch = null;
+  private volatile OutputDispatcher mOutputDispatcher = null;
 
-  private OutputDispatcher mOutputDispatcher = null;
+  //Allows the number of locally added states to be counted. This 
+  //should provide useful numbers for testing the effectiveness of 
+  //state distribution implementations
+  private volatile CountingStateHandler mLocalHandler = null;
 }

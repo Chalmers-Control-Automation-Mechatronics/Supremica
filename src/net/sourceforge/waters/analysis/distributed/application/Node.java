@@ -34,4 +34,6 @@ public interface Node extends Remote
 
 
   public void cleanup(ControllerID id) throws RemoteException;
+
+  public void shutdown() throws RemoteException;
 }
