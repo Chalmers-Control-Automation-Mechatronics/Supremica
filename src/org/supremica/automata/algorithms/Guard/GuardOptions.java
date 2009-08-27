@@ -23,9 +23,9 @@ public final class GuardOptions
 {
 	private static Logger logger = LoggerFactory.createLogger(GuardOptions.class);
 	private String event;    
-	private boolean expressionType;    // if true: the guard expression will be generated from the allowed states, else: from forbidden states
-        private boolean dialogOK = false;
-        private int nbrOfExecuters;
+	private int expressionType;    // 0: the guard expression will be generated from the forbidden states; 1: from forbidden states; 2: Optimal case
+    private boolean dialogOK = false;
+    private int nbrOfExecuters;
 
 	public GuardOptions()
 	{
@@ -37,7 +37,7 @@ public final class GuardOptions
 		}
 
 		this.event = "";
-		this.expressionType = true;
+		this.expressionType = 2;
 	}
 
 	public void setDialogOK(boolean bool)
@@ -55,17 +55,17 @@ public final class GuardOptions
 		return nbrOfExecuters;
 	}
 
-	public boolean getExpressionType()
-        {
-            return expressionType;
-        }
+	public int getExpressionType()
+    {
+        return expressionType;
+    }
+
+    public String getEvent()
+    {
+        return event;
+    }
         
-        public String getEvent()
-        {
-            return event;
-        }
-        
-        public void setExpressionType(boolean set)
+    public void setExpressionType(int set)
 	{
 		expressionType = set;
 	}
@@ -89,7 +89,7 @@ public final class GuardOptions
 	public static GuardOptions getDefaultGuardOptions()
 	{
 		GuardOptions options = new GuardOptions();
-		options.setExpressionType(true);
+		options.setExpressionType(2);
 		options.setEvent(""); 
 		return options;
 	}

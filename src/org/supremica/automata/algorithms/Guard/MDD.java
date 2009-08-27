@@ -14,8 +14,8 @@ public class MDD {
 
     private int nodeID = -1;
     private MDDNode root;
-    private HashMap<MDDNode,HashSet<MDDEdge>> fromNode2edgesMap = new HashMap<MDDNode,HashSet<MDDEdge>>();
-    private HashMap<MDDNode,HashSet<MDDEdge>> toNode2edgesMap = new HashMap<MDDNode,HashSet<MDDEdge>>();
+    private HashMap<MDDNode,HashSet<MDDEdge>> node2OutEdgesMap = new HashMap<MDDNode,HashSet<MDDEdge>>();
+    private HashMap<MDDNode,HashSet<MDDEdge>> node2InEdgesMap = new HashMap<MDDNode,HashSet<MDDEdge>>();
 
     HashMap<Integer, MDDNode> nodeID2node = new HashMap<Integer, MDDNode>();
 
@@ -40,38 +40,38 @@ public class MDD {
         edge.getFromNode().addChild(edge.getToNode());
         edge.getToNode().addParent(edge.getFromNode());
         edge.getToNode().setReachedBy(edge.getLabel());
-        if(fromNode2edgesMap.get(edge.getFromNode()) == null)
+        if(node2OutEdgesMap.get(edge.getFromNode()) == null)
         {
             HashSet<MDDEdge> temp = new HashSet<MDDEdge>();
             temp.add(edge);
-            fromNode2edgesMap.put(edge.getFromNode(), temp);
+            node2OutEdgesMap.put(edge.getFromNode(), temp);
         }
         else
         {
-            fromNode2edgesMap.get(edge.getFromNode()).add(edge);
+            node2OutEdgesMap.get(edge.getFromNode()).add(edge);
         }
 
-        if(toNode2edgesMap.get(edge.getToNode()) == null)
+        if(node2InEdgesMap.get(edge.getToNode()) == null)
         {
             HashSet<MDDEdge> temp = new HashSet<MDDEdge>();
             temp.add(edge);
-            toNode2edgesMap.put(edge.getToNode(), temp);
+            node2InEdgesMap.put(edge.getToNode(), temp);
         }
         else
         {
-            toNode2edgesMap.get(edge.getToNode()).add(edge);
+            node2InEdgesMap.get(edge.getToNode()).add(edge);
         }
 
     }
 
-    public HashSet<MDDEdge> fromNode2edges(MDDNode node)
+    public HashSet<MDDEdge> node2OutEdges(MDDNode node)
     {
-        return fromNode2edgesMap.get(node);
+        return node2OutEdgesMap.get(node);
     }
 
-    public HashSet<MDDEdge> toNode2edges(MDDNode node)
+    public HashSet<MDDEdge> node2InEdges(MDDNode node)
     {
-        return toNode2edgesMap.get(node);
+        return node2InEdgesMap.get(node);
     }
 
     public HashSet<MDDEdge> getEdges()

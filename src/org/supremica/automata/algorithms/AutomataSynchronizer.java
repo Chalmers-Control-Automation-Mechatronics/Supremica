@@ -55,6 +55,12 @@ import org.supremica.log.*;
 import org.supremica.util.SupremicaException;
 
 import java.util.*;
+import net.sourceforge.waters.model.module.SimpleComponentProxy;
+
+import net.sourceforge.waters.subject.base.AbstractSubject;
+import net.sourceforge.waters.subject.base.ListSubject;
+import net.sourceforge.waters.subject.module.*;
+import net.sourceforge.waters.xsd.base.ComponentKind;
 
 public class AutomataSynchronizer
     implements Stoppable
@@ -68,13 +74,29 @@ public class AutomataSynchronizer
     
     // For stopping execution
     private boolean stopRequested = false;
-    
+
+
+    private HashMap<Arc,EdgeSubject> arc2edgeTable[];
+    private HashMap<String,Integer> autName2indexTable = new HashMap<String, Integer>();
+    private int automatonIndex = 0;
+
+
+    public AutomataSynchronizer(ListSubject<AbstractSubject> components, SynchronizationOptions options)
+    {
+        Automata automata = removeGuardsActionsFromEFAs(components);
+        this.theAutomata = automata;
+        this.syncOptions = options;
+        synchHelper = new AutomataSynchronizerHelper(automata, options,arc2edgeTable,autName2indexTable);
+
+        initialize();
+    }
+
     public AutomataSynchronizer(Automata automata, SynchronizationOptions options)
     {
         this.theAutomata = automata;
         this.syncOptions = options;
         synchHelper = new AutomataSynchronizerHelper(automata, options);
-        
+
         initialize();
     }
     
@@ -93,7 +115,7 @@ public class AutomataSynchronizer
     /**
      * Initializes the AutomataSynchronizerExecuter:s based on the AutomataSynchronizerHelper.
      */
-    private void initialize()
+    public void initialize()
     {
         // Allocate and initialize the synchronizationExecuters
         int nbrOfExecuters = syncOptions.getNbrOfExecuters();
@@ -114,7 +136,7 @@ public class AutomataSynchronizer
         
         // Build the initial state - and the comment
         Iterator<Automaton> autIt = theAutomata.iterator();
-        StringBuffer comment = new StringBuffer();;
+        StringBuffer comment = new StringBuffer();
         
         // Set an apropriate comment on the automaton
         while (autIt.hasNext())
@@ -264,5 +286,113 @@ public class AutomataSynchronizer
         synchronizer.clear();
         
         return result;
+    }
+
+    public SimpleComponentProxy getSynchronizedComponent()
+    {
+        SynchronizationOptions options = SynchronizationOptions.getDefaultSynchronizationOptions();
+        AutomataSynchronizerHelper helper = new AutomataSynchronizerHelper(theAutomata, options, arc2edgeTable,autName2indexTable);
+        AutomataSynchronizer synchronizer = new AutomataSynchronizer(helper);
+        synchronizer.execute();
+        synchronizer.getAutomaton();
+        helper.createExtendedAutomaton();
+        return helper.getSynchronizedComponent();
+    }
+
+    public Automaton removeGuardsActionsFromEFA(SimpleComponentSubject component)
+    {
+        Automaton automaton = new Automaton(component.getName());
+
+        if(component.getKind() == ComponentKind.PLANT)
+            automaton.setType(AutomatonType.PLANT);
+        if(component.getKind() == ComponentKind.SPEC)
+            automaton.setType(AutomatonType.SPECIFICATION);
+        if(component.getKind() == ComponentKind.SUPERVISOR)
+            automaton.setType(AutomatonType.SUPERVISOR);
+        if(component.getKind() == ComponentKind.PROPERTY)
+            automaton.setType(AutomatonType.PROPERTY);
+
+        State fromState , toState;
+        LabeledEvent event;
+        boolean initialFlag = true;
+        for(EdgeSubject edge : component.getGraph().getEdgesModifiable())
+        {
+            fromState = automaton.getStateWithName(edge.getSource().getName());
+            if(fromState == null)
+            {
+                fromState = new State(edge.getSource().getName());
+                if(initialFlag && edge.getSource().toString().contains("initial"))
+                {
+                    fromState.setInitial(true);
+                    initialFlag = false;
+                }
+                if(edge.getSource().toString().contains("accepting"))
+                {
+                    fromState.setAccepting(true);
+                }
+                automaton.addState(fromState);
+            }
+            toState = automaton.getStateWithName(edge.getTarget().getName());
+            if(toState == null)
+            {
+                toState = new State(edge.getTarget().getName());
+                if(edge.getTarget().toString().contains("accepting"))
+                {
+                    toState.setAccepting(true);
+                }
+                automaton.addState(toState);
+            }
+
+            ListSubject<AbstractSubject> eventList = edge.getLabelBlock().getEventListModifiable();
+            for(AbstractSubject e:eventList)
+            {
+//                EventDeclSubject eventSubject = (EventDeclSubject)e;
+//                SimpleComponentSubject eventSubject = (SimpleComponentSubject)e;
+                SimpleIdentifierSubject eventSubject = (SimpleIdentifierSubject)e;
+                event = automaton.getAlphabet().getEvent(eventSubject.getName());
+                if(event == null)
+                {
+                    event = new LabeledEvent(eventSubject.getName());
+                    automaton.getAlphabet().add(event);
+                }
+/*                if(eventSubject.getKind() == EventKind.CONTROLLABLE)
+                {
+                    event.setControllable(true);
+                }
+                else
+                {
+                    event.setControllable(false);
+                }
+ */
+                Arc currArc = new Arc(fromState, toState, event);
+                arc2edgeTable[automatonIndex].put(currArc, edge);
+                automaton.addArc(currArc);
+            }
+
+        }
+
+        return automaton;
+    }
+
+    public Automata removeGuardsActionsFromEFAs(ListSubject<AbstractSubject> components)
+    {
+        Automata automata = new Automata();
+        HashSet<SimpleComponentSubject> autComps = new HashSet<SimpleComponentSubject>();
+
+        for(AbstractSubject component : components)
+            if(component.toString().contains("NODES") && component.toString().contains("EDGES"))
+                autComps.add((SimpleComponentSubject)component);
+
+        arc2edgeTable = new HashMap[autComps.size()];
+
+        for(SimpleComponentSubject autComp: autComps)
+        {
+            autName2indexTable.put(autComp.getName(), automatonIndex);
+            arc2edgeTable[automatonIndex] = new HashMap<Arc, EdgeSubject>();
+            automata.addAutomaton(removeGuardsActionsFromEFA(autComp));
+            automatonIndex++;
+        }
+
+        return automata;
     }
 }

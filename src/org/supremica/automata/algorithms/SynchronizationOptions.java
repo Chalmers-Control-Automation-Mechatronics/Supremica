@@ -53,7 +53,7 @@ import org.supremica.log.*;
 import org.supremica.properties.Config;
 import org.supremica.util.SupremicaException;
 
-public final class SynchronizationOptions
+public class SynchronizationOptions
 {
 	private static Logger logger = LoggerFactory.createLogger(SynchronizationOptions.class);
 	private SynchronizationType syncType;    // PRIORITIZED, FULL, Broadcast, Unknown

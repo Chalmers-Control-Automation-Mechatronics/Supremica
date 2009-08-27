@@ -13,18 +13,10 @@ import javax.swing.Action;
 import javax.swing.ImageIcon;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
-import java.io.BufferedWriter;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
+import java.util.*;
 import org.supremica.automata.algorithms.Guard.*;
 import org.supremica.gui.ide.IDE;
 import org.supremica.gui.GuardDialog;
-import java.util.List;
-import java.util.Set;
-import java.util.StringTokenizer;
 import org.supremica.automata.*;
 import org.supremica.log.*;
 
@@ -32,7 +24,6 @@ import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
 import net.sourceforge.waters.model.expr.ExpressionParser;
 import net.sourceforge.waters.model.expr.Operator;
 import net.sourceforge.waters.model.expr.ParseException;
-import net.sourceforge.waters.model.module.ConstantAliasProxy;
 import net.sourceforge.waters.subject.base.AbstractSubject;
 import net.sourceforge.waters.subject.module.*;
 import net.sourceforge.waters.xsd.base.EventKind;
@@ -40,9 +31,13 @@ import org.supremica.automata.BDD.BDDAutomata;
 import org.supremica.automata.BDD.BDDManager;
 import org.supremica.gui.ide.EditorPanel;
 import net.sf.javabdd.*;
-import net.sourceforge.waters.model.des.StateProxy;
 import net.sourceforge.waters.model.module.NodeProxy;
-import net.sourceforge.waters.subject.base.ListSubject;
+
+import org.omg.CosTransactions.Synchronization;
+import org.omg.CosTransactions.SynchronizationOperations;
+import org.supremica.automata.algorithms.AutomataSynchronizer;
+import org.supremica.automata.algorithms.SynchronizationOptions;
+
 
 /**
  *
@@ -99,18 +94,28 @@ public class AnalyzerGuardAction
         
         // Get the current options
         GuardOptions guardOptions = new GuardOptions();
-        
+            
+ //       GuardGenerator gg = new GuardGenerator(selectedAutomata.getAutomatonAt(0),guardOptions.getExpressionType());
+        editorPanel = ide.getActiveDocumentContainer().getEditorPanel();
+
+        Vector events = new Vector();
+        events.add("Generate guards for ALL events");
+        for(EventDeclSubject sigmaS:  editorPanel.getModuleSubject().getEventDeclListModifiable())
+        {
+            if(sigmaS.getKind() == EventKind.CONTROLLABLE)
+            {
+                events.add(sigmaS.getName());
+            }
+        }
         // Start a dialog to allow the user changing the options
-        GuardDialog guardDialog = new GuardDialog(ide.getFrame(), guardOptions);
+        GuardDialog guardDialog = new GuardDialog(ide.getFrame(), guardOptions,events);
 
         guardDialog.show();
-/*        if (!guardOptions.getDialogOK())
+        if (!guardOptions.getDialogOK())
         {
             return;
         }
- */       
- //       GuardGenerator gg = new GuardGenerator(selectedAutomata.getAutomatonAt(0),guardOptions.getExpressionType());
-        editorPanel = ide.getActiveDocumentContainer().getEditorPanel();
+ 
         LabeledEvent sigma = new LabeledEvent(guardOptions.getEvent());
         BDDGuardGenerator bddgg = null;
         
@@ -123,11 +128,13 @@ public class AnalyzerGuardAction
         BDD prelUnconStates = manager.prelimUncontrollableStates(automataBDD);
         BDD forbiddenStates = prelUnconStates.or(automataBDD.getForbiddenStates());
 //        forbiddenStates.printDot();
-        BDD safeStatesBDD = manager.safeStateSynthesis(automataBDD, forbiddenStates).and(automataBDD.getReachableStates());
+        BDD safeStatesBDD = manager.safeStateSynthesis(automataBDD, forbiddenStates).and(automataBDD.getReachableAndCoreachableStates());
 
         long synthesisTime = System.currentTimeMillis()-time1;
+        System.out.println("Synthesis time: "+synthesisTime+" millisecs");
 
-        BufferedWriter out = null;
+
+/*        BufferedWriter out = null;
         try
         {
             out = new BufferedWriter(new FileWriter("C:/Users/sajed/Desktop/STS/examples/ResultsWithMyAlg/"+editorPanel.getModuleSubject().getName()+".doc"));
@@ -138,7 +145,7 @@ public class AnalyzerGuardAction
             out.newLine();
         }
         catch (IOException e) {}
-
+*/
         HashMap<String,BDDGuardGenerator> event2guard = new HashMap<String,BDDGuardGenerator>();
         boolean singleEventSelected = false;
 
@@ -151,13 +158,18 @@ public class AnalyzerGuardAction
                 if(sigmaS.getKind() == EventKind.CONTROLLABLE)
                 {
     //                System.out.println("Generating guard for event "+ sigmaS.getName()+"...");
+                    long runTime = System.currentTimeMillis();
                     bddgg = new BDDGuardGenerator(automataBDD, sigmaS.getName(), safeStatesBDD, guardOptions.getExpressionType());
-                    try
-                    {
-                        out.write(sigmaS.getName()+"\t"+bddgg.getBDDSize()+"\t"+bddgg.getNbrOfTerms()+"\t"+bddgg.getRunTime());
-                        out.newLine();
-                    }
-                    catch (IOException e) {}
+
+//                    System.out.println("The guard was generated in "+(System.currentTimeMillis()-runTime)+" millisecs");
+
+                    System.out.println("Number of terms in the expression: "+bddgg.getNbrOfTerms());
+//                    try
+//                    {
+//                        out.write(sigmaS.getName()+"\t"+bddgg.getBDDSize()+"\t"+bddgg.getNbrOfTerms()+"\t"+bddgg.getRunTime());
+//                        out.newLine();
+//                    }
+//                    catch (IOException e) {}
 
                     event2guard.put(sigmaS.getName(), bddgg);
                 }
@@ -171,15 +183,26 @@ public class AnalyzerGuardAction
 
         long totalGuardGenTime = System.currentTimeMillis()-time2;
 
-        try
+/*        try
         {
             out.newLine();
             out.write("Total time of generating guards for all events: "+totalGuardGenTime+" ms");
             out.close();
         }
         catch (IOException e) {}
+*/
+
+////////////////////
+
+/*        SynchronizationOptions synchOps = new SynchronizationOptions();
+//        ide.getActiveDocumentContainer().getAnalyzerPanel().addAutomata(myAutomata);
+        AutomataSynchronizer synch = new AutomataSynchronizer(editorPanel.getModuleSubject().getComponentListModifiable(),synchOps);
+
+        ide.getActiveDocumentContainer().getEditorPanel().getModuleSubject().getComponentListModifiable().add((SimpleComponentSubject)synch.getSynchronizedComponent());*/
+/////////////////////
+        
         //Add the guard to the automata
-        ModuleSubjectFactory factory = ModuleSubjectFactory.getInstance();
+/*        ModuleSubjectFactory factory = ModuleSubjectFactory.getInstance();
         parser = new ExpressionParser(factory, CompilerOperatorTable.getInstance());
 
         SimpleComponentSubject tempSubj =null;
@@ -192,7 +215,6 @@ public class AnalyzerGuardAction
         {
             tempAut2initState.put(aut.getName(), aut.getInitialState().getName());
         }
-        
         aut2type = new HashMap<String,String>();
         aut2initState = new HashMap<String,String>();
         String autName = "";
@@ -205,8 +227,7 @@ public class AnalyzerGuardAction
             aut2initState.put(tempSubj.getName(), tempAut2initState.get(autName));
             subjects.add(tempSubj);
         }
-
-        
+       
         boolean changed = false;
         String guard = "";
         BDDGuardGenerator currBDDGG = null;
@@ -218,7 +239,8 @@ public class AnalyzerGuardAction
             for(EdgeSubject ep:simSubj.getGraph().getEdgesModifiable())
             {
                 SimpleExpressionSubject ses = null;
-                //&& simSubj.getKind().name().equals("SPEC")
+                //&& simSubj.getKind().name().equals("SPEC")                               
+
                 String currEvent = ep.getLabelBlock().getEventList().iterator().next().toString();
                 currBDDGG = singleEventSelected ? bddgg : event2guard.get(currEvent);
                 if( ((singleEventSelected && currEvent.equals(sigma.getName()) && !currBDDGG.guardIsTrueOrFalse()) ||
@@ -245,7 +267,7 @@ public class AnalyzerGuardAction
             
              if(changed)
                 editorPanel.addComponent(simSubj);
-        }
+        }*/
         
     }
 

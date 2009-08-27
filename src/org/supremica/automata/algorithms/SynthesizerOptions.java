@@ -71,6 +71,12 @@ public final class SynthesizerOptions
     public boolean oneEventAtATime = false;
     public boolean addOnePlantAtATime = false;
 
+
+    //Guard options
+	private String event;
+	private int expressionType;    // 0: the guard expression will be generated from the forbidden states; 1: from forbidden states; 2: Optimal case
+    private int nbrOfExecuters;
+
     /**
      * The current options, based on earlier user preferences.
      */
@@ -104,6 +110,17 @@ public final class SynthesizerOptions
         this.maximallyPermissiveIncremental = maximallyPermissiveIncremental;
         this.reduceSupervisors = reduceSupervisors;
         this.bddExtractSupervisor = bddExtractSupervisor;
+
+        //Guard options
+		this.nbrOfExecuters = Config.SYNC_NBR_OF_EXECUTERS.get();
+		//The following check should ideally be done within SupremicaProperties
+		if (this.nbrOfExecuters > 1 )
+		{
+			//			throw new SupremicaException("Error in SupremicaProperties. The property synchNbrOfExecuters must be at least 1.");
+		}
+
+		this.event = "";
+		this.expressionType = 2;
     }
 
     public boolean isValid()
@@ -245,6 +262,7 @@ public final class SynthesizerOptions
         return reduceSupervisors;
     }
 
+
     /**
      * Stores the current set of options in SupremicaProperties.
      */
@@ -280,6 +298,36 @@ public final class SynthesizerOptions
         options.removeUnnecessarySupervisors = false;
         options.reduceSupervisors = false;
 
+        options.setExpressionType(2);
+		options.setEvent("");
+
         return options;
     }
+
+    //Guard options
+	public int getNbrOfExecuters()
+	{
+		return nbrOfExecuters;
+	}
+
+	public int getExpressionType()
+    {
+        return expressionType;
+    }
+
+    public String getEvent()
+    {
+        return event;
+    }
+
+    public void setExpressionType(int set)
+	{
+		expressionType = set;
+	}
+
+    public void setEvent(String set)
+	{
+		event = set;
+	}
+
 }

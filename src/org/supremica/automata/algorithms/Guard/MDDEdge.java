@@ -11,6 +11,7 @@ public class MDDEdge {
     private MDDNode fromNode;
     private MDDNode toNode;
     private HashSet<Integer> label = new HashSet<Integer>();
+    private HashSet<String> labelString = new HashSet<String>();
 
 
     public MDDEdge(MDDNode fromNode, MDDNode toNode)
@@ -19,10 +20,12 @@ public class MDDEdge {
         this.toNode = toNode;
     }
 
-    public MDDEdge(MDDNode fromNode, MDDNode toNode, HashSet<Integer> label)
+    public MDDEdge(MDDNode fromNode, MDDNode toNode, HashSet<Integer> label,HashSet<String> labelString)
     {
         this(fromNode, toNode);
         this.label = label;
+        this.labelString = labelString;
+
     }
 
     public void setFromNode(MDDNode fNode)
@@ -46,6 +49,11 @@ public class MDDEdge {
         label = l;
     }
 
+    public void setLabelString(HashSet<String> lString)
+    {
+        labelString = lString;
+    }
+
     public MDDNode getFromNode()
     {
         return fromNode;
@@ -59,6 +67,11 @@ public class MDDEdge {
     public HashSet<Integer> getLabel()
     {
         return label;
+    }
+
+    public HashSet<String> getLabelString()
+    {
+        return labelString;
     }
 
 }

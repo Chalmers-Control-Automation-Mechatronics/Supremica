@@ -303,6 +303,17 @@ public class BDDAutomaton
         return output;
     }
 
+    public HashSet<String> getComplementStateNames(HashSet<String> stateNames)
+    {
+        HashSet<String> output = new HashSet<String>();
+        for(State state: getAutomaton().getStateSet())
+        {
+            if(!stateNames.contains(state.getName()))
+                output.add(state.getName());
+        }
+        return output;
+    }
+
     public Integer generateIndex(BDD bdd)
     {
         if(bdd.low().isOne())

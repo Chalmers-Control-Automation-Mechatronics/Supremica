@@ -49,7 +49,7 @@
  */
 package org.supremica.automata.algorithms;
 
-import org.supremica.automata.AutomataIndexMap;
+import java.util.AbstractList;
 import org.supremica.log.*;
 import org.supremica.util.SupremicaException;
 import org.supremica.gui.*;
@@ -57,15 +57,27 @@ import org.supremica.gui.*;
 // For the automata selection methods
 import java.util.ArrayList;
 import java.util.Iterator;
-import org.supremica.automata.Arc;
-import org.supremica.automata.AutomataIndexForm;
-import org.supremica.automata.AutomataIndexFormHelper;
-import org.supremica.automata.Automaton;
-import org.supremica.automata.Automata;
-import org.supremica.automata.AutomatonType;
-import org.supremica.automata.CompositeState;
-import org.supremica.automata.LabeledEvent;
+import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
+import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
+import org.supremica.automata.*;
 import org.supremica.properties.Config;
+
+import net.sourceforge.waters.model.module.*;
+import net.sourceforge.waters.model.des.*;
+
+import net.sourceforge.waters.model.expr.BinaryOperator;
+import net.sourceforge.waters.model.expr.ExpressionParser;
+import net.sourceforge.waters.model.expr.Operator;
+import net.sourceforge.waters.subject.base.ListSubject;
+import net.sourceforge.waters.subject.module.BinaryExpressionSubject;
+import net.sourceforge.waters.subject.module.EdgeSubject;
+import net.sourceforge.waters.subject.module.GuardActionBlockSubject;
+import net.sourceforge.waters.subject.module.ModuleSubjectFactory;
+import net.sourceforge.waters.subject.module.SimpleExpressionSubject;
+import org.supremica.automata.*;
+import org.supremica.automata.algorithms.*;
 
 /**
  * Performs all kinds of synchronization tasks, for synchronization, verification and synthesis.
@@ -531,6 +543,7 @@ public final class AutomataSynchronizerExecuter
                 if (canExecuteInPlant)
                 {
                     disabledEvents[nbrOfDisabledEvents++] = currEventIndex;
+                    helper.mCurrentBlockedEvents.add(indexForm.getIndexMap().getEventAt(currEventIndex));
                 }
             }
             
@@ -649,7 +662,6 @@ public final class AutomataSynchronizerExecuter
     public void run()
     {
         initialize();
-        
         // Get the first state to process from the helper (the helper is common to all executer threads)
         int[] currState = helper.getStateToProcess();
         
@@ -1000,6 +1012,8 @@ public final class AutomataSynchronizerExecuter
                 newState.setFirst(AutomataIndexFormHelper.isFirst(currState));
                 newState.setLast(AutomataIndexFormHelper.isLast(currState));
                 newState.initCosts();
+
+                helper.mCurrentNodeMap.put(newState, helper.importNode(newState));
                 
                 theAutomaton.addState(newState);
             }
@@ -1179,6 +1193,96 @@ public final class AutomataSynchronizerExecuter
                     org.supremica.automata.State toState = theAutomaton.getStateWithIndex(nextIndex);
                     LabeledEvent theEvent = indexMap.getEventAt(currEventIndex);
                     //theAutomaton.getAlphabet().getEventWithIndex(currEventIndex);
+
+                    ///////////////////
+                    org.supremica.automata.State[][] stateTable = indexForm.getStateTable();
+
+                    List<SimpleExpressionProxy> allGuards = new ArrayList<SimpleExpressionProxy>();
+                    List<BinaryExpressionProxy> allActions = new ArrayList<BinaryExpressionProxy>();
+                    for (int j = 0; j < currState.length - AutomataIndexFormHelper.STATE_EXTRA_DATA; j++)
+                    {
+                        if(indexForm.getAutomaton(j).getAlphabet().contains(theEvent))
+                        {
+                            String automatonName = indexForm.getAutomaton(j).getName();
+                            String fStateName = stateTable[j][currState[j]].getName();
+                            String tStateName = stateTable[j][nextState[j]].getName();
+                            String eventName = theEvent.getName();
+                            EdgeSubject edge = helper.getEdge(automatonName, fStateName, tStateName, eventName);
+                            List<SimpleExpressionProxy> guards = edge.getGuardActionBlock().getGuards();
+                            List<BinaryExpressionProxy> actions = edge.getGuardActionBlock().getActions();
+                            allGuards.addAll(guards);
+                            allActions.addAll(actions);
+                            System.out.println(automatonName+"   "+fStateName+"   "+tStateName+"   "+eventName);
+                            System.out.println(edge.getGuardActionBlock().getGuardsModifiable().get(0).toString());
+                        }
+                    }
+/*                    final Set<EventProxy> newlabel = null;
+                   final Set<EventProxy> labels = (Set<EventProxy>)fromState.getPropositions();
+                    if (labels != null)
+                    {
+                      labels.add(theEvent);
+                    }
+                    else
+                    {
+ */
+                    final Set<EventProxy> newlabel = new TreeSet<EventProxy>();
+                    newlabel.add(theEvent);
+//                    }
+
+                    ModuleSubjectFactory factory = ModuleSubjectFactory.getInstance();
+                    ExpressionParser parser = new ExpressionParser(factory, CompilerOperatorTable.getInstance());
+
+                    GuardActionBlockSubject gab = new GuardActionBlockSubject();
+                    if(allGuards.size() > 0)
+                    {
+                        BinaryExpressionSubject synchedGuard = null;
+                        if(allGuards.size() > 1)
+                        {
+                            final CompilerOperatorTable optable = CompilerOperatorTable.getInstance();
+                            Iterator<SimpleExpressionProxy> guardIt = allGuards.iterator();
+                            SimpleExpressionProxy leftGuard = parser.parse(guardIt.next().toString(),Operator.TYPE_BOOLEAN);
+                            SimpleExpressionProxy rightGuard = parser.parse(guardIt.next().toString(),Operator.TYPE_BOOLEAN);
+                            synchedGuard = factory.createBinaryExpressionProxy(optable.getAndOperator(),leftGuard , rightGuard);
+//                            synchedGuardString = guardIt.next().getPlainText();
+                            while(guardIt.hasNext())
+                            {
+                                rightGuard = parser.parse(guardIt.next().toString(),Operator.TYPE_BOOLEAN);
+                                synchedGuard = factory.createBinaryExpressionProxy(optable.getAndOperator(),synchedGuard , rightGuard);
+//                                  synchedGuardString = synchedGuardString + optable.getAndOperator().getName() + guardIt.next().getPlainText();
+                            }
+                        }
+                        else
+                        {
+                            synchedGuard = (BinaryExpressionSubject)allGuards.get(0);
+                        }
+                        BinaryExpressionSubject bes = (BinaryExpressionSubject)(parser.parse(synchedGuard.toString(),Operator.TYPE_BOOLEAN));
+                        gab.getGuardsModifiable().add(bes);
+                    }
+                    if(allActions.size() > 0)
+                    {
+                        BinaryExpressionProxy synchedAction = null;
+                        Iterator<BinaryExpressionProxy> actionIt = allActions.iterator();
+                        synchedAction = actionIt.next();
+                        while(actionIt.hasNext())
+                        {
+                            BinaryExpressionProxy currAction = actionIt.next();
+                            if(!synchedAction.equalsByContents(currAction))
+                            {
+                                synchedAction = null;
+                                break;
+                            }
+
+                        }
+                        if(synchedAction != null)
+                        {
+                            BinaryExpressionSubject bes = (BinaryExpressionSubject)(parser.parse(synchedAction.toString(),Operator.TYPE_ARITHMETIC));
+                            gab.getActionsModifiable().add(bes);
+                        }
+                    }
+                    EdgeSubject edge = helper.importEdge(fromState, toState, newlabel,gab);
+                    helper.mEdges.add(edge);
+
+                    //////////////////////////////
                     
                     // Create new arc
                     Arc newArc = new Arc(fromState, toState, theEvent);

@@ -61,6 +61,17 @@ import org.supremica.automata.AutomataIndexMap;
 import org.supremica.automata.Automaton;
 import org.supremica.automata.State;
 import org.supremica.automata.LabeledEvent;
+
+import net.sourceforge.waters.subject.base.AbstractSubject;
+import net.sourceforge.waters.subject.base.ListSubject;
+import net.sourceforge.waters.subject.module.*;
+import net.sourceforge.waters.xsd.base.ComponentKind;
+
+import net.sourceforge.waters.model.module.*;
+import net.sourceforge.waters.model.des.*;
+import net.sourceforge.waters.model.base.ItemNotFoundException;
+import org.supremica.automata.Arc;
+
 //import EDU.oswego.cs.dl.util.concurrent.Rendezvous;
 
 /**
@@ -69,7 +80,7 @@ import org.supremica.automata.LabeledEvent;
  *@author  ka
  *@since  November 28, 2001
  */
-public final class AutomataSynchronizerHelper
+public class AutomataSynchronizerHelper
 {
     private static Logger logger = LoggerFactory.createLogger(AutomataSynchronizerHelper.class);
     private AutomataIndexForm theAutomataIndexForm;
@@ -114,19 +125,43 @@ public final class AutomataSynchronizerHelper
     
     // Stop execution after amount of state
     private int stopExecutionLimit = -1;
-    
+
+    //////////////////
+    private ModuleSubjectFactory mFactory = ModuleSubjectFactory.getInstance();
+    Set<EventProxy> mCurrentEvents;
+    Set<EventProxy> mCurrentBlockedEvents;
+    Map<State,SimpleNodeProxy> mCurrentNodeMap;
+    Collection<EdgeProxy> mEdges;
+    SimpleComponentProxy synchronizedComponent = null;
+    private HashMap<Arc,EdgeSubject>[] arc2EdgeTable;
+    private HashMap<String,Integer> autName2indexTable = new HashMap<String, Integer>();
+
+
     public AutomataSynchronizerHelper(Automata theAutomata, SynchronizationOptions syncOptions)
     {
+        this(theAutomata,syncOptions,null,null);
+    }
+
+    public AutomataSynchronizerHelper(Automata theAutomata, SynchronizationOptions syncOptions, HashMap<Arc,EdgeSubject>[] arc2EdgeTable, HashMap<String,Integer> autName2indexTable)
+    {
+        if(arc2EdgeTable != null && autName2indexTable != null)
+        {
+            this.arc2EdgeTable = arc2EdgeTable;
+            this.autName2indexTable = autName2indexTable;
+            mCurrentNodeMap = new HashMap<State,SimpleNodeProxy>();
+            mEdges = new ArrayList<EdgeProxy>();
+            mCurrentBlockedEvents = new HashSet<EventProxy>();
+        }
         if (theAutomata == null)
         {
             throw new IllegalArgumentException("theAutomata must be non-null");
         }
-        
+
         if (syncOptions == null)
         {
             throw new IllegalArgumentException("syncOptions must be non-null");
         }
-        
+
         this.theAutomata = theAutomata;
         this.syncOptions = syncOptions;
         helperStatistics = new AutomataSynchronizerHelperStatistics();
@@ -135,7 +170,7 @@ public final class AutomataSynchronizerHelper
         theStates = new IntArrayHashTable(syncOptions.getInitialHashtableSize(),
             syncOptions.expandHashtable());
         theAutomaton = new Automaton();
-        
+
         // Calculate the automataIndexForm (a more efficient representation of an automata)
         try
         {
@@ -145,7 +180,7 @@ public final class AutomataSynchronizerHelper
         {
             logger.error("Error while computing AutomataIndexForm");
             logger.debug(e.getStackTrace());
-            
+
             throw new RuntimeException(e);
         }
     }
@@ -358,7 +393,7 @@ public final class AutomataSynchronizerHelper
             fromStateList.addLast(fromState);
         }
         
-        if (true)    // What? /Hguo.
+        if (true)    // What? /Hugo.
         {
             int prevStateIndex = theStates.getIndex(fromState);
             
@@ -949,6 +984,104 @@ public final class AutomataSynchronizerHelper
         {
             controllableEventsTable[i] = !controllableEventsTable[i];
         }
+    }
+
+    //Functions declraed for extended automata
+    public EdgeSubject getEdge(String automaton, String fromState, String toState, String event)
+    {
+        int automatonIndex = autName2indexTable.get(automaton);
+
+        HashMap<Arc,EdgeSubject>[] map = arc2EdgeTable;
+        for(Arc arc:map[automatonIndex].keySet())
+        {
+            if(arc.getSource().getName().equals(fromState)
+               && arc.getTarget().getName().equals(toState)
+               && arc.getEvent().getName().equals(event))
+            {
+                return map[automatonIndex].get(arc);
+            }
+        }
+
+        return null;
+    }
+
+    public SimpleNodeProxy importNode(final State state)
+    {
+        final String name = state.getName();
+        final boolean initial = state.isInitial();
+        final Collection<EventProxy> props = state.getPropositions();
+        final Collection<SimpleIdentifierProxy> idents =
+          new TreeSet<SimpleIdentifierProxy>();
+        for (final EventProxy prop : props)
+        {
+          checkEvent(prop);
+          final SimpleIdentifierProxy ident = importEvent(prop);
+          idents.add(ident);
+        }
+        final PlainEventListProxy list = mFactory.createPlainEventListProxy(idents);
+        return mFactory.createSimpleNodeProxy(name, list, initial, null, null, null);
+    }
+
+    public SimpleIdentifierProxy importEvent(final EventProxy event)
+    {
+        final String name = event.getName();
+        return mFactory.createSimpleIdentifierProxy(name);
+    }
+
+    public EdgeSubject importEdge(final State fromState, final State toState, final Set<EventProxy> events, final GuardActionBlockProxy guardAction)
+    {
+        NodeProxy fromNode = mCurrentNodeMap.get(fromState);
+        NodeProxy toNode = mCurrentNodeMap.get(toState);
+
+        final int numevents = events.size();
+        final Collection<SimpleIdentifierProxy> labels = new ArrayList<SimpleIdentifierProxy>(numevents);
+        for (final EventProxy event : events)
+        {
+          final SimpleIdentifierProxy label = importEvent(event);
+          labels.add(label);
+        }
+        final LabelBlockProxy labelblock = mFactory.createLabelBlockProxy(labels, null);
+        final EdgeProxy edge = mFactory.createEdgeProxy(fromNode, toNode, labelblock, guardAction, null, null, null);
+
+        return (EdgeSubject)edge;
+    }
+
+    private void checkEvent(final EventProxy event)
+    {
+        if (mCurrentEvents.contains(event))
+        {
+          mCurrentBlockedEvents.remove(event);
+        }
+        else
+        {
+          throw new ItemNotFoundException
+            ("Automaton '" + "'the synchronized automaton'" +
+             "' does not contain the event named '" + event.getName() + "'!");
+        }
+    }
+
+    public void createExtendedAutomaton()
+    {
+        final int numblocked = mCurrentBlockedEvents.size();
+        final Collection<SimpleIdentifierProxy> blockedlabels = new ArrayList<SimpleIdentifierProxy>(numblocked);
+        for (final EventProxy event : mCurrentBlockedEvents)
+        {
+            final SimpleIdentifierProxy label = importEvent(event);
+            blockedlabels.add(label);
+        }
+        final LabelBlockProxy blockedblock = blockedlabels.isEmpty() ? null : mFactory.createLabelBlockProxy(blockedlabels, null);
+        final Collection<SimpleNodeProxy> nodes = mCurrentNodeMap.values();
+        boolean deterministic = true;
+        final GraphProxy graph = mFactory.createGraphProxy(deterministic, blockedblock, nodes, mEdges);
+        String name = "testAutomaton";
+        final SimpleIdentifierProxy ident = mFactory.createSimpleIdentifierProxy(name);
+
+        synchronizedComponent =  mFactory.createSimpleComponentProxy(ident, ComponentKind.PLANT, graph);
+    }
+
+    public SimpleComponentProxy getSynchronizedComponent()
+    {
+        return synchronizedComponent;
     }
 
 }

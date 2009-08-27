@@ -123,7 +123,7 @@ public class ExtendedAutomaton
 		allAcceptingStates = acceptingStates;
 	}
 
-	protected SimpleComponentSubject getComponent()
+	public SimpleComponentSubject getComponent()
 	{
 		return component;
 	}

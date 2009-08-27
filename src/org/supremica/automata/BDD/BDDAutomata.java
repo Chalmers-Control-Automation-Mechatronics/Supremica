@@ -201,6 +201,7 @@ public class BDDAutomata
             int[] vars = sourceStateDomain.vars();
             int nbrOfVars = vars.length;
             aut2nbrOfBits.put(automaton.getName(), nbrOfVars);
+//            System.out.println(automaton.getName()+": ");
             for(int h=0;h<nbrOfVars;h++)
             {
                 bddVar2AutName.put(vars[h], automaton.getName());
@@ -430,6 +431,24 @@ public class BDDAutomata
             i++;
         }
 
+        return bddvarset;
+    }
+
+    public BDDVarSet getSourceStateVars(Automaton aut)
+    {
+        BDDVarSet bddvarset = null;
+        int i = 0;
+
+        //Buld a variable set including all variables in the automata except 'aut'
+        for(Automaton inAut: theAutomata)
+        {
+            if(aut.equalAutomaton(inAut))
+            {
+                bddvarset = sourceStateDomains[i].set();
+                return bddvarset;
+            }
+            i++;
+        }
         return bddvarset;
     }
         
