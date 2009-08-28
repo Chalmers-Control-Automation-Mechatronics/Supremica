@@ -83,6 +83,7 @@ public class AutomataSynchronizer
 
     public AutomataSynchronizer(ListSubject<AbstractSubject> components, SynchronizationOptions options)
     {
+        options.setEFAMode(true);
         Automata automata = removeGuardsActionsFromEFAs(components);
         this.theAutomata = automata;
         this.syncOptions = options;
@@ -95,6 +96,7 @@ public class AutomataSynchronizer
     {
         this.theAutomata = automata;
         this.syncOptions = options;
+        syncOptions.setEFAMode(false);
         synchHelper = new AutomataSynchronizerHelper(automata, options);
 
         initialize();
@@ -104,7 +106,7 @@ public class AutomataSynchronizer
      * Creates an AutomataSynchronizer based on an already existing helper.
      */
     public AutomataSynchronizer(AutomataSynchronizerHelper helper)
-    {
+    {        
         this.theAutomata = helper.getAutomata();
         this.syncOptions = helper.getSynchronizationOptions();
         synchHelper = helper;
@@ -266,6 +268,7 @@ public class AutomataSynchronizer
     public static Automaton synchronizeAutomata(Automata automata, SynchronizationOptions options)
     throws Exception
     {
+        options.setEFAMode(false);
         AutomataSynchronizerHelper helper = new AutomataSynchronizerHelper(automata, options);
         return synchronizeAutomata(helper);
     }
@@ -291,6 +294,7 @@ public class AutomataSynchronizer
     public SimpleComponentProxy getSynchronizedComponent()
     {
         SynchronizationOptions options = SynchronizationOptions.getDefaultSynchronizationOptions();
+        options.setEFAMode(true);
         AutomataSynchronizerHelper helper = new AutomataSynchronizerHelper(theAutomata, options, arc2edgeTable,autName2indexTable);
         AutomataSynchronizer synchronizer = new AutomataSynchronizer(helper);
         synchronizer.execute();
