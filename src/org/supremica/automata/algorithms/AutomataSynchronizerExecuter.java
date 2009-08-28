@@ -543,7 +543,8 @@ public final class AutomataSynchronizerExecuter
                 if (canExecuteInPlant)
                 {
                     disabledEvents[nbrOfDisabledEvents++] = currEventIndex;
-                    helper.mCurrentBlockedEvents.add(indexForm.getIndexMap().getEventAt(currEventIndex));
+                    if(helper.getSynchronizationOptions().getEFAMode())
+                        helper.mCurrentBlockedEvents.add(indexForm.getIndexMap().getEventAt(currEventIndex));
                 }
             }
             
@@ -1013,7 +1014,8 @@ public final class AutomataSynchronizerExecuter
                 newState.setLast(AutomataIndexFormHelper.isLast(currState));
                 newState.initCosts();
 
-                helper.mCurrentNodeMap.put(newState, helper.importNode(newState));
+                if(helper.getSynchronizationOptions().getEFAMode())
+                    helper.mCurrentNodeMap.put(newState, helper.importNode(newState));
                 
                 theAutomaton.addState(newState);
             }
@@ -1195,92 +1197,87 @@ public final class AutomataSynchronizerExecuter
                     //theAutomaton.getAlphabet().getEventWithIndex(currEventIndex);
 
                     ///////////////////
-                    org.supremica.automata.State[][] stateTable = indexForm.getStateTable();
-
-                    List<SimpleExpressionProxy> allGuards = new ArrayList<SimpleExpressionProxy>();
-                    List<BinaryExpressionProxy> allActions = new ArrayList<BinaryExpressionProxy>();
-                    for (int j = 0; j < currState.length - AutomataIndexFormHelper.STATE_EXTRA_DATA; j++)
+                    if(helper.getSynchronizationOptions().getEFAMode())
                     {
-                        if(indexForm.getAutomaton(j).getAlphabet().contains(theEvent))
+                        org.supremica.automata.State[][] stateTable = indexForm.getStateTable();
+
+                        List<SimpleExpressionProxy> allGuards = new ArrayList<SimpleExpressionProxy>();
+                        List<BinaryExpressionProxy> allActions = new ArrayList<BinaryExpressionProxy>();
+                        for (int j = 0; j < currState.length - AutomataIndexFormHelper.STATE_EXTRA_DATA; j++)
                         {
-                            String automatonName = indexForm.getAutomaton(j).getName();
-                            String fStateName = stateTable[j][currState[j]].getName();
-                            String tStateName = stateTable[j][nextState[j]].getName();
-                            String eventName = theEvent.getName();
-                            EdgeSubject edge = helper.getEdge(automatonName, fStateName, tStateName, eventName);
-                            List<SimpleExpressionProxy> guards = edge.getGuardActionBlock().getGuards();
-                            List<BinaryExpressionProxy> actions = edge.getGuardActionBlock().getActions();
-                            allGuards.addAll(guards);
-                            allActions.addAll(actions);
-                            System.out.println(automatonName+"   "+fStateName+"   "+tStateName+"   "+eventName);
-                            System.out.println(edge.getGuardActionBlock().getGuardsModifiable().get(0).toString());
-                        }
-                    }
-/*                    final Set<EventProxy> newlabel = null;
-                   final Set<EventProxy> labels = (Set<EventProxy>)fromState.getPropositions();
-                    if (labels != null)
-                    {
-                      labels.add(theEvent);
-                    }
-                    else
-                    {
- */
-                    final Set<EventProxy> newlabel = new TreeSet<EventProxy>();
-                    newlabel.add(theEvent);
-//                    }
-
-                    ModuleSubjectFactory factory = ModuleSubjectFactory.getInstance();
-                    ExpressionParser parser = new ExpressionParser(factory, CompilerOperatorTable.getInstance());
-
-                    GuardActionBlockSubject gab = new GuardActionBlockSubject();
-                    if(allGuards.size() > 0)
-                    {
-                        BinaryExpressionSubject synchedGuard = null;
-                        if(allGuards.size() > 1)
-                        {
-                            final CompilerOperatorTable optable = CompilerOperatorTable.getInstance();
-                            Iterator<SimpleExpressionProxy> guardIt = allGuards.iterator();
-                            SimpleExpressionProxy leftGuard = parser.parse(guardIt.next().toString(),Operator.TYPE_BOOLEAN);
-                            SimpleExpressionProxy rightGuard = parser.parse(guardIt.next().toString(),Operator.TYPE_BOOLEAN);
-                            synchedGuard = factory.createBinaryExpressionProxy(optable.getAndOperator(),leftGuard , rightGuard);
-//                            synchedGuardString = guardIt.next().getPlainText();
-                            while(guardIt.hasNext())
+                            if(indexForm.getAutomaton(j).getAlphabet().contains(theEvent))
                             {
-                                rightGuard = parser.parse(guardIt.next().toString(),Operator.TYPE_BOOLEAN);
-                                synchedGuard = factory.createBinaryExpressionProxy(optable.getAndOperator(),synchedGuard , rightGuard);
-//                                  synchedGuardString = synchedGuardString + optable.getAndOperator().getName() + guardIt.next().getPlainText();
+                                String automatonName = indexForm.getAutomaton(j).getName();
+                                String fStateName = stateTable[j][currState[j]].getName();
+                                String tStateName = stateTable[j][nextState[j]].getName();
+                                String eventName = theEvent.getName();
+                                EdgeSubject edge = helper.getEdge(automatonName, fStateName, tStateName, eventName);
+                                List<SimpleExpressionProxy> guards = edge.getGuardActionBlock().getGuards();
+                                List<BinaryExpressionProxy> actions = edge.getGuardActionBlock().getActions();
+                                allGuards.addAll(guards);
+                                allActions.addAll(actions);
+                                System.out.println(automatonName+"   "+fStateName+"   "+tStateName+"   "+eventName);
+                                System.out.println(edge.getGuardActionBlock().getGuardsModifiable().get(0).toString());
                             }
                         }
-                        else
-                        {
-                            synchedGuard = (BinaryExpressionSubject)allGuards.get(0);
-                        }
-                        BinaryExpressionSubject bes = (BinaryExpressionSubject)(parser.parse(synchedGuard.toString(),Operator.TYPE_BOOLEAN));
-                        gab.getGuardsModifiable().add(bes);
-                    }
-                    if(allActions.size() > 0)
-                    {
-                        BinaryExpressionProxy synchedAction = null;
-                        Iterator<BinaryExpressionProxy> actionIt = allActions.iterator();
-                        synchedAction = actionIt.next();
-                        while(actionIt.hasNext())
-                        {
-                            BinaryExpressionProxy currAction = actionIt.next();
-                            if(!synchedAction.equalsByContents(currAction))
-                            {
-                                synchedAction = null;
-                                break;
-                            }
 
-                        }
-                        if(synchedAction != null)
+                        final Set<EventProxy> newlabel = new TreeSet<EventProxy>();
+                        newlabel.add(theEvent);
+    //                    }
+
+                        ModuleSubjectFactory factory = ModuleSubjectFactory.getInstance();
+                        ExpressionParser parser = new ExpressionParser(factory, CompilerOperatorTable.getInstance());
+
+                        GuardActionBlockSubject gab = new GuardActionBlockSubject();
+                        if(allGuards.size() > 0)
                         {
-                            BinaryExpressionSubject bes = (BinaryExpressionSubject)(parser.parse(synchedAction.toString(),Operator.TYPE_ARITHMETIC));
-                            gab.getActionsModifiable().add(bes);
+                            BinaryExpressionSubject synchedGuard = null;
+                            if(allGuards.size() > 1)
+                            {
+                                final CompilerOperatorTable optable = CompilerOperatorTable.getInstance();
+                                Iterator<SimpleExpressionProxy> guardIt = allGuards.iterator();
+                                SimpleExpressionProxy leftGuard = parser.parse(guardIt.next().toString(),Operator.TYPE_BOOLEAN);
+                                SimpleExpressionProxy rightGuard = parser.parse(guardIt.next().toString(),Operator.TYPE_BOOLEAN);
+                                synchedGuard = factory.createBinaryExpressionProxy(optable.getAndOperator(),leftGuard , rightGuard);
+    //                            synchedGuardString = guardIt.next().getPlainText();
+                                while(guardIt.hasNext())
+                                {
+                                    rightGuard = parser.parse(guardIt.next().toString(),Operator.TYPE_BOOLEAN);
+                                    synchedGuard = factory.createBinaryExpressionProxy(optable.getAndOperator(),synchedGuard , rightGuard);
+    //                                  synchedGuardString = synchedGuardString + optable.getAndOperator().getName() + guardIt.next().getPlainText();
+                                }
+                            }
+                            else
+                            {
+                                synchedGuard = (BinaryExpressionSubject)allGuards.get(0);
+                            }
+                            BinaryExpressionSubject bes = (BinaryExpressionSubject)(parser.parse(synchedGuard.toString(),Operator.TYPE_BOOLEAN));
+                            gab.getGuardsModifiable().add(bes);
                         }
+                        if(allActions.size() > 0)
+                        {
+                            BinaryExpressionProxy synchedAction = null;
+                            Iterator<BinaryExpressionProxy> actionIt = allActions.iterator();
+                            synchedAction = actionIt.next();
+                            while(actionIt.hasNext())
+                            {
+                                BinaryExpressionProxy currAction = actionIt.next();
+                                if(!synchedAction.equalsByContents(currAction))
+                                {
+                                    synchedAction = null;
+                                    break;
+                                }
+
+                            }
+                            if(synchedAction != null)
+                            {
+                                BinaryExpressionSubject bes = (BinaryExpressionSubject)(parser.parse(synchedAction.toString(),Operator.TYPE_ARITHMETIC));
+                                gab.getActionsModifiable().add(bes);
+                            }
+                        }
+                        EdgeSubject edge = helper.importEdge(fromState, toState, newlabel,gab);
+                        helper.mEdges.add(edge);
                     }
-                    EdgeSubject edge = helper.importEdge(fromState, toState, newlabel,gab);
-                    helper.mEdges.add(edge);
 
                     //////////////////////////////
                     
