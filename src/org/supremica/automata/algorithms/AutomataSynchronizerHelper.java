@@ -144,7 +144,7 @@ public class AutomataSynchronizerHelper
 
     public AutomataSynchronizerHelper(Automata theAutomata, SynchronizationOptions syncOptions, HashMap<Arc,EdgeSubject>[] arc2EdgeTable, HashMap<String,Integer> autName2indexTable)
     {
-        if(arc2EdgeTable != null && autName2indexTable != null)
+        if(syncOptions.getEFAMode())
         {
             this.arc2EdgeTable = arc2EdgeTable;
             this.autName2indexTable = autName2indexTable;
