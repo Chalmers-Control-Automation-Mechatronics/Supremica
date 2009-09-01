@@ -365,6 +365,12 @@ public abstract class AbstractMazeTest extends AbstractWatersTest
     testMaze("peter", true);
   }
 
+  public void testMaze_twokeys()
+    throws IOException, JAXBException, WatersException
+  {
+    testMaze("twokeys", true);
+  }
+
   public void testMaze_unsolvable1()
     throws IOException, JAXBException, WatersException
   {

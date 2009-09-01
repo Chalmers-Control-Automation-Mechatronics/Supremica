@@ -283,6 +283,7 @@
           <include name="net/sourceforge/waters/**/*Test.java"/>
           <exclude name="net/sourceforge/waters/gui/**/*.java"/>
           <exclude name="net/sourceforge/waters/analysis/**/*HeuristicTest.java"/>
+          <exclude name="net/sourceforge/waters/analysis/composing/**/*.java"/>
           <exclude name="**/Abstract*.java"/>
           <exclude name="**/Native*.java"/>
         </fileset>
@@ -323,8 +324,7 @@
       <formatter type="xml"/>
       <batchtest todir="${logs.results}">
         <fileset dir="${supremica.testsrc}">
-          <include name="net/sourceforge/waters/analysis/composing/**/*.java"/>
-          <exclude name="**/Abstract*.java"/>
+          <include name="**/NativeMaze*.java"/>
         </fileset>
       </batchtest>
       <classpath refid="waters.test.classpath"/>

@@ -1,74 +1,98 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<Module Name="door_norock" xmlns="http://waters.sourceforge.net/xsd/module">
-<EventDeclList>
-<EventDecl Scope="REQUIRED_PARAMETER" Kind="UNCONTROLLABLE" Name="enter"/>
-<EventDecl Scope="REQUIRED_PARAMETER" Kind="UNCONTROLLABLE" Name="exit"/>
-<EventDecl Scope="REQUIRED_PARAMETER" Kind="UNCONTROLLABLE" Name="unlock"/>
-</EventDeclList>
-<ComponentList>
-<SimpleComponent Kind="PLANT">
-<SimpleIdentifier Name="door_norock"/>
-<Graph>
-<NodeList>
-<SimpleNode Name="hero">
-<PointGeometry>
-<Point X="208" Y="176"/>
-</PointGeometry>
-<LabelGeometry>
-<Point X="-11" Y="21"/>
-</LabelGeometry>
-</SimpleNode>
-<SimpleNode Initial="true" Name="door">
-<PointGeometry>
-<Point X="112" Y="80"/>
-</PointGeometry>
-<LabelGeometry>
-<Point X="-13" Y="-9"/>
-</LabelGeometry>
-</SimpleNode>
-<SimpleNode Name="free">
-<PointGeometry>
-<Point X="208" Y="80"/>
-</PointGeometry>
-<LabelGeometry>
-<Point X="-11" Y="-9"/>
-</LabelGeometry>
-</SimpleNode>
-</NodeList>
-<EdgeList>
-<Edge Source="hero" Target="free">
-<LabelBlock>
-<SimpleIdentifier Name="exit"/>
-<LabelGeometry>
-<Point X="7" Y="4"/>
-</LabelGeometry>
-</LabelBlock>
-<SplineGeometry>
-<Point X="225" Y="129"/>
-</SplineGeometry>
-</Edge>
-<Edge Source="free" Target="hero">
-<LabelBlock>
-<SimpleIdentifier Name="enter"/>
-<LabelGeometry>
-<Point X="-38" Y="4"/>
-</LabelGeometry>
-</LabelBlock>
-<SplineGeometry>
-<Point X="193" Y="129"/>
-</SplineGeometry>
-</Edge>
-<Edge Source="door" Target="free">
-<LabelBlock>
-<SimpleIdentifier Name="unlock"/>
-<LabelGeometry>
-<Point X="-18" Y="-5"/>
-</LabelGeometry>
-</LabelBlock>
-</Edge>
-</EdgeList>
-</Graph>
-</SimpleComponent>
-</ComponentList>
+<Module Name="door_norock" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
+    <ns2:Comment></ns2:Comment>
+    <EventDeclList>
+        <EventDecl Scope="REQUIRED_PARAMETER" Kind="UNCONTROLLABLE" Name="enter"/>
+        <EventDecl Scope="REQUIRED_PARAMETER" Kind="UNCONTROLLABLE" Name="exit"/>
+        <EventDecl Scope="REQUIRED_PARAMETER" Kind="UNCONTROLLABLE" Name="unlock"/>
+    </EventDeclList>
+    <ComponentList>
+        <SimpleComponent Kind="PLANT" Name="door_norock">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Name="hero">
+                        <PointGeometry>
+                            <Point Y="176" X="208"/>
+                        </PointGeometry>
+                        <LabelGeometry>
+                            <Point Y="6" X="-22"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Initial="true" Name="door">
+                        <PointGeometry>
+                            <Point Y="80" X="112"/>
+                        </PointGeometry>
+                        <InitialArrowGeometry>
+                            <Point Y="-5" X="-5"/>
+                        </InitialArrowGeometry>
+                        <LabelGeometry>
+                            <Point Y="6" X="-28"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="free">
+                        <PointGeometry>
+                            <Point Y="80" X="208"/>
+                        </PointGeometry>
+                        <LabelGeometry>
+                            <Point Y="6" X="-27"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="free" Source="hero">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="exit"/>
+                            <LabelGeometry>
+                                <Point Y="-9" X="4"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="129" X="225"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Target="hero" Source="free">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="enter"/>
+                            <LabelGeometry>
+                                <Point Y="-6" X="-42"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="129" X="193"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Target="free" Source="door">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="unlock"/>
+                            <LabelGeometry>
+                                <Point Y="-20" X="-24"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="free" Source="free">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="unlock"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-10" X="3"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="81" X="252"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Target="hero" Source="hero">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="unlock"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-11" X="2"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="178" X="250"/>
+                        </SplineGeometry>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+    </ComponentList>
 </Module>
-
