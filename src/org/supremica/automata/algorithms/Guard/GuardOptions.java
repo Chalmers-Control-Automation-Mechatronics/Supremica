@@ -1,10 +1,16 @@
+//# -*- tab-width: 4  indent-tabs-mode: nil  c-basic-offset: 4 -*-
+//###########################################################################
+//# PROJECT: Supremica
+//# PACKAGE: org.supremica.automata.algorithms.Guard
+//# CLASS:   GuardOptions
+//###########################################################################
+//# $Id$
+//###########################################################################
+
 /*
  * GuardOptions.java
  *
  * Created on May 7, 2008, 6:36 PM
- *
- * To change this template, choose Tools | Template Manager
- * and open the template in the editor.
  */
 
 package org.supremica.automata.algorithms.Guard;
@@ -24,6 +30,8 @@ public final class GuardOptions
 	private static Logger logger = LoggerFactory.createLogger(GuardOptions.class);
 	private String event;    
 	private int expressionType;    // 0: the guard expression will be generated from the forbidden states; 1: from forbidden states; 2: Optimal case
+    // I do not understand. 0 and 1 seem to be the same.
+    // Please clarify, or better use an enumeration. ~~~ Robi
     private boolean dialogOK = false;
     private int nbrOfExecuters;
 

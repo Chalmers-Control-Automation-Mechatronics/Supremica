@@ -161,13 +161,11 @@ public abstract class AbstractMazeTest extends AbstractWatersTest
     testMaze("maze15", true);
   }
 
-  /*
   public void testMaze_maze15a()
     throws IOException, JAXBException, WatersException
   {
     testMaze("maze15a", true);
   }
-  */
 
   public void testMaze_maze15b()
     throws IOException, JAXBException, WatersException

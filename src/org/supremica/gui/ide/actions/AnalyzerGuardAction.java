@@ -1,10 +1,16 @@
+//# -*- tab-width: 4  indent-tabs-mode: nil  c-basic-offset: 4 -*-
+//###########################################################################
+//# PROJECT: Supremica/Waters IDE
+//# PACKAGE: org.supremica.gui.ide.actions
+//# CLASS:   AnalyzerGuardAction
+//###########################################################################
+//# $Id$
+//###########################################################################
+
 /*
  * AnalyzerGuardAction.java
  *
  * Created on May 7, 2008, 3:51 PM
- *
- * To change this template, choose Tools | Template Manager
- * and open the template in the editor.
  */
 
 package org.supremica.gui.ide.actions;
@@ -108,7 +114,13 @@ public class AnalyzerGuardAction
             }
         }
         // Start a dialog to allow the user changing the options
-        GuardDialog guardDialog = new GuardDialog(ide.getFrame(), guardOptions,events);
+        /*
+          GuardDialog constructor does not accept events argument. ~~~ Robi
+        GuardDialog guardDialog =
+            new GuardDialog(ide.getFrame(), guardOptions,events);
+        */
+        GuardDialog guardDialog =
+            new GuardDialog(ide.getFrame(), guardOptions);
 
         guardDialog.show();
         if (!guardOptions.getDialogOK())

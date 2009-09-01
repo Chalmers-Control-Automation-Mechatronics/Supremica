@@ -1,10 +1,16 @@
+//# -*- tab-width: 4  indent-tabs-mode: nil  c-basic-offset: 4 -*-
+//###########################################################################
+//# PROJECT: Supremica/Waters IDE
+//# PACKAGE: org.supremica.gui
+//# CLASS:   GuardPanel
+//###########################################################################
+//# $Id$
+//###########################################################################
+
 /*
  * GuardDialog.java
  *
  * Created on May 7, 2008, 6:21 PM
- *
- * To change this template, choose Tools | Template Manager
- * and open the template in the editor.
  */
 
 package org.supremica.gui;
@@ -65,29 +71,37 @@ class GuardDialogStandardPanel
 
 	public void update(GuardOptions guardOptions)
 	{
-                if(guardOptions.getExpressionType())
-                {
-                    fromAllowedStatesButton.setSelected(true);
-                    fromForbiddenStatesButton.setSelected(false);
-                }
-                else
-                {
-                    fromAllowedStatesButton.setSelected(false);
-                    fromForbiddenStatesButton.setSelected(true);
-                }
-                
-                eventField.setText(guardOptions.getEvent());
+        // I have no idea from the comments what is intended,
+        // but booleans do not compile :-( ~~~ Robi
+        switch (guardOptions.getExpressionType()) {
+        case 0:
+            fromAllowedStatesButton.setSelected(true);
+            fromForbiddenStatesButton.setSelected(false);
+            break;
+        case 1:
+            fromAllowedStatesButton.setSelected(false);
+            fromForbiddenStatesButton.setSelected(true);
+            break;
+        default:
+            throw new UnsupportedOperationException
+                ("ExpressionType " + guardOptions.getExpressionType() +
+                 " not supported!");
+        }                
+        eventField.setText(guardOptions.getEvent());
 	}
 
 	public void regain(GuardOptions guardOptions)
 	{
             if(fromAllowedStatesButton.isSelected())
             {
-                guardOptions.setExpressionType(true);
+                // I have no idea from the comments what is intended,
+                // but booleans do not compile :-( ~~~ Robi
+                guardOptions.setExpressionType(0);
             }
             if(fromForbiddenStatesButton.isSelected())
             {
-                guardOptions.setExpressionType(false);
+                // Same as above.
+                guardOptions.setExpressionType(1);
             }
             
             guardOptions.setEvent(eventField.getText());

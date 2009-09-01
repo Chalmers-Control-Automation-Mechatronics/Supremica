@@ -1,3 +1,12 @@
+//# -*- tab-width: 4  indent-tabs-mode: nil  c-basic-offset: 4 -*-
+//###########################################################################
+//# PROJECT: Supremica/Waters IDE
+//# PACKAGE: org.supremica.gui.ide.actions
+//# CLASS:   AnalyzerSynthesizerAction
+//###########################################################################
+//# $Id$
+//###########################################################################
+
 package org.supremica.gui.ide.actions;
 
 import javax.swing.Action;
@@ -64,8 +73,13 @@ public class AnalyzerSynthesizerAction
                 controllableEvents.add(sigmaS.getName());
             }
         }
-
+	/*
+	  SynthesizerDialog constructor does not accept controllableEvents
+	  argument. ~~~Robi
         SynthesizerDialog synthesizerDialog = new SynthesizerDialog(ide.getFrame(), selectedAutomata.size(), options,controllableEvents);
+	*/
+        SynthesizerDialog synthesizerDialog = new SynthesizerDialog
+	  (ide.getFrame(), selectedAutomata.size(), options);
         synthesizerDialog.show();
         if (!options.getDialogOK())
         {

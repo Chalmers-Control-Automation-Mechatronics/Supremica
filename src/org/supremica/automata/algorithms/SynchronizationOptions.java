@@ -1,3 +1,11 @@
+//# -*- tab-width: 4  indent-tabs-mode: nil  c-basic-offset: 4 -*-
+//###########################################################################
+//# PROJECT: Supremica
+//# PACKAGE: org.supremica.automata.algorithms
+//# CLASS:   SynchronizationOptions
+//###########################################################################
+//# $Id$
+//###########################################################################
 
 /*
  * Supremica Software License Agreement
@@ -68,6 +76,7 @@ public class SynchronizationOptions
 	private boolean requireConsistentControllability;    // check that common events have same controllability
 	private boolean requireConsistentImmediate;    // check that common evenst have same immediaticity
 	private boolean rememberDisabledEvents;    // redirect disabled transitions to forbidden dump-state
+    private boolean mEFAMode;
 	private boolean dialogOK = false;
 	private String automatonNameSeparator;
 	private String stateNameSeparator;
@@ -112,6 +121,7 @@ public class SynchronizationOptions
 		this.rememberDisabledEvents = false;
 		this.automatonNameSeparator = Config.SYNC_AUTOMATON_NAME_SEPARATOR.getAsString();
 		this.stateNameSeparator = Config.GENERAL_STATE_SEPARATOR.getAsString();
+        mEFAMode = false;
 	}
 
 	public void setDialogOK(boolean bool)
@@ -233,6 +243,18 @@ public class SynchronizationOptions
 	{
 		useShortStateNames = set;
 	}
+
+    // Added these two methods and the mEFAMode member.
+    // I hope I did it correctly. ~~~Robi
+    public boolean getEFAMode()
+    {
+        return mEFAMode;
+    }
+
+    public void setEFAMode(final boolean mode)
+    {
+        mEFAMode = mode;
+    }
 
 	public boolean isValid()
 	{
