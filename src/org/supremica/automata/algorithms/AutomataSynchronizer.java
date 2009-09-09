@@ -87,6 +87,7 @@ public class AutomataSynchronizer
         Automata automata = removeGuardsActionsFromEFAs(components);
         this.theAutomata = automata;
         this.syncOptions = options;
+
         synchHelper = new AutomataSynchronizerHelper(automata, options,arc2edgeTable,autName2indexTable);
 
         initialize();
@@ -144,7 +145,7 @@ public class AutomataSynchronizer
         while (autIt.hasNext())
         {
             Automaton currAutomaton = autIt.next();
-            
+
             currInitialState = currAutomaton.getInitialState();
             initialState[indexMap.getAutomatonIndex(currAutomaton)] = indexMap.getStateIndex(currAutomaton, currInitialState);
             
@@ -335,16 +336,31 @@ public class AutomataSynchronizer
                     fromState.setAccepting(true);
                 }
                 automaton.addState(fromState);
+                if(fromState.isInitial())
+                {
+                    automaton.setInitialState(fromState);
+                }
             }
             toState = automaton.getStateWithName(edge.getTarget().getName());
             if(toState == null)
             {
                 toState = new State(edge.getTarget().getName());
+
+                if(initialFlag && edge.getTarget().toString().contains("initial"))
+                {
+                    toState.setInitial(true);
+                    initialFlag = false;
+                }
+
                 if(edge.getTarget().toString().contains("accepting"))
                 {
                     toState.setAccepting(true);
                 }
                 automaton.addState(toState);
+                if(toState.isInitial())
+                {
+                    automaton.setInitialState(toState);
+                }
             }
 
             ListSubject<AbstractSubject> eventList = edge.getLabelBlock().getEventListModifiable();
@@ -368,6 +384,12 @@ public class AutomataSynchronizer
                     event.setControllable(false);
                 }
  */
+                if(edge.getGuardActionBlock() == null)
+                {
+                    GuardActionBlockSubject gab = new GuardActionBlockSubject();
+                    edge.setGuardActionBlock(gab);
+                }
+
                 Arc currArc = new Arc(fromState, toState, event);
                 arc2edgeTable[automatonIndex].put(currArc, edge);
                 automaton.addArc(currArc);
