@@ -80,6 +80,7 @@ public class SynchronizationOptions
 	private boolean dialogOK = false;
 	private String automatonNameSeparator;
 	private String stateNameSeparator;
+    private boolean EFAMode;
 
 	/**
 	 * Default constructor
@@ -121,7 +122,8 @@ public class SynchronizationOptions
 		this.rememberDisabledEvents = false;
 		this.automatonNameSeparator = Config.SYNC_AUTOMATON_NAME_SEPARATOR.getAsString();
 		this.stateNameSeparator = Config.GENERAL_STATE_SEPARATOR.getAsString();
-        mEFAMode = false;
+        this.EFAMode = false;
+
 	}
 
 	public void setDialogOK(boolean bool)
