@@ -53,7 +53,6 @@ import java.math.BigInteger;
 import net.sf.javabdd.*;
 import java.util.*;
 import org.supremica.automata.*;
-import org.supremica.util.ArrayHelper;
 
 public class BDDAutomaton
 {

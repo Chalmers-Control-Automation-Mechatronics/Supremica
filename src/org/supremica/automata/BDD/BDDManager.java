@@ -410,24 +410,6 @@ public class BDDManager
         preStates.replaceWith(bdda.getDest2SourcePairing());
 
         return preStates;
-    }
-
-    public HashMap<BDD,String> getBDDState2StateMap(BDDAutomata bdda)
-    {
-        HashMap<BDD,String> BDDState2StateMap = new HashMap<BDD,String>();
-        
-        int stateIndex;
-        for(Automaton aut: bdda.getAutomata())
-        {
-            for(State state: aut.getStateSet())
-            {
-                stateIndex = bdda.getStateIndex(aut, state);
-                BDD stateBDD = factory.buildCube(stateIndex, bdda.getSourceStateDomains()[bdda.getAutomatonIndex(aut)].vars());
-                BDDState2StateMap.put(stateBDD, state.getName());
-            }
-        }
-        
-        return BDDState2StateMap;
-    }     
+    } 
     
 }

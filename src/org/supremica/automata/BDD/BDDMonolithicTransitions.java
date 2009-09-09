@@ -50,6 +50,8 @@
 
 package org.supremica.automata.BDD;
 
+import org.supremica.automata.BDD.EFA.BDDExtendedAutomaton;
+import org.supremica.automata.BDD.EFA.BDDExtendedAutomata;
 import net.sf.javabdd.*;
 import org.supremica.log.*;
 import org.supremica.util.SupremicaException;

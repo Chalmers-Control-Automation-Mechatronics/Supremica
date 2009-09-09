@@ -1010,14 +1010,15 @@ public class AutomataSynchronizerHelper
         final String name = state.getName();
         final boolean initial = state.isInitial();
         final Collection<EventProxy> props = state.getPropositions();
-        final Collection<SimpleIdentifierProxy> idents =
-          new TreeSet<SimpleIdentifierProxy>();
-        for (final EventProxy prop : props)
+
+        final Collection<SimpleIdentifierProxy> idents = new TreeSet<SimpleIdentifierProxy>();
+/*        for (final EventProxy prop : props)
         {
           checkEvent(prop);
           final SimpleIdentifierProxy ident = importEvent(prop);
           idents.add(ident);
         }
+ */
         final PlainEventListProxy list = mFactory.createPlainEventListProxy(idents);
         return mFactory.createSimpleNodeProxy(name, list, initial, null, null, null);
     }
@@ -1073,7 +1074,7 @@ public class AutomataSynchronizerHelper
         final Collection<SimpleNodeProxy> nodes = mCurrentNodeMap.values();
         boolean deterministic = true;
         final GraphProxy graph = mFactory.createGraphProxy(deterministic, blockedblock, nodes, mEdges);
-        String name = "testAutomaton";
+        String name = "Synchronized Automaton";
         final SimpleIdentifierProxy ident = mFactory.createSimpleIdentifierProxy(name);
 
         synchronizedComponent =  mFactory.createSimpleComponentProxy(ident, ComponentKind.PLANT, graph);

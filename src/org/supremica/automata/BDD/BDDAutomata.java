@@ -51,18 +51,10 @@ package org.supremica.automata.BDD;
 
 import net.sf.javabdd.*;
 import org.supremica.log.*;
-import org.supremica.util.SupremicaException;
 import java.util.*;
-import java.io.*;
 import java.math.BigInteger;
 import org.supremica.util.ArrayHelper;
 import org.supremica.automata.*;
-import org.supremica.automata.IO.*;
-import org.supremica.util.BDD.PCGNode;
-import org.supremica.util.BDD.PCG;
-import org.supremica.util.BDD.Options;
-
-import org.supremica.util.BDD.solvers.OrderingSolver;
 
 public class BDDAutomata
     implements Iterable<BDDAutomaton>
@@ -114,12 +106,6 @@ public class BDDAutomata
     BDD plantsUncontrollableEvents = null;
     BDD specsUncontrollableEvents = null;
 
-    BDDVarSet plantsDestStateVariables = null;
-    BDDVarSet specsDestStateVariables = null;
-
-    BDDVarSet plantsSourceStateVariables = null;
-    BDDVarSet specsSourceStateVariables = null;
-    
     double nbrOfReachableStates = -1;
     double nbrOfCoreachableStates = -1;
     double nbrOfReachableAndCoreachableStates = -1;
@@ -179,12 +165,6 @@ public class BDDAutomata
         sourceStateVariables = manager.createEmptyVarSet();
         destStateVariables = manager.createEmptyVarSet();
 
-        plantsDestStateVariables = manager.createEmptyVarSet();
-        specsDestStateVariables = manager.createEmptyVarSet();
-
-        plantsSourceStateVariables = manager.createEmptyVarSet();
-        specsSourceStateVariables = manager.createEmptyVarSet();
-        
         sourceStateDomains = new BDDDomain[theAutomata.size()];
         destStateDomains = new BDDDomain[theAutomata.size()];
         
@@ -234,10 +214,7 @@ public class BDDAutomata
 //                bddAutomaton.getTransitionForwardBDD().exist(bddAutomaton.getDestStateDomain().set()).printDot();
                 plantsForwardTransitions = plantsForwardTransitions.or(bddAutomaton.getTransitionForwardBDD());
                 plantsBackwardTransitions = plantsBackwardTransitions.or(bddAutomaton.getTransitionBackwardBDD());
-                plantsUncontrollableEvents = plantsUncontrollableEvents.or(currUnconEvents);
-                
-                plantsSourceStateVariables.unionWith(sourceStateDomain.set());
-                plantsDestStateVariables.unionWith(destStateDomain.set());
+                plantsUncontrollableEvents = plantsUncontrollableEvents.or(currUnconEvents);                
 
                 plantsSelfLoopsBDD = plantsSelfLoopsBDD.or(bddAutomaton.getSelfLoopsBDD());
 //                bddAutomaton.getTransitionForwardBDD().and(bddAutomaton.getSelfLoopsBDD().not()).printDot();
@@ -247,9 +224,6 @@ public class BDDAutomata
                 specsForwardTransitions = specsForwardTransitions.or(bddAutomaton.getTransitionForwardBDD());
                 specsBackwardTransitions = specsBackwardTransitions.or(bddAutomaton.getTransitionBackwardBDD());
                 specsUncontrollableEvents = specsUncontrollableEvents.or(currUnconEvents);
-                
-                specsSourceStateVariables.unionWith(sourceStateDomain.set());
-                specsDestStateVariables.unionWith(destStateDomain.set());
 
                 specsSelfLoopsBDD = specsSelfLoopsBDD.or(bddAutomaton.getSelfLoopsBDD());
             }
@@ -307,7 +281,7 @@ public class BDDAutomata
     {
         return sourceStateVariables;
     }
-    
+
     public BDDVarSet getDestStateVariables()
     {
         return destStateVariables;
@@ -348,26 +322,6 @@ public class BDDAutomata
         return specsUncontrollableEvents;
     }
 
-    public BDDVarSet getPlantsSourceStateVars()
-    {
-        return plantsSourceStateVariables;
-    }
-
-    public BDDVarSet getSpecsSourceStateVars()
-    {
-        return specsSourceStateVariables;
-    }
-
-    public BDDVarSet getPlantsDestStateVars()
-    {
-        return plantsDestStateVariables;
-    }
-
-    public BDDVarSet getSpecsDestStateVars()
-    {
-        return specsDestStateVariables;
-    }
-
     public BDDTransitions getBDDTransitions()
     {
         return bddTransitions;
@@ -406,33 +360,6 @@ public class BDDAutomata
         return theAutomata.getInverseAlphabet(currAutomaton);
     }
 
-    public BDDVarSet getInverseSourceStateVars(Automaton aut)
-    {
-        BDDVarSet bddvarset = null;
-        boolean flag = true;
-        int i = 0;
-
-        //Buld a variable set including all variables in the automata except 'aut'
-        for(Automaton inAut: theAutomata)
-        {
-            if(flag)
-            {
-                if(!aut.equals(inAut))
-                {
-                    bddvarset = sourceStateDomains[i].set();
-                    flag = false;
-                }
-            }
-            else
-            {
-                if(!aut.equals(inAut))
-                    bddvarset = bddvarset.union(sourceStateDomains[i].set());
-            }
-            i++;
-        }
-
-        return bddvarset;
-    }
 
     public BDDVarSet getSourceStateVars(Automaton aut)
     {

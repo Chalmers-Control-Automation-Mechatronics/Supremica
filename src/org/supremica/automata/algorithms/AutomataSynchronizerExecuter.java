@@ -1190,7 +1190,9 @@ public final class AutomataSynchronizerExecuter
                 if (nextIndex >= 0)
                 {
                     // Get fromState (from currState) and toState (from nextState) and the event
+
                     Automaton theAutomaton = helper.getAutomaton();
+
                     org.supremica.automata.State fromState = theAutomaton.getStateWithIndex(helper.getStateIndex(currState));
                     org.supremica.automata.State toState = theAutomaton.getStateWithIndex(nextIndex);
                     LabeledEvent theEvent = indexMap.getEventAt(currEventIndex);
@@ -1211,13 +1213,14 @@ public final class AutomataSynchronizerExecuter
                                 String fStateName = stateTable[j][currState[j]].getName();
                                 String tStateName = stateTable[j][nextState[j]].getName();
                                 String eventName = theEvent.getName();
+//                                System.out.println(automatonName+"   "+fStateName+"   "+tStateName+"   "+eventName);
+
                                 EdgeSubject edge = helper.getEdge(automatonName, fStateName, tStateName, eventName);
                                 List<SimpleExpressionProxy> guards = edge.getGuardActionBlock().getGuards();
                                 List<BinaryExpressionProxy> actions = edge.getGuardActionBlock().getActions();
                                 allGuards.addAll(guards);
                                 allActions.addAll(actions);
-                                System.out.println(automatonName+"   "+fStateName+"   "+tStateName+"   "+eventName);
-                                System.out.println(edge.getGuardActionBlock().getGuardsModifiable().get(0).toString());
+//                                System.out.println(edge.getGuardActionBlock().getGuardsModifiable().get(0).toString());
                             }
                         }
 
@@ -1238,13 +1241,11 @@ public final class AutomataSynchronizerExecuter
                                 Iterator<SimpleExpressionProxy> guardIt = allGuards.iterator();
                                 SimpleExpressionProxy leftGuard = parser.parse(guardIt.next().toString(),Operator.TYPE_BOOLEAN);
                                 SimpleExpressionProxy rightGuard = parser.parse(guardIt.next().toString(),Operator.TYPE_BOOLEAN);
-                                synchedGuard = factory.createBinaryExpressionProxy(optable.getAndOperator(),leftGuard , rightGuard);
-    //                            synchedGuardString = guardIt.next().getPlainText();
+                                synchedGuard = factory.createBinaryExpressionProxy(optable.getAndOperator(), leftGuard , rightGuard);
                                 while(guardIt.hasNext())
                                 {
                                     rightGuard = parser.parse(guardIt.next().toString(),Operator.TYPE_BOOLEAN);
                                     synchedGuard = factory.createBinaryExpressionProxy(optable.getAndOperator(),synchedGuard , rightGuard);
-    //                                  synchedGuardString = synchedGuardString + optable.getAndOperator().getName() + guardIt.next().getPlainText();
                                 }
                             }
                             else
@@ -1275,6 +1276,7 @@ public final class AutomataSynchronizerExecuter
                                 gab.getActionsModifiable().add(bes);
                             }
                         }
+ 
                         EdgeSubject edge = helper.importEdge(fromState, toState, newlabel,gab);
                         helper.mEdges.add(edge);
                     }
