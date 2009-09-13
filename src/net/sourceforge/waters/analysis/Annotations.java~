@@ -1,0 +1,543 @@
+import java.util.Arrays;
+import java.util.Map;
+import java.util.HashMap;
+import gnu.trove.TIntObjectHashMap;
+import gnu.trove.TObjectIntHashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import gnu.trove.TObjectIdentityHashingStrategy;
+import java.util.Collections;
+import java.util.Collection;
+import net.sourceforge.waters.model.des.EventProxy;
+import java.util.Set;
+import java.util.ArrayList;
+import gnu.trove.TObjectProcedure;
+import gnu.trove.THashMap;
+
+public class Annotations
+{
+  private static final THashMap<Set<EventProxy>, Set<EventProxy>> EVENTSETS =
+                       new THashMap<Set<EventProxy>, Set<EventProxy>>();
+  private static final THashMap<Tuple, Set<EventProxy>> EVENTUNION =
+                       new THashMap<Tuple, Set<EventProxy>>();
+  private static final Map<Merge, EventProxy[]> INTERSECTIONS = 
+                       new HashMap<Merge, EventProxy[]>();
+  private static final Map<MergeMed, Set<EventProxy[]>> INTERSECTIONSMED = 
+                       new HashMap<MergeMed, Set<EventProxy[]>>();
+  private static final Map<MergeLarge, Set<EventProxy[]>> INTERSECTIONSLARGE = 
+                       new HashMap<MergeLarge, Set<EventProxy[]>>();
+  private static final Map<Merge, Boolean> ISSUBSET = new HashMap<Tuple, Boolean>();
+  private static final Map<Array, EventProxy[]> ANNOTATIONS =
+                       new HashMap<Array, EventProxy[]>();
+  private static final Map<Set<EventProxy[]>, Set<EventProxy[]>> ANNOTATIONSETS =
+                       new HashMap<Set<EventProxy[]>, Set<EventProxy[]>>();
+  private static final TObjectIntHashMap<Set<EventProxy[]>> SETCOUNT =
+                       new TObjectIntHashMap<Set<EventProxy[]>>(
+                       new TObjectIdentityHashingStrategy<Set<EventProxy[]>>());
+  
+  //TODO possibly store annotations as try
+                       
+  private Annotations()
+  {
+  }
+  
+  static private EventProxy[] getCopyAr(EventProxy[] array)
+  {
+    Array ar = new Array(array);
+    EventProxy[] res = ANNOTATIONS.get(ar);
+    if (res == null) {
+      res = array;
+      ANNOTATIONS.put(ar, res);
+    }
+    return res;
+  }
+  
+  static public Set<EventProxy> getCopyEvSet(Set<EventProxy> set)
+  {
+    Set<EventProxy> res = EVENTSETS.get(set);
+    if (res == null) {
+      res = Collections.unmodifiableSet(set);
+      EVENTSETS.put(res, res);
+    }
+    return res;
+  }
+  
+  static private Set<EventProxy[]> getCopySet(Set<EventProxy[]> set)
+  {
+    Set<EventProxy[]> res = ANNOTATIONSETS.get(set);
+    if (res == null) {
+      res = Collections.unmodifiableSet(set);
+      ANNOTATIONSETS.put(res, res);
+    }
+    return res;
+  }
+  
+  static private Set<EventProxy> unionEvents(Set<EventProxy> set1,
+                                             Set<EventProxy> set2)
+  {
+    Tuple tup = new Tuple(set1, set2);
+    Set<EventProxy> result = EVENTUNION.get(tup);
+    if (result != null) {
+      return result;
+    }
+    result = new HashSet<EventProxy>(set1.size() > set2.size() ? set1 : set2);
+    result.addAll(set1.size() > set2.size() ? set2 : set1);
+    result = getCopyEvSet(result);
+    EVENTUNION.put(tup, result);
+    return result;
+  }
+  
+  static private void clearCache()
+  {
+    INTERSECTIONS.clear();
+    INTERSECTIONSMED.clear();
+    INTERSECTIONSLARGE.clear();
+    final Collection<Set<EventProxy[]>> keys = 
+      new ArrayList<Set<EventProxy[]>>(SETCOUNT.size());
+    SETCOUNT.forEachKey(new TObjectProcedure<Set<EventProxy[]>>() {
+      public boolean execute(Set<EventProxy[]> set)
+      {
+        keys.add(set);
+        return true;
+      }
+    });
+    ANNOTATIONSETS.keySet().retainAll(keys);
+    Set<EventProxy[]> ans = new HashSet<EventProxy[]>();
+    for (Set<EventProxy[]> ev : keys) {
+      ans.addAll(ev);
+    }
+    ANNOTATIONS.keySet().retainAll(ans);
+  }
+  
+  static private void register(Set<EventProxy[]> set)
+  {
+    int count = SETCOUNT.get(set);
+    count++;
+    SETCOUNT.put(set, count);
+  }
+  
+  static public void free(Set<EventProxy[]> set)
+  {
+    int count = SETCOUNT.get(set);
+    count--;
+    assert(count >= 0);
+    if (count != 0) {
+      SETCOUNT.put(set, count);
+    } else {
+      SETCOUNT.remove(set);
+    }
+  }
+  
+  /**
+   *  Determines whether an1 is a subset of an2
+   *
+   *  @return true if an1 is a subset of an2, false otherwise.
+   */
+  static public boolean isSubset(EventProxy[] an1, EventProxy[] an2)
+  {
+    if (an1 == an2) {
+      return true;
+    }
+    Tuple merge = new Tuple(an1, an2);
+    Boolean answer = ISSUBSET.get(merge);
+    if (answer != null) {
+      return answer;
+    }
+    if (an1.length > an2.length) {
+      EventProxy[] temp = an1;
+      an1 = an2;
+      an2 = temp;
+    }
+    int i1 = 0;
+    int i2 = 0;
+    while (i1 < an1.length && i2 < an2.length) {
+      if (an1.length - i1 > an2.length - i2) {
+        ISSUBSET.put(merge, false);
+        return false;
+      }
+      if (an1[i1] == an2[i2]) {
+        i1++;
+        i2++;
+        continue;
+      }
+      if (an1[i1].compareTo(an2[i2]) < 0) {
+        ISSUBSET.put(merge, false);
+        return false;
+      }
+      i2++;
+    }
+    ISSUBSET.put(merge, true);
+    return true;
+  }
+  
+  /**
+   *  returns the intersection of an1 and an2
+   */
+  static public EventProxy[] merge(EventProxy[] an1, EventProxy[] an2,
+                                   Set<EventProxy> set1, Set<EventProxy> set2)
+  {
+    Merge merge = new Merge(an1, an2, set1, set2);
+    EventProxy[] ar = INTERSECTIONS.get(merge);
+    if (ar != null) {
+      return ar;
+    }
+    int i1 = 0;
+    int i2 = 0;
+    int i3 = 0;
+    ar = new EventProxy[an1.length < an2.length ? an1.length : an2.length];
+    while (i1 < an1.length && i2 < an2.length) {
+      if (an1[i1] == an2[i2]) {
+        ar[i3] = an1[i1];
+        i1++;
+        i2++;
+        i3++;
+        continue;
+      }
+      // anotations are kept sorted so increment the smaller of the two for
+      // comparison
+      if (an1[i1].compareTo(an2[i2]) > 0) {
+        if (!set1.contains(an2[i2])) {
+          ar[i3] = an2[i2];
+          i3++;
+        }
+        i2++;
+      } else {
+        if (!set2.contains(an1[i1])) {
+          ar[i3] = an1[i1];
+          i3++;
+        }
+        i1++;
+      }
+    }
+    EventProxy[] t = new EventProxy[i3];
+    for (int i = 0; i < i3; i++) {
+      t[i] = ar[i];
+    }
+    ar = t;
+    // we only want to have one copy of any annotation
+    ar = getCopyAr(ar);
+    INTERSECTIONS.put(merge, ar);
+    return ar;
+  }
+  
+  private static boolean removeSuperSets(Set<EventProxy[]> set, EventProxy[] other)
+  {
+    Iterator<EventProxy[]> it = set.iterator();
+    boolean res = false;
+    while (it.hasNext()) {
+      EventProxy[] already = it.next();
+      if (res && other.length >= already.length) {
+        continue;
+      }
+      if (isSubset(already, other)) {
+        if (other.length < already.length) {
+          it.remove();
+          res = true;
+        } else {
+          return false;
+        }
+      }
+    }
+    return true;
+  }
+  
+  private static Set<EventProxy[]> mergeMed(Set<EventProxy[]> anset, EventProxy[] an2,
+                                            Set<EventProxy> set1, Set<EventProxy> set2)
+  {
+    MergeMed merge = new MergeMed(anset, an2, set1, set2);
+    Set<EventProxy[]> result = INTERSECTIONSMED.get(merge);
+    if (result != null) {
+      return result;
+    }
+    result = new HashSet<EventProxy[]>();
+    for (EventProxy[] an1 : anset) {
+      EventProxy[] intersect = merge(an1, an2, set1, set2);
+      // TODO maybe this would be faster if done later and making certain that 
+      // the is largest set done first
+      if (removeSuperSets(result, intersect)) {
+        result.add(intersect);
+      }
+    }
+    //TODO don't think I need the getcopy here
+    INTERSECTIONSMED.put(merge, result);
+    return result;
+  }
+  
+  public static Set<EventProxy[]> mergeLarge(Set<EventProxy[]> anset1,
+                                             Set<EventProxy[]> anset2,
+                                             Set<EventProxy> set1,
+                                             Set<EventProxy> set2)
+  {
+    MergeLarge merge = new MergeLarge(anset1, anset2, set1, set2);
+    Set<EventProxy[]> result = INTERSECTIONSLARGE.get(merge);
+    if (result != null) {
+      register(result);
+      return result;
+    }
+    //The Set with the higher setcount is more likely to be merge with things
+    //thus more likely to be cached in intersectionsmed
+    //TODO maybe better to go with set with most annotations
+    if (SETCOUNT.get(anset1) > SETCOUNT.get(anset2)) {
+      Set<EventProxy[]> temp = anset1;
+      anset1 = anset2;
+      anset2 = temp;
+    }
+    if (anset2.size() == 1) {
+      Set<EventProxy[]> temp = anset1;
+      anset1 = anset2;
+      anset2 = temp;
+    }
+    Set<EventProxy[]> toadd = new HashSet<EventProxy[]>();
+    for (EventProxy[] an : anset1) {
+      Set<EventProxy[]> intersectmed = mergeMed(anset2, an);
+      if (result == null) {
+        result = new HashSet<EventProxy[]>(intersectmed);
+      }
+      toadd.clear();
+      for (EventProxy[] intersect : intersectmed) {
+        if (removeSuperSets(result, intersect)) {
+          toadd.add(intersect);
+        }
+      }
+      result.addAll(toadd);
+    }
+    result = getCopySet(result);
+    INTERSECTIONSLARGE.put(merge, result);
+    return result;
+  }
+  
+  public static Set<EventProxy[]> intersect(List<Set<EventProxy[]>> sets, List<Set<EventProxy>> localevents)
+  {
+    // merge those with lots of instances first should hopefully use cache
+    PriorityQueue<SetWrapper> queue = new PriorityQueue<SetWrapper>(sets.size());
+    for (int i = 0; i < sets.size(); i++) {
+      queue.offer(new SetWrapper(sets.get(i), localevents.get(i)));
+    }
+    while (queue.size() >= 2) {
+      SetWrapper fwr = queue.poll();
+      SetWrapper swr = queue.poll();
+      Set<EventProxy[]> intersect = mergeLarge(fwr.mSet, swr.mSet, fwr.mLocal, swr.mLocal);
+      Set<EventProxy> local = unionEvents(fwr.mLocal, swr.mLocal);
+      queue.offer(new SetWrapper(intersect, local));
+    }
+    Set<EventProxy[]> result = queue.poll().mSet;
+    register(result);
+    return result;
+  }
+  
+  public static Set<EventProxy[]> union(Collection<Set<EventProxy[]>> set,
+                                        Collection<EventProxy[]> singleans)
+  {
+    //TODO maybe add cache
+    Set<EventProxy[]> result = new HashSet<EventProxy[]>();
+    Set<EventProxy[]> toadd = new HashSet<EventProxy[]>();
+    for (Set<EventProxy[]> anset : set) {
+      if (result.size() == 0) {
+        result.addAll(anset);
+        continue;
+      }
+      for (EventProxy[] an : anset) {
+        if (removeSuperSets(result, an)) {
+          toadd.add(an);
+        }
+      }
+      result.addAll(toadd);
+      toadd.clear();
+    }
+    for (EventProxy[] an : singleans) {
+      an = getCopyAr(an);
+      if (removeSuperSets(result, an)) {
+        result.add(an);
+      }
+    }
+    result = getCopySet(result);
+    register(result);
+    return result;
+  }
+  
+  private static class Tuple
+  {
+    private final Object m1;
+    private final Object m2;
+    
+    Tuple(Object o1, Object o2)
+    {
+      m1 = m1;
+      m2 = m2;
+    }
+    
+    boolean equals(Object o)
+    {
+      Tuple tup = (Tuple)o;
+      return (o1 == tup.o1 && o2 == tup.o2) || (o1 == tup.o2 && o2 == tup.o1);
+    }
+    
+    int hashCode()
+    {
+      return System.identityHashCode(m1) * System.identityHashCode(m2);
+    }
+  }
+  
+  private static class MergeLarge
+  {
+    private final Set<EventProxy[]> mArg1;
+    private final Set<EventProxy[]> mArg2;
+    private final Set<EventProxy> mSet1;
+    private final Set<EventProxy> mSet2;
+    private final int mHashCode;
+    
+    public MergeLarge(Set<EventProxy[]> arg1, Set<EventProxy[]> arg2,
+                      Set<EventProxy> set1, Set<EventProxy> set2)
+    {
+      mArg1 = arg1;
+      mArg2 = arg2;
+      mSet1 = set1;
+      mSet2 = set2;
+      mHashCode = (((7 * 31) + System.identityHashCode(mArg1) *
+                    System.identityHashCode(mArg2)) * 31) +
+                  System.identityHashCode(mSet1) *
+                  System.identityHashCode(mSet2);
+    }
+    
+    public boolean equals(Object o)
+    {
+      if (!(o instanceof MergeLarge)) {
+        return false;
+      }
+      MergeLarge m2 = (MergeLarge)o;
+      if (mHashCode != m2.mHashCode) {
+        return false;
+      }
+      return (mArg1 == m2.mArg1 && mArg2 == m2.mArg2 &&
+              mSet1 == m2.mSet1 && mSet2 == m2.mSet2) ||
+             (mArg1 == m2.mArg2 && mArg2 == m2.mArg1 &&
+              mSet1 == m2.mSet2 && mSet2 == m2.mSet1);
+    }
+    
+    public int hashCode()
+    {
+      return mHashCode;
+    }
+  }
+  
+  private static class MergeMed
+  {
+    private Set<EventProxy[]> mArg1;
+    private EventProxy[] mArg2;
+    private final Set<EventProxy> mSet1;
+    private final Set<EventProxy> mSet2;
+    private int mHashCode;
+    
+    public MergeMed(Set<EventProxy[]> arg1, EventProxy[] arg2,
+                    Set<EventProxy> set1, Set<EventProxy> set2)
+    {
+      mArg1 = arg1;
+      mArg2 = arg2;
+      mSet1 = set1;
+      mSet2 = set2;
+      mHashCode = (((7 * 31) + System.identityHashCode(mArg1) *
+                    mArg2.hashCode()) * 31) +
+                  System.identityHashCode(mSet1) *
+                  System.identityHashCode(mSet2);
+    }
+    
+    public boolean equals(Object o)
+    {
+      if (!(o instanceof MergeMed)) {
+        return false;
+      }
+      MergeMed m2 = (MergeMed)o;
+      if (mHashCode != m2.mHashCode) {
+        return false;
+      }
+      return (mArg1 == m2.mArg1 && mArg2 == m2.mArg2 &&
+              mSet1 == m2.mSet1 && mSet2 == m2.mSet2);
+    }
+    
+    public int hashCode()
+    {
+      return mHashCode;
+    }
+  }
+  
+  private static class Merge
+  {
+    private EventProxy[] mArg1;
+    private EventProxy[] mArg2;
+    private final Set<EventProxy> mSet1;
+    private final Set<EventProxy> mSet2;
+    private final int mHashCode;
+    
+    public Merge(EventProxy[] arg1, EventProxy[] arg2,
+                 Set<EventProxy> set1, Set<EventProxy> set2)
+    {
+      mArg1 = arg1;
+      mArg2 = arg2;
+      mSet1 = set1;
+      mSet2 = set2;
+      mHashCode = (((7 * 31) + mArg1.hashCode() * mArg2.hashCode()) * 31) +
+                  System.identityHashCode(mSet1) *
+                  System.identityHashCode(mSet2);
+    }
+    
+    public boolean equals(Object o)
+    {
+      if (!(o instanceof Merge)) {
+        return false;
+      }
+      Merge m2 = (Merge)o;
+      return (mArg1 == m2.mArg1 && mArg2 == m2.mArg2 &&
+              mSet1 == m2.mSet1 && mSet2 == m2.mSet2) ||
+             (mArg1 == m2.mArg2 && mArg2 == m2.mArg1 &&
+              mSet1 == m2.mSet2 && mSet2 == m2.mSet1);
+    }
+    
+    public int hashCode()
+    {
+      return mHashCode;
+    }
+  }
+  
+  private static class SetWrapper
+    implements Comparable<SetWrapper>
+  {
+    Set<EventProxy[]> mSet;
+    Set<EventProxy> mLocal;
+    
+    SetWrapper(Set<Annotation> set, Set<EventProxy> local)
+    {
+      mSet = set;
+      mLocal = local;
+    }
+    
+    int compareTo(SetWrapper set)
+    {
+      return SETCOUNT.get(set.mSet) - SETCOUNT.get(mSet);
+    }
+  }
+  
+  private static class Array
+  {
+    private final EventProxy[] mArray;
+    private final int mHash;
+    
+    public Array(EventProxy[] array)
+    {
+      mArray = array;
+      mHash = Arrays.hashCode(array);
+    }
+    
+    public boolean equals(Object o) {
+      if (!(o instanceof Array)) {
+        return false;
+      }
+      Array a2 = (Array) o;
+      return Arrays.equals(mArray, a2.mArray);
+    }
+    
+    public int hashCode()
+    {
+      return mHash;
+    }
+  }
+}

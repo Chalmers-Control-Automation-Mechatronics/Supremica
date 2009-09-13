@@ -1,0 +1,322 @@
+package net.sourceforge.waters.analysis;
+
+import net.sourceforge.waters.plain.base.NamedElement;
+import net.sourceforge.waters.model.des.AutomatonProxy;
+import net.sourceforge.waters.model.des.EventProxy;
+import net.sourceforge.waters.model.des.TransitionProxy;
+import net.sourceforge.waters.model.des.StateProxy;
+import java.util.Set;
+import java.util.HashSet;
+import java.util.Arrays;
+import net.sourceforge.waters.xsd.base.ComponentKind;
+import java.util.ArrayList;
+import net.sourceforge.waters.model.des.ProductDESProxyFactory;
+import gnu.trove.TObjectIntHashMap;
+import gnu.trove.TIntArrayList;
+import java.util.Collection;
+import net.sourceforge.waters.model.base.ProxyVisitor;
+import net.sourceforge.waters.model.base.NamedProxy;
+import net.sourceforge.waters.model.base.Proxy;
+import net.sourceforge.waters.model.des.ProductDESProxyVisitor;
+import net.sourceforge.waters.model.base.VisitorException;
+import java.util.Collections;
+import java.util.List;
+
+public class LightWeightGraph
+  extends NamedElement
+  implements AutomatonProxy
+{
+  private final int[][] mTransitions;
+  private final EventProxy[] mEvents;
+  private final int[] mMarked;
+  private final EventProxy mMark;
+  private final ProductDESProxyFactory mFactory;
+  private final int mStateNum;
+  private Set<EventProxy> mEventSet;
+  private Set<StateProxy> mStateSet;
+  private Collection<TransitionProxy> mTransitionSet;
+  
+  public LightWeightGraph(String name, int[][] transitions, int statenum,
+                          EventProxy[] events, int[] marked, EventProxy mark,
+                          ProductDESProxyFactory factory)
+  {
+    super(name);
+    mStateNum = statenum;
+    mTransitions = transitions;
+    mEvents = events;
+    mMarked = marked;
+    mMark = mark;
+    mFactory = factory;
+  }
+  
+  public LightWeightGraph(AutomatonProxy graph, ProductDESProxyFactory factory,
+                          EventProxy mark)
+  {
+    super(graph.getName());
+    mStateNum = graph.getStates().size();
+    TObjectIntHashMap<StateProxy> states = 
+      new TObjectIntHashMap<StateProxy>(mStateNum);
+    TObjectIntHashMap<EventProxy> events = 
+      new TObjectIntHashMap<EventProxy>(mStateNum);
+    int num = 1;
+    mTransitions = new int[graph.getTransitions().size()][3];
+    int tnum = 0;
+    int evnum = 0;
+    mEvents = new EventProxy[graph.getEvents().size()];
+    Collection<EventProxy> evs = graph.getEvents();
+    for (EventProxy e: evs) {
+      mEvents[evnum] = e;
+      evnum++;
+    }
+    Arrays.sort(mEvents);
+    for (int i = 0; i < mEvents.length; i++) {
+      events.put(mEvents[i], i);
+    }
+    TIntArrayList marked = new TIntArrayList();
+    Collection<StateProxy> st = graph.getStates();
+    for (StateProxy s : st) {
+      int statenum = s.isInitial() ? 0 : num++;
+      states.put(s, statenum);
+      if (s.getPropositions().contains(mark)) {
+        marked.add(statenum);
+      }
+    }
+    mMarked = marked.toNativeArray();
+    Collection<TransitionProxy> trans = graph.getTransitions();
+    for (TransitionProxy t : trans) {
+      mTransitions[tnum][0] = states.get(t.getSource());
+      mTransitions[tnum][1] = events.get(t.getEvent());
+      mTransitions[tnum][2] = states.get(t.getTarget());
+      tnum++;
+    }
+    mMark = mark;
+    mFactory = factory;
+  }
+  
+  public LightWeightGraph clone()
+  {
+    assert(false);
+    return new LightWeightGraph(getName(), mTransitions, mStateNum, mEvents,
+                                mMarked, mMark, mFactory);
+  }
+  
+  public Set<EventProxy> getEvents()
+  {
+    if (mEventSet == null) {
+      mEventSet = new HashSet<EventProxy>(Arrays.asList(mEvents));
+    }
+    return mEventSet;
+  }
+  
+  private void setup()
+  {
+    System.out.println("Setup");
+    Exception ex = new Exception();
+    ex.printStackTrace();
+    StateProxy[] states = new StateProxy[mStateNum];
+    int j = 0;
+    for (int i = 0; i < states.length; i++) {
+      EventProxy event = null;
+      if (j < mMarked.length && mMarked[j] == i) {
+        event = mMark;
+        j++;
+      }
+      states[i] = new MemStateProxy(i, mMark);
+    }
+    mStateSet = new HashSet<StateProxy>(Arrays.asList(states));
+    mTransitionSet = new ArrayList<TransitionProxy>(mTransitions.length);
+    for (int i = 0; i < mTransitions.length; i++) {
+      mTransitionSet.add(mFactory.createTransitionProxy(states[mTransitions[i][0]],
+                                                        mEvents[mTransitions[i][1]],
+                                                        states[mTransitions[i][2]]));
+    }
+  }
+  
+  public Set<StateProxy> getStates()
+  {
+    if (mStateSet == null) {
+      setup();
+    }
+    return mStateSet;
+  }
+  
+  public Collection<TransitionProxy> getTransitions()
+  {
+    if (mTransitionSet == null) {
+      setup();
+    }
+    return mTransitionSet;
+  }
+  
+  public ComponentKind getKind()
+  {
+    return ComponentKind.PLANT;
+  }
+  
+  public int[][] getLightTransitions()
+  {
+    return mTransitions;
+  }
+  
+  public int[] getMarkedStates()
+  {
+    return mMarked;
+  }
+  
+  public EventProxy getMarked()
+  {
+    return mMark;
+  }
+  
+  public EventProxy[] getLightEvents()
+  {
+    return mEvents;
+  }
+  
+  public int getStateNum()
+  {
+    return mStateNum;
+  }
+  
+  public int hashCode()
+  {
+    return System.identityHashCode(this);
+  }
+  
+  public boolean equals(Object o)
+  {
+    return System.identityHashCode(this) == System.identityHashCode(o);
+  }
+  
+  private static class MemStateProxy
+    implements StateProxy
+  {
+    private final int mName;
+    private final EventProxy mEvent;
+    
+    public MemStateProxy(int name, EventProxy event)
+    {
+      mName = name;
+      mEvent = event;
+    }
+    
+    public MemStateProxy(int name)
+    {
+      this(name, null);
+    }
+    
+    public Collection<EventProxy> getPropositions()
+    {
+      if (mEvent == null) {
+        return Collections.emptySet();
+      } else {
+        return Collections.singleton(mEvent);
+      }
+    }
+    
+    public boolean isInitial()
+    {
+      return mName == 0;
+    }
+    
+    public int getNum()
+    {
+      return mName;
+    }
+    
+    public MemStateProxy clone()
+    {
+      return new MemStateProxy(mName, mEvent);
+    }
+    
+    public String getName()
+    {
+      return Integer.toString(mName);
+    }
+    
+    public boolean refequals(Object o)
+    {
+      if (o instanceof NamedProxy) {
+        return refequals((NamedProxy) o);
+      }
+      return false;
+    }
+    
+    public boolean refequals(NamedProxy o)
+    {
+      if (o instanceof MemStateProxy) {
+        final MemStateProxy s = (MemStateProxy) o;
+        return s.mName == mName;
+      } else {
+        return false;
+      }
+    }
+    
+    public int refHashCode()
+    {
+      return mName;
+    }
+    
+    public Object acceptVisitor(final ProxyVisitor visitor)
+      throws VisitorException
+    {
+      final ProductDESProxyVisitor desvisitor = (ProductDESProxyVisitor) visitor;
+      return desvisitor.visitStateProxy(this);
+    }
+
+    public Class<StateProxy> getProxyInterface()
+    {
+      return StateProxy.class;
+    }
+
+    public boolean equalsByContents(final Proxy partner)
+    {
+      if (partner != null &&
+          partner.getProxyInterface() == getProxyInterface()) {
+        final StateProxy state = (StateProxy) partner;
+        return (getName().equals(state.getName())) &&
+               (isInitial() == state.isInitial()) &&
+               state.getPropositions().isEmpty();
+      } else {
+        return false;
+      }
+    }
+    
+    public boolean equalsWithGeometry(Proxy o)
+    {
+      return equalsByContents(o);
+    }
+    
+    public int hashCodeByContents()
+    {
+      return refHashCode();
+    }
+    
+    public int hashCodeWithGeometry()
+    {
+      return refHashCode();
+    }
+    
+    public int compareTo(NamedProxy n)
+    {
+      return n.getName().compareTo(getName());
+    }
+    
+    public String toString()
+    {
+      return "S:" + mName;
+    }
+  }
+  
+  public Object acceptVisitor(ProxyVisitor visitor)
+    throws VisitorException
+  {
+    final ProductDESProxyVisitor desvisitor = (ProductDESProxyVisitor) visitor;
+    return desvisitor.visitAutomatonProxy(this);
+  }
+
+  public Class<AutomatonProxy> getProxyInterface()
+  {
+    return AutomatonProxy.class;
+  }
+}

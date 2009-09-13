@@ -1,0 +1,68 @@
+package net.sourceforge.waters.analysis;
+
+import java.util.Arrays;
+import net.sourceforge.waters.model.des.EventProxy;
+
+public class Annotation
+{
+  public final EventProxy[] mEvents;
+  /** is this the events contained within the annotation, or the events not in
+      the annotation */
+  public final boolean mContains;
+  private final int mHashCode;
+  
+  public Annotation(EventProxy[] events, boolean contains)
+  {
+    mEvents = events;
+    mContains = contains;
+    int hashcode = Arrays.hashcode(events);
+    hashcode <<= 1;
+    hashcode |= contains ? 1 : 0;
+    mHashCode = hashcode;
+  }
+  
+  public Annotation intersect(Annotation o)
+  {
+    Annotation result;
+    if (mContains && o.mContains) {
+      result = Annotations.intersectEvents(mEvents, o.mEvents);
+    } else if (!mContains && !o.mContains) {
+      result = Annotations.unionEvents(mEvents, o.mEvents);
+    } else {
+      EventProxy[] keep = mContains ? mEvents : o.mEvents;
+      EventProxy[] remove = !mContains ? mEvents : o.mEvents;
+      result = Annotations.removeAll(keep, remove);
+    }
+    return result;
+  }
+  
+  public boolean isSubset(Annotation o)
+  {
+    boolean result;
+    Annotation result;
+    if (mContains && o.mContains) {
+      result = Annotations.isSubsetIntersectEvents(mEvents, o.mEvents);
+    } else if (!mContains && !o.mContains) {
+      result = Annotations.isSubsetUnionEvents(mEvents, o.mEvents);
+    } else {
+      EventProxy[] keep = mContains ? mEvents : o.mEvents;
+      EventProxy[] remove = !mContains ? mEvents : o.mEvents;
+      result = Annotations.isSubsetRemoveAll(keep, remove);
+    }
+    return result;
+  }
+  
+  public boolean equals(Object o)
+  {
+    Annotation a2 = (Annotation)o;
+    if (mHashCode != a2.mHashCode) {
+      return false;
+    }
+    return Arrays.equals(mEvents, a2.mEvents) && mContains == a2.mContains;
+  }
+  
+  public int hashCode()
+  {
+    return mHashCode;
+  }
+}

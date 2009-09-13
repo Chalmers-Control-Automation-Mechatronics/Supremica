@@ -34,22 +34,15 @@ import gnu.trove.TIntHashSet;
 import gnu.trove.TIntArrayList;
 
 
-public class ObserverProjection
+public class Composer
 {
-  public ObserverProjection(ProductDESProxy model, ProductDESProxyFactory factory,
-                            Set<EventProxy> hide, Set<EventProxy> forbidden, EventProxy marked)
+  public Composer(ProductDESProxy model, ProductDESProxyFactory factory,
+                  EventProxy marked)
   {
-    Set<EventProxy[]> set = new HashSet<EventProxy[]>();
-    
     mMarked = marked;
     mModel = model;
     mFactory = factory;
-    mHide = hide;
-    mForbidden = new HashSet<EventProxy>(forbidden);
-    mForbidden.retainAll(mModel.getEvents());
     mNodeLimit = 1000;
-    mDisabled = new HashSet<EventProxy>(mModel.getEvents());
-    mDisabled.remove(mHide);
     numStates = 1;
     //System.out.println("hide:" + hide);
     //System.out.println("forbidden;" + forbidden);
@@ -60,7 +53,7 @@ public class ObserverProjection
     mNodeLimit = stateLimit;
   }
   
-  public AutomatonProxy project()
+  public AutomatonProxy run()
     throws AnalysisException
   {
     mNewMarked = new TIntHashSet();
@@ -74,34 +67,14 @@ public class ObserverProjection
     }
     eventAutomaton = new int[events.length][numAutomata];
     int stateLength = numAutomata;
-    int l = 0;
     // transitions indexed first by automaton then by event then by source state
     transitions = new int[numAutomata][events.length][];
     // go through and put all the events to be hidden to the front
     Map<EventProxy, Integer> eventToIndex = new HashMap<EventProxy, Integer>(events.length);
-    for (int i = 0; i < events.length; i++) {
-      if (mHide.contains(events[i])) {
-        EventProxy temp = events[i];
-        events[i] = events[l];
-        events[l] = temp;
-        l++;
-      }
-    }
-    Arrays.sort(events, 0, mHide.size());
-    assert(l == mHide.size());
     //put all the forbidden events directly after the Hidden ones
-    for (int i = l; i < events.length; i++) {
-      if (mForbidden.contains(events[i])) {
-        EventProxy temp = events[i];
-        events[i] = events[l];
-        events[l] = temp;
-        l++;
-      }
-    }
     for (int i = 0; i < events.length; i++) {
       eventToIndex.put(events[i], i);
     }
-    assert(l == mHide.size() + mForbidden.size());
     // this has to be done after events gets it's final ordering to avoid
     // subtle bugs
     for (int i = 0; i < events.length; i++) {
@@ -120,7 +93,7 @@ public class ObserverProjection
     for (int i = 0; i < aut.length; i++) {
       Map<StateProxy, Integer> stateMap = new HashMap<StateProxy, Integer>(aut[i].getStates().size());
       mMarkedStates[i] = new boolean[aut[i].getStates().size()];
-      l = 0;
+      int l = 0;
       Set<StateProxy> states = aut[i].getStates();
       boolean containsmarked = aut[i].getEvents().contains(mMarked);
       for (StateProxy s : states) {
@@ -181,104 +154,23 @@ public class ObserverProjection
       currentState = unvisited.take();
       //System.out.println(Arrays.toString(currentState));
       //explore(currentState, true);
-      explore(currentState, true);
-      explore(currentState, false);
+      explore(currentState);
+      explore(currentState);
     }
     System.out.println("Composition:" + states.values().size());
     mCompositionSize = states.values().size();
     states = null;
-    currentState = new int[] {0};
-    transitions = new int[1][events.length][numStates];
-    mBackTransitions = new TIntArrayList[events.length][numStates];
-    for (int i = 0; i < transitions[0].length; i++) {
-      for (int j = 0; j < transitions[0][i].length; j++) {         
-        transitions[0][i][j] = -1;
-      }
-    }
-    for (int[] tran : newtrans) {
-      if (tran[1] < mHide.size() && tran[0] == tran[2]) {
-        //System.out.println("removed selfloop");
-        //continue;
-      }
-      transitions[0][tran[1]][tran[0]] = tran[2];
-      if (mBackTransitions[tran[1]][tran[2]] == null) {
-        mBackTransitions[tran[1]][tran[2]] = new TIntArrayList(1);
-      }
-      mBackTransitions[tran[1]][tran[2]].add(tran[0]);
-    }
-    //System.out.println("mark");
-    markStates();
-    mBackTransitions = null;
-    List<EventProxy> removed = new ArrayList<EventProxy>();
-    mNextMarked = new TIntHashSet();
-    projloop:
-    for (int k = 0; k < mHide.size(); k++) {
-      newtrans.clear();
-      //System.out.println("newmarked:" + Arrays.toString(mNewMarked.toArray()));
-      System.out.println("attemptevent: " + (k+1) + " of " + mHide.size() + " numStates:" + numStates);
-      int prevStates = numStates;
-      numStates = 1;
-      currentState = new int[] {0};
-      currentState = actualState(currentState, k);
-      int ism = isMarked(currentState, k);
-      if (ism == 1) {
-        mNextMarked.add(0);
-      } else if (ism == -1) {
-        numStates = prevStates;
-        continue;
-      }
-      newStates = new StateMap(mNodeLimit);
-      newStates.put(currentState, new MemStateProxy(0));
-      unvisited = new ArrayBag(100);
-      unvisited.offer(currentState);
-      while (!unvisited.isEmpty()) {
-        currentState = unvisited.take();
-        if (!explore2(currentState, k)) {
-          mNextMarked.clear();
-          numStates = prevStates;
-          continue projloop;
-        }
-      }
-      removed.add(events[k]);
-      transitions = new int[1][events.length][numStates];
-      for (int i = 0; i < transitions[0].length; i++) {
-        for (int j = 0; j < transitions[0][i].length; j++) {         
-          transitions[0][i][j] = -1;
-        }
-      }
-      for (int[] tran : newtrans) {
-        if (tran[1] < mHide.size() && tran[0] == tran[2]) {
-          //System.out.println("removed selfloop");
-          //continue;
-        }
-        transitions[0][tran[1]][tran[0]] = tran[2];
-      }
-      //System.out.println("nextMarked:" + Arrays.toString(mNextMarked.toArray()));
-      mNewMarked = mNextMarked;
-      mNextMarked = new TIntHashSet();
-      mDumpState = mNewDumpState;
-    }
-    System.out.println("endmarked:" + Arrays.toString(mNewMarked.toArray()));
-    Collection<EventProxy> ev = new ArrayList<EventProxy>(mModel.getEvents());
-    newStates = null;
     MemStateProxy[] ns = new MemStateProxy[numStates];
     for (int i = 0; i < ns.length; i++) {
       ns[i] = mNewMarked.contains(i) ? new MemStateProxy(i, mMarked) 
                                      : new MemStateProxy(i);
     }
-    trans.clear();
-    for (int i = 0; i < transitions[0].length; i++) {
-      for (int j = 0; j < transitions[0][i].length; j++) {
-        int target = transitions[0][i][j];
-        if (target != -1) {
-          StateProxy source = ns[j];
-          EventProxy eveo = events[i];
-          StateProxy targ = ns[target];
-          trans.add(mFactory.createTransitionProxy(ns[j], events[i], ns[target]));
-        }
-      }
+    for (int[] tran : newtrans) {
+      StateProxy source = ns[tran[0]];
+      EventProxy eveo = events[tran[1]];
+      StateProxy targ = ns[tran[2]];
+      trans.add(mFactory.createTransitionProxy(source, eveo, targ));
     }
-    ev.removeAll(removed);
     StringBuffer name = new StringBuffer();
     for (AutomatonProxy a : mModel.getAutomata()) {
       name.append(a.getName());
@@ -290,9 +182,8 @@ public class ObserverProjection
     String nam = name.toString();
     ComponentKind ck = ComponentKind.PLANT;
     AutomatonProxy result = mFactory.createAutomatonProxy(nam, ck,
-                                                          ev, states,
+                                                          mModel.getEvents(), states,
                                                           trans);
-    newStates = null;
     trans = null;
     ns = null;
     System.out.println("Project:" + result.getStates().size() + " Composition:" + mCompositionSize);
@@ -310,7 +201,6 @@ public class ObserverProjection
     ///
     //System.out.println("new:\n" + result);
     System.out.println("dumpstate:" + mDumpState);
-    System.out.println("disabled:" + mDisabled);
     return result;
   }
   
@@ -365,29 +255,7 @@ public class ObserverProjection
     }
   }
   
-  private boolean isBlocked(int state, int event)
-  {
-    IntBag suc = new IntBag(10);
-    TIntHashSet states = new TIntHashSet();
-    suc.offer(state);
-    while (!suc.isEmpty()) {
-      int s = suc.take();
-      if (transitions[0][event][s] != -1) {
-        return false;
-      }
-      for (int i = 0; i < mHide.size(); i++) {
-        int stat = transitions[0][i][s];
-        if (stat != -1) {
-          if (states.add(stat)) {
-            suc.offer(stat);
-          }
-        }
-      }
-    }
-    return true;
-  }
-  
-  public boolean explore(int[] state, boolean forbidden)
+  public boolean explore(int[] state)
     throws AnalysisException
   {
     boolean result = false;
@@ -395,20 +263,10 @@ public class ObserverProjection
     int source = states.get(state);
     state = decode(state);
     int min, max;
-    if (forbidden) {
-      min = mHide.size();
-      max = mHide.size() + mForbidden.size();
-    } else {
-      min = 0;
-      max = events.length;
-    }
+    min = 0;
+    max = events.length;
     events:
     for (int i = min; i < max; i++) {
-      if (!forbidden) {
-        if (mHide.size() >= i && (mHide.size() + mForbidden.size()) < i) {
-          continue;
-        }
-      }
       int[] suc = new int[numAutomata];
       for (int l = 0; l < numAutomata; l++) {
         int automaton = eventAutomaton[i][l];
@@ -427,7 +285,6 @@ public class ObserverProjection
         }
       }
       result = true;
-      mDisabled.remove(events[i]);
       Integer target = states.get(suc);
       //System.out.println("suc:" + Arrays.toString(suc) + "targ:" + target);
       if (target == null) {
@@ -456,155 +313,6 @@ public class ObserverProjection
       }
     }
     return true;
-  }
-  
-  public boolean explore2(int[] state, int hideevent)
-    throws AnalysisException
-  {
-    int min, max;
-    min = 0;
-    max = events.length;
-    boolean result = false;
-    TIntHashSet blocked = new TIntHashSet();
-    //System.out.println("state:" + Arrays.toString(state));
-    MemStateProxy source = newStates.get(state);
-    if (source == null) {
-      System.out.println("thing");
-      System.out.println(newStates);
-    }
-    for (int i = min; i < max; i++) {
-      if (i == hideevent) {
-        continue;
-      }
-      List<Integer> successor = new ArrayList<Integer>(state.length);
-      boolean isblocked = false;
-      for (int j = 0; j < state.length; j++) {
-        int s = transitions[0][i][state[j]];
-        if (s == -1) {
-          int targ = transitions[0][hideevent][state[j]];
-          if (targ == -1 || blocked.contains(targ)) {
-            isblocked = true;
-          }
-          blocked.add(state[j]);
-          /*if (!isblocked) {
-            isblocked = isBlocked(state[j], i);
-          }*/
-          continue;
-        }
-        successor.add(s);
-      }
-      /*if (i < mHide.size()) {
-        isblocked = false;
-      }*/
-      blocked.clear();
-      //System.out.println("successor:" + successor);
-      if (successor.isEmpty()) {
-        continue;
-      } else {
-        if (isblocked && (successor.size() != 1 || successor.get(0) != mDumpState)) {
-          System.out.println("unfulfilled blocked");
-          return false;
-        }
-      }
-      result = true;
-      int[] succ = new int[successor.size()];
-      for (int j = 0; j < succ.length; j++) {
-        succ[j] = successor.get(j);
-        if (succ[j] == mDumpState) {
-          /*if (succ.length > 1) {
-            throw new AnalysisException("not good");
-          }*/
-        }
-      }
-      succ = actualState(succ, hideevent);
-      if (succ == null) {
-        assert(false);
-        return false;
-      }
-      MemStateProxy target = newStates.get(succ);
-      if (target == null) {
-        target = new MemStateProxy(numStates);
-        int ism = isMarked(succ, hideevent);
-        if (ism == 1) {
-          mNextMarked.add(numStates);
-        } else if (ism == -1) {
-          return false;
-        }
-        if (numStates >= mCompositionSize) {
-          System.out.println("to big");
-          return false;
-        }
-        if (succ[0] == mDumpState) {
-          mNewDumpState = numStates;
-          System.out.println("new dumpstate:" + mNewDumpState);
-        }
-        newStates.put(succ, target);
-        numStates++;
-        if (numStates > mNodeLimit) {
-          throw new AnalysisException("State Limit Exceeded");
-        }
-        unvisited.offer(succ);
-      }
-      newtrans.add(new int[] {source.getNum(), i, target.getNum()});
-      //transitions[1][i][source.getNum()] = target.getNum();
-      //trans.add(mFactory.createTransitionProxy(source, events[i], target));
-    }
-    return true;
-  }
-  
-  public int isMarked(int[] state, int hideevent)
-  {
-    TIntHashSet notMarkedStates = new TIntHashSet();
-    boolean marked = false;
-    boolean notmarked = false;
-    for (int i = 0; i < state.length; i++) {
-      if (mNewMarked.contains(state[i])) {
-        marked = true;
-      } else {
-        int targ = transitions[0][hideevent][state[i]];
-        if (targ == -1 || notMarkedStates.contains(targ)) {
-          notmarked = true;
-        }
-      }
-    }
-    if (notmarked && marked) {
-      System.out.println("unfulfilled");
-      return -1;
-    }
-    return marked ? 1 : 0;
-  }
-  
-  public int[] actualState(int[] state, int hideEvent)
-  {
-    int numAutomata = transitions.length;
-    int numHidden = mHide.size();
-    SortedSet<Integer> setofstates = new TreeSet<Integer>();
-    IntBag nextstate = new IntBag(100);
-    for (int i = 0; i < state.length; i++) {
-      if (setofstates.add(state[i])) {
-        nextstate.offer(state[i]);
-      }
-    }
-    // find out what states can be reached from state with hidden events
-    while (!nextstate.isEmpty()) {
-      int s = nextstate.take();
-      int i = hideEvent;
-      int newstate = transitions[0][i][s];
-      if (newstate == -1) {
-        continue;
-      }
-      if (setofstates.add(newstate)) {
-        nextstate.offer(newstate);
-      }
-    }
-    int[] result = new int[setofstates.size()];
-    int l = 0;
-    for (Integer a : setofstates) {
-      result[l] = a;
-      l++;
-    }
-    assert(result.length == l);
-    return result;
   }
   
   private static class MemStateProxy
@@ -1005,9 +713,6 @@ public class ObserverProjection
   private int mNodeLimit;
   private ProductDESProxy mModel;
   private ProductDESProxyFactory mFactory;
-  private Set<EventProxy> mHide;
-  private Set<EventProxy> mForbidden;
-  private Set<EventProxy> mDisabled;
   private Map<int[], Integer> states;
   private Collection<TransitionProxy> trans;
   private EventProxy[] events;
@@ -1015,14 +720,11 @@ public class ObserverProjection
   private TIntArrayList[][] mBackTransitions;
   private boolean[][] mMarkedStates;
   private TIntHashSet mNewMarked;
-  private TIntHashSet mNextMarked;
   private List<int[]> newtrans = new ArrayList<int[]>();
-  private Map<int[], MemStateProxy> newStates;
   private int numStates;
   private Bag unvisited;
   private int[][] eventAutomaton;
   private final EventProxy mMarked;
   private int mNewDumpState;
-  private TIntArrayList[][] mBackTrans;
   private int mDumpState = -1;
 }

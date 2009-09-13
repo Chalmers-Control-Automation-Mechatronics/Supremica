@@ -67,7 +67,6 @@ import gnu.trove.THashMap;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import gnu.trove.TObjectIntHashMap;
-import net.sourceforge.waters.analysis.modular.BlockedEvents;
 
 
 /**
@@ -143,7 +142,6 @@ public class ProjectingNonBlockingChecker
       new NativeConflictChecker(list.getModel(), getMarkingProposition(),
                                 getFactory());
     boolean result = checker.run();
-    System.out.println("result: " + result);
     mTime += System.currentTimeMillis();
     try {
       BufferedWriter write = new BufferedWriter(new FileWriter("/home/darius/supremica/" + getModel().getName()));
@@ -612,54 +610,6 @@ public class ProjectingNonBlockingChecker
     final Set<EventProxy> mHidden;
     final AutomatonProxy mNew;
     final Set<EventProxy> mTarget;
-    
-    private boolean containsAny(Set<EventProxy> contains, Set<EventProxy> of)
-    {
-      for (EventProxy e : of) {
-        if (contains.contains(e)) {return true;}
-      }
-      return false;
-    }
-    
-    private void blockedEvents()
-    {
-      Set<AutomatonProxy> mTempComp = new THashSet<AutomatonProxy>();
-      Set<AutomatonProxy> mTempAut = new THashSet<AutomatonProxy>();
-      System.out.println("before");
-      for (AutomatonProxy aut : mCompautomata) {
-        System.out.println(aut.getName() + " trans:" + aut.getTransitions().size());
-      }
-      for (AutomatonProxy aut : mCompautomata) {
-        AutomatonProxy aut1 = aut;
-        mTempAut.clear();
-        for (AutomatonProxy aut2 : mAutomata) {
-          if (containsAny(aut1.getEvents(), aut2.getEvents())) {
-            List<AutomatonProxy> tocomp = 
-              Arrays.asList(new AutomatonProxy[]{aut1, aut2});
-            BlockedEvents be = new BlockedEvents(tocomp, getFactory(), getMarkingProposition());
-            be.setNodeLimit(100000);
-            try {
-              tocomp = be.run();
-            } catch (AnalysisException ae) {
-              ae.printStackTrace();
-            }
-            aut1 = tocomp.get(0);
-            mTempAut.add(tocomp.get(1));
-          } else {
-            mTempAut.add(aut2);
-          }
-        }
-        mAutomata.clear();
-        mAutomata.addAll(mTempAut);
-        mTempComp.add(aut1);
-      }
-      System.out.println("after");
-      mCompautomata.clear();
-      mCompautomata.addAll(mTempComp);
-      for (AutomatonProxy aut : mCompautomata) {
-        System.out.println(aut.getName() + " trans:" + aut.getTransitions().size());
-      }
-    }
 
     public ProjectionList(ProjectionList parent,
                           Set<AutomatonProxy> automata,
@@ -697,7 +647,6 @@ public class ProjectingNonBlockingChecker
           throw new OverflowException();
         }
       } else {
-        blockedEvents();
         Set<EventProxy> forb = Collections.emptySet();
         System.out.println("marking: " + getMarkingProposition());
         try {
@@ -716,7 +665,7 @@ public class ProjectingNonBlockingChecker
           //end remove transitions
           NonDeterministicComposer composer =
             new NonDeterministicComposer(
-              new ArrayList<AutomatonProxy>(mCompautomata), getFactory(),
+              new ArrayList<AutomatonProxy>(compAutomata), getFactory(),
                                             getMarkingProposition());
           int size = maxsize;
           System.out.println(size);

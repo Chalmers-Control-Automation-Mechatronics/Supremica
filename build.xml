@@ -817,6 +817,64 @@ Class-Path: ${manifest.pathlist}</echo>
         </java>
     </target>
     
+    <target name="run_test8" depends="build">
+        <java classname="net.sourceforge.waters.analysis.modular.SpeedComparison2" fork="true" maxmemory="512m">
+            <classpath>
+                <pathelement location="${dist}/Supremica.jar"/>
+                <pathelement location="${dist}/SupremicaLib.jar"/>
+                <pathelement location="${dist}/SupremicaTest.jar"/>
+                <pathelement path="${java.class.path}"/>
+            </classpath>
+            <sysproperty key="waters.test.inputdir" value="${examples}"/>
+            <sysproperty key="waters.test.outputdir" value="${logs.results}"/>
+            <sysproperty key="java.library.path" value="${dist}"/>
+        </java>
+    </target>
+    
+    <target name="run_test9" depends="build">
+        <java classname="net.sourceforge.waters.analysis.modular.SpeedComparison3" fork="true" maxmemory="512m">
+            <classpath>
+                <pathelement location="${dist}/Supremica.jar"/>
+                <pathelement location="${dist}/SupremicaLib.jar"/>
+                <pathelement location="${dist}/SupremicaTest.jar"/>
+                <pathelement path="${java.class.path}"/>
+            </classpath>
+            <sysproperty key="waters.test.inputdir" value="${examples}"/>
+            <sysproperty key="waters.test.outputdir" value="${logs.results}"/>
+            <sysproperty key="java.library.path" value="${dist}"/>
+        </java>
+    </target>
+    
+    <target name="run_test7" depends="build">
+        <mkdir dir="${logs.results}"/>
+        <delete>
+            <fileset dir="${logs.results}" includes="**/log4j.log"/>
+        </delete>
+        <junit printsummary="on" fork="true" maxmemory="512m" haltonfailure="false">
+            <formatter type="xml"/>
+            <batchtest todir="${logs.results}">
+                <fileset dir="${testssrc}">
+                    <include name="**/NewConflictCheckerTest.java"/>
+                    <exclude name="**/Test*.java"/>
+                    <exclude name="org/supremica/testhelpers/**/*.java"/>
+                    <exclude name="**/TestPackage*.java"/>
+                    <exclude name="**/Abstract*.java"/>
+                    <exclude name="**/Native*.java"/>
+                    <exclude name="net/sourceforge/waters/analysis/modular/**/*.java"/>
+                </fileset>
+            </batchtest>
+            <classpath>
+                <pathelement location="${dist}/Supremica.jar"/>
+                <pathelement location="${dist}/SupremicaLib.jar"/>
+                <pathelement location="${dist}/SupremicaTest.jar"/>
+                <pathelement path="${java.class.path}"/>
+            </classpath>
+            <sysproperty key="waters.test.inputdir" value="${examples}"/>
+            <sysproperty key="waters.test.outputdir" value="${logs.results}"/>
+            <sysproperty key="java.library.path" value="${dist}"/>
+        </junit>
+    </target>
+    
     <target name="test_report">
         <mkdir dir="${logs.reports}"/>
         <junitreport todir="${logs.reports}">
