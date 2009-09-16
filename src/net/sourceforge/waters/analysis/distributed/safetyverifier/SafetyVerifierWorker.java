@@ -3,11 +3,11 @@ package net.sourceforge.waters.analysis.distributed.safetyverifier;
 import java.rmi.Remote;
 import java.rmi.RemoteException;
 
-
 import net.sourceforge.waters.analysis.distributed.application.Job;
+import net.sourceforge.waters.analysis.distributed.application.Worker;
 import net.sourceforge.waters.analysis.distributed.schemata.ProductDESSchema;
 
-public interface SafetyVerifierWorker extends Remote, StateHandler
+public interface SafetyVerifierWorker extends Remote, StateHandler, Worker
 {
   /**
    * Sets the job that is being processed. This provides access to the
@@ -19,19 +19,6 @@ public interface SafetyVerifierWorker extends Remote, StateHandler
   public void setModelSchema(ProductDESSchema des) throws RemoteException;
   public ProductDESSchema getModelSchema() throws RemoteException;
 
-  /**
-   * Sets a (hopefully) unique ID for the worker. This should uniquely
-   * identify workers in the current job/controller.
-   * @param id the worker id.
-   */
-  public void setWorkerID(String id) throws RemoteException;
-
-  /**
-   * Gets the ID that is associated with this worker. If no 
-   * ID is set, this returns a null value.
-   * @return the worker id, null if undefined.
-   */
-  public String getWorkerID() throws RemoteException;
 
   /**
    * Sets the state distribution for this worker. This call depends on

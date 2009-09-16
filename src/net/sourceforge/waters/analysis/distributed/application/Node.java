@@ -19,12 +19,14 @@ public interface Node extends Remote
    * Exceptions will be thrown if the worker cannot be created... 
    * somehow through the remote exception
    *
+   * @param id Controller id, used for resource management.
    * @param classname name of the class to load.
+   * @param cb error callback to use, null for no callback.
    * @return remote instance of a worker. 
    * @throws IllegalArgumentException if the controller ID or classname
    *                                  is null.
    */
-  public Worker createWorker(ControllerID id, String classname) 
+  public Worker createWorker(ControllerID id, String classname, ErrorCallback cb) 
     throws 
     ClassNotFoundException,
     IllegalAccessException,

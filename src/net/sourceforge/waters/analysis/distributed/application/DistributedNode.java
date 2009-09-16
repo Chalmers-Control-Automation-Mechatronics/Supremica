@@ -29,7 +29,7 @@ public class DistributedNode
   }
 
 
-  public Worker createWorker(ControllerID id, String classname) 
+  public Worker createWorker(ControllerID id, String classname, ErrorCallback cb) 
     throws 
     ClassNotFoundException,
     IllegalAccessException,
@@ -53,6 +53,17 @@ public class DistributedNode
     //Export the worker as a remote object.
     Worker stub = (Worker) UnicastRemoteObject.exportObject(w, 0);
     
+    //Set the remote proxy for the worker.
+    try
+      {
+	((WorkerLocal)w).setWorkerProxy(stub);
+	((WorkerLocal)w).setErrorCallback(cb);
+      }
+    catch (Exception e)
+      {
+	throw new UnsupportedOperationException("Could not set worker proxy or error callback", e);
+      }
+
     //Call the create method on the worker. If something goes wrong, chain
     //an unsupported operation exception.
     try

@@ -37,7 +37,7 @@ public class TestController extends AbstractController
       {
 	try
 	  {
-	    Worker w = n.createWorker(getControllerID(), "net.sourceforge.waters.analysis.distributed.application.TestWorker");
+	    Worker w = n.createWorker(getControllerID(), "net.sourceforge.waters.analysis.distributed.application.TestWorker", null);
 	    nodesArray[i] = n;
 	    workers[i] = w;
 	    i++;

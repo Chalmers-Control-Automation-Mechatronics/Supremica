@@ -33,4 +33,35 @@ public interface WorkerLocal
    * collected.
    */
   public void deleted();
+
+  /**
+   * Sets the RMI proxy for this worker object.
+   * @param proxy to use
+   */
+  public void setWorkerProxy(Worker proxy);
+
+  /**
+   * Gets the worker proxy object.
+   * @returns proxy object for this worker.
+   */
+  public Worker getWorkerProxy();
+
+  /**
+   * Can be called by the worker code when an exception or error
+   * occurs. The behaviour of this depends on the worker
+   * implementation.
+   * @param throwable exception or error to handle.
+   */
+  public void handle(Throwable throwable);
+
+  /**
+   * Set an object to handle errors and exceptions that occur in the
+   * worker, but do not occur as a direct result of a remote method
+   * call, for example an exception occurs in another thread.
+   * By default there should be no callback. A null callback will 
+   * prevent remote calls when an error occurs.
+   * @param callback to handle remote error, null to disable.
+   */
+  public void setErrorCallback(ErrorCallback callback);
+
 }

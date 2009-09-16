@@ -27,12 +27,10 @@ public class SafetyVerifierWorkerImpl extends AbstractWorker implements SafetyVe
     System.out.format("Constructed safety verifier worker\n");
   }
 
-
   public void setJob(Job job)
   {
     mJob = job;
   }
-
 
   public void setModelSchema(ProductDESSchema des)
   {
@@ -49,19 +47,6 @@ public class SafetyVerifierWorkerImpl extends AbstractWorker implements SafetyVe
     return mModel;
   }
 
-
-  public void setWorkerID(String id)
-  {
-    mWorkerID = id;
-  }
-
-
-  public String getWorkerID()
-  {
-    return mWorkerID;
-  }
-
-
   public void setStateDistribution(StateDistribution stateDist)
   {
     if (getWorkerID() == null)
@@ -76,7 +61,7 @@ public class SafetyVerifierWorkerImpl extends AbstractWorker implements SafetyVe
     mStateDistribution.setHandler(getWorkerID(), mLocalHandler);
 
     //mOutputDispatcher = new SynchronousOutputDispatcher(mStateDistribution);
-    mOutputDispatcher = new ThreadedOutputDispatcher(mStateDistribution, 4);
+    mOutputDispatcher = new ThreadedOutputDispatcher(this, mStateDistribution, 4);
   }
 
 
@@ -346,7 +331,6 @@ public class SafetyVerifierWorkerImpl extends AbstractWorker implements SafetyVe
     //if the buffer is full.
     private void outputState(StateTuple state)
     {
-      
       try
 	{
 	  mOutputDispatcher.addState(state);
@@ -357,7 +341,7 @@ public class SafetyVerifierWorkerImpl extends AbstractWorker implements SafetyVe
 	}
       catch (Exception e)
 	{
-	  throw new RuntimeException(e);
+	  handle(new RuntimeException("Dispatch state failed", e));
 	}
       
       /*
@@ -645,6 +629,19 @@ public class SafetyVerifierWorkerImpl extends AbstractWorker implements SafetyVe
     System.err.format("Safety verifier worker: all threads terminated\n");
   }
 
+  /**
+   * Override the basic error handling mechanism to pause the
+   * worker.
+   * @param throwable error to handle.
+   */
+  public void handle(Throwable throwable)
+  {
+    //Pause the worker. This should attempt to stop the bork.
+    pause();
+
+    super.handle(throwable);
+  }
+
 
   /**
    * Checks for the kill and pause state, blocking if
@@ -799,7 +796,6 @@ public class SafetyVerifierWorkerImpl extends AbstractWorker implements SafetyVe
     return mTransitionTables[automaton];
   }
 
-  private String mWorkerID = null;
   private StateDistribution mStateDistribution = null;
   private StateEncoding mStateEncoding = null;
   private Job mJob = null;

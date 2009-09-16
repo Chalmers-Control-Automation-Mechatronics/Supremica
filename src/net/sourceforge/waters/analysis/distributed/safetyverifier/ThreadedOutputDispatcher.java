@@ -5,13 +5,18 @@ import java.util.ArrayList;
 import java.util.Deque;
 import java.util.List;
 
+import net.sourceforge.waters.analysis.distributed.application.WorkerLocal;
+
 import net.sourceforge.waters.model.base.WatersRuntimeException;
 
 public class ThreadedOutputDispatcher extends AbstractOutputDispatcher
 {
-  public ThreadedOutputDispatcher(StateDistribution dist, int threadcount)
+  public ThreadedOutputDispatcher(WorkerLocal worker, StateDistribution dist, int threadcount)
   {
     super(dist);
+
+    mWorker = worker;
+
     //An arbitrary, somewhat big queue. We don't want to
     //block the processing threads until there really is a 
     //large backlog of states.
@@ -63,11 +68,10 @@ public class ThreadedOutputDispatcher extends AbstractOutputDispatcher
 		}
 	      catch (Exception e)
 		{
-		  //XXX: what to do here?
-		  //The model verification is possibly compromised
-		  throw new WatersRuntimeException("Asynchronous add state " + 
-						   "failed in dispatch thread. " +
-						   "Verification compromised?");
+		  mWorker.handle(new RuntimeException("Asynchronous add state " + 
+						      "failed in dispatch thread. " +
+						      "Verification compromised?", e));
+		  halt();
 		}
 	    }
 	}
@@ -85,7 +89,7 @@ public class ThreadedOutputDispatcher extends AbstractOutputDispatcher
   {
     synchronized (mOutputQueue)
       {
-	while (mOutputQueue.size() == 0)
+	while (mOutputQueue.size() == 0 || mHalt)
 	  {
 	    mOutputQueue.wait();
 	  }
@@ -93,6 +97,11 @@ public class ThreadedOutputDispatcher extends AbstractOutputDispatcher
 	StateTuple t = mOutputQueue.removeFirst();
 	return t;
       }
+  }
+
+  private void halt()
+  {
+    mHalt = true;
   }
 
   public void shutdown()
@@ -122,4 +131,11 @@ public class ThreadedOutputDispatcher extends AbstractOutputDispatcher
 
   //Access to this queue is externally synchronized
   private final Deque<StateTuple> mOutputQueue;
+
+  //Used for error reporting
+  private final WorkerLocal mWorker;
+
+  //Used to stop the dispatcher if something bad happens. This should help
+  //mitigate massive spam if an error occurs.
+  private volatile boolean mHalt; 
 }

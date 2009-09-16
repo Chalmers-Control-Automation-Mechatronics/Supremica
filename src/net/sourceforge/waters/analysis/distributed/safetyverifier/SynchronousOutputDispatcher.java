@@ -13,6 +13,5 @@ public class SynchronousOutputDispatcher extends AbstractOutputDispatcher
     mDistribution.addState(state);
   }
 
-  //Strictly not necessary any more
   private final StateDistribution mDistribution;
 }
