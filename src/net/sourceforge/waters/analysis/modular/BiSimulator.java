@@ -2,9 +2,9 @@
 //###########################################################################
 //# PROJECT: Waters Analysis Algorithms
 //# PACKAGE: net.sourceforge.waters.analysis.modular
-//# CLASS:   Minimizer
+//# CLASS:   BiSimulator
 //###########################################################################
-//# $Id: Minimizer.java 4514 2008-11-11 20:26:15Z js173 $
+//# $Id: BiSimulator.java 4514 2008-11-11 20:26:15Z js173 $
 //###########################################################################
 
 package net.sourceforge.waters.analysis.modular;
@@ -12,47 +12,33 @@ package net.sourceforge.waters.analysis.modular;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.ListIterator;
-import java.util.Map.Entry;
 import java.util.Map;
-import java.util.Queue;
-import java.util.Set;
-import java.util.TreeSet;
 
+import gnu.trove.THashMap;
+import gnu.trove.THashSet;
+import gnu.trove.TIntArrayList;
 import gnu.trove.TIntHashSet;
 import gnu.trove.TIntIntHashMap;
-import gnu.trove.TIntIterator;
-import gnu.trove.TIntIntIterator;
-
-import net.sourceforge.waters.model.base.NamedProxy;
-import net.sourceforge.waters.model.base.Proxy;
-import net.sourceforge.waters.model.base.ProxyVisitor;
-import net.sourceforge.waters.model.base.VisitorException;
-import net.sourceforge.waters.model.des.AutomatonProxy;
-import net.sourceforge.waters.model.analysis.OverflowException;
-import net.sourceforge.waters.model.des.EventProxy;
-import net.sourceforge.waters.model.des.ProductDESProxyFactory;
-import net.sourceforge.waters.model.des.ProductDESProxyVisitor;
-import net.sourceforge.waters.model.des.StateProxy;
-import net.sourceforge.waters.model.des.TransitionProxy;
-import net.sourceforge.waters.xsd.base.EventKind;
-import net.sourceforge.waters.analysis.LightWeightGraph;
-import gnu.trove.TIntArrayList;
 import gnu.trove.TIntIntProcedure;
-import gnu.trove.TLinkedList;
 import gnu.trove.TObjectIntHashMap;
 import gnu.trove.TObjectProcedure;
-import gnu.trove.TIntProcedure;
-import gnu.trove.THashSet;
-import gnu.trove.THashMap;
-import net.sourceforge.waters.xsd.base.ComponentKind;
+
 import net.sourceforge.waters.analysis.AnnotatedMemStateProxy;
+import net.sourceforge.waters.model.analysis.OverflowException;
+import net.sourceforge.waters.model.base.Proxy;
+import net.sourceforge.waters.model.des.AutomatonProxy;
+import net.sourceforge.waters.model.des.EventProxy;
+import net.sourceforge.waters.model.des.ProductDESProxyFactory;
+import net.sourceforge.waters.model.des.StateProxy;
+import net.sourceforge.waters.model.des.TransitionProxy;
+import net.sourceforge.waters.xsd.base.ComponentKind;
+
+
+/**
+ * @author Simon Ware
+ */
 
 public class BiSimulator
 {
