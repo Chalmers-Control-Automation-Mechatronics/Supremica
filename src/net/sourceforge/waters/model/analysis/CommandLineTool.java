@@ -226,6 +226,10 @@ public class CommandLineTool
           if (stats) {
             System.out.println(SEPARATOR);
             System.out.println("Statistics:");
+            System.out.println("Automata in model: " +
+                               des.getAutomata().size());
+            System.out.println("Events in model: " +
+                               des.getEvents().size());
             result.print(System.out);
             additions = true;
           }

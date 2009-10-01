@@ -1,6 +1,18 @@
+//# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
+//###########################################################################
+//# PROJECT: Waters
+//# PACKAGE: net.sourceforge.waters.analysis
+//# CLASS:   BlockedEvents
+//###########################################################################
+//# $Id$
+//###########################################################################
+
 package net.sourceforge.waters.analysis.modular;
 
-import net.sourceforge.waters.xsd.base.ComponentKind;
+import gnu.trove.THashSet;
+import gnu.trove.TIntHashSet;
+import gnu.trove.TIntArrayList;
+import gnu.trove.TObjectIntHashMap;
 
 import java.util.AbstractMap;
 import java.util.ArrayList;
@@ -12,10 +24,14 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.PriorityQueue;
 import java.util.Set;
 import java.util.SortedSet;
+import java.util.Stack;
 import java.util.TreeSet;
 
+import net.sourceforge.waters.analysis.AnnotatedMemStateProxy;
+import net.sourceforge.waters.analysis.LightWeightGraph;
 import net.sourceforge.waters.model.base.NamedProxy;
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.base.ProxyTools;
@@ -30,19 +46,13 @@ import net.sourceforge.waters.model.des.StateProxy;
 import net.sourceforge.waters.model.des.TransitionProxy;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 
-import gnu.trove.TIntHashSet;
-import gnu.trove.TIntArrayList;
-import net.sourceforge.waters.analysis.LightWeightGraph;
-import java.util.PriorityQueue;
-import gnu.trove.TObjectIntHashMap;
-import java.util.Stack;
-import gnu.trove.THashSet;
-import net.sourceforge.waters.analysis.AnnotatedMemStateProxy;
+import net.sourceforge.waters.xsd.base.ComponentKind;
 
 
 public class BlockedEvents
 {
-  public BlockedEvents(List<AutomatonProxy> model, ProductDESProxyFactory factory,
+  public BlockedEvents(List<AutomatonProxy> model,
+		       ProductDESProxyFactory factory,
                        EventProxy marked)
   {
     mMarked = marked;
@@ -147,17 +157,20 @@ public class BlockedEvents
     return aut;
   }
   
+  @SuppressWarnings("unchecked")
   public List<AutomatonProxy> run()
     throws AnalysisException
   {
     mNewMarked = new TIntArrayList();
     states = new IntMap(mNodeLimit);
-    TObjectIntHashMap<EventProxy> eventToIndex = new TObjectIntHashMap<EventProxy>();
+    TObjectIntHashMap<EventProxy> eventToIndex =
+      new TObjectIntHashMap<EventProxy>();
     events = unionEvents();
     int numAutomata = mModel.size();
     eventAutomaton = new int[events.length][numAutomata];
     int stateLength = numAutomata;
-    // transitions indexed first by automaton then by event then by source state
+    // transitions indexed first by automaton then by event
+    // then by source state
     transitions = new int[numAutomata][events.length][][];
     for (int i = 0; i < events.length; i++) {
       eventToIndex.put(events[i], i);
@@ -649,5 +662,5 @@ public class BlockedEvents
   private int mDumpState = -1;
   private TIntHashSet mNewInitial = new TIntHashSet();
   private boolean containsmarked;
-  private TObjectIntHashMap mEventToIndex;
+  private TObjectIntHashMap<EventProxy> mEventToIndex;
 }

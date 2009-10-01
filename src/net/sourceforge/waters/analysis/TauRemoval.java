@@ -1,39 +1,50 @@
+//# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
+//###########################################################################
+//# PROJECT: Waters
+//# PACKAGE: net.sourceforge.waters.analysis
+//# CLASS:   TauRemoval
+//###########################################################################
+//# $Id$
+//###########################################################################
+
 package net.sourceforge.waters.analysis;
 
-import java.util.ArrayList;
+import gnu.trove.THashMap;
+import gnu.trove.THashSet;
 import gnu.trove.TIntArrayList;
 import gnu.trove.TIntHashSet;
-import gnu.trove.TIntIterator;
-import gnu.trove.TIntStack;
 import gnu.trove.TIntIntHashMap;
-import java.util.List;
-import java.util.LinkedList;
-import gnu.trove.TObjectHashingStrategy;
-import java.util.Arrays;
-import net.sourceforge.waters.model.des.ProductDESProxyFactory;
-import gnu.trove.THashSet;
-import net.sourceforge.waters.model.des.EventProxy;
-import net.sourceforge.waters.xsd.base.EventKind;
-import java.util.Iterator;
-import java.util.Collection;
-import gnu.trove.THashMap;
-import net.sourceforge.waters.model.des.AutomatonProxy;
-import net.sourceforge.waters.model.des.TransitionProxy;
-import gnu.trove.TObjectIntHashMap;
-import net.sourceforge.waters.model.des.StateProxy;
-import net.sourceforge.waters.xsd.base.ComponentKind;
-import java.util.Set;
-import net.sourceforge.waters.analysis.AnnotatedMemStateProxy;
-import java.util.Collections;
-import java.util.Map;
-import net.sourceforge.waters.plain.base.NamedElement;
-import net.sourceforge.waters.model.base.ProxyVisitor;
-import net.sourceforge.waters.model.base.VisitorException;
-import net.sourceforge.waters.model.des.ProductDESProxyVisitor;
-import net.sourceforge.waters.analysis.modular.BiSimulator;
+import gnu.trove.TIntIterator;
 import gnu.trove.TIntObjectHashMap;
 import gnu.trove.TIntObjectIterator;
+import gnu.trove.TIntStack;
+import gnu.trove.TObjectHashingStrategy;
+import gnu.trove.TObjectIntHashMap;
 import gnu.trove.TObjectIntIterator;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import net.sourceforge.waters.analysis.AnnotatedMemStateProxy;
+import net.sourceforge.waters.analysis.modular.BiSimulator;
+import net.sourceforge.waters.model.base.ProxyVisitor;
+import net.sourceforge.waters.model.base.VisitorException;
+import net.sourceforge.waters.model.des.AutomatonProxy;
+import net.sourceforge.waters.model.des.EventProxy;
+import net.sourceforge.waters.model.des.ProductDESProxyFactory;
+import net.sourceforge.waters.model.des.ProductDESProxyVisitor;
+import net.sourceforge.waters.model.des.StateProxy;
+import net.sourceforge.waters.model.des.TransitionProxy;
+import net.sourceforge.waters.plain.base.NamedElement;
+import net.sourceforge.waters.xsd.base.ComponentKind;
+import net.sourceforge.waters.xsd.base.EventKind;
 
 public class TauRemoval
 {  
@@ -44,10 +55,13 @@ public class TauRemoval
   private static boolean[] VISITED = null;
   private static TIntStack STACK = new TIntStack();
   private static TIntIntHashMap STATEMAPSTO = new TIntIntHashMap();
-  private static THashMap<TIntHashSet, TIntHashSet> SETS = new THashMap<TIntHashSet, TIntHashSet>();
+  private static THashMap<TIntHashSet, TIntHashSet> SETS =
+    new THashMap<TIntHashSet, TIntHashSet>();
   private static THashMap<Set<Set<EventProxy>>, AnnotationEvent> EVENTSETS =
     new THashMap<Set<Set<EventProxy>>, AnnotationEvent>();
   
+
+  @SuppressWarnings("unchecked")
   public static AutomatonProxy tauRemoval(AutomatonProxy graph,
                                           Set<EventProxy> taus,
                                           EventProxy mark,
@@ -55,7 +69,8 @@ public class TauRemoval
     throws Exception
   {
     TIntHashSet[] tautransitions = new TIntHashSet[graph.getStates().size()];
-    THashSet<int[]>[] statetransitions = new THashSet[graph.getStates().size()];
+    THashSet<int[]>[] statetransitions =
+      new THashSet[graph.getStates().size()];
     StateProxy[] states = new StateProxy[graph.getStates().size()];
     EventProxy[] events = new EventProxy[graph.getEvents().size()];
     states = graph.getStates().toArray(states);
@@ -520,9 +535,11 @@ public class TauRemoval
     }
   }
   
-  private static Set<TIntHashSet>[] annotatedGraph(THashSet<int[]>[] statetransitions,
-                                                   TIntHashSet[] tautransitions,
-                                                   boolean[] marked)
+  @SuppressWarnings("unchecked")
+  private static Set<TIntHashSet>[] annotatedGraph
+    (THashSet<int[]>[] statetransitions,
+     TIntHashSet[] tautransitions,
+     boolean[] marked)
   {
     TIntHashSet[] activeEvents = new TIntHashSet[statetransitions.length];
     Set<TIntHashSet>[] annotations = new Set[statetransitions.length];
@@ -610,6 +627,7 @@ public class TauRemoval
     return an2;
   }
   
+  @SuppressWarnings("unchecked")
   private static void equivalentIncoming(THashSet<int[]>[] statetransitions,
                                          Set<TIntHashSet>[] annotations,
                                          boolean[] marked, boolean[] initial)

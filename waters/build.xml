@@ -184,6 +184,7 @@
         <exclude name="net/sourceforge/waters/gui/**"/>
         <exclude name="net/sourceforge/waters/mbt/**"/>
         <exclude name="net/sourceforge/waters/model/analysis/**"/>
+        <exclude name="net/sourceforge/waters/model/compiler/old/**"/>
         <exclude name="net/sourceforge/waters/samples/**"/>
       </fileset>
     </jar>
@@ -475,7 +476,6 @@
         <include name="net/sourceforge/waters/**"/>
         <exclude name="net/sourceforge/waters/analysis/modular/supremica/**"/>
         <exclude name="net/sourceforge/waters/build/**"/>
-        <exclude name="net/sourceforge/waters/model/compiler/old/**"/>
         <exclude name="net/sourceforge/waters/gui/**"/>
         <exclude name="net/sourceforge/waters/mbt/**"/>
       </packageset>
@@ -496,13 +496,16 @@
     <mkdir dir="${javadoc552}/src"/>
     <copy todir="${javadoc552}/src">
       <fileset dir="${supremica.src}">
-        <include name="net/sourceforge/waters/analysis/comp552/Conflict*"/>
         <include
-           name="net/sourceforge/waters/analysis/comp552/ModelChecker.java"/>
+          name="net/sourceforge/waters/analysis/comp552/ConflictChecker.java"/>
+        <include
+          name="net/sourceforge/waters/analysis/comp552/ConflictMain.java"/>
+        <include
+          name="net/sourceforge/waters/analysis/comp552/ModelChecker.java"/>
         <include name="net/sourceforge/waters/model/**"/>
         <exclude name="net/sourceforge/waters/model/analysis/**"/>
+        <exclude name="net/sourceforge/waters/model/compiler/old/OldModuleCompiler.java"/>
         <include name="net/sourceforge/waters/plain/**"/>
-        <include name="net/sourceforge/waters/subject/**"/>
         <include name="net/sourceforge/waters/valid/**"/>
       </fileset>
     </copy>

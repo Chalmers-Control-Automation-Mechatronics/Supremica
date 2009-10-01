@@ -169,7 +169,7 @@ public class ConflictChecker extends ModelChecker
     for (final EventProxy event : events) {
       tracelist.add(event);
     }
-    // Note. To complete conflict kind field of the trace is optional for
+    // Note. The conflict kind field of the trace is optional for
     // this assignment---it will not be tested.
     final ConflictTraceProxy trace =
       desFactory.createConflictTraceProxy(tracename, model, tracelist,

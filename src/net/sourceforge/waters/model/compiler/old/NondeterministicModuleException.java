@@ -1,7 +1,7 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
 //# PROJECT: Waters
-//# PACKAGE: net.sourceforge.waters.model.compiler
+//# PACKAGE: net.sourceforge.waters.model.compiler.old
 //# CLASS:   NondeterministicModuleException
 //###########################################################################
 //# $Id$
@@ -16,7 +16,7 @@ import net.sourceforge.waters.model.expr.EvalException;
 
 
 /**
- * An exception thrown by the {@link ModuleCompiler} to indicate that
+ * An exception thrown by the compiler to indicate that
  * a graph compiles to a nondeterministic automaton although it is
  * declared to be deterministic.
  *

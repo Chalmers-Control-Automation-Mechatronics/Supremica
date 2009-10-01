@@ -1,26 +1,38 @@
+//# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
+//###########################################################################
+//# PROJECT: Waters
+//# PACKAGE: net.sourceforge.waters.analysis
+//# CLASS:   TransitionRelation
+//###########################################################################
+//# $Id$
+//###########################################################################
+
 package net.sourceforge.waters.analysis;
 
-import gnu.trove.TIntHashSet;
-import java.util.Set;
-import net.sourceforge.waters.model.des.EventProxy;
-import gnu.trove.TIntProcedure;
+import gnu.trove.THashMap;
 import gnu.trove.THashSet;
-import java.util.Iterator;
-import net.sourceforge.waters.model.des.AutomatonProxy;
+import gnu.trove.TIntHashSet;
+import gnu.trove.TIntProcedure;
 import gnu.trove.TObjectIntHashMap;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import net.sourceforge.waters.model.des.AutomatonProxy;
+import net.sourceforge.waters.model.des.EventProxy;
+import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 import net.sourceforge.waters.model.des.StateProxy;
 import net.sourceforge.waters.model.des.TransitionProxy;
-import java.util.Collection;
-import java.util.Map;
-import net.sourceforge.waters.model.des.ProductDESProxyFactory;
-import java.util.ArrayList;
 import net.sourceforge.waters.xsd.base.ComponentKind;
-import java.util.List;
-import gnu.trove.THashMap;
-import java.util.HashSet;
 import net.sourceforge.waters.xsd.base.EventKind;
-import java.util.Collections;
-import java.util.Arrays;
+
 
 public class TransitionRelation
 {
@@ -42,6 +54,7 @@ public class TransitionRelation
     this(aut, marked, aut.getEvents());
   }
   
+  @SuppressWarnings("unchecked")
   public TransitionRelation(AutomatonProxy aut, EventProxy marked,
                             Set<EventProxy> eventsall)
   {
@@ -71,7 +84,8 @@ public class TransitionRelation
     mIsInitial = new boolean[aut.getStates().size()];
     for (StateProxy s : aut.getStates()) {
       stateToInt.put(s, numstates);
-      if (s.getPropositions().contains(marked) || !aut.getEvents().contains(marked)) {
+      if (s.getPropositions().contains(marked) ||
+	  !aut.getEvents().contains(marked)) {
         markState(numstates, true);
       }
       if (s.isInitial()) {
