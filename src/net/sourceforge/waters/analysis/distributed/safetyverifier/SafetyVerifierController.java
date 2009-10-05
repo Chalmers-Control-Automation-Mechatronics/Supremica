@@ -35,210 +35,57 @@ public class SafetyVerifierController extends AbstractController
 
   protected void executeController() throws Exception
   {
-    WorkerErrorCallback realErrorCallback = new WorkerErrorCallback();
-    ErrorCallback errorCallback = 
-      (ErrorCallback)UnicastRemoteObject.exportObject(realErrorCallback, 0);
+    //Create an error callback remote object for the controller.
+    mRealCallback = new WorkerErrorCallback();
+    mErrorCallback = (ErrorCallback)
+      UnicastRemoteObject.exportObject(mRealCallback, 0);
 
-    //Catch any exceptions, use this to unexport the error callback.
+    SafetyVerificationJobResult result = new SafetyVerificationJobResult();
+
     try
       {
-	System.out.println("Running safety verifier controller!");
-	
-	if (getNodes() == null)
-	  throw new IllegalStateException("No nodes was collection set");
-	
-	if (getJob() == null)
-	  throw new IllegalStateException("No job was set");
-	
-	
-	Collection<Node> nodes = getNodes();
-	SafetyVerificationJob job = new SafetyVerificationJob(getJob());
-	
-	//Build a schematic of the model, on which the model checking will
-	//be done.
-	mActualModel = job.getModel();
-	KindTranslator translator = job.getKindTranslator();
-	mModel = SchemaBuilder.build(mActualModel, translator);
-	mStateEncoding = new PackedStateEncoding(mModel);
-	((PackedStateEncoding)mStateEncoding).outputDebugging();
-	//mStateEncoding = new NullStateEncoding(mModel);
-	
-	//Create workers. If this fails the job will fail. Oh well.
-	SafetyVerifierWorker[] workers = new SafetyVerifierWorker[nodes.size()];
-	int k = 0;
-	for (Node n : nodes)
+	initialise();
+
+	result.setName(mJob.getName());
+
+	createWorkers();
+	initialiseStateDistribution();
+	startWorkerProcessingThreads();
+
+	//Begin state exploration.
+	try
 	  {
-	    workers[k] = 
-	      (SafetyVerifierWorker) n.createWorker(getControllerID(), WORKER_CLASS, errorCallback);
-	    k++;
+	    controlStateExploration();
 	  }
-	
-	
-	//Create a set of unique worker IDs.
-	Set<String> workerIdSet = new HashSet<String>();
-	while (workerIdSet.size() < workers.length)
+	catch (TimeupException ex)
 	  {
-	    workerIdSet.add(UUID.randomUUID().toString());
+	    //Job time limit exceeded.
+	    throw new RuntimeException(ex);
 	  }
-	String[] workerIDs = workerIdSet.toArray(new String[0]);
-	
-	//Create the state distribution function, using a parameter
-	//from the job.
-	StateDistribution stateDist = null; 
-	String distname = job.getStateDistribution();
-	if ("prototype".equals(distname))
-	  stateDist = new PrototypeStateDistribution(workerIDs, mModel, mStateEncoding, 8);
-	else 
-	  stateDist = new HashStateDistribution(workerIDs);
-	
-	for (int i = 0; i < workers.length; i++)
+	catch (AsyncWorkerException ex)
 	  {
-	    String id = workerIDs[i];
-	    stateDist.setHandler(id, workers[i]);
+	    //Do something!
+	    throw new RuntimeException(ex);
 	  }
-	
-	
-	//Set job parameters on the workers.
-	for (int i = 0; i < workers.length; i++)
+	catch (StateExplorationException ex)
 	  {
-	    SafetyVerifierWorker w = workers[i];
-	    w.setJob(getJob());
-	    w.setModelSchema(mModel);
-	    w.setStateEncoding(mStateEncoding);
-	    w.setWorkerID(workerIDs[i]);
-	    w.setStateDistribution(stateDist);
+	    //State exploration failed, do some cleanup
+	    //here, collect stats etc.
+	    throw new RuntimeException(ex);
 	  }
-	
-	//Start some processing threads
-	for (SafetyVerifierWorker w : workers)
-	  {
-	    w.startProcessingThreads(2, 8192);
-	  }
-	
-	
-	//Establish the walltime limit. This is stored as the absolute
-	//time when the job should be terminated in milliseconds. This
-	//makes testing easier. If there is no limit, the value will be
-	//less than zero.
-	long startTime = System.currentTimeMillis();
-	long walltimeLimit = -1;
-	if (job.getWalltimeLimit() != null)
-	  walltimeLimit = job.getWalltimeLimit() * 1000 + startTime;
-	
-	System.err.format("The time is %d. The limit is %d\n", startTime, 
-			  walltimeLimit);
-	
-	
-	//Wowza! Add the first state!
-	StateTuple initial = findInitialState();
-	
-	stateDist.addState(initial);
-	
-	StateTuple badState = null;
-	
-	//Store the total message counts for the purposes of
-	//worker stats.
-	long totalIncoming = 0;
-	long totalOutgoing = 0;
-	int totalStates = 0;
-	boolean timeUp = false;
-	
-	while (true)
-	  {
-	    boolean bad = false;
-	    
-	    totalStates = 0;
-	    long total_incoming1 = 0;
-	    long total_incoming2 = 0;
-	    
-	    //Outgoing counts start at 1 to account for adding the
-	    //initial state.
-	    long total_outgoing1 = 1;
-	    long total_outgoing2 = 1;
-	    
-	    for (SafetyVerifierWorker w : workers)
-	      {
-		w.startIdleTest();
-	      }
-	    
-	    
-	    for (SafetyVerifierWorker w : workers)
-	      {
-		StateTuple s = w.getBadState();
-		if (s != null)
-		  {
-		    //Store the first bad state that is found
-		    if (badState == null)
-		      badState = s;
-		    
-		    bad = true;
-		  }
-		
-		totalStates += w.getStateCount();
-		total_incoming1 += w.getIncomingStateCount();
-		total_outgoing1 += w.getOutgoingStateCount();
-	      }
-	    
-	    for (SafetyVerifierWorker w : workers)
-	      {
-		total_incoming2 += w.getIncomingStateCount();
-		total_outgoing2 += w.getOutgoingStateCount();
-	      }
-	    
-	    boolean still_running = false;
-	    for (SafetyVerifierWorker w : workers)
-	      {
-		if (!w.finishIdleTest())
-		  still_running = true;
-	      }
-	    
-	    //Condition for termination: all counters are equal and
-	    //system is not still running (i.e. all nodes are idle)
-	    boolean terminate = total_incoming1 == total_incoming2 
-	      && total_outgoing1 == total_outgoing2 
-	      && total_incoming1 == total_outgoing1
-	      && !still_running;
-	    
-	    //Also terminate if there is a bad state.
-	    if (badState != null)
-	      terminate = true;
-	    
-	    System.out.format("%b %b %b %d %d %d\n", !bad, terminate, still_running,
-			      totalStates, 
-			      total_incoming1, 
-			      total_outgoing1);
-	    
-	    //Check if the job has used up its time limit. This won't
-	    //terminate the job if it just finished.
-	    if (!terminate && walltimeLimit > 0 && walltimeLimit < System.currentTimeMillis())
-	      {
-		timeUp = true;
-		terminate = true;
-		System.err.println("Job walltime expired, terminating");
-	      }
-	    
-	    if (terminate)
-	      {
-		totalIncoming = total_incoming1;
-		totalOutgoing = total_outgoing1;
-		break;
-	      }
-	    
-	    Thread.sleep(2000);
-	  }
-	
-	long explorationTime = System.currentTimeMillis() - startTime;
-	
-	//Pausing the workers would be a good idea. Also check
-	//the bad state now. This tries to find the best available
-	//bad state to start from (as there could be multiple).
+
+
+	//Figure out the result of the state exploration.
+	//This means finding if a bad state was found. For
+	//the purposes of creating a counter-example, we 
+	//find the best bad state (if more than one exists),
+	//as well as the bad event (which caused the property
+	//to fail).
 	int bestDepth = Integer.MAX_VALUE;
-	badState = null;
+	StateTuple badState = null;
 	int badEvent = -1;
-	for (SafetyVerifierWorker w : workers)
+	for (SafetyVerifierWorker w : mWorkers)
 	  {
-	    w.pause();
-	    
 	    StateTuple s = w.getBadState();
 	    if (s != null)
 	      {
@@ -254,74 +101,437 @@ public class SafetyVerifierController extends AbstractController
 		  }
 	      }
 	  }
-	
-	SafetyVerificationJobResult result = new SafetyVerificationJobResult();
-	result.setName(job.getName());
-	
-	long traceTime = 0;
-	
-	if (badState != null)
+
+	//If no bad state was found, then the verification
+	//result is true.
+	boolean verificationResult = badState == null;
+
+	result.setName(mJob.getName());
+	result.setResult(verificationResult);
+
+	//If the verification was unsuccessful, then find
+	//a counter-example.
+	if (verificationResult == false)
 	  {
 	    long traceStart = System.currentTimeMillis();
-	    int[] trace = findCounterExample(badState, badEvent, initial, workers);
-	    
+	    int[] trace = findCounterExample(badState, badEvent, mInitialState, mWorkers);
+
 	    //Convert trace into event objects
 	    EventProxy[] ntrace = translateTraceToEvents(trace);
 	    
-	    traceTime = System.currentTimeMillis() - traceStart;
-	    
-	    result.setResult(false);
+	    mTraceTime = System.currentTimeMillis() - traceStart;
 	    result.setTrace(ntrace);
 	  }
-	else if (timeUp)
-	  {
-	    result.setResult(false);
-	    result.setException(new Exception("Job timed out"));
-	  }
-	else
-	  {
-	    result.setResult(true);
-	    result.setTrace(null);
-	  }
-	
-	
-	//Collect up statistics of interest.
-	JobStats[] workerStats = new JobStats[workers.length];
-	for (int i = 0; i < workers.length; i++)
-	  {
-	    workerStats[i] = workers[i].getWorkerStats();
-	  }
-	
-	
-	JobStats controllerStats = new JobStats();
-	controllerStats.set("job-name", job.getName());
-	controllerStats.set("worker-stats", workerStats);
-	controllerStats.set("bad-state-depth", bestDepth);
-	controllerStats.set("total-states", totalStates);
-	controllerStats.set("total-incoming", totalIncoming);
-	controllerStats.set("total-outgoing", totalOutgoing);
-	
-	//Timing information
-	controllerStats.set("walltime-expired", timeUp);
-	controllerStats.set("exploration-time", explorationTime);
-	controllerStats.set("trace-time", traceTime);
-	controllerStats.set("walltime-limit", job.getWalltimeLimit());
-	
-	result.setJobStats(controllerStats);
-	
-	setResult(result);    
       }
-    catch (Throwable t)
+    catch (Throwable e)
       {
-	//Something happened! Unexport remote objects.
-	UnicastRemoteObject.unexportObject(realErrorCallback, true);
-
-	if (t instanceof Exception)
-	  throw (Exception)t;
+	//Can't just throw e, because the compiler will want 
+	//us to declare the method as throwing Throwable, but
+	//that's too general and shouldn't happen.
+	if (e instanceof Error)
+	  throw (Error)e;
+	else if (e instanceof Exception)
+	  {
+	    result.setException((Exception)e);
+	    throw (Exception)e;
+	  }
 	else
-	  throw new RuntimeException(t);
+	  throw new RuntimeException("Caught an unexpected throwable!", e);
+      }
+    finally
+      {
+	//Try and get stats for the job. On a successful run there shouldn't be any problems with this
+	result.setJobStats(getControllerStats());
+	setResult(result);
+
+	//Unexport the error callback.
+	UnicastRemoteObject.unexportObject(mRealCallback, true);
       }
   }
+
+  /**
+   * Initialise some data for the job, construct model schematic.
+   */
+  private void initialise() throws Exception
+  {
+    if (getNodes() == null)
+      throw new IllegalArgumentException("No nodes collection was set");
+    if (getJob() == null)
+      throw new IllegalArgumentException("No job was set");
+
+    mNodes = getNodes();
+    
+    if (mNodes.size() == 0)
+      throw new IllegalArgumentException("Node collection was empty");
+    mJob = new SafetyVerificationJob(getJob());
+
+    //Extract parameters from the job.
+    mActualModel = mJob.getModel();
+    
+    if (mActualModel == null)
+      throw new IllegalArgumentException("No model was set");
+
+    mTranslator = mJob.getKindTranslator();
+
+    if (mTranslator == null)
+      throw new IllegalArgumentException("No KindTranslator was set");
+
+    try
+      {
+	mModel = SchemaBuilder.build(mActualModel, mTranslator);
+      }
+    catch (Exception e)
+      {
+	throw new RuntimeException("Building model schematic failed", e);
+      }
+
+    mStateEncoding = createStateEncoding();
+  }
+
+  private StateEncoding createStateEncoding()
+  {
+    return new PackedStateEncoding(mModel);
+  }
+
+  private void createWorkers() throws Exception
+  {
+    mWorkers = new SafetyVerifierWorker[mNodes.size()];
+    
+    int k = 0;
+    for (Node n : mNodes)
+      {
+	mWorkers[k++] =
+	  (SafetyVerifierWorker) n.createWorker(getControllerID(), WORKER_CLASS, mErrorCallback);
+      }
+						
+    //Create some unique IDs for the workers.
+    Set<String> workerIdSet = new HashSet<String>();
+    while (workerIdSet.size() < mWorkers.length)
+      {
+	workerIdSet.add("worker-" + UUID.randomUUID().toString());
+      }
+
+    mWorkerIDs = workerIdSet.toArray(new String[0]);
+    
+    //Set parameters on workers.
+    for (int i = 0; i < mWorkers.length; i++)
+      {
+	SafetyVerifierWorker w = mWorkers[i];
+	w.setJob(getJob());
+	w.setModelSchema(mModel);
+	w.setStateEncoding(mStateEncoding);
+	w.setWorkerID(mWorkerIDs[i]);
+      }
+  }
+
+  private void initialiseStateDistribution() throws Exception
+  {
+    mStateDistribution = createStateDistribution();
+
+    for (int i = 0; i < mWorkers.length; i++)
+      {
+	String id = mWorkerIDs[i];
+	mStateDistribution.setHandler(id, mWorkers[i]);
+      }
+
+    for (SafetyVerifierWorker w : mWorkers)
+      {
+	w.setStateDistribution(mStateDistribution);
+      }
+  }
+
+  private StateDistribution createStateDistribution() throws Exception
+  {
+    String distname = mJob.getStateDistribution();
+    if ("prototype".equals(distname))
+      return new PrototypeStateDistribution(mWorkerIDs, mModel, mStateEncoding, 8);
+    else
+      return new HashStateDistribution(mWorkerIDs);
+  }
+
+  private void startWorkerProcessingThreads() throws Exception
+  {
+    for (SafetyVerifierWorker w : mWorkers)
+      {
+	w.startProcessingThreads(2, 8192);  //Arbitrarily chosen numbers
+      }
+  }
+
+  //Some specific exceptions for dealing with various failure modes.
+  private static class StateExplorationException extends Exception
+  {
+    public StateExplorationException(String message, Exception e)
+    {
+      super(message, e);
+    }
+  }
+
+  /**
+   * A worker has failed asynchronously, this exception is thrown when
+   * something detects the failure and needs to handle it.
+   */
+  private static class AsyncWorkerException extends Exception
+  {
+    public AsyncWorkerException(String message, String workerid, Throwable e)
+    {
+      super(message, e);
+      
+      mWorkerID = workerid;
+    }
+
+    public String getWorkerID()
+    {
+      return mWorkerID;
+    }
+
+    private String mWorkerID;
+  }
+
+  private static class TimeupException extends StateExplorationException
+  {
+    public TimeupException(String message)
+    {
+      super(message, null);
+    }
+  } 
+
+  /**
+   * Control logic for the state exploration. This is a 
+   * fairly long bit of code.
+   *
+   * A StateExplorationException will be thrown if exploration
+   * fails. Upon termination of exploration, all workers will be
+   * paused to prevent further state exploration.
+   * @throws StateExplorationException if something bad happens.
+   */
+  private void controlStateExploration() 
+    throws StateExplorationException, AsyncWorkerException
+  {
+    //Establish the walltime limit. This is stored as the absolute
+    //time when the job should be terminated in milliseconds. This
+    //makes testing easier. If there is no limit, the value will be
+    //less than zero.
+    long startTime = System.currentTimeMillis();
+    long walltimeLimit = -1;
+
+    if (mJob.getWalltimeLimit() != null)
+      walltimeLimit = mJob.getWalltimeLimit() * 1000 + startTime;
+
+    try
+      {
+	//At this point, the workers are all waiting for something
+	//to do. To start the state exploration, we just need to
+	//add the initial state to the appropriate worker.
+	mInitialState = findInitialState();
+	mStateDistribution.addState(mInitialState);
+	
+	//Reasons for termination. Used after the main
+	//while loop to figure out the current state.
+	boolean timeUp = false;
+	boolean hasBadState = false;
+	
+      exploration: while (true)
+	  {
+	    //For termination detection, the total number of incoming and
+	    //outgoing messages are counted twice.  If all the counts are
+	    //equal, then there has been no communication between workers
+	    //between the counts.  This is the 4 counter algorithm from
+	    //"Algorithms for distributed termination detection"
+	    //(Friedemann Mattern, 1987). The technique published in that
+	    //paper assumes messages can only be sent when the node is
+	    //idle, however this is not the case in this program.  In
+	    //addition to the message counts, an idle test is done on each
+	    //worker, which checks if they do any significant work during
+	    //the termination test.
+
+	    //Outgoing message counts adjusted to include the initial 
+	    //state being dispatched to the appropriate worker.
+	    long totalIncoming1 = 0;
+	    long totalOutgoing1 = 1;
+	    long totalIncoming2 = 0;
+	    long totalOutgoing2 = 1;
+	    long totalStates = 0;
+	    
+	    for (SafetyVerifierWorker w : mWorkers)
+	      w.startIdleTest();
+
+	    
+	    //Check for bad states. If found, then set
+	    //flag and break out of loop
+	    for (SafetyVerifierWorker w : mWorkers)
+	      if (w.getBadState() != null)
+		{
+		  hasBadState = true;
+		  break exploration;
+		}
+
+	    //Do first count, also count the number of
+	    //explored states, so that status can be 
+	    //printed out.
+	    for (SafetyVerifierWorker w : mWorkers)
+	      {
+		totalStates += w.getStateCount();
+		totalIncoming1 += w.getIncomingStateCount();
+		totalOutgoing1 += w.getOutgoingStateCount();
+	      }
+
+	    //Count states a second time, so that we can
+	    //ensure nothing has happened.
+	    for (SafetyVerifierWorker w :mWorkers)
+	      {
+		totalIncoming2 += w.getIncomingStateCount();
+		totalOutgoing2 += w.getOutgoingStateCount();
+	      }
+
+	    //Determine if the workers have run while counting
+	    //messages (indicative of some kind of activity)
+	    boolean stillRunning = false;
+	    for (SafetyVerifierWorker w : mWorkers)
+	      if (!w.finishIdleTest())
+		{
+		  stillRunning = true;
+		  break;
+		}
+
+	    //Calculate the termination 'predicate' -- if the
+	    //counters are all equal and the workers are not
+	    //still running.
+	    boolean terminate = totalIncoming1 == totalIncoming2
+	      && totalOutgoing1 == totalOutgoing2
+	      && totalIncoming1 == totalOutgoing1
+	      && !stillRunning;
+
+	    System.out.format("%b %d %d %d\n", terminate, totalStates, totalIncoming2, totalOutgoing2);
+
+	    //Update some global stat counters now. This means if it
+	    //terminates, we won't lose them
+	    mTotalStates = totalStates;
+	    mTotalIncoming = totalIncoming2;
+	    mTotalOutgoing = totalOutgoing2;
+
+	    //Check the termination predicate and store any
+	    //necessary state.
+	    if (terminate)
+	      {
+		break exploration;
+	      }
+
+	    if (walltimeLimit > 0 && walltimeLimit < System.currentTimeMillis())
+	      {
+		throw new TimeupException("Job walltime exceeded");
+	      }
+
+	    //Check for asynchronous errors.
+	    if (mRealCallback.hasErrored())
+	      {
+		Throwable t = mRealCallback.getFirstError();
+		String workerid = mRealCallback.getFirstErrorWorkerID();
+		throw new AsyncWorkerException("Asynchronous worker error detected from " + workerid,
+					       workerid,
+					       t);
+	      }
+
+	    
+	    updatePeriodicStats();
+
+	    Thread.sleep(2000);
+	  }
+      }
+    catch (Exception e)
+      {
+	throw new StateExplorationException("Exploration failed", e);
+      }
+    finally
+      {
+	mExplorationTime = System.currentTimeMillis() - startTime;
+
+	//Pause workers.
+	for (SafetyVerifierWorker w : mWorkers)
+	  {
+	    try
+	      {
+		w.pause();
+	      }
+	    catch (Exception e)
+	      {
+		//Excuses. This could probably be made more descriptive.
+		System.err.format("Worker didn't pause?");
+	      }
+	  }
+      }
+  }
+  
+  private JobStats[] getWorkerStats()
+  {
+    JobStats[] stats = new JobStats[mWorkers.length];
+    for (int i = 0; i < stats.length; i++)
+      {
+	if (mWorkers[i] != null)
+	  {
+	    try
+	      {
+		stats[i] = mWorkers[i].getWorkerStats();
+	      }
+	    catch (RemoteException e)
+	      {
+		//Oh well, null shall be stored
+	      }
+	  }
+
+	//If no stats were obtained (for whatever reason),
+	//try the periodic stats
+	if (stats[i] == null && mPeriodicStats != null)
+	  {
+	    stats[i] = mPeriodicStats[i];
+	  }
+      }
+
+    return stats;
+  }
+  
+  private JobStats getControllerStats()
+  {
+    JobStats stats = new JobStats();
+    stats.set("job-name", mJob.getName());
+    stats.set("worker-stats", getWorkerStats());
+    
+    stats.set("exploration-time", mExplorationTime);
+    stats.set("trace-time", mTraceTime);
+
+    stats.set("total-states", mTotalStates);
+    stats.set("total-incoming", mTotalIncoming);
+    stats.set("total-outgoing", mTotalOutgoing);
+    
+    return stats;
+  }
+
+
+  /**
+   * Keep an archive of the last good stats for each worker.
+   * This means that if a worker goes down we have a record of it.
+   */
+  private void updatePeriodicStats()
+  {
+    //The get worker stats method also looks at the periodic stats
+    //table. This isn't really a problem but it means we will get 
+    //given archived versions of stats.
+    JobStats[] stats = getWorkerStats();
+
+    if (mPeriodicStats == null)
+      mPeriodicStats = stats;
+    else
+      {
+	for (int i = 0; i < stats.length; i++)
+	  {
+	    if (stats[i] != null)
+	      {
+		stats[i].set("archived", true);
+		mPeriodicStats[i] = stats[i];
+	      }
+	  }
+      }
+  }
+
 
   /**
    * Translates event ids into EventProxy objects. This is used to get
@@ -397,8 +607,16 @@ public class SafetyVerifierController extends AbstractController
   {
     public synchronized void handle(String workerid, Worker worker, Throwable throwable)
     {
+      //System.err.format("An error occurred: %s\n", throwable);
+      //throwable.printStackTrace();
       mErrored = true;
       mErrorMap.put(workerid, throwable);
+
+      if (mFirstError == null)
+	{
+	  mFirstError = throwable;
+	  mFirstErrorWorkerID = workerid;
+	}
     }
 
     public synchronized Throwable getErrorForWorker(String workerid)
@@ -406,9 +624,14 @@ public class SafetyVerifierController extends AbstractController
       return mErrorMap.get(workerid);
     }
 
-    public synchronized Throwable getLastError()
+    public synchronized Throwable getFirstError()
     {
-      return mLastError;
+      return mFirstError;
+    }
+
+    public synchronized String getFirstErrorWorkerID()
+    {
+      return mFirstErrorWorkerID;
     }
 
     public synchronized boolean hasErrored()
@@ -417,14 +640,33 @@ public class SafetyVerifierController extends AbstractController
     }
 
     private boolean mErrored = false;
-    private Throwable mLastError = null;
+    private Throwable mFirstError = null;
+    private String mFirstErrorWorkerID = null;
     private Map<String,Throwable> mErrorMap = new HashMap<String,Throwable>();
   }
 
 
+  private WorkerErrorCallback mRealCallback;
+  private ErrorCallback mErrorCallback;
+  private Collection<Node> mNodes;
+  private SafetyVerificationJob mJob;
+  private KindTranslator mTranslator;
+  private SafetyVerifierWorker[] mWorkers;
+  private String[] mWorkerIDs;
   private ProductDESProxy mActualModel;
   private ProductDESSchema mModel;
   private StateEncoding mStateEncoding;
+  private StateDistribution mStateDistribution;
+  private StateTuple mInitialState = null;
+
+  private JobStats[] mPeriodicStats = null;
+
+  //Values for timekeeping and other stats.
+  private long mExplorationTime = 0;
+  private long mTraceTime = 0;
+  private long mTotalStates = 0;
+  private long mTotalIncoming = 0;
+  private long mTotalOutgoing = 0;
 
   private static final String WORKER_CLASS = "net.sourceforge.waters.analysis.distributed.safetyverifier.SafetyVerifierWorkerImpl";
 }

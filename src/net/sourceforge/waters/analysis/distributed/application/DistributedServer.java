@@ -109,6 +109,8 @@ public class DistributedServer
 
   public JobResult submitJob(Job job)
   {
+    JobResult result = new JobResult();
+
     try
       {
 	if (job.getController() == null)
@@ -155,10 +157,14 @@ public class DistributedServer
 		e.printStackTrace();
 	      }
 	  }
+
+	result = control.getResult();
+	if (result == null)
+	  result = new JobResult();
 	
 	if (control.getState() == ControllerState.COMPLETED)
 	  {
-	    JobResult result = control.getResult();
+	    result = control.getResult();
 	    return result;
 	  }
 	else if (control.getState() == ControllerState.EXCEPTION)
@@ -168,7 +174,6 @@ public class DistributedServer
       }
     catch (Exception e)
       {
-	JobResult result = new JobResult();
 	result.setException(e);
 	return result;
       }

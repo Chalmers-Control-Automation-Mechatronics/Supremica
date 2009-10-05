@@ -85,6 +85,9 @@ public class ResultAnalyser
     boolean first = true;
     for (JobStats s : workers)
       {
+	if (s == null)
+	  continue;
+
 	//Separate entries with a newline. Don't 
 	//put a newline in for the first one though
 	if (!first)

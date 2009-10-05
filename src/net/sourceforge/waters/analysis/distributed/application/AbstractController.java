@@ -69,7 +69,7 @@ public abstract class AbstractController implements Controller
 
   public final JobResult getResult() throws IllegalStateException
   {
-    if (getState() != ControllerState.COMPLETED)
+    if (getState() == ControllerState.NOT_RUN)
       {
 	throw new IllegalStateException("Getting result before job "+
 					"has completed successfully is " +
