@@ -106,19 +106,19 @@ public class ConflictChecker extends ModelChecker
       // Is the marking proposition in the alphabet?
       final Collection<EventProxy> events = aut.getEvents();
       if (events.contains(mMarking)) {
-	// Yes, this automaton has explicit markings.
-	// For each state ...
-	for (final StateProxy state : aut.getStates()) {
-	  // Does the list of propositions contain the marking proposition?
-	  final Collection<EventProxy> props = state.getPropositions();
-	  if (props.contains(mMarking)) {
-	    // Yes --- this is a marked state.
-	    count++;
-	  }
-	}
+        // Yes, this automaton has explicit markings.
+        // For each state ...
+        for (final StateProxy state : aut.getStates()) {
+          // Does the list of propositions contain the marking proposition?
+          final Collection<EventProxy> props = state.getPropositions();
+          if (props.contains(mMarking)) {
+            // Yes --- this is a marked state.
+            count++;
+          }
+        }
       } else {
-	// Marking proposition not in alphabet: all states marked implicitly.
-	count += aut.getStates().size();
+        // Marking proposition not in alphabet: all states marked implicitly.
+        count += aut.getStates().size();
       }
     }
     // Print the number of marked states that we have counted.
