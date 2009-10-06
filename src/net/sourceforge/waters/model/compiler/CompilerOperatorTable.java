@@ -13,18 +13,14 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
 
-import net.sourceforge.waters.model.compiler.old.CompiledIntValue;
-import net.sourceforge.waters.model.compiler.old.CompiledIntRangeValue;
 import net.sourceforge.waters.model.expr.AbstractOperatorTable;
 import net.sourceforge.waters.model.expr.AbstractSimpleExpressionSimplifier;
 import net.sourceforge.waters.model.expr.BinaryOperator;
 import net.sourceforge.waters.model.expr.EvalException;
-import net.sourceforge.waters.model.expr.IntValue;
 import net.sourceforge.waters.model.expr.Operator;
 import net.sourceforge.waters.model.expr.OperatorTable;
 import net.sourceforge.waters.model.expr.TypeMismatchException;
 import net.sourceforge.waters.model.expr.UnaryOperator;
-import net.sourceforge.waters.model.expr.Value;
 import net.sourceforge.waters.model.module.BinaryExpressionProxy;
 import net.sourceforge.waters.model.module.IdentifierProxy;
 import net.sourceforge.waters.model.module.ModuleProxyFactory;
@@ -417,23 +413,6 @@ public class CompilerOperatorTable extends AbstractOperatorTable {
       }
     }
 
-    public Value eval(final Value lhsValue, final Value rhsValue)
-      throws EvalException
-    {
-      if (!(lhsValue instanceof IntValue)) {
-        throw new TypeMismatchException(lhsValue, "INTEGER");
-      }
-      if (!(rhsValue instanceof IntValue)) {
-        throw new TypeMismatchException(rhsValue, "INTEGER");
-      }
-      final IntValue lhsIntValue = (IntValue) lhsValue;
-      final IntValue rhsIntValue = (IntValue) rhsValue;
-      final int lhs = lhsIntValue.getValue();
-      final int rhs = rhsIntValue.getValue();
-      final int result = eval(lhs, rhs);
-      return new CompiledIntValue(result);
-    }
-
     //#######################################################################
     //# Interface net.sourceforge.waters.model.expr.BinaryOperator
     public int getAssociativity()
@@ -771,19 +750,6 @@ public class CompilerOperatorTable extends AbstractOperatorTable {
       }
     }
 
-    public CompiledIntValue eval(final Value argValue)
-      throws EvalException
-    {
-      if (!(argValue instanceof IntValue)) {
-        throw new TypeMismatchException(argValue, "INTEGER");
-      }
-      final IntValue argIntValue = (IntValue) argValue;
-      final int arg = argIntValue.getValue();
-      final int result = eval(arg);
-      return new CompiledIntValue(result);
-    }
-
-
     //#######################################################################
     //# Provided by Subclasses
     abstract int eval(int arg)
@@ -876,13 +842,6 @@ public class CompilerOperatorTable extends AbstractOperatorTable {
       } else {
         return createExpression(simplifier, simpLHS, simpRHS);
       }
-    }
-
-    public CompiledIntValue eval(final Value lhsValue, final Value rhsValue)
-    {
-      final boolean result = lhsValue.equals(rhsValue);
-      final boolean eresult = getEqualsResult();
-      return new CompiledIntValue(result ? eresult : !eresult);
     }
 
     //#######################################################################
@@ -1006,23 +965,6 @@ public class CompilerOperatorTable extends AbstractOperatorTable {
       } else {
         return createExpression(simplifier, simpLHS, simpRHS);
       }
-    }
-
-    public Value eval(final Value lhsValue, final Value rhsValue)
-      throws EvalException
-    {
-      if (!(lhsValue instanceof IntValue)) {
-        throw new TypeMismatchException(lhsValue, "INTEGER");
-      }
-      if (!(rhsValue instanceof IntValue)) {
-        throw new TypeMismatchException(rhsValue, "INTEGER");
-      }
-      final IntValue lhsIntValue = (IntValue) lhsValue;
-      final IntValue rhsIntValue = (IntValue) rhsValue;
-      final int lhs = lhsIntValue.getValue();
-      final int rhs = rhsIntValue.getValue();
-      final boolean result = eval(lhs, rhs);
-      return new CompiledIntValue(result);
     }
 
     //#######################################################################
@@ -1211,29 +1153,6 @@ public class CompilerOperatorTable extends AbstractOperatorTable {
       }
     }
 
-    public Value eval(final Value lhsValue, final Value rhsValue)
-      throws EvalException
-    {
-      if (!(lhsValue instanceof IntValue)) {
-        throw new TypeMismatchException(lhsValue, "BOOLEAN");
-      }
-      final IntValue lhsIntValue = (IntValue) lhsValue;
-      final int lhs = lhsIntValue.getValue();
-      if (lhs < 0 || lhs > 1) {
-        throw new TypeMismatchException(lhsValue, "BOOLEAN");
-      }
-      if (!(rhsValue instanceof IntValue)) {
-        throw new TypeMismatchException(rhsValue, "BOOLEAN");
-      }
-      final IntValue rhsIntValue = (IntValue) rhsValue;
-      final int rhs = rhsIntValue.getValue();
-      if (rhs < 0 || rhs > 1) {
-        throw new TypeMismatchException(rhsValue, "BOOLEAN");
-      }
-      final boolean result = eval(lhs != 0, rhs != 0);
-      return new CompiledIntValue(result);
-    }
-
     //#######################################################################
     //# Interface net.sourceforge.waters.model.expr.BinaryOperator
     public int getAssociativity()
@@ -1401,22 +1320,6 @@ public class CompilerOperatorTable extends AbstractOperatorTable {
       }
     }
 
-    public CompiledIntValue eval(final Value argValue)
-      throws EvalException
-    {
-      if (!(argValue instanceof IntValue)) {
-        throw new TypeMismatchException(argValue, "BOOLEAN");
-      }
-      final IntValue argIntValue = (IntValue) argValue;
-      final int arg = argIntValue.getValue();
-      if (arg < 0 || arg > 1) {
-        throw new TypeMismatchException(argValue, "BOOLEAN");
-      }
-      final boolean result = eval(arg != 0);
-      return new CompiledIntValue(result);
-    }
-
-
     //#######################################################################
     //# Provided by Subclasses
     abstract boolean eval(boolean arg)
@@ -1515,23 +1418,6 @@ public class CompilerOperatorTable extends AbstractOperatorTable {
       return createExpression(simplifier, simpLHS, simpRHS);
     }
 
-    public CompiledIntRangeValue eval(final Value lhsValue,
-                                      final Value rhsValue)
-      throws TypeMismatchException
-    {
-      if (!(lhsValue instanceof IntValue)) {
-        throw new TypeMismatchException(lhsValue, "INTEGER");
-      }
-      if (!(rhsValue instanceof IntValue)) {
-        throw new TypeMismatchException(rhsValue, "INTEGER");
-      }
-      final IntValue lhsIntValue = (IntValue) lhsValue;
-      final IntValue rhsIntValue = (IntValue) rhsValue;
-      final int lhs = lhsIntValue.getValue();
-      final int rhs = rhsIntValue.getValue();
-      return new CompiledIntRangeValue(lhs, rhs);
-    }
-
   }
 
 
@@ -1601,11 +1487,6 @@ public class CompilerOperatorTable extends AbstractOperatorTable {
       return OPNAME_ASSIGNMENT;
     }
 
-    public Value eval(final Value lhsValue, final Value rhsValue)
-    {
-      return rhsValue;
-    }
-
   }
 
 
@@ -1636,23 +1517,6 @@ public class CompilerOperatorTable extends AbstractOperatorTable {
     public String getName()
     {
       return OPNAME_INCREMENT;
-    }
-
-    public Value eval(final Value lhsValue, final Value rhsValue)
-      throws EvalException
-    {
-      if (!(lhsValue instanceof IntValue)) {
-        throw new TypeMismatchException(lhsValue, "INTEGER");
-      }
-      if (!(rhsValue instanceof IntValue)) {
-        throw new TypeMismatchException(rhsValue, "INTEGER");
-      }
-      final IntValue lhsIntValue = (IntValue) lhsValue;
-      final IntValue rhsIntValue = (IntValue) rhsValue;
-      final int lhs = lhsIntValue.getValue();
-      final int rhs = rhsIntValue.getValue();
-      final int result = lhs + rhs;
-      return new CompiledIntValue(result);
     }
 
   }
@@ -1687,23 +1551,6 @@ public class CompilerOperatorTable extends AbstractOperatorTable {
       return OPNAME_DECREMENT;
     }
 
-    public Value eval(final Value lhsValue, final Value rhsValue)
-      throws EvalException
-    {
-      if (!(lhsValue instanceof IntValue)) {
-        throw new TypeMismatchException(lhsValue, "INTEGER");
-      }
-      if (!(rhsValue instanceof IntValue)) {
-        throw new TypeMismatchException(rhsValue, "INTEGER");
-      }
-      final IntValue lhsIntValue = (IntValue) lhsValue;
-      final IntValue rhsIntValue = (IntValue) rhsValue;
-      final int lhs = lhsIntValue.getValue();
-      final int rhs = rhsIntValue.getValue();
-      final int result = lhs - rhs;
-      return new CompiledIntValue(result);
-    }
-
   }
 
 
@@ -1736,29 +1583,6 @@ public class CompilerOperatorTable extends AbstractOperatorTable {
       return OPNAME_ANDWITH;
     }
 
-    public Value eval(final Value lhsValue, final Value rhsValue)
-      throws EvalException
-    {
-      if (!(lhsValue instanceof IntValue)) {
-        throw new TypeMismatchException(lhsValue, "BOOLEAN");
-      }
-      final IntValue lhsIntValue = (IntValue) lhsValue;
-      final int lhs = lhsIntValue.getValue();
-      if (lhs < 0 || lhs > 1) {
-        throw new TypeMismatchException(lhsValue, "BOOLEAN");
-      }
-      if (!(rhsValue instanceof IntValue)) {
-        throw new TypeMismatchException(rhsValue, "BOOLEAN");
-      }
-      final IntValue rhsIntValue = (IntValue) rhsValue;
-      final int rhs = rhsIntValue.getValue();
-      if (rhs < 0 || rhs > 1) {
-        throw new TypeMismatchException(rhsValue, "BOOLEAN");
-      }
-      final int result = lhs & rhs;
-      return new CompiledIntValue(result);
-    }
-
   }
 
 
@@ -1789,29 +1613,6 @@ public class CompilerOperatorTable extends AbstractOperatorTable {
     public String getName()
     {
       return OPNAME_ORWITH;
-    }
-
-    public Value eval(final Value lhsValue, final Value rhsValue)
-      throws EvalException
-    {
-      if (!(lhsValue instanceof IntValue)) {
-        throw new TypeMismatchException(lhsValue, "BOOLEAN");
-      }
-      final IntValue lhsIntValue = (IntValue) lhsValue;
-      final int lhs = lhsIntValue.getValue();
-      if (lhs < 0 || lhs > 1) {
-        throw new TypeMismatchException(lhsValue, "BOOLEAN");
-      }
-      if (!(rhsValue instanceof IntValue)) {
-        throw new TypeMismatchException(rhsValue, "BOOLEAN");
-      }
-      final IntValue rhsIntValue = (IntValue) rhsValue;
-      final int rhs = rhsIntValue.getValue();
-      if (rhs < 0 || rhs > 1) {
-        throw new TypeMismatchException(rhsValue, "BOOLEAN");
-      }
-      final int result = lhs | rhs;
-      return new CompiledIntValue(result);
     }
 
   }
@@ -1893,13 +1694,6 @@ public class CompilerOperatorTable extends AbstractOperatorTable {
       return simplifier.simplify(qual);
     }
 
-    public Value eval(final Value lhsValue, final Value rhsValue)
-      throws EvalException
-    {
-      throw new IllegalStateException
-        ("BinaryQualificationOperator cannot be evaluated!");
-    }
-
   }
 
 
@@ -1940,12 +1734,6 @@ public class CompilerOperatorTable extends AbstractOperatorTable {
     public int getReturnTypes(final int argType)
     {
       return argType & Operator.TYPE_INDEX;
-    }
-
-    public Value eval(final Value argValue)
-      throws EvalException
-    {
-      throw new EvalException("Next cannot be avaluated!");
     }
 
   }

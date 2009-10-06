@@ -48,33 +48,6 @@ public class TypeMismatchException extends EvalException {
           "' is not bound to a " + typename + "!",
           binding);
   }
-
-  /**
-   * Constructs a new exception indicating that the given value is not
-   * of an expected type.
-   * @param  value    The value that is not well-types.
-   * @param  typename The name of the expected type.
-   */
-  public TypeMismatchException(final Value value, final String typename)
-  {
-    super("Value '" + value + "' is not of type " + typename + "!");
-  }
-
-  /**
-   * Constructs a new exception indicating that the given expression is not
-   * well-typed.
-   * @param  expr     The subterm that is not well-typed.
-   * @param  subvalue The value to which that subterm has been evaluated.
-   * @param  typename The name of the expected type.
-   */
-  public TypeMismatchException(final Proxy expr,
-                               final Value subvalue,
-                               final String typename)
-  {
-    super("Expression '" + expr +
-          "' (evaluated to " + subvalue + ") is not of type " +
-          typename + "!", expr);
-  }
   
   
   //#########################################################################

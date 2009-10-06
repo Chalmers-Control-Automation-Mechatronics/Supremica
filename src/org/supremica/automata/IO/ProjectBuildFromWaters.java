@@ -64,7 +64,6 @@ import java.util.Collection;
 import java.util.Iterator;
 
 import net.sourceforge.waters.model.compiler.ModuleCompiler;
-import net.sourceforge.waters.model.compiler.old.OldModuleCompiler;
 import net.sourceforge.waters.model.des.*;
 import net.sourceforge.waters.model.expr.EvalException;
 import net.sourceforge.waters.model.marshaller.DocumentManager;
@@ -148,22 +147,14 @@ public class ProjectBuildFromWaters
 		final boolean expand = Config.EXPAND_EXTENDED_AUTOMATA.isTrue();
         final ProductDESProxyFactory factory =
             ProductDESElementFactory.getInstance();
-		final ProductDESProxy des;
-		if (Config.USE_OLD_COMPILER.isTrue()) {
-			final OldModuleCompiler compiler =
-				new OldModuleCompiler(mDocumentManager, factory, module);
-			compiler.setExpandingEFATransitions(expand);
-			des = compiler.compile();
-		} else {
-			final boolean optimize = Config.OPTIMIZING_COMPILER.isTrue();
-			final boolean ealpha = Config.USE_EVENT_ALPHABET.isTrue();
-			final ModuleCompiler compiler =
-				new ModuleCompiler(mDocumentManager, factory, module);
-			compiler.setOptimizationEnabled(optimize);
-			compiler.setExpandingEFATransitions(expand);
-			compiler.setUsingEventAlphabet(ealpha);
-			des = compiler.compile();
-		}
+		final boolean optimize = Config.OPTIMIZING_COMPILER.isTrue();
+		final boolean ealpha = Config.USE_EVENT_ALPHABET.isTrue();
+		final ModuleCompiler compiler =
+			new ModuleCompiler(mDocumentManager, factory, module);
+		compiler.setOptimizationEnabled(optimize);
+		compiler.setExpandingEFATransitions(expand);
+		compiler.setUsingEventAlphabet(ealpha);
+		final ProductDESProxy des = compiler.compile();
         return build(des);
     }
 

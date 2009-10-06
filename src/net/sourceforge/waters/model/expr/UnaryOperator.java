@@ -50,6 +50,4 @@ public interface UnaryOperator extends Operator {
      AbstractSimpleExpressionSimplifier simplifier)
     throws EvalException;
 
-  public Value eval(Value arg) throws EvalException;
-
 }

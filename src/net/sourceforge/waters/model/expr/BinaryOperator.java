@@ -53,8 +53,6 @@ public interface BinaryOperator extends Operator {
      AbstractSimpleExpressionSimplifier simplifier)
     throws EvalException;
 
-  public Value eval(Value lhs, Value rhs) throws EvalException;
-
 
   //#########################################################################
   //# Class Constants

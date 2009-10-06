@@ -42,7 +42,7 @@ public interface WorkerLocal
 
   /**
    * Gets the worker proxy object.
-   * @returns proxy object for this worker.
+   * @return proxy object for this worker.
    */
   public Worker getWorkerProxy();
 
