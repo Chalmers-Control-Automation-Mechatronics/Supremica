@@ -50,12 +50,7 @@
 
 package org.supremica.automata.BDD;
 
-//import org.supremica.automata.BDD.EFA.BDDExtendedAutomaton;
-//import org.supremica.automata.BDD.EFA.BDDExtendedAutomata;
 import net.sf.javabdd.*;
-import org.supremica.log.*;
-import org.supremica.util.SupremicaException;
-import java.util.*;
 
 public class BDDMonolithicTransitions
     implements BDDTransitions
@@ -82,7 +77,12 @@ public class BDDMonolithicTransitions
             transitionForwardBDD = transitionForwardBDD.and(currAutomaton.getTransitionForwardConjunctiveBDD());
             transitionBackwardBDD = transitionBackwardBDD.and(currAutomaton.getTransitionBackwardConjunctiveBDD());
         }
-        
+
+        //smarter way to obtain backward transitions
+/*        transitionBackwardBDD = transitionForwardBDD.replace(bddAutomata.sourceToTempStatePairing);
+        transitionBackwardBDD = transitionBackwardBDD.replace(bddAutomata.destToSourceStatePairing);
+        transitionBackwardBDD = transitionBackwardBDD.replace(bddAutomata.tempToDestStatePairing);
+*/
         myTransitionForwardBDD = transitionForwardBDD;
         myTransitionBackwardBDD = transitionBackwardBDD;  
         

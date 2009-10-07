@@ -55,52 +55,23 @@
 package org.supremica.automata;
 
 import java.io.File;
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.Unmarshaller;
-import javax.xml.bind.JAXBException;
 
-import java.util.Iterator;
-import java.util.Set;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.LinkedList;
 import java.util.ArrayList;
-import java.util.Map;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.StringTokenizer;
 
-import java.io.Reader;
-import java.io.StringReader;
-import java_cup.runtime.Scanner;
-
-import net.sourceforge.fuber.model.Variables;
-import net.sourceforge.fuber.model.IntegerVariable;
-
-import net.sourceforge.fuber.model.interpreters.Finder;
-import net.sourceforge.fuber.model.interpreters.Evaluator;
-import net.sourceforge.fuber.model.interpreters.Printer;
-import net.sourceforge.fuber.model.interpreters.efa.Lexer;
-import net.sourceforge.fuber.model.interpreters.efa.Parser;
-import net.sourceforge.fuber.model.interpreters.abstractsyntax.Goal;
-import net.sourceforge.fuber.model.interpreters.abstractsyntax.StatementList;
-import net.sourceforge.fuber.model.interpreters.abstractsyntax.Expression;
-import net.sourceforge.fuber.model.interpreters.abstractsyntax.Identifier;
-
-import net.sourceforge.waters.model.base.Proxy;
-import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
 import net.sourceforge.waters.model.expr.ExpressionParser;
-import net.sourceforge.waters.model.expr.Operator;
-import net.sourceforge.waters.model.expr.ParseException;
-import net.sourceforge.waters.model.expr.TypeMismatchException;
 import net.sourceforge.waters.model.marshaller.JAXBModuleMarshaller;
 import net.sourceforge.waters.model.module.*;
-import net.sourceforge.waters.subject.base.ListSubject;
+import net.sourceforge.waters.subject.base.AbstractSubject;
 import net.sourceforge.waters.subject.module.*;
 import net.sourceforge.waters.xsd.base.EventKind;
 
-
-public class ExtendedAutomata
+public class ExtendedAutomata implements Iterable<ExtendedAutomaton>
 {
 
 	private ModuleSubjectFactory factory;
@@ -108,11 +79,86 @@ public class ExtendedAutomata
 	private ExpressionParser parser;
 	private ModuleSubject module;
 	private boolean expand;
+    private int nbrOfExAutomata = 0;
+    private ArrayList<ExtendedAutomaton> theExAutomata;
+    private Map<String, EventDeclProxy> eventIdToProxyMap;
+    List<EventDeclProxy> unionAlphabet;
+    List<VariableComponentProxy> variables;
+    int maxRangeOfVars = 0;
+    HashMap<String,Integer> var2initValMap;
+    boolean contradictingInitValues = false;
+
+    public ExtendedAutomata()
+    {
+        factory = ModuleSubjectFactory.getInstance();
+        theExAutomata = new ArrayList<ExtendedAutomaton>();
+        unionAlphabet = new ArrayList<EventDeclProxy>();
+        variables = new ArrayList<VariableComponentProxy>();
+        var2initValMap = new HashMap<String, Integer>();
+        contradictingInitValues = false;
+    }
+
+	public ExtendedAutomata(ModuleSubject module)
+    {
+        this();
+        this.module = module;
+        for(EventDeclProxy e: module.getEventDeclList())
+        {
+            if(e.getKind() != EventKind.PROPOSITION)
+                unionAlphabet.add(e);
+        }
+        eventIdToProxyMap = new HashMap<String, EventDeclProxy>();
+        for(EventDeclProxy e:module.getEventDeclList())
+        {
+            eventIdToProxyMap.put(e.getName(), e);
+        }
+
+        for(AbstractSubject sub:module.getComponentListModifiable())
+        {
+            if(sub instanceof VariableComponentProxy)
+            {
+                variables.add((VariableComponentProxy)sub);
+            }
+
+            if(sub instanceof SimpleComponentSubject)
+            {
+                nbrOfExAutomata++;
+                addAutomatonToList(new ExtendedAutomaton(this, (SimpleComponentSubject)sub));
+            }
+        }
+
+        for(VariableComponentProxy var:variables)
+        {
+            StringTokenizer token = new StringTokenizer(var.getInitialStatePredicate().toString(),"==");
+            token.nextToken();
+            int initialValue = Integer.parseInt(token.nextToken());
+            if(!var2initValMap.containsKey(var.getName()))
+            {
+                var2initValMap.put(var.getName(), initialValue);
+            }
+            else if(var2initValMap.get(var.getName()) != initialValue)
+            {
+                contradictingInitValues = true;
+            }
+
+            token = new StringTokenizer(var.getType().toString(), "..");
+            int lowerBound = Integer.parseInt(token.nextToken());
+            int upperBound = -1;
+            upperBound = Integer.parseInt(token.nextToken());
+            
+            if((upperBound-lowerBound+1)>maxRangeOfVars)
+            {
+                maxRangeOfVars = upperBound-lowerBound+1;
+            }            
+        }
+
+  		parser = new ExpressionParser(factory, CompilerOperatorTable.getInstance());
+    }
 
 	public ExtendedAutomata(String name, boolean expand) 
 	{
-		factory = ModuleSubjectFactory.getInstance();
-		identifier = factory.createSimpleIdentifierProxy(name);
+        this();
+        identifier = factory.createSimpleIdentifierProxy(name);
 		module = new ModuleSubject(name, null);
 
 		// make marking proposition
@@ -126,15 +172,69 @@ public class ExtendedAutomata
 		parser = new ExpressionParser(factory, CompilerOperatorTable.getInstance());
 	}
 
+    public boolean isInitValuesContradicting()
+    {
+        return contradictingInitValues;
+    }
+
+    public int getMaxRangeOfVars()
+    {
+        return maxRangeOfVars;
+    }
+
+    public int getInitValueofVar(String var)
+    {
+        return var2initValMap.get(var);
+    }
+
+    public int size()
+    {
+        return nbrOfExAutomata;
+    }
+
+    public List<VariableComponentProxy> getVars()
+    {
+        return variables;
+    }
+
+    public List<EventDeclProxy> getInverseAlphabet(ExtendedAutomaton exAut)
+    {
+        List<EventDeclProxy> events = getUnionAlphabet();
+        List<EventDeclProxy> invAlph = new ArrayList<EventDeclProxy>();
+        for(EventDeclProxy e:events)
+        {
+            if(!exAut.getAlphabet().contains(e))
+                invAlph.add(e);
+        }
+
+        return invAlph;
+    }
+
 	protected ModuleSubject getModule()
 	{
 		return module;
 	}
 
+    public EventDeclProxy eventIdToProxy(String id)
+    {
+        return eventIdToProxyMap.get(id);
+    }
+
+    public List<EventDeclProxy> getUnionAlphabet()
+    {
+        return unionAlphabet;
+    }
+
 	public void addEvent(String name)
 	{
 		addEvent(name,"controllable");
 	}
+    
+
+    public Iterator<ExtendedAutomaton> iterator()
+    {
+        return theExAutomata.iterator();
+    }
 	
 	public void addEvent(String name, String kind)
 	{
@@ -151,11 +251,26 @@ public class ExtendedAutomata
 	}
 
 
-	public void addAutomaton(ExtendedAutomaton automaton)
+	public void addAutomaton(ExtendedAutomaton exAutomaton)
 	{
-		module.getComponentListModifiable().add(automaton.getComponent());
+        addAutomatonToList(exAutomaton);
+		module.getComponentListModifiable().add(exAutomaton.getComponent());
 	}
 
+    public void addAutomatonToList(ExtendedAutomaton exAutomaton)
+    {
+        theExAutomata.add(exAutomaton);
+    }
+
+    public ArrayList<AbstractSubject> getComponents()
+    {
+        ArrayList<AbstractSubject> components = new ArrayList<AbstractSubject>();
+
+        for(ExtendedAutomaton exAut:theExAutomata)
+            components.add(exAut.getComponent());
+        
+        return components;
+    }
 
 	public void writeToFile(File file)
 	{

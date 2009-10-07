@@ -58,27 +58,13 @@ import java.util.Set;
 import java.util.List;
 import java.util.LinkedList;
 import java.util.ArrayList;
-import java.util.Iterator;
+import java.util.HashMap;
 
-import net.sourceforge.waters.subject.module.ModuleSubjectFactory;
-import net.sourceforge.waters.subject.module.IdentifierSubject;
-import net.sourceforge.waters.subject.module.ModuleSubject;
-import net.sourceforge.waters.subject.module.SimpleComponentSubject;
-import net.sourceforge.waters.subject.module.GraphSubject;
-import net.sourceforge.waters.subject.module.SimpleNodeSubject;
-import net.sourceforge.waters.subject.module.EdgeSubject;
-import net.sourceforge.waters.subject.module.LabelBlockSubject;
-import net.sourceforge.waters.subject.module.SimpleExpressionSubject;
-import net.sourceforge.waters.subject.module.GuardActionBlockSubject;
-import net.sourceforge.waters.subject.module.BinaryExpressionSubject;
-import net.sourceforge.waters.subject.module.SimpleExpressionSubject;
-import net.sourceforge.waters.subject.module.PlainEventListSubject;
-import net.sourceforge.waters.subject.module.EventDeclSubject;
-import net.sourceforge.waters.model.module.EventDeclProxy;
+
+import java.util.HashSet;
+import net.sourceforge.waters.subject.module.*;
 
 import net.sourceforge.waters.xsd.base.ComponentKind;
-import net.sourceforge.waters.xsd.base.EventKind;
-
 import net.sourceforge.waters.model.base.Proxy;
 
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
@@ -87,6 +73,10 @@ import net.sourceforge.waters.model.expr.ExpressionParser;
 import net.sourceforge.waters.model.expr.Operator;
 import net.sourceforge.waters.model.expr.ParseException;
 import net.sourceforge.waters.model.expr.TypeMismatchException;
+
+import net.sourceforge.waters.model.module.EventListExpressionProxy;
+import net.sourceforge.waters.model.module.NodeProxy;
+import net.sourceforge.waters.model.module.EventDeclProxy;
 
 
 public class ExtendedAutomaton
@@ -101,17 +91,23 @@ public class ExtendedAutomaton
 	private ModuleSubject module;
 	private SimpleComponentSubject component;
 	private GraphSubject graph;
-
 	private ExpressionParser parser;
+    private List<EventDeclProxy> alphabet;
+    private HashMap<NodeProxy,ArrayList<EdgeSubject>> locationToOutgoingEdgesMap;
+    private HashMap<NodeProxy,ArrayList<EdgeSubject>> locationToIngoingEdgesMap;
+    private Set<NodeProxy> nodes;
+    private Set<NodeProxy> initialLocations;
+    private Set<NodeProxy> acceptedLocations;
+    private Set<NodeProxy> forbiddenLocations;
 
 	public ExtendedAutomaton(String name, ExtendedAutomata automata, boolean acceptingStates)
 	{
 		this.name = name;
 
 		factory = ModuleSubjectFactory.getInstance();
-		
+
 		this.automata = automata;
-		
+
 		module = automata.getModule();
 
 		identifier = factory.createSimpleIdentifierProxy(name);
@@ -123,10 +119,128 @@ public class ExtendedAutomaton
 		allAcceptingStates = acceptingStates;
 	}
 
+    public ExtendedAutomaton(ExtendedAutomata automata, SimpleComponentSubject component)
+    {
+        this.name = component.getName();
+        factory = ModuleSubjectFactory.getInstance();
+        this.automata = automata;
+        this.component = component;
+        graph = component.getGraph();
+        module = automata.getModule();
+        parser = new ExpressionParser(factory, CompilerOperatorTable.getInstance());
+        nodes = graph.getNodes();
+
+        locationToOutgoingEdgesMap = new HashMap<NodeProxy, ArrayList<EdgeSubject>>(graph.getNodes().size());
+        locationToIngoingEdgesMap = new HashMap<NodeProxy, ArrayList<EdgeSubject>>(graph.getNodes().size());
+        alphabet = new ArrayList<EventDeclProxy>();
+
+        initialLocations = new HashSet<NodeProxy>();
+        forbiddenLocations = new HashSet<NodeProxy>();
+        acceptedLocations = new HashSet<NodeProxy>();
+
+        for(NodeProxy node:nodes)
+        {
+            locationToOutgoingEdgesMap.put(node, new ArrayList<EdgeSubject>());
+            locationToIngoingEdgesMap.put(node, new ArrayList<EdgeSubject>());
+
+            if (node.toString().contains("initial"))
+            {
+                initialLocations.add(node);
+            }
+            if (node.toString().contains("accepting"))
+            {
+                acceptedLocations.add(node);
+            }
+            if (node.toString().contains("forbidden"))
+            {
+               forbiddenLocations.add(node);
+            }
+        }
+
+
+        EventListExpressionProxy blockedEvents = component.getGraph().getBlockedEvents();
+        if(blockedEvents != null)
+        {
+            for(Proxy event:blockedEvents.getEventList())
+            {
+                String eventName = ((SimpleIdentifierSubject)event).getName();
+                alphabet.add(automata.eventIdToProxy(eventName));
+            }
+        }
+
+        for(EdgeSubject edge:component.getGraph().getEdgesModifiable())
+        {
+            for(Proxy event:edge.getLabelBlock().getEventList())
+            {
+                String eventName = ((SimpleIdentifierSubject)event).getName();
+                alphabet.add(automata.eventIdToProxy(eventName));
+            }
+
+            locationToOutgoingEdgesMap.get(edge.getSource()).add(edge);
+            locationToIngoingEdgesMap.get(edge.getTarget()).add(edge);
+        }
+    }
+
+    public boolean isLocationInitial(NodeProxy node)
+    {
+        if(initialLocations.contains(node))
+            return true;
+        return false;
+    }
+
+    public boolean isLocationForbidden(NodeProxy node)
+    {
+        if(forbiddenLocations.contains(node))
+            return true;
+        return false;
+    }
+
+    public boolean isLocationAccepted(NodeProxy node)
+    {
+        if(acceptedLocations.contains(node))
+            return true;
+        return false;
+    }
+
+    public  HashMap<NodeProxy,ArrayList<EdgeSubject>> getLocationToOutgoingEdgesMap()
+    {
+        return  locationToOutgoingEdgesMap;
+    }
+
+    public  HashMap<NodeProxy,ArrayList<EdgeSubject>> getLocationToIngoingEdgesMap()
+    {
+        return  locationToIngoingEdgesMap;
+    }
+
+    public ComponentKind getKind()
+    {
+        return component.getKind();
+    }
+
+    public Set<NodeProxy> getNodes()
+    {
+        return nodes;
+    }
+
+    public int nbrOfNodes()
+    {
+        return nodes.size();
+    }
+
+    public String getName()
+    {
+        return component.getName();
+    }
+
 	public SimpleComponentSubject getComponent()
 	{
 		return component;
 	}
+
+    public List<EventDeclProxy> getAlphabet()
+    {
+        return alphabet;
+    }
 
 	public void addInitialState(String name)
 	{

@@ -1,16 +1,10 @@
-//# -*- tab-width: 4  indent-tabs-mode: nil  c-basic-offset: 4 -*-
-//###########################################################################
-//# PROJECT: Supremica/Waters IDE
-//# PACKAGE: org.supremica.gui.ide.actions
-//# CLASS:   AnalyzerGuardAction
-//###########################################################################
-//# $Id$
-//###########################################################################
-
 /*
  * AnalyzerGuardAction.java
  *
  * Created on May 7, 2008, 3:51 PM
+ *
+ * To change this template, choose Tools | Template Manager
+ * and open the template in the editor.
  */
 
 package org.supremica.gui.ide.actions;
@@ -26,7 +20,6 @@ import org.supremica.gui.GuardDialog;
 import org.supremica.automata.*;
 import org.supremica.log.*;
 
-import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
 import net.sourceforge.waters.model.expr.ExpressionParser;
 import net.sourceforge.waters.model.expr.Operator;
 import net.sourceforge.waters.model.expr.ParseException;
@@ -39,20 +32,15 @@ import org.supremica.gui.ide.EditorPanel;
 import net.sf.javabdd.*;
 import net.sourceforge.waters.model.module.NodeProxy;
 
-import org.omg.CosTransactions.Synchronization;
-import org.omg.CosTransactions.SynchronizationOperations;
-import org.supremica.automata.algorithms.AutomataSynchronizer;
-import org.supremica.automata.algorithms.SynchronizationOptions;
-
 
 /**
  *
  * @author Sajed
  */
-public class AnalyzerGuardAction 
+public class AnalyzerGuardAction
     extends IDEAction
 {
-    
+
     /** Creates a new instance of AnalyzerGuardAction */
 
     private static final long serialVersionUID = 1L;
@@ -64,26 +52,26 @@ public class AnalyzerGuardAction
     EditorPanel editorPanel;
     ExpressionParser parser;
     HashSet<String> addedVariables;
-    
+
     public AnalyzerGuardAction(List<IDEAction> actionList)
     {
         super(actionList);
-        
+
         setAnalyzerActiveRequired(true);
         setMinimumNumberOfSelectedComponents(2);
-        
+
         putValue(Action.NAME, "Generate Guard...");
         putValue(Action.SHORT_DESCRIPTION, "Generate a guard expression for a given event");
         putValue(Action.MNEMONIC_KEY, new Integer(KeyEvent.VK_S));
         //putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_A, ActionEvent.CTRL_MASK));
         putValue(Action.SMALL_ICON, new ImageIcon(IDE.class.getResource("/icons/expression.gif")));
     }
-    
+
     public void actionPerformed(ActionEvent e)
     {
         doAction();
     }
-    
+
     public void doAction()
     {
         // Retrieve the selected automata and make a sanity check
@@ -91,21 +79,30 @@ public class AnalyzerGuardAction
 //        if (selectedAutomata.nbrOfAutomata() > 1)
 //        {
 //            System.err.println("Just one automton should be selected!");
-/*             JOptionPane.showMessageDialog(ActionMan.getGui().getComponent(),
-                    "Just one automton should be selected",
-                    "Alert",    
-                    JOptionPane.ERROR_MESSAGE);*/
 //            return;
 //        }
-        
+
         // Get the current options
         GuardOptions guardOptions = new GuardOptions();
-            
+
  //       GuardGenerator gg = new GuardGenerator(selectedAutomata.getAutomatonAt(0),guardOptions.getExpressionType());
         editorPanel = ide.getActiveDocumentContainer().getEditorPanel();
 
         Vector events = new Vector();
         events.add("Generate guards for ALL events");
+
+/*       for(AbstractSubject as: editorPanel.getModuleSubject().getComponentListModifiable())
+        {
+            System.out.println("--------------------");
+            for(EdgeSubject edge:((SimpleComponentSubject)as).getGraph().getEdgesModifiable())
+            {
+                if(edge.getSource() == edge.getTarget())
+                    System.out.println("YESSSSSSSSSSS");
+            }
+
+        }
+ */
+
         for(EventDeclSubject sigmaS:  editorPanel.getModuleSubject().getEventDeclListModifiable())
         {
             if(sigmaS.getKind() == EventKind.CONTROLLABLE)
@@ -114,23 +111,17 @@ public class AnalyzerGuardAction
             }
         }
         // Start a dialog to allow the user changing the options
-        /*
-          GuardDialog constructor does not accept events argument. ~~~ Robi
-        GuardDialog guardDialog =
-            new GuardDialog(ide.getFrame(), guardOptions,events);
-        */
-        GuardDialog guardDialog =
-            new GuardDialog(ide.getFrame(), guardOptions);
+        GuardDialog guardDialog = new GuardDialog(ide.getFrame(), guardOptions,events);
 
         guardDialog.show();
         if (!guardOptions.getDialogOK())
         {
             return;
         }
- 
+
         LabeledEvent sigma = new LabeledEvent(guardOptions.getEvent());
         BDDGuardGenerator bddgg = null;
-        
+
         //Compute safe states
         BDDAutomata automataBDD = new BDDAutomata(selectedAutomata);
         BDDManager manager = automataBDD.getBDDManager();
@@ -140,6 +131,7 @@ public class AnalyzerGuardAction
         BDD prelUnconStates = manager.prelimUncontrollableStates(automataBDD);
         BDD forbiddenStates = prelUnconStates.or(automataBDD.getForbiddenStates());
 //        forbiddenStates.printDot();
+//        System.out.println("number of coreachable states: "+automataBDD.numberOfCoreachableStates());
         BDD safeStatesBDD = manager.safeStateSynthesis(automataBDD, forbiddenStates).and(automataBDD.getReachableAndCoreachableStates());
 
         long synthesisTime = System.currentTimeMillis()-time1;
@@ -162,7 +154,6 @@ public class AnalyzerGuardAction
         boolean singleEventSelected = false;
 
         long time2 = System.currentTimeMillis();
-
         if(sigma.getName().equals(""))
         {
             for(EventDeclSubject sigmaS:  editorPanel.getModuleSubject().getEventDeclListModifiable())
@@ -204,25 +195,17 @@ public class AnalyzerGuardAction
         catch (IOException e) {}
 */
 
-////////////////////
 
-/*        SynchronizationOptions synchOps = new SynchronizationOptions();
-//        ide.getActiveDocumentContainer().getAnalyzerPanel().addAutomata(myAutomata);
-        AutomataSynchronizer synch = new AutomataSynchronizer(editorPanel.getModuleSubject().getComponentListModifiable(),synchOps);
-
-        ide.getActiveDocumentContainer().getEditorPanel().getModuleSubject().getComponentListModifiable().add((SimpleComponentSubject)synch.getSynchronizedComponent());*/
-/////////////////////
-        
         //Add the guard to the automata
 /*        ModuleSubjectFactory factory = ModuleSubjectFactory.getInstance();
         parser = new ExpressionParser(factory, CompilerOperatorTable.getInstance());
 
         SimpleComponentSubject tempSubj =null;
         HashSet<SimpleComponentSubject> subjects = new HashSet();
-        
-        
+
+
         HashMap<String,String> tempAut2initState = new HashMap<String,String>();
-        
+
         for(Automaton aut:selectedAutomata)
         {
             tempAut2initState.put(aut.getName(), aut.getInitialState().getName());
@@ -239,7 +222,7 @@ public class AnalyzerGuardAction
             aut2initState.put(tempSubj.getName(), tempAut2initState.get(autName));
             subjects.add(tempSubj);
         }
-       
+
         boolean changed = false;
         String guard = "";
         BDDGuardGenerator currBDDGG = null;
@@ -251,7 +234,7 @@ public class AnalyzerGuardAction
             for(EdgeSubject ep:simSubj.getGraph().getEdgesModifiable())
             {
                 SimpleExpressionSubject ses = null;
-                //&& simSubj.getKind().name().equals("SPEC")                               
+                //&& simSubj.getKind().name().equals("SPEC")
 
                 String currEvent = ep.getLabelBlock().getEventList().iterator().next().toString();
                 currBDDGG = singleEventSelected ? bddgg : event2guard.get(currEvent);
@@ -276,11 +259,11 @@ public class AnalyzerGuardAction
                     changed = true;
                 }
              }
-            
+
              if(changed)
                 editorPanel.addComponent(simSubj);
         }*/
-        
+
     }
 
     public int addVariablesToModel(BinaryExpressionSubject bes, SimpleComponentSubject simSubj)
@@ -331,6 +314,6 @@ public class AnalyzerGuardAction
 
         return output;
     }
-    
+
 }
 

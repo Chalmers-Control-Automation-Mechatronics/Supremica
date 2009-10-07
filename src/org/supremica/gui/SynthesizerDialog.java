@@ -51,6 +51,7 @@ package org.supremica.gui;
 
 import java.awt.*;
 import java.awt.event.*;
+import java.util.Vector;
 import javax.swing.*;
 import org.supremica.automata.algorithms.*;
 
@@ -380,7 +381,7 @@ class SynthesizerDialogAdvancedPanel
 
         maximallyPermissiveIncrementalBox.setEnabled(maximallyPermissiveBox.isSelected());
         maximallyPermissiveOnePlantAtATimeBox.setEnabled(maximallyPermissiveIncrementalBox.isSelected() &&
-            maximallyPermissiveIncrementalBox.isEnabled());
+        maximallyPermissiveIncrementalBox.isEnabled());
     }
     
     public void regain(SynthesizerOptions options)
@@ -404,6 +405,99 @@ class SynthesizerDialogAdvancedPanel
     }
 }
 
+class SynthesizerDialogGuardPanel
+    extends SynthesizerPanel
+{
+	private static final long serialVersionUID = 1L;
+    private JRadioButton fromAllowedStatesButton;
+    private JRadioButton fromForbiddenStatesButton;
+    private JRadioButton optimalButton;
+    private JComboBox eventList;
+//	private JTextField eventField;
+
+    public SynthesizerDialogGuardPanel(Vector events)
+    {
+		Box standardBox = Box.createVerticalBox();
+
+		fromAllowedStatesButton = new JRadioButton("From allowed states");
+		fromAllowedStatesButton.setToolTipText("Generate the guard from the Allowed state set");
+
+        fromForbiddenStatesButton = new JRadioButton("From forbidden states");
+		fromForbiddenStatesButton.setToolTipText("Generate the guard from the Forbidden state set");
+
+        optimalButton = new JRadioButton("Optimal solution");
+		optimalButton.setToolTipText("Generate the guard from the state set that yields the best result");
+
+		JLabel event = new JLabel("Events");
+//		eventField = new JTextField(15);
+//		eventField.setToolTipText("The name of the desired event");
+
+        ButtonGroup group = new ButtonGroup();
+        group.add(fromAllowedStatesButton);
+        group.add(fromForbiddenStatesButton);
+        group.add(optimalButton);
+
+        JPanel expressionTypePanel = new JPanel();
+        expressionTypePanel.add(fromAllowedStatesButton);
+        expressionTypePanel.add(fromForbiddenStatesButton);
+        expressionTypePanel.add(optimalButton);
+
+        eventList = new JComboBox(events);
+
+        standardBox.add(expressionTypePanel);
+		standardBox.add(event);
+//        standardBox.add(eventField);
+        standardBox.add(eventList);
+
+		this.add(standardBox);
+    }
+
+	public void update(SynthesizerOptions synthesizerOptions)
+	{
+        if(synthesizerOptions.getExpressionType() == 0)
+        {
+            fromAllowedStatesButton.setSelected(false);
+            fromForbiddenStatesButton.setSelected(true);
+            optimalButton.setSelected(false);
+        }
+        else if(synthesizerOptions.getExpressionType() == 1)
+        {
+            fromAllowedStatesButton.setSelected(true);
+            fromForbiddenStatesButton.setSelected(false);
+            optimalButton.setSelected(false);
+        }
+        else if(synthesizerOptions.getExpressionType() == 2)
+        {
+            fromAllowedStatesButton.setSelected(false);
+            fromForbiddenStatesButton.setSelected(false);
+            optimalButton.setSelected(true);
+        }
+
+//        eventField.setText(guardOptions.getEvent());
+	}
+
+	public void regain(SynthesizerOptions synthesizerOptions)
+	{
+        if(fromForbiddenStatesButton.isSelected())
+        {
+            synthesizerOptions.setExpressionType(0);
+        }
+        if(fromAllowedStatesButton.isSelected())
+        {
+            synthesizerOptions.setExpressionType(1);
+        }
+        if(optimalButton.isSelected())
+        {
+            synthesizerOptions.setExpressionType(2);
+        }
+
+        if(eventList.getSelectedIndex() == 0)
+            synthesizerOptions.setEvent("");
+        else
+            synthesizerOptions.setEvent((String)eventList.getSelectedItem());
+	}
+}
+
 public class SynthesizerDialog
     implements ActionListener
 {
@@ -412,6 +506,8 @@ public class SynthesizerDialog
     private SynthesizerOptions synthesizerOptions;
     SynthesizerDialogStandardPanel standardPanel;
     SynthesizerDialogAdvancedPanel advancedPanel;
+    SynthesizerDialogGuardPanel guardPanel;
+
     private JDialog dialog;
     private Frame parentFrame;
     
@@ -436,6 +532,7 @@ public class SynthesizerDialog
         
         tabbedPane.addTab("Standard options", null, standardPanel, "Standard options");
         tabbedPane.addTab("Advanced options", null, advancedPanel, "Advanced options");
+//        tabbedPane.addTab("Guard options", null, guardPanel, "Guard options");
         
         // buttonPanel
         JPanel buttonPanel = new JPanel();
@@ -454,6 +551,14 @@ public class SynthesizerDialog
         dialog.setResizable(false);
         update();
     }
+
+    public SynthesizerDialog(Frame parentFrame, int numSelected, SynthesizerOptions synthesizerOptions, Vector controllableEvents)
+    {
+        this(parentFrame, numSelected, synthesizerOptions);
+        guardPanel = new SynthesizerDialogGuardPanel(controllableEvents);
+
+    }
+
     
     /**
      * Updates the information in the dialog from what is recorded in SynthesizerOptions.

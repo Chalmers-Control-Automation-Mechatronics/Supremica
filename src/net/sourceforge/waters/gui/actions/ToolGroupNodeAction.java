@@ -27,6 +27,6 @@ public class ToolGroupNodeAction
 	  "Create group nodes",
 	  "/icons/waters/nodegroup16.gif",
 	  ControlledToolbar.Tool.GROUPNODE);
-  }
+    }
 
 }

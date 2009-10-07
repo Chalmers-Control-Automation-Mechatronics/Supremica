@@ -76,13 +76,15 @@ public class BDDAutomata
     BDDTransitions bddTransitions = null;
                
     BDDDomain eventDomain;
+    BDDDomain[] tempStateDomains = null;
     BDDDomain[] sourceStateDomains = null;
     BDDDomain[] destStateDomains = null;
         
     BDDVarSet sourceStateVariables = null;
     BDDVarSet destStateVariables = null;
     
-//    BDDPairing sourceToDestStatePairing = null;
+    BDDPairing tempToDestStatePairing = null;
+    BDDPairing sourceToTempStatePairing = null;
     BDDPairing destToSourceStatePairing = null;
 
     BDD initialStatesBDD = null;
@@ -165,6 +167,7 @@ public class BDDAutomata
         sourceStateVariables = manager.createEmptyVarSet();
         destStateVariables = manager.createEmptyVarSet();
 
+        tempStateDomains = new BDDDomain[theAutomata.size()];
         sourceStateDomains = new BDDDomain[theAutomata.size()];
         destStateDomains = new BDDDomain[theAutomata.size()];
         
@@ -174,6 +177,7 @@ public class BDDAutomata
         {
             int nbrOfStates = automaton.nbrOfStates();
             //System.err.println("nbrOfStates: " + nbrOfStates);
+            BDDDomain tempStateDomain = manager.createDomain(nbrOfStates);
             BDDDomain sourceStateDomain = manager.createDomain(nbrOfStates);
             BDDDomain destStateDomain = manager.createDomain(nbrOfStates);
             BDDAutomaton bddAutomaton = new BDDAutomaton(this, automaton, sourceStateDomain, destStateDomain);
@@ -203,6 +207,8 @@ public class BDDAutomata
             sourceStateDomains[i].setName(automaton.getName());
             destStateDomains[i] = destStateDomain;
             destStateDomains[i].setName(automaton.getName());
+
+            tempStateDomains[i] = tempStateDomain;
 
             currUnconEvents = bddAutomaton.getUncontrollableEvents();
             uncontrollableEventsBDD = uncontrollableEventsBDD.or(currUnconEvents);
@@ -236,7 +242,8 @@ public class BDDAutomata
             i++;
         }
        
-        //sourceToDestStatePairing = manager.makePairing(sourceStateDomains, destStateDomains);
+        sourceToTempStatePairing = manager.makePairing(sourceStateDomains, tempStateDomains);
+        tempToDestStatePairing = manager.makePairing(tempStateDomains, destStateDomains);
         destToSourceStatePairing = manager.makePairing(destStateDomains, sourceStateDomains);       
   
         bddTransitions = new BDDTransitionFactory(this).createTransitions();

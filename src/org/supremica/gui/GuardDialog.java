@@ -1,22 +1,12 @@
-//# -*- tab-width: 4  indent-tabs-mode: nil  c-basic-offset: 4 -*-
-//###########################################################################
-//# PROJECT: Supremica/Waters IDE
-//# PACKAGE: org.supremica.gui
-//# CLASS:   GuardPanel
-//###########################################################################
-//# $Id$
-//###########################################################################
-
 /*
  * GuardDialog.java
- *
- * Created on May 7, 2008, 6:21 PM
  */
 
 package org.supremica.gui;
 
 import java.awt.*;
 import java.awt.event.*;
+import java.util.Vector;
 import javax.swing.*;
 import org.supremica.automata.algorithms.Guard.*;
 
@@ -37,76 +27,94 @@ class GuardDialogStandardPanel
 	extends GuardPanel
 {
 	private static final long serialVersionUID = 1L;
-        private JRadioButton fromAllowedStatesButton;
-        private JRadioButton fromForbiddenStatesButton;
-	private JTextField eventField;
+    private JRadioButton fromAllowedStatesButton;
+    private JRadioButton fromForbiddenStatesButton;
+    private JRadioButton optimalButton;
+    private JComboBox eventList;
+//	private JTextField eventField;
 
-	public GuardDialogStandardPanel()
+	public GuardDialogStandardPanel(Vector events)
 	{
 		Box standardBox = Box.createVerticalBox();
 
 		fromAllowedStatesButton = new JRadioButton("From allowed states");
-		fromAllowedStatesButton.setToolTipText("Generate the expressions from the allowed states");
-                
-                fromForbiddenStatesButton = new JRadioButton("From forbidden states");
-		fromForbiddenStatesButton.setToolTipText("Generate the expressions from the forbidden states");
+		fromAllowedStatesButton.setToolTipText("Generate the guard from the Allowed state set");
 
-		JLabel event = new JLabel("Event");
-		eventField = new JTextField(15);
-		eventField.setToolTipText("The name of the desired event");
+        fromForbiddenStatesButton = new JRadioButton("From forbidden states");
+		fromForbiddenStatesButton.setToolTipText("Generate the guard from the Forbidden state set");
 
-                ButtonGroup group = new ButtonGroup();
-                group.add(fromAllowedStatesButton);
-                group.add(fromForbiddenStatesButton);
+        optimalButton = new JRadioButton("Optimal solution");
+		optimalButton.setToolTipText("Generate the guard from the state set that yields the best result");
 
-                JPanel expressionTypePanel = new JPanel();
-                expressionTypePanel.add(fromAllowedStatesButton);
-                expressionTypePanel.add(fromForbiddenStatesButton);
-                
-                standardBox.add(expressionTypePanel);
+		JLabel event = new JLabel("Events");
+//		eventField = new JTextField(15);
+//		eventField.setToolTipText("The name of the desired event");
+
+        ButtonGroup group = new ButtonGroup();
+        group.add(fromAllowedStatesButton);
+        group.add(fromForbiddenStatesButton);
+        group.add(optimalButton);
+
+        JPanel expressionTypePanel = new JPanel();
+        expressionTypePanel.add(fromAllowedStatesButton);
+        expressionTypePanel.add(fromForbiddenStatesButton);
+        expressionTypePanel.add(optimalButton);
+
+        eventList = new JComboBox(events);
+
+        standardBox.add(expressionTypePanel);
 		standardBox.add(event);
-                standardBox.add(eventField);
+//        standardBox.add(eventField);
+        standardBox.add(eventList);
+
 		this.add(standardBox);
 	}
 
 	public void update(GuardOptions guardOptions)
 	{
-        // I have no idea from the comments what is intended,
-        // but booleans do not compile :-( ~~~ Robi
-        switch (guardOptions.getExpressionType()) {
-        case 0:
-            fromAllowedStatesButton.setSelected(true);
-            fromForbiddenStatesButton.setSelected(false);
-            break;
-        case 1:
+        if(guardOptions.getExpressionType() == 0)
+        {
             fromAllowedStatesButton.setSelected(false);
             fromForbiddenStatesButton.setSelected(true);
-            break;
-        default:
-            throw new UnsupportedOperationException
-                ("ExpressionType " + guardOptions.getExpressionType() +
-                 " not supported!");
-        }                
-        eventField.setText(guardOptions.getEvent());
+            optimalButton.setSelected(false);
+        }
+        else if(guardOptions.getExpressionType() == 1)
+        {
+            fromAllowedStatesButton.setSelected(true);
+            fromForbiddenStatesButton.setSelected(false);
+            optimalButton.setSelected(false);
+        }
+        else if(guardOptions.getExpressionType() == 2)
+        {
+            fromAllowedStatesButton.setSelected(false);
+            fromForbiddenStatesButton.setSelected(false);
+            optimalButton.setSelected(true);
+        }
+
+//        eventField.setText(guardOptions.getEvent());
 	}
 
 	public void regain(GuardOptions guardOptions)
 	{
-            if(fromAllowedStatesButton.isSelected())
-            {
-                // I have no idea from the comments what is intended,
-                // but booleans do not compile :-( ~~~ Robi
-                guardOptions.setExpressionType(0);
-            }
-            if(fromForbiddenStatesButton.isSelected())
-            {
-                // Same as above.
-                guardOptions.setExpressionType(1);
-            }
-            
-            guardOptions.setEvent(eventField.getText());
+        if(fromForbiddenStatesButton.isSelected())
+        {
+            guardOptions.setExpressionType(0);
+        }
+        if(fromAllowedStatesButton.isSelected())
+        {
+            guardOptions.setExpressionType(1);
+        }
+        if(optimalButton.isSelected())
+        {
+            guardOptions.setExpressionType(2);
+        }
+
+        if(eventList.getSelectedIndex() == 0)
+            guardOptions.setEvent("");
+        else
+            guardOptions.setEvent((String)eventList.getSelectedItem());
 	}
-        
+
 }
 
 public class GuardDialog
@@ -119,21 +127,19 @@ public class GuardDialog
 	private JDialog dialog;
 	private Frame parentFrame;
 
-	/**
-	 * Creates modal dialog box for input of synthesizer options.
-	 */
-	public GuardDialog(Frame parentFrame, GuardOptions guardOptions)
+
+	public GuardDialog(Frame parentFrame, GuardOptions guardOptions, Vector events)
 	{
 		dialog = new JDialog(parentFrame, true);    // modal
 		this.parentFrame = parentFrame;
-                this.guardOptions = guardOptions;
+        this.guardOptions = guardOptions;
 
 		dialog.setTitle("Guard options");
 		dialog.setSize(new Dimension(400, 200));
 
 		Container contentPane = dialog.getContentPane();
 
-		standardPanel = new GuardDialogStandardPanel();
+		standardPanel = new GuardDialogStandardPanel(events);
 
 		JTabbedPane tabbedPane = new JTabbedPane();
 
@@ -149,7 +155,6 @@ public class GuardDialog
 		contentPane.add("South", buttonPanel);
 		Utility.setDefaultButton(dialog, okButton);
 
-		// ** MF ** Fix to get the frigging thing centered
 		Dimension dim = dialog.getMinimumSize();
 
 		dialog.setLocation(Utility.getPosForCenter(dim));
@@ -157,10 +162,7 @@ public class GuardDialog
 		update();
 	}
 
-	/**
-	 * Updates the information in the dialog from what is recorded in synchronizationOptions.
-	 * @see SynchronizationOptions
-	 */
+
 	public void update()
 	{
 		standardPanel.update(guardOptions);
@@ -193,6 +195,7 @@ public class GuardDialog
 			{
 				dialog.setVisible(false);
 				dialog.dispose();
+                guardOptions.setDialogOK(true);
 			}
 			else
 			{

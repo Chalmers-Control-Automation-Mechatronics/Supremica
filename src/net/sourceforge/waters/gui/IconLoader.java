@@ -64,5 +64,6 @@ public class IconLoader
     public static final ImageIcon ICON_UNCONTROLLABLE =
 		getIcon(NAME_UNCONTROLLABLE);
     public static final ImageIcon ICON_VARIABLE = getIcon(NAME_VARIABLE);
+
     
 }

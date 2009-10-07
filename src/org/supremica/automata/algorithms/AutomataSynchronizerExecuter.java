@@ -1198,7 +1198,7 @@ public final class AutomataSynchronizerExecuter
                     LabeledEvent theEvent = indexMap.getEventAt(currEventIndex);
                     //theAutomaton.getAlphabet().getEventWithIndex(currEventIndex);
 
-                    ///////////////////
+                    ///////////////////for EFA synchronization
                     if(helper.getSynchronizationOptions().getEFAMode())
                     {
                         org.supremica.automata.State[][] stateTable = indexForm.getStateTable();
