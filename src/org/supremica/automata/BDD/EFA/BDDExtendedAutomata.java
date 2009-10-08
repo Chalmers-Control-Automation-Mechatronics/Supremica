@@ -482,7 +482,10 @@ public class BDDExtendedAutomata implements Iterable<BDDExtendedAutomaton>{
     public BDD getConstantBDD(String varName, int cons)
     {
         BDDBitVector c = manager.getFactory().buildVector(constantDomain);
-        c.initialize(cons);
+        // c.initialize(cons);
+	// ++ cannot find symbol
+	// ++ symbol  : method initialize(int)
+	// ++ location: class net.sf.javabdd.BDDBitVector
 
         BDD result = manager.getOneBDD();
         for(int i=0;i<c.size();i++)

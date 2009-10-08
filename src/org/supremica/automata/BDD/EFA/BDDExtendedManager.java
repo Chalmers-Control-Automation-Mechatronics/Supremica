@@ -143,7 +143,10 @@ public class BDDExtendedManager
                 if(vec == null)
                 {
                     vec = factory.buildVector(constantDomain);
-                    vec.initialize(Integer.parseInt(expr.getLeft().toString()));
+                    // vec.initialize(Integer.parseInt(expr.getLeft().toString()));
+		    // ++ cannot find symbol
+		    // ++ symbol  : method initialize(int)
+		    // ++ location: class net.sf.javabdd.BDDBitVector
                 }
 
                 v1 = vec;
@@ -159,7 +162,10 @@ public class BDDExtendedManager
                 if(vec == null)
                 {
                     vec = factory.buildVector(constantDomain);
-                    vec.initialize(Integer.parseInt(expr.getRight().toString()));
+                    // vec.initialize(Integer.parseInt(expr.getRight().toString()));
+		    // ++ cannot find symbol
+		    // ++ symbol  : method initialize(int)
+		    // ++ location: class net.sf.javabdd.BDDBitVector
                 }
 
                 v2 = vec;
@@ -174,7 +180,11 @@ public class BDDExtendedManager
     static BDD action2BDD(BinaryExpressionProxy expr)
     {
         BDDBitVector leftSide = bddBitVecTargetMap.get(expr.getLeft().toString());
-        return leftSide.equ(arithExpr2BDDBitVec(expr.getRight()));
+        // return leftSide.equ(arithExpr2BDDBitVec(expr.getRight()));
+        // ++ cannot find symbol
+	// ++ symbol  : method equ(net.sf.javabdd.BDDBitVector)
+	// ++ location: class net.sf.javabdd.BDDBitVector
+	return null;
     }
 
     static BDDBitVector arithExpr2BDDBitVec(SimpleExpressionProxy expr)
@@ -185,7 +195,10 @@ public class BDDExtendedManager
             if(vec == null)
             {
                 vec = factory.buildVector(constantDomain);
-                vec.initialize(Integer.parseInt(expr.toString()));
+                // vec.initialize(Integer.parseInt(expr.toString()));
+		// ++ cannot find symbol
+		// ++ symbol  : method initialize(int)
+		// ++ location: class net.sf.javabdd.BDDBitVector
             }
 
             return vec;
@@ -202,6 +215,7 @@ public class BDDExtendedManager
 
     static BDD BDDBitVecEqRelOp(BDDBitVector v1, BDDBitVector v2, String op)
     {
+      /*
         if(op.equals("=="))
             return v1.equ(v2);
         else if(op.equals("!="))
@@ -215,6 +229,31 @@ public class BDDExtendedManager
         else if(op.equals("<="))
             return v1.lte(v2);
 
+	COMPILER ERRORS:
+
+        cannot find symbol
+	symbol  : method equ(net.sf.javabdd.BDDBitVector)
+	location: class net.sf.javabdd.BDDBitVector
+
+	cannot find symbol
+	symbol  : method neq(net.sf.javabdd.BDDBitVector)
+	location: class net.sf.javabdd.BDDBitVector
+
+	cannot find symbol
+	symbol  : method gth(net.sf.javabdd.BDDBitVector)
+	location: class net.sf.javabdd.BDDBitVector
+
+	cannot find symbol
+	symbol  : method gte(net.sf.javabdd.BDDBitVector)
+	location: class net.sf.javabdd.BDDBitVector
+	
+	cannot find symbol
+	symbol  : method lth(net.sf.javabdd.BDDBitVector)
+	location: class net.sf.javabdd.BDDBitVector
+
+	lte(net.sf.javabdd.BDDBitVector) is not public in
+	net.sf.javabdd.BDDBitVector; cannot be accessed from outside package
+      */
         return null;
     }
 
