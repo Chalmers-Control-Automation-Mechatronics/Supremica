@@ -271,7 +271,7 @@ expandSafetyState(const uint32* sourcetuple, const uint32* sourcepacked)
       if (code == getNumberOfStates()) {                                \
         bufferpacked = getStateSpace().prepare(incNumberOfStates());    \
       }                                                                 \
-      ADD_TRANSITION_ALLOC(source, code);                                     \
+      ADD_TRANSITION_ALLOC(source, code);                               \
     }                                                                   \
   }
 
@@ -283,8 +283,7 @@ expandNonblockingReachabilityState(uint32 source,
   const int numwords = getAutomatonEncoding().getNumberOfWords();
   setConflictKind(jni::ConflictKind_DEADLOCK);
   if (getTransitionLimit() > 0) {
-#   define ADD_TRANSITION(source, target) \
-      addCoreachabilityTransition(source, target)
+#   define ADD_TRANSITION addCoreachabilityTransition
 #   define ADD_TRANSITION_ALLOC ADD_TRANSITION
     EXPAND(numwords, source, sourcetuple, sourcepacked);
 #   undef ADD_TRANSITION
@@ -338,13 +337,12 @@ setupReverseTransitionRelations()
   if (mReversedEventRecords == 0) {
     bool removing =
       getMode() == EXPLORER_MODE_NONBLOCKING && getTransitionLimit() == 0;
-    int numremoved = 0;
     int numreversed = 0;
     mReversedEventRecords = new BroadEventRecord*[mNumEventRecords];
     for (int e = 0; e < mNumEventRecords; e++) {
       BroadEventRecord* event = mEventRecords[e];
       if (removing) {
-        numremoved += event->removeTransitionsNotTaken();
+        event->removeTransitionsNotTaken();
       }
       if (!event->isGloballyDisabled() && !event->isOnlySelfloops()) {
         if (event->reverse()) {

@@ -575,7 +575,7 @@ checkCoreachabilityState()
 
 void ProductExplorer::
 checkTraceState()
-{
+{        
   uint32 found = mStateSpace->find();
   if (found < mTraceLimit) {
     mTraceState = found;

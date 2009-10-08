@@ -99,7 +99,7 @@ uint32 hashIntArray(const uint32* key, const int len)
 }
 
 
-uint32 hashIntArray(const uint32* key, const int len, const uint32 mask0)
+uint32 hashIntArray(const uint32* key, const int len, uint32 mask0)
 {
   register uint32 a = gold;
   register uint32 b = gold;
@@ -108,10 +108,11 @@ uint32 hashIntArray(const uint32* key, const int len, const uint32 mask0)
 
   // Handle most of the key ...
   while (rest >= 3) {
-    a += key[0];
+    a += key[0] & mask0;
     b += key[1];
     c += key[2];
     mix(a,b,c);
+    mask0 = ~0;
     key += 3;
     rest -= 3;
   }

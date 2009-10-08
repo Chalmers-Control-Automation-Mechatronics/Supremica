@@ -85,7 +85,6 @@ addTransition(uint32 source, uint32 target)
   }
 
   // suppress duplicate transitions
-  bool alloc;
   uint32 nodeindex;
   uint32* nodeblock;
   if ((head & TAG_DATA) == 0) {
@@ -115,7 +114,6 @@ addTransition(uint32 source, uint32 target)
   } else {
     nodeindex = UNDEF_UINT32;
     nodeblock = 0;
-    alloc = true;
   }
 
   // allocate and/or populate node
