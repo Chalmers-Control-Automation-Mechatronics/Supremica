@@ -190,7 +190,7 @@ public class SafetyVerifierController extends AbstractController
 
   private StateEncoding createStateEncoding()
   {
-    return new PackedStateEncoding(mModel);
+    return new GreedyPackedStateEncoding(mModel);
   }
 
   private void createWorkers() throws Exception

@@ -30,6 +30,11 @@ public class ProductDESSchema implements Serializable
     return mAutomata.length;
   }
 
+  public AutomatonSchema[] getAutomata()
+  {
+    return mAutomata.clone();
+  }
+
   public EventSchema getEvent(int index)
   {
     return mEvents[index];

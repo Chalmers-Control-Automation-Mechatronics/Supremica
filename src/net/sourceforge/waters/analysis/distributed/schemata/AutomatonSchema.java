@@ -10,18 +10,25 @@ public class AutomatonSchema implements Serializable
 		  int[] eventIds,
 		  StateSchema[] states,
 		  int kind,
-		  TransitionSchema[] transitions)
+		  TransitionSchema[] transitions,
+		  int id)
   {
     mName = name;
     mEventIds = eventIds;
     mStates = states;
     mKind = kind;
     mTransitions = transitions;
+    mAutomatonId = id;
   }
 
   public String getName()
   {
     return mName;
+  }
+
+  public int getAutomatonId()
+  {
+    return mAutomatonId;
   }
   
   public int getEventId(int index)
@@ -63,6 +70,7 @@ public class AutomatonSchema implements Serializable
   {
     Formatter fmt = new Formatter();
     fmt.format("Name: %s\n", mName);
+    fmt.format("Id: %d\n", mAutomatonId);
     fmt.format("Events: %s\n", Arrays.toString(mEventIds));
     fmt.format("Transitions: %s\n", Arrays.deepToString(mTransitions));
     fmt.format("States: %s\n", Arrays.deepToString(mStates));
@@ -76,6 +84,7 @@ public class AutomatonSchema implements Serializable
   private final StateSchema[] mStates;
   private final int mKind;
   private final TransitionSchema[] mTransitions;
+  private final int mAutomatonId;
 
   public static final int PLANT = 0;
   public static final int SPECIFICATION = 1;

@@ -56,7 +56,7 @@ public class SchemaBuilder
     int i = 0;
     for (AutomatonProxy automaton : automata)
       {
-	schemata[i] = build_automaton(automaton, emap, translator);
+	schemata[i] = build_automaton(automaton, emap, translator, i);
 	  i++;
       }
 
@@ -66,7 +66,8 @@ public class SchemaBuilder
 
   private static AutomatonSchema build_automaton(final AutomatonProxy aut, 
 						 Map<EventProxy,Integer> emap,
-						 KindTranslator translator)
+						 KindTranslator translator,
+						 int id)
   { 
     String name = aut.getName();
     int[] events = map_events(aut.getEvents(), emap);
@@ -88,7 +89,7 @@ public class SchemaBuilder
     TransitionSchema[] transitions = build_transitions(aut.getTransitions(), 
 						       smap, emap);
 
-    return new AutomatonSchema(name, events, states, kind, transitions);
+    return new AutomatonSchema(name, events, states, kind, transitions, id);
   }
 
   private static TransitionSchema[] build_transitions

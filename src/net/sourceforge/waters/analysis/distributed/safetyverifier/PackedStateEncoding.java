@@ -74,18 +74,18 @@ public class PackedStateEncoding extends StateEncoding
 
     StateTuple t = new StateTuple(pstate, depth);
   
-    /*
+    
     int[] unpacked2 = decodeState(t);
    
       //Check if the state encodes/decodes correctly. 
       if (!java.util.Arrays.equals(unpacked, unpacked2))
 	{
-	  System.err.format("Encoder fail:\n%s\n%s\n",
-			    java.util.Arrays.toString(unpacked),
-			    java.util.Arrays.toString(unpacked2));
-	  throw new RuntimeException("State encoder fail");
+	  String errmsg = String.format("Encoding failure: %s %s", 
+					java.util.Arrays.toString(unpacked),
+					java.util.Arrays.toString(unpacked2));
+	  System.err.println(errmsg);
+	  throw new RuntimeException(errmsg);
       }
-    */
 
     return t;
   }
@@ -153,6 +153,7 @@ public class PackedStateEncoding extends StateEncoding
     //Calculate the length that needs to be stored in the
     //current element.
     int ce_length = Math.min(length, 32 - sbit);
+    assert (ce_length > 0);
 
     //Build a value mask.
     //In the case where ce_len == 32 - sbit; by substitution
