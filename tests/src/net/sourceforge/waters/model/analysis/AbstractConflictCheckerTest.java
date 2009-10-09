@@ -117,7 +117,6 @@ public abstract class AbstractConflictCheckerTest
 
   //#########################################################################
   //# Test Cases --- hisc
-  /*
   public void testHISCRhoneSubsystem1Patch0() throws Exception
   {
     final String group = "tests";
@@ -141,7 +140,6 @@ public abstract class AbstractConflictCheckerTest
     final String name = "rhone_subsystem1_patch2.wmod";
     runModelVerifier(group, dir, name, true);
   }
-  */
 
 
   //#########################################################################

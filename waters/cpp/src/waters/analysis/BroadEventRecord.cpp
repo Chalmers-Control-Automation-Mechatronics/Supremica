@@ -14,6 +14,10 @@
 #include <new>
 #include <iostream>
 
+#ifdef DEBUG
+#include "jni/cache/JavaString.h"
+#endif /* DEBUG */
+
 #include "waters/analysis/AutomatonEncoding.h"
 #include "waters/analysis/BroadEventRecord.h"
 #include "waters/analysis/TransitionRecord.h"
@@ -469,5 +473,33 @@ storeNondeterministicTargets(TransitionRecord* trans,
   }
 }
 
+
+//############################################################################
+//# BroadEventRecord: Debug Output
+
+#ifdef DEBUG
+
+void BroadEventRecord::
+dumpTransitionRecords()
+  const
+{
+  std::cerr << (const char*) (getName()) << " {";
+  bool first = true;
+  for (TransitionRecord* trans = getTransitionRecord();
+       trans != 0;                                                      
+       trans = trans->getNextInSearch()) {
+    if (first) {
+      first = false;
+    } else {
+      std::cerr << ", ";
+    }
+    const AutomatonRecord* aut = trans->getAutomaton();
+    std::cerr << (const char*) aut->getName()
+              << " (" << aut->getAutomatonIndex() << ")";
+  }  
+  std::cerr << "}" << std::endl;
+}
+
+#endif /* DEBUG */
 
 }  /* namespace waters */

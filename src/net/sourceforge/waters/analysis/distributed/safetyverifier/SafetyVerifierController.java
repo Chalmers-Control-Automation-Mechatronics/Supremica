@@ -463,36 +463,34 @@ public class SafetyVerifierController extends AbstractController
   
   private JobStats[] getWorkerStats()
   {
-    JobStats[] stats = new JobStats[mWorkers.length];
-    for (int i = 0; i < stats.length; i++)
-      {
-	if (mWorkers[i] != null)
-	  {
-	    try
-	      {
-		stats[i] = mWorkers[i].getWorkerStats();
-	      }
-	    catch (RemoteException e)
-	      {
-		//Oh well, null shall be stored
-	      }
+    if (mWorkers == null) {
+      return null;
+    } else {
+      final JobStats[] stats = new JobStats[mWorkers.length];
+      for (int i = 0; i < stats.length; i++) {
+	if (mWorkers[i] != null) {
+	  try {
+	    stats[i] = mWorkers[i].getWorkerStats();
+	  } catch (RemoteException e) {
+	    //Oh well, null shall be stored
 	  }
-
+	}
 	//If no stats were obtained (for whatever reason),
 	//try the periodic stats
-	if (stats[i] == null && mPeriodicStats != null)
-	  {
-	    stats[i] = mPeriodicStats[i];
-	  }
+	if (stats[i] == null && mPeriodicStats != null) {
+	  stats[i] = mPeriodicStats[i];
+	}
       }
-
-    return stats;
+      return stats;
+    }
   }
   
   private JobStats getControllerStats()
   {
     JobStats stats = new JobStats();
-    stats.set("job-name", mJob.getName());
+    if (mJob != null) {
+      stats.set("job-name", mJob.getName());
+    }
     stats.set("worker-stats", getWorkerStats());
     
     stats.set("exploration-time", mExplorationTime);

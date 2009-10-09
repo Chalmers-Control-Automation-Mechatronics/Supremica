@@ -91,6 +91,12 @@ public:
 				    const uint32* targettuple,
 				    const jni::MapGlue& map) const;
 
+  //##########################################################################
+  //# Debug Output
+#ifdef DEBUG
+  void dumpTransitionRecords() const;
+#endif /* DEBUG */
+
 private:
   //##########################################################################
   //# Auxiliary Methods

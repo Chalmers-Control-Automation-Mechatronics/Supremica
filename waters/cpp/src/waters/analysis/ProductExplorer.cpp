@@ -350,10 +350,10 @@ doNonblockingCoreachabilitySearch()
         if (++mNumCoreachableStates == mNumStates) {
           return true;
         }
-        if (currenttuple == 0) {
+        if (currenttuple == 0) { // storing
           //mReverseTransitionStore->dump(mNumStates);
           exploreNonblockingCoreachabilityStateDFS(current);
-        } else {
+        } else { // non-storing
           exploreNonblockingCoreachabilityStateDFS(currenttuple,
                                                    currentpacked);
         }
