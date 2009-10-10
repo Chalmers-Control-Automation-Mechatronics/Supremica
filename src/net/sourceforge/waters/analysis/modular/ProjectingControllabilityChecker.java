@@ -264,17 +264,13 @@ public class ProjectingControllabilityChecker
     for (AutomatonProxy a : automata) {
       events.addAll(a.getEvents());
     }
-    ProductDESProxy model = getFactory().createProductDESProxy("model",
-                                                               events,
-                                                               automata);
-    ProjectionList list = project(model, forbiddenEvents);
-    /*ControllabilityChecker checker = new ModularControllabilityChecker(
-                                           list.getModel(), getFactory(),
-                                           mChecker, mHeuristic, mLeast);*/
-    ControllabilityChecker checker = mChecker;
-    mChecker.setModel(list.getModel());
-    checker.setNodeLimit(getNodeLimit());
-    checker.setKindTranslator(new KindTranslator()
+    final ProductDESProxy model =
+      getFactory().createProductDESProxy("model", events, automata);
+    final ProjectionList list = project(model, forbiddenEvents);
+    final ProductDESProxy pmodel = list == null ? model : list.getModel();
+    mChecker.setModel(pmodel);
+    mChecker.setNodeLimit(getNodeLimit());
+    mChecker.setKindTranslator(new KindTranslator()
     {
       public EventKind getEventKind(EventProxy e)
       {
@@ -287,25 +283,20 @@ public class ProjectingControllabilityChecker
       }
     });
     mMinAutMap.clear();
-    if (checker.run()) {
-      //mStates += checker.getAnalysisResult().getTotalNumberOfStates();
-      mStates = (int)checker.getAnalysisResult().getTotalNumberOfStates();
-      setSatisfiedResult();
-      return true;
+    if (mChecker.run()) {
+      //mStates += mChecker.getAnalysisResult().getTotalNumberOfStates();
+      mStates = (int) mChecker.getAnalysisResult().getTotalNumberOfStates();
+      return setSatisfiedResult();
     } else {
-      //mStates += checker.getAnalysisResult().getTotalNumberOfStates();
-      mStates = (int)checker.getAnalysisResult().getTotalNumberOfStates();
-      System.out.println(checker.getAnalysisResult().getTotalNumberOfStates());
-      TraceProxy counter = checker.getCounterExample();
+      //mStates += mChecker.getAnalysisResult().getTotalNumberOfStates();
+      mStates = (int) mChecker.getAnalysisResult().getTotalNumberOfStates();
+      TraceProxy counter = mChecker.getCounterExample();
       counter = list.getTrace(counter, model);
       List<EventProxy> e = new ArrayList<EventProxy>(counter.getEvents());
-      System.out.println(e);
       e.set(e.size() - 1, forbtouncont.get(e.get(e.size() - 1)));
-      System.out.println(e);
       counter = getFactory().createSafetyTraceProxy(getModel().getName(),
                                                     getModel(), e);
-      setFailedResult(counter);
-      return false;
+      return setFailedResult(counter);
     }
   }
 
@@ -451,7 +442,6 @@ public class ProjectingControllabilityChecker
           total.addAll(a.getEvents());
           common.retainAll(a.getEvents());
         }
-        Iterator<AutomatonProxy> it = s.iterator();
         double tot = total.size();
         double uncom = tot - common.size();
         size *= uncom;
@@ -463,10 +453,6 @@ public class ProjectingControllabilityChecker
       int setSize = -1;
       for (Tuple tup : possible) {
         try {
-          long maxsize = 1;
-          for (AutomatonProxy a : tup.mSet) {
-            maxsize *= a.getStates().size();
-          }
           ProjectionList t =
             new ProjectionList(p, automata, tup.mSet, forbiddenEvents);
           if (minSize >= t.getNew().getStates().size()) {
