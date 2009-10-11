@@ -68,6 +68,12 @@ glue class HashMap extends Map {
   HashMap(int initialCapacity);
 }
 
+glue class TreeSet extends Set {
+  TreeSet();
+  TreeSet(glue Collection c);
+}
+
+
 //###########################################################################
 package net.sourceforge.waters.xsd.base;
 //###########################################################################

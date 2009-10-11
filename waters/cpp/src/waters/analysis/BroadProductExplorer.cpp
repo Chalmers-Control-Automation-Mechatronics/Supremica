@@ -32,6 +32,7 @@
 #include "jni/glue/SetGlue.h"
 #include "jni/glue/StateGlue.h"
 #include "jni/glue/TransitionGlue.h"
+#include "jni/glue/TreeSetGlue.h"
 #include "jni/glue/VerificationResultGlue.h"
 
 #include "waters/analysis/BroadEventRecord.h"
@@ -546,9 +547,10 @@ setupTransitions
   jni::ClassCache* cache = getCache();
   HashTable<const jni::StateGlue*,uint32>* statemap = aut->createStateMap();
   const jni::CollectionGlue transitions = autglue.getTransitionsGlue(cache);
+  const jni::TreeSetGlue uniqtrans(&transitions, cache);
   int maxpass = 1;
   for (int pass = 1; pass <= maxpass; pass++) {
-    const jni::IteratorGlue transiter = transitions.iteratorGlue(cache);
+    const jni::IteratorGlue transiter = uniqtrans.iteratorGlue(cache);
     while (transiter.hasNext()) {
       jobject javaobject = transiter.next();
       jni::TransitionGlue trans(javaobject, cache);
