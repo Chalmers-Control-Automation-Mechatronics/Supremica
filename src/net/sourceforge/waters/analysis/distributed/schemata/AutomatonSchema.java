@@ -79,6 +79,23 @@ public class AutomatonSchema implements Serializable
     return fmt.toString();
   }
 
+  /**
+   * A simple predicate to check if an event is in the alphabet for
+   * this automaton.
+   * @param event to check for
+   * @return true if event is in the alphabet for this automaton.
+   */
+  public boolean hasEvent(int event)
+  {
+    for (int eventid : mEventIds)
+      {
+	if (event == eventid)
+	  return true;
+      }
+
+    return false;
+  }
+
   private final String mName;
   private final int[] mEventIds;
   private final StateSchema[] mStates;
