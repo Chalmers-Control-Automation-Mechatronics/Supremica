@@ -2,14 +2,14 @@
 //###########################################################################
 //# PROJECT: Waters
 //# PACKAGE: waters.analysis
-//# CLASS:   BroadProductExplorer
+//# CLASS:   NarrowProductExplorer
 //###########################################################################
 //# $Id$
 //###########################################################################
 
 
-#ifndef _BroadProductExplorer_h_
-#define _BroadProductExplorer_h_
+#ifndef _NarrowProductExplorer_h_
+#define _NarrowProductExplorer_h_
 
 #ifdef __GNUG__
 #pragma interface
@@ -38,25 +38,27 @@ namespace jni {
 
 namespace waters {
 
-class BroadEventRecord;
+class NarrowEventRecord;
+class NarrowTransitionTable;
 class NondeterministicTransitionIterator;
 
 
 //############################################################################
-//# class BroadProductExplorer
+//# class NarrowProductExplorer
 //############################################################################
 
-class BroadProductExplorer : public ProductExplorer
+class NarrowProductExplorer : public ProductExplorer
 {
 public:
   //##########################################################################
   //# Constructors & Destructors
-  explicit BroadProductExplorer(const jni::ProductDESProxyFactoryGlue& factory,
-				const jni::ProductDESGlue& des,
-				const jni::KindTranslatorGlue& translator,
-				const jni::EventGlue& marking,
-				jni::ClassCache* cache);
-  virtual ~BroadProductExplorer();
+  explicit NarrowProductExplorer
+    (const jni::ProductDESProxyFactoryGlue& factory,
+     const jni::ProductDESGlue& des,
+     const jni::KindTranslatorGlue& translator,
+     const jni::EventGlue& marking,
+     jni::ClassCache* cache);
+  virtual ~NarrowProductExplorer();
 
 protected:
   //##########################################################################
@@ -75,28 +77,17 @@ protected:
 
 private:
   //##########################################################################
-  //# Private Auxiliary Methods
-  void setupSafety();
-  void setupNonblocking();
-  void setupEventMap
-    (HashTable<const jni::EventGlue*,BroadEventRecord*>& eventmap);
-  void setupTransitions
-    (AutomatonRecord* aut,
-     const jni::AutomatonGlue& autglue,
-     const HashTable<const jni::EventGlue*,BroadEventRecord*>& eventmap);
-  void setupCompactEventList
-    (const HashTable<const jni::EventGlue*,BroadEventRecord*>& eventmap);
-
-  //##########################################################################
   //# Data Members
   int mNumEventRecords;
-  BroadEventRecord** mEventRecords;
-  BroadEventRecord** mReversedEventRecords;
+  NarrowEventRecord** mEventRecords;
+  NarrowTransitionTable* mTransitionTables;
+  /*
   int mMaxUpdates;
   NondeterministicTransitionIterator* mNondeterministicTransitionIterators;
   uint32 mTraceLimit;
+  */
 };
 
 }   /* namespace waters */
 
-#endif  /* !_BroadProductExplorer_h_ */
+#endif  /* !_NarrowProductExplorer_h_ */

@@ -101,5 +101,13 @@ compareTo(const EventRecord* partner)
   return mJavaEvent.compareTo(&partner->mJavaEvent);
 }
 
+int EventRecord::
+compare(const void* elem1, const void* elem2)
+{
+  const EventRecord* val1 = *((const EventRecord**) elem1);
+  const EventRecord* val2 = *((const EventRecord**) elem2);
+  return val1->compareTo(val2);
+}
+
 
 }  /* namespace waters */

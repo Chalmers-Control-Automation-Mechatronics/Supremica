@@ -44,7 +44,10 @@ class NarrowTransitionTable
 public:
   //##########################################################################
   //# Constructors & Destructors
-  explicit NarrowTransitionTable(AutomatonRecord* aut);
+  explicit NarrowTransitionTable
+    (AutomatonRecord* aut,
+     jni::ClassCache* cache,
+     const HashTable<const jni::EventGlue*, NarrowEventRecord*>& eventmap);
   ~NarrowTransitionTable();
 
   //##########################################################################
@@ -53,12 +56,6 @@ public:
 
 private:
   //##########################################################################
-  //# Auxiliary Methods
-  void setup(jni::ClassCache* cache,
-	     const HashTable<const jni::EventGlue*,NarrowEventRecord*>&
-	       eventmap);
-
-  //##########################################################################
   //# Data Members
   AutomatonRecord* mAutomaton;
   uint32* mStateTable;
@@ -66,7 +63,8 @@ private:
 
   //##########################################################################
   //# Class Constants
-  static const uint32 TAG_NONDET = 0x10000000;
+  static const uint32 TAG_END_OF_LIST = 0x80000000;
+  friend class NarrowTransitionRecord;
 };
 
 
