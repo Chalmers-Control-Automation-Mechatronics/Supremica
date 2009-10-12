@@ -11,16 +11,18 @@ import net.sourceforge.waters.model.base.WatersRuntimeException;
 
 public class ThreadedOutputDispatcher extends AbstractOutputDispatcher
 {
-  public ThreadedOutputDispatcher(WorkerLocal worker, StateDistribution dist, int threadcount)
+  public ThreadedOutputDispatcher(WorkerLocal worker, StateDistribution dist, int threadcount, int waitinglimit)
   {
     super(dist);
+
+    mWaitingLimit = waitinglimit;
 
     mWorker = worker;
 
     //An arbitrary, somewhat big queue. We don't want to
     //block the processing threads until there really is a 
     //large backlog of states.
-    mOutputQueue = new ArrayDeque<StateTuple>(32768);
+    mOutputQueue = new ArrayDeque<StateTuple>(mWaitingLimit);
 
     for (int i = 0; i < threadcount; i++)
       {
@@ -35,8 +37,15 @@ public class ThreadedOutputDispatcher extends AbstractOutputDispatcher
   {
     synchronized (mOutputQueue)
       {
+	//If the queue is full, then block until it is less 
+	//full.
+	while (mOutputQueue.size() + 1 > mWaitingLimit)
+	  {
+	    mOutputQueue.wait();
+	  }
+
 	mOutputQueue.addLast(state);
-	mOutputQueue.notify();
+	mOutputQueue.notifyAll();
       }
   }
 
@@ -44,6 +53,11 @@ public class ThreadedOutputDispatcher extends AbstractOutputDispatcher
   {
     synchronized (mOutputQueue)
       {
+	while (mOutputQueue.size() + length > mWaitingLimit)
+	  {
+	    mOutputQueue.wait();
+	  }
+
 	for (int i = offset; i < offset+length && i < states.length; i++)
 	  {
 	    mOutputQueue.addLast(states[i]);
@@ -95,6 +109,9 @@ public class ThreadedOutputDispatcher extends AbstractOutputDispatcher
 	  }
 
 	StateTuple t = mOutputQueue.removeFirst();
+
+	//Let the vultures swoop in
+	mOutputQueue.notifyAll();
 	return t;
       }
   }
@@ -104,10 +121,11 @@ public class ThreadedOutputDispatcher extends AbstractOutputDispatcher
     mHalt = true;
   }
 
-  public void shutdown()
+  public synchronized void shutdown()
   {
     //Interrupt all dispatch threads then wait for them
     //to terminate
+    notifyAll();
     for (DispatchThread t : mDispatchers)
       {
 	t.interrupt();
@@ -137,5 +155,7 @@ public class ThreadedOutputDispatcher extends AbstractOutputDispatcher
 
   //Used to stop the dispatcher if something bad happens. This should help
   //mitigate massive spam if an error occurs.
-  private volatile boolean mHalt; 
+  private volatile boolean mHalt;
+
+  private final int mWaitingLimit;
 }

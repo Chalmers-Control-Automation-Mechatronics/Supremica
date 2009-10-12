@@ -61,7 +61,9 @@ public class SafetyVerifierWorkerImpl extends AbstractWorker implements SafetyVe
     mStateDistribution.setHandler(getWorkerID(), mLocalHandler);
 
     //mOutputDispatcher = new SynchronousOutputDispatcher(mStateDistribution);
-    mOutputDispatcher = new ThreadedOutputDispatcher(this, mStateDistribution, 4);
+    //Use 16Mb of memory for the output queue, at which point the 
+    //processing threads will be blocked until the queue empties.
+    mOutputDispatcher = new ThreadedOutputDispatcher(this, mStateDistribution, 8, 1 << 22);
   }
 
 
