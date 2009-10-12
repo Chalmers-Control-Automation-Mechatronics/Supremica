@@ -245,6 +245,21 @@ public class SafetyVerifierController extends AbstractController
     String distname = mJob.getStateDistribution();
     if ("prototype".equals(distname))
       return new PrototypeStateDistribution(mWorkerIDs, mModel, mStateEncoding, 8);
+    else if ("lowestprob".equals(distname))
+      {
+	ProbabilityEstimator est = new ChangeProbabilityEstimator(mModel);
+	AutomataSelector as =  new LowestProbabilitySelector
+	  (mModel, est, Util.clog2(mWorkerIDs.length * 2));
+	return new SelectorDistribution(mWorkerIDs, mModel, mStateEncoding, as);
+      }
+    else if ("independent_events".equals(distname))
+      {
+	ProbabilityEstimator est = new ChangeProbabilityEstimator(mModel);
+	AutomataSelector as =  new IndependentEventsSelector
+	  (mModel, est);
+	return new SelectorDistribution(mWorkerIDs, mModel, mStateEncoding, as);
+
+      }
     else
       return new HashStateDistribution(mWorkerIDs);
   }

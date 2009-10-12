@@ -125,6 +125,11 @@ public class GreedyPackedStateEncoding extends StateEncoding
     return unpacked;
   }
 
+  public int decodeAutomatonState(StateTuple packed, int a)
+  {
+    return (packed.getStateArray()[mWordIndex[a]] & mBitMask[a]) >>> mShift[a];
+  }
+
   public String interpret(StateTuple packed)
   {
     return interpret(decodeState(packed));
