@@ -5,6 +5,7 @@ import gnu.trove.THashMap;
 import java.rmi.RemoteException;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
@@ -142,6 +143,9 @@ public class SafetyVerifierWorkerImpl extends AbstractWorker implements SafetyVe
       super();
       mBufferSize = bufferSize;
       mOutgoingBuffer = new StateTuple[bufferSize];
+      
+      //A small cache for recently queued states.
+      mOutputCache = new HashCache(1 << 18);
     }
 
     public void run()
@@ -322,9 +326,17 @@ public class SafetyVerifierWorkerImpl extends AbstractWorker implements SafetyVe
 	    }
 	  
 	  //Eventually dispatch the state.
+
 	  StateTuple packed = mStateEncoding.encodeState(successor, state.getDepthHint() + 1);
-	  outputState(packed);
 	  
+	  //If the state has been recently dispatched, there is no reason
+	  //to dispatch it again. This can be done by checking if it is 
+	  //inside the cache.
+	  if (!mOutputCache.contains(packed))
+	    {
+	      mOutputCache.put(packed);
+	      outputState(packed);
+	    }
 	}
     }
     
@@ -390,6 +402,7 @@ public class SafetyVerifierWorkerImpl extends AbstractWorker implements SafetyVe
     private final StateTuple[] mOutgoingBuffer;
     private int mOutgoingBufferIndex = 0;
     private final int mBufferSize;
+    private final HashCache mOutputCache; 
   }
 
     
