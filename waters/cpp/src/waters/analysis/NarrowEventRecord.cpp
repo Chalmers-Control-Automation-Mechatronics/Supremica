@@ -27,13 +27,29 @@ NarrowEventRecord::
 NarrowEventRecord(jni::EventGlue event, bool controllable, uint32 code)
   : EventRecord(event, controllable),
     mEventCode(code),
-    mNumAutomata(0)
+    mNumAutomata(0),
+    mIsOnlySelfloops(true),
+    mIsOnlySelfloopsDisabledInSpec(false),
+    mIsGloballyDisabled(false)
 {
 }
 
 
 //############################################################################
 //# NarrowEventRecord: Simple Access
+
+bool NarrowEventRecord::
+isSkippable()
+  const
+{
+  return
+    mIsGloballyDisabled ||
+    mIsOnlySelfloops && !mIsOnlySelfloopsDisabledInSpec;
+}
+
+
+//############################################################################
+//# NarrowEventRecord: Setup
 
 void NarrowEventRecord::
 resetLocalTransitions()
@@ -45,7 +61,7 @@ resetLocalTransitions()
 void NarrowEventRecord::
 countLocalTransition(bool selfloop)
 {
-  mNumLocalTransitions;
+  mNumLocalTransitions++;
   mIsOnlyLocalSelfloops &= selfloop;
 }
 
@@ -53,6 +69,9 @@ void NarrowEventRecord::
 mergeLocalToGlobal(bool isplant, uint32 numstates)
 {
   mIsOnlySelfloops &= mIsOnlyLocalSelfloops;
+  if (mIsOnlySelfloops && !isplant) {
+    mIsOnlySelfloopsDisabledInSpec |= mNumLocalTransitions < numstates;
+  }
   if (mNumLocalTransitions == 0) {
     mIsGloballyDisabled = isplant || isControllable();
   }
@@ -66,6 +85,7 @@ mergeLocalToGlobal(bool isplant, uint32 numstates)
 
 bool NarrowEventRecord::
 isLocallySelflooped(uint32 numstates)
+  const
 {
   return mIsOnlyLocalSelfloops && mNumLocalTransitions == numstates;
 }

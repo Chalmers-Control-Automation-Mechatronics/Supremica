@@ -50,13 +50,14 @@ public:
   inline uint32 getNumberOfPlants() const {return mNumPlants;}
   inline bool isGloballyDisabled() const {return mIsGloballyDisabled;}
   inline bool isOnlySelfloops() const {return mIsOnlySelfloops;}
+  bool isSkippable() const;
 
   //##########################################################################
   //# Setup
   void resetLocalTransitions();
   void countLocalTransition(bool selfloop);
   void mergeLocalToGlobal(bool isplant, uint32 numstates);
-  bool isLocallySelflooped(uint32 numstates);
+  bool isLocallySelflooped(uint32 numstates) const;
 
   //##########################################################################
   //# Trace Computation
@@ -71,6 +72,7 @@ private:
   uint32 mNumAutomata;
   uint32 mNumPlants;
   bool mIsOnlySelfloops;
+  bool mIsOnlySelfloopsDisabledInSpec;
   bool mIsGloballyDisabled;
   uint32 mNumLocalTransitions;
   bool mIsOnlyLocalSelfloops;
