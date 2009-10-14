@@ -275,10 +275,10 @@ NarrowTransitionTable(AutomatonRecord* aut,
     mStateTable(0),
     mBuffers(0)
 {
-  const uint32 numstates = mAutomaton->getNumberOfStates();
+  mNumStates = mAutomaton->getNumberOfStates();
   NarrowStateRecord* narrowstates =
-    (NarrowStateRecord*) new char[numstates * sizeof(NarrowStateRecord)];
-  for (uint32 code = 0; code < numstates; code++) {
+    (NarrowStateRecord*) new char[mNumStates * sizeof(NarrowStateRecord)];
+  for (uint32 code = 0; code < mNumStates; code++) {
     const jni::StateGlue& state = mAutomaton->getJavaState(code);
     new (&narrowstates[code]) NarrowStateRecord(state, code, cache);
   }
@@ -345,13 +345,13 @@ NarrowTransitionTable(AutomatonRecord* aut,
     jobject javaobject = eventiter2.next();
     jni::EventGlue event(javaobject, cache);
     NarrowEventRecord* eventrecord = eventmap.get(&event);
-    eventrecord->mergeLocalToGlobal(isplant, numstates);
+    eventrecord->mergeLocalToGlobal(isplant, mNumStates);
   }
 
-  mStateTable = new uint32[numstates];
-  mBuffers = new uint32[2 * transcount + numstates + ndcount];
+  mStateTable = new uint32[mNumStates];
+  mBuffers = new uint32[2 * transcount + mNumStates + ndcount];
   uint32 next = 0;
-  for (uint32 code = 0; code < numstates; code++) {
+  for (uint32 code = 0; code < mNumStates; code++) {
     NarrowStateRecord& narrowstate = narrowstates[code];
     narrowstate.sort();
     mStateTable[code] = next;
@@ -381,7 +381,7 @@ NarrowTransitionTable(AutomatonRecord* aut,
     const jni::EventGlue& event = trans.getEventGlue(cache);
     const NarrowEventRecord* eventrecord = eventmap.get(&event);
     if (eventrecord->isGloballyDisabled() ||
-        eventrecord->isLocallySelflooped(numstates)) {
+        eventrecord->isLocallySelflooped(mNumStates)) {
       continue;
     }
     const uint32 eventcode = eventrecord->getEventCode();
@@ -395,7 +395,7 @@ NarrowTransitionTable(AutomatonRecord* aut,
   }
 
   mAutomaton->deleteStateMap(statemap);
-  for (uint32 code = 0; code < numstates; code++) {
+  for (uint32 code = 0; code < mNumStates; code++) {
     narrowstates[code].~NarrowStateRecord();
   }
   delete (const char*) narrowstates;
@@ -411,8 +411,31 @@ NarrowTransitionTable::
 
 
 //############################################################################
-//# NarrowTransitionTable: Auxiliary Methods
+//# NarrowTransitionTable: Setup
 
+void NarrowTransitionTable::
+removeSkipped(const NarrowEventRecord* const* events)
+{
+  for (uint32 state = 0; state < mNumStates; state++) {
+    uint32 rpos = mStateTable[state];
+    uint32 wpos = rpos;
+    uint32 ecode = mBuffers[rpos++];
+    while (ecode != UNDEF_UINT32) {
+      if (events[ecode]->isSkippable()) {
+        rpos += 2;
+      } else if (rpos == wpos) {
+        wpos = rpos += 2;
+      } else {
+        rpos++;
+        mBuffers[wpos++] = ecode;
+        mBuffers[wpos++] = mBuffers[rpos++];
+      }
+    }
+    if (rpos != wpos) {
+      mBuffers[wpos] = UNDEF_UINT32;
+    }
+  }
+}
 
 
 }  /* namespace waters */

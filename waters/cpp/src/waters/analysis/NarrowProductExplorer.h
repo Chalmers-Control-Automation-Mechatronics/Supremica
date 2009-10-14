@@ -77,10 +77,15 @@ protected:
 
 private:
   //##########################################################################
+  //# Private Auxiliary Methods
+  void addSuccessorStates();
+
+  //##########################################################################
   //# Data Members
   int mNumEventRecords;
   NarrowEventRecord** mEventRecords;
   NarrowTransitionTable* mTransitionTables;
+  uint32* mIterator;
   /*
   int mMaxUpdates;
   NondeterministicTransitionIterator* mNondeterministicTransitionIterators;

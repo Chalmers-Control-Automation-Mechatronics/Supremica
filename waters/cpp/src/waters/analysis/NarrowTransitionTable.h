@@ -54,9 +54,22 @@ public:
   //# Simple Access
   inline const AutomatonRecord* getAutomaton() const {return mAutomaton;}
 
+  //##########################################################################
+  //# Iteration
+  inline uint32 iterator(uint32 state) const {return mStateTable[state];}
+  inline uint32 hasNext(uint32 iterator) const
+    {return mBuffers[iterator] != UNDEF_UINT32;}
+  inline uint32 next(uint32 iterator) const {return iterator + 2;}
+  inline uint32 getEvent(uint32 iterator) const {return mBuffers[iterator];}
+
+  //##########################################################################
+  //# Setup
+  void removeSkipped(const NarrowEventRecord* const* events);
+
 private:
   //##########################################################################
   //# Data Members
+  uint32 mNumStates;
   AutomatonRecord* mAutomaton;
   uint32* mStateTable;
   uint32* mBuffers;

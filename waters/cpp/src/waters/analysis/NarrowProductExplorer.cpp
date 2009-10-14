@@ -59,7 +59,8 @@ NarrowProductExplorer(const jni::ProductDESProxyFactoryGlue& factory,
   : ProductExplorer(factory, des, translator, marking, cache),
     mNumEventRecords(0),
     mEventRecords(0),
-    mTransitionTables(0)
+    mTransitionTables(0),
+    mIterator(0)
 {
 }
 
@@ -70,15 +71,16 @@ NarrowProductExplorer::
     for (int i = 0; i < mNumEventRecords; i++) {
       delete mEventRecords[i];
     }
-    delete [] mEventRecords;
+    delete[] mEventRecords;
   }
   if (mTransitionTables != 0) {
     const int numaut = getNumberOfAutomata();
     for (int a = 0; a < numaut; a++) {
       mTransitionTables[a].~NarrowTransitionTable();
     }
-    delete [] (char*) mTransitionTables;
+    delete[] (char*) mTransitionTables;
   }
+  delete[] mIterator;
 }
 
 
@@ -162,6 +164,12 @@ setup()
     AutomatonRecord* aut = getAutomatonEncoding().getRecord(a);
     new (&mTransitionTables[a]) NarrowTransitionTable(aut, cache, eventmap);
   }
+  for (int a = 0; a < numaut; a++) {
+    mTransitionTables[a].removeSkipped(mEventRecords);
+  }
+
+  // More allocation ...
+  mIterator = new uint32[numaut];
 }
 
 void NarrowProductExplorer::
@@ -183,6 +191,8 @@ teardown()
     delete [] (char*) mTransitionTables;
     mTransitionTables = 0;
   }
+  delete [] mIterator;
+  mIterator = 0;
   ProductExplorer::teardown();
 }
 
@@ -356,33 +366,41 @@ expandNonblockingReachabilityState(uint32 source,
                                    const uint32* sourcetuple,
                                    const uint32* sourcepacked)
 {
-  /*
-  const int numwords = getAutomatonEncoding().getNumberOfWords();
-  setConflictKind(jni::ConflictKind_DEADLOCK);
-  if (getTransitionLimit() > 0) {
-#   define ADD_TRANSITION addCoreachabilityTransition
-#   define ADD_TRANSITION_ALLOC ADD_TRANSITION
-    EXPAND(numwords, source, sourcetuple, sourcepacked);
-#   undef ADD_TRANSITION
-#   undef ADD_TRANSITION_ALLOC
-  } else {
-    bool markedoff = false;
-#   define ADD_TRANSITION(source, target) {                             \
-      incNumberOfTransitions();                                         \
-      event->markTransitionsTakenFast(sourcetuple);                     \
+  const int numaut = getNumberOfAutomata();
+  uint32 minevent = UNDEF_UINT32;
+  uint32 mincount;
+  for (int a = 0; a < numaut; a++) {
+    const NarrowTransitionTable& table = mTransitionTables[a];
+    mIterator[a] = table.iterator(sourcetuple[a]);
+    uint32 event = table.getEvent(mIterator[a]);
+    if (event < minevent) {
+      minevent = event;
+      mincount = 1;
+    } else if (event == minevent) {
+      mincount++;
     }
-#   define ADD_TRANSITION_ALLOC(source, target) {                       \
-      incNumberOfTransitions();                                         \
-      if (!markedoff) {                                                 \
-        event->markTransitionsTakenFast(sourcetuple);                   \
-        markedoff = true;                                               \
-      }                                                                 \
-    }
-    EXPAND(numwords, source, sourcetuple, sourcepacked);
-#   undef ADD_TRANSITION
-#   undef ADD_TRANSITION_ALLOC
   }
-  */
+  while (minevent != UNDEF_UINT32) {
+    if (mincount == mEventRecords[minevent]->getNumberOfAutomata()) {
+      addSuccessorStates();
+    }
+    uint32 newminevent = UNDEF_UINT32;
+    for (int a = 0; a < numaut; a++) {
+      const NarrowTransitionTable& table = mTransitionTables[a];
+      uint32 event = table.getEvent(mIterator[a]);
+      if (event == minevent) {
+        mIterator[a] = table.next(mIterator[a]);
+        event = table.getEvent(mIterator[a]);
+      }
+      if (event < newminevent) {
+        newminevent = event;
+        mincount = 1;
+      } else if (event == newminevent) {
+        mincount++;
+      }
+    }
+    minevent = newminevent;
+  }
   if (getConflictKind() != jni::ConflictKind_DEADLOCK) {
     return true;
   } else if (getAutomatonEncoding().isMarkedStateTuple(sourcetuple)) {
@@ -465,6 +483,15 @@ expandTraceState(const uint32* targettuple, const uint32* targetpacked)
 #undef ADD_NEW_STATE
 #undef ADD_NEW_STATE_ALLOC
 #undef EXPAND
+
+
+//############################################################################
+//# NarrowProductExplorer: Private Auxiliary Methods
+
+void NarrowProductExplorer::
+addSuccessorStates()
+{
+}
 
 
 }  /* namespace waters */
