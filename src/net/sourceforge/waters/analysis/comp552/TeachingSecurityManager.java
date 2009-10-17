@@ -135,42 +135,34 @@ class TeachingSecurityManager extends SecurityManager
 
   public void checkPermission(final Permission perm)
   {
-    try {
-      final String name = perm.getName();
-      if (mEnabled) {
-	if (perm instanceof FilePermission) {
-	  final FilePermission fileperm = (FilePermission) perm;
-	  final String actionlist = fileperm.getActions();
-	  final String[] actions = actionlist.split(",");
-	  for (final String action : actions) {
-	    if (action.equals("read")) {
-	      if (!isAccessible(name, mReadableDirectories)) {
-		throw new SecurityException
-		  ("File access disabled!\n" +
-		   "(Attempted to read '" + name + "'.)");
-	      }
-	    } else if (action.equals("write") || actions.equals("delete")) {
-	      if (!isAccessible(name, mWriteableDirectories)) {
-		throw new SecurityException
-		  ("File access disabled!\n(Attempted to " + action +
-		   " '" + name + "'.)");
-	      }
-	    } else {
-	      throw new SecurityException
-		("System commands disabled!\n" +
+    final String name = perm.getName();
+    if (mEnabled) {
+      if (perm instanceof FilePermission) {
+        final FilePermission fileperm = (FilePermission) perm;
+        final String actionlist = fileperm.getActions();
+        final String[] actions = actionlist.split(",");
+        for (final String action : actions) {
+          if (action.equals("read")) {
+            if (!isAccessible(name, mReadableDirectories)) {
+              throw new SecurityException
+                ("File access disabled!\n" +
+                 "(Attempted to read '" + name + "'.)");
+            }
+          } else if (action.equals("write") || actions.equals("delete")) {
+            if (!isAccessible(name, mWriteableDirectories)) {
+              throw new SecurityException
+                ("File access disabled!\n(Attempted to " + action +
+                 " '" + name + "'.)");
+            }
+          } else {
+            throw new SecurityException
+              ("System commands disabled!\n" +
 		 "(Attempted to execute '" + name + "'.)");
-	    }
-	  }
-	} else {
-	  super.checkPermission(perm);
-	}
+          }
+        }
+      } else {
+        super.checkPermission(perm);
       }
-      /*
-    } catch (final SecurityException exception) {
-      System.err.println("DECLINE: " + perm);
-      exception.printStackTrace(System.err);
-      throw exception;
-      */
     }
   }
 
