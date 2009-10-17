@@ -41,6 +41,21 @@ public abstract class CommandLineArgumentInteger
   }
 
   /**
+   * Creates an optional command line argument of integer type.
+   * @param  name          The name of the argument,
+   *                       for example <CODE>&quot;-limit&quot;</CODE>.
+   * @param  description   A textual description of the argument.
+   * @param  value         Default value for argument.
+   */
+  protected CommandLineArgumentInteger(final String name,
+                                       final String description,
+                                       final int value)
+  {
+    super(name, description);
+    mValue = value;
+  }
+
+  /**
    * Creates a command line argument of integer type.
    * @param  name          The name of the argument,
    *                       for example <CODE>&quot;limit&quot;</CODE>.
@@ -52,7 +67,7 @@ public abstract class CommandLineArgumentInteger
    */
   protected CommandLineArgumentInteger(final String name,
                                        final String description,
-                                      final boolean required)
+                                       final boolean required)
   {
     super(name, description, required);
   }

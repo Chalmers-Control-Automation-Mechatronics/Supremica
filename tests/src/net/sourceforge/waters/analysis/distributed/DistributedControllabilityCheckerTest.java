@@ -65,32 +65,6 @@ public class DistributedControllabilityCheckerTest
 
 
   //#########################################################################
-  //# Overridden Test Cases
-  public void testHISCRhoneSubsystem1Patch0() throws Exception
-  {
-    // OutOfMemoryError, 24386 states
-  }
-
-  public void testHISCRhoneSubsystem1Patch1() throws Exception
-  {
-  }
-
-  public void testHISCRhoneSubsystem1Patch2() throws Exception
-  {
-  }
-
-  public void testProfisafeI4Host() throws Exception
-  {
-    // <2% CPU usage, no response ...
-  }
-
-  public void testFischertechnik() throws Exception
-  {
-    // Initial state bad, no response ...
-  }
-
-
-  //#########################################################################
   //# Class Constants
   private static final String HOSTNAME = "localhost";
   private static final int NUM_NODES = 3;
@@ -99,7 +73,7 @@ public class DistributedControllabilityCheckerTest
     try {
       final String name = DistributedServer.DEFAULT_SERVICE_NAME;
       final int port = DistributedServer.DEFAULT_PORT;
-      final Registry registry =	LocateRegistry.createRegistry(port);
+      final Registry registry = LocateRegistry.createRegistry(port);
       final Server server = new DistributedServer();
       final Server stub = (Server) UnicastRemoteObject.exportObject(server, 0);
       registry.bind(name, stub);

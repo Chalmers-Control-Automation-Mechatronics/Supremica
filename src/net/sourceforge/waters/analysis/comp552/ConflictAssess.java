@@ -1,3 +1,4 @@
+//# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
 //# PROJECT: Waters
 //# PACKAGE: net.sourceforge.waters.analysis
@@ -34,6 +35,7 @@ import java.util.Map;
 import javax.xml.bind.JAXBException;
 
 import net.sourceforge.waters.cpp.analysis.NativeLanguageInclusionChecker;
+import net.sourceforge.waters.cpp.analysis.NativeModelAnalyser;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.LanguageInclusionChecker;
 import net.sourceforge.waters.model.base.DocumentProxy;
@@ -78,9 +80,11 @@ public class ConflictAssess
 
   //#########################################################################
   //# Constructors
-  private ConflictAssess(final File outputfile, final int minutes)
+  private ConflictAssess(final File outputfile, final int minutes,
+                         final TeachingSecurityManager secman)
     throws FileNotFoundException, JAXBException, SAXException
   {
+    mSecurityManager = secman;
     final ModuleProxyFactory moduleFactory =
       ModuleElementFactory.getInstance();
     mDESFactory = ProductDESElementFactory.getInstance();
@@ -118,28 +122,30 @@ public class ConflictAssess
     throws Exception
   {
     try {
+      final File dirname = filename.getParentFile();
       mStream = new FileInputStream(filename);
       final Reader streamreader = new InputStreamReader(mStream);
       final BufferedReader reader = new BufferedReader(streamreader);
+      System.setSecurityManager(mSecurityManager);
       String line = reader.readLine();
       while (line != null) {
-	line = line.trim();
-	if (!line.startsWith("#")) {
-	  final String[] parts = line.split(" +");
-	  if (parts.length == 2) {
-	    final File name = new File(parts[0]);
-	    final boolean expect = parts[1].equals("true");
-	    runTest(name, expect);
-	  }
-	}
-	line = reader.readLine();
+        line = line.trim();
+        if (!line.startsWith("#")) {
+          final String[] parts = line.split(" +");
+          if (parts.length == 2) {
+            final File name = new File(dirname, parts[0]);
+            final boolean expect = parts[1].equals("true");
+            runTest(name, expect);
+          }
+        }
+        line = reader.readLine();
       }
     } finally {
       synchronized (this) {
-	if (mStream != null) {
-	  mStream.close();
-	  mStream = null;
-	}
+        if (mStream != null) {
+          mStream.close();
+          mStream = null;
+        }
       }
     }
   }
@@ -154,13 +160,13 @@ public class ConflictAssess
     } else {
       final ModuleProxy module = (ModuleProxy) doc;
       final ModuleCompiler compiler =
-	new ModuleCompiler(mDocumentManager, mDESFactory, module);
+        new ModuleCompiler(mDocumentManager, mDESFactory, module);
       des = compiler.compile();
     }
 
     synchronized (this) {
       if (mTerminated) {
-	return;
+        return;
       }
       mPrinter.print(des.getName() + " ... ");
       mPrinter.flush();
@@ -170,7 +176,9 @@ public class ConflictAssess
     boolean result;
     double time;
     try {
-      checker =	new ConflictChecker(des, mDESFactory);
+      System.err.println("E1");
+      mSecurityManager.setEnabled(true);
+      checker = new ConflictChecker(des, mDESFactory);
       final long starttime = System.currentTimeMillis();
       result = checker.run();
       final long stoptime = System.currentTimeMillis();
@@ -183,46 +191,52 @@ public class ConflictAssess
     } catch (final Throwable exception) {
       printException(exception);
       return;
+    } finally {
+      System.err.println("D1");
+      mSecurityManager.setEnabled(false);
     }
 
     synchronized (this) {
       if (mTerminated) {
-	return;
+        return;
       }
       if (result) {
-	mPrinter.print("nonconflicting");
+        mPrinter.print("nonconflicting");
       } else {
-	mPrinter.print("conflicting");
+        mPrinter.print("conflicting");
       }
       if (result == expect) {
-	mPrinter.print(" - ok");
-	mNumCorrectAnswers++;
+        mPrinter.print(" - ok");
+        mNumCorrectAnswers++;
       } else {
-	mPrinter.print(" - WRONG");
+        mPrinter.print(" - WRONG");
       }
       mPrinter.println(" <" + mFormatter.format(time) + "s>");
     }
 
     if (!result && !expect) {
       synchronized (this) {
-	mPrinter.print("  Counterexample ... ");
-	mPrinter.flush();
+        mPrinter.print("  Counterexample ... ");
+        mPrinter.flush();
       }
       ConflictTraceProxy trace;
       try {
-	trace = checker.getCounterExample();
+	System.err.println("E2");
+	mSecurityManager.setEnabled(true);
+        trace = checker.getCounterExample();
       } catch (final OutOfMemoryError error) {
-	checker = null;
-	System.gc();
-	printException(error);
-	return;
+        checker = null;
+        System.gc();
+        printException(error);
+        return;
       } catch (final Throwable exception) {
-	printException(exception);
-	return;
+        printException(exception);
+        return;
+      } finally {
+	System.err.println("D2");
+	mSecurityManager.setEnabled(false);
       }
-      final boolean ok = checkCounterExample(des, trace);
-      if (ok) {
-      }
+      checkCounterExample(des, trace);
     }
   }
 
@@ -230,7 +244,7 @@ public class ConflictAssess
   //#########################################################################
   //# Counterexample Verification
   private boolean checkCounterExample(final ProductDESProxy des,
-				      final ConflictTraceProxy trace)
+                                      final ConflictTraceProxy trace)
   {
     if (trace == null) {
       printMalformedCounterExample(trace, "is NULL");
@@ -241,19 +255,19 @@ public class ConflictAssess
     boolean containsnull = false;
     for (final EventProxy event : traceevents) {
       if (event == null) {
-	containsnull = true;
+        containsnull = true;
       } else if (!events.contains(event)) {
-	printMalformedCounterExample(trace, "contains bad events");
-	return false;
+        printMalformedCounterExample(trace, "contains bad events");
+        return false;
       }
     }
     return checkCounterExample(des, trace, containsnull, false);
   }
 
   private boolean checkCounterExample(final ProductDESProxy des,
-				      final ConflictTraceProxy trace,
-				      final boolean containsnull,
-				      final boolean reversed)
+                                      final ConflictTraceProxy trace,
+                                      final boolean containsnull,
+                                      final boolean reversed)
   {
     final Collection<AutomatonProxy> automata = des.getAutomata();
     final int size = automata.size();
@@ -262,11 +276,11 @@ public class ConflictAssess
     for (final AutomatonProxy aut : automata) {
       final StateProxy state = checkCounterExample(aut, trace);
       if (state == null) {
-	if (!checkReversedCounterExample(des, trace, reversed)) {
-	  printMalformedCounterExample
-	    (trace, "not accepted by component " + aut.getName());
-	}
-	return false;
+        if (!reversed && !checkReversedCounterExample(des, trace)) {
+          printMalformedCounterExample
+            (trace, "not accepted by component " + aut.getName());
+        }
+        return false;
       }
       tuple.put(aut, state);
     }
@@ -281,9 +295,9 @@ public class ConflictAssess
       return false;
     }
     if (!blocking) {
-      if (!checkReversedCounterExample(des, trace, reversed)) {
-	final SafetyTraceProxy ltrace = checker.getCounterExample();
-	printMalformedCounterExample(trace, ltrace);
+      if (!reversed && !checkReversedCounterExample(des, trace)) {
+        final SafetyTraceProxy ltrace = checker.getCounterExample();
+        printMalformedCounterExample(trace, ltrace);
       }
       return false;
     } else if (reversed) {
@@ -300,33 +314,28 @@ public class ConflictAssess
   }
 
   private boolean checkReversedCounterExample(final ProductDESProxy des,
-					      final ConflictTraceProxy trace,
-					      final boolean reversed)
+                                              final ConflictTraceProxy trace)
   {
-    if (reversed) {
-      return false;
+    final List<EventProxy> origlist = trace.getEvents();
+    final List<EventProxy> reversedlist = new LinkedList<EventProxy>();
+    for (final EventProxy event : origlist) {
+      reversedlist.add(0, event);
+    }
+    final String name = trace.getName() + ":reversed";
+    final ConflictKind kind = trace.getKind();
+    final ConflictTraceProxy reversedtrace =
+      mDESFactory.createConflictTraceProxy(name, des, reversedlist, kind);
+    if (checkCounterExample(des, reversedtrace, false, true)) {
+      printGoodCounterExample(trace, " (BUT REVERSED ORDER)");
+      mNumReversedTraces++;
+      return true;
     } else {
-      final List<EventProxy> origlist = trace.getEvents();
-      final List<EventProxy> reversedlist = new LinkedList<EventProxy>();
-      for (final EventProxy event : origlist) {
-	reversedlist.add(0, event);
-      }
-      final String name = trace.getName() + ":reversed";
-      final ConflictKind kind = trace.getKind();
-      final ConflictTraceProxy reversedtrace =
-	mDESFactory.createConflictTraceProxy(name, des, reversedlist, kind);
-      if (checkCounterExample(des, reversedtrace, false, true)) {
-	printGoodCounterExample(trace, " (BUT REVERSED ORDER)");
-	mNumReversedTraces++;
-	return true;
-      } else {
-	return false;
-      }
+      return false;
     }
   }
 
   private StateProxy checkCounterExample(final AutomatonProxy aut,
-					 final ConflictTraceProxy trace)
+                                         final ConflictTraceProxy trace)
   {
     final Collection<EventProxy> events = aut.getEvents();
     final Collection<StateProxy> states = aut.getStates();
@@ -334,8 +343,8 @@ public class ConflictAssess
     StateProxy current = null;
     for (final StateProxy state : states) {
       if (state.isInitial()) {
-	current = state;
-	break;
+        current = state;
+        break;
       }
     }
     if (current == null) {
@@ -344,17 +353,17 @@ public class ConflictAssess
     final List<EventProxy> traceevents = trace.getEvents();
     for (final EventProxy event : traceevents) {
       if (events.contains(event)) {
-	boolean found = false;
-	for (final TransitionProxy trans : transitions) {
-	  if (trans.getSource() == current && trans.getEvent().equals(event)) {
-	    current = trans.getTarget();
-	    found = true;
-	    break;
-	  }
-	}
-	if (!found) {
-	  return null;
-	}
+        boolean found = false;
+        for (final TransitionProxy trans : transitions) {
+          if (trans.getSource() == current && trans.getEvent().equals(event)) {
+            current = trans.getTarget();
+            found = true;
+            break;
+          }
+        }
+        if (!found) {
+          return null;
+        }
       }
     }
     return current;
@@ -403,25 +412,25 @@ public class ConflictAssess
       int count = 0;
       boolean first = true;
       for (final EventProxy event : traceevents) {
-	if (first) {
-	  first = false;
-	} else {
-	  buffer.append(", ");
-	}
-	final String name = event == null ? "(null)" : event.getName();
-	if (buffer.length() + name.length() > 77) {
-	  mPrinter.println(buffer);
-	  buffer.delete(2, buffer.length());
-	}
-	if (count++ <= 100) {
-	  buffer.append(name);
-	} else {
-	  buffer.append("...");
-	  break;
-	}
+        if (first) {
+          first = false;
+        } else {
+          buffer.append(", ");
+        }
+        final String name = event == null ? "(null)" : event.getName();
+        if (buffer.length() + name.length() > 77) {
+          mPrinter.println(buffer);
+          buffer.delete(2, buffer.length());
+        }
+        if (count++ <= 100) {
+          buffer.append(name);
+        } else {
+          buffer.append("...");
+          break;
+        }
       }
       if (buffer.length() > 2) {
-	mPrinter.println(buffer);
+        mPrinter.println(buffer);
       }
     }
   }
@@ -451,20 +460,20 @@ public class ConflictAssess
     EventProxy newmarking = null;
     for (final EventProxy oldevent : oldevents) {
       if (oldevent.getKind() == EventKind.PROPOSITION) {
-	final String eventname = oldevent.getName();
-	if (eventname.equals(EventDeclProxy.DEFAULT_MARKING_NAME)) {
-	  oldmarking = oldevent;
-	  newmarking =
-	    mDESFactory.createEventProxy(eventname, EventKind.UNCONTROLLABLE);
-	  newevents.add(newmarking);
-	}
+        final String eventname = oldevent.getName();
+        if (eventname.equals(EventDeclProxy.DEFAULT_MARKING_NAME)) {
+          oldmarking = oldevent;
+          newmarking =
+            mDESFactory.createEventProxy(eventname, EventKind.UNCONTROLLABLE);
+          newevents.add(newmarking);
+        }
       } else {
-	newevents.add(oldevent);
+        newevents.add(oldevent);
       }
     }
     if (oldmarking == null) {
       throw new IllegalArgumentException
-	("Default marking proposition not found in model!");
+        ("Default marking proposition not found in model!");
     }
     final Collection<AutomatonProxy> oldautomata = des.getAutomata();
     final int numaut = oldautomata.size();
@@ -473,7 +482,7 @@ public class ConflictAssess
     for (final AutomatonProxy oldaut : oldautomata) {
       final StateProxy init = inittuple.get(oldaut);
       final AutomatonProxy newaut =
-	createLanguageInclusionAutomaton(oldaut, init, oldmarking, newmarking);
+        createLanguageInclusionAutomaton(oldaut, init, oldmarking, newmarking);
       newautomata.add(newaut);
     }
     final AutomatonProxy prop = createPropertyAutomaton(newmarking);
@@ -494,9 +503,9 @@ public class ConflictAssess
       new ArrayList<EventProxy>(numevents);
     for (final EventProxy oldevent : oldevents) {
       if (oldevent == oldmarking) {
-	newevents.add(newmarking);
+        newevents.add(newmarking);
       } else if (oldevent.getKind() != EventKind.PROPOSITION) {
-	newevents.add(oldevent);
+        newevents.add(oldevent);
       }
     }
     final Collection<StateProxy> oldstates = aut.getStates();
@@ -512,13 +521,13 @@ public class ConflictAssess
     for (final StateProxy oldstate : oldstates) {
       final String statename = oldstate.getName();
       final StateProxy newstate =
-	mDESFactory.createStateProxy(statename, oldstate == newinit, null);
+        mDESFactory.createStateProxy(statename, oldstate == newinit, null);
       newstates.add(newstate);
       statemap.put(oldstate, newstate);
       if (oldstate.getPropositions().contains(oldmarking)) {
-	final TransitionProxy trans =
-	  mDESFactory.createTransitionProxy(newstate, newmarking, newstate);
-	newtransitions.add(trans);
+        final TransitionProxy trans =
+          mDESFactory.createTransitionProxy(newstate, newmarking, newstate);
+        newtransitions.add(trans);
       }
     }
     for (final TransitionProxy oldtrans : oldtransitions) {
@@ -528,7 +537,7 @@ public class ConflictAssess
       final StateProxy newtarget = statemap.get(oldtarget);
       final EventProxy event = oldtrans.getEvent();
       final TransitionProxy newtrans =
-	mDESFactory.createTransitionProxy(newsource, event, newtarget);
+        mDESFactory.createTransitionProxy(newsource, event, newtarget);
       newtransitions.add(newtrans);
     }
     final String autname = aut.getName();
@@ -567,8 +576,8 @@ public class ConflictAssess
     try {
       mPrinter.close();
       if (mStream != null) {
-	mStream.close();
-	mStream = null;
+        mStream.close();
+        mStream = null;
       }
     } catch (final IOException exception) {
       // ignore
@@ -585,7 +594,7 @@ public class ConflictAssess
     if (!mTerminated) {
       mTerminated = true;
       if (msg != null) {
-	mPrinter.println(msg);
+        mPrinter.println(msg);
       }
       printScore();
       close();
@@ -606,27 +615,32 @@ public class ConflictAssess
   {
     ConflictAssess assessor = null;
     try {
-      if (args.length != 3) {
-	System.err.println
-	  ("USAGE: java " + ConflictAssess.class.getName() +
-	   " <input> <output> <minutes>");
-	System.exit(1);
+      if (args.length < 3) {
+        System.err.println
+          ("USAGE: java " + ConflictAssess.class.getName() +
+           " <input> <output> <minutes> <readable-dir> ...");
+        System.exit(1);
       }
       final File inputfile = new File(args[0]);
       final File outputfile = new File(args[1]);
       final int minutes = Integer.parseInt(args[2]);
-      assessor = new ConflictAssess(outputfile, minutes);
+      final TeachingSecurityManager secman = new TeachingSecurityManager();
+      secman.addReadWriteDirectory("");
+      for (int i = 3; i < args.length; i++) {
+        secman.addReadOnlyDirectory(args[i]);
+      }
+      assessor = new ConflictAssess(outputfile, minutes, secman);
       assessor.runSuite(inputfile);
       assessor.terminate();
     } catch (final Throwable exception) {
       System.err.println("FATAL ERROR !!!");
       System.err.println(exception.getClass().getName() +
-			 " caught in main()!");
+                         " caught in main()!");
       exception.printStackTrace(System.err);
       System.exit(1);
     } finally {
       if (assessor != null) {
-	assessor.close();
+        assessor.close();
       }
     }
     System.exit(0);
@@ -646,11 +660,12 @@ public class ConflictAssess
     public void run()
     {
       try {
-	Thread.sleep(60000 * mMinutes);
-	terminate("TIMEOUT <" + mMinutes + "min overall>");
+        Thread.sleep(60000 * mMinutes);
+        terminate("TIMEOUT <" + mMinutes + "min overall>");
       } catch (final InterruptedException exception) {
-	terminate("FATAL ERROR (InterruptedException)");
+        terminate("FATAL ERROR (InterruptedException)");
       }
+      mSecurityManager.setEnabled(false);
       System.exit(0);
     }
 
@@ -661,6 +676,7 @@ public class ConflictAssess
 
   //#########################################################################
   //# Data Members
+  private final TeachingSecurityManager mSecurityManager;
   private final ProductDESProxyFactory mDESFactory;
   private final DocumentManager mDocumentManager;
   private final PrintWriter mPrinter;
