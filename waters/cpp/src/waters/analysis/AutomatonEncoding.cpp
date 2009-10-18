@@ -157,7 +157,7 @@ int AutomatonRecord::
 compareTo(const AutomatonRecord* partner)
   const
 {
-  int result = partner->mNumStates - mNumStates;
+  const int result = partner->mNumStates - mNumStates;
   if (result != 0) {
     return result;
   } else {

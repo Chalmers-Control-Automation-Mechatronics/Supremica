@@ -75,11 +75,12 @@ public class ProjectingControllabilityChecker
   {
     this(model, factory, checker, least, 16000);
   }
-  
+
   public ProjectingControllabilityChecker(final ProductDESProxy model,
                                           final ProductDESProxyFactory factory,
                                           final ControllabilityChecker checker,
-                                          final boolean least, int maxsize)
+                                          final boolean least,
+                                          final int maxsize)
   {
     super(model, factory);
     setKindTranslator(ControllabilityKindTranslator.getInstance());
@@ -89,8 +90,26 @@ public class ProjectingControllabilityChecker
     mChecker = checker;
     mStates = 0;
     mLeast = least;
-    setNodeLimit(10000000);
     mMaxProjStates = maxsize;
+  }
+
+
+  //#########################################################################
+  //# Configuration
+  public void setNodeLimit(final int limit)
+  {
+    setMaxSyncProductStates(limit);
+    setMaxProjStates(limit);
+  }
+
+  public void setMaxSyncProductStates(final int limit)
+  {
+    super.setNodeLimit(limit);
+  }
+
+  public void setMaxProjStates(final int limit)
+  {
+    mMaxProjStates = limit;
   }
 
 
@@ -304,11 +323,6 @@ public class ProjectingControllabilityChecker
   //#########################################################################
   //# Overrides for Abstract Base Class
   //# net.sourceforge.waters.model.analysis.AbstractModelVerifier
-  public void setNodeLimit(final int limit)
-  {
-    super.setNodeLimit(limit);
-  }
-
   protected void addStatistics(final VerificationResult result)
   {
     result.setNumberOfStates(mStates);
@@ -579,11 +593,9 @@ public class ProjectingControllabilityChecker
         Projection2 proj =
           new Projection2(comp, getFactory(), mHidden, localforbiddenEvents);
         try {
-          int size = mMaxProjStates;
-          proj.setNodeLimit(size);
+          proj.setNodeLimit(mMaxProjStates);
           minAutomaton = proj.project();
           if (mOriginalAlphabet.containsAll(forbiddenEvents)) {
-            System.out.println("con");
             TransitionRelation tr = new TransitionRelation(minAutomaton, null);
             int states = tr.getAutomaton(getFactory()).getStates().size();
             tr.setMarkingToStatesWithOutgoing(forbiddenEvents);

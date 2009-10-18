@@ -49,6 +49,48 @@ isSkippable()
 
 
 //############################################################################
+//# NarrowEventRecord: Comparing and Hashing
+
+int NarrowEventRecord::
+compareTo(const EventRecord* partner)
+  const
+{
+  const NarrowEventRecord* narrow =
+    dynamic_cast<const NarrowEventRecord*>(partner);
+  if (narrow == 0) {
+    return EventRecord::compareTo(partner);
+  } else {
+    return compareTo(narrow);
+  }
+}
+
+int NarrowEventRecord::
+compareTo(const NarrowEventRecord* partner)
+  const
+{
+  const bool onlyspec1 = mNumPlants == 0;
+  const bool onlyspec2 = partner->mNumPlants == 0;
+  if (onlyspec1 != onlyspec2) {
+    return onlyspec1 ? 1 : -1;
+  }
+  const bool cont1 = isControllable();
+  const bool cont2 = partner->isControllable();
+  if (cont1 != cont2) {
+    return cont1 ? -1 : 1;
+  }
+  return EventRecord::compareTo(partner);
+}
+
+int NarrowEventRecord::
+compare(const void* elem1, const void* elem2)
+{
+  const NarrowEventRecord* val1 = *((const NarrowEventRecord**) elem1);
+  const NarrowEventRecord* val2 = *((const NarrowEventRecord**) elem2);
+  return val1->compareTo(val2);
+}
+
+
+//############################################################################
 //# NarrowEventRecord: Setup
 
 void NarrowEventRecord::

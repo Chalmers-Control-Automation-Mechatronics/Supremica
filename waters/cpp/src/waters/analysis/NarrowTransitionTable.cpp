@@ -214,8 +214,7 @@ class NarrowStateRecord // : public StateRecord
 public:
   //##########################################################################
   //# Constructors & Destructors
-  explicit NarrowStateRecord
-      (const jni::StateGlue& state, uint32 code, jni::ClassCache* cache) :
+  explicit NarrowStateRecord(uint32 code) :
     mNumEvents(0),
     mTransitionRecords(0)
   {}
@@ -271,16 +270,17 @@ NarrowTransitionTable(AutomatonRecord* aut,
                       jni::ClassCache* cache,
                       const HashTable<const jni::EventGlue*,
                                       NarrowEventRecord*>& eventmap)
-  : mAutomaton(aut),
+  : mNumTransitions(0),
+    mAutomaton(aut),
     mStateTable(0),
     mBuffers(0)
 {
+  mAutomatonIndex = mAutomaton->getAutomatonIndex();
   mNumStates = mAutomaton->getNumberOfStates();
   NarrowStateRecord* narrowstates =
     (NarrowStateRecord*) new char[mNumStates * sizeof(NarrowStateRecord)];
   for (uint32 code = 0; code < mNumStates; code++) {
-    const jni::StateGlue& state = mAutomaton->getJavaState(code);
-    new (&narrowstates[code]) NarrowStateRecord(state, code, cache);
+    new (&narrowstates[code]) NarrowStateRecord(code);
   }
 
   const jni::AutomatonGlue& autglue = mAutomaton->getJavaAutomaton();
@@ -392,6 +392,7 @@ NarrowTransitionTable(AutomatonRecord* aut,
     const jni::StateGlue& target = trans.getTargetGlue(cache);
     const uint32 targetcode = statemap->get(&target);
     oldtrans->putSuccessor(mBuffers, targetcode);
+    mNumTransitions++;
   }
 
   mAutomaton->deleteStateMap(statemap);
@@ -435,6 +436,129 @@ removeSkipped(const NarrowEventRecord* const* events)
       mBuffers[wpos] = UNDEF_UINT32;
     }
   }
+}
+
+
+void NarrowTransitionTable::
+reverse(const NarrowEventRecord* const* events)
+{
+  NarrowStateRecord* narrowstates =
+    (NarrowStateRecord*) new char[mNumStates * sizeof(NarrowStateRecord)];
+  for (uint32 code = 0; code < mNumStates; code++) {
+    new (&narrowstates[code]) NarrowStateRecord(code);
+  }
+  const HashAccessor* accessor = NarrowTransitionRecord::getHashAccessor();
+  HashTable<NarrowTransitionRecord*,NarrowTransitionRecord*>
+    narrowtransmap(accessor, mNumTransitions);
+  int transcount = 0;
+  int ndcount = 0;
+  NarrowTransitionRecord* newtrans = 0;
+  for (uint32 source = 0; source < mNumStates; source++) {
+    for (uint32 iter = iterator(source); hasNext(iter); iter = next(iter)) {
+      const uint32 e = getEvent(iter);
+      const NarrowEventRecord* event = events[e];
+      if (!event->isOnlySelfloops()) {
+        uint32 raw = getRawSuccessors(iter);
+        uint32 list = raw;
+        if ((raw & TAG_END_OF_LIST) == 0) {
+          raw = getRawNondetSuccessor(list);
+        }
+        bool done = false;
+        do {
+          uint32 target;
+          if (raw & TAG_END_OF_LIST) {
+            target = raw & ~TAG_END_OF_LIST;
+            done = true;
+          } else {
+            target = raw;
+            raw = getRawNondetSuccessor(++list);
+          }
+          if (newtrans == 0) {
+            newtrans = new NarrowTransitionRecord(target, e);
+          } else {
+            newtrans->init(target, e);
+          }
+          NarrowTransitionRecord* oldtrans = narrowtransmap.add(newtrans);
+          if (oldtrans == newtrans) {
+            narrowstates[target].addTransition(newtrans);
+            newtrans = 0;
+            transcount++;
+          } else if (oldtrans->isDeterministic()) {
+            oldtrans->addSuccessor();
+            ndcount += 2;
+          } else {
+            oldtrans->addSuccessor();
+            ndcount++;
+          }
+        } while (!done);
+      }
+    }
+  }
+  uint32 *newstatetable = new uint32[mNumStates];
+  uint32 *newbuffers = new uint32[2 * transcount + mNumStates + ndcount];
+  uint32 nextpos = 0;
+  for (uint32 code = 0; code < mNumStates; code++) {
+    NarrowStateRecord& narrowstate = narrowstates[code];
+    narrowstate.sort();
+    newstatetable[code] = nextpos;
+    uint32 pos = nextpos;
+    nextpos += narrowstate.getNumberOfEnabledEvents() + 1;
+    for (NarrowTransitionRecord* narrowtrans = narrowstate.getTransitions();
+         narrowtrans != 0;
+         narrowtrans = narrowtrans->getNext()) {
+      newbuffers[pos++] = narrowtrans->getEvent();
+      if (narrowtrans->isDeterministic()) {
+        narrowtrans->setBufferPos(pos++);
+      } else {
+        newbuffers[pos++] = nextpos;
+        nextpos += narrowtrans->getNumberOfSuccessors();
+      }
+    }
+    newbuffers[pos] = UNDEF_UINT32;
+  }
+  if (newtrans == 0) {
+    newtrans = new NarrowTransitionRecord();
+  }
+  for (uint32 source = 0; source < mNumStates; source++) {
+    for (uint32 iter = iterator(source); hasNext(iter); iter = next(iter)) {
+      const uint32 e = getEvent(iter);
+      const NarrowEventRecord* event = events[e];
+      if (!event->isOnlySelfloops()) {
+        uint32 raw = getRawSuccessors(iter);
+        uint32 list = raw;
+        if ((raw & TAG_END_OF_LIST) == 0) {
+          raw = getRawNondetSuccessor(list);
+        }
+        bool done = false;
+        do {
+          uint32 target;
+          if (raw & TAG_END_OF_LIST) {
+            target = raw & ~TAG_END_OF_LIST;
+            done = true;
+          } else {
+            target = raw;
+            raw = getRawNondetSuccessor(++list);
+          }
+          if (newtrans == 0) {
+            newtrans = new NarrowTransitionRecord(target, e);
+          } else {
+            newtrans->init(target, e);
+          }
+          NarrowTransitionRecord* oldtrans = narrowtransmap.get(newtrans);
+          oldtrans->putSuccessor(newbuffers, source);
+        } while (!done);
+      }
+    }
+  }
+  delete [] mStateTable;
+  mStateTable = newstatetable;
+  delete [] mBuffers;
+  mBuffers = newbuffers;
+  mNumTransitions = transcount;
+  for (uint32 code = 0; code < mNumStates; code++) {
+    narrowstates[code].~NarrowStateRecord();
+  }
+  delete (const char*) narrowstates;
 }
 
 

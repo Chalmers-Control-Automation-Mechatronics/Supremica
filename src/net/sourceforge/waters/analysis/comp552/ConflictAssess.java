@@ -629,6 +629,7 @@ public class ConflictAssess
       for (int i = 3; i < args.length; i++) {
         secman.addReadOnlyDirectory(args[i]);
       }
+      secman.close();
       assessor = new ConflictAssess(outputfile, minutes, secman);
       assessor.runSuite(inputfile);
       assessor.terminate();

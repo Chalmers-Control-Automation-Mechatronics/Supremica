@@ -53,6 +53,12 @@ public:
   bool isSkippable() const;
 
   //##########################################################################
+  //# Comparing and Hashing
+  int compareTo(const EventRecord* partner) const;
+  int compareTo(const NarrowEventRecord* partner) const;
+  static int compare(const void* elem1, const void* elem2);
+
+  //##########################################################################
   //# Setup
   void resetLocalTransitions();
   void countLocalTransition(bool selfloop);

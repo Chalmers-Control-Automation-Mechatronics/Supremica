@@ -77,7 +77,7 @@ public:
 
   //##########################################################################
   //# Comparing and Hashing
-  int compareTo(const EventRecord* partner) const;
+  virtual int compareTo(const EventRecord* partner) const;
   static const HashAccessor* getHashAccessor() {return &theHashAccessor;}
   static int compare(const void* elem1, const void* elem2);
 

@@ -78,14 +78,20 @@ protected:
 private:
   //##########################################################################
   //# Private Auxiliary Methods
-  void addSuccessorStates();
+  void addSuccessorStates(const uint32* sourcetuple, uint32 autcount);
 
   //##########################################################################
   //# Data Members
-  int mNumEventRecords;
+  uint32 mNumEventRecords;
+  uint32 mNumPlants;
   NarrowEventRecord** mEventRecords;
   NarrowTransitionTable* mTransitionTables;
+  NarrowTransitionTable** mPlantTransitionTables;
+  NarrowTransitionTable** mSpecTransitionTables;
   uint32* mIterator;
+  uint32* mNondetIterator;
+  uint32* mCurrentAutomata;
+  uint32* mTargetTuple;
   /*
   int mMaxUpdates;
   NondeterministicTransitionIterator* mNondeterministicTransitionIterators;

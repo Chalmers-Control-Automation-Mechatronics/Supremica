@@ -12,13 +12,11 @@ package net.sourceforge.waters.analysis.comp552;
 import java.io.File;
 import java.io.FilePermission;
 import java.io.IOException;
-import java.lang.reflect.ReflectPermission;
 import java.net.InetAddress;
 import java.util.Collection;
 import java.util.LinkedList;
-import java.util.logging.LoggingPermission;
+import java.util.PropertyPermission;
 import java.security.Permission;
-import java.security.SecurityPermission;
 
 
 class TeachingSecurityManager extends SecurityManager
@@ -32,6 +30,7 @@ class TeachingSecurityManager extends SecurityManager
     mReadableDirectories = new LinkedList<String>();
     mWriteableDirectories = new LinkedList<String>();
     mEnabled = false;
+    mClosed = false;
   }
 
 
@@ -47,8 +46,10 @@ class TeachingSecurityManager extends SecurityManager
   void addReadOnlyDirectory(final File file)
     throws IOException
   {
-    final String path = file.getCanonicalPath();
-    mReadableDirectories.add(path);
+    if (!mClosed) {
+      final String path = file.getCanonicalPath();
+      mReadableDirectories.add(path);
+    }
   }
 
   void addReadWriteDirectory(final String filename)
@@ -61,14 +62,21 @@ class TeachingSecurityManager extends SecurityManager
   void addReadWriteDirectory(final File file)
     throws IOException
   {
-    final String path = file.getCanonicalPath();
-    mReadableDirectories.add(path);
-    mWriteableDirectories.add(path);
+    if (!mClosed) {
+      final String path = file.getCanonicalPath();
+      mReadableDirectories.add(path);
+      mWriteableDirectories.add(path);
+    }
   }
 
   void setEnabled(final boolean enabled)
   {
     mEnabled = enabled;
+  }
+
+  void close()
+  {
+    mClosed = true;
   }
 
 
@@ -100,12 +108,6 @@ class TeachingSecurityManager extends SecurityManager
   {
   }
 
-  public void checkExec(final String cmd)
-  {
-    throw new SecurityException
-      ("System commands disabled!\n(Attempted to execute '" + cmd + "'.)");
-  }
-
   public void checkExit(final int status)
   {
     if (mEnabled) {
@@ -131,50 +133,57 @@ class TeachingSecurityManager extends SecurityManager
 
   public void checkMemberAccess(final Class<?> clazz, final int which)
   {
+    if (mEnabled || clazz == getClass()) {
+      super.checkMemberAccess(clazz, which);
+    }
   }
 
   public void checkPermission(final Permission perm)
   {
     final String name = perm.getName();
-    if (mEnabled) {
-      if (perm instanceof FilePermission) {
-        final FilePermission fileperm = (FilePermission) perm;
-        final String actionlist = fileperm.getActions();
-        final String[] actions = actionlist.split(",");
-        for (final String action : actions) {
-          if (action.equals("read")) {
-            if (!isAccessible(name, mReadableDirectories)) {
-              throw new SecurityException
-                ("File access disabled!\n" +
-                 "(Attempted to read '" + name + "'.)");
-            }
-          } else if (action.equals("write") || actions.equals("delete")) {
-            if (!isAccessible(name, mWriteableDirectories)) {
-              throw new SecurityException
-                ("File access disabled!\n(Attempted to " + action +
-                 " '" + name + "'.)");
-            }
-          } else {
-            throw new SecurityException
-              ("System commands disabled!\n" +
-		 "(Attempted to execute '" + name + "'.)");
+    if (perm instanceof FilePermission) {
+      final FilePermission fileperm = (FilePermission) perm;
+      final String actionlist = fileperm.getActions();
+      final String[] actions = actionlist.split(",");
+      for (final String action : actions) {
+        if (action.equals("read")) {
+          if (mEnabled && !isAccessible(name, mReadableDirectories)) {
+            super.checkPermission(perm);
           }
+        } else if (action.equals("write") || actions.equals("delete")) {
+          if (!isAccessible(name, mWriteableDirectories)) {
+            super.checkPermission(perm);
+          }
+        } else {
+          super.checkPermission(perm);
         }
-      } else {
-        super.checkPermission(perm);
       }
+    } else if (perm instanceof PropertyPermission) {
+      final PropertyPermission propperm = (PropertyPermission) perm;
+      final String actionlist = propperm.getActions();
+      final String[] actions = actionlist.split(",");
+      for (final String action : actions) {
+        if (action.equals("read")) {
+          if (name.equals("*") ||
+              name.equals("java.*") ||
+              name.equals("java.library.*") ||
+              name.equals("java.library.path") ||
+              name.equals("user.*") ||
+              name.equals("user.home") ||
+              name.equals("user.name")) {
+            super.checkPermission(perm);
+          }
+        } else if (action.equals("write")) {
+          super.checkPermission(perm);
+        }
+      }
+    } else if (mEnabled) {
+      super.checkPermission(perm);
     }
   }
 
   public void checkPackageAccess(final String pack)
   {
-  }
-
-  public void checkPropertyAccess(final String key)
-  {
-    if (mEnabled) {
-      super.checkPropertyAccess(key);
-    }
   }
 
   public void checkSetFactory()
@@ -213,5 +222,6 @@ class TeachingSecurityManager extends SecurityManager
   private final Collection<String> mReadableDirectories;
   private final Collection<String> mWriteableDirectories;
   private boolean mEnabled;
+  private boolean mClosed;
 
 }

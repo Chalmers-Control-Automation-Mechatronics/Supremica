@@ -52,6 +52,7 @@ public:
 
   //##########################################################################
   //# Simple Access
+  inline uint32 getAutomatonIndex() const {return mAutomatonIndex;}
   inline const AutomatonRecord* getAutomaton() const {return mAutomaton;}
 
   //##########################################################################
@@ -61,23 +62,29 @@ public:
     {return mBuffers[iterator] != UNDEF_UINT32;}
   inline uint32 next(uint32 iterator) const {return iterator + 2;}
   inline uint32 getEvent(uint32 iterator) const {return mBuffers[iterator];}
+  inline uint32 getRawSuccessors(uint32 iterator) const
+    {return mBuffers[iterator + 1];}
+  inline uint32 getRawNondetSuccessor(uint32 offset) const
+    {return mBuffers[offset];}
 
   //##########################################################################
   //# Setup
   void removeSkipped(const NarrowEventRecord* const* events);
+  void reverse(const NarrowEventRecord* const* events);
+
+  //##########################################################################
+  //# Class Constants
+  static const uint32 TAG_END_OF_LIST = 0x80000000;
 
 private:
   //##########################################################################
   //# Data Members
   uint32 mNumStates;
+  uint32 mNumTransitions;
+  uint32 mAutomatonIndex;
   AutomatonRecord* mAutomaton;
   uint32* mStateTable;
   uint32* mBuffers;
-
-  //##########################################################################
-  //# Class Constants
-  static const uint32 TAG_END_OF_LIST = 0x80000000;
-  friend class NarrowTransitionRecord;
 };
 
 
