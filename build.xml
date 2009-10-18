@@ -501,7 +501,8 @@ Class-Path: ${manifest.pathlist}</echo>
     
     <target name="-jar_supremica" depends="compile_supremica,downloads_supremica,copy_watersxmlfiles_into_build">
         <jar jarfile="${dist}/Supremica.jar" manifest="${build}/manifest.txt"> 
-            <fileset dir="${build}"/>
+            <fileset dir="${build}"
+                     excludes="net/sourceforge/waters/analysis/comp552/"/>
             <fileset dir="${images}"/>
             <fileset dir="${examples}"/>
             <fileset dir="${animations}"/>              

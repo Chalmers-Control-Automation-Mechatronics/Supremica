@@ -34,6 +34,7 @@ import java.util.Map;
 
 import javax.xml.bind.JAXBException;
 
+import net.sourceforge.waters.analysis.comp552.ConflictChecker;
 import net.sourceforge.waters.cpp.analysis.NativeLanguageInclusionChecker;
 import net.sourceforge.waters.cpp.analysis.NativeModelAnalyser;
 import net.sourceforge.waters.model.analysis.AnalysisException;
@@ -50,13 +51,17 @@ import net.sourceforge.waters.model.des.SafetyTraceProxy;
 import net.sourceforge.waters.model.des.StateProxy;
 import net.sourceforge.waters.model.des.TraceProxy;
 import net.sourceforge.waters.model.des.TransitionProxy;
+import net.sourceforge.waters.model.expr.ExpressionParser;
 import net.sourceforge.waters.model.expr.OperatorTable;
+import net.sourceforge.waters.model.expr.ParseException;
 import net.sourceforge.waters.model.marshaller.DocumentManager;
 import net.sourceforge.waters.model.marshaller.JAXBModuleMarshaller;
 import net.sourceforge.waters.model.marshaller.JAXBProductDESMarshaller;
 import net.sourceforge.waters.model.module.EventDeclProxy;
 import net.sourceforge.waters.model.module.ModuleProxy;
 import net.sourceforge.waters.model.module.ModuleProxyFactory;
+import net.sourceforge.waters.model.module.ParameterBindingProxy;
+import net.sourceforge.waters.model.module.SimpleExpressionProxy;
 import net.sourceforge.waters.plain.des.ProductDESElementFactory;
 import net.sourceforge.waters.plain.module.ModuleElementFactory;
 import net.sourceforge.waters.valid.ValidUnmarshaller;
@@ -80,7 +85,9 @@ public class ConflictAssess
 
   //#########################################################################
   //# Constructors
-  private ConflictAssess(final File outputfile, final int minutes,
+  private ConflictAssess(final File outputfile,
+                         final File marksfile,
+                         final int minutes,
                          final TeachingSecurityManager secman)
     throws FileNotFoundException, JAXBException, SAXException
   {
@@ -100,9 +107,10 @@ public class ConflictAssess
     mDocumentManager.registerUnmarshaller(moduleMarshaller);
     mDocumentManager.registerUnmarshaller(importer);
 
-    final OutputStream stream = new FileOutputStream(outputfile);
-    mPrinter = new PrintWriter(stream);
-
+    final OutputStream outstream = new FileOutputStream(outputfile);
+    mPrinter = new PrintWriter(outstream);
+    final OutputStream marksstream = new FileOutputStream(marksfile);
+    mMarker = new PrintWriter(marksstream);
     mFormatter = new DecimalFormat("0.000");
 
     mStream = null;
@@ -132,10 +140,12 @@ public class ConflictAssess
         line = line.trim();
         if (!line.startsWith("#")) {
           final String[] parts = line.split(" +");
-          if (parts.length == 2) {
+          if (parts.length >= 2) {
             final File name = new File(dirname, parts[0]);
             final boolean expect = parts[1].equals("true");
-            runTest(name, expect);
+            final List<ParameterBindingProxy> bindings =
+              parseBindings(parts, 2);
+            runTest(name, bindings, expect);
           }
         }
         line = reader.readLine();
@@ -150,7 +160,39 @@ public class ConflictAssess
     }
   }
 
-  private void runTest(final File filename, final boolean expect)
+  private List<ParameterBindingProxy> parseBindings(final String[] args,
+                                                    final int start)
+    throws ParseException
+  {
+    if (start < args.length) {
+      final List<ParameterBindingProxy> bindings =
+        new ArrayList<ParameterBindingProxy>(args.length - start);
+      final ModuleProxyFactory moduleFactory =
+        ModuleElementFactory.getInstance();
+      final OperatorTable optable = CompilerOperatorTable.getInstance();
+      final ExpressionParser parser =
+        new ExpressionParser(moduleFactory, optable);
+      for (int i = start; i + 1 < args.length; i++) {
+        final String arg = args[i];
+        final int eqpos = arg.indexOf('=', 2);
+        if (eqpos > 2) {
+          final String name = arg.substring(2, eqpos);
+          final String text = arg.substring(eqpos + 1);
+          final SimpleExpressionProxy expr = parser.parse(text);
+          final ParameterBindingProxy binding =
+            moduleFactory.createParameterBindingProxy(name, expr);
+          bindings.add(binding);              
+        }
+      }
+      return bindings;
+    } else {
+      return null;
+    }
+  }
+
+  private void runTest(final File filename,
+                       final List<ParameterBindingProxy> bindings,
+                       final boolean expect)
     throws Exception
   {
     final DocumentProxy doc = mDocumentManager.load(filename);
@@ -161,7 +203,7 @@ public class ConflictAssess
       final ModuleProxy module = (ModuleProxy) doc;
       final ModuleCompiler compiler =
         new ModuleCompiler(mDocumentManager, mDESFactory, module);
-      des = compiler.compile();
+      des = compiler.compile(bindings);
     }
 
     synchronized (this) {
@@ -176,7 +218,6 @@ public class ConflictAssess
     boolean result;
     double time;
     try {
-      System.err.println("E1");
       mSecurityManager.setEnabled(true);
       checker = new ConflictChecker(des, mDESFactory);
       final long starttime = System.currentTimeMillis();
@@ -192,7 +233,6 @@ public class ConflictAssess
       printException(exception);
       return;
     } finally {
-      System.err.println("D1");
       mSecurityManager.setEnabled(false);
     }
 
@@ -221,7 +261,6 @@ public class ConflictAssess
       }
       ConflictTraceProxy trace;
       try {
-	System.err.println("E2");
 	mSecurityManager.setEnabled(true);
         trace = checker.getCounterExample();
       } catch (final OutOfMemoryError error) {
@@ -233,7 +272,6 @@ public class ConflictAssess
         printException(exception);
         return;
       } finally {
-	System.err.println("D2");
 	mSecurityManager.setEnabled(false);
       }
       checkCounterExample(des, trace);
@@ -568,13 +606,16 @@ public class ConflictAssess
       0.25 * mNumReversedTraces;
     final NumberFormat formatter =
       new DecimalFormat((mNumReversedTraces & 1) == 0 ? "0.0" : "0.00");
-    mPrinter.println("Recommending " + formatter.format(score) + " marks.");
+    final String marks = formatter.format(score);
+    mPrinter.println("Recommending " + marks + " marks.");
+    mMarker.println(marks);
   }
 
   private void close()
   {
     try {
       mPrinter.close();
+      mMarker.close();
       if (mStream != null) {
         mStream.close();
         mStream = null;
@@ -618,19 +659,20 @@ public class ConflictAssess
       if (args.length < 3) {
         System.err.println
           ("USAGE: java " + ConflictAssess.class.getName() +
-           " <input> <output> <minutes> <readable-dir> ...");
+           " <input> <output> <marks> <minutes> <readable-dir> ...");
         System.exit(1);
       }
       final File inputfile = new File(args[0]);
       final File outputfile = new File(args[1]);
-      final int minutes = Integer.parseInt(args[2]);
+      final File marksfile = new File(args[2]);
+      final int minutes = Integer.parseInt(args[3]);
       final TeachingSecurityManager secman = new TeachingSecurityManager();
       secman.addReadWriteDirectory("");
-      for (int i = 3; i < args.length; i++) {
+      for (int i = 4; i < args.length; i++) {
         secman.addReadOnlyDirectory(args[i]);
       }
       secman.close();
-      assessor = new ConflictAssess(outputfile, minutes, secman);
+      assessor = new ConflictAssess(outputfile, marksfile, minutes, secman);
       assessor.runSuite(inputfile);
       assessor.terminate();
     } catch (final Throwable exception) {
@@ -681,6 +723,7 @@ public class ConflictAssess
   private final ProductDESProxyFactory mDESFactory;
   private final DocumentManager mDocumentManager;
   private final PrintWriter mPrinter;
+  private final PrintWriter mMarker;
   private final NumberFormat mFormatter;
 
   private InputStream mStream;

@@ -309,7 +309,7 @@
       <formatter type="xml"/>
       <batchtest todir="${logs.results}" if="native.make">
         <fileset dir="${supremica.testsrc}">
-          <include name="**/Teaching*.java"/>
+          <include name="**/Native*.java"/>
         </fileset>
       </batchtest>
       <classpath refid="waters.test.classpath"/>
