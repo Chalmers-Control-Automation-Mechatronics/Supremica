@@ -65,7 +65,7 @@ class FieldGlue implements Comparable<FieldGlue>, WritableGlue {
     return mFieldName;
   }
 
-  Class getJavaType()
+  Class<?> getJavaType()
   {
     return mType.getJavaClass();
   }
@@ -73,13 +73,13 @@ class FieldGlue implements Comparable<FieldGlue>, WritableGlue {
 
   //#########################################################################
   //# Type Verification
-  void verify(final Class javaclass, final ErrorReporter reporter)
+  void verify(final Class<?> javaclass, final ErrorReporter reporter)
   {
     try {
       final Field field = javaclass.getField(mFieldName);
-      final Class fieldtype = field.getType();
+      final Class<?> fieldtype = field.getType();
       final int mod = field.getModifiers();
-      final Class gluetype = getJavaType();
+      final Class<?> gluetype = getJavaType();
       if (gluetype != null && gluetype != fieldtype) {
         reporter.reportError
           ("Field " + mFieldName + " in class " + javaclass.getName() +

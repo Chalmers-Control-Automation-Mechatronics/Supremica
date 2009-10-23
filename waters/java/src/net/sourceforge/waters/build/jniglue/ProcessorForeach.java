@@ -13,6 +13,6 @@ import java.util.Iterator;
 
 interface ProcessorForeach {
 
-  public Iterator getIterator();
+  public Iterator<?> getIterator();
 
 }

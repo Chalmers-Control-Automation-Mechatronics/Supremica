@@ -24,26 +24,26 @@ abstract class StringProcessorForeach implements ProcessorForeach {
 
   //#########################################################################
   //# Provided by User
-  abstract Collection getStringCollection();
+  abstract Collection<?> getStringCollection();
 
 
   //#########################################################################
   //# Interface net.sourceforge.waters.build.jniglue.ProcessorForeach
-  public Iterator getIterator()
+  public Iterator<?> getIterator()
   {
-    final Collection collection = getStringCollection();
-    final Iterator iter = collection.iterator();
+    final Collection<?> collection = getStringCollection();
+    final Iterator<?> iter = collection.iterator();
     return new GlueIterator(iter);
   }
 
 
   //#########################################################################
   //# Local Class GlueIterator
-  private class GlueIterator implements Iterator {
+  private class GlueIterator implements Iterator<Object> {
 
     //#######################################################################
     //# Constructors
-    private GlueIterator(final Iterator iter)
+    private GlueIterator(final Iterator<?> iter)
     {
       mIterator = iter;
     }
@@ -68,7 +68,7 @@ abstract class StringProcessorForeach implements ProcessorForeach {
 
     //#######################################################################
     //# Data Members
-    private final Iterator mIterator;
+    private final Iterator<?> mIterator;
   }
 
 

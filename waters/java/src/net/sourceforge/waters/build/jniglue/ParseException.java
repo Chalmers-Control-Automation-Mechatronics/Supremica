@@ -52,6 +52,8 @@ class ParseException extends Exception
 
   //#########################################################################
   //# Data Members
+  public static final long serialVersionUID = 1;
+
   private final int mLineNo;
 
 }

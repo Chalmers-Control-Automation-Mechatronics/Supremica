@@ -25,7 +25,7 @@ abstract class TypeGlue implements Comparable<TypeGlue>, WritableGlue {
 
   abstract String getJNICallPart();
 
-  abstract Class getJavaClass();
+  abstract Class<?> getJavaClass();
 
 
   //#########################################################################

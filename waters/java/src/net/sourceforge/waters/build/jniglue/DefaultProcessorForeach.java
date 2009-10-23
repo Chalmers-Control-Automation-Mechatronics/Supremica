@@ -16,7 +16,7 @@ class DefaultProcessorForeach implements ProcessorForeach {
 
   //#########################################################################
   //# Constructors
-  DefaultProcessorForeach(final Collection glue)
+  DefaultProcessorForeach(final Collection<?> glue)
   {
     mGlue = glue;
   }
@@ -24,7 +24,7 @@ class DefaultProcessorForeach implements ProcessorForeach {
 
   //#########################################################################
   //# Interface net.sourceforge.waters.build.jniglue.ProcessorForeach
-  public Iterator getIterator()
+  public Iterator<?> getIterator()
   {
     return mGlue.iterator();
   }
@@ -32,6 +32,6 @@ class DefaultProcessorForeach implements ProcessorForeach {
 
   //#########################################################################
   //# Data Members
-  private final Collection mGlue;
+  private final Collection<?> mGlue;
 
 }

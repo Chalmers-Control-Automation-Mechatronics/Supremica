@@ -46,7 +46,7 @@ class TemplateFragmentForeach extends TemplateFragment {
     final TemplateContext outer = getRelevantContext(context);
     final ProcessorForeach processor = outer.getProcessorForeach(mName);
     if (processor != null) {
-      final Iterator iter = processor.getIterator();
+      final Iterator<?> iter = processor.getIterator();
       final int numerrors = writer.getNumErrors();
       final ProcessorINDEX indexproc = new ProcessorINDEX();
       final ProcessorVariable commaproc = new ProcessorCOMMA(iter, ",");
@@ -110,7 +110,7 @@ class TemplateFragmentForeach extends TemplateFragment {
 
     //######################################################################
     //# Constructors
-    private ProcessorCOMMA(final Iterator iter, final String text)
+    private ProcessorCOMMA(final Iterator<?> iter, final String text)
     {
       mIterator = iter;
       mText = text;
@@ -129,7 +129,7 @@ class TemplateFragmentForeach extends TemplateFragment {
 
     //######################################################################
     //# Data Members
-    private final Iterator mIterator;
+    private final Iterator<?> mIterator;
     private final String mText;
 
   }
@@ -141,7 +141,7 @@ class TemplateFragmentForeach extends TemplateFragment {
 
     //######################################################################
     //# Constructors
-    private ProcessorHASNEXT(final Iterator iter)
+    private ProcessorHASNEXT(final Iterator<?> iter)
     {
       mIterator = iter;
     }
@@ -155,7 +155,7 @@ class TemplateFragmentForeach extends TemplateFragment {
 
     //######################################################################
     //# Data Members
-    private final Iterator mIterator;
+    private final Iterator<?> mIterator;
 
   }
 

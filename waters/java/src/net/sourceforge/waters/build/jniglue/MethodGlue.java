@@ -99,13 +99,13 @@ abstract class MethodGlue implements Comparable<MethodGlue>, WritableGlue {
   //# Type Verification
   abstract void verify(final Class<?> javaclass, final ErrorReporter reporter);
 
-  Class[] getParameterClasses()
+  Class<?>[] getParameterClasses()
   {
     if (mParameterList.isEmpty()) {
       return null;
     } else {
       final int arity = mParameterList.size();
-      final Class[] result = new Class[arity];
+      final Class<?>[] result = new Class[arity];
       for (int i = 0; i < arity; i++) {
         final ParameterGlue param = mParameterList.get(i);
         final TypeGlue type = param.getType();

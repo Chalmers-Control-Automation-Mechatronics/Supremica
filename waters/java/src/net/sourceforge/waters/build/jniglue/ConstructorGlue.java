@@ -9,7 +9,6 @@
 
 package net.sourceforge.waters.build.jniglue;
 
-import java.lang.reflect.Constructor;
 import java.util.List;
 
 
@@ -60,8 +59,8 @@ class ConstructorGlue extends MethodGlue {
   void verify(final Class<?> javaclass, final ErrorReporter reporter)
   {
     try {
-      final Class[] paramtypes = getParameterClasses();
-      final Constructor constructor = javaclass.getConstructor(paramtypes);
+      final Class<?>[] paramtypes = getParameterClasses();
+      javaclass.getConstructor(paramtypes);
     } catch (final NoSuchMethodException exception) {
       reporter.reportError
         ("Can't find this constructor in class " + javaclass.getName() + "!");

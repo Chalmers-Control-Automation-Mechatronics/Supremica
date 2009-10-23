@@ -102,7 +102,7 @@ class ClassTypeGlue extends TypeGlue {
     return "Object";
   }
 
-  Class getJavaClass()
+  Class<?> getJavaClass()
   {
     return mClass.getJavaClass();
   }

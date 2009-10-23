@@ -18,7 +18,7 @@ import java.util.Set;
 import java.util.TreeSet;
 
 
-abstract class ClassGlue implements Comparable, FileWritableGlue {
+abstract class ClassGlue implements Comparable<Object>, FileWritableGlue {
 
   //#########################################################################
   //# Constructors
@@ -185,7 +185,7 @@ abstract class ClassGlue implements Comparable, FileWritableGlue {
     return mNeedsGlue;
   }
 
-  Class getJavaClass()
+  Class<?> getJavaClass()
   {
     return mJavaClass;
   }
@@ -311,7 +311,7 @@ abstract class ClassGlue implements Comparable, FileWritableGlue {
 
   //#########################################################################
   //# Type Verification
-  private Class loadClass(final ErrorReporter reporter)
+  private Class<?> loadClass(final ErrorReporter reporter)
   {
     final String javaname = getJavaClassName();
     final ClassLoader loader = getClass().getClassLoader();
@@ -438,7 +438,7 @@ abstract class ClassGlue implements Comparable, FileWritableGlue {
   private ClassGlue mBaseClass;
   private final Set<MethodGlue> mMethods;
   private final Set<FieldGlue> mFields;
-  private final Class mJavaClass;
+  private final Class<?> mJavaClass;
   private ClassModifier mModifier;
   private boolean mNeedsGlue;
   private String mCppClassName;

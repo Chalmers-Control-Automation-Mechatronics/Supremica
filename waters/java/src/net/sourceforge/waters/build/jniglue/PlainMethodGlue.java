@@ -87,7 +87,7 @@ class PlainMethodGlue extends MethodGlue {
     return mMethodName;
   }
 
-  Class getJavaType()
+  Class<?> getJavaType()
   {
     return mReturnType.getJavaClass();
   }
@@ -112,7 +112,7 @@ class PlainMethodGlue extends MethodGlue {
   void verify(final Class<?> javaclass, final ErrorReporter reporter)
   {
     try {
-      final Class[] paramtypes = getParameterClasses();
+      final Class<?>[] paramtypes = getParameterClasses();
       final Method method = javaclass.getMethod(mMethodName, paramtypes);
       final Class<?> methodtype = method.getReturnType();
       final Class<?> gluetype = getJavaType();

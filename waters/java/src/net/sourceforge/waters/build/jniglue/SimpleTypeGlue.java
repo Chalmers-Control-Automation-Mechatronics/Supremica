@@ -51,7 +51,7 @@ class SimpleTypeGlue extends TypeGlue {
 		 final String jniname,
 		 final String signature,
 		 final String jnicall,
-		 final Class javaclass)
+		 final Class<?> javaclass)
   {
     mCode = code;
     mName = name;
@@ -126,7 +126,7 @@ class SimpleTypeGlue extends TypeGlue {
     return mJNICallPart;
   }
 
-  Class getJavaClass()
+  Class<?> getJavaClass()
   {
     return mJavaClass;
   }
@@ -175,6 +175,6 @@ class SimpleTypeGlue extends TypeGlue {
   private final String mJNIName;
   private final String mSignature;
   private final String mJNICallPart;
-  private final Class mJavaClass;
+  private final Class<?> mJavaClass;
 
 }

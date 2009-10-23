@@ -177,6 +177,7 @@ public class GlueCompiler {
   //#########################################################################
   //# Local Class AbortException
   private class AbortException extends Exception {
+	public static final long serialVersionUID = 1;
   }
 
 

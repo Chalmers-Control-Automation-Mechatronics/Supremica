@@ -9,7 +9,7 @@
 package net.sourceforge.waters.build.jniglue;
 
 
-class TypeSignature implements Comparable, WritableGlue {
+class TypeSignature implements Comparable<Object>, WritableGlue {
 
   //#########################################################################
   //# Constructors

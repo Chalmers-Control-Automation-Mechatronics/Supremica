@@ -172,17 +172,15 @@ public class ConflictAssess
       final OperatorTable optable = CompilerOperatorTable.getInstance();
       final ExpressionParser parser =
         new ExpressionParser(moduleFactory, optable);
-      for (int i = start; i + 1 < args.length; i++) {
+      for (int i = start; i < args.length; i++) {
         final String arg = args[i];
-        final int eqpos = arg.indexOf('=', 2);
-        if (eqpos > 2) {
-          final String name = arg.substring(2, eqpos);
-          final String text = arg.substring(eqpos + 1);
-          final SimpleExpressionProxy expr = parser.parse(text);
-          final ParameterBindingProxy binding =
-            moduleFactory.createParameterBindingProxy(name, expr);
-          bindings.add(binding);              
-        }
+        final int eqpos = arg.indexOf('=');
+        final String name = arg.substring(0, eqpos);
+        final String text = arg.substring(eqpos + 1);
+        final SimpleExpressionProxy expr = parser.parse(text);
+        final ParameterBindingProxy binding =
+          moduleFactory.createParameterBindingProxy(name, expr);
+        bindings.add(binding);              
       }
       return bindings;
     } else {
@@ -203,6 +201,8 @@ public class ConflictAssess
       final ModuleProxy module = (ModuleProxy) doc;
       final ModuleCompiler compiler =
         new ModuleCompiler(mDocumentManager, mDESFactory, module);
+      final Collection<String> empty = Collections.emptyList();
+      compiler.setEnabledPropertyNames(empty);
       des = compiler.compile(bindings);
     }
 
@@ -210,7 +210,21 @@ public class ConflictAssess
       if (mTerminated) {
         return;
       }
-      mPrinter.print(des.getName() + " ... ");
+      mPrinter.print(des.getName());
+      if (bindings != null) {
+        mPrinter.print(" <");
+        boolean first = true;
+        for (final ParameterBindingProxy binding : bindings) {
+          if (first) {
+            first = false;
+          } else {
+            mPrinter.print(", ");
+          }
+          mPrinter.print(binding);
+        }
+        mPrinter.print('>');
+      }
+      mPrinter.print(" ... ");
       mPrinter.flush();
     }
 
@@ -608,6 +622,8 @@ public class ConflictAssess
       new DecimalFormat((mNumReversedTraces & 1) == 0 ? "0.0" : "0.00");
     final String marks = formatter.format(score);
     mPrinter.println("Recommending " + marks + " marks.");
+    mMarker.println(mNumCorrectAnswers);
+    mMarker.println(mNumCorrectTraces);
     mMarker.println(marks);
   }
 
