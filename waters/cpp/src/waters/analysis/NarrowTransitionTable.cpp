@@ -276,6 +276,7 @@ NarrowTransitionTable(AutomatonRecord* aut,
     mBuffers(0)
 {
   mAutomatonIndex = mAutomaton->getAutomatonIndex();
+  mIsPlant = mAutomaton->isPlant();
   mNumStates = mAutomaton->getNumberOfStates();
   NarrowStateRecord* narrowstates =
     (NarrowStateRecord*) new char[mNumStates * sizeof(NarrowStateRecord)];

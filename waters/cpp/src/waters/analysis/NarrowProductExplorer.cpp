@@ -27,6 +27,7 @@
 #include "jni/glue/EventKindGlue.h"
 #include "jni/glue/IteratorGlue.h"
 #include "jni/glue/LinkedListGlue.h"
+#include "jni/glue/MapGlue.h"
 #include "jni/glue/NativeSafetyVerifierGlue.h"
 #include "jni/glue/NondeterministicDESExceptionGlue.h"
 #include "jni/glue/SetGlue.h"
@@ -58,11 +59,10 @@ NarrowProductExplorer(const jni::ProductDESProxyFactoryGlue& factory,
                       jni::ClassCache* cache)
   : ProductExplorer(factory, des, translator, marking, cache),
     mNumEventRecords(0),
+    mFirstSpecOnlyUncontrollable(0),
     mNumPlants(0),
     mEventRecords(0),
     mTransitionTables(0),
-    mPlantTransitionTables(0),
-    mSpecTransitionTables(0),
     mIterator(0),
     mNondetIterator(0),
     mCurrentAutomata(0),
@@ -86,7 +86,6 @@ NarrowProductExplorer::
     }
     delete[] (char*) mTransitionTables;
   }
-  delete[] mPlantTransitionTables;
   delete[] mIterator;
   delete[] mNondetIterator;
   delete[] mCurrentAutomata;
@@ -167,8 +166,13 @@ setup()
   }
   qsort(mEventRecords, mNumEventRecords, sizeof(NarrowEventRecord*),
         NarrowEventRecord::compare);
-  for (e = 0; e < mNumEventRecords; e++) {
-    mEventRecords[e]->setEventCode(e);
+  e = mFirstSpecOnlyUncontrollable = mNumEventRecords;
+  for (e--; e >= 0; e--) {
+    NarrowEventRecord* event = mEventRecords[e];
+    event->setEventCode(e);
+    if (event->isSpecOnly() && !event->isControllable()) {
+      mFirstSpecOnlyUncontrollable = e;
+    }
   }
 
   // Collect transitions ...
@@ -180,20 +184,6 @@ setup()
   }
   for (uint32 a = 0; a < numaut; a++) {
     mTransitionTables[a].removeSkipped(mEventRecords);
-  }
-  if (getMode() == EXPLORER_MODE_SAFETY) {
-    mPlantTransitionTables = new NarrowTransitionTable*[numaut];
-    mSpecTransitionTables = &mPlantTransitionTables[mNumPlants];
-    uint32 nextplant = 0;
-    uint32 nextspec = 0;
-    for (uint32 a = 0; a < numaut; a++) {
-      const AutomatonRecord* aut = getAutomatonEncoding().getRecord(a);
-      if (aut->isPlant()) {
-        mPlantTransitionTables[nextplant++] = &mTransitionTables[a];
-      } else {
-        mSpecTransitionTables[nextspec++] = &mTransitionTables[a];
-      }
-    }
   }
 
   // More allocation ...
@@ -222,8 +212,6 @@ teardown()
     delete [] (char*) mTransitionTables;
     mTransitionTables = 0;
   }
-  delete [] mPlantTransitionTables;
-  mPlantTransitionTables = mSpecTransitionTables = 0;
   mNumPlants = 0;
   delete [] mIterator;
   mIterator = 0;
@@ -237,22 +225,18 @@ teardown()
 }
 
 
-// I know this is really kludgy,
-// but inlining this code is 15% faster than using method calls.
-// ~~~Robi
-
 #define EXPAND(source, sourcetuple, minevent, numaut, TAG)              \
   {                                                                     \
     uint32 mincount = UNDEF_UINT32;                                     \
     for (uint32 a = 0; a < numaut; a++) {                               \
       const NarrowTransitionTable& table = mTransitionTables[a];        \
       mIterator[a] = table.iterator(sourcetuple[a]);                    \
-      uint32 event = table.getEvent(mIterator[a]);                      \
-      if (event < minevent) {                                           \
-        minevent = event;                                               \
+      uint32 e = table.getEvent(mIterator[a]);                          \
+      if (e < minevent) {                                               \
+        minevent = e;                                                   \
         mincount = 1;                                                   \
         mCurrentAutomata[0] = a;                                        \
-      } else if (event == minevent) {                                   \
+      } else if (e == minevent) {                                       \
         mCurrentAutomata[mincount++] = a;                               \
       }                                                                 \
     }                                                                   \
@@ -263,16 +247,16 @@ teardown()
       uint32 newminevent = UNDEF_UINT32;                                \
       for (uint32 a = 0; a < numaut; a++) {                             \
         const NarrowTransitionTable& table = mTransitionTables[a];      \
-        uint32 event = table.getEvent(mIterator[a]);                    \
-        if (event == minevent) {                                        \
+        uint32 e = table.getEvent(mIterator[a]);                        \
+        if (e == minevent) {                                            \
           mIterator[a] = table.next(mIterator[a]);                      \
-          event = table.getEvent(mIterator[a]);                         \
+          e = table.getEvent(mIterator[a]);                             \
         }                                                               \
-        if (event < newminevent) {                                      \
-          newminevent = event;                                          \
+        if (e < newminevent) {                                          \
+          newminevent = e;                                              \
           mincount = 1;                                                 \
           mCurrentAutomata[0] = a;                                      \
-        } else if (event == newminevent) {                              \
+        } else if (e == newminevent) {                                  \
           mCurrentAutomata[mincount++] = a;                             \
         }                                                               \
       }                                                                 \
@@ -302,7 +286,7 @@ teardown()
     uint32 ndindex = 0;                                                 \
     do {                                                                \
       uint32* packed = getStateSpace().prepare();                       \
-      getAutomatonEncoding().encode(mTargetTuple, packed);               \
+      getAutomatonEncoding().encode(mTargetTuple, packed);              \
       ADD_NEW_STATE(source);                                            \
       for (ndindex = 0; ndindex < ndcount; ndindex++) {                 \
         const uint32 a = mCurrentAutomata[ndindex];                     \
@@ -337,46 +321,78 @@ teardown()
 bool NarrowProductExplorer::
 expandSafetyState(const uint32* sourcetuple, const uint32* sourcepacked)
 {
+  const uint32 numaut = getNumberOfAutomata();
+  const uint32 TAG = NarrowTransitionTable::TAG_END_OF_LIST;
   uint32 minevent = UNDEF_UINT32;
-  uint32 mincount = UNDEF_UINT32;     
-  for (uint32 t = 0; t < mNumPlants; t++) {
-    const NarrowTransitionTable* table = mPlantTransitionTables[t];
-    const uint32 a = table->getAutomatonIndex();
-    mIterator[a] = table->iterator(sourcetuple[a]);
-    uint32 event = table->getEvent(mIterator[a]);
-    if (event < minevent) {
-      minevent = event;
-      mincount = 1;
+  uint32 mincount = UNDEF_UINT32;
+  uint32 plantcount = UNDEF_UINT32;
+  uint32 speconly = mFirstSpecOnlyUncontrollable;
+
+  for (uint32 a = 0; a < numaut; a++) {
+    const NarrowTransitionTable& table = mTransitionTables[a];
+    mIterator[a] = table.iterator(sourcetuple[a]);
+    uint32 e = table.getEvent(mIterator[a]);
+    if (e < minevent) {
+      minevent = e;
       mCurrentAutomata[0] = a;
-    } else if (event == minevent) {
+      mincount = 1;
+      plantcount = table.isPlant() ? 1 : 0;
+    } else if (e == minevent) {
       mCurrentAutomata[mincount++] = a;
+      if (table.isPlant()) {
+        plantcount++;
+      }
     }
   }
+
   while (minevent != UNDEF_UINT32) {
-    if (mincount == mEventRecords[minevent]->getNumberOfPlants()) {
-      break;
+    if (minevent >= speconly) {
+      if (minevent == speconly) {
+        speconly++;
+      } else {
+        const NarrowEventRecord* event = mEventRecords[speconly];
+        setTraceEvent(event);
+        return false;
+      }
+    }
+    const NarrowEventRecord* event = mEventRecords[minevent];
+    if (mincount == event->getNumberOfAutomata()) {
+      ADD_SUCCESSORS(SOURCE, sourcetuple, mincount, numaut, TAG);
+    } else if (event->isControllable()) {
+      // controllable event blocked, no problem ...
+    } else if (plantcount == event->getNumberOfPlants()) {
+      // uncontrollable event accepted by plant, but not spec ...
+      setTraceEvent(event);
+      return false;
     }
     uint32 newminevent = UNDEF_UINT32;
-    for (uint32 t = 0; t < mNumPlants; t++) {
-      const NarrowTransitionTable* table = mPlantTransitionTables[t];
-      const uint32 a = table->getAutomatonIndex();
-      uint32 event = table->getEvent(mIterator[a]);
-      if (event == minevent) {
-        mIterator[a] = table->next(mIterator[a]);
-        event = table->getEvent(mIterator[a]);
+    for (uint32 a = 0; a < numaut; a++) {
+      const NarrowTransitionTable& table = mTransitionTables[a];
+      uint32 e = table.getEvent(mIterator[a]);
+      if (e == minevent) {
+        mIterator[a] = table.next(mIterator[a]);
+        e = table.getEvent(mIterator[a]);
       }
-      if (event < newminevent) {
-        newminevent = event;
-        mincount = 1;
+      if (e < newminevent) {
+        newminevent = e;
         mCurrentAutomata[0] = a;
-      } else if (event == newminevent) {
+        mincount = 1;
+        plantcount = table.isPlant() ? 1 : 0;
+      } else if (e == newminevent) {
         mCurrentAutomata[mincount++] = a;
+        if (table.isPlant()) {
+          plantcount++;
+        }
       }
     }
     minevent = newminevent;
   }
 
-  // TBD
+  if (speconly < mNumEventRecords) {
+    const NarrowEventRecord* event = mEventRecords[speconly];
+    setTraceEvent(event);
+    return false;
+  }
   return true;
 }
 
@@ -473,5 +489,31 @@ expandTraceState(const uint32* targettuple, const uint32* targetpacked)
 #undef ADD_NEW_STATE
 #undef ADD_SUCCESSORS
 #undef EXPAND
+
+
+void NarrowProductExplorer::
+storeNondeterministicTargets(const uint32* sourcetuple,
+                             const uint32* targettuple,
+                             const jni::MapGlue& statemap)
+{
+  const uint32 numaut = getNumberOfAutomata();
+  const NarrowEventRecord* event = (const NarrowEventRecord*) getTraceEvent();
+  const uint32 e = event->getEventCode();
+  for (uint32 a = 0; a < numaut; a++) {
+    const NarrowTransitionTable& table = mTransitionTables[a];
+    uint32 iter = table.iterator(sourcetuple[a]);
+    while (table.getEvent(iter) != e) {
+      iter = table.next(iter);
+    }
+    if ((table.getRawSuccessors(iter) &
+         NarrowTransitionTable::TAG_END_OF_LIST) == 0) {
+      const AutomatonRecord* autrecord = getAutomatonEncoding().getRecord(a);
+      const jni::AutomatonGlue& aut = autrecord->getJavaAutomaton();
+      const jni::StateGlue& state = autrecord->getJavaState(targettuple[a]);
+      statemap.put(&aut, &state);
+    }
+  }
+}
+
 
 }  /* namespace waters */

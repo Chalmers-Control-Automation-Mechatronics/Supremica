@@ -74,6 +74,9 @@ protected:
   virtual void setupReverseTransitionRelations();
   virtual void expandTraceState
     (const uint32* targettuple,	const uint32* targetpacked);
+  virtual void storeNondeterministicTargets
+    (const uint32* sourcetuple, const uint32* targettuple,
+     const jni::MapGlue& statemap);
 
 private:
   //##########################################################################
@@ -83,20 +86,14 @@ private:
   //##########################################################################
   //# Data Members
   uint32 mNumEventRecords;
+  uint32 mFirstSpecOnlyUncontrollable;
   uint32 mNumPlants;
   NarrowEventRecord** mEventRecords;
   NarrowTransitionTable* mTransitionTables;
-  NarrowTransitionTable** mPlantTransitionTables;
-  NarrowTransitionTable** mSpecTransitionTables;
   uint32* mIterator;
   uint32* mNondetIterator;
   uint32* mCurrentAutomata;
   uint32* mTargetTuple;
-  /*
-  int mMaxUpdates;
-  NondeterministicTransitionIterator* mNondeterministicTransitionIterators;
-  uint32 mTraceLimit;
-  */
 };
 
 }   /* namespace waters */

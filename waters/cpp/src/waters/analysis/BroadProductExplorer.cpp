@@ -386,6 +386,16 @@ expandTraceState(const uint32* targettuple, const uint32* targetpacked)
 #undef EXPAND
 
 
+void BroadProductExplorer::
+storeNondeterministicTargets(const uint32* sourcetuple,
+                             const uint32* targettuple,
+                             const jni::MapGlue& map)
+{
+  const BroadEventRecord* event = (const BroadEventRecord*) getTraceEvent();
+  event->storeNondeterministicTargets(sourcetuple, targettuple, map);
+}
+
+
 //############################################################################
 //# BroadProductExplorer: Private Auxiliary Methods
 

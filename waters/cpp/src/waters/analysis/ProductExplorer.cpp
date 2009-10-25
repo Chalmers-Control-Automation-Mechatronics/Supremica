@@ -415,8 +415,7 @@ computeCounterExample(const jni::ListGlue& list, uint32 level)
       expandTraceState(targettuple, targetpacked);
       uint32* sourcepacked = mStateSpace->get(mTraceState);
       mEncoding->decode(sourcepacked, sourcetuple);
-      mTraceEvent->storeNondeterministicTargets
-        (sourcetuple, targettuple, statemap);
+      storeNondeterministicTargets(sourcetuple, targettuple, statemap);
       const jni::EventGlue& event = mTraceEvent->getJavaEvent();
       jni::TraceStepGlue step =
         mFactory.createTraceStepProxyGlue(&event, &statemap, mCache);

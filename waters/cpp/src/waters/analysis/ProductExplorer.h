@@ -132,6 +132,9 @@ protected:
   virtual void setupReverseTransitionRelations() = 0;
   virtual void expandTraceState
     (const uint32* targettuple, const uint32* targetpacked) = 0;
+  virtual void storeNondeterministicTargets
+    (const uint32* sourcetuple, const uint32* targettuple,
+     const jni::MapGlue& map) = 0;
   
   void exploreNonblockingCoreachabilityStateDFS(uint32 target);
   void exploreNonblockingCoreachabilityStateDFS

@@ -53,6 +53,7 @@ public:
   //##########################################################################
   //# Simple Access
   inline uint32 getAutomatonIndex() const {return mAutomatonIndex;}
+  inline bool isPlant() const {return mIsPlant;}
   inline const AutomatonRecord* getAutomaton() const {return mAutomaton;}
 
   //##########################################################################
@@ -82,6 +83,7 @@ private:
   uint32 mNumStates;
   uint32 mNumTransitions;
   uint32 mAutomatonIndex;
+  bool mIsPlant;
   AutomatonRecord* mAutomaton;
   uint32* mStateTable;
   uint32* mBuffers;

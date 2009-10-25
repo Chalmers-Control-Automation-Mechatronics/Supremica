@@ -50,6 +50,8 @@ public:
   inline uint32 getNumberOfPlants() const {return mNumPlants;}
   inline bool isGloballyDisabled() const {return mIsGloballyDisabled;}
   inline bool isOnlySelfloops() const {return mIsOnlySelfloops;}
+  inline bool isPlantOnly() const {return mNumAutomata == mNumPlants;}
+  inline bool isSpecOnly() const {return mNumPlants == 0;}
   bool isSkippable() const;
 
   //##########################################################################
@@ -64,12 +66,6 @@ public:
   void countLocalTransition(bool selfloop);
   void mergeLocalToGlobal(bool isplant, uint32 numstates);
   bool isLocallySelflooped(uint32 numstates) const;
-
-  //##########################################################################
-  //# Trace Computation
-  virtual void storeNondeterministicTargets(const uint32* sourcetuple,
-					    const uint32* targettuple,
-					    const jni::MapGlue& map) const;
 
 private:
   //##########################################################################

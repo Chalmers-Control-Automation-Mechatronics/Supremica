@@ -23,6 +23,10 @@
 #include "waters/analysis/EventRecord.h"
 #include "waters/analysis/ExplorerMode.h"
 
+namespace jni {
+  class MapGlue;
+}
+
 
 namespace waters {
 

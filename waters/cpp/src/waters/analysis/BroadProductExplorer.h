@@ -72,6 +72,9 @@ protected:
   virtual void setupReverseTransitionRelations();
   virtual void expandTraceState
     (const uint32* targettuple,	const uint32* targetpacked);
+  virtual void storeNondeterministicTargets
+    (const uint32* sourcetuple, const uint32* targettuple,
+     const jni::MapGlue& map);
 
 private:
   //##########################################################################

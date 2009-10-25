@@ -44,7 +44,7 @@ isSkippable()
 {
   return
     mIsGloballyDisabled ||
-    mIsOnlySelfloops && !mIsOnlySelfloopsDisabledInSpec;
+    (mIsOnlySelfloops && !mIsOnlySelfloopsDisabledInSpec);
 }
 
 
@@ -130,19 +130,6 @@ isLocallySelflooped(uint32 numstates)
   const
 {
   return mIsOnlyLocalSelfloops && mNumLocalTransitions == numstates;
-}
-
-
-//############################################################################
-//# Trace Computation
-
-void NarrowEventRecord::
-storeNondeterministicTargets(const uint32* sourcetuple,
-                             const uint32* targettuple,
-                             const jni::MapGlue& map)
-  const
-{
-  // TBD
 }
 
 
