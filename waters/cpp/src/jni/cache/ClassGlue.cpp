@@ -11,6 +11,8 @@
 #pragma implementation
 #endif
 
+#include <iostream>
+
 #include "jni/cache/ClassCache.h"
 #include "jni/cache/ClassGlue.h"
 #include "jni/cache/ClassInfo.h"

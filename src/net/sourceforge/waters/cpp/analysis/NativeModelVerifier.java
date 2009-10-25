@@ -37,7 +37,21 @@ public abstract class NativeModelVerifier
 			     final ProductDESProxyFactory factory)
   {
     super(model, factory);
+    mExplorerMode = ExplorerMode.BEST_GUESS;
     mResult = null;
+  }
+
+
+  //#########################################################################
+  //# Configuration
+  public void setExplorerMode(final ExplorerMode mode)
+  {
+    mExplorerMode = mode;
+  }
+
+  public ExplorerMode getExplorerMode()
+  {
+    return mExplorerMode;
   }
 
 
@@ -128,6 +142,7 @@ public abstract class NativeModelVerifier
 
   //#########################################################################
   //# Data Members
+  private ExplorerMode mExplorerMode;
   private VerificationResult mResult;
 
 }

@@ -61,6 +61,7 @@ public abstract class NativeSafetyVerifier
     return (SafetyTraceProxy) super.getCounterExample();
   }
 
+
   //#########################################################################
   //# Native Methods
   native VerificationResult runNativeAlgorithm();

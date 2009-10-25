@@ -23,6 +23,7 @@
 #include "jni/glue/ConflictKindGlue.h"
 #include "jni/glue/ConflictTraceGlue.h"
 #include "jni/glue/EventGlue.h"
+#include "jni/glue/ExplorerModeGlue.h"
 #include "jni/glue/HashMapGlue.h"
 #include "jni/glue/LinkedListGlue.h"
 #include "jni/glue/NativeConflictCheckerGlue.h"
@@ -34,6 +35,7 @@
 
 #include "waters/analysis/BroadProductExplorer.h"
 #include "waters/analysis/EventRecord.h"
+#include "waters/analysis/NarrowProductExplorer.h"
 #include "waters/analysis/ProductExplorer.h"
 #include "waters/analysis/StateSpace.h"
 #include "waters/analysis/TransitionRecord.h"
@@ -602,8 +604,56 @@ getDepth(uint32 state)
 }
 
 
-}  /* namespace waters */
 
+//############################################################################
+//# Class ProductExplorerFinalizer
+
+class ProductExplorerFinalizer {
+
+public:
+  //##########################################################################
+  //# Constructor & Destructor
+  ProductExplorerFinalizer() : mProductExplorer(0) {}
+  ~ProductExplorerFinalizer() {delete mProductExplorer;}
+
+  //##########################################################################
+  //# Initialisation
+  ProductExplorer* createProductExplorer
+    (const jni::NativeModelVerifierGlue& gchecker,
+     const jni::KindTranslatorGlue& translator,
+     const jni::EventGlue& marking,
+     jni::ClassCache& cache)
+  {
+    jni::ProductDESProxyFactoryGlue factory = gchecker.getFactoryGlue(&cache);
+    jni::ProductDESGlue des = gchecker.getModelGlue(&cache);
+    jni::ExplorerMode mode = gchecker.getExplorerModeGlue(&cache);
+    if (mode == jni::ExplorerMode_NARROW) {
+      mProductExplorer =
+        new NarrowProductExplorer(factory, des, translator, marking, &cache);
+    } else {
+      mProductExplorer =
+        new BroadProductExplorer(factory, des, translator, marking, &cache);
+    }
+    const int limit = gchecker.getNodeLimit();
+    if (limit != UNDEF_INT32) {
+      mProductExplorer->setStateLimit(limit);
+    }
+    const int tlimit = gchecker.getTransitionLimit();
+    if (tlimit != UNDEF_INT32) {
+      mProductExplorer->setTransitionLimit(tlimit);
+    }
+    return mProductExplorer;
+  }
+
+private:
+  //##########################################################################
+  //# Data Members
+  ProductExplorer* mProductExplorer;
+
+};
+
+
+}  /* namespace waters */
 
 
 //############################################################################
@@ -617,28 +667,22 @@ Java_net_sourceforge_waters_cpp_analysis_NativeSafetyVerifier_runNativeAlgorithm
     jni::ClassCache cache(env);
     try {
       jni::NativeSafetyVerifierGlue gchecker(jchecker, &cache);
-      jni::ProductDESProxyFactoryGlue factory =
-        gchecker.getFactoryGlue(&cache);
-      jni::ProductDESGlue des = gchecker.getModelGlue(&cache);
       jni::KindTranslatorGlue translator =
         gchecker.getKindTranslatorGlue(&cache);
       jni::EventGlue marking(0, &cache);
-      waters::BroadProductExplorer checker(factory, des, translator, marking,
-                                           &cache);
-      const int limit = gchecker.getNodeLimit();
-      if (limit != UNDEF_INT32) {
-        checker.setStateLimit(limit);
-      }
-      bool result = checker.runSafetyCheck();
+      waters::ProductExplorerFinalizer finalizer;
+      waters::ProductExplorer* checker =
+        finalizer.createProductExplorer(gchecker, translator, marking, cache);
+      bool result = checker->runSafetyCheck();
       if (result) {
         jni::VerificationResultGlue vresult(result, 0, &cache);
-        checker.addStatistics(vresult);
+        checker->addStatistics(vresult);
         return vresult.returnJavaObject();
       } else {
         jstring name = gchecker.getTraceName();
-        jni::SafetyTraceGlue trace = checker.getSafetyCounterExample(name);
+        jni::SafetyTraceGlue trace = checker->getSafetyCounterExample(name);
         jni::VerificationResultGlue vresult(result, &trace, &cache);
-        checker.addStatistics(vresult);
+        checker->addStatistics(vresult);
         return vresult.returnJavaObject();
       }
     } catch (const jni::PreJavaException& pre) {
@@ -659,32 +703,23 @@ Java_net_sourceforge_waters_cpp_analysis_NativeConflictChecker_runNativeAlgorith
     jni::ClassCache cache(env);
     try {
       jni::NativeConflictCheckerGlue gchecker(jchecker, &cache);
-      jni::ProductDESProxyFactoryGlue factory =
-        gchecker.getFactoryGlue(&cache);
-      jni::ProductDESGlue des = gchecker.getModelGlue(&cache);
       jni::KindTranslatorGlue translator =
         gchecker.getKindTranslatorGlue(&cache);
       jni::EventGlue marking = gchecker.getUsedMarkingPropositionGlue(&cache);
-      waters::BroadProductExplorer checker(factory, des, translator, marking,
-                                           &cache);
-      const int slimit = gchecker.getNodeLimit();
-      if (slimit != UNDEF_INT32) {
-        checker.setStateLimit(slimit);
-      }
-      const int tlimit = gchecker.getTransitionLimit();
-      if (tlimit != UNDEF_INT32) {
-        checker.setTransitionLimit(tlimit);
-      }
-      bool result = checker.runNonblockingCheck();
+      waters::ProductExplorerFinalizer finalizer;
+      waters::ProductExplorer* checker =
+        finalizer.createProductExplorer(gchecker, translator, marking, cache);
+      bool result = checker->runNonblockingCheck();
       if (result) {
         jni::VerificationResultGlue vresult(result, 0, &cache);
-        checker.addStatistics(vresult);
+        checker->addStatistics(vresult);
         return vresult.returnJavaObject();
       } else {
         jstring name = gchecker.getTraceName();
-        jni::ConflictTraceGlue trace = checker.getConflictCounterExample(name);
+        jni::ConflictTraceGlue trace =
+          checker->getConflictCounterExample(name);
         jni::VerificationResultGlue vresult(result, &trace, &cache);
-        checker.addStatistics(vresult);
+        checker->addStatistics(vresult);
         return vresult.returnJavaObject();
       }
     } catch (const jni::PreJavaException& pre) {

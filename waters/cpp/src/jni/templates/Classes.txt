@@ -220,6 +220,8 @@ glue class OverflowException extends Exception {
 package net.sourceforge.waters.cpp.analysis;
 //###########################################################################
 
+enum class ExplorerMode {BROAD, NARROW, BEST_GUESS}
+
 glue class NativeModelAnalyser {
   glue ProductDESProxyFactory getFactory();
   glue ProductDESProxy getModel();
@@ -228,6 +230,7 @@ glue class NativeModelAnalyser {
 }
 
 glue class NativeModelVerifier extends NativeModelAnalyser {
+  glue ExplorerMode getExplorerMode();
   String getTraceName();
 }
 
