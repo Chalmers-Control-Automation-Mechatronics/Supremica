@@ -2,7 +2,7 @@
 //###########################################################################
 //# PROJECT: Waters
 //# PACKAGE: net.sourceforge.waters.cpp.analysis
-//# CLASS:   NativeControllabilityCheckerTest
+//# CLASS:   NativeNarrowLanguageInclusionCheckerTest
 //###########################################################################
 //# $Id$
 //###########################################################################
@@ -13,22 +13,22 @@ import junit.framework.Test;
 import junit.framework.TestSuite;
 
 import net.sourceforge.waters.model.analysis.
-  AbstractControllabilityCheckerTest;
-import net.sourceforge.waters.model.analysis.ControllabilityChecker;
+  AbstractLanguageInclusionCheckerTest;
+import net.sourceforge.waters.model.analysis.LanguageInclusionChecker;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 
 
-public class NativeControllabilityCheckerTest
-  extends AbstractControllabilityCheckerTest
+public class NativeNarrowLanguageInclusionCheckerTest
+  extends AbstractLanguageInclusionCheckerTest
 {
 
   //#########################################################################
   //# Entry points in junit.framework.TestCase
   public static Test suite()
   {
-    final TestSuite suite =
-      new TestSuite(NativeControllabilityCheckerTest.class);
-    return suite;
+    TestSuite testSuite =
+      new TestSuite(NativeNarrowLanguageInclusionCheckerTest.class);
+    return testSuite;
   }
 
   public static void main(final String[] args)
@@ -40,10 +40,13 @@ public class NativeControllabilityCheckerTest
   //#########################################################################
   //# Overrides for abstract base class
   //# net.sourceforge.waters.analysis.AbstractModelVerifierTest
-  protected ControllabilityChecker
+  protected LanguageInclusionChecker
     createModelVerifier(final ProductDESProxyFactory factory)
   {
-    return new NativeControllabilityChecker(factory);
+    final NativeLanguageInclusionChecker checker =
+      new NativeLanguageInclusionChecker(factory);
+    checker.setExplorerMode(ExplorerMode.NARROW);
+    return checker;
   }
 
 }

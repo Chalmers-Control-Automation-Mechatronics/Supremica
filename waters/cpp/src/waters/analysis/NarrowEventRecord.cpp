@@ -28,6 +28,7 @@ NarrowEventRecord(jni::EventGlue event, bool controllable, uint32 code)
   : EventRecord(event, controllable),
     mEventCode(code),
     mNumAutomata(0),
+    mNumPlants(0),
     mIsOnlySelfloops(true),
     mIsOnlySelfloopsDisabledInSpec(false),
     mIsGloballyDisabled(false)

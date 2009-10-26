@@ -2,7 +2,7 @@
 //###########################################################################
 //# PROJECT: Waters
 //# PACKAGE: net.sourceforge.waters.cpp.analysis
-//# CLASS:   NativeLanguageInclusionCheckerTest
+//# CLASS:   NativeBroadControllabilityCheckerTest
 //###########################################################################
 //# $Id$
 //###########################################################################
@@ -13,21 +13,22 @@ import junit.framework.Test;
 import junit.framework.TestSuite;
 
 import net.sourceforge.waters.model.analysis.
-  AbstractLanguageInclusionCheckerTest;
-import net.sourceforge.waters.model.analysis.LanguageInclusionChecker;
+  AbstractControllabilityCheckerTest;
+import net.sourceforge.waters.model.analysis.ControllabilityChecker;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 
 
-public class NativeLanguageInclusionCheckerTest
-  extends AbstractLanguageInclusionCheckerTest
+public class NativeBroadControllabilityCheckerTest
+  extends AbstractControllabilityCheckerTest
 {
 
   //#########################################################################
   //# Entry points in junit.framework.TestCase
-  public static Test suite() {
-    TestSuite testSuite =
-      new TestSuite(NativeLanguageInclusionCheckerTest.class);
-    return testSuite;
+  public static Test suite()
+  {
+    final TestSuite suite =
+      new TestSuite(NativeBroadControllabilityCheckerTest.class);
+    return suite;
   }
 
   public static void main(final String[] args)
@@ -39,10 +40,13 @@ public class NativeLanguageInclusionCheckerTest
   //#########################################################################
   //# Overrides for abstract base class
   //# net.sourceforge.waters.analysis.AbstractModelVerifierTest
-  protected LanguageInclusionChecker
+  protected ControllabilityChecker
     createModelVerifier(final ProductDESProxyFactory factory)
   {
-    return new NativeLanguageInclusionChecker(factory);
+    final NativeControllabilityChecker checker =
+      new NativeControllabilityChecker(factory);
+    checker.setExplorerMode(ExplorerMode.BROAD);
+    return checker;
   }
 
 }

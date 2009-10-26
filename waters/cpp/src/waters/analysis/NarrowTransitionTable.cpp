@@ -86,14 +86,16 @@ public:
   //##########################################################################
   //# Constructors & Destructors
   explicit NarrowTransitionRecord(uint32 state = UNDEF_UINT32,
-                                  uint32 event = UNDEF_UINT32) :
+                                  const NarrowEventRecord* event = 0) :
     mState(state), mEvent(event), mNumSuccessors(1), mNext(0) {}
   ~NarrowTransitionRecord() {delete mNext;}
-  void init(uint32 state, uint32 event) {mState = state; mEvent = event;}
+  void init(uint32 state, const NarrowEventRecord* event)
+    {mState = state; mEvent = event;}
 
   //##########################################################################
   //# Simple Access
-  uint32 getEvent() const {return mEvent;}
+  const NarrowEventRecord* getEvent() const {return mEvent;}
+  uint32 getEventCode() const {return mEvent->getEventCode();}
   bool isDeterministic() const {return mNumSuccessors <= 1;}
   uint32 getNumberOfSuccessors() const {return mNumSuccessors;}
   NarrowTransitionRecord* getNext() const {return mNext;}
@@ -117,7 +119,7 @@ private:
   //##########################################################################
   //# Data Members
   uint32 mState;
-  uint32 mEvent;
+  const NarrowEventRecord* mEvent;
   uint32 mNumSuccessors;
   NarrowTransitionRecord* mNext;
   uint32 mBufferPos;
@@ -291,7 +293,9 @@ NarrowTransitionTable(AutomatonRecord* aut,
     jobject javaobject = eventiter1.next();
     jni::EventGlue event(javaobject, cache);
     NarrowEventRecord* eventrecord = eventmap.get(&event);
-    eventrecord->resetLocalTransitions();
+    if (eventrecord != 0) {
+      eventrecord->resetLocalTransitions();
+    }
   }
 
   const jni::CollectionGlue transitions = autglue.getTransitionsGlue(cache);
@@ -315,16 +319,15 @@ NarrowTransitionTable(AutomatonRecord* aut,
     if (eventrecord->isGloballyDisabled()) {
       continue;
     }
-    const uint32 eventcode = eventrecord->getEventCode();
     const jni::StateGlue& source = trans.getSourceGlue(cache);
     const uint32 sourcecode = statemap->get(&source);
     const jni::StateGlue& target = trans.getTargetGlue(cache);
     const uint32 targetcode = statemap->get(&target);
     eventrecord->countLocalTransition(sourcecode == targetcode);
     if (newtrans == 0) {
-      newtrans = new NarrowTransitionRecord(sourcecode, eventcode);
+      newtrans = new NarrowTransitionRecord(sourcecode, eventrecord);
     } else {
-      newtrans->init(sourcecode, eventcode);
+      newtrans->init(sourcecode, eventrecord);
     }
     NarrowTransitionRecord* oldtrans = narrowtransmap.add(newtrans);
     if (oldtrans == newtrans) {
@@ -340,14 +343,17 @@ NarrowTransitionTable(AutomatonRecord* aut,
     }
   }
 
-  const bool isplant = aut->isPlant();
   const jni::IteratorGlue eventiter2 = events.iteratorGlue(cache);
   while (eventiter2.hasNext()) {
     jobject javaobject = eventiter2.next();
     jni::EventGlue event(javaobject, cache);
     NarrowEventRecord* eventrecord = eventmap.get(&event);
-    eventrecord->mergeLocalToGlobal(isplant, mNumStates);
+    if (eventrecord != 0) {
+      eventrecord->mergeLocalToGlobal(mIsPlant, mNumStates);
+    }
   }
+
+  // Break here and setup event ordering ...
 
   mStateTable = new uint32[mNumStates];
   mBuffers = new uint32[2 * transcount + mNumStates + ndcount];
@@ -357,11 +363,11 @@ NarrowTransitionTable(AutomatonRecord* aut,
     narrowstate.sort();
     mStateTable[code] = next;
     uint32 pos = next;
-    next += narrowstate.getNumberOfEnabledEvents() + 1;
+    next += 2 * narrowstate.getNumberOfEnabledEvents() + 1;
     for (NarrowTransitionRecord* narrowtrans = narrowstate.getTransitions();
          narrowtrans != 0;
          narrowtrans = narrowtrans->getNext()) {
-      mBuffers[pos++] = narrowtrans->getEvent();
+      mBuffers[pos++] = narrowtrans->getEventCode();
       if (narrowtrans->isDeterministic()) {
         narrowtrans->setBufferPos(pos++);
       } else {
@@ -388,7 +394,7 @@ NarrowTransitionTable(AutomatonRecord* aut,
     const uint32 eventcode = eventrecord->getEventCode();
     const jni::StateGlue& source = trans.getSourceGlue(cache);
     const uint32 sourcecode = statemap->get(&source);
-    newtrans->init(sourcecode, eventcode);
+    newtrans->init(sourcecode, eventrecord);
     NarrowTransitionRecord* oldtrans = narrowtransmap.get(newtrans);
     const jni::StateGlue& target = trans.getTargetGlue(cache);
     const uint32 targetcode = statemap->get(&target);
@@ -421,7 +427,7 @@ removeSkipped(const NarrowEventRecord* const* events)
   for (uint32 state = 0; state < mNumStates; state++) {
     uint32 rpos = mStateTable[state];
     uint32 wpos = rpos;
-    uint32 ecode = mBuffers[rpos++];
+    uint32 ecode = mBuffers[rpos];
     while (ecode != UNDEF_UINT32) {
       if (events[ecode]->isSkippable()) {
         rpos += 2;
@@ -432,6 +438,7 @@ removeSkipped(const NarrowEventRecord* const* events)
         mBuffers[wpos++] = ecode;
         mBuffers[wpos++] = mBuffers[rpos++];
       }
+      ecode = mBuffers[rpos];
     }
     if (rpos != wpos) {
       mBuffers[wpos] = UNDEF_UINT32;
@@ -475,9 +482,9 @@ reverse(const NarrowEventRecord* const* events)
             raw = getRawNondetSuccessor(++list);
           }
           if (newtrans == 0) {
-            newtrans = new NarrowTransitionRecord(target, e);
+            newtrans = new NarrowTransitionRecord(target, event);
           } else {
-            newtrans->init(target, e);
+            newtrans->init(target, event);
           }
           NarrowTransitionRecord* oldtrans = narrowtransmap.add(newtrans);
           if (oldtrans == newtrans) {
@@ -507,7 +514,7 @@ reverse(const NarrowEventRecord* const* events)
     for (NarrowTransitionRecord* narrowtrans = narrowstate.getTransitions();
          narrowtrans != 0;
          narrowtrans = narrowtrans->getNext()) {
-      newbuffers[pos++] = narrowtrans->getEvent();
+      newbuffers[pos++] = narrowtrans->getEventCode();
       if (narrowtrans->isDeterministic()) {
         narrowtrans->setBufferPos(pos++);
       } else {
@@ -541,9 +548,9 @@ reverse(const NarrowEventRecord* const* events)
             raw = getRawNondetSuccessor(++list);
           }
           if (newtrans == 0) {
-            newtrans = new NarrowTransitionRecord(target, e);
+            newtrans = new NarrowTransitionRecord(target, event);
           } else {
-            newtrans->init(target, e);
+            newtrans->init(target, event);
           }
           NarrowTransitionRecord* oldtrans = narrowtransmap.get(newtrans);
           oldtrans->putSuccessor(newbuffers, source);

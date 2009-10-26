@@ -156,7 +156,7 @@ setup()
     eventmap.add(record);
   }
 
-  // Establish compact event list ...
+  // Establish ordered event list ...
   mNumEventRecords = eventmap.size();
   mEventRecords = new NarrowEventRecord*[mNumEventRecords];
   HashTableIterator hiter = eventmap.iterator();
@@ -164,11 +164,28 @@ setup()
   while (eventmap.hasNext(hiter)) {
     mEventRecords[e++] = eventmap.next(hiter);
   }
+  /*
+  for (uint32 a = 0; a < numaut; a++) {
+    const AutomatonRecord* aut = getAutomatonEncoding().getRecord(a);
+    const bool isplant = aut->isPlant();
+    const jni::AutomatonGlue& autglue = mAutomaton->getJavaAutomaton();
+    const jni::CollectionGlue events = autglue.getEventsGlue(cache);
+    const jni::IteratorGlue eventiter1 = events.iteratorGlue(cache);
+    while (eventiter1.hasNext()) {
+      jobject javaobject = eventiter1.next();
+      jni::EventGlue event(javaobject, cache);
+      NarrowEventRecord* eventrecord = eventmap.get(&event);
+      if (eventrecord != 0) {
+        eventrecord->addAutomaton(isplant);
+      }
+    }
+  }
+  */
   qsort(mEventRecords, mNumEventRecords, sizeof(NarrowEventRecord*),
         NarrowEventRecord::compare);
   e = mFirstSpecOnlyUncontrollable = mNumEventRecords;
-  for (e--; e >= 0; e--) {
-    NarrowEventRecord* event = mEventRecords[e];
+  while (e > 0) {
+    NarrowEventRecord* event = mEventRecords[--e];
     event->setEventCode(e);
     if (event->isSpecOnly() && !event->isControllable()) {
       mFirstSpecOnlyUncontrollable = e;
@@ -236,7 +253,7 @@ teardown()
         minevent = e;                                                   \
         mincount = 1;                                                   \
         mCurrentAutomata[0] = a;                                        \
-      } else if (e == minevent) {                                       \
+      } else if (e == minevent && e != UNDEF_UINT32) {                  \
         mCurrentAutomata[mincount++] = a;                               \
       }                                                                 \
     }                                                                   \
@@ -256,7 +273,7 @@ teardown()
           newminevent = e;                                              \
           mincount = 1;                                                 \
           mCurrentAutomata[0] = a;                                      \
-        } else if (e == newminevent) {                                  \
+        } else if (e == newminevent && e != UNDEF_UINT32) {             \
           mCurrentAutomata[mincount++] = a;                             \
         }                                                               \
       }                                                                 \
@@ -323,7 +340,7 @@ expandSafetyState(const uint32* sourcetuple, const uint32* sourcepacked)
 {
   const uint32 numaut = getNumberOfAutomata();
   const uint32 TAG = NarrowTransitionTable::TAG_END_OF_LIST;
-  uint32 minevent = UNDEF_UINT32;
+  uint32 minevent = mNumEventRecords;
   uint32 mincount = UNDEF_UINT32;
   uint32 plantcount = UNDEF_UINT32;
   uint32 speconly = mFirstSpecOnlyUncontrollable;
@@ -345,11 +362,13 @@ expandSafetyState(const uint32* sourcetuple, const uint32* sourcepacked)
     }
   }
 
-  while (minevent != UNDEF_UINT32) {
+  while (minevent < mNumEventRecords) {
     if (minevent >= speconly) {
       if (minevent == speconly) {
         speconly++;
       } else {
+        std::cerr << minevent << ":" << speconly << ":"
+                  << mincount << ":" << plantcount << std::endl;
         const NarrowEventRecord* event = mEventRecords[speconly];
         setTraceEvent(event);
         return false;
@@ -365,7 +384,7 @@ expandSafetyState(const uint32* sourcetuple, const uint32* sourcepacked)
       setTraceEvent(event);
       return false;
     }
-    uint32 newminevent = UNDEF_UINT32;
+    uint32 newminevent = mNumEventRecords;
     for (uint32 a = 0; a < numaut; a++) {
       const NarrowTransitionTable& table = mTransitionTables[a];
       uint32 e = table.getEvent(mIterator[a]);

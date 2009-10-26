@@ -12,6 +12,8 @@ package net.sourceforge.waters.cpp.analysis;
 import java.util.List;
 
 import net.sourceforge.waters.model.analysis.AbstractModelVerifierFactory;
+import net.sourceforge.waters.model.analysis.CommandLineArgumentFlag;
+import net.sourceforge.waters.model.analysis.ModelVerifier;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 
 
@@ -34,6 +36,8 @@ public class NativeModelVerifierFactory
   private NativeModelVerifierFactory(final List<String> arglist)
   {
     super(arglist);
+    addArgument(new CommandLineArgumentBroad());
+    addArgument(new CommandLineArgumentNarrow());
   }
 
 
@@ -72,6 +76,42 @@ public class NativeModelVerifierFactory
     getInstance(final List<String> cmdline)
   {
     return new NativeModelVerifierFactory(cmdline);
+  }
+
+
+  //#########################################################################
+  //# Inner Class CommandLineArgumentBroad
+  private static class CommandLineArgumentBroad
+    extends CommandLineArgumentFlag
+  {
+    private CommandLineArgumentBroad()
+    {
+      super("-broad", "Run state expansion in 'broad' mode");
+    }
+
+    protected void configure(final ModelVerifier verifier)
+    {
+      NativeModelVerifier nverifier = (NativeModelVerifier) verifier;
+      nverifier.setExplorerMode(ExplorerMode.BROAD);
+    }
+  }
+
+
+  //#########################################################################
+  //# Inner Class CommandLineArgumentNarrow
+  private static class CommandLineArgumentNarrow
+    extends CommandLineArgumentFlag
+  {
+    private CommandLineArgumentNarrow()
+    {
+      super("-narrow", "Run state expansion in 'narrow' mode");
+    }
+
+    protected void configure(final ModelVerifier verifier)
+    {
+      NativeModelVerifier nverifier = (NativeModelVerifier) verifier;
+      nverifier.setExplorerMode(ExplorerMode.NARROW);
+    }
   }
 
 
