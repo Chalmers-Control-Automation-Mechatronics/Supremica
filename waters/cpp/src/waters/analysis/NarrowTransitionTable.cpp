@@ -52,26 +52,35 @@ NarrowTransitionTable(const NarrowPreTransitionTable* pre,
   mIsPlant = mAutomaton->isPlant();
   mNumStates = mAutomaton->getNumberOfStates();
   mStateTable = new uint32[mNumStates];
-  const uint32 transcount = pre->getTransitionCount();
-  const uint32 ndcount = pre->getNDCount();
-  mBuffers = new uint32[2 * transcount + mNumStates + ndcount];
-  uint32 next = 0;
+  uint32 ndcount = 0;
   for (uint32 code = 0; code < mNumStates; code++) {
     NarrowStateRecord* narrowstate = pre->getNarrowStateRecord(code);
+    narrowstate->removeSkippable(pre);
     narrowstate->sort();
-    // BUG: Must remove skippable stuff HERE!!!
-    mStateTable[code] = next;
-    uint32 pos = next;
-    next += 2 * narrowstate->getNumberOfEnabledEvents() + 1;
+    mNumTransitions += narrowstate->getNumberOfEnabledEvents();
+    ndcount += narrowstate->getNumberOfNondeterministicTransitions();
+  }
+  const HashAccessor* taccessor = NarrowTransitionRecord::getHashAccessor();
+  HashTable<NarrowTransitionRecord*,NarrowTransitionRecord*>
+    transmap(taccessor, mNumTransitions);
+  mBuffers = new uint32[2 * mNumTransitions + mNumStates + ndcount];
+  uint32 nextpos = 0;
+  for (uint32 code = 0; code < mNumStates; code++) {
+    NarrowStateRecord* narrowstate = pre->getNarrowStateRecord(code);
+    mStateTable[code] = nextpos;
+    uint32 pos = nextpos;
+    nextpos += 2 * narrowstate->getNumberOfEnabledEvents() + 1;
     for (NarrowTransitionRecord* narrowtrans = narrowstate->getTransitions();
          narrowtrans != 0;
          narrowtrans = narrowtrans->getNext()) {
+      transmap.add(narrowtrans);
       mBuffers[pos++] = narrowtrans->getEventCode();
       if (narrowtrans->isDeterministic()) {
         narrowtrans->setBufferPos(pos++);
       } else {
-        mBuffers[pos++] = next;
-        next += narrowtrans->getNumberOfSuccessors();
+        narrowtrans->setBufferPos(nextpos);
+        mBuffers[pos++] = nextpos;
+        nextpos += narrowtrans->getNumberOfSuccessors();
       }
     }
     mBuffers[pos] = UNDEF_UINT32;
@@ -84,20 +93,16 @@ NarrowTransitionTable(const NarrowPreTransitionTable* pre,
     jni::TransitionGlue trans(javaobject, cache);
     const jni::EventGlue& event = trans.getEventGlue(cache);
     const NarrowEventRecord* eventrecord = eventmap.get(&event);
-    std::cerr << (const char*) eventrecord->getName() << std::endl;
-    if (eventrecord->isSkippable() || pre->isLocallySelflooped(event)) {
-      std::cerr << eventrecord->isSkippable()
-                << " " << pre->isLocallySelflooped(event) << std::endl;
+    if (eventrecord->isSkippable() || pre->isLocallySelflooped(eventrecord)) {
       continue;
     }
     const jni::StateGlue& source = trans.getSourceGlue(cache);
     const uint32 sourcecode = pre->getStateCode(source);
     tmptrans->init(sourcecode, eventrecord);
-    NarrowTransitionRecord* ntrans = pre->getNarrowTransitionRecord(tmptrans);
+    NarrowTransitionRecord* narrowtrans = transmap.get(tmptrans);
     const jni::StateGlue& target = trans.getTargetGlue(cache);
     const uint32 targetcode = pre->getStateCode(target);
-    ntrans->putSuccessor(mBuffers, targetcode, TAG_END_OF_LIST);
-    mNumTransitions++;
+    narrowtrans->putSuccessor(mBuffers, targetcode, TAG_END_OF_LIST);
   }
   delete tmptrans;
 }
@@ -177,7 +182,7 @@ reverse(const NarrowEventRecord* const* events)
     narrowstate.sort();
     newstatetable[code] = nextpos;
     uint32 pos = nextpos;
-    nextpos += narrowstate.getNumberOfEnabledEvents() + 1;
+    nextpos += 2 * narrowstate.getNumberOfEnabledEvents() + 1;
     for (NarrowTransitionRecord* narrowtrans = narrowstate.getTransitions();
          narrowtrans != 0;
          narrowtrans = narrowtrans->getNext()) {
@@ -185,6 +190,7 @@ reverse(const NarrowEventRecord* const* events)
       if (narrowtrans->isDeterministic()) {
         narrowtrans->setBufferPos(pos++);
       } else {
+        narrowtrans->setBufferPos(nextpos);
         newbuffers[pos++] = nextpos;
         nextpos += narrowtrans->getNumberOfSuccessors();
       }
@@ -243,10 +249,11 @@ reverse(const NarrowEventRecord* const* events)
 #ifdef DEBUG
 
 void NarrowTransitionTable::
-dump(const NarrowEventRecord* const* events)
+dump(uint32 a, const NarrowEventRecord* const* events)
   const
 {
-  std::cerr << (const char*) (mAutomaton->getName()) << " {" << std::endl
+  std::cerr << (const char*) (mAutomaton->getName())
+            << "<" << a << "> {" << std::endl
             << "STATE TABLE:" << std::endl;
   for (uint32 code = 0; code < mNumStates; code++) {
     uint32 data = mStateTable[code];

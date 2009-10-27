@@ -36,7 +36,9 @@ namespace waters {
 
 class AutomatonRecord;
 class NarrowEventRecord;
-class NarrowTransitionRecord;  // forward
+class NarrowPreTransitionTable;  // forward
+class NarrowStateRecord;         // forward
+class NarrowTransitionRecord;    // forward
 
 
 //###########################################################################
@@ -133,8 +135,10 @@ private:
   //##########################################################################
   //# Class Variables
   static const NarrowTransitionRecordHashAccessor theHashAccessor;
-  friend class NarrowTransitionRecordHashAccessor;
   static const NarrowTransitionRecordListAccessor theListAccessor;
+
+  friend class NarrowStateRecord;
+  friend class NarrowTransitionRecordHashAccessor;
   friend class NarrowTransitionRecordListAccessor;
 };
 
@@ -157,8 +161,10 @@ public:
   //##########################################################################
   //# Simple Access
   uint32 getNumberOfEnabledEvents() const {return mNumEvents;}
+  uint32 getNumberOfNondeterministicTransitions() const;
   NarrowTransitionRecord* getTransitions() const {return mTransitionRecords;}
   void addTransition(NarrowTransitionRecord* trans);
+  void removeSkippable(const NarrowPreTransitionTable* pre);
   void sort();
 
 private:
@@ -191,14 +197,9 @@ public:
     {return &mNarrowStates[code];}
   uint32 getStateCode(const jni::StateGlue& state) const
     {return mStateMap->get(&state);}
-  bool isLocallySelflooped(const jni::EventGlue& event) const;
-  NarrowTransitionRecord* getNarrowTransitionRecord
-    (NarrowTransitionRecord* trans) const
-    {return mTransitionMap->get(trans);}
+  bool isLocallySelflooped(const NarrowEventRecord *event) const;
   const jni::SetGlue& getUniqueTransitions() const
     {return *mUniqueTransitions;}
-  uint32 getTransitionCount() const {return mTransitionCount;}
-  uint32 getNDCount() const {return mNDCount;}
 
 private:
   //##########################################################################
@@ -207,10 +208,7 @@ private:
   NarrowStateRecord* mNarrowStates;
   HashTable<const jni::StateGlue*,uint32>* mStateMap;
   HashTable<const jni::EventGlue*,NarrowEventRecord*>* mSelfloopMap;
-  HashTable<NarrowTransitionRecord*,NarrowTransitionRecord*>* mTransitionMap;
   jni::SetGlue* mUniqueTransitions;
-  uint32 mTransitionCount;
-  uint32 mNDCount;
 };
 
 

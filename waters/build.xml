@@ -320,7 +320,7 @@
     </junit>
   </target>
 
-  <target name="test2" depends="test-jar">
+  <target name="test2" depends="test-jar,cpp">
     <mkdir dir="${logs.results}"/>
     <junit printsummary="on" fork="true" maxmemory="512m">
       <formatter type="xml"/>

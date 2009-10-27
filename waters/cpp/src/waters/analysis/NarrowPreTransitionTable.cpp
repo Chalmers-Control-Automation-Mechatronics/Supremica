@@ -41,7 +41,9 @@ hash(const void* key)
   const
 {
   const NarrowTransitionRecord* trans = (const NarrowTransitionRecord*) key;
-  return hashIntArray(&trans->mState, 2);
+  const jni::EventGlue& jevent = trans->mEvent->getJavaEvent();
+  uint32 code[] = {trans->mState, (uint32) jevent.hashCode()};
+  return hashIntArray(code, 2);
 }
 
 
@@ -121,8 +123,8 @@ compareTo(const NarrowTransitionRecord* record)
 void NarrowTransitionRecord::
 putSuccessor(uint32* buffer, uint32 code, uint32 endtag)
 {
-  std::cerr << "putsucc:" << mNumSuccessors << ":"
-	    << mBufferPos << "->" << code << std::endl;
+  // std::cerr << "putsucc:" << mNumSuccessors << ":"
+  //           << mBufferPos << "->" << code << std::endl;
   if (--mNumSuccessors == 0) {
     buffer[mBufferPos] = code | endtag;
   } else {
@@ -146,12 +148,49 @@ const NarrowTransitionRecordListAccessor
 //############################################################################
 //# NarrowStateRecord: Simple Access
 
+uint32 NarrowStateRecord::
+getNumberOfNondeterministicTransitions()
+  const
+{
+  uint32 result = 0;
+  for (const NarrowTransitionRecord* current = mTransitionRecords;
+       current != 0;
+       current = current->getNext()) {
+    const uint32 numsucc = current->getNumberOfSuccessors();
+    if (numsucc > 1) {
+      result += numsucc;
+    }
+  }
+  return result;
+}
+
+
 void NarrowStateRecord::
 addTransition(NarrowTransitionRecord* trans)
 {
   trans->setNext(mTransitionRecords);
   mTransitionRecords = trans;
   mNumEvents++;
+}
+
+
+void NarrowStateRecord::
+removeSkippable(const NarrowPreTransitionTable* pre)
+{
+  NarrowTransitionRecord** ref = &mTransitionRecords;
+  NarrowTransitionRecord* current = *ref;
+  while (current != 0) {
+    const NarrowEventRecord* event = current->getEvent();
+    if (event->isSkippable() || pre->isLocallySelflooped(event)) {
+      mNumEvents--;
+      *ref = current->mNext;
+      current->mNext = 0;
+      delete current;
+    } else {
+      ref = &current->mNext;
+    }
+    current = *ref;
+  }
 }
 
 
@@ -182,10 +221,7 @@ NarrowPreTransitionTable(AutomatonRecord* aut,
     mNarrowStates(0),
     mStateMap(0),
     mSelfloopMap(0),
-    mTransitionMap(0),
-    mUniqueTransitions(0),
-    mTransitionCount(0),
-    mNDCount(0)
+    mUniqueTransitions(0)
 {
   const uint32 numstates = mAutomaton->getNumberOfStates();
   mNarrowStates =
@@ -210,9 +246,8 @@ NarrowPreTransitionTable(AutomatonRecord* aut,
   mUniqueTransitions = new jni::TreeSetGlue(&transitions, cache);
   const int numtrans = mUniqueTransitions->size();
   const HashAccessor* taccessor = NarrowTransitionRecord::getHashAccessor();
-  mTransitionMap =
-    new HashTable<NarrowTransitionRecord*,NarrowTransitionRecord*>
-          (taccessor, numtrans);
+  HashTable<NarrowTransitionRecord*,NarrowTransitionRecord*>
+    transmap(taccessor, numtrans);
 
   mStateMap = mAutomaton->createStateMap();
   NarrowTransitionRecord* newtrans = 0;
@@ -235,17 +270,12 @@ NarrowPreTransitionTable(AutomatonRecord* aut,
     } else {
       newtrans->init(sourcecode, eventrecord);
     }
-    NarrowTransitionRecord* oldtrans = mTransitionMap->add(newtrans);
+    NarrowTransitionRecord* oldtrans = transmap.add(newtrans);
     if (oldtrans == newtrans) {
       mNarrowStates[sourcecode].addTransition(newtrans);
       newtrans = 0;
-      mTransitionCount++;
-    } else if (oldtrans->isDeterministic()) {
-      oldtrans->addSuccessor();
-      mNDCount += 2;
     } else {
       oldtrans->addSuccessor();
-      mNDCount++;
     }
   }
 
@@ -263,7 +293,6 @@ NarrowPreTransitionTable(AutomatonRecord* aut,
       eventrecord->mergeLocalToGlobal(isplant, numstates);
       if (eventrecord->isLocallySelflooped(numstates)) {
 	mSelfloopMap->add(eventrecord);
-	mTransitionCount -= numstates;
       }
     }
   }
@@ -280,7 +309,6 @@ NarrowPreTransitionTable::
   delete (const char*) mNarrowStates;
   mAutomaton->deleteStateMap(mStateMap);
   delete mSelfloopMap;
-  delete mTransitionMap;
   delete mUniqueTransitions;
 }
 
@@ -289,10 +317,11 @@ NarrowPreTransitionTable::
 //# NarrowPreTransitionTable: Simple Access
 
 bool NarrowPreTransitionTable::
-isLocallySelflooped(const jni::EventGlue& event)
+isLocallySelflooped(const NarrowEventRecord* event)
   const
 {
-  return mSelfloopMap->get(&event) != 0;
+  const jni::EventGlue& jevent = event->getJavaEvent();
+  return mSelfloopMap->get(&jevent) != 0;
 }
 
 

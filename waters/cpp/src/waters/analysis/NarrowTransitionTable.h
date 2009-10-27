@@ -76,7 +76,7 @@ public:
   //##########################################################################
   //# Debug Output
 #ifdef DEBUG
-  void dump(const NarrowEventRecord* const* events) const;
+  void dump(uint32 a, const NarrowEventRecord* const* events) const;
 #endif /* DEBUG */
 
   //##########################################################################

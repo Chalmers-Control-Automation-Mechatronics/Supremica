@@ -190,7 +190,7 @@ setup()
   for (uint32 a = 0; a < numaut; a++) {
     NarrowPreTransitionTable* pre = &pretrans[a];
     new (&mTransitionTables[a]) NarrowTransitionTable(pre, cache, eventmap);
-    mTransitionTables[a].dump(mEventRecords);
+    // mTransitionTables[a].dump(a, mEventRecords);
     pretrans[a].~NarrowPreTransitionTable();    
   }
   delete (const char*) pretrans;
@@ -237,6 +237,7 @@ teardown()
 
 #define EXPAND(source, sourcetuple, minevent, numaut, TAG)              \
   {                                                                     \
+    minevent = mNumEventRecords;                                        \
     uint32 mincount = UNDEF_UINT32;                                     \
     for (uint32 a = 0; a < numaut; a++) {                               \
       const NarrowTransitionTable& table = mTransitionTables[a];        \
@@ -246,15 +247,15 @@ teardown()
         minevent = e;                                                   \
         mincount = 1;                                                   \
         mCurrentAutomata[0] = a;                                        \
-      } else if (e == minevent && e != UNDEF_UINT32) {                  \
+      } else if (e == minevent) {                                       \
         mCurrentAutomata[mincount++] = a;                               \
       }                                                                 \
     }                                                                   \
-    while (minevent != UNDEF_UINT32) {                                  \
+    while (minevent < mNumEventRecords) {                               \
       if (mincount == mEventRecords[minevent]->getNumberOfAutomata()) { \
         ADD_SUCCESSORS(source, sourcetuple, mincount, numaut, TAG);     \
       }                                                                 \
-      uint32 newminevent = UNDEF_UINT32;                                \
+      uint32 newminevent = mNumEventRecords;                            \
       for (uint32 a = 0; a < numaut; a++) {                             \
         const NarrowTransitionTable& table = mTransitionTables[a];      \
         uint32 e = table.getEvent(mIterator[a]);                        \
@@ -266,7 +267,7 @@ teardown()
           newminevent = e;                                              \
           mincount = 1;                                                 \
           mCurrentAutomata[0] = a;                                      \
-        } else if (e == newminevent && e != UNDEF_UINT32) {             \
+        } else if (e == newminevent) {                                  \
           mCurrentAutomata[mincount++] = a;                             \
         }                                                               \
       }                                                                 \
@@ -472,7 +473,9 @@ setupReverseTransitionRelations()
 {
   const uint32 numaut = getNumberOfAutomata();
   for (uint32 a = 0; a < numaut; a++) {
+    //mTransitionTables[a].dump(a, mEventRecords);
     mTransitionTables[a].reverse(mEventRecords);
+    //mTransitionTables[a].dump(a, mEventRecords);
   }
 }
 
@@ -512,10 +515,13 @@ storeNondeterministicTargets(const uint32* sourcetuple,
   for (uint32 a = 0; a < numaut; a++) {
     const NarrowTransitionTable& table = mTransitionTables[a];
     uint32 iter = table.iterator(sourcetuple[a]);
-    while (table.getEvent(iter) != e) {
+    uint32 current = table.getEvent(iter);
+    while (current < e) {
       iter = table.next(iter);
+      current = table.getEvent(iter);
     }
-    if ((table.getRawSuccessors(iter) &
+    if (current == e &&
+        (table.getRawSuccessors(iter) &
          NarrowTransitionTable::TAG_END_OF_LIST) == 0) {
       const AutomatonRecord* autrecord = getAutomatonEncoding().getRecord(a);
       const jni::AutomatonGlue& aut = autrecord->getJavaAutomaton();
