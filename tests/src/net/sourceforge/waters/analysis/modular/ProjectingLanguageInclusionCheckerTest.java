@@ -12,11 +12,10 @@ package net.sourceforge.waters.analysis.modular;
 import junit.framework.Test;
 import junit.framework.TestSuite;
 
-import net.sourceforge.waters.cpp.analysis.NativeControllabilityChecker;
+import net.sourceforge.waters.cpp.analysis.NativeLanguageInclusionChecker;
 import net.sourceforge.waters.model.analysis.
        AbstractLanguageInclusionCheckerTest;
-import net.sourceforge.waters.model.analysis.LanguageInclusionChecker;
-import net.sourceforge.waters.model.analysis.ModelVerifierFactory;
+import net.sourceforge.waters.model.analysis.SafetyVerifier;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 
 
@@ -42,12 +41,15 @@ public class ProjectingLanguageInclusionCheckerTest
   //#########################################################################
   //# Overrides for abstract base class
   //# net.sourceforge.waters.analysis.AbstractModelVerifierTest
-  protected LanguageInclusionChecker createModelVerifier
-    (final ProductDESProxyFactory desfactory)
+  protected ProjectingLanguageInclusionChecker createModelVerifier
+    (final ProductDESProxyFactory factory)
   {
-    final ModelVerifierFactory checkerfactory =
-      ProjectingModelVerifierFactory.getInstance();
-    return checkerfactory.createLanguageInclusionChecker(desfactory);
+    final SafetyVerifier subchecker =
+      new NativeLanguageInclusionChecker(factory);
+    final ProjectingLanguageInclusionChecker checker =
+      new ProjectingLanguageInclusionChecker(factory, subchecker);
+    checker.setMaxProjStates(2000);
+    return checker;
   }
 
 }

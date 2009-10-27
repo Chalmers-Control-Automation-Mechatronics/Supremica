@@ -11,8 +11,8 @@ package net.sourceforge.waters.analysis.modular;
 
 import java.util.List;
 
-import net.sourceforge.waters.analysis.monolithic.MonolithicControllabilityChecker;
 import net.sourceforge.waters.cpp.analysis.NativeControllabilityChecker;
+import net.sourceforge.waters.cpp.analysis.NativeLanguageInclusionChecker;
 import net.sourceforge.waters.model.analysis.AbstractModelVerifierFactory;
 import net.sourceforge.waters.model.analysis.LanguageInclusionChecker;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
@@ -48,20 +48,18 @@ public class ProjectingModelVerifierFactory
     (final ProductDESProxyFactory factory)
   {
     return new ProjectingControllabilityChecker
-      (null,
-       factory,
-       new NativeControllabilityChecker(factory),
-       false);
+      (null, factory, new NativeControllabilityChecker(factory));
   }
 
   public LanguageInclusionChecker createLanguageInclusionChecker
     (final ProductDESProxyFactory factory)
   {
-    return new ModularLanguageInclusionChecker(
-       null, factory,
-       /*new OneUncontrollableChecker(null, factory,
-                                    createControllabilityChecker(factory)),*/
-       createControllabilityChecker(factory));
+    return new ProjectingLanguageInclusionChecker
+      (null, factory, new NativeLanguageInclusionChecker(factory));
+    /*
+    return new ModularLanguageInclusionChecker
+      (null, factory, createControllabilityChecker(factory));
+    */
   }
 
 

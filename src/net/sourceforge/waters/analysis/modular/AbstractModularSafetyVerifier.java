@@ -37,7 +37,15 @@ abstract class AbstractModularSafetyVerifier
   public AbstractModularSafetyVerifier(final ProductDESProxy model,
                                        final ProductDESProxyFactory factory)
   {
+    this(model, null, factory);
+  }
+
+  public AbstractModularSafetyVerifier(final ProductDESProxy model,
+                                       final KindTranslator translator,
+                                       final ProductDESProxyFactory factory)
+  {
     super(model, factory);
+    mTranslator = translator;
     mHeuristicMethod = ModularHeuristicFactory.Method.RelMaxCommonEvents;
     mHeuristicPreference = ModularHeuristicFactory.Preference.NOPREF;
   }

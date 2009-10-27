@@ -322,11 +322,10 @@ public class SpeedComparison3
       pt.print(model.getName());
       pt.print(",");
       for (int i = 100; i <= 3200; i *= 2) {
-        ControllabilityChecker mo = new ProjectingControllabilityChecker(model, mProductDESProxyFactory,
-                                                                         nativec, false, i);
-        LanguageInclusionChecker lang = new ModularLanguageInclusionChecker(model,
-                                       mProductDESProxyFactory,
-                                       mo);
+        ControllabilityChecker mo = new ProjectingControllabilityChecker
+	  (model, mProductDESProxyFactory, nativec, i);
+        LanguageInclusionChecker lang = new ModularLanguageInclusionChecker
+	  (model, mProductDESProxyFactory, mo);
         mo.setNodeLimit(2000000);
         lang.setNodeLimit(2000000);
         long timeb = 0;

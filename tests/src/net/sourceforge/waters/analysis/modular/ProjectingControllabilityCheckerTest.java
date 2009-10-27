@@ -15,9 +15,8 @@ import junit.framework.TestSuite;
 import net.sourceforge.waters.cpp.analysis.NativeControllabilityChecker;
 import net.sourceforge.waters.model.analysis.
   AbstractControllabilityCheckerTest;
+import net.sourceforge.waters.model.analysis.SafetyVerifier;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
-import net.sourceforge.waters.analysis.monolithic.
-  MonolithicControllabilityChecker;
 
 
 public class ProjectingControllabilityCheckerTest
@@ -43,11 +42,14 @@ public class ProjectingControllabilityCheckerTest
   //# Overrides for abstract base class
   //# net.sourceforge.waters.analysis.AbstractModelVerifierTest
   protected ProjectingControllabilityChecker createModelVerifier
-    (final ProductDESProxyFactory desfactory)
+    (final ProductDESProxyFactory factory)
   {
-    final ProjectingModelVerifierFactory checkerfactory =
-      ProjectingModelVerifierFactory.getInstance();
-    return checkerfactory.createControllabilityChecker(desfactory);
+    final SafetyVerifier subchecker =
+      new NativeControllabilityChecker(factory);
+    final ProjectingControllabilityChecker checker =
+      new ProjectingControllabilityChecker(factory, subchecker);
+    checker.setMaxProjStates(2000);
+    return checker;
   }
 
 }
