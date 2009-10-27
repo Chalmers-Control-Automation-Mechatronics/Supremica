@@ -1,0 +1,185 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Module Name="wsp_timer" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
+    <ns2:Comment>Two blocking components of the BMW central locking system, plus the noreset specification to fix the problem.</ns2:Comment>
+    <EventDeclList>
+        <EventDecl Kind="PROPOSITION" Name=":accepting"/>
+        <EventDecl Kind="CONTROLLABLE" Name="timer"/>
+        <EventDecl Kind="CONTROLLABLE" Name="reset"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="timeout"/>
+        <EventDecl Kind="CONTROLLABLE" Name="autovr"/>
+        <EventDecl Kind="CONTROLLABLE" Name="cmd"/>
+        <EventDecl Kind="CONTROLLABLE" Name="restart"/>
+    </EventDeclList>
+    <ComponentList>
+        <SimpleComponent Kind="PLANT" Name="timer">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="IDLE">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                        <PointGeometry>
+                            <Point Y="128" X="64"/>
+                        </PointGeometry>
+                        <InitialArrowGeometry>
+                            <Point Y="-5" X="-5"/>
+                        </InitialArrowGeometry>
+                        <LabelGeometry>
+                            <Point Y="12" X="-13"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="RUN">
+                        <PointGeometry>
+                            <Point Y="128" X="176"/>
+                        </PointGeometry>
+                        <LabelGeometry>
+                            <Point Y="9" X="-13"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="RUN" Source="IDLE">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="timer"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="1" X="-14"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="142" X="119"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Target="IDLE" Source="RUN">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="timeout"/>
+                            <SimpleIdentifier Name="reset"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-33" X="-22"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="115" X="119"/>
+                        </SplineGeometry>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="SPEC" Name="wsptime">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Name="RESET">
+                        <PointGeometry>
+                            <Point Y="112" X="288"/>
+                        </PointGeometry>
+                        <LabelGeometry>
+                            <Point Y="7" X="-16"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="TIME">
+                        <PointGeometry>
+                            <Point Y="112" X="128"/>
+                        </PointGeometry>
+                        <LabelGeometry>
+                            <Point Y="7" X="-17"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Initial="true" Name="IN">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                        <PointGeometry>
+                            <Point Y="112" X="48"/>
+                        </PointGeometry>
+                        <InitialArrowGeometry>
+                            <Point Y="-5" X="-5"/>
+                        </InitialArrowGeometry>
+                        <LabelGeometry>
+                            <Point Y="9" X="-6"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="RUN">
+                        <PointGeometry>
+                            <Point Y="112" X="208"/>
+                        </PointGeometry>
+                        <LabelGeometry>
+                            <Point Y="7" X="-13"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="IN" Source="RESET">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="restart"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="3" X="-37"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="148" X="172"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Target="RESET" Source="RUN">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="timeout"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-19" X="-23"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="RUN" Source="RUN">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="cmd"/>
+                            <SimpleIdentifier Name="autovr"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-31" X="-20"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="72" X="207"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Target="TIME" Source="IN">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="cmd"/>
+                            <SimpleIdentifier Name="autovr"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-30" X="-23"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="RUN" Source="TIME">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="timer"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-23" X="-22"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="SPEC" Name="noreset">
+            <Graph>
+                <LabelBlock>
+                    <SimpleIdentifier Name="reset"/>
+                    <LabelGeometry Anchor="NW">
+                        <Point Y="41" X="17"/>
+                    </LabelGeometry>
+                </LabelBlock>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="init">
+                        <PointGeometry>
+                            <Point Y="48" X="128"/>
+                        </PointGeometry>
+                        <InitialArrowGeometry>
+                            <Point Y="-5" X="-5"/>
+                        </InitialArrowGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="10" X="0"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                </NodeList>
+            </Graph>
+        </SimpleComponent>
+    </ComponentList>
+</Module>

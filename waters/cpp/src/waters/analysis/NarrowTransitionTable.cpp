@@ -14,251 +14,22 @@
 #include <iostream>
 #include <new>
 
-#include "jni/glue/AutomatonGlue.h"
 #include "jni/glue/IteratorGlue.h"
 #include "jni/glue/SetGlue.h"
 #include "jni/glue/StateGlue.h"
 #include "jni/glue/TransitionGlue.h"
-#include "jni/glue/TreeSetGlue.h"
 
 #include "waters/analysis/AutomatonEncoding.h"
 #include "waters/analysis/NarrowEventRecord.h"
+#include "waters/analysis/NarrowPreTransitionTable.h"
 #include "waters/analysis/NarrowTransitionTable.h"
-#include "waters/base/LinkedRecordList.h"
+
+#ifdef DEBUG
+#include "jni/cache/JavaString.h"
+#endif /* DEBUG */
 
 
 namespace waters {
-
-class NarrowTransitionRecord;  // forward
-
-
-//###########################################################################
-//# Class NarrowTransitionRecordHashAccessor (local)
-//###########################################################################
-
-class NarrowTransitionRecordHashAccessor : public PtrHashAccessor
-{
-private:
-  //##########################################################################
-  //# Constructors & Destructors
-  explicit NarrowTransitionRecordHashAccessor() {};
-  friend class NarrowTransitionRecord;
-
-public:
-  //##########################################################################
-  //# Hash Methods
-  virtual uint32 hash(const void* key) const;
-  virtual bool equals(const void* key1, const void* key2) const;
-  virtual const void* getKey(const void* value) const {return value;}
-};
-
-
-//############################################################################
-//# Class NarrowTransitionRecordListAccessor (local)
-//############################################################################
-
-class NarrowTransitionRecordListAccessor :
-  public LinkedRecordAccessor<NarrowTransitionRecord>
-{
-public:
-  //##########################################################################
-  //# Constructors & Destructors
-  NarrowTransitionRecordListAccessor() {}
-
-  //##########################################################################
-  //# Override for LinkedRecordAccessor
-  virtual NarrowTransitionRecord* getNext(const NarrowTransitionRecord* record)
-    const;
-  virtual void setNext(NarrowTransitionRecord* record,
-                       NarrowTransitionRecord* next) const;
-  virtual int compare(const NarrowTransitionRecord* record1,
-		      const NarrowTransitionRecord* record2) const;
-};
-
-
-//############################################################################
-//# class NarrowTransitionRecord (local)
-//############################################################################
-
-class NarrowTransitionRecord
-{
-public:
-  //##########################################################################
-  //# Constructors & Destructors
-  explicit NarrowTransitionRecord(uint32 state = UNDEF_UINT32,
-                                  const NarrowEventRecord* event = 0) :
-    mState(state), mEvent(event), mNumSuccessors(1), mNext(0) {}
-  ~NarrowTransitionRecord() {delete mNext;}
-  void init(uint32 state, const NarrowEventRecord* event)
-    {mState = state; mEvent = event;}
-
-  //##########################################################################
-  //# Simple Access
-  const NarrowEventRecord* getEvent() const {return mEvent;}
-  uint32 getEventCode() const {return mEvent->getEventCode();}
-  bool isDeterministic() const {return mNumSuccessors <= 1;}
-  uint32 getNumberOfSuccessors() const {return mNumSuccessors;}
-  NarrowTransitionRecord* getNext() const {return mNext;}
-  void addSuccessor() {mNumSuccessors++;}
-  void setNext(NarrowTransitionRecord* next) {mNext = next;}
-  void setBufferPos(uint32 pos) {mBufferPos = pos;}
-
-  //##########################################################################
-  //# Building the Transition Table
-  void putSuccessor(uint32* buffer, uint32 code);
-
-  //##########################################################################
-  //# Comparing and Hashing
-  int compareTo(const NarrowTransitionRecord* record) const
-    {return (int) mEvent - (int) record->mEvent;}
-  static const HashAccessor* getHashAccessor() {return &theHashAccessor;}
-  static const LinkedRecordAccessor<NarrowTransitionRecord>* getListAccessor()
-    {return &theListAccessor;}
-
-private:
-  //##########################################################################
-  //# Data Members
-  uint32 mState;
-  const NarrowEventRecord* mEvent;
-  uint32 mNumSuccessors;
-  NarrowTransitionRecord* mNext;
-  uint32 mBufferPos;
-
-  //##########################################################################
-  //# Class Variables
-  static const NarrowTransitionRecordHashAccessor theHashAccessor;
-  friend class NarrowTransitionRecordHashAccessor;
-  static const NarrowTransitionRecordListAccessor theListAccessor;
-  friend class NarrowTransitionRecordListAccessor;
-};
-
-
-//############################################################################
-//# NarrowTransitionRecord: Building the Transition Table
-
-void NarrowTransitionRecord::
-putSuccessor(uint32* buffer, uint32 code)
-{
-  if (--mNumSuccessors == 0) {
-    buffer[mBufferPos] = code | NarrowTransitionTable::TAG_END_OF_LIST;
-  } else {
-    buffer[mBufferPos++] = code;
-  }
-}
-
-
-//############################################################################
-//# NarrowTransitionRecordHashAccessor: Hash Methods
-
-uint32 NarrowTransitionRecordHashAccessor::
-hash(const void* key)
-  const
-{
-  const NarrowTransitionRecord* trans = (const NarrowTransitionRecord*) key;
-  return hashIntArray(&trans->mState, 2);
-}
-
-
-bool NarrowTransitionRecordHashAccessor::
-equals(const void* key1, const void* key2)
-  const
-{
-  const NarrowTransitionRecord* trans1 = (const NarrowTransitionRecord*) key1;
-  const NarrowTransitionRecord* trans2 = (const NarrowTransitionRecord*) key2;
-  return trans1->mState == trans2->mState && trans1->mEvent == trans2->mEvent;
-}
-
-
-//############################################################################
-//# NarrowTransitionRecordListAccessor: List Accessor Methods
-
-NarrowTransitionRecord* NarrowTransitionRecordListAccessor::
-getNext(const NarrowTransitionRecord* record)
-  const
-{
-  return record->getNext();
-}
-
-
-void NarrowTransitionRecordListAccessor::
-setNext(NarrowTransitionRecord* record, NarrowTransitionRecord* next)
-  const
-{
-  record->setNext(next);
-}
-
-
-int NarrowTransitionRecordListAccessor::
-compare(const NarrowTransitionRecord* record1,
-        const NarrowTransitionRecord* record2)
-  const
-{
-  return record1->compareTo(record2);
-}
-
-
-//############################################################################
-//# NarrowTransitionRecord: Class Variables
-
-const NarrowTransitionRecordHashAccessor
-  NarrowTransitionRecord::theHashAccessor;
-const NarrowTransitionRecordListAccessor
-  NarrowTransitionRecord::theListAccessor;
-
-
-
-//############################################################################
-//# class NarrowStateRecord (local)
-//############################################################################
-
-class NarrowStateRecord // : public StateRecord
-{
-public:
-  //##########################################################################
-  //# Constructors & Destructors
-  explicit NarrowStateRecord(uint32 code) :
-    mNumEvents(0),
-    mTransitionRecords(0)
-  {}
-  ~NarrowStateRecord() {delete mTransitionRecords;}
-
-  //##########################################################################
-  //# Simple Access
-  uint32 getNumberOfEnabledEvents() const {return mNumEvents;}
-  NarrowTransitionRecord* getTransitions() const {return mTransitionRecords;}
-  void addTransition(NarrowTransitionRecord* trans);
-  void sort();
-
-private:
-  //##########################################################################
-  //# Data Members
-  uint32 mNumEvents;
-  NarrowTransitionRecord* mTransitionRecords;
-};
-
-
-//############################################################################
-//# NarrowStateRecord: Simple Access
-
-void NarrowStateRecord::
-addTransition(NarrowTransitionRecord* trans)
-{
-  trans->setNext(mTransitionRecords);
-  mTransitionRecords = trans;
-  mNumEvents++;
-}
-
-
-void NarrowStateRecord::
-sort()
-{
-  const LinkedRecordAccessor<NarrowTransitionRecord>* accessor =
-    NarrowTransitionRecord::getListAccessor();
-  LinkedRecordList<NarrowTransitionRecord> list(accessor, mTransitionRecords);
-  list.qsort();
-  mTransitionRecords = list.getHead();
-}
-
 
 //############################################################################
 //# class NarrowTransitionTable
@@ -268,103 +39,31 @@ sort()
 //# NarrowTransitionTable: Constructors & Destructors
 
 NarrowTransitionTable::
-NarrowTransitionTable(AutomatonRecord* aut,
+NarrowTransitionTable(const NarrowPreTransitionTable* pre,
                       jni::ClassCache* cache,
                       const HashTable<const jni::EventGlue*,
                                       NarrowEventRecord*>& eventmap)
   : mNumTransitions(0),
-    mAutomaton(aut),
     mStateTable(0),
     mBuffers(0)
 {
+  mAutomaton = pre->getAutomaton();
   mAutomatonIndex = mAutomaton->getAutomatonIndex();
   mIsPlant = mAutomaton->isPlant();
   mNumStates = mAutomaton->getNumberOfStates();
-  NarrowStateRecord* narrowstates =
-    (NarrowStateRecord*) new char[mNumStates * sizeof(NarrowStateRecord)];
-  for (uint32 code = 0; code < mNumStates; code++) {
-    new (&narrowstates[code]) NarrowStateRecord(code);
-  }
-
-  const jni::AutomatonGlue& autglue = mAutomaton->getJavaAutomaton();
-  const jni::CollectionGlue events = autglue.getEventsGlue(cache);
-  const jni::IteratorGlue eventiter1 = events.iteratorGlue(cache);
-  while (eventiter1.hasNext()) {
-    jobject javaobject = eventiter1.next();
-    jni::EventGlue event(javaobject, cache);
-    NarrowEventRecord* eventrecord = eventmap.get(&event);
-    if (eventrecord != 0) {
-      eventrecord->resetLocalTransitions();
-    }
-  }
-
-  const jni::CollectionGlue transitions = autglue.getTransitionsGlue(cache);
-  const jni::TreeSetGlue uniqtrans(&transitions, cache);
-  const int numtrans = uniqtrans.size();
-  const HashAccessor* accessor = NarrowTransitionRecord::getHashAccessor();
-  HashTable<NarrowTransitionRecord*,NarrowTransitionRecord*>
-    narrowtransmap(accessor, numtrans);
-
-  HashTable<const jni::StateGlue*,uint32>* statemap =
-    mAutomaton->createStateMap();
-  int transcount = 0;
-  int ndcount = 0;
-  NarrowTransitionRecord* newtrans = 0;
-  const jni::IteratorGlue iter1 = uniqtrans.iteratorGlue(cache);
-  while (iter1.hasNext()) {
-    jobject javaobject = iter1.next();
-    jni::TransitionGlue trans(javaobject, cache);
-    const jni::EventGlue& event = trans.getEventGlue(cache);
-    NarrowEventRecord* eventrecord = eventmap.get(&event);
-    if (eventrecord->isGloballyDisabled()) {
-      continue;
-    }
-    const jni::StateGlue& source = trans.getSourceGlue(cache);
-    const uint32 sourcecode = statemap->get(&source);
-    const jni::StateGlue& target = trans.getTargetGlue(cache);
-    const uint32 targetcode = statemap->get(&target);
-    eventrecord->countLocalTransition(sourcecode == targetcode);
-    if (newtrans == 0) {
-      newtrans = new NarrowTransitionRecord(sourcecode, eventrecord);
-    } else {
-      newtrans->init(sourcecode, eventrecord);
-    }
-    NarrowTransitionRecord* oldtrans = narrowtransmap.add(newtrans);
-    if (oldtrans == newtrans) {
-      narrowstates[sourcecode].addTransition(newtrans);
-      newtrans = 0;
-      transcount++;
-    } else if (oldtrans->isDeterministic()) {
-      oldtrans->addSuccessor();
-      ndcount += 2;
-    } else {
-      oldtrans->addSuccessor();
-      ndcount++;
-    }
-  }
-
-  const jni::IteratorGlue eventiter2 = events.iteratorGlue(cache);
-  while (eventiter2.hasNext()) {
-    jobject javaobject = eventiter2.next();
-    jni::EventGlue event(javaobject, cache);
-    NarrowEventRecord* eventrecord = eventmap.get(&event);
-    if (eventrecord != 0) {
-      eventrecord->mergeLocalToGlobal(mIsPlant, mNumStates);
-    }
-  }
-
-  // Break here and setup event ordering ...
-
   mStateTable = new uint32[mNumStates];
+  const uint32 transcount = pre->getTransitionCount();
+  const uint32 ndcount = pre->getNDCount();
   mBuffers = new uint32[2 * transcount + mNumStates + ndcount];
   uint32 next = 0;
   for (uint32 code = 0; code < mNumStates; code++) {
-    NarrowStateRecord& narrowstate = narrowstates[code];
-    narrowstate.sort();
+    NarrowStateRecord* narrowstate = pre->getNarrowStateRecord(code);
+    narrowstate->sort();
+    // BUG: Must remove skippable stuff HERE!!!
     mStateTable[code] = next;
     uint32 pos = next;
-    next += 2 * narrowstate.getNumberOfEnabledEvents() + 1;
-    for (NarrowTransitionRecord* narrowtrans = narrowstate.getTransitions();
+    next += 2 * narrowstate->getNumberOfEnabledEvents() + 1;
+    for (NarrowTransitionRecord* narrowtrans = narrowstate->getTransitions();
          narrowtrans != 0;
          narrowtrans = narrowtrans->getNext()) {
       mBuffers[pos++] = narrowtrans->getEventCode();
@@ -377,36 +76,30 @@ NarrowTransitionTable(AutomatonRecord* aut,
     }
     mBuffers[pos] = UNDEF_UINT32;
   }
-
-  if (newtrans == 0) {
-    newtrans = new NarrowTransitionRecord();
-  }
-  const jni::IteratorGlue iter2 = uniqtrans.iteratorGlue(cache);
-  while (iter2.hasNext()) {
-    jobject javaobject = iter2.next();
+  NarrowTransitionRecord* tmptrans = new NarrowTransitionRecord();
+  const jni::SetGlue& uniqtrans = pre->getUniqueTransitions();
+  const jni::IteratorGlue iter = uniqtrans.iteratorGlue(cache);
+  while (iter.hasNext()) {
+    jobject javaobject = iter.next();
     jni::TransitionGlue trans(javaobject, cache);
     const jni::EventGlue& event = trans.getEventGlue(cache);
     const NarrowEventRecord* eventrecord = eventmap.get(&event);
-    if (eventrecord->isGloballyDisabled() ||
-        eventrecord->isLocallySelflooped(mNumStates)) {
+    std::cerr << (const char*) eventrecord->getName() << std::endl;
+    if (eventrecord->isSkippable() || pre->isLocallySelflooped(event)) {
+      std::cerr << eventrecord->isSkippable()
+                << " " << pre->isLocallySelflooped(event) << std::endl;
       continue;
     }
-    const uint32 eventcode = eventrecord->getEventCode();
     const jni::StateGlue& source = trans.getSourceGlue(cache);
-    const uint32 sourcecode = statemap->get(&source);
-    newtrans->init(sourcecode, eventrecord);
-    NarrowTransitionRecord* oldtrans = narrowtransmap.get(newtrans);
+    const uint32 sourcecode = pre->getStateCode(source);
+    tmptrans->init(sourcecode, eventrecord);
+    NarrowTransitionRecord* ntrans = pre->getNarrowTransitionRecord(tmptrans);
     const jni::StateGlue& target = trans.getTargetGlue(cache);
-    const uint32 targetcode = statemap->get(&target);
-    oldtrans->putSuccessor(mBuffers, targetcode);
+    const uint32 targetcode = pre->getStateCode(target);
+    ntrans->putSuccessor(mBuffers, targetcode, TAG_END_OF_LIST);
     mNumTransitions++;
   }
-
-  mAutomaton->deleteStateMap(statemap);
-  for (uint32 code = 0; code < mNumStates; code++) {
-    narrowstates[code].~NarrowStateRecord();
-  }
-  delete (const char*) narrowstates;
+  delete tmptrans;
 }
 
 
@@ -420,32 +113,6 @@ NarrowTransitionTable::
 
 //############################################################################
 //# NarrowTransitionTable: Setup
-
-void NarrowTransitionTable::
-removeSkipped(const NarrowEventRecord* const* events)
-{
-  for (uint32 state = 0; state < mNumStates; state++) {
-    uint32 rpos = mStateTable[state];
-    uint32 wpos = rpos;
-    uint32 ecode = mBuffers[rpos];
-    while (ecode != UNDEF_UINT32) {
-      if (events[ecode]->isSkippable()) {
-        rpos += 2;
-      } else if (rpos == wpos) {
-        wpos = rpos += 2;
-      } else {
-        rpos++;
-        mBuffers[wpos++] = ecode;
-        mBuffers[wpos++] = mBuffers[rpos++];
-      }
-      ecode = mBuffers[rpos];
-    }
-    if (rpos != wpos) {
-      mBuffers[wpos] = UNDEF_UINT32;
-    }
-  }
-}
-
 
 void NarrowTransitionTable::
 reverse(const NarrowEventRecord* const* events)
@@ -553,7 +220,7 @@ reverse(const NarrowEventRecord* const* events)
             newtrans->init(target, event);
           }
           NarrowTransitionRecord* oldtrans = narrowtransmap.get(newtrans);
-          oldtrans->putSuccessor(newbuffers, source);
+          oldtrans->putSuccessor(newbuffers, source, TAG_END_OF_LIST);
         } while (!done);
       }
     }
@@ -568,6 +235,43 @@ reverse(const NarrowEventRecord* const* events)
   }
   delete (const char*) narrowstates;
 }
+
+
+//############################################################################
+//# NarrowTransitionTable: Debug Output
+
+#ifdef DEBUG
+
+void NarrowTransitionTable::
+dump(const NarrowEventRecord* const* events)
+  const
+{
+  std::cerr << (const char*) (mAutomaton->getName()) << " {" << std::endl
+            << "STATE TABLE:" << std::endl;
+  for (uint32 code = 0; code < mNumStates; code++) {
+    uint32 data = mStateTable[code];
+    std::cerr << "  " << code << ":" << (data & ~TAG_END_OF_LIST)
+              << (data & TAG_END_OF_LIST ? "+" : "") << std::endl;
+  }
+  std::cerr << "BUFFERS:" << std::endl;
+  for (uint32 code = 0; code < mNumStates; code++) {
+    uint32 iter = iterator(code);
+    while (hasNext(iter)) {
+      uint32 data = getRawSuccessors(iter);
+      uint32 ecode = getEvent(iter);
+      std::cerr << "  " << iter << ":" << ecode
+                << ":" << (data & ~TAG_END_OF_LIST)
+                << (data & TAG_END_OF_LIST ? "+" : "")
+                << " <" << (const char*) events[ecode]->getName() << ">"
+                << std::endl;
+      iter = next(iter);
+    }
+    std::cerr << "  " << iter << ":*" << std::endl;
+  }
+  std::cerr << "}" << std::endl;
+}
+
+#endif /* DEBUG */
 
 
 }  /* namespace waters */

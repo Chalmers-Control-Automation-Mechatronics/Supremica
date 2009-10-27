@@ -37,6 +37,7 @@
 
 #include "waters/analysis/NarrowEventRecord.h"
 #include "waters/analysis/NarrowProductExplorer.h"
+#include "waters/analysis/NarrowPreTransitionTable.h"
 #include "waters/analysis/NarrowTransitionTable.h"
 #include "waters/analysis/StateSpace.h"
 #include "waters/base/HashTable.h"
@@ -156,7 +157,15 @@ setup()
     eventmap.add(record);
   }
 
-  // Establish ordered event list ...
+  // Build pre-transition tables ...
+  NarrowPreTransitionTable* pretrans = (NarrowPreTransitionTable*)
+    new char[numaut * sizeof(NarrowPreTransitionTable)];
+  for (uint32 a = 0; a < numaut; a++) {
+    AutomatonRecord* aut = getAutomatonEncoding().getRecord(a);
+    new (&pretrans[a]) NarrowPreTransitionTable(aut, cache, eventmap);
+  }
+
+  // Establish event ordering ...
   mNumEventRecords = eventmap.size();
   mEventRecords = new NarrowEventRecord*[mNumEventRecords];
   HashTableIterator hiter = eventmap.iterator();
@@ -164,23 +173,6 @@ setup()
   while (eventmap.hasNext(hiter)) {
     mEventRecords[e++] = eventmap.next(hiter);
   }
-  /*
-  for (uint32 a = 0; a < numaut; a++) {
-    const AutomatonRecord* aut = getAutomatonEncoding().getRecord(a);
-    const bool isplant = aut->isPlant();
-    const jni::AutomatonGlue& autglue = mAutomaton->getJavaAutomaton();
-    const jni::CollectionGlue events = autglue.getEventsGlue(cache);
-    const jni::IteratorGlue eventiter1 = events.iteratorGlue(cache);
-    while (eventiter1.hasNext()) {
-      jobject javaobject = eventiter1.next();
-      jni::EventGlue event(javaobject, cache);
-      NarrowEventRecord* eventrecord = eventmap.get(&event);
-      if (eventrecord != 0) {
-        eventrecord->addAutomaton(isplant);
-      }
-    }
-  }
-  */
   qsort(mEventRecords, mNumEventRecords, sizeof(NarrowEventRecord*),
         NarrowEventRecord::compare);
   e = mFirstSpecOnlyUncontrollable = mNumEventRecords;
@@ -196,12 +188,12 @@ setup()
   mTransitionTables =
     (NarrowTransitionTable*) new char[numaut * sizeof(NarrowTransitionTable)];
   for (uint32 a = 0; a < numaut; a++) {
-    AutomatonRecord* aut = getAutomatonEncoding().getRecord(a);
-    new (&mTransitionTables[a]) NarrowTransitionTable(aut, cache, eventmap);
+    NarrowPreTransitionTable* pre = &pretrans[a];
+    new (&mTransitionTables[a]) NarrowTransitionTable(pre, cache, eventmap);
+    mTransitionTables[a].dump(mEventRecords);
+    pretrans[a].~NarrowPreTransitionTable();    
   }
-  for (uint32 a = 0; a < numaut; a++) {
-    mTransitionTables[a].removeSkipped(mEventRecords);
-  }
+  delete (const char*) pretrans;
 
   // More allocation ...
   mIterator = new uint32[numaut];
@@ -209,6 +201,7 @@ setup()
   mCurrentAutomata = new uint32[numaut];
   mTargetTuple = new uint32[numaut];
 }
+
 
 void NarrowProductExplorer::
 teardown()
@@ -367,8 +360,6 @@ expandSafetyState(const uint32* sourcetuple, const uint32* sourcepacked)
       if (minevent == speconly) {
         speconly++;
       } else {
-        std::cerr << minevent << ":" << speconly << ":"
-                  << mincount << ":" << plantcount << std::endl;
         const NarrowEventRecord* event = mEventRecords[speconly];
         setTraceEvent(event);
         return false;

@@ -33,6 +33,7 @@ namespace waters {
 
 class AutomatonRecord;
 class NarrowEventRecord;
+class NarrowPreTransitionTable;
 
 
 //############################################################################
@@ -45,7 +46,7 @@ public:
   //##########################################################################
   //# Constructors & Destructors
   explicit NarrowTransitionTable
-    (AutomatonRecord* aut,
+    (const NarrowPreTransitionTable* pre,
      jni::ClassCache* cache,
      const HashTable<const jni::EventGlue*, NarrowEventRecord*>& eventmap);
   ~NarrowTransitionTable();
@@ -70,8 +71,13 @@ public:
 
   //##########################################################################
   //# Setup
-  void removeSkipped(const NarrowEventRecord* const* events);
   void reverse(const NarrowEventRecord* const* events);
+
+  //##########################################################################
+  //# Debug Output
+#ifdef DEBUG
+  void dump(const NarrowEventRecord* const* events) const;
+#endif /* DEBUG */
 
   //##########################################################################
   //# Class Constants
@@ -80,11 +86,11 @@ public:
 private:
   //##########################################################################
   //# Data Members
-  uint32 mNumStates;
-  uint32 mNumTransitions;
+  AutomatonRecord* mAutomaton;
   uint32 mAutomatonIndex;
   bool mIsPlant;
-  AutomatonRecord* mAutomaton;
+  uint32 mNumStates;
+  uint32 mNumTransitions;
   uint32* mStateTable;
   uint32* mBuffers;
 };
