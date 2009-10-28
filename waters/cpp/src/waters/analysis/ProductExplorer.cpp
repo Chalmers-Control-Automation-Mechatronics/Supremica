@@ -152,7 +152,7 @@ runNonblockingCheck()
       storeInitialStates(false);
       if (mIsTrivial) {
         result = false;
-        // mDeadlock = "transitions enabled in mBadState";
+        // mDeadlock = "transitions enabled in mTraceState";
       } else {
         result = doNonblockingReachabilitySearch();
         if (result) {
@@ -161,7 +161,6 @@ runNonblockingCheck()
         }
       }
       if (!result) {
-        setupReverseTransitionRelations();
         mTraceStartTime = clock();
         mTraceList = new jni::LinkedListGlue(mCache);
         const uint32 level = getDepth(mTraceState);
@@ -234,29 +233,39 @@ setup()
     new AutomatonEncoding(mModel, mKindTranslator, mMarking, mCache, numtags);
   // mEncoding->dump();
   mNumAutomata = mEncoding->getNumberOfRecords();
-  mIsTrivial =
-    mMode == EXPLORER_MODE_SAFETY ? !mEncoding->hasSpecs() : mNumAutomata == 0;
-  if (!mIsTrivial) {
-    switch (mMode) {
-    case EXPLORER_MODE_SAFETY:
-      mStateSpace = new StateSpace(mEncoding, mStateLimit);
-      break;
-    case EXPLORER_MODE_NONBLOCKING:
-      mStateSpace = new TaggedStateSpace(mEncoding, mStateLimit);
-      if (mTransitionLimit > 0) {
-        mReverseTransitionStore = new ReverseTransitionStore(mTransitionLimit);
-      }
-      break;
-    default:
-      // throw exception ?
-      break;
-    }
-    mDepthMap = new ArrayList<uint32>(128);
-  }
   mNumStates = 0;
   mTraceEvent = 0;
   mTraceState = UNDEF_UINT32;
   mConflictKind = jni::ConflictKind_CONFLICT;
+  switch (mMode) {
+  case EXPLORER_MODE_SAFETY:
+    if (mEncoding->hasSpecs()) {
+      mStateSpace = new StateSpace(mEncoding, mStateLimit);
+      mDepthMap = new ArrayList<uint32>(128);
+    } else {
+      setTrivial();
+    }
+    break;
+  case EXPLORER_MODE_NONBLOCKING:
+    if (mEncoding->isAllMarked()) {
+      setTrivial();
+    } else if (mEncoding->isTriviallyBlocking()) {
+      mStateSpace = new StateSpace(mEncoding, 1);
+      storeInitialStates(false, false);
+      setTraceState(0);
+      setTrivial();
+    } else {
+      mStateSpace = new TaggedStateSpace(mEncoding, mStateLimit);
+      mDepthMap = new ArrayList<uint32>(128);
+      if (mTransitionLimit > 0) {
+        mReverseTransitionStore = new ReverseTransitionStore(mTransitionLimit);
+      }
+    }
+    break;
+  default:
+    // throw exception ?
+    break;
+  }
 }
 
 void ProductExplorer::
@@ -442,7 +451,7 @@ computeCounterExample(const jni::ListGlue& list, uint32 level)
 
 
 void ProductExplorer::
-storeInitialStates(bool initzero)
+storeInitialStates(bool initzero, bool donondet)
 {
   uint32* initpacked = mStateSpace->prepare();
   if (initzero) {
@@ -460,7 +469,8 @@ storeInitialStates(bool initzero)
     delete [] inittuple;
   }
   mStateSpace->add();
-  const int ndcount = mEncoding->getNumberOfNondeterministicInitialAutomata();
+  const int ndcount =
+    donondet ? mEncoding->getNumberOfNondeterministicInitialAutomata() : 0;
   if (ndcount == 0) {
     mNumStates++;
   } else {
@@ -491,8 +501,10 @@ storeInitialStates(bool initzero)
       throw;
     }
   }
-  mDepthMap->add(0);
-  mDepthMap->add(mNumStates);
+  if (mDepthMap != 0) {
+    mDepthMap->add(0);
+    mDepthMap->add(mNumStates);
+  }
 }
 
 

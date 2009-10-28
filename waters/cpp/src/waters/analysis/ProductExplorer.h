@@ -122,7 +122,7 @@ protected:
   virtual bool doNonblockingReachabilitySearch();
   virtual bool doNonblockingCoreachabilitySearch();
   virtual void computeCounterExample(const jni::ListGlue& list, uint32 level);
-  virtual void storeInitialStates(bool initzero);
+  virtual void storeInitialStates(bool initzero, bool donondet = true);
   virtual bool expandSafetyState
     (const uint32* sourcetuple, const uint32* sourcepacked) = 0;
   virtual bool expandNonblockingReachabilityState

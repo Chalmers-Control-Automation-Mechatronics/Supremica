@@ -71,7 +71,7 @@ public abstract class AbstractControllabilityCheckerTest
     try {
       final ModelVerifier verifier = getModelVerifier();
       verifier.setNodeLimit(2);
-      testBigFactory();
+      testTransferline__1();
       fail("Expected overflow not caught!");
     } catch (final OverflowException exception) {
       // O.K.

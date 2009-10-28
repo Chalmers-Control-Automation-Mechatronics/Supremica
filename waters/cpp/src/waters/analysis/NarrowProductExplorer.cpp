@@ -64,6 +64,7 @@ NarrowProductExplorer(const jni::ProductDESProxyFactoryGlue& factory,
     mNumPlants(0),
     mEventRecords(0),
     mTransitionTables(0),
+    mTransitionTablesReversed(false),
     mIterator(0),
     mNondetIterator(0),
     mCurrentAutomata(0),
@@ -185,6 +186,7 @@ setup()
   }
 
   // Collect transitions ...
+  mTransitionTablesReversed = false;
   mTransitionTables =
     (NarrowTransitionTable*) new char[numaut * sizeof(NarrowTransitionTable)];
   for (uint32 a = 0; a < numaut; a++) {
@@ -430,6 +432,7 @@ expandNonblockingReachabilityState(uint32 source,
   const uint32 numaut = getNumberOfAutomata();
   const uint32 TAG = NarrowTransitionTable::TAG_END_OF_LIST;
   uint32 minevent = UNDEF_UINT32;
+  setConflictKind(jni::ConflictKind_DEADLOCK);
   if (getTransitionLimit() > 0) {
 #   define ADD_TRANSITION addCoreachabilityTransition
     EXPAND(source, sourcetuple, minevent, numaut, TAG);
@@ -471,11 +474,14 @@ expandNonblockingCoreachabilityState(const uint32* targettuple,
 void NarrowProductExplorer::
 setupReverseTransitionRelations()
 {
-  const uint32 numaut = getNumberOfAutomata();
-  for (uint32 a = 0; a < numaut; a++) {
-    //mTransitionTables[a].dump(a, mEventRecords);
-    mTransitionTables[a].reverse(mEventRecords);
-    //mTransitionTables[a].dump(a, mEventRecords);
+  if (!mTransitionTablesReversed) {
+    const uint32 numaut = getNumberOfAutomata();
+    for (uint32 a = 0; a < numaut; a++) {
+      //mTransitionTables[a].dump(a, mEventRecords);
+      mTransitionTables[a].reverse(mEventRecords);
+      //mTransitionTables[a].dump(a, mEventRecords);
+    }
+    mTransitionTablesReversed = true;
   }
 }
 

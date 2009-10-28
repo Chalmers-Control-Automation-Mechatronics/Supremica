@@ -453,6 +453,7 @@ setupSafety()
   setupCompactEventList(eventmap);
 }
 
+
 void BroadProductExplorer::
 setupNonblocking()
 {
@@ -466,9 +467,7 @@ setupNonblocking()
   setupEventMap(eventmap);
 
   // Collect transitions ...
-  const jni::EventGlue& marking = getMarking();
   const int numaut = getNumberOfAutomata();
-  bool allmarked = true;
   for (int a = 0; a < numaut; a++) {
     AutomatonRecord* aut = getAutomatonEncoding().getRecord(a);
     const jni::AutomatonGlue& autglue = aut->getJavaAutomaton();
@@ -479,7 +478,6 @@ setupNonblocking()
     setupTransitions(aut, autglue, eventmap);
     const jni::SetGlue& events = autglue.getEventsGlue(cache);
     const jni::IteratorGlue& eventiter = events.iteratorGlue(cache);
-    bool usemarking = false;
     while (eventiter.hasNext()) {
       jobject javaobject = eventiter.next();
       jni::EventGlue event(javaobject, cache);
@@ -489,37 +487,18 @@ setupNonblocking()
         {
           BroadEventRecord* eventrecord = eventmap.get(&event);
           eventrecord->normalize(aut);
+          break;
         }
-        break;
-      case jni::EventKind_PROPOSITION:
-        if (!usemarking) {
-          usemarking = event.isSameObject(marking, cache);
-        }
-        break;
       default:
         break;
       }
     }
-    if (!usemarking) {
-      aut->setAllMarked();
-    } else if (aut->getNumberOfMarkedStates() == 0) {
-      // we are blocking --- if there is an initial state ...
-      setTraceState(0);
-      setTrivial();
-      allmarked = false;
-    } else {
-      allmarked &= aut->isAllMarked();
-    }
   }
-  if (allmarked) {
-    setTrivial();
-    return;
-  }
-  getAutomatonEncoding().setupMarkingTest();
 
   // Establish compact event list ...
   setupCompactEventList(eventmap);
 }
+
 
 void BroadProductExplorer::
 setupEventMap(HashTable<const jni::EventGlue*,BroadEventRecord*>& eventmap)
@@ -547,6 +526,7 @@ setupEventMap(HashTable<const jni::EventGlue*,BroadEventRecord*>& eventmap)
     eventmap.add(record);
   }
 }
+
 
 void BroadProductExplorer::
 setupTransitions
@@ -590,6 +570,7 @@ setupTransitions
   }
   aut->deleteStateMap(statemap);
 }
+
 
 void BroadProductExplorer::
 setupCompactEventList

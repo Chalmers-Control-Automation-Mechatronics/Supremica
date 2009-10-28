@@ -584,6 +584,11 @@ public class Projection2
       mMap = new HashMap<IntArray, StateProxy>(num);
     }
     
+    public int size()
+    {
+      return mMap.size();
+    }
+
     public Set<Map.Entry<int[],StateProxy>> entrySet()
     {
       return null; // I don't think i'll be using this method so meh
@@ -599,12 +604,7 @@ public class Projection2
     {
       return mMap.get(new IntArray(a));
     }
-    
-    public StateProxy put(Object o, StateProxy s)
-    {
-      return mMap.put(new IntArray((int[])o), s);
-    }
-    
+
     public StateProxy put(int[] a, StateProxy s)
     {
       return mMap.put(new IntArray(a), s);

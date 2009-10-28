@@ -241,7 +241,6 @@ public class ProjectingSafetyVerifier
   public boolean run()
     throws AnalysisException
   {
-    System.out.println(getModel().getName());
     Set<AutomatonProxy> plants = new HashSet<AutomatonProxy>();
     final Set<AutomatonProxy> specs = new HashSet<AutomatonProxy>();
     final Set<AutomatonProxy> origspecs = new HashSet<AutomatonProxy>();
@@ -598,7 +597,6 @@ public class ProjectingSafetyVerifier
             CertainDeath con = new CertainDeath(tr); con.run();
             minAutomaton = tr.getAutomaton(getFactory());
             states -= tr.getAutomaton(getFactory()).getStates().size();
-            System.out.println(states);
           }
           mStates += minAutomaton.getStates().size();
           mMinAutMap.put(ah, minAutomaton);

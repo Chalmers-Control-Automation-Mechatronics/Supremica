@@ -101,10 +101,13 @@ AutomatonRecord(const jni::AutomatonGlue& aut,
   mNumStates = states.size();
   mNumBits = log2(mNumStates);
   mJavaStates = (jni::StateGlue*) malloc(mNumStates * sizeof(jni::StateGlue));
+  const jni::CollectionGlue events = aut.getEventsGlue(cache);
   if (omega.isNull()) {
-    initNonMarking(cache);
-  } else {
+    initNonMarking(cache, false);
+  } else if (events.contains(&omega)) {
     initMarking(omega, cache);
+  } else {
+    initNonMarking(cache, true);
   }
 }
 
@@ -231,7 +234,7 @@ deleteStateMap(HashTable<const jni::StateGlue*,uint32>* statemap)
 //# AutomatonRecord: Auxiliary Methods
 
 void AutomatonRecord::
-initNonMarking(jni::ClassCache* cache)
+initNonMarking(jni::ClassCache* cache, bool allmarked)
 {
   const jni::SetGlue states = mJavaAutomaton.getStatesGlue(cache);
   const jni::IteratorGlue iter = states.iteratorGlue(cache);
@@ -250,7 +253,7 @@ initNonMarking(jni::ClassCache* cache)
   }
   mFirstInitialState = 0;
   mEndInitialStates = nextinit;
-  mFirstMarkedState = mNumStates;
+  mFirstMarkedState = allmarked ? 0 : mNumStates;
 }
 
 void AutomatonRecord::
@@ -344,9 +347,12 @@ AutomatonEncoding(const jni::ProductDESGlue& des,
                   jni::ClassCache* cache,
                   int numtags)
   : mNumTags(numtags),
+    mIsAllMarked(true),
+    mIsTriviallyBlocking(false),
     mMarkingTestRecords(0),
     mNumMarkingTestRecords(0)
 {
+  bool hasinit = true;
   int totalbits = numtags;
   int a, w;
 
@@ -373,7 +379,11 @@ AutomatonEncoding(const jni::ProductDESGlue& des,
     AutomatonRecord* record = new AutomatonRecord(aut, plant, omega, cache);
     totalbits += record->getNumberOfBits();
     records[a++] = record;
+    hasinit &= record->getNumberOfInitialStates() > 0;
+    mIsAllMarked &= record->isAllMarked();
+    mIsTriviallyBlocking |= record->getNumberOfMarkedStates() == 0;
   }
+  mIsTriviallyBlocking &= hasinit;
   mNumRecords = a;
 
   // sort records ...
@@ -421,6 +431,11 @@ AutomatonEncoding(const jni::ProductDESGlue& des,
     const int index = used[w]++;
     mAutomatonRecords[index] = record;
     record->setAutomatonIndex(index);
+  }
+
+  // setup marking test ...
+  if (!omega.isNull()) {
+    setupMarkingTest();
   }
 
   // clean up ...
@@ -553,31 +568,6 @@ shift(uint32* decoded)
 
 //############################################################################
 //# AutomatonEncoding: Marking
-
-void AutomatonEncoding::
-setupMarkingTest()
-{
-  if (mMarkingTestRecords == 0) {
-    int a;
-    for (a = 0; a < mNumRecords; a++) {
-      AutomatonRecord* record = mAutomatonRecords[a];
-      if (!record->isAllMarked()) {
-        mNumMarkingTestRecords++;
-      }
-    }
-    mMarkingTestRecords =
-      new const AutomatonRecord*[mNumMarkingTestRecords];
-    mNumMarkingTestRecords = 0;
-    for (a = 0; a < mNumRecords; a++) {
-      const AutomatonRecord* record = mAutomatonRecords[a];
-      if (!record->isAllMarked()) {
-        mMarkingTestRecords[mNumMarkingTestRecords++] = record;
-      }
-    }
-    qsort(mMarkingTestRecords, mNumMarkingTestRecords,
-          sizeof(AutomatonRecord*), AutomatonRecord::compareByMarking);
-  }
-}
 
 bool AutomatonEncoding::
 isMarkedStateTuplePacked(const uint32* encoded)
@@ -726,6 +716,36 @@ dumpDecodedState(const uint32* decoded)
 }
 
 #endif /* DEBUG */
+
+
+//############################################################################
+//# AutomatonEncoding: Auxiliary Methods
+
+void AutomatonEncoding::
+setupMarkingTest()
+{
+  if (mMarkingTestRecords == 0) {
+    int a;
+    for (a = 0; a < mNumRecords; a++) {
+      AutomatonRecord* record = mAutomatonRecords[a];
+      if (!record->isAllMarked()) {
+        mNumMarkingTestRecords++;
+      }
+    }
+    mMarkingTestRecords =
+      new const AutomatonRecord*[mNumMarkingTestRecords];
+    mNumMarkingTestRecords = 0;
+    for (a = 0; a < mNumRecords; a++) {
+      const AutomatonRecord* record = mAutomatonRecords[a];
+      if (!record->isAllMarked()) {
+        mMarkingTestRecords[mNumMarkingTestRecords++] = record;
+      }
+    }
+    qsort(mMarkingTestRecords, mNumMarkingTestRecords,
+          sizeof(AutomatonRecord*), AutomatonRecord::compareByMarking);
+  }
+}
+
 
 }  /* namespace waters */
 

@@ -733,6 +733,22 @@ public abstract class AbstractConflictCheckerTest
     runModelVerifier(group, dir, name, false);
   }
 
+  public void testWspTimer() throws Exception
+  {
+    final String group = "valid";
+    final String dir  = "central_locking";
+    final String name = "wsp_timer.wmod";
+    runModelVerifier(group, dir, name, false);
+  }
+
+  public void testWspTimerNoreset() throws Exception
+  {
+    final String group = "valid";
+    final String dir  = "central_locking";
+    final String name = "wsp_timer_noreset.wmod";
+    runModelVerifier(group, dir, name, true);
+  }
+
   public void testSafetydisplay() throws Exception
   {
     final String group = "valid";

@@ -2,7 +2,7 @@
 //###########################################################################
 //# PROJECT: Waters
 //# PACKAGE: net.sourceforge.waters.cpp.analysis
-//# CLASS:   NativeStoringConflictCheckerTest
+//# CLASS:   NativeBroadNonStoringConflictCheckerTest
 //###########################################################################
 //# $Id$
 //###########################################################################
@@ -12,12 +12,13 @@ package net.sourceforge.waters.cpp.analysis;
 import junit.framework.Test;
 import junit.framework.TestSuite;
 
+import net.sourceforge.waters.cpp.analysis.ExplorerMode;
 import net.sourceforge.waters.model.analysis.AbstractConflictCheckerTest;
 import net.sourceforge.waters.model.analysis.ConflictChecker;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 
 
-public class NativeStoringConflictCheckerTest
+public class NativeBroadNonStoringConflictCheckerTest
   extends AbstractConflictCheckerTest
 {
 
@@ -26,7 +27,7 @@ public class NativeStoringConflictCheckerTest
   public static Test suite()
   {
     final TestSuite suite =
-      new TestSuite(NativeStoringConflictCheckerTest.class);
+      new TestSuite(NativeBroadNonStoringConflictCheckerTest.class);
     return suite;
   }
 
@@ -42,7 +43,10 @@ public class NativeStoringConflictCheckerTest
   protected ConflictChecker
     createModelVerifier(final ProductDESProxyFactory factory)
   {
-    return new NativeConflictChecker(factory);
+    final NativeConflictChecker checker = new NativeConflictChecker(factory);
+    checker.setExplorerMode(ExplorerMode.BROAD);
+    checker.setTransitionLimit(0);
+    return checker;
   }
 
 }

@@ -91,7 +91,6 @@ public:
   inline bool isMarkedState(uint32 code) const
     {return code >= mFirstMarkedState;}
   inline bool isAllMarked() const {return mFirstMarkedState == 0;}
-  inline void setAllMarked() {mFirstMarkedState = 0;}
   inline int getNumberOfBits() const {return mNumBits;}
   inline int getAutomatonIndex() const {return mAutomatonIndex;}
   inline int getWordIndex() const {return mWordIndex;}
@@ -126,7 +125,7 @@ public:
 private:
   //##########################################################################
   //# Auxiliary Methods
-  void initNonMarking(jni::ClassCache* cache);
+  void initNonMarking(jni::ClassCache* cache, bool allmarked);
   void initMarking(const jni::EventGlue& omega, jni::ClassCache* cache);
   static int getCategory(const jni::StateGlue& state,
 			 const jni::EventGlue& omega,
@@ -197,7 +196,8 @@ public:
 
   //##########################################################################
   //# Marking
-  void setupMarkingTest();
+  bool isAllMarked() const {return mIsAllMarked;}
+  bool isTriviallyBlocking() const {return mIsTriviallyBlocking;}
   bool isMarkedStateTuplePacked(const uint32* encoded) const;
   bool isMarkedStateTuple(const uint32* decoded) const;
 
@@ -240,12 +240,18 @@ public:
 
 private:
   //##########################################################################
+  //# Auxiliary Methods
+  void setupMarkingTest();
+
+  //##########################################################################
   //# Data Members
   AutomatonRecord** mAutomatonRecords;
   int mNumTags;
   int mNumRecords;
   int mNumWords;
   int* mWordStop;
+  bool mIsAllMarked;
+  bool mIsTriviallyBlocking;
   const AutomatonRecord** mMarkingTestRecords;
   int mNumMarkingTestRecords;
 };
