@@ -21,6 +21,7 @@ import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.base.ProxyTools;
 import net.sourceforge.waters.model.base.ProxyVisitor;
 import net.sourceforge.waters.model.base.VisitorException;
+import net.sourceforge.waters.model.module.BoxGeometryProxy;
 import net.sourceforge.waters.model.module.EdgeProxy;
 import net.sourceforge.waters.model.module.GraphProxy;
 import net.sourceforge.waters.model.module.LabelBlockProxy;
@@ -48,11 +49,13 @@ public final class GraphElement
    * @param blockedEvents The list of blocked events of the new graph, or <CODE>null</CODE>.
    * @param nodes The set of nodes of the new graph, or <CODE>null</CODE> if empty.
    * @param edges The collection of edges of the new graph, or <CODE>null</CODE> if empty.
+   * @param geometry The geometric information of the new graph, or <CODE>null</CODE>.
    */
   public GraphElement(final boolean deterministic,
                       final LabelBlockProxy blockedEvents,
                       final Collection<? extends NodeProxy> nodes,
-                      final Collection<? extends EdgeProxy> edges)
+                      final Collection<? extends EdgeProxy> edges,
+                      final BoxGeometryProxy geometry)
   {
     mIsDeterministic = deterministic;
     mBlockedEvents = blockedEvents;
@@ -72,6 +75,7 @@ public final class GraphElement
       mEdges =
         Collections.unmodifiableCollection(edgesModifiable);
     }
+    mGeometry = geometry;
   }
 
   /**
@@ -79,12 +83,14 @@ public final class GraphElement
    * This constructor creates a graph with
    * the determinism status set to <CODE>true</CODE>,
    * the list of blocked events set to <CODE>null</CODE>,
-   * an empty set of nodes, and
-   * an empty collection of edges.
+   * an empty set of nodes,
+   * an empty collection of edges, and
+   * the geometric information set to <CODE>null</CODE>.
    */
   public GraphElement()
   {
     this(true,
+         null,
          null,
          null,
          null);
@@ -132,7 +138,8 @@ public final class GraphElement
         ProxyTools.isEqualSetWithGeometry
           (mNodes, downcast.getNodes()) &&
         ProxyTools.isEqualCollectionWithGeometry
-          (mEdges, downcast.getEdges());
+          (mEdges, downcast.getEdges()) &&
+        ProxyTools.equalsWithGeometry(mGeometry, downcast.getGeometry());
     } else {
       return false;
     }
@@ -167,6 +174,8 @@ public final class GraphElement
     result += ProxyTools.getSetHashCodeWithGeometry(mNodes);
     result *= 5;
     result += ProxyTools.getCollectionHashCodeWithGeometry(mEdges);
+    result *= 5;
+    result += ProxyTools.hashCodeWithGeometry(mGeometry);
     return result;
   }
 
@@ -203,6 +212,11 @@ public final class GraphElement
     return mEdges;
   }
 
+  public BoxGeometryProxy getGeometry()
+  {
+    return mGeometry;
+  }
+
 
   //#########################################################################
   //# Data Members
@@ -210,10 +224,11 @@ public final class GraphElement
   private final LabelBlockProxy mBlockedEvents;
   private final Set<NodeProxy> mNodes;
   private final Collection<EdgeProxy> mEdges;
+  private final BoxGeometryProxy mGeometry;
 
 
   //#########################################################################
   //# Class Constants
-  private static final long serialVersionUID = 2791138918150034103L;
+  private static final long serialVersionUID = -7726237518484164593L;
 
 }

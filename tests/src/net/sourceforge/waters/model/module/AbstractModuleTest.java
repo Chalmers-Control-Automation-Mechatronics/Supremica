@@ -323,7 +323,7 @@ public abstract class AbstractModuleTest extends AbstractJAXBTest<ModuleProxy>
     final List<SimpleNodeProxy> nodes = Collections.singletonList(node);
     final List<EdgeProxy> edges = Collections.singletonList(edge);
     final GraphProxy graph =
-      factory.createGraphProxy(true, null, nodes, edges);
+      factory.createGraphProxy(true, null, nodes, edges, null);
     final IdentifierProxy compident =
       factory.createSimpleIdentifierProxy(compname);
     final SimpleComponentProxy comp =
@@ -359,7 +359,7 @@ public abstract class AbstractModuleTest extends AbstractJAXBTest<ModuleProxy>
                                     pointgeo, arrowgeo, null);
     final List<SimpleNodeProxy> nodes = Collections.singletonList(node);
     final GraphProxy graph =
-      factory.createGraphProxy(true, null, nodes, null);
+      factory.createGraphProxy(true, null, nodes, null, null);
     final IdentifierProxy compident =
       factory.createSimpleIdentifierProxy(compname);
     final SimpleComponentProxy comp =
@@ -420,7 +420,7 @@ public abstract class AbstractModuleTest extends AbstractJAXBTest<ModuleProxy>
     nodes.add(group);
     final List<EdgeProxy> edges = Collections.singletonList(edge);
     final GraphProxy graph =
-      factory.createGraphProxy(true, null, nodes, edges);
+      factory.createGraphProxy(true, null, nodes, edges, null);
     final IdentifierProxy compident =
       factory.createSimpleIdentifierProxy(compname);
     final SimpleComponentProxy comp =
@@ -470,7 +470,7 @@ public abstract class AbstractModuleTest extends AbstractJAXBTest<ModuleProxy>
     nodes.add(group);
     final List<EdgeProxy> edges = Collections.singletonList(edge);
     final GraphProxy graph =
-      factory.createGraphProxy(true, null, nodes, edges);
+      factory.createGraphProxy(true, null, nodes, edges, null);
     final IdentifierProxy compident =
       factory.createSimpleIdentifierProxy(compname);
     final SimpleComponentProxy comp =

@@ -292,7 +292,7 @@ public class SimpleComponentEditorDialog
       final boolean deterministic = mDeterministicButton.isSelected();
       if (mComponent == null) {
         final GraphSubject graph =
-          new GraphSubject(deterministic, null, null, null);
+          new GraphSubject(deterministic, null, null, null, null);
         final SimpleComponentSubject template =
           new SimpleComponentSubject(ident, kind, graph);
         final SelectionOwner panel = mRoot.getComponentsPanel();

@@ -36,8 +36,8 @@ package net.sourceforge.waters.model.module;
  * @author Robi Malik
  */
 
-public interface GroupNodeProxy extends NodeProxy {
-
+public interface GroupNodeProxy extends NodeProxy
+{
 
   //#########################################################################
   //# Getters and Setters

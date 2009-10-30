@@ -36,6 +36,7 @@ import net.sourceforge.waters.model.base.ProxyTools;
 import net.sourceforge.waters.model.base.ProxyVisitor;
 import net.sourceforge.waters.model.base.VisitorException;
 import net.sourceforge.waters.model.module.AbstractModuleProxyVisitor;
+import net.sourceforge.waters.model.module.BoxGeometryProxy;
 import net.sourceforge.waters.model.module.EdgeProxy;
 import net.sourceforge.waters.model.module.GraphProxy;
 import net.sourceforge.waters.model.module.GroupNodeProxy;
@@ -185,6 +186,11 @@ class EditorGraph
   public boolean isDeterministic()
   {
     return mGraph.isDeterministic();
+  }
+
+  public BoxGeometryProxy getGeometry()
+  {
+    return mGraph.getGeometry();
   }
 
 

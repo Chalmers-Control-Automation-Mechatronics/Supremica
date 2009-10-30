@@ -801,6 +801,12 @@ public class JAXBModuleExporter
       mGraphNodeListHandler.toJAXB(this, mGraphNodeList, element);
       final Collection<EdgeProxy> edgesProxy = proxy.getEdges();
       mGraphEdgeListHandler.toJAXB(this, edgesProxy, element);
+      final BoxGeometryProxy geometryProxy = proxy.getGeometry();
+      if (geometryProxy != null) {
+        final BoxGeometry geometryElement =
+          visitBoxGeometryProxy(geometryProxy);
+        element.setBoxGeometry(geometryElement);
+      }
     } finally {
       mGraphNodeList = null;
     }

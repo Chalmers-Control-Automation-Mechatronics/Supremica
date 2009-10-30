@@ -333,10 +333,14 @@ public class ModuleProxyCloner
       final Collection<NodeProxy> nodes = lookupNodeProxyCollection(nodes0);
       final Collection<EdgeProxy> edges0 = proxy.getEdges();
       final Collection<EdgeProxy> edges = cloneProxyCollection(edges0);
+      final BoxGeometryProxy geometry0 = proxy.getGeometry();
+      final BoxGeometryProxy geometry =
+        geometry0 == null ? null : visitBoxGeometryProxy(geometry0);
       return mFactory.createGraphProxy(deterministic,
                                        blockedEvents,
                                        nodes,
-                                       edges);
+                                       edges,
+                                       geometry);
     } finally {
       mNodeMap = null;
     }

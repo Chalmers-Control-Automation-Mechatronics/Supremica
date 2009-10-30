@@ -443,6 +443,7 @@
           </xs:element>
           <xs:element ref="M:NodeList" minOccurs="0"/>
           <xs:element ref="M:EdgeList" minOccurs="0"/>
+          <xs:element ref="M:BoxGeometry" minOccurs="0"/>
         </xs:sequence>
         <xs:attribute name="Deterministic" type="xs:boolean" default="true"/>
       </xs:extension>

@@ -1087,7 +1087,9 @@ public class AutomataSynchronizerHelper
         final LabelBlockProxy blockedblock = blockedlabels.isEmpty() ? null : mFactory.createLabelBlockProxy(blockedlabels, null);
         final Collection<SimpleNodeProxy> nodes = mCurrentNodeMap.values();
         boolean deterministic = true;
-        final GraphProxy graph = mFactory.createGraphProxy(deterministic, blockedblock, nodes, mEdges);
+        final GraphProxy graph =
+	  mFactory.createGraphProxy(deterministic, blockedblock,
+				    nodes, mEdges, null);
         String name = "Synchronized Automaton";
         final SimpleIdentifierProxy ident = mFactory.createSimpleIdentifierProxy(name);
 

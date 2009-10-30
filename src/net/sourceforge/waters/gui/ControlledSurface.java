@@ -4266,7 +4266,7 @@ public class ControlledSurface
         }
       }
       final GraphProxy graph = new GraphElement
-        (false, mTransferredBlock, mTransferredNodes, mTransferredEdges);
+        (false, mTransferredBlock, mTransferredNodes, mTransferredEdges, null);
       final ProxyTransferable transferable = new GraphTransferable(graph);
       mTransferredBlock = null;
       mTransferredNodes = null;

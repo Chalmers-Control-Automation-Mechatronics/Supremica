@@ -217,7 +217,7 @@ public class MazeCompiler implements ProxyUnmarshaller<ModuleProxy>
     final LabelBlockProxy labelBlock =
       mFactory.createLabelBlockProxy(blocked, null);
     final GraphProxy graph =
-      mFactory.createGraphProxy(true, labelBlock, nodes, null);
+      mFactory.createGraphProxy(true, labelBlock, nodes, null, null);
     return mFactory.createSimpleComponentProxy(ident, kind, graph);
   }
 

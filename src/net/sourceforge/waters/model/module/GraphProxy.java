@@ -21,8 +21,8 @@ import net.sourceforge.waters.model.base.Proxy;
  * @author Robi Malik
  */
 
-public interface GraphProxy extends Proxy {
-
+public interface GraphProxy extends Proxy
+{
 
   //#########################################################################
   //# Getters and Setters
@@ -65,5 +65,14 @@ public interface GraphProxy extends Proxy {
    * this method may or may not contain duplicate entries.
    */
   public Collection<EdgeProxy> getEdges();
+
+  /**
+   * Gets the geometric information for this graph.
+   * The geometry of a graph defines its position and size in a larger
+   * display, such as a simulator that shows multiple graphs simultaneously.
+   * @return A {@link BoxGeometryProxy} identifying the position and size
+   *         of the graph, or <CODE>null</CODE>
+   */
+  public BoxGeometryProxy getGeometry();
 
 }
